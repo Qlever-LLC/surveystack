@@ -9,7 +9,7 @@ export default {
 </script>
 
 <style>
-@import('../assets/vars.css');
+/* @import('../assets/vars.css'); */
 
 :root {
   /* --bg-color: rebeccapurple; */
