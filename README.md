@@ -1,34 +1,27 @@
-# oursci-pwa-test2
+# Our-Sci PWA
 
-## Project setup
-```
-yarn install
-```
+Our-Sci PWA is a Progressive Web App (PWA) for creating and collecting surveys.
 
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
+## Coding guidelines
 
-### Compiles and minifies for production
-```
-yarn build
-```
+Our-Sci PWA adheres to airbnb coding style guidelines. For development, we recommend using Visual Studio Code with the following workspace settings under `.vscode/settings.json`:
 
-### Run your unit tests
 ```
-yarn test:unit
-```
-
-### Run your end-to-end tests
-```
-yarn test:e2e
+{
+    "prettier.requireConfig": true,
+    "eslint.run": "onType",
+    "eslint.autoFixOnSave": true,
+    "eslint.validate": [
+        {
+            "language": "vue",
+            "autoFix": true
+        },
+    ],
+}
 ```
 
-### Lints and fixes files
-```
-yarn lint
-```
+> **NOTE:** This settings file is not commited to git, so feel free to customize.
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+The above config disables prettier (if installed) as we do not use a .prettierrc config file. Otherwise prettier and eslint keep battling each other... There may be a better approach, but for now this will do.
+
+Furthermore, we recommend using the [Vetur](https://vuejs.github.io/vetur) extension for Visual Studio Code.
