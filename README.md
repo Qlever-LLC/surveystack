@@ -12,6 +12,7 @@ Our-Sci PWA adheres to airbnb coding style guidelines. For development, we recom
     "eslint.run": "onType",
     "eslint.autoFixOnSave": true,
     "eslint.validate": [
+        "javascript",
         {
             "language": "vue",
             "autoFix": true

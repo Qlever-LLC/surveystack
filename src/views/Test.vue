@@ -1,14 +1,12 @@
 <template>
   <div>
     <h2>Hello</h2>
-    <input v-model="message" @keyup.enter="addFeedback(message)" /><button
-      @click="addFeedback(message)"
-    >
-      ADD
-    </button>
+    <input v-model="message" @keyup.enter="addFeedback(message)" />
+    <button @click="addFeedback(message)">ADD</button>
     <ul v-if="hasFeedback">
       <li v-for="(msg, idx) in feedback" :key="idx">
-        {{ msg }}<button @click="removeFeedback(idx)">x</button>
+        {{ msg }}
+        <button @click="removeFeedback(idx)">x</button>
       </li>
     </ul>
     <button v-if="hasFeedback" @click="clearAllFeedback">CLEAR ALL</button>
@@ -46,11 +44,7 @@ export default {
 </script>
 
 <style>
-<<<<<<< HEAD
-/* @import('../assets/vars.css'); */
-=======
-@import ('../assets/vars.css');
->>>>>>> b8de28def58b10c96597c2cd65ac58c8cb35df09
+@import ("../assets/vars.css");
 
 :root {
   /* --bg-color: rebeccapurple; */

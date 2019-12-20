@@ -6,14 +6,6 @@ import modules from './modules';
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-<<<<<<< HEAD
-  state: {},
-  mutations: {},
-  actions: {
-
-  },
-  modules: {},
-=======
   modules,
   state: {},
   actions: {
@@ -23,5 +15,4 @@ export default new Vuex.Store({
     },
   },
   mutations: {},
->>>>>>> b8de28def58b10c96597c2cd65ac58c8cb35df09
 });
