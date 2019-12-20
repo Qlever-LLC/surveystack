@@ -1,24 +1,27 @@
 <template>
   <div id="app">
     <Header />
-    <router-view/>
+    <app-feedback />
+    <router-view />
     <!-- <Footer /> -->
   </div>
 </template>
 
 <script>
 import Header from '@/components/Header.vue';
+import appFeedback from '@/components/Feedback.vue';
 
 export default {
   components: {
     Header,
+    appFeedback,
   },
 };
 </script>
 
 <style lang="scss">
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;

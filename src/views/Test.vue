@@ -1,15 +1,8 @@
 <template>
   <div>
-    <h2>Hello</h2>
+    <h2>Hello</h2>Add Feedback to store
     <input v-model="message" @keyup.enter="addFeedback(message)" />
     <button @click="addFeedback(message)">ADD</button>
-    <ul v-if="hasFeedback">
-      <li v-for="(msg, idx) in feedback" :key="idx">
-        {{ msg }}
-        <button @click="removeFeedback(idx)">x</button>
-      </li>
-    </ul>
-    <button v-if="hasFeedback" @click="clearAllFeedback">CLEAR ALL</button>
   </div>
 </template>
 
@@ -24,20 +17,6 @@ export default {
     addFeedback(message) {
       this.$store.dispatch('feedback/add', message);
       this.message = '';
-    },
-    removeFeedback(idx) {
-      this.$store.dispatch('feedback/remove', idx);
-    },
-    clearAllFeedback() {
-      this.$store.dispatch('feedback/reset');
-    },
-  },
-  computed: {
-    feedback() {
-      return this.$store.state.feedback.items;
-    },
-    hasFeedback() {
-      return this.$store.getters['feedback/hasFeedback'];
     },
   },
 };
