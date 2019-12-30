@@ -14,7 +14,7 @@ import apiRoutes from './api/routes';
 const PATH_PREFIX = process.env.PATH_PREFIX;
 
 const app = express();
-const frontend = express.static('../client/dist');
+const frontend = express.static('../our-sci-pwa/dist');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
