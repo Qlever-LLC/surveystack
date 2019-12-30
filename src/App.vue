@@ -1,43 +1,20 @@
 <template>
-  <div id="app">
-    <Header />
-    <app-feedback />
-    <router-view />
-    <!-- <Footer /> -->
-  </div>
+  <v-app>
+    <app-navbar />
+
+    <v-content>
+      <router-view></router-view>
+    </v-content>
+  </v-app>
 </template>
 
 <script>
-import Header from '@/components/Header.vue';
-import appFeedback from '@/components/Feedback.vue';
+import appNavbar from '@/components/Navbar.vue';
 
 export default {
+  name: 'App',
   components: {
-    Header,
-    appFeedback,
+    appNavbar,
   },
 };
 </script>
-
-<style lang="scss">
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
-</style>
