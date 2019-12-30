@@ -1,0 +1,53 @@
+import { Router } from 'express';
+
+import authController from '../controllers/authController';
+import groupController from '../controllers/groupController';
+import surveyController from '../controllers/surveyController';
+import submissionController from '../controllers/submissionController';
+import userController from '../controllers/userController';
+import debugController from '../controllers/debugController';
+
+import checkPermissions from '../handlers/checkPermissions';
+import { catchErrors } from '../handlers/errorHandlers';
+
+const router = Router();
+
+/** Auth */
+router.post('/auth/register', catchErrors(authController.register));
+router.post('/auth/login', catchErrors(authController.login));
+
+/** Debug */
+router.get('/debug', catchErrors(debugController.getDefault));
+router.get('/debug/throw-error', catchErrors(debugController.throwError));
+router.post('/debug/create-dummy-submissions', catchErrors(debugController.createDummySubmissions));
+
+/** Group */
+router.get('/groups', catchErrors(groupController.getGroups));
+router.get('/groups/by-path*', catchErrors(groupController.getGroupByPath));
+router.get('/groups/:id', catchErrors(groupController.getGroupById));
+router.post('/groups', catchErrors(groupController.createGroup));
+router.put('/groups/:id', catchErrors(groupController.updateGroup));
+router.delete('/groups/:id', catchErrors(groupController.deleteGroup));
+
+/** Submissions */
+router.get('/submissions', catchErrors(submissionController.getSubmissions));
+router.get('/submissions/:id', catchErrors(submissionController.getSubmission));
+router.post('/submissions', catchErrors(submissionController.createSubmission));
+router.put('/submissions/:id', catchErrors(submissionController.updateSubmission));
+router.delete('/submissions/:id', catchErrors(submissionController.deleteSubmission));
+
+/** Surveys */
+router.get('/surveys', catchErrors(surveyController.getSurveys));
+router.get('/surveys/:id', catchErrors(surveyController.getSurvey));
+router.post('/surveys', catchErrors(surveyController.createSurvey));
+router.put('/surveys/:id', catchErrors(surveyController.updateSurvey));
+router.delete('/surveys/:id', catchErrors(surveyController.deleteSurvey));
+
+/** Users */
+router.get('/users', catchErrors(userController.getUsers));
+router.get('/users/:id', catchErrors(userController.getUser));
+router.post('/users', catchErrors(userController.createUser));
+router.put('/users/:id', catchErrors(userController.updateUser));
+router.delete('/users/:id', catchErrors(userController.deleteUser));
+
+export default router;
