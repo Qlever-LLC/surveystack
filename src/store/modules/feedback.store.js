@@ -1,11 +1,11 @@
-const initialState = () => ({
-  items: []
+const createInitialState = () => ({
+  items: [],
 });
 
-const state = initialState();
+const initialState = createInitialState();
 
 const getters = {
-  hasFeedback: state => state.items.length > 0
+  hasFeedback: state => state.items.length > 0,
 };
 
 const actions = {
@@ -18,13 +18,13 @@ const actions = {
   },
   remove({ commit }, idx) {
     commit('remove', idx);
-  }
+  },
 };
 
 const mutations = {
   RESET(state) {
-    const newState = initialState();
-    Object.keys(newState).forEach(key => {
+    const newState = createInitialState();
+    Object.keys(newState).forEach((key) => {
       state[key] = newState[key];
     });
   },
@@ -33,13 +33,13 @@ const mutations = {
   },
   remove(state, idx) {
     state.items.splice(idx, 1);
-  }
+  },
 };
 
 export default {
   namespaced: true,
-  state,
+  state: initialState,
   getters,
   actions,
-  mutations
+  mutations,
 };
