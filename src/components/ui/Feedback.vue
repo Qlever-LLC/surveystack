@@ -1,17 +1,9 @@
 <template>
-  <div class="alert alert-dismissible fade show" :class="`alert-${type}`" role="alert">
+  <v-alert border="left" :type="type" role="alert">
     <strong class="mr-1">{{title}}</strong>
     <slot />
-    <button
-      type="button"
-      class="close"
-      data-dismiss="alert"
-      aria-label="Close"
-      @click="$emit('closed')"
-    >
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+    <v-icon class="float-right" @click="$emit('closed')">mdi-close-circle</v-icon>
+  </v-alert>
 </template>
 
 <script>
