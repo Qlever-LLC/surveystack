@@ -8,6 +8,9 @@ import BrowseSurveys from '@/views/surveys/Browse.vue';
 import CollectSurvey from '@/views/surveys/collect/_survey_id.vue';
 import DraftSurveyResult from '@/views/surveys/collect/drafts/_result_id.vue';
 
+import Login from '@/views/auth/Login.vue';
+import Register from '@/views/auth/Register.vue';
+
 Vue.use(VueRouter);
 
 const routes = [
@@ -48,6 +51,16 @@ const routes = [
     path: '/surveys/collect/drafts/:id',
     name: 'collect-survey-draft-result',
     component: DraftSurveyResult,
+  },
+  {
+    path: '/auth/login',
+    name: 'auth-login',
+    component: Login,
+  },
+  {
+    path: '/auth/register',
+    name: 'auth-register',
+    component: Register,
   },
 ];
 
