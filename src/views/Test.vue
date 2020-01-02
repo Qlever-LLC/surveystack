@@ -23,12 +23,13 @@ export default {
 </script>
 
 <style scoped>
+/* This works if style is not scoped! */
+
 :root {
   --bg-color: rebeccapurple;
 }
 
 h2 {
-  /* color: red !important; */
   color: var(--bg-color);
 }
 </style>
