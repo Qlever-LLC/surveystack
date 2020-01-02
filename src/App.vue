@@ -3,7 +3,7 @@
     <app-navbar />
 
     <v-content>
-      <router-view></router-view>
+      <router-view class="pa-3"></router-view>
     </v-content>
   </v-app>
 </template>
