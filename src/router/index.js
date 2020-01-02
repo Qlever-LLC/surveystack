@@ -10,6 +10,8 @@ import DraftSurveyResult from '@/views/surveys/collect/drafts/_result_id.vue';
 
 import Login from '@/views/auth/Login.vue';
 import Register from '@/views/auth/Register.vue';
+import Profile from '@/views/auth/Profile.vue';
+
 
 Vue.use(VueRouter);
 
@@ -61,6 +63,11 @@ const routes = [
     path: '/auth/register',
     name: 'auth-register',
     component: Register,
+  },
+  {
+    path: '/auth/profile',
+    name: 'auth-profile',
+    component: Profile,
   },
 ];
 

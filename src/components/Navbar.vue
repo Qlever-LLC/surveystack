@@ -6,9 +6,13 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn href="https://github.com/vuetifyjs/vuetify/releases/latest" target="_blank" text>
-        <span class="mr-2">Vuetify</span>
-        <v-icon>mdi-open-in-new</v-icon>
+      <v-btn v-if="$store.getters['auth/isLoggedIn']" :to="{name: 'auth-profile'}" text>
+        <v-icon>mdi-account</v-icon>
+      </v-btn>
+
+      <v-btn v-else :to="{name: 'auth-login'}" text>
+        <v-icon>mdi-login</v-icon>
+        <span class="ml-2">Login</span>
       </v-btn>
     </v-app-bar>
 
