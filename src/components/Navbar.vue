@@ -1,25 +1,25 @@
 <template>
   <nav>
-    <v-app-bar app dark color="primary">
+    <v-app-bar app light>
       <v-app-bar-nav-icon @click="drawer = !drawer" />
       <v-toolbar-title class="ml-2">Our-Sci</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
       <v-btn href="https://github.com/vuetifyjs/vuetify/releases/latest" target="_blank" text>
-        <span class="mr-2">Latest Release</span>
+        <span class="mr-2">Vuetify</span>
         <v-icon>mdi-open-in-new</v-icon>
       </v-btn>
     </v-app-bar>
 
-    <v-navigation-drawer v-model="drawer" app class="primary">
+    <v-navigation-drawer v-model="drawer" app>
       <v-list>
-        <v-list-item>
+        <v-list-item v-for="(link, idx) in links" :key="idx" :to="link.to">
           <v-list-item-icon>
-            <v-icon>mdi-heart</v-icon>
+            <v-icon>{{link.icon}}</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title>Dashboard</v-list-item-title>
+            <v-list-item-title>{{link.title}}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -32,6 +32,34 @@ export default {
   data() {
     return {
       drawer: false,
+      links: [
+        {
+          title: 'My Surveys',
+          to: { name: 'my-surveys' },
+          icon: 'mdi-clipboard',
+        },
+        {
+          title: 'Browse',
+          to: { name: 'browse-surveys' },
+          icon: 'mdi-magnify',
+        },
+        {
+          title: 'New Survey',
+          to: {
+            name: 'collect-survey',
+            params: { id: 'asdf' },
+          },
+          icon: 'mdi-newspaper-plus',
+        },
+        {
+          title: 'Draft Survey',
+          to: {
+            name: 'collect-survey-draft-result',
+            params: { id: 'asdf' },
+          },
+          icon: 'mdi-pencil-plus',
+        },
+      ],
     };
   },
 };

@@ -8,11 +8,12 @@ export default new Vuetify({
     options: {
       customProperties: true,
     },
+    light: true,
     themes: {
       light: {
-        primary: '#679F38',
+        primary: '#03A9F4',
         secondary: '#82AF9C',
-        accent: '#99AC3D',
+        accent: '#FF5722',
         error: '#f44336',
         warning: '#ffc107',
         info: '#82AF9C',
