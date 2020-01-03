@@ -7,7 +7,9 @@ import submissionController from '../controllers/submissionController';
 import userController from '../controllers/userController';
 import debugController from '../controllers/debugController';
 
-import checkPermissions from '../handlers/checkPermissions';
+//import { authenticated } from '../handlers/checkPermissions';
+import { assertAuthenticated, assertEntityExists, assertIdsMatch } from '../handlers/assertions';
+
 import { catchErrors } from '../handlers/errorHandlers';
 
 const router = Router();
@@ -18,6 +20,7 @@ router.post('/auth/login', catchErrors(authController.login));
 
 /** Debug */
 router.get('/debug', catchErrors(debugController.getDefault));
+router.get('/debug/authenticated', assertAuthenticated, catchErrors(debugController.getDefault));
 router.get('/debug/throw-error', catchErrors(debugController.throwError));
 router.post('/debug/create-dummy-submissions', catchErrors(debugController.createDummySubmissions));
 
@@ -25,9 +28,9 @@ router.post('/debug/create-dummy-submissions', catchErrors(debugController.creat
 router.get('/groups', catchErrors(groupController.getGroups));
 router.get('/groups/by-path*', catchErrors(groupController.getGroupByPath));
 router.get('/groups/:id', catchErrors(groupController.getGroupById));
-router.post('/groups', catchErrors(groupController.createGroup));
+router.post('/groups', assertAuthenticated, catchErrors(groupController.createGroup));
 router.put('/groups/:id', catchErrors(groupController.updateGroup));
-router.delete('/groups/:id', catchErrors(groupController.deleteGroup));
+router.delete('/groups/:id', assertAuthenticated, catchErrors(groupController.deleteGroup));
 
 /** Submissions */
 router.get('/submissions', catchErrors(submissionController.getSubmissions));
@@ -40,8 +43,16 @@ router.delete('/submissions/:id', catchErrors(submissionController.deleteSubmiss
 router.get('/surveys', catchErrors(surveyController.getSurveys));
 router.get('/surveys/:id', catchErrors(surveyController.getSurvey));
 router.post('/surveys', catchErrors(surveyController.createSurvey));
-router.put('/surveys/:id', catchErrors(surveyController.updateSurvey));
-router.delete('/surveys/:id', catchErrors(surveyController.deleteSurvey));
+router.put(
+  '/surveys/:id',
+  [assertAuthenticated, assertIdsMatch, assertEntityExists({ collection: 'surveys' })],
+  catchErrors(surveyController.updateSurvey)
+);
+router.delete(
+  '/surveys/:id',
+  [assertAuthenticated, assertEntityExists({ collection: 'surveys' })],
+  catchErrors(surveyController.deleteSurvey)
+);
 
 /** Users */
 router.get('/users', catchErrors(userController.getUsers));

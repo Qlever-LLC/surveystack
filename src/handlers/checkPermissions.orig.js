@@ -1,17 +1,10 @@
-import { ObjectId } from 'mongodb';
-import boom from '@hapi/boom';
-
 import canUser from '../helpers/canUser';
 import { catchErrors } from '../handlers/errorHandlers';
+import boom from '@hapi/boom';
 
 import { db } from '../models';
 
-export const checkPermissions = ({
-  permissions,
-  lastCheck = true,
-  owns = null,
-  getUserPermissions = null,
-}) =>
+module.exports = ({ permissions, lastCheck = true, owns = null, getUserPermissions = null }) =>
   catchErrors(async (req, res, next) => {
     if (req.authorized) {
       return next();
@@ -37,11 +30,3 @@ export const checkPermissions = ({
     }
     next();
   });
-
-export const authenticated = catchErrors(async (req, res, next) => {
-  console.log('inside authenticated');
-  if (res.locals.auth.isAuthenticated) return next();
-
-  console.log('boom.unauthorized!');
-  throw boom.unauthorized();
-});
