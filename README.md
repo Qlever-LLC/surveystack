@@ -40,4 +40,4 @@ Have a look at the official [documentation on application](https://vuetifyjs.com
 - [v-system-bar](https://vuetifyjs.com/components/system-bars)
 
 Basically, the following layout is used:
-![vuetify application layout](./src/assets/documentation/vuetify-app.webp)
+![vuetify application layout](./src/assets/documentation/vuetify-app.png)
