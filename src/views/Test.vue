@@ -1,8 +1,8 @@
 <template>
   <div>
-    <h2>Hello</h2>Add Feedback to store
-    <input v-model="message" @keyup.enter="addFeedback(message)" />
-    <button @click="addFeedback(message)">ADD</button>
+    <h2>Hi</h2>Add Feedback to store
+    <v-text-field v-model="message" @keyup.enter="addFeedback(message)" placeholder="Feedback..." />
+    <v-btn @click="addFeedback(message)">ADD</v-btn>
   </div>
 </template>
 
@@ -22,14 +22,14 @@ export default {
 };
 </script>
 
-<style>
-@import ("../assets/vars.css");
+<style scoped>
+/* This works if style is not scoped! */
 
 :root {
-  /* --bg-color: rebeccapurple; */
+  --bg-color: rebeccapurple;
 }
 
-body {
-  background-color: var(--bg-color);
+h2 {
+  color: var(--bg-color);
 }
 </style>

@@ -7,7 +7,7 @@
         <button @click="removeFeedback(idx)">x</button>
       </li>
     </ul>
-    <button v-if="hasFeedback" @click="clearAllFeedback">CLEAR ALL</button>
+    <v-btn v-if="hasFeedback" @click="clearAllFeedback">CLEAR ALL</v-btn>
   </div>
 </template>
 

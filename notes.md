@@ -1,5 +1,12 @@
 ## Routes
 
+### Auth Routes
+
+- Login page
+	/auth/login
+- Sign-up page
+	/auth/sign-up
+
 ### Account Routes
 
 - Invite view: 
@@ -9,10 +16,6 @@
 	/groups/:id/invites/new
 - View Invites
 	/groups/:group_id/invites
-- Sign up form page: 
-	/users/sign-up
-- Login page: 
-	/users/login
 - User Account page: 
 	/users/:account_id
 
