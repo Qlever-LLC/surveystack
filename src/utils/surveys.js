@@ -1,7 +1,7 @@
 import { unflatten } from 'flat';
 import _ from 'lodash';
 
-const survey = {
+export const mockSurvey = {
   _id: '5dadc4c9988f9df9527f07ac',
   name: 'Generations Survey',
   controls: [
@@ -146,7 +146,7 @@ const survey = {
   ],
 };
 
-const instance = {
+const mockInstance = {
   controls: [
     {
       name: 'hello',
@@ -208,12 +208,12 @@ function* processSurveyNamesFull(data, namespace = '') {
 
   for (let i = 0; i < data.length; i++) {
     const val = data[i];
-    yield `${namespace == '' ? '' : `${namespace}.`}${val.name}`;
+    yield `${namespace === '' ? '' : `${namespace}.`}${val.name}`;
 
     if (val.children) {
       yield* processSurveyNamesFull(
         val.children,
-        `${namespace == '' ? '' : `${namespace }.`}${val.name}`,
+        `${namespace === '' ? '' : `${namespace}.`}${val.name}`,
       );
     }
   }
@@ -242,14 +242,14 @@ function* processJsDoc(data, namespace = 'data') {
         type = 'any';
     }
 
-    yield `@param {${type}} ${namespace == '' ? namespace : `${namespace}.`}${
+    yield `@param {${type}} ${namespace === '' ? namespace : `${namespace}.`}${
       val.name
     }`;
 
     if (val.children) {
       yield* processJsDoc(
         val.children,
-        `${namespace == '' ? namespace : `${namespace }.`}${val.name}`,
+        `${namespace === '' ? namespace : `${namespace}.`}${val.name}`,
       );
     }
   }
@@ -280,13 +280,13 @@ function* processData(data, namespace = '') {
   for (let i = 0; i < data.length; i++) {
     const val = data[i];
     yield {
-      [`${namespace == '' ? '' : `${namespace }.`}${val.name}`]: val.value,
+      [`${namespace === '' ? '' : `${namespace}.`}${val.name}`]: val.value,
     };
 
     if (val.children) {
       yield* processData(
         val.children,
-        `${namespace == '' ? '' : `${namespace }.`}${val.name}`,
+        `${namespace === '' ? '' : `${namespace}.`}${val.name}`,
       );
     }
   }
@@ -392,7 +392,7 @@ function get(target, key) {
 }
 
 export function compileSandboxSingleLine(src) {
-  const wrappedSource = `with (sandbox) { return ${  src  }}`;
+  const wrappedSource = `with (sandbox) { return ${src}}`;
   const code = new Function('sandbox', wrappedSource);
 
   return function (sandbox) {
@@ -402,7 +402,7 @@ export function compileSandboxSingleLine(src) {
 }
 
 export function compileSandbox(src, fname) {
-  const wrappedSource = `with (sandbox) { ${  src  }\nreturn ${  fname  }(data); }`;
+  const wrappedSource = `with (sandbox) { ${src}\nreturn ${fname}(data); }`;
   const code = new Function('sandbox', wrappedSource);
 
   return function (sandbox) {
@@ -449,7 +449,7 @@ export const handleize = (str) => {
 // Use a class? or helper function in here?
 export const calculateControl = (control) => {
   if (!control.calculate || control.calculate === '') {
-    
+    // TODO
   }
 };
 
@@ -458,14 +458,14 @@ const DBG = false;
 if (DBG) {
   console.log();
   console.log('Processing instance:');
-  const instanceData = getInstanceData(instance);
+  const instanceData = getInstanceData(mockInstance);
   console.log(instanceData);
 }
 
 if (DBG) {
   console.log();
   console.log('Pocessing names:');
-  const it = processSurveyNames(survey.controls);
+  const it = processSurveyNames(mockSurvey.controls);
   let res = it.next();
   while (!res.done) {
     console.log(res.value);
@@ -476,7 +476,7 @@ if (DBG) {
 if (DBG) {
   console.log();
   console.log('Pocessing names full:');
-  const it = processSurveyNamesFull(survey.controls);
+  const it = processSurveyNamesFull(mockSurvey.controls);
   let res = it.next();
   while (!res.done) {
     console.log(res.value);
@@ -487,7 +487,7 @@ if (DBG) {
 if (DBG) {
   console.log();
   console.log('Processing positions:');
-  const it = processPositions(survey.controls);
+  const it = processPositions(mockSurvey.controls);
   let res = it.next();
   while (!res.done) {
     console.log(res.value);
@@ -498,7 +498,7 @@ if (DBG) {
 if (DBG) {
   console.log();
   console.log('Pocessing jsDoc:');
-  const it = processJsDoc(survey.controls);
+  const it = processJsDoc(mockSurvey.controls);
   let res = it.next();
   while (!res.done) {
     console.log(res.value);
