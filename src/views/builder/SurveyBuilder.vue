@@ -1,35 +1,37 @@
 <template>
-  <div class="row">
-    <div class="col-7">
-      <div class="d-flex justify-content-between align-items-center">
-        <h3>Survey Builder</h3>
-        <small v-if="!showCode">
-          <a @click.prevent="showCode = true" href="./view?showCode=true">view code</a>
-        </small>
-        <small v-else @click="showCode = false">
-          <a @click.prevent="showCode = true" href="./view?showCode=false">view graphical</a>
-        </small>
-      </div>
+  <v-container>
+    <v-row>
+      <v-col cols="7">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Survey Builder</h2>
+          <small v-if="!showCode">
+            <a @click.prevent="showCode = true" href="./view?showCode=true">view code</a>
+          </small>
+          <small v-else @click="showCode = false">
+            <a @click.prevent="showCode = true" href="./view?showCode=false">view graphical</a>
+          </small>
+        </div>
 
-      <graphical-view
-        v-if="!showCode"
-        :selected="control"
-        :controls="survey.controls"
-        @controlSelected="controlSelected"
-      />
-      <code-view v-else v-model="survey" />
-    </div>
-    <div class="col-5">
-      <div class="sticky-top">
-        <h3>Details</h3>
-        <survey-details v-model="survey" :editMode="editMode" />
-        <h3>Add questions</h3>
-        <control-adder @controlAdded="controlAdded" />
-        <h3>Properties</h3>
-        <control-properties :control="control" :survey="survey" />
-      </div>
-    </div>
-  </div>
+        <graphical-view
+          v-if="!showCode"
+          :selected="control"
+          :controls="survey.controls"
+          @controlSelected="controlSelected"
+        />
+        <code-view v-else v-model="survey" />
+      </v-col>
+      <v-col cols="5">
+        <div class="sticky-top">
+          <h3>Details</h3>
+          <survey-details v-model="survey" :editMode="editMode" />
+          <h3>Add questions</h3>
+          <control-adder @controlAdded="controlAdded" />
+          <h3>Properties</h3>
+          <control-properties :control="control" :survey="survey" />
+        </div>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
