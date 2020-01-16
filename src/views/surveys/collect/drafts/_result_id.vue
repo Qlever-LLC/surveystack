@@ -82,7 +82,14 @@ export default {
     inputText,
     inputNumeric,
   },
-  data() { return { message: 'hello', survey: utils.mockSurvey, questionIdx: 0 }; },
+  data() {
+    return {
+      message: 'hello',
+      survey: utils.mockSurvey,
+      surveyPositions: utils.getSurveyPositions(utils.mockSurvey),
+      questionIdx: 0,
+    };
+  },
   methods: {
     prev() {
       if (this.questionIdx > 0) {
@@ -100,10 +107,13 @@ export default {
   },
   computed: {
     last() {
-      return this.questionIdx >= this.survey.controls.length - 1;
+      return this.questionIdx >= this.surveyPositions.length - 1;
     },
     currentControl() {
-      return this.survey.controls[this.questionIdx];
+      return utils.getControl(this.survey, this.questionIdx);
+    },
+    getBreadcrumbs() {
+      return utils.getBreadcrumbs(this.survey, this.questionIdx);
     },
   },
 };
