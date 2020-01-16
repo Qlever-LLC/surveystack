@@ -6,16 +6,15 @@
         <div class="subtitle-1 count grey--text text--darken-2">Total<br>{{ survey.controls.length + 5254}} Questions</div>
       </div>
       <div class="infos grey--text text--darken-2">
-        <div>Question {{ questionIdx + 1 }} <kbd>{{ survey.controls[questionIdx].name }}</kbd></div>
+        <div v-if="!isGroup"><kbd class="display-1">{{ questionNumber }}</kbd> Question <span class="font-italic">{{ currentControl.name }}</span ></div>
+        <div v-else><kbd class="display-1">{{ questionNumber }}</kbd> Group <span class="font-italic">{{ currentControl.name }}</span></div>
       </div>
     </v-row>
     <v-row>
-
       <component
         :is="currentControl.type"
         :question="currentControl"
-      >
-      </component>
+      > </component>
 
     </v-row>
     <v-footer
@@ -75,12 +74,14 @@
 <script>
 import inputText from '@/components/survey/question_types/TextInput.vue';
 import inputNumeric from '@/components/survey/question_types/NumberInput.vue';
+import group from '@/components/survey/question_types/Group.vue';
 import * as utils from '@/utils/surveys';
 
 export default {
   components: {
     inputText,
     inputNumeric,
+    group,
   },
   data() {
     return {
@@ -110,10 +111,17 @@ export default {
       return this.questionIdx >= this.surveyPositions.length - 1;
     },
     currentControl() {
-      return utils.getControl(this.survey, this.questionIdx);
+      return utils.getControl(this.survey, this.surveyPositions[this.questionIdx]);
     },
     getBreadcrumbs() {
-      return utils.getBreadcrumbs(this.survey, this.questionIdx);
+      return utils.getBreadcrumbs(this.survey, this.surveyPositions[this.questionIdx]);
+    },
+    questionNumber() {
+      const edited = this.surveyPositions[this.questionIdx].map(value => value + 1);
+      return edited.join('.');
+    },
+    isGroup() {
+      return utils.getControl(this.survey, this.surveyPositions[this.questionIdx]).type === 'group';
     },
   },
 };
