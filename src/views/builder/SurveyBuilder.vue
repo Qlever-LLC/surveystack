@@ -36,11 +36,11 @@
 import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 
-import graphicalView from './GraphicalView.vue';
-import codeView from './CodeView.vue';
-import controlProperties from './ControlProperties.vue';
-import controlAdder from './ControlAdder.vue';
-import surveyDetails from './SurveyDetails.vue';
+import graphicalView from '@/components/builder/GraphicalView.vue';
+import codeView from '@/components/builder/CodeView.vue';
+import controlProperties from '@/components/builder/ControlProperties.vue';
+import controlAdder from '@/components/builder/ControlAdder.vue';
+import surveyDetails from '@/components/builder/SurveyDetails.vue';
 
 export default {
   components: {
@@ -81,7 +81,7 @@ export default {
 
     if (this.editMode) {
       try {
-        const {id} = this.$route.params;
+        const { id } = this.$route.params;
         this.survey._id = id;
         const { data } = await api.get(`/surveys/${this.survey._id}`);
         this.survey = data;
