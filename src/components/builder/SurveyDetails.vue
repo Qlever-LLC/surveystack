@@ -24,11 +24,9 @@
         <strong>{{value._id}}</strong> already exists. Do you want to generate a different id?
       </template>
     </app-modal>
-    <form>
-      <div class="form-group">
-        <label for="survey-name">name</label>
-        <input class="form-control" v-model="value.name" id="survey-name" />
-      </div>
+    <v-form>
+      <v-text-field v-model="value.name" label="Name" />
+      <v-text-field v-model="value._id" label="id" readonly />
       <div class="form-group">
         <label for="survey-id">id</label>
         <input class="form-control" v-model="value._id" id="survey-id" readonly />
@@ -43,7 +41,7 @@
         >Delete</button>
         <button type="submit" class="btn btn-primary" @click.prevent="onSubmit">{{submitText}}</button>
       </div>
-    </form>
+    </v-form>
   </div>
 </template>
 
