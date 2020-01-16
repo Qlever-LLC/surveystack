@@ -381,6 +381,18 @@ export const getBreadcrumbs = (survey, position) => {
   return breadcrumbs;
 };
 
+
+export const getInstanceIndex = (survey, position) => {
+  const breadcrumbs = [];
+  let { controls } = survey;
+  position.forEach((i) => {
+    breadcrumbs.push(controls[i].name);
+    controls = controls[i].children;
+  });
+
+  return breadcrumbs.join('.');
+};
+
 // eslint-disable-next-line no-unused-vars
 function has(target, key) {
   return true;

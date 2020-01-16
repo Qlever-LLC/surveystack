@@ -3,7 +3,8 @@
     <v-row>
       <v-text-field
         outlined
-        :label=question.label
+        :label=control.label
+        v-model="instance[controlIndex]"
       >
       </v-text-field>
     </v-row>
@@ -13,8 +14,20 @@
 <script>
 export default {
   props: {
-    question: {
+    control: {
       type: Object,
+      required: true,
+    },
+    instance: {
+      type: Object,
+      required: true,
+    },
+    position: {
+      type: Array,
+      required: true,
+    },
+    controlIndex: {
+      type: String,
       required: true,
     },
   },
