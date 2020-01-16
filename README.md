@@ -11,7 +11,7 @@ yarn
 yarn start
 ```
 
-By default, the server will run on [http://localhost:4010](http://localhost:4010). You can change default port settings, mongodb server, etc. by copying the [.env.defaults](./.env.defaults) file.
+By default, the server will run on [http://localhost:3000](http://localhost:3000). You can change default port settings, mongodb server, etc. by copying the [.env.defaults](./.env.defaults) file.
 
 ```
 cp .env.defaults .env
@@ -25,10 +25,10 @@ On the current webserver, it is run with node process manager [pm2](http://pm2.k
 
 ```
 # example commands
-pm2 start "yarn start" --name "oursci-mango19"
+pm2 start "yarn start" --name "oursci-server-dev"
 pm2 list
-pm2 stop oursci-mango19
-pm2 start oursci-mango19
+pm2 stop oursci-server-dev
+pm2 start oursci-server-dev
 # keep process list on reboot
 pm2 startup
 pm2 save
