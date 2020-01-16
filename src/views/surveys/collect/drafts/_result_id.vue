@@ -2,11 +2,11 @@
   <v-container class="pl-8 pr-8">
     <v-row>
       <div class="title">
-        <div class="inner-title">{{ mock[0].name }} is a long but complicated name right?</div>
-        <div class="subtitle-1 count grey--text text--darken-2">Total<br>{{ mock[0].controls.length + 5254}} Questions</div>
+        <div class="inner-title">{{ survey.name }} is a long but complicated name right?</div>
+        <div class="subtitle-1 count grey--text text--darken-2">Total<br>{{ survey.controls.length + 5254}} Questions</div>
       </div>
       <div class="infos grey--text text--darken-2">
-        <div>Question {{ questionIdx + 1 }} <kbd>{{ mock[0].controls[questionIdx].name }}</kbd></div>
+        <div>Question {{ questionIdx + 1 }} <kbd>{{ survey.controls[questionIdx].name }}</kbd></div>
       </div>
     </v-row>
     <v-row>
@@ -75,15 +75,14 @@
 <script>
 import inputText from '@/components/survey/question_types/TextInput.vue';
 import inputNumeric from '@/components/survey/question_types/NumberInput.vue';
-
-import mock from '../../mock';
+import * as utils from '@/utils/surveys';
 
 export default {
   components: {
     inputText,
     inputNumeric,
   },
-  data() { return { message: 'hello', mock, questionIdx: 0 }; },
+  data() { return { message: 'hello', survey: utils.mockSurvey, questionIdx: 0 }; },
   methods: {
     prev() {
       if (this.questionIdx > 0) {
@@ -101,10 +100,10 @@ export default {
   },
   computed: {
     last() {
-      return this.questionIdx >= mock[0].controls.length - 1;
+      return this.questionIdx >= this.survey.controls.length - 1;
     },
     currentControl() {
-      return mock[0].controls[this.questionIdx];
+      return this.survey.controls[this.questionIdx];
     },
   },
 };
