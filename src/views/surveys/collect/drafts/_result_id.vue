@@ -26,7 +26,7 @@
       <component
         :is="currentControl.type"
         :control="currentControl"
-        :position="surveyPositions[questionIdx]"
+        :position="surveyPositions[controlIndex]"
         :instance="instance"
         :controlIndex="controlIndex"
       >
@@ -83,10 +83,13 @@
 </template>
 
 <script>
+import _ from 'lodash';
+import ObjectId from 'bson-objectid';
 import inputText from '@/components/survey/question_types/TextInput.vue';
 import inputNumeric from '@/components/survey/question_types/NumberInput.vue';
 import group from '@/components/survey/question_types/Group.vue';
 import * as utils from '@/utils/surveys';
+
 
 export default {
   components: {
@@ -96,52 +99,73 @@ export default {
   },
   data() {
     return {
-      message: 'hello',
-      survey: utils.mockSurvey,
-      surveyPositions: utils.getSurveyPositions(utils.mockSurvey),
-      questionIdx: 0,
-      instance: {
-
-      },
+      survey: null,
+      surveyPositions: null,
+      controlIndex: 0,
+      instance: null,
     };
   },
+
   methods: {
     prev() {
-      if (this.questionIdx > 0) {
-        this.questionIdx -= 1;
+      if (this.controlIndex > 0) {
+        this.controlIndex -= 1;
       }
     },
     next() {
       if (!this.last) {
-        this.questionIdx += 1;
+        this.controlIndex += 1;
       }
     },
     submit() {
 
     },
+    calculateControl() {
+      if (
+        !this.currentControl.options.calculate || this.currentControl.options.calculate === ''
+      ) {
+        return;
+      }
+      const sandbox = utils.compileSandboxSingleLine(this.currentControl.options.calculate);
+      this.currentControl.value = sandbox({ data: this.instanceData });
+    },
   },
   computed: {
     last() {
-      return this.questionIdx >= this.surveyPositions.length - 1;
+      return this.controlIndex >= this.surveyPositions.length - 1;
     },
     currentControl() {
-      return utils.getControl(this.survey, this.surveyPositions[this.questionIdx]);
+      return utils.getControl(this.survey, this.surveyPositions[this.controlIndex]);
     },
     breadcrumbs() {
-      const ret = utils.getBreadcrumbs(this.survey, this.surveyPositions[this.questionIdx]);
+      const ret = utils.getBreadcrumbs(this.survey, this.surveyPositions[this.controlIndex]);
       ret.splice(-1, 1);
       return ret.map(txt => `<kbd>${txt}</kbd>`).join(' &gt; ');
     },
     questionNumber() {
-      const edited = this.surveyPositions[this.questionIdx].map(value => value + 1);
+      const edited = this.surveyPositions[this.controlIndex].map(value => value + 1);
       return edited.join('.');
     },
-    controlIndex() {
-      return utils.getInstanceIndex(this.survey, this.surveyPositions[this.questionIdx]);
-    },
     isGroup() {
-      return utils.getControl(this.survey, this.surveyPositions[this.questionIdx]).type === 'group';
+      return utils.getControl(this.survey, this.surveyPositions[this.controlIndex]).type === 'group';
     },
+    instanceData() {
+      return utils.getInstanceData(this.instance);
+    },
+  },
+
+  async created() {
+    try {
+      // const { id } = this.$route.params;
+      // const { data } = await api.get(`/surveys/${id}`);
+      this.survey._id = ObjectId();
+
+      this.survey = utils.mockSurvey;
+      this.instance = _.cloneDeep(this.survey);
+      this.positions = utils.getSurveyPositions(this.survey);
+    } catch (e) {
+      console.log('something went wrong:', e);
+    }
   },
 };
 </script>
