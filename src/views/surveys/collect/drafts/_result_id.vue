@@ -1,7 +1,5 @@
 <template>
-  <v-container
-    class="pl-8 pr-8 "
-  >
+  <v-container class="pl-8 pr-8 ">
     <v-row class="flex-grow-0 flex-shrink-1">
       <div class="title">
         <div class="inner-title">{{ survey.name }} is a long but complicated name right?</div>
@@ -82,7 +80,6 @@
 
     </div>
   </v-container>
-
 </template>
 
 <script>
@@ -103,7 +100,9 @@ export default {
       survey: utils.mockSurvey,
       surveyPositions: utils.getSurveyPositions(utils.mockSurvey),
       questionIdx: 0,
-      instance: {},
+      instance: {
+
+      },
     };
   },
   methods: {
@@ -116,7 +115,6 @@ export default {
       if (!this.last) {
         this.questionIdx += 1;
       }
-      console.log(this.instance);
     },
     submit() {
 
