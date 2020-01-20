@@ -9,7 +9,8 @@ import { connectDatabase, db } from './models';
 import { initAdmins } from './services/admin.service';
 import errorHandlers from './handlers/errorHandlers';
 
-import apiRoutes from './api/routes';
+import apiRoutes from './routes/api';
+import debugRoutes from './routes/debug';
 
 const PATH_PREFIX = process.env.PATH_PREFIX;
 
@@ -49,6 +50,8 @@ app.use(async (req, res, next) => {
 // routes
 app.use(`${PATH_PREFIX}/api`, apiRoutes);
 app.use(`${PATH_PREFIX}/api`, errorHandlers.developmentErrors);
+
+app.use('/debug', debugRoutes);
 
 // Serve Vue.js from dist folder
 // https://github.com/bripkens/connect-history-api-fallback/tree/master/examples/static-files-and-index-rewrite

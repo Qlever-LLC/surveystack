@@ -8,7 +8,12 @@ import userController from '../controllers/userController';
 import debugController from '../controllers/debugController';
 
 //import { authenticated } from '../handlers/checkPermissions';
-import { assertAuthenticated, assertEntityExists, assertIdsMatch } from '../handlers/assertions';
+import {
+  assertAuthenticated,
+  assertEntityExists,
+  assertIdsMatch,
+  assertNameNotEmpty,
+} from '../handlers/assertions';
 
 import { catchErrors } from '../handlers/errorHandlers';
 
@@ -42,10 +47,15 @@ router.delete('/submissions/:id', catchErrors(submissionController.deleteSubmiss
 /** Surveys */
 router.get('/surveys', catchErrors(surveyController.getSurveys));
 router.get('/surveys/:id', catchErrors(surveyController.getSurvey));
-router.post('/surveys', catchErrors(surveyController.createSurvey));
+router.post('/surveys', [assertNameNotEmpty], catchErrors(surveyController.createSurvey));
 router.put(
   '/surveys/:id',
-  [assertAuthenticated, assertIdsMatch, assertEntityExists({ collection: 'surveys' })],
+  [
+    assertAuthenticated,
+    assertNameNotEmpty,
+    assertIdsMatch,
+    assertEntityExists({ collection: 'surveys' }),
+  ],
   catchErrors(surveyController.updateSurvey)
 );
 router.delete(

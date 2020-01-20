@@ -7,18 +7,15 @@ import { catchErrors } from '../handlers/errorHandlers';
 import { db } from '../models';
 
 export const assertAuthenticated = catchErrors(async (req, res, next) => {
-  console.log('ENTERING: assertAuthenticated');
   if (!res.locals.auth.isAuthenticated) {
     throw boom.unauthorized();
   }
 
-  console.log('LEAVING: assertAuthenticated');
   next();
 });
 
 export const assertEntityExists = ({ collection }) =>
   catchErrors(async (req, res, next) => {
-    console.log('ENTERING: assertEntityExists');
     const { id } = req.params;
 
     if (!id) {
@@ -34,19 +31,27 @@ export const assertEntityExists = ({ collection }) =>
       throw boom.notFound(`No entity exists for id: ${id}`);
     }
 
-    console.log('LEAVING: assertEntityExists');
     next();
   });
 
-export const assertIdsMatch = (req, res, next) => {
-  console.log('ENTERING: assertIdsMatch');
+export const assertNameNotEmpty = catchErrors(async (req, res, next) => {
+  if (!res.locals.auth.isAuthenticated) {
+    throw boom.unauthorized();
+  }
+  const entity = req.body;
+  if (!entity.name || entity.name.trim() === '') {
+    throw boom.badRequest('name must not be empty');
+  }
 
+  next();
+});
+
+export const assertIdsMatch = (req, res, next) => {
   const entity = req.body;
   const id = entity._id;
   if (id != req.params.id) {
     throw boom.badRequest(`Ids do not match: ${id}, ${req.params.id}`);
   }
 
-  console.log('LEAVING: assertIdsMatch');
   next();
 };
