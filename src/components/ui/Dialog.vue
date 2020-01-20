@@ -2,7 +2,7 @@
   <v-dialog v-model="show">
     <v-card>
       <v-card-title class="headline">
-        <slot name="header">Header slot content</slot>
+        <slot name="title">Header slot content</slot>
       </v-card-title>
       <v-card-text>
         <slot name="default">Default slot content</slot>

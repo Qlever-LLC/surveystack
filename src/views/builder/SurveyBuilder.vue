@@ -1,26 +1,21 @@
 <template>
   <v-container>
-    <app-dialog v-model="deleteDialog" @cancel="deleteDialog = false" @confirm="onDelete"></app-dialog>
+    <app-dialog v-model="deleteDialog" @cancel="deleteDialog = false" @confirm="onDelete">
+      <template v-slot:title>Confirm your action</template>
+      <template>
+        Delete survey
+        <strong>{{survey._id}}</strong>
+        for sure?
+      </template>
+    </app-dialog>
 
-    <v-dialog
-      v-model="conflictDialog"
-      @cancel="conflictDialog = false"
-      @confirm="generateId"
-      labelConfirm="Generate"
-    >
-      <v-card>
-        <v-card-title class="headline">Conflict 409</v-card-title>
-        <v-card-text>
-          A survey with id
-          <strong>{{survey._id}}</strong> already exists. Do you want to generate a different id?
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="green darken-1" text @click="conflictDialog = false">Cancel</v-btn>
-          <v-btn color="green darken-1" text @click="conflictDialog = false">Generate</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <app-dialog v-model="conflictDialog" @cancel="conflictDialog = false" @confirm="generateId">
+      <template v-slot:title>Conflict 409</template>
+      <template>
+        A survey with id
+        <strong>{{survey._id}}</strong> already exists. Do you want to generate a different id?
+      </template>
+    </app-dialog>
 
     <v-row>
       <v-col cols="7">
@@ -111,6 +106,7 @@ export default {
     },
     generateId() {
       this.survey._id = new ObjectId();
+      this.conflictDialog = false;
     },
     async onDelete() {
       if (!this.deleteDialog) {
