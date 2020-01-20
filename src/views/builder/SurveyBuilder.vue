@@ -1,5 +1,22 @@
 <template>
   <v-container>
+    <app-dialog v-model="deleteDialog" @cancel="deleteDialog = false" @confirm="onDelete">
+      <template v-slot:title>Confirm your action</template>
+      <template>
+        Delete survey
+        <strong>{{survey._id}}</strong>
+        for sure?
+      </template>
+    </app-dialog>
+
+    <app-dialog v-model="conflictDialog" @cancel="conflictDialog = false" @confirm="generateId">
+      <template v-slot:title>Conflict 409</template>
+      <template>
+        A survey with id
+        <strong>{{survey._id}}</strong> already exists. Do you want to generate a different id?
+      </template>
+    </app-dialog>
+
     <v-row>
       <v-col cols="7">
         <div class="d-flex justify-content-between align-items-center">
@@ -23,7 +40,13 @@
       <v-col cols="5">
         <div class="sticky-top">
           <h3>Details</h3>
-          <survey-details v-model="survey" :editMode="editMode" />
+          <survey-details
+            v-model="survey"
+            :editMode="editMode"
+            @cancel="onCancel"
+            @submit="onSubmit"
+            @delete="onDelete"
+          />
           <h3>Add questions</h3>
           <control-adder @controlAdded="controlAdded" />
           <h3>Properties</h3>
@@ -44,6 +67,8 @@ import controlProperties from '@/components/builder/ControlProperties.vue';
 import controlAdder from '@/components/builder/ControlAdder.vue';
 import surveyDetails from '@/components/builder/SurveyDetails.vue';
 
+import appDialog from '@/components/ui/Dialog.vue';
+
 export default {
   components: {
     graphicalView,
@@ -51,18 +76,12 @@ export default {
     controlProperties,
     controlAdder,
     surveyDetails,
-  },
-  methods: {
-    controlSelected(control) {
-      this.control = control;
-    },
-    controlAdded(control) {
-      this.survey.controls.push(control);
-      this.control = control;
-    },
+    appDialog,
   },
   data() {
     return {
+      conflictDialog: false,
+      deleteDialog: false,
       editMode: false,
       showCode: false,
       control: null,
@@ -74,6 +93,49 @@ export default {
       },
     };
   },
+  methods: {
+    controlSelected(control) {
+      this.control = control;
+    },
+    controlAdded(control) {
+      this.survey.controls.push(control);
+      this.control = control;
+    },
+    onCancel() {
+      this.$router.push('/surveys');
+    },
+    generateId() {
+      this.survey._id = new ObjectId();
+      this.conflictDialog = false;
+    },
+    async onDelete() {
+      if (!this.deleteDialog) {
+        this.deleteDialog = true;
+        return;
+      }
+      try {
+        await api.delete(`/surveys/${this.survey._id}`);
+        this.$router.push('/surveys');
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async onSubmit() {
+      const method = this.editMode ? 'put' : 'post';
+      const url = this.editMode ? `/surveys/${this.survey._id}` : '/surveys';
+
+      try {
+        await api.customRequest({ method, url, data: this.survey });
+        this.$router.push('/surveys');
+      } catch (error) {
+        console.log(error.response);
+        if (error.response.status === 409) {
+          this.conflictDialog = true;
+        }
+      }
+    },
+  },
+
   async created() {
     this.editMode = !this.$route.matched.some(
       ({ name }) => name === 'survey-builder-new',

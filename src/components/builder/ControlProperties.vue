@@ -1,15 +1,10 @@
 <template>
   <div>
-    <form v-if="control">
-      <div class="form-group">
-        <label for="properties-name">Data name</label>
-        <input class="form-control" v-model="control.name" id="properties-name" />
-      </div>
-      <div class="form-group">
-        <label for="properties-label">Label</label>
-        <input class="form-control" v-model="control.label" id="properties-label" />
-      </div>
-      <div v-if="!showAdvanced" class="d-flex justify-content-end">
+    <v-form v-if="control">
+      <v-text-field v-model="control.name" label="Data name" />
+      <v-text-field v-model="control.label" label="Label" />
+
+      <div v-if="!showAdvanced" class="d-flex justify-end">
         <small>
           <a
             @click.prevent="showAdvanced = true"
@@ -17,20 +12,14 @@
           >show advanced...</a>
         </small>
       </div>
-      <div v-if="showAdvanced" class="p-3 rounded border">
-        <button type="button" class="close" aria-label="Close" @click.stop="showAdvanced = false">
-          <span aria-hidden="true">&times;</span>
-        </button>
-        <h5>Advanced Options</h5>
-        <div class="form-group">
-          <label for="properties-label">Calculate</label>
-          <input class="form-control" v-model="control.options.calculate" id="properties-label" />
+      <div v-if="showAdvanced" class="mt-2">
+        <div class="d-flex justify-space-between">
+          <h4 class="d-flex">Advanced Options</h4>
+          <v-icon @click.stop="showAdvanced = false">mdi-close</v-icon>
         </div>
 
-        <div class="form-group">
-          <label for="properties-label">Show question if</label>
-          <input class="form-control" v-model="control.options.relevance" id="properties-label" />
-        </div>
+        <v-text-field v-model="control.options.calculate" label="Calculate" />
+        <v-text-field v-model="control.options.relevance" label="Show question if" />
 
         <div class="d-flex justify-content-end">
           <small>
@@ -38,7 +27,7 @@
           </small>
         </div>
       </div>
-    </form>
+    </v-form>
     <div v-else>...</div>
   </div>
 </template>
