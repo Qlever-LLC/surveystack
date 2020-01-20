@@ -12,6 +12,8 @@ import Login from '@/views/auth/Login.vue';
 import Register from '@/views/auth/Register.vue';
 import Profile from '@/views/auth/Profile.vue';
 
+import SurveyBuilder from '../views/builder/SurveyBuilder.vue';
+
 
 Vue.use(VueRouter);
 
@@ -33,6 +35,11 @@ const routes = [
     path: '/test',
     name: 'test',
     component: Test,
+  },
+  {
+    path: '/surveys/new',
+    name: 'survey-builder-new',
+    component: SurveyBuilder,
   },
   {
     path: '/surveys/my-surveys',

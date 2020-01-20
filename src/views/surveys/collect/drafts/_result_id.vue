@@ -1,65 +1,70 @@
 <template>
-  <v-container
-    fluid
-    class="pl-8 pr-8"
-  >
+  <v-container class="pl-8 pr-8">
     <v-row>
-      <div class='title'>
-        <p>{{ mock[0].name }}</p>
+      <div class="title">
+        <div class="inner-title">{{ survey.name }} is a long but complicated name right?</div>
+        <div class="subtitle-1 count grey--text text--darken-2">Total<br>{{ survey.controls.length + 5254}} Questions</div>
+      </div>
+      <div class="infos grey--text text--darken-2">
+        <div v-if="!isGroup"><kbd class="display-1">{{ questionNumber }}</kbd> Question <span class="font-italic">{{ currentControl.name }}</span ></div>
+        <div v-else><kbd class="display-1">{{ questionNumber }}</kbd> Group <span class="font-italic">{{ currentControl.name }}</span></div>
       </div>
     </v-row>
     <v-row>
-      <app-text-input
-        v-for="(c,idx) in mock[0].controls"
-        :key="idx"
-        :question="c"
-        v-show="idx == questionIdx"
-      ></app-text-input>
+      <component
+        :is="currentControl.type"
+        :question="currentControl"
+      > </component>
+
     </v-row>
     <v-footer
-      absolute
+      fixed
       class="font-weight-medium"
     >
-      <v-col
-        class="text-center"
-        cols="6"
-      >
-        <v-btn
-          @click="prev"
-          class="full"
-          outlined
-          depressed
-          large
-          color="primary"
-        >Preivous</v-btn>
-      </v-col>
+      <v-container class="pl-8 pr-8">
+        <v-row>
+          <v-col
+            class="text-center"
+            cols="6"
+          >
+            <v-btn
+              @click="prev"
+              class="full"
+              outlined
+              depressed
+              large
+              color="primary"
+            >Preivous</v-btn>
+          </v-col>
 
-      <v-col
-        v-if="last"
-        class="text-center"
-        cols="6"
-      >
-        <v-btn
-          @click="submit"
-          class="full"
-          depressed
-          large
-          color="primary"
-        >Submit</v-btn>
-      </v-col>
-      <v-col
-        v-else
-        class="text-center"
-        cols="6"
-      >
-        <v-btn
-          @click="next"
-          class="full"
-          depressed
-          large
-          color="primary"
-        >Next</v-btn>
-      </v-col>
+          <v-col
+            v-if="last"
+            class="text-center"
+            cols="6"
+          >
+            <v-btn
+              @click="submit"
+              class="full"
+              depressed
+              large
+              color="primary"
+            >Submit</v-btn>
+          </v-col>
+          <v-col
+            v-else
+            class="text-center"
+            cols="6"
+          >
+            <v-btn
+              @click="next"
+              class="full"
+              depressed
+              large
+              color="primary"
+            >Next</v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
 
     </v-footer>
   </v-container>
@@ -67,16 +72,26 @@
 </template>
 
 <script>
-import appTextInput from '@/components/survey/question_types/TextInput.vue';
-import mock from '../../mock';
+import inputText from '@/components/survey/question_types/TextInput.vue';
+import inputNumeric from '@/components/survey/question_types/NumberInput.vue';
+import group from '@/components/survey/question_types/Group.vue';
+import * as utils from '@/utils/surveys';
 
 export default {
   components: {
-    appTextInput,
+    inputText,
+    inputNumeric,
+    group,
   },
-  data() { return { message: 'hello', mock, questionIdx: 0 }; },
+  data() {
+    return {
+      message: 'hello',
+      survey: utils.mockSurvey,
+      surveyPositions: utils.getSurveyPositions(utils.mockSurvey),
+      questionIdx: 0,
+    };
+  },
   methods: {
-
     prev() {
       if (this.questionIdx > 0) {
         this.questionIdx -= 1;
@@ -93,7 +108,20 @@ export default {
   },
   computed: {
     last() {
-      return this.questionIdx >= mock[0].controls.length - 1;
+      return this.questionIdx >= this.surveyPositions.length - 1;
+    },
+    currentControl() {
+      return utils.getControl(this.survey, this.surveyPositions[this.questionIdx]);
+    },
+    getBreadcrumbs() {
+      return utils.getBreadcrumbs(this.survey, this.surveyPositions[this.questionIdx]);
+    },
+    questionNumber() {
+      const edited = this.surveyPositions[this.questionIdx].map(value => value + 1);
+      return edited.join('.');
+    },
+    isGroup() {
+      return utils.getControl(this.survey, this.surveyPositions[this.questionIdx]).type === 'group';
     },
   },
 };
@@ -102,5 +130,24 @@ export default {
 <style>
 .full {
   width: 100%;
+}
+
+.count {
+  flex-grow: 0;
+}
+
+.title {
+  /* align-items: center; */
+  line-height: 1.5rem !important;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  margin: 0.2rem 0;
+}
+
+.inner-title {
+  flex-basis: 0;
+  flex-grow: 1;
 }
 </style>

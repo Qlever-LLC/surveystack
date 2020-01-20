@@ -1,6 +1,6 @@
 <template>
   <nav>
-    <v-app-bar app light>
+    <v-app-bar app light clipped-left>
       <v-app-bar-nav-icon @click="drawer = !drawer" />
       <v-toolbar-title class="ml-2">Our-Sci</v-toolbar-title>
 
@@ -16,7 +16,7 @@
       </v-btn>
     </v-app-bar>
 
-    <v-navigation-drawer v-model="drawer" app>
+    <v-navigation-drawer v-model="drawer" app clipped>
       <v-list>
         <v-list-item v-for="(link, idx) in links" :key="idx" :to="link.to">
           <v-list-item-icon>
