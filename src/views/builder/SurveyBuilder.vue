@@ -19,14 +19,14 @@
 
     <v-row>
       <v-col cols="7">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex justify-space-between align-center">
           <h2>Survey Builder</h2>
-          <small v-if="!showCode">
-            <a @click.prevent="showCode = true" href="./view?showCode=true">view code</a>
-          </small>
-          <small v-else @click="showCode = false">
-            <a @click.prevent="showCode = true" href="./view?showCode=false">view graphical</a>
-          </small>
+          <v-btn
+            @click="showCode = !showCode"
+            color="primary"
+            small
+            text
+          >{{ showCode ? "graphical" : "code"}}</v-btn>
         </div>
 
         <graphical-view

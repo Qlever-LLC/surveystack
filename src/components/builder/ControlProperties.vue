@@ -5,12 +5,7 @@
       <v-text-field v-model="control.label" label="Label" />
 
       <div v-if="!showAdvanced" class="d-flex justify-end">
-        <small>
-          <a
-            @click.prevent="showAdvanced = true"
-            href="./builder?showAdvanced=true"
-          >show advanced...</a>
-        </small>
+        <v-btn @click="showAdvanced = true" color="primary" small text>advanced</v-btn>
       </div>
       <div v-if="showAdvanced" class="mt-2">
         <div class="d-flex justify-space-between">
