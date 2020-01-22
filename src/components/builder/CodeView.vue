@@ -5,7 +5,7 @@
       filled
       rows="20"
       :value="valueString"
-      @input="writeBack($event.target.value)"
+      @input="writeBack($event)"
       outlined
     ></v-textarea>
   </div>

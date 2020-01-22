@@ -11,6 +11,12 @@ import api from './services/api.service';
 
 api.init(process.env.VUE_APP_API_URL);
 
+Vue.filter('capitalize', (value) => {
+  if (!value) return '';
+  const v = value.toString();
+  return v.charAt(0).toUpperCase() + v.slice(1);
+});
+
 Vue.config.productionTip = false;
 
 new Vue({

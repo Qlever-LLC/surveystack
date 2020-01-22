@@ -17,6 +17,11 @@
       </template>
     </app-dialog>
 
+    <v-snackbar v-model="showSnackbar" :timeout="0">
+      {{snackbarMessage | capitalize}}
+      <v-btn color="pink" text @click="showSnackbar = false">Close</v-btn>
+    </v-snackbar>
+
     <v-row>
       <v-col cols="7">
         <div class="mb-2 d-flex justify-space-between align-center">
@@ -80,6 +85,8 @@ export default {
   },
   data() {
     return {
+      showSnackbar: false,
+      snackbarMessage: '',
       conflictDialog: false,
       deleteDialog: false,
       editMode: false,
@@ -131,6 +138,10 @@ export default {
         console.log(error.response);
         if (error.response.status === 409) {
           this.conflictDialog = true;
+        } else {
+          // this.$store.dispatch('feedback/add', error.response.data.message);
+          this.snackbarMessage = error.response.data.message;
+          this.showSnackbar = true;
         }
       }
     },
