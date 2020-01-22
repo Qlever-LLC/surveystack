@@ -1,11 +1,11 @@
 <template>
-  <div class="mb-3">
-    <button
+  <div class="mt-3 mb-3">
+    <v-btn
       v-for="el in availableControls"
-      class="btn btn-outline-primary mr-2 mb-2"
       :key="el.type"
       @click="addControl(el)"
-    >{{el.name}}</button>
+      class="mr-1"
+    >{{el.name}}</v-btn>
   </div>
 </template>
 
