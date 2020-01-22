@@ -1,5 +1,6 @@
 <template>
   <draggable
+    v-if="controls.length !== 0 || index.length !== 0"
     class="draggable list-group"
     tag="div"
     :list="controls"
@@ -40,7 +41,6 @@
       />
     </div>
   </draggable>
-  <!--
   <div v-else>
     <v-card>
       <v-card-title>Empty survey</v-card-title>
@@ -49,7 +49,6 @@
       </v-card-text>
     </v-card>
   </div>
-  -->
 </template>
 <script>
 import draggable from 'vuedraggable';

@@ -4,7 +4,7 @@
       v-for="el in availableControls"
       :key="el.type"
       @click="addControl(el)"
-      class="mr-1"
+      class="ma-1"
     >{{el.name}}</v-btn>
   </div>
 </template>
