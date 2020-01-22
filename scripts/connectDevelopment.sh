@@ -5,7 +5,6 @@ ROOT_PATH="$( cd "$(dirname "$0")"; cd .. ; pwd -P )"
 cd $(dirname $0)
 
 if [ ! -f "../$PEM_FILE" ]; then
-    EXPECTED_LOCATION="$(dirname $0)"
     echo "'$PEM_FILE' not found at '$ROOT_PATH/$PEM_FILE', aborting..."
     exit
 fi
