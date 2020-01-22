@@ -158,11 +158,11 @@ export default {
     try {
       // const { id } = this.$route.params;
       // const { data } = await api.get(`/surveys/${id}`);
-      this.survey._id = ObjectId();
 
       this.survey = utils.mockSurvey;
+      this.survey._id = ObjectId();
       this.instance = _.cloneDeep(this.survey);
-      this.positions = utils.getSurveyPositions(this.survey);
+      this.surveyPositions = utils.getSurveyPositions(this.survey);
     } catch (e) {
       console.log('something went wrong:', e);
     }
