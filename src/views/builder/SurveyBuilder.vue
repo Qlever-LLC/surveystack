@@ -19,8 +19,8 @@
 
     <v-row>
       <v-col cols="7">
-        <div class="d-flex justify-space-between align-center">
-          <h2>Survey Builder</h2>
+        <div class="mb-2 d-flex justify-space-between align-center">
+          <h1 class="display-1">Survey Builder</h1>
           <v-btn
             @click="showCode = !showCode"
             color="primary"

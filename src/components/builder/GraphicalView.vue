@@ -8,36 +8,54 @@
   >
     <div
       v-for="(el, idx) in controls"
-      class="list-group-item"
-      :class="{'selected': (el === selected)}"
+      class="control-item"
+      :class="{'control-item-selected': (el === selected)}"
       :key="el.name"
       @click.stop="$emit('controlSelected', el)"
     >
-      {{ el.label }}
-      <button
-        v-if="selected === el"
-        type="button"
-        class="close"
-        aria-label="Close"
-        @click.stop="removeAt(idx)"
-      >
-        <span aria-hidden="true">&times;</span>
-      </button>
-      <small class="text-muted d-block mb-2">{{ el.name }} : {{ el.type }}</small>
+      <div class="mb-2 d-flex justify-space-between align-center">
+        <div>
+          <span
+            class="caption grey--text text--darken-1"
+          >{{ createIndex(index, idx + 1) | displayIndex}}</span>
+          <br />
+          <span class="title">{{el.label}}</span>
+          <br />
+          <span class="font-weight-light grey--text text--darken-2">{{ el.name }} : {{ el.type }}</span>
+        </div>
+        <v-icon
+          v-if="selected === el"
+          @click.stop="removeAt(idx)"
+          color="grey lighten-1"
+        >mdi-trash-can-outline</v-icon>
+      </div>
+
       <nested-draggable
         v-if="el.type == 'group'"
-        class="drop-area"
+        :class="{'drop-area': (el.children.length === 0)}"
         :selected="selected"
         :controls="el.children"
         @controlSelected="$emit('controlSelected', $event)"
+        :index="createIndex(index, idx + 1)"
       />
     </div>
   </draggable>
+  <!--
+  <div v-else>
+    <v-card>
+      <v-card-title>Empty survey</v-card-title>
+      <v-card-text>
+        <div class="text--primary">You can add questions from the menu on the right.</div>
+      </v-card-text>
+    </v-card>
+  </div>
+  -->
 </template>
 <script>
 import draggable from 'vuedraggable';
 
 export default {
+  name: 'nested-draggable',
   components: {
     draggable,
   },
@@ -47,6 +65,17 @@ export default {
       type: Array,
     },
     selected: Object,
+    index: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
+  },
+  filters: {
+    displayIndex(value) {
+      return value.join('.');
+    },
   },
   methods: {
     log(name) {
@@ -56,13 +85,18 @@ export default {
       this.controls.splice(idx, 1);
       this.$emit('controlSelected', null);
     },
+    createIndex(current, idx) {
+      const newIndex = [...current];
+      newIndex.push(idx);
+      return newIndex;
+    },
   },
-  name: 'nested-draggable',
 };
 </script>
 <style scoped>
 .drop-area {
   min-height: 4rem;
+  border-radius: 0.25rem;
   border: 1px solid rgba(0, 0, 0, 0.125);
 }
 
@@ -72,7 +106,18 @@ export default {
   line-height: 1.125rem;
 }
 
-.selected {
-  border-left: 2px solid #42b983;
+.control-item:first-child {
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+.control-item {
+  padding: 0.75rem 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  margin-bottom: -1px;
+}
+
+.control-item-selected {
+  border-left: 2px solid var(--v-primary-base);
 }
 </style>
