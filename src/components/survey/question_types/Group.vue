@@ -22,7 +22,7 @@ export default {
       required: true,
     },
     controlIndex: {
-      type: String,
+      type: Number,
       required: true,
     },
   },
