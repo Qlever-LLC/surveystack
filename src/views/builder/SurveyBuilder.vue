@@ -17,16 +17,21 @@
       </template>
     </app-dialog>
 
+    <v-snackbar v-model="showSnackbar" :timeout="0">
+      {{snackbarMessage | capitalize}}
+      <v-btn color="pink" text @click="showSnackbar = false">Close</v-btn>
+    </v-snackbar>
+
     <v-row>
       <v-col cols="7">
-        <div class="d-flex justify-content-between align-items-center">
-          <h2>Survey Builder</h2>
-          <small v-if="!showCode">
-            <a @click.prevent="showCode = true" href="./view?showCode=true">view code</a>
-          </small>
-          <small v-else @click="showCode = false">
-            <a @click.prevent="showCode = true" href="./view?showCode=false">view graphical</a>
-          </small>
+        <div class="mb-2 d-flex justify-space-between align-center">
+          <h1 class="display-1">Survey Builder</h1>
+          <v-btn
+            @click="showCode = !showCode"
+            color="primary"
+            small
+            text
+          >{{ showCode ? "graphical" : "code"}}</v-btn>
         </div>
 
         <graphical-view
@@ -80,6 +85,8 @@ export default {
   },
   data() {
     return {
+      showSnackbar: false,
+      snackbarMessage: '',
       conflictDialog: false,
       deleteDialog: false,
       editMode: false,
@@ -131,6 +138,10 @@ export default {
         console.log(error.response);
         if (error.response.status === 409) {
           this.conflictDialog = true;
+        } else {
+          // this.$store.dispatch('feedback/add', error.response.data.message);
+          this.snackbarMessage = error.response.data.message;
+          this.showSnackbar = true;
         }
       }
     },

@@ -1,6 +1,13 @@
 <template>
   <div>
-    <textarea class="form-control" :value="valueString" @input="writeBack($event.target.value)"></textarea>
+    <v-textarea
+      class="app-min-height"
+      filled
+      rows="20"
+      :value="valueString"
+      @input="writeBack($event)"
+      outlined
+    ></v-textarea>
   </div>
 </template>
 <script>
@@ -30,12 +37,7 @@ export default {
 };
 </script>
 <style scoped>
-pre {
-  text-align: start;
-}
-
-textarea {
+.app-min-height {
   min-height: 30rem;
-  resize: both;
 }
 </style>

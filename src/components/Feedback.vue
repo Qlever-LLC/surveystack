@@ -7,7 +7,7 @@
         <button @click="removeFeedback(idx)">x</button>
       </li>
     </ul>
-    <v-btn v-if="hasFeedback" @click="clearAllFeedback">CLEAR ALL</v-btn>
+    <v-btn v-if="showClearAll" @click="clearAllFeedback">CLEAR ALL</v-btn>
   </div>
 </template>
 
@@ -28,6 +28,9 @@ export default {
     },
     hasFeedback() {
       return this.$store.getters['feedback/hasFeedback'];
+    },
+    showClearAll() {
+      return this.$store.state.feedback.items.length > 1;
     },
   },
 };
