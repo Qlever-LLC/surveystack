@@ -1,11 +1,13 @@
 #!/bin/bash
-PEM_FILE=oursci-allround.pem
-ROOT_PATH="$( cd "$(dirname "$0")"; cd .. ; pwd -P )"
+PEM_FILE=~/.ssh/oursci-allround.pem
+USER=ubuntu
+SERVER=ec2-52-207-218-148.compute-1.amazonaws.com
 
 cd $(dirname $0)
 
-if [ ! -f "../$PEM_FILE" ]; then
-    echo "'$PEM_FILE' not found at '$ROOT_PATH/$PEM_FILE', aborting..."
+if [ ! -f "$PEM_FILE" ]; then
+    echo "'.pem file not found at '$PEM_FILE', aborting..."
     exit
 fi
-ssh -i "../oursci-allround.pem" ubuntu@ec2-52-207-218-148.compute-1.amazonaws.com
+
+ssh -i "$PEM_FILE" "$USER@$SERVER"
