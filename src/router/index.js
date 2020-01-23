@@ -5,8 +5,10 @@ import Test from '@/views/Test.vue';
 
 import MySurveys from '@/views/surveys/MySurveys.vue';
 import BrowseSurveys from '@/views/surveys/Browse.vue';
-import CollectSurvey from '@/views/surveys/collect/_survey_id.vue';
+// import DraftSurveyResult from '@/views/surveys/collect/drafts/_result_id.vue';
+import DraftSubmission from '@/views/surveys/collect/drafts/_id.vue';
 import DraftSurveyResult from '@/views/surveys/collect/drafts/_result_id.vue';
+import BrowseSurveyDrafts from '@/views/surveys/collect/drafts/browse.vue';
 
 import Login from '@/views/auth/Login.vue';
 import Register from '@/views/auth/Register.vue';
@@ -42,6 +44,11 @@ const routes = [
     component: SurveyBuilder,
   },
   {
+    path: '/surveys/edit/:id',
+    name: 'survey-builder-edit',
+    component: SurveyBuilder,
+  },
+  {
     path: '/surveys/my-surveys',
     name: 'my-surveys',
     component: MySurveys,
@@ -52,13 +59,18 @@ const routes = [
     component: BrowseSurveys,
   },
   {
-    path: '/surveys/collect/:id',
-    name: 'collect-survey',
-    component: CollectSurvey,
+    path: '/surveys/collect/start/:id',
+    name: 'collect-start-survey',
+    component: DraftSubmission,
+  },
+  {
+    path: '/surveys/collect/drafts/browse',
+    name: 'browse-survey-drafts',
+    component: BrowseSurveyDrafts,
   },
   {
     path: '/surveys/collect/drafts/:id',
-    name: 'collect-survey-draft-result',
+    name: 'collect-survey-draft',
     component: DraftSurveyResult,
   },
   {

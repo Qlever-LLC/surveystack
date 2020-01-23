@@ -12,7 +12,7 @@
       class="control-item"
       :class="{'control-item-selected': (el === selected)}"
       :key="el.name"
-      @click.stop="$emit('controlSelected', el)"
+      @mousedown.stop.left="$emit('controlSelected', el)"
     >
       <div class="mb-2 d-flex justify-space-between align-center">
         <div>
@@ -103,6 +103,7 @@ export default {
   text-align: left;
   cursor: pointer;
   line-height: 1.125rem;
+  background: #fff;
 }
 
 .control-item:first-child {

@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pl-8 pr-8 ">
+  <v-container class="pl-8 pr-8 " v-if="instance">
     <v-row class="flex-grow-0 flex-shrink-1">
       <div class="title">
         <div class="inner-title">{{ survey.name }} is a long but complicated name right?</div>
@@ -83,13 +83,29 @@
 </template>
 
 <script>
+/* eslint-disable prefer-destructuring */
+
+
 import _ from 'lodash';
 import ObjectId from 'bson-objectid';
 import inputText from '@/components/survey/question_types/TextInput.vue';
 import inputNumeric from '@/components/survey/question_types/NumberInput.vue';
 import group from '@/components/survey/question_types/Group.vue';
+import * as db from '@/store/db';
 import * as utils from '@/utils/surveys';
 
+
+const loadResults = () => new Promise((resolve, reject) => {
+  db.openDb(() => {
+    db.getAllSurveyResults((results) => {
+      if (!results || results.length === 0) {
+        reject();
+      } else {
+        resolve(results);
+      }
+    });
+  });
+});
 
 export default {
   components: {
@@ -103,22 +119,25 @@ export default {
       surveyPositions: null,
       controlIndex: 0,
       instance: null,
+      surveyResults: [],
     };
   },
 
   methods: {
     prev() {
+      this.persist();
       if (this.controlIndex > 0) {
         this.controlIndex -= 1;
       }
     },
     next() {
+      this.persist();
       if (!this.last) {
         this.controlIndex += 1;
       }
     },
     submit() {
-
+      this.persist();
     },
     calculateControl() {
       if (
@@ -128,6 +147,9 @@ export default {
       }
       const sandbox = utils.compileSandboxSingleLine(this.currentControl.options.calculate);
       this.currentControl.value = sandbox({ data: this.instanceData });
+    },
+    persist() {
+      db.persistSurveyResult(this.instance);
     },
   },
   computed: {
@@ -153,15 +175,26 @@ export default {
       return utils.getInstanceData(this.instance);
     },
   },
-
   async created() {
     try {
-      // const { id } = this.$route.params;
+      const { id } = this.$route.params;
       // const { data } = await api.get(`/surveys/${id}`);
 
       this.survey = utils.mockSurvey;
-      this.survey._id = ObjectId();
-      this.instance = _.cloneDeep(this.survey);
+
+      try {
+        const results = await loadResults();
+        this.results = results;
+        this.instance = results.find(r => r._id === id);
+        if (!this.instance) {
+          throw Error('No matching instance found');
+        }
+      } catch (error) {
+        this.instance = _.cloneDeep(this.survey);
+        this.instance._id = ObjectId().toString();
+        console.log(error);
+      }
+
       this.surveyPositions = utils.getSurveyPositions(this.survey);
     } catch (e) {
       console.log('something went wrong:', e);
