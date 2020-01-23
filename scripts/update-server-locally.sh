@@ -12,6 +12,7 @@ git pull
 # NOTE: not building on server because memory limits
 # install node modules in client
 # cd ../our-sci-pwa
+# git pull
 # yarn install
 # yarn build
 # cd ../our-sci-server
