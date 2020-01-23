@@ -9,19 +9,34 @@
         <div class="subtitle-1 count grey--text text--darken-2">Total<br>{{ drafts.length }} Drafts</div>
       </div>
     </v-row>
-    <v-row
-      v-for="draft in drafts"
-      :key="draft._id"
-      justify="center"
-      align="center"
-      class="flex-grow-1 flex-shrink-0"
-      style="min-width: 100px; max-width: 100%;"
+
+    <v-card
+      class="mx-auto"
+      max-width="400"
+      tile
     >
-      <div>
-        <div>{{ draft.name }}</div>
-        <div>{{ draft._id }}</div>
-      </div>
-    </v-row>
+      <v-list>
+        <v-subheader>Drafts</v-subheader>
+        <v-list-item-group
+          color="primary"
+        >
+          <v-list-item
+            v-for="draft in drafts"
+            :key="draft._id"
+            @click="select(draft)"
+          >
+
+            <v-list-item-icon>
+              <v-icon>mdi-pencil-plus</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title v-html="draft.name"></v-list-item-title>
+              <v-list-item-subtitle>{{ draft._id }}</v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list-item-group>
+      </v-list>
+    </v-card>
   </v-container>
 </template>
 
@@ -52,6 +67,10 @@ export default {
   },
 
   methods: {
+    select(draft) {
+      console.log(`clicked ${draft._id}`);
+      this.$router.push(`/surveys/collect/drafts/${draft._id}`);
+    },
     persist() {
       db.persistSurveyResult(this.instance);
     },
