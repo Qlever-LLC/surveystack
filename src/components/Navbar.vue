@@ -58,7 +58,7 @@ export default {
         {
           title: 'Collect',
           to: {
-            name: 'collect-survey-draft-result',
+            name: 'collect-survey-draft',
             params: { id: 'asdf' },
           },
           icon: 'mdi-pencil-plus',
