@@ -177,17 +177,18 @@ export default {
   },
   async created() {
     try {
-      // const { id } = this.$route.params;
+      const { id } = this.$route.params;
       // const { data } = await api.get(`/surveys/${id}`);
 
       this.survey = utils.mockSurvey;
 
-
       try {
         const results = await loadResults();
         this.results = results;
-        this.instance = results[0];
-        console.log(results);
+        this.instance = results.find(r => r._id === id);
+        if (!this.instance) {
+          throw Error('No matching instance found');
+        }
       } catch (error) {
         this.instance = _.cloneDeep(this.survey);
         this.instance._id = ObjectId().toString();
