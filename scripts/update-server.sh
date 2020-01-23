@@ -3,7 +3,7 @@ PEM_FILE=~/.ssh/oursci-allround.pem
 USER=ubuntu
 SERVER=ec2-52-207-218-148.compute-1.amazonaws.com
 
-SERVER_PWA_DIR=~/repos/development/our-sci-pwa
+SERVER_PWA_DIR=/home/ubuntu/repos/development/our-sci-pwa
 
 print_usage() {
   printf "Usage: $0 [ -s ]\n"
