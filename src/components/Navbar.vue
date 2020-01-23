@@ -56,10 +56,9 @@ export default {
           icon: 'mdi-newspaper-plus',
         },
         {
-          title: 'Collect',
+          title: 'Drafts',
           to: {
-            name: 'collect-survey-draft',
-            params: { id: 'asdf' },
+            name: 'browse-survey-drafts',
           },
           icon: 'mdi-pencil-plus',
         },
