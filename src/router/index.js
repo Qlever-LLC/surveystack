@@ -14,6 +14,8 @@ import Login from '@/views/auth/Login.vue';
 import Register from '@/views/auth/Register.vue';
 import Profile from '@/views/auth/Profile.vue';
 
+import SubmissionList from '@/views/submissions/Submissions.vue';
+
 import SurveyBuilder from '../views/builder/SurveyBuilder.vue';
 
 
@@ -37,6 +39,11 @@ const routes = [
     path: '/test',
     name: 'test',
     component: Test,
+  },
+  {
+    path: '/submissions',
+    name: 'submissions',
+    component: SubmissionList,
   },
   {
     path: '/surveys/new',

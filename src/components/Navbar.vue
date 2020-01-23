@@ -50,7 +50,7 @@ export default {
         {
           title: 'New Survey',
           to: {
-            name: 'collect-survey',
+            name: 'collect-survey-draft',
             params: { id: 'asdf' },
           },
           icon: 'mdi-newspaper-plus',

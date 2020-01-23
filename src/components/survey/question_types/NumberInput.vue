@@ -1,13 +1,7 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-text-field
-        outlined
-        :label=control.label
-        type="number"
-        v-model="instance[controlIndex]"
-      >
-      </v-text-field>
+      <v-text-field outlined :label="control.label" type="number" v-model.number="control.value"></v-text-field>
     </v-row>
   </v-container>
 </template>

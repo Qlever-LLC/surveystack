@@ -9,6 +9,9 @@
             <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle>
           </v-list-item-content>
           <v-list-item-icon>
+            <v-btn :to="`/submissions?survey=${e._id}`" text>
+              <v-icon>mdi-eye</v-icon>
+            </v-btn>
             <v-btn :to="`/surveys/edit/${e._id}`" text>
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
