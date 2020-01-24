@@ -4,7 +4,7 @@ import Home from '../views/Home.vue';
 import Test from '@/views/Test.vue';
 
 import MySurveys from '@/views/surveys/MySurveys.vue';
-import BrowseSurveys from '@/views/surveys/Browse.vue';
+import SurveysBrowse from '@/views/surveys/Browse.vue';
 // import DraftSurveyResult from '@/views/surveys/collect/drafts/_result_id.vue';
 import DraftSubmission from '@/views/surveys/collect/drafts/_id.vue';
 import DraftSurveyResult from '@/views/surveys/collect/drafts/_result_id.vue';
@@ -63,7 +63,7 @@ const routes = [
   {
     path: '/surveys/browse',
     name: 'surveys-browse',
-    component: BrowseSurveys,
+    component: SurveysBrowse,
   },
   {
     path: '/surveys/collect/start/:id',
