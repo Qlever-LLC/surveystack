@@ -93,7 +93,6 @@
 /* eslint-disable prefer-destructuring */
 
 
-import ObjectId from 'bson-objectid';
 import inputText from '@/components/survey/question_types/TextInput.vue';
 import inputNumeric from '@/components/survey/question_types/NumberInput.vue';
 import group from '@/components/survey/question_types/Group.vue';
@@ -215,8 +214,7 @@ export default {
           throw Error('No matching instance found');
         }
       } catch (error) {
-        this.instance = utils.createInstancePayload(this.survey);
-        this.instance._id = ObjectId().toString();
+        this.instance = utils.createInstance(this.survey);
         console.log(error);
       }
 
