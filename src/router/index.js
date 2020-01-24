@@ -8,13 +8,13 @@ import BrowseSurveys from '@/views/surveys/Browse.vue';
 // import DraftSurveyResult from '@/views/surveys/collect/drafts/_result_id.vue';
 import DraftSubmission from '@/views/surveys/collect/drafts/_id.vue';
 import DraftSurveyResult from '@/views/surveys/collect/drafts/_result_id.vue';
-import BrowseSurveyDrafts from '@/views/surveys/collect/drafts/browse.vue';
+import SubmissionDraftsList from '@/views/submissions/drafts/List.vue';
 
 import Login from '@/views/auth/Login.vue';
 import Register from '@/views/auth/Register.vue';
 import Profile from '@/views/auth/Profile.vue';
 
-import SubmissionList from '@/views/submissions/Submissions.vue';
+import SubmissionList from '@/views/submissions/List.vue';
 
 import SurveyBuilder from '../views/builder/SurveyBuilder.vue';
 
@@ -62,7 +62,7 @@ const routes = [
   },
   {
     path: '/surveys/browse',
-    name: 'browse-surveys',
+    name: 'surveys-browse',
     component: BrowseSurveys,
   },
   {
@@ -71,13 +71,13 @@ const routes = [
     component: DraftSubmission,
   },
   {
-    path: '/surveys/collect/drafts/browse',
-    name: 'browse-survey-drafts',
-    component: BrowseSurveyDrafts,
+    path: '/submissions/drafts',
+    name: 'submissions-drafts-list',
+    component: SubmissionDraftsList,
   },
   {
-    path: '/surveys/collect/drafts/:id',
-    name: 'collect-survey-draft',
+    path: '/submissions/drafts/:id',
+    name: 'submissions-drafts-detail',
     component: DraftSurveyResult,
   },
   {
