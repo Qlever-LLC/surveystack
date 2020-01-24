@@ -56,7 +56,12 @@ export default {
         },
         {
           title: 'Builder',
-          to: { name: 'survey-builder-new' },
+          to: { name: 'surveys-new' },
+          icon: 'mdi-newspaper-plus',
+        },
+        {
+          title: 'Mock Survey',
+          to: { name: 'mock' },
           icon: 'mdi-newspaper-plus',
         },
       ],

@@ -5,8 +5,7 @@ import Test from '@/views/Test.vue';
 
 import MySurveys from '@/views/surveys/MySurveys.vue';
 import SurveysBrowse from '@/views/surveys/Browse.vue';
-// import DraftSurveyResult from '@/views/surveys/collect/drafts/_result_id.vue';
-import DraftSubmission from '@/views/surveys/collect/drafts/_id.vue';
+import DraftSubmission from '@/views/submissions/drafts/Draft.vue';
 import DraftSurveyResult from '@/views/surveys/collect/drafts/_result_id.vue';
 import SubmissionDraftsList from '@/views/submissions/drafts/List.vue';
 
@@ -46,16 +45,6 @@ const routes = [
     component: SubmissionList,
   },
   {
-    path: '/surveys/new',
-    name: 'survey-builder-new',
-    component: SurveyBuilder,
-  },
-  {
-    path: '/surveys/edit/:id',
-    name: 'survey-builder-edit',
-    component: SurveyBuilder,
-  },
-  {
     path: '/surveys/my-surveys',
     name: 'my-surveys',
     component: MySurveys,
@@ -66,9 +55,14 @@ const routes = [
     component: SurveysBrowse,
   },
   {
-    path: '/surveys/collect/start/:id',
-    name: 'collect-start-survey',
-    component: DraftSubmission,
+    path: '/surveys/new',
+    name: 'surveys-new',
+    component: SurveyBuilder,
+  },
+  {
+    path: '/surveys/:id/edit',
+    name: 'surveys-edit',
+    component: SurveyBuilder,
   },
   {
     path: '/submissions/drafts',
@@ -76,8 +70,18 @@ const routes = [
     component: SubmissionDraftsList,
   },
   {
+    path: '/submissions/drafts/new',
+    name: 'submissions-drafts-new',
+    component: DraftSubmission,
+  },
+  {
     path: '/submissions/drafts/:id',
     name: 'submissions-drafts-detail',
+    component: DraftSurveyResult,
+  },
+  {
+    path: '/mock',
+    name: 'mock',
     component: DraftSurveyResult,
   },
   {

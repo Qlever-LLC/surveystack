@@ -1,32 +1,30 @@
+
 <template>
-  <v-container class="pl-8 pr-8" v-if="instance">
+  <v-container v-if="instance" class="pl-8 pr-8">
     <v-row class="flex-grow-0 flex-shrink-1">
       <div class="title">
-        <div class="inner-title">{{ survey.name }} is a long but complicated name right?</div>
-        <div class="subtitle-1 count grey--text text--darken-2">
-          Total
-          <br />
-          {{ survey.controls.length + 5254}} Questions
-        </div>
+        <div class="inner-title">{{ instance.name }}</div>
+        <div class="subtitle-1 count grey--text text--darken-2">Total {{positions.length}} Questions</div>
       </div>
       <div class="infos grey--text text--darken-2">
-        <div v-if="!isGroup">
+        <div v-if="control.type !== 'group'">
           <kbd class="display-1">{{ questionNumber }}</kbd> Question
-          <span class="font-italic blue--text">{{ currentControl.name }}</span>
+          <span class="font-italic blue--text">{{ control.name }}</span>
         </div>
         <div v-else>
           <kbd class="display-1">{{ questionNumber }}</kbd> Group
-          <span class="font-italic blue--text">{{ currentControl.name }}</span>
+          <span class="font-italic blue--text">{{ control.name }}</span>
         </div>
       </div>
     </v-row>
     <v-row class="flex-grow-0 flex-shrink-1">
       <div
-        v-if="breadcrumbs.length > 0"
+        v-if="mbreadcrumbs.length > 0"
         class="infos grey--text text--darken-2 mt-2"
-        v-html="breadcrumbs"
+        v-html="mbreadcrumbs"
       ></div>
     </v-row>
+
     <v-row
       justify="center"
       align="center"
@@ -34,24 +32,71 @@
       style="min-width: 100px; max-width: 100%;"
     >
       <component
-        :is="currentControl.type"
-        :control="currentControl"
-        :position="surveyPositions[controlIndex]"
+        :is="control.type"
+        :control="control"
+        :position="positions[index]"
         :instance="instance"
-        :controlIndex="controlIndex"
+        :controlIndex="index"
       ></component>
     </v-row>
+
+    <!--
+    <form>
+      <div class="form-group">
+        <label for="survey-question">
+          <h3>{{control.label}}</h3>
+        </label>
+        <input
+          v-if="showInput"
+          class="form-control"
+          id="survey-question"
+          name="survey-question"
+          v-model="control.value"
+        />
+      </div>
+      <div class="d-flex justify-content-end">
+        <button
+          type="button"
+          class="btn btn-outline-primary mr-2"
+          @click="previous"
+          v-show="!atStart"
+        >Previous</button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          @click.prevent="next"
+        >{{ atEnd ? "Submit" : "Next"}}</button>
+      </div>
+    </form>
+    -->
     <div class="font-weight-medium footer">
       <v-container class="pl-8 pr-8">
         <v-row>
           <v-col class="text-center" cols="6">
-            <v-btn @click="prev" class="full" outlined depressed large color="primary">Preivous</v-btn>
+            <v-btn
+              v-show="!atStart"
+              @click="previous"
+              class="full"
+              outlined
+              depressed
+              large
+              color="primary"
+            >Previous</v-btn>
           </v-col>
-          <v-col v-if="last" class="text-center" cols="6">
-            <v-btn @click="submit" class="full" depressed large color="primary">Submit</v-btn>
+
+          <v-col v-if="atEnd" class="text-center" cols="6">
+            <v-btn @click="next" class="full" depressed large color="primary">Submit</v-btn>
           </v-col>
+
           <v-col v-else class="text-center" cols="6">
-            <v-btn @click="next" class="full" depressed large color="primary">Next</v-btn>
+            <v-btn
+              @click="next"
+              @keyup.enter="next"
+              class="full"
+              depressed
+              large
+              color="primary"
+            >Next</v-btn>
           </v-col>
         </v-row>
       </v-container>
@@ -59,134 +104,137 @@
   </v-container>
 </template>
 
-<script>
-/* eslint-disable prefer-destructuring */
 
+<script>
 import _ from 'lodash';
-import ObjectId from 'bson-objectid';
+import api from '@/services/api.service';
+
 import inputText from '@/components/survey/question_types/TextInput.vue';
 import inputNumeric from '@/components/survey/question_types/NumberInput.vue';
 import group from '@/components/survey/question_types/Group.vue';
-import AppQuestionList from '@/components/survey/QuestionList.vue';
-import * as db from '@/store/db';
-import * as utils from '@/utils/surveys';
 
-import { loadResults } from '@/utils/drafts';
+import {
+  getControl,
+  getBreadcrumbs,
+  getInstanceData,
+  getSurveyPositions,
+  compileSandboxSingleLine,
+  createInstancePayload,
+} from '@/utils/surveys';
 
 export default {
   components: {
     inputText,
     inputNumeric,
     group,
-    AppQuestionList,
   },
   data() {
     return {
-      selected: [],
       survey: null,
-      surveyPositions: null,
-      controlIndex: 0,
+      control: null,
       instance: null,
-      surveyResults: [],
+      instanceData: null,
+      positions: null,
+      breadcrumbs: [],
+      index: 0,
     };
   },
+  computed: {
+    totalQuestions() {
+      return 13;
+    },
+    atStart() {
+      return this.index === 0;
+    },
+    atEnd() {
+      return this.index >= this.positions.length - 1;
+    },
+    showInput() {
+      if (this.control.type === 'group') {
+        return false;
+      }
 
-  methods: {
-    prev() {
-      this.persist();
-      if (this.controlIndex > 0) {
-        this.controlIndex -= 1;
-      }
+      return true;
     },
-    next() {
-      this.persist();
-      if (!this.last) {
-        this.controlIndex += 1;
-      }
-    },
-    submit() {
-      this.persist();
-    },
-    calculateControl() {
-      if (
-        !this.currentControl.options.calculate
-        || this.currentControl.options.calculate === ''
-      ) {
-        return;
-      }
-      const sandbox = utils.compileSandboxSingleLine(
-        this.currentControl.options.calculate,
-      );
-      this.currentControl.value = sandbox({ data: this.instanceData });
-    },
-    persist() {
-      db.persistSurveyResult(this.instance);
-    },
-    controlFromPosition(position) {
-      return utils.getControl(this.survey, position);
-    },
-    numberOf(questionIndex) {
-      const edited = this.surveyPositions[questionIndex].map(
-        value => value + 1,
-      );
+    questionNumber() {
+      const edited = this.positions[this.index].map(value => value + 1);
       return edited.join('.');
     },
-  },
-  computed: {
-    last() {
-      return this.controlIndex >= this.surveyPositions.length - 1;
-    },
-    currentControl() {
-      return utils.getControl(
-        this.survey,
-        this.surveyPositions[this.controlIndex],
-      );
-    },
-    breadcrumbs() {
-      const ret = utils.getBreadcrumbs(
-        this.survey,
-        this.surveyPositions[this.controlIndex],
-      );
+    mbreadcrumbs() {
+      const ret = getBreadcrumbs(this.survey, this.positions[this.index]);
       ret.splice(-1, 1);
       return ret.map(txt => `<kbd>${txt}</kbd>`).join(' &gt; ');
     },
-    questionNumber() {
-      const edited = this.surveyPositions[this.controlIndex].map(
-        value => value + 1,
-      );
-      return edited.join('.');
-    },
-    isGroup() {
-      return (
-        utils.getControl(this.survey, this.surveyPositions[this.controlIndex])
-          .type === 'group'
-      );
-    },
-    instanceData() {
-      return utils.getInstanceData(this.instance);
-    },
   },
-  async created() {
-    try {
-      const { id } = this.$route.params;
-      // const { data } = await api.get(`/surveys/${id}`);
-
-      this.survey = utils.mockSurvey;
-
+  methods: {
+    setValue(ev) {
+      this.control.value = ev.target.value;
+    },
+    next() {
+      if (this.atEnd) {
+        const payload = createInstancePayload(this.instance, this.survey);
+        console.log('payload', payload);
+        this.submit(payload);
+        return;
+      }
+      this.index++;
+      this.instanceData = getInstanceData(this.instance);
+      this.control = getControl(this.instance, this.positions[this.index]);
+      this.breadcrumbs = getBreadcrumbs(
+        this.survey,
+        this.positions[this.index],
+      );
+      this.calculateControl();
+    },
+    previous() {
+      if (this.atStart) {
+        return;
+      }
+      this.index--;
+      this.control = getControl(this.instance, this.positions[this.index]);
+      this.breadcrumbs = getBreadcrumbs(
+        this.survey,
+        this.positions[this.index],
+      );
+    },
+    calculateControl() {
+      console.log(this.control);
+      if (
+        !this.control.options.calculate
+        || this.control.options.calculate === ''
+      ) {
+        return;
+      }
+      const sandbox = compileSandboxSingleLine(this.control.options.calculate);
+      this.control.value = sandbox({ data: this.instanceData });
+      console.log(this.control.value);
+    },
+    async submit(payload) {
       try {
-        const results = await loadResults();
-        this.results = results;
-        this.instance = results.find(r => r._id === id);
-        if (!this.instance) {
-          throw Error('No matching instance found');
-        }
+        await api.post('/submissions', payload);
+        this.$router.push('/surveys/browse');
       } catch (error) {
-        this.instance = _.cloneDeep(this.survey);
-        this.instance._id = ObjectId().toString();
         console.log(error);
       }
+    },
+  },
 
-      this.surveyPositions = utils.getSurveyPositions(this.survey);
+  async created() {
+    try {
+      const { survey } = this.$route.query;
+      const { data } = await api.get(`/surveys/${survey}`);
+      this.survey = data;
+      this.instance = _.cloneDeep(this.survey);
+
+      this.positions = getSurveyPositions(this.survey);
+      this.instanceData = getInstanceData(this.instance);
+
+      this.index = 0;
+      this.control = getControl(this.instance, this.positions[this.index]);
+      this.breadcrumbs = getBreadcrumbs(
+        this.survey,
+        this.positions[this.index],
+      );
     } catch (e) {
       console.log('something went wrong:', e);
     }
