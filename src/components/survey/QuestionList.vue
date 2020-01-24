@@ -9,13 +9,13 @@
         <v-list-item :key="question.number">
           <template v-slot:default="{ active }">
             <v-list-item-content>
-              <v-list-item-title v-text="question.title"></v-list-item-title>
-              <v-list-item-subtitle class="text--primary">{{ `${numberOf(index)}  ${question.name}`}}</v-list-item-subtitle>
-              <v-list-item-subtitle v-text="question.label"></v-list-item-subtitle>
+              <v-list-item-title v-text="question.control.title"></v-list-item-title>
+              <v-list-item-subtitle class="text--primary">{{ `${question.number}  ${question.control.name}`}}</v-list-item-subtitle>
+              <v-list-item-subtitle v-text="question.control.label"></v-list-item-subtitle>
             </v-list-item-content>
 
             <v-list-item-action>
-              <v-list-item-action-text v-text="question.type"></v-list-item-action-text>
+              <v-list-item-action-text v-text="question.control.type"></v-list-item-action-text>
               <v-icon
                 v-if="!active"
                 color="grey lighten-1"
@@ -43,6 +43,9 @@
 </template>
 <script>
 export default {
+  data: () => ({
+    selected: [],
+  }),
   props: {
     questions: {
       type: Array,

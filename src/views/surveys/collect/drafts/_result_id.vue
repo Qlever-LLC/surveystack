@@ -3,7 +3,9 @@
     class="pl-8 pr-8 "
     v-if="instance"
   >
-
+    <v-row v-if="surveyPositions">
+      <app-question-list :questions=questions></app-question-list>
+    </v-row>
 
     <v-row class="flex-grow-0 flex-shrink-1">
       <div class="title">
@@ -91,7 +93,6 @@
 /* eslint-disable prefer-destructuring */
 
 
-import _ from 'lodash';
 import ObjectId from 'bson-objectid';
 import inputText from '@/components/survey/question_types/TextInput.vue';
 import inputNumeric from '@/components/survey/question_types/NumberInput.vue';
@@ -122,7 +123,6 @@ export default {
   },
   data() {
     return {
-      selected: [],
       survey: null,
       surveyPositions: null,
       controlIndex: 0,
@@ -189,6 +189,16 @@ export default {
     instanceData() {
       return utils.getInstanceData(this.instance);
     },
+    questions() {
+      if (!this.surveyPositions) {
+        return [];
+      }
+
+      return this.surveyPositions.map(pos => ({
+        number: pos.map(v => v + 1).join('.'),
+        control: this.controlFromPosition(pos),
+      }));
+    },
   },
   async created() {
     try {
@@ -205,7 +215,7 @@ export default {
           throw Error('No matching instance found');
         }
       } catch (error) {
-        this.instance = _.cloneDeep(this.survey);
+        this.instance = utils.createInstancePayload(this.survey);
         this.instance._id = ObjectId().toString();
         console.log(error);
       }
