@@ -133,7 +133,7 @@ export default {
 
       try {
         await api.customRequest({ method, url, data: this.survey });
-        this.$router.push('/surveys');
+        this.$router.push('/surveys/browse');
       } catch (error) {
         console.log(error.response);
         if (error.response.status === 409) {

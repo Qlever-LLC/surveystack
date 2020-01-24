@@ -1,8 +1,10 @@
 <template>
   <nav>
-    <v-app-bar app light clipped-left color="#f44336ff" >
+    <v-app-bar app light clipped-left color="#f44336ff">
       <v-app-bar-nav-icon color="white" @click="drawer = !drawer" />
-      <v-toolbar-title class="ml-2"><span class="title">Our-Sci</span></v-toolbar-title>
+      <v-toolbar-title class="ml-2">
+        <span class="title">Our-Sci</span>
+      </v-toolbar-title>
 
       <v-spacer></v-spacer>
 
@@ -16,7 +18,7 @@
       </v-btn>
     </v-app-bar>
 
-    <v-navigation-drawer v-model="drawer" app clipped >
+    <v-navigation-drawer v-model="drawer" app clipped>
       <v-list>
         <v-list-item v-for="(link, idx) in links" :key="idx" :to="link.to">
           <v-list-item-icon>
@@ -44,29 +46,22 @@ export default {
         },
         {
           title: 'Browse',
-          to: { name: 'browse-surveys' },
+          to: { name: 'surveys-browse' },
           icon: 'mdi-magnify',
         },
         {
-          title: 'New Survey',
-          to: {
-            name: 'collect-survey-draft',
-            params: { id: 'asdf' },
-          },
-          icon: 'mdi-newspaper-plus',
-        },
-        {
           title: 'Drafts',
-          to: {
-            name: 'browse-survey-drafts',
-          },
+          to: { name: 'submissions-drafts-list' },
           icon: 'mdi-pencil-plus',
         },
         {
           title: 'Builder',
-          to: {
-            name: 'survey-builder-new',
-          },
+          to: { name: 'surveys-new' },
+          icon: 'mdi-newspaper-plus',
+        },
+        {
+          title: 'Mock Survey',
+          to: { name: 'mock' },
           icon: 'mdi-newspaper-plus',
         },
         {

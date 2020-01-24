@@ -221,8 +221,8 @@ export default {
 
   async created() {
     try {
-      const { id } = this.$route.params;
-      const { data } = await api.get(`/surveys/${id}`);
+      const { survey } = this.$route.query;
+      const { data } = await api.get(`/surveys/${survey}`);
       this.survey = data;
       this.instance = _.cloneDeep(this.survey);
 

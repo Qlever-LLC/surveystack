@@ -4,18 +4,17 @@ import Home from '../views/Home.vue';
 import Test from '@/views/Test.vue';
 
 import MySurveys from '@/views/surveys/MySurveys.vue';
-import BrowseSurveys from '@/views/surveys/Browse.vue';
-// import DraftSurveyResult from '@/views/surveys/collect/drafts/_result_id.vue';
-import DraftSubmission from '@/views/surveys/collect/drafts/_id.vue';
+import SurveysBrowse from '@/views/surveys/Browse.vue';
+import DraftSubmission from '@/views/submissions/drafts/Draft.vue';
 import DraftSurveyResult from '@/views/surveys/collect/drafts/_result_id.vue';
-import BrowseSurveyDrafts from '@/views/surveys/collect/drafts/browse.vue';
+import SubmissionDraftsList from '@/views/submissions/drafts/List.vue';
 
 import Login from '@/views/auth/Login.vue';
 import Register from '@/views/auth/Register.vue';
 import Profile from '@/views/auth/Profile.vue';
 import ExperimentQuestions from '@/views/experiment/Questions.vue';
 
-import SubmissionList from '@/views/submissions/Submissions.vue';
+import SubmissionList from '@/views/submissions/List.vue';
 
 import SurveyBuilder from '../views/builder/SurveyBuilder.vue';
 
@@ -47,38 +46,43 @@ const routes = [
     component: SubmissionList,
   },
   {
-    path: '/surveys/new',
-    name: 'survey-builder-new',
-    component: SurveyBuilder,
-  },
-  {
-    path: '/surveys/edit/:id',
-    name: 'survey-builder-edit',
-    component: SurveyBuilder,
-  },
-  {
     path: '/surveys/my-surveys',
     name: 'my-surveys',
     component: MySurveys,
   },
   {
     path: '/surveys/browse',
-    name: 'browse-surveys',
-    component: BrowseSurveys,
+    name: 'surveys-browse',
+    component: SurveysBrowse,
   },
   {
-    path: '/surveys/collect/start/:id',
-    name: 'collect-start-survey',
+    path: '/surveys/new',
+    name: 'surveys-new',
+    component: SurveyBuilder,
+  },
+  {
+    path: '/surveys/:id/edit',
+    name: 'surveys-edit',
+    component: SurveyBuilder,
+  },
+  {
+    path: '/submissions/drafts',
+    name: 'submissions-drafts-list',
+    component: SubmissionDraftsList,
+  },
+  {
+    path: '/submissions/drafts/new',
+    name: 'submissions-drafts-new',
     component: DraftSubmission,
   },
   {
-    path: '/surveys/collect/drafts/browse',
-    name: 'browse-survey-drafts',
-    component: BrowseSurveyDrafts,
+    path: '/submissions/drafts/:id',
+    name: 'submissions-drafts-detail',
+    component: DraftSurveyResult,
   },
   {
-    path: '/surveys/collect/drafts/:id',
-    name: 'collect-survey-draft',
+    path: '/mock',
+    name: 'mock',
     component: DraftSurveyResult,
   },
   {
