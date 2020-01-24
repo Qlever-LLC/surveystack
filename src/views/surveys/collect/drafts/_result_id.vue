@@ -1,5 +1,10 @@
 <template>
-  <v-container class="pl-8 pr-8 " v-if="instance">
+  <v-container
+    class="pl-8 pr-8 "
+    v-if="instance"
+  >
+
+
     <v-row class="flex-grow-0 flex-shrink-1">
       <div class="title">
         <div class="inner-title">{{ survey.name }} is a long but complicated name right?</div>
@@ -91,6 +96,7 @@ import ObjectId from 'bson-objectid';
 import inputText from '@/components/survey/question_types/TextInput.vue';
 import inputNumeric from '@/components/survey/question_types/NumberInput.vue';
 import group from '@/components/survey/question_types/Group.vue';
+import AppQuestionList from '@/components/survey/QuestionList.vue';
 import * as db from '@/store/db';
 import * as utils from '@/utils/surveys';
 
@@ -112,9 +118,11 @@ export default {
     inputText,
     inputNumeric,
     group,
+    AppQuestionList,
   },
   data() {
     return {
+      selected: [],
       survey: null,
       surveyPositions: null,
       controlIndex: 0,
@@ -150,6 +158,13 @@ export default {
     },
     persist() {
       db.persistSurveyResult(this.instance);
+    },
+    controlFromPosition(position) {
+      return utils.getControl(this.survey, position);
+    },
+    numberOf(questionIndex) {
+      const edited = this.surveyPositions[questionIndex].map(value => value + 1);
+      return edited.join('.');
     },
   },
   computed: {

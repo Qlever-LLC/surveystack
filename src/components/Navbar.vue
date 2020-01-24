@@ -1,13 +1,13 @@
 <template>
   <nav>
-    <v-app-bar app light clipped-left>
-      <v-app-bar-nav-icon @click="drawer = !drawer" />
-      <v-toolbar-title class="ml-2">Our-Sci</v-toolbar-title>
+    <v-app-bar app light clipped-left color="#f44336ff" >
+      <v-app-bar-nav-icon color="white" @click="drawer = !drawer" />
+      <v-toolbar-title class="ml-2"><span class="title">Our-Sci</span></v-toolbar-title>
 
       <v-spacer></v-spacer>
 
       <v-btn v-if="$store.getters['auth/isLoggedIn']" :to="{name: 'auth-profile'}" text>
-        <v-icon>mdi-account</v-icon>
+        <v-icon color="white">mdi-account</v-icon>
       </v-btn>
 
       <v-btn v-else :to="{name: 'auth-login'}" text>
@@ -16,7 +16,7 @@
       </v-btn>
     </v-app-bar>
 
-    <v-navigation-drawer v-model="drawer" app clipped>
+    <v-navigation-drawer v-model="drawer" app clipped >
       <v-list>
         <v-list-item v-for="(link, idx) in links" :key="idx" :to="link.to">
           <v-list-item-icon>
@@ -74,3 +74,8 @@ export default {
   },
 };
 </script>
+<style scoped>
+.title {
+  color: white;
+}
+</style>
