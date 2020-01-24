@@ -47,7 +47,6 @@
           <v-col class="text-center" cols="6">
             <v-btn @click="prev" class="full" outlined depressed large color="primary">Preivous</v-btn>
           </v-col>
-
           <v-col v-if="last" class="text-center" cols="6">
             <v-btn @click="submit" class="full" depressed large color="primary">Submit</v-btn>
           </v-col>
@@ -72,17 +71,7 @@ import AppQuestionList from '@/components/survey/QuestionList.vue';
 import * as db from '@/store/db';
 import * as utils from '@/utils/surveys';
 
-const loadResults = () => new Promise((resolve, reject) => {
-    db.openDb(() => {
-      db.getAllSurveyResults((results) => {
-        if (!results || results.length === 0) {
-          reject();
-        } else {
-          resolve(results);
-        }
-      });
-    });
-  });
+import { loadResults } from '@/utils/drafts';
 
 export default {
   components: {
