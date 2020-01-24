@@ -443,6 +443,30 @@ export function compileSandbox(src, fname) {
   };
 }
 
+
+export const createInstance = (survey) => {
+  const clone = _.cloneDeep(survey);
+  const positions = getSurveyPositions(survey);
+
+  positions.forEach((position) => {
+    const control = getControl(clone, position);
+    delete control.label;
+    delete control.options;
+  });
+
+  // rename "controls" to "data"
+  // https://stackoverflow.com/a/50101979
+  delete Object.assign(clone, { data: clone.controls }).controls;
+
+  clone.survey = survey._id;
+  delete clone._id;
+  delete clone.name;
+  clone.created = new Date();
+
+  return clone;
+};
+
+
 /**
  * Returns a new instance ready to upload
  * @param {Object} instance
