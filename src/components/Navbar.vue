@@ -69,6 +69,13 @@ export default {
           },
           icon: 'mdi-newspaper-plus',
         },
+        {
+          title: 'Experiment',
+          to: {
+            name: 'experiment-questions',
+          },
+          icon: 'mdi-pill',
+        },
       ],
     };
   },

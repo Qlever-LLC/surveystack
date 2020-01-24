@@ -13,6 +13,7 @@ import BrowseSurveyDrafts from '@/views/surveys/collect/drafts/browse.vue';
 import Login from '@/views/auth/Login.vue';
 import Register from '@/views/auth/Register.vue';
 import Profile from '@/views/auth/Profile.vue';
+import ExperimentQuestions from '@/views/experiment/Questions.vue';
 
 import SubmissionList from '@/views/submissions/Submissions.vue';
 
@@ -94,6 +95,11 @@ const routes = [
     path: '/auth/profile',
     name: 'auth-profile',
     component: Profile,
+  },
+  {
+    path: '/experiment/questions',
+    name: 'experiment-questions',
+    component: ExperimentQuestions,
   },
 ];
 
