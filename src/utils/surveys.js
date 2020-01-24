@@ -489,7 +489,7 @@ export const createInstancePayload = (instance, survey) => {
   delete Object.assign(clone, { data: clone.controls }).controls;
 
   clone.survey = survey._id;
-  delete clone._id;
+  // delete clone._id;
   delete clone.name;
   clone.created = new Date();
 
