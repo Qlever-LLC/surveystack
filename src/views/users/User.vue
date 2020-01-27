@@ -3,6 +3,7 @@
     <v-card>
       <v-card-title>{{entity.email}}</v-card-title>
       <v-card-subtitle>{{entity._id}}</v-card-subtitle>
+      <v-card-text>{{entity.name}}</v-card-text>
     </v-card>
   </v-container>
 </template>
@@ -23,7 +24,7 @@ export default {
   async created() {
     const { id } = this.$route.params;
     const { data } = await api.get(`/users/${id}`);
-    this.entity = data;
+    this.entity = { ...this.entity, ...data };
   },
 };
 </script>

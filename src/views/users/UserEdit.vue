@@ -13,7 +13,7 @@
       />
 
       <v-text-field
-        v-model="entity.passwordConfirmation"
+        v-model="passwordConfirmation"
         label="Password (Confirmation)"
         :type="showPasswords ? 'text' : 'password'"
         :hint="passwordHint"
@@ -56,7 +56,7 @@ export default {
     async submit() {
       const data = this.entity;
       const method = this.editMode ? 'put' : 'post';
-      const url = this.editMode ? `/partners/${this.entity._id}` : '/partners';
+      const url = this.editMode ? `/users/${this.entity._id}` : '/users';
 
       if (this.entity.password !== this.passwordConfirmation) {
         this.$store.dispatch('feedback/add', 'Passwords do not match');
@@ -94,7 +94,7 @@ export default {
       try {
         const { id } = this.$route.params;
         const { data } = await api.get(`/users/${id}`);
-        this.entity = data;
+        this.entity = { ...this.entity, ...data };
       } catch (e) {
         console.log('something went wrong:', e);
       }
