@@ -21,8 +21,9 @@ const survey = {
     {
       name: 'personal_group',
       label: 'Personal Group',
-      type: 'group',
+      type: 'group', // group
       children: [
+        // group has children
         {
           name: 'full_name',
           label: 'Full Name',
