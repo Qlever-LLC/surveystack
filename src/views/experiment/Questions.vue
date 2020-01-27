@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pl-8 pr-8 ">
+  <v-container fluid class="pl-8 pr-8" height="100%">
 
     <app-map></app-map>
 
