@@ -53,7 +53,7 @@ export default {
     goToEditSelf() {
       // eslint-disable-next-line
       const id = this.$store.state.auth.user._id;
-      this.$router.push(`/users/edit/${id}`);
+      this.$router.push(`/users/${id}/edit`);
     },
   },
   data() {
