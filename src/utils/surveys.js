@@ -511,7 +511,7 @@ export const calculateControl = (control) => {
   }
 };
 
-const DBG = false;
+const DBG = true;
 
 if (DBG) {
   console.log();
