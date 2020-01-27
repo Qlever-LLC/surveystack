@@ -97,6 +97,7 @@ export default {
         name: '',
         _id: '',
         controls: [],
+        dateCreated: new Date(),
       },
     };
   },
@@ -133,7 +134,7 @@ export default {
 
       try {
         await api.customRequest({ method, url, data: this.survey });
-        this.$router.push('/surveys');
+        this.$router.push('/surveys/browse');
       } catch (error) {
         console.log(error.response);
         if (error.response.status === 409) {
@@ -149,7 +150,7 @@ export default {
 
   async created() {
     this.editMode = !this.$route.matched.some(
-      ({ name }) => name === 'survey-builder-new',
+      ({ name }) => name === 'surveys-new',
     );
 
     this.survey._id = ObjectId();
@@ -159,7 +160,7 @@ export default {
         const { id } = this.$route.params;
         this.survey._id = id;
         const { data } = await api.get(`/surveys/${this.survey._id}`);
-        this.survey = data;
+        this.survey = { ...this.survey, ...data };
       } catch (e) {
         console.log('something went wrong:', e);
       }

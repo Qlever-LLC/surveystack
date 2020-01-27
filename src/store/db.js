@@ -68,6 +68,7 @@ function clearAllSurveyResults() {
 function persistSurveyResult(surveyResult) {
   const store = getObjectStore(surveysResultsStoreName, 'readwrite');
   let req;
+
   try {
     req = store.put(surveyResult);
   } catch (e) {

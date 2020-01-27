@@ -1,13 +1,27 @@
 <template>
-  <v-container class="pl-8 pr-8 " v-if="instance">
+  <v-container class="pl-8 pr-8" v-if="instance">
+    <v-row v-if="surveyPositions">
+      <app-question-list :questions="questions"></app-question-list>
+    </v-row>
+
     <v-row class="flex-grow-0 flex-shrink-1">
       <div class="title">
         <div class="inner-title">{{ survey.name }} is a long but complicated name right?</div>
-        <div class="subtitle-1 count grey--text text--darken-2">Total<br>{{ survey.controls.length + 5254}} Questions</div>
+        <div class="subtitle-1 count grey--text text--darken-2">
+          Total
+          <br />
+          {{ survey.controls.length + 5254}} Questions
+        </div>
       </div>
       <div class="infos grey--text text--darken-2">
-        <div v-if="!isGroup"><kbd class="display-1">{{ questionNumber }}</kbd> Question <span class="font-italic blue--text">{{ currentControl.name }}</span></div>
-        <div v-else><kbd class="display-1">{{ questionNumber }}</kbd> Group <span class="font-italic blue--text">{{ currentControl.name }}</span></div>
+        <div v-if="!isGroup">
+          <kbd class="display-1">{{ questionNumber }}</kbd> Question
+          <span class="font-italic blue--text">{{ currentControl.name }}</span>
+        </div>
+        <div v-else>
+          <kbd class="display-1">{{ questionNumber }}</kbd> Group
+          <span class="font-italic blue--text">{{ currentControl.name }}</span>
+        </div>
       </div>
     </v-row>
     <v-row class="flex-grow-0 flex-shrink-1">
@@ -15,7 +29,7 @@
         v-if="breadcrumbs.length > 0"
         class="infos grey--text text--darken-2 mt-2"
         v-html="breadcrumbs"
-      > </div>
+      ></div>
     </v-row>
     <v-row
       justify="center"
@@ -29,89 +43,45 @@
         :position="surveyPositions[controlIndex]"
         :instance="instance"
         :controlIndex="controlIndex"
-      >
-      </component>
+      ></component>
     </v-row>
     <div class="font-weight-medium footer">
       <v-container class="pl-8 pr-8">
         <v-row>
-          <v-col
-            class="text-center"
-            cols="6"
-          >
-            <v-btn
-              @click="prev"
-              class="full"
-              outlined
-              depressed
-              large
-              color="primary"
-            >Preivous</v-btn>
+          <v-col class="text-center" cols="6">
+            <v-btn @click="prev" class="full" outlined depressed large color="primary">Preivous</v-btn>
           </v-col>
 
-          <v-col
-            v-if="last"
-            class="text-center"
-            cols="6"
-          >
-            <v-btn
-              @click="submit"
-              class="full"
-              depressed
-              large
-              color="primary"
-            >Submit</v-btn>
+          <v-col v-if="last" class="text-center" cols="6">
+            <v-btn @click="submit" class="full" depressed large color="primary">Submit</v-btn>
           </v-col>
-          <v-col
-            v-else
-            class="text-center"
-            cols="6"
-          >
-            <v-btn
-              @click="next"
-              class="full"
-              depressed
-              large
-              color="primary"
-            >Next</v-btn>
+          <v-col v-else class="text-center" cols="6">
+            <v-btn @click="next" class="full" depressed large color="primary">Next</v-btn>
           </v-col>
         </v-row>
       </v-container>
-
     </div>
   </v-container>
 </template>
 
 <script>
 /* eslint-disable prefer-destructuring */
-
-
 import _ from 'lodash';
 import ObjectId from 'bson-objectid';
 import inputText from '@/components/survey/question_types/TextInput.vue';
 import inputNumeric from '@/components/survey/question_types/NumberInput.vue';
 import group from '@/components/survey/question_types/Group.vue';
+import AppQuestionList from '@/components/survey/QuestionList.vue';
 import * as db from '@/store/db';
 import * as utils from '@/utils/surveys';
-
-
-const loadResults = () => new Promise((resolve, reject) => {
-  db.openDb(() => {
-    db.getAllSurveyResults((results) => {
-      if (!results || results.length === 0) {
-        reject();
-      } else {
-        resolve(results);
-      }
-    });
-  });
-});
+import { loadResults } from '@/utils/drafts';
 
 export default {
   components: {
     inputText,
     inputNumeric,
     group,
+    AppQuestionList,
   },
   data() {
     return {
@@ -141,15 +111,28 @@ export default {
     },
     calculateControl() {
       if (
-        !this.currentControl.options.calculate || this.currentControl.options.calculate === ''
+        !this.currentControl.options.calculate
+        || this.currentControl.options.calculate === ''
       ) {
         return;
       }
-      const sandbox = utils.compileSandboxSingleLine(this.currentControl.options.calculate);
+      const sandbox = utils.compileSandboxSingleLine(
+        this.currentControl.options.calculate,
+      );
       this.currentControl.value = sandbox({ data: this.instanceData });
     },
     persist() {
+      console.log(this.instance);
       db.persistSurveyResult(this.instance);
+    },
+    controlFromPosition(position) {
+      return utils.getControl(this.survey, position);
+    },
+    numberOf(questionIndex) {
+      const edited = this.surveyPositions[questionIndex].map(
+        value => value + 1,
+      );
+      return edited.join('.');
     },
   },
   computed: {
@@ -157,22 +140,43 @@ export default {
       return this.controlIndex >= this.surveyPositions.length - 1;
     },
     currentControl() {
-      return utils.getControl(this.survey, this.surveyPositions[this.controlIndex]);
+      return utils.getControl(
+        this.survey,
+        this.surveyPositions[this.controlIndex],
+      );
     },
     breadcrumbs() {
-      const ret = utils.getBreadcrumbs(this.survey, this.surveyPositions[this.controlIndex]);
+      const ret = utils.getBreadcrumbs(
+        this.survey,
+        this.surveyPositions[this.controlIndex],
+      );
       ret.splice(-1, 1);
       return ret.map(txt => `<kbd>${txt}</kbd>`).join(' &gt; ');
     },
     questionNumber() {
-      const edited = this.surveyPositions[this.controlIndex].map(value => value + 1);
+      const edited = this.surveyPositions[this.controlIndex].map(
+        value => value + 1,
+      );
       return edited.join('.');
     },
     isGroup() {
-      return utils.getControl(this.survey, this.surveyPositions[this.controlIndex]).type === 'group';
+      return (
+        utils.getControl(this.survey, this.surveyPositions[this.controlIndex])
+          .type === 'group'
+      );
     },
     instanceData() {
       return utils.getInstanceData(this.instance);
+    },
+    questions() {
+      if (!this.surveyPositions) {
+        return [];
+      }
+
+      return this.surveyPositions.map(pos => ({
+        number: pos.map(v => v + 1).join('.'),
+        control: this.controlFromPosition(pos),
+      }));
     },
   },
   async created() {
@@ -192,7 +196,7 @@ export default {
       } catch (error) {
         this.instance = _.cloneDeep(this.survey);
         this.instance._id = ObjectId().toString();
-        console.log(error);
+        console.log(this.instance);
       }
 
       this.surveyPositions = utils.getSurveyPositions(this.survey);

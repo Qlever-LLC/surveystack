@@ -1,13 +1,15 @@
 <template>
   <nav>
-    <v-app-bar app light clipped-left>
-      <v-app-bar-nav-icon @click="drawer = !drawer" />
-      <v-toolbar-title class="ml-2">Our-Sci</v-toolbar-title>
+    <v-app-bar app light clipped-left color="#f44336ff">
+      <v-app-bar-nav-icon color="white" @click="drawer = !drawer" />
+      <v-toolbar-title class="ml-2">
+        <span class="title">Our-Sci</span>
+      </v-toolbar-title>
 
       <v-spacer></v-spacer>
 
       <v-btn v-if="$store.getters['auth/isLoggedIn']" :to="{name: 'auth-profile'}" text>
-        <v-icon>mdi-account</v-icon>
+        <v-icon color="white">mdi-account</v-icon>
       </v-btn>
 
       <v-btn v-else :to="{name: 'auth-login'}" text>
@@ -44,33 +46,45 @@ export default {
         },
         {
           title: 'Browse',
-          to: { name: 'browse-surveys' },
+          to: { name: 'surveys-browse' },
           icon: 'mdi-magnify',
         },
         {
-          title: 'New Survey',
-          to: {
-            name: 'collect-survey',
-            params: { id: 'asdf' },
-          },
-          icon: 'mdi-newspaper-plus',
-        },
-        {
           title: 'Drafts',
-          to: {
-            name: 'browse-survey-drafts',
-          },
+          to: { name: 'submissions-drafts-list' },
           icon: 'mdi-pencil-plus',
         },
         {
           title: 'Builder',
-          to: {
-            name: 'survey-builder-new',
-          },
+          to: { name: 'surveys-new' },
           icon: 'mdi-newspaper-plus',
+        },
+        {
+          title: 'Mock Survey',
+          to: { name: 'mock' },
+          icon: 'mdi-newspaper-plus',
+        },
+        {
+          title: 'Experiment',
+          to: {
+            name: 'experiment-questions',
+          },
+          icon: 'mdi-pill',
+        },
+        {
+          title: 'Users',
+          to: {
+            name: 'users-list',
+          },
+          icon: 'mdi-account-group',
         },
       ],
     };
   },
 };
 </script>
+<style scoped>
+.title {
+  color: white;
+}
+</style>

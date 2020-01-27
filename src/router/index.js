@@ -4,15 +4,21 @@ import Home from '../views/Home.vue';
 import Test from '@/views/Test.vue';
 
 import MySurveys from '@/views/surveys/MySurveys.vue';
-import BrowseSurveys from '@/views/surveys/Browse.vue';
-// import DraftSurveyResult from '@/views/surveys/collect/drafts/_result_id.vue';
-import DraftSubmission from '@/views/surveys/collect/drafts/_id.vue';
+import SurveysBrowse from '@/views/surveys/Browse.vue';
+import DraftSubmission from '@/views/submissions/drafts/Draft.vue';
 import DraftSurveyResult from '@/views/surveys/collect/drafts/_result_id.vue';
-import BrowseSurveyDrafts from '@/views/surveys/collect/drafts/browse.vue';
+import SubmissionDraftsList from '@/views/submissions/drafts/List.vue';
 
 import Login from '@/views/auth/Login.vue';
 import Register from '@/views/auth/Register.vue';
 import Profile from '@/views/auth/Profile.vue';
+import ExperimentQuestions from '@/views/experiment/Questions.vue';
+
+import UserList from '@/views/users/UserList.vue';
+import User from '@/views/users/User.vue';
+import UserEdit from '@/views/users/UserEdit.vue';
+
+import SubmissionList from '@/views/submissions/List.vue';
 
 import SurveyBuilder from '../views/builder/SurveyBuilder.vue';
 
@@ -39,14 +45,9 @@ const routes = [
     component: Test,
   },
   {
-    path: '/surveys/new',
-    name: 'survey-builder-new',
-    component: SurveyBuilder,
-  },
-  {
-    path: '/surveys/edit/:id',
-    name: 'survey-builder-edit',
-    component: SurveyBuilder,
+    path: '/submissions',
+    name: 'submissions',
+    component: SubmissionList,
   },
   {
     path: '/surveys/my-surveys',
@@ -55,22 +56,37 @@ const routes = [
   },
   {
     path: '/surveys/browse',
-    name: 'browse-surveys',
-    component: BrowseSurveys,
+    name: 'surveys-browse',
+    component: SurveysBrowse,
   },
   {
-    path: '/surveys/collect/start/:id',
-    name: 'collect-start-survey',
+    path: '/surveys/new',
+    name: 'surveys-new',
+    component: SurveyBuilder,
+  },
+  {
+    path: '/surveys/:id/edit',
+    name: 'surveys-edit',
+    component: SurveyBuilder,
+  },
+  {
+    path: '/submissions/drafts',
+    name: 'submissions-drafts-list',
+    component: SubmissionDraftsList,
+  },
+  {
+    path: '/submissions/drafts/new',
+    name: 'submissions-drafts-new',
     component: DraftSubmission,
   },
   {
-    path: '/surveys/collect/drafts/browse',
-    name: 'browse-survey-drafts',
-    component: BrowseSurveyDrafts,
+    path: '/submissions/drafts/:id',
+    name: 'submissions-drafts-detail',
+    component: DraftSurveyResult,
   },
   {
-    path: '/surveys/collect/drafts/:id',
-    name: 'collect-survey-draft',
+    path: '/mock',
+    name: 'mock',
     component: DraftSurveyResult,
   },
   {
@@ -88,6 +104,33 @@ const routes = [
     name: 'auth-profile',
     component: Profile,
   },
+  {
+    path: '/experiment/questions',
+    name: 'experiment-questions',
+    component: ExperimentQuestions,
+  },
+  {
+    path: '/users',
+    name: 'users-list',
+    component: UserList,
+  },
+  {
+    path: '/users/new',
+    name: 'users-new',
+    component: UserEdit,
+  },
+  {
+    path: '/users/:id/edit',
+    name: 'users-edit',
+    component: UserEdit,
+  },
+  {
+    path: '/users/:id',
+    name: 'users-detail',
+    component: User,
+  },
+
+
 ];
 
 const router = new VueRouter({

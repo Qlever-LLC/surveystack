@@ -3,26 +3,20 @@
     <h3>Register</h3>
     <v-form class="mb-5">
       <v-text-field
-        label="Username"
+        label="E-Mail"
         type="text"
         class="form-control"
-        :value="user.username.toLowerCase()"
-        @input="user.username = $event.toLowerCase()"
+        :value="entity.email.toLowerCase()"
+        @input="entity.email = $event.toLowerCase()"
       />
 
-      <v-text-field
-        label="Email"
-        type="text"
-        class="form-control"
-        :value="user.email.toLowerCase()"
-        @input="user.email = $event.toLowerCase()"
-      />
+      <v-text-field label="Name" type="text" class="form-control" v-model="entity.name" />
 
       <v-text-field
         label="Password"
         :type="passwordInputType"
         class="form-control"
-        v-model="user.password"
+        v-model="entity.password"
       />
 
       <v-text-field
@@ -43,7 +37,6 @@
       </div>
     </v-form>
     <app-feedback v-if="status" @closed="status = ''">{{status}}</app-feedback>
-    <app-username-rules v-if="showUsernameRules" class="mt-2" @closed="showUsernameRules = false" />
     <div class="text-center text-muted mt-5">
       Already have an account?
       <router-link to="/auth/login">Go to login</router-link>.
@@ -52,20 +45,16 @@
 </template>
 
 <script>
-import { isValidUsername } from '@/utils/index';
-import appUsernameRules from '@/components/auth/UsernameRules.vue';
-
 export default {
   data() {
     return {
       status: '',
       passwordConfirmation: '',
       showPasswords: false,
-      showUsernameRules: false,
-      user: {
-        username: '',
-        password: '',
+      entity: {
         email: '',
+        name: '',
+        password: '',
       },
     };
   },
@@ -84,32 +73,25 @@ export default {
     async submit() {
       console.log('submitting');
 
-      if (this.user.username === '') {
-        this.status = 'Username must not be empty.';
+      if (this.entity.email === '') {
+        this.status = 'Email must not be empty.';
         return;
       }
 
-      if (!isValidUsername(this.user.username)) {
-        this.status = 'Invalid username';
-        this.showUsernameRules = true;
-        return;
-      }
-
-      if (this.user.password === '') {
+      if (this.entity.password === '') {
         this.status = 'Password must not be empty.';
         return;
       }
 
-      if (this.user.password !== this.passwordConfirmation) {
+      if (this.entity.password !== this.passwordConfirmation) {
         this.status = 'Passwords do not match.';
         return;
       }
 
       try {
-        // await api.post("/auth/register", this.user);
         await this.$store.dispatch('auth/login', {
           url: '/auth/register',
-          user: this.user,
+          user: this.entity,
         });
         this.$router.push('/surveys');
       } catch (error) {
@@ -122,9 +104,6 @@ export default {
         }
       }
     },
-  },
-  components: {
-    appUsernameRules,
   },
 };
 </script>

@@ -85,7 +85,7 @@
           </v-col>
 
           <v-col v-if="atEnd" class="text-center" cols="6">
-            <v-btn @click="submit" class="full" depressed large color="primary">Submit</v-btn>
+            <v-btn @click="next" class="full" depressed large color="primary">Submit</v-btn>
           </v-col>
 
           <v-col v-else class="text-center" cols="6">
@@ -107,6 +107,7 @@
 
 <script>
 import _ from 'lodash';
+import ObjectID from 'bson-objectid';
 import api from '@/services/api.service';
 
 import inputText from '@/components/survey/question_types/TextInput.vue';
@@ -173,6 +174,7 @@ export default {
     next() {
       if (this.atEnd) {
         const payload = createInstancePayload(this.instance, this.survey);
+        console.log('payload', payload);
         this.submit(payload);
         return;
       }
@@ -197,6 +199,7 @@ export default {
       );
     },
     calculateControl() {
+      console.log(this.control);
       if (
         !this.control.options.calculate
         || this.control.options.calculate === ''
@@ -205,11 +208,12 @@ export default {
       }
       const sandbox = compileSandboxSingleLine(this.control.options.calculate);
       this.control.value = sandbox({ data: this.instanceData });
+      console.log(this.control.value);
     },
-    submit(payload) {
+    async submit(payload) {
       try {
-        api.post('/survey-results', payload);
-        this.$router.push('/surveys');
+        await api.post('/submissions', payload);
+        this.$router.push('/surveys/browse');
       } catch (error) {
         console.log(error);
       }
@@ -218,10 +222,11 @@ export default {
 
   async created() {
     try {
-      const { id } = this.$route.params;
-      const { data } = await api.get(`/surveys/${id}`);
+      const { survey } = this.$route.query;
+      const { data } = await api.get(`/surveys/${survey}`);
       this.survey = data;
       this.instance = _.cloneDeep(this.survey);
+      this.instance._id = new ObjectID(); // TODO: get id from existing draft
 
       this.positions = getSurveyPositions(this.survey);
       this.instanceData = getInstanceData(this.instance);
