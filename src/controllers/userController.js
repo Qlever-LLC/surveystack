@@ -25,7 +25,7 @@ const getUsers = async (req, res) => {
     }
     entities = await db
       .collection(col)
-      .find({ username: { $regex: req.query.find, $options: 'i' } })
+      .find({ name: { $regex: req.query.find, $options: 'i' } })
       .project(projection)
       .toArray();
     return res.send(entities);
@@ -59,7 +59,7 @@ const getUser = async (req, res) => {
 const createUser = async (req, res) => {
   const entity = req.body;
 
-  const { email, username, password } = entity;
+  const { email, name, password } = entity;
   if (password.trim() === '') {
     throw boom.badRequest('Password must not be empty');
   }
@@ -75,11 +75,11 @@ const createUser = async (req, res) => {
   const hash = bcrypt.hashSync(password, parseInt(process.env.BCRYPT_ROUNDS));
   const token = uuidv4();
   const user = {
-    username,
     email,
+    name,
     token,
     password: hash,
-    permissions: [`/u/${username}`],
+    permissions: [],
     authProviders: [],
   };
 
@@ -98,11 +98,14 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const entity = req.body;
+  console.log('entity', entity);
   const id = entity._id;
 
+  /*
   if (!res.locals.auth.isAdmin && res.locals.auth.user._id != id) {
     throw boom.unauthorized(`Not allowed to put user: ${id}`);
   }
+  */
 
   const { password } = entity;
   if (password === '') {

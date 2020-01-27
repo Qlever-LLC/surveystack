@@ -29,9 +29,9 @@ app.use(async (req, res, next) => {
   if (req.headers.authorization) {
     //console.log("authHeader", req.headers.authorization);
     const authHeader = req.headers.authorization;
-    const [username, token] = authHeader.split(' ');
+    const [email, token] = authHeader.split(' ');
 
-    user = await db.collection('users').findOne({ username, token });
+    user = await db.collection('users').findOne({ email, token });
     if (user) {
       isAuthenticated = true;
       isAdmin = user.permissions.includes('admin');

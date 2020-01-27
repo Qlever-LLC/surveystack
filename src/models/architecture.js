@@ -74,8 +74,8 @@ permissions: ["admin@our-sci", "member@rfc-lab", "greg"]
 
 const user = {
   _id: '5dc4294f48ddbfa5e0bca38e',
-  username: 'greg',
   email: '',
+  name: 'greg',
   token: '838b0f85-ca5d-4117-b2bd-7bd5ece53d0b',
   password: '$2b$12$Y3DIwVT2EYiJJZ5E8Wag5O/zDBOMuYYQCWzVaXuJ52vUyXm4SzpmG',
   permissions: ['/u/greg', '/g/our-sci/admins'],
