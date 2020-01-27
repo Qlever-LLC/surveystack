@@ -98,14 +98,11 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const entity = req.body;
-  console.log('entity', entity);
   const id = entity._id;
 
-  /*
   if (!res.locals.auth.isAdmin && res.locals.auth.user._id != id) {
     throw boom.unauthorized(`Not allowed to put user: ${id}`);
   }
-  */
 
   const { password } = entity;
   if (password === '') {

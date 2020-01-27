@@ -120,7 +120,8 @@ const submissions = [
   },
 ];
 
-// versioning
+// IGNORE BELOW: We will use an automatically generated version, 27 Jan 2020
+//
 // https://stackoverflow.com/questions/17770338/comparing-versions-in-mongodb
 // version should be a property on bascially any resource
 // e.g. version 1.3.9
