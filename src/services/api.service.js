@@ -44,14 +44,6 @@ const ApiService = {
 
   /**
    * Perform a custom Axios request.
-   *
-   * data is an object containing the following properties:
-   *  - method
-   *  - url
-   *  - data ... request payload
-   *  - auth (optional)
-   *    - username
-   *    - password
    * */
   customRequest(data) {
     return httpClient(data);

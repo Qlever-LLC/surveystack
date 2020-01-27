@@ -11,12 +11,12 @@
         href="/shapeshift?mode=off"
         class="text-info"
         @click.prevent="$store.dispatch('auth/leaveShapeshift')"
-      >Click to return as '{{$store.state.auth.shapeshiftUser.username}}'</a>
+      >Click to return as '{{$store.state.auth.shapeshiftUser.email}}'</a>
     </app-feedback>
     <h2>Login successful</h2>
     <h4>
       You are logged in as
-      <strong>{{ user.username }}</strong>.
+      <strong>{{ user.email }}</strong>.
     </h4>
 
     <div class="mt-2">

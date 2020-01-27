@@ -71,6 +71,13 @@ export default {
           },
           icon: 'mdi-pill',
         },
+        {
+          title: 'Users',
+          to: {
+            name: 'users-list',
+          },
+          icon: 'mdi-account-group',
+        },
       ],
     };
   },

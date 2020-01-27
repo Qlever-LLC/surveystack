@@ -30,8 +30,8 @@ const actions = {
         .post(auth.url, auth.user)
         .then((resp) => {
           const user = resp.data;
-          const { username, token } = user;
-          const header = `${username} ${token}`;
+          const { email, token } = user;
+          const header = `${email} ${token}`;
 
           AuthService.saveStatus('success');
           AuthService.saveUser(user);
@@ -65,8 +65,8 @@ const actions = {
         .get(`/admin/user/${id}`)
         .then((resp) => {
           const user = resp.data;
-          const { username, token } = user;
-          const header = `${username} ${token}`;
+          const { email, token } = user;
+          const header = `${email} ${token}`;
 
           AuthService.shapeshiftPush({
             status: 'success',

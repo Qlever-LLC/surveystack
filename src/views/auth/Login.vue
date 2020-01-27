@@ -3,17 +3,17 @@
     <h3>Login</h3>
     <v-form>
       <v-text-field
-        label="Username"
+        label="E-Mail"
         type="text"
         class="form-control"
-        :value="user.username"
-        @input="user.username = $event.toLowerCase()"
+        :value="entity.email"
+        @input="entity.email = $event.toLowerCase()"
       />
       <v-text-field
         label="Password"
         :type="passwordInputType"
         class="form-control"
-        v-model="user.password"
+        v-model="entity.password"
       />
       <div class="d-flex">
         <v-btn
@@ -46,8 +46,8 @@ export default {
     return {
       status: '',
       showPasswords: false,
-      user: {
-        username: '',
+      entity: {
+        email: '',
         password: '',
       },
     };
@@ -61,18 +61,15 @@ export default {
     },
   },
   methods: {
-    changedUsername(ev) {
-      console.log(ev);
-    },
     async submit() {
       console.log('submitting');
 
-      if (this.user.username === '') {
-        this.status = 'Username must not be empty.';
+      if (this.entity.email === '') {
+        this.status = 'E-Mail must not be empty.';
         return;
       }
 
-      if (this.user.password === '') {
+      if (this.entity.password === '') {
         this.status = 'Password must not be empty.';
         return;
       }
@@ -80,7 +77,7 @@ export default {
       try {
         await this.$store.dispatch('auth/login', {
           url: '/auth/login',
-          user: this.user,
+          user: this.entity,
         });
         this.$router.push('/');
       } catch (error) {

@@ -14,6 +14,10 @@ import Register from '@/views/auth/Register.vue';
 import Profile from '@/views/auth/Profile.vue';
 import ExperimentQuestions from '@/views/experiment/Questions.vue';
 
+import UserList from '@/views/users/UserList.vue';
+import User from '@/views/users/User.vue';
+import UserEdit from '@/views/users/UserEdit.vue';
+
 import SubmissionList from '@/views/submissions/List.vue';
 
 import SurveyBuilder from '../views/builder/SurveyBuilder.vue';
@@ -105,6 +109,28 @@ const routes = [
     name: 'experiment-questions',
     component: ExperimentQuestions,
   },
+  {
+    path: '/users',
+    name: 'users-list',
+    component: UserList,
+  },
+  {
+    path: '/users/new',
+    name: 'users-new',
+    component: UserEdit,
+  },
+  {
+    path: '/users/:id/edit',
+    name: 'users-edit',
+    component: UserEdit,
+  },
+  {
+    path: '/users/:id',
+    name: 'users-detail',
+    component: User,
+  },
+
+
 ];
 
 const router = new VueRouter({
