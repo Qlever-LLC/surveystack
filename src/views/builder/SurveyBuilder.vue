@@ -149,7 +149,7 @@ export default {
 
   async created() {
     this.editMode = !this.$route.matched.some(
-      ({ name }) => name === 'survey-builder-new',
+      ({ name }) => name === 'surveys-new',
     );
 
     this.survey._id = ObjectId();
