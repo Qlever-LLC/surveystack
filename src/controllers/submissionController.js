@@ -1,11 +1,11 @@
-import assert from "assert";
-import { ObjectId } from "mongodb";
+import assert from 'assert';
+import { ObjectId } from 'mongodb';
 
-import boom from "@hapi/boom";
+import boom from '@hapi/boom';
 
-import { db } from "../models";
+import { db } from '../db';
 
-const col = "submissions";
+const col = 'submissions';
 
 const getSubmissions = async (req, res) => {
   let entities;
@@ -14,7 +14,7 @@ const getSubmissions = async (req, res) => {
     entities = await db
       .collection(col)
       .find({
-        survey: new ObjectId(req.query.survey)
+        survey: new ObjectId(req.query.survey),
       })
       .toArray();
     return res.send(entities);
@@ -35,7 +35,7 @@ const getSubmission = async (req, res) => {
 
   if (!entity) {
     return res.status(404).send({
-      message: `No entity with _id exists: ${id}`
+      message: `No entity with _id exists: ${id}`,
     });
   }
 
@@ -45,20 +45,16 @@ const getSubmission = async (req, res) => {
 const createSubmission = async (req, res) => {
   const entity = req.body;
   try {
-    let r = await db
-      .collection(col)
-      .insertOne({ ...entity, survey: new ObjectId(entity.survey) });
+    let r = await db.collection(col).insertOne({ ...entity, survey: new ObjectId(entity.survey) });
     assert.equal(1, r.insertedCount);
     return res.send(r);
   } catch (err) {
-    if (err.name === "MongoError" && err.code === 11000) {
-      return res
-        .status(409)
-        .send({ message: `Entity with _id already exists: ${entity._id}` });
+    if (err.name === 'MongoError' && err.code === 11000) {
+      return res.status(409).send({ message: `Entity with _id already exists: ${entity._id}` });
     }
   }
 
-  return res.status(500).send({ message: "Internal error" });
+  return res.status(500).send({ message: 'Internal error' });
 };
 
 const updateSubmission = async (req, res) => {
@@ -67,7 +63,7 @@ const updateSubmission = async (req, res) => {
   const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
   if (!existing) {
     return res.status(404).send({
-      message: `No entity with _id exists: ${id}`
+      message: `No entity with _id exists: ${id}`,
     });
   }
 
@@ -76,32 +72,30 @@ const updateSubmission = async (req, res) => {
       { _id: id },
       { $set: req.body },
       {
-        returnOriginal: false
+        returnOriginal: false,
       }
     );
     return res.send(updated);
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ message: "Ouch :/" });
+    return res.status(500).send({ message: 'Ouch :/' });
   }
 };
 
 const deleteSubmission = async (req, res) => {
   const { id } = req.params;
   try {
-    const existing = await db
-      .collection(col)
-      .findOne({ _id: new ObjectId(id) });
+    const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
     if (!existing) {
       return res.status(404).send({
-        message: `No entity with _id exists: ${id}`
+        message: `No entity with _id exists: ${id}`,
       });
     }
     let r = await db.collection(col).deleteOne({ _id: id });
     assert.equal(1, r.deletedCount);
-    return res.send({ message: "OK" });
+    return res.send({ message: 'OK' });
   } catch (error) {
-    return res.status(500).send({ message: "Ouch :/" });
+    return res.status(500).send({ message: 'Ouch :/' });
   }
 };
 
@@ -110,5 +104,5 @@ export default {
   getSubmission,
   createSubmission,
   updateSubmission,
-  deleteSubmission
+  deleteSubmission,
 };

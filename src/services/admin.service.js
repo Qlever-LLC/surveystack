@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt';
 import uuidv4 from 'uuid/v4';
 
-import { db } from '../models';
+import { db } from '../db';
 
 const getDefaultAdminPasswordHash = () => {
   const password = process.env.ADMIN_PASSWORD;

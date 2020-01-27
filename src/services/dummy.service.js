@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 
-import { db } from '../models';
+import { db } from '../db';
 
 const randomString = () =>
   Math.random()

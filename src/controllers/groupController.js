@@ -1,15 +1,12 @@
-import assert from "assert";
-import { ObjectId } from "mongodb";
+import assert from 'assert';
+import { ObjectId } from 'mongodb';
 
-import bcrypt from "bcrypt";
-import uuidv4 from "uuid/v4";
+import boom from '@hapi/boom';
+import { GROUP_PATH_DELIMITER } from '../constants';
 
-import boom from "@hapi/boom";
-import { GROUP_PATH_DELIMITER } from "../constants";
+import { db } from '../db';
 
-import { db } from "../models";
-
-const col = "groups";
+const col = 'groups';
 
 const getGroups = async (req, res) => {
   let entities;
@@ -31,12 +28,10 @@ const getGroups = async (req, res) => {
 };
 
 const getGroupByPath = async (req, res) => {
-  console.log("req.params[0] =", req.params[0]);
+  console.log('req.params[0] =', req.params[0]);
   let entity;
 
-  const splits = req.params[0]
-    .split(GROUP_PATH_DELIMITER)
-    .filter(split => split !== "");
+  const splits = req.params[0].split(GROUP_PATH_DELIMITER).filter(split => split !== '');
 
   console.log(splits);
 
@@ -44,7 +39,7 @@ const getGroupByPath = async (req, res) => {
   let name = null;
 
   if (splits.length === 0) {
-    return res.status(400).send({ message: "Invalid path" });
+    throw boom.badRequest('Invalid path');
   }
 
   if (splits.length === 1) {
@@ -54,20 +49,17 @@ const getGroupByPath = async (req, res) => {
 
   if (splits.length > 1) {
     name = splits.pop();
-    path =
-      GROUP_PATH_DELIMITER +
-      splits.join(GROUP_PATH_DELIMITER) +
-      GROUP_PATH_DELIMITER;
+    path = GROUP_PATH_DELIMITER + splits.join(GROUP_PATH_DELIMITER) + GROUP_PATH_DELIMITER;
   }
 
-  console.log("path", path);
-  console.log("name", name);
+  console.log('path', path);
+  console.log('name', name);
 
   entity = await db.collection(col).findOne({ path, name });
 
   if (!entity) {
     return res.status(404).send({
-      message: `No entity found: path=${path}, name=${name}`
+      message: `No entity found: path=${path}, name=${name}`,
     });
   }
 
@@ -81,9 +73,7 @@ const getGroupById = async (req, res) => {
   entity = await db.collection(col).findOne({ _id: new ObjectId(id) });
 
   if (!entity) {
-    return res.status(404).send({
-      message: `No entity with _id exists: ${id}`
-    });
+    throw boom.notFound(`No entity with _id exists: ${id}`);
   }
 
   return res.send(entity);
@@ -92,20 +82,16 @@ const getGroupById = async (req, res) => {
 const createGroup = async (req, res) => {
   const entity = req.body;
   try {
-    let r = await db
-      .collection(col)
-      .insertOne({ ...entity, _id: new ObjectId(entity._id) });
+    let r = await db.collection(col).insertOne({ ...entity, _id: new ObjectId(entity._id) });
     assert.equal(1, r.insertedCount);
     return res.send(r);
   } catch (err) {
-    if (err.name === "MongoError" && err.code === 11000) {
-      return res
-        .status(409)
-        .send({ message: `Entity with _id already exists: ${entity._id}` });
+    if (err.name === 'MongoError' && err.code === 11000) {
+      return res.status(409).send({ message: `Entity with _id already exists: ${entity._id}` });
     }
   }
 
-  return res.status(500).send({ message: "Internal error" });
+  return res.status(500).send({ message: 'Internal error' });
 };
 
 const updateGroup = async (req, res) => {
@@ -114,7 +100,7 @@ const updateGroup = async (req, res) => {
   const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
   if (!existing) {
     return res.status(404).send({
-      message: `No entity with _id exists: ${id}`
+      message: `No entity with _id exists: ${id}`,
     });
   }
 
@@ -125,7 +111,7 @@ const updateGroup = async (req, res) => {
       { _id: new ObjectId(id) },
       { $set: { ...entity, _id: new ObjectId(id) } },
       {
-        returnOriginal: false
+        returnOriginal: false,
       }
     );
 
@@ -147,12 +133,8 @@ const updateGroup = async (req, res) => {
         console.log(`${descendant.path}${descendant.name}`);
       });
     console.log(`old_name: '${existing.name}' => new_name: '${entity.name}'`);
-    console.log(
-      `old_path: '${oldSubgroupPath}' => new_path: '${newSubgroupPath}'`
-    );
-    console.log(
-      `This change will affect descendants under '${oldSubgroupPath}'`
-    );
+    console.log(`old_path: '${oldSubgroupPath}' => new_path: '${newSubgroupPath}'`);
+    console.log(`This change will affect descendants under '${oldSubgroupPath}'`);
 
     // with MONGO 4.2 "update" can accept an aggregation pipeline
     // https://stackoverflow.com/questions/12589792/how-to-replace-substring-in-mongodb-document
@@ -161,7 +143,7 @@ const updateGroup = async (req, res) => {
     return res.send(updated);
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ message: "Ouch :/" });
+    return res.status(500).send({ message: 'Ouch :/' });
   }
 };
 
@@ -184,8 +166,8 @@ const bulkChangePaths = async (oldPath, newPath) => {
       bulkWrites.push({
         updateOne: {
           filter: { _id: doc._id },
-          update: doc
-        }
+          update: doc,
+        },
       });
 
       // Update the documents and log progress every `bulkDocumentsSize` documents
@@ -204,19 +186,17 @@ const bulkChangePaths = async (oldPath, newPath) => {
 const deleteGroup = async (req, res) => {
   const { id } = req.params;
   try {
-    const existing = await db
-      .collection(col)
-      .findOne({ _id: new ObjectId(id) });
+    const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
     if (!existing) {
       return res.status(404).send({
-        message: `No entity with _id exists: ${id}`
+        message: `No entity with _id exists: ${id}`,
       });
     }
     let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
     assert.equal(1, r.deletedCount);
-    return res.send({ message: "OK" });
+    return res.send({ message: 'OK' });
   } catch (error) {
-    return res.status(500).send({ message: "Ouch :/" });
+    return res.status(500).send({ message: 'Ouch :/' });
   }
 };
 
@@ -226,5 +206,5 @@ export default {
   getGroupById,
   createGroup,
   updateGroup,
-  deleteGroup
+  deleteGroup,
 };

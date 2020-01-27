@@ -5,7 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import history from 'connect-history-api-fallback';
 
-import { connectDatabase, db } from './models';
+import { connectDatabase, db } from './db';
 import { initAdmins } from './services/admin.service';
 import errorHandlers from './handlers/errorHandlers';
 

@@ -2,7 +2,7 @@ import canUser from '../helpers/canUser';
 import { catchErrors } from '../handlers/errorHandlers';
 import boom from '@hapi/boom';
 
-import { db } from '../models';
+import { db } from '../db';
 
 module.exports = ({ permissions, lastCheck = true, owns = null, getUserPermissions = null }) =>
   catchErrors(async (req, res, next) => {

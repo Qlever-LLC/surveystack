@@ -4,7 +4,7 @@ import boom from '@hapi/boom';
 import canUser from '../helpers/canUser';
 import { catchErrors } from '../handlers/errorHandlers';
 
-import { db } from '../models';
+import { db } from '../db';
 
 export const assertAuthenticated = catchErrors(async (req, res, next) => {
   if (!res.locals.auth.isAuthenticated) {

@@ -5,7 +5,7 @@ import uuidv4 from 'uuid/v4';
 
 import boom from '@hapi/boom';
 
-import { db } from '../models';
+import { db } from '../db';
 
 const col = 'users';
 
