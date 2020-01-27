@@ -1,12 +1,15 @@
 // Example survey
 const survey = {
-  _id: '5e2ed0ca2ae9cd0001b8c3d1', // survey id
-  name: 'Calculating Survey 2019',
+  _id: '5e2ee761b0aadd000181151a', // Survey id
+  name: 'Example Survey',
+  dateCreated: '2020-01-27T13:59:31.989Z',
+  // controls
   controls: [
     {
-      name: 'first_name',
-      label: 'First name',
+      name: 'fav_color',
+      label: 'Favorite Color',
       type: 'inputText',
+      // options
       options: {
         readOnly: false,
         required: false,
@@ -16,27 +19,41 @@ const survey = {
       },
     },
     {
-      name: 'last_name',
-      label: 'Last name',
-      type: 'inputText',
+      name: 'personal_group',
+      label: 'Personal Group',
+      type: 'group',
+      children: [
+        {
+          name: 'full_name',
+          label: 'Full Name',
+          type: 'inputText',
+          options: {
+            readOnly: false,
+            required: false,
+            relevance: '',
+            constraint: '',
+            calculate: '',
+          },
+        },
+        {
+          name: 'age',
+          label: 'Age',
+          type: 'inputNumeric',
+          options: {
+            readOnly: false,
+            required: false,
+            relevance: '',
+            constraint: '',
+            calculate: '',
+          },
+        },
+      ],
       options: {
         readOnly: false,
         required: false,
         relevance: '',
         constraint: '',
         calculate: '',
-      },
-    },
-    {
-      name: 'full_name',
-      label: 'Full name calculation',
-      type: 'inputText',
-      options: {
-        readOnly: false,
-        required: false,
-        relevance: '',
-        constraint: '',
-        calculate: "data.first_name + ' ' + data.last_name",
       },
     },
   ],
