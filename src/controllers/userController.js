@@ -1,16 +1,18 @@
-import { ObjectId } from "mongodb";
-import assert from "assert";
-import bcrypt from "bcrypt";
-import uuidv4 from "uuid/v4";
+import { ObjectId } from 'mongodb';
+import assert from 'assert';
+import bcrypt from 'bcrypt';
+import uuidv4 from 'uuid/v4';
 
-import { db } from "../models";
+import boom from '@hapi/boom';
 
-const col = "users";
+import { db } from '../models';
+
+const col = 'users';
 
 const getUsers = async (req, res) => {
   let entities;
 
-  const projection = { username: 1 };
+  const projection = { name: 1, email: 1 };
 
   if (req.query.find) {
     if (ObjectId.isValid(req.query.find)) {
@@ -23,7 +25,7 @@ const getUsers = async (req, res) => {
     }
     entities = await db
       .collection(col)
-      .find({ username: { $regex: req.query.find, $options: "i" } })
+      .find({ username: { $regex: req.query.find, $options: 'i' } })
       .project(projection)
       .toArray();
     return res.send(entities);
@@ -47,7 +49,7 @@ const getUser = async (req, res) => {
 
   if (!entity) {
     return res.status(404).send({
-      message: `No entity with _id exists: ${id}`
+      message: `No entity with _id exists: ${id}`,
     });
   }
 
@@ -57,19 +59,17 @@ const getUser = async (req, res) => {
 const createUser = async (req, res) => {
   const entity = req.body;
 
-  const { username, email, password } = entity;
-  if (password.trim() === "") {
-    return res.status(400).send("password must not be empty");
+  const { email, username, password } = entity;
+  if (password.trim() === '') {
+    throw boom.badRequest('Password must not be empty');
   }
 
   const existing = await db.collection(col).findOne({
-    username
+    email,
   });
 
   if (existing) {
-    return res
-      .status(409)
-      .send({ message: `User already exists: ${username}` });
+    throw boom.conflict(`User already exists: ${email}`);
   }
 
   const hash = bcrypt.hashSync(password, parseInt(process.env.BCRYPT_ROUNDS));
@@ -80,54 +80,35 @@ const createUser = async (req, res) => {
     token,
     password: hash,
     permissions: [`/u/${username}`],
-    authProviders: []
+    authProviders: [],
   };
 
   try {
-    let r = await db
-      .collection(col)
-      .insertOne({ ...user, _id: new ObjectId(entity._id) });
+    let r = await db.collection(col).insertOne({ ...user, _id: new ObjectId(entity._id) });
     assert.equal(1, r.insertedCount);
     return res.send(r);
   } catch (err) {
-    if (err.name === "MongoError" && err.code === 11000) {
-      return res
-        .status(409)
-        .send({ message: `User with _id already exists: ${entity._id}` });
+    if (err.name === 'MongoError' && err.code === 11000) {
+      return res.status(409).send({ message: `User with _id already exists: ${entity._id}` });
     }
   }
 
-  return res.status(500).send({ message: "Internal error" });
+  return res.status(500).send({ message: 'Internal error' });
 };
 
 const updateUser = async (req, res) => {
   const entity = req.body;
   const id = entity._id;
-  if (id != req.params.id) {
-    return res
-      .status(400)
-      .send({ message: `Ids do not match: ${id}, ${req.params.id}` });
-  }
-
-  const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
-  if (!existing) {
-    return res.status(404).send({
-      message: `No entity with _id exists: ${id}`
-    });
-  }
 
   if (!res.locals.auth.isAdmin && res.locals.auth.user._id != id) {
-    return res.status(403).send(`Not allowed to put user: ${id}`);
+    throw boom.unauthorized(`Not allowed to put user: ${id}`);
   }
 
   const { password } = entity;
-  if (password === "") {
+  if (password === '') {
     delete entity.password;
   } else {
-    entity.password = await bcrypt.hash(
-      password,
-      parseInt(process.env.BCRYPT_ROUNDS)
-    );
+    entity.password = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS));
   }
 
   try {
@@ -136,32 +117,30 @@ const updateUser = async (req, res) => {
       { _id: new ObjectId(id) },
       { $set: entity },
       {
-        returnOriginal: false
+        returnOriginal: false,
       }
     );
     return res.send(updated);
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ message: "Ouch :/" });
+    return res.status(500).send({ message: 'Ouch :/' });
   }
 };
 
 const deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
-    const existing = await db
-      .collection(col)
-      .findOne({ _id: new ObjectId(id) });
+    const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
     if (!existing) {
       return res.status(404).send({
-        message: `No entity with _id exists: ${id}`
+        message: `No entity with _id exists: ${id}`,
       });
     }
     let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
     assert.equal(1, r.deletedCount);
-    return res.send({ message: "OK" });
+    return res.send({ message: 'OK' });
   } catch (error) {
-    return res.status(500).send({ message: "Ouch :/" });
+    return res.status(500).send({ message: 'Ouch :/' });
   }
 };
 
@@ -170,5 +149,5 @@ export default {
   getUser,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
 };

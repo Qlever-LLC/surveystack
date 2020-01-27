@@ -17,15 +17,15 @@ const register = async (req, res) => {
   console.log('inside register handler');
   // TODO: sanity check
   // TODO: ensure unique indexes
-  const { username, email, password } = req.body;
+  const { email, name, password } = req.body;
   const hash = bcrypt.hashSync(password, parseInt(process.env.BCRYPT_ROUNDS));
   const token = uuidv4();
   const user = {
-    username,
     email,
+    name,
     token,
     password: hash,
-    permissions: [`/u/${username}`],
+    permissions: [],
     authProviders: [],
   };
 
@@ -36,7 +36,7 @@ const register = async (req, res) => {
     return res.send(payload);
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
-      return res.status(409).send(`Username already taken: ${username}`);
+      return res.status(409).send(`Email already taken: ${email}`);
     }
   }
 
@@ -45,22 +45,21 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   console.log('inside login handler');
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
-  if (username == '' || password == '') {
-    return res.status(400).send('Username and password must not be empty');
+  if (email == '' || password == '') {
+    return res.status(400).send('Email and password must not be empty');
   }
 
-  const existingUser = await db.collection(col).findOne({ username });
+  const existingUser = await db.collection(col).findOne({ email });
   if (!existingUser) {
-    return res.status(404).send(`No user with username exists: ${username}`);
+    return res.status(404).send(`No user with email exists: ${email}`);
   }
 
   const passwordsMatch = await bcrypt.compare(password, existingUser.password);
 
   if (!passwordsMatch) {
-    //return res.status(401).send(`Incorrect password for user: ${username}`);
-    throw boom.unauthorized(`Incorrect password for user: ${username}`);
+    throw boom.unauthorized(`Incorrect password for user: ${email}`);
   }
 
   return res.send(createPayload(existingUser));

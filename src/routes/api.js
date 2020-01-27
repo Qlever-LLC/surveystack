@@ -68,7 +68,11 @@ router.delete(
 router.get('/users', catchErrors(userController.getUsers));
 router.get('/users/:id', catchErrors(userController.getUser));
 router.post('/users', catchErrors(userController.createUser));
-router.put('/users/:id', catchErrors(userController.updateUser));
+router.put(
+  '/users/:id',
+  [assertIdsMatch, assertEntityExists({ collection: 'users' })],
+  catchErrors(userController.updateUser)
+);
 router.delete('/users/:id', catchErrors(userController.deleteUser));
 
 export default router;
