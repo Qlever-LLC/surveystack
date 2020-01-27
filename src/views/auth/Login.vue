@@ -1,6 +1,7 @@
 <template>
   <div class="container-mid">
     <h3>Login</h3>
+    <p>Default admin: admin@our-sci.net // 1234</p>
     <v-form>
       <v-text-field
         label="E-Mail"

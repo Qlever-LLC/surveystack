@@ -107,6 +107,7 @@
 
 <script>
 import _ from 'lodash';
+import ObjectID from 'bson-objectid';
 import api from '@/services/api.service';
 
 import inputText from '@/components/survey/question_types/TextInput.vue';
@@ -225,6 +226,7 @@ export default {
       const { data } = await api.get(`/surveys/${survey}`);
       this.survey = data;
       this.instance = _.cloneDeep(this.survey);
+      this.instance._id = new ObjectID(); // TODO: get id from existing draft
 
       this.positions = getSurveyPositions(this.survey);
       this.instanceData = getInstanceData(this.instance);

@@ -443,7 +443,8 @@ export function compileSandbox(src, fname) {
   };
 }
 
-
+/*
+// currently not used?
 export const createInstance = (survey) => {
   const clone = _.cloneDeep(survey);
   const positions = getSurveyPositions(survey);
@@ -465,6 +466,7 @@ export const createInstance = (survey) => {
 
   return clone;
 };
+*/
 
 
 /**
@@ -491,7 +493,7 @@ export const createInstancePayload = (instance, survey) => {
   clone.survey = survey._id;
   // delete clone._id;
   delete clone.name;
-  clone.created = new Date();
+  clone.dateCreated = new Date();
 
   return clone;
 };

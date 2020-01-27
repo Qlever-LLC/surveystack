@@ -97,6 +97,7 @@ export default {
         name: '',
         _id: '',
         controls: [],
+        dateCreated: new Date(),
       },
     };
   },
@@ -159,7 +160,7 @@ export default {
         const { id } = this.$route.params;
         this.survey._id = id;
         const { data } = await api.get(`/surveys/${this.survey._id}`);
-        this.survey = data;
+        this.survey = { ...this.survey, ...data };
       } catch (e) {
         console.log('something went wrong:', e);
       }
