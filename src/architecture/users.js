@@ -1,3 +1,13 @@
+/*
+ API endpoint: /api/users
+ 
+ list: GET /api/users
+ detail: GET /api/users/$id
+ create: POST /api/users
+ update: PUT /api/users/:id
+ delete: DELETE /api/users/:id
+*/
+
 const users = [
   {
     _id: '5dad91cd925e13de6f174644', // user id

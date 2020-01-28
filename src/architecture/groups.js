@@ -1,3 +1,13 @@
+/*
+ API endpoint: /api/groups
+ 
+ list: GET /api/groups
+ detail: GET /api/groups/$id
+ create: POST /api/groups
+ update: PUT /api/groups/:id
+ delete: DELETE /api/groups/:id
+*/
+
 //For groups, we may want to use the following structure
 //https://docs.mongodb.com/manual/tutorial/model-tree-structures-with-materialized-paths/
 

@@ -1,3 +1,13 @@
+/*
+ API endpoint: /api/surveys
+ 
+ list: GET /api/surveys
+ detail: GET /api/surveys/$id
+ create: POST /api/surveys
+ update: PUT /api/surveys/:id
+ delete: DELETE /api/surveys/:id
+*/
+
 // Example survey
 const survey = {
   _id: '5e2ee761b0aadd000181151a', // Survey id
