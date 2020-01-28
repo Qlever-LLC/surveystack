@@ -3,8 +3,8 @@
     <v-row>
       <v-text-field
         outlined
-        :label="controlArgs.control.label"
-        v-bind:value="controlArgs.control.value"
+        :label="control.label"
+        v-bind:value="control.value"
         v-on:input="onInput"
       ></v-text-field>
     </v-row>
@@ -12,7 +12,8 @@
 </template>
 
 <script>
-import controlValidator from '@/utils/controlValidator';
+import controlComputed from '@/utils/controls/computed';
+import controlProps from '@/utils/controls/props';
 
 export default {
   data() {
@@ -21,19 +22,17 @@ export default {
     };
   },
   methods: {
-    onInput(event) {
-      if (event !== this.value) {
-        this.value = event;
-        this.controlArgs.changed();
+    onInput(v) {
+      if (this.control.value !== v) {
+        this.changed(v);
       }
     },
   },
   props: {
-    controlArgs: {
-      type: Object,
-      required: true,
-      validator: controlValidator,
-    },
+    ...controlProps,
+  },
+  computed: {
+    ...controlComputed,
   },
 };
 </script>

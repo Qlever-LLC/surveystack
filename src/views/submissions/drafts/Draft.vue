@@ -2,9 +2,10 @@
 <template>
   <v-container
     v-if="instance"
-    class="pl-8 pr-8"
+    id="question-container"
   >
-    <v-row class="flex-grow-0 flex-shrink-1">
+    <v-row class="flex-grow-0 flex-shrink-1 pl-2 pr-2 pb-2"
+>
       <div class="title">
         <div class="inner-title">{{ instance.name }}</div>
         <div class="subtitle-1 count grey--text text--darken-2">Total {{positions.length}} Questions</div>
@@ -69,8 +70,8 @@
       </div>
     </form>
     -->
-    <div class="font-weight-medium footer">
-      <v-container class="pl-8 pr-8">
+    <div v-if="mShowNav" class="font-weight-medium footer">
+      <v-container class="pa-0">
         <v-row>
           <v-col
             class="text-center"
@@ -158,6 +159,7 @@ export default {
       positions: null,
       breadcrumbs: [],
       index: 0,
+      mShowNav: true,
     };
   },
   computed: {
@@ -193,18 +195,32 @@ export default {
           const sandbox = compileSandboxSingleLine(expr);
           return sandbox({ data: this.instanceData });
         },
-        changed: () => {
-          console.log('value has changed, update instance');
+        changed: (v) => {
+          this.setValue(v);
+          // TODO change modified timestamp, persist
+        },
+        showNav: () => {
+          console.log('shownav');
+          this.showNav(true);
+        },
+        hideNav: () => {
+          this.showNav(false);
+        },
+        next: () => {
+          this.next();
         },
       };
     },
   },
   methods: {
-    setValue(ev) {
-      this.control.value = ev.target.value;
+    showNav(visible) {
+      this.mShowNav = visible;
+    },
+    setValue(v) {
+      this.control.value = v;
     },
     next() {
-      console.log(`changed: ${this.controlArgs.changed}`);
+      this.showNav(true);
       if (this.atEnd) {
         const payload = createInstancePayload(this.instance, this.survey);
         console.log('payload', payload);
@@ -330,10 +346,13 @@ export default {
   transition-duration: 0.2s;
   transition-property: background-color, left, right;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 100;
+  z-index: 1;
   position: fixed;
   left: 0px;
   right: 0px;
   bottom: 0px;
+}
+
+#question-container {
 }
 </style>

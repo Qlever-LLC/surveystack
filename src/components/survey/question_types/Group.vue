@@ -7,18 +7,10 @@
 </template>
 
 <script>
-import controlValidator from '@/utils/controlValidator';
-
+import controlProps from '@/utils/controls/props';
 
 export default {
-
-  props: {
-    controlArgs: {
-      type: Object,
-      required: true,
-      validator: controlValidator,
-    },
-  },
+  props: controlProps,
 };
 </script>
 

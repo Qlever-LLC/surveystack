@@ -1,37 +1,60 @@
 <template>
-  <v-row align="center">
-    <v-card
-      width="100%"
-      height="100%"
-    >
+  <v-container>
+    <v-row align="center">
+
       <div id="map-question">
         <img
+          v-if="!this.control.value"
           id="map-marker"
           src="@/assets/marker.svg"
           alt="marker"
         />
       </div>
 
-      <v-card-title class="headline">Pick Location</v-card-title>
-      <v-card-subtitle>Pick a location on the Map.</v-card-subtitle>
-      <v-card-actions>
-        <v-btn
-          text
-          dark
-          color="indigo"
-          @click="pickLocation()"
-        >Pick</v-btn>
-      </v-card-actions>
+      <v-container
+        class="infos grey--text text--darken-2 text-center"
+        fluid
+      >
+        <template v-if="!location">
+          <p class="headline">{{ control.label }}<span class="subtitle-1 ml-2"> {{ control.name }}</span></p>
+          <v-btn
+            large
+            class="mx-4 full"
+            dark
+            color="indigo"
+            @click="pickLocation"
+          >Pick</v-btn>
 
-    </v-card>
-  </v-row>
+          <v-btn
+            large
+            class="mx-4 full"
+            outlined
+            color="indigo"
+            @click="skip"
+          >Skip</v-btn>
+        </template>
+
+        <template v-else>
+          <v-btn
+            large
+            class="mx-4 full"
+            outlined
+            color="indigo"
+            @click="retake"
+          >Retake</v-btn>
+        </template>
+
+      </v-container>
+    </v-row>
+  </v-container>
+
 </template>
 <script>
 /* eslint-disable no-new */
 
 import mapboxgl from 'mapbox-gl';
-import controlValidator from '@/utils/controlValidator';
-
+import controlProps from '@/utils/controls/props';
+import controlComputed from '@/utils/controls/computed';
 
 let wakeLock = null;
 
@@ -47,44 +70,98 @@ const requestWakeLock = async () => {
   }
 };
 
-
 export default {
   data() {
     return {
       map: null,
+      first: true,
+      location: null,
     };
   },
-  props: {
-    controlArgs: {
-      type: Object,
-      required: true,
-      validator: controlValidator,
-    },
-  },
+  props: controlProps,
   methods: {
     pickLocation() {
       console.log(this.map.getCenter());
+      this.changed(this.map.getCenter());
+      this.location = this.map.getCenter();
+      this.next();
     },
-  },
-  mounted() {
-    mapboxgl.accessToken = 'pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA';
-    this.map = new mapboxgl.Map({
-      container: 'map-question',
-      style: 'mapbox://styles/mapbox/satellite-v9',
-      center: [8.311068, 47.462507],
-      zoom: 15,
-    });
-
-    this.map.addControl(
-      new mapboxgl.GeolocateControl({
+    skip() {
+      this.next();
+    },
+    retake() {
+      this.changed(null);
+      this.location = null;
+      this.hideNav();
+    },
+    handleMap(map, control) {
+      const ctrl = new mapboxgl.GeolocateControl({
         positionOptions: {
           enableHighAccuracy: true,
         },
         trackUserLocation: true,
-      }),
-    );
+      });
 
+      map.addControl(ctrl);
+
+      if (control.value) {
+        new mapboxgl.Marker()
+          .setLngLat([control.value.lng, control.value.lat])
+          .addTo(map);
+
+        map.jumpTo({
+          center: [control.value.lng, control.value.lat],
+        });
+      } else {
+        map.on('load', () => {
+          ctrl.trigger();
+        });
+
+        ctrl.on('geolocate', (e) => {
+          if (!this.first) {
+            return;
+          }
+
+          map.stop();
+          map.jumpTo({
+            center: [e.coords.longitude, e.coords.latitude],
+          });
+
+          this.first = false;
+        });
+      }
+    },
+  },
+  computed: {
+    ...controlComputed, // TODO check out decorators / higher order functions
+    started() {
+      return true;
+    },
+  },
+  created() {
+    this.first = true;
+    this.location = this.control.value;
+  },
+  mounted() {
+    console.log(`mounted, ${this.map}`);
+
+    mapboxgl.accessToken = 'pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA';
+    this.map = new mapboxgl.Map({
+      container: 'map-question',
+      style: 'mapbox://styles/mapbox/satellite-v9',
+      // center: [8.311068, 47.462507],
+      zoom: 15,
+    });
+
+    this.handleMap(this.map, this.control);
+    if (!this.controlArgs.control.value) {
+      this.controlArgs.hideNav();
+    }
     requestWakeLock();
+  },
+  beforeDestroy() {
+    console.log('removing map');
+    this.map.remove();
   },
 };
 </script>
@@ -95,6 +172,9 @@ export default {
 #map-question {
   height: 50vh;
   width: 100%;
+  padding: 0px;
+  margin-left: 12px;
+  margin-right: -12px;
 }
 
 #map-marker {
