@@ -1,13 +1,18 @@
-/*
- API endpoint: /api/users
- 
- list: GET /api/users
- detail: GET /api/users/$id
- create: POST /api/users
- update: PUT /api/users/:id
- delete: DELETE /api/users/:id
-*/
+# Users
 
+## Endpoints
+
+API endpoint `/api/users`
+
+- list<br/>GET /api/users
+- detail<br/>GET /api/users/:id
+- create<br/> POST /api/users
+- update<br/> PUT /api/users/:id
+- delete<br/> DELETE /api/users/:id
+
+## Description
+
+```javascript
 const users = [
   {
     _id: '5dad91cd925e13de6f174644', // user id
@@ -41,3 +46,4 @@ const users = [
     ],
   },
 ];
+```

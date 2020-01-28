@@ -1,5 +1,7 @@
 # Surveys
 
+Represents a definition of a survey, as in a "survey blueprint".
+
 ## Endpoints
 
 API endpoint `/api/surveys`

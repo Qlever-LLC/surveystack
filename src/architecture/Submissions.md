@@ -1,5 +1,7 @@
 # Submissions
 
+Represents a specific - partially or completely - filled out version of a survey, which can be submitted to the server.
+
 ## Endpoints
 
 API endpoint `/api/submissions`
