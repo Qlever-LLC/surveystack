@@ -4,6 +4,8 @@
 
 
 import { unflatten } from 'flat';
+import ObjectID from 'bson-objectid';
+
 import _ from 'lodash';
 
 export const mockSurvey = {
@@ -300,7 +302,7 @@ function* processData(data, namespace = '') {
 /**
  * Returns a data object with keys and values from the instance controls.
  * e.g.
- *  instance = {controls: [{name: "msg", value: "hello"}, {name: "age", value: 30}], ...}
+ *  instance = {data: [{name: "msg", value: "hello"}, {name: "age", value: 30}], ...}
  *  =>
  *  instanceData = {msg: "hello", age: 30}
  * @param {Object} instance
@@ -308,7 +310,7 @@ function* processData(data, namespace = '') {
  * @returns {Object} Object with keys and values
  */
 export const getInstanceData = (instance) => {
-  const it = processData(instance.controls);
+  const it = processData(instance.data);
   let res = it.next();
   const objects = [];
   while (!res.done) {
@@ -322,8 +324,8 @@ export const getInstanceData = (instance) => {
   return u;
 };
 
-export const getSurveyPositions = (survey) => {
-  const it = processPositions(survey.controls);
+export const getControlPositions = (controls) => {
+  const it = processPositions(controls);
   let res = it.next();
   const positions = [];
   while (!res.done) {
@@ -331,6 +333,11 @@ export const getSurveyPositions = (survey) => {
     res = it.next();
   }
 
+  return positions;
+};
+
+export const getSurveyPositions = (survey, version = 0) => {
+  const positions = getControlPositions(survey.versions[version].controls);
   return positions;
 };
 
@@ -364,12 +371,13 @@ function showQuestion(data) {
 }`;
 };
 
-export const getControl = (survey, position) => {
+export const getControl = (controls, position) => {
   let control;
-  let { controls } = survey;
+  let currentControls = controls;
+  // let { controls } = survey;
   position.forEach((i) => {
-    control = controls[i];
-    controls = control.children;
+    control = currentControls[i];
+    currentControls = control.children;
   });
 
   return control;
@@ -443,56 +451,49 @@ export function compileSandbox(src, fname) {
   };
 }
 
-/*
-// currently not used?
-export const createInstance = (survey) => {
-  const clone = _.cloneDeep(survey);
-  const positions = getSurveyPositions(survey);
 
-  positions.forEach((position) => {
-    const control = getControl(clone, position);
-    delete control.label;
-    delete control.options;
-  });
+/**
+ * Returns a new instance based off a specific survey version
+ * @param {Object} survey
+ * @param String version
+ *
+ * @returns {Object} An specifc survey version instance.
+ */
+export const createInstance = (survey, version = 0) => {
+  const clone = _.cloneDeep(survey.versions[version]);
+  delete clone.dateCreated;
+
+  clone._id = new ObjectID().toString();
+  clone.meta = {
+    survey: survey._id,
+    dateCreated: new Date(),
+    version,
+  };
 
   // rename "controls" to "data"
   // https://stackoverflow.com/a/50101979
   delete Object.assign(clone, { data: clone.controls }).controls;
-
-  clone.survey = survey._id;
-  delete clone._id;
-  delete clone.name;
-  clone.created = new Date();
 
   return clone;
 };
-*/
 
 
 /**
- * Returns a new instance ready to upload
+ * Returns a payload of an instance ready to upload to the server
  * @param {Object} instance
- * @param {Object} survey
  *
  * @returns {Object} A representation of the instance ready for uploading to the server
  */
-export const createInstancePayload = (instance, survey) => {
+export const createInstancePayload = (instance) => {
   const clone = _.cloneDeep(instance);
-  const positions = getSurveyPositions(survey);
+  const positions = getControlPositions(instance.data);
 
   positions.forEach((position) => {
-    const control = getControl(clone, position);
+    const control = getControl(clone.data, position);
     delete control.label;
     delete control.options;
   });
 
-  // rename "controls" to "data"
-  // https://stackoverflow.com/a/50101979
-  delete Object.assign(clone, { data: clone.controls }).controls;
-
-  clone.survey = survey._id;
-  // delete clone._id;
-  delete clone.name;
   clone.dateCreated = new Date();
 
   return clone;
@@ -511,7 +512,7 @@ export const calculateControl = (control) => {
   }
 };
 
-const DBG = true;
+const DBG = false;
 
 if (DBG) {
   console.log();

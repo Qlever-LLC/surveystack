@@ -1,13 +1,11 @@
 <template>
   <v-container fluid>
-    <v-row>
       <v-text-field
         outlined
         :label="control.label"
         v-bind:value="control.value"
         v-on:input="onInput"
       ></v-text-field>
-    </v-row>
   </v-container>
 </template>
 

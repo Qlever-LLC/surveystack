@@ -7,7 +7,10 @@
     <v-row class="flex-grow-0 flex-shrink-1 pl-2 pr-2 pb-2"
 >
       <div class="title">
-        <div class="inner-title">{{ instance.name }}</div>
+        <div class="inner-title">
+          {{ survey.name }}
+          <small>Version {{version}}</small>
+        </div>
         <div class="subtitle-1 count grey--text text--darken-2">Total {{positions.length}} Questions</div>
       </div>
       <div class="infos grey--text text--darken-2">
@@ -124,8 +127,6 @@
 
 
 <script>
-import _ from 'lodash';
-import ObjectID from 'bson-objectid';
 import api from '@/services/api.service';
 
 import inputText from '@/components/survey/question_types/TextInput.vue';
@@ -140,6 +141,7 @@ import {
   getInstanceData,
   getSurveyPositions,
   compileSandboxSingleLine,
+  createInstance,
   createInstancePayload,
 } from '@/utils/surveys';
 
@@ -160,6 +162,8 @@ export default {
       breadcrumbs: [],
       index: 0,
       mShowNav: true,
+      version: 0,
+
     };
   },
   computed: {
@@ -184,7 +188,10 @@ export default {
       return edited.join('.');
     },
     mbreadcrumbs() {
-      const ret = getBreadcrumbs(this.survey, this.positions[this.index]);
+      const ret = getBreadcrumbs(
+        this.survey.versions[this.version],
+        this.positions[this.index],
+      );
       ret.splice(-1, 1);
       return ret.map(txt => `<kbd>${txt}</kbd>`).join(' &gt; ');
     },
@@ -222,16 +229,19 @@ export default {
     next() {
       this.showNav(true);
       if (this.atEnd) {
-        const payload = createInstancePayload(this.instance, this.survey);
+        const payload = createInstancePayload(
+          this.instance,
+          this.survey.versions[this.version],
+        );
         console.log('payload', payload);
         this.submit(payload);
         return;
       }
       this.index++;
       this.instanceData = getInstanceData(this.instance);
-      this.control = getControl(this.instance, this.positions[this.index]);
+      this.control = getControl(this.instance.data, this.positions[this.index]);
       this.breadcrumbs = getBreadcrumbs(
-        this.survey,
+        this.survey.versions[this.version],
         this.positions[this.index],
       );
       this.calculateControl();
@@ -241,9 +251,9 @@ export default {
         return;
       }
       this.index--;
-      this.control = getControl(this.instance, this.positions[this.index]);
+      this.control = getControl(this.instance.data, this.positions[this.index]);
       this.breadcrumbs = getBreadcrumbs(
-        this.survey,
+        this.survey.versions[this.version],
         this.positions[this.index],
       );
     },
@@ -284,16 +294,22 @@ export default {
       const { survey } = this.$route.query;
       const { data } = await api.get(`/surveys/${survey}`);
       this.survey = data;
-      this.instance = _.cloneDeep(this.survey);
-      this.instance._id = new ObjectID(); // TODO: get id from existing draft
 
-      this.positions = getSurveyPositions(this.survey);
+      this.version = this.survey.versions.length - 1;
+      if (this.version < 0) {
+        console.log('invalid version', this.version);
+        return;
+      }
+
+      this.instance = createInstance(this.survey, this.version);
+
+      this.positions = getSurveyPositions(this.survey, this.version);
       this.instanceData = getInstanceData(this.instance);
 
       this.index = 0;
-      this.control = getControl(this.instance, this.positions[this.index]);
+      this.control = getControl(this.instance.data, this.positions[this.index]);
       this.breadcrumbs = getBreadcrumbs(
-        this.survey,
+        this.survey.versions[this.version],
         this.positions[this.index],
       );
     } catch (e) {
