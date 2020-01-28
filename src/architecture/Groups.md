@@ -1,5 +1,7 @@
 # Groups
 
+Represents a group or an organization.
+
 ## Endpoints
 
 API endpoint `/api/groups`

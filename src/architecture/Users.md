@@ -1,5 +1,7 @@
 # Users
 
+Represents a user.
+
 ## Endpoints
 
 API endpoint `/api/users`
