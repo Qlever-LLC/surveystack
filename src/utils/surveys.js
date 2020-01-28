@@ -424,11 +424,16 @@ export const falttenSubmission = (submission) => {
   const positions = getControlPositions(submission.data);
   positions.forEach((p) => {
     const control = getControl(submission.data, p);
+    console.log('control: ');
+    console.log(control);
     const breadcrumbs = getBreadcrumbsForSubmission(submission.data, p);
     console.log(breadcrumbs);
     if (control.type !== 'group') {
       const key = breadcrumbs.join('.');
-      res[key] = control.value;
+      res[key] = {
+        value: control.value,
+        type: control.type,
+      };
     }
   });
   console.log(res);

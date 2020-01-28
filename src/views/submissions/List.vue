@@ -90,10 +90,19 @@ export default {
     },
     items() {
       const table = [];
+      console.log(this.flatSubmissions);
       this.flatSubmissions.forEach((submission) => {
         const tableItem = {};
         Object.keys(submission).forEach((k) => {
-          tableItem[k] = submission[k];
+          console.log(submission[k]);
+          if (submission[k].type === 'inputLocation') {
+            const v = submission[k].value;
+            console.log(v);
+            tableItem[k] = !v ? '' : Object.keys(v).map(name => `${name}: ${v[name]}`).join(' ');
+          } else {
+            tableItem[k] = submission[k].value;
+          }
+          // TODO serialize item for user
         });
 
         table.push(tableItem);
