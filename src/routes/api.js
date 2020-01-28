@@ -28,6 +28,7 @@ router.get('/debug', catchErrors(debugController.getDefault));
 router.get('/debug/authenticated', assertAuthenticated, catchErrors(debugController.getDefault));
 router.get('/debug/throw-error', catchErrors(debugController.throwError));
 router.post('/debug/create-dummy-submissions', catchErrors(debugController.createDummySubmissions));
+router.post('/debug/tabularasa', catchErrors(debugController.tabulaRasa));
 
 /** Group */
 router.get('/groups', catchErrors(groupController.getGroups));

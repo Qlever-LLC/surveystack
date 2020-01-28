@@ -5,6 +5,16 @@ import { db } from '../db';
 
 const col = 'surveys';
 
+const sanitize = entity => {
+  entity._id = new ObjectId(entity._id);
+  entity.dateCreated = new Date(entity.dateCreated);
+  entity.dateModified = new Date(entity.dateModified);
+  entity.versions.forEach(version => {
+    version.dateCreated = new Date(entity.dateCreated);
+  });
+  return entity;
+};
+
 const getSurveys = async (req, res) => {
   let entities;
 
@@ -46,9 +56,10 @@ const getSurvey = async (req, res) => {
 };
 
 const createSurvey = async (req, res) => {
-  const entity = req.body;
+  const entity = sanitize(req.body);
+
   try {
-    let r = await db.collection(col).insertOne({ ...entity, _id: new ObjectId(entity._id) });
+    let r = await db.collection(col).insertOne(entity);
     assert.equal(1, r.insertedCount);
     return res.send(r);
   } catch (err) {
@@ -62,11 +73,12 @@ const createSurvey = async (req, res) => {
 
 const updateSurvey = async (req, res) => {
   const { id } = req.params;
+  const entity = sanitize(req.body);
 
   try {
     let updated = await db.collection(col).findOneAndUpdate(
       { _id: new ObjectId(id) },
-      { $set: { ...req.body, _id: new ObjectId(id) } },
+      { $set: entity },
       {
         returnOriginal: false,
       }

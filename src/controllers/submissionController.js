@@ -7,6 +7,12 @@ import { db } from '../db';
 
 const col = 'submissions';
 
+const sanitize = entity => {
+  entity.meta.survey = new ObjectId(entity.meta.survey);
+  entity.meta.dateCreated = new Date(entity.meta.dateCreated);
+  return entity;
+};
+
 const getSubmissions = async (req, res) => {
   let entities;
 
@@ -14,7 +20,7 @@ const getSubmissions = async (req, res) => {
     entities = await db
       .collection(col)
       .find({
-        survey: new ObjectId(req.query.survey),
+        'meta.survey': new ObjectId(req.query.survey),
       })
       .toArray();
     return res.send(entities);
@@ -43,9 +49,10 @@ const getSubmission = async (req, res) => {
 };
 
 const createSubmission = async (req, res) => {
-  const entity = req.body;
+  const entity = sanitize(req.body);
+
   try {
-    let r = await db.collection(col).insertOne({ ...entity, survey: new ObjectId(entity.survey) });
+    let r = await db.collection(col).insertOne(entity);
     assert.equal(1, r.insertedCount);
     return res.send(r);
   } catch (err) {
@@ -59,18 +66,12 @@ const createSubmission = async (req, res) => {
 
 const updateSubmission = async (req, res) => {
   const { id } = req.params;
-
-  const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
-  if (!existing) {
-    return res.status(404).send({
-      message: `No entity with _id exists: ${id}`,
-    });
-  }
+  const entity = sanitize(req.body);
 
   try {
     let updated = await db.collection(col).findOneAndUpdate(
       { _id: id },
-      { $set: req.body },
+      { $set: entity },
       {
         returnOriginal: false,
       }

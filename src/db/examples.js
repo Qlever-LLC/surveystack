@@ -1,36 +1,18 @@
-# Surveys
+import { ObjectId } from 'mongodb';
 
-Represents a definition of a survey, as in a "survey blueprint".
-
-## Endpoints
-
-API endpoint `/api/surveys`
-
-- list<br/>GET /api/surveys
-- detail<br/>GET /api/surveys/:id
-- create<br/> POST /api/surveys
-- update<br/> PUT /api/surveys/:id
-- delete<br/> DELETE /api/surveys/:id
-
-## Description
-
-```javascript
-// Example survey
-const survey = {
-  _id: '5e2ee761b0aadd000181151a', // Survey id
-  name: 'Example Survey',
-  dateCreated: '2020-01-27T13:59:31.989Z',
-  dateModified: '2020-01-27T14:15:29.811Z',
+export const exampleSurvey = {
+  _id: new ObjectId('5e3038dbea0cf40001aef63b'),
+  name: 'Favorite Colors',
+  dateCreated: new Date('2020-01-28T13:36:13.031Z'),
+  dateModified: new Date('2020-01-28T13:36:13.031Z'),
   versions: [
     {
-      dateCreated: '2020-01-27T14:15:29.811Z',
-      // controls
+      dateCreated: new Date('2020-01-28T13:36:13.031Z'),
       controls: [
         {
-          name: 'fav_color',
-          label: 'Favorite Color',
+          name: 'favorite_color',
+          label: 'What is your favorite color?',
           type: 'inputText',
-          // options
           options: {
             readOnly: false,
             required: false,
@@ -42,9 +24,8 @@ const survey = {
         {
           name: 'personal_group',
           label: 'Personal Group',
-          type: 'group', // group
+          type: 'group',
           children: [
-            // group has children
             {
               name: 'full_name',
               label: 'Full Name',
@@ -82,4 +63,36 @@ const survey = {
     },
   ],
 };
-```
+
+export const exampleSubmission = {
+  _id: new ObjectId('5e303982ea0cf40001aef63c'),
+  meta: {
+    survey: new ObjectId('5e3038dbea0cf40001aef63b'),
+    dateCreated: new Date('2020-01-28T13:39:14.544Z'),
+    version: 0,
+  },
+  data: [
+    {
+      name: 'favorite_color',
+      type: 'inputText',
+      value: 'blue',
+    },
+    {
+      name: 'personal_group',
+      type: 'group',
+      children: [
+        {
+          name: 'full_name',
+          type: 'inputText',
+          value: 'Andreas Rudolf',
+        },
+        {
+          name: 'age',
+          type: 'inputNumeric',
+          value: 35,
+        },
+      ],
+    },
+  ],
+  dateCreated: new Date('2020-01-28T13:39:31.574Z'),
+};

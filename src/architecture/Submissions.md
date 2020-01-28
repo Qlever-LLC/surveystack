@@ -1,6 +1,6 @@
 # Submissions
 
-Represents a specific - partially or completely - filled out version of a survey, which can be submitted to the server.
+Represents a specific - partially or completely - `filled out version` of a survey, which can be submitted to the server.
 
 ## Endpoints
 
@@ -19,8 +19,11 @@ API endpoint `/api/submissions`
 const submissions = [
   {
     _id: '5e2eed723c98557ae2c1d967', // submission id
-    survey: '5e2eecc36f371d00015775af', // survey reference
-    dateCreated: '2020-01-27T14:10:41.623Z',
+    meta: {
+      survey: '5e2eecc36f371d00015775af', // survey reference
+      dateCreated: '2020-01-27T14:10:41.623Z',
+      version: 0, // survey version
+    }
     // data from controls
     data: [
       {
@@ -48,8 +51,11 @@ const submissions = [
   },
   {
     _id: '5e2eed803c98557ae2c1d968',
-    survey: '5e2eecc36f371d00015775af',
-    dateCreated: '2020-01-27T14:12:24.730Z',
+    meta: {
+      survey: '5e2eecc36f371d00015775af',
+      dateCreated: '2020-01-27T14:12:24.730Z',
+      version: 3,
+    },
     data: [
       {
         name: 'fav_color',
