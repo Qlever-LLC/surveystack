@@ -78,6 +78,13 @@ export default {
           },
           icon: 'mdi-account-group',
         },
+        {
+          title: 'Tabula Rasa',
+          to: {
+            name: 'tabula-rasa',
+          },
+          icon: 'mdi-delete-variant',
+        },
       ],
     };
   },

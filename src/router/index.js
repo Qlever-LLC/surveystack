@@ -22,6 +22,8 @@ import SubmissionList from '@/views/submissions/List.vue';
 
 import SurveyBuilder from '../views/builder/SurveyBuilder.vue';
 
+import TabulaRasa from '../views/debug/TabulaRasa.vue';
+
 
 Vue.use(VueRouter);
 
@@ -129,7 +131,11 @@ const routes = [
     name: 'users-detail',
     component: User,
   },
-
+  {
+    path: '/tabularasa',
+    name: 'tabula-rasa',
+    component: TabulaRasa,
+  },
 
 ];
 
