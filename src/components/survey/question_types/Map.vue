@@ -53,6 +53,24 @@ export default {
       map: null,
     };
   },
+  props: {
+    control: {
+      type: Object,
+      required: true,
+    },
+    instance: {
+      type: Object,
+      required: true,
+    },
+    position: {
+      type: Array,
+      required: true,
+    },
+    controlIndex: {
+      type: Number,
+      required: true,
+    },
+  },
   methods: {
     pickLocation() {
       console.log(this.map.getCenter());
@@ -97,7 +115,7 @@ export default {
   margin-top: -2rem;
   top: 50%;
   left: 50%;
-  z-index: 100;
+  z-index: 1;
 }
 
 .mapboxgl-ctrl-geolocate::before {

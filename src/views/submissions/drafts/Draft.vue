@@ -1,6 +1,9 @@
 
 <template>
-  <v-container v-if="instance" class="pl-8 pr-8">
+  <v-container
+    v-if="instance"
+    class="pl-8 pr-8"
+  >
     <v-row class="flex-grow-0 flex-shrink-1">
       <div class="title">
         <div class="inner-title">{{ instance.name }}</div>
@@ -72,7 +75,10 @@
     <div class="font-weight-medium footer">
       <v-container class="pl-8 pr-8">
         <v-row>
-          <v-col class="text-center" cols="6">
+          <v-col
+            class="text-center"
+            cols="6"
+          >
             <v-btn
               v-show="!atStart"
               @click="previous"
@@ -84,11 +90,25 @@
             >Previous</v-btn>
           </v-col>
 
-          <v-col v-if="atEnd" class="text-center" cols="6">
-            <v-btn @click="next" class="full" depressed large color="primary">Submit</v-btn>
+          <v-col
+            v-if="atEnd"
+            class="text-center"
+            cols="6"
+          >
+            <v-btn
+              @click="next"
+              class="full"
+              depressed
+              large
+              color="primary"
+            >Submit</v-btn>
           </v-col>
 
-          <v-col v-else class="text-center" cols="6">
+          <v-col
+            v-else
+            class="text-center"
+            cols="6"
+          >
             <v-btn
               @click="next"
               @keyup.enter="next"
@@ -112,7 +132,9 @@ import api from '@/services/api.service';
 
 import inputText from '@/components/survey/question_types/TextInput.vue';
 import inputNumeric from '@/components/survey/question_types/NumberInput.vue';
+import inputLocation from '@/components/survey/question_types/Map.vue';
 import group from '@/components/survey/question_types/Group.vue';
+
 
 import {
   getControl,
@@ -127,6 +149,7 @@ export default {
   components: {
     inputText,
     inputNumeric,
+    inputLocation,
     group,
   },
   data() {
@@ -209,6 +232,16 @@ export default {
       const sandbox = compileSandboxSingleLine(this.control.options.calculate);
       this.control.value = sandbox({ data: this.instanceData });
       console.log(this.control.value);
+    },
+    questions() {
+      if (!this.surveyPositions) {
+        return [];
+      }
+
+      return this.surveyPositions.map(pos => ({
+        number: pos.map(v => v + 1).join('.'),
+        control: this.controlFromPosition(pos),
+      }));
     },
     async submit(payload) {
       try {

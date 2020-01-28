@@ -12,4 +12,7 @@ export const availableControls = [
   {
     name: 'group', label: 'My group', type: 'group', children: [],
   },
+  {
+    name: 'location', label: 'Pick Location', type: 'inputLocation',
+  },
 ];

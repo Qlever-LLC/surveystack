@@ -1,13 +1,22 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-text-field outlined :label="control.label" v-model="control.value"></v-text-field>
+      <v-text-field
+        outlined
+        :label="control.label"
+        v-model="control.value"
+      ></v-text-field>
     </v-row>
   </v-container>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      value: null,
+    };
+  },
   props: {
     control: {
       type: Object,
@@ -17,12 +26,8 @@ export default {
       type: Object,
       required: true,
     },
-    position: {
-      type: Array,
-      required: true,
-    },
-    controlIndex: {
-      type: Number,
+    change: {
+      type: Function,
       required: true,
     },
   },
