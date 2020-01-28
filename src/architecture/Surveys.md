@@ -1,13 +1,18 @@
-/*
- API endpoint: /api/surveys
- 
- list: GET /api/surveys
- detail: GET /api/surveys/$id
- create: POST /api/surveys
- update: PUT /api/surveys/:id
- delete: DELETE /api/surveys/:id
-*/
+# Surveys
 
+## Endpoints
+
+API endpoint `/api/surveys`
+
+- list<br/>GET /api/surveys
+- detail<br/>GET /api/surveys/:id
+- create<br/> POST /api/surveys
+- update<br/> PUT /api/surveys/:id
+- delete<br/> DELETE /api/surveys/:id
+
+## Description
+
+```javascript
 // Example survey
 const survey = {
   _id: '5e2ee761b0aadd000181151a', // Survey id
@@ -69,3 +74,4 @@ const survey = {
     },
   ],
 };
+```

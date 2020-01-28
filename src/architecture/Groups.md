@@ -1,17 +1,21 @@
-/*
- API endpoint: /api/groups
- 
- list: GET /api/groups
- detail: GET /api/groups/$id
- create: POST /api/groups
- update: PUT /api/groups/:id
- delete: DELETE /api/groups/:id
-*/
+# Groups
 
-//For groups, we may want to use the following structure
-//https://docs.mongodb.com/manual/tutorial/model-tree-structures-with-materialized-paths/
+## Endpoints
 
-// unique indexes: https://docs.mongodb.com/manual/core/index-unique/
+API endpoint `/api/groups`
+
+- list<br/>GET /api/groups
+- detail<br/>GET /api/groups/:id
+- create<br/> POST /api/groups
+- update<br/> PUT /api/groups/:id
+- delete<br/> DELETE /api/groups/:id
+
+## Description
+
+For groups, we may want to use the a similar structure as in
+[materialized paths](https://docs.mongodb.com/manual/tutorial/model-tree-structures-with-materialized-paths/).
+
+```javascript
 const groups = [
   {
     _id: '5df8af90a6d59d4375e4b363', // group id
@@ -50,3 +54,4 @@ const groups = [
     label: 'Postgrad Group',
   },
 ];
+```

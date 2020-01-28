@@ -1,13 +1,18 @@
-/*
- API endpoint: /api/submissions
- 
- list: GET /api/submissions
- detail: GET /api/submissions/$id
- create: POST /api/submissions
- update: PUT /api/submissions/:id
- delete: DELETE /api/submissions/:id
-*/
+# Submissions
 
+## Endpoints
+
+API endpoint `/api/submissions`
+
+- list<br/>GET /api/submissions
+- detail<br/>GET /api/submissions/:id
+- create<br/> POST /api/submissions
+- update<br/> PUT /api/submissions/:id
+- delete<br/> DELETE /api/submissions/:id
+
+## Description
+
+```javascript
 // Example submission
 const submissions = [
   {
@@ -68,3 +73,4 @@ const submissions = [
     ],
   },
 ];
+```

@@ -1,4 +1,4 @@
-# Authenitcation
+# Authentication
 
 The current authentication method is to send an `Authorization` header with each request of the following form:
 
