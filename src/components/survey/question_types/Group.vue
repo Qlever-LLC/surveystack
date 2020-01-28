@@ -7,23 +7,16 @@
 </template>
 
 <script>
+import controlValidator from '@/utils/controlValidator';
+
+
 export default {
+
   props: {
-    control: {
+    controlArgs: {
       type: Object,
       required: true,
-    },
-    instance: {
-      type: Object,
-      required: true,
-    },
-    position: {
-      type: Array,
-      required: true,
-    },
-    controlIndex: {
-      type: Number,
-      required: true,
+      validator: controlValidator,
     },
   },
 };

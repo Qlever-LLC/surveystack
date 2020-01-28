@@ -30,6 +30,7 @@
 /* eslint-disable no-new */
 
 import mapboxgl from 'mapbox-gl';
+import controlValidator from '@/utils/controlValidator';
 
 
 let wakeLock = null;
@@ -54,21 +55,10 @@ export default {
     };
   },
   props: {
-    control: {
+    controlArgs: {
       type: Object,
       required: true,
-    },
-    instance: {
-      type: Object,
-      required: true,
-    },
-    position: {
-      type: Array,
-      required: true,
-    },
-    controlIndex: {
-      type: Number,
-      required: true,
+      validator: controlValidator,
     },
   },
   methods: {

@@ -36,10 +36,7 @@
     >
       <component
         :is="control.type"
-        :control="control"
-        :position="positions[index]"
-        :instance="instance"
-        :controlIndex="index"
+        :controlArgs="controlArgs"
       ></component>
     </v-row>
 
@@ -189,12 +186,25 @@ export default {
       ret.splice(-1, 1);
       return ret.map(txt => `<kbd>${txt}</kbd>`).join(' &gt; ');
     },
+    controlArgs() {
+      return {
+        control: this.control,
+        eval: (expr) => {
+          const sandbox = compileSandboxSingleLine(expr);
+          return sandbox({ data: this.instanceData });
+        },
+        changed: () => {
+          console.log('value has changed, update instance');
+        },
+      };
+    },
   },
   methods: {
     setValue(ev) {
       this.control.value = ev.target.value;
     },
     next() {
+      console.log(`changed: ${this.controlArgs.changed}`);
       if (this.atEnd) {
         const payload = createInstancePayload(this.instance, this.survey);
         console.log('payload', payload);
