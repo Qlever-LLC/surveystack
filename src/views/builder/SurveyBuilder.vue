@@ -92,7 +92,6 @@ export default {
       editMode: false,
       showCode: false,
       control: null,
-      controls: [],
       survey: {
         name: '',
         _id: '',
@@ -107,6 +106,7 @@ export default {
     },
     controlAdded(control) {
       this.survey.controls.push(control);
+      // this.currentArray.splice(this.currentArrayPosition, 0, control);
       this.control = control;
     },
     onCancel() {
@@ -147,7 +147,18 @@ export default {
       }
     },
   },
+  computed: {
+    currentArray() {
+      if (!this.control) {
+        return this.survey.controls;
+      }
 
+      return this.survey.controls;
+    },
+    currentArrayPosition() {
+      return 0;
+    },
+  },
   async created() {
     this.editMode = !this.$route.matched.some(
       ({ name }) => name === 'surveys-new',
