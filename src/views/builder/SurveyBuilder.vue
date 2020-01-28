@@ -37,7 +37,7 @@
         <graphical-view
           v-if="!showCode"
           :selected="control"
-          :controls="survey.controls"
+          :controls="survey.versions[currentVersion].controls"
           @controlSelected="controlSelected"
         />
         <code-view v-else v-model="survey" />
@@ -74,6 +74,8 @@ import surveyDetails from '@/components/builder/SurveyDetails.vue';
 
 import appDialog from '@/components/ui/Dialog.vue';
 
+const currentDate = new Date();
+
 export default {
   components: {
     graphicalView,
@@ -93,10 +95,16 @@ export default {
       showCode: false,
       control: null,
       survey: {
-        name: '',
         _id: '',
-        controls: [],
+        name: '',
         dateCreated: new Date(),
+        dateModified: currentDate,
+        versions: [
+          {
+            dateCreated: currentDate,
+            controls: [],
+          },
+        ],
       },
     };
   },
@@ -105,7 +113,7 @@ export default {
       this.control = control;
     },
     controlAdded(control) {
-      this.survey.controls.push(control);
+      this.survey.versions[this.currentVersion].controls.push(control);
       // this.currentArray.splice(this.currentArrayPosition, 0, control);
       this.control = control;
     },
@@ -158,6 +166,9 @@ export default {
     currentArrayPosition() {
       return 0;
     },
+    currentVersion() {
+      return 0;
+    },
   },
   async created() {
     this.editMode = !this.$route.matched.some(
@@ -165,6 +176,7 @@ export default {
     );
 
     this.survey._id = ObjectId();
+    this.survey.dateCreated = new Date();
 
     if (this.editMode) {
       try {
