@@ -1,6 +1,9 @@
 <template>
   <v-row align="center">
-    <v-card width="100%" height="100%">
+    <v-card
+      width="100%"
+      height="100%"
+    >
       <div id="map-question">
         <img
           id="map-marker"
@@ -27,6 +30,21 @@
 /* eslint-disable no-new */
 
 import mapboxgl from 'mapbox-gl';
+
+
+let wakeLock = null;
+
+const requestWakeLock = async () => {
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    wakeLock.addEventListener('release', () => {
+      console.log('Wake Lock was released');
+    });
+    console.log('Wake Lock is active');
+  } catch (e) {
+    console.error(`${e.name}, ${e.message}`);
+  }
+};
 
 
 export default {
@@ -57,6 +75,8 @@ export default {
         trackUserLocation: true,
       }),
     );
+
+    requestWakeLock();
   },
 };
 </script>
@@ -65,18 +85,23 @@ export default {
 @import url("https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css");
 
 #map-question {
-  height: 70vh;
+  height: 50vh;
   width: 100%;
 }
 
 #map-marker {
   position: absolute;
-  width: 5rem;
-  height: 5rem;
-  margin-left: -2.5rem;
-  margin-top: -5rem;
+  width: 2rem;
+  height: 2rem;
+  margin-left: -1rem;
+  margin-top: -2rem;
   top: 50%;
   left: 50%;
   z-index: 100;
+}
+
+.mapboxgl-ctrl-geolocate::before {
+  content: "\F352";
+  font: normal normal normal 24px/1 "Material Design Icons";
 }
 </style>
