@@ -2,6 +2,7 @@ import boom from '@hapi/boom';
 
 export const catchErrors = fn => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch(err => {
+    console.log(err);
     if (!err.isBoom) {
       return next(boom.badImplementation(err));
     }

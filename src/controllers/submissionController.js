@@ -19,19 +19,24 @@ const sanitize = entity => {
 const getSubmissions = async (req, res) => {
   let entities;
 
+  let filter = {};
+
   if (req.query.survey) {
-    entities = await db
-      .collection(col)
-      .find({
-        survey: new ObjectId(req.query.survey),
-      })
-      .toArray();
-    return res.send(entities);
+    filter.survey = new ObjectId(req.query.survey);
+  }
+
+  if (req.query.q) {
+    try {
+      const q = JSON.parse(req.query.q);
+      filter = { ...filter, ...q };
+    } catch (error) {
+      throw boom.badRequest('invalid query');
+    }
   }
 
   entities = await db
     .collection(col)
-    .find({})
+    .find(filter)
     .toArray();
   return res.send(entities);
 };
