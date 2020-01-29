@@ -424,16 +424,12 @@ export const getInstanceIndex = (survey, position) => {
   return breadcrumbs.join('.');
 };
 
-export const falttenSubmission = (submission) => {
-  console.log(submission);
+export const flattenSubmission = (submission) => {
   const res = {};
   const positions = getControlPositions(submission.data);
   positions.forEach((p) => {
     const control = getControl(submission.data, p);
-    console.log('control: ');
-    console.log(control);
     const breadcrumbs = getBreadcrumbsForSubmission(submission.data, p);
-    console.log(breadcrumbs);
     if (control.type !== 'group') {
       const key = breadcrumbs.join('.');
       res[key] = {
@@ -442,7 +438,6 @@ export const falttenSubmission = (submission) => {
       };
     }
   });
-  console.log(res);
   return res;
 };
 
