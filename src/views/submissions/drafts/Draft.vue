@@ -134,9 +134,6 @@ export default {
     return {
       survey: null,
       control: null,
-      fakeControl: {
-        value: null,
-      },
       instance: null,
       instanceData: null,
       positions: null,
@@ -175,11 +172,6 @@ export default {
       );
       ret.splice(-1, 1);
       return ret.map(txt => `<kbd>${txt}</kbd>`).join(' &gt; ');
-    },
-    computedControl() {
-      return {
-        v: this.fakeControl.value,
-      };
     },
     controlArgs() {
       // eslint-disable-next-line no-unused-vars
@@ -220,12 +212,10 @@ export default {
     },
     setValue(v) {
       // TODO change modified timestamp, persist
-      console.log('setting value', v);
-      this.fakeControl.value = v;
-      this.control.value = v;
-      console.log(this.control);
+      this.$set(this.control, 'value', v);
       this.instance.meta.modified = new Date().getTime();
       this.persist();
+      this.$forceUpdate();
     },
     next() {
       this.showNav(true);
