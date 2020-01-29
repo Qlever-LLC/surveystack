@@ -6,7 +6,7 @@
         v-for="e in entities"
         :key="e._id"
       >
-        <v-list-item>
+        <v-list-item @click="selected(e)">
           <v-list-item-content>
             <v-list-item-title>{{e.name}}</v-list-item-title>
             <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle>
@@ -69,6 +69,7 @@ export default {
 
     this.entities = data;
     db.openDb(() => {
+      // TODO, this is not necessary if pulling cached data in the first place
       data.forEach((d) => {
         db.persistSurvey(d);
       });
