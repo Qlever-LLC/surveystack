@@ -1,18 +1,34 @@
 export default {
-
   props: {
     control: { type: Object, required: true },
-    eval: { type: Function, required: true },
-    changed: { type: Function, required: true },
-    showNav: { type: Function, required: true },
-    hideNav: { type: Function, required: true },
-    next: { type: Function, required: true },
-    hideNext: { type: Function, required: true },
-    showNext: { type: Function, required: true },
+    value: { required: true },
   },
   computed: {
-    value() {
-      return this.control.value;
+    // value() {
+    //   return this.control.value;
+    // },
+  },
+  methods: {
+    eval() {
+      this.$emit('eval');
+    },
+    changed(value) {
+      this.$emit('changed', value);
+    },
+    showNav() {
+      this.$emit('show-nav');
+    },
+    hideNav() {
+      this.$emit('hide-nav');
+    },
+    next() {
+      this.$emit('next');
+    },
+    hideNext() {
+      this.$emit('hide-next');
+    },
+    showNext() {
+      this.$emit('show-next');
     },
   },
 };

@@ -40,7 +40,15 @@
       <component
         :key="breadcrumbs.join('.')"
         :is="control.type"
-        v-bind="controlArgs"
+        :control="control"
+        :value="value"
+        @eval="eval"
+        @changed="setValue"
+        @show-nav="showNav(true)"
+        @hide-nav="showNav(false)"
+        @next="next"
+        @hide-next="showNext(false)"
+        @show-next="showNext(true)"
       ></component>
     </v-row>
 
@@ -142,6 +150,7 @@ export default {
       mShowNav: true,
       mShowNext: true,
       version: 0,
+      value: null,
     };
   },
   computed: {
@@ -173,37 +182,14 @@ export default {
       ret.splice(-1, 1);
       return ret.map(txt => `<kbd>${txt}</kbd>`).join(' &gt; ');
     },
-    controlArgs() {
-      // eslint-disable-next-line no-unused-vars
+    example() {
       return {
-        control: this.control,
-        value: this.control.value,
-        eval: (expr) => {
-          const sandbox = compileSandboxSingleLine(expr);
-          return sandbox({ data: this.instanceData });
-        },
-        changed: (v) => {
-          this.setValue(v);
-        },
-        showNav: () => {
-          this.showNav(true);
-        },
-        hideNav: () => {
-          this.showNav(false);
-        },
-        next: () => {
-          this.next();
-        },
-        hideNext: () => {
-          this.showNext(false);
-        },
-        showNext: () => {
-          this.showNext(true);
-        },
+        hello: 'world',
       };
     },
   },
   methods: {
+    eval() {},
     showNav(visible) {
       this.mShowNav = visible;
     },
@@ -212,7 +198,9 @@ export default {
     },
     setValue(v) {
       // TODO change modified timestamp, persist
+      console.log('setValue', v);
       this.$set(this.control, 'value', v);
+      this.value = v;
       this.instance.meta.modified = new Date().getTime();
       this.persist();
       this.$forceUpdate();
@@ -232,6 +220,7 @@ export default {
       this.index++;
       this.instanceData = getInstanceData(this.instance);
       this.control = getControl(this.instance.data, this.positions[this.index]);
+      this.value = this.control.value;
       this.breadcrumbs = getBreadcrumbs(
         this.survey.versions[this.version],
         this.positions[this.index],
@@ -246,6 +235,7 @@ export default {
       }
       this.index--;
       this.control = getControl(this.instance.data, this.positions[this.index]);
+      this.value = this.control.value;
       this.breadcrumbs = getBreadcrumbs(
         this.survey.versions[this.version],
         this.positions[this.index],
@@ -260,6 +250,7 @@ export default {
       }
       const sandbox = compileSandboxSingleLine(this.control.options.calculate);
       this.control.value = sandbox({ data: this.instanceData });
+      this.value = this.control.value;
       console.log(this.control.value);
     },
     questions() {
@@ -321,6 +312,7 @@ export default {
 
           this.index = 0;
           this.control = getControl(this.instance.data, this.positions[this.index]);
+          this.value = this.control.value;
           this.breadcrumbs = getBreadcrumbs(
             this.survey.versions[this.version],
             this.positions[this.index],
@@ -364,6 +356,7 @@ export default {
 
             console.log('getting control');
             this.control = getControl(this.instance.data, this.positions[this.index]);
+            this.value = this.control.value;
 
             console.log('getting breadcrumbs');
 

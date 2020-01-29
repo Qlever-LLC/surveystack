@@ -1,8 +1,16 @@
 <template>
   <v-container>
-    <v-row align="center">
-
-      <div id="map-question">
+    <v-row
+      align="center"
+      justify="center"
+    >
+      <v-alert>
+        {{ value }}
+      </v-alert>
+      <div
+        id="map-question"
+        v-if="!mapError"
+      >
         <img
           v-if="!this.value"
           id="map-marker"
@@ -10,6 +18,14 @@
           alt="marker"
         />
       </div>
+      <v-alert
+        type="error"
+        border="right"
+        prominent
+        v-else
+      >
+        Error loading map. Unable to load map. Using GPS coordinates.
+      </v-alert>
 
       <v-container
         class="infos grey--text text--darken-2 text-center"
@@ -75,6 +91,7 @@ export default {
   data() {
     return {
       map: null,
+      mapError: false,
       first: true,
       location: null,
     };
@@ -93,6 +110,14 @@ export default {
       this.changed(null);
       this.location = null;
       this.hideNext();
+    },
+    startTracking() {
+      if (!navigator.geolocation) {
+        return;
+      }
+      navigator.geolocation.watchPosition((position) => {
+        console.log(position);
+      });
     },
     handleMap(map, control) {
       const ctrl = new mapboxgl.GeolocateControl({
@@ -115,6 +140,10 @@ export default {
       } else {
         map.on('load', () => {
           ctrl.trigger();
+        });
+
+        map.on('error', () => {
+          this.mapError = true;
         });
 
         ctrl.on('geolocate', (e) => {
@@ -157,6 +186,8 @@ export default {
       this.hideNext();
     }
     requestWakeLock();
+
+    this.startTracking();
   },
   beforeDestroy() {
     console.log('removing map');
