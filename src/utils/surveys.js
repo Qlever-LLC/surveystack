@@ -498,8 +498,8 @@ export const createInstance = (survey, version = 0) => {
   delete clone.dateCreated;
 
   clone._id = new ObjectID().toString();
+  clone.survey = survey._id;
   clone.meta = {
-    survey: survey._id,
     dateCreated: new Date(),
     version,
   };
@@ -528,7 +528,7 @@ export const createInstancePayload = (instance) => {
     delete control.options;
   });
 
-  clone.dateCreated = new Date();
+  // TODO: may need to adapt dates
 
   return clone;
 };
