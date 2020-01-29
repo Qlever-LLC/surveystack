@@ -44,35 +44,6 @@
       ></component>
     </v-row>
 
-    <!--
-    <form>
-      <div class="form-group">
-        <label for="survey-question">
-          <h3>{{control.label}}</h3>
-        </label>
-        <input
-          v-if="showInput"
-          class="form-control"
-          id="survey-question"
-          name="survey-question"
-          v-model="control.value"
-        />
-      </div>
-      <div class="d-flex justify-content-end">
-        <button
-          type="button"
-          class="btn btn-outline-primary mr-2"
-          @click="previous"
-          v-show="!atStart"
-        >Previous</button>
-        <button
-          type="submit"
-          class="btn btn-primary"
-          @click.prevent="next"
-        >{{ atEnd ? "Submit" : "Next"}}</button>
-      </div>
-    </form>
-    -->
     <div
       v-if="mShowNav"
       class="font-weight-medium footer"
