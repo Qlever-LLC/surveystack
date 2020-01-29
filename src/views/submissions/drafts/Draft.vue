@@ -38,6 +38,7 @@
       style="min-width: 100px; max-width: 100%;"
     >
       <component
+        class="tall"
         :key="breadcrumbs.join('.')"
         :is="control.type"
         :control="control"
@@ -425,6 +426,11 @@ export default {
   bottom: 0px;
 }
 
+.tall {
+  padding-bottom: 20vh;
+}
+
 #question-container {
+
 }
 </style>

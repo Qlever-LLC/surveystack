@@ -4,9 +4,6 @@
       align="center"
       justify="center"
     >
-      <v-alert>
-        {{ value }}
-      </v-alert>
       <div
         id="map-question"
         v-if="!mapError"
@@ -31,8 +28,11 @@
         class="infos grey--text text--darken-2 text-center"
         fluid
       >
+
+        <p class="headline">{{ control.label }}<span class="subtitle-1 ml-2"> {{ control.name }}</span></p>
+
         <template v-if="!location">
-          <p class="headline">{{ control.label }}<span class="subtitle-1 ml-2"> {{ control.name }}</span></p>
+
           <v-btn
             large
             class="mx-4 full"
@@ -60,8 +60,44 @@
           >Retake</v-btn>
         </template>
 
+        <v-container v-if="value">
+          Selected <kbd>lat: {{ value.lat }}</kbd> <kbd>lng: {{ value.lng }}</kbd>
+          <br>
+          <v-btn
+            @click="clipboard(value)"
+            dark
+            color="blue"
+          >
+            <v-icon left>mdi-clipboard</v-icon>Copy to Clipboard
+          </v-btn>
+        </v-container>
+
+        <v-container v-if="gps">
+          GPS <kbd>lat: {{ gps.lat }}</kbd> <kbd>lng: {{ gps.lng }}</kbd> <kbd>acc: {{ gps.acc }}</kbd>
+          <br>
+          <v-btn
+            @click="clipboard(gps)"
+            dark
+            color="blue"
+          >
+            <v-icon left>mdi-clipboard</v-icon>Copy to Clipboard
+          </v-btn>
+        </v-container>
+
       </v-container>
     </v-row>
+
+    <v-snackbar v-model="snackbar">
+      {{ snackbarText }}
+      <v-btn
+        color="pink"
+        text
+        @click="snackbar = false"
+      >
+        Close
+      </v-btn>
+    </v-snackbar>
+
   </v-container>
 
 </template>
@@ -94,9 +130,20 @@ export default {
       mapError: false,
       first: true,
       location: null,
+      gps: null,
+      snackbar: false,
+      snackbarText: '',
     };
   },
   methods: {
+    clipboard(obj) {
+      navigator.clipboard.writeText(`${obj.lat}, ${obj.lng}`).then(() => {
+        this.snackbarText = 'Copied Text to Clipboard';
+        this.snackbar = true;
+      }, (err) => {
+        console.error('Async: Could not copy text: ', err);
+      });
+    },
     pickLocation() {
       console.log(this.map.getCenter());
       this.changed(this.map.getCenter());
@@ -117,6 +164,11 @@ export default {
       }
       navigator.geolocation.watchPosition((position) => {
         console.log(position);
+        this.gps = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          acc: position.coords.accuracy,
+        };
       });
     },
     handleMap(map, control) {
