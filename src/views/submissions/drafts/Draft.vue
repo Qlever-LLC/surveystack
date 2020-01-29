@@ -1,7 +1,11 @@
 
 <template>
-  <v-container v-if="instance" class="pl-8 pr-8">
-    <v-row class="flex-grow-0 flex-shrink-1">
+  <v-container
+    v-if="instance"
+    id="question-container"
+  >
+    <v-row class="flex-grow-0 flex-shrink-1 pl-2 pr-2 pb-2"
+>
       <div class="title">
         <div class="inner-title">
           {{ survey.name }}
@@ -36,10 +40,7 @@
     >
       <component
         :is="control.type"
-        :control="control"
-        :position="positions[index]"
-        :instance="instance"
-        :controlIndex="index"
+        :controlArgs="controlArgs"
       ></component>
     </v-row>
 
@@ -72,10 +73,13 @@
       </div>
     </form>
     -->
-    <div class="font-weight-medium footer">
-      <v-container class="pl-8 pr-8">
+    <div v-if="mShowNav" class="font-weight-medium footer">
+      <v-container class="pa-0">
         <v-row>
-          <v-col class="text-center" cols="6">
+          <v-col
+            class="text-center"
+            cols="6"
+          >
             <v-btn
               v-show="!atStart"
               @click="previous"
@@ -87,11 +91,25 @@
             >Previous</v-btn>
           </v-col>
 
-          <v-col v-if="atEnd" class="text-center" cols="6">
-            <v-btn @click="next" class="full" depressed large color="primary">Submit</v-btn>
+          <v-col
+            v-if="atEnd"
+            class="text-center"
+            cols="6"
+          >
+            <v-btn
+              @click="next"
+              class="full"
+              depressed
+              large
+              color="primary"
+            >Submit</v-btn>
           </v-col>
 
-          <v-col v-else class="text-center" cols="6">
+          <v-col
+            v-else
+            class="text-center"
+            cols="6"
+          >
             <v-btn
               @click="next"
               @keyup.enter="next"
@@ -113,7 +131,9 @@ import api from '@/services/api.service';
 
 import inputText from '@/components/survey/question_types/TextInput.vue';
 import inputNumeric from '@/components/survey/question_types/NumberInput.vue';
+import inputLocation from '@/components/survey/question_types/Map.vue';
 import group from '@/components/survey/question_types/Group.vue';
+
 
 import {
   getControl,
@@ -129,6 +149,7 @@ export default {
   components: {
     inputText,
     inputNumeric,
+    inputLocation,
     group,
   },
   data() {
@@ -140,7 +161,9 @@ export default {
       positions: null,
       breadcrumbs: [],
       index: 0,
+      mShowNav: true,
       version: 0,
+
     };
   },
   computed: {
@@ -172,12 +195,39 @@ export default {
       ret.splice(-1, 1);
       return ret.map(txt => `<kbd>${txt}</kbd>`).join(' &gt; ');
     },
+    controlArgs() {
+      return {
+        control: this.control,
+        eval: (expr) => {
+          const sandbox = compileSandboxSingleLine(expr);
+          return sandbox({ data: this.instanceData });
+        },
+        changed: (v) => {
+          this.setValue(v);
+          // TODO change modified timestamp, persist
+        },
+        showNav: () => {
+          console.log('shownav');
+          this.showNav(true);
+        },
+        hideNav: () => {
+          this.showNav(false);
+        },
+        next: () => {
+          this.next();
+        },
+      };
+    },
   },
   methods: {
-    setValue(ev) {
-      this.control.value = ev.target.value;
+    showNav(visible) {
+      this.mShowNav = visible;
+    },
+    setValue(v) {
+      this.control.value = v;
     },
     next() {
+      this.showNav(true);
       if (this.atEnd) {
         const payload = createInstancePayload(
           this.instance,
@@ -218,6 +268,16 @@ export default {
       const sandbox = compileSandboxSingleLine(this.control.options.calculate);
       this.control.value = sandbox({ data: this.instanceData });
       console.log(this.control.value);
+    },
+    questions() {
+      if (!this.surveyPositions) {
+        return [];
+      }
+
+      return this.surveyPositions.map(pos => ({
+        number: pos.map(v => v + 1).join('.'),
+        control: this.controlFromPosition(pos),
+      }));
     },
     async submit(payload) {
       try {
@@ -302,10 +362,13 @@ export default {
   transition-duration: 0.2s;
   transition-property: background-color, left, right;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 100;
+  z-index: 1;
   position: fixed;
   left: 0px;
   right: 0px;
   bottom: 0px;
+}
+
+#question-container {
 }
 </style>

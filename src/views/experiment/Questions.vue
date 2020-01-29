@@ -4,7 +4,6 @@
     height="100%"
   >
     <app-map></app-map>
-
   </v-container>
 </template>
 

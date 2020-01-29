@@ -2,18 +2,38 @@
   <v-container>
     <h1>Browse Surveys</h1>
     <v-card>
-      <div v-for="e in entities" :key="e._id">
-        <v-list-item :to="`/submissions/drafts/new?survey=${e._id}`">
+      <div
+        v-for="e in entities"
+        :key="e._id"
+      >
+        <v-list-item>
           <v-list-item-content>
             <v-list-item-title>{{e.name}}</v-list-item-title>
             <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle>
           </v-list-item-content>
-          <v-list-item-icon>
-            <v-btn :to="`/submissions?survey=${e._id}`" text>
-              <v-icon>mdi-eye</v-icon>
+          <v-list-item-icon class="center-items">
+            <v-btn
+              class="mx-2"
+              outlined
+              :to="`/submissions?survey=${e._id}`"
+              text
+            >
+              <v-icon left>mdi-eye</v-icon>Submission
             </v-btn>
-            <v-btn :to="`/surveys/${e._id}/edit`" text>
-              <v-icon>mdi-pencil</v-icon>
+            <v-btn
+              class="mx-2"
+              outlined
+              :to="`/surveys/${e._id}/edit`"
+              text
+            >
+              <v-icon left>mdi-pencil</v-icon> Edit
+            </v-btn>
+            <v-btn
+              class="mx-2"
+              outlined
+              :to="`/submissions/drafts/new?survey=${e._id}`"
+            >
+              New Draft
             </v-btn>
           </v-list-item-icon>
         </v-list-item>
@@ -40,5 +60,8 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.center-items {
+  vertical-align: center;
+}
 </style>

@@ -7,25 +7,10 @@
 </template>
 
 <script>
+import controlProps from '@/utils/controls/props';
+
 export default {
-  props: {
-    control: {
-      type: Object,
-      required: true,
-    },
-    instance: {
-      type: Object,
-      required: true,
-    },
-    position: {
-      type: Array,
-      required: true,
-    },
-    controlIndex: {
-      type: Number,
-      required: true,
-    },
-  },
+  props: controlProps,
 };
 </script>
 
