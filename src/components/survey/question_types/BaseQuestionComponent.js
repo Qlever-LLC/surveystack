@@ -7,6 +7,8 @@ export default {
     showNav: { type: Function, required: true },
     hideNav: { type: Function, required: true },
     next: { type: Function, required: true },
+    hideNext: { type: Function, required: true },
+    showNext: { type: Function, required: true },
   },
   computed: {
     value() {

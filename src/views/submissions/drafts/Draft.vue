@@ -4,7 +4,7 @@
     v-if="instance"
     id="question-container"
   >
-
+    <kbd>{{ control }}</kbd>
     <v-row class="flex-grow-0 flex-shrink-1 pl-2 pr-2 pb-2">
       <div class="title">
         <div class="inner-title">
@@ -101,6 +101,7 @@
             cols="6"
           >
             <v-btn
+              v-if="mShowNext"
               @click="next"
               class="full"
               depressed
@@ -115,6 +116,7 @@
             cols="6"
           >
             <v-btn
+              v-if="mShowNext"
               @click="next"
               @keyup.enter="next"
               class="full"
@@ -160,15 +162,13 @@ export default {
     return {
       survey: null,
       control: null,
-      fakeControl: {
-        value: null,
-      },
       instance: null,
       instanceData: null,
       positions: null,
       breadcrumbs: [],
       index: 0,
       mShowNav: true,
+      mShowNext: true,
       version: 0,
     };
   },
@@ -237,6 +237,12 @@ export default {
         hideNav() {
           this.$parent.showNav(false);
         },
+        hideNext() {
+          this.$parent.showNext(false);
+        },
+        showNext() {
+          this.$parent.showNext(true);
+        },
         next() {
           this.$parent.next();
         },
@@ -247,13 +253,16 @@ export default {
     showNav(visible) {
       this.mShowNav = visible;
     },
+    showNext(visible) {
+      this.mShowNext = visible;
+    },
     setValue(v) {
       console.log('setting value', v);
-      this.fakeControl.value = v;
       this.control.value = v;
     },
     next() {
       this.showNav(true);
+      this.showNext(true);
       if (this.atEnd) {
         const payload = createInstancePayload(
           this.instance,
@@ -273,6 +282,8 @@ export default {
       this.calculateControl();
     },
     previous() {
+      this.showNav(true);
+      this.showNext(true);
       if (this.atStart) {
         return;
       }
