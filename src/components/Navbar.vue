@@ -50,11 +50,6 @@ export default {
           icon: 'mdi-magnify',
         },
         {
-          title: 'Drafts',
-          to: { name: 'submissions-drafts-list' },
-          icon: 'mdi-pencil-plus',
-        },
-        {
           title: 'Builder',
           to: { name: 'surveys-new' },
           icon: 'mdi-newspaper-plus',

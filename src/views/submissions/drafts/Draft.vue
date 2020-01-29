@@ -1,10 +1,9 @@
 
 <template>
   <v-container
-    v-if="instance"
+    v-if="instance && survey"
     id="question-container"
   >
-
     <v-row class="flex-grow-0 flex-shrink-1 pl-2 pr-2 pb-2">
       <div class="title">
         <div class="inner-title">
@@ -101,6 +100,7 @@
             cols="6"
           >
             <v-btn
+              v-if="mShowNext"
               @click="next"
               class="full"
               depressed
@@ -115,6 +115,7 @@
             cols="6"
           >
             <v-btn
+              v-if="mShowNext"
               @click="next"
               @keyup.enter="next"
               class="full"
@@ -137,6 +138,7 @@ import inputText from '@/components/survey/question_types/TextInput.vue';
 import inputNumeric from '@/components/survey/question_types/NumberInput.vue';
 import inputLocation from '@/components/survey/question_types/Map.vue';
 import group from '@/components/survey/question_types/Group.vue';
+import * as db from '@/store/db';
 
 
 import {
@@ -147,6 +149,7 @@ import {
   compileSandboxSingleLine,
   createInstance,
   createInstancePayload,
+  getControlPositions,
 } from '@/utils/surveys';
 
 export default {
@@ -169,18 +172,9 @@ export default {
       breadcrumbs: [],
       index: 0,
       mShowNav: true,
+      mShowNext: true,
       version: 0,
     };
-  },
-  watch: {
-    control: {
-      // eslint-disable-next-line func-names
-      handler(val, oldVal) {
-        console.log(`value: ${oldVal} => ${val}`);
-      },
-      deep: true,
-    },
-
   },
   computed: {
     totalQuestions() {
@@ -212,33 +206,36 @@ export default {
       return ret.map(txt => `<kbd>${txt}</kbd>`).join(' &gt; ');
     },
     computedControl() {
-      console.log('computedControl');
       return {
         v: this.fakeControl.value,
       };
     },
     controlArgs() {
-      console.log('computing controlargs');
       // eslint-disable-next-line no-unused-vars
       return {
         control: this.control,
-        eval(expr) {
+        value: this.control.value,
+        eval: (expr) => {
           const sandbox = compileSandboxSingleLine(expr);
           return sandbox({ data: this.instanceData });
         },
-        changed(v) {
-          console.log('changed', this.$parent);
-          this.$parent.setValue(v);
+        changed: (v) => {
+          this.setValue(v);
         },
-        showNav() {
-          console.log('shownav');
-          this.$parent.showNav(true);
+        showNav: () => {
+          this.showNav(true);
         },
-        hideNav() {
-          this.$parent.showNav(false);
+        hideNav: () => {
+          this.showNav(false);
         },
-        next() {
-          this.$parent.next();
+        next: () => {
+          this.next();
+        },
+        hideNext: () => {
+          this.showNext(false);
+        },
+        showNext: () => {
+          this.showNext(true);
         },
       };
     },
@@ -247,13 +244,21 @@ export default {
     showNav(visible) {
       this.mShowNav = visible;
     },
+    showNext(visible) {
+      this.mShowNext = visible;
+    },
     setValue(v) {
+      // TODO change modified timestamp, persist
       console.log('setting value', v);
       this.fakeControl.value = v;
       this.control.value = v;
+      console.log(this.control);
+      this.instance.meta.modified = new Date().getTime();
+      this.persist();
     },
     next() {
       this.showNav(true);
+      this.showNext(true);
       if (this.atEnd) {
         const payload = createInstancePayload(
           this.instance,
@@ -273,6 +278,8 @@ export default {
       this.calculateControl();
     },
     previous() {
+      this.showNav(true);
+      this.showNext(true);
       if (this.atStart) {
         return;
       }
@@ -284,7 +291,6 @@ export default {
       );
     },
     calculateControl() {
-      console.log(this.control);
       if (
         !this.control.options.calculate
         || this.control.options.calculate === ''
@@ -305,6 +311,9 @@ export default {
         control: this.controlFromPosition(pos),
       }));
     },
+    persist() {
+      db.persistSurveyResult(this.instance);
+    },
     async submit(payload) {
       try {
         await api.post('/submissions', payload);
@@ -317,27 +326,94 @@ export default {
 
   async created() {
     try {
+      const { id } = this.$route.params;
       const { survey } = this.$route.query;
-      const { data } = await api.get(`/surveys/${survey}`);
-      this.survey = data;
 
-      this.version = this.survey.versions.length - 1;
-      if (this.version < 0) {
-        console.log('invalid version', this.version);
-        return;
-      }
+      db.openDb(async () => {
+        if (!id) {
+          let data = {};
 
-      this.instance = createInstance(this.survey, this.version);
+          try {
+            // eslint-disable-next-line prefer-destructuring
+            data = (await api.get(`/surveys/${survey}`)).data;
+          } catch (error) {
+            console.log('using cached data');
+            data = (await new Promise((resolve) => {
+              db.getAllSurveys(surveys => resolve(surveys));
+            })).find(s => s._id === survey);
+          }
 
-      this.positions = getSurveyPositions(this.survey, this.version);
-      this.instanceData = getInstanceData(this.instance);
+          this.survey = data;
 
-      this.index = 0;
-      this.control = getControl(this.instance.data, this.positions[this.index]);
-      this.breadcrumbs = getBreadcrumbs(
-        this.survey.versions[this.version],
-        this.positions[this.index],
-      );
+          console.log(this.survey);
+
+
+          this.version = this.survey.versions.length - 1;
+          if (this.version < 0) {
+            console.log('invalid version', this.version);
+            return;
+          }
+
+          this.instance = createInstance(this.survey, this.version);
+          this.positions = getSurveyPositions(this.survey, this.version);
+          this.instanceData = getInstanceData(this.instance);
+
+          this.index = 0;
+          this.control = getControl(this.instance.data, this.positions[this.index]);
+          this.breadcrumbs = getBreadcrumbs(
+            this.survey.versions[this.version],
+            this.positions[this.index],
+          );
+        } else {
+          console.log('loading existing submissing', id);
+          db.getAllSurveyResults(async (results) => {
+            console.log(results);
+            this.instance = results.find(i => i._id === id);
+            if (!this.instance) {
+              // TODO instance not found
+              return;
+            }
+
+            console.log('instance', this.instance);
+
+            console.log('fetching survey');
+            let data = {};
+
+            try {
+              // eslint-disable-next-line prefer-destructuring
+              data = (await api.get(`/surveys/${this.instance.survey}`)).data;
+            } catch (error) {
+              console.log('using cached data');
+              data = (await new Promise((resolve) => {
+                db.getAllSurveys(surveys => resolve(surveys));
+              })).find(s => s._id === this.instance.survey);
+            }
+
+            this.survey = data;
+            this.version = this.instance.meta.version;
+
+
+            console.log('getting control positions');
+            this.positions = getControlPositions(this.instance.data);
+
+            console.log('getting instance data');
+            this.instanceData = getInstanceData(this.instance);
+
+            this.index = 0;
+
+            console.log('getting control');
+            this.control = getControl(this.instance.data, this.positions[this.index]);
+
+            console.log('getting breadcrumbs');
+
+            console.log('survey', this.survey);
+            this.breadcrumbs = getBreadcrumbs(
+              this.survey.versions[this.version],
+              this.positions[this.index],
+            );
+          });
+        }
+      });
     } catch (e) {
       console.log('something went wrong:', e);
     }

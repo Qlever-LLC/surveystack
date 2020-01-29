@@ -92,7 +92,7 @@ export default {
     retake() {
       this.changed(null);
       this.location = null;
-      this.hideNav();
+      this.hideNext();
     },
     handleMap(map, control) {
       const ctrl = new mapboxgl.GeolocateControl({
@@ -154,7 +154,7 @@ export default {
 
     this.handleMap(this.map, this.control);
     if (!this.value) {
-      this.hideNav();
+      this.hideNext();
     }
     requestWakeLock();
   },
