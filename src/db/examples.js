@@ -66,8 +66,8 @@ export const exampleSurvey = {
 
 export const exampleSubmission = {
   _id: new ObjectId('5e303982ea0cf40001aef63c'),
+  survey: new ObjectId('5e3038dbea0cf40001aef63b'),
   meta: {
-    survey: new ObjectId('5e3038dbea0cf40001aef63b'),
     dateCreated: new Date('2020-01-28T13:39:14.544Z'),
     version: 0,
   },
@@ -94,5 +94,4 @@ export const exampleSubmission = {
       ],
     },
   ],
-  dateCreated: new Date('2020-01-28T13:39:31.574Z'),
 };

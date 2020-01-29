@@ -8,7 +8,10 @@ import { db } from '../db';
 const col = 'submissions';
 
 const sanitize = entity => {
-  entity.meta.survey = new ObjectId(entity.meta.survey);
+  if (entity._id) {
+    entity._id = new ObjectId(entity._id);
+  }
+  entity.survey = new ObjectId(entity.survey);
   entity.meta.dateCreated = new Date(entity.meta.dateCreated);
   return entity;
 };
@@ -20,7 +23,7 @@ const getSubmissions = async (req, res) => {
     entities = await db
       .collection(col)
       .find({
-        'meta.survey': new ObjectId(req.query.survey),
+        survey: new ObjectId(req.query.survey),
       })
       .toArray();
     return res.send(entities);

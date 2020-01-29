@@ -15,12 +15,12 @@ API endpoint `/api/submissions`
 ## Description
 
 ```javascript
-// Example submission
+// Example submissions
 const submissions = [
   {
     _id: '5e2eed723c98557ae2c1d967', // submission id
+    survey: '5e2eecc36f371d00015775af', // survey reference
     meta: {
-      survey: '5e2eecc36f371d00015775af', // survey reference
       dateCreated: '2020-01-27T14:10:41.623Z',
       version: 0, // survey version
     }
@@ -51,8 +51,8 @@ const submissions = [
   },
   {
     _id: '5e2eed803c98557ae2c1d968',
+    survey: '5e2eecc36f371d00015775af',
     meta: {
-      survey: '5e2eecc36f371d00015775af',
       dateCreated: '2020-01-27T14:12:24.730Z',
       version: 3,
     },
