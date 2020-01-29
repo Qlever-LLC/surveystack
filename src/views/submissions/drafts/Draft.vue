@@ -4,8 +4,8 @@
     v-if="instance"
     id="question-container"
   >
-    <v-row class="flex-grow-0 flex-shrink-1 pl-2 pr-2 pb-2"
->
+
+    <v-row class="flex-grow-0 flex-shrink-1 pl-2 pr-2 pb-2">
       <div class="title">
         <div class="inner-title">
           {{ survey.name }}
@@ -39,8 +39,9 @@
       style="min-width: 100px; max-width: 100%;"
     >
       <component
+        :key="breadcrumbs.join('.')"
         :is="control.type"
-        :controlArgs="controlArgs"
+        v-bind="controlArgs"
       ></component>
     </v-row>
 
@@ -73,7 +74,10 @@
       </div>
     </form>
     -->
-    <div v-if="mShowNav" class="font-weight-medium footer">
+    <div
+      v-if="mShowNav"
+      class="font-weight-medium footer"
+    >
       <v-container class="pa-0">
         <v-row>
           <v-col
@@ -156,6 +160,9 @@ export default {
     return {
       survey: null,
       control: null,
+      fakeControl: {
+        value: null,
+      },
       instance: null,
       instanceData: null,
       positions: null,
@@ -163,8 +170,17 @@ export default {
       index: 0,
       mShowNav: true,
       version: 0,
-
     };
+  },
+  watch: {
+    control: {
+      // eslint-disable-next-line func-names
+      handler(val, oldVal) {
+        console.log(`value: ${oldVal} => ${val}`);
+      },
+      deep: true,
+    },
+
   },
   computed: {
     totalQuestions() {
@@ -195,26 +211,34 @@ export default {
       ret.splice(-1, 1);
       return ret.map(txt => `<kbd>${txt}</kbd>`).join(' &gt; ');
     },
+    computedControl() {
+      console.log('computedControl');
+      return {
+        v: this.fakeControl.value,
+      };
+    },
     controlArgs() {
+      console.log('computing controlargs');
+      // eslint-disable-next-line no-unused-vars
       return {
         control: this.control,
-        eval: (expr) => {
+        eval(expr) {
           const sandbox = compileSandboxSingleLine(expr);
           return sandbox({ data: this.instanceData });
         },
-        changed: (v) => {
-          this.setValue(v);
-          // TODO change modified timestamp, persist
+        changed(v) {
+          console.log('changed', this.$parent);
+          this.$parent.setValue(v);
         },
-        showNav: () => {
+        showNav() {
           console.log('shownav');
-          this.showNav(true);
+          this.$parent.showNav(true);
         },
-        hideNav: () => {
-          this.showNav(false);
+        hideNav() {
+          this.$parent.showNav(false);
         },
-        next: () => {
-          this.next();
+        next() {
+          this.$parent.next();
         },
       };
     },
@@ -224,6 +248,8 @@ export default {
       this.mShowNav = visible;
     },
     setValue(v) {
+      console.log('setting value', v);
+      this.fakeControl.value = v;
       this.control.value = v;
     },
     next() {

@@ -381,6 +381,12 @@ export const getControl = (controls, position) => {
     currentControls = control.children;
   });
 
+  if (control.type !== 'group') {
+    if (control.value === undefined) {
+      control.value = null;
+    }
+  }
+
   return control;
 };
 

@@ -5,7 +5,7 @@
         outlined
         type="number"
         :label="control.label"
-        v-bind:value="control.value"
+        v-bind:value="value"
         v-on:input="onInput"
       ></v-text-field>
     </v-row>
@@ -13,27 +13,16 @@
 </template>
 
 <script>
-import controlComputed from '@/utils/controls/computed';
-import controlProps from '@/utils/controls/props';
+import baseQuestionComponent from './BaseQuestionComponent';
 
 export default {
-  data() {
-    return {
-      value: this.controlArgs.control.value,
-    };
-  },
+  mixins: [baseQuestionComponent],
   methods: {
     onInput(v) {
-      if (this.control.value !== v) {
+      if (this.value !== v) {
         this.changed(v);
       }
     },
-  },
-  props: {
-    ...controlProps,
-  },
-  computed: {
-    ...controlComputed,
   },
 };
 </script>

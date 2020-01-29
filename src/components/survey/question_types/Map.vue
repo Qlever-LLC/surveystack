@@ -4,7 +4,7 @@
 
       <div id="map-question">
         <img
-          v-if="!this.control.value"
+          v-if="!this.value"
           id="map-marker"
           src="@/assets/marker.svg"
           alt="marker"
@@ -53,8 +53,8 @@
 /* eslint-disable no-new */
 
 import mapboxgl from 'mapbox-gl';
-import controlProps from '@/utils/controls/props';
-import controlComputed from '@/utils/controls/computed';
+import baseQuestionComponent from './BaseQuestionComponent';
+
 
 let wakeLock = null;
 
@@ -71,6 +71,7 @@ const requestWakeLock = async () => {
 };
 
 export default {
+  mixins: [baseQuestionComponent],
   data() {
     return {
       map: null,
@@ -78,7 +79,6 @@ export default {
       location: null,
     };
   },
-  props: controlProps,
   methods: {
     pickLocation() {
       console.log(this.map.getCenter());
@@ -133,14 +133,13 @@ export default {
     },
   },
   computed: {
-    ...controlComputed, // TODO check out decorators / higher order functions
     started() {
       return true;
     },
   },
   created() {
     this.first = true;
-    this.location = this.control.value;
+    this.location = this.value;
   },
   mounted() {
     console.log(`mounted, ${this.map}`);
@@ -154,8 +153,8 @@ export default {
     });
 
     this.handleMap(this.map, this.control);
-    if (!this.controlArgs.control.value) {
-      this.controlArgs.hideNav();
+    if (!this.value) {
+      this.hideNav();
     }
     requestWakeLock();
   },
