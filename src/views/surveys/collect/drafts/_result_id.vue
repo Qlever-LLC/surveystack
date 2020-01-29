@@ -181,6 +181,10 @@ export default {
   },
   async created() {
     try {
+      db.openDb(() => {
+        console.log('DB open');
+      });
+
       const { id } = this.$route.params;
       // const { data } = await api.get(`/surveys/${id}`);
 

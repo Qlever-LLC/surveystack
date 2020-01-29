@@ -45,6 +45,7 @@
 
 <script>
 import api from '@/services/api.service';
+import * as db from '@/store/db';
 
 export default {
   data() {
@@ -53,8 +54,25 @@ export default {
     };
   },
   async created() {
-    const { data } = await api.get('/surveys');
+    let data = {};
+
+    try {
+      // eslint-disable-next-line prefer-destructuring
+      data = (await api.get('/surveys')).data;
+    } catch (error) {
+      console.log('using cached data');
+      data = (await new Promise((resolve) => {
+        db.getAllSurveys(surveys => resolve(surveys));
+      }));
+    }
+
+
     this.entities = data;
+    db.openDb(() => {
+      data.forEach((d) => {
+        db.persistSurvey(d);
+      });
+    });
     // this.entities = data;
   },
 };

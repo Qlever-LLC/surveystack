@@ -46,7 +46,7 @@ export default {
   methods: {
     select(draft) {
       console.log(`clicked ${draft._id}`);
-      this.$router.push(`/surveys/collect/drafts/${draft._id}`);
+      this.$router.push(`/submissions/drafts/${draft._id}`);
     },
     persist() {
       db.persistSurveyResult(this.instance);
