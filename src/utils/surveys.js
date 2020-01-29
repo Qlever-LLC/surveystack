@@ -154,7 +154,9 @@ export const mockSurvey = {
 };
 
 const mockInstance = {
-  controls: [
+  _id: '5dadc4c9988f9df9527f99ef',
+  survey: '5dadc4c9988f9df9527f07ac',
+  data: [
     {
       name: 'hello',
       label: 'How do you say hello?',
@@ -188,9 +190,7 @@ const mockInstance = {
       ],
     },
   ],
-  _id: 'the-most-best-survey-2019',
-  name: 'the most best survey 2019',
-  __v: 0,
+
 };
 
 function* processSurveyNames(data) {
