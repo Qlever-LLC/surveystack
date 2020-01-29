@@ -1,4 +1,5 @@
-import api from '@/services/api.service';
+// import api from '@/services/api.service';
+import * as db from '@/store/db';
 
 export const types = {
   FETCH_SUBMISSIONS: 'FETCH_SUBMISSIONS',
@@ -44,9 +45,16 @@ const actions = {
     commit(types.RESET);
   },
   async [types.FETCH_SUBMISSIONS]({ commit }/* , userId */) {
-    const response = await api.get('/submissions');
-    console.log('submissions', response.data);
-    commit(types.SET_SUBMISSIONS, response.data);
+    // const response = await api.get('/submissions');
+
+    // TODO reject if timeout here
+    const response = await new Promise((resolve) => {
+      db.openDb(() => {
+        db.getAllSurveyResults(results => resolve(results));
+      });
+    });
+    console.log('submissions', response);
+    commit(types.SET_SUBMISSIONS, response);
   },
   [types.ADD_SUBMISSION]({ commit }, submission) {
     commit(types.ADD_SUBMISSION, submission);

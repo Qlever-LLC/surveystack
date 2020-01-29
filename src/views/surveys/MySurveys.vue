@@ -21,6 +21,7 @@
             <v-list-item
               v-for="(item, i) in tab.content"
               :key="i"
+              @click="select(item)"
             >
               <v-list-item-content>
                 <v-list-item-title>
@@ -71,6 +72,12 @@ export default {
           content: this.$store.getters['submissions/sent'],
         },
       ];
+    },
+  },
+  methods: {
+    select(draft) {
+      console.log(`clicked ${draft._id}`);
+      this.$router.push(`/submissions/drafts/${draft._id}`);
     },
   },
 };
