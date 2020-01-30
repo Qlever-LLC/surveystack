@@ -2,6 +2,66 @@
 
 Our-Sci PWA is a Progressive Web App (PWA) for creating and collecting surveys.
 
+## Development Quickstart
+
+### Development Server
+
+For development, you will need:
+- this repository, *d'uh*
+- the [our-sci-server](https://gitlab.com/our-sci/our-sci-server) repository
+- A [mongoDB](https://www.mongodb.com/) server (preferably running on localhost)
+- [node](https://nodejs.org/en/) & [yarn](https://yarnpkg.com/)
+
+Start VueJS front-end on [http://localhost:8080](http://localhost:8080)
+```
+cd ~/repos/oursci/our-sci-pwa
+yarn
+yarn serve
+```
+
+Start Node.js back-end on [http://localhost:3000](http://localhost:3000)
+```
+cd ~/repos/oursci/our-sci-server
+yarn
+yarn start
+```
+
+You can now **view the webapp on your local machine** under [http://localhost:8080](http://localhost:8080)!
+
+**Note:** Let's say your local machine has IP address `192.168.1.66`, then you can access the webapp from another computer or mobile phone under [http://192.168.1.66:8080](http://192.168.1.66:8080). In order for the **communication between front-end and back-end API** to work, you also need to **create a local environment file**, and adjust `VUE_APP_API_URL` with your current IP address.
+```
+$ cp .env.development .env.development.local
+$ gedit .env.development.local
+...
+VUE_APP_API_URL=http://192.168.1.66:3000/api
+```
+The above `.env.development.local` file is **not commited** to git.
+
+### Production build
+
+You can try a production build by building the VueJS front-end, which will end up in `our-sci-pwa/dist`. The `our-sci-server` repository should be next to the `our-sci-pwa`, and it will statically serve `../our-sci-pwa/dist`.
+
+```
+# Make sure our-sci-pwa and our-sci-server are in the same directory
+$ cd ~/repos/oursci
+$ ls
+our-sci-pwa
+our-sci-server
+adorablePuppies.exe
+...
+
+# Build front-end production dist folder
+$ cd our-sci-pwa
+$ yarn build
+
+# Start back-end server which statically serves ../our-sci-pwa/dist
+$ cd our-sci-server
+$ yarn
+$ yarn start
+```
+
+You can now view the webapp under [http://localhost:3000](http://localhost:3000) (or your local IP address instead of localhost).
+
 ## Coding guidelines
 
 Our-Sci PWA adheres to airbnb coding style guidelines. For development, we recommend using Visual Studio Code with the following workspace settings under `.vscode/settings.json`:
