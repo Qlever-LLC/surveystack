@@ -409,10 +409,13 @@ export const insertControl = (control, controls, position) => {
 
 
   for (let i = 0; i < position.length; i++) {
-    currentControl = currentControls[i];
+    currentControl = currentControls[position[i]];
     index = position[i];
     if (currentControl.type === 'group') {
       console.log('we are inside a group');
+      if (i === position.length - 1) {
+        break;
+      }
       currentControls = currentControl.children;
     }
   }
