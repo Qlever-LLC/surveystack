@@ -144,9 +144,6 @@ export default {
 
       const position = utils.getPosition(this.control, this.currentControls);
       utils.insertControl(control, this.currentControls, position);
-
-      // this.survey.versions[this.currentVersion].controls.push(control);
-      // this.currentArray.splice(this.currentArrayPosition, 0, control);
       this.control = control;
     },
     onCancel() {
