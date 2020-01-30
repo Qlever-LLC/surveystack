@@ -1,6 +1,6 @@
 # Our-Sci PWA
 
-Our-Sci PWA is a Progressive Web App (PWA) for creating and collecting surveys.
+Our-Sci PWA is a Progressive Web App (PWA) for creating and collecting surveys, see [development demo here](https://dev.our-sci.net).
 
 ## Development Quickstart
 
@@ -39,7 +39,7 @@ The above `.env.development.local` file is **not commited** to git.
 
 ### Production build
 
-You can try a production build by building the VueJS front-end, which will end up in `our-sci-pwa/dist`. The `our-sci-server` repository should be next to the `our-sci-pwa`, and it will statically serve `../our-sci-pwa/dist`.
+You can try a production build by building the VueJS front-end, which will end up in `our-sci-pwa/dist`. The [our-sci-server](https://gitlab.com/our-sci/our-sci-server) repository should be next to the `our-sci-pwa`, and it will statically serve `../our-sci-pwa/dist`.
 
 ```
 # Make sure our-sci-pwa and our-sci-server are in the same directory
@@ -61,6 +61,25 @@ $ yarn start
 ```
 
 You can now view the webapp under [http://localhost:3000](http://localhost:3000) (or your local IP address instead of localhost).
+
+## Deployment
+
+For deploying to the [current development server](https://dev.our-sci.net), run the update script from the [our-sci-server](https://gitlab.com/our-sci/our-sci-server) repository:
+```
+# Make sure repositories are synced
+$ cd ~/repos/oursci
+$ cd our-sci-pwa
+$ git pull
+$ cd ..
+$ cd our-sci-server
+$ git pull
+
+# Run the update script
+$ cd ~/repos/oursci/our-sci-server
+$ scripts/update-server.sh
+```
+
+In order for this to work, you will need **oursci-allround.pem** inside `~/.ssh/oursci-allround.pem`.
 
 ## Coding guidelines
 
