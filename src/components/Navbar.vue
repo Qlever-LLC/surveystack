@@ -1,26 +1,51 @@
 <template>
   <nav>
-    <v-app-bar app light clipped-left color="#f44336ff">
-      <v-app-bar-nav-icon color="white" @click="drawer = !drawer" />
-      <v-toolbar-title class="ml-2">
-        <span class="title">Our-Sci</span>
+    <v-app-bar
+      app
+      dark
+      clipped-left
+      color="#f44336ff"
+    >
+      <v-app-bar-nav-icon
+        color="white"
+        @click="drawer = !drawer"
+      />
+      <v-toolbar-title class="ml-2 flex-column">
+        <div class="title py-0 my-0"> {{ appTitle }} </div>
+        <div class="subtitle py-0 my-0" v-html="appSubtitle"></div>
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
 
-      <v-btn v-if="$store.getters['auth/isLoggedIn']" :to="{name: 'auth-profile'}" text>
+      <v-btn
+        v-if="$store.getters['auth/isLoggedIn']"
+        :to="{name: 'auth-profile'}"
+        text
+      >
         <v-icon color="white">mdi-account</v-icon>
       </v-btn>
 
-      <v-btn v-else :to="{name: 'auth-login'}" text>
+      <v-btn
+        v-else
+        :to="{name: 'auth-login'}"
+        text
+      >
         <v-icon>mdi-login</v-icon>
         <span class="ml-2">Login</span>
       </v-btn>
     </v-app-bar>
 
-    <v-navigation-drawer v-model="drawer" app clipped>
+    <v-navigation-drawer
+      v-model="drawer"
+      app
+      clipped
+    >
       <v-list>
-        <v-list-item v-for="(link, idx) in links" :key="idx" :to="link.to">
+        <v-list-item
+          v-for="(link, idx) in links"
+          :key="idx"
+          :to="link.to"
+        >
           <v-list-item-icon>
             <v-icon>{{link.icon}}</v-icon>
           </v-list-item-icon>
@@ -83,10 +108,25 @@ export default {
       ],
     };
   },
+  computed: {
+    appTitle() {
+      return this.$store.getters['appui/title'];
+    },
+    appSubtitle() {
+      return this.$store.getters['appui/subtitle'];
+    },
+  },
 };
 </script>
 <style scoped>
 .title {
   color: white;
+  font-size: 1rem;
+  line-height: 1rem;
+}
+
+.subtitle {
+  font-size: 0.8rem;
+  line-height: 0.8rem;
 }
 </style>

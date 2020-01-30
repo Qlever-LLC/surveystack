@@ -5,13 +5,6 @@
     id="question-container"
   >
     <v-row class="flex-grow-0 flex-shrink-1 pl-2 pr-2 pb-2">
-      <div class="title">
-        <div class="inner-title">
-          {{ survey.name }}
-          <small>Version {{version}}</small>
-        </div>
-        <div class="subtitle-1 count grey--text text--darken-2">Total {{positions.length}} Questions</div>
-      </div>
       <div class="infos grey--text text--darken-2">
         <div v-if="control.type !== 'group'">
           <kbd class="display-1">{{ questionNumber }}</kbd> Question
@@ -23,7 +16,10 @@
         </div>
       </div>
     </v-row>
-    <v-row class="flex-grow-0 flex-shrink-1" v-if="mbreadcrumbs.length > 0">
+    <v-row
+      class="flex-grow-0 flex-shrink-1"
+      v-if="mbreadcrumbs.length > 0"
+    >
       <div
         class="infos grey--text text--darken-2 mt-2"
         v-html="mbreadcrumbs"
@@ -129,6 +125,12 @@ import {
   createInstancePayload,
   getControlPositions,
 } from '@/utils/surveys';
+
+
+function updateTitle(vm) {
+  vm.$store.dispatch('appui/title', vm.survey.name);
+  vm.$store.dispatch('appui/subtitle', `Version ${vm.version} <kbd>${vm.positions.length} Questions</kbd>`);
+}
 
 export default {
   components: {
@@ -274,7 +276,14 @@ export default {
       }
     },
   },
-
+  watch: {
+    control(newControl, oldControl) {
+      //
+    },
+  },
+  beforeDestroy() {
+    this.$store.dispatch('reset');
+  },
   async created() {
     try {
       const { id } = this.$route.params;
@@ -316,6 +325,8 @@ export default {
             this.survey.versions[this.version],
             this.positions[this.index],
           );
+
+          updateTitle(this);
         } else {
           console.log('loading existing submissing', id);
           db.getAllSurveyResults(async (results) => {
@@ -364,6 +375,8 @@ export default {
               this.survey.versions[this.version],
               this.positions[this.index],
             );
+
+            updateTitle(this);
           });
         }
       });
