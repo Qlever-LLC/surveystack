@@ -1,24 +1,23 @@
 <template>
   <v-container>
-    <h1>Browse Surveys</h1>
     <v-card>
       <div
         v-for="e in entities"
         :key="e._id"
       >
-        <v-list-item>
+        <v-list-item two-line>
           <v-list-item-content>
             <v-list-item-title>{{e.name}}</v-list-item-title>
             <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle>
           </v-list-item-content>
-          <v-list-item-icon class="center-items">
+          <v-list-item-icon>
             <v-btn
               class="mx-2"
               outlined
               :to="`/submissions?survey=${e._id}`"
               text
             >
-              <v-icon left>mdi-eye</v-icon>Submission
+              <v-icon >mdi-eye</v-icon><span class="d-none d-lg-flex">Submission</span>
             </v-btn>
             <v-btn
               class="mx-2"
@@ -26,14 +25,14 @@
               :to="`/surveys/${e._id}/edit`"
               text
             >
-              <v-icon left>mdi-pencil</v-icon> Edit
+              <v-icon >mdi-pencil</v-icon><span class="d-none d-lg-flex">Edit</span>
             </v-btn>
             <v-btn
               class="mx-2"
               outlined
               :to="`/submissions/drafts/new?survey=${e._id}`"
             >
-              New Draft
+              <v-icon >mdi-file-document-box-plus-outline</v-icon><span class="d-none d-lg-flex">New Draft</span>
             </v-btn>
           </v-list-item-icon>
         </v-list-item>
@@ -52,6 +51,12 @@ export default {
     return {
       entities: [],
     };
+  },
+  beforeDestroy() {
+    this.$store.dispatch('appui/reset');
+  },
+  updated() {
+    this.$store.dispatch('appui/title', 'Browse Surveys');
   },
   async created() {
     let data = {};

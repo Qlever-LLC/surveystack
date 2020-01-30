@@ -6,6 +6,7 @@
     >
       <div
         id="map-question"
+        class="ml-n4"
         v-if="!mapError"
       >
         <img
@@ -14,6 +15,11 @@
           src="@/assets/marker.svg"
           alt="marker"
         />
+
+        <v-container
+          id="map-center"
+          v-if="mapCenter"
+        > <kbd class="pa-2">Map Center<br> lat: {{ mapCenter.lat }}<br> lng: {{ mapCenter.lng }}</kbd></v-container>
       </div>
       <v-alert
         type="info"
@@ -59,7 +65,6 @@
             @click="retake"
           >Retake</v-btn>
         </template>
-
         <v-container v-if="value">
           Selected <kbd>lat: {{ value.lat }}</kbd> <kbd>lng: {{ value.lng }}</kbd>
           <br>
@@ -156,6 +161,7 @@ export default {
       snackbar: false,
       snackbarText: '',
       geolocationID: null,
+      mapCenter: null,
     };
   },
   methods: {
@@ -193,6 +199,14 @@ export default {
       map.addControl(ctrl);
       map.on('error', () => {
         this.mapError = true;
+      });
+
+      map.on('touchmove', () => {
+        this.mapCenter = map.getCenter();
+      });
+
+      map.on('moveend', () => {
+        this.mapCenter = map.getCenter();
       });
 
 
@@ -294,6 +308,11 @@ export default {
   margin-top: -2rem;
   top: 50%;
   left: 50%;
+  z-index: 1;
+}
+
+#map-center {
+  position: absolute;
   z-index: 1;
 }
 

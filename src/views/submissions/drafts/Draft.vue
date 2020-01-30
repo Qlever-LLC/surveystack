@@ -282,7 +282,7 @@ export default {
     },
   },
   beforeDestroy() {
-    this.$store.dispatch('reset');
+    this.$store.dispatch('appui/reset');
   },
   async created() {
     try {
