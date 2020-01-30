@@ -189,6 +189,7 @@ export default {
       return !this.draftId && !!this.surveyId;
     },
     activeVersion() {
+      /** Do we need to handle invalid version numbers? */
       return this.isNewSubmission
         ? this.activeSurvey.versions.length - 1
         : this.activeSubmission.meta.version;
@@ -331,46 +332,48 @@ export default {
         // await this.$store.dispatch('submissions/fetchSubmissions');
         // this.$store.getters['submissions/getSubmission'](draftId);
         this.activeSubmission = await this.$store.dispatch('submissions/GET_SUBMISSION', draftId);
-        // this.activeSurveyId = this.activeSubmission.survey;
-        // console.log('activeSubmission', this.activeSubmission);
+        // TODO: handle submission not found, set error on page
       }
 
       this.activeSurvey = await this.$store.dispatch(
         'surveys/fetchSurvey',
         surveyId || (this.activeSubmission && this.activeSubmission.survey),
       );
-      // console.log('activeSurvey', this.activeSurvey);
 
 
       db.openDb(async () => {
         if (!draftId) {
           /** draftId does not exist, create new submission for definition of surveyId */
-          let data = {};
+          const data = {};
 
           /** This block should be abstracted into VueX store call,
            * which calls Surveys Service, which automatically handles
            * loading from cache vs API
            * */
-          try {
-            // eslint-disable-next-line prefer-destructuring
-            data = (await api.get(`/surveys/${surveyId}`)).data;
-          } catch (error) {
-            console.log('using cached data');
-            data = (await new Promise((resolve) => {
-              db.getAllSurveys(surveys => resolve(surveys));
-            })).find(s => s._id === surveyId);
-          }
+          // try {
+          //   // eslint-disable-next-line prefer-destructuring
+          //   data = (await api.get(`/surveys/${surveyId}`)).data;
+          // } catch (error) {
+          //   console.log('using cached data');
+          //   data = (await new Promise((resolve) => {
+          //     db.getAllSurveys(surveys => resolve(surveys));
+          //   })).find(s => s._id === surveyId);
+          // }
 
-          this.survey = data;
+          // this.survey = data;
 
-          console.log(this.survey);
+          // console.log(this.survey);
+          /** Stubbing while refactoring */
+          this.survey = this.activeSurvey;
 
           /** Moved to activeVersion computed value */
-          this.version = this.survey.versions.length - 1;
-          if (this.version < 0) {
-            console.log('invalid version', this.version);
-            return;
-          }
+          // this.version = this.survey.versions.length - 1;
+          // if (this.version < 0) {
+          //   console.log('invalid version', this.version);
+          //   return;
+          // }
+          /** Stubbing while refactoring */
+          this.version = this.activeVersion;
 
           /** Can these be put into computed properties or VueX getters?
            * the functionality is common with the draftId does exist case below, should be
@@ -392,56 +395,61 @@ export default {
         } else {
           /** draftId does exist, edit existing submission */
           console.log('loading existing submission', draftId);
-          db.getAllSurveyResults(async (results) => {
-            console.log(results);
-            this.instance = results.find(i => i._id === draftId);
-            if (!this.instance) {
-              // TODO instance not found
-              return;
-            }
+          // db.getAllSurveyResults(async (results) => {
+          //   console.log(results);
+          //   this.instance = results.find(i => i._id === draftId);
+          //   if (!this.instance) {
+          //     // TODO instance not found
+          //     return;
+          //   }
 
-            console.log('instance', this.instance);
+          //   console.log('instance', this.instance);
 
-            console.log('fetching survey');
-            let data = {};
+          //   console.log('fetching survey');
+          //   let data = {};
 
-            try {
-              // eslint-disable-next-line prefer-destructuring
-              data = (await api.get(`/surveys/${this.instance.survey}`)).data;
-            } catch (error) {
-              console.log('using cached data');
-              data = (await new Promise((resolve) => {
-                db.getAllSurveys(surveys => resolve(surveys));
-              })).find(s => s._id === this.instance.survey);
-            }
+          //   try {
+          //     // eslint-disable-next-line prefer-destructuring
+          //     data = (await api.get(`/surveys/${this.instance.survey}`)).data;
+          //   } catch (error) {
+          //     console.log('using cached data');
+          //     data = (await new Promise((resolve) => {
+          //       db.getAllSurveys(surveys => resolve(surveys));
+          //     })).find(s => s._id === this.instance.survey);
+          //   }
 
-            this.survey = data;
-            /** Moved to activeVersion computed value */
-            this.version = this.instance.meta.version;
+          //   this.survey = data;
+
+          /** stubbing while refactoring */
+          this.instance = this.activeSubmission;
+          this.survey = this.activeSurvey;
+          /** Moved to activeVersion computed value */
+          // this.version = this.instance.meta.version;
+          this.version = this.activeVersion;
 
 
-            console.log('getting control positions');
-            this.positions = getControlPositions(this.instance.data);
+          console.log('getting control positions');
+          this.positions = getControlPositions(this.instance.data);
 
-            console.log('getting instance data');
-            this.instanceData = getInstanceData(this.instance);
+          console.log('getting instance data');
+          this.instanceData = getInstanceData(this.instance);
 
-            this.index = 0;
+          this.index = 0;
 
-            console.log('getting control');
-            this.control = getControl(this.instance.data, this.positions[this.index]);
-            this.value = this.control.value;
+          console.log('getting control');
+          this.control = getControl(this.instance.data, this.positions[this.index]);
+          this.value = this.control.value;
 
-            console.log('getting breadcrumbs');
+          console.log('getting breadcrumbs');
 
-            console.log('survey', this.survey);
-            this.breadcrumbs = getBreadcrumbs(
-              this.survey.versions[this.version],
-              this.positions[this.index],
-            );
+          console.log('survey', this.survey);
+          this.breadcrumbs = getBreadcrumbs(
+            this.survey.versions[this.version],
+            this.positions[this.index],
+          );
 
-            updateTitle(this);
-          });
+          updateTitle(this);
+          // });
         }
       });
     } catch (e) {

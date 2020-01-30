@@ -60,6 +60,7 @@ const actions = {
     return response;
   },
   [types.ADD_SUBMISSION]({ commit }, submission) {
+    // TODO: submissions should be a unique collection, we shouldn't just push
     commit(types.ADD_SUBMISSION, submission);
   },
   [types.REMOVE_SUBMISSION]({ commit }, id) {
