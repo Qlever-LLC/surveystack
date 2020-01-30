@@ -390,6 +390,40 @@ export const getControl = (controls, position) => {
   return control;
 };
 
+export const getPosition = (control, controls) => {
+  const positions = getControlPositions(controls);
+  for (let i = 0; i < positions.length; i++) {
+    const position = positions[i];
+    const c = getControl(controls, position);
+    if (c === control) {
+      return position;
+    }
+  }
+  return null;
+};
+
+export const insertControl = (control, controls, position) => {
+  let currentControl;
+  let currentControls = controls;
+  let index = position[0];
+
+
+  for (let i = 0; i < position.length; i++) {
+    currentControl = currentControls[i];
+    index = position[i];
+    if (currentControl.type === 'group') {
+      console.log('we are inside a group');
+      currentControls = currentControl.children;
+    }
+  }
+
+  console.log('position', position);
+  console.log('index', index);
+  console.log('currentControls', currentControls);
+
+  currentControls.splice(index + 1, 0, control);
+};
+
 export const getBreadcrumbs = (survey, position) => {
   const breadcrumbs = [];
   let { controls } = survey;

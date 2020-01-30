@@ -1,6 +1,10 @@
 <template>
   <v-container>
-    <app-dialog v-model="deleteDialog" @cancel="deleteDialog = false" @confirm="onDelete">
+    <app-dialog
+      v-model="deleteDialog"
+      @cancel="deleteDialog = false"
+      @confirm="onDelete"
+    >
       <template v-slot:title>Confirm your action</template>
       <template>
         Delete survey
@@ -9,7 +13,11 @@
       </template>
     </app-dialog>
 
-    <app-dialog v-model="conflictDialog" @cancel="conflictDialog = false" @confirm="generateId">
+    <app-dialog
+      v-model="conflictDialog"
+      @cancel="conflictDialog = false"
+      @confirm="generateId"
+    >
       <template v-slot:title>Conflict 409</template>
       <template>
         A survey with id
@@ -17,9 +25,16 @@
       </template>
     </app-dialog>
 
-    <v-snackbar v-model="showSnackbar" :timeout="0">
+    <v-snackbar
+      v-model="showSnackbar"
+      :timeout="0"
+    >
       {{snackbarMessage | capitalize}}
-      <v-btn color="pink" text @click="showSnackbar = false">Close</v-btn>
+      <v-btn
+        color="pink"
+        text
+        @click="showSnackbar = false"
+      >Close</v-btn>
     </v-snackbar>
 
     <v-row>
@@ -40,7 +55,10 @@
           :controls="survey.versions[currentVersion].controls"
           @controlSelected="controlSelected"
         />
-        <code-view v-else v-model="survey" />
+        <code-view
+          v-else
+          v-model="survey"
+        />
       </v-col>
       <v-col cols="5">
         <div class="sticky-top">
@@ -55,7 +73,10 @@
           <h3>Add questions</h3>
           <control-adder @controlAdded="controlAdded" />
           <h3>Properties</h3>
-          <control-properties :control="control" :survey="survey" />
+          <control-properties
+            :control="control"
+            :survey="survey"
+          />
         </div>
       </v-col>
     </v-row>
@@ -73,6 +94,8 @@ import controlAdder from '@/components/builder/ControlAdder.vue';
 import surveyDetails from '@/components/builder/SurveyDetails.vue';
 
 import appDialog from '@/components/ui/Dialog.vue';
+
+import * as utils from '@/utils/surveys';
 
 const currentDate = new Date();
 
@@ -113,7 +136,16 @@ export default {
       this.control = control;
     },
     controlAdded(control) {
-      this.survey.versions[this.currentVersion].controls.push(control);
+      if (!this.control) {
+        this.survey.versions[this.currentVersion].controls.push(control);
+        this.control = control;
+        return;
+      }
+
+      const position = utils.getPosition(this.control, this.currentControls);
+      utils.insertControl(control, this.currentControls, position);
+
+      // this.survey.versions[this.currentVersion].controls.push(control);
       // this.currentArray.splice(this.currentArrayPosition, 0, control);
       this.control = control;
     },
@@ -168,6 +200,9 @@ export default {
     },
     currentVersion() {
       return 0;
+    },
+    currentControls() {
+      return this.survey.versions[this.currentVersion].controls;
     },
   },
   async created() {
