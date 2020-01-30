@@ -38,7 +38,16 @@ db.submissions
 From submissions page:
 
 ```javascript
+{}
+
+{"data.value": "blue"}
+
+{"data": { "$elemMatch": {"name": "favorite_color", "value": "blue"}}}
+
 {"data": { "$elemMatch": {"name": "favorite_color", "value": "red"}}, "meta.version": 0}
+
+{"data": {"$elemMatch": { "name": "personal_group", "children": {"$elemMatch": {"name": "full_name", "value": "Andreas Rudolf"}}}}}
+
 {"data": {"$elemMatch": { "name": "personal_group", "children": {"$elemMatch": {"name": "full_name", "value": {"$regex": "Andrea"}}}}}}
-{"data": {"$elemMatch": { "name": "personal_group", "children": {"name": "full_name", "type": "inputText", "value": "Andreas Rudolf"}}}}
+
 ```
