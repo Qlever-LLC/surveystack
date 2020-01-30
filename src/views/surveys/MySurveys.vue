@@ -1,43 +1,85 @@
 <template>
-  <v-container>
-    <h1>My Surveys</h1>
-    <v-card>
-      <v-tabs v-model="activeTab">
-        <v-tab
-          v-for="tab in tabs"
-          :key="tab.name"
-          :href="`#${tab.name}`"
+  <v-container style="height: 100%">
+    <v-container
+      style="height: 100%"
+      class="ma-0 pa-0 mt-n4 pt-4 d-flex"
+    >
+      <v-row class="d-flex flex-grow-1">
+        <v-tabs
+          v-model="activeTab"
+          class="flex-grow-0"
         >
-          {{ tab.title }}
-        </v-tab>
-      </v-tabs>
-      <v-tabs-items v-model="activeTab">
-        <v-tab-item
-          v-for="tab in tabs"
-          :key="tab.name"
-          :value="tab.name"
+          <v-tab
+            v-for="tab in tabs"
+            :key="tab.name"
+            :href="`#${tab.name}`"
+          >
+            {{ tab.title }}
+          </v-tab>
+        </v-tabs>
+        <v-tabs-items
+          v-model="activeTab"
+          style="height: 100%;"
+          class="flex-grow-1"
         >
-          <v-list>
-            <v-list-item
-              v-for="(item, i) in tab.content"
-              :key="i"
-              @click="select(item)"
+          <v-tab-item
+            v-for="tab in tabs"
+            :key="tab.name"
+            :value="tab.name"
+            class="flex-grow-1 flex-column align-center justify-center align-content-center"
+            style="height: 100%;"
+          >
+            <v-list v-if="tab.content.length > 0">
+              <template v-for="(item, i) in tab.content">
+                <v-list-item
+                  @click="select(item)"
+                  :key="i"
+                >
+                  <v-list-item-content two-line>
+                    <v-list-item-title v-if="surveyForSubmission(item)">
+                      {{ surveyForSubmission(item).name}}
+                    </v-list-item-title>
+                    <v-list-item-title v-else>
+                      loading name
+                    </v-list-item-title>
+                    <v-list-item-subtitle>
+                      ID: {{ item._id }} <br>
+                      {{ (new Date(item.meta.dateCreated)).toLocaleString() }}
+                    </v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+                <v-divider
+                  v-if="i + 1 < tab.content.length"
+                  :key="`divider_${i}`"
+                ></v-divider>
+              </template>
+            </v-list>
+            <v-container
+              fill-height
+              fluid
+              v-else
             >
-              <v-list-item-content>
-                <v-list-item-title>
-                  ID: {{ item._id }}
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ (new Date(item.meta.dateCreated)).toLocaleString() }}
-                </v-list-item-subtitle>
-              </v-list-item-content>
+              <v-row
+                align="center"
+                justify="center"
+              >
+                <v-col>
+                  <div class="d-flex flex-column align-center">
+                    <v-icon large>mdi-file-multiple</v-icon>
+                    <v-alert
+                      type="info"
+                      text
+                      class="ma-4"
+                    >No drafts yet</v-alert>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-tab-item>
+        </v-tabs-items>
+      </v-row>
 
-            </v-list-item>
-          </v-list>
-        </v-tab-item>
-      </v-tabs-items>
-    </v-card>
-
+    </v-container>
   </v-container>
 </template>
 
@@ -50,9 +92,16 @@ export default {
       activeTab: 'drafts',
     };
   },
+  updated() {
+    this.$store.dispatch('appui/title', 'My Submissions');
+  },
   async created() {
-    const response = await this.$store.dispatch(`submissions/${submissionsTypes.FETCH_SUBMISSIONS}`);
-    console.log('response from promise', response);
+    this.$store.dispatch(`submissions/${submissionsTypes.FETCH_SUBMISSIONS}`);
+
+    await this.$store.dispatch('surveys/fetchSurveys');
+  },
+  beforeDestroy() {
+    this.$store.dispatch('appui/reset');
   },
   computed: {
     tabs() {
@@ -76,6 +125,9 @@ export default {
     },
   },
   methods: {
+    surveyForSubmission(submission) {
+      return this.$store.state.surveys.surveys.find(survey => survey._id === submission.survey);
+    },
     select(draft) {
       console.log(`clicked ${draft._id}`);
       this.$router.push(`/submissions/drafts/${draft._id}`);

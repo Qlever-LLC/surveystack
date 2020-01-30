@@ -20,7 +20,7 @@ const surveyStoreName = 'surveys';
 
 // Opening a Database
 function openDb(onSuccess) {
-  const request = indexedDB.open('Database', 4);
+  const request = indexedDB.open('Database', 6);
   db = this.result;
 
   request.onerror = (event) => {
@@ -39,8 +39,17 @@ function openDb(onSuccess) {
 
     db = event.target.result;
     // eslint-disable-next-line no-unused-vars
-    db.createObjectStore(submissionsStoreName, { keyPath: '_id' });
-    db.createObjectStore(surveyStoreName, { keyPath: '_id' });
+    try {
+      db.createObjectStore(submissionsStoreName, { keyPath: '_id' });
+    } catch (error) {
+      // ignore
+    }
+
+    try {
+      db.createObjectStore(surveyStoreName, { keyPath: '_id' });
+    } catch (error) {
+      // ignore
+    }
   };
 }
 

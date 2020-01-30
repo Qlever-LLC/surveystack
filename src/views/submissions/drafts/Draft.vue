@@ -5,37 +5,20 @@
     id="question-container"
   >
     <v-row class="flex-grow-0 flex-shrink-1 pl-2 pr-2 pb-2">
-      <div class="title">
-        <div class="inner-title">
-          {{ survey.name }}
-          <small>Version {{version}}</small>
-        </div>
-        <div class="subtitle-1 count grey--text text--darken-2">Total {{positions.length}} Questions</div>
-      </div>
       <div class="infos grey--text text--darken-2">
-        <div v-if="control.type !== 'group'">
-          <kbd class="display-1">{{ questionNumber }}</kbd> Question
-          <span class="font-italic blue--text">{{ control.name }}</span>
-        </div>
-        <div v-else>
-          <kbd class="display-1">{{ questionNumber }}</kbd> Group
-          <span class="font-italic blue--text">{{ control.name }}</span>
+        <div>
+          <kbd class="display-1">{{ questionNumber }}</kbd><span
+            class="ml-2"
+            v-html="mbreadcrumbs"
+          ></span>
         </div>
       </div>
-    </v-row>
-    <v-row class="flex-grow-0 flex-shrink-1">
-      <div
-        v-if="mbreadcrumbs.length > 0"
-        class="infos grey--text text--darken-2 mt-2"
-        v-html="mbreadcrumbs"
-      ></div>
     </v-row>
 
     <v-row
       justify="center"
       align="center"
-      class="flex-grow-1 flex-shrink-0"
-      style="min-width: 100px; max-width: 100%;"
+      class="px-2"
     >
       <component
         class="tall"
@@ -48,8 +31,8 @@
         @show-nav="showNav(true)"
         @hide-nav="showNav(false)"
         @next="next"
-        @hide-next="showNext(false)"
         @show-next="showNext(true)"
+        @hide-next="showNext(false)"
       ></component>
     </v-row>
 
@@ -80,7 +63,7 @@
             cols="6"
           >
             <v-btn
-              v-if="mShowNext"
+              :disabled="!mShowNext"
               @click="next"
               class="full"
               depressed
@@ -95,7 +78,7 @@
             cols="6"
           >
             <v-btn
-              v-if="mShowNext"
+              :disabled="!mShowNext"
               @click="next"
               @keyup.enter="next"
               class="full"
@@ -131,6 +114,12 @@ import {
   createInstancePayload,
   getControlPositions,
 } from '@/utils/surveys';
+
+
+function updateTitle(vm) {
+  vm.$store.dispatch('appui/title', vm.survey.name);
+  vm.$store.dispatch('appui/subtitle', `Version ${vm.version} <v-chip class="ma-2" color="blue">${vm.positions.length} Questions</v-chip>`);
+}
 
 export default {
   components: {
@@ -183,7 +172,6 @@ export default {
         this.survey.versions[this.version],
         this.positions[this.index],
       );
-      ret.splice(-1, 1);
       return ret.map(txt => `<kbd>${txt}</kbd>`).join(' &gt; ');
     },
     example() {
@@ -207,7 +195,7 @@ export default {
     },
   },
   methods: {
-    eval() {},
+    eval() { },
     showNav(visible) {
       this.mShowNav = visible;
     },
@@ -226,38 +214,64 @@ export default {
     next() {
       this.showNav(true);
       this.showNext(true);
-      if (this.atEnd) {
-        const payload = createInstancePayload(
-          this.instance,
+
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        if (this.atEnd) {
+          const payload = createInstancePayload(
+            this.instance,
+            this.survey.versions[this.version],
+          );
+          console.log('payload', payload);
+          this.submit(payload);
+          return;
+        }
+
+
+        this.index++;
+        this.instanceData = getInstanceData(this.instance);
+        this.control = getControl(this.instance.data, this.positions[this.index]);
+        this.value = this.control.value;
+
+        if (this.control.type === 'group') {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
+        this.breadcrumbs = getBreadcrumbs(
           this.survey.versions[this.version],
+          this.positions[this.index],
         );
-        console.log('payload', payload);
-        this.submit(payload);
+
+        this.calculateControl();
         return;
       }
-      this.index++;
-      this.instanceData = getInstanceData(this.instance);
-      this.control = getControl(this.instance.data, this.positions[this.index]);
-      this.value = this.control.value;
-      this.breadcrumbs = getBreadcrumbs(
-        this.survey.versions[this.version],
-        this.positions[this.index],
-      );
-      this.calculateControl();
     },
     previous() {
       this.showNav(true);
       this.showNext(true);
-      if (this.atStart) {
+
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        if (this.atStart) {
+          return;
+        }
+        this.index--;
+        this.control = getControl(this.instance.data, this.positions[this.index]);
+        this.value = this.control.value;
+
+        if (this.control.type === 'group') {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
+        this.breadcrumbs = getBreadcrumbs(
+          this.survey.versions[this.version],
+          this.positions[this.index],
+        );
+
         return;
       }
-      this.index--;
-      this.control = getControl(this.instance.data, this.positions[this.index]);
-      this.value = this.control.value;
-      this.breadcrumbs = getBreadcrumbs(
-        this.survey.versions[this.version],
-        this.positions[this.index],
-      );
     },
     calculateControl() {
       if (
@@ -293,7 +307,14 @@ export default {
       }
     },
   },
-
+  watch: {
+    control(newControl, oldControl) {
+      //
+    },
+  },
+  beforeDestroy() {
+    this.$store.dispatch('appui/reset');
+  },
   async created() {
     try {
       /**
@@ -366,6 +387,8 @@ export default {
             this.survey.versions[this.version],
             this.positions[this.index],
           );
+
+          updateTitle(this);
         } else {
           /** draftId does exist, edit existing submission */
           console.log('loading existing submission', draftId);
@@ -416,6 +439,8 @@ export default {
               this.survey.versions[this.version],
               this.positions[this.index],
             );
+
+            updateTitle(this);
           });
         }
       });
@@ -481,6 +506,5 @@ export default {
 }
 
 #question-container {
-
 }
 </style>
