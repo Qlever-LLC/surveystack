@@ -50,8 +50,9 @@ export default {
       activeTab: 'drafts',
     };
   },
-  created() {
-    this.$store.dispatch(`submissions/${submissionsTypes.FETCH_SUBMISSIONS}`);
+  async created() {
+    const response = await this.$store.dispatch(`submissions/${submissionsTypes.FETCH_SUBMISSIONS}`);
+    console.log('response from promise', response);
   },
   computed: {
     tabs() {

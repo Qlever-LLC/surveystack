@@ -84,7 +84,8 @@ const routes = [
   {
     path: '/submissions/drafts/:id',
     name: 'submissions-drafts-detail',
-    component: DraftSurveyResult,
+    // component: DraftSurveyResult,
+    component: DraftSubmission,
   },
   {
     path: '/mock',

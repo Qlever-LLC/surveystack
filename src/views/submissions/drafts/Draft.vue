@@ -141,6 +141,9 @@ export default {
   },
   data() {
     return {
+      activeSubmission: null,
+      activeSurvey: null,
+      // activeSurveyId: null,
       survey: null,
       control: null,
       instance: null,
@@ -187,6 +190,20 @@ export default {
       return {
         hello: 'world',
       };
+    },
+    draftId() {
+      return this.$route.params && this.$route.params.id;
+    },
+    surveyId() {
+      return this.$route.query && this.$route.query.survey;
+    },
+    isNewSubmission() {
+      return !this.draftId && !!this.surveyId;
+    },
+    activeVersion() {
+      return this.isNewSubmission
+        ? this.activeSurvey.versions.length - 1
+        : this.activeSubmission.meta.version;
     },
   },
   methods: {
@@ -279,34 +296,65 @@ export default {
 
   async created() {
     try {
-      const { id } = this.$route.params;
-      const { survey } = this.$route.query;
+      /**
+       * Page will either be loaded with query parameter for survey definition ID or
+       * route parameter for draft ID
+       */
+      const { id: draftId } = this.$route.params;
+      const { survey: surveyId } = this.$route.query;
+
+      // const isNewSubmission = !draftId;
+
+      if (draftId) {
+        /** Either fetch all submissions then use getter, or use GET_SUBMISSION action, which automatically does this. */
+        // await this.$store.dispatch('submissions/fetchSubmissions');
+        // this.$store.getters['submissions/getSubmission'](draftId);
+        this.activeSubmission = await this.$store.dispatch('submissions/GET_SUBMISSION', draftId);
+        // this.activeSurveyId = this.activeSubmission.survey;
+        // console.log('activeSubmission', this.activeSubmission);
+      }
+
+      this.activeSurvey = await this.$store.dispatch(
+        'surveys/fetchSurvey',
+        surveyId || (this.activeSubmission && this.activeSubmission.survey),
+      );
+      // console.log('activeSurvey', this.activeSurvey);
+
 
       db.openDb(async () => {
-        if (!id) {
+        if (!draftId) {
+          /** draftId does not exist, create new submission for definition of surveyId */
           let data = {};
 
+          /** This block should be abstracted into VueX store call,
+           * which calls Surveys Service, which automatically handles
+           * loading from cache vs API
+           * */
           try {
             // eslint-disable-next-line prefer-destructuring
-            data = (await api.get(`/surveys/${survey}`)).data;
+            data = (await api.get(`/surveys/${surveyId}`)).data;
           } catch (error) {
             console.log('using cached data');
             data = (await new Promise((resolve) => {
               db.getAllSurveys(surveys => resolve(surveys));
-            })).find(s => s._id === survey);
+            })).find(s => s._id === surveyId);
           }
 
           this.survey = data;
 
           console.log(this.survey);
 
-
+          /** Moved to activeVersion computed value */
           this.version = this.survey.versions.length - 1;
           if (this.version < 0) {
             console.log('invalid version', this.version);
             return;
           }
 
+          /** Can these be put into computed properties or VueX getters?
+           * the functionality is common with the draftId does exist case below, should be
+           * abstracted.
+          */
           this.instance = createInstance(this.survey, this.version);
           this.positions = getSurveyPositions(this.survey, this.version);
           this.instanceData = getInstanceData(this.instance);
@@ -319,10 +367,11 @@ export default {
             this.positions[this.index],
           );
         } else {
-          console.log('loading existing submissing', id);
+          /** draftId does exist, edit existing submission */
+          console.log('loading existing submission', draftId);
           db.getAllSurveyResults(async (results) => {
             console.log(results);
-            this.instance = results.find(i => i._id === id);
+            this.instance = results.find(i => i._id === draftId);
             if (!this.instance) {
               // TODO instance not found
               return;
@@ -344,6 +393,7 @@ export default {
             }
 
             this.survey = data;
+            /** Moved to activeVersion computed value */
             this.version = this.instance.meta.version;
 
 
