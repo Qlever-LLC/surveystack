@@ -80,18 +80,6 @@ export default {
           icon: 'mdi-newspaper-plus',
         },
         {
-          title: 'Mock Survey',
-          to: { name: 'mock' },
-          icon: 'mdi-newspaper-plus',
-        },
-        {
-          title: 'Experiment',
-          to: {
-            name: 'experiment-questions',
-          },
-          icon: 'mdi-pill',
-        },
-        {
           title: 'Users',
           to: {
             name: 'users-list',
