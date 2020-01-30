@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container fluid>
     <v-row
       align="center"
       justify="center"
@@ -16,7 +16,7 @@
         />
       </div>
       <v-alert
-        type="error"
+        type="info"
         border="right"
         prominent
         v-else
@@ -32,11 +32,11 @@
         <p class="headline">{{ control.label }}<span class="subtitle-1 ml-2"> {{ control.name }}</span></p>
 
         <template v-if="!location">
-
           <v-btn
             large
+            :disabled="disablePick"
+            :dark="!disablePick"
             class="mx-4 full"
-            dark
             color="indigo"
             @click="pickLocation"
           >Pick</v-btn>
@@ -82,6 +82,28 @@
           >
             <v-icon left>mdi-clipboard</v-icon>Copy to Clipboard
           </v-btn>
+        </v-container>
+        <v-container v-else>
+          <v-row
+            class="fill-height"
+            align-content="center"
+            justify="center"
+          >
+            <v-col
+              class="subtitle-1 text-center"
+              cols="12"
+            >
+              Getting GPS Coordinates
+            </v-col>
+            <v-col cols="6">
+              <v-progress-linear
+                color="red accent-4"
+                indeterminate
+                rounded
+                height="6"
+              ></v-progress-linear>
+            </v-col>
+          </v-row>
         </v-container>
 
       </v-container>
@@ -133,6 +155,7 @@ export default {
       gps: null,
       snackbar: false,
       snackbarText: '',
+      geolocationID: null,
     };
   },
   methods: {
@@ -146,8 +169,9 @@ export default {
     },
     pickLocation() {
       console.log(this.map.getCenter());
-      this.changed(this.map.getCenter());
-      this.location = this.map.getCenter();
+      const loc = this.mapError ? this.gps : this.map.getCenter();
+      this.changed(loc);
+      this.location = loc;
       this.next();
     },
     skip() {
@@ -158,19 +182,6 @@ export default {
       this.location = null;
       this.hideNext();
     },
-    startTracking() {
-      if (!navigator.geolocation) {
-        return;
-      }
-      navigator.geolocation.watchPosition((position) => {
-        console.log(position);
-        this.gps = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-          acc: position.coords.accuracy,
-        };
-      });
-    },
     handleMap(map, control) {
       const ctrl = new mapboxgl.GeolocateControl({
         positionOptions: {
@@ -180,6 +191,10 @@ export default {
       });
 
       map.addControl(ctrl);
+      map.on('error', () => {
+        this.mapError = true;
+      });
+
 
       if (control.value) {
         new mapboxgl.Marker()
@@ -194,9 +209,6 @@ export default {
           ctrl.trigger();
         });
 
-        map.on('error', () => {
-          this.mapError = true;
-        });
 
         ctrl.on('geolocate', (e) => {
           if (!this.first) {
@@ -214,6 +226,9 @@ export default {
     },
   },
   computed: {
+    disablePick() {
+      return !this.gps && this.mapError;
+    },
     started() {
       return true;
     },
@@ -239,10 +254,22 @@ export default {
     }
     requestWakeLock();
 
-    this.startTracking();
+    if (navigator.geolocation) {
+      this.geolocationID = navigator.geolocation.watchPosition((position) => {
+        console.log(position);
+        this.gps = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          acc: position.coords.accuracy,
+        };
+      });
+    }
   },
   beforeDestroy() {
     console.log('removing map');
+    if (navigator.geolocation) {
+      navigator.geolocation.clearWatch(this.geolocationID);
+    }
     this.map.remove();
   },
 };

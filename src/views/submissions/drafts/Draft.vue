@@ -23,9 +23,8 @@
         </div>
       </div>
     </v-row>
-    <v-row class="flex-grow-0 flex-shrink-1">
+    <v-row class="flex-grow-0 flex-shrink-1" v-if="mbreadcrumbs.length > 0">
       <div
-        v-if="mbreadcrumbs.length > 0"
         class="infos grey--text text--darken-2 mt-2"
         v-html="mbreadcrumbs"
       ></div>
@@ -34,8 +33,7 @@
     <v-row
       justify="center"
       align="center"
-      class="flex-grow-1 flex-shrink-0"
-      style="min-width: 100px; max-width: 100%;"
+      class="px-2"
     >
       <component
         class="tall"
@@ -48,8 +46,8 @@
         @show-nav="showNav(true)"
         @hide-nav="showNav(false)"
         @next="next"
-        @hide-next="showNext(false)"
         @show-next="showNext(true)"
+        @hide-next="showNext(false)"
       ></component>
     </v-row>
 
@@ -80,7 +78,7 @@
             cols="6"
           >
             <v-btn
-              v-if="mShowNext"
+              :disabled="!mShowNext"
               @click="next"
               class="full"
               depressed
@@ -95,7 +93,7 @@
             cols="6"
           >
             <v-btn
-              v-if="mShowNext"
+              :disabled="!mShowNext"
               @click="next"
               @keyup.enter="next"
               class="full"
@@ -190,7 +188,7 @@ export default {
     },
   },
   methods: {
-    eval() {},
+    eval() { },
     showNav(visible) {
       this.mShowNav = visible;
     },
@@ -431,6 +429,5 @@ export default {
 }
 
 #question-container {
-
 }
 </style>
