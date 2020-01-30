@@ -65,7 +65,7 @@ export default {
       drawer: false,
       links: [
         {
-          title: 'My Surveys',
+          title: 'My Submission',
           to: { name: 'my-surveys' },
           icon: 'mdi-clipboard',
         },

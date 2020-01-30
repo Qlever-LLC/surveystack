@@ -30,24 +30,29 @@
             style="height: 100%;"
           >
             <v-list v-if="tab.content.length > 0">
-              <v-list-item
-                v-for="(item, i) in tab.content"
-                :key="i"
-                @click="select(item)"
-              >
-                <v-list-item-content>
-                  <v-list-item-title v-if="surveyForSubmission(item)">
-                    {{ surveyForSubmission(item).name}}
-                  </v-list-item-title>
-                  <v-list-item-title v-else>
-                    loading name
-                  </v-list-item-title>
-                  <v-list-item-subtitle>
-                    ID: {{ item._id }} <br>
-                    {{ (new Date(item.meta.dateCreated)).toLocaleString() }}
-                  </v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
+              <template v-for="(item, i) in tab.content">
+                <v-list-item
+                  @click="select(item)"
+                  :key="i"
+                >
+                  <v-list-item-content two-line>
+                    <v-list-item-title v-if="surveyForSubmission(item)">
+                      {{ surveyForSubmission(item).name}}
+                    </v-list-item-title>
+                    <v-list-item-title v-else>
+                      loading name
+                    </v-list-item-title>
+                    <v-list-item-subtitle>
+                      ID: {{ item._id }} <br>
+                      {{ (new Date(item.meta.dateCreated)).toLocaleString() }}
+                    </v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+                <v-divider
+                  v-if="i + 1 < tab.content.length"
+                  :key="`divider_${i}`"
+                ></v-divider>
+              </template>
             </v-list>
             <v-container
               fill-height
@@ -88,7 +93,7 @@ export default {
     };
   },
   updated() {
-    this.$store.dispatch('appui/title', 'My Surveys');
+    this.$store.dispatch('appui/title', 'My Submissions');
   },
   async created() {
     this.$store.dispatch(`submissions/${submissionsTypes.FETCH_SUBMISSIONS}`);

@@ -6,24 +6,13 @@
   >
     <v-row class="flex-grow-0 flex-shrink-1 pl-2 pr-2 pb-2">
       <div class="infos grey--text text--darken-2">
-        <div v-if="control.type !== 'group'">
-          <kbd class="display-1">{{ questionNumber }}</kbd> Question
-          <span class="font-italic blue--text">{{ control.name }}</span>
-        </div>
-        <div v-else>
-          <kbd class="display-1">{{ questionNumber }}</kbd> Group
-          <span class="font-italic blue--text">{{ control.name }}</span>
+        <div>
+          <kbd class="display-1">{{ questionNumber }}</kbd><span
+            class="ml-2"
+            v-html="mbreadcrumbs"
+          ></span>
         </div>
       </div>
-    </v-row>
-    <v-row
-      class="flex-grow-0 flex-shrink-1"
-      v-if="mbreadcrumbs.length > 0"
-    >
-      <div
-        class="infos grey--text text--darken-2 mt-2"
-        v-html="mbreadcrumbs"
-      ></div>
     </v-row>
 
     <v-row
@@ -129,7 +118,7 @@ import {
 
 function updateTitle(vm) {
   vm.$store.dispatch('appui/title', vm.survey.name);
-  vm.$store.dispatch('appui/subtitle', `Version ${vm.version} <kbd>${vm.positions.length} Questions</kbd>`);
+  vm.$store.dispatch('appui/subtitle', `Version ${vm.version} <v-chip class="ma-2" color="blue">${vm.positions.length} Questions</v-chip>`);
 }
 
 export default {
@@ -180,7 +169,6 @@ export default {
         this.survey.versions[this.version],
         this.positions[this.index],
       );
-      ret.splice(-1, 1);
       return ret.map(txt => `<kbd>${txt}</kbd>`).join(' &gt; ');
     },
     example() {
@@ -209,38 +197,64 @@ export default {
     next() {
       this.showNav(true);
       this.showNext(true);
-      if (this.atEnd) {
-        const payload = createInstancePayload(
-          this.instance,
+
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        if (this.atEnd) {
+          const payload = createInstancePayload(
+            this.instance,
+            this.survey.versions[this.version],
+          );
+          console.log('payload', payload);
+          this.submit(payload);
+          return;
+        }
+
+
+        this.index++;
+        this.instanceData = getInstanceData(this.instance);
+        this.control = getControl(this.instance.data, this.positions[this.index]);
+        this.value = this.control.value;
+
+        if (this.control.type === 'group') {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
+        this.breadcrumbs = getBreadcrumbs(
           this.survey.versions[this.version],
+          this.positions[this.index],
         );
-        console.log('payload', payload);
-        this.submit(payload);
+
+        this.calculateControl();
         return;
       }
-      this.index++;
-      this.instanceData = getInstanceData(this.instance);
-      this.control = getControl(this.instance.data, this.positions[this.index]);
-      this.value = this.control.value;
-      this.breadcrumbs = getBreadcrumbs(
-        this.survey.versions[this.version],
-        this.positions[this.index],
-      );
-      this.calculateControl();
     },
     previous() {
       this.showNav(true);
       this.showNext(true);
-      if (this.atStart) {
+
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        if (this.atStart) {
+          return;
+        }
+        this.index--;
+        this.control = getControl(this.instance.data, this.positions[this.index]);
+        this.value = this.control.value;
+
+        if (this.control.type === 'group') {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
+        this.breadcrumbs = getBreadcrumbs(
+          this.survey.versions[this.version],
+          this.positions[this.index],
+        );
+
         return;
       }
-      this.index--;
-      this.control = getControl(this.instance.data, this.positions[this.index]);
-      this.value = this.control.value;
-      this.breadcrumbs = getBreadcrumbs(
-        this.survey.versions[this.version],
-        this.positions[this.index],
-      );
     },
     calculateControl() {
       if (
