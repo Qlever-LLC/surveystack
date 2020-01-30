@@ -1,8 +1,13 @@
 <template>
-  <v-container>
-    <h1>My Surveys</h1>
-    <v-card>
-      <v-tabs v-model="activeTab">
+  <v-container
+    style="height: 100%"
+    class="ma-0 pa-0 mt-n4 pt-4 d-flex"
+  >
+    <v-row class="d-flex flex-grow-1">
+      <v-tabs
+        v-model="activeTab"
+        class="flex-grow-0"
+      >
         <v-tab
           v-for="tab in tabs"
           :key="tab.name"
@@ -11,13 +16,19 @@
           {{ tab.title }}
         </v-tab>
       </v-tabs>
-      <v-tabs-items v-model="activeTab">
+      <v-tabs-items
+        v-model="activeTab"
+        style="height: 100%;"
+        class="flex-grow-1"
+      >
         <v-tab-item
           v-for="tab in tabs"
           :key="tab.name"
           :value="tab.name"
+          class="flex-grow-1 flex-column align-center justify-center align-content-center"
+          style="height: 100%;"
         >
-          <v-list>
+          <v-list v-if="tab.content.length > 0">
             <v-list-item
               v-for="(item, i) in tab.content"
               :key="i"
@@ -34,9 +45,26 @@
 
             </v-list-item>
           </v-list>
+          <v-container
+            fill-height
+            fluid
+            v-else
+          >
+            <v-row
+              align="center"
+              justify="center"
+            >
+              <v-col>
+                <div class="d-flex flex-column align-center">
+                  <v-icon large>mdi-file-multiple</v-icon>
+                  <v-alert type="info" text class="ma-4">No drafts yet</v-alert>
+                </div>
+              </v-col>
+            </v-row>
+          </v-container>
         </v-tab-item>
       </v-tabs-items>
-    </v-card>
+    </v-row>
 
   </v-container>
 </template>
@@ -52,6 +80,7 @@ export default {
   },
   created() {
     this.$store.dispatch(`submissions/${submissionsTypes.FETCH_SUBMISSIONS}`);
+    this.$store.dispatch('appui/title', 'My Surveys');
   },
   computed: {
     tabs() {
