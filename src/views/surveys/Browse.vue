@@ -1,17 +1,16 @@
 <template>
   <v-container>
-    <h1>Browse Surveys</h1>
     <v-card>
       <div
         v-for="e in entities"
         :key="e._id"
       >
-        <v-list-item>
+        <v-list-item two-line>
           <v-list-item-content>
             <v-list-item-title>{{e.name}}</v-list-item-title>
             <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle>
           </v-list-item-content>
-          <v-list-item-icon class="center-items">
+          <v-list-item-icon>
             <v-btn
               class="mx-2"
               outlined
@@ -52,6 +51,12 @@ export default {
     return {
       entities: [],
     };
+  },
+  beforeDestroy() {
+    this.$store.dispatch('appui/reset');
+  },
+  updated() {
+    this.$store.dispatch('appui/title', 'Browse Surveys');
   },
   async created() {
     let data = {};

@@ -87,9 +87,12 @@ export default {
       activeTab: 'drafts',
     };
   },
+  updated() {
+    this.$store.dispatch('appui/title', 'My Surveys');
+  },
   async created() {
     this.$store.dispatch(`submissions/${submissionsTypes.FETCH_SUBMISSIONS}`);
-    this.$store.dispatch('appui/title', 'My Surveys');
+
     await this.$store.dispatch('surveys/fetchSurveys');
   },
   beforeDestroy() {
