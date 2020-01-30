@@ -412,17 +412,12 @@ export const insertControl = (control, controls, position) => {
     currentControl = currentControls[position[i]];
     index = position[i];
     if (currentControl.type === 'group') {
-      console.log('we are inside a group');
       if (i === position.length - 1) {
         break;
       }
       currentControls = currentControl.children;
     }
   }
-
-  console.log('position', position);
-  console.log('index', index);
-  console.log('currentControls', currentControls);
 
   currentControls.splice(index + 1, 0, control);
 };
