@@ -66,6 +66,7 @@
           <survey-details
             v-model="survey"
             :editMode="editMode"
+            :dirty="dirty"
             @cancel="onCancel"
             @submit="onSubmit"
             @delete="onDelete"
@@ -84,6 +85,8 @@
 </template>
 
 <script>
+import _ from 'lodash';
+
 import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 
@@ -99,6 +102,7 @@ import * as utils from '@/utils/surveys';
 
 const currentDate = new Date();
 
+
 export default {
   components: {
     graphicalView,
@@ -112,6 +116,7 @@ export default {
     return {
       // modes
       editMode: false,
+      dirty: false,
       // ui
       viewCode: false,
       showSnackbar: false,
@@ -121,6 +126,7 @@ export default {
       // currently selected control
       control: null,
       // survey entity
+      initialSurvey: null,
       survey: {
         _id: '',
         name: '',
@@ -153,7 +159,7 @@ export default {
       this.control = control;
     },
     onCancel() {
-      this.$router.push('/surveys');
+      this.$router.push('/surveys/browse');
     },
     generateId() {
       this.survey._id = new ObjectId();
@@ -189,11 +195,46 @@ export default {
     },
   },
   computed: {
+    /*
+    dirty() {
+      if (this.editMode) {
+        return !_.isEqualWith(this.survey.versions, this.initialSurvey.versions, (value1, value2, key) => ((key === 'label') ? true : undefined));
+      }
+
+      return true;
+    },
+    */
     currentVersion() {
-      return 1;
+      return this.survey.latestVersion;
     },
     currentControls() {
-      return this.survey.versions.find(item => (item.version === 1)).controls;
+      return this.survey.versions.find(item => (item.version === this.survey.latestVersion)).controls;
+    },
+  },
+  watch: {
+    survey: {
+      handler(newVal, oldVal) {
+        if (this.dirty || !this.editMode || !this.initialSurvey) {
+          return;
+        }
+        if (!_.isEqualWith(newVal.versions, this.initialSurvey.versions, (value1, value2, key) => ((key === 'label') ? true : undefined))) {
+          this.dirty = true;
+          const { latestVersion } = this.initialSurvey;
+          const nextVersion = latestVersion + 1;
+          const date = new Date();
+
+          const nextVersionObj = this.survey.versions.find(item => item.version === latestVersion);
+          nextVersionObj.version = nextVersion;
+          nextVersionObj.dateCreated = date;
+
+          this.$set(this.survey, 'versions', this.initialSurvey.versions);
+
+          this.survey.versions.push(nextVersionObj);
+          this.survey.latestVersion = nextVersion;
+          this.survey.dateModified = date;
+        }
+      },
+      deep: true,
     },
   },
   async created() {
@@ -210,6 +251,7 @@ export default {
         this.survey._id = id;
         const { data } = await api.get(`/surveys/${this.survey._id}`);
         this.survey = { ...this.survey, ...data };
+        this.initialSurvey = _.cloneDeep(this.survey);
       } catch (e) {
         console.log('something went wrong:', e);
       }
