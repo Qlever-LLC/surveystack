@@ -361,7 +361,7 @@ export default {
       this.submission = createInstance(this.survey, this.activeVersion);
     }
 
-    /** Should this be broken out into method that can be tested? */
+    /** Should this be broken out into method? */
     this.index = 0;
     this.positions = getSurveyPositions(this.survey, this.activeVersion);
     this.submissionData = getInstanceData(this.submission);
