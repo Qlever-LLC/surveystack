@@ -14,7 +14,11 @@
           :icon="display.icon"
           :color="display.color"
         >
-          <v-card>
+          <v-card
+            @click="$emit('navigate', display.position);"
+            :color="display.background"
+            :dark="display.active"
+          >
             <v-card-title class="d-block">
               <div class="ma-0 pa-0">
                 <v-chip
@@ -73,7 +77,7 @@ export default {
   props: [
     'survey',
     'submission',
-    'index',
+    'position',
   ],
   computed: {
     flatSubmission() {
@@ -81,8 +85,9 @@ export default {
     },
     controlDisplays() {
       console.log('submission', this.submission);
-      const r = linearControls(this.submission).map((control, idx) => {
+      const r = linearControls(this.submission).map((control) => {
         const icon = iconify(control);
+        const active = _.isEqual(control.position, this.position);
         return {
           label: control.label,
           value: control.value,
@@ -90,7 +95,9 @@ export default {
           icon: icon[0],
           color: icon[1],
           number: control.number.join('.'),
-          active: _.isEqual(control.position, this.index),
+          background: active ? colors.green.base : 'white',
+          position: control.position,
+          active,
         };
       });
       console.log('controlDisplays', r);
@@ -103,6 +110,7 @@ export default {
 <style scoped>
 .number-chip {
   display: inline-flex;
+  box-shadow: 0 0 1px 0px white inset, 0 0 1px 0px white;
   border: 1px solid red;
   background-color: white;
   color: #ff5722;

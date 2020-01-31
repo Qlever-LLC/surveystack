@@ -10,7 +10,10 @@
       flat
       tile
     >
-      <v-toolbar-title class="d-flex" v-if="!showOverview && index < positions.length">
+      <v-toolbar-title
+        class="d-flex"
+        v-if="!showOverview && index < positions.length"
+      >
         <div class="infos grey--text text--darken-2">
           <div class="d-flex">
             <span class="number-chip mr-2">{{ questionNumber }}</span>
@@ -26,6 +29,7 @@
 
       <v-btn
         icon
+        v-if="!atEnd"
         @click="showOverview = !showOverview"
       >
         <v-icon>mdi-view-list</v-icon>
@@ -36,7 +40,10 @@
       </v-btn>
     </v-toolbar>
 
-    <div class="ml-5 mt-1" v-if="!showOverview && index < positions.length">
+    <div
+      class="ml-5 mt-1"
+      v-if="!showOverview && index < positions.length"
+    >
       <v-chip
         dark
         small
@@ -72,6 +79,8 @@
           v-if="atEnd || showOverview"
           :survey="survey"
           :submission="submission"
+          :position="this.positions[this.index]"
+          @navigate="(pos) => navigate(pos)"
         ></draft-overview>
 
         <component
@@ -158,6 +167,7 @@
 
 
 <script>
+import _ from 'lodash';
 import api from '@/services/api.service';
 
 import inputText from '@/components/survey/question_types/TextInput.vue';
@@ -272,6 +282,20 @@ export default {
       this.persist();
       // Why do we need to force update?
       this.$forceUpdate();
+    },
+    navigate(pos) {
+      console.log('navigating', pos);
+      this.showNav(true);
+      this.showNext(true);
+
+      this.index = this.positions.findIndex(p => _.isEqual(p, pos));
+      console.log(this.index);
+      this.submissionData = getInstanceData(this.submission);
+      this.control = getControl(this.submission.data, pos);
+      this.value = this.control.value;
+      this.showOverview = false;
+
+      this.calculateControl();
     },
     handleNext() {
       this.showNav(true);
