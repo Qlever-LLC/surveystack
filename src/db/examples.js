@@ -5,9 +5,11 @@ export const exampleSurvey = {
   name: 'Favorite Colors',
   dateCreated: new Date('2020-01-28T13:36:13.031Z'),
   dateModified: new Date('2020-01-28T13:36:13.031Z'),
+  latestVersion: 1,
   versions: [
     {
       dateCreated: new Date('2020-01-28T13:36:13.031Z'),
+      version: 1,
       controls: [
         {
           name: 'favorite_color',
@@ -69,7 +71,7 @@ export const exampleSubmission = {
   survey: new ObjectId('5e3038dbea0cf40001aef63b'),
   meta: {
     dateCreated: new Date('2020-01-28T13:39:14.544Z'),
-    version: 0,
+    version: 1,
   },
   data: [
     {

@@ -21,9 +21,11 @@ const survey = {
   name: 'Example Survey',
   dateCreated: '2020-01-27T13:59:31.989Z',
   dateModified: '2020-01-27T14:15:29.811Z',
+  latestVersion: 1,
   versions: [
     {
       dateCreated: '2020-01-27T14:15:29.811Z',
+      version: 1,
       // controls
       controls: [
         {
