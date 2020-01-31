@@ -1,8 +1,8 @@
 <template>
   <v-container>
     <app-dialog
-      v-model="deleteDialog"
-      @cancel="deleteDialog = false"
+      v-model="showDeleteModal"
+      @cancel="showDeleteModal = false"
       @confirm="onDelete"
     >
       <template v-slot:title>Confirm your action</template>
@@ -14,8 +14,8 @@
     </app-dialog>
 
     <app-dialog
-      v-model="conflictDialog"
-      @cancel="conflictDialog = false"
+      v-model="showConflictModal"
+      @cancel="showConflictModal = false"
       @confirm="generateId"
     >
       <template v-slot:title>Conflict 409</template>
@@ -42,17 +42,17 @@
         <div class="mb-2 d-flex justify-space-between align-center">
           <h1 class="display-1">Survey Builder</h1>
           <v-btn
-            @click="showCode = !showCode"
+            @click="viewCode = !viewCode"
             color="primary"
             small
             text
-          >{{ showCode ? "graphical" : "code"}}</v-btn>
+          >{{ viewCode ? "graphical" : "code"}}</v-btn>
         </div>
 
         <graphical-view
-          v-if="!showCode"
+          v-if="!viewCode"
           :selected="control"
-          :controls="survey.versions[currentVersion].controls"
+          :controls="currentControls"
           @controlSelected="controlSelected"
         />
         <code-view
@@ -110,21 +110,27 @@ export default {
   },
   data() {
     return {
+      // modes
+      editMode: false,
+      // ui
+      viewCode: false,
       showSnackbar: false,
       snackbarMessage: '',
-      conflictDialog: false,
-      deleteDialog: false,
-      editMode: false,
-      showCode: false,
+      showConflictModal: false,
+      showDeleteModal: false,
+      // currently selected control
       control: null,
+      // survey entity
       survey: {
         _id: '',
         name: '',
-        dateCreated: new Date(),
+        dateCreated: currentDate,
         dateModified: currentDate,
+        latestVersion: 1,
         versions: [
           {
             dateCreated: currentDate,
+            version: 1,
             controls: [],
           },
         ],
@@ -137,7 +143,7 @@ export default {
     },
     controlAdded(control) {
       if (!this.control) {
-        this.survey.versions[this.currentVersion].controls.push(control);
+        this.currentControls.push(control);
         this.control = control;
         return;
       }
@@ -151,11 +157,11 @@ export default {
     },
     generateId() {
       this.survey._id = new ObjectId();
-      this.conflictDialog = false;
+      this.showConflictModal = false;
     },
     async onDelete() {
-      if (!this.deleteDialog) {
-        this.deleteDialog = true;
+      if (!this.showDeleteModal) {
+        this.showDeleteModal = true;
         return;
       }
       try {
@@ -173,11 +179,9 @@ export default {
         await api.customRequest({ method, url, data: this.survey });
         this.$router.push('/surveys/browse');
       } catch (error) {
-        console.log(error.response);
         if (error.response.status === 409) {
-          this.conflictDialog = true;
+          this.showConflictModal = true;
         } else {
-          // this.$store.dispatch('feedback/add', error.response.data.message);
           this.snackbarMessage = error.response.data.message;
           this.showSnackbar = true;
         }
@@ -185,21 +189,11 @@ export default {
     },
   },
   computed: {
-    currentArray() {
-      if (!this.control) {
-        return this.survey.controls;
-      }
-
-      return this.survey.controls;
-    },
-    currentArrayPosition() {
-      return 0;
-    },
     currentVersion() {
-      return 0;
+      return 1;
     },
     currentControls() {
-      return this.survey.versions[this.currentVersion].controls;
+      return this.survey.versions.find(item => (item.version === 1)).controls;
     },
   },
   async created() {
@@ -220,6 +214,9 @@ export default {
         console.log('something went wrong:', e);
       }
     }
+
+    console.log('survey', this.survey);
+    console.log('survey.versions', this.survey.versions);
   },
 };
 </script>
