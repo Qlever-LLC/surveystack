@@ -1,115 +1,156 @@
 
 <template>
-  <v-container
+  <div
+    id="top-level-container"
+    class="my-n3 py-4"
     v-if="submission && survey"
-    id="question-container"
   >
-    <v-row
-      class="flex-grow-0 flex-shrink-1 pl-2 pr-2"
-      v-if="!atOverview"
+    <v-toolbar
+      color="grey lighten-4"
+      flat
+      tile
     >
-      <div class="infos grey--text text--darken-2">
-        <div class="d-flex">
-          <kbd class="display-1">{{ questionNumber }}</kbd>
-          <span
-            class="ml-2"
-            v-html="mbreadcrumbs"
-          />
+      <v-toolbar-title class="d-flex">
+        <div class="infos grey--text text--darken-2">
+          <div class="d-flex">
+            <span class="number-chip mr-2">{{ questionNumber }}</span>
+          </div>
         </div>
-      </div>
-    </v-row>
+      </v-toolbar-title>
 
-    <v-row
-      justify="center"
-      align="center"
-      class="px-2"
-    >
-      <draft-overview
-        class="tall"
-        v-if="atEnd"
-        :survey="survey"
-        :submission="submission"
-      ></draft-overview>
+      <v-spacer></v-spacer>
 
-      <component
-        v-else
-        class="tall"
-        :key="breadcrumbs.join('.')"
-        :is="control.type"
-        :control="control"
-        :value="value"
-        @eval="eval"
-        @changed="setValue"
-        @show-nav="showNav(true)"
-        @hide-nav="showNav(false)"
-        @next="handleNext"
-        @show-next="showNext(true)"
-        @hide-next="showNext(false)"
-      />
+      <v-btn icon>
+        <v-icon>mdi-magnify</v-icon>
+      </v-btn>
 
-    </v-row>
+      <v-btn icon @click="showOverview = !showOverview">
+        <v-icon>mdi-view-list</v-icon>
+      </v-btn>
 
-    <div
-      v-if="mShowNav"
-      class="font-weight-medium footer"
-    >
-      <v-container class="pa-0">
-        <v-row>
-          <v-col
-            class="text-center"
-            cols="6"
-          >
-            <v-btn
-              v-show="!atStart"
-              @click="handlePrevious"
-              class="full"
-              outlined
-              depressed
-              large
-              color="primary"
-            >
-              Previous
-            </v-btn>
-          </v-col>
+      <v-btn icon>
+        <v-icon>mdi-dots-vertical</v-icon>
+      </v-btn>
+    </v-toolbar>
 
-          <v-col
-            v-if="atEnd"
-            class="text-center"
-            cols="6"
-          >
-            <v-btn
-              :disabled="!mShowNext"
-              @click="handleNext"
-              class="full"
-              depressed
-              large
-              color="primary"
-            >
-              Submit
-            </v-btn>
-          </v-col>
-
-          <v-col
-            v-else
-            class="text-center"
-            cols="6"
-          >
-            <v-btn
-              :disabled="!mShowNext"
-              @click="handleNext"
-              @keyup.enter="handleNext"
-              class="full"
-              depressed
-              large
-              color="primary"
-            >
-              Next
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
+    <div class="ml-5 mt-1">
+      <v-chip
+        dark
+        small
+        color="red"
+        class="mr-0 mr-1"
+        v-if="mbreadcrumbs.length > 0"
+      ><span
+          v-for="(crumb, ci) in mbreadcrumbs"
+          :key="`bread_${ci}`"
+        >{{ crumb }} <span
+            class="mr-1"
+            v-if="ci < mbreadcrumbs.length - 1"
+          >&gt;</span></span></v-chip>
     </div>
-  </v-container>
+    <v-container
+      class="mt-n3"
+      id="question-container"
+    >
+      <v-row
+        class="flex-grow-0 flex-shrink-1 pl-2 pr-2"
+        v-if="!atOverview"
+      >
+
+      </v-row>
+
+      <v-row
+        justify="center"
+        align="center"
+        class="px-2"
+      >
+        <draft-overview
+          class="tall"
+          v-if="atEnd || showOverview"
+          :survey="survey"
+          :submission="submission"
+        ></draft-overview>
+
+        <component
+          v-else
+          class="tall"
+          :key="breadcrumbs.join('.')"
+          :is="control.type"
+          :control="control"
+          :value="value"
+          @eval="eval"
+          @changed="setValue"
+          @show-nav="showNav(true)"
+          @hide-nav="showNav(false)"
+          @next="handleNext"
+          @show-next="showNext(true)"
+          @hide-next="showNext(false)"
+        />
+
+      </v-row>
+
+      <div
+        v-if="mShowNav"
+        class="font-weight-medium footer"
+      >
+        <v-container class="pa-0">
+          <v-row>
+            <v-col
+              class="text-center"
+              cols="6"
+            >
+              <v-btn
+                v-show="!atStart"
+                @click="handlePrevious"
+                class="full"
+                outlined
+                depressed
+                large
+                color="primary"
+              >
+                Previous
+              </v-btn>
+            </v-col>
+
+            <v-col
+              v-if="atEnd"
+              class="text-center"
+              cols="6"
+            >
+              <v-btn
+                :disabled="!mShowNext"
+                @click="handleNext"
+                class="full"
+                depressed
+                large
+                color="primary"
+              >
+                Submit
+              </v-btn>
+            </v-col>
+
+            <v-col
+              v-else
+              class="text-center"
+              cols="6"
+            >
+              <v-btn
+                :disabled="!mShowNext"
+                @click="handleNext"
+                @keyup.enter="handleNext"
+                class="full"
+                depressed
+                large
+                color="primary"
+              >
+                Next
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
+      </div>
+    </v-container>
+  </div>
 </template>
 
 
@@ -157,6 +198,7 @@ export default {
       mShowNext: true,
       activeVersion: 0,
       value: null,
+      showOverview: false,
     };
   },
   computed: {
@@ -190,7 +232,7 @@ export default {
       );
 
       const ret = b.splice(0, b.length - 1);
-      return `${ret.map(txt => `<kbd>${txt}</kbd>`).join(' &gt; ')}`;
+      return ret;
     },
     breadcrumbs() {
       return getBreadcrumbs(
@@ -433,7 +475,7 @@ export default {
   transition-duration: 0.2s;
   transition-property: background-color, left, right;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 3;
+  z-index: 6;
   position: fixed;
   left: 0px;
   right: 0px;
@@ -442,6 +484,37 @@ export default {
 
 .tall {
   margin-bottom: 70px;
+}
+
+.app-chip {
+  display: inline-flex;
+  background-color: white;
+  color: #ff5722;
+  border-radius: 0.4rem;
+  font-weight: bold;
+  font-size: 80%;
+  padding: 0.2rem;
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
+}
+
+.number-chip {
+  display: inline-flex;
+  border: 2px solid #ff5722;
+  background-color: white;
+  color: #ff5722;
+  border-radius: 2rem;
+  line-height: 2rem;
+  font-weight: bold;
+  font-size: 2rem;
+  padding: 0.4rem;
+  padding-left: 0.8rem;
+  padding-right: 0.9rem;
+}
+
+#top-level-container{
+  padding-left: 0px !important;
+  padding-right: 0px !important;
 }
 </style>
 

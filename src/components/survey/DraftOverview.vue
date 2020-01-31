@@ -1,7 +1,8 @@
 <template>
   <v-container>
     <v-card>
-      <v-card-title>Overview</v-card-title>
+      <v-card-title>{{ survey.name }}</v-card-title>
+      <v-card-subtitle> {{ submission._id }}</v-card-subtitle>
     </v-card>
     <v-timeline
       v-if="controlDisplays"
@@ -21,9 +22,10 @@
                   small
                   color="red"
                   class="mr-0 mr-1"
-                  v-for="(crumb, ci) in display.breadcrumbs"
-                  :key="`bread_${ci}`"
-                >{{ crumb }}</v-chip>
+                ><span
+                    v-for="(crumb, ci) in display.breadcrumbs"
+                    :key="`bread_${ci}`"
+                  >{{ crumb }} <span class="mr-1" v-if="ci < display.breadcrumbs.length - 1">&gt;</span></span></v-chip>
               </div>
               <span class="number-chip mr-2">{{ display.number }}</span> {{ display.label }}
             </v-card-title>
@@ -42,9 +44,25 @@ import colors from 'vuetify/lib/util/colors';
 import appMixin from '@/components/mixin/appCoomponent.mixin';
 import { linearControls } from '@/utils/surveys';
 
+const states = {
+  done: ['mdi-check-bold', 'green'],
+  missing: ['mdi-clipboard-arrow-right', 'orange'],
+  error: ['mdi-exclamation-thick', 'red'],
+  warning: ['mdi-clipboard-alert-outline', 'red'],
+  ok: ['', ''],
+};
 
-function done(question) {
-  return question.value !== null;
+function iconify(control) {
+  if (control.value != null) {
+    return states.done;
+  } if (control.value == null && control.required) {
+    return states.missing;
+  } if (control.warning) {
+    return states.warning;
+  } if (control.error) {
+    return states.error;
+  }
+  return states.ok;
 }
 
 export default {
@@ -59,14 +77,17 @@ export default {
     },
     controlDisplays() {
       console.log('submission', this.submission);
-      const r = linearControls(this.submission).map(control => ({
-        label: control.label,
-        value: control.value,
-        breadcrumbs: control.breadcrumbs,
-        icon: done(control) ? 'mdi-check-bold' : '',
-        color: done(control) ? 'green' : '#fafafa',
-        number: control.number.join('.'),
-      }));
+      const r = linearControls(this.submission).map((control) => {
+        const icon = iconify(control);
+        return {
+          label: control.label,
+          value: control.value,
+          breadcrumbs: control.breadcrumbs,
+          icon: icon[0],
+          color: icon[1],
+          number: control.number.join('.'),
+        };
+      });
       console.log('controlDisplays', r);
       return r;
     },
