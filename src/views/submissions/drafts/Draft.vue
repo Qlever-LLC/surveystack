@@ -4,9 +4,9 @@
     v-if="submission && survey"
     id="question-container"
   >
-    <v-row class="flex-grow-0 flex-shrink-1 pl-2 pr-2 pb-2">
+    <v-row class="flex-grow-0 flex-shrink-1 pl-2 pr-2">
       <div class="infos grey--text text--darken-2">
-        <div>
+        <div class="d-flex">
           <kbd class="display-1">{{ questionNumber }}</kbd>
           <span
             class="ml-2"
@@ -108,6 +108,7 @@ import inputText from '@/components/survey/question_types/TextInput.vue';
 import inputNumeric from '@/components/survey/question_types/NumberInput.vue';
 import inputLocation from '@/components/survey/question_types/Map.vue';
 import group from '@/components/survey/question_types/Group.vue';
+import appMixin from '@/components/mixin/appCoomponent.mixin';
 import * as db from '@/store/db';
 
 
@@ -121,8 +122,8 @@ import {
   createInstancePayload,
 } from '@/utils/surveys';
 
-
 export default {
+  mixins: [appMixin],
   components: {
     inputText,
     inputNumeric,
@@ -165,11 +166,13 @@ export default {
       return edited.join('.');
     },
     mbreadcrumbs() {
-      const ret = getBreadcrumbs(
+      const b = getBreadcrumbs(
         this.survey.versions.find(item => item.version === this.activeVersion),
         this.positions[this.index],
       );
-      return ret.map(txt => `<kbd>${txt}</kbd>`).join(' &gt; ');
+
+      const ret = b.splice(0, b.length - 1);
+      return `${ret.map(txt => `<kbd>${txt}</kbd>`).join(' &gt; ')}`;
     },
     breadcrumbs() {
       return getBreadcrumbs(
@@ -292,10 +295,6 @@ export default {
         console.log(error);
       }
     },
-    setNavbarContent({ title, subtitle }) {
-      this.$store.dispatch('appui/setTitle', title);
-      this.$store.dispatch('appui/setSubtitle', subtitle);
-    },
     // getInitialSubmissionState({
     //   survey,
     //   version,
@@ -318,9 +317,6 @@ export default {
   //     //
   //   },
   // },
-  beforeDestroy() {
-    this.$store.dispatch('appui/reset');
-  },
   async created() {
     /**
        * Page will either be loaded with query parameter for survey definition ID or
@@ -365,7 +361,7 @@ export default {
 
     this.setNavbarContent({
       title: this.survey.name,
-      subtitle: `Version ${this.activeVersion} <v-chip class="ma-2" color="blue">${this.positions.length} Questions</v-chip>`,
+      subtitle: `<span><span id="question-title-chip">Version ${this.activeVersion}</span></span> <span id="question-title-chip">${this.positions.length} Questions</span> <span id="question-title-chip">${this.control.name}</span>`,
     });
   },
 };
@@ -422,9 +418,20 @@ export default {
 }
 
 .tall {
-  padding-bottom: 20vh;
+  margin-bottom: 20vh;
 }
+</style>
 
-#question-container {
+<style>
+#question-title-chip {
+  display: inline-flex;
+  background-color: white;
+  color: #ff5722;
+  border-radius: 0.4rem;
+  font-weight: bold;
+  font-size: 80%;
+  padding: 0.2rem;
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
 }
 </style>

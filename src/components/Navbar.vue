@@ -11,8 +11,11 @@
         @click="drawer = !drawer"
       />
       <v-toolbar-title class="ml-2 flex-column">
-        <div class="title py-0 my-0"> {{ appTitle }} </div>
-        <div class="subtitle py-0 my-0" v-html="appSubtitle"></div>
+        <div id="app-bar-title" class="title py-0 my-0">{{ appTitle }} </div>
+        <div
+          class="app-bar-subtitle subtitle py-0 my-0"
+          v-html="appSubtitle"
+        ></div>
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
@@ -107,14 +110,20 @@ export default {
 };
 </script>
 <style scoped>
-.title {
-  color: white;
+#app-bar-title {
   font-size: 1rem;
-  line-height: 1rem;
+  font-weight: normal;
+  color: white;
+  line-height: 1.8rem;
 }
 
 .subtitle {
   font-size: 0.8rem;
   line-height: 0.8rem;
+}
+</style>
+<style>
+.app-bar-subtitle span {
+  vertical-align: middle;
 }
 </style>
