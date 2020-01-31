@@ -23,10 +23,10 @@
             alt="marker"
           />
 
-          <app-gps
-            id="map-center"
-            :location="mapCenter"
-          >Map Center</app-gps>
+          <div id="map-center">
+            <app-gps :location="currentLocation.location">{{ currentLocation.label }}</app-gps>
+          </div>
+
         </div>
         <v-alert
           type="info"
@@ -44,20 +44,19 @@
           <template v-if="!location">
             <v-btn
               large
+              class="mx-4 full"
+              outlined
+              color="blue"
+              @click="skip"
+            >Skip</v-btn>
+            <v-btn
+              large
               :disabled="disablePick"
               :dark="!disablePick"
               class="mx-4 full"
-              color="indigo"
+              color="blue"
               @click="pickLocation"
             >Pick</v-btn>
-
-            <v-btn
-              large
-              class="mx-4 full"
-              outlined
-              color="indigo"
-              @click="skip"
-            >Skip</v-btn>
           </template>
 
           <template v-else>
@@ -69,30 +68,7 @@
               @click="retake"
             >Retake</v-btn>
           </template>
-          <v-container v-if="value">
-            Selected <kbd>lat: {{ value.lat }}</kbd> <kbd>lng: {{ value.lng }}</kbd>
-            <br>
-            <v-btn
-              @click="clipboard(value)"
-              dark
-              color="blue"
-            >
-              <v-icon left>mdi-clipboard</v-icon>Copy
-            </v-btn>
-          </v-container>
-
-          <v-container v-if="gps">
-            GPS <kbd>lat: {{ gps.lat }}</kbd> <kbd>lng: {{ gps.lng }}</kbd> <kbd>acc: {{ gps.acc.toFixed(2) }}</kbd>
-            <br>
-            <v-btn
-              @click="clipboard(gps)"
-              dark
-              color="blue"
-            >
-              <v-icon left>mdi-clipboard</v-icon>Copy
-            </v-btn>
-          </v-container>
-          <v-container v-else>
+          <v-container v-if="!gps">
             <v-row
               class="fill-height"
               align-content="center"
@@ -117,18 +93,6 @@
 
         </v-container>
       </v-row>
-
-      <v-snackbar v-model="snackbar">
-        {{ snackbarText }}
-        <v-btn
-          color="pink"
-          text
-          @click="snackbar = false"
-        >
-          Close
-        </v-btn>
-      </v-snackbar>
-
     </v-container>
   </div>
 </template>
@@ -166,25 +130,16 @@ export default {
       first: true,
       location: null,
       gps: null,
-      snackbar: false,
-      snackbarText: '',
       geolocationID: null,
       mapCenter: null,
       usingGPS: true,
+      marker: null,
     };
   },
   methods: {
-    clipboard(obj) {
-      navigator.clipboard.writeText(`${obj.lat}, ${obj.lng}`).then(() => {
-        this.snackbarText = 'Copied Text to Clipboard';
-        this.snackbar = true;
-      }, (err) => {
-        console.error('Async: Could not copy text: ', err);
-      });
-    },
     pickLocation() {
       console.log(this.map.getCenter());
-      const loc = this.mapError ? this.gps : this.map.getCenter();
+      const loc = this.usingGPS ? this.gps : this.map.getCenter();
       this.changed(loc);
       this.location = loc;
       this.next();
@@ -194,10 +149,13 @@ export default {
     },
     retake() {
       this.changed(null);
+      if (this.marker) {
+        this.marker.remove();
+      }
       this.location = null;
       this.hideNext();
     },
-    handleMap(map, control) {
+    handleMap(map, value) {
       const ctrl = new mapboxgl.GeolocateControl({
         positionOptions: {
           enableHighAccuracy: true,
@@ -211,31 +169,28 @@ export default {
         this.usingGPS = true;
       });
 
-      map.on('touchmove', () => {
+      map.on('drag', () => {
+        this.usingGPS = false;
         this.mapCenter = map.getCenter();
       });
 
-      map.on('moveend', () => {
-        this.mapCenter = map.getCenter();
-      });
-
-      map.on('trackuserlocationstart', () => {
+      ctrl.on('trackuserlocationstart', () => {
         this.usingGPS = true;
       });
 
 
-      map.on('trackuserlocationend', () => {
-        this.usingGPS = false;
+      ctrl.on('trackuserlocationend', () => {
+        console.log('trackuserlocationend');
       });
 
 
-      if (control.value) {
-        new mapboxgl.Marker()
-          .setLngLat([control.value.lng, control.value.lat])
+      if (value) {
+        this.marker = new mapboxgl.Marker()
+          .setLngLat([value.lng, value.lat])
           .addTo(map);
 
         map.jumpTo({
-          center: [control.value.lng, control.value.lat],
+          center: [value.lng, value.lat],
         });
       } else {
         map.on('load', () => {
@@ -259,6 +214,19 @@ export default {
     },
   },
   computed: {
+    currentLocation() {
+      if (this.value) {
+        return {
+          location: this.value,
+          label: `used ${this.value.acc ? ' GPS' : 'Map Center'}`,
+        };
+      }
+
+      return {
+        location: this.usingGPS ? this.gps : this.mapCenter,
+        label: this.usingGPS ? 'Using GPS' : 'Using Map Center',
+      };
+    },
     disablePick() {
       return !this.gps && this.mapError;
     },
@@ -281,7 +249,7 @@ export default {
       zoom: 15,
     });
 
-    this.handleMap(this.map, this.control);
+    this.handleMap(this.map, this.value);
     if (!this.value) {
       this.hideNext();
     }
@@ -289,7 +257,6 @@ export default {
 
     if (navigator.geolocation) {
       this.geolocationID = navigator.geolocation.watchPosition((position) => {
-        console.log(position);
         this.gps = {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
