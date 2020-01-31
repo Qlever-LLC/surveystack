@@ -20,7 +20,7 @@ const surveyStoreName = 'surveys';
 
 // Opening a Database
 function openDb(onSuccess) {
-  const request = indexedDB.open('Database', 6);
+  const request = indexedDB.open('Database', 7);
   db = this.result;
 
   request.onerror = (event) => {

@@ -4,7 +4,10 @@
     v-if="submission && survey"
     id="question-container"
   >
-    <v-row class="flex-grow-0 flex-shrink-1 pl-2 pr-2">
+    <v-row
+      class="flex-grow-0 flex-shrink-1 pl-2 pr-2"
+      v-if="!atOverview"
+    >
       <div class="infos grey--text text--darken-2">
         <div class="d-flex">
           <kbd class="display-1">{{ questionNumber }}</kbd>
@@ -21,7 +24,15 @@
       align="center"
       class="px-2"
     >
+      <draft-overview
+        class="tall"
+        v-if="atEnd"
+        :survey="survey"
+        :submission="submission"
+      ></draft-overview>
+
       <component
+        v-else
         class="tall"
         :key="breadcrumbs.join('.')"
         :is="control.type"
@@ -35,6 +46,7 @@
         @show-next="showNext(true)"
         @hide-next="showNext(false)"
       />
+
     </v-row>
 
     <div
@@ -108,7 +120,9 @@ import inputText from '@/components/survey/question_types/TextInput.vue';
 import inputNumeric from '@/components/survey/question_types/NumberInput.vue';
 import inputLocation from '@/components/survey/question_types/Map.vue';
 import group from '@/components/survey/question_types/Group.vue';
+import draftOverview from '@/components/survey/DraftOverview.vue';
 import appMixin from '@/components/mixin/appCoomponent.mixin';
+
 import * as db from '@/store/db';
 
 
@@ -129,6 +143,7 @@ export default {
     inputNumeric,
     inputLocation,
     group,
+    draftOverview,
   },
   data() {
     return {
@@ -151,8 +166,11 @@ export default {
     atStart() {
       return this.index === 0;
     },
-    atEnd() {
+    atOverview() {
       return this.index >= this.positions.length - 1;
+    },
+    atEnd() {
+      return this.index >= this.positions.length;
     },
     showInput() {
       if (this.control.type === 'group') {
@@ -223,6 +241,11 @@ export default {
           );
           console.log('payload', payload);
           this.submit(payload);
+          return;
+        }
+
+        if (this.atOverview) {
+          this.index++;
           return;
         }
 
@@ -361,7 +384,7 @@ export default {
 
     this.setNavbarContent({
       title: this.survey.name,
-      subtitle: `<span><span id="question-title-chip">Version ${this.activeVersion}</span></span> <span id="question-title-chip">${this.positions.length} Questions</span> <span id="question-title-chip">${this.control.name}</span>`,
+      subtitle: `<span><span id="question-title-chip">Version ${this.activeVersion}</span></span> <span id="question-title-chip">${this.positions.length} Questions</span>`,
     });
   },
 };
@@ -410,7 +433,7 @@ export default {
   transition-duration: 0.2s;
   transition-property: background-color, left, right;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 1;
+  z-index: 3;
   position: fixed;
   left: 0px;
   right: 0px;
@@ -418,7 +441,7 @@ export default {
 }
 
 .tall {
-  margin-bottom: 20vh;
+  margin-bottom: 70px;
 }
 </style>
 
