@@ -473,6 +473,27 @@ export const flattenSubmission = (submission) => {
   return res;
 };
 
+
+export const linearControls = (submission) => {
+  const res = [];
+  const positions = getControlPositions(submission.data);
+  positions.forEach((p) => {
+    console.log('pos', p);
+    const control = getControl(submission.data, p);
+    const breadcrumbs = getBreadcrumbsForSubmission(submission.data, p);
+    if (control.type !== 'group') {
+      const key = breadcrumbs.join('.');
+      const r = Object.assign({
+        breadcrumbs,
+        key,
+        number: p.map(value => value + 1),
+      }, control);
+      res.push(r);
+    }
+  });
+  return res;
+};
+
 export const uuid = () => {
   const rnd = new Uint8Array(32);
   crypto.getRandomValues(rnd);
