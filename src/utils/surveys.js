@@ -336,8 +336,8 @@ export const getControlPositions = (controls) => {
   return positions;
 };
 
-export const getSurveyPositions = (survey, version = 0) => {
-  const positions = getControlPositions(survey.versions[version].controls);
+export const getSurveyPositions = (survey, version = 1) => {
+  const positions = getControlPositions(survey.versions.find(item => item.version === version).controls);
   return positions;
 };
 
@@ -526,8 +526,8 @@ export function compileSandbox(src, fname) {
  *
  * @returns {Object} An specifc survey version instance.
  */
-export const createInstance = (survey, version = 0) => {
-  const clone = _.cloneDeep(survey.versions[version]);
+export const createInstance = (survey, version = 1) => {
+  const clone = _.cloneDeep(survey.versions.find(item => item.version === version));
   delete clone.dateCreated;
 
   clone._id = new ObjectID().toString();

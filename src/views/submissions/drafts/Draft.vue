@@ -136,7 +136,6 @@ export default {
       control: null,
       submissionData: null,
       positions: null,
-      breadcrumbs: [],
       index: 0,
       mShowNav: true,
       mShowNext: true,
@@ -167,10 +166,16 @@ export default {
     },
     mbreadcrumbs() {
       const ret = getBreadcrumbs(
-        this.survey.versions[this.activeVersion],
+        this.survey.versions.find(item => item.version === this.activeVersion),
         this.positions[this.index],
       );
       return ret.map(txt => `<kbd>${txt}</kbd>`).join(' &gt; ');
+    },
+    breadcrumbs() {
+      return getBreadcrumbs(
+        this.survey.versions.find(item => item.version === this.activeVersion),
+        this.positions[this.index],
+      );
     },
     example() {
       return {
@@ -229,11 +234,6 @@ export default {
           continue;
         }
 
-        this.breadcrumbs = getBreadcrumbs(
-          this.survey.versions[this.activeVersion],
-          this.positions[this.index],
-        );
-
         this.calculateControl();
         return;
       }
@@ -255,11 +255,6 @@ export default {
           // eslint-disable-next-line no-continue
           continue;
         }
-
-        this.breadcrumbs = getBreadcrumbs(
-          this.survey.versions[this.activeVersion],
-          this.positions[this.index],
-        );
 
         return;
       }
@@ -354,7 +349,7 @@ export default {
        * in the `survey.versions` array needs to a have a version attribute.
        * */
     this.activeVersion = isNewSubmission
-      ? this.survey.versions.length - 1
+      ? this.survey.latestVersion
       : this.submission.meta.version;
 
     if (!draftId) {
@@ -367,10 +362,6 @@ export default {
     this.submissionData = getInstanceData(this.submission);
     this.control = getControl(this.submission.data, this.positions[this.index]);
     this.value = this.control.value;
-    this.breadcrumbs = getBreadcrumbs(
-      this.survey.versions[this.activeVersion],
-      this.positions[this.index],
-    );
 
     this.setNavbarContent({
       title: this.survey.name,
