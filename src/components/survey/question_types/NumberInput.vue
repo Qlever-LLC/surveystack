@@ -20,8 +20,17 @@ export default {
   methods: {
     onInput(v) {
       if (this.value !== v) {
+        // TODO: implicitly parse as Integer or Float?
+        // Maybe add a separate question type like inputInteger, inputFloat?
         const converted = Number(v);
-        // TODO: check for NaN, implicitly parse as Integer or Float?
+
+        if (v === '' || Number.isNaN(converted)) {
+          // Empty strings is converted to 0
+          // but we rather want no value at all
+          this.changed(null);
+          return;
+        }
+
         this.changed(converted);
       }
     },
