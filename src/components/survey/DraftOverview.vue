@@ -25,7 +25,10 @@
                 ><span
                     v-for="(crumb, ci) in display.breadcrumbs"
                     :key="`bread_${ci}`"
-                  >{{ crumb }} <span class="mr-1" v-if="ci < display.breadcrumbs.length - 1">&gt;</span></span></v-chip>
+                  >{{ crumb }} <span
+                      class="mr-1"
+                      v-if="ci < display.breadcrumbs.length - 1"
+                    >&gt;</span></span></v-chip>
               </div>
               <span class="number-chip mr-2">{{ display.number }}</span> {{ display.label }}
             </v-card-title>
@@ -40,6 +43,7 @@
 
 <script>
 
+import _ from 'lodash';
 import colors from 'vuetify/lib/util/colors';
 import appMixin from '@/components/mixin/appCoomponent.mixin';
 import { linearControls } from '@/utils/surveys';
@@ -69,6 +73,7 @@ export default {
   props: [
     'survey',
     'submission',
+    'index',
   ],
   mixins: [appMixin],
   computed: {
@@ -77,7 +82,7 @@ export default {
     },
     controlDisplays() {
       console.log('submission', this.submission);
-      const r = linearControls(this.submission).map((control) => {
+      const r = linearControls(this.submission).map((control, idx) => {
         const icon = iconify(control);
         return {
           label: control.label,
@@ -86,6 +91,7 @@ export default {
           icon: icon[0],
           color: icon[1],
           number: control.number.join('.'),
+          active: _.isEqual(control.position, this.index),
         };
       });
       console.log('controlDisplays', r);

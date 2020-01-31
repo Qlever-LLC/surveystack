@@ -487,6 +487,7 @@ export const linearControls = (submission) => {
         breadcrumbs,
         key,
         number: p.map(value => value + 1),
+        position: p,
       }, control);
       res.push(r);
     }

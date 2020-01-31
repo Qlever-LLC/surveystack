@@ -10,7 +10,7 @@
       flat
       tile
     >
-      <v-toolbar-title class="d-flex">
+      <v-toolbar-title class="d-flex" v-if="!showOverview">
         <div class="infos grey--text text--darken-2">
           <div class="d-flex">
             <span class="number-chip mr-2">{{ questionNumber }}</span>
@@ -24,7 +24,10 @@
         <v-icon>mdi-magnify</v-icon>
       </v-btn>
 
-      <v-btn icon @click="showOverview = !showOverview">
+      <v-btn
+        icon
+        @click="showOverview = !showOverview"
+      >
         <v-icon>mdi-view-list</v-icon>
       </v-btn>
 
@@ -33,7 +36,7 @@
       </v-btn>
     </v-toolbar>
 
-    <div class="ml-5 mt-1">
+    <div class="ml-5 mt-1" v-if="!showOverview">
       <v-chip
         dark
         small
@@ -512,7 +515,7 @@ export default {
   padding-right: 0.9rem;
 }
 
-#top-level-container{
+#top-level-container {
   padding-left: 0px !important;
   padding-right: 0px !important;
 }
