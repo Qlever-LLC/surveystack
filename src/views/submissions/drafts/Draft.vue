@@ -74,17 +74,27 @@
         align="center"
         class="px-2"
       >
-        <draft-overview
-          class="tall"
-          v-if="atEnd || showOverview"
-          :survey="survey"
-          :submission="submission"
-          :position="this.positions[this.index]"
-          @navigate="(pos) => navigate(pos)"
-        ></draft-overview>
+        <v-navigation-drawer
+          v-model="showOverview"
+          style="width: 100%;"
+          clipped
+          right
+          fixed
+          touchless
+          stateless
+        >
+
+          <draft-overview
+            class="tall"
+            :survey="survey"
+            :submission="submission"
+            :position="this.positions[this.index]"
+            @navigate="(pos) => navigate(pos)"
+          ></draft-overview>
+        </v-navigation-drawer>
 
         <component
-          v-else
+          v-if="!atEnd"
           class="tall"
           :key="breadcrumbs.join('.')"
           :is="control.type"
@@ -315,8 +325,11 @@ export default {
 
         if (this.atOverview) {
           this.index++;
+          this.showOverview = true;
           return;
         }
+
+        this.showOverview = false;
 
 
         this.index++;
@@ -345,6 +358,8 @@ export default {
         this.index--;
         this.control = getControl(this.submission.data, this.positions[this.index]);
         this.value = this.control.value;
+
+        this.showOverview = false;
 
         if (this.control.type === 'group') {
           // eslint-disable-next-line no-continue
