@@ -17,6 +17,7 @@
 
 <script>
 import api from '@/services/api.service';
+import * as db from '@/store/db';
 
 export default {
   data() {
@@ -28,6 +29,18 @@ export default {
     async submit() {
       await api.post('/debug/tabularasa');
       this.$router.push('/surveys/browse');
+
+      try {
+        db.clearAllSurveyResults();
+      } catch (error) {
+        console.log(error);
+      }
+
+      try {
+        db.clearAllSurveys();
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
 };
