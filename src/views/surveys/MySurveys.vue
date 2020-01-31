@@ -93,7 +93,7 @@ export default {
     };
   },
   updated() {
-    this.$store.dispatch('appui/title', 'My Submissions');
+    this.$store.dispatch('appui/setTitle', 'My Submissions');
   },
   async created() {
     this.$store.dispatch(`submissions/${submissionsTypes.FETCH_SUBMISSIONS}`);
