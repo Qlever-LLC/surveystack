@@ -10,7 +10,7 @@
       flat
       tile
     >
-      <v-toolbar-title class="d-flex" v-if="!showOverview">
+      <v-toolbar-title class="d-flex" v-if="!showOverview && index < positions.length">
         <div class="infos grey--text text--darken-2">
           <div class="d-flex">
             <span class="number-chip mr-2">{{ questionNumber }}</span>
@@ -36,7 +36,7 @@
       </v-btn>
     </v-toolbar>
 
-    <div class="ml-5 mt-1" v-if="!showOverview">
+    <div class="ml-5 mt-1" v-if="!showOverview && index < positions.length">
       <v-chip
         dark
         small
