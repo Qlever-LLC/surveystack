@@ -20,7 +20,9 @@ export default {
   methods: {
     onInput(v) {
       if (this.value !== v) {
-        this.changed(v);
+        const converted = Number(v);
+        // TODO: check for NaN, implicitly parse as Integer or Float?
+        this.changed(converted);
       }
     },
   },
