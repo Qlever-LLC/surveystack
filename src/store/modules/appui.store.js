@@ -1,3 +1,9 @@
+const types = {
+  SET_TITLE: 'SET_TITLE',
+  SET_SUBTITLE: 'SET_SUBTITLE',
+  RESET: 'RESET',
+};
+
 const createInitialState = () => ({
   title: 'Our-Sci',
   subtitle: '',
@@ -12,13 +18,13 @@ const getters = {
 
 const actions = {
   reset({ commit }) {
-    commit('RESET');
+    commit(types.RESET);
   },
-  title({ commit }, title) {
-    commit('title', title);
+  setTitle({ commit }, title) {
+    commit(types.SET_TITLE, title);
   },
-  subtitle({ commit }, subtitle) {
-    commit('subtitle', subtitle);
+  setSubtitle({ commit }, subtitle) {
+    commit(types.SET_SUBTITLE, subtitle);
   },
 };
 
@@ -29,10 +35,10 @@ const mutations = {
       state[key] = newState[key];
     });
   },
-  title(state, title) {
+  [types.SET_TITLE](state, title) {
     state.title = title;
   },
-  subtitle(state, subtitle) {
+  [types.SET_SUBTITLE](state, subtitle) {
     state.subtitle = subtitle;
   },
 };

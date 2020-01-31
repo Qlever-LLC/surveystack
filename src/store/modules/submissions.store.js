@@ -4,7 +4,6 @@ import * as db from '@/store/db';
 export const types = {
   FETCH_SUBMISSIONS: 'FETCH_SUBMISSIONS',
   SET_SUBMISSIONS: 'SET_SUBMISSIONS',
-  GET_SUBMISSION: 'GET_SUBMISSION',
   RESET: 'RESET',
   ADD_SUBMISSION: 'ADD_SUBMISSION',
   REMOVE_SUBMISSION: 'REMOVE_SUBMISSION',
@@ -66,7 +65,7 @@ const actions = {
   [types.REMOVE_SUBMISSION]({ commit }, id) {
     commit(types.REMOVE_SUBMISSION, id);
   },
-  async [types.GET_SUBMISSION]({ state, dispatch }, id) {
+  async getSubmission({ state, dispatch }, id) {
     const submissions = state.submissions.length > 0
       ? state.submissions
       : await dispatch(types.FETCH_SUBMISSIONS);

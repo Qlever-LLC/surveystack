@@ -1,7 +1,7 @@
 
 <template>
   <v-container
-    v-if="instance && survey"
+    v-if="activeSubmission && activeSurvey"
     id="question-container"
   >
     <v-row class="flex-grow-0 flex-shrink-1 pl-2 pr-2 pb-2">
@@ -112,14 +112,8 @@ import {
   compileSandboxSingleLine,
   createInstance,
   createInstancePayload,
-  getControlPositions,
 } from '@/utils/surveys';
 
-
-function updateTitle(vm) {
-  vm.$store.dispatch('appui/title', vm.survey.name);
-  vm.$store.dispatch('appui/subtitle', `Version ${vm.version} <v-chip class="ma-2" color="blue">${vm.positions.length} Questions</v-chip>`);
-}
 
 export default {
   components: {
@@ -169,7 +163,7 @@ export default {
     },
     mbreadcrumbs() {
       const ret = getBreadcrumbs(
-        this.survey.versions[this.version],
+        this.activeSurvey.versions[this.activeVersion],
         this.positions[this.index],
       );
       return ret.map(txt => `<kbd>${txt}</kbd>`).join(' &gt; ');
@@ -188,12 +182,12 @@ export default {
     isNewSubmission() {
       return !this.draftId && !!this.surveyId;
     },
-    activeVersion() {
-      /** Do we need to handle invalid version numbers? */
-      return this.isNewSubmission
-        ? this.activeSurvey.versions.length - 1
-        : this.activeSubmission.meta.version;
-    },
+    // activeVersion() {
+    //   /** Do we need to handle invalid version numbers? */
+    //   return this.isNewSubmission
+    //     ? this.activeSurvey.versions.length - 1
+    //     : this.activeSubmission.meta.version;
+    // },
   },
   methods: {
     eval() { },
@@ -221,7 +215,7 @@ export default {
         if (this.atEnd) {
           const payload = createInstancePayload(
             this.instance,
-            this.survey.versions[this.version],
+            this.activeSurvey.versions[this.activeVersion],
           );
           console.log('payload', payload);
           this.submit(payload);
@@ -240,7 +234,7 @@ export default {
         }
 
         this.breadcrumbs = getBreadcrumbs(
-          this.survey.versions[this.version],
+          this.activeSurvey.versions[this.activeVersion],
           this.positions[this.index],
         );
 
@@ -267,7 +261,7 @@ export default {
         }
 
         this.breadcrumbs = getBreadcrumbs(
-          this.survey.versions[this.version],
+          this.activeSurvey.versions[this.activeVersion],
           this.positions[this.index],
         );
 
@@ -307,6 +301,10 @@ export default {
         console.log(error);
       }
     },
+    updateTitle({ title, subtitle }) {
+      this.$store.dispatch('appui/setTitle', title);
+      this.$store.dispatch('appui/setSubtitle', subtitle);
+    },
   },
   watch: {
     control(newControl, oldControl) {
@@ -331,7 +329,7 @@ export default {
         /** Either fetch all submissions then use getter, or use GET_SUBMISSION action, which automatically does this. */
         // await this.$store.dispatch('submissions/fetchSubmissions');
         // this.$store.getters['submissions/getSubmission'](draftId);
-        this.activeSubmission = await this.$store.dispatch('submissions/GET_SUBMISSION', draftId);
+        this.activeSubmission = await this.$store.dispatch('submissions/getSubmission', draftId);
         // TODO: handle submission not found, set error on page
       }
 
@@ -340,117 +338,22 @@ export default {
         surveyId || (this.activeSubmission && this.activeSubmission.survey),
       );
 
+      if (!draftId) {
+        this.activeSubmission = createInstance(this.activeSurvey, this.activeVersion);
+      }
 
-      db.openDb(async () => {
-        if (!draftId) {
-          /** draftId does not exist, create new submission for definition of surveyId */
-          const data = {};
-
-          /** This block should be abstracted into VueX store call,
-           * which calls Surveys Service, which automatically handles
-           * loading from cache vs API
-           * */
-          // try {
-          //   // eslint-disable-next-line prefer-destructuring
-          //   data = (await api.get(`/surveys/${surveyId}`)).data;
-          // } catch (error) {
-          //   console.log('using cached data');
-          //   data = (await new Promise((resolve) => {
-          //     db.getAllSurveys(surveys => resolve(surveys));
-          //   })).find(s => s._id === surveyId);
-          // }
-
-          // this.survey = data;
-
-          // console.log(this.survey);
-          /** Stubbing while refactoring */
-          this.survey = this.activeSurvey;
-
-          /** Moved to activeVersion computed value */
-          // this.version = this.survey.versions.length - 1;
-          // if (this.version < 0) {
-          //   console.log('invalid version', this.version);
-          //   return;
-          // }
-          /** Stubbing while refactoring */
-          this.version = this.activeVersion;
-
-          /** Can these be put into computed properties or VueX getters?
-           * the functionality is common with the draftId does exist case below, should be
-           * abstracted.
-          */
-          this.instance = createInstance(this.survey, this.version);
-          this.positions = getSurveyPositions(this.survey, this.version);
-          this.instanceData = getInstanceData(this.instance);
-
-          this.index = 0;
-          this.control = getControl(this.instance.data, this.positions[this.index]);
-          this.value = this.control.value;
-          this.breadcrumbs = getBreadcrumbs(
-            this.survey.versions[this.version],
-            this.positions[this.index],
-          );
-
-          updateTitle(this);
-        } else {
-          /** draftId does exist, edit existing submission */
-          console.log('loading existing submission', draftId);
-          // db.getAllSurveyResults(async (results) => {
-          //   console.log(results);
-          //   this.instance = results.find(i => i._id === draftId);
-          //   if (!this.instance) {
-          //     // TODO instance not found
-          //     return;
-          //   }
-
-          //   console.log('instance', this.instance);
-
-          //   console.log('fetching survey');
-          //   let data = {};
-
-          //   try {
-          //     // eslint-disable-next-line prefer-destructuring
-          //     data = (await api.get(`/surveys/${this.instance.survey}`)).data;
-          //   } catch (error) {
-          //     console.log('using cached data');
-          //     data = (await new Promise((resolve) => {
-          //       db.getAllSurveys(surveys => resolve(surveys));
-          //     })).find(s => s._id === this.instance.survey);
-          //   }
-
-          //   this.survey = data;
-
-          /** stubbing while refactoring */
-          this.instance = this.activeSubmission;
-          this.survey = this.activeSurvey;
-          /** Moved to activeVersion computed value */
-          // this.version = this.instance.meta.version;
-          this.version = this.activeVersion;
-
-
-          console.log('getting control positions');
-          this.positions = getControlPositions(this.instance.data);
-
-          console.log('getting instance data');
-          this.instanceData = getInstanceData(this.instance);
-
-          this.index = 0;
-
-          console.log('getting control');
-          this.control = getControl(this.instance.data, this.positions[this.index]);
-          this.value = this.control.value;
-
-          console.log('getting breadcrumbs');
-
-          console.log('survey', this.survey);
-          this.breadcrumbs = getBreadcrumbs(
-            this.survey.versions[this.version],
-            this.positions[this.index],
-          );
-
-          updateTitle(this);
-          // });
-        }
+      this.instance = this.activeSubmission;
+      this.positions = getSurveyPositions(this.activeSurvey, this.activeVersion);
+      this.instanceData = getInstanceData(this.activeSubmission);
+      this.control = getControl(this.activeSubmission.data, this.positions[this.index]);
+      this.value = this.control.value;
+      this.breadcrumbs = getBreadcrumbs(
+        this.activeSurvey.versions[this.activeVersion],
+        this.positions[this.index],
+      );
+      this.updateTitle({
+        title: this.activeSurvey.name,
+        subtitle: `Version ${this.activeVersion} <v-chip class="ma-2" color="blue">${this.positions.length} Questions</v-chip>`,
       });
     } catch (e) {
       console.log('something went wrong:', e);
