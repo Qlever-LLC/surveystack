@@ -19,6 +19,7 @@ const getters = {
   drafts: state => state.submissions.filter(s => s),
   outbox: state => state.submissions.filter(s => s),
   sent: state => state.submissions.filter(s => s),
+  getSubmission: state => id => state.submissions.find(submission => submission._id === id),
 };
 
 const mutations = {
@@ -41,7 +42,7 @@ const mutations = {
 };
 
 const actions = {
-  reset({ commit }) {
+  [types.RESET]({ commit }) {
     commit(types.RESET);
   },
   async [types.FETCH_SUBMISSIONS]({ commit }/* , userId */) {
@@ -55,13 +56,23 @@ const actions = {
     });
     console.log('submissions', response);
     commit(types.SET_SUBMISSIONS, response);
+    return response;
   },
   [types.ADD_SUBMISSION]({ commit }, submission) {
+    // TODO: submissions should be a unique collection, we shouldn't just push
     commit(types.ADD_SUBMISSION, submission);
   },
   [types.REMOVE_SUBMISSION]({ commit }, id) {
     commit(types.REMOVE_SUBMISSION, id);
   },
+  async getSubmission({ state, dispatch }, id) {
+    const submissions = state.submissions.length > 0
+      ? state.submissions
+      : await dispatch(types.FETCH_SUBMISSIONS);
+      // : await dispatch(`submissions/${types.FETCH_SUBMISSIONS}`);
+    return submissions.find(submission => submission._id === id);
+  },
+
 };
 
 export default {

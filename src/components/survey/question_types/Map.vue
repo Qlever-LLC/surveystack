@@ -1,138 +1,143 @@
 <template>
-  <v-container fluid>
-    <v-row
-      align="center"
-      justify="center"
-    >
-      <div
-        id="map-question"
-        class="ml-n4"
-        v-if="!mapError"
+  <div style="width: 100%">
+    <v-card
+      dark
+      color="gray"
+      class="body-1 font-weight-n pa-2 px-4 mt-2"
+      style="width: 100%"
+    >{{ control.label }}</v-card>
+    <v-container fluid>
+      <v-row
+        align="center"
+        justify="center"
       >
-        <img
-          v-if="!this.value"
-          id="map-marker"
-          src="@/assets/marker.svg"
-          alt="marker"
-        />
+        <div
+          id="map-question"
+          class="ml-n4"
+          v-if="!mapError"
+        >
+          <img
+            v-if="!this.value"
+            id="map-marker"
+            src="@/assets/marker.svg"
+            alt="marker"
+          />
+
+          <app-gps
+            id="map-center"
+            :location="mapCenter"
+          >Map Center</app-gps>
+        </div>
+        <v-alert
+          type="info"
+          border="right"
+          prominent
+          v-else
+        >
+          Error loading map. Unable to load map. Using GPS coordinates.
+        </v-alert>
 
         <v-container
-          id="map-center"
-          v-if="mapCenter"
-        > <kbd class="pa-2">Map Center<br> lat: {{ mapCenter.lat }}<br> lng: {{ mapCenter.lng }}</kbd></v-container>
-      </div>
-      <v-alert
-        type="info"
-        border="right"
-        prominent
-        v-else
-      >
-        Error loading map. Unable to load map. Using GPS coordinates.
-      </v-alert>
+          class="infos grey--text text--darken-2 text-center"
+          fluid
+        >
+          <template v-if="!location">
+            <v-btn
+              large
+              :disabled="disablePick"
+              :dark="!disablePick"
+              class="mx-4 full"
+              color="indigo"
+              @click="pickLocation"
+            >Pick</v-btn>
 
-      <v-container
-        class="infos grey--text text--darken-2 text-center"
-        fluid
-      >
+            <v-btn
+              large
+              class="mx-4 full"
+              outlined
+              color="indigo"
+              @click="skip"
+            >Skip</v-btn>
+          </template>
 
-        <p class="headline">{{ control.label }}<span class="subtitle-1 ml-2"> {{ control.name }}</span></p>
-
-        <template v-if="!location">
-          <v-btn
-            large
-            :disabled="disablePick"
-            :dark="!disablePick"
-            class="mx-4 full"
-            color="indigo"
-            @click="pickLocation"
-          >Pick</v-btn>
-
-          <v-btn
-            large
-            class="mx-4 full"
-            outlined
-            color="indigo"
-            @click="skip"
-          >Skip</v-btn>
-        </template>
-
-        <template v-else>
-          <v-btn
-            large
-            class="mx-4 full"
-            outlined
-            color="indigo"
-            @click="retake"
-          >Retake</v-btn>
-        </template>
-        <v-container v-if="value">
-          Selected <kbd>lat: {{ value.lat }}</kbd> <kbd>lng: {{ value.lng }}</kbd>
-          <br>
-          <v-btn
-            @click="clipboard(value)"
-            dark
-            color="blue"
-          >
-            <v-icon left>mdi-clipboard</v-icon>Copy to Clipboard
-          </v-btn>
-        </v-container>
-
-        <v-container v-if="gps">
-          GPS <kbd>lat: {{ gps.lat }}</kbd> <kbd>lng: {{ gps.lng }}</kbd> <kbd>acc: {{ gps.acc }}</kbd>
-          <br>
-          <v-btn
-            @click="clipboard(gps)"
-            dark
-            color="blue"
-          >
-            <v-icon left>mdi-clipboard</v-icon>Copy to Clipboard
-          </v-btn>
-        </v-container>
-        <v-container v-else>
-          <v-row
-            class="fill-height"
-            align-content="center"
-            justify="center"
-          >
-            <v-col
-              class="subtitle-1 text-center"
-              cols="12"
+          <template v-else>
+            <v-btn
+              large
+              class="mx-4 full"
+              outlined
+              color="indigo"
+              @click="retake"
+            >Retake</v-btn>
+          </template>
+          <v-container v-if="value">
+            Selected <kbd>lat: {{ value.lat }}</kbd> <kbd>lng: {{ value.lng }}</kbd>
+            <br>
+            <v-btn
+              @click="clipboard(value)"
+              dark
+              color="blue"
             >
-              Getting GPS Coordinates
-            </v-col>
-            <v-col cols="6">
-              <v-progress-linear
-                color="red accent-4"
-                indeterminate
-                rounded
-                height="6"
-              ></v-progress-linear>
-            </v-col>
-          </v-row>
+              <v-icon left>mdi-clipboard</v-icon>Copy
+            </v-btn>
+          </v-container>
+
+          <v-container v-if="gps">
+            GPS <kbd>lat: {{ gps.lat }}</kbd> <kbd>lng: {{ gps.lng }}</kbd> <kbd>acc: {{ gps.acc.toFixed(2) }}</kbd>
+            <br>
+            <v-btn
+              @click="clipboard(gps)"
+              dark
+              color="blue"
+            >
+              <v-icon left>mdi-clipboard</v-icon>Copy
+            </v-btn>
+          </v-container>
+          <v-container v-else>
+            <v-row
+              class="fill-height"
+              align-content="center"
+              justify="center"
+            >
+              <v-col
+                class="subtitle-1 text-center"
+                cols="12"
+              >
+                Getting GPS Coordinates
+              </v-col>
+              <v-col cols="6">
+                <v-progress-linear
+                  color="red accent-4"
+                  indeterminate
+                  rounded
+                  height="6"
+                ></v-progress-linear>
+              </v-col>
+            </v-row>
+          </v-container>
+
         </v-container>
+      </v-row>
 
-      </v-container>
-    </v-row>
+      <v-snackbar v-model="snackbar">
+        {{ snackbarText }}
+        <v-btn
+          color="pink"
+          text
+          @click="snackbar = false"
+        >
+          Close
+        </v-btn>
+      </v-snackbar>
 
-    <v-snackbar v-model="snackbar">
-      {{ snackbarText }}
-      <v-btn
-        color="pink"
-        text
-        @click="snackbar = false"
-      >
-        Close
-      </v-btn>
-    </v-snackbar>
-
-  </v-container>
-
+    </v-container>
+  </div>
 </template>
 <script>
 /* eslint-disable no-new */
 
 import mapboxgl from 'mapbox-gl';
 import baseQuestionComponent from './BaseQuestionComponent';
+import appGps from '@/components/ui/Gps.vue';
 
 
 let wakeLock = null;
@@ -151,6 +156,9 @@ const requestWakeLock = async () => {
 
 export default {
   mixins: [baseQuestionComponent],
+  components: {
+    appGps,
+  },
   data() {
     return {
       map: null,
@@ -162,6 +170,7 @@ export default {
       snackbarText: '',
       geolocationID: null,
       mapCenter: null,
+      usingGPS: true,
     };
   },
   methods: {
@@ -199,6 +208,7 @@ export default {
       map.addControl(ctrl);
       map.on('error', () => {
         this.mapError = true;
+        this.usingGPS = true;
       });
 
       map.on('touchmove', () => {
@@ -207,6 +217,15 @@ export default {
 
       map.on('moveend', () => {
         this.mapCenter = map.getCenter();
+      });
+
+      map.on('trackuserlocationstart', () => {
+        this.usingGPS = true;
+      });
+
+
+      map.on('trackuserlocationend', () => {
+        this.usingGPS = false;
       });
 
 
@@ -293,7 +312,7 @@ export default {
 @import url("https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css");
 
 #map-question {
-  height: 50vh;
+  height: 40vh;
   width: 100%;
   padding: 0px;
   margin-left: 12px;
