@@ -24,10 +24,7 @@ const getters = {
 
 const mutations = {
   [types.RESET](state) {
-    const newState = createInitialState();
-    Object.keys(newState).forEach((key) => {
-      state[key] = newState[key];
-    });
+    Object.assign(state, createInitialState());
   },
   [types.SET_SUBMISSIONS](state, submissions) {
     state.submissions = submissions;
@@ -69,7 +66,7 @@ const actions = {
     const submissions = state.submissions.length > 0
       ? state.submissions
       : await dispatch(types.FETCH_SUBMISSIONS);
-      // : await dispatch(`submissions/${types.FETCH_SUBMISSIONS}`);
+    // : await dispatch(`submissions/${types.FETCH_SUBMISSIONS}`);
     return submissions.find(submission => submission._id === id);
   },
 

@@ -30,10 +30,7 @@ const actions = {
 
 const mutations = {
   RESET(state) {
-    const newState = createInitialState();
-    Object.keys(newState).forEach((key) => {
-      state[key] = newState[key];
-    });
+    Object.assign(state, createInitialState());
   },
   [types.SET_TITLE](state, title) {
     state.title = title;
