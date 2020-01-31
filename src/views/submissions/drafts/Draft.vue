@@ -7,10 +7,11 @@
     <v-row class="flex-grow-0 flex-shrink-1 pl-2 pr-2 pb-2">
       <div class="infos grey--text text--darken-2">
         <div>
-          <kbd class="display-1">{{ questionNumber }}</kbd><span
+          <kbd class="display-1">{{ questionNumber }}</kbd>
+          <span
             class="ml-2"
             v-html="mbreadcrumbs"
-          ></span>
+          />
         </div>
       </div>
     </v-row>
@@ -30,10 +31,10 @@
         @changed="setValue"
         @show-nav="showNav(true)"
         @hide-nav="showNav(false)"
-        @next="next"
+        @next="handleNext"
         @show-next="showNext(true)"
         @hide-next="showNext(false)"
-      ></component>
+      />
     </v-row>
 
     <div
@@ -48,13 +49,15 @@
           >
             <v-btn
               v-show="!atStart"
-              @click="previous"
+              @click="handlePrevious"
               class="full"
               outlined
               depressed
               large
               color="primary"
-            >Previous</v-btn>
+            >
+              Previous
+            </v-btn>
           </v-col>
 
           <v-col
@@ -64,12 +67,14 @@
           >
             <v-btn
               :disabled="!mShowNext"
-              @click="next"
+              @click="handleNext"
               class="full"
               depressed
               large
               color="primary"
-            >Submit</v-btn>
+            >
+              Submit
+            </v-btn>
           </v-col>
 
           <v-col
@@ -79,13 +84,15 @@
           >
             <v-btn
               :disabled="!mShowNext"
-              @click="next"
-              @keyup.enter="next"
+              @click="handleNext"
+              @keyup.enter="handleNext"
               class="full"
               depressed
               large
               color="primary"
-            >Next</v-btn>
+            >
+              Next
+            </v-btn>
           </v-col>
         </v-row>
       </v-container>
@@ -195,7 +202,7 @@ export default {
       // Why do we need to force update?
       this.$forceUpdate();
     },
-    next() {
+    handleNext() {
       this.showNav(true);
       this.showNext(true);
 
@@ -231,7 +238,7 @@ export default {
         return;
       }
     },
-    previous() {
+    handlePrevious() {
       this.showNav(true);
       this.showNext(true);
 
