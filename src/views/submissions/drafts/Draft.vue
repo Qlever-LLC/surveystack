@@ -4,6 +4,12 @@
     v-if="instance && survey"
     id="question-container"
   >
+
+    <v-chip
+      color="red"
+      class="pa-2"
+      dark
+    >Question</v-chip>
     <v-row class="flex-grow-0 flex-shrink-1 pl-2 pr-2 pb-2">
       <div class="infos grey--text text--darken-2">
         <div>
@@ -118,7 +124,7 @@ import {
 
 function updateTitle(vm) {
   vm.$store.dispatch('appui/title', vm.survey.name);
-  vm.$store.dispatch('appui/subtitle', `Version ${vm.version} <v-chip class="ma-2" color="blue">${vm.positions.length} Questions</v-chip>`);
+  vm.$store.dispatch('appui/subtitle', `Version ${vm.version} Question ${vm.positions.length}`);
 }
 
 export default {
