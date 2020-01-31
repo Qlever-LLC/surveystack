@@ -1,7 +1,7 @@
 
 <template>
   <v-container
-    v-if="activeSubmission && activeSurvey"
+    v-if="submission && survey"
     id="question-container"
   >
     <v-row class="flex-grow-0 flex-shrink-1 pl-2 pr-2 pb-2">
@@ -124,19 +124,16 @@ export default {
   },
   data() {
     return {
-      activeSubmission: null,
-      activeSurvey: null,
-      // activeSurveyId: null,
+      submission: null,
       survey: null,
       control: null,
-      instance: null,
-      instanceData: null,
+      submissionData: null,
       positions: null,
       breadcrumbs: [],
       index: 0,
       mShowNav: true,
       mShowNext: true,
-      version: 0,
+      activeVersion: 0,
       value: null,
     };
   },
@@ -163,7 +160,7 @@ export default {
     },
     mbreadcrumbs() {
       const ret = getBreadcrumbs(
-        this.activeSurvey.versions[this.activeVersion],
+        this.survey.versions[this.activeVersion],
         this.positions[this.index],
       );
       return ret.map(txt => `<kbd>${txt}</kbd>`).join(' &gt; ');
@@ -179,15 +176,6 @@ export default {
     surveyId() {
       return this.$route.query && this.$route.query.survey;
     },
-    isNewSubmission() {
-      return !this.draftId && !!this.surveyId;
-    },
-    // activeVersion() {
-    //   /** Do we need to handle invalid version numbers? */
-    //   return this.isNewSubmission
-    //     ? this.activeSurvey.versions.length - 1
-    //     : this.activeSubmission.meta.version;
-    // },
   },
   methods: {
     eval() { },
@@ -202,8 +190,9 @@ export default {
       console.log('setValue', v);
       this.$set(this.control, 'value', v);
       this.value = v;
-      this.instance.meta.modified = new Date().getTime();
+      this.submission.meta.modified = new Date().getTime();
       this.persist();
+      // Why do we need to force update?
       this.$forceUpdate();
     },
     next() {
@@ -214,8 +203,8 @@ export default {
       while (true) {
         if (this.atEnd) {
           const payload = createInstancePayload(
-            this.instance,
-            this.activeSurvey.versions[this.activeVersion],
+            this.submission,
+            this.survey.versions[this.activeVersion],
           );
           console.log('payload', payload);
           this.submit(payload);
@@ -224,8 +213,8 @@ export default {
 
 
         this.index++;
-        this.instanceData = getInstanceData(this.instance);
-        this.control = getControl(this.instance.data, this.positions[this.index]);
+        this.submissionData = getInstanceData(this.submission);
+        this.control = getControl(this.submission.data, this.positions[this.index]);
         this.value = this.control.value;
 
         if (this.control.type === 'group') {
@@ -234,7 +223,7 @@ export default {
         }
 
         this.breadcrumbs = getBreadcrumbs(
-          this.activeSurvey.versions[this.activeVersion],
+          this.survey.versions[this.activeVersion],
           this.positions[this.index],
         );
 
@@ -252,7 +241,7 @@ export default {
           return;
         }
         this.index--;
-        this.control = getControl(this.instance.data, this.positions[this.index]);
+        this.control = getControl(this.submission.data, this.positions[this.index]);
         this.value = this.control.value;
 
         if (this.control.type === 'group') {
@@ -261,7 +250,7 @@ export default {
         }
 
         this.breadcrumbs = getBreadcrumbs(
-          this.activeSurvey.versions[this.activeVersion],
+          this.survey.versions[this.activeVersion],
           this.positions[this.index],
         );
 
@@ -276,7 +265,7 @@ export default {
         return;
       }
       const sandbox = compileSandboxSingleLine(this.control.options.calculate);
-      this.control.value = sandbox({ data: this.instanceData });
+      this.control.value = sandbox({ data: this.submissionData });
       this.value = this.control.value;
       console.log(this.control.value);
     },
@@ -291,7 +280,7 @@ export default {
       }));
     },
     persist() {
-      db.persistSurveyResult(this.instance);
+      db.persistSurveyResult(this.submission);
     },
     async submit(payload) {
       try {
@@ -301,63 +290,85 @@ export default {
         console.log(error);
       }
     },
-    updateTitle({ title, subtitle }) {
+    setNavbarContent({ title, subtitle }) {
       this.$store.dispatch('appui/setTitle', title);
       this.$store.dispatch('appui/setSubtitle', subtitle);
     },
+    // getInitialSubmissionState({
+    //   survey,
+    //   version,
+    //   submission,
+    //   index = 0,
+    // }) {
+    //   const positions = getSurveyPositions(survey, version);
+    //   const control = getControl(submission.data, positions[index]);
+    //   return {
+    //     positions,
+    //     submissionData: getInstanceData(this.submission),
+    //     control,
+    //     value: control.value,
+    //     breadcrumbs: getBreadcrumbs(survey.versions[version], positions[index]),
+    //   };
+    // },
   },
-  watch: {
-    control(newControl, oldControl) {
-      //
-    },
-  },
+  // watch: {
+  //   control(newControl, oldControl) {
+  //     //
+  //   },
+  // },
   beforeDestroy() {
     this.$store.dispatch('appui/reset');
   },
   async created() {
-    try {
-      /**
+    /**
        * Page will either be loaded with query parameter for survey definition ID or
        * route parameter for draft ID
        */
-      const { id: draftId } = this.$route.params;
-      const { survey: surveyId } = this.$route.query;
+    const { id: draftId } = this.$route.params;
+    const { survey: surveyId } = this.$route.query;
 
-      // const isNewSubmission = !draftId;
+    const isNewSubmission = !draftId;
 
-      if (draftId) {
-        /** Either fetch all submissions then use getter, or use GET_SUBMISSION action, which automatically does this. */
-        // await this.$store.dispatch('submissions/fetchSubmissions');
-        // this.$store.getters['submissions/getSubmission'](draftId);
-        this.activeSubmission = await this.$store.dispatch('submissions/getSubmission', draftId);
-        // TODO: handle submission not found, set error on page
-      }
-
-      this.activeSurvey = await this.$store.dispatch(
-        'surveys/fetchSurvey',
-        surveyId || (this.activeSubmission && this.activeSubmission.survey),
-      );
-
-      if (!draftId) {
-        this.activeSubmission = createInstance(this.activeSurvey, this.activeVersion);
-      }
-
-      this.instance = this.activeSubmission;
-      this.positions = getSurveyPositions(this.activeSurvey, this.activeVersion);
-      this.instanceData = getInstanceData(this.activeSubmission);
-      this.control = getControl(this.activeSubmission.data, this.positions[this.index]);
-      this.value = this.control.value;
-      this.breadcrumbs = getBreadcrumbs(
-        this.activeSurvey.versions[this.activeVersion],
-        this.positions[this.index],
-      );
-      this.updateTitle({
-        title: this.activeSurvey.name,
-        subtitle: `Version ${this.activeVersion} <v-chip class="ma-2" color="blue">${this.positions.length} Questions</v-chip>`,
-      });
-    } catch (e) {
-      console.log('something went wrong:', e);
+    if (draftId) {
+      /** Either fetch all submissions then use getter, or use GET_SUBMISSION action, which automatically does this. */
+      // await this.$store.dispatch('submissions/fetchSubmissions');
+      // this.$store.getters['submissions/getSubmission'](draftId);
+      this.submission = await this.$store.dispatch('submissions/getSubmission', draftId);
+      // TODO: handle submission not found, set error on page
     }
+
+    this.survey = await this.$store.dispatch(
+      'surveys/fetchSurvey',
+      surveyId || (this.submission && this.submission.survey),
+    );
+
+    /** TODO: survey definition versions need the ability to be archived, so we can't just use an index
+       * of `survey.versions.length` to reference which version we're using. Instead, each survey definition
+       * in the `survey.versions` array needs to a have a version attribute.
+       * */
+    this.activeVersion = isNewSubmission
+      ? this.survey.versions.length - 1
+      : this.submission.meta.version;
+
+    if (!draftId) {
+      this.submission = createInstance(this.survey, this.activeVersion);
+    }
+
+    /** Should this be broken out into method that can be tested? */
+    this.index = 0;
+    this.positions = getSurveyPositions(this.survey, this.activeVersion);
+    this.submissionData = getInstanceData(this.submission);
+    this.control = getControl(this.submission.data, this.positions[this.index]);
+    this.value = this.control.value;
+    this.breadcrumbs = getBreadcrumbs(
+      this.survey.versions[this.activeVersion],
+      this.positions[this.index],
+    );
+
+    this.setNavbarContent({
+      title: this.survey.name,
+      subtitle: `Version ${this.activeVersion} <v-chip class="ma-2" color="blue">${this.positions.length} Questions</v-chip>`,
+    });
   },
 };
 </script>
