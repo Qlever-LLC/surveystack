@@ -17,7 +17,7 @@
               :to="`/submissions?survey=${e._id}`"
               text
             >
-              <v-icon >mdi-eye</v-icon><span class="d-none d-lg-flex">Submission</span>
+              <v-icon>mdi-eye</v-icon><span class="d-none d-lg-flex">Submission</span>
             </v-btn>
             <v-btn
               class="mx-2"
@@ -25,14 +25,14 @@
               :to="`/surveys/${e._id}/edit`"
               text
             >
-              <v-icon >mdi-pencil</v-icon><span class="d-none d-lg-flex">Edit</span>
+              <v-icon>mdi-pencil</v-icon><span class="d-none d-lg-flex">Edit</span>
             </v-btn>
             <v-btn
               class="mx-2"
               outlined
               :to="`/submissions/drafts/new?survey=${e._id}`"
             >
-              <v-icon >mdi-file-document-box-plus-outline</v-icon><span class="d-none d-lg-flex">New Draft</span>
+              <v-icon>mdi-file-document-box-plus-outline</v-icon><span class="d-none d-lg-flex">New Draft</span>
             </v-btn>
           </v-list-item-icon>
         </v-list-item>
@@ -56,7 +56,7 @@ export default {
     this.$store.dispatch('appui/reset');
   },
   updated() {
-    this.$store.dispatch('appui/title', 'Browse Surveys');
+    this.$store.dispatch('appui/setTitle', 'Browse Surveys');
   },
   async created() {
     let data = {};

@@ -101,10 +101,7 @@ const actions = {
 
 const mutations = {
   RESET(state) {
-    const newState = initialState();
-    Object.keys(newState).forEach((key) => {
-      state[key] = newState[key];
-    });
+    Object.assign(state, createInitialState());
   },
   auth_request(state) {
     state.status = 'loading';

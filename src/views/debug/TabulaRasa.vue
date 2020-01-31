@@ -2,7 +2,10 @@
   <v-container>
     <h1>Tabula Rasa</h1>
     <p>This will clear all surveys and all submissions. And furthermore create an example survey with corresponding submissions.</p>
-    <v-checkbox label="Activate" v-model="activate" />
+    <v-checkbox
+      label="Activate"
+      v-model="activate"
+    />
 
     <v-btn
       color="primary"

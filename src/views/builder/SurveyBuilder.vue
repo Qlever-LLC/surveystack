@@ -214,9 +214,6 @@ export default {
         console.log('something went wrong:', e);
       }
     }
-
-    console.log('survey', this.survey);
-    console.log('survey.versions', this.survey.versions);
   },
 };
 </script>
