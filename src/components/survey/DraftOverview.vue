@@ -75,7 +75,6 @@ export default {
     'submission',
     'index',
   ],
-  mixins: [appMixin],
   computed: {
     flatSubmission() {
       return linearControls(this.submission);
