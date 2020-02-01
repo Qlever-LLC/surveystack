@@ -1,0 +1,15 @@
+{
+    "prettier.requireConfig": true,
+    "eslint.run": "onType",
+    "eslint.autoFixOnSave": true,
+    "eslint.validate": [
+        "javascript",
+        {
+            "language": "vue",
+            "autoFix": true
+        },
+    ],
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    },
+}
