@@ -12,7 +12,7 @@ import SubmissionDraftsList from '@/views/submissions/drafts/List.vue';
 import Login from '@/views/auth/Login.vue';
 import Register from '@/views/auth/Register.vue';
 import Profile from '@/views/auth/Profile.vue';
-import ExperimentQuestions from '@/views/experiment/Questions.vue';
+import Experiment from '@/views/experiment/Experiments.vue';
 
 import UserList from '@/views/users/UserList.vue';
 import User from '@/views/users/User.vue';
@@ -107,9 +107,9 @@ const routes = [
     component: Profile,
   },
   {
-    path: '/experiment/questions',
-    name: 'experiment-questions',
-    component: ExperimentQuestions,
+    path: '/experiment',
+    name: 'experiment',
+    component: Experiment,
   },
   {
     path: '/users',

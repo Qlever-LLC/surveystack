@@ -1,177 +1,126 @@
 
 <template>
-  <div
-    id="top-level-container"
-    class="my-n3 py-4"
-    v-if="submission && survey"
-  >
-    <v-toolbar
-      color="grey lighten-4"
-      flat
-      tile
-    >
-      <v-toolbar-title
-        class="d-flex"
-        v-if="!showOverview && index < positions.length"
-      >
-        <div class="infos grey--text text--darken-2">
-          <div class="d-flex">
-            <span class="number-chip mr-2">{{ questionNumber }}</span>
-          </div>
-        </div>
-      </v-toolbar-title>
-
-      <v-spacer></v-spacer>
-
-      <v-btn icon>
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
-
-      <v-btn
-        icon
-        v-if="!atEnd"
-        @click="showOverview = !showOverview"
-      >
-        <v-icon>mdi-view-list</v-icon>
-      </v-btn>
-
-      <v-btn icon>
-        <v-icon>mdi-dots-vertical</v-icon>
-      </v-btn>
-    </v-toolbar>
-
-    <div
-      class="ml-5 mt-1"
-      v-if="!showOverview && index < positions.length"
-    >
-      <v-chip
-        dark
-        small
-        color="red"
-        class="mr-0 mr-1"
-        v-if="mbreadcrumbs.length > 0"
-      ><span
-          v-for="(crumb, ci) in mbreadcrumbs"
-          :key="`bread_${ci}`"
-        >{{ crumb }} <span
-            class="mr-1"
-            v-if="ci < mbreadcrumbs.length - 1"
-          >&gt;</span></span></v-chip>
-    </div>
-    <v-container
-      class="mt-n3"
-      id="question-container"
-    >
-      <v-row
-        class="flex-grow-0 flex-shrink-1 pl-2 pr-2"
-        v-if="!atOverview"
-      >
-
-      </v-row>
-
-      <v-row
-        justify="center"
-        align="center"
-        class="px-2"
-      >
-        <v-navigation-drawer
-          v-model="showOverview"
-          style="width: 100%;"
-          clipped
-          right
-          fixed
-          touchless
-          stateless
-        >
-
-          <draft-overview
-            class="tall"
-            :survey="survey"
-            :submission="submission"
-            :position="this.positions[this.index]"
-            @navigate="(pos) => navigate(pos)"
-          ></draft-overview>
-        </v-navigation-drawer>
-
-        <component
-          v-if="!atEnd"
-          class="tall"
-          :key="breadcrumbs.join('.')"
-          :is="control.type"
-          :control="control"
-          :value="value"
-          @eval="eval"
-          @changed="setValue"
-          @show-nav="showNav(true)"
-          @hide-nav="showNav(false)"
-          @next="handleNext"
-          @show-next="showNext(true)"
-          @hide-next="showNext(false)"
-        />
-
-      </v-row>
-
+  <div id="draft-root">
+    <transition :name="slide">
       <div
-        v-if="mShowNav"
-        class="font-weight-medium footer"
+        id="draft-container"
+        :key="'container-'+index"
+        v-if="submission && survey"
       >
-        <v-container class="pa-0">
-          <v-row>
-            <v-col
-              class="text-center"
-              cols="6"
-            >
-              <v-btn
-                v-show="!atStart"
-                @click="handlePrevious"
-                class="full"
-                outlined
-                depressed
-                large
-                color="primary"
-              >
-                Previous
-              </v-btn>
-            </v-col>
+        <v-toolbar
+          color="grey lighten-4"
+          class="flex-grow-0 flex-shrink-0"
+          flat
+          tile
+        >
+          <v-toolbar-title
+            id="draft-toolbar"
+            v-if="!showOverview && index < positions.length"
+          >
+            <div class="infos grey--text text--darken-2">
+              <div class="d-flex">
+                <span class="number-chip mr-2">{{ questionNumber }}</span>
+              </div>
+            </div>
+          </v-toolbar-title>
 
-            <v-col
-              v-if="atEnd"
-              class="text-center"
-              cols="6"
-            >
-              <v-btn
-                :disabled="!mShowNext"
-                @click="handleNext"
-                class="full"
-                depressed
-                large
-                color="primary"
-              >
-                Submit
-              </v-btn>
-            </v-col>
+          <v-spacer></v-spacer>
 
-            <v-col
-              v-else
-              class="text-center"
-              cols="6"
-            >
-              <v-btn
-                :disabled="!mShowNext"
-                @click="handleNext"
-                @keyup.enter="handleNext"
-                class="full"
-                depressed
-                large
-                color="primary"
-              >
-                Next
-              </v-btn>
-            </v-col>
+          <v-btn icon>
+            <v-icon>mdi-magnify</v-icon>
+          </v-btn>
+
+          <v-btn
+            icon
+            v-if="!atEnd"
+            @click="showOverview = !showOverview"
+          >
+            <v-icon>mdi-view-list</v-icon>
+          </v-btn>
+
+          <v-btn icon>
+            <v-icon>mdi-dots-vertical</v-icon>
+          </v-btn>
+        </v-toolbar>
+
+        <div
+          class="px-4"
+          id="draft-breadcrumbs"
+          v-show="!showOverview && index < positions.length"
+        >
+          <v-chip
+            dark
+            small
+            color="red"
+            class="mr-0 mr-1"
+            v-if="mbreadcrumbs.length > 0"
+          ><span
+              v-for="(crumb, ci) in mbreadcrumbs"
+              :key="`bread_${ci}`"
+            >{{ crumb }} <span
+                class="mr-1"
+                v-if="ci < mbreadcrumbs.length - 1"
+              >&gt;</span></span></v-chip>
+        </div>
+
+        <v-container id="draft-body">
+          <v-row
+            class="flex-grow-0 flex-shrink-1 pl-2 pr-2"
+            v-if="!atOverview"
+          >
+
+          </v-row>
+
+          <v-row
+            justify="center"
+            align="center"
+            class="px-2"
+          >
+            <component
+              v-if="!atEnd"
+              class="tall"
+              :key="breadcrumbs.join('.')"
+              :is="control.type"
+              :control="control"
+              :value="value"
+              @eval="eval"
+              @changed="setValue"
+              @show-nav="showNav(true)"
+              @hide-nav="showNav(false)"
+              @next="handleNext"
+              @show-next="showNext(true)"
+              @hide-next="showNext(false)"
+            />
           </v-row>
         </v-container>
+        <draft-footer
+          id="draft-footer"
+          :showPrev="!atStart"
+          :enableNext="showNext"
+          :showSubmit="atEnd"
+          :showNav="showNav"
+          @next="handleNext"
+          @prev="handlePrevious"
+          @submit="handleNext"
+        />
       </div>
-    </v-container>
+    </transition>
+    <v-navigation-drawer
+      id="navigation-body"
+      v-model="showOverview"
+      clipped
+      right
+      touchless
+      stateless
+    >
+
+      <draft-overview
+        :survey="survey"
+        :submission="submission"
+        :position="this.positions[this.index]"
+        @navigate="(pos) => navigate(pos)"
+      ></draft-overview>
+    </v-navigation-drawer>
   </div>
 </template>
 
@@ -185,6 +134,7 @@ import inputNumeric from '@/components/survey/question_types/NumberInput.vue';
 import inputLocation from '@/components/survey/question_types/Map.vue';
 import group from '@/components/survey/question_types/Group.vue';
 import draftOverview from '@/components/survey/DraftOverview.vue';
+import draftFooter from '@/components/survey/DraftFooter.vue';
 import appMixin from '@/components/mixin/appCoomponent.mixin';
 
 import * as db from '@/store/db';
@@ -208,6 +158,7 @@ export default {
     inputLocation,
     group,
     draftOverview,
+    draftFooter,
   },
   data() {
     return {
@@ -222,6 +173,7 @@ export default {
       activeVersion: 0,
       value: null,
       showOverview: false,
+      slide: 'slide-in',
     };
   },
   computed: {
@@ -308,6 +260,7 @@ export default {
       this.calculateControl();
     },
     handleNext() {
+      this.slide = 'slide-in';
       this.showNav(true);
       this.showNext(true);
 
@@ -347,6 +300,8 @@ export default {
       }
     },
     handlePrevious() {
+      this.slide = 'slide-out';
+
       this.showNav(true);
       this.showNext(true);
 
@@ -475,6 +430,59 @@ export default {
 </script>
 
 <style scoped>
+#draft-root {
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  padding: 0px !important;
+}
+
+#draft-container {
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  padding: 0px !important;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto 1fr auto;
+  position: absolute;
+
+  will-change: transform;
+}
+#draft-toolbar {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+#draft-breadcrumbs {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+#navigation-body {
+  position: absolute;
+  width: 100% !important;
+  z-index: 4;
+  max-height: 100%;
+  overflow: auto;
+}
+
+#draft-body {
+  max-height: 100%;
+  overflow: auto;
+  grid-column: 1;
+  grid-row: 3;
+}
+
+#draft-footer {
+  grid-column: 1;
+  grid-row: 4;
+}
+</style>
+
+
+<style scoped>
 .full {
   width: 100%;
 }
@@ -500,32 +508,6 @@ export default {
 
 .pack {
   flex-basis: 0 !important;
-}
-
-.footer {
-  border-top: 1px solid #ccc;
-  background: #fff;
-  margin: 0;
-  border-radius: 0;
-  -webkit-box-align: center;
-  align-items: center;
-  display: flex;
-  -webkit-box-flex: 0 !important;
-  flex: 0 1 auto !important;
-  flex-wrap: wrap;
-  padding: 6px 16px;
-  transition-duration: 0.2s;
-  transition-property: background-color, left, right;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 6;
-  position: fixed;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
-}
-
-.tall {
-  margin-bottom: 70px;
 }
 
 .app-chip {
@@ -557,6 +539,46 @@ export default {
 #top-level-container {
   padding-left: 0px !important;
   padding-right: 0px !important;
+}
+
+.slide-in-enter-active,
+.slide-in-leave-active {
+  transition: all 0.5s;
+}
+
+.slide-in-enter {
+  transform: translateX(100vw);
+}
+.slide-in-leave-to {
+  position: fixed;
+  transform: translateX(-100vw);
+}
+.slide-in-leave {
+  transform: translateX(0%);
+}
+.slide-in-enter-to {
+  position: fixed;
+  transform: translateX(0%);
+}
+
+.slide-out-enter-active,
+.slide-out-leave-active {
+  transition: all 0.5s;
+}
+
+.slide-out-enter {
+  transform: translateX(-100vw);
+}
+.slide-out-leave-to {
+  position: fixed;
+  transform: translateX(100vw);
+}
+.slide-out-leave {
+  transform: translateX(0%);
+}
+.slide-out-enter-to {
+  position: fixed;
+  transform: translateX(0%);
 }
 </style>
 

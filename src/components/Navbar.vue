@@ -100,11 +100,11 @@ export default {
           icon: 'mdi-delete-variant',
         },
         {
-          title: 'Tabula Rasa',
+          title: 'Experiment',
           to: {
-            name: 'tabula-rasa',
+            name: 'experiment',
           },
-          icon: 'mdi-delete-variant',
+          icon: 'mdi-pill',
         },
       ],
     };
