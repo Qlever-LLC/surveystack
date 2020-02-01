@@ -11,7 +11,10 @@
         @click="drawer = !drawer"
       />
       <v-toolbar-title class="ml-2 flex-column">
-        <div id="app-bar-title" class="title py-0 my-0">{{ appTitle }} </div>
+        <div
+          id="app-bar-title"
+          class="title py-0 my-0"
+        >{{ appTitle }}</div>
         <div
           class="app-bar-subtitle subtitle py-0 my-0"
           v-html="appSubtitle"
@@ -88,6 +91,13 @@ export default {
             name: 'users-list',
           },
           icon: 'mdi-account-group',
+        },
+        {
+          title: 'Tabula Rasa',
+          to: {
+            name: 'tabula-rasa',
+          },
+          icon: 'mdi-delete-variant',
         },
         {
           title: 'Tabula Rasa',
