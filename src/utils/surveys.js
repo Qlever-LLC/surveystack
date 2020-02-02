@@ -478,7 +478,6 @@ export const linearControls = (submission) => {
   const res = [];
   const positions = getControlPositions(submission.data);
   positions.forEach((p) => {
-    console.log('pos', p);
     const control = getControl(submission.data, p);
     const breadcrumbs = getBreadcrumbsForSubmission(submission.data, p);
     if (control.type !== 'group') {

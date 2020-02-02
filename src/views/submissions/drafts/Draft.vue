@@ -97,6 +97,7 @@
       </div>
     </transition>
     <v-navigation-drawer
+      v-if="survey"
       id="navigation-container"
       v-model="showOverview"
       clipped
@@ -167,7 +168,7 @@ export default {
       survey: null,
       control: null,
       submissionData: null,
-      positions: null,
+      positions: [],
       index: 0,
       mShowNav: true,
       mShowNext: true,
@@ -389,6 +390,7 @@ export default {
        * Page will either be loaded with query parameter for survey definition ID or
        * route parameter for draft ID
        */
+    db.openDb();
     const { id: draftId } = this.$route.params;
     const { survey: surveyId } = this.$route.query;
 
@@ -566,18 +568,18 @@ export default {
 }
 
 .slide-in-enter {
-  transform: translateX(100vw);
+  transform: translate3d(100vw, 0, 0);
 }
 .slide-in-leave-to {
   position: fixed;
-  transform: translateX(-100vw);
+  transform: translate3d(-100vw, 0, 0);
 }
 .slide-in-leave {
-  transform: translateX(0%);
+  transform: translate3d(0%, 0, 0);
 }
 .slide-in-enter-to {
   position: fixed;
-  transform: translateX(0%);
+  transform: translate3d(0%, 0, 0);
 }
 
 .slide-out-enter-active,
@@ -586,18 +588,18 @@ export default {
 }
 
 .slide-out-enter {
-  transform: translateX(-100vw);
+  transform: translate3d(-100vw, 0, 0);
 }
 .slide-out-leave-to {
   position: fixed;
-  transform: translateX(100vw);
+  transform: translate3d(100vw, 0, 0);
 }
 .slide-out-leave {
-  transform: translateX(0%);
+  transform: translate3d(0%, 0, 0);
 }
 .slide-out-enter-to {
   position: fixed;
-  transform: translateX(0%);
+  transform: translate3d(0%, 0, 0);
 }
 </style>
 

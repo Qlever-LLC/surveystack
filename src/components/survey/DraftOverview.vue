@@ -84,7 +84,6 @@ export default {
       return linearControls(this.submission);
     },
     controlDisplays() {
-      console.log('submission', this.submission);
       const r = linearControls(this.submission).map((control) => {
         const icon = iconify(control);
         const active = _.isEqual(control.position, this.position);
@@ -100,7 +99,6 @@ export default {
           active,
         };
       });
-      console.log('controlDisplays', r);
       return r;
     },
   },
