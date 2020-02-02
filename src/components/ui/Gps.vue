@@ -7,7 +7,10 @@
       color="gray"
       class="map-container font-weight-bold pa-2"
     >
-      <v-expansion-panel>
+      <v-expansion-panel
+        class="ma-4"
+        style="flex-basis: unset; flex-grow: 0;"
+      >
         <v-expansion-panel-header>
           <slot></slot>
         </v-expansion-panel-header>
@@ -66,5 +69,6 @@ export default {
 <style scoped>
 .map-container {
   font-family: monospace;
+  justify-content: left;
 }
 </style>

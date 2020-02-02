@@ -75,6 +75,7 @@
             justify="center"
             align="center"
             class="px-2"
+            style="height: 100%; margin-left: 0px; margin-right: 0px;"
           >
             <component
               v-if="!atEnd"
@@ -448,11 +449,13 @@ export default {
 }
 
 #draft-container {
+  position: relative;
   height: 100%;
   width: 100%;
   margin: 0px;
   padding: 0px !important;
   max-height: 100%;
+  overflow: auto;
 
   grid-column: 1;
   grid-row: 1;

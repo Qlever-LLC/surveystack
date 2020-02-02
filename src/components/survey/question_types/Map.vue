@@ -1,99 +1,98 @@
 <template>
-  <div style="width: 100%">
+  <div id="map-root">
     <v-card
+      id="map-header"
       dark
       color="gray"
-      class="body-1 font-weight-n pa-2 px-4 mt-2"
+      class="body-1 font-weight-n pa-2 px-4 mt-0"
       style="width: 100%"
     >{{ control.label }}</v-card>
-    <v-container fluid>
-      <v-row
-        align="center"
-        justify="center"
+
+    <div
+      id="map-container"
+      class="my-2"
+    >
+      <div id="gps-info">
+        <app-gps :location="currentLocation.location">{{ currentLocation.label }}</app-gps>
+      </div>
+      <div
+        id="map-question"
+        v-if="!mapError"
       >
-        <div
-          id="map-question"
-          class="ml-n4"
-          v-if="!mapError"
+        <img
+          v-if="!this.value"
+          id="map-marker"
+          src="@/assets/marker.svg"
+          alt="marker"
+        />
+      </div>
+      <v-alert
+        type="info"
+        border="right"
+        prominent
+        v-else
+      >
+        Error loading map. Unable to load map. Using GPS coordinates.
+      </v-alert>
+    </div>
+
+    <v-container
+      id="map-footer"
+      class="infos grey--text text--darken-2 text-center"
+      fluid
+    >
+      <template v-if="!location">
+        <v-btn
+          large
+          class="mx-4 full"
+          outlined
+          color="blue"
+          @click="skip"
+        >Skip</v-btn>
+        <v-btn
+          large
+          :disabled="disablePick"
+          :dark="!disablePick"
+          class="mx-4 full"
+          color="blue"
+          @click="pickLocation"
+        >Pick</v-btn>
+      </template>
+
+      <template v-else>
+        <v-btn
+          large
+          class="mx-4 full"
+          outlined
+          color="indigo"
+          @click="retake"
+        >Retake</v-btn>
+      </template>
+      <v-container v-if="!gps">
+        <v-row
+          class="fill-height"
+          align-content="center"
+          justify="center"
         >
-          <img
-            v-if="!this.value"
-            id="map-marker"
-            src="@/assets/marker.svg"
-            alt="marker"
-          />
+          <v-col
+            class="subtitle-1 text-center"
+            cols="12"
+          >
+            Getting GPS Coordinates
+          </v-col>
+          <v-col cols="6">
+            <v-progress-linear
+              color="red accent-4"
+              indeterminate
+              rounded
+              height="6"
+            ></v-progress-linear>
+          </v-col>
+        </v-row>
+      </v-container>
 
-          <div id="map-center">
-            <app-gps :location="currentLocation.location">{{ currentLocation.label }}</app-gps>
-          </div>
-
-        </div>
-        <v-alert
-          type="info"
-          border="right"
-          prominent
-          v-else
-        >
-          Error loading map. Unable to load map. Using GPS coordinates.
-        </v-alert>
-
-        <v-container
-          class="infos grey--text text--darken-2 text-center"
-          fluid
-        >
-          <template v-if="!location">
-            <v-btn
-              large
-              class="mx-4 full"
-              outlined
-              color="blue"
-              @click="skip"
-            >Skip</v-btn>
-            <v-btn
-              large
-              :disabled="disablePick"
-              :dark="!disablePick"
-              class="mx-4 full"
-              color="blue"
-              @click="pickLocation"
-            >Pick</v-btn>
-          </template>
-
-          <template v-else>
-            <v-btn
-              large
-              class="mx-4 full"
-              outlined
-              color="indigo"
-              @click="retake"
-            >Retake</v-btn>
-          </template>
-          <v-container v-if="!gps">
-            <v-row
-              class="fill-height"
-              align-content="center"
-              justify="center"
-            >
-              <v-col
-                class="subtitle-1 text-center"
-                cols="12"
-              >
-                Getting GPS Coordinates
-              </v-col>
-              <v-col cols="6">
-                <v-progress-linear
-                  color="red accent-4"
-                  indeterminate
-                  rounded
-                  height="6"
-                ></v-progress-linear>
-              </v-col>
-            </v-row>
-          </v-container>
-
-        </v-container>
-      </v-row>
     </v-container>
+
   </div>
 </template>
 <script>
@@ -134,6 +133,7 @@ export default {
       mapCenter: null,
       usingGPS: true,
       marker: null,
+      ctrl: null,
     };
   },
   methods: {
@@ -154,16 +154,17 @@ export default {
       }
       this.location = null;
       this.hideNext();
+      this.ctrl.trigger();
     },
     handleMap(map, value) {
-      const ctrl = new mapboxgl.GeolocateControl({
+      this.ctrl = new mapboxgl.GeolocateControl({
         positionOptions: {
           enableHighAccuracy: true,
         },
         trackUserLocation: true,
       });
 
-      map.addControl(ctrl);
+      map.addControl(this.ctrl);
       map.on('error', () => {
         this.mapError = true;
         this.usingGPS = true;
@@ -174,15 +175,34 @@ export default {
         this.mapCenter = map.getCenter();
       });
 
-      ctrl.on('trackuserlocationstart', () => {
+      this.ctrl.on('trackuserlocationstart', () => {
         this.usingGPS = true;
       });
 
 
-      ctrl.on('trackuserlocationend', () => {
+      this.ctrl.on('trackuserlocationend', () => {
         console.log('trackuserlocationend');
       });
 
+      map.on('load', () => {
+        if (!value) {
+          this.ctrl.trigger();
+        }
+        map.resize();
+      });
+
+      this.ctrl.on('geolocate', (e) => {
+        if (!this.first) {
+          return;
+        }
+
+        map.stop();
+        map.jumpTo({
+          center: [e.coords.longitude, e.coords.latitude],
+        });
+
+        this.first = false;
+      });
 
       if (value) {
         this.marker = new mapboxgl.Marker()
@@ -191,24 +211,6 @@ export default {
 
         map.jumpTo({
           center: [value.lng, value.lat],
-        });
-      } else {
-        map.on('load', () => {
-          ctrl.trigger();
-        });
-
-
-        ctrl.on('geolocate', (e) => {
-          if (!this.first) {
-            return;
-          }
-
-          map.stop();
-          map.jumpTo({
-            center: [e.coords.longitude, e.coords.latitude],
-          });
-
-          this.first = false;
         });
       }
     },
@@ -278,13 +280,51 @@ export default {
 
 <style>
 @import url("https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css");
+#map-root {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+  width: 100%;
+}
+
+#map-header {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+#gps-info {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin-left: 0.2rem;
+  margin-top: 0.2rem;
+  z-index: 1;
+  display: block;
+}
+
+#map-container {
+  position: relative;
+  grid-column: 1;
+  grid-row: 2;
+  height: 100%;
+  overflow: auto;
+  max-height: 100%;
+}
+
+#map-footer {
+  grid-column: 1;
+  grid-row: 3;
+}
 
 #map-question {
-  height: 40vh;
+  left: 0px;
+  top: 0px;
+  position: absolute;
   width: 100%;
   padding: 0px;
-  margin-left: 12px;
-  margin-right: -12px;
+  min-height: 100%;
+  height: 100%;
 }
 
 #map-marker {
