@@ -201,6 +201,9 @@ export default {
       return edited.join('.');
     },
     mbreadcrumbs() {
+      if (this.atOverview || this.atEnd) {
+        return [];
+      }
       const b = getBreadcrumbs(
         this.survey.versions.find(item => item.version === this.activeVersion),
         this.positions[this.index],
@@ -432,36 +435,41 @@ export default {
 
 <style scoped>
 #draft-root {
+  position: absolute;
   height: 100%;
   width: 100%;
   margin: 0px;
   padding: 0px !important;
+  min-height: 100%;
+
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr auto;
 }
 
 #draft-container {
-  position: absolute;
   height: 100%;
   width: 100%;
   margin: 0px;
   padding: 0px !important;
+  max-height: 100%;
+
   grid-column: 1;
   grid-row: 1;
 
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto auto 1fr;
-  will-change: "transform";
+  will-change: transform;
 }
 
 #navigation-container {
-  position: absolute;
+  position: relative;
   width: 100% !important;
   z-index: 4;
   max-height: 100%;
   overflow: auto;
+
   grid-column: 1;
   grid-row: 1;
 }
