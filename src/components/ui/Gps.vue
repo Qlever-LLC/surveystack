@@ -6,6 +6,7 @@
       dark
       color="gray"
       class="map-container font-weight-bold pa-2"
+      v-model="expandedVal"
     >
       <v-expansion-panel
         class="ma-4"
@@ -48,10 +49,12 @@ export default {
     return {
       snackbar: false,
       snackbarText: '',
+      expandedVal: this.expanded ? 0 : null,
     };
   },
   props: [
     'location',
+    'expanded',
   ],
   methods: {
     clipboard() {

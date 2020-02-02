@@ -14,7 +14,10 @@
       v-if="!mapError"
     >
       <div id="gps-info">
-        <app-gps :location="currentLocation.location">{{ currentLocation.label }}</app-gps>
+        <app-gps
+          :expanded="false"
+          :location="currentLocation.location"
+        >{{ currentLocation.label }}</app-gps>
       </div>
       <div
         id="map-question"
@@ -44,7 +47,10 @@
       </v-alert>
 
       <div>
-        <app-gps :location="currentLocation.location">{{ currentLocation.label }}</app-gps>
+        <app-gps
+          :expanded="true"
+          :location="currentLocation.location"
+        >{{ currentLocation.label }}</app-gps>
       </div>
 
     </div>
@@ -137,6 +143,7 @@ export default {
   },
   data() {
     return {
+      panel: [0],
       map: null,
       mapError: false,
       first: true,

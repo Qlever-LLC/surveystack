@@ -63,7 +63,10 @@
               >&gt;</span></span></v-chip>
         </div>
 
-        <v-container id="draft-body">
+        <v-container
+          id="draft-body"
+          style="max-width: 800px;"
+        >
           <v-row
             class="flex-grow-0 flex-shrink-1 pl-2 pr-2"
             v-if="!atOverview"
