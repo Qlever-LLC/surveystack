@@ -30,7 +30,9 @@ function openDb(onSuccess) {
   request.onsuccess = (event) => {
     console.log(`Success: ${event}`);
     db = event.target.result;
-    onSuccess();
+    if (onSuccess) {
+      onSuccess();
+    }
   };
 
   // OnUpgradeNeeded Handler
