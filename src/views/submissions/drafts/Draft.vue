@@ -93,27 +93,16 @@
             />
           </v-row>
         </v-container>
-        <draft-footer
-          id="draft-footer"
-          :showPrev="!atStart"
-          :enableNext="showNext"
-          :showSubmit="atEnd"
-          :showNav="showNav"
-          @next="handleNext"
-          @prev="handlePrevious"
-          @submit="handleNext"
-        />
       </div>
     </transition>
     <v-navigation-drawer
-      id="navigation-body"
+      id="navigation-container"
       v-model="showOverview"
       clipped
       right
       touchless
       stateless
     >
-
       <draft-overview
         :survey="survey"
         :submission="submission"
@@ -121,6 +110,17 @@
         @navigate="(pos) => navigate(pos)"
       ></draft-overview>
     </v-navigation-drawer>
+
+    <draft-footer
+      id="footer-container"
+      :showPrev="!atStart"
+      :enableNext="showNext"
+      :showSubmit="atEnd"
+      :showNav="showNav"
+      @next="handleNext"
+      @prev="handlePrevious"
+      @submit="handleNext"
+    />
   </div>
 </template>
 
@@ -246,6 +246,7 @@ export default {
       this.$forceUpdate();
     },
     navigate(pos) {
+      this.slide = 'slide-out';
       console.log('navigating', pos);
       this.showNav(true);
       this.showNext(true);
@@ -435,21 +436,41 @@ export default {
   width: 100%;
   margin: 0px;
   padding: 0px !important;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto;
 }
 
 #draft-container {
+  position: absolute;
   height: 100%;
   width: 100%;
   margin: 0px;
   padding: 0px !important;
+  grid-column: 1;
+  grid-row: 1;
 
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: auto auto 1fr auto;
-  position: absolute;
-
-  will-change: transform;
+  grid-template-rows: auto auto 1fr;
+  will-change: "transform";
 }
+
+#navigation-container {
+  position: absolute;
+  width: 100% !important;
+  z-index: 4;
+  max-height: 100%;
+  overflow: auto;
+  grid-column: 1;
+  grid-row: 1;
+}
+
+#footer-container {
+  grid-column: 1;
+  grid-row: 2;
+}
+
 #draft-toolbar {
   grid-column: 1;
   grid-row: 1;
@@ -460,24 +481,11 @@ export default {
   grid-row: 2;
 }
 
-#navigation-body {
-  position: absolute;
-  width: 100% !important;
-  z-index: 4;
-  max-height: 100%;
-  overflow: auto;
-}
-
 #draft-body {
   max-height: 100%;
   overflow: auto;
   grid-column: 1;
   grid-row: 3;
-}
-
-#draft-footer {
-  grid-column: 1;
-  grid-row: 4;
 }
 </style>
 
