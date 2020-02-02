@@ -11,6 +11,7 @@
     <div
       id="map-container"
       class="my-2"
+      v-if="!mapError"
     >
       <div id="gps-info">
         <app-gps :location="currentLocation.location">{{ currentLocation.label }}</app-gps>
@@ -26,14 +27,26 @@
           alt="marker"
         />
       </div>
+    </div>
+
+    <div
+      id="map-error-alert"
+      class="my-4"
+      v-else
+    >
+
       <v-alert
         type="info"
         border="right"
         prominent
-        v-else
       >
         Error loading map. Unable to load map. Using GPS coordinates.
       </v-alert>
+
+      <div>
+        <app-gps :location="currentLocation.location">{{ currentLocation.label }}</app-gps>
+      </div>
+
     </div>
 
     <v-container
@@ -253,6 +266,7 @@ export default {
 
     this.handleMap(this.map, this.value);
     if (!this.value) {
+      console.log('hiding next');
       this.hideNext();
     }
     requestWakeLock();
@@ -304,6 +318,14 @@ export default {
 }
 
 #map-container {
+  position: relative;
+  grid-column: 1;
+  grid-row: 2;
+  height: 100%;
+  overflow: auto;
+  max-height: 100%;
+}
+#map-errpr-alert {
   position: relative;
   grid-column: 1;
   grid-row: 2;

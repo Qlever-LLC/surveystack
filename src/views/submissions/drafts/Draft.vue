@@ -116,9 +116,9 @@
     <draft-footer
       id="footer-container"
       :showPrev="!atStart"
-      :enableNext="showNext"
+      :enableNext="mShowNext"
       :showSubmit="atEnd"
-      :showNav="showNav"
+      :showNav="mShowNav"
       @next="handleNext"
       @prev="handlePrevious"
       @submit="handleNext"
