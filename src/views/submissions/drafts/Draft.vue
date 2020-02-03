@@ -133,9 +133,6 @@ export default {
     };
   },
   computed: {
-    totalQuestions() {
-      return 13;
-    },
     atStart() {
       return this.index === 0;
     },

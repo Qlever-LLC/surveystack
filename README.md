@@ -105,7 +105,7 @@ Our-Sci PWA adheres to airbnb coding style guidelines. For development, we recom
 }
 ```
 
-> **NOTE:** This settings file is not commited to git, so feel free to customize.
+> **NOTE:** This settings file is not commited to git, so feel free to customize. **Edit** 3 Feb 2020: It is now commited anyway
 
 The above config disables prettier (if installed) as we do not use a .prettierrc config file. Otherwise prettier and eslint keep battling each other... There may be a better approach, but for now this will do. Also you may need to **disable Prettier for this workspace** since there is currently (Jan 2020) a bug, where Prettier formatting is applied anyhow even though there is no prettier config file.
 
