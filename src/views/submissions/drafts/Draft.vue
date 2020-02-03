@@ -410,10 +410,9 @@ export default {
 #draft-root {
   position: absolute;
   max-width: 100vw;
-  height: 100%;
+  height: calc(100% - 110px);
   overflow: auto;
   overflow-x: hidden;
-  padding-bottom: 68px;
   width: 100vw;
   margin: 0px;
   padding: 0px !important;
