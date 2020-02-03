@@ -7,10 +7,9 @@
 </template>
 
 <script>
-import controlProps from '@/utils/controls/props';
 
 export default {
-  props: controlProps,
+
 };
 </script>
 

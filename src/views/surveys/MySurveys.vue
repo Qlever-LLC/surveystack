@@ -29,52 +29,55 @@
             class="flex-grow-1 flex-column align-center justify-center align-content-center"
             style="height: 100%;"
           >
-            <v-list v-if="tab.content.length > 0">
-              <template v-for="(item, i) in tab.content">
-                <v-list-item
-                  @click="select(item)"
-                  :key="i"
-                >
-                  <v-list-item-content two-line>
-                    <v-list-item-title v-if="surveyForSubmission(item)">
-                      {{ surveyForSubmission(item).name}}
-                    </v-list-item-title>
-                    <v-list-item-title v-else>
-                      loading name
-                    </v-list-item-title>
-                    <v-list-item-subtitle>
-                      ID: {{ item._id }} <br>
-                      {{ (new Date(item.meta.dateCreated)).toLocaleString() }}
-                    </v-list-item-subtitle>
-                  </v-list-item-content>
-                </v-list-item>
-                <v-divider
-                  v-if="i + 1 < tab.content.length"
-                  :key="`divider_${i}`"
-                ></v-divider>
-              </template>
-            </v-list>
-            <v-container
-              fill-height
-              fluid
-              v-else
-            >
-              <v-row
-                align="center"
-                justify="center"
+            <v-card>
+              <v-list v-if="tab.content.length > 0">
+                <template v-for="(item, i) in tab.content">
+                  <v-list-item
+                    @click="select(item)"
+                    :key="i"
+                  >
+                    <v-list-item-content two-line>
+                      <v-list-item-title v-if="surveyForSubmission(item)">
+                        {{ surveyForSubmission(item).name}}
+                      </v-list-item-title>
+                      <v-list-item-title v-else>
+                        loading name
+                      </v-list-item-title>
+                      <v-list-item-subtitle>
+                        ID: {{ item._id }} <br>
+                        {{ (new Date(item.meta.dateCreated)).toLocaleString() }}
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                  <v-divider
+                    v-if="i + 1 < tab.content.length"
+                    :key="`divider_${i}`"
+                  ></v-divider>
+                </template>
+              </v-list>
+              <v-container
+                fill-height
+                fluid
+                v-else
               >
-                <v-col>
-                  <div class="d-flex flex-column align-center">
-                    <v-icon large>mdi-file-multiple</v-icon>
-                    <v-alert
-                      type="info"
-                      text
-                      class="ma-4"
-                    >No drafts yet</v-alert>
-                  </div>
-                </v-col>
-              </v-row>
-            </v-container>
+                <v-row
+                  align="center"
+                  justify="center"
+                >
+                  <v-col>
+                    <div class="d-flex flex-column align-center">
+                      <v-icon large>mdi-file-multiple</v-icon>
+                      <v-alert
+                        type="info"
+                        text
+                        class="ma-4"
+                      >No drafts yet</v-alert>
+                    </div>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-card>
+
           </v-tab-item>
         </v-tabs-items>
       </v-row>
