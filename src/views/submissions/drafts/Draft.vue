@@ -2,71 +2,28 @@
 <template>
   <div id="relative-wrapper">
     <div id="draft-root">
-      <transition :name="slide">
-        <div
-          id="draft-container"
-          :key="'container-'+index"
-          v-if="submission && survey"
-        >
-          <v-toolbar
-            color="grey lighten-4"
-            class="flex-grow-0 flex-shrink-0"
-            flat
-            tile
-          >
-            <v-toolbar-title
-              id="draft-toolbar"
-              v-if="!showOverview && index < positions.length"
-            >
-              <div class="infos grey--text text--darken-2">
-                <div class="d-flex">
-                  <span class="number-chip mr-2">{{ questionNumber }}</span>
-                </div>
-              </div>
-            </v-toolbar-title>
+      <div
+        id="draft-container"
+        :key="'container-'+index"
+        v-if="submission && survey"
+        style="border-right: 1px solid #AAA; border-left: 1px solid #AAA"
+      >
+        <draft-toolbar
+          :showOverview="showOverview"
+          :showOverViewIcon="!atEnd"
+          :questionNumber="questionNumber"
+          v-if="!showOverview && index < positions.length"
+          @showOverviewClicked="showOverview = !showOverview"
+        />
+        <draft-title
+          v-if="!showOverview && index < positions.length"
+          :breadcrumbs="mbreadcrumbs"
+        />
 
-            <v-spacer></v-spacer>
-
-            <v-btn icon>
-              <v-icon>mdi-magnify</v-icon>
-            </v-btn>
-
-            <v-btn
-              icon
-              v-if="!atEnd"
-              @click="showOverview = !showOverview"
-            >
-              <v-icon>mdi-view-list</v-icon>
-            </v-btn>
-
-            <v-btn icon>
-              <v-icon>mdi-dots-vertical</v-icon>
-            </v-btn>
-          </v-toolbar>
-
-          <div
-            class="px-4"
-            id="draft-breadcrumbs"
-            v-show="!showOverview && index < positions.length"
-          >
-            <v-chip
-              dark
-              small
-              color="red"
-              class="mr-0 mr-1"
-              v-if="mbreadcrumbs.length > 0"
-            ><span
-                v-for="(crumb, ci) in mbreadcrumbs"
-                :key="`bread_${ci}`"
-              >{{ crumb }} <span
-                  class="mr-1"
-                  v-if="ci < mbreadcrumbs.length - 1"
-                >&gt;</span></span></v-chip>
-          </div>
-
+        <transition :name="slide">
           <v-container
             id="draft-body"
-            style="max-width: 800px;"
+            style="max-width: 800px; height: 100%;"
           >
             <v-row
               class="flex-grow-0 flex-shrink-1 pl-2 pr-2"
@@ -98,8 +55,8 @@
               />
             </v-row>
           </v-container>
-        </div>
-      </transition>
+        </transition>
+      </div>
       <v-navigation-drawer
         v-if="survey"
         id="navigation-container"
@@ -116,18 +73,19 @@
           @navigate="(pos) => navigate(pos)"
         ></draft-overview>
       </v-navigation-drawer>
-
-      <draft-footer
-        id="footer-container"
-        :showPrev="!atStart"
-        :enableNext="mShowNext"
-        :showSubmit="atEnd"
-        :showNav="mShowNav"
-        @next="handleNext"
-        @prev="handlePrevious"
-        @submit="handleNext"
-      />
     </div>
+
+    <draft-footer
+      class="px-4"
+      id="footer-container"
+      :showPrev="!atStart"
+      :enableNext="mShowNext"
+      :showSubmit="atEnd"
+      :showNav="mShowNav"
+      @next="handleNext"
+      @prev="handlePrevious"
+      @submit="handleNext"
+    />
   </div>
 </template>
 
@@ -141,9 +99,12 @@ import appControlNumber from '@/components/survey/question_types/Number.vue';
 import appControlLocation from '@/components/survey/question_types/Location.vue';
 import appControlGroup from '@/components/survey/question_types/Group.vue';
 
-import draftOverview from '@/components/survey/DraftOverview.vue';
-import draftFooter from '@/components/survey/DraftFooter.vue';
-import appMixin from '@/components/mixin/appCoomponent.mixin';
+import draftOverview from '@/components/survey/drafts/DraftOverview.vue';
+import draftFooter from '@/components/survey/drafts/DraftFooter.vue';
+import draftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
+import draftTitle from '@/components/survey/drafts/DraftTitle.vue';
+
+import appMixin from '@/components/mixin/appComponent.mixin';
 
 import * as db from '@/store/db';
 
@@ -167,6 +128,8 @@ export default {
     appControlGroup,
     draftOverview,
     draftFooter,
+    draftToolbar,
+    draftTitle,
   },
   data() {
     return {
@@ -450,14 +413,25 @@ export default {
   min-height: 100%;
 }
 
+#footer-container {
+  width: 100%;
+  border-top: 1px solid #eee;
+  height: 68px;
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+}
+
 #draft-root {
   position: absolute;
-  max-width: 100%;
+  max-width: 100vw;
   height: 100%;
-  width: 100%;
+  overflow: auto;
+  overflow-x: hidden;
+  padding-bottom: 68px;
+  width: 100vw;
   margin: 0px;
   padding: 0px !important;
-  min-height: 100%;
 
   display: grid;
   grid-template-columns: 1fr;
@@ -491,11 +465,6 @@ export default {
 
   grid-column: 1;
   grid-row: 1;
-}
-
-#footer-container {
-  grid-column: 1;
-  grid-row: 2;
 }
 
 #draft-toolbar {
@@ -555,20 +524,6 @@ export default {
   padding: 0.2rem;
   padding-left: 0.4rem;
   padding-right: 0.4rem;
-}
-
-.number-chip {
-  display: inline-flex;
-  border: 2px solid #ff5722;
-  background-color: white;
-  color: #ff5722;
-  border-radius: 2rem;
-  line-height: 2rem;
-  font-weight: bold;
-  font-size: 2rem;
-  padding: 0.4rem;
-  padding-left: 0.8rem;
-  padding-right: 0.9rem;
 }
 
 #top-level-container {
