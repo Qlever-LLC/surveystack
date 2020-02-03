@@ -108,18 +108,26 @@ export const exampleSubmission = {
   data: {
     favorite_color: {
       value: 'blue',
-      type: 'string',
+      meta: {
+        type: 'string',
+      },
     },
     personal_group: {
       full_name: {
         value: 'Andreas Rudolf',
-        type: 'string',
+        meta: {
+          type: 'string',
+        },
       },
       age: {
         value: 35,
-        type: 'number',
+        meta: {
+          type: 'number',
+        },
       },
-      type: 'group',
+      meta: {
+        type: 'group',
+      },
     },
   },
 };
