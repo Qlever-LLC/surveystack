@@ -6,7 +6,6 @@ import Test from '@/views/Test.vue';
 import MySurveys from '@/views/surveys/MySurveys.vue';
 import SurveysBrowse from '@/views/surveys/Browse.vue';
 import DraftSubmission from '@/views/submissions/drafts/Draft.vue';
-import DraftSurveyResult from '@/views/surveys/collect/drafts/_result_id.vue';
 import SubmissionDraftsList from '@/views/submissions/drafts/List.vue';
 
 import Login from '@/views/auth/Login.vue';
@@ -85,11 +84,6 @@ const routes = [
     path: '/submissions/drafts/:id',
     name: 'submissions-drafts-detail',
     component: DraftSubmission,
-  },
-  {
-    path: '/mock',
-    name: 'mock',
-    component: DraftSurveyResult,
   },
   {
     path: '/auth/login',

@@ -7,12 +7,12 @@ export const defaultControlOptions = {
 };
 
 export const availableControls = [
-  { name: 'text', label: 'Enter some text', type: 'inputText' },
-  { name: 'numeric', label: 'Enter a number', type: 'inputNumeric' },
+  { name: 'text', label: 'Enter some text', type: 'string' },
+  { name: 'number', label: 'Enter a number', type: 'number' },
   {
     name: 'group', label: 'My group', type: 'group', children: [],
   },
   {
-    name: 'location', label: 'Pick Location', type: 'inputLocation',
+    name: 'location', label: 'Pick Location', type: 'location',
   },
 ];

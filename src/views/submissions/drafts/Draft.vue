@@ -85,7 +85,7 @@
                 v-if="!atEnd"
                 class="tall"
                 :key="breadcrumbs.join('.')"
-                :is="control.type"
+                :is="componentName"
                 :control="control"
                 :value="value"
                 @eval="eval"
@@ -136,10 +136,11 @@
 import _ from 'lodash';
 import api from '@/services/api.service';
 
-import inputText from '@/components/survey/question_types/TextInput.vue';
-import inputNumeric from '@/components/survey/question_types/NumberInput.vue';
-import inputLocation from '@/components/survey/question_types/Map.vue';
-import group from '@/components/survey/question_types/Group.vue';
+import appControlString from '@/components/survey/question_types/String.vue';
+import appControlNumber from '@/components/survey/question_types/Number.vue';
+import appControlLocation from '@/components/survey/question_types/Location.vue';
+import appControlGroup from '@/components/survey/question_types/Group.vue';
+
 import draftOverview from '@/components/survey/DraftOverview.vue';
 import draftFooter from '@/components/survey/DraftFooter.vue';
 import appMixin from '@/components/mixin/appCoomponent.mixin';
@@ -160,10 +161,10 @@ import {
 export default {
   mixins: [appMixin],
   components: {
-    inputText,
-    inputNumeric,
-    inputLocation,
-    group,
+    appControlString,
+    appControlNumber,
+    appControlLocation,
+    appControlGroup,
     draftOverview,
     draftFooter,
   },
@@ -222,16 +223,16 @@ export default {
         this.positions[this.index],
       );
     },
-    example() {
-      return {
-        hello: 'world',
-      };
-    },
     draftId() {
       return this.$route.params && this.$route.params.id;
     },
     surveyId() {
       return this.$route.query && this.$route.query.survey;
+    },
+    componentName() {
+      let { type } = this.control;
+      type = type.charAt(0).toUpperCase() + type.slice(1);
+      return `appControl${type}`;
     },
   },
   methods: {
