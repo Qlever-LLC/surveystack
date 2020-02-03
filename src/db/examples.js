@@ -14,7 +14,7 @@ export const exampleSurvey = {
         {
           name: 'favorite_color',
           label: 'What is your favorite color?',
-          type: 'inputText',
+          type: 'string',
           options: {
             readOnly: false,
             required: false,
@@ -31,7 +31,7 @@ export const exampleSurvey = {
             {
               name: 'full_name',
               label: 'Full Name',
-              type: 'inputText',
+              type: 'string',
               options: {
                 readOnly: false,
                 required: false,
@@ -43,7 +43,7 @@ export const exampleSurvey = {
             {
               name: 'age',
               label: 'Age',
-              type: 'inputNumeric',
+              type: 'number',
               options: {
                 readOnly: false,
                 required: false,
@@ -66,7 +66,7 @@ export const exampleSurvey = {
   ],
 };
 
-export const exampleSubmission = {
+export const exampleSubmissionDep = {
   _id: new ObjectId('5e303982ea0cf40001aef63c'),
   survey: new ObjectId('5e3038dbea0cf40001aef63b'),
   meta: {
@@ -96,4 +96,29 @@ export const exampleSubmission = {
       ],
     },
   ],
+};
+
+export const exampleSubmission = {
+  _id: new ObjectId('5e303982ea0cf40001aef63c'),
+  survey: new ObjectId('5e3038dbea0cf40001aef63b'),
+  meta: {
+    dateCreated: new Date('2020-01-28T13:39:14.544Z'),
+    version: 1,
+  },
+  data: {
+    favorite_color: {
+      value: 'blue',
+      type: 'inputText',
+    },
+    personal_group: {
+      full_name: {
+        value: 'Andreas Rudolf',
+        type: 'inputText',
+      },
+      age: {
+        value: 35,
+        type: 'inputNumber',
+      },
+    },
+  },
 };
