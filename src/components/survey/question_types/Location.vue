@@ -6,7 +6,7 @@
       color="gray"
       class="body-1 font-weight-n pa-2 px-4 mt-0"
       style="width: 100%"
-    >{{ control.label }}</v-card>
+    > {{ control.label }}</v-card>
 
     <div
       id="map-container"
@@ -20,9 +20,11 @@
         >{{ currentLocation.label }}</app-gps>
       </div>
       <div
+        style="background-color: #000"
         id="map-question"
         v-if="!mapError"
       >
+
         <img
           v-if="!this.value"
           id="map-marker"
@@ -263,19 +265,23 @@ export default {
   mounted() {
     console.log(`mounted, ${this.map}`);
 
-    mapboxgl.accessToken = 'pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA';
-    this.map = new mapboxgl.Map({
-      container: 'map-question',
-      style: 'mapbox://styles/mapbox/satellite-v9',
-      // center: [8.311068, 47.462507],
-      zoom: 15,
+    this.$nextTick(() => {
+      console.log('loading map');
+      mapboxgl.accessToken = 'pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA';
+      this.map = new mapboxgl.Map({
+        container: 'map-question',
+        style: 'mapbox://styles/mapbox/satellite-v9',
+        // center: [8.311068, 47.462507],
+        zoom: 15,
+      });
+
+      this.handleMap(this.map, this.value);
+      if (!this.value) {
+        console.log('hiding next');
+        this.hideNext();
+      }
     });
 
-    this.handleMap(this.map, this.value);
-    if (!this.value) {
-      console.log('hiding next');
-      this.hideNext();
-    }
     requestWakeLock();
 
     if (navigator.geolocation) {

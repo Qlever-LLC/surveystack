@@ -1,79 +1,85 @@
 
 <template>
   <div id="relative-wrapper">
-    <div id="draft-root">
-      <div
-        id="draft-container"
-        :key="'container-'+index"
-        v-if="submission && survey"
-        style="border-right: 1px solid #AAA; border-left: 1px solid #AAA"
-      >
-        <draft-toolbar
-          :showOverview="showOverview"
-          :showOverViewIcon="!atEnd"
-          :questionNumber="questionNumber"
-          v-if="!showOverview && index < positions.length"
-          @showOverviewClicked="showOverview = !showOverview"
-        />
-        <draft-title
-          v-if="!showOverview && index < positions.length"
-          :breadcrumbs="mbreadcrumbs"
-        />
 
+    <div
+      id="draft-container"
+      v-if="submission && survey"
+      style="border-right: 1px solid #AAA; border-left: 1px solid #AAA"
+    >
+      <draft-toolbar
+        :showOverview="showOverview"
+        :showOverviewIcon="!atEnd"
+        :questionNumber="questionNumber"
+        v-if="!showOverview && index < positions.length"
+        @showOverviewClicked="showOverview = !showOverview"
+      />
+      <draft-title
+        v-if="!showOverview && index < positions.length"
+        :breadcrumbs="mbreadcrumbs"
+      />
+
+      <div style="position: relative; width: 100%; height: 100%;">
         <transition :name="slide">
-          <v-container
-            id="draft-body"
-            style="max-width: 800px; height: 100%;"
+          <div
+            id="transition-container"
+            :key="'container-'+index"
           >
-            <v-row
-              class="flex-grow-0 flex-shrink-1 pl-2 pr-2"
-              v-if="!atOverview"
+            <v-container
+              id="draft-body"
+              style="max-width: 800px; height: 100%;"
             >
+              <v-row
+                class="flex-grow-0 flex-shrink-1 pl-2 pr-2"
+                v-if="!atOverview"
+              >
 
-            </v-row>
+              </v-row>
 
-            <v-row
-              justify="center"
-              align="center"
-              class="px-2"
-              style="height: 100%; margin-left: 0px; margin-right: 0px;"
-            >
-              <component
-                v-if="!atEnd"
-                class="tall"
-                :key="breadcrumbs.join('.')"
-                :is="componentName"
-                :control="control"
-                :value="value"
-                @eval="eval"
-                @changed="setValue"
-                @show-nav="showNav(true)"
-                @hide-nav="showNav(false)"
-                @next="handleNext"
-                @show-next="showNext(true)"
-                @hide-next="showNext(false)"
-              />
-            </v-row>
-          </v-container>
+              <v-row
+                justify="center"
+                align="center"
+                class="px-2"
+                style="height: 100%; margin-left: 0px; margin-right: 0px;"
+              >
+                <component
+                  v-if="!atEnd"
+                  class="tall"
+                  :key="'question_'+index"
+                  :is="componentName"
+                  :control="control"
+                  :value="value"
+                  @eval="eval"
+                  @changed="setValue"
+                  @show-nav="showNav(true)"
+                  @hide-nav="showNav(false)"
+                  @next="handleNext"
+                  @show-next="showNext(true)"
+                  @hide-next="showNext(false)"
+                />
+              </v-row>
+            </v-container>
+          </div>
         </transition>
       </div>
-      <v-navigation-drawer
-        v-if="survey"
-        id="navigation-container"
-        v-model="showOverview"
-        clipped
-        right
-        touchless
-        stateless
-      >
-        <draft-overview
-          :survey="survey"
-          :submission="submission"
-          :position="this.positions[this.index]"
-          @navigate="(pos) => navigate(pos)"
-        ></draft-overview>
-      </v-navigation-drawer>
     </div>
+
+    <v-navigation-drawer
+      v-if="survey"
+      id="navigation-container"
+      v-model="showOverview"
+      clipped
+      right
+      touchless
+      stateless
+    >
+      <draft-overview
+        :survey="survey"
+        :submission="submission"
+        :position="this.positions[this.index]"
+        @navigate="(pos) => navigate(pos)"
+      ></draft-overview>
+    </v-navigation-drawer>
 
     <draft-footer
       class="px-4"
@@ -404,7 +410,6 @@ export default {
 
 <style scoped>
 #relative-wrapper {
-  position: absolute;
   max-width: 100%;
   height: 100%;
   width: 100%;
@@ -422,29 +427,20 @@ export default {
   left: 0px;
 }
 
-#draft-root {
-  position: absolute;
-  max-width: 100vw;
-  height: calc(100% - 68px - 56px);
-  overflow: auto;
-  overflow-x: hidden;
-  width: 100vw;
-  margin: 0px;
-  padding: 0px !important;
-
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 1fr auto;
-}
-
 #draft-container {
-  position: relative;
-  height: 100%;
+  position: fixed;
   width: 100%;
   margin: 0px;
   padding: 0px !important;
-  max-height: 100%;
   overflow: auto;
+  overflow-x: hidden;
+  bottom: 68px;
+  top: 56px;
+  left: 0px;
+  /*
+  height: calc(100% - 68px - 56px);
+  max-height: calc(100% - 68px - 56px);
+  */
 
   grid-column: 1;
   grid-row: 1;
@@ -456,12 +452,13 @@ export default {
 }
 
 #navigation-container {
-  position: relative;
+  position: fixed;
   width: 100% !important;
   z-index: 4;
-  max-height: 100%;
+  margin-top: 56px;
+  height: calc(100% - 68px - 56px);
+  max-height: calc(100% - 68px - 56px);
   overflow: auto;
-
   grid-column: 1;
   grid-row: 1;
 }
@@ -477,10 +474,20 @@ export default {
 }
 
 #draft-body {
+  will-change: transform;
   max-height: 100%;
   overflow: auto;
   grid-column: 1;
   grid-row: 3;
+}
+
+#transition-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-left: 1px solid #aaa;
+  border-right: 1px solid #aaa;
+  will-change: transform;
 }
 </style>
 
@@ -536,18 +543,16 @@ export default {
 }
 
 .slide-in-enter {
-  transform: translate3d(100vw, 0, 0);
+  transform: translateX(100vw);
 }
 .slide-in-leave-to {
-  position: fixed;
-  transform: translate3d(-100vw, 0, 0);
+  transform: translateX(-100vw);
 }
 .slide-in-leave {
-  transform: translate3d(0%, 0, 0);
+  transform: translateX(0);
 }
 .slide-in-enter-to {
-  position: fixed;
-  transform: translate3d(0%, 0, 0);
+  transform: translateX(0);
 }
 
 .slide-out-enter-active,
@@ -556,18 +561,16 @@ export default {
 }
 
 .slide-out-enter {
-  transform: translate3d(-100vw, 0, 0);
+  transform: translateX(-100vw);
 }
 .slide-out-leave-to {
-  position: fixed;
-  transform: translate3d(100vw, 0, 0);
+  transform: translateX(100vw);
 }
 .slide-out-leave {
-  transform: translate3d(0%, 0, 0);
+  transform: translateX(0);
 }
 .slide-out-enter-to {
-  position: fixed;
-  transform: translate3d(0%, 0, 0);
+  transform: translateX(0);
 }
 </style>
 
