@@ -24,8 +24,9 @@ export default {
 <style scoped>
 </style>
 <style>
+/* this will avoid having to scroll down to see the footer */
+
 /*
-this will avoid having to scroll down to see the footer
 #app,
 #app > div {
   height: 100% !important;

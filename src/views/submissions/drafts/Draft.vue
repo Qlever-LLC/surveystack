@@ -425,7 +425,7 @@ export default {
 #draft-root {
   position: absolute;
   max-width: 100vw;
-  height: calc(100% - 110px);
+  height: calc(100% - 68px - 56px);
   overflow: auto;
   overflow-x: hidden;
   width: 100vw;
