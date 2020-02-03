@@ -1,52 +1,25 @@
 <template>
-  <div
-    id="screen-root"
-    style="width: 100%; height: 100%; padding: 0px !important; margin: 0px;"
-  >
-    <div
-      class="dflex pa-4 align-center"
-      j
-      style="width: 100%"
-    >
-      <v-btn
-        dark
-        primary
-        color="blue"
-        large
-        @click="show=!show"
-      > show</v-btn>
-    </div>
-    <transition :name="slide">
-      <v-container
-        :key="show"
-        style="position: absolute; will-change: transform"
-        fluid
-        height="100%"
-      >
-        <v-alert
-          v-if="show"
-          class="ma-10 pa-12"
-          dark
-          color="red"
-          prominent
-        >Hello</v-alert>
-
-        <v-alert
-          v-else
-          class="ma-10 pa-12"
-          dark
-          color="green"
-          prominent
-        >Hello</v-alert>
-      </v-container>
-    </transition>
+  <div id="root">
+    <div id="header"></div>
+    <div id="content"></div>
+    <draft-footer
+      id="footer"
+      showPrev="true"
+      enableNext="false"
+      showSubmit="false"
+      showNav="true"
+    />
   </div>
 </template>
 
 <script>
 
+import draftFooter from '@/components/survey/drafts/DraftFooter.vue';
+
+
 export default {
   components: {
+    draftFooter,
   },
   data() {
     return ({
@@ -58,43 +31,30 @@ export default {
 </script>
 
 <style scoped>
-.slide-in-enter-active,
-.slide-in-leave-active {
-  transition: all 0.5s;
+#root {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  padding: 0px;
+  margin: 0px;
+  left: 0;
+  top: 0;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
 }
 
-.slide-in-enter {
-  transform: translateX(100vw);
+#root > div {
+  grid-column: 1;
 }
-.slide-in-leave-to {
-  position: fixed;
-  transform: translateX(-100vw);
+#header {
+  grid-row: 1;
 }
-.slide-in-leave {
-  transform: translateX(0%);
+#content {
+  grid-row: 2;
 }
-.slide-in-enter-to {
-  position: fixed;
-  transform: translateX(0%);
-}
-
-.slide-out-enter-active,
-.slide-out-leave-active {
-  transition: all 0.5s;
-}
-
-.slide-out-enter {
-  transform: translateX(-100vw);
-}
-.slide-out-leave-to {
-  position: fixed;
-  transform: translateX(100vw);
-}
-.slide-out-leave {
-  transform: translateX(0%);
-}
-.slide-out-enter-to {
-  position: fixed;
-  transform: translateX(0%);
+#footer {
+  grid-row: 3;
 }
 </style>

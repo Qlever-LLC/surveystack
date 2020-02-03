@@ -49,7 +49,7 @@
 
 import _ from 'lodash';
 import colors from 'vuetify/lib/util/colors';
-import appMixin from '@/components/mixin/appCoomponent.mixin';
+import appMixin from '@/components/mixin/appComponent.mixin';
 import { linearControls } from '@/utils/surveys';
 
 const states = {
