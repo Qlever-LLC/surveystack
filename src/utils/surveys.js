@@ -15,7 +15,7 @@ export const mockSurvey = {
     {
       name: 'name',
       label: 'What is your name?',
-      type: 'inputText',
+      type: 'string',
       options: {
         readOnly: false,
         required: false,
@@ -27,7 +27,7 @@ export const mockSurvey = {
     {
       name: 'age',
       label: 'What is your age?',
-      type: 'inputNumeric',
+      type: 'number',
       options: {
         readOnly: false,
         required: false,
@@ -44,7 +44,7 @@ export const mockSurvey = {
         {
           name: 'medication',
           label: 'What medication do you use?',
-          type: 'inputText',
+          type: 'text',
           options: {
             readOnly: false,
             required: false,
@@ -61,7 +61,7 @@ export const mockSurvey = {
             {
               name: 'vision',
               label: 'What is your vision?',
-              type: 'inputNumeric',
+              type: 'number',
               options: {
                 readOnly: false,
                 required: false,
@@ -73,7 +73,7 @@ export const mockSurvey = {
             {
               name: 'time_mile',
               label: 'How long do run one mile?',
-              type: 'inputText',
+              type: 'string',
               options: {
                 readOnly: false,
                 required: false,
@@ -108,7 +108,7 @@ export const mockSurvey = {
         {
           name: 'sports',
           label: 'What sports do you watch?',
-          type: 'inputText',
+          type: 'string',
           options: {
             readOnly: false,
             required: false,
@@ -120,7 +120,7 @@ export const mockSurvey = {
         {
           name: 'consoles',
           label: 'Which consoles do you own?',
-          type: 'inputText',
+          type: 'string',
           options: {
             readOnly: false,
             required: false,
@@ -141,7 +141,7 @@ export const mockSurvey = {
     {
       name: 'goodbye',
       label: 'Say goodbye',
-      type: 'inputText',
+      type: 'string',
       options: {
         readOnly: false,
         required: false,
@@ -160,7 +160,7 @@ const mockInstance = {
     {
       name: 'hello',
       label: 'How do you say hello?',
-      type: 'inputText',
+      type: 'string',
       value: 'Grüezi',
     },
     {
@@ -171,7 +171,7 @@ const mockInstance = {
         {
           name: 'text_0',
           label: 'Enter some text 0',
-          type: 'inputText',
+          type: 'string',
           value: 'This is completely random',
         },
         {
@@ -182,7 +182,7 @@ const mockInstance = {
             {
               name: 'numeric_1',
               label: 'Enter a number 1',
-              type: 'inputNumeric',
+              type: 'number',
               value: 17,
             },
           ],
@@ -239,10 +239,10 @@ function* processJsDoc(data, namespace = 'data') {
       case 'group':
         type = 'Object';
         break;
-      case 'inputNumeric':
+      case 'number':
         type = 'number';
         break;
-      case 'inputText':
+      case 'string':
         type = 'string';
         break;
       default:

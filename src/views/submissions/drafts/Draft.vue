@@ -25,21 +25,35 @@
             id="draft-body"
             style="max-width: 800px; height: 100%;"
           >
-            <component
-              v-if="!atEnd"
-              class="tall"
-              :key="breadcrumbs.join('.')"
-              :is="control.type"
-              :control="control"
-              :value="value"
-              @eval="eval"
-              @changed="setValue"
-              @show-nav="showNav(true)"
-              @hide-nav="showNav(false)"
-              @next="handleNext"
-              @show-next="showNext(true)"
-              @hide-next="showNext(false)"
-            />
+            <v-row
+              class="flex-grow-0 flex-shrink-1 pl-2 pr-2"
+              v-if="!atOverview"
+            >
+
+            </v-row>
+
+            <v-row
+              justify="center"
+              align="center"
+              class="px-2"
+              style="height: 100%; margin-left: 0px; margin-right: 0px;"
+            >
+              <component
+                v-if="!atEnd"
+                class="tall"
+                :key="breadcrumbs.join('.')"
+                :is="componentName"
+                :control="control"
+                :value="value"
+                @eval="eval"
+                @changed="setValue"
+                @show-nav="showNav(true)"
+                @hide-nav="showNav(false)"
+                @next="handleNext"
+                @show-next="showNext(true)"
+                @hide-next="showNext(false)"
+              />
+            </v-row>
           </v-container>
         </transition>
       </div>
@@ -80,10 +94,11 @@
 import _ from 'lodash';
 import api from '@/services/api.service';
 
-import inputText from '@/components/survey/question_types/TextInput.vue';
-import inputNumeric from '@/components/survey/question_types/NumberInput.vue';
-import inputLocation from '@/components/survey/question_types/Map.vue';
-import group from '@/components/survey/question_types/Group.vue';
+import appControlString from '@/components/survey/question_types/String.vue';
+import appControlNumber from '@/components/survey/question_types/Number.vue';
+import appControlLocation from '@/components/survey/question_types/Location.vue';
+import appControlGroup from '@/components/survey/question_types/Group.vue';
+
 import draftOverview from '@/components/survey/drafts/DraftOverview.vue';
 import draftFooter from '@/components/survey/drafts/DraftFooter.vue';
 import draftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
@@ -107,10 +122,10 @@ import {
 export default {
   mixins: [appMixin],
   components: {
-    inputText,
-    inputNumeric,
-    inputLocation,
-    group,
+    appControlString,
+    appControlNumber,
+    appControlLocation,
+    appControlGroup,
     draftOverview,
     draftFooter,
     draftToolbar,
@@ -171,16 +186,16 @@ export default {
         this.positions[this.index],
       );
     },
-    example() {
-      return {
-        hello: 'world',
-      };
-    },
     draftId() {
       return this.$route.params && this.$route.params.id;
     },
     surveyId() {
       return this.$route.query && this.$route.query.survey;
+    },
+    componentName() {
+      let { type } = this.control;
+      type = type.charAt(0).toUpperCase() + type.slice(1);
+      return `appControl${type}`;
     },
   },
   methods: {
