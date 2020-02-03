@@ -1,131 +1,133 @@
 
 <template>
-  <div id="draft-root">
-    <transition :name="slide">
-      <div
-        id="draft-container"
-        :key="'container-'+index"
-        v-if="submission && survey"
-      >
-        <v-toolbar
-          color="grey lighten-4"
-          class="flex-grow-0 flex-shrink-0"
-          flat
-          tile
-        >
-          <v-toolbar-title
-            id="draft-toolbar"
-            v-if="!showOverview && index < positions.length"
-          >
-            <div class="infos grey--text text--darken-2">
-              <div class="d-flex">
-                <span class="number-chip mr-2">{{ questionNumber }}</span>
-              </div>
-            </div>
-          </v-toolbar-title>
-
-          <v-spacer></v-spacer>
-
-          <v-btn icon>
-            <v-icon>mdi-magnify</v-icon>
-          </v-btn>
-
-          <v-btn
-            icon
-            v-if="!atEnd"
-            @click="showOverview = !showOverview"
-          >
-            <v-icon>mdi-view-list</v-icon>
-          </v-btn>
-
-          <v-btn icon>
-            <v-icon>mdi-dots-vertical</v-icon>
-          </v-btn>
-        </v-toolbar>
-
+  <div id="relative-wrapper">
+    <div id="draft-root">
+      <transition :name="slide">
         <div
-          class="px-4"
-          id="draft-breadcrumbs"
-          v-show="!showOverview && index < positions.length"
+          id="draft-container"
+          :key="'container-'+index"
+          v-if="submission && survey"
         >
-          <v-chip
-            dark
-            small
-            color="red"
-            class="mr-0 mr-1"
-            v-if="mbreadcrumbs.length > 0"
-          ><span
-              v-for="(crumb, ci) in mbreadcrumbs"
-              :key="`bread_${ci}`"
-            >{{ crumb }} <span
-                class="mr-1"
-                v-if="ci < mbreadcrumbs.length - 1"
-              >&gt;</span></span></v-chip>
-        </div>
-
-        <v-container
-          id="draft-body"
-          style="max-width: 800px;"
-        >
-          <v-row
-            class="flex-grow-0 flex-shrink-1 pl-2 pr-2"
-            v-if="!atOverview"
+          <v-toolbar
+            color="grey lighten-4"
+            class="flex-grow-0 flex-shrink-0"
+            flat
+            tile
           >
+            <v-toolbar-title
+              id="draft-toolbar"
+              v-if="!showOverview && index < positions.length"
+            >
+              <div class="infos grey--text text--darken-2">
+                <div class="d-flex">
+                  <span class="number-chip mr-2">{{ questionNumber }}</span>
+                </div>
+              </div>
+            </v-toolbar-title>
 
-          </v-row>
+            <v-spacer></v-spacer>
 
-          <v-row
-            justify="center"
-            align="center"
-            class="px-2"
-            style="height: 100%; margin-left: 0px; margin-right: 0px;"
-          >
-            <component
+            <v-btn icon>
+              <v-icon>mdi-magnify</v-icon>
+            </v-btn>
+
+            <v-btn
+              icon
               v-if="!atEnd"
-              class="tall"
-              :key="breadcrumbs.join('.')"
-              :is="control.type"
-              :control="control"
-              :value="value"
-              @eval="eval"
-              @changed="setValue"
-              @show-nav="showNav(true)"
-              @hide-nav="showNav(false)"
-              @next="handleNext"
-              @show-next="showNext(true)"
-              @hide-next="showNext(false)"
-            />
-          </v-row>
-        </v-container>
-      </div>
-    </transition>
-    <v-navigation-drawer
-      v-if="survey"
-      id="navigation-container"
-      v-model="showOverview"
-      clipped
-      right
-      touchless
-      stateless
-    >
-      <draft-overview
-        :survey="survey"
-        :submission="submission"
-        :position="this.positions[this.index]"
-        @navigate="(pos) => navigate(pos)"
-      ></draft-overview>
-    </v-navigation-drawer>
+              @click="showOverview = !showOverview"
+            >
+              <v-icon>mdi-view-list</v-icon>
+            </v-btn>
 
-    <draft-footer
-      id="footer-container"
-      :showPrev="!atStart"
-      :enableNext="mShowNext"
-      :showSubmit="atEnd"
-      :showNav="mShowNav"
-      @next="handleNext"
-      @prev="handlePrevious"
-      @submit="handleNext"
-    />
+            <v-btn icon>
+              <v-icon>mdi-dots-vertical</v-icon>
+            </v-btn>
+          </v-toolbar>
+
+          <div
+            class="px-4"
+            id="draft-breadcrumbs"
+            v-show="!showOverview && index < positions.length"
+          >
+            <v-chip
+              dark
+              small
+              color="red"
+              class="mr-0 mr-1"
+              v-if="mbreadcrumbs.length > 0"
+            ><span
+                v-for="(crumb, ci) in mbreadcrumbs"
+                :key="`bread_${ci}`"
+              >{{ crumb }} <span
+                  class="mr-1"
+                  v-if="ci < mbreadcrumbs.length - 1"
+                >&gt;</span></span></v-chip>
+          </div>
+
+          <v-container
+            id="draft-body"
+            style="max-width: 800px;"
+          >
+            <v-row
+              class="flex-grow-0 flex-shrink-1 pl-2 pr-2"
+              v-if="!atOverview"
+            >
+
+            </v-row>
+
+            <v-row
+              justify="center"
+              align="center"
+              class="px-2"
+              style="height: 100%; margin-left: 0px; margin-right: 0px;"
+            >
+              <component
+                v-if="!atEnd"
+                class="tall"
+                :key="breadcrumbs.join('.')"
+                :is="control.type"
+                :control="control"
+                :value="value"
+                @eval="eval"
+                @changed="setValue"
+                @show-nav="showNav(true)"
+                @hide-nav="showNav(false)"
+                @next="handleNext"
+                @show-next="showNext(true)"
+                @hide-next="showNext(false)"
+              />
+            </v-row>
+          </v-container>
+        </div>
+      </transition>
+      <v-navigation-drawer
+        v-if="survey"
+        id="navigation-container"
+        v-model="showOverview"
+        clipped
+        right
+        touchless
+        stateless
+      >
+        <draft-overview
+          :survey="survey"
+          :submission="submission"
+          :position="this.positions[this.index]"
+          @navigate="(pos) => navigate(pos)"
+        ></draft-overview>
+      </v-navigation-drawer>
+
+      <draft-footer
+        id="footer-container"
+        :showPrev="!atStart"
+        :enableNext="mShowNext"
+        :showSubmit="atEnd"
+        :showNav="mShowNav"
+        @next="handleNext"
+        @prev="handlePrevious"
+        @submit="handleNext"
+      />
+    </div>
   </div>
 </template>
 
@@ -440,8 +442,19 @@ export default {
 </script>
 
 <style scoped>
+#relative-wrapper {
+  position: absolute;
+  max-width: 100%;
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  padding: 0px !important;
+  min-height: 100%;
+}
+
 #draft-root {
   position: absolute;
+  max-width: 100%;
   height: 100%;
   width: 100%;
   margin: 0px;
