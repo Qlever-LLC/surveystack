@@ -49,6 +49,7 @@
                   :is="componentName"
                   :control="control"
                   :value="value"
+                  :index="index"
                   @eval="eval"
                   @changed="setValue"
                   @show-nav="showNav(true)"
@@ -486,7 +487,6 @@ export default {
   width: 100%;
   height: 100%;
   border-left: 1px solid #aaa;
-  border-right: 1px solid #aaa;
   will-change: transform;
 }
 </style>
@@ -539,7 +539,8 @@ export default {
 
 .slide-in-enter-active,
 .slide-in-leave-active {
-  transition: all 0.5s;
+  transition: all 0.3s;
+  transition-timing-function: ease-in-out;
 }
 
 .slide-in-enter {
@@ -557,7 +558,8 @@ export default {
 
 .slide-out-enter-active,
 .slide-out-leave-active {
-  transition: all 0.5s;
+  transition: all 0.3s;
+  transition-timing-function: ease-in-out;
 }
 
 .slide-out-enter {

@@ -21,7 +21,8 @@
       </div>
       <div
         style="background-color: #000"
-        id="map-question"
+        :id="`map-question-${index}`"
+        class="map-question"
         v-if="!mapError"
       >
 
@@ -265,22 +266,25 @@ export default {
   mounted() {
     console.log(`mounted, ${this.map}`);
 
-    this.$nextTick(() => {
-      console.log('loading map');
-      mapboxgl.accessToken = 'pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA';
-      this.map = new mapboxgl.Map({
-        container: 'map-question',
-        style: 'mapbox://styles/mapbox/satellite-v9',
-        // center: [8.311068, 47.462507],
-        zoom: 15,
-      });
+    setTimeout(() => {
 
-      this.handleMap(this.map, this.value);
-      if (!this.value) {
-        console.log('hiding next');
-        this.hideNext();
-      }
+    }, 2000);
+
+    console.log('loading map', this.index);
+    mapboxgl.accessToken = 'pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA';
+    this.map = new mapboxgl.Map({
+      container: `map-question-${this.index}`,
+      style: 'mapbox://styles/mapbox/satellite-v9',
+      // center: [8.311068, 47.462507],
+      zoom: 15,
     });
+
+    this.handleMap(this.map, this.value);
+    if (!this.value) {
+      console.log('hiding next');
+      this.hideNext();
+    }
+
 
     requestWakeLock();
 
@@ -352,7 +356,7 @@ export default {
   grid-row: 3;
 }
 
-#map-question {
+.map-question {
   left: 0px;
   top: 0px;
   position: absolute;

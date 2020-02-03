@@ -2,6 +2,7 @@ export default {
   props: {
     control: { type: Object, required: true },
     value: { required: true },
+    index: { required: true },
   },
   computed: {
     // value() {
