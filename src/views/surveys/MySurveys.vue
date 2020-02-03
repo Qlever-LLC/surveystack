@@ -1,13 +1,15 @@
 <template>
   <v-container style="height: 100%">
-    <v-container
-      style="height: 100%"
-      class="ma-0 pa-0 mt-n4 pt-4 d-flex"
-    >
+    <v-container>
       <v-row class="d-flex flex-grow-1">
         <v-tabs
+          dark
+          flat
+          background-color="red"
           v-model="activeTab"
-          class="flex-grow-0"
+          centered
+          icons-and-text
+          grow
         >
           <v-tab
             v-for="tab in tabs"
@@ -15,6 +17,7 @@
             :href="`#${tab.name}`"
           >
             {{ tab.title }}
+            <v-icon>{{ tab.icon }}</v-icon>
           </v-tab>
         </v-tabs>
         <v-tabs-items
@@ -113,16 +116,20 @@ export default {
           name: 'drafts',
           title: 'Drafts',
           content: this.$store.getters['submissions/drafts'],
+          icon: 'mdi-file-document-edit',
         },
         {
           name: 'outbox',
           title: 'Outbox',
           content: this.$store.getters['submissions/outbox'],
+          icon: 'mdi-cloud-sync',
+
         },
         {
           name: 'sent',
           title: 'Sent',
           content: this.$store.getters['submissions/sent'],
+          icon: 'mdi-email-check',
         },
       ];
     },

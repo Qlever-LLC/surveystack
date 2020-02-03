@@ -539,8 +539,7 @@ export default {
 
 .slide-in-enter-active,
 .slide-in-leave-active {
-  transition: all 0.3s;
-  transition-timing-function: ease-in-out;
+  transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);;
 }
 
 .slide-in-enter {
@@ -558,8 +557,7 @@ export default {
 
 .slide-out-enter-active,
 .slide-out-leave-active {
-  transition: all 0.3s;
-  transition-timing-function: ease-in-out;
+  transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);;
 }
 
 .slide-out-enter {

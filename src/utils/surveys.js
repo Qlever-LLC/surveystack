@@ -402,17 +402,21 @@ export const getPosition = (control, controls) => {
   return null;
 };
 
-export const insertControl = (control, controls, position) => {
+export const insertControl = (control, controls, position, selectedControlIsGroup) => {
   let currentControl;
   let currentControls = controls;
   let index = position[0];
 
+  let exit = false;
 
   for (let i = 0; i < position.length; i++) {
     currentControl = currentControls[position[i]];
     index = position[i];
     if (currentControl.type === 'group') {
-      if (i === position.length - 1) {
+      if (exit || control.type === 'group') {
+        break;
+      } if (i === position.length - 1 && !selectedControlIsGroup) {
+        exit = true;
         break;
       }
       currentControls = currentControl.children;
