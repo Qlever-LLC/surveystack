@@ -1,100 +1,128 @@
 <template>
-  <v-container>
-    <app-dialog
-      v-model="showDeleteModal"
-      @cancel="showDeleteModal = false"
-      @confirm="onDelete"
+  <div>
+    <div
+      dark
+      class="blue-grey darken-2"
+      :class="{ 'editor-visible': showCodeEditor, 'editor-hidden' : !showCodeEditor }"
+      id="builder-editor"
     >
-      <template v-slot:title>Confirm your action</template>
-      <template>
-        Delete survey
-        <strong>{{survey._id}}</strong>
-        for sure?
-      </template>
-    </app-dialog>
-
-    <app-dialog
-      v-model="showConflictModal"
-      @cancel="showConflictModal = false"
-      @confirm="generateId"
+      <monaco-editor v-if="survey" :survey="survey" style="margin: 12px; height: 100%"></monaco-editor>
+    </div>
+    <div
+      id="builder-container"
+      :class="{ 'builder-container-squeeze': showCodeEditor}"
     >
-      <template v-slot:title>Conflict 409</template>
-      <template>
-        A survey with id
-        <strong>{{survey._id}}</strong> already exists. Do you want to generate a different id?
-      </template>
-    </app-dialog>
+      <v-container>
+        <app-dialog
+          v-model="showDeleteModal"
+          @cancel="showDeleteModal = false"
+          @confirm="onDelete"
+        >
+          <template v-slot:title>Confirm your action</template>
+          <template>
+            Delete survey
+            <strong>{{survey._id}}</strong>
+            for sure?
+          </template>
+        </app-dialog>
 
-    <v-snackbar
-      v-model="showSnackbar"
-      :timeout="0"
-    >
-      {{snackbarMessage | capitalize}}
-      <v-btn
-        color="pink"
-        text
-        @click="showSnackbar = false"
-      >Close</v-btn>
-    </v-snackbar>
+        <app-dialog
+          v-model="showConflictModal"
+          @cancel="showConflictModal = false"
+          @confirm="generateId"
+        >
+          <template v-slot:title>Conflict 409</template>
+          <template>
+            A survey with id
+            <strong>{{survey._id}}</strong> already exists. Do you want to generate a different id?
+          </template>
+        </app-dialog>
 
-    <v-row>
-      <v-col cols="7">
-        <div class="mb-2 d-flex justify-space-between align-center">
-          <h1 class="display-1">Survey Builder</h1>
+        <v-snackbar
+          v-model="showSnackbar"
+          :timeout="0"
+        >
+          {{snackbarMessage | capitalize}}
           <v-btn
-            @click="viewCode = !viewCode"
-            color="primary"
-            small
+            color="pink"
             text
-          >{{ viewCode ? "graphical" : "code"}}</v-btn>
-        </div>
+            @click="showSnackbar = false"
+          >Close</v-btn>
+        </v-snackbar>
 
-        <graphical-view
-          v-if="!viewCode"
-          :selected="control"
-          :controls="currentControls"
-          @controlSelected="controlSelected"
-        />
-        <code-view
-          v-else
-          v-model="survey"
-        />
-      </v-col>
-      <v-col cols="5">
-        <div class="sticky-top">
-          <h3>Details</h3>
-          <survey-details
-            v-model="survey"
-            :editMode="editMode"
-            :dirty="dirty"
-            @cancel="onCancel"
-            @submit="onSubmit"
-            @delete="onDelete"
-          />
-          <h3>Add questions</h3>
-          <control-adder @controlAdded="controlAdded" />
-          <h3>Properties</h3>
-          <control-properties
-            :control="control"
-            :survey="survey"
-          />
-        </div>
-      </v-col>
-    </v-row>
-  </v-container>
+        <v-row>
+          <v-col cols="7">
+            <div class="mb-2 d-flex justify-space-between align-center">
+              <v-btn
+                @click="viewCode = !viewCode"
+                color="primary"
+                small
+                text
+              >{{ viewCode ? "graphical" : "code"}}</v-btn>
+            </div>
+
+            <graphical-view
+              v-if="!viewCode"
+              :selected="control"
+              :controls="currentControls"
+              @controlSelected="controlSelected"
+            />
+            <code-view
+              style="font-family: monospace;"
+              v-else
+              v-model="survey"
+            />
+          </v-col>
+          <v-col cols="5">
+            <v-card>
+              <div class="sticky-top pa-4">
+                <v-card-title>Details</v-card-title>
+                <div class="pa-4">
+                  <v-btn
+                    dark
+                    color="blue"
+                    @click="toggleCodeEditor()"
+                  >
+                    <v-icon>mdi-code-braces</v-icon>
+                  </v-btn>
+                </div>
+                <survey-details
+                  v-model="survey"
+                  :editMode="editMode"
+                  :dirty="dirty"
+                  @cancel="onCancel"
+                  @submit="onSubmit"
+                  @delete="onDelete"
+                />
+                <h3>Add questions</h3>
+                <control-adder @controlAdded="controlAdded" />
+                <h3>Properties</h3>
+                <control-properties
+                  :control="control"
+                  :survey="survey"
+                />
+              </div>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </div>
+
+  </div>
 </template>
 
 <script>
 import _ from 'lodash';
-
 import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 
+import monacoEditor from '@/components/ui/Editor.vue';
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import codeView from '@/components/builder/CodeView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
 import controlAdder from '@/components/builder/ControlAdder.vue';
 import surveyDetails from '@/components/builder/SurveyDetails.vue';
+import appMixin from '@/components/mixin/appComponent.mixin';
 
 import appDialog from '@/components/ui/Dialog.vue';
 
@@ -104,7 +132,11 @@ const currentDate = new Date();
 
 
 export default {
+  mixins: [
+    appMixin,
+  ],
   components: {
+    monacoEditor,
     graphicalView,
     codeView,
     controlProperties,
@@ -115,6 +147,7 @@ export default {
   data() {
     return {
       // modes
+      showCodeEditor: true,
       editMode: false,
       dirty: false,
       // ui
@@ -144,6 +177,12 @@ export default {
     };
   },
   methods: {
+    onChange(value) {
+      console.log(value);
+    },
+    toggleCodeEditor() {
+      this.showCodeEditor = !this.showCodeEditor;
+    },
     controlSelected(control) {
       this.control = control;
     },
@@ -155,7 +194,7 @@ export default {
       }
 
       const position = utils.getPosition(this.control, this.currentControls);
-      utils.insertControl(control, this.currentControls, position);
+      utils.insertControl(control, this.currentControls, position, this.control.type === 'group');
       this.control = control;
     },
     onCancel() {
@@ -238,6 +277,11 @@ export default {
     },
   },
   async created() {
+    this.setNavbarContent(
+      {
+        title: 'Survey Builder',
+      },
+    );
     this.editMode = !this.$route.matched.some(
       ({ name }) => name === 'surveys-new',
     );
@@ -263,5 +307,43 @@ export default {
 <style scoped>
 .no-outline {
   outline: none;
+}
+
+#builder-container {
+  overflow-y: auto;
+  position: fixed;
+  height: calc(100% - 56px);
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+  left: 0;
+  right: 0;
+
+  will-change: transform;
+  transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.builder-container-squeeze {
+  right: calc(48px + 50vw) !important;
+}
+
+#builder-editor {
+  width: 50vw;
+  position: fixed;
+  top: 64px;
+  right: 0;
+  bottom: 0;
+  will-change: transform;
+  transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: calc(100% - 64px);
+}
+
+.editor-visible {
+  transform: translateX(0);
+}
+
+.editor-hidden {
+  transform: translateX(100%);
 }
 </style>

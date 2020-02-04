@@ -30,5 +30,8 @@ export const availableControls = [
     toString(value) {
       return `lat: ${value.lat} lon: ${value.lon}`;
     },
+    definition() {
+
+    },
   },
 ];
