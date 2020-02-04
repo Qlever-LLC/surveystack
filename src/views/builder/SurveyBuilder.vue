@@ -247,7 +247,7 @@ export default {
   watch: {
     survey: {
       handler(newVal, oldVal) {
-        this.instance = utils.createInstance(newVal, newVal.latestVersion);
+        this.instance = utils.codeFromSubmission(utils.createInstance(newVal, newVal.latestVersion));
         if (this.dirty || !this.editMode || !this.initialSurvey) {
           return;
         }

@@ -506,6 +506,23 @@ export const flattenSubmission = (submission, delimiter) => {
   return res;
 };
 
+function objectFromChild(child) {
+  const v = {};
+  if (child.type !== 'group') {
+    v[`${child.name}`] = child.value;
+    return v;
+  }
+
+  v[`${child.name}`] = Object.assign({}, ...(child.children.map(c => objectFromChild(c))));
+  return v;
+}
+
+export const codeFromSubmission = (submission) => {
+  console.log(submission.data);
+  const values = Object.assign({}, ...(submission.data.map(d => objectFromChild(d))));
+  return values;
+};
+
 
 export const linearControls = (submission) => {
   const res = [];
