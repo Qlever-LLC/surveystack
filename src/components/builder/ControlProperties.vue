@@ -1,25 +1,59 @@
 <template>
   <div>
     <v-form v-if="control">
-      <v-text-field v-model="control.name" label="Data name" />
-      <v-text-field v-model="control.label" label="Label" />
+      <v-text-field
+        outlined
+        v-model="control.name"
+        label="Data name"
+      />
+      <v-text-field
+        outlined
+        v-model="control.label"
+        label="Label"
+      />
 
-      <div v-if="!showAdvanced" class="d-flex justify-end">
-        <v-btn @click="showAdvanced = true" color="primary" small text>advanced</v-btn>
+      <div
+        v-if="!showAdvanced"
+        class="d-flex justify-end"
+      >
+        <v-btn
+          @click="showAdvanced = true"
+          color="primary"
+          small
+          text
+        >advanced</v-btn>
       </div>
-      <div v-if="showAdvanced" class="mt-2">
+      <div
+        v-if="showAdvanced"
+        class="mt-2"
+      >
         <div class="d-flex justify-space-between">
           <h4 class="d-flex">Advanced Options</h4>
           <v-icon @click.stop="showAdvanced = false">mdi-close</v-icon>
         </div>
 
-        <v-text-field v-model="control.options.calculate" label="Calculate" />
-        <v-text-field v-model="control.options.relevance" label="Show question if" />
+        <v-text-field
+          outlined
+          v-model="control.options.calculate"
+          label="Calculate"
+        />
+        <v-text-field
+          outlined
+          v-model="control.options.relevance"
+          label="Show question if"
+        />
 
         <div class="d-flex justify-content-end">
-          <small>
-            <a @click.prevent="openAdvancedEditor" href="./editor">open in editor...</a>
-          </small>
+          <div class="pa-4">
+            <v-btn
+              dark
+              color="blue"
+              @click="toggleCode()"
+            >
+              Code Editor
+              <v-icon>mdi-code-tags</v-icon>
+            </v-btn>
+          </div>
         </div>
       </div>
     </v-form>
@@ -31,6 +65,9 @@ import { getAdvancedCodeTemplate } from '@/utils/surveys';
 
 export default {
   props: {
+    toggleCode: {
+      required: true,
+    },
     control: {
       required: false,
     },

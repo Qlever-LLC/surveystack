@@ -1,6 +1,19 @@
 <template>
-  <div id="monaco-editor">
+  <div style="width: 100%; height: 100%; min-height: 100%;">
+    <v-tabs
+      dark
+      background-color="dark-blue"
+    >
+      <v-tab @click="showCode">Code</v-tab>
+      <v-tab @click="showSurvey">Survey</v-tab>
+    </v-tabs>
+    <div
+      style="height: 100%"
+      id="monaco-editor"
+    >
+    </div>
   </div>
+
 </template>
 <script>
 
@@ -22,6 +35,8 @@ monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
   allowNonTsExtensions: true,
 });
 
+monaco.languages.typescript.javascriptDefaults.setEagerModelSync(true);
+
 // extra libraries
 const definitions = (survey) => {
   let declaration = 'declare class survey {\n';
@@ -38,7 +53,7 @@ const definitions = (survey) => {
 const jsCode = [
   '',
   'function relevant() {',
-  '        return true;',
+  '\treturn true;',
   '}',
 ].join('\n');
 
@@ -46,7 +61,10 @@ const jsCode = [
 export default {
   data() {
     return {
+      codeState: null,
       editor: null,
+      code: null,
+      library: null,
     };
   },
   props: [
@@ -56,24 +74,43 @@ export default {
     survey: {
       handler(newVal, oldVal) {
         console.log(this.editor);
-        monaco.languages.typescript.javascriptDefaults.setExtraLibs({
-          libs: [[
-            definitions(newVal),
-          ].join('\n'), 'ts:filename/survey.d.ts'],
-        });
-
-        const template = `const structure = ${JSON.stringify(newVal, null, 4)}\n ${jsCode}`;
-
-        this.editor.setValue(template);
+        this.library.setValue(`const survey = ${JSON.stringify(newVal, null, 4)};`);
       },
       deep: true,
     },
 
   },
+  methods: {
+    showSurvey() {
+      if (this.editor.getModel() === this.library) {
+        return;
+      }
+
+      this.editor.updateOptions({ readOnly: true });
+      this.codeState = this.editor.saveViewState();
+      this.editor.setModel(this.library);
+      this.editor.focus();
+    },
+    showCode() {
+      if (this.editor.getModel() === this.code) {
+        return;
+      }
+
+      this.editor.updateOptions({ readOnly: false });
+      this.editor.setModel(this.code);
+      this.editor.restoreViewState(this.codeState);
+      this.editor.focus();
+    },
+  },
   mounted() {
+    this.code = monaco.editor.createModel(jsCode, 'javascript');
+    this.library = monaco.editor.createModel('', 'javascript');
+
     this.editor = monaco.editor.create(document.getElementById('monaco-editor'), {
       theme: 'vs-dark',
       language: 'javascript',
+      model: this.code,
+      automaticLayout: true,
     });
   },
 };

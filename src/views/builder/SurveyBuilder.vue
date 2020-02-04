@@ -6,7 +6,8 @@
       :class="{ 'editor-visible': showCodeEditor, 'editor-hidden' : !showCodeEditor }"
       id="builder-editor"
     >
-      <monaco-editor v-if="survey" :survey="survey" style="margin: 12px; height: 100%"></monaco-editor>
+      <monaco-editor v-if="survey" :survey="survey" style="height: 100%"></monaco-editor>
+
     </div>
     <div
       id="builder-container"
@@ -77,15 +78,6 @@
             <v-card>
               <div class="sticky-top pa-4">
                 <v-card-title>Details</v-card-title>
-                <div class="pa-4">
-                  <v-btn
-                    dark
-                    color="blue"
-                    @click="toggleCodeEditor()"
-                  >
-                    <v-icon>mdi-code-braces</v-icon>
-                  </v-btn>
-                </div>
                 <survey-details
                   v-model="survey"
                   :editMode="editMode"
@@ -98,6 +90,7 @@
                 <control-adder @controlAdded="controlAdded" />
                 <h3>Properties</h3>
                 <control-properties
+                  :toggleCode="toggleCodeEditor"
                   :control="control"
                   :survey="survey"
                 />

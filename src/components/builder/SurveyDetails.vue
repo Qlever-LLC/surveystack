@@ -3,10 +3,12 @@
     <div class="text-left"><small>Version {{version}}</small></div>
     <v-form>
       <v-text-field
+        outlined
         v-model="value.name"
         label="Name"
       />
       <v-text-field
+        outlined
         v-model="value._id"
         label="id"
         disabled
