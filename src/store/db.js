@@ -15,8 +15,10 @@ const groups = [];
 
 let db = null;
 
-const submissionsStoreName = 'submissions';
-const surveyStoreName = 'surveys';
+const stores = {
+  SUBMISSIONS: 'submissions',
+  SURVEYS: 'surveys',
+};
 
 // Opening a Database
 function openDb(onSuccess) {
@@ -42,13 +44,13 @@ function openDb(onSuccess) {
     db = event.target.result;
     // eslint-disable-next-line no-unused-vars
     try {
-      db.createObjectStore(submissionsStoreName, { keyPath: '_id' });
+      db.createObjectStore(stores.SUBMISSIONS, { keyPath: '_id' });
     } catch (error) {
       // ignore
     }
 
     try {
-      db.createObjectStore(surveyStoreName, { keyPath: '_id' });
+      db.createObjectStore(stores.SURVEYS, { keyPath: '_id' });
     } catch (error) {
       // ignore
     }
@@ -75,12 +77,12 @@ function clearObjectStore(storeName) {
   };
 }
 
-function clearAllSurveyResults() {
-  clearObjectStore(submissionsStoreName);
+function clearAllSubmissions() {
+  clearObjectStore(stores.SUBMISSIONS);
 }
 
 function clearAllSurveys() {
-  clearObjectStore(surveyStoreName);
+  clearObjectStore(stores.SURVEYS);
 }
 
 
@@ -102,17 +104,17 @@ function persist(storeName, obj) {
   };
 }
 
-function persistSurveyResult(surveyResult) {
-  persist(submissionsStoreName, surveyResult);
+function persistSubmission(submission) {
+  persist(stores.SUBMISSIONS, submission);
 }
 
 function persistSurvey(survey) {
-  persist(surveyStoreName, survey);
+  persist(stores.SURVEYS, survey);
 }
 
 function getResults(storeName, success) {
   // Create an array
-  const surveyResults = [];
+  const results = [];
   // Get the ObjectStore
   const objectStore = getObjectStore(storeName, 'readwrite');
 
@@ -121,23 +123,23 @@ function getResults(storeName, success) {
     const cursor = event.target.result;
     // If there is a next item, add it to the array
     if (cursor) {
-      surveyResults.push(cursor.value);
+      results.push(cursor.value);
       console.log(cursor.value);
       cursor.continue();
     } else {
-      success(surveyResults);
+      success(results);
     }
   };
 }
 
 // Read All data in ObjectStore
-function getAllSurveyResults(onSuccess) {
-  getResults(submissionsStoreName, onSuccess);
+function getAllSubmissions(onSuccess) {
+  getResults(stores.SUBMISSIONS, onSuccess);
 }
 
 
 function getAllSurveys(onSuccess) {
-  getResults(surveyStoreName, onSuccess);
+  getResults(stores.SURVEYS, onSuccess);
 }
 
 export {
@@ -149,10 +151,10 @@ export {
   groups,
   scripts,
   openDb,
-  persistSurveyResult,
+  persistSubmission,
   persistSurvey,
-  getAllSurveyResults,
-  clearAllSurveyResults,
+  getAllSubmissions,
+  clearAllSubmissions,
   getAllSurveys,
   clearAllSurveys,
 };
