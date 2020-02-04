@@ -6,7 +6,7 @@
       :class="{ 'editor-visible': showCodeEditor, 'editor-hidden' : !showCodeEditor }"
       id="builder-editor"
     >
-      <monaco-editor v-if="survey" :survey="survey" style="height: 100%"></monaco-editor>
+      <monaco-editor v-if="survey" :survey="instance" style="height: 100%"></monaco-editor>
 
     </div>
     <div
@@ -153,6 +153,7 @@ export default {
       control: null,
       // survey entity
       initialSurvey: null,
+      instance: null,
       survey: {
         _id: '',
         name: '',
@@ -246,6 +247,7 @@ export default {
   watch: {
     survey: {
       handler(newVal, oldVal) {
+        this.instance = utils.createInstance(newVal, newVal.latestVersion);
         if (this.dirty || !this.editMode || !this.initialSurvey) {
           return;
         }

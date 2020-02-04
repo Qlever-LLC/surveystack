@@ -487,14 +487,16 @@ export const getInstanceIndex = (survey, position) => {
   return breadcrumbs.join('.');
 };
 
-export const flattenSubmission = (submission) => {
+export const flattenSubmission = (submission, delimiter) => {
+  const delim = delimiter || '.';
+
   const res = {};
   const positions = getControlPositions(submission.data);
   positions.forEach((p) => {
     const control = getControl(submission.data, p);
     const breadcrumbs = getBreadcrumbsForSubmission(submission.data, p);
     if (control.type !== 'group') {
-      const key = breadcrumbs.join('.');
+      const key = breadcrumbs.join(delim);
       res[key] = {
         value: control.value,
         type: control.type,

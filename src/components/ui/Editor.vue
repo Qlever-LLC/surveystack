@@ -61,6 +61,7 @@ const jsCode = [
 export default {
   data() {
     return {
+      libraryState: null,
       codeState: null,
       editor: null,
       code: null,
@@ -86,9 +87,11 @@ export default {
         return;
       }
 
-      this.editor.updateOptions({ readOnly: true });
+      this.editor.updateOptions({ readOnly: false });
       this.codeState = this.editor.saveViewState();
+
       this.editor.setModel(this.library);
+      this.editor.restoreViewState(this.libraryState);
       this.editor.focus();
     },
     showCode() {
@@ -97,6 +100,8 @@ export default {
       }
 
       this.editor.updateOptions({ readOnly: false });
+      this.libraryState = this.editor.saveViewState();
+
       this.editor.setModel(this.code);
       this.editor.restoreViewState(this.codeState);
       this.editor.focus();
