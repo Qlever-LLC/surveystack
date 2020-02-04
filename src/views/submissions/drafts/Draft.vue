@@ -56,9 +56,7 @@ export default {
         console.log(error);
       }
     },
-
   },
-
   async created() {
     this.loading = true;
     db.openDb();
