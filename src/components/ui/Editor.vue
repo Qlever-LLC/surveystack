@@ -1,11 +1,12 @@
 <template>
   <div style="width: 100%; height: 100%; min-height: 100%;">
     <v-tabs
+      v-model="selectedTab"
       dark
       background-color="dark-blue"
     >
-      <v-tab @click="showCode">Code</v-tab>
-      <v-tab @click="showSurvey">Survey</v-tab>
+      <v-tab @click="showCode" key="tab_code">Code</v-tab>
+      <v-tab @click="showSurvey" key="tab_survey">Survey</v-tab>
     </v-tabs>
     <div
       style="height: 100%"
@@ -66,6 +67,7 @@ export default {
       editor: null,
       code: null,
       library: null,
+      selectedTab: 'tab_survey',
     };
   },
   props: [
@@ -73,9 +75,37 @@ export default {
   ],
   watch: {
     survey: {
-      handler(newVal, oldVal) {
+      handler(newVal) {
         console.log(this.editor);
-        this.library.setValue(`const survey = ${JSON.stringify(newVal, null, 4)};`);
+        const libraryActive = this.editor !== null ? (this.editor.getModel() === this.library) : true;
+
+        let v = '';
+        if (this.editor !== null) {
+          v = this.code.getValue();
+
+          this.library.dispose();
+          this.code.dispose();
+          this.editor.dispose();
+        }
+
+        this.code = monaco.editor.createModel(jsCode, 'javascript');
+        this.library = monaco.editor.createModel('', 'javascript');
+
+        this.editor = monaco.editor.create(document.getElementById('monaco-editor'), {
+          theme: 'vs-dark',
+          language: 'javascript',
+          model: this.code,
+          automaticLayout: true,
+        });
+
+        this.library = monaco.editor.createModel(`const survey = ${JSON.stringify(newVal, null, 4)};`, 'javascript');
+        this.code = monaco.editor.createModel(v, 'javascript');
+
+
+        this.editor.setModel(libraryActive ? this.library : this.code);
+        if (!libraryActive) {
+          this.editor.restoreViewState(this.codeState);
+        }
       },
       deep: true,
     },
@@ -106,17 +136,6 @@ export default {
       this.editor.restoreViewState(this.codeState);
       this.editor.focus();
     },
-  },
-  mounted() {
-    this.code = monaco.editor.createModel(jsCode, 'javascript');
-    this.library = monaco.editor.createModel('', 'javascript');
-
-    this.editor = monaco.editor.create(document.getElementById('monaco-editor'), {
-      theme: 'vs-dark',
-      language: 'javascript',
-      model: this.code,
-      automaticLayout: true,
-    });
   },
 };
 </script>
