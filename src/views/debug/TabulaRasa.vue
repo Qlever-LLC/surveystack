@@ -31,7 +31,7 @@ export default {
       this.$router.push('/surveys/browse');
 
       try {
-        db.clearAllSurveyResults();
+        db.clearAllSubmissions();
       } catch (error) {
         console.log(error);
       }

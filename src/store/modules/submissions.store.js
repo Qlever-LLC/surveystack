@@ -48,7 +48,7 @@ const actions = {
     // TODO reject if timeout here
     const response = await new Promise((resolve) => {
       db.openDb(() => {
-        db.getAllSurveyResults(results => resolve(results));
+        db.getAllSubmissions(results => resolve(results));
       });
     });
     console.log('submissions', response);
