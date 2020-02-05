@@ -5,13 +5,22 @@ import * as surveyUtils from '@/utils/surveys';
 import router from '@/router';
 
 export const types = {
-  FETCH_SUBMISSIONS: 'FETCH_SUBMISSIONS',
-  SET_SUBMISSIONS: 'SET_SUBMISSIONS',
-  RESET: 'RESET',
-  ADD_SUBMISSION: 'ADD_SUBMISSION',
-  REMOVE_SUBMISSION: 'REMOVE_SUBMISSION',
-  START_DRAFT: 'START_DRAFT',
+  mutations: {
+    RESET: 'RESET',
+    SET_SUBMISSIONS: 'SET_SUBMISSIONS',
+    ADD_SUBMISSION: 'ADD_SUBMISSION',
+    REMOVE_SUBMISSION: 'REMOVE_SUBMISSION',
+  },
+  actions: {
+    reset: 'reset',
+    add: 'add',
+    remove: 'remove',
+    fetchSubmission: 'fetchSubmission',
+    fetchSubmissions: 'fetchSubmissions',
+    startDraft: 'startDraft',
+  },
 };
+
 
 const createInitialState = () => ({
   submissions: [],
@@ -27,26 +36,26 @@ const getters = {
 };
 
 const mutations = {
-  [types.RESET](state) {
+  [types.mutations.RESET](state) {
     Object.assign(state, createInitialState());
   },
-  [types.SET_SUBMISSIONS](state, submissions) {
+  [types.mutations.SET_SUBMISSIONS](state, submissions) {
     state.submissions = submissions;
   },
-  [types.ADD_SUBMISSION](state, submission) {
+  [types.mutations.ADD_SUBMISSION](state, submission) {
     state.submissions.push(submission);
   },
-  [types.REMOVE_SUBMISSION](state, id) {
+  [types.mutations.REMOVE_SUBMISSION](state, id) {
     const index = state.submissions.findIndex(submission => submission._id === id);
     state.submissions.splice(index, 1);
   },
 };
 
 const actions = {
-  [types.RESET]({ commit }) {
-    commit(types.RESET);
+  [types.actions.reset]({ commit }) {
+    commit(types.mutations.RESET);
   },
-  async [types.FETCH_SUBMISSIONS]({ commit }/* , userId */) {
+  async [types.actions.fetchSubmissions]({ commit }/* , userId */) {
     // const response = await api.get('/submissions');
 
     // TODO reject if timeout here
@@ -56,32 +65,31 @@ const actions = {
       });
     });
     console.log('submissions', response);
-    commit(types.SET_SUBMISSIONS, response);
+    commit(types.mutations.SET_SUBMISSIONS, response);
     return response;
   },
-  [types.ADD_SUBMISSION]({ commit }, submission) {
+  [types.actions.add]({ commit }, submission) {
     // TODO: submissions should be a unique collection, we shouldn't just push
-    commit(types.ADD_SUBMISSION, submission);
+    commit(types.mutations.ADD_SUBMISSION, submission);
   },
-  [types.REMOVE_SUBMISSION]({ commit }, id) {
-    commit(types.REMOVE_SUBMISSION, id);
+  [types.actions.remove]({ commit }, id) {
+    commit(types.mutations.REMOVE_SUBMISSION, id);
   },
-  async getSubmission({ state, dispatch }, id) {
+  async [types.actions.fetchSubmission]({ state, dispatch }, id) {
     const submissions = state.submissions.length > 0
       ? state.submissions
-      : await dispatch(types.FETCH_SUBMISSIONS);
-    // : await dispatch(`submissions/${types.FETCH_SUBMISSIONS}`);
+      : await dispatch(types.actions.fetchSubmissions);
     return submissions.find(submission => submission._id === id);
   },
   // Create a draft, store it in database and Vuex store, then navigate to draft
   // TODO: figure out where and when to persist to database and store.
   // Also, should this even be a Vuex action or should it reside somewhere else?
-  async startDraft({ commit, dispatch }, { survey, version }) {
+  async [types.actions.startDraft]({ commit, dispatch }, { survey, version }) {
     const surveyEntity = await dispatch('surveys/fetchSurvey', survey, { root: true });
     const activeVersion = surveyEntity.latestVersion;
     const submission = surveyUtils.createInstance(surveyEntity, activeVersion);
     await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
-    dispatch(types.ADD_SUBMISSION, submission);
+    dispatch(types.actions.add, submission);
     router.push({ name: 'submissions-drafts-detail', params: { id: submission._id } });
   },
 

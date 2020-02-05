@@ -51,10 +51,7 @@ export default {
     db.openDb();
     const { id } = this.$route.params;
 
-    /** Either fetch all submissions then use getter, or use GET_SUBMISSION action, which automatically does this. */
-    // await this.$store.dispatch('submissions/fetchSubmissions');
-    // this.$store.getters['submissions/getSubmission'](draftId);
-    this.submission = await this.$store.dispatch('submissions/getSubmission', id);
+    this.submission = await this.$store.dispatch('submissions/fetchSubmission', id);
     // TODO: handle submission not found, set error on page
 
     this.survey = await this.$store.dispatch(

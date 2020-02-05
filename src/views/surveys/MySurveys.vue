@@ -104,7 +104,7 @@ export default {
     this.$store.dispatch('appui/setTitle', 'My Submissions');
   },
   async created() {
-    this.$store.dispatch(`submissions/${submissionsTypes.FETCH_SUBMISSIONS}`);
+    this.$store.dispatch(`submissions/${submissionsTypes.actions.fetchSubmissions}`);
 
     await this.$store.dispatch('surveys/fetchSurveys');
   },
