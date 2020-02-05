@@ -268,6 +268,11 @@ export default {
 
     survey: {
       handler(newVal, oldVal) {
+        const current = newVal.versions.find(v => v.version === newVal.latestVersion);
+        if (current.controls.length === 0) {
+          return;
+        }
+
         this.instance = utils.createInstance(newVal, newVal.latestVersion);
         this.submissionCode = `const survey = ${JSON.stringify(utils.codeFromSubmission(this.instance), null, 4)}`;
 
@@ -362,7 +367,9 @@ export default {
 }
 
 .pane-draft {
+  flex-grow: 1;
   position: relative;
+  min-width: 400px;
 }
 
 .no-outline {
