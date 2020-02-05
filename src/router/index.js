@@ -7,7 +7,6 @@ import MySurveys from '@/views/surveys/MySurveys.vue';
 import SurveysBrowse from '@/views/surveys/Browse.vue';
 import SurveysDetail from '@/views/surveys/Detail.vue';
 import DraftSubmission from '@/views/submissions/drafts/Draft.vue';
-import SubmissionDraftsList from '@/views/submissions/drafts/List.vue';
 
 import Login from '@/views/auth/Login.vue';
 import Register from '@/views/auth/Register.vue';
@@ -20,9 +19,9 @@ import UserEdit from '@/views/users/UserEdit.vue';
 
 import SubmissionList from '@/views/submissions/List.vue';
 
-import SurveyBuilder from '../views/builder/SurveyBuilder.vue';
+import SurveyBuilder from '@/views/builder/SurveyBuilder.vue';
 
-import TabulaRasa from '../views/debug/TabulaRasa.vue';
+import TabulaRasa from '@/views/debug/TabulaRasa.vue';
 
 
 Vue.use(VueRouter);
@@ -75,11 +74,6 @@ const routes = [
     path: '/surveys/:id/edit',
     name: 'surveys-edit',
     component: SurveyBuilder,
-  },
-  {
-    path: '/submissions/drafts',
-    name: 'submissions-drafts-list',
-    component: SubmissionDraftsList,
   },
   {
     path: '/submissions/drafts/:id',
