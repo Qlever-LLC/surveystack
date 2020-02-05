@@ -4,76 +4,87 @@
     layout="vertical"
   >
     <div class="pane pane-survey">
-      <graphical-view
-        class="graphical-view"
-        v-if="!viewCode"
-        :selected="control"
-        :controls="currentControls"
-        @controlSelected="controlSelected"
-      />
     </div>
     <multipane-resizer />
     <div class="pane pane-controls">
-      <v-card>
-        <div class="sticky-top pa-4">
-          <v-card-title>Details</v-card-title>
-          <survey-details
-            v-model="survey"
-            :editMode="editMode"
-            :dirty="dirty"
-            @cancel="onCancel"
-            @submit="onSubmit"
-            @delete="onDelete"
-          />
-          <h3>Add questions</h3>
-          <control-adder @controlAdded="controlAdded" />
-          <h3>Properties</h3>
-          <control-properties
-            :toggleCode="toggleCodeEditor"
-            :control="control"
-            :survey="survey"
-          />
-        </div>
-      </v-card>
     </div>
     <multipane-resizer />
     <div class="pane pane-main-code">
 
-      <div
-        class="code-editor"
-        :class="{ 'editor-visible': showCodeEditor, 'editor-hidden' : !showCodeEditor }"
-      >
+      <div :class="{ 'editor-visible': showCodeEditor, 'editor-hidden' : !showCodeEditor }">
         <code-editor
-          title="Relevance"
           v-if="survey"
           class="code-editor"
-          :refresh="codeRefreshCounter"
         ></code-editor>
 
       </div>
     </div>
     <multipane-resizer />
     <div class="pane pane-submission-code">
-      <div
-        class="code-editor"
-        :class="{ 'editor-visible': showCodeEditor, 'editor-hidden' : !showCodeEditor }"
-      >
+      <div :class="{ 'editor-visible': showCodeEditor, 'editor-hidden' : !showCodeEditor }">
         <code-editor
-          title="Survey Submission"
           v-if="survey"
           class="code-editor"
-          readonly="true"
-          :code="submissionCode"
         ></code-editor>
       </div>
     </div>
     <multipane-resizer />
-    <div class="pane pane-draft">
-      <draft
-        v-if="survey && instance"
-        :submission="instance"
-        :survey="survey"
-      ></draft>
+    <div class="pane pane-draft"></div>
+
+    <div
+      id="builder-container"
+      :class="{ 'builder-container-squeeze': showCodeEditor}"
+    >
+      <v-container>
+
+        <v-row>
+          <v-col cols="7">
+            <div class="mb-2 d-flex justify-space-between align-center">
+              <v-btn
+                @click="viewCode = !viewCode"
+                color="primary"
+                small
+                text
+              >{{ viewCode ? "graphical" : "code"}}</v-btn>
+            </div>
+
+            <graphical-view
+              v-if="!viewCode"
+              :selected="control"
+              :controls="currentControls"
+              @controlSelected="controlSelected"
+            />
+            <code-view
+              style="font-family: monospace;"
+              v-else
+              v-model="survey"
+            />
+          </v-col>
+          <v-col cols="5">
+            <v-card>
+              <div class="sticky-top pa-4">
+                <v-card-title>Details</v-card-title>
+                <survey-details
+                  v-model="survey"
+                  :editMode="editMode"
+                  :dirty="dirty"
+                  @cancel="onCancel"
+                  @submit="onSubmit"
+                  @delete="onDelete"
+                />
+                <h3>Add questions</h3>
+                <control-adder @controlAdded="controlAdded" />
+                <h3>Properties</h3>
+                <control-properties
+                  :toggleCode="toggleCodeEditor"
+                  :control="control"
+                  :survey="survey"
+                />
+              </div>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
     </div>
 
     <app-dialog
@@ -125,11 +136,10 @@ import api from '@/services/api.service';
 
 import codeEditor from '@/components/ui/CodeEditor.vue';
 import graphicalView from '@/components/builder/GraphicalView.vue';
+import codeView from '@/components/builder/CodeView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
 import controlAdder from '@/components/builder/ControlAdder.vue';
 import surveyDetails from '@/components/builder/SurveyDetails.vue';
-import draft from '@/components/survey/drafts/DraftComponent.vue';
-
 import appMixin from '@/components/mixin/appComponent.mixin';
 
 import appDialog from '@/components/ui/Dialog.vue';
@@ -148,11 +158,11 @@ export default {
     MultipaneResizer,
     codeEditor,
     graphicalView,
+    codeView,
     controlProperties,
     controlAdder,
     surveyDetails,
     appDialog,
-    draft,
   },
   data() {
     return {
@@ -171,8 +181,6 @@ export default {
       // survey entity
       initialSurvey: null,
       instance: null,
-      codeRefreshCounter: 0,
-      submissionCode: null,
       survey: {
         _id: '',
         name: '',
@@ -262,19 +270,11 @@ export default {
     currentControls() {
       return this.survey.versions.find(item => (item.version === this.survey.latestVersion)).controls;
     },
-
   },
   watch: {
-
     survey: {
       handler(newVal, oldVal) {
-        this.instance = utils.createInstance(newVal, newVal.latestVersion);
-        this.submissionCode = `const survey = ${JSON.stringify(utils.codeFromSubmission(this.instance), null, 4)}`;
-
-        console.log('instance', this.instance);
-        console.log('survey', newVal);
-
-
+        this.instance = utils.codeFromSubmission(utils.createInstance(newVal, newVal.latestVersion));
         if (this.dirty || !this.editMode || !this.initialSurvey) {
           return;
         }
@@ -329,40 +329,32 @@ export default {
 <style scoped>
 .pane-root {
   width: 100%;
-  height: 90%;
-  max-height: 90%;
-  overflow: auto;
+  height: 100%;
 }
 
 .pane-root > .pane ~ .pane {
-  border-left: 1px solid #eee;
+  border-left: 1px solid #ccc;
 }
 .pane {
-  overflow: hidden;
-  padding: 12px;
-  max-width: 50%;
-  position: initial;
+  height: 100%;
+  max-width: 15%;
+  flex-grow: 1;
 }
 
 .pane-survey {
-  min-width: 400px;
-  height: 90%;
-  max-height: 90%;
-  overflow: auto;
+  min-width: 50px;
 }
-
-.graphical-view {
-  overflow: auto;
-  max-height: 100%;
+.pane-controls {
+  min-width: 50px;
 }
-
-.pane-main-code,
-.pane-submission-code {
-  min-width: 400px;
+.pane-main {
+  min-width: 50px;
 }
-
+.pane-submission {
+  min-width: 50px;
+}
 .pane-draft {
-  position: relative;
+  min-width: 50px;
 }
 
 .no-outline {
@@ -398,10 +390,6 @@ export default {
   transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   height: calc(100% - 64px);
   max-height: calc(100% - 64px);
-}
-
-.code-editor {
-  height: 100%;
 }
 
 .editor-visible {

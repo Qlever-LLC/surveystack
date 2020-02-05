@@ -1,28 +1,48 @@
 <template>
-  <div style="width: 100%; height: 100%; min-height: 100%;">
-    <v-tabs
-      v-model="selectedTab"
-      dark
-      background-color="dark-blue"
+  <div style="width: 100%; height: 80%;">
+    <split-pane
+      :min-percent='20'
+      :default-percent='50'
+      split="vertical"
     >
-      <v-tab @click="showCode" key="tab_code">Code</v-tab>
-      <v-tab @click="showSurvey" key="tab_survey">Survey</v-tab>
-    </v-tabs>
-    <div
-      style="height: 100%"
-      id="monaco-editor"
-    >
-    </div>
+      <v-card
+        dark
+        style="height: calc(100% - 32px);"
+        color="dark-blue--lighten-2"
+        class="ma-4"
+        slot="paneL"
+      >
+        <v-card-title>Code</v-card-title>
+        <div
+          style="height: calc(100% - 80px)"
+          id="monaco-editor-main"
+        > </div>
+      </v-card>
+
+      <v-card
+        dark
+        style="height: calc(100% - 32px);"
+        color="dark-blue--lighten-2"
+        class="ma-4"
+        slot="paneR"
+      >
+        <v-card-title>Survey</v-card-title>
+
+        <div
+          style="height: calc(100% - 80px)"
+          id="monaco-editor-survey"
+        >
+        </div>
+      </v-card>
+    </split-pane>
+
   </div>
 
 </template>
 <script>
 
 import * as monaco from 'monaco-editor';
-// Add additonal d.ts files to the JavaScript language service and change.
-// Also change the default compilation options.
-// The sample below shows how a class Facts is declared and introduced
-// to the system and how the compiler is told to use ES6 (target=2).
+import splitPane from 'vue-multipane';
 
 // validation settings
 monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
@@ -52,14 +72,26 @@ const definitions = (survey) => {
 };
 
 const jsCode = [
-  '',
-  'function relevant() {',
-  '\treturn true;',
-  '}',
+  `
+ /**
+ * return true if this question should be shown
+ * and false if it should be skipped.
+ * 
+ * Skipping groups will skip all child questions
+ * within the group.
+ * 
+ */
+function relevant() {
+\treturn true;
+}
+`,
 ].join('\n');
 
 
 export default {
+  components: {
+    splitPane,
+  },
   data() {
     return {
       libraryState: null,
@@ -67,7 +99,6 @@ export default {
       editor: null,
       code: null,
       library: null,
-      selectedTab: 'tab_survey',
     };
   },
   props: [
@@ -85,24 +116,32 @@ export default {
 
           this.library.dispose();
           this.code.dispose();
-          this.editor.dispose();
+          // this.editor.dispose();
+        } else {
+          v = jsCode;
         }
 
-        this.code = monaco.editor.createModel(jsCode, 'javascript');
-        this.library = monaco.editor.createModel('', 'javascript');
-
-        this.editor = monaco.editor.create(document.getElementById('monaco-editor'), {
-          theme: 'vs-dark',
-          language: 'javascript',
-          model: this.code,
-          automaticLayout: true,
-        });
-
-        this.library = monaco.editor.createModel(`const survey = ${JSON.stringify(newVal, null, 4)};`, 'javascript');
         this.code = monaco.editor.createModel(v, 'javascript');
+        this.library = monaco.editor.createModel(`const survey = ${JSON.stringify(newVal, null, 4)};`, 'javascript');
+
+        if (this.editor === null) {
+          this.editor = monaco.editor.create(document.getElementById('monaco-editor-main'), {
+            theme: 'vs-dark',
+            language: 'javascript',
+            automaticLayout: true,
+          });
+          this.surveyEditor = monaco.editor.create(document.getElementById('monaco-editor-survey'), {
+            theme: 'vs-dark',
+            language: 'javascript',
+            automaticLayout: true,
+          });
+        }
 
 
-        this.editor.setModel(libraryActive ? this.library : this.code);
+        this.editor.setModel(this.code);
+        this.surveyEditor.setModel(this.library);
+
+
         if (!libraryActive) {
           this.editor.restoreViewState(this.codeState);
         }
