@@ -90,6 +90,8 @@
 </template>
 
 <script>
+// TODO: figure out why there is an import cycle from submissions.strore > router
+// eslint-disable-next-line import/no-cycle
 import { types as submissionsTypes } from '@/store/modules/submissions.store';
 
 export default {
