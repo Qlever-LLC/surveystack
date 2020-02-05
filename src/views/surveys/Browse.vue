@@ -5,41 +5,14 @@
         v-for="e in entities"
         :key="e._id"
       >
-        <v-list-item>
+        <v-list-item :to="`/surveys/${e._id}`">
           <v-list-item-content>
 
             <v-list-item-title>{{e.name}}</v-list-item-title>
             <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle>
             <small class="grey--text">Version {{e.latestVersion}}</small>
           </v-list-item-content>
-          <v-list-item-action class="d-flex flex-row align-center">
-            <v-btn
-              class="mx-2"
-              outlined
-              :to="`/submissions?survey=${e._id}`"
-              text
-            >
-              <v-icon>mdi-eye</v-icon>
-              <span class="d-none d-lg-inline ml-1">Submission</span>
-            </v-btn>
-            <v-btn
-              class="mx-2"
-              outlined
-              :to="`/surveys/${e._id}/edit`"
-              text
-            >
-              <v-icon>mdi-pencil</v-icon>
-              <span class="d-none d-lg-inline ml-1">Edit</span>
-            </v-btn>
-            <v-btn
-              class="mx-2"
-              outlined
-              @click="startDraft(e._id)"
-            >
-              <v-icon>mdi-file-document-box-plus-outline</v-icon>
-              <span class="d-none d-lg-inline ml-1">New Draft</span>
-            </v-btn>
-          </v-list-item-action>
+
         </v-list-item>
         <v-divider />
       </div>
@@ -56,11 +29,6 @@ export default {
     return {
       entities: [],
     };
-  },
-  methods: {
-    startDraft(survey) {
-      this.$store.dispatch('submissions/startDraft', { survey });
-    },
   },
   async created() {
     let data = {};

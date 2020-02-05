@@ -5,6 +5,7 @@ import Test from '@/views/Test.vue';
 
 import MySurveys from '@/views/surveys/MySurveys.vue';
 import SurveysBrowse from '@/views/surveys/Browse.vue';
+import SurveysDetail from '@/views/surveys/Detail.vue';
 import DraftSubmission from '@/views/submissions/drafts/Draft.vue';
 import SubmissionDraftsList from '@/views/submissions/drafts/List.vue';
 
@@ -64,6 +65,11 @@ const routes = [
     path: '/surveys/new',
     name: 'surveys-new',
     component: SurveyBuilder,
+  },
+  {
+    path: '/surveys/:id',
+    name: 'surveys-detail',
+    component: SurveysDetail,
   },
   {
     path: '/surveys/:id/edit',

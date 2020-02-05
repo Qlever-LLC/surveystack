@@ -182,16 +182,13 @@ function loadFromIndexedDB(storeName, id) {
 }
 
 function saveToIndexedDB(storeName, object) {
-  console.log('storeName', storeName);
-  console.log('object to be saved', object);
-
   return new Promise(
     ((resolve, reject) => {
       const dbRequest = indexedDB.open(storeName);
 
       if (object._id === undefined) reject(Error('object has no _id.'));
 
-      dbRequest.onerror = function (ev) {
+      dbRequest.onerror = (ev) => {
         reject(Error('IndexedDB database error'));
       };
 
@@ -202,10 +199,8 @@ function saveToIndexedDB(storeName, object) {
 
       dbRequest.onsuccess = (event) => {
         const database = event.target.result;
-        console.log('database:', database);
         const transaction = database.transaction(storeName, 'readwrite');
         const objectStore = transaction.objectStore(storeName);
-        console.log('objectStore', objectStore);
         const objectRequest = objectStore.put(object); // Overwrite if exists
 
         objectRequest.onerror = (ev) => {
