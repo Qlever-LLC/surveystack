@@ -20,9 +20,11 @@ const stores = {
   SURVEYS: 'surveys',
 };
 
+const DATABASE_NAME = 'Database';
+
 // Opening a Database
 function openDb(onSuccess) {
-  const request = indexedDB.open('Database', 7);
+  const request = indexedDB.open(DATABASE_NAME, 7);
   db = this.result;
 
   request.onerror = (event) => {
@@ -150,7 +152,7 @@ function getAllSurveys(onSuccess) {
 function loadFromIndexedDB(storeName, id) {
   return new Promise(
     ((resolve, reject) => {
-      const dbRequest = indexedDB.open(storeName);
+      const dbRequest = indexedDB.open(DATABASE_NAME);
 
       dbRequest.onerror = (ev) => {
         reject(Error('Error text'));
@@ -184,7 +186,7 @@ function loadFromIndexedDB(storeName, id) {
 function saveToIndexedDB(storeName, object) {
   return new Promise(
     ((resolve, reject) => {
-      const dbRequest = indexedDB.open(storeName);
+      const dbRequest = indexedDB.open(DATABASE_NAME);
 
       if (object._id === undefined) reject(Error('object has no _id.'));
 

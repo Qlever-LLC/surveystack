@@ -9,6 +9,9 @@ import '@mdi/font/css/materialdesignicons.css';
 
 import api from './services/api.service';
 
+// Auto include components for questions types
+import '@/components/survey/question_types';
+
 api.init(process.env.VUE_APP_API_URL);
 
 Vue.filter('capitalize', (value) => {

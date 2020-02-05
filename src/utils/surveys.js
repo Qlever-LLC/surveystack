@@ -299,33 +299,6 @@ function* processData(data, namespace = '') {
   }
 }
 
-
-function* processDataNew(data, namespace = '') {
-  if (!data) {
-    return;
-  }
-
-  /* eslint-disable no-restricted-syntax */
-  /* eslint-disable guard-for-in */
-  /* eslint-disable no-continue */
-  for (const [key, control] of Object.entries(data)) {
-    if (key === 'meta') {
-      continue;
-    }
-    if (control.meta.type === 'group') {
-      yield* processData(
-        control,
-        `${namespace === '' ? '' : `${namespace}.`}${key}`,
-      );
-    } else {
-      yield {
-        [`${namespace === '' ? '' : `${namespace}.`}${key}`]: control.value,
-      };
-    }
-  }
-}
-
-
 /**
  * Returns a data object with keys and values from the instance controls.
  * e.g.

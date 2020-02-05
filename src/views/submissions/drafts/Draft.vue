@@ -20,10 +20,6 @@ import * as db from '@/store/db';
 
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 
-import {
-  createInstance,
-} from '@/utils/surveys';
-
 export default {
   mixins: [appMixin],
   components: {
@@ -36,14 +32,6 @@ export default {
       loading: false,
     };
   },
-  computed: {
-    draftId() {
-      return this.$route.params && this.$route.params.id;
-    },
-    surveyId() {
-      return this.$route.query && this.$route.query.survey;
-    },
-  },
   methods: {
     persist({ submission }) {
       db.persistSubmission(submission);
@@ -51,7 +39,7 @@ export default {
     async submit({ payload }) {
       try {
         await api.post('/submissions', payload);
-        this.$router.push('/surveys/browse');
+        this.$router.push(`/surveys/${this.survey._id}`);
       } catch (error) {
         console.log(error);
       }
@@ -59,13 +47,11 @@ export default {
   },
   async created() {
     this.loading = true;
-    // db.openDb();
+    // TODO: figure out whether we need openDb?
+    db.openDb();
     const { id } = this.$route.params;
 
-    /** Either fetch all submissions then use getter, or use GET_SUBMISSION action, which automatically does this. */
-    // await this.$store.dispatch('submissions/fetchSubmissions');
-    // this.$store.getters['submissions/getSubmission'](draftId);
-    this.submission = await this.$store.dispatch('submissions/getSubmission', id);
+    this.submission = await this.$store.dispatch('submissions/fetchSubmission', id);
     // TODO: handle submission not found, set error on page
 
     this.survey = await this.$store.dispatch(
