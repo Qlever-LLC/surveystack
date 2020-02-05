@@ -268,6 +268,7 @@ export default {
 
     survey: {
       handler(newVal, oldVal) {
+        console.log('changed');
         const current = newVal.versions.find(v => v.version === newVal.latestVersion);
         if (current.controls.length === 0) {
           return;
@@ -275,10 +276,6 @@ export default {
 
         this.instance = utils.createInstance(newVal, newVal.latestVersion);
         this.submissionCode = `const survey = ${JSON.stringify(utils.codeFromSubmission(this.instance), null, 4)}`;
-
-        console.log('instance', this.instance);
-        console.log('survey', newVal);
-
 
         if (this.dirty || !this.editMode || !this.initialSurvey) {
           return;

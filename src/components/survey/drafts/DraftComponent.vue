@@ -384,7 +384,7 @@ export default {
   overflow: auto;
   overflow-x: hidden;
   bottom: 68px;
-  top: 56px;
+  top: 0px;
   left: 0px;
   /*
   height: calc(100% - 68px - 56px);
@@ -404,9 +404,8 @@ export default {
   position: absolute;
   width: 100% !important;
   z-index: 4;
-  margin-top: 56px;
-  height: calc(100% - 68px - 56px);
-  max-height: calc(100% - 68px - 56px);
+  height: calc(100% - 68px);
+  max-height: calc(100% - 68px);
   overflow: auto;
   grid-column: 1;
   grid-row: 1;
