@@ -1,12 +1,16 @@
 // import api from '@/services/api.service';
 import * as db from '@/store/db';
 
+import * as surveyUtils from '@/utils/surveys';
+import router from '@/router';
+
 export const types = {
   FETCH_SUBMISSIONS: 'FETCH_SUBMISSIONS',
   SET_SUBMISSIONS: 'SET_SUBMISSIONS',
   RESET: 'RESET',
   ADD_SUBMISSION: 'ADD_SUBMISSION',
   REMOVE_SUBMISSION: 'REMOVE_SUBMISSION',
+  START_DRAFT: 'START_DRAFT',
 };
 
 const createInitialState = () => ({
@@ -68,6 +72,17 @@ const actions = {
       : await dispatch(types.FETCH_SUBMISSIONS);
     // : await dispatch(`submissions/${types.FETCH_SUBMISSIONS}`);
     return submissions.find(submission => submission._id === id);
+  },
+  // Create a draft, store it in database and Vuex store, then navigate to draft
+  // TODO: figure out where and when to persist to database and store.
+  // Also, should this even be a Vuex action or should it reside somewhere else?
+  async startDraft({ commit, dispatch }, { survey, version }) {
+    const surveyEntity = await dispatch('surveys/fetchSurvey', survey, { root: true });
+    const activeVersion = surveyEntity.latestVersion;
+    const submission = surveyUtils.createInstance(surveyEntity, activeVersion);
+    await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
+    dispatch(types.ADD_SUBMISSION, submission);
+    router.push({ name: 'submissions-drafts-detail', params: { id: submission._id } });
   },
 
 };
