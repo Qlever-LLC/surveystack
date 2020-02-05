@@ -20,10 +20,6 @@ import * as db from '@/store/db';
 
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 
-import {
-  createInstance,
-} from '@/utils/surveys';
-
 export default {
   mixins: [appMixin],
   components: {
@@ -35,14 +31,6 @@ export default {
       survey: null,
       loading: false,
     };
-  },
-  computed: {
-    draftId() {
-      return this.$route.params && this.$route.params.id;
-    },
-    surveyId() {
-      return this.$route.query && this.$route.query.survey;
-    },
   },
   methods: {
     persist({ submission }) {
@@ -59,7 +47,8 @@ export default {
   },
   async created() {
     this.loading = true;
-    // db.openDb();
+    // TODO: figure out whether we need openDb?
+    db.openDb();
     const { id } = this.$route.params;
 
     /** Either fetch all submissions then use getter, or use GET_SUBMISSION action, which automatically does this. */
