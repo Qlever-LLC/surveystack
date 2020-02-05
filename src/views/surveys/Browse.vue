@@ -34,7 +34,7 @@
             <v-btn
               class="mx-2"
               outlined
-              :to="`/submissions/drafts/new?survey=${e._id}`"
+              @click="startDraft(e._id)"
             >
               <v-icon>mdi-file-document-box-plus-outline</v-icon>
               <span class="d-none d-lg-inline ml-1">New Draft</span>
@@ -57,11 +57,10 @@ export default {
       entities: [],
     };
   },
-  beforeDestroy() {
-    this.$store.dispatch('appui/reset');
-  },
-  updated() {
-    this.$store.dispatch('appui/setTitle', 'Browse Surveys');
+  methods: {
+    startDraft(survey) {
+      this.$store.dispatch('submissions/startDraft', { survey });
+    },
   },
   async created() {
     let data = {};

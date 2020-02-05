@@ -65,6 +65,8 @@ export default {
 
     const isNewSubmission = !draftId;
 
+    console.log('draftId', draftId);
+
     if (draftId) {
       /** Either fetch all submissions then use getter, or use GET_SUBMISSION action, which automatically does this. */
       // await this.$store.dispatch('submissions/fetchSubmissions');
@@ -72,6 +74,10 @@ export default {
       this.submission = await this.$store.dispatch('submissions/getSubmission', draftId);
       // TODO: handle submission not found, set error on page
     }
+
+    console.log('submission', this.submission);
+
+    console.log('surveyId', surveyId || (this.submission && this.submission.survey));
 
     this.survey = await this.$store.dispatch(
       'surveys/fetchSurvey',

@@ -142,6 +142,84 @@ function getAllSurveys(onSuccess) {
   getResults(stores.SURVEYS, onSuccess);
 }
 
+/*
+  https://stackoverflow.com/questions/41586400/using-indexeddb-asynchronously
+  Maybe we could use "idb" which is a wrapper for IndexedDB but with promises?
+  Also, we may want to add a "db" module to the Vuex store?
+*/
+function loadFromIndexedDB(storeName, id) {
+  return new Promise(
+    ((resolve, reject) => {
+      const dbRequest = indexedDB.open(storeName);
+
+      dbRequest.onerror = (ev) => {
+        reject(Error('Error text'));
+      };
+
+      dbRequest.onupgradeneeded = (ev) => {
+        // Objectstore does not exist. Nothing to load
+        ev.target.transaction.abort();
+        reject(Error('Not found'));
+      };
+
+      dbRequest.onsuccess = (ev) => {
+        const database = ev.target.result;
+        const transaction = database.transaction([storeName]);
+        const objectStore = transaction.objectStore(storeName);
+        const objectRequest = objectStore.get(id);
+
+        objectRequest.onerror = () => {
+          reject(Error('Error text'));
+        };
+
+        objectRequest.onsuccess = () => {
+          if (objectRequest.result) resolve(objectRequest.result);
+          else reject(Error('object not found'));
+        };
+      };
+    }),
+  );
+}
+
+function saveToIndexedDB(storeName, object) {
+  console.log('storeName', storeName);
+  console.log('object to be saved', object);
+
+  return new Promise(
+    ((resolve, reject) => {
+      const dbRequest = indexedDB.open(storeName);
+
+      if (object._id === undefined) reject(Error('object has no _id.'));
+
+      dbRequest.onerror = function (ev) {
+        reject(Error('IndexedDB database error'));
+      };
+
+      dbRequest.onupgradeneeded = (ev) => {
+        const database = ev.target.result;
+        const objectStore = database.createObjectStore(storeName, { keyPath: '_id' });
+      };
+
+      dbRequest.onsuccess = (event) => {
+        const database = event.target.result;
+        console.log('database:', database);
+        const transaction = database.transaction(storeName, 'readwrite');
+        const objectStore = transaction.objectStore(storeName);
+        console.log('objectStore', objectStore);
+        const objectRequest = objectStore.put(object); // Overwrite if exists
+
+        objectRequest.onerror = (ev) => {
+          reject(Error('Error text'));
+        };
+
+        objectRequest.onsuccess = (ev) => {
+          resolve('Data saved OK');
+        };
+      };
+    }),
+  );
+}
+
 export {
   surveys,
   submissions,
@@ -157,4 +235,7 @@ export {
   clearAllSubmissions,
   getAllSurveys,
   clearAllSurveys,
+  loadFromIndexedDB,
+  saveToIndexedDB,
+  stores,
 };
