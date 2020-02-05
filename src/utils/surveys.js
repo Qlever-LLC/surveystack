@@ -509,7 +509,7 @@ export const flattenSubmission = (submission, delimiter) => {
 function objectFromChild(child) {
   const v = {};
   if (child.type !== 'group') {
-    v[`${child.name}`] = child.value;
+    v[`${child.name}`] = child.value || null;
     return v;
   }
 
@@ -518,7 +518,6 @@ function objectFromChild(child) {
 }
 
 export const codeFromSubmission = (submission) => {
-  console.log(submission.data);
   const values = Object.assign({}, ...(submission.data.map(d => objectFromChild(d))));
   return values;
 };

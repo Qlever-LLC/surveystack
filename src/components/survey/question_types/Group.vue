@@ -7,9 +7,11 @@
 </template>
 
 <script>
+import baseQuestionComponent from './BaseQuestionComponent';
+
 
 export default {
-
+  mixins: [baseQuestionComponent],
 };
 </script>
 

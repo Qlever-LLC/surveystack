@@ -78,7 +78,7 @@
         :survey="survey"
         :submission="submission"
         :position="this.positions[this.index]"
-        @navigate="(pos) => navigate(pos)"
+        @navigate="navigate"
       ></draft-overview>
     </v-navigation-drawer>
 
@@ -148,7 +148,6 @@ export default {
     return {
       control: null,
       submissionData: null,
-      positions: [],
       index: 0,
       mShowNav: true,
       mShowNext: true,
@@ -159,6 +158,9 @@ export default {
     };
   },
   computed: {
+    positions() {
+      return getSurveyPositions(this.survey, this.activeVersion);
+    },
     atStart() {
       return this.index === 0;
     },
@@ -233,6 +235,7 @@ export default {
       this.showNav(true);
       this.showNext(true);
 
+      console.log(this.positions);
       this.index = this.positions.findIndex(p => _.isEqual(p, pos));
       console.log(this.index);
       this.submissionData = getInstanceData(this.submission);
@@ -342,7 +345,6 @@ export default {
 
     /** Should this be broken out into method? */
     this.index = 0;
-    this.positions = getSurveyPositions(this.survey, this.activeVersion);
     this.submissionData = getInstanceData(this.submission);
     this.control = getControl(this.submission.data, this.positions[this.index]);
     this.value = this.control.value;
@@ -369,20 +371,20 @@ export default {
   width: 100%;
   border-top: 1px solid #eee;
   height: 68px;
-  position: fixed;
+  position: absolute;
   bottom: 0px;
   left: 0px;
 }
 
 #draft-container {
-  position: fixed;
+  position: absolute;
   width: 100%;
   margin: 0px;
   padding: 0px !important;
   overflow: auto;
   overflow-x: hidden;
   bottom: 68px;
-  top: 56px;
+  top: 0px;
   left: 0px;
   /*
   height: calc(100% - 68px - 56px);
@@ -399,12 +401,11 @@ export default {
 }
 
 #navigation-container {
-  position: fixed;
+  position: absolute;
   width: 100% !important;
   z-index: 4;
-  margin-top: 56px;
-  height: calc(100% - 68px - 56px);
-  max-height: calc(100% - 68px - 56px);
+  height: calc(100% - 68px);
+  max-height: calc(100% - 68px);
   overflow: auto;
   grid-column: 1;
   grid-row: 1;
