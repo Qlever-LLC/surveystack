@@ -39,7 +39,7 @@ export default {
     async submit({ payload }) {
       try {
         await api.post('/submissions', payload);
-        this.$router.push('/surveys/browse');
+        this.$router.push(`/surveys/${this.survey._id}`);
       } catch (error) {
         console.log(error);
       }
