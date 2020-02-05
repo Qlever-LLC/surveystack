@@ -71,7 +71,7 @@
     <div class="pane pane-draft">
       <draft
         v-if="survey && instance"
-        :submission="instance"
+        v-model="instance"
         :survey="survey"
       ></draft>
     </div>
@@ -172,7 +172,6 @@ export default {
       initialSurvey: null,
       instance: null,
       codeRefreshCounter: 0,
-      submissionCode: null,
       survey: {
         _id: '',
         name: '',
@@ -262,10 +261,20 @@ export default {
     currentControls() {
       return this.survey.versions.find(item => (item.version === this.survey.latestVersion)).controls;
     },
-
+    submissionCode() {
+      if (this.instance === null) {
+        return '';
+      }
+      return `const survey = ${JSON.stringify(utils.codeFromSubmission(this.instance), null, 4)}`;
+    },
   },
   watch: {
-
+    instance: {
+      handler(newVal, oldVal) {
+        console.log('instance has changed');
+      },
+      deep: true,
+    },
     survey: {
       handler(newVal, oldVal) {
         console.log('changed');
@@ -273,9 +282,7 @@ export default {
         if (current.controls.length === 0) {
           return;
         }
-
         this.instance = utils.createInstance(newVal, newVal.latestVersion);
-        this.submissionCode = `const survey = ${JSON.stringify(utils.codeFromSubmission(this.instance), null, 4)}`;
 
         if (this.dirty || !this.editMode || !this.initialSurvey) {
           return;

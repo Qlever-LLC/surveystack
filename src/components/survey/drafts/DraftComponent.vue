@@ -123,6 +123,10 @@ import {
 } from '@/utils/surveys';
 
 export default {
+  model: {
+    prop: 'submission',
+    event: 'change',
+  },
   props: {
     submission: {
       type: Object,
@@ -221,13 +225,12 @@ export default {
     },
     setValue(v) {
       // TODO change modified timestamp, persist
-      console.log('setValue', v);
       this.$set(this.control, 'value', v);
       this.value = v;
       this.submission.meta.modified = new Date().getTime();
+      console.log('emitting change');
+      this.$emit('change', this.submission);
       this.persist();
-      // Why do we need to force update?
-      this.$forceUpdate();
     },
     navigate(pos) {
       this.slide = 'slide-out';
