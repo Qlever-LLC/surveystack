@@ -76,11 +76,6 @@ const routes = [
     component: SubmissionDraftsList,
   },
   {
-    path: '/submissions/drafts/new',
-    name: 'submissions-drafts-new',
-    component: DraftSubmission,
-  },
-  {
     path: '/submissions/drafts/:id',
     name: 'submissions-drafts-detail',
     component: DraftSubmission,

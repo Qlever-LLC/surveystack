@@ -59,38 +59,19 @@ export default {
   },
   async created() {
     this.loading = true;
-    db.openDb();
-    const { id: draftId } = this.$route.params;
-    const { survey: surveyId } = this.$route.query;
+    // db.openDb();
+    const { id } = this.$route.params;
 
-    const isNewSubmission = !draftId;
-
-    console.log('draftId', draftId);
-
-    if (draftId) {
-      /** Either fetch all submissions then use getter, or use GET_SUBMISSION action, which automatically does this. */
-      // await this.$store.dispatch('submissions/fetchSubmissions');
-      // this.$store.getters['submissions/getSubmission'](draftId);
-      this.submission = await this.$store.dispatch('submissions/getSubmission', draftId);
-      // TODO: handle submission not found, set error on page
-    }
-
-    console.log('submission', this.submission);
-
-    console.log('surveyId', surveyId || (this.submission && this.submission.survey));
+    /** Either fetch all submissions then use getter, or use GET_SUBMISSION action, which automatically does this. */
+    // await this.$store.dispatch('submissions/fetchSubmissions');
+    // this.$store.getters['submissions/getSubmission'](draftId);
+    this.submission = await this.$store.dispatch('submissions/getSubmission', id);
+    // TODO: handle submission not found, set error on page
 
     this.survey = await this.$store.dispatch(
       'surveys/fetchSurvey',
-      surveyId || (this.submission && this.submission.survey),
+      this.submission.survey,
     );
-
-    this.activeVersion = isNewSubmission
-      ? this.survey.latestVersion
-      : this.submission.meta.version;
-
-    if (!draftId) {
-      this.submission = createInstance(this.survey, this.activeVersion);
-    }
 
     this.loading = false;
   },
