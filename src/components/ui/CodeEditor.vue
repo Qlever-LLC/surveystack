@@ -6,9 +6,23 @@
       class="card-height"
       slot="paneL"
     >
-      <v-card-title>{{ title }} <v-spacer></v-spacer>
+      <v-card-title>{{ title }} <v-chip
+          v-if="result !== null"
+          class="mx-4"
+          :color="result ? 'green' : 'red'"
+        >{{ result }}</v-chip>
+        <v-spacer></v-spacer>
+        <v-icon
+          v-if="runnable"
+          class="mr-4"
+          @click="$emit('run', model.getValue())"
+        >mdi-play</v-icon>
         <v-icon @click="$emit('close')">mdi-close-circle-outline</v-icon>
       </v-card-title>
+      <div
+        class="error red text--white pa-2"
+        v-if="error"
+      >{{ error }}</div>
       <div
         class="editor-height"
         :id="'monaco-editor-'+_uid"
@@ -18,6 +32,12 @@
 </template>
 
 <style scoped>
+.error {
+  width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI",
+    "HelveticaNeue-Light", "Ubuntu", "Droid Sans", sans-serif !important;
+}
+
 .full {
   width: 100%;
   height: 100%;
@@ -28,7 +48,7 @@
 }
 
 .card-height {
-  height: calc(100% - 32px);
+  height: calc(100% - 56px);
 }
 </style>
 
@@ -50,6 +70,13 @@ monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
 
 monaco.languages.typescript.javascriptDefaults.setEagerModelSync(true);
 
+monaco.editor.createModel(`
+/**
+ * logs a message
+ */
+function log(message){};
+`, 'javascript');
+
 export default {
   data() {
     return {
@@ -59,6 +86,9 @@ export default {
     };
   },
   props: {
+    error: {
+      default: null,
+    },
     title: {
       default: 'Code Editor',
     },
@@ -75,6 +105,12 @@ export default {
     theme: {
       default: 'vs-dark',
     },
+    runnable: {
+      default: false,
+    },
+    result: {
+      default: null,
+    },
   },
   watch: {
     refresh() {
@@ -89,7 +125,14 @@ export default {
 
       const model = monaco.editor.createModel(v, this.language);
 
-      this.editor.setModel(model);
+      this.editor.dispose();
+      this.editor = monaco.editor.create(document.getElementById(`monaco-editor-${this._uid}`), {
+        theme: this.theme,
+        language: this.language,
+        automaticLayout: true,
+        readOnly: this.readonly,
+        model: this.model,
+      });
       this.editor.restoreViewState(this.viewState);
 
       this.model = model;
@@ -102,7 +145,7 @@ export default {
     },
   },
   mounted() {
-    this.model = monaco.editor.createModel('', this.language);
+    this.model = monaco.editor.createModel(this.code, this.language);
 
     this.editor = monaco.editor.create(document.getElementById(`monaco-editor-${this._uid}`), {
       theme: this.theme,

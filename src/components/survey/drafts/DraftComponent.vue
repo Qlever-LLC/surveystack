@@ -123,11 +123,10 @@ import {
 } from '@/utils/surveys';
 
 export default {
-  model: {
-    prop: 'submission',
-    event: 'change',
-  },
   props: {
+    submissionChanged: {
+      type: Function,
+    },
     submission: {
       type: Object,
       required: true,
@@ -229,7 +228,7 @@ export default {
       this.value = v;
       this.submission.meta.modified = new Date().getTime();
       console.log('emitting change');
-      this.$emit('change', this.submission);
+      this.$emit('submissionChanged', this.submission);
       this.persist();
     },
     navigate(pos) {
