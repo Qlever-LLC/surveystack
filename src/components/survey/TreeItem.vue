@@ -1,15 +1,23 @@
 <template>
-  <ul>
+  <ul v-if="item">
     <li>
-      <div :class="{bold: isFolder}" @click="toggle" @dblclick="makeFolder">
-        {{ item.name }}: {{ item.value }}
+      <div
+        :class="{bold: isFolder}"
+        @click="toggle"
+        @dblclick="makeFolder"
+      >
+        {{ name }}: {{ item.value }}
         <span v-if="isFolder">[{{ isOpen ? '-' : '+' }}]</span>
       </div>
-      <ul v-show="isOpen" v-if="isFolder">
+      <ul
+        v-show="isOpen"
+        v-if="isFolder"
+      >
         <tree-item
           class="item"
-          v-for="(child, index) in item.children"
+          v-for="(child, name, index) in getChildren(item)"
           :key="index"
+          :name="name"
           :item="child"
           @make-folder="$emit('make-folder', $event)"
           @add-item="$emit('add-item', $event)"
@@ -24,6 +32,7 @@ export default {
   name: 'tree-item',
   props: {
     item: Object,
+    name: String,
   },
   data() {
     return {
@@ -32,7 +41,10 @@ export default {
   },
   computed: {
     isFolder() {
-      return this.item.children && this.item.children.length;
+      if (!this.item || !this.item.meta || !this.item.meta.type) {
+        return false;
+      }
+      return this.item.meta.type === 'group';
     },
   },
   methods: {
@@ -47,7 +59,23 @@ export default {
         this.isOpen = true;
       }
     },
+    getChildren() {
+      if (this.item.meta.type !== 'group') {
+        return {};
+      }
+
+      let children = {};
+      Object.keys(this.item).forEach((k) => {
+        if (k === 'meta') {
+          return;
+        }
+        children = { ...children, [k]: this.item[k] };
+      });
+
+      return children;
+    },
   },
+
 };
 </script>
 

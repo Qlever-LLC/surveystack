@@ -451,17 +451,6 @@ export const getBreadcrumbs = (survey, position) => {
   return breadcrumbs;
 };
 
-export const getBreadcrumbsForSubmission = (controlsArg, position) => {
-  let controls = controlsArg;
-  const breadcrumbs = [];
-  position.forEach((i) => {
-    breadcrumbs.push(controls[i].name);
-    controls = controls[i].children;
-  });
-
-  return breadcrumbs;
-};
-
 
 export const getInstanceIndex = (survey, position) => {
   const breadcrumbs = [];
@@ -474,24 +463,6 @@ export const getInstanceIndex = (survey, position) => {
   return breadcrumbs.join('.');
 };
 
-export const flattenSubmission = (submission, delimiter) => {
-  const delim = delimiter || '.';
-
-  const res = {};
-  const positions = getControlPositions(submission.data);
-  positions.forEach((p) => {
-    const control = getControl(submission.data, p);
-    const breadcrumbs = getBreadcrumbsForSubmission(submission.data, p);
-    if (control.type !== 'group') {
-      const key = breadcrumbs.join(delim);
-      res[key] = {
-        value: control.value,
-        type: control.type,
-      };
-    }
-  });
-  return res;
-};
 
 function objectFromChild(child) {
   const v = {};
@@ -507,27 +478,6 @@ function objectFromChild(child) {
 export const codeFromSubmission = (submission) => {
   const values = Object.assign({}, ...(submission.data.map(d => objectFromChild(d))));
   return values;
-};
-
-
-export const linearControls = (submission) => {
-  const res = [];
-  const positions = getControlPositions(submission.data);
-  positions.forEach((p) => {
-    const control = getControl(submission.data, p);
-    const breadcrumbs = getBreadcrumbsForSubmission(submission.data, p);
-    if (control.type !== 'group') {
-      const key = breadcrumbs.join('.');
-      const r = Object.assign({
-        breadcrumbs,
-        key,
-        number: p.map(value => value + 1),
-        position: p,
-      }, control);
-      res.push(r);
-    }
-  });
-  return res;
 };
 
 export const uuid = () => {

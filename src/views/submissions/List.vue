@@ -46,12 +46,13 @@
         <small class="grey--text text--darken-1">{{submission._id}}</small>
         <small class="grey--text text--darken-1">(Version {{submission.meta.version}})</small>
         <div
-          v-for="(control, i) in submission.data"
+          v-for="(item, name, i) in submission.data"
           :key="i"
         >
           <tree-item
             class="item"
-            :item="control"
+            :item="item"
+            :name="name"
           />
         </div>
       </li>
@@ -65,7 +66,7 @@
 
 import api from '@/services/api.service';
 import treeItem from '@/components/survey/TreeItem.vue';
-import { flattenSubmission } from '@/utils/surveys';
+import { flattenSubmission } from '@/utils/submissions';
 
 // <tree-item class="item" :item="result" @make-folder="makeFolder" @add-item="addItem" />
 

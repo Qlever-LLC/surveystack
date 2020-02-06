@@ -1,6 +1,93 @@
 import ObjectID from 'bson-objectid';
 import { unflatten } from 'flat';
-import { getControlPositions, getControl, getFlatName } from './surveys';
+
+function* processPositions(data, position = []) {
+  if (!data) {
+    return;
+  }
+
+  for (let i = 0; i < data.length; i++) {
+    const val = data[i];
+    yield [...position, i];
+
+    if (val.children) {
+      yield* processPositions(val.children, [...position, i]);
+    }
+  }
+}
+
+const getControlPositions = (controls) => {
+  const it = processPositions(controls);
+  let res = it.next();
+  const positions = [];
+  while (!res.done) {
+    positions.push(res.value);
+    res = it.next();
+  }
+
+  return positions;
+};
+
+const getFlatName = (controls, position) => {
+  let flatName = '';
+  let control;
+  let currentControls = controls;
+  position.forEach((i) => {
+    control = currentControls[i];
+    currentControls = control.children;
+    flatName += `.${control.name}`;
+  });
+
+
+  return flatName.substr(1);
+};
+
+const getControl = (controls, position) => {
+  let control;
+  let currentControls = controls;
+  position.forEach((i) => {
+    control = currentControls[i];
+    currentControls = control.children;
+  });
+
+  if (control.type !== 'group') {
+    if (control.value === undefined) {
+      control.value = null;
+    }
+  }
+
+  return control;
+};
+
+
+export const getBreadcrumbsForSubmission = (controls, position) => {
+  let currentControls = controls;
+  const breadcrumbs = [];
+  position.forEach((i) => {
+    breadcrumbs.push(currentControls[i].name);
+    currentControls = currentControls[i].children;
+  });
+
+  return breadcrumbs;
+};
+
+
+export const flattenSubmission = (submission, delimiter = '.') => {
+  const res = {};
+  const positions = getControlPositions(submission.data);
+  positions.forEach((p) => {
+    const control = getControl(submission.data, p);
+    const breadcrumbs = getBreadcrumbsForSubmission(submission.data, p);
+    if (control.type !== 'group') {
+      const key = breadcrumbs.join(delimiter);
+      res[key] = {
+        value: control.value,
+        type: control.type,
+      };
+    }
+  });
+  return res;
+};
 
 
 /**
@@ -58,6 +145,29 @@ const getSubmissionField = (submission, survey, position) => {
   });
 
   return obj;
+};
+
+export const linearControls = (survey, submission) => {
+  const res = [];
+  const { controls } = survey.versions.find(item => item.version === submission.meta.version);
+  const positions = getControlPositions(controls);
+  positions.forEach((p) => {
+    const control = getControl(controls, p);
+    const breadcrumbs = getBreadcrumbsForSubmission(controls, p);
+    const submissionField = getSubmissionField(submission, survey, p);
+    if (control.type !== 'group') {
+      const key = breadcrumbs.join('.');
+      const r = Object.assign(control, {
+        breadcrumbs,
+        key,
+        number: p.map(value => value + 1),
+        position: p,
+        value: submissionField.value,
+      });
+      res.push(r);
+    }
+  });
+  return res;
 };
 
 export default {

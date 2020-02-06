@@ -46,11 +46,11 @@
 </template>
 
 <script>
-
 import _ from 'lodash';
 import colors from 'vuetify/lib/util/colors';
 import appMixin from '@/components/mixin/appComponent.mixin';
-import { linearControls } from '@/utils/surveys';
+import { linearControls } from '@/utils/submissions';
+
 
 const states = {
   done: ['mdi-check-bold', 'green'],
@@ -80,22 +80,19 @@ export default {
     'position',
   ],
   computed: {
-    flatSubmission() {
-      return linearControls(this.submission);
-    },
     controlDisplays() {
-      const r = linearControls(this.submission).map((control) => {
-        const icon = iconify(control);
-        const active = _.isEqual(control.position, this.position);
+      const r = linearControls(this.survey, this.submission).map((item) => {
+        const icon = iconify(item);
+        const active = _.isEqual(item.position, this.position);
         return {
-          label: control.label,
-          value: control.value,
-          breadcrumbs: control.breadcrumbs,
+          label: item.label,
+          value: item.value,
+          breadcrumbs: item.breadcrumbs,
           icon: icon[0],
           color: icon[1],
-          number: control.number.join('.'),
+          number: item.number.join('.'),
           background: active ? colors.green.base : 'white',
-          position: control.position,
+          position: item.position,
           active,
         };
       });
