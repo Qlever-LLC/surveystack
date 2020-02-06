@@ -47,14 +47,28 @@
         v-if="showMainCode"
       >
 
-        <code-editor
-          @close="showMainCode = false"
-          title="Relevance"
-          v-if="survey"
-          class="code-editor"
-          :refresh="codeRefreshCounter"
-        ></code-editor>
-
+        <multipane
+          layout="horizontal"
+          class="code-resizer"
+        >
+          <code-editor
+            @close="showMainCode = false"
+            title="Relevance"
+            v-if="survey"
+            class="main-code-editor"
+            :refresh="codeRefreshCounter"
+            :runnable="true"
+            :error="codeError"
+            @run="runCode"
+            :result="evaluated"
+          ></code-editor>
+          <multipane-resizer class="horizontal-line" />
+          <console-log
+            class="console-log"
+            :log="log"
+            @clear="log = ''"
+          />
+        </multipane>
       </div>
       <multipane-resizer v-if="showMainCode" />
       <div class="pane pane-submission-code">
@@ -71,16 +85,6 @@
           ></code-editor>
         </div>
       </div>
-      <multipane-resizer />
-      <div class="pane pane-draft">
-        <draft
-          class="draft"
-          v-if="survey && instance"
-          v-model="instance"
-          :survey="survey"
-        ></draft>
-      </div>
-
       <multipane-resizer />
       <div class="pane pane-draft">
         <draft
@@ -146,6 +150,7 @@ import controlProperties from '@/components/builder/ControlProperties.vue';
 import controlAdder from '@/components/builder/ControlAdder.vue';
 import surveyDetails from '@/components/builder/SurveyDetails.vue';
 import draft from '@/components/survey/drafts/DraftComponent.vue';
+import consoleLog from '@/components/builder/ConsoleLog.vue';
 
 import appMixin from '@/components/mixin/appComponent.mixin';
 
@@ -170,6 +175,7 @@ export default {
     surveyDetails,
     appDialog,
     draft,
+    consoleLog,
   },
   data() {
     return {
@@ -186,6 +192,9 @@ export default {
       showDeleteModal: false,
       // currently selected control
       control: null,
+      log: '',
+      codeError: null,
+      evaluated: null,
       // survey entity
       initialSurvey: null,
       instance: null,
@@ -208,6 +217,21 @@ export default {
     };
   },
   methods: {
+    runCode(code) {
+      const sandbox = utils.compileSandbox(code, 'relevance');
+
+      try {
+        const res = sandbox({ JSON, survey: utils.codeFromSubmission(this.instance), log: (line) => { this.log += `${line}\n`; } });
+        if (typeof res !== 'boolean') {
+          throw Error('Function must return true or false');
+        }
+
+        this.evaluated = res;
+        this.codeError = null;
+      } catch (error) {
+        this.codeError = error;
+      }
+    },
     onChange(value) {
       console.log(value);
     },
@@ -252,7 +276,9 @@ export default {
       const url = this.editMode ? `/surveys/${this.survey._id}` : '/surveys';
 
       try {
-        await api.customRequest({ method, url, data: this.survey });
+        await api.customRequest({
+          method, url, data: this.survey,
+        });
         this.$router.push('/surveys/browse');
       } catch (error) {
         if (error.response.status === 409) {
@@ -265,7 +291,8 @@ export default {
     },
     refreshSubmission() {
       console.log('refreshSubmission');
-      this.submissionCode = `const survey = ${JSON.stringify(utils.codeFromSubmission(this.instance), null, 4)}`;
+      const code = JSON.stringify(utils.codeFromSubmission(this.instance), null, 4);
+      this.submissionCode = `const survey = ${code}`;
     },
   },
   computed: {
@@ -357,11 +384,16 @@ export default {
 .pane-root {
   height: 100%;
   padding: 12px;
-  width: 2200px;
+  width: 2800px;
+  min-width: 100vw;
 }
 
 .pane-root > .pane ~ .pane {
   border-left: 1px solid #eee;
+}
+
+.horizontal-line {
+  border-bottom: 1px solid #eee;
 }
 
 .pane {
@@ -370,7 +402,10 @@ export default {
   height: calc(100vh - 64px - 30px - 24px);
   min-width: 400px;
   max-height: 100%;
-  padding: 15px;
+  margin-top: 15px;
+  margin-left: 15px;
+  margin-right: 15px;
+  margin-bottom: 0px;
   overflow: hidden;
 }
 
@@ -388,7 +423,6 @@ export default {
 }
 
 .pane-draft {
-  flex-grow: 1;
   width: 100vw;
   max-width: 500px;
   position: relative;
@@ -410,8 +444,31 @@ export default {
   right: calc(48px + 50vw) !important;
 }
 
-.code-editor {
+.code-resizer {
+  width: 100%;
   height: 100%;
+}
+
+.code-editor {
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  padding-bottom: 12px;
+}
+
+.main-code-editor {
+  min-height: 20vw;
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.console-log {
+  width: 100%;
+  height: 20vw;
+  min-height: 10vh;
+  flex-grow: 1;
 }
 
 .editor-visible {
