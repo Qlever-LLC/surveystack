@@ -350,11 +350,6 @@ export default {
     this.submissionData = getInstanceData(this.submission);
     this.control = getControl(this.submission.data, this.positions[this.index]);
     this.value = this.control.value;
-
-    this.setNavbarContent({
-      title: this.survey.name,
-      subtitle: `<span><span id="question-title-chip">Version ${this.activeVersion}</span></span> <span id="question-title-chip">${this.positions.length} Questions</span>`,
-    });
   },
 };
 </script>

@@ -1,49 +1,54 @@
 <template>
-  <multipane
-    class="pane-root"
-    layout="vertical"
+  <div
+    class="screen-root"
+    style="padding: 0px 12px 0px 0px !important"
   >
-    <div class="pane pane-survey">
-      <graphical-view
-        class="graphical-view"
-        v-if="!viewCode"
-        :selected="control"
-        :controls="currentControls"
-        @controlSelected="controlSelected"
-      />
-    </div>
-    <multipane-resizer />
-    <div class="pane pane-controls">
-      <v-card>
-        <div class="sticky-top pa-4">
-          <v-card-title>Details</v-card-title>
-          <survey-details
-            v-model="survey"
-            :editMode="editMode"
-            :dirty="dirty"
-            @cancel="onCancel"
-            @submit="onSubmit"
-            @delete="onDelete"
-          />
-          <h3>Add questions</h3>
-          <control-adder @controlAdded="controlAdded" />
-          <h3>Properties</h3>
-          <control-properties
-            :toggleCode="toggleCodeEditor"
-            :control="control"
-            :survey="survey"
-          />
-        </div>
-      </v-card>
-    </div>
-    <multipane-resizer />
-    <div class="pane pane-main-code">
-
+    <multipane
+      style="padding: 0px !important"
+      class="pane-root"
+      layout="vertical"
+    >
+      <div class="pane pane-survey">
+        <graphical-view
+          class="graphical-view"
+          v-if="!viewCode"
+          :selected="control"
+          :controls="currentControls"
+          @controlSelected="controlSelected"
+        />
+      </div>
+      <multipane-resizer />
+      <div class="pane pane-controls">
+        <v-card>
+          <div class="sticky-top pa-4">
+            <v-card-title>Details</v-card-title>
+            <survey-details
+              v-model="survey"
+              :editMode="editMode"
+              :dirty="dirty"
+              @cancel="onCancel"
+              @submit="onSubmit"
+              @delete="onDelete"
+            />
+            <h3>Add questions</h3>
+            <control-adder @controlAdded="controlAdded" />
+            <h3>Properties</h3>
+            <control-properties
+              :toggleCode="toggleCodeEditor"
+              :control="control"
+              :survey="survey"
+            />
+          </div>
+        </v-card>
+      </div>
+      <multipane-resizer />
       <div
-        class="code-editor"
-        :class="{ 'editor-visible': showCodeEditor, 'editor-hidden' : !showCodeEditor }"
+        class="pane pane-main-code"
+        v-if="showMainCode"
       >
+
         <code-editor
+          @close="showMainCode = false"
           title="Relevance"
           v-if="survey"
           class="code-editor"
@@ -51,31 +56,42 @@
         ></code-editor>
 
       </div>
-    </div>
-    <multipane-resizer />
-    <div class="pane pane-submission-code">
-      <div
-        class="code-editor"
-        :class="{ 'editor-visible': showCodeEditor, 'editor-hidden' : !showCodeEditor }"
-      >
-        <code-editor
-          title="Survey Submission"
-          v-if="survey"
+      <multipane-resizer v-if="showMainCode" />
+      <div class="pane pane-submission-code">
+        <div
           class="code-editor"
-          readonly="true"
-          :code="submissionCode"
-        ></code-editor>
+          :class="{ 'editor-visible': showCodeEditor, 'editor-hidden' : !showCodeEditor }"
+        >
+          <code-editor
+            title="Survey Submission"
+            v-if="survey"
+            class="code-editor"
+            readonly="true"
+            :code="submissionCode"
+          ></code-editor>
+        </div>
       </div>
-    </div>
-    <multipane-resizer />
-    <div class="pane pane-draft">
-      <draft
-        v-if="survey && instance"
-        :submission="instance"
-        :survey="survey"
-        @submissionChanged="refreshSubmission"
-      ></draft>
-    </div>
+      <multipane-resizer />
+      <div class="pane pane-draft">
+        <draft
+          class="draft"
+          v-if="survey && instance"
+          v-model="instance"
+          :survey="survey"
+        ></draft>
+      </div>
+
+      <multipane-resizer />
+      <div class="pane pane-draft">
+        <draft
+          v-if="survey && instance"
+          :submission="instance"
+          :survey="survey"
+          @submissionChanged="refreshSubmission"
+        ></draft>
+      </div>
+
+    </multipane>
 
     <app-dialog
       v-model="showDeleteModal"
@@ -113,7 +129,7 @@
         @click="showSnackbar = false"
       >Close</v-btn>
     </v-snackbar>
-  </multipane>
+  </div>
 </template>
 
 <script>
@@ -159,6 +175,7 @@ export default {
     return {
       // modes
       showCodeEditor: true,
+      showMainCode: true,
       editMode: false,
       dirty: false,
       // ui
@@ -331,79 +348,66 @@ export default {
 </script>
 
 <style scoped>
-.pane-root {
+.screen-root {
   width: 100%;
-  height: 90%;
-  max-height: 90%;
-  overflow: auto;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.pane-root {
+  height: 100%;
+  padding: 12px;
+  width: 2200px;
 }
 
 .pane-root > .pane ~ .pane {
   border-left: 1px solid #eee;
 }
+
 .pane {
+  will-change: transform;
+  transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  height: calc(100vh - 64px - 30px - 24px);
+  min-width: 400px;
+  max-height: 100%;
+  padding: 15px;
   overflow: hidden;
-  padding: 12px;
-  max-width: 50%;
-  position: initial;
+}
+
+.pane-submission-code,
+.pane-main-code {
+  min-width: 500px;
 }
 
 .pane-survey {
-  min-width: 400px;
-  height: 90%;
-  max-height: 90%;
   overflow: auto;
 }
 
 .graphical-view {
   overflow: auto;
-  max-height: 100%;
-}
-
-.pane-main-code,
-.pane-submission-code {
-  min-width: 400px;
 }
 
 .pane-draft {
   flex-grow: 1;
+  width: 100vw;
+  max-width: 500px;
   position: relative;
-  min-width: 400px;
+}
+
+.draft {
+  max-width: 500px;
+}
+
+.hide-pane {
+  transform: translateX(-100%);
 }
 
 .no-outline {
   outline: none;
 }
 
-#builder-container {
-  overflow-y: auto;
-  position: fixed;
-  height: calc(100% - 56px);
-  padding-top: 0px !important;
-  padding-bottom: 0px !important;
-  margin-top: 0px !important;
-  margin-bottom: 0px !important;
-  left: 0;
-  right: 0;
-
-  will-change: transform;
-  transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
 .builder-container-squeeze {
   right: calc(48px + 50vw) !important;
-}
-
-#builder-editor {
-  width: 50vw;
-  position: fixed;
-  top: 64px;
-  right: 0;
-  bottom: 0;
-  will-change: transform;
-  transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  height: calc(100% - 64px);
-  max-height: calc(100% - 64px);
 }
 
 .code-editor {
@@ -416,5 +420,21 @@ export default {
 
 .editor-hidden {
   transform: translateX(100%);
+}
+
+.pane::-webkit-scrollbar {
+  width: 12px;
+  background-color: #f5f5f5;
+}
+
+.pane::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+  background-image: linear-gradient(120deg, #f44336 0%, #d67a74 100%);
+}
+.pane::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+  background-color: #f5f5f5;
+  border-radius: 10px;
 }
 </style>
