@@ -3,34 +3,9 @@
 ## Mongo Shell
 
 ```javascript
-db.submissions.find({ data: { $elemMatch: { name: 'favorite_color', value: 'blue' } } }).pretty();
-db.submissions
-  .find({
-    data: {
-      $elemMatch: { name: 'personal_group', children: { $elemMatch: { name: 'age', value: '2' } } },
-    },
-  })
-  .pretty();
-db.submissions
-  .find({
-    data: {
-      $elemMatch: {
-        name: 'personal_group',
-        children: { $elemMatch: { name: 'full_name', value: 'Nora Rudolf' } },
-      },
-    },
-  })
-  .pretty();
-db.submissions
-  .find({
-    data: {
-      $elemMatch: {
-        name: 'personal_group',
-        children: { $elemMatch: { name: 'full_name', value: { $regex: 'Andreas' } } },
-      },
-    },
-  })
-  .pretty();
+db.submissions.find({ 'data.favorite_color.value': 'blue' }).pretty();
+
+db.submissions.find({ 'data.personal_group.full_name.value': { $regex: 'olf$' } }).pretty();
 ```
 
 ## Query
@@ -40,14 +15,20 @@ From submissions page:
 ```javascript
 {}
 
-{"data.value": "blue"}
+//Find
+{"data.personal_group.full_name.value": {"$regex": "olf$"}}
 
-{"data": { "$elemMatch": {"name": "favorite_color", "value": "blue"}}}
+//Sort
+{"data.personal_group.age.value": -1}
 
-{"data": { "$elemMatch": {"name": "favorite_color", "value": "red"}}, "meta.version": 0}
+//Projection
+{"data.personal_group.full_name": 0}
+```
 
-{"data": {"$elemMatch": { "name": "personal_group", "children": {"$elemMatch": {"name": "full_name", "value": "Andreas Rudolf"}}}}}
+## MongoDB Compass
 
-{"data": {"$elemMatch": { "name": "personal_group", "children": {"$elemMatch": {"name": "full_name", "value": {"$regex": "Andrea"}}}}}}
-
+```javascript
+{
+  _id: ObjectId('5e303982ea0cf40001aef63c');
+}
 ```
