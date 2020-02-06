@@ -19,24 +19,46 @@ const sanitize = entity => {
 const getSubmissions = async (req, res) => {
   let entities;
 
-  let filter = {};
+  let find = {};
+  let project = {};
+  let sort = {};
 
   if (req.query.survey) {
-    filter.survey = new ObjectId(req.query.survey);
+    find.survey = new ObjectId(req.query.survey);
   }
 
-  if (req.query.q) {
+  if (req.query.find) {
     try {
-      const q = JSON.parse(req.query.q);
-      filter = { ...filter, ...q };
+      const f = JSON.parse(req.query.find);
+      find = { ...find, ...f };
     } catch (error) {
-      throw boom.badRequest('invalid query');
+      throw boom.badRequest('invalid find query');
+    }
+  }
+
+  if (req.query.project) {
+    try {
+      const p = JSON.parse(req.query.project);
+      project = { ...project, ...p };
+    } catch (error) {
+      throw boom.badRequest('invalid project query');
+    }
+  }
+
+  if (req.query.sort) {
+    try {
+      const s = JSON.parse(req.query.sort);
+      sort = { ...sort, ...s };
+    } catch (error) {
+      throw boom.badRequest('invalid sort query');
     }
   }
 
   entities = await db
     .collection(col)
-    .find(filter)
+    .find(find)
+    .sort(sort)
+    .project(project)
     .toArray();
   return res.send(entities);
 };

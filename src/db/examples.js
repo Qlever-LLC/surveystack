@@ -66,44 +66,14 @@ export const exampleSurvey = {
   ],
 };
 
-export const exampleSubmissionDep = {
-  _id: new ObjectId('5e303982ea0cf40001aef63c'),
-  survey: new ObjectId('5e3038dbea0cf40001aef63b'),
-  meta: {
-    dateCreated: new Date('2020-01-28T13:39:14.544Z'),
-    version: 1,
-  },
-  data: [
-    {
-      name: 'favorite_color',
-      type: 'inputText',
-      value: 'blue',
-    },
-    {
-      name: 'personal_group',
-      type: 'group',
-      children: [
-        {
-          name: 'full_name',
-          type: 'inputText',
-          value: 'Andreas Rudolf',
-        },
-        {
-          name: 'age',
-          type: 'inputNumeric',
-          value: 35,
-        },
-      ],
-    },
-  ],
-};
-
 export const exampleSubmission = {
   _id: new ObjectId('5e303982ea0cf40001aef63c'),
   survey: new ObjectId('5e3038dbea0cf40001aef63b'),
   meta: {
     dateCreated: new Date('2020-01-28T13:39:14.544Z'),
     version: 1,
+    permissions: [],
+    path: '/oursci/lab',
   },
   data: {
     favorite_color: {
@@ -127,7 +97,114 @@ export const exampleSubmission = {
       },
       meta: {
         type: 'group',
+        permissions: ['admin'],
       },
     },
+  },
+};
+
+const userPermissionsDefault = ['public'];
+const userPermissionsAdmin = ['public', 'admin@/oursci/lab'];
+const userPermissions = userPermissionsAdmin;
+
+export const redactStage = {
+  $cond: {
+    if: {
+      $gt: [
+        {
+          $size: {
+            $setIntersection: [
+              {
+                $cond: {
+                  if: { $eq: ['$meta.permissions', null] },
+                  then: ['public'],
+                  else: {
+                    $map: {
+                      input: '$meta.permissions',
+                      as: 'role',
+                      in: { $concat: ['$role', '@', '$$ROOT.meta.path'] },
+                    },
+                  },
+                },
+              },
+              userPermissions,
+            ],
+          },
+        },
+        0,
+      ],
+    },
+    then: '$$DESCEND',
+    else: '$$PRUNE',
+  },
+};
+
+const currentStage = {
+  $cond: {
+    if: {
+      $gt: [
+        {
+          $size: {
+            $setIntersection: [{ $ifNull: ['$meta.permissions', ['public']] }, ['public']],
+          },
+        },
+        0,
+      ],
+    },
+    then: '$$DESCEND',
+    else: '$$PRUNE',
+  },
+};
+
+/*
+
+  Redact Stage:
+  If meta.permissions exists, concat its items with ROOT.meta.path, and compare with user permissions
+  E.g.
+  ROOT.meta.path: '/oursci/lab'
+  meta.permissions: ['admin', 'owner']
+  => ['admin@/oursci/lab', 'owner@/oursci/lab', ...] has permission
+  
+
+  If meta.permissions does not exist, treat its permissions as 'public'.
+  => ['public', ...] has permission
+
+*/
+const currentStage2 = {
+  $cond: {
+    if: {
+      $gt: [
+        {
+          $size: {
+            $setIntersection: [
+              {
+                $concatArrays: [
+                  {
+                    $map: {
+                      input: {
+                        $ifNull: ['$meta.permissions', []],
+                      },
+                      as: 'role',
+                      in: { $concat: ['$$role', '@', '$$ROOT.meta.path'] },
+                    },
+                  },
+                  {
+                    $cond: {
+                      if: { $eq: [{ $size: { $ifNull: ['$meta.permissions', []] } }, 0] },
+                      then: ['public'],
+                      else: [],
+                    },
+                  },
+                ],
+              },
+              ['public@/oursci/lab', 'public', 'admin@/oursci/lab'], // user permissions
+            ],
+          },
+        },
+        0,
+      ],
+    },
+    then: '$$DESCEND',
+    else: '$$PRUNE',
   },
 };
