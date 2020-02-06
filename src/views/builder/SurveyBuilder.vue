@@ -30,13 +30,16 @@
               @submit="onSubmit"
               @delete="onDelete"
             />
-            <h3>Add questions</h3>
+            <v-card-title>Add questions</v-card-title>
             <control-adder @controlAdded="controlAdded" />
-            <h3>Properties</h3>
+            <v-card-title>Properties</v-card-title>
             <control-properties
+              :hasRelevance="currentControlHasRelevance"
+              :hasCalculate="currentControlHasCalculate"
               :toggleCode="toggleCodeEditor"
               :control="control"
               :survey="survey"
+              @code-calculate="showMainCode = true"
             />
           </div>
         </v-card>
@@ -211,6 +214,8 @@ export default {
       codeError: null,
       evaluated: null,
       relevanceCode: initialRelevanceCode,
+      currentControlHasRelevance: false,
+      currentControlHasCalculate: false,
       // survey entity
       initialSurvey: null,
       instance: null,
@@ -341,7 +346,7 @@ export default {
     refreshSubmission() {
       console.log('refreshSubmission');
       const code = JSON.stringify(utils.codeFromSubmission(this.instance), null, 4);
-      this.submissionCode = `const survey = ${code}`;
+      this.submissionCode = `const submission = ${code}`;
     },
   },
   computed: {
@@ -362,6 +367,16 @@ export default {
     },
   },
   watch: {
+    currentControlHasRelevance(newVal) {
+      console.log('value changed');
+      if (newVal) {
+        if (!this.control.relevance) {
+          this.control.relevance = initialRelevanceCode;
+        }
+      }
+
+      this.showMainCode = newVal;
+    },
     survey: {
       handler(newVal, oldVal) {
         console.log('changed');

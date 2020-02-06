@@ -28,33 +28,43 @@
         class="mt-2"
       >
         <div class="d-flex justify-space-between">
-          <h4 class="d-flex">Advanced Options</h4>
+          <v-card-title class="d-flex">Advanced Options</v-card-title>
           <v-icon @click.stop="showAdvanced = false">mdi-close</v-icon>
         </div>
 
-        <v-text-field
-          outlined
-          v-model="control.options.calculate"
-          label="Calculate"
-        />
-        <v-text-field
-          outlined
-          v-model="control.options.relevance"
-          label="Show question if"
-        />
+        <div class="d-flex">
 
-        <div class="d-flex justify-content-end">
-          <div class="pa-4">
-            <v-btn
-              dark
-              color="blue"
-              @click="toggleCode()"
-            >
-              Code Editor
-              <v-icon>mdi-code-tags</v-icon>
-            </v-btn>
-          </div>
+          <v-checkbox
+            color="blue"
+            outlined
+            :value="hasCalculate"
+            label="Calculate Expression"
+          />
+          <v-spacer />
+          <v-icon
+            color="blue"
+            @click="$emit('code-calculate')"
+          >
+            mdi-code-not-equal-variant
+          </v-icon>
         </div>
+
+        <div class="d-flex">
+          <v-checkbox
+            color="blue"
+            outlined
+            :value="hasRelevance"
+            label="Relevance Expression"
+          />
+          <v-spacer />
+          <v-icon
+            color="blue"
+            @click="$emit('code-relevance')"
+          >
+            mdi-code-not-equal-variant
+          </v-icon>
+        </div>
+
       </div>
     </v-form>
     <div v-else>...</div>
@@ -73,6 +83,12 @@ export default {
     },
     survey: {
       required: true,
+    },
+    hasRelevance: {
+
+    },
+    hasCalculate: {
+
     },
   },
   data() {

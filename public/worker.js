@@ -24,7 +24,7 @@ onmessage = (e) => {
 
     const res = sandbox({
       JSON,
-      survey: e.data.surveyCode,
+      submission: e.data.surveyCode,
       log: (line) => {
         postMessage({ log: line });
       },
