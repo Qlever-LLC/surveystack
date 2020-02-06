@@ -30,6 +30,7 @@
         >QUERY!</v-btn>
       </div>
     </v-container>
+    <!--
     <v-card>
       <v-card-title>
         Submissions
@@ -42,6 +43,7 @@
           hide-details
         ></v-text-field>
       </v-card-title>
+
       <v-data-table
         :headers="headers"
         :items="items"
@@ -50,30 +52,34 @@
         :search="search"
       ></v-data-table>
     </v-card>
-
-    <ul
-      v-if="submissions.length > 0"
-      class="list-group"
-    >
-      <li
-        v-for="submission in submissions"
-        :key="submission._id"
-        class="list-group-item"
-      >
-        <small class="grey--text text--darken-1">{{submission._id}}</small>
-        <small class="grey--text text--darken-1">(Version {{submission.meta.version}})</small>
-        <div
-          v-for="(item, name, i) in submission.data"
-          :key="i"
+    -->
+    <v-container>
+      <v-card class="pa-3">
+        <ul
+          v-if="submissions.length > 0"
+          class="list-group"
         >
-          <tree-item
-            class="item"
-            :item="item"
-            :name="name"
-          />
-        </div>
-      </li>
-    </ul>
+          <li
+            v-for="submission in submissions"
+            :key="submission._id"
+            class="list-group-item pa-2"
+          >
+            <small class="grey--text text--darken-1">{{submission._id}}</small>
+            <small class="grey--text text--darken-1">(Version {{submission.meta.version}})</small>
+            <div
+              v-for="(item, name, i) in submission.data"
+              :key="i"
+            >
+              <tree-item
+                class="item"
+                :item="item"
+                :name="name"
+              />
+            </div>
+          </li>
+        </ul>
+      </v-card>
+    </v-container>
   </div>
 </template>
 

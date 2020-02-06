@@ -2,11 +2,10 @@
   <ul v-if="item">
     <li>
       <div
-        :class="{bold: isFolder}"
         @click="toggle"
         @dblclick="makeFolder"
       >
-        {{ name }}: {{ item.value }}
+        <span class="grey--text text--darken-2">{{ name }}:</span> <strong>{{ item.value }}</strong>
         <span v-if="isFolder">[{{ isOpen ? '-' : '+' }}]</span>
       </div>
       <ul
