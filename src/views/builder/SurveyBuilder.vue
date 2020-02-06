@@ -54,6 +54,7 @@
           <code-editor
             @close="showMainCode = false"
             title="Relevance"
+            :code="relevanceCode"
             v-if="survey"
             class="main-code-editor"
             :refresh="codeRefreshCounter"
@@ -161,6 +162,19 @@ import * as utils from '@/utils/surveys';
 const currentDate = new Date();
 
 
+const initialRelevanceCode = `
+/**
+ * use \`survey.\` to autocomplete
+ * use \`log(message)\` to log to console
+ * 
+ */
+function relevance() {
+
+  // return true or false
+  return true;
+}
+`;
+
 export default {
   mixins: [
     appMixin,
@@ -192,9 +206,11 @@ export default {
       showDeleteModal: false,
       // currently selected control
       control: null,
+      // code stuff
       log: '',
       codeError: null,
       evaluated: null,
+      relevanceCode: initialRelevanceCode,
       // survey entity
       initialSurvey: null,
       instance: null,
@@ -217,19 +233,51 @@ export default {
     };
   },
   methods: {
-    runCode(code) {
-      const sandbox = utils.compileSandbox(code, 'relevance');
+    async runCode(code) {
+      const worker = new Worker('/worker.js');
+      const surveyCode = utils.codeFromSubmission(this.instance || { data: [] });
+
 
       try {
-        const res = sandbox({ JSON, survey: utils.codeFromSubmission(this.instance), log: (line) => { this.log += `${line}\n`; } });
-        if (typeof res !== 'boolean') {
-          throw Error('Function must return true or false');
-        }
+        const res = await new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            reject(new Error('timeout'));
+          }, 2000);
 
+          let counter = 0;
+
+          worker.onmessage = (m) => {
+            if (m.data.res) {
+              clearTimeout(timeout);
+              resolve(m.data.res);
+            } else if (m.data.error) {
+              clearTimeout(timeout);
+              reject(m.data.error);
+            } else if (m.data.log) {
+              if (counter++ > 1000) {
+                reject(new Error('Too many log messages'));
+              } else {
+                this.log = `${this.log}${m.data.log}\n`;
+              }
+            }
+          };
+
+          worker.postMessage(
+            {
+              code,
+              surveyCode,
+            },
+          );
+        });
+
+        console.log('evaluated', res);
         this.evaluated = res;
         this.codeError = null;
       } catch (error) {
         this.codeError = error;
+        this.evaluated = null;
+      } finally {
+        worker.terminate();
       }
     },
     onChange(value) {

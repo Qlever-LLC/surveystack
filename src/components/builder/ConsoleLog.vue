@@ -31,9 +31,7 @@ export default {
   background-color: #0004;
   padding: 12px;
   width: 100%;
-  height: 100%;
-  min-height: 100%;
-  max-height: 100%;
+  height: calc(100% - 80px);
   padding: 4px;
   resize: none;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI",

@@ -145,7 +145,7 @@ export default {
     },
   },
   mounted() {
-    this.model = monaco.editor.createModel('', this.language);
+    this.model = monaco.editor.createModel(this.code, this.language);
 
     this.editor = monaco.editor.create(document.getElementById(`monaco-editor-${this._uid}`), {
       theme: this.theme,
