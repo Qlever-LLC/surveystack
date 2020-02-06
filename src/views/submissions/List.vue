@@ -20,6 +20,18 @@
               label="Projection"
             />
           </v-col>
+          <v-col cols="2">
+            <v-text-field
+              v-model.number="skip"
+              label="Skip"
+            />
+          </v-col>
+          <v-col cols="2">
+            <v-text-field
+              v-model.number="limit"
+              label="Limit"
+            />
+          </v-col>
         </v-row>
 
         <v-btn
@@ -65,7 +77,7 @@
             class="list-group-item pa-2"
           >
             <small class="grey--text text--darken-1">{{submission._id}}</small>
-            <small class="grey--text text--darken-1">(Version {{submission.meta.version}})</small>
+            <small class="grey--text text--darken-1 ml-1">(Version {{submission.meta.version}})</small>
             <div
               v-for="(item, name, i) in submission.data"
               :key="i"
@@ -102,6 +114,8 @@ export default {
       find: '{}',
       project: '{}',
       sort: '{}',
+      skip: 0,
+      limit: 0,
       submissions: [],
       search: '',
     };
@@ -169,7 +183,7 @@ export default {
       try {
         const { survey } = this.$route.query;
         const { data } = await api.get(
-          `/submissions?survey=${survey}&find=${this.find}&sort=${this.sort}&project=${this.project}`,
+          `/submissions?survey=${survey}&find=${this.find}&sort=${this.sort}&project=${this.project}&skip=${this.skip}&limit=${this.limit}`,
         );
         this.submissions = data;
       } catch (e) {
