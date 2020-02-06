@@ -3,10 +3,12 @@
     <v-card
       dark
       color="dark-blue--lighten-2"
-      class="ma-4 card-height"
+      class="card-height"
       slot="paneL"
     >
-      <v-card-title>{{ title }}</v-card-title>
+      <v-card-title>{{ title }} <v-spacer></v-spacer>
+        <v-icon @click="$emit('close')">mdi-close-circle-outline</v-icon>
+      </v-card-title>
       <div
         class="editor-height"
         :id="'monaco-editor-'+_uid"
@@ -22,7 +24,7 @@
 }
 
 .editor-height {
-  height: calc(100% - 80px);
+  height: 100%;
 }
 
 .card-height {

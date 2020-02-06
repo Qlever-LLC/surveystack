@@ -17,6 +17,7 @@
 import api from '@/services/api.service';
 import appMixin from '@/components/mixin/appComponent.mixin';
 import * as db from '@/store/db';
+import * as utils from '@/utils/surveys';
 
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 
@@ -48,7 +49,9 @@ export default {
   async created() {
     this.loading = true;
     // TODO: figure out whether we need openDb?
-    db.openDb();
+    await new Promise(resolve => db.openDb(() => {
+      resolve();
+    }));
     const { id } = this.$route.params;
 
     this.submission = await this.$store.dispatch('submissions/fetchSubmission', id);
@@ -58,6 +61,12 @@ export default {
       'surveys/fetchSurvey',
       this.submission.survey,
     );
+
+    const positions = utils.getSurveyPositions(this.survey);
+    this.setNavbarContent({
+      title: this.survey.name,
+      subtitle: `<span><span id="question-title-chip">Version ${this.submission.version}</span></span> <span id="question-title-chip">${positions.length} Questions</span>`,
+    });
 
     this.loading = false;
   },
