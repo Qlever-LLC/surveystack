@@ -41,7 +41,15 @@
           color="primary"
         >QUERY!</v-btn>
       </div>
+
+      <h4>API</h4>
+      <a
+        class="body-2"
+        :href="apiHref"
+        target="_blank"
+      >{{apiHref}}</a>
     </v-container>
+
     <!--
     <v-card>
       <v-card-title>
@@ -176,6 +184,13 @@ export default {
     },
     flatSubmissions() {
       return this.submissions.map(s => flattenSubmission(s));
+    },
+    apiRequest() {
+      const { survey } = this.$route.query;
+      return `/submissions?survey=${survey}&find=${this.find}&sort=${this.sort}&project=${this.project}&skip=${this.skip}&limit=${this.limit}`;
+    },
+    apiHref() {
+      return `${process.env.VUE_APP_API_URL}${this.apiRequest}`;
     },
   },
   methods: {
