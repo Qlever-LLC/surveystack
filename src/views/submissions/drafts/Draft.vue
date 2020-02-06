@@ -19,7 +19,7 @@ import appMixin from '@/components/mixin/appComponent.mixin';
 import * as db from '@/store/db';
 import * as utils from '@/utils/surveys';
 
-import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
+import appDraftComponent from '@/components/survey/drafts/DraftComponent2.vue';
 
 export default {
   mixins: [appMixin],

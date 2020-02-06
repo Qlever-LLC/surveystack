@@ -402,6 +402,20 @@ export const getPosition = (control, controls) => {
   return null;
 };
 
+export const getFlatName = (controls, position) => {
+  let flatName = '';
+  let control;
+  let currentControls = controls;
+  position.forEach((i) => {
+    control = currentControls[i];
+    currentControls = control.children;
+    flatName += `.${control.name}`;
+  });
+
+
+  return flatName.substr(1);
+};
+
 export const insertControl = (control, controls, position, selectedControlIsGroup) => {
   let currentControl;
   let currentControls = controls;

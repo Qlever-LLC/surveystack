@@ -1,7 +1,9 @@
 // import api from '@/services/api.service';
 import * as db from '@/store/db';
 
-import * as surveyUtils from '@/utils/surveys';
+import submissionUtils from '@/utils/submissions';
+import { createInstance } from '@/utils/surveys';
+
 import router from '@/router';
 
 export const types = {
@@ -87,7 +89,8 @@ const actions = {
   async [types.actions.startDraft]({ commit, dispatch }, { survey, version }) {
     const surveyEntity = await dispatch('surveys/fetchSurvey', survey, { root: true });
     const activeVersion = surveyEntity.latestVersion;
-    const submission = surveyUtils.createInstance(surveyEntity, activeVersion);
+    // const submission = surveyUtils.createInstance(surveyEntity, activeVersion);
+    const submission = submissionUtils.createSubmissionFromSurvey(surveyEntity, activeVersion);
     await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
     dispatch(types.actions.add, submission);
     router.push({ name: 'submissions-drafts-detail', params: { id: submission._id } });
