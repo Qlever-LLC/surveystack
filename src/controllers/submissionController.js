@@ -22,6 +22,8 @@ const getSubmissions = async (req, res) => {
   let find = {};
   let project = {};
   let sort = {};
+  let skip = 0;
+  let limit = 0;
 
   if (req.query.survey) {
     find.survey = new ObjectId(req.query.survey);
@@ -54,11 +56,21 @@ const getSubmissions = async (req, res) => {
     }
   }
 
+  if (req.query.skip) {
+    skip = Number.parseInt(req.query.skip);
+  }
+
+  if (req.query.limit) {
+    limit = Number.parseInt(req.query.limit);
+  }
+
   entities = await db
     .collection(col)
     .find(find)
     .sort(sort)
     .project(project)
+    .skip(skip)
+    .limit(limit)
     .toArray();
   return res.send(entities);
 };
