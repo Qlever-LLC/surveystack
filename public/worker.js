@@ -29,11 +29,13 @@ onmessage = (e) => {
         postMessage({ log: line });
       },
     });
+    console.log('res', res);
     if (typeof res !== 'boolean') {
       throw Error('Function must return true or false');
     }
     postMessage({ res });
   } catch (error) {
+    console.log(error);
     postMessage({ error });
   }
 };

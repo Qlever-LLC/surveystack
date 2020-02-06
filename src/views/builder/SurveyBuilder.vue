@@ -247,7 +247,7 @@ export default {
           let counter = 0;
 
           worker.onmessage = (m) => {
-            if (m.data.res) {
+            if (m.data.res !== undefined) {
               clearTimeout(timeout);
               resolve(m.data.res);
             } else if (m.data.error) {
@@ -274,6 +274,7 @@ export default {
         this.evaluated = res;
         this.codeError = null;
       } catch (error) {
+        console.log(error);
         this.codeError = error;
         this.evaluated = null;
       } finally {
