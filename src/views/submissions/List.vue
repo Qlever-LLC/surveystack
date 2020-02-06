@@ -3,13 +3,30 @@
     <v-container>
       <div class="d-flex flex-column">
         <v-textarea
-          v-model="q"
+          v-model="find"
           outlined
+          label="Find"
         />
+        <v-row>
+          <v-col>
+            <v-text-field
+              v-model="sort"
+              label="Sort"
+            />
+          </v-col>
+          <v-col>
+            <v-text-field
+              v-model="project"
+              label="Projection"
+            />
+          </v-col>
+        </v-row>
+
         <v-btn
           @click="fetchData"
           :disabled="!validQuery"
           class="ml-auto"
+          color="primary"
         >QUERY!</v-btn>
       </div>
     </v-container>
@@ -76,18 +93,23 @@ export default {
   },
   data() {
     return {
-      q: '',
-      search: '',
+      find: '{}',
+      project: '{}',
+      sort: '{}',
       submissions: [],
+      search: '',
     };
   },
   computed: {
     validQuery() {
       try {
-        const q = JSON.parse(this.q);
+        const find = JSON.parse(this.find);
+        const sort = JSON.parse(this.sort);
+        const project = JSON.parse(this.project);
       } catch (error) {
         return false;
       }
+
       return true;
     },
     headers() {
@@ -141,7 +163,7 @@ export default {
       try {
         const { survey } = this.$route.query;
         const { data } = await api.get(
-          `/submissions?survey=${survey}&q=${this.q}`,
+          `/submissions?survey=${survey}&find=${this.find}&sort=${this.sort}&project=${this.project}`,
         );
         this.submissions = data;
       } catch (e) {
