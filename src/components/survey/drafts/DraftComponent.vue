@@ -344,6 +344,7 @@ export default {
   width: 100%;
   border-top: 1px solid #eee;
   height: 68px;
+  overflow: hidden;
   position: absolute;
   bottom: 0px;
   left: 0px;
