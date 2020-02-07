@@ -277,6 +277,12 @@ export default {
   methods: {
     highlight(tab) {
       this.hideCode = false;
+      switch (tab) {
+        case 'calculate':
+          break;
+        default:
+          break;
+      }
     },
     async runCode(code) {
       const worker = new Worker('/worker.js');
