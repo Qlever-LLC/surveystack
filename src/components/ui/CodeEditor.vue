@@ -111,6 +111,13 @@ export default {
     result: {
       default: null,
     },
+    fold: {
+      default: false,
+    },
+  },
+  model: {
+    event: 'change',
+    prop: 'code',
   },
   watch: {
     refresh() {
@@ -133,14 +140,24 @@ export default {
         readOnly: this.readonly,
         model: this.model,
       });
+      this.editor.onDidChangeModelContent((event) => {
+        const value = this.editor.getValue();
+        if (this.value !== value) {
+          if (!this.readonly) {
+            this.$emit('change', value, event);
+          }
+        }
+      });
+
       this.editor.restoreViewState(this.viewState);
+      if (this.fold) {
+        this.editor.trigger('fold', 'editor.foldAll');
+      }
 
       this.model = model;
     },
     code(newVal) {
-      if (this.editor === null || this.model === null) {
-        return;
-      }
+      console.log('code changed');
       this.model.setValue(newVal);
     },
   },
@@ -153,6 +170,19 @@ export default {
       automaticLayout: true,
       readOnly: this.readonly,
       model: this.model,
+    });
+
+    if (this.fold) {
+      this.editor.trigger('fold', 'editor.foldAll');
+    }
+
+    this.editor.onDidChangeModelContent((event) => {
+      const value = this.editor.getValue();
+      if (this.value !== value) {
+        if (!this.readonly) {
+          this.$emit('change', value, event);
+        }
+      }
     });
   },
 };

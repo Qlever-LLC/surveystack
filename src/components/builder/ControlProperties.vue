@@ -33,35 +33,57 @@
         </div>
 
         <div class="d-flex">
+          <v-checkbox
+            class="ma-0"
+            color="blue"
+            outlined
+            v-model="control.options.relevance.enabled"
+            label="Relevance Expression"
+          />
+          <v-spacer />
+          <v-icon
+            class="align-self-start"
+            color="blue"
+            @click="$emit('code-relevance')"
+          >
+            mdi-open-in-new
+          </v-icon>
+        </div>
+
+        <div class="d-flex">
 
           <v-checkbox
             color="blue"
+            class="ma-0"
             outlined
-            :value="hasCalculate"
+            v-model="control.options.calculate.enabled"
             label="Calculate Expression"
           />
           <v-spacer />
           <v-icon
+            class="align-self-start"
             color="blue"
             @click="$emit('code-calculate')"
           >
-            mdi-code-not-equal-variant
+            mdi-open-in-new
           </v-icon>
         </div>
 
         <div class="d-flex">
           <v-checkbox
+            class="ma-0"
             color="blue"
             outlined
-            :value="hasRelevance"
-            label="Relevance Expression"
+            v-model="control.options.constraint.enabled"
+            label="Constraint Expression"
           />
           <v-spacer />
           <v-icon
+            class="align-self-start"
             color="blue"
-            @click="$emit('code-relevance')"
+            @click="$emit('code-constraint')"
           >
-            mdi-code-not-equal-variant
+            mdi-open-in-new
           </v-icon>
         </div>
 
@@ -83,12 +105,6 @@ export default {
     },
     survey: {
       required: true,
-    },
-    hasRelevance: {
-
-    },
-    hasCalculate: {
-
     },
   },
   data() {

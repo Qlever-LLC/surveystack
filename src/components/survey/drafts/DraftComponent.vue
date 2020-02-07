@@ -231,12 +231,7 @@ export default {
       // eslint-disable-next-line no-constant-condition
       while (true) {
         if (this.atEnd) {
-          const payload = utils.createInstancePayload(
-            this.submission,
-            this.survey.versions[this.activeVersion],
-          );
-          console.log('payload', payload);
-          this.submit(payload);
+          this.submit(this.submission);
           return;
         }
 
@@ -288,6 +283,10 @@ export default {
       }
     },
     calculateControl() {
+      if (!this.control.options.calculate.enabled) {
+        return;
+      }
+
       if (
         !this.control.options.calculate
         || this.control.options.calculate === ''

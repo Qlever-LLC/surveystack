@@ -1,9 +1,18 @@
 export const defaultControlOptions = {
   readOnly: false,
   required: false,
-  relevance: '',
-  constraint: '',
-  calculate: '',
+  relevance: {
+    enabled: false,
+    code: '',
+  },
+  constraint: {
+    enabled: false,
+    code: '',
+  },
+  calculate: {
+    enabled: false,
+    code: '',
+  },
 };
 
 export const availableControls = [
@@ -27,11 +36,5 @@ export const availableControls = [
     name: 'location',
     label: 'Pick Location',
     type: 'location',
-    toString(value) {
-      return `lat: ${value.lat} lon: ${value.lon}`;
-    },
-    definition() {
-
-    },
   },
 ];

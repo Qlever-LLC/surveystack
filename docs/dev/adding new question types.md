@@ -8,4 +8,3 @@
         type: 'inputLocation',
     },
     ```
-3. In `views/submissions/drafts/Draft.vue` add Component as import **and** also in `components` export.

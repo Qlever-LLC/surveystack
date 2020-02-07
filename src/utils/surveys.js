@@ -525,54 +525,6 @@ export function compileSandbox(src, fname) {
   };
 }
 
-
-/**
- * Returns a new instance based off a specific survey version
- * @param {Object} survey
- * @param String version
- *
- * @returns {Object} An specifc survey version instance.
- */
-export const createInstance = (survey, version = 1) => {
-  const clone = _.cloneDeep(survey.versions.find(item => item.version === version));
-  delete clone.dateCreated;
-
-  clone._id = new ObjectID().toString();
-  clone.survey = survey._id;
-  clone.meta = {
-    dateCreated: new Date(),
-    version,
-  };
-
-  // rename "controls" to "data"
-  // https://stackoverflow.com/a/50101979
-  delete Object.assign(clone, { data: clone.controls }).controls;
-
-  return clone;
-};
-
-
-/**
- * Returns a payload of an instance ready to upload to the server
- * @param {Object} instance
- *
- * @returns {Object} A representation of the instance ready for uploading to the server
- */
-export const createInstancePayload = (instance) => {
-  const clone = _.cloneDeep(instance);
-  const positions = getControlPositions(instance.data);
-
-  positions.forEach((position) => {
-    const control = getControl(clone.data, position);
-    delete control.label;
-    delete control.options;
-  });
-
-  // TODO: may need to adapt dates
-
-  return clone;
-};
-
 export const handleize = (str) => {
   const handle = str && str.toLowerCase().replace(/\s/gi, '-');
   return handle;

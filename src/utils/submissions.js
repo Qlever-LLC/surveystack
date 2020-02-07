@@ -140,6 +140,7 @@ const getSubmissionField = (submission, survey, position) => {
   const splits = flatName.split('.');
 
   let obj = submission.data;
+
   splits.forEach((key) => {
     obj = obj[key];
   });

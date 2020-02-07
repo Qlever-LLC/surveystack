@@ -1,3 +1,4 @@
+/* eslint-disable no-new-func */
 function has(target, key) {
   return true;
 }
@@ -24,7 +25,9 @@ onmessage = (e) => {
 
     const res = sandbox({
       JSON,
-      submission: e.data.surveyCode,
+      submission: e.data.submission,
+      rawSubmission: e.data.rawSubmission,
+      survey: e.data.survey,
       log: (line) => {
         postMessage({ log: line });
       },

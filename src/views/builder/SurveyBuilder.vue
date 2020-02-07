@@ -34,12 +34,12 @@
             <control-adder @controlAdded="controlAdded" />
             <v-card-title>Properties</v-card-title>
             <control-properties
-              :hasRelevance="currentControlHasRelevance"
-              :hasCalculate="currentControlHasCalculate"
               :toggleCode="toggleCodeEditor"
               :control="control"
               :survey="survey"
-              @code-calculate="showMainCode = true"
+              @code-calculate="highlight('calculate')"
+              @code-relevance="highlight('relevance')"
+              @code-constraint="highlight('constraint')"
             />
           </div>
         </v-card>
@@ -47,17 +47,33 @@
       <multipane-resizer />
       <div
         class="pane pane-main-code"
-        v-if="showMainCode"
+        v-if="hasCode && !hideCode"
       >
-
         <multipane
           layout="horizontal"
           class="code-resizer"
         >
+
+          <v-tabs
+            fixed-tabs
+            background-color="blue-grey darken-4"
+            dark
+          >
+            <v-tab v-if="control.options &&  control.options.relevance && control.options.relevance.enabled">
+              Relevance
+            </v-tab>
+            <v-tab v-if="control.options &&  control.options.computed && control.options.computed.enabled">
+              Computed
+            </v-tab>
+            <v-tab v-if="control.options &&  control.options.constraint && control.options.constraint.enabled">
+              Constraint
+            </v-tab>
+          </v-tabs>
+
           <code-editor
-            @close="showMainCode = false"
+            @close="hideCode = true"
             title="Relevance"
-            :code="relevanceCode"
+            :code="control.options.relevance.code"
             v-if="survey"
             class="main-code-editor"
             :refresh="codeRefreshCounter"
@@ -65,8 +81,13 @@
             :error="codeError"
             @run="runCode"
             :result="evaluated"
-          ></code-editor>
-          <multipane-resizer class="horizontal-line" />
+          >
+          </code-editor>
+
+          <multipane-resizer
+            v-if="control"
+            class="horizontal-line"
+          />
           <console-log
             class="console-log"
             :log="log"
@@ -74,28 +95,28 @@
           />
         </multipane>
       </div>
-      <multipane-resizer v-if="showMainCode" />
-      <div class="pane pane-submission-code">
-        <div
-          class="code-editor"
-          :class="{ 'editor-visible': showCodeEditor, 'editor-hidden' : !showCodeEditor }"
-        >
+      <multipane-resizer v-if="hasCode && !hideCode" />
+      <div
+        class="pane pane-submission-code"
+        v-if="hasCode && !hideCode"
+      >
+        <div class="code-editor">
           <code-editor
-            title="Survey Submission"
+            title="Shared Code"
             v-if="survey"
             class="code-editor"
             readonly="true"
-            :code="submissionCode"
+            :code="sharedCode"
+            fold="true"
           ></code-editor>
         </div>
       </div>
-      <multipane-resizer />
+      <multipane-resizer v-if="hasCode && !hideCode" />
       <div class="pane pane-draft">
         <draft
           v-if="survey && instance"
           :submission="instance"
           :survey="survey"
-          @submissionChanged="refreshSubmission"
         ></draft>
       </div>
 
@@ -161,13 +182,17 @@ import appMixin from '@/components/mixin/appComponent.mixin';
 import appDialog from '@/components/ui/Dialog.vue';
 
 import * as utils from '@/utils/surveys';
+import submissionUtils from '@/utils/submissions';
+
 
 const currentDate = new Date();
 
 
 const initialRelevanceCode = `
 /**
- * use \`survey.\` to autocomplete
+ * BASIC: use \`submission.\` to autocomplete the basic submission
+ * ADVANCED: use \`rawSubmission.\` to autocomplete the advanced version of a submission
+ * use \`survey.\` to access the current survey and its information
  * use \`log(message)\` to log to console
  * 
  */
@@ -177,6 +202,19 @@ function relevance() {
   return true;
 }
 `;
+
+const simplify = (submissionItem) => {
+  if (submissionItem.meta !== undefined && submissionItem.meta.type !== 'group') {
+    return submissionItem.value;
+  }
+
+  const ret = {};
+  const keys = Object.keys(submissionItem).filter(k => k !== 'value' && k !== 'meta');
+  keys.forEach((k) => {
+    ret[k] = simplify(submissionItem[k]);
+  });
+  return ret;
+};
 
 export default {
   mixins: [
@@ -197,8 +235,7 @@ export default {
   data() {
     return {
       // modes
-      showCodeEditor: true,
-      showMainCode: true,
+      hideCode: false,
       editMode: false,
       dirty: false,
       // ui
@@ -238,16 +275,18 @@ export default {
     };
   },
   methods: {
+    highlight(tab) {
+      this.hideCode = false;
+    },
     async runCode(code) {
       const worker = new Worker('/worker.js');
-      const surveyCode = utils.codeFromSubmission(this.instance || { data: [] });
 
 
       try {
         const res = await new Promise((resolve, reject) => {
           const timeout = setTimeout(() => {
             reject(new Error('timeout'));
-          }, 2000);
+          }, 10000);
 
           let counter = 0;
 
@@ -262,7 +301,8 @@ export default {
               if (counter++ > 1000) {
                 reject(new Error('Too many log messages'));
               } else {
-                this.log = `${this.log}${m.data.log}\n`;
+                const arg = typeof m.data.log === 'object' ? JSON.stringify(m.data.log, null, 2) : m.data.log;
+                this.log = `${this.log}${arg}\n`;
               }
             }
           };
@@ -270,7 +310,9 @@ export default {
           worker.postMessage(
             {
               code,
-              surveyCode,
+              submission: simplify(this.instance.data),
+              rawSubmission: this.instance,
+              survey: this.survey,
             },
           );
         });
@@ -289,10 +331,8 @@ export default {
     onChange(value) {
       console.log(value);
     },
-    toggleCodeEditor() {
-      this.showCodeEditor = !this.showCodeEditor;
-    },
     controlSelected(control) {
+      console.log(control);
       this.control = control;
     },
     controlAdded(control) {
@@ -343,40 +383,52 @@ export default {
         }
       }
     },
-    refreshSubmission() {
-      console.log('refreshSubmission');
-      const code = JSON.stringify(utils.codeFromSubmission(this.instance), null, 4);
-      this.submissionCode = `const submission = ${code}\n\nconst survey = ${JSON.stringify(this.survey, null, 4)}`;
-    },
   },
   computed: {
-    /*
-    dirty() {
-      if (this.editMode) {
-        return !_.isEqualWith(this.survey.versions, this.initialSurvey.versions, (value1, value2, key) => ((key === 'label') ? true : undefined));
+    hasCode() {
+      if (!this.control) {
+        return false;
       }
-
-      return true;
+      return this.control.options.relevance.enabled || this.control.options.calculate.enabled || this.control.options.constraint.enabled;
     },
-    */
     currentVersion() {
       return this.survey.latestVersion;
     },
     currentControls() {
       return this.survey.versions.find(item => (item.version === this.survey.latestVersion)).controls;
     },
-  },
-  watch: {
-    currentControlHasRelevance(newVal) {
-      console.log('value changed');
-      if (newVal) {
-        if (!this.control.relevance) {
-          this.control.relevance = initialRelevanceCode;
-        }
+    sharedCode() {
+      if (!this.instance) {
+        return '';
       }
 
-      this.showMainCode = newVal;
+      const simplified = simplify(this.instance.data);
+      const submission = `
+/**
+ * This is the basic version of the submission.
+ * start typing 'submission.' in order to see completion
+ */
+  
+const submission = ${JSON.stringify(simplified, null, 4)}`;
+      const rawSubmission = `
+/**
+ * This is the raw version of the submission, it includes additional
+ * meta information such as question type and modification timestamps.
+ * 
+ * use this if you need advanced information of the submission
+ */
+const rawSubmission = ${JSON.stringify(this.instance, null, 4)}`;
+      const survey = `
+/**
+ * This is the survey object. It contains all questions as well
+ * as their properties and attributes.
+ */
+
+const survey = ${JSON.stringify(this.survey, null, 4)}`;
+      return `${submission}\n\n${rawSubmission}\n\n${survey}\n`;
     },
+  },
+  watch: {
     survey: {
       handler(newVal, oldVal) {
         console.log('changed');
@@ -384,8 +436,7 @@ export default {
         if (current.controls.length === 0) {
           return;
         }
-        this.instance = utils.createInstance(newVal, newVal.latestVersion);
-        this.refreshSubmission();
+        this.instance = submissionUtils.createSubmissionFromSurvey(newVal, newVal.latestVersion);
 
         if (this.dirty || !this.editMode || !this.initialSurvey) {
           return;
@@ -475,7 +526,7 @@ export default {
 
 .pane-submission-code,
 .pane-main-code {
-  min-width: 500px;
+  min-width: 700px;
 }
 
 .pane-survey {
@@ -488,10 +539,10 @@ export default {
 
 .pane-draft {
   width: 100vw;
-  max-width: 500px;
   position: relative;
 }
 
+.pane-draft,
 .draft {
   max-width: 500px;
 }
