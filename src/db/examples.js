@@ -18,9 +18,18 @@ export const exampleSurvey = {
           options: {
             readOnly: false,
             required: false,
-            relevance: '',
-            constraint: '',
-            calculate: '',
+            relevance: {
+              enabled: false,
+              code: '',
+            },
+            constraint: {
+              enabled: false,
+              code: '',
+            },
+            calculate: {
+              enabled: false,
+              code: '',
+            },
           },
         },
         {
@@ -35,9 +44,19 @@ export const exampleSurvey = {
               options: {
                 readOnly: false,
                 required: false,
-                relevance: '',
-                constraint: '',
-                calculate: '',
+
+                relevance: {
+                  enabled: false,
+                  code: '',
+                },
+                constraint: {
+                  enabled: false,
+                  code: '',
+                },
+                calculate: {
+                  enabled: false,
+                  code: '',
+                },
               },
             },
             {
@@ -47,18 +66,36 @@ export const exampleSurvey = {
               options: {
                 readOnly: false,
                 required: false,
-                relevance: '',
-                constraint: '',
-                calculate: '',
+                relevance: {
+                  enabled: false,
+                  code: '',
+                },
+                constraint: {
+                  enabled: false,
+                  code: '',
+                },
+                calculate: {
+                  enabled: false,
+                  code: '',
+                },
               },
             },
           ],
           options: {
             readOnly: false,
             required: false,
-            relevance: '',
-            constraint: '',
-            calculate: '',
+            relevance: {
+              enabled: false,
+              code: '',
+            },
+            constraint: {
+              enabled: false,
+              code: '',
+            },
+            calculate: {
+              enabled: false,
+              code: '',
+            },
           },
         },
       ],
