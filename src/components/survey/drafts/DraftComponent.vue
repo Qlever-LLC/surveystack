@@ -1,7 +1,6 @@
 
 <template>
   <div id="relative-wrapper">
-
     <div
       id="draft-container"
       v-if="submission && survey"
@@ -18,7 +17,6 @@
         v-if="!showOverview && index < positions.length"
         :breadcrumbs="mbreadcrumbs"
       />
-
       <div style="position: relative; width: 100%; height: 100%;">
         <transition :name="slide">
           <div
@@ -27,15 +25,12 @@
           >
             <v-container
               id="draft-body"
-              style="max-width: 800px; height: 100%;"
+              style="max-width: 50rem; height: 100%;"
             >
               <v-row
                 class="flex-grow-0 flex-shrink-1 pl-2 pr-2"
                 v-if="!atOverview"
-              >
-
-              </v-row>
-
+              />
               <v-row
                 justify="center"
                 align="center"
@@ -43,7 +38,7 @@
                 style="height: 100%; margin-left: 0px; margin-right: 0px;"
               >
                 <component
-                  v-if="!atEnd"
+                  v-if="control && !atEnd"
                   class="tall"
                   :key="'question_'+index"
                   :is="componentName"
@@ -79,7 +74,7 @@
         :submission="submission"
         :position="this.positions[this.index]"
         @navigate="navigate"
-      ></draft-overview>
+      />
     </v-navigation-drawer>
 
     <draft-footer
@@ -96,15 +91,8 @@
   </div>
 </template>
 
-
 <script>
 import _ from 'lodash';
-import api from '@/services/api.service';
-
-import appControlString from '@/components/survey/question_types/String.vue';
-import appControlNumber from '@/components/survey/question_types/Number.vue';
-import appControlLocation from '@/components/survey/question_types/Location.vue';
-import appControlGroup from '@/components/survey/question_types/Group.vue';
 
 import draftOverview from '@/components/survey/drafts/DraftOverview.vue';
 import draftFooter from '@/components/survey/drafts/DraftFooter.vue';
@@ -113,20 +101,16 @@ import draftTitle from '@/components/survey/drafts/DraftTitle.vue';
 
 import appMixin from '@/components/mixin/appComponent.mixin';
 
-import {
-  getControl,
-  getBreadcrumbs,
-  getInstanceData,
-  getSurveyPositions,
-  compileSandboxSingleLine,
-  createInstancePayload,
-} from '@/utils/surveys';
+import * as utils from '@/utils/surveys';
+import submissionUtils from '@/utils/submissions';
+
 
 export default {
+  model: {
+    prop: 'submission',
+    event: 'change',
+  },
   props: {
-    submissionChanged: {
-      type: Function,
-    },
     submission: {
       type: Object,
       required: true,
@@ -138,10 +122,6 @@ export default {
   },
   mixins: [appMixin],
   components: {
-    appControlString,
-    appControlNumber,
-    appControlLocation,
-    appControlGroup,
     draftOverview,
     draftFooter,
     draftToolbar,
@@ -150,11 +130,9 @@ export default {
   data() {
     return {
       control: null,
-      submissionData: null,
       index: 0,
       mShowNav: true,
       mShowNext: true,
-      activeVersion: 0,
       value: null,
       showOverview: false,
       slide: 'slide-in',
@@ -162,7 +140,10 @@ export default {
   },
   computed: {
     positions() {
-      return getSurveyPositions(this.survey, this.activeVersion);
+      return utils.getSurveyPositions(this.survey, this.activeVersion);
+    },
+    position() {
+      return this.positions[this.index];
     },
     atStart() {
       return this.index === 0;
@@ -173,13 +154,6 @@ export default {
     atEnd() {
       return this.index >= this.positions.length;
     },
-    showInput() {
-      if (this.control.type === 'group') {
-        return false;
-      }
-
-      return true;
-    },
     questionNumber() {
       const edited = this.positions[this.index].map(value => value + 1);
       return edited.join('.');
@@ -188,30 +162,34 @@ export default {
       if (this.atOverview || this.atEnd) {
         return [];
       }
-      const b = getBreadcrumbs(
+      const b = utils.getBreadcrumbs(
         this.survey.versions.find(item => item.version === this.activeVersion),
-        this.positions[this.index],
+        this.position,
       );
 
       const ret = b.splice(0, b.length - 1);
       return ret;
     },
     breadcrumbs() {
-      return getBreadcrumbs(
+      return utils.getBreadcrumbs(
         this.survey.versions.find(item => item.version === this.activeVersion),
-        this.positions[this.index],
+        this.position,
       );
-    },
-    draftId() {
-      return this.$route.params && this.$route.params.id;
-    },
-    surveyId() {
-      return this.$route.query && this.$route.query.survey;
     },
     componentName() {
       let { type } = this.control;
       type = type.charAt(0).toUpperCase() + type.slice(1);
       return `appControl${type}`;
+    },
+    controls() {
+      // TODO: handle version not found
+      return this.survey.versions.find(item => item.version === this.activeVersion).controls;
+    },
+    activeVersion() {
+      return this.submission.meta.version;
+    },
+    submissionField() {
+      return submissionUtils.getSubmissionField(this.submission, this.survey, this.position);
     },
   },
   methods: {
@@ -224,11 +202,12 @@ export default {
     },
     setValue(v) {
       // TODO change modified timestamp, persist
-      this.$set(this.control, 'value', v);
+      // local
       this.value = v;
+      // submission
       this.submission.meta.modified = new Date().getTime();
-      console.log('emitting change');
-      this.$emit('submissionChanged', this.submission);
+      this.submissionField.value = v;
+      this.$emit('change', this.submission);
       this.persist();
     },
     navigate(pos) {
@@ -237,12 +216,9 @@ export default {
       this.showNav(true);
       this.showNext(true);
 
-      console.log(this.positions);
       this.index = this.positions.findIndex(p => _.isEqual(p, pos));
-      console.log(this.index);
-      this.submissionData = getInstanceData(this.submission);
-      this.control = getControl(this.submission.data, pos);
-      this.value = this.control.value;
+      this.control = utils.getControl(this.controls, pos);
+      this.value = submissionUtils.getSubmissionField(this.submission, this.survey, pos).value;
       this.showOverview = false;
 
       this.calculateControl();
@@ -255,7 +231,7 @@ export default {
       // eslint-disable-next-line no-constant-condition
       while (true) {
         if (this.atEnd) {
-          const payload = createInstancePayload(
+          const payload = utils.createInstancePayload(
             this.submission,
             this.survey.versions[this.activeVersion],
           );
@@ -274,9 +250,8 @@ export default {
 
 
         this.index++;
-        this.submissionData = getInstanceData(this.submission);
-        this.control = getControl(this.submission.data, this.positions[this.index]);
-        this.value = this.control.value;
+        this.control = utils.getControl(this.controls, this.position);
+        this.value = submissionUtils.getSubmissionField(this.submission, this.survey, this.position).value;
 
         if (this.control.type === 'group') {
           // eslint-disable-next-line no-continue
@@ -299,8 +274,8 @@ export default {
           return;
         }
         this.index--;
-        this.control = getControl(this.submission.data, this.positions[this.index]);
-        this.value = this.control.value;
+        this.control = utils.getControl(this.controls, this.position);
+        this.value = submissionUtils.getSubmissionField(this.submission, this.survey, this.position).value;
 
         this.showOverview = false;
 
@@ -319,8 +294,8 @@ export default {
       ) {
         return;
       }
-      const sandbox = compileSandboxSingleLine(this.control.options.calculate);
-      this.control.value = sandbox({ data: this.submissionData });
+      const sandbox = utils.compileSandboxSingleLine(this.control.options.calculate);
+      this.control.value = sandbox({ data: this.submission.data });
       this.value = this.control.value;
       console.log(this.control.value);
     },
@@ -343,13 +318,15 @@ export default {
   },
 
   async created() {
-    this.activeVersion = this.submission.meta.version;
-
+    console.log('submission', this.submission);
     /** Should this be broken out into method? */
-    this.index = 0;
-    this.submissionData = getInstanceData(this.submission);
-    this.control = getControl(this.submission.data, this.positions[this.index]);
-    this.value = this.control.value;
+    this.control = utils.getControl(this.controls, this.position);
+    this.value = submissionUtils.getSubmissionField(this.submission, this.survey, this.position).value;
+
+    this.setNavbarContent({
+      title: this.survey.name,
+      subtitle: `<span><span id="question-title-chip">Version ${this.activeVersion}</span></span> <span id="question-title-chip">${this.positions.length} Questions</span>`,
+    });
   },
 };
 </script>
@@ -433,10 +410,7 @@ export default {
   border-left: 1px solid #aaa;
   will-change: transform;
 }
-</style>
 
-
-<style scoped>
 .full {
   width: 100%;
 }

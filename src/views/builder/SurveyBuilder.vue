@@ -346,7 +346,7 @@ export default {
     refreshSubmission() {
       console.log('refreshSubmission');
       const code = JSON.stringify(utils.codeFromSubmission(this.instance), null, 4);
-      this.submissionCode = `const submission = ${code}`;
+      this.submissionCode = `const submission = ${code}\n\nconst survey = ${JSON.stringify(this.survey, null, 4)}`;
     },
   },
   computed: {

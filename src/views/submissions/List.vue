@@ -7,6 +7,13 @@
           outlined
           label="Find"
         />
+        <code-editor
+        style="height: 300px;"
+        :code="find"
+        language="json"
+        :runnable="true"
+        @run="goFetch"
+        ></code-editor>
         <v-row>
           <v-col>
             <v-text-field
@@ -109,6 +116,7 @@
 
 import api from '@/services/api.service';
 import treeItem from '@/components/survey/TreeItem.vue';
+import CodeEditor from '@/components/ui/CodeEditor.vue';
 import { flattenSubmission } from '@/utils/submissions';
 
 // <tree-item class="item" :item="result" @make-folder="makeFolder" @add-item="addItem" />
@@ -116,6 +124,7 @@ import { flattenSubmission } from '@/utils/submissions';
 export default {
   components: {
     treeItem,
+    CodeEditor,
   },
   data() {
     return {
@@ -194,6 +203,10 @@ export default {
     },
   },
   methods: {
+    async goFetch(findValue) {
+      this.find = findValue;
+      this.fetchData();
+    },
     async fetchData() {
       try {
         const { survey } = this.$route.query;
