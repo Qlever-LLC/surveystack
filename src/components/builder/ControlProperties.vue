@@ -97,9 +97,6 @@ import { getAdvancedCodeTemplate } from '@/utils/surveys';
 
 export default {
   props: {
-    toggleCode: {
-      required: true,
-    },
     control: {
       required: false,
     },

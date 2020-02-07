@@ -34,7 +34,6 @@
             <control-adder @controlAdded="controlAdded" />
             <v-card-title>Properties</v-card-title>
             <control-properties
-              :toggleCode="toggleCodeEditor"
               :control="control"
               :survey="survey"
               @code-calculate="highlight('calculate')"
@@ -55,26 +54,26 @@
         >
 
           <v-tabs
+            v-model="selectedTab"
             fixed-tabs
             background-color="blue-grey darken-4"
             dark
           >
-            <v-tab v-if="control.options &&  control.options.relevance && control.options.relevance.enabled">
+            <v-tab v-show="control.options &&  control.options.relevance && control.options.relevance.enabled">
               Relevance
             </v-tab>
-            <v-tab v-if="control.options &&  control.options.computed && control.options.computed.enabled">
-              Computed
+            <v-tab v-show="control.options &&  control.options.calculate && control.options.calculate.enabled">
+              Calculate
             </v-tab>
-            <v-tab v-if="control.options &&  control.options.constraint && control.options.constraint.enabled">
+            <v-tab v-show="control.options &&  control.options.constraint && control.options.constraint.enabled">
               Constraint
             </v-tab>
           </v-tabs>
 
           <code-editor
+            v-if="selectedTab !== null"
             @close="hideCode = true"
-            title="Relevance"
-            :code="control.options.relevance.code"
-            v-if="survey"
+            :code="activeCode"
             class="main-code-editor"
             :refresh="codeRefreshCounter"
             :runnable="true"
@@ -216,6 +215,12 @@ const simplify = (submissionItem) => {
   return ret;
 };
 
+const tabMap = [
+  'relevance',
+  'calculate',
+  'constraint',
+];
+
 export default {
   mixins: [
     appMixin,
@@ -250,9 +255,7 @@ export default {
       log: '',
       codeError: null,
       evaluated: null,
-      relevanceCode: initialRelevanceCode,
-      currentControlHasRelevance: false,
-      currentControlHasCalculate: false,
+      selectedTab: null,
       // survey entity
       initialSurvey: null,
       instance: null,
@@ -277,12 +280,13 @@ export default {
   methods: {
     highlight(tab) {
       this.hideCode = false;
-      switch (tab) {
-        case 'calculate':
-          break;
-        default:
-          break;
+
+      if (!this.control.options[tab].enabled) {
+        return;
       }
+
+
+      this.selectedTab = tabMap.indexOf(tab);
     },
     async runCode(code) {
       const worker = new Worker('/worker.js');
@@ -391,6 +395,12 @@ export default {
     },
   },
   computed: {
+    activeCode() {
+      if (this.selectedTab === null) {
+        return null;
+      }
+      return this.control.options[tabMap[this.selectedTab]].code;
+    },
     hasCode() {
       if (!this.control) {
         return false;
@@ -435,9 +445,27 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
     },
   },
   watch: {
+    control: {
+      handler(newVal, oldVal) {
+        if (!oldVal || !newVal) {
+          return;
+        }
+
+        console.log('changed control');
+        Object.keys(tabMap).forEach((t) => {
+          if (newVal.options[t] !== oldVal.options[t]) {
+            if (newVal.options[t].enabled) {
+              this.selectedTab = tabMap[t];
+            }
+          }
+        });
+      },
+      deep: true,
+    },
     survey: {
       handler(newVal, oldVal) {
         console.log('changed');
+
         const current = newVal.versions.find(v => v.version === newVal.latestVersion);
         if (current.controls.length === 0) {
           return;
@@ -528,6 +556,10 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
   margin-right: 15px;
   margin-bottom: 0px;
   overflow: hidden;
+}
+
+.pane-controls {
+  overflow: auto;
 }
 
 .pane-submission-code,
