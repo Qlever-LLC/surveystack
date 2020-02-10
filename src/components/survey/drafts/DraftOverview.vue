@@ -17,7 +17,7 @@
           <v-card
             @click="$emit('navigate', display.position);"
             :color="display.background"
-            :dark="display.active"
+            :dark="display.dark"
           >
             <v-card-title class="d-block">
               <div class="ma-0 pa-0">
@@ -50,6 +50,7 @@ import _ from 'lodash';
 import colors from 'vuetify/lib/util/colors';
 import appMixin from '@/components/mixin/appComponent.mixin';
 import { linearControls } from '@/utils/submissions';
+import * as utils from '@/utils/surveys';
 
 
 const states = {
@@ -81,9 +82,18 @@ export default {
   ],
   computed: {
     controlDisplays() {
+      const positions = utils.getSurveyPositions(this.survey, this.submission.version);
       const r = linearControls(this.survey, this.submission).map((item) => {
         const icon = iconify(item);
         const active = _.isEqual(item.position, this.position);
+        const idx = positions.findIndex(p => _.isEqual(p, item.position));
+        const relevant = utils.isRelevant(this.submission, this.survey, idx, positions);
+        const rel = relevant === undefined ? true : relevant;
+
+        console.log('is relevant', item.label, rel, relevant);
+        // eslint-disable-next-line no-nested-ternary
+        const background = rel ? (active ? colors.green.base : 'white') : colors.grey.darken3;
+
         return {
           label: item.label,
           value: item.value,
@@ -91,9 +101,10 @@ export default {
           icon: icon[0],
           color: icon[1],
           number: item.number.join('.'),
-          background: active ? colors.green.base : 'white',
+          background,
           position: item.position,
-          active,
+          dark: active || !rel,
+          relevant: rel,
         };
       });
       return r;

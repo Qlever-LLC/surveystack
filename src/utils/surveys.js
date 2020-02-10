@@ -427,7 +427,7 @@ const firstParentWithRelevance = (submission, survey, index, positions) => {
   const relevantParent = parts.find((p) => {
     const field = submissionUtils.getSubmissionField(submission, survey, p);
     console.log('find', field);
-    return field.meta.relevant !== undefined;
+    return field.meta.relevant === false;
   });
 
   return relevantParent;
@@ -439,7 +439,7 @@ export const isRelevant = (submission, survey, index, positions) => {
   console.log('relevant pos', relevantPosition);
   const field = submissionUtils.getSubmissionField(submission, survey, relevantPosition);
   console.log('relevant field', field);
-  return field.meta.relevance;
+  return field.meta.relevant;
 };
 
 
