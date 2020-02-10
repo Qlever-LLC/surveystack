@@ -6,6 +6,7 @@
           v-model="match"
           outlined
           label="Match"
+          rows="3"
         />
         <v-row>
           <v-col>
@@ -34,12 +35,25 @@
           </v-col>
         </v-row>
 
-        <v-btn
-          @click="fetchData"
-          :disabled="!validQuery"
-          class="ml-auto"
-          color="primary"
-        >QUERY!</v-btn>
+        <v-row>
+          <v-col cols="6">
+            <v-text-field
+              v-model.number="roles"
+              label="Roles (Debug)"
+            />
+          </v-col>
+          <v-col
+            cols="6"
+            class="d-flex align-center justify-end"
+          >
+            <v-btn
+              @click="fetchData"
+              :disabled="!validQuery"
+              color="primary"
+            >QUERY!</v-btn>
+          </v-col>
+        </v-row>
+
       </div>
 
       <h4>API</h4>
@@ -85,7 +99,11 @@
             class="list-group-item pa-2"
           >
             <small class="grey--text text--darken-1">{{submission._id}}</small>
-            <small class="grey--text text--darken-1 ml-1">(Version {{submission.meta.version}})</small>
+            <small class="grey--text text--darken-1">, Version {{submission.meta.version}}</small>
+            <small
+              v-if="submission.meta.path"
+              class="grey--text text--darken-1"
+            >, {{submission.meta.path}}</small>
             <div
               v-for="(item, name, i) in submission.data"
               :key="i"
@@ -124,6 +142,7 @@ export default {
       sort: '{}',
       skip: 0,
       limit: 0,
+      roles: 'public',
       submissions: [],
       search: '',
     };
@@ -187,7 +206,7 @@ export default {
     },
     apiRequest() {
       const { survey } = this.$route.query;
-      return `/submissions?survey=${survey}&match=${this.match}&sort=${this.sort}&project=${this.project}&skip=${this.skip}&limit=${this.limit}`;
+      return `/submissions?survey=${survey}&match=${this.match}&sort=${this.sort}&project=${this.project}&skip=${this.skip}&limit=${this.limit}&roles=${this.roles}`;
     },
     apiUrl() {
       return `${process.env.VUE_APP_API_URL}${this.apiRequest}`;
