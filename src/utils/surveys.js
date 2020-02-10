@@ -337,7 +337,7 @@ export const getControlPositions = (controls) => {
 };
 
 export const getSurveyPositions = (survey, version = 1) => {
-  const positions = getControlPositions(survey.versions.find(item => item.version === version).controls);
+  const positions = getControlPositions(survey.revisions.find(revision => revision.version === version).controls);
   return positions;
 };
 

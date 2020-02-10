@@ -277,7 +277,7 @@ export default {
         dateCreated: currentDate,
         dateModified: currentDate,
         latestVersion: 1,
-        versions: [
+        revisions: [
           {
             dateCreated: currentDate,
             version: 1,
@@ -441,7 +441,7 @@ export default {
       return this.survey.latestVersion;
     },
     currentControls() {
-      return this.survey.versions.find(item => (item.version === this.survey.latestVersion)).controls;
+      return this.survey.revisions.find(revision => (revision.version === this.survey.latestVersion)).controls;
     },
     sharedCode() {
       if (!this.instance) {
@@ -515,7 +515,7 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
       handler(newVal, oldVal) {
         console.log('survey changed');
 
-        const current = newVal.versions.find(v => v.version === newVal.latestVersion);
+        const current = newVal.revisions.find(revision => revision.version === newVal.latestVersion);
         if (current.controls.length === 0) {
           return;
         }
@@ -524,19 +524,19 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
         if (this.dirty || !this.editMode || !this.initialSurvey) {
           return;
         }
-        if (!_.isEqualWith(newVal.versions, this.initialSurvey.versions, (value1, value2, key) => ((key === 'label') ? true : undefined))) {
+        if (!_.isEqualWith(newVal.revisions, this.initialSurvey.revisions, (value1, value2, key) => ((key === 'label') ? true : undefined))) {
           this.dirty = true;
           const { latestVersion } = this.initialSurvey;
           const nextVersion = latestVersion + 1;
           const date = new Date();
 
-          const nextVersionObj = this.survey.versions.find(item => item.version === latestVersion);
+          const nextVersionObj = this.survey.revisions.find(revision => revision.version === latestVersion);
           nextVersionObj.version = nextVersion;
           nextVersionObj.dateCreated = date;
 
-          this.$set(this.survey, 'versions', this.initialSurvey.versions);
+          this.$set(this.survey, 'revisions', this.initialSurvey.revisions);
 
-          this.survey.versions.push(nextVersionObj);
+          this.survey.revisions.push(nextVersionObj);
           this.survey.latestVersion = nextVersion;
           this.survey.dateModified = date;
         }
