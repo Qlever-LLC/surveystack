@@ -1,5 +1,5 @@
 import ObjectID from 'bson-objectid';
-import { unflatten } from 'flat';
+import { flatten, unflatten } from 'flat';
 
 function* processPositions(data, position = []) {
   if (!data) {
@@ -97,7 +97,8 @@ export const flattenSubmission = (submission, delimiter = '.') => {
  *
  * @returns {Object} A submission for a specific survey version.
  */
-const createSubmissionFromSurvey = (survey, version = 1, instance) => {
+const createSubmissionFromSurvey = (survey, version = 1, instance = null) => {
+  console.log('createSubmissionFromSurvey: instance', instance);
   const submission = {};
 
   submission._id = new ObjectID().toString();
@@ -111,11 +112,19 @@ const createSubmissionFromSurvey = (survey, version = 1, instance) => {
   const { controls } = survey.revisions.find(revision => revision.version === version);
   const positions = getControlPositions(controls);
 
+
+  let flattenedInstance;
+  if (instance) {
+    flattenedInstance = flatten(instance.data);
+  }
+
+
   const objects = [];
   positions.forEach((position) => {
     const control = getControl(controls, position);
     const flatName = getFlatName(controls, position);
-    objects.push({ [flatName]: { value: null, meta: { type: control.type } } });
+    const value = flattenedInstance ? flattenedInstance[`${flatName}.value`] : null;
+    objects.push({ [flatName]: { value, meta: { type: control.type } } });
   });
 
   const c = Object.assign({}, ...objects);
