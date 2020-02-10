@@ -1,4 +1,3 @@
-
 <template>
   <div id="relative-wrapper">
     <div
@@ -92,6 +91,8 @@
 </template>
 
 <script>
+/* eslint-disable no-continue */
+
 import _ from 'lodash';
 
 import draftOverview from '@/components/survey/drafts/DraftOverview.vue';
@@ -246,10 +247,31 @@ export default {
 
         this.index++;
         this.control = utils.getControl(this.controls, this.position);
-        this.value = submissionUtils.getSubmissionField(this.submission, this.survey, this.position).value;
+        const field = submissionUtils.getSubmissionField(this.submission, this.survey, this.position);
+        console.log(utils.isRelevant(this.submission, this.survey, this.index, this.positions));
+
+        /*         if (field.meta.relevant === false) {
+                  // todo skip entire group
+                  if (field.meta.type === 'group') {
+                    const len = this.position.length;
+                    const start = this.index + 1;
+                    for (let i = start; i < this.positions.length; i++) {
+                      if (this.positions[i].length <= len) {
+                        console.log('new index', i);
+                        this.index = i;
+                        break;
+                      }
+                    }
+                    console.log('position', this.position);
+                    console.log('positions', this.positions);
+                  }
+                  continue;
+                } */
+
+        this.value = field.value;
+
 
         if (this.control.type === 'group') {
-          // eslint-disable-next-line no-continue
           continue;
         }
 
@@ -314,6 +336,47 @@ export default {
     async submit(payload) {
       this.$emit('submit', { payload });
     },
+    async calculateRelevance() {
+      const items = this.positions.map((pos) => {
+        const control = utils.getControl(this.controls, pos);
+        if (!control.options.relevance.enabled) {
+          return null;
+        }
+        const { code } = control.options.relevance;
+        return {
+          pos,
+          control,
+          code,
+        };
+      }).filter(item => item !== null);
+
+      console.log('items for relevance eval', items);
+
+      const promises = items.map(item => new Promise((resolve, reject) => {
+        utils.execute(item.code, 'relevance', this.submission, this.survey)
+          .then(r => resolve({
+            control: item.control,
+            pos: item.pos,
+            res: r,
+          })).catch((e) => {
+            reject(e);
+          });
+      }));
+
+      try {
+        const res = await Promise.all(promises);
+        res.forEach((item) => {
+          const field = submissionUtils.getSubmissionField(this.submission, this.survey, item.pos);
+          if (typeof item.res !== 'boolean') {
+            console.log('error, result is not boolean', item.res);
+            return;
+          }
+          field.meta.relevant = item.res;
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
 
   async created() {
@@ -326,6 +389,14 @@ export default {
       title: this.survey.name,
       subtitle: `<span><span id="question-title-chip">Version ${this.activeVersion}</span></span> <span id="question-title-chip">${this.positions.length} Questions</span>`,
     });
+  },
+  watch: {
+    submission: {
+      async handler() {
+        await this.calculateRelevance();
+      },
+      deep: true,
+    },
   },
 };
 </script>

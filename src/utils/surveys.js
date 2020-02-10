@@ -5,193 +5,9 @@
 
 import { unflatten } from 'flat';
 import ObjectID from 'bson-objectid';
-
 import _ from 'lodash';
+import submissionUtils from './submissions';
 
-export const mockSurvey = {
-  _id: '5dadc4c9988f9df9527f07ac',
-  name: 'Generations Survey',
-  controls: [
-    {
-      name: 'name',
-      label: 'What is your name?',
-      type: 'string',
-      options: {
-        readOnly: false,
-        required: false,
-        relevance: '',
-        constraint: '',
-        calculate: '',
-      },
-    },
-    {
-      name: 'age',
-      label: 'What is your age?',
-      type: 'number',
-      options: {
-        readOnly: false,
-        required: false,
-        relevance: '',
-        constraint: '',
-        calculate: '',
-      },
-    },
-    {
-      name: 'group_old',
-      label: 'Old group',
-      type: 'group',
-      children: [
-        {
-          name: 'medication',
-          label: 'What medication do you use?',
-          type: 'text',
-          options: {
-            readOnly: false,
-            required: false,
-            relevance: '',
-            constraint: '',
-            calculate: '',
-          },
-        },
-        {
-          name: 'physical',
-          label: 'My group 2',
-          type: 'group',
-          children: [
-            {
-              name: 'vision',
-              label: 'What is your vision?',
-              type: 'number',
-              options: {
-                readOnly: false,
-                required: false,
-                relevance: '',
-                constraint: '',
-                calculate: '',
-              },
-            },
-            {
-              name: 'time_mile',
-              label: 'How long do run one mile?',
-              type: 'string',
-              options: {
-                readOnly: false,
-                required: false,
-                relevance: '',
-                constraint: '',
-                calculate: '',
-              },
-            },
-          ],
-          options: {
-            readOnly: false,
-            required: false,
-            relevance: '',
-            constraint: '',
-            calculate: '',
-          },
-        },
-      ],
-      options: {
-        readOnly: false,
-        required: false,
-        relevance: '',
-        constraint: '',
-        calculate: '',
-      },
-    },
-    {
-      name: 'group_young',
-      label: 'My group 5',
-      type: 'group',
-      children: [
-        {
-          name: 'sports',
-          label: 'What sports do you watch?',
-          type: 'string',
-          options: {
-            readOnly: false,
-            required: false,
-            relevance: '',
-            constraint: '',
-            calculate: '',
-          },
-        },
-        {
-          name: 'consoles',
-          label: 'Which consoles do you own?',
-          type: 'string',
-          options: {
-            readOnly: false,
-            required: false,
-            relevance: '',
-            constraint: '',
-            calculate: '',
-          },
-        },
-      ],
-      options: {
-        readOnly: false,
-        required: false,
-        relevance: '',
-        constraint: '',
-        calculate: '',
-      },
-    },
-    {
-      name: 'goodbye',
-      label: 'Say goodbye',
-      type: 'string',
-      options: {
-        readOnly: false,
-        required: false,
-        relevance: '',
-        constraint: '',
-        calculate: '',
-      },
-    },
-  ],
-};
-
-const mockInstance = {
-  _id: '5dadc4c9988f9df9527f99ef',
-  survey: '5dadc4c9988f9df9527f07ac',
-  data: [
-    {
-      name: 'hello',
-      label: 'How do you say hello?',
-      type: 'string',
-      value: 'Grüezi',
-    },
-    {
-      name: 'personal_stuff',
-      label: 'My group 2',
-      type: 'group',
-      children: [
-        {
-          name: 'text_0',
-          label: 'Enter some text 0',
-          type: 'string',
-          value: 'This is completely random',
-        },
-        {
-          name: 'group_0',
-          label: 'My group 0',
-          type: 'group',
-          children: [
-            {
-              name: 'numeric_1',
-              label: 'Enter a number 1',
-              type: 'number',
-              value: 17,
-            },
-          ],
-        },
-      ],
-    },
-  ],
-
-};
 
 function* processSurveyNames(data) {
   if (!data) {
@@ -530,6 +346,61 @@ export const handleize = (str) => {
   return handle;
 };
 
+export const simplify = (submissionItem) => {
+  if (submissionItem.meta !== undefined && submissionItem.meta.type !== 'group') {
+    return submissionItem.value || null;
+  }
+
+  const ret = {};
+  const keys = Object.keys(submissionItem).filter(k => k !== 'value' && k !== 'meta');
+  keys.forEach((k) => {
+    ret[k] = simplify(submissionItem[k]);
+  });
+  return ret;
+};
+
+export function execute(code, functionName, instance, survey, log) {
+  const worker = new Worker('/worker.js');
+
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      worker.terminate();
+      reject(new Error('timeout'));
+    }, 10000);
+
+    let counter = 0;
+
+    worker.onmessage = (m) => {
+      if (m.data.res !== undefined) {
+        clearTimeout(timeout);
+        worker.terminate();
+        resolve(m.data.res);
+      } else if (m.data.error) {
+        clearTimeout(timeout);
+        worker.terminate();
+        reject(m.data.error);
+      } else if (m.data.log) {
+        if (counter++ > 1000) {
+          reject(new Error('Too many log messages'));
+        } else {
+          const arg = typeof m.data.log === 'object' ? JSON.stringify(m.data.log, null, 2) : m.data.log;
+          log(arg);
+        }
+      }
+    };
+
+    worker.postMessage(
+      {
+        code,
+        submission: simplify(instance.data),
+        rawSubmission: instance,
+        survey,
+        functionName,
+      },
+    );
+  });
+}
+
 // TOOD: decide how to do business logic on Survey and Survey instances
 // Use a class? or helper function in here?
 export const calculateControl = (control) => {
@@ -538,6 +409,224 @@ export const calculateControl = (control) => {
   }
 };
 
+
+const firstParentWithRelevance = (submission, survey, index, positions) => {
+  const pos = _.clone(positions[index]);
+  const len = pos.length - 1;
+  const parts = [];
+  parts.push(_.clone(pos));
+  for (let i = 0; i < len; i++) { // swim to the top
+    pos.splice(-1, 1);
+    parts.push(_.clone(pos));
+    console.log('pos', pos);
+  }
+  parts.reverse();
+
+  console.log('parts', parts);
+
+  const relevantParent = parts.find((p) => {
+    const field = submissionUtils.getSubmissionField(submission, survey, p);
+    console.log('find', field);
+    return field.meta.relevant !== undefined;
+  });
+
+  return relevantParent;
+};
+
+export const isRelevant = (submission, survey, index, positions) => {
+  console.log('is relevant for index', index);
+  const relevantPosition = firstParentWithRelevance(submission, survey, index, positions) || positions[index];
+  console.log('relevant pos', relevantPosition);
+  const field = submissionUtils.getSubmissionField(submission, survey, relevantPosition);
+  console.log('relevant field', field);
+  return field.meta.relevance;
+};
+
+
+export const mockSurvey = {
+  _id: '5dadc4c9988f9df9527f07ac',
+  name: 'Generations Survey',
+  controls: [
+    {
+      name: 'name',
+      label: 'What is your name?',
+      type: 'string',
+      options: {
+        readOnly: false,
+        required: false,
+        relevance: '',
+        constraint: '',
+        calculate: '',
+      },
+    },
+    {
+      name: 'age',
+      label: 'What is your age?',
+      type: 'number',
+      options: {
+        readOnly: false,
+        required: false,
+        relevance: '',
+        constraint: '',
+        calculate: '',
+      },
+    },
+    {
+      name: 'group_old',
+      label: 'Old group',
+      type: 'group',
+      children: [
+        {
+          name: 'medication',
+          label: 'What medication do you use?',
+          type: 'text',
+          options: {
+            readOnly: false,
+            required: false,
+            relevance: '',
+            constraint: '',
+            calculate: '',
+          },
+        },
+        {
+          name: 'physical',
+          label: 'My group 2',
+          type: 'group',
+          children: [
+            {
+              name: 'vision',
+              label: 'What is your vision?',
+              type: 'number',
+              options: {
+                readOnly: false,
+                required: false,
+                relevance: '',
+                constraint: '',
+                calculate: '',
+              },
+            },
+            {
+              name: 'time_mile',
+              label: 'How long do run one mile?',
+              type: 'string',
+              options: {
+                readOnly: false,
+                required: false,
+                relevance: '',
+                constraint: '',
+                calculate: '',
+              },
+            },
+          ],
+          options: {
+            readOnly: false,
+            required: false,
+            relevance: '',
+            constraint: '',
+            calculate: '',
+          },
+        },
+      ],
+      options: {
+        readOnly: false,
+        required: false,
+        relevance: '',
+        constraint: '',
+        calculate: '',
+      },
+    },
+    {
+      name: 'group_young',
+      label: 'My group 5',
+      type: 'group',
+      children: [
+        {
+          name: 'sports',
+          label: 'What sports do you watch?',
+          type: 'string',
+          options: {
+            readOnly: false,
+            required: false,
+            relevance: '',
+            constraint: '',
+            calculate: '',
+          },
+        },
+        {
+          name: 'consoles',
+          label: 'Which consoles do you own?',
+          type: 'string',
+          options: {
+            readOnly: false,
+            required: false,
+            relevance: '',
+            constraint: '',
+            calculate: '',
+          },
+        },
+      ],
+      options: {
+        readOnly: false,
+        required: false,
+        relevance: '',
+        constraint: '',
+        calculate: '',
+      },
+    },
+    {
+      name: 'goodbye',
+      label: 'Say goodbye',
+      type: 'string',
+      options: {
+        readOnly: false,
+        required: false,
+        relevance: '',
+        constraint: '',
+        calculate: '',
+      },
+    },
+  ],
+};
+
+const mockInstance = {
+  _id: '5dadc4c9988f9df9527f99ef',
+  survey: '5dadc4c9988f9df9527f07ac',
+  data: [
+    {
+      name: 'hello',
+      label: 'How do you say hello?',
+      type: 'string',
+      value: 'Grüezi',
+    },
+    {
+      name: 'personal_stuff',
+      label: 'My group 2',
+      type: 'group',
+      children: [
+        {
+          name: 'text_0',
+          label: 'Enter some text 0',
+          type: 'string',
+          value: 'This is completely random',
+        },
+        {
+          name: 'group_0',
+          label: 'My group 0',
+          type: 'group',
+          children: [
+            {
+              name: 'numeric_1',
+              label: 'Enter a number 1',
+              type: 'number',
+              value: 17,
+            },
+          ],
+        },
+      ],
+    },
+  ],
+
+};
 const DBG = false;
 
 if (DBG) {
