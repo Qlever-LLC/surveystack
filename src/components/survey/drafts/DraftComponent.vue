@@ -387,6 +387,9 @@ export default {
     });
   },
   watch: {
+    async showOverview() {
+      await this.calculateRelevance();
+    },
     submission: {
       async handler() {
         await this.calculateRelevance();

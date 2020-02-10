@@ -10,17 +10,19 @@
     >
       <template v-for="(display, idx) in controlDisplays">
         <v-timeline-item
+          v-if="display.collate === 0 || display.lastOfCollation || !display.hidden"
           :key="idx"
           :icon="display.icon"
           :color="display.color"
         >
           <v-card
+            v-if="display.relevant || !display.hidden"
             @click="$emit('navigate', display.position);"
             :color="display.background"
             :dark="display.dark"
           >
             <v-card-title class="d-block">
-              <div class="ma-0 pa-0">
+              <div class="ma-0 pa-0 d-flex">
                 <v-chip
                   dark
                   small
@@ -33,12 +35,29 @@
                       class="mr-1"
                       v-if="ci < display.breadcrumbs.length - 1"
                     >&gt;</span></span></v-chip>
+                <v-spacer></v-spacer>
+                <v-chip
+                  small
+                  dark
+                  v-if="display.collate > 0"
+                  color="grey-darken-5"
+                >Irrelevant</v-chip>
               </div>
-              <span class="number-chip mr-2">{{ display.number }}</span> {{ display.label }}
+              <span class="number-chip mr-2">{{ display.number }}</span>
+              {{ display.label }}
             </v-card-title>
             <v-card-text v-if="display.value"><kbd class="pa-2">{{ display.value }}</kbd></v-card-text>
             <v-card-text v-else>No answer</v-card-text>
           </v-card>
+
+          <v-chip
+            v-else
+            @click="expand(display.collateGroup)"
+            dark
+            small
+            color="grey"
+            class="mr-0 mr-1"
+          >{{ display.collate }} Irrelevant Questions</v-chip>
         </v-timeline-item>
       </template>
     </v-timeline>
@@ -80,19 +99,54 @@ export default {
     'submission',
     'position',
   ],
-  computed: {
-    controlDisplays() {
+  data() {
+    return {
+      controlDisplays: [],
+    };
+  },
+  methods: {
+    relevant(item, positions) {
+      const idx = positions.findIndex(p => _.isEqual(p, item.position));
+      const relevant = utils.isRelevant(this.submission, this.survey, idx, positions);
+      return relevant === undefined ? true : relevant;
+    },
+    expand(group) {
+      this.controlDisplays.filter(item => item.collateGroup === group).forEach((item) => {
+        // eslint-disable-next-line no-param-reassign
+        item.collate = 1;
+        // eslint-disable-next-line no-param-reassign
+        item.hidden = false;
+      });
+    },
+    refresh() {
       const positions = utils.getSurveyPositions(this.survey, this.submission.version);
-      const r = linearControls(this.survey, this.submission).map((item) => {
+
+      let collate = 0;
+      let collateGroup = 0;
+      const controls = linearControls(this.survey, this.submission);
+
+      const r = controls.map((item, itemIndex) => {
+        const peek = itemIndex + 1 < controls.length ? controls[itemIndex + 1] : null;
         const icon = iconify(item);
         const active = _.isEqual(item.position, this.position);
-        const idx = positions.findIndex(p => _.isEqual(p, item.position));
-        const relevant = utils.isRelevant(this.submission, this.survey, idx, positions);
-        const rel = relevant === undefined ? true : relevant;
+        const rel = this.relevant(item, positions);
+        let lastOfCollation = false;
 
-        console.log('is relevant', item.label, rel, relevant);
-        // eslint-disable-next-line no-nested-ternary
-        const background = rel ? (active ? colors.green.base : 'white') : colors.grey.darken3;
+        if (!rel) {
+          collate++;
+          if (peek) {
+            if (this.relevant(peek, positions)) {
+              lastOfCollation = true;
+            }
+          } else {
+            lastOfCollation = true;
+          }
+        } else {
+          collate = 0;
+          collateGroup++;
+        }
+
+        const background = (active ? colors.green.base : 'white');
 
         return {
           label: item.label,
@@ -103,11 +157,29 @@ export default {
           number: item.number.join('.'),
           background,
           position: item.position,
-          dark: active || !rel,
+          dark: active,
           relevant: rel,
+          hidden: !rel,
+          collate,
+          collateGroup,
+          lastOfCollation,
         };
       });
-      return r;
+      this.controlDisplays = r;
+    },
+  },
+  watch: {
+    submission: {
+      handler() {
+        this.refresh();
+      },
+      deep: true,
+    },
+    survey: {
+      handler() {
+        this.refresh();
+      },
+      deep: true,
     },
   },
 };
