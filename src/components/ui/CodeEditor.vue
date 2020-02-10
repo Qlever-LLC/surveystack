@@ -6,7 +6,7 @@
       class="card-height"
       slot="paneL"
     >
-      <v-card-title v-if="title">{{ title }} <v-chip
+      <v-card-title>{{ title || "" }} <v-chip
           v-if="result !== null"
           class="mx-4"
           :color="result ? 'green' : 'red'"
@@ -157,8 +157,17 @@ export default {
       this.model = model;
     },
     code(newVal) {
-      console.log('code changed');
-      this.model.setValue(newVal);
+      if (!this.readonly) {
+        console.log('code changed', newVal);
+      }
+
+      if (this.editor) {
+        if (newVal !== this.editor.getValue()) {
+          this.editor.setValue(newVal);
+        }
+      }
+
+      // this.model.setValue(newVal);
     },
   },
   mounted() {

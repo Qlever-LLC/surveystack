@@ -37,7 +37,7 @@
             class="ma-0"
             color="blue"
             outlined
-            v-model="control.options.relevance.enabled"
+            v-model="relevance.enabled"
             label="Relevance Expression"
           />
           <v-spacer />
@@ -56,7 +56,7 @@
             color="blue"
             class="ma-0"
             outlined
-            v-model="control.options.calculate.enabled"
+            v-model="calculate.enabled"
             label="Calculate Expression"
           />
           <v-spacer />
@@ -74,7 +74,7 @@
             class="ma-0"
             color="blue"
             outlined
-            v-model="control.options.constraint.enabled"
+            v-model="constraint.enabled"
             label="Constraint Expression"
           />
           <v-spacer />
@@ -97,6 +97,15 @@ import { getAdvancedCodeTemplate } from '@/utils/surveys';
 
 export default {
   props: {
+    calculate: {
+
+    },
+    relevance: {
+
+    },
+    constraint: {
+
+    },
     control: {
       required: false,
     },

@@ -34,8 +34,13 @@
             <control-adder @controlAdded="controlAdded" />
             <v-card-title>Properties</v-card-title>
             <control-properties
+              v-if="control"
+              :key="'props_'+controlId"
               :control="control"
               :survey="survey"
+              :relevance="optionsRelevance"
+              :calculate="optionsCalculate"
+              :constraint="optionsConstraint"
               @code-calculate="highlight('calculate')"
               @code-relevance="highlight('relevance')"
               @code-constraint="highlight('constraint')"
@@ -54,18 +59,18 @@
         >
 
           <v-tabs
+            v-if="control.options"
             v-model="selectedTab"
-            fixed-tabs
             background-color="blue-grey darken-4"
             dark
           >
-            <v-tab v-show="control.options &&  control.options.relevance && control.options.relevance.enabled">
+            <v-tab :disabled="!control.options.relevance.enabled">
               Relevance
             </v-tab>
-            <v-tab v-show="control.options &&  control.options.calculate && control.options.calculate.enabled">
+            <v-tab :disabled="!control.options.calculate.enabled">
               Calculate
             </v-tab>
-            <v-tab v-show="control.options &&  control.options.constraint && control.options.constraint.enabled">
+            <v-tab :disabled="!control.options.constraint.enabled">
               Constraint
             </v-tab>
           </v-tabs>
@@ -76,10 +81,11 @@
             :code="activeCode"
             class="main-code-editor"
             :refresh="codeRefreshCounter"
-            :runnable="true"
+            runnable="true"
             :error="codeError"
             @run="runCode"
             :result="evaluated"
+            @change="updateSelectedCode"
           >
           </code-editor>
 
@@ -187,7 +193,7 @@ import submissionUtils from '@/utils/submissions';
 const currentDate = new Date();
 
 
-const initialRelevanceCode = `
+const initialRelevanceCode = variable => `
 /**
  * BASIC: use \`submission.\` to autocomplete the basic submission
  * ADVANCED: use \`rawSubmission.\` to autocomplete the advanced version of a submission
@@ -195,7 +201,7 @@ const initialRelevanceCode = `
  * use \`log(message)\` to log to console
  * 
  */
-function relevance() {
+function ${variable}() {
 
   // return true or false
   return true;
@@ -256,6 +262,10 @@ export default {
       codeError: null,
       evaluated: null,
       selectedTab: null,
+      optionsRelevance: null,
+      optionsCalculate: null,
+      optionsConstraint: null,
+      activeCode: '',
       // survey entity
       initialSurvey: null,
       instance: null,
@@ -278,15 +288,35 @@ export default {
     };
   },
   methods: {
-    highlight(tab) {
+    updateSelectedCode(code) {
+      this.control.options[tabMap[this.selectedTab]].code = code;
+    },
+    highlightNext() {
+      [
+        this.optionsRelevance,
+        this.optionsCalculate,
+        this.optionsConstraint,
+      ].forEach((item, idx) => {
+        if (item.enabled) {
+          this.selectedTab = idx;
+        }
+      });
+    },
+    highlight(tab, select = true) {
       this.hideCode = false;
 
       if (!this.control.options[tab].enabled) {
+        this.highlightNext();
         return;
       }
 
-
       this.selectedTab = tabMap.indexOf(tab);
+
+      if (!this.control.options[tab].code) {
+        this.control.options[tab].code = initialRelevanceCode(tab);
+      }
+
+      this.activeCode = this.control.options[tabMap[this.selectedTab]].code;
     },
     async runCode(code) {
       const worker = new Worker('/worker.js');
@@ -395,11 +425,9 @@ export default {
     },
   },
   computed: {
-    activeCode() {
-      if (this.selectedTab === null) {
-        return null;
-      }
-      return this.control.options[tabMap[this.selectedTab]].code;
+    controlId() {
+      const position = utils.getPosition(this.control, this.currentControls);
+      return utils.getFlatName(this.currentControls, position);
     },
     hasCode() {
       if (!this.control) {
@@ -445,26 +473,45 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
     },
   },
   watch: {
+    selectedTab(tab) {
+      this.highlight(tabMap[tab]);
+    },
+    optionsRelevance: {
+      handler(newVal) {
+        this.highlight('relevance', newVal.enabled);
+      },
+      deep: true,
+    },
+    optionsCalculate: {
+      handler(newVal) {
+        this.highlight('calculate', newVal.enabled);
+      },
+      deep: true,
+    },
+    optionsConstraint: {
+      handler(newVal) {
+        this.highlight('constraint', newVal.enabled);
+      },
+      deep: true,
+    },
     control: {
-      handler(newVal, oldVal) {
-        if (!oldVal || !newVal) {
-          return;
+      handler(newVal) {
+        console.log('control changed');
+        if (!newVal) {
+          this.optionsRelevance = null;
+          this.optionsCalculate = null;
+          this.optionsConstraint = null;
         }
 
-        console.log('changed control');
-        Object.keys(tabMap).forEach((t) => {
-          if (newVal.options[t] !== oldVal.options[t]) {
-            if (newVal.options[t].enabled) {
-              this.selectedTab = tabMap[t];
-            }
-          }
-        });
+        this.optionsRelevance = newVal.options.relevance;
+        this.optionsCalculate = newVal.options.calculate;
+        this.optionsConstraint = newVal.options.constraint;
       },
       deep: true,
     },
     survey: {
       handler(newVal, oldVal) {
-        console.log('changed');
+        console.log('survey changed');
 
         const current = newVal.versions.find(v => v.version === newVal.latestVersion);
         if (current.controls.length === 0) {
