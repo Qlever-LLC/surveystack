@@ -6,7 +6,7 @@ export const exampleSurvey = {
   dateCreated: new Date('2020-01-28T13:36:13.031Z'),
   dateModified: new Date('2020-01-28T13:36:13.031Z'),
   latestVersion: 1,
-  versions: [
+  revisions: [
     {
       dateCreated: new Date('2020-01-28T13:36:13.031Z'),
       version: 1,
