@@ -224,10 +224,11 @@ export default {
 
       this.calculateControl();
     },
-    handleNext() {
+    async handleNext() {
       this.slide = 'slide-in';
       this.showNav(true);
       this.showNext(true);
+      await this.calculateRelevance();
 
       // eslint-disable-next-line no-constant-condition
       while (true) {
@@ -255,7 +256,6 @@ export default {
 
         this.control = utils.getControl(this.controls, this.position);
         const field = submissionUtils.getSubmissionField(this.submission, this.survey, this.position);
-        console.log(utils.isRelevant(this.submission, this.survey, this.index, this.positions));
 
         this.value = field.value;
 
@@ -268,7 +268,9 @@ export default {
         return;
       }
     },
-    handlePrevious() {
+    async handlePrevious() {
+      await this.calculateRelevance();
+
       this.slide = 'slide-out';
 
       this.showNav(true);
@@ -388,11 +390,11 @@ export default {
   },
   watch: {
     async showOverview() {
-      await this.calculateRelevance();
+      // await this.calculateRelevance();
     },
     submission: {
       async handler() {
-        await this.calculateRelevance();
+        // await this.calculateRelevance();
       },
       deep: true,
     },

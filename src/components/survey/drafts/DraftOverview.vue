@@ -176,12 +176,6 @@ export default {
       },
       deep: true,
     },
-    survey: {
-      handler() {
-        this.refresh();
-      },
-      deep: true,
-    },
   },
 };
 </script>

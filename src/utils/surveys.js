@@ -418,15 +418,10 @@ const firstParentWithRelevance = (submission, survey, index, positions) => {
   for (let i = 0; i < len; i++) { // swim to the top
     pos.splice(-1, 1);
     parts.push(_.clone(pos));
-    console.log('pos', pos);
   }
   parts.reverse();
-
-  console.log('parts', parts);
-
   const relevantParent = parts.find((p) => {
     const field = submissionUtils.getSubmissionField(submission, survey, p);
-    console.log('find', field);
     return field.meta.relevant === false;
   });
 
@@ -434,11 +429,8 @@ const firstParentWithRelevance = (submission, survey, index, positions) => {
 };
 
 export const isRelevant = (submission, survey, index, positions) => {
-  console.log('is relevant for index', index);
   const relevantPosition = firstParentWithRelevance(submission, survey, index, positions) || positions[index];
-  console.log('relevant pos', relevantPosition);
   const field = submissionUtils.getSubmissionField(submission, survey, relevantPosition);
-  console.log('relevant field', field);
   return field.meta.relevant;
 };
 
