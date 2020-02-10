@@ -22,32 +22,34 @@ const submissions = [
     survey: '5e2eecc36f371d00015775af', // survey reference
     meta: {
       dateCreated: '2020-01-27T14:10:41.623Z',
-      version: 0, // survey version
+      version: 1, // survey version
     }
     // data from controls
-    data: [
-      {
-        name: 'fav_color',
-        type: 'inputText',
+    data: {
+      fav_color: {
         value: 'blue',
+        meta: {
+          type: 'string',
+        }
       },
-      {
-        name: 'personal_group',
-        type: 'group',
-        children: [
-          {
-            name: 'full_name',
-            type: 'inputText',
-            value: 'Andreas Rudolf',
-          },
-          {
-            name: 'age',
-            type: 'inputNumeric',
-            value: 35,
-          },
-        ],
-      },
-    ],
+      personal_group: {
+        full_name: {
+          value: 'Andreas Rudolf',
+          meta: {
+            type: 'string',
+          }
+        },
+        age: {
+          value: 35,
+          meta: {
+            type: 'number'
+          }
+        },
+        meta: {
+          type: 'group'
+        }
+      }
+    }
   },
   {
     _id: '5e2eed803c98557ae2c1d968',
@@ -56,29 +58,31 @@ const submissions = [
       dateCreated: '2020-01-27T14:12:24.730Z',
       version: 3,
     },
-    data: [
-      {
-        name: 'fav_color',
-        type: 'inputText',
+    data: {
+      fav_color: {
         value: 'green',
+        meta: {
+          type: 'string',
+        }
       },
-      {
-        name: 'personal_group',
-        type: 'group',
-        children: [
-          {
-            name: 'full_name',
-            type: 'inputText',
-            value: 'Manuel Di Cerbo',
-          },
-          {
-            name: 'age',
-            type: 'inputNumeric',
-            value: 35,
-          },
-        ],
-      },
-    ],
+      personal_group: {
+        full_name: {
+          value: 'Philipp Rudolf',
+          meta: {
+            type: 'string',
+          }
+        },
+        age: {
+          value: 3,
+          meta: {
+            type: 'number'
+          }
+        },
+        meta: {
+          type: 'group'
+        }
+      }
+    },
   },
 ];
 ```
