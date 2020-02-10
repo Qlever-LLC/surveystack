@@ -246,27 +246,16 @@ export default {
 
 
         this.index++;
+
+        const rel = utils.isRelevant(this.submission, this.survey, this.index, this.positions);
+
+        if (rel === false) {
+          continue;
+        }
+
         this.control = utils.getControl(this.controls, this.position);
         const field = submissionUtils.getSubmissionField(this.submission, this.survey, this.position);
         console.log(utils.isRelevant(this.submission, this.survey, this.index, this.positions));
-
-        /*         if (field.meta.relevant === false) {
-                  // todo skip entire group
-                  if (field.meta.type === 'group') {
-                    const len = this.position.length;
-                    const start = this.index + 1;
-                    for (let i = start; i < this.positions.length; i++) {
-                      if (this.positions[i].length <= len) {
-                        console.log('new index', i);
-                        this.index = i;
-                        break;
-                      }
-                    }
-                    console.log('position', this.position);
-                    console.log('positions', this.positions);
-                  }
-                  continue;
-                } */
 
         this.value = field.value;
 
@@ -291,6 +280,13 @@ export default {
           return;
         }
         this.index--;
+
+        const rel = utils.isRelevant(this.submission, this.survey, this.index, this.positions);
+
+        if (rel === false) {
+          continue;
+        }
+
         this.control = utils.getControl(this.controls, this.position);
         this.value = submissionUtils.getSubmissionField(this.submission, this.survey, this.position).value;
 
