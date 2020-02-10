@@ -3,9 +3,9 @@
     <v-container>
       <div class="d-flex flex-column">
         <v-textarea
-          v-model="find"
+          v-model="match"
           outlined
-          label="Find"
+          label="Match"
         />
         <v-row>
           <v-col>
@@ -45,9 +45,9 @@
       <h4>API</h4>
       <a
         class="body-2"
-        :href="apiHref"
+        :href="apiUrl"
         target="_blank"
-      >{{apiHref}}</a>
+      >{{apiUrl}}</a>
     </v-container>
 
     <!--
@@ -119,7 +119,7 @@ export default {
   },
   data() {
     return {
-      find: '{}',
+      match: '{}',
       project: '{}',
       sort: '{}',
       skip: 0,
@@ -131,7 +131,7 @@ export default {
   computed: {
     validQuery() {
       try {
-        const find = JSON.parse(this.find);
+        const match = JSON.parse(this.match);
         const sort = JSON.parse(this.sort);
         const project = JSON.parse(this.project);
       } catch (error) {
@@ -187,23 +187,17 @@ export default {
     },
     apiRequest() {
       const { survey } = this.$route.query;
-      return `/submissions?survey=${survey}&find=${this.find}&sort=${this.sort}&project=${this.project}&skip=${this.skip}&limit=${this.limit}`;
+      return `/submissions?survey=${survey}&match=${this.match}&sort=${this.sort}&project=${this.project}&skip=${this.skip}&limit=${this.limit}`;
     },
-    apiHref() {
+    apiUrl() {
       return `${process.env.VUE_APP_API_URL}${this.apiRequest}`;
     },
   },
   methods: {
-    async goFetch(findValue) {
-      this.find = findValue;
-      this.fetchData();
-    },
     async fetchData() {
       try {
         const { survey } = this.$route.query;
-        const { data } = await api.get(
-          `/submissions?survey=${survey}&find=${this.find}&sort=${this.sort}&project=${this.project}&skip=${this.skip}&limit=${this.limit}`,
-        );
+        const { data } = await api.get(this.apiRequest);
         this.submissions = data;
       } catch (e) {
         console.log('something went wrong:', e);
