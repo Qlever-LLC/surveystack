@@ -26,6 +26,7 @@ export default {
       const currentSequence = this.sequence;
 
       const clone = _.cloneDeep(control);
+      console.log('added', clone);
       const cloneWithDefaults = Object.assign(clone, {
         options: defaultControlOptions,
       });

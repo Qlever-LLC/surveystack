@@ -372,7 +372,7 @@ export default {
       console.log(value);
     },
     controlSelected(control) {
-      console.log(control);
+      console.log('selected control', control);
       this.control = control;
     },
     controlAdded(control) {
@@ -427,7 +427,9 @@ export default {
   computed: {
     controlId() {
       const position = utils.getPosition(this.control, this.currentControls);
-      return utils.getFlatName(this.currentControls, position);
+      const id = utils.getFlatName(this.currentControls, position);
+      console.log('controlId', id);
+      return id;
     },
     hasCode() {
       if (!this.control) {
