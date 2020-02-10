@@ -207,19 +207,6 @@ function ${variable}() {
 }
 `;
 
-const simplify = (submissionItem) => {
-  if (submissionItem.meta !== undefined && submissionItem.meta.type !== 'group') {
-    return submissionItem.value;
-  }
-
-  const ret = {};
-  const keys = Object.keys(submissionItem).filter(k => k !== 'value' && k !== 'meta');
-  keys.forEach((k) => {
-    ret[k] = simplify(submissionItem[k]);
-  });
-  return ret;
-};
-
 const tabMap = [
   'relevance',
   'calculate',
@@ -317,54 +304,21 @@ export default {
 
       this.activeCode = this.control.options[tabMap[this.selectedTab]].code;
     },
-    async runCode(code) {
-      const worker = new Worker('/worker.js');
-
-
+    async runCode() {
       try {
-        const res = await new Promise((resolve, reject) => {
-          const timeout = setTimeout(() => {
-            reject(new Error('timeout'));
-          }, 10000);
-
-          let counter = 0;
-
-          worker.onmessage = (m) => {
-            if (m.data.res !== undefined) {
-              clearTimeout(timeout);
-              resolve(m.data.res);
-            } else if (m.data.error) {
-              clearTimeout(timeout);
-              reject(m.data.error);
-            } else if (m.data.log) {
-              if (counter++ > 1000) {
-                reject(new Error('Too many log messages'));
-              } else {
-                const arg = typeof m.data.log === 'object' ? JSON.stringify(m.data.log, null, 2) : m.data.log;
-                this.log = `${this.log}${arg}\n`;
-              }
-            }
-          };
-
-          worker.postMessage(
-            {
-              code,
-              submission: simplify(this.instance.data),
-              rawSubmission: this.instance,
-              survey: this.survey,
-            },
-          );
-        });
-
-        console.log('evaluated', res);
+        const res = await utils.execute(this.activeCode, tabMap[this.selectedTab],
+          this.instance, this.survey, (arg) => {
+            this.log = `${this.log}${arg}\n`;
+          });
+        if (typeof res !== 'boolean') {
+          throw Error('Function must return true or false');
+        }
         this.evaluated = res;
         this.codeError = null;
       } catch (error) {
         console.log(error);
         this.codeError = error;
         this.evaluated = null;
-      } finally {
-        worker.terminate();
       }
     },
     onChange(value) {
@@ -447,7 +401,7 @@ export default {
         return '';
       }
 
-      const simplified = simplify(this.instance.data);
+      const simplified = utils.simplify(this.instance.data);
       const submission = `
 /**
  * This is the basic version of the submission.
@@ -479,18 +433,27 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
     },
     optionsRelevance: {
       handler(newVal) {
+        if (!newVal) {
+          return;
+        }
         this.highlight('relevance', newVal.enabled);
       },
       deep: true,
     },
     optionsCalculate: {
       handler(newVal) {
+        if (!newVal) {
+          return;
+        }
         this.highlight('calculate', newVal.enabled);
       },
       deep: true,
     },
     optionsConstraint: {
       handler(newVal) {
+        if (!newVal) {
+          return;
+        }
         this.highlight('constraint', newVal.enabled);
       },
       deep: true,
@@ -502,6 +465,7 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
           this.optionsRelevance = null;
           this.optionsCalculate = null;
           this.optionsConstraint = null;
+          return;
         }
 
         this.optionsRelevance = newVal.options.relevance;

@@ -180,6 +180,7 @@ export const linearControls = (survey, submission) => {
   return res;
 };
 
+
 export default {
   createSubmissionFromSurvey,
   getSubmissionField,

@@ -21,7 +21,7 @@ function compileSandbox(src, fname) {
 
 onmessage = (e) => {
   try {
-    const sandbox = compileSandbox(e.data.code, 'relevance');
+    const sandbox = compileSandbox(e.data.code, e.data.functionName);
 
     const res = sandbox({
       JSON,
@@ -33,9 +33,6 @@ onmessage = (e) => {
       },
     });
     console.log('res', res);
-    if (typeof res !== 'boolean') {
-      throw Error('Function must return true or false');
-    }
     postMessage({ res });
   } catch (error) {
     console.log(error);

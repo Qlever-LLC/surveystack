@@ -157,10 +157,6 @@ export default {
       this.model = model;
     },
     code(newVal) {
-      if (!this.readonly) {
-        console.log('code changed', newVal);
-      }
-
       if (this.editor) {
         if (newVal !== this.editor.getValue()) {
           this.editor.setValue(newVal);
