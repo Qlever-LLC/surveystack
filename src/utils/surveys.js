@@ -251,7 +251,7 @@ function* processJsDoc(data, namespace = 'data') {
 
     yield `@param {${type}} ${namespace === '' ? namespace : `${namespace}.`}${
       val.name
-      }`;
+    }`;
 
     if (val.children) {
       yield* processJsDoc(
