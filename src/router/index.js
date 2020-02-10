@@ -17,6 +17,10 @@ import UserList from '@/views/users/UserList.vue';
 import User from '@/views/users/User.vue';
 import UserEdit from '@/views/users/UserEdit.vue';
 
+import GroupList from '@/views/groups/GroupList.vue';
+import Group from '@/views/groups/Group.vue';
+import GroupEdit from '@/views/groups/GroupEdit.vue';
+
 import SubmissionList from '@/views/submissions/List.vue';
 
 import SurveyBuilder from '@/views/builder/SurveyBuilder.vue';
@@ -100,6 +104,7 @@ const routes = [
     name: 'experiment',
     component: Experiment,
   },
+  // users
   {
     path: '/users',
     name: 'users-list',
@@ -119,6 +124,27 @@ const routes = [
     path: '/users/:id',
     name: 'users-detail',
     component: User,
+  },
+  // groups
+  {
+    path: '/groups',
+    name: 'groups-list',
+    component: GroupList,
+  },
+  {
+    path: '/groups/new',
+    name: 'groups-new',
+    component: GroupEdit,
+  },
+  {
+    path: '/groups/edit/:id',
+    name: 'groups-edit',
+    component: GroupEdit,
+  },
+  {
+    path: '/groups/*',
+    name: 'groups-by-path',
+    component: Group,
   },
   {
     path: '/tabularasa',

@@ -86,12 +86,20 @@ export default {
           icon: 'mdi-newspaper-plus',
         },
         {
+          title: 'Groups',
+          to: {
+            name: 'groups-list',
+          },
+          icon: 'mdi-domain',
+        },
+        {
           title: 'Users',
           to: {
             name: 'users-list',
           },
-          icon: 'mdi-account-group',
+          icon: 'mdi-account-search',
         },
+
         {
           title: 'Tabula Rasa',
           to: {

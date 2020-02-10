@@ -20,6 +20,12 @@ Vue.filter('capitalize', (value) => {
   return v.charAt(0).toUpperCase() + v.slice(1);
 });
 
+Vue.filter('showNull', (value) => {
+  if (value === null) return 'null';
+  if (!value) return '';
+  return value;
+});
+
 Vue.config.productionTip = false;
 
 new Vue({
