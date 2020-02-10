@@ -108,7 +108,7 @@ const createSubmissionFromSurvey = (survey, version = 1) => {
   };
 
   // TODO: handle version not found
-  const { controls } = survey.versions.find(item => item.version === version);
+  const { controls } = survey.revisions.find(revision => revision.version === version);
   const positions = getControlPositions(controls);
 
   const objects = [];
@@ -134,7 +134,7 @@ const createSubmissionFromSurvey = (survey, version = 1) => {
  */
 const getSubmissionField = (submission, survey, position) => {
   // TODO: handle version not found
-  const { controls } = survey.versions.find(item => item.version === submission.meta.version);
+  const { controls } = survey.revisions.find(revision => revision.version === submission.meta.version);
 
   const flatName = getFlatName(controls, position);
   const splits = flatName.split('.');
@@ -150,7 +150,7 @@ const getSubmissionField = (submission, survey, position) => {
 
 export const linearControls = (survey, submission) => {
   const res = [];
-  const { controls } = survey.versions.find(item => item.version === submission.meta.version);
+  const { controls } = survey.revisions.find(revision => revision.version === submission.meta.version);
   const positions = getControlPositions(controls);
   positions.forEach((p) => {
     const control = getControl(controls, p);

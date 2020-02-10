@@ -163,7 +163,7 @@ export default {
         return [];
       }
       const b = utils.getBreadcrumbs(
-        this.survey.versions.find(item => item.version === this.activeVersion),
+        this.survey.revisions.find(revision => revision.version === this.activeVersion),
         this.position,
       );
 
@@ -172,7 +172,7 @@ export default {
     },
     breadcrumbs() {
       return utils.getBreadcrumbs(
-        this.survey.versions.find(item => item.version === this.activeVersion),
+        this.survey.revisions.find(revision => revision.version === this.activeVersion),
         this.position,
       );
     },
@@ -183,7 +183,7 @@ export default {
     },
     controls() {
       // TODO: handle version not found
-      return this.survey.versions.find(item => item.version === this.activeVersion).controls;
+      return this.survey.revisions.find(revision => revision.version === this.activeVersion).controls;
     },
     activeVersion() {
       return this.submission.meta.version;
