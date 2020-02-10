@@ -93,7 +93,10 @@ const getSubmissions = async (req, res) => {
   }
 
   if (req.query.roles) {
-    roles = req.query.roles;
+    const splits = req.query.roles.split(',');
+    splits.forEach(role => {
+      roles.push(role.trim());
+    });
   }
 
   const redactStage = createRedactStage(user, roles);

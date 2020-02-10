@@ -9,7 +9,7 @@ const sanitize = entity => {
   entity._id = new ObjectId(entity._id);
   entity.dateCreated = new Date(entity.dateCreated);
   entity.dateModified = new Date(entity.dateModified);
-  entity.versions.forEach(version => {
+  entity.revisions.forEach(version => {
     version.dateCreated = new Date(entity.dateCreated);
   });
   return entity;
