@@ -97,7 +97,7 @@ export const flattenSubmission = (submission, delimiter = '.') => {
  *
  * @returns {Object} A submission for a specific survey version.
  */
-const createSubmissionFromSurvey = (survey, version = 1) => {
+const createSubmissionFromSurvey = (survey, version = 1, instance) => {
   const submission = {};
 
   submission._id = new ObjectID().toString();

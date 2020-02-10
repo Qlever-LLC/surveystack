@@ -35,7 +35,6 @@
             <v-card-title>Properties</v-card-title>
             <control-properties
               v-if="control"
-              :key="'props_'+controlId"
               :control="control"
               :survey="survey"
               :relevance="optionsRelevance"
@@ -519,7 +518,7 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
         if (current.controls.length === 0) {
           return;
         }
-        this.instance = submissionUtils.createSubmissionFromSurvey(newVal, newVal.latestVersion);
+        this.instance = submissionUtils.createSubmissionFromSurvey(newVal, newVal.latestVersion, this.instance);
 
         if (this.dirty || !this.editMode || !this.initialSurvey) {
           return;
