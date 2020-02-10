@@ -14,6 +14,7 @@
           :key="idx"
           :icon="display.icon"
           :color="display.color"
+          :hide-dot="display.hidden"
         >
           <v-card
             v-if="display.relevant || !display.hidden"
