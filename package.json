@@ -25,6 +25,7 @@
     "cors": "^2.8.5",
     "dotenv-defaults": "^1.0.2",
     "express": "^4.17.1",
+    "lodash": "^4.17.15",
     "mongodb": "^3.3.3",
     "uuid": "^3.3.3"
   }

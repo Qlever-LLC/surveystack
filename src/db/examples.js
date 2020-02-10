@@ -245,3 +245,53 @@ const currentStage2 = {
     else: '$$PRUNE',
   },
 };
+
+const OWNER = '37190y1';
+const ROLES = ['admin@/our/sci', 'member@/farmos'];
+
+const switchStage = {
+  $switch: {
+    branches: [
+      // check for owner rights
+      {
+        case: { $in: [OWNER, { $ifNull: ['$$ROOT.meta.owners', []] }] },
+        then: '$$KEEP',
+      },
+      // check if meta.permissions does not exist or is empty
+      {
+        case: { $eq: [{ $size: { $ifNull: ['$meta.permissions', []] } }, 0] },
+        then: '$$DESCEND',
+      },
+      // check if user has specific role
+      // e.g. "meta.permissions": ['admin'], "$$ROOT.meta.path": "/oursci/lab"
+      // => User needs 'admin@/oursci/lab' to view
+      {
+        case: {
+          $gt: [
+            {
+              $size: {
+                $setIntersection: [
+                  {
+                    $concatArrays: [
+                      {
+                        $map: {
+                          input: '$meta.permissions',
+                          as: 'role',
+                          in: { $concat: ['$$role', '@', '$$ROOT.meta.path'] },
+                        },
+                      },
+                    ],
+                  },
+                  ROLES,
+                ],
+              },
+            },
+            0,
+          ],
+        },
+        then: '$$DESCEND',
+      },
+    ],
+    default: '$$PRUNE',
+  },
+};

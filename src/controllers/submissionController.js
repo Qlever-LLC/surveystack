@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import assert from 'assert';
 import { ObjectId } from 'mongodb';
 
@@ -16,28 +18,99 @@ const sanitize = entity => {
   return entity;
 };
 
+const createRedactStage = (user, roles) => {
+  return {
+    $redact: {
+      $switch: {
+        branches: [
+          // check for owner rights
+          {
+            case: { $in: [user, { $ifNull: ['$$ROOT.meta.owners', []] }] },
+            then: '$$KEEP',
+          },
+          // check if meta.permissions does not exist or is empty
+          {
+            case: { $eq: [{ $size: { $ifNull: ['$meta.permissions', []] } }, 0] },
+            then: '$$DESCEND',
+          },
+          // check if user has specific role
+          // e.g. "meta.permissions": ['admin'], "$$ROOT.meta.path": "/oursci/lab"
+          // => User needs 'admin@/oursci/lab' to view
+          {
+            case: {
+              $gt: [
+                {
+                  $size: {
+                    $setIntersection: [
+                      {
+                        $concatArrays: [
+                          {
+                            $map: {
+                              input: '$meta.permissions',
+                              as: 'role',
+                              in: { $concat: ['$$role', '@', '$$ROOT.meta.path'] },
+                            },
+                          },
+                        ],
+                      },
+                      roles,
+                    ],
+                  },
+                },
+                0,
+              ],
+            },
+            then: '$$DESCEND',
+          },
+        ],
+        default: '$$PRUNE', // default do not proceed
+      },
+    },
+  };
+};
+
 const getSubmissions = async (req, res) => {
   let entities;
 
-  let find = {};
+  const pipeline = [];
+
+  let match = {};
   let project = {};
   let sort = {};
   let skip = 0;
   let limit = 0;
+  let user = 'ed1d1xx1';
+  let roles = [];
 
+  // initial match stage to filter surveys
   if (req.query.survey) {
-    find.survey = new ObjectId(req.query.survey);
+    pipeline.push({ $match: { survey: new ObjectId(req.query.survey) } });
   }
 
-  if (req.query.find) {
+  // redact stage
+  if (req.query.user) {
+    user = req.query.user;
+  }
+
+  if (req.query.roles) {
+    roles = req.query.roles;
+  }
+
+  const redactStage = createRedactStage(user, roles);
+  pipeline.push(redactStage);
+
+  // user defined match stage
+  if (req.query.match) {
     try {
-      const f = JSON.parse(req.query.find);
-      find = { ...find, ...f };
+      const m = JSON.parse(req.query.match);
+      match = { ...match, ...m };
     } catch (error) {
-      throw boom.badRequest('invalid find query');
+      throw boom.badRequest('invalid match query');
     }
+    pipeline.push({ $match: match });
   }
 
+  // project stage
   if (req.query.project) {
     try {
       const p = JSON.parse(req.query.project);
@@ -45,33 +118,90 @@ const getSubmissions = async (req, res) => {
     } catch (error) {
       throw boom.badRequest('invalid project query');
     }
+
+    if (!_.isEmpty(project)) {
+      const autoProjections = {};
+      if (_.some(project, v => v === 0) && _.some(project, v => v === 1)) {
+        throw boom.badRequest(`One can not mix and match inclusion and exclusion in project stage`);
+      }
+
+      /*
+        If a nested field inside a group was marked as 1
+        then we should also include the meta data of the parents
+        e.g.
+        {"data.personal_group.age": 1}
+        => {"data.personal_group.age": 1, "data.personal_group.meta": 1}
+        Furthermore, the root level "meta" should be included
+      */
+      if (_.every(project, v => v === 1)) {
+        autoProjections.meta = 1;
+        _.map(project, (v, k) => {
+          const splits = k.split('.');
+          if (splits[0] === 'data' && splits.length > 2) {
+            let key = 'data';
+            for (let i = 1; i < splits.length - 1; i++) {
+              key += `.${splits[i]}`;
+              autoProjections[`${key}.meta`] = 1;
+            }
+          }
+        });
+      }
+      project = { ...project, ...autoProjections };
+      pipeline.push({ $project: project });
+    }
   }
 
+  // sort stage
   if (req.query.sort) {
     try {
       const s = JSON.parse(req.query.sort);
       sort = { ...sort, ...s };
     } catch (error) {
-      throw boom.badRequest('invalid sort query');
+      throw boom.badRequest(`Bad query paramter sort: ${sort}`);
+    }
+
+    _.forOwn(sort, v => {
+      if (v !== -1 && v !== 1) {
+        throw boom.badRequest(`Bad query paramter sort, value must be either 1 or -1`);
+      }
+    });
+
+    if (!_.isEmpty(sort)) {
+      pipeline.push({
+        $sort: sort,
+      });
     }
   }
 
+  // skip stage
   if (req.query.skip) {
-    skip = Number.parseInt(req.query.skip);
+    try {
+      skip = Number.parseInt(req.query.skip);
+      if (skip > 0) {
+        pipeline.push({ $skip: skip });
+      }
+    } catch (error) {
+      throw boom.badRequest(`Bad query paramter skip: ${skip}`);
+    }
   }
 
+  // limit stage
   if (req.query.limit) {
-    limit = Number.parseInt(req.query.limit);
+    try {
+      limit = Number.parseInt(req.query.limit);
+      if (limit > 0) {
+        pipeline.push({ $limit: limit });
+      }
+    } catch (error) {
+      throw boom.badRequest(`Bad query paramter limit: ${limit}`);
+    }
   }
 
   entities = await db
     .collection(col)
-    .find(find)
-    .sort(sort)
-    .project(project)
-    .skip(skip)
-    .limit(limit)
+    .aggregate(pipeline)
     .toArray();
+
   return res.send(entities);
 };
 
