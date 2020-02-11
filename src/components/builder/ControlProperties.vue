@@ -16,6 +16,7 @@
         class="ma-0"
         color="blue"
         outlined
+        v-if="control.type !== 'group'"
         v-model="control.required"
         label="Required"
       />
