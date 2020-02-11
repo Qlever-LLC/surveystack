@@ -1,10 +1,9 @@
 <template>
   <v-container
     v-if="entity"
-    style="height: calc(100% - 64px)"
-    class="mt-2 d-flex flex-column justify-center"
+    class="mt-2"
   >
-    <div class="d-flex justify-center">
+    <div class="d-flex justify-end">
       <v-btn
         class="mx-2"
         :to="`/surveys/${entity._id}/edit`"
@@ -22,14 +21,10 @@
 
     </div>
 
-    <div class="mt-4 d-flex justify-center">
-      <span class="text-center">
-        <h1>{{entity.name}}</h1>
-        This is a good survey with 17 submissions.
-      </span>
-    </div>
+    <h1>{{entity.name}}</h1>
+    This is a good survey with 17 submissions.
 
-    <div class="mt-4 d-flex justify-center">
+    <div class="mt-4">
       <v-btn
         x-large
         color="primary"
