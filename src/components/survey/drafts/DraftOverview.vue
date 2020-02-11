@@ -91,10 +91,10 @@ const states = {
   ok: ['', ''],
 };
 
-function iconify(control) {
+function iconify(control, relevant) {
   if (control.value != null) {
     return states.done;
-  } if (control.value == null && control.required) {
+  } if (relevant && (control.value == null && control.required)) {
     return states.missing;
   } if (control.warning) {
     return states.warning;
@@ -142,10 +142,10 @@ export default {
 
       const r = controls.map((item, itemIndex) => {
         const peek = itemIndex + 1 < controls.length ? controls[itemIndex + 1] : null;
-        const icon = iconify(item);
         const active = _.isEqual(item.position, this.position);
         const rel = this.relevant(item, positions);
         let lastOfCollation = false;
+        const icon = iconify(item, rel);
 
         if (!rel) {
           collate++;
