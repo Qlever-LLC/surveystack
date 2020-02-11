@@ -140,116 +140,10 @@ export const exampleSubmission = {
   },
 };
 
-const userPermissionsDefault = ['public'];
-const userPermissionsAdmin = ['public', 'admin@/oursci/lab'];
-const userPermissions = userPermissionsAdmin;
-
-export const redactStage = {
-  $cond: {
-    if: {
-      $gt: [
-        {
-          $size: {
-            $setIntersection: [
-              {
-                $cond: {
-                  if: { $eq: ['$meta.permissions', null] },
-                  then: ['public'],
-                  else: {
-                    $map: {
-                      input: '$meta.permissions',
-                      as: 'role',
-                      in: { $concat: ['$role', '@', '$$ROOT.meta.path'] },
-                    },
-                  },
-                },
-              },
-              userPermissions,
-            ],
-          },
-        },
-        0,
-      ],
-    },
-    then: '$$DESCEND',
-    else: '$$PRUNE',
-  },
-};
-
-const currentStage = {
-  $cond: {
-    if: {
-      $gt: [
-        {
-          $size: {
-            $setIntersection: [{ $ifNull: ['$meta.permissions', ['public']] }, ['public']],
-          },
-        },
-        0,
-      ],
-    },
-    then: '$$DESCEND',
-    else: '$$PRUNE',
-  },
-};
-
-/*
-
-  Redact Stage:
-  If meta.permissions exists, concat its items with ROOT.meta.path, and compare with user permissions
-  E.g.
-  ROOT.meta.path: '/oursci/lab'
-  meta.permissions: ['admin', 'owner']
-  => ['admin@/oursci/lab', 'owner@/oursci/lab', ...] has permission
-  
-
-  If meta.permissions does not exist, treat its permissions as 'public'.
-  => ['public', ...] has permission
-
-*/
-const currentStage2 = {
-  $cond: {
-    if: {
-      $gt: [
-        {
-          $size: {
-            $setIntersection: [
-              {
-                $concatArrays: [
-                  {
-                    $map: {
-                      input: {
-                        $ifNull: ['$meta.permissions', []],
-                      },
-                      as: 'role',
-                      in: { $concat: ['$$role', '@', '$$ROOT.meta.path'] },
-                    },
-                  },
-                  {
-                    $cond: {
-                      if: { $eq: [{ $size: { $ifNull: ['$meta.permissions', []] } }, 0] },
-                      then: ['public'],
-                      else: [],
-                    },
-                  },
-                ],
-              },
-              ['public@/oursci/lab', 'public', 'admin@/oursci/lab'], // user permissions
-            ],
-          },
-        },
-        0,
-      ],
-    },
-    then: '$$DESCEND',
-    else: '$$PRUNE',
-  },
-};
-
 const OWNER = '37190y1';
 const ROLES = ['admin@/our/sci', 'member@/farmos'];
 
-const switchStage = {
+const redactStage = {
   $switch: {
     branches: [
       // check for owner rights
@@ -295,3 +189,50 @@ const switchStage = {
     default: '$$PRUNE',
   },
 };
+
+const oldPath = '/superheroes/';
+const newPath = '/super-heroes/';
+const bulkUpdatePipeline = [
+  {
+    $set: {
+      path: { $concat: [newPath, { $substr: ['$path', { $strLenBytes: oldPath }, -1] }] },
+    },
+  },
+];
+
+/*
+db.groups.update(
+  { path: { $regex: '^/superheroes/' } },
+  [
+    {
+      $set: {
+        path: {
+          $concat: [
+            '/super-heroes/',
+            { $substr: ['$path', { $strLenBytes: '/superheroes/' }, -1] },
+          ],
+        },
+      },
+    },
+  ],
+  { multi: true }
+);
+
+var oldPath = "/super-heroes/";
+var newPath = "/supermanheroes/";
+db.groups.updateMany(
+  { path: { $regex: `^${oldPath}` } },
+  [
+    {
+      $set: {
+        path: {
+          $concat: [
+            newPath,
+            { $substr: ['$path', { $strLenBytes: oldPath }, -1] },
+          ],
+        },
+      },
+    },
+  ]
+);
+*/

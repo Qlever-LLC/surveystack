@@ -35,7 +35,16 @@ router.get('/groups', catchErrors(groupController.getGroups));
 router.get('/groups/by-path*', catchErrors(groupController.getGroupByPath));
 router.get('/groups/:id', catchErrors(groupController.getGroupById));
 router.post('/groups', assertAuthenticated, catchErrors(groupController.createGroup));
-router.put('/groups/:id', catchErrors(groupController.updateGroup));
+router.put(
+  '/groups/:id',
+  [
+    assertAuthenticated,
+    assertNameNotEmpty,
+    assertIdsMatch,
+    assertEntityExists({ collection: 'groups' }),
+  ],
+  catchErrors(groupController.updateGroup)
+);
 router.delete('/groups/:id', assertAuthenticated, catchErrors(groupController.deleteGroup));
 
 /** Submissions */

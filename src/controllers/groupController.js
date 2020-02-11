@@ -96,15 +96,9 @@ const createGroup = async (req, res) => {
 
 const updateGroup = async (req, res) => {
   const { id } = req.params;
+  const entity = req.body;
 
   const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
-  if (!existing) {
-    return res.status(404).send({
-      message: `No entity with _id exists: ${id}`,
-    });
-  }
-
-  const entity = req.body;
 
   try {
     let updated = await db.collection(col).findOneAndUpdate(
@@ -136,8 +130,6 @@ const updateGroup = async (req, res) => {
     console.log(`old_path: '${oldSubgroupPath}' => new_path: '${newSubgroupPath}'`);
     console.log(`This change will affect descendants under '${oldSubgroupPath}'`);
 
-    // with MONGO 4.2 "update" can accept an aggregation pipeline
-    // https://stackoverflow.com/questions/12589792/how-to-replace-substring-in-mongodb-document
     await bulkChangePaths(oldSubgroupPath, newSubgroupPath);
 
     return res.send(updated);
@@ -147,8 +139,21 @@ const updateGroup = async (req, res) => {
   }
 };
 
-// https://stackoverflow.com/questions/25507866/how-can-i-use-a-cursor-foreach-in-mongodb-using-node-js/56333962#56333962
+// mongodb 4.2 now allows an aggregation pipeline inside "update"
 const bulkChangePaths = async (oldPath, newPath) => {
+  await db.collection(col).updateMany({ path: { $regex: `^${oldPath}` } }, [
+    {
+      $set: {
+        path: {
+          $concat: [newPath, { $substr: ['$path', { $strLenBytes: oldPath }, -1] }],
+        },
+      },
+    },
+  ]);
+};
+
+// https://stackoverflow.com/questions/25507866/how-can-i-use-a-cursor-foreach-in-mongodb-using-node-js/56333962#56333962
+const bulkChangePaths2 = async (oldPath, newPath) => {
   // Double the value of the 'foo' field in all documents
   let bulkWrites = [];
   const bulkDocumentsSize = 100; // how many documents to write at once
