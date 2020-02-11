@@ -37,4 +37,9 @@ export const availableControls = [
     label: 'Pick Location',
     type: 'location',
   },
+  {
+    name: 'script',
+    label: 'Script',
+    type: 'script',
+  },
 ];

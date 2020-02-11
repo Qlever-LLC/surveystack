@@ -45,6 +45,7 @@
                   :control="control"
                   :value="value"
                   :index="index"
+                  :submission="submission"
                   @eval="eval"
                   @changed="setValue"
                   @show-nav="showNav(true)"
@@ -207,6 +208,7 @@ export default {
       // submission
       this.submission.meta.modified = new Date().getTime();
       this.submissionField.value = v;
+      console.log('set value');
       this.$emit('change', this.submission);
       this.persist();
     },
