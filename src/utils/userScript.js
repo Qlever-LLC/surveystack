@@ -75,30 +75,6 @@ export default function buildScriptQuestionIframeContents({ script, submissionJS
 
         let state = getInitialState();
 
-        // // User's script code
-        // function main({ value, submission }) {
-        //   // Do stuff ...
-
-        //   // submissions = ['5e3d86db598b4a0001b8287d', '5e3d86ec598b4a0001b8287e'];
-        //   // requestFetchSubmissions(submissions);
-        // }
-
-
-        // function run() {
-        //   // User's code to
-        //   // Make an API request
-        //   // Transform data
-        //   // ...
-        //   // before rendering custom UI
-        //   return { ...state };
-        // }
-
-        // function render(state) {
-        //   // if (state && !state.errors) {
-        //   //   ui.success('Your script executed successfully!');
-        //   // }
-        // }
-
         ${script.run}
 
         ${script.render}

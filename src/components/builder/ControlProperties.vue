@@ -12,6 +12,15 @@
         label="Label"
       />
 
+      <v-checkbox
+        class="ma-0"
+        color="blue"
+        outlined
+        v-if="control.type !== 'group'"
+        v-model="control.required"
+        label="Required"
+      />
+
       <div
         v-if="!showAdvanced"
         class="d-flex justify-end"
@@ -37,7 +46,7 @@
             class="ma-0"
             color="blue"
             outlined
-            v-model="control.options.relevance.enabled"
+            v-model="relevance.enabled"
             label="Relevance Expression"
           />
           <v-spacer />
@@ -56,7 +65,7 @@
             color="blue"
             class="ma-0"
             outlined
-            v-model="control.options.calculate.enabled"
+            v-model="calculate.enabled"
             label="Calculate Expression"
           />
           <v-spacer />
@@ -74,7 +83,7 @@
             class="ma-0"
             color="blue"
             outlined
-            v-model="control.options.constraint.enabled"
+            v-model="constraint.enabled"
             label="Constraint Expression"
           />
           <v-spacer />
@@ -97,8 +106,14 @@ import { getAdvancedCodeTemplate } from '@/utils/surveys';
 
 export default {
   props: {
-    toggleCode: {
-      required: true,
+    calculate: {
+
+    },
+    relevance: {
+
+    },
+    constraint: {
+
     },
     control: {
       required: false,

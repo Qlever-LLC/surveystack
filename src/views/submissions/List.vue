@@ -3,17 +3,11 @@
     <v-container>
       <div class="d-flex flex-column">
         <v-textarea
-          v-model="find"
+          v-model="match"
           outlined
-          label="Find"
+          label="Match"
+          rows="3"
         />
-        <code-editor
-        style="height: 300px;"
-        :code="find"
-        language="json"
-        :runnable="true"
-        @run="goFetch"
-        ></code-editor>
         <v-row>
           <v-col>
             <v-text-field
@@ -41,20 +35,33 @@
           </v-col>
         </v-row>
 
-        <v-btn
-          @click="fetchData"
-          :disabled="!validQuery"
-          class="ml-auto"
-          color="primary"
-        >QUERY!</v-btn>
+        <v-row>
+          <v-col cols="6">
+            <v-text-field
+              v-model.number="roles"
+              label="Roles (Debug)"
+            />
+          </v-col>
+          <v-col
+            cols="6"
+            class="d-flex align-center justify-end"
+          >
+            <v-btn
+              @click="fetchData"
+              :disabled="!validQuery"
+              color="primary"
+            >QUERY!</v-btn>
+          </v-col>
+        </v-row>
+
       </div>
 
       <h4>API</h4>
       <a
         class="body-2"
-        :href="apiHref"
+        :href="apiUrl"
         target="_blank"
-      >{{apiHref}}</a>
+      >{{apiUrl}}</a>
     </v-container>
 
     <!--
@@ -92,7 +99,11 @@
             class="list-group-item pa-2"
           >
             <small class="grey--text text--darken-1">{{submission._id}}</small>
-            <small class="grey--text text--darken-1 ml-1">(Version {{submission.meta.version}})</small>
+            <small class="grey--text text--darken-1">, Version {{submission.meta.version}}</small>
+            <small
+              v-if="submission.meta.path"
+              class="grey--text text--darken-1"
+            >, {{submission.meta.path}}</small>
             <div
               v-for="(item, name, i) in submission.data"
               :key="i"
@@ -116,7 +127,6 @@
 
 import api from '@/services/api.service';
 import treeItem from '@/components/survey/TreeItem.vue';
-import CodeEditor from '@/components/ui/CodeEditor.vue';
 import { flattenSubmission } from '@/utils/submissions';
 
 // <tree-item class="item" :item="result" @make-folder="makeFolder" @add-item="addItem" />
@@ -124,15 +134,15 @@ import { flattenSubmission } from '@/utils/submissions';
 export default {
   components: {
     treeItem,
-    CodeEditor,
   },
   data() {
     return {
-      find: '{}',
+      match: '{}',
       project: '{}',
       sort: '{}',
       skip: 0,
       limit: 0,
+      roles: 'public',
       submissions: [],
       search: '',
     };
@@ -140,7 +150,7 @@ export default {
   computed: {
     validQuery() {
       try {
-        const find = JSON.parse(this.find);
+        const match = JSON.parse(this.match);
         const sort = JSON.parse(this.sort);
         const project = JSON.parse(this.project);
       } catch (error) {
@@ -196,23 +206,17 @@ export default {
     },
     apiRequest() {
       const { survey } = this.$route.query;
-      return `/submissions?survey=${survey}&find=${this.find}&sort=${this.sort}&project=${this.project}&skip=${this.skip}&limit=${this.limit}`;
+      return `/submissions?survey=${survey}&match=${this.match}&sort=${this.sort}&project=${this.project}&skip=${this.skip}&limit=${this.limit}&roles=${this.roles}`;
     },
-    apiHref() {
+    apiUrl() {
       return `${process.env.VUE_APP_API_URL}${this.apiRequest}`;
     },
   },
   methods: {
-    async goFetch(findValue) {
-      this.find = findValue;
-      this.fetchData();
-    },
     async fetchData() {
       try {
         const { survey } = this.$route.query;
-        const { data } = await api.get(
-          `/submissions?survey=${survey}&find=${this.find}&sort=${this.sort}&project=${this.project}&skip=${this.skip}&limit=${this.limit}`,
-        );
+        const { data } = await api.get(this.apiRequest);
         this.submissions = data;
       } catch (e) {
         console.log('something went wrong:', e);

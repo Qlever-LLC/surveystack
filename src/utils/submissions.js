@@ -1,5 +1,6 @@
 import ObjectID from 'bson-objectid';
-import { unflatten } from 'flat';
+import { flatten, unflatten } from 'flat';
+import _ from 'lodash';
 
 function* processPositions(data, position = []) {
   if (!data) {
@@ -97,7 +98,8 @@ export const flattenSubmission = (submission, delimiter = '.') => {
  *
  * @returns {Object} A submission for a specific survey version.
  */
-const createSubmissionFromSurvey = (survey, version = 1) => {
+const createSubmissionFromSurvey = (survey, version = 1, instance = null) => {
+  console.log('createSubmissionFromSurvey: instance', instance);
   const submission = {};
 
   submission._id = new ObjectID().toString();
@@ -108,14 +110,23 @@ const createSubmissionFromSurvey = (survey, version = 1) => {
   };
 
   // TODO: handle version not found
-  const { controls } = survey.versions.find(item => item.version === version);
+  const { controls } = survey.revisions.find(revision => revision.version === version);
   const positions = getControlPositions(controls);
+
+
+  let flattenedInstance;
+  if (instance) {
+    flattenedInstance = flatten(instance.data);
+  }
+
 
   const objects = [];
   positions.forEach((position) => {
     const control = getControl(controls, position);
     const flatName = getFlatName(controls, position);
-    objects.push({ [flatName]: { value: null, meta: { type: control.type } } });
+    const value = flattenedInstance ? flattenedInstance[`${flatName}.value`] : null;
+    const dateModified = flattenedInstance ? flattenedInstance[`${flatName}.meta.dateModified`] : null;
+    objects.push({ [flatName]: { value, meta: { type: control.type, dateModified } } });
   });
 
   const c = Object.assign({}, ...objects);
@@ -134,7 +145,7 @@ const createSubmissionFromSurvey = (survey, version = 1) => {
  */
 const getSubmissionField = (submission, survey, position) => {
   // TODO: handle version not found
-  const { controls } = survey.versions.find(item => item.version === submission.meta.version);
+  const { controls } = survey.revisions.find(revision => revision.version === submission.meta.version);
 
   const flatName = getFlatName(controls, position);
   const splits = flatName.split('.');
@@ -150,10 +161,10 @@ const getSubmissionField = (submission, survey, position) => {
 
 export const linearControls = (survey, submission) => {
   const res = [];
-  const { controls } = survey.versions.find(item => item.version === submission.meta.version);
+  const { controls } = survey.revisions.find(revision => revision.version === submission.meta.version);
   const positions = getControlPositions(controls);
   positions.forEach((p) => {
-    const control = getControl(controls, p);
+    const control = _.cloneDeep(getControl(controls, p));
     const breadcrumbs = getBreadcrumbsForSubmission(controls, p);
     const submissionField = getSubmissionField(submission, survey, p);
     if (control.type !== 'group') {
@@ -164,12 +175,14 @@ export const linearControls = (survey, submission) => {
         number: p.map(value => value + 1),
         position: p,
         value: submissionField.value,
+        meta: submissionField.meta,
       });
       res.push(r);
     }
   });
   return res;
 };
+
 
 export default {
   createSubmissionFromSurvey,

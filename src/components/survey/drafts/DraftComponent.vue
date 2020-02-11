@@ -1,4 +1,3 @@
-
 <template>
   <div id="relative-wrapper">
     <div
@@ -71,6 +70,7 @@
       stateless
     >
       <draft-overview
+        ref="overview"
         :survey="survey"
         :submission="submission"
         :position="this.positions[this.index]"
@@ -93,7 +93,10 @@
 </template>
 
 <script>
+/* eslint-disable no-continue */
+
 import _ from 'lodash';
+import moment from 'moment';
 
 import draftOverview from '@/components/survey/drafts/DraftOverview.vue';
 import draftFooter from '@/components/survey/drafts/DraftFooter.vue';
@@ -164,7 +167,7 @@ export default {
         return [];
       }
       const b = utils.getBreadcrumbs(
-        this.survey.versions.find(item => item.version === this.activeVersion),
+        this.survey.revisions.find(revision => revision.version === this.activeVersion),
         this.position,
       );
 
@@ -173,7 +176,7 @@ export default {
     },
     breadcrumbs() {
       return utils.getBreadcrumbs(
-        this.survey.versions.find(item => item.version === this.activeVersion),
+        this.survey.revisions.find(revision => revision.version === this.activeVersion),
         this.position,
       );
     },
@@ -184,7 +187,7 @@ export default {
     },
     controls() {
       // TODO: handle version not found
-      return this.survey.versions.find(item => item.version === this.activeVersion).controls;
+      return this.survey.revisions.find(revision => revision.version === this.activeVersion).controls;
     },
     activeVersion() {
       return this.submission.meta.version;
@@ -206,9 +209,11 @@ export default {
       // local
       this.value = v;
       // submission
-      this.submission.meta.modified = new Date().getTime();
+      const modified = moment().toISOString();
+      this.submission.meta.dateModified = modified;
+      console.log('setting value', this.sumissionField, v);
       this.submissionField.value = v;
-      console.log('set value');
+      this.submissionField.meta.dateModified = modified;
       this.$emit('change', this.submission);
       this.persist();
     },
@@ -225,10 +230,12 @@ export default {
 
       this.calculateControl();
     },
-    handleNext() {
+    async handleNext() {
+      console.log('handleNext()');
       this.slide = 'slide-in';
       this.showNav(true);
       this.showNext(true);
+      await this.calculateRelevance();
 
       // eslint-disable-next-line no-constant-condition
       while (true) {
@@ -247,11 +254,20 @@ export default {
 
 
         this.index++;
+
+        const rel = utils.isRelevant(this.submission, this.survey, this.index, this.positions);
+
+        if (rel === false) {
+          continue;
+        }
+
         this.control = utils.getControl(this.controls, this.position);
-        this.value = submissionUtils.getSubmissionField(this.submission, this.survey, this.position).value;
+        const field = submissionUtils.getSubmissionField(this.submission, this.survey, this.position);
+
+        this.value = field.value;
+
 
         if (this.control.type === 'group') {
-          // eslint-disable-next-line no-continue
           continue;
         }
 
@@ -259,7 +275,10 @@ export default {
         return;
       }
     },
-    handlePrevious() {
+    async handlePrevious() {
+      console.log('handlePrevious()');
+      await this.calculateRelevance();
+
       this.slide = 'slide-out';
 
       this.showNav(true);
@@ -271,6 +290,13 @@ export default {
           return;
         }
         this.index--;
+
+        const rel = utils.isRelevant(this.submission, this.survey, this.index, this.positions);
+
+        if (rel === false) {
+          continue;
+        }
+
         this.control = utils.getControl(this.controls, this.position);
         this.value = submissionUtils.getSubmissionField(this.submission, this.survey, this.position).value;
 
@@ -298,7 +324,7 @@ export default {
       const sandbox = utils.compileSandboxSingleLine(this.control.options.calculate);
       this.control.value = sandbox({ data: this.submission.data });
       this.value = this.control.value;
-      console.log(this.control.value);
+      console.log('calculated', this.control.value);
     },
     questions() {
       if (!this.surveyPositions) {
@@ -316,6 +342,47 @@ export default {
     async submit(payload) {
       this.$emit('submit', { payload });
     },
+    async calculateRelevance() {
+      console.log('calculateRelevance()');
+      const items = this.positions.map((pos) => {
+        const control = utils.getControl(this.controls, pos);
+        if (!control.options.relevance.enabled) {
+          return null;
+        }
+        const { code } = control.options.relevance;
+        return {
+          pos,
+          control,
+          code,
+        };
+      }).filter(item => item !== null);
+
+
+      const promises = items.map(item => new Promise((resolve, reject) => {
+        utils.execute(item.code, 'relevance', this.submission, this.survey)
+          .then(r => resolve({
+            control: item.control,
+            pos: item.pos,
+            res: r,
+          })).catch((e) => {
+            reject(e);
+          });
+      }));
+
+      try {
+        const res = await Promise.all(promises);
+        res.forEach((item) => {
+          const field = submissionUtils.getSubmissionField(this.submission, this.survey, item.pos);
+          if (typeof item.res !== 'boolean') {
+            console.log('error, result is not boolean', item.res);
+            return;
+          }
+          field.meta.relevant = item.res;
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
 
   async created() {
@@ -328,6 +395,18 @@ export default {
       title: this.survey.name,
       subtitle: `<span><span id="question-title-chip">Version ${this.activeVersion}</span></span> <span id="question-title-chip">${this.positions.length} Questions</span>`,
     });
+  },
+  watch: {
+    async showOverview() {
+      await this.calculateRelevance();
+      this.$refs.overview.refresh();
+    },
+    submission: {
+      async handler() {
+        // await this.calculateRelevance();
+      },
+      deep: true,
+    },
   },
 };
 </script>

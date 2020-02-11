@@ -34,9 +34,12 @@
             <control-adder @controlAdded="controlAdded" />
             <v-card-title>Properties</v-card-title>
             <control-properties
-              :toggleCode="toggleCodeEditor"
+              v-if="control"
               :control="control"
               :survey="survey"
+              :relevance="optionsRelevance"
+              :calculate="optionsCalculate"
+              :constraint="optionsConstraint"
               @code-calculate="highlight('calculate')"
               @code-relevance="highlight('relevance')"
               @code-constraint="highlight('constraint')"
@@ -55,32 +58,33 @@
         >
 
           <v-tabs
-            fixed-tabs
+            v-if="control.options"
+            v-model="selectedTab"
             background-color="blue-grey darken-4"
             dark
           >
-            <v-tab v-if="control.options &&  control.options.relevance && control.options.relevance.enabled">
+            <v-tab :disabled="!control.options.relevance.enabled">
               Relevance
             </v-tab>
-            <v-tab v-if="control.options &&  control.options.computed && control.options.computed.enabled">
-              Computed
+            <v-tab :disabled="!control.options.calculate.enabled">
+              Calculate
             </v-tab>
-            <v-tab v-if="control.options &&  control.options.constraint && control.options.constraint.enabled">
+            <v-tab :disabled="!control.options.constraint.enabled">
               Constraint
             </v-tab>
           </v-tabs>
 
           <code-editor
+            v-if="selectedTab !== null"
             @close="hideCode = true"
-            title="Relevance"
-            :code="control.options.relevance.code"
-            v-if="survey"
+            :code="activeCode"
             class="main-code-editor"
             :refresh="codeRefreshCounter"
-            :runnable="true"
+            runnable="true"
             :error="codeError"
             @run="runCode"
             :result="evaluated"
+            @change="updateSelectedCode"
           >
           </code-editor>
 
@@ -114,6 +118,7 @@
       <multipane-resizer v-if="hasCode && !hideCode" />
       <div class="pane pane-draft">
         <draft
+          @submit="submit"
           v-if="survey && instance"
           :submission="instance"
           :survey="survey"
@@ -188,7 +193,7 @@ import submissionUtils from '@/utils/submissions';
 const currentDate = new Date();
 
 
-const initialRelevanceCode = `
+const initialRelevanceCode = variable => `
 /**
  * BASIC: use \`submission.\` to autocomplete the basic submission
  * ADVANCED: use \`rawSubmission.\` to autocomplete the advanced version of a submission
@@ -196,25 +201,18 @@ const initialRelevanceCode = `
  * use \`log(message)\` to log to console
  * 
  */
-function relevance() {
+function ${variable}() {
 
   // return true or false
   return true;
 }
 `;
 
-const simplify = (submissionItem) => {
-  if (submissionItem.meta !== undefined && submissionItem.meta.type !== 'group') {
-    return submissionItem.value;
-  }
-
-  const ret = {};
-  const keys = Object.keys(submissionItem).filter(k => k !== 'value' && k !== 'meta');
-  keys.forEach((k) => {
-    ret[k] = simplify(submissionItem[k]);
-  });
-  return ret;
-};
+const tabMap = [
+  'relevance',
+  'calculate',
+  'constraint',
+];
 
 export default {
   mixins: [
@@ -250,9 +248,11 @@ export default {
       log: '',
       codeError: null,
       evaluated: null,
-      relevanceCode: initialRelevanceCode,
-      currentControlHasRelevance: false,
-      currentControlHasCalculate: false,
+      selectedTab: null,
+      optionsRelevance: null,
+      optionsCalculate: null,
+      optionsConstraint: null,
+      activeCode: '',
       // survey entity
       initialSurvey: null,
       instance: null,
@@ -264,7 +264,7 @@ export default {
         dateCreated: currentDate,
         dateModified: currentDate,
         latestVersion: 1,
-        versions: [
+        revisions: [
           {
             dateCreated: currentDate,
             version: 1,
@@ -275,64 +275,68 @@ export default {
     };
   },
   methods: {
-    highlight(tab) {
-      this.hideCode = false;
-    },
-    async runCode(code) {
-      const worker = new Worker('/worker.js');
-
-
+    async submit({ payload }) {
       try {
-        const res = await new Promise((resolve, reject) => {
-          const timeout = setTimeout(() => {
-            reject(new Error('timeout'));
-          }, 10000);
+        await api.post('/submissions', payload);
+        // this.$router.push(`/surveys/${this.survey._id}`);
+        this.snackbarMessage = 'Submitted';
+        this.showSnackbar = true;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    updateSelectedCode(code) {
+      this.control.options[tabMap[this.selectedTab]].code = code;
+    },
+    highlightNext() {
+      [
+        this.optionsRelevance,
+        this.optionsCalculate,
+        this.optionsConstraint,
+      ].forEach((item, idx) => {
+        if (item.enabled) {
+          this.selectedTab = idx;
+        }
+      });
+    },
+    highlight(tab, select = true) {
+      this.hideCode = false;
 
-          let counter = 0;
+      if (!this.control.options[tab].enabled) {
+        this.highlightNext();
+        return;
+      }
 
-          worker.onmessage = (m) => {
-            if (m.data.res !== undefined) {
-              clearTimeout(timeout);
-              resolve(m.data.res);
-            } else if (m.data.error) {
-              clearTimeout(timeout);
-              reject(m.data.error);
-            } else if (m.data.log) {
-              if (counter++ > 1000) {
-                reject(new Error('Too many log messages'));
-              } else {
-                const arg = typeof m.data.log === 'object' ? JSON.stringify(m.data.log, null, 2) : m.data.log;
-                this.log = `${this.log}${arg}\n`;
-              }
-            }
-          };
+      this.selectedTab = tabMap.indexOf(tab);
 
-          worker.postMessage(
-            {
-              code,
-              submission: simplify(this.instance.data),
-              rawSubmission: this.instance,
-              survey: this.survey,
-            },
-          );
-        });
+      if (!this.control.options[tab].code) {
+        this.control.options[tab].code = initialRelevanceCode(tab);
+      }
 
-        console.log('evaluated', res);
+      this.activeCode = this.control.options[tabMap[this.selectedTab]].code;
+    },
+    async runCode() {
+      try {
+        const res = await utils.execute(this.activeCode, tabMap[this.selectedTab],
+          this.instance, this.survey, (arg) => {
+            this.log = `${this.log}${arg}\n`;
+          });
+        if (typeof res !== 'boolean') {
+          throw Error('Function must return true or false');
+        }
         this.evaluated = res;
         this.codeError = null;
       } catch (error) {
         console.log(error);
         this.codeError = error;
         this.evaluated = null;
-      } finally {
-        worker.terminate();
       }
     },
     onChange(value) {
       console.log(value);
     },
     controlSelected(control) {
-      console.log(control);
+      console.log('selected control', control);
       this.control = control;
     },
     controlAdded(control) {
@@ -385,6 +389,12 @@ export default {
     },
   },
   computed: {
+    controlId() {
+      const position = utils.getPosition(this.control, this.currentControls);
+      const id = utils.getFlatName(this.currentControls, position);
+      console.log('controlId', id);
+      return id;
+    },
     hasCode() {
       if (!this.control) {
         return false;
@@ -395,14 +405,14 @@ export default {
       return this.survey.latestVersion;
     },
     currentControls() {
-      return this.survey.versions.find(item => (item.version === this.survey.latestVersion)).controls;
+      return this.survey.revisions.find(revision => (revision.version === this.survey.latestVersion)).controls;
     },
     sharedCode() {
       if (!this.instance) {
         return '';
       }
 
-      const simplified = simplify(this.instance.data);
+      const simplified = utils.simplify(this.instance.data);
       const submission = `
 /**
  * This is the basic version of the submission.
@@ -429,31 +439,78 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
     },
   },
   watch: {
+    selectedTab(tab) {
+      this.highlight(tabMap[tab]);
+    },
+    optionsRelevance: {
+      handler(newVal) {
+        if (!newVal) {
+          return;
+        }
+        this.highlight('relevance', newVal.enabled);
+      },
+      deep: true,
+    },
+    optionsCalculate: {
+      handler(newVal) {
+        if (!newVal) {
+          return;
+        }
+        this.highlight('calculate', newVal.enabled);
+      },
+      deep: true,
+    },
+    optionsConstraint: {
+      handler(newVal) {
+        if (!newVal) {
+          return;
+        }
+        this.highlight('constraint', newVal.enabled);
+      },
+      deep: true,
+    },
+    control: {
+      handler(newVal) {
+        console.log('control changed');
+        if (!newVal) {
+          this.optionsRelevance = null;
+          this.optionsCalculate = null;
+          this.optionsConstraint = null;
+          return;
+        }
+
+        this.optionsRelevance = newVal.options.relevance;
+        this.optionsCalculate = newVal.options.calculate;
+        this.optionsConstraint = newVal.options.constraint;
+      },
+      deep: true,
+    },
     survey: {
       handler(newVal, oldVal) {
-        console.log('changed');
-        const current = newVal.versions.find(v => v.version === newVal.latestVersion);
+        console.log('survey changed');
+
+        const current = newVal.revisions.find(revision => revision.version === newVal.latestVersion);
         if (current.controls.length === 0) {
           return;
         }
-        this.instance = submissionUtils.createSubmissionFromSurvey(newVal, newVal.latestVersion);
+        this.instance = submissionUtils.createSubmissionFromSurvey(newVal, newVal.latestVersion, this.instance);
 
         if (this.dirty || !this.editMode || !this.initialSurvey) {
           return;
         }
-        if (!_.isEqualWith(newVal.versions, this.initialSurvey.versions, (value1, value2, key) => ((key === 'label') ? true : undefined))) {
+        if (!_.isEqualWith(newVal.revisions, this.initialSurvey.revisions, (value1, value2, key) => ((key === 'label') ? true : undefined))) {
           this.dirty = true;
           const { latestVersion } = this.initialSurvey;
           const nextVersion = latestVersion + 1;
           const date = new Date();
 
-          const nextVersionObj = this.survey.versions.find(item => item.version === latestVersion);
+          const nextVersionObj = this.survey.revisions.find(revision => revision.version === latestVersion);
           nextVersionObj.version = nextVersion;
           nextVersionObj.dateCreated = date;
 
-          this.$set(this.survey, 'versions', this.initialSurvey.versions);
+          this.$set(this.survey, 'revisions', this.initialSurvey.revisions);
 
-          this.survey.versions.push(nextVersionObj);
+          this.survey.revisions.push(nextVersionObj);
           this.survey.latestVersion = nextVersion;
           this.survey.dateModified = date;
         }
@@ -522,6 +579,10 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
   margin-right: 15px;
   margin-bottom: 0px;
   overflow: hidden;
+}
+
+.pane-controls {
+  overflow: auto;
 }
 
 .pane-submission-code,

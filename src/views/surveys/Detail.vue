@@ -20,13 +20,13 @@
       </v-btn>
 
     </div>
+
     <h1>{{entity.name}}</h1>
-    <p>This is a good survey with 17 submissions.</p>
+    This is a good survey with 17 submissions.
 
     <div class="mt-4">
       <v-btn
         x-large
-        block
         color="primary"
         @click="startDraft(entity._id)"
       >
