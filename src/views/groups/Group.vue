@@ -1,45 +1,44 @@
 <template>
-  <v-container v-if="initialized">
-    <div v-if="status.code === 200">
-
-      <div class="d-flex justify-space-between align-center">
-        <span v-if="entity.path">
-          <router-link
-            :to="`/groups${entity.path}`"
-            class="text-muted"
-          >{{entity.path}}</router-link>
-        </span>
-        <v-btn
-          class="ml-auto"
-          :to="{name: 'groups-edit', params: {id: entity._id}}"
-          text
-        >
-          <v-icon>mdi-pencil</v-icon>
-          <span class="ml-2">Edit</span>
-        </v-btn>
-      </div>
-
-      <h1>
-        {{entity.name}}
-
-      </h1>
-
-      <div class="mt-2">
-        <app-group-list
-          :entities="subgroups"
-          :path="subgroupPath"
-          title="Subgroups"
-        />
-        <div
-          v-if="subgroups.length === 0"
-          class="grey--text"
-        >No subgroups yet</div>
-      </div>
+  <v-container v-if="initialized && status.code === 200">
+    <div class="d-flex justify-space-between align-center">
+      <span v-if="entity.path">
+        <router-link
+          :to="`/groups${entity.path}`"
+          class="text-muted"
+        >{{entity.path}}</router-link>
+      </span>
+      <v-btn
+        class="ml-auto"
+        :to="{name: 'groups-edit', params: {id: entity._id}}"
+        text
+      >
+        <v-icon>mdi-pencil</v-icon>
+        <span class="ml-2">Edit</span>
+      </v-btn>
     </div>
-    <div v-if="status.code === 404">
-      <h1>Oh snap!</h1>
-      <p>This group was not found :/</p>
+
+    <h1>
+      {{entity.name}}
+
+    </h1>
+
+    <div class="mt-2">
+      <app-group-list
+        :entities="subgroups"
+        :path="subgroupPath"
+        title="Subgroups"
+      />
+      <div
+        v-if="subgroups.length === 0"
+        class="grey--text"
+      >No subgroups yet</div>
     </div>
+
+  </v-container>
+  <v-container v-else-if="status.code === 404">
+    <h1>Oh snap!</h1>
+    <p>No group under <strong>{{$route.params.pathMatch}}</strong> was found :/ </p>
+
   </v-container>
 </template>
 
@@ -70,10 +69,10 @@ export default {
     };
   },
   methods: {
-    async getEntity(id) {
+    async getEntity(path) {
       this.initialized = false;
       try {
-        const { data } = await api.get(`/groups/by-path/${id}`);
+        const { data } = await api.get(`/groups/by-path/${path}`);
         this.entity = data;
         this.getSubgroups();
       } catch (e) {
