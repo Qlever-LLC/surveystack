@@ -15,6 +15,7 @@ const sanitize = entity => {
   }
   entity.survey = new ObjectId(entity.survey);
   entity.meta.dateCreated = new Date(entity.meta.dateCreated);
+  entity.meta.dateModified = new Date(entity.meta.dateModified);
   return entity;
 };
 

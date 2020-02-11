@@ -152,42 +152,6 @@ const bulkChangePaths = async (oldPath, newPath) => {
   ]);
 };
 
-// https://stackoverflow.com/questions/25507866/how-can-i-use-a-cursor-foreach-in-mongodb-using-node-js/56333962#56333962
-const bulkChangePaths2 = async (oldPath, newPath) => {
-  // Double the value of the 'foo' field in all documents
-  let bulkWrites = [];
-  const bulkDocumentsSize = 100; // how many documents to write at once
-  let i = 0;
-  await db
-    .collection(col)
-    .find({ path: { $regex: `^${oldPath}` } })
-    .forEach(async doc => {
-      i++;
-
-      // Update the document...
-      doc.path = doc.path.replace(oldPath, newPath);
-
-      // Add the update to an array of bulk operations to execute later
-      bulkWrites.push({
-        updateOne: {
-          filter: { _id: doc._id },
-          update: doc,
-        },
-      });
-
-      // Update the documents and log progress every `bulkDocumentsSize` documents
-      if (i % bulkDocumentsSize === 0) {
-        await db.collection(col).bulkWrite(bulkWrites);
-        bulkWrites = [];
-        console.log(`Updated ${i} documents`);
-      }
-    });
-  // Flush the last <100 bulk writes
-  if (bulkWrites.length > 0) {
-    await db.collection(col).bulkWrite(bulkWrites);
-  }
-};
-
 const deleteGroup = async (req, res) => {
   const { id } = req.params;
   try {
