@@ -1,5 +1,6 @@
 import ObjectID from 'bson-objectid';
 import { flatten, unflatten } from 'flat';
+import _ from 'lodash';
 
 function* processPositions(data, position = []) {
   if (!data) {
@@ -162,7 +163,7 @@ export const linearControls = (survey, submission) => {
   const { controls } = survey.revisions.find(revision => revision.version === submission.meta.version);
   const positions = getControlPositions(controls);
   positions.forEach((p) => {
-    const control = getControl(controls, p);
+    const control = _.cloneDeep(getControl(controls, p));
     const breadcrumbs = getBreadcrumbsForSubmission(controls, p);
     const submissionField = getSubmissionField(submission, survey, p);
     if (control.type !== 'group') {
@@ -173,6 +174,7 @@ export const linearControls = (survey, submission) => {
         number: p.map(value => value + 1),
         position: p,
         value: submissionField.value,
+        meta: submissionField.meta,
       });
       res.push(r);
     }

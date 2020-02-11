@@ -2,7 +2,11 @@
   <v-container>
     <v-card>
       <v-card-title>{{ survey.name }}</v-card-title>
-      <v-card-subtitle> {{ submission._id }}</v-card-subtitle>
+      <v-card-subtitle>
+        {{ submission._id }}
+        <br><kbd>{{ created }}</kbd> created
+        <br><kbd>{{ modified }}</kbd> last modified
+      </v-card-subtitle>
     </v-card>
     <v-timeline
       v-if="controlDisplays"
@@ -22,33 +26,60 @@
             :color="display.background"
             :dark="display.dark"
           >
-            <v-card-title class="d-block">
-              <div class="ma-0 pa-0 d-flex">
-                <v-chip
-                  dark
-                  small
-                  color="red"
-                  class="mr-0 mr-1"
-                ><span
-                    v-for="(crumb, ci) in display.breadcrumbs"
-                    :key="`bread_${ci}`"
-                  >{{ crumb }} <span
-                      class="mr-1"
-                      v-if="ci < display.breadcrumbs.length - 1"
-                    >&gt;</span></span></v-chip>
-                <v-spacer></v-spacer>
-                <v-chip
-                  small
-                  dark
-                  v-if="display.collate > 0"
-                  color="grey-darken-5"
-                >Irrelevant</v-chip>
+            <div class="d-flex flex-row">
+              <div
+                v-if="display.active"
+                style="width: 1rem;"
+                class="green"
+              > </div>
+
+              <div class="flex-grow-1">
+                <v-card-title class="d-block">
+                  <div class="ma-0 pa-0 d-flex align-stretch">
+                    <v-chip
+                      dark
+                      small
+                      color="red"
+                      class="mr-0 mr-1"
+                    ><span
+                        v-for="(crumb, ci) in display.breadcrumbs"
+                        :key="`bread_${ci}`"
+                      >{{ crumb }} <span
+                          class="mr-1"
+                          v-if="ci < display.breadcrumbs.length - 1"
+                        >&gt;</span></span></v-chip>
+                    <v-spacer></v-spacer>
+                    <v-chip
+                      small
+                      dark
+                      v-if="display.collate > 0"
+                      color="grey-darken-5"
+                    >Irrelevant</v-chip>
+                  </div>
+                  <span class="number-chip mr-2">{{ display.number }}</span>
+                  {{ display.label }}
+                </v-card-title>
+                <v-card-text
+                  class="py-0"
+                  v-if="display.value"
+                ><kbd class="pa-2">{{ display.value }}</kbd></v-card-text>
+                <v-card-text
+                  v-else
+                >No answer</v-card-text>
+                <div
+                  v-if="display.modified"
+                  class="d-flex flex-row text--secondary pa-2"
+                  style="font-size: 0.8rem"
+                >
+                  <div class="flex-grow-1">
+                    {{ display.modified.format('YYYY-MM-DD HH:mm') }}<v-spacer></v-spacer>
+                  </div>
+                  <div class="text-right">
+                    {{ display.human }} ago
+                  </div>
+                </div>
               </div>
-              <span class="number-chip mr-2">{{ display.number }}</span>
-              {{ display.label }}
-            </v-card-title>
-            <v-card-text v-if="display.value"><kbd class="pa-2">{{ display.value }}</kbd></v-card-text>
-            <v-card-text v-else>No answer</v-card-text>
+            </div>
           </v-card>
 
           <v-chip
@@ -67,6 +98,7 @@
 
 <script>
 import _ from 'lodash';
+import moment from 'moment';
 import colors from 'vuetify/lib/util/colors';
 import appMixin from '@/components/mixin/appComponent.mixin';
 import { linearControls } from '@/utils/submissions';
@@ -81,10 +113,10 @@ const states = {
   ok: ['', ''],
 };
 
-function iconify(control) {
+function iconify(control, relevant) {
   if (control.value != null) {
     return states.done;
-  } if (control.value == null && control.required) {
+  } if (relevant && (control.value == null && control.required)) {
     return states.missing;
   } if (control.warning) {
     return states.warning;
@@ -103,16 +135,22 @@ export default {
   data() {
     return {
       controlDisplays: [],
+      modified: '',
+      created: '',
     };
   },
   methods: {
     relevant(item, positions) {
       const idx = positions.findIndex(p => _.isEqual(p, item.position));
+      if (idx === -1) {
+        return true;
+      }
+
       const relevant = utils.isRelevant(this.submission, this.survey, idx, positions);
       return relevant === undefined ? true : relevant;
     },
     expand(group) {
-      this.controlDisplays.filter(item => item.collateGroup === group).forEach((item) => {
+      this.controlDisplays.filter(item => item.collateGroup === group && item.collate > 0).forEach((item) => {
         // eslint-disable-next-line no-param-reassign
         item.collate = 1;
         // eslint-disable-next-line no-param-reassign
@@ -120,7 +158,11 @@ export default {
       });
     },
     refresh() {
-      const positions = utils.getSurveyPositions(this.survey, this.submission.version);
+      this.created = moment(this.submission.meta.dateCreated).format('YYYY-MM-DD HH:mm');
+      this.modified = moment(this.submission.meta.dateModified).format('YYYY-MM-DD HH:mm');
+
+      const now = moment();
+      const positions = utils.getSurveyPositions(this.survey, this.submission.meta.version);
 
       let collate = 0;
       let collateGroup = 0;
@@ -128,10 +170,10 @@ export default {
 
       const r = controls.map((item, itemIndex) => {
         const peek = itemIndex + 1 < controls.length ? controls[itemIndex + 1] : null;
-        const icon = iconify(item);
         const active = _.isEqual(item.position, this.position);
         const rel = this.relevant(item, positions);
         let lastOfCollation = false;
+        const icon = iconify(item, rel);
 
         if (!rel) {
           collate++;
@@ -147,7 +189,9 @@ export default {
           collateGroup++;
         }
 
-        const background = (active ? colors.green.base : 'white');
+        const modified = item.meta.dateModified ? moment(item.meta.dateModified) : null;
+
+        const background = 'white';
 
         return {
           label: item.label,
@@ -158,30 +202,29 @@ export default {
           number: item.number.join('.'),
           background,
           position: item.position,
-          dark: active,
+          dark: false,
           relevant: rel,
           hidden: !rel,
           collate,
           collateGroup,
           lastOfCollation,
+          active,
+          modified,
+          human: moment.duration(now.diff(modified)).humanize(),
         };
       });
       this.controlDisplays = r;
     },
   },
   watch: {
+    /*
     submission: {
       handler() {
         this.refresh();
       },
       deep: true,
     },
-    survey: {
-      handler() {
-        this.refresh();
-      },
-      deep: true,
-    },
+    */
   },
 };
 </script>

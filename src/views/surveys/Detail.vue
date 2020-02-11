@@ -1,9 +1,10 @@
 <template>
   <v-container
     v-if="entity"
-    class="mt-2"
+    style="height: calc(100% - 64px)"
+    class="mt-2 d-flex flex-column justify-center"
   >
-    <div class="d-flex justify-end">
+    <div class="d-flex justify-center">
       <v-btn
         class="mx-2"
         :to="`/surveys/${entity._id}/edit`"
@@ -20,13 +21,17 @@
       </v-btn>
 
     </div>
-    <h1>{{entity.name}}</h1>
-    <p>This is a good survey with 17 submissions.</p>
 
-    <div class="mt-4">
+    <div class="mt-4 d-flex justify-center">
+      <span class="text-center">
+        <h1>{{entity.name}}</h1>
+        This is a good survey with 17 submissions.
+      </span>
+    </div>
+
+    <div class="mt-4 d-flex justify-center">
       <v-btn
         x-large
-        block
         color="primary"
         @click="startDraft(entity._id)"
       >

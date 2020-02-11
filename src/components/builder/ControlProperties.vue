@@ -12,6 +12,14 @@
         label="Label"
       />
 
+      <v-checkbox
+        class="ma-0"
+        color="blue"
+        outlined
+        v-model="control.required"
+        label="Required"
+      />
+
       <div
         v-if="!showAdvanced"
         class="d-flex justify-end"

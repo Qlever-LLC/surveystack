@@ -69,6 +69,7 @@
       stateless
     >
       <draft-overview
+        ref="overview"
         :survey="survey"
         :submission="submission"
         :position="this.positions[this.index]"
@@ -94,6 +95,7 @@
 /* eslint-disable no-continue */
 
 import _ from 'lodash';
+import moment from 'moment';
 
 import draftOverview from '@/components/survey/drafts/DraftOverview.vue';
 import draftFooter from '@/components/survey/drafts/DraftFooter.vue';
@@ -206,8 +208,11 @@ export default {
       // local
       this.value = v;
       // submission
-      this.submission.meta.modified = new Date().getTime();
+      const modified = moment().toISOString();
+      this.submission.meta.dateModified = modified;
+      console.log('setting value', this.sumissionField, v);
       this.submissionField.value = v;
+      this.submissionField.meta.dateModified = modified;
       this.$emit('change', this.submission);
       this.persist();
     },
@@ -224,10 +229,12 @@ export default {
 
       this.calculateControl();
     },
-    handleNext() {
+    async handleNext() {
+      console.log('handleNext()');
       this.slide = 'slide-in';
       this.showNav(true);
       this.showNext(true);
+      await this.calculateRelevance();
 
       // eslint-disable-next-line no-constant-condition
       while (true) {
@@ -255,7 +262,6 @@ export default {
 
         this.control = utils.getControl(this.controls, this.position);
         const field = submissionUtils.getSubmissionField(this.submission, this.survey, this.position);
-        console.log(utils.isRelevant(this.submission, this.survey, this.index, this.positions));
 
         this.value = field.value;
 
@@ -268,7 +274,10 @@ export default {
         return;
       }
     },
-    handlePrevious() {
+    async handlePrevious() {
+      console.log('handlePrevious()');
+      await this.calculateRelevance();
+
       this.slide = 'slide-out';
 
       this.showNav(true);
@@ -314,7 +323,7 @@ export default {
       const sandbox = utils.compileSandboxSingleLine(this.control.options.calculate);
       this.control.value = sandbox({ data: this.submission.data });
       this.value = this.control.value;
-      console.log(this.control.value);
+      console.log('calculated', this.control.value);
     },
     questions() {
       if (!this.surveyPositions) {
@@ -333,6 +342,7 @@ export default {
       this.$emit('submit', { payload });
     },
     async calculateRelevance() {
+      console.log('calculateRelevance()');
       const items = this.positions.map((pos) => {
         const control = utils.getControl(this.controls, pos);
         if (!control.options.relevance.enabled) {
@@ -346,7 +356,6 @@ export default {
         };
       }).filter(item => item !== null);
 
-      console.log('items for relevance eval', items);
 
       const promises = items.map(item => new Promise((resolve, reject) => {
         utils.execute(item.code, 'relevance', this.submission, this.survey)
@@ -389,10 +398,11 @@ export default {
   watch: {
     async showOverview() {
       await this.calculateRelevance();
+      this.$refs.overview.refresh();
     },
     submission: {
       async handler() {
-        await this.calculateRelevance();
+        // await this.calculateRelevance();
       },
       deep: true,
     },

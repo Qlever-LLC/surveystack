@@ -118,6 +118,7 @@
       <multipane-resizer v-if="hasCode && !hideCode" />
       <div class="pane pane-draft">
         <draft
+          @submit="submit"
           v-if="survey && instance"
           :submission="instance"
           :survey="survey"
@@ -274,6 +275,16 @@ export default {
     };
   },
   methods: {
+    async submit({ payload }) {
+      try {
+        await api.post('/submissions', payload);
+        // this.$router.push(`/surveys/${this.survey._id}`);
+        this.snackbarMessage = 'Submitted';
+        this.showSnackbar = true;
+      } catch (error) {
+        console.log(error);
+      }
+    },
     updateSelectedCode(code) {
       this.control.options[tabMap[this.selectedTab]].code = code;
     },
