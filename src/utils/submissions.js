@@ -125,7 +125,8 @@ const createSubmissionFromSurvey = (survey, version = 1, instance = null) => {
     const control = getControl(controls, position);
     const flatName = getFlatName(controls, position);
     const value = flattenedInstance ? flattenedInstance[`${flatName}.value`] : null;
-    objects.push({ [flatName]: { value, meta: { type: control.type } } });
+    const dateModified = flattenedInstance ? flattenedInstance[`${flatName}.meta.dateModified`] : null;
+    objects.push({ [flatName]: { value, meta: { type: control.type, dateModified } } });
   });
 
   const c = Object.assign({}, ...objects);
