@@ -174,6 +174,7 @@ export const linearControls = (survey, submission) => {
         number: p.map(value => value + 1),
         position: p,
         value: submissionField.value,
+        meta: submissionField.meta,
       });
       res.push(r);
     }

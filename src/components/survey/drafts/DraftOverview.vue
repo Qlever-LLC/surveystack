@@ -2,7 +2,11 @@
   <v-container>
     <v-card>
       <v-card-title>{{ survey.name }}</v-card-title>
-      <v-card-subtitle> {{ submission._id }}</v-card-subtitle>
+      <v-card-subtitle>
+        {{ submission._id }}
+        <br><kbd>{{ created }}</kbd> created
+        <br><kbd>{{ modified }}</kbd> last modified
+      </v-card-subtitle>
     </v-card>
     <v-timeline
       v-if="controlDisplays"
@@ -55,8 +59,25 @@
                   <span class="number-chip mr-2">{{ display.number }}</span>
                   {{ display.label }}
                 </v-card-title>
-                <v-card-text v-if="display.value"><kbd class="pa-2">{{ display.value }}</kbd></v-card-text>
-                <v-card-text v-else>No answer</v-card-text>
+                <v-card-text
+                  class="py-0"
+                  v-if="display.value"
+                ><kbd class="pa-2">{{ display.value }}</kbd></v-card-text>
+                <v-card-text
+                  v-else
+                >No answer</v-card-text>
+                <div
+                  v-if="display.modified"
+                  class="d-flex flex-row text--secondary pa-2"
+                  style="font-size: 0.8rem"
+                >
+                  <div class="flex-grow-1">
+                    {{ display.modified.format('YYYY-MM-DD HH:mm') }}<v-spacer></v-spacer>
+                  </div>
+                  <div class="text-right">
+                    {{ display.human }} ago
+                  </div>
+                </div>
               </div>
             </div>
           </v-card>
@@ -77,6 +98,7 @@
 
 <script>
 import _ from 'lodash';
+import moment from 'moment';
 import colors from 'vuetify/lib/util/colors';
 import appMixin from '@/components/mixin/appComponent.mixin';
 import { linearControls } from '@/utils/submissions';
@@ -113,6 +135,8 @@ export default {
   data() {
     return {
       controlDisplays: [],
+      modified: '',
+      created: '',
     };
   },
   methods: {
@@ -134,6 +158,10 @@ export default {
       });
     },
     refresh() {
+      this.created = moment(this.submission.meta.dateCreated).format('YYYY-MM-DD HH:mm');
+      this.modified = moment(this.submission.meta.dateModified).format('YYYY-MM-DD HH:mm');
+
+      const now = moment();
       const positions = utils.getSurveyPositions(this.survey, this.submission.meta.version);
 
       let collate = 0;
@@ -161,6 +189,8 @@ export default {
           collateGroup++;
         }
 
+        const modified = item.meta.dateModified ? moment(item.meta.dateModified) : null;
+
         const background = 'white';
 
         return {
@@ -179,6 +209,8 @@ export default {
           collateGroup,
           lastOfCollation,
           active,
+          modified,
+          human: moment.duration(now.diff(modified)).humanize(),
         };
       });
       this.controlDisplays = r;

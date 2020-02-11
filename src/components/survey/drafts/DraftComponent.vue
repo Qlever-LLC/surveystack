@@ -95,6 +95,7 @@
 /* eslint-disable no-continue */
 
 import _ from 'lodash';
+import moment from 'moment';
 
 import draftOverview from '@/components/survey/drafts/DraftOverview.vue';
 import draftFooter from '@/components/survey/drafts/DraftFooter.vue';
@@ -207,8 +208,11 @@ export default {
       // local
       this.value = v;
       // submission
-      this.submission.meta.modified = new Date().getTime();
+      const modified = moment().toISOString();
+      this.submission.meta.dateModified = modified;
+      console.log('setting value', this.sumissionField, v);
       this.submissionField.value = v;
+      this.submissionField.meta.dateModified = modified;
       this.$emit('change', this.submission);
       this.persist();
     },
@@ -319,7 +323,7 @@ export default {
       const sandbox = utils.compileSandboxSingleLine(this.control.options.calculate);
       this.control.value = sandbox({ data: this.submission.data });
       this.value = this.control.value;
-      console.log(this.control.value);
+      console.log('calculated', this.control.value);
     },
     questions() {
       if (!this.surveyPositions) {
@@ -352,7 +356,6 @@ export default {
         };
       }).filter(item => item !== null);
 
-      console.log('items for relevance eval', items);
 
       const promises = items.map(item => new Promise((resolve, reject) => {
         utils.execute(item.code, 'relevance', this.submission, this.survey)
