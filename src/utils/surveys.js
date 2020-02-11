@@ -384,7 +384,9 @@ export function execute(code, functionName, instance, survey, log) {
           reject(new Error('Too many log messages'));
         } else {
           const arg = typeof m.data.log === 'object' ? JSON.stringify(m.data.log, null, 2) : m.data.log;
-          log(arg);
+          if (log) {
+            log(arg);
+          }
         }
       }
     };

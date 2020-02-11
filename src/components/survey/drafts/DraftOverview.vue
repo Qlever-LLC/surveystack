@@ -118,7 +118,6 @@ export default {
   methods: {
     relevant(item, positions) {
       const idx = positions.findIndex(p => _.isEqual(p, item.position));
-      console.log('positions', positions, idx, item.position);
       if (idx === -1) {
         return true;
       }
@@ -127,7 +126,7 @@ export default {
       return relevant === undefined ? true : relevant;
     },
     expand(group) {
-      this.controlDisplays.filter(item => item.collateGroup === group).forEach((item) => {
+      this.controlDisplays.filter(item => item.collateGroup === group && item.collate > 0).forEach((item) => {
         // eslint-disable-next-line no-param-reassign
         item.collate = 1;
         // eslint-disable-next-line no-param-reassign
@@ -135,7 +134,7 @@ export default {
       });
     },
     refresh() {
-      const positions = utils.getSurveyPositions(this.survey, this.submission.version);
+      const positions = utils.getSurveyPositions(this.survey, this.submission.meta.version);
 
       let collate = 0;
       let collateGroup = 0;
