@@ -1,21 +1,24 @@
 <template>
   <v-container>
-    <h1>Group Edit</h1>
+    <h1>{{editMode ? "Edit group" : "Create group"}}</h1>
 
     <form @submit.prevent="onSubmit">
       <v-text-field
         label="Name"
         placeholder="Enter group name"
-        class="form-control"
         id="group-name"
         v-model="entity.name"
       />
-      <p>path={{entity.path | showNull}}</p>
+      <small>path={{entity.path | showNull}}</small>
       <div class="d-flex justify-end">
+        <v-btn
+          text
+          @click="cancel"
+        >Cancel</v-btn>
         <v-btn
           color="primary"
           type="submit"
-        >Submit</v-btn>
+        >{{editMode ? "Save" : "Create"}}</v-btn>
       </div>
     </form>
   </v-container>
@@ -60,6 +63,14 @@ export default {
       } catch (err) {
         console.log(err);
       }
+    },
+    cancel() {
+      if (!this.entity.path) {
+        this.$router.replace({ name: 'groups-list' });
+        return;
+      }
+
+      this.$router.replace(`/groups${this.entity.path}`);
     },
   },
   async created() {

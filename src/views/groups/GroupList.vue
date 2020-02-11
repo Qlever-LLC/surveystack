@@ -1,7 +1,14 @@
 <template>
-  <div>
-    <app-group-list :entities="entities" />
-  </div>
+  <v-container>
+    <app-group-list
+      :entities="entities"
+      class="mt-3"
+    >
+      <template v-slot:header>
+        <h1>Groups</h1>
+      </template>
+    </app-group-list>
+  </v-container>
 </template>
 
 <script>

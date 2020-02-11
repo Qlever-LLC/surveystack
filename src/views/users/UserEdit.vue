@@ -2,10 +2,18 @@
   <v-container>
     <h1>{{ editMode ? "Edit user" : "Create user" }}</h1>
     <v-form>
-      <v-text-field v-model="entity.email" label="E-Mail" />
-      <v-text-field v-model="entity.name" label="Name" />
+      <v-text-field
+        v-model="entity.email"
+        label="E-Mail"
+      />
+      <v-text-field
+        v-model="entity.name"
+        label="Name"
+      />
       <v-text-field
         v-model="entity.password"
+        :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+        @click:append="showPasswords = !showPasswords"
         label="Password"
         :type="showPasswords ? 'text' : 'password'"
         :hint="passwordHint"
@@ -14,18 +22,23 @@
 
       <v-text-field
         v-model="passwordConfirmation"
+        :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+        @click:append="showPasswords = !showPasswords"
         label="Password (Confirmation)"
         :type="showPasswords ? 'text' : 'password'"
         :hint="passwordHint"
         persistent-hint
       />
-      <div class="d-flex mt-2">
+      <div class="d-flex mt-2 justify-end">
+
         <v-btn
-          class="mr-auto"
-          @click="showPasswords = !showPasswords"
-        >{{showPasswords ? 'Hide Passwords' : 'Show Passwords'}}</v-btn>
-        <v-btn text @click="cancel">Cancel</v-btn>
-        <v-btn color="primary" @click="submit">Submit</v-btn>
+          text
+          @click="cancel"
+        >Cancel</v-btn>
+        <v-btn
+          color="primary"
+          @click="submit"
+        >Submit</v-btn>
       </div>
     </v-form>
   </v-container>
