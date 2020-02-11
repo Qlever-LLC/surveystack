@@ -69,6 +69,7 @@
       stateless
     >
       <draft-overview
+        ref="overview"
         :survey="survey"
         :submission="submission"
         :position="this.positions[this.index]"
@@ -225,6 +226,7 @@ export default {
       this.calculateControl();
     },
     async handleNext() {
+      console.log('handleNext()');
       this.slide = 'slide-in';
       this.showNav(true);
       this.showNext(true);
@@ -269,6 +271,7 @@ export default {
       }
     },
     async handlePrevious() {
+      console.log('handlePrevious()');
       await this.calculateRelevance();
 
       this.slide = 'slide-out';
@@ -335,6 +338,7 @@ export default {
       this.$emit('submit', { payload });
     },
     async calculateRelevance() {
+      console.log('calculateRelevance()');
       const items = this.positions.map((pos) => {
         const control = utils.getControl(this.controls, pos);
         if (!control.options.relevance.enabled) {
@@ -390,7 +394,8 @@ export default {
   },
   watch: {
     async showOverview() {
-      // await this.calculateRelevance();
+      await this.calculateRelevance();
+      this.$refs.overview.refresh();
     },
     submission: {
       async handler() {

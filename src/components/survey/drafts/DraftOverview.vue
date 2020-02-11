@@ -22,33 +22,43 @@
             :color="display.background"
             :dark="display.dark"
           >
-            <v-card-title class="d-block">
-              <div class="ma-0 pa-0 d-flex">
-                <v-chip
-                  dark
-                  small
-                  color="red"
-                  class="mr-0 mr-1"
-                ><span
-                    v-for="(crumb, ci) in display.breadcrumbs"
-                    :key="`bread_${ci}`"
-                  >{{ crumb }} <span
-                      class="mr-1"
-                      v-if="ci < display.breadcrumbs.length - 1"
-                    >&gt;</span></span></v-chip>
-                <v-spacer></v-spacer>
-                <v-chip
-                  small
-                  dark
-                  v-if="display.collate > 0"
-                  color="grey-darken-5"
-                >Irrelevant</v-chip>
+            <div class="d-flex flex-row">
+              <div
+                v-if="display.active"
+                style="width: 1rem;"
+                class="green"
+              > </div>
+
+              <div class="flex-grow-1">
+                <v-card-title class="d-block">
+                  <div class="ma-0 pa-0 d-flex align-stretch">
+                    <v-chip
+                      dark
+                      small
+                      color="red"
+                      class="mr-0 mr-1"
+                    ><span
+                        v-for="(crumb, ci) in display.breadcrumbs"
+                        :key="`bread_${ci}`"
+                      >{{ crumb }} <span
+                          class="mr-1"
+                          v-if="ci < display.breadcrumbs.length - 1"
+                        >&gt;</span></span></v-chip>
+                    <v-spacer></v-spacer>
+                    <v-chip
+                      small
+                      dark
+                      v-if="display.collate > 0"
+                      color="grey-darken-5"
+                    >Irrelevant</v-chip>
+                  </div>
+                  <span class="number-chip mr-2">{{ display.number }}</span>
+                  {{ display.label }}
+                </v-card-title>
+                <v-card-text v-if="display.value"><kbd class="pa-2">{{ display.value }}</kbd></v-card-text>
+                <v-card-text v-else>No answer</v-card-text>
               </div>
-              <span class="number-chip mr-2">{{ display.number }}</span>
-              {{ display.label }}
-            </v-card-title>
-            <v-card-text v-if="display.value"><kbd class="pa-2">{{ display.value }}</kbd></v-card-text>
-            <v-card-text v-else>No answer</v-card-text>
+            </div>
           </v-card>
 
           <v-chip
@@ -108,6 +118,11 @@ export default {
   methods: {
     relevant(item, positions) {
       const idx = positions.findIndex(p => _.isEqual(p, item.position));
+      console.log('positions', positions, idx, item.position);
+      if (idx === -1) {
+        return true;
+      }
+
       const relevant = utils.isRelevant(this.submission, this.survey, idx, positions);
       return relevant === undefined ? true : relevant;
     },
@@ -147,7 +162,7 @@ export default {
           collateGroup++;
         }
 
-        const background = (active ? colors.green.base : 'white');
+        const background = 'white';
 
         return {
           label: item.label,
@@ -158,24 +173,27 @@ export default {
           number: item.number.join('.'),
           background,
           position: item.position,
-          dark: active,
+          dark: false,
           relevant: rel,
           hidden: !rel,
           collate,
           collateGroup,
           lastOfCollation,
+          active,
         };
       });
       this.controlDisplays = r;
     },
   },
   watch: {
+    /*
     submission: {
       handler() {
         this.refresh();
       },
       deep: true,
     },
+    */
   },
 };
 </script>
