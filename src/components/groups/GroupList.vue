@@ -1,17 +1,21 @@
 <template>
-  <v-container>
+  <div>
     <div class="d-flex justify-space-between align-center mb-2">
-      <h3>{{title}}</h3>
-      <v-text-field
-        placeholder="Search..."
-        v-model="q"
-        class="mw-40 mx-2"
-      />
+      <slot name="header">
+        <h2 class="grey--text text--darken-3">{{title}}</h2>
+      </slot>
       <v-btn
         color="primary"
+        class="ml-4"
         :to="{name: 'groups-new', query: {path: path}}"
-      >New</v-btn>
+      >New...</v-btn>
     </div>
+    <v-text-field
+      label="Search"
+      v-model="q"
+      id="oursci-group-list-search"
+      append-icon="mdi-magnify"
+    />
 
     <v-card>
       <div
@@ -24,20 +28,12 @@
             <v-list-item-subtitle>{{group._id}}</v-list-item-subtitle>
             <small>path={{group.path | showNull}}</small>
           </v-list-item-content>
-          <v-list-item-icon>
-            <v-btn
-              :to="{name: 'groups-edit', params: {id: group._id}}"
-              text
-            >
-              <v-icon>mdi-pencil</v-icon>
-            </v-btn>
-          </v-list-item-icon>
         </v-list-item>
         <v-divider />
       </div>
     </v-card>
 
-  </v-container>
+  </div>
 </template>
 
 <script>

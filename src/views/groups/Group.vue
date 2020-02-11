@@ -1,58 +1,44 @@
 <template>
-  <v-container v-if="initialized">
-    <span v-if="entity.path">
-      <router-link
-        :to="`/groups/${entity.path}`"
-        class="text-muted"
-      >{{entity.path}}</router-link>
-    </span>
+  <v-container v-if="initialized && status.code === 200">
+    <div class="d-flex justify-space-between align-center">
+      <span v-if="entity.path">
+        <router-link
+          :to="`/groups${entity.path}`"
+          class="text-muted"
+        >{{entity.path}}</router-link>
+      </span>
+      <v-btn
+        class="ml-auto"
+        :to="{name: 'groups-edit', params: {id: entity._id}}"
+        text
+      >
+        <v-icon>mdi-pencil</v-icon>
+        <span class="ml-2">Edit</span>
+      </v-btn>
+    </div>
+
     <h1>
       {{entity.name}}
-      <small>
-        <router-link
-          :to="{name: 'groups-edit', params: {id: entity._id}}"
-          class="text-muted"
-        >edit</router-link>
-      </small>
+
     </h1>
 
     <div class="mt-2">
       <app-group-list
         :entities="subgroups"
-        title="Subgroups"
         :path="subgroupPath"
+        title="Subgroups"
       />
-      <ul
-        v-if="initialized && subgroups.length === 0"
-        class="list-group"
-      >
-        <li class="list-group-item text-muted">
-          No subgroups found...
-          <v-btn :to="{name: 'groups-new', query: {path: subgroupPath}}">Create one now</v-btn>
-        </li>
-      </ul>
+      <div
+        v-if="subgroups.length === 0"
+        class="grey--text"
+      >No subgroups yet</div>
     </div>
 
-    <div class="nav nav-tabs mt-4">
-      <li class="nav-item">
-        <a
-          class="nav-link active"
-          href="#"
-        >Surveys</a>
-      </li>
-      <li class="nav-item">
-        <a
-          class="nav-link"
-          href="#"
-        >Dashboards</a>
-      </li>
-      <li class="nav-item">
-        <a
-          class="nav-link"
-          href="#"
-        >Scripts</a>
-      </li>
-    </div>
+  </v-container>
+  <v-container v-else-if="status.code === 404">
+    <h1>Oh snap!</h1>
+    <p>No group under <strong>{{$route.params.pathMatch}}</strong> was found :/ </p>
+
   </v-container>
 </template>
 
@@ -70,7 +56,10 @@ export default {
   data() {
     return {
       initialized: false,
-      status: '',
+      status: {
+        code: 200,
+        message: '',
+      },
       entity: {
         _id: '',
         name: '',
@@ -80,14 +69,15 @@ export default {
     };
   },
   methods: {
-    async getEntity(id) {
+    async getEntity(path) {
       this.initialized = false;
       try {
-        const { data } = await api.get(`/groups/by-path/${id}`);
+        const { data } = await api.get(`/groups/by-path/${path}`);
         this.entity = data;
         this.getSubgroups();
       } catch (e) {
-        this.status = e.response.data;
+        this.status.code = e.response.status;
+        this.status.message = e.response.data.message;
       }
     },
     async getSubgroups() {
@@ -99,9 +89,9 @@ export default {
 
         const { data } = await api.get(`/groups?path=${childrenPath}`);
         this.subgroups = data;
-        this.initialized = true;
       } catch (e) {
-        this.status = e.response.data;
+        this.status.code = e.response.status;
+        this.status.message = e.response.data.message;
       }
     },
   },
@@ -113,24 +103,21 @@ export default {
       return `${this.entity.path}${this.entity.name}${GROUP_PATH_DELIMITER}`;
     },
   },
-  beforeRouteUpdate(to, from, next) {
+  async beforeRouteUpdate(to, from, next) {
     const { pathMatch } = to.params;
-    this.getEntity(pathMatch);
+    await this.getEntity(pathMatch);
+    this.initialized = true;
     next();
   },
-  created() {
+  async created() {
     const { pathMatch } = this.$route.params;
-    this.getEntity(pathMatch);
+    await this.getEntity(pathMatch);
+    this.initialized = true;
   },
 };
 </script>
 
 <style scoped>
-h1,
-h2 {
-  margin-bottom: 0px;
-}
-
 .placeholder {
   display: flex;
   margin-bottom: 3rem;
