@@ -23,7 +23,7 @@ import GroupEdit from '@/views/groups/GroupEdit.vue';
 
 import SubmissionList from '@/views/submissions/List.vue';
 
-import SurveyBuilder from '@/views/builder/SurveyBuilder.vue';
+import Builder from '@/views/builder/Builder.vue';
 
 import TabulaRasa from '@/views/debug/TabulaRasa.vue';
 
@@ -67,7 +67,7 @@ const routes = [
   {
     path: '/surveys/new',
     name: 'surveys-new',
-    component: SurveyBuilder,
+    component: Builder,
   },
   {
     path: '/surveys/:id',
@@ -77,7 +77,7 @@ const routes = [
   {
     path: '/surveys/:id/edit',
     name: 'surveys-edit',
-    component: SurveyBuilder,
+    component: Builder,
   },
   {
     path: '/submissions/drafts/:id',
