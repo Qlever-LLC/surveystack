@@ -5,6 +5,7 @@ import groupController from '../controllers/groupController';
 import surveyController from '../controllers/surveyController';
 import submissionController from '../controllers/submissionController';
 import userController from '../controllers/userController';
+import scriptController from '../controllers/scriptController';
 import debugController from '../controllers/debugController';
 
 //import { authenticated } from '../handlers/checkPermissions';
@@ -84,5 +85,16 @@ router.put(
   catchErrors(userController.updateUser)
 );
 router.delete('/users/:id', catchErrors(userController.deleteUser));
+
+/** Scripts */
+router.get('/scripts', catchErrors(scriptController.getScripts));
+router.get('/scripts/:id', catchErrors(scriptController.getScript));
+router.post('/scripts', catchErrors(scriptController.createScript));
+router.put(
+  '/scripts/:id',
+  [assertIdsMatch, assertEntityExists({ collection: 'scripts' })],
+  catchErrors(scriptController.updateScript)
+);
+router.delete('/scripts/:id', catchErrors(scriptController.deleteScript));
 
 export default router;
