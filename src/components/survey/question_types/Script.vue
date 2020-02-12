@@ -10,6 +10,8 @@
     >
       Run Script
     </v-btn>
+    status: {{ meta && meta.status }}
+    status message: {{ meta && meta.statusMessage }}
   </div>
 </template>
 
@@ -25,6 +27,18 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    meta: {
+      type: Object,
+      default: () => ({}),
+    },
+  },
+  computed: {
+    status() {
+      return {
+        type: this.meta.status,
+        message: this.meta.statusMessage,
+      };
+    },
   },
   data() {
     return {};
@@ -36,6 +50,9 @@ export default {
     requestRenderScript() {
       this.$refs.iframe.contentWindow.postMessage({ type: 'REQUEST_RENDER_SCRIPT', payload: { value: this.value } });
     },
+    // handleRequestSetStatus() {
+    //   this.emit
+    // },
   },
   mounted() {
     const { iframe } = this.$refs;
@@ -56,6 +73,7 @@ export default {
         this.requestRenderScript();
       }
     });
+    onMessage('REQUEST_SET_QUESTION_STATUS', ({ type, message }) => this.$emit('setStatus', { type, message }));
   },
 };
 

@@ -39,6 +39,17 @@ export function requestFetchSubmissions() {
   });
 }
 
+export function requestSetStatus({ type, message = '' }) {
+  const [origin] = window.location.ancestorOrigins;
+  window.parent.postMessage({
+    type: 'REQUEST_SET_QUESTION_STATUS',
+    payload: {
+      type,
+      message,
+    },
+  }, origin);
+}
+
 export function requestSetValue(value) {
   let origin;
 
@@ -55,16 +66,16 @@ export function requestSetValue(value) {
     },
   }, origin);
 
-  return new Promise((resolve, reject) => {
-    window.addEventListener('message', (event) => {
-      if (!event.data || !event.data.type || event.data.type !== 'RETURN_SET_QUESTION_VALUE') {
-        return;
-      }
-      if (event.data && event.data.type && event.data.type === 'RETURN_SET_QUESTION_VALUE') {
-        resolve(event.data.payload);
-      }
-    });
-  });
+  // return new Promise((resolve, reject) => {
+  //   window.addEventListener('message', (event) => {
+  //     if (!event.data || !event.data.type || event.data.type !== 'RETURN_SET_QUESTION_VALUE') {
+  //       return;
+  //     }
+  //     if (event.data && event.data.type && event.data.type === 'RETURN_SET_QUESTION_VALUE') {
+  //       resolve(event.data.payload);
+  //     }
+  //   });
+  // });
 }
 
 export function listen() {

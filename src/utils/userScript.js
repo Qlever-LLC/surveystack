@@ -1,3 +1,4 @@
+
 // import {
 //   requestFetchSubmissions,
 //   requestSetValue,
@@ -6,14 +7,8 @@
 
 
 // Should go in iframeMessaging lib file
-export function requestSetValue(value) {
-  // let origin;
-
-  // try {
+function requestSetValue(value) {
   const [origin] = window.location.ancestorOrigins;
-  // } catch (error) {
-  //   // origin = 'https://app.our-sci.net';
-  // }
 
   window.parent.postMessage({
     type: 'REQUEST_SET_QUESTION_VALUE',
@@ -34,6 +29,21 @@ export function requestSetValue(value) {
   });
 }
 
+// should only be in iframeMessaging
+function requestSetStatus({
+  type,
+  message = '',
+}) {
+  const [origin] = window.location.ancestorOrigins;
+  window.parent.postMessage({
+    type: 'REQUEST_SET_QUESTION_STATUS',
+    payload: {
+      type,
+      message,
+    },
+  }, origin);
+}
+
 
 // Should go in iframeMessaging lib file
 // TODO: validated origin, pass in as arg
@@ -45,6 +55,7 @@ export function onMessage(type, callback) {
     }
   });
 }
+
 
 function h(tag, attributes, ...children) {
   const el = document.createElement(tag);
@@ -58,16 +69,6 @@ function h(tag, attributes, ...children) {
   children.forEach((child) => {
     el.append(child);
   });
-  // for (const key in attrs) {
-  //   // if (key === 'class') {
-  //   //   el.className = attrs[key];
-  //   // } else {
-  //   //   el.setAttribute(key, attrs[key]);
-  //   // }
-  // }
-  // for (const child of children) {
-  //   el.append(child);
-  // }
   return el;
 }
 
@@ -77,6 +78,7 @@ export const exampleScript = {
   process({ submission }) {
     const madlib = `${submission.data.text_1.value} likes ${submission.data.text_2.value}`;
     requestSetValue({ madlib });
+    requestSetStatus({ type: 'SUCCESS', message: `it worked! ${Date.now()}` });
     return {
       madlib,
     };
@@ -96,9 +98,19 @@ export default function buildScriptQuestionIframeContents({ script, submissionJS
       <script type="module">
         import {
           requestFetchSubmissions,
+          requestSetStatus,
           requestSetValue,
           onMessage,
         } from 'http://localhost:8081/iframeMessaging.js';
+
+
+        function getInitialState() {
+          return {
+            submission: ${submissionJSON},
+            value: ${valueJSON},
+            scriptHasRun: ${!!valueJSON},
+          }
+        };
 
         function h(tag, attributes, ...children) {
           const el = document.createElement(tag);
@@ -112,15 +124,8 @@ export default function buildScriptQuestionIframeContents({ script, submissionJS
           children.forEach((child) => {
             el.append(child);
           });
+          return el;
         }
-
-        function getInitialState() {
-          return {
-            submission: ${submissionJSON},
-            value: ${valueJSON},
-            scriptHasRun: ${!!valueJSON},
-          }
-        };
 
         let state = getInitialState();
         let result;
@@ -151,7 +156,6 @@ export default function buildScriptQuestionIframeContents({ script, submissionJS
 
         onMessage('REQUEST_RENDER_SCRIPT', (payload) => {
           const root = document.querySelector('#root');
-          // root.innerHTML = JSON.stringify(payload);
           root.innerHTML = render(payload.value).innerHTML;
         });
 
