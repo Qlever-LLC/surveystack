@@ -1,5 +1,7 @@
 <template>
   <div>
+    <v-card-title class="pl-0">Properties</v-card-title>
+
     <v-form v-if="control">
       <v-text-field
         outlined

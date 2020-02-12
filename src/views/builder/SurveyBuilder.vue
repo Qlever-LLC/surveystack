@@ -3,12 +3,12 @@
     class="screen-root"
     style="padding: 0px 12px 0px 0px !important"
   >
-    <multipane
+    <splitpanes
       style="padding: 0px !important"
       class="pane-root"
-      layout="vertical"
+      vertical
     >
-      <div class="pane pane-survey">
+      <pane class="pane pane-survey">
         <graphical-view
           class="graphical-view"
           v-if="!viewCode"
@@ -16,12 +16,12 @@
           :controls="currentControls"
           @controlSelected="controlSelected"
         />
-      </div>
-      <multipane-resizer />
-      <div class="pane pane-controls">
+      </pane>
+
+      <pane class="pane pane-controls">
         <v-card>
-          <div class="sticky-top pa-4">
-            <v-card-title>Details</v-card-title>
+          <div class="sticky-top px-4">
+            <v-card-title class="pl-0">Details</v-card-title>
             <survey-details
               v-model="survey"
               :editMode="editMode"
@@ -29,10 +29,14 @@
               @cancel="onCancel"
               @submit="onSubmit"
               @delete="onDelete"
+              :enablePublish="enablePublish"
             />
-            <v-card-title>Add questions</v-card-title>
+            <v-divider class="my-4"></v-divider>
+
+            <v-card-title class="pl-0">Add questions</v-card-title>
             <control-adder @controlAdded="controlAdded" />
-            <v-card-title>Properties</v-card-title>
+            <v-divider class="my-4"></v-divider>
+
             <control-properties
               v-if="control"
               :control="control"
@@ -46,64 +50,64 @@
             />
           </div>
         </v-card>
-      </div>
-      <multipane-resizer />
-      <div
+      </pane>
+      <pane
         class="pane pane-main-code"
         v-if="hasCode && !hideCode"
       >
-        <multipane
-          layout="horizontal"
+        <splitpanes
+          horizontal
           class="code-resizer"
         >
 
-          <v-tabs
-            v-if="control.options"
-            v-model="selectedTab"
-            background-color="blue-grey darken-4"
-            dark
-          >
-            <v-tab v-if="control.type === 'script'">
-              Script
-            </v-tab>
-            <v-tab :disabled="!control.options.relevance.enabled">
-              Relevance
-            </v-tab>
-            <v-tab :disabled="!control.options.calculate.enabled">
-              Calculate
-            </v-tab>
-            <v-tab :disabled="!control.options.constraint.enabled">
-              Constraint
-            </v-tab>
-          </v-tabs>
+          <pane>
+            <div style="height: 100%">
+              <v-tabs
+                v-if="control.options"
+                v-model="selectedTab"
+                background-color="blue-grey darken-4"
+                dark
+              >
+                <v-tab v-if="control.type === 'script'">
+                  Script
+                </v-tab>
+                <v-tab :disabled="!control.options.relevance.enabled">
+                  Relevance
+                </v-tab>
+                <v-tab :disabled="!control.options.calculate.enabled">
+                  Calculate
+                </v-tab>
+                <v-tab :disabled="!control.options.constraint.enabled">
+                  Constraint
+                </v-tab>
+              </v-tabs>
 
-          <code-editor
-            v-if="selectedTab !== null"
-            @close="hideCode = true"
-            :code="activeCode"
-            class="main-code-editor"
-            :refresh="codeRefreshCounter"
-            runnable="true"
-            :error="codeError"
-            @run="runCode"
-            :result="evaluated"
-            @change="updateSelectedCode"
-          >
-          </code-editor>
+              <code-editor
+                v-if="selectedTab !== null"
+                @close="hideCode = true"
+                :code="activeCode"
+                class="main-code-editor"
+                :refresh="codeRefreshCounter"
+                runnable="true"
+                :error="codeError"
+                @run="runCode"
+                :result="evaluated"
+                @change="updateSelectedCode"
+              >
+              </code-editor>
+            </div>
 
-          <multipane-resizer
-            v-if="control"
-            class="horizontal-line"
-          />
-          <console-log
-            class="console-log"
-            :log="log"
-            @clear="log = ''"
-          />
-        </multipane>
-      </div>
-      <multipane-resizer v-if="hasCode && !hideCode" />
-      <div
+          </pane>
+          <pane>
+            <console-log
+              class="console-log"
+              :log="log"
+              @clear="log = ''"
+            />
+          </pane>
+        </splitpanes>
+      </pane>
+      <pane
         class="pane pane-submission-code"
         v-if="hasCode && !hideCode"
       >
@@ -117,18 +121,17 @@
             fold="true"
           ></code-editor>
         </div>
-      </div>
-      <multipane-resizer v-if="hasCode && !hideCode" />
-      <div class="pane pane-draft">
+      </pane>
+      <pane class="pane pane-draft">
         <draft
           @submit="submit"
           v-if="survey && instance"
           :submission="instance"
           :survey="survey"
         ></draft>
-      </div>
+      </pane>
 
-    </multipane>
+    </splitpanes>
 
     <app-dialog
       v-model="showDeleteModal"
@@ -173,7 +176,7 @@
 import _ from 'lodash';
 import ObjectId from 'bson-objectid';
 
-import { Multipane, MultipaneResizer } from 'vue-multipane';
+import { Splitpanes, Pane } from 'splitpanes';
 
 import api from '@/services/api.service';
 
@@ -222,8 +225,8 @@ export default {
     appMixin,
   ],
   components: {
-    Multipane,
-    MultipaneResizer,
+    Splitpanes,
+    Pane,
     codeEditor,
     graphicalView,
     controlProperties,
@@ -240,6 +243,7 @@ export default {
       editMode: false,
       dirty: false,
       // ui
+      enablePublish: false,
       viewCode: false,
       showSnackbar: false,
       snackbarMessage: '',
@@ -380,7 +384,9 @@ export default {
         await api.customRequest({
           method, url, data: this.survey,
         });
-        this.$router.push('/surveys/browse');
+        // this.$router.push('/surveys/browse');
+        this.snackbarMessage = 'Saved Survey';
+        this.showSnackbar = true;
       } catch (error) {
         if (error.response.status === 409) {
           this.showConflictModal = true;
@@ -587,8 +593,10 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
   overflow: hidden;
 }
 
+.pane-survey,
 .pane-controls {
   overflow: auto;
+  width: 400px !important;
 }
 
 .pane-submission-code,
@@ -607,11 +615,13 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
 .pane-draft {
   width: 100vw;
   position: relative;
+  align-self: center;
 }
 
 .pane-draft,
 .draft {
   max-width: 500px;
+  max-height: 1000px;
 }
 
 .hide-pane {
@@ -675,5 +685,128 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
   background-color: #f5f5f5;
   border-radius: 10px;
+}
+</style>
+
+<style>
+.splitpanes {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+.splitpanes--vertical {
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: row;
+  flex-direction: row;
+}
+.splitpanes--horizontal {
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+.splitpanes--dragging * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.splitpanes__pane {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  -webkit-transition: width 0.2s ease-out, height 0.2s ease-out;
+  transition: width 0.2s ease-out, height 0.2s ease-out;
+}
+.splitpanes--dragging .splitpanes__pane {
+  -webkit-transition: none;
+  transition: none;
+}
+.splitpanes__splitter {
+  -ms-touch-action: none;
+  touch-action: none;
+}
+.splitpanes--vertical > .splitpanes__splitter {
+  min-width: 1px;
+  cursor: col-resize;
+}
+.splitpanes--horizontal > .splitpanes__splitter {
+  min-height: 1px;
+  cursor: row-resize;
+}
+.splitpanes.default-theme .splitpanes__pane {
+  background-color: #f2f2f2;
+}
+.splitpanes.default-theme .splitpanes__splitter {
+  background-color: #fff;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  position: relative;
+}
+.splitpanes.default-theme .splitpanes__splitter:after,
+.splitpanes.default-theme .splitpanes__splitter:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background-color: rgba(0, 0, 0, 0.15);
+  -webkit-transition: background-color 0.3s;
+  transition: background-color 0.3s;
+}
+.splitpanes.default-theme .splitpanes__splitter:hover:after,
+.splitpanes.default-theme .splitpanes__splitter:hover:before {
+  background-color: rgba(0, 0, 0, 0.25);
+}
+.default-theme.splitpanes .splitpanes .splitpanes__splitter {
+  z-index: 1;
+}
+.default-theme.splitpanes--vertical > .splitpanes__splitter,
+.default-theme .splitpanes--vertical > .splitpanes__splitter {
+  width: 9px;
+  border-left: 1px solid #eee;
+  margin-left: -1px;
+}
+.default-theme.splitpanes--vertical > .splitpanes__splitter:after,
+.default-theme .splitpanes--vertical > .splitpanes__splitter:after,
+.default-theme.splitpanes--vertical > .splitpanes__splitter:before,
+.default-theme .splitpanes--vertical > .splitpanes__splitter:before {
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+  width: 1px;
+  height: 30px;
+}
+.default-theme.splitpanes--vertical > .splitpanes__splitter:before,
+.default-theme .splitpanes--vertical > .splitpanes__splitter:before {
+  margin-left: -2px;
+}
+.default-theme.splitpanes--vertical > .splitpanes__splitter:after,
+.default-theme .splitpanes--vertical > .splitpanes__splitter:after {
+  margin-left: 1px;
+}
+.default-theme.splitpanes--horizontal > .splitpanes__splitter,
+.default-theme .splitpanes--horizontal > .splitpanes__splitter {
+  height: 9px;
+  border-top: 1px solid #eee;
+  margin-top: -1px;
+}
+.default-theme.splitpanes--horizontal > .splitpanes__splitter:after,
+.default-theme .splitpanes--horizontal > .splitpanes__splitter:after,
+.default-theme.splitpanes--horizontal > .splitpanes__splitter:before,
+.default-theme .splitpanes--horizontal > .splitpanes__splitter:before {
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
+  width: 30px;
+  height: 1px;
+}
+.default-theme.splitpanes--horizontal > .splitpanes__splitter:before,
+.default-theme .splitpanes--horizontal > .splitpanes__splitter:before {
+  margin-top: -2px;
+}
+.default-theme.splitpanes--horizontal > .splitpanes__splitter:after,
+.default-theme .splitpanes--horizontal > .splitpanes__splitter:after {
+  margin-top: 1px;
 }
 </style>
