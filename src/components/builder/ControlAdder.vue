@@ -1,7 +1,17 @@
 <template>
   <div class="mt-3 mb-3">
     <v-btn
-      v-for="el in availableControls"
+      dark
+      color="red"
+      key="group"
+      @click="addControl(group)"
+      class="ma-1"
+    >Group</v-btn>
+    <v-divider class="my-4"></v-divider>
+    <v-btn
+      dark
+      color="indigo"
+      v-for="el in rest"
       :key="el.type"
       @click="addControl(el)"
       class="ma-1"
@@ -13,15 +23,20 @@
 import _ from 'lodash';
 import { defaultControlOptions, availableControls } from '@/utils/surveyConfig';
 
+const group = availableControls.find(c => c.type === 'group');
+const rest = availableControls.filter(c => c.type !== 'group');
+
 export default {
   data() {
     return {
-      availableControls,
+      rest,
+      group,
       sequence: 0,
     };
   },
   methods: {
     addControl(control) {
+      console.log(control);
       this.sequence += 1;
       const currentSequence = this.sequence;
 

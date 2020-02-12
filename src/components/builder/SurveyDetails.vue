@@ -1,7 +1,14 @@
 <template>
   <div>
-    <div class="text-left"><small>Version {{version}}</small></div>
-    <v-form>
+    <div class="text-left">
+      <v-chip
+        dark
+        small
+        color="red"
+        class="mr-0 mr-1"
+      >Version {{version}}</v-chip>
+    </div>
+    <div class="mt-4">
       <v-text-field
         outlined
         v-model="value.name"
@@ -17,22 +24,22 @@
       <div class="d-flex flex-wrap justify-end">
         <v-btn
           v-if="editMode"
-          @click.prevent="$emit('delete')"
+          @click="$emit('delete')"
           color="error"
           text
         >Delete</v-btn>
         <v-btn
-          @click.prevent="$emit('cancel')"
+          @click="$emit('cancel')"
           text
         >Cancel</v-btn>
         <v-btn
-          @click.prevent="$emit('submit')"
+          @click="$emit('submit')"
           color="primary"
         >
           <div>{{submitText}}</div>
         </v-btn>
       </div>
-    </v-form>
+    </div>
   </div>
 </template>
 
