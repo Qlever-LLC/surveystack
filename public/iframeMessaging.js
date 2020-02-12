@@ -1,8 +1,12 @@
+export const types = {
+
+};
+
 export function requestFetchSubmissions() {
   let origin;
 
   try {
-    origin = window.location.ancestorOrigins[0];
+    [origin] = window.location.ancestorOrigins;
   } catch (error) {
     // origin = 'https://app.our-sci.net';
   }
@@ -39,7 +43,7 @@ export function requestSetValue(value) {
   let origin;
 
   try {
-    origin = window.location.ancestorOrigins[0];
+    [origin] = window.location.ancestorOrigins;
   } catch (error) {
     // origin = 'https://app.our-sci.net';
   }
@@ -65,13 +69,13 @@ export function requestSetValue(value) {
 
 export function listen() {
   window.addEventListener('message', (event) => {
-    if (event.data && event.data.type && event.data.type === 'RESET_SCRIPT') {
+    // if (event.data && event.data.type && event.data.type === 'RESET_SCRIPT') {
 
-    }
+    // }
 
-    if (event.data && event.data.type && event.data.type === 'RUN_SCRIPT') {
+    // if (event.data && event.data.type && event.data.type === 'RUN_SCRIPT') {
 
-    }
+    // }
   });
 }
 
@@ -80,7 +84,7 @@ export function listen() {
 export function onMessage(type, callback) {
   window.addEventListener('message', (event) => {
     if (event.data && event.data.type && event.data.type === type) {
-      callback(event);
+      callback(event.data.payload);
     }
   });
 }
