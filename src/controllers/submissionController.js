@@ -16,7 +16,27 @@ const sanitize = entity => {
   entity.survey = new ObjectId(entity.survey);
   entity.meta.dateCreated = new Date(entity.meta.dateCreated);
   entity.meta.dateModified = new Date(entity.meta.dateModified);
+
+  // TODO: may want to save dateModified from nested data meta fields
+  // as new Date(..) as well, currently it is just a string
+
   return entity;
+};
+
+const sanitizeMatch = obj => {
+  Object.keys(obj).forEach(key => {
+    //console.log(`key: ${key}, value: ${obj[key]}`);
+    if (typeof obj[key] === 'object') {
+      // check for {"$date": "2020-01-30"}
+      // and transform it into new Date("2020-01-30")
+      if (obj[key]['$date']) {
+        const v = obj[key]['$date'];
+        obj[key] = new Date(v);
+        return;
+      }
+      sanitizeMatch(obj[key]);
+    }
+  });
 };
 
 const createRedactStage = (user, roles) => {
@@ -108,6 +128,7 @@ const getSubmissions = async (req, res) => {
     try {
       const m = JSON.parse(req.query.match);
       match = { ...match, ...m };
+      sanitizeMatch(match);
     } catch (error) {
       throw boom.badRequest('invalid match query');
     }
