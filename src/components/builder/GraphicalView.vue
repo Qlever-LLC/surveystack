@@ -11,7 +11,7 @@
       v-for="(el, idx) in controls"
       class="control-item"
       :class="{'control-item-selected': (el === selected)}"
-      :key="el.name"
+      :key="idx"
       @mousedown.stop.left="$emit('controlSelected', el)"
     >
       <div class="mb-2 d-flex justify-space-between align-center">

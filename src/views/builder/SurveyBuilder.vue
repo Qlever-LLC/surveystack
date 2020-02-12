@@ -379,7 +379,9 @@ export default {
         await api.customRequest({
           method, url, data: this.survey,
         });
-        this.$router.push('/surveys/browse');
+        // this.$router.push('/surveys/browse');
+        this.snackbarMessage = 'Saved Survey';
+        this.showSnackbar = true;
       } catch (error) {
         if (error.response.status === 409) {
           this.showConflictModal = true;
