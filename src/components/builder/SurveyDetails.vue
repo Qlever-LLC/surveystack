@@ -33,18 +33,23 @@
           text
         >Cancel</v-btn>
         <v-btn
+          :dark="publishDisabled"
+          :disabled="!publishDisabled"
           @click="$emit('submit')"
           color="primary"
         >
           <div>{{submitText}}</div>
         </v-btn>
       </div>
-      <div>
+      <div
+        style="width: 100%;"
+        class="d-flex justify-center"
+      >
         <v-btn
           v-if="editMode"
           :dark="!publishDisabled"
           large
-          class="ma-4 align-self"
+          class="ma-4"
           @click="$emit('submit')"
           color="green"
           :disabled="publishDisabled"

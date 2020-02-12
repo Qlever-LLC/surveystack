@@ -29,6 +29,7 @@
               @cancel="onCancel"
               @submit="onSubmit"
               @delete="onDelete"
+              :enablePublish="enablePublish"
             />
             <v-divider class="my-4"></v-divider>
 
@@ -239,6 +240,7 @@ export default {
       editMode: false,
       dirty: false,
       // ui
+      enablePublish: false,
       viewCode: false,
       showSnackbar: false,
       snackbarMessage: '',
