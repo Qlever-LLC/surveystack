@@ -63,6 +63,9 @@
             background-color="blue-grey darken-4"
             dark
           >
+            <v-tab v-if="control.type === 'script'">
+              Script
+            </v-tab>
             <v-tab :disabled="!control.options.relevance.enabled">
               Relevance
             </v-tab>
@@ -199,7 +202,7 @@ const initialRelevanceCode = variable => `
  * ADVANCED: use \`rawSubmission.\` to autocomplete the advanced version of a submission
  * use \`survey.\` to access the current survey and its information
  * use \`log(message)\` to log to console
- * 
+ *
  */
 function ${variable}() {
 
@@ -399,7 +402,10 @@ export default {
       if (!this.control) {
         return false;
       }
-      return this.control.options.relevance.enabled || this.control.options.calculate.enabled || this.control.options.constraint.enabled;
+      return this.control.options.relevance.enabled
+        || this.control.options.calculate.enabled
+        || this.control.options.constraint.enabled
+        || this.control.type === 'script';
     },
     currentVersion() {
       return this.survey.latestVersion;
@@ -418,13 +424,13 @@ export default {
  * This is the basic version of the submission.
  * start typing 'submission.' in order to see completion
  */
-  
+
 const submission = ${JSON.stringify(simplified, null, 4)}`;
       const rawSubmission = `
 /**
  * This is the raw version of the submission, it includes additional
  * meta information such as question type and modification timestamps.
- * 
+ *
  * use this if you need advanced information of the submission
  */
 const rawSubmission = ${JSON.stringify(this.instance, null, 4)}`;
