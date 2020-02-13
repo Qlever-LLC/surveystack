@@ -27,7 +27,7 @@ import GroupEdit from '@/views/groups/GroupEdit.vue';
 
 import SubmissionList from '@/views/submissions/List.vue';
 
-import SurveyBuilder from '@/views/builder/SurveyBuilder.vue';
+import Builder from '@/views/builder/Builder.vue';
 
 import ScriptList from '@/views/scripts/ScriptList.vue';
 import Script from '@/views/scripts/Script.vue';
@@ -75,18 +75,25 @@ const routes = [
   {
     path: '/surveys/new',
     name: 'surveys-new',
-    component: SurveyBuilder,
+    component: Builder,
+    props: {
+      isNew: true,
+    },
+  },
+  {
+    path: '/surveys/:id/edit',
+    name: 'surveys-edit',
+    component: Builder,
+    props: {
+      isNew: false,
+    },
   },
   {
     path: '/surveys/:id',
     name: 'surveys-detail',
     component: SurveysDetail,
   },
-  {
-    path: '/surveys/:id/edit',
-    name: 'surveys-edit',
-    component: SurveyBuilder,
-  },
+
   {
     path: '/submissions/drafts/:id',
     name: 'submissions-drafts-detail',

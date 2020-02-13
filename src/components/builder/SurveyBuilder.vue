@@ -27,8 +27,8 @@
               :editMode="editMode"
               :dirty="dirty"
               @cancel="onCancel"
-              @submit="onSubmit"
-              @delete="onDelete"
+              @submit="$emit('onSubmit');"
+              @delete="$emit('onDelete')"
               :enablePublish="enablePublish"
             />
             <v-divider class="my-4"></v-divider>
@@ -124,7 +124,7 @@
       </pane>
       <pane class="pane pane-draft">
         <draft
-          @submit="submit"
+          @submit="payload => $emit('submit', payload)"
           v-if="survey && instance"
           :submission="instance"
           :survey="survey"
@@ -136,25 +136,13 @@
     <app-dialog
       v-model="showDeleteModal"
       @cancel="showDeleteModal = false"
-      @confirm="onDelete"
+      @confirm="$emit('onDelete');"
     >
       <template v-slot:title>Confirm your action</template>
       <template>
         Delete survey
         <strong>{{survey._id}}</strong>
         for sure?
-      </template>
-    </app-dialog>
-
-    <app-dialog
-      v-model="showConflictModal"
-      @cancel="showConflictModal = false"
-      @confirm="generateId"
-    >
-      <template v-slot:title>Conflict 409</template>
-      <template>
-        A survey with id
-        <strong>{{survey._id}}</strong> already exists. Do you want to generate a different id?
       </template>
     </app-dialog>
 
@@ -174,12 +162,9 @@
 
 <script>
 import _ from 'lodash';
-import ObjectId from 'bson-objectid';
-
 import { Splitpanes, Pane } from 'splitpanes';
 
-import api from '@/services/api.service';
-
+import ObjectId from 'bson-objectid';
 import codeEditor from '@/components/ui/CodeEditor.vue';
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
@@ -193,10 +178,8 @@ import appMixin from '@/components/mixin/appComponent.mixin';
 import appDialog from '@/components/ui/Dialog.vue';
 
 import * as utils from '@/utils/surveys';
+
 import submissionUtils from '@/utils/submissions';
-
-
-const currentDate = new Date();
 
 
 const initialRelevanceCode = variable => `
@@ -236,18 +219,20 @@ export default {
     draft,
     consoleLog,
   },
+  props: [
+    'survey',
+    'editMode',
+  ],
   data() {
     return {
       // modes
       hideCode: false,
-      editMode: false,
       dirty: false,
       // ui
       enablePublish: false,
       viewCode: false,
       showSnackbar: false,
       snackbarMessage: '',
-      showConflictModal: false,
       showDeleteModal: false,
       // currently selected control
       control: null,
@@ -261,37 +246,13 @@ export default {
       optionsConstraint: null,
       activeCode: '',
       // survey entity
-      initialSurvey: null,
-      instance: null,
       codeRefreshCounter: 0,
       submissionCode: '',
-      survey: {
-        _id: '',
-        name: '',
-        dateCreated: currentDate,
-        dateModified: currentDate,
-        latestVersion: 1,
-        revisions: [
-          {
-            dateCreated: currentDate,
-            version: 1,
-            controls: [],
-          },
-        ],
-      },
+      instance: null,
+      initialSurvey: _.cloneDeep(this.survey),
     };
   },
   methods: {
-    async submit({ payload }) {
-      try {
-        await api.post('/submissions', payload);
-        // this.$router.push(`/surveys/${this.survey._id}`);
-        this.snackbarMessage = 'Submitted';
-        this.showSnackbar = true;
-      } catch (error) {
-        console.log(error);
-      }
-    },
     updateSelectedCode(code) {
       this.control.options[tabMap[this.selectedTab]].code = code;
     },
@@ -360,42 +321,6 @@ export default {
     onCancel() {
       this.$router.push('/surveys/browse');
     },
-    generateId() {
-      this.survey._id = new ObjectId();
-      this.showConflictModal = false;
-    },
-    async onDelete() {
-      if (!this.showDeleteModal) {
-        this.showDeleteModal = true;
-        return;
-      }
-      try {
-        await api.delete(`/surveys/${this.survey._id}`);
-        this.$router.push('/surveys');
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    async onSubmit() {
-      const method = this.editMode ? 'put' : 'post';
-      const url = this.editMode ? `/surveys/${this.survey._id}` : '/surveys';
-
-      try {
-        await api.customRequest({
-          method, url, data: this.survey,
-        });
-        // this.$router.push('/surveys/browse');
-        this.snackbarMessage = 'Saved Survey';
-        this.showSnackbar = true;
-      } catch (error) {
-        if (error.response.status === 409) {
-          this.showConflictModal = true;
-        } else {
-          this.snackbarMessage = error.response.data.message;
-          this.showSnackbar = true;
-        }
-      }
-    },
   },
   computed: {
     controlId() {
@@ -417,6 +342,7 @@ export default {
       return this.survey.latestVersion;
     },
     currentControls() {
+      console.log('currentcontrols -> survey revision', this.survey.revisions);
       return this.survey.revisions.find(revision => (revision.version === this.survey.latestVersion)).controls;
     },
     sharedCode() {
@@ -499,7 +425,7 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
     },
     survey: {
       handler(newVal, oldVal) {
-        console.log('survey changed');
+        console.log('survey changed', newVal);
 
         const current = newVal.revisions.find(revision => revision.version === newVal.latestVersion);
         if (current.controls.length === 0) {
@@ -530,30 +456,15 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
       deep: true,
     },
   },
-  async created() {
+  created() {
     this.setNavbarContent(
       {
         title: 'Survey Builder',
       },
     );
-    this.editMode = !this.$route.matched.some(
-      ({ name }) => name === 'surveys-new',
-    );
-
-    this.survey._id = ObjectId();
-    this.survey.dateCreated = new Date();
-
-    if (this.editMode) {
-      try {
-        const { id } = this.$route.params;
-        this.survey._id = id;
-        const { data } = await api.get(`/surveys/${this.survey._id}`);
-        this.survey = { ...this.survey, ...data };
-        this.initialSurvey = _.cloneDeep(this.survey);
-      } catch (e) {
-        console.log('something went wrong:', e);
-      }
-    }
+    this.instance = submissionUtils.createSubmissionFromSurvey(this.survey, this.survey.latestVersion, this.instance);
+    console.log('instance', this.instance);
+    console.log('survey', this.survey);
   },
 };
 </script>
@@ -614,7 +525,6 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
 
 .pane-draft {
   width: 100vw;
-  position: relative;
   align-self: center;
 }
 

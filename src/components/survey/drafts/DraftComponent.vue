@@ -1,9 +1,25 @@
 <template>
   <div id="relative-wrapper">
+
+    <div
+      class="full fill-height d-flex justify-center align-center"
+      style="position: absolute;"
+      v-if="controls.length === 0"
+    >
+      <div class="d-flex flex-column">
+        <v-icon large color="blue">mdi-file-multiple</v-icon>
+        <v-alert
+          type="info"
+          text
+          color="blue"
+          class="ma-4"
+        >No Questions yet</v-alert>
+      </div>
+    </div>
+
     <div
       id="draft-container"
       v-if="submission && survey"
-      style="border-right: 1px solid #AAA; border-left: 1px solid #AAA"
     >
       <draft-toolbar
         :showOverview="showOverview"
@@ -75,7 +91,7 @@
         ref="overview"
         :survey="survey"
         :submission="submission"
-        :position="this.positions[this.index]"
+        :position="positions[index]"
         @navigate="navigate"
       />
     </v-navigation-drawer>
@@ -84,8 +100,8 @@
       class="px-4"
       id="footer-container"
       :showPrev="!atStart"
-      :enableNext="mShowNext"
-      :showSubmit="atEnd"
+      :enableNext="mShowNext && controls.length > 0"
+      :showSubmit="atEnd && controls.length > 0"
       :showNav="mShowNav"
       @next="handleNext"
       @prev="handlePrevious"
@@ -402,6 +418,13 @@ export default {
   async created() {
     console.log('submission', this.submission);
     /** Should this be broken out into method? */
+    console.log('pos', this.position);
+    console.log('survey', this.survey);
+    if (!this.position) {
+      return;
+    }
+
+
     this.control = utils.getControl(this.controls, this.position);
     this.value = submissionUtils.getSubmissionField(this.submission, this.survey, this.position).value;
 
