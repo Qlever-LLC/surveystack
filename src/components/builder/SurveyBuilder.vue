@@ -121,7 +121,7 @@
       </pane>
       <pane class="pane pane-draft">
         <draft
-          @submit="$emit('submit', this.instance)"
+          @submit="payload => $emit('submit', payload)"
           v-if="survey && instance"
           :submission="instance"
           :survey="survey"
@@ -173,6 +173,7 @@
 import _ from 'lodash';
 import { Splitpanes, Pane } from 'splitpanes';
 
+import ObjectId from 'bson-objectid';
 import codeEditor from '@/components/ui/CodeEditor.vue';
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
@@ -186,10 +187,8 @@ import appMixin from '@/components/mixin/appComponent.mixin';
 import appDialog from '@/components/ui/Dialog.vue';
 
 import * as utils from '@/utils/surveys';
+
 import submissionUtils from '@/utils/submissions';
-
-
-const currentDate = new Date();
 
 
 const initialRelevanceCode = variable => `
@@ -229,6 +228,9 @@ export default {
     draft,
     consoleLog,
   },
+  props: [
+    'survey',
+  ],
   data() {
     return {
       // modes
@@ -254,24 +256,10 @@ export default {
       optionsConstraint: null,
       activeCode: '',
       // survey entity
-      initialSurvey: null,
-      instance: null,
       codeRefreshCounter: 0,
       submissionCode: '',
-      survey: {
-        _id: '',
-        name: '',
-        dateCreated: currentDate,
-        dateModified: currentDate,
-        latestVersion: 1,
-        revisions: [
-          {
-            dateCreated: currentDate,
-            version: 1,
-            controls: [],
-          },
-        ],
-      },
+      instance: null,
+      initialSurvey: _.cloneDeep(this.survey),
     };
   },
   methods: {
@@ -342,6 +330,10 @@ export default {
     },
     onCancel() {
       this.$router.push('/surveys/browse');
+    },
+    generateId() {
+      this.survey._id = new ObjectId();
+      this.showConflictModal = false;
     },
   },
   computed: {
@@ -443,7 +435,7 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
     },
     survey: {
       handler(newVal, oldVal) {
-        console.log('survey changed');
+        console.log('survey changed', newVal);
 
         const current = newVal.revisions.find(revision => revision.version === newVal.latestVersion);
         if (current.controls.length === 0) {
@@ -473,6 +465,16 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
       },
       deep: true,
     },
+  },
+  created() {
+    this.setNavbarContent(
+      {
+        title: 'Survey Builder',
+      },
+    );
+    this.instance = submissionUtils.createSubmissionFromSurvey(this.survey, this.survey.latestVersion, this.instance);
+    console.log('instance', this.instance);
+    console.log('survey', this.survey);
   },
   beforeRouteLeave(to, from, next) {
     console.log('to', to);

@@ -4,10 +4,8 @@
     <survey-builder
       v-if="!loading"
       :survey="survey"
-      :submission="submission"
-      @persist="persist"
-      @submit="submit"
-      @onSubmit="onSubmit"
+      @submit="submitSubmission"
+      @onSubmit="submitSurvey"
       @onDelete="onDelete"
     />
     <div v-else>LOADING...</div>
@@ -17,9 +15,13 @@
 <script>
 import ObjectId from 'bson-objectid';
 import _ from 'lodash';
+import moment from 'moment';
 import api from '@/services/api.service';
 
 import SurveyBuilder from '@/components/builder/SurveyBuilder.vue';
+
+
+const currentDate = moment().toISOString();
 
 
 export default {
@@ -28,7 +30,24 @@ export default {
   },
   data() {
     return {
+      loading: true,
       editMode: false,
+      instance: {},
+      survey: {
+        _id: '',
+        name: '',
+        dateCreated: currentDate,
+        dateModified: currentDate,
+        latestVersion: 1,
+        revisions: [
+          {
+            dateCreated: currentDate,
+            version: 1,
+            controls: [],
+          },
+        ],
+      },
+
     };
   },
   methods: {
@@ -44,8 +63,9 @@ export default {
         console.log(error);
       }
     },
-    async submit({ payload }) {
+    async submitSubmission({ payload }) {
       try {
+        console.log('submitting', payload);
         await api.post('/submissions', payload);
         // this.$router.push(`/surveys/${this.survey._id}`);
         this.snackbarMessage = 'Submitted';
@@ -54,7 +74,7 @@ export default {
         console.log(error);
       }
     },
-    async onSubmit() {
+    async submitSurvey() {
       const method = this.editMode ? 'put' : 'post';
       const url = this.editMode ? `/surveys/${this.survey._id}` : '/surveys';
 
@@ -74,19 +94,9 @@ export default {
         }
       }
     },
-    generateId() {
-      this.survey._id = new ObjectId();
-      this.showConflictModal = false;
-    },
   },
 
   async created() {
-    this.setNavbarContent(
-      {
-        title: 'Survey Builder',
-      },
-    );
-
     this.editMode = !this.$route.matched.some(
       ({ name }) => name === 'surveys-new',
     );
@@ -100,11 +110,12 @@ export default {
         this.survey._id = id;
         const { data } = await api.get(`/surveys/${this.survey._id}`);
         this.survey = { ...this.survey, ...data };
-        this.initialSurvey = _.cloneDeep(this.survey);
       } catch (e) {
         console.log('something went wrong:', e);
       }
     }
+
+    this.loading = false;
   },
 };
 </script>
