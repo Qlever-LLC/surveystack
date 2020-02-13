@@ -76,17 +76,24 @@ const routes = [
     path: '/surveys/new',
     name: 'surveys-new',
     component: Builder,
+    props: {
+      isNew: true,
+    },
+  },
+  {
+    path: '/surveys/:id/edit',
+    name: 'surveys-edit',
+    component: Builder,
+    props: {
+      isNew: false,
+    },
   },
   {
     path: '/surveys/:id',
     name: 'surveys-detail',
     component: SurveysDetail,
   },
-  {
-    path: '/surveys/:id/edit',
-    name: 'surveys-edit',
-    component: Builder,
-  },
+
   {
     path: '/submissions/drafts/:id',
     name: 'submissions-drafts-detail',

@@ -2,6 +2,7 @@
 <template>
   <div>
     <survey-builder
+      :key="sessionId"
       v-if="!loading"
       :survey="survey"
       @submit="submitSubmission"
@@ -22,32 +23,35 @@ import SurveyBuilder from '@/components/builder/SurveyBuilder.vue';
 
 
 const currentDate = moment().toISOString();
-
+const emptySurvey = {
+  _id: '',
+  name: '',
+  dateCreated: currentDate,
+  dateModified: currentDate,
+  latestVersion: 1,
+  revisions: [
+    {
+      dateCreated: currentDate,
+      version: 1,
+      controls: [],
+    },
+  ],
+};
 
 export default {
   components: {
     SurveyBuilder,
   },
+  props: [
+    'isNew',
+  ],
   data() {
     return {
+      sessionId: 0,
       loading: true,
       editMode: false,
       instance: {},
-      survey: {
-        _id: '',
-        name: '',
-        dateCreated: currentDate,
-        dateModified: currentDate,
-        latestVersion: 1,
-        revisions: [
-          {
-            dateCreated: currentDate,
-            version: 1,
-            controls: [],
-          },
-        ],
-      },
-
+      survey: emptySurvey,
     };
   },
   methods: {
@@ -94,28 +98,38 @@ export default {
         }
       }
     },
-  },
+    async refresh() {
+      this.sessionId++;
+      this.survey = _.clone(emptySurvey);
+      this.editMode = !this.$route.matched.some(
+        ({ name }) => name === 'surveys-new',
+      );
 
-  async created() {
-    this.editMode = !this.$route.matched.some(
-      ({ name }) => name === 'surveys-new',
-    );
+      this.survey._id = ObjectId();
+      this.survey.dateCreated = new Date();
 
-    this.survey._id = ObjectId();
-    this.survey.dateCreated = new Date();
-
-    if (this.editMode) {
-      try {
-        const { id } = this.$route.params;
-        this.survey._id = id;
-        const { data } = await api.get(`/surveys/${this.survey._id}`);
-        this.survey = { ...this.survey, ...data };
-      } catch (e) {
-        console.log('something went wrong:', e);
+      if (this.editMode) {
+        try {
+          const { id } = this.$route.params;
+          this.survey._id = id;
+          const { data } = await api.get(`/surveys/${this.survey._id}`);
+          this.survey = { ...this.survey, ...data };
+        } catch (e) {
+          console.log('something went wrong:', e);
+        }
       }
-    }
 
-    this.loading = false;
+      this.loading = false;
+    },
+  },
+  watch: {
+    async isNew() {
+      await this.refresh();
+    },
+  },
+  async created() {
+    console.log('new is', this.isNew);
+    await this.refresh();
   },
 };
 </script>

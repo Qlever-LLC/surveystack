@@ -476,11 +476,6 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
     console.log('instance', this.instance);
     console.log('survey', this.survey);
   },
-  beforeRouteLeave(to, from, next) {
-    console.log('to', to);
-    console.log('from', from);
-    next();
-  },
 };
 </script>
 
