@@ -5,11 +5,25 @@
       :key="sessionId"
       v-if="!loading"
       :survey="survey"
+      :editMode="!isNew"
       @submit="submitSubmission"
       @onSubmit="submitSurvey"
       @onDelete="onDelete"
     />
     <div v-else>LOADING...</div>
+
+    <app-dialog
+      v-model="showConflictModal"
+      @cancel="showConflictModal = false"
+      @confirm="generateId"
+    >
+      <template v-slot:title>Conflict 409</template>
+      <template>
+        A survey with id
+        <strong>{{survey._id}}</strong> already exists. Do you want to generate a different id?
+      </template>
+    </app-dialog>
+
   </div>
 </template>
 
@@ -19,6 +33,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import api from '@/services/api.service';
 
+import appDialog from '@/components/ui/Dialog.vue';
 import SurveyBuilder from '@/components/builder/SurveyBuilder.vue';
 
 
@@ -41,20 +56,25 @@ const emptySurvey = {
 export default {
   components: {
     SurveyBuilder,
+    appDialog,
   },
   props: [
     'isNew',
   ],
   data() {
     return {
-      sessionId: 0,
+      showConflictModal: false,
+      sessionId: new ObjectId().toString(),
       loading: true,
-      editMode: false,
       instance: {},
-      survey: emptySurvey,
+      survey: _.cloneDeep(emptySurvey),
     };
   },
   methods: {
+    generateId() {
+      this.survey._id = new ObjectId();
+      this.showConflictModal = false;
+    },
     async onDelete() {
       if (!this.showDeleteModal) {
         this.showDeleteModal = true;
@@ -79,14 +99,14 @@ export default {
       }
     },
     async submitSurvey() {
-      const method = this.editMode ? 'put' : 'post';
-      const url = this.editMode ? `/surveys/${this.survey._id}` : '/surveys';
+      const method = this.isNew ? 'post' : 'put';
+      const url = this.isNew ? '/surveys' : `/surveys/${this.survey._id}`;
 
       try {
         await api.customRequest({
           method, url, data: this.survey,
         });
-        // this.$router.push('/surveys/browse');
+        this.$router.push(`/surveys/${this.survey._id}/edit`);
         this.snackbarMessage = 'Saved Survey';
         this.showSnackbar = true;
       } catch (error) {
@@ -99,16 +119,11 @@ export default {
       }
     },
     async refresh() {
-      this.sessionId++;
-      this.survey = _.clone(emptySurvey);
-      this.editMode = !this.$route.matched.some(
-        ({ name }) => name === 'surveys-new',
-      );
-
-      this.survey._id = ObjectId();
-      this.survey.dateCreated = new Date();
-
-      if (this.editMode) {
+      this.survey = _.cloneDeep(emptySurvey);
+      if (this.isNew) {
+        this.survey._id = ObjectId();
+        this.survey.dateCreated = moment().toISOString();
+      } else {
         try {
           const { id } = this.$route.params;
           this.survey._id = id;
@@ -119,11 +134,13 @@ export default {
         }
       }
 
+      this.sessionId = new ObjectId().toString();
       this.loading = false;
     },
   },
   watch: {
     async isNew() {
+      console.log('isnew', this.isNew);
       await this.refresh();
     },
   },

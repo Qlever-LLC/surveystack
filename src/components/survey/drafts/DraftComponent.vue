@@ -7,10 +7,11 @@
       v-if="controls.length === 0"
     >
       <div class="d-flex flex-column">
-        <v-icon large>mdi-file-multiple</v-icon>
+        <v-icon large color="blue">mdi-file-multiple</v-icon>
         <v-alert
           type="info"
           text
+          color="blue"
           class="ma-4"
         >No Questions yet</v-alert>
       </div>

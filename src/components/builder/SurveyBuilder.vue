@@ -143,18 +143,6 @@
       </template>
     </app-dialog>
 
-    <app-dialog
-      v-model="showConflictModal"
-      @cancel="showConflictModal = false"
-      @confirm="generateId"
-    >
-      <template v-slot:title>Conflict 409</template>
-      <template>
-        A survey with id
-        <strong>{{survey._id}}</strong> already exists. Do you want to generate a different id?
-      </template>
-    </app-dialog>
-
     <v-snackbar
       v-model="showSnackbar"
       :timeout="0"
@@ -230,19 +218,18 @@ export default {
   },
   props: [
     'survey',
+    'editMode',
   ],
   data() {
     return {
       // modes
       hideCode: false,
-      editMode: false,
       dirty: false,
       // ui
       enablePublish: false,
       viewCode: false,
       showSnackbar: false,
       snackbarMessage: '',
-      showConflictModal: false,
       showDeleteModal: false,
       // currently selected control
       control: null,
@@ -331,10 +318,6 @@ export default {
     onCancel() {
       this.$router.push('/surveys/browse');
     },
-    generateId() {
-      this.survey._id = new ObjectId();
-      this.showConflictModal = false;
-    },
   },
   computed: {
     controlId() {
@@ -353,6 +336,7 @@ export default {
       return this.survey.latestVersion;
     },
     currentControls() {
+      console.log('currentcontrols -> survey revision', this.survey.revisions);
       return this.survey.revisions.find(revision => (revision.version === this.survey.latestVersion)).controls;
     },
     sharedCode() {
