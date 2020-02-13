@@ -81,6 +81,7 @@ const createUser = async (req, res) => {
     password: hash,
     permissions: [],
     authProviders: [],
+    groups: [],
   };
 
   try {

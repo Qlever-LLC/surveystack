@@ -237,3 +237,22 @@ db.groups.updateMany(
   ]
 );
 */
+
+// Left join on group id
+const user = {
+  _id: '5e452119c5117c000185f275',
+  email: 'xxx@gmail.com',
+  name: 'xxx',
+  token: '4a6076b6-6c16-4dfa-aa38-fd14f35f1ae6',
+  password: '$2b$12$L.CzwVxqRJq5NNxF3xDhnOKVW6jA3B8V3PblffF2jiKeOczK9p09C',
+  permissions: [],
+  authProviders: [],
+  groups: [
+    {
+      id: '5e42887c834f2500019b2fd1',
+      role: 'admin',
+    },
+  ],
+};
+
+//db.users.aggregate([ {$lookup: {from: "groups",localField: "groups.id",foreignField: "_id", as: "groups"}}]).pretty()
