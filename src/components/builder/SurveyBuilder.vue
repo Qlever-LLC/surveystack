@@ -519,7 +519,6 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
 
 .pane-draft {
   width: 100vw;
-  position: relative;
   align-self: center;
 }
 
