@@ -47,18 +47,30 @@
       clipped
     >
       <v-list>
-        <v-list-item
-          v-for="(link, idx) in links"
-          :key="idx"
-          :to="link.to"
-        >
-          <v-list-item-icon>
-            <v-icon>{{link.icon}}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>{{link.title}}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+        <template v-for="(item, i) in items">
+          <v-divider
+            v-if="item.divider"
+            :key="i"
+            dark
+            class="my-3"
+          />
+          <v-list-item
+            v-else
+            :key="i"
+            :to="item.to"
+          >
+            <v-list-item-icon
+              v-if="item.icon"
+              :class="item.class"
+            >
+              <v-icon>{{item.icon}}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>{{item.title}}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </template>
+
       </v-list>
     </v-navigation-drawer>
   </nav>
@@ -69,7 +81,7 @@ export default {
   data() {
     return {
       drawer: false,
-      links: [
+      items: [
         {
           title: 'My Submissions',
           to: { name: 'my-surveys' },
@@ -84,6 +96,11 @@ export default {
           title: 'Builder',
           to: { name: 'surveys-new' },
           icon: 'mdi-newspaper-plus',
+        },
+        {
+          title: 'Scripts',
+          to: { name: 'scripts-list' },
+          icon: 'mdi-language-javascript',
         },
         {
           title: 'Groups',
@@ -108,11 +125,41 @@ export default {
           icon: 'mdi-delete-variant',
         },
         {
+          divider: true,
+        },
+        {
           title: 'Experiment',
           to: {
             name: 'experiment',
           },
           icon: 'mdi-pill',
+        },
+        {
+          title: 'Andreas',
+          to: {
+            name: 'experiment-ar',
+          },
+          icon: 'mdi-alpha-a',
+          class: 'ml-3',
+        },
+        {
+          title: 'Manuel',
+          to: {
+            name: 'experiment-mdc',
+          },
+          icon: 'mdi-alpha-m',
+          class: 'ml-3',
+        },
+        {
+          title: 'Will',
+          to: {
+            name: 'experiment-wg',
+          },
+          icon: 'mdi-alpha-w',
+          class: 'ml-3',
+        },
+        {
+          divider: true,
         },
       ],
     };
