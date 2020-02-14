@@ -13,6 +13,24 @@
         v-model="control.label"
         label="Label"
       />
+      <v-autocomplete
+        v-model="scriptSourceId"
+        v-if="isScript"
+        :items="scriptSourceItems"
+        label="Script Source"
+        item-text="name"
+        item-value="_id"
+        @focus="handleScriptSourceFocus"
+        @change="$emit('set-control-source')"
+        solo
+        outlined
+        chips
+        persistent-hint
+      >
+        <template v-slot:selection="{ attr, on, item, selected }">
+          <div>{{ item.name }}</div>
+        </template>
+      </v-autocomplete>
 
       <v-checkbox
         class="ma-0"
@@ -105,6 +123,8 @@
 </template>
 <script>
 import { getAdvancedCodeTemplate } from '@/utils/surveys';
+import api from '@/services/api.service';
+
 
 export default {
   props: {
@@ -127,7 +147,15 @@ export default {
   data() {
     return {
       showAdvanced: false,
+      scriptSourceId: null,
+      scriptSourceIsLoading: false,
+      scriptSourceItems: [],
     };
+  },
+  computed: {
+    isScript() {
+      return this.control.type === 'script';
+    },
   },
   methods: {
     openAdvancedEditor() {
@@ -140,6 +168,27 @@ export default {
         },
       });
     },
+    async fetchScripts() {
+      // TODO: use Mongo project to limit results, only get script name and id,
+      // so we're not fetching all the script bodies in the database.
+      // Then fetch the body of the selected script once it's selected.
+      this.scriptSourceIsLoading = true;
+      const { data } = await api.get('/scripts');
+      this.scriptSourceItems = data;
+      this.scriptSourceIsLoading = false;
+    },
+    handleScriptSourceFocus() {
+      this.fetchScripts();
+    },
+    handleScriptSourceChange(id) {
+      console.log('autocomplete change', id);
+      // this.$emit('setControlSource', id);
+      this.$emit('set-control-source', id);
+      // this.$emit('something', id);
+    },
+  },
+  created() {
+    this.$parent.$emit('myclick');
   },
 };
 </script>
