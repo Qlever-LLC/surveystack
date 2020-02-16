@@ -47,6 +47,7 @@
               @code-calculate="highlight('calculate')"
               @code-relevance="highlight('relevance')"
               @code-constraint="highlight('constraint')"
+              @set-control-source="setControlSource"
             />
           </div>
         </v-card>
@@ -320,6 +321,10 @@ export default {
     },
     onCancel() {
       this.$router.push('/surveys/browse');
+    },
+    setControlSource(id) {
+      console.log('set control source', id);
+      this.control.source = id;
     },
   },
   computed: {

@@ -1,8 +1,3 @@
-// const MyEl = {
-//   props: ['msg'],
-
-// }
-
 <template>
   <div>
     <survey-builder
