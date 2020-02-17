@@ -24,12 +24,15 @@
             <v-card-title class="pl-0">Details</v-card-title>
             <survey-details
               v-model="survey"
-              :editMode="editMode"
+              :isNew="!editMode"
               :dirty="dirty"
+              :enableUpdate="!dirty && !surveyUnchanged"
+              :enableSaveDraft="true"
+              :enablePublish="enablePublish"
               @cancel="onCancel"
               @submit="$emit('onSubmit');"
               @delete="$emit('onDelete')"
-              :enablePublish="enablePublish"
+              @publish="$emit('onPublish')"
             />
             <v-divider class="my-4"></v-divider>
 
@@ -296,6 +299,9 @@ export default {
     },
   },
   computed: {
+    surveyUnchanged() {
+      return _.isEqual(this.initialSurvey, this.survey);
+    },
     enablePublish() {
       if (!this.editMode) {
         return true;
@@ -426,6 +432,7 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
         if (this.dirty || !this.editMode || !this.initialSurvey) {
           return;
         }
+        // FLAG IS_EQUAL
         if (!_.isEqualWith(newVal.revisions, this.initialSurvey.revisions, (value1, value2, key) => ((key === 'label') ? true : undefined))) {
           this.dirty = true;
           const { latestVersion } = this.initialSurvey;
