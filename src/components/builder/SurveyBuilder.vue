@@ -133,31 +133,6 @@
       </pane>
 
     </splitpanes>
-
-    <app-dialog
-      v-model="showDeleteModal"
-      @cancel="showDeleteModal = false"
-      @confirm="$emit('onDelete');"
-    >
-      <template v-slot:title>Confirm your action</template>
-      <template>
-        Delete survey
-        <strong>{{survey._id}}</strong>
-        for sure?
-      </template>
-    </app-dialog>
-
-    <v-snackbar
-      v-model="showSnackbar"
-      :timeout="0"
-    >
-      {{snackbarMessage | capitalize}}
-      <v-btn
-        color="pink"
-        text
-        @click="showSnackbar = false"
-      >Close</v-btn>
-    </v-snackbar>
   </div>
 </template>
 
@@ -175,8 +150,6 @@ import draft from '@/components/survey/drafts/DraftComponent.vue';
 import consoleLog from '@/components/builder/ConsoleLog.vue';
 
 import appMixin from '@/components/mixin/appComponent.mixin';
-
-import appDialog from '@/components/ui/Dialog.vue';
 
 import * as utils from '@/utils/surveys';
 
@@ -216,7 +189,6 @@ export default {
     controlProperties,
     controlAdder,
     surveyDetails,
-    appDialog,
     draft,
     consoleLog,
   },
@@ -230,11 +202,7 @@ export default {
       hideCode: false,
       dirty: false,
       // ui
-      enablePublish: false,
       viewCode: false,
-      showSnackbar: false,
-      snackbarMessage: '',
-      showDeleteModal: false,
       // currently selected control
       control: null,
       // code stuff
@@ -328,6 +296,13 @@ export default {
     },
   },
   computed: {
+    enablePublish() {
+      if (!this.editMode) {
+        return true;
+      }
+
+      return this.dirty;
+    },
     controlId() {
       const position = utils.getPosition(this.control, this.currentControls);
       const id = utils.getFlatName(this.currentControls, position);

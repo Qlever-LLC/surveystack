@@ -23,6 +23,31 @@
       </template>
     </app-dialog>
 
+    <app-dialog
+      v-model="showDeleteModal"
+      @cancel="showDeleteModal = false"
+      @confirm="$emit('onDelete');"
+    >
+      <template v-slot:title>Confirm your action</template>
+      <template>
+        Delete survey
+        <strong>{{survey._id}}</strong>
+        for sure?
+      </template>
+    </app-dialog>
+
+    <v-snackbar
+      v-model="showSnackbar"
+      :timeout="0"
+    >
+      {{snackbarMessage | capitalize}}
+      <v-btn
+        color="pink"
+        text
+        @click="showSnackbar = false"
+      >Close</v-btn>
+    </v-snackbar>
+
   </div>
 </template>
 
@@ -67,6 +92,9 @@ export default {
       loading: true,
       instance: {},
       survey: _.cloneDeep(emptySurvey),
+      showSnackbar: false,
+      snackbarMessage: '',
+      showDeleteModal: false,
     };
   },
   methods: {
@@ -94,6 +122,8 @@ export default {
         this.snackbarMessage = 'Submitted';
         this.showSnackbar = true;
       } catch (error) {
+        this.snackbarMessage = error.response.data.message;
+        this.showSnackbar = true;
         console.log(error);
       }
     },
@@ -105,7 +135,10 @@ export default {
         await api.customRequest({
           method, url, data: this.survey,
         });
-        this.$router.push(`/surveys/${this.survey._id}/edit`);
+        if (this.isNew) {
+          this.$router.push(`/surveys/${this.survey._id}/edit`);
+        }
+
         this.snackbarMessage = 'Saved Survey';
         this.showSnackbar = true;
       } catch (error) {

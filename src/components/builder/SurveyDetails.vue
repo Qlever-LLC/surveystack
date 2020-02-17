@@ -38,19 +38,18 @@
           @click="$emit('submit')"
           color="primary"
         >
-          <div>{{submitText}}</div>
+          <div>Save Draft</div>
         </v-btn>
       </div>
       <div
         style="width: 100%;"
-        class="d-flex justify-center"
+        class="d-flex flex-wrap justify-end"
       >
         <v-btn
-          v-if="editMode"
           :dark="!publishDisabled"
           large
-          class="ma-4"
-          @click="$emit('submit')"
+          class="mt-4"
+          @click="$emit('publish')"
           color="green"
           :disabled="publishDisabled"
         >
@@ -67,13 +66,6 @@ export default {
   computed: {
     publishDisabled() {
       return !this.enablePublish;
-    },
-    submitText() {
-      if (!this.editMode) {
-        return 'Create';
-      }
-
-      return this.dirty ? 'Save Draft' : 'Update Current';
     },
     version() {
       if (this.dirty) {
