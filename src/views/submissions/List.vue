@@ -87,14 +87,16 @@
       ></v-data-table>
     </v-card>
     -->
+
     <v-container>
+      <div class="text-right text--secondary"><small>total {{submissions.pagination.total}} records</small></div>
       <v-card class="pa-3">
         <ul
-          v-if="submissions.length > 0"
+          v-if="submissions.content.length > 0"
           class="list-group"
         >
           <li
-            v-for="submission in submissions"
+            v-for="submission in submissions.content"
             :key="submission._id"
             class="list-group-item pa-2"
           >
@@ -143,7 +145,14 @@ export default {
       skip: 0,
       limit: 0,
       roles: 'public',
-      submissions: [],
+      submissions: {
+        content: [],
+        pagination: {
+          total: 0,
+          skip: 0,
+          limit: 100000,
+        },
+      },
       search: '',
     };
   },
