@@ -8,6 +8,7 @@ import boom from '@hapi/boom';
 import { db } from '../db';
 
 const col = 'submissions';
+const DEFAULT_LIMIT = 100000;
 
 const sanitize = entity => {
   if (entity._id) {
@@ -99,7 +100,7 @@ const getSubmissions = async (req, res) => {
   let project = {};
   let sort = {};
   let skip = 0;
-  let limit = 0;
+  let limit = DEFAULT_LIMIT;
   let user = 'ed1d1xx1';
   let roles = [];
 
@@ -198,36 +199,49 @@ const getSubmissions = async (req, res) => {
     }
   }
 
-  // skip stage
+  // skip
   if (req.query.skip) {
     try {
-      skip = Number.parseInt(req.query.skip);
-      if (skip > 0) {
-        pipeline.push({ $skip: skip });
+      const querySkip = Number.parseInt(req.query.skip);
+      if (querySkip > 0) {
+        skip = querySkip;
       }
     } catch (error) {
       throw boom.badRequest(`Bad query paramter skip: ${skip}`);
     }
   }
 
-  // limit stage
+  // limit
   if (req.query.limit) {
     try {
-      limit = Number.parseInt(req.query.limit);
-      if (limit > 0) {
-        pipeline.push({ $limit: limit });
+      const queryLimit = Number.parseInt(req.query.limit);
+      if (queryLimit > 0) {
+        limit = queryLimit;
       }
     } catch (error) {
       throw boom.badRequest(`Bad query paramter limit: ${limit}`);
     }
   }
 
+  // pagination stage
+  const paginationStages = [
+    {
+      $facet: {
+        content: [{ $skip: skip }, { $limit: limit }],
+        pagination: [{ $count: 'total' }, { $addFields: { skip, limit } }],
+      },
+    },
+    { $unwind: '$pagination' },
+  ];
+
+  pipeline.push(...paginationStages);
+
   entities = await db
     .collection(col)
     .aggregate(pipeline)
     .toArray();
 
-  return res.send(entities);
+  return res.send(entities[0]);
 };
 
 const getSubmission = async (req, res) => {

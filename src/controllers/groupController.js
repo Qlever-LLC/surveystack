@@ -36,30 +36,30 @@ const getGroupByPath = async (req, res) => {
   console.log(splits);
 
   let path = null;
-  let name = null;
+  let slug = null;
 
   if (splits.length === 0) {
     throw boom.badRequest('Invalid path');
   }
 
   if (splits.length === 1) {
-    name = splits[0];
+    slug = splits[0];
     path = null;
   }
 
   if (splits.length > 1) {
-    name = splits.pop();
+    slug = splits.pop();
     path = GROUP_PATH_DELIMITER + splits.join(GROUP_PATH_DELIMITER) + GROUP_PATH_DELIMITER;
   }
 
   console.log('path', path);
-  console.log('name', name);
+  console.log('slug', slug);
 
-  entity = await db.collection(col).findOne({ path, name });
+  entity = await db.collection(col).findOne({ path, slug });
 
   if (!entity) {
     return res.status(404).send({
-      message: `No entity found: path=${path}, name=${name}`,
+      message: `No entity found: path=${path}, slug=${slug}`,
     });
   }
 
@@ -110,23 +110,23 @@ const updateGroup = async (req, res) => {
     );
 
     // also find and modify descendants
-    let oldSubgroupPath = `${existing.path}${existing.name}${GROUP_PATH_DELIMITER}`;
+    let oldSubgroupPath = `${existing.path}${existing.slug}${GROUP_PATH_DELIMITER}`;
     if (existing.path === null) {
-      oldSubgroupPath = `${GROUP_PATH_DELIMITER}${existing.name}${GROUP_PATH_DELIMITER}`;
+      oldSubgroupPath = `${GROUP_PATH_DELIMITER}${existing.slug}${GROUP_PATH_DELIMITER}`;
     }
 
-    let newSubgroupPath = `${entity.path}${entity.name}${GROUP_PATH_DELIMITER}`;
+    let newSubgroupPath = `${entity.path}${entity.slug}${GROUP_PATH_DELIMITER}`;
     if (entity.path === null) {
-      newSubgroupPath = `${GROUP_PATH_DELIMITER}${entity.name}${GROUP_PATH_DELIMITER}`;
+      newSubgroupPath = `${GROUP_PATH_DELIMITER}${entity.slug}${GROUP_PATH_DELIMITER}`;
     }
 
     await db
       .collection(col)
       .find({ path: { $regex: `^${oldSubgroupPath}` } })
       .forEach(descendant => {
-        console.log(`${descendant.path}${descendant.name}`);
+        console.log(`${descendant.path}${descendant.slug}`);
       });
-    console.log(`old_name: '${existing.name}' => new_name: '${entity.name}'`);
+    console.log(`old_name: '${existing.slug}' => new_name: '${entity.slug}'`);
     console.log(`old_path: '${oldSubgroupPath}' => new_path: '${newSubgroupPath}'`);
     console.log(`This change will affect descendants under '${oldSubgroupPath}'`);
 
