@@ -19,6 +19,7 @@
 import BaseQuestionComponent from './BaseQuestionComponent';
 import buildScriptQuestionIframeContents, { exampleScript, onMessage } from '@/utils/userScript';
 // import { onMessage } from '../../../../public/iframeMessaging';
+import api from '@/services/api.service';
 
 export default {
   mixins: [BaseQuestionComponent],
@@ -41,7 +42,9 @@ export default {
     },
   },
   data() {
-    return {};
+    return {
+      source: null,
+    };
   },
   methods: {
     requestRunScript() {
@@ -53,27 +56,38 @@ export default {
     // handleRequestSetStatus() {
     //   this.emit
     // },
+    initializeIframe() {
+      const { iframe } = this.$refs;
+      const submissionJSON = JSON.stringify(this.submission);
+      const valueJSON = JSON.stringify(this.value);
+
+
+      // iframe.src = 'http://localhost:8082/script.html';
+      const html = buildScriptQuestionIframeContents({ script: this.source.content, submissionJSON, valueJSON });
+      // iframe.src = `data:text/html;charset=utf-8,${encodeURI(html)}`;
+      iframe.contentWindow.document.open();
+      iframe.contentWindow.document.write(html);
+      iframe.contentWindow.document.close();
+
+      onMessage('REQUEST_SET_QUESTION_VALUE', ({ value }) => this.changed(value));
+      onMessage('SCRIPT_HAS_LOADED', () => {
+        if (this.value) {
+          this.requestRenderScript();
+        }
+      });
+      onMessage('REQUEST_SET_QUESTION_STATUS', ({ type, message }) => this.$emit('setStatus', { type, message }));
+    },
+    async fetchScriptSource() {
+      const sourceId = this.control && this.control.source;
+      const { data } = await api.get(`/scripts/${sourceId}`);
+      this.source = data;
+    },
   },
-  mounted() {
-    const { iframe } = this.$refs;
-    const submissionJSON = JSON.stringify(this.submission);
-    const valueJSON = JSON.stringify(this.value);
-
-
-    // iframe.src = 'http://localhost:8082/script.html';
-    const html = buildScriptQuestionIframeContents({ script: exampleScript, submissionJSON, valueJSON });
-    // iframe.src = `data:text/html;charset=utf-8,${encodeURI(html)}`;
-    iframe.contentWindow.document.open();
-    iframe.contentWindow.document.write(html);
-    iframe.contentWindow.document.close();
-
-    onMessage('REQUEST_SET_QUESTION_VALUE', ({ value }) => this.changed(value));
-    onMessage('SCRIPT_HAS_LOADED', () => {
-      if (this.value) {
-        this.requestRenderScript();
-      }
-    });
-    onMessage('REQUEST_SET_QUESTION_STATUS', ({ type, message }) => this.$emit('setStatus', { type, message }));
+  // async created() {
+  // },
+  async mounted() {
+    await this.fetchScriptSource();
+    this.initializeIframe();
   },
 };
 

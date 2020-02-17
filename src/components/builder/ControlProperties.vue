@@ -21,7 +21,7 @@
         item-text="name"
         item-value="_id"
         @focus="handleScriptSourceFocus"
-        @change="$emit('set-control-source')"
+        @change="(id) => $emit('set-control-source', id)"
         solo
         outlined
         chips
@@ -143,6 +143,9 @@ export default {
     survey: {
       required: true,
     },
+    source: {
+      type: String,
+    },
   },
   data() {
     return {
@@ -188,7 +191,10 @@ export default {
     },
   },
   created() {
-    this.$parent.$emit('myclick');
+    if (this.isScript) {
+      this.fetchScripts();
+    }
+    this.scriptSourceId = this.control.source;
   },
 };
 </script>

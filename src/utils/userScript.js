@@ -130,9 +130,7 @@ export default function buildScriptQuestionIframeContents({ script, submissionJS
         let state = getInitialState();
         let result;
 
-        ${script.process}
-
-        ${script.render}
+        ${script}
 
 
         function handleLoaded() {
