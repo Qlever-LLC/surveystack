@@ -7,6 +7,10 @@ import { db } from '../db';
 
 const col = 'scripts';
 
+const sanitize = entity => {
+  entity._id = new ObjectId(entity._id);
+};
+
 const getScripts = async (req, res) => {
   const entities = await db
     .collection(col)
@@ -47,6 +51,8 @@ const createScript = async (req, res) => {
 const updateScript = async (req, res) => {
   const { id } = req.params;
   const entity = req.body;
+
+  sanitize(entity);
 
   try {
     let updated = await db.collection(col).findOneAndUpdate(
