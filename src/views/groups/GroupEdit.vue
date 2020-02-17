@@ -2,14 +2,30 @@
   <v-container>
     <h1>{{editMode ? "Edit group" : "Create group"}}</h1>
 
-    <form @submit.prevent="onSubmit">
+    <form
+      @submit.prevent="onSubmit"
+      autocomplete="off"
+    >
       <v-text-field
         label="Name"
         placeholder="Enter group name"
         id="group-name"
+        autocomplete="off"
         v-model="entity.name"
       />
-      <small>path={{entity.path | showNull}}</small>
+      <v-text-field
+        label="Slug"
+        placeholder="Enter group slug or use suggested"
+        id="group-slug"
+        v-model="entity.slug"
+        :readonly="!editSlug"
+        :append-icon="editSlug ? 'mdi-pencil-off-outline' : 'mdi-pencil-outline'"
+        autocomplete="off"
+        @click:append="editSlug = !editSlug"
+        hint="URL friendly version of name"
+        persistent-hint
+      />
+
       <div class="d-flex justify-end">
         <v-btn
           text
@@ -20,7 +36,9 @@
           type="submit"
         >{{editMode ? "Save" : "Create"}}</v-btn>
       </div>
+
     </form>
+    <small>path={{entity.path | showNull}}</small>
   </v-container>
 </template>
 
@@ -28,12 +46,16 @@
 import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 
+import { handleize } from '@/utils/groups';
+
 export default {
   data() {
     return {
+      editSlug: false,
       entity: {
         _id: '',
         name: '',
+        slug: '',
         path: null,
       },
     };
@@ -42,6 +64,11 @@ export default {
     async onSubmit() {
       if (this.entity.name.trim() === '') {
         console.log('name must not be empty');
+        return;
+      }
+
+      if (this.entity.slug.trim() === '') {
+        console.log('slug must not be empty');
         return;
       }
 
@@ -57,7 +84,7 @@ export default {
         });
         this.$router.push(
           `/groups/${this.entity.path ? this.entity.path : ''}${
-            this.entity.name
+            this.entity.slug
           }`,
         );
       } catch (err) {
@@ -71,6 +98,20 @@ export default {
       }
 
       this.$router.replace(`/groups${this.entity.path}`);
+    },
+  },
+  watch: {
+    'entity.name': {
+      handler(newVal, oldVal) {
+        const handle = handleize(newVal);
+        this.entity.slug = handle;
+      },
+    },
+    'entity.slug': {
+      handler(newVal, oldVal) {
+        const handle = handleize(newVal);
+        this.entity.slug = handle;
+      },
     },
   },
   async created() {
