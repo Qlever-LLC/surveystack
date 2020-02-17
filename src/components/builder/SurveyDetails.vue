@@ -23,7 +23,7 @@
 
       <div class="d-flex flex-wrap justify-end">
         <v-btn
-          v-if="editMode"
+          v-if="!isNew"
           @click="$emit('delete')"
           color="error"
           text
@@ -32,30 +32,79 @@
           @click="$emit('cancel')"
           text
         >Cancel</v-btn>
+
         <v-btn
-          :dark="publishDisabled"
-          :disabled="!publishDisabled"
+          v-if="!isNew"
+          :dark="enableUpdate"
+          :disabled="!enableUpdate"
           @click="$emit('submit')"
           color="primary"
+          class="my-1 mr-1"
         >
-          <div>{{submitText}}</div>
+          <div>Update</div>
         </v-btn>
+
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              v-on="on"
+              color="blue"
+            >mdi-information-outline</v-icon>
+          </template>
+
+          <span>Update / Override an existing and <b>published</b> Survey.
+            <br>
+            Updating is only possible when <i>only</i> changing Labels of a Question.</span>
+
+        </v-tooltip>
+
+        <v-btn
+          v-if="enableSaveDraft"
+          :dark="enableSaveDraft"
+          :disabled="!enableSaveDraft"
+          @click="$emit('submit')"
+          color="primary"
+          class="my-1 mr-1"
+        >
+          <div>Save Draft</div>
+        </v-btn>
+
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              v-on="on"
+              color="blue"
+            >mdi-information-outline</v-icon>
+          </template>
+
+          <span>Creates a new <b>Version</b> of the Survey</span>
+        </v-tooltip>
       </div>
       <div
         style="width: 100%;"
-        class="d-flex justify-center"
+        class="d-flex flex-wrap justify-end"
       >
         <v-btn
-          v-if="editMode"
-          :dark="!publishDisabled"
+          :dark="enablePublish"
           large
-          class="ma-4"
-          @click="$emit('submit')"
+          class="my-1 mr-1"
+          @click="$emit('publish')"
           color="green"
-          :disabled="publishDisabled"
+          :disabled="!enablePublish"
         >
           Publish
         </v-btn>
+
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              v-on="on"
+              color="blue"
+            >mdi-information-outline</v-icon>
+          </template>
+
+          <span>Roll out current state of Survey to users.</span>
+        </v-tooltip>
       </div>
     </div>
   </div>
@@ -63,18 +112,15 @@
 
 <script>
 export default {
-  props: ['value', 'editMode', 'dirty', 'enablePublish'],
+  props: [
+    'value',
+    'isNew',
+    'dirty',
+    'enableUpdate',
+    'enableSaveDraft',
+    'enablePublish',
+  ],
   computed: {
-    publishDisabled() {
-      return !this.enablePublish;
-    },
-    submitText() {
-      if (!this.editMode) {
-        return 'Create';
-      }
-
-      return this.dirty ? 'Save Draft' : 'Update Current';
-    },
     version() {
       if (this.dirty) {
         return `${this.value.latestVersion} *`;

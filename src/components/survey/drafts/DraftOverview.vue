@@ -107,8 +107,8 @@ import * as utils from '@/utils/surveys';
 
 const states = {
   done: ['mdi-check-bold', 'green'],
-  missing: ['mdi-clipboard-arrow-right', 'orange'],
-  error: ['mdi-exclamation-thick', 'red'],
+  missing: ['mdi-alert-decagram', 'orange'],
+  error: ['mdi-alert-decagram', 'red'],
   warning: ['mdi-clipboard-alert-outline', 'red'],
   ok: ['', ''],
 };

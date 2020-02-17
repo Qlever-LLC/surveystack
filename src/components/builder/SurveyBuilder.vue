@@ -24,12 +24,15 @@
             <v-card-title class="pl-0">Details</v-card-title>
             <survey-details
               v-model="survey"
-              :editMode="editMode"
+              :isNew="!editMode"
               :dirty="dirty"
+              :enableUpdate="!dirty && !surveyUnchanged"
+              :enableSaveDraft="true"
+              :enablePublish="enablePublish"
               @cancel="onCancel"
               @submit="$emit('onSubmit');"
               @delete="$emit('onDelete')"
-              :enablePublish="enablePublish"
+              @publish="$emit('onPublish')"
             />
             <v-divider class="my-4"></v-divider>
 
@@ -133,31 +136,6 @@
       </pane>
 
     </splitpanes>
-
-    <app-dialog
-      v-model="showDeleteModal"
-      @cancel="showDeleteModal = false"
-      @confirm="$emit('onDelete');"
-    >
-      <template v-slot:title>Confirm your action</template>
-      <template>
-        Delete survey
-        <strong>{{survey._id}}</strong>
-        for sure?
-      </template>
-    </app-dialog>
-
-    <v-snackbar
-      v-model="showSnackbar"
-      :timeout="0"
-    >
-      {{snackbarMessage | capitalize}}
-      <v-btn
-        color="pink"
-        text
-        @click="showSnackbar = false"
-      >Close</v-btn>
-    </v-snackbar>
   </div>
 </template>
 
@@ -175,8 +153,6 @@ import draft from '@/components/survey/drafts/DraftComponent.vue';
 import consoleLog from '@/components/builder/ConsoleLog.vue';
 
 import appMixin from '@/components/mixin/appComponent.mixin';
-
-import appDialog from '@/components/ui/Dialog.vue';
 
 import * as utils from '@/utils/surveys';
 
@@ -216,7 +192,6 @@ export default {
     controlProperties,
     controlAdder,
     surveyDetails,
-    appDialog,
     draft,
     consoleLog,
   },
@@ -230,11 +205,7 @@ export default {
       hideCode: false,
       dirty: false,
       // ui
-      enablePublish: false,
       viewCode: false,
-      showSnackbar: false,
-      snackbarMessage: '',
-      showDeleteModal: false,
       // currently selected control
       control: null,
       // code stuff
@@ -328,6 +299,16 @@ export default {
     },
   },
   computed: {
+    surveyUnchanged() {
+      return _.isEqual(this.initialSurvey, this.survey);
+    },
+    enablePublish() {
+      if (!this.editMode) {
+        return true;
+      }
+
+      return this.dirty;
+    },
     controlId() {
       const position = utils.getPosition(this.control, this.currentControls);
       const id = utils.getFlatName(this.currentControls, position);
@@ -432,6 +413,16 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
       handler(newVal, oldVal) {
         console.log('survey changed', newVal);
 
+        const amountQuestions = utils.getSurveyPositions(this.survey, newVal.latestVersion);
+        console.log('amount: ', amountQuestions);
+
+
+        const version = this.dirty ? `${newVal.latestVersion} *` : newVal.latestVersion;
+        this.setNavbarContent({
+          title: newVal.name,
+          subtitle: `<span><span id="question-title-chip">Version ${version}</span></span> <span id="question-title-chip">${amountQuestions.length} Questions</span>`,
+        });
+
         const current = newVal.revisions.find(revision => revision.version === newVal.latestVersion);
         if (current.controls.length === 0) {
           return;
@@ -441,6 +432,7 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
         if (this.dirty || !this.editMode || !this.initialSurvey) {
           return;
         }
+        // FLAG IS_EQUAL
         if (!_.isEqualWith(newVal.revisions, this.initialSurvey.revisions, (value1, value2, key) => ((key === 'label') ? true : undefined))) {
           this.dirty = true;
           const { latestVersion } = this.initialSurvey;
