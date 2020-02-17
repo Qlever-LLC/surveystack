@@ -407,6 +407,16 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
       handler(newVal, oldVal) {
         console.log('survey changed', newVal);
 
+        const amountQuestions = utils.getSurveyPositions(this.survey, newVal.latestVersion);
+        console.log('amount: ', amountQuestions);
+
+
+        const version = this.dirty ? `${newVal.latestVersion} *` : newVal.latestVersion;
+        this.setNavbarContent({
+          title: newVal.name,
+          subtitle: `<span><span id="question-title-chip">Version ${version}</span></span> <span id="question-title-chip">${amountQuestions.length} Questions</span>`,
+        });
+
         const current = newVal.revisions.find(revision => revision.version === newVal.latestVersion);
         if (current.controls.length === 0) {
           return;
