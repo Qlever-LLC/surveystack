@@ -24,6 +24,8 @@ const tabulaRasa = async (req, res) => {
   console.log('inside tabula rasa');
   await db.collection('surveys').deleteMany({});
   await db.collection('submissions').deleteMany({});
+  await db.collection('scripts').deleteMany({});
+  await db.collection('groups').deleteMany({});
 
   const survey = _.cloneDeep(exampleSurvey);
   await db.collection('surveys').insertOne(survey);
