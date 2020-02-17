@@ -1,10 +1,12 @@
 import { Router } from 'express';
-import { uploadToS3 } from '../services/bucket.service';
+import _ from 'lodash';
+import { flatten } from 'flat';
+import { ObjectId } from 'mongodb';
 
 import { db } from '../db';
-import { flatten } from 'flat';
+import { uploadToS3 } from '../services/bucket.service';
 
-import { ObjectId } from 'mongodb';
+import papa from 'papaparse';
 
 const router = Router();
 
@@ -33,12 +35,18 @@ router.get('/submissions', async (req, res) => {
     .find(filter)
     .toArray();
 
-  const csv = [];
+  const items = [];
   submissions.forEach(submission => {
     submission._id = submission._id.toString();
     submission.survey = submission.survey.toString();
-    csv.push(flatten(submission));
+    items.push(flatten(submission));
   });
+
+  // With implicit header row
+  // (keys of first object populate header row)
+  // TODO: add all headers from all submissions
+  // https://www.papaparse.com/docs
+  const csv = papa.unparse(items);
 
   return res.send(csv);
 });
