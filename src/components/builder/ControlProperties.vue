@@ -184,17 +184,14 @@ export default {
       this.fetchScripts();
     },
     handleScriptSourceChange(id) {
-      console.log('autocomplete change', id);
-      // this.$emit('setControlSource', id);
       this.$emit('set-control-source', id);
-      // this.$emit('something', id);
     },
   },
   created() {
     if (this.isScript) {
       this.fetchScripts();
     }
-    this.scriptSourceId = this.control.source;
+    this.scriptSourceId = this.control.options.source;
   },
 };
 </script>

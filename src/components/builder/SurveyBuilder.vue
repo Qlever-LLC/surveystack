@@ -72,9 +72,6 @@
                 background-color="blue-grey darken-4"
                 dark
               >
-                <v-tab v-if="control.type === 'script'">
-                  Script
-                </v-tab>
                 <v-tab :disabled="!control.options.relevance.enabled">
                   Relevance
                 </v-tab>
@@ -83,6 +80,9 @@
                 </v-tab>
                 <v-tab :disabled="!control.options.constraint.enabled">
                   Constraint
+                </v-tab>
+                <v-tab v-if="control.type === 'script'">
+                  Script
                 </v-tab>
               </v-tabs>
 
@@ -153,6 +153,8 @@ import draft from '@/components/survey/drafts/DraftComponent.vue';
 import consoleLog from '@/components/builder/ConsoleLog.vue';
 
 import appMixin from '@/components/mixin/appComponent.mixin';
+import api from '@/services/api.service';
+
 
 import * as utils from '@/utils/surveys';
 
@@ -178,6 +180,7 @@ const tabMap = [
   'relevance',
   'calculate',
   'constraint',
+  'script',
 ];
 
 export default {
@@ -223,6 +226,7 @@ export default {
       instance: null,
       initialSurvey: _.cloneDeep(this.survey),
       surveyUnchanged: true,
+      controlSource: null,
     };
   },
   methods: {
@@ -254,7 +258,11 @@ export default {
         this.control.options[tab].code = initialRelevanceCode(tab);
       }
 
-      this.activeCode = this.control.options[tabMap[this.selectedTab]].code;
+      if (this.control.type === 'script' && this.control.options.source) {
+        this.activeCode = this.controlSource;
+      } else {
+        this.activeCode = this.control.options[tabMap[this.selectedTab]].code;
+      }
     },
     async runCode() {
       try {
@@ -276,9 +284,13 @@ export default {
     onChange(value) {
       console.log(value);
     },
-    controlSelected(control) {
+    async controlSelected(control) {
       console.log('selected control', control);
       this.control = control;
+      if (control.type === 'script' && control.options.source) {
+        const { data } = await api.get(`/scripts/${control.options.source}`);
+        this.controlSource = data;
+      }
     },
     controlAdded(control) {
       if (!this.control) {
@@ -295,8 +307,7 @@ export default {
       this.$router.push('/surveys/browse');
     },
     setControlSource(id) {
-      console.log('set control source', id);
-      this.control.source = id;
+      this.control.options.source = id;
     },
   },
   computed: {

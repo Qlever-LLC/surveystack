@@ -2,20 +2,26 @@
   <v-container>
     <h1>{{ editMode ? "Edit script" : "Create script" }}</h1>
     <span class="text--secondary">{{this.entity._id}}</span>
-    <v-form class="mt-3">
+    <v-form class="mt-3" @keydown.enter.prevent="submit">
       <v-text-field
         v-model="entity.name"
         label="Name"
         outlined
       />
-      <v-textarea
+      <code-editor
+        title=""
+        class="code-editor"
+        :code="this.entity && this.entity.content"
+        @keydown.enter.prevent="submit"
+      />
+      <!-- <v-textarea
         v-model="entity.content"
         label="Content"
         id="script-edit-content"
         outlined
         placeholder="This does not do anything for now..."
         :rows="15"
-      />
+      /> -->
       <div class="d-flex mt-2 justify-end">
 
         <v-btn
@@ -34,6 +40,7 @@
 <script>
 import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
+import CodeEditor from '@/components/ui/CodeEditor.vue';
 
 export default {
   data() {
@@ -45,6 +52,9 @@ export default {
         content: '',
       },
     };
+  },
+  components: {
+    CodeEditor,
   },
   methods: {
     cancel() {
@@ -99,3 +109,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.code-editor {
+  height: 77vh;
+}
+</style>
