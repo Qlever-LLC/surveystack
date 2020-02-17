@@ -19,7 +19,6 @@
 
     <h1>
       {{entity.name}}
-
     </h1>
 
     <div class="mt-2">
@@ -63,6 +62,7 @@ export default {
       entity: {
         _id: '',
         name: '',
+        slug: '',
         path: null,
       },
       subgroups: [],
@@ -82,9 +82,9 @@ export default {
     },
     async getSubgroups() {
       try {
-        let childrenPath = `${this.entity.path}${this.entity.name}${GROUP_PATH_DELIMITER}`;
+        let childrenPath = `${this.entity.path}${this.entity.slug}${GROUP_PATH_DELIMITER}`;
         if (this.entity.path === null) {
-          childrenPath = `${GROUP_PATH_DELIMITER}${this.entity.name}${GROUP_PATH_DELIMITER}`;
+          childrenPath = `${GROUP_PATH_DELIMITER}${this.entity.slug}${GROUP_PATH_DELIMITER}`;
         }
 
         const { data } = await api.get(`/groups?path=${childrenPath}`);
@@ -98,9 +98,9 @@ export default {
   computed: {
     subgroupPath() {
       if (!this.entity.path) {
-        return `${GROUP_PATH_DELIMITER}${this.entity.name}${GROUP_PATH_DELIMITER}`;
+        return `${GROUP_PATH_DELIMITER}${this.entity.slug}${GROUP_PATH_DELIMITER}`;
       }
-      return `${this.entity.path}${this.entity.name}${GROUP_PATH_DELIMITER}`;
+      return `${this.entity.path}${this.entity.slug}${GROUP_PATH_DELIMITER}`;
     },
   },
   async beforeRouteUpdate(to, from, next) {

@@ -1,17 +1,19 @@
-// Should go in iframeMessaging lib file
-export function requestSetValue(value) {
-  // let origin;
 
-  // try {
+// import {
+//   requestFetchSubmissions,
+//   requestSetValue,
+//   onMessage,
+// } from '../../public/iframeMessaging';
+
+
+// Should go in iframeMessaging lib file
+function requestSetValue(value) {
   const [origin] = window.location.ancestorOrigins;
-  // } catch (error) {
-  //   // origin = 'https://app.our-sci.net';
-  // }
 
   window.parent.postMessage({
     type: 'REQUEST_SET_QUESTION_VALUE',
     payload: {
-      value,
+      value: JSON.stringify(value),
     },
   }, origin);
 
@@ -27,6 +29,22 @@ export function requestSetValue(value) {
   });
 }
 
+// should only be in iframeMessaging
+function requestSetStatus({
+  type,
+  message = '',
+}) {
+  const [origin] = window.location.ancestorOrigins;
+  window.parent.postMessage({
+    type: 'REQUEST_SET_QUESTION_STATUS',
+    payload: {
+      type,
+      message,
+    },
+  }, origin);
+}
+
+
 // Should go in iframeMessaging lib file
 // TODO: validated origin, pass in as arg
 export function onMessage(type, callback) {
@@ -39,18 +57,37 @@ export function onMessage(type, callback) {
 }
 
 
+function h(tag, attributes, ...children) {
+  const el = document.createElement(tag);
+  Object.entries(attributes).forEach(([k, v]) => {
+    if (k === 'class') {
+      el.className = v;
+    } else {
+      el.setAttribute(k, v);
+    }
+  });
+  children.forEach((child) => {
+    el.append(child);
+  });
+  return el;
+}
+
+
 // An example of a user's script
 export const exampleScript = {
-  run({ submission }) {
+  process({ submission }) {
     const madlib = `${submission.data.text_1.value} likes ${submission.data.text_2.value}`;
-    requestSetValue(madlib);
+    requestSetValue({ madlib });
+    requestSetStatus({ type: 'SUCCESS', message: `it worked! ${Date.now()}` });
     return {
       madlib,
     };
   },
-  render(state) {
-    const node = document.querySelector('#root');
-    node.innerText = state.madlib;
+  render(result) {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = result.madlib;
+    return wrapper;
+    // return h('ul', {}, h('li', {}, result.madlib));
   },
 };
 
@@ -61,9 +98,11 @@ export default function buildScriptQuestionIframeContents({ script, submissionJS
       <script type="module">
         import {
           requestFetchSubmissions,
+          requestSetStatus,
           requestSetValue,
           onMessage,
         } from 'http://localhost:8081/iframeMessaging.js';
+
 
         function getInitialState() {
           return {
@@ -73,19 +112,54 @@ export default function buildScriptQuestionIframeContents({ script, submissionJS
           }
         };
 
+        function h(tag, attributes, ...children) {
+          const el = document.createElement(tag);
+          Object.entries(attributes).forEach(([k, v]) => {
+            if (k === 'class') {
+              el.className = v;
+            } else {
+              el.setAttribute(k, v);
+            }
+          });
+          children.forEach((child) => {
+            el.append(child);
+          });
+          return el;
+        }
+
         let state = getInitialState();
+        let result;
 
-        ${script.run}
-
-        ${script.render}
+        ${script}
 
 
         function handleLoaded() {
-          render(run(state));
+          // render(run(state));
+          window.parent.postMessage({
+            type: 'SCRIPT_HAS_LOADED',
+            payload: {},
+          }, window.location.ancestorOrigins[0]);
         }
 
-        onMessage('RUN_SCRIPT', () => render(run(state)));
-        // onMessage('RESET_SCRIPT', () => {})
+        function resetDOM() {
+
+        }
+
+
+        onMessage('REQUEST_RUN_SCRIPT', () => {
+          const root = document.querySelector('#root');
+          result = process(state);
+          root.innerHTML = render(result).innerHTML;
+        });
+
+        onMessage('REQUEST_RENDER_SCRIPT', (payload) => {
+          const root = document.querySelector('#root');
+          root.innerHTML = render(payload.value).innerHTML;
+        });
+
+        onMessage('REQUEST_RESET_SCRIPT', () => {
+
+        })
         // onMessage('UPDATE_SCRIPT_SUBMISSION', () => {});
 
         document.addEventListener('DOMContentLoaded', handleLoaded);

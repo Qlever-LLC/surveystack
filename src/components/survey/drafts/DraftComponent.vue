@@ -61,8 +61,10 @@
                   :value="value"
                   :index="index"
                   :submission="submission"
+                  :meta="submissionField.meta"
                   @eval="eval"
                   @changed="setValue"
+                  @setStatus="setStatus"
                   @show-nav="showNav(true)"
                   @hide-nav="showNav(false)"
                   @next="handleNext"
@@ -230,6 +232,18 @@ export default {
       console.log('setting value', this.sumissionField, v);
       this.submissionField.value = v;
       this.submissionField.meta.dateModified = modified;
+      this.$emit('change', this.submission);
+      this.persist();
+    },
+    setStatus({ type, message }) {
+      const field = submissionUtils.getSubmissionField(this.submission, this.survey, this.position);
+      // Need to reassign field.meta here to trigger rerender for Script Question type when status changes
+      // since Vue only performs shallow comparison.
+      field.meta = {
+        ...field.meta,
+        status: type,
+        statusMessage: message,
+      };
       this.$emit('change', this.submission);
       this.persist();
     },

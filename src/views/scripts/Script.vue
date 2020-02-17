@@ -3,13 +3,29 @@
     <span class="text--secondary">{{entity._id}}</span>
     <h1>{{entity.name}}</h1>
     <p>This is a good script</p>
+    <code-editor
+      title=""
+      class="code-editor"
+      readonly="true"
+      :code="this.entity.content"
+      fold="true"
+    />
+    <router-link :to="{ name: 'scripts-edit', params: { id: entity._id }}">
+      <v-btn color="primary">
+        Edit
+      </v-btn>
+    </router-link>
   </v-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
+import CodeEditor from '@/components/ui/CodeEditor.vue';
 
 export default {
+  components: {
+    CodeEditor,
+  },
   data() {
     return {
       entity: null,
@@ -22,3 +38,11 @@ export default {
   },
 };
 </script>
+
+
+<style scoped>
+.code-editor {
+  height: 72vh;
+  margin-bottom: 15px;
+}
+</style>
