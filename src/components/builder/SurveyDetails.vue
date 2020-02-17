@@ -39,6 +39,7 @@
           :disabled="!enableUpdate"
           @click="$emit('submit')"
           color="primary"
+          class="my-1 mr-1"
         >
           <div>Update</div>
         </v-btn>
@@ -63,6 +64,7 @@
           :disabled="!enableSaveDraft"
           @click="$emit('submit')"
           color="primary"
+          class="my-1 mr-1"
         >
           <div>Save Draft</div>
         </v-btn>
@@ -85,13 +87,24 @@
         <v-btn
           :dark="enablePublish"
           large
-          class="mt-4"
+          class="my-1 mr-1"
           @click="$emit('publish')"
           color="green"
           :disabled="!enablePublish"
         >
           Publish
         </v-btn>
+
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              v-on="on"
+              color="blue"
+            >mdi-information-outline</v-icon>
+          </template>
+
+          <span>Roll out current state of Survey to users.</span>
+        </v-tooltip>
       </div>
     </div>
   </div>
