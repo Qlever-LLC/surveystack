@@ -26,11 +26,11 @@
               v-model="survey"
               :isNew="!editMode"
               :dirty="dirty"
-              :enableUpdate="!dirty && !surveyUnchanged"
-              :enableSaveDraft="true"
+              :enableUpdate="!dirty"
+              :enableSaveDraft="!surveyUnchanged"
               :enablePublish="enablePublish"
               @cancel="onCancel"
-              @submit="$emit('onSubmit');"
+              @saveDraft="$emit('onSaveDraft');"
               @delete="$emit('onDelete')"
               @publish="$emit('onPublish')"
             />
@@ -222,6 +222,7 @@ export default {
       submissionCode: '',
       instance: null,
       initialSurvey: _.cloneDeep(this.survey),
+      surveyUnchanged: true,
     };
   },
   methods: {
@@ -299,9 +300,6 @@ export default {
     },
   },
   computed: {
-    surveyUnchanged() {
-      return _.isEqual(this.initialSurvey, this.survey);
-    },
     enablePublish() {
       if (!this.editMode) {
         return true;
@@ -423,6 +421,14 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
           subtitle: `<span><span id="question-title-chip">Version ${version}</span></span> <span id="question-title-chip">${amountQuestions.length} Questions</span>`,
         });
 
+        if (!this.initialSurvey || !this.survey) {
+          this.surveyUnchanged = true;
+        }
+
+        console.log('surveys equal:', this.initialSurvey.revisions, newVal.revisions);
+        const res = _.isEqual(this.initialSurvey.revisions, newVal.revisions);
+        this.surveyUnchanged = res;
+
         const current = newVal.revisions.find(revision => revision.version === newVal.latestVersion);
         if (current.controls.length === 0) {
           return;
@@ -443,7 +449,7 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
           nextVersionObj.version = nextVersion;
           nextVersionObj.dateCreated = date;
 
-          this.$set(this.survey, 'revisions', this.initialSurvey.revisions);
+          this.$set(this.survey, 'revisions', _.cloneDeep(this.initialSurvey.revisions));
 
           this.survey.revisions.push(nextVersionObj);
           this.survey.latestVersion = nextVersion;

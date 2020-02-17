@@ -6,7 +6,7 @@
       :survey="survey"
       :editMode="!isNew"
       @submit="submitSubmission"
-      @onSubmit="submitSurvey"
+      @onSaveDraft="submitSurvey(true)"
       @onDelete="onDelete"
     />
     <div v-else>LOADING...</div>
@@ -127,9 +127,10 @@ export default {
         console.log(error);
       }
     },
-    async submitSurvey() {
+    async submitSurvey(isDraft) {
       const method = this.isNew ? 'post' : 'put';
       const url = this.isNew ? '/surveys' : `/surveys/${this.survey._id}`;
+      console.log('submitting survey', this.survey);
 
       try {
         await api.customRequest({
