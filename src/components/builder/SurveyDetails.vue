@@ -44,7 +44,10 @@
           <div>Update</div>
         </v-btn>
 
-        <v-tooltip bottom>
+        <v-tooltip
+          bottom
+          v-if="!isNew"
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               v-on="on"
@@ -59,10 +62,9 @@
         </v-tooltip>
 
         <v-btn
-          v-if="enableSaveDraft"
           :dark="enableSaveDraft"
           :disabled="!enableSaveDraft"
-          @click="$emit('submit')"
+          @click="$emit('saveDraft')"
           color="primary"
           class="my-1 mr-1"
         >
