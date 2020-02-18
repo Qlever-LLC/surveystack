@@ -17,7 +17,8 @@ export function requestFetchSubmissions() {
       // ids,
       // sharecodeIds,
     },
-  }, origin);
+  }, '*');
+  // }, origin);
 
   return new Promise((resolve, reject) => {
     window.addEventListener('message', (event) => {
@@ -47,7 +48,8 @@ export function requestSetStatus({ type, message = '' }) {
       type,
       message,
     },
-  }, origin);
+  }, '*');
+  // }, origin);
 }
 
 export function requestSetValue(value) {
@@ -64,7 +66,8 @@ export function requestSetValue(value) {
     payload: {
       value,
     },
-  }, origin);
+  }, '*');
+  // }, origin);
 
   // return new Promise((resolve, reject) => {
   //   window.addEventListener('message', (event) => {
@@ -76,6 +79,17 @@ export function requestSetValue(value) {
   //     }
   //   });
   // });
+}
+
+export function requestLogMessage(...messages) {
+  const [origin] = window.location.ancestorOrigins;
+  window.parent.postMessage({
+    type: 'REQUEST_LOG_MESSAGE',
+    payload: {
+      messages,
+    },
+  // }, origin);
+  }, '*');
 }
 
 export function listen() {

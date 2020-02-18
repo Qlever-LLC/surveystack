@@ -11,6 +11,11 @@ module.exports = {
   transpileDependencies: [
     'vuetify',
   ],
+  devServer: {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
+  },
   pwa: {
     name: 'Our-Sci',
     themeColor: '#f44336',

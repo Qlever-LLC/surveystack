@@ -1,6 +1,11 @@
 <template>
   <div class="question question-script">
-    <iframe src="" frameborder="0" ref="iframe"></iframe>
+    <iframe
+      src=""
+      frameborder="0"
+      ref="iframe"
+      sandbox="allow-scripts"
+    />
     <v-btn
       @click="requestRunScript"
       class="full"
@@ -48,10 +53,10 @@ export default {
   },
   methods: {
     requestRunScript() {
-      this.$refs.iframe.contentWindow.postMessage({ type: 'REQUEST_RUN_SCRIPT', payload: { value: this.value } });
+      this.$refs.iframe.contentWindow.postMessage({ type: 'REQUEST_RUN_SCRIPT', payload: { value: this.value } }, '*');
     },
     requestRenderScript() {
-      this.$refs.iframe.contentWindow.postMessage({ type: 'REQUEST_RENDER_SCRIPT', payload: { value: this.value } });
+      this.$refs.iframe.contentWindow.postMessage({ type: 'REQUEST_RENDER_SCRIPT', payload: { value: this.value } }, '*');
     },
     // handleRequestSetStatus() {
     //   this.emit
@@ -64,10 +69,10 @@ export default {
 
       // iframe.src = 'http://localhost:8082/script.html';
       const html = buildScriptQuestionIframeContents({ script: this.source.content, submissionJSON, valueJSON });
-      // iframe.src = `data:text/html;charset=utf-8,${encodeURI(html)}`;
-      iframe.contentWindow.document.open();
-      iframe.contentWindow.document.write(html);
-      iframe.contentWindow.document.close();
+      iframe.src = `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
+      // iframe.contentWindow.document.open();
+      // iframe.contentWindow.document.write(html);
+      // iframe.contentWindow.document.close();
 
       onMessage('REQUEST_SET_QUESTION_VALUE', ({ value }) => this.changed(value));
       onMessage('SCRIPT_HAS_LOADED', () => {
@@ -76,9 +81,10 @@ export default {
         }
       });
       onMessage('REQUEST_SET_QUESTION_STATUS', ({ type, message }) => this.$emit('setStatus', { type, message }));
+      onMessage('REQUEST_LOG_MESSAGE', ({ messages }) => console.log(...messages));
     },
     async fetchScriptSource() {
-      const sourceId = this.control && this.control.source;
+      const sourceId = this.control && this.control.options && this.control.options.source;
       const { data } = await api.get(`/scripts/${sourceId}`);
       this.source = data;
     },

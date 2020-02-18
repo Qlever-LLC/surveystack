@@ -8,7 +8,6 @@
       class="code-editor"
       readonly="true"
       :code="this.entity.content"
-      fold="true"
     />
     <router-link :to="{ name: 'scripts-edit', params: { id: entity._id }}">
       <v-btn color="primary">

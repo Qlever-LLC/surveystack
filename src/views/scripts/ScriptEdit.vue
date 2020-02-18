@@ -13,6 +13,7 @@
         class="code-editor"
         :code="this.entity && this.entity.content"
         @keydown.enter.prevent="submit"
+        @change="updateCode"
       />
       <!-- <v-textarea
         v-model="entity.content"
@@ -59,6 +60,9 @@ export default {
   methods: {
     cancel() {
       this.$router.replace({ name: 'scripts-list' });
+    },
+    updateCode(code) {
+      this.entity.content = code;
     },
     async submit() {
       const data = this.entity;

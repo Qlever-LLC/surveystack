@@ -100,6 +100,7 @@ export default function buildScriptQuestionIframeContents({ script, submissionJS
           requestFetchSubmissions,
           requestSetStatus,
           requestSetValue,
+          requestLogMessage,
           onMessage,
         } from 'http://localhost:8081/iframeMessaging.js';
 
@@ -138,7 +139,8 @@ export default function buildScriptQuestionIframeContents({ script, submissionJS
           window.parent.postMessage({
             type: 'SCRIPT_HAS_LOADED',
             payload: {},
-          }, window.location.ancestorOrigins[0]);
+          // }, window.location.ancestorOrigins[0]);
+          }, '*');
         }
 
         function resetDOM() {
