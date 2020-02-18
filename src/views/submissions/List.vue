@@ -215,7 +215,7 @@ export default {
     },
     apiRequest() {
       const { survey } = this.$route.query;
-      return `/submissions?survey=${survey}&match=${this.match}&sort=${this.sort}&project=${this.project}&skip=${this.skip}&limit=${this.limit}&roles=${this.roles}`;
+      return `/submissions/page?survey=${survey}&match=${this.match}&sort=${this.sort}&project=${this.project}&skip=${this.skip}&limit=${this.limit}&roles=${this.roles}`;
     },
     apiUrl() {
       return `${process.env.VUE_APP_API_URL}${this.apiRequest}`;
