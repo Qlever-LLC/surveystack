@@ -76,9 +76,14 @@ export default {
   },
   async created() {
     const r = await axios.get('http://localhost:3000/debug/submissions?survey=5e3038dbea0cf40001aef63b');
-    console.log('r.data', r.data);
     this.parsed = papa.parse(r.data, { header: true });
-    console.log(this.parsed);
   },
 };
 </script>
+
+<style scoped>
+/* https://vue-loader.vuejs.org/guide/scoped-css.html#child-component-root-elements */
+.v-data-table >>> td {
+  font-family: monospace;
+}
+</style>
