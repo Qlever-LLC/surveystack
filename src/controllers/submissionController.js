@@ -91,7 +91,7 @@ const createRedactStage = (user, roles) => {
   };
 };
 
-const getSubmissions = async (req, res) => {
+const buildPipeline = async (req, res) => {
   let entities;
 
   const pipeline = [];
@@ -198,6 +198,15 @@ const getSubmissions = async (req, res) => {
       });
     }
   }
+  return pipeline;
+};
+
+const getSubmissionsPage = async (req, res) => {
+  let entities;
+  let skip = 0;
+  let limit = DEFAULT_LIMIT;
+
+  const pipeline = await buildPipeline(req, res);
 
   // skip
   if (req.query.skip) {
@@ -234,6 +243,7 @@ const getSubmissions = async (req, res) => {
     { $unwind: '$pagination' },
   ];
 
+  console.log(pipeline);
   pipeline.push(...paginationStages);
 
   entities = await db
@@ -242,6 +252,47 @@ const getSubmissions = async (req, res) => {
     .toArray();
 
   return res.send(entities[0]);
+};
+
+const getSubmissions = async (req, res) => {
+  let entities;
+  let skip = 0;
+  let limit = DEFAULT_LIMIT;
+
+  const pipeline = await buildPipeline(req, res);
+
+  // skip
+  if (req.query.skip) {
+    try {
+      const querySkip = Number.parseInt(req.query.skip);
+      if (querySkip > 0) {
+        skip = querySkip;
+        pipeline.push({ $skip: skip });
+      }
+    } catch (error) {
+      throw boom.badRequest(`Bad query paramter skip: ${skip}`);
+    }
+  }
+
+  // limit
+  if (req.query.limit) {
+    try {
+      const queryLimit = Number.parseInt(req.query.limit);
+      if (queryLimit > 0) {
+        limit = queryLimit;
+        pipeline.push({ $limit: limit });
+      }
+    } catch (error) {
+      throw boom.badRequest(`Bad query paramter limit: ${limit}`);
+    }
+  }
+
+  entities = await db
+    .collection(col)
+    .aggregate(pipeline)
+    .toArray();
+
+  return res.send(entities);
 };
 
 const getSubmission = async (req, res) => {
@@ -313,6 +364,7 @@ const deleteSubmission = async (req, res) => {
 
 export default {
   getSubmissions,
+  getSubmissionsPage,
   getSubmission,
   createSubmission,
   updateSubmission,
