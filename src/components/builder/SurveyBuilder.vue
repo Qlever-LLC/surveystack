@@ -26,8 +26,8 @@
               v-model="survey"
               :isNew="!editMode"
               :dirty="dirty"
-              :enableUpdate="!dirty"
-              :enableSaveDraft="!surveyUnchanged"
+              :enableUpdate="enableUpdate"
+              :enableSaveDraft="enableSaveDraft"
               :enablePublish="enablePublish"
               @cancel="onCancel"
               @saveDraft="$emit('onSaveDraft');"
@@ -300,9 +300,37 @@ export default {
     },
   },
   computed: {
+    isDraft() {
+      if (!this.survey.revisions || this.survey.revisions.length < 2) {
+        return false;
+      }
+
+      const len = this.survey.revisions.length;
+      return this.survey.revisions[len - 1].version !== this.survey.latestVersion;
+    },
+    enableUpdate() {
+      if (this.initialSurvey.name !== this.survey.name) {
+        return true;
+      }
+      if (this.surveyUnchanged) {
+        return false;
+      }
+      return !this.dirty;
+    },
+    enableSaveDraft() {
+      if (!this.editMode) { // if survey new
+        if (this.initialSurvey.name !== this.survey.name) {
+          return true;
+        }
+      }
+
+      return !this.surveyUnchanged;
+    },
     enablePublish() {
       if (!this.editMode) {
-        return true;
+        if (this.initialSurvey.name !== this.survey.name) {
+          return true;
+        }
       }
 
       return this.dirty;
