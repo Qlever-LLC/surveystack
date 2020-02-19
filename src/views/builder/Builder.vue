@@ -7,6 +7,7 @@
       :editMode="!isNew"
       @submit="submitSubmission"
       @onSaveDraft="submitSurvey(true)"
+      @onPublish="submitSurvey(false)"
       @onDelete="onDelete"
     />
     <div v-else>LOADING...</div>
@@ -128,6 +129,10 @@ export default {
       }
     },
     async submitSurvey(isDraft) {
+      if (!isDraft && this.survey.revisions.length > 0) {
+        this.survey.latestVersion = this.survey.revisions[this.survey.revisions.length - 1].version;
+      }
+
       const method = this.isNew ? 'post' : 'put';
       const url = this.isNew ? '/surveys' : `/surveys/${this.survey._id}`;
       console.log('submitting survey', this.survey);
