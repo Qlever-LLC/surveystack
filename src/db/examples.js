@@ -247,12 +247,10 @@ const user = {
   password: '$2b$12$L.CzwVxqRJq5NNxF3xDhnOKVW6jA3B8V3PblffF2jiKeOczK9p09C',
   permissions: [],
   authProviders: [],
-  groups: [
-    {
-      id: '5e42887c834f2500019b2fd1',
-      role: 'admin',
-    },
-  ],
+  groups: {
+    member: ['5e4a656fa1f0db0001bb4a9b'],
+    admin: ['5e4a6a6052fc340001d15453'],
+  },
 };
 
-//db.users.aggregate([ {$lookup: {from: "groups",localField: "groups.id",foreignField: "_id", as: "groups"}}]).pretty()
+//db.users.aggregate([{$lookup: {from: "groups", localField: "groups.admin", foreignField: "_id", as: "groups.admin"}}]).pretty()
