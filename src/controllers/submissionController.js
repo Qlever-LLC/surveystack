@@ -92,8 +92,6 @@ const createRedactStage = (user, roles) => {
 };
 
 const buildPipeline = async (req, res) => {
-  let entities;
-
   const pipeline = [];
 
   let match = {};
