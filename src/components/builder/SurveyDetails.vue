@@ -134,11 +134,12 @@ export default {
     'enableUpdate',
     'enableSaveDraft',
     'enablePublish',
+    'enableDismissDraft',
   ],
   computed: {
     version() {
       if (this.dirty) {
-        return `${this.value.latestVersion} *`;
+        return `${this.value.latestVersion + 1} (draft)`;
       }
       return this.value.latestVersion;
     },
