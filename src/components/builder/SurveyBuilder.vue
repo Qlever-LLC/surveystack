@@ -227,6 +227,25 @@ export default {
     };
   },
   methods: {
+    initNavbarAndDirtyFlag(survey) {
+      const v = survey.revisions[survey.revisions.length - 1].version;
+      const amountQuestions = utils.getSurveyPositions(this.survey, v);
+      console.log('amount: ', amountQuestions);
+
+      if (!survey.revisions || survey.revisions.length < 2) {
+        this.dirty = false;
+      } else {
+        const len = survey.revisions.length;
+        this.dirty = survey.revisions[len - 1].version !== survey.latestVersion;
+      }
+
+
+      const version = this.dirty ? `${survey.latestVersion + 1} (draft)` : survey.latestVersion;
+      this.setNavbarContent({
+        title: survey.name,
+        subtitle: `<span><span id="question-title-chip">Version ${version}</span></span> <span id="question-title-chip">${amountQuestions.length} Questions</span>`,
+      });
+    },
     updateSelectedCode(code) {
       this.control.options[tabMap[this.selectedTab]].code = code;
     },
@@ -442,17 +461,6 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
       handler(newVal, oldVal) {
         console.log('survey changed', newVal);
 
-        const v = this.survey.revisions[this.survey.revisions.length - 1].version;
-        const amountQuestions = utils.getSurveyPositions(this.survey, v);
-        console.log('amount: ', amountQuestions);
-
-        if (!newVal.revisions || newVal.revisions.length < 2) {
-          this.dirty = false;
-        } else {
-          const len = newVal.revisions.length;
-          this.dirty = newVal.revisions[len - 1].version !== newVal.latestVersion;
-        }
-
         if (!this.dirty && !_.isEqualWith(newVal.revisions, this.initialSurvey.revisions, (value1, value2, key) => ((key === 'label') ? true : undefined))) {
           this.dirty = true;
           const { latestVersion } = this.initialSurvey;
@@ -469,13 +477,7 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
           this.survey.dateModified = date;
         }
 
-
-        const version = this.dirty ? `${newVal.latestVersion + 1} (draft)` : newVal.latestVersion;
-        this.setNavbarContent({
-          title: newVal.name,
-          subtitle: `<span><span id="question-title-chip">Version ${version}</span></span> <span id="question-title-chip">${amountQuestions.length} Questions</span>`,
-        });
-
+        this.initNavbarAndDirtyFlag(newVal);
         if (!this.initialSurvey || !this.survey) {
           this.surveyUnchanged = true;
         }
@@ -483,30 +485,20 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
         const res = _.isEqual(this.initialSurvey.revisions, newVal.revisions);
         this.surveyUnchanged = res;
 
-        const current = newVal.revisions.find(revision => revision.version === newVal.latestVersion);
+        const current = newVal.revisions[newVal.revision.length - 1];
         if (current.controls.length === 0) {
           return;
         }
 
-        this.instance = submissionUtils.createSubmissionFromSurvey(newVal, newVal.latestVersion, this.instance);
+        this.instance = submissionUtils.createSubmissionFromSurvey(newVal, newVal.revisions[newVal.revision.length - 1].latestVersion, this.instance);
       },
       deep: true,
     },
   },
   created() {
-    if (!this.survey.revisions || this.survey.revisions.length < 2) {
-      this.dirty = false;
-    } else {
-      const len = this.survey.revisions.length;
-      this.dirty = this.survey.revisions[len - 1].version !== this.survey.latestVersion;
-    }
+    this.initNavbarAndDirtyFlag(this.survey);
 
-    this.setNavbarContent(
-      {
-        title: 'Survey Builder',
-      },
-    );
-    this.instance = submissionUtils.createSubmissionFromSurvey(this.survey, this.survey.latestVersion, this.instance);
+    this.instance = submissionUtils.createSubmissionFromSurvey(this.survey, this.survey.revisions[this.survey.revisions.length - 1].version, this.instance);
     console.log('instance', this.instance);
     console.log('survey', this.survey);
   },
