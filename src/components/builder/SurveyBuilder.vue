@@ -32,6 +32,7 @@
               :enableSaveDraft="enableSaveDraft"
               :enableDismissDraft="enableDismissDraft"
               :enablePublish="enablePublish"
+              @update="publish"
               @cancel="onCancel"
               @saveDraft="saveDraft"
               @delete="$emit('onDelete')"

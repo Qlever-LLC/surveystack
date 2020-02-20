@@ -39,7 +39,7 @@
           v-if="!isNew"
           :dark="enableUpdate"
           :disabled="!enableUpdate"
-          @click="$emit('submit')"
+          @click="$emit('update')"
           color="primary"
           class="my-1 mr-1"
         >
