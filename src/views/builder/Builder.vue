@@ -99,6 +99,10 @@ export default {
     };
   },
   methods: {
+    snack(message) {
+      this.snackbarMessage = message;
+      this.showSnackbar = true;
+    },
     generateId() {
       this.survey._id = new ObjectId();
       this.showConflictModal = false;
@@ -120,16 +124,16 @@ export default {
         console.log('submitting', payload);
         await api.post('/submissions', payload);
         // this.$router.push(`/surveys/${this.survey._id}`);
-        this.snackbarMessage = 'Submitted';
-        this.showSnackbar = true;
+        const message = 'Submitted';
+        this.snack(message);
       } catch (error) {
-        this.snackbarMessage = error.response.data.message;
-        this.showSnackbar = true;
+        const { message } = error.response.data;
+        this.snack(message);
         console.log(error);
       }
     },
     async submitSurvey(isDraft) {
-      const tmp = _.cloneDeep(this.survey);
+      const tmp = { ...this.survey };
 
       if (!isDraft && tmp.revisions.length > 0) {
         tmp.latestVersion = tmp.revisions[tmp.revisions.length - 1].version;
@@ -144,22 +148,22 @@ export default {
           method, url, data: tmp,
         });
         if (this.isNew) {
+          console.log('id is ', tmp._id);
           this.$router.push(`/surveys/${tmp._id}/edit`);
         }
 
-        this.snackbarMessage = 'Saved Survey';
-        this.showSnackbar = true;
+        this.snack(isDraft ? 'Saved Draft' : 'Published Survey');
       } catch (error) {
         if (error.response.status === 409) {
           this.showConflictModal = true;
         } else {
-          this.snackbarMessage = error.response.data.message;
-          this.showSnackbar = true;
+          const { message } = error.response.data;
+          this.snack(message);
         }
       }
 
       this.sessionId = new ObjectId().toString();
-      this.survey = tmp;
+      this.survey = { ...tmp };
     },
     async refresh() {
       this.survey = _.cloneDeep(emptySurvey);
