@@ -65,6 +65,7 @@
                   @eval="eval"
                   @changed="setValue"
                   @setStatus="setStatus"
+                  @setContext="setContext"
                   @show-nav="showNav(true)"
                   @hide-nav="showNav(false)"
                   @next="handleNext"
@@ -244,6 +245,13 @@ export default {
         status: type,
         statusMessage: message,
       };
+      this.$emit('change', this.submission);
+      this.persist();
+    },
+    setContext(context) {
+      const field = submissionUtils.getSubmissionField(this.submission, this.survey, this.position);
+      field.meta.context = context;
+      // TODO: update meta modified;
       this.$emit('change', this.submission);
       this.persist();
     },

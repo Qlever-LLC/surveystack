@@ -17,8 +17,7 @@ export function requestFetchSubmissions() {
       // ids,
       // sharecodeIds,
     },
-  }, '*');
-  // }, origin);
+  }, origin);
 
   return new Promise((resolve, reject) => {
     window.addEventListener('message', (event) => {
@@ -48,8 +47,17 @@ export function requestSetStatus({ type, message = '' }) {
       type,
       message,
     },
-  }, '*');
-  // }, origin);
+  }, origin);
+}
+
+export function requestSetContext(context) {
+  const [origin] = window.location.ancestorOrigins;
+  window.parent.postMessage({
+    type: 'REQUEST_SET_QUESTION_CONTEXT',
+    payload: {
+      context,
+    },
+  }, origin);
 }
 
 export function requestSetValue(value) {
@@ -66,8 +74,7 @@ export function requestSetValue(value) {
     payload: {
       value,
     },
-  }, '*');
-  // }, origin);
+  }, origin);
 
   // return new Promise((resolve, reject) => {
   //   window.addEventListener('message', (event) => {
@@ -88,8 +95,7 @@ export function requestLogMessage(...messages) {
     payload: {
       messages,
     },
-  // }, origin);
-  }, '*');
+  }, origin);
 }
 
 export function listen() {
@@ -112,4 +118,32 @@ export function onMessage(type, callback) {
       callback(event.data.payload);
     }
   });
+}
+
+export function handleLoaded() {
+  window.parent.postMessage({
+    type: 'SCRIPT_HAS_LOADED',
+    payload: {},
+  }, window.location.ancestorOrigins[0]);
+}
+
+export const statusTypes = {
+  SUCCESS: 'SUCCESS',
+  FAILURE: 'FAILURE',
+  WARNING: 'WARNING',
+};
+
+export function h(tag, attributes, ...children) {
+  const el = document.createElement(tag);
+  Object.entries(attributes).forEach(([k, v]) => {
+    if (k === 'class') {
+      el.className = v;
+    } else {
+      el.setAttribute(k, v);
+    }
+  });
+  children.forEach((child) => {
+    el.append(child);
+  });
+  return el;
 }

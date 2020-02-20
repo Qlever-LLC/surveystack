@@ -1,59 +1,15 @@
-
-// import {
-//   requestFetchSubmissions,
-//   requestSetValue,
-//   onMessage,
-// } from '../../public/iframeMessaging';
-
-
-// Should go in iframeMessaging lib file
-function requestSetValue(value) {
-  const [origin] = window.location.ancestorOrigins;
-
-  window.parent.postMessage({
-    type: 'REQUEST_SET_QUESTION_VALUE',
-    payload: {
-      value: JSON.stringify(value),
-    },
-  }, origin);
-
-  return new Promise((resolve, reject) => {
-    window.addEventListener('message', (event) => {
-      if (!event.data || !event.data.type || event.data.type !== 'RETURN_SET_QUESTION_VALUE') {
-        return;
-      }
-      if (event.data && event.data.type && event.data.type === 'RETURN_SET_QUESTION_VALUE') {
-        resolve(event.data.payload);
-      }
-    });
-  });
-}
-
-// should only be in iframeMessaging
-function requestSetStatus({
-  type,
-  message = '',
-}) {
-  const [origin] = window.location.ancestorOrigins;
-  window.parent.postMessage({
-    type: 'REQUEST_SET_QUESTION_STATUS',
-    payload: {
-      type,
-      message,
-    },
-  }, origin);
-}
-
-
-// Should go in iframeMessaging lib file
-// TODO: validated origin, pass in as arg
+// TODO: validate origin, pass in as arg
+// TODO: return value to allow removeEventListener
 export function onMessage(type, callback) {
-  window.addEventListener('message', (event) => {
+  function handler(event) {
     if (event.data && event.data.type && event.data.type === type) {
       // callback(event);
+      // console.log('message', event);
       callback(event.data.payload);
     }
-  });
+  }
+  window.addEventListener('message', handler);
+  return handler;
 }
 
 
@@ -73,26 +29,29 @@ function h(tag, attributes, ...children) {
 }
 
 
-// An example of a user's script
-export const exampleScript = {
-  process({ submission }) {
-    const madlib = `${submission.data.text_1.value} likes ${submission.data.text_2.value}`;
-    requestSetValue({ madlib });
-    requestSetStatus({ type: 'SUCCESS', message: `it worked! ${Date.now()}` });
-    return {
-      madlib,
-    };
-  },
-  render(result) {
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = result.madlib;
-    return wrapper;
-    // return h('ul', {}, h('li', {}, result.madlib));
-  },
-};
+// // An example of a user's script
+// export function process({ submission }) {
+//   const madlib = `${submission.data.text_1.value} likes ${submission.data.text_2.value}`;
+//   requestSetValue({ madlib });
+//   requestSetStatus({ type: 'SUCCESS', message: `it worked! ${Date.now()}` });
+//   return {
+//     madlib,
+//   };
+// };
+// export function render(result) {
+//   const wrapper = document.createElement('div');
+//   wrapper.innerHTML = result.madlib;
+//   return wrapper;
+//   // return h('ul', {}, h('li', {}, result.madlib));
+// };
 
 // Build iframe contents for Question Script
-export default function buildScriptQuestionIframeContents({ script, submissionJSON, valueJSON }) {
+export default function buildScriptQuestionIframeContents({
+  scriptSource,
+  submissionJSON,
+  valueJSON,
+  contextJSON,
+}) {
   return `<body>
       <div id="root"></div>
       <script type="module">
@@ -100,69 +59,55 @@ export default function buildScriptQuestionIframeContents({ script, submissionJS
           requestFetchSubmissions,
           requestSetStatus,
           requestSetValue,
+          requestSetContext,
           requestLogMessage,
           onMessage,
+          handleLoaded,
+          statusTypes,
         } from 'http://localhost:8081/iframeMessaging.js';
-
 
         function getInitialState() {
           return {
             submission: ${submissionJSON},
             value: ${valueJSON},
-            scriptHasRun: ${!!valueJSON},
+            context: ${contextJSON},
+            // scriptHasRun: ${!!valueJSON},
           }
         };
 
-        function h(tag, attributes, ...children) {
-          const el = document.createElement(tag);
-          Object.entries(attributes).forEach(([k, v]) => {
-            if (k === 'class') {
-              el.className = v;
-            } else {
-              el.setAttribute(k, v);
-            }
-          });
-          children.forEach((child) => {
-            el.append(child);
-          });
-          return el;
-        }
-
         let state = getInitialState();
-        let result;
 
-        ${script}
-
-
-        function handleLoaded() {
-          // render(run(state));
-          window.parent.postMessage({
-            type: 'SCRIPT_HAS_LOADED',
-            payload: {},
-          // }, window.location.ancestorOrigins[0]);
-          }, '*');
-        }
+        ${scriptSource}
 
         function resetDOM() {
-
+          const root = document.querySelector('#root');
+          root.innerHTML = '';
         }
-
 
         onMessage('REQUEST_RUN_SCRIPT', () => {
           const root = document.querySelector('#root');
-          result = process(state);
-          root.innerHTML = render(result).innerHTML;
+          const { context, value, status } = process(state);
+          if (context) {
+            requestSetContext(context);
+          }
+          if (value) {
+            requestSetValue(value);
+          }
+          if (status) {
+            requestSetStatus(status);
+          }
+          root.innerHTML = render({ context, value }).innerHTML;
         });
 
-        onMessage('REQUEST_RENDER_SCRIPT', (payload) => {
+        onMessage('REQUEST_RENDER_SCRIPT', ({ context, value }) => {
           const root = document.querySelector('#root');
-          root.innerHTML = render(payload.value).innerHTML;
+          root.innerHTML = render({ context, value }).innerHTML;
         });
 
         onMessage('REQUEST_RESET_SCRIPT', () => {
-
-        })
-        // onMessage('UPDATE_SCRIPT_SUBMISSION', () => {});
+          state = getInitialState();
+          resetDOM();
+        });
 
         document.addEventListener('DOMContentLoaded', handleLoaded);
       </script>

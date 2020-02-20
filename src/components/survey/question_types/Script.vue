@@ -22,8 +22,7 @@
 
 <script>
 import BaseQuestionComponent from './BaseQuestionComponent';
-import buildScriptQuestionIframeContents, { exampleScript, onMessage } from '@/utils/userScript';
-// import { onMessage } from '../../../../public/iframeMessaging';
+import buildScriptQuestionIframeContents, { onMessage } from '@/utils/userScript';
 import api from '@/services/api.service';
 
 export default {
@@ -49,39 +48,65 @@ export default {
   data() {
     return {
       source: null,
+      messageEventListeners: [],
     };
   },
   methods: {
     requestRunScript() {
-      this.$refs.iframe.contentWindow.postMessage({ type: 'REQUEST_RUN_SCRIPT', payload: { value: this.value } }, '*');
+      this.$refs.iframe.contentWindow.postMessage({
+        type: 'REQUEST_RUN_SCRIPT',
+      }, '*');
     },
     requestRenderScript() {
-      this.$refs.iframe.contentWindow.postMessage({ type: 'REQUEST_RENDER_SCRIPT', payload: { value: this.value } }, '*');
+      this.$refs.iframe.contentWindow.postMessage({
+        type: 'REQUEST_RENDER_SCRIPT',
+        payload: {
+          value: this.value,
+          context: this.meta.context || {},
+        },
+      }, '*');
     },
-    // handleRequestSetStatus() {
-    //   this.emit
-    // },
+    handleScriptHasLoaded() {
+      if (this.value) {
+        this.requestRenderScript();
+      }
+    },
+    handleRequestSetQuestionValue({ value }) {
+      this.changed(value);
+    },
+    handleRequestSetQuestionStatus({ type, message }) {
+      this.$emit('setStatus', { type, message });
+    },
+    handleRequestLogMessage({ messages }) {
+      console.log(...messages);
+    },
+    handleRequestSetContext({ context }) {
+      // TODO: ensure `context` is sanitized
+      console.log('set context', context);
+      this.$emit('setContext', context);
+    },
     initializeIframe() {
       const { iframe } = this.$refs;
       const submissionJSON = JSON.stringify(this.submission);
       const valueJSON = JSON.stringify(this.value);
+      const contextJSON = JSON.stringify(this.meta.context || {});
 
-
-      // iframe.src = 'http://localhost:8082/script.html';
-      const html = buildScriptQuestionIframeContents({ script: this.source.content, submissionJSON, valueJSON });
-      iframe.src = `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
-      // iframe.contentWindow.document.open();
-      // iframe.contentWindow.document.write(html);
-      // iframe.contentWindow.document.close();
-
-      onMessage('REQUEST_SET_QUESTION_VALUE', ({ value }) => this.changed(value));
-      onMessage('SCRIPT_HAS_LOADED', () => {
-        if (this.value) {
-          this.requestRenderScript();
-        }
+      const html = buildScriptQuestionIframeContents({
+        scriptSource: this.source.content,
+        submissionJSON,
+        valueJSON,
+        contextJSON,
       });
-      onMessage('REQUEST_SET_QUESTION_STATUS', ({ type, message }) => this.$emit('setStatus', { type, message }));
-      onMessage('REQUEST_LOG_MESSAGE', ({ messages }) => console.log(...messages));
+      iframe.src = `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
+
+      // onMessage returns the message listener function so that the listener can be removed on destroyed lifecycle method
+      this.messageEventListeners.push(
+        onMessage('SCRIPT_HAS_LOADED', this.handleScriptHasLoaded),
+        onMessage('REQUEST_SET_QUESTION_VALUE', this.handleRequestSetQuestionValue),
+        onMessage('REQUEST_SET_QUESTION_STATUS', this.handleRequestSetQuestionStatus),
+        onMessage('REQUEST_LOG_MESSAGE', this.handleRequestLogMessage),
+        onMessage('REQUEST_SET_QUESTION_CONTEXT', this.handleRequestSetContext),
+      );
     },
     async fetchScriptSource() {
       const sourceId = this.control && this.control.options && this.control.options.source;
@@ -89,11 +114,12 @@ export default {
       this.source = data;
     },
   },
-  // async created() {
-  // },
   async mounted() {
     await this.fetchScriptSource();
     this.initializeIframe();
+  },
+  destroyed() {
+    this.messageEventListeners.forEach(handler => window.removeEventListener('message', handler));
   },
 };
 
