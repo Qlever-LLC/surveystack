@@ -98,10 +98,6 @@ export default {
     },
     createCustomFilter(field) {
       return (value, search, item) => {
-        console.log('filter value', value);
-        console.log('filter search', search);
-        console.log('filter item', item);
-
         if (!this.searchFields[field]) {
           return true;
         }
