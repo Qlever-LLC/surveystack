@@ -8,6 +8,7 @@
         show-select
         item-key="_id"
         :search="search"
+        :mobile-breakpoint="NaN"
       >
         <template v-slot:top>
           <v-toolbar flat>
@@ -34,6 +35,21 @@
             </v-row>
 
           </v-toolbar>
+        </template>
+        <template v-slot:header="{ props: { headers } }">
+          <thead>
+            <tr>
+              <th
+                v-for="header in headers"
+                :key="header.text"
+              >
+                <v-text-field
+                  :label="header.text"
+                  box
+                />
+              </th>
+            </tr>
+          </thead>
         </template>
       </v-data-table>
     </v-card>
