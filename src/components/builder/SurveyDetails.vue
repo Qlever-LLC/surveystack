@@ -6,7 +6,7 @@
         small
         color="red"
         class="mr-0 mr-1"
-      >Version {{version}}</v-chip>
+      >Version {{ version }}</v-chip>
     </div>
     <div class="mt-4">
       <v-text-field
@@ -135,14 +135,6 @@ export default {
     'enableSaveDraft',
     'enablePublish',
     'enableDismissDraft',
-  ],
-  computed: {
-    version() {
-      if (this.dirty) {
-        return `${this.value.latestVersion + 1} (draft)`;
-      }
-      return this.value.latestVersion;
-    },
-  },
+    'version'],
 };
 </script>

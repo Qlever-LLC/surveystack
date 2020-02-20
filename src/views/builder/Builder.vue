@@ -129,20 +129,22 @@ export default {
       }
     },
     async submitSurvey(isDraft) {
-      if (!isDraft && this.survey.revisions.length > 0) {
-        this.survey.latestVersion = this.survey.revisions[this.survey.revisions.length - 1].version;
+      const tmp = _.cloneDeep(this.survey);
+
+      if (!isDraft && tmp.revisions.length > 0) {
+        tmp.latestVersion = tmp.revisions[tmp.revisions.length - 1].version;
       }
 
       const method = this.isNew ? 'post' : 'put';
-      const url = this.isNew ? '/surveys' : `/surveys/${this.survey._id}`;
-      console.log('submitting survey', this.survey);
+      const url = this.isNew ? '/surveys' : `/surveys/${tmp._id}`;
+      console.log('submitting survey', tmp);
 
       try {
         await api.customRequest({
-          method, url, data: this.survey,
+          method, url, data: tmp,
         });
         if (this.isNew) {
-          this.$router.push(`/surveys/${this.survey._id}/edit`);
+          this.$router.push(`/surveys/${tmp._id}/edit`);
         }
 
         this.snackbarMessage = 'Saved Survey';
@@ -155,6 +157,9 @@ export default {
           this.showSnackbar = true;
         }
       }
+
+      this.sessionId = new ObjectId().toString();
+      this.survey = tmp;
     },
     async refresh() {
       this.survey = _.cloneDeep(emptySurvey);
