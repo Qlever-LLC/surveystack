@@ -40,13 +40,14 @@
           <thead>
             <tr>
               <th
-                v-for="header in headers"
+                v-for="(header,i) in headers"
                 :key="header.text"
               >
                 <v-text-field
-                  :label="header.text"
-                  box
+                  v-if="i > 0"
+                  @input="(v) => hello(v, header.text)"
                 />
+
               </th>
             </tr>
           </thead>
@@ -68,21 +69,13 @@ export default {
       csv: null,
       parsed: null,
       search: '',
+      searchFields: {
+        survey: '',
+      },
+      headers: [],
     };
   },
   computed: {
-    headers() {
-      const headers = [];
-      if (this.parsed) {
-        this.parsed.meta.fields.forEach((header) => {
-          if (this.excludeMeta && header.startsWith('meta')) {
-            return;
-          }
-          headers.push({ text: header, value: header });
-        });
-      }
-      return headers;
-    },
     items() {
       if (this.parsed) {
         return this.parsed.data;
@@ -90,9 +83,51 @@ export default {
       return [];
     },
   },
+  watch: {
+    excludeMeta() {
+      this.createHeaders();
+    },
+  },
+  methods: {
+    hello(value, field) {
+      this.searchFields[field] = value;
+      // this.$set(this.searchFields, field, value);
+
+      console.log(field);
+      console.log(value);
+    },
+    createCustomFilter(field) {
+      return (value, search, item) => {
+        console.log('filter value', value);
+        console.log('filter search', search);
+        console.log('filter item', item);
+
+        if (!this.searchFields[field]) {
+          return true;
+        }
+
+        return value.toLowerCase().startsWith(this.searchFields[field].toLowerCase());
+      };
+    },
+    createHeaders() {
+      const headers = [];
+      if (this.parsed) {
+        this.parsed.meta.fields.forEach((header) => {
+          if (this.excludeMeta && header.startsWith('meta')) {
+            return;
+          }
+          this.$set(this.searchFields, header, '');
+          headers.push({ text: header, value: header, filter: this.createCustomFilter(header) });
+        });
+      }
+      this.headers = headers;
+    },
+  },
+
   async created() {
     const r = await axios.get('http://localhost:3000/debug/submissions?survey=5e3038dbea0cf40001aef63b');
     this.parsed = papa.parse(r.data, { header: true });
+    this.createHeaders();
   },
 };
 </script>
@@ -102,4 +137,10 @@ export default {
 .v-data-table >>> td {
   font-family: monospace;
 }
+
+/*
+.v-data-table >>> .v-label {
+  font-size: 12px;
+}
+*/
 </style>
