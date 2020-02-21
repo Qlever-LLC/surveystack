@@ -76,6 +76,7 @@ export default function buildScriptQuestionIframeContents({
         };
 
         let state = getInitialState();
+        window.requestLogMessage = requestLogMessage;
 
         ${scriptSource}
 
@@ -99,9 +100,10 @@ export default function buildScriptQuestionIframeContents({
           root.innerHTML = render({ context, value }).innerHTML;
         });
 
-        onMessage('REQUEST_RENDER_SCRIPT', ({ context, value }) => {
+        onMessage('REQUEST_RENDER_SCRIPT', ({ submission, context, value }) => {
           const root = document.querySelector('#root');
-          root.innerHTML = render({ context, value }).innerHTML;
+          root.innerHTML = '';
+          root.appendChild(render({ submission, context, value }));
         });
 
         onMessage('REQUEST_RESET_SCRIPT', () => {
@@ -110,6 +112,10 @@ export default function buildScriptQuestionIframeContents({
         });
 
         document.addEventListener('DOMContentLoaded', handleLoaded);
+        // const button = document.createElement('button');
+        // button.innerText = 'click here';
+        // button.onclick = (ev) => requestLogMessage('clicky from body!');
+        // document.body.appendChild(button);
       </script>
     </body>`;
 }

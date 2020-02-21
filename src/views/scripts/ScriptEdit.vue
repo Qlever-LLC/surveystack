@@ -80,7 +80,7 @@ export default {
           url,
           data,
         });
-        this.$router.push('/scripts');
+        // this.$router.push('/scripts');
       } catch (err) {
         console.log(err);
       }
