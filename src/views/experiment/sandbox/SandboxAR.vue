@@ -121,7 +121,7 @@ export default {
   },
 
   async created() {
-    const r = await axios.get('http://localhost:3000/debug/submissions?survey=5e3038dbea0cf40001aef63b');
+    const r = await axios.get('http://192.168.1.66:3000/debug/submissions?survey=5e3038dbea0cf40001aef63b');
     this.parsed = papa.parse(r.data, { header: true });
     this.createHeaders();
   },

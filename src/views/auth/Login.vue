@@ -1,6 +1,6 @@
 <template>
-  <div class="container-mid">
-    <h3>Login</h3>
+  <v-container>
+    <h1>Login</h1>
     <p>Default admin: admin@our-sci.net // 1234</p>
     <v-form>
       <v-text-field
@@ -15,29 +15,49 @@
         :type="passwordInputType"
         class="form-control"
         v-model="entity.password"
+        :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+        @click:append="showPasswords = !showPasswords"
       />
-      <div class="d-flex">
+      <small>
+        <router-link :to="{name: 'auth-forgot-password', query: {email: entity.email}}">Forgot password?</router-link>
+      </small>
+      <div class="d-flex justify-end">
         <v-btn
           type="button"
-          class="btn btn-outline-secondary mr-auto"
-          @click="showPasswords = !showPasswords"
-        >{{passwordShowHideText}}</v-btn>
-        <v-btn class="btn btn-primary" type="submit" @click.prevent="submit" color="primary">Submit</v-btn>
+          class="mr-2"
+          text
+          @click="reset"
+        >Reset</v-btn>
+        <v-btn
+          type="submit"
+          @click.prevent="submit"
+          color="primary"
+        >Login</v-btn>
       </div>
     </v-form>
 
-    <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{status}}</app-feedback>
-
     <div class="text-center text-muted mt-5">
       Don't have an account?
-      <router-link :to="{name: 'auth-register'}">Register now</router-link>.
+      <router-link :to="{name: 'auth-register', params: {initialEmail: entity.email, initialPassword: entity.password}}">Register now</router-link>
     </div>
-  </div>
+    <transition name="fade">
+      <app-feedback
+        v-if="status"
+        class="mt-5"
+        @closed="status = ''"
+      >{{status}}</app-feedback>
+    </transition>
+  </v-container>
 </template>
 
 
 <script>
 import appFeedback from '@/components/ui/Feedback.vue';
+
+const DEFAULT_ENTITY = {
+  email: '',
+  password: '',
+};
 
 export default {
   components: {
@@ -48,8 +68,7 @@ export default {
       status: '',
       showPasswords: false,
       entity: {
-        email: '',
-        password: '',
+        ...DEFAULT_ENTITY,
       },
     };
   },
@@ -63,8 +82,6 @@ export default {
   },
   methods: {
     async submit() {
-      console.log('submitting');
-
       if (this.entity.email === '') {
         this.status = 'E-Mail must not be empty.';
         return;
@@ -84,16 +101,25 @@ export default {
       } catch (error) {
         switch (error.response.status) {
           case 401:
-            this.status = error.response.data;
+            this.status = error.response.data.message;
             break;
           case 404:
-            this.status = error.response.data;
+            this.status = error.response.data.message;
             break;
           default:
             this.status = 'Unknown error :/';
         }
       }
     },
+    reset() {
+      this.entity = { ...DEFAULT_ENTITY };
+    },
   },
 };
 </script>
+
+<style scoped>
+a {
+  text-decoration: none;
+}
+</style>
