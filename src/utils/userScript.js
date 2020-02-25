@@ -66,6 +66,8 @@ export default function buildScriptQuestionIframeContents({
           statusTypes,
         } from 'http://localhost:8081/iframeMessaging.js';
 
+        window.log = requestLogMessage;
+
         function getInitialState() {
           return {
             submission: ${submissionJSON},
@@ -84,25 +86,50 @@ export default function buildScriptQuestionIframeContents({
           root.innerHTML = '';
         }
 
-        onMessage('REQUEST_RUN_SCRIPT', () => {
-          const root = document.querySelector('#root');
-          const { context, value, status } = process(state);
+        function setState({ context = {}, value = null }) {
+          state.context = context;
+          state.value = value;
+          // Trigger render(process(state))
+          log('running setState');
+          runScript();
+        }
+
+        onMessage('REQUEST_RUN_SCRIPT', runScript);
+
+        function runScript() {
+          log('runScript');
+          log('setState', JSON.stringify(typeof setState));
+          const {
+            context,
+            value,
+            status,
+          } = process(state);
           if (context) {
             requestSetContext(context);
+            state.context = context;
           }
           if (value) {
             requestSetValue(value);
+            state.value = value;
           }
           if (status) {
             requestSetStatus(status);
           }
-          root.innerHTML = render({ context, value }).innerHTML;
-        });
+          renderScript(state);
+        }
 
-        onMessage('REQUEST_RENDER_SCRIPT', ({ context, value }) => {
+        function renderScript(state) {
           const root = document.querySelector('#root');
-          root.innerHTML = render({ context, value }).innerHTML;
-        });
+          root.innerHTML = '';
+          root.appendChild(render({
+            context: state.context,
+            value: state.value,
+            submission: state.submission,
+            setState,
+          }));
+        }
+
+        onMessage('REQUEST_RENDER_SCRIPT', () => renderScript(state));
 
         onMessage('REQUEST_RESET_SCRIPT', () => {
           state = getInitialState();
@@ -110,6 +137,10 @@ export default function buildScriptQuestionIframeContents({
         });
 
         document.addEventListener('DOMContentLoaded', handleLoaded);
+        // const button = document.createElement('button');
+        // button.innerText = 'click here';
+        // button.onclick = (ev) => requestLogMessage('clicky from body!');
+        // document.body.appendChild(button);
       </script>
     </body>`;
 }
