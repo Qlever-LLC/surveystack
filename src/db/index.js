@@ -1,4 +1,4 @@
-import { MongoClient, Db } from "mongodb";
+import { MongoClient, Db } from 'mongodb';
 
 /**
  * @type {Db}
@@ -15,6 +15,7 @@ const connectDatabase = async () => {
   const client = new MongoClient(url, { poolSize: 10, useNewUrlParser: true });
   await client.connect();
   db = client.db(dbName);
+  await db.collection('users').createIndex({ email: 1 }, { unique: true });
 };
 
 export { db, connectDatabase };

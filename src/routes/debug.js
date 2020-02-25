@@ -2,11 +2,11 @@ import { Router } from 'express';
 import _ from 'lodash';
 import { flatten } from 'flat';
 import { ObjectId } from 'mongodb';
+import papa from 'papaparse';
 
 import { db } from '../db';
 import { uploadToS3 } from '../services/bucket.service';
-
-import papa from 'papaparse';
+import mailService from '../services/mail.service';
 
 const router = Router();
 
@@ -95,6 +95,32 @@ router.get('/submissions', async (req, res) => {
   const csv = papa.unparse(items);
 
   return res.send(csv);
+});
+
+router.get('/mail/check', async (req, res) => {
+  console.log(process.env.SMTP_DEFAULT_SENDER);
+  console.log(process.env.SMTP_HOST);
+  try {
+    await mailService.check();
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+
+  return res.send('OK');
+});
+
+router.post('/mail/send', async (req, res) => {
+  try {
+    await mailService.send({
+      to: 'andreas.rudolf@nexus-computing.ch',
+      subject: 'This is another test',
+      text: 'Hello\n\nGreetings from our-sci.net\n\nBest Regards',
+    });
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+
+  return res.send('OK');
 });
 
 export default router;

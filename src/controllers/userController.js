@@ -64,6 +64,7 @@ const createUser = async (req, res) => {
     throw boom.badRequest('Password must not be empty');
   }
 
+  /*
   const existing = await db.collection(col).findOne({
     email,
   });
@@ -71,6 +72,7 @@ const createUser = async (req, res) => {
   if (existing) {
     throw boom.conflict(`User already exists: ${email}`);
   }
+  */
 
   const hash = bcrypt.hashSync(password, parseInt(process.env.BCRYPT_ROUNDS));
   const token = uuidv4();

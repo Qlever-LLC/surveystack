@@ -23,6 +23,8 @@ const router = Router();
 /** Auth */
 router.post('/auth/register', catchErrors(authController.register));
 router.post('/auth/login', catchErrors(authController.login));
+router.post('/auth/send-password-reset-mail', catchErrors(authController.sendPasswordResetMail));
+router.post('/auth/reset-password', catchErrors(authController.resetPassword));
 
 /** Debug */
 router.get('/debug', catchErrors(debugController.getDefault));

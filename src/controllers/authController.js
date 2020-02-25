@@ -4,6 +4,7 @@ import uuidv4 from 'uuid/v4';
 
 import boom from '@hapi/boom';
 
+import mailService from '../services/mail.service';
 import { db } from '../db';
 
 const col = 'users';
@@ -14,9 +15,7 @@ const createPayload = user => {
 };
 
 const register = async (req, res) => {
-  console.log('inside register handler');
   // TODO: sanity check
-  // TODO: ensure unique indexes
   const { email, name, password } = req.body;
   const hash = bcrypt.hashSync(password, parseInt(process.env.BCRYPT_ROUNDS));
   const token = uuidv4();
@@ -36,24 +35,23 @@ const register = async (req, res) => {
     return res.send(payload);
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
-      return res.status(409).send(`Email already taken: ${email}`);
+      throw boom.conflict(`E-Mail already in use: ${email}`, { email });
     }
   }
 
-  return res.status(500).send({ message: 'Internal error' });
+  throw boom.internal();
 };
 
 const login = async (req, res) => {
-  console.log('inside login handler');
   const { email, password } = req.body;
 
-  if (email == '' || password == '') {
-    return res.status(400).send('Email and password must not be empty');
+  if (email.trim() === '' || password.trim() === '') {
+    throw boom.badRequest('Email and password must not be empty');
   }
 
   const existingUser = await db.collection(col).findOne({ email });
   if (!existingUser) {
-    return res.status(404).send(`No user with email exists: ${email}`);
+    throw boom.notFound(`No user with email exists: ${email}`);
   }
 
   const passwordsMatch = await bcrypt.compare(password, existingUser.password);
@@ -65,7 +63,58 @@ const login = async (req, res) => {
   return res.send(createPayload(existingUser));
 };
 
+const sendPasswordResetMail = async (req, res) => {
+  const { email } = req.body;
+  const existingUser = await db.collection(col).findOne({ email });
+  if (!existingUser) {
+    throw boom.notFound(`No user with email exists: ${email}`);
+  }
+  await mailService.send({
+    to: email,
+    subject: 'Link to reset your password',
+    text: `Hello,
+
+Use the following link to set a new password:
+
+${process.env.SERVER_URL}/auth/reset-password?token=${existingUser.token}&email=${existingUser.email}
+
+If you did not request this email, you can safely ignore it.
+
+Best Regards`,
+  });
+  return res.status(200);
+};
+
+const resetPassword = async (req, res) => {
+  const { email, token, password } = req.body;
+  const existingUser = await db.collection(col).findOne({ email });
+  if (!existingUser) {
+    throw boom.notFound(`No user with email exists: ${email}`);
+  }
+
+  if (existingUser.token !== token) {
+    throw boom.unauthorized(`Invalid token for user: ${existingUser.email}`);
+  }
+
+  const hash = bcrypt.hashSync(password, parseInt(process.env.BCRYPT_ROUNDS));
+  try {
+    let updated = await db.collection(col).findOneAndUpdate(
+      { _id: existingUser._id },
+      { $set: { password: hash } },
+      {
+        returnOriginal: false,
+      }
+    );
+    return res.send(updated);
+  } catch (err) {
+    console.log(err);
+    throw boom.internal(`Ouch`);
+  }
+};
+
 export default {
   register,
   login,
+  resetPassword,
+  sendPasswordResetMail,
 };
