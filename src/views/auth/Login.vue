@@ -72,13 +72,21 @@ export default {
       },
     };
   },
+  props: {
+    initialEmail: {
+      type: String,
+      required: false,
+    },
+  },
   computed: {
     passwordInputType() {
       return this.showPasswords ? 'text' : 'password';
     },
-    passwordShowHideText() {
-      return this.showPasswords ? 'Hide password' : 'Show password';
-    },
+  },
+  created() {
+    if (this.initialEmail) {
+      this.entity.email = this.initialEmail;
+    }
   },
   methods: {
     async submit() {

@@ -105,6 +105,7 @@ const routes = [
     path: '/auth/login',
     name: 'auth-login',
     component: Login,
+    props: true,
   },
   {
     path: '/auth/register',

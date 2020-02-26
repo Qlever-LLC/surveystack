@@ -11,6 +11,7 @@
     >{{title}}</strong>
     <slot />
     <v-icon
+      v-if="closeable"
       class="float-right"
       @click="$emit('closed')"
     >mdi-close-circle</v-icon>
@@ -28,6 +29,10 @@ export default {
       type: String,
       default: 'error',
       required: false,
+    },
+    closeable: {
+      type: Boolean,
+      default: true,
     },
   },
 };
