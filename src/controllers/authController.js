@@ -82,11 +82,11 @@ If you did not request this email, you can safely ignore it.
 
 Best Regards`,
   });
-  return res.status(200);
+  return res.send('OK');
 };
 
 const resetPassword = async (req, res) => {
-  const { email, token, password } = req.body;
+  const { email, token, newPassword } = req.body;
   const existingUser = await db.collection(col).findOne({ email });
   if (!existingUser) {
     throw boom.notFound(`No user with email exists: ${email}`);
@@ -96,7 +96,11 @@ const resetPassword = async (req, res) => {
     throw boom.unauthorized(`Invalid token for user: ${existingUser.email}`);
   }
 
-  const hash = bcrypt.hashSync(password, parseInt(process.env.BCRYPT_ROUNDS));
+  if (newPassword.trim() === '') {
+    throw boom.badRequest('Password must not be empty');
+  }
+
+  const hash = bcrypt.hashSync(newPassword, parseInt(process.env.BCRYPT_ROUNDS));
   try {
     let updated = await db.collection(col).findOneAndUpdate(
       { _id: existingUser._id },
