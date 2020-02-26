@@ -13,8 +13,12 @@
         >{{ result }}</v-chip>
         <v-spacer></v-spacer>
         <v-icon
-          v-if="runnable"
+          v-if="saveable"
           class="mr-4"
+          @click="$emit('save', model.getValue())"
+        >mdi-content-save</v-icon>
+        <v-icon
+          v-if="runnable"
           @click="$emit('run', model.getValue())"
         >mdi-play</v-icon>
         <v-icon @click="$emit('close')">mdi-close-circle-outline</v-icon>
@@ -106,6 +110,9 @@ export default {
       default: 'vs-dark',
     },
     runnable: {
+      default: false,
+    },
+    saveable: {
       default: false,
     },
     result: {

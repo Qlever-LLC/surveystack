@@ -60,6 +60,22 @@
         </v-card>
       </pane>
       <pane
+        class="pane pane-script"
+        v-if="hasScript && !hideScriptCode && scriptCode !== null"
+      >
+        <code-editor
+          :saveable="true"
+          @close="hideScriptCode = true"
+          :code="scriptCode.content"
+          class="main-code-editor"
+          :refresh="codeRefreshCounter"
+          @change="updateScriptCode"
+          @save="saveScript"
+        >
+        </code-editor>
+      </pane>
+
+      <pane
         class="pane pane-main-code"
         v-if="hasCode && !hideCode"
       >
@@ -117,7 +133,7 @@
       </pane>
       <pane
         class="pane pane-submission-code"
-        v-if="hasCode && !hideCode"
+        v-if="(hasCode && !hideCode) || (hasScript && !hideScriptCode)"
       >
         <div class="code-editor">
           <code-editor
@@ -184,7 +200,6 @@ const tabMap = [
   'relevance',
   'calculate',
   'constraint',
-  'script',
 ];
 
 export default {
@@ -210,6 +225,7 @@ export default {
     return {
       // modes
       hideCode: false,
+      hideScriptCode: false,
       dirty: false,
       version: 1,
       // ui
@@ -225,16 +241,42 @@ export default {
       optionsCalculate: null,
       optionsConstraint: null,
       activeCode: '',
+      scriptCode: null,
       // survey entity
       codeRefreshCounter: 0,
       submissionCode: '',
       instance: null,
       initialSurvey: _.cloneDeep(this.survey),
       surveyUnchanged: true,
-      controlSource: null,
     };
   },
   methods: {
+    async saveScript() {
+      console.log('saving script');
+      // post new script
+      const data = this.scriptCode;
+      const method = this.scriptCode._id !== null ? 'put' : 'post';
+      const url = this.scriptCode._id !== null ? `/scripts/${this.scriptCode._id}` : '/scripts';
+
+      if (this.scriptCode.name.trim() === '') {
+        console.log('Name must not be empty');
+        return;
+      }
+
+      try {
+        await api.customRequest({
+          method,
+          url,
+          data,
+        });
+        // this.$router.push('/scripts');
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    updateScriptCode(code) {
+      this.scriptCode.content = code;
+    },
     publish() {
       this.$emit('onPublish');
     },
@@ -318,12 +360,6 @@ export default {
       if (!this.control.options[tab].code) {
         this.control.options[tab].code = initialRelevanceCode(tab);
       }
-
-      if (this.control.type === 'script' && this.control.options.source) {
-        this.activeCode = this.controlSource;
-      } else {
-        this.activeCode = this.control.options[tabMap[this.selectedTab]].code;
-      }
     },
     async runCode() {
       try {
@@ -350,7 +386,10 @@ export default {
       this.control = control;
       if (control.type === 'script' && control.options.source) {
         const { data } = await api.get(`/scripts/${control.options.source}`);
-        this.controlSource = data;
+        this.hideScriptCode = false;
+        this.scriptCode = data || { _id: null, name: 'New Script', content: '' };
+      } else {
+        this.scriptCode = null;
       }
     },
     controlAdded(control) {
@@ -425,8 +464,13 @@ export default {
       }
       return this.control.options.relevance.enabled
         || this.control.options.calculate.enabled
-        || this.control.options.constraint.enabled
-        || this.control.type === 'script';
+        || this.control.options.constraint.enabled;
+    },
+    hasScript() {
+      if (!this.control) {
+        return false;
+      }
+      return this.control.type === 'script';
     },
     currentVersion() {
       return this.survey.revisions[this.survey.revisions.length - 1].version;
