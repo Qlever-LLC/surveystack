@@ -2,8 +2,8 @@ import nodemailer from 'nodemailer';
 
 let transport = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: 587, // upgrade later with STARTTLS
-  secure: false,
+  port: process.env.SMTP_PORT,
+  secure: false, // upgrade later with STARTTLS
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
@@ -11,6 +11,7 @@ let transport = nodemailer.createTransport({
 });
 
 const check = async () => {
+  console.log(transport);
   await transport.verify();
 };
 
