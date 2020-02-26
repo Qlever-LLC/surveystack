@@ -169,44 +169,36 @@ export function h(tag, attributes, ...children) {
 //   runScript(props, nextState);
 // }
 
-
-export function runScript(props, state, process, render) {
-  // log('runScript');
-  // log('setState', JSON.stringify(typeof setState));
-  const {
-    context,
-    value,
-    status,
-  } = process(props, state);
-  if (context) {
-    requestSetContext(context);
-    state.context = context;
-  }
-  if (value) {
-    requestSetValue(value);
-    state.value = value;
-  }
-  if (status) {
-    requestSetStatus(status);
-  }
-  renderScript(props, state, process, render);
+export function resetDOM() {
+  const root = document.querySelector('#root');
+  root.innerHTML = '';
 }
 
 
-// in iframe we can define `const setState = reprocess(props)`
+export function runScript(props, state, process, render) {
+  const nextState = process(props, state);
+  if (nextState.context) {
+    requestSetContext(nextState.context);
+  }
+  if (nextState.value) {
+    requestSetValue(nextState.value);
+  }
+  if (nextState.status) {
+    requestSetStatus(nextState.status);
+  }
+  renderScript(props, nextState, process, render);
+}
+
+
+// in iframe we can define `const setState = update(props)`
 export const update = (props, process, render) => (state) => {
-  const nextState = { ...state };
-  runScript(props, nextState, process, render);
+  runScript(props, state, process, render);
 };
 
 export function renderScript(props, state, process, render) {
   const root = document.querySelector('#root');
   root.innerHTML = '';
-  window.log('typeof setstate', typeof update(props));
-  root.appendChild(render(props, {
-    context: state.context,
-    value: state.value,
-    submission: state.submission,
-    setState: update(props, process, render),
-  }));
+  root.appendChild(
+    render(props, state, update(props, process, render)),
+  );
 }
