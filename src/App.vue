@@ -3,7 +3,6 @@
     <app-navbar />
     <v-content>
       <app-feedback />
-
       <router-view class="pa-3"></router-view>
     </v-content>
   </v-app>

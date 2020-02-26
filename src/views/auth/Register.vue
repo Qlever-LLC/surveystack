@@ -1,6 +1,6 @@
 <template>
-  <div class="container-mid">
-    <h3>Register</h3>
+  <v-container>
+    <h1>Register</h1>
     <v-form class="mb-5">
       <v-text-field
         label="E-Mail"
@@ -10,13 +10,20 @@
         @input="entity.email = $event.toLowerCase()"
       />
 
-      <v-text-field label="Name" type="text" class="form-control" v-model="entity.name" />
+      <v-text-field
+        label="Name"
+        type="text"
+        class="form-control"
+        v-model="entity.name"
+      />
 
       <v-text-field
         label="Password"
         :type="passwordInputType"
         class="form-control"
         v-model="entity.password"
+        :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+        @click:append="showPasswords = !showPasswords"
       />
 
       <v-text-field
@@ -24,39 +31,69 @@
         :type="passwordInputType"
         class="form-control"
         v-model="passwordConfirmation"
+        :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+        @click:append="showPasswords = !showPasswords"
       />
 
-      <div class="d-flex">
+      <div class="d-flex justify-end">
         <v-btn
           type="button"
-          class="mr-auto"
-          @click="showPasswords = !showPasswords"
-        >{{passwordShowHideText}}</v-btn>
-        <v-btn type="button" class="mr-2" outlined>Cancel</v-btn>
-        <v-btn type="submit" @click.prevent="submit" color="primary">Sign up</v-btn>
+          class="mr-2"
+          text
+          @click="reset"
+        >Reset</v-btn>
+        <v-btn
+          type="submit"
+          @click.prevent="submit"
+          color="primary"
+        >Sign up</v-btn>
       </div>
     </v-form>
-    <app-feedback v-if="status" @closed="status = ''">{{status}}</app-feedback>
     <div class="text-center text-muted mt-5">
       Already have an account?
-      <router-link to="/auth/login">Go to login</router-link>.
+      <router-link to="/auth/login">Sign in</router-link>
     </div>
-  </div>
+    <transition name="fade">
+      <app-feedback
+        v-if="status"
+        class="mt-5"
+        @closed="status = ''"
+      >{{status}}</app-feedback>
+    </transition>
+  </v-container>
 </template>
 
 <script>
+import appFeedback from '@/components/ui/Feedback.vue';
+
+const DEFAULT_ENTITY = {
+  email: '',
+  name: '',
+  password: '',
+};
+
 export default {
+  components: {
+    appFeedback,
+  },
   data() {
     return {
       status: '',
       passwordConfirmation: '',
       showPasswords: false,
-      entity: {
-        email: '',
-        name: '',
-        password: '',
-      },
+      entity: { ...DEFAULT_ENTITY },
     };
+  },
+  props: {
+    initialEmail: {
+      type: String,
+      required: false,
+    },
+  },
+  created() {
+    if (this.initialEmail) {
+      this.entity.email = this.initialEmail;
+    }
   },
   computed: {
     passwordInputType() {
@@ -71,6 +108,7 @@ export default {
   },
   methods: {
     async submit() {
+      this.status = '';
       console.log('submitting');
 
       if (this.entity.email === '') {
@@ -95,15 +133,25 @@ export default {
         });
         this.$router.push('/surveys');
       } catch (error) {
+        console.log(error.response);
         switch (error.response.status) {
           case 409:
-            this.status = error.response.data;
+            this.status = error.response.data.message;
             break;
           default:
             this.status = 'Unknown error :/';
         }
       }
     },
+    reset() {
+      this.entity = { ...DEFAULT_ENTITY };
+    },
   },
 };
 </script>
+
+<style scoped>
+a {
+  text-decoration: none;
+}
+</style>

@@ -11,6 +11,8 @@ import DraftSubmission from '@/views/submissions/drafts/Draft.vue';
 import Login from '@/views/auth/Login.vue';
 import Register from '@/views/auth/Register.vue';
 import Profile from '@/views/auth/Profile.vue';
+import ForgotPassword from '@/views/auth/ForgotPassword.vue';
+import ResetPassword from '@/views/auth/ResetPassword.vue';
 
 import Experiment from '@/views/experiment/Experiments.vue';
 import SandboxAR from '@/views/experiment/sandbox/SandboxAR.vue';
@@ -103,16 +105,28 @@ const routes = [
     path: '/auth/login',
     name: 'auth-login',
     component: Login,
+    props: true,
   },
   {
     path: '/auth/register',
     name: 'auth-register',
     component: Register,
+    props: true,
   },
   {
     path: '/auth/profile',
     name: 'auth-profile',
     component: Profile,
+  },
+  {
+    path: '/auth/forgot-password',
+    name: 'auth-forgot-password',
+    component: ForgotPassword,
+  },
+  {
+    path: '/auth/reset-password',
+    name: 'auth-reset-password',
+    component: ResetPassword,
   },
   // experiment
   {

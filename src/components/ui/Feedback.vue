@@ -1,8 +1,20 @@
 <template>
-  <v-alert border="left" :type="type" role="alert">
-    <strong class="mr-1">{{title}}</strong>
+  <v-alert
+    border="left"
+    :type="type"
+    colored-border
+    elevation="3"
+  >
+    <strong
+      v-if="title"
+      class="mr-1"
+    >{{title}}</strong>
     <slot />
-    <v-icon class="float-right" @click="$emit('closed')">mdi-close-circle</v-icon>
+    <v-icon
+      v-if="closeable"
+      class="float-right"
+      @click="$emit('closed')"
+    >mdi-close-circle</v-icon>
   </v-alert>
 </template>
 
@@ -11,12 +23,16 @@ export default {
   props: {
     title: {
       type: String,
-      default: 'Error!',
+      default: '',
     },
     type: {
       type: String,
-      default: 'warning',
+      default: 'error',
       required: false,
+    },
+    closeable: {
+      type: Boolean,
+      default: true,
     },
   },
 };

@@ -66,10 +66,14 @@ export default function buildScriptQuestionIframeContents({
           onMessage,
           handleLoaded,
           statusTypes,
+<<<<<<< HEAD
           renderScript,
           runScript,
           update,
         } from 'http://localhost:8081/iframeMessaging.js';
+=======
+        } from 'http://localhost:5500/public/iframeMessaging.js';
+>>>>>>> 242aec797cb56c898db7d8632ad57e2cab948f3a
 
         window.log = requestLogMessage;
 
