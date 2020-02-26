@@ -90,12 +90,14 @@ export default {
       const submissionJSON = JSON.stringify(this.submission);
       const valueJSON = JSON.stringify(this.value);
       const contextJSON = JSON.stringify(this.meta.context || {});
+      const controlJSON = JSON.stringify(this.control);
 
       const html = buildScriptQuestionIframeContents({
         scriptSource: this.source.content,
         submissionJSON,
         valueJSON,
         contextJSON,
+        controlJSON,
       });
       iframe.src = `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
 

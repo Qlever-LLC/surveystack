@@ -147,3 +147,66 @@ export function h(tag, attributes, ...children) {
   });
   return el;
 }
+
+
+// export function setState(state) {
+
+// }
+
+// export function setState({
+//   context = {},
+//   value = null,
+// }) {
+//   // state.context = context;
+//   // state.value = value;
+//   const nextState = {
+//     ...state,
+//     context,
+//     value,
+//   };
+//   // Trigger render(process(state))
+//   // log('running setState');
+//   runScript(props, nextState);
+// }
+
+
+export function runScript(props, state, process, render) {
+  // log('runScript');
+  // log('setState', JSON.stringify(typeof setState));
+  const {
+    context,
+    value,
+    status,
+  } = process(props, state);
+  if (context) {
+    requestSetContext(context);
+    state.context = context;
+  }
+  if (value) {
+    requestSetValue(value);
+    state.value = value;
+  }
+  if (status) {
+    requestSetStatus(status);
+  }
+  renderScript(props, state, process, render);
+}
+
+
+// in iframe we can define `const setState = reprocess(props)`
+export const update = (props, process, render) => (state) => {
+  const nextState = { ...state };
+  runScript(props, nextState, process, render);
+};
+
+export function renderScript(props, state, process, render) {
+  const root = document.querySelector('#root');
+  root.innerHTML = '';
+  window.log('typeof setstate', typeof update(props));
+  root.appendChild(render(props, {
+    context: state.context,
+    value: state.value,
+    submission: state.submission,
+    setState: update(props, process, render),
+  }));
+}

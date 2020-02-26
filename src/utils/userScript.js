@@ -51,6 +51,8 @@ export default function buildScriptQuestionIframeContents({
   submissionJSON,
   valueJSON,
   contextJSON,
+  controlJSON,
+  paramsJSON,
 }) {
   return `<body>
       <div id="root"></div>
@@ -64,13 +66,15 @@ export default function buildScriptQuestionIframeContents({
           onMessage,
           handleLoaded,
           statusTypes,
+          renderScript,
+          runScript,
+          update,
         } from 'http://localhost:8081/iframeMessaging.js';
 
         window.log = requestLogMessage;
 
         function getInitialState() {
           return {
-            submission: ${submissionJSON},
             value: ${valueJSON},
             context: ${contextJSON},
             // scriptHasRun: ${!!valueJSON},
@@ -78,6 +82,11 @@ export default function buildScriptQuestionIframeContents({
         };
 
         let state = getInitialState();
+        const props = {
+          submission: ${submissionJSON},
+          control: ${controlJSON},
+          params: ${paramsJSON},
+        }
 
         ${scriptSource}
 
@@ -86,50 +95,17 @@ export default function buildScriptQuestionIframeContents({
           root.innerHTML = '';
         }
 
-        function setState({ context = {}, value = null }) {
-          state.context = context;
-          state.value = value;
-          // Trigger render(process(state))
-          log('running setState');
-          runScript();
-        }
 
-        onMessage('REQUEST_RUN_SCRIPT', runScript);
+        window.log('buildiframe typeof process', typeof process);
+        onMessage('REQUEST_RUN_SCRIPT', () => runScript(props, state, process, render));
 
-        function runScript() {
-          log('runScript');
-          log('setState', JSON.stringify(typeof setState));
-          const {
-            context,
-            value,
-            status,
-          } = process(state);
-          if (context) {
-            requestSetContext(context);
-            state.context = context;
-          }
-          if (value) {
-            requestSetValue(value);
-            state.value = value;
-          }
-          if (status) {
-            requestSetStatus(status);
-          }
-          renderScript(state);
-        }
+        // const setState = update(props);
 
-        function renderScript(state) {
-          const root = document.querySelector('#root');
-          root.innerHTML = '';
-          root.appendChild(render({
-            context: state.context,
-            value: state.value,
-            submission: state.submission,
-            setState,
-          }));
-        }
 
-        onMessage('REQUEST_RENDER_SCRIPT', () => renderScript(state));
+
+
+
+        onMessage('REQUEST_RENDER_SCRIPT', () => renderScript(props, state, process, render));
 
         onMessage('REQUEST_RESET_SCRIPT', () => {
           state = getInitialState();
