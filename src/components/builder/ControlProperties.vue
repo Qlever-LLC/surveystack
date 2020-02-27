@@ -31,7 +31,14 @@
           <div>{{ item.name }}</div>
         </template>
       </v-autocomplete>
-
+      <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
+      <v-textarea
+        v-model="scriptParams"
+        @change="handleScriptParamsChange"
+        v-if="isScript"
+        label="Parameters"
+        outlined
+      />
       <v-checkbox
         class="ma-0"
         color="blue"
@@ -150,7 +157,9 @@ export default {
   data() {
     return {
       showAdvanced: false,
+      // if we migrate to using Vue Composition API, the script functionality could be extracted out into a `useScriptProperties` hook
       scriptSourceId: null,
+      scriptParams: (this.control && this.control.options && JSON.stringify(this.control.options.params)) || {},
       scriptSourceIsLoading: false,
       scriptSourceItems: [],
     };
@@ -185,6 +194,16 @@ export default {
     },
     handleScriptSourceChange(id) {
       this.$emit('set-control-source', id);
+    },
+    handleScriptParamsChange(params) {
+      // TODO: review safety, security
+      // Validate params is valid json object
+      try {
+        this.$emit('set-control-params', JSON.parse(params));
+        // this.control.options.params = JSON.parse(params);
+      } catch (error) {
+        console.warn('script params not valid JSON', error);
+      }
     },
   },
   created() {

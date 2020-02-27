@@ -55,6 +55,7 @@
               @code-relevance="highlight('relevance')"
               @code-constraint="highlight('constraint')"
               @set-control-source="setControlSource"
+              @set-control-params="setControlParams"
             />
           </div>
         </v-card>
@@ -408,6 +409,9 @@ export default {
     },
     setControlSource(id) {
       this.control.options.source = id;
+    },
+    setControlParams(params) {
+      this.control.options.params = params;
     },
   },
   computed: {

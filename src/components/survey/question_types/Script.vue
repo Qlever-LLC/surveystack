@@ -91,6 +91,7 @@ export default {
       const valueJSON = JSON.stringify(this.value);
       const contextJSON = JSON.stringify(this.meta.context || {});
       const controlJSON = JSON.stringify(this.control);
+      const paramsJSON = JSON.stringify((this.control.options && this.control.options.params) || {});
 
       const html = buildScriptQuestionIframeContents({
         scriptSource: this.source.content,
@@ -98,6 +99,7 @@ export default {
         valueJSON,
         contextJSON,
         controlJSON,
+        paramsJSON,
       });
       iframe.src = `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
 
