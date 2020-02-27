@@ -1,45 +1,47 @@
 <template>
-  <v-container>
-    <h1>Login</h1>
-    <p>Default admin: admin@our-sci.net // 1234</p>
-    <v-form>
-      <v-text-field
-        label="E-Mail"
-        type="text"
-        class="form-control"
-        :value="entity.email"
-        @input="entity.email = $event.toLowerCase()"
-      />
-      <v-text-field
-        label="Password"
-        :type="passwordInputType"
-        class="form-control"
-        v-model="entity.password"
-        :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-        @click:append="showPasswords = !showPasswords"
-      />
-      <small>
-        <router-link :to="{name: 'auth-forgot-password', query: {email: entity.email}}">Forgot password?</router-link>
-      </small>
-      <div class="d-flex justify-end">
-        <v-btn
-          type="button"
-          class="mr-2"
-          text
-          @click="reset"
-        >Reset</v-btn>
-        <v-btn
-          type="submit"
-          @click.prevent="submit"
-          color="primary"
-        >Login</v-btn>
-      </div>
-    </v-form>
+  <v-container class="mw-40">
+    <v-card class="pa-5">
+      <h1>Login</h1>
+      <p>Default admin: admin@our-sci.net // 1234</p>
+      <v-form>
+        <v-text-field
+          label="E-Mail"
+          type="text"
+          class="form-control"
+          :value="entity.email"
+          @input="entity.email = $event.toLowerCase()"
+        />
+        <v-text-field
+          label="Password"
+          :type="passwordInputType"
+          class="form-control"
+          v-model="entity.password"
+          :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+          @click:append="showPasswords = !showPasswords"
+        />
+        <small>
+          <router-link :to="{name: 'auth-forgot-password', query: {email: entity.email}}">Forgot password?</router-link>
+        </small>
+        <div class="d-flex justify-end">
+          <v-btn
+            type="button"
+            class="mr-2"
+            text
+            @click="reset"
+          >Reset</v-btn>
+          <v-btn
+            type="submit"
+            @click.prevent="submit"
+            color="primary"
+          >Login</v-btn>
+        </div>
+      </v-form>
 
-    <div class="text-center text-muted mt-5">
-      Don't have an account?
-      <router-link :to="{name: 'auth-register', params: {initialEmail: entity.email, initialPassword: entity.password}}">Register now</router-link>
-    </div>
+      <div class="text-center text-muted mt-5">
+        Don't have an account?
+        <router-link :to="{name: 'auth-register', params: {initialEmail: entity.email, initialPassword: entity.password}}">Register now</router-link>
+      </div>
+    </v-card>
     <transition name="fade">
       <app-feedback
         v-if="status"

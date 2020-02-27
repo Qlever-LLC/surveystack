@@ -1,22 +1,23 @@
 <template>
-  <v-container>
-    <h1>Password forgotten</h1>
-    <p>Enter your email address and we will send you a link for setting a new password.</p>
+  <v-container class="mw-40">
+    <v-card class="pa-5">
+      <h1>Password forgotten</h1>
+      <p>Enter your email address and we will send you a link for setting a new password.</p>
 
-    <v-form @submit.prevent="submit">
-      <v-text-field
-        v-model="email"
-        label="Email"
-      />
-      <div class="d-flex justify-end">
-        <v-btn
-          type="submit"
-          color="primary"
-        >Submit</v-btn>
-      </div>
+      <v-form @submit.prevent="submit">
+        <v-text-field
+          v-model="email"
+          label="Email"
+        />
+        <div class="d-flex justify-end">
+          <v-btn
+            type="submit"
+            color="primary"
+          >Submit</v-btn>
+        </div>
 
-    </v-form>
-
+      </v-form>
+    </v-card>
     <transition name="fade">
       <app-feedback
         v-if="status"

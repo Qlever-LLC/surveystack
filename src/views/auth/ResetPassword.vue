@@ -1,29 +1,31 @@
 <template>
-  <v-container>
-    <h1>New password</h1>
-    <p>Set a new password for {{this.email}}</p>
-    <v-form @submit.prevent="submit">
-      <v-text-field
-        v-model="newPassword"
-        label="Password"
-        :type="passwordInputType"
-        :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-        @click:append="showPasswords = !showPasswords"
-      />
-      <v-text-field
-        v-model="newPasswordConfirmation"
-        label="Password confirmation"
-        :type="passwordInputType"
-        :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-        @click:append="showPasswords = !showPasswords"
-      />
-      <div class="d-flex justify-end">
-        <v-btn
-          type="submit"
-          color="primary"
-        >Set password</v-btn>
-      </div>
-    </v-form>
+  <v-container class="mw-40">
+    <v-card class="pa-5">
+      <h1>New password</h1>
+      <p>Set a new password for {{this.email}}</p>
+      <v-form @submit.prevent="submit">
+        <v-text-field
+          v-model="newPassword"
+          label="Password"
+          :type="passwordInputType"
+          :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+          @click:append="showPasswords = !showPasswords"
+        />
+        <v-text-field
+          v-model="newPasswordConfirmation"
+          label="Password confirmation"
+          :type="passwordInputType"
+          :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+          @click:append="showPasswords = !showPasswords"
+        />
+        <div class="d-flex justify-end">
+          <v-btn
+            type="submit"
+            color="primary"
+          >Set password</v-btn>
+        </div>
+      </v-form>
+    </v-card>
     <transition name="fade">
       <app-feedback
         v-if="status"
@@ -32,7 +34,6 @@
         :type="status.type"
       >{{status.message}}</app-feedback>
     </transition>
-
     <transition name="fade">
       <app-feedback
         v-if="showSuccessMessage"

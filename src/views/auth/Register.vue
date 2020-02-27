@@ -1,58 +1,61 @@
 <template>
-  <v-container>
-    <h1>Register</h1>
-    <v-form class="mb-5">
-      <v-text-field
-        label="E-Mail"
-        type="text"
-        class="form-control"
-        :value="entity.email.toLowerCase()"
-        @input="entity.email = $event.toLowerCase()"
-      />
+  <v-container class="mw-40">
+    <v-card class="pa-5">
+      <h1>Register</h1>
+      <v-form class="mb-5">
+        <v-text-field
+          label="E-Mail"
+          type="text"
+          class="form-control"
+          :value="entity.email.toLowerCase()"
+          @input="entity.email = $event.toLowerCase()"
+        />
 
-      <v-text-field
-        label="Name"
-        type="text"
-        class="form-control"
-        v-model="entity.name"
-      />
+        <v-text-field
+          label="Name"
+          type="text"
+          class="form-control"
+          v-model="entity.name"
+        />
 
-      <v-text-field
-        label="Password"
-        :type="passwordInputType"
-        class="form-control"
-        v-model="entity.password"
-        :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-        @click:append="showPasswords = !showPasswords"
-      />
+        <v-text-field
+          label="Password"
+          :type="passwordInputType"
+          class="form-control"
+          v-model="entity.password"
+          :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+          @click:append="showPasswords = !showPasswords"
+        />
 
-      <v-text-field
-        label="Password confirmation"
-        :type="passwordInputType"
-        class="form-control"
-        v-model="passwordConfirmation"
-        :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-        @click:append="showPasswords = !showPasswords"
-      />
+        <v-text-field
+          label="Password confirmation"
+          :type="passwordInputType"
+          class="form-control"
+          v-model="passwordConfirmation"
+          :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+          @click:append="showPasswords = !showPasswords"
+        />
 
-      <div class="d-flex justify-end">
-        <v-btn
-          type="button"
-          class="mr-2"
-          text
-          @click="reset"
-        >Reset</v-btn>
-        <v-btn
-          type="submit"
-          @click.prevent="submit"
-          color="primary"
-        >Sign up</v-btn>
+        <div class="d-flex justify-end">
+          <v-btn
+            type="button"
+            class="mr-2"
+            text
+            @click="reset"
+          >Reset</v-btn>
+          <v-btn
+            type="submit"
+            @click.prevent="submit"
+            color="primary"
+          >Sign up</v-btn>
+        </div>
+      </v-form>
+      <div class="text-center text-muted mt-5">
+        Already have an account?
+        <router-link to="/auth/login">Sign in</router-link>
       </div>
-    </v-form>
-    <div class="text-center text-muted mt-5">
-      Already have an account?
-      <router-link to="/auth/login">Sign in</router-link>
-    </div>
+
+    </v-card>
     <transition name="fade">
       <app-feedback
         v-if="status"
