@@ -189,16 +189,60 @@ export function runScript(props, state, process, render) {
   renderScript(props, nextState, process, render);
 }
 
-
-// in iframe we can define `const setState = update(props)`
+// lets us define `const setState = update(props, process, render)` which allows user to call
+// `setState` in their scripts
 export const update = (props, process, render) => (state) => {
   runScript(props, state, process, render);
 };
 
+/**
+ *
+ */
 export function renderScript(props, state, process, render) {
   const root = document.querySelector('#root');
   root.innerHTML = '';
   root.appendChild(
     render(props, state, update(props, process, render)),
   );
+}
+
+
+export function createUI(queue = []) {
+  return {
+    renderQueue: queue,
+    enqueue(...items) {
+      this.renderQueue = [...this.renderQueue, ...items];
+      return this.renderQueue;
+    },
+    dequeue() {
+      const [item, ...rest] = this.renderQueue;
+      this.renderQueue = rest;
+      return item;
+    },
+    executeRenderQueue() {
+      return this.renderQueue.map(item => item());
+    },
+    plot(x, y) {
+      const node = document.createElement('div');
+      node.className = 'plot';
+      node.style.border = '1px solid red';
+      node.style.borderLeftColor = 'black';
+      node.style.borderBottomColor = 'black';
+      node.innerHTML = 'plot <br/> x <br/> o';
+      return node;
+    },
+    info(message) {
+      const node = document.createElement('div');
+      node.className = 'info';
+      node.style.border = '1px solid blue';
+      node.innerHTML = message;
+      return node;
+    },
+    addPlot(x, y) {
+      return this.enqueue(() => this.plot(x, y));
+    },
+    addInfo(message) {
+      return this.enqueue(() => this.info(message));
+    },
+  };
 }

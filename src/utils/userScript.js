@@ -36,6 +36,7 @@ export default function buildScriptQuestionIframeContents({
           renderScript,
           runScript,
           resetDOM,
+          createUI,
         } from 'http://localhost:8081/iframeMessaging.js';
 
         window.log = requestLogMessage;
@@ -44,7 +45,7 @@ export default function buildScriptQuestionIframeContents({
           return {
             value: ${valueJSON},
             context: ${contextJSON},
-          }
+          };
         };
 
         const state = getInitialState();
