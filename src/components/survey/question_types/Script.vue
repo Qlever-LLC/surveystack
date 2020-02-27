@@ -82,8 +82,12 @@ export default {
     },
     handleRequestSetContext({ context }) {
       // TODO: ensure `context` is sanitized
-      console.log('set context', context);
       this.$emit('setContext', context);
+    },
+    handleRequestSetRenderQueue({ queue }) {
+      // TODO: ensure `context` is sanitized
+      console.log('set render queue', queue);
+      this.$emit('setRenderQueue', queue);
     },
     initializeIframe() {
       const { iframe } = this.$refs;
@@ -110,6 +114,7 @@ export default {
         onMessage('REQUEST_SET_QUESTION_STATUS', this.handleRequestSetQuestionStatus),
         onMessage('REQUEST_LOG_MESSAGE', this.handleRequestLogMessage),
         onMessage('REQUEST_SET_QUESTION_CONTEXT', this.handleRequestSetContext),
+        onMessage('REQUEST_SET_QUESTION_RENDER_QUEUE', this.handleRequestSetRenderQueue),
       );
     },
     async fetchScriptSource() {

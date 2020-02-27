@@ -29,6 +29,7 @@ export default function buildScriptQuestionIframeContents({
           requestSetStatus,
           requestSetValue,
           requestSetContext,
+          requestSetRenderQueue,
           requestLogMessage,
           onMessage,
           handleLoaded,

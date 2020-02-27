@@ -60,6 +60,16 @@ export function requestSetContext(context) {
   }, origin);
 }
 
+export function requestSetRenderQueue(queue) {
+  const [origin] = window.location.ancestorOrigins;
+  window.parent.postMessage({
+    type: 'REQUEST_SET_QUESTION_RENDER_QUEUE',
+    payload: {
+      queue,
+    },
+  }, origin);
+}
+
 export function requestSetValue(value) {
   let origin;
 
@@ -186,6 +196,13 @@ export function runScript(props, state, process, render) {
   if (nextState.status) {
     requestSetStatus(nextState.status);
   }
+  if (nextState.ui && nextState.ui.renderQueue) {
+    window.log('renderQueue', nextState.ui.renderQueue.map(f => String(f)));
+    requestSetRenderQueue(nextState.ui.renderQueue.map(f => String(f)));
+    // TODO: add listener on parent for requestSetRenderQueue
+    // TODO: pass createUI(renderQueue) into render function
+    // TODO: how to store and rehydrate renderQueue? could store as string and eval()? or maybe function constructor
+  }
   renderScript(props, nextState, process, render);
 }
 
@@ -242,6 +259,7 @@ export function createUI(queue = []) {
       return this.enqueue(() => this.plot(x, y));
     },
     addInfo(message) {
+      // TODO: figure out how to make this store actual values passed in, instead of variable name when stringified
       return this.enqueue(() => this.info(message));
     },
   };

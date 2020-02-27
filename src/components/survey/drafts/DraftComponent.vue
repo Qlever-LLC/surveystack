@@ -66,6 +66,7 @@
                   @changed="setValue"
                   @setStatus="setStatus"
                   @setContext="setContext"
+                  @setRenderQueue="setRenderQueue"
                   @show-nav="showNav(true)"
                   @hide-nav="showNav(false)"
                   @next="handleNext"
@@ -252,6 +253,12 @@ export default {
       const field = submissionUtils.getSubmissionField(this.submission, this.survey, this.position);
       field.meta.context = context;
       // TODO: update meta modified;
+      this.$emit('change', this.submission);
+      this.persist();
+    },
+    setRenderQueue(queue) {
+      const field = submissionUtils.getSubmissionField(this.submission, this.survey, this.position);
+      field.meta.renderQueue = queue;
       this.$emit('change', this.submission);
       this.persist();
     },
