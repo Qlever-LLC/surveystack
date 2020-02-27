@@ -60,6 +60,7 @@ router.delete('/submissions/:id', catchErrors(submissionController.deleteSubmiss
 
 /** Surveys */
 router.get('/surveys', catchErrors(surveyController.getSurveys));
+router.get('/surveys/page', catchErrors(surveyController.getSurveyPage));
 router.get('/surveys/:id', catchErrors(surveyController.getSurvey));
 router.post('/surveys', [assertNameNotEmpty], catchErrors(surveyController.createSurvey));
 router.put(

@@ -1,9 +1,11 @@
 import assert from 'assert';
 import { ObjectId } from 'mongodb';
+import boom from '@hapi/boom';
 
 import { db } from '../db';
 
 const col = 'surveys';
+const DEFAULT_LIMIT = 20;
 
 const sanitize = entity => {
   entity._id = new ObjectId(entity._id);
@@ -38,6 +40,73 @@ const getSurveys = async (req, res) => {
     .find({})
     .toArray();
   return res.send(entities);
+};
+
+const getSurveyPage = async (req, res) => {
+  let entities;
+  const match = {};
+  let skip = 0;
+  let limit = DEFAULT_LIMIT;
+
+  const { q } = req.query;
+  if (q) {
+    match.name = { $regex: q, $options: 'i' };
+  }
+
+  const pipeline = [{ $match: match }];
+  if (!q) {
+    pipeline.push({ $sort: { dateModified: -1 } });
+  }
+
+  // skip
+  if (req.query.skip) {
+    try {
+      const querySkip = Number.parseInt(req.query.skip);
+      if (querySkip > 0) {
+        skip = querySkip;
+      }
+    } catch (error) {
+      throw boom.badRequest(`Bad query paramter skip: ${skip}`);
+    }
+  }
+
+  // limit
+  if (req.query.limit) {
+    try {
+      const queryLimit = Number.parseInt(req.query.limit);
+      if (queryLimit > 0) {
+        limit = queryLimit;
+      }
+    } catch (error) {
+      throw boom.badRequest(`Bad query paramter limit: ${limit}`);
+    }
+  }
+
+  // pagination stage
+  const paginationStages = [
+    {
+      $facet: {
+        content: [{ $skip: skip }, { $limit: limit }],
+        pagination: [{ $count: 'total' }, { $addFields: { skip, limit } }],
+      },
+    },
+    { $unwind: '$pagination' },
+  ];
+
+  pipeline.push(...paginationStages);
+
+  entities = await db
+    .collection(col)
+    .aggregate(pipeline)
+    .toArray();
+
+  // empty array when ther is no match
+  // however, we still want content and pagination properties
+  if (!entities[0]) {
+    entities[0] = { content: [], pagination: { total: 0, skip, limit } };
+  }
+
+  return res.send(entities[0]);
 };
 
 const getSurvey = async (req, res) => {
@@ -103,6 +172,7 @@ const deleteSurvey = async (req, res) => {
 
 export default {
   getSurveys,
+  getSurveyPage,
   getSurvey,
   createSurvey,
   updateSurvey,
