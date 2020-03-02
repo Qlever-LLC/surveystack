@@ -185,44 +185,51 @@ export function resetDOM() {
 }
 
 
-export function runScript(props, state, process, render) {
-  const nextState = process(props, state);
-  if (nextState.context) {
-    requestSetContext(nextState.context);
+export function updateParentState(state) {
+  if (state.context) {
+    requestSetContext(state.context);
   }
-  if (nextState.value) {
-    requestSetValue(nextState.value);
+  if (state.value) {
+    requestSetValue(state.value);
   }
-  if (nextState.status) {
-    requestSetStatus(nextState.status);
+  if (state.status) {
+    requestSetStatus(state.status);
   }
-  if (nextState.ui && nextState.ui.renderQueue) {
-    window.log('renderQueue', nextState.ui.renderQueue.map(f => String(f)));
-    requestSetRenderQueue(nextState.ui.renderQueue.map(f => String(f)));
+  if (state.ui && state.ui.renderQueue) {
+    window.log('renderQueue', state.ui.renderQueue.map(f => String(f)));
+    requestSetRenderQueue(state.ui.renderQueue.map(f => String(f)));
     // TODO: add listener on parent for requestSetRenderQueue
     // TODO: pass createUI(renderQueue) into render function
     // TODO: how to store and rehydrate renderQueue? could store as string and eval()? or maybe function constructor
   }
-  renderScript(props, nextState, process, render);
 }
 
-// lets us define `const setState = update(props, process, render)` which allows user to call
-// `setState` in their scripts
-export const update = (props, process, render) => (state) => {
-  runScript(props, state, process, render);
-};
-
-/**
- *
- */
-export function renderScript(props, state, process, render) {
+function updateDOM(node) {
   const root = document.querySelector('#root');
   root.innerHTML = '';
-  root.appendChild(
-    render(props, state, update(props, process, render)),
-  );
+  root.appendChild(node);
 }
 
+export const renderScript = (process, render, props) => (state) => {
+  updateDOM(
+    render(props, state, runScript(process, render, props)),
+  );
+};
+
+export const runScript = (process, render, props) => (state) => {
+  const nextState = process(props, state);
+  updateParentState(nextState);
+  renderScript(process, render, props)(state);
+};
+
+
+// const runScriptFromState = runScript3(process, render, props);
+// const renderScriptFromState = renderScript2(process, render, props);
+// const runScript3 = (process, renderScriptFromState, props) => (state) => {
+//   const nextState = process(props, state);
+//   updateParentState(nextState);
+//   renderScriptFromState(nextState);
+// };
 
 export function createUI(queue = []) {
   return {

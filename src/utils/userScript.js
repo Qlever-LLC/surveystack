@@ -58,8 +58,8 @@ export default function buildScriptQuestionIframeContents({
 
         ${scriptSource}
 
-        onMessage('REQUEST_RUN_SCRIPT', () => runScript(props, state, process, render));
-        onMessage('REQUEST_RENDER_SCRIPT', () => renderScript(props, state, process, render));
+        onMessage('REQUEST_RUN_SCRIPT', () => runScript(process, render, props)(state));
+        onMessage('REQUEST_RENDER_SCRIPT', () => renderScript(process, render, props)(state));
         onMessage('REQUEST_RESET_SCRIPT', resetDOM);
 
         document.addEventListener('DOMContentLoaded', handleLoaded);
