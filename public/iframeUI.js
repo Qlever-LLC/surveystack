@@ -1,4 +1,4 @@
-import marked from 'http://localhost:8081/marked.esm.js';
+import marked from 'https://cdn.jsdelivr.net/npm/marked@latest/lib/marked.esm.js';
 
 export function card(content, { header, meta, footer }) {
   const node = document.createElement('div');
@@ -66,6 +66,12 @@ export function markdown(content) {
   return node;
 }
 
+export function md(content) {
+  const node = document.createElement('div');
+  node.innerText = content;
+  return node;
+}
+
 
 export function createUI() {
   return {
@@ -74,6 +80,7 @@ export function createUI() {
     message,
     card,
     markdown,
+    md,
     add(...elements) {
       elements.forEach(el => this.node.appendChild(el));
     },

@@ -37,6 +37,7 @@
         @change="handleScriptParamsChange"
         v-if="isScript"
         label="Parameters"
+        :rules="[validateScriptParams]"
         outlined
       />
       <v-checkbox
@@ -159,7 +160,8 @@ export default {
       showAdvanced: false,
       // if we migrate to using Vue Composition API, the script functionality could be extracted out into a `useScriptProperties` hook
       scriptSourceId: null,
-      scriptParams: (this.control && this.control.options && JSON.stringify(this.control.options.params)) || {},
+      scriptParams: (this.control && this.control.options && JSON.stringify(this.control.options.params))
+        || JSON.stringify({}),
       scriptSourceIsLoading: false,
       scriptSourceItems: [],
     };
@@ -204,6 +206,14 @@ export default {
       } catch (error) {
         console.warn('script params not valid JSON', error);
       }
+    },
+    validateScriptParams(params) {
+      try {
+        JSON.parse(params);
+      } catch (err) {
+        return 'Invalid JSON';
+      }
+      return true;
     },
   },
   created() {

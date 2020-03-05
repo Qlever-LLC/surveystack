@@ -129,7 +129,6 @@ export default {
   async mounted() {
     await this.fetchScriptSource();
     this.initializeIframe();
-    console.log('env', process.env);
   },
   destroyed() {
     this.messageEventListeners.forEach(handler => window.removeEventListener('message', handler));
