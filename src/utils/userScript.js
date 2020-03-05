@@ -21,7 +21,12 @@ export default function buildScriptQuestionIframeContents({
   controlJSON,
   paramsJSON,
 }) {
-  return `<body>
+  return `
+  <head>
+    <!-- <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet"> -->
+    <link href="http://localhost:8081/iframeStyles.css" rel="stylesheet">
+  </head>
+  <body>
       <div id="root"></div>
       <script type="module">
         import {
@@ -37,8 +42,11 @@ export default function buildScriptQuestionIframeContents({
           renderScript,
           runScript,
           resetDOM,
-          createUI,
+          // createUI,
         } from 'http://localhost:8081/iframeMessaging.js';
+
+        import { createUI } from 'http://localhost:8081/iframeUI.js';
+        import * as ui from 'http://localhost:8081/iframeUI.js';
 
         window.log = requestLogMessage;
 
@@ -64,5 +72,6 @@ export default function buildScriptQuestionIframeContents({
 
         document.addEventListener('DOMContentLoaded', handleLoaded);
       </script>
+      <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     </body>`;
 }

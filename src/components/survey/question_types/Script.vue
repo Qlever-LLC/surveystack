@@ -8,15 +8,18 @@
     />
     <v-btn
       @click="requestRunScript"
-      class="full"
+      class="full run-button"
       depressed
       large
       color="primary"
     >
       Run Script
     </v-btn>
-    status: {{ meta && meta.status }}
-    status message: {{ meta && meta.statusMessage }}
+    <p class="status">
+      status: {{ meta && meta.status }}
+      <br/>
+      status message: {{ meta && meta.statusMessage }}
+    </p>
   </div>
 </template>
 
@@ -126,6 +129,7 @@ export default {
   async mounted() {
     await this.fetchScriptSource();
     this.initializeIframe();
+    console.log('env', process.env);
   },
   destroyed() {
     this.messageEventListeners.forEach(handler => window.removeEventListener('message', handler));
@@ -134,6 +138,24 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
+iframe {
+  width: 100%;
+  display: block;
+  height: 50vh;
+}
 
+.status {
+
+}
+
+.run-button {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+.question-script {
+  width: 100%;
+}
 </style>
