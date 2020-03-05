@@ -1,8 +1,14 @@
 <template>
   <v-container>
+    <v-text-field
+      v-model="search"
+      label="Search"
+      append-icon="mdi-magnify"
+    />
+    <div class="d-flex justify-end"><small class="text--secondary">{{surveys.pagination.total}} results</small></div>
     <v-card>
       <div
-        v-for="e in entities"
+        v-for="e in surveys.content"
         :key="e._id"
       >
         <v-list-item :to="`/surveys/${e._id}`">
@@ -22,42 +28,39 @@
 
 <script>
 import api from '@/services/api.service';
-import * as db from '@/store/db';
 
 export default {
   data() {
     return {
-      entities: [],
+      search: '',
+      surveys: {
+        content: [],
+        pagination: {
+          total: 0,
+          skip: 0,
+          limit: 100000,
+        },
+      },
     };
   },
+  watch: {
+    search() {
+      this.fetchData();
+    },
+  },
+  methods: {
+    async fetchData() {
+      try {
+        const { data } = await api.get(`/surveys/page?q=${this.search}`);
+        this.surveys = data;
+      } catch (e) {
+        // TODO: use cached data?
+        console.log('something went wrong:', e);
+      }
+    },
+  },
   async created() {
-    let data = {};
-
-    try {
-      // eslint-disable-next-line prefer-destructuring
-      data = (await api.get('/surveys')).data;
-    } catch (error) {
-      console.log('using cached data');
-      data = (await new Promise((resolve) => {
-        db.getAllSurveys(surveys => resolve(surveys));
-      }));
-    }
-
-
-    this.entities = data;
-    db.openDb(() => {
-      // TODO, this is not necessary if pulling cached data in the first place
-      data.forEach((d) => {
-        db.persistSurvey(d);
-      });
-    });
-    // this.entities = data;
+    await this.fetchData();
   },
 };
 </script>
-
-<style scoped>
-.center-items {
-  vertical-align: center;
-}
-</style>

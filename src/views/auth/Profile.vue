@@ -1,5 +1,8 @@
 <template>
-  <div v-if="isLoggedIn">
+  <v-container
+    v-if="isLoggedIn"
+    class="mw-40"
+  >
     <app-feedback
       title="Shapeshift:"
       type="info"
@@ -13,17 +16,23 @@
         @click.prevent="$store.dispatch('auth/leaveShapeshift')"
       >Click to return as '{{$store.state.auth.shapeshiftUser.email}}'</a>
     </app-feedback>
-    <h2>Login successful</h2>
+    <h1>Profile</h1>
     <h4>
       You are logged in as
       <strong>{{ user.email }}</strong>.
     </h4>
 
-    <div class="mt-2">
-      <v-btn class="btn btn-primary mr-2" @click="goToEditSelf">Edit</v-btn>
-      <v-btn class="btn btn-primary" @click="logout">Logout</v-btn>
+    <div class="d-flex justify-end">
+      <v-btn
+        text
+        @click="goToEditSelf"
+      >Edit</v-btn>
+      <v-btn
+        color="primary"
+        @click="logout"
+      >Logout</v-btn>
     </div>
-  </div>
+  </v-container>
   <div v-else>You are not logged in.</div>
 </template>
 
