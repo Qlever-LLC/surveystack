@@ -22,7 +22,7 @@ export default function buildScriptQuestionIframeContents({
   paramsJSON,
 }) {
   const baseURL = process.env.NODE_ENV === 'production'
-    ? 'https://app.our-sci.net'
+    ? 'https://dev.our-sci.net'
     : `http://localhost:${process.env.VUE_APP_DEV_SERVER_PORT || 8080}`;
   return `
   <head>
@@ -69,7 +69,7 @@ export default function buildScriptQuestionIframeContents({
 
         ${scriptSource}
 
-        onMessage('REQUEST_RUN_SCRIPT', () => runScript(process, render, props)(state));
+        onMessage('REQUEST_RUN_SCRIPT', (state) => runScript(process, render, props)(state));
         onMessage('REQUEST_RENDER_SCRIPT', () => renderScript(process, render, props)(state));
         onMessage('REQUEST_RESET_SCRIPT', resetDOM);
 

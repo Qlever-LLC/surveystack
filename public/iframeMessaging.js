@@ -208,17 +208,29 @@ function updateDOM(node) {
   const root = document.querySelector('#root');
   root.innerHTML = '';
   root.appendChild(node);
+  // const s = new XMLSerializer();
+
+  // if (root.children[0]) {
+  //   // log('old', s.serializeToString(root.children[0]));
+  //   root.children[0].replaceWith(node);
+  // } else {
+  //   root.appendChild(node);
+  // }
+  // log('new', s.serializeToString(node));
 }
 
 export const renderScript = (process, render, props) => (state) => {
+  console.log('renderScript', state);
   updateDOM(
     render(props, state, runScript(process, render, props)),
   );
 };
 
 export const runScript = (process, render, props) => (state) => {
+  console.log('runscript state', state);
   const nextState = process(props, state);
   updateParentState(nextState);
+  log(state && state.value);
   renderScript(process, render, props)(state);
 };
 

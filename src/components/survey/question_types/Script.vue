@@ -58,6 +58,11 @@ export default {
     requestRunScript() {
       this.$refs.iframe.contentWindow.postMessage({
         type: 'REQUEST_RUN_SCRIPT',
+        payload: {
+          value: this.value,
+          context: this.meta.context || {},
+          status: this.status || { type: null, message: null },
+        },
       }, '*');
     },
     requestRenderScript() {

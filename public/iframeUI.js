@@ -1,6 +1,6 @@
 import marked from 'https://cdn.jsdelivr.net/npm/marked@latest/lib/marked.esm.js';
 
-export function card(content, { header, meta, footer }) {
+export function card(content, { header, meta, footer } = {}) {
   const node = document.createElement('div');
   // node.className = 'max-w-sm rounded overflow-hidden shadow-lg';
   node.className = 'card shadow';
@@ -25,7 +25,7 @@ export function card(content, { header, meta, footer }) {
 }
 
 
-export function message(content, { type = null, header }) {
+export function message(content, { type = null, header } = {}) {
   const node = document.createElement('div');
   node.className = 'message shadow';
   switch (type) {
