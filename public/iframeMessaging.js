@@ -227,11 +227,9 @@ export const renderScript = (process, render, props) => (state) => {
 };
 
 export const runScript = (process, render, props) => (state) => {
-  console.log('runscript state', state);
   const nextState = process(props, state);
   updateParentState(nextState);
-  log(state && state.value);
-  renderScript(process, render, props)(state);
+  renderScript(process, render, props)(nextState);
 };
 
 
