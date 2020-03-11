@@ -407,8 +407,8 @@ export default {
     onCancel() {
       this.$router.push('/surveys/browse');
     },
-    setControlSource(id) {
-      this.control.options.source = id;
+    setControlSource(value) {
+      this.control.options.source = value;
     },
     setControlParams(params) {
       this.control.options.params = params;

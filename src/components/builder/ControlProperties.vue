@@ -49,6 +49,12 @@
         label="Required"
       />
 
+        <!-- :items="control.meta.source " -->
+      <select-items-editor
+        v-if="isSelect"
+        @change="handleSelectItemsChange"
+      />
+
       <div
         v-if="!showAdvanced"
         class="d-flex justify-end"
@@ -132,9 +138,13 @@
 <script>
 import { getAdvancedCodeTemplate } from '@/utils/surveys';
 import api from '@/services/api.service';
+import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
 
 
 export default {
+  components: {
+    SelectItemsEditor,
+  },
   props: {
     calculate: {
 
@@ -169,6 +179,9 @@ export default {
   computed: {
     isScript() {
       return this.control.type === 'script';
+    },
+    isSelect() {
+      return /select/i.test(this.control.type);
     },
   },
   methods: {
@@ -214,6 +227,9 @@ export default {
         return 'Invalid JSON';
       }
       return true;
+    },
+    handleSelectItemsChange(ev) {
+      console.log('handleSelectItemsChange', ev);
     },
   },
   created() {

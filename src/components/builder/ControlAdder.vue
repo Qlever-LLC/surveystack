@@ -15,7 +15,16 @@
       :key="el.type"
       @click="addControl(el)"
       class="ma-1"
-    >{{el.name}}</v-btn>
+    >
+      <v-icon
+        left
+        v-if="el.icon"
+        color="grey lighten-1"
+      >
+        {{el.icon}}
+      </v-icon>
+      {{el.name}}
+    </v-btn>
   </div>
 </template>
 
