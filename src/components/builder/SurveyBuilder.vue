@@ -19,7 +19,7 @@
       </pane>
 
       <pane class="pane pane-controls">
-        <v-card>
+        <v-card class="pb-3 mb-3">
           <div class="sticky-top px-4">
             <v-card-title class="pl-0">Details</v-card-title>
             <survey-details

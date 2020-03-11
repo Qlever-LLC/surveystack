@@ -8,9 +8,10 @@
         v-if="control.meta.source && control.meta.source.length > 0"
       >
         <v-radio
-          :v-for="(item) in control.meta.source"
+          v-for="(item) in control.meta.source"
           :label="item.label"
           :value="item.value"
+          :key="item.key"
         />
       </v-radio-group>
     </v-row>

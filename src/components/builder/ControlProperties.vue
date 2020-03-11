@@ -49,12 +49,6 @@
         label="Required"
       />
 
-        <!-- :items="control.meta.source " -->
-      <select-items-editor
-        v-if="isSelect"
-        @change="handleSelectItemsChange"
-      />
-
       <div
         v-if="!showAdvanced"
         class="d-flex justify-end"
@@ -129,8 +123,13 @@
             mdi-open-in-new
           </v-icon>
         </div>
-
       </div>
+        <!-- :items="control.meta.source " -->
+      <select-items-editor
+        v-if="isSelect"
+        @change="handleSelectItemsChange"
+        class="mt-5"
+      />
     </v-form>
     <div v-else>...</div>
   </div>
