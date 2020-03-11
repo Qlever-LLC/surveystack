@@ -1,6 +1,29 @@
 <template>
   <div>
     <v-container>
+      <v-menu
+        offset-y
+        class="mb-3"
+      >
+        <template v-slot:activator="{ on }">
+          <v-btn
+            color="primary"
+            dark
+            v-on="on"
+          >
+            {{formats[selectedFormat].title}}
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item
+            v-for="(item, index) in formats"
+            :key="index"
+            @click="() => setFormat(index)"
+          >
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
       <app-submissions-filter v-model="filter" />
 
       <div class="d-flex justify-end">
@@ -51,6 +74,7 @@
         </ul>
       </v-card>
     </v-container>
+    <app-submissions-table v-if="false" />
   </div>
 </template>
 
@@ -62,15 +86,23 @@ import api from '@/services/api.service';
 import treeItem from '@/components/survey/TreeItem.vue';
 import { flattenSubmission } from '@/utils/submissions';
 import appSubmissionsFilter from '@/components/submissions/SubmissionFilter.vue';
+import appSubmissionsTable from '@/components/submissions/SubmissionTable.vue';
+
 
 export default {
   components: {
     treeItem,
     appSubmissionsFilter,
+    appSubmissionsTable,
   },
   data() {
     return {
       survey: null,
+      formats: [
+        { title: 'CSV', value: 'csv' },
+        { title: 'JSON', value: 'json' },
+      ],
+      selectedFormat: 0,
       filter: {
         match: '{}',
         project: '{}',
@@ -117,6 +149,9 @@ export default {
       } catch (e) {
         console.log('something went wrong:', e);
       }
+    },
+    setFormat(ev) {
+      this.selectedFormat = ev;
     },
   },
   async created() {
