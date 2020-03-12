@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <v-container class="pa-3">
     <v-textarea
-      class="ma-3"
       :value="valueString"
       rows="30"
+      outlined
       readonly
     />
-  </div>
+  </v-container>
 </template>
 <script>
 export default {
