@@ -55,6 +55,10 @@ export default {
         options: _.cloneDeep(defaultControlOptions),
       });
 
+      if (/select/.test(control.type)) {
+        cloneWithDefaults.options.source = [];
+      }
+
       const sequencedControl = {
         ...cloneWithDefaults,
         name: `${control.name}_${currentSequence}`,

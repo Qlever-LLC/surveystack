@@ -408,6 +408,7 @@ export default {
       this.$router.push('/surveys/browse');
     },
     setControlSource(value) {
+      console.log('setControlSource', value);
       this.control.options.source = value;
     },
     setControlParams(params) {

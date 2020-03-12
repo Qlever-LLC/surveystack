@@ -124,10 +124,12 @@
           </v-icon>
         </div>
       </div>
-        <!-- :items="control.meta.source " -->
+        <!-- :items="control.options.source || []" -->
+        <!-- @change="handleSelectItemsChange" -->
+        <!-- :items="control.options.source" -->
       <select-items-editor
         v-if="isSelect"
-        @change="handleSelectItemsChange"
+        v-model="control.options.source"
         class="mt-5"
       />
     </v-form>
