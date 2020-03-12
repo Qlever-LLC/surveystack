@@ -24,13 +24,3 @@ export default {
 
 };
 </script>
-<style scoped>
-pre {
-  text-align: start;
-}
-
-textarea {
-  min-height: 30rem;
-  resize: both;
-}
-</style>
