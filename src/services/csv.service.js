@@ -1,6 +1,7 @@
 /* eslint no-restricted-syntax: 0 */
 /* eslint no-param-reassign: 0 */
 import papa from 'papaparse';
+import _ from 'lodash';
 import { flatten } from 'flat';
 
 function removeKeys(obj, keys) {
@@ -27,7 +28,8 @@ function removeKeys(obj, keys) {
 
 function createCsv(submissions) {
   const items = [];
-  submissions.forEach(submission => {
+  submissions.forEach(s => {
+    const submission = _.cloneDeep(s);
     submission._id = submission._id.toString();
     submission.survey = submission.survey.toString();
     removeKeys(submission.data, ['meta']);
