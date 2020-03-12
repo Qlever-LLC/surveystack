@@ -93,6 +93,10 @@ export default {
     excludeMeta() {
       this.createHeaders();
     },
+    submissions() {
+      console.log('submissions have changed');
+      this.fetchData();
+    },
   },
   methods: {
     hello(value, field) {
@@ -125,8 +129,10 @@ export default {
       this.headers = headers;
     },
     async fetchData() {
-      const r = await api.get('/submissions/page?survey=5e3038dbea0cf40001aef63b');
-      this.csv = csvService.createCsv(r.data.content);
+      if (!this.submissions) {
+        return;
+      }
+      this.csv = csvService.createCsv(this.submissions.content);
       this.parsed = papa.parse(this.csv, { header: true });
       this.createHeaders();
     },
