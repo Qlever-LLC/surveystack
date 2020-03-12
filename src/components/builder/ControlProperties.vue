@@ -123,8 +123,15 @@
             mdi-open-in-new
           </v-icon>
         </div>
-
       </div>
+        <!-- :items="control.options.source || []" -->
+        <!-- @change="handleSelectItemsChange" -->
+        <!-- :items="control.options.source" -->
+      <select-items-editor
+        v-if="isSelect"
+        v-model="control.options.source"
+        class="mt-5"
+      />
     </v-form>
     <div v-else>...</div>
   </div>
@@ -132,9 +139,13 @@
 <script>
 import { getAdvancedCodeTemplate } from '@/utils/surveys';
 import api from '@/services/api.service';
+import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
 
 
 export default {
+  components: {
+    SelectItemsEditor,
+  },
   props: {
     calculate: {
 
@@ -169,6 +180,9 @@ export default {
   computed: {
     isScript() {
       return this.control.type === 'script';
+    },
+    isSelect() {
+      return /select/i.test(this.control.type);
     },
   },
   methods: {
@@ -214,6 +228,9 @@ export default {
         return 'Invalid JSON';
       }
       return true;
+    },
+    handleSelectItemsChange(ev) {
+      console.log('handleSelectItemsChange', ev);
     },
   },
   created() {

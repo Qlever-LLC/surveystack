@@ -19,7 +19,7 @@
       </pane>
 
       <pane class="pane pane-controls">
-        <v-card>
+        <v-card class="pb-3 mb-3">
           <div class="sticky-top px-4">
             <v-card-title class="pl-0">Details</v-card-title>
             <survey-details
@@ -407,8 +407,9 @@ export default {
     onCancel() {
       this.$router.push('/surveys/browse');
     },
-    setControlSource(id) {
-      this.control.options.source = id;
+    setControlSource(value) {
+      console.log('setControlSource', value);
+      this.control.options.source = value;
     },
     setControlParams(params) {
       this.control.options.params = params;

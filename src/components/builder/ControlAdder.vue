@@ -15,7 +15,16 @@
       :key="el.type"
       @click="addControl(el)"
       class="ma-1"
-    >{{el.name}}</v-btn>
+    >
+      <v-icon
+        left
+        v-if="el.icon"
+        color="grey lighten-1"
+      >
+        {{el.icon}}
+      </v-icon>
+      {{el.name}}
+    </v-btn>
   </div>
 </template>
 
@@ -45,6 +54,10 @@ export default {
       const cloneWithDefaults = Object.assign(clone, {
         options: _.cloneDeep(defaultControlOptions),
       });
+
+      if (/select/.test(control.type)) {
+        cloneWithDefaults.options.source = [];
+      }
 
       const sequencedControl = {
         ...cloneWithDefaults,
