@@ -24,7 +24,10 @@
           </v-list-item>
         </v-list>
       </v-menu>
-      <app-submissions-filter v-model="filter" />
+      <app-submissions-filter
+        v-model="filter"
+        class="mt-3"
+      />
 
       <div class="d-flex justify-end">
         <v-btn
@@ -74,7 +77,7 @@
         </ul>
       </v-card>
     </v-container>
-    <app-submissions-table v-if="false" />
+    <app-submissions-table-client-csv v-if="false" />
   </div>
 </template>
 
@@ -86,14 +89,14 @@ import api from '@/services/api.service';
 import treeItem from '@/components/survey/TreeItem.vue';
 import { flattenSubmission } from '@/utils/submissions';
 import appSubmissionsFilter from '@/components/submissions/SubmissionFilter.vue';
-import appSubmissionsTable from '@/components/submissions/SubmissionTable.vue';
+import appSubmissionsTableClientCsv from '@/components/submissions/SubmissionTableClientCsv.vue';
 
 
 export default {
   components: {
     treeItem,
     appSubmissionsFilter,
-    appSubmissionsTable,
+    appSubmissionsTableClientCsv,
   },
   data() {
     return {

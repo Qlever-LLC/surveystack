@@ -59,10 +59,16 @@
 </template>
 
 <script>
-import axios from 'axios';
 import papa from 'papaparse';
+import api from '@/services/api.service';
+import csvService from '@/services/csv.service';
 
 export default {
+  props: {
+    submissions: {
+      type: Object,
+    },
+  },
   data() {
     return {
       excludeMeta: true,
@@ -118,13 +124,15 @@ export default {
       }
       this.headers = headers;
     },
+    async fetchData() {
+      const r = await api.get('/submissions/page?survey=5e3038dbea0cf40001aef63b');
+      this.csv = csvService.createCsv(r.data.content);
+      this.parsed = papa.parse(this.csv, { header: true });
+      this.createHeaders();
+    },
   },
-
   async created() {
-    const r = await axios.get('http://192.168.1.66:3000/debug/submissions?survey=5e3038dbea0cf40001aef63b');
-    this.parsed = papa.parse(r.data, { header: true });
-    console.log(this.parsed);
-    this.createHeaders();
+    this.fetchData();
   },
 };
 </script>
