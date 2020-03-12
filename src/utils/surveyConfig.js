@@ -50,7 +50,7 @@ export const availableControls = [
   {
     name: 'single select',
     label: 'Select One',
-    type: 'select_single',
+    type: 'selectSingle',
     // icon: 'mdi-order-bool-descending',
     icon: 'mdi-checkbox-multiple-blank-circle-outline',
   },

@@ -18,6 +18,7 @@
                   label="Label"
                   :value="item.label"
                   @input="(value) => handleItemInput(index, 'label', value)"
+                  :rules="[rules.notEmpty]"
                   outlined
                 />
               </v-col>
@@ -26,6 +27,7 @@
                   label="Value"
                   :value="item.value"
                   @input="(value) => handleItemInput(index, 'value', value)"
+                  :rules="[rules.notEmpty]"
                   outlined
                 />
               </v-col>
@@ -54,6 +56,16 @@ export default {
   components: {
     // draggable,
   },
+  data() {
+    return {
+      rules: {
+        notEmpty: (val) => {
+          console.log(val !== null && val !== '');
+          return (val !== null && val !== '') ? true : 'Please enter a string';
+        },
+      },
+    };
+  },
   methods: {
     setItems() {
       this.$emit('set-control-source', this.items);
@@ -78,7 +90,6 @@ export default {
       this.$emit('set-control-source', newItems);
     },
     handleItemInput(index, type, value) {
-      console.log('handle input item', value, index, type);
       const newItem = {
         ...this.value[index],
         [type]: value,
@@ -86,7 +97,7 @@ export default {
       const newItems = [
         ...this.value.slice(0, index),
         newItem,
-        ...this.value.slice(index + 1, -1),
+        ...this.value.slice(index + 1, this.value.length),
       ];
       this.$emit('set-control-source', newItems);
     },
@@ -99,21 +110,8 @@ export default {
   props: {
     value: {
       type: Array,
+      required: true,
     },
-    // items: {
-    //   type: Array,
-    //   required: true,
-    //   default: () => ([
-    //     // {
-    //     //   label: 'Item 1',
-    //     //   value: 'item-1',
-    //     // },
-    //     // {
-    //     //   label: '',
-    //     //   value: '',
-    //     // },
-    //   ]),
-    // },
   },
 };
 </script>
