@@ -64,6 +64,9 @@
           <v-tab-item>
             <app-submissions-tree :submissions="submissions" />
           </v-tab-item>
+          <v-tab-item>
+            <app-submissions-code :submissions="submissions" />
+          </v-tab-item>
         </v-tabs-items>
       </v-tabs>
     </v-container>
@@ -78,8 +81,9 @@
 import api from '@/services/api.service';
 import { flattenSubmission } from '@/utils/submissions';
 import appSubmissionsFilter from '@/components/submissions/SubmissionFilter.vue';
-import appSubmissionsTree from '@/components/submissions/SubmissionTree.vue';
 import appSubmissionsTableClientCsv from '@/components/submissions/SubmissionTableClientCsv.vue';
+import appSubmissionsTree from '@/components/submissions/SubmissionTree.vue';
+import appSubmissionsCode from '@/components/submissions/SubmissionCode.vue';
 
 
 export default {
@@ -87,6 +91,7 @@ export default {
     appSubmissionsFilter,
     appSubmissionsTree,
     appSubmissionsTableClientCsv,
+    appSubmissionsCode,
   },
   data() {
     return {
@@ -94,6 +99,7 @@ export default {
       views: [
         { tab: 'Table', component: 'table' },
         { tab: 'Tree', component: 'tree' },
+        { tab: 'Raw', component: 'raw' },
       ],
       survey: null,
       formats: [
