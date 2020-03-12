@@ -13,18 +13,15 @@
           <v-toolbar flat>
             <v-row>
               <v-col>
-                <v-toolbar-title>Simple CSV</v-toolbar-title>
-              </v-col>
-
-              <v-col :cols="2">
-                <v-switch
-                  v-model="excludeMeta"
-                  label="Hide meta"
-                  class="mt-2"
-                ></v-switch>
+                <div class="d-flex justify-end">
+                  <v-switch
+                    v-model="excludeMeta"
+                    label="Hide meta"
+                    class="mt-2"
+                  ></v-switch>
+                </div>
               </v-col>
             </v-row>
-
           </v-toolbar>
         </template>
         <template v-slot:header="{ props: { headers } }">
