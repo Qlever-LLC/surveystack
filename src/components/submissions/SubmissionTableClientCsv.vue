@@ -1,6 +1,5 @@
 <template>
-  <v-container fluid>
-    <h1>Andreas' Sandbox</h1>
+  <div>
     <v-card class="pt-2">
       <v-data-table
         :headers="headers"
@@ -16,15 +15,7 @@
               <v-col>
                 <v-toolbar-title>Simple CSV</v-toolbar-title>
               </v-col>
-              <v-col>
-                <v-text-field
-                  v-model="search"
-                  append-icon="mdi-search"
-                  label="Search"
-                  single-line
-                  autocomplete="off"
-                />
-              </v-col>
+
               <v-col :cols="2">
                 <v-switch
                   v-model="excludeMeta"
@@ -55,7 +46,7 @@
       </v-data-table>
     </v-card>
 
-  </v-container>
+  </div>
 </template>
 
 <script>
