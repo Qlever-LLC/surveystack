@@ -1,29 +1,37 @@
 <template>
   <div>
     <v-container>
-      <v-menu
-        offset-y
-        class="mb-3"
+
+      <v-list
+        v-if="false && queryList"
+        dense
       >
-        <template v-slot:activator="{ on }">
-          <v-btn
-            color="primary"
-            dark
-            v-on="on"
-          >
-            {{formats[selectedFormat].title}}
-          </v-btn>
-        </template>
-        <v-list>
+        <v-list-item-group
+          v-model="settings"
+          multiple
+          active-class=""
+        >
           <v-list-item
-            v-for="(item, index) in formats"
-            :key="index"
-            @click="() => setFormat(index)"
+            v-for="item in queryList"
+            :key="item.name"
           >
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
+            <template v-slot:default="{ active, toggle }">
+              <v-list-item-action>
+                <v-checkbox
+                  v-model="active"
+                  color="primary"
+                  @click="toggle"
+                ></v-checkbox>
+              </v-list-item-action>
+
+              <v-list-item-content>
+                <v-list-item-title>{{item.name}}</v-list-item-title>
+                <v-list-item-subtitle>{{item.type}}</v-list-item-subtitle>
+              </v-list-item-content>
+            </template>
           </v-list-item>
-        </v-list>
-      </v-menu>
+        </v-list-item-group>
+      </v-list>
 
       <app-submissions-filter
         v-model="filter"
@@ -31,6 +39,29 @@
       />
 
       <div class="d-flex justify-end">
+        <v-menu
+          offset-y
+          class="mb-3"
+        >
+          <template v-slot:activator="{ on }">
+            <v-btn
+              v-on="on"
+              class="mr-2"
+              outlined
+            >
+              <v-icon left>mdi-chevron-down</v-icon>{{formats[selectedFormat].title}}
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item
+              v-for="(item, index) in formats"
+              :key="index"
+              @click="() => setFormat(index)"
+            >
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
         <v-btn
           @click="fetchData"
           :disabled="!validQuery"
@@ -85,6 +116,8 @@ import appSubmissionsTableClientCsv from '@/components/submissions/SubmissionTab
 import appSubmissionsTree from '@/components/submissions/SubmissionTree.vue';
 import appSubmissionsCode from '@/components/submissions/SubmissionCode.vue';
 
+import { createQueryList } from '@/utils/surveys';
+
 
 export default {
   components: {
@@ -95,6 +128,7 @@ export default {
   },
   data() {
     return {
+      settings: [],
       tab: null,
       views: [
         { tab: 'Table', component: 'table' },
@@ -102,6 +136,7 @@ export default {
         { tab: 'Raw', component: 'raw' },
       ],
       survey: null,
+      surveyObject: null,
       formats: [
         { title: 'CSV', value: 'csv' },
         { title: 'JSON', value: 'json' },
@@ -144,11 +179,18 @@ export default {
     apiUrl() {
       return `${process.env.VUE_APP_API_URL}${this.apiRequest}`;
     },
+    queryList() {
+      if (!this.surveyObject) {
+        return null;
+      }
+      console.log(this.surveyObject);
+      const list = createQueryList(this.surveyObject, this.surveyObject.latestVersion);
+      return list;
+    },
   },
   methods: {
     async fetchData() {
       try {
-        this.survey = this.$route.query.survey;
         this.submissions = (await api.get(this.apiRequest)).data;
       } catch (e) {
         console.log('something went wrong:', e);
@@ -159,6 +201,10 @@ export default {
     },
   },
   async created() {
+    this.survey = this.$route.query.survey;
+    const r = await api.get(`/surveys/${this.survey}`);
+    this.surveyObject = r.data;
+    console.log(this.surveyObject);
     await this.fetchData();
   },
 };

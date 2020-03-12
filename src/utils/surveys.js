@@ -436,6 +436,20 @@ export const isRelevant = (submission, survey, index, positions) => {
   return field.meta.relevant;
 };
 
+export const createQueryList = (survey, version = 1) => {
+  const { controls } = survey.revisions.find(revision => revision.version === version);
+  const positions = getControlPositions(controls);
+  const items = [];
+  positions.forEach((position) => {
+    const control = getControl(controls, position);
+    if (control.type !== 'group') {
+      const flatName = getFlatName(controls, position);
+      items.push({ name: flatName, queryName: `${flatName}.value`, type: control.type });
+    }
+  });
+  return items;
+};
+
 
 export const mockSurvey = {
   _id: '5dadc4c9988f9df9527f07ac',
