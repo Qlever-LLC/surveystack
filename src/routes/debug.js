@@ -92,7 +92,9 @@ router.get('/submissions', async (req, res) => {
   // (keys of first object populate header row)
   // TODO: add all headers from all submissions
   // https://www.papaparse.com/docs
-  const csv = papa.unparse(items);
+  const csv = papa.unparse(items, {
+    columns: null,
+  });
 
   return res.send(csv);
 });

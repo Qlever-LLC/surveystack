@@ -6,6 +6,7 @@ import { ObjectId } from 'mongodb';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
+import csvService from '../services/csv.service';
 
 const col = 'submissions';
 const DEFAULT_LIMIT = 100000;
@@ -289,6 +290,12 @@ const getSubmissions = async (req, res) => {
     .collection(col)
     .aggregate(pipeline)
     .toArray();
+
+  if (req.query.format === 'csv') {
+    const csv = csvService.createCsv(entities);
+    res.set('Content-Type', 'text/plain');
+    return res.send(csv);
+  }
 
   return res.send(entities);
 };
