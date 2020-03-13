@@ -48,7 +48,7 @@ export const availableControls = [
     icon: 'mdi-code-braces',
   },
   {
-    name: 'single select',
+    name: 'single_select',
     label: 'Select One',
     type: 'selectSingle',
     // icon: 'mdi-order-bool-descending',

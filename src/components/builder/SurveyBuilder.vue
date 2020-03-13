@@ -409,7 +409,9 @@ export default {
     },
     setControlSource(value) {
       console.log('setControlSource', value);
-      this.control.options.source = value;
+      // this.control.options.source = value;
+      this.$set(this.control.options, 'source', value);
+      // this.$forceUpdate();
     },
     setControlParams(params) {
       this.control.options.params = params;

@@ -3,44 +3,53 @@
     <!-- <h4>Items</h4> -->
     <v-card-title class="px-0 d-flex justify-space-between">
       <span>
-        Items
+        Select Options
       </span>
     </v-card-title>
     <v-list>
-      <template
-        v-for="(item, index) in value"
+      <draggable
+        :list="value"
       >
-        <v-list-item :key="index">
-          <v-list-item-content>
-            <v-row>
-              <v-col class="py-0">
-                <v-text-field
-                  label="Label"
-                  :value="item.label"
-                  @input="(value) => handleItemInput(index, 'label', value)"
-                  :rules="[rules.notEmpty]"
-                  outlined
-                />
-              </v-col>
-              <v-col class="py-0">
-                <v-text-field
-                  label="Value"
-                  :value="item.value"
-                  @input="(value) => handleItemInput(index, 'value', value)"
-                  :rules="[rules.notEmpty]"
-                  outlined
-                />
-              </v-col>
+        <v-card
+          v-for="(item, index) in value"
+          :key="index"
+          class="mb-2 draggable-cursor"
+          outlined
+        >
+          <v-list-item class="draggable-cursor">
+            <v-list-item-content class="pb-1">
+              <v-row>
+                <v-col class="py-0">
+                  <v-text-field
+                    label="Label"
+                    :value="item.label"
+                    @input="(value) => handleItemInput(index, 'label', value)"
+                    :rules="[rules.notEmpty]"
+                    outlined
+                    dense
+                  />
+                </v-col>
+                <v-col class="py-0">
+                  <v-text-field
+                    label="Value"
+                    :value="item.value"
+                    @input="(value) => handleItemInput(index, 'value', value)"
+                    :rules="[rules.notEmpty]"
+                    outlined
+                    dense
+                  />
+                </v-col>
 
-            </v-row>
-          </v-list-item-content>
-          <v-list-item-action class="mt-n3">
-            <v-btn icon>
-              <v-icon color="grey" @click="() => deleteItem(index)">mdi-trash-can-outline</v-icon>
-            </v-btn>
-          </v-list-item-action>
-        </v-list-item>
-      </template>
+              </v-row>
+            </v-list-item-content>
+            <v-list-item-action class="mt-n3">
+              <v-btn icon>
+                <v-icon color="grey" @click="() => deleteItem(index)">mdi-trash-can-outline</v-icon>
+              </v-btn>
+            </v-list-item-action>
+          </v-list-item>
+        </v-card>
+      </draggable>
     </v-list>
     <v-btn class="ml-auto mr-0 d-block mb-3" @click="addItem">
       +&nbsp;Add Item
@@ -50,11 +59,11 @@
 </template>
 
 <script>
-// import draggable from 'vuedraggable';
+import draggable from 'vuedraggable';
 
 export default {
   components: {
-    // draggable,
+    draggable,
   },
   data() {
     return {
@@ -67,9 +76,9 @@ export default {
     };
   },
   methods: {
-    setItems() {
-      this.$emit('set-control-source', this.items);
-    },
+    // setItems() {
+    //   this.$emit('set-control-source', this.items);
+    // },
     createItem({ value = '', label = '' } = {}) {
       return {
         value: '',
@@ -116,6 +125,12 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.draggable-cursor {
+  cursor: grab;
+}
 
+.draggable-cursor:active {
+  cursor: grabbing;
+}
 </style>

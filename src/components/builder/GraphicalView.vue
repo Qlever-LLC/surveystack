@@ -101,7 +101,7 @@ export default {
 
 .draggable {
   text-align: left;
-  cursor: pointer;
+  cursor: grab;
   line-height: 1.125rem;
   background: #fff;
 }
