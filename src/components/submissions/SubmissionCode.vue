@@ -1,12 +1,11 @@
 <template>
-  <v-container class="pa-3">
-    <v-textarea
+  <div class="pa-3">
+    <textarea
       :value="valueString"
       rows="30"
-      outlined
       readonly
     />
-  </v-container>
+    </div>
 </template>
 <script>
 export default {
@@ -24,3 +23,14 @@ export default {
 
 };
 </script>
+
+<style scoped>
+textarea {
+  width: 100%;
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: #333;
+  border: 1px solid #bbb;
+  background-color: whitesmoke;
+}
+</style>
