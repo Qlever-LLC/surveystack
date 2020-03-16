@@ -28,6 +28,7 @@
         :to="{name: 'auth-profile'}"
         text
       >
+        <span class="d-none d-md-inline mr-1">{{$store.getters['auth/user'].email}}</span>
         <v-icon color="white">mdi-account</v-icon>
       </v-btn>
 
@@ -72,6 +73,7 @@
         </template>
 
       </v-list>
+
     </v-navigation-drawer>
   </nav>
 </template>
