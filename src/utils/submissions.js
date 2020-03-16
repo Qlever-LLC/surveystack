@@ -126,7 +126,11 @@ const createSubmissionFromSurvey = (survey, version = 1, instance = null) => {
     const flatName = getFlatName(controls, position);
     const value = flattenedInstance ? flattenedInstance[`${flatName}.value`] : null;
     const dateModified = flattenedInstance ? flattenedInstance[`${flatName}.meta.dateModified`] : null;
-    objects.push({ [flatName]: { value, meta: { type: control.type, dateModified } } });
+    const meta = { type: control.type, dateModified };
+    if (control.options.redacted) {
+      meta.permissions = ['admin'];
+    }
+    objects.push({ [flatName]: { value, meta } });
   });
 
   const c = Object.assign({}, ...objects);

@@ -63,9 +63,7 @@
                   class="py-0"
                   v-if="display.value"
                 ><kbd class="pa-2">{{ display.value }}</kbd></v-card-text>
-                <v-card-text
-                  v-else
-                >No answer</v-card-text>
+                <v-card-text v-else>No answer</v-card-text>
                 <div
                   v-if="display.modified"
                   class="d-flex flex-row text--secondary pa-2"
@@ -116,7 +114,7 @@ const states = {
 function iconify(control, relevant) {
   if (control.value != null) {
     return states.done;
-  } if (relevant && (control.value == null && control.required)) {
+  } if (relevant && (control.value == null && control.options.required)) {
     return states.missing;
   } if (control.warning) {
     return states.warning;

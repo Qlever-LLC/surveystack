@@ -30,7 +30,7 @@
 
 <script>
 import _ from 'lodash';
-import { defaultControlOptions, availableControls } from '@/utils/surveyConfig';
+import { createControlInstance, availableControls } from '@/utils/surveyConfig';
 
 const group = availableControls.find(c => c.type === 'group');
 const rest = availableControls.filter(c => c.type !== 'group');
@@ -49,15 +49,7 @@ export default {
       this.sequence += 1;
       const currentSequence = this.sequence;
 
-      const clone = _.cloneDeep(control);
-
-      const cloneWithDefaults = Object.assign(clone, {
-        options: _.cloneDeep(defaultControlOptions),
-      });
-
-      if (/select/.test(control.type)) {
-        cloneWithDefaults.options.source = [];
-      }
+      const cloneWithDefaults = createControlInstance(control);
 
       const sequencedControl = {
         ...cloneWithDefaults,
