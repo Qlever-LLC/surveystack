@@ -2,8 +2,10 @@
   <v-container fluid>
     <v-row>
       <v-list v-if="sourceIsValid">
+        <v-label>{{control.label}}</v-label>
         <v-list-item-group
-          v-model="value"
+          :value="value || []"
+          @change="onChange"
           multiple
         >
           <v-list-item
@@ -40,11 +42,11 @@ import baseQuestionComponent from './BaseQuestionComponent';
 export default {
   mixins: [baseQuestionComponent],
   methods: {
-    // onChange(v) {
-    //   if (this.value !== v) {
-    //     this.changed(v);
-    //   }
-    // },
+    onChange(v) {
+      if (this.value !== v) {
+        this.changed(v);
+      }
+    },
   },
   computed: {
     sourceIsValid() {
