@@ -25,7 +25,7 @@ export const createControlInstance = (control) => {
     options: _.cloneDeep(defaultControlOptions),
   });
 
-  if (control.type === 'select') {
+  if (control.type === 'selectSingle' || control.type === 'selectMultiple' || control.type === 'ontology') {
     cloneWithDefaultOptions.options.source = [];
   }
 
@@ -67,18 +67,24 @@ export const availableControls = [
     icon: 'mdi-code-braces',
   },
   {
-    name: 'single_select',
-    label: 'Select One',
+    name: 'multiple_choice',
+    label: 'Multiple Choice',
     type: 'selectSingle',
     // icon: 'mdi-order-bool-descending',
     icon: 'mdi-checkbox-multiple-blank-circle-outline',
   },
   {
-    name: 'multi select',
-    label: 'Select All that Apply',
-    type: 'select_multiple',
+    name: 'checkboxes',
+    label: 'Checkboxes',
+    type: 'selectMultiple',
     // icon: 'mdi-order-bool-ascending-variant',
     // icon: 'mdi-check-box-outline',
     icon: 'mdi-checkbox-multiple-marked-outline',
+  },
+  {
+    name: 'autocomplete_list',
+    label: 'Autocomplete List',
+    type: 'ontology',
+    icon: 'mdi-text-search',
   },
 ];

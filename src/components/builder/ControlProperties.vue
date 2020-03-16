@@ -131,9 +131,6 @@
           </v-icon>
         </div>
       </div>
-      <!-- :items="control.options.source || []" -->
-      <!-- @change="handleSelectItemsChange" -->
-      <!-- :items="control.options.source" -->
       <select-items-editor
         v-if="isSelect"
         v-model="control.options.source"

@@ -33,9 +33,6 @@ export default {
       }
     },
   },
-  mounted() {
-    console.log('control options source select', this.control.options.source);
-  },
   computed: {
     sourceIsValid() {
       return this.control.options.source
