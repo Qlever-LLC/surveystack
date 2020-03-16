@@ -106,7 +106,11 @@ const createSubmissionFromSurvey = (survey, version = 1, instance = null) => {
   submission.survey = survey._id;
   submission.meta = {
     dateCreated: new Date(),
+    dateModified: new Date(),
     version,
+    permissions: [],
+    group: '5e6f8bbeea14550001470c28',
+    path: '/our-sci',
   };
 
   // TODO: handle version not found
