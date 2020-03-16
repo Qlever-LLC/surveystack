@@ -2,8 +2,9 @@ import _ from 'lodash';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
-import { exampleSurvey, exampleSubmission } from '../db/examples';
+import { exampleSurvey, exampleSubmission, exampleGroup, exampleUsers } from '../db/examples';
 import { createDummyResults } from '../services/dummy.service';
+import { initAdmins } from '../services/admin.service';
 
 const getDefault = async (req, res) => {
   return res.send('This is the debug route');
@@ -26,12 +27,22 @@ const tabulaRasa = async (req, res) => {
   await db.collection('submissions').deleteMany({});
   await db.collection('scripts').deleteMany({});
   await db.collection('groups').deleteMany({});
+  await db.collection('users').deleteMany({});
 
   const survey = _.cloneDeep(exampleSurvey);
   await db.collection('surveys').insertOne(survey);
 
   const submission = _.cloneDeep(exampleSubmission);
   await db.collection('submissions').insertOne(submission);
+
+  const group = _.cloneDeep(exampleGroup);
+  await db.collection('groups').insertOne(group);
+
+  await initAdmins();
+  exampleUsers.forEach(async exampleUser => {
+    const user = _.cloneDeep(exampleUser);
+    await db.collection('users').insertOne(user);
+  });
 
   console.log('end of tabula rasa');
   return res.send('OK');

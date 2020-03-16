@@ -44,7 +44,6 @@ export const exampleSurvey = {
               options: {
                 readOnly: false,
                 required: false,
-
                 relevance: {
                   enabled: false,
                   code: '',
@@ -84,6 +83,7 @@ export const exampleSurvey = {
           options: {
             readOnly: false,
             required: false,
+            redacted: true,
             relevance: {
               enabled: false,
               code: '',
@@ -111,7 +111,8 @@ export const exampleSubmission = {
     dateModified: new Date('2020-01-28T13:41:34.329Z'),
     version: 1,
     permissions: [],
-    path: '/oursci/lab',
+    group: new ObjectId('5e6f8bbeea14550001470c28'),
+    path: '/our-sci',
   },
   data: {
     favorite_color: {
@@ -140,6 +141,42 @@ export const exampleSubmission = {
     },
   },
 };
+
+export const exampleGroup = {
+  _id: new ObjectId('5e6f8bbeea14550001470c28'),
+  name: 'Our-Sci',
+  slug: 'our-sci',
+  path: null,
+};
+
+export const exampleUsers = [
+  {
+    _id: '5e452119c5117c000185f275',
+    email: 'admin@our-sci.net',
+    name: 'Default Our-Sci Admin',
+    token: '0bb69ddf-49fa-458d-b7f3-42011b1c009a',
+    password: '$2b$12$IkxwFgrwXlnpBKBAapHia..beTddaB6qLIATJwMNaPRF5/2jA/97q', // 1234
+    permissions: [],
+    authProviders: [],
+    group: {
+      user: [],
+      admin: ['5e6f8bbeea14550001470c28'],
+    },
+  },
+  {
+    _id: '5e6f92f16070e700015e0371',
+    email: 'user@our-sci.net',
+    name: 'Default Our-Sci User',
+    token: '8805b1c0-85b7-41b9-abe4-cb28c6603715',
+    password: '$2b$12$7cy0/MdjUywLJ2RHeSuKtuczE11Vo10b5xf5g5jKOxQK09T4tBti2', // 1234
+    permissions: [],
+    authProviders: [],
+    group: {
+      user: ['5e6f8bbeea14550001470c28'],
+      admin: [],
+    },
+  },
+];
 
 const OWNER = '37190y1';
 const ROLES = ['admin@/our/sci', 'member@/farmos'];
