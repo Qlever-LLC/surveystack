@@ -1,6 +1,9 @@
+import _ from 'lodash';
+
 export const defaultControlOptions = {
   readOnly: false,
   required: false,
+  redacted: false,
   relevance: {
     enabled: false,
     code: '',
@@ -14,6 +17,22 @@ export const defaultControlOptions = {
     code: '',
   },
 };
+
+export const createControlInstance = (control) => {
+  const clone = _.cloneDeep(control);
+
+  const cloneWithDefaultOptions = Object.assign(clone, {
+    options: _.cloneDeep(defaultControlOptions),
+  });
+
+  if (control.type === 'select') {
+    cloneWithDefaultOptions.options.source = [];
+  }
+
+  delete cloneWithDefaultOptions.icon;
+  return cloneWithDefaultOptions;
+};
+
 
 export const availableControls = [
   {

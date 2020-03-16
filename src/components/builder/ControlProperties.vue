@@ -45,8 +45,15 @@
         color="blue"
         outlined
         v-if="control.type !== 'group'"
-        v-model="control.required"
+        v-model="control.options.required"
         label="Required"
+      />
+      <v-checkbox
+        class="ma-0"
+        color="blue"
+        outlined
+        v-model="control.options.redacted"
+        label="Redacted"
       />
 
       <div
@@ -124,9 +131,9 @@
           </v-icon>
         </div>
       </div>
-        <!-- :items="control.options.source || []" -->
-        <!-- @change="handleSelectItemsChange" -->
-        <!-- :items="control.options.source" -->
+      <!-- :items="control.options.source || []" -->
+      <!-- @change="handleSelectItemsChange" -->
+      <!-- :items="control.options.source" -->
       <select-items-editor
         v-if="isSelect"
         v-model="control.options.source"
@@ -147,6 +154,9 @@ export default {
     SelectItemsEditor,
   },
   props: {
+    control: {
+      required: false,
+    },
     calculate: {
 
     },
@@ -155,9 +165,6 @@ export default {
     },
     constraint: {
 
-    },
-    control: {
-      required: false,
     },
     survey: {
       required: true,
