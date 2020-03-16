@@ -116,16 +116,15 @@ export default {
           },
           icon: 'mdi-account-search',
         },
-
+        {
+          divider: true,
+        },
         {
           title: 'Tabula Rasa',
           to: {
             name: 'tabula-rasa',
           },
           icon: 'mdi-delete-variant',
-        },
-        {
-          divider: true,
         },
         {
           title: 'Experiment',
