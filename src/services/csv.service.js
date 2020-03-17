@@ -31,7 +31,11 @@ function createCsv(submissions) {
   submissions.forEach((s) => {
     const submission = _.cloneDeep(s);
     submission._id = submission._id.toString();
-    submission.survey = submission.survey.toString();
+
+    if (submission.survey) {
+      submission.survey = submission.survey.toString();
+    }
+
     removeKeys(submission.data, ['meta']);
 
     items.push(flatten(submission));

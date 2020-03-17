@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-column">
+  <v-form class="d-flex flex-column">
     <v-textarea
       v-model="value.match"
       outlined
@@ -47,7 +47,7 @@
       </v-col>
     </v-row>
 
-  </div>
+  </v-form>
 </template>
 
 <script>
