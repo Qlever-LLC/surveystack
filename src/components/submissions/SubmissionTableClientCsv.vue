@@ -48,7 +48,6 @@
 
 <script>
 import papa from 'papaparse';
-import api from '@/services/api.service';
 import csvService from '@/services/csv.service';
 
 export default {
