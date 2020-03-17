@@ -48,12 +48,28 @@
         v-model="control.options.required"
         label="Required"
       />
+
       <v-checkbox
         class="ma-0"
         color="blue"
         outlined
         v-model="control.options.redacted"
         label="Redacted"
+      />
+
+      <v-checkbox
+        class="ma-0"
+        v-model="control.options.allowCustomSelection"
+        v-if="isSelect || isOntology"
+        outlined
+        label="Allow Custom Entry"
+      />
+
+      <v-checkbox
+        class="ma-0"
+        v-model="control.options.hasMultipleSelections"
+        v-if="control.type === 'ontology'"
+        label="Allow Multiple Selections"
       />
 
       <div
@@ -132,7 +148,7 @@
         </div>
       </div>
       <select-items-editor
-        v-if="isSelect"
+        v-if="isSelect || isOntology"
         v-model="control.options.source"
         class="mt-5"
       />
@@ -187,6 +203,9 @@ export default {
     },
     isSelect() {
       return /select/i.test(this.control.type);
+    },
+    isOntology() {
+      return this.control.type === 'ontology';
     },
   },
   methods: {

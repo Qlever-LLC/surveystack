@@ -16,10 +16,10 @@
           class="mb-2 draggable-cursor"
           outlined
         >
-          <v-list-item class="draggable-cursor">
+          <v-list-item class="draggable-cursor px-1">
             <v-list-item-content class="pb-1">
               <v-row>
-                <v-col class="py-0">
+                <v-col class="py-0 pl-4 pr-1">
                   <v-text-field
                     label="Label"
                     :value="item.label"
@@ -29,7 +29,7 @@
                     dense
                   />
                 </v-col>
-                <v-col class="py-0">
+                <v-col class="py-0 pl-1 pr-3">
                   <v-text-field
                     label="Value"
                     :value="item.value"
