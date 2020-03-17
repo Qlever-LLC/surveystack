@@ -103,9 +103,6 @@ export default {
         && Array.isArray(this.control.options.source)
         && !this.value.every(this.sourceHasValue);
     },
-    customValue() {
-
-    },
   },
   created() {
     // set `customSelection` value to submission question value if we allow the user to enter custom selections
