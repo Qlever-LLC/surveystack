@@ -444,7 +444,7 @@ export const createQueryList = (survey, version = 1) => {
     const control = getControl(controls, position);
     if (control.type !== 'group') {
       const flatName = getFlatName(controls, position);
-      items.push({ name: flatName, queryName: `${flatName}.value`, type: control.type });
+      items.push({ name: flatName, key: `data.${flatName}.value`, type: control.type });
     }
   });
   return items;
