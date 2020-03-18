@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-card-title>Filters</v-card-title>
+    <v-card-title>Basic Filters</v-card-title>
     <v-card-text>
       <v-select
         :items="fieldItems"
@@ -18,14 +18,22 @@
       <v-text-field
         label="Value"
         v-model="selectedValue"
+        @keyup.enter="add"
       />
 
-      <div class="d-flex justify-end my-2">
+      <div class="d-flex justify-end">
         <v-btn
+          class="ma-2"
           @click="$emit('showAdvanced', true)"
           text
-        >Advanced...</v-btn>
+        >Advanced</v-btn>
         <v-btn
+          class="ma-2"
+          outlined
+          @click="reset"
+        >Reset</v-btn>
+        <v-btn
+          class="ma-2"
           @click="add"
           color="primary"
         >Apply</v-btn>
@@ -63,6 +71,10 @@
 export default {
   props: {
     queryList: {
+      type: Array,
+      required: true,
+    },
+    basicFilters: {
       type: Array,
       required: true,
     },
@@ -107,7 +119,7 @@ export default {
   },
   methods: {
     add() {
-      if (!this.selectedField || !this.selectedOperator || !this.selectedValue) {
+      if (!this.selectedField || !this.selectedOperator) {
         return;
       }
       const { key, type } = this.queryList.find(item => item.name === this.selectedField);
@@ -131,6 +143,7 @@ export default {
       } else {
         this.filters.push(filter);
       }
+      this.$emit('apply-basic-filters', this.filters);
     },
     remove(idx) {
       this.filters.splice(idx, 1);
@@ -140,6 +153,16 @@ export default {
       this.selectedOperator = operator;
       this.selectedValue = value;
     },
+    reset() {
+      this.selectedField = null;
+      this.selectedOperator = null;
+      this.selectedValue = null;
+      this.filters = [];
+      this.$emit('reset');
+    },
+  },
+  created() {
+    this.filters = this.basicFilters;
   },
 };
 </script>

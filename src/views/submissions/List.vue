@@ -6,15 +6,23 @@
         v-if="!showAdvancedFilters && queryList"
         :queryList="queryList"
         @showAdvanced="(ev) => showAdvancedFilters = ev"
+        :basicFilters="basicFilters"
+        @apply-basic-filters="applyBasicFilters"
+        @reset="reset"
       />
 
       <app-submissions-filter-advanced
         v-if="showAdvancedFilters"
         v-model="filter"
         @showAdvanced="(ev) => showAdvancedFilters = ev"
+        @apply-advanced-filters="fetchData"
+        @reset="reset"
       />
 
-      <div class="d-flex justify-end">
+      <div
+        class="d-flex justify-end"
+        v-if="false"
+      >
         <v-menu
           offset-y
           class="mb-3"
@@ -45,7 +53,7 @@
         >QUERY!</v-btn>
       </div>
 
-      <h4>API</h4>
+      <h4 class="mt-3">API</h4>
       <a
         class="body-2"
         :href="apiUrl"
@@ -98,6 +106,14 @@ import appSubmissionsCode from '@/components/submissions/SubmissionCode.vue';
 
 import { createQueryList } from '@/utils/surveys';
 
+const defaultFilter = {
+  match: '{}',
+  project: '{}',
+  sort: '{}',
+  skip: 0,
+  limit: 0,
+  roles: 'public',
+};
 
 export default {
   components: {
@@ -131,6 +147,7 @@ export default {
         limit: 0,
         roles: 'public',
       },
+      basicFilters: [],
       submissions: {
         content: [],
         pagination: {
@@ -178,6 +195,24 @@ export default {
     },
     setFormat(ev) {
       this.selectedFormat = ev;
+    },
+    applyBasicFilters(basicFilters) {
+      const match = {};
+      basicFilters.forEach((basicFilter) => {
+        Object.assign(match, basicFilter.query);
+      });
+      try {
+        const stringified = JSON.stringify(match);
+        this.filter.match = stringified;
+        this.fetchData();
+      } catch (error) {
+        console.log('invalid basic filter JSON');
+      }
+    },
+    reset() {
+      Object.assign(this.filter, defaultFilter);
+      this.basicFilters = [];
+      this.fetchData();
     },
   },
   async created() {

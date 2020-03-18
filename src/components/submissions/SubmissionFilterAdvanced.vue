@@ -50,14 +50,22 @@
           </v-col>
         </v-row>
 
-        <div class="d-flex justify-end my-2">
+        <div class="d-flex justify-end">
           <v-btn
+            class="ma-2"
             @click="$emit('showAdvanced', false)"
             text
-          >Basic...</v-btn>
+          >Basic</v-btn>
           <v-btn
-            @click="add"
+            class="ma-2"
+            outlined
+            @click="$emit('reset')"
+          >Reset</v-btn>
+          <v-btn
+            class="ma-2"
             color="primary"
+            @click="$emit('apply-advanced-filters')"
+            :disabled="!validQuery"
           >Apply</v-btn>
         </div>
 
@@ -71,6 +79,19 @@ export default {
   props: {
     value: {
       type: Object,
+    },
+  },
+  computed: {
+    validQuery() {
+      try {
+        JSON.parse(this.value.match);
+        JSON.parse(this.value.sort);
+        JSON.parse(this.value.project);
+      } catch (error) {
+        return false;
+      }
+
+      return true;
     },
   },
 };
