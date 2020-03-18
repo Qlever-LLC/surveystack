@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card class="pt-2">
+    <v-card class="py-2">
       <v-data-table
         :headers="headers"
         :items="items"
@@ -8,6 +8,7 @@
         item-key="_id"
         :search="search"
         :mobile-breakpoint="NaN"
+        hide-default-footer
       >
         <template v-slot:top>
           <v-toolbar flat>
@@ -24,22 +25,7 @@
             </v-row>
           </v-toolbar>
         </template>
-        <template v-slot:header="{ props: { headers } }">
-          <thead>
-            <tr>
-              <th
-                v-for="(header,i) in headers"
-                :key="header.text"
-              >
-                <v-text-field
-                  v-if="i > 0"
-                  @input="(v) => hello(v, header.text)"
-                />
 
-              </th>
-            </tr>
-          </thead>
-        </template>
       </v-data-table>
     </v-card>
 

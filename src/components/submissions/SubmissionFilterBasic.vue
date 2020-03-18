@@ -1,43 +1,62 @@
 <template>
-  <v-container>
-    <v-select
-      :items="fieldItems"
-      label="Field"
-      v-model="selectedField"
-      hide-details
-    />
-    <v-select
-      :items="operators.default"
-      label="Operator"
-      v-model="selectedOperator"
-      hide-details
-    />
-    <v-text-field
-      label="Value"
-      v-model="selectedValue"
-    />
+  <v-card>
+    <v-card-title>Filters</v-card-title>
+    <v-card-text>
+      <v-select
+        :items="fieldItems"
+        label="Field"
+        v-model="selectedField"
+        hide-details
+      />
+      <v-select
+        :items="operators.default"
+        label="Operator"
+        v-model="selectedOperator"
+        hide-details
+        return-object
+      />
+      <v-text-field
+        label="Value"
+        v-model="selectedValue"
+      />
 
-    <div class="d-flex justify-end mt-2">
-      <v-btn
-        @click="$emit('showAdvanced')"
-        text
-      >Advanced</v-btn>
-      <v-btn
-        @click="add"
-        color="primary"
-      >Add</v-btn>
-    </div>
+      <div class="d-flex justify-end my-2">
+        <v-btn
+          @click="$emit('showAdvanced', true)"
+          text
+        >Advanced...</v-btn>
+        <v-btn
+          @click="add"
+          color="primary"
+        >Apply</v-btn>
+      </div>
 
-    <ul>
-      <li
-        v-for="(filter,i) in filters"
-        :key="i"
+      <v-card
+        outlined
+        v-if="filters.length > 0"
       >
-        {{filter}}
-      </li>
-    </ul>
+        <v-list>
+          <v-list-item
+            v-for="(filter,i) in filters"
+            :key="i"
+            @click="select(filter)"
+          >
+            <v-list-item-content>
+              <v-list-item-title>{{filter.field}}</v-list-item-title>
+              <v-list-item-subtitle>{{filter.operator.text}} {{filter.value}}</v-list-item-subtitle>
+            </v-list-item-content>
+            <v-list-item-action @click="remove(i)">
+              <v-btn icon>
+                <v-icon>mdi-trash-can-outline</v-icon>
+              </v-btn>
+            </v-list-item-action>
 
-  </v-container>
+          </v-list-item>
+        </v-list>
+      </v-card>
+    </v-card-text>
+
+  </v-card>
 </template>
 
 <script>
@@ -100,8 +119,26 @@ export default {
       }
       console.log(this.selectedOperator);
 
-      const value = (this.selectedOperator === '$eq') ? v : { [this.selectedOperator]: v };
-      this.filters.push({ [key]: value });
+      const value = (this.selectedOperator.value === '$eq') ? v : { [this.selectedOperator.value]: v };
+      const query = { [key]: value };
+
+      const idx = this.filters.findIndex(item => item.key === key);
+      const filter = {
+        key, query, field: this.selectedField, operator: this.selectedOperator, value: this.selectedValue,
+      };
+      if (idx >= 0) {
+        this.filters.splice(idx, 1, filter);
+      } else {
+        this.filters.push(filter);
+      }
+    },
+    remove(idx) {
+      this.filters.splice(idx, 1);
+    },
+    select({ field, operator, value }) {
+      this.selectedField = field;
+      this.selectedOperator = operator;
+      this.selectedValue = value;
     },
   },
 };

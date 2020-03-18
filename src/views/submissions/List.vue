@@ -1,51 +1,49 @@
 <template>
   <div>
     <v-container>
-
+      <h1 v-if="surveyEntity">{{surveyEntity.name}}</h1>
       <app-submissions-filter-basic
-        v-if="queryList"
+        v-if="!showAdvancedFilters && queryList"
         :queryList="queryList"
-        @showAdvanced="showAdvancedFilters = true"
+        @showAdvanced="(ev) => showAdvancedFilters = ev"
       />
 
-      <app-submissions-filter
+      <app-submissions-filter-advanced
         v-if="showAdvancedFilters"
         v-model="filter"
-        class="mt-3"
+        @showAdvanced="(ev) => showAdvancedFilters = ev"
       />
 
-      <v-container>
-        <div class="d-flex justify-end">
-          <v-menu
-            offset-y
-            class="mb-3"
-          >
-            <template v-slot:activator="{ on }">
-              <v-btn
-                v-on="on"
-                class="mr-2"
-                outlined
-              >
-                <v-icon left>mdi-chevron-down</v-icon>{{formats[selectedFormat].title}}
-              </v-btn>
-            </template>
-            <v-list>
-              <v-list-item
-                v-for="(item, index) in formats"
-                :key="index"
-                @click="() => setFormat(index)"
-              >
-                <v-list-item-title>{{ item.title }}</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-          <v-btn
-            @click="fetchData"
-            :disabled="!validQuery"
-            color="primary"
-          >QUERY!</v-btn>
-        </div>
-      </v-container>
+      <div class="d-flex justify-end">
+        <v-menu
+          offset-y
+          class="mb-3"
+        >
+          <template v-slot:activator="{ on }">
+            <v-btn
+              v-on="on"
+              class="mr-2"
+              outlined
+            >
+              <v-icon left>mdi-chevron-down</v-icon>{{formats[selectedFormat].title}}
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item
+              v-for="(item, index) in formats"
+              :key="index"
+              @click="() => setFormat(index)"
+            >
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+        <v-btn
+          @click="fetchData"
+          :disabled="!validQuery"
+          color="primary"
+        >QUERY!</v-btn>
+      </div>
 
       <h4>API</h4>
       <a
@@ -63,7 +61,10 @@
         >
           {{view.tab}}
         </v-tab>
-        <v-tabs-items v-model="tab">
+        <v-tabs-items
+          v-model="tab"
+          touchless
+        >
           <v-tab-item>
             <app-submissions-table-client-csv
               :submissions="submissions"
@@ -90,7 +91,7 @@
 import api from '@/services/api.service';
 import { flattenSubmission } from '@/utils/submissions';
 import appSubmissionsFilterBasic from '@/components/submissions/SubmissionFilterBasic.vue';
-import appSubmissionsFilter from '@/components/submissions/SubmissionFilter.vue';
+import appSubmissionsFilterAdvanced from '@/components/submissions/SubmissionFilterAdvanced.vue';
 import appSubmissionsTableClientCsv from '@/components/submissions/SubmissionTableClientCsv.vue';
 import appSubmissionsTree from '@/components/submissions/SubmissionTree.vue';
 import appSubmissionsCode from '@/components/submissions/SubmissionCode.vue';
@@ -101,7 +102,7 @@ import { createQueryList } from '@/utils/surveys';
 export default {
   components: {
     appSubmissionsFilterBasic,
-    appSubmissionsFilter,
+    appSubmissionsFilterAdvanced,
     appSubmissionsTree,
     appSubmissionsTableClientCsv,
     appSubmissionsCode,
