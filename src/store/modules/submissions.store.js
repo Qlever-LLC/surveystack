@@ -84,10 +84,9 @@ const actions = {
   // Create a draft, store it in database and Vuex store, then navigate to draft
   // TODO: figure out where and when to persist to database and store.
   // Also, should this even be a Vuex action or should it reside somewhere else?
-  async [types.actions.startDraft]({ commit, dispatch }, { survey, version }) {
+  async [types.actions.startDraft]({ commit, dispatch }, { survey, version = 0 }) {
     const surveyEntity = await dispatch('surveys/fetchSurvey', survey, { root: true });
-    const activeVersion = surveyEntity.latestVersion;
-    // const submission = surveyUtils.createInstance(surveyEntity, activeVersion);
+    const activeVersion = (version === 0) ? surveyEntity.latestVersion : version;
     const submission = submissionUtils.createSubmissionFromSurvey(surveyEntity, activeVersion);
     await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
     dispatch(types.actions.add, submission);
