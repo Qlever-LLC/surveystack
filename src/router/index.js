@@ -1,41 +1,41 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import Home from '../views/Home.vue';
-import Test from '@/views/Test.vue';
+import Home from '@/pages/Home.vue';
+import Test from '@/pages/Test.vue';
 
-import MySurveys from '@/views/surveys/MySurveys.vue';
-import SurveysBrowse from '@/views/surveys/Browse.vue';
-import SurveysDetail from '@/views/surveys/Detail.vue';
-import DraftSubmission from '@/views/submissions/drafts/Draft.vue';
+import MySurveys from '@/pages/surveys/MySurveys.vue';
+import SurveysBrowse from '@/pages/surveys/Browse.vue';
+import SurveysDetail from '@/pages/surveys/Detail.vue';
+import DraftSubmission from '@/pages/submissions/drafts/Draft.vue';
 
-import Login from '@/views/auth/Login.vue';
-import Register from '@/views/auth/Register.vue';
-import Profile from '@/views/auth/Profile.vue';
-import ForgotPassword from '@/views/auth/ForgotPassword.vue';
-import ResetPassword from '@/views/auth/ResetPassword.vue';
+import Login from '@/pages/auth/Login.vue';
+import Register from '@/pages/auth/Register.vue';
+import Profile from '@/pages/auth/Profile.vue';
+import ForgotPassword from '@/pages/auth/ForgotPassword.vue';
+import ResetPassword from '@/pages/auth/ResetPassword.vue';
 
-import Experiment from '@/views/experiment/Experiments.vue';
-import SandboxAR from '@/views/experiment/sandbox/SandboxAR.vue';
-import SandboxMDC from '@/views/experiment/sandbox/SandboxMDC.vue';
-import SandboxWG from '@/views/experiment/sandbox/SandboxWG.vue';
+import Experiment from '@/pages/experiment/Experiments.vue';
+import SandboxAR from '@/pages/experiment/sandbox/SandboxAR.vue';
+import SandboxMDC from '@/pages/experiment/sandbox/SandboxMDC.vue';
+import SandboxWG from '@/pages/experiment/sandbox/SandboxWG.vue';
 
-import UserList from '@/views/users/UserList.vue';
-import User from '@/views/users/User.vue';
-import UserEdit from '@/views/users/UserEdit.vue';
+import UserList from '@/pages/users/UserList.vue';
+import User from '@/pages/users/User.vue';
+import UserEdit from '@/pages/users/UserEdit.vue';
 
-import GroupList from '@/views/groups/GroupList.vue';
-import Group from '@/views/groups/Group.vue';
-import GroupEdit from '@/views/groups/GroupEdit.vue';
+import GroupList from '@/pages/groups/GroupList.vue';
+import Group from '@/pages/groups/Group.vue';
+import GroupEdit from '@/pages/groups/GroupEdit.vue';
 
-import SubmissionList from '@/views/submissions/List.vue';
+import SubmissionList from '@/pages/submissions/List.vue';
 
-import Builder from '@/views/builder/Builder.vue';
+import Builder from '@/pages/builder/Builder.vue';
 
-import ScriptList from '@/views/scripts/ScriptList.vue';
-import Script from '@/views/scripts/Script.vue';
-import ScriptEdit from '@/views/scripts/ScriptEdit.vue';
+import ScriptList from '@/pages/scripts/ScriptList.vue';
+import Script from '@/pages/scripts/Script.vue';
+import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
 
-import TabulaRasa from '@/views/debug/TabulaRasa.vue';
+import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 
 
 Vue.use(VueRouter);
@@ -52,7 +52,7 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue'),
+    component: () => import(/* webpackChunkName: "about" */ '@/pages/About.vue'),
   },
   {
     path: '/test',
