@@ -43,22 +43,28 @@
         outlined
         v-if="filters.length > 0"
       >
-        <v-list>
+        <v-list dense>
           <v-list-item
             v-for="(filter,i) in filters"
             :key="i"
             @click="select(filter)"
+            dense
           >
             <v-list-item-content>
-              <v-list-item-title>{{filter.field}}</v-list-item-title>
-              <v-list-item-subtitle>{{filter.operator.text}} {{filter.value}}</v-list-item-subtitle>
+              <div>
+                <span class="font-weight-medium mr-1">{{filter.field}}</span>
+                <span class="font-weight-regular text--secondary mr-1">{{filter.operator.text}}</span>
+                <span class="font-weight-boldmr-1">{{filter.value}}</span>
+              </div>
             </v-list-item-content>
             <v-list-item-action @click="remove(i)">
-              <v-btn icon>
+              <v-btn
+                icon
+                small
+              >
                 <v-icon>mdi-trash-can-outline</v-icon>
               </v-btn>
             </v-list-item-action>
-
           </v-list-item>
         </v-list>
       </v-card>
