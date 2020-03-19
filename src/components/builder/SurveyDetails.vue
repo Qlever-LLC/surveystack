@@ -13,6 +13,7 @@
         outlined
         v-model="value.name"
         label="Name"
+        placeholder="Untitled Survey"
       />
       <v-text-field
         outlined

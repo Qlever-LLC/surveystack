@@ -328,7 +328,7 @@ export default {
       const amountQuestions = utils.getSurveyPositions(this.survey, v);
       console.log('amount: ', amountQuestions);
       this.setNavbarContent({
-        title: this.survey.name,
+        title: this.survey.name || 'Untitled Survey',
         subtitle: `<span><span id="question-title-chip">Version ${version}</span></span> <span id="question-title-chip">${amountQuestions.length} Questions</span>`,
       });
 
@@ -580,7 +580,10 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
           return;
         }
 
-        this.instance = submissionUtils.createSubmissionFromSurvey(newVal, newVal.revisions[newVal.revisions.length - 1].latestVersion, this.instance);
+        // latestVersion does not exist on revisions, but is a root property of the survey, so this probably always picked the default version = 1.
+        // TODO: Check if this still works as intended
+        // this.instance = submissionUtils.createSubmissionFromSurvey(newVal, newVal.revisions[newVal.revisions.length - 1].latestVersion, this.instance);
+        this.instance = submissionUtils.createSubmissionFromSurvey(newVal, newVal.latestVersion, this.instance);
       },
       deep: true,
     },
