@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import { uniqWith, isEqual } from 'lodash';
+
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
 
 export default {
@@ -62,7 +64,7 @@ export default {
   methods: {
     handleFileChange(data) {
       console.log('table editor file change', data);
-      this.appendItems(data.data);
+      this.appendItems(data);
     },
     handleSave() {
       // this.$emit('close-dialog');
@@ -73,11 +75,14 @@ export default {
       console.log('delete item, new items:', newItems);
       this.$emit('change', newItems);
     },
+    filterDuplicateItems(items) {
+      return uniqWith(items, isEqual);
+    },
     appendItems(items) {
-      this.$emit('change', [
+      this.$emit('change', this.filterDuplicateItems([
         ...this.items,
         ...items,
-      ]);
+      ]));
     },
   },
 };
