@@ -147,6 +147,7 @@ export default {
     },
     remove(idx) {
       this.filters.splice(idx, 1);
+      this.$emit('apply-basic-filters', this.filters);
     },
     select({ field, operator, value }) {
       this.selectedField = field;
