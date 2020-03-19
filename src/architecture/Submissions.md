@@ -22,7 +22,10 @@ const submissions = [
     survey: '5e2eecc36f371d00015775af', // survey reference
     meta: {
       dateCreated: '2020-01-27T14:10:41.623Z',
+      dateModified: '2020-01-27T14:11:56.301Z',
       version: 1, // survey version
+      group: '5e6f8bbeea14550001470c28',
+      path: '/our-sci',
     }
     // data from controls
     data: {
@@ -46,7 +49,8 @@ const submissions = [
           }
         },
         meta: {
-          type: 'group'
+          type: 'group',
+          permissions: ['admin'],
         }
       }
     }
@@ -56,7 +60,10 @@ const submissions = [
     survey: '5e2eecc36f371d00015775af',
     meta: {
       dateCreated: '2020-01-27T14:12:24.730Z',
+      dateModified: '2020-01-27T14:15:33.901Z',
       version: 3,
+      group: '5e6f8bbeea14550001470c28',
+      path: '/our-sci',
     },
     data: {
       fav_color: {
@@ -79,7 +86,8 @@ const submissions = [
           }
         },
         meta: {
-          type: 'group'
+          type: 'group',
+          permissions: ['admin'],
         }
       }
     },

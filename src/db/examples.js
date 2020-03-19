@@ -151,7 +151,7 @@ export const exampleGroup = {
 
 export const exampleUsers = [
   {
-    _id: '5e452119c5117c000185f275',
+    _id: new ObjectId('5e452119c5117c000185f275'),
     email: 'admin@our-sci.net',
     name: 'Default Our-Sci Admin',
     token: '0bb69ddf-49fa-458d-b7f3-42011b1c009a',
@@ -160,11 +160,11 @@ export const exampleUsers = [
     authProviders: [],
     group: {
       user: [],
-      admin: ['5e6f8bbeea14550001470c28'],
+      admin: [new ObjectId('5e6f8bbeea14550001470c28')],
     },
   },
   {
-    _id: '5e6f92f16070e700015e0371',
+    _id: new ObjectId('5e6f92f16070e700015e0371'),
     email: 'user@our-sci.net',
     name: 'Default Our-Sci User',
     token: '8805b1c0-85b7-41b9-abe4-cb28c6603715',
@@ -172,7 +172,7 @@ export const exampleUsers = [
     permissions: [],
     authProviders: [],
     group: {
-      user: ['5e6f8bbeea14550001470c28'],
+      user: [new ObjectId('5e6f8bbeea14550001470c28')],
       admin: [],
     },
   },
@@ -277,17 +277,62 @@ db.groups.updateMany(
 
 // Left join on group id
 const user = {
-  _id: '5e452119c5117c000185f275',
-  email: 'xxx@gmail.com',
-  name: 'xxx',
-  token: '4a6076b6-6c16-4dfa-aa38-fd14f35f1ae6',
-  password: '$2b$12$L.CzwVxqRJq5NNxF3xDhnOKVW6jA3B8V3PblffF2jiKeOczK9p09C',
+  _id: ObjectId('5e6f92f16070e700015e0371'),
+  email: 'user@our-sci.net',
+  name: 'Default Our-Sci User',
+  token: '8805b1c0-85b7-41b9-abe4-cb28c6603715',
+  password: '$2b$12$7cy0/MdjUywLJ2RHeSuKtuczE11Vo10b5xf5g5jKOxQK09T4tBti2',
   permissions: [],
   authProviders: [],
-  groups: {
-    member: ['5e4a656fa1f0db0001bb4a9b'],
-    admin: ['5e4a6a6052fc340001d15453'],
+  group: {
+    user: [
+      {
+        _id: ObjectId('5e6f8bbeea14550001470c28'),
+        name: 'Our-Sci',
+        slug: 'our-sci',
+        path: null,
+      },
+    ],
+    admin: [],
   },
 };
 
-//db.users.aggregate([{$lookup: {from: "groups", localField: "groups.admin", foreignField: "_id", as: "groups.admin"}}]).pretty()
+/*
+// find members of group with 'user' rights
+db.users.aggregate([
+    { $match: { 'group.user': ObjectId('5e6f8bbeea14550001470c28') } },
+    {
+      $lookup: { from: 'groups', localField: 'group.user', foreignField: '_id', as: 'group.user' },
+    },
+  ]);
+
+// find members of group with 'user' rights
+db.users.aggregate([
+    { $match: {} },
+    {
+      $lookup: { from: 'groups', localField: 'group.user', foreignField: '_id', as: 'group.user' },
+    },
+    {
+      $lookup: { from: 'groups', localField: 'group.admin', foreignField: '_id', as: 'group.admin' },
+    }
+  ]);
+*/
+
+/*
+// Apply projection to group.user lookup stage
+db.users
+  .aggregate([
+    {
+      $lookup: {
+        from: 'groups',
+        let: { usergroups: { $ifNull: ['$group.user', []] } },
+        pipeline: [
+          { $match: { $expr: { $in: ['$_id', '$$usergroups'] } } },
+          { $project: { slug: 0 } },
+        ],
+        as: 'group.user',
+      },
+    },
+  ])
+  .pretty();
+*/
