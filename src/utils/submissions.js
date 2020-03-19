@@ -134,7 +134,14 @@ const createSubmissionFromSurvey = (survey, version = 1, instance = null) => {
     if (control.options.redacted) {
       meta.permissions = ['admin'];
     }
-    objects.push({ [flatName]: { value, meta } });
+
+    const entry = { value, meta };
+    if (control.type === 'group') {
+      delete entry.value;
+      delete entry.meta.dateModified;
+    }
+
+    objects.push({ [flatName]: entry });
   });
 
   const c = Object.assign({}, ...objects);
