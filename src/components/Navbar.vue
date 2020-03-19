@@ -50,11 +50,15 @@
       <v-list>
         <template v-for="(item, i) in items">
           <v-divider
-            v-if="item.divider"
+            v-if="item.type === 'divider'"
             :key="i"
             dark
-            class="my-3"
+            class="my-1"
           />
+          <v-subheader
+            v-else-if="item.type === 'subheader'"
+            :key="i"
+          >{{item.label}}</v-subheader>
           <v-list-item
             v-else
             :key="i"
@@ -67,7 +71,7 @@
               <v-icon>{{item.icon}}</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title>{{item.title}}</v-list-item-title>
+              <v-list-item-title>{{item.label}}</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </template>
@@ -85,58 +89,82 @@ export default {
       drawer: false,
       items: [
         {
-          title: 'My Submissions',
+          type: 'subheader',
+          label: 'COLLECT',
+        },
+        {
+          type: 'link',
+          label: 'My Submissions',
           to: { name: 'my-surveys' },
           icon: 'mdi-clipboard',
         },
         {
-          title: 'Browse',
+          type: 'link',
+          label: 'Browse',
           to: { name: 'surveys-browse' },
           icon: 'mdi-magnify',
         },
         {
-          title: 'Builder',
+          type: 'divider',
+        },
+        {
+          type: 'subheader',
+          label: 'ADMIN',
+        },
+        {
+          type: 'link',
+          label: 'Builder',
           to: { name: 'surveys-new' },
           icon: 'mdi-newspaper-plus',
         },
         {
-          title: 'Scripts',
+          type: 'link',
+          label: 'Scripts',
           to: { name: 'scripts-list' },
           icon: 'mdi-language-javascript',
         },
         {
-          title: 'Groups',
+          type: 'link',
+          label: 'Groups',
           to: {
             name: 'groups-list',
           },
           icon: 'mdi-domain',
         },
         {
-          title: 'Users',
+          type: 'link',
+          label: 'Users',
           to: {
             name: 'users-list',
           },
           icon: 'mdi-account-search',
         },
         {
-          divider: true,
+          type: 'divider',
         },
         {
-          title: 'Tabula Rasa',
+          type: 'subheader',
+          label: 'DEBUG',
+        },
+        {
+          type: 'link',
+          label: 'Tabula Rasa',
           to: {
             name: 'tabula-rasa',
           },
           icon: 'mdi-delete-variant',
         },
         {
-          title: 'Experiment',
+          type: 'link',
+          label: 'Experiment',
           to: {
             name: 'experiment',
           },
           icon: 'mdi-pill',
         },
         {
-          title: 'Andreas',
+          type: 'link',
+          label: 'Andreas',
           to: {
             name: 'experiment-ar',
           },
@@ -144,7 +172,8 @@ export default {
           class: 'ml-3',
         },
         {
-          title: 'Manuel',
+          type: 'link',
+          label: 'Manuel',
           to: {
             name: 'experiment-mdc',
           },
@@ -152,15 +181,13 @@ export default {
           class: 'ml-3',
         },
         {
-          title: 'Will',
+          type: 'link',
+          label: 'Will',
           to: {
             name: 'experiment-wg',
           },
           icon: 'mdi-alpha-w',
           class: 'ml-3',
-        },
-        {
-          divider: true,
         },
       ],
     };
