@@ -1,0 +1,88 @@
+<template>
+  <v-card>
+    <v-card-title>Edit Select Options</v-card-title>
+
+    <v-card-text>
+      <v-data-table
+        :headers="tableHeaders"
+        :items="items"
+      >
+       <template v-slot:item.actions="{ item }">
+        <v-icon
+          @click="deleteItem(item)"
+        >
+          mdi-delete
+        </v-icon>
+      </template>
+      </v-data-table>
+    </v-card-text>
+
+    <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
+      <select-items-upload-button @change="handleFileChange" />
+      <!-- <v-btn class="ml-4" @click="handleSave">Save</v-btn> -->
+    </v-card-actions>
+  </v-card>
+</template>
+
+<script>
+import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
+
+export default {
+  props: {
+    items: {
+      type: Array,
+      required: true,
+    },
+  },
+  components: {
+    SelectItemsUploadButton,
+  },
+  data() {
+    return {
+      tableHeaders: [
+        {
+          text: 'Label',
+          value: 'label',
+        },
+        {
+          text: 'Value',
+          value: 'value',
+        },
+        {
+          text: 'Tags',
+          value: 'tags',
+        },
+        {
+          text: 'Actions',
+          value: 'actions',
+        },
+      ],
+    };
+  },
+  methods: {
+    handleFileChange(data) {
+      console.log('table editor file change', data);
+      this.appendItems(data.data);
+    },
+    handleSave() {
+      // this.$emit('close-dialog');
+      // this.$emit('change', this.)
+    },
+    deleteItem(item) {
+      const newItems = this.items.filter(x => x.label !== item.label && x.value !== item.value);
+      console.log('delete item, new items:', newItems);
+      this.$emit('change', newItems);
+    },
+    appendItems(items) {
+      this.$emit('change', [
+        ...this.items,
+        ...items,
+      ]);
+    },
+  },
+};
+</script>
+
+<style scoped>
+
+</style>

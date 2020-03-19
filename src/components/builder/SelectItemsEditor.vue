@@ -5,6 +5,11 @@
       <span>
         Select Options
       </span>
+      <div>
+        <v-btn icon @click.stop="openTableDialog">
+          <v-icon>mdi-table</v-icon>
+        </v-btn>
+      </div>
     </v-card-title>
     <v-list>
       <draggable
@@ -51,34 +56,48 @@
         </v-card>
       </draggable>
     </v-list>
-    <v-btn class="ml-auto mr-0 d-block mb-3" @click="addItem">
-      +&nbsp;Add Item
-    </v-btn>
+    <v-row>
 
+      <v-btn class="ml-auto mr-0 d-block mb-3" @click="addItem">
+        +&nbsp;Add Item
+      </v-btn>
+    </v-row>
+
+    <v-dialog
+      v-model="tableDialogIsVisible"
+    >
+      <select-items-table-editor
+        :items="value"
+        @change="setItems"
+        @close-dialog="closeTableDialog"
+      />
+    </v-dialog>
   </div>
+
 </template>
 
 <script>
 import draggable from 'vuedraggable';
+import SelectItemsTableEditor from '@/components/builder/SelectItemsTableEditor.vue';
 
 export default {
   components: {
     draggable,
+    SelectItemsTableEditor,
   },
   data() {
     return {
+      tableDialogIsVisible: false,
       rules: {
-        notEmpty: (val) => {
-          console.log(val !== null && val !== '');
-          return (val !== null && val !== '') ? true : 'Please enter a string';
-        },
+        notEmpty: val => ((val !== null && val !== '') ? true : 'Please enter a string'),
       },
     };
   },
   methods: {
-    // setItems() {
-    //   this.$emit('set-control-source', this.items);
-    // },
+    setItems(items) {
+      console.log('set items', items);
+      this.$emit('set-control-source', items);
+    },
     createItem({ value = '', label = '' } = {}) {
       return {
         value: '',
@@ -109,6 +128,12 @@ export default {
         ...this.value.slice(index + 1, this.value.length),
       ];
       this.$emit('set-control-source', newItems);
+    },
+    openTableDialog() {
+      this.tableDialogIsVisible = true;
+    },
+    closeTableDialog() {
+      this.tableDialogIsVisible = false;
     },
   },
   model: {
