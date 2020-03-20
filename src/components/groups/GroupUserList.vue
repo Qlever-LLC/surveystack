@@ -8,17 +8,24 @@
           append-icon="mdi-magnify"
           v-model="q"
         />
-        <v-list-item
-          v-for="(user,i) in users"
-          :key="`user-${i}`"
-          two-line
-          :to="`/users/${user._id}`"
-        >
-          <v-list-item-content>
-            <v-list-item-title>{{user.name}}</v-list-item-title>
-            <v-list-item-subtitle>{{user.email}}</v-list-item-subtitle>
-          </v-list-item-content>
-        </v-list-item>
+        <template v-if="entities.length > 0">
+          <v-list-item
+            v-for="(user,i) in users"
+            :key="`user-${i}`"
+            two-line
+            :to="`/users/${user._id}`"
+          >
+            <v-list-item-content>
+              <v-list-item-title>{{user.name}}</v-list-item-title>
+              <v-list-item-subtitle>{{user.email}}</v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+        </template>
+        <div
+          v-else
+          class="grey--text"
+        >No members yet</div>
+
       </v-card-text>
 
     </v-card>
