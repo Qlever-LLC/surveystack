@@ -1,7 +1,16 @@
 <template>
   <div>
     <v-card>
-      <v-card-title>Members</v-card-title>
+      <v-card-title>
+        Members
+        <v-spacer />
+        <v-btn
+          color="primary"
+          class="ml-4"
+          :to="{name: 'users-new'}"
+          text
+        >New...</v-btn>
+      </v-card-title>
       <v-card-text>
         <v-text-field
           label="Search"

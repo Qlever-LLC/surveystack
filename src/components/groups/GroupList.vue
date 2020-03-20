@@ -1,36 +1,42 @@
 <template>
   <div>
-    <div class="d-flex justify-space-between align-center mb-2">
-      <slot name="header">
-        <h2 class="grey--text text--darken-3">{{title}}</h2>
-      </slot>
-      <v-btn
-        color="primary"
-        class="ml-4"
-        :to="{name: 'groups-new', query: {path: path}}"
-      >New...</v-btn>
-    </div>
-    <v-text-field
-      label="Search"
-      v-model="q"
-      id="oursci-group-list-search"
-      append-icon="mdi-magnify"
-    />
-
     <v-card>
-      <div
-        v-for="group in groups"
-        :key="group._id"
-      >
-        <v-list-item :to="`/g/${group.path?group.path:''}${group.slug}`">
-          <v-list-item-content>
-            <v-list-item-title>{{group.name}}</v-list-item-title>
-            <v-list-item-subtitle>{{group._id}}</v-list-item-subtitle>
-            <small>path={{group.path | showNull}}</small>
-          </v-list-item-content>
-        </v-list-item>
-        <v-divider />
-      </div>
+      <v-card-title>
+        {{title}}
+        <v-spacer />
+        <v-btn
+          color="primary"
+          class="ml-4"
+          :to="{name: 'groups-new', query: {path: path}}"
+          text
+        >New...</v-btn>
+      </v-card-title>
+      <v-card-text>
+        <v-text-field
+          label="Search"
+          v-model="q"
+          id="oursci-group-list-search"
+          append-icon="mdi-magnify"
+        />
+        <template v-if="entities.length > 0">
+          <v-list-item
+            v-for="group in groups"
+            :key="group._id"
+            two-line
+            :to="`/g/${group.path?group.path:''}${group.slug}`"
+          >
+            <v-list-item-content>
+              <v-list-item-title>{{group.name}}</v-list-item-title>
+              <v-list-item-subtitle>{{group._id}}</v-list-item-subtitle>
+              <small>path={{group.path | showNull}}</small>
+            </v-list-item-content>
+          </v-list-item>
+        </template>
+        <div
+          v-else
+          class="grey--text"
+        >No {{title}} yet</div>
+      </v-card-text>
     </v-card>
 
   </div>

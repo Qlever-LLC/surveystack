@@ -22,19 +22,21 @@
     </h1>
 
     <v-row>
-      <v-col>
+      <v-col
+        cols="12"
+        lg="6"
+      >
         <app-group-user-list :entities="users" />
       </v-col>
-      <v-col>
+      <v-col
+        cols="12"
+        lg="6"
+      >
         <app-group-list
           :entities="subgroups"
           :path="subgroupPath"
           title="Subgroups"
         />
-        <div
-          v-if="subgroups.length === 0"
-          class="grey--text"
-        >No subgroups yet</div>
       </v-col>
     </v-row>
 
