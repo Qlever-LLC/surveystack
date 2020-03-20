@@ -44,6 +44,7 @@ export const exampleSurvey = {
               options: {
                 readOnly: false,
                 required: false,
+                redacted: true,
                 relevance: {
                   enabled: false,
                   code: '',
@@ -83,7 +84,7 @@ export const exampleSurvey = {
           options: {
             readOnly: false,
             required: false,
-            redacted: true,
+            redacted: false,
             relevance: {
               enabled: false,
               code: '',
@@ -103,44 +104,160 @@ export const exampleSurvey = {
   ],
 };
 
-export const exampleSubmission = {
-  _id: new ObjectId('5e303982ea0cf40001aef63c'),
-  survey: new ObjectId('5e3038dbea0cf40001aef63b'),
-  meta: {
-    dateCreated: new Date('2020-01-28T13:39:14.544Z'),
-    dateModified: new Date('2020-01-28T13:41:34.329Z'),
-    version: 1,
-    permissions: [],
-    group: new ObjectId('5e6f8bbeea14550001470c28'),
-    path: '/our-sci',
-  },
-  data: {
-    favorite_color: {
-      value: 'blue',
-      meta: {
-        type: 'string',
-      },
+export const exampleSubmissions = [
+  {
+    _id: new ObjectId('5e303982ea0cf40001aef63c'),
+    survey: new ObjectId('5e3038dbea0cf40001aef63b'),
+    meta: {
+      dateCreated: new Date('2020-01-28T13:39:14.544Z'),
+      dateModified: new Date('2020-01-28T13:41:34.329Z'),
+      version: 1,
+      permissions: [],
+      group: new ObjectId('5e6f8bbeea14550001470c28'),
+      path: '/our-sci',
     },
-    personal_group: {
-      full_name: {
-        value: 'Andreas Rudolf',
+    data: {
+      favorite_color: {
+        value: 'blue',
         meta: {
           type: 'string',
         },
       },
-      age: {
-        value: 35,
-        meta: {
-          type: 'number',
+      personal_group: {
+        full_name: {
+          value: 'Andreas Rudolf',
+          meta: {
+            type: 'string',
+            permissions: ['admin'],
+          },
         },
-      },
-      meta: {
-        type: 'group',
-        permissions: ['admin'],
+        age: {
+          value: 35,
+          meta: {
+            type: 'number',
+          },
+        },
+        meta: {
+          type: 'group',
+        },
       },
     },
   },
-};
+  {
+    _id: new ObjectId('5e303982ea0cf40001aef79b'),
+    survey: new ObjectId('5e3038dbea0cf40001aef63b'),
+    meta: {
+      dateCreated: new Date('2020-01-28T13:41:33.984Z'),
+      dateModified: new Date('2020-01-28T13:42:52.711Z'),
+      version: 1,
+      permissions: [],
+      group: new ObjectId('5e6f8bbeea14550001470c28'),
+      path: '/our-sci',
+    },
+    data: {
+      favorite_color: {
+        value: 'green',
+        meta: {
+          type: 'string',
+        },
+      },
+      personal_group: {
+        full_name: {
+          value: 'Philipp Rudolf',
+          meta: {
+            type: 'string',
+            permissions: ['admin'],
+          },
+        },
+        age: {
+          value: 3,
+          meta: {
+            type: 'number',
+          },
+        },
+        meta: {
+          type: 'group',
+        },
+      },
+    },
+  },
+  {
+    _id: new ObjectId('5e303982ea0cf40001aef81e'),
+    survey: new ObjectId('5e3038dbea0cf40001aef63b'),
+    meta: {
+      dateCreated: new Date('2020-01-28T13:42:07.781Z'),
+      dateModified: new Date('2020-01-28T13:43:38.987Z'),
+      version: 1,
+      permissions: [],
+      group: new ObjectId('5e6f8bbeea14550001470c28'),
+      path: '/our-sci',
+    },
+    data: {
+      favorite_color: {
+        value: 'pink',
+        meta: {
+          type: 'string',
+        },
+      },
+      personal_group: {
+        full_name: {
+          value: 'Nora Rudolf',
+          meta: {
+            type: 'string',
+            permissions: ['admin'],
+          },
+        },
+        age: {
+          value: 0,
+          meta: {
+            type: 'number',
+          },
+        },
+        meta: {
+          type: 'group',
+        },
+      },
+    },
+  },
+  {
+    _id: new ObjectId('5e303982ea0cf40001aef94f'),
+    survey: new ObjectId('5e3038dbea0cf40001aef63b'),
+    meta: {
+      dateCreated: new Date('2020-01-28T13:42:33.452Z'),
+      dateModified: new Date('2020-01-28T13:42:55.314Z'),
+      version: 1,
+      permissions: [],
+      group: new ObjectId('5e6f8bbeea14550001470c28'),
+      path: '/our-sci',
+    },
+    data: {
+      favorite_color: {
+        value: 'blue',
+        meta: {
+          type: 'string',
+        },
+      },
+      personal_group: {
+        full_name: {
+          value: 'Stefanie Rudolf',
+          meta: {
+            type: 'string',
+            permissions: ['admin'],
+          },
+        },
+        age: {
+          value: 32,
+          meta: {
+            type: 'number',
+          },
+        },
+        meta: {
+          type: 'group',
+        },
+      },
+    },
+  },
+];
 
 export const exampleGroup = {
   _id: new ObjectId('5e6f8bbeea14550001470c28'),
@@ -335,4 +452,17 @@ db.users
     },
   ])
   .pretty();
+*/
+
+/*
+db.users.aggregate([
+  {
+    $match: {
+      $or: [
+        { 'group.user': ObjectId('5e6f8bbeea14550001470c28') },
+        { 'group.admin': ObjectId('5e6f8bbeea14550001470c28') },
+      ],
+    },
+  },
+]);
 */

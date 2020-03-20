@@ -169,6 +169,30 @@ const deleteGroup = async (req, res) => {
   }
 };
 
+const getUsers = async (req, res) => {
+  const { id } = req.params;
+
+  const users = await db
+    .collection('users')
+    .aggregate([
+      {
+        $match: {
+          $or: [{ 'group.user': new ObjectId(id) }, { 'group.admin': new ObjectId(id) }],
+        },
+      },
+      {
+        $project: {
+          email: 1,
+          name: 1,
+          group: 1,
+        },
+      },
+    ])
+    .toArray();
+
+  return res.send(users);
+};
+
 export default {
   getGroups,
   getGroupByPath,
@@ -176,4 +200,5 @@ export default {
   createGroup,
   updateGroup,
   deleteGroup,
+  getUsers,
 };
