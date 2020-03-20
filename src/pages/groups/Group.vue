@@ -3,7 +3,7 @@
     <div class="d-flex justify-space-between align-center">
       <span v-if="entity.path">
         <router-link
-          :to="`/groups${entity.path}`"
+          :to="`/g${entity.path}`"
           class="text-muted"
         >{{entity.path}}</router-link>
       </span>
@@ -21,17 +21,22 @@
       {{entity.name}}
     </h1>
 
-    <div class="mt-2">
-      <app-group-list
-        :entities="subgroups"
-        :path="subgroupPath"
-        title="Subgroups"
-      />
-      <div
-        v-if="subgroups.length === 0"
-        class="grey--text"
-      >No subgroups yet</div>
-    </div>
+    <v-row>
+      <v-col>
+        <app-group-user-list :entities="users" />
+      </v-col>
+      <v-col>
+        <app-group-list
+          :entities="subgroups"
+          :path="subgroupPath"
+          title="Subgroups"
+        />
+        <div
+          v-if="subgroups.length === 0"
+          class="grey--text"
+        >No subgroups yet</div>
+      </v-col>
+    </v-row>
 
   </v-container>
   <v-container v-else-if="status.code === 404">
@@ -44,6 +49,8 @@
 <script>
 import api from '@/services/api.service';
 import appGroupList from '@/components/groups/GroupList.vue';
+import appGroupUserList from '@/components/groups/GroupUserList.vue';
+
 
 import { GROUP_PATH_DELIMITER } from '@/constants';
 
@@ -51,6 +58,7 @@ export default {
   name: 'Group',
   components: {
     appGroupList,
+    appGroupUserList,
   },
   data() {
     return {
@@ -65,6 +73,7 @@ export default {
         slug: '',
         path: null,
       },
+      users: [],
       subgroups: [],
     };
   },
@@ -74,7 +83,8 @@ export default {
       try {
         const { data } = await api.get(`/groups/by-path/${path}`);
         this.entity = data;
-        this.getSubgroups();
+        await this.getSubgroups();
+        await this.getUsers();
       } catch (e) {
         this.status.code = e.response.status;
         this.status.message = e.response.data.message;
@@ -93,6 +103,10 @@ export default {
         this.status.code = e.response.status;
         this.status.message = e.response.data.message;
       }
+    },
+    async getUsers() {
+      const { data } = await api.get(`/groups/${this.entity._id}/users`);
+      this.users = data;
     },
   },
   computed: {

@@ -22,7 +22,7 @@
         v-for="group in groups"
         :key="group._id"
       >
-        <v-list-item :to="`/groups/${group.path?group.path:''}${group.slug}`">
+        <v-list-item :to="`/g/${group.path?group.path:''}${group.slug}`">
           <v-list-item-content>
             <v-list-item-title>{{group.name}}</v-list-item-title>
             <v-list-item-subtitle>{{group._id}}</v-list-item-subtitle>
