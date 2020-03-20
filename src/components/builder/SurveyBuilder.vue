@@ -154,6 +154,13 @@
           :submission="instance"
           :survey="survey"
         ></draft>
+        <v-overlay :value="enableSaveDraft">
+          <v-card>
+            <v-card-text>
+              Please Save Draft to update Survey Preview.
+            </v-card-text>
+          </v-card>
+        </v-overlay>
       </pane>
 
     </splitpanes>
