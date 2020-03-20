@@ -105,9 +105,7 @@ export default {
       };
     },
     addItem() {
-      // console.log('add item', this.$emit, this.items);
       this.$emit('set-control-source', [
-      // this.$emit('input', [
         ...this.value,
         this.createItem(),
       ]);

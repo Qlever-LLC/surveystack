@@ -1,30 +1,50 @@
 <template>
   <div class="mt-3 mb-3">
-    <v-btn
-      dark
-      color="red"
-      key="group"
-      @click="addControl(group)"
-      class="ma-1"
-    >Group</v-btn>
-    <v-divider class="my-4"></v-divider>
-    <v-btn
-      dark
-      color="indigo"
-      v-for="el in rest"
-      :key="el.type"
-      @click="addControl(el)"
-      class="ma-1"
+    <v-speed-dial
+      v-model="fabIsOpen"
+      absolute
+      transition="none"
+      :style="{ bottom: '40px', left: '200px', transform: 'translateX(-50%)' }"
+
     >
-      <v-icon
-        left
-        v-if="el.icon"
-        color="grey lighten-1"
+      <template v-slot:activator>
+        <v-btn
+          v-model="fabIsOpen"
+          fab
+          color="blue darken-2"
+          dark
+        >
+          <v-icon v-if="fabIsOpen">mdi-close</v-icon>
+          <v-icon v-else>mdi-plus</v-icon>
+        </v-btn>
+      </template>
+      <v-btn
+        dark
+        color="red"
+        key="group"
+        @click="addControl(group)"
+        class="ma-1"
       >
-        {{el.icon}}
-      </v-icon>
-      {{el.name}}
-    </v-btn>
+        Group
+      </v-btn>
+      <v-btn
+        dark
+        color="indigo"
+        v-for="el in rest"
+        :key="el.type"
+        @click="addControl(el)"
+        class="ma-1"
+      >
+        <v-icon
+          left
+          v-if="el.icon"
+          color="grey lighten-1"
+        >
+          {{el.icon}}
+        </v-icon>
+        {{el.name}}
+      </v-btn>
+    </v-speed-dial>
   </div>
 </template>
 
@@ -41,6 +61,7 @@ export default {
       rest,
       group,
       sequence: 0,
+      fabIsOpen: false,
     };
   },
   methods: {

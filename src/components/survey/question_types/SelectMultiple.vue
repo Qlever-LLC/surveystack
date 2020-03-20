@@ -9,7 +9,7 @@
           multiple
         >
           <v-list-item
-            v-for="(item) in control.options.source"
+            v-for="(item) in filteredSource"
             :value="item.value"
             :key="item.value"
           >
@@ -22,7 +22,7 @@
                 />
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title v-text="item.value" />
+                <v-list-item-title v-text="item.label" />
               </v-list-item-content>
             </template>
           </v-list-item>
@@ -91,6 +91,9 @@ export default {
     },
   },
   computed: {
+    filteredSource() {
+      return this.control.options.source.filter(({ value, label }) => value && label);
+    },
     sourceIsValid() {
       return this.control.options.source
         && Array.isArray(this.control.options.source)

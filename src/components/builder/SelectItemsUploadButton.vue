@@ -22,33 +22,45 @@
 <script>
 import { parse } from 'papaparse';
 
+const columns = ['label', 'value', 'tags'];
+function columnIsValid(name) {
+  return RegExp(this.columns.join('|')).test(name);
+}
+
 export default {
+  data() {
+    return {
+      columns,
+    };
+  },
   methods: {
+    columnIsValid,
+    filterItemsKeys(items) {
+      return items.map(({ label, value, tags }) => ({ label, value, tags }));
+    },
     async handleFileChange({ target: { files: [file] } }) {
       console.log('handle file change');
       console.log(file);
-
+      console.log(this.columns);
       try {
         const data = parse(await file.text(), {
           header: true,
           skipEmptyLines: true,
-          // beforeFirstChunk(chunk) {
-          //   const { index } = chunk.match(/\r\n|\r|\n/);
-          //   const headings = chunk.substr(0, index).split(',');
-          //   // headings[0] = 'newHeading';
-          //   // headings.split
-          //   return headings.join() + chunk.substr(index);
-          // },
+          // Normalize keys / column headings
+          transformHeader(header) {
+            return columns.reduce(
+              (r, x) => r.replace(RegExp(x, 'i'), x),
+              header,
+            );
+          },
+
         });
 
-        this.$emit('change', data);
+        this.$emit('change', this.filterItemsKeys(data.data));
         this.$refs['select-items-file-input'].value = null;
       } catch (err) {
-        console.error('error parsing CSV file');
+        console.error('error parsing CSV file', err);
       }
-    },
-    itemIsValid(item) {
-      // return [/label/].every(key => key));
     },
   },
 };
