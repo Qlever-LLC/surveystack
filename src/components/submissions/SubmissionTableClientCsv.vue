@@ -92,7 +92,7 @@ export default {
       const headers = [];
       if (this.parsed) {
         this.parsed.meta.fields.forEach((header) => {
-          if (this.excludeMeta && header.startsWith('meta')) {
+          if (this.excludeMeta && (header.startsWith('meta') || header === 'survey')) {
             return;
           }
           this.$set(this.searchFields, header, '');
