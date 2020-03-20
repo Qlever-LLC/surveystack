@@ -53,6 +53,7 @@ export const availableControls = [
     label: 'My group',
     type: 'group',
     children: [],
+    icon: 'mdi-group',
   },
   {
     name: 'location',

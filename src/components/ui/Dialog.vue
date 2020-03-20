@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="show">
+  <v-dialog v-model="show" :width="width">
     <v-card>
       <v-card-title class="headline">
         <slot name="title">Header slot content</slot>
@@ -25,6 +25,7 @@ export default {
   props: {
     value: Boolean,
     labelConfirm: String,
+    width: [String, Number],
   },
   computed: {
     show: {

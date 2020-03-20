@@ -3,48 +3,47 @@
     class="screen-root"
     style="padding: 0px 12px 0px 0px !important"
   >
-    <control-adder @controlAdded="controlAdded" />
+
     <splitpanes
       style="padding: 0px !important"
       class="pane-root"
       vertical
     >
-      <pane class="pane pane-survey">
-        <survey-details
-          :version="version"
-          :draft="isDraft"
-          v-model="survey"
-          :isNew="!editMode"
-          :dirty="dirty"
-          :enableUpdate="enableUpdate"
-          :enableSaveDraft="enableSaveDraft"
-          :enableDismissDraft="enableDismissDraft"
-          :enablePublish="enablePublish"
-          @update="publish"
-          @cancel="onCancel"
-          @saveDraft="saveDraft"
-          @delete="$emit('onDelete')"
-          @publish="publish"
-          class="mb-4"
-        />
-        <graphical-view
-          class="graphical-view"
-          v-if="!viewCode"
-          :selected="control"
-          :controls="currentControls"
-          @controlSelected="controlSelected"
-        />
+      <pane class="pane pane-survey" style="position: relative; overflow: hidden">
+        <div class="pane-fixed-wrapper pr-2">
+          <control-adder @controlAdded="controlAdded" />
+          <survey-details
+            :version="version"
+            :draft="isDraft"
+            v-model="survey"
+            :isNew="!editMode"
+            :dirty="dirty"
+            :enableUpdate="enableUpdate"
+            :enableSaveDraft="enableSaveDraft"
+            :enableDismissDraft="enableDismissDraft"
+            :enablePublish="enablePublish"
+            @update="publish"
+            @cancel="onCancel"
+            @saveDraft="saveDraft"
+            @delete="$emit('onDelete')"
+            @publish="publish"
+            class="mb-4"
+          />
+          <graphical-view
+            class="graphical-view"
+            v-if="!viewCode"
+            :selected="control"
+            :controls="currentControls"
+            @controlSelected="controlSelected"
+          />
 
-
+        </div>
       </pane>
 
-      <pane class="pane pane-controls">
+      <pane class="pane pane-controls" v-if="control">
         <v-card class="pb-3 mb-3">
           <div class=" px-4">
             <!-- <v-card-title class="pl-0">Details</v-card-title> -->
-
-            <v-divider v-if="control" class="my-4"></v-divider>
-
             <control-properties
               v-if="control"
               :control="control"
@@ -155,13 +154,13 @@
           :submission="instance"
           :survey="survey"
         ></draft>
-        <v-overlay :value="enableSaveDraft">
+        <!-- <v-overlay :value="enableSaveDraft">
           <v-card>
             <v-card-text>
               Please Save Draft to update Survey Preview.
             </v-card-text>
           </v-card>
-        </v-overlay>
+        </v-overlay> -->
       </pane>
 
     </splitpanes>
@@ -339,7 +338,7 @@ export default {
         title: this.survey.name || 'Untitled Survey',
         subtitle: `
           <span><span class="question-title-chip">Version ${version}</span></span>
-          <span class="question-title-chip">${amountQuestions.length} Questions</span>
+          <span class="ml-2">${amountQuestions.length} Question${amountQuestions.length > 1 || amountQuestions.length < 1 ? 's' : ''}</span>
         `,
       });
 
@@ -647,7 +646,7 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
 .pane-survey,
 .pane-controls {
   overflow: auto;
-  width: 400px !important;
+  width: 420px !important;
 }
 
 .pane-submission-code,
@@ -721,20 +720,26 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
   transform: translateX(100%);
 }
 
-.pane::-webkit-scrollbar {
+/* .pane::-webkit-scrollbar {
   width: 12px;
   background-color: #f5f5f5;
-}
+} */
 
-.pane::-webkit-scrollbar-thumb {
+/* .pane::-webkit-scrollbar-thumb {
   border-radius: 10px;
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
   background-image: linear-gradient(120deg, #f44336 0%, #d67a74 100%);
-}
-.pane::-webkit-scrollbar-track {
+} */
+/* .pane::-webkit-scrollbar-track {
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
   background-color: #f5f5f5;
   border-radius: 10px;
+} */
+
+.pane-fixed-wrapper {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
 }
 </style>
 

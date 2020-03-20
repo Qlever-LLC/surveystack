@@ -28,13 +28,11 @@
       v-model="showDeleteModal"
       @cancel="showDeleteModal = false"
       @confirm="$emit('onDelete');"
+      width="400"
     >
       <template v-slot:title>Confirm your action</template>
-      <template>
-        Delete survey
-        <strong>{{survey._id}}</strong>
-        for sure?
-      </template>
+      Are you sure you want to delete survey
+      <strong>{{survey.name}}</strong> ({{survey._id}})?
     </app-dialog>
 
     <v-snackbar

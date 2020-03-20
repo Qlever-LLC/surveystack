@@ -5,6 +5,7 @@
     @input="emitInput"
     @blur="setIsEditing(false)"
     placeholder="Untitled Survey"
+    :error-messages="['hello']"
     class="display-1"
     autofocus
   />

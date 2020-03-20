@@ -1,8 +1,10 @@
 <template>
-  <div class="mt-3 mb-3 control-adder">
+  <div class="control-adder">
     <v-speed-dial
       v-model="fabIsOpen"
-      absolute
+      fixed
+      bottom
+      direction="top"
       transition="fade"
       class="fab-button"
       :style="{  }"
@@ -26,10 +28,17 @@
             color="white"
             key="group"
             @click="addControl(group)"
-            class="ma-1 indigo--text"
+            class="ma-1 indigo--text bg-white shadow"
             outlined
             small
           >
+            <v-icon
+              left
+              v-if="group.icon"
+              color="indigo lighten-2"
+            >
+              {{group.icon}}
+            </v-icon>
             Group
           </v-btn>
           <v-btn
@@ -39,7 +48,7 @@
             v-for="el in rest"
             :key="el.type"
             @click="addControl(el)"
-            class="ma-1 d-inline-block"
+            class="ma-1 d-inline-block shadow"
           >
             <v-icon
               left
@@ -100,8 +109,9 @@ export default {
 }
 
 .fab-button {
-  bottom: 40px;
-  left: 227px;
+  /* bottom: 40px; */
+  /* left: 227px; */
+  left: 50%;
   transform: translateX(-50%);
 
 }
@@ -110,4 +120,13 @@ export default {
 .control-adder >>> .v-speed-dial--direction-bottom .v-speed-dial__list {
   with
 } */
+
+.bg-white {
+  background-color: white;
+}
+
+.shadow {
+  /* background: rgba(0, 0, 0, 0.1); */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
 </style>

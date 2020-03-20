@@ -6,40 +6,45 @@
     :list="controls"
     :group="{ name: 'g1' }"
     :invertSwap="true"
+    :dragOptions="{ animation: 200, }"
+    @start="drag = true"
+    @end="drag = false"
   >
-    <div
-      v-for="(el, idx) in controls"
-      class="control-item"
-      :class="{'control-item-selected': (el === selected)}"
-      :key="idx"
-      @mousedown.stop.left="$emit('controlSelected', el)"
-    >
-      <div class="mb-2 d-flex justify-space-between align-center">
-        <div>
-          <span
-            class="caption grey--text text--darken-1"
-          >{{ createIndex(index, idx + 1) | displayIndex}}</span>
-          <br />
-          <span class="title">{{el.label}}</span>
-          <br />
-          <span class="font-weight-light grey--text text--darken-2">{{ el.name }} : {{ el.type }}</span>
+    <transition-group type="transition" :name="!drag ? 'flip-list' : null">
+      <v-card
+        v-for="(el, idx) in controls"
+        class="control-item mb-2"
+        :class="{'control-item-selected': (el === selected)}"
+        :key="idx"
+        @mousedown.stop.left="$emit('controlSelected', el)"
+      >
+        <div class="mb-2 d-flex justify-space-between align-center">
+          <div>
+            <span
+              class="caption grey--text text--darken-1"
+            >{{ createIndex(index, idx + 1) | displayIndex}}</span>
+            <br />
+            <span class="title">{{el.label}}</span>
+            <br />
+            <span class="font-weight-light grey--text text--darken-2">{{ el.name }} : {{ el.type }}</span>
+          </div>
+          <v-icon
+            v-if="selected === el"
+            @click.stop="removeAt(idx)"
+            color="grey lighten-1"
+          >mdi-trash-can-outline</v-icon>
         </div>
-        <v-icon
-          v-if="selected === el"
-          @click.stop="removeAt(idx)"
-          color="grey lighten-1"
-        >mdi-trash-can-outline</v-icon>
-      </div>
 
-      <nested-draggable
-        v-if="el.type == 'group'"
-        :class="{'drop-area': (el.children.length === 0)}"
-        :selected="selected"
-        :controls="el.children"
-        @controlSelected="$emit('controlSelected', $event)"
-        :index="createIndex(index, idx + 1)"
-      />
-    </div>
+        <nested-draggable
+          v-if="el.type == 'group'"
+          :class="{'drop-area': (el.children.length === 0)}"
+          :selected="selected"
+          :controls="el.children"
+          @controlSelected="$emit('controlSelected', $event)"
+          :index="createIndex(index, idx + 1)"
+        />
+      </v-card>
+    </transition-group>
   </draggable>
   <div v-else>
     <v-card>
@@ -57,6 +62,11 @@ export default {
   name: 'nested-draggable',
   components: {
     draggable,
+  },
+  data() {
+    return {
+      drag: false,
+    };
   },
   props: {
     controls: {
@@ -115,9 +125,40 @@ export default {
   padding: 0.75rem 1.25rem;
   border: 1px solid rgba(0, 0, 0, 0.125);
   margin-bottom: -1px;
+  /* border-left: 2px solid transparent; */
+  border-left-width: 2px;
+  position: relative;
+}
+
+.control-item:hover::before, .control-item-selected::before {
+  position: absolute;
+  content: '\F01DD';
+  font-family: "Material Design Icons";
+  font-size: 28px;
+  color: #bbb;
+  top: 50%;
+  transform: translateY(-50%);
+  left: -5px;
 }
 
 .control-item-selected {
   border-left: 2px solid var(--v-primary-base);
+}
+
+
+</style>
+
+
+<style>
+
+.flip-list-move {
+  transition: transform 0.5s;
+}
+.no-move {
+  transition: transform 0s;
+}
+
+.sortable-ghost {
+  opacity: 0.2;
 }
 </style>
