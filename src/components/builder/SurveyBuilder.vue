@@ -3,6 +3,7 @@
     class="screen-root"
     style="padding: 0px 12px 0px 0px !important"
   >
+    <control-adder @controlAdded="controlAdded" />
     <splitpanes
       style="padding: 0px !important"
       class="pane-root"
@@ -16,6 +17,8 @@
           :controls="currentControls"
           @controlSelected="controlSelected"
         />
+
+
       </pane>
 
       <pane class="pane pane-controls">
@@ -38,11 +41,7 @@
               @delete="$emit('onDelete')"
               @publish="publish"
             />
-            <v-divider class="my-4"></v-divider>
-
-            <v-card-title class="pl-0">Add questions</v-card-title>
-            <control-adder @controlAdded="controlAdded" />
-            <v-divider class="my-4"></v-divider>
+            <v-divider v-if="control" class="my-4"></v-divider>
 
             <control-properties
               v-if="control"

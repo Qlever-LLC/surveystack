@@ -67,7 +67,7 @@ export const availableControls = [
     icon: 'mdi-code-braces',
   },
   {
-    name: 'multiple_choice',
+    name: 'multiple choice',
     label: 'Multiple Choice',
     type: 'selectSingle',
     icon: 'mdi-order-bool-descending',
