@@ -445,7 +445,10 @@ export default {
 
     this.setNavbarContent({
       title: this.survey.name,
-      subtitle: `<span><span id="question-title-chip">Version ${this.activeVersion}</span></span> <span id="question-title-chip">${this.positions.length} Questions</span>`,
+      subtitle: `
+        <span><span class="question-title-chip">Version ${this.activeVersion}</span></span>
+        <span class="ml-2">${this.positions.length} Question${this.positions.length > 1 ? 's' : ''}</span>
+      `,
     });
   },
   watch: {
@@ -626,7 +629,7 @@ export default {
 </style>
 
 <style>
-#question-title-chip {
+.question-title-chip {
   display: inline-flex;
   background-color: white;
   color: #ff5722;

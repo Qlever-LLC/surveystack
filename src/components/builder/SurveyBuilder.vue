@@ -10,6 +10,23 @@
       vertical
     >
       <pane class="pane pane-survey">
+        <survey-details
+          :version="version"
+          :draft="isDraft"
+          v-model="survey"
+          :isNew="!editMode"
+          :dirty="dirty"
+          :enableUpdate="enableUpdate"
+          :enableSaveDraft="enableSaveDraft"
+          :enableDismissDraft="enableDismissDraft"
+          :enablePublish="enablePublish"
+          @update="publish"
+          @cancel="onCancel"
+          @saveDraft="saveDraft"
+          @delete="$emit('onDelete')"
+          @publish="publish"
+          class="mb-4"
+        />
         <graphical-view
           class="graphical-view"
           v-if="!viewCode"
@@ -23,24 +40,9 @@
 
       <pane class="pane pane-controls">
         <v-card class="pb-3 mb-3">
-          <div class="sticky-top px-4">
-            <v-card-title class="pl-0">Details</v-card-title>
-            <survey-details
-              :version="version"
-              :draft="isDraft"
-              v-model="survey"
-              :isNew="!editMode"
-              :dirty="dirty"
-              :enableUpdate="enableUpdate"
-              :enableSaveDraft="enableSaveDraft"
-              :enableDismissDraft="enableDismissDraft"
-              :enablePublish="enablePublish"
-              @update="publish"
-              @cancel="onCancel"
-              @saveDraft="saveDraft"
-              @delete="$emit('onDelete')"
-              @publish="publish"
-            />
+          <div class=" px-4">
+            <!-- <v-card-title class="pl-0">Details</v-card-title> -->
+
             <v-divider v-if="control" class="my-4"></v-divider>
 
             <control-properties
@@ -335,7 +337,10 @@ export default {
       console.log('amount: ', amountQuestions);
       this.setNavbarContent({
         title: this.survey.name || 'Untitled Survey',
-        subtitle: `<span><span id="question-title-chip">Version ${version}</span></span> <span id="question-title-chip">${amountQuestions.length} Questions</span>`,
+        subtitle: `
+          <span><span class="question-title-chip">Version ${version}</span></span>
+          <span class="question-title-chip">${amountQuestions.length} Questions</span>
+        `,
       });
 
       console.log('version is', version);

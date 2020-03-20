@@ -150,10 +150,12 @@ export default {
 
 <style scoped>
 .draggable-cursor {
-  cursor: grab;
+  /* cursor: grab; */
+  cursor: all-scroll;
 }
 
 .draggable-cursor:active {
-  cursor: grabbing;
+  /* cursor: grabbing; */
+  cursor: all-scroll;
 }
 </style>

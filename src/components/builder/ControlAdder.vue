@@ -1,10 +1,11 @@
 <template>
-  <div class="mt-3 mb-3">
+  <div class="mt-3 mb-3 control-adder">
     <v-speed-dial
       v-model="fabIsOpen"
       absolute
-      transition="none"
-      :style="{ bottom: '40px', left: '200px', transform: 'translateX(-50%)' }"
+      transition="fade"
+      class="fab-button"
+      :style="{  }"
 
     >
       <template v-slot:activator>
@@ -18,32 +19,39 @@
           <v-icon v-else>mdi-plus</v-icon>
         </v-btn>
       </template>
-      <v-btn
-        dark
-        color="red"
-        key="group"
-        @click="addControl(group)"
-        class="ma-1"
-      >
-        Group
-      </v-btn>
-      <v-btn
-        dark
-        color="indigo"
-        v-for="el in rest"
-        :key="el.type"
-        @click="addControl(el)"
-        class="ma-1"
-      >
-        <v-icon
-          left
-          v-if="el.icon"
-          color="grey lighten-1"
-        >
-          {{el.icon}}
-        </v-icon>
-        {{el.name}}
-      </v-btn>
+      <template v-slot:default>
+        <div class="button-grid">
+          <v-btn
+            dark
+            color="white"
+            key="group"
+            @click="addControl(group)"
+            class="ma-1 indigo--text"
+            outlined
+            small
+          >
+            Group
+          </v-btn>
+          <v-btn
+            small
+            dark
+            color="indigo"
+            v-for="el in rest"
+            :key="el.type"
+            @click="addControl(el)"
+            class="ma-1 d-inline-block"
+          >
+            <v-icon
+              left
+              v-if="el.icon"
+              color="grey lighten-1"
+            >
+              {{el.icon}}
+            </v-icon>
+            {{el.name}}
+          </v-btn>
+        </div>
+      </template>
     </v-speed-dial>
   </div>
 </template>
@@ -83,3 +91,23 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.button-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 340px;
+}
+
+.fab-button {
+  bottom: 40px;
+  left: 227px;
+  transform: translateX(-50%);
+
+}
+
+/* .control-adder >>> .v-speed-dial--direction-top .v-speed-dial__list,
+.control-adder >>> .v-speed-dial--direction-bottom .v-speed-dial__list {
+  with
+} */
+</style>

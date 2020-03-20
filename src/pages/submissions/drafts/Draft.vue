@@ -63,10 +63,13 @@ export default {
     );
 
     const positions = utils.getSurveyPositions(this.survey);
-    this.setNavbarContent({
-      title: this.survey.name,
-      subtitle: `<span><span id="question-title-chip">Version ${this.submission.meta.version}</span></span> <span id="question-title-chip">${positions.length} Questions</span>`,
-    });
+    // this.setNavbarContent({
+    //   title: this.survey.name,
+    //   subtitle: `
+    //     <span><span class="question-title-chip">Version ${this.submission.meta.version}</span></span>
+    //     <span class="question-title-chip">${positions.length} Questions</span>
+    //   `,
+    // });
 
     this.loading = false;
   },
