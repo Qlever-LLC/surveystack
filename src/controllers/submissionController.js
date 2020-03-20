@@ -100,7 +100,7 @@ const buildPipeline = async (req, res) => {
   let sort = {};
   let skip = 0;
   let limit = DEFAULT_LIMIT;
-  let user = 'ed1d1xx1';
+  let user = '5e452119c5117c000185f266';
   let roles = [];
 
   // initial match stage to filter surveys
@@ -109,8 +109,13 @@ const buildPipeline = async (req, res) => {
   }
 
   // redact stage
-  if (req.query.user) {
-    user = req.query.user;
+  if (res.locals.auth.user) {
+    user = res.locals.auth.user._id.toString();
+    // TODO: remove this hack and do a real implementation
+    console.log('User is ', user);
+    if (user === '5e452119c5117c000185f275') {
+      roles.push('admin@/our-sci');
+    }
   }
 
   if (req.query.roles) {
