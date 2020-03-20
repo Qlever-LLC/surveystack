@@ -2,41 +2,41 @@
   <div>
     <v-card>
       <v-card-title>
-        {{title}}
+        Members
         <v-spacer />
         <v-btn
           color="primary"
           class="ml-4"
-          :to="{name: 'groups-new', query: {path: path}}"
+          :to="{name: 'users-new'}"
           text
         >New...</v-btn>
       </v-card-title>
       <v-card-text>
         <v-text-field
           label="Search"
-          v-model="q"
-          id="oursci-group-list-search"
           append-icon="mdi-magnify"
+          v-model="q"
         />
         <template v-if="entities.length > 0">
           <v-list-item
-            v-for="group in groups"
-            :key="group._id"
+            v-for="(user,i) in users"
+            :key="`user-${i}`"
             two-line
-            :to="`/g/${group.path?group.path:''}${group.slug}`"
+            :to="`/users/${user._id}`"
           >
             <v-list-item-content>
-              <v-list-item-title>{{group.name}}</v-list-item-title>
-              <v-list-item-subtitle>{{group._id}}</v-list-item-subtitle>
-              <small>path={{group.path | showNull}}</small>
+              <v-list-item-title>{{user.name}}</v-list-item-title>
+              <v-list-item-subtitle>{{user.email}}</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
         </template>
         <div
           v-else
           class="grey--text"
-        >No {{title}} yet</div>
+        >No members yet</div>
+
       </v-card-text>
+
     </v-card>
 
   </div>
@@ -44,32 +44,32 @@
 
 <script>
 export default {
-  props: {
-    entities: {
-      type: Array,
-    },
-    title: {
-      type: String,
-      default: 'Groups',
-    },
-    path: {
-      type: String,
-      default: null,
-    },
-  },
-  computed: {
-    groups() {
-      if (!this.q) {
-        return this.entities;
-      }
-
-      return this.entities.filter(entity => entity.name.toLowerCase().indexOf(this.q) > -1);
-    },
-  },
   data() {
     return {
       q: '',
     };
+  },
+  props: {
+    entities: {
+      type: Array,
+    },
+  },
+  computed: {
+    users() {
+      if (!this.q) {
+        return this.entities;
+      }
+      return this.entities.filter((entity) => {
+        if (entity.name.toLowerCase().indexOf(this.q.toLowerCase()) > -1) {
+          return true;
+        }
+
+        if (entity.email.toLowerCase().startsWith(this.q.toLowerCase())) {
+          return true;
+        }
+        return false;
+      });
+    },
   },
 };
 </script>

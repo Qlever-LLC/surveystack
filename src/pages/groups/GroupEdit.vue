@@ -83,7 +83,7 @@ export default {
           data,
         });
         this.$router.push(
-          `/groups/${this.entity.path ? this.entity.path : ''}${
+          `/g/${this.entity.path ? this.entity.path : ''}${
             this.entity.slug
           }`,
         );
@@ -97,14 +97,16 @@ export default {
         return;
       }
 
-      this.$router.replace(`/groups${this.entity.path}`);
+      this.$router.replace(`/g${this.entity.path}`);
     },
   },
   watch: {
     'entity.name': {
       handler(newVal, oldVal) {
-        const handle = handleize(newVal);
-        this.entity.slug = handle;
+        if (!this.editMode) {
+          const handle = handleize(newVal);
+          this.entity.slug = handle;
+        }
       },
     },
     'entity.slug': {

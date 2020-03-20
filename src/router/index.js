@@ -187,7 +187,7 @@ const routes = [
     component: GroupEdit,
   },
   {
-    path: '/groups/*',
+    path: '/g/*',
     name: 'groups-by-path',
     component: Group,
   },
