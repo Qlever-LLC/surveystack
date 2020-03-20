@@ -28,11 +28,23 @@
             <br />
             <span class="font-weight-light grey--text text--darken-2">{{ el.name }} : {{ el.type }}</span>
           </div>
-          <v-icon
-            v-if="selected === el"
-            @click.stop="removeAt(idx)"
-            color="grey lighten-1"
-          >mdi-trash-can-outline</v-icon>
+          <div class="d-flex">
+            <v-btn
+              icon
+              v-if="selected === el"
+              @click.stop="() => duplicateControl(el)"
+              class="mr-0"
+            >
+              <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
+            </v-btn>
+            <v-btn
+              icon
+              v-if="selected === el"
+              @click.stop="removeAt(idx)"
+            >
+              <v-icon color="grey lighten-1">mdi-delete</v-icon>
+            </v-btn>
+          </div>
         </div>
 
         <nested-draggable
@@ -57,6 +69,7 @@
 </template>
 <script>
 import draggable from 'vuedraggable';
+import { cloneDeep } from 'lodash';
 
 export default {
   name: 'nested-draggable',
@@ -98,6 +111,13 @@ export default {
       const newIndex = [...current];
       newIndex.push(idx);
       return newIndex;
+    },
+    duplicateControl(el) {
+      this.$emit('duplicate-control', {
+        ...el,
+        name: `${el.name}_copy`,
+        label: `${el.label} copy`,
+      });
     },
   },
 };

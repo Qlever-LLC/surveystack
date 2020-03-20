@@ -35,6 +35,7 @@
             :selected="control"
             :controls="currentControls"
             @controlSelected="controlSelected"
+            @duplicate-control="duplicateControl"
           />
 
         </div>
@@ -154,13 +155,13 @@
           :submission="instance"
           :survey="survey"
         ></draft>
-        <!-- <v-overlay :value="enableSaveDraft">
+        <v-overlay :value="enableSaveDraft">
           <v-card>
             <v-card-text>
               Please Save Draft to update Survey Preview.
             </v-card-text>
           </v-card>
-        </v-overlay> -->
+        </v-overlay>
       </pane>
 
     </splitpanes>
@@ -402,6 +403,13 @@ export default {
       } else {
         this.scriptCode = null;
       }
+    },
+    duplicateControl(control) {
+      console.log('duplicate control', control);
+
+      const position = utils.getPosition(this.control, this.currentControls);
+      utils.insertControl(control, this.currentControls, position, this.control.type === 'group');
+      this.control = control;
     },
     controlAdded(control) {
       if (!this.control) {
