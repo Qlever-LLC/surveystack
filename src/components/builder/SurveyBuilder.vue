@@ -383,9 +383,9 @@ export default {
       console.log(value);
     },
     async controlSelected(control) {
-      console.log('selected control', control);
+      // console.log('selected control', control);
       this.control = control;
-      if (control.type === 'script' && control.options.source) {
+      if (control && control.type === 'script' && control.options.source) {
         const { data } = await api.get(`/scripts/${control.options.source}`);
         this.hideScriptCode = false;
         this.scriptCode = data || { _id: null, name: 'New Script', content: '' };

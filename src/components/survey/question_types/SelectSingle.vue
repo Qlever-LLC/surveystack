@@ -8,7 +8,7 @@
         v-if="sourceIsValid"
       >
         <v-radio
-          v-for="(item) in control.options.source"
+          v-for="(item) in filteredSource"
           :label="item.label"
           :value="item.value"
           :key="item.key"
@@ -16,6 +16,7 @@
         <v-radio
           label="Other"
           :value="customSelection"
+          v-if="control.options.allowCustomSelection"
         >
           <template v-slot:label>
               <!-- v-model="customSelection" -->
@@ -70,6 +71,9 @@ export default {
     },
   },
   computed: {
+    filteredSource() {
+      return this.control.options.source.filter(({ value, label }) => value && label);
+    },
     sourceIsValid() {
       return this.control.options.source
         && Array.isArray(this.control.options.source)
