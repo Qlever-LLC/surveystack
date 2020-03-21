@@ -405,8 +405,6 @@ export default {
       }
     },
     duplicateControl(control) {
-      console.log('duplicate control', control);
-
       const position = utils.getPosition(this.control, this.currentControls);
       utils.insertControl(control, this.currentControls, position, this.control.type === 'group');
       this.control = control;

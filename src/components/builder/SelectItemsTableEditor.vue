@@ -4,7 +4,14 @@
       <span>
         Edit Select Options
       </span>
-      <select-items-upload-button @change="handleFileChange" class="mt-4 mb-n2" />
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on }">
+          <div v-on="on">
+            <select-items-upload-button @change="handleFileChange" class="mt-4 mb-n2" />
+          </div>
+        </template>
+        CSV must have column headers 'label', 'value', and optionally 'tags'
+      </v-tooltip>
     </v-card-title>
 
     <v-card-text>

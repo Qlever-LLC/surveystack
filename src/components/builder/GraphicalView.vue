@@ -33,7 +33,6 @@
               icon
               v-if="selected === el"
               @click.stop="() => duplicateControl(el)"
-              class="mr-0"
             >
               <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
             </v-btn>
