@@ -226,8 +226,8 @@ export const renderScript = (process, render, props) => (state) => {
   );
 };
 
-export const runScript = (process, render, props) => (state) => {
-  const nextState = process(props, state);
+export const runScript = (process, render, props) => async (state) => {
+  const nextState = await process(props, state);
   updateParentState(nextState);
   renderScript(process, render, props)(nextState);
 };

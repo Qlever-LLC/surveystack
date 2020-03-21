@@ -69,7 +69,7 @@ export default function buildScriptQuestionIframeContents({
 
         ${scriptSource}
 
-        onMessage('REQUEST_RUN_SCRIPT', (state) => runScript(process, render, props)(state));
+        onMessage('REQUEST_RUN_SCRIPT', async (state) => await runScript(process, render, props)(state));
         onMessage('REQUEST_RENDER_SCRIPT', () => renderScript(process, render, props)(state));
         onMessage('REQUEST_RESET_SCRIPT', resetDOM);
 
