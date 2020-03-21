@@ -15,11 +15,11 @@ export const notFound = (req, res, next) => {
 };
 
 export const developmentErrors = (err, req, res, next) => {
-  res.status(err.output.statusCode).json({ message: err.message });
+  res.status((err.output && err.output.statusCode) || 500).json({ message: err.message });
 };
 
 export const productionErrors = (err, req, res, next) => {
-  res.status(err.output.statusCode).json(err.output.payload);
+  res.status((err.output && err.output.statusCode) || 500).json((err && err.output && err.output.payload) || err);
 };
 
 export default {
