@@ -112,11 +112,12 @@ export default {
       return newIndex;
     },
     duplicateControl(el) {
-      this.$emit('duplicate-control', {
-        ...el,
+      const copy = {
+        ...cloneDeep(el),
         name: `${el.name}_copy`,
         label: `${el.label} copy`,
-      });
+      };
+      this.$emit('duplicate-control', copy);
     },
   },
 };
