@@ -17,7 +17,7 @@ const PATH_PREFIX = process.env.PATH_PREFIX;
 const app = express();
 const frontend = express.static('../our-sci-pwa/dist');
 
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({ limit: '3mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
