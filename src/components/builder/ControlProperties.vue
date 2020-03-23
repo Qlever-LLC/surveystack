@@ -41,21 +41,35 @@
         outlined
       />
       <v-checkbox
-        class="ma-0"
+        class="my-1"
         color="blue"
         outlined
         v-if="control.type !== 'group'"
         v-model="control.options.required"
         label="Required"
-      />
+        hide-details
+      >
+        <template slot="label">
+          <div>
+            <div class="text--primary">Required</div>
+            <div class="body-2">Make this a required field</div>
+          </div>
+        </template>
+      </v-checkbox>
 
       <v-checkbox
-        class="ma-0"
+        class="my-1"
         color="blue"
-        outlined
         v-model="control.options.redacted"
-        label="Redacted"
-      />
+        label="Private"
+      >
+        <template slot="label">
+          <div>
+            <div class="text--primary">Private</div>
+            <div class="body-2">Only admins and original submitters can see this field</div>
+          </div>
+        </template>
+      </v-checkbox>
 
       <v-checkbox
         class="ma-0"
@@ -74,7 +88,7 @@
 
       <div
         v-if="!showAdvanced"
-        class="d-flex justify-end"
+        class="d-flex justify-end mt-4"
       >
         <v-btn
           @click="showAdvanced = true"
