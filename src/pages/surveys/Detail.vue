@@ -5,6 +5,7 @@
   >
     <div class="d-flex justify-end">
       <v-btn
+        v-if="$store.getters['auth/isLoggedIn']"
         class="mx-2"
         :to="`/surveys/${entity._id}/edit`"
       >

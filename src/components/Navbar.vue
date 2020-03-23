@@ -203,8 +203,10 @@ export default {
       const items = [];
       const divider = { type: 'divider' };
       items.push(...this.sidenav.collect);
-      items.push(divider);
-      items.push(...this.sidenav.admin);
+      if (this.$store.getters['auth/isLoggedIn']) {
+        items.push(divider);
+        items.push(...this.sidenav.admin);
+      }
       // items.push(divider);
       // items.push(...this.sidenav.dev);
       return items;
