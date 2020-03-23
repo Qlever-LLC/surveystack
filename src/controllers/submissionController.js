@@ -19,6 +19,10 @@ const sanitize = entity => {
   entity.meta.dateCreated = new Date(entity.meta.dateCreated);
   entity.meta.dateModified = new Date(entity.meta.dateModified);
 
+  if (entity.meta.creator) {
+    entity.meta.creator = new ObjectId(entity.meta.creator);
+  }
+
   // TODO: may want to save dateModified from nested data meta fields
   // as new Date(..) as well, currently it is just a string
 
@@ -46,9 +50,19 @@ const createRedactStage = (user, roles) => {
     $redact: {
       $switch: {
         branches: [
+          // check if user is creator
+          {
+            case: { $eq: [user ? new ObjectId(user) : 'NO_AUTH_USER', '$$ROOT.meta.creator'] },
+            then: '$$KEEP',
+          },
           // check for owner rights
           {
-            case: { $in: [user, { $ifNull: ['$$ROOT.meta.owners', []] }] },
+            case: {
+              $in: [
+                user ? new ObjectId(user) : 'NO_AUTH_USER',
+                { $ifNull: ['$$ROOT.meta.owners', []] },
+              ],
+            },
             then: '$$KEEP',
           },
           // check if meta.permissions does not exist or is empty
@@ -100,7 +114,7 @@ const buildPipeline = async (req, res) => {
   let sort = {};
   let skip = 0;
   let limit = DEFAULT_LIMIT;
-  let user = '5e452119c5117c000185f266';
+  let user = null;
   let roles = [];
 
   // initial match stage to filter surveys
@@ -125,6 +139,7 @@ const buildPipeline = async (req, res) => {
     });
   }
 
+  console.log('creating redact stage with user', user);
   const redactStage = createRedactStage(user, roles);
   pipeline.push(redactStage);
 
@@ -322,6 +337,13 @@ const getSubmission = async (req, res) => {
 
 const createSubmission = async (req, res) => {
   const entity = sanitize(req.body);
+
+  // apply creator
+  if (res.locals.auth.user) {
+    entity.meta.creator = res.locals.auth.user._id;
+  } else {
+    entity.meta.creator = null;
+  }
 
   try {
     let r = await db.collection(col).insertOne(entity);
