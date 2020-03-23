@@ -9,7 +9,10 @@
       class="pane-root"
       vertical
     >
-      <pane class="pane pane-survey" style="position: relative; overflow: hidden">
+      <pane
+        class="pane pane-survey"
+        style="position: relative; overflow: hidden"
+      >
         <div class="pane-fixed-wrapper pr-2">
           <control-adder @controlAdded="controlAdded" />
           <survey-details
@@ -41,7 +44,10 @@
         </div>
       </pane>
 
-      <pane class="pane pane-controls" v-if="control">
+      <pane
+        class="pane pane-controls"
+        v-if="control"
+      >
         <v-card class="pb-3 mb-3">
           <div class=" px-4">
             <!-- <v-card-title class="pl-0">Details</v-card-title> -->
@@ -347,6 +353,7 @@ export default {
     },
     updateSelectedCode(code) {
       this.control.options[tabMap[this.selectedTab]].code = code;
+      this.activeCode = code;
     },
     highlightNext() {
       [
@@ -370,7 +377,11 @@ export default {
       this.selectedTab = tabMap.indexOf(tab);
 
       if (!this.control.options[tab].code) {
-        this.control.options[tab].code = initialRelevanceCode(tab);
+        const initalCode = initialRelevanceCode(tab);
+        this.control.options[tab].code = initalCode;
+        this.activeCode = initalCode;
+      } else {
+        this.activeCode = this.control.options[tab].code;
       }
     },
     async runCode() {
@@ -596,10 +607,8 @@ const survey = ${JSON.stringify(this.survey, null, 4)}`;
           return;
         }
 
-        // latestVersion does not exist on revisions, but is a root property of the survey, so this probably always picked the default version = 1.
-        // TODO: Check if this still works as intended
-        // this.instance = submissionUtils.createSubmissionFromSurvey(newVal, newVal.revisions[newVal.revisions.length - 1].latestVersion, this.instance);
-        this.instance = submissionUtils.createSubmissionFromSurvey(newVal, newVal.latestVersion, this.instance);
+        // if only relevance changes, don't flush results
+        this.instance = submissionUtils.createSubmissionFromSurvey(newVal, this.survey.revisions[this.survey.revisions.length - 1].version, this.instance);
       },
       deep: true,
     },

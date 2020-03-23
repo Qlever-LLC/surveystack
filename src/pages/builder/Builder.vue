@@ -13,6 +13,16 @@
     <div v-else>LOADING...</div>
 
     <app-dialog
+      v-model="showLogin"
+      @confirm="navigateToLogin"
+    >
+      <template v-slot:title>Log in to create a Survey</template>
+      <template>
+        Please log in order to be able to save your survey.
+      </template>
+    </app-dialog>
+
+    <app-dialog
       v-model="showConflictModal"
       @cancel="showConflictModal = false"
       @confirm="generateId"
@@ -96,7 +106,16 @@ export default {
       showDeleteModal: false,
     };
   },
+  computed: {
+    showLogin() {
+      console.log('logged in', this.$store.getters['auth/isLoggedIn']);
+      return !this.$store.getters['auth/isLoggedIn'];
+    },
+  },
   methods: {
+    navigateToLogin() {
+      this.$router.push('/auth/login');
+    },
     snack(message) {
       this.snackbarMessage = message;
       this.showSnackbar = true;

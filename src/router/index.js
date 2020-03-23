@@ -37,8 +37,17 @@ import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
 
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 
+import store from '@/store';
 
 Vue.use(VueRouter);
+
+const guard = async (to, from, next) => {
+  if (!store.getters['auth/isLoggedIn']) {
+    next({ name: 'auth-login', params: { redirect: to } });
+  } else {
+    next();
+  }
+};
 
 const routes = [
   {
@@ -81,6 +90,7 @@ const routes = [
     props: {
       isNew: true,
     },
+    beforeEnter: guard,
   },
   {
     path: '/surveys/:id/edit',
@@ -89,6 +99,7 @@ const routes = [
     props: {
       isNew: false,
     },
+    beforeEnter: guard,
   },
   {
     path: '/surveys/:id',
@@ -227,5 +238,6 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes,
 });
+
 
 export default router;

@@ -126,6 +126,7 @@ export default {
   methods: {
     add() {
       if (!this.selectedField || !this.selectedOperator) {
+        this.$emit('apply-basic-filters', this.filters);
         return;
       }
       const { key, type } = this.queryList.find(item => item.name === this.selectedField);

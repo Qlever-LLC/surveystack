@@ -87,109 +87,109 @@ export default {
   data() {
     return {
       drawer: false,
-      items: [
-        {
-          type: 'subheader',
-          label: 'COLLECT',
-        },
-        {
-          type: 'link',
-          label: 'My Submissions',
-          to: { name: 'my-surveys' },
-          icon: 'mdi-clipboard',
-        },
-        {
-          type: 'link',
-          label: 'Browse',
-          to: { name: 'surveys-browse' },
-          icon: 'mdi-magnify',
-        },
-        {
-          type: 'divider',
-        },
-        {
-          type: 'subheader',
-          label: 'ADMIN',
-        },
-        {
-          type: 'link',
-          label: 'Builder',
-          to: { name: 'surveys-new' },
-          icon: 'mdi-newspaper-plus',
-        },
-        {
-          type: 'link',
-          label: 'Scripts',
-          to: { name: 'scripts-list' },
-          icon: 'mdi-language-javascript',
-        },
-        {
-          type: 'link',
-          label: 'Groups',
-          to: {
-            name: 'groups-list',
+      sidenav: {
+        collect: [
+          {
+            type: 'subheader',
+            label: 'COLLECT',
           },
-          icon: 'mdi-domain',
-        },
-        {
-          type: 'link',
-          label: 'Users',
-          to: {
-            name: 'users-list',
+          {
+            type: 'link',
+            label: 'My Submissions',
+            to: { name: 'my-surveys' },
+            icon: 'mdi-clipboard',
           },
-          icon: 'mdi-account-search',
-        },
-        {
-          type: 'divider',
-        },
-        {
-          type: 'subheader',
-          label: 'DEBUG',
-        },
-        {
-          type: 'link',
-          label: 'Tabula Rasa',
-          to: {
-            name: 'tabula-rasa',
+          {
+            type: 'link',
+            label: 'Browse',
+            to: { name: 'surveys-browse' },
+            icon: 'mdi-magnify',
           },
-          icon: 'mdi-delete-variant',
-        },
-        {
-          type: 'link',
-          label: 'Experiment',
-          to: {
-            name: 'experiment',
+        ],
+        admin: [
+          {
+            type: 'subheader',
+            label: 'ADMIN',
           },
-          icon: 'mdi-pill',
-        },
-        {
-          type: 'link',
-          label: 'Andreas',
-          to: {
-            name: 'experiment-ar',
+          {
+            type: 'link',
+            label: 'Builder',
+            to: { name: 'surveys-new' },
+            icon: 'mdi-newspaper-plus',
           },
-          icon: 'mdi-alpha-a',
-          class: 'ml-3',
-        },
-        {
-          type: 'link',
-          label: 'Manuel',
-          to: {
-            name: 'experiment-mdc',
+          {
+            type: 'link',
+            label: 'Scripts',
+            to: { name: 'scripts-list' },
+            icon: 'mdi-language-javascript',
           },
-          icon: 'mdi-alpha-m',
-          class: 'ml-3',
-        },
-        {
-          type: 'link',
-          label: 'Will',
-          to: {
-            name: 'experiment-wg',
+          {
+            type: 'link',
+            label: 'Groups',
+            to: {
+              name: 'groups-list',
+            },
+            icon: 'mdi-domain',
           },
-          icon: 'mdi-alpha-w',
-          class: 'ml-3',
-        },
-      ],
+          {
+            type: 'link',
+            label: 'Users',
+            to: {
+              name: 'users-list',
+            },
+            icon: 'mdi-account-search',
+          },
+        ],
+        dev: [
+          {
+            type: 'subheader',
+            label: 'DEBUG',
+          },
+          {
+            type: 'link',
+            label: 'Tabula Rasa',
+            to: {
+              name: 'tabula-rasa',
+            },
+            icon: 'mdi-delete-variant',
+          },
+          {
+            type: 'link',
+            label: 'Experiment',
+            to: {
+              name: 'experiment',
+            },
+            icon: 'mdi-pill',
+          },
+          {
+            type: 'link',
+            label: 'Andreas',
+            to: {
+              name: 'experiment-ar',
+            },
+            icon: 'mdi-alpha-a',
+            class: 'ml-3',
+          },
+          {
+            type: 'link',
+            label: 'Manuel',
+            to: {
+              name: 'experiment-mdc',
+            },
+            icon: 'mdi-alpha-m',
+            class: 'ml-3',
+          },
+          {
+            type: 'link',
+            label: 'Will',
+            to: {
+              name: 'experiment-wg',
+            },
+            icon: 'mdi-alpha-w',
+            class: 'ml-3',
+          },
+        ],
+      },
     };
   },
   computed: {
@@ -198,6 +198,18 @@ export default {
     },
     appSubtitle() {
       return this.$store.getters['appui/subtitle'];
+    },
+    items() {
+      const items = [];
+      const divider = { type: 'divider' };
+      items.push(...this.sidenav.collect);
+      if (this.$store.getters['auth/isLoggedIn']) {
+        items.push(divider);
+        items.push(...this.sidenav.admin);
+      }
+      // items.push(divider);
+      // items.push(...this.sidenav.dev);
+      return items;
     },
   },
 };

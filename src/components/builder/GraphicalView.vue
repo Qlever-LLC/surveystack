@@ -10,7 +10,12 @@
     @start="drag = true"
     @end="drag = false"
   >
-    <transition-group type="transition" :name="!drag ? 'flip-list' : null">
+    <transition-group
+      type="transition"
+      tag="div"
+      class="drop-area"
+      :name="!drag ? 'flip-list' : null"
+    >
       <v-card
         v-for="(el, idx) in controls"
         class="control-item mb-2"
@@ -20,9 +25,7 @@
       >
         <div class="mb-2 d-flex justify-space-between align-center">
           <div>
-            <span
-              class="caption grey--text text--darken-1"
-            >{{ createIndex(index, idx + 1) | displayIndex}}</span>
+            <span class="caption grey--text text--darken-1">{{ createIndex(index, idx + 1) | displayIndex}}</span>
             <br />
             <span class="title">{{el.label}}</span>
             <br />
@@ -48,7 +51,7 @@
 
         <nested-draggable
           v-if="el.type == 'group'"
-          :class="{'drop-area': (el.children.length === 0)}"
+          :class="{'drop-area-border': (el.children.length === 0)}"
           :selected="selected"
           :controls="el.children"
           @controlSelected="$emit('controlSelected', $event)"
@@ -125,6 +128,9 @@ export default {
 <style scoped>
 .drop-area {
   min-height: 4rem;
+}
+
+.drop-area-border {
   border-radius: 0.25rem;
   border: 1px solid rgba(0, 0, 0, 0.125);
 }
@@ -150,9 +156,10 @@ export default {
   position: relative;
 }
 
-.control-item:hover::before, .control-item-selected::before {
+.control-item:hover::before,
+.control-item-selected::before {
   position: absolute;
-  content: '\F01DD';
+  content: "\F01DD";
   font-family: "Material Design Icons";
   font-size: 28px;
   color: #bbb;
@@ -164,13 +171,10 @@ export default {
 .control-item-selected {
   border-left: 2px solid var(--v-primary-base);
 }
-
-
 </style>
 
 
 <style>
-
 .flip-list-move {
   transition: transform 0.5s;
 }

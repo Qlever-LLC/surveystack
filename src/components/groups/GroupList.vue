@@ -28,7 +28,6 @@
             <v-list-item-content>
               <v-list-item-title>{{group.name}}</v-list-item-title>
               <v-list-item-subtitle>{{group._id}}</v-list-item-subtitle>
-              <small>path={{group.path | showNull}}</small>
             </v-list-item-content>
           </v-list-item>
         </template>
