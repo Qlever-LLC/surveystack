@@ -466,3 +466,33 @@ db.users.aggregate([
   },
 ]);
 */
+
+/*
+// This may be a better way to store roles, however, a lookup on the nested groups is more complicated
+const userWithRoles = {
+  email: 'user@gmx.ch',
+  name: 'User William Roles',
+  roles: [
+    { group: '5e6f8bbeea14550001470c28', type: 'admin' },
+    { group: '5e789e8a9f0a2b00018f7c27', type: 'user' },
+  ],
+};
+
+// find users in group 5e6f8bbeea14550001470c28
+// and then also filter their roles to only contain this group
+const matchStage = {"roles.group": ObjectId('5e6f8bbeea14550001470c28')},
+const projectStage = {
+  $project: {
+    email: 1,
+    name: 1,
+    roles: {
+      $filter: {
+        input: '$roles',
+        as: 'role',
+        cond: { $in: ['$$role.group', [ObjectId('5e6f8bbeea14550001470c28')]] },
+      },
+    },
+  },
+};
+
+*/
