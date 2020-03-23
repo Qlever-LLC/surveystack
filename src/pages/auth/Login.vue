@@ -89,6 +89,7 @@ export default {
     if (this.initialEmail) {
       this.entity.email = this.initialEmail;
     }
+    console.log(this.$route.params);
   },
   methods: {
     async submit() {
@@ -107,7 +108,11 @@ export default {
           url: '/auth/login',
           user: this.entity,
         });
-        this.$router.push('/');
+        if (this.$route.params.redirect) {
+          this.$router.push(this.$route.params.redirect);
+        } else {
+          this.$router.push('/');
+        }
       } catch (error) {
         switch (error.response.status) {
           case 401:
