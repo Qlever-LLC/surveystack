@@ -61,6 +61,7 @@
 import * as monaco from 'monaco-editor';
 
 /*
+// TODO: make sure scripts editor still works
 // validation settings
 monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
   noSemanticValidation: true,
