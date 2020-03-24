@@ -150,7 +150,6 @@
             class="code-editor"
             readonly="true"
             :code="sharedCode"
-            fold="true"
           ></code-editor>
         </div>
       </pane>
