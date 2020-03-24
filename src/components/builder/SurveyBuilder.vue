@@ -196,17 +196,14 @@ import * as utils from '@/utils/surveys';
 import submissionUtils from '@/utils/submissions';
 
 
-const initialRelevanceCode = variable => `
+const initialRelevanceCode = variable => `\
 /**
- * BASIC: use \`submission.\` to autocomplete the basic submission
- * ADVANCED: use \`rawSubmission.\` to autocomplete the advanced version of a submission
- * use \`survey.\` to access the current survey and its information
- * use \`log(message)\` to log to console
- *
+ * ${variable.charAt(0).toUpperCase() + variable.substr(1)}
+ * 
+ * @param {Object} args
+ * @param {Data} args.data
  */
-function ${variable}() {
-
-  // return true or false
+function ${variable}({data}) {
   return true;
 }
 `;
@@ -517,30 +514,14 @@ export default {
         return '';
       }
 
-      const simplified = utils.simplify(this.instance.data);
-      const submission = `
-/**
- * This is the basic version of the submission.
- * start typing 'submission.' in order to see completion
- */
-
-const submission = ${JSON.stringify(simplified, null, 4)}`;
-      const rawSubmission = `
-/**
- * This is the raw version of the submission, it includes additional
- * meta information such as question type and modification timestamps.
- *
- * use this if you need advanced information of the submission
- */
-const rawSubmission = ${JSON.stringify(this.instance, null, 4)}`;
-      const survey = `
-/**
- * This is the survey object. It contains all questions as well
- * as their properties and attributes.
- */
-
-const survey = ${JSON.stringify(this.survey, null, 4)}`;
-      return `${submission}\n\n${rawSubmission}\n\n${survey}\n`;
+      const data = `const Data = ${JSON.stringify(this.instance.data, null, 2)}`;
+      /*
+            const submission = `\
+      const Submission = ${JSON.stringify(this.instance, null, 4)}`;
+            const survey = `\
+      const Survey = ${JSON.stringify(this.survey, null, 4)}`;
+      */
+      return `${data}\n`;
     },
   },
   watch: {

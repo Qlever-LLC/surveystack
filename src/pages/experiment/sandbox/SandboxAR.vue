@@ -1,13 +1,16 @@
 <template>
-  <app-submission-table-server-csv />
+  <code-editor
+    class="main-code-editor"
+  />
 </template>
 
 <script>
-import appSubmissionTableServerCsv from '@/components/submissions/SubmissionTableServerCsv.vue';
+import codeEditor from '@/components/ui/CodeEditor.vue';
+
 
 export default {
   components: {
-    appSubmissionTableServerCsv,
+    codeEditor,
   },
 };
 </script>

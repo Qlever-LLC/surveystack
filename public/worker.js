@@ -9,7 +9,7 @@ function get(target, key) {
 }
 
 function compileSandbox(src, fname) {
-  const wrappedSource = `with (sandbox) { ${src}\nreturn ${fname}(data); }`;
+  const wrappedSource = `with (sandbox) { ${src}\n\nreturn ${fname}(args); }`;
   const code = new Function('sandbox', wrappedSource);
 
   return function (sandbox) {
@@ -24,10 +24,8 @@ onmessage = (e) => {
     const sandbox = compileSandbox(e.data.code, e.data.functionName);
 
     const res = sandbox({
-      JSON,
-      submission: e.data.submission,
-      rawSubmission: e.data.rawSubmission,
-      survey: e.data.survey,
+      args: e.data.args,
+      JSON, // for using JSON.stringify() and JSON.parse()
       log: (line) => {
         postMessage({ log: line });
       },

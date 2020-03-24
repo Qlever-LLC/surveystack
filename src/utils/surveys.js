@@ -393,10 +393,8 @@ export function execute(code, functionName, instance, survey, log) {
 
     worker.postMessage(
       {
+        args: { data: instance.data },
         code,
-        submission: simplify(instance.data),
-        rawSubmission: instance,
-        survey,
         functionName,
       },
     );

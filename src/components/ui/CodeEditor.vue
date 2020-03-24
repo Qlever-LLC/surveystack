@@ -60,6 +60,7 @@
 
 import * as monaco from 'monaco-editor';
 
+/*
 // validation settings
 monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
   noSemanticValidation: true,
@@ -73,6 +74,7 @@ monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
 });
 
 monaco.languages.typescript.javascriptDefaults.setEagerModelSync(true);
+*/
 
 monaco.editor.createModel(`
 /**
