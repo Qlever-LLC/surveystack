@@ -557,7 +557,6 @@ export default {
     },
     control: {
       handler(newVal) {
-        console.log('control changed');
         if (!newVal) {
           this.optionsRelevance = null;
           this.optionsCalculate = null;
@@ -573,8 +572,6 @@ export default {
     },
     survey: {
       handler(newVal, oldVal) {
-        console.log('survey changed', newVal);
-
         this.initNavbarAndDirtyFlag(newVal);
         if (!this.initialSurvey || !this.survey) {
           this.surveyUnchanged = true;
@@ -598,8 +595,6 @@ export default {
     this.initNavbarAndDirtyFlag(this.survey);
 
     this.instance = submissionUtils.createSubmissionFromSurvey(this.survey, this.survey.revisions[this.survey.revisions.length - 1].version, this.instance);
-    console.log('instance', this.instance);
-    console.log('survey', this.survey);
   },
 };
 </script>
