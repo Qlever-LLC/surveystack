@@ -29,12 +29,32 @@ export const createControlInstance = (control) => {
     cloneWithDefaultOptions.options.source = [];
   }
 
+  if (control.type === 'instructions') {
+    cloneWithDefaultOptions.options.source = '';
+  }
+
   delete cloneWithDefaultOptions.icon;
   return cloneWithDefaultOptions;
 };
 
 
 export const availableControls = [
+  {
+    name: 'instructions',
+    label: 'Instructions',
+    type: 'instructions',
+    // icon: 'mdi-card-text-outline',
+    // icon: 'mdi-card-text',
+    // icon: 'mdi-sign-text',
+    // icon: 'mdi-format-list-text',
+    // icon: 'mdi-clipboard-text',
+    icon: 'mdi-clipboard-text-outline',
+    // icon: 'mdi-note-text',
+    // icon: 'mdi-note-text-outline',
+    // icon: 'mdi-text',
+    // icon: 'mdi-text-box',
+    // icon: 'mdi-text-box-outline',
+  },
   {
     name: 'text',
     label: 'Enter some text',
@@ -71,17 +91,21 @@ export const availableControls = [
     name: 'multiple choice',
     label: 'Multiple Choice',
     type: 'selectSingle',
-    icon: 'mdi-order-bool-descending',
+    // icon: 'mdi-order-bool-descending',
     // icon: 'mdi-checkbox-multiple-blank-circle-outline',
+    icon: 'mdi-radiobox-marked',
   },
   {
     name: 'checkboxes',
     label: 'Checkboxes',
     type: 'selectMultiple',
     // icon: 'mdi-order-bool-ascending-variant',
-    icon: 'mdi-format-list-checks',
+    // icon: 'mdi-format-list-checks',
     // icon: 'mdi-check-box-outline',
     // icon: 'mdi-checkbox-multiple-marked-outline',
+    // icon: 'mdi-checkbox-marked',
+    icon: 'mdi-checkbox-marked-outline',
+
   },
   {
     name: 'dropdown',
@@ -90,6 +114,10 @@ export const availableControls = [
     // icon: 'mdi-text-search',
     // icon: 'mdi-view-list',
     // icon: 'mdi-box-search',
-    icon: 'mdi-format-list-bulleted-type',
+    // icon: 'mdi-format-list-bulleted-type',
+    // icon: 'mdi-textbox',
+    icon: 'mdi-arrow-down-drop-circle',
+    // icon: 'mdi-arrow-down-drop-circle-outline',
+
   },
 ];

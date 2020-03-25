@@ -121,8 +121,8 @@
 /* eslint-disable no-new */
 
 import mapboxgl from 'mapbox-gl';
-import baseQuestionComponent from './BaseQuestionComponent';
 import appGps from '@/components/ui/Gps.vue';
+import baseQuestionComponent from './BaseQuestionComponent';
 
 
 let wakeLock = null;

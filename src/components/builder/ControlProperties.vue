@@ -166,6 +166,11 @@
         v-model="control.options.source"
         class="mt-5"
       />
+
+      <instructions-editor
+        v-if="isInstructions"
+        v-model="control.options.source"
+      />
     </v-form>
     <div v-else>...</div>
   </div>
@@ -174,11 +179,12 @@
 import { getAdvancedCodeTemplate } from '@/utils/surveys';
 import api from '@/services/api.service';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
-
+import InstructionsEditor from '@/components/builder/InstructionsEditor.vue';
 
 export default {
   components: {
     SelectItemsEditor,
+    InstructionsEditor,
   },
   props: {
     control: {
@@ -214,6 +220,9 @@ export default {
   computed: {
     isScript() {
       return this.control.type === 'script';
+    },
+    isInstructions() {
+      return this.control.type === 'instructions';
     },
     isSelect() {
       return /select/i.test(this.control.type);

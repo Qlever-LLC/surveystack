@@ -24,9 +24,9 @@
 </template>
 
 <script>
-import BaseQuestionComponent from './BaseQuestionComponent';
 import buildScriptQuestionIframeContents, { onMessage } from '@/utils/userScript';
 import api from '@/services/api.service';
+import BaseQuestionComponent from './BaseQuestionComponent';
 
 export default {
   mixins: [BaseQuestionComponent],
