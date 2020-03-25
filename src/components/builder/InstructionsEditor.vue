@@ -2,8 +2,111 @@
   <v-card outlined class="instructions-editor">
     <v-card-title class="pa-0">
       <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
-          <v-toolbar color="grey lighten-3" flat dense class="pa-0">
-            <v-toolbar-items class="pa-0" color="grey lighten-3">
+          <v-toolbar color="grey lighten-3" flat dense class="pa-0 editor-toolbar">
+            <v-toolbar-items class="pa-0 align-center justify-space-between" color="grey lighten-3">
+              <div>
+                <v-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': isActive.paragraph() }"
+                  @click="commands.paragraph"
+                >
+                  <v-icon>mdi-format-pilcrow</v-icon>
+                </v-btn>
+
+                <v-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': isActive.heading({ level: 1 }) }"
+                  @click="commands.heading({ level: 1 })"
+                >
+                  <v-icon>mdi-format-header-1</v-icon>
+                </v-btn>
+
+                <v-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': isActive.heading({ level: 2 }) }"
+                  @click="commands.heading({ level: 2 })"
+                >
+                  <v-icon>mdi-format-header-2</v-icon>
+
+                </v-btn>
+
+                <v-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': isActive.heading({ level: 3 }) }"
+                  @click="commands.heading({ level: 3 })"
+                >
+                  <v-icon>mdi-format-header-3</v-icon>
+
+                </v-btn>
+              </div>
+
+              <div class="ml-2">
+                <v-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': isActive.blockquote() }"
+                  @click="commands.blockquote"
+                >
+                  <v-icon>mdi-format-quote-close</v-icon>
+                </v-btn>
+
+                <!-- <v-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': isActive.code() }"
+                  @click="commands.code"
+                >
+                  <v-icon>mdi-code-tags</v-icon>
+                </v-btn> -->
+
+                <!-- <v-select
+                  :items="getParagraphStyles(isActive, commands)"
+                >
+                  <template v-slot:selection="{ item, index }">
+                    <v-btn
+                      icon
+                      small
+                      class="menubar__button"
+                      :class="{ 'v-btn--active': condition }"
+                      @click="item.action"
+                    >
+                      <v-icon>{{ item.icon }}</v-icon>
+                    </v-btn>
+                  </template>
+
+                </v-select> -->
+
+                <v-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': isActive.bullet_list() }"
+                  @click="commands.bullet_list"
+                >
+                  <v-icon>mdi-format-list-bulleted</v-icon>
+                </v-btn>
+
+                <v-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': isActive.ordered_list() }"
+                  @click="commands.ordered_list"
+                >
+                  <v-icon>mdi-format-list-numbered</v-icon>
+                </v-btn>
+              </div>
+
               <!-- <v-btn
                 icon
                 small
@@ -22,127 +125,47 @@
                 <v-icon>mdi-redo</v-icon>
               </v-btn> -->
 
-              <v-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.bold() }"
-                @click="commands.bold"
-              >
-                <v-icon>mdi-format-bold</v-icon>
-              </v-btn>
+              <div>
+                <v-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': isActive.bold() }"
+                  @click="commands.bold"
+                >
+                  <v-icon>mdi-format-bold</v-icon>
+                </v-btn>
 
-              <v-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.italic() }"
-                @click="commands.italic"
-              >
-                <v-icon>mdi-format-italic</v-icon>
-              </v-btn>
+                <v-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': isActive.italic() }"
+                  @click="commands.italic"
+                >
+                  <v-icon>mdi-format-italic</v-icon>
+                </v-btn>
 
-              <v-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.strike() }"
-                @click="commands.strike"
-              >
-                <v-icon>mdi-format-strikethrough</v-icon>
-              </v-btn>
+                <v-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': isActive.strike() }"
+                  @click="commands.strike"
+                >
+                  <v-icon>mdi-format-strikethrough</v-icon>
+                </v-btn>
 
-              <v-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.underline() }"
-                @click="commands.underline"
-              >
-                <v-icon>mdi-format-underline</v-icon>
-              </v-btn>
-
-              <!-- <v-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.code() }"
-                @click="commands.code"
-              >
-                <v-icon>mdi-code-tags</v-icon>
-              </v-btn> -->
-
-              <v-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.paragraph() }"
-                @click="commands.paragraph"
-              >
-                <!-- <v-icon>mdi-format-paragraph</v-icon> -->
-                <v-icon>mdi-format-pilcrow</v-icon>
-              </v-btn>
-
-              <v-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.heading({ level: 1 }) }"
-                @click="commands.heading({ level: 1 })"
-              >
-                <v-icon>mdi-format-header-1</v-icon>
-              </v-btn>
-
-              <v-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.heading({ level: 2 }) }"
-                @click="commands.heading({ level: 2 })"
-              >
-                <v-icon>mdi-format-header-2</v-icon>
-
-              </v-btn>
-
-              <v-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.heading({ level: 3 }) }"
-                @click="commands.heading({ level: 3 })"
-              >
-                <v-icon>mdi-format-header-3</v-icon>
-
-              </v-btn>
-
-              <v-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.bullet_list() }"
-                @click="commands.bullet_list"
-              >
-                <v-icon>mdi-format-list-bulleted</v-icon>
-              </v-btn>
-
-              <v-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.ordered_list() }"
-                @click="commands.ordered_list"
-              >
-                <v-icon>mdi-format-list-numbered</v-icon>
-              </v-btn>
-              <v-btn
-                icon
-                small
-                class="menubar__button"
-                :class="{ 'v-btn--active': isActive.blockquote() }"
-                @click="commands.blockquote"
-              >
-                <v-icon>mdi-format-quote-close</v-icon>
-              </v-btn>
+                <v-btn
+                  icon
+                  small
+                  class="menubar__button"
+                  :class="{ 'v-btn--active': isActive.underline() }"
+                  @click="commands.underline"
+                >
+                  <v-icon>mdi-format-underline</v-icon>
+                </v-btn>
+              </div>
 
               <!-- <v-btn
                 icon
@@ -154,14 +177,14 @@
                 <v-icon>mdi-code-braces</v-icon>
               </v-btn> -->
 
-              <v-btn
+              <!-- <v-btn
                 icon
                 small
                 class="menubar__button"
                 @click="commands.horizontal_rule"
               >
                 <v-icon>mdi-minus</v-icon>
-              </v-btn>
+              </v-btn> -->
 
             </v-toolbar-items>
           </v-toolbar>
@@ -249,7 +272,77 @@
           </v-toolbar> -->
       </editor-menu-bar>
     </v-card-title>
-    <v-card-text class="pt-4">
+    <v-card-text class="pa-0">
+      <editor-menu-bubble
+        class="menububble"
+        :editor="editor"
+        @hide="hideLinkMenu"
+        v-slot="{ commands, isActive, getMarkAttrs, menu }"
+      >
+        <div
+          class="menububble"
+          :class="{ 'is-active': menu.isActive }"
+          :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`"
+        >
+          <v-card class="pa-0">
+            <v-card-text class="pa-0">
+              <form
+                class="menububble__form"
+                v-if="linkMenuIsActive"
+                @submit.prevent="setLinkUrl(commands.link, linkUrl)"
+              >
+                <!-- <input
+                  class="menububble__input"
+                  type="text"
+                  v-model="linkUrl"
+                  placeholder="https://"
+                  ref="linkInput"
+                  @keydown.esc="hideLinkMenu"
+                /> -->
+
+                <v-text-field
+                  class="menububble__input ml-4"
+                  dense
+                  v-model="linkUrl"
+                  placeholder="https://"
+                  ref="linkInput"
+                  @keydown.esc="hideLinkMenu"
+                />
+                <v-btn
+                  small
+                  class="menububble__button"
+                  @click="setLinkUrl(commands.link, linkUrl)"
+                  icon
+                >
+                  <v-icon>mdi-check</v-icon>
+                </v-btn>
+                <v-btn
+                  small
+                  class="menububble__button mr-1"
+                  @click="setLinkUrl(commands.link, null)"
+                  icon
+                >
+                  <v-icon>mdi-close</v-icon>
+                </v-btn>
+              </form>
+
+              <template v-else>
+                <v-btn
+                  class="menububble__button"
+                  @click="showLinkMenu(getMarkAttrs('link'))"
+                  :class="{ 'is-active': isActive.link() }"
+                  icon
+                >
+                  <span>{{ isActive.link() ? 'Update Link' : 'Add Link'}}</span>
+                  <v-icon>mdi-link</v-icon>
+                </v-btn>
+              </template>
+            </v-card-text>
+          </v-card>
+
+
+        </div>
+      </editor-menu-bubble>
       <editor-content
         :editor="editor"
         class="tiptap-editor"
@@ -269,7 +362,12 @@
 </template>
 
 <script>
-import { Editor, EditorContent, EditorMenuBar } from 'tiptap';
+import {
+  Editor,
+  EditorContent,
+  EditorMenuBar,
+  EditorMenuBubble,
+} from 'tiptap';
 import {
   Blockquote,
   CodeBlock,
@@ -317,6 +415,7 @@ export default {
     // TiptapVuetify,
     EditorContent,
     EditorMenuBar,
+    EditorMenuBubble,
   },
   props: {
     value: {
@@ -368,6 +467,32 @@ export default {
     return {
       editor: null,
       emitAfterOnUpdate: false,
+      linkUrl: null,
+      linkMenuIsActive: false,
+      // getParagraphStyles(isActive, commands) {
+      //   return [
+      //     {
+      //       condition: isActive.paragraph(),
+      //       action: commands.paragraph,
+      //       icon: 'mdi-format-pilcrow',
+      //     },
+      //     {
+      //       condition: isActive.heading({ level: 1 }),
+      //       action: commands.heading({ level: 1 }),
+      //       icon: 'mdi-format-header-1',
+      //     },
+      //     {
+      //       condition: isActive.heading({ level: 2 }),
+      //       action: commands.heading({ level: 2 }),
+      //       icon: 'mdi-format-header-2',
+      //     },
+      //     {
+      //       condition: isActive.heading({ level: 3 }),
+      //       action: commands.heading({ level: 3 }),
+      //       icon: 'mdi-format-header-3',
+      //     },
+      //   ];
+      // },
     };
   },
   watch: {
@@ -379,6 +504,23 @@ export default {
       if (this.editor) {
         this.editor.setContent(val);
       }
+    },
+  },
+  methods: {
+    showLinkMenu(attrs) {
+      this.linkUrl = attrs.href;
+      this.linkMenuIsActive = true;
+      this.$nextTick(() => {
+        this.$refs.linkInput.focus();
+      });
+    },
+    hideLinkMenu() {
+      this.linkUrl = null;
+      this.linkMenuIsActive = false;
+    },
+    setLinkUrl(command, url) {
+      command({ href: url });
+      this.hideLinkMenu();
     },
   },
 };
@@ -394,5 +536,80 @@ export default {
   width: 100%;
   height: 100%;
   min-height: 150px;
+  padding: 16px;
+}
+
+.tiptap-editor >>> .ProseMirror blockquote {
+  border-left: .25em solid #dfe2e5;
+  padding-left: 1em;
+  color: #6a737d;
+  margin: 20px 0;
+}
+
+:root {
+  --color-black: #666;
+  --color-white: #eee;
+}
+
+.menububble {
+  position: absolute;
+  display: flex;
+  z-index: 20;
+  background: var(--color-black);
+  border-radius: 5px;
+  padding: 0.3rem;
+  margin-bottom: 0.5rem;
+  transform: translateX(-50%);
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s, visibility 0.2s;
+}
+.menububble.is-active {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+.menububble__button {
+    display: inline-flex;
+    background: transparent;
+    border: 0;
+    color: var(--color-white);
+    padding: 0.2rem 0.5rem;
+    margin-right: 0.2rem;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.menububble__button:last-child {
+      margin-right: 0;
+}
+
+.menububble__button:hover {
+  background-color: rgba(var(--color-white, 0.1));
+}
+
+.menububble__button.is-active {
+  background-color: rgba(var(--color-white, 0.2));
+}
+
+.menububble__form {
+    display: flex;
+    align-items: center;
+  }
+
+.menububble__input {
+    font: inherit;
+    border: none;
+    background: transparent;
+    color: var(--color-white);
+}
+
+.instructions-editor >>> .editor-toolbar .v-toolbar__items {
+  width: 100%;
+}
+.instructions-editor >>> .editor-toolbar .v-toolbar__content {
+  padding-left: 4px;
+  padding-right: 4px;
+  width: 100%;
 }
 </style>
