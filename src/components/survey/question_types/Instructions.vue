@@ -1,9 +1,10 @@
 <template>
-  <v-container fluid>
+  <v-container fluid class="instructions">
     <v-row>
       <div
         v-if="control.options.source"
         v-html="control.options.source"
+        class="instr"
       />
     </v-row>
   </v-container>
@@ -18,6 +19,13 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.instructions >>> blockquote {
+  border-left: .25em solid #dfe2e5;
+  padding-left: 1em;
+  color: #6a737d;
+  margin: 20px 0;
+}
+
 
 </style>
