@@ -10,12 +10,12 @@
     @start="drag = true"
     @end="drag = false"
   >
-    <transition-group
+    <!-- <transition-group
       type="transition"
       tag="div"
       class="drop-area"
       :name="!drag ? 'flip-list' : null"
-    >
+    > -->
       <v-card
         v-for="(el, idx) in controls"
         class="control-item mb-2"
@@ -58,7 +58,7 @@
           :index="createIndex(index, idx + 1)"
         />
       </v-card>
-    </transition-group>
+    <!-- </transition-group> -->
   </draggable>
   <div v-else>
     <v-card>
