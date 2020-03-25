@@ -199,8 +199,8 @@ const initialRelevanceCode = variable => `\
 /**
  * ${variable.charAt(0).toUpperCase() + variable.substr(1)}
  * 
- * @param {Object} args
- * @param {Data} args.data
+ * @param {Object} params
+ * @param {Data} params.data
  */
 function ${variable}({data}) {
   return true;
