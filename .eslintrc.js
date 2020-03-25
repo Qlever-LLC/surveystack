@@ -11,9 +11,9 @@ module.exports = {
     'no-console': process.env.NODE_ENV === 'production' ? 'off' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'import/prefer-default-export': 1,
-    'max-len': 1,
+    'max-len': 0,
     'no-underscore-dangle': 0,
-    'no-plusplus' : 0,
+    'no-plusplus': 0,
     'no-unused-vars': 1,
   },
   parserOptions: {
@@ -27,5 +27,5 @@ module.exports = {
     env: {
       jest: true,
     },
-  }, ],
+  },],
 };
