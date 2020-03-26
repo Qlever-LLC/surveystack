@@ -4,7 +4,6 @@
 
 
 import { unflatten } from 'flat';
-import ObjectID from 'bson-objectid';
 import _ from 'lodash';
 import submissionUtils from './submissions';
 

@@ -30,6 +30,8 @@
             @saveDraft="saveDraft"
             @delete="$emit('onDelete')"
             @publish="publish"
+            @export-survey="$emit('export-survey')"
+            @import-survey="(file) => $emit('import-survey', file)"
             class="mb-4"
           />
           <graphical-view
@@ -199,8 +201,8 @@ const initialRelevanceCode = variable => `\
 /**
  * ${variable.charAt(0).toUpperCase() + variable.substr(1)}
  * 
- * @param {Object} args
- * @param {Data} args.data
+ * @param {Object} params
+ * @param {Data} params.data
  */
 function ${variable}({data}) {
   return true;
@@ -231,6 +233,7 @@ export default {
   props: [
     'survey',
     'editMode',
+    'freshImport',
   ],
   data() {
     return {
@@ -465,6 +468,10 @@ export default {
       return !this.isDraft;
     },
     enableSaveDraft() {
+      if (this.freshImport) {
+        return true;
+      }
+
       if (!this.editMode) { // if survey new
         if (this.initialSurvey.name !== this.survey.name) {
           return true;
