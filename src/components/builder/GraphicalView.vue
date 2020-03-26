@@ -10,17 +10,17 @@
     @start="drag = true"
     @end="drag = false"
   >
-    <!-- <transition-group
+    <transition-group
       type="transition"
       tag="div"
       class="drop-area"
       :name="!drag ? 'flip-list' : null"
-    > -->
+    >
       <v-card
         v-for="(el, idx) in controls"
         class="control-item mb-2"
         :class="{'control-item-selected': (el === selected)}"
-        :key="idx"
+        :key="el.name"
         @mousedown.stop.left="$emit('controlSelected', el)"
       >
         <div class="mb-2 d-flex justify-space-between align-center">
@@ -58,7 +58,7 @@
           :index="createIndex(index, idx + 1)"
         />
       </v-card>
-    <!-- </transition-group> -->
+    </transition-group>
   </draggable>
   <div v-else>
     <v-card>

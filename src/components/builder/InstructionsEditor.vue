@@ -291,15 +291,6 @@
                 v-if="linkMenuIsActive"
                 @submit.prevent="setLinkUrl(commands.link, linkUrl)"
               >
-                <!-- <input
-                  class="menububble__input"
-                  type="text"
-                  v-model="linkUrl"
-                  placeholder="https://"
-                  ref="linkInput"
-                  @keydown.esc="hideLinkMenu"
-                /> -->
-
                 <v-text-field
                   class="menububble__input ml-4"
                   dense
@@ -348,16 +339,7 @@
         class="tiptap-editor"
         style="width: 100%; height: 100%;"
       />
-      <!-- <v-row>
-        <v-col cols="12">
-        </v-col>
-      </v-row> -->
     </v-card-text>
-
-      <!-- <tiptap-vuetify
-        v-model="content"
-        :extensions="extensions"
-      /> -->
   </v-card>
 </template>
 
@@ -391,28 +373,10 @@ import {
   Underline,
   History,
 } from 'tiptap-extensions';
-// import {
-//   TiptapVuetify,
-//   Heading,
-//   Bold,
-//   Italic,
-//   Strike,
-//   Underline,
-//   Code,
-//   Paragraph,
-//   BulletList,
-//   OrderedList,
-//   ListItem,
-//   Link,
-//   Blockquote,
-//   HardBreak,
-//   HorizontalRule,
-//   History,
-// } from 'tiptap-vuetify';
+
 
 export default {
   components: {
-    // TiptapVuetify,
     EditorContent,
     EditorMenuBar,
     EditorMenuBubble,
@@ -424,9 +388,6 @@ export default {
     },
   },
   mounted() {
-    // this.editor = new Editor({
-    //   content: '<p>this is just a boring paragraph</p>',
-    // });
     this.editor = new Editor({
       extensions: [
         new Blockquote(),
@@ -527,10 +488,6 @@ export default {
 </script>
 
 <style scoped>
-/* .instructions-editor >>> .ProseMirror {
-  background-color: red;
-} */
-
 .tiptap-editor >>> .ProseMirror {
   /* background-color: blue; */
   width: 100%;
