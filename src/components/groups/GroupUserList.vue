@@ -27,6 +27,31 @@
             <v-list-item-content>
               <v-list-item-title>{{user.name}}</v-list-item-title>
               <v-list-item-subtitle>{{user.email}}</v-list-item-subtitle>
+              <v-autocomplete
+                class="mt-4"
+                dense
+                @change="onChange"
+                :items="items"
+                outlined
+                :delimiters="[',']"
+                chips
+                label="FarmOS: RFC Aggregator"
+                multiple
+              >
+              </v-autocomplete>
+
+              <v-autocomplete
+                class="mt-4"
+                dense
+                @change="onChange"
+                :items="items"
+                outlined
+                :delimiters="[',']"
+                chips
+                label="FarmOS: GM Aggregator"
+                multiple
+              >
+              </v-autocomplete>
             </v-list-item-content>
             <v-list-item-action>
               <v-icon v-if="user.memberships[0].role === 'admin'">mdi-crown-outline</v-icon>
