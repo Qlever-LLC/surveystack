@@ -172,23 +172,50 @@ const deleteGroup = async (req, res) => {
 const getUsers = async (req, res) => {
   const { id } = req.params;
 
+  var groups = [new ObjectId(id)];
+
   const users = await db
     .collection('users')
     .aggregate([
+      { $match: { 'memberships.group': { $in: groups } } },
+      { $unwind: '$memberships' },
       {
-        $match: {
-          $or: [{ 'group.user': new ObjectId(id) }, { 'group.admin': new ObjectId(id) }],
+        $lookup: {
+          from: 'groups',
+          let: { groupId: '$memberships.group' },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$_id', '$$groupId'] } } },
+            { $project: { _id: 1, name: 1 } },
+          ],
+          as: 'memberships.groupDetail',
+        },
+      },
+      { $unwind: '$memberships.groupDetail' },
+      {
+        $group: {
+          _id: '$_id',
+          email: { $first: '$email' },
+          name: { $first: '$name' },
+          memberships: { $push: '$memberships' },
         },
       },
       {
         $project: {
           email: 1,
           name: 1,
-          group: 1,
+          memberships: {
+            $filter: {
+              input: '$memberships',
+              as: 'membership',
+              cond: { $in: ['$$membership.group', groups] },
+            },
+          },
         },
       },
     ])
     .toArray();
+
+  console.log(users);
 
   return res.send(users);
 };

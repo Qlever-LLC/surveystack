@@ -275,10 +275,12 @@ export const exampleUsers = [
     password: '$2b$12$IkxwFgrwXlnpBKBAapHia..beTddaB6qLIATJwMNaPRF5/2jA/97q', // 1234
     permissions: [],
     authProviders: [],
-    group: {
-      user: [],
-      admin: [new ObjectId('5e6f8bbeea14550001470c28')],
-    },
+    memberships: [
+      {
+        group: new ObjectId('5e6f8bbeea14550001470c28'),
+        role: 'admin',
+      },
+    ],
   },
   {
     _id: new ObjectId('5e6f92f16070e700015e0371'),
@@ -288,10 +290,12 @@ export const exampleUsers = [
     password: '$2b$12$7cy0/MdjUywLJ2RHeSuKtuczE11Vo10b5xf5g5jKOxQK09T4tBti2', // 1234
     permissions: [],
     authProviders: [],
-    group: {
-      user: [new ObjectId('5e6f8bbeea14550001470c28')],
-      admin: [],
-    },
+    memberships: [
+      {
+        group: new ObjectId('5e6f8bbeea14550001470c28'),
+        role: 'user',
+      },
+    ],
   },
 ];
 
