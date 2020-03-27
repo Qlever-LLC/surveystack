@@ -1,11 +1,11 @@
 <template>
   <v-container v-if="initialized && status.code === 200">
     <div class="d-flex justify-space-between align-center">
-      <span v-if="entity.path">
+      <span v-if="entity.dir !== '/'">
         <router-link
-          :to="`/g${entity.path}`"
+          :to="`/g${entity.dir}`"
           class="text-muted"
-        >{{entity.path}}</router-link>
+        >{{entity.dir}}</router-link>
       </span>
       <v-btn
         class="ml-auto"

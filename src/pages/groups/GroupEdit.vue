@@ -38,7 +38,7 @@
       </div>
 
     </form>
-    <small>path={{entity.path | showNull}}</small>
+    <small>dir={{entity.dir | showNull}}</small>
   </v-container>
 </template>
 
@@ -56,7 +56,8 @@ export default {
         _id: '',
         name: '',
         slug: '',
-        path: null,
+        dir: '/',
+        path: '',
       },
     };
   },
@@ -82,22 +83,13 @@ export default {
           url,
           data,
         });
-        this.$router.push(
-          `/g/${this.entity.path ? this.entity.path : ''}${
-            this.entity.slug
-          }`,
-        );
+        this.$router.push(`/g${this.entity.dir}${this.entity.slug}`);
       } catch (err) {
         console.log(err);
       }
     },
     cancel() {
-      if (!this.entity.path) {
-        this.$router.replace({ name: 'groups-list' });
-        return;
-      }
-
-      this.$router.replace(`/g${this.entity.path}`);
+      this.$router.replace(`/g${this.entity.dir}`);
     },
   },
   watch: {
@@ -121,8 +113,9 @@ export default {
       ({ name }) => name === 'groups-new',
     );
 
-    if (this.$route.query.path) {
-      this.entity.path = this.$route.query.path;
+    const { dir } = this.$route.query;
+    if (dir) {
+      this.entity.dir = dir;
     }
 
     this.entity._id = new ObjectId();
