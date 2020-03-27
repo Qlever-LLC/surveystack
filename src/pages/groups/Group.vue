@@ -34,7 +34,7 @@
       >
         <app-group-list
           :entities="subgroups"
-          :path="subgroupPath"
+          :dir="entity.path"
           title="Subgroups"
         />
       </v-col>
@@ -52,9 +52,6 @@
 import api from '@/services/api.service';
 import appGroupList from '@/components/groups/GroupList.vue';
 import appGroupUserList from '@/components/groups/GroupUserList.vue';
-
-
-import { GROUP_PATH_DELIMITER } from '@/constants';
 
 export default {
   name: 'Group',
@@ -94,12 +91,7 @@ export default {
     },
     async getSubgroups() {
       try {
-        let childrenPath = `${this.entity.path}${this.entity.slug}${GROUP_PATH_DELIMITER}`;
-        if (this.entity.path === null) {
-          childrenPath = `${GROUP_PATH_DELIMITER}${this.entity.slug}${GROUP_PATH_DELIMITER}`;
-        }
-
-        const { data } = await api.get(`/groups?path=${childrenPath}`);
+        const { data } = await api.get(`/groups?dir=${this.entity.path}`);
         this.subgroups = data;
       } catch (e) {
         this.status.code = e.response.status;
@@ -109,14 +101,6 @@ export default {
     async getUsers() {
       const { data } = await api.get(`/groups/${this.entity._id}/users`);
       this.users = data;
-    },
-  },
-  computed: {
-    subgroupPath() {
-      if (!this.entity.path) {
-        return `${GROUP_PATH_DELIMITER}${this.entity.slug}${GROUP_PATH_DELIMITER}`;
-      }
-      return `${this.entity.path}${this.entity.slug}${GROUP_PATH_DELIMITER}`;
     },
   },
   async beforeRouteUpdate(to, from, next) {

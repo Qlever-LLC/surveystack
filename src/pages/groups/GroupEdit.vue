@@ -116,6 +116,9 @@ export default {
     const { dir } = this.$route.query;
     if (dir) {
       this.entity.dir = dir;
+      if (!this.entity.dir.endsWith('/')) {
+        this.entity.dir += '/';
+      }
     }
 
     this.entity._id = new ObjectId();
