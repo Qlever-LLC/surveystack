@@ -2,7 +2,6 @@ import assert from 'assert';
 import { ObjectId } from 'mongodb';
 
 import boom from '@hapi/boom';
-import { GROUP_PATH_DELIMITER } from '../constants';
 
 import { db } from '../db';
 
@@ -10,25 +9,35 @@ const col = 'groups';
 
 const getGroups = async (req, res) => {
   let entities;
+  let dir = '/';
 
   if (req.query.dir) {
-    entities = await db
-      .collection(col)
-      .find({ dir: req.query.dir })
-      .sort({ name: 1 })
-      .toArray();
-    return res.send(entities);
+    dir = req.query.dir;
+    if (!dir.endsWith('/')) {
+      dir += '/';
+    }
+  }
+
+  let dirQuery = dir;
+  if (req.query.tree) {
+    console.log('setting dirQuery');
+    dirQuery = { $regex: `^${dir}` };
   }
 
   entities = await db
     .collection(col)
-    .find({ dir: '/' })
+    .find({ dir: dirQuery })
+    .sort({ path: 1 })
     .toArray();
   return res.send(entities);
 };
 
 const getGroupByPath = async (req, res) => {
-  const path = req.params[0];
+  let path = req.params[0];
+
+  if (path.endsWith('/')) {
+    path = path.substring(0, path.length - 1);
+  }
 
   const entity = await db.collection(col).findOne({ path });
 
@@ -72,6 +81,7 @@ const createGroup = async (req, res) => {
 const updateGroup = async (req, res) => {
   const { id } = req.params;
   const entity = req.body;
+  entity.path = `${entity.dir}${entity.slug}`;
 
   const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
 
@@ -84,28 +94,12 @@ const updateGroup = async (req, res) => {
       }
     );
 
-    // also find and modify descendants
-    let oldSubgroupPath = `${existing.path}${existing.slug}${GROUP_PATH_DELIMITER}`;
-    if (existing.path === null) {
-      oldSubgroupPath = `${GROUP_PATH_DELIMITER}${existing.slug}${GROUP_PATH_DELIMITER}`;
+    if (existing.slug !== updated.slug) {
+      // also find and modify descendants
+      let oldSubgroupDir = existing.path + '/';
+      let newSubgroupDir = entity.path + '/';
+      await bulkChangePaths(oldSubgroupDir, newSubgroupDir);
     }
-
-    let newSubgroupPath = `${entity.path}${entity.slug}${GROUP_PATH_DELIMITER}`;
-    if (entity.path === null) {
-      newSubgroupPath = `${GROUP_PATH_DELIMITER}${entity.slug}${GROUP_PATH_DELIMITER}`;
-    }
-
-    await db
-      .collection(col)
-      .find({ path: { $regex: `^${oldSubgroupPath}` } })
-      .forEach(descendant => {
-        console.log(`${descendant.path}${descendant.slug}`);
-      });
-    console.log(`old_name: '${existing.slug}' => new_name: '${entity.slug}'`);
-    console.log(`old_path: '${oldSubgroupPath}' => new_path: '${newSubgroupPath}'`);
-    console.log(`This change will affect descendants under '${oldSubgroupPath}'`);
-
-    await bulkChangePaths(oldSubgroupPath, newSubgroupPath);
 
     return res.send(updated);
   } catch (err) {
@@ -121,6 +115,9 @@ const bulkChangePaths = async (oldDir, newDir) => {
       $set: {
         dir: {
           $concat: [newDir, { $substr: ['$dir', { $strLenBytes: oldDir }, -1] }],
+        },
+        path: {
+          $concat: [newDir, { $substr: ['$dir', { $strLenBytes: oldDir }, -1] }, '$slug'],
         },
       },
     },
