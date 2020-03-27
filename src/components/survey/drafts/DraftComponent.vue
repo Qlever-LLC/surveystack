@@ -7,7 +7,10 @@
       v-if="controls.length === 0"
     >
       <div class="d-flex flex-column">
-        <v-icon large color="blue">mdi-file-multiple</v-icon>
+        <v-icon
+          large
+          color="blue"
+        >mdi-file-multiple</v-icon>
         <v-alert
           type="info"
           text
@@ -404,7 +407,7 @@ export default {
 
 
       const promises = items.map(item => new Promise((resolve, reject) => {
-        utils.execute(item.code, 'relevance', this.submission, this.survey)
+        utils.execute({ code: item.code, fname: 'relevance', submission: this.submission })
           .then(r => resolve({
             control: item.control,
             pos: item.pos,
