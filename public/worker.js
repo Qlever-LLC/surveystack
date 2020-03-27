@@ -1,4 +1,6 @@
 /* eslint-disable no-new-func */
+/* eslint-disable func-names */
+
 function has(target, key) {
   return true;
 }
@@ -9,7 +11,7 @@ function get(target, key) {
 }
 
 function compileSandbox(src, fname) {
-  const wrappedSource = `with (sandbox) { ${src}\n\nreturn ${fname}(args); }`;
+  const wrappedSource = `with (sandbox) { ${src}\n\nreturn ${fname}(arg1); }`;
   const code = new Function('sandbox', wrappedSource);
 
   return function (sandbox) {
@@ -21,10 +23,10 @@ function compileSandbox(src, fname) {
 
 onmessage = (e) => {
   try {
-    const sandbox = compileSandbox(e.data.code, e.data.functionName);
+    const sandbox = compileSandbox(e.data.code, e.data.fname);
 
     const res = sandbox({
-      args: e.data.args,
+      arg1: e.data.arg1,
       JSON, // for using JSON.stringify() and JSON.parse()
       log: (line) => {
         postMessage({ log: line });

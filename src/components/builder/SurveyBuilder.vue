@@ -201,10 +201,9 @@ const initialRelevanceCode = variable => `\
 /**
  * ${variable.charAt(0).toUpperCase() + variable.substr(1)}
  * 
- * @param {Object} params
- * @param {Data} params.data
+ * @param {submission} submission
  */
-function ${variable}({data}) {
+function ${variable}(submission) {
   return true;
 }
 `;
@@ -385,10 +384,16 @@ export default {
     },
     async runCode() {
       try {
-        const res = await utils.execute(this.activeCode, tabMap[this.selectedTab],
-          this.instance, this.survey, (arg) => {
-            this.log = `${this.log}${arg}\n`;
-          });
+        const res = await utils.execute(
+          {
+            code: this.activeCode,
+            fname: tabMap[this.selectedTab],
+            submission: this.instance,
+            log: (arg) => {
+              this.log = `${this.log}${arg}\n`;
+            },
+          },
+        );
         if (typeof res !== 'boolean') {
           throw Error('Function must return true or false');
         }
@@ -520,14 +525,9 @@ export default {
         return '';
       }
 
-      const data = `const Data = ${JSON.stringify(this.instance.data, null, 2)}`;
-      /*
-            const submission = `\
-      const Submission = ${JSON.stringify(this.instance, null, 4)}`;
-            const survey = `\
-      const Survey = ${JSON.stringify(this.survey, null, 4)}`;
-      */
-      return `${data}\n`;
+      // const data = `const Data = ${JSON.stringify(this.instance.data, null, 2)}`;
+      const submission = `const submission = ${JSON.stringify(this.instance, null, 2)}`;
+      return `${submission}\n`;
     },
   },
   watch: {

@@ -28,12 +28,17 @@
               <v-list-item-title>{{user.name}}</v-list-item-title>
               <v-list-item-subtitle>{{user.email}}</v-list-item-subtitle>
             </v-list-item-content>
+            <v-list-item-action>
+              <v-icon v-if="user.memberships[0].role === 'admin'">mdi-crown-outline</v-icon>
+            </v-list-item-action>
           </v-list-item>
         </template>
         <div
           v-else
-          class="grey--text"
-        >No members yet</div>
+          class="
+                grey--text"
+        >No members yet
+        </div>
 
       </v-card-text>
 
