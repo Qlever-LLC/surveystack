@@ -11,10 +11,10 @@ const col = 'groups';
 const getGroups = async (req, res) => {
   let entities;
 
-  if (req.query.path) {
+  if (req.query.dir) {
     entities = await db
       .collection(col)
-      .find({ path: req.query.path })
+      .find({ dir: req.query.dir })
       .sort({ name: 1 })
       .toArray();
     return res.send(entities);
@@ -22,44 +22,19 @@ const getGroups = async (req, res) => {
 
   entities = await db
     .collection(col)
-    .find({ path: null })
+    .find({ dir: '/' })
     .toArray();
   return res.send(entities);
 };
 
 const getGroupByPath = async (req, res) => {
-  console.log('req.params[0] =', req.params[0]);
-  let entity;
+  const path = req.params[0];
 
-  const splits = req.params[0].split(GROUP_PATH_DELIMITER).filter(split => split !== '');
-
-  console.log(splits);
-
-  let path = null;
-  let slug = null;
-
-  if (splits.length === 0) {
-    throw boom.badRequest('Invalid path');
-  }
-
-  if (splits.length === 1) {
-    slug = splits[0];
-    path = null;
-  }
-
-  if (splits.length > 1) {
-    slug = splits.pop();
-    path = GROUP_PATH_DELIMITER + splits.join(GROUP_PATH_DELIMITER) + GROUP_PATH_DELIMITER;
-  }
-
-  console.log('path', path);
-  console.log('slug', slug);
-
-  entity = await db.collection(col).findOne({ path, slug });
+  const entity = await db.collection(col).findOne({ path });
 
   if (!entity) {
     return res.status(404).send({
-      message: `No entity found: path=${path}, slug=${slug}`,
+      message: `No entity found under path: ${path}`,
     });
   }
 
@@ -140,12 +115,12 @@ const updateGroup = async (req, res) => {
 };
 
 // mongodb 4.2 now allows an aggregation pipeline inside "update"
-const bulkChangePaths = async (oldPath, newPath) => {
-  await db.collection(col).updateMany({ path: { $regex: `^${oldPath}` } }, [
+const bulkChangePaths = async (oldDir, newDir) => {
+  await db.collection(col).updateMany({ dir: { $regex: `^${oldDir}` } }, [
     {
       $set: {
-        path: {
-          $concat: [newPath, { $substr: ['$path', { $strLenBytes: oldPath }, -1] }],
+        dir: {
+          $concat: [newDir, { $substr: ['$dir', { $strLenBytes: oldDir }, -1] }],
         },
       },
     },
@@ -172,23 +147,50 @@ const deleteGroup = async (req, res) => {
 const getUsers = async (req, res) => {
   const { id } = req.params;
 
+  var groups = [new ObjectId(id)];
+
   const users = await db
     .collection('users')
     .aggregate([
+      { $match: { 'memberships.group': { $in: groups } } },
+      { $unwind: '$memberships' },
       {
-        $match: {
-          $or: [{ 'group.user': new ObjectId(id) }, { 'group.admin': new ObjectId(id) }],
+        $lookup: {
+          from: 'groups',
+          let: { groupId: '$memberships.group' },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$_id', '$$groupId'] } } },
+            { $project: { _id: 1, name: 1 } },
+          ],
+          as: 'memberships.groupDetail',
+        },
+      },
+      { $unwind: '$memberships.groupDetail' },
+      {
+        $group: {
+          _id: '$_id',
+          email: { $first: '$email' },
+          name: { $first: '$name' },
+          memberships: { $push: '$memberships' },
         },
       },
       {
         $project: {
           email: 1,
           name: 1,
-          group: 1,
+          memberships: {
+            $filter: {
+              input: '$memberships',
+              as: 'membership',
+              cond: { $in: ['$$membership.group', groups] },
+            },
+          },
         },
       },
     ])
     .toArray();
+
+  console.log(users);
 
   return res.send(users);
 };
