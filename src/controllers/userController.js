@@ -7,6 +7,8 @@ import boom from '@hapi/boom';
 
 import { db } from '../db';
 
+import { populate } from '../helpers';
+
 const col = 'users';
 
 const getUsers = async (req, res) => {
@@ -90,9 +92,43 @@ const getUser = async (req, res) => {
   const { id } = req.params;
   let entity;
 
+  const pipeline = [];
+  pipeline.push({ $match: { _id: new ObjectId(id) } });
+
+  if (populate(req)) {
+    pipeline.push(
+      ...[
+        { $unwind: '$memberships' },
+        {
+          $lookup: {
+            from: 'groups',
+            let: { groupId: '$memberships.group' },
+            pipeline: [
+              { $match: { $expr: { $eq: ['$_id', '$$groupId'] } } },
+              { $project: { _id: 1, name: 1, slug: 1, path: 1 } },
+            ],
+            as: 'memberships.groupDetail',
+          },
+        },
+        { $unwind: '$memberships.groupDetail' },
+        {
+          $group: {
+            _id: '$_id',
+            email: { $first: '$email' },
+            name: { $first: '$name' },
+            memberships: { $push: '$memberships' },
+          },
+        },
+      ]
+    );
+  }
+
+  pipeline.push({ $project: { password: 0, token: 0 } });
+
   entity = await db
     .collection(col)
-    .findOne({ _id: new ObjectId(id) }, { projection: { password: 0 } });
+    .aggregate(pipeline)
+    .toArray();
 
   if (!entity) {
     return res.status(404).send({
@@ -100,7 +136,7 @@ const getUser = async (req, res) => {
     });
   }
 
-  return res.send(entity);
+  return res.send(entity[0]);
 };
 
 const createUser = async (req, res) => {
