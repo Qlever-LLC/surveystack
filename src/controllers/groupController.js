@@ -65,6 +65,8 @@ const getGroupById = async (req, res) => {
 
 const createGroup = async (req, res) => {
   const entity = req.body;
+  entity.path = `${entity.dir}${entity.slug}`; // TODO: make sanitization function
+
   try {
     let r = await db.collection(col).insertOne({ ...entity, _id: new ObjectId(entity._id) });
     assert.equal(1, r.insertedCount);
@@ -81,7 +83,7 @@ const createGroup = async (req, res) => {
 const updateGroup = async (req, res) => {
   const { id } = req.params;
   const entity = req.body;
-  entity.path = `${entity.dir}${entity.slug}`;
+  entity.path = `${entity.dir}${entity.slug}`; // TODO: make sanitization function
 
   const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
 
