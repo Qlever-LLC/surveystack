@@ -5,10 +5,13 @@
       v-if="!loading"
       :survey="survey"
       :editMode="!isNew"
+      :freshImport="freshImport"
       @submit="submitSubmission"
       @onSaveDraft="submitSurvey(true)"
       @onPublish="submitSurvey(false)"
       @onDelete="onDelete"
+      @import-survey="importSurvey"
+      @export-survey="exportSurvey"
     />
     <div v-else>LOADING...</div>
 
@@ -37,12 +40,23 @@
     <app-dialog
       v-model="showDeleteModal"
       @cancel="showDeleteModal = false"
-      @confirm="$emit('onDelete');"
+      @confirm="onDelete"
       width="400"
     >
       <template v-slot:title>Confirm your action</template>
       Are you sure you want to delete survey
       <strong>{{survey.name}}</strong> ({{survey._id}})?
+    </app-dialog>
+
+    <app-dialog
+      v-model="showOverrideModal"
+      @cancel="showOverrideModal = false"
+      @confirm="onOverride"
+      labelConfirm="Dismiss unpublished changes"
+      width="400"
+    >
+      <template v-slot:title>Confirm your action</template>
+      You have unpublished changes in your Draft. Importing a survey will dismiss these.
     </app-dialog>
 
     <v-snackbar
@@ -104,6 +118,9 @@ export default {
       showSnackbar: false,
       snackbarMessage: '',
       showDeleteModal: false,
+      showOverrideModal: false,
+      importedSurvey: null,
+      freshImport: false,
     };
   },
   computed: {
@@ -150,6 +167,7 @@ export default {
       }
     },
     async submitSurvey(isDraft) {
+      this.freshImport = false;
       const tmp = { ...this.survey };
 
       if (!isDraft && tmp.revisions.length > 0) {
@@ -200,6 +218,50 @@ export default {
 
       this.sessionId = new ObjectId().toString();
       this.loading = false;
+    },
+    async importSurvey({ target: { files: [file] } }) {
+      try {
+        const importedSurvey = JSON.parse(await file.text());
+        this.importedSurvey = importedSurvey;
+        if (this.survey.revisions.length !== this.survey.latestVersion) {
+          this.showOverrideModal = true;
+        } else {
+          this.onOverride();
+        }
+      } catch (err) {
+        console.error('error parsing Survey file', err);
+        this.snack(`error parsing Survey file:${err}`);
+      }
+    },
+    onOverride() {
+      console.log('onOverride');
+      this.showOverrideModal = false;
+
+      try {
+        const filtered = this.survey.revisions.filter(r => r.version <= this.survey.latestVersion);
+        this.survey.revisions = filtered;
+        const revision = this.importedSurvey.revisions[this.importedSurvey.revisions.length - 1];
+        revision.version = this.survey.latestVersion + 1;
+        this.survey.revisions.push(revision);
+        this.freshImport = true;
+        this.sessionId = new ObjectId().toString();
+      } catch (err) {
+        console.error('error parsing Survey file', err);
+        this.snack(`error parsing Survey file:${err}`);
+      }
+    },
+    exportSurvey() {
+      const data = JSON.stringify(this.survey, null, 4);
+      const element = document.createElement('a');
+      element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(data)}`);
+      element.setAttribute('download', `${this.survey.name}.json`);
+
+      element.style.display = 'none';
+      document.body.appendChild(element);
+
+      element.click();
+
+      document.body.removeChild(element);
     },
   },
   watch: {

@@ -3,31 +3,74 @@
     <v-card-title class="d-block pb-0">
       <div class="d-flex justify-space-between">
         <survey-name-editor v-model="value.name" />
-        <v-btn
-          icon
-          v-if="!isNew"
-          @click="$emit('delete')"
-        >
-          <v-icon color="grey lighten-1">mdi-delete</v-icon>
-        </v-btn>
+        <div class="d-flex flex-wrap justify-end">
 
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <div v-on="on">
+                <v-input>
+                  <label
+                    for="select-items-file-input-surveydetails"
+                    class="cursor-pointer"
+                  >
+                    <v-btn class="pointer-events-none" icon>
+                      <v-icon color="grey lighten-1">mdi-file-import</v-icon>
+                    </v-btn>
+                  </label>
+                  <input
+                    type="file"
+                    id="select-items-file-input-surveydetails"
+                    ref="select-items-file-input-surveydetails"
+                    accept=".json"
+                    class="d-none"
+                    @change="(file) => $emit('import-survey', file)"
+                  />
+                </v-input>
+              </div>
+
+            </template>
+            <span>Import Survey from JSON File</span>
+          </v-tooltip>
+
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <div v-on="on">
+                <v-btn
+                  icon
+                  @click="$emit('export-survey')"
+                >
+                  <v-icon color="grey lighten-1">mdi-file-export</v-icon>
+                </v-btn>
+
+              </div>
+            </template>
+            <span>Export Survey to JSON File</span>
+          </v-tooltip>
+
+          <v-btn
+            icon
+            v-if="!isNew"
+            @click="$emit('delete')"
+          >
+            <v-icon color="grey lighten-1">mdi-delete</v-icon>
+          </v-btn>
+        </div>
       </div>
-
       <div class="d-flex justify-space-between align-center mt-n1">
 
         <div class="body-2 grey--text caption">
           {{ value._id }}
         </div>
         <div class="text-left ">
-        <v-chip
-          dark
-          small
-          outlined
-          color="grey"
-        >
-          Version {{ version }}
-        </v-chip>
-      </div>
+          <v-chip
+            dark
+            small
+            outlined
+            color="grey"
+          >
+            Version {{ version }}
+          </v-chip>
+        </div>
       </div>
     </v-card-title>
     <v-card-text>
@@ -81,7 +124,6 @@
           >
             <div>Dismiss Draft</div>
           </v-btn> -->
-
 
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
@@ -143,3 +185,13 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.pointer-events-none {
+  pointer-events: none !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+</style>
