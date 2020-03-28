@@ -7,6 +7,7 @@ import submissionController from '../controllers/submissionController';
 import userController from '../controllers/userController';
 import scriptController from '../controllers/scriptController';
 import debugController from '../controllers/debugController';
+import farmosController from '../controllers/farmosController';
 
 //import { authenticated } from '../handlers/checkPermissions';
 import {
@@ -102,5 +103,10 @@ router.put(
   catchErrors(scriptController.updateScript)
 );
 router.delete('/scripts/:id', catchErrors(scriptController.deleteScript));
+
+/** farmos */
+router.get('/farmos/fields', catchErrors(farmosController.getFields));
+router.get('/farmos/assets', catchErrors(farmosController.getAssets));
+
 
 export default router;
