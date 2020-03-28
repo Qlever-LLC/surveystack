@@ -8,7 +8,6 @@
       transition="fade"
       class="fab-button"
       :style="{  }"
-
     >
       <template v-slot:activator>
         <v-btn
@@ -51,9 +50,9 @@
             class="ma-1 d-inline-block shadow"
           >
             <v-icon
+              dark
               left
               v-if="el.icon"
-              color="grey lighten-1"
             >
               {{el.icon}}
             </v-icon>
@@ -113,7 +112,6 @@ export default {
   /* left: 227px; */
   left: 50%;
   transform: translateX(-50%);
-
 }
 
 /* .control-adder >>> .v-speed-dial--direction-top .v-speed-dial__list,
