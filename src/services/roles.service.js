@@ -8,7 +8,7 @@ const getUser = async userId => {
 
   pipeline.push(
     ...[
-      { $unwind: '$memberships' },
+      { $unwind: { path: '$memberships', preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
           from: 'groups',
@@ -20,7 +20,7 @@ const getUser = async userId => {
           as: 'memberships.groupDetail',
         },
       },
-      { $unwind: '$memberships.groupDetail' },
+      { $unwind: { path: '$memberships.groupDetail', preserveNullAndEmptyArrays: true } },
       {
         $group: {
           _id: '$_id',
@@ -39,11 +39,16 @@ const getUser = async userId => {
     .aggregate(pipeline)
     .toArray();
 
-  if (!entity) {
+  let r = entity[0];
+  if (r.memberships.length === 1 && Object.keys(r.memberships[0]).length === 0) {
+    r.memberships = [];
+  }
+
+  if (!r) {
     return null;
   }
 
-  return entity[0];
+  return r;
 };
 
 const getDescendantGroups = async group => {

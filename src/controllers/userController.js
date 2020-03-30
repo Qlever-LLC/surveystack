@@ -98,7 +98,7 @@ const getUser = async (req, res) => {
   if (populate(req)) {
     pipeline.push(
       ...[
-        { $unwind: '$memberships' },
+        { $unwind: { path: '$memberships', preserveNullAndEmptyArrays: true } },
         {
           $lookup: {
             from: 'groups',
@@ -110,7 +110,7 @@ const getUser = async (req, res) => {
             as: 'memberships.groupDetail',
           },
         },
-        { $unwind: '$memberships.groupDetail' },
+        { $unwind: { path: '$memberships.groupDetail', preserveNullAndEmptyArrays: true } },
         {
           $group: {
             _id: '$_id',
@@ -130,13 +130,18 @@ const getUser = async (req, res) => {
     .aggregate(pipeline)
     .toArray();
 
-  if (!entity) {
+  let r = entity[0];
+  if (r.memberships.length === 1 && Object.keys(r.memberships[0]).length === 0) {
+    r.memberships = [];
+  }
+
+  if (!r) {
     return res.status(404).send({
       message: `No entity with _id exists: ${id}`,
     });
   }
 
-  return res.send(entity[0]);
+  return res.send(r);
 };
 
 const createUser = async (req, res) => {
