@@ -213,7 +213,7 @@ export default {
       return this.survey.revisions.find(revision => revision.version === this.activeVersion).controls;
     },
     activeVersion() {
-      return this.submission.meta.version;
+      return this.submission.meta.survey.version;
     },
     submissionField() {
       return submissionUtils.getSubmissionField(this.submission, this.survey, this.position);

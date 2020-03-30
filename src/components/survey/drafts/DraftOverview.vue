@@ -98,7 +98,6 @@
 import _ from 'lodash';
 import moment from 'moment';
 import colors from 'vuetify/lib/util/colors';
-import appMixin from '@/components/mixin/appComponent.mixin';
 import { linearControls } from '@/utils/submissions';
 import * as utils from '@/utils/surveys';
 
@@ -160,7 +159,7 @@ export default {
       this.modified = moment(this.submission.meta.dateModified).format('YYYY-MM-DD HH:mm');
 
       const now = moment();
-      const positions = utils.getSurveyPositions(this.survey, this.submission.meta.version);
+      const positions = utils.getSurveyPositions(this.survey, this.submission.meta.survey.version);
 
       let collate = 0;
       let collateGroup = 0;
