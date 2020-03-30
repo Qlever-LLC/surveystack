@@ -27,7 +27,7 @@
           >
             <v-list-item-content>
               <v-list-item-title>{{group.name}}</v-list-item-title>
-              <v-list-item-subtitle>{{group._id}}</v-list-item-subtitle>
+              <v-list-item-subtitle>{{group.path}}</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
         </template>

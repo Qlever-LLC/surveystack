@@ -20,6 +20,7 @@
     <h1>
       {{entity.name}}
     </h1>
+    <h3 class="text--secondary">{{entity.path}}</h3>
 
     <v-row>
       <v-col
