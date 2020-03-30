@@ -259,12 +259,43 @@ export const exampleSubmissions = [
   },
 ];
 
-export const exampleGroup = {
-  _id: new ObjectId('5e6f8bbeea14550001470c28'),
-  name: 'Our-Sci',
-  slug: 'our-sci',
-  path: null,
-};
+export const exampleGroups = [
+  {
+    _id: new ObjectId('5e6f8bbeea14550001470c28'),
+    name: 'Our-Sci LLC',
+    slug: 'our-sci',
+    dir: '/',
+    path: '/our-sci',
+  },
+  {
+    _id: new ObjectId('5e6f8bbeea14550001470c32'),
+    name: 'Our-Sci Lab',
+    slug: 'lab',
+    dir: '/our-sci/',
+    path: '/our-sci/lab',
+  },
+  {
+    _id: new ObjectId('5e6f8bbeea14550001470c34'),
+    name: 'Our-Sci Lab Testing',
+    slug: 'testing',
+    dir: '/our-sci/lab/',
+    path: '/our-sci/lab/testing',
+  },
+  {
+    _id: new ObjectId('5e6f8bbeea14550001470c36'),
+    name: 'Our-Sci Lab Results',
+    slug: 'results',
+    dir: '/our-sci/lab/',
+    path: '/our-sci/lab/results',
+  },
+  {
+    _id: new ObjectId('5e6f8bbeea14550001470c38'),
+    name: 'Nexus-Computing GmbH',
+    slug: 'nexus-computing',
+    dir: '/',
+    path: '/nexus-computing',
+  },
+];
 
 export const exampleUsers = [
   {

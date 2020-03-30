@@ -2,7 +2,6 @@ import assert from 'assert';
 import { ObjectId } from 'mongodb';
 
 import boom from '@hapi/boom';
-import { GROUP_PATH_DELIMITER } from '../constants';
 
 import { db } from '../db';
 
@@ -10,56 +9,41 @@ const col = 'groups';
 
 const getGroups = async (req, res) => {
   let entities;
+  let dir = '/';
 
-  if (req.query.path) {
-    entities = await db
-      .collection(col)
-      .find({ path: req.query.path })
-      .sort({ name: 1 })
-      .toArray();
-    return res.send(entities);
+  if (req.query.dir) {
+    dir = req.query.dir;
+    if (!dir.endsWith('/')) {
+      dir += '/';
+    }
+  }
+
+  let dirQuery = dir;
+  if (req.query.tree) {
+    console.log('setting dirQuery');
+    dirQuery = { $regex: `^${dir}` };
   }
 
   entities = await db
     .collection(col)
-    .find({ path: null })
+    .find({ dir: dirQuery })
+    .sort({ path: 1 })
     .toArray();
   return res.send(entities);
 };
 
 const getGroupByPath = async (req, res) => {
-  console.log('req.params[0] =', req.params[0]);
-  let entity;
+  let path = req.params[0];
 
-  const splits = req.params[0].split(GROUP_PATH_DELIMITER).filter(split => split !== '');
-
-  console.log(splits);
-
-  let path = null;
-  let slug = null;
-
-  if (splits.length === 0) {
-    throw boom.badRequest('Invalid path');
+  if (path.endsWith('/')) {
+    path = path.substring(0, path.length - 1);
   }
 
-  if (splits.length === 1) {
-    slug = splits[0];
-    path = null;
-  }
-
-  if (splits.length > 1) {
-    slug = splits.pop();
-    path = GROUP_PATH_DELIMITER + splits.join(GROUP_PATH_DELIMITER) + GROUP_PATH_DELIMITER;
-  }
-
-  console.log('path', path);
-  console.log('slug', slug);
-
-  entity = await db.collection(col).findOne({ path, slug });
+  const entity = await db.collection(col).findOne({ path });
 
   if (!entity) {
     return res.status(404).send({
-      message: `No entity found: path=${path}, slug=${slug}`,
+      message: `No entity found under path: ${path}`,
     });
   }
 
@@ -79,8 +63,17 @@ const getGroupById = async (req, res) => {
   return res.send(entity);
 };
 
+const sanitizeGroup = group => {
+  const slugExp = new RegExp('^[a-z0-9]+(-[a-z0-9]+)*$');
+  if (!slugExp.test(group.slug)) {
+    throw boom.badRequest(`Bad group slug name: ${group.slug}`);
+  }
+};
+
 const createGroup = async (req, res) => {
   const entity = req.body;
+  entity.path = `${entity.dir}${entity.slug}`; // TODO: make sanitization function
+
   try {
     let r = await db.collection(col).insertOne({ ...entity, _id: new ObjectId(entity._id) });
     assert.equal(1, r.insertedCount);
@@ -97,6 +90,7 @@ const createGroup = async (req, res) => {
 const updateGroup = async (req, res) => {
   const { id } = req.params;
   const entity = req.body;
+  entity.path = `${entity.dir}${entity.slug}`; // TODO: make sanitization function
 
   const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
 
@@ -109,28 +103,12 @@ const updateGroup = async (req, res) => {
       }
     );
 
-    // also find and modify descendants
-    let oldSubgroupPath = `${existing.path}${existing.slug}${GROUP_PATH_DELIMITER}`;
-    if (existing.path === null) {
-      oldSubgroupPath = `${GROUP_PATH_DELIMITER}${existing.slug}${GROUP_PATH_DELIMITER}`;
+    if (existing.slug !== updated.slug) {
+      // also find and modify descendants
+      let oldSubgroupDir = existing.path + '/';
+      let newSubgroupDir = entity.path + '/';
+      await bulkChangePaths(oldSubgroupDir, newSubgroupDir);
     }
-
-    let newSubgroupPath = `${entity.path}${entity.slug}${GROUP_PATH_DELIMITER}`;
-    if (entity.path === null) {
-      newSubgroupPath = `${GROUP_PATH_DELIMITER}${entity.slug}${GROUP_PATH_DELIMITER}`;
-    }
-
-    await db
-      .collection(col)
-      .find({ path: { $regex: `^${oldSubgroupPath}` } })
-      .forEach(descendant => {
-        console.log(`${descendant.path}${descendant.slug}`);
-      });
-    console.log(`old_name: '${existing.slug}' => new_name: '${entity.slug}'`);
-    console.log(`old_path: '${oldSubgroupPath}' => new_path: '${newSubgroupPath}'`);
-    console.log(`This change will affect descendants under '${oldSubgroupPath}'`);
-
-    await bulkChangePaths(oldSubgroupPath, newSubgroupPath);
 
     return res.send(updated);
   } catch (err) {
@@ -140,12 +118,15 @@ const updateGroup = async (req, res) => {
 };
 
 // mongodb 4.2 now allows an aggregation pipeline inside "update"
-const bulkChangePaths = async (oldPath, newPath) => {
-  await db.collection(col).updateMany({ path: { $regex: `^${oldPath}` } }, [
+const bulkChangePaths = async (oldDir, newDir) => {
+  await db.collection(col).updateMany({ dir: { $regex: `^${oldDir}` } }, [
     {
       $set: {
+        dir: {
+          $concat: [newDir, { $substr: ['$dir', { $strLenBytes: oldDir }, -1] }],
+        },
         path: {
-          $concat: [newPath, { $substr: ['$path', { $strLenBytes: oldPath }, -1] }],
+          $concat: [newDir, { $substr: ['$dir', { $strLenBytes: oldDir }, -1] }, '$slug'],
         },
       },
     },

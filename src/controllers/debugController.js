@@ -2,7 +2,7 @@ import _ from 'lodash';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
-import { exampleSurvey, exampleSubmissions, exampleGroup, exampleUsers } from '../db/examples';
+import { exampleSurvey, exampleSubmissions, exampleGroups, exampleUsers } from '../db/examples';
 import { createDummyResults } from '../services/dummy.service';
 import { initAdmins } from '../services/admin.service';
 
@@ -36,8 +36,9 @@ const tabulaRasa = async (req, res) => {
     await db.collection('submissions').insertOne(exampleSubmission);
   });
 
-  const group = _.cloneDeep(exampleGroup);
-  await db.collection('groups').insertOne(group);
+  exampleGroups.forEach(async exampleGroup => {
+    await db.collection('groups').insertOne(exampleGroup);
+  });
 
   await initAdmins();
   exampleUsers.forEach(async exampleUser => {
