@@ -63,6 +63,13 @@ const getGroupById = async (req, res) => {
   return res.send(entity);
 };
 
+const sanitizeGroup = group => {
+  const slugExp = new RegExp('^[a-z0-9]+(-[a-z0-9]+)*$');
+  if (!slugExp.test(group.slug)) {
+    throw boom.badRequest(`Bad group slug name: ${group.slug}`);
+  }
+};
+
 const createGroup = async (req, res) => {
   const entity = req.body;
   entity.path = `${entity.dir}${entity.slug}`; // TODO: make sanitization function
