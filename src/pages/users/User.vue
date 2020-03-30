@@ -13,7 +13,7 @@
           v-for="(m,i) in entity.memberships"
           :key="`user-${entity._id}-memberships-${i}`"
           two-line
-          :to="`/g/${m.groupDetail.path?m.groupDetail.path:''}${m.groupDetail.slug}`"
+          :to="`/g${m.groupDetail.path}`"
         >
           <v-list-item-content>
             <v-list-item-title>
@@ -27,7 +27,10 @@
       </v-list>
     </v-card>
 
-    <v-card class="pa-4 mt-4">
+    <v-card
+      class="pa-4 mt-4"
+      v-if="false"
+    >
       <v-card-text>This is only seen by the admin of the respective group.<br>As Admin of RFC I would only see the RFC dropdown. <br> As user I am seeing the farms as list, but can't edit.</v-card-text>
       <v-card-title>FarmOS Farms</v-card-title>
       <div class="ma-4 pa-4 round-border">
