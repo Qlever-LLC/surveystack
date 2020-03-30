@@ -331,7 +331,7 @@ export function compileSandboxSingleLine(src) {
 }
 
 export function compileSandbox(src, fname) {
-  const wrappedSource = `with (sandbox) { ${src}\nreturn ${fname}(data); }`;
+  const wrappedSource = `with (sandbox) { ${src}\nreturn ${fname}(arg1); }`;
   const code = new Function('sandbox', wrappedSource);
 
   return function (sandbox) {
@@ -358,7 +358,9 @@ export const simplify = (submissionItem) => {
   return ret;
 };
 
-export function execute(code, functionName, instance, survey, log) {
+export function execute({
+  code, fname, submission, log,
+}) {
   const worker = new Worker('/worker.js');
 
   return new Promise((resolve, reject) => {
@@ -392,9 +394,9 @@ export function execute(code, functionName, instance, survey, log) {
 
     worker.postMessage(
       {
-        args: { data: instance.data },
+        fname,
+        arg1: submission,
         code,
-        functionName,
       },
     );
   });

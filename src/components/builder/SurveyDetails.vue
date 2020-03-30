@@ -14,7 +14,7 @@
                     class="cursor-pointer"
                   >
                     <v-btn class="pointer-events-none" icon>
-                      <v-icon color="grey lighten-1">mdi-file-import</v-icon>
+                      <v-icon color="grey lighten-1">mdi-file-upload</v-icon>
                     </v-btn>
                   </label>
                   <input
@@ -39,7 +39,7 @@
                   icon
                   @click="$emit('export-survey')"
                 >
-                  <v-icon color="grey lighten-1">mdi-file-export</v-icon>
+                  <v-icon color="grey lighten-1">mdi-file-download</v-icon>
                 </v-btn>
 
               </div>

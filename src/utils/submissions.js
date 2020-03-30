@@ -102,11 +102,11 @@ const createSubmissionFromSurvey = (survey, version = 1, instance = null) => {
   const submission = {};
 
   submission._id = new ObjectID().toString();
-  submission.survey = survey._id;
   submission.meta = {
     dateCreated: new Date(),
     dateModified: new Date(),
-    version,
+    survey: { id: survey._id, version },
+    revision: 1,
     permissions: [],
     group: '5e6f8bbeea14550001470c28',
     path: '/our-sci',
@@ -159,7 +159,7 @@ const createSubmissionFromSurvey = (survey, version = 1, instance = null) => {
  */
 const getSubmissionField = (submission, survey, position) => {
   // TODO: handle version not found
-  const { controls } = survey.revisions.find(revision => revision.version === submission.meta.version);
+  const { controls } = survey.revisions.find(revision => revision.version === submission.meta.survey.version);
 
   const flatName = getFlatName(controls, position);
   const splits = flatName.split('.');
@@ -175,7 +175,7 @@ const getSubmissionField = (submission, survey, position) => {
 
 export const linearControls = (survey, submission) => {
   const res = [];
-  const { controls } = survey.revisions.find(revision => revision.version === submission.meta.version);
+  const { controls } = survey.revisions.find(revision => revision.version === submission.meta.survey.version);
   const positions = getControlPositions(controls);
   positions.forEach((p) => {
     const control = _.cloneDeep(getControl(controls, p));

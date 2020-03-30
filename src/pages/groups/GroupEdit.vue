@@ -6,27 +6,93 @@
       @submit.prevent="onSubmit"
       autocomplete="off"
     >
-      <v-text-field
-        label="Name"
-        placeholder="Enter group name"
-        id="group-name"
-        autocomplete="off"
-        v-model="entity.name"
-      />
-      <v-text-field
-        label="Slug"
-        placeholder="Enter group slug or use suggested"
-        id="group-slug"
-        v-model="entity.slug"
-        :readonly="!editSlug"
-        :append-icon="editSlug ? 'mdi-pencil-off-outline' : 'mdi-pencil-outline'"
-        autocomplete="off"
-        @click:append="editSlug = !editSlug"
-        hint="URL friendly version of name"
-        persistent-hint
-      />
 
-      <div class="d-flex justify-end">
+      <v-card class="pa-4 mb-4">
+        <v-text-field
+          label="Name"
+          placeholder="Enter group name"
+          id="group-name"
+          autocomplete="off"
+          v-model="entity.name"
+        />
+        <v-text-field
+          label="Slug"
+          placeholder="Enter group slug or use suggested"
+          id="group-slug"
+          v-model="entity.slug"
+          :readonly="!editSlug"
+          :append-icon="editSlug ? 'mdi-pencil-off-outline' : 'mdi-pencil-outline'"
+          autocomplete="off"
+          @click:append="editSlug = !editSlug"
+          hint="URL friendly version of name"
+          persistent-hint
+        />
+      </v-card>
+
+      <v-card class="pa-4">
+        <v-card-title>API Integrations</v-card-title>
+
+        <div class="pa-4 api-border">
+          <div class="d-flex">
+            <v-text-field
+              class="mr-12"
+              label="Name"
+              placeholder="Enter a Name"
+              autocomplete="off"
+              v-model="entity.integrations[0].name"
+            />
+
+            <v-btn
+              icon
+              @click="deleteIntegration"
+            >
+              <v-icon color="grey lighten-1">mdi-delete</v-icon>
+            </v-btn>
+
+          </div>
+
+          <v-select
+            :items="entity.integrationTypes"
+            :value="entity.integrations[0].type"
+            label="Type"
+            outlined
+          ></v-select>
+
+          <v-text-field
+            label="URL"
+            placeholder="Enter the API URL"
+            autocomplete="off"
+            v-model="entity.integrations[0].url"
+          />
+
+          <v-text-field
+            label="API Key"
+            placeholder="Enter the API Key"
+            autocomplete="off"
+            v-model="entity.integrations[0].apiKey"
+          />
+
+          <v-text-field
+            label="API Parameters"
+            placeholder="Enter the API Parameters"
+            autocomplete="off"
+            v-model="entity.integrations[0].parameters"
+          />
+        </div>
+
+        <v-divider class="mt-4 mb-4"></v-divider>
+        <div class="d-flex justify-end pa-4">
+          <v-btn
+            color="primary"
+            @click="addIntegration"
+          >
+            <v-icon left>mdi-plus-circle-outline</v-icon> Add Integration
+          </v-btn>
+        </div>
+
+      </v-card>
+
+      <div class="d-flex justify-end pa-4">
         <v-btn
           text
           @click="cancel"
@@ -36,9 +102,8 @@
           type="submit"
         >{{editMode ? "Save" : "Create"}}</v-btn>
       </div>
-
     </form>
-    <small>path={{entity.path | showNull}}</small>
+    <small>dir={{entity.dir | showNull}}</small>
   </v-container>
 </template>
 
@@ -48,6 +113,26 @@ import api from '@/services/api.service';
 
 import { handleize } from '@/utils/groups';
 
+const integrations = {
+  integrationTypes: [
+    {
+      value: 'farmos-aggregator',
+      text: 'FarmOS Aggregator',
+    },
+    {
+      value: 'generic',
+      text: 'Generic',
+    },
+  ],
+  integrations: [{
+    type: 'farmos-aggregator',
+    name: 'FarmOS Aggregator RFC',
+    url: 'oursci.farmos.group',
+    apiKey: '1234',
+    parameters: 'rfc,nofa',
+  }],
+};
+
 export default {
   data() {
     return {
@@ -56,7 +141,8 @@ export default {
         _id: '',
         name: '',
         slug: '',
-        path: null,
+        dir: '/',
+        path: '',
       },
     };
   },
@@ -82,22 +168,13 @@ export default {
           url,
           data,
         });
-        this.$router.push(
-          `/g/${this.entity.path ? this.entity.path : ''}${
-            this.entity.slug
-          }`,
-        );
+        this.$router.push(`/g${this.entity.dir}${this.entity.slug}`);
       } catch (err) {
         console.log(err);
       }
     },
     cancel() {
-      if (!this.entity.path) {
-        this.$router.replace({ name: 'groups-list' });
-        return;
-      }
-
-      this.$router.replace(`/g${this.entity.path}`);
+      this.$router.replace(`/g${this.entity.dir}`);
     },
   },
   watch: {
@@ -121,8 +198,12 @@ export default {
       ({ name }) => name === 'groups-new',
     );
 
-    if (this.$route.query.path) {
-      this.entity.path = this.$route.query.path;
+    const { dir } = this.$route.query;
+    if (dir) {
+      this.entity.dir = dir;
+      if (!this.entity.dir.endsWith('/')) {
+        this.entity.dir += '/';
+      }
     }
 
     this.entity._id = new ObjectId();
@@ -136,6 +217,17 @@ export default {
         console.log('something went wrong:', e);
       }
     }
+
+    // fake integrations
+    this.entity.integrationTypes = integrations.integrationTypes;
+    this.entity.integrations = integrations.integrations;
   },
 };
 </script>
+
+<style scoped>
+.api-border {
+  border: 1px solid rgba(0, 0, 0, 0.24);
+  border-radius: 4px;
+}
+</style>

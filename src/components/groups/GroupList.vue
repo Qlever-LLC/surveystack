@@ -7,7 +7,7 @@
         <v-btn
           color="primary"
           class="ml-4"
-          :to="{name: 'groups-new', query: {path: path}}"
+          :to="{name: 'groups-new', query: {dir: dir}}"
           text
         >New...</v-btn>
       </v-card-title>
@@ -23,11 +23,11 @@
             v-for="group in groups"
             :key="group._id"
             two-line
-            :to="`/g/${group.path?group.path:''}${group.slug}`"
+            :to="`/g${group.path}`"
           >
             <v-list-item-content>
               <v-list-item-title>{{group.name}}</v-list-item-title>
-              <v-list-item-subtitle>{{group._id}}</v-list-item-subtitle>
+              <v-list-item-subtitle>{{group.path}}</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
         </template>
@@ -51,9 +51,9 @@ export default {
       type: String,
       default: 'Groups',
     },
-    path: {
+    dir: {
       type: String,
-      default: null,
+      default: '/',
     },
   },
   computed: {

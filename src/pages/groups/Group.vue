@@ -1,12 +1,7 @@
 <template>
   <v-container v-if="initialized && status.code === 200">
     <div class="d-flex justify-space-between align-center">
-      <span v-if="entity.path">
-        <router-link
-          :to="`/g${entity.path}`"
-          class="text-muted"
-        >{{entity.path}}</router-link>
-      </span>
+      <app-group-breadcrumbs :path="entity.path" />
       <v-btn
         class="ml-auto"
         :to="{name: 'groups-edit', params: {id: entity._id}}"
@@ -20,6 +15,7 @@
     <h1>
       {{entity.name}}
     </h1>
+    <h3 class="text--secondary">{{entity.path}}</h3>
 
     <v-row>
       <v-col
@@ -34,7 +30,7 @@
       >
         <app-group-list
           :entities="subgroups"
-          :path="subgroupPath"
+          :dir="entity.path"
           title="Subgroups"
         />
       </v-col>
@@ -52,15 +48,14 @@
 import api from '@/services/api.service';
 import appGroupList from '@/components/groups/GroupList.vue';
 import appGroupUserList from '@/components/groups/GroupUserList.vue';
-
-
-import { GROUP_PATH_DELIMITER } from '@/constants';
+import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 
 export default {
   name: 'Group',
   components: {
     appGroupList,
     appGroupUserList,
+    appGroupBreadcrumbs,
   },
   data() {
     return {
@@ -73,7 +68,7 @@ export default {
         _id: '',
         name: '',
         slug: '',
-        path: null,
+        path: '/',
       },
       users: [],
       subgroups: [],
@@ -94,12 +89,7 @@ export default {
     },
     async getSubgroups() {
       try {
-        let childrenPath = `${this.entity.path}${this.entity.slug}${GROUP_PATH_DELIMITER}`;
-        if (this.entity.path === null) {
-          childrenPath = `${GROUP_PATH_DELIMITER}${this.entity.slug}${GROUP_PATH_DELIMITER}`;
-        }
-
-        const { data } = await api.get(`/groups?path=${childrenPath}`);
+        const { data } = await api.get(`/groups?dir=${this.entity.path}`);
         this.subgroups = data;
       } catch (e) {
         this.status.code = e.response.status;
@@ -109,14 +99,6 @@ export default {
     async getUsers() {
       const { data } = await api.get(`/groups/${this.entity._id}/users`);
       this.users = data;
-    },
-  },
-  computed: {
-    subgroupPath() {
-      if (!this.entity.path) {
-        return `${GROUP_PATH_DELIMITER}${this.entity.slug}${GROUP_PATH_DELIMITER}`;
-      }
-      return `${this.entity.path}${this.entity.slug}${GROUP_PATH_DELIMITER}`;
     },
   },
   async beforeRouteUpdate(to, from, next) {
