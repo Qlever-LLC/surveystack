@@ -22,7 +22,6 @@
             v-for="(user,i) in users"
             :key="`user-${i}`"
             two-line
-            :to="`/users/${user._id}`"
           >
             <v-list-item-content>
               <v-list-item-title>{{user.name}}</v-list-item-title>
@@ -54,7 +53,6 @@
               </v-autocomplete>
             </v-list-item-content>
             <v-list-item-action>
-              <v-icon v-if="user.memberships[0].role === 'admin'">mdi-crown-outline</v-icon>
             </v-list-item-action>
           </v-list-item>
         </template>
@@ -77,6 +75,11 @@ export default {
   data() {
     return {
       q: '',
+      items: [
+        'Dan\'s Farm',
+        'Gregs\'s Farm',
+        'Mike\'s Farm',
+      ],
     };
   },
   props: {

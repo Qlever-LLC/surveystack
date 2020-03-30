@@ -120,4 +120,30 @@ export const availableControls = [
     // icon: 'mdi-arrow-down-drop-circle-outline',
 
   },
+  {
+    name: 'farmos-field',
+    label: 'Farmos Field',
+    type: 'farmOsField',
+    // icon: 'mdi-text-search',
+    // icon: 'mdi-view-list',
+    // icon: 'mdi-box-search',
+    // icon: 'mdi-format-list-bulleted-type',
+    // icon: 'mdi-textbox',
+    icon: 'mdi-leaf',
+    // icon: 'mdi-arrow-down-drop-circle-outline',
+
+  },
+  {
+    name: 'farmos-planting',
+    label: 'Farmos Planting',
+    type: 'farmOsPlanting',
+    // icon: 'mdi-text-search',
+    // icon: 'mdi-view-list',
+    // icon: 'mdi-box-search',
+    // icon: 'mdi-format-list-bulleted-type',
+    // icon: 'mdi-textbox',
+    icon: 'mdi-leaf',
+    // icon: 'mdi-arrow-down-drop-circle-outline',
+
+  },
 ];
