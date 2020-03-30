@@ -15,9 +15,11 @@ const sanitize = entity => {
   if (entity._id) {
     entity._id = new ObjectId(entity._id);
   }
-  entity.survey = new ObjectId(entity.survey);
+
   entity.meta.dateCreated = new Date(entity.meta.dateCreated);
   entity.meta.dateModified = new Date(entity.meta.dateModified);
+
+  entity.meta.survey.id = new ObjectId(entity.meta.survey.id);
 
   if (entity.meta.creator) {
     entity.meta.creator = new ObjectId(entity.meta.creator);
@@ -119,7 +121,7 @@ const buildPipeline = async (req, res) => {
 
   // initial match stage to filter surveys
   if (req.query.survey) {
-    pipeline.push({ $match: { survey: new ObjectId(req.query.survey) } });
+    pipeline.push({ $match: { 'meta.survey.id': new ObjectId(req.query.survey) } });
   }
 
   // redact stage

@@ -107,11 +107,14 @@ export const exampleSurvey = {
 export const exampleSubmissions = [
   {
     _id: new ObjectId('5e303982ea0cf40001aef63c'),
-    survey: new ObjectId('5e3038dbea0cf40001aef63b'),
     meta: {
       dateCreated: new Date('2020-01-28T13:39:14.544Z'),
       dateModified: new Date('2020-01-28T13:41:34.329Z'),
-      version: 1,
+      survey: {
+        id: new ObjectId('5e3038dbea0cf40001aef63b'),
+        version: 1,
+      },
+      revision: 3,
       permissions: [],
       creator: new ObjectId('5e6f92f16070e700015e0371'),
       group: new ObjectId('5e6f8bbeea14550001470c28'),
@@ -146,11 +149,14 @@ export const exampleSubmissions = [
   },
   {
     _id: new ObjectId('5e303982ea0cf40001aef79b'),
-    survey: new ObjectId('5e3038dbea0cf40001aef63b'),
     meta: {
       dateCreated: new Date('2020-01-28T13:41:33.984Z'),
       dateModified: new Date('2020-01-28T13:42:52.711Z'),
-      version: 1,
+      survey: {
+        id: new ObjectId('5e3038dbea0cf40001aef63b'),
+        version: 1,
+      },
+      revision: 1,
       permissions: [],
       creator: new ObjectId('5e452119c5117c000185f275'),
       group: new ObjectId('5e6f8bbeea14550001470c28'),
@@ -185,11 +191,14 @@ export const exampleSubmissions = [
   },
   {
     _id: new ObjectId('5e303982ea0cf40001aef81e'),
-    survey: new ObjectId('5e3038dbea0cf40001aef63b'),
     meta: {
       dateCreated: new Date('2020-01-28T13:42:07.781Z'),
       dateModified: new Date('2020-01-28T13:43:38.987Z'),
-      version: 1,
+      survey: {
+        id: new ObjectId('5e3038dbea0cf40001aef63b'),
+        version: 1,
+      },
+      revision: 1,
       permissions: [],
       creator: new ObjectId('5e452119c5117c000185f275'),
       group: new ObjectId('5e6f8bbeea14550001470c28'),
@@ -224,11 +233,14 @@ export const exampleSubmissions = [
   },
   {
     _id: new ObjectId('5e303982ea0cf40001aef94f'),
-    survey: new ObjectId('5e3038dbea0cf40001aef63b'),
     meta: {
       dateCreated: new Date('2020-01-28T13:42:33.452Z'),
       dateModified: new Date('2020-01-28T13:42:55.314Z'),
-      version: 1,
+      survey: {
+        id: new ObjectId('5e3038dbea0cf40001aef63b'),
+        version: 1,
+      },
+      revision: 1,
       permissions: [],
       group: new ObjectId('5e6f8bbeea14550001470c28'),
       path: '/our-sci',

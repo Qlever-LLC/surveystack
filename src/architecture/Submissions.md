@@ -19,13 +19,18 @@ API endpoint `/api/submissions`
 const submissions = [
   {
     _id: '5e2eed723c98557ae2c1d967', // submission id
-    survey: '5e2eecc36f371d00015775af', // survey reference
     meta: {
       dateCreated: '2020-01-27T14:10:41.623Z',
       dateModified: '2020-01-27T14:11:56.301Z',
-      version: 1, // survey version
+      survey: {
+        id: '5e2eecc36f371d00015775af', // survey reference
+        version: 2, // survey version
+      },
+      revision: 1, // submission revision
+      permissions: [],
       group: '5e6f8bbeea14550001470c28',
       path: '/our-sci',
+      creator: '5e6f92f16070e700015e0371',
     }
     // data from controls
     data: {
@@ -56,14 +61,19 @@ const submissions = [
     }
   },
   {
-    _id: '5e2eed803c98557ae2c1d968',
-    survey: '5e2eecc36f371d00015775af',
+    _id: '5e2eed803c98557ae2c1d968', // submission id
     meta: {
       dateCreated: '2020-01-27T14:12:24.730Z',
       dateModified: '2020-01-27T14:15:33.901Z',
-      version: 3,
+      survey: {
+        id: '5e2eecc36f371d00015775af', // survey reference
+        version: 1, // survey version
+      },
+      revision: 2, // submission revision
+      permissions: [],
       group: '5e6f8bbeea14550001470c28',
       path: '/our-sci',
+      creator: '5e6f92f16070e700015e0371',
     },
     data: {
       fav_color: {
