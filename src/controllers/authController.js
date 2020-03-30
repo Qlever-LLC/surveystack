@@ -5,12 +5,15 @@ import uuidv4 from 'uuid/v4';
 import boom from '@hapi/boom';
 
 import mailService from '../services/mail.service';
+import rolesService from '../services/roles.service';
 import { db } from '../db';
 
 const col = 'users';
 
-const createPayload = user => {
+const createPayload = async user => {
   delete user.password;
+  const roles = await rolesService.getRoles(user._id);
+  user.roles = roles;
   return user;
 };
 
@@ -26,12 +29,13 @@ const register = async (req, res) => {
     password: hash,
     permissions: [],
     authProviders: [],
+    memberships: [],
   };
 
   try {
     let r = await db.collection(col).insertOne(user);
     assert.equal(1, r.insertedCount);
-    const payload = createPayload(r.ops[0]);
+    const payload = await createPayload(r.ops[0]);
     return res.send(payload);
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
@@ -60,7 +64,8 @@ const login = async (req, res) => {
     throw boom.unauthorized(`Incorrect password for user: ${email}`);
   }
 
-  return res.send(createPayload(existingUser));
+  const payload = await createPayload(existingUser);
+  return res.send(payload);
 };
 
 const sendPasswordResetMail = async (req, res) => {

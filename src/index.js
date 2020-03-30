@@ -7,6 +7,7 @@ import history from 'connect-history-api-fallback';
 
 import { connectDatabase, db } from './db';
 import { initAdmins } from './services/admin.service';
+import { getRoles } from './services/roles.service';
 import errorHandlers from './handlers/errorHandlers';
 
 import apiRoutes from './routes/api';
@@ -26,6 +27,7 @@ app.use(async (req, res, next) => {
   let isAuthenticated = false;
   let isAdmin = false;
   let user = null;
+  let roles = [];
   if (req.headers.authorization) {
     //console.log("authHeader", req.headers.authorization);
     const authHeader = req.headers.authorization;
@@ -36,12 +38,17 @@ app.use(async (req, res, next) => {
       isAuthenticated = true;
       isAdmin = user.permissions.includes('admin');
     }
+
+    if (user) {
+      roles = await getRoles(user._id);
+    }
   }
 
   res.locals.auth = {
     isAuthenticated,
     isAdmin,
     user,
+    roles,
   };
 
   next();

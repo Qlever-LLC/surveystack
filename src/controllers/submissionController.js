@@ -123,15 +123,12 @@ const buildPipeline = async (req, res) => {
   }
 
   // redact stage
-  if (res.locals.auth.user) {
+  if (res.locals.auth.isAuthenticated) {
     user = res.locals.auth.user._id.toString();
-    // TODO: remove this hack and do a real implementation
-    console.log('User is ', user);
-    if (user === '5e452119c5117c000185f275') {
-      roles.push('admin@/our-sci');
-    }
+    roles.push(...res.locals.auth.roles);
   }
 
+  // TODO: remove this from production!
   if (req.query.roles) {
     const splits = req.query.roles.split(',');
     splits.forEach(role => {
@@ -140,6 +137,7 @@ const buildPipeline = async (req, res) => {
   }
 
   console.log('creating redact stage with user', user);
+  console.log('roles', roles);
   const redactStage = createRedactStage(user, roles);
   pipeline.push(redactStage);
 
