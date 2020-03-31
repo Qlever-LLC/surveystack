@@ -2,19 +2,26 @@
   <v-card>
     <v-card-title class="d-block pb-0">
       <div class="d-flex justify-space-between">
-        <survey-name-editor v-model="value.name" />
-        <div class="d-flex flex-wrap justify-end">
-
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <div v-on="on">
-                <v-input>
+        <survey-name-editor style="max-width: 81%;" v-model="value.name" />
+        <v-menu offset-y left>
+          <template v-slot:activator="{ on }">
+            <v-btn icon v-on="on">
+              <v-icon>mdi-dots-vertical</v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item class="d-flex align-center">
+              <v-list-item-title>
+                <v-input hide-details>
                   <label
                     for="select-items-file-input-surveydetails"
                     class="cursor-pointer"
                   >
                     <v-btn class="pointer-events-none" icon>
                       <v-icon color="grey lighten-1">mdi-file-upload</v-icon>
+                      <div class="ml-1">
+                        Import
+                      </div>
                     </v-btn>
                   </label>
                   <input
@@ -26,35 +33,40 @@
                     @change="(file) => $emit('import-survey', file)"
                   />
                 </v-input>
-              </div>
-
-            </template>
-            <span>Import Survey from JSON File</span>
-          </v-tooltip>
-
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <div v-on="on">
+              </v-list-item-title>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title>
                 <v-btn
                   icon
                   @click="$emit('export-survey')"
                 >
                   <v-icon color="grey lighten-1">mdi-file-download</v-icon>
+                  <div class="ml-1">
+                    Export
+                  </div>
                 </v-btn>
+              </v-list-item-title>
+            </v-list-item>
+            <v-list-item
+              v-if="!isNew"
+            >
+              <v-list-item-title>
+                <v-btn
+                  icon
+                  @click="$emit('delete')"
+                >
+                  <v-icon color="grey lighten-1">mdi-delete</v-icon>
+                  <div class="grey--text ml-1">
+                    Delete
+                  </div>
+                </v-btn>
+              </v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
 
-              </div>
-            </template>
-            <span>Export Survey to JSON File</span>
-          </v-tooltip>
 
-          <v-btn
-            icon
-            v-if="!isNew"
-            @click="$emit('delete')"
-          >
-            <v-icon color="grey lighten-1">mdi-delete</v-icon>
-          </v-btn>
-        </div>
       </div>
       <div class="d-flex justify-space-between align-center mt-n1">
 

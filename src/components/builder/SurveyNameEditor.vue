@@ -1,14 +1,15 @@
 <template>
+    <!-- v-if="state.isEditing" -->
   <v-text-field
-    v-if="state.isEditing"
     :value="value"
     @input="emitInput"
     @blur="setIsEditing(false)"
     placeholder="Untitled Survey"
     class="display-1"
+    :rules="[rules.hasOnlyValidCharacters, rules.hasValidLength]"
     autofocus
   />
-  <div
+  <!-- <div
     v-else
     @click="() => setIsEditing(true)"
     @focus="() => setIsEditing(true)"
@@ -17,8 +18,7 @@
   >
     <div v-if="value">{{ value }}</div>
     <div v-else class="grey--text lighten-4">Untitled Survey</div>
-    <!-- <v-icon class="ml-2">mdi-pencil</v-icon> -->
-  </div>
+  </div> -->
 </template>
 
 <script>
@@ -41,6 +41,14 @@ export default {
       state,
       emitInput: val => context.emit('input', val),
       setIsEditing,
+      rules: {
+        hasOnlyValidCharacters(val) {
+          return /^[\w-]*$/.test(val) ? true : 'survey name cannot contain special characters';
+        },
+        hasValidLength(val) {
+          return val.length > 4 ? true : 'survey name must be at least 4 characters long';
+        },
+      },
     };
   },
 };

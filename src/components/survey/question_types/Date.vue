@@ -2,7 +2,7 @@
   <v-container fluid class="instructions date question">
     <v-row>
       <v-menu
-        v-model="menu1"
+        v-model="datePickerIsVisible"
         :close-on-content-click="false"
         transition="scale-transition"
         offset-y
@@ -12,18 +12,18 @@
         <template v-slot:activator="{ on }">
           <v-text-field
             :value="dateFormatted"
-            @input="menu1 = false"
+            @input="datePickerIsVisible = false"
             @change="updateDateInput"
             label="Date"
             hint="MM/DD/YYYY format"
             persistent-hint
             prepend-icon="mdi-calendar"
             v-on="on"
-          ></v-text-field>
+          />
         </template>
         <v-date-picker
           :value="dateForPicker"
-          @input="menu1 = false"
+          @input="datePickerIsVisible = false"
           @change="updateDatePicker"
           no-title
         />
@@ -39,7 +39,7 @@ export default {
   mixins: [baseQuestionComponent],
   data() {
     return {
-      menu1: false,
+      datePickerIsVisible: false,
     };
   },
   computed: {
@@ -48,6 +48,12 @@ export default {
     },
     dateForPicker() {
       return new Date(this.value || Date.now()).toISOString().substr(0, 10);
+    },
+    dateType() {
+      return (this.control
+        && this.control.options
+        && this.control.options.subtype)
+        || 'date';
     },
 
   },

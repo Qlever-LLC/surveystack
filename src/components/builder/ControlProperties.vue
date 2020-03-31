@@ -98,6 +98,14 @@
         label="Allow Multiple Selections"
       />
 
+      <v-select
+        v-if="isDate"
+        :items="dateTypes"
+        label="Type"
+        v-model="control.options.subtype"
+        outlined
+      />
+
       <div
         v-if="!showAdvanced"
         class="d-flex justify-end mt-4"
@@ -227,9 +235,26 @@ export default {
         || JSON.stringify({}),
       scriptSourceIsLoading: false,
       scriptSourceItems: [],
+      dateTypes: [
+        {
+          text: 'Full Date (Month, Day, and Year)',
+          value: 'date',
+        },
+        {
+          text: 'Month and Year Only',
+          value: 'date-month-year',
+        },
+        {
+          text: 'Year Only',
+          value: 'date-year',
+        },
+      ],
     };
   },
   computed: {
+    isDate() {
+      return this.control.type === 'date';
+    },
     isScript() {
       return this.control.type === 'script';
     },

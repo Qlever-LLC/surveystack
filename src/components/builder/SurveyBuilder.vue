@@ -177,7 +177,9 @@
 </template>
 
 <script>
-import _ from 'lodash';
+import {
+  cloneDeep, isEqualWith, isEqual, uniqBy,
+} from 'lodash';
 import { Splitpanes, Pane } from 'splitpanes';
 
 import ObjectId from 'bson-objectid';
@@ -260,7 +262,7 @@ export default {
       codeRefreshCounter: 0,
       submissionCode: '',
       instance: null,
-      initialSurvey: _.cloneDeep(this.survey),
+      initialSurvey: cloneDeep(this.survey),
       surveyUnchanged: true,
     };
   },
@@ -315,7 +317,7 @@ export default {
       nextVersionObj.version = nextVersion;
       nextVersionObj.dateCreated = date;
 
-      this.$set(this.survey, 'revisions', _.cloneDeep(this.initialSurvey.revisions));
+      this.$set(this.survey, 'revisions', cloneDeep(this.initialSurvey.revisions));
 
       this.survey.revisions.push(nextVersionObj);
       this.survey.dateModified = date;
@@ -330,7 +332,7 @@ export default {
         this.dirty = survey.revisions[len - 1].version !== survey.latestVersion;
       }
 
-      if (!this.dirty && !_.isEqualWith(survey.revisions, this.initialSurvey.revisions, (value1, value2, key) => ((key === 'label') ? true : undefined))) {
+      if (!this.dirty && !isEqualWith(survey.revisions, this.initialSurvey.revisions, (value1, value2, key) => ((key === 'label') ? true : undefined))) {
         this.createDraft();
       }
 
@@ -453,7 +455,6 @@ export default {
     },
     async setControlSource(value) {
       console.log('setControlSource', value);
-      // this.control.options.source = value;
       this.$set(this.control.options, 'source', value);
       const data = await this.fetchScript(value);
       this.setScriptCode(data);
@@ -461,8 +462,29 @@ export default {
     setControlParams(params) {
       this.control.options.params = params;
     },
+    validateSurveyName() {
+      // TODO: disallow special characters?
+      return !!this.survey.name && this.survey.name.length > 4;
+    },
+    validateSurveyQuestions() {
+      const currentControls = this.survey.revisions[this.survey.revisions.length - 1].controls;
+      const uniqueNames = uniqBy(currentControls, 'name');
+      const hasOnlyUniqueNames = uniqueNames.length === currentControls.length;
+      const allNamesContainOnlyValidCharacters = !currentControls.some(
+        control => !/^[\w-]*$/.test(control.name),
+      );
+      console.log({ allNamesContainOnlyValidCharacters });
+      return hasOnlyUniqueNames && allNamesContainOnlyValidCharacters;
+    },
   },
   computed: {
+    surveyIsValid() {
+      // check if survey name is valid
+
+      // check for duplicate values
+      return this.validateSurveyName()
+        && this.validateSurveyQuestions();
+    },
     enableDismissDraft() {
       return this.isDraft;
     },
@@ -475,6 +497,10 @@ export default {
       return this.survey.revisions[len - 1].version !== this.survey.latestVersion;
     },
     enableUpdate() {
+      if (!this.surveyIsValid) {
+        return false;
+      }
+
       if (this.isDraft) {
         return false;
       }
@@ -487,6 +513,10 @@ export default {
       return !this.isDraft;
     },
     enableSaveDraft() {
+      if (!this.surveyIsValid) {
+        return false;
+      }
+
       if (this.freshImport) {
         return true;
       }
@@ -500,6 +530,10 @@ export default {
       return !this.surveyUnchanged;
     },
     enablePublish() {
+      if (!this.surveyIsValid) {
+        return false;
+      }
+
       if (!this.editMode) {
         if (this.initialSurvey.name !== this.survey.name) {
           return true;
@@ -597,7 +631,7 @@ export default {
           this.surveyUnchanged = true;
         }
 
-        const res = _.isEqual(this.initialSurvey.revisions, newVal.revisions);
+        const res = isEqual(this.initialSurvey.revisions, newVal.revisions);
         this.surveyUnchanged = res;
 
         const current = newVal.revisions[newVal.revisions.length - 1];
