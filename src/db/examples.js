@@ -242,6 +242,7 @@ export const exampleSubmissions = [
       },
       revision: 1,
       permissions: [],
+      creator: new ObjectId('5e452119c5117c000185f275'),
       group: new ObjectId('5e6f8bbeea14550001470c28'),
       path: '/our-sci/',
     },

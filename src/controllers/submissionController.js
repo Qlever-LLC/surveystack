@@ -101,6 +101,42 @@ const createRedactStage = (user, roles) => {
             },
             then: '$$DESCEND',
           },
+          // Assume "meta.permissions": ['admin'] and "$$ROOT.meta.path": "/oursci/lab/testing/"
+          // => submission_role = "admin@/oursci/lab/testing/"
+          // A user role of "admin@/oursci/" can view, since
+          // "admin@/oursci/lab/testing" is a regexMatch of "^admin@/oursci/"
+          // TODO: with this case branch, we probably dont even need the one from before
+          {
+            case: {
+              $anyElementTrue: {
+                $map: {
+                  input: {
+                    $map: {
+                      input: '$meta.permissions',
+                      as: 'role',
+                      in: { $concat: ['$$role', '@', '$$ROOT.meta.path'] },
+                    },
+                  },
+                  as: 'submission_role',
+                  in: {
+                    $anyElementTrue: {
+                      $map: {
+                        input: roles,
+                        as: 'user_role',
+                        in: {
+                          $regexMatch: {
+                            input: '$$submission_role',
+                            regex: { $concat: ['^', '$$user_role'] },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            then: '$$DESCEND',
+          },
         ],
         default: '$$PRUNE', // default do not proceed
       },
@@ -270,7 +306,17 @@ const getSubmissionsPage = async (req, res) => {
     .aggregate(pipeline)
     .toArray();
 
-  return res.send(entities[0]);
+  console.log('Entities', entities);
+  console.log('Entities[0]', entities[0]);
+  const r = entities[0];
+  if (!r) {
+    return res.send({
+      content: [],
+      pagination: { total: 0, skip: 0, limit: DEFAULT_LIMIT },
+    });
+  }
+
+  return res.send(r);
 };
 
 const getSubmissions = async (req, res) => {
