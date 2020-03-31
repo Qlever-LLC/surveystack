@@ -64,7 +64,7 @@
               @code-calculate="highlight('calculate')"
               @code-relevance="highlight('relevance')"
               @code-constraint="highlight('constraint')"
-              @code-api-compose="highlight('api-compose')"
+              @code-api-compose="highlight('apiCompose')"
               @set-control-source="setControlSource"
               @set-control-params="setControlParams"
               @set-script-editor-is-visible="setScriptIsVisible"
@@ -221,7 +221,7 @@ const tabMap = [
   'relevance',
   'calculate',
   'constraint',
-  'api-compose',
+  'apiCompose',
 ];
 
 export default {
@@ -390,6 +390,7 @@ export default {
 
       this.selectedTab = tabMap.indexOf(tab);
 
+      console.log('options', this.control.options);
       if (!this.control.options[tab].code) {
         const initalCode = initialRelevanceCode(tab);
         this.control.options[tab].code = initalCode;
@@ -558,6 +559,7 @@ export default {
   },
   watch: {
     selectedTab(tab) {
+      console.log('selecting tab', tab);
       this.highlight(tabMap[tab]);
     },
     optionsRelevance: {
@@ -592,7 +594,7 @@ export default {
         if (!newVal) {
           return;
         }
-        this.highlight('api-compose', newVal.enabled);
+        this.highlight('apiCompose', newVal.enabled);
       },
       deep: true,
     },

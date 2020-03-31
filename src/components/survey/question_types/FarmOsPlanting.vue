@@ -14,6 +14,15 @@
         :label="control.label"
         :multiple="false"
       >
+        <template v-slot:item="{item}">
+          <div v-html="item.label"></div>
+        </template>
+        <template v-slot:selection="{item}">
+          <div
+            v-html="item.label"
+            class="d-flex align-center"
+          ></div>
+        </template>
       </v-autocomplete>
 
       <v-progress-circular
