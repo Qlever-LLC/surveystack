@@ -9,11 +9,12 @@ function farmOSPlanting() {
 
 }
 
-function sandbox() {
+function sandbox(submission) {
   const planting = farmOSPlanting('corn', '2019-03-30');
   return [{
     api: 'farmOS',
     type: 'asset',
+    method: 'post',
     body: planting,
   }];
 }

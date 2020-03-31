@@ -160,6 +160,24 @@
             mdi-open-in-new
           </v-icon>
         </div>
+
+        <div class="d-flex">
+          <v-checkbox
+            class="ma-0"
+            color="blue"
+            outlined
+            v-model="apiCompose.enabled"
+            label="Api Compose Expression"
+          />
+          <v-spacer />
+          <v-icon
+            class="align-self-start"
+            color="blue"
+            @click="$emit('code-api-compose')"
+          >
+            mdi-open-in-new
+          </v-icon>
+        </div>
       </div>
       <select-items-editor
         v-if="isSelect || isOntology"
@@ -197,6 +215,9 @@ export default {
 
     },
     constraint: {
+
+    },
+    apiCompose: {
 
     },
     survey: {

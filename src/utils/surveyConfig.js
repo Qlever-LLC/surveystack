@@ -16,6 +16,10 @@ export const defaultControlOptions = {
     enabled: false,
     code: '',
   },
+  apiCompose: {
+    enabled: false,
+    code: '',
+  },
 };
 
 export const createControlInstance = (control) => {

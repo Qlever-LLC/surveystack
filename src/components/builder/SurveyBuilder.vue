@@ -60,9 +60,11 @@
               :calculate="optionsCalculate"
               :relevance="optionsRelevance"
               :constraint="optionsConstraint"
+              :api-compose="optionsApiCompose"
               @code-calculate="highlight('calculate')"
               @code-relevance="highlight('relevance')"
               @code-constraint="highlight('constraint')"
+              @code-api-compose="highlight('api-compose')"
               @set-control-source="setControlSource"
               @set-control-params="setControlParams"
             />
@@ -110,6 +112,12 @@
                 </v-tab>
                 <v-tab :disabled="!control.options.constraint.enabled">
                   Constraint
+                </v-tab>
+                <v-tab
+                  v-if="control.options.apiCompose"
+                  :disabled="!control.options.apiCompose.enabled"
+                >
+                  API Compose
                 </v-tab>
                 <v-tab v-if="control.type === 'script'">
                   Script
@@ -212,6 +220,7 @@ const tabMap = [
   'relevance',
   'calculate',
   'constraint',
+  'api-compose',
 ];
 
 export default {
@@ -253,6 +262,7 @@ export default {
       optionsRelevance: null,
       optionsCalculate: null,
       optionsConstraint: null,
+      optionsApiCompose: null,
       activeCode: '',
       scriptCode: null,
       // survey entity
@@ -358,7 +368,8 @@ export default {
         this.optionsRelevance,
         this.optionsCalculate,
         this.optionsConstraint,
-      ].forEach((item, idx) => {
+        this.optionsApiCompose,
+      ].filter(o => o !== undefined).forEach((item, idx) => {
         if (item.enabled) {
           this.selectedTab = idx;
         }
@@ -367,7 +378,7 @@ export default {
     highlight(tab, select = true) {
       this.hideCode = false;
 
-      if (!this.control.options[tab].enabled) {
+      if (this.control.options[tab] && !this.control.options[tab].enabled) {
         this.highlightNext();
         return;
       }
@@ -506,7 +517,8 @@ export default {
       }
       return this.control.options.relevance.enabled
         || this.control.options.calculate.enabled
-        || this.control.options.constraint.enabled;
+        || this.control.options.constraint.enabled
+        || this.control.options.apiCompose.enabled;
     },
     hasScript() {
       if (!this.control) {
@@ -561,18 +573,34 @@ export default {
       },
       deep: true,
     },
+    optionsApiCompose: {
+      handler(newVal) {
+        if (!newVal) {
+          return;
+        }
+        this.highlight('api-compose', newVal.enabled);
+      },
+      deep: true,
+    },
     control: {
       handler(newVal) {
+        const emptyOptions = {
+          enabled: false,
+          code: '',
+        };
+
         if (!newVal) {
           this.optionsRelevance = null;
           this.optionsCalculate = null;
           this.optionsConstraint = null;
+          this.optionsApiCompose = null;
           return;
         }
 
-        this.optionsRelevance = newVal.options.relevance;
-        this.optionsCalculate = newVal.options.calculate;
-        this.optionsConstraint = newVal.options.constraint;
+        this.optionsRelevance = newVal.options.relevance || _.cloneDeep(emptyOptions);
+        this.optionsCalculate = newVal.options.calculate || _.cloneDeep(emptyOptions);
+        this.optionsConstraint = newVal.options.constraint || _.cloneDeep(emptyOptions);
+        this.optionsApiCompose = newVal.options.apiCompose || _.cloneDeep(emptyOptions);
       },
       deep: true,
     },
