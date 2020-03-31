@@ -73,8 +73,8 @@ const createRedactStage = (user, roles) => {
             then: '$$DESCEND',
           },
           // check if user has specific role
-          // e.g. "meta.permissions": ['admin'], "$$ROOT.meta.path": "/oursci/lab"
-          // => User needs 'admin@/oursci/lab' to view
+          // e.g. "meta.permissions": ['admin'], "$$ROOT.meta.path": "/oursci/lab/"
+          // => User needs 'admin@/oursci/lab/' to view
           {
             case: {
               $gt: [

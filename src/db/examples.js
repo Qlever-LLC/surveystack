@@ -118,7 +118,7 @@ export const exampleSubmissions = [
       permissions: [], // restrict access to submission, leave empty for now
       creator: new ObjectId('5e6f92f16070e700015e0371'),
       group: new ObjectId('5e6f8bbeea14550001470c28'),
-      path: '/our-sci',
+      path: '/our-sci/',
     },
     data: {
       favorite_color: {
@@ -160,7 +160,7 @@ export const exampleSubmissions = [
       permissions: [],
       creator: new ObjectId('5e452119c5117c000185f275'),
       group: new ObjectId('5e6f8bbeea14550001470c28'),
-      path: '/our-sci',
+      path: '/our-sci/',
     },
     data: {
       favorite_color: {
@@ -202,7 +202,7 @@ export const exampleSubmissions = [
       permissions: [],
       creator: new ObjectId('5e452119c5117c000185f275'),
       group: new ObjectId('5e6f8bbeea14550001470c28'),
-      path: '/our-sci',
+      path: '/our-sci/',
     },
     data: {
       favorite_color: {
@@ -243,7 +243,7 @@ export const exampleSubmissions = [
       revision: 1,
       permissions: [],
       group: new ObjectId('5e6f8bbeea14550001470c28'),
-      path: '/our-sci',
+      path: '/our-sci/',
     },
     data: {
       favorite_color: {
@@ -280,35 +280,35 @@ export const exampleGroups = [
     name: 'Our-Sci LLC',
     slug: 'our-sci',
     dir: '/',
-    path: '/our-sci',
+    path: '/our-sci/',
   },
   {
     _id: new ObjectId('5e6f8bbeea14550001470c32'),
     name: 'Our-Sci Lab',
     slug: 'lab',
     dir: '/our-sci/',
-    path: '/our-sci/lab',
+    path: '/our-sci/lab/',
   },
   {
     _id: new ObjectId('5e6f8bbeea14550001470c34'),
     name: 'Our-Sci Lab Testing',
     slug: 'testing',
     dir: '/our-sci/lab/',
-    path: '/our-sci/lab/testing',
+    path: '/our-sci/lab/testing/',
   },
   {
     _id: new ObjectId('5e6f8bbeea14550001470c36'),
     name: 'Our-Sci Lab Results',
     slug: 'results',
     dir: '/our-sci/lab/',
-    path: '/our-sci/lab/results',
+    path: '/our-sci/lab/results/',
   },
   {
     _id: new ObjectId('5e6f8bbeea14550001470c38'),
     name: 'Nexus-Computing GmbH',
     slug: 'nexus-computing',
     dir: '/',
-    path: '/nexus-computing',
+    path: '/nexus-computing/',
   },
 ];
 
@@ -346,7 +346,7 @@ export const exampleUsers = [
 ];
 
 const OWNER = '37190y1';
-const ROLES = ['admin@/our/sci', 'member@/farmos'];
+const ROLES = ['admin@/our/sci/', 'member@/farmos'];
 
 const redactStage = {
   $switch: {

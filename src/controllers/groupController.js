@@ -13,9 +13,10 @@ const getGroups = async (req, res) => {
 
   if (req.query.dir) {
     dir = req.query.dir;
-    if (!dir.endsWith('/')) {
-      dir += '/';
-    }
+  }
+
+  if (!dir.endsWith('/')) {
+    dir += '/';
   }
 
   let dirQuery = dir;
@@ -35,8 +36,8 @@ const getGroups = async (req, res) => {
 const getGroupByPath = async (req, res) => {
   let path = req.params[0];
 
-  if (path.endsWith('/')) {
-    path = path.substring(0, path.length - 1);
+  if (!path.endsWith('/')) {
+    path += '/';
   }
 
   const entity = await db.collection(col).findOne({ path });
@@ -72,7 +73,7 @@ const sanitizeGroup = group => {
 
 const createGroup = async (req, res) => {
   const entity = req.body;
-  entity.path = `${entity.dir}${entity.slug}`; // TODO: make sanitization function
+  entity.path = `${entity.dir}${entity.slug}/`; // TODO: make sanitization function
 
   try {
     let r = await db.collection(col).insertOne({ ...entity, _id: new ObjectId(entity._id) });
@@ -90,7 +91,7 @@ const createGroup = async (req, res) => {
 const updateGroup = async (req, res) => {
   const { id } = req.params;
   const entity = req.body;
-  entity.path = `${entity.dir}${entity.slug}`; // TODO: make sanitization function
+  entity.path = `${entity.dir}${entity.slug}/`; // TODO: make sanitization function
 
   const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
 
@@ -105,8 +106,8 @@ const updateGroup = async (req, res) => {
 
     if (existing.slug !== updated.slug) {
       // also find and modify descendants
-      let oldSubgroupDir = existing.path + '/';
-      let newSubgroupDir = entity.path + '/';
+      let oldSubgroupDir = existing.path;
+      let newSubgroupDir = entity.path;
       await bulkChangePaths(oldSubgroupDir, newSubgroupDir);
     }
 
@@ -126,7 +127,7 @@ const bulkChangePaths = async (oldDir, newDir) => {
           $concat: [newDir, { $substr: ['$dir', { $strLenBytes: oldDir }, -1] }],
         },
         path: {
-          $concat: [newDir, { $substr: ['$dir', { $strLenBytes: oldDir }, -1] }, '$slug'],
+          $concat: [newDir, { $substr: ['$dir', { $strLenBytes: oldDir }, -1] }, '$slug', '/'],
         },
       },
     },
