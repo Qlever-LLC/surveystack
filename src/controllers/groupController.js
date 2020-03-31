@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { ObjectId } from 'mongodb';
 
-import boom from '@hapi/boom';
+import boom, { entityTooLarge } from '@hapi/boom';
 
 import { db } from '../db';
 
@@ -64,16 +64,40 @@ const getGroupById = async (req, res) => {
   return res.send(entity);
 };
 
-const sanitizeGroup = group => {
-  const slugExp = new RegExp('^[a-z0-9]+(-[a-z0-9]+)*$');
-  if (!slugExp.test(group.slug)) {
-    throw boom.badRequest(`Bad group slug name: ${group.slug}`);
+const sanitizeGroup = entity => {
+  if (!entity.slug) {
+    throw boom.badRequest(`Group slug not set`);
   }
+
+  const slugExp = new RegExp('^[a-z0-9]+(-[a-z0-9]+)*$');
+  if (!slugExp.test(entity.slug)) {
+    throw boom.badRequest(`Bad group slug name: ${entity.slug}`);
+  }
+
+  console.log(entity);
+
+  if (entity.dir !== '/') {
+    if (entity.dir.length <= 2 || !entity.dir.startsWith('/') || !entity.dir.endsWith('/')) {
+      throw boom.badRequest(`Bad group dir: ${entity.dir}`);
+    }
+
+    let slugs = entity.dir.split('/');
+    // remove first and last empty strings
+    slugs.shift();
+    slugs.pop();
+    slugs.forEach(slug => {
+      if (!slugExp.test(slug)) {
+        throw boom.badRequest(`Bad group dir: ${entity.dir}`);
+      }
+    });
+  }
+
+  entity.path = `${entity.dir}${entity.slug}/`;
 };
 
 const createGroup = async (req, res) => {
   const entity = req.body;
-  entity.path = `${entity.dir}${entity.slug}/`; // TODO: make sanitization function
+  sanitizeGroup(entity);
 
   try {
     let r = await db.collection(col).insertOne({ ...entity, _id: new ObjectId(entity._id) });
@@ -81,7 +105,9 @@ const createGroup = async (req, res) => {
     return res.send(r);
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
-      return res.status(409).send({ message: `Entity with _id already exists: ${entity._id}` });
+      return res
+        .status(409)
+        .send({ message: `Conflict _id or path: ${entity._id}, ${entity.path}` });
     }
   }
 
@@ -91,7 +117,7 @@ const createGroup = async (req, res) => {
 const updateGroup = async (req, res) => {
   const { id } = req.params;
   const entity = req.body;
-  entity.path = `${entity.dir}${entity.slug}/`; // TODO: make sanitization function
+  sanitizeGroup(entity);
 
   const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
 
