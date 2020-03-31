@@ -125,4 +125,9 @@ router.post('/mail/send', async (req, res) => {
   return res.send('OK');
 });
 
+router.get('/node_env', async (req, res) => {
+  console.log(process.env.NODE_ENV);
+  return res.send(process.env.NODE_ENV);
+});
+
 export default router;
