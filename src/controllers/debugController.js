@@ -22,6 +22,9 @@ const createDummySubmissions = async (req, res) => {
 
 // TODO: delete this endpoint in production!
 const tabulaRasa = async (req, res) => {
+  if (process.env.NODE_ENV !== 'development') {
+    throw boom.badRequest('Can only tabula rasa on development server');
+  }
   console.log('inside tabula rasa');
   await db.collection('surveys').deleteMany({});
   await db.collection('submissions').deleteMany({});
