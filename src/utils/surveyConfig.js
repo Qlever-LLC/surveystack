@@ -73,6 +73,12 @@ export const availableControls = [
     icon: 'mdi-numeric',
   },
   {
+    name: 'date',
+    label: 'Enter a date',
+    type: 'date',
+    icon: 'mdi-calendar',
+  },
+  {
     name: 'group',
     label: 'My group',
     type: 'group',

@@ -59,17 +59,10 @@ export default {
 
     this.survey = await this.$store.dispatch(
       'surveys/fetchSurvey',
-      this.submission.survey,
+      this.submission.meta.survey.id,
     );
 
     const positions = utils.getSurveyPositions(this.survey);
-    // this.setNavbarContent({
-    //   title: this.survey.name,
-    //   subtitle: `
-    //     <span><span class="question-title-chip">Version ${this.submission.meta.version}</span></span>
-    //     <span class="question-title-chip">${positions.length} Questions</span>
-    //   `,
-    // });
 
     this.loading = false;
   },

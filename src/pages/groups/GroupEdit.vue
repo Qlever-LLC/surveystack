@@ -168,13 +168,13 @@ export default {
           url,
           data,
         });
-        this.$router.push(`/g${this.entity.dir}${this.entity.slug}`);
+        this.$router.push(`/g${this.entity.dir}${this.entity.slug}/`);
       } catch (err) {
         console.log(err);
       }
     },
     cancel() {
-      this.$router.replace(`/g${this.entity.dir}`);
+      this.$router.replace(`/g${this.entity.dir}${this.entity.slug}/`);
     },
   },
   watch: {

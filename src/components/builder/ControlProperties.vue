@@ -13,24 +13,36 @@
         v-model="control.label"
         label="Label"
       />
-      <v-autocomplete
-        v-model="scriptSourceId"
+      <div
+        class="d-flex align-start"
         v-if="isScript"
-        :items="scriptSourceItems"
-        label="Script Source"
-        item-text="name"
-        item-value="_id"
-        @focus="handleScriptSourceFocus"
-        @change="(id) => $emit('set-control-source', id)"
-        solo
-        outlined
-        chips
-        persistent-hint
       >
-        <template v-slot:selection="{ attr, on, item, selected }">
-          <div>{{ item.name }}</div>
-        </template>
-      </v-autocomplete>
+        <v-autocomplete
+          v-model="scriptSourceId"
+          v-if="isScript"
+          :items="scriptSourceItems"
+          label="Script Source"
+          item-text="name"
+          item-value="_id"
+          @focus="handleScriptSourceFocus"
+          @change="(id) => $emit('set-control-source', id)"
+          solo
+          outlined
+          chips
+          persistent-hint
+        >
+          <template v-slot:selection="{ attr, on, item, selected }">
+            <div>{{ item.name }}</div>
+          </template>
+        </v-autocomplete>
+        <v-btn
+          icon
+          class="mt-2"
+          @click="(ev) => $emit('set-script-editor-is-visible', true)"
+        >
+          <v-icon>mdi-open-in-new</v-icon>
+        </v-btn>
+      </div>
       <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
       <v-textarea
         v-model="scriptParams"

@@ -67,17 +67,18 @@
               @code-api-compose="highlight('api-compose')"
               @set-control-source="setControlSource"
               @set-control-params="setControlParams"
+              @set-script-editor-is-visible="setScriptIsVisible"
             />
           </div>
         </v-card>
       </pane>
       <pane
         class="pane pane-script"
-        v-if="hasScript && !hideScriptCode && scriptCode !== null"
+        v-if="hasScript && scriptEditorIsVisible && scriptCode !== null"
       >
         <code-editor
           :saveable="true"
-          @close="hideScriptCode = true"
+          @close="() => setScriptIsVisible(false)"
           :code="scriptCode.content"
           class="main-code-editor"
           :refresh="codeRefreshCounter"
@@ -151,7 +152,7 @@
       </pane>
       <pane
         class="pane pane-submission-code"
-        v-if="(hasCode && !hideCode) || (hasScript && !hideScriptCode)"
+        v-if="(hasCode && !hideCode) || (hasScript && scriptEditorIsVisible)"
       >
         <div class="code-editor">
           <code-editor
@@ -208,7 +209,7 @@ import submissionUtils from '@/utils/submissions';
 const initialRelevanceCode = variable => `\
 /**
  * ${variable.charAt(0).toUpperCase() + variable.substr(1)}
- * 
+ *
  * @param {submission} submission
  */
 function ${variable}(submission) {
@@ -247,7 +248,7 @@ export default {
     return {
       // modes
       hideCode: false,
-      hideScriptCode: false,
+      scriptEditorIsVisible: false,
       dirty: false,
       version: 1,
       // ui
@@ -296,6 +297,10 @@ export default {
       } catch (err) {
         console.log(err);
       }
+    },
+    setScriptIsVisible(val) {
+      console.log('hello');
+      this.scriptEditorIsVisible = val;
     },
     updateScriptCode(code) {
       this.scriptCode.content = code;
@@ -422,13 +427,21 @@ export default {
     async controlSelected(control) {
       // console.log('selected control', control);
       this.control = control;
+      console.log('controlSelected', control);
       if (control && control.type === 'script' && control.options.source) {
-        const { data } = await api.get(`/scripts/${control.options.source}`);
-        this.hideScriptCode = false;
-        this.scriptCode = data || { _id: null, name: 'New Script', content: '' };
+        const data = await this.fetchScript(control.options.source);
+        this.scriptEditorIsVisible = false;
+        this.setScriptCode(data);
       } else {
         this.scriptCode = null;
       }
+    },
+    async fetchScript(id) {
+      const { data } = await api.get(`/scripts/${id}`);
+      return data;
+    },
+    setScriptCode(data) {
+      this.scriptCode = data || { _id: null, name: 'New Script', content: '' };
     },
     duplicateControl(control) {
       const position = utils.getPosition(this.control, this.currentControls);
@@ -449,11 +462,12 @@ export default {
     onCancel() {
       this.$router.push('/surveys/browse');
     },
-    setControlSource(value) {
+    async setControlSource(value) {
       console.log('setControlSource', value);
       // this.control.options.source = value;
       this.$set(this.control.options, 'source', value);
-      // this.$forceUpdate();
+      const data = await this.fetchScript(value);
+      this.setScriptCode(data);
     },
     setControlParams(params) {
       this.control.options.params = params;

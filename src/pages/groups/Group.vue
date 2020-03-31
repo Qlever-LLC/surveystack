@@ -1,12 +1,7 @@
 <template>
   <v-container v-if="initialized && status.code === 200">
     <div class="d-flex justify-space-between align-center">
-      <span v-if="entity.dir !== '/'">
-        <router-link
-          :to="`/g${entity.dir}`"
-          class="text-muted"
-        >{{entity.dir}}</router-link>
-      </span>
+      <app-group-breadcrumbs :path="entity.path" />
       <v-btn
         class="ml-auto"
         :to="{name: 'groups-edit', params: {id: entity._id}}"
@@ -53,12 +48,14 @@
 import api from '@/services/api.service';
 import appGroupList from '@/components/groups/GroupList.vue';
 import appGroupUserList from '@/components/groups/GroupUserList.vue';
+import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 
 export default {
   name: 'Group',
   components: {
     appGroupList,
     appGroupUserList,
+    appGroupBreadcrumbs,
   },
   data() {
     return {
@@ -71,7 +68,7 @@ export default {
         _id: '',
         name: '',
         slug: '',
-        path: null,
+        path: '/',
       },
       users: [],
       subgroups: [],
