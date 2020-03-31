@@ -127,7 +127,24 @@ const createSubmissionFromSurvey = (survey, version = 1, instance = null) => {
   positions.forEach((position) => {
     const control = getControl(controls, position);
     const flatName = getFlatName(controls, position);
-    const v = flattenedInstance ? flattenedInstance[`${flatName}.value`] : null;
+    let v = null;
+    if (flattenedInstance) {
+      const keys = Object.keys(flattenedInstance).filter(o => o.startsWith(`${flatName}.value`));
+      if (keys.length === 1) {
+        // eslint-disable-next-line prefer-destructuring
+        v = flattenedInstance[keys[0]];
+      } else { // if this is an object
+        const inner = {};
+        // eslint-disable-next-line no-restricted-syntax
+        for (const k of keys) {
+          const len = `${flatName}.value`.length;
+          const updatedKey = k.substring(len + 1); // '.' char
+          inner[updatedKey] = flattenedInstance[k];
+        }
+        v = unflatten(inner);
+        console.log('unflattened');
+      }
+    }
     const dateModified = flattenedInstance ? flattenedInstance[`${flatName}.meta.dateModified`] : null;
     const meta = { type: control.type, dateModified };
     if (control.options.redacted) {
