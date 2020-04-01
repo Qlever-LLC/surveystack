@@ -40,4 +40,9 @@ export default {
 .app-min-height {
   min-height: 30rem;
 }
+
+div {
+  background: #fff;
+  padding: 2rem;
+}
 </style>
