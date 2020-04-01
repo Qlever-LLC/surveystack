@@ -6,11 +6,43 @@
       class="card-height"
       slot="paneL"
     >
-      <v-card-title>{{ title || "" }} <v-chip
-          v-if="result !== null"
+      <v-card-title>{{ title || "" }}
+
+        <v-chip
+          v-if="result !== null && typeof result === 'boolean'"
           class="mx-4"
           :color="result ? 'green' : 'red'"
-        >{{ result }}</v-chip>
+        >
+          {{ result }}
+        </v-chip>
+
+        <v-chip
+          v-if="result !== null && typeof result === 'object'"
+          class="mx-4"
+          color="blue"
+          @click.stop="dialog = true"
+        >
+          Result Object (click to expand)
+        </v-chip>
+
+        <v-dialog v-model="dialog">
+          <v-card>
+            <v-card-title class="headline">Object Created</v-card-title>
+            <pre><code>{{ result }}</code></pre>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn
+                color="green darken-1"
+                text
+                @click="dialog = false"
+              >
+                Close
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
         <v-spacer></v-spacer>
         <v-icon
           v-if="saveable"
@@ -26,7 +58,8 @@
       <div
         class="error red text--white pa-2"
         v-if="error"
-      >{{ error }}</div>
+      >{{ error }}
+      </div>
       <div
         class="editor-height"
         :id="'monaco-editor-'+_uid"
@@ -90,6 +123,9 @@ export default {
       editor: null,
       model: null,
       viewState: null,
+      dialog: false,
+      resultEditor: null,
+      resultModel: null,
     };
   },
   props: {
@@ -150,6 +186,7 @@ export default {
         readOnly: this.readonly,
         model: this.model,
       });
+
       this.editor.onDidChangeModelContent((event) => {
         const value = this.editor.getValue();
         if (this.value !== value) {
@@ -174,6 +211,9 @@ export default {
       }
 
       // this.model.setValue(newVal);
+    },
+    result(newVal) {
+      // TODO show editor for result
     },
   },
   mounted() {

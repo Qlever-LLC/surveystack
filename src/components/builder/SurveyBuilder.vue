@@ -151,7 +151,7 @@
         </splitpanes>
       </pane>
       <pane
-        class="pane pane-submission-code"
+        class="pane pane-submission-code pane-shared-code"
         v-if="(hasCode && !hideCode) || (hasScript && scriptEditorIsVisible)"
       >
         <div class="code-editor">
@@ -400,18 +400,23 @@ export default {
       }
     },
     async runCode() {
+      const tab = tabMap[this.selectedTab];
       try {
         const res = await utils.execute(
           {
             code: this.activeCode,
-            fname: tabMap[this.selectedTab],
+            fname: tab,
             submission: this.instance,
             log: (arg) => {
               this.log = `${this.log}${arg}\n`;
             },
           },
         );
-        if (typeof res !== 'boolean') {
+        if (tab === 'apiCompose') {
+          if ((typeof res !== 'object')) {
+            throw Error('Function must return an object');
+          }
+        } else if (typeof res !== 'boolean') {
           throw Error('Function must return true or false');
         }
         this.evaluated = res;
@@ -692,7 +697,11 @@ export default {
 
 .pane-submission-code,
 .pane-main-code {
-  min-width: 700px;
+  min-width: 800px;
+}
+
+.pane-shared-code {
+  min-width: 500px;
 }
 
 .pane-survey {
