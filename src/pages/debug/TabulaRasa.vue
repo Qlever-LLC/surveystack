@@ -12,23 +12,41 @@
       @click="submit"
       :disabled="!activate"
     >{{activate ? "CONFIRM!" : "Activate first"}}</v-btn>
+
+    <transition name="fade">
+      <app-feedback
+        v-if="status"
+        class="mt-5"
+        @closed="status = ''"
+      >{{status}}</app-feedback>
+    </transition>
   </v-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
 import * as db from '@/store/db';
+import appFeedback from '@/components/ui/Feedback.vue';
+
 
 export default {
+  components: {
+    appFeedback,
+  },
   data() {
     return {
       activate: false,
+      status: '',
     };
   },
   methods: {
     async submit() {
-      await api.post('/debug/tabularasa');
-      this.$router.push('/surveys/browse');
+      try {
+        await api.post('/debug/tabularasa');
+      } catch (error) {
+        this.status = error.response.data.message;
+        return;
+      }
 
       try {
         db.clearAllSubmissions();
@@ -41,6 +59,8 @@ export default {
       } catch (error) {
         console.log(error);
       }
+
+      this.$router.push('/surveys/browse');
     },
   },
 };

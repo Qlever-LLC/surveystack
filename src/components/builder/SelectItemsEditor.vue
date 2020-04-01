@@ -6,15 +6,16 @@
         Select Options
       </span>
       <div>
-        <v-btn icon @click.stop="openTableDialog">
+        <v-btn
+          icon
+          @click.stop="openTableDialog"
+        >
           <v-icon>mdi-table</v-icon>
         </v-btn>
       </div>
     </v-card-title>
     <v-list>
-      <draggable
-        :list="value"
-      >
+      <draggable :list="value">
         <v-card
           v-for="(item, index) in value"
           :key="index"
@@ -49,7 +50,10 @@
             </v-list-item-content>
             <v-list-item-action class="mt-n3">
               <v-btn icon>
-                <v-icon color="grey" @click="() => deleteItem(index)">mdi-trash-can-outline</v-icon>
+                <v-icon
+                  color="grey"
+                  @click="() => deleteItem(index)"
+                >mdi-trash-can-outline</v-icon>
               </v-btn>
             </v-list-item-action>
           </v-list-item>
@@ -58,14 +62,15 @@
     </v-list>
     <v-row>
 
-      <v-btn class="ml-auto mr-0 d-block mb-3" @click="addItem">
+      <v-btn
+        class="ml-auto mr-0 d-block mb-3"
+        @click="addItem"
+      >
         +&nbsp;Add Item
       </v-btn>
     </v-row>
 
-    <v-dialog
-      v-model="tableDialogIsVisible"
-    >
+    <v-dialog v-model="tableDialogIsVisible">
       <select-items-table-editor
         :items="value"
         @change="setItems"

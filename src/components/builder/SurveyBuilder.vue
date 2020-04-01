@@ -3,6 +3,9 @@
     class="screen-root"
     style="padding: 0px 12px 0px 0px !important"
   >
+    <v-dialog v-model="viewCode">
+      <app-code-view v-model="survey" />
+    </v-dialog>
 
     <splitpanes
       style="padding: 0px !important"
@@ -25,6 +28,7 @@
             :enableSaveDraft="enableSaveDraft"
             :enableDismissDraft="enableDismissDraft"
             :enablePublish="enablePublish"
+            @view-code-toggle="viewCode = !viewCode"
             @update="publish"
             @cancel="onCancel"
             @saveDraft="saveDraft"
@@ -192,6 +196,8 @@ import surveyDetails from '@/components/builder/SurveyDetails.vue';
 import draft from '@/components/survey/drafts/DraftComponent.vue';
 import consoleLog from '@/components/builder/ConsoleLog.vue';
 
+import appCodeView from '@/components/builder/CodeView.vue';
+
 import appMixin from '@/components/mixin/appComponent.mixin';
 import api from '@/services/api.service';
 
@@ -232,6 +238,7 @@ export default {
     surveyDetails,
     draft,
     consoleLog,
+    appCodeView,
   },
   props: [
     'survey',

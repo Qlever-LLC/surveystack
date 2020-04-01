@@ -38,8 +38,8 @@
             <v-list-item>
               <v-list-item-title>
                 <v-btn
+                  class="pointer-events-none"
                   icon
-                  @click="$emit('export-survey')"
                 >
                   <v-icon color="grey lighten-1">mdi-file-download</v-icon>
                   <div class="ml-1">

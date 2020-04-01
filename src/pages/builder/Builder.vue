@@ -4,7 +4,7 @@
       :key="sessionId"
       v-if="!loading"
       :survey="survey"
-      :editMode="!isNew"
+      :editMode="editMode"
       :freshImport="freshImport"
       @submit="submitSubmission"
       @onSaveDraft="submitSurvey(true)"
@@ -13,17 +13,13 @@
       @import-survey="importSurvey"
       @export-survey="exportSurvey"
     />
-    <div v-else>LOADING...</div>
-
-    <app-dialog
-      v-model="showLogin"
-      @confirm="navigateToLogin"
-    >
-      <template v-slot:title>Log in to create a Survey</template>
-      <template>
-        Please log in order to be able to save your survey.
-      </template>
-    </app-dialog>
+    <div v-else>
+      <v-progress-circular
+        :size="50"
+        color="primary"
+        indeterminate
+      ></v-progress-circular>
+    </div>
 
     <app-dialog
       v-model="showConflictModal"
@@ -105,14 +101,12 @@ export default {
     SurveyBuilder,
     appDialog,
   },
-  props: [
-    'isNew',
-  ],
   data() {
     return {
+      editMode: true,
       showConflictModal: false,
       sessionId: new ObjectId().toString(),
-      loading: true,
+      loading: false,
       instance: {},
       survey: _.cloneDeep(emptySurvey),
       showSnackbar: false,
@@ -122,12 +116,6 @@ export default {
       importedSurvey: null,
       freshImport: false,
     };
-  },
-  computed: {
-    showLogin() {
-      console.log('logged in', this.$store.getters['auth/isLoggedIn']);
-      return !this.$store.getters['auth/isLoggedIn'];
-    },
   },
   methods: {
     navigateToLogin() {
@@ -174,16 +162,16 @@ export default {
         tmp.latestVersion = tmp.revisions[tmp.revisions.length - 1].version;
       }
 
-      const method = this.isNew ? 'post' : 'put';
-      const url = this.isNew ? '/surveys' : `/surveys/${tmp._id}`;
+      const method = this.editMode ? 'put' : 'post';
+      const url = this.editMode ? `/surveys/${tmp._id}` : '/surveys';
       console.log('submitting survey', tmp);
 
       try {
         await api.customRequest({
           method, url, data: tmp,
         });
-        if (this.isNew) {
-          console.log('id is ', tmp._id);
+        if (!this.editMode) {
+          this.editMode = true;
           this.$router.push(`/surveys/${tmp._id}/edit`);
         }
 
@@ -195,30 +183,13 @@ export default {
           const { message } = error.response.data;
           this.snack(message);
         }
+        return;
       }
 
       this.sessionId = new ObjectId().toString();
       this.survey = { ...tmp };
     },
-    async refresh() {
-      this.survey = _.cloneDeep(emptySurvey);
-      if (this.isNew) {
-        this.survey._id = ObjectId();
-        this.survey.dateCreated = moment().toISOString();
-      } else {
-        try {
-          const { id } = this.$route.params;
-          this.survey._id = id;
-          const { data } = await api.get(`/surveys/${this.survey._id}`);
-          this.survey = { ...this.survey, ...data };
-        } catch (e) {
-          console.log('something went wrong:', e);
-        }
-      }
 
-      this.sessionId = new ObjectId().toString();
-      this.loading = false;
-    },
     async importSurvey({ target: { files: [file] } }) {
       try {
         const importedSurvey = JSON.parse(await file.text());
@@ -263,16 +234,31 @@ export default {
 
       document.body.removeChild(element);
     },
-  },
-  watch: {
-    async isNew() {
-      console.log('isnew', this.isNew);
-      await this.refresh();
+    async fetchData() {
+      try {
+        const { id } = this.$route.params;
+        this.survey._id = id;
+        const { data } = await api.get(`/surveys/${this.survey._id}`);
+        this.survey = { ...this.survey, ...data };
+      } catch (e) {
+        console.log('something went wrong:', e);
+      }
+      this.sessionId = new ObjectId().toString();
+      this.loading = false;
     },
   },
   async created() {
-    console.log('new is', this.isNew);
-    await this.refresh();
+    this.editMode = !this.$route.matched.some(
+      ({ name }) => name === 'surveys-new',
+    );
+
+    this.survey._id = ObjectId();
+    this.survey.dateCreated = moment().toISOString();
+
+    if (this.editMode) {
+      this.loading = true;
+      await this.fetchData();
+    }
   },
 };
 </script>

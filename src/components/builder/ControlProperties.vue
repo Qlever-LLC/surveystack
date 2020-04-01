@@ -202,6 +202,7 @@ import api from '@/services/api.service';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
 import InstructionsEditor from '@/components/builder/InstructionsEditor.vue';
 
+import { convertToKey } from '@/utils/builder';
 
 export default {
   components: {
@@ -357,6 +358,15 @@ export default {
     },
     handleSelectItemsChange(ev) {
       console.log('handleSelectItemsChange', ev);
+    },
+  },
+  watch: {
+    'control.name': {
+      handler(newVal, oldVal) {
+        const key = convertToKey(newVal);
+        console.log(`setting control.name to "${key}"`);
+        this.control.name = key;
+      },
     },
   },
   created() {

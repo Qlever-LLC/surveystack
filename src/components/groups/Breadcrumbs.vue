@@ -31,9 +31,8 @@ export default {
         });
       }
 
-      // links.pop();
+
       links.reverse();
-      links.push({ to: `/g${this.path}` });
 
       // create text
       links.forEach((link) => {
