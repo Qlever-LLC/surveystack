@@ -9,6 +9,7 @@ import scriptController from '../controllers/scriptController';
 import debugController from '../controllers/debugController';
 import rolesController from '../controllers/rolesController';
 import farmosController from '../controllers/farmosController';
+import integrationController from '../controllers/integrationController';
 
 //import { authenticated } from '../handlers/checkPermissions';
 import {
@@ -111,5 +112,16 @@ router.get('/roles', catchErrors(rolesController.getRoles));
 /** farmos */
 router.get('/farmos/fields', catchErrors(farmosController.getFields));
 router.get('/farmos/assets', catchErrors(farmosController.getAssets));
+
+/** Integrations */
+router.get('/integrations', catchErrors(integrationController.getIntegrations));
+router.get('/integrations/:id', catchErrors(integrationController.getIntegration));
+router.post('/integrations', catchErrors(integrationController.createIntegration));
+router.put(
+  '/integrations/:id',
+  [assertIdsMatch, assertEntityExists({ collection: 'integrations' })],
+  catchErrors(integrationController.updateIntegration)
+);
+router.delete('/integrations/:id', catchErrors(integrationController.deleteIntegration));
 
 export default router;
