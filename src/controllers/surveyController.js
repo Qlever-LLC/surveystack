@@ -4,7 +4,7 @@ import boom from '@hapi/boom';
 
 import { db } from '../db';
 
-import { getDuplicateControls } from '../helpers/surveys';
+import { checkSurvey } from '../helpers/surveys';
 
 const col = 'surveys';
 const DEFAULT_LIMIT = 20;
@@ -17,10 +17,7 @@ const sanitize = entity => {
     version.dateCreated = new Date(entity.dateCreated);
   });
 
-  const duplicateControls = getDuplicateControls(entity, entity.latestVersion);
-  if (duplicateControls.length > 0) {
-    throw boom.badRequest(`Error Duplicate control '${duplicateControls[0]}'`);
-  }
+  checkSurvey(entity, entity.latestVersion);
 
   return entity;
 };

@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import boom from '@hapi/boom';
 
 function* processPositions(data, position = []) {
   if (!data) {
@@ -75,4 +76,27 @@ export const getDuplicateControls = (survey, version = 1) => {
     _.includes(iteratee, value, index + 1)
   );
   return duplicates;
+};
+
+export const checkSurvey = (survey, version = 1) => {
+  const controlNameExp = new RegExp('^[a-z0-9]+(-[a-z0-9]+)*$');
+
+  const { controls } = survey.revisions.find(revision => revision.version === version);
+  const positions = getControlPositions(controls);
+  positions.forEach(position => {
+    const control = getControl(controls, position);
+    if (!controlNameExp.test(control.name)) {
+      const flatName = getFlatName(controls, position);
+      throw boom.badRequest(`Invalid control name: ${flatName}`);
+    }
+  });
+
+  const flatNames = getFlatNames(survey, version);
+  const duplicates = _.filter(flatNames, (value, index, iteratee) =>
+    _.includes(iteratee, value, index + 1)
+  );
+
+  if (duplicates.length > 0) {
+    throw boom.badRequest(`Error duplicate control ${duplicates[0]}`);
+  }
 };
