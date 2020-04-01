@@ -60,6 +60,7 @@
               :calculate="optionsCalculate"
               :relevance="optionsRelevance"
               :constraint="optionsConstraint"
+              :controls="currentControls"
               @code-calculate="highlight('calculate')"
               @code-relevance="highlight('relevance')"
               @code-constraint="highlight('constraint')"
@@ -473,7 +474,6 @@ export default {
       const allNamesContainOnlyValidCharacters = !currentControls.some(
         control => !/^[\w-]*$/.test(control.name),
       );
-      console.log({ allNamesContainOnlyValidCharacters });
       return hasOnlyUniqueNames && allNamesContainOnlyValidCharacters;
     },
   },

@@ -686,3 +686,40 @@ if (DBG) {
     res = it.next();
   }
 }
+
+export function findControlById(controlId, controls) {
+  function reducer(id) {
+    return (r, x) => {
+      debugger;
+      if (x._id === id) {
+        return [x, ...r];
+      }
+      if (x.type === 'group') {
+        return [
+          ...x.children.reduce(reducer(id), []),
+          ...r,
+        ];
+      }
+      return r;
+    };
+  }
+
+  const [result] = controls.reduce(reducer(controlId), []);
+  return result || null;
+}
+
+export function findParentByChildId(controlId, controls) {
+  function fpr(id) {
+    return (r, x) => {
+      if (x.type === 'group') {
+        if (x.children.some(child => child._id === id)) {
+          return [x, ...r];
+        }
+        return [...x.children.reduce(fpr(id), []), ...r];
+      }
+      return r;
+    };
+  }
+  const [result] = controls.reduce(fpr(controlId), []);
+  return result || null;
+}

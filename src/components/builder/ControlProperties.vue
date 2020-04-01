@@ -7,6 +7,7 @@
         outlined
         v-model="control.name"
         label="Data name"
+        :rules="[nameIsUnique]"
       />
       <v-text-field
         outlined
@@ -196,10 +197,11 @@
   </div>
 </template>
 <script>
-import { getAdvancedCodeTemplate } from '@/utils/surveys';
+import { getAdvancedCodeTemplate, findParentByChildId } from '@/utils/surveys';
 import api from '@/services/api.service';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
 import InstructionsEditor from '@/components/builder/InstructionsEditor.vue';
+
 
 export default {
   components: {
@@ -225,6 +227,9 @@ export default {
     source: {
       type: String,
     },
+    controls: {
+      type: Array,
+    },
   },
   data() {
     return {
@@ -249,9 +254,22 @@ export default {
           value: 'date-year',
         },
       ],
+      // nameRules: {
+      //   // const pat = new RegExp(this.controlNames.join('|'));
+      //   unique(val) {
+      //     console.log(this.controlNames.some(name => name === val));
+      //     return this.controlNames.some(name => name === val) ? true : 'date name must be unique';
+      //   },
+      // },
     };
   },
   computed: {
+    controlNames() {
+      return this.controls.map(control => control.name);
+    },
+    isGroup() {
+      return this.control.type === 'group';
+    },
     isDate() {
       return this.control.type === 'date';
     },
@@ -269,6 +287,31 @@ export default {
     },
   },
   methods: {
+    nameIsUnique(val) {
+      // const matchingNames = this.controlNames.filter(name => val === name);
+      // return matchingNames.length > 1 ? 'Data name must be unique' : true;
+
+      const hasSameNameAndDifferentId = control => control.name === this.control.name && control._id !== this.control._id;
+      const parent = findParentByChildId(this.control._id, this.controls);
+      // return parent
+      //   ? parent.children.find(hasSameNameAndDifferentId)
+      //   : this.controls.find(hasSameNameAndDifferentId);
+      // console.log({ parent });
+      // if (parent) {
+      //   const result = parent.children.filter(hasSameNameAndDifferentId);
+      //   console.log('parent', { result });
+      //   return result;
+      // }
+      // const result = this.controls.filter(hasSameNameAndDifferentId);
+      // console.log({ result });
+      // return result;
+      const controlsWithSameName = parent
+        ? parent.children.filter(hasSameNameAndDifferentId)
+        : this.controls.filter(hasSameNameAndDifferentId);
+      return controlsWithSameName.length > 0
+        ? 'Data name must be unique'
+        : true;
+    },
     openAdvancedEditor() {
       // TODO: can't pass params to new window
       // Use Vuex maybe?

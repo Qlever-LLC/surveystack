@@ -1,4 +1,5 @@
 import { cloneDeep } from 'lodash';
+import ObjectId from 'bson-objectid';
 
 export const defaultControlOptions = {
   readOnly: false,
@@ -23,6 +24,7 @@ export const createControlInstance = (control) => {
 
   const cloneWithDefaultOptions = Object.assign(clone, {
     options: cloneDeep(defaultControlOptions),
+    _id: new ObjectId().toString(),
   });
 
   if (control.type === 'selectSingle' || control.type === 'selectMultiple' || control.type === 'ontology') {

@@ -46,7 +46,7 @@ export default {
           return /^[\w-]*$/.test(val) ? true : 'survey name cannot contain special characters';
         },
         hasValidLength(val) {
-          return val.length > 4 ? true : 'survey name must be at least 4 characters long';
+          return val.length > 4 ? true : 'survey name must be at least 5 characters long';
         },
       },
     };
