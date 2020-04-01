@@ -94,7 +94,7 @@ export const availableControls = [
     icon: 'mdi-code-braces',
   },
   {
-    name: 'multiple choice',
+    name: 'multiple_choice',
     label: 'Multiple Choice',
     type: 'selectSingle',
     // icon: 'mdi-order-bool-descending',
@@ -127,7 +127,7 @@ export const availableControls = [
 
   },
   {
-    name: 'farmos-field',
+    name: 'farmos_field',
     label: 'Farmos Field',
     type: 'farmOsField',
     // icon: 'mdi-text-search',
@@ -140,7 +140,7 @@ export const availableControls = [
 
   },
   {
-    name: 'farmos-planting',
+    name: 'farmos_planting',
     label: 'Farmos Planting',
     type: 'farmOsPlanting',
     // icon: 'mdi-text-search',

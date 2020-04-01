@@ -171,8 +171,8 @@ export default {
           method, url, data: tmp,
         });
         if (!this.editMode) {
+          this.editMode = true;
           this.$router.push(`/surveys/${tmp._id}/edit`);
-          return;
         }
 
         this.snack(isDraft ? 'Saved Draft' : 'Published Survey');
