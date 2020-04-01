@@ -62,7 +62,7 @@ export default {
         return this.entities;
       }
 
-      return this.entities.filter(entity => entity.name.toLowerCase().indexOf(this.q) > -1);
+      return this.entities.filter(entity => entity.name.toLowerCase().indexOf(this.q.toLowerCase()) > -1);
     },
   },
   data() {
