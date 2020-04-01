@@ -79,7 +79,7 @@ export const getDuplicateControls = (survey, version = 1) => {
 };
 
 export const checkSurvey = (survey, version = 1) => {
-  const controlNameExp = new RegExp('^[a-z0-9]+(-[a-z0-9]+)*$');
+  const controlNameExp = new RegExp('^[a-z0-9]+(_[a-z0-9]+)*$');
 
   const { controls } = survey.revisions.find(revision => revision.version === version);
   const positions = getControlPositions(controls);
