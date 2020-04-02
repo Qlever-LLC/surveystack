@@ -674,10 +674,10 @@ export default {
           return;
         }
 
-        this.optionsRelevance = newVal.options.relevance || _.cloneDeep(emptyOptions);
-        this.optionsCalculate = newVal.options.calculate || _.cloneDeep(emptyOptions);
-        this.optionsConstraint = newVal.options.constraint || _.cloneDeep(emptyOptions);
-        this.optionsApiCompose = newVal.options.apiCompose || _.cloneDeep(emptyOptions);
+        this.optionsRelevance = newVal.options.relevance || cloneDeep(emptyOptions);
+        this.optionsCalculate = newVal.options.calculate || cloneDeep(emptyOptions);
+        this.optionsConstraint = newVal.options.constraint || cloneDeep(emptyOptions);
+        this.optionsApiCompose = newVal.options.apiCompose || cloneDeep(emptyOptions);
       },
       deep: true,
     },
