@@ -43,7 +43,10 @@
     </v-card>
 
     <v-card v-if="editMode">
-      <app-api-integrations />
+      <app-integration-list
+        :entities="integrations"
+        :group="entity._id"
+      />
     </v-card>
 
   </v-container>
@@ -52,13 +55,13 @@
 <script>
 import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
-import appApiIntegrations from '@/components/groups/ApiIntegrations.vue';
+import appIntegrationList from '@/components/integrations/IntegrationList.vue';
 
 import { handleize } from '@/utils/groups';
 
 export default {
   components: {
-    appApiIntegrations,
+    appIntegrationList,
   },
   data() {
     return {
@@ -71,6 +74,7 @@ export default {
         dir: '/',
         path: '',
       },
+      integrations: [],
     };
   },
   methods: {
@@ -137,13 +141,16 @@ export default {
       }
     }
 
-    this.entity._id = new ObjectId();
+    this.entity._id = new ObjectId().toString();
 
     if (this.editMode) {
       try {
         const { id } = this.$route.params;
         const { data } = await api.get(`/groups/${id}`);
         this.entity = { ...this.entity, ...data };
+
+        const i = await api.get(`/integrations?group=${id}`);
+        this.integrations = i.data;
       } catch (e) {
         console.log('something went wrong:', e);
       }

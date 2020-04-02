@@ -7,7 +7,7 @@
         <v-btn
           color="primary"
           class="ml-4"
-          :to="{name: 'users-new'}"
+          :to="{name: 'users-new', query: {group: group._id, role: 'user' }}"
           text
         >New...</v-btn>
       </v-card-title>
@@ -26,6 +26,7 @@
             <v-list-item-content>
               <v-list-item-title>{{user.name}}</v-list-item-title>
               <v-list-item-subtitle>{{user.email}}</v-list-item-subtitle>
+              <!--
               <v-autocomplete
                 class="mt-4"
                 dense
@@ -51,6 +52,7 @@
                 multiple
               >
               </v-autocomplete>
+              //-->
             </v-list-item-content>
             <v-list-item-action>
             </v-list-item-action>
@@ -85,6 +87,9 @@ export default {
   props: {
     entities: {
       type: Array,
+    },
+    group: {
+      type: Object,
     },
   },
   computed: {

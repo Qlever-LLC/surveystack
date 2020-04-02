@@ -35,6 +35,8 @@ import ScriptList from '@/pages/scripts/ScriptList.vue';
 import Script from '@/pages/scripts/Script.vue';
 import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
 
+import IntegrationEdit from '@/pages/integrations/IntegrationEdit.vue';
+
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 
 import store from '@/store';
@@ -222,6 +224,17 @@ const routes = [
     path: '/scripts/:id',
     name: 'scripts-detail',
     component: Script,
+  },
+  // integrations
+  {
+    path: '/integrations/new',
+    name: 'integrations-new',
+    component: IntegrationEdit,
+  },
+  {
+    path: '/integrations/:id/edit',
+    name: 'integrations-edit',
+    component: IntegrationEdit,
   },
   // tabula rasa
   // TODO: remove this from production

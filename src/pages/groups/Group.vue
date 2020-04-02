@@ -22,16 +22,19 @@
         cols="12"
         lg="6"
       >
-        <app-group-user-list :entities="users" />
+        <app-group-list
+          :entities="subgroups"
+          :dir="entity.path"
+          title="Subgroups"
+        />
       </v-col>
       <v-col
         cols="12"
         lg="6"
       >
-        <app-group-list
-          :entities="subgroups"
-          :dir="entity.path"
-          title="Subgroups"
+        <app-group-user-list
+          :entities="users"
+          :group="entity"
         />
       </v-col>
     </v-row>
