@@ -25,6 +25,7 @@
           :value="dateForPicker"
           @input="datePickerIsVisible = false"
           @change="updateDatePicker"
+          :type="datePickerType"
           no-title
         />
       </v-menu>
@@ -44,7 +45,7 @@ export default {
   },
   computed: {
     dateFormatted() {
-      return this.formatDate(new Date(this.value || Date.now()).toISOString().substr(0, 10));
+      return this.value ? this.formatDate(new Date(this.value).toISOString().substr(0, 10)) : null;
     },
     dateForPicker() {
       return new Date(this.value || Date.now()).toISOString().substr(0, 10);
@@ -55,7 +56,14 @@ export default {
         && this.control.options.subtype)
         || 'date';
     },
-
+    datePickerType() {
+      switch (this.control.options.subtype) {
+        case 'date-month-year':
+          return 'month';
+        default:
+          return 'date';
+      }
+    },
   },
   methods: {
     handlePickerInput(ev) {
@@ -86,6 +94,9 @@ export default {
       if (!date) return null;
 
       const [year, month, day] = date.split('-');
+      if (this.control.options.subtype === 'date-month-year') {
+        return `${month}/${year}`;
+      }
       return `${month}/${day}/${year}`;
     },
   },
