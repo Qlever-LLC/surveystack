@@ -1,7 +1,5 @@
 import { ObjectId } from 'mongodb';
 import assert from 'assert';
-import bcrypt from 'bcrypt';
-import uuidv4 from 'uuid/v4';
 
 import boom from '@hapi/boom';
 
@@ -10,6 +8,10 @@ import { db } from '../db';
 import { populate } from '../helpers';
 
 const col = 'integrations';
+
+const sanitizeIntegration = entity => {
+  return true;
+};
 
 const getIntegrations = async (req, res) => {
   let entities;

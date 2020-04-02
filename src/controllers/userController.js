@@ -147,20 +147,10 @@ const getUser = async (req, res) => {
 const createUser = async (req, res) => {
   const entity = req.body;
 
-  const { email, name, password } = entity;
+  const { email, name, password, memberships } = entity;
   if (password.trim() === '') {
     throw boom.badRequest('Password must not be empty');
   }
-
-  /*
-  const existing = await db.collection(col).findOne({
-    email,
-  });
-
-  if (existing) {
-    throw boom.conflict(`User already exists: ${email}`);
-  }
-  */
 
   const hash = bcrypt.hashSync(password, parseInt(process.env.BCRYPT_ROUNDS));
   const token = uuidv4();
@@ -171,8 +161,13 @@ const createUser = async (req, res) => {
     password: hash,
     permissions: [],
     authProviders: [],
-    groups: [],
+    memberships,
   };
+
+  // TODO: only allow admins of group to create memberships
+  user.memberships.forEach(membership => {
+    membership.group = new ObjectId(membership.group);
+  });
 
   try {
     let r = await db.collection(col).insertOne({ ...user, _id: new ObjectId(entity._id) });
@@ -201,6 +196,10 @@ const updateUser = async (req, res) => {
   } else {
     entity.password = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS));
   }
+
+  entity.memberships.forEach(membership => {
+    membership.group = new ObjectId(membership.group);
+  });
 
   try {
     delete entity._id;
