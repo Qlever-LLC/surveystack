@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import { cloneDeep } from 'lodash';
+import ObjectId from 'bson-objectid';
 
 export const defaultControlOptions = {
   readOnly: false,
@@ -23,10 +24,11 @@ export const defaultControlOptions = {
 };
 
 export const createControlInstance = (control) => {
-  const clone = _.cloneDeep(control);
+  const clone = cloneDeep(control);
 
   const cloneWithDefaultOptions = Object.assign(clone, {
-    options: _.cloneDeep(defaultControlOptions),
+    options: cloneDeep(defaultControlOptions),
+    _id: new ObjectId().toString(),
   });
 
   if (control.type === 'selectSingle' || control.type === 'selectMultiple' || control.type === 'ontology') {
@@ -47,24 +49,13 @@ export const availableControls = [
     name: 'instructions',
     label: 'Instructions',
     type: 'instructions',
-    // icon: 'mdi-card-text-outline',
-    // icon: 'mdi-card-text',
-    // icon: 'mdi-sign-text',
-    // icon: 'mdi-format-list-text',
-    // icon: 'mdi-clipboard-text',
     icon: 'mdi-clipboard-text-outline',
-    // icon: 'mdi-note-text',
-    // icon: 'mdi-note-text-outline',
-    // icon: 'mdi-text',
-    // icon: 'mdi-text-box',
-    // icon: 'mdi-text-box-outline',
   },
   {
     name: 'text',
     label: 'Enter some text',
     type: 'string',
     icon: 'mdi-format-text-variant',
-    // icon: 'mdi-format-text',
   },
   {
     name: 'number',
@@ -98,22 +89,15 @@ export const availableControls = [
     icon: 'mdi-code-braces',
   },
   {
-    name: 'multiple choice',
+    name: 'multiple_choice',
     label: 'Multiple Choice',
     type: 'selectSingle',
-    // icon: 'mdi-order-bool-descending',
-    // icon: 'mdi-checkbox-multiple-blank-circle-outline',
     icon: 'mdi-radiobox-marked',
   },
   {
     name: 'checkboxes',
     label: 'Checkboxes',
     type: 'selectMultiple',
-    // icon: 'mdi-order-bool-ascending-variant',
-    // icon: 'mdi-format-list-checks',
-    // icon: 'mdi-check-box-outline',
-    // icon: 'mdi-checkbox-multiple-marked-outline',
-    // icon: 'mdi-checkbox-marked',
     icon: 'mdi-checkbox-marked-outline',
 
   },
@@ -121,39 +105,20 @@ export const availableControls = [
     name: 'dropdown',
     label: 'Dropdown',
     type: 'ontology',
-    // icon: 'mdi-text-search',
-    // icon: 'mdi-view-list',
-    // icon: 'mdi-box-search',
-    // icon: 'mdi-format-list-bulleted-type',
-    // icon: 'mdi-textbox',
     icon: 'mdi-arrow-down-drop-circle',
-    // icon: 'mdi-arrow-down-drop-circle-outline',
 
   },
   {
-    name: 'farmos-field',
+    name: 'farmos_field',
     label: 'Farmos Field',
     type: 'farmOsField',
-    // icon: 'mdi-text-search',
-    // icon: 'mdi-view-list',
-    // icon: 'mdi-box-search',
-    // icon: 'mdi-format-list-bulleted-type',
-    // icon: 'mdi-textbox',
     icon: 'mdi-leaf',
-    // icon: 'mdi-arrow-down-drop-circle-outline',
 
   },
   {
-    name: 'farmos-planting',
+    name: 'farmos_planting',
     label: 'Farmos Planting',
     type: 'farmOsPlanting',
-    // icon: 'mdi-text-search',
-    // icon: 'mdi-view-list',
-    // icon: 'mdi-box-search',
-    // icon: 'mdi-format-list-bulleted-type',
-    // icon: 'mdi-textbox',
     icon: 'mdi-leaf',
-    // icon: 'mdi-arrow-down-drop-circle-outline',
-
   },
 ];

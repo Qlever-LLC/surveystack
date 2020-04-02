@@ -7,6 +7,7 @@
         outlined
         v-model="control.name"
         label="Data name"
+        :rules="[nameIsUnique]"
       />
       <v-text-field
         outlined
@@ -96,6 +97,14 @@
         v-model="control.options.hasMultipleSelections"
         v-if="control.type === 'ontology'"
         label="Allow Multiple Selections"
+      />
+
+      <v-select
+        v-if="isDate"
+        :items="dateTypes"
+        label="Type"
+        v-model="control.options.subtype"
+        outlined
       />
 
       <div
@@ -206,10 +215,12 @@
   </div>
 </template>
 <script>
-import { getAdvancedCodeTemplate } from '@/utils/surveys';
+import { getAdvancedCodeTemplate, findParentByChildId } from '@/utils/surveys';
 import api from '@/services/api.service';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
 import InstructionsEditor from '@/components/builder/InstructionsEditor.vue';
+
+import { convertToKey } from '@/utils/builder';
 
 export default {
   components: {
@@ -238,6 +249,9 @@ export default {
     source: {
       type: String,
     },
+    controls: {
+      type: Array,
+    },
   },
   data() {
     return {
@@ -248,9 +262,39 @@ export default {
         || JSON.stringify({}),
       scriptSourceIsLoading: false,
       scriptSourceItems: [],
+      dateTypes: [
+        {
+          text: 'Full Date (Month, Day, and Year)',
+          value: 'date',
+        },
+        {
+          text: 'Month and Year Only',
+          value: 'date-month-year',
+        },
+        // {
+        //   text: 'Year Only',
+        //   value: 'date-year',
+        // },
+      ],
+      // nameRules: {
+      //   // const pat = new RegExp(this.controlNames.join('|'));
+      //   unique(val) {
+      //     console.log(this.controlNames.some(name => name === val));
+      //     return this.controlNames.some(name => name === val) ? true : 'date name must be unique';
+      //   },
+      // },
     };
   },
   computed: {
+    controlNames() {
+      return this.controls.map(control => control.name);
+    },
+    isGroup() {
+      return this.control.type === 'group';
+    },
+    isDate() {
+      return this.control.type === 'date';
+    },
     isScript() {
       return this.control.type === 'script';
     },
@@ -265,6 +309,17 @@ export default {
     },
   },
   methods: {
+    nameIsUnique(val) {
+      const hasSameNameAndDifferentId = control => control.name === this.control.name && control._id !== this.control._id;
+      const parent = findParentByChildId(this.control._id, this.controls);
+
+      const controlsWithSameName = parent
+        ? parent.children.filter(hasSameNameAndDifferentId)
+        : this.controls.filter(hasSameNameAndDifferentId);
+      return controlsWithSameName.length > 0
+        ? 'Data name must be unique'
+        : true;
+    },
     openAdvancedEditor() {
       // TODO: can't pass params to new window
       // Use Vuex maybe?
@@ -310,6 +365,15 @@ export default {
     },
     handleSelectItemsChange(ev) {
       console.log('handleSelectItemsChange', ev);
+    },
+  },
+  watch: {
+    'control.name': {
+      handler(newVal, oldVal) {
+        const key = convertToKey(newVal);
+        console.log(`setting control.name to "${key}"`);
+        this.control.name = key;
+      },
     },
   },
   created() {

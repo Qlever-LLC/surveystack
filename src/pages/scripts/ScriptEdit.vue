@@ -50,7 +50,73 @@ export default {
       entity: {
         _id: '',
         name: '',
-        content: '',
+        content: `
+/**
+ * Process
+ * @param {props} props
+ * @param {state} state
+ */
+export async function process(props, state) {
+  const { submission, control, params } = props;
+  const { value, context } = state;
+
+  // do stuff
+  // ...
+
+  return {
+    context,
+    value: null,
+    status: {
+      type: statusTypes.SUCCESS,
+      message: \`script successfully executed at ${(new Date().toISOString())}\`,
+    },
+  }
+}
+
+/**
+ * render
+ * @param {props} props
+ * @param {state} state
+ * @param {setState} setState
+ */
+export function render(props, state, setState) {
+  const { submission, control, params } = props;
+  const { value, context } = state;
+  const ui = createUI();
+
+  ui.add(
+      ui.text('Basic text'),
+      ui.markdown(\`# Markdown Headline
+-------
+*italics*
+**bold**
+***bold italics***
+~~strikethrough~~
+[link]()
+> Quote
+- Unordered List
+- List Item
+
+1. Ordered List
+2. List Item
+    \`),
+
+    ui.card('my card content', {
+        header: 'Card',
+        meta: 'meta',
+        footer: 'footer',
+    }),
+    ui.message('Error', { type: 'error', header: 'Error' }),
+    ui.message('Warning', { type: 'warning', header: 'Warning' }),
+    ui.message('Plain', { header: 'Plain' }),
+    ui.message('Plain'),
+    ui.message('Info', { type: 'info', header: 'Info' }),
+    ui.message('Success', { type: 'success', header: 'Success' }),
+  );
+
+  return ui.node;
+};
+        `,
       },
     };
   },
