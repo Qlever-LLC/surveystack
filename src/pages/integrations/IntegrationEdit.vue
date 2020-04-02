@@ -9,6 +9,7 @@
       <v-text-field
         v-model="entity.name"
         label="Name"
+        placeholder="Untitled integration"
         outlined
       />
 
@@ -71,9 +72,13 @@ export default {
       integrationTypes,
       entity: {
         _id: '',
-        type: '',
+        type: 'generic',
         name: '',
-        data: '',
+        data: {
+          url: '',
+          apiKey: '',
+          parameters: '',
+        },
       },
     };
   },
@@ -91,7 +96,7 @@ export default {
 
       if (this.entity.name.trim() === '') {
         console.log('Name must not be empty');
-        return;
+        // return;
       }
 
       try {
