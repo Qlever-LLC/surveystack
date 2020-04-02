@@ -220,6 +220,9 @@ const getUsers = async (req, res) => {
           },
         },
       },
+      {
+        $sort: { name: 1 },
+      },
     ])
     .toArray();
 
