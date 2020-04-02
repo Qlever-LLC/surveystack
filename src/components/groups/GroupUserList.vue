@@ -55,6 +55,7 @@
               //-->
             </v-list-item-content>
             <v-list-item-action>
+              <v-icon v-if="user.memberships[0].role === 'admin'">mdi-crown-outline</v-icon>
             </v-list-item-action>
           </v-list-item>
         </template>
