@@ -1,6 +1,7 @@
 import {
   findControlById,
   findParentByChildId,
+  findGroups,
 } from '@/utils/surveys';
 
 const controls = [{
@@ -56,5 +57,10 @@ describe('surveys', () => {
   test('findParentByChildId works', () => {
     const parent = findParentByChildId('5e8508f7ba06570001c46b19', controls);
     expect(parent.name).toBe('group_5');
+  });
+
+  test('findGroups works', () => {
+    const groups = findGroups(controls);
+    console.log(JSON.stringify(groups, null, 2));
   });
 });

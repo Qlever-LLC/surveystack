@@ -687,6 +687,12 @@ if (DBG) {
   }
 }
 
+/**
+ * Finds the control object given a control's id and a nested list of controls
+ * @param {string} controlId - The ObjectID string for the control to find.
+ * @param {array} controls - The nested controls array to search through.
+ * @returns {(null | object)} Control object or null if control cannot be found.
+ */
 export function findControlById(controlId, controls) {
   function reducer(id) {
     return (r, x) => {
@@ -708,6 +714,12 @@ export function findControlById(controlId, controls) {
   return result || null;
 }
 
+/**
+ * Finds the parent control object given a child control's id and a nested list of controls
+ * @param {string} controlId - The ObjectID string for the control for which to find the parent control.
+ * @param {array} controls - The nested controls array to search through.
+ * @returns {(null | object)} Parent control object or null if control is top level or cannot be found.
+ */
 export function findParentByChildId(controlId, controls) {
   function fpr(id) {
     return (r, x) => {
@@ -722,4 +734,26 @@ export function findParentByChildId(controlId, controls) {
   }
   const [result] = controls.reduce(fpr(controlId), []);
   return result || null;
+}
+
+/**
+ * Get a top level list of groups in a nested controls list
+ * @param {[{}]} controls a nested list of control objects
+ * @returns {[{}]} List of groups and their children
+ */
+export function getGroups(controls) {
+  function reducer(r, x, i) {
+    // console.log(i, r);
+    if (x.type === 'group') {
+      // return [x, ...r];
+      return [
+        ...x.children.reduce(reducer, []),
+        x,
+        ...r,
+      ];
+    }
+    return r;
+  }
+
+  return controls.reduce(reducer, []);
 }

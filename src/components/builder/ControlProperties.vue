@@ -289,23 +289,9 @@ export default {
   },
   methods: {
     nameIsUnique(val) {
-      // const matchingNames = this.controlNames.filter(name => val === name);
-      // return matchingNames.length > 1 ? 'Data name must be unique' : true;
-
       const hasSameNameAndDifferentId = control => control.name === this.control.name && control._id !== this.control._id;
       const parent = findParentByChildId(this.control._id, this.controls);
-      // return parent
-      //   ? parent.children.find(hasSameNameAndDifferentId)
-      //   : this.controls.find(hasSameNameAndDifferentId);
-      // console.log({ parent });
-      // if (parent) {
-      //   const result = parent.children.filter(hasSameNameAndDifferentId);
-      //   console.log('parent', { result });
-      //   return result;
-      // }
-      // const result = this.controls.filter(hasSameNameAndDifferentId);
-      // console.log({ result });
-      // return result;
+
       const controlsWithSameName = parent
         ? parent.children.filter(hasSameNameAndDifferentId)
         : this.controls.filter(hasSameNameAndDifferentId);

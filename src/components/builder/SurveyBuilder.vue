@@ -475,13 +475,28 @@ export default {
       return !!this.survey.name && this.survey.name.length > 4;
     },
     validateSurveyQuestions() {
+      const namePattern = /^[\w-]{4,}$/;
       const currentControls = this.survey.revisions[this.survey.revisions.length - 1].controls;
       const uniqueNames = uniqBy(currentControls, 'name');
       const hasOnlyUniqueNames = uniqueNames.length === currentControls.length;
       const allNamesContainOnlyValidCharacters = !currentControls.some(
-        control => !/^[\w-]*$/.test(control.name),
+        control => !namePattern.test(control.name),
       );
-      return hasOnlyUniqueNames && allNamesContainOnlyValidCharacters;
+
+      const groupedQuestionsAreValid = utils.getGroups(currentControls).reduce((r, group) => {
+        const uniqueNamesInGroup = uniqBy(group.children, 'name');
+        const groupHasOnlyUniqueNames = uniqueNamesInGroup.length === group.children.length;
+        const allNamesInGroupContainOnlyValidCharacters = !group.children.some(
+          control => !namePattern.test(control.name),
+        );
+        return r
+          && groupHasOnlyUniqueNames
+          && allNamesInGroupContainOnlyValidCharacters;
+      }, true);
+
+      return hasOnlyUniqueNames
+        && allNamesContainOnlyValidCharacters
+        && groupedQuestionsAreValid;
     },
   },
   computed: {
