@@ -57,7 +57,7 @@
 
     <v-snackbar
       v-model="showSnackbar"
-      :timeout="0"
+      :timeout="4000"
     >
       {{snackbarMessage | capitalize}}
       <v-btn
