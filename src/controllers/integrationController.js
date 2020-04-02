@@ -10,6 +10,7 @@ import { populate } from '../helpers';
 const col = 'integrations';
 
 const sanitizeIntegration = entity => {
+  entity._id = new ObjectId(entity._id);
   return true;
 };
 
@@ -33,6 +34,7 @@ const getIntegration = async (req, res) => {
 
 const createIntegration = async (req, res) => {
   const entity = req.body;
+  sanitizeIntegration(entity);
 
   try {
     let r = await db.collection(col).insertOne(entity);

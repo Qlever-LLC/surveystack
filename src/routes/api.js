@@ -66,7 +66,11 @@ router.delete('/submissions/:id', catchErrors(submissionController.deleteSubmiss
 router.get('/surveys', catchErrors(surveyController.getSurveys));
 router.get('/surveys/page', catchErrors(surveyController.getSurveyPage));
 router.get('/surveys/:id', catchErrors(surveyController.getSurvey));
-router.post('/surveys', [assertNameNotEmpty], catchErrors(surveyController.createSurvey));
+router.post(
+  '/surveys',
+  [assertAuthenticated, assertNameNotEmpty],
+  catchErrors(surveyController.createSurvey)
+);
 router.put(
   '/surveys/:id',
   [
@@ -116,10 +120,14 @@ router.get('/farmos/assets', catchErrors(farmosController.getAssets));
 /** Integrations */
 router.get('/integrations', catchErrors(integrationController.getIntegrations));
 router.get('/integrations/:id', catchErrors(integrationController.getIntegration));
-router.post('/integrations', catchErrors(integrationController.createIntegration));
+router.post(
+  '/integrations',
+  [assertNameNotEmpty],
+  catchErrors(integrationController.createIntegration)
+);
 router.put(
   '/integrations/:id',
-  [assertIdsMatch, assertEntityExists({ collection: 'integrations' })],
+  [assertNameNotEmpty, assertIdsMatch, assertEntityExists({ collection: 'integrations' })],
   catchErrors(integrationController.updateIntegration)
 );
 router.delete('/integrations/:id', catchErrors(integrationController.deleteIntegration));
