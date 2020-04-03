@@ -141,7 +141,7 @@ router.post(
 );
 router.put(
   '/group-integrations/:id',
-  [assertNameNotEmpty, assertIdsMatch, assertEntityExists({ collection: 'integrations' })],
+  [assertNameNotEmpty, assertIdsMatch, assertEntityExists({ collection: 'integrations.groups' })],
   catchErrors(groupIntegrationController.updateIntegration)
 );
 router.delete('/group-integrations/:id', catchErrors(groupIntegrationController.deleteIntegration));
@@ -162,7 +162,11 @@ router.post(
 );
 router.put(
   '/membership-integrations/:id',
-  [assertNameNotEmpty, assertIdsMatch, assertEntityExists({ collection: 'integrations' })],
+  [
+    assertNameNotEmpty,
+    assertIdsMatch,
+    assertEntityExists({ collection: 'integrations.memberships' }),
+  ],
   catchErrors(membershipIntegrationController.updateIntegration)
 );
 router.delete(

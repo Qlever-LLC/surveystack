@@ -11,6 +11,7 @@ const col = 'integrations.memberships';
 
 const sanitizeIntegration = entity => {
   entity._id = new ObjectId(entity._id);
+  entity.membership = new ObjectId(entity.membership);
   return true;
 };
 

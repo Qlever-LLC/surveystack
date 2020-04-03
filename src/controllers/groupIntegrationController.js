@@ -11,14 +11,20 @@ const col = 'integrations.groups';
 
 const sanitizeIntegration = entity => {
   entity._id = new ObjectId(entity._id);
+  entity.group = new ObjectId(entity.group);
   return true;
 };
 
 const getIntegrations = async (req, res) => {
-  let entities;
-  entities = await db
+  const filter = {};
+  const { group } = req.query;
+  if (group) {
+    filter.group = new ObjectId(group);
+  }
+
+  const entities = await db
     .collection(col)
-    .find({})
+    .find(filter)
     .toArray();
   return res.send(entities);
 };
@@ -52,6 +58,7 @@ const createIntegration = async (req, res) => {
 const updateIntegration = async (req, res) => {
   const entity = req.body;
   const id = entity._id;
+  sanitizeIntegration(entity);
 
   try {
     delete entity._id;
