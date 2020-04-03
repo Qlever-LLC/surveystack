@@ -24,14 +24,15 @@
         <app-json-editor v-model="entity.data" />
         <div class="d-flex ma-2">
           <v-btn
+            v-if="editMode"
             color="error"
             outlined
-            class="mr-auto"
             @click="deleteEntity"
           >
             <v-icon left>mdi-trash-can-outline</v-icon> Delete
           </v-btn>
           <v-btn
+            class="ml-auto"
             text
             @click="cancel"
           >Cancel</v-btn>
@@ -140,6 +141,10 @@ export default {
     );
 
     this.entity._id = new ObjectId();
+    const { membership } = this.$route.query;
+    if (membership) {
+      this.entity.membership = membership;
+    }
 
     if (this.editMode) {
       try {
