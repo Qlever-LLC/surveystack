@@ -100,3 +100,28 @@ export const checkSurvey = (survey, version = 1) => {
     throw boom.badRequest(`Error duplicate control ${duplicates[0]}`);
   }
 };
+
+
+/**
+ * Returns the object from submission's data corresponding to the current position in a survey
+ * @param {Object} submission A submission entity
+ * @param {Object} survey A survey entity
+ * @param {Array} position The current position inside the survey
+ *
+ * @returns {Object} The nested object from submission's data
+ */
+export const getSubmissionField = (submission, survey, position) => {
+  // TODO: handle version not found
+  const { controls } = survey.revisions.find(revision => revision.version === submission.meta.survey.version);
+
+  const flatName = getFlatName(controls, position);
+  const splits = flatName.split('.');
+
+  let obj = submission.data;
+
+  splits.forEach((key) => {
+    obj = obj[key];
+  });
+
+  return obj;
+};

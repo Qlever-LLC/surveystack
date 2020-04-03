@@ -7,6 +7,7 @@ import boom from '@hapi/boom';
 
 import { db } from '../db';
 import csvService from '../services/csv.service';
+import * as farmOsService from '../services/farmos.service';
 
 const col = 'submissions';
 const DEFAULT_LIMIT = 100000;
@@ -390,6 +391,22 @@ const createSubmission = async (req, res) => {
   } else {
     entity.meta.creator = null;
   }
+  
+  const surveyId = entity.meta.survey.id;
+  
+
+  const survey = await db.collection('surveys').findOne({ _id: surveyId });
+  
+  try {
+    const farmosResults = farmOsService.handle(res, entity, survey, res.locals.auth.user);  
+    // could contain errors, need to pass these on to the user
+  } catch (error) {
+    console.log("error");
+    // TODO what should we do if something internal fails?
+    // need to let the user somehow know
+  }
+  
+  
 
   try {
     let r = await db.collection(col).insertOne(entity);

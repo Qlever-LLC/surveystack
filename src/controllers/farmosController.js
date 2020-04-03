@@ -11,13 +11,13 @@ const common = async (endpoint, req, res) => {
   const farms = [
     {
       name: 'farmOS Test',
-      url: 'https://test.farmos.net',
+      url: 'test.farmos.net',
       aggregatorURL: 'oursci.farmos.group',
       aggregatorApiKey: process.env.FARMOS_AGGREGATOR_APIKEY,
     },
     {
       name: 'Our Sci Test	',
-      url: 'https://ourscitest.farmos.net',
+      url: 'ourscitest.farmos.net',
       aggregatorURL: 'oursci.farmos.group',
       aggregatorApiKey: process.env.FARMOS_AGGREGATOR_APIKEY,
     },
