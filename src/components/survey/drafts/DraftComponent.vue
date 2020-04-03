@@ -126,10 +126,12 @@ import draftFooter from '@/components/survey/drafts/DraftFooter.vue';
 import draftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 import draftTitle from '@/components/survey/drafts/DraftTitle.vue';
 
+
 import appMixin from '@/components/mixin/appComponent.mixin';
 
 import * as utils from '@/utils/surveys';
 import submissionUtils from '@/utils/submissions';
+import * as codeEvaluator from '@/utils/codeEvaluator';
 
 
 export default {
@@ -284,10 +286,13 @@ export default {
       this.showNav(true);
       this.showNext(true);
       await this.calculateRelevance();
+      await this.calculateApiCompose();
+
 
       // eslint-disable-next-line no-constant-condition
       while (true) {
         if (this.atEnd) {
+          // eslint-disable-next-line no-await-in-loop
           this.submit(this.submission);
           return;
         }
@@ -391,45 +396,11 @@ export default {
       this.$emit('submit', { payload });
     },
     async calculateRelevance() {
-      console.log('calculateRelevance()');
-      const items = this.positions.map((pos) => {
-        const control = utils.getControl(this.controls, pos);
-        if (!control.options.relevance.enabled) {
-          return null;
-        }
-        const { code } = control.options.relevance;
-        return {
-          pos,
-          control,
-          code,
-        };
-      }).filter(item => item !== null);
-
-
-      const promises = items.map(item => new Promise((resolve, reject) => {
-        utils.execute({ code: item.code, fname: 'relevance', submission: this.submission })
-          .then(r => resolve({
-            control: item.control,
-            pos: item.pos,
-            res: r,
-          })).catch((e) => {
-            reject(e);
-          });
-      }));
-
-      try {
-        const res = await Promise.all(promises);
-        res.forEach((item) => {
-          const field = submissionUtils.getSubmissionField(this.submission, this.survey, item.pos);
-          if (typeof item.res !== 'boolean') {
-            console.log('error, result is not boolean', item.res);
-            return;
-          }
-          field.meta.relevant = item.res;
-        });
-      } catch (error) {
-        console.log(error);
-      }
+      return codeEvaluator.calculateRelevance(this.survey, this.submission, this.positions, this.controls);
+    },
+    async calculateApiCompose() {
+      console.log('calculating api compose');
+      return codeEvaluator.calculateApiCompose(this.survey, this.submission, this.positions, this.controls);
     },
   },
 
