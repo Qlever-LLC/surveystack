@@ -2,7 +2,13 @@ import _ from 'lodash';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
-import { exampleSurvey, exampleSubmissions, exampleGroups, exampleUsers } from '../db/examples';
+import {
+  exampleSurveys,
+  exampleSubmissions,
+  exampleGroups,
+  exampleUsers,
+  exampleMemberships,
+} from '../db/examples';
 import { createDummyResults } from '../services/dummy.service';
 import { initAdmins } from '../services/admin.service';
 
@@ -26,28 +32,24 @@ const tabulaRasa = async (req, res) => {
     throw boom.badRequest('Can only tabula rasa on development server');
   }
   console.log('inside tabula rasa');
+
+  // clear collections
   await db.collection('surveys').deleteMany({});
   await db.collection('submissions').deleteMany({});
   await db.collection('scripts').deleteMany({});
   await db.collection('groups').deleteMany({});
   await db.collection('users').deleteMany({});
+  await db.collection('memberships').deleteMany({});
 
-  const survey = _.cloneDeep(exampleSurvey);
-  await db.collection('surveys').insertOne(survey);
+  // insert examples
+  await db.collection('surveys').insertMany(exampleSurveys);
+  await db.collection('submissions').insertMany(exampleSubmissions);
+  await db.collection('groups').insertMany(exampleGroups);
+  await db.collection('users').insertMany(exampleUsers);
+  await db.collection('memberships').insertMany(exampleMemberships);
 
-  exampleSubmissions.forEach(async exampleSubmission => {
-    await db.collection('submissions').insertOne(exampleSubmission);
-  });
-
-  exampleGroups.forEach(async exampleGroup => {
-    await db.collection('groups').insertOne(exampleGroup);
-  });
-
+  // create initial admin
   await initAdmins();
-  exampleUsers.forEach(async exampleUser => {
-    const user = _.cloneDeep(exampleUser);
-    await db.collection('users').insertOne(user);
-  });
 
   console.log('end of tabula rasa');
   return res.send('OK');

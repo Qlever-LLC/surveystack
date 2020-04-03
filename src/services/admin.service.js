@@ -24,9 +24,8 @@ const createDefaultAdmin = async () => {
   const token = uuidv4();
 
   const password = getDefaultAdminPasswordHash();
-  const permissions = [`${_id}`, 'admin'];
+  const permissions = ['admin'];
   const authProviders = [];
-  const memberships = [];
 
   const created = await db.collection('users').insertOne({
     _id,
@@ -36,7 +35,6 @@ const createDefaultAdmin = async () => {
     password,
     permissions,
     authProviders,
-    memberships,
   });
   console.log('Created admin', created.ops[0]);
 };

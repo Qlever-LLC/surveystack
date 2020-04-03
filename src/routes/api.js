@@ -10,6 +10,7 @@ import debugController from '../controllers/debugController';
 import rolesController from '../controllers/rolesController';
 import farmosController from '../controllers/farmosController';
 import integrationController from '../controllers/integrationController';
+import membershipController from '../controllers/membershipController';
 
 //import { authenticated } from '../handlers/checkPermissions';
 import {
@@ -39,7 +40,7 @@ router.post('/debug/tabularasa', catchErrors(debugController.tabulaRasa));
 /** Group */
 router.get('/groups', catchErrors(groupController.getGroups));
 router.get('/groups/by-path*', catchErrors(groupController.getGroupByPath));
-router.get('/groups/:id/users', catchErrors(groupController.getUsers));
+//router.get('/groups/:id/users', catchErrors(groupController.getUsers));
 router.get('/groups/:id', catchErrors(groupController.getGroupById));
 router.post('/groups', assertAuthenticated, catchErrors(groupController.createGroup));
 router.put(
@@ -89,7 +90,7 @@ router.delete(
 
 /** Users */
 router.get('/users', catchErrors(userController.getUsers));
-router.get('/users/by-group/:group', catchErrors(userController.getUsersByGroup));
+//router.get('/users/by-group/:group', catchErrors(userController.getUsersByGroup));
 router.get('/users/:id', catchErrors(userController.getUser));
 router.post('/users', catchErrors(userController.createUser));
 router.put(
@@ -109,6 +110,17 @@ router.put(
   catchErrors(scriptController.updateScript)
 );
 router.delete('/scripts/:id', catchErrors(scriptController.deleteScript));
+
+/** Memberships */
+router.get('/memberships', catchErrors(membershipController.getMemberships));
+router.get('/memberships/:id', catchErrors(membershipController.getMembership));
+router.post('/memberships', catchErrors(membershipController.createMembership));
+router.put(
+  '/memberships/:id',
+  [assertIdsMatch, assertEntityExists({ collection: 'memberships' })],
+  catchErrors(membershipController.updateMembership)
+);
+router.delete('/memberships/:id', catchErrors(membershipController.deleteMembership));
 
 /** Roles */
 router.get('/roles', catchErrors(rolesController.getRoles));
