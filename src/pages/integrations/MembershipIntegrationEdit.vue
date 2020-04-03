@@ -21,7 +21,13 @@
           outlined
         ></v-select>
 
+        <app-farmos-farm-picker
+          v-if="entity.type === 'farmos-farm'"
+          :aggregators="aggregators"
+          @farm-selected="(ev) => {entity.data = ev; entity.name = ev.name}"
+        />
         <app-json-editor v-model="entity.data" />
+
         <div class="d-flex ma-2">
           <v-btn
             v-if="editMode"
@@ -48,9 +54,11 @@
 
 <script>
 import ObjectId from 'bson-objectid';
+import axios from 'axios';
 import api from '@/services/api.service';
 
 import appJsonEditor from '@/components/ui/JsonEditor.vue';
+import appFarmosFarmPicker from '@/components/integrations/FarmosFarmPicker.vue';
 
 
 const exampleIntegration = {
@@ -75,6 +83,7 @@ const integrationTypes = [
 export default {
   components: {
     appJsonEditor,
+    appFarmosFarmPicker,
   },
   data() {
     return {
@@ -91,6 +100,7 @@ export default {
           parameters: '',
         },
       },
+      aggregators: [],
     };
   },
   methods: {
@@ -127,12 +137,23 @@ export default {
       this.$router.back();
     },
   },
-  computed: {
-    passwordHint() {
-      if (this.editMode) {
-        return 'Leave blank for no changeee';
-      }
-      return '';
+  watch: {
+    'entity.type': {
+      async handler(newVal, oldVal) {
+        if (newVal === 'farmos-farm') {
+          const m = await api.get(`/memberships/${this.entity.membership}`);
+
+          const gi = await api.get(`/group-integrations?group=${m.data.group}&type=farmos-aggregator`);
+          this.aggregators = [];
+          gi.data.forEach(async (aggregator) => {
+            const { data } = await api.get(`/farmos/aggregator/farms?url=${aggregator.data.url}&apiKey=${aggregator.data.apiKey}`);
+            const a = {
+              _id: aggregator._id, text: aggregator.name, value: aggregator._id, url: aggregator.data.url, farms: [...data],
+            };
+            this.aggregators.push(a);
+          });
+        }
+      },
     },
   },
   async created() {

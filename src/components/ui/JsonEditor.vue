@@ -1,9 +1,8 @@
 <template>
   <div>
     <v-textarea
-      class="app-min-height"
       filled
-      rows="20"
+      rows="8"
       :value="valueString"
       @input="writeBack($event)"
       outlined
@@ -36,14 +35,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.app-min-height {
-  min-height: 30rem;
-}
-
-div {
-  background: #fff;
-  padding: 2rem;
-}
-</style>
