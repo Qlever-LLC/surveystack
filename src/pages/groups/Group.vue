@@ -32,8 +32,8 @@
         cols="12"
         lg="6"
       >
-        <app-group-user-list
-          :entities="users"
+        <app-group-member-list
+          :entities="members"
           :group="entity"
         />
       </v-col>
@@ -50,14 +50,14 @@
 <script>
 import api from '@/services/api.service';
 import appGroupList from '@/components/groups/GroupList.vue';
-import appGroupUserList from '@/components/groups/GroupUserList.vue';
+import appGroupMemberList from '@/components/groups/GroupMemberList.vue';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 
 export default {
   name: 'Group',
   components: {
     appGroupList,
-    appGroupUserList,
+    appGroupMemberList,
     appGroupBreadcrumbs,
   },
   data() {
@@ -73,7 +73,7 @@ export default {
         slug: '',
         path: '/',
       },
-      users: [],
+      members: [],
       subgroups: [],
     };
   },
@@ -84,7 +84,7 @@ export default {
         const { data } = await api.get(`/groups/by-path/${path}`);
         this.entity = data;
         await this.getSubgroups();
-        await this.getUsers();
+        await this.getMembers();
       } catch (e) {
         this.status.code = e.response.status;
         this.status.message = e.response.data.message;
@@ -99,9 +99,9 @@ export default {
         this.status.message = e.response.data.message;
       }
     },
-    async getUsers() {
-      const { data } = await api.get(`/groups/${this.entity._id}/users`);
-      this.users = data;
+    async getMembers() {
+      const { data } = await api.get(`/memberships?group=${this.entity._id}&populate=true`);
+      this.members = data;
     },
   },
   async beforeRouteUpdate(to, from, next) {

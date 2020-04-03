@@ -19,13 +19,14 @@
         />
         <template v-if="entities.length > 0">
           <v-list-item
-            v-for="(user,i) in users"
-            :key="`user-${i}`"
+            v-for="(member,i) in members"
+            :key="`member-${i}`"
+            :to="`/users/${member.user._id}`"
             two-line
           >
             <v-list-item-content>
-              <v-list-item-title>{{user.name}}</v-list-item-title>
-              <v-list-item-subtitle>{{user.email}}</v-list-item-subtitle>
+              <v-list-item-title>{{member.user.name}}</v-list-item-title>
+              <v-list-item-subtitle>{{member.user.email}}</v-list-item-subtitle>
               <!--
               <v-autocomplete
                 class="mt-4"
@@ -55,7 +56,7 @@
               //-->
             </v-list-item-content>
             <v-list-item-action>
-              <v-icon v-if="user.memberships[0].role === 'admin'">mdi-crown-outline</v-icon>
+              <v-icon v-if="member.role === 'admin'">mdi-crown-outline</v-icon>
             </v-list-item-action>
           </v-list-item>
         </template>
@@ -94,7 +95,7 @@ export default {
     },
   },
   computed: {
-    users() {
+    members() {
       if (!this.q) {
         return this.entities;
       }
