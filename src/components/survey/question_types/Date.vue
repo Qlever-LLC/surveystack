@@ -34,7 +34,9 @@
 </template>
 
 <script>
+import moment from 'moment';
 import baseQuestionComponent from './BaseQuestionComponent';
+
 
 export default {
   mixins: [baseQuestionComponent],
@@ -45,10 +47,10 @@ export default {
   },
   computed: {
     dateFormatted() {
-      return this.value ? this.formatDate(new Date(this.value).toISOString().substr(0, 10)) : null;
+      return this.value ? this.formatDate(moment(this.value).toISOString(true).substr(0, 10)) : null;
     },
     dateForPicker() {
-      return new Date(this.value || Date.now()).toISOString().substr(0, 10);
+      return moment().toISOString(true).substr(0, 10);
     },
     dateType() {
       return (this.control
@@ -77,17 +79,17 @@ export default {
     },
     updateDate(date) {
       console.log(date);
-      const newDate = new Date(date).toISOString();
+      const newDate = moment(date).toISOString(true);
       this.dateFormatted = newDate;
     },
     updateDateInput(date) {
       console.log('input', date);
-      const newDate = new Date(date).toISOString();
+      const newDate = moment(date).toISOString(true);
       this.changed(newDate);
     },
     updateDatePicker(date) {
       console.log('picker', date);
-      const newDate = new Date(date).toISOString();
+      const newDate = moment(date).toISOString(true);
       this.changed(newDate);
     },
     formatDate(date) {

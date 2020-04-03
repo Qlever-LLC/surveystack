@@ -721,6 +721,10 @@ export default {
   min-width: 700px;
 }
 
+.pane-script {
+  min-width: 700px;
+}
+
 .pane-survey {
   overflow: auto;
 }

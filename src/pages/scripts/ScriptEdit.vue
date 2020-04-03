@@ -54,6 +54,7 @@ export default {
 /**
  * Process
  * @param {props} props
+ * @param {submission} props.submission
  * @param {state} state
  */
 export async function process(props, state) {
