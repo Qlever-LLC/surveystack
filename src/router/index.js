@@ -35,8 +35,11 @@ import ScriptList from '@/pages/scripts/ScriptList.vue';
 import Script from '@/pages/scripts/Script.vue';
 import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
 
-import IntegrationEdit from '@/pages/integrations/IntegrationEdit.vue';
 import MembershipEdit from '@/pages/memberships/MembershipEdit.vue';
+
+// integrations
+import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
+import GroupIntegrationEdit from '@/pages/integrations/GroupIntegrationEdit.vue';
 
 
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
@@ -229,14 +232,24 @@ const routes = [
   },
   // integrations
   {
-    path: '/integrations/new',
-    name: 'integrations-new',
-    component: IntegrationEdit,
+    path: '/group-integrations/new',
+    name: 'group-integrations-new',
+    component: GroupIntegrationEdit,
   },
   {
-    path: '/integrations/:id/edit',
-    name: 'integrations-edit',
-    component: IntegrationEdit,
+    path: '/group-integrations/:id/edit',
+    name: 'group-integrations-edit',
+    component: GroupIntegrationEdit,
+  },
+  {
+    path: '/membership-integrations/new',
+    name: 'membership-integrations-new',
+    component: MembershipIntegrationEdit,
+  },
+  {
+    path: '/membership-integrations/:id/edit',
+    name: 'membership-integrations-edit',
+    component: MembershipIntegrationEdit,
   },
   // memberships
   {

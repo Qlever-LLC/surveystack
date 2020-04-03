@@ -46,7 +46,8 @@
       <app-integration-list
         title="Group Integrations"
         :entities="integrations"
-        :group="entity._id"
+        integrationType="group"
+        :newRoute="{name: 'group-integrations-new', query: {group: entity._id}}"
       />
     </v-card>
 

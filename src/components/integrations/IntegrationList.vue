@@ -7,7 +7,7 @@
         <v-btn
           color="primary"
           class="ml-4"
-          :to="{name: 'integrations-new', query: {group: group}}"
+          :to="newRoute"
           text
         >New...</v-btn>
       </v-card-title>
@@ -23,7 +23,7 @@
             v-for="integration in integrations"
             :key="integration._id"
             two-line
-            :to="`/integrations/${integration._id}/edit`"
+            :to="`/${integrationType}-integrations/${integration._id}/edit`"
           >
             <v-list-item-content>
               <v-list-item-title>{{integration.name}}</v-list-item-title>
@@ -51,9 +51,12 @@ export default {
       type: String,
       default: 'Integrations',
     },
-    group: {
+    newRoute: {
+      type: Object,
+    },
+    integrationType: {
       type: String,
-      default: '/',
+      required: true,
     },
   },
   computed: {

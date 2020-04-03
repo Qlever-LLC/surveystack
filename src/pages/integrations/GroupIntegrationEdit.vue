@@ -1,38 +1,47 @@
 <template>
   <v-container>
-    <h1>{{ editMode ? "Edit integration" : "Create integration" }}</h1>
+    <h1>{{ editMode ? "Edit Group Integration" : "Create Group Integration" }}</h1>
     <span class="text--secondary">{{this.entity._id}}</span>
-    <v-form
-      class="mt-3"
-      @keydown.enter.prevent="submit"
-    >
-      <v-text-field
-        v-model="entity.name"
-        label="Name"
-        placeholder="Untitled integration"
-        outlined
-      />
+    <v-card class="pa-4 mb-4">
+      <v-form
+        class="mt-3"
+        @keydown.enter.prevent="submit"
+      >
+        <v-text-field
+          v-model="entity.name"
+          label="Name"
+          placeholder="Untitled integration"
+          outlined
+        />
 
-      <v-select
-        :items="integrationTypes"
-        v-model="entity.type"
-        label="Type"
-        outlined
-      ></v-select>
+        <v-select
+          :items="integrationTypes"
+          v-model="entity.type"
+          label="Type"
+          outlined
+        ></v-select>
 
-      <app-json-editor v-model="entity.data" />
-      <div class="d-flex mt-2 justify-end">
-
-        <v-btn
-          text
-          @click="cancel"
-        >Cancel</v-btn>
-        <v-btn
-          color="primary"
-          @click="submit"
-        >Submit</v-btn>
-      </div>
-    </v-form>
+        <app-json-editor v-model="entity.data" />
+        <div class="d-flex ma-2">
+          <v-btn
+            color="error"
+            outlined
+            class="mr-auto"
+            @click="deleteEntity"
+          >
+            <v-icon left>mdi-trash-can-outline</v-icon> Delete
+          </v-btn>
+          <v-btn
+            text
+            @click="cancel"
+          >Cancel</v-btn>
+          <v-btn
+            color="primary"
+            @click="submit"
+          >Submit</v-btn>
+        </div>
+      </v-form>
+    </v-card>
   </v-container>
 </template>
 
@@ -72,6 +81,7 @@ export default {
       integrationTypes,
       entity: {
         _id: '',
+        group: '',
         type: 'generic',
         name: '',
         data: {
@@ -111,6 +121,10 @@ export default {
         console.log(err);
       }
     },
+    async deleteEntity() {
+      await api.delete(`/group-integrations/${this.entity._id}`);
+      this.$router.back();
+    },
   },
   computed: {
     passwordHint() {
@@ -122,10 +136,14 @@ export default {
   },
   async created() {
     this.editMode = !this.$route.matched.some(
-      ({ name }) => name === 'integrations-new',
+      ({ name }) => name === 'group-integrations-new',
     );
 
     this.entity._id = new ObjectId();
+    const { group } = this.$route.query;
+    if (group) {
+      this.entity.group = group;
+    }
 
     if (this.editMode) {
       try {

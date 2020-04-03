@@ -1,34 +1,36 @@
 <template>
   <v-container>
-    <h1>{{ editMode ? "Edit Membership" : "Create Membership" }}</h1>
+    <h1>{{ editMode ? "Edit Membership Integration" : "Create Membership Integration" }}</h1>
     <span class="text--secondary">{{this.entity._id}}</span>
-
     <v-card class="pa-4 mb-4">
       <v-form
         class="mt-3"
         @keydown.enter.prevent="submit"
       >
         <v-text-field
-          v-model="entity.group"
-          label="Group"
-          outlined
-        />
-
-        <v-text-field
-          v-model="entity.user"
-          label="User"
+          v-model="entity.name"
+          label="Name"
+          placeholder="Untitled integration"
           outlined
         />
 
         <v-select
-          :items="availableRoles"
-          v-model="entity.role"
-          label="Role"
+          :items="integrationTypes"
+          v-model="entity.type"
+          label="Type"
           outlined
         ></v-select>
 
-        <div class="d-flex mt-2 justify-end">
-
+        <app-json-editor v-model="entity.data" />
+        <div class="d-flex ma-2">
+          <v-btn
+            color="error"
+            outlined
+            class="mr-auto"
+            @click="deleteEntity"
+          >
+            <v-icon left>mdi-trash-can-outline</v-icon> Delete
+          </v-btn>
           <v-btn
             text
             @click="cancel"
@@ -40,49 +42,54 @@
         </div>
       </v-form>
     </v-card>
-
-    <v-card v-if="editMode">
-      <app-integration-list
-        title="Membership Integrations"
-        :entities="integrations"
-        :newRoute="{name: 'membership-integrations-new', query: {membership: entity._id}}"
-        integrationType="membership"
-      />
-    </v-card>
   </v-container>
 </template>
 
 <script>
 import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
-import appIntegrationList from '@/components/integrations/IntegrationList.vue';
 
-const availableRoles = [
+import appJsonEditor from '@/components/ui/JsonEditor.vue';
+
+
+const exampleIntegration = {
+  type: 'farmos-aggregator',
+  name: 'FarmOS Aggregator RFC',
+  url: 'oursci.farmos.group',
+  apiKey: '1234',
+  parameters: 'rfc,nofa',
+};
+
+const integrationTypes = [
   {
-    value: 'user',
-    text: 'User',
+    value: 'generic',
+    text: 'Generic',
   },
   {
-    value: 'admin',
-    text: 'Admin',
+    value: 'farmos-farm',
+    text: 'FarmOS Farm',
   },
 ];
 
 export default {
   components: {
-    appIntegrationList,
+    appJsonEditor,
   },
   data() {
     return {
       editMode: true,
-      availableRoles,
+      integrationTypes,
       entity: {
         _id: '',
-        user: '',
-        group: '',
-        role: '',
+        membership: '',
+        type: 'generic',
+        name: '',
+        data: {
+          url: '',
+          apiKey: '',
+          parameters: '',
+        },
       },
-      integrations: [],
     };
   },
   methods: {
@@ -95,7 +102,12 @@ export default {
     async submit() {
       const data = this.entity;
       const method = this.editMode ? 'put' : 'post';
-      const url = this.editMode ? `/memberships/${this.entity._id}` : '/memberships';
+      const url = this.editMode ? `/membership-integrations/${this.entity._id}` : '/membership-integrations';
+
+      if (this.entity.name.trim() === '') {
+        console.log('Name must not be empty');
+        // return;
+      }
 
       try {
         await api.customRequest({
@@ -109,18 +121,22 @@ export default {
         console.log(err);
       }
     },
+    async deleteEntity() {
+      await api.delete(`/membership-integrations/${this.entity._id}`);
+      this.$router.back();
+    },
   },
   computed: {
     passwordHint() {
       if (this.editMode) {
-        return 'Leave blank for no change';
+        return 'Leave blank for no changeee';
       }
       return '';
     },
   },
   async created() {
     this.editMode = !this.$route.matched.some(
-      ({ name }) => name === 'memberships-new',
+      ({ name }) => name === 'membership-integrations-new',
     );
 
     this.entity._id = new ObjectId();
@@ -128,11 +144,8 @@ export default {
     if (this.editMode) {
       try {
         const { id } = this.$route.params;
-        const { data } = await api.get(`/memberships/${id}`);
+        const { data } = await api.get(`/membership-integrations/${id}`);
         this.entity = { ...this.entity, ...data };
-
-        const i = await api.get(`/membership-integrations?membership=${id}`);
-        this.integrations = i.data;
       } catch (e) {
         console.log('something went wrong:', e);
       }
