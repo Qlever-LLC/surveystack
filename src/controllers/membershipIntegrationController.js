@@ -16,10 +16,20 @@ const sanitizeIntegration = entity => {
 };
 
 const getIntegrations = async (req, res) => {
-  let entities;
-  entities = await db
+  const { membership, type } = req.query;
+  const filter = {};
+
+  if (membership) {
+    filter.membership = new ObjectId(membership);
+  }
+
+  if (type) {
+    filter.type = type;
+  }
+
+  const entities = await db
     .collection(col)
-    .find({})
+    .find(filter)
     .toArray();
   return res.send(entities);
 };

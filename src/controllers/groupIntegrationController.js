@@ -16,10 +16,15 @@ const sanitizeIntegration = entity => {
 };
 
 const getIntegrations = async (req, res) => {
+  const { group, type } = req.query;
   const filter = {};
-  const { group } = req.query;
+
   if (group) {
     filter.group = new ObjectId(group);
+  }
+
+  if (type) {
+    filter.type = type;
   }
 
   const entities = await db
