@@ -35,6 +35,13 @@ import ScriptList from '@/pages/scripts/ScriptList.vue';
 import Script from '@/pages/scripts/Script.vue';
 import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
 
+import MembershipEdit from '@/pages/memberships/MembershipEdit.vue';
+
+// integrations
+import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
+import GroupIntegrationEdit from '@/pages/integrations/GroupIntegrationEdit.vue';
+
+
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 
 import store from '@/store';
@@ -222,6 +229,38 @@ const routes = [
     path: '/scripts/:id',
     name: 'scripts-detail',
     component: Script,
+  },
+  // integrations
+  {
+    path: '/group-integrations/new',
+    name: 'group-integrations-new',
+    component: GroupIntegrationEdit,
+  },
+  {
+    path: '/group-integrations/:id/edit',
+    name: 'group-integrations-edit',
+    component: GroupIntegrationEdit,
+  },
+  {
+    path: '/membership-integrations/new',
+    name: 'membership-integrations-new',
+    component: MembershipIntegrationEdit,
+  },
+  {
+    path: '/membership-integrations/:id/edit',
+    name: 'membership-integrations-edit',
+    component: MembershipIntegrationEdit,
+  },
+  // memberships
+  {
+    path: '/memberships/new',
+    name: 'memberships-new',
+    component: MembershipEdit,
+  },
+  {
+    path: '/memberships/:id/edit',
+    name: 'memberships-edit',
+    component: MembershipEdit,
   },
   // tabula rasa
   // TODO: remove this from production

@@ -1,13 +1,14 @@
 <template>
   <v-container>
+    <small>{{entity.dir}}</small>
+
     <h1>{{editMode ? "Edit group" : "Create group"}}</h1>
 
-    <form
-      @submit.prevent="onSubmit"
-      autocomplete="off"
-    >
-
-      <v-card class="pa-4 mb-4">
+    <v-card class="pa-4 mb-4">
+      <form
+        @submit.prevent="onSubmit"
+        autocomplete="off"
+      >
         <v-text-field
           label="Name"
           placeholder="Enter group name"
@@ -27,116 +28,47 @@
           hint="URL friendly version of name"
           persistent-hint
         />
-      </v-card>
 
-      <v-card class="pa-4">
-        <v-card-title>API Integrations</v-card-title>
-
-        <div class="pa-4 api-border">
-          <div class="d-flex">
-            <v-text-field
-              class="mr-12"
-              label="Name"
-              placeholder="Enter a Name"
-              autocomplete="off"
-              v-model="entity.integrations[0].name"
-            />
-
-            <v-btn
-              icon
-              @click="deleteIntegration"
-            >
-              <v-icon color="grey lighten-1">mdi-delete</v-icon>
-            </v-btn>
-
-          </div>
-
-          <v-select
-            :items="entity.integrationTypes"
-            :value="entity.integrations[0].type"
-            label="Type"
-            outlined
-          ></v-select>
-
-          <v-text-field
-            label="URL"
-            placeholder="Enter the API URL"
-            autocomplete="off"
-            v-model="entity.integrations[0].url"
-          />
-
-          <v-text-field
-            label="API Key"
-            placeholder="Enter the API Key"
-            autocomplete="off"
-            v-model="entity.integrations[0].apiKey"
-          />
-
-          <v-text-field
-            label="API Parameters"
-            placeholder="Enter the API Parameters"
-            autocomplete="off"
-            v-model="entity.integrations[0].parameters"
-          />
-        </div>
-
-        <v-divider class="mt-4 mb-4"></v-divider>
-        <div class="d-flex justify-end pa-4">
+        <div class="d-flex justify-end pa-2">
+          <v-btn
+            text
+            @click="cancel"
+          >Cancel</v-btn>
           <v-btn
             color="primary"
-            @click="addIntegration"
-          >
-            <v-icon left>mdi-plus-circle-outline</v-icon> Add Integration
-          </v-btn>
+            type="submit"
+          >{{editMode ? "Save" : "Create"}}</v-btn>
         </div>
+      </form>
+    </v-card>
 
-      </v-card>
+    <v-card v-if="editMode">
+      <app-integration-list
+        title="Group Integrations"
+        :entities="integrations"
+        integrationType="group"
+        :newRoute="{name: 'group-integrations-new', query: {group: entity._id}}"
+      />
+    </v-card>
 
-      <div class="d-flex justify-end pa-4">
-        <v-btn
-          text
-          @click="cancel"
-        >Cancel</v-btn>
-        <v-btn
-          color="primary"
-          type="submit"
-        >{{editMode ? "Save" : "Create"}}</v-btn>
-      </div>
-    </form>
-    <small>dir={{entity.dir | showNull}}</small>
   </v-container>
 </template>
 
 <script>
 import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
+import appIntegrationList from '@/components/integrations/IntegrationList.vue';
 
 import { handleize } from '@/utils/groups';
 
-const integrations = {
-  integrationTypes: [
-    {
-      value: 'farmos-aggregator',
-      text: 'FarmOS Aggregator',
-    },
-    {
-      value: 'generic',
-      text: 'Generic',
-    },
-  ],
-  integrations: [{
-    type: 'farmos-aggregator',
-    name: 'FarmOS Aggregator RFC',
-    url: 'oursci.farmos.group',
-    apiKey: '1234',
-    parameters: 'rfc,nofa',
-  }],
-};
-
 export default {
+  components: {
+    appIntegrationList,
+  },
   data() {
     return {
       editSlug: false,
+      editMode: true,
       entity: {
         _id: '',
         name: '',
@@ -144,6 +76,7 @@ export default {
         dir: '/',
         path: '',
       },
+      integrations: [],
     };
   },
   methods: {
@@ -174,6 +107,10 @@ export default {
       }
     },
     cancel() {
+      if (this.entity.dir === '/') {
+        this.$router.replace('/groups');
+        return;
+      }
       this.$router.replace(`/g${this.entity.dir}${this.entity.slug}/`);
     },
   },
@@ -206,21 +143,20 @@ export default {
       }
     }
 
-    this.entity._id = new ObjectId();
+    this.entity._id = new ObjectId().toString();
 
     if (this.editMode) {
       try {
         const { id } = this.$route.params;
         const { data } = await api.get(`/groups/${id}`);
         this.entity = { ...this.entity, ...data };
+
+        const i = await api.get(`/group-integrations?group=${id}`);
+        this.integrations = i.data;
       } catch (e) {
         console.log('something went wrong:', e);
       }
     }
-
-    // fake integrations
-    this.entity.integrationTypes = integrations.integrationTypes;
-    this.entity.integrations = integrations.integrations;
   },
 };
 </script>
