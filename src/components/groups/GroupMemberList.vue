@@ -19,9 +19,9 @@
         />
         <template v-if="entities.length > 0">
           <v-list-item
-            v-for="(member,i) in members"
-            :key="`member-${i}`"
-            :to="`/users/${member.user._id}`"
+            v-for="(member) in members"
+            :key="`membership-${member._id}`"
+            :to="`/memberships/${member._id}/edit`"
             two-line
           >
             <v-list-item-content>

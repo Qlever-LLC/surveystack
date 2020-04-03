@@ -92,7 +92,7 @@ export default {
     async submit() {
       const data = this.entity;
       const method = this.editMode ? 'put' : 'post';
-      const url = this.editMode ? `/integrations/${this.entity._id}` : '/integrations';
+      const url = this.editMode ? `/group-integrations/${this.entity._id}` : '/group-integrations';
 
       if (this.entity.name.trim() === '') {
         console.log('Name must not be empty');
@@ -130,7 +130,7 @@ export default {
     if (this.editMode) {
       try {
         const { id } = this.$route.params;
-        const { data } = await api.get(`/integrations/${id}`);
+        const { data } = await api.get(`/group-integrations/${id}`);
         this.entity = { ...this.entity, ...data };
       } catch (e) {
         console.log('something went wrong:', e);

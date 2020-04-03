@@ -36,6 +36,8 @@ import Script from '@/pages/scripts/Script.vue';
 import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
 
 import IntegrationEdit from '@/pages/integrations/IntegrationEdit.vue';
+import MembershipEdit from '@/pages/memberships/MembershipEdit.vue';
+
 
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 
@@ -235,6 +237,17 @@ const routes = [
     path: '/integrations/:id/edit',
     name: 'integrations-edit',
     component: IntegrationEdit,
+  },
+  // memberships
+  {
+    path: '/memberships/new',
+    name: 'memberships-new',
+    component: MembershipEdit,
+  },
+  {
+    path: '/memberships/:id/edit',
+    name: 'memberships-edit',
+    component: MembershipEdit,
   },
   // tabula rasa
   // TODO: remove this from production

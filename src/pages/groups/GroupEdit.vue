@@ -44,6 +44,7 @@
 
     <v-card v-if="editMode">
       <app-integration-list
+        title="Group Integrations"
         :entities="integrations"
         :group="entity._id"
       />
@@ -149,7 +150,7 @@ export default {
         const { data } = await api.get(`/groups/${id}`);
         this.entity = { ...this.entity, ...data };
 
-        const i = await api.get(`/integrations?group=${id}`);
+        const i = await api.get(`/group-integrations?group=${id}`);
         this.integrations = i.data;
       } catch (e) {
         console.log('something went wrong:', e);
