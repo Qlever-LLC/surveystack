@@ -9,8 +9,10 @@ import scriptController from '../controllers/scriptController';
 import debugController from '../controllers/debugController';
 import rolesController from '../controllers/rolesController';
 import farmosController from '../controllers/farmosController';
-import integrationController from '../controllers/integrationController';
 import membershipController from '../controllers/membershipController';
+
+import groupIntegrationController from '../controllers/groupIntegrationController';
+import membershipIntegrationController from '../controllers/membershipIntegrationController';
 
 //import { authenticated } from '../handlers/checkPermissions';
 import {
@@ -129,19 +131,43 @@ router.get('/roles', catchErrors(rolesController.getRoles));
 router.get('/farmos/fields', catchErrors(farmosController.getFields));
 router.get('/farmos/assets', catchErrors(farmosController.getAssets));
 
-/** Integrations */
-router.get('/integrations', catchErrors(integrationController.getIntegrations));
-router.get('/integrations/:id', catchErrors(integrationController.getIntegration));
+/** Integrations - Group */
+router.get('/group-integrations', catchErrors(groupIntegrationController.getIntegrations));
+router.get('/group-integrations/:id', catchErrors(groupIntegrationController.getIntegration));
 router.post(
-  '/integrations',
+  '/group-integrations',
   [assertNameNotEmpty],
-  catchErrors(integrationController.createIntegration)
+  catchErrors(groupIntegrationController.createIntegration)
 );
 router.put(
-  '/integrations/:id',
+  '/group-integrations/:id',
   [assertNameNotEmpty, assertIdsMatch, assertEntityExists({ collection: 'integrations' })],
-  catchErrors(integrationController.updateIntegration)
+  catchErrors(groupIntegrationController.updateIntegration)
 );
-router.delete('/integrations/:id', catchErrors(integrationController.deleteIntegration));
+router.delete('/group-integrations/:id', catchErrors(groupIntegrationController.deleteIntegration));
+
+/** Integrations - Membership */
+router.get(
+  '/membership-integrations',
+  catchErrors(membershipIntegrationController.getIntegrations)
+);
+router.get(
+  '/membership-integrations/:id',
+  catchErrors(membershipIntegrationController.getIntegration)
+);
+router.post(
+  '/membership-integrations',
+  [assertNameNotEmpty],
+  catchErrors(membershipIntegrationController.createIntegration)
+);
+router.put(
+  '/membership-integrations/:id',
+  [assertNameNotEmpty, assertIdsMatch, assertEntityExists({ collection: 'integrations' })],
+  catchErrors(membershipIntegrationController.updateIntegration)
+);
+router.delete(
+  '/membership-integrations/:id',
+  catchErrors(membershipIntegrationController.deleteIntegration)
+);
 
 export default router;

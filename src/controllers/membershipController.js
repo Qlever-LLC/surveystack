@@ -11,6 +11,8 @@ const col = 'memberships';
 
 const sanitize = entity => {
   entity._id = new ObjectId(entity._id);
+  entity.group = new ObjectId(entity.group);
+  entity.user = new ObjectId(entity.user);
 };
 
 const getMemberships = async (req, res) => {
@@ -82,6 +84,7 @@ const getMembership = async (req, res) => {
 
 const createMembership = async (req, res) => {
   const entity = req.body;
+  sanitize(entity);
 
   try {
     let r = await db.collection(col).insertOne({ ...entity, _id: new ObjectId(entity._id) });
