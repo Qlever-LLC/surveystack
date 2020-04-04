@@ -1,8 +1,9 @@
-import axios from 'axios';
-import https from 'https';
 import * as utils from '../helpers/surveys';
+import { planting } from './farmos/planting';
+import { aggregatorRequest } from './farmos/request';
+import { farminfo } from './farmos/farminfo';
 
-const farms = [
+const credentials = [
   {
     name: 'farmOS Test',
     url: 'test.farmos.net',
@@ -23,110 +24,81 @@ function allowed(farmUrl, user) {
   return true;
 }
 
-async function farminfo(aggregatorURL, aggregatorKey) {
-  const agentOptions = {
-    host: aggregatorURL,
-    port: '443',
-    path: '/',
-    rejectUnauthorized: false,
-  };
-
-  const agent = new https.Agent(agentOptions);
-
-  const r = await axios.get(`https://${aggregatorURL}/api/v1/farms/info/?use_cached=true`, {
-    headers: {
-      accept: 'application/json',
-      'api-key': aggregatorKey,
-    },
-    httpsAgent: agent,
-  });
-
-  return r;
-}
-
-async function getRequest(aggregatorURL, aggregatorKey, farmUrl, endpoint) {
-  const agentOptions = {
-    host: aggregatorURL,
-    port: '443',
-    path: '/',
-    rejectUnauthorized: false,
-  };
-
-  const agent = new https.Agent(agentOptions);
-
-  const r = await axios.get(
-    `https://${aggregatorURL}/api/v1/farms/${endpoint}/?farm_url=${encodeURIComponent(farmUrl)}`,
-    {
-      headers: {
-        accept: 'application/json',
-        'api-key': aggregatorKey,
-      },
-      httpsAgent: agent,
-    }
-  );
-
-  const farmId = Object.keys(r)[0];
-  return r[farmId];
-}
-
-async function planting(farmUrl, info, apiCompose, submission) {
-  const farm = farms.find(farm => farm.url === farmUrl);
-  const id=
-
-  const termsResponse = await getRequest(
-    farm.aggregatorURL,
-    farm.aggregatorApiKey,
-    farmUrl,
-    'terms'
-  );
-}
-
 async function log(aggregator, farmUrl, apiCompose, submission) {
   // TODO
 }
 
-async function execute(apiCompose, info, user, submission) {
-  const { farmUrl, type } = apiCompose;
+async function fetchTerms(farmUrl, user) {
   if (!allowed(farmUrl, user)) {
     throw Error('No Access to farm');
   }
 
+  const cred = credentials.find((c) => c.url === farmUrl);
+  if (!cred) {
+    return;
+  }
+
+  return await aggregatorRequest(
+    cred.aggregatorURL,
+    cred.aggregatorApiKey,
+    farmUrl,
+    'terms',
+    'get'
+  );
+}
+
+async function execute(apiCompose, info, terms, user, submission) {
+  const url = apiCompose.body.url;
+  const type = apiCompose.body.type;
+
+  if (!allowed(url, user)) {
+    throw Error('No Access to farm');
+  }
+
   if (type === 'planting') {
-    planting(farmUrl, info, apiCompose, submission);
+    return await planting(apiCompose, info, terms, user, credentials, submission);
   }
 }
 
 const handle = async (res, submission, survey, user) => {
   const surveyVersion = submission.meta.survey.version;
 
-  const { controls } = survey.revisions.find(revision => revision.version === surveyVersion);
+  const { controls } = survey.revisions.find((revision) => revision.version === surveyVersion);
   const positions = utils.getControlPositions(controls);
 
-  const fields = [];
-  positions.forEach(position => {
+  const farmOsCompose = [];
+  positions.forEach((position) => {
     const control = utils.getControl(controls, position);
     if (!control.options.apiCompose || !control.options.apiCompose.enabled) {
       return;
     }
 
     const field = utils.getSubmissionField(submission, survey, position);
-    if (!field.meta.apiCompose) {
-      console.log('missing api compose');
+
+    const compose = [];
+    if (Array.isArray(field.meta.apiCompose)) {
+      for (const c of field.meta.apiCompose) {
+        compose.push(c);
+      }
+    } else if (typeof field.meta.apiCompose === 'object') {
+      compose.push(field.meta.apiCompose);
+    } else {
       return;
     }
 
-    if (!field.meta.apiCompose.type || field.meta.apiCompose.type !== 'farmos') {
-      // only handle farmos
+    const relevantApiCompose = compose.filter((c) => c.type !== undefined && c.type === 'farmos');
+    if (relevantApiCompose.length === 0) {
       return;
     }
-    fields.push(field);
+
+    farmOsCompose.push(...compose);
   });
 
   const results = [];
 
-  const runSingle = async (apiCompose, info) => {
+  const runSingle = async (apiCompose, info, terms) => {
     try {
-      const r = await execute(apiCompose, info, user, submission);
+      const r = await execute(apiCompose, info, terms, user, submission);
       results.push(r);
     } catch (error) {
       results.push({
@@ -138,41 +110,42 @@ const handle = async (res, submission, survey, user) => {
 
   let info = [];
   try {
-    info = farminfo('oursci.farmos.group', process.env.FARMOS_AGGREGATOR_APIKEY);
+    info = (await farminfo('oursci.farmos.group', process.env.FARMOS_AGGREGATOR_APIKEY)).data;
   } catch (error) {
     console.log('error fetching farm info from aggregator');
+    throw error;
   }
 
-  const farmUrls = [];
+  console.log('info', info);
 
-  for (const field of fields) {
-    const obj = field.meta.apiCompose;
-    if (Array.isArray(obj)) {
-      for (const apiCompose of obj) {
-        farmUrls.push(apiCompose.body.farmUrl);
+  const farmUrls = farmOsCompose
+    .map((c) => {
+      if (c.body !== undefined && typeof c.body === 'object') {
+        return c.body.farmUrl;
       }
-    } else {
-      farmUrls.push(obj.body.farmUrl);
-    }
+      return null;
+    })
+    .filter((u) => u !== null);
+
+  const distinctFarms = farmUrls.filter((u, pos) => farmUrls.indexOf(u) === pos);
+
+  const termMap = {};
+  for (const f of distinctFarms) {
+    const terms = await fetchTerms(f, user);
+    termMap[f] = terms;
   }
 
-  for (const field of fields) {
-    const obj = field.meta.apiCompose;
-    if (Array.isArray(obj)) {
-      for (const apiCompose of obj) {
-        await runSingle(
-          apiCompose,
-          info.find(farm => farm.url === obj.body.farmUrl)
-        );
-      }
-    } else {
-      await runSingle(
-        obj,
-        info.find(farm => farm.url === obj.body.farmUrl)
-      );
-    }
+  for (const compose of farmOsCompose) {
+    console.log('compose', compose);
+
+    await runSingle(
+      compose,
+      info.find((farm) => farm.url === compose.body.farmUrl),
+      termMap[compose.body.farmUrl]
+    );
   }
 
+  console.log('results', results);
   return results;
 };
 

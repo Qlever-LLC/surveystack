@@ -12,7 +12,7 @@ import * as farmOsService from '../services/farmos.service';
 const col = 'submissions';
 const DEFAULT_LIMIT = 100000;
 
-const sanitize = entity => {
+const sanitize = (entity) => {
   if (entity._id) {
     entity._id = new ObjectId(entity._id);
   }
@@ -32,8 +32,8 @@ const sanitize = entity => {
   return entity;
 };
 
-const sanitizeMatch = obj => {
-  Object.keys(obj).forEach(key => {
+const sanitizeMatch = (obj) => {
+  Object.keys(obj).forEach((key) => {
     //console.log(`key: ${key}, value: ${obj[key]}`);
     if (typeof obj[key] === 'object') {
       // check for {"$date": "2020-01-30"}
@@ -170,7 +170,7 @@ const buildPipeline = async (req, res) => {
   // TODO: remove this from production!
   if (req.query.roles) {
     const splits = req.query.roles.split(',');
-    splits.forEach(role => {
+    splits.forEach((role) => {
       roles.push(role.trim());
     });
   }
@@ -203,7 +203,7 @@ const buildPipeline = async (req, res) => {
 
     if (!_.isEmpty(project)) {
       const autoProjections = {};
-      if (_.some(project, v => v === 0) && _.some(project, v => v === 1)) {
+      if (_.some(project, (v) => v === 0) && _.some(project, (v) => v === 1)) {
         throw boom.badRequest(`One can not mix and match inclusion and exclusion in project stage`);
       }
 
@@ -215,7 +215,7 @@ const buildPipeline = async (req, res) => {
         => {"data.personal_group.age": 1, "data.personal_group.meta": 1}
         Furthermore, the root level "meta" should be included
       */
-      if (_.every(project, v => v === 1)) {
+      if (_.every(project, (v) => v === 1)) {
         autoProjections.meta = 1;
         _.map(project, (v, k) => {
           const splits = k.split('.');
@@ -242,7 +242,7 @@ const buildPipeline = async (req, res) => {
       throw boom.badRequest(`Bad query paramter sort: ${sort}`);
     }
 
-    _.forOwn(sort, v => {
+    _.forOwn(sort, (v) => {
       if (v !== -1 && v !== 1) {
         throw boom.badRequest(`Bad query paramter sort, value must be either 1 or -1`);
       }
@@ -302,10 +302,7 @@ const getSubmissionsPage = async (req, res) => {
   console.log(pipeline);
   pipeline.push(...paginationStages);
 
-  entities = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  entities = await db.collection(col).aggregate(pipeline).toArray();
 
   console.log('Entities', entities);
   console.log('Entities[0]', entities[0]);
@@ -353,10 +350,7 @@ const getSubmissions = async (req, res) => {
     }
   }
 
-  entities = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  entities = await db.collection(col).aggregate(pipeline).toArray();
 
   if (req.query.format === 'csv') {
     const csv = csvService.createCsv(entities);
@@ -391,22 +385,22 @@ const createSubmission = async (req, res) => {
   } else {
     entity.meta.creator = null;
   }
-  
+
   const surveyId = entity.meta.survey.id;
-  
 
   const survey = await db.collection('surveys').findOne({ _id: surveyId });
-  
+
   try {
-    const farmosResults = farmOsService.handle(res, entity, survey, res.locals.auth.user);  
+    const farmosResults = await farmOsService.handle(res, entity, survey, res.locals.auth.user);
     // could contain errors, need to pass these on to the user
   } catch (error) {
-    console.log("error");
     // TODO what should we do if something internal fails?
     // need to let the user somehow know
+    console.log('error handling farmos', error);
+    return res.status(503).send({
+      message: `error submitting to farmos ${error}`,
+    });
   }
-  
-  
 
   try {
     let r = await db.collection(col).insertOne(entity);
