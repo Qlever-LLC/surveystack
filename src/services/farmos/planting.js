@@ -24,9 +24,9 @@ function log(type, cropName, fieldId, assetId, timestamp, instanceId) {
     assetId,
     timestamp,
     done: 1,
-    data: {
+    data: JSON.stringify({
       instanceId,
-    },
+    }),
   };
 }
 
@@ -115,6 +115,7 @@ async function planting(apiCompose, info, terms, user, credentials, submission) 
     const timestamp = date ? moment(date).unix() : moment().unix();
 
     const body = log(method, `${tmp} for ${crop}`, field, plantingId, timestamp, instanceId);
+    console.log('log body', body);
 
     const r = await aggregatorRequest(
       cred.aggregatorURL,
