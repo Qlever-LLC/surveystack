@@ -250,6 +250,10 @@ export default {
           text: 'Month and Year Only',
           value: 'date-month-year',
         },
+        {
+          text: 'Year Only',
+          value: 'date-year',
+        },
         // {
         //   text: 'Year Only',
         //   value: 'date-year',
