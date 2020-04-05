@@ -24,8 +24,9 @@ function allowed(farmUrl, user) {
   return true;
 }
 
-async function log(aggregator, farmUrl, apiCompose, submission) {
-  // TODO
+
+async function flushlogs(farmUrl, user, submission) {
+  //  TODO
 }
 
 async function fetchTerms(farmUrl, user) {
@@ -121,7 +122,6 @@ const handle = async (res, submission, survey, user) => {
     throw error;
   }
 
-
   const farmUrls = farmOsCompose
     .map((c) => {
       if (c.body !== undefined && typeof c.body === 'object') {
@@ -140,7 +140,6 @@ const handle = async (res, submission, survey, user) => {
   }
 
   for (const compose of farmOsCompose) {
-
     await runSingle(
       compose,
       info.find((farm) => farm.url === compose.body.farmUrl),

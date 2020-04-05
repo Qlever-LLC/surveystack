@@ -10,9 +10,7 @@ function plantingBody(name, cropId, instanceId) {
         id: cropId,
       },
     ],
-    data: JSON.stringify({
-      instanceId,
-    }),
+    data: instanceId,
   };
 }
 
@@ -30,10 +28,50 @@ function log(type, cropName, fieldId, assetId, timestamp, instanceId) {
     type,
     timestamp,
     done: 1,
-    data: JSON.stringify({
-      instanceId,
-    }),
+    data: instanceId,
   };
+}
+
+async function createOrUpdate(farmUrl, cred, instanceId, endpoint, body) {
+  const checkExisting = await aggregatorRequest(
+    cred.aggregatorURL,
+    cred.aggregatorApiKey,
+    farmUrl,
+    endpoint,
+    'get',
+    undefined,
+    instanceId
+  );
+
+  let id = null;
+  if (checkExisting.length !== 0) {
+    id = checkExisting[0].id; // TODO should probably check if there are several
+  }
+
+  let r;
+  if (id === null) {
+    r = await aggregatorRequest(
+      cred.aggregatorURL,
+      cred.aggregatorApiKey,
+      farmUrl,
+      endpoint,
+      'post',
+      body
+    );
+  } else {
+    // update the planting
+    Object.assign(body, { id });
+    r = await aggregatorRequest(
+      cred.aggregatorURL,
+      cred.aggregatorApiKey,
+      farmUrl,
+      endpoint,
+      'put',
+      body
+    );
+  }
+
+  return r;
 }
 
 async function planting(apiCompose, info, terms, user, credentials, submission) {
@@ -91,15 +129,7 @@ async function planting(apiCompose, info, terms, user, credentials, submission) 
       farmOsCrop.tid,
       instanceId
     );
-    const r = await aggregatorRequest(
-      cred.aggregatorURL,
-      cred.aggregatorApiKey,
-      farmUrl,
-      'assets',
-      'post',
-      body
-    );
-
+    const r = await createOrUpdate(farmUrl, cred, instanceId, 'assets', body);
     results.push(r);
     plantingId = r[0].id;
 
@@ -122,15 +152,7 @@ async function planting(apiCompose, info, terms, user, credentials, submission) 
       instanceId
     );
 
-    const r = await aggregatorRequest(
-      cred.aggregatorURL,
-      cred.aggregatorApiKey,
-      farmUrl,
-      'logs',
-      'post',
-      body
-    );
-
+    const r = await createOrUpdate(farmUrl, cred, instanceId, 'logs', body);
     results.push(r);
   }
 

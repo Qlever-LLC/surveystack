@@ -1,7 +1,15 @@
 import axios from 'axios';
 import https from 'https';
 
-async function aggregatorRequest(aggregatorURL, aggregatorKey, farmUrl, endpoint, method, body) {
+async function aggregatorRequest(
+  aggregatorURL,
+  aggregatorKey,
+  farmUrl,
+  endpoint,
+  method,
+  body,
+  instanceIdQuery
+) {
   const agentOptions = {
     host: aggregatorURL,
     port: '443',
@@ -11,9 +19,13 @@ async function aggregatorRequest(aggregatorURL, aggregatorKey, farmUrl, endpoint
 
   const agent = new https.Agent(agentOptions);
 
-  const url = `https://${aggregatorURL}/api/v1/farms/${endpoint}/?farm_url=${encodeURIComponent(
+  let url = `https://${aggregatorURL}/api/v1/farms/${endpoint}/?farm_url=${encodeURIComponent(
     farmUrl
   )}`;
+
+  if (instanceIdQuery) {
+    url += '&data=' + encodeURIComponent(instanceIdQuery);
+  }
 
   const config = {
     method,
@@ -31,8 +43,8 @@ async function aggregatorRequest(aggregatorURL, aggregatorKey, farmUrl, endpoint
   }
 
   const response = await axios(config);
-  console.log("response", response);
-  const r = response.data
+  console.log('response', response);
+  const r = response.data;
 
   const farmId = Object.keys(r)[0];
   return r[farmId];
