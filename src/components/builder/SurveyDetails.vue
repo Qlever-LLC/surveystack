@@ -2,10 +2,19 @@
   <v-card>
     <v-card-title class="d-block pb-0">
       <div class="d-flex justify-space-between">
-        <survey-name-editor style="max-width: 81%;" v-model="value.name" />
-        <v-menu offset-y left>
+        <survey-name-editor
+          style="max-width: 81%;"
+          v-model="value.name"
+        />
+        <v-menu
+          offset-y
+          left
+        >
           <template v-slot:activator="{ on }">
-            <v-btn icon v-on="on">
+            <v-btn
+              icon
+              v-on="on"
+            >
               <v-icon>mdi-dots-vertical</v-icon>
             </v-btn>
           </template>
@@ -17,7 +26,10 @@
                     for="select-items-file-input-surveydetails"
                     class="cursor-pointer"
                   >
-                    <v-btn class="pointer-events-none" icon>
+                    <v-btn
+                      class="pointer-events-none"
+                      icon
+                    >
                       <v-icon color="grey lighten-1">mdi-file-upload</v-icon>
                       <div class="ml-1">
                         Import
@@ -38,7 +50,7 @@
             <v-list-item>
               <v-list-item-title>
                 <v-btn
-                  class="pointer-events-none"
+                  @click="$emit('export-survey')"
                   icon
                 >
                   <v-icon color="grey lighten-1">mdi-file-download</v-icon>
@@ -48,9 +60,7 @@
                 </v-btn>
               </v-list-item-title>
             </v-list-item>
-            <v-list-item
-              v-if="!isNew"
-            >
+            <v-list-item v-if="!isNew">
               <v-list-item-title>
                 <v-btn
                   icon
@@ -65,7 +75,6 @@
             </v-list-item>
           </v-list>
         </v-menu>
-
 
       </div>
       <div class="d-flex justify-space-between align-center mt-n1">
