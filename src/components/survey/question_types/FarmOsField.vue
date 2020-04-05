@@ -18,7 +18,10 @@
           <div v-html="item.label"></div>
         </template>
         <template v-slot:selection="{item}">
-          <div v-html="item.label" class="d-flex align-center"></div>
+          <div
+            v-html="item.label"
+            class="d-flex align-center"
+          ></div>
         </template>
       </v-autocomplete>
 
@@ -41,16 +44,6 @@ export default {
   mixins: [baseQuestionComponent, farmosBase('fields')],
   data() {
     return {
-      test: [
-        {
-          text: 'Bold HELOO',
-          value: '1',
-        },
-        {
-          text: '<b>Bold</b> HELOO 2',
-          value: '2',
-        },
-      ],
     };
   },
 };

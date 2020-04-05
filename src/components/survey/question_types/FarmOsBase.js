@@ -56,7 +56,7 @@ const base = type => ({
           }
           // filter out plantings
           return data.filter(asset => asset.type === 'planting').map(planting => ({
-            label: `<span class="blue-chip">${f.farm}</span> ${planting.name} `,
+            label: `<span class="blue-chip mr-4">${f.farm}</span> ${planting.name} `,
             value: {
               farmName: f.farm.trim(),
               url: f.url,

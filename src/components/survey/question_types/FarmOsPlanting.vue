@@ -45,5 +45,30 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
+.orange-chip,
+.green-chip,
+.blue-chip {
+  display: inline-flex;
+  border: 1px #466cb3 solid;
+  background-color: white;
+  color: #466cb3;
+  border-radius: 0.4rem;
+  font-weight: bold;
+  font-size: 80%;
+  padding: 0.2rem;
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
+  vertical-align: middle;
+}
+
+.green-chip {
+  color: #46b355;
+  border: 1px #46b355 solid;
+}
+
+.orange-chip {
+  color: #f38d49;
+  border: 1px #f38d49 solid;
+}
 </style>
