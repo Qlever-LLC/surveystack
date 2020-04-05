@@ -18,7 +18,7 @@ function plantingBody(name, cropId, instanceId) {
 
 function log(type, cropName, fieldId, assetId, timestamp, instanceId) {
   return {
-    logName: cropName,
+    name: cropName,
     movementFieldId: fieldId,
     type,
     assetId,
@@ -33,12 +33,10 @@ function log(type, cropName, fieldId, assetId, timestamp, instanceId) {
 async function planting(apiCompose, info, terms, user, credentials, submission) {
   const { farmUrl } = apiCompose.body;
 
-  console.log('finding credentials', farmUrl);
   const cred = credentials.find((c) => c.url === farmUrl);
   if (!cred) {
     return;
   }
-  console.log('cred', cred);
 
   const crop = apiCompose.body.crop;
   const field = apiCompose.body.area;
@@ -48,21 +46,15 @@ async function planting(apiCompose, info, terms, user, credentials, submission) 
   const vocabId = info.info.resources.taxonomy_term.farm_crops.vid;
   const cropTypes = terms.filter((term) => term.vocabulary.id === vocabId);
   // const farm = farms.find(farm => farm.url === farmUrl);
-  console.log('planting something');
-  console.log('apiCompose', apiCompose);
-  console.log('vocabId', vocabId);
-  console.log('availableCrops', cropTypes);
 
   let farmOsCrop = cropTypes.find((c) => c.name.toLowerCase() === crop);
-  console.log('farmOsCrop', farmOsCrop);
+  const results = [];
+
   if (!farmOsCrop) {
-    console.log('creating crop', crop);
     const body = {
       vocabulary: parseInt(vocabId),
       name: crop,
     };
-
-    console.log('body', body);
 
     const r = await aggregatorRequest(
       cred.aggregatorURL,
@@ -72,7 +64,7 @@ async function planting(apiCompose, info, terms, user, credentials, submission) 
       'post',
       body
     );
-    console.log('created crop', r);
+
     farmOsCrop = {
       name: crop,
       vocabulary: {
@@ -81,6 +73,7 @@ async function planting(apiCompose, info, terms, user, credentials, submission) 
       tid: r[0].id,
     };
     terms.push(farmOsCrop);
+    results.push(r);
   }
   //console.log('vocab', info.info.resources.taxonomy_term.farm_crops.vid);
   // console.log('terms', terms);
@@ -101,7 +94,7 @@ async function planting(apiCompose, info, terms, user, credentials, submission) 
       body
     );
 
-    console.log('created planting asset', r);
+    results.push(r);
     plantingId = r[0].id;
 
     if (!plantingId) {
@@ -114,22 +107,28 @@ async function planting(apiCompose, info, terms, user, credentials, submission) 
     const method = tmp === 'seeding' ? 'farm_seeding' : 'farm_transplanting';
     const timestamp = date ? moment(date).unix() : moment().unix();
 
-    const body = log(method, `${tmp} for ${crop}`, field, plantingId, timestamp, instanceId);
-    console.log('log body', body);
+    const body = log(
+      method,
+      `${tmp} for ${crop}`,
+      parseInt(field),
+      parseInt(plantingId),
+      parseInt(timestamp),
+      instanceId
+    );
 
     const r = await aggregatorRequest(
       cred.aggregatorURL,
       cred.aggregatorApiKey,
       farmUrl,
-      'assets',
+      'logs',
       'post',
       body
     );
 
-    console.log('log added', r);
+    results.push(r);
   }
 
-  return 'planting result';
+  return results;
 }
 
 export { planting };

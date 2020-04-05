@@ -30,7 +30,9 @@ async function aggregatorRequest(aggregatorURL, aggregatorKey, farmUrl, endpoint
     config.headers['Content-Type'] = 'application/json';
   }
 
-  const r = (await axios(config)).data;
+  const response = await axios(config);
+  console.log("response", response);
+  const r = response.data
 
   const farmId = Object.keys(r)[0];
   return r[farmId];

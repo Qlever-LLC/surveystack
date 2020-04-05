@@ -99,8 +99,13 @@ const handle = async (res, submission, survey, user) => {
   const runSingle = async (apiCompose, info, terms) => {
     try {
       const r = await execute(apiCompose, info, terms, user, submission);
-      results.push(r);
+      if (Array.isArray(r)) {
+        results.push(...r);
+      } else {
+        results.push(r);
+      }
     } catch (error) {
+      console.log('error in run single', error);
       results.push({
         status: 'error',
         error,
@@ -116,7 +121,6 @@ const handle = async (res, submission, survey, user) => {
     throw error;
   }
 
-  console.log('info', info);
 
   const farmUrls = farmOsCompose
     .map((c) => {
@@ -136,7 +140,6 @@ const handle = async (res, submission, survey, user) => {
   }
 
   for (const compose of farmOsCompose) {
-    console.log('compose', compose);
 
     await runSingle(
       compose,
