@@ -19,9 +19,15 @@ function plantingBody(name, cropId, instanceId) {
 function log(type, cropName, fieldId, assetId, timestamp, instanceId) {
   return {
     name: cropName,
-    movementFieldId: fieldId,
+    movement: {
+      area: [
+        {
+          id: fieldId,
+        },
+      ],
+    },
+    asset: [{ id: assetId }],
     type,
-    assetId,
     timestamp,
     done: 1,
     data: JSON.stringify({
