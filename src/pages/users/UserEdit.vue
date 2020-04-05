@@ -1,46 +1,49 @@
 <template>
   <v-container>
     <h1>{{ editMode ? "Edit user" : "Create user" }}</h1>
-    <v-form>
-      <v-text-field
-        v-model="entity.email"
-        label="E-Mail"
-      />
-      <v-text-field
-        v-model="entity.name"
-        label="Name"
-      />
-      <v-text-field
-        v-model="entity.password"
-        :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-        @click:append="showPasswords = !showPasswords"
-        label="Password"
-        :type="showPasswords ? 'text' : 'password'"
-        :hint="passwordHint"
-        persistent-hint
-      />
+    <v-card class="pa-4 mb-4">
 
-      <v-text-field
-        v-model="passwordConfirmation"
-        :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-        @click:append="showPasswords = !showPasswords"
-        label="Password (Confirmation)"
-        :type="showPasswords ? 'text' : 'password'"
-        :hint="passwordHint"
-        persistent-hint
-      />
-      <div class="d-flex mt-2 justify-end">
+      <v-form>
+        <v-text-field
+          v-model="entity.email"
+          label="E-Mail"
+        />
+        <v-text-field
+          v-model="entity.name"
+          label="Name"
+        />
+        <v-text-field
+          v-model="entity.password"
+          :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+          @click:append="showPasswords = !showPasswords"
+          label="Password"
+          :type="showPasswords ? 'text' : 'password'"
+          :hint="passwordHint"
+          persistent-hint
+        />
 
-        <v-btn
-          text
-          @click="cancel"
-        >Cancel</v-btn>
-        <v-btn
-          color="primary"
-          @click="submit"
-        >Submit</v-btn>
-      </div>
-    </v-form>
+        <v-text-field
+          v-model="passwordConfirmation"
+          :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+          @click:append="showPasswords = !showPasswords"
+          label="Password (Confirmation)"
+          :type="showPasswords ? 'text' : 'password'"
+          :hint="passwordHint"
+          persistent-hint
+        />
+        <div class="d-flex mt-2 justify-end">
+
+          <v-btn
+            text
+            @click="cancel"
+          >Cancel</v-btn>
+          <v-btn
+            color="primary"
+            @click="submit"
+          >Submit</v-btn>
+        </div>
+      </v-form>
+    </v-card>
   </v-container>
 </template>
 
@@ -59,12 +62,13 @@ export default {
         email: '',
         name: '',
         password: '',
+        memberships: [],
       },
     };
   },
   methods: {
     cancel() {
-      this.$router.replace({ name: 'users-list' });
+      this.$router.back();
     },
     async submit() {
       const data = this.entity;
@@ -82,7 +86,7 @@ export default {
           url,
           data,
         });
-        this.$router.push('/users');
+        this.$router.back();
       } catch (err) {
         console.log(err);
       }
@@ -102,6 +106,10 @@ export default {
     );
 
     this.entity._id = new ObjectId();
+    const { group, role } = this.$route.query;
+    if (group && role) {
+      this.entity.memberships.push({ group, role });
+    }
 
     if (this.editMode) {
       try {

@@ -7,7 +7,7 @@
         <v-btn
           color="primary"
           class="ml-4"
-          :to="{name: 'users-new'}"
+          :to="{name: 'users-new', query: {group: group._id, role: 'user' }}"
           text
         >New...</v-btn>
       </v-card-title>
@@ -19,13 +19,15 @@
         />
         <template v-if="entities.length > 0">
           <v-list-item
-            v-for="(user,i) in users"
-            :key="`user-${i}`"
+            v-for="(member) in members"
+            :key="`membership-${member._id}`"
+            :to="`/memberships/${member._id}/edit`"
             two-line
           >
             <v-list-item-content>
-              <v-list-item-title>{{user.name}}</v-list-item-title>
-              <v-list-item-subtitle>{{user.email}}</v-list-item-subtitle>
+              <v-list-item-title>{{member.user.name}}</v-list-item-title>
+              <v-list-item-subtitle>{{member.user.email}}</v-list-item-subtitle>
+              <!--
               <v-autocomplete
                 class="mt-4"
                 dense
@@ -51,8 +53,10 @@
                 multiple
               >
               </v-autocomplete>
+              //-->
             </v-list-item-content>
             <v-list-item-action>
+              <v-icon v-if="member.role === 'admin'">mdi-crown-outline</v-icon>
             </v-list-item-action>
           </v-list-item>
         </template>
@@ -86,9 +90,12 @@ export default {
     entities: {
       type: Array,
     },
+    group: {
+      type: Object,
+    },
   },
   computed: {
-    users() {
+    members() {
       if (!this.q) {
         return this.entities;
       }

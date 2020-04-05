@@ -80,7 +80,7 @@ import appDialog from '@/components/ui/Dialog.vue';
 import SurveyBuilder from '@/components/builder/SurveyBuilder.vue';
 
 
-const currentDate = moment().toISOString();
+const currentDate = moment().toISOString(true);
 const emptySurvey = {
   _id: '',
   name: '',
@@ -253,7 +253,7 @@ export default {
     );
 
     this.survey._id = ObjectId();
-    this.survey.dateCreated = moment().toISOString();
+    this.survey.dateCreated = moment().toISOString(true);
 
     if (this.editMode) {
       this.loading = true;
