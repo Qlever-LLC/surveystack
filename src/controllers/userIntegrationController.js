@@ -7,7 +7,7 @@ import { db } from '../db';
 
 import { populate } from '../helpers';
 
-const col = 'integrations';
+const col = 'integrations.users';
 
 const sanitizeIntegration = entity => {
   entity._id = new ObjectId(entity._id);

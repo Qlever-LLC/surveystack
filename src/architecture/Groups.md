@@ -14,34 +14,47 @@ API endpoint `/api/groups`
 
 ## Description
 
-For groups, we may want to use the a similar structure as in
+For groups, we are utilizing a similar structure as in
 [materialized paths](https://docs.mongodb.com/manual/tutorial/model-tree-structures-with-materialized-paths/).
+
+Paths are unique, also note how the rule for building the path is always `dir + slug + '/'`.
 
 ```javascript
 const groups = [
   {
-    _id: '5e4a656fa1f0db0001bb4a9b',
-    name: 'Oursci Lab',
-    slug: 'oursci-lab',
-    path: null,
+    _id: '5e6f8bbeea14550001470c28',
+    name: 'Our-Sci LLC',
+    slug: 'our-sci',
+    dir: '/',
+    path: '/our-sci/',
   },
   {
-    _id: '5e4a699b52fc340001d15450',
-    name: 'Andreas',
-    slug: 'andreas',
-    path: '/oursci-lab/',
+    _id: '5e6f8bbeea14550001470c32',
+    name: 'Our-Sci Lab',
+    slug: 'lab',
+    dir: '/our-sci/',
+    path: '/our-sci/lab/',
   },
   {
-    _id: '5e4a6a6052fc340001d15453',
-    name: 'test',
-    slug: 'test',
-    path: '/oursci-lab/andreas/',
+    _id: '5e6f8bbeea14550001470c34',
+    name: 'Our-Sci Lab Testing',
+    slug: 'testing',
+    dir: '/our-sci/lab/',
+    path: '/our-sci/lab/testing/',
   },
   {
-    _id: '5e4a6a6952fc340001d15454',
-    name: 'migros',
-    slug: 'migros',
-    path: '/oursci-lab/andreas/',
+    _id: '5e6f8bbeea14550001470c36',
+    name: 'Our-Sci Lab Results',
+    slug: 'results',
+    dir: '/our-sci/lab/',
+    path: '/our-sci/lab/results/',
+  },
+  {
+    _id: '5e6f8bbeea14550001470c38',
+    name: 'Nexus-Computing GmbH',
+    slug: 'nexus-computing',
+    dir: '/',
+    path: '/nexus-computing/',
   },
 ];
 ```

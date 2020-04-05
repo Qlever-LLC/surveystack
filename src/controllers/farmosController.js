@@ -67,7 +67,19 @@ const getAssets = async (req, res) => {
   return common('assets', req, res);
 };
 
+const getAggregatorFarms = async (req, res) => {
+  const { url, apiKey, tags } = req.query;
+  const { data } = await axios.get(`https://${url}/api/v1/farms/`, {
+    headers: {
+      accept: 'application/json',
+      'api-key': apiKey,
+    },
+  });
+  return res.send(data);
+};
+
 export default {
   getFields,
   getAssets,
+  getAggregatorFarms,
 };

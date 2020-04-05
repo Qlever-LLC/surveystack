@@ -41,6 +41,7 @@ const getUsers = async (req, res) => {
   return res.send(entities);
 };
 
+/*
 // TODO: secure this route
 const getUsersByGroup = async (req, res) => {
   const { group } = req.params;
@@ -87,6 +88,7 @@ const getUsersByGroup = async (req, res) => {
 
   return res.send(entities);
 };
+*/
 
 const getUser = async (req, res) => {
   const { id } = req.params;
@@ -95,28 +97,38 @@ const getUser = async (req, res) => {
   const pipeline = [];
   pipeline.push({ $match: { _id: new ObjectId(id) } });
 
+  // would be better if membership endpoint was used
   if (populate(req)) {
+    pipeline.push({
+      $lookup: {
+        from: 'memberships',
+        let: { userId: '$_id' },
+        pipeline: [{ $match: { $expr: { $eq: ['$user', '$$userId'] } } }],
+        as: 'membershipsDetail',
+      },
+    });
+
     pipeline.push(
       ...[
-        { $unwind: { path: '$memberships', preserveNullAndEmptyArrays: true } },
+        { $unwind: { path: '$membershipsDetail', preserveNullAndEmptyArrays: true } },
         {
           $lookup: {
             from: 'groups',
-            let: { groupId: '$memberships.group' },
+            let: { groupId: '$membershipsDetail.group' },
             pipeline: [
               { $match: { $expr: { $eq: ['$_id', '$$groupId'] } } },
               { $project: { _id: 1, name: 1, slug: 1, path: 1 } },
             ],
-            as: 'memberships.groupDetail',
+            as: 'membershipsDetail.groupDetail',
           },
         },
-        { $unwind: { path: '$memberships.groupDetail', preserveNullAndEmptyArrays: true } },
+        { $unwind: { path: '$membershipsDetail.groupDetail', preserveNullAndEmptyArrays: true } },
         {
           $group: {
             _id: '$_id',
             email: { $first: '$email' },
             name: { $first: '$name' },
-            memberships: { $push: '$memberships' },
+            membershipsDetail: { $push: '$membershipsDetail' },
           },
         },
       ]
@@ -131,8 +143,8 @@ const getUser = async (req, res) => {
     .toArray();
 
   let r = entity[0];
-  if (r.memberships.length === 1 && Object.keys(r.memberships[0]).length === 0) {
-    r.memberships = [];
+  if (r.membershipsDetail.length === 1 && Object.keys(r.membershipsDetail[0]).length === 0) {
+    r.membershipsDetail = [];
   }
 
   if (!r) {
@@ -237,7 +249,7 @@ const deleteUser = async (req, res) => {
 export default {
   getUsers,
   getUser,
-  getUsersByGroup,
+  //getUsersByGroup,
   createUser,
   updateUser,
   deleteUser,

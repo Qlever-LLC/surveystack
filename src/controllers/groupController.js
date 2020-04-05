@@ -177,6 +177,7 @@ const deleteGroup = async (req, res) => {
   }
 };
 
+/*
 const getUsers = async (req, res) => {
   const { id } = req.params;
 
@@ -230,6 +231,7 @@ const getUsers = async (req, res) => {
 
   return res.send(users);
 };
+*/
 
 export default {
   getGroups,
@@ -238,5 +240,5 @@ export default {
   createGroup,
   updateGroup,
   deleteGroup,
-  getUsers,
+  //getUsers,
 };

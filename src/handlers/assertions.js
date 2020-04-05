@@ -28,7 +28,7 @@ export const assertEntityExists = ({ collection }) =>
 
     const doc = await db.collection(collection).findOne({ _id: new ObjectId(id) });
     if (!doc) {
-      throw boom.notFound(`No entity exists for id: ${id}`);
+      throw boom.notFound(`assertEntityExists: No entity exists for id: ${id}`);
     }
 
     next();
@@ -40,7 +40,7 @@ export const assertNameNotEmpty = catchErrors(async (req, res, next) => {
   }
   const entity = req.body;
   if (!entity.name || entity.name.trim() === '') {
-    throw boom.badRequest('name must not be empty');
+    throw boom.badRequest('assertNameNotEmpty: Name must not be empty');
   }
 
   next();
@@ -50,7 +50,7 @@ export const assertIdsMatch = (req, res, next) => {
   const entity = req.body;
   const id = entity._id;
   if (id != req.params.id) {
-    throw boom.badRequest(`Ids do not match: ${id}, ${req.params.id}`);
+    throw boom.badRequest(`assertIdsMatch: Ids do not match: ${id}, ${req.params.id}`);
   }
 
   next();

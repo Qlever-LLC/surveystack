@@ -1,108 +1,110 @@
 import { ObjectId } from 'mongodb';
 
-export const exampleSurvey = {
-  _id: new ObjectId('5e3038dbea0cf40001aef63b'),
-  name: 'Favorite Colors',
-  dateCreated: new Date('2020-01-28T13:36:13.031Z'),
-  dateModified: new Date('2020-01-28T13:36:13.031Z'),
-  latestVersion: 1,
-  revisions: [
-    {
-      dateCreated: new Date('2020-01-28T13:36:13.031Z'),
-      version: 1,
-      controls: [
-        {
-          name: 'favorite_color',
-          label: 'What is your favorite color?',
-          type: 'string',
-          options: {
-            readOnly: false,
-            required: false,
-            relevance: {
-              enabled: false,
-              code: '',
-            },
-            constraint: {
-              enabled: false,
-              code: '',
-            },
-            calculate: {
-              enabled: false,
-              code: '',
-            },
-          },
-        },
-        {
-          name: 'personal_group',
-          label: 'Personal Group',
-          type: 'group',
-          children: [
-            {
-              name: 'full_name',
-              label: 'Full Name',
-              type: 'string',
-              options: {
-                readOnly: false,
-                required: false,
-                redacted: true,
-                relevance: {
-                  enabled: false,
-                  code: '',
-                },
-                constraint: {
-                  enabled: false,
-                  code: '',
-                },
-                calculate: {
-                  enabled: false,
-                  code: '',
-                },
+export const exampleSurveys = [
+  {
+    _id: new ObjectId('5e3038dbea0cf40001aef63b'),
+    name: 'Favorite Colors',
+    dateCreated: new Date('2020-01-28T13:36:13.031Z'),
+    dateModified: new Date('2020-01-28T13:36:13.031Z'),
+    latestVersion: 1,
+    revisions: [
+      {
+        dateCreated: new Date('2020-01-28T13:36:13.031Z'),
+        version: 1,
+        controls: [
+          {
+            name: 'favorite_color',
+            label: 'What is your favorite color?',
+            type: 'string',
+            options: {
+              readOnly: false,
+              required: false,
+              relevance: {
+                enabled: false,
+                code: '',
+              },
+              constraint: {
+                enabled: false,
+                code: '',
+              },
+              calculate: {
+                enabled: false,
+                code: '',
               },
             },
-            {
-              name: 'age',
-              label: 'Age',
-              type: 'number',
-              options: {
-                readOnly: false,
-                required: false,
-                relevance: {
-                  enabled: false,
-                  code: '',
-                },
-                constraint: {
-                  enabled: false,
-                  code: '',
-                },
-                calculate: {
-                  enabled: false,
-                  code: '',
+          },
+          {
+            name: 'personal_group',
+            label: 'Personal Group',
+            type: 'group',
+            children: [
+              {
+                name: 'full_name',
+                label: 'Full Name',
+                type: 'string',
+                options: {
+                  readOnly: false,
+                  required: false,
+                  redacted: true,
+                  relevance: {
+                    enabled: false,
+                    code: '',
+                  },
+                  constraint: {
+                    enabled: false,
+                    code: '',
+                  },
+                  calculate: {
+                    enabled: false,
+                    code: '',
+                  },
                 },
               },
-            },
-          ],
-          options: {
-            readOnly: false,
-            required: false,
-            redacted: false,
-            relevance: {
-              enabled: false,
-              code: '',
-            },
-            constraint: {
-              enabled: false,
-              code: '',
-            },
-            calculate: {
-              enabled: false,
-              code: '',
+              {
+                name: 'age',
+                label: 'Age',
+                type: 'number',
+                options: {
+                  readOnly: false,
+                  required: false,
+                  relevance: {
+                    enabled: false,
+                    code: '',
+                  },
+                  constraint: {
+                    enabled: false,
+                    code: '',
+                  },
+                  calculate: {
+                    enabled: false,
+                    code: '',
+                  },
+                },
+              },
+            ],
+            options: {
+              readOnly: false,
+              required: false,
+              redacted: false,
+              relevance: {
+                enabled: false,
+                code: '',
+              },
+              constraint: {
+                enabled: false,
+                code: '',
+              },
+              calculate: {
+                enabled: false,
+                code: '',
+              },
             },
           },
-        },
-      ],
-    },
-  ],
-};
+        ],
+      },
+    ],
+  },
+];
 
 export const exampleSubmissions = [
   {
@@ -322,12 +324,6 @@ export const exampleUsers = [
     password: '$2b$12$IkxwFgrwXlnpBKBAapHia..beTddaB6qLIATJwMNaPRF5/2jA/97q', // 1234
     permissions: [],
     authProviders: [],
-    memberships: [
-      {
-        group: new ObjectId('5e6f8bbeea14550001470c28'),
-        role: 'admin',
-      },
-    ],
   },
   {
     _id: new ObjectId('5e6f92f16070e700015e0371'),
@@ -337,12 +333,21 @@ export const exampleUsers = [
     password: '$2b$12$7cy0/MdjUywLJ2RHeSuKtuczE11Vo10b5xf5g5jKOxQK09T4tBti2', // 1234
     permissions: [],
     authProviders: [],
-    memberships: [
-      {
-        group: new ObjectId('5e6f8bbeea14550001470c28'),
-        role: 'user',
-      },
-    ],
+  },
+];
+
+export const exampleMemberships = [
+  {
+    _id: new ObjectId('5e4a656fa1f0db0001bb4a9b'),
+    user: new ObjectId('5e452119c5117c000185f275'), // Default Our-Sci Admin
+    group: new ObjectId('5e6f8bbeea14550001470c28'),
+    role: 'admin',
+  },
+  {
+    _id: new ObjectId('5e4a656fa1f0db0001bb4a9c'),
+    user: new ObjectId('5e6f92f16070e700015e0371'), // Default Our-Sci User
+    group: new ObjectId('5e6f8bbeea14550001470c28'),
+    role: 'user',
   },
 ];
 
