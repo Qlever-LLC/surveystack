@@ -100,7 +100,7 @@ async function execute(apiCompose, info, terms, user, submission) {
   const type = apiCompose.body.type;
 
   if (!allowed(url, user)) {
-    throw boom.unauthorized('No Access to farm');
+    throw boom.unauthorized(`User has no access to farm: ${url}`);
   }
 
   const credentials = await getCredentials(user);
