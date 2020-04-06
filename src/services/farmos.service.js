@@ -3,6 +3,9 @@ import { planting } from './farmos/planting';
 import { aggregatorRequest } from './farmos/request';
 import { farminfo } from './farmos/farminfo';
 
+import { ObjectId } from 'mongodb';
+import { db } from '../db';
+
 const credentials = [
   {
     name: 'farmOS Test',
@@ -18,12 +21,32 @@ const credentials = [
   },
 ];
 
+const getCredentials = async (user) => {
+  if (!user) {
+    return [];
+  }
+
+  const filter = { type: 'farmos-farm' };
+
+  const memberships = await db
+    .collection('memberships')
+    .find({ user: user._id })
+    .project({ _id: 1 })
+    .toArray();
+  filter.membership = { $in: memberships.map((m) => m._id) };
+
+  const entities = await db
+    .collection('integrations.memberships')
+    .find(filter)
+    .toArray();
+  return entities;
+};
+
 function allowed(farmUrl, user) {
   // TODO: has user access to farm URL in one of the Aggregators?
   // TODO: also figure out aggregator
   return true;
 }
-
 
 async function flushlogs(farmUrl, user, submission) {
   //  TODO
