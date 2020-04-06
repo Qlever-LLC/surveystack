@@ -3,10 +3,13 @@ import _ from 'lodash';
 import { flatten } from 'flat';
 import { ObjectId } from 'mongodb';
 import papa from 'papaparse';
+import boom from '@hapi/boom';
 
 import { db } from '../db';
 import { uploadToS3 } from '../services/bucket.service';
 import mailService from '../services/mail.service';
+import farmosService from '../services/farmos.service';
+import { catchErrors } from '../handlers/errorHandlers';
 
 const router = Router();
 
@@ -80,7 +83,7 @@ router.get('/submissions', async (req, res) => {
     .toArray();
 
   const items = [];
-  submissions.forEach(submission => {
+  submissions.forEach((submission) => {
     submission._id = submission._id.toString();
     submission.survey = submission.survey.toString();
     removeKeys2(submission.data, ['meta']);
@@ -129,5 +132,20 @@ router.get('/node_env', async (req, res) => {
   console.log(process.env.NODE_ENV);
   return res.send(process.env.NODE_ENV);
 });
+
+const getCredentials = async (req, res) => {
+  const { user } = req.query;
+
+  const u = await db.collection('users').findOne({ _id: new ObjectId(user) });
+
+  if (!u) {
+    throw boom.notFound(`User not found: ${user}`);
+  }
+
+  const credentials = await farmosService.getCredentials(u);
+  return res.send(credentials);
+};
+
+router.get('/farmos/credentials', catchErrors(getCredentials));
 
 export default router;

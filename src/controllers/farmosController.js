@@ -2,26 +2,10 @@ import { db } from '../db';
 import axios from 'axios';
 import boom from '@hapi/boom';
 import https from 'https';
+import farmosService from '../services/farmos.service';
 
 const common = async (endpoint, req, res) => {
-  // TODO check auth
-  // TODO get API Key
-  // Get List of Farms available to user
-
-  const farms = [
-    {
-      name: 'farmOS Test',
-      url: 'test.farmos.net',
-      aggregatorURL: 'oursci.farmos.group',
-      aggregatorApiKey: process.env.FARMOS_AGGREGATOR_APIKEY,
-    },
-    {
-      name: 'Our Sci Test	',
-      url: 'ourscitest.farmos.net',
-      aggregatorURL: 'oursci.farmos.group',
-      aggregatorApiKey: process.env.FARMOS_AGGREGATOR_APIKEY,
-    },
-  ];
+  const farms = await farmosService.getCredentials(res.locals.auth.user);
 
   const farmosFields = [];
 
@@ -68,6 +52,7 @@ const getAssets = async (req, res) => {
 };
 
 const getAggregatorFarms = async (req, res) => {
+  // TODO: try not to pass api key from front-end
   const { url, apiKey, tags } = req.query;
   const { data } = await axios.get(`https://${url}/api/v1/farms/`, {
     headers: {

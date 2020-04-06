@@ -2,10 +2,11 @@ import * as utils from '../helpers/surveys';
 import { planting } from './farmos/planting';
 import { aggregatorRequest } from './farmos/request';
 import { farminfo } from './farmos/farminfo';
+import boom from '@hapi/boom';
 
-import { ObjectId } from 'mongodb';
 import { db } from '../db';
 
+/*
 const credentials = [
   {
     name: 'farmOS Test',
@@ -20,10 +21,11 @@ const credentials = [
     aggregatorApiKey: process.env.FARMOS_AGGREGATOR_APIKEY,
   },
 ];
+*/
 
-const getCredentials = async (user) => {
+export const getCredentials = async (user) => {
   if (!user) {
-    return [];
+    throw boom.unauthorized(`You are not logged in.`);
   }
 
   const filter = { type: 'farmos-farm' };
@@ -37,7 +39,29 @@ const getCredentials = async (user) => {
 
   const entities = await db
     .collection('integrations.memberships')
-    .find(filter)
+    .aggregate([
+      { $match: filter },
+      {
+        $lookup: {
+          from: 'integrations.groups',
+          localField: 'data.aggregator',
+          foreignField: '_id',
+          as: 'aggregatorDetails',
+        },
+      },
+      {
+        $unwind: '$aggregatorDetails',
+      },
+      {
+        $project: {
+          name: '$name',
+          url: '$data.url',
+          aggregatorURL: '$aggregatorDetails.data.url',
+          aggregatorApiKey: '$aggregatorDetails.data.apiKey',
+          farmId: '$data.farm',
+        },
+      },
+    ])
     .toArray();
   return entities;
 };
@@ -52,7 +76,7 @@ async function flushlogs(farmUrl, user, submission) {
   //  TODO
 }
 
-async function fetchTerms(farmUrl, user) {
+async function fetchTerms(farmUrl, credentials, user) {
   if (!allowed(farmUrl, user)) {
     throw Error('No Access to farm');
   }
@@ -79,12 +103,16 @@ async function execute(apiCompose, info, terms, user, submission) {
     throw Error('No Access to farm');
   }
 
+  const credentials = await getCredentials(user);
+
   if (type === 'planting') {
     return await planting(apiCompose, info, terms, user, credentials, submission);
   }
 }
 
-const handle = async (res, submission, survey, user) => {
+export const handle = async (res, submission, survey, user) => {
+  const credentials = await getCredentials(user);
+
   const surveyVersion = submission.meta.survey.version;
 
   const { controls } = survey.revisions.find((revision) => revision.version === surveyVersion);
@@ -158,7 +186,7 @@ const handle = async (res, submission, survey, user) => {
 
   const termMap = {};
   for (const f of distinctFarms) {
-    const terms = await fetchTerms(f, user);
+    const terms = await fetchTerms(f, credentials, user);
     termMap[f] = terms;
   }
 
@@ -174,4 +202,4 @@ const handle = async (res, submission, survey, user) => {
   return results;
 };
 
-export { handle };
+export default { handle, getCredentials };

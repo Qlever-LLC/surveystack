@@ -302,7 +302,10 @@ const getSubmissionsPage = async (req, res) => {
   console.log(pipeline);
   pipeline.push(...paginationStages);
 
-  entities = await db.collection(col).aggregate(pipeline).toArray();
+  entities = await db
+    .collection(col)
+    .aggregate(pipeline)
+    .toArray();
 
   console.log('Entities', entities);
   console.log('Entities[0]', entities[0]);
@@ -350,7 +353,10 @@ const getSubmissions = async (req, res) => {
     }
   }
 
-  entities = await db.collection(col).aggregate(pipeline).toArray();
+  entities = await db
+    .collection(col)
+    .aggregate(pipeline)
+    .toArray();
 
   if (req.query.format === 'csv') {
     const csv = csvService.createCsv(entities);

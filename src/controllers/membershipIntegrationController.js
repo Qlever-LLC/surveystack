@@ -12,6 +12,11 @@ const col = 'integrations.memberships';
 const sanitizeIntegration = (entity) => {
   entity._id = new ObjectId(entity._id);
   entity.membership = new ObjectId(entity.membership);
+
+  if (entity.type === 'farmos-farm') {
+    entity.data.aggregator = new ObjectId(entity.data.aggregator);
+  }
+
   return true;
 };
 
