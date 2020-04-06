@@ -9,11 +9,11 @@ import { checkSurvey } from '../helpers/surveys';
 const col = 'surveys';
 const DEFAULT_LIMIT = 20;
 
-const sanitize = entity => {
+const sanitize = (entity) => {
   entity._id = new ObjectId(entity._id);
   entity.dateCreated = new Date(entity.dateCreated);
   entity.dateModified = new Date(entity.dateModified);
-  entity.revisions.forEach(version => {
+  entity.revisions.forEach((version) => {
     version.dateCreated = new Date(entity.dateCreated);
   });
 
@@ -129,6 +129,54 @@ const getSurvey = async (req, res) => {
   return res.send(entity);
 };
 
+const getSurveyInfo = async (req, res) => {
+  const { id } = req.query;
+
+  if (!id) {
+    throw boom.badRequest(`query param not set: id`);
+  }
+
+  const entity = await db
+    .collection('surveys')
+    .findOne(
+      { _id: new ObjectId(id) },
+      { projection: { name: 1, dateModified: 1, dateCreated: 1, latestVersion: 1 } }
+    );
+
+  const submissions = await db
+    .collection('submissions')
+    .find({ 'meta.survey.id': new ObjectId(id) })
+    .count();
+
+  const latestSubmissions = await db
+    .collection('submissions')
+    .aggregate([
+      { $match: { 'meta.survey.id': new ObjectId(id) } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'meta.creator',
+          foreignField: '_id',
+          as: 'meta.creator',
+        },
+      },
+      { $unwind: '$meta.creator' },
+      { $project: { 'meta.dateModified': 1, 'meta.creator._id': 1, 'meta.creator.name': 1 } },
+      { $sort: { 'meta.dateModified': -1 } },
+      { $limit: 1 },
+    ])
+    .toArray();
+
+  entity.latestSubmission = null;
+  if (latestSubmissions[0]) {
+    const s = latestSubmissions[0];
+    entity.latestSubmission = { dateModified: s.meta.dateModified, creator: s.meta.creator };
+  }
+  entity.submissions = submissions;
+
+  return res.send(entity);
+};
+
 const createSurvey = async (req, res) => {
   const entity = sanitize(req.body);
 
@@ -179,6 +227,7 @@ export default {
   getSurveys,
   getSurveyPage,
   getSurvey,
+  getSurveyInfo,
   createSurvey,
   updateSurvey,
   deleteSurvey,
