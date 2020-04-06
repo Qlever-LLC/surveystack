@@ -24,9 +24,13 @@
         <app-farmos-farm-picker
           v-if="entity.type === 'farmos-farm'"
           :aggregators="aggregators"
+          :data="entity.data"
           @farm-selected="(ev) => {entity.data = ev; entity.name = ev.name}"
         />
-        <app-json-editor v-model="entity.data" />
+        <app-json-editor
+          v-model="entity.data"
+          class="mt-3"
+        />
 
         <div class="d-flex ma-2">
           <v-btn
@@ -91,13 +95,11 @@ export default {
       integrationTypes,
       entity: {
         _id: '',
+        name: '',
         membership: '',
         type: 'generic',
-        name: '',
         data: {
-          url: '',
-          apiKey: '',
-          parameters: '',
+
         },
       },
       aggregators: [],

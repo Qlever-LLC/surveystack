@@ -6,6 +6,8 @@
       :value="valueString"
       @input="writeBack($event)"
       outlined
+      style="font-family: monospace; font-size: 0.8rem"
+      :label="label"
     ></v-textarea>
   </div>
 </template>
@@ -14,6 +16,10 @@ export default {
   props: {
     value: {
       required: true,
+    },
+    label: {
+      type: String,
+      default: 'Data',
     },
   },
   computed: {
@@ -35,3 +41,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+textarea {
+  font-family: monospace;
+}
+</style>
