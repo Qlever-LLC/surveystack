@@ -1,7 +1,7 @@
 <template>
   <v-container>
+    <span class="text--secondary overline">{{this.entity._id}}</span>
     <h1>{{ editMode ? "Edit Membership" : "Create Membership" }}</h1>
-    <span class="text--secondary">{{this.entity._id}}</span>
 
     <v-card class="pa-4 mb-4">
       <v-form

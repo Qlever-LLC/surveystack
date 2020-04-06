@@ -1,8 +1,11 @@
 <template>
   <v-container>
-    <h1>{{ editMode ? "Edit Group Integration" : "Create Group Integration" }}</h1>
-    <span class="text--secondary">{{this.entity._id}}</span>
+
     <v-card class="pa-4 mb-4">
+      <span class="text--secondary overline">{{this.entity._id}}</span>
+
+      <h1>{{ editMode ? "Edit Group Integration" : "Create Group Integration" }}</h1>
+
       <v-form
         class="mt-3"
         @keydown.enter.prevent="submit"
