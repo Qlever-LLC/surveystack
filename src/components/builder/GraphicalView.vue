@@ -35,7 +35,7 @@
             <v-btn
               icon
               v-if="selected === el"
-              @click.stop="() => duplicateControl(el)"
+              @click.stop="duplicateControl(el)"
             >
               <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
             </v-btn>
@@ -55,6 +55,7 @@
           :selected="selected"
           :controls="el.children"
           @controlSelected="$emit('controlSelected', $event)"
+          @duplicate-control="$emit('duplicate-control', $event)"
           :index="createIndex(index, idx + 1)"
         />
       </v-card>
