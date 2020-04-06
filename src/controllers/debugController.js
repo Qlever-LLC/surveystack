@@ -40,6 +40,9 @@ const tabulaRasa = async (req, res) => {
   await db.collection('groups').deleteMany({});
   await db.collection('users').deleteMany({});
   await db.collection('memberships').deleteMany({});
+  await db.collection('integrations.groups').deleteMany({});
+  await db.collection('integrations.memberships').deleteMany({});
+  await db.collection('integrations.users').deleteMany({});
 
   // insert examples
   await db.collection('surveys').insertMany(exampleSurveys);
