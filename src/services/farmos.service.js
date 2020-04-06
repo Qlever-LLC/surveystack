@@ -78,7 +78,7 @@ async function flushlogs(farmUrl, user, submission) {
 
 async function fetchTerms(farmUrl, credentials, user) {
   if (!allowed(farmUrl, user)) {
-    throw Error('No Access to farm');
+    throw boom.unauthorized('No Access to farm');
   }
 
   const cred = credentials.find((c) => c.url === farmUrl);
@@ -100,7 +100,7 @@ async function execute(apiCompose, info, terms, user, submission) {
   const type = apiCompose.body.type;
 
   if (!allowed(url, user)) {
-    throw Error('No Access to farm');
+    throw boom.unauthorized('No Access to farm');
   }
 
   const credentials = await getCredentials(user);
