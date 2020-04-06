@@ -75,6 +75,7 @@ import ObjectId from 'bson-objectid';
 import _ from 'lodash';
 import moment from 'moment';
 import api from '@/services/api.service';
+import * as constants from '@/constants';
 
 import appDialog from '@/components/ui/Dialog.vue';
 import SurveyBuilder from '@/components/builder/SurveyBuilder.vue';
@@ -87,6 +88,7 @@ const emptySurvey = {
   dateCreated: currentDate,
   dateModified: currentDate,
   latestVersion: 1,
+  specVersion: constants.SPEC_VERSION_SURVEY,
   revisions: [
     {
       dateCreated: currentDate,
