@@ -75,7 +75,7 @@ export default {
   methods: {
     onChange(v) {
       if (this.value !== v) {
-        this.changed(v);
+        this.changed(v.sort());
       }
     },
     sourceHasValue(value) {

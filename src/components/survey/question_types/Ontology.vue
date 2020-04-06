@@ -1,7 +1,6 @@
 <template>
   <v-container fluid>
     <v-row>
-        <!-- v-model="values" -->
       <v-autocomplete
         :value="value"
         @change="onChange"
@@ -83,7 +82,11 @@ export default {
   methods: {
     onChange(v) {
       if (this.value !== v) {
-        this.changed(v);
+        if (Array.isArray(v)) {
+          this.changed(v.sort());
+        } else {
+          this.changed(v);
+        }
       }
     },
     info(data) {
