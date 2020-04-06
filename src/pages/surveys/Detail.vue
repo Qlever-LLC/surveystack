@@ -23,7 +23,13 @@
     </div>
 
     <h1>{{entity.name}}</h1>
-    This is a good survey with 17 submissions.
+    <div v-if="surveyInfo">
+      {{surveyInfo.submissions}} {{surveyInfo.submissions === 1 ? 'submission' : 'submissions'}}
+      <div
+        v-if="surveyInfo.latestSubmission"
+        class="text--secondary"
+      >Latest submission on {{surveyInfo.latestSubmission.dateModified}}</div>
+    </div>
 
     <div class="mt-4">
       <v-btn
@@ -45,6 +51,7 @@ export default {
   data() {
     return {
       entity: null,
+      surveyInfo: null,
     };
   },
   methods: {
@@ -54,8 +61,11 @@ export default {
   },
   async created() {
     const { id } = this.$route.params;
-    const { data } = await api.get(`/surveys/${id}`);
-    this.entity = data;
+    const s = await api.get(`/surveys/${id}`);
+    this.entity = s.data;
+
+    const i = await api.get(`/surveys/info?id=${id}`);
+    this.surveyInfo = i.data;
   },
 
 };
