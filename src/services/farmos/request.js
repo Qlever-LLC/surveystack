@@ -43,7 +43,7 @@ async function aggregatorRequest(
   }
 
   const response = await axios(config);
-  console.log('response', response);
+  //console.log('response', response);
   const r = response.data;
 
   const farmId = Object.keys(r)[0];

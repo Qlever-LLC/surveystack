@@ -165,9 +165,19 @@ export const handle = async (res, submission, survey, user) => {
     }
   };
 
+  // distinct aggregator map
+  const aggregators = new Map();
+  credentials.forEach((credential) => {
+    aggregators.set(credential.aggregatorURL, credential.aggregatorApiKey);
+  });
+
   let info = [];
   try {
-    info = (await farminfo('oursci.farmos.group', process.env.FARMOS_AGGREGATOR_APIKEY)).data;
+    // FML: note that one can not use forEach with await
+    for (const [url, apiKey] of aggregators.entries()) {
+      const { data } = await farminfo(url, apiKey);
+      info.push(...data);
+    }
   } catch (error) {
     console.log('error fetching farm info from aggregator');
     throw error;

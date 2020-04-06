@@ -148,4 +148,30 @@ const getCredentials = async (req, res) => {
 
 router.get('/farmos/credentials', catchErrors(getCredentials));
 
+const getAggregators = async (req, res) => {
+  const { user } = req.query;
+
+  const u = await db.collection('users').findOne({ _id: new ObjectId(user) });
+
+  if (!u) {
+    throw boom.notFound(`User not found: ${user}`);
+  }
+
+  const credentials = await farmosService.getCredentials(u);
+
+  const map = new Map();
+  credentials.forEach((credential) => {
+    map.set(credential.aggregatorURL, credential.aggregatorApiKey);
+  });
+
+  const aggregators = [];
+  map.forEach((apiKey, url) => {
+    aggregators.push({ url, apiKey });
+  });
+
+  return res.send(aggregators);
+};
+
+router.get('/farmos/aggregators', catchErrors(getAggregators));
+
 export default router;
