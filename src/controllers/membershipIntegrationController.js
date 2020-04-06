@@ -9,7 +9,7 @@ import { populate } from '../helpers';
 
 const col = 'integrations.memberships';
 
-const sanitizeIntegration = entity => {
+const sanitizeIntegration = (entity) => {
   entity._id = new ObjectId(entity._id);
   entity.membership = new ObjectId(entity.membership);
   return true;
@@ -30,7 +30,7 @@ const getIntegrations = async (req, res) => {
       .find({ user: new ObjectId(user) })
       .project({ _id: 1 })
       .toArray();
-    filter.membership = { $in: memberships.map(m => m._id) };
+    filter.membership = { $in: memberships.map((m) => m._id) };
   }
 
   // ... or override with integrations for a specific membership
@@ -76,6 +76,7 @@ const createIntegration = async (req, res) => {
 const updateIntegration = async (req, res) => {
   const entity = req.body;
   const id = entity._id;
+  sanitizeIntegration(entity);
 
   try {
     delete entity._id;
