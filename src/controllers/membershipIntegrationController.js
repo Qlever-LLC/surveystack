@@ -16,16 +16,29 @@ const sanitizeIntegration = entity => {
 };
 
 const getIntegrations = async (req, res) => {
-  const { membership, type } = req.query;
+  const { membership, type, user } = req.query;
   const filter = {};
-
-  if (membership) {
-    filter.membership = new ObjectId(membership);
-  }
 
   if (type) {
     filter.type = type;
   }
+
+  // integrations for a specific user
+  if (user) {
+    const memberships = await db
+      .collection('memberships')
+      .find({ user: new ObjectId(user) })
+      .project({ _id: 1 })
+      .toArray();
+    filter.membership = { $in: memberships.map(m => m._id) };
+  }
+
+  // ... or override with integrations for a specific membership
+  if (membership) {
+    filter.membership = new ObjectId(membership);
+  }
+
+  console.log('filter', filter);
 
   const entities = await db
     .collection(col)
