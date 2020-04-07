@@ -42,6 +42,7 @@
 import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import CodeEditor from '@/components/ui/CodeEditor.vue';
+import { SPEC_VERSION_SCRIPT } from '@/constants';
 
 export default {
   data() {
@@ -50,6 +51,7 @@ export default {
       entity: {
         _id: '',
         name: '',
+        specVersion: SPEC_VERSION_SCRIPT,
         content: `
 /**
  * Process
