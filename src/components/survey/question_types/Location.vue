@@ -309,8 +309,9 @@ export default {
 };
 </script>
 
+
 <style>
-@import url("https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css");
+@import url('~mapbox-gl/dist/mapbox-gl.css');
 #map-root {
   display: grid;
   grid-template-columns: 1fr;
