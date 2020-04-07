@@ -10,6 +10,7 @@ import { uploadToS3 } from '../services/bucket.service';
 import mailService from '../services/mail.service';
 import farmosService from '../services/farmos.service';
 import { catchErrors } from '../handlers/errorHandlers';
+import rolesService from '../services/roles.service';
 
 const router = Router();
 
@@ -126,6 +127,12 @@ router.post('/mail/send', async (req, res) => {
   }
 
   return res.send('OK');
+});
+
+router.get('/roles', async (req, res) => {
+  const { user } = req.query;
+  const roles = await rolesService.getRoles(user);
+  return res.send(roles);
 });
 
 router.get('/node_env', async (req, res) => {

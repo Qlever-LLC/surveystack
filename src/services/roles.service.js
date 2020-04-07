@@ -1,5 +1,8 @@
+import { ObjectId } from 'mongodb';
+
 import { db } from '../db';
 
+/*
 const getUser = async userId => {
   let entity;
 
@@ -50,8 +53,9 @@ const getUser = async userId => {
 
   return r;
 };
+*/
 
-const getDescendantGroups = async group => {
+const getDescendantGroups = async (group) => {
   const descendants = await db
     .collection('groups')
     .find({ path: { $regex: `^${group.path}/` } })
@@ -59,14 +63,24 @@ const getDescendantGroups = async group => {
   return descendants;
 };
 
-export const getRoles = async userId => {
-  const roles = [];
+export const getRoles = async (userId) => {
+  const roles = ['public'];
+  if (!userId) {
+    return roles;
+  }
 
-  const user = await getUser(userId);
+  const memberships = await db
+    .collection('memberships')
+    .aggregate([
+      { $match: { user: new ObjectId(userId) } },
+      { $lookup: { from: 'groups', localField: 'group', foreignField: '_id', as: 'groupDetail' } },
+      { $unwind: '$groupDetail' },
+    ])
+    .toArray();
 
-  user.memberships.forEach(async membership => {
-    // TOOD: add child roles?
-    roles.push(`${membership.role}@${membership.groupDetail.path}`);
+  memberships.forEach((membership) => {
+    const role = `${membership.role}@${membership.groupDetail.path}`;
+    roles.push(role);
   });
 
   return roles;

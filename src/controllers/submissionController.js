@@ -8,6 +8,7 @@ import boom from '@hapi/boom';
 import { db } from '../db';
 import csvService from '../services/csv.service';
 import * as farmOsService from '../services/farmos.service';
+import rolesService from '../services/roles.service';
 
 const col = 'submissions';
 const DEFAULT_LIMIT = 100000;
@@ -175,8 +176,6 @@ const buildPipeline = async (req, res) => {
     });
   }
 
-  console.log('creating redact stage with user', user);
-  console.log('roles', roles);
   const redactStage = createRedactStage(user, roles);
   pipeline.push(redactStage);
 
@@ -299,13 +298,13 @@ const getSubmissionsPage = async (req, res) => {
     { $unwind: '$pagination' },
   ];
 
-  console.log(pipeline);
   pipeline.push(...paginationStages);
 
-  entities = await db.collection(col).aggregate(pipeline).toArray();
+  entities = await db
+    .collection(col)
+    .aggregate(pipeline)
+    .toArray();
 
-  console.log('Entities', entities);
-  console.log('Entities[0]', entities[0]);
   const r = entities[0];
   if (!r) {
     return res.send({
@@ -350,7 +349,10 @@ const getSubmissions = async (req, res) => {
     }
   }
 
-  entities = await db.collection(col).aggregate(pipeline).toArray();
+  entities = await db
+    .collection(col)
+    .aggregate(pipeline)
+    .toArray();
 
   if (req.query.format === 'csv') {
     const csv = csvService.createCsv(entities);
