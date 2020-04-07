@@ -302,10 +302,7 @@ const getSubmissionsPage = async (req, res) => {
   console.log(pipeline);
   pipeline.push(...paginationStages);
 
-  entities = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  entities = await db.collection(col).aggregate(pipeline).toArray();
 
   console.log('Entities', entities);
   console.log('Entities[0]', entities[0]);
@@ -353,10 +350,7 @@ const getSubmissions = async (req, res) => {
     }
   }
 
-  entities = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  entities = await db.collection(col).aggregate(pipeline).toArray();
 
   if (req.query.format === 'csv') {
     const csv = csvService.createCsv(entities);
@@ -413,8 +407,12 @@ const createSubmission = async (req, res) => {
     assert.equal(1, r.insertedCount);
     return res.send(r);
   } catch (err) {
-    if (err.name === 'MongoError' && err.code === 11000) {
-      return res.status(409).send({ message: `Entity with _id already exists: ${entity._id}` });
+    try {
+      await updateSubmission(req, res);
+    } catch (error) {
+      if (err.name === 'MongoError' && err.code === 11000) {
+        return res.status(409).send({ message: `Entity with _id already exists: ${entity._id}` });
+      }
     }
   }
 
