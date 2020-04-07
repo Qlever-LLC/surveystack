@@ -1,7 +1,7 @@
 #!/bin/bash
 PEM_FILE=~/.ssh/oursci-allround.pem
 USER=ubuntu
-SERVER=ec2-52-90-19-245.compute-1.amazonaws.com
+SERVER=ec2-54-85-87-170.compute-1.amazonaws.com
 
 cd $(dirname $0)
 
