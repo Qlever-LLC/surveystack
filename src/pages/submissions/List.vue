@@ -112,7 +112,7 @@ const defaultFilter = {
   sort: '{}',
   skip: 0,
   limit: 0,
-  roles: 'public',
+  roles: '',
 };
 
 export default {
@@ -145,7 +145,7 @@ export default {
         sort: '{}',
         skip: 0,
         limit: 0,
-        roles: 'public',
+        roles: '',
       },
       basicFilters: [],
       submissions: {
