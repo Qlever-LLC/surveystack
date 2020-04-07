@@ -69,7 +69,7 @@ export async function process(props, state) {
     value: null,
     status: {
       type: statusTypes.SUCCESS,
-      message: \`script successfully executed at ${(new Date().toISOString())}\`,
+      message: \`script successfully executed at ${(new Date().toISOString(true))}\`,
     },
   }
 }
