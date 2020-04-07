@@ -4,7 +4,7 @@ Make sure a local mongodb server is running.
 
 ```
 # switch to server directory
-cd mango/server
+cd our-sci-erver
 # install packages
 yarn
 # start server
