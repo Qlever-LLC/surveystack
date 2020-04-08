@@ -338,15 +338,39 @@ export const exampleUsers = [
 
 export const exampleMemberships = [
   {
-    _id: new ObjectId('5e4a656fa1f0db0001bb4a9b'),
+    _id: new ObjectId('5e4a656fa1f0db0001bb4a9a'),
     user: new ObjectId('5e452119c5117c000185f275'), // Default Our-Sci Admin
     group: new ObjectId('5e6f8bbeea14550001470c28'),
     role: 'admin',
   },
   {
+    _id: new ObjectId('5e4a656fa1f0db0001bb4a9b'),
+    user: new ObjectId('5e452119c5117c000185f275'), // Default Our-Sci Admin
+    group: new ObjectId('5e6f8bbeea14550001470c38'),
+    role: 'admin',
+  },
+  {
     _id: new ObjectId('5e4a656fa1f0db0001bb4a9c'),
     user: new ObjectId('5e6f92f16070e700015e0371'), // Default Our-Sci User
-    group: new ObjectId('5e6f8bbeea14550001470c28'),
+    group: new ObjectId('5e6f8bbeea14550001470c28'), // our-sci
+    role: 'user',
+  },
+  {
+    _id: new ObjectId('5e4a656fa1f0db0001bb4a9e'),
+    user: new ObjectId('5e6f92f16070e700015e0371'), // Default Our-Sci User
+    group: new ObjectId('5e6f8bbeea14550001470c32'), // our-sci/lab
+    role: 'user',
+  },
+  {
+    _id: new ObjectId('5e4a656fa1f0db0001bb4a9f'),
+    user: new ObjectId('5e6f92f16070e700015e0371'), // Default Our-Sci User
+    group: new ObjectId('5e6f8bbeea14550001470c34'), // our-sci/lab/testing
+    role: 'user',
+  },
+  {
+    _id: new ObjectId('5e4a656fa1f0db0001bb4aa0'),
+    user: new ObjectId('5e6f92f16070e700015e0371'), // Default Our-Sci User
+    group: new ObjectId('5e6f8bbeea14550001470c36'), // our-sci/lab/results
     role: 'user',
   },
 ];
