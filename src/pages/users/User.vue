@@ -17,10 +17,12 @@
           v-for="membership in memberships"
           :key="membership._id"
           :to="`/g${membership.group.path}`"
+          three-line
         >
           <v-list-item-content>
+            <span class="text--secondary caption">{{membership.group.path}}</span>
             <v-list-item-title>{{membership.group.name}}</v-list-item-title>
-            <v-list-item-subtitle>{{membership.role}}</v-list-item-subtitle>
+            <v-list-item-subtitle class="text--secondary">{{membership.role}}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
       </v-list>
