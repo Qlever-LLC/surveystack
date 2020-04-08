@@ -9,7 +9,7 @@ import { populate } from '../helpers';
 
 const col = 'memberships';
 
-const sanitize = entity => {
+const sanitize = (entity) => {
   entity._id = new ObjectId(entity._id);
   entity.group = new ObjectId(entity.group);
   entity.user = new ObjectId(entity.user);
@@ -18,9 +18,13 @@ const sanitize = entity => {
 const getMemberships = async (req, res) => {
   const filter = {};
 
-  const { group } = req.query;
+  const { group, user } = req.query;
   if (group) {
     filter.group = new ObjectId(group);
+  }
+
+  if (user) {
+    filter.user = new ObjectId(user);
   }
 
   const pipeline = [{ $match: filter }];
