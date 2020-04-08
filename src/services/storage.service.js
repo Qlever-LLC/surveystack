@@ -3,6 +3,8 @@ const AUTH_USER_KEY = 'auth_user';
 const AUTH_HEADER_KEY = 'auth_header';
 const AUTH_SHAPESHIFT_USER_KEY = 'auth_shapeshift_user';
 const AUTH_SHAPESHIFT_HEADER_KEY = 'auth_shapeshift_header';
+const USER_MEMBERSHIP_KEY = 'user_memberships';
+const USER_MEMBERSHIP_STATUS_KEY = 'user_memberships_status';
 
 const AuthService = {
   getStatus() {
@@ -65,4 +67,26 @@ const AuthService = {
   },
 };
 
-export { AuthService };
+const MembershipService = {
+  getStatus() {
+    return localStorage.getItem(USER_MEMBERSHIP_STATUS_KEY) || '';
+  },
+  saveStatus(status) {
+    localStorage.setItem(USER_MEMBERSHIP_STATUS_KEY, status);
+  },
+  getUserMemberships() {
+    return JSON.parse(localStorage.getItem(USER_MEMBERSHIP_KEY)) || [];
+  },
+  saveMemberships(memberships = []) {
+    localStorage.setItem(USER_MEMBERSHIP_KEY, JSON.stringify(memberships));
+  },
+  clear() {
+    localStorage.removeItem(USER_MEMBERSHIP_STATUS_KEY);
+    localStorage.removeItem(USER_MEMBERSHIP_KEY);
+  },
+};
+
+export {
+  AuthService,
+  MembershipService,
+};

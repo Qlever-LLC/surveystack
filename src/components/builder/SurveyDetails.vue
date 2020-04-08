@@ -201,12 +201,20 @@
 
       <v-tooltip bottom v-if="validationErrors.length > 0">
         <template v-slot:activator="{ on }">
-          <div v-on="on" class="text-center mt-4 error--text" >
+          <!-- <div v-on="on" class="text-center mt-4 error--text" >
             <v-icon color="error">mdi-exclamation</v-icon>
             Survey contains errors
-
-
-          </div>
+          </div> -->
+          <v-alert
+            type="error"
+            colored-border
+            border="left"
+            class="mt-2"
+            elevation="2"
+            v-on="on"
+          >
+            Survey contains errors
+          </v-alert>
         </template>
         <div
           v-for="error in validationErrors"
