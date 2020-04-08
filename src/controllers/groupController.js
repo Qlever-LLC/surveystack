@@ -104,12 +104,12 @@ const createGroup = async (req, res) => {
     assert.equal(1, r.insertedCount);
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
-      return res
-        .status(409)
-        .send({ message: `Conflict _id or path: ${entity._id}, ${entity.path}` });
+      throw boom.conflict(`Conflict _id or path: ${entity._id}, ${entity.path}`);
     }
-    return res.status(500).send({ message: 'Internal error' });
+    throw boom.internal(`createGroup: unknown internal error`);
   }
+
+  // TODO: add admin membership to created group for current user
 
   return res.send(r);
 };
