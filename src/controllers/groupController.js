@@ -1,11 +1,40 @@
 import assert from 'assert';
 import { ObjectId } from 'mongodb';
 
-import boom, { entityTooLarge } from '@hapi/boom';
+import boom from '@hapi/boom';
 
 import { db } from '../db';
 
 const col = 'groups';
+
+const sanitizeGroup = (entity) => {
+  if (!entity.slug) {
+    throw boom.badRequest(`Group slug not set`);
+  }
+
+  const slugExp = new RegExp('^[a-z0-9]+(-[a-z0-9]+)*$');
+  if (!slugExp.test(entity.slug)) {
+    throw boom.badRequest(`Bad group slug name: ${entity.slug}`);
+  }
+
+  if (entity.dir !== '/') {
+    if (entity.dir.length <= 2 || !entity.dir.startsWith('/') || !entity.dir.endsWith('/')) {
+      throw boom.badRequest(`Bad group dir: ${entity.dir}`);
+    }
+
+    let slugs = entity.dir.split('/');
+    // remove first and last empty strings
+    slugs.shift();
+    slugs.pop();
+    slugs.forEach((slug) => {
+      if (!slugExp.test(slug)) {
+        throw boom.badRequest(`Bad group dir: ${entity.dir}`);
+      }
+    });
+  }
+
+  entity.path = `${entity.dir}${entity.slug}/`;
+};
 
 const getGroups = async (req, res) => {
   let entities;
@@ -64,54 +93,25 @@ const getGroupById = async (req, res) => {
   return res.send(entity);
 };
 
-const sanitizeGroup = entity => {
-  if (!entity.slug) {
-    throw boom.badRequest(`Group slug not set`);
-  }
-
-  const slugExp = new RegExp('^[a-z0-9]+(-[a-z0-9]+)*$');
-  if (!slugExp.test(entity.slug)) {
-    throw boom.badRequest(`Bad group slug name: ${entity.slug}`);
-  }
-
-  console.log(entity);
-
-  if (entity.dir !== '/') {
-    if (entity.dir.length <= 2 || !entity.dir.startsWith('/') || !entity.dir.endsWith('/')) {
-      throw boom.badRequest(`Bad group dir: ${entity.dir}`);
-    }
-
-    let slugs = entity.dir.split('/');
-    // remove first and last empty strings
-    slugs.shift();
-    slugs.pop();
-    slugs.forEach(slug => {
-      if (!slugExp.test(slug)) {
-        throw boom.badRequest(`Bad group dir: ${entity.dir}`);
-      }
-    });
-  }
-
-  entity.path = `${entity.dir}${entity.slug}/`;
-};
-
 const createGroup = async (req, res) => {
   const entity = req.body;
   sanitizeGroup(entity);
 
+  let r;
+
   try {
-    let r = await db.collection(col).insertOne({ ...entity, _id: new ObjectId(entity._id) });
+    r = await db.collection(col).insertOne({ ...entity, _id: new ObjectId(entity._id) });
     assert.equal(1, r.insertedCount);
-    return res.send(r);
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
       return res
         .status(409)
         .send({ message: `Conflict _id or path: ${entity._id}, ${entity.path}` });
     }
+    return res.status(500).send({ message: 'Internal error' });
   }
 
-  return res.status(500).send({ message: 'Internal error' });
+  return res.send(r);
 };
 
 const updateGroup = async (req, res) => {
@@ -177,62 +177,6 @@ const deleteGroup = async (req, res) => {
   }
 };
 
-/*
-const getUsers = async (req, res) => {
-  const { id } = req.params;
-
-  var groups = [new ObjectId(id)];
-
-  const users = await db
-    .collection('users')
-    .aggregate([
-      { $match: { 'memberships.group': { $in: groups } } },
-      { $unwind: '$memberships' },
-      {
-        $lookup: {
-          from: 'groups',
-          let: { groupId: '$memberships.group' },
-          pipeline: [
-            { $match: { $expr: { $eq: ['$_id', '$$groupId'] } } },
-            { $project: { _id: 1, name: 1 } },
-          ],
-          as: 'memberships.groupDetail',
-        },
-      },
-      { $unwind: '$memberships.groupDetail' },
-      {
-        $group: {
-          _id: '$_id',
-          email: { $first: '$email' },
-          name: { $first: '$name' },
-          memberships: { $push: '$memberships' },
-        },
-      },
-      {
-        $project: {
-          email: 1,
-          name: 1,
-          memberships: {
-            $filter: {
-              input: '$memberships',
-              as: 'membership',
-              cond: { $in: ['$$membership.group', groups] },
-            },
-          },
-        },
-      },
-      {
-        $sort: { name: 1 },
-      },
-    ])
-    .toArray();
-
-  console.log(users);
-
-  return res.send(users);
-};
-*/
-
 export default {
   getGroups,
   getGroupByPath,
@@ -240,5 +184,4 @@ export default {
   createGroup,
   updateGroup,
   deleteGroup,
-  //getUsers,
 };

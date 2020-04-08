@@ -92,68 +92,21 @@ const getUsersByGroup = async (req, res) => {
 
 const getUser = async (req, res) => {
   const { id } = req.params;
-  let entity;
 
   const pipeline = [];
   pipeline.push({ $match: { _id: new ObjectId(id) } });
+  pipeline.push({ $project: { email: 1, name: 1 } });
 
-  // would be better if membership endpoint was used
-  if (populate(req)) {
-    pipeline.push({
-      $lookup: {
-        from: 'memberships',
-        let: { userId: '$_id' },
-        pipeline: [{ $match: { $expr: { $eq: ['$user', '$$userId'] } } }],
-        as: 'membershipsDetail',
-      },
-    });
-
-    pipeline.push(
-      ...[
-        { $unwind: { path: '$membershipsDetail', preserveNullAndEmptyArrays: true } },
-        {
-          $lookup: {
-            from: 'groups',
-            let: { groupId: '$membershipsDetail.group' },
-            pipeline: [
-              { $match: { $expr: { $eq: ['$_id', '$$groupId'] } } },
-              { $project: { _id: 1, name: 1, slug: 1, path: 1 } },
-            ],
-            as: 'membershipsDetail.groupDetail',
-          },
-        },
-        { $unwind: { path: '$membershipsDetail.groupDetail', preserveNullAndEmptyArrays: true } },
-        {
-          $group: {
-            _id: '$_id',
-            email: { $first: '$email' },
-            name: { $first: '$name' },
-            membershipsDetail: { $push: '$membershipsDetail' },
-          },
-        },
-      ]
-    );
-  }
-
-  pipeline.push({ $project: { password: 0, token: 0 } });
-
-  entity = await db
+  const [entity] = await db
     .collection(col)
     .aggregate(pipeline)
     .toArray();
 
-  let r = entity[0];
-  if (r.membershipsDetail.length === 1 && Object.keys(r.membershipsDetail[0]).length === 0) {
-    r.membershipsDetail = [];
+  if (!entity) {
+    throw boom.notFound(`No user found for id: ${id}`);
   }
 
-  if (!r) {
-    return res.status(404).send({
-      message: `No entity with _id exists: ${id}`,
-    });
-  }
-
-  return res.send(r);
+  return res.send(entity);
 };
 
 const createUser = async (req, res) => {
@@ -177,7 +130,7 @@ const createUser = async (req, res) => {
   };
 
   // TODO: only allow admins of group to create memberships
-  user.memberships.forEach(membership => {
+  user.memberships.forEach((membership) => {
     membership.group = new ObjectId(membership.group);
   });
 
@@ -209,7 +162,7 @@ const updateUser = async (req, res) => {
     entity.password = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS));
   }
 
-  entity.memberships.forEach(membership => {
+  entity.memberships.forEach((membership) => {
     membership.group = new ObjectId(membership.group);
   });
 
