@@ -28,9 +28,9 @@
                   >
                     <v-btn
                       class="pointer-events-none"
-                      icon
+                      text
                     >
-                      <v-icon color="grey lighten-1">mdi-file-upload</v-icon>
+                      <v-icon color="grey">mdi-file-upload</v-icon>
                       <div class="ml-1">
                         Import
                       </div>
@@ -51,9 +51,9 @@
               <v-list-item-title>
                 <v-btn
                   @click="$emit('export-survey')"
-                  icon
+                  text
                 >
-                  <v-icon color="grey lighten-1">mdi-file-download</v-icon>
+                  <v-icon color="grey">mdi-file-download</v-icon>
                   <div class="ml-1">
                     Export
                   </div>
@@ -63,11 +63,11 @@
             <v-list-item v-if="!isNew">
               <v-list-item-title>
                 <v-btn
-                  icon
+                  text
                   @click="$emit('delete')"
                 >
-                  <v-icon color="grey lighten-1">mdi-delete</v-icon>
-                  <div class="grey--text ml-1">
+                  <v-icon color="grey">mdi-delete</v-icon>
+                  <div class="ml-1">
                     Delete
                   </div>
                 </v-btn>
