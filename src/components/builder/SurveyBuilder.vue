@@ -16,7 +16,7 @@
         class="pane pane-survey"
         style="position: relative; overflow: hidden"
       >
-        <div class="pane-fixed-wrapper pr-2">
+        <div class="pane-fixed-wrapper pr-2" style="position: relative;">
           <control-adder @controlAdded="controlAdded" />
           <survey-details
             :version="version"
@@ -47,7 +47,6 @@
             @controlSelected="controlSelected"
             @duplicate-control="duplicateControl"
           />
-
         </div>
       </pane>
 
