@@ -7,7 +7,7 @@
         outlined
         v-model="control.name"
         label="Data name"
-        :rules="[nameIsUnique]"
+        :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
       />
       <v-text-field
         outlined
@@ -323,6 +323,14 @@ export default {
       return controlsWithSameName.length > 0
         ? 'Data name must be unique'
         : true;
+    },
+    nameHasValidCharacters(val) {
+      const namePattern = /^[\w]*$/;
+      return namePattern.test(val) ? true : 'Data name must only contain valid charcters';
+    },
+    nameHasValidLength(val) {
+      const namePattern = /^.{4,}$/;
+      return namePattern.test(val) ? true : 'Data name must be at least 4 characters in length';
     },
     openAdvancedEditor() {
       // TODO: can't pass params to new window

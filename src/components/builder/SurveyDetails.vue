@@ -105,7 +105,7 @@
           disabled
         /> -->
 
-        <div class="d-flex flex-wrap justify-end">
+        <div class="d-flex flex-wrap justify-end align-center">
           <!-- <v-btn
             class="my-1 mr-1"
             @click="$emit('cancel')"
@@ -170,9 +170,9 @@
               <div v-on="on">
                 <v-btn
                   :dark="enableSaveDraft"
-                  :disabled="!enableSaveDraft"
                   @click="$emit('saveDraft')"
                   color="primary"
+                  :disabled="!enableSaveDraft"
                   class="my-1 mr-1"
                 >
                   <v-icon class="mr-1">mdi-content-save</v-icon>
@@ -182,8 +182,39 @@
             </template>
             <span>Save a new draft <strong>version</strong> of the Survey</span>
           </v-tooltip>
+          <!-- <v-tooltip bottom v-if="validationErrors.length > 0">
+            <template v-slot:activator="{ on }">
+              <div v-on="on">
+                <v-icon small color="error">mdi-close-circle-outline</v-icon>
+              </div>
+            </template>
+            <span
+              v-for="error in validationErrors"
+              :key="error"
+            >
+              {{error}}
+            </span>
+          </v-tooltip> -->
         </div>
       </div>
+
+
+      <v-tooltip bottom v-if="validationErrors.length > 0">
+        <template v-slot:activator="{ on }">
+          <div v-on="on" class="text-center mt-4 error--text" >
+            <v-icon color="error">mdi-exclamation</v-icon>
+            Survey contains errors
+
+
+          </div>
+        </template>
+        <div
+          v-for="error in validationErrors"
+          :key="error"
+        >
+          {{error}}
+        </div>
+      </v-tooltip>
     </v-card-text>
   </v-card>
 </template>
@@ -200,7 +231,9 @@ export default {
     'enableSaveDraft',
     'enablePublish',
     'enableDismissDraft',
-    'version'],
+    'version',
+    'validationErrors',
+  ],
   components: {
     SurveyNameEditor,
   },

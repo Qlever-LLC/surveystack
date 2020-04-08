@@ -28,6 +28,7 @@
             :enableSaveDraft="enableSaveDraft"
             :enableDismissDraft="enableDismissDraft"
             :enablePublish="enablePublish"
+            :validationErrors="surveyValidationErrors"
             @view-code-toggle="viewCode = !viewCode"
             @update="publish"
             @cancel="onCancel"
@@ -489,7 +490,9 @@ export default {
     },
     validateSurveyName() {
       // TODO: disallow special characters?
-      return !!this.survey.name && this.survey.name.length > 4;
+      return !!this.survey.name && /^[\w-\s]{4,}$/.test(this.survey.name)
+        ? true
+        : 'Survey name is invalid';
     },
     validateSurveyQuestions() {
       const namePattern = /^[\w-]{4,}$/;
@@ -511,18 +514,22 @@ export default {
           && allNamesInGroupContainOnlyValidCharacters;
       }, true);
 
-      return hasOnlyUniqueNames
+      return (hasOnlyUniqueNames
         && allNamesContainOnlyValidCharacters
-        && groupedQuestionsAreValid;
+        && groupedQuestionsAreValid) ? true : 'Questions list contains an invalid data name';
     },
   },
   computed: {
     surveyIsValid() {
-      // check if survey name is valid
-
-      // check for duplicate values
-      return this.validateSurveyName()
-        && this.validateSurveyQuestions();
+      // return this.invalidValidations.length > 0 ? invalidValidations : true;
+      return !(this.surveyValidationErrors.length > 0);
+    },
+    surveyValidationErrors() {
+      const validations = [
+        this.validateSurveyName(),
+        this.validateSurveyQuestions(),
+      ];
+      return validations.filter(validation => validation !== true);
     },
     enableDismissDraft() {
       return this.isDraft;
