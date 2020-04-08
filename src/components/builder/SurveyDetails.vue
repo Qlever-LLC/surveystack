@@ -6,6 +6,10 @@
           style="max-width: 81%;"
           v-model="value.name"
         />
+        <v-spacer />
+        <v-btn icon>
+          <v-icon>mdi-pencil</v-icon>
+        </v-btn>
         <v-menu
           offset-y
           left
@@ -95,6 +99,19 @@
       </div>
     </v-card-title>
     <v-card-text>
+        <!-- v-model="value.group" -->
+      <active-group-selector
+        class="mt-4"
+        :value="value.group"
+
+        label="Group"
+      />
+      <v-textarea
+        v-model="value.description"
+        label="Description"
+        dense
+        rows="1"
+      />
       <div class="mt-4">
 
         <!-- <v-text-field
@@ -229,6 +246,7 @@
 
 <script>
 import SurveyNameEditor from '@/components/builder/SurveyNameEditor.vue';
+import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 
 export default {
   props: [
@@ -244,6 +262,21 @@ export default {
   ],
   components: {
     SurveyNameEditor,
+    ActiveGroupSelector,
+  },
+  methods: {
+    updateSurveyName(name) {
+      this.$emit('set-survey-name', name);
+      // this.$set(this.value, 'name', name);
+    },
+    updateSurveyGroup({ _id }) {
+      this.$emit('set-survey-group', _id);
+      // this.$set(this.value, 'group', _id);
+    },
+    updateSurveyDescription(description) {
+      this.$emit('set-survey-description', description);
+      // this.$set(this.value, 'description', description);
+    },
   },
 };
 </script>

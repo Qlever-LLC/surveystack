@@ -2,11 +2,13 @@ import api from '@/services/api.service';
 
 import {
   MembershipService,
+  GroupService,
 } from '@/services/storage.service';
 
 const createInitialState = () => ({
   status: MembershipService.getStatus(),
   memberships: MembershipService.getUserMemberships(),
+  activeGroup: GroupService.getActiveGroup(),
 });
 
 const initialState = createInitialState();
@@ -14,6 +16,7 @@ const initialState = createInitialState();
 const getters = {
   status: state => state.status,
   memberships: state => state.memberships,
+  activeGroup: state => state.activeGroup,
 };
 
 const actions = {
@@ -25,7 +28,7 @@ const actions = {
       commit('membership_request');
       console.log('get user membership', userId);
       api
-        .get(`/memberships?user=${userId}`)
+        .get(`/memberships?user=${userId}&populate=1`)
         .then((response) => {
           MembershipService.saveMemberships(response.data);
           commit('membership_success', response.data);
@@ -38,6 +41,15 @@ const actions = {
           reject(error);
         });
     });
+  },
+  setActiveGroup({ commit }, group) {
+    try {
+      GroupService.saveActiveGroup(group);
+      commit('set_active_group', group);
+    } catch (err) {
+      console.log(err);
+      GroupService.clear();
+    }
   },
 };
 
@@ -56,6 +68,9 @@ const mutations = {
     state.status = 'error';
     state.user = {};
     state.header = '';
+  },
+  set_active_group(state, group) {
+    state.activeGroup = group;
   },
 };
 

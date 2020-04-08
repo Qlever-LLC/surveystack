@@ -135,7 +135,9 @@ export default {
           user: this.entity,
         });
         const memberships = await this.$store.dispatch('memberships/getUserMemberships', user._id);
-        console.log(user, memberships);
+        if (memberships && memberships.length > 0 && memberships[0].group) {
+          this.$store.dispatch('memberships/setActiveGroup', memberships[0].group);
+        }
         this.$router.push('/surveys');
       } catch (error) {
         console.log(error.response);

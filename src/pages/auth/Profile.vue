@@ -17,10 +17,16 @@
       >Click to return as '{{$store.state.auth.shapeshiftUser.email}}'</a>
     </app-feedback>
     <h1>Profile</h1>
-    <h4>
+    <p class="mt-4 mb-6">
       You are logged in as
       <strong>{{ user.email }}</strong>.
-    </h4>
+    </p>
+
+    <active-group-selector
+      class="my-4"
+      v-model="activeGroup"
+      outlined
+      />
 
     <div class="d-flex justify-end">
       <v-btn
@@ -38,10 +44,12 @@
 
 <script>
 import appFeedback from '@/components/ui/Feedback.vue';
+import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 
 export default {
   components: {
     appFeedback,
+    ActiveGroupSelector,
   },
   computed: {
     isLoggedIn() {
@@ -52,6 +60,14 @@ export default {
     },
     isShapeshifting() {
       return this.$store.getters['auth/isShapeshifting'];
+    },
+    activeGroup: {
+      get() {
+        return this.$store.getters['memberships/activeGroup'];
+      },
+      set(val) {
+        this.$store.dispatch('memberships/setActiveGroup', val);
+      },
     },
   },
   methods: {

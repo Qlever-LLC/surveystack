@@ -5,6 +5,7 @@ const AUTH_SHAPESHIFT_USER_KEY = 'auth_shapeshift_user';
 const AUTH_SHAPESHIFT_HEADER_KEY = 'auth_shapeshift_header';
 const USER_MEMBERSHIP_KEY = 'user_memberships';
 const USER_MEMBERSHIP_STATUS_KEY = 'user_memberships_status';
+const USER_ACTIVE_GROUP_KEY = 'user_active_group';
 
 const AuthService = {
   getStatus() {
@@ -86,7 +87,20 @@ const MembershipService = {
   },
 };
 
+const GroupService = {
+  saveActiveGroup(group) {
+    localStorage.setItem(USER_ACTIVE_GROUP_KEY, JSON.stringify(group));
+  },
+  getActiveGroup() {
+    return JSON.parse(localStorage.getItem(USER_ACTIVE_GROUP_KEY));
+  },
+  clear() {
+    localStorage.removeItem(USER_ACTIVE_GROUP_KEY);
+  },
+};
+
 export {
   AuthService,
   MembershipService,
+  GroupService,
 };
