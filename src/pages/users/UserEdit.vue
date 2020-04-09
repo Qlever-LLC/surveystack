@@ -4,7 +4,7 @@
     <div
       v-if="hasMembership && groupEntity"
       class="subtitle-1"
-    >... with role <span class="font-weight-bold">User</span> @ <span class="font-weight-bold">{{groupEntity.name}}</span></div>
+    >... with role <span class="font-weight-bold">{{$route.query.role}}</span> @ <span class="font-weight-bold">{{groupEntity.name}}</span></div>
     <v-card class="pa-4 mb-4 mt-2">
 
       <v-form>
@@ -35,6 +35,13 @@
           :hint="passwordHint"
           persistent-hint
         />
+
+        <v-checkbox
+          v-if="hasMembership"
+          v-model="sendMail"
+          label="[NOT_IMPLEMENTED] Also send a welcome email"
+        />
+
         <div class="d-flex mt-2 justify-end">
 
           <v-btn
@@ -81,6 +88,7 @@ export default {
         password: '',
       },
       groupEntity: null,
+      sendMail: false,
     };
   },
   methods: {
