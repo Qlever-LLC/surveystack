@@ -18,14 +18,14 @@ const PATH_PREFIX = process.env.PATH_PREFIX;
 const app = express();
 const frontend = express.static('../our-sci-pwa/dist');
 
-app.use(express.json({ limit: '3mb' }));
+app.use(express.json({ limit: '8mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 // auth
 app.use(async (req, res, next) => {
   let isAuthenticated = false;
-  let isAdmin = false;
+  let isSuperAdmin = false;
   let user = null;
   let roles = [];
   if (req.headers.authorization) {
@@ -36,7 +36,7 @@ app.use(async (req, res, next) => {
     user = await db.collection('users').findOne({ email, token });
     if (user) {
       isAuthenticated = true;
-      isAdmin = user.permissions.includes('admin');
+      isSuperAdmin = user.permissions.includes('super-admin');
     }
 
     if (user) {
@@ -46,7 +46,7 @@ app.use(async (req, res, next) => {
 
   res.locals.auth = {
     isAuthenticated,
-    isAdmin,
+    isSuperAdmin,
     user,
     roles,
   };

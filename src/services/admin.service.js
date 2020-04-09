@@ -24,24 +24,29 @@ const createDefaultAdmin = async () => {
   const token = uuidv4();
 
   const password = getDefaultAdminPasswordHash();
-  const permissions = ['admin'];
+  const permissions = ['super-admin'];
   const authProviders = [];
 
-  const created = await db.collection('users').insertOne({
-    _id,
-    email,
-    name,
-    token,
-    password,
-    permissions,
-    authProviders,
-  });
-  console.log('Created admin', created.ops[0]);
+  try {
+    const created = await db.collection('users').insertOne({
+      _id,
+      email,
+      name,
+      token,
+      password,
+      permissions,
+      authProviders,
+    });
+    console.log('Created admin', created.ops[0]);
+  } catch (error) {
+    console.log(error);
+    console.log('Could not create default super admin');
+  }
 };
 
 export const initAdmins = async () => {
   console.log('initAdmins...');
-  const existingAdmin = await db.collection('users').findOne({ permissions: 'admin' });
+  const existingAdmin = await db.collection('users').findOne({ permissions: 'super-admin' });
   if (!existingAdmin) {
     console.log('There is not a single admin, creating one now...');
     await createDefaultAdmin();

@@ -146,7 +146,7 @@ const updateUser = async (req, res) => {
   const entity = req.body;
   const id = entity._id;
 
-  if (!res.locals.auth.isAdmin && res.locals.auth.user._id != id) {
+  if (!res.locals.auth.isSuperAdmin && res.locals.auth.user._id != id) {
     throw boom.unauthorized(`Not allowed to put user: ${id}`);
   }
 
@@ -156,10 +156,6 @@ const updateUser = async (req, res) => {
   } else {
     entity.password = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS));
   }
-
-  entity.memberships.forEach((membership) => {
-    membership.group = new ObjectId(membership.group);
-  });
 
   try {
     delete entity._id;
