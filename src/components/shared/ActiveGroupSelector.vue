@@ -1,13 +1,14 @@
 <template>
   <div class="survey-group-selector">
     <v-select
-      :value="memberships[0]"
+      :value="value"
       @input="handleInput"
-      :items="memberships"
-      item-text="group.name"
-      item-value="group"
+      :items="groupItems"
+      item-text="text"
+      item-value="value"
       :label="label"
       :outlined="outlined"
+      hide-details
     >
     </v-select>
   </div>
@@ -16,8 +17,32 @@
 <script>
 export default {
   computed: {
-    memberships() {
-      return this.$store.getters['memberships/memberships'];
+    groups() {
+      return this.$store.getters['memberships/groups'];
+    },
+    groupItems() {
+      return this.groups.map(({ name, _id, path }) => {
+        if (this.returnObject) {
+          return {
+            text: name,
+            value: {
+              id: _id,
+              path,
+            },
+          };
+        }
+
+        return {
+          text: name,
+          value: _id,
+        };
+      });
+    },
+    // memberships() {
+    //   return this.$store.getters['memberships/memberships'];
+    // },
+    activeGroup() {
+      return this.$store.getters['memberships/activeGroup'];
     },
   },
   props: {
@@ -26,6 +51,10 @@ export default {
     // surveyGroup: {
     //   type: String,
     // },
+    returnObject: {
+      type: Boolean,
+      default: false,
+    },
     label: {
       type: String,
       default: 'Active Group',
@@ -39,6 +68,10 @@ export default {
     handleInput(val) {
       this.$emit('input', val);
     },
+  },
+  created() {
+    const user = this.$store.getters['auth/user'];
+    this.$store.dispatch('memberships/getUserMemberships', user._id);
   },
 };
 </script>

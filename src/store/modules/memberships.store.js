@@ -17,6 +17,7 @@ const getters = {
   status: state => state.status,
   memberships: state => state.memberships,
   activeGroup: state => state.activeGroup,
+  groups: state => state.memberships.map(membership => membership.group),
 };
 
 const actions = {

@@ -2,6 +2,8 @@
   <v-card>
     <v-card-title class="d-block pb-0">
       <div class="d-flex justify-space-between">
+          <!-- :value="value.name"
+          @input="updateSurveyName" -->
         <survey-name-editor
           style="max-width: 81%;"
           v-model="value.name"
@@ -99,12 +101,13 @@
       </div>
     </v-card-title>
     <v-card-text>
-        <!-- v-model="value.group" -->
+        <!-- :value="value.group"
+        @input="updateSurveyGroup" -->
       <active-group-selector
         class="mt-4"
-        :value="value.group"
-
         label="Group"
+        v-model="value.group"
+        returnObject
       />
       <v-textarea
         v-model="value.description"

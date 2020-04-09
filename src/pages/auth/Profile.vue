@@ -26,7 +26,7 @@
       class="my-4"
       v-model="activeGroup"
       outlined
-      />
+    />
 
     <div class="d-flex justify-end">
       <v-btn

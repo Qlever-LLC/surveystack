@@ -23,14 +23,35 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn
+      <v-menu
+        offset-y
         v-if="$store.getters['auth/isLoggedIn']"
-        :to="{name: 'auth-profile'}"
-        text
+        :close-on-content-click="false"
       >
-        <span class="d-none d-md-inline mr-1">{{$store.getters['auth/user'].email}}</span>
-        <v-icon color="white">mdi-account</v-icon>
-      </v-btn>
+        <template v-slot:activator="{ on }">
+            <!-- :to="{name: 'auth-profile'}" -->
+          <v-btn
+            text
+            v-on="on"
+          >
+            <span class="d-none d-md-inline mr-1">{{$store.getters['auth/user'].email}}</span>
+            <v-icon color="white">mdi-account</v-icon>
+          </v-btn>
+        </template>
+        <v-card>
+          <v-card-text>
+            <!-- <v-list>
+              <v-list-item v-for="group in ">
+              </v-list-item>
+            </v-list> -->
+            <active-group-selector
+              class="my-4"
+              v-model="activeGroup"
+              outlined
+            />
+          </v-card-text>
+        </v-card>
+      </v-menu>
 
       <v-btn
         v-else
@@ -83,7 +104,12 @@
 </template>
 
 <script>
+import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
+
 export default {
+  components: {
+    ActiveGroupSelector,
+  },
   data() {
     return {
       drawer: false,
@@ -210,6 +236,14 @@ export default {
       // items.push(divider);
       // items.push(...this.sidenav.dev);
       return items;
+    },
+    activeGroup: {
+      get() {
+        return this.$store.getters['memberships/activeGroup'];
+      },
+      set(val) {
+        this.$store.dispatch('memberships/setActiveGroup', val);
+      },
     },
   },
 };

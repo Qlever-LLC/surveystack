@@ -37,11 +37,11 @@
             @publish="publish"
             @export-survey="$emit('export-survey')"
             @import-survey="(file) => $emit('import-survey', file)"
-            @set-survey-name="setSurveyName"
-            @set-survey-group="setSurveyGroup"
-            @set-survey-description="setSurveyDescription"
             class="mb-4"
           />
+            <!-- @set-survey-name="setSurveyName"
+            @set-survey-group="setSurveyGroup"
+            @set-survey-description="setSurveyDescription" -->
           <graphical-view
             class="graphical-view"
             v-if="!viewCode"
@@ -562,7 +562,10 @@ export default {
       if (this.isDraft) {
         return false;
       }
-      if (this.initialSurvey.name !== this.survey.name) {
+      if (
+        (this.initialSurvey.name !== this.survey.name)
+        || (this.initialSurvey.description !== this.survey.description)
+      ) {
         return true;
       }
       if (this.surveyUnchanged) {
@@ -703,12 +706,17 @@ export default {
     survey: {
       handler(newVal, oldVal) {
         this.initNavbarAndDirtyFlag(newVal);
+        // debugger;
         if (!this.initialSurvey || !this.survey) {
           this.surveyUnchanged = true;
         }
 
-        const res = isEqual(this.initialSurvey.revisions, newVal.revisions);
-        this.surveyUnchanged = res;
+        const revisionsAreEqual = isEqual(this.initialSurvey.revisions, newVal.revisions);
+        const surveyDetailsAreEquivalent = (this.initialSurvey.name === newVal.name)
+          && isEqual(this.initialSurvey.group, newVal.group)
+          && (this.initialSurvey.description === newVal.description);
+        console.log(surveyDetailsAreEquivalent);
+        this.surveyUnchanged = revisionsAreEqual && surveyDetailsAreEquivalent;
 
         const current = newVal.revisions[newVal.revisions.length - 1];
         if (current.controls.length === 0) {
