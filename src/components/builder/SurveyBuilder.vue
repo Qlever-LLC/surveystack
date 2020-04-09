@@ -37,6 +37,9 @@
             @publish="publish"
             @export-survey="$emit('export-survey')"
             @import-survey="(file) => $emit('import-survey', file)"
+            @set-survey-name="setSurveyName"
+            @set-survey-group="setSurveyGroup"
+            @set-survey-description="setSurveyDescription"
             class="mb-4"
           />
           <graphical-view
@@ -516,6 +519,16 @@ export default {
       return (hasOnlyUniqueNames
         && allNamesContainOnlyValidCharacters
         && groupedQuestionsAreValid) ? true : 'Questions list contains an invalid data name';
+    },
+    setSurveyName(value) {
+      this.$set(this.survey, 'name', value);
+      this.$forceUpdate();
+    },
+    setSurveyGroup(value) {
+      this.$set(this.survey, 'group', value);
+    },
+    setSurveyDescription(value) {
+      this.$set(this.survey, 'description', value);
     },
   },
   computed: {

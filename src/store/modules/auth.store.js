@@ -39,7 +39,7 @@ const actions = {
           api.setHeader('Authorization', header);
 
           commit('auth_success', { user, header });
-          resolve(resp);
+          resolve(resp.data);
         })
         .catch((err) => {
           console.log(err);
