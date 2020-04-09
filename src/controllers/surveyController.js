@@ -13,6 +13,9 @@ const sanitize = (entity) => {
   entity._id = new ObjectId(entity._id);
   entity.dateCreated = new Date(entity.dateCreated);
   entity.dateModified = new Date(entity.dateModified);
+  if (entity.creator) {
+    entity.creator = new ObjectId(entity.creator);
+  }
   entity.revisions.forEach((version) => {
     version.dateCreated = new Date(entity.dateCreated);
   });
@@ -179,6 +182,8 @@ const getSurveyInfo = async (req, res) => {
 
 const createSurvey = async (req, res) => {
   const entity = sanitize(req.body);
+  // add creator to survey
+  entity.creator = res.locals.auth.user._id;
 
   try {
     let r = await db.collection(col).insertOne(entity);
