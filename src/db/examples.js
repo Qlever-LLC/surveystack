@@ -3,13 +3,14 @@ import { ObjectId } from 'mongodb';
 export const exampleSurveys = [
   {
     _id: new ObjectId('5e3038dbea0cf40001aef63b'),
-    name: 'Favorite Colors',
-    dateCreated: new Date('2020-01-28T13:36:13.031Z'),
-    dateModified: new Date('2020-01-28T13:36:13.031Z'),
+    name: 'Favorite Colors 2',
+    dateCreated: new Date('2020-04-09T12:48:20.002Z'),
+    dateModified: new Date('2020-04-09T12:47:42.124Z'),
     latestVersion: 1,
+    specVersion: 1,
     revisions: [
       {
-        dateCreated: new Date('2020-01-28T13:36:13.031Z'),
+        dateCreated: new Date('2020-04-09T12:48:20.002Z'),
         version: 1,
         controls: [
           {
@@ -19,6 +20,7 @@ export const exampleSurveys = [
             options: {
               readOnly: false,
               required: false,
+              redacted: false,
               relevance: {
                 enabled: false,
                 code: '',
@@ -31,7 +33,13 @@ export const exampleSurveys = [
                 enabled: false,
                 code: '',
               },
+              apiCompose: {
+                enabled: false,
+                code: '',
+              },
             },
+            _id: '5e8f19a13a9b2e00010a2460',
+            value: null,
           },
           {
             name: 'personal_group',
@@ -39,34 +47,13 @@ export const exampleSurveys = [
             type: 'group',
             children: [
               {
-                name: 'full_name',
-                label: 'Full Name',
-                type: 'string',
-                options: {
-                  readOnly: false,
-                  required: false,
-                  redacted: true,
-                  relevance: {
-                    enabled: false,
-                    code: '',
-                  },
-                  constraint: {
-                    enabled: false,
-                    code: '',
-                  },
-                  calculate: {
-                    enabled: false,
-                    code: '',
-                  },
-                },
-              },
-              {
                 name: 'age',
-                label: 'Age',
+                label: 'What is your age?',
                 type: 'number',
                 options: {
                   readOnly: false,
                   required: false,
+                  redacted: false,
                   relevance: {
                     enabled: false,
                     code: '',
@@ -79,7 +66,41 @@ export const exampleSurveys = [
                     enabled: false,
                     code: '',
                   },
+                  apiCompose: {
+                    enabled: false,
+                    code: '',
+                  },
                 },
+                _id: '5e8f19f03a9b2e00010a24dd',
+                value: null,
+              },
+              {
+                name: 'full_name',
+                label: 'What is your name?',
+                type: 'string',
+                options: {
+                  readOnly: false,
+                  required: false,
+                  redacted: false,
+                  relevance: {
+                    enabled: false,
+                    code: '',
+                  },
+                  constraint: {
+                    enabled: false,
+                    code: '',
+                  },
+                  calculate: {
+                    enabled: false,
+                    code: '',
+                  },
+                  apiCompose: {
+                    enabled: false,
+                    code: '',
+                  },
+                },
+                _id: '5e8f19e73a9b2e00010a24db',
+                value: null,
               },
             ],
             options: {
@@ -98,11 +119,17 @@ export const exampleSurveys = [
                 enabled: false,
                 code: '',
               },
+              apiCompose: {
+                enabled: false,
+                code: '',
+              },
             },
+            _id: '5e8f19cb3a9b2e00010a2499',
           },
         ],
       },
     ],
+    description: 'One of the funniest surveys.',
   },
 ];
 
