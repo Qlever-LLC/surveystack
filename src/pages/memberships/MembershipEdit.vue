@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <span class="text--secondary overline">{{this.entity._id}}</span>
+    <span class="text--secondary overline">{{entity._id}}</span>
     <h1>{{ editMode ? "Edit Membership" : "Create Membership" }}</h1>
 
     <v-card class="pa-4 mb-4">
@@ -9,20 +9,26 @@
         @keydown.enter.prevent="submit"
       >
         <v-text-field
-          v-model="entity.group.name"
+          v-model="entity.group._id"
           label="Group"
           outlined
-          :disabled="this.editMode"
+          :disabled="editMode"
+          :hint="entity.group.name"
+          persistent-hint
         />
 
         <v-text-field
-          v-model="entity.user.name"
+          class="mt-3"
+          v-model="entity.user._id"
           label="User"
           outlined
-          :disabled="this.editMode"
+          :disabled="editMode"
+          :hint="entity.user.name"
+          persistent-hint
         />
 
         <v-select
+          class="mt-3"
           :items="availableRoles"
           v-model="entity.role"
           label="Role"
@@ -144,9 +150,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.code-editor {
-  height: 77vh;
-}
-</style>
