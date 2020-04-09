@@ -19,7 +19,8 @@ const sanitizeIntegration = (entity) => {
 const getIntegrations = async (req, res) => {
   const { group, type } = req.query;
   const filter = {};
-  const options = { projection: { data: 0 } }; // TODO: find better way to hide secrets
+  //const options = { projection: { 'data.apiKey': 0 } }; // TODO: find better way to hide secrets
+  const options = {}; // TODO: find better way to hide secrets
 
   if (group) {
     filter.group = new ObjectId(group);
