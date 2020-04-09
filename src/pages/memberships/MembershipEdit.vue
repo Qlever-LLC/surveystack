@@ -9,15 +9,17 @@
         @keydown.enter.prevent="submit"
       >
         <v-text-field
-          v-model="entity.group"
+          v-model="entity.group.name"
           label="Group"
           outlined
+          :disabled="this.editMode"
         />
 
         <v-text-field
-          v-model="entity.user"
+          v-model="entity.user.name"
           label="User"
           outlined
+          :disabled="this.editMode"
         />
 
         <v-select
@@ -78,8 +80,8 @@ export default {
       availableRoles,
       entity: {
         _id: '',
-        user: '',
-        group: '',
+        user: { _id: '', name: '' },
+        group: { _id: '', name: '', path: '' },
         role: '',
       },
       integrations: [],
@@ -93,7 +95,9 @@ export default {
       this.entity.content = code;
     },
     async submit() {
-      const data = this.entity;
+      const data = {
+        _id: this.entity._id, user: this.entity.user._id, group: this.entity.group._id, role: this.entity.role,
+      };
       const method = this.editMode ? 'put' : 'post';
       const url = this.editMode ? `/memberships/${this.entity._id}` : '/memberships';
 
@@ -128,7 +132,7 @@ export default {
     if (this.editMode) {
       try {
         const { id } = this.$route.params;
-        const { data } = await api.get(`/memberships/${id}`);
+        const { data } = await api.get(`/memberships/${id}?populate=1`);
         this.entity = { ...this.entity, ...data };
 
         const i = await api.get(`/membership-integrations?membership=${id}`);
