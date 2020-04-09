@@ -120,7 +120,7 @@ export default {
     },
     async submit() {
       const data = {
-        _id: this.entity._id, user: this.entity.user._id, group: this.entity.group._id, role: this.entity.role,
+        _id: this.entity._id, user: this.entity.user.email, group: this.entity.group._id, role: this.entity.role,
       };
       const url = '/memberships';
 
