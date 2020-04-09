@@ -43,8 +43,6 @@ const getIntegrations = async (req, res) => {
     filter.membership = new ObjectId(membership);
   }
 
-  console.log('filter', filter);
-
   const entities = await db
     .collection(col)
     .find(filter)

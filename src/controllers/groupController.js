@@ -4,10 +4,13 @@ import { ObjectId } from 'mongodb';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
+import membershipService from '../services/membership.service';
 
 const col = 'groups';
 
 const sanitizeGroup = (entity) => {
+  entity._id = new ObjectId(entity._id);
+
   if (!entity.slug) {
     throw boom.badRequest(`Group slug not set`);
   }
@@ -100,7 +103,7 @@ const createGroup = async (req, res) => {
   let r;
 
   try {
-    r = await db.collection(col).insertOne({ ...entity, _id: new ObjectId(entity._id) });
+    r = await db.collection(col).insertOne(entity);
     assert.equal(1, r.insertedCount);
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
@@ -110,10 +113,16 @@ const createGroup = async (req, res) => {
   }
 
   // TODO: add admin membership to created group for current user
+  await membershipService.createMembership({
+    user: res.locals.auth.user._id,
+    group: entity._id,
+    role: 'admin',
+  });
 
   return res.send(r);
 };
 
+// TODO: only allow admins to update group
 const updateGroup = async (req, res) => {
   const { id } = req.params;
   const entity = req.body;
@@ -123,8 +132,8 @@ const updateGroup = async (req, res) => {
 
   try {
     let updated = await db.collection(col).findOneAndUpdate(
-      { _id: new ObjectId(id) },
-      { $set: { ...entity, _id: new ObjectId(id) } },
+      { _id: entity._id },
+      { $set: { ...entity } },
       {
         returnOriginal: false,
       }

@@ -75,9 +75,56 @@ const getMemberships = async (req, res) => {
 
 const getMembership = async (req, res) => {
   const { id } = req.params;
+  const filter = {};
 
-  console.log('getMembership', id);
-  const entity = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  if (!id) {
+    throw boom.badRequest(`param not set: id`);
+  }
+
+  filter._id = new ObjectId(id);
+
+  const pipeline = [{ $match: filter }];
+
+  if (populate(req)) {
+    pipeline.push(
+      ...[
+        {
+          $lookup: {
+            from: 'users',
+            let: { userId: '$user' },
+            pipeline: [
+              { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
+              { $project: { name: 1, email: 1 } },
+            ],
+            as: 'user',
+          },
+        },
+        {
+          $unwind: '$user',
+        },
+      ]
+    );
+
+    pipeline.push(
+      ...[
+        {
+          $lookup: {
+            from: 'groups',
+            let: { groupId: '$group' },
+            pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$groupId'] } } }],
+            as: 'group',
+          },
+        },
+        {
+          $unwind: '$group',
+        },
+      ]
+    );
+  }
+  const [entity] = await db
+    .collection(col)
+    .aggregate(pipeline)
+    .toArray();
 
   if (!entity) {
     throw boom.notFound();
