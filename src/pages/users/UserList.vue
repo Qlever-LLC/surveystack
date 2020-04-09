@@ -18,7 +18,7 @@
         <v-list-item :to="`/users/${e._id}`">
           <v-list-item-content>
             <v-list-item-title>{{e.email}}</v-list-item-title>
-            <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle>
+            <v-list-item-subtitle>{{e.name}}</v-list-item-subtitle>
           </v-list-item-content>
           <v-list-item-icon>
             <v-btn
