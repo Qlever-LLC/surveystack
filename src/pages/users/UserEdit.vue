@@ -1,7 +1,11 @@
 <template>
   <v-container>
     <h1>{{ editMode ? "Edit user" : "Create user" }}</h1>
-    <v-card class="pa-4 mb-4">
+    <div
+      v-if="hasMembership && groupEntity"
+      class="subtitle-1"
+    >... with role <span class="font-weight-bold">User</span> @ <span class="font-weight-bold">{{groupEntity.name}}</span></div>
+    <v-card class="pa-4 mb-4 mt-2">
 
       <v-form>
         <v-text-field
@@ -44,26 +48,39 @@
         </div>
       </v-form>
     </v-card>
+    <transition name="fade">
+      <app-feedback
+        v-if="status"
+        class="mt-5"
+        @closed="status = ''"
+      >{{status}}</app-feedback>
+    </transition>
   </v-container>
 </template>
 
 <script>
 import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
+import appFeedback from '@/components/ui/Feedback.vue';
+
 
 export default {
+  components: {
+    appFeedback,
+  },
   data() {
     return {
       editMode: true,
       passwordConfirmation: '',
       showPasswords: false,
+      status: '',
       entity: {
         _id: '',
         email: '',
         name: '',
         password: '',
-        memberships: [],
       },
+      groupEntity: null,
     };
   },
   methods: {
@@ -76,19 +93,27 @@ export default {
       const url = this.editMode ? `/users/${this.entity._id}` : '/users';
 
       if (this.entity.password !== this.passwordConfirmation) {
-        this.$store.dispatch('feedback/add', 'Passwords do not match');
+        this.status = 'Passwords do not match';
         return;
       }
 
       try {
-        await api.customRequest({
+        const { data: newUser } = await api.customRequest({
           method,
           url,
           data,
         });
+
+        // also may want to create membership
+        if (!this.editMode && this.hasMembership) {
+          const { group, role } = this.$route.query;
+          const membership = { user: newUser._id, group, role };
+          await api.post('/memberships', membership);
+        }
         this.$router.back();
       } catch (err) {
         console.log(err);
+        this.status = err.response.data.message;
       }
     },
   },
@@ -99,6 +124,10 @@ export default {
       }
       return '';
     },
+    hasMembership() {
+      const { group, role, email } = this.$route.query;
+      return group && role && email;
+    },
   },
   async created() {
     this.editMode = !this.$route.matched.some(
@@ -106,9 +135,13 @@ export default {
     );
 
     this.entity._id = new ObjectId();
-    const { group, role } = this.$route.query;
-    if (group && role) {
-      this.entity.memberships.push({ group, role });
+
+    if (this.hasMembership) {
+      const { group, email } = this.$route.query;
+      this.entity.email = email;
+
+      const { data: groupEntity } = await api.get(`/groups/${group}`);
+      this.groupEntity = groupEntity;
     }
 
     if (this.editMode) {

@@ -19,10 +19,10 @@
 
         <v-text-field
           class="mt-3"
-          v-model="entity.user._id"
+          v-model="entity.user.email"
           label="User"
           outlined
-          :hint="entity.user.name"
+          placeholder="User e-mail"
           persistent-hint
         />
 
@@ -43,10 +43,41 @@
           <v-btn
             color="primary"
             @click="submit"
+            :disabled="!submittable"
           >Submit</v-btn>
         </div>
       </v-form>
     </v-card>
+
+    <v-dialog
+      v-model="dialogCreateUser"
+      max-width="500"
+    >
+      <v-card class="">
+        <v-card-title>
+          User does not exist yet
+        </v-card-title>
+        <v-card-text class="mt-4">
+          Do you want to proceed to create a new user with email {{this.entity.user.email}}
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            @click.stop="dialogCreateUser = false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            text
+            color="red"
+            @click.stop="proceedToUserCreation"
+          >
+            Proceed
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
   </v-container>
 </template>
@@ -72,11 +103,12 @@ export default {
       availableRoles,
       entity: {
         _id: '',
-        user: { _id: '', name: '' },
+        user: { _id: '', name: '', email: '' },
         group: { _id: '', name: '', path: '' },
         role: 'user',
       },
       integrations: [],
+      dialogCreateUser: false,
     };
   },
   methods: {
@@ -97,11 +129,31 @@ export default {
 
         this.$router.back();
       } catch (err) {
-        console.log(err);
+        if (err.response.status === 404) {
+          this.dialogCreateUser = true;
+        }
       }
     },
+    proceedToUserCreation() {
+      this.$router.replace({
+        name: 'users-new',
+        query: {
+          group: this.entity.group._id,
+          role: this.entity.role,
+          email: this.entity.user.email,
+        },
+      });
+    },
   },
+  computed: {
+    submittable() {
+      if (this.entity.user.email.trim() === '') {
+        return false;
+      }
 
+      return true;
+    },
+  },
   async created() {
     this.entity._id = new ObjectId();
 

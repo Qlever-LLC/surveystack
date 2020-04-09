@@ -146,7 +146,7 @@ export default {
 
         this.$router.back();
       } catch (err) {
-        console.log(err);
+        console.log('err', err);
       }
     },
     async remove() {
