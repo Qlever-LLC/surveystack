@@ -126,18 +126,13 @@ const createUser = async (req, res) => {
     password: hash,
     permissions: [],
     authProviders: [],
-    memberships,
   };
 
   // TODO: only allow admins of group to create memberships
-  user.memberships.forEach((membership) => {
-    membership.group = new ObjectId(membership.group);
-  });
-
   try {
     let r = await db.collection(col).insertOne({ ...user, _id: new ObjectId(entity._id) });
     assert.equal(1, r.insertedCount);
-    return res.send(r);
+    return res.send(r.ops[0]);
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
       return res.status(409).send({ message: `User with _id already exists: ${entity._id}` });

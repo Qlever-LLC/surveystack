@@ -133,9 +133,29 @@ const getMembership = async (req, res) => {
   return res.send(entity);
 };
 
+/**
+ * Create a membership with user: ObjectId | email
+ */
 const createMembership = async (req, res) => {
   const entity = req.body;
-  sanitize(entity);
+
+  // sanitize but treat user as: ObjectId | email
+  entity._id = new ObjectId(entity._id);
+  entity.group = new ObjectId(entity.group);
+  if (ObjectId.isValid(entity.user)) {
+    entity.user = new ObjectId(entity.user);
+  } else {
+    const u = await db.collection('users').findOne({ email: entity.user });
+    if (!u) {
+      throw boom.notFound(`user not found: ${entity.user}`);
+    }
+    entity.user = u._id;
+  }
+
+  const g = await db.collection('groups').findOne({ _id: entity.group });
+  if (!g) {
+    throw boom.badRequest(`Group does not exist: ${entity.group}`);
+  }
 
   try {
     let r = await db.collection(col).insertOne({ ...entity, _id: new ObjectId(entity._id) });
@@ -172,6 +192,7 @@ const updateMembership = async (req, res) => {
 };
 
 const deleteMembership = async (req, res) => {
+  // TODO: also delete associated integrations
   const { id } = req.params;
   try {
     let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });

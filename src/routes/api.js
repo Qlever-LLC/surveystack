@@ -95,7 +95,7 @@ router.delete(
 router.get('/users', catchErrors(userController.getUsers));
 //router.get('/users/by-group/:group', catchErrors(userController.getUsersByGroup));
 router.get('/users/:id', catchErrors(userController.getUser));
-router.post('/users', catchErrors(userController.createUser));
+router.post('/users', [assertNameNotEmpty], catchErrors(userController.createUser));
 router.put(
   '/users/:id',
   [assertIdsMatch, assertEntityExists({ collection: 'users' })],
