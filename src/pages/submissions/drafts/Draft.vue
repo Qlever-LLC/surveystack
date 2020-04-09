@@ -9,6 +9,22 @@
       @submit="submit"
     />
     <div v-else>LOADING...</div>
+    <v-dialog
+      v-model="submitting"
+      hide-overlay
+      persistent
+      width="300"
+    >
+      <v-card>
+        <v-card-text class="pa-4">
+          <span>Submitting</span>
+          <v-progress-linear
+            indeterminate
+            class="mb-0"
+          ></v-progress-linear>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -31,6 +47,7 @@ export default {
       submission: null,
       survey: null,
       loading: false,
+      submitting: false,
     };
   },
   methods: {
@@ -38,12 +55,14 @@ export default {
       db.persistSubmission(submission);
     },
     async submit({ payload }) {
+      this.submitting = true;
       try {
         await api.post('/submissions', payload);
         this.$router.push(`/surveys/${this.survey._id}`);
       } catch (error) {
         console.log(error);
       }
+      this.submitting = false;
     },
   },
   async created() {
