@@ -75,7 +75,7 @@ const createRedactStage = (user, roles) => {
             then: '$$DESCEND',
           },
           // check if user has specific role
-          // e.g. "meta.permissions": ['admin'], "$$ROOT.meta.path": "/oursci/lab/"
+          // e.g. "meta.permissions": ['admin'], "$$ROOT.meta.group.path": "/oursci/lab/"
           // => User needs 'admin@/oursci/lab/' to view
           {
             case: {
@@ -89,7 +89,7 @@ const createRedactStage = (user, roles) => {
                             $map: {
                               input: '$meta.permissions',
                               as: 'role',
-                              in: { $concat: ['$$role', '@', '$$ROOT.meta.path'] },
+                              in: { $concat: ['$$role', '@', '$$ROOT.meta.group.path'] },
                             },
                           },
                         ],
@@ -103,7 +103,7 @@ const createRedactStage = (user, roles) => {
             },
             then: '$$DESCEND',
           },
-          // Assume "meta.permissions": ['admin'] and "$$ROOT.meta.path": "/oursci/lab/testing/"
+          // Assume "meta.permissions": ['admin'] and "$$ROOT.meta.group.path": "/oursci/lab/testing/"
           // => submission_role = "admin@/oursci/lab/testing/"
           // A user role of "admin@/oursci/" can view, since
           // "admin@/oursci/lab/testing" is a regexMatch of "^admin@/oursci/"
@@ -116,7 +116,7 @@ const createRedactStage = (user, roles) => {
                     $map: {
                       input: '$meta.permissions',
                       as: 'role',
-                      in: { $concat: ['$$role', '@', '$$ROOT.meta.path'] },
+                      in: { $concat: ['$$role', '@', '$$ROOT.meta.group.path'] },
                     },
                   },
                   as: 'submission_role',

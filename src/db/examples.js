@@ -146,8 +146,10 @@ export const exampleSubmissions = [
       revision: 3,
       permissions: [], // restrict access to submission, leave empty for now
       creator: new ObjectId('5e6f92f16070e700015e0371'),
-      group: new ObjectId('5e6f8bbeea14550001470c28'),
-      path: '/our-sci/',
+      group: {
+        id: new ObjectId('5e6f8bbeea14550001470c28'),
+        path: '/our-sci/',
+      },
     },
     data: {
       favorite_color: {
@@ -188,8 +190,10 @@ export const exampleSubmissions = [
       revision: 1,
       permissions: [],
       creator: new ObjectId('5e452119c5117c000185f275'),
-      group: new ObjectId('5e6f8bbeea14550001470c28'),
-      path: '/our-sci/',
+      group: {
+        id: new ObjectId('5e6f8bbeea14550001470c28'),
+        path: '/our-sci/',
+      },
     },
     data: {
       favorite_color: {
@@ -230,8 +234,10 @@ export const exampleSubmissions = [
       revision: 1,
       permissions: [],
       creator: new ObjectId('5e452119c5117c000185f275'),
-      group: new ObjectId('5e6f8bbeea14550001470c28'),
-      path: '/our-sci/',
+      group: {
+        id: new ObjectId('5e6f8bbeea14550001470c28'),
+        path: '/our-sci/',
+      },
     },
     data: {
       favorite_color: {
@@ -272,8 +278,10 @@ export const exampleSubmissions = [
       revision: 1,
       permissions: [],
       creator: new ObjectId('5e452119c5117c000185f275'),
-      group: new ObjectId('5e6f8bbeea14550001470c28'),
-      path: '/our-sci/',
+      group: {
+        id: new ObjectId('5e6f8bbeea14550001470c34'),
+        path: '/our-sci/lab/testing/',
+      },
     },
     data: {
       favorite_color: {
