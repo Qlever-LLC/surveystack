@@ -16,7 +16,10 @@
         class="pane pane-survey"
         style="position: relative; overflow: hidden"
       >
-        <div class="pane-fixed-wrapper pr-2" style="position: relative;">
+        <div
+          class="pane-fixed-wrapper pr-2"
+          style="position: relative;"
+        >
           <control-adder @controlAdded="controlAdded" />
           <survey-details
             :version="version"
@@ -497,7 +500,7 @@ export default {
         : 'Survey name is invalid';
     },
     validateSurveyQuestions() {
-      const namePattern = /^[\w-]{4,}$/;
+      const namePattern = /^[\w-]{1,}$/; // one character should be ok, especially within groups
       const currentControls = this.survey.revisions[this.survey.revisions.length - 1].controls;
       const uniqueNames = uniqBy(currentControls, 'name');
       const hasOnlyUniqueNames = uniqueNames.length === currentControls.length;
