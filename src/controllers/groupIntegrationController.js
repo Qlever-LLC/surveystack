@@ -6,10 +6,11 @@ import boom from '@hapi/boom';
 import { db } from '../db';
 
 import { populate } from '../helpers';
+import rolesService from '../services/roles.service';
 
 const col = 'integrations.groups';
 
-const sanitizeIntegration = entity => {
+const sanitizeIntegration = (entity) => {
   entity._id = new ObjectId(entity._id);
   entity.group = new ObjectId(entity.group);
   return true;
@@ -18,6 +19,7 @@ const sanitizeIntegration = entity => {
 const getIntegrations = async (req, res) => {
   const { group, type } = req.query;
   const filter = {};
+  const options = { projection: { data: 0 } }; // TODO: find better way to hide secrets
 
   if (group) {
     filter.group = new ObjectId(group);
@@ -29,7 +31,7 @@ const getIntegrations = async (req, res) => {
 
   const entities = await db
     .collection(col)
-    .find(filter)
+    .find(filter, options)
     .toArray();
   return res.send(entities);
 };
@@ -39,6 +41,10 @@ const getIntegration = async (req, res) => {
 
   let entity;
   entity = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  const access = await rolesService.hasRole(res.locals.auth.user._id, entity.group, 'admin');
+  if (!access) {
+    throw boom.unauthorized();
+  }
 
   return res.send(entity);
 };
@@ -46,6 +52,11 @@ const getIntegration = async (req, res) => {
 const createIntegration = async (req, res) => {
   const entity = req.body;
   sanitizeIntegration(entity);
+
+  const access = await rolesService.hasRole(res.locals.auth.user._id, entity.group, 'admin');
+  if (!access) {
+    throw boom.unauthorized();
+  }
 
   try {
     let r = await db.collection(col).insertOne(entity);
@@ -64,6 +75,11 @@ const updateIntegration = async (req, res) => {
   const entity = req.body;
   const id = entity._id;
   sanitizeIntegration(entity);
+
+  const access = await rolesService.hasRole(res.locals.auth.user._id, entity.group, 'admin');
+  if (!access) {
+    throw boom.unauthorized();
+  }
 
   try {
     delete entity._id;

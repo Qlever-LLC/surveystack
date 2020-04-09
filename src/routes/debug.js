@@ -181,4 +181,10 @@ const getAggregators = async (req, res) => {
 
 router.get('/farmos/aggregators', catchErrors(getAggregators));
 
+router.get('/roles/check', async (req, res) => {
+  const { user, group, role } = req.query;
+  const ret = await rolesService.hasRole(user, group, role);
+  return res.send(ret);
+});
+
 export default router;
