@@ -841,7 +841,7 @@ export default {
 }
 
 .main-code-editor {
-  min-height: 80vw;
+  min-height: 20vw;
   width: 100%;
   min-width: 100%;
   max-width: 100%;
@@ -850,8 +850,8 @@ export default {
 
 .console-log {
   width: 100%;
-  height: 10vh;
-  min-height: 5vh;
+  height: 20vw;
+  min-height: 10vh;
   flex-grow: 1;
 }
 
