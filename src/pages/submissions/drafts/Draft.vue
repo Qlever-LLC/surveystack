@@ -31,7 +31,6 @@
       :items="resultItems"
       title="Result of Submission"
     />
-
   </div>
 
 </template>

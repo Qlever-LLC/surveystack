@@ -217,6 +217,7 @@ import api from '@/services/api.service';
 
 
 import * as utils from '@/utils/surveys';
+import { defaultApiCompose } from '@/utils/apiCompose';
 
 import submissionUtils from '@/utils/submissions';
 
@@ -408,7 +409,13 @@ export default {
 
       console.log('options', this.control.options);
       if (!this.control.options[tab].code) {
-        const initalCode = initialRelevanceCode(tab);
+        let initalCode;
+        if (tab === 'apiCompose') {
+          initalCode = defaultApiCompose();
+        } else {
+          initalCode = initialRelevanceCode(tab);
+        }
+
         this.control.options[tab].code = initalCode;
         this.activeCode = initalCode;
       } else {

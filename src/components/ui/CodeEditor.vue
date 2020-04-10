@@ -49,10 +49,15 @@
           class="mr-4"
           @click="$emit('save', model.getValue())"
         >mdi-content-save</v-icon>
-        <v-icon
+        <v-btn
+          class="mr-2"
+          outlined
+          color="white"
           v-if="runnable"
           @click="$emit('run', model.getValue())"
-        >mdi-play</v-icon>
+        >
+          <v-icon left>mdi-play</v-icon> Run
+        </v-btn>
         <v-icon @click="$emit('close')">mdi-close-circle-outline</v-icon>
       </v-card-title>
       <div
