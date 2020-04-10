@@ -398,6 +398,9 @@ export default {
       });
     },
     highlight(tab, select = true) {
+      this.codeError = null;
+      this.evaluated = null;
+
       this.hideCode = false;
 
       if (this.control.options[tab] && !this.control.options[tab].enabled) {
@@ -410,8 +413,9 @@ export default {
       console.log('options', this.control.options);
       if (!this.control.options[tab].code) {
         let initalCode;
+        console.log('tab is', tab);
         if (tab === 'apiCompose') {
-          initalCode = defaultApiCompose();
+          initalCode = defaultApiCompose;
         } else {
           initalCode = initialRelevanceCode(tab);
         }

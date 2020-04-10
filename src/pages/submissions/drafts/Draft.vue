@@ -25,7 +25,14 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+
+    <result-dialog
+      v-model="showResult"
+      :items="resultItems"
+      title="Result of Submission"
+    />
   </div>
+
 </template>
 
 
@@ -34,13 +41,18 @@ import api from '@/services/api.service';
 import appMixin from '@/components/mixin/appComponent.mixin';
 import * as db from '@/store/db';
 import * as utils from '@/utils/surveys';
+import resultMixin from '@/components/ui/ResultsMixin';
+
 
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
+import resultDialog from '@/components/ui/ResultDialog.vue';
+
 
 export default {
-  mixins: [appMixin],
+  mixins: [appMixin, resultMixin],
   components: {
     appDraftComponent,
+    resultDialog,
   },
   data() {
     return {
@@ -57,9 +69,14 @@ export default {
     async submit({ payload }) {
       this.submitting = true;
       try {
-        await api.post('/submissions', payload);
-        this.$router.push(`/surveys/${this.survey._id}`);
+        console.log('submitting', payload);
+        const response = await api.post('/submissions', payload);
+        // this.$router.push(`/surveys/${this.survey._id}`);
+        this.result(response);
       } catch (error) {
+        console.log('error', error);
+        const { message } = error.response.data;
+        this.snack(message);
         console.log(error);
       }
       this.submitting = false;
