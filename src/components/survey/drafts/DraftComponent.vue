@@ -112,6 +112,12 @@
       @prev="handlePrevious"
       @submit="handleNext"
     />
+
+    <error-dialog
+      v-model="showApiComposeErrors"
+      :errors="apiComposeErrors"
+      title="API Compose Errors"
+    />
   </div>
 </template>
 
@@ -125,6 +131,8 @@ import draftOverview from '@/components/survey/drafts/DraftOverview.vue';
 import draftFooter from '@/components/survey/drafts/DraftFooter.vue';
 import draftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 import draftTitle from '@/components/survey/drafts/DraftTitle.vue';
+
+import errorDialog from '@/components/ui/Errors.vue';
 
 
 import appMixin from '@/components/mixin/appComponent.mixin';
@@ -155,6 +163,7 @@ export default {
     draftFooter,
     draftToolbar,
     draftTitle,
+    errorDialog,
   },
   data() {
     return {
@@ -165,6 +174,8 @@ export default {
       value: null,
       showOverview: false,
       slide: 'slide-in',
+      apiComposeErrors: [],
+      showApiComposeErrors: false,
     };
   },
   computed: {
@@ -297,13 +308,24 @@ export default {
       // eslint-disable-next-line no-constant-condition
       while (true) {
         if (this.atEnd) {
-          // eslint-disable-next-line no-await-in-loop
+          // eslint-disable-next-lineno-await-in-loop
           try {
             // eslint-disable-next-line no-await-in-loop
-            await this.calculateApiCompose();
+            const r = await this.calculateApiCompose();
+            const errors = r.filter(result => result.error !== undefined);
+            console.log('results with erors', errors);
+            if (errors.length > 0) {
+              this.apiComposeErrors = errors.map(e => ({
+                title: e.control.name,
+                body: e.error,
+              }));
+              this.showApiComposeErrors = true;
+              return;
+            }
           } catch (error) {
-            console.log('error on apiCompose');
+            console.log('error on apiCompose', error);
             // TODO show what's wrong
+            return;
           }
 
           this.submit(this.submission);

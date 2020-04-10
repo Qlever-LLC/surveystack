@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import * as utils from './surveys';
 import submissionUtils from './submissions';
 
@@ -31,16 +32,31 @@ async function calculateField(survey, submission, positions, controls, option, f
 
   const evaluated = [];
 
-  const res = await Promise.all(promises);
-  res.forEach((item) => {
-    const field = submissionUtils.getSubmissionField(submission, survey, item.pos);
-    const evaluatedItem = {
-      field,
-      res: item.res,
-    };
+  let idx = 0;
+  // eslint-disable-next-line no-restricted-syntax
+  for (const promise of promises) {
+    const item = items[idx];
 
-    evaluated.push(evaluatedItem);
-  });
+    try {
+      const res = await promise;
+      const field = submissionUtils.getSubmissionField(submission, survey, item.pos);
+      const evaluatedItem = {
+        control: item.control,
+        field,
+        res,
+      };
+      evaluated.push(evaluatedItem);
+    } catch (error) {
+      const field = submissionUtils.getSubmissionField(submission, survey, item.pos);
+      const evaluatedItem = {
+        control: item.control,
+        field,
+        error,
+      };
+      evaluated.push(evaluatedItem);
+    }
+    idx++;
+  }
 
 
   return evaluated;
@@ -71,4 +87,5 @@ export const calculateApiCompose = async (survey, submission, positions, control
     // eslint-disable-next-line no-param-reassign
     item.field.meta.apiCompose = item.res;
   });
+  return r;
 };

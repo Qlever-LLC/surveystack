@@ -36,6 +36,10 @@ onmessage = (e) => {
     postMessage({ res });
   } catch (error) {
     console.log(error);
-    postMessage({ error: error.message });
+    if (error.message) {
+      postMessage({ error: error.message });
+    } else {
+      postMessage({ error });
+    }
   }
 };
