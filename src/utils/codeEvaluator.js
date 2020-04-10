@@ -43,7 +43,7 @@ async function calculateField(survey, submission, positions, controls, option, f
       const evaluatedItem = {
         control: item.control,
         field,
-        res,
+        res: res.res,
       };
       evaluated.push(evaluatedItem);
     } catch (error) {
@@ -57,7 +57,6 @@ async function calculateField(survey, submission, positions, controls, option, f
     }
     idx++;
   }
-
 
   return evaluated;
 }
@@ -81,6 +80,7 @@ export const calculateRelevance = async (survey, submission, positions, controls
 export const calculateApiCompose = async (survey, submission, positions, controls) => {
   const r = await calculateField(survey, submission, positions, controls, 'apiCompose', 'apiCompose');
   r.forEach((item) => {
+    console.log('item', item);
     if (typeof item.res !== 'object') {
       console.log('error, result is rejected', item.res);
     }

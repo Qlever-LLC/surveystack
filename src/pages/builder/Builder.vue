@@ -72,6 +72,12 @@
       </v-card>
     </v-dialog>
 
+    <result-dialog
+      v-model="showResult"
+      :items="resultItems"
+      title="Result of Submission"
+    />
+
     <v-snackbar
       v-model="showSnackbar"
       :timeout="4000"
@@ -96,6 +102,8 @@ import * as constants from '@/constants';
 
 import appDialog from '@/components/ui/Dialog.vue';
 import SurveyBuilder from '@/components/builder/SurveyBuilder.vue';
+import resultDialog from '@/components/ui/ResultDialog.vue';
+import resultMixin from '@/components/ui/ResultsMixin';
 
 
 const currentDate = moment().toISOString(true);
@@ -119,7 +127,11 @@ export default {
   components: {
     SurveyBuilder,
     appDialog,
+    resultDialog,
   },
+  mixins: [
+    resultMixin,
+  ],
   data() {
     return {
       editMode: true,
@@ -167,7 +179,7 @@ export default {
         console.log('submitting', payload);
         const response = await api.post('/submissions', payload);
         // this.$router.push(`/surveys/${this.survey._id}`);
-        this.showResult(response);
+        this.result(response);
       } catch (error) {
         console.log('error', error);
         const { message } = error.response.data;
@@ -267,18 +279,6 @@ export default {
       }
       this.sessionId = new ObjectId().toString();
       this.loading = false;
-    },
-    showResult(response) {
-      console.log('response', response);
-      const messages = [];
-      if (response.data.farmos) {
-        response.data.farmos.forEach((farmos) => {
-          messages.push({
-            title: farmos.title,
-            body: farmos.body,
-          });
-        });
-      }
     },
   },
   async created() {
