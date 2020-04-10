@@ -8,7 +8,8 @@ async function aggregatorRequest(
   endpoint,
   method,
   body,
-  instanceIdQuery
+  instanceIdQuery,
+  idQuery
 ) {
   const agentOptions = {
     host: aggregatorURL,
@@ -25,6 +26,10 @@ async function aggregatorRequest(
 
   if (instanceIdQuery) {
     url += '&data=' + encodeURIComponent(instanceIdQuery);
+  }
+
+  if (idQuery) {
+    url += '&id=' + encodeURIComponent(idQuery);
   }
 
   const config = {

@@ -42,7 +42,16 @@ async function ensureTerm(name, machine, info, availableTerms, farmUrl, cred) {
   }
 }
 
-async function log(apiCompose, info, availableTerms, user, credentials, submission) {
+
+async function log(
+  apiCompose,
+  info,
+  availableTerms,
+  user,
+  credentials,
+  submission,
+  currentAssetId
+) {
   const results = [];
   const farmUrl = apiCompose.url;
 
@@ -75,6 +84,10 @@ async function log(apiCompose, info, availableTerms, user, credentials, submissi
     const id = termMap[sym];
     bodyString = bodyString.replace(sym, id);
   });
+
+  if (currentAssetId) {
+    bodyString = bodyString.replace('$PLANTING', currentAssetId);
+  }
 
   console.log('substituted string', bodyString);
 

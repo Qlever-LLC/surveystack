@@ -75,8 +75,44 @@ function allowed(farmUrl, user) {
   return true;
 }
 
-async function flushlogs(farmUrl, user, submission) {
-  //  TODO
+async function flushlogs(farmUrl, credentials, user, id) {
+  if (!allowed(farmUrl, user)) {
+    throw boom.unauthorized('No Access to farm');
+  }
+
+  const cred = credentials.find((c) => c.url === farmUrl);
+  if (!cred) {
+    return [];
+  }
+
+  const results = [];
+  const logs = await aggregatorRequest(
+    cred.aggregatorURL,
+    cred.aggregatorApiKey,
+    farmUrl,
+    'logs',
+    'get',
+    undefined,
+    id
+  );
+
+  for (const l of logs) {
+    console.log('deleting log', l);
+    const r = await aggregatorRequest(
+      cred.aggregatorURL,
+      cred.aggregatorApiKey,
+      farmUrl,
+      'logs',
+      'delete',
+      undefined,
+      undefined,
+      l.id
+    );
+
+    r[0].message = 'deleted log: ' + l.id;
+    results.push(r[0]);
+  }
+  return results;
 }
 
 async function fetchTerms(farmUrl, credentials, user) {
@@ -98,7 +134,7 @@ async function fetchTerms(farmUrl, credentials, user) {
   );
 }
 
-async function execute(apiCompose, info, terms, user, submission) {
+async function execute(apiCompose, info, terms, user, submission, currentAssetId) {
   const url = apiCompose.url;
   const type = apiCompose.farmosType;
 
@@ -111,7 +147,7 @@ async function execute(apiCompose, info, terms, user, submission) {
   if (type === 'planting') {
     return await planting(apiCompose, info, terms, user, credentials, submission);
   } else if (type === 'log') {
-    return await log(apiCompose, info, terms, user, credentials, submission);
+    return await log(apiCompose, info, terms, user, credentials, submission, currentAssetId);
     // TODO create log
     // TODO check all terms, create if not existing
     // TODO replace terms in body
@@ -159,13 +195,15 @@ export const handle = async (res, submission, survey, user) => {
 
   const results = [];
 
-  const runSingle = async (apiCompose, info, terms) => {
+  const runSingle = async (apiCompose, info, terms, currentAssetId) => {
     try {
-      const r = await execute(apiCompose, info, terms, user, submission);
+      const r = await execute(apiCompose, info, terms, user, submission, currentAssetId);
       if (Array.isArray(r)) {
         results.push(...r);
+        return r;
       } else {
         results.push(r);
+        return [r];
       }
     } catch (error) {
       console.log('error in run single', error.message);
@@ -173,6 +211,7 @@ export const handle = async (res, submission, survey, user) => {
         status: 'error',
         error,
       });
+      return null;
     }
   };
 
@@ -209,14 +248,26 @@ export const handle = async (res, submission, survey, user) => {
   for (const f of distinctFarms) {
     const terms = await fetchTerms(f, credentials, user);
     termMap[f] = terms;
+    const flushed = await flushlogs(f, credentials, user, submission._id, results);
+    results.push(...flushed);
   }
 
+  let currentAssetId = null;
   for (const compose of farmOsCompose) {
-    await runSingle(
+    const r = await runSingle(
       compose,
       info.find((farm) => farm.url === compose.url),
-      termMap[compose.url]
+      termMap[compose.url],
+      currentAssetId
     );
+
+    if (r) {
+      r.forEach((item) => {
+        if (item.resource === 'farm_asset') {
+          currentAssetId = item.id;
+        }
+      });
+    }
   }
 
   console.log('results', results);
