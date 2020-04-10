@@ -2,16 +2,40 @@
   <v-card>
     <v-card-title class="d-block pb-0">
       <div class="d-flex justify-space-between">
-          <!-- :value="value.name"
-          @input="updateSurveyName" -->
         <survey-name-editor
           style="max-width: 81%;"
           v-model="value.name"
         />
         <v-spacer />
-        <v-btn icon>
-          <v-icon>mdi-pencil</v-icon>
-        </v-btn>
+        <v-dialog width="500" max-width="75%">
+          <template v-slot:activator="{ on }">
+            <v-btn icon v-on="on">
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+          </template>
+          <v-card>
+            <v-card-title>
+              Edit Survey Details
+            </v-card-title>
+            <v-card-text>
+              <active-group-selector
+                class="mt-4"
+                label="Group"
+                v-model="value.group"
+                outlined
+                returnObject
+              />
+              <v-textarea
+                v-model="value.description"
+                label="Description"
+                class="mt-4"
+                rows="2"
+                outlined
+              />
+            </v-card-text>
+            <v-card-actions />
+          </v-card>
+        </v-dialog>
         <v-menu
           offset-y
           left
@@ -101,30 +125,16 @@
       </div>
     </v-card-title>
     <v-card-text>
-        <!-- :value="value.group"
-        @input="updateSurveyGroup" -->
-      <active-group-selector
-        class="mt-4"
-        label="Group"
-        v-model="value.group"
-        returnObject
-      />
-      <v-textarea
-        v-model="value.description"
-        label="Description"
-        dense
-        rows="1"
-      />
       <div class="mt-4">
-
-        <!-- <v-text-field
-          outlined
-          dense
-          v-model="value._id"
-          label="id"
+        <v-text-field
+          :value="surveyGroupName"
+          label="Group"
+          readonly
           disabled
-        /> -->
-
+          dense
+          hide-details
+          class="mb-2 survey-group-name-input"
+        />
         <div class="d-flex flex-wrap justify-end align-center">
           <!-- <v-btn
             class="my-1 mr-1"
@@ -263,6 +273,14 @@ export default {
     'version',
     'validationErrors',
   ],
+  computed: {
+    surveyGroupName() {
+      const id = this.$store.getters['memberships/activeGroup'];
+      const groups = this.$store.getters['memberships/groups'];
+      const { name } = groups.find(({ _id }) => id === _id);
+      return name;
+    },
+  },
   components: {
     SurveyNameEditor,
     ActiveGroupSelector,
@@ -291,5 +309,15 @@ export default {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.survey-group-name-input >>> .v-input__slot ::before {
+  border: none;
+}
+.survey-group-name-input >>> .theme--light.v-text-field.v-input--is-disabled > .v-input__control > .v-input__slot:before {
+  border: none;
+}
+.survey-group-name-input >>> .v-input__control >>> .v-input__slot ::before {
+  border: none;
 }
 </style>
