@@ -14,6 +14,10 @@ export default {
 
       if (response.data.farmos) {
         response.data.farmos.forEach((farmos) => {
+          if (!farmos) {
+            return;
+          }
+
           if (farmos.status === 'error') {
             this.resultItems.push({
               title: 'Error submitting to FarmOS',
@@ -24,7 +28,7 @@ export default {
           } else {
             this.resultItems.push({
               title: 'FarmOS success:',
-              body: farmos.uri,
+              body: farmos.uri || farmos.message,
             });
           }
         });

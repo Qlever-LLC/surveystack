@@ -398,6 +398,9 @@ export default {
       });
     },
     highlight(tab, select = true) {
+      this.codeError = null;
+      this.evaluated = null;
+
       this.hideCode = false;
 
       if (this.control.options[tab] && !this.control.options[tab].enabled) {
@@ -410,8 +413,9 @@ export default {
       console.log('options', this.control.options);
       if (!this.control.options[tab].code) {
         let initalCode;
+        console.log('tab is', tab);
         if (tab === 'apiCompose') {
-          initalCode = defaultApiCompose();
+          initalCode = defaultApiCompose;
         } else {
           initalCode = initialRelevanceCode(tab);
         }
@@ -837,7 +841,7 @@ export default {
 }
 
 .main-code-editor {
-  min-height: 20vw;
+  min-height: 80vw;
   width: 100%;
   min-width: 100%;
   max-width: 100%;
@@ -846,8 +850,8 @@ export default {
 
 .console-log {
   width: 100%;
-  height: 20vw;
-  min-height: 10vh;
+  height: 10vh;
+  min-height: 5vh;
   flex-grow: 1;
 }
 
