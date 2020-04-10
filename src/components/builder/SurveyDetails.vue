@@ -275,7 +275,7 @@ export default {
   ],
   computed: {
     surveyGroupName() {
-      const id = this.$store.getters['memberships/activeGroup'];
+      const { id } = this.value.group;
       const groups = this.$store.getters['memberships/groups'];
       const { name } = groups.find(({ _id }) => id === _id);
       return name;
