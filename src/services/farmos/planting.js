@@ -75,7 +75,7 @@ async function createOrUpdate(farmUrl, cred, instanceId, endpoint, body) {
 }
 
 async function planting(apiCompose, info, terms, user, credentials, submission) {
-  const { farmUrl } = apiCompose.body;
+  const farmUrl = apiCompose.url;
 
   const cred = credentials.find((c) => c.url === farmUrl);
   if (!cred) {
@@ -130,7 +130,7 @@ async function planting(apiCompose, info, terms, user, credentials, submission) 
       instanceId
     );
     const r = await createOrUpdate(farmUrl, cred, instanceId, 'assets', body);
-    results.push(r);
+    results.push(r[0]);
     plantingId = r[0].id;
 
     if (!plantingId) {
@@ -153,7 +153,7 @@ async function planting(apiCompose, info, terms, user, credentials, submission) 
     );
 
     const r = await createOrUpdate(farmUrl, cred, instanceId, 'logs', body);
-    results.push(r);
+    results.push(r[0]);
   }
 
   return results;
