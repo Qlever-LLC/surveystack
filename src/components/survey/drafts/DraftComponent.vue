@@ -286,13 +286,26 @@ export default {
       this.showNav(true);
       this.showNext(true);
       await this.calculateRelevance();
-      await this.calculateApiCompose();
+
+      try {
+        await this.calculateApiCompose();
+      } catch (error) {
+        // ignore during running
+      }
 
 
       // eslint-disable-next-line no-constant-condition
       while (true) {
         if (this.atEnd) {
           // eslint-disable-next-line no-await-in-loop
+          try {
+            // eslint-disable-next-line no-await-in-loop
+            await this.calculateApiCompose();
+          } catch (error) {
+            console.log('error on apiCompose');
+            // TODO show what's wrong
+          }
+
           this.submit(this.submission);
           return;
         }

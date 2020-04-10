@@ -144,11 +144,11 @@ export default {
     async submitSubmission({ payload }) {
       try {
         console.log('submitting', payload);
-        await api.post('/submissions', payload);
+        const response = await api.post('/submissions', payload);
         // this.$router.push(`/surveys/${this.survey._id}`);
-        const message = 'Submitted';
-        this.snack(message);
+        this.showResult(response);
       } catch (error) {
+        console.log('error', error);
         const { message } = error.response.data;
         this.snack(message);
         console.log(error);
@@ -245,6 +245,18 @@ export default {
       }
       this.sessionId = new ObjectId().toString();
       this.loading = false;
+    },
+    showResult(response) {
+      console.log('response', response);
+      const messages = [];
+      if (response.data.farmos) {
+        response.data.farmos.forEach((farmos) => {
+          messages.push({
+            title: farmos.title,
+            body: farmos.body,
+          });
+        });
+      }
     },
   },
   async created() {

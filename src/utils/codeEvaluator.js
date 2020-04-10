@@ -30,33 +30,35 @@ async function calculateField(survey, submission, positions, controls, option, f
 
 
   const evaluated = [];
-  try {
-    const res = await Promise.all(promises);
-    res.forEach((item) => {
-      const field = submissionUtils.getSubmissionField(submission, survey, item.pos);
-      const evaluatedItem = {
-        field,
-        res: item.res,
-      };
 
-      evaluated.push(evaluatedItem);
-    });
-  } catch (error) {
-    console.log(error);
-  }
+  const res = await Promise.all(promises);
+  res.forEach((item) => {
+    const field = submissionUtils.getSubmissionField(submission, survey, item.pos);
+    const evaluatedItem = {
+      field,
+      res: item.res,
+    };
+
+    evaluated.push(evaluatedItem);
+  });
+
 
   return evaluated;
 }
 
 export const calculateRelevance = async (survey, submission, positions, controls) => {
-  const r = await calculateField(survey, submission, positions, controls, 'relevance', 'relevance');
-  r.forEach((item) => {
-    if (typeof item.res !== 'boolean') {
-      console.log('error, result is rejected', item.res);
-    }
-    // eslint-disable-next-line no-param-reassign
-    item.field.meta.relevant = item.res;
-  });
+  try {
+    const r = await calculateField(survey, submission, positions, controls, 'relevance', 'relevance');
+    r.forEach((item) => {
+      if (typeof item.res !== 'boolean') {
+        console.log('error, result is rejected', item.res);
+      }
+      // eslint-disable-next-line no-param-reassign
+      item.field.meta.relevant = item.res;
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 
