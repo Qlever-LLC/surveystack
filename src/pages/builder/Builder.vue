@@ -89,31 +89,13 @@
 
 <script>
 import ObjectId from 'bson-objectid';
-import _ from 'lodash';
 import moment from 'moment';
 import api from '@/services/api.service';
-import * as constants from '@/constants';
 
 import appDialog from '@/components/ui/Dialog.vue';
 import SurveyBuilder from '@/components/builder/SurveyBuilder.vue';
 
-
-const currentDate = moment().toISOString(true);
-const emptySurvey = {
-  _id: '',
-  name: '',
-  dateCreated: currentDate,
-  dateModified: currentDate,
-  latestVersion: 1,
-  specVersion: constants.SPEC_VERSION_SURVEY,
-  revisions: [
-    {
-      dateCreated: currentDate,
-      version: 1,
-      controls: [],
-    },
-  ],
-};
+import { createSurvey } from '@/utils/surveys';
 
 export default {
   components: {
@@ -127,7 +109,9 @@ export default {
       sessionId: new ObjectId().toString(),
       loading: false,
       instance: {},
-      survey: _.cloneDeep(emptySurvey),
+      survey: createSurvey({
+        group: this.getActiveGroupSimpleObject(),
+      }),
       showSnackbar: false,
       snackbarMessage: '',
       showDeleteModal: false,
@@ -138,6 +122,15 @@ export default {
     };
   },
   methods: {
+    getActiveGroupSimpleObject() {
+      const id = this.$store.getters['memberships/activeGroup'];
+      const groups = this.$store.getters['memberships/groups'];
+      const { path } = groups.find(({ _id }) => _id === id);
+      return {
+        id,
+        path,
+      };
+    },
     navigateToLogin() {
       this.$router.push('/auth/login');
     },

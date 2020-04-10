@@ -27,7 +27,6 @@ const actions = {
   getUserMemberships({ commit }, userId) {
     return new Promise((resolve, reject) => {
       commit('membership_request');
-      console.log('get user membership', userId);
       api
         .get(`/memberships?user=${userId}&populate=1`)
         .then((response) => {

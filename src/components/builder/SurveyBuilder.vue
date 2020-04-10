@@ -39,9 +39,6 @@
             @import-survey="(file) => $emit('import-survey', file)"
             class="mb-4"
           />
-            <!-- @set-survey-name="setSurveyName"
-            @set-survey-group="setSurveyGroup"
-            @set-survey-description="setSurveyDescription" -->
           <graphical-view
             class="graphical-view"
             v-if="!viewCode"
@@ -491,8 +488,7 @@ export default {
       this.control.options.params = params;
     },
     validateSurveyName() {
-      // TODO: disallow special characters?
-      return !!this.survey.name && /^[\w-\s]{4,}$/.test(this.survey.name)
+      return !!this.survey.name && /^[\w-\s]{5,}$/.test(this.survey.name)
         ? true
         : 'Survey name is invalid';
     },

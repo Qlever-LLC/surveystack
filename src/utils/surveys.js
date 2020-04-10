@@ -4,8 +4,10 @@
 
 
 import { unflatten } from 'flat';
-import _ from 'lodash';
+import { clone } from 'lodash';
+import moment from 'moment';
 import submissionUtils from './submissions';
+import { SPEC_VERSION_SURVEY } from '@/constants';
 
 
 function* processSurveyNames(data) {
@@ -412,13 +414,13 @@ export const calculateControl = (control) => {
 
 
 const firstParentWithRelevance = (submission, survey, index, positions) => {
-  const pos = _.clone(positions[index]);
+  const pos = clone(positions[index]);
   const len = pos.length - 1;
   const parts = [];
-  parts.push(_.clone(pos));
+  parts.push(clone(pos));
   for (let i = 0; i < len; i++) { // swim to the top
     pos.splice(-1, 1);
-    parts.push(_.clone(pos));
+    parts.push(clone(pos));
   }
   parts.reverse();
   const relevantParent = parts.find((p) => {
@@ -756,4 +758,33 @@ export function getGroups(controls) {
   }
 
   return controls.reduce(reducer, []);
+}
+
+/**
+ * Creates initial survey definition object
+ * @param {object} options configuration object
+ * @param {object} options.group
+ * @param {object} options.group.id group id
+ * @param {object} options.group.path group path
+ * @param {number} options.specVersion specification version for survey definition
+ */
+export function createSurvey({
+  group = null,
+  specVersion = SPEC_VERSION_SURVEY,
+}) {
+  const currentDate = moment().toISOString(true);
+  return {
+    _id: '',
+    name: '',
+    dateCreated: currentDate,
+    dateModified: currentDate,
+    latestVersion: 1,
+    group,
+    specVersion,
+    revisions: [{
+      dateCreated: currentDate,
+      version: 1,
+      controls: [],
+    }],
+  };
 }
