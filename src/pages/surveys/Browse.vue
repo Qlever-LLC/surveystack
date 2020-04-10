@@ -6,6 +6,7 @@
       append-icon="mdi-magnify"
     />
     <div class="d-flex justify-end"><small class="text--secondary">{{surveys.pagination.total}} results</small></div>
+    <h1>Active Group here</h1>
     <v-card>
       <div
         v-for="e in surveys.content"
@@ -23,6 +24,13 @@
         <v-divider />
       </div>
     </v-card>
+    <v-row>
+      <v-spacer />
+      <v-btn
+        outlined
+        class="ma-8"
+      >Show Others</v-btn>
+    </v-row>
   </v-container>
 </template>
 
@@ -50,6 +58,7 @@ export default {
   },
   methods: {
     async fetchData() {
+      //  TODO create two lists, filter by active group and others
       try {
         const { data } = await api.get(`/surveys/page?q=${this.search}`);
         this.surveys = data;

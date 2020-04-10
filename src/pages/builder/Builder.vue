@@ -72,6 +72,12 @@
       </v-card>
     </v-dialog>
 
+    <result-dialog
+      v-model="showResult"
+      :items="resultItems"
+      title="Result of Submission"
+    />
+
     <v-snackbar
       v-model="showSnackbar"
       :timeout="4000"
@@ -94,6 +100,8 @@ import api from '@/services/api.service';
 
 import appDialog from '@/components/ui/Dialog.vue';
 import SurveyBuilder from '@/components/builder/SurveyBuilder.vue';
+import resultDialog from '@/components/ui/ResultDialog.vue';
+import resultMixin from '@/components/ui/ResultsMixin';
 
 import { createSurvey } from '@/utils/surveys';
 
@@ -101,7 +109,11 @@ export default {
   components: {
     SurveyBuilder,
     appDialog,
+    resultDialog,
   },
+  mixins: [
+    resultMixin,
+  ],
   data() {
     return {
       editMode: true,
@@ -158,11 +170,11 @@ export default {
       this.submitting = true;
       try {
         console.log('submitting', payload);
-        await api.post('/submissions', payload);
+        const response = await api.post('/submissions', payload);
         // this.$router.push(`/surveys/${this.survey._id}`);
-        const message = 'Submitted';
-        this.snack(message);
+        this.result(response);
       } catch (error) {
+        console.log('error', error);
         const { message } = error.response.data;
         this.snack(message);
         console.log(error);

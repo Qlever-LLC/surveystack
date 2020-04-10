@@ -374,6 +374,7 @@ export function execute({
     let counter = 0;
 
     worker.onmessage = (m) => {
+      console.log('message from worker', m);
       if (m.data.res !== undefined) {
         clearTimeout(timeout);
         worker.terminate();

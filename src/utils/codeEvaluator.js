@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import * as utils from './surveys';
 import submissionUtils from './submissions';
 
@@ -30,43 +31,61 @@ async function calculateField(survey, submission, positions, controls, option, f
 
 
   const evaluated = [];
-  try {
-    const res = await Promise.all(promises);
-    res.forEach((item) => {
+
+  let idx = 0;
+  // eslint-disable-next-line no-restricted-syntax
+  for (const promise of promises) {
+    const item = items[idx];
+
+    try {
+      const res = await promise;
       const field = submissionUtils.getSubmissionField(submission, survey, item.pos);
       const evaluatedItem = {
+        control: item.control,
         field,
-        res: item.res,
+        res: res.res,
       };
-
       evaluated.push(evaluatedItem);
-    });
-  } catch (error) {
-    console.log(error);
+    } catch (error) {
+      const field = submissionUtils.getSubmissionField(submission, survey, item.pos);
+      const evaluatedItem = {
+        control: item.control,
+        field,
+        error,
+      };
+      evaluated.push(evaluatedItem);
+    }
+    idx++;
   }
 
   return evaluated;
 }
 
 export const calculateRelevance = async (survey, submission, positions, controls) => {
-  const r = await calculateField(survey, submission, positions, controls, 'relevance', 'relevance');
-  r.forEach((item) => {
-    if (typeof item.res !== 'boolean') {
-      console.log('error, result is rejected', item.res);
-    }
-    // eslint-disable-next-line no-param-reassign
-    item.field.meta.relevant = item.res;
-  });
+  try {
+    const r = await calculateField(survey, submission, positions, controls, 'relevance', 'relevance');
+    r.forEach((item) => {
+      if (typeof item.res !== 'boolean') {
+        console.log('error, result is rejected', item.res);
+      }
+      // eslint-disable-next-line no-param-reassign
+      item.field.meta.relevant = item.res;
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 
 export const calculateApiCompose = async (survey, submission, positions, controls) => {
   const r = await calculateField(survey, submission, positions, controls, 'apiCompose', 'apiCompose');
   r.forEach((item) => {
+    console.log('item', item);
     if (typeof item.res !== 'object') {
       console.log('error, result is rejected', item.res);
     }
     // eslint-disable-next-line no-param-reassign
     item.field.meta.apiCompose = item.res;
   });
+  return r;
 };

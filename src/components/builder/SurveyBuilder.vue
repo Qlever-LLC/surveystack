@@ -16,7 +16,10 @@
         class="pane pane-survey"
         style="position: relative; overflow: hidden"
       >
-        <div class="pane-fixed-wrapper pr-2" style="position: relative;">
+        <div
+          class="pane-fixed-wrapper pr-2"
+          style="position: relative;"
+        >
           <control-adder @controlAdded="controlAdded" />
           <survey-details
             :version="version"
@@ -211,6 +214,7 @@ import api from '@/services/api.service';
 
 
 import * as utils from '@/utils/surveys';
+import { defaultApiCompose } from '@/utils/apiCompose';
 
 import submissionUtils from '@/utils/submissions';
 
@@ -391,6 +395,9 @@ export default {
       });
     },
     highlight(tab, select = true) {
+      this.codeError = null;
+      this.evaluated = null;
+
       this.hideCode = false;
 
       if (this.control.options[tab] && !this.control.options[tab].enabled) {
@@ -402,7 +409,14 @@ export default {
 
       console.log('options', this.control.options);
       if (!this.control.options[tab].code) {
-        const initalCode = initialRelevanceCode(tab);
+        let initalCode;
+        console.log('tab is', tab);
+        if (tab === 'apiCompose') {
+          initalCode = defaultApiCompose;
+        } else {
+          initalCode = initialRelevanceCode(tab);
+        }
+
         this.control.options[tab].code = initalCode;
         this.activeCode = initalCode;
       } else {
@@ -493,7 +507,7 @@ export default {
         : 'Survey name is invalid';
     },
     validateSurveyQuestions() {
-      const namePattern = /^[\w-]{4,}$/;
+      const namePattern = /^[\w-]{1,}$/; // one character should be ok, especially within groups
       const currentControls = this.survey.revisions[this.survey.revisions.length - 1].controls;
       const uniqueNames = uniqBy(currentControls, 'name');
       const hasOnlyUniqueNames = uniqueNames.length === currentControls.length;
