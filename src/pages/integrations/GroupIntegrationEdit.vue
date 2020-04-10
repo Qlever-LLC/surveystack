@@ -45,6 +45,13 @@
         </div>
       </v-form>
     </v-card>
+    <transition name="fade">
+      <app-feedback
+        v-if="status"
+        class="mt-5"
+        @closed="status = ''"
+      >{{status}}</app-feedback>
+    </transition>
   </v-container>
 </template>
 
@@ -53,6 +60,7 @@ import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 
 import appJsonEditor from '@/components/ui/JsonEditor.vue';
+import appFeedback from '@/components/ui/Feedback.vue';
 
 
 const exampleIntegration = {
@@ -77,10 +85,12 @@ const integrationTypes = [
 export default {
   components: {
     appJsonEditor,
+    appFeedback,
   },
   data() {
     return {
       editMode: true,
+      status: '',
       integrationTypes,
       entity: {
         _id: '',
@@ -107,11 +117,6 @@ export default {
       const method = this.editMode ? 'put' : 'post';
       const url = this.editMode ? `/group-integrations/${this.entity._id}` : '/group-integrations';
 
-      if (this.entity.name.trim() === '') {
-        console.log('Name must not be empty');
-        // return;
-      }
-
       try {
         await api.customRequest({
           method,
@@ -122,11 +127,16 @@ export default {
         this.$router.back();
       } catch (err) {
         console.log(err);
+        this.status = err.response.data.message;
       }
     },
     async deleteEntity() {
-      await api.delete(`/group-integrations/${this.entity._id}`);
-      this.$router.back();
+      try {
+        await api.delete(`/group-integrations/${this.entity._id}`);
+        this.$router.back();
+      } catch (err) {
+        this.status = err.response.data.message;
+      }
     },
   },
   computed: {
@@ -153,8 +163,9 @@ export default {
         const { id } = this.$route.params;
         const { data } = await api.get(`/group-integrations/${id}`);
         this.entity = { ...this.entity, ...data };
-      } catch (e) {
-        console.log('something went wrong:', e);
+      } catch (err) {
+        console.log('something went wrong:', err);
+        this.status = err.response.data.message;
       }
     }
   },

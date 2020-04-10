@@ -329,8 +329,8 @@ export default {
       return namePattern.test(val) ? true : 'Data name must only contain valid charcters';
     },
     nameHasValidLength(val) {
-      const namePattern = /^.{4,}$/;
-      return namePattern.test(val) ? true : 'Data name must be at least 4 characters in length';
+      const namePattern = /^.{1,}$/; // one character should be ok, especially within groups
+      return namePattern.test(val) ? true : 'Data name must be at least 1 characters in length';
     },
     openAdvancedEditor() {
       // TODO: can't pass params to new window

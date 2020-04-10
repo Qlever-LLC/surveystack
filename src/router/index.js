@@ -35,7 +35,9 @@ import ScriptList from '@/pages/scripts/ScriptList.vue';
 import Script from '@/pages/scripts/Script.vue';
 import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
 
+import MembershipNew from '@/pages/memberships/MembershipNew.vue';
 import MembershipEdit from '@/pages/memberships/MembershipEdit.vue';
+
 
 // integrations
 import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
@@ -255,7 +257,7 @@ const routes = [
   {
     path: '/memberships/new',
     name: 'memberships-new',
-    component: MembershipEdit,
+    component: MembershipNew,
   },
   {
     path: '/memberships/:id/edit',

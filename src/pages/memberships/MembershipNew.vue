@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <span class="text--secondary overline">{{entity._id}}</span>
-    <h1>Edit Membership</h1>
+    <h1>Create Membership</h1>
 
     <v-card class="pa-4 mb-4">
       <v-form
@@ -19,11 +19,10 @@
 
         <v-text-field
           class="mt-3"
-          v-model="entity.user._id"
+          v-model="entity.user.email"
           label="User"
           outlined
-          disabled
-          :hint="entity.user.name"
+          placeholder="User e-mail"
           persistent-hint
         />
 
@@ -35,13 +34,7 @@
           outlined
         ></v-select>
 
-        <div class="d-flex mt-2">
-          <v-btn
-            class="mr-auto"
-            text
-            color="error"
-            @click="dialogRemoval = true"
-          >Delete</v-btn>
+        <div class="d-flex mt-2 justify-end">
 
           <v-btn
             text
@@ -50,55 +43,48 @@
           <v-btn
             color="primary"
             @click="submit"
+            :disabled="!submittable"
           >Submit</v-btn>
         </div>
       </v-form>
     </v-card>
 
-    <v-card>
-      <app-integration-list
-        title="Membership Integrations"
-        :entities="integrations"
-        :newRoute="{name: 'membership-integrations-new', query: {membership: entity._id}}"
-        integrationType="membership"
-      />
-    </v-card>
-
     <v-dialog
-      v-model="dialogRemoval"
-      max-width="290"
+      v-model="dialogCreateUser"
+      max-width="500"
     >
       <v-card class="">
         <v-card-title>
-          Delete Membership
+          User does not exist yet
         </v-card-title>
         <v-card-text class="mt-4">
-          Are you sure you want to delete this membership?
+          Do you want to proceed to create a new user with email {{this.entity.user.email}}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn
             text
-            @click.stop="dialogRemoval = false"
+            @click.stop="dialogCreateUser = false"
           >
             Cancel
           </v-btn>
           <v-btn
             text
             color="red"
-            @click.stop="remove"
+            @click.stop="proceedToUserCreation"
           >
-            Delete
+            Proceed
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
+
   </v-container>
 </template>
 
 <script>
+import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
-import appIntegrationList from '@/components/integrations/IntegrationList.vue';
 
 const availableRoles = [
   {
@@ -112,20 +98,17 @@ const availableRoles = [
 ];
 
 export default {
-  components: {
-    appIntegrationList,
-  },
   data() {
     return {
       availableRoles,
       entity: {
         _id: '',
-        user: { _id: '', name: '' },
+        user: { _id: '', name: '', email: '' },
         group: { _id: '', name: '', path: '' },
         role: 'user',
       },
       integrations: [],
-      dialogRemoval: false,
+      dialogCreateUser: false,
     };
   },
   methods: {
@@ -137,37 +120,51 @@ export default {
     },
     async submit() {
       const data = {
-        _id: this.entity._id, user: this.entity.user._id, group: this.entity.group._id, role: this.entity.role,
+        _id: this.entity._id, user: this.entity.user.email, group: this.entity.group._id, role: this.entity.role,
       };
-      const url = `/memberships/${this.entity._id}`;
+      const url = '/memberships';
 
       try {
-        await api.put(url, data);
+        await api.post(url, data);
 
         this.$router.back();
       } catch (err) {
-        console.log('err', err);
+        if (err.response.status === 404) {
+          this.dialogCreateUser = true;
+        }
       }
     },
-    async remove() {
-      this.dialogRemoval = false;
-      try {
-        await api.delete(`/memberships/${this.entity._id}`);
-        this.$router.back();
-      } catch (err) {
-        console.log('MembershipEdit remove error', err);
-      }
+    proceedToUserCreation() {
+      this.$router.replace({
+        name: 'users-new',
+        query: {
+          group: this.entity.group._id,
+          role: this.entity.role,
+          email: this.entity.user.email,
+        },
+      });
     },
   },
+  computed: {
+    submittable() {
+      if (this.entity.user.email.trim() === '') {
+        return false;
+      }
 
+      return true;
+    },
+  },
   async created() {
-    try {
-      const { id } = this.$route.params;
-      const { data } = await api.get(`/memberships/${id}?populate=1`);
-      this.entity = { ...this.entity, ...data };
+    this.entity._id = new ObjectId();
 
-      const i = await api.get(`/membership-integrations?membership=${id}`);
-      this.integrations = i.data;
+    const { group, role } = this.$route.query;
+    if (!group || !role) {
+      return;
+    }
+
+    try {
+      const { data: groupEntity } = await api.get(`/groups/${group}`);
+      this.entity.group = groupEntity;
     } catch (e) {
       console.log('something went wrong:', e);
     }
