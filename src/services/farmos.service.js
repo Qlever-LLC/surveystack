@@ -1,5 +1,7 @@
+/* eslint-disable no-unreachable */
 import * as utils from '../helpers/surveys';
 import { planting } from './farmos/planting';
+import { log } from './farmos/log';
 import { aggregatorRequest } from './farmos/request';
 import { farminfo } from './farmos/farminfo';
 import boom from '@hapi/boom';
@@ -35,6 +37,7 @@ export const getCredentials = async (user) => {
     .find({ user: user._id })
     .project({ _id: 1 })
     .toArray();
+
   filter.membership = { $in: memberships.map((m) => m._id) };
 
   const entities = await db
@@ -96,8 +99,8 @@ async function fetchTerms(farmUrl, credentials, user) {
 }
 
 async function execute(apiCompose, info, terms, user, submission) {
-  const url = apiCompose.body.url;
-  const type = apiCompose.body.type;
+  const url = apiCompose.url;
+  const type = apiCompose.farmosType;
 
   if (!allowed(url, user)) {
     throw boom.unauthorized(`User has no access to farm: ${url}`);
@@ -107,6 +110,11 @@ async function execute(apiCompose, info, terms, user, submission) {
 
   if (type === 'planting') {
     return await planting(apiCompose, info, terms, user, credentials, submission);
+  } else if (type === 'log') {
+    return await log(apiCompose, info, terms, user, credentials, submission);
+    // TODO create log
+    // TODO check all terms, create if not existing
+    // TODO replace terms in body
   }
 }
 
@@ -128,6 +136,7 @@ export const handle = async (res, submission, survey, user) => {
     const field = utils.getSubmissionField(submission, survey, position);
 
     const compose = [];
+
     if (Array.isArray(field.meta.apiCompose)) {
       for (const c of field.meta.apiCompose) {
         compose.push(c);
@@ -146,6 +155,8 @@ export const handle = async (res, submission, survey, user) => {
     farmOsCompose.push(...compose);
   });
 
+  console.log('farmOsCompose', farmOsCompose);
+
   const results = [];
 
   const runSingle = async (apiCompose, info, terms) => {
@@ -157,7 +168,7 @@ export const handle = async (res, submission, survey, user) => {
         results.push(r);
       }
     } catch (error) {
-      console.log('error in run single', error);
+      console.log('error in run single', error.message);
       results.push({
         status: 'error',
         error,
@@ -186,7 +197,7 @@ export const handle = async (res, submission, survey, user) => {
   const farmUrls = farmOsCompose
     .map((c) => {
       if (c.body !== undefined && typeof c.body === 'object') {
-        return c.body.farmUrl;
+        return c.url;
       }
       return null;
     })
@@ -203,8 +214,8 @@ export const handle = async (res, submission, survey, user) => {
   for (const compose of farmOsCompose) {
     await runSingle(
       compose,
-      info.find((farm) => farm.url === compose.body.farmUrl),
-      termMap[compose.body.farmUrl]
+      info.find((farm) => farm.url === compose.url),
+      termMap[compose.url]
     );
   }
 

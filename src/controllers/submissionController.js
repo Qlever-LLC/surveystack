@@ -300,10 +300,7 @@ const getSubmissionsPage = async (req, res) => {
 
   pipeline.push(...paginationStages);
 
-  entities = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  entities = await db.collection(col).aggregate(pipeline).toArray();
 
   const r = entities[0];
   if (!r) {
@@ -349,10 +346,7 @@ const getSubmissions = async (req, res) => {
     }
   }
 
-  entities = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  entities = await db.collection(col).aggregate(pipeline).toArray();
 
   if (req.query.format === 'csv') {
     const csv = csvService.createCsv(entities);
@@ -392,8 +386,10 @@ const createSubmission = async (req, res) => {
 
   const survey = await db.collection('surveys').findOne({ _id: surveyId });
 
+  const farmosResults = [];
   try {
-    const farmosResults = await farmOsService.handle(res, entity, survey, res.locals.auth.user);
+    const results = await farmOsService.handle(res, entity, survey, res.locals.auth.user);
+    farmosResults.push(...results);
     // could contain errors, need to pass these on to the user
   } catch (error) {
     // TODO what should we do if something internal fails?
@@ -401,16 +397,38 @@ const createSubmission = async (req, res) => {
     console.log('error handling farmos', error);
     return res.status(503).send({
       message: `error submitting to farmos ${error}`,
+      farmos: error.messages,
     });
   }
 
   try {
     let r = await db.collection(col).insertOne(entity);
     assert.equal(1, r.insertedCount);
+
+    r.farmos = farmosResults;
     return res.send(r);
   } catch (err) {
+    // TODO get rid of this ... just a copy paste of the updateSubmission function ...
     try {
-      await updateSubmission(req, res);
+      const { id } = req.params;
+      const entity = sanitize(req.body);
+
+      try {
+        let updated = await db.collection(col).findOneAndUpdate(
+          { _id: id },
+          { $set: entity },
+          {
+            returnOriginal: false,
+          }
+        );
+
+        updated.farmos = farmosResults;
+
+        return res.send(updated);
+      } catch (err) {
+        console.log(err);
+        return res.status(500).send({ message: 'Ouch :/' });
+      }
     } catch (error) {
       if (err.name === 'MongoError' && err.code === 11000) {
         return res.status(409).send({ message: `Entity with _id already exists: ${entity._id}` });
