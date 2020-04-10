@@ -1,7 +1,5 @@
 <template>
   <v-container>
-    <small>{{entity.dir}}</small>
-
     <h1>{{editMode ? "Edit group" : "Create group"}}</h1>
 
     <v-card class="pa-4 mb-4">

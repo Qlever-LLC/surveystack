@@ -1,8 +1,9 @@
 <template>
   <v-container>
-    <h1>{{ editMode ? "Edit Membership Integration" : "Create Membership Integration" }}</h1>
-    <span class="text--secondary">{{this.entity._id}}</span>
     <v-card class="pa-4 mb-4">
+      <span class="text--secondary overline">{{this.entity._id}}</span>
+      <h1>{{ editMode ? "Edit Membership Integration" : "Create Membership Integration" }}</h1>
+
       <v-form
         class="mt-3"
         @keydown.enter.prevent="submit"
@@ -24,9 +25,13 @@
         <app-farmos-farm-picker
           v-if="entity.type === 'farmos-farm'"
           :aggregators="aggregators"
+          :data="entity.data"
           @farm-selected="(ev) => {entity.data = ev; entity.name = ev.name}"
         />
-        <app-json-editor v-model="entity.data" />
+        <app-json-editor
+          v-model="entity.data"
+          class="mt-3"
+        />
 
         <div class="d-flex ma-2">
           <v-btn
@@ -91,13 +96,11 @@ export default {
       integrationTypes,
       entity: {
         _id: '',
+        name: '',
         membership: '',
         type: 'generic',
-        name: '',
         data: {
-          url: '',
-          apiKey: '',
-          parameters: '',
+
         },
       },
       aggregators: [],

@@ -7,7 +7,7 @@
         <v-btn
           color="primary"
           class="ml-4"
-          :to="{name: 'users-new', query: {group: group._id, role: 'user' }}"
+          :to="{name: 'memberships-new', query: {group: group._id, role: 'user' }}"
           text
         >New...</v-btn>
       </v-card-title>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3>Custom Farm picker</h3>
+    <h3>FarmOS Farm picker</h3>
     <v-select
       class="mt-2"
       :items="aggregators"
@@ -30,12 +30,23 @@ export default {
     aggregators: {
       type: Array,
     },
+    data: {
+      type: Object,
+      default: () => { },
+    },
   },
   data() {
-    return { selectedAggregator: null, selectedFarm: null };
+    return {
+      selectedAggregator: this.data.aggregator || null,
+      selectedFarm: this.data.farm || null,
+    };
   },
   computed: {
     farms() {
+      if (!this.aggregators || this.aggregators.length === 0) {
+        return [];
+      }
+
       if (!this.selectedAggregator) {
         return [];
       }
@@ -51,7 +62,9 @@ export default {
       async handler(newVal, oldVal) {
         const a = this.aggregators.find(aggregator => aggregator._id === this.selectedAggregator);
         const f = a.farms.find(farm => farm.id === this.selectedFarm);
-        const data = { name: f.farm_name, url: f.url, aggregatorURL: a.url };
+        const data = {
+          name: f.farm_name, url: f.url, aggregator: a._id, farm: f.id,
+        };
         this.$emit('farm-selected', data);
       },
     },

@@ -16,7 +16,10 @@
         class="pane pane-survey"
         style="position: relative; overflow: hidden"
       >
-        <div class="pane-fixed-wrapper pr-2">
+        <div
+          class="pane-fixed-wrapper pr-2"
+          style="position: relative;"
+        >
           <control-adder @controlAdded="controlAdded" />
           <survey-details
             :version="version"
@@ -28,6 +31,7 @@
             :enableSaveDraft="enableSaveDraft"
             :enableDismissDraft="enableDismissDraft"
             :enablePublish="enablePublish"
+            :validationErrors="surveyValidationErrors"
             @view-code-toggle="viewCode = !viewCode"
             @update="publish"
             @cancel="onCancel"
@@ -36,6 +40,9 @@
             @publish="publish"
             @export-survey="$emit('export-survey')"
             @import-survey="(file) => $emit('import-survey', file)"
+            @set-survey-name="setSurveyName"
+            @set-survey-group="setSurveyGroup"
+            @set-survey-description="setSurveyDescription"
             class="mb-4"
           />
           <graphical-view
@@ -46,7 +53,6 @@
             @controlSelected="controlSelected"
             @duplicate-control="duplicateControl"
           />
-
         </div>
       </pane>
 
@@ -489,10 +495,12 @@ export default {
     },
     validateSurveyName() {
       // TODO: disallow special characters?
-      return !!this.survey.name && this.survey.name.length > 4;
+      return !!this.survey.name && /^[\w-\s]{4,}$/.test(this.survey.name)
+        ? true
+        : 'Survey name is invalid';
     },
     validateSurveyQuestions() {
-      const namePattern = /^[\w-]{4,}$/;
+      const namePattern = /^[\w-]{1,}$/; // one character should be ok, especially within groups
       const currentControls = this.survey.revisions[this.survey.revisions.length - 1].controls;
       const uniqueNames = uniqBy(currentControls, 'name');
       const hasOnlyUniqueNames = uniqueNames.length === currentControls.length;
@@ -511,18 +519,32 @@ export default {
           && allNamesInGroupContainOnlyValidCharacters;
       }, true);
 
-      return hasOnlyUniqueNames
+      return (hasOnlyUniqueNames
         && allNamesContainOnlyValidCharacters
-        && groupedQuestionsAreValid;
+        && groupedQuestionsAreValid) ? true : 'Questions list contains an invalid data name';
+    },
+    setSurveyName(value) {
+      this.$set(this.survey, 'name', value);
+      this.$forceUpdate();
+    },
+    setSurveyGroup(value) {
+      this.$set(this.survey, 'group', value);
+    },
+    setSurveyDescription(value) {
+      this.$set(this.survey, 'description', value);
     },
   },
   computed: {
     surveyIsValid() {
-      // check if survey name is valid
-
-      // check for duplicate values
-      return this.validateSurveyName()
-        && this.validateSurveyQuestions();
+      // return this.invalidValidations.length > 0 ? invalidValidations : true;
+      return !(this.surveyValidationErrors.length > 0);
+    },
+    surveyValidationErrors() {
+      const validations = [
+        this.validateSurveyName(),
+        this.validateSurveyQuestions(),
+      ];
+      return validations.filter(validation => validation !== true);
     },
     enableDismissDraft() {
       return this.isDraft;

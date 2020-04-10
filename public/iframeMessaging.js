@@ -3,13 +3,13 @@ export const types = {
 };
 
 export function requestFetchSubmissions() {
-  let origin;
+  // let origin;
 
-  try {
-    [origin] = window.location.ancestorOrigins;
-  } catch (error) {
-    // origin = 'https://app.our-sci.net';
-  }
+  // try {
+  //   [origin] = window.location.ancestorOrigins;
+  // } catch (error) {
+  //   // origin = 'https://app.our-sci.net';
+  // }
 
   window.parent.postMessage({
     type: 'REQUEST_FETCH_SUBMISSION',
@@ -17,7 +17,7 @@ export function requestFetchSubmissions() {
       // ids,
       // sharecodeIds,
     },
-  }, origin);
+  }, '*');
 
   return new Promise((resolve, reject) => {
     window.addEventListener('message', (event) => {
@@ -40,51 +40,51 @@ export function requestFetchSubmissions() {
 }
 
 export function requestSetStatus({ type, message = '' }) {
-  const [origin] = window.location.ancestorOrigins;
+  // const [origin] = window.location.ancestorOrigins;
   window.parent.postMessage({
     type: 'REQUEST_SET_QUESTION_STATUS',
     payload: {
       type,
       message,
     },
-  }, origin);
+  }, '*');
 }
 
 export function requestSetContext(context) {
-  const [origin] = window.location.ancestorOrigins;
+  // const [origin] = window.location.ancestorOrigins;
   window.parent.postMessage({
     type: 'REQUEST_SET_QUESTION_CONTEXT',
     payload: {
       context,
     },
-  }, origin);
+  }, '*');
 }
 
 export function requestSetRenderQueue(queue) {
-  const [origin] = window.location.ancestorOrigins;
+  // const [origin] = window.location.ancestorOrigins;
   window.parent.postMessage({
     type: 'REQUEST_SET_QUESTION_RENDER_QUEUE',
     payload: {
       queue,
     },
-  }, origin);
+  }, '*');
 }
 
 export function requestSetValue(value) {
-  let origin;
+  // let origin;
 
-  try {
-    [origin] = window.location.ancestorOrigins;
-  } catch (error) {
-    // origin = 'https://app.our-sci.net';
-  }
+  // try {
+  //   [origin] = window.location.ancestorOrigins;
+  // } catch (error) {
+  //   // origin = 'https://app.our-sci.net';
+  // }
 
   window.parent.postMessage({
     type: 'REQUEST_SET_QUESTION_VALUE',
     payload: {
       value,
     },
-  }, origin);
+  }, '*');
 
   // return new Promise((resolve, reject) => {
   //   window.addEventListener('message', (event) => {
@@ -99,13 +99,13 @@ export function requestSetValue(value) {
 }
 
 export function requestLogMessage(...messages) {
-  const [origin] = window.location.ancestorOrigins;
+  // const [origin] = window.location.ancestorOrigins;
   window.parent.postMessage({
     type: 'REQUEST_LOG_MESSAGE',
     payload: {
       messages,
     },
-  }, origin);
+  }, '*');
 }
 
 export function listen() {
@@ -134,7 +134,7 @@ export function handleLoaded() {
   window.parent.postMessage({
     type: 'SCRIPT_HAS_LOADED',
     payload: {},
-  }, window.location.ancestorOrigins[0]);
+  }, '*');
 }
 
 export const statusTypes = {

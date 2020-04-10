@@ -55,6 +55,23 @@
       You have unpublished changes in your Draft. Importing a survey will dismiss these.
     </app-dialog>
 
+    <v-dialog
+      v-model="submitting"
+      hide-overlay
+      persistent
+      width="300"
+    >
+      <v-card>
+        <v-card-text class="pa-4">
+          <span>Submitting</span>
+          <v-progress-linear
+            indeterminate
+            class="mb-0"
+          ></v-progress-linear>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
     <v-snackbar
       v-model="showSnackbar"
       :timeout="4000"
@@ -75,6 +92,7 @@ import ObjectId from 'bson-objectid';
 import _ from 'lodash';
 import moment from 'moment';
 import api from '@/services/api.service';
+import * as constants from '@/constants';
 
 import appDialog from '@/components/ui/Dialog.vue';
 import SurveyBuilder from '@/components/builder/SurveyBuilder.vue';
@@ -87,6 +105,7 @@ const emptySurvey = {
   dateCreated: currentDate,
   dateModified: currentDate,
   latestVersion: 1,
+  specVersion: constants.SPEC_VERSION_SURVEY,
   revisions: [
     {
       dateCreated: currentDate,
@@ -115,6 +134,7 @@ export default {
       showOverrideModal: false,
       importedSurvey: null,
       freshImport: false,
+      submitting: false,
     };
   },
   methods: {
@@ -142,6 +162,7 @@ export default {
       }
     },
     async submitSubmission({ payload }) {
+      this.submitting = true;
       try {
         console.log('submitting', payload);
         const response = await api.post('/submissions', payload);
@@ -153,6 +174,7 @@ export default {
         this.snack(message);
         console.log(error);
       }
+      this.submitting = false;
     },
     async submitSurvey(isDraft) {
       this.freshImport = false;

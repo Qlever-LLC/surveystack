@@ -104,10 +104,14 @@ export default {
       }
 
       try {
-        await this.$store.dispatch('auth/login', {
+        const user = await this.$store.dispatch('auth/login', {
           url: '/auth/login',
           user: this.entity,
         });
+        const memberships = await this.$store.dispatch('memberships/getUserMemberships', user._id);
+        if (memberships && memberships.length > 0 && memberships[0].group) {
+          this.$store.dispatch('memberships/setActiveGroup', memberships[0].group);
+        }
         if (this.$route.params.redirect) {
           this.$router.push(this.$route.params.redirect);
         } else {

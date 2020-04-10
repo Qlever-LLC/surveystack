@@ -309,8 +309,9 @@ export default {
 };
 </script>
 
+
 <style>
-@import url("https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css");
+@import url('~mapbox-gl/dist/mapbox-gl.css');
 #map-root {
   display: grid;
   grid-template-columns: 1fr;
@@ -382,8 +383,10 @@ export default {
   z-index: 1;
 }
 
-.mapboxgl-ctrl-geolocate::before {
-  content: "\F352";
+/* .mapboxgl-ctrl-geolocate::before {
+  content: "\F01A4";
   font: normal normal normal 24px/1 "Material Design Icons";
-}
+  margin-top: 3px;
+  display: block;
+} */
 </style>

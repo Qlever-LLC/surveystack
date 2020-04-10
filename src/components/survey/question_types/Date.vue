@@ -10,7 +10,6 @@
           v-if="control.options.subtype !== 'date-year'"
           :value="dateForPicker"
           @input="updateDatePicker"
-          @click="handlePickerClick"
           :type="datePickerType"
           reactive
           no-title
@@ -38,6 +37,7 @@
               prepend-icon="mdi-calendar"
               v-on="on"
               readonly
+              outlined
             />
           </template>
           <v-date-picker
@@ -141,6 +141,7 @@ export default {
       this.changed(newDate);
     },
     updateDatePicker(date) {
+      this.datePickerIsVisible = false;
       const newDate = moment(date);
       if (this.control.options.subtype === 'date-year') {
         this.$refs.picker.activePicker = 'YEAR';

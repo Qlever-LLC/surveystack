@@ -2,6 +2,8 @@ import ObjectID from 'bson-objectid';
 import { flatten, unflatten } from 'flat';
 import _ from 'lodash';
 
+import * as constants from '@/constants';
+
 function* processPositions(data, position = []) {
   if (!data) {
     return;
@@ -110,6 +112,7 @@ const createSubmissionFromSurvey = (survey, version = 1, instance = null) => {
     permissions: [],
     group: '5e6f8bbeea14550001470c28',
     path: '/our-sci',
+    specVersion: constants.SPEC_VERSION_SUBMISSION,
   };
 
   // TODO: handle version not found

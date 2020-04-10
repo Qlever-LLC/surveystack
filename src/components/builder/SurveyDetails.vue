@@ -6,6 +6,10 @@
           style="max-width: 81%;"
           v-model="value.name"
         />
+        <v-spacer />
+        <v-btn icon>
+          <v-icon>mdi-pencil</v-icon>
+        </v-btn>
         <v-menu
           offset-y
           left
@@ -28,9 +32,9 @@
                   >
                     <v-btn
                       class="pointer-events-none"
-                      icon
+                      text
                     >
-                      <v-icon color="grey lighten-1">mdi-file-upload</v-icon>
+                      <v-icon color="grey">mdi-file-upload</v-icon>
                       <div class="ml-1">
                         Import
                       </div>
@@ -51,9 +55,9 @@
               <v-list-item-title>
                 <v-btn
                   @click="$emit('export-survey')"
-                  icon
+                  text
                 >
-                  <v-icon color="grey lighten-1">mdi-file-download</v-icon>
+                  <v-icon color="grey">mdi-file-download</v-icon>
                   <div class="ml-1">
                     Export
                   </div>
@@ -63,11 +67,11 @@
             <v-list-item v-if="!isNew">
               <v-list-item-title>
                 <v-btn
-                  icon
+                  text
                   @click="$emit('delete')"
                 >
-                  <v-icon color="grey lighten-1">mdi-delete</v-icon>
-                  <div class="grey--text ml-1">
+                  <v-icon color="grey">mdi-delete</v-icon>
+                  <div class="ml-1">
                     Delete
                   </div>
                 </v-btn>
@@ -95,6 +99,19 @@
       </div>
     </v-card-title>
     <v-card-text>
+        <!-- v-model="value.group" -->
+      <active-group-selector
+        class="mt-4"
+        :value="value.group"
+
+        label="Group"
+      />
+      <v-textarea
+        v-model="value.description"
+        label="Description"
+        dense
+        rows="1"
+      />
       <div class="mt-4">
 
         <!-- <v-text-field
@@ -105,7 +122,7 @@
           disabled
         /> -->
 
-        <div class="d-flex flex-wrap justify-end">
+        <div class="d-flex flex-wrap justify-end align-center">
           <!-- <v-btn
             class="my-1 mr-1"
             @click="$emit('cancel')"
@@ -170,9 +187,9 @@
               <div v-on="on">
                 <v-btn
                   :dark="enableSaveDraft"
-                  :disabled="!enableSaveDraft"
                   @click="$emit('saveDraft')"
                   color="primary"
+                  :disabled="!enableSaveDraft"
                   class="my-1 mr-1"
                 >
                   <v-icon class="mr-1">mdi-content-save</v-icon>
@@ -182,14 +199,54 @@
             </template>
             <span>Save a new draft <strong>version</strong> of the Survey</span>
           </v-tooltip>
+          <!-- <v-tooltip bottom v-if="validationErrors.length > 0">
+            <template v-slot:activator="{ on }">
+              <div v-on="on">
+                <v-icon small color="error">mdi-close-circle-outline</v-icon>
+              </div>
+            </template>
+            <span
+              v-for="error in validationErrors"
+              :key="error"
+            >
+              {{error}}
+            </span>
+          </v-tooltip> -->
         </div>
       </div>
+
+
+      <v-tooltip bottom v-if="validationErrors.length > 0">
+        <template v-slot:activator="{ on }">
+          <!-- <div v-on="on" class="text-center mt-4 error--text" >
+            <v-icon color="error">mdi-exclamation</v-icon>
+            Survey contains errors
+          </div> -->
+          <v-alert
+            type="error"
+            colored-border
+            border="left"
+            class="mt-2"
+            elevation="2"
+            v-on="on"
+          >
+            Survey contains errors
+          </v-alert>
+        </template>
+        <div
+          v-for="error in validationErrors"
+          :key="error"
+        >
+          {{error}}
+        </div>
+      </v-tooltip>
     </v-card-text>
   </v-card>
 </template>
 
 <script>
 import SurveyNameEditor from '@/components/builder/SurveyNameEditor.vue';
+import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 
 export default {
   props: [
@@ -200,9 +257,26 @@ export default {
     'enableSaveDraft',
     'enablePublish',
     'enableDismissDraft',
-    'version'],
+    'version',
+    'validationErrors',
+  ],
   components: {
     SurveyNameEditor,
+    ActiveGroupSelector,
+  },
+  methods: {
+    updateSurveyName(name) {
+      this.$emit('set-survey-name', name);
+      // this.$set(this.value, 'name', name);
+    },
+    updateSurveyGroup({ _id }) {
+      this.$emit('set-survey-group', _id);
+      // this.$set(this.value, 'group', _id);
+    },
+    updateSurveyDescription(description) {
+      this.$emit('set-survey-description', description);
+      // this.$set(this.value, 'description', description);
+    },
   },
 };
 </script>
