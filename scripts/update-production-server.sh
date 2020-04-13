@@ -1,6 +1,5 @@
 #!/bin/bash
 APP_URL=https://app.surveystack.io
-MODE=production
 PEM_FILE=~/.ssh/surveystack-production.pem
 
 USER=ubuntu
