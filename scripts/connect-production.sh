@@ -1,9 +1,9 @@
 #!/bin/bash
-APP_URL=https://dev.our-sci.net
+APP_URL=https://app.surveystack.io
 
-PEM_FILE=~/.ssh/oursci-allround.pem
+PEM_FILE=~/.ssh/surveystack-production.pem
 USER=ubuntu
-SERVER_FALLBACK=ec2-54-85-87-170.compute-1.amazonaws.com
+SERVER_FALLBACK=ec2-18-212-28-97.compute-1.amazonaws.com
 
 SERVER=`curl -f -s $APP_URL/api/info/public-hostname`
 

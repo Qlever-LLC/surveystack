@@ -18,10 +18,6 @@ else
   echo "Found public hostname: $SERVER"
 fi
 
-echo "Will use this server: $SERVER"
-
-exit 1
-
 print_usage() {
   printf "Usage: $0 [ -s ]\n"
   printf "  -s   updates server module only (skip building and uploading client)\n"
