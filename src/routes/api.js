@@ -179,6 +179,7 @@ router.delete(
 
 // info
 router.get('/info/ip', catchErrors(infoController.getIP));
+router.get('/info/public-ip', catchErrors(infoController.getPublicIP));
 
 // default api
 router.get('/', (req, res) => {
