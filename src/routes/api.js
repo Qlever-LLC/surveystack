@@ -180,6 +180,7 @@ router.delete(
 // info
 router.get('/info/ip', catchErrors(infoController.getIP));
 router.get('/info/public-ip', catchErrors(infoController.getPublicIP));
+router.get('/info/public-hostname', catchErrors(infoController.getPublicHostname));
 
 // default api
 router.get('/', (req, res) => {

@@ -17,7 +17,15 @@ const getPublicIP = async (req, res) => {
   return res.send(address);
 };
 
+const getPublicHostname = async (req, res) => {
+  const { data: hostname } = await axios.get(
+    'http://instance-data/latest/meta-data/public-hostname'
+  );
+  return res.send(hostname);
+};
+
 export default {
   getIP,
   getPublicIP,
+  getPublicHostname,
 };
