@@ -10,6 +10,7 @@ import debugController from '../controllers/debugController';
 import rolesController from '../controllers/rolesController';
 import farmosController from '../controllers/farmosController';
 import membershipController from '../controllers/membershipController';
+import infoController from '../controllers/infoController';
 
 import groupIntegrationController from '../controllers/groupIntegrationController';
 import membershipIntegrationController from '../controllers/membershipIntegrationController';
@@ -176,7 +177,10 @@ router.delete(
   catchErrors(membershipIntegrationController.deleteIntegration)
 );
 
-// default info
+// info
+router.get('/info/ip', catchErrors(infoController.getIP));
+
+// default api
 router.get('/', (req, res) => {
   return res.send('This is API version 1');
 });
