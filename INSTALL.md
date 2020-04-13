@@ -94,7 +94,7 @@ $ cd ~/repos/production/our-sci-server
 $ touch .env
 $ vim .env
 ...
-PORT=3100
+PORT=4400
 DATABASE_URL=<mongodb-connection-string>
 DATABASE_NAME=surveystack-production
 ```
@@ -141,8 +141,9 @@ Create an **application** load balancer under _Compute > EC2 > Load Balancing_..
 name: tg-surveystack-production
 type: instance
 protocol: HTTP
-port: 3100
+port: 4400
 VPC: (default)
+Health check path: /api
 ```
 
 ### Certificate
@@ -173,4 +174,4 @@ Add a new rule with condition **Host Header** and a value of your desired subdom
 
 ### Add instance targets to your target group
 
-Inside AWS console, switch to **EC2 > Target groups** and select your target group (e.g. `tg-surveystack-production`). Switch to the **Targets** tab, and add your running EC2 instance as a registered target group.
+Inside AWS console, switch to **EC2 > Target groups** and select your target group (e.g. `tg-surveystack-production`). Switch to the **Targets** tab, and add your running EC2 instance as a registered target group. Make sure that your EC2 instance has its security group set to be able to received health checks and traffic on its target port. Once the health checks pass, the initial server api should now be available under your chosen subdomain, e.g. [https://app.surveystack.io/api](https://app.surveystack.io/api)
