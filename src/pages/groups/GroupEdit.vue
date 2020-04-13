@@ -105,11 +105,7 @@ export default {
       }
     },
     cancel() {
-      if (this.entity.dir === '/') {
-        this.$router.replace('/groups');
-        return;
-      }
-      this.$router.replace(`/g${this.entity.dir}${this.entity.slug}/`);
+      this.$router.back();
     },
   },
   watch: {
