@@ -2,7 +2,6 @@
   <v-container class="mw-40">
     <v-card class="pa-5">
       <h1>Login</h1>
-      <p>Default admin: admin@our-sci.net // 1234</p>
       <v-form>
         <v-text-field
           label="E-Mail"
