@@ -176,4 +176,9 @@ router.delete(
   catchErrors(membershipIntegrationController.deleteIntegration)
 );
 
+// default info
+router.get('/', (req, res) => {
+  return res.send('This is API version 1');
+});
+
 export default router;
