@@ -170,3 +170,7 @@ value=lb-allround-1734767466.us-east-1.elb.amazonaws.com
 Select your load balancer and switch to the listeners tab. Add a new `HTTPS:443` listener. Add your certificate, e.g. `*.surveystack.io`, and then edit **Rules** for this listener.
 
 Add a new rule with condition **Host Header** and a value of your desired subdomain, e.g. `app.surveystack.io`. In that case, forward to your target group, e.g. `tg-surveystack-production`.
+
+### Add instance targets to your target group
+
+Inside AWS console, switch to **EC2 > Target groups** and select your target group (e.g. `tg-surveystack-production`). Switch to the **Targets** tab, and add your running EC2 instance as a registered target group.
