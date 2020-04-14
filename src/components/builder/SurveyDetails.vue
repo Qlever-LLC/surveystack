@@ -8,10 +8,7 @@
         />
         <v-spacer />
         <v-dialog
-<<<<<<< HEAD
           v-model="editDetailsDialogIsVisible"
-=======
->>>>>>> 84b931730603d1d9872e4b7a3bb67d981feca1fe
           width="500"
           max-width="75%"
         >
@@ -307,7 +304,6 @@ export default {
     'validationErrors',
   ],
   computed: {
-<<<<<<< HEAD
     // surveyGroupName() {
     //   const { id } = this.value.group;
     //   const groups = this.$store.getters['memberships/groups'];
@@ -321,6 +317,7 @@ export default {
   watch: {
     value: {
       async handler(value, oldValue) {
+        // console.log(value.group.id, this.value.group.id);
         // if (
         //   value.group && oldValue.group && value.group.id && oldValue.group.id
         //   && value.group.id === oldValue.group.id
@@ -332,17 +329,6 @@ export default {
         this.surveyGroupName = await this.getGroupNameById(value.group.id);
       },
       deep: true,
-=======
-    surveyGroupName() {
-      try {
-        const { id } = this.value.group;
-        const groups = this.$store.getters['memberships/groups'];
-        const { name } = groups.find(({ _id }) => id === _id);
-        return name;
-      } catch (error) {
-        return '(No group)';
-      }
->>>>>>> 84b931730603d1d9872e4b7a3bb67d981feca1fe
     },
   },
   components: {
