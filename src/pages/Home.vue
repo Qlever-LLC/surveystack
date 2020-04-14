@@ -14,7 +14,7 @@
       </v-flex>
 
       <v-flex mb-4>
-        <h1 class="display-3 mb-3">Welcome to Our-Sci</h1>
+        <h1 class="display-3 mb-3">Welcome to Surveystack</h1>
         <p>
           <strong>Note:</strong> This is a work in progress
         </p>

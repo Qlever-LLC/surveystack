@@ -8,12 +8,18 @@
         />
         <v-spacer />
         <v-dialog
+<<<<<<< HEAD
           v-model="editDetailsDialogIsVisible"
+=======
+>>>>>>> 84b931730603d1d9872e4b7a3bb67d981feca1fe
           width="500"
           max-width="75%"
         >
           <template v-slot:activator="{ on }">
-            <v-btn icon v-on="on">
+            <v-btn
+              icon
+              v-on="on"
+            >
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
           </template>
@@ -241,8 +247,10 @@
         </div>
       </div>
 
-
-      <v-tooltip bottom v-if="validationErrors.length > 0">
+      <v-tooltip
+        bottom
+        v-if="validationErrors.length > 0"
+      >
         <template v-slot:activator="{ on }">
           <!-- <div v-on="on" class="text-center mt-4 error--text" >
             <v-icon color="error">mdi-exclamation</v-icon>
@@ -299,6 +307,7 @@ export default {
     'validationErrors',
   ],
   computed: {
+<<<<<<< HEAD
     // surveyGroupName() {
     //   const { id } = this.value.group;
     //   const groups = this.$store.getters['memberships/groups'];
@@ -323,6 +332,17 @@ export default {
         this.surveyGroupName = await this.getGroupNameById(value.group.id);
       },
       deep: true,
+=======
+    surveyGroupName() {
+      try {
+        const { id } = this.value.group;
+        const groups = this.$store.getters['memberships/groups'];
+        const { name } = groups.find(({ _id }) => id === _id);
+        return name;
+      } catch (error) {
+        return '(No group)';
+      }
+>>>>>>> 84b931730603d1d9872e4b7a3bb67d981feca1fe
     },
   },
   components: {
@@ -368,7 +388,10 @@ export default {
 .survey-group-name-input >>> .v-input__slot ::before {
   border: none;
 }
-.survey-group-name-input >>> .theme--light.v-text-field.v-input--is-disabled > .v-input__control > .v-input__slot:before {
+.survey-group-name-input
+  >>> .theme--light.v-text-field.v-input--is-disabled
+  > .v-input__control
+  > .v-input__slot:before {
   border: none;
 }
 .survey-group-name-input >>> .v-input__control >>> .v-input__slot ::before {

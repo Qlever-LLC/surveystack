@@ -38,9 +38,17 @@
 
       <div class="text-center text-muted mt-5">
         Don't have an account?
-        <router-link :to="{name: 'auth-register', params: {initialEmail: entity.email, initialPassword: entity.password}}">Register now</router-link>
+        <router-link :to="registerLink">Register now</router-link>
       </div>
     </v-card>
+
+    <v-alert
+      class="mt-4"
+      outlined
+      v-if="membership"
+      type="info"
+    >Your code is eligible to join <strong>{{membership.group.name}}</strong></v-alert>
+
     <transition name="fade">
       <app-feedback
         v-if="status"
@@ -54,6 +62,8 @@
 
 <script>
 import appFeedback from '@/components/ui/Feedback.vue';
+import api from '@/services/api.service';
+
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -64,6 +74,12 @@ export default {
   components: {
     appFeedback,
   },
+  props: {
+    initialEmail: {
+      type: String,
+      required: false,
+    },
+  },
   data() {
     return {
       status: '',
@@ -71,24 +87,45 @@ export default {
       entity: {
         ...DEFAULT_ENTITY,
       },
+      invitation: '',
+      membership: null,
     };
-  },
-  props: {
-    initialEmail: {
-      type: String,
-      required: false,
-    },
   },
   computed: {
     passwordInputType() {
       return this.showPasswords ? 'text' : 'password';
     },
+    registerLink() {
+      const link = {
+        name: 'auth-register',
+        params: {
+          initialEmail: this.entity.email,
+          initialPassword: this.entity.password,
+        },
+      };
+
+      if (this.$route.params && this.$route.params.redirect) {
+        link.params.redirect = this.$route.params.redirect;
+      }
+
+      if (this.invitation) {
+        link.query = { invitation: this.invitation };
+      }
+      return link;
+    },
   },
-  created() {
+  async created() {
     if (this.initialEmail) {
       this.entity.email = this.initialEmail;
     }
-    console.log(this.$route.params);
+
+    const { invitation } = this.$route.query;
+    this.invitation = invitation;
+    if (invitation) {
+      this.$store.dispatch('invitation/set', invitation);
+      const { data: [membership] } = await api.get(`/memberships?invitation=${invitation}&populate=true`);
+      this.membership = membership;
+    }
   },
   methods: {
     async submit() {
@@ -116,8 +153,11 @@ export default {
         ) {
           this.$store.dispatch('memberships/setActiveGroup', memberships[0].group._id);
         }
+
         if (this.$route.params.redirect) {
           this.$router.push(this.$route.params.redirect);
+        } else if (this.$store.getters['invitation/hasInvitation']) {
+          this.$router.push({ name: 'invitations', query: { code: this.$store.getters['invitation/code'] } });
         } else {
           this.$router.push('/');
         }

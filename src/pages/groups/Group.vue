@@ -12,7 +12,6 @@
       </v-btn>
     </div>
 
-    <span class="overline text--secondary">{{entity._id}}</span>
     <h1>
       {{entity.name}}
     </h1>

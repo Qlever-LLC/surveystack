@@ -135,13 +135,17 @@ export default {
   },
   methods: {
     getActiveGroupSimpleObject() {
-      const id = this.$store.getters['memberships/activeGroup'];
-      const groups = this.$store.getters['memberships/groups'];
-      const { path } = groups.find(({ _id }) => _id === id);
-      return {
-        id,
-        path,
-      };
+      try {
+        const id = this.$store.getters['memberships/activeGroup'];
+        const groups = this.$store.getters['memberships/groups'];
+        const { path } = groups.find(({ _id }) => _id === id);
+        return {
+          id,
+          path,
+        };
+      } catch (error) {
+        return { id: null, path: null };
+      }
     },
     navigateToLogin() {
       this.$router.push('/auth/login');

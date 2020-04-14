@@ -5,7 +5,7 @@ const types = {
 };
 
 const createInitialState = () => ({
-  title: 'Our-Sci',
+  title: 'Surveystack',
   subtitle: '',
 });
 

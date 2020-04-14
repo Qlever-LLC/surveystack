@@ -699,7 +699,7 @@ if (DBG) {
 export function findControlById(controlId, controls) {
   function reducer(id) {
     return (r, x) => {
-      debugger;
+      // debugger;
       if (x._id === id) {
         return [x, ...r];
       }
