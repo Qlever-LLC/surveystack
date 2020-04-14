@@ -15,8 +15,14 @@
       v-if="$store.getters['auth/isLoggedIn']"
       class="d-flex justify-end"
     >
-      <v-btn text>Cancel</v-btn>
-      <v-btn color="primary">Join {{membership.group.name}}</v-btn>
+      <v-btn
+        text
+        @click="cancel"
+      >Cancel</v-btn>
+      <v-btn
+        color="primary"
+        @click="join"
+      >Join {{membership.group.name}}</v-btn>
     </div>
     <div
       v-else
@@ -79,27 +85,14 @@ export default {
 
       this.initialized = true;
     },
-    gotoRegister() {
-      this.$router.push({
-        name: 'auth-register',
-        query: {
-          invitation: this.code,
-        },
-        params: {
-          redirect: { name: 'invitations', query: { code: this.code } },
-        },
-      });
+    cancel() {
+      this.$store.dispatch('invitation/clear');
+      this.$router.push('/');
     },
-    gotoLogin() {
-      this.$router.push({
-        name: 'auth-login',
-        query: {
-          invitation: this.code,
-        },
-        params: {
-          redirect: { name: 'invitations', query: { code: this.code } },
-        },
-      });
+    join() {
+      this.$store.dispatch('invitation/clear');
+      // TODO: call membership claim endpoint
+      this.$router.push('/');
     },
   },
 

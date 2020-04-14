@@ -158,8 +158,11 @@ export default {
         ) {
           this.$store.dispatch('memberships/setActiveGroup', memberships[0].group._id);
         }
+
         if (this.$route.params.redirect) {
           this.$router.push(this.$route.params.redirect);
+        } else if (this.$store.getters['invitation/hasInvitation']) {
+          this.$router.push({ name: 'invitations', query: { code: this.$store.getters['invitation/code'] } });
         } else {
           this.$router.push('/surveys');
         }
@@ -186,6 +189,7 @@ export default {
     const { invitation } = this.$route.query;
     this.invitation = invitation;
     if (invitation) {
+      this.$store.dispatch('invitation/set', invitation);
       const { data: [membership] } = await api.get(`/memberships?invitation=${invitation}&populate=true`);
       this.membership = membership;
     }
