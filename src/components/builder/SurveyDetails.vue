@@ -7,7 +7,11 @@
           v-model="value.name"
         />
         <v-spacer />
-        <v-dialog width="500" max-width="75%">
+        <v-dialog
+          v-model="editDetailsDialogIsVisible"
+          width="500"
+          max-width="75%"
+        >
           <template v-slot:activator="{ on }">
             <v-btn icon v-on="on">
               <v-icon>mdi-pencil</v-icon>
@@ -33,7 +37,16 @@
                 outlined
               />
             </v-card-text>
-            <v-card-actions />
+            <v-card-actions class="mr-3">
+              <v-spacer />
+              <v-btn
+                @click="editDetailsDialogIsVisible = false"
+                color="primary"
+                text
+              >
+                Close
+              </v-btn>
+            </v-card-actions>
           </v-card>
         </v-dialog>
         <v-menu
@@ -260,8 +273,20 @@
 <script>
 import SurveyNameEditor from '@/components/builder/SurveyNameEditor.vue';
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
+import api from '@/services/api.service';
 
 export default {
+  data() {
+    return {
+      editDetailsDialogIsVisible: false,
+      surveyGroupName: 'Group Not Found',
+    };
+  },
+  async created() {
+    const { id } = this.value.group;
+    const name = await this.getGroupNameById(id);
+    this.surveyGroupName = name;
+  },
   props: [
     'value',
     'isNew',
@@ -274,11 +299,30 @@ export default {
     'validationErrors',
   ],
   computed: {
-    surveyGroupName() {
-      const { id } = this.value.group;
-      const groups = this.$store.getters['memberships/groups'];
-      const { name } = groups.find(({ _id }) => id === _id);
-      return name;
+    // surveyGroupName() {
+    //   const { id } = this.value.group;
+    //   const groups = this.$store.getters['memberships/groups'];
+    //   const { name } = groups.find(({ _id }) => id === _id);
+    //   if (!name) {
+
+    //   }
+    //   return name;
+    // },
+  },
+  watch: {
+    value: {
+      async handler(value, oldValue) {
+        // if (
+        //   value.group && oldValue.group && value.group.id && oldValue.group.id
+        //   && value.group.id === oldValue.group.id
+        // ) {
+        //   console.log('groups are same');
+        //   return;
+        // }
+
+        this.surveyGroupName = await this.getGroupNameById(value.group.id);
+      },
+      deep: true,
     },
   },
   components: {
@@ -286,6 +330,16 @@ export default {
     ActiveGroupSelector,
   },
   methods: {
+    async getGroupNameById(id) {
+      const groups = this.$store.getters['memberships/groups'];
+      // const { name } = groups.find(({ _id }) => id === _id);
+      const result = groups.find(({ _id }) => id === _id);
+      if (result) {
+        return result.name;
+      }
+      const response = await api.get(`/groups/${id}`);
+      return response.data.name;
+    },
     updateSurveyName(name) {
       this.$emit('set-survey-name', name);
       // this.$set(this.value, 'name', name);

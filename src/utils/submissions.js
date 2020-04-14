@@ -145,7 +145,7 @@ const createSubmissionFromSurvey = (survey, version = 1, instance = null) => {
           inner[updatedKey] = flattenedInstance[k];
         }
         v = unflatten(inner);
-        console.log('unflattened');
+        // console.log('unflattened');
       }
     }
     const dateModified = flattenedInstance ? flattenedInstance[`${flatName}.meta.dateModified`] : null;

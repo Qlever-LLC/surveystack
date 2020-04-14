@@ -367,7 +367,7 @@ export default {
 
       const v = this.survey.revisions[this.survey.revisions.length - 1].version;
       const amountQuestions = utils.getSurveyPositions(this.survey, v);
-      console.log('amount: ', amountQuestions);
+      // console.log('amount: ', amountQuestions);
       this.setNavbarContent({
         title: this.survey.name || 'Untitled Survey',
         subtitle: `
@@ -376,7 +376,7 @@ export default {
         `,
       });
 
-      console.log('version is', version);
+      // console.log('version is', version);
     },
     updateSelectedCode(code) {
       this.control.options[tabMap[this.selectedTab]].code = code;
@@ -725,7 +725,6 @@ export default {
         const surveyDetailsAreEquivalent = (this.initialSurvey.name === newVal.name)
           && isEqual(this.initialSurvey.group, newVal.group)
           && (this.initialSurvey.description === newVal.description);
-        console.log(surveyDetailsAreEquivalent);
         this.surveyUnchanged = revisionsAreEqual && surveyDetailsAreEquivalent;
 
         const current = newVal.revisions[newVal.revisions.length - 1];

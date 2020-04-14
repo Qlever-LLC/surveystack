@@ -290,7 +290,7 @@ export default {
 
     if (navigator.geolocation) {
       this.geolocationID = navigator.geolocation.watchPosition((position) => {
-        console.log('pos', position.coords);
+        // console.log('pos', position.coords);
         this.gps = {
           lat: position.coords.latitude,
           lng: position.coords.longitude,

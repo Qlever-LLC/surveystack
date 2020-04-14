@@ -440,10 +440,10 @@ export default {
   },
 
   async created() {
-    console.log('submission', this.submission);
+    // console.log('submission', this.submission);
     /** Should this be broken out into method? */
-    console.log('pos', this.position);
-    console.log('survey', this.survey);
+    // console.log('pos', this.position);
+    // console.log('survey', this.survey);
     if (!this.position) {
       return;
     }
