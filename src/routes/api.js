@@ -118,6 +118,7 @@ router.delete('/scripts/:id', catchErrors(scriptController.deleteScript));
 /** Memberships */
 router.get('/memberships', catchErrors(membershipController.getMemberships));
 router.get('/memberships/:id', catchErrors(membershipController.getMembership));
+router.post('/memberships/claim', catchErrors(membershipController.claimMembership));
 router.post('/memberships', catchErrors(membershipController.createMembership));
 router.put(
   '/memberships/:id',

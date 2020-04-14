@@ -7,6 +7,7 @@ import { db } from '../db';
 
 import { populate } from '../helpers';
 import mailService from '../services/mail.service';
+import membershipService from '../services/membership.service';
 
 const col = 'memberships';
 
@@ -26,7 +27,7 @@ const sanitize = (entity) => {
 const getMemberships = async (req, res) => {
   const filter = {};
 
-  const { group, user, invitation } = req.query;
+  const { group, user, invitation, status } = req.query;
   if (group) {
     filter.group = new ObjectId(group);
   }
@@ -37,6 +38,10 @@ const getMemberships = async (req, res) => {
 
   if (invitation) {
     filter['meta.invitation'] = invitation;
+  }
+
+  if (status) {
+    filter['meta.status'] = status;
   }
 
   const pipeline = [{ $match: filter }];
@@ -168,13 +173,13 @@ const createMembership = async (req, res) => {
 
   mailService.send({
     to: entity.meta.sentTo,
-    subject: `SurveyStack invitation to group ${g.name}`,
+    subject: `Surveystack invitation to group ${g.name}`,
     text: `Hello
     
 You are invited to join group ${g.name}!
     
 Please use the following link to claim your invitation:
-https://app.surveystack.io/auth/register?invitation=${entity.meta.code}
+https://app.surveystack.io/invitations?code=${entity.meta.invitation}
     
 Best Regards`,
   });
@@ -225,10 +230,20 @@ const deleteMembership = async (req, res) => {
   }
 };
 
+const claimMembership = async (req, res) => {
+  const { code } = req.body;
+  const user = res.locals.auth.user._id;
+
+  await membershipService.claimMembership({ code, user });
+
+  return res.send('OK');
+};
+
 export default {
   getMemberships,
   getMembership,
   createMembership,
   updateMembership,
   deleteMembership,
+  claimMembership,
 };
