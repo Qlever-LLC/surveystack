@@ -60,9 +60,15 @@ const getSurveyPage = async (req, res) => {
   let skip = 0;
   let limit = DEFAULT_LIMIT;
 
-  const { q } = req.query;
+  const { q, group } = req.query;
   if (q) {
     match.name = { $regex: q, $options: 'i' };
+  }
+
+  if (group && !Array.isArray(group)) {
+    match['group.id'] = group;
+  } else if (group && Array.isArray(group)) {
+    match['group.id'] = { $in: group };
   }
 
   const pipeline = [{ $match: match }];
