@@ -24,37 +24,16 @@
             :to="`/memberships/${member._id}/edit`"
             two-line
           >
-            <v-list-item-content>
+            <v-list-item-content v-if="member.meta.status === 'pending'">
+              <v-list-item-title class="text--secondary">[Pending] Invitation</v-list-item-title>
+              <v-list-item-subtitle>{{member.meta.sentTo}}</v-list-item-subtitle>
+            </v-list-item-content>
+
+            <v-list-item-content v-else>
               <v-list-item-title>{{member.user.name}}</v-list-item-title>
               <v-list-item-subtitle>{{member.user.email}}</v-list-item-subtitle>
-              <!--
-              <v-autocomplete
-                class="mt-4"
-                dense
-                @change="onChange"
-                :items="items"
-                outlined
-                :delimiters="[',']"
-                chips
-                label="FarmOS: RFC Aggregator"
-                multiple
-              >
-              </v-autocomplete>
-
-              <v-autocomplete
-                class="mt-4"
-                dense
-                @change="onChange"
-                :items="items"
-                outlined
-                :delimiters="[',']"
-                chips
-                label="FarmOS: GM Aggregator"
-                multiple
-              >
-              </v-autocomplete>
-              //-->
             </v-list-item-content>
+
             <v-list-item-action>
               <v-icon v-if="member.role === 'admin'">mdi-crown-outline</v-icon>
             </v-list-item-action>
@@ -99,14 +78,23 @@ export default {
       if (!this.q) {
         return this.entities;
       }
+      const q = this.q.toLowerCase();
+
       return this.entities.filter((entity) => {
-        if (entity.name.toLowerCase().indexOf(this.q.toLowerCase()) > -1) {
-          return true;
+        if (entity.user) {
+          if (entity.user.name.toLowerCase().indexOf(q) > -1) {
+            return true;
+          }
+
+          if (entity.user.email.toLowerCase().startsWith(q)) {
+            return true;
+          }
+        } else if (entity.meta.sentTo) {
+          if (entity.meta.sentTo.toLowerCase().indexOf(q) > -1) {
+            return true;
+          }
         }
 
-        if (entity.email.toLowerCase().startsWith(this.q.toLowerCase())) {
-          return true;
-        }
         return false;
       });
     },

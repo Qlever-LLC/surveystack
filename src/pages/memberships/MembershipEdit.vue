@@ -9,21 +9,21 @@
         @keydown.enter.prevent="submit"
       >
         <v-text-field
-          v-model="entity.group._id"
+          v-model="entity.group"
           label="Group"
           outlined
           disabled
-          :hint="entity.group.name"
+          :hint="entity.group"
           persistent-hint
         />
 
         <v-text-field
           class="mt-3"
-          v-model="entity.user._id"
+          v-model="entity.user"
           label="User"
           outlined
           disabled
-          :hint="entity.user.name"
+          :hint="entity.user"
           persistent-hint
         />
 
@@ -120,10 +120,12 @@ export default {
       availableRoles,
       entity: {
         _id: '',
-        user: { _id: '', name: '' },
-        group: { _id: '', name: '', path: '' },
+        user: null,
+        group: null,
         role: 'user',
+        meta: {},
       },
+      groupDetail: null,
       integrations: [],
       dialogRemoval: false,
     };
@@ -136,9 +138,7 @@ export default {
       this.entity.content = code;
     },
     async submit() {
-      const data = {
-        _id: this.entity._id, user: this.entity.user._id, group: this.entity.group._id, role: this.entity.role,
-      };
+      const data = this.entity;
       const url = `/memberships/${this.entity._id}`;
 
       try {
@@ -163,11 +163,14 @@ export default {
   async created() {
     try {
       const { id } = this.$route.params;
-      const { data } = await api.get(`/memberships/${id}?populate=1`);
-      this.entity = { ...this.entity, ...data };
+      const { data: entity } = await api.get(`/memberships/${id}`);
+      this.entity = { ...this.entity, ...entity };
 
-      const i = await api.get(`/membership-integrations?membership=${id}`);
-      this.integrations = i.data;
+      const { data: groupDetail } = await api.get(`/groups/${this.entity.group}`);
+      this.groupDetail = groupDetail;
+
+      const { data: integrations } = await api.get(`/membership-integrations?membership=${id}`);
+      this.integrations = integrations;
     } catch (e) {
       console.log('something went wrong:', e);
     }

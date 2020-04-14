@@ -1,30 +1,14 @@
 <template>
   <v-container>
     <span class="text--secondary overline">{{entity._id}}</span>
-    <h1>Create Membership</h1>
-
+    <h1>Invite Members</h1>
+    <h3>{{groupDetail.name}}</h3>
+    <h4 class="text--secondary">{{groupDetail.path}}</h4>
     <v-card class="pa-4 mb-4">
       <v-form
         class="mt-3"
         @keydown.enter.prevent="submit"
       >
-        <v-text-field
-          v-model="entity.group._id"
-          label="Group"
-          outlined
-          disabled
-          :hint="entity.group.name"
-          persistent-hint
-        />
-
-        <v-text-field
-          class="mt-3"
-          v-model="entity.user.email"
-          label="User"
-          outlined
-          placeholder="User e-mail"
-          persistent-hint
-        />
 
         <v-select
           class="mt-3"
@@ -33,6 +17,13 @@
           label="Role"
           outlined
         ></v-select>
+
+        <v-text-field
+          class="mt-3"
+          v-model="entity.meta.sentTo"
+          label="Email"
+          outlined
+        />
 
         <div class="d-flex mt-2 justify-end">
 
@@ -58,7 +49,7 @@
           User does not exist yet
         </v-card-title>
         <v-card-text class="mt-4">
-          Do you want to proceed to create a new user with email {{this.entity.user.email}}
+          Do you want to proceed to create a new user with email {{this.entity.meta.sentTo}}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -86,6 +77,8 @@
 import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 
+import { uuid } from '@/utils/memberships';
+
 const availableRoles = [
   {
     value: 'user',
@@ -103,11 +96,19 @@ export default {
       availableRoles,
       entity: {
         _id: '',
-        user: { _id: '', name: '', email: '' },
-        group: { _id: '', name: '', path: '' },
+        user: null,
+        group: null,
         role: 'user',
+        meta: {
+          status: 'pending',
+          dateCreated: new Date(),
+          dateClaimed: null,
+          sentTo: null,
+          notes: '',
+          code: uuid(),
+        },
       },
-      integrations: [],
+      groupDetail: { name: '', path: '' },
       dialogCreateUser: false,
     };
   },
@@ -119,9 +120,7 @@ export default {
       this.entity.content = code;
     },
     async submit() {
-      const data = {
-        _id: this.entity._id, user: this.entity.user.email, group: this.entity.group._id, role: this.entity.role,
-      };
+      const data = this.entity;
       const url = '/memberships';
 
       try {
@@ -138,19 +137,15 @@ export default {
       this.$router.replace({
         name: 'users-new',
         query: {
-          group: this.entity.group._id,
+          group: this.entity.group,
           role: this.entity.role,
-          email: this.entity.user.email,
+          email: this.entity.meta.sentTo,
         },
       });
     },
   },
   computed: {
     submittable() {
-      if (this.entity.user.email.trim() === '') {
-        return false;
-      }
-
       return true;
     },
   },
@@ -163,8 +158,10 @@ export default {
     }
 
     try {
-      const { data: groupEntity } = await api.get(`/groups/${group}`);
-      this.entity.group = groupEntity;
+      const { data: groupDetail } = await api.get(`/groups/${group}`);
+      this.groupDetail = groupDetail;
+      this.entity.group = group;
+      this.entity.role = role;
     } catch (e) {
       console.log('something went wrong:', e);
     }

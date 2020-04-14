@@ -56,6 +56,14 @@
       </div>
 
     </v-card>
+
+    <v-alert
+      class="mt-4"
+      outlined
+      v-if="membership"
+      type="info"
+    >You will join group <strong>{{membership.group.name}}</strong></v-alert>
+
     <transition name="fade">
       <app-feedback
         v-if="status"
@@ -68,6 +76,7 @@
 
 <script>
 import appFeedback from '@/components/ui/Feedback.vue';
+import api from '@/services/api.service';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -85,6 +94,8 @@ export default {
       passwordConfirmation: '',
       showPasswords: false,
       entity: { ...DEFAULT_ENTITY },
+      invitation: '',
+      membership: null,
     };
   },
   props: {
@@ -93,9 +104,16 @@ export default {
       required: false,
     },
   },
-  created() {
+  async created() {
     if (this.initialEmail) {
       this.entity.email = this.initialEmail;
+    }
+
+    const { invitation } = this.$route.query;
+    this.invitation = invitation;
+    if (invitation) {
+      const { data: [membership] } = await api.get(`/memberships?invitation=${invitation}&populate=true`);
+      this.membership = membership;
     }
   },
   computed: {
