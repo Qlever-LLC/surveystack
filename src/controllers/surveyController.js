@@ -20,6 +20,10 @@ const sanitize = (entity) => {
     version.dateCreated = new Date(entity.dateCreated);
   });
 
+  if (entity.group.id) {
+    entity.group.id = new ObjectId(entity.group.id);
+  }
+
   checkSurvey(entity, entity.latestVersion);
 
   return entity;
