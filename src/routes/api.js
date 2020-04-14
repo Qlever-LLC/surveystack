@@ -187,4 +187,13 @@ router.get('/', (req, res) => {
   return res.send('This is API version 1');
 });
 
+// 404 fallback
+router.use((req, res) => {
+  return res.status(404).send({
+    message: 'API route not found',
+    path: req.path,
+    status: 404,
+  });
+});
+
 export default router;

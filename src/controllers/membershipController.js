@@ -6,25 +6,37 @@ import { ObjectId } from 'mongodb';
 import { db } from '../db';
 
 import { populate } from '../helpers';
+import mailService from '../services/mail.service';
 
 const col = 'memberships';
 
 const sanitize = (entity) => {
   entity._id = new ObjectId(entity._id);
-  entity.group = new ObjectId(entity.group);
-  entity.user = new ObjectId(entity.user);
+
+  entity.group && (entity.group = new ObjectId(entity.group));
+  entity.user && (entity.user = new ObjectId(entity.user));
+
+  if (entity.meta) {
+    const meta = entity.meta;
+    meta.dateCreated && (meta.dateCreated = new Date(meta.dateCreated));
+    meta.dateClaimed && (meta.dateClaimed = new Date(meta.dateClaimed));
+  }
 };
 
 const getMemberships = async (req, res) => {
   const filter = {};
 
-  const { group, user } = req.query;
+  const { group, user, code } = req.query;
   if (group) {
     filter.group = new ObjectId(group);
   }
 
   if (user) {
     filter.user = new ObjectId(user);
+  }
+
+  if (code) {
+    filter['meta.code'] = code;
   }
 
   const pipeline = [{ $match: filter }];
@@ -43,7 +55,12 @@ const getMemberships = async (req, res) => {
           },
         },
         {
-          $unwind: '$user',
+          $unwind: { path: '$user', preserveNullAndEmptyArrays: true },
+        },
+        {
+          $set: {
+            user: { $ifNull: ['$user', null] }, // we want user: null explicitly
+          },
         },
       ]
     );
@@ -100,7 +117,12 @@ const getMembership = async (req, res) => {
           },
         },
         {
-          $unwind: '$user',
+          $unwind: { path: '$user', preserveNullAndEmptyArrays: true },
+        },
+        {
+          $set: {
+            user: { $ifNull: ['$user', null] }, // we want user: null explicitly
+          },
         },
       ]
     );
@@ -126,6 +148,8 @@ const getMembership = async (req, res) => {
     .aggregate(pipeline)
     .toArray();
 
+  console.log(entity);
+
   if (!entity) {
     throw boom.notFound();
   }
@@ -133,32 +157,30 @@ const getMembership = async (req, res) => {
   return res.send(entity);
 };
 
-/**
- * Create a membership with user: ObjectId | email
- */
 const createMembership = async (req, res) => {
   const entity = req.body;
-
-  // sanitize but treat user as: ObjectId | email
-  entity._id = new ObjectId(entity._id);
-  entity.group = new ObjectId(entity.group);
-  if (ObjectId.isValid(entity.user)) {
-    entity.user = new ObjectId(entity.user);
-  } else {
-    const u = await db.collection('users').findOne({ email: entity.user });
-    if (!u) {
-      throw boom.notFound(`user not found: ${entity.user}`);
-    }
-    entity.user = u._id;
-  }
+  sanitize(entity);
 
   const g = await db.collection('groups').findOne({ _id: entity.group });
   if (!g) {
     throw boom.badRequest(`Group does not exist: ${entity.group}`);
   }
 
+  mailService.send({
+    to: entity.meta.sentTo,
+    subject: `SurveyStack invitation to group ${g.name}`,
+    text: `Hello
+    
+You are invited to join group ${g.name}!
+    
+Please use the following link to claim your invitation:
+https://app.surveystack.io/auth/register?invitation=${entity.meta.code}
+    
+Best Regards`,
+  });
+
   try {
-    let r = await db.collection(col).insertOne({ ...entity, _id: new ObjectId(entity._id) });
+    let r = await db.collection(col).insertOne(entity);
     assert.equal(1, r.insertedCount);
     return res.send(r);
   } catch (err) {

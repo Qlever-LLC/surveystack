@@ -377,36 +377,84 @@ export const exampleMemberships = [
     user: new ObjectId('5e452119c5117c000185f275'), // Default Our-Sci Admin
     group: new ObjectId('5e6f8bbeea14550001470c28'),
     role: 'admin',
+    meta: {
+      status: 'claimed',
+      dateCreated: '2020-04-14T08:04:26.170Z',
+      dateClaimed: null,
+      sentTo: '',
+      notes: '',
+      code: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbba',
+    },
   },
   {
     _id: new ObjectId('5e4a656fa1f0db0001bb4a9b'),
     user: new ObjectId('5e452119c5117c000185f275'), // Default Our-Sci Admin
     group: new ObjectId('5e6f8bbeea14550001470c38'),
     role: 'admin',
+    meta: {
+      status: 'claimed',
+      dateCreated: '2020-04-14T08:04:26.170Z',
+      dateClaimed: null,
+      sentTo: '',
+      notes: '',
+      code: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbb',
+    },
   },
   {
     _id: new ObjectId('5e4a656fa1f0db0001bb4a9c'),
     user: new ObjectId('5e6f92f16070e700015e0371'), // Default Our-Sci User
     group: new ObjectId('5e6f8bbeea14550001470c28'), // our-sci
     role: 'user',
+    meta: {
+      status: 'claimed',
+      dateCreated: '2020-04-14T08:04:26.170Z',
+      dateClaimed: null,
+      sentTo: '',
+      notes: '',
+      code: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbc',
+    },
   },
   {
     _id: new ObjectId('5e4a656fa1f0db0001bb4a9e'),
     user: new ObjectId('5e6f92f16070e700015e0371'), // Default Our-Sci User
     group: new ObjectId('5e6f8bbeea14550001470c32'), // our-sci/lab
     role: 'user',
+    meta: {
+      status: 'claimed',
+      dateCreated: '2020-04-14T08:04:26.170Z',
+      dateClaimed: null,
+      sentTo: '',
+      notes: '',
+      code: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbd',
+    },
   },
   {
     _id: new ObjectId('5e4a656fa1f0db0001bb4a9f'),
     user: new ObjectId('5e6f92f16070e700015e0371'), // Default Our-Sci User
     group: new ObjectId('5e6f8bbeea14550001470c34'), // our-sci/lab/testing
     role: 'user',
+    meta: {
+      status: 'claimed',
+      dateCreated: '2020-04-14T08:04:26.170Z',
+      dateClaimed: null,
+      sentTo: '',
+      notes: '',
+      code: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbe',
+    },
   },
   {
     _id: new ObjectId('5e4a656fa1f0db0001bb4aa0'),
     user: new ObjectId('5e6f92f16070e700015e0371'), // Default Our-Sci User
     group: new ObjectId('5e6f8bbeea14550001470c36'), // our-sci/lab/results
     role: 'user',
+    meta: {
+      status: 'claimed',
+      dateCreated: '2020-04-14T08:04:26.170Z',
+      dateClaimed: null,
+      sentTo: '',
+      notes: '',
+      code: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbf',
+    },
   },
 ];
 
