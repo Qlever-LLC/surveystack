@@ -91,7 +91,7 @@ export default {
     },
     async join() {
       this.$store.dispatch('invitation/clear');
-      // TODO: call membership claim endpoint
+      // TODO: display status/errors
       await api.post('/memberships/claim', { code: this.code });
       this.$router.push('/');
     },

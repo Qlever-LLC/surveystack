@@ -164,7 +164,7 @@ export default {
         } else if (this.$store.getters['invitation/hasInvitation']) {
           this.$router.push({ name: 'invitations', query: { code: this.$store.getters['invitation/code'] } });
         } else {
-          this.$router.push('/surveys');
+          this.$router.push('/');
         }
       } catch (error) {
         console.log(error.response);
