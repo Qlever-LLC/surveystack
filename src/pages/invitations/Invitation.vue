@@ -89,9 +89,10 @@ export default {
       this.$store.dispatch('invitation/clear');
       this.$router.push('/');
     },
-    join() {
+    async join() {
       this.$store.dispatch('invitation/clear');
       // TODO: call membership claim endpoint
+      await api.post('/memberships/claim', { code: this.code });
       this.$router.push('/');
     },
   },

@@ -47,7 +47,7 @@
       outlined
       v-if="membership"
       type="info"
-    >You will be joining group <strong>{{membership.group.name}}</strong></v-alert>
+    >Your code is eligible to join <strong>{{membership.group.name}}</strong></v-alert>
 
     <transition name="fade">
       <app-feedback
