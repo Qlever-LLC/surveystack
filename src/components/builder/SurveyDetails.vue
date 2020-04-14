@@ -7,9 +7,15 @@
           v-model="value.name"
         />
         <v-spacer />
-        <v-dialog width="500" max-width="75%">
+        <v-dialog
+          width="500"
+          max-width="75%"
+        >
           <template v-slot:activator="{ on }">
-            <v-btn icon v-on="on">
+            <v-btn
+              icon
+              v-on="on"
+            >
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
           </template>
@@ -228,8 +234,10 @@
         </div>
       </div>
 
-
-      <v-tooltip bottom v-if="validationErrors.length > 0">
+      <v-tooltip
+        bottom
+        v-if="validationErrors.length > 0"
+      >
         <template v-slot:activator="{ on }">
           <!-- <div v-on="on" class="text-center mt-4 error--text" >
             <v-icon color="error">mdi-exclamation</v-icon>
@@ -275,10 +283,14 @@ export default {
   ],
   computed: {
     surveyGroupName() {
-      const { id } = this.value.group;
-      const groups = this.$store.getters['memberships/groups'];
-      const { name } = groups.find(({ _id }) => id === _id);
-      return name;
+      try {
+        const { id } = this.value.group;
+        const groups = this.$store.getters['memberships/groups'];
+        const { name } = groups.find(({ _id }) => id === _id);
+        return name;
+      } catch (error) {
+        return '(No group)';
+      }
     },
   },
   components: {
@@ -314,7 +326,10 @@ export default {
 .survey-group-name-input >>> .v-input__slot ::before {
   border: none;
 }
-.survey-group-name-input >>> .theme--light.v-text-field.v-input--is-disabled > .v-input__control > .v-input__slot:before {
+.survey-group-name-input
+  >>> .theme--light.v-text-field.v-input--is-disabled
+  > .v-input__control
+  > .v-input__slot:before {
   border: none;
 }
 .survey-group-name-input >>> .v-input__control >>> .v-input__slot ::before {

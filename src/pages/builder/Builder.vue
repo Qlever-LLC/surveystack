@@ -137,6 +137,9 @@ export default {
     getActiveGroupSimpleObject() {
       const id = this.$store.getters['memberships/activeGroup'];
       const groups = this.$store.getters['memberships/groups'];
+      if (groups.length === 0) {
+        return { id: null, path: null };
+      }
       const { path } = groups.find(({ _id }) => _id === id);
       return {
         id,
