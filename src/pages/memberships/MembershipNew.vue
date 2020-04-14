@@ -105,7 +105,7 @@ export default {
           dateClaimed: null,
           sentTo: null,
           notes: '',
-          code: uuid(),
+          invitation: uuid(),
         },
       },
       groupDetail: { name: '', path: '' },

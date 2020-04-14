@@ -52,7 +52,7 @@
       </v-form>
       <div class="text-center text-muted mt-5">
         Already have an account?
-        <router-link to="/auth/login">Sign in</router-link>
+        <router-link :to="signInLink">Sign in</router-link>
       </div>
 
     </v-card>
@@ -62,7 +62,7 @@
       outlined
       v-if="membership"
       type="info"
-    >You will join group <strong>{{membership.group.name}}</strong></v-alert>
+    >You will be joining group <strong>{{membership.group.name}}</strong></v-alert>
 
     <transition name="fade">
       <app-feedback
@@ -104,18 +104,6 @@ export default {
       required: false,
     },
   },
-  async created() {
-    if (this.initialEmail) {
-      this.entity.email = this.initialEmail;
-    }
-
-    const { invitation } = this.$route.query;
-    this.invitation = invitation;
-    if (invitation) {
-      const { data: [membership] } = await api.get(`/memberships?invitation=${invitation}&populate=true`);
-      this.membership = membership;
-    }
-  },
   computed: {
     passwordInputType() {
       return this.showPasswords ? 'text' : 'password';
@@ -123,8 +111,17 @@ export default {
     passwordShowHideText() {
       return this.showPasswords ? 'Hide passwords' : 'Show passwords';
     },
-    mode() {
-      return this.$route.name === 'auth-register' ? 'register' : 'login';
+    signInLink() {
+      const link = { name: 'auth-login', params: {} };
+
+      if (this.$route.params && this.$route.params.redirect) {
+        link.params.redirect = this.$route.params.redirect;
+      }
+
+      if (this.invitation) {
+        link.query = { invitation: this.invitation };
+      }
+      return link;
     },
   },
   methods: {
@@ -161,7 +158,11 @@ export default {
         ) {
           this.$store.dispatch('memberships/setActiveGroup', memberships[0].group._id);
         }
-        this.$router.push('/surveys');
+        if (this.$route.params.redirect) {
+          this.$router.push(this.$route.params.redirect);
+        } else {
+          this.$router.push('/surveys');
+        }
       } catch (error) {
         console.log(error.response);
         switch (error.response.status) {
@@ -176,6 +177,18 @@ export default {
     reset() {
       this.entity = { ...DEFAULT_ENTITY };
     },
+  },
+  async created() {
+    if (this.initialEmail) {
+      this.entity.email = this.initialEmail;
+    }
+
+    const { invitation } = this.$route.query;
+    this.invitation = invitation;
+    if (invitation) {
+      const { data: [membership] } = await api.get(`/memberships?invitation=${invitation}&populate=true`);
+      this.membership = membership;
+    }
   },
 };
 </script>

@@ -38,6 +38,8 @@ import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
 import MembershipNew from '@/pages/memberships/MembershipNew.vue';
 import MembershipEdit from '@/pages/memberships/MembershipEdit.vue';
 
+import Invitation from '@/pages/invitations/Invitation.vue';
+
 
 // integrations
 import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
@@ -263,6 +265,12 @@ const routes = [
     path: '/memberships/:id/edit',
     name: 'memberships-edit',
     component: MembershipEdit,
+  },
+  // Invitation
+  {
+    path: '/invitations',
+    name: 'invitations',
+    component: Invitation,
   },
   // tabula rasa
   // TODO: remove this from production
