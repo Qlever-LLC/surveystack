@@ -7,10 +7,11 @@ import boom from '@hapi/boom';
 import mailService from '../services/mail.service';
 import rolesService from '../services/roles.service';
 import { db } from '../db';
+import membershipService from '../services/membership.service';
 
 const col = 'users';
 
-const createPayload = async user => {
+const createPayload = async (user) => {
   delete user.password;
   const roles = await rolesService.getRoles(user._id);
   user.roles = roles;
@@ -19,7 +20,7 @@ const createPayload = async user => {
 
 const register = async (req, res) => {
   // TODO: sanity check
-  const { email, name, password } = req.body;
+  const { email, name, password, invitation } = req.body;
   const hash = bcrypt.hashSync(password, parseInt(process.env.BCRYPT_ROUNDS));
   const token = uuidv4();
   const user = {
@@ -35,6 +36,12 @@ const register = async (req, res) => {
   try {
     let r = await db.collection(col).insertOne(user);
     assert.equal(1, r.insertedCount);
+
+    // TODO: apply invitation
+    if (invitation) {
+      await membershipService.claimMembership({ invitation, user: r.ops[0]._id });
+    }
+
     const payload = await createPayload(r.ops[0]);
     return res.send(payload);
   } catch (err) {
@@ -47,7 +54,7 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, invitation } = req.body;
 
   if (email.trim() === '' || password.trim() === '') {
     throw boom.badRequest('Email and password must not be empty');
@@ -62,6 +69,11 @@ const login = async (req, res) => {
 
   if (!passwordsMatch) {
     throw boom.unauthorized(`Incorrect password for user: ${email}`);
+  }
+
+  // TODO: apply invitation
+  if (invitation) {
+    await membershipService.claimMembership({ invitation, user: existingUser._id });
   }
 
   const payload = await createPayload(existingUser);

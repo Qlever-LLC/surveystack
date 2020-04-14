@@ -12,6 +12,20 @@ export const createMembership = async ({ user, group, role }) => {
   return m;
 };
 
+export const claimMembership = async ({ invitation, user }) => {
+  await db.collection(col).findOneAndUpdate(
+    { 'meta.invitation': invitation },
+    {
+      $set: {
+        user: user,
+        'meta.status': 'active',
+        'meta.dateClaimed': new Date(),
+      },
+    }
+  );
+};
+
 export default {
   createMembership,
+  claimMembership,
 };

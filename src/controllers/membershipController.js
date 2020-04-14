@@ -26,7 +26,7 @@ const sanitize = (entity) => {
 const getMemberships = async (req, res) => {
   const filter = {};
 
-  const { group, user, code } = req.query;
+  const { group, user, invitation } = req.query;
   if (group) {
     filter.group = new ObjectId(group);
   }
@@ -35,8 +35,8 @@ const getMemberships = async (req, res) => {
     filter.user = new ObjectId(user);
   }
 
-  if (code) {
-    filter['meta.code'] = code;
+  if (invitation) {
+    filter['meta.invitation'] = invitation;
   }
 
   const pipeline = [{ $match: filter }];

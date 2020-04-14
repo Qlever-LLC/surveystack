@@ -383,7 +383,7 @@ export const exampleMemberships = [
       dateClaimed: null,
       sentTo: '',
       notes: '',
-      code: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbba',
+      invitation: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbba',
     },
   },
   {
@@ -397,7 +397,7 @@ export const exampleMemberships = [
       dateClaimed: null,
       sentTo: '',
       notes: '',
-      code: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbb',
+      invitation: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbb',
     },
   },
   {
@@ -411,7 +411,7 @@ export const exampleMemberships = [
       dateClaimed: null,
       sentTo: '',
       notes: '',
-      code: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbc',
+      invitation: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbc',
     },
   },
   {
@@ -425,7 +425,7 @@ export const exampleMemberships = [
       dateClaimed: null,
       sentTo: '',
       notes: '',
-      code: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbd',
+      invitation: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbd',
     },
   },
   {
@@ -439,7 +439,7 @@ export const exampleMemberships = [
       dateClaimed: null,
       sentTo: '',
       notes: '',
-      code: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbe',
+      invitation: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbe',
     },
   },
   {
@@ -453,7 +453,7 @@ export const exampleMemberships = [
       dateClaimed: null,
       sentTo: '',
       notes: '',
-      code: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbf',
+      invitation: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbf',
     },
   },
 ];
