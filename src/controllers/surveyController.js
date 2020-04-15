@@ -30,26 +30,19 @@ const sanitize = (entity) => {
 };
 
 const getSurveys = async (req, res) => {
-  let entities;
+  const filter = {};
 
   if (req.query.find) {
     if (ObjectId.isValid(req.query.find)) {
-      entities = await db
-        .collection(col)
-        .find({ _id: new ObjectId(req.query.find) })
-        .toArray();
-      return res.send(entities);
+      filter._id = new ObjectId(req.query.find);
+    } else {
+      filter.name = { $regex: req.query.find, $options: 'i' };
     }
-    entities = await db
-      .collection(col)
-      .find({ name: { $regex: req.query.find, $options: 'i' } })
-      .toArray();
-    return res.send(entities);
   }
 
-  entities = await db
+  const entities = await db
     .collection(col)
-    .find({})
+    .find(filter)
     .toArray();
   return res.send(entities);
 };
@@ -65,10 +58,13 @@ const getSurveyPage = async (req, res) => {
     match.name = { $regex: q, $options: 'i' };
   }
 
-  if (group && !Array.isArray(group)) {
-    match['group.id'] = group;
-  } else if (group && Array.isArray(group)) {
-    match['group.id'] = { $in: group };
+  if (group) {
+    match['group.id'] = {
+      $in: group
+        .split(',') // split by commas
+        .filter((item) => item) // remove empty strings (trailing commas)
+        .map((item) => new ObjectId(item)), // convert to ObjectId
+    };
   }
 
   const pipeline = [{ $match: match }];
