@@ -1,5 +1,5 @@
 #!/bin/bash
-APP_URL=https://dev.our-sci.net
+APP_URL=https://dev.surveystack.io
 PEM_FILE=~/.ssh/oursci-allround.pem
 
 USER=ubuntu
