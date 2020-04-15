@@ -58,13 +58,10 @@ const getSurveyPage = async (req, res) => {
     match.name = { $regex: q, $options: 'i' };
   }
 
-  if (group) {
-    match['group.id'] = {
-      $in: group
-        .split(',') // split by commas
-        .filter((item) => item) // remove empty strings (trailing commas)
-        .map((item) => new ObjectId(item)), // convert to ObjectId
-    };
+  if (group && !Array.isArray(group)) {
+    match['group.id'] = new ObjectId(group);
+  } else if (group && Array.isArray(group)) {
+    match['group.id'] = { $in: group.map((item) => new ObjectId(item)) };
   }
 
   const pipeline = [{ $match: match }];
