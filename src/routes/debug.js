@@ -129,6 +129,10 @@ router.post('/mail/send', async (req, res) => {
   return res.send('OK');
 });
 
+router.get('/auth', async (req, res) => {
+  return res.send(req.auth);
+});
+
 router.get('/roles', async (req, res) => {
   const { user } = req.query;
   const roles = await rolesService.getRoles(user);

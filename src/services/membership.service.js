@@ -6,7 +6,7 @@ import { db } from '../db';
 
 const col = 'memberships';
 
-export const createMembership = async ({ user, group, role }) => {
+export const addMembership = async ({ user, group, role }) => {
   const entity = { user, group, role };
   entity.meta = {
     status: 'active',
@@ -43,6 +43,6 @@ export const claimMembership = async ({ code, user }) => {
 };
 
 export default {
-  createMembership,
+  addMembership,
   claimMembership,
 };

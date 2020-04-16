@@ -35,6 +35,11 @@ export const hasRole = async (user, group, role) => {
   return ret;
 };
 
+export const hasAdminRole = async (user, group) => {
+  const ret = await hasRole(user, group, 'admin');
+  return ret;
+};
+
 export const getRoles = async (user) => {
   const roles = ['public'];
   if (!user) {
@@ -63,4 +68,5 @@ export const getRoles = async (user) => {
 export default {
   getRoles,
   hasRole,
+  hasAdminRole,
 };

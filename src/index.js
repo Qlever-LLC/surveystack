@@ -29,7 +29,6 @@ app.use(async (req, res, next) => {
   let user = null;
   let roles = [];
   if (req.headers.authorization) {
-    //console.log("authHeader", req.headers.authorization);
     const authHeader = req.headers.authorization;
     const [email, token] = authHeader.split(' ');
 

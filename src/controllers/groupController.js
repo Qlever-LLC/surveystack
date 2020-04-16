@@ -112,8 +112,7 @@ const createGroup = async (req, res) => {
     throw boom.internal(`createGroup: unknown internal error`);
   }
 
-  // TODO: add admin membership to created group for current user
-  await membershipService.createMembership({
+  await membershipService.addMembership({
     user: res.locals.auth.user._id,
     group: entity._id,
     role: 'admin',

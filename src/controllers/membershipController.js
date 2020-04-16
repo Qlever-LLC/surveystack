@@ -8,6 +8,7 @@ import { db } from '../db';
 import { populate } from '../helpers';
 import mailService from '../services/mail.service';
 import membershipService from '../services/membership.service';
+import rolesService from '../services/roles.service';
 
 const col = 'memberships';
 
@@ -171,6 +172,11 @@ const createMembership = async (req, res) => {
     throw boom.badRequest(`Group does not exist: ${entity.group}`);
   }
 
+  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
+  if (!adminAccess) {
+    throw boom.unauthorized(`Only group admins can create memberships`);
+  }
+
   mailService.send({
     to: entity.meta.sentTo,
     subject: `Surveystack invitation to group ${g.name}`,
@@ -203,6 +209,11 @@ const updateMembership = async (req, res) => {
 
   sanitize(entity);
 
+  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
+  if (!adminAccess) {
+    throw boom.unauthorized(`Only group admins can update memberships`);
+  }
+
   try {
     let updated = await db.collection(col).findOneAndUpdate(
       { _id: new ObjectId(id) },
@@ -219,11 +230,26 @@ const updateMembership = async (req, res) => {
 };
 
 const deleteMembership = async (req, res) => {
-  // TODO: also delete associated integrations
   const { id } = req.params;
+
+  const membership = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  if (!membership) {
+    throw boom.notFound(`No membership found: ${id}`);
+  }
+
+  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, membership.group);
+  const userAccess = membership.user.equals(res.locals.auth.user._id);
+  if (!adminAccess && !userAccess) {
+    throw boom.unauthorized(`Only group admins or oneself can delete memberships`);
+  }
+
   try {
     let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
     assert.equal(1, r.deletedCount);
+
+    // delete associated intgegrations
+    await db.collection('integrations.memberships').deleteMany({ membership: new ObjectId(id) });
+
     return res.send({ message: 'OK' });
   } catch (error) {
     return res.status(500).send({ message: 'Ouch :/' });
