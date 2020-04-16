@@ -7,11 +7,14 @@
 <script>
 import * as monaco from 'monaco-editor';
 
-
 export default {
   props: {
     value: {
       required: true,
+    },
+    raw: {
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -37,7 +40,9 @@ export default {
     },
   },
   mounted() {
-    const model = monaco.editor.createModel(JSON.stringify(this.value, null, 2), 'javascript');
+    console.log('value', this.value);
+    const text = this.raw ? this.value : JSON.stringify(this.value, null, 2);
+    const model = monaco.editor.createModel(text, 'javascript');
     this.editor = monaco.editor.create(document.getElementById(`monaco-editor-${this._uid}`), {
       language: 'javascript',
       automaticLayout: true,
