@@ -14,6 +14,10 @@ const actions = {
   },
 
   add({ commit }, feedback) {
+    if (typeof feedback === 'string') {
+      commit('add', { title: 'Error', type: 'error', message: feedback });
+      return;
+    }
     commit('add', feedback);
   },
   remove({ commit }, idx) {
