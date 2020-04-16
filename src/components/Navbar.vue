@@ -171,7 +171,7 @@ export default {
           {
             type: 'link',
             label: 'My Submissions',
-            to: { name: 'my-surveys' },
+            to: { name: 'my-submissions' },
             icon: 'mdi-clipboard',
           },
           {
