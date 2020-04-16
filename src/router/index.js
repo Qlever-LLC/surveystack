@@ -3,7 +3,7 @@ import VueRouter from 'vue-router';
 import Home from '@/pages/Home.vue';
 import Test from '@/pages/Test.vue';
 
-import MySurveys from '@/pages/surveys/MySurveys.vue';
+import MySubmissions from '@/pages/surveys/MySubmissions.vue';
 import SurveysBrowse from '@/pages/surveys/Browse.vue';
 import SurveysDetail from '@/pages/surveys/Detail.vue';
 import DraftSubmission from '@/pages/submissions/drafts/Draft.vue';
@@ -85,9 +85,9 @@ const routes = [
     component: SubmissionList,
   },
   {
-    path: '/surveys/my-surveys',
-    name: 'my-surveys',
-    component: MySurveys,
+    path: '/surveys/my-submissions',
+    name: 'my-submissions',
+    component: MySubmissions,
   },
   {
     path: '/surveys/browse',
