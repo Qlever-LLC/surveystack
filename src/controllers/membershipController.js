@@ -185,7 +185,7 @@ const createMembership = async (req, res) => {
 You are invited to join group ${g.name}!
     
 Please use the following link to claim your invitation:
-https://app.surveystack.io/invitations?code=${entity.meta.invitation}
+${process.env.SERVER_URL}/invitations?code=${entity.meta.invitation}
     
 Best Regards`,
   });
