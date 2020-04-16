@@ -1,21 +1,23 @@
 <template>
-  <div>
-    <v-textarea
-      class="app-min-height"
-      filled
-      rows="20"
-      :value="valueString"
-      @input="writeBack($event)"
-      outlined
-    ></v-textarea>
-  </div>
+  <div
+    class="code-editor pa-0"
+    :id="'monaco-editor-'+_uid"
+  ></div>
 </template>
 <script>
+import * as monaco from 'monaco-editor';
+
+
 export default {
   props: {
     value: {
       required: true,
     },
+  },
+  data() {
+    return {
+      editor: null,
+    };
   },
   computed: {
     valueString() {
@@ -34,15 +36,19 @@ export default {
       }
     },
   },
+  mounted() {
+    const model = monaco.editor.createModel(JSON.stringify(this.value, null, 2), 'javascript');
+    this.editor = monaco.editor.create(document.getElementById(`monaco-editor-${this._uid}`), {
+      language: 'javascript',
+      automaticLayout: true,
+      readOnly: true,
+      model,
+    });
+  },
 };
 </script>
 <style scoped>
-.app-min-height {
-  min-height: 30rem;
-}
-
-div {
-  background: #fff;
-  padding: 2rem;
+.code-editor {
+  height: 100%;
 }
 </style>

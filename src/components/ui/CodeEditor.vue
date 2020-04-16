@@ -25,10 +25,16 @@
           Result Object (click to expand)
         </v-chip>
 
-        <v-dialog v-model="dialog">
+        <v-dialog
+          v-model="dialog"
+          width="800"
+        >
           <v-card>
             <v-card-title class="headline">Object Created</v-card-title>
-            <pre><code>{{ result }}</code></pre>
+            <div style="width: 100%; height: 60vh;">
+              <app-code-view :value="result">
+              </app-code-view>
+            </div>
 
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -49,6 +55,15 @@
           class="mr-4"
           @click="$emit('save', model.getValue())"
         >mdi-content-save</v-icon>
+        <v-btn
+          class="mr-2"
+          outlined
+          color="white"
+          v-if="examples"
+          @click="$emit('examples')"
+        >
+          <v-icon left>mdi-code-braces</v-icon>Examples
+        </v-btn>
         <v-btn
           class="mr-2"
           outlined
@@ -97,6 +112,8 @@
 <script>
 
 import * as monaco from 'monaco-editor';
+import appCodeView from '@/components/builder/CodeView.vue';
+
 
 /*
 // TODO: make sure scripts editor still works
@@ -123,6 +140,9 @@ function log(message){};
 `, 'javascript');
 
 export default {
+  components: {
+    appCodeView,
+  },
   data() {
     return {
       editor: null,
@@ -163,6 +183,9 @@ export default {
       default: null,
     },
     fold: {
+      default: false,
+    },
+    examples: {
       default: false,
     },
   },

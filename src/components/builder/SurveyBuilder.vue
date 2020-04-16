@@ -7,6 +7,10 @@
       <app-code-view v-model="survey" />
     </v-dialog>
 
+    <v-dialog v-model="showExamples">
+      <app-examples-view category="apiCompose" />
+    </v-dialog>
+
     <splitpanes
       style="padding: 0px !important"
       class="pane-root"
@@ -144,6 +148,8 @@
                 @run="runCode"
                 :result="evaluated"
                 @change="updateSelectedCode"
+                :examples="true"
+                @examples="showExamples = true"
               >
               </code-editor>
             </div>
@@ -208,6 +214,7 @@ import draft from '@/components/survey/drafts/DraftComponent.vue';
 import consoleLog from '@/components/builder/ConsoleLog.vue';
 
 import appCodeView from '@/components/builder/CodeView.vue';
+import appExamplesView from '@/components/builder/ExamplesView.vue';
 
 import appMixin from '@/components/mixin/appComponent.mixin';
 import api from '@/services/api.service';
@@ -252,6 +259,7 @@ export default {
     draft,
     consoleLog,
     appCodeView,
+    appExamplesView,
   },
   props: [
     'survey',
@@ -286,6 +294,7 @@ export default {
       instance: null,
       initialSurvey: cloneDeep(this.survey),
       surveyUnchanged: true,
+      showExamples: false,
     };
   },
   methods: {
