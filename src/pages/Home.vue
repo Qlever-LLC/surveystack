@@ -6,7 +6,7 @@
     >
       <v-flex xs12>
         <v-img
-          :src="require('../assets/oursci.png')"
+          :src="require('../assets/surveystack_temp_logo.svg')"
           class="my-3"
           contain
           height="250"
