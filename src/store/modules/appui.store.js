@@ -5,7 +5,7 @@ const types = {
 };
 
 const createInitialState = () => ({
-  title: 'Surveystack',
+  title: 'SurveyStack',
   subtitle: '',
 });
 

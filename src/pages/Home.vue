@@ -14,7 +14,7 @@
       </v-flex>
 
       <v-flex mb-4>
-        <h1 class="display-3 mb-3">Welcome to Surveystack</h1>
+        <h1 class="display-3 mb-3">Welcome to SurveyStack</h1>
         <p>
           <strong>Note:</strong> This is a work in progress
         </p>
@@ -44,7 +44,7 @@
         xs12
       >
         <h2 class="headline font-weight-bold mb-3">What's next?</h2>
-        <p>The Our Sci PWA is being built...</p>
+        <p>The SurveyStack app is being built...</p>
       </v-flex>
     </v-layout>
   </v-container>
