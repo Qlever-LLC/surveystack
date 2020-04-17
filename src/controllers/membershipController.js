@@ -238,7 +238,7 @@ const deleteMembership = async (req, res) => {
   }
 
   const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, membership.group);
-  const userAccess = membership.user.equals(res.locals.auth.user._id);
+  const userAccess = res.locals.auth.user._id.equals(membership.user);
   if (!adminAccess && !userAccess) {
     throw boom.unauthorized(`Only group admins or oneself can delete memberships`);
   }
