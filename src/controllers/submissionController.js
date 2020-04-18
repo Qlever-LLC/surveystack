@@ -300,7 +300,10 @@ const getSubmissionsPage = async (req, res) => {
 
   pipeline.push(...paginationStages);
 
-  entities = await db.collection(col).aggregate(pipeline).toArray();
+  entities = await db
+    .collection(col)
+    .aggregate(pipeline)
+    .toArray();
 
   const r = entities[0];
   if (!r) {
@@ -346,7 +349,10 @@ const getSubmissions = async (req, res) => {
     }
   }
 
-  entities = await db.collection(col).aggregate(pipeline).toArray();
+  entities = await db
+    .collection(col)
+    .aggregate(pipeline)
+    .toArray();
 
   if (req.query.format === 'csv') {
     const csv = csvService.createCsv(entities);
@@ -408,6 +414,7 @@ const createSubmission = async (req, res) => {
     r.farmos = farmosResults;
     return res.send(r);
   } catch (err) {
+    console.log(err);
     // TODO get rid of this ... just a copy paste of the updateSubmission function ...
     try {
       const { id } = req.params;
