@@ -43,6 +43,13 @@
         >
           <v-icon>mdi-open-in-new</v-icon>
         </v-btn>
+        <!-- <v-btn
+          icon
+          class="mt-2"
+          @click="refreshScript"
+        >
+          <v-icon>mdi-refresh</v-icon>
+        </v-btn> -->
       </div>
       <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
       <v-textarea
@@ -377,6 +384,10 @@ export default {
     },
     handleSelectItemsChange(ev) {
       console.log('handleSelectItemsChange', ev);
+    },
+    refreshScript() {
+      this.fetchScripts();
+      this.$emit('set-control-source', null);
     },
   },
   watch: {
