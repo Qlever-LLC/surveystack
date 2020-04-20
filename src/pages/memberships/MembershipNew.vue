@@ -131,6 +131,7 @@ export default {
         if (err.response.status === 404) {
           this.dialogCreateUser = true;
         }
+        this.$store.dispatch('feedback/add', err.response.data.message);
       }
     },
     proceedToUserCreation() {

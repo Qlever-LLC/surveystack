@@ -146,7 +146,7 @@ export default {
 
         this.$router.back();
       } catch (err) {
-        console.log('err', err);
+        this.$store.dispatch('feedback/add', err.response.data.message);
       }
     },
     async remove() {
@@ -155,7 +155,7 @@ export default {
         await api.delete(`/memberships/${this.entity._id}`);
         this.$router.back();
       } catch (err) {
-        console.log('MembershipEdit remove error', err);
+        this.$store.dispatch('feedback/add', err.response.data.message);
       }
     },
   },
