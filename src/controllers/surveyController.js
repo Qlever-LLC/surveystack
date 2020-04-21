@@ -65,12 +65,14 @@ const buildPipelineForGetSurveyPage = ({
   groups,
   projections,
   creator,
-  skip = 0,
-  limit = DEFAULT_LIMIT,
+  skip,
+  limit,
 }) => {
   const match = {};
   const project = {};
-  
+  let parsedSkip = 0;
+  let parsedLimit = DEFAULT_LIMIT;
+
   if (q) {
     match.name = {
       $regex: q,
@@ -113,10 +115,10 @@ const buildPipelineForGetSurveyPage = ({
     try {
       const querySkip = Number.parseInt(skip);
       if (querySkip > 0) {
-        skip = querySkip;
+        parsedSkip = querySkip;
       }
     } catch (error) {
-      throw boom.badRequest(`Bad query paramter skip: ${skip}`);
+      throw boom.badRequest(`Bad query paramter skip: ${parsedSkip}`);
     }
   }
   
@@ -125,10 +127,10 @@ const buildPipelineForGetSurveyPage = ({
     try {
       const queryLimit = Number.parseInt(limit);
       if (queryLimit > 0) {
-        limit = queryLimit;
+        parsedLimit = queryLimit;
       }
     } catch (error) {
-      throw boom.badRequest(`Bad query paramter limit: ${limit}`);
+      throw boom.badRequest(`Bad query paramter limit: ${parsedLimit}`);
     }
   }
   
@@ -136,16 +138,16 @@ const buildPipelineForGetSurveyPage = ({
   const paginationStages = [{
     $facet: {
       content: [{
-        $skip: skip
+        $skip: parsedSkip
       }, {
-        $limit: limit
+        $limit: parsedLimit
       }],
       pagination: [{
         $count: 'total'
       }, {
         $addFields: {
-          skip,
-          limit
+          parsedSkip,
+          parsedLimit,
         }
       }],
     },
