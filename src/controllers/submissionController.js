@@ -300,7 +300,10 @@ const getSubmissionsPage = async (req, res) => {
 
   pipeline.push(...paginationStages);
 
-  entities = await db.collection(col).aggregate(pipeline).toArray();
+  entities = await db
+    .collection(col)
+    .aggregate(pipeline)
+    .toArray();
 
   const r = entities[0];
   if (!r) {
@@ -346,7 +349,10 @@ const getSubmissions = async (req, res) => {
     }
   }
 
-  entities = await db.collection(col).aggregate(pipeline).toArray();
+  entities = await db
+    .collection(col)
+    .aggregate(pipeline)
+    .toArray();
 
   if (req.query.format === 'csv') {
     const csv = csvService.createCsv(entities);
@@ -403,40 +409,30 @@ const createSubmission = async (req, res) => {
 
   try {
     let r = await db.collection(col).insertOne(entity);
-    assert.equal(1, r.insertedCount);
+    //assert.equal(1, r.insertedCount);
 
     r.farmos = farmosResults;
     return res.send(r);
   } catch (err) {
-    // TODO get rid of this ... just a copy paste of the updateSubmission function ...
-    try {
-      const { id } = req.params;
-      const entity = sanitize(req.body);
-
+    if (err.name === 'MongoError' && err.code === 11000) {
+      // TODO: findOneAndUpdate now.. copy and up revision later
       try {
         let updated = await db.collection(col).findOneAndUpdate(
-          { _id: id },
+          { _id: entity._id },
           { $set: entity },
           {
             returnOriginal: false,
           }
         );
-
         updated.farmos = farmosResults;
-
         return res.send(updated);
-      } catch (err) {
-        console.log(err);
-        return res.status(500).send({ message: 'Ouch :/' });
-      }
-    } catch (error) {
-      if (err.name === 'MongoError' && err.code === 11000) {
-        return res.status(409).send({ message: `Entity with _id already exists: ${entity._id}` });
+      } catch (error) {
+        throw boom.boomify(err);
       }
     }
-  }
 
-  return res.status(500).send({ message: 'Internal error' });
+    throw boom.boomify(err);
+  }
 };
 
 const updateSubmission = async (req, res) => {
