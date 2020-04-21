@@ -31,18 +31,28 @@ const sanitize = (entity) => {
 
 const getSurveys = async (req, res) => {
   const filter = {};
+  const project = {};
 
-  if (req.query.find) {
-    if (ObjectId.isValid(req.query.find)) {
-      filter._id = new ObjectId(req.query.find);
+  const { find, projections } = req.query;
+
+  if (find) {
+    if (ObjectId.isValid(find)) {
+      filter._id = new ObjectId(find);
     } else {
-      filter.name = { $regex: req.query.find, $options: 'i' };
+      filter.name = { $regex: find, $options: 'i' };
     }
+  }
+
+  if (projections) {
+    projections.forEach((projection) => {
+      project[projection] = 1;
+    });
   }
 
   const entities = await db
     .collection(col)
     .find(filter)
+    .project(project)
     .toArray();
   return res.send(entities);
 };
