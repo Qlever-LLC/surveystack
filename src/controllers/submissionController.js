@@ -13,15 +13,28 @@ import rolesService from '../services/roles.service';
 const col = 'submissions';
 const DEFAULT_LIMIT = 100000;
 
-const sanitize = (entity) => {
+const sanitize = async (entity) => {
   if (entity._id) {
     entity._id = new ObjectId(entity._id);
   }
 
   entity.meta.dateCreated = new Date(entity.meta.dateCreated);
   entity.meta.dateModified = new Date(entity.meta.dateModified);
+  entity.meta.dateSubmitted = new Date();
 
   entity.meta.survey.id = new ObjectId(entity.meta.survey.id);
+
+  if (entity.meta.group) {
+    if (entity.meta.group.id) {
+      entity.meta.group.id = new ObjectId(entity.meta.group.id);
+      const group = await db
+        .collection('groups')
+        .findOne({ _id: new ObjectId(entity.meta.group.id) });
+      if (group) {
+        entity.meta.group.path = group.path;
+      }
+    }
+  }
 
   if (entity.meta.creator) {
     entity.meta.creator = new ObjectId(entity.meta.creator);
@@ -379,7 +392,7 @@ const getSubmission = async (req, res) => {
 };
 
 const createSubmission = async (req, res) => {
-  const entity = sanitize(req.body);
+  const entity = await sanitize(req.body);
 
   // apply creator
   if (res.locals.auth.user) {
@@ -437,7 +450,7 @@ const createSubmission = async (req, res) => {
 
 const updateSubmission = async (req, res) => {
   const { id } = req.params;
-  const entity = sanitize(req.body);
+  const entity = await sanitize(req.body);
 
   try {
     let updated = await db.collection(col).findOneAndUpdate(
