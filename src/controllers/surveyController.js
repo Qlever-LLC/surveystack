@@ -179,11 +179,6 @@ const getSurveyPage = async (req, res) => {
 };
 
 const getSurveyListPage = async (req, res) => {
-<<<<<<< HEAD
-=======
-  const skip = req.query.skip || 0;
-  const limit = req.query.limit || DEFAULT_LIMIT;
->>>>>>> 941202b36b6d4713986227ea3b8ff64ce021dea9
   const query = {
     ...req.query,
     projections: [
@@ -208,13 +203,8 @@ const getSurveyListPage = async (req, res) => {
       content: [],
       pagination: {
         total: 0,
-<<<<<<< HEAD
         skip: req.query.skip || 0,
         limit: req.query.limit || DEFAULT_LIMIT,
-=======
-        skip,
-        limit,
->>>>>>> 941202b36b6d4713986227ea3b8ff64ce021dea9
       }
     };
   }
