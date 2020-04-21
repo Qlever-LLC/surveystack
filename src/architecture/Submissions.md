@@ -28,9 +28,12 @@ const submissions = [
       },
       revision: 1, // submission revision
       permissions: [],
-      group: '5e6f8bbeea14550001470c28',
-      path: '/our-sci',
       creator: '5e6f92f16070e700015e0371',
+      group: {
+        id: '5e6f8bbeea14550001470c28',
+        path: '/our-sci/',
+      },
+      specVersion: 1,
     }
     // data from controls
     data: {
@@ -70,10 +73,13 @@ const submissions = [
         version: 1, // survey version
       },
       revision: 2, // submission revision
-      permissions: [],
-      group: '5e6f8bbeea14550001470c28',
-      path: '/our-sci',
       creator: '5e6f92f16070e700015e0371',
+      permissions: [],
+      group: {
+        id: '5e6f8bbeea14550001470c28',
+        path: '/our-sci/',
+      },
+      specVersion: 1,
     },
     data: {
       fav_color: {

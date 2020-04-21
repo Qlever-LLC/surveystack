@@ -150,6 +150,7 @@ export const exampleSubmissions = [
         id: new ObjectId('5e6f8bbeea14550001470c28'),
         path: '/our-sci/',
       },
+      specVersion: 1,
     },
     data: {
       favorite_color: {
@@ -194,6 +195,7 @@ export const exampleSubmissions = [
         id: new ObjectId('5e6f8bbeea14550001470c28'),
         path: '/our-sci/',
       },
+      specVersion: 1,
     },
     data: {
       favorite_color: {
@@ -238,6 +240,7 @@ export const exampleSubmissions = [
         id: new ObjectId('5e6f8bbeea14550001470c28'),
         path: '/our-sci/',
       },
+      specVersion: 1,
     },
     data: {
       favorite_color: {
@@ -282,6 +285,7 @@ export const exampleSubmissions = [
         id: new ObjectId('5e6f8bbeea14550001470c34'),
         path: '/our-sci/lab/testing/',
       },
+      specVersion: 1,
     },
     data: {
       favorite_color: {
