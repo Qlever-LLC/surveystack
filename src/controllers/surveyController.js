@@ -60,10 +60,12 @@ const getSurveys = async (req, res) => {
 const getSurveyPage = async (req, res) => {
   let entities;
   const match = {};
+  const project = {};
+
   let skip = 0;
   let limit = DEFAULT_LIMIT;
 
-  const { q, group } = req.query;
+  const { q, group, projections } = req.query;
   if (q) {
     match.name = { $regex: q, $options: 'i' };
   }
@@ -77,6 +79,13 @@ const getSurveyPage = async (req, res) => {
   const pipeline = [{ $match: match }];
   if (!q) {
     pipeline.push({ $sort: { dateModified: -1 } });
+  }
+
+  if (projections) {
+    projections.forEach((projection) => {
+      project[projection] = 1;
+    });
+    pipeline.push({ $project: project });
   }
 
   // skip
