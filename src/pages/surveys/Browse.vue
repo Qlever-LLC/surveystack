@@ -177,17 +177,18 @@ export default {
 
       const queryParams = new URLSearchParams();
       if (user) {
-        queryParams.append('user', user);
+        queryParams.append('creator', user);
       }
       if (groups.length > 0) {
-        groups.forEach(group => queryParams.append('group[]', group));
+        groups.forEach(group => queryParams.append('groups[]', group));
       }
       if (this.search) {
         queryParams.append('q', this.search);
       }
 
       try {
-        const { data } = await api.get(`/surveys/page?${queryParams}`);
+        // const { data } = await api.get(`/surveys/page?${queryParams}`);
+        const { data } = await api.get(`/surveys/list-page?${queryParams}`);
         this.surveys = data;
       } catch (e) {
         // TODO: use cached data?
