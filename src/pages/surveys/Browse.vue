@@ -115,8 +115,11 @@ export default {
     },
     activeGroupName() {
       const groups = this.$store.getters['memberships/groups'];
-      const { name } = groups.find(({ _id }) => this.activeGroupId === _id);
-      return name;
+      const group = groups.find(item => item._id === this.activeGroupId);
+      if (group) {
+        return group.name;
+      }
+      return 'No active group';
     },
     // activeTabContent() {
     //   switch (this.activeTab) {
