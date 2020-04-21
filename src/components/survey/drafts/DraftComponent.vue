@@ -247,7 +247,7 @@ export default {
       // submission
       const modified = moment().toISOString(true);
       this.submission.meta.dateModified = modified;
-      console.log('setting value', this.sumissionField, v);
+      console.log('setting value:', v);
       this.submissionField.value = v;
       this.submissionField.meta.dateModified = modified;
       this.$emit('change', this.submission);

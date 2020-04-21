@@ -29,7 +29,7 @@
         :close-on-content-click="false"
       >
         <template v-slot:activator="{ on }">
-            <!-- :to="{name: 'auth-profile'}" -->
+          <!-- :to="{name: 'auth-profile'}" -->
           <v-btn
             text
             v-on="on"
@@ -39,64 +39,72 @@
           </v-btn>
         </template>
         <!-- <v-card> -->
-          <!-- <v-card-text> -->
-            <!-- <v-list>
+        <!-- <v-card-text> -->
+        <!-- <v-list>
               <v-list-item v-for="group in ">
               </v-list-item>
             </v-list> -->
-            <!-- <active-group-selector
+        <!-- <active-group-selector
               class="my-4"
               v-model="activeGroup"
               outlined
             /> -->
-          <!-- </v-card-text> -->
-          <!-- <v-card-title class="d-block pb-0"> -->
-            <!-- <div class="text-center">
+        <!-- </v-card-text> -->
+        <!-- <v-card-title class="d-block pb-0"> -->
+        <!-- <div class="text-center">
 
               <v-icon x-large>mdi-account</v-icon>
               <div class="">{{$store.getters['auth/user'].email}}</div>
             </div> -->
 
-            <!-- View Profile
+        <!-- View Profile
           </v-card-title> -->
-          <!-- <v-card-text class="pt-0"> -->
-            <v-list flat>
-              <v-list-item link :to="{name: 'auth-profile'}">
-                <v-list-item-icon>
-                  <v-icon>mdi-account-circle</v-icon>
-                </v-list-item-icon>
-                <v-list-item-title>
-                    Profile
-                </v-list-item-title>
-              </v-list-item>
-              <v-list-item link :to="{name: 'users-edit', params: { id: this.$store.state.auth.user._id }}">
-                <v-list-item-icon>
-                  <v-icon>mdi-account-edit</v-icon>
-                </v-list-item-icon>
-                <v-list-item-title>
-                    Edit Account
-                </v-list-item-title>
-              </v-list-item>
-              <active-group-selector-list
-                class=""
-                v-model="activeGroup"
-              />
-              <!-- <v-divider /> -->
-              <v-list-item
-                link
-                @click="logout"
-                class="mt-2"
-              >
-                <v-list-item-icon>
-                  <v-icon>mdi-logout-variant</v-icon>
-                </v-list-item-icon>
-                <v-list-item-title>
-                    Sign Out
-                </v-list-item-title>
-              </v-list-item>
-            </v-list>
+        <!-- <v-card-text class="pt-0"> -->
+        <v-list flat>
+          <v-list-item
+            link
+            :to="{name: 'auth-profile'}"
+          >
+            <v-list-item-icon>
+              <v-icon>mdi-account-circle</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>
+              Profile
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item
+            link
+            :to="{name: 'users-edit', params: { id: this.$store.state.auth.user._id }}"
+          >
+            <v-list-item-icon>
+              <v-icon>mdi-account-edit</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>
+              Edit Account
+            </v-list-item-title>
+          </v-list-item>
+          <v-divider />
+          <v-subheader>Active Group</v-subheader>
+          <active-group-selector-list
+            class=""
+            v-model="activeGroup"
+          />
+          <v-divider />
+          <v-list-item
+            link
+            @click="logout"
+            class="mt-2"
+          >
+            <v-list-item-icon>
+              <v-icon>mdi-logout-variant</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>
+              Sign Out
+            </v-list-item-title>
+          </v-list-item>
+        </v-list>
 
-          <!-- </v-card-text> -->
+        <!-- </v-card-text> -->
         <!-- </v-card> -->
       </v-menu>
 

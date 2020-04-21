@@ -11,6 +11,7 @@ export default new Vuex.Store({
   actions: {
     reset({ commit }) {
       // resets state of all the modules
+      console.log('!!! resetting state of all modules !!!');
       Object.keys(modules).forEach(moduleName => commit(`${moduleName}/RESET`));
     },
   },

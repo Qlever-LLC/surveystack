@@ -39,7 +39,9 @@
       >Logout</v-btn>
     </div>
   </v-container>
-  <div v-else>You are not logged in.</div>
+  <v-container v-else>
+    <h1>Profile</h1>You are not logged in... <router-link to="/auth/login">Go to Login</router-link>
+  </v-container>
 </template>
 
 <script>
