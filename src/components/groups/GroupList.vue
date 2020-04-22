@@ -15,7 +15,7 @@
         <v-text-field
           label="Search"
           v-model="q"
-          id="oursci-group-list-search"
+          id="surveystack-group-list-search"
           append-icon="mdi-magnify"
         />
         <template v-if="entities.length > 0">

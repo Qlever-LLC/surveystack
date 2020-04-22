@@ -6,11 +6,20 @@ export default {
     };
   },
   methods: {
-    result(response) {
+    result({ response, error }) {
       this.showResult = true;
-      console.log('response', response);
       this.resultItems = [];
       let hasErrors = false;
+
+      if (error) {
+        hasErrors = true;
+        this.resultItems.push({
+          title: 'Error',
+          body: error.response.data.message,
+          error: true,
+        });
+        return;
+      }
 
       if (response.data.farmos) {
         response.data.farmos.forEach((farmos) => {

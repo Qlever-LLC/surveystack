@@ -549,6 +549,14 @@ export default {
     setSurveyDescription(value) {
       this.$set(this.survey, 'description', value);
     },
+    createInstance() {
+      const { version } = this.survey.revisions[this.survey.revisions.length - 1];
+      const group = this.$store.getters['memberships/activeGroup'];
+
+      this.instance = submissionUtils.createSubmissionFromSurvey({
+        survey: this.survey, version, group, instance: this.instance,
+      });
+    },
   },
   computed: {
     surveyIsValid() {
@@ -742,15 +750,14 @@ export default {
         }
 
         // if only relevance changes, don't flush results
-        this.instance = submissionUtils.createSubmissionFromSurvey(newVal, this.survey.revisions[this.survey.revisions.length - 1].version, this.instance);
+        this.createInstance();
       },
       deep: true,
     },
   },
   created() {
     this.initNavbarAndDirtyFlag(this.survey);
-
-    this.instance = submissionUtils.createSubmissionFromSurvey(this.survey, this.survey.revisions[this.survey.revisions.length - 1].version, this.instance);
+    this.createInstance();
   },
 };
 </script>

@@ -1,5 +1,5 @@
 import api from '@/services/api.service';
-import { AuthService } from '@/services/storage.service';
+import { AuthService, MembershipService, GroupService } from '@/services/storage.service';
 
 const createInitialState = () => ({
   status: AuthService.getStatus(),
@@ -19,11 +19,23 @@ const getters = {
   isShapeshifting: state => state.shapeshiftHeader && state.shapeshiftUser,
 };
 
+const clearLocalData = ({ dispatch }) => {
+  // remove default Authentication headers
+  api.removeHeaders();
+  // remove items from storage
+  AuthService.clear();
+  MembershipService.clear();
+  GroupService.clear();
+
+  console.log('calling global reset...');
+  dispatch('reset', null, { root: true });
+};
+
 const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  login({ commit }, auth) {
+  login({ commit, dispatch }, auth) {
     return new Promise((resolve, reject) => {
       commit('auth_request');
       api
@@ -44,21 +56,19 @@ const actions = {
         .catch((err) => {
           console.log(err);
           commit('auth_error');
-          AuthService.clear();
-          api.removeHeaders();
+          clearLocalData({ dispatch });
           reject(err);
         });
     });
   },
-  logout({ commit }) {
+  logout({ commit, dispatch }) {
     return new Promise((resolve) => {
       commit('logout');
-      AuthService.clear();
-      api.removeHeaders();
+      clearLocalData({ dispatch });
       resolve();
     });
   },
-  enterShapeshift({ commit, state }, id) {
+  enterShapeshift({ commit, dispatch, state }, id) {
     return new Promise((resolve, reject) => {
       commit('auth_request');
       api
@@ -85,8 +95,7 @@ const actions = {
         })
         .catch((err) => {
           commit('auth_error');
-          AuthService.clear();
-          api.removeHeaders();
+          clearLocalData({ dispatch });
           reject(err);
         });
     });

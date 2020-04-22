@@ -63,7 +63,7 @@
     >
       <v-card>
         <v-card-text class="pa-4">
-          <span>Submitting</span>
+          <span>Submitting Builder</span>
           <v-progress-linear
             indeterminate
             class="mb-0"
@@ -176,7 +176,7 @@ export default {
         console.log('submitting', payload);
         const response = await api.post('/submissions', payload);
         // this.$router.push(`/surveys/${this.survey._id}`);
-        this.result(response);
+        this.result({ response });
       } catch (error) {
         console.log('error', error);
         const { message } = error.response.data;

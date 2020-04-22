@@ -10,23 +10,7 @@
         {{surveys.pagination.total}} results
       </small>
     </div>
-    <v-tabs
-      v-model="activeTab"
-      fixed-tabs
-    >
-      <v-tab
-        v-for="tab in tabs"
-        :href="`#${tab.name}`"
-        :key="tab.name"
-      >
-        <span v-if="tab.name === 'active-group'">
-          {{ activeGroupName }}
-        </span>
-        <span v-else>
-          {{ tab.label }}
-        </span>
-      </v-tab>
-    </v-tabs>
+
     <!-- <v-tabs-items
       v-model="activeTab"
     >
@@ -37,22 +21,54 @@
         {{}}
       </v-card-text>
     </v-card> -->
-    <v-card>
-      <div
-        v-for="e in surveys.content"
-        :key="e._id"
-      >
-        <v-list-item :to="`/surveys/${e._id}`">
-          <v-list-item-content>
+    <v-card min-height="70vh" class="d-flex flex-column">
+      <v-card-title>
+        <v-tabs
+          v-model="activeTab"
+          fixed-tabs
+        >
+          <v-tab
+            v-for="tab in tabs"
+            :href="`#${tab.name}`"
+            :key="tab.name"
+          >
+            <span v-if="tab.name === 'active-group'">
+              {{ activeGroupName }}
+            </span>
+            <span v-else>
+              {{ tab.label }}
+            </span>
+          </v-tab>
+        </v-tabs>
+      </v-card-title>
+      <v-card-text class="flex-grow-1">
+        <div
+          v-for="e in surveys.content"
+          :key="e._id"
+        >
+          <v-list-item :to="`/surveys/${e._id}`">
+            <v-list-item-content>
 
-            <v-list-item-title>{{e.name}}</v-list-item-title>
-            <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle>
-            <small class="grey--text">Version {{e.latestVersion}}</small>
-          </v-list-item-content>
+              <v-list-item-title>{{e.name}}</v-list-item-title>
+              <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle>
+              <small class="grey--text">Version {{e.latestVersion}}</small>
+            </v-list-item-content>
 
-        </v-list-item>
-        <v-divider />
-      </div>
+          </v-list-item>
+          <v-divider />
+        </div>
+        <div v-if="surveys.content.length < 1" class="py-12 text-center">
+          No surveys available
+        </div>
+      </v-card-text>
+      <v-card-actions>
+        <v-pagination
+          v-if="surveys.content.length > 0"
+          v-model="page"
+          :length="activeTabPaginationLength"
+          @input="() => getDataForTab(activeTab)"
+        />
+      </v-card-actions>
     </v-card>
     <!-- <v-row>
       <v-spacer />
@@ -67,12 +83,15 @@
 <script>
 import api from '@/services/api.service';
 
+const PAGINATION_LIMIT = 20;
+
 export default {
   data() {
     return {
       selectedGroupIds: [],
       activeTab: null,
       // groups: null,
+      page: 1,
       search: '',
       surveys: {
         content: [],
@@ -104,6 +123,16 @@ export default {
     };
   },
   computed: {
+    // activeTabHasMorePages() {
+    //   return this.surveys
+    //     && this.surveys.pagination
+    //     && this.surveys.pagination.total
+    //     && this.surveys.pagination.total > limit;
+    // }
+    activeTabPaginationLength() {
+      const { total } = this.surveys.pagination;
+      return total ? Math.ceil(total / PAGINATION_LIMIT) : 0;
+    },
     activeGroupId() {
       return this.$store.getters['memberships/activeGroup'];
     },
@@ -115,8 +144,11 @@ export default {
     },
     activeGroupName() {
       const groups = this.$store.getters['memberships/groups'];
-      const { name } = groups.find(({ _id }) => this.activeGroupId === _id);
-      return name;
+      const group = groups.find(item => item._id === this.activeGroupId);
+      if (group) {
+        return group.name;
+      }
+      return 'No active group';
     },
     // activeTabContent() {
     //   switch (this.activeTab) {
@@ -174,17 +206,21 @@ export default {
 
       const queryParams = new URLSearchParams();
       if (user) {
-        queryParams.append('user', user);
+        queryParams.append('creator', user);
       }
       if (groups.length > 0) {
-        groups.forEach(group => queryParams.append('group[]', group));
+        groups.forEach(group => queryParams.append('groups[]', group));
       }
       if (this.search) {
         queryParams.append('q', this.search);
       }
 
+      queryParams.append('skip', (this.page - 1) * PAGINATION_LIMIT);
+      queryParams.append('limit', PAGINATION_LIMIT);
+
       try {
-        const { data } = await api.get(`/surveys/page?${queryParams}`);
+        // const { data } = await api.get(`/surveys/page?${queryParams}`);
+        const { data } = await api.get(`/surveys/list-page?${queryParams}`);
         this.surveys = data;
       } catch (e) {
         // TODO: use cached data?

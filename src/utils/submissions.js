@@ -100,18 +100,23 @@ export const flattenSubmission = (submission, delimiter = '.') => {
  *
  * @returns {Object} A submission for a specific survey version.
  */
-const createSubmissionFromSurvey = (survey, version = 1, instance = null) => {
+const createSubmissionFromSurvey = ({
+  survey, version = 1, instance, group,
+}) => {
   const submission = {};
 
   submission._id = new ObjectID().toString();
   submission.meta = {
     dateCreated: new Date(),
     dateModified: new Date(),
+    dateSubmitted: null,
     survey: { id: survey._id, version },
     revision: 1,
     permissions: [],
-    group: '5e6f8bbeea14550001470c28',
-    path: '/our-sci',
+    group: {
+      id: group,
+      path: null,
+    },
     specVersion: constants.SPEC_VERSION_SUBMISSION,
   };
 
