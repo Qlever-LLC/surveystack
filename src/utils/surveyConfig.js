@@ -28,7 +28,7 @@ export const createControlInstance = (control) => {
 
   const cloneWithDefaultOptions = Object.assign(clone, {
     options: cloneDeep(defaultControlOptions),
-    _id: new ObjectId().toString(),
+    id: new ObjectId().toString(),
   });
 
   if (control.type === 'selectSingle' || control.type === 'selectMultiple' || control.type === 'ontology') {

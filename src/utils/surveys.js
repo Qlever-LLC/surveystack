@@ -700,7 +700,7 @@ export function findControlById(controlId, controls) {
   function reducer(id) {
     return (r, x) => {
       // debugger;
-      if (x._id === id) {
+      if (x.id === id) {
         return [x, ...r];
       }
       if (x.type === 'group') {
@@ -727,7 +727,7 @@ export function findParentByChildId(controlId, controls) {
   function fpr(id) {
     return (r, x) => {
       if (x.type === 'group') {
-        if (x.children.some(child => child._id === id)) {
+        if (x.children.some(child => child.id === id)) {
           return [x, ...r];
         }
         return [...x.children.reduce(fpr(id), []), ...r];
