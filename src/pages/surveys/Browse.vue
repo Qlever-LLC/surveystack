@@ -39,6 +39,31 @@
               {{ tab.label }}
             </span>
           </v-tab>
+          <!-- <v-menu
+           v-if="groupsItems.length"
+           bottom
+           left
+          >
+            <template v-slot:activator="{ on }">
+              <v-btn
+                text
+                class="align-self-center mr-4"
+                v-on="on"
+              >
+                more
+                <v-icon right>mdi-menu-down</v-icon>
+              </v-btn>
+            </template>
+            <v-list class="">
+              <v-list-item
+                v-for="item in groupsItems"
+                :key="item.name"
+                @click="setMenuTab(item)"
+              >
+                {{ item.label }}
+              </v-list-item>
+            </v-list>
+          </v-menu> -->
         </v-tabs>
       </v-card-title>
       <v-card-text class="flex-grow-1">
@@ -140,7 +165,8 @@ export default {
       return this.$store.getters['memberships/groups'];
     },
     groupsItems() {
-      return this.groups.map(({ _id, name, slug }) => ({ id: _id, label: name, name: 'slug' }));
+      return this.groups
+        .map(({ _id, name, slug }) => ({ id: _id, label: name, name: slug }));
     },
     activeGroupName() {
       const groups = this.$store.getters['memberships/groups'];
@@ -180,6 +206,11 @@ export default {
     },
   },
   methods: {
+    setMenuTab(tab) {
+      this.activeTab = tab.name;
+      this.selectedGroupIds = [tab.id];
+      this.fetchData({ groups: [tab.id] });
+    },
     async getDataForTab(tab) {
       switch (tab) {
         case 'active-group':
