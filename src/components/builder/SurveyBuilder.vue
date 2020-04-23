@@ -205,6 +205,7 @@ import {
 import { Splitpanes, Pane } from 'splitpanes';
 
 import ObjectId from 'bson-objectid';
+import moment from 'moment';
 import codeEditor from '@/components/ui/CodeEditor.vue';
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
@@ -342,7 +343,7 @@ export default {
       this.dirty = true;
       const { latestVersion } = this.initialSurvey;
       const nextVersion = latestVersion + 1;
-      const date = new Date();
+      const date = moment().toISOString(true);
 
       const nextVersionObj = this.survey.revisions.find(revision => revision.version === latestVersion);
       nextVersionObj.version = nextVersion;

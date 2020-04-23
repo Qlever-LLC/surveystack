@@ -1,8 +1,7 @@
 <template>
   <v-container>
     <span class="text--secondary overline">{{entity._id}}</span>
-    <h1>Invite Members</h1>
-    <h3>{{groupDetail.name}}</h3>
+    <h2>Invite Members to {{groupDetail.name}}</h2>
     <h4 class="text--secondary">{{groupDetail.path}}</h4>
     <v-card class="pa-4 mb-4">
       <v-form
@@ -75,6 +74,7 @@
 
 <script>
 import ObjectId from 'bson-objectid';
+import moment from 'moment';
 import api from '@/services/api.service';
 
 import { uuid } from '@/utils/memberships';
@@ -101,7 +101,7 @@ export default {
         role: 'user',
         meta: {
           status: 'pending',
-          dateCreated: new Date(),
+          dateCreated: moment().toISOString(),
           dateClaimed: null,
           sentTo: null,
           notes: '',

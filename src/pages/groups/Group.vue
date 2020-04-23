@@ -18,25 +18,40 @@
     <h3 class="text--secondary">{{entity.path}}</h3>
 
     <v-row>
-      <v-col
-        cols="12"
-        lg="6"
-      >
-        <app-group-list
+      <v-col>
+        <app-basic-list
           :entities="subgroups"
-          :dir="entity.path"
           title="Subgroups"
-        />
+          :link="(e) => `/g${e.path}`"
+          :linkNew="{name: 'groups-new', query: {dir: entity.path}}"
+        >
+          <template v-slot:entity="{ entity }">
+            <v-list-item-content>
+              <v-list-item-title>{{entity.name}}</v-list-item-title>
+              <v-list-item-subtitle>{{entity.path}}</v-list-item-subtitle>
+            </v-list-item-content>
+          </template>
+        </app-basic-list>
       </v-col>
-      <v-col
-        cols="12"
-        lg="6"
-      >
-        <app-group-member-list
-          :entities="members"
-          :group="entity"
-        />
+
+    </v-row>
+    <v-row>
+      <v-col>
+        <app-basic-list
+          :entities="(entity.surveys && entity.surveys.pinned) ? entity.surveys.pinned : []"
+          title="Pinned Surveys"
+          :link="(e) => `/surveys/${e._id}`"
+          :linkNew="`/groups/edit/${entity._id}`"
+        >
+          <template v-slot:entity="{ entity }">
+            <v-list-item-content>
+              <v-list-item-title>{{entity.name}}</v-list-item-title>
+              <v-list-item-subtitle>{{entity._id}}</v-list-item-subtitle>
+            </v-list-item-content>
+          </template>
+        </app-basic-list>
       </v-col>
+
     </v-row>
 
   </v-container>
@@ -49,16 +64,14 @@
 
 <script>
 import api from '@/services/api.service';
-import appGroupList from '@/components/groups/GroupList.vue';
-import appGroupMemberList from '@/components/groups/GroupMemberList.vue';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
+import appBasicList from '@/components/ui/BasicList.vue';
 
 export default {
   name: 'Group',
   components: {
-    appGroupList,
-    appGroupMemberList,
     appGroupBreadcrumbs,
+    appBasicList,
   },
   data() {
     return {
@@ -73,7 +86,6 @@ export default {
         slug: '',
         path: '/',
       },
-      members: [],
       subgroups: [],
     };
   },
@@ -81,10 +93,9 @@ export default {
     async getEntity(path) {
       this.initialized = false;
       try {
-        const { data } = await api.get(`/groups/by-path/${path}`);
+        const { data } = await api.get(`/groups/by-path/${path}?populate=true`);
         this.entity = data;
         await this.getSubgroups();
-        await this.getMembers();
       } catch (e) {
         this.status.code = e.response.status;
         this.status.message = e.response.data.message;
@@ -98,10 +109,6 @@ export default {
         this.status.code = e.response.status;
         this.status.message = e.response.data.message;
       }
-    },
-    async getMembers() {
-      const { data } = await api.get(`/memberships?group=${this.entity._id}&populate=true`);
-      this.members = data;
     },
   },
   async beforeRouteUpdate(to, from, next) {

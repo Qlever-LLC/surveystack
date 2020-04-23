@@ -65,7 +65,6 @@
 </template>
 
 <script>
-import _ from 'lodash';
 import { createControlInstance, availableControls } from '@/utils/surveyConfig';
 
 const group = availableControls.find(c => c.type === 'group');

@@ -321,8 +321,8 @@ export default {
   },
   methods: {
     nameIsUnique(val) {
-      const hasSameNameAndDifferentId = control => control.name === this.control.name && control._id !== this.control._id;
-      const parent = findParentByChildId(this.control._id, this.controls);
+      const hasSameNameAndDifferentId = control => control.name === this.control.name && control.id !== this.control.id;
+      const parent = findParentByChildId(this.control.id, this.controls);
 
       const controlsWithSameName = parent
         ? parent.children.filter(hasSameNameAndDifferentId)
