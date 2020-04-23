@@ -38,7 +38,79 @@ const sanitizeGroup = (entity) => {
     });
   }
 
+  if (entity.surveys && entity.surveys.pinned) {
+    entity.surveys.pinned = entity.surveys.pinned.map((p) => {
+      if (typeof p === 'object') {
+        return new ObjectId(p._id);
+      }
+      return new ObjectId(p);
+    });
+  }
+
   entity.path = `${entity.dir}${entity.slug}/`;
+};
+
+const createPinnedSurveysPopulationStages = () => {
+  // Aggregation to populate favorites such as "surveys.pinned"
+  // This is a bit tricky, because we want users to have duplicate and - more importantly - ordered survey favorites.
+  // The $lookup stage however removes duplicate references and does not guarantee order
+  // https://stackoverflow.com/questions/55033804/aggregate-lookup-does-not-return-elements-original-array-order
+  // https://jira.mongodb.org/browse/SERVER-32494
+  return [
+    {
+      $lookup: {
+        from: 'surveys',
+        let: { surveyIds: { $ifNull: ['$surveys.pinned', []] } },
+        pipeline: [
+          { $match: { $expr: { $in: ['$_id', '$$surveyIds'] } } },
+          {
+            $addFields: {
+              sort: { $indexOfArray: ['$$surveyIds', '$_id'] },
+            },
+          },
+          { $sort: { sort: 1 } },
+          { $addFields: { sort: '$$REMOVE' } },
+          { $project: { name: 1, dateModified: 1 } },
+        ],
+        as: 'surveys.pinnedDetails',
+      },
+    },
+    {
+      $addFields: {
+        'surveys.pinned': {
+          $map: {
+            input: { $ifNull: ['$surveys.pinned', []] },
+            as: 'a',
+            in: {
+              $arrayElemAt: [
+                {
+                  $filter: {
+                    input: '$surveys.pinnedDetails',
+                    cond: { $eq: ['$$this._id', '$$a'] },
+                  },
+                },
+                0,
+              ],
+            },
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        'surveys.pinned': {
+          $filter: {
+            input: '$surveys.pinned',
+            as: 'sp',
+            cond: {
+              $ne: ['$$sp', null],
+            },
+          },
+        },
+        'surveys.pinnedDetails': '$REMOVE',
+      },
+    },
+  ];
 };
 
 const getGroups = async (req, res) => {
@@ -76,56 +148,8 @@ const getGroupByPath = async (req, res) => {
 
   const pipeline = [{ $match: { path } }];
 
-  // Aggregation to populate favorites such as "surveys.pinned"
-  // This is a bit tricky, because we want users to have duplicate and - more importantly - ordered survey favorites.
-  // The $lookup stage however removes duplicate references and does not guarantee order
-  // https://stackoverflow.com/questions/55033804/aggregate-lookup-does-not-return-elements-original-array-order
-  // https://jira.mongodb.org/browse/SERVER-32494
   if (populate(req)) {
-    pipeline.push(
-      ...[
-        {
-          $lookup: {
-            from: 'surveys',
-            let: { surveyIds: { $ifNull: ['$surveys.pinned', []] } },
-            pipeline: [
-              { $match: { $expr: { $in: ['$_id', '$$surveyIds'] } } },
-              {
-                $addFields: {
-                  sort: { $indexOfArray: ['$$surveyIds', '$_id'] },
-                },
-              },
-              { $sort: { sort: 1 } },
-              { $addFields: { sort: '$$REMOVE' } },
-              { $project: { name: 1 } },
-            ],
-            as: 'surveys.pinnedDetails',
-          },
-        },
-        {
-          $addFields: {
-            'surveys.pinned': {
-              $map: {
-                input: { $ifNull: ['$surveys.pinned', []] },
-                as: 'a',
-                in: {
-                  $arrayElemAt: [
-                    {
-                      $filter: {
-                        input: '$surveys.pinnedDetails',
-                        cond: { $eq: ['$$this._id', '$$a'] },
-                      },
-                    },
-                    0,
-                  ],
-                },
-              },
-            },
-            'surveys.pinnedDetails': '$REMOVE',
-          },
-        },
-      ]
-    );
+    pipeline.push(...createPinnedSurveysPopulationStages());
   }
 
   const [entity] = await db
@@ -144,12 +168,21 @@ const getGroupByPath = async (req, res) => {
 
 const getGroupById = async (req, res) => {
   const { id } = req.params;
-  let entity;
+  const pipeline = [{ $match: { _id: new ObjectId(id) } }];
 
-  entity = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  if (populate(req)) {
+    pipeline.push(...createPinnedSurveysPopulationStages());
+  }
+
+  const [entity] = await db
+    .collection(col)
+    .aggregate(pipeline)
+    .toArray();
 
   if (!entity) {
-    throw boom.notFound(`No entity with _id exists: ${id}`);
+    return res.status(404).send({
+      message: `No entity found with _id: ${id}`,
+    });
   }
 
   return res.send(entity);
