@@ -1,8 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-use-before-define */
-/* eslint-disable no-throw-literal */
-
-
 /*
 Simple example to demonstrate how to create a planting on farmos.
 
@@ -31,8 +26,8 @@ The structure to send to the surveystack-server looks like this:
     "crop": "potato",
     "area": "8",
     "date": "2020-04-02T00:00:00.000+02:00"
+    "method": "seeding"
   },
-  "method": "farm_transplanting"
 }
 
 
@@ -42,6 +37,7 @@ Other functions may be called within.
 However, we are in a sandbox here, so no requests
 outside are possible.
 
+use `log()` to log to console below
 */
 
 /**
@@ -55,8 +51,6 @@ function apiCompose(submission) {
     submission.data.planting.date,
     submission.data.planting.crop,
   );
-
-  request.body.method = 'farm_transplanting';
 
   return request;
 }
@@ -95,6 +89,7 @@ function populatePlanting(fieldAnswer, dateAnswer, cropAnswer) {
       crop,
       area,
       date,
+      method: 'seeding',
     },
   };
 }
