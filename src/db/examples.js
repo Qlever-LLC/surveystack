@@ -323,6 +323,9 @@ export const exampleGroups = [
     slug: 'our-sci',
     dir: '/',
     path: '/our-sci/',
+    surveys: {
+      pinned: [],
+    },
   },
   {
     _id: new ObjectId('5e6f8bbeea14550001470c32'),
@@ -330,6 +333,9 @@ export const exampleGroups = [
     slug: 'lab',
     dir: '/our-sci/',
     path: '/our-sci/lab/',
+    surveys: {
+      pinned: [],
+    },
   },
   {
     _id: new ObjectId('5e6f8bbeea14550001470c34'),
@@ -337,6 +343,9 @@ export const exampleGroups = [
     slug: 'testing',
     dir: '/our-sci/lab/',
     path: '/our-sci/lab/testing/',
+    surveys: {
+      pinned: [],
+    },
   },
   {
     _id: new ObjectId('5e6f8bbeea14550001470c36'),
@@ -344,6 +353,9 @@ export const exampleGroups = [
     slug: 'results',
     dir: '/our-sci/lab/',
     path: '/our-sci/lab/results/',
+    surveys: {
+      pinned: [],
+    },
   },
   {
     _id: new ObjectId('5e6f8bbeea14550001470c38'),
@@ -351,6 +363,9 @@ export const exampleGroups = [
     slug: 'nexus-computing',
     dir: '/',
     path: '/nexus-computing/',
+    surveys: {
+      pinned: [new ObjectId('5e3038dbea0cf40001aef63b')],
+    },
   },
 ];
 

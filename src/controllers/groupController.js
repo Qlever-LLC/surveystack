@@ -4,6 +4,8 @@ import { ObjectId } from 'mongodb';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
+import { populate } from '../helpers';
+
 import membershipService from '../services/membership.service';
 
 const col = 'groups';
@@ -72,7 +74,64 @@ const getGroupByPath = async (req, res) => {
     path += '/';
   }
 
-  const entity = await db.collection(col).findOne({ path });
+  const pipeline = [{ $match: { path } }];
+
+  // Aggregation to populate favorites such as "surveys.pinned"
+  // This is a bit tricky, because we want users to have duplicate and - more importantly - ordered survey favorites.
+  // The $lookup stage however removes duplicate references and does not guarantee order
+  // https://stackoverflow.com/questions/55033804/aggregate-lookup-does-not-return-elements-original-array-order
+  // https://jira.mongodb.org/browse/SERVER-32494
+  if (populate(req)) {
+    pipeline.push(
+      ...[
+        {
+          $lookup: {
+            from: 'surveys',
+            let: { surveyIds: { $ifNull: ['$surveys.pinned', []] } },
+            pipeline: [
+              { $match: { $expr: { $in: ['$_id', '$$surveyIds'] } } },
+              {
+                $addFields: {
+                  sort: { $indexOfArray: ['$$surveyIds', '$_id'] },
+                },
+              },
+              { $sort: { sort: 1 } },
+              { $addFields: { sort: '$$REMOVE' } },
+              { $project: { name: 1 } },
+            ],
+            as: 'surveys.pinnedDetails',
+          },
+        },
+        {
+          $addFields: {
+            'surveys.pinned': {
+              $map: {
+                input: { $ifNull: ['$surveys.pinned', []] },
+                as: 'a',
+                in: {
+                  $arrayElemAt: [
+                    {
+                      $filter: {
+                        input: '$surveys.pinnedDetails',
+                        cond: { $eq: ['$$this._id', '$$a'] },
+                      },
+                    },
+                    0,
+                  ],
+                },
+              },
+            },
+            'surveys.pinnedDetails': '$REMOVE',
+          },
+        },
+      ]
+    );
+  }
+
+  const [entity] = await db
+    .collection(col)
+    .aggregate(pipeline)
+    .toArray();
 
   if (!entity) {
     return res.status(404).send({

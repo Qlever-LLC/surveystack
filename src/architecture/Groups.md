@@ -27,6 +27,9 @@ const groups = [
     slug: 'our-sci',
     dir: '/',
     path: '/our-sci/',
+    surveys: {
+      pinned: ['5e95d425a6681900016584f9', '5e95c6ecdf51440001984b2d'],
+    },
   },
   {
     _id: '5e6f8bbeea14550001470c32',
@@ -34,6 +37,9 @@ const groups = [
     slug: 'lab',
     dir: '/our-sci/',
     path: '/our-sci/lab/',
+    surveys: {
+      pinned: [],
+    },
   },
   {
     _id: '5e6f8bbeea14550001470c34',
@@ -41,6 +47,9 @@ const groups = [
     slug: 'testing',
     dir: '/our-sci/lab/',
     path: '/our-sci/lab/testing/',
+    surveys: {
+      pinned: [],
+    },
   },
   {
     _id: '5e6f8bbeea14550001470c36',
@@ -48,6 +57,9 @@ const groups = [
     slug: 'results',
     dir: '/our-sci/lab/',
     path: '/our-sci/lab/results/',
+    surveys: {
+      pinned: [],
+    },
   },
   {
     _id: '5e6f8bbeea14550001470c38',
@@ -55,6 +67,9 @@ const groups = [
     slug: 'nexus-computing',
     dir: '/',
     path: '/nexus-computing/',
+    surveys: {
+      pinned: ['5e95c6ecdf51440001984b2d'],
+    },
   },
 ];
 ```
