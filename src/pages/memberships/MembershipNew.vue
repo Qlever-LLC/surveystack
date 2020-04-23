@@ -75,6 +75,7 @@
 
 <script>
 import ObjectId from 'bson-objectid';
+import moment from 'moment';
 import api from '@/services/api.service';
 
 import { uuid } from '@/utils/memberships';
@@ -101,7 +102,7 @@ export default {
         role: 'user',
         meta: {
           status: 'pending',
-          dateCreated: new Date(),
+          dateCreated: moment().toISOString(),
           dateClaimed: null,
           sentTo: null,
           notes: '',

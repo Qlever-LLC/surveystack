@@ -1,6 +1,7 @@
 import ObjectID from 'bson-objectid';
 import { flatten, unflatten } from 'flat';
-import _ from 'lodash';
+import { cloneDeep } from 'lodash';
+import moment from 'moment';
 
 import * as constants from '@/constants';
 
@@ -107,8 +108,8 @@ const createSubmissionFromSurvey = ({
 
   submission._id = new ObjectID().toString();
   submission.meta = {
-    dateCreated: new Date(),
-    dateModified: new Date(),
+    dateCreated: moment().toISOString(true),
+    dateModified: moment().toISOString(true),
     dateSubmitted: null,
     survey: { id: survey._id, version },
     revision: 1,
@@ -203,7 +204,7 @@ export const linearControls = (survey, submission) => {
   const { controls } = survey.revisions.find(revision => revision.version === submission.meta.survey.version);
   const positions = getControlPositions(controls);
   positions.forEach((p) => {
-    const control = _.cloneDeep(getControl(controls, p));
+    const control = cloneDeep(getControl(controls, p));
     const breadcrumbs = getBreadcrumbsForSubmission(controls, p);
     const submissionField = getSubmissionField(submission, survey, p);
     if (control.type !== 'group') {
