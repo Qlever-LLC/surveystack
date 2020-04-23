@@ -22,20 +22,67 @@
         cols="12"
         lg="6"
       >
-        <app-group-list
+        <app-basic-list
           :entities="subgroups"
-          :dir="entity.path"
           title="Subgroups"
-        />
+          :link="(e) => `/g${e.path}`"
+          :linkNew="{name: 'groups-new', query: {dir: entity.path}}"
+        >
+          <template v-slot:entity="{ entity }">
+            <v-list-item-content>
+              <v-list-item-title>{{entity.name}}</v-list-item-title>
+              <v-list-item-subtitle>{{entity.path}}</v-list-item-subtitle>
+            </v-list-item-content>
+          </template>
+        </app-basic-list>
       </v-col>
       <v-col
         cols="12"
         lg="6"
       >
-        <app-group-member-list
+        <app-basic-list
           :entities="members"
-          :group="entity"
-        />
+          title="Members"
+          :link="(member) => `/memberships/${member._id}/edit`"
+          :linkNew="{name: 'memberships-new', query: {group: entity._id, role: 'user' }}"
+          :filter="filterMembers"
+        >
+          <template v-slot:entity="{ entity }">
+            <v-list-item-content v-if="entity.meta.status === 'pending'">
+              <v-list-item-title class="text--secondary">[Pending] Invitation</v-list-item-title>
+              <v-list-item-subtitle>{{entity.meta.sentTo}}</v-list-item-subtitle>
+            </v-list-item-content>
+
+            <v-list-item-content v-else>
+              <v-list-item-title>{{entity.user.name}}</v-list-item-title>
+              <v-list-item-subtitle>{{entity.user.email}}</v-list-item-subtitle>
+            </v-list-item-content>
+
+            <v-list-item-action>
+              <v-icon v-if="entity.role === 'admin'">mdi-crown-outline</v-icon>
+            </v-list-item-action>
+          </template>
+        </app-basic-list>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <app-basic-list
+          :entities="(entity.surveys && entity.surveys.pinned) ? entity.surveys.pinned : []"
+          title="Pinned Surveys"
+          :link="(e) => `/surveys/${e._id}`"
+          linkNew="/surveys/browse"
+        >
+          <template v-slot:entity="{ entity }">
+            <v-list-item-content>
+              <v-list-item-title>{{entity.name}}</v-list-item-title>
+              <v-list-item-subtitle>{{entity._id}}</v-list-item-subtitle>
+            </v-list-item-content>
+          </template>
+        </app-basic-list>
+      </v-col>
+      <v-col>
+
       </v-col>
     </v-row>
 
@@ -49,16 +96,14 @@
 
 <script>
 import api from '@/services/api.service';
-import appGroupList from '@/components/groups/GroupList.vue';
-import appGroupMemberList from '@/components/groups/GroupMemberList.vue';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
+import appBasicList from '@/components/ui/BasicList.vue';
 
 export default {
   name: 'Group',
   components: {
-    appGroupList,
-    appGroupMemberList,
     appGroupBreadcrumbs,
+    appBasicList,
   },
   data() {
     return {
@@ -81,7 +126,7 @@ export default {
     async getEntity(path) {
       this.initialized = false;
       try {
-        const { data } = await api.get(`/groups/by-path/${path}`);
+        const { data } = await api.get(`/groups/by-path/${path}?populate=true`);
         this.entity = data;
         await this.getSubgroups();
         await this.getMembers();
@@ -102,6 +147,30 @@ export default {
     async getMembers() {
       const { data } = await api.get(`/memberships?group=${this.entity._id}&populate=true`);
       this.members = data;
+    },
+    filterMembers(entities, q) {
+      if (!q) {
+        return entities;
+      }
+      const ql = q.toLowerCase();
+
+      return entities.filter((entity) => {
+        if (entity.user) {
+          if (entity.user.name.toLowerCase().indexOf(ql) > -1) {
+            return true;
+          }
+
+          if (entity.user.email.toLowerCase().startsWith(ql)) {
+            return true;
+          }
+        } else if (entity.meta.sentTo) {
+          if (entity.meta.sentTo.toLowerCase().indexOf(ql) > -1) {
+            return true;
+          }
+        }
+
+        return false;
+      });
     },
   },
   async beforeRouteUpdate(to, from, next) {
