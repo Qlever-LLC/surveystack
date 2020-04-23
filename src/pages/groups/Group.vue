@@ -74,7 +74,7 @@
           :entities="(entity.surveys && entity.surveys.pinned) ? entity.surveys.pinned : []"
           title="Pinned Surveys"
           :link="(e) => `/surveys/${e._id}`"
-          linkNew="/surveys/browse"
+          :linkNew="`/groups/edit/${entity._id}`"
         >
           <template v-slot:entity="{ entity }">
             <v-list-item-content>
