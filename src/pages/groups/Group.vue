@@ -66,7 +66,10 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col>
+      <v-col
+        cols="12"
+        lg="6"
+      >
         <app-basic-list
           :entities="(entity.surveys && entity.surveys.pinned) ? entity.surveys.pinned : []"
           title="Pinned Surveys"
@@ -81,7 +84,10 @@
           </template>
         </app-basic-list>
       </v-col>
-      <v-col>
+      <v-col
+        cols="12"
+        lg="6"
+      >
 
       </v-col>
     </v-row>

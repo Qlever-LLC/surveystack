@@ -40,6 +40,11 @@
       </form>
     </v-card>
 
+    <v-card class="pa-4 mb-4">
+      <v-card-title>Pinned Surveys</v-card-title>
+      <app-pinned-surveys :entities="entity.surveys.pinned" />
+    </v-card>
+
     <v-card v-if="editMode">
       <app-integration-list
         title="Group Integrations"
@@ -56,12 +61,14 @@
 import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import appIntegrationList from '@/components/integrations/IntegrationList.vue';
+import appPinnedSurveys from '@/components/groups/PinnedSurveys.vue';
 
 import { handleize } from '@/utils/groups';
 
 export default {
   components: {
     appIntegrationList,
+    appPinnedSurveys,
   },
   data() {
     return {
@@ -73,6 +80,9 @@ export default {
         slug: '',
         dir: '/',
         path: '',
+        surveys: {
+          pinned: [],
+        },
       },
       integrations: [],
     };
@@ -142,7 +152,7 @@ export default {
     if (this.editMode) {
       try {
         const { id } = this.$route.params;
-        const { data } = await api.get(`/groups/${id}`);
+        const { data } = await api.get(`/groups/${id}?populate=true`);
         this.entity = { ...this.entity, ...data };
 
         const i = await api.get(`/group-integrations?group=${id}`);
