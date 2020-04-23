@@ -2,6 +2,7 @@
   <v-container fluid>
     <v-text-field
       outlined
+      autofocus
       :label="control.label"
       v-bind:value="value"
       v-on:input="onInput"
