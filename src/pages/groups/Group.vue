@@ -18,10 +18,7 @@
     <h3 class="text--secondary">{{entity.path}}</h3>
 
     <v-row>
-      <v-col
-        cols="12"
-        lg="6"
-      >
+      <v-col>
         <app-basic-list
           :entities="subgroups"
           title="Subgroups"
@@ -36,40 +33,10 @@
           </template>
         </app-basic-list>
       </v-col>
-      <v-col
-        cols="12"
-        lg="6"
-      >
-        <app-basic-list
-          :entities="members"
-          title="Members"
-          :link="(member) => `/memberships/${member._id}/edit`"
-          :linkNew="{name: 'memberships-new', query: {group: entity._id, role: 'user' }}"
-          :filter="filterMembers"
-        >
-          <template v-slot:entity="{ entity }">
-            <v-list-item-content v-if="entity.meta.status === 'pending'">
-              <v-list-item-title class="text--secondary">[Pending] Invitation</v-list-item-title>
-              <v-list-item-subtitle>{{entity.meta.sentTo}}</v-list-item-subtitle>
-            </v-list-item-content>
 
-            <v-list-item-content v-else>
-              <v-list-item-title>{{entity.user.name}}</v-list-item-title>
-              <v-list-item-subtitle>{{entity.user.email}}</v-list-item-subtitle>
-            </v-list-item-content>
-
-            <v-list-item-action>
-              <v-icon v-if="entity.role === 'admin'">mdi-crown-outline</v-icon>
-            </v-list-item-action>
-          </template>
-        </app-basic-list>
-      </v-col>
     </v-row>
     <v-row>
-      <v-col
-        cols="12"
-        lg="6"
-      >
+      <v-col>
         <app-basic-list
           :entities="(entity.surveys && entity.surveys.pinned) ? entity.surveys.pinned : []"
           title="Pinned Surveys"
@@ -84,12 +51,7 @@
           </template>
         </app-basic-list>
       </v-col>
-      <v-col
-        cols="12"
-        lg="6"
-      >
 
-      </v-col>
     </v-row>
 
   </v-container>
@@ -124,7 +86,6 @@ export default {
         slug: '',
         path: '/',
       },
-      members: [],
       subgroups: [],
     };
   },
@@ -135,7 +96,6 @@ export default {
         const { data } = await api.get(`/groups/by-path/${path}?populate=true`);
         this.entity = data;
         await this.getSubgroups();
-        await this.getMembers();
       } catch (e) {
         this.status.code = e.response.status;
         this.status.message = e.response.data.message;
@@ -149,34 +109,6 @@ export default {
         this.status.code = e.response.status;
         this.status.message = e.response.data.message;
       }
-    },
-    async getMembers() {
-      const { data } = await api.get(`/memberships?group=${this.entity._id}&populate=true`);
-      this.members = data;
-    },
-    filterMembers(entities, q) {
-      if (!q) {
-        return entities;
-      }
-      const ql = q.toLowerCase();
-
-      return entities.filter((entity) => {
-        if (entity.user) {
-          if (entity.user.name.toLowerCase().indexOf(ql) > -1) {
-            return true;
-          }
-
-          if (entity.user.email.toLowerCase().startsWith(ql)) {
-            return true;
-          }
-        } else if (entity.meta.sentTo) {
-          if (entity.meta.sentTo.toLowerCase().indexOf(ql) > -1) {
-            return true;
-          }
-        }
-
-        return false;
-      });
     },
   },
   async beforeRouteUpdate(to, from, next) {

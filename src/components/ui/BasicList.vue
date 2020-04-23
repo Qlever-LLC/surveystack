@@ -1,53 +1,51 @@
 <template>
-  <div>
-    <v-card>
-      <v-card-title>
-        <slot name="title">
-          {{title}}
-        </slot>
-        <v-spacer />
-        <slot name="action-new">
-          <v-btn
-            color="primary"
-            class="ml-4"
-            :to="linkNew"
-            text
-          >{{labelNew}}</v-btn>
-        </slot>
-      </v-card-title>
-      <v-card-text>
-        <v-text-field
-          label="Search"
-          v-model="q"
-          append-icon="mdi-magnify"
-        />
-        <template v-if="entities.length > 0">
-          <v-list-item
-            v-for="(entity, idx) in filteredEntities"
-            :key="idx"
-            two-line
-            :to="link(entity)"
+  <v-card>
+    <v-card-title>
+      <slot name="title">
+        {{title}}
+      </slot>
+      <v-spacer />
+      <slot name="action-new">
+        <v-btn
+          color="primary"
+          class="ml-4"
+          :to="linkNew"
+          text
+        >{{labelNew}}</v-btn>
+      </slot>
+    </v-card-title>
+    <v-card-text>
+      <v-text-field
+        label="Search"
+        v-model="q"
+        append-icon="mdi-magnify"
+      />
+      <template v-if="entities.length > 0">
+        <v-list-item
+          v-for="(entity, idx) in filteredEntities"
+          :key="idx"
+          two-line
+          :to="link(entity)"
+        >
+          <slot
+            name="entity"
+            v-bind:entity="entity"
           >
-            <slot
-              name="entity"
-              v-bind:entity="entity"
-            >
-              <v-list-item-content>
-                <v-list-item-title>Title #{{idx}}</v-list-item-title>
-                <v-list-item-subtitle>Subtitle</v-list-item-subtitle>
-              </v-list-item-content>
-            </slot>
-          </v-list-item>
+            <v-list-item-content>
+              <v-list-item-title>Title #{{idx}}</v-list-item-title>
+              <v-list-item-subtitle>Subtitle</v-list-item-subtitle>
+            </v-list-item-content>
+          </slot>
+        </v-list-item>
 
-        </template>
-        <div
-          v-else
-          class="grey--text"
-        >No {{title}} yet</div>
-      </v-card-text>
-    </v-card>
+      </template>
+      <div
+        v-else
+        class="grey--text"
+      >No {{title}} yet</div>
+    </v-card-text>
+  </v-card>
 
-  </div>
 </template>
 
 <script>
