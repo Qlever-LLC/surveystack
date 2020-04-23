@@ -1,8 +1,7 @@
 <template>
   <v-container>
     <span class="text--secondary overline">{{entity._id}}</span>
-    <h1>Invite Members</h1>
-    <h3>{{groupDetail.name}}</h3>
+    <h2>Invite Members to {{groupDetail.name}}</h2>
     <h4 class="text--secondary">{{groupDetail.path}}</h4>
     <v-card class="pa-4 mb-4">
       <v-form

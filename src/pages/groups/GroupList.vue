@@ -1,23 +1,32 @@
 <template>
   <v-container>
-    <app-group-list
-      :entities="entities"
+    <app-basic-list
       class="mt-3"
+      :entities="entities"
+      title="Groups"
+      :link="(e) => `/g${e.path}`"
+      :linkNew="{name: 'groups-new', query: {dir: '/'}}"
     >
-      <template v-slot:header>
-        <h1>Groups</h1>
+
+      <template v-slot:entity="{ entity }">
+        <v-list-item-content>
+          <v-list-item-title>{{entity.name}}</v-list-item-title>
+          <v-list-item-subtitle>{{entity.path}}</v-list-item-subtitle>
+        </v-list-item-content>
       </template>
-    </app-group-list>
+
+    </app-basic-list>
+
   </v-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
-import appGroupList from '@/components/groups/GroupList.vue';
+import appBasicList from '@/components/ui/BasicList.vue';
 
 export default {
   components: {
-    appGroupList,
+    appBasicList,
   },
   data() {
     return {
