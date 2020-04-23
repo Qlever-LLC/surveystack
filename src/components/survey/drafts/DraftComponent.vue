@@ -602,7 +602,7 @@ export default {
 
 .slide-in-enter-active,
 .slide-in-leave-active {
-  transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .slide-in-enter {
@@ -620,7 +620,7 @@ export default {
 
 .slide-out-enter-active,
 .slide-out-leave-active {
-  transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .slide-out-enter {
