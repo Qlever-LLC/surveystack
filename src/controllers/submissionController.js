@@ -183,10 +183,14 @@ const buildPipeline = async (req, res) => {
 
   // For development purposes
   if (process.env.NODE_ENV === 'development' && req.query.roles) {
-    const splits = req.query.roles.split(',');
-    splits.forEach((role) => {
-      roles.push(role.trim());
-    });
+    try {
+      const splits = req.query.roles.split(',');
+      splits.forEach((role) => {
+        roles.push(role.trim());
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   const redactStage = createRedactStage(user, roles);
@@ -467,20 +471,42 @@ const updateSubmission = async (req, res) => {
   }
 };
 
+const isUserAllowedToDeleteSubmission = async (submission, user) => {
+  if (!submission.meta.group && !submission.meta.creator) {
+    return true; // no user and no group => free for all!
+  }
+
+  if (submission.meta.creator.equals(user)) {
+    return true; // user may delete their own submissions
+  }
+
+  const hasAdminRole = await rolesService.hasAdminRole(user, submission.meta.group.id);
+  if (hasAdminRole) {
+    return true; // group admins may delete submissions
+  }
+
+  return false;
+};
+
 const deleteSubmission = async (req, res) => {
   const { id } = req.params;
+
+  const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  if (!existing) {
+    throw boom.notFound(`No entity with _id exists: ${id}`);
+  }
+
+  const isAllowed = await isUserAllowedToDeleteSubmission(existing, res.locals.auth.user._id);
+  if (!isAllowed) {
+    throw boom.unauthorized(`You are not allowed to delete submission: ${id}`);
+  }
+
   try {
-    const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
-    if (!existing) {
-      return res.status(404).send({
-        message: `No entity with _id exists: ${id}`,
-      });
-    }
-    let r = await db.collection(col).deleteOne({ _id: id });
+    let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
     assert.equal(1, r.deletedCount);
     return res.send({ message: 'OK' });
   } catch (error) {
-    return res.status(500).send({ message: 'Ouch :/' });
+    throw boom.internal(`deleteSubmission: unknown error`);
   }
 };
 

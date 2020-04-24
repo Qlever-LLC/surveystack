@@ -64,7 +64,11 @@ router.get('/submissions/page', catchErrors(submissionController.getSubmissionsP
 router.get('/submissions/:id', catchErrors(submissionController.getSubmission));
 router.post('/submissions', catchErrors(submissionController.createSubmission));
 router.put('/submissions/:id', catchErrors(submissionController.updateSubmission));
-router.delete('/submissions/:id', catchErrors(submissionController.deleteSubmission));
+router.delete(
+  '/submissions/:id',
+  [assertAuthenticated],
+  catchErrors(submissionController.deleteSubmission)
+);
 
 /** Surveys */
 router.get('/surveys', catchErrors(surveyController.getSurveys));
