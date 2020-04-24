@@ -8,7 +8,7 @@ import { db } from '../db';
 
 export const assertAuthenticated = catchErrors(async (req, res, next) => {
   if (!res.locals.auth.isAuthenticated) {
-    throw boom.unauthorized();
+    throw boom.unauthorized('You are not logged in.');
   }
 
   next();
