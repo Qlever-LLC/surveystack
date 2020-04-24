@@ -181,8 +181,8 @@ const buildPipeline = async (req, res) => {
     roles.push(...res.locals.auth.roles);
   }
 
-  // TODO: remove this from production!
-  if (req.query.roles) {
+  // For development purposes
+  if (process.env.NODE_ENV === 'development' && req.query.roles) {
     const splits = req.query.roles.split(',');
     splits.forEach((role) => {
       roles.push(role.trim());
