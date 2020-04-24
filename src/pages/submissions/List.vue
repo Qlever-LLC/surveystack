@@ -172,7 +172,11 @@ export default {
       return true;
     },
     apiRequest() {
-      return `/submissions/page?survey=${this.survey}&match=${this.filter.match}&sort=${this.filter.sort}&project=${this.filter.project}&skip=${this.filter.skip}&limit=${this.filter.limit}&roles=${this.filter.roles}`;
+      const req = `/submissions/page?survey=${this.survey}&match=${this.filter.match}&sort=${this.filter.sort}&project=${this.filter.project}&skip=${this.filter.skip}&limit=${this.filter.limit}`;
+      if (process.env.NODE_ENV === 'development') {
+        return `${req}&roles=${this.filter.roles}`;
+      }
+      return req;
     },
     apiUrl() {
       return `${process.env.VUE_APP_API_URL}${this.apiRequest}`;
@@ -188,7 +192,8 @@ export default {
   methods: {
     async fetchData() {
       try {
-        this.submissions = (await api.get(this.apiRequest)).data;
+        const { data: submissions } = await api.get(this.apiRequest);
+        this.submissions = submissions;
       } catch (e) {
         console.log('something went wrong:', e);
       }
