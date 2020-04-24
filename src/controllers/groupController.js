@@ -7,6 +7,7 @@ import { db } from '../db';
 import { populate } from '../helpers';
 
 import membershipService from '../services/membership.service';
+import rolesService from '../services/roles.service';
 
 const col = 'groups';
 
@@ -192,6 +193,25 @@ const createGroup = async (req, res) => {
   const entity = req.body;
   sanitizeGroup(entity);
 
+  // TODO: only allow admins to create subgroups
+  if (entity.dir !== '/') {
+    const parentGroup = await db.collection(col).findOne({ path: entity.dir });
+    if (!parentGroup) {
+      throw boom.notFound(`No parent group found for subgroup (${entity.dir})`);
+    }
+
+    const hasAdminRoleForParentGroup = await rolesService.hasAdminRole(
+      res.locals.auth.user._id,
+      parentGroup._id
+    );
+
+    if (!hasAdminRoleForParentGroup) {
+      throw boom.unauthorized(
+        `You do not have admin rights for parent group (admin@${parentGroup.path})`
+      );
+    }
+  }
+
   let r;
 
   try {
@@ -220,6 +240,14 @@ const updateGroup = async (req, res) => {
   sanitizeGroup(entity);
 
   const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  const hasAdminRole = await rolesService.hasRole(
+    res.locals.auth.user._id,
+    new ObjectId(id),
+    'admin'
+  );
+  if (!hasAdminRole) {
+    throw boom.unauthorized(`You are not authorized: admin@${existing.path}`);
+  }
 
   try {
     let updated = await db.collection(col).findOneAndUpdate(
