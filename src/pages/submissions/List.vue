@@ -1,7 +1,18 @@
 <template>
   <div>
     <v-container>
+      <div class="d-flex justify-end">
+        <v-btn
+          outlined
+          color="secondary"
+          @click="startDraft(survey)"
+        >
+          <v-icon left>mdi-note-plus</v-icon>
+          New submission
+        </v-btn>
+      </div>
       <h1 v-if="surveyEntity">{{surveyEntity.name}}</h1>
+
       <app-submissions-filter-basic
         v-if="!showAdvancedFilters && queryList"
         :queryList="queryList"
@@ -59,6 +70,28 @@
         :href="apiUrl"
         target="_blank"
       >{{apiUrl}}</a>
+
+      <v-card
+        v-if="selected.length > 0"
+        class="mt-4"
+      >
+        <v-card-text>
+          <div class="d-flex align-center">
+            <div><span class="subtitle-2">ACTIONS</span><br />{{selected.length}} {{selected.length === 1 ? 'submission' : 'submissions'}} selected</div>
+            <div class="ml-auto">
+              <v-btn
+                v-if="selected.length === 1"
+                color="error"
+                text
+                @click="deleteSubmission(selected[0])"
+              >
+                DELETE
+              </v-btn>
+            </div>
+          </div>
+        </v-card-text>
+      </v-card>
+
     </v-container>
 
     <v-container>
@@ -77,6 +110,7 @@
             <app-submissions-table-client-csv
               :submissions="submissions"
               v-if="submissions"
+              :selected.sync="selected"
             />
           </v-tab-item>
           <v-tab-item>
@@ -156,6 +190,7 @@ export default {
           limit: 100000,
         },
       },
+      selected: [],
       search: '',
     };
   },
@@ -198,6 +233,15 @@ export default {
         console.log('something went wrong:', e);
       }
     },
+    async deleteSubmission(submission) {
+      try {
+        await api.delete(`/submissions/${submission._id}`);
+        this.selected = [];
+        this.fetchData();
+      } catch (err) {
+        this.$store.dispatch('feedback/add', err.response.data.message);
+      }
+    },
     setFormat(ev) {
       this.selectedFormat = ev;
     },
@@ -218,6 +262,13 @@ export default {
       Object.assign(this.filter, defaultFilter);
       this.basicFilters = [];
       this.fetchData();
+    },
+    onSubmissionsSelected(submissions) {
+      this.selectedSubmissions = submissions;
+    },
+    startDraft(survey) {
+      const group = this.$store.getters['memberships/activeGroup'];
+      this.$store.dispatch('submissions/startDraft', { survey, group });
     },
   },
   async created() {
