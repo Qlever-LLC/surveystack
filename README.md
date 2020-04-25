@@ -81,6 +81,12 @@ $ scripts/update-server.sh
 
 In order for this to work, you will need **oursci-allround.pem** inside `~/.ssh/oursci-allround.pem`.
 
+## Deployment QA
+
+We have a list of manual QA testing before pushing changes to the production server [linked here](/wikis/Deployment-Manual-QA).
+
+Read and follow the QA prior to deployment, and add as features are expanded or better examples or test cases become available.
+
 ## Coding guidelines
 
 Our-Sci PWA adheres to airbnb coding style guidelines. For development, we recommend using Visual Studio Code with the following workspace settings under `.vscode/settings.json`:
