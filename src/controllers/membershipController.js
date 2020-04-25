@@ -25,6 +25,49 @@ const sanitize = (entity) => {
   }
 };
 
+const createPopulationPipeline = () => {
+  const pipeline = [];
+  const userLookup = [
+    {
+      $lookup: {
+        from: 'users',
+        let: { userId: '$user' },
+        pipeline: [
+          { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
+          { $project: { name: 1, email: 1 } },
+        ],
+        as: 'user',
+      },
+    },
+    {
+      $unwind: { path: '$user', preserveNullAndEmptyArrays: true },
+    },
+    {
+      $set: {
+        user: { $ifNull: ['$user', null] }, // we want user: null explicitly
+      },
+    },
+  ];
+  pipeline.push(...userLookup);
+
+  const groupLookup = [
+    {
+      $lookup: {
+        from: 'groups',
+        let: { groupId: '$group' },
+        pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$groupId'] } } }],
+        as: 'group',
+      },
+    },
+    {
+      $unwind: '$group',
+    },
+  ];
+  pipeline.push(...groupLookup);
+
+  return pipeline;
+};
+
 const getMemberships = async (req, res) => {
   const filter = {};
 
@@ -47,45 +90,7 @@ const getMemberships = async (req, res) => {
 
   const pipeline = [{ $match: filter }];
   if (populate(req)) {
-    pipeline.push(
-      ...[
-        {
-          $lookup: {
-            from: 'users',
-            let: { userId: '$user' },
-            pipeline: [
-              { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
-              { $project: { name: 1, email: 1 } },
-            ],
-            as: 'user',
-          },
-        },
-        {
-          $unwind: { path: '$user', preserveNullAndEmptyArrays: true },
-        },
-        {
-          $set: {
-            user: { $ifNull: ['$user', null] }, // we want user: null explicitly
-          },
-        },
-      ]
-    );
-
-    pipeline.push(
-      ...[
-        {
-          $lookup: {
-            from: 'groups',
-            let: { groupId: '$group' },
-            pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$groupId'] } } }],
-            as: 'group',
-          },
-        },
-        {
-          $unwind: '$group',
-        },
-      ]
-    );
+    pipeline.push(...createPopulationPipeline());
   }
 
   const entities = await db
@@ -94,6 +99,65 @@ const getMemberships = async (req, res) => {
     .toArray();
 
   return res.send(entities);
+};
+
+const getTree = async (req, res) => {
+  const { user } = req.query;
+
+  if (!user && !res.locals.auth.isAuthenticated) {
+    return res.send([]);
+  }
+
+  const userId = new ObjectId(user ? user : res.locals.auth.user._id);
+
+  const membershipPipeline = [
+    { $match: { user: userId, 'meta.status': 'active' } },
+    { $project: { role: 1, group: 1 } },
+  ];
+
+  membershipPipeline.push(...createPopulationPipeline());
+  membershipPipeline.push(
+    ...[
+      {
+        $lookup: {
+          from: 'groups',
+          let: { path: '$group.path' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: [{ $indexOfCP: ['$path', '$$path'] }, 0] },
+              },
+            },
+            { $project: { name: 1, slug: 1, dir: 1, path: 1 } },
+          ],
+          as: 'group',
+        },
+      },
+      { $unwind: '$group' },
+      {
+        $group: {
+          _id: '$group._id',
+          group: { $first: '$group' },
+          roles: { $addToSet: '$role' },
+        },
+      },
+      {
+        $sort: { 'group.path': 1 },
+      },
+    ]
+  );
+
+  const memberships = await db
+    .collection(col)
+    .aggregate(membershipPipeline)
+    .toArray();
+
+  const m = await db
+    .collection(col)
+    .aggregate([{ $match: { user: userId } }])
+    .toArray();
+
+  return res.send(memberships);
 };
 
 const getMembership = async (req, res) => {
@@ -109,45 +173,7 @@ const getMembership = async (req, res) => {
   const pipeline = [{ $match: filter }];
 
   if (populate(req)) {
-    pipeline.push(
-      ...[
-        {
-          $lookup: {
-            from: 'users',
-            let: { userId: '$user' },
-            pipeline: [
-              { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
-              { $project: { name: 1, email: 1 } },
-            ],
-            as: 'user',
-          },
-        },
-        {
-          $unwind: { path: '$user', preserveNullAndEmptyArrays: true },
-        },
-        {
-          $set: {
-            user: { $ifNull: ['$user', null] }, // we want user: null explicitly
-          },
-        },
-      ]
-    );
-
-    pipeline.push(
-      ...[
-        {
-          $lookup: {
-            from: 'groups',
-            let: { groupId: '$group' },
-            pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$groupId'] } } }],
-            as: 'group',
-          },
-        },
-        {
-          $unwind: '$group',
-        },
-      ]
-    );
+    pipeline.push(...createPopulationPipeline());
   }
   const [entity] = await db
     .collection(col)
@@ -272,4 +298,5 @@ export default {
   updateMembership,
   deleteMembership,
   claimMembership,
+  getTree,
 };

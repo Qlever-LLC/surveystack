@@ -397,7 +397,7 @@ export const exampleMemberships = [
     group: new ObjectId('5e6f8bbeea14550001470c28'),
     role: 'admin',
     meta: {
-      status: 'claimed',
+      status: 'active',
       dateCreated: '2020-04-14T08:04:26.170Z',
       dateClaimed: null,
       sentTo: '',
@@ -411,7 +411,7 @@ export const exampleMemberships = [
     group: new ObjectId('5e6f8bbeea14550001470c38'),
     role: 'admin',
     meta: {
-      status: 'claimed',
+      status: 'active',
       dateCreated: '2020-04-14T08:04:26.170Z',
       dateClaimed: null,
       sentTo: '',
@@ -425,7 +425,7 @@ export const exampleMemberships = [
     group: new ObjectId('5e6f8bbeea14550001470c28'), // our-sci
     role: 'user',
     meta: {
-      status: 'claimed',
+      status: 'active',
       dateCreated: '2020-04-14T08:04:26.170Z',
       dateClaimed: null,
       sentTo: '',
@@ -439,7 +439,7 @@ export const exampleMemberships = [
     group: new ObjectId('5e6f8bbeea14550001470c32'), // our-sci/lab
     role: 'user',
     meta: {
-      status: 'claimed',
+      status: 'active',
       dateCreated: '2020-04-14T08:04:26.170Z',
       dateClaimed: null,
       sentTo: '',
@@ -453,7 +453,7 @@ export const exampleMemberships = [
     group: new ObjectId('5e6f8bbeea14550001470c34'), // our-sci/lab/testing
     role: 'user',
     meta: {
-      status: 'claimed',
+      status: 'active',
       dateCreated: '2020-04-14T08:04:26.170Z',
       dateClaimed: null,
       sentTo: '',
@@ -467,7 +467,7 @@ export const exampleMemberships = [
     group: new ObjectId('5e6f8bbeea14550001470c36'), // our-sci/lab/results
     role: 'user',
     meta: {
-      status: 'claimed',
+      status: 'active',
       dateCreated: '2020-04-14T08:04:26.170Z',
       dateClaimed: null,
       sentTo: '',
