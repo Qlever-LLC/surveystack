@@ -780,6 +780,7 @@ export function createSurvey({
     dateCreated: currentDate,
     dateModified: currentDate,
     latestVersion: 1,
+    creator: null,
     group,
     specVersion,
     revisions: [{
