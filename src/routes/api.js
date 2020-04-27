@@ -99,26 +99,25 @@ router.delete(
 
 /** Users */
 router.get('/users', catchErrors(userController.getUsers));
-//router.get('/users/by-group/:group', catchErrors(userController.getUsersByGroup));
 router.get('/users/:id', catchErrors(userController.getUser));
 router.post('/users', [assertNameNotEmpty], catchErrors(userController.createUser));
 router.put(
   '/users/:id',
-  [assertIdsMatch, assertEntityExists({ collection: 'users' })],
+  [assertAuthenticated, assertIdsMatch, assertEntityExists({ collection: 'users' })],
   catchErrors(userController.updateUser)
 );
-router.delete('/users/:id', catchErrors(userController.deleteUser));
+router.delete('/users/:id', [assertAuthenticated], catchErrors(userController.deleteUser));
 
 /** Scripts */
 router.get('/scripts', catchErrors(scriptController.getScripts));
 router.get('/scripts/:id', catchErrors(scriptController.getScript));
-router.post('/scripts', catchErrors(scriptController.createScript));
+router.post('/scripts', [assertAuthenticated], catchErrors(scriptController.createScript));
 router.put(
   '/scripts/:id',
-  [assertIdsMatch, assertEntityExists({ collection: 'scripts' })],
+  [assertAuthenticated, assertIdsMatch, assertEntityExists({ collection: 'scripts' })],
   catchErrors(scriptController.updateScript)
 );
-router.delete('/scripts/:id', catchErrors(scriptController.deleteScript));
+router.delete('/scripts/:id', [assertAuthenticated], catchErrors(scriptController.deleteScript));
 
 /** Memberships */
 router.get('/memberships', catchErrors(membershipController.getMemberships));

@@ -22,6 +22,12 @@ const survey = {
   dateCreated: '2020-01-27T13:59:31.989Z',
   dateModified: '2020-01-27T14:15:29.811Z',
   latestVersion: 1, // default initial version starts at 1
+  creator: '5e452119c5117c000185f275', // user reference
+  group: {
+    id: '5e6f8bbeea14550001470c28', // group reference
+    path: '/our-sci/',
+  },
+  specVersion: 1,
   revisions: [
     {
       dateCreated: '2020-01-27T14:15:29.811Z',

@@ -5,11 +5,12 @@ import boom from '@hapi/boom';
 import { db } from '../db';
 
 import { checkSurvey } from '../helpers/surveys';
+import rolesService from '../services/roles.service';
 
 const col = 'surveys';
 const DEFAULT_LIMIT = 20;
 
-const sanitize = (entity) => {
+const sanitize = async (entity) => {
   entity._id = new ObjectId(entity._id);
   entity.dateCreated = new Date(entity.dateCreated);
   entity.dateModified = new Date(entity.dateModified);
@@ -22,6 +23,17 @@ const sanitize = (entity) => {
 
   if (entity.group.id) {
     entity.group.id = new ObjectId(entity.group.id);
+  }
+
+  if (entity.group) {
+    if (entity.group.id) {
+      const _id = new ObjectId(entity.group.id);
+      entity.group.id = _id;
+      const group = await db.collection('groups').findOne({ _id });
+      if (group) {
+        entity.group.path = group.path;
+      }
+    }
   }
 
   checkSurvey(entity, entity.latestVersion);
@@ -271,9 +283,13 @@ const getSurveyInfo = async (req, res) => {
 };
 
 const createSurvey = async (req, res) => {
-  const entity = sanitize(req.body);
-  // add creator to survey
-  entity.creator = res.locals.auth.user._id;
+  const entity = await sanitize(req.body);
+  // apply creator
+  if (res.locals.auth.user) {
+    entity.creator = res.locals.auth.user._id;
+  } else {
+    entity.creator = null;
+  }
 
   try {
     let r = await db.collection(col).insertOne(entity);
@@ -288,9 +304,36 @@ const createSurvey = async (req, res) => {
   return res.status(500).send({ message: 'Internal error' });
 };
 
+const isUserAllowedToModifySurvey = async (survey, user) => {
+  if (!survey.group && !survey.creator) {
+    return true; // no user and no group => free for all!
+  }
+
+  if (survey.creator.equals(user)) {
+    return true; // user may delete their own surveys
+  }
+
+  const hasAdminRole = await rolesService.hasAdminRole(user, survey.group.id);
+  if (hasAdminRole) {
+    return true; // group admins may delete surveys
+  }
+
+  return false;
+};
+
 const updateSurvey = async (req, res) => {
   const { id } = req.params;
-  const entity = sanitize(req.body);
+  const entity = await sanitize(req.body);
+
+  const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  if (!existing) {
+    throw boom.notFound(`No entity with _id exists: ${id}`);
+  }
+
+  const isAllowed = await isUserAllowedToModifySurvey(existing, res.locals.auth.user._id);
+  if (!isAllowed) {
+    throw boom.unauthorized(`You are not authorized to update survey: ${id}`);
+  }
 
   try {
     let updated = await db.collection(col).findOneAndUpdate(
@@ -309,6 +352,17 @@ const updateSurvey = async (req, res) => {
 
 const deleteSurvey = async (req, res) => {
   const { id } = req.params;
+
+  const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  if (!existing) {
+    throw boom.notFound(`No entity with _id exists: ${id}`);
+  }
+
+  const isAllowed = await isUserAllowedToModifySurvey(existing, res.locals.auth.user._id);
+  if (!isAllowed) {
+    throw boom.unauthorized(`You are not authorized to delete survey: ${id}`);
+  }
+
   try {
     let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
     assert.equal(1, r.deletedCount);

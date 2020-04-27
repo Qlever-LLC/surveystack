@@ -26,10 +26,9 @@ const sanitize = async (entity) => {
 
   if (entity.meta.group) {
     if (entity.meta.group.id) {
-      entity.meta.group.id = new ObjectId(entity.meta.group.id);
-      const group = await db
-        .collection('groups')
-        .findOne({ _id: new ObjectId(entity.meta.group.id) });
+      const _id = new ObjectId(entity.meta.group.id);
+      entity.meta.group.id = _id;
+      const group = await db.collection('groups').findOne({ _id });
       if (group) {
         entity.meta.group.path = group.path;
       }
