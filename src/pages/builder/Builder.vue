@@ -122,6 +122,7 @@ export default {
       loading: false,
       instance: {},
       survey: createSurvey({
+        creator: this.$store.state.auth.user._id,
         group: this.getActiveGroupSimpleObject(),
       }),
       showSnackbar: false,
@@ -165,7 +166,7 @@ export default {
       }
       try {
         await api.delete(`/surveys/${this.survey._id}`);
-        this.$router.push('/surveys');
+        this.$router.push('/surveys/browse');
       } catch (error) {
         console.log(error);
       }

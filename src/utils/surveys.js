@@ -770,6 +770,7 @@ export function getGroups(controls) {
  * @param {number} options.specVersion specification version for survey definition
  */
 export function createSurvey({
+  creator = null,
   group = null,
   specVersion = SPEC_VERSION_SURVEY,
 }) {
@@ -780,7 +781,7 @@ export function createSurvey({
     dateCreated: currentDate,
     dateModified: currentDate,
     latestVersion: 1,
-    creator: null,
+    creator,
     group,
     specVersion,
     revisions: [{
