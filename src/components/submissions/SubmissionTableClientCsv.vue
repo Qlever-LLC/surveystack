@@ -131,7 +131,7 @@ export default {
       if (!this.submissions) {
         return;
       }
-      this.csv = csvService.createCsv(this.submissions.content);
+      this.csv = csvService.createCsvLegacy(this.submissions.content);
       this.parsed = papa.parse(this.csv, { header: true });
       this.createHeaders();
     },
