@@ -33,6 +33,7 @@
       >
       </v-progress-circular>
     </v-row>
+    <p class="mt-2">{{ control.hint }}</p>
   </v-container>
 </template>
 

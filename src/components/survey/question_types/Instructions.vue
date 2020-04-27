@@ -1,11 +1,14 @@
 <template>
   <v-container fluid class="instructions">
     <v-row>
-      <div
-        v-if="control.options.source"
-        v-html="control.options.source"
-        class="instr"
-      />
+      <v-col cols="12">
+        <div
+          v-if="control.options.source"
+          v-html="control.options.source"
+          class="instr"
+        />
+        <p class="mt-4">{{ control.hint }}</p>
+      </v-col>
     </v-row>
   </v-container>
 </template>

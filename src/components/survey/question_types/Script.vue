@@ -20,6 +20,8 @@
       <br/>
       status message: {{ meta && meta.statusMessage }}
     </p>
+
+    <p class="mt-4">{{ control.hint }}</p>
   </div>
 </template>
 

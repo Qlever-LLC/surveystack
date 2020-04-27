@@ -91,6 +91,7 @@ export default {
         ...cloneWithDefaults,
         name: `${control.name}_${currentSequence}`,
         label: `${control.label} ${currentSequence}`,
+        hint: '',
       };
 
       this.$emit('controlAdded', sequencedControl);
