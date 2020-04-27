@@ -273,7 +273,6 @@ const buildPipeline = async (req, res) => {
 };
 
 const getSubmissionsPage = async (req, res) => {
-  let entities;
   let skip = 0;
   let limit = DEFAULT_LIMIT;
 
@@ -308,6 +307,15 @@ const getSubmissionsPage = async (req, res) => {
     {
       $facet: {
         content: [{ $skip: skip }, { $limit: limit }],
+        // merge: [
+        //   {
+        //     $group: {
+        //       _id: null,
+        //       meta: { $mergeObjects: '$meta' },
+        //       data: { $mergeObjects: '$data' },
+        //     },
+        //   },
+        // ],
         pagination: [{ $count: 'total' }, { $addFields: { skip, limit } }],
       },
     },
@@ -316,24 +324,22 @@ const getSubmissionsPage = async (req, res) => {
 
   pipeline.push(...paginationStages);
 
-  entities = await db
+  const [entities] = await db
     .collection(col)
     .aggregate(pipeline)
     .toArray();
 
-  const r = entities[0];
-  if (!r) {
+  if (!entities) {
     return res.send({
       content: [],
       pagination: { total: 0, skip: 0, limit: DEFAULT_LIMIT },
     });
   }
 
-  return res.send(r);
+  return res.send(entities);
 };
 
 const getSubmissions = async (req, res) => {
-  let entities;
   let skip = 0;
   let limit = DEFAULT_LIMIT;
 
@@ -365,13 +371,24 @@ const getSubmissions = async (req, res) => {
     }
   }
 
-  entities = await db
+  const entities = await db
     .collection(col)
     .aggregate(pipeline)
     .toArray();
 
   if (req.query.format === 'csv') {
-    const csv = csvService.createCsv(entities);
+    const [mergedObject] = await db
+      .collection(col)
+      .aggregate([
+        ...pipeline,
+        {
+          $group: { _id: null, meta: { $mergeObjects: '$meta' }, data: { $mergeObjects: '$data' } },
+        },
+      ])
+      .toArray();
+
+    const headers = csvService.createHeaders(mergedObject);
+    const csv = csvService.createCsv(entities, headers);
     res.set('Content-Type', 'text/plain');
     return res.send(csv);
   }
