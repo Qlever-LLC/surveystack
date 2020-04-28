@@ -1,20 +1,28 @@
 <template>
   <v-card>
-    <v-card-title class="d-flex justify-space-between">
-      <span>
-        Edit Select Options
-      </span>
-      <div>
-        {{ resource.label }}
+    <v-card-title class="d-block">
+      <div class="d-flex justify-space-between">
+        <span>
+          Edit Select Options
+        </span>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <div v-on="on">
+              <select-items-upload-button @change="handleFileChange" class="mt-4 mb-n2" />
+            </div>
+          </template>
+          CSV must have column headers 'label', 'value', and optionally 'tags'
+        </v-tooltip>
       </div>
-      <v-tooltip bottom>
-        <template v-slot:activator="{ on }">
-          <div v-on="on">
-            <select-items-upload-button @change="handleFileChange" class="mt-4 mb-n2" />
-          </div>
-        </template>
-        CSV must have column headers 'label', 'value', and optionally 'tags'
-      </v-tooltip>
+      <div>
+        <!-- {{ resource.label }} -->
+        <v-text-field
+          :value="resource.label"
+          @input="handleUpdateLabel"
+          outlined
+          class="d-inline-block"
+        />
+      </div>
     </v-card-title>
 
     <v-card-text>
@@ -47,6 +55,7 @@
 
 <script>
 import { uniqWith, isEqual } from 'lodash';
+import slugify from '@/utils/slugify';
 
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
 
@@ -85,6 +94,13 @@ export default {
     };
   },
   methods: {
+    handleUpdateLabel(label) {
+      this.$emit('change', {
+        ...this.resource,
+        label,
+        handle: slugify(label),
+      });
+    },
     handleFileChange(data) {
       console.log('table editor file change', data);
       this.appendItems(data);

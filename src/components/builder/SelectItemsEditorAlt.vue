@@ -6,7 +6,7 @@
       </span>
 
     </v-card-title>
-    <div class="text-center">
+    <div class="text-center d-flex">
         <!-- v-model="value"  -->
       <resource-selector
         :resources="resources"
@@ -21,7 +21,7 @@
       >
         <!-- Edit entries -->
         <!-- <v-icon class="ml-2">mdi-table</v-icon> -->
-        <v-icon class="ml-2">mdi-pencil</v-icon>
+        <v-icon class="ml-2 mt-3">mdi-pencil</v-icon>
       </v-btn>
 
     </div>

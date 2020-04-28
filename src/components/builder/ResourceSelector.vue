@@ -1,15 +1,12 @@
 <template>
-  <div>
     <v-select
       :items="items"
       item-text="label"
       item-value="id"
       :value="value"
       @input="handleSelect"
-    >
-
-    </v-select>
-  </div>
+      outlined
+    />
 </template>
 
 <script>
