@@ -96,22 +96,29 @@ async function flushlogs(farmUrl, credentials, user, id) {
     id
   );
 
-  for (const l of logs) {
-    console.log('deleting log', l);
-    const r = await aggregatorRequest(
-      cred.aggregatorURL,
-      cred.aggregatorApiKey,
-      farmUrl,
-      'logs',
-      'delete',
-      undefined,
-      undefined,
-      l.id
-    );
-
-    r[0].message = 'deleted log: ' + l.id;
-    results.push(r[0]);
+  if (logs.length === 0) {
+    return results;
   }
+
+  console.log('logs response', logs);
+
+  const query = logs.map((l) => `id=${l.id}`).join('&');
+
+  console.log('query string: ' + query);
+
+  const r = await aggregatorRequest(
+    cred.aggregatorURL,
+    cred.aggregatorApiKey,
+    farmUrl,
+    'logs',
+    'delete',
+    undefined,
+    undefined,
+    undefined,
+    query
+  );
+
+  results.push(r[0]);
   return results;
 }
 
