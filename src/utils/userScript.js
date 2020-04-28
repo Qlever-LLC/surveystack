@@ -30,6 +30,9 @@ export default function buildScriptQuestionIframeContents({
     <link href="${baseURL}/iframeStyles.css" rel="stylesheet">
   </head>
   <body>
+      <div class="spinner-container">
+        <div id="spinner" class="spinner hidden"></div>
+      </div>
       <div id="root"></div>
       <script type="module">
         import {
@@ -75,6 +78,6 @@ export default function buildScriptQuestionIframeContents({
 
         document.addEventListener('DOMContentLoaded', handleLoaded);
       </script>
-      <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+      <script async src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     </body>`;
 }

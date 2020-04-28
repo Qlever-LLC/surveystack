@@ -63,7 +63,7 @@
     >
       <v-card>
         <v-card-text class="pa-4">
-          <span>Submitting</span>
+          <span>Submitting Builder</span>
           <v-progress-linear
             indeterminate
             class="mb-0"
@@ -122,6 +122,7 @@ export default {
       loading: false,
       instance: {},
       survey: createSurvey({
+        creator: this.$store.state.auth.user._id,
         group: this.getActiveGroupSimpleObject(),
       }),
       showSnackbar: false,
@@ -165,7 +166,7 @@ export default {
       }
       try {
         await api.delete(`/surveys/${this.survey._id}`);
-        this.$router.push('/surveys');
+        this.$router.push('/surveys/browse');
       } catch (error) {
         console.log(error);
       }
@@ -176,7 +177,7 @@ export default {
         console.log('submitting', payload);
         const response = await api.post('/submissions', payload);
         // this.$router.push(`/surveys/${this.survey._id}`);
-        this.result(response);
+        this.result({ response });
       } catch (error) {
         console.log('error', error);
         const { message } = error.response.data;

@@ -1,6 +1,6 @@
 <template>
   <!-- <div class="survey-group-selector-list"> -->
-    <!-- <v-select
+  <!-- <v-select
       :value="value"
       @input="handleInput"
       :items="groupItems"
@@ -16,11 +16,15 @@
     :value="true"
   >
     <template v-slot:activator>
-      <v-list-item-title>Active Group</v-list-item-title>
+      <v-list-item-title v-if="activeGroup">{{activeGroupName}}</v-list-item-title>
+      <v-list-item-title v-else>No Group selected</v-list-item-title>
     </template>
-    <v-list-item flat class="pt-0">
+    <v-list-item
+      flat
+      class="pt-0"
+    >
       <!-- <v-subheader class="text-uppercase px-0">Groups</v-subheader> -->
-        <!-- v-model="activeItem" -->
+      <!-- v-model="activeItem" -->
       <v-list-item-group
         :value="activeItem"
         color="primary"
@@ -41,7 +45,7 @@
         </v-list-item>
       </v-list-item-group>
     </v-list-item>
-  <!-- </div> -->
+    <!-- </div> -->
   </v-list-group>
 </template>
 
@@ -85,6 +89,19 @@ export default {
     activeGroup() {
       return this.$store.getters['memberships/activeGroup'];
     },
+    activeGroupName() {
+      if (!this.activeGroup) {
+        return '';
+      }
+
+      // it's possible that a membership that a membership was deleted on the server
+      // so check if it still exists first
+      const group = this.groups.find(g => g._id === this.activeGroup);
+      if (group) {
+        return group.name;
+      }
+      return '';
+    },
   },
   props: {
     value: {
@@ -121,5 +138,4 @@ export default {
 </script>
 
 <style>
-
 </style>

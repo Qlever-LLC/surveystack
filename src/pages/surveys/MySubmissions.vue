@@ -90,6 +90,7 @@
 </template>
 
 <script>
+import moment from 'moment';
 // TODO: figure out why there is an import cycle from submissions.strore > router
 // eslint-disable-next-line import/no-cycle
 import { types as submissionsTypes } from '@/store/modules/submissions.store';
@@ -117,20 +118,20 @@ export default {
         {
           name: 'drafts',
           title: 'Drafts',
-          content: this.$store.getters['submissions/drafts'],
+          content: this.sortSubmissions(this.$store.getters['submissions/drafts']),
           icon: 'mdi-file-document-edit',
         },
         {
           name: 'outbox',
           title: 'Outbox',
-          content: this.$store.getters['submissions/outbox'],
+          content: this.sortSubmissions(this.$store.getters['submissions/outbox']),
           icon: 'mdi-cloud-sync',
 
         },
         {
           name: 'sent',
           title: 'Sent',
-          content: this.$store.getters['submissions/sent'],
+          content: this.sortSubmissions(this.$store.getters['submissions/sent']),
           icon: 'mdi-email-check',
         },
       ];
@@ -138,11 +139,18 @@ export default {
   },
   methods: {
     surveyForSubmission(submission) {
-      return this.$store.state.surveys.surveys.find(survey => survey._id === submission.survey);
+      return this.$store.state.surveys.surveys.find(
+        survey => survey._id === submission.meta.survey.id,
+      );
     },
     select(draft) {
       console.log(`clicked ${draft._id}`);
       this.$router.push(`/submissions/drafts/${draft._id}`);
+    },
+    sortSubmissions(submissions) {
+      return [...submissions].sort(
+        (a, b) => (new Date(b.meta.dateModified)).valueOf() - (new Date(a.meta.dateModified)).valueOf(),
+      );
     },
   },
 };

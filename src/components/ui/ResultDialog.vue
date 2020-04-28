@@ -3,6 +3,7 @@
     <v-dialog
       v-model="show"
       max-width="350"
+      :persistent="persistent"
     >
       <v-card class="pa-4">
         <v-card-title class="headline">{{title}}</v-card-title>
@@ -15,10 +16,23 @@
               class="mb-2"
               :color="item.error ? 'red darken-4' : 'green'"
             >
-              <v-card-text class="white--text"><span style="font-weight: bold">{{ item.title }}</span> {{ item.body }} </v-card-text>
+              <v-card-text class="white--text">
+                <span style="font-weight: bold">{{ item.title }}</span> {{ item.body }}
+              </v-card-text>
             </v-card>
           </div>
         </template>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            :to="persistent ? to : null"
+            @click="show = null"
+          >
+            Ok
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
@@ -30,6 +44,14 @@ export default {
     value: Boolean,
     items: Array,
     title: String,
+    persistent: {
+      type: Boolean,
+      default: false,
+    },
+    to: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   computed: {
     show: {

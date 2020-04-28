@@ -22,92 +22,8 @@
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
+      <navbar-user-menu />
 
-      <v-menu
-        offset-y
-        v-if="$store.getters['auth/isLoggedIn']"
-        :close-on-content-click="false"
-      >
-        <template v-slot:activator="{ on }">
-            <!-- :to="{name: 'auth-profile'}" -->
-          <v-btn
-            text
-            v-on="on"
-          >
-            <span class="d-none d-md-inline mr-1">{{$store.getters['auth/user'].email}}</span>
-            <v-icon color="white">mdi-account</v-icon>
-          </v-btn>
-        </template>
-        <!-- <v-card> -->
-          <!-- <v-card-text> -->
-            <!-- <v-list>
-              <v-list-item v-for="group in ">
-              </v-list-item>
-            </v-list> -->
-            <!-- <active-group-selector
-              class="my-4"
-              v-model="activeGroup"
-              outlined
-            /> -->
-          <!-- </v-card-text> -->
-          <!-- <v-card-title class="d-block pb-0"> -->
-            <!-- <div class="text-center">
-
-              <v-icon x-large>mdi-account</v-icon>
-              <div class="">{{$store.getters['auth/user'].email}}</div>
-            </div> -->
-
-            <!-- View Profile
-          </v-card-title> -->
-          <!-- <v-card-text class="pt-0"> -->
-            <v-list flat>
-              <v-list-item link :to="{name: 'auth-profile'}">
-                <v-list-item-icon>
-                  <v-icon>mdi-account-circle</v-icon>
-                </v-list-item-icon>
-                <v-list-item-title>
-                    Profile
-                </v-list-item-title>
-              </v-list-item>
-              <v-list-item link :to="{name: 'users-edit', params: { id: this.$store.state.auth.user._id }}">
-                <v-list-item-icon>
-                  <v-icon>mdi-account-edit</v-icon>
-                </v-list-item-icon>
-                <v-list-item-title>
-                    Edit Account
-                </v-list-item-title>
-              </v-list-item>
-              <active-group-selector-list
-                class=""
-                v-model="activeGroup"
-              />
-              <!-- <v-divider /> -->
-              <v-list-item
-                link
-                @click="logout"
-                class="mt-2"
-              >
-                <v-list-item-icon>
-                  <v-icon>mdi-logout-variant</v-icon>
-                </v-list-item-icon>
-                <v-list-item-title>
-                    Sign Out
-                </v-list-item-title>
-              </v-list-item>
-            </v-list>
-
-          <!-- </v-card-text> -->
-        <!-- </v-card> -->
-      </v-menu>
-
-      <v-btn
-        v-else
-        :to="{name: 'auth-login'}"
-        text
-      >
-        <v-icon>mdi-login-variant</v-icon>
-        <span class="ml-2">Login</span>
-      </v-btn>
     </v-app-bar>
 
     <v-navigation-drawer
@@ -151,13 +67,11 @@
 </template>
 
 <script>
-// import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
-import ActiveGroupSelectorList from '@/components/shared/ActiveGroupSelectorList.vue';
+import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 
 export default {
   components: {
-    // ActiveGroupSelector,
-    ActiveGroupSelectorList,
+    NavbarUserMenu,
   },
   data() {
     return {
@@ -286,20 +200,7 @@ export default {
       // items.push(...this.sidenav.dev);
       return items;
     },
-    activeGroup: {
-      get() {
-        return this.$store.getters['memberships/activeGroup'];
-      },
-      set(val) {
-        this.$store.dispatch('memberships/setActiveGroup', val);
-      },
-    },
-  },
-  methods: {
-    async logout() {
-      this.$store.dispatch('auth/logout');
-      this.$router.push('/auth/login');
-    },
+
   },
 };
 </script>

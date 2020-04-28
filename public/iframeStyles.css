@@ -7,6 +7,48 @@ body {
 	margin: 0;
 }
 
+.hidden {
+	display: none;
+}
+
+.spinner-container {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 50px;
+}
+
+.spinner {
+	position: relative;
+	/* color: transparent !important; */
+	pointer-events: none;
+}
+
+.spinner::after {
+	content: '';
+	position: absolute !important;
+	top: calc(50% - (1em / 2));
+	left: calc(50% - (1em / 2));
+	display: block;
+	width: 1em;
+	height: 1em;
+	border: 0.1em solid currentColor;
+	border-radius: 9999px;
+	border-right-color: transparent;
+	border-top-color: transparent;
+	animation: spinAround 500ms infinite linear;
+}
+
+@keyframes spinAround {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
 .button {
 	border-radius: 2px;
 	cursor: pointer;

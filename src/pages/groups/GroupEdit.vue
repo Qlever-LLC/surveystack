@@ -40,14 +40,64 @@
       </form>
     </v-card>
 
-    <v-card v-if="editMode">
-      <app-integration-list
-        title="Group Integrations"
-        :entities="integrations"
-        integrationType="group"
-        :newRoute="{name: 'group-integrations-new', query: {group: entity._id}}"
-      />
-    </v-card>
+    <v-row>
+      <v-col
+        cols="12"
+        lg="6"
+      >
+        <app-pinned-surveys
+          class="mb-4"
+          v-if="editMode"
+          :entities="entity.surveys.pinned"
+          :searchResults="searchResults"
+          @search="searchSurveys"
+        >
+
+        </app-pinned-surveys>
+      </v-col>
+      <v-col
+        cols="12"
+        lg="6"
+      >
+        <v-card
+          v-if="editMode"
+          class="mb-4"
+        >
+          <app-integration-list
+            title="Group Integrations"
+            :entities="integrations"
+            integrationType="group"
+            :newRoute="{name: 'group-integrations-new', query: {group: entity._id}}"
+          />
+        </v-card>
+      </v-col>
+    </v-row>
+
+    <app-basic-list
+      class="mb-4"
+      v-if="editMode"
+      :entities="members"
+      title="Members"
+      :link="(member) => `/memberships/${member._id}/edit`"
+      :linkNew="{name: 'memberships-new', query: {group: entity._id, role: 'user' }}"
+      :filter="filterMembers"
+    >
+      <template v-slot:entity="{ entity }">
+        <v-list-item-content v-if="entity.meta.status === 'pending'">
+          <v-list-item-title class="text--secondary">[Pending] Invitation</v-list-item-title>
+          <v-list-item-subtitle>{{entity.meta.sentTo}}</v-list-item-subtitle>
+        </v-list-item-content>
+
+        <v-list-item-content v-else>
+          <v-list-item-title>{{entity.user.name}}</v-list-item-title>
+          <v-list-item-subtitle>{{entity.user.email}}</v-list-item-subtitle>
+        </v-list-item-content>
+
+        <v-list-item-action>
+          <v-icon v-if="entity.role === 'admin'">mdi-crown-outline</v-icon>
+        </v-list-item-action>
+      </template>
+    </app-basic-list>
 
   </v-container>
 </template>
@@ -56,12 +106,17 @@
 import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import appIntegrationList from '@/components/integrations/IntegrationList.vue';
+import appPinnedSurveys from '@/components/groups/PinnedSurveys.vue';
+import appBasicList from '@/components/ui/BasicList.vue';
+
 
 import { handleize } from '@/utils/groups';
 
 export default {
   components: {
     appIntegrationList,
+    appPinnedSurveys,
+    appBasicList,
   },
   data() {
     return {
@@ -73,8 +128,13 @@ export default {
         slug: '',
         dir: '/',
         path: '',
+        surveys: {
+          pinned: [],
+        },
       },
       integrations: [],
+      searchResults: [],
+      members: [],
     };
   },
   methods: {
@@ -101,11 +161,40 @@ export default {
         });
         this.$router.push(`/g${this.entity.dir}${this.entity.slug}/`);
       } catch (err) {
+        this.$store.dispatch('feedback/add', err.response.data.message);
         console.log(err);
       }
     },
     cancel() {
       this.$router.back();
+    },
+    async searchSurveys(q) {
+      const { data: searchResults } = await api.get(`/surveys?projections[]=name&projections[]=dateModified&q=${q}`);
+      this.searchResults = searchResults;
+    },
+    filterMembers(entities, q) {
+      if (!q) {
+        return entities;
+      }
+      const ql = q.toLowerCase();
+
+      return entities.filter((entity) => {
+        if (entity.user) {
+          if (entity.user.name.toLowerCase().indexOf(ql) > -1) {
+            return true;
+          }
+
+          if (entity.user.email.toLowerCase().startsWith(ql)) {
+            return true;
+          }
+        } else if (entity.meta.sentTo) {
+          if (entity.meta.sentTo.toLowerCase().indexOf(ql) > -1) {
+            return true;
+          }
+        }
+
+        return false;
+      });
     },
   },
   watch: {
@@ -142,11 +231,14 @@ export default {
     if (this.editMode) {
       try {
         const { id } = this.$route.params;
-        const { data } = await api.get(`/groups/${id}`);
+        const { data } = await api.get(`/groups/${id}?populate=true`);
         this.entity = { ...this.entity, ...data };
 
-        const i = await api.get(`/group-integrations?group=${id}`);
-        this.integrations = i.data;
+        const { data: members } = await api.get(`/memberships?group=${this.entity._id}&populate=true`);
+        this.members = members;
+
+        const { data: integrations } = await api.get(`/group-integrations?group=${id}`);
+        this.integrations = integrations;
       } catch (e) {
         console.log('something went wrong:', e);
       }

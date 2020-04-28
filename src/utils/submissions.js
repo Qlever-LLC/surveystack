@@ -1,6 +1,7 @@
 import ObjectID from 'bson-objectid';
 import { flatten, unflatten } from 'flat';
-import _ from 'lodash';
+import { cloneDeep } from 'lodash';
+import moment from 'moment';
 
 import * as constants from '@/constants';
 
@@ -100,18 +101,23 @@ export const flattenSubmission = (submission, delimiter = '.') => {
  *
  * @returns {Object} A submission for a specific survey version.
  */
-const createSubmissionFromSurvey = (survey, version = 1, instance = null) => {
+const createSubmissionFromSurvey = ({
+  survey, version = 1, instance, group,
+}) => {
   const submission = {};
 
   submission._id = new ObjectID().toString();
   submission.meta = {
-    dateCreated: new Date(),
-    dateModified: new Date(),
+    dateCreated: moment().toISOString(true),
+    dateModified: moment().toISOString(true),
+    dateSubmitted: null,
     survey: { id: survey._id, version },
     revision: 1,
     permissions: [],
-    group: '5e6f8bbeea14550001470c28',
-    path: '/our-sci',
+    group: {
+      id: group,
+      path: null,
+    },
     specVersion: constants.SPEC_VERSION_SUBMISSION,
   };
 
@@ -198,7 +204,7 @@ export const linearControls = (survey, submission) => {
   const { controls } = survey.revisions.find(revision => revision.version === submission.meta.survey.version);
   const positions = getControlPositions(controls);
   positions.forEach((p) => {
-    const control = _.cloneDeep(getControl(controls, p));
+    const control = cloneDeep(getControl(controls, p));
     const breadcrumbs = getBreadcrumbsForSubmission(controls, p);
     const submissionField = getSubmissionField(submission, survey, p);
     if (control.type !== 'group') {

@@ -3,6 +3,7 @@
     <v-row>
       <v-text-field
         outlined
+        autofocus
         type="number"
         :label="control.label"
         v-bind:value="value"

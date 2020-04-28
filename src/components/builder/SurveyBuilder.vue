@@ -205,6 +205,7 @@ import {
 import { Splitpanes, Pane } from 'splitpanes';
 
 import ObjectId from 'bson-objectid';
+import moment from 'moment';
 import codeEditor from '@/components/ui/CodeEditor.vue';
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
@@ -342,7 +343,7 @@ export default {
       this.dirty = true;
       const { latestVersion } = this.initialSurvey;
       const nextVersion = latestVersion + 1;
-      const date = new Date();
+      const date = moment().toISOString(true);
 
       const nextVersionObj = this.survey.revisions.find(revision => revision.version === latestVersion);
       nextVersionObj.version = nextVersion;
@@ -549,6 +550,14 @@ export default {
     setSurveyDescription(value) {
       this.$set(this.survey, 'description', value);
     },
+    createInstance() {
+      const { version } = this.survey.revisions[this.survey.revisions.length - 1];
+      const group = this.$store.getters['memberships/activeGroup'];
+
+      this.instance = submissionUtils.createSubmissionFromSurvey({
+        survey: this.survey, version, group, instance: this.instance,
+      });
+    },
   },
   computed: {
     surveyIsValid() {
@@ -742,15 +751,14 @@ export default {
         }
 
         // if only relevance changes, don't flush results
-        this.instance = submissionUtils.createSubmissionFromSurvey(newVal, this.survey.revisions[this.survey.revisions.length - 1].version, this.instance);
+        this.createInstance();
       },
       deep: true,
     },
   },
   created() {
     this.initNavbarAndDirtyFlag(this.survey);
-
-    this.instance = submissionUtils.createSubmissionFromSurvey(this.survey, this.survey.revisions[this.survey.revisions.length - 1].version, this.instance);
+    this.createInstance();
   },
 };
 </script>

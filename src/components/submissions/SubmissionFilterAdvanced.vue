@@ -40,7 +40,7 @@
           </v-col>
         </v-row>
 
-        <v-row>
+        <v-row v-if="showRolesDebug">
           <v-col cols="6">
             <v-text-field
               v-model.number="value.roles"
@@ -93,6 +93,10 @@ export default {
 
       return true;
     },
+    showRolesDebug() {
+      return process.env.NODE_ENV === 'development';
+    },
   },
+
 };
 </script>

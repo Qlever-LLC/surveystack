@@ -219,6 +219,15 @@ function updateDOM(node) {
   // log('new', s.serializeToString(node));
 }
 
+function setIsLoading(isLoading) {
+  const spinner = document.querySelector('#spinner');
+  if (isLoading) {
+    spinner.classList.remove('hidden');
+  } else {
+    spinner.classList.add('hidden');
+  }
+}
+
 export const renderScript = (process, render, props) => (state) => {
   console.log('renderScript', state);
   updateDOM(
@@ -227,7 +236,15 @@ export const renderScript = (process, render, props) => (state) => {
 };
 
 export const runScript = (process, render, props) => async (state) => {
-  const nextState = await process(props, state);
+  setIsLoading(true);
+  let nextState;
+  try {
+    nextState = await process(props, state);
+  } catch (err) {
+    setIsLoading(false);
+    throw err;
+  }
+  setIsLoading(false);
   updateParentState(nextState);
   renderScript(process, render, props)(nextState);
 };

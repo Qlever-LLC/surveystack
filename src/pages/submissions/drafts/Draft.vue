@@ -17,7 +17,7 @@
     >
       <v-card>
         <v-card-text class="pa-4">
-          <span>Submitting</span>
+          <span>Submitting Draft</span>
           <v-progress-linear
             indeterminate
             class="mb-0"
@@ -30,6 +30,8 @@
       v-model="showResult"
       :items="resultItems"
       title="Result of Submission"
+      persistent
+      :to="survey && {name: 'surveys-detail', params: { id: survey._id }}"
     />
   </div>
 
@@ -72,14 +74,15 @@ export default {
         console.log('submitting', payload);
         const response = await api.post('/submissions', payload);
         // this.$router.push(`/surveys/${this.survey._id}`);
-        this.result(response);
+        this.result({ response });
       } catch (error) {
-        console.log('error', error);
+        console.log('Draft submit error:', error);
         const { message } = error.response.data;
-        this.snack(message);
-        console.log(error);
+        // this.snack(message); // does not exists here?
+        this.result({ error });
+      } finally {
+        this.submitting = false;
       }
-      this.submitting = false;
     },
   },
   async created() {
