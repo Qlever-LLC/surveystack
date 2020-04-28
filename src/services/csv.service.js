@@ -102,4 +102,4 @@ function createCsv(submissions, headers) {
   return csv;
 }
 
-export default { createCsvLegacy };
+export default { createCsv, createCsvLegacy };

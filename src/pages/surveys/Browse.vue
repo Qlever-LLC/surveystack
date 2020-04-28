@@ -21,7 +21,10 @@
         {{}}
       </v-card-text>
     </v-card> -->
-    <v-card min-height="70vh" class="d-flex flex-column">
+    <v-card
+      min-height="70vh"
+      class="d-flex flex-column"
+    >
       <v-card-title>
         <v-tabs
           v-model="activeTab"
@@ -82,7 +85,10 @@
           </v-list-item>
           <v-divider />
         </div>
-        <div v-if="surveys.content.length < 1" class="py-12 text-center">
+        <div
+          v-if="surveys.content.length < 1"
+          class="py-12 text-center"
+        >
           No surveys available
         </div>
       </v-card-text>
@@ -240,7 +246,7 @@ export default {
         queryParams.append('creator', user);
       }
       if (groups.length > 0) {
-        groups.forEach(group => queryParams.append('groups[]', group));
+        groups.filter(group => group !== null).forEach(group => queryParams.append('groups[]', group));
       }
       if (this.search) {
         queryParams.append('q', this.search);

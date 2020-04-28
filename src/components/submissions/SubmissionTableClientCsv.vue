@@ -11,6 +11,7 @@
         hide-default-footer
         v-model="tableSelected"
         @item-selected="onRowSelected"
+        disable-pagination
       >
         <template v-slot:top>
           <v-toolbar flat>
@@ -64,6 +65,7 @@ export default {
   computed: {
     items() {
       if (this.parsed) {
+        console.log('this.parsed', this.parsed);
         return this.parsed.data;
       }
       return [];
@@ -118,7 +120,7 @@ export default {
       const headers = [];
       if (this.parsed) {
         this.parsed.meta.fields.forEach((header) => {
-          if (this.excludeMeta && (header.startsWith('meta') || header === 'survey')) {
+          if (this.excludeMeta && (header.startsWith('meta') || header.includes('meta'))) {
             return;
           }
           this.$set(this.searchFields, header, '');
@@ -131,7 +133,7 @@ export default {
       if (!this.submissions) {
         return;
       }
-      this.csv = csvService.createCsvLegacy(this.submissions.content);
+      this.csv = csvService.createCsv(this.submissions.content, this.submissions.headers);
       this.parsed = papa.parse(this.csv, { header: true });
       this.createHeaders();
     },
