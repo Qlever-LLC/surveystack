@@ -81,6 +81,7 @@
               @code-constraint="highlight('constraint')"
               @code-api-compose="highlight('apiCompose')"
               @set-control-source="setControlSource"
+              @set-survey-resources="setSurveyResources"
               @set-control-params="setControlParams"
               @set-script-editor-is-visible="setScriptIsVisible"
             />
@@ -509,8 +510,13 @@ export default {
     async setControlSource(value) {
       console.log('setControlSource', value);
       this.$set(this.control.options, 'source', value);
-      const data = await this.fetchScript(value);
-      this.setScriptCode(data);
+      if (this.control.type === 'script') {
+        const data = await this.fetchScript(value);
+        this.setScriptCode(data);
+      }
+    },
+    setSurveyResources(resources) {
+      this.$set(this.survey, 'resources', resources);
     },
     setControlParams(params) {
       this.control.options.params = params;

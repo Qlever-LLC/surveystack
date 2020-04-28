@@ -4,6 +4,9 @@
       <span>
         Edit Select Options
       </span>
+      <div>
+        {{ resource.label }}
+      </div>
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
           <div v-on="on">
@@ -17,7 +20,7 @@
     <v-card-text>
       <v-data-table
         :headers="tableHeaders"
-        :items="items"
+        :items="resource.content"
       >
         <!-- <template v-slot:top>
           <v-toolbar flat color="white">
@@ -49,9 +52,10 @@ import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButto
 
 export default {
   props: {
-    items: {
-      type: Array,
+    resource: {
+      type: Object,
       required: true,
+      default: () => ({ content: [] }),
     },
   },
   components: {
@@ -98,10 +102,14 @@ export default {
       return uniqWith(items, isEqual);
     },
     appendItems(items) {
-      this.$emit('change', this.filterDuplicateItems([
-        ...this.items,
+      const content = this.filterDuplicateItems([
+        ...this.resource.content,
         ...items,
-      ]));
+      ]);
+      this.$emit('change', {
+        ...this.resource,
+        content,
+      });
     },
   },
 };

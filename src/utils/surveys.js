@@ -784,6 +784,7 @@ export function createSurvey({
     creator,
     group,
     specVersion,
+    resources: [],
     revisions: [{
       dateCreated: currentDate,
       version: 1,

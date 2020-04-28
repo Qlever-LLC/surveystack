@@ -31,11 +31,11 @@ export const createControlInstance = (control) => {
     id: new ObjectId().toString(),
   });
 
-  if (control.type === 'selectSingle' || control.type === 'selectMultiple' || control.type === 'ontology') {
+  if (control.type === 'selectSingle' || control.type === 'selectMultiple') {
     cloneWithDefaultOptions.options.source = [];
-  }
-
-  if (control.type === 'instructions') {
+  } else if (control.type === 'ontology') {
+    cloneWithDefaultOptions.options.source = '';
+  } else if (control.type === 'instructions') {
     cloneWithDefaultOptions.options.source = '';
   }
 

@@ -213,13 +213,22 @@
         </div>
       </div>
       <select-items-editor
-        v-if="isSelect || isOntology"
+        v-if="isSelect"
         v-model="control.options.source"
+        class="mt-5"
+      />
+        <!-- v-model="survey.resources" -->
+      <select-items-editor-alt
+        v-else-if="isOntology"
+        :value="control.options.source"
+        :resources="survey.resources"
+        @set-control-source="(val) => $emit('set-control-source', val)"
+        @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         class="mt-5"
       />
 
       <instructions-editor
-        v-if="isInstructions"
+        v-else-if="isInstructions"
         v-model="control.options.source"
       />
     </v-form>
@@ -230,6 +239,7 @@
 import { getAdvancedCodeTemplate, findParentByChildId } from '@/utils/surveys';
 import api from '@/services/api.service';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
+import SelectItemsEditorAlt from '@/components/builder/SelectItemsEditorAlt.vue';
 import InstructionsEditor from '@/components/builder/InstructionsEditor.vue';
 
 import { convertToKey } from '@/utils/builder';
@@ -237,6 +247,7 @@ import { convertToKey } from '@/utils/builder';
 export default {
   components: {
     SelectItemsEditor,
+    SelectItemsEditorAlt,
     InstructionsEditor,
   },
   props: {

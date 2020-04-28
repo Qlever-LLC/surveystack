@@ -5,14 +5,7 @@
       <span>
         Select Options
       </span>
-      <div>
-        <v-btn
-          icon
-          @click.stop="openTableDialog"
-        >
-          <v-icon>mdi-table</v-icon>
-        </v-btn>
-      </div>
+
     </v-card-title>
     <v-list>
       <draggable :list="value">
@@ -53,7 +46,7 @@
                 <v-icon
                   color="grey"
                   @click="() => deleteItem(index)"
-                >mdi-trash-can-outline</v-icon>
+                >mdi-delete</v-icon>
               </v-btn>
             </v-list-item-action>
           </v-list-item>
@@ -70,29 +63,20 @@
       </v-btn>
     </v-row>
 
-    <v-dialog v-model="tableDialogIsVisible">
-      <select-items-table-editor
-        :items="value"
-        @change="setItems"
-        @close-dialog="closeTableDialog"
-      />
-    </v-dialog>
+
   </div>
 
 </template>
 
 <script>
 import draggable from 'vuedraggable';
-import SelectItemsTableEditor from '@/components/builder/SelectItemsTableEditor.vue';
 
 export default {
   components: {
     draggable,
-    SelectItemsTableEditor,
   },
   data() {
     return {
-      tableDialogIsVisible: false,
       rules: {
         notEmpty: val => ((val !== null && val !== '') ? true : 'Please enter a string'),
       },
@@ -132,12 +116,7 @@ export default {
       ];
       this.$emit('set-control-source', newItems);
     },
-    openTableDialog() {
-      this.tableDialogIsVisible = true;
-    },
-    closeTableDialog() {
-      this.tableDialogIsVisible = false;
-    },
+
   },
   model: {
     // prop: 'items',
