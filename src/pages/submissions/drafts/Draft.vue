@@ -30,6 +30,8 @@
       v-model="showResult"
       :items="resultItems"
       title="Result of Submission"
+      persistent
+      :to="survey && {name: 'surveys-detail', params: { id: survey._id }}"
     />
   </div>
 

@@ -126,7 +126,7 @@ function getResults(storeName, success) {
     // If there is a next item, add it to the array
     if (cursor) {
       results.push(cursor.value);
-      console.log(cursor.value);
+      // console.log(cursor.value);
       cursor.continue();
     } else {
       success(results);

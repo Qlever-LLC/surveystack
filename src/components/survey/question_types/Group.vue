@@ -1,8 +1,7 @@
 <template>
   <v-container fluid>
-    <v-row>
-      <p class="display-1 grey--text text--darken-3">{{ control.label }} </p>
-    </v-row>
+    <p class="display-1 grey--text text--darken-3">{{ control.label }} </p>
+    <p class="mt-2">{{ control.hint }}</p>
   </v-container>
 </template>
 

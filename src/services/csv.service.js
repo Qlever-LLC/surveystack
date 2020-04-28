@@ -26,7 +26,13 @@ function removeKeys(obj, keys) {
   }
 }
 
-function createCsv(submissions) {
+function createHeaders(mergedObject) {
+  const flattened = flatten(mergedObject);
+  const headers = Object.keys(flattened);
+  return headers;
+}
+
+function createCsvLegacy(submissions) {
   const items = [];
   submissions.forEach((s) => {
     const submission = _.cloneDeep(s);
@@ -70,4 +76,30 @@ function createCsv(submissions) {
   return csv;
 }
 
-export default { createCsv };
+
+function createCsv(submissions, headers) {
+  const items = [];
+  submissions.forEach((s) => {
+    const submission = _.cloneDeep(s);
+    submission._id = submission._id.toString();
+    submission.meta.survey.id = submission.meta.survey.id.toString();
+    submission.meta.group.id = submission.meta.group.id.toString();
+    submission.meta.creator = submission.meta.creator.toString();
+    removeKeys(submission.data, ['meta']);
+
+    items.push(flatten(submission));
+  });
+
+  let csv = '';
+  try {
+    csv = papa.unparse(items, {
+      columns: headers,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  return csv;
+}
+
+export default { createCsvLegacy };

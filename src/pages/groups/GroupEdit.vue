@@ -161,6 +161,7 @@ export default {
         });
         this.$router.push(`/g${this.entity.dir}${this.entity.slug}/`);
       } catch (err) {
+        this.$store.dispatch('feedback/add', err.response.data.message);
         console.log(err);
       }
     },

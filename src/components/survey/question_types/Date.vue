@@ -49,6 +49,7 @@
             no-title
           />
         </v-menu>
+        <p class="mt-4">{{control.hint}}</p>
       </div>
     </v-row>
   </v-container>

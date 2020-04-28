@@ -71,6 +71,7 @@
         Invalid Select Options, please update Suvey Definition
       </div>
     </v-row>
+    <p class="mt-2">{{ control.hint }}</p>
   </v-container>
 </template>
 

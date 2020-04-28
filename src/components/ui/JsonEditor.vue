@@ -2,7 +2,7 @@
   <div>
     <v-textarea
       filled
-      rows="8"
+      :rows="rows"
       :value="valueString"
       @input="writeBack($event)"
       outlined
@@ -20,6 +20,10 @@ export default {
     label: {
       type: String,
       default: 'Data',
+    },
+    rows: {
+      type: Number,
+      default: 8,
     },
   },
   computed: {

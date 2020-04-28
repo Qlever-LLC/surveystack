@@ -9,6 +9,8 @@
         :search="search"
         :mobile-breakpoint="NaN"
         hide-default-footer
+        v-model="tableSelected"
+        @item-selected="onRowSelected"
       >
         <template v-slot:top>
           <v-toolbar flat>
@@ -41,6 +43,11 @@ export default {
     submissions: {
       type: Object,
     },
+    selected: {
+      type: Array,
+      required: true,
+    },
+
   },
   data() {
     return {
@@ -61,14 +68,26 @@ export default {
       }
       return [];
     },
+    tableSelected: {
+      get() {
+        return this.selected;
+      },
+      set(newValue) {
+        this.$emit('update:selected', newValue);
+      },
+    },
   },
   watch: {
     excludeMeta() {
       this.createHeaders();
     },
     submissions() {
-      console.log('submissions have changed');
       this.fetchData();
+    },
+    selected(newVal) {
+      // see 'sync' modifier
+      // https://vuejs.org/v2/guide/components-custom-events.html
+      // this.$emit('update:selected', this.selected);
     },
   },
   methods: {
@@ -78,6 +97,13 @@ export default {
 
       console.log(field);
       console.log(value);
+    },
+    onRowSelected({ value, item }) {
+      if (value) {
+        console.log(`selected ${item._id}`);
+      } else {
+        console.log(`de-selected ${item._id}`);
+      }
     },
     createCustomFilter(field) {
       return (value, search, item) => {
@@ -105,7 +131,7 @@ export default {
       if (!this.submissions) {
         return;
       }
-      this.csv = csvService.createCsv(this.submissions.content);
+      this.csv = csvService.createCsvLegacy(this.submissions.content);
       this.parsed = papa.parse(this.csv, { header: true });
       this.createHeaders();
     },

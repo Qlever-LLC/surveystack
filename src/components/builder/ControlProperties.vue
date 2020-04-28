@@ -14,6 +14,11 @@
         v-model="control.label"
         label="Label"
       />
+      <v-text-field
+        outlined
+        v-model="control.hint"
+        label="Hint"
+      />
       <div
         class="d-flex align-start"
         v-if="isScript"
