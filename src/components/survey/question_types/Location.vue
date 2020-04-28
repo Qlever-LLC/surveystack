@@ -112,6 +112,7 @@
           </v-col>
         </v-row>
       </v-container>
+      <p v-if="control.hint" class="mt-4 mb-0">{{ control.hint }}</p>
 
     </v-container>
 

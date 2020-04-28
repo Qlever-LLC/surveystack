@@ -7,6 +7,7 @@
       v-bind:value="value"
       v-on:input="onInput"
     ></v-text-field>
+    <p>{{ control.hint }}</p>
   </v-container>
 </template>
 
@@ -24,6 +25,3 @@ export default {
   },
 };
 </script>
-
-<style>
-</style>

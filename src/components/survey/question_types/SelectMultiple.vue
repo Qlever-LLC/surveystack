@@ -1,63 +1,66 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-list v-if="sourceIsValid">
-        <v-label>{{control.label}}</v-label>
-        <v-list-item-group
-          :value="value || []"
-          @change="onChange"
-          multiple
-        >
-          <v-list-item
-            v-for="(item) in filteredSource"
-            :value="item.value"
-            :key="item.value"
+      <v-col cols="12">
+        <v-list v-if="sourceIsValid">
+          <v-label>{{control.label}}</v-label>
+          <v-list-item-group
+            :value="value || []"
+            @change="onChange"
+            multiple
           >
-            <template v-slot:default="{ active, toggle }">
-              <v-list-item-action>
-                <v-checkbox
-                  :input-value="active"
-                  :true-value="item"
-                  @click="toggle"
-                />
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title v-text="item.label" />
-              </v-list-item-content>
-            </template>
-          </v-list-item>
+            <v-list-item
+              v-for="(item) in filteredSource"
+              :value="item.value"
+              :key="item.value"
+            >
+              <template v-slot:default="{ active, toggle }">
+                <v-list-item-action>
+                  <v-checkbox
+                    :input-value="active"
+                    :true-value="item"
+                    @click="toggle"
+                  />
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title v-text="item.label" />
+                </v-list-item-content>
+              </template>
+            </v-list-item>
 
-          <v-list-item
-            v-if="control.options.allowCustomSelection"
-            :value="customSelection"
-          >
-            <template v-slot:default="{ active, toggle }">
-              <v-list-item-action>
-                <v-checkbox
-                  :input-value="active"
-                  :true-value="customSelection"
-                  @click="toggle"
-                />
-              </v-list-item-action>
-              <v-list-item-content>
-                  <!-- v-model="customSelection" -->
-                <v-text-field
-                  label="Other"
-                  :value="customSelection"
-                  @input="handleCustomSelectionChange"
-                  outlined
-                  dense
-                  class="mb-0"
-                  hide-details
-                />
-              </v-list-item-content>
-            </template>
-          </v-list-item>
-        </v-list-item-group>
-      </v-list>
-      <div v-else>
-        Invalid Select Options, please update Suvey Definition
-      </div>
+            <v-list-item
+              v-if="control.options.allowCustomSelection"
+              :value="customSelection"
+            >
+              <template v-slot:default="{ active, toggle }">
+                <v-list-item-action>
+                  <v-checkbox
+                    :input-value="active"
+                    :true-value="customSelection"
+                    @click="toggle"
+                  />
+                </v-list-item-action>
+                <v-list-item-content>
+                    <!-- v-model="customSelection" -->
+                  <v-text-field
+                    label="Other"
+                    :value="customSelection"
+                    @input="handleCustomSelectionChange"
+                    outlined
+                    dense
+                    class="mb-0"
+                    hide-details
+                  />
+                </v-list-item-content>
+              </template>
+            </v-list-item>
+          </v-list-item-group>
+        </v-list>
+        <div v-else>
+          Invalid Select Options, please update Suvey Definition
+        </div>
+        <p class="mt-4">{{ control.hint }}</p>
+      </v-col>
     </v-row>
   </v-container>
 </template>

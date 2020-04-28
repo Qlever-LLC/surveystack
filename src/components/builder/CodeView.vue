@@ -7,11 +7,14 @@
 <script>
 import * as monaco from 'monaco-editor';
 
-
 export default {
   props: {
     value: {
       required: true,
+    },
+    raw: {
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -35,15 +38,32 @@ export default {
         console.log('parsing failed', error);
       }
     },
+    refresh() {
+      console.log('value cahnged');
+      const text = this.raw ? this.value : JSON.stringify(this.value, null, 2);
+      const model = monaco.editor.createModel(text, 'javascript');
+      console.log('models', monaco.editor.getModels());
+
+      if (this.editor !== null) {
+        this.editor.getModel().dispose();
+        this.editor.dispose();
+      }
+
+      this.editor = monaco.editor.create(document.getElementById(`monaco-editor-${this._uid}`), {
+        language: 'javascript',
+        automaticLayout: true,
+        readOnly: true,
+        model,
+      });
+    },
+  },
+  watch: {
+    value() {
+      this.refresh();
+    },
   },
   mounted() {
-    const model = monaco.editor.createModel(JSON.stringify(this.value, null, 2), 'javascript');
-    this.editor = monaco.editor.create(document.getElementById(`monaco-editor-${this._uid}`), {
-      language: 'javascript',
-      automaticLayout: true,
-      readOnly: true,
-      model,
-    });
+    this.refresh();
   },
 };
 </script>

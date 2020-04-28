@@ -1,14 +1,17 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-text-field
-        outlined
-        autofocus
-        type="number"
-        :label="control.label"
-        v-bind:value="value"
-        v-on:input="onInput"
-      ></v-text-field>
+      <v-col cols="12">
+        <v-text-field
+          outlined
+          autofocus
+          type="number"
+          :label="control.label"
+          v-bind:value="value"
+          v-on:input="onInput"
+        />
+        <p class="mt-2">{{ control.hint }}</p>
+      </v-col>
     </v-row>
   </v-container>
 </template>
