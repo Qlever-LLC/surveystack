@@ -56,7 +56,7 @@ function apiCompose(submission) {
     submission.data.planting.crop,
   );
 
-  request.body.method = 'farm_transplanting';
+  request.body.method = 'seeding';
 
   return request;
 }
