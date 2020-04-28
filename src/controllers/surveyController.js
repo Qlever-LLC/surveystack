@@ -82,7 +82,7 @@ const buildPipelineForGetSurveyPage = ({ q, groups, projections, creator, skip, 
     };
   }
 
-  if (groups && Array.isArray(groups)) {
+  if (groups && Array.isArray(groups) && groups.length > 0) {
     match['group.id'] = {
       $in: groups.map((item) => new ObjectId(item)),
     };
@@ -284,12 +284,8 @@ const getSurveyInfo = async (req, res) => {
 
 const createSurvey = async (req, res) => {
   const entity = await sanitize(req.body);
-  // apply creator
-  if (res.locals.auth.user) {
-    entity.creator = res.locals.auth.user._id;
-  } else {
-    entity.creator = null;
-  }
+  // apply creator (endpoint already has assertAuthenticated, so auth.user._id must exist)
+  entity.creator = res.locals.auth.user._id;
 
   try {
     let r = await db.collection(col).insertOne(entity);

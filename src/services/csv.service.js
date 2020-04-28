@@ -27,6 +27,10 @@ function removeKeys(obj, keys) {
 }
 
 function createHeaders(mergedObject) {
+  mergedObject.meta.survey.id = mergedObject.meta.survey.id.toString();
+  mergedObject.meta.group.id = mergedObject.meta.group.id.toString();
+  mergedObject.meta.creator = mergedObject.meta.creator.toString();
+
   const flattened = flatten(mergedObject);
   const headers = Object.keys(flattened);
   return headers;

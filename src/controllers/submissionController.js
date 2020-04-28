@@ -307,15 +307,15 @@ const getSubmissionsPage = async (req, res) => {
     {
       $facet: {
         content: [{ $skip: skip }, { $limit: limit }],
-        // merge: [
-        //   {
-        //     $group: {
-        //       _id: null,
-        //       meta: { $mergeObjects: '$meta' },
-        //       data: { $mergeObjects: '$data' },
-        //     },
-        //   },
-        // ],
+        headers: [
+          {
+            $group: {
+              _id: null,
+              meta: { $mergeObjects: '$meta' },
+              data: { $mergeObjects: '$data' },
+            },
+          },
+        ],
         pagination: [{ $count: 'total' }, { $addFields: { skip, limit } }],
       },
     },
@@ -332,9 +332,13 @@ const getSubmissionsPage = async (req, res) => {
   if (!entities) {
     return res.send({
       content: [],
+      headers: [],
       pagination: { total: 0, skip: 0, limit: DEFAULT_LIMIT },
     });
   }
+
+  const headers = csvService.createHeaders(entities.headers[0]);
+  entities.headers = headers;
 
   return res.send(entities);
 };
