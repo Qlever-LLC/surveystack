@@ -95,6 +95,7 @@ function populatePlanting(fieldAnswer, dateAnswer, cropAnswer) {
       crop,
       area,
       date,
+      method: 'seeding',
     },
   };
 }

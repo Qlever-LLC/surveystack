@@ -8,7 +8,10 @@
     </v-dialog>
 
     <v-dialog v-model="showExamples">
-      <app-examples-view category="apiCompose" />
+      <app-examples-view
+        @close="showExamples = false"
+        :category="tabMap[selectedTab]"
+      />
     </v-dialog>
 
     <splitpanes
@@ -269,6 +272,7 @@ export default {
   ],
   data() {
     return {
+      tabMap,
       // modes
       hideCode: false,
       scriptEditorIsVisible: false,

@@ -1,6 +1,6 @@
 <template>
   <v-card
-    style="height: 60vh"
+    style="height: 90vh"
     color="grey darken-3"
   >
     <v-container>
@@ -11,15 +11,25 @@
           rounded
           dark
           solo
-          label="Example"
+          label="Select example and copy"
           v-model="selected"
-          :items="examples"
+          :items="files"
           single-line
           filled
         >
         </v-autocomplete>
+        <v-btn
+          outlined
+          class="ma-2"
+          dark
+          color="white"
+          text
+          @click="close"
+        >
+          Close
+        </v-btn>
       </v-row>
-      <div style="width: 100%; height: 60vh;">
+      <div style="width: 100%; height: 80vh;">
         <app-code-view
           :raw="true"
           :value="code"
@@ -35,9 +45,12 @@
 
 import appCodeView from '@/components/builder/CodeView.vue';
 
+const reg = /.*\/(.*?)$/;
+
 const req = require.context('!!raw-loader!@/examples/', true, /\.js$/);
 const examples = req.keys().map(key => ({
-  text: key,
+  text: reg.exec(key)[1],
+  path: key,
   value: key,
   content: req(key).default,
 }));
@@ -47,15 +60,25 @@ export default {
   components: {
     appCodeView,
   },
+  props: [
+    'category',
+  ],
   data() {
     return {
       selected: null,
-      examples,
     };
+  },
+  methods: {
+    close() {
+      this.$emit('close');
+    },
   },
   computed: {
     code() {
-      return this.examples.find(e => e.value === this.selected).content;
+      return examples.find(e => e.value === this.selected).content;
+    },
+    files() {
+      return examples.filter(e => e.path.startsWith(`./${this.category}/`));
     },
   },
 };
