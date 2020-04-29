@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card min-height="70vh" class="d-flex flex-column">
     <v-card-title class="d-block">
       <div class="d-flex justify-space-between align-center">
         <div class="grey--text text--darken-2">
@@ -41,7 +41,7 @@
     </v-card-title>
 
     <v-card-text class="pt-4">
-      <div class="d-flex flex-space-between align-end">
+      <div class="d-flex flex-space-between align-center">
         <!-- {{ resource.label }} -->
         <v-text-field
           :value="resource.label"
@@ -51,7 +51,16 @@
           style="max-width: 12em;"
         />
         <v-spacer />
+        <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Search"
+            single-line
+            hide-details
+          />
+        <v-spacer />
         <div>
+
           <v-btn icon @click="deleteSelectedItems" :disabled="!selectedItems.length">
             <v-icon>mdi-delete</v-icon>
           </v-btn>
@@ -62,6 +71,7 @@
         :items="resource.content"
         show-select
         v-model="selectedItems"
+        :search="search"
         item-key="id"
       >
         <!-- <template v-slot:top>
@@ -80,7 +90,7 @@
         </template>
       </v-data-table>
     </v-card-text>
-
+    <v-spacer />
     <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
       <!-- <v-btn class="ml-4" @click="handleSave">Save</v-btn> -->
       <v-btn text class="ml-4" @click="() => $emit('close-dialog')">Close</v-btn>
@@ -123,6 +133,7 @@ export default {
   data() {
     return {
       editedItem: this.createEmptyItem(),
+      search: '',
       deleteDialogIsVisible: false,
       selectedItems: [],
       editItemId: null,
@@ -151,23 +162,27 @@ export default {
   methods: {
     moveItemDown({ id }) {
       const index = this.resource.content.findIndex(item => item.id === id);
-      const newItems = [...this.resource.content];
-      const [item] = newItems.splice(index, 1);
-      newItems.splice(index + 1, 0, item);
-      this.$emit('change', {
-        ...this.resource,
-        content: newItems,
-      });
+      if (index > this.resource.content.length - 1) {
+        const newItems = [...this.resource.content];
+        const [item] = newItems.splice(index, 1);
+        newItems.splice(index + 1, 0, item);
+        this.$emit('change', {
+          ...this.resource,
+          content: newItems,
+        });
+      }
     },
     moveItemUp({ id }) {
       const index = this.resource.content.findIndex(item => item.id === id);
-      const newItems = [...this.resource.content];
-      const [item] = newItems.splice(index, 1);
-      newItems.splice(index - 1, 0, item);
-      this.$emit('change', {
-        ...this.resource,
-        content: newItems,
-      });
+      if (index > 0) {
+        const newItems = [...this.resource.content];
+        const [item] = newItems.splice(index, 1);
+        newItems.splice(index - 1, 0, item);
+        this.$emit('change', {
+          ...this.resource,
+          content: newItems,
+        });
+      }
     },
     createEmptyItem() {
       return {
