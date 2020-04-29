@@ -516,6 +516,7 @@ export default {
       }
     },
     setSurveyResources(resources) {
+      // console.log(resources, resources.length);
       this.$set(this.survey, 'resources', resources);
     },
     setControlParams(params) {
@@ -744,16 +745,18 @@ export default {
     survey: {
       handler(newVal, oldVal) {
         this.initNavbarAndDirtyFlag(newVal);
-        // debugger;
         if (!this.initialSurvey || !this.survey) {
           this.surveyUnchanged = true;
         }
 
+        const resourcesAreEqual = isEqual(this.initialSurvey.resources, newVal.resources);
         const revisionsAreEqual = isEqual(this.initialSurvey.revisions, newVal.revisions);
         const surveyDetailsAreEquivalent = (this.initialSurvey.name === newVal.name)
           && isEqual(this.initialSurvey.group, newVal.group)
           && (this.initialSurvey.description === newVal.description);
-        this.surveyUnchanged = revisionsAreEqual && surveyDetailsAreEquivalent;
+        this.surveyUnchanged = revisionsAreEqual
+          && surveyDetailsAreEquivalent
+          && resourcesAreEqual;
 
         const current = newVal.revisions[newVal.revisions.length - 1];
         if (current.controls.length === 0) {
