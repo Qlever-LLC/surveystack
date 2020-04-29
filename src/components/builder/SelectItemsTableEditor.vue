@@ -72,7 +72,9 @@
         </template> -->
         <template v-slot:item.actions="{ item }">
           <div class="d-flex">
-            <v-icon @click="openItemEditDialog(item)">mdi-pencil</v-icon>
+            <v-icon @click="moveItemUp(item)">mdi-arrow-up</v-icon>
+            <v-icon class="ml-2" @click="moveItemDown(item)">mdi-arrow-down</v-icon>
+            <v-icon class="ml-2" @click="openItemEditDialog(item)">mdi-pencil</v-icon>
             <v-icon class="ml-2" @click="deleteItem(item)">mdi-delete</v-icon>
           </div>
         </template>
@@ -147,6 +149,26 @@ export default {
     };
   },
   methods: {
+    moveItemDown({ id }) {
+      const index = this.resource.content.findIndex(item => item.id === id);
+      const newItems = [...this.resource.content];
+      const [item] = newItems.splice(index, 1);
+      newItems.splice(index + 1, 0, item);
+      this.$emit('change', {
+        ...this.resource,
+        content: newItems,
+      });
+    },
+    moveItemUp({ id }) {
+      const index = this.resource.content.findIndex(item => item.id === id);
+      const newItems = [...this.resource.content];
+      const [item] = newItems.splice(index, 1);
+      newItems.splice(index - 1, 0, item);
+      this.$emit('change', {
+        ...this.resource,
+        content: newItems,
+      });
+    },
     createEmptyItem() {
       return {
         id: '',

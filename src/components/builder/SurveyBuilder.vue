@@ -516,7 +516,6 @@ export default {
       }
     },
     setSurveyResources(resources) {
-      // console.log(resources, resources.length);
       this.$set(this.survey, 'resources', resources);
     },
     setControlParams(params) {
