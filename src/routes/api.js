@@ -123,6 +123,11 @@ router.delete('/scripts/:id', [assertAuthenticated], catchErrors(scriptControlle
 router.get('/memberships', catchErrors(membershipController.getMemberships));
 router.get('/memberships/tree', catchErrors(membershipController.getTree));
 router.get('/memberships/:id', catchErrors(membershipController.getMembership));
+router.post(
+  '/memberships/:id/resend',
+  [assertEntityExists({ collection: 'memberships' })],
+  catchErrors(membershipController.resendInvitation)
+);
 router.post('/memberships/claim', catchErrors(membershipController.claimMembership));
 router.post('/memberships', catchErrors(membershipController.createMembership));
 router.put(

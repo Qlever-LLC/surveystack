@@ -193,28 +193,12 @@ const createMembership = async (req, res) => {
   const entity = req.body;
   sanitize(entity);
 
-  const g = await db.collection('groups').findOne({ _id: entity.group });
-  if (!g) {
-    throw boom.badRequest(`Group does not exist: ${entity.group}`);
-  }
-
   const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
   if (!adminAccess) {
     throw boom.unauthorized(`Only group admins can create memberships`);
   }
 
-  mailService.send({
-    to: entity.meta.sentTo,
-    subject: `Surveystack invitation to group ${g.name}`,
-    text: `Hello
-    
-You are invited to join group ${g.name}!
-    
-Please use the following link to claim your invitation:
-${process.env.SERVER_URL}/invitations?code=${entity.meta.invitation}
-    
-Best Regards`,
-  });
+  await sendMembershipInvitation(entity);
 
   try {
     let r = await db.collection(col).insertOne(entity);
@@ -227,6 +211,36 @@ Best Regards`,
   }
 
   throw boom.internal();
+};
+
+const sendMembershipInvitation = async (membership) => {
+  const group = await db.collection('groups').findOne({ _id: membership.group });
+  if (!group) {
+    throw boom.badRequest(`Group does not exist: ${membership.group}`);
+  }
+
+  mailService.send({
+    to: membership.meta.sentTo,
+    subject: `Surveystack invitation to group ${group.name}`,
+    text: `Hello
+    
+You are invited to join group ${group.name}!
+    
+Please use the following link to claim your invitation:
+${process.env.SERVER_URL}/invitations?code=${membership.meta.invitation}
+    
+Best Regards`,
+  });
+};
+
+const resendInvitation = async (req, res) => {
+  const membership = res.locals.existing;
+  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, membership.group);
+  if (!adminAccess) {
+    throw boom.unauthorized(`Only group admins can resend membership invitations`);
+  }
+  await sendMembershipInvitation(membership);
+  return res.send('OK');
 };
 
 const updateMembership = async (req, res) => {
@@ -299,4 +313,5 @@ export default {
   deleteMembership,
   claimMembership,
   getTree,
+  resendInvitation,
 };

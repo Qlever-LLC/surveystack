@@ -26,10 +26,14 @@ export const assertEntityExists = ({ collection }) =>
       throw boom.badImplementation();
     }
 
-    const doc = await db.collection(collection).findOne({ _id: new ObjectId(id) });
-    if (!doc) {
-      throw boom.notFound(`assertEntityExists: No entity exists for id: ${id}`);
+    const existing = await db.collection(collection).findOne({ _id: new ObjectId(id) });
+    if (!existing) {
+      throw boom.notFound(
+        `assertEntityExists: No entity exists for collection/id: ${collection}/${id}`
+      );
     }
+
+    res.locals.existing = existing;
 
     next();
   });
