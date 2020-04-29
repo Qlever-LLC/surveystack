@@ -289,8 +289,10 @@ export default {
   },
   async created() {
     const { id } = this.value.group;
-    const name = await this.getGroupNameById(id);
-    this.surveyGroupName = name;
+    if (id) {
+      const name = await this.getGroupNameById(id);
+      this.surveyGroupName = name;
+    }
   },
   props: [
     'value',
@@ -325,8 +327,9 @@ export default {
         //   console.log('groups are same');
         //   return;
         // }
-
-        this.surveyGroupName = await this.getGroupNameById(value.group.id);
+        if (value.group && value.group.id) {
+          this.surveyGroupName = await this.getGroupNameById(value.group.id);
+        }
       },
       deep: true,
     },
