@@ -4,10 +4,21 @@
     <h1>Edit Membership</h1>
 
     <v-card class="pa-4 mb-4">
+      <div class="d-flex">
+        <v-btn
+          class="ml-auto"
+          color="error"
+          outlined
+          @click="dialogRemoval = true"
+        >
+          <v-icon left>mdi-trash-can-outline</v-icon> Delete
+        </v-btn>
+      </div>
       <v-form
         class="mt-3"
         @keydown.enter.prevent="submit"
       >
+
         <v-text-field
           v-model="entity.group"
           label="Group"
@@ -37,13 +48,15 @@
 
         <div class="d-flex mt-2">
           <v-btn
-            class="mr-auto"
-            text
-            color="error"
-            @click="dialogRemoval = true"
-          >Delete</v-btn>
-
+            color="secondary"
+            outlined
+            @click="resend"
+            v-if="entity.meta.status === 'pending'"
+          >
+            <v-icon left>mdi-email-send-outline</v-icon> Resend
+          </v-btn>
           <v-btn
+            class="ml-auto"
             text
             @click="cancel"
           >Cancel</v-btn>
@@ -154,6 +167,13 @@ export default {
       try {
         await api.delete(`/memberships/${this.entity._id}`);
         this.$router.back();
+      } catch (err) {
+        this.$store.dispatch('feedback/add', err.response.data.message);
+      }
+    },
+    async resend() {
+      try {
+        await api.post(`/memberships/${this.entity._id}/resend`);
       } catch (err) {
         this.$store.dispatch('feedback/add', err.response.data.message);
       }
