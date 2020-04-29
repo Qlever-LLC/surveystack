@@ -21,6 +21,7 @@
 
 <script>
 import { parse } from 'papaparse';
+import ObjectId from 'bson-objectid';
 
 const columns = ['label', 'value', 'tags'];
 function columnIsValid(name) {
@@ -56,7 +57,13 @@ export default {
 
         });
 
-        this.$emit('change', this.filterItemsKeys(data.data));
+
+        const items = this.filterItemsKeys(data.data)
+          .map(item => ({
+            ...item,
+            id: new ObjectId().toString(),
+          }));
+        this.$emit('change', items);
         this.$refs['select-items-file-input'].value = null;
       } catch (err) {
         console.error('error parsing CSV file', err);

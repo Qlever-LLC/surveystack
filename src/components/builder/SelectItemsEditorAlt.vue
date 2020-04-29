@@ -1,23 +1,23 @@
 <template>
   <div>
     <v-card-title class="px-0 d-flex justify-space-between">
-      <span>
+      <div>
         Select Options
-      </span>
+      </div>
 
     </v-card-title>
     <div class="text-center d-flex">
-        <!-- v-model="value"  -->
+        <!-- :resourceTypes="['ONTOLOGY_LIST']" -->
       <resource-selector
-        :resources="resources"
+        :resources="filteredResources"
         :value="value"
-        :resourceTypes="['ONTOLOGY_LIST']"
         @on-new="createResourceHandler"
         @on-select="selectResourceHandler"
       />
       <v-btn
         icon
         @click.stop="openTableDialog"
+        :class="{'d-none': !value}"
       >
         <!-- Edit entries -->
         <!-- <v-icon class="ml-2">mdi-table</v-icon> -->
@@ -26,10 +26,10 @@
 
     </div>
     <v-dialog v-model="tableDialogIsVisible">
-        <!-- v-if="resource" -->
       <select-items-table-editor
         :resource="resource"
         @change="setResource"
+        @delete="removeResource"
         @close-dialog="closeTableDialog"
       />
     </v-dialog>
@@ -56,9 +56,17 @@ export default {
       console.log('set items', items);
       // this.$emit('set-control-source', items);
     },
+    removeResource(id) {
+      const index = this.resources.findIndex(r => r.id === id);
+      const newResources = [
+        ...this.resources.slice(0, index),
+        ...this.resources.slice(index + 1),
+      ];
+      this.$emit('set-survey-resources', newResources);
+    },
     setResource(resource) {
-      console.log('set resource', resource);
       const index = this.resources.findIndex(r => r.id === resource.id);
+      console.log('set resource', resource, index);
       const newResources = [
         ...this.resources.slice(0, index),
         resource,
@@ -76,7 +84,7 @@ export default {
       console.log('create resource');
       const id = new ObjectId().toString();
       this.$emit('set-survey-resources', [...this.resources, {
-        label: 'Dropdown Items',
+        label: `Dropdown Items ${this.resources.length + 1}`,
         handle: 'dropdown_items',
         id,
         type: 'ONTOLOGY_LIST',
@@ -112,6 +120,9 @@ export default {
   computed: {
     resource() {
       return this.resources.find(resource => resource.id === this.value);
+    },
+    filteredResources() {
+      return this.resources.filter(resource => resource.type === 'ONTOLOGY_LIST');
     },
   },
 };
