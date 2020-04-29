@@ -1,12 +1,13 @@
 <template>
-    <v-select
-      :items="items"
-      item-text="label"
-      item-value="id"
-      :value="value"
-      @input="handleSelect"
-      outlined
-    />
+  <v-select
+    :items="items"
+    item-text="label"
+    item-value="id"
+    :value="value"
+    @input="handleSelect"
+    placeholder="Choose a list"
+    outlined
+  />
 </template>
 
 <script>
@@ -34,24 +35,28 @@ export default {
     // },
   },
   computed: {
+    filteredResources() {
+      return this.resourceTypes.length === 0
+        ? this.resources
+        : this.resources.filter(
+          resource => this.resourceTypes.some(
+            type => type === resource.type,
+          ),
+        );
+    },
     items() {
-      const filteredResources = this.resources.filter(
-        resource => this.resourceTypes.some(
-          type => type === resource.type,
-        ),
-      );
       return [
-        ...filteredResources,
+        ...this.filteredResources,
         {
           label: '+ New',
-          id: '',
+          id: 'NEW_ONTOLOGY_LIST',
         },
       ];
     },
   },
   methods: {
     handleSelect(val) {
-      if (val === null || val === '') {
+      if (val === 'NEW_ONTOLOGY_LIST') {
         this.$emit('on-new');
       } else {
         this.$emit('on-select', val);

@@ -1,34 +1,78 @@
 <template>
-  <v-card>
+  <v-card min-height="70vh" class="d-flex flex-column">
     <v-card-title class="d-block">
-      <div class="d-flex justify-space-between">
-        <span>
-          Edit Select Options
-        </span>
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <div v-on="on">
-              <select-items-upload-button @change="handleFileChange" class="mt-4 mb-n2" />
-            </div>
-          </template>
-          CSV must have column headers 'label', 'value', and optionally 'tags'
-        </v-tooltip>
+      <div class="d-flex justify-space-between align-center">
+        <div class="grey--text text--darken-2">
+          Dropdown Options
+        </div>
+        <div class="d-flex align-center">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <div v-on="on">
+                <select-items-upload-button @change="handleFileChange" class="mt-4 mb-n2" />
+              </div>
+            </template>
+            CSV must have column headers 'label', 'value', and optionally 'tags'
+          </v-tooltip>
+          <v-dialog v-model="deleteDialogIsVisible" max-width="290">
+            <template v-slot:activator="{ on }">
+              <v-btn icon v-on="on" class="ml-2">
+                <v-icon>mdi-delete</v-icon>
+                <!-- Delete List -->
+              </v-btn>
+            </template>
+            <v-card>
+              <v-card-title>Delete List</v-card-title>
+              <v-card-text>
+                Are you sure you want to delete this list: <strong>{{ resource.label }}</strong>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer />
+                <v-btn text color="red" @click="deleteResult">Delete</v-btn>
+                <v-btn text @click="closeDeleteDialog">Cancel</v-btn>
+
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </div>
+
       </div>
-      <div>
+      <v-divider />
+    </v-card-title>
+
+    <v-card-text class="pt-4">
+      <div class="d-flex flex-space-between align-center">
         <!-- {{ resource.label }} -->
         <v-text-field
           :value="resource.label"
           @input="handleUpdateLabel"
-          outlined
-          class="d-inline-block"
+          label="List Label"
+          class="display-1 flex-shrink-1"
+          style="max-width: 12em;"
         />
-      </div>
-    </v-card-title>
+        <v-spacer />
+        <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Search"
+            single-line
+            hide-details
+          />
+        <v-spacer />
+        <div>
 
-    <v-card-text>
+          <v-btn icon @click="deleteSelectedItems" :disabled="!selectedItems.length">
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
+        </div>
+      </div>
       <v-data-table
         :headers="tableHeaders"
         :items="resource.content"
+        show-select
+        v-model="selectedItems"
+        :search="search"
+        item-key="id"
       >
         <!-- <template v-slot:top>
           <v-toolbar flat color="white">
@@ -37,19 +81,35 @@
           </v-toolbar>
         </template> -->
         <template v-slot:item.actions="{ item }">
-          <v-icon
-            @click="deleteItem(item)"
-          >
-            mdi-delete
-          </v-icon>
+          <div class="d-flex">
+            <v-icon @click="moveItemUp(item)">mdi-arrow-up</v-icon>
+            <v-icon class="ml-2" @click="moveItemDown(item)">mdi-arrow-down</v-icon>
+            <v-icon class="ml-2" @click="openItemEditDialog(item)">mdi-pencil</v-icon>
+            <v-icon class="ml-2" @click="deleteItem(item)">mdi-delete</v-icon>
+          </div>
         </template>
       </v-data-table>
     </v-card-text>
-
+    <v-spacer />
     <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
       <!-- <v-btn class="ml-4" @click="handleSave">Save</v-btn> -->
-      <!-- <v-btn text class="ml-4" @click="() => $emit('close-dialog')">Close</v-btn> -->
+      <v-btn text class="ml-4" @click="() => $emit('close-dialog')">Close</v-btn>
     </v-card-actions>
+
+    <v-dialog v-model="editItemDialogIsVisible" @input="updateEditItem" max-width="350">
+      <v-card>
+        <v-card-title>Edit Item</v-card-title>
+        <v-card-text>
+          <v-text-field v-model="editedItem.label" label="Label" />
+          <v-text-field v-model="editedItem.value" label="Value" />
+          <v-text-field v-model="editedItem.tags" label="Tags" />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn text color="primary" @click="closeItemEditDialog">Ok</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -72,6 +132,12 @@ export default {
   },
   data() {
     return {
+      editedItem: this.createEmptyItem(),
+      search: '',
+      deleteDialogIsVisible: false,
+      selectedItems: [],
+      editItemId: null,
+      editItemDialogIsVisible: false,
       tableHeaders: [
         {
           text: 'Label',
@@ -94,6 +160,89 @@ export default {
     };
   },
   methods: {
+    moveItemDown({ id }) {
+      const index = this.resource.content.findIndex(item => item.id === id);
+      if (index > this.resource.content.length - 1) {
+        const newItems = [...this.resource.content];
+        const [item] = newItems.splice(index, 1);
+        newItems.splice(index + 1, 0, item);
+        this.$emit('change', {
+          ...this.resource,
+          content: newItems,
+        });
+      }
+    },
+    moveItemUp({ id }) {
+      const index = this.resource.content.findIndex(item => item.id === id);
+      if (index > 0) {
+        const newItems = [...this.resource.content];
+        const [item] = newItems.splice(index, 1);
+        newItems.splice(index - 1, 0, item);
+        this.$emit('change', {
+          ...this.resource,
+          content: newItems,
+        });
+      }
+    },
+    createEmptyItem() {
+      return {
+        id: '',
+        label: '',
+        value: '',
+        tags: '',
+      };
+    },
+    deleteSelectedItems() {
+      const isNotSelectedItem = item => !this.selectedItems.some(s => s.id === item.id);
+      const newItems = this.resource.content.filter(isNotSelectedItem);
+      this.selectedItems = [];
+      this.$emit('change', {
+        ...this.resource,
+        content: newItems,
+      });
+    },
+    openItemEditDialog(item) {
+      this.editItemDialogIsVisible = true;
+      this.editItemId = item.id;
+      this.editedItem = { ...item };
+    },
+    closeItemEditDialog() {
+      this.editItemDialogIsVisible = false;
+      this.updateEditItem();
+    },
+    handleEditDialogInput(val) {
+      if (!val) {
+        this.updateEditItem();
+      }
+    },
+    updateEditItem() {
+      const index = this.resource.content.findIndex(item => item.id === this.editedItem.id);
+      // const index = this.resource.content.findIndex(c => c.id === this.editItemId);
+      if (index > -1) {
+        const newItems = [
+          ...this.resource.content.slice(0, index),
+          this.editedItem,
+          ...this.resource.content.slice(index + 1),
+        ];
+        this.$emit('change', {
+          ...this.resource,
+          content: newItems,
+        });
+      }
+      this.editedItem = this.createEmptyItem();
+      this.editItemId = null;
+    },
+    openDeleteDialog() {
+      this.deleteDialogIsVisible = true;
+    },
+    closeDeleteDialog() {
+      this.deleteDialogIsVisible = false;
+    },
+    deleteResult() {
+      this.closeDeleteDialog();
+      this.$emit('delete', this.resource.id);
+      this.$emit('close-dialog');
+    },
     handleUpdateLabel(label) {
       this.$emit('change', {
         ...this.resource,
