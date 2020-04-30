@@ -11,6 +11,7 @@
         :chips="!!control.options.hasMultipleSelections"
         :label="control.label"
         :multiple="!!control.options.hasMultipleSelections"
+        :menu-props="autocompleteMenuProps"
         v-if="sourceIsValid && !control.options.allowCustomSelection"
       >
         <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
@@ -43,6 +44,7 @@
         :chips="!!control.options.hasMultipleSelections"
         :label="control.label"
         :multiple="!!control.options.hasMultipleSelections"
+        :menu-props="autocompleteMenuProps"
         v-else-if="sourceIsValid && control.options.allowCustomSelection"
       >
         <template v-slot:selection="data">
@@ -104,7 +106,6 @@ export default {
       );
     },
     getLabelForItemValue(value) {
-      // const item = this.control.options.source.find(x => x.value === value);
       const item = this.items.find(x => x.value === value);
       return (item && item.label) || value;
     },
@@ -119,6 +120,23 @@ export default {
         && Array.isArray(this.items)
         && this.items.length > 0
         && this.items.every(({ label, value }) => label && value);
+    },
+    autocompleteMenuProps() {
+      // default properties copied from the vuetify-autocomplete docs
+      const defaultProps = {
+        closeOnClick: false,
+        closeOnContentClick: false,
+        disableKeys: true,
+        openOnClick: false,
+        maxHeight: 304,
+      };
+
+      if (this.$vuetify.breakpoint.smAndDown) {
+        defaultProps.maxHeight = 130;
+        defaultProps.top = true;
+        defaultProps.closeOnContentClick = true;
+      }
+      return defaultProps;
     },
   },
 };
