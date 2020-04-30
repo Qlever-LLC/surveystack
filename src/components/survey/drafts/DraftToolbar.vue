@@ -5,9 +5,7 @@
     flat
     tile
   >
-    <v-toolbar-title
-      id="draft-toolbar"
-    >
+    <v-toolbar-title id="draft-toolbar">
       <div class="infos grey--text text--darken-2">
         <div class="d-flex">
           <span class="number-chip mr-2">{{ questionNumber }}</span>
@@ -15,6 +13,16 @@
       </div>
     </v-toolbar-title>
 
+    <v-spacer></v-spacer>
+    <v-chip
+      v-if="required"
+      dark
+      color="red"
+    >
+      <span class="font-weight-bold">
+        <v-icon class="mr-2">mdi-alert-circle</v-icon>answer is required
+      </span>
+    </v-chip>
     <v-spacer></v-spacer>
 
     <v-btn icon>
@@ -40,6 +48,7 @@ export default {
   props: [
     'showOverviewIcon',
     'questionNumber',
+    'required',
   ],
 };
 </script>

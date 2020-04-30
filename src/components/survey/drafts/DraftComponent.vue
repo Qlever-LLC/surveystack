@@ -25,6 +25,7 @@
       v-if="submission && survey"
     >
       <draft-toolbar
+        :required="control.options.required"
         :showOverview="showOverview"
         :showOverviewIcon="!atEnd"
         :questionNumber="questionNumber"
@@ -253,6 +254,12 @@ export default {
       this.submissionField.meta.dateModified = modified;
       this.$emit('change', this.submission);
       this.persist();
+
+
+      const req = this.control.options.required === true;
+      if (req) {
+        this.showNext(v !== null);
+      }
     },
     setStatus({ type, message }) {
       const field = submissionUtils.getSubmissionField(this.submission, this.survey, this.position);
@@ -353,6 +360,8 @@ export default {
         this.control = utils.getControl(this.controls, this.position);
         const field = submissionUtils.getSubmissionField(this.submission, this.survey, this.position);
 
+        this.disableNextIfRequiredAndNotAnswered(field);
+
         this.value = field.value;
 
 
@@ -387,7 +396,9 @@ export default {
         }
 
         this.control = utils.getControl(this.controls, this.position);
-        this.value = submissionUtils.getSubmissionField(this.submission, this.survey, this.position).value;
+        const field = submissionUtils.getSubmissionField(this.submission, this.survey, this.position);
+        this.disableNextIfRequiredAndNotAnswered(field);
+        this.value = field.value;
 
         this.showOverview = false;
 
@@ -437,6 +448,12 @@ export default {
     async calculateApiCompose() {
       console.log('calculating api compose');
       return codeEvaluator.calculateApiCompose(this.survey, this.submission, this.positions, this.controls);
+    },
+    disableNextIfRequiredAndNotAnswered(field) {
+      const req = this.control.options.required === true;
+      if (req) {
+        this.showNext(field.value !== null);
+      }
     },
   },
 

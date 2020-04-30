@@ -244,8 +244,19 @@ export default {
         const filtered = this.survey.revisions.filter(r => r.version <= this.survey.latestVersion);
         this.survey.revisions = filtered;
         const revision = this.importedSurvey.revisions[this.importedSurvey.revisions.length - 1];
+        const { resources } = this.importedSurvey;
+
+
+        if (this.importedSurvey.specVersion < 2) {
+          // for each control of revision
+          // if type === 'ontology'
+          // remove control.options.source
+          // todo figure out how to itterate
+        }
+
         revision.version = this.survey.latestVersion + 1;
         this.survey.revisions.push(revision);
+        this.survey.resources = resources;
         this.freshImport = true;
         this.sessionId = new ObjectId().toString();
       } catch (err) {

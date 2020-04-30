@@ -1,6 +1,6 @@
 <template>
   <div
-    class="px-4"
+    class="px-4 d-flex"
     id="draft-breadcrumbs"
   >
     <v-chip
@@ -28,5 +28,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>
