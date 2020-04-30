@@ -262,7 +262,9 @@ export default {
         this.survey.resources = this.importedSurvey.resources ? this.importedSurvey.resources : [];
         revision.version = this.survey.latestVersion + 1;
         this.freshImport = true;
-        this.sessionId = new ObjectId().toString();
+
+        const id = new ObjectId().toString();
+        this.sessionId = id;
       } catch (err) {
         console.error('error parsing Survey file', err);
         this.snack(`error parsing Survey file:${err}`);

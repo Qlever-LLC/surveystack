@@ -46,50 +46,50 @@
         class="drop-area"
         :name="!drag ? 'flip-list' : null"
       > -->
-        <v-card
-          v-for="(el, idx) in controls"
-          class="control-item mb-2"
-          :class="{'control-item-selected': (el === selected)}"
-          :key="el._id"
-          @mousedown.stop.left="$emit('controlSelected', el)"
-        >
-          <div class="mb-2 d-flex justify-space-between align-center">
-            <div>
-              <span class="caption grey--text text--darken-1">{{ createIndex(index, idx + 1) | displayIndex}}</span>
-              <br />
-              <span class="title">{{el.label}}</span>
-              <br />
-              <span class="font-weight-light grey--text text--darken-2">{{ el.name }} : {{ el.type }}</span>
-            </div>
-            <div class="d-flex">
-              <v-btn
-                icon
-                v-if="selected === el"
-                @click.stop="duplicateControl(el)"
-              >
-                <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
-              </v-btn>
-                <!-- @click.stop="removeAt(idx)" -->
-              <v-btn
-                icon
-                v-if="selected === el"
-                @click.stop="() => showDeleteModal(idx)"
-              >
-                <v-icon color="grey lighten-1">mdi-delete</v-icon>
-              </v-btn>
-            </div>
+      <v-card
+        v-for="(el, idx) in controls"
+        class="control-item mb-2"
+        :class="{'control-item-selected': (el === selected)}"
+        :key="controlKey(el)"
+        @mousedown.stop.left="$emit('controlSelected', el)"
+      >
+        <div class="mb-2 d-flex justify-space-between align-center">
+          <div>
+            <span class="caption grey--text text--darken-1">{{ createIndex(index, idx + 1) | displayIndex}}</span>
+            <br />
+            <span class="title">{{el.label}}</span>
+            <br />
+            <span class="font-weight-light grey--text text--darken-2">{{ el.name }} : {{ el.type }}</span>
           </div>
+          <div class="d-flex">
+            <v-btn
+              icon
+              v-if="selected === el"
+              @click.stop="duplicateControl(el)"
+            >
+              <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
+            </v-btn>
+            <!-- @click.stop="removeAt(idx)" -->
+            <v-btn
+              icon
+              v-if="selected === el"
+              @click.stop="() => showDeleteModal(idx)"
+            >
+              <v-icon color="grey lighten-1">mdi-delete</v-icon>
+            </v-btn>
+          </div>
+        </div>
 
-          <nested-draggable
-            v-if="el.type == 'group'"
-            :class="{'drop-area-border': (el.children.length === 0)}"
-            :selected="selected"
-            :controls="el.children"
-            @controlSelected="$emit('controlSelected', $event)"
-            @duplicate-control="$emit('duplicate-control', $event)"
-            :index="createIndex(index, idx + 1)"
-          />
-        </v-card>
+        <nested-draggable
+          v-if="el.type == 'group'"
+          :class="{'drop-area-border': (el.children.length === 0)}"
+          :selected="selected"
+          :controls="el.children"
+          @controlSelected="$emit('controlSelected', $event)"
+          @duplicate-control="$emit('duplicate-control', $event)"
+          :index="createIndex(index, idx + 1)"
+        />
+      </v-card>
       <!-- </transition-group> -->
     </draggable>
     <div v-else>
@@ -105,6 +105,7 @@
 <script>
 import draggable from 'vuedraggable';
 import { cloneDeep } from 'lodash';
+import ObjectID from 'bson-objectid';
 
 export default {
   name: 'nested-draggable',
@@ -163,7 +164,31 @@ export default {
         name: `${el.name}_copy`,
         label: `${el.label} copy`,
       };
+
+      const dive = (control, cb) => {
+        cb(control);
+        if (!control.children) {
+          return;
+        }
+        control.children.forEach((c) => {
+          dive(c, cb);
+        });
+      };
+      copy.id = new ObjectID().toString();
+
+      dive(copy, (control) => {
+        // eslint-disable-next-line no-param-reassign
+        control.id = new ObjectID().toString();
+      });
+
+
+      console.log('copy', copy);
+
+
       this.$emit('duplicate-control', copy);
+    },
+    controlKey(control) {
+      return control._id || control.id;
     },
   },
 };
