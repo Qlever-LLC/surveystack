@@ -258,7 +258,9 @@ export default {
         this.survey.revisions.push(revision);
         this.survey.resources = resources;
         this.freshImport = true;
-        this.sessionId = new ObjectId().toString();
+
+        const id = new ObjectId().toString();
+        this.sessionId = id;
       } catch (err) {
         console.error('error parsing Survey file', err);
         this.snack(`error parsing Survey file:${err}`);
