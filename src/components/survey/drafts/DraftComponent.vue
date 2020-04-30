@@ -468,7 +468,9 @@ export default {
 
 
     this.control = utils.getControl(this.controls, this.position);
-    this.value = submissionUtils.getSubmissionField(this.submission, this.survey, this.position).value;
+    const field = submissionUtils.getSubmissionField(this.submission, this.survey, this.position);
+    this.disableNextIfRequiredAndNotAnswered(field);
+    this.value = field.value;
 
     this.setNavbarContent({
       title: this.survey.name,
