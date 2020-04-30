@@ -50,7 +50,7 @@
         v-for="(el, idx) in controls"
         class="control-item mb-2"
         :class="{'control-item-selected': (el === selected)}"
-        :key="controlKey(el)"
+        :key="el.id"
         @mousedown.stop.left="$emit('controlSelected', el)"
       >
         <div class="mb-2 d-flex justify-space-between align-center">
@@ -163,6 +163,7 @@ export default {
         ...cloneDeep(el),
         name: `${el.name}_copy`,
         label: `${el.label} copy`,
+        id: new ObjectID().toString(),
       };
 
       const dive = (control, cb) => {
@@ -174,21 +175,13 @@ export default {
           dive(c, cb);
         });
       };
-      copy.id = new ObjectID().toString();
 
       dive(copy, (control) => {
         // eslint-disable-next-line no-param-reassign
         control.id = new ObjectID().toString();
       });
 
-
-      console.log('copy', copy);
-
-
       this.$emit('duplicate-control', copy);
-    },
-    controlKey(control) {
-      return control._id || control.id;
     },
   },
 };

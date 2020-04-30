@@ -760,24 +760,24 @@ export function getGroups(controls) {
   return controls.reduce(reducer, []);
 }
 
-export function modifyOptions(controls = [], options = {}) {
-  function modify({ type, key, value }) {
-    return (control) => {
-      if (control.type === type && control.options[key]) {
-        console.log(control.name, control.options[key]);
-        // eslint-disable-next-line no-param-reassign
-        control.options[key] = value;
-        console.log('--->', control.options[key]);
-      } else if (control.type === 'group' && control.children.length) {
-        control.children.forEach(modify({ type, key, value }));
-      }
-    };
-  }
+// export function modifyOptions(controls = [], options = {}) {
+//   function modify({ type, key, value }) {
+//     return (control) => {
+//       if (control.type === type && control.options[key]) {
+//         console.log(control.name, control.options[key]);
+//         // eslint-disable-next-line no-param-reassign
+//         control.options[key] = value;
+//         console.log('--->', control.options[key]);
+//       } else if (control.type === 'group' && control.children.length) {
+//         control.children.forEach(modify({ type, key, value }));
+//       }
+//     };
+//   }
 
-  const copy = cloneDeep(controls);
-  copy.forEach(modify(options));
-  return copy;
-}
+//   const copy = cloneDeep(controls);
+//   copy.forEach(modify(options));
+//   return copy;
+// }
 
 /**
  *

@@ -103,9 +103,7 @@ import SurveyBuilder from '@/components/builder/SurveyBuilder.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import resultMixin from '@/components/ui/ResultsMixin';
 
-import {
-  createSurvey, getGroups, modifyOptions, updateControls,
-} from '@/utils/surveys';
+import { createSurvey, updateControls } from '@/utils/surveys';
 
 export default {
   components: {
@@ -239,9 +237,7 @@ export default {
       }
     },
     onOverride() {
-      console.log('onOverride');
       this.showOverrideModal = false;
-
       try {
         // only keep latest revision of survey definition
         const filtered = this.survey.revisions.filter(r => r.version <= this.survey.latestVersion);
@@ -249,10 +245,12 @@ export default {
         const revision = { ...this.importedSurvey.revisions[this.importedSurvey.revisions.length - 1] };
 
         if (this.importedSurvey.specVersion === 1) {
-          // map
+          // const pipe = (...fns) => fns.reduceRight(compose2);
+          // const migratedControls pipe
+
           const migratedControls = updateControls(
             updateControls(revision.controls, { type: 'ontology', key: 'options.source', replacer: () => '' }),
-            { type: /.*/, replacer: ({ _id, ...rest }) => ({ id: _id, ...rest }) },
+            { type: /.*/, replacer: ({ _id, ...rest }) => ({ id: new ObjectId().toString(), ...rest }) },
           );
           revision.controls = migratedControls;
         }
