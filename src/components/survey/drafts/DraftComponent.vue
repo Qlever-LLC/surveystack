@@ -65,6 +65,7 @@
                   :index="index"
                   :submission="submission"
                   :meta="submissionField.meta"
+                  :resources="survey.resources"
                   @eval="eval"
                   @changed="setValue"
                   @setStatus="setStatus"

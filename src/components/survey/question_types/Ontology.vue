@@ -4,7 +4,7 @@
       <v-autocomplete
         :value="value"
         @change="onChange"
-        :items="control.options.source || []"
+        :items="items"
         item-text="label"
         item-value="value"
         outlined
@@ -34,7 +34,7 @@
       <v-combobox
         :value="value"
         @change="onChange"
-        :items="control.options.source || []"
+        :items="items"
         item-text="label"
         item-value="value"
         outlined
@@ -104,21 +104,21 @@ export default {
       );
     },
     getLabelForItemValue(value) {
-      const item = this.control.options.source.find(x => x.value === value);
-      return (item && item.label) || value;
-    },
-    getLabelForItemValue2(value) {
-      console.log(value);
-      const item = this.control.options.source.find(x => x.value === value);
+      // const item = this.control.options.source.find(x => x.value === value);
+      const item = this.items.find(x => x.value === value);
       return (item && item.label) || value;
     },
   },
   computed: {
+    items() {
+      const { content } = this.resources.find(resource => resource.id === this.control.options.source);
+      return content || [];
+    },
     sourceIsValid() {
-      return this.control.options.source
-        && Array.isArray(this.control.options.source)
-        && this.control.options.source.length > 0
-        && this.control.options.source.every(({ label, value }) => label && value);
+      return this.items
+        && Array.isArray(this.items)
+        && this.items.length > 0
+        && this.items.every(({ label, value }) => label && value);
     },
   },
 };

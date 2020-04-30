@@ -3,7 +3,7 @@
     <v-card-title class="d-block">
       <div class="d-flex justify-space-between align-center">
         <div class="grey--text text--darken-2">
-          Dropdown Options
+          Dropdown List Editor
         </div>
         <div class="d-flex align-center">
           <v-tooltip bottom>
@@ -47,6 +47,7 @@
           :value="resource.label"
           @input="handleUpdateLabel"
           label="List Label"
+          persistent-hint
           class="display-1 flex-shrink-1"
           style="max-width: 12em;"
         />

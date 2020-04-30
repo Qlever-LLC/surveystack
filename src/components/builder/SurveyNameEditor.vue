@@ -7,7 +7,7 @@
     placeholder="Untitled Survey"
     class="display-1"
     :rules="[rules.hasOnlyValidCharacters, rules.hasValidLength]"
-    autofocus
+    :autofocus="value === ''"
   />
   <!-- <div
     v-else
