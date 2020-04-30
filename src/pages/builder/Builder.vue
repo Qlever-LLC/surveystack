@@ -103,7 +103,9 @@ import SurveyBuilder from '@/components/builder/SurveyBuilder.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import resultMixin from '@/components/ui/ResultsMixin';
 
-import { createSurvey } from '@/utils/surveys';
+import {
+  createSurvey, getGroups, modifyOptions, updateControls,
+} from '@/utils/surveys';
 
 export default {
   components: {
@@ -241,22 +243,24 @@ export default {
       this.showOverrideModal = false;
 
       try {
+        // only keep latest revision of survey definition
         const filtered = this.survey.revisions.filter(r => r.version <= this.survey.latestVersion);
         this.survey.revisions = filtered;
-        const revision = this.importedSurvey.revisions[this.importedSurvey.revisions.length - 1];
-        const { resources } = this.importedSurvey;
+        const revision = { ...this.importedSurvey.revisions[this.importedSurvey.revisions.length - 1] };
 
-
-        if (this.importedSurvey.specVersion < 2) {
-          // for each control of revision
-          // if type === 'ontology'
-          // remove control.options.source
-          // todo figure out how to itterate
+        if (this.importedSurvey.specVersion === 1) {
+          // map
+          const migratedControls = updateControls(
+            updateControls(revision.controls, { type: 'ontology', key: 'options.source', replacer: () => '' }),
+            { type: /.*/, replacer: ({ _id, ...rest }) => ({ id: _id, ...rest }) },
+          );
+          revision.controls = migratedControls;
         }
 
-        revision.version = this.survey.latestVersion + 1;
+        // append imported survey definition as latest revision
         this.survey.revisions.push(revision);
-        this.survey.resources = resources;
+        this.survey.resources = this.importedSurvey.resources ? this.importedSurvey.resources : [];
+        revision.version = this.survey.latestVersion + 1;
         this.freshImport = true;
         this.sessionId = new ObjectId().toString();
       } catch (err) {

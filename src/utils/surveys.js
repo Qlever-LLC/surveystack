@@ -4,11 +4,10 @@
 
 
 import { unflatten } from 'flat';
-import { clone } from 'lodash';
+import { clone, cloneDeep, set } from 'lodash';
 import moment from 'moment';
 import submissionUtils from './submissions';
 import { SPEC_VERSION_SURVEY } from '@/constants';
-
 
 function* processSurveyNames(data) {
   if (!data) {
@@ -313,11 +312,11 @@ export const uuid = () => {
 };
 
 // eslint-disable-next-line no-unused-vars
-function has(target, key) {
+function _has(target, key) {
   return true;
 }
 
-function get(target, key) {
+function _get(target, key) {
   if (key === Symbol.unscopables) return undefined;
   return target[key];
 }
@@ -327,7 +326,7 @@ export function compileSandboxSingleLine(src) {
   const code = new Function('sandbox', wrappedSource);
 
   return function (sandbox) {
-    const sandboxProxy = new Proxy(sandbox, { has, get });
+    const sandboxProxy = new Proxy(sandbox, { _has, _get });
     return code(sandboxProxy);
   };
 }
@@ -337,7 +336,7 @@ export function compileSandbox(src, fname) {
   const code = new Function('sandbox', wrappedSource);
 
   return function (sandbox) {
-    const sandboxProxy = new Proxy(sandbox, { has, get });
+    const sandboxProxy = new Proxy(sandbox, { _has, _get });
     return code(sandboxProxy);
   };
 }
@@ -740,12 +739,12 @@ export function findParentByChildId(controlId, controls) {
 }
 
 /**
- * Get a top level list of groups in a nested controls list
+ * _Get a top level list of groups in a nested controls list
  * @param {[{}]} controls a nested list of control objects
  * @returns {[{}]} List of groups and their children
  */
 export function getGroups(controls) {
-  function reducer(r, x, i) {
+  function reducer(r, x) {
     // console.log(i, r);
     if (x.type === 'group') {
       // return [x, ...r];
@@ -759,6 +758,75 @@ export function getGroups(controls) {
   }
 
   return controls.reduce(reducer, []);
+}
+
+export function modifyOptions(controls = [], options = {}) {
+  function modify({ type, key, value }) {
+    return (control) => {
+      if (control.type === type && control.options[key]) {
+        console.log(control.name, control.options[key]);
+        // eslint-disable-next-line no-param-reassign
+        control.options[key] = value;
+        console.log('--->', control.options[key]);
+      } else if (control.type === 'group' && control.children.length) {
+        control.children.forEach(modify({ type, key, value }));
+      }
+    };
+  }
+
+  const copy = cloneDeep(controls);
+  copy.forEach(modify(options));
+  return copy;
+}
+
+/**
+ *
+ * @param {[{}]} controls a nested list of control objects
+ * @param {object} options
+ * @param {string} options.type control type to modify, if blank then it will apply the replacer function to all question types
+ * @param {string} options.key control key to modify,
+ * @param {function({})} options.replacer function to replace the value for the control's key.
+ *    takes the control as an argument and returns the replacement value
+ */
+export function updateControls(controls = [], options = {
+  replacer: () => null,
+}) {
+  // equivalent to doing `obj = newObj`, mutating the original object, without reassigning it
+  function mutateObj(left, newVal) {
+    Object.keys(left).forEach((k) => {
+      // eslint-disable-next-line no-param-reassign
+      delete left[k];
+    });
+    Object.entries(newVal).forEach(([k, v]) => {
+      // eslint-disable-next-line no-param-reassign
+      left[k] = v;
+    });
+  }
+
+  function modify({
+    type,
+    key,
+    replacer,
+  }) {
+    return (control) => {
+      if (
+        control.type === type
+        || (type instanceof RegExp && type.test(control.type))
+      ) {
+        if (key) {
+          set(control, key, replacer(control));
+        } else {
+          mutateObj(control, replacer(control));
+        }
+      } else if (control.type === 'group' && control.children.length) {
+        control.children.forEach(modify({ type, key, replacer }));
+      }
+    };
+  }
+
+  const copy = cloneDeep(controls);
+  copy.forEach(modify(options));
+  return copy;
 }
 
 /**
