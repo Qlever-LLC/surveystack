@@ -13,6 +13,7 @@
         :chips="false"
         :label="control.label"
         :multiple="false"
+        @keyup.enter.prevent="submit"
       >
         <template v-slot:item="{item}">
           <div v-html="item.label"></div>

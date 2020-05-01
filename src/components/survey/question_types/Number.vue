@@ -9,6 +9,7 @@
           :label="control.label"
           v-bind:value="value"
           v-on:input="onInput"
+          @keyup.enter.prevent="submit"
         />
         <p class="mt-2">{{ control.hint }}</p>
       </v-col>
@@ -22,6 +23,13 @@ import baseQuestionComponent from './BaseQuestionComponent';
 export default {
   mixins: [baseQuestionComponent],
   methods: {
+    keyup(ev) {
+      console.log('key: ', ev);
+    },
+    submit() {
+      this.onInput(this.value);
+      this.$emit('next');
+    },
     onInput(v) {
       if (this.value !== v) {
         // TODO: implicitly parse as Integer or Float?

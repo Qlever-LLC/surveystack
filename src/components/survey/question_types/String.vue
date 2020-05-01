@@ -6,6 +6,7 @@
       :label="control.label"
       v-bind:value="value"
       v-on:input="onInput"
+      @keyup.enter.prevent="submit"
     ></v-text-field>
     <p>{{ control.hint }}</p>
   </v-container>
@@ -17,6 +18,10 @@ import baseQuestionComponent from './BaseQuestionComponent';
 export default {
   mixins: [baseQuestionComponent],
   methods: {
+    submit() {
+      this.onInput(this.value);
+      this.$emit('next');
+    },
     onInput(v) {
       if (this.value !== v) {
         this.changed(v);

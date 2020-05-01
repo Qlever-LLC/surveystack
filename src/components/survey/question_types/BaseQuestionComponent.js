@@ -13,6 +13,10 @@ export default {
     // },
   },
   methods: {
+    submit() {
+      this.changed(this.value);
+      this.next();
+    },
     eval() {
       this.$emit('eval');
     },
