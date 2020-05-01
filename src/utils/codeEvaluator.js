@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
 import * as utils from './surveys';
 import submissionUtils from './submissions';
@@ -18,27 +19,18 @@ async function calculateField(survey, submission, positions, controls, option, f
   }).filter(item => item !== null);
 
 
-  const promises = items.map(item => new Promise((resolve, reject) => {
-    utils.execute({ code: item.code, fname, submission })
-      .then(r => resolve({
-        control: item.control,
-        pos: item.pos,
-        res: r,
-      })).catch((e) => {
-        reject(e);
-      });
-  }));
-
-
   const evaluated = [];
 
-  let idx = 0;
-  // eslint-disable-next-line no-restricted-syntax
-  for (const promise of promises) {
-    const item = items[idx];
 
+  // eslint-disable-next-line no-restricted-syntax
+  for (const item of items) {
     try {
-      const res = await promise;
+      const res = {
+        res: utils.executeUnsafe({ code: item.code, fname, submission }),
+        pos: item.pos,
+        control: item.control,
+      };
+
       const field = submissionUtils.getSubmissionField(submission, survey, item.pos);
       const evaluatedItem = {
         control: item.control,
@@ -55,7 +47,6 @@ async function calculateField(survey, submission, positions, controls, option, f
       };
       evaluated.push(evaluatedItem);
     }
-    idx++;
   }
 
   return evaluated;

@@ -359,10 +359,24 @@ export const simplify = (submissionItem) => {
   return ret;
 };
 
+export function executeUnsafe({
+  code, fname, submission, log,
+}) {
+  const sandbox = compileSandbox(code, fname);
+
+  const res = sandbox({
+    arg1: submission,
+    JSON, // for using JSON.stringify() and JSON.parse()
+  });
+
+  return res;
+}
+
 export function execute({
   code, fname, submission, log,
 }) {
   const worker = new Worker('/worker.js');
+
 
   return new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
@@ -373,7 +387,7 @@ export function execute({
     let counter = 0;
 
     worker.onmessage = (m) => {
-      console.log('message from worker', m);
+      console.log('message from worker', m, m.data);
       if (m.data.res !== undefined) {
         clearTimeout(timeout);
         worker.terminate();
