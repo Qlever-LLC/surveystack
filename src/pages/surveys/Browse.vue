@@ -54,16 +54,44 @@
         </v-list>
       </v-menu> -->
     </v-tabs>
+    <v-card class="my-2" v-if="activeTab === 'active-group'">
+      <v-card-text>
+        <div
+          v-for="(e, i) in pinnedSurveys"
+          :key="`${e._id}_${pinned}`"
+        >
+          <v-list-item :to="`/surveys/${e._id}`">
+            <v-list-item-icon>
+              <v-icon v-if="e.pinned">mdi-pin</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <div>
+                <v-list-item-title>{{e.name}}</v-list-item-title>
+                <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle>
+                <v-list-item-subtitle v-if="e.group && e.group.id">
+                  {{ getGroupName(e.group.id) }}
+                </v-list-item-subtitle>
+                <small v-if="e.latestVersion" class="grey--text">Survey Version {{e.latestVersion}}</small>
+              </div>
+            </v-list-item-content>
+
+          </v-list-item>
+          <v-divider v-if="i < pinnedSurveys.length - 1" />
+        </div>
+      </v-card-text>
+    </v-card>
     <v-card
-      min-height="70vh"
+      min-height="60vh"
       class="d-flex flex-column"
     >
       <v-card-title>
 
       </v-card-title>
       <v-card-text class="flex-grow-1">
+
+
         <div
-          v-for="e in surveys.content"
+          v-for="(e, i) in surveys.content"
           :key="e._id"
         >
           <v-list-item :to="`/surveys/${e._id}`">
@@ -82,7 +110,8 @@
             </v-list-item-content>
 
           </v-list-item>
-          <v-divider />
+          <v-divider v-if="i < surveys.content.length - 1" />
+
         </div>
         <div
           v-if="surveys.content.length < 1"
@@ -114,7 +143,7 @@
 import { uniqBy } from 'lodash';
 import api from '@/services/api.service';
 
-const PAGINATION_LIMIT = 20;
+const PAGINATION_LIMIT = 5;
 
 export default {
   data() {
@@ -124,6 +153,7 @@ export default {
       // groups: null,
       page: 1,
       search: '',
+      pinnedSurveys: [],
       surveys: {
         content: [],
         pagination: {
@@ -235,14 +265,17 @@ export default {
             this.fetchPinnedSurveys(this.activeGroupId),
             this.fetchData({ groups: [this.activeGroupId] }),
           ]);
-          this.surveys.content = uniqBy([
-            ...pinnedResponse.map(r => ({ ...r, pinned: true })),
-            ...response.content,
-          ], '_id');
-          this.surveys.pagination = {
-            ...response.pagination,
-            total: this.surveys.content.length,
-          };
+
+          // this.surveys.content = uniqBy([
+          //   ...pinnedResponse.map(r => ({ ...r, pinned: true })),
+          //   ...response.content,
+          // ], '_id');
+          // this.surveys.pagination = {
+          //   ...response.pagination,
+          //   total: this.surveys.content.length,
+          // };
+          this.surveys = response;
+          this.pinnedSurveys = pinnedResponse.map(r => ({ ...r, pinned: true }));
           break;
         case 'my-surveys':
           this.surveys = await this.fetchData({ user: this.$store.getters['auth/user']._id });
