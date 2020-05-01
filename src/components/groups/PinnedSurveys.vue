@@ -23,7 +23,8 @@
         v-for="(el, idx) in entities"
         :key="`${idx}-survey-${el._id}`"
         class="ma-2 mx-6"
-        elevation="2"
+        elevation="1"
+        outlined
       >
         <v-card-text>
           <div class="d-flex justify-space-between align-center">

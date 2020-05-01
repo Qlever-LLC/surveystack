@@ -71,7 +71,8 @@
 
               <v-list-item-title>{{e.name}}</v-list-item-title>
               <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle>
-              <small class="grey--text">Version {{e.latestVersion}}</small>
+              <v-list-item-subtitle>{{ getGroupName(e.group.id) }}</v-list-item-subtitle>
+              <small class="grey--text">Survey Version {{e.latestVersion}}</small>
             </v-list-item-content>
 
           </v-list-item>
@@ -156,6 +157,10 @@ export default {
       }
 
       return [
+        // {
+        //   name: 'active-group-pinned-surveys',
+        //   label: 'Pinned Surveys',
+        // },
         {
           name: 'active-group',
           label: 'Active Group',
@@ -178,8 +183,7 @@ export default {
         .map(({ _id, name, slug }) => ({ id: _id, label: name, name: slug }));
     },
     activeGroupName() {
-      const groups = this.$store.getters['memberships/groups'];
-      const group = groups.find(item => item._id === this.activeGroupId);
+      const group = this.groups.find(item => item._id === this.activeGroupId);
       if (group) {
         return group.name;
       }
@@ -206,6 +210,7 @@ export default {
       this.fetchData();
     },
     async activeTab(value) {
+      console.log(value);
       await this.getDataForTab(value);
     },
     async activeGroupId(value) {
@@ -215,6 +220,13 @@ export default {
     },
   },
   methods: {
+    getGroupName(id) {
+      const group = this.groups.find(item => item._id === id);
+      if (group) {
+        return group.name;
+      }
+      return null;
+    },
     setMenuTab(tab) {
       this.activeTab = tab.name;
       this.selectedGroupIds = [tab.id];
@@ -222,14 +234,20 @@ export default {
     },
     async getDataForTab(tab) {
       switch (tab) {
+        case 'active-group-pinned-surveys':
+          this.surveys = await this.fetchPinnedSurveys(this.activeGroupId);
+          break;
         case 'active-group':
-          await this.fetchData({ groups: [this.activeGroupId] });
+          await Promise.all([
+            this.fetchPinnedSurveys(this.activeGroupId),
+            this.fetchData({ groups: [this.activeGroupId] }),
+          ]);
           break;
         case 'my-surveys':
-          await this.fetchData({ user: this.$store.getters['auth/user']._id });
+          this.surveys = await this.fetchData({ user: this.$store.getters['auth/user']._id });
           break;
         case 'my-groups':
-          await this.fetchData({
+          this.surveys = await this.fetchData({
             groups: this.$store.getters['memberships/groups'].map(({ _id }) => _id),
           });
           break;
@@ -237,7 +255,7 @@ export default {
           break;
         case 'all-groups':
         default:
-          await this.fetchData();
+          this.surveys = await this.fetchData();
       }
     },
     async fetchData({ user, groups = [] } = {}) {
@@ -261,16 +279,38 @@ export default {
       try {
         // const { data } = await api.get(`/surveys/page?${queryParams}`);
         const { data } = await api.get(`/surveys/list-page?${queryParams}`);
-        this.surveys = data;
+        return data;
       } catch (e) {
         // TODO: use cached data?
-        console.log('something went wrong:', e);
+        console.log('Error fetching surveys:', e);
       }
+      return [];
+    },
+    async fetchPinnedSurveys(groupId) {
+      console.log('fetch pinned');
+      try {
+        const { data } = await api.get(`/groups/${groupId}?populate=1`);
+        if (data && data.surveys && data.surveys.pinned && Array.isArray(data.surveys.pinned)) {
+          return data.surveys.pinned;
+        }
+      } catch (err) {
+        console.log('Error fetching surveys:', err);
+      }
+      return [];
     },
   },
   async created() {
-    this.selectedGroupIds = [this.activeGroupId];
-    await this.fetchData({ groups: [this.activeGroupId] });
+    // this.selectedGroupIds = [this.activeGroupId];
+    // await this.fetchData({ groups: [this.activeGroupId] });
+    // await this.fetchPinned(this.activeGroupId);
+    // if (this.activeGroupId) {
+    //   this.getDataForTab('active-group-pinned-surveys');
+    // } else {
+    //   this.getDataForTab('my-surveys');
+    // }
+    this.getDataForTab(
+      (this.activeGroupId ? 'active-group' : 'my-surveys'),
+    );
   },
 };
 </script>
