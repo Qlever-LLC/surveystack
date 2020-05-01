@@ -67,12 +67,18 @@
           :key="e._id"
         >
           <v-list-item :to="`/surveys/${e._id}`">
+            <v-list-item-icon>
+              <v-icon v-if="e.pinned">mdi-pin</v-icon>
+            </v-list-item-icon>
             <v-list-item-content>
-
-              <v-list-item-title>{{e.name}}</v-list-item-title>
-              <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle>
-              <v-list-item-subtitle>{{ getGroupName(e.group.id) }}</v-list-item-subtitle>
-              <small class="grey--text">Survey Version {{e.latestVersion}}</small>
+              <div>
+                <v-list-item-title>{{e.name}}</v-list-item-title>
+                <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle>
+                <v-list-item-subtitle v-if="e.group && e.group.id">
+                  {{ getGroupName(e.group.id) }}
+                </v-list-item-subtitle>
+                <small v-if="e.latestVersion" class="grey--text">Survey Version {{e.latestVersion}}</small>
+              </div>
             </v-list-item-content>
 
           </v-list-item>
@@ -105,6 +111,7 @@
 </template>
 
 <script>
+import { uniqBy } from 'lodash';
 import api from '@/services/api.service';
 
 const PAGINATION_LIMIT = 20;
@@ -189,21 +196,6 @@ export default {
       }
       return 'No active group';
     },
-    // activeTabContent() {
-    //   switch (this.activeTab) {
-    //     case 'active-group':
-
-    //       break;
-    //     case 'my-surveys':
-    //       break;
-    //     case 'my-groups':
-    //       break;
-    //     case 'all-groups':
-    //       break;
-    //     default:
-    //   }
-    //   return '';
-    // },
   },
   watch: {
     search() {
@@ -238,10 +230,19 @@ export default {
           this.surveys = await this.fetchPinnedSurveys(this.activeGroupId);
           break;
         case 'active-group':
-          await Promise.all([
+          // eslint-disable-next-line no-case-declarations
+          const [pinnedResponse, response] = await Promise.all([
             this.fetchPinnedSurveys(this.activeGroupId),
             this.fetchData({ groups: [this.activeGroupId] }),
           ]);
+          this.surveys.content = uniqBy([
+            ...pinnedResponse.map(r => ({ ...r, pinned: true })),
+            ...response.content,
+          ], '_id');
+          this.surveys.pagination = {
+            ...response.pagination,
+            total: this.surveys.content.length,
+          };
           break;
         case 'my-surveys':
           this.surveys = await this.fetchData({ user: this.$store.getters['auth/user']._id });
@@ -298,19 +299,6 @@ export default {
       }
       return [];
     },
-  },
-  async created() {
-    // this.selectedGroupIds = [this.activeGroupId];
-    // await this.fetchData({ groups: [this.activeGroupId] });
-    // await this.fetchPinned(this.activeGroupId);
-    // if (this.activeGroupId) {
-    //   this.getDataForTab('active-group-pinned-surveys');
-    // } else {
-    //   this.getDataForTab('my-surveys');
-    // }
-    this.getDataForTab(
-      (this.activeGroupId ? 'active-group' : 'my-surveys'),
-    );
   },
 };
 </script>

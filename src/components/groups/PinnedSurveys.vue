@@ -51,6 +51,8 @@
     </draggable>
     <v-card
       class="ma-2"
+      outlined
+      elevation="1"
       v-else
     >
       <v-card-text>
