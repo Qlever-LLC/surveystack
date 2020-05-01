@@ -1,73 +1,65 @@
 <template>
   <v-container>
-    <v-text-field
-      v-model="search"
-      label="Search"
-      append-icon="mdi-magnify"
-    />
-    <div class="d-flex justify-end mb-4">
-      <small class="text--secondary">
-        {{surveys.pagination.total}} results
-      </small>
+    <div class="px-5 py-2">
+      <v-text-field
+        v-model="search"
+        label="Search"
+        append-icon="mdi-magnify"
+      />
+      <div class="d-flex justify-end mb-4">
+        <small class="text--secondary">
+          {{surveys.pagination.total}} results
+        </small>
+      </div>
     </div>
-
-    <!-- <v-tabs-items
+    <v-tabs
       v-model="activeTab"
+      fixed-tabs
     >
-
-    </v-tabs-items> -->
-    <!-- <v-card>
-      <v-card-text>
-        {{}}
-      </v-card-text>
-    </v-card> -->
+      <v-tab
+        v-for="tab in tabs"
+        :href="`#${tab.name}`"
+        :key="tab.name"
+      >
+        <span v-if="tab.name === 'active-group'">
+          {{ activeGroupName }}
+        </span>
+        <span v-else>
+          {{ tab.label }}
+        </span>
+      </v-tab>
+      <!-- <v-menu
+        v-if="groupsItems.length"
+        bottom
+        left
+      >
+        <template v-slot:activator="{ on }">
+          <v-btn
+            text
+            class="align-self-center mr-4"
+            v-on="on"
+          >
+            more
+            <v-icon right>mdi-menu-down</v-icon>
+          </v-btn>
+        </template>
+        <v-list class="">
+          <v-list-item
+            v-for="item in groupsItems"
+            :key="item.name"
+            @click="setMenuTab(item)"
+          >
+            {{ item.label }}
+          </v-list-item>
+        </v-list>
+      </v-menu> -->
+    </v-tabs>
     <v-card
       min-height="70vh"
       class="d-flex flex-column"
     >
       <v-card-title>
-        <v-tabs
-          v-model="activeTab"
-          fixed-tabs
-        >
-          <v-tab
-            v-for="tab in tabs"
-            :href="`#${tab.name}`"
-            :key="tab.name"
-          >
-            <span v-if="tab.name === 'active-group'">
-              {{ activeGroupName }}
-            </span>
-            <span v-else>
-              {{ tab.label }}
-            </span>
-          </v-tab>
-          <!-- <v-menu
-           v-if="groupsItems.length"
-           bottom
-           left
-          >
-            <template v-slot:activator="{ on }">
-              <v-btn
-                text
-                class="align-self-center mr-4"
-                v-on="on"
-              >
-                more
-                <v-icon right>mdi-menu-down</v-icon>
-              </v-btn>
-            </template>
-            <v-list class="">
-              <v-list-item
-                v-for="item in groupsItems"
-                :key="item.name"
-                @click="setMenuTab(item)"
-              >
-                {{ item.label }}
-              </v-list-item>
-            </v-list>
-          </v-menu> -->
-        </v-tabs>
+
       </v-card-title>
       <v-card-text class="flex-grow-1">
         <div
@@ -132,11 +124,19 @@ export default {
           limit: 100000,
         },
       },
-      tabs: [
-        {
-          name: 'active-group',
-          label: 'Active Group',
-        },
+
+      surveysForCurrentGroup: null,
+    };
+  },
+  computed: {
+    // activeTabHasMorePages() {
+    //   return this.surveys
+    //     && this.surveys.pagination
+    //     && this.surveys.pagination.total
+    //     && this.surveys.pagination.total > limit;
+    // }
+    tabs() {
+      const commonTabs = [
         {
           name: 'my-surveys',
           label: 'My Surveys',
@@ -149,17 +149,20 @@ export default {
           name: 'all-groups',
           label: 'All Groups',
         },
-      ],
-      surveysForCurrentGroup: null,
-    };
-  },
-  computed: {
-    // activeTabHasMorePages() {
-    //   return this.surveys
-    //     && this.surveys.pagination
-    //     && this.surveys.pagination.total
-    //     && this.surveys.pagination.total > limit;
-    // }
+      ];
+
+      if (!this.activeGroupId) {
+        return commonTabs;
+      }
+
+      return [
+        {
+          name: 'active-group',
+          label: 'Active Group',
+        },
+        ...commonTabs,
+      ];
+    },
     activeTabPaginationLength() {
       const { total } = this.surveys.pagination;
       return total ? Math.ceil(total / PAGINATION_LIMIT) : 0;
