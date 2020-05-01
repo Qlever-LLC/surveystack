@@ -194,7 +194,14 @@ const getSurveyPage = async (req, res) => {
 const getSurveyListPage = async (req, res) => {
   const query = {
     ...req.query,
-    projections: [...(req.query.projections || []), 'name', '_id', 'dateModified', 'latestVersion'],
+    projections: [
+      ...(req.query.projections || []), 
+      'name', 
+      '_id', 
+      'dateModified', 
+      'latestVersion', 
+      'group',
+    ],
   };
   const pipeline = buildPipelineForGetSurveyPage(query);
 
