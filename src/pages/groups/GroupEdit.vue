@@ -83,7 +83,7 @@
       :filter="filterMembers"
     >
       <template v-slot:entity="{ entity }">
-        <v-list-item-content v-if="entity.meta.status === 'pending'">
+        <v-list-item-content v-if="entity.meta && entity.meta.status === 'pending'">
           <v-list-item-title class="text--secondary">[Pending] Invitation</v-list-item-title>
           <v-list-item-subtitle>sent to {{entity.meta.sentTo}}</v-list-item-subtitle>
         </v-list-item-content>
