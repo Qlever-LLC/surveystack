@@ -58,7 +58,7 @@
       <v-card-text>
         <div
           v-for="(e, i) in pinnedSurveys"
-          :key="`${e._id}_${pinned}`"
+          :key="`${e._id}_pinned`"
         >
           <v-list-item :to="`/surveys/${e._id}`">
             <v-list-item-icon>

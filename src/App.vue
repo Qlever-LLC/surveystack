@@ -3,7 +3,7 @@
     <app-navbar />
     <v-content>
       <app-global-feedback />
-      <router-view class="pa-3"></router-view>
+      <router-view :class="{'pa-3': $route.name !== 'submissions-drafts-detail'}" style="height: 100%;"></router-view>
     </v-content>
   </v-app>
 </template>
