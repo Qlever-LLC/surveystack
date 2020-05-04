@@ -1,5 +1,5 @@
 <template>
-  <div id="relative-wrapper">
+  <div id="relative-wrapper" class="">
 
     <div
       class="full fill-height d-flex justify-center align-center"
@@ -37,7 +37,7 @@
         :breadcrumbs="mbreadcrumbs"
       />
       <div style="position: relative; width: 100%; height: 100%;">
-        <transition :name="slide">
+        <transition class="transition" :name="slide">
           <div
             id="transition-container"
             :key="'container-'+index"
@@ -47,14 +47,14 @@
               style="max-width: 50rem; height: 100%;"
             >
               <v-row
-                class="flex-grow-0 flex-shrink-1 pl-2 pr-2"
                 v-if="!atOverview"
+                class="flex-grow-0 flex-shrink-1 pl-2 pr-2"
               />
               <v-row
                 justify="center"
                 align="center"
                 class="px-2"
-                style="height: 100%; margin-left: 0px; margin-right: 0px;"
+                style="height: 100%; margin-left: 0px; margin-right: 0px; max-height: calc(100vh - 68px - 56px - 56px);"
               >
                 <component
                   v-if="control && !atEnd"
@@ -86,7 +86,7 @@
     </div>
 
     <v-navigation-drawer
-      v-if="survey"
+      v-if="survey && showOverview"
       id="navigation-container"
       v-model="showOverview"
       clipped
@@ -458,6 +458,10 @@ export default {
   },
 
   async created() {
+    // // HACK: to let us position the next button at the bottom of the screen
+    // const vh = window.innerHeight * 0.01;
+    // document.documentElement.style.setProperty('--vh', `${vh}px`);
+
     // console.log('submission', this.submission);
     /** Should this be broken out into method? */
     // console.log('pos', this.position);
@@ -510,13 +514,18 @@ export default {
   border-top: 1px solid #eee;
   height: 68px;
   overflow: hidden;
-  position: absolute;
-  bottom: 0px;
+  position: fixed;
+  /* bottom: 0px; */
+  top: calc(100% - 68px);
+  /* top: 80%; */
+  /* top: calc(100vh - 68px); */
+  /* top: 0vh; */
   left: 0px;
 }
 
 #draft-container {
-  position: absolute;
+  /* position: absolute; */
+  height: 100%;
   width: 100%;
   margin: 0px;
   padding: 0px !important;
@@ -569,11 +578,17 @@ export default {
 }
 
 #transition-container {
-  position: absolute;
+  /* position: absolute; */
   width: 100%;
   height: 100%;
   border-left: 1px solid #aaa;
   will-change: transform;
+  display: flex;
+  align-items: center;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
 }
 
 .full {
