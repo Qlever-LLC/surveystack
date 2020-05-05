@@ -5,7 +5,7 @@
         {{title}}
       </slot>
       <v-spacer />
-      <slot name="action-new">
+      <slot name="action-new" v-if="editable">
         <v-btn
           color="primary"
           class="ml-4"
@@ -51,6 +51,9 @@
 <script>
 export default {
   props: {
+    editable: {
+      type: Boolean,
+    },
     entities: {
       type: Array,
     },

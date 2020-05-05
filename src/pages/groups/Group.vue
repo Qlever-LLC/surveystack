@@ -7,8 +7,10 @@
         :to="{name: 'groups-edit', params: {id: entity._id}}"
         text
       >
-        <v-icon>mdi-pencil</v-icon>
-        <span class="ml-2">Edit</span>
+        <template v-if="editable">
+          <v-icon>mdi-pencil</v-icon>
+          <span class="ml-2">Edit</span>
+        </template>
       </v-btn>
     </div>
 
@@ -20,6 +22,7 @@
     <v-row>
       <v-col>
         <app-basic-list
+          :editable="editable"
           :entities="subgroups"
           title="Subgroups"
           :link="(e) => `/g${e.path}`"
@@ -38,6 +41,7 @@
     <v-row>
       <v-col>
         <app-basic-list
+          :editable="editable"
           :entities="(entity.surveys && entity.surveys.pinned) ? entity.surveys.pinned : []"
           title="Pinned Surveys"
           :link="(e) => `/surveys/${e._id}`"
@@ -95,6 +99,8 @@ export default {
       try {
         const { data } = await api.get(`/groups/by-path/${path}?populate=true`);
         this.entity = data;
+        console.log('entity', this.entity);
+        console.log('memberships', this.groups);
         await this.getSubgroups();
       } catch (e) {
         this.status.code = e.response.status;
@@ -111,6 +117,21 @@ export default {
       }
     },
   },
+  computed: {
+    user() {
+      return this.$store.getters['auth/user'];
+    },
+    memberships() {
+      return this.$store.getters['memberships/memberships'];
+    },
+    editable() {
+      const g = this.memberships.find(m => m.group._id === this.entity._id);
+      if (g && g.role === 'admin') {
+        return true;
+      }
+      return false;
+    },
+  },
   async beforeRouteUpdate(to, from, next) {
     const { pathMatch } = to.params;
     await this.getEntity(pathMatch);
@@ -120,6 +141,8 @@ export default {
   async created() {
     const { pathMatch } = this.$route.params;
     await this.getEntity(pathMatch);
+    const user = this.$store.getters['auth/user'];
+    this.$store.dispatch('memberships/getUserMemberships', user._id);
     this.initialized = true;
   },
 };
