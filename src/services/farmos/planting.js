@@ -15,21 +15,26 @@ function plantingBody(name, cropId, instanceId) {
 }
 
 function log(type, cropName, fieldId, assetId, timestamp, instanceId) {
-  return {
+  const ret = {
     name: cropName,
-    movement: {
-      area: [
-        {
-          id: fieldId,
-        },
-      ],
-    },
     asset: [{ id: assetId }],
     type,
     timestamp,
     done: 1,
     data: instanceId,
   };
+
+  if (fieldId) {
+    ret.movement = {
+      area: [
+        {
+          id: fieldId,
+        },
+      ],
+    };
+  }
+
+  return ret;
 }
 
 async function createOrUpdate(farmUrl, cred, instanceId, endpoint, body) {

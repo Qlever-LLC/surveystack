@@ -42,7 +42,6 @@ async function ensureTerm(name, machine, info, availableTerms, farmUrl, cred) {
   }
 }
 
-
 async function log(
   apiCompose,
   info,
@@ -62,11 +61,13 @@ async function log(
 
   const { terms } = apiCompose;
   const termMap = {};
-  for (const t of terms) {
-    const id = await ensureTerm(t.name, t.machine, info, availableTerms, farmUrl, cred);
-    console.log('term', t);
-    console.log('id', id);
-    termMap[t.sym] = id;
+  if (terms) {
+    for (const t of terms) {
+      const id = await ensureTerm(t.name, t.machine, info, availableTerms, farmUrl, cred);
+      console.log('term', t);
+      console.log('id', id);
+      termMap[t.sym] = id;
+    }
   }
 
   const date = apiCompose.body.date;

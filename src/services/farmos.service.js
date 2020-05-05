@@ -270,6 +270,10 @@ export const handle = async (res, submission, survey, user) => {
 
     if (r) {
       r.forEach((item) => {
+        if (!item) {
+          return;
+        }
+
         if (item.resource === 'farm_asset') {
           currentAssetId = item.id;
         }
