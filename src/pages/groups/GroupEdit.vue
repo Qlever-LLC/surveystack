@@ -74,6 +74,7 @@
     </v-row>
 
     <app-basic-list
+      editable
       class="mb-4"
       v-if="editMode"
       :entities="members"

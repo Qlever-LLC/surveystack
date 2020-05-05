@@ -1,6 +1,7 @@
 <template>
   <v-container>
     <app-basic-list
+      editable
       class="mt-3"
       :entities="entities"
       title="Groups"

@@ -14,10 +14,22 @@
       </v-flex>
 
       <v-flex mb-4>
-        <h1 class="display-3 mb-3">Welcome to SurveyStack</h1>
+        <h1 class="display-2 mb-3">Welcome to SurveyStack</h1>
         <p>
           <strong>Note:</strong> This is a work in progress
         </p>
+
+        <div
+          class="text-center ma-8"
+          v-if="showInstall"
+        >
+          <v-btn
+            @click="install"
+            large
+            color="primary"
+          >Install</v-btn>
+        </div>
+
         <p class="subheading font-weight-regular">
           Source code for this application can be found here
           <br />
@@ -30,22 +42,8 @@
             target="_blank"
           >Backend</a>.
         </p>
-        <p>
-          Architectural entities may be
-          <a
-            href="https://gitlab.com/our-sci/our-sci-server/-/tree/master/src/architecture"
-            target="_blank"
-          >found here</a>
-        </p>
       </v-flex>
 
-      <v-flex
-        mb-5
-        xs12
-      >
-        <h2 class="headline font-weight-bold mb-3">What's next?</h2>
-        <p>The SurveyStack app is being built...</p>
-      </v-flex>
     </v-layout>
   </v-container>
 </template>
@@ -55,5 +53,31 @@
 
 export default {
   name: 'home',
+  data() {
+    return {
+      installPrompt: {
+        prompt() {
+          console.log('install stub');
+        },
+      },
+      showInstall: true,
+    };
+  },
+  methods: {
+    install() {
+      this.installPrompt.prompt();
+    },
+  },
+  created() {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      console.log('beforeinstall');
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      this.installPrompt = e;
+      // Update UI notify the user they can install the PWA
+      this.showInstall = true;
+    });
+  },
 };
 </script>

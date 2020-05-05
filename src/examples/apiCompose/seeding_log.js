@@ -1,3 +1,5 @@
+
+
 /**
  * ApiCompose
  *
@@ -10,6 +12,9 @@ function apiCompose(submission) {
   };
 
   farmosRequest.url = submission.data.field.value.url;
+  farmosRequest.terms = [];
+
+
   const { fieldId } = submission.data.field.value;
   const crop = submission.data.crop.value;
   const date = submission.data.seeding_date.value;

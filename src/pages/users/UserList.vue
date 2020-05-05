@@ -22,6 +22,7 @@
           </v-list-item-content>
           <v-list-item-icon>
             <v-btn
+              v-if="false"
               :to="`/users/${e._id}/edit`"
               text
             >

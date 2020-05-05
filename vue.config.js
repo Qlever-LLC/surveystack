@@ -20,7 +20,7 @@ module.exports = {
     },
   },
   pwa: {
-    name: 'Our-Sci',
+    name: 'Surveystack',
     themeColor: '#f44336',
     msTileColor: '#000000',
     appleMobileWebAppCapable: 'yes',
