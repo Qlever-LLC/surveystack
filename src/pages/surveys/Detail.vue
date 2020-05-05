@@ -5,7 +5,7 @@
   >
     <div class="d-flex justify-end">
       <v-btn
-        v-if="$store.getters['auth/isLoggedIn']"
+        v-if="editable"
         class="mx-2"
         :to="`/surveys/${entity._id}/edit`"
       >
@@ -60,6 +60,35 @@ export default {
       this.$store.dispatch('submissions/startDraft', { survey, group });
     },
   },
+  computed: {
+    user() {
+      return this.$store.getters['auth/user'];
+    },
+    memberships() {
+      return this.$store.getters['memberships/memberships'];
+    },
+    editable() {
+      if (!this.$store.getters['auth/isLoggedIn']) {
+        return false;
+      }
+      const user = this.$store.getters['auth/user'];
+
+      if (this.entity.creator === user._id) {
+        return true;
+      }
+
+      if (!this.entity.group || !this.entity.group.id) {
+        return false;
+      }
+
+      console.log('entity', this.entity);
+      const g = this.memberships.find(m => m.group._id === this.entity.group.id);
+      if (g && g.role === 'admin') {
+        return true;
+      }
+      return false;
+    },
+  },
   async created() {
     const { id } = this.$route.params;
     const s = await api.get(`/surveys/${id}`);
@@ -67,6 +96,9 @@ export default {
 
     const i = await api.get(`/surveys/info?id=${id}`);
     this.surveyInfo = i.data;
+
+    const user = this.$store.getters['auth/user'];
+    this.$store.dispatch('memberships/getUserMemberships', user._id);
   },
 
 };
