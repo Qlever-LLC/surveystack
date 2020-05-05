@@ -1,6 +1,6 @@
 
 <template>
-  <div>
+  <div style="height: 100%;">
     <app-draft-component
       v-if="!loading"
       :survey="survey"

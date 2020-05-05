@@ -13,6 +13,8 @@ module.exports = {
   ],
   devServer: {
     port: process.env.VUE_APP_DEV_SERVER_PORT || 8080,
+    disableHostCheck: true,
+    compress: true,
     headers: {
       'Access-Control-Allow-Origin': '*',
     },
