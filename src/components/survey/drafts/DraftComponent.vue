@@ -53,8 +53,8 @@
               <v-row
                 justify="center"
                 align="center"
-                class="px-2"
-                style="height: 100%; margin-left: 0px; margin-right: 0px; max-height: calc(100vh - 68px - 56px - 56px);"
+                class="mb-5 mx-0"
+                style="height: 100%; max-height: calc(100vh - 68px - 56px - 56px); overflow: auto;"
               >
                 <component
                   v-if="control && !atEnd"
@@ -104,7 +104,7 @@
     </v-navigation-drawer>
 
     <draft-footer
-      class="px-4"
+      class="px-4 grey lighten-5"
       id="footer-container"
       :showPrev="!atStart"
       :enableNext="mShowNext && controls.length > 0"
@@ -510,6 +510,7 @@ export default {
 }
 
 #footer-container {
+  /* background-color: white; */
   width: 100%;
   border-top: 1px solid #eee;
   height: 68px;
@@ -572,6 +573,7 @@ export default {
 #draft-body {
   will-change: transform;
   max-height: 100%;
+  width: 100%;
   overflow: auto;
   grid-column: 1;
   grid-row: 3;

@@ -1,8 +1,8 @@
 <template>
   <div>
     <survey-builder
-      :key="sessionId"
       v-if="!loading"
+      :key="sessionId"
       :survey="survey"
       :editMode="editMode"
       :freshImport="freshImport"
@@ -13,12 +13,16 @@
       @import-survey="importSurvey"
       @export-survey="exportSurvey"
     />
-    <div v-else>
+    <div
+      v-else
+      class="d-flex align-center justify-center"
+      style="height: 100%"
+    >
       <v-progress-circular
         :size="50"
         color="primary"
         indeterminate
-      ></v-progress-circular>
+      />
     </div>
 
     <app-dialog

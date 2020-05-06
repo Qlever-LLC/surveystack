@@ -8,7 +8,17 @@
       @persist="persist"
       @submit="submit"
     />
-    <div v-else>LOADING...</div>
+    <div
+      v-else
+      class="d-flex align-center justify-center"
+      style="height: 100%"
+    >
+      <v-progress-circular
+        :size="50"
+        color="primary"
+        indeterminate
+      />
+    </div>
     <v-dialog
       v-model="submitting"
       hide-overlay

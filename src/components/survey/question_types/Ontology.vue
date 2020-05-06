@@ -1,80 +1,78 @@
 <template>
-  <v-container fluid>
-    <v-row>
-      <v-autocomplete
-        :value="value"
-        @change="onChange"
-        :items="items"
-        item-text="label"
-        item-value="value"
-        outlined
-        :chips="!!control.options.hasMultipleSelections"
-        :label="control.label"
-        :multiple="!!control.options.hasMultipleSelections"
-        :menu-props="autocompleteMenuProps"
-        v-if="sourceIsValid && !control.options.allowCustomSelection"
-      >
-        <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
-          <v-chip
-            v-bind="data.attrs"
-            :input-value="data.selected"
-            close
-            @click="data.select"
-            @click:close="remove(data.item)"
-          >
-            {{ data.item.label }}
-          </v-chip>
-        </template>
-        <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
-          <v-list-item-content>
-            <v-list-item-title v-html="data.item.label" />
-            <!-- <v-list-item-subtitle v-html="data.item.group"></v-list-item-subtitle> -->
-          </v-list-item-content>
-        </template>
-      </v-autocomplete>
-      <v-combobox
-        :value="value"
-        @change="onChange"
-        :items="items"
-        item-text="label"
-        item-value="value"
-        outlined
-        :delimiters="[',']"
-        :return-object="false"
-        :chips="!!control.options.hasMultipleSelections"
-        :label="control.label"
-        :multiple="!!control.options.hasMultipleSelections"
-        :menu-props="autocompleteMenuProps"
-        v-else-if="sourceIsValid && control.options.allowCustomSelection"
-      >
-        <template v-slot:selection="data">
-          <v-chip
-            v-bind="data.attrs"
-            :input-value="data.selected"
-            close
-            @click="data.select"
-            @click:close="removeValue(data.item); info(data)"
-            v-if="!!control.options.hasMultipleSelections"
-          >
-            {{ getLabelForItemValue(data.item) }}
-          </v-chip>
-          <div v-else>
-            {{ getLabelForItemValue(data.item) }}
-          </div>
-        </template>
-        <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
-          <v-list-item-content>
-            <v-list-item-title v-html="data.item.label" />
-            <!-- <v-list-item-subtitle v-html="data.item.group"></v-list-item-subtitle> -->
-          </v-list-item-content>
-        </template>
-      </v-combobox>
-      <div v-else>
-        Invalid Select Options, please update Suvey Definition
-      </div>
-    </v-row>
+  <div>
+    <v-autocomplete
+      :value="value"
+      @change="onChange"
+      :items="items"
+      item-text="label"
+      item-value="value"
+      outlined
+      :chips="!!control.options.hasMultipleSelections"
+      :label="control.label"
+      :multiple="!!control.options.hasMultipleSelections"
+      :menu-props="autocompleteMenuProps"
+      v-if="sourceIsValid && !control.options.allowCustomSelection"
+    >
+      <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
+        <v-chip
+          v-bind="data.attrs"
+          :input-value="data.selected"
+          close
+          @click="data.select"
+          @click:close="remove(data.item)"
+        >
+          {{ data.item.label }}
+        </v-chip>
+      </template>
+      <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
+        <v-list-item-content>
+          <v-list-item-title v-html="data.item.label" />
+          <!-- <v-list-item-subtitle v-html="data.item.group"></v-list-item-subtitle> -->
+        </v-list-item-content>
+      </template>
+    </v-autocomplete>
+    <v-combobox
+      :value="value"
+      @change="onChange"
+      :items="items"
+      item-text="label"
+      item-value="value"
+      outlined
+      :delimiters="[',']"
+      :return-object="false"
+      :chips="!!control.options.hasMultipleSelections"
+      :label="control.label"
+      :multiple="!!control.options.hasMultipleSelections"
+      :menu-props="autocompleteMenuProps"
+      v-else-if="sourceIsValid && control.options.allowCustomSelection"
+    >
+      <template v-slot:selection="data">
+        <v-chip
+          v-bind="data.attrs"
+          :input-value="data.selected"
+          close
+          @click="data.select"
+          @click:close="removeValue(data.item); info(data)"
+          v-if="!!control.options.hasMultipleSelections"
+        >
+          {{ getLabelForItemValue(data.item) }}
+        </v-chip>
+        <div v-else>
+          {{ getLabelForItemValue(data.item) }}
+        </div>
+      </template>
+      <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
+        <v-list-item-content>
+          <v-list-item-title v-html="data.item.label" />
+          <!-- <v-list-item-subtitle v-html="data.item.group"></v-list-item-subtitle> -->
+        </v-list-item-content>
+      </template>
+    </v-combobox>
+    <div v-else>
+      Invalid Select Options, please update Suvey Definition
+    </div>
     <p class="mt-2">{{ control.hint }}</p>
-  </v-container>
+  </div>
 </template>
 
 <script>
