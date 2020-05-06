@@ -294,7 +294,7 @@ const getSurveyInfo = async (req, res) => {
 const createSurvey = async (req, res) => {
   const entity = await sanitize(req.body);
   // apply creator (endpoint already has assertAuthenticated, so auth.user._id must exist)
-  entity.creator = res.locals.auth.user._id;
+  entity.meta.creator = res.locals.auth.user._id;
 
   try {
     let r = await db.collection(col).insertOne(entity);
@@ -310,15 +310,15 @@ const createSurvey = async (req, res) => {
 };
 
 const isUserAllowedToModifySurvey = async (survey, user) => {
-  if (!survey.group && !survey.creator) {
+  if (!survey.meta.group && !survey.meta.creator) {
     return true; // no user and no group => free for all!
   }
 
-  if (survey.creator.equals(user)) {
+  if (survey.meta.creator.equals(user)) {
     return true; // user may delete their own surveys
   }
 
-  const hasAdminRole = await rolesService.hasAdminRole(user, survey.group.id);
+  const hasAdminRole = await rolesService.hasAdminRole(user, survey.meta.group.id);
   if (hasAdminRole) {
     return true; // group admins may delete surveys
   }
