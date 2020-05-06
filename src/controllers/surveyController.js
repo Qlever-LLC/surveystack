@@ -117,24 +117,24 @@ const buildPipelineForGetSurveyPage = ({ q, groups, projections, creator, skip, 
   // skip
   if (skip) {
     try {
-      const querySkip = Number.parseInt(skip);
-      if (querySkip > 0) {
-        parsedSkip = querySkip;
+      const n = Number.parseInt(skip);
+      if (n > 0) {
+        parsedSkip = n;
       }
     } catch (error) {
-      throw boom.badRequest(`Bad query paramter skip: ${parsedSkip}`);
+      throw boom.badRequest(`Bad query paramter skip: ${skip}`);
     }
   }
 
   // limit
   if (limit) {
     try {
-      const queryLimit = Number.parseInt(limit);
-      if (queryLimit > 0) {
-        parsedLimit = queryLimit;
+      const n = Number.parseInt(limit);
+      if (n > 0) {
+        parsedLimit = n;
       }
     } catch (error) {
-      throw boom.badRequest(`Bad query paramter limit: ${parsedLimit}`);
+      throw boom.badRequest(`Bad query paramter limit: ${limit}`);
     }
   }
 
@@ -195,35 +195,35 @@ const getSurveyListPage = async (req, res) => {
   const query = {
     ...req.query,
     projections: [
-      ...(req.query.projections || []), 
-      'name', 
-      '_id', 
-      'dateModified', 
-      'latestVersion', 
+      ...(req.query.projections || []),
+      'name',
+      '_id',
+      'dateModified',
+      'latestVersion',
       'group',
     ],
   };
   const pipeline = buildPipelineForGetSurveyPage(query);
 
-  const entities = await db
+  const [entities] = await db
     .collection(col)
     .aggregate(pipeline)
     .toArray();
 
   // empty array when ther is no match
   // however, we still want content and pagination properties
-  if (!entities[0]) {
-    entities[0] = {
+  if (!entities) {
+    return res.send({
       content: [],
       pagination: {
         total: 0,
         skip: req.query.skip || 0,
         limit: req.query.limit || DEFAULT_LIMIT,
       },
-    };
+    });
   }
 
-  return res.send(entities[0]);
+  return res.send(entities);
 };
 
 const getSurvey = async (req, res) => {
