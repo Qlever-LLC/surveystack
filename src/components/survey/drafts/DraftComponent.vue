@@ -25,7 +25,7 @@
       v-if="submission && survey"
     >
       <draft-toolbar
-        :required="control.options.required"
+        :required="control && control.options && control.options.required"
         :showOverview="showOverview"
         :showOverviewIcon="!atEnd"
         :questionNumber="questionNumber"
@@ -54,11 +54,11 @@
                 justify="center"
                 align="center"
                 class="mb-5 mx-0"
-                style="height: 100%; max-height: calc(100vh - 68px - 56px - 56px); overflow: auto;"
+                style="height: 100%; max-height: calc(100vh - 68px - 56px - 56px - 50px); overflow: auto;"
               >
                 <component
                   v-if="control && !atEnd"
-                  class="tall"
+                  class="draft-control"
                   :key="'question_'+index"
                   :is="componentName"
                   :control="control"
@@ -500,6 +500,11 @@ export default {
 </script>
 
 <style scoped>
+.draft-control {
+  height: calc(100% - 68px);
+  width: 100%;
+}
+
 #relative-wrapper {
   max-width: 100%;
   height: 100%;

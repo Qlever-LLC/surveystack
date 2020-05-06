@@ -5,7 +5,7 @@
         <div
           v-if="control.options.source"
           v-html="control.options.source"
-          class="instr"
+          class="instructions"
         />
         <p class="mt-4">{{ control.hint }}</p>
       </v-col>

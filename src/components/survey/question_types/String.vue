@@ -1,5 +1,6 @@
 <template>
   <v-container fluid>
+    <p>{{ control.hint }}</p>
     <v-text-field
       outlined
       autofocus
@@ -7,8 +8,7 @@
       v-bind:value="value"
       v-on:input="onInput"
       @keyup.enter.prevent="submit"
-    ></v-text-field>
-    <p>{{ control.hint }}</p>
+    />
   </v-container>
 </template>
 

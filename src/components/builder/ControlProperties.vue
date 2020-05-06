@@ -410,7 +410,7 @@ export default {
     'control.name': {
       handler(newVal, oldVal) {
         const key = convertToKey(newVal);
-        console.log(`setting control.name to "${key}"`);
+        // console.log(`setting control.name to "${key}"`);
         this.control.name = key;
       },
     },

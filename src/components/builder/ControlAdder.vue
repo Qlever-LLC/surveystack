@@ -81,7 +81,6 @@ export default {
   },
   methods: {
     addControl(control) {
-      console.log(control);
       this.sequence += 1;
       const currentSequence = this.sequence;
 

@@ -1,5 +1,6 @@
 <template>
-  <div fluid>
+  <div>
+    <p class="mb-4">{{ control.hint }}</p>
     <v-list v-if="sourceIsValid" style="overflow: auto;">
       <div class="ml-3">
         <v-label class="ml-3">{{control.label}}</v-label>
@@ -59,7 +60,6 @@
     <div v-else>
       Invalid Select Options, please update Suvey Definition
     </div>
-    <p class="mt-4">{{ control.hint }}</p>
   </div>
 </template>
 

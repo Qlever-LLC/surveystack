@@ -1,121 +1,123 @@
 <template>
-  <div id="map-root">
-    <v-card
-      id="map-header"
-      dark
-      color="gray"
-      class="body-1 font-weight-n pa-2 px-4 mt-0"
-      style="width: 100%"
-    > {{ control.label }}</v-card>
+  <div>
+    <div id="map-root" :class="{'shorter-map': !!control.hint }">
+      <v-card
+        id="map-header"
+        dark
+        color="gray"
+        class="body-1 font-weight-n pa-2 px-4 mt-0"
+        style="width: 100%"
+      > {{ control.label }}</v-card>
 
-    <div
-      id="map-container"
-      class="my-2"
-      v-if="!mapError"
-    >
-      <div id="gps-info">
-        <app-gps
-          :expanded="false"
-          :location="currentLocation.location"
-        >{{ currentLocation.label }}</app-gps>
-      </div>
       <div
-        style="background-color: #000"
-        :id="`map-question-${index}`"
-        class="map-question"
+        id="map-container"
+        class="my-2"
         v-if="!mapError"
       >
-
-        <img
-          v-if="!this.value"
-          id="map-marker"
-          src="@/assets/marker.svg"
-          alt="marker"
-        />
-      </div>
-    </div>
-
-    <div
-      id="map-error-alert"
-      class="my-4"
-      v-else
-    >
-
-      <v-alert
-        type="info"
-        border="right"
-        prominent
-      >
-        Error loading map. Unable to load map. Using GPS coordinates.
-      </v-alert>
-
-      <div>
-        <app-gps
-          :expanded="true"
-          :location="currentLocation.location"
-        >{{ currentLocation.label }}</app-gps>
-      </div>
-
-    </div>
-
-    <v-container
-      id="map-footer"
-      class="infos grey--text text--darken-2 text-center"
-      fluid
-    >
-      <template v-if="!location">
-        <v-btn
-          large
-          class="mx-4 full"
-          outlined
-          color="blue"
-          @click="skip"
-        >Skip</v-btn>
-        <v-btn
-          large
-          :disabled="disablePick"
-          :dark="!disablePick"
-          class="mx-4 full"
-          color="blue"
-          @click="pickLocation"
-        >Pick</v-btn>
-      </template>
-
-      <template v-else>
-        <v-btn
-          large
-          class="mx-4 full"
-          outlined
-          color="indigo"
-          @click="retake"
-        >Retake</v-btn>
-      </template>
-      <v-container v-if="!gps">
-        <v-row
-          class="fill-height"
-          align-content="center"
-          justify="center"
+        <div id="gps-info">
+          <app-gps
+            :expanded="false"
+            :location="currentLocation.location"
+          >{{ currentLocation.label }}</app-gps>
+        </div>
+        <div
+          style="background-color: #000"
+          :id="`map-question-${index}`"
+          class="map-question"
+          v-if="!mapError"
         >
-          <v-col
-            class="subtitle-1 text-center"
-            cols="12"
+
+          <img
+            v-if="!this.value"
+            id="map-marker"
+            src="@/assets/marker.svg"
+            alt="marker"
+          />
+        </div>
+      </div>
+
+      <div
+        id="map-error-alert"
+        class="my-4"
+        v-else
+      >
+
+        <v-alert
+          type="info"
+          border="right"
+          prominent
+        >
+          Error loading map. Unable to load map. Using GPS coordinates.
+        </v-alert>
+
+        <div>
+          <app-gps
+            :expanded="true"
+            :location="currentLocation.location"
+          >{{ currentLocation.label }}</app-gps>
+        </div>
+
+      </div>
+
+      <v-container
+        id="map-footer"
+        class="infos grey--text text--darken-2 text-center"
+        fluid
+      >
+        <template v-if="!location">
+          <v-btn
+            large
+            class="mx-4 full"
+            outlined
+            color="blue"
+            @click="skip"
+          >Skip</v-btn>
+          <v-btn
+            large
+            :disabled="disablePick"
+            :dark="!disablePick"
+            class="mx-4 full"
+            color="blue"
+            @click="pickLocation"
+          >Pick</v-btn>
+        </template>
+
+        <template v-else>
+          <v-btn
+            large
+            class="mx-4 full"
+            outlined
+            color="indigo"
+            @click="retake"
+          >Retake</v-btn>
+        </template>
+        <v-container v-if="!gps">
+          <v-row
+            class="fill-height"
+            align-content="center"
+            justify="center"
           >
-            Getting GPS Coordinates
-          </v-col>
-          <v-col cols="6">
-            <v-progress-linear
-              color="red accent-4"
-              indeterminate
-              rounded
-              height="6"
-            ></v-progress-linear>
-          </v-col>
-        </v-row>
+            <v-col
+              class="subtitle-1 text-center"
+              cols="12"
+            >
+              Getting GPS Coordinates
+            </v-col>
+            <v-col cols="6">
+              <v-progress-linear
+                color="red accent-4"
+                indeterminate
+                rounded
+                height="6"
+              ></v-progress-linear>
+            </v-col>
+          </v-row>
+        </v-container>
+
       </v-container>
       <p v-if="control.hint" class="mt-4 mb-0">{{ control.hint }}</p>
 
-    </v-container>
-
+    </div>
   </div>
 </template>
 <script>
@@ -321,6 +323,11 @@ export default {
   width: 100%;
 }
 
+
+#map-root.shorter-map  {
+  height: 90%;
+}
+
 #map-header {
   grid-column: 1;
   grid-row: 1;
@@ -344,6 +351,8 @@ export default {
   overflow: auto;
   max-height: 100%;
 }
+
+
 #map-errpr-alert {
   position: relative;
   grid-column: 1;
@@ -364,9 +373,10 @@ export default {
   position: absolute;
   width: 100%;
   padding: 0px;
-  min-height: 100%;
+  /* min-height: 100%; */
   height: 100%;
 }
+
 
 #map-marker {
   position: absolute;

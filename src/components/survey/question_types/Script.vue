@@ -1,27 +1,40 @@
 <template>
   <div class="question question-script">
-    <iframe
-      src=""
-      frameborder="0"
-      ref="iframe"
-      sandbox="allow-scripts"
-    />
-    <v-btn
-      @click="requestRunScript"
-      class="full run-button"
-      depressed
-      large
-      color="primary"
-    >
-      Run Script
-    </v-btn>
-    <p class="status">
-      status: {{ meta && meta.status }}
-      <br/>
-      status message: {{ meta && meta.statusMessage }}
-    </p>
+    <p class="mb-4">{{ control.hint }}</p>
+    <div v-if="this.source">
+      <iframe
+        src=""
+        frameborder="0"
+        ref="iframe"
+        sandbox="allow-scripts"
+      />
+      <v-btn
+        @click="requestRunScript"
+        class="full run-button"
+        depressed
+        large
+        color="primary"
+      >
+        Run Script
+      </v-btn>
+      <p class="status">
+        status: {{ meta && meta.status }}
+        <br/>
+        status message: {{ meta && meta.statusMessage }}
+      </p>
+    </div>
+    <div v-else-if="isLoading" class="d-flex align-center justify-center">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        class="ma-5"
+      />
+    </div>
+    <div v-else-if="loadingSourceFailed" class="text-center">
+      <v-icon color="red">mdi-close-thick</v-icon>
+      There was an error loading the script.
+    </div>
 
-    <p class="mt-4">{{ control.hint }}</p>
   </div>
 </template>
 
@@ -54,6 +67,8 @@ export default {
     return {
       source: null,
       messageEventListeners: [],
+      isLoading: false,
+      loadingSourceFailed: false,
     };
   },
   methods: {
@@ -134,8 +149,16 @@ export default {
     },
   },
   async mounted() {
-    await this.fetchScriptSource();
-    this.initializeIframe();
+    try {
+      this.isLoading = true;
+      await this.fetchScriptSource();
+      this.initializeIframe();
+      this.isLoading = false;
+    } catch (err) {
+      console.log('Could not get script source', err);
+      this.isLoading = false;
+      this.loadingSourceFailed = true;
+    }
   },
   destroyed() {
     this.messageEventListeners.forEach(handler => window.removeEventListener('message', handler));

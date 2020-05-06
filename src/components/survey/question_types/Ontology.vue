@@ -1,5 +1,6 @@
 <template>
   <div>
+    <p class="mb-2">{{ control.hint }}</p>
     <v-autocomplete
       :value="value"
       @change="onChange"
@@ -71,7 +72,6 @@
     <div v-else>
       Invalid Select Options, please update Suvey Definition
     </div>
-    <p class="mt-2">{{ control.hint }}</p>
   </div>
 </template>
 
@@ -110,8 +110,8 @@ export default {
   },
   computed: {
     items() {
-      const { content } = this.resources.find(resource => resource.id === this.control.options.source);
-      return content || [];
+      const resource = this.resources.find(r => r.id === this.control.options.source);
+      return (resource && resource.content) || [];
     },
     sourceIsValid() {
       return this.items
