@@ -73,16 +73,16 @@ export default {
       }
       const user = this.$store.getters['auth/user'];
 
-      if (this.entity.creator === user._id) {
+      if (this.entity.meta.creator === user._id) {
         return true;
       }
 
-      if (!this.entity.group || !this.entity.group.id) {
+      if (!this.entity.meta.group || !this.entity.meta.group.id) {
         return false;
       }
 
       console.log('entity', this.entity);
-      const g = this.memberships.find(m => m.group._id === this.entity.group.id);
+      const g = this.memberships.find(m => m.group._id === this.entity.meta.group.id);
       if (g && g.role === 'admin') {
         return true;
       }

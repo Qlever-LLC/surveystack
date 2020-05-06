@@ -54,7 +54,10 @@
         </v-list>
       </v-menu> -->
     </v-tabs>
-    <v-card class="my-2" v-if="activeTab === 'active-group'">
+    <v-card
+      class="my-2"
+      v-if="activeTab === 'active-group'"
+    >
       <v-card-text>
         <div
           v-for="(e, i) in pinnedSurveys"
@@ -67,11 +70,14 @@
             <v-list-item-content>
               <div>
                 <v-list-item-title>{{e.name}}</v-list-item-title>
-                <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle>
-                <v-list-item-subtitle v-if="e.group && e.group.id">
-                  {{ getGroupName(e.group.id) }}
+                <!-- <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle> -->
+                <v-list-item-subtitle v-if="e.meta.group && e.meta.group.id">
+                  {{ getGroupName(e.meta.group.id) }}
                 </v-list-item-subtitle>
-                <small v-if="e.latestVersion" class="grey--text">Survey Version {{e.latestVersion}}</small>
+                <small
+                  v-if="e.latestVersion"
+                  class="grey--text"
+                >Survey Version {{e.latestVersion}}</small>
               </div>
             </v-list-item-content>
 
@@ -89,7 +95,6 @@
       </v-card-title>
       <v-card-text class="flex-grow-1">
 
-
         <div
           v-for="(e, i) in surveys.content"
           :key="e._id"
@@ -101,11 +106,14 @@
             <v-list-item-content>
               <div>
                 <v-list-item-title>{{e.name}}</v-list-item-title>
-                <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle>
-                <v-list-item-subtitle v-if="e.group && e.group.id">
-                  {{ getGroupName(e.group.id) }}
+                <!-- <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle> -->
+                <v-list-item-subtitle v-if="e.meta.group && e.meta.group.id">
+                  {{ getGroupName(e.meta.group.id) }}
                 </v-list-item-subtitle>
-                <small v-if="e.latestVersion" class="grey--text">Survey Version {{e.latestVersion}}</small>
+                <small
+                  v-if="e.latestVersion"
+                  class="grey--text"
+                >Survey Version {{e.latestVersion}}</small>
               </div>
             </v-list-item-content>
 

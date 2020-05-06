@@ -170,7 +170,7 @@ export default {
       this.$router.back();
     },
     async searchSurveys(q) {
-      const { data: searchResults } = await api.get(`/surveys?projections[]=name&projections[]=dateModified&q=${q}`);
+      const { data: searchResults } = await api.get(`/surveys?projections[]=name&projections[]=meta.dateModified&q=${q}`);
       this.searchResults = searchResults;
     },
     filterMembers(entities, q) {

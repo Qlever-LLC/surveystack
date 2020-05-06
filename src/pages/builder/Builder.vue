@@ -303,8 +303,7 @@ export default {
       ({ name }) => name === 'surveys-new',
     );
 
-    this.survey._id = ObjectId();
-    this.survey.dateCreated = moment().toISOString(true);
+    this.survey._id = new ObjectId();
 
     if (this.editMode) {
       this.loading = true;
