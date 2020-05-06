@@ -71,7 +71,7 @@ const createPinnedSurveysPopulationStages = () => {
           },
           { $sort: { sort: 1 } },
           { $addFields: { sort: '$$REMOVE' } },
-          { $project: { name: 1, dateModified: 1 } },
+          { $project: { name: 1, latestVersion: 1, meta: 1 } },
         ],
         as: 'surveys.pinnedDetails',
       },

@@ -12,26 +12,27 @@ const DEFAULT_LIMIT = 20;
 
 const sanitize = async (entity) => {
   entity._id = new ObjectId(entity._id);
-  entity.dateCreated = new Date(entity.dateCreated);
-  entity.dateModified = new Date(entity.dateModified);
-  if (entity.creator) {
-    entity.creator = new ObjectId(entity.creator);
-  }
+
   entity.revisions.forEach((version) => {
     version.dateCreated = new Date(entity.dateCreated);
   });
 
-  if (entity.group.id) {
-    entity.group.id = new ObjectId(entity.group.id);
-  }
+  if (entity.meta) {
+    entity.meta.dateCreated = new Date(entity.meta.dateCreated);
+    entity.meta.dateModified = new Date(entity.meta.dateModified);
 
-  if (entity.group) {
-    if (entity.group.id) {
-      const _id = new ObjectId(entity.group.id);
-      entity.group.id = _id;
-      const group = await db.collection('groups').findOne({ _id });
-      if (group) {
-        entity.group.path = group.path;
+    if (entity.meta.creator) {
+      entity.meta.creator = new ObjectId(entity.meta.creator);
+    }
+
+    if (entity.meta.group) {
+      if (entity.meta.group.id) {
+        const _id = new ObjectId(entity.meta.group.id);
+        entity.meta.group.id = _id;
+        const group = await db.collection('groups').findOne({ _id });
+        if (group) {
+          entity.meta.group.path = group.path;
+        }
       }
     }
   }
@@ -83,13 +84,13 @@ const buildPipelineForGetSurveyPage = ({ q, groups, projections, creator, skip, 
   }
 
   if (groups && Array.isArray(groups) && groups.length > 0) {
-    match['group.id'] = {
+    match['meta.group.id'] = {
       $in: groups.map((item) => new ObjectId(item)),
     };
   }
 
   if (creator) {
-    match.creator = ObjectId(creator);
+    match['meta.creator'] = new ObjectId(creator);
   }
 
   const pipeline = [
@@ -196,11 +197,12 @@ const getSurveyListPage = async (req, res) => {
     ...req.query,
     projections: [
       ...(req.query.projections || []),
-      'name',
       '_id',
-      'dateModified',
+      'name',
       'latestVersion',
-      'group',
+      'meta.dateModified',
+      'meta.group',
+      'meta.creator',
     ],
   };
   const pipeline = buildPipelineForGetSurveyPage(query);
@@ -252,7 +254,7 @@ const getSurveyInfo = async (req, res) => {
     .collection('surveys')
     .findOne(
       { _id: new ObjectId(id) },
-      { projection: { name: 1, dateModified: 1, dateCreated: 1, latestVersion: 1 } }
+      { projection: { name: 1, latestVersion: 1, 'meta.dateModified': 1, 'meta.dateCreated': 1 } }
     );
 
   const submissions = await db
