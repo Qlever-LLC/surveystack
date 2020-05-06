@@ -357,7 +357,7 @@ export default {
       this.$set(this.survey, 'revisions', cloneDeep(this.initialSurvey.revisions));
 
       this.survey.revisions.push(nextVersionObj);
-      this.survey.dateModified = date;
+      this.survey.meta.dateModified = date;
     },
     initNavbarAndDirtyFlag(survey) {
       if (!survey.revisions) {
@@ -751,7 +751,7 @@ export default {
         const resourcesAreEqual = isEqual(this.initialSurvey.resources, newVal.resources);
         const revisionsAreEqual = isEqual(this.initialSurvey.revisions, newVal.revisions);
         const surveyDetailsAreEquivalent = (this.initialSurvey.name === newVal.name)
-          && isEqual(this.initialSurvey.group, newVal.group)
+          && isEqual(this.initialSurvey.meta.group, newVal.meta.group)
           && (this.initialSurvey.description === newVal.description);
         this.surveyUnchanged = revisionsAreEqual
           && surveyDetailsAreEquivalent

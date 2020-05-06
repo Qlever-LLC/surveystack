@@ -860,12 +860,14 @@ export function createSurvey({
   return {
     _id: '',
     name: '',
-    dateCreated: currentDate,
-    dateModified: currentDate,
     latestVersion: 1,
-    creator,
-    group,
-    specVersion,
+    meta: {
+      dateCreated: currentDate,
+      dateModified: currentDate,
+      creator,
+      group,
+      specVersion,
+    },
     resources: [],
     revisions: [{
       dateCreated: currentDate,
