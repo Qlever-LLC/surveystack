@@ -87,7 +87,7 @@ export default {
         this.result({ response });
       } catch (error) {
         console.log('Draft submit error:', error);
-        const { message } = error.response.data;
+        // const { message } = error.response.data;
         // this.snack(message); // does not exists here?
         this.result({ error });
       } finally {
@@ -103,15 +103,16 @@ export default {
     }));
     const { id } = this.$route.params;
 
-    this.submission = await this.$store.dispatch('submissions/fetchSubmission', id);
+    this.submission = await this.$store.dispatch('submissions/fetchLocalSubmission', id);
     // TODO: handle submission not found, set error on page
+    console.log('submission', this.submission);
 
     this.survey = await this.$store.dispatch(
       'surveys/fetchSurvey',
       this.submission.meta.survey.id,
     );
 
-    const positions = utils.getSurveyPositions(this.survey);
+    // const positions = utils.getSurveyPositions(this.survey);
 
     this.loading = false;
   },

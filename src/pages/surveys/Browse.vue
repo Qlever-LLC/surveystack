@@ -143,7 +143,7 @@
 import { uniqBy } from 'lodash';
 import api from '@/services/api.service';
 
-const PAGINATION_LIMIT = 5;
+const PAGINATION_LIMIT = 10;
 
 export default {
   data() {
@@ -231,6 +231,7 @@ export default {
     search() {
       this.fetchData();
     },
+    // TODO: reimplement with @change listener instead of watch
     async activeTab(value) {
       console.log(value);
       await this.getDataForTab(value);

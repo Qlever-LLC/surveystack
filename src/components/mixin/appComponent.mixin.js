@@ -11,9 +11,9 @@ export default {
     },
   },
   methods: {
-    fetchSubmission(draftId) {
-      this.$store.dispatch('submissions/getSubmission', draftId);
-    },
+    // fetchSubmission(draftId) {
+    //   this.$store.dispatch('submissions/getSubmission', draftId);
+    // },
     setNavbarContent({ title, subtitle }) {
       this.$store.dispatch('appui/setTitle', title);
       this.$store.dispatch('appui/setSubtitle', subtitle);

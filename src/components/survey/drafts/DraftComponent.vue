@@ -58,7 +58,7 @@
               >
                 <component
                   v-if="control && !atEnd"
-                  class="draft-control"
+                  class="draft-control d-flex align-center justify-center"
                   :key="'question_'+index"
                   :is="componentName"
                   :control="control"

@@ -1,4 +1,5 @@
 import * as db from '@/store/db';
+// import api from '@/services/api.service';
 
 import submissionUtils from '@/utils/submissions';
 
@@ -10,20 +11,23 @@ export const types = {
     SET_SUBMISSIONS: 'SET_SUBMISSIONS',
     ADD_SUBMISSION: 'ADD_SUBMISSION',
     REMOVE_SUBMISSION: 'REMOVE_SUBMISSION',
+    // SET_REMOTE_SUBMISSIONS: 'SET_REMOTE_SUBMISSIONS',
   },
   actions: {
     reset: 'reset',
     add: 'add',
     remove: 'remove',
-    fetchSubmission: 'fetchSubmission',
-    fetchSubmissions: 'fetchSubmissions',
+    fetchLocalSubmission: 'fetchLocalSubmission',
+    fetchLocalSubmissions: 'fetchLocalSubmissions',
     startDraft: 'startDraft',
+    // fetchRemoteSubmissions: 'fetchRemoteSubmissions',
   },
 };
 
 
 const createInitialState = () => ({
   submissions: [],
+  // remoteSubmissions: [],
 });
 
 const initialState = createInitialState();
@@ -31,7 +35,7 @@ const initialState = createInitialState();
 const getters = {
   drafts: state => state.submissions.filter(s => s),
   outbox: state => state.submissions.filter(s => s),
-  sent: state => state.submissions.filter(s => s),
+  // TODO should this search previously uploaded submissions
   getSubmission: state => id => state.submissions.find(submission => submission._id === id),
 };
 
@@ -49,13 +53,16 @@ const mutations = {
     const index = state.submissions.findIndex(submission => submission._id === id);
     state.submissions.splice(index, 1);
   },
+  // [types.mutations.SET_REMOTE_SUBMISSIONS](state, submissions) {
+  //   state.remoteSubmissions = submissions;
+  // },
 };
 
 const actions = {
   [types.actions.reset]({ commit }) {
     commit(types.mutations.RESET);
   },
-  async [types.actions.fetchSubmissions]({ commit }/* , userId */) {
+  async [types.actions.fetchLocalSubmissions]({ commit }/* , userId */) {
     // const response = await api.get('/submissions');
 
     // TODO reject if timeout here
@@ -75,10 +82,10 @@ const actions = {
   [types.actions.remove]({ commit }, id) {
     commit(types.mutations.REMOVE_SUBMISSION, id);
   },
-  async [types.actions.fetchSubmission]({ state, dispatch }, id) {
+  async [types.actions.fetchLocalSubmission]({ state, dispatch }, id) {
     const submissions = state.submissions.length > 0
       ? state.submissions
-      : await dispatch(types.actions.fetchSubmissions);
+      : await dispatch(types.actions.fetchLocalSubmissions);
     return submissions.find(submission => submission._id === id);
   },
   // Create a draft, store it in database and Vuex store, then navigate to draft
@@ -92,6 +99,8 @@ const actions = {
     dispatch(types.actions.add, submission);
     router.push({ name: 'submissions-drafts-detail', params: { id: submission._id } });
   },
+  // async [types.actions.fetchRemoteSubmissions]({ commit }, { userId }) {
+  // },
 
 };
 

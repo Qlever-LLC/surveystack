@@ -44,7 +44,6 @@ const actions = {
     commit(types.RESET);
   },
   async fetchSurveys({ commit }) {
-    console.log('fetching surveys');
     const response = await api.get('/surveys');
     commit(types.SET_SURVEYS, response.data);
     return response.data;
