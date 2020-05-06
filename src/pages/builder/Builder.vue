@@ -107,6 +107,7 @@ import SurveyBuilder from '@/components/builder/SurveyBuilder.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import resultMixin from '@/components/ui/ResultsMixin';
 
+
 import { createSurvey, updateControls } from '@/utils/surveys';
 
 export default {
@@ -309,6 +310,10 @@ export default {
       this.loading = true;
       await this.fetchData();
     }
+  },
+  beforeRouteLeave(to, from, next) {
+    console.log('builder');
+    next(true);
   },
 };
 </script>

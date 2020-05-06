@@ -199,6 +199,13 @@
       </pane>
 
     </splitpanes>
+
+    <confirm-leave-dialog
+      ref="confirmLeaveDialog"
+      title="Confirm Leave Survey"
+    >
+      Are you sure you want to leave this survey?
+    </confirm-leave-dialog>
   </div>
 </template>
 
@@ -208,8 +215,10 @@ import {
 } from 'lodash';
 import { Splitpanes, Pane } from 'splitpanes';
 
+
 import ObjectId from 'bson-objectid';
 import moment from 'moment';
+import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
 import codeEditor from '@/components/ui/CodeEditor.vue';
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
@@ -264,6 +273,7 @@ export default {
     draft,
     consoleLog,
     appCodeView,
+    ConfirmLeaveDialog,
     appExamplesView,
   },
   props: [
@@ -772,6 +782,16 @@ export default {
     this.initNavbarAndDirtyFlag(this.survey);
     this.createInstance();
   },
+
+  // TODO: get route guard to work here, or move dirty flag up to Builder.vue
+  // beforeRouteLeave(to, from, next) {
+  //   console.log('hello');
+  //   if (true) {
+  //     this.$refs.confirmLeaveDialog.open(next);
+  //     return;
+  //   }
+  //   next(true);
+  // },
 };
 </script>
 

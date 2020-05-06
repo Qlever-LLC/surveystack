@@ -43,6 +43,7 @@ export default {
   props: {
     title: {
       type: String,
+      default: 'Confirm Leave',
     },
     confirmText: {
       type: String,
