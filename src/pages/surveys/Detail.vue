@@ -73,7 +73,7 @@ export default {
       }
       const user = this.$store.getters['auth/user'];
 
-      if (this.entity.meta.creator === user._id) {
+      if (this.entity && this.entity.meta && this.entity.meta.creator === user._id) {
         return true;
       }
 

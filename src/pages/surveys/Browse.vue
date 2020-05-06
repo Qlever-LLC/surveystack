@@ -56,7 +56,7 @@
     </v-tabs>
     <v-card
       class="my-2"
-      v-if="activeTab === 'active-group'"
+      v-if="activeTab === 'active-group' && pinnedSurveys.length"
     >
       <v-card-text>
         <div
@@ -71,7 +71,7 @@
               <div>
                 <v-list-item-title>{{e.name}}</v-list-item-title>
                 <!-- <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle> -->
-                <v-list-item-subtitle v-if="e.meta.group && e.meta.group.id">
+                <v-list-item-subtitle v-if="e.meta && e.meta.group && e.meta.group.id">
                   {{ getGroupName(e.meta.group.id) }}
                 </v-list-item-subtitle>
                 <small
@@ -107,7 +107,7 @@
               <div>
                 <v-list-item-title>{{e.name}}</v-list-item-title>
                 <!-- <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle> -->
-                <v-list-item-subtitle v-if="e.meta.group && e.meta.group.id">
+                <v-list-item-subtitle v-if="e.meta && e.meta.group && e.meta.group.id">
                   {{ getGroupName(e.meta.group.id) }}
                 </v-list-item-subtitle>
                 <small

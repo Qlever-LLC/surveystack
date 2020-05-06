@@ -19,6 +19,14 @@
         indeterminate
       />
     </div>
+
+    <confirm-leave-dialog
+      ref="confirmLeaveDialog"
+      title="Confirm Exit Draft"
+    >
+      Are you sure you want to exit this draft?
+    </confirm-leave-dialog>
+
     <v-dialog
       v-model="submitting"
       hide-overlay
@@ -58,6 +66,7 @@ import resultMixin from '@/components/ui/ResultsMixin';
 
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
+import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
 
 
 export default {
@@ -65,6 +74,7 @@ export default {
   components: {
     appDraftComponent,
     resultDialog,
+    ConfirmLeaveDialog,
   },
   data() {
     return {
@@ -72,6 +82,7 @@ export default {
       survey: null,
       loading: false,
       submitting: false,
+      isSubmitted: false,
     };
   },
   methods: {
@@ -81,10 +92,11 @@ export default {
     async submit({ payload }) {
       this.submitting = true;
       try {
-        console.log('submitting', payload);
+        // console.log('submitting', payload);
         const response = await api.post('/submissions', payload);
-        // this.$router.push(`/surveys/${this.survey._id}`);
         this.result({ response });
+        this.isSubmitted = true;
+        // this.$router.push(`/surveys/${this.survey._id}`);
       } catch (error) {
         console.log('Draft submit error:', error);
         // const { message } = error.response.data;
@@ -116,5 +128,13 @@ export default {
 
     this.loading = false;
   },
+  beforeRouteLeave(to, from, next) {
+    if (!this.isSubmitted) {
+      this.$refs.confirmLeaveDialog.open(next);
+      return;
+    }
+    next(true);
+  },
+
 };
 </script>
