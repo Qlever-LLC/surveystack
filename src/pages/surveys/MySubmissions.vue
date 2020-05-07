@@ -230,8 +230,6 @@ export default {
     async fetchRemoteSubmissions() {
       this.isLoading = true;
       try {
-        // const response = api.get(`/submissions/page?creator=${this.activeUser}`);
-        // debugger;
         const queryParams = new URLSearchParams();
         queryParams.append('creator', this.activeUser);
         queryParams.append('limit', PAGINATION_LIMIT);

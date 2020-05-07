@@ -44,7 +44,7 @@
           >
             <v-container
               id="draft-body"
-              style="max-width: 50rem; height: 100%;"
+              style="max-width: 50rem;"
             >
               <v-row
                 v-if="!atOverview"
@@ -54,11 +54,12 @@
                 justify="center"
                 align="center"
                 class="mb-5 mx-0"
-                style="height: 100%; max-height: calc(100vh - 68px - 56px - 56px - 50px); overflow: auto;"
+                style="height: 100%; max-height: calc(100vh - 68px - 56px - 56px - 60px); overflow: auto;"
               >
                 <component
                   v-if="control && !atEnd"
-                  class="draft-control d-flex align-center justify-center"
+                  style="width: 100%"
+                  class="draft-control d-flex flex-column align-center justify-center"
                   :key="'question_'+index"
                   :is="componentName"
                   :control="control"
@@ -374,7 +375,7 @@ export default {
       }
     },
     async handlePrevious() {
-      console.log('handlePrevious()');
+      // console.log('handlePrevious()');
       await this.calculateRelevance();
 
       this.slide = 'slide-out';
