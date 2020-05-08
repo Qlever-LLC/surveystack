@@ -44,7 +44,7 @@
           >
             <v-container
               id="draft-body"
-              style="max-width: 50rem; height: 100%;"
+              style="max-width: 50rem;"
             >
               <v-row
                 v-if="!atOverview"
@@ -54,11 +54,12 @@
                 justify="center"
                 align="center"
                 class="mb-5 mx-0"
-                style="height: 100%; max-height: calc(100vh - 68px - 56px - 56px - 50px); overflow: auto;"
+                style="height: 100%; max-height: calc(100vh - 68px - 56px - 56px - 60px); overflow: auto;"
               >
                 <component
                   v-if="control && !atEnd"
-                  class="draft-control d-flex align-center justify-center"
+                  style="width: 100%"
+                  class="draft-control d-flex flex-column align-center justify-center"
                   :key="'question_'+index"
                   :is="componentName"
                   :control="control"
@@ -120,6 +121,13 @@
       :errors="apiComposeErrors"
       title="API Compose Errors"
     />
+
+    <confirm-submission-dialog
+      v-model="confirmSubmissionIsVisible"
+      :group="submission.meta.group.id"
+      @submit="() => submit(submission)"
+      @set-group="(val) => $set(submission.meta.group, 'id', val)"
+    />
   </div>
 </template>
 
@@ -133,6 +141,7 @@ import draftOverview from '@/components/survey/drafts/DraftOverview.vue';
 import draftFooter from '@/components/survey/drafts/DraftFooter.vue';
 import draftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 import draftTitle from '@/components/survey/drafts/DraftTitle.vue';
+import ConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 
 import errorDialog from '@/components/ui/Errors.vue';
 
@@ -166,6 +175,7 @@ export default {
     draftToolbar,
     draftTitle,
     errorDialog,
+    ConfirmSubmissionDialog,
   },
   data() {
     return {
@@ -178,6 +188,7 @@ export default {
       slide: 'slide-in',
       apiComposeErrors: [],
       showApiComposeErrors: false,
+      confirmSubmissionIsVisible: false,
     };
   },
   computed: {
@@ -336,7 +347,9 @@ export default {
             return;
           }
 
-          this.submit(this.submission);
+
+          this.confirmSubmissionIsVisible = true;
+          // this.submit(this.submission);
           return;
         }
 
@@ -374,7 +387,7 @@ export default {
       }
     },
     async handlePrevious() {
-      console.log('handlePrevious()');
+      // console.log('handlePrevious()');
       await this.calculateRelevance();
 
       this.slide = 'slide-out';

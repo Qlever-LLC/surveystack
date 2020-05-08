@@ -53,6 +53,7 @@
       />
 
       <v-dialog
+        v-if="deleteQuestionModalIsVisible"
         v-model="deleteQuestionModalIsVisible"
         max-width="290"
       >

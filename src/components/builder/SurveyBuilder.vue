@@ -200,12 +200,12 @@
 
     </splitpanes>
 
-    <confirm-leave-dialog
+    <!-- <confirm-leave-dialog
       ref="confirmLeaveDialog"
       title="Confirm Leave Survey"
     >
       Are you sure you want to leave this survey?
-    </confirm-leave-dialog>
+    </confirm-leave-dialog> -->
   </div>
 </template>
 
@@ -274,7 +274,7 @@ export default {
     draft,
     consoleLog,
     appCodeView,
-    ConfirmLeaveDialog,
+    // ConfirmLeaveDialog,
     appExamplesView,
   },
   props: [

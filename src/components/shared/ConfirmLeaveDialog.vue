@@ -12,21 +12,21 @@
         <slot/>
       </v-card-text>
       <v-card-actions>
-          <v-spacer />
-          <v-btn
-            text
-            @click.stop="handleAbort"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            text
-            color="primary"
-            @click.stop="handleConfirm"
-          >
-            {{ confirmText }}
-          </v-btn>
-        </v-card-actions>
+        <v-spacer />
+        <v-btn
+          text
+          @click.stop="handleAbort"
+        >
+          Cancel
+        </v-btn>
+        <v-btn
+          text
+          color="primary"
+          @click.stop="handleConfirm"
+        >
+          {{ confirmText }}
+        </v-btn>
+      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>

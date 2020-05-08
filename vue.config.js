@@ -18,18 +18,19 @@ module.exports = {
     headers: {
       'Access-Control-Allow-Origin': '*',
     },
-    proxy: {
-      '/api': {
-        target: `http://localhost:${process.env.VUE_APP_API_DEV_SERVER_PORT || 3000}/api`,
-        ws: true,
-        changeOrigin: true,
-      },
-      '/bucket': {
-        target: `http://localhost:${process.env.VUE_APP_API_DEV_SERVER_PORT || 3000}/api`,
-        ws: true,
-        changeOrigin: true,
-      },
-    },
+    // proxy: {
+    //   '^/api': {
+    //     target: 'http://localhost:3000/api',
+    //     ws: true,
+    //     // changeOrigin: true,
+    //   },
+    //   '^/bucket': {
+    //     target: 'http://localhost:3000/bucket',
+    //     ws: true,
+    //     // changeOrigin: true,
+    //   },
+    // },
+    proxy: `http://localhost:${process.env.VUE_APP_DEV_API_SERVER_PORT || 3000}`,
   },
   pwa: {
     name: 'Surveystack',

@@ -241,7 +241,6 @@ export default {
     },
     // TODO: reimplement with @change listener instead of watch
     async activeTab(value) {
-      console.log(value);
       await this.getDataForTab(value);
     },
     async activeGroupId(value) {
@@ -330,7 +329,6 @@ export default {
       return [];
     },
     async fetchPinnedSurveys(groupId) {
-      console.log('fetch pinned');
       try {
         const { data } = await api.get(`/groups/${groupId}?populate=1`);
         if (data && data.surveys && data.surveys.pinned && Array.isArray(data.surveys.pinned)) {
