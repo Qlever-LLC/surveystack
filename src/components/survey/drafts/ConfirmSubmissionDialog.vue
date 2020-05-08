@@ -8,7 +8,10 @@
       <v-card-title>
         Confirm Submission
       </v-card-title>
-      <v-card-text>
+      <v-card-text v-if="!currentGroupName">
+        Submit Survey
+      </v-card-text>
+      <v-card-text v-else>
         Submit this draft to
         <strong>{{ currentGroupName }}</strong>
         <div class="d-inline-flex align-end">
@@ -70,7 +73,7 @@ export default {
       type: Boolean,
     },
     group: {
-      required: true,
+      required: false,
       type: String,
     },
   },
@@ -82,6 +85,10 @@ export default {
       return this.$store.getters['memberships/groups'];
     },
     currentGroupName() {
+      if (!this.groups || this.groups.length === 0) {
+        return null;
+      }
+
       const { name } = this.groups.find(g => g._id === this.group);
       return name || this.group;
     },
@@ -108,5 +115,4 @@ export default {
 </script>
 
 <style>
-
 </style>
