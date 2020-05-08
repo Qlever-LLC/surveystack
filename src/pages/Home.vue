@@ -6,6 +6,14 @@
     >
       <v-flex xs12>
         <v-img
+          v-if="appPartner"
+          :src="appPartner.logo"
+          class="my-3"
+          contain
+          height="250"
+        ></v-img>
+        <v-img
+          v-else
           :src="require('../assets/surveystack_temp_logo.svg')"
           class="my-3"
           contain
@@ -66,6 +74,11 @@ export default {
   methods: {
     install() {
       this.installPrompt.prompt();
+    },
+  },
+  computed: {
+    appPartner() {
+      return this.$store.getters['appui/partner'];
     },
   },
   created() {

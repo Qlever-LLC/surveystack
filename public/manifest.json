@@ -1,0 +1,22 @@
+{
+    "short_name": "SurveyStack",
+    "name": "SurveyStack",
+    "description": "The Ultimate Survey Toolchain",
+    "icons": [
+      {
+        "src": "/img/icons/android-chrome-192x192.png",
+        "type": "image/png",
+        "sizes": "192x192"
+      },
+      {
+        "src": "/img/icons/android-chrome-256x256.png",
+        "type": "image/png",
+        "sizes": "256x256"
+      }
+    ],
+    "start_url": "/?source=pwa",
+    "background_color": "#FFF",
+    "display": "standalone",
+    "scope": "/",
+    "theme_color": "#FFF"
+  }

@@ -14,12 +14,16 @@
 <script>
 import appNavbar from '@/components/Navbar.vue';
 import appGlobalFeedback from '@/components/GlobalFeedback.vue';
+import domainHandler from '@/utils/domainHandler';
 
 export default {
   name: 'App',
   components: {
     appNavbar,
     appGlobalFeedback,
+  },
+  created() {
+    domainHandler.install(this);
   },
 };
 </script>

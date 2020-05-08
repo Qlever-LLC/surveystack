@@ -304,6 +304,7 @@ export default {
       ({ name }) => name === 'surveys-new',
     );
 
+
     this.survey._id = new ObjectId();
 
     if (this.editMode) {
@@ -312,7 +313,6 @@ export default {
     }
   },
   beforeRouteLeave(to, from, next) {
-    console.log('builder');
     next(true);
   },
 };

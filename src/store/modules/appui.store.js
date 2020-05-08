@@ -1,12 +1,14 @@
 const types = {
   SET_TITLE: 'SET_TITLE',
   SET_SUBTITLE: 'SET_SUBTITLE',
+  SET_PARTNER: 'SET_PARTNER',
   RESET: 'RESET',
 };
 
 const createInitialState = () => ({
   title: 'SurveyStack',
   subtitle: '',
+  partner: null,
 });
 
 const initialState = createInitialState();
@@ -14,6 +16,7 @@ const initialState = createInitialState();
 const getters = {
   title: state => state.title,
   subtitle: state => state.subtitle,
+  partner: state => state.partner,
 };
 
 const actions = {
@@ -26,17 +29,28 @@ const actions = {
   setSubtitle({ commit }, subtitle) {
     commit(types.SET_SUBTITLE, subtitle);
   },
+  setPartner({ commit }, partner) {
+    commit(types.SET_PARTNER, partner);
+  },
 };
 
 const mutations = {
   RESET(state) {
+    const { partner } = state;
     Object.assign(state, createInitialState());
+    state.partner = partner;
+    if (state.partner) {
+      state.title = partner.name;
+    }
   },
   [types.SET_TITLE](state, title) {
     state.title = title;
   },
   [types.SET_SUBTITLE](state, subtitle) {
     state.subtitle = subtitle;
+  },
+  [types.SET_PARTNER](state, partner) {
+    state.partner = partner;
   },
 };
 

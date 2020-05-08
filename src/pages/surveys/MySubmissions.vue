@@ -5,7 +5,7 @@
         <v-tabs
           dark
           flat
-          background-color="red"
+          background-color="primary"
           v-model="activeTab"
           centered
           icons-and-text

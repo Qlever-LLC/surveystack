@@ -1,6 +1,7 @@
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = {
+  chainWebpack: config => config.plugins.delete('pwa'),
   configureWebpack: {
     plugins: [
       new MonacoWebpackPlugin({
