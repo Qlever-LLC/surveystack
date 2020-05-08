@@ -245,8 +245,9 @@ const initialRelevanceCode = variable => `\
  * ${variable.charAt(0).toUpperCase() + variable.substr(1)}
  *
  * @param {submission} submission
+ * @param {survey} survey
  */
-function ${variable}(submission) {
+function ${variable}(submission, survey) {
   return true;
 }
 `;
@@ -451,11 +452,12 @@ export default {
     async runCode() {
       const tab = tabMap[this.selectedTab];
       try {
-        const res = await utils.execute(
+        const res = await utils.executeUnsafe(
           {
             code: this.activeCode,
             fname: tab,
             submission: this.instance,
+            survey: this.survey,
             log: (arg) => {
               this.log = `${this.log}${arg}\n`;
             },

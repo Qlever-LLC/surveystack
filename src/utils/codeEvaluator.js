@@ -26,7 +26,9 @@ async function calculateField(survey, submission, positions, controls, option, f
   for (const item of items) {
     try {
       const res = {
-        res: utils.executeUnsafe({ code: item.code, fname, submission }),
+        res: utils.executeUnsafe({
+          code: item.code, fname, submission, survey,
+        }),
         pos: item.pos,
         control: item.control,
       };

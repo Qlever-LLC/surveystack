@@ -8,6 +8,7 @@ import { clone, cloneDeep, set } from 'lodash';
 import moment from 'moment';
 import submissionUtils from './submissions';
 import { SPEC_VERSION_SURVEY } from '@/constants';
+import supplySandbox from './supplySandbox';
 
 function* processSurveyNames(data) {
   if (!data) {
@@ -332,7 +333,7 @@ export function compileSandboxSingleLine(src) {
 }
 
 export function compileSandbox(src, fname) {
-  const wrappedSource = `with (sandbox) { ${src}\nreturn ${fname}(arg1); }`;
+  const wrappedSource = `with (sandbox) { ${src}\nreturn ${fname}(arg1, arg2); }`;
   const code = new Function('sandbox', wrappedSource);
 
   return function (sandbox) {
@@ -360,21 +361,25 @@ export const simplify = (submissionItem) => {
 };
 
 export function executeUnsafe({
-  code, fname, submission, log,
+  code, fname, submission, survey, log,
 }) {
+  console.log('execute unsafe called');
   const sandbox = compileSandbox(code, fname);
 
   const res = sandbox({
     arg1: submission,
-    JSON, // for using JSON.stringify() and JSON.parse()
+    arg2: survey,
+    log,
+    ...supplySandbox,
   });
 
   return res;
 }
 
 export function execute({
-  code, fname, submission, log,
+  code, fname, submission, log, survey,
 }) {
+  console.log('execute safe called');
   const worker = new Worker('/worker.js');
 
 
@@ -412,6 +417,7 @@ export function execute({
       {
         fname,
         arg1: submission,
+        arg2: survey,
         code,
       },
     );
