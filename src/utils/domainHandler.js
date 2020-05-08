@@ -35,11 +35,10 @@ export default {
         manifestElement.setAttribute('href', `/partners/${subdomain}/manifest.json`);
         iconElement.setAttribute('href', `/partners/${subdomain}/images/icons/icon-72x72.png`);
         document.title = activePartner.name;
+        // TODO use vuex store here
+        vue.$store.dispatch('appui/setPartner', activePartner);
+        vue.$store.dispatch('appui/setTitle', activePartner.name);
       }
-
-      // TODO use vuex store here
-      vue.$store.dispatch('appui/setPartner', activePartner);
-      vue.$store.dispatch('appui/setTitle', activePartner.name);
     }
 
 
