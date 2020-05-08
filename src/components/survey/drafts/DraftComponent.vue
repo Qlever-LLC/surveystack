@@ -500,7 +500,9 @@ export default {
   watch: {
     async showOverview() {
       await this.calculateRelevance();
-      this.$refs.overview.refresh();
+      if (this.$refs.overview) {
+        this.$refs.overview.refresh();
+      }
     },
     submission: {
       async handler() {
