@@ -71,7 +71,6 @@ const actions = {
         db.getAllSubmissions(results => resolve(results));
       });
     });
-    console.log('submissions', response);
     commit(types.mutations.SET_SUBMISSIONS, response);
     return response;
   },
