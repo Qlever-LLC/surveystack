@@ -1,12 +1,19 @@
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
   chainWebpack: config => config.plugins.delete('pwa'),
   configureWebpack: {
+    resolve: {
+      alias: {
+        'monaco-editor': 'monaco-editor/esm/vs/editor/editor.api.js',
+      },
+    },
     plugins: [
       new MonacoWebpackPlugin({
         languages: ['javascript', 'typescript'],
       }),
+      new CompressionPlugin(),
     ],
   },
   transpileDependencies: [
