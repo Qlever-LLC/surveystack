@@ -6,8 +6,14 @@ module.exports = {
     plugins: [
       new MonacoWebpackPlugin({
         languages: ['javascript', 'typescript'],
+        features: [],
       }),
     ],
+    resolve: {
+      alias: {
+        'monaco-editor': 'monaco-editor/esm/vs/editor/editor.api.js',
+      },
+    },
   },
   transpileDependencies: [
     'vuetify',
