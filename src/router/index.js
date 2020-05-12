@@ -97,7 +97,8 @@ const routes = [
   {
     path: '/surveys/new',
     name: 'surveys-new',
-    component: Builder,
+    // component: Builder,
+    component: () => import('@/pages/builder/Builder.vue'),
     props: {
       isNew: true,
     },
@@ -222,17 +223,20 @@ const routes = [
   {
     path: '/scripts/new',
     name: 'scripts-new',
-    component: ScriptEdit,
+    // component: ScriptEdit,
+    component: () => import('@/pages/scripts/ScriptEdit.vue'),
   },
   {
     path: '/scripts/:id/edit',
     name: 'scripts-edit',
-    component: ScriptEdit,
+    // component: ScriptEdit,
+    component: () => import('@/pages/scripts/ScriptEdit.vue'),
   },
   {
     path: '/scripts/:id',
     name: 'scripts-detail',
-    component: Script,
+    // component: Script,
+    component: () => import('@/pages/scripts/Script.vue'),
   },
   // integrations
   {
