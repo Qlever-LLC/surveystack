@@ -2,6 +2,7 @@ import dotenv from 'dotenv-defaults';
 dotenv.config();
 
 import express from 'express';
+import expressStaticGzip from 'express-static-gzip';
 import cors from 'cors';
 import history from 'connect-history-api-fallback';
 
@@ -16,7 +17,7 @@ import debugRoutes from './routes/debug';
 const PATH_PREFIX = process.env.PATH_PREFIX;
 
 const app = express();
-const frontend = express.static('../our-sci-pwa/dist');
+const frontend = expressStaticGzip('../our-sci-pwa/dist');
 
 app.use(express.json({ limit: '8mb' }));
 app.use(express.urlencoded({ extended: true }));
