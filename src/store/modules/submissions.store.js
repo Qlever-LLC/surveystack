@@ -12,6 +12,7 @@ export const types = {
     ADD_SUBMISSION: 'ADD_SUBMISSION',
     REMOVE_SUBMISSION: 'REMOVE_SUBMISSION',
     // SET_REMOTE_SUBMISSIONS: 'SET_REMOTE_SUBMISSIONS',
+    SET_READY_TO_SUBMIT: 'SET_READY_TO_SUBMIT',
   },
   actions: {
     reset: 'reset',
@@ -21,6 +22,11 @@ export const types = {
     fetchLocalSubmissions: 'fetchLocalSubmissions',
     startDraft: 'startDraft',
     // fetchRemoteSubmissions: 'fetchRemoteSubmissions',
+    setReadyToSubmit: 'setReadyToSubmit',
+    getReadyToSubmit: 'getReadyToSubmit',
+    addReadyToSubmit: 'addReadyToSubmit',
+    removeReadyToSubmit: 'removeReadyToSubmit',
+    clearReadyToSubmit: 'clearReadyToSubmit',
   },
 };
 
@@ -28,6 +34,7 @@ export const types = {
 const createInitialState = () => ({
   submissions: [],
   // remoteSubmissions: [],
+  readyToSubmit: [],
 });
 
 const initialState = createInitialState();
@@ -56,6 +63,9 @@ const mutations = {
   // [types.mutations.SET_REMOTE_SUBMISSIONS](state, submissions) {
   //   state.remoteSubmissions = submissions;
   // },
+  [types.mutations.SET_READY_TO_SUBMIT](state, arr) {
+    state.readyToSubmit = arr;
+  },
 };
 
 const actions = {
@@ -78,7 +88,11 @@ const actions = {
     // TODO: submissions should be a unique collection, we shouldn't just push
     commit(types.mutations.ADD_SUBMISSION, submission);
   },
-  [types.actions.remove]({ commit }, id) {
+  // [types.actions.remove]({ commit }, id) {
+  //   commit(types.mutations.REMOVE_SUBMISSION, id);
+  // },
+  async [types.actions.remove]({ commit }, id) {
+    await db.removeFromIndexedDB(db.stores.SUBMISSIONS, id);
     commit(types.mutations.REMOVE_SUBMISSION, id);
   },
   async [types.actions.fetchLocalSubmission]({ state, dispatch }, id) {
@@ -100,7 +114,49 @@ const actions = {
   },
   // async [types.actions.fetchRemoteSubmissions]({ commit }, { userId }) {
   // },
+  // async [types.actions.setReadyToSubmit]({ commit }, arr) {
+  //   await db.saveToIndexedDB(db.stores.SUBMISSIONS, {
+  //     _id: 'READY_TO_SUBMIT',
+  //     arr,
+  //   });
+  //   commit(types.mutations.SET_READY_TO_SUBMIT, arr);
+  // },
+  // async [types.actions.getReadyToSubmit]({ state, commit }) {
+  //   if (state.readyToSubmit.length === 0) {
+  //     const readyToSubmit = await new Promise((resolve) => {
+  //       db.openDb(() => {
+  //         db.getAllSubmissions(results => resolve(
+  //           results.find(({ _id }) => _id === 'READY_TO_SUBMIT') || [],
+  //         ));
+  //       });
+  //     });
+  //     commit(types.mutations.SET_READY_TO_SUBMIT, readyToSubmit);
+  //     console.log('get readyToSubmit', readyToSubmit);
 
+  //     return readyToSubmit;
+  //   }
+  //   console.log('get readyToSubmit', state.readyToSubmit);
+  //   return state.readyToSubmit;
+  // },
+  // async [types.actions.addReadyToSubmit]({ dispatch, commit }, id) {
+  //   const readyToSubmit = await dispatch('getReadyToSubmit');
+  //   const newValue = Array.from(new Set([...readyToSubmit, id]));
+  //   await dispatch('setReadyToSubmit', newValue);
+  //   commit(types.mutations.SET_READY_TO_SUBMIT, newValue);
+  //   return newValue;
+  // },
+  // async [types.actions.removeReadyToSubmit]({ dispatch, commit }, id) {
+  //   const readyToSubmit = await dispatch('getReadyToSubmit');
+  //   const newValue = readyToSubmit.filter(x => x !== id);
+  //   await dispatch('setReadyToSubmit', newValue);
+  //   commit(types.mutations.SET_READY_TO_SUBMIT, newValue);
+  //   return newValue;
+  // },
+  // async [types.actions.clearReadyToSubmit]({ dispatch, commit }) {
+  //   const readyToSubmit = await dispatch('setReadyToSubmit', []);
+  //   commit(types.mutations.SET_READY_TO_SUBMIT, []);
+  //   return readyToSubmit;
+  // },
 };
 
 export default {

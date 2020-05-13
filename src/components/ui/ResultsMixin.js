@@ -11,11 +11,13 @@ export default {
       this.resultItems = [];
       let hasErrors = false;
 
+      // debugger;
       if (error) {
         hasErrors = true;
         this.resultItems.push({
           title: 'Error',
-          body: error.response.data.message,
+          body: (error.response && error.response.data && error.response.data.message)
+            || error,
           error: true,
         });
         return;

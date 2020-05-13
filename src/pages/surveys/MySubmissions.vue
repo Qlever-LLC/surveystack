@@ -55,6 +55,13 @@
                           {{ (new Date(item.meta.dateCreated)).toLocaleString() }}
                         </v-list-item-subtitle>
                       </v-list-item-content>
+                      <v-list-item-action>
+                        <v-btn icon>
+                          <v-icon v-if="readyToSubmitHas(item._id)">
+                            mdi-cloud-upload
+                          </v-icon>
+                        </v-btn>
+                      </v-list-item-action>
                     </v-list-item>
                     <v-divider
                       v-if="i + 1 < tab.content.length"
@@ -167,14 +174,24 @@ export default {
     this.$store.dispatch('appui/setTitle', 'My Submissions');
   },
   async created() {
-    this.$store.dispatch(`submissions/${submissionsTypes.actions.fetchLocalSubmissions}`);
+    // await this.$store.dispatch(`submissions/${submissionsTypes.actions.fetchLocalSubmissions}`);
 
-    await this.$store.dispatch('surveys/fetchSurveys');
+    // await this.$store.dispatch('surveys/fetchSurveys');
+    // await this.$store.dispatch('readyToSubmit/getAll');
+
+    await Promise.all([
+      this.$store.dispatch('submissions/fetchLocalSubmissions'),
+      this.$store.dispatch('surveys/fetchSurveys'),
+      this.$store.dispatch('readyToSubmit/getAll'),
+    ]);
   },
   beforeDestroy() {
     this.$store.dispatch('appui/reset');
   },
   computed: {
+    readyToSubmit() {
+      return this.$store.state.readyToSubmit.readyToSubmit || [];
+    },
     activeTabBody() {
       return this.tabs.find(t => t.name === this.activeTab);
     },
@@ -222,6 +239,9 @@ export default {
     },
   },
   methods: {
+    readyToSubmitHas(id) {
+      return this.readyToSubmit.indexOf(id) > -1;
+    },
     getPageOfArray(arr, page, limit = PAGINATION_LIMIT) {
       const rangeStart = (page - 1) * limit;
       const rangeEnd = page * limit;

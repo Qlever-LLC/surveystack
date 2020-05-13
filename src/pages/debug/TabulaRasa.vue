@@ -40,14 +40,7 @@ export default {
     };
   },
   methods: {
-    async submit() {
-      try {
-        await api.post('/debug/tabularasa');
-      } catch (error) {
-        this.status = error.response.data.message;
-        return;
-      }
-
+    clearAll() {
       try {
         db.clearAllSubmissions();
       } catch (error) {
@@ -59,6 +52,22 @@ export default {
       } catch (error) {
         console.log(error);
       }
+
+      try {
+        db.clearAllReadyToSubmit();
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async submit() {
+      try {
+        await api.post('/debug/tabularasa');
+      } catch (error) {
+        this.status = error.response.data.message;
+        return;
+      }
+
+      db.openDb(this.clearAll);
 
       this.$router.push('/surveys/browse');
     },
