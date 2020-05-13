@@ -37,6 +37,12 @@
             color="primary"
           >Install</v-btn>
         </div>
+        <v-progress-circular
+          class="mb-4"
+          v-else
+          color="primary"
+          indeterminate
+        ></v-progress-circular>
 
         <p class="subheading font-weight-regular">
           Source code for this application can be found here
@@ -68,7 +74,7 @@ export default {
           console.log('install stub');
         },
       },
-      showInstall: true,
+      showInstall: false,
     };
   },
   methods: {
