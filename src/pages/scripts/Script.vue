@@ -19,11 +19,12 @@
 
 <script>
 import api from '@/services/api.service';
-import CodeEditor from '@/components/ui/CodeEditor.vue';
+
+const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
 export default {
   components: {
-    CodeEditor,
+    codeEditor,
   },
   data() {
     return {

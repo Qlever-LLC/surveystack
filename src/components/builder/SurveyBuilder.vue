@@ -219,7 +219,7 @@ import { Splitpanes, Pane } from 'splitpanes';
 import ObjectId from 'bson-objectid';
 import moment from 'moment';
 import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
-import codeEditor from '@/components/ui/CodeEditor.vue';
+
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
 import controlAdder from '@/components/builder/ControlAdder.vue';
@@ -239,6 +239,7 @@ import { defaultApiCompose } from '@/utils/apiCompose';
 
 import submissionUtils from '@/utils/submissions';
 
+const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
 const initialRelevanceCode = variable => `\
 /**

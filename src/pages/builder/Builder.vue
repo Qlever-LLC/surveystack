@@ -99,16 +99,15 @@
 
 <script>
 import ObjectId from 'bson-objectid';
-import moment from 'moment';
 import api from '@/services/api.service';
 
 import appDialog from '@/components/ui/Dialog.vue';
-import SurveyBuilder from '@/components/builder/SurveyBuilder.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import resultMixin from '@/components/ui/ResultsMixin';
 
-
 import { createSurvey, updateControls } from '@/utils/surveys';
+
+const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
 export default {
   components: {
