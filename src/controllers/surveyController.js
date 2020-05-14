@@ -116,7 +116,14 @@ const buildPipelineForGetSurveyPage = ({ q, groups, projections, creator, skip, 
   }
 
   // default sort by name (or date modified?)
-  pipeline.push({ $sort: { name: 1 } });
+  // needs aggregation for case insensitive sorting
+  pipeline.push(
+    ...[
+      { $addFields: { name_lowercase: { $toLower: '$name' } } },
+      { $sort: { name_lowercase: 1 } },
+      { $project: { name_lowercase: 0 } },
+    ]
+  );
 
   // skip
   if (skip) {
