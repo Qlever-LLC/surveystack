@@ -16,11 +16,6 @@ module.exports = {
       }),
       new CompressionPlugin(),
     ],
-    resolve: {
-      alias: {
-        'monaco-editor': 'monaco-editor/esm/vs/editor/editor.api.js',
-      },
-    },
   },
   transpileDependencies: [
     'vuetify',

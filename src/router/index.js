@@ -29,11 +29,7 @@ import GroupEdit from '@/pages/groups/GroupEdit.vue';
 
 import SubmissionList from '@/pages/submissions/List.vue';
 
-import Builder from '@/pages/builder/Builder.vue';
-
 import ScriptList from '@/pages/scripts/ScriptList.vue';
-import Script from '@/pages/scripts/Script.vue';
-import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
 
 import MembershipNew from '@/pages/memberships/MembershipNew.vue';
 import MembershipEdit from '@/pages/memberships/MembershipEdit.vue';
@@ -49,6 +45,11 @@ import GroupIntegrationEdit from '@/pages/integrations/GroupIntegrationEdit.vue'
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 
 import store from '@/store';
+
+const Builder = () => import('@/pages/builder/Builder.vue');
+const Script = () => import('@/pages/scripts/Script.vue');
+const ScriptEdit = () => import('@/pages/scripts/ScriptEdit.vue');
+
 
 Vue.use(VueRouter);
 
@@ -97,8 +98,7 @@ const routes = [
   {
     path: '/surveys/new',
     name: 'surveys-new',
-    // component: Builder,
-    component: () => import('@/pages/builder/Builder.vue'),
+    component: Builder,
     props: {
       isNew: true,
     },
@@ -223,20 +223,17 @@ const routes = [
   {
     path: '/scripts/new',
     name: 'scripts-new',
-    // component: ScriptEdit,
-    component: () => import('@/pages/scripts/ScriptEdit.vue'),
+    component: ScriptEdit,
   },
   {
     path: '/scripts/:id/edit',
     name: 'scripts-edit',
-    // component: ScriptEdit,
-    component: () => import('@/pages/scripts/ScriptEdit.vue'),
+    component: ScriptEdit,
   },
   {
     path: '/scripts/:id',
     name: 'scripts-detail',
-    // component: Script,
-    component: () => import('@/pages/scripts/Script.vue'),
+    component: Script,
   },
   // integrations
   {

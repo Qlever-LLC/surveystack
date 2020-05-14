@@ -41,8 +41,10 @@
 <script>
 import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
-import CodeEditor from '@/components/ui/CodeEditor.vue';
 import { SPEC_VERSION_SCRIPT } from '@/constants';
+
+const codeEditor = () => import('@/components/ui/CodeEditor.vue');
+
 
 export default {
   data() {
@@ -124,7 +126,7 @@ export function render(props, state, setState) {
     };
   },
   components: {
-    CodeEditor,
+    codeEditor,
   },
   methods: {
     cancel() {
