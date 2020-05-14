@@ -1,8 +1,5 @@
 <template>
-  <v-container
-    v-if="entity"
-    class="mt-2"
-  >
+  <v-container v-if="entity">
     <div class="d-flex justify-end">
       <v-btn
         v-if="editable"
