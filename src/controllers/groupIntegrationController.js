@@ -19,8 +19,8 @@ const sanitizeIntegration = (entity) => {
 const getIntegrations = async (req, res) => {
   const { group, type } = req.query;
   const filter = {};
-  //const options = { projection: { 'data.apiKey': 0 } }; // TODO: find better way to hide secrets
-  const options = {}; // TODO: find better way to hide secrets
+  const options = { projection: { 'data.apiKey': 0 } }; // TODO: find better way to hide secrets
+  //const options = {}; // TODO: find better way to hide secrets
 
   if (group) {
     filter.group = new ObjectId(group);
@@ -42,7 +42,7 @@ const getIntegration = async (req, res) => {
 
   let entity;
   entity = await db.collection(col).findOne({ _id: new ObjectId(id) });
-  const access = await rolesService.hasRole(res.locals.auth.user._id, entity.group, 'admin');
+  const access = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
   if (!access) {
     throw boom.unauthorized();
   }
@@ -54,7 +54,7 @@ const createIntegration = async (req, res) => {
   const entity = req.body;
   sanitizeIntegration(entity);
 
-  const access = await rolesService.hasRole(res.locals.auth.user._id, entity.group, 'admin');
+  const access = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
   if (!access) {
     throw boom.unauthorized();
   }
@@ -77,7 +77,7 @@ const updateIntegration = async (req, res) => {
   const id = entity._id;
   sanitizeIntegration(entity);
 
-  const access = await rolesService.hasRole(res.locals.auth.user._id, entity.group, 'admin');
+  const access = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
   if (!access) {
     throw boom.unauthorized();
   }
@@ -100,13 +100,14 @@ const updateIntegration = async (req, res) => {
 
 const deleteIntegration = async (req, res) => {
   const { id } = req.params;
+
+  const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  const access = await rolesService.hasAdminRole(res.locals.auth.user._id, existing.group);
+  if (!access) {
+    throw boom.unauthorized();
+  }
+
   try {
-    const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
-    if (!existing) {
-      return res.status(404).send({
-        message: `No entity with _id exists: ${id}`,
-      });
-    }
     let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
     assert.equal(1, r.deletedCount);
     return res.send({ message: 'OK' });

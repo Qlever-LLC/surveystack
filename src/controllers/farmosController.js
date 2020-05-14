@@ -1,8 +1,11 @@
 import { db } from '../db';
+import { ObjectId } from 'mongodb';
+
 import axios from 'axios';
 import boom from '@hapi/boom';
 import https from 'https';
 import farmosService from '../services/farmos.service';
+import rolesService from '../services/roles.service';
 
 const common = async (endpoint, req, res) => {
   const farms = await farmosService.getCredentials(res.locals.auth.user);
@@ -51,20 +54,34 @@ const getAssets = async (req, res) => {
   return common('assets', req, res);
 };
 
-const getAggregatorFarms = async (req, res) => {
-  // TODO: try not to pass api key from front-end
-  const { url, apiKey, tags } = req.query;
-  const { data } = await axios.get(`https://${url}/api/v1/farms/`, {
+const getIntegrationFarms = async (req, res) => {
+  const { id } = req.params;
+  const { tags } = req.query;
+
+  const aggregator = await db
+    .collection('integrations.groups')
+    .findOne({ _id: new ObjectId(id), type: 'farmos-aggregator' });
+
+  if (!aggregator) {
+    throw boom.notFound();
+  }
+
+  const hasAdminRole = await rolesService.hasAdminRole(res.locals.auth.user._id, aggregator.group);
+  if (!hasAdminRole) {
+    throw boom.unauthorized();
+  }
+
+  const { data: farms } = await axios.get(`https://${aggregator.data.url}/api/v1/farms/`, {
     headers: {
       accept: 'application/json',
-      'api-key': apiKey,
+      'api-key': aggregator.data.apiKey,
     },
   });
-  return res.send(data);
+  return res.send(farms);
 };
 
 export default {
   getFields,
   getAssets,
-  getAggregatorFarms,
+  getIntegrationFarms,
 };

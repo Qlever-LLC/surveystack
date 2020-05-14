@@ -143,7 +143,11 @@ router.get('/roles', catchErrors(rolesController.getRoles));
 /** farmos */
 router.get('/farmos/fields', catchErrors(farmosController.getFields));
 router.get('/farmos/assets', catchErrors(farmosController.getAssets));
-router.get('/farmos/aggregator/farms', catchErrors(farmosController.getAggregatorFarms));
+router.get(
+  '/farmos/integrations/:id/farms',
+  [assertAuthenticated],
+  catchErrors(farmosController.getIntegrationFarms)
+);
 
 /** Integrations - Group */
 router.get('/group-integrations', catchErrors(groupIntegrationController.getIntegrations));
@@ -158,7 +162,11 @@ router.put(
   [assertNameNotEmpty, assertIdsMatch, assertEntityExists({ collection: 'integrations.groups' })],
   catchErrors(groupIntegrationController.updateIntegration)
 );
-router.delete('/group-integrations/:id', catchErrors(groupIntegrationController.deleteIntegration));
+router.delete(
+  '/group-integrations/:id',
+  [assertAuthenticated, assertEntityExists({ collection: 'integrations.groups' })],
+  catchErrors(groupIntegrationController.deleteIntegration)
+);
 
 /** Integrations - Membership */
 router.get(
@@ -185,6 +193,7 @@ router.put(
 );
 router.delete(
   '/membership-integrations/:id',
+  [assertAuthenticated, assertEntityExists({ collection: 'integrations.memberships' })],
   catchErrors(membershipIntegrationController.deleteIntegration)
 );
 
