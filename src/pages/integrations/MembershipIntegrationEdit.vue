@@ -149,7 +149,7 @@ export default {
           const gi = await api.get(`/group-integrations?group=${m.data.group}&type=farmos-aggregator`);
           this.aggregators = [];
           gi.data.forEach(async (aggregator) => {
-            const { data } = await api.get(`/farmos/aggregator/farms?url=${aggregator.data.url}&apiKey=${aggregator.data.apiKey}`);
+            const { data } = await api.get(`/farmos/integrations/${aggregator._id}/farms`);
             const a = {
               _id: aggregator._id, text: aggregator.name, value: aggregator._id, url: aggregator.data.url, farms: [...data],
             };
