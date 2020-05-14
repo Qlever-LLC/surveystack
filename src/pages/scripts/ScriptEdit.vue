@@ -2,7 +2,10 @@
   <v-container>
     <h1>{{ editMode ? "Edit script" : "Create script" }}</h1>
     <span class="text--secondary">{{this.entity._id}}</span>
-    <v-form class="mt-3" @keydown.enter.prevent="submit">
+    <v-form
+      class="mt-3"
+      @keydown.enter.prevent="submit"
+    >
       <v-text-field
         v-model="entity.name"
         label="Name"
@@ -43,7 +46,10 @@ import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import { SPEC_VERSION_SCRIPT } from '@/constants';
 
-const codeEditor = () => import('@/components/ui/CodeEditor.vue');
+import codeEditor from '@/components/ui/CodeEditor.vue';
+
+// When lazy-loading, the code editor just keeps on growing and growing :/
+// const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
 
 export default {
