@@ -1,5 +1,27 @@
 <template>
   <div>
+    <app-dialog
+      v-model="showArchiveModal"
+      @cancel="showArchiveModal = false"
+      @confirm="archiveSubmission(selected[0])"
+    >
+      <template v-slot:title>Confirm archiving</template>
+      <template>
+        Do you want to archive this submission?
+      </template>
+    </app-dialog>
+
+    <app-dialog
+      v-model="showDeleteModal"
+      @cancel="showDeleteModal = false"
+      @confirm="deleteSubmission(selected[0])"
+    >
+      <template v-slot:title>Confirm deletion</template>
+      <template>
+        Are you sure you want to delete this submission? This can not be undone.
+      </template>
+    </app-dialog>
+
     <v-container>
       <div class="d-flex justify-end">
         <v-btn
@@ -29,6 +51,15 @@
         @apply-advanced-filters="fetchData"
         @reset="reset"
       />
+
+      <div class="d-flex justify-end">
+        <v-checkbox
+          label="Show archived"
+          v-model="showArchived"
+          dense
+          hide-details
+        />
+      </div>
 
       <div
         class="d-flex justify-end"
@@ -64,7 +95,7 @@
         >QUERY!</v-btn>
       </div>
 
-      <h4 class="mt-3">API</h4>
+      <h4>API</h4>
       <a
         class="body-2"
         :href="apiUrl"
@@ -80,12 +111,20 @@
             <div><span class="subtitle-2">ACTIONS</span><br />{{selected.length}} {{selected.length === 1 ? 'submission' : 'submissions'}} selected</div>
             <div class="ml-auto">
               <v-btn
-                v-if="selected.length === 1"
+                v-if="selected.length === 1 && selected[0]['meta.archived'] === 'true'"
                 color="error"
                 text
-                @click="deleteSubmission(selected[0])"
+                @click="showDeleteModal = true"
               >
                 DELETE
+              </v-btn>
+              <v-btn
+                v-if="selected.length === 1 && selected[0]['meta.archived'] !== 'true'"
+                color="error"
+                text
+                @click="showArchiveModal = true"
+              >
+                ARCHIVE
               </v-btn>
             </div>
           </div>
@@ -137,6 +176,7 @@ import appSubmissionsFilterAdvanced from '@/components/submissions/SubmissionFil
 import appSubmissionsTableClientCsv from '@/components/submissions/SubmissionTableClientCsv.vue';
 import appSubmissionsTree from '@/components/submissions/SubmissionTree.vue';
 import appSubmissionsCode from '@/components/submissions/SubmissionCode.vue';
+import appDialog from '@/components/ui/Dialog.vue';
 
 import { createQueryList } from '@/utils/surveys';
 
@@ -156,6 +196,7 @@ export default {
     appSubmissionsTree,
     appSubmissionsTableClientCsv,
     appSubmissionsCode,
+    appDialog,
   },
   data() {
     return {
@@ -192,6 +233,9 @@ export default {
       },
       selected: [],
       search: '',
+      showArchived: false,
+      showArchiveModal: false,
+      showDeleteModal: false,
     };
   },
   computed: {
@@ -207,7 +251,11 @@ export default {
       return true;
     },
     apiRequest() {
-      const req = `/submissions/page?survey=${this.survey}&match=${this.filter.match}&sort=${this.filter.sort}&project=${this.filter.project}&skip=${this.filter.skip}&limit=${this.filter.limit}`;
+      let req = `/submissions/page?survey=${this.survey}&match=${this.filter.match}&sort=${this.filter.sort}&project=${this.filter.project}&skip=${this.filter.skip}&limit=${this.filter.limit}`;
+      if (this.showArchived) {
+        req += '&showArchived=true';
+      }
+
       if (process.env.NODE_ENV === 'development') {
         return `${req}&roles=${this.filter.roles}`;
       }
@@ -234,8 +282,19 @@ export default {
       }
     },
     async deleteSubmission(submission) {
+      this.showDeleteModal = false;
       try {
         await api.delete(`/submissions/${submission._id}`);
+        this.selected = [];
+        this.fetchData();
+      } catch (err) {
+        this.$store.dispatch('feedback/add', err.response.data.message);
+      }
+    },
+    async archiveSubmission(submission) {
+      this.showArchiveModal = false;
+      try {
+        const { data: archived } = await api.post(`/submissions/${submission._id}/archive`);
         this.selected = [];
         this.fetchData();
       } catch (err) {
@@ -269,6 +328,12 @@ export default {
     startDraft(survey) {
       const group = this.$store.getters['memberships/activeGroup'];
       this.$store.dispatch('submissions/startDraft', { survey, group });
+    },
+  },
+  watch: {
+    showArchived() {
+      this.selected = [];
+      this.fetchData();
     },
   },
   async created() {
