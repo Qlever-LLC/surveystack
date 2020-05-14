@@ -115,6 +115,9 @@ const buildPipelineForGetSurveyPage = ({ q, groups, projections, creator, skip, 
     });
   }
 
+  // default sort by name (or date modified?)
+  pipeline.push({ $sort: { name: 1 } });
+
   // skip
   if (skip) {
     try {
