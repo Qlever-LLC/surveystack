@@ -3,9 +3,7 @@
     <v-container>
       <v-row class="d-flex flex-grow-1">
         <v-tabs
-          dark
           flat
-          background-color="primary"
           v-model="activeTab"
           centered
           icons-and-text
@@ -34,54 +32,65 @@
             class="flex-grow-1 flex-column align-center justify-center align-content-center"
             style="height: 100%;"
           >
-            <v-card>
-              <!-- <div v-if="tab.name !== 'sent' && tab.content.length > 0"> -->
-              <div v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
-                <v-list >
-                  <template v-for="(item, i) in activeTabPageContent">
-                    <v-list-item
-                      @click="select(item)"
-                      :key="i"
-                    >
-                      <v-list-item-content two-line>
-                        <v-list-item-title v-if="surveyForSubmission(item)">
-                          {{ surveyForSubmission(item).name}}
-                        </v-list-item-title>
-                        <v-list-item-title v-else>
-                          Loading name
-                        </v-list-item-title>
-                        <v-list-item-subtitle>
-                          ID: {{ item._id }} <br>
-                          {{ (new Date(item.meta.dateCreated)).toLocaleString() }}
-                        </v-list-item-subtitle>
-                      </v-list-item-content>
-                      <v-list-item-action>
-                        <v-btn icon>
-                          <v-icon v-if="readyToSubmitHas(item._id)">
-                            mdi-cloud-upload
-                          </v-icon>
-                        </v-btn>
-                      </v-list-item-action>
-                    </v-list-item>
-                    <v-divider
-                      v-if="i + 1 < tab.content.length"
-                      :key="`divider_${i}`"
-                    ></v-divider>
-                  </template>
-                </v-list>
-                <v-pagination
-                  v-model="page"
-                  :length="activeTabPaginationLength"
-                />
-              </div>
-              <div v-else-if="tab.name === 'sent' && tab.content.length > 0">
+            <v-card min-height="70vh" class="d-flex flex-column justify-space-between">
+              <template v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
+                <v-card-text >
+                  <v-list >
+                    <template v-for="(item, i) in activeTabPageContent">
+                      <v-list-item
+                        :key="i"
+                      >
+                        <v-list-item-content
+                          @click="select(item)"
+                          class="cursor-pointer"
+                          two-line
+                        >
+                          <v-list-item-title v-if="surveyForSubmission(item)">
+                            {{ surveyForSubmission(item).name}}
+                          </v-list-item-title>
+                          <v-list-item-title v-else>
+                            Loading name
+                          </v-list-item-title>
+                          <v-list-item-subtitle>
+                            ID: {{ item._id }} <br>
+                            {{ (new Date(item.meta.dateCreated)).toLocaleString() }}
+                          </v-list-item-subtitle>
+                        </v-list-item-content>
+                        <v-list-item-action>
+                          <v-btn icon>
+                            <v-icon v-if="readyToSubmitHas(item._id)">
+                              mdi-cloud-upload
+                            </v-icon>
+                          </v-btn>
+                        </v-list-item-action>
+                      </v-list-item>
+                      <v-divider
+                        v-if="i + 1 < tab.content.length"
+                        :key="`divider_${i}`"
+                      ></v-divider>
+                    </template>
+                  </v-list>
+                </v-card-text>
+                <v-spacer class="flex-grow-1" />
+                <v-card-actions>
+                  <v-pagination
+                    v-model="page"
+                    :length="activeTabPaginationLength"
+                    class=""
+                  />
+                </v-card-actions>
+              </template>
+              <template v-else-if="tab.name === 'sent' && tab.content.length > 0">
                 <v-list >
                   <template v-for="(item, i) in tab.content">
                     <v-list-item
-                      @click="select(item)"
                       :key="i"
                     >
-                      <v-list-item-content two-line>
+                      <v-list-item-content
+                        @click="select(item)"
+                        class="cursor-pointer"
+                        two-line
+                      >
                         <v-list-item-title v-if="surveyForSubmission(item)">
                           {{ surveyForSubmission(item).name}}
                         </v-list-item-title>
@@ -100,12 +109,13 @@
                     ></v-divider>
                   </template>
                 </v-list>
+                <v-spacer />
                 <v-pagination
                   v-model="remotePage"
                   :length="sentTabPaginationLength"
                   @input="fetchRemoteSubmissions"
                 />
-              </div>
+              </template>
               <v-container
                 fill-height
                 fluid
@@ -143,6 +153,16 @@
       </v-row>
 
     </v-container>
+      <!-- :group="submission.meta.group.id"
+      @submit="() => submit(submission)"
+      @set-group="(val) => $set(submission.meta.group, 'id', val)" -->
+    <confirm-submission-dialog
+      v-if="confirmSubmissionIsVisible"
+      :group="activeSubmission.meta.group.id"
+      @set-group="(val) => setSubmissionGroup(activeSubmissionId, val)"
+      v-model="confirmSubmissionIsVisible"
+      @submit="() => submit(activeSubmissionId)"
+    />
   </v-container>
 </template>
 
@@ -152,10 +172,15 @@ import api from '@/services/api.service';
 // TODO: figure out why there is an import cycle from submissions.strore > router
 // eslint-disable-next-line import/no-cycle
 import { types as submissionsTypes } from '@/store/modules/submissions.store';
+import ConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
+
 
 const PAGINATION_LIMIT = 10;
 
 export default {
+  components: {
+    ConfirmSubmissionDialog,
+  },
   data() {
     return {
       isLoading: false,
@@ -168,6 +193,8 @@ export default {
         skip: 0,
         limit: 1e5,
       },
+      confirmSubmissionIsVisible: false,
+      activeSubmissionId: null,
     };
   },
   updated() {
@@ -182,15 +209,19 @@ export default {
     await Promise.all([
       this.$store.dispatch('submissions/fetchLocalSubmissions'),
       this.$store.dispatch('surveys/fetchSurveys'),
-      this.$store.dispatch('readyToSubmit/getAll'),
+      // this.$store.dispatch('readyToSubmit/getAll'),
     ]);
   },
   beforeDestroy() {
     this.$store.dispatch('appui/reset');
   },
   computed: {
+    activeSubmission() {
+      return this.$store.getters.submissions.getSubmission(this.activeSubmissionId);
+    },
     readyToSubmit() {
-      return this.$store.state.readyToSubmit.readyToSubmit || [];
+      // return this.$store.state.readyToSubmit.readyToSubmit || [];
+      return this.$store.getters['submissions/readyToSubmit'];
     },
     activeTabBody() {
       return this.tabs.find(t => t.name === this.activeTab);
@@ -239,6 +270,9 @@ export default {
     },
   },
   methods: {
+    getSubmission(id) {
+      return this.$store.getters.submissions.getSubmission(id);
+    },
     readyToSubmitHas(id) {
       return this.readyToSubmit.indexOf(id) > -1;
     },
@@ -289,9 +323,19 @@ export default {
         (a, b) => (new Date(b.meta.dateModified)).valueOf() - (new Date(a.meta.dateModified)).valueOf(),
       );
     },
+    async uploadSubmission(submission) {
+      const response = await api.post('/submissions', submission);
+    },
+    setSubmissionGroup(id, groupId) {
+      // this.$store.commit('');
+      console.log('set submission group');
+    },
   },
 };
 </script>
 
-<style>
+<style scoped>
+.cursor-pointer {
+  cursor: pointer;
+}
 </style>

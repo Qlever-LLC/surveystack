@@ -12,7 +12,7 @@ const scripts = [];
 
 const groups = [];
 
-const readyToSubmit = [];
+// const readyToSubmit = [];
 
 
 let db = null;
@@ -54,11 +54,11 @@ function openDb(onSuccess) {
       // ignore
     }
 
-    try {
-      db.createObjectStore(stores.READY_TO_SUBMIT, { keyPath: '_id' });
-    } catch (error) {
-      // ignore
-    }
+    // try {
+    //   db.createObjectStore(stores.READY_TO_SUBMIT, { keyPath: '_id' });
+    // } catch (error) {
+    //   // ignore
+    // }
 
     try {
       db.createObjectStore(stores.SURVEYS, { keyPath: '_id' });
@@ -100,9 +100,9 @@ function clearAllSurveys() {
   clearObjectStore(stores.SURVEYS);
 }
 
-function clearAllReadyToSubmit() {
-  clearObjectStore(stores.READY_TO_SUBMIT);
-}
+// function clearAllReadyToSubmit() {
+//   clearObjectStore(stores.READY_TO_SUBMIT);
+// }
 
 
 function persist(storeName, obj) {
@@ -131,9 +131,9 @@ function persistSurvey(survey) {
   persist(stores.SURVEYS, survey);
 }
 
-function persistReadyToSubmit(obj) {
-  persist(stores.READY_TO_SUBMIT, obj);
-}
+// function persistReadyToSubmit(obj) {
+//   persist(stores.READY_TO_SUBMIT, obj);
+// }
 
 function getResults(storeName, success) {
   // Create an array
@@ -155,9 +155,9 @@ function getResults(storeName, success) {
   };
 }
 
-function getAllReadyToSubmit(onSuccess) {
-  getResults(stores.READY_TO_SUBMIT, onSuccess);
-}
+// function getAllReadyToSubmit(onSuccess) {
+//   getResults(stores.READY_TO_SUBMIT, onSuccess);
+// }
 
 // Read All data in ObjectStore
 function getAllSubmissions(onSuccess) {
@@ -292,8 +292,8 @@ export {
   loadFromIndexedDB,
   saveToIndexedDB,
   stores,
-  getAllReadyToSubmit,
-  persistReadyToSubmit,
-  clearAllReadyToSubmit,
+  // getAllReadyToSubmit,
+  // persistReadyToSubmit,
+  // clearAllReadyToSubmit,
   removeFromIndexedDB,
 };

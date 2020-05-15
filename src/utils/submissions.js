@@ -102,7 +102,10 @@ export const flattenSubmission = (submission, delimiter = '.') => {
  * @returns {Object} A submission for a specific survey version.
  */
 const createSubmissionFromSurvey = ({
-  survey, version = 1, instance, group,
+  survey,
+  version = 1,
+  instance,
+  group,
 }) => {
   const submission = {};
 
@@ -114,6 +117,7 @@ const createSubmissionFromSurvey = ({
     survey: { id: survey._id, version },
     revision: 1,
     permissions: [],
+    status: [],
     group: {
       id: group,
       path: null,

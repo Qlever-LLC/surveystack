@@ -10,6 +10,8 @@ export const types = {
     RESET: 'RESET',
     SET_SUBMISSIONS: 'SET_SUBMISSIONS',
     ADD_SUBMISSION: 'ADD_SUBMISSION',
+    GET_SUBMISSION: 'GET_SUBMISSION',
+    UPDATE_SUBMISSION: 'UPDATE_SUBMISSION',
     REMOVE_SUBMISSION: 'REMOVE_SUBMISSION',
     // SET_REMOTE_SUBMISSIONS: 'SET_REMOTE_SUBMISSIONS',
     SET_READY_TO_SUBMIT: 'SET_READY_TO_SUBMIT',
@@ -21,12 +23,8 @@ export const types = {
     fetchLocalSubmission: 'fetchLocalSubmission',
     fetchLocalSubmissions: 'fetchLocalSubmissions',
     startDraft: 'startDraft',
-    // fetchRemoteSubmissions: 'fetchRemoteSubmissions',
-    setReadyToSubmit: 'setReadyToSubmit',
-    getReadyToSubmit: 'getReadyToSubmit',
-    addReadyToSubmit: 'addReadyToSubmit',
-    removeReadyToSubmit: 'removeReadyToSubmit',
-    clearReadyToSubmit: 'clearReadyToSubmit',
+    get: 'get',
+    update: 'update',
   },
 };
 
@@ -44,6 +42,9 @@ const getters = {
   outbox: state => state.submissions.filter(s => s),
   // TODO should this search previously uploaded submissions
   getSubmission: state => id => state.submissions.find(submission => submission._id === id),
+  readyToSubmit: state => state.submissions.filter(
+    ({ meta }) => meta.status && meta.status.find(({ type }) => type === 'READY_TO_SUBMIT'),
+  ).map(({ _id }) => _id),
 };
 
 const mutations = {
@@ -63,9 +64,7 @@ const mutations = {
   // [types.mutations.SET_REMOTE_SUBMISSIONS](state, submissions) {
   //   state.remoteSubmissions = submissions;
   // },
-  [types.mutations.SET_READY_TO_SUBMIT](state, arr) {
-    state.readyToSubmit = arr;
-  },
+
 };
 
 const actions = {
@@ -107,55 +106,17 @@ const actions = {
   async [types.actions.startDraft]({ commit, dispatch }, { survey, version = 0, group }) {
     const surveyEntity = await dispatch('surveys/fetchSurvey', survey, { root: true });
     const activeVersion = (version === 0) ? surveyEntity.latestVersion : version;
-    const submission = submissionUtils.createSubmissionFromSurvey({ survey: surveyEntity, version: activeVersion, group });
+    const submission = submissionUtils.createSubmissionFromSurvey({
+      survey: surveyEntity,
+      version: activeVersion,
+      group,
+    });
     await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
     dispatch(types.actions.add, submission);
     router.push({ name: 'submissions-drafts-detail', params: { id: submission._id } });
   },
-  // async [types.actions.fetchRemoteSubmissions]({ commit }, { userId }) {
-  // },
-  // async [types.actions.setReadyToSubmit]({ commit }, arr) {
-  //   await db.saveToIndexedDB(db.stores.SUBMISSIONS, {
-  //     _id: 'READY_TO_SUBMIT',
-  //     arr,
-  //   });
-  //   commit(types.mutations.SET_READY_TO_SUBMIT, arr);
-  // },
-  // async [types.actions.getReadyToSubmit]({ state, commit }) {
-  //   if (state.readyToSubmit.length === 0) {
-  //     const readyToSubmit = await new Promise((resolve) => {
-  //       db.openDb(() => {
-  //         db.getAllSubmissions(results => resolve(
-  //           results.find(({ _id }) => _id === 'READY_TO_SUBMIT') || [],
-  //         ));
-  //       });
-  //     });
-  //     commit(types.mutations.SET_READY_TO_SUBMIT, readyToSubmit);
-  //     console.log('get readyToSubmit', readyToSubmit);
+  // async [types.actions.update]({ commit, dispatch }, submission) {
 
-  //     return readyToSubmit;
-  //   }
-  //   console.log('get readyToSubmit', state.readyToSubmit);
-  //   return state.readyToSubmit;
-  // },
-  // async [types.actions.addReadyToSubmit]({ dispatch, commit }, id) {
-  //   const readyToSubmit = await dispatch('getReadyToSubmit');
-  //   const newValue = Array.from(new Set([...readyToSubmit, id]));
-  //   await dispatch('setReadyToSubmit', newValue);
-  //   commit(types.mutations.SET_READY_TO_SUBMIT, newValue);
-  //   return newValue;
-  // },
-  // async [types.actions.removeReadyToSubmit]({ dispatch, commit }, id) {
-  //   const readyToSubmit = await dispatch('getReadyToSubmit');
-  //   const newValue = readyToSubmit.filter(x => x !== id);
-  //   await dispatch('setReadyToSubmit', newValue);
-  //   commit(types.mutations.SET_READY_TO_SUBMIT, newValue);
-  //   return newValue;
-  // },
-  // async [types.actions.clearReadyToSubmit]({ dispatch, commit }) {
-  //   const readyToSubmit = await dispatch('setReadyToSubmit', []);
-  //   commit(types.mutations.SET_READY_TO_SUBMIT, []);
-  //   return readyToSubmit;
   // },
 };
 

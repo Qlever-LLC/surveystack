@@ -86,26 +86,43 @@ export default {
     };
   },
   methods: {
+    addReadyToSubmit(status) {
+      return [
+        ...status.filter(({ type }) => type !== 'READY_TO_SUBMIT'),
+        {
+          type: 'READY_TO_SUBMIT',
+          value: {
+            at: new Date().toISOString(),
+          },
+        },
+      ];
+    },
+    // removeReadyToSubmit(status) {
+    //   return status.filter(({ type }) => type !== 'READY_TO_SUBMIT');
+    // },
     persist({ submission }) {
       db.persistSubmission(submission);
     },
     async submit({ payload }) {
       this.submitting = true;
-      this.$store.dispatch('readyToSubmit/add', this.submission._id);
-      // this.$store.dispatch('submissions/addReadyToSubmit', this.submission._id);
+      // this.$store.dispatch('readyToSubmit/add', this.submission._id);
+      this.submission.meta.status = this.addReadyToSubmit(this.submission.meta.status || []);
+
       try {
         // console.log('submitting', payload);
         const response = await api.post('/submissions', payload);
         this.result({ response });
         this.isSubmitted = true;
         await this.$store.dispatch('submissions/remove', this.submission._id);
-        await this.$store.dispatch('readyToSubmit/remove', this.submission._id);
-        // this.$store.dispatch('submissions/removeReadyToSubmit', this.submission._id);
-        // this.$router.push(`/surveys/${this.survey._id}`);
+        // await Promise.all([
+
+        //   // this.$store.dispatch('readyToSubmit/remove', this.submission._id),
+        // ]);
       } catch (error) {
         console.log('Draft submit error:', error);
         // const { message } = error.response.data;
         // this.snack(message); // does not exists here?
+        await db.persistSubmission(this.submission);
         this.result({ error });
       } finally {
         this.submitting = false;
