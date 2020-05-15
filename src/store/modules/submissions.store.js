@@ -58,12 +58,16 @@ const mutations = {
     state.submissions.push(submission);
   },
   [types.mutations.REMOVE_SUBMISSION](state, id) {
-    const index = state.submissions.findIndex(submission => submission._id === id);
+    const index = state.submissions.findIndex(({ _id }) => _id === id);
     state.submissions.splice(index, 1);
   },
   // [types.mutations.SET_REMOTE_SUBMISSIONS](state, submissions) {
   //   state.remoteSubmissions = submissions;
   // },
+  [types.mutations.UPDATE_SUBMISSION](state, submission) {
+    const index = state.submissions.findIndex(({ _id }) => _id === submission._id);
+    state.submissions[index] = submission;
+  },
 
 };
 
@@ -103,7 +107,7 @@ const actions = {
   // Create a draft, store it in database and Vuex store, then navigate to draft
   // TODO: figure out where and when to persist to database and store.
   // Also, should this even be a Vuex action or should it reside somewhere else?
-  async [types.actions.startDraft]({ commit, dispatch }, { survey, version = 0, group }) {
+  async [types.actions.startDraft]({ dispatch }, { survey, version = 0, group }) {
     const surveyEntity = await dispatch('surveys/fetchSurvey', survey, { root: true });
     const activeVersion = (version === 0) ? surveyEntity.latestVersion : version;
     const submission = submissionUtils.createSubmissionFromSurvey({
@@ -115,9 +119,11 @@ const actions = {
     dispatch(types.actions.add, submission);
     router.push({ name: 'submissions-drafts-detail', params: { id: submission._id } });
   },
-  // async [types.actions.update]({ commit, dispatch }, submission) {
-
-  // },
+  async [types.actions.update]({ commit, dispatch }, submission) {
+    await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
+    commit(types.mutations.UPDATE_SUBMISSION, submission);
+    return submission;
+  },
 };
 
 export default {

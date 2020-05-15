@@ -27,7 +27,7 @@
       Are you sure you want to exit this draft?
     </confirm-leave-dialog>
 
-    <v-dialog
+    <!-- <v-dialog
       v-model="submitting"
       hide-overlay
       persistent
@@ -42,7 +42,8 @@
           ></v-progress-linear>
         </v-card-text>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
+    <submitting-dialog v-model="submitting" />
 
     <result-dialog
       v-model="showResult"
@@ -67,6 +68,7 @@ import resultMixin from '@/components/ui/ResultsMixin';
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
+import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 
 
 export default {
@@ -75,6 +77,7 @@ export default {
     appDraftComponent,
     resultDialog,
     ConfirmLeaveDialog,
+    SubmittingDialog,
   },
   data() {
     return {

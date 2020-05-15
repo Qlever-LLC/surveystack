@@ -52,12 +52,6 @@ export default {
       } catch (error) {
         console.log(error);
       }
-
-      try {
-        db.clearAllReadyToSubmit();
-      } catch (error) {
-        console.log(error);
-      }
     },
     async submit() {
       try {

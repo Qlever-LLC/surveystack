@@ -57,8 +57,12 @@
                           </v-list-item-subtitle>
                         </v-list-item-content>
                         <v-list-item-action>
-                          <v-btn icon>
-                            <v-icon v-if="readyToSubmitHas(item._id)">
+                          <v-btn
+                            v-if="readyToSubmitHas(item._id)"
+                            icon
+                            @click="() => handleSubmitClick(item._id)"
+                          >
+                            <v-icon>
                               mdi-cloud-upload
                             </v-icon>
                           </v-btn>
@@ -156,12 +160,21 @@
       <!-- :group="submission.meta.group.id"
       @submit="() => submit(submission)"
       @set-group="(val) => $set(submission.meta.group, 'id', val)" -->
+      <!-- :group="activeSubmission.meta.group.id" -->
     <confirm-submission-dialog
       v-if="confirmSubmissionIsVisible"
-      :group="activeSubmission.meta.group.id"
       @set-group="(val) => setSubmissionGroup(activeSubmissionId, val)"
+      :group="activeSubmission.meta.group.id"
       v-model="confirmSubmissionIsVisible"
-      @submit="() => submit(activeSubmissionId)"
+      @input="handleConfirmSubmissionDialogInput"
+      @submit="() => uploadSubmission(activeSubmission)"
+    />
+    <submitting-dialog v-model="this.isSubmitting" />
+    <result-dialog
+      v-model="showResult"
+      :items="resultItems"
+      title="Result of Submission"
+      persistent
     />
   </v-container>
 </template>
@@ -173,16 +186,28 @@ import api from '@/services/api.service';
 // eslint-disable-next-line import/no-cycle
 import { types as submissionsTypes } from '@/store/modules/submissions.store';
 import ConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
+import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
+import ResultMixin from '@/components/ui/ResultsMixin';
+import ResultDialog from '@/components/ui/ResultDialog.vue';
 
 
 const PAGINATION_LIMIT = 10;
 
 export default {
+  mixins: [ResultMixin],
   components: {
     ConfirmSubmissionDialog,
+    SubmittingDialog,
+    ResultDialog,
+  },
+  watch: {
+    activeSubmissionId(id) {
+      this.activeSubmission = this.$store.getters['submissions/getSubmission'](id);
+    },
   },
   data() {
     return {
+      isSubmitting: false,
       isLoading: false,
       activeTab: 'drafts',
       page: 1,
@@ -195,6 +220,7 @@ export default {
       },
       confirmSubmissionIsVisible: false,
       activeSubmissionId: null,
+      activeSubmission: null,
     };
   },
   updated() {
@@ -216,9 +242,11 @@ export default {
     this.$store.dispatch('appui/reset');
   },
   computed: {
-    activeSubmission() {
-      return this.$store.getters.submissions.getSubmission(this.activeSubmissionId);
-    },
+    // activeSubmission() {
+    //   // return this.$store.getters['submissions/getSubmission'](this.activeSubmissionId);
+    //   return this.$store.state.submissions.submissions
+    //     .find(({ _id }) => this.activeSubmissionId === _id);
+    // },
     readyToSubmit() {
       // return this.$store.state.readyToSubmit.readyToSubmit || [];
       return this.$store.getters['submissions/readyToSubmit'];
@@ -270,8 +298,29 @@ export default {
     },
   },
   methods: {
+    async uploadSubmission(submission) {
+      this.isSubmitting = true;
+      try {
+        const response = await api.post('/submissions', submission);
+        await this.$store.dispatch('submissions/remove', submission._id);
+        this.result({ response });
+      } catch (err) {
+        console.log('Draft submit error:', err);
+      } finally {
+        this.isSubmitting = false;
+      }
+    },
+    async handleSubmitClick(id) {
+      this.activeSubmissionId = id;
+      this.confirmSubmissionIsVisible = true;
+    },
+    handleConfirmSubmissionDialogInput(value) {
+      if (!value) {
+        this.activeSubmissionId = null;
+      }
+    },
     getSubmission(id) {
-      return this.$store.getters.submissions.getSubmission(id);
+      return this.$store.getters['submissions/getSubmission'](id);
     },
     readyToSubmitHas(id) {
       return this.readyToSubmit.indexOf(id) > -1;
@@ -323,12 +372,20 @@ export default {
         (a, b) => (new Date(b.meta.dateModified)).valueOf() - (new Date(a.meta.dateModified)).valueOf(),
       );
     },
-    async uploadSubmission(submission) {
-      const response = await api.post('/submissions', submission);
-    },
-    setSubmissionGroup(id, groupId) {
-      // this.$store.commit('');
-      console.log('set submission group');
+    async setSubmissionGroup(id, groupId) {
+      await this.$store.dispatch('submissions/update', {
+        // ...submission,
+        ...this.activeSubmission,
+        meta: {
+          // ...submission.meta,
+          ...this.activeSubmission.meta,
+          group: {
+            id: groupId,
+            path: null,
+          },
+        },
+      });
+      this.activeSubmission = this.$store.getters['submissions/getSubmission'](this.activeSubmissionId);
     },
   },
 };
