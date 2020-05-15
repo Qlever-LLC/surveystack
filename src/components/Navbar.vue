@@ -4,7 +4,7 @@
       app
       dark
       clipped-left
-      color="primary"
+      color="appbar"
     >
       <v-app-bar-nav-icon
         color="white"

@@ -31,7 +31,16 @@ export default {
       const activePartner = partners.find(p => p.domain === subdomain);
 
       if (activePartner) {
-        vue.$vuetify.theme.themes.light.primary = activePartner.primaryColor;
+        // every property needs to be set manually to force a reactive update
+        vue.$vuetify.theme.themes.light.primary = activePartner.themes.light.primary;
+        vue.$vuetify.theme.themes.light.secondary = activePartner.themes.light.secondary;
+        vue.$vuetify.theme.themes.light.accent = activePartner.themes.light.accent;
+        vue.$vuetify.theme.themes.light.error = activePartner.themes.light.error;
+        vue.$vuetify.theme.themes.light.warning = activePartner.themes.light.warning;
+        vue.$vuetify.theme.themes.light.info = activePartner.themes.light.info;
+        vue.$vuetify.theme.themes.light.success = activePartner.themes.light.success;
+        vue.$vuetify.theme.themes.light.appbar = activePartner.themes.light.appbar;
+
         manifestElement.setAttribute('href', `/partners/${subdomain}/manifest.json`);
         iconElement.setAttribute('href', `/partners/${subdomain}/images/icons/icon-72x72.png`);
         document.title = activePartner.name;
