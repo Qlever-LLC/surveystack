@@ -1,4 +1,3 @@
-import moment from 'moment';
 import { aggregatorRequest } from './request';
 
 function plantingBody(name, cropId, instanceId) {
@@ -12,29 +11,6 @@ function plantingBody(name, cropId, instanceId) {
     ],
     data: instanceId,
   };
-}
-
-function log(type, cropName, fieldId, assetId, timestamp, instanceId) {
-  const ret = {
-    name: cropName,
-    asset: [{ id: assetId }],
-    type,
-    timestamp,
-    done: 1,
-    data: instanceId,
-  };
-
-  if (fieldId) {
-    ret.movement = {
-      area: [
-        {
-          id: fieldId,
-        },
-      ],
-    };
-  }
-
-  return ret;
 }
 
 async function createOrUpdate(farmUrl, cred, instanceId, endpoint, body) {
@@ -88,8 +64,6 @@ async function planting(apiCompose, info, terms, user, credentials, submission) 
   }
 
   const crop = apiCompose.body.crop;
-  const field = apiCompose.body.area;
-  const date = apiCompose.body.date;
   const instanceId = submission._id;
 
   const vocabId = info.info.resources.taxonomy_term.farm_crops.vid;
@@ -134,6 +108,7 @@ async function planting(apiCompose, info, terms, user, credentials, submission) 
       farmOsCrop.tid,
       instanceId
     );
+    
     const r = await createOrUpdate(farmUrl, cred, instanceId, 'assets', body);
     results.push(r[0]);
     plantingId = r[0].id;
@@ -141,24 +116,6 @@ async function planting(apiCompose, info, terms, user, credentials, submission) 
     if (!plantingId) {
       throw Error(`Planting ID not defined ${r}`);
     }
-  }
-
-  {
-    const tmp = apiCompose.body.method || 'seeding';
-    const method = tmp === 'seeding' ? 'farm_seeding' : 'farm_transplanting';
-    const timestamp = date ? moment(date).unix() : moment().unix();
-
-    const body = log(
-      method,
-      `${tmp} for ${crop}`,
-      parseInt(field),
-      parseInt(plantingId),
-      parseInt(timestamp),
-      instanceId
-    );
-
-    const r = await createOrUpdate(farmUrl, cred, instanceId, 'logs', body);
-    results.push(r[0]);
   }
 
   return results;

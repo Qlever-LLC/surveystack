@@ -24,6 +24,7 @@
     "aws-sdk": "^2.616.0",
     "axios": "^0.19.2",
     "bcrypt": "^3.0.6",
+    "compression": "^1.7.4",
     "connect-history-api-fallback": "^1.6.0",
     "cors": "^2.8.5",
     "dotenv-defaults": "^1.0.2",

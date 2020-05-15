@@ -162,7 +162,6 @@ async function execute(apiCompose, info, terms, user, submission, currentAssetId
 }
 
 export const handle = async (res, submission, survey, user) => {
-  const credentials = await getCredentials(user);
 
   const surveyVersion = submission.meta.survey.version;
 
@@ -199,6 +198,9 @@ export const handle = async (res, submission, survey, user) => {
   });
 
   console.log('farmOsCompose', farmOsCompose);
+  if(farmOsCompose.length === 0){
+    return [];
+  }
 
   const results = [];
 
@@ -224,6 +226,8 @@ export const handle = async (res, submission, survey, user) => {
 
   // distinct aggregator map
   const aggregators = new Map();
+  const credentials = await getCredentials(user);
+
   credentials.forEach((credential) => {
     aggregators.set(credential.aggregatorURL, credential.aggregatorApiKey);
   });
