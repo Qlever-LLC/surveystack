@@ -454,7 +454,6 @@ const firstParentWithRelevance = (submission, survey, index, positions) => {
 export const isRelevant = (submission, survey, index, positions) => {
   const relevantPosition = firstParentWithRelevance(submission, survey, index, positions) || positions[index];
   const field = submissionUtils.getSubmissionField(submission, survey, relevantPosition);
-  console.log('deciding field', field);
   return field.meta.relevant;
 };
 
