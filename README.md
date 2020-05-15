@@ -142,4 +142,4 @@ Basically, the following layout is used:
 
 ## Increment Version
 
-Run `yarn version` to create a new version. Also don't forget to push the new tag `git push origin master --tags`
+Run `yarn version --patch` or `yarn version --minor` to create a new version. Also don't forget to push the new tag `git push origin master --tags`
