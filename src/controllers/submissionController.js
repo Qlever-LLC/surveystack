@@ -171,8 +171,18 @@ const buildPipeline = async (req, res) => {
 
   // initial match stage to filter surveys
   if (req.query.survey) {
-    pipeline.push({ $match: { 'meta.survey.id': new ObjectId(req.query.survey) } });
+    pipeline.push({
+      $match: { 'meta.survey.id': new ObjectId(req.query.survey) },
+    });
   }
+
+  // archived
+  const archivedMatch = { 'meta.archived': { $ne: true } };
+  if (req.query.showArchived && req.query.showArchived === 'true') {
+    archivedMatch['meta.archived'] = true;
+  }
+  console.log('pushing archivedMatch', archivedMatch);
+  pipeline.push({ $match: archivedMatch });
 
   // redact stage
   if (res.locals.auth.isAuthenticated) {
@@ -508,6 +518,19 @@ const isUserAllowedToDeleteSubmission = async (submission, user) => {
   return false;
 };
 
+const archiveSubmission = async (req, res) => {
+  const { id } = req.params;
+  const updated = await db.collection(col).findOneAndUpdate(
+    { _id: new ObjectId(id) },
+    { $set: { 'meta.archived': true } },
+    {
+      returnOriginal: false,
+    }
+  );
+
+  return res.send(updated);
+};
+
 const deleteSubmission = async (req, res) => {
   const { id } = req.params;
 
@@ -536,5 +559,6 @@ export default {
   getSubmission,
   createSubmission,
   updateSubmission,
+  archiveSubmission,
   deleteSubmission,
 };

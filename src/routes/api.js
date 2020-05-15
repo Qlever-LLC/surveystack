@@ -61,6 +61,7 @@ router.delete('/groups/:id', assertAuthenticated, catchErrors(groupController.de
 /** Submissions */
 router.get('/submissions', catchErrors(submissionController.getSubmissions));
 router.get('/submissions/page', catchErrors(submissionController.getSubmissionsPage));
+router.post('/submissions/:id/archive', catchErrors(submissionController.archiveSubmission));
 router.get('/submissions/:id', catchErrors(submissionController.getSubmission));
 router.post('/submissions', catchErrors(submissionController.createSubmission));
 router.put('/submissions/:id', catchErrors(submissionController.updateSubmission));
