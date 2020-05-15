@@ -56,6 +56,8 @@
             target="_blank"
           >Backend</a>.
         </p>
+
+        <p>App-Version: {{ version }}</p>
       </v-flex>
 
     </v-layout>
@@ -69,6 +71,7 @@ export default {
   name: 'home',
   data() {
     return {
+      version: process.env.VUE_APP_VERSION,
       installPrompt: {
         prompt() {
           console.log('install stub');

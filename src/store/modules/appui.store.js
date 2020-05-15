@@ -11,6 +11,7 @@ const createInitialState = () => ({
   partner: null,
 });
 
+
 const initialState = createInitialState();
 
 const getters = {

@@ -1,8 +1,17 @@
+/* eslint-disable no-param-reassign */
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 
+const fs = require('fs');
+
+const packageJson = fs.readFileSync('./package.json');
+const version = JSON.parse(packageJson).version || 0;
+process.env.VUE_APP_VERSION = version;
+
 module.exports = {
-  chainWebpack: config => config.plugins.delete('pwa'),
+  chainWebpack: (config) => {
+    config.plugins.delete('pwa');
+  },
   configureWebpack: {
     resolve: {
       alias: {
