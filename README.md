@@ -139,3 +139,7 @@ Have a look at the official [documentation on application](https://vuetifyjs.com
 
 Basically, the following layout is used:
 ![vuetify application layout](./src/assets/documentation/vuetify-app.png)
+
+## Increment Version
+
+Run `yarn version` to create a new version. Also don't forget to push the new tag `git push origin --tags`
