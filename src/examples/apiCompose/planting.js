@@ -31,7 +31,7 @@ function populatePlanting(cropAnswer, field) {
 
 
   const crop = cropAnswer.value;
-  const farmUrl = field.value.farmUrl;
+  const farmUrl = field.value.url;
 
   return {
     type: 'farmos',
