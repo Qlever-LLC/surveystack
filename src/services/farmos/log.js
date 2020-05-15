@@ -59,7 +59,7 @@ async function log(
     return;
   }
 
-  const { terms } = apiCompose;
+  const terms = apiCompose.terms;
   const termMap = {};
   if (terms) {
     for (const t of terms) {
