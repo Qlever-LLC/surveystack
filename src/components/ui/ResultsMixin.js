@@ -29,6 +29,8 @@ export default {
             return;
           }
 
+          console.log('parsing error', farmos);
+
           if (farmos.status === 'error') {
             this.resultItems.push({
               title: 'Error submitting to FarmOS',

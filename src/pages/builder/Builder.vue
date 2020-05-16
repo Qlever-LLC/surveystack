@@ -181,7 +181,11 @@ export default {
         console.log('submitting', payload);
         const response = await api.post('/submissions', payload);
         // this.$router.push(`/surveys/${this.survey._id}`);
-        this.result({ response });
+        try {
+          this.result({ response });
+        } catch (error) {
+          console.log('error parsing result from server', error);
+        }
       } catch (error) {
         console.log('error', error);
         const { message } = error.response.data;
