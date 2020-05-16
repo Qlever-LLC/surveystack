@@ -48,6 +48,9 @@ async function aggregatorRequest(
     data: body,
   };
 
+  console.log("submitting body to farmos");
+  console.log(JSON.stringify(body, null, 2));
+
   if (method.toLowerCase() === 'post') {
     config.headers['Content-Type'] = 'application/json';
   }
@@ -55,6 +58,7 @@ async function aggregatorRequest(
   const response = await axios(config);
   //console.log('response', response);
   const r = response.data;
+  console.log("response from aggregator", r);
 
   const farmId = Object.keys(r)[0];
   return r[farmId];

@@ -72,10 +72,12 @@ async function log(
 
   const date = apiCompose.body.date;
   const instanceId = submission._id;
-  const timestamp = date ? moment(date).unix() : moment().unix();
+  if (!apiCompose.body.timestamp && date) {
+    const timestamp = date ? moment(date).unix() : moment().unix();
+    apiCompose.body.timestamp = timestamp;
+    delete apiCompose.body.date;
+  }
 
-  delete apiCompose.body.date;
-  apiCompose.body.timestamp = timestamp;
   apiCompose.body.data = instanceId;
 
   let bodyString = JSON.stringify(apiCompose.body, null, 4);
@@ -101,7 +103,19 @@ async function log(
       'post',
       JSON.parse(bodyString)
     );
-    results.push(r[0]);
+
+    const response = r[0];
+    if (response == null) {
+      results.push({
+        status: 'error',
+        error: {
+          message: apiCompose.body.name,
+          config: {
+            data: 'farmos returned *null*',
+          },
+        },
+      });
+    }
   }
 
   return results;

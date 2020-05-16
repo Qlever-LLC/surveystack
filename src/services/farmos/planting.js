@@ -108,7 +108,7 @@ async function planting(apiCompose, info, terms, user, credentials, submission) 
       farmOsCrop.tid,
       instanceId
     );
-    
+
     const r = await createOrUpdate(farmUrl, cred, instanceId, 'assets', body);
     results.push(r[0]);
     plantingId = r[0].id;
