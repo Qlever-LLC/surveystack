@@ -56,6 +56,10 @@ const sanitizeMatch = (obj) => {
         obj[key] = new Date(v);
         return;
       }
+      // if (/^.*\.(creator|id)$/) {
+      //   obj[key] = ObjectId(obj[key]);
+      //   return;
+      // }
       sanitizeMatch(obj[key]);
     }
   });
@@ -183,6 +187,22 @@ const buildPipeline = async (req, res) => {
   }
   console.log('pushing archivedMatch', archivedMatch);
   pipeline.push({ $match: archivedMatch });
+
+  if (req.query.creator) {
+    pipeline.push({
+      $match: {
+        'meta.creator': new ObjectId(req.query.creator)
+      }
+    });
+  }
+
+  if (req.query.group) {
+    pipeline.push({
+      $match: {
+        'meta.group.id': new ObjectId(req.query.group)
+      }
+    });
+  }
 
   // redact stage
   if (res.locals.auth.isAuthenticated) {
