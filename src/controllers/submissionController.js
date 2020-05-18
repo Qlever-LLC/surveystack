@@ -334,7 +334,10 @@ const getSubmissionsPage = async (req, res) => {
 
   pipeline.push(...paginationStages);
 
-  const [entities] = await db.collection(col).aggregate(pipeline).toArray();
+  const [entities] = await db
+    .collection(col)
+    .aggregate(pipeline)
+    .toArray();
 
   if (!entities) {
     return res.send({
@@ -349,7 +352,7 @@ const getSubmissionsPage = async (req, res) => {
     entities.headers = headers;
   } catch (error) {
     console.error('error creating headers', error);
-    entities.headers = {};
+    entities.headers = [];
   }
 
   return res.send(entities);
@@ -387,7 +390,10 @@ const getSubmissions = async (req, res) => {
     }
   }
 
-  const entities = await db.collection(col).aggregate(pipeline).toArray();
+  const entities = await db
+    .collection(col)
+    .aggregate(pipeline)
+    .toArray();
 
   if (req.query.format === 'csv') {
     const [mergedObject] = await db
