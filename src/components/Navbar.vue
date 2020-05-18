@@ -2,12 +2,12 @@
   <nav>
     <v-app-bar
       app
-      dark
+      :dark="true"
       clipped-left
       color="appbar"
     >
+        <!-- color="white" -->
       <v-app-bar-nav-icon
-        color="white"
         @click="drawer = !drawer"
       />
       <v-toolbar-title class="ml-2 flex-column">
@@ -208,7 +208,7 @@ export default {
 #app-bar-title {
   font-size: 1rem;
   font-weight: normal;
-  color: white;
+  /* color: white; */
   line-height: 1.8rem;
 }
 

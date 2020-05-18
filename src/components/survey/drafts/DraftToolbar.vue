@@ -25,21 +25,21 @@
     </v-chip>
     <v-spacer></v-spacer>
 
-    <v-btn icon>
+    <!-- <v-btn icon>
       <v-icon>mdi-magnify</v-icon>
-    </v-btn>
+    </v-btn> -->
 
     <v-btn
       icon
       v-if="showOverviewIcon"
       @click="$emit('showOverviewClicked')"
     >
-      <v-icon>mdi-view-list</v-icon>
+      <v-icon>mdi-format-list-numbered</v-icon>
     </v-btn>
 
-    <v-btn icon>
+    <!-- <v-btn icon>
       <v-icon>mdi-dots-vertical</v-icon>
-    </v-btn>
+    </v-btn> -->
   </v-toolbar>
 </template>
 
@@ -56,9 +56,10 @@ export default {
 <style scoped>
 .number-chip {
   display: inline-flex;
-  border: 2px solid #ff5722;
+  /* border: 2px solid #ff5722; */
+  border: 2px solid currentColor;
   background-color: white;
-  color: #ff5722;
+  /* color: #ff5722; */
   border-radius: 2rem;
   line-height: 2rem;
   font-weight: bold;
