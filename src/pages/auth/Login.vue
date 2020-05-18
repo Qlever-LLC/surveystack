@@ -63,6 +63,7 @@
 <script>
 import appFeedback from '@/components/ui/Feedback.vue';
 import api from '@/services/api.service';
+import { autoSelectActiveGroup } from '@/utils/memberships';
 
 
 const DEFAULT_ENTITY = {
@@ -140,19 +141,12 @@ export default {
       }
 
       try {
-        const user = await this.$store.dispatch('auth/login', {
+        await this.$store.dispatch('auth/login', {
           url: '/auth/login',
           user: this.entity,
         });
-        const memberships = await this.$store.dispatch('memberships/getUserMemberships', user._id);
-        if (
-          // !this.$store.getters['memberships/activeGroup'] &&
-          memberships
-          && memberships.length > 0
-          && memberships[0].group
-        ) {
-          this.$store.dispatch('memberships/setActiveGroup', memberships[0].group._id);
-        }
+
+        await autoSelectActiveGroup(this.$store);
 
         if (this.$route.params.redirect) {
           this.$router.push(this.$route.params.redirect);

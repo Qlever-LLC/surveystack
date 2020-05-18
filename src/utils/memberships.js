@@ -14,7 +14,20 @@ export const uuid = () => {
   return `${u}.${new Date().getTime().toString(16)}`;
 };
 
+export const autoSelectActiveGroup = async (store) => {
+  const user = store.getters['auth/user'];
+  const memberships = await store.dispatch('memberships/getUserMemberships', user._id);
+  if (
+    memberships
+    && memberships.length > 0
+    && memberships[0].group
+  ) {
+    store.dispatch('memberships/setActiveGroup', memberships[0].group._id);
+  }
+};
+
 
 export default {
   uuid,
+  autoSelectActiveGroup,
 };

@@ -85,8 +85,8 @@
     >
       <template v-slot:entity="{ entity }">
         <v-list-item-content v-if="entity.meta && entity.meta.status === 'pending'">
-          <v-list-item-title class="text--secondary">[Pending] Invitation</v-list-item-title>
-          <v-list-item-subtitle>sent to {{entity.meta.sentTo}}</v-list-item-subtitle>
+          <v-list-item-title class="text--secondary">[Pending] {{entity.meta.invitationEmail}}</v-list-item-title>
+          <v-list-item-subtitle>{{entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'}}</v-list-item-subtitle>
         </v-list-item-content>
 
         <v-list-item-content v-else>
@@ -188,8 +188,8 @@ export default {
           if (entity.user.email.toLowerCase().startsWith(ql)) {
             return true;
           }
-        } else if (entity.meta.sentTo) {
-          if (entity.meta.sentTo.toLowerCase().indexOf(ql) > -1) {
+        } else if (entity.meta.invitationEmail) {
+          if (entity.meta.invitationEmail.toLowerCase().indexOf(ql) > -1) {
             return true;
           }
         }
