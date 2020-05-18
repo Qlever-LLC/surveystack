@@ -399,10 +399,11 @@ export const exampleMemberships = [
     meta: {
       status: 'active',
       dateCreated: '2020-04-14T08:04:26.170Z',
-      dateClaimed: null,
-      sentTo: '',
+      dateSent: null,
+      dateActivated: null,
       notes: '',
-      invitation: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbba',
+      invitationEmail: null,
+      invitationCode: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbba',
     },
   },
   {
@@ -413,10 +414,11 @@ export const exampleMemberships = [
     meta: {
       status: 'active',
       dateCreated: '2020-04-14T08:04:26.170Z',
-      dateClaimed: null,
-      sentTo: '',
+      dateSent: null,
+      dateActivated: null,
       notes: '',
-      invitation: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbb',
+      invitationEmail: null,
+      invitationCode: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbb',
     },
   },
   {
@@ -427,10 +429,11 @@ export const exampleMemberships = [
     meta: {
       status: 'active',
       dateCreated: '2020-04-14T08:04:26.170Z',
-      dateClaimed: null,
-      sentTo: '',
+      dateSent: null,
+      dateActivated: null,
       notes: '',
-      invitation: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbc',
+      invitationEmail: null,
+      invitationCode: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbc',
     },
   },
   {
@@ -441,10 +444,11 @@ export const exampleMemberships = [
     meta: {
       status: 'active',
       dateCreated: '2020-04-14T08:04:26.170Z',
-      dateClaimed: null,
-      sentTo: '',
+      dateSent: null,
+      dateActivated: null,
       notes: '',
-      invitation: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbd',
+      invitationEmail: null,
+      invitationCode: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbd',
     },
   },
   {
@@ -455,10 +459,11 @@ export const exampleMemberships = [
     meta: {
       status: 'active',
       dateCreated: '2020-04-14T08:04:26.170Z',
-      dateClaimed: null,
-      sentTo: '',
+      dateSent: null,
+      dateActivated: null,
       notes: '',
-      invitation: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbe',
+      invitationEmail: null,
+      invitationCode: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbe',
     },
   },
   {
@@ -469,10 +474,11 @@ export const exampleMemberships = [
     meta: {
       status: 'active',
       dateCreated: '2020-04-14T08:04:26.170Z',
-      dateClaimed: null,
-      sentTo: '',
+      dateSent: null,
+      dateActivated: null,
       notes: '',
-      invitation: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbf',
+      invitationEmail: null,
+      invitationCode: 'b4565ef5-2be8-4b73-82f0-d8192859c70c.17177b7cbbf',
     },
   },
 ];

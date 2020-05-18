@@ -1,5 +1,3 @@
-import { ObjectId } from 'mongodb';
-
 import boom from '@hapi/boom';
 
 import { db } from '../db';
@@ -11,32 +9,33 @@ export const addMembership = async ({ user, group, role }) => {
   entity.meta = {
     status: 'active',
     dateCreated: new Date(),
-    dateClaimed: new Date(),
-    sentTo: null,
+    dateSent: null,
+    dateActivated: new Date(),
     notes: '(creator)',
-    invitation: null,
+    invitationEmail: null,
+    invitationCode: null,
   };
   const m = await db.collection(col).insertOne(entity);
   return m;
 };
 
-export const claimMembership = async ({ code, user }) => {
-  const existing = await db.collection(col).findOne({ 'meta.invitation': code });
+export const activateMembership = async ({ code, user }) => {
+  const existing = await db.collection(col).findOne({ 'meta.invitationCode': code });
   if (!existing) {
     throw boom.notFound(`No invitation found for code: ${code}`);
   }
 
   if (existing.meta.status !== 'pending') {
-    throw boom.badRequest(`Code already claimed: ${code}`);
+    throw boom.badRequest(`Code already activated: ${code}`);
   }
 
   await db.collection(col).findOneAndUpdate(
-    { 'meta.invitation': code },
+    { 'meta.invitationCode': code },
     {
       $set: {
         user: user,
         'meta.status': 'active',
-        'meta.dateClaimed': new Date(),
+        'meta.dateActivated': new Date(),
       },
     }
   );
@@ -44,5 +43,5 @@ export const claimMembership = async ({ code, user }) => {
 
 export default {
   addMembership,
-  claimMembership,
+  activateMembership,
 };

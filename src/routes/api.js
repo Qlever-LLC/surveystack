@@ -129,7 +129,7 @@ router.post(
   [assertEntityExists({ collection: 'memberships' })],
   catchErrors(membershipController.resendInvitation)
 );
-router.post('/memberships/claim', catchErrors(membershipController.claimMembership));
+router.post('/memberships/activate', catchErrors(membershipController.activateMembership));
 router.post('/memberships', catchErrors(membershipController.createMembership));
 router.put(
   '/memberships/:id',

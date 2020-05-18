@@ -21,7 +21,8 @@ const sanitize = (entity) => {
   if (entity.meta) {
     const meta = entity.meta;
     meta.dateCreated && (meta.dateCreated = new Date(meta.dateCreated));
-    meta.dateClaimed && (meta.dateClaimed = new Date(meta.dateClaimed));
+    meta.dateSent && (meta.dateSent = new Date(meta.dateSent));
+    meta.dateActivated && (meta.dateActivated = new Date(meta.dateActivated));
   }
 };
 
@@ -71,7 +72,7 @@ const createPopulationPipeline = () => {
 const getMemberships = async (req, res) => {
   const filter = {};
 
-  const { group, user, invitation, status } = req.query;
+  const { group, user, invitationCode, status } = req.query;
   if (group) {
     filter.group = new ObjectId(group);
   }
@@ -80,8 +81,8 @@ const getMemberships = async (req, res) => {
     filter.user = new ObjectId(user);
   }
 
-  if (invitation) {
-    filter['meta.invitation'] = invitation;
+  if (invitationCode) {
+    filter['meta.invitationCode'] = invitationCode;
   }
 
   if (status) {
@@ -191,14 +192,24 @@ const getMembership = async (req, res) => {
 
 const createMembership = async (req, res) => {
   const entity = req.body;
+  const { sendEmail } = req.query;
   sanitize(entity);
+
+  console.log(req.headers);
+
+  if (!entity.meta.invitationEmail) {
+    throw boom.badRequest('Need to supply an email address');
+  }
 
   const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
   if (!adminAccess) {
     throw boom.unauthorized(`Only group admins can create memberships`);
   }
 
-  await sendMembershipInvitation(entity);
+  if (sendEmail === 'SEND_NOW') {
+    await sendMembershipInvitation({ membership: entity, origin: req.headers.origin });
+    entity.meta.dateSent = new Date();
+  }
 
   try {
     let r = await db.collection(col).insertOne(entity);
@@ -213,22 +224,22 @@ const createMembership = async (req, res) => {
   throw boom.internal();
 };
 
-const sendMembershipInvitation = async (membership) => {
+const sendMembershipInvitation = async ({ membership, origin }) => {
   const group = await db.collection('groups').findOne({ _id: membership.group });
   if (!group) {
     throw boom.badRequest(`Group does not exist: ${membership.group}`);
   }
 
-  mailService.send({
-    to: membership.meta.sentTo,
+  await mailService.send({
+    to: membership.meta.invitationEmail,
     subject: `Surveystack invitation to group ${group.name}`,
     text: `Hello
-    
-You are invited to join group ${group.name}!
-    
-Please use the following link to claim your invitation:
-${process.env.SERVER_URL}/invitations?code=${membership.meta.invitation}
-    
+
+You have been invited to join group '${group.name}'!
+
+Please use the following link to activate your invitation:
+${origin}/invitations?code=${membership.meta.invitationCode}
+
 Best Regards`,
   });
 };
@@ -239,8 +250,15 @@ const resendInvitation = async (req, res) => {
   if (!adminAccess) {
     throw boom.unauthorized(`Only group admins can resend membership invitations`);
   }
-  await sendMembershipInvitation(membership);
-  return res.send('OK');
+  await sendMembershipInvitation({ membership, origin: req.headers.origin });
+  const updated = await db
+    .collection(col)
+    .findOneAndUpdate(
+      { _id: membership._id },
+      { $set: { 'meta.dateSent': new Date() } },
+      { returnOriginal: false }
+    );
+  return res.send(updated.value);
 };
 
 const updateMembership = async (req, res) => {
@@ -255,13 +273,9 @@ const updateMembership = async (req, res) => {
   }
 
   try {
-    let updated = await db.collection(col).findOneAndUpdate(
-      { _id: new ObjectId(id) },
-      { $set: entity },
-      {
-        returnOriginal: false,
-      }
-    );
+    let updated = await db
+      .collection(col)
+      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: entity }, { returnOriginal: false });
     return res.send(updated);
   } catch (err) {
     console.log(err);
@@ -296,11 +310,11 @@ const deleteMembership = async (req, res) => {
   }
 };
 
-const claimMembership = async (req, res) => {
+const activateMembership = async (req, res) => {
   const { code } = req.body;
   const user = res.locals.auth.user._id;
 
-  await membershipService.claimMembership({ code, user });
+  await membershipService.activateMembership({ code, user });
 
   return res.send('OK');
 };
@@ -311,7 +325,7 @@ export default {
   createMembership,
   updateMembership,
   deleteMembership,
-  claimMembership,
+  activateMembership,
   getTree,
   resendInvitation,
 };
