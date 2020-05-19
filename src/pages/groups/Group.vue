@@ -2,16 +2,16 @@
   <v-container v-if="initialized && status.code === 200">
     <div class="d-flex justify-space-between align-center">
       <app-group-breadcrumbs :path="entity.path" />
-      <v-btn
-        class="ml-auto"
-        :to="{name: 'groups-edit', params: {id: entity._id}}"
-        text
-      >
-        <template v-if="editable">
-          <v-icon>mdi-pencil</v-icon>
-          <span class="ml-2">Edit</span>
-        </template>
-      </v-btn>
+
+      <div v-if="editable">
+        <v-btn
+          class="ml-auto"
+          :to="{name: 'groups-edit', params: {id: entity._id}}"
+          text
+        >
+          <v-icon left>mdi-cog</v-icon> Admin
+        </v-btn>
+      </div>
     </div>
 
     <h1>

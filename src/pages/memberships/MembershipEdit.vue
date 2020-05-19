@@ -18,6 +18,12 @@
         class="mt-3"
         @keydown.enter.prevent="submit"
       >
+        <v-select
+          :items="availableStatus"
+          v-model="entity.meta.status"
+          label="Status"
+          disabled
+        />
 
         <v-text-field
           v-model="entity.group"
@@ -26,6 +32,7 @@
         />
 
         <v-text-field
+          v-if="entity.user"
           class="mt-3"
           v-model="entity.user"
           label="User"
@@ -47,12 +54,11 @@
         ></v-select>
 
         <div class="d-flex mt-2">
-          <div>
+          <div v-if="entity.meta.status === 'pending'">
             <v-btn
               color="secondary"
               outlined
               @click="resend"
-              v-if="entity.meta.status === 'pending'"
             >
               <v-icon left>mdi-email-send-outline</v-icon> Resend
             </v-btn><br />
@@ -66,7 +72,7 @@
           <v-btn
             color="primary"
             @click="submit"
-          >Submit</v-btn>
+          >Save</v-btn>
         </div>
       </v-form>
     </v-card>
@@ -150,6 +156,17 @@ const availableRoles = [
   },
 ];
 
+const availableStatus = [
+  {
+    value: 'pending',
+    text: 'Pending',
+  },
+  {
+    value: 'active',
+    text: 'Active',
+  },
+];
+
 export default {
   components: {
     appIntegrationList,
@@ -157,6 +174,7 @@ export default {
   data() {
     return {
       availableRoles,
+      availableStatus,
       entity: {
         _id: '',
         user: null,
