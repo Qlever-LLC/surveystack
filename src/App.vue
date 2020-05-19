@@ -12,6 +12,8 @@
 </template>
 
 <script>
+/* eslint-disable no-restricted-syntax */
+
 import appNavbar from '@/components/Navbar.vue';
 import appGlobalFeedback from '@/components/GlobalFeedback.vue';
 import domainHandler from '@/utils/domainHandler';
@@ -24,6 +26,19 @@ export default {
   },
   created() {
     domainHandler.install(this);
+  },
+  mounted() {
+    console.log('mounted');
+    const user = this.$store.getters['auth/user'];
+    this.$store.dispatch('memberships/getUserMemberships', user._id);
+    const memberships = this.$store.getters['memberships/memberships'];
+    console.log('memberships', memberships);
+    for (const membership of memberships) {
+      this.$store.dispatch('surveys/fetchPinned', membership.group._id);
+    }
+    // this.$store.dispatch('surveys/fetchPinned', ),
+    // fetch pinned surveys
+    // for survey, prefetch
   },
 };
 </script>

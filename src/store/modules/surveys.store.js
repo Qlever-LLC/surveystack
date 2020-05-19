@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import api from '@/services/api.service';
 
 
@@ -53,10 +54,23 @@ const actions = {
     commit(types.ADD_SURVEY, response.data);
     return response.data;
   },
+  async fetchPinned({ commit }, groupId) {
+    try {
+      const { data } = await api.get(`/groups/${groupId}?populate=1`);
+      if (data && data.surveys && data.surveys.pinned && Array.isArray(data.surveys.pinned)) {
+        for (const s of data.surveys.pinned) {
+          console.log('fetching pinned survey', s);
+          actions.fetchSurvey({ commit }, s._id);
+        }
+      }
+    } catch (err) {
+      console.log('Error fetching surveys:', err);
+    }
+    return [];
+  },
   removeSurvey({ commit }, id) {
     commit(types.REMOVE_SURVEY, id);
   },
-
 };
 
 export default {

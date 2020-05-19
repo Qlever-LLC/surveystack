@@ -33,7 +33,7 @@
               <br />
               <span class="title">{{el.name}}</span>
               <br />
-              <span class="font-weight-light grey--text text--darken-2">last modified {{ renderDateFromNow(el.meta.dateModified) }}</span>
+              <span class="font-weight-light grey--text text--darken-2" v-if="el.meta">last modified {{ renderDateFromNow(el.meta.dateModified) }}</span>
 
             </div>
             <div class="d-flex">
@@ -110,7 +110,7 @@
             >
               <v-list-item-content>
                 <v-list-item-title>{{searchResult.name}}</v-list-item-title>
-                <v-list-item-subtitle>last modified {{ renderDateFromNow(searchResult.meta.dateModified) }}</v-list-item-subtitle>
+                <v-list-item-subtitle v-if="searchResult.meta">last modified {{ renderDateFromNow(searchResult.meta.dateModified) }}</v-list-item-subtitle>
 
               </v-list-item-content>
 
@@ -152,6 +152,9 @@ export default {
     searchResults: {
       type: Array,
     },
+  },
+  mounted() {
+    console.log('entities', this.entities);
   },
   methods: {
     showDeleteModal(index) {
