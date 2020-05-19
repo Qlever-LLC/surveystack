@@ -36,6 +36,7 @@ import MembershipEdit from '@/pages/memberships/MembershipEdit.vue';
 
 import Invitation from '@/pages/invitations/Invitation.vue';
 
+import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
 
 // integrations
 import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
@@ -272,6 +273,12 @@ const routes = [
     path: '/invitations',
     name: 'invitations',
     component: Invitation,
+  },
+  // Request submissions
+  {
+    path: '/call-for-submissions',
+    name: 'call-for-submissions',
+    component: CallForSubmissions,
   },
   // tabula rasa
   // TODO: remove this from production

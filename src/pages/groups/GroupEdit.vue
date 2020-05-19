@@ -1,7 +1,16 @@
 <template>
   <v-container>
-    <h1>{{editMode ? "Edit group" : "Create group"}}</h1>
-
+    <div class="d-flex justify-space-between">
+      <h1>{{editMode ? "Edit group" : "Create group"}}</h1>
+      <v-btn
+        v-if="editMode"
+        class="ma-2"
+        :to="`/call-for-submissions?group=${entity._id}`"
+        color="secondary"
+      >
+        <v-icon left>mdi-email-multiple-outline</v-icon>Call for submissions...
+      </v-btn>
+    </div>
     <v-card class="pa-4 mb-4">
       <form
         @submit.prevent="onSubmit"

@@ -127,6 +127,20 @@ export default {
       const { data: [membership] } = await api.get(`/memberships?invitation=${invitation}&populate=true`);
       this.membership = membership;
     }
+
+    // magic link login
+    const {
+      cfs, email, token, group,
+    } = this.$route.query;
+    if (cfs) {
+      await this.$store.dispatch('auth/login', {
+        url: '/auth/login',
+        user: { email: email.replace(/ /g, '+'), token }, // TODO: find a better solution for + signs
+      });
+
+      await autoSelectActiveGroup(this.$store, group);
+      this.$router.replace({ name: 'surveys-detail', params: { id: cfs } });
+    }
   },
   methods: {
     async submit() {
