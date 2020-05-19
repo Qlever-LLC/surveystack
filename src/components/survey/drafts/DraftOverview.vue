@@ -36,10 +36,10 @@
               <div class="flex-grow-1">
                 <v-card-title class="d-block">
                   <div class="ma-0 pa-0 d-flex align-stretch">
+                      <!-- color="#FF5722" -->
                     <v-chip
                       dark
                       small
-                      color="red"
                       class="mr-0 mr-1"
                     ><span
                         v-for="(crumb, ci) in display.breadcrumbs"
@@ -230,9 +230,10 @@ export default {
 .number-chip {
   display: inline-flex;
   box-shadow: 0 0 1px 0px white inset, 0 0 1px 0px white;
-  border: 1px solid red;
+  /* border: 1px solid red; */
+  border: 1px solid currentColor;
   background-color: white;
-  color: #ff5722;
+  /* color: #ff5722; */
   border-radius: 1rem;
   line-height: 1rem;
   font-weight: bold;

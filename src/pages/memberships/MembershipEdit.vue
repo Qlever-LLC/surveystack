@@ -22,20 +22,21 @@
         <v-text-field
           v-model="entity.group"
           label="Group"
-          outlined
           disabled
-          :hint="entity.group"
-          persistent-hint
         />
 
         <v-text-field
           class="mt-3"
           v-model="entity.user"
           label="User"
-          outlined
           disabled
-          :hint="entity.user"
-          persistent-hint
+        />
+
+        <v-text-field
+          class="mt-3"
+          v-model="entity.meta.invitationEmail"
+          label="Invitation Email"
+          disabled
         />
 
         <v-select
@@ -43,18 +44,20 @@
           :items="availableRoles"
           v-model="entity.role"
           label="Role"
-          outlined
         ></v-select>
 
         <div class="d-flex mt-2">
-          <v-btn
-            color="secondary"
-            outlined
-            @click="resend"
-            v-if="entity.meta.status === 'pending'"
-          >
-            <v-icon left>mdi-email-send-outline</v-icon> Resend
-          </v-btn>
+          <div>
+            <v-btn
+              color="secondary"
+              outlined
+              @click="resend"
+              v-if="entity.meta.status === 'pending'"
+            >
+              <v-icon left>mdi-email-send-outline</v-icon> Resend
+            </v-btn><br />
+            <span class="caption text--secondary">{{entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Not yet sent'}}</span>
+          </div>
           <v-btn
             class="ml-auto"
             text
@@ -106,6 +109,29 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog
+      v-model="dialogSent"
+      max-width="400"
+    >
+      <v-card class="">
+        <v-card-title>
+          Sent
+        </v-card-title>
+        <v-card-text class="mt-4">
+          An invitation email has been sent to<br />{{entity.meta.invitationEmail}}
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            @click.stop="dialogSent = false"
+          >
+            OK
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -141,6 +167,7 @@ export default {
       groupDetail: null,
       integrations: [],
       dialogRemoval: false,
+      dialogSent: false,
     };
   },
   methods: {
@@ -172,8 +199,12 @@ export default {
       }
     },
     async resend() {
+      this.dialogSent = false;
       try {
-        await api.post(`/memberships/${this.entity._id}/resend`);
+        const { data: updated } = await api.post(`/memberships/${this.entity._id}/resend`);
+        console.log(updated);
+        this.entity = updated;
+        this.dialogSent = true;
       } catch (err) {
         this.$store.dispatch('feedback/add', err.response.data.message);
       }

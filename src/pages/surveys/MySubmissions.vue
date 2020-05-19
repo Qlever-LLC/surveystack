@@ -1,6 +1,17 @@
 <template>
   <v-container style="height: 100%">
     <v-container>
+      <v-row class="my-2">
+        <v-spacer />
+        <v-btn
+          color="primary"
+          v-if="activeTab !== 'sent' && readyToSubmit.length"
+          @click="handleSubmitCompleted"
+        >
+          Submit Completed
+          <v-icon class="ml-2">mdi-cloud-upload</v-icon>
+        </v-btn>
+      </v-row>
       <v-row class="d-flex flex-grow-1">
         <v-tabs
           flat
@@ -80,7 +91,7 @@
                   <v-pagination
                     v-model="page"
                     :length="activeTabPaginationLength"
-                    class=""
+                    color="grey"
                   />
                 </v-card-actions>
               </template>
@@ -118,6 +129,7 @@
                   v-model="remotePage"
                   :length="sentTabPaginationLength"
                   @input="fetchRemoteSubmissions"
+                  color="grey"
                 />
               </template>
               <v-container
@@ -157,22 +169,22 @@
       </v-row>
 
     </v-container>
-      <!-- :group="submission.meta.group.id"
-      @submit="() => submit(submission)"
-      @set-group="(val) => $set(submission.meta.group, 'id', val)" -->
-      <!-- :group="activeSubmission.meta.group.id" -->
+      <!-- @input="handleConfirmSubmissionDialogInput" -->
     <confirm-submission-dialog
+      ref="confirm-submission-dialog"
       v-if="confirmSubmissionIsVisible"
       @set-group="(val) => setSubmissionGroup(activeSubmissionId, val)"
       :group="activeSubmission.meta.group.id"
+      :id="activeSubmissionId"
       v-model="confirmSubmissionIsVisible"
-      @input="handleConfirmSubmissionDialogInput"
+      @close="handleConfirmSubmissionDialogClose"
       @submit="() => uploadSubmission(activeSubmission)"
     />
     <submitting-dialog v-model="this.isSubmitting" />
     <result-dialog
       v-model="showResult"
       :items="resultItems"
+      @input="handleResultDialogInput"
       title="Result of Submission"
       persistent
     />
@@ -221,21 +233,16 @@ export default {
       confirmSubmissionIsVisible: false,
       activeSubmissionId: null,
       activeSubmission: null,
+      uploadQueue: [],
     };
   },
   updated() {
     this.$store.dispatch('appui/setTitle', 'My Submissions');
   },
   async created() {
-    // await this.$store.dispatch(`submissions/${submissionsTypes.actions.fetchLocalSubmissions}`);
-
-    // await this.$store.dispatch('surveys/fetchSurveys');
-    // await this.$store.dispatch('readyToSubmit/getAll');
-
     await Promise.all([
       this.$store.dispatch('submissions/fetchLocalSubmissions'),
       this.$store.dispatch('surveys/fetchSurveys'),
-      // this.$store.dispatch('readyToSubmit/getAll'),
     ]);
   },
   beforeDestroy() {
@@ -298,6 +305,10 @@ export default {
     },
   },
   methods: {
+    handleSubmitCompleted() {
+      this.uploadQueue = [...this.readyToSubmit];
+      this.uploadQueueNext();
+    },
     async uploadSubmission(submission) {
       this.isSubmitting = true;
       try {
@@ -310,13 +321,26 @@ export default {
         this.isSubmitting = false;
       }
     },
-    async handleSubmitClick(id) {
+    handleSubmitClick(id) {
       this.activeSubmissionId = id;
       this.confirmSubmissionIsVisible = true;
     },
-    handleConfirmSubmissionDialogInput(value) {
-      if (!value) {
-        this.activeSubmissionId = null;
+    handleConfirmSubmissionDialogClose({ done }) {
+      this.activeSubmissionId = null;
+      if (done) {
+        this.uploadQueueNext();
+      }
+    },
+    handleResultDialogInput(val) {
+      if (!val) {
+        // Closing result dialog
+        this.uploadQueueNext();
+      }
+    },
+    uploadQueueNext() {
+      if (this.uploadQueue.length > 0) {
+        this.activeSubmissionId = this.uploadQueue.shift() || null;
+        this.confirmSubmissionIsVisible = true;
       }
     },
     getSubmission(id) {
@@ -364,7 +388,6 @@ export default {
       );
     },
     select(draft) {
-      console.log(`clicked ${draft._id}`);
       this.$router.push(`/submissions/drafts/${draft._id}`);
     },
     sortSubmissions(submissions) {

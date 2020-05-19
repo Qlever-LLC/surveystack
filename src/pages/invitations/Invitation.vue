@@ -2,40 +2,51 @@
   <v-container v-if="initialized && membership">
     <h1>Invitation</h1>
     <p class="subtitle-2 text--secondary">{{code}}</p>
-    <v-alert
-      class="mt-4"
-      outlined
-      v-if="membership"
-      type="info"
-    >This code allows you to join <strong>{{membership.group.name}}</strong>!
-      <div v-if="!$store.getters['auth/isLoggedIn']">Please proceed to <strong>login</strong> or <strong>create</strong> an account.</div>
-    </v-alert>
+    <div v-if="membership.meta.status === 'pending'">
+      <v-alert
+        class="mt-4"
+        outlined
+        v-if="membership"
+        type="info"
+      >This code allows you to join <strong>{{membership.group.name}}</strong>!
+        <div v-if="!$store.getters['auth/isLoggedIn']">Please proceed to <strong>login</strong> or <strong>create</strong> an account.</div>
+      </v-alert>
 
-    <div
-      v-if="$store.getters['auth/isLoggedIn']"
-      class="d-flex justify-end"
-    >
-      <v-btn
-        text
-        @click="cancel"
-      >Cancel</v-btn>
-      <v-btn
-        color="primary"
-        @click="join"
-      >Join {{membership.group.name}}</v-btn>
+      <div
+        v-if="$store.getters['auth/isLoggedIn']"
+        class="d-flex justify-end"
+      >
+        <v-btn
+          text
+          @click="cancel"
+        >Cancel</v-btn>
+        <v-btn
+          color="primary"
+          @click="join"
+        >Join {{membership.group.name}}</v-btn>
+      </div>
+      <div
+        v-else
+        class="d-flex justify-end"
+      >
+        <v-btn
+          text
+          :to="{name: 'auth-login', query: {invitation: code}}"
+        >Login</v-btn>
+        <v-btn
+          color="primary"
+          :to="{name: 'auth-register', query: {invitation: code}}"
+        >Create account</v-btn>
+      </div>
     </div>
-    <div
-      v-else
-      class="d-flex justify-end"
-    >
-      <v-btn
-        text
-        :to="{name: 'auth-login', query: {invitation: code}}"
-      >Login</v-btn>
-      <v-btn
-        color="primary"
-        :to="{name: 'auth-register', query: {invitation: code}}"
-      >Create account</v-btn>
+    <div v-else>
+      <v-alert
+        class="mt-4"
+        outlined
+        v-if="membership"
+        type="error"
+      >This code has already been activated and is no longer valid...
+      </v-alert>
     </div>
 
   </v-container>
@@ -66,6 +77,7 @@
 
 <script>
 import api from '@/services/api.service';
+import { autoSelectActiveGroup } from '@/utils/memberships';
 
 export default {
   data() {
@@ -79,7 +91,7 @@ export default {
     async fetchData() {
       this.initialized = false;
       if (this.code) {
-        const { data: [membership] } = await api.get(`/memberships?invitation=${this.code}&populate=true`);
+        const { data: [membership] } = await api.get(`/memberships?invitationCode=${this.code}&populate=true`);
         this.membership = membership;
       }
 
@@ -92,7 +104,8 @@ export default {
     async join() {
       this.$store.dispatch('invitation/clear');
       // TODO: display status/errors
-      await api.post('/memberships/claim', { code: this.code });
+      await api.post('/memberships/activate', { code: this.code });
+      await autoSelectActiveGroup(this.$store);
       this.$router.push('/');
     },
   },

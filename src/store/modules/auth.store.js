@@ -56,7 +56,7 @@ const actions = {
         .catch((err) => {
           console.log(err);
           commit('auth_error');
-          clearLocalData({ dispatch });
+          // clearLocalData({ dispatch });
           reject(err);
         });
     });
@@ -95,7 +95,7 @@ const actions = {
         })
         .catch((err) => {
           commit('auth_error');
-          clearLocalData({ dispatch });
+          // clearLocalData({ dispatch });
           reject(err);
         });
     });

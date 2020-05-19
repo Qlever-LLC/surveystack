@@ -92,7 +92,7 @@ const GroupService = {
     localStorage.setItem(USER_ACTIVE_GROUP_KEY, JSON.stringify(group));
   },
   getActiveGroup() {
-    return JSON.parse(localStorage.getItem(USER_ACTIVE_GROUP_KEY));
+    return JSON.parse(localStorage.getItem(USER_ACTIVE_GROUP_KEY)) || null;
   },
   clear() {
     localStorage.removeItem(USER_ACTIVE_GROUP_KEY);

@@ -12,7 +12,7 @@
         Submit Survey
       </v-card-text>
       <v-card-text v-else>
-        Submit this draft to
+        Submit this draft <strong>{{ id }}</strong> to
         <strong>{{ currentGroupName }}</strong>
         <div class="d-inline-flex align-end">
           <active-group-selector
@@ -76,6 +76,12 @@ export default {
       required: false,
       type: String,
     },
+    'survey-name': {
+      type: String,
+    },
+    id: {
+      type: String,
+    },
   },
   components: {
     ActiveGroupSelector,
@@ -97,9 +103,11 @@ export default {
     handleConfirm() {
       this.$emit('input', false);
       this.$emit('submit');
+      this.$emit('close', { done: false });
     },
     handleAbort() {
       this.$emit('input', false);
+      this.$emit('close', { done: true });
     },
     setGroup(v) {
       this.$emit('set-group', v);
