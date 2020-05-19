@@ -31,15 +31,20 @@
         <v-text-field
           v-model="subject"
           label="Subject"
-          outlined
+          filled
         />
         <v-textarea
           rows="10"
           v-model="body"
           label="Message"
-          outlined
+          filled
+          hide-details
         />
-        <div class="d-flex justify-end align-center">
+        <div
+          v-if="showMissingMagicLinkWarning"
+          class="mt-2 error--text"
+        >Message does not contain %CFS_MAGIC_LINK%! Members will not be able to automatically log in.</div>
+        <div class="d-flex justify-end align-center mt-3">
           <span
             v-if="!submittable"
             class="mr-2"
@@ -106,7 +111,7 @@ const defaultSubject = 'Request to submit a survey';
 const defaultBody = `Hello
 
 Please use the following link to automatically login and start the survey:
-$CFS_MAGIC_LINK$
+%CFS_MAGIC_LINK%
 
 All the best
 `;
@@ -161,6 +166,9 @@ export default {
     },
     submittable() {
       return this.selectedSurvey !== null && this.selectedMembers.length !== 0;
+    },
+    showMissingMagicLinkWarning() {
+      return this.body.search('%CFS_MAGIC_LINK%') === -1;
     },
   },
   async created() {
