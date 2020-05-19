@@ -82,9 +82,13 @@
       max-width="500"
     >
       <v-card>
-        <v-card-title>Confirmation</v-card-title>
+        <v-card-title class="headline">Confirmation</v-card-title>
         <v-card-text>
-          You are about to send an email to {{selectedMembers.length}} members.<br />Are you sure you want to proceed?
+          <p class="body-1">You are about to send an E-mail to {{selectedMembers.length}} {{selectedMembers.length === 1 ? 'member': 'members'}}.<br />Are you sure you want to proceed?</p>
+          <v-checkbox
+            label="Also send a copy to myself"
+            v-model="copy"
+          />
         </v-card-text>
         <v-card-actions class="d-flex justify-end">
 
@@ -133,6 +137,7 @@ export default {
       selectedSurvey: null,
       subject: defaultSubject,
       body: defaultBody,
+      copy: false,
       headers: [
         { text: 'id', value: '_id' },
         { text: 'name', value: 'user.name' },
@@ -161,7 +166,7 @@ export default {
         const members = this.selectedMembers.map(member => member._id);
         const survey = this.selectedSurvey._id;
         await api.post('/call-for-submissions/send', {
-          survey, members, subject: this.subject, body: this.body, group: this.group,
+          survey, members, subject: this.subject, body: this.body, group: this.group, copy: this.copy,
         });
       } catch (err) {
         this.$store.dispatch('feedback/add', err.response.data.message);
