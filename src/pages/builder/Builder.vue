@@ -177,9 +177,17 @@ export default {
     },
     async submitSubmission({ payload }) {
       this.submitting = true;
+      const submission = {
+        ...payload,
+        meta: {
+          ...payload.meta,
+          archived: true,
+          archivedReason: 'SUBMISSION_FROM_BUILDER',
+        },
+      };
       try {
-        console.log('submitting', payload);
-        const response = await api.post('/submissions', payload);
+        console.log('submitting', submission);
+        const response = await api.post('/submissions', submission);
         // this.$router.push(`/surveys/${this.survey._id}`);
         try {
           this.result({ response });
