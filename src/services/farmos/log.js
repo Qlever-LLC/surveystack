@@ -78,6 +78,13 @@ async function log(
     delete apiCompose.body.date;
   }
 
+  // replace archived timestamp with unix
+  const archived = apiCompose.body.archived;
+  if (archived) {
+    const tmp = moment(archived).unix();
+    apiCompose.body.archived = tmp;
+  }
+
   apiCompose.body.data = instanceId;
 
   let bodyString = JSON.stringify(apiCompose.body, null, 4);
