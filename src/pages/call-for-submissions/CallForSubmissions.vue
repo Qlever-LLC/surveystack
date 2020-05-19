@@ -11,6 +11,7 @@
     />
     <v-card class="my-2">
       <v-card-text>
+        <label>Survey</label>
         <div class="mb-5 d-flex align-center">
           <v-btn
             @click="showSelectSurvey = true"
@@ -50,7 +51,8 @@
           <v-btn
             color="primary"
             :disabled="!submittable"
-          >Send</v-btn>
+            @click="showConfirmDialog = true"
+          >Send...</v-btn>
         </div>
       </v-card-text>
     </v-card>
@@ -69,6 +71,27 @@
         />
       </v-card-text>
     </v-card>
+
+    <v-dialog
+      v-model="showConfirmDialog"
+      max-width="500"
+    >
+      <v-card>
+        <v-card-title>Confirmation</v-card-title>
+        <v-card-text>
+          You are about to send an email to {{selectedMembers.length}} members.<br />Are you sure you want to proceed?
+        </v-card-text>
+        <v-card-actions class="d-flex justify-end">
+
+          <v-btn
+            @click="showConfirmDialog = false"
+            text
+          >Cancel</v-btn>
+          <v-btn color="primary">SEND NOW</v-btn>
+
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
   </v-container>
 </template>
@@ -107,6 +130,7 @@ export default {
         { text: 'name', value: 'user.name' },
         { text: 'email', value: 'user.email' },
       ],
+      showConfirmDialog: false,
     };
   },
   methods: {
