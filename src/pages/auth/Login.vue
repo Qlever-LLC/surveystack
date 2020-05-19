@@ -138,11 +138,23 @@ export default {
         user: { email: email.replace(/ /g, '+'), token }, // TODO: find a better solution for + signs
       });
 
+      await this.fetchPinned();
+
       await autoSelectActiveGroup(this.$store, group);
       this.$router.replace({ name: 'surveys-detail', params: { id: cfs } });
     }
   },
   methods: {
+    async fetchPinned() {
+      const user = this.$store.getters['auth/user'];
+      this.$store.dispatch('memberships/getUserMemberships', user._id);
+
+      const memberships = this.$store.getters['memberships/memberships'];
+      // eslint-disable-next-line no-restricted-syntax
+      for (const membership of memberships) {
+        this.$store.dispatch('surveys/fetchPinned', membership.group._id);
+      }
+    },
     async submit() {
       if (this.entity.email === '') {
         this.status = 'E-Mail must not be empty.';
@@ -161,6 +173,8 @@ export default {
         });
 
         await autoSelectActiveGroup(this.$store);
+
+        this.fetchPinned();
 
         if (this.$route.params.redirect) {
           this.$router.push(this.$route.params.redirect);

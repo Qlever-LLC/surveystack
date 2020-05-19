@@ -17,6 +17,8 @@
 import appNavbar from '@/components/Navbar.vue';
 import appGlobalFeedback from '@/components/GlobalFeedback.vue';
 import domainHandler from '@/utils/domainHandler';
+import api from '@/services/api.service';
+
 
 export default {
   name: 'App',
@@ -32,10 +34,12 @@ export default {
     const user = this.$store.getters['auth/user'];
     this.$store.dispatch('memberships/getUserMemberships', user._id);
     const memberships = this.$store.getters['memberships/memberships'];
-    console.log('memberships', memberships);
     for (const membership of memberships) {
       this.$store.dispatch('surveys/fetchPinned', membership.group._id);
     }
+
+    api.get('farmos/fields');
+    api.get('farmos/assets');
     // this.$store.dispatch('surveys/fetchPinned', ),
     // fetch pinned surveys
     // for survey, prefetch

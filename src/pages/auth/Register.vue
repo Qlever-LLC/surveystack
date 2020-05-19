@@ -125,6 +125,16 @@ export default {
     },
   },
   methods: {
+    async fetchPinned() { // TODO this is copy paste!!!
+      const user = this.$store.getters['auth/user'];
+      this.$store.dispatch('memberships/getUserMemberships', user._id);
+
+      const memberships = this.$store.getters['memberships/memberships'];
+      // eslint-disable-next-line no-restricted-syntax
+      for (const membership of memberships) {
+        this.$store.dispatch('surveys/fetchPinned', membership.group._id);
+      }
+    },
     async submit() {
       this.status = '';
       console.log('submitting');
@@ -155,6 +165,7 @@ export default {
         } else if (this.$store.getters['invitation/hasInvitation']) {
           this.$router.push({ name: 'invitations', query: { code: this.$store.getters['invitation/code'] } });
         } else {
+          this.fetchPinned();
           this.$router.push('/');
         }
       } catch (error) {

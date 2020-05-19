@@ -7,6 +7,7 @@ export const types = {
   FETCH_SURVEYS: 'FETCH_SURVEYS',
   // GET_SURVEY: 'GET_SURVEY',
   SET_SURVEY: 'SET_SURVEY',
+  SET_PINNED: 'SET_PINNED',
   RESET: 'RESET',
   REMOVE_SURVEY: 'REMOVE_SURVEY',
   ADD_SURVEY: 'ADD_SURVEY',
@@ -16,12 +17,14 @@ export const types = {
 
 const createInitialState = () => ({
   surveys: [],
+  pinned: [],
 });
 
 const initialState = createInitialState();
 
 const getters = {
   getSurvey: state => id => state.surveys.find(survey => survey._id === id),
+  getPinned: state => state.pinned,
 };
 
 const mutations = {
@@ -37,6 +40,9 @@ const mutations = {
   [types.REMOVE_SURVEY](state, id) {
     const index = state.surveys.findIndex(survey => survey._id === id);
     state.submissions.splice(index, 1);
+  },
+  [types.SET_PINNED](state, pinned) {
+    state.pinned = pinned;
   },
 };
 
@@ -55,10 +61,17 @@ const actions = {
     return response.data;
   },
   async fetchPinned({ commit }, groupId) {
+    const pinned = [];
+
     try {
       const { data } = await api.get(`/groups/${groupId}?populate=1`);
       if (data && data.surveys && data.surveys.pinned && Array.isArray(data.surveys.pinned)) {
         for (const s of data.surveys.pinned) {
+          pinned.push({
+            id: s._id,
+            name: s.name,
+            group: data.name,
+          });
           console.log('fetching pinned survey', s);
           actions.fetchSurvey({ commit }, s._id);
         }
@@ -66,6 +79,7 @@ const actions = {
     } catch (err) {
       console.log('Error fetching surveys:', err);
     }
+    commit(types.SET_PINNED, pinned);
     return [];
   },
   removeSurvey({ commit }, id) {

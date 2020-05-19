@@ -6,10 +6,8 @@
       clipped-left
       color="appbar"
     >
-        <!-- color="white" -->
-      <v-app-bar-nav-icon
-        @click="drawer = !drawer"
-      />
+      <!-- color="white" -->
+      <v-app-bar-nav-icon @click="drawer = !drawer" />
       <v-toolbar-title class="ml-2 flex-column">
         <div
           id="app-bar-title"
@@ -62,6 +60,12 @@
 
       </v-list>
 
+      <template v-slot:append>
+        <div dark class="grey--text">
+          <p class="pt-4 pl-4">App-Version: {{ version }}</p>
+        </div>
+      </template>
+
     </v-navigation-drawer>
   </nav>
 </template>
@@ -75,6 +79,7 @@ export default {
   },
   data() {
     return {
+      version: process.env.VUE_APP_VERSION,
       drawer: false,
       sidenav: {
         collect: [

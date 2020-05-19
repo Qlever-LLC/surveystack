@@ -65,14 +65,15 @@ module.exports = {
       // ...other Workbox options...
       clientsClaim: true,
       skipWaiting: true,
-      runtimeCaching: [{
-        urlPattern: /\/api\/surveys.*$/,
-        handler: 'NetworkFirst',
-      },
-      {
-        urlPattern: /https:\/\/api\.mapbox\.com.*$/,
-        handler: 'CacheFirst',
-      },
+      runtimeCaching: [
+        {
+          urlPattern: /\/api\/.*$/,
+          handler: 'NetworkFirst',
+        },
+        {
+          urlPattern: /https:\/\/api\.mapbox\.com.*$/,
+          handler: 'CacheFirst',
+        },
       ],
     },
   },
