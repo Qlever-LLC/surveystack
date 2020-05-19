@@ -200,7 +200,7 @@ router.delete(
 );
 
 // Call for submissions (CFS)
-router.post('/call-for-submissions/send', catchErrors(cfsController.send));
+router.post('/call-for-submissions/send', [assertAuthenticated], catchErrors(cfsController.send));
 
 // info
 router.get('/info/ip', catchErrors(infoController.getIP));

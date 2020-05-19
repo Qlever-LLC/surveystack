@@ -7,16 +7,16 @@ import mailService from '../services/mail.service';
 import rolesService from '../services/roles.service';
 import { db } from '../db';
 
-const col = 'users';
+const createText = (text, { origin, survey, group, token, email }) => {
+  return text.replace(
+    /%CFS_MAGIC_LINK%/g,
+    `${origin}/auth/login?cfs=${survey}&group=${group}&token=${token}&email=${email}`
+  );
+};
 
 const send = async (req, res) => {
-  const { subject, body, survey, members, group } = req.body;
+  const { subject, body, survey, members, group, copy } = req.body;
   const { origin } = req.headers;
-
-  console.log('subject', subject);
-  console.log('body', body);
-  console.log('survey', survey);
-  console.log('members', members);
 
   const memberships = await db
     .collection('memberships')
@@ -28,25 +28,28 @@ const send = async (req, res) => {
     ])
     .toArray();
 
-  const promises = [];
+  //const promises = [];
   for (const membership of memberships) {
-    console.log('MEMBERSHIP');
-
     const { email, token } = membership.user;
-    const text = body.replace(
-      /%CFS_MAGIC_LINK%/g,
-      `${origin}/auth/login?cfs=${survey}&group=${group}&token=${token}&email=${email}`
-    );
-    console.log('text', text);
+    const text = createText(body, { origin, survey, group, token, email });
 
-    /*
-    mailService.send({
-      to: membership.email,
+    // TODO: find a better way to send bulk emails
+    await mailService.send({
+      to: email,
       subject: subject,
-      text: body
+      text,
     });
-    */
-    console.log('');
+  }
+
+  if (copy) {
+    const { email, token } = res.locals.auth.user;
+    const text = createText(body, { origin, survey, group, token, email });
+
+    await mailService.send({
+      to: email,
+      subject: `[COPY] ${subject}`,
+      text,
+    });
   }
 
   return res.send('OK');
