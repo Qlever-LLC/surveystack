@@ -106,7 +106,7 @@ export default {
   },
   created() {
     const { email, token } = this.$route.query;
-    this.email = email;
+    this.email = email.replace(/ /g, '+'); // TODO: find a better solution for + signs in emails
     this.token = token;
   },
 };

@@ -14,15 +14,24 @@ export const uuid = () => {
   return `${u}.${new Date().getTime().toString(16)}`;
 };
 
-export const autoSelectActiveGroup = async (store) => {
+export const autoSelectActiveGroup = async (store, preferredGroupId = null) => {
   const user = store.getters['auth/user'];
   const memberships = await store.dispatch('memberships/getUserMemberships', user._id);
   if (
     memberships
     && memberships.length > 0
-    && memberships[0].group
   ) {
-    store.dispatch('memberships/setActiveGroup', memberships[0].group._id);
+    // default to the first membership
+    let groupId = memberships[0].group._id;
+    // try to use the preferred group (such as from call-for-submissions)
+    if (preferredGroupId) {
+      const isMemberOfPreferredGroup = memberships.some(m => m.group._id === preferredGroupId);
+      if (isMemberOfPreferredGroup) {
+        groupId = preferredGroupId;
+      }
+    }
+
+    store.dispatch('memberships/setActiveGroup', groupId);
   }
 };
 

@@ -92,7 +92,10 @@
             @click="showConfirmDialog = false"
             text
           >Cancel</v-btn>
-          <v-btn color="primary">SEND NOW</v-btn>
+          <v-btn
+            color="primary"
+            @click="submit"
+          >SEND NOW</v-btn>
 
         </v-card-actions>
       </v-card>
@@ -151,6 +154,18 @@ export default {
     },
     cancel() {
       this.$router.back();
+    },
+    async submit() {
+      this.showConfirmDialog = false;
+      try {
+        const members = this.selectedMembers.map(member => member._id);
+        const survey = this.selectedSurvey._id;
+        await api.post('/call-for-submissions/send', {
+          survey, members, subject: this.subject, body: this.body, group: this.group,
+        });
+      } catch (err) {
+        this.$store.dispatch('feedback/add', err.response.data.message);
+      }
     },
   },
   watch: {
