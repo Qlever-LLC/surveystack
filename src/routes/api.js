@@ -15,7 +15,8 @@ import infoController from '../controllers/infoController';
 import groupIntegrationController from '../controllers/groupIntegrationController';
 import membershipIntegrationController from '../controllers/membershipIntegrationController';
 
-//import { authenticated } from '../handlers/checkPermissions';
+import cfsController from '../controllers/cfsController';
+
 import {
   assertAuthenticated,
   assertEntityExists,
@@ -197,6 +198,9 @@ router.delete(
   [assertAuthenticated, assertEntityExists({ collection: 'integrations.memberships' })],
   catchErrors(membershipIntegrationController.deleteIntegration)
 );
+
+// Call for submissions (CFS)
+router.post('/call-for-submissions/send', [assertAuthenticated], catchErrors(cfsController.send));
 
 // info
 router.get('/info/ip', catchErrors(infoController.getIP));

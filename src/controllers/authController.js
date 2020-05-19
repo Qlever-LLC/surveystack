@@ -48,7 +48,16 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, token } = req.body;
+  if (token) {
+    // alternative magic link login with token
+    const existingUser = await db.collection(col).findOne({ email, token });
+    if (!existingUser) {
+      throw boom.notFound(`No user found with matching email and token: [${email}, ${token}]`);
+    }
+    const payload = await createPayload(existingUser);
+    return res.send(payload);
+  }
 
   if (email.trim() === '' || password.trim() === '') {
     throw boom.badRequest('Email and password must not be empty');
@@ -71,6 +80,7 @@ const login = async (req, res) => {
 
 const sendPasswordResetMail = async (req, res) => {
   const { email } = req.body;
+  const { origin } = req.headers;
   const existingUser = await db.collection(col).findOne({ email });
   if (!existingUser) {
     throw boom.notFound(`No user with email exists: ${email}`);
@@ -82,7 +92,7 @@ const sendPasswordResetMail = async (req, res) => {
 
 Use the following link to set a new password:
 
-${process.env.SERVER_URL}/auth/reset-password?token=${existingUser.token}&email=${existingUser.email}
+${origin}/auth/reset-password?token=${existingUser.token}&email=${existingUser.email}
 
 If you did not request this email, you can safely ignore it.
 
