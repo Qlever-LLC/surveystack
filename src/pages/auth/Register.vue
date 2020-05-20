@@ -192,7 +192,7 @@ export default {
     this.invitation = invitation;
     if (invitation) {
       this.$store.dispatch('invitation/set', invitation);
-      const { data: [membership] } = await api.get(`/memberships?invitation=${invitation}&populate=true`);
+      const { data: [membership] } = await api.get(`/memberships?invitationCode=${invitation}&populate=true`);
       this.membership = membership;
     }
   },
