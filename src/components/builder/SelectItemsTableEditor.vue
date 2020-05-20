@@ -245,6 +245,7 @@ export default {
       this.$emit('close-dialog');
     },
     handleUpdateLabel(label) {
+      console.log('update label');
       this.$emit('change', {
         ...this.resource,
         label,
@@ -252,7 +253,7 @@ export default {
       });
     },
     handleFileChange(data) {
-      console.log('table editor file change', data);
+      // console.log('table editor file change', data);
       this.appendItems(data);
     },
     handleSave() {
@@ -261,7 +262,7 @@ export default {
     },
     deleteItem(item) {
       const newItems = this.items.filter(x => x.label !== item.label && x.value !== item.value);
-      console.log('delete item, new items:', newItems);
+      // console.log('delete item, new items:', newItems);
       this.$emit('change', newItems);
     },
     filterDuplicateItems(items) {

@@ -52,10 +52,6 @@ export default {
     };
   },
   methods: {
-    setItems(items) {
-      console.log('set items', items);
-      // this.$emit('set-control-source', items);
-    },
     removeResource(id) {
       const index = this.resources.findIndex(r => r.id === id);
       const newResources = [
@@ -63,10 +59,10 @@ export default {
         ...this.resources.slice(index + 1),
       ];
       this.$emit('set-survey-resources', newResources);
+      this.$emit('set-control-source', null);
     },
     setResource(resource) {
       const index = this.resources.findIndex(r => r.id === resource.id);
-      console.log('set resource', resource, index);
       const newResources = [
         ...this.resources.slice(0, index),
         resource,
@@ -81,11 +77,10 @@ export default {
       this.tableDialogIsVisible = false;
     },
     createResourceHandler() {
-      console.log('create resource');
       const id = new ObjectId().toString();
       this.$emit('set-survey-resources', [...this.resources, {
         label: `Dropdown Items ${this.resources.length + 1}`,
-        handle: 'dropdown_items',
+        handle: `dropdown_items_${this.resources.length + 1}`,
         id,
         type: 'ONTOLOGY_LIST',
         location: 'EMBEDDED',
@@ -95,7 +90,6 @@ export default {
       this.openTableDialog();
     },
     selectResourceHandler(id) {
-      console.log('select resource', id);
       this.$emit('set-control-source', id);
     },
   },

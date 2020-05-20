@@ -261,9 +261,6 @@ export default {
         const revision = { ...this.importedSurvey.revisions[this.importedSurvey.revisions.length - 1] };
 
         if (this.importedSurvey.specVersion === 1) {
-          // const pipe = (...fns) => fns.reduceRight(compose2);
-          // const migratedControls pipe
-
           const migratedControls = updateControls(
             updateControls(revision.controls, { type: 'ontology', key: 'options.source', replacer: () => '' }),
             { type: /.*/, replacer: ({ _id, ...rest }) => ({ id: new ObjectId().toString(), ...rest }) },
@@ -271,9 +268,17 @@ export default {
           revision.controls = migratedControls;
         }
 
+        // set new ObjectIDs for all controls
+        revision.controls = updateControls(
+          revision.controls,
+          { type: /.*/, replacer: ({ id, ...rest }) => ({ id: new ObjectId().toString(), ...rest }) },
+        );
+
         // append imported survey definition as latest revision
         this.survey.revisions.push(revision);
-        this.survey.resources = this.importedSurvey.resources ? this.importedSurvey.resources : [];
+        this.survey.resources = this.importedSurvey.resources
+          ? this.importedSurvey.resources.map(r => ({ ...r, id: new ObjectId().toString() }))
+          : [];
         revision.version = this.survey.latestVersion + 1;
         this.freshImport = true;
 
