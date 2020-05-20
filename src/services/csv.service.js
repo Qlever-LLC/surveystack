@@ -83,8 +83,12 @@ function createCsv(submissions, headers) {
     const submission = _.cloneDeep(s);
     submission._id = submission._id.toString();
     submission.meta.survey.id = submission.meta.survey.id.toString();
-    submission.meta.group.id = submission.meta.group.id.toString();
-    submission.meta.creator = submission.meta.creator.toString();
+    if (submission.meta.group.id) {
+      submission.meta.group.id = submission.meta.group.id.toString();
+    }
+    if (submission.meta.creator) {
+      submission.meta.creator = submission.meta.creator.toString();
+    }
     removeKeys(submission.data, ['meta']);
 
     items.push(flatten(submission));
