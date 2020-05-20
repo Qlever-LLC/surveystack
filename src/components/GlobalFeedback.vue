@@ -5,7 +5,9 @@
       <v-btn
         text
         @click="clearAllFeedback"
-      >{{clearAllText}}</v-btn>
+      >
+        <v-icon left>mdi-close</v-icon>{{clearAllText}}
+      </v-btn>
     </div>
     <v-alert
       v-for="(feedback, idx) in items"
