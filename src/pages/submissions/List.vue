@@ -119,6 +119,13 @@
                 DELETE
               </v-btn>
               <v-btn
+                v-if="selected.length === 1 && selected[0]['meta.archived'] === 'true'"
+                text
+                @click="archiveSubmission(selected[0], false)"
+              >
+                RESTORE
+              </v-btn>
+              <v-btn
                 v-if="selected.length === 1 && selected[0]['meta.archived'] !== 'true'"
                 color="error"
                 text
@@ -291,10 +298,10 @@ export default {
         this.$store.dispatch('feedback/add', err.response.data.message);
       }
     },
-    async archiveSubmission(submission) {
+    async archiveSubmission(submission, value = true) {
       this.showArchiveModal = false;
       try {
-        const { data: archived } = await api.post(`/submissions/${submission._id}/archive`);
+        const { data: archived } = await api.post(`/submissions/${submission._id}/archive?set=${value}`);
         this.selected = [];
         this.fetchData();
       } catch (err) {
