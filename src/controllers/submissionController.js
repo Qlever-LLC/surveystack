@@ -39,6 +39,10 @@ const sanitize = async (entity) => {
     entity.meta.creator = new ObjectId(entity.meta.creator);
   }
 
+  if (entity.meta.original) {
+    entity.meta.original = new ObjectId(entity.meta.original);
+  }
+
   // TODO: may want to save dateModified from nested data meta fields
   // as new Date(..) as well, currently it is just a string
 
@@ -185,22 +189,21 @@ const buildPipeline = async (req, res) => {
   if (req.query.showArchived && req.query.showArchived === 'true') {
     archivedMatch['meta.archived'] = true;
   }
-  console.log('pushing archivedMatch', archivedMatch);
   pipeline.push({ $match: archivedMatch });
 
   if (req.query.creator) {
     pipeline.push({
       $match: {
-        'meta.creator': new ObjectId(req.query.creator)
-      }
+        'meta.creator': new ObjectId(req.query.creator),
+      },
     });
   }
 
   if (req.query.group) {
     pipeline.push({
       $match: {
-        'meta.group.id': new ObjectId(req.query.group)
-      }
+        'meta.group.id': new ObjectId(req.query.group),
+      },
     });
   }
 
@@ -526,28 +529,19 @@ const updateSubmission = async (req, res) => {
   }
 };
 
-const isUserAllowedToDeleteSubmission = async (submission, user) => {
-  if (!submission.meta.group && !submission.meta.creator) {
-    return true; // no user and no group => free for all!
-  }
-
-  if (submission.meta.creator.equals(user)) {
-    return true; // user may delete their own submissions
-  }
-
-  const hasAdminRole = await rolesService.hasAdminRole(user, submission.meta.group.id);
-  if (hasAdminRole) {
-    return true; // group admins may delete submissions
-  }
-
-  return false;
-};
-
 const archiveSubmission = async (req, res) => {
   const { id } = req.params;
+  let set = true;
+
+  if (req.query.set) {
+    if (req.query.set === 'false' || req.query.set === '0') {
+      set = false;
+    }
+  }
+
   const updated = await db.collection(col).findOneAndUpdate(
     { _id: new ObjectId(id) },
-    { $set: { 'meta.archived': true } },
+    { $set: { 'meta.archived': set } },
     {
       returnOriginal: false,
     }
@@ -558,16 +552,6 @@ const archiveSubmission = async (req, res) => {
 
 const deleteSubmission = async (req, res) => {
   const { id } = req.params;
-
-  const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
-  if (!existing) {
-    throw boom.notFound(`No entity with _id exists: ${id}`);
-  }
-
-  const isAllowed = await isUserAllowedToDeleteSubmission(existing, res.locals.auth.user._id);
-  if (!isAllowed) {
-    throw boom.unauthorized(`You are not allowed to delete submission: ${id}`);
-  }
 
   try {
     let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });

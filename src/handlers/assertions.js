@@ -4,6 +4,7 @@ import boom from '@hapi/boom';
 import canUser from '../helpers/canUser';
 import { catchErrors } from '../handlers/errorHandlers';
 
+import rolesService from '../services/roles.service';
 import { db } from '../db';
 
 export const assertAuthenticated = catchErrors(async (req, res, next) => {
@@ -37,6 +38,26 @@ export const assertEntityExists = ({ collection }) =>
 
     next();
   });
+
+export const assertEntityRights = catchErrors(async (req, res, next) => {
+  const { existing } = res.locals;
+  const user = res.locals.auth.user._id;
+
+  if (!existing.meta.group && !existing.meta.creator) {
+    return next(); // no user and no group => free for all! may want to change this behaviour
+  }
+
+  if (existing.meta.creator.equals(user)) {
+    return next(); // user may delete their own submissions
+  }
+
+  const hasAdminRole = await rolesService.hasAdminRole(user, existing.meta.group.id);
+  if (hasAdminRole) {
+    return next(); // group admins may delete submissions
+  }
+
+  throw boom.unauthorized(`No entity rights on: ${existing._id}`);
+});
 
 export const assertNameNotEmpty = catchErrors(async (req, res, next) => {
   if (!res.locals.auth.isAuthenticated) {

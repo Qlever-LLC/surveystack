@@ -14,10 +14,12 @@ import rolesService from '../services/roles.service';
 
 const router = Router();
 
-router.get('/lucky', async (req, res) => {
+const getLucky = async (req, res) => {
   const luckyNumber = Math.floor(Math.random() * 100 + 1);
   return res.send(`Your lucky number is: ${luckyNumber}`);
-});
+};
+
+router.get('/lucky', catchErrors(getLucky));
 
 router.get('/s3upload', async (req, res) => {
   const prefix = 'pictures';

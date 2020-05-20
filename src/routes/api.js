@@ -22,6 +22,7 @@ import {
   assertEntityExists,
   assertIdsMatch,
   assertNameNotEmpty,
+  assertEntityRights,
 } from '../handlers/assertions';
 
 import { catchErrors } from '../handlers/errorHandlers';
@@ -62,13 +63,17 @@ router.delete('/groups/:id', assertAuthenticated, catchErrors(groupController.de
 /** Submissions */
 router.get('/submissions', catchErrors(submissionController.getSubmissions));
 router.get('/submissions/page', catchErrors(submissionController.getSubmissionsPage));
-router.post('/submissions/:id/archive', catchErrors(submissionController.archiveSubmission));
+router.post(
+  '/submissions/:id/archive',
+  [assertAuthenticated, assertEntityExists({ collection: 'submissions' }), assertEntityRights],
+  catchErrors(submissionController.archiveSubmission)
+);
 router.get('/submissions/:id', catchErrors(submissionController.getSubmission));
 router.post('/submissions', catchErrors(submissionController.createSubmission));
 router.put('/submissions/:id', catchErrors(submissionController.updateSubmission));
 router.delete(
   '/submissions/:id',
-  [assertAuthenticated],
+  [assertAuthenticated, assertEntityExists({ collection: 'submissions' }), assertEntityRights],
   catchErrors(submissionController.deleteSubmission)
 );
 
