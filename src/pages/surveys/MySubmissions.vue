@@ -176,6 +176,7 @@
       @set-group="(val) => setSubmissionGroup(activeSubmissionId, val)"
       :group="activeSubmission.meta.group.id"
       :id="activeSubmissionId"
+      :dateSubmitted="activeSubmission.meta.dateSubmitted"
       v-model="confirmSubmissionIsVisible"
       @close="handleConfirmSubmissionDialogClose"
       @submit="() => uploadSubmission(activeSubmission)"
@@ -312,7 +313,9 @@ export default {
     async uploadSubmission(submission) {
       this.isSubmitting = true;
       try {
-        const response = await api.post('/submissions', submission);
+        const response = submission.meta.dateSubmitted
+          ? await api.put(`/submissions/${submission._id}`, submission)
+          : await api.post('/submissions', submission);
         await this.$store.dispatch('submissions/remove', submission._id);
         this.result({ response });
       } catch (err) {
@@ -387,7 +390,15 @@ export default {
         survey => survey._id === submission.meta.survey.id,
       );
     },
-    select(draft) {
+    async select(draft) {
+      console.log('select', draft._id, this.getSubmission(draft._id));
+      if (!this.getSubmission(draft._id)) {
+        // TODO: should we persist this submission to IDB? not doing it for now
+        // If we don't persist submission to IDB then it will throw an error if the user tries to refresh the page
+        // But by not persisting it to IDB, we're preventing the user from creating drafts unnecessarily
+        // The draft will be persisted anyways as soon as the user makes any edits to the submission.
+        await this.$store.dispatch('submissions/fetchRemoteSubmission', draft._id);
+      }
       this.$router.push(`/submissions/drafts/${draft._id}`);
     },
     sortSubmissions(submissions) {

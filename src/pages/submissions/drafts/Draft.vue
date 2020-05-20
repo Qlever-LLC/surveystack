@@ -2,14 +2,14 @@
 <template>
   <div style="height: 100%;">
     <app-draft-component
-      v-if="!loading"
+      v-if="!loading && !hasError"
       :survey="survey"
       :submission="submission"
       @persist="persist"
       @submit="submit"
     />
     <div
-      v-else
+      v-else-if="loading && !hasError"
       class="d-flex align-center justify-center"
       style="height: 100%"
     >
@@ -19,32 +19,26 @@
         indeterminate
       />
     </div>
+    <div v-else-if="hasError" class="text-center mt-8">
+      Error Loading Draft Submission or Survey
+    </div>
 
     <confirm-leave-dialog
       ref="confirmLeaveDialog"
       title="Confirm Exit Draft"
+      v-if="submission && survey"
     >
       Are you sure you want to exit this draft?
     </confirm-leave-dialog>
 
-    <!-- <v-dialog
-      v-model="submitting"
-      hide-overlay
-      persistent
-      width="300"
-    >
-      <v-card>
-        <v-card-text class="pa-4">
-          <span>Submitting Draft</span>
-          <v-progress-linear
-            indeterminate
-            class="mb-0"
-          ></v-progress-linear>
-        </v-card-text>
-      </v-card>
-    </v-dialog> -->
-    <submitting-dialog v-model="submitting" />
 
+    <confirm-edit-submitted-dialog
+      v-if="submission && survey"
+      v-model="confirmEditSubmittedIsVisible"
+      @abort="abortEditSubmitted"
+    />
+
+    <submitting-dialog v-model="submitting" />
     <result-dialog
       v-model="showResult"
       :items="resultItems"
@@ -68,6 +62,7 @@ import resultMixin from '@/components/ui/ResultsMixin';
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
+import ConfirmEditSubmittedDialog from '@/components/survey/drafts/ConfirmEditSubmittedDialog.vue';
 import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 
 
@@ -77,6 +72,7 @@ export default {
     appDraftComponent,
     resultDialog,
     ConfirmLeaveDialog,
+    ConfirmEditSubmittedDialog,
     SubmittingDialog,
   },
   data() {
@@ -86,9 +82,19 @@ export default {
       loading: false,
       submitting: false,
       isSubmitted: false,
+      hasError: false,
+      confirmEditSubmittedIsVisible: false,
     };
   },
   methods: {
+    abortEditSubmitted() {
+      this.$store.dispatch('submissions/remove', this.submission._id);
+      // TODO: should we remove the router guard in this situation? otherwise it pops up a modal asking if the user
+      // is sure they want to leave. User can click 'cancel' when prompted whether they want to "Confirm editing submitted",
+      // which deleted the submission from the store, then when prompted whether they want to leave the current draft
+      // they can also click cancel, which may cause an error
+      this.$router.push({ name: 'my-submissions' });
+    },
     addReadyToSubmit(status) {
       return [
         ...status.filter(({ type }) => type !== 'READY_TO_SUBMIT'),
@@ -113,7 +119,9 @@ export default {
 
       try {
         // console.log('submitting', payload);
-        const response = await api.post('/submissions', payload);
+        const response = payload.meta.dateSubmitted
+          ? await api.put(`/submissions/${payload._id}`, payload)
+          : await api.post('/submissions', payload);
         this.result({ response });
         this.isSubmitted = true;
         await this.$store.dispatch('submissions/remove', this.submission._id);
@@ -140,21 +148,35 @@ export default {
     }));
     const { id } = this.$route.params;
 
-    this.submission = await this.$store.dispatch('submissions/fetchLocalSubmission', id);
-    // TODO: handle submission not found, set error on page
-    console.log('submission', this.submission);
+    try {
+      this.submission = await this.$store.dispatch('submissions/fetchLocalSubmission', id);
+    } catch (error) {
+      console.log('Error: submssion not found');
+      this.hasError = true;
+      return;
+    }
+    if (!this.submission) {
+      console.log('Error: submssion not found');
+      this.hasError = true;
+      return;
+    }
+
+    if (this.submission && this.submission.meta && this.submission.meta.dateSubmitted) {
+      this.confirmEditSubmittedIsVisible = true;
+    }
 
     this.survey = await this.$store.dispatch(
       'surveys/fetchSurvey',
       this.submission.meta.survey.id,
     );
-
-    // const positions = utils.getSurveyPositions(this.survey);
+    if (!this.survey) {
+      console.log('Error: survey not found');
+    }
 
     this.loading = false;
   },
   beforeRouteLeave(to, from, next) {
-    if (!this.isSubmitted) {
+    if (this.submission && this.survey && !this.isSubmitted) {
       this.$refs.confirmLeaveDialog.open(next);
       return;
     }

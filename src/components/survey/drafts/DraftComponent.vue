@@ -26,7 +26,6 @@
     >
       <draft-toolbar
         :required="control && control.options && control.options.required"
-        :showOverview="showOverview"
         :showOverviewIcon="!atEnd"
         :questionNumber="questionNumber"
         v-if="!showOverview && index < positions.length"
@@ -127,6 +126,7 @@
       :group="submission.meta.group.id"
       @submit="() => submit(submission)"
       @set-group="(val) => $set(submission.meta.group, 'id', val)"
+      :dateSubmitted="submission.meta.dateSubmitted"
     />
   </div>
 </template>
@@ -471,11 +471,6 @@ export default {
   },
 
   async created() {
-    // // HACK: to let us position the next button at the bottom of the screen
-    // const vh = window.innerHeight * 0.01;
-    // document.documentElement.style.setProperty('--vh', `${vh}px`);
-
-    // console.log('submission', this.submission);
     /** Should this be broken out into method? */
     // console.log('pos', this.position);
     // console.log('survey', this.survey);
@@ -496,6 +491,18 @@ export default {
         <span class="ml-2">${this.positions.length} Question${this.positions.length > 1 || this.positions.length < 1 ? 's' : ''}</span>
       `,
     });
+
+    if (
+      (this.submission.meta.dateModified && this.submission.meta.dateCreated
+      && this.submission.meta.dateCreated === this.submission.meta.dateModified)
+    ) {
+      this.showOverview = true;
+    }
+
+    if (this.submission.meta.dateSubmitted) {
+      console.log('this submission has been previously submitted!');
+      this.showOverview = true;
+    }
   },
   watch: {
     async showOverview() {
