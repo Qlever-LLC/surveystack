@@ -33,4 +33,29 @@ if [ -z "$DB" ]; then
     exit 1
 fi
 
-mongodump --host "$HOST" --ssl --username "$USERNAME" --password "$PASSWORD" --authenticationDatabase admin --db "$DB"
+if [ -z "$LOCAL_DB" ]; then
+    echo "LOCAL_DB is not defined";
+    exit 1
+fi
+
+TIMESTAMP=`date +%Y-%m-%d_%H-%M-%S`
+OUTFOLDER="dumps/$TIMESTAMP"
+
+# create backup from remote database
+echo "##"
+echo "# Creating dump of remote database $DB in folder $OUTFOLDER..."
+echo "##"
+mkdir -p "$OUTFOLDER"
+mongodump --out="$OUTFOLDER" --host="$HOST" --ssl --username="$USERNAME" --password="$PASSWORD" --authenticationDatabase=admin --db="$DB"
+
+# restore into local database
+echo "##"
+echo "# Copying backup into local database $LOCAL_DB..."
+echo "##"
+mongorestore --nsFrom="$DB.*" --nsTo="$LOCAL_DB.*" "$OUTFOLDER"
+
+echo "##"
+echo "# DONE!"
+echo "# Note: You may want to set DATABASE_NAME=$LOCAL_DB inside the root .env file of this project"
+echo "##"
+
