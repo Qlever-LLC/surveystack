@@ -2,7 +2,6 @@
   <nav>
     <v-app-bar
       app
-      :dark="true"
       clipped-left
       color="appbar"
     >

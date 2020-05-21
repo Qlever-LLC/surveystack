@@ -11,7 +11,7 @@
             v-on="on"
           >
             <span class="d-none d-md-inline mr-1">{{$store.getters['auth/user'].email}}</span>
-            <v-icon color="white">mdi-account</v-icon>
+            <v-icon>mdi-account</v-icon>
           </v-btn>
         </template>
         <v-list flat>

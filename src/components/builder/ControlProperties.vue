@@ -67,11 +67,11 @@
       />
       <v-checkbox
         class="my-1"
-        color="blue"
         outlined
         v-if="control.type !== 'group'"
         v-model="control.options.required"
         label="Required"
+        color="grey darken-1"
         hide-details
       >
         <template slot="label">
@@ -84,7 +84,7 @@
 
       <v-checkbox
         class="my-1"
-        color="blue"
+        color="grey darken-1"
         v-model="control.options.redacted"
         label="Private"
       >
@@ -98,6 +98,7 @@
 
       <v-checkbox
         class="ma-0"
+        color="grey darken-1"
         v-model="control.options.allowCustomSelection"
         v-if="isSelect || isOntology"
         outlined
@@ -125,7 +126,7 @@
       >
         <v-btn
           @click="showAdvanced = true"
-          color="primary"
+          color="grey darken-1"
           small
           text
         >advanced</v-btn>
@@ -142,7 +143,7 @@
         <div class="d-flex">
           <v-checkbox
             class="ma-0"
-            color="blue"
+            color="grey darken-1"
             outlined
             v-model="relevance.enabled"
             label="Relevance Expression"
@@ -150,7 +151,7 @@
           <v-spacer />
           <v-icon
             class="align-self-start"
-            color="blue"
+            color="grey darken-1"
             @click="$emit('code-relevance')"
           >
             mdi-open-in-new
@@ -160,7 +161,7 @@
         <div class="d-flex">
 
           <v-checkbox
-            color="blue"
+            color="grey darken-1"
             class="ma-0"
             outlined
             v-model="calculate.enabled"
@@ -169,7 +170,7 @@
           <v-spacer />
           <v-icon
             class="align-self-start"
-            color="blue"
+            color="grey darken-1"
             @click="$emit('code-calculate')"
           >
             mdi-open-in-new
@@ -179,7 +180,7 @@
         <div class="d-flex">
           <v-checkbox
             class="ma-0"
-            color="blue"
+            color="grey darken-1"
             outlined
             v-model="constraint.enabled"
             label="Constraint Expression"
@@ -187,7 +188,7 @@
           <v-spacer />
           <v-icon
             class="align-self-start"
-            color="blue"
+            color="grey darken-1"
             @click="$emit('code-constraint')"
           >
             mdi-open-in-new
@@ -197,7 +198,7 @@
         <div class="d-flex">
           <v-checkbox
             class="ma-0"
-            color="blue"
+            color="grey darken-1"
             outlined
             v-model="apiCompose.enabled"
             label="Api Compose Expression"
@@ -205,7 +206,7 @@
           <v-spacer />
           <v-icon
             class="align-self-start"
-            color="blue"
+            color="grey darken-1"
             @click="$emit('code-api-compose')"
           >
             mdi-open-in-new

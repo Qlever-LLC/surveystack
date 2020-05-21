@@ -88,7 +88,7 @@
     >
       {{snackbarMessage | capitalize}}
       <v-btn
-        color="pink"
+        color="grey"
         text
         @click="showSnackbar = false"
       >Close</v-btn>

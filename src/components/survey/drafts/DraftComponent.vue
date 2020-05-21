@@ -93,6 +93,7 @@
       right
       touchless
       stateless
+      class="grey lighten-4"
     >
       <draft-overview
         ref="overview"
@@ -651,8 +652,8 @@ export default {
 
 .app-chip {
   display: inline-flex;
-  background-color: white;
-  color: #ff5722;
+  /* background-color: white; */
+  /* color: #ff5722; */
   border-radius: 0.4rem;
   font-weight: bold;
   font-size: 80%;
@@ -706,8 +707,8 @@ export default {
 <style>
 .question-title-chip {
   display: inline-flex;
-  background-color: white;
-  color: #ff5722;
+  /* background-color: white; */
+  /* color: #ff5722; */
   border-radius: 0.4rem;
   font-weight: bold;
   font-size: 80%;
