@@ -45,8 +45,8 @@
           color="primary"
           x-large
           outlined
-          :to="`/surveys`"
-        >To All surveys</v-btn>
+          :to="`/surveys/browse`"
+        >Browse All</v-btn>
       </v-flex>
 
     </v-layout>

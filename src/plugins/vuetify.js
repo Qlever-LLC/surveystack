@@ -12,14 +12,14 @@ export default new Vuetify({
     themes: {
       light: {
         primary: '#03A9F4',
-        secondary: '#82AF9C',
+        secondary: '#8558b0',
         accent: '#FF5722',
         error: '#f44336',
         warning: '#ffc107',
         info: '#82AF9C',
         success: '#8bc34a',
         // appbar: '#ffffff',
-        appbar: '#FF5722',
+        appbar: '#8558b0',
       },
     },
   },

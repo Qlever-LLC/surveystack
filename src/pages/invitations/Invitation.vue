@@ -88,16 +88,6 @@ export default {
     };
   },
   methods: {
-    async fetchPinned() { // TODO this is copy paste!!!
-      const user = this.$store.getters['auth/user'];
-      this.$store.dispatch('memberships/getUserMemberships', user._id);
-
-      const memberships = this.$store.getters['memberships/memberships'];
-      // eslint-disable-next-line no-restricted-syntax
-      for (const membership of memberships) {
-        this.$store.dispatch('surveys/fetchPinned', membership.group._id);
-      }
-    },
     async fetchData() {
       this.initialized = false;
       if (this.code) {
@@ -109,7 +99,6 @@ export default {
     },
     cancel() {
       this.$store.dispatch('invitation/clear');
-      this.fetchPinned();
       this.$router.push('/');
     },
     async join() {
@@ -117,7 +106,7 @@ export default {
       // TODO: display status/errors
       await api.post('/memberships/activate', { code: this.code });
       await autoSelectActiveGroup(this.$store);
-      this.fetchPinned();
+      this.$store.dispatch('surveys/fetchPinned');
       this.$router.push('/');
     },
   },

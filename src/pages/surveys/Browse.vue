@@ -328,7 +328,7 @@ export default {
       }
       return [];
     },
-    async fetchPinnedSurveys(groupId) {
+    async fetchPinnedSurveys(groupId) { // TODO replace with new store action (?)
       try {
         const { data } = await api.get(`/groups/${groupId}?populate=1`);
         if (data && data.surveys && data.surveys.pinned && Array.isArray(data.surveys.pinned)) {

@@ -1,4 +1,8 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
+/* eslint-disable-next-line no-await-in-loop */
+
+
 import api from '@/services/api.service';
 
 
@@ -60,27 +64,44 @@ const actions = {
     commit(types.ADD_SURVEY, response.data);
     return response.data;
   },
-  async fetchPinned({ commit }, groupId) {
+  async fetchPinned({
+    commit, dispatch, rootState, rootGetters,
+  }) {
     const pinned = [];
 
-    try {
-      const { data } = await api.get(`/groups/${groupId}?populate=1`);
-      if (data && data.surveys && data.surveys.pinned && Array.isArray(data.surveys.pinned)) {
-        for (const s of data.surveys.pinned) {
-          pinned.push({
-            id: s._id,
-            name: s.name,
-            group: data.name,
-          });
-          console.log('fetching pinned survey', s);
-          actions.fetchSurvey({ commit }, s._id);
-        }
-      }
-    } catch (err) {
-      console.log('Error fetching surveys:', err);
+    console.log('rootGetters', rootGetters);
+    console.log('rootState', rootState);
+
+    if (!rootGetters['auth/isLoggedIn']) {
+      return pinned;
     }
+
+    const userId = rootState.auth.user._id;
+    dispatch('memberships/getUserMemberships', userId, { root: true });
+    const memberships = rootGetters['memberships/memberships'];
+
+    for (const membership of memberships) {
+      try {
+        const { data } = await api.get(`/groups/${membership.group._id}?populate=1`);
+        if (data && data.surveys && data.surveys.pinned && Array.isArray(data.surveys.pinned)) {
+          for (const s of data.surveys.pinned) {
+            pinned.push({
+              id: s._id,
+              name: s.name,
+              group: data.name,
+            });
+            console.log('fetching pinned survey', s);
+            actions.fetchSurvey({ commit }, s._id);
+          }
+        }
+      } catch (err) {
+        console.log('Error fetching surveys:', err);
+      }
+    }
+
     commit(types.SET_PINNED, pinned);
-    return [];
+
+    return pinned;
   },
   removeSurvey({ commit }, id) {
     commit(types.REMOVE_SURVEY, id);

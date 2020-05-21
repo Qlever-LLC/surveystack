@@ -31,13 +31,7 @@ export default {
   },
   mounted() {
     console.log('mounted');
-    const user = this.$store.getters['auth/user'];
-    this.$store.dispatch('memberships/getUserMemberships', user._id);
-    const memberships = this.$store.getters['memberships/memberships'];
-    for (const membership of memberships) {
-      this.$store.dispatch('surveys/fetchPinned', membership.group._id);
-    }
-
+    this.$store.dispatch('surveys/fetchPinned');
     api.get('farmos/fields');
     api.get('farmos/assets');
     // this.$store.dispatch('surveys/fetchPinned', ),
