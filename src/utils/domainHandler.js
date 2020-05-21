@@ -33,7 +33,7 @@ export default {
     manifestElement.setAttribute('href', '/manifest.json');
 
 
-    console.log('parts', parts);
+    // console.log('parts', parts);
     if (parts.length > 0) {
       const subdomain = parts[0];
       const activePartner = partners.find(p => p.domain === subdomain);

@@ -12,9 +12,8 @@
           class="list-group-item pa-2"
         >
           <small class="grey--text text--darken-1">{{submission._id}}</small>
-          <small class="grey--text text--darken-1">, Version {{submission.meta.survey.version}}</small>
           <small
-            v-if="submission.meta.path"
+            v-if="submission.meta && submission.meta.path"
             class="grey--text text--darken-1"
           >, {{submission.meta.path}}</small>
           <div

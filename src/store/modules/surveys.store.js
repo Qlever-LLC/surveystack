@@ -69,9 +69,6 @@ const actions = {
   }) {
     const pinned = [];
 
-    console.log('rootGetters', rootGetters);
-    console.log('rootState', rootState);
-
     if (!rootGetters['auth/isLoggedIn']) {
       return pinned;
     }
@@ -90,7 +87,6 @@ const actions = {
               name: s.name,
               group: data.name,
             });
-            console.log('fetching pinned survey', s);
             actions.fetchSurvey({ commit }, s._id);
           }
         }

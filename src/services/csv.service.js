@@ -82,18 +82,26 @@ function createCsv(submissions, headers) {
   submissions.forEach((s) => {
     const submission = _.cloneDeep(s);
     submission._id = submission._id.toString();
-    submission.meta.survey.id = submission.meta.survey.id.toString();
-    if (submission.meta.group.id) {
-      submission.meta.group.id = submission.meta.group.id.toString();
-    }
-    if (submission.meta.creator) {
-      submission.meta.creator = submission.meta.creator.toString();
-    }
-    if (submission.meta.original) {
-      submission.meta.original = submission.meta.original.toString();
-    }
-    removeKeys(submission.data, ['meta']);
 
+    if (submission.meta) {
+      if (submission.meta.survey && submission.meta.survey.id) {
+        submission.meta.survey.id = submission.meta.survey.id.toString();
+      }
+
+      if (submission.meta.group && submission.meta.group.id) {
+        submission.meta.group.id = submission.meta.group.id.toString();
+      }
+
+      if (submission.meta.creator) {
+        submission.meta.creator = submission.meta.creator.toString();
+      }
+
+      if (submission.meta.original) {
+        submission.meta.original = submission.meta.original.toString();
+      }
+    }
+
+    removeKeys(submission.data, ['meta']);
     items.push(flatten(submission));
   });
 

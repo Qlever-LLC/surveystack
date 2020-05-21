@@ -30,7 +30,6 @@ export default {
     domainHandler.install(this);
   },
   mounted() {
-    console.log('mounted');
     this.$store.dispatch('surveys/fetchPinned');
 
     if (this.$store.getters['auth/isLoggedIn']) {
