@@ -12,9 +12,14 @@
         "src": "/img/icons/android-chrome-256x256.png",
         "type": "image/png",
         "sizes": "256x256"
+      },
+      {
+        "src": "/img/icons/android-chrome-512x512.png",
+        "type": "image/png",
+        "sizes": "512x512"
       }
     ],
-    "start_url": "/?source=pwa",
+    "start_url": "/",
     "background_color": "#FFF",
     "display": "standalone",
     "scope": "/",
