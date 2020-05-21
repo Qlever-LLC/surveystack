@@ -109,9 +109,12 @@
         <v-card-text>
           <div class="d-flex align-center">
             <div><span class="subtitle-2">ACTIONS</span><br />{{selected.length}} {{selected.length === 1 ? 'submission' : 'submissions'}} selected</div>
-            <div class="ml-auto">
+            <div
+              class="ml-auto"
+              v-if="selected.length === 1"
+            >
               <v-btn
-                v-if="selected.length === 1 && selected[0]['meta.archived'] === 'true'"
+                v-if="selected[0]['meta.archived'] === 'true'"
                 color="error"
                 text
                 @click="showDeleteModal = true"
@@ -119,20 +122,29 @@
                 DELETE
               </v-btn>
               <v-btn
-                v-if="selected.length === 1 && selected[0]['meta.archived'] === 'true'"
+                v-if="selected[0]['meta.archived'] === 'true'"
                 text
                 @click="archiveSubmission(selected[0], false)"
               >
                 RESTORE
               </v-btn>
               <v-btn
-                v-if="selected.length === 1 && selected[0]['meta.archived'] !== 'true'"
+                v-if="selected[0]['meta.archived'] !== 'true'"
                 color="error"
                 text
                 @click="showArchiveModal = true"
               >
                 ARCHIVE
               </v-btn>
+              <v-btn
+                v-if="selected[0]['meta.archived'] !== 'true'"
+                text
+                color="secondary"
+                @click="resubmit(selected[0])"
+              >
+                RESUBMIT...
+              </v-btn>
+
             </div>
           </div>
         </v-card-text>
@@ -175,6 +187,13 @@
 
 <script>
 /* eslint-disable no-unused-vars */
+
+/*
+ Note how the submission object to methods like archiveSubmission
+ is coming from v-data-table's row and is of the flattened form:
+ {"_id": xxx, "meta.archived": 'false', ...}
+ ... it's ok for now but working with the real JSON object would make more sense
+*/
 
 import api from '@/services/api.service';
 import { flattenSubmission } from '@/utils/submissions';
@@ -335,6 +354,10 @@ export default {
     startDraft(survey) {
       const group = this.$store.getters['memberships/activeGroup'];
       this.$store.dispatch('submissions/startDraft', { survey, group });
+    },
+    async resubmit(submission) {
+      await this.$store.dispatch('submissions/fetchRemoteSubmission', submission._id);
+      this.$router.push(`/submissions/drafts/${submission._id}`);
     },
   },
   watch: {

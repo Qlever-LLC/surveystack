@@ -4,8 +4,12 @@
       <v-card-title>{{ survey.name }}</v-card-title>
       <v-card-subtitle>
         {{ submission._id }}
-        <br><kbd>{{ created }}</kbd> created
-        <br><kbd>{{ modified }}</kbd> last modified
+        <br>
+        <kbd>{{ created }}</kbd> created
+        <br>
+        <kbd>{{ modified }}</kbd> last modified
+        <br>
+        <strong><kbd>{{ submitted }}</kbd> submitted</strong>
       </v-card-subtitle>
     </v-card>
     <v-timeline
@@ -134,6 +138,7 @@ export default {
       controlDisplays: [],
       modified: '',
       created: '',
+      submitted: '',
     };
   },
   methods: {
@@ -157,6 +162,7 @@ export default {
     refresh() {
       this.created = moment(this.submission.meta.dateCreated).format('YYYY-MM-DD HH:mm');
       this.modified = moment(this.submission.meta.dateModified).format('YYYY-MM-DD HH:mm');
+      this.submitted = moment(this.submission.meta.dateSubmitted).format('YYYY-MM-DD HH:mm');
 
       const now = moment();
       const positions = utils.getSurveyPositions(this.survey, this.submission.meta.survey.version);
