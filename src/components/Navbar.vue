@@ -61,7 +61,10 @@
       </v-list>
 
       <template v-slot:append>
-        <div dark class="grey--text">
+        <div
+          dark
+          class="grey--text"
+        >
           <p class="pt-4 pl-4">App-Version: {{ version }}</p>
         </div>
       </template>
@@ -124,6 +127,12 @@ export default {
               name: 'groups-list',
             },
             icon: 'mdi-domain',
+          },
+        ],
+        superAdmin: [
+          {
+            type: 'subheader',
+            label: 'SUPER-ADMIN',
           },
           {
             type: 'link',
@@ -200,6 +209,10 @@ export default {
       if (this.$store.getters['auth/isLoggedIn']) {
         items.push(divider);
         items.push(...this.sidenav.admin);
+      }
+      if (this.$store.getters['auth/isSuperAdmin']) {
+        items.push(divider);
+        items.push(...this.sidenav.superAdmin);
       }
       // items.push(divider);
       // items.push(...this.sidenav.dev);
