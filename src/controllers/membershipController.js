@@ -65,6 +65,7 @@ const createPopulationPipeline = () => {
     },
   ];
   pipeline.push(...groupLookup);
+  pipeline.push({ $sort: { 'group.path': 1 } });
 
   return pipeline;
 };
