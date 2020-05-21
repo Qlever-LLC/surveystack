@@ -231,12 +231,19 @@ export default {
       });
 
       if (value) {
+        // this.marker = new mapboxgl.Marker()
+        //   .setLngLat([value.lng, value.lat])
+        //   .addTo(map);
+
+        // map.jumpTo({
+        //   center: [value.lng, value.lat],
+        // });
         this.marker = new mapboxgl.Marker()
-          .setLngLat([value.lng, value.lat])
+          .setLngLat([value.geometry.coordinates[0], value.geometry.coordinates[1]])
           .addTo(map);
 
         map.jumpTo({
-          center: [value.lng, value.lat],
+          center: [value.geometry.coordinates[0], value.geometry.coordinates[1]],
         });
       }
     },
@@ -246,7 +253,8 @@ export default {
       if (this.value) {
         return {
           location: this.value,
-          label: `used ${this.value.acc ? ' GPS' : 'Map Center'}`,
+          // label: `used ${this.value.acc ? ' GPS' : 'Map Center'}`,
+          label: `used ${this.value.properties ? ' GPS' : 'Map Center'}`,
         };
       }
 
@@ -294,10 +302,23 @@ export default {
     if (navigator.geolocation) {
       this.geolocationID = navigator.geolocation.watchPosition((position) => {
         // console.log('pos', position.coords);
+        // this.gps = {
+        //   lat: position.coords.latitude,
+        //   lng: position.coords.longitude,
+        //   acc: position.coords.accuracy,
+        // };
         this.gps = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-          acc: position.coords.accuracy,
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [position.coords.longitude, position.coords.latitude],
+          },
+          properties: {
+            accuracy: position.coords.accuracy,
+          },
+          // lat: position.coords.latitude,
+          // lng: position.coords.longitude,
+          // acc: position.coords.accuracy,
         };
       });
     }

@@ -11,11 +11,13 @@
         <div
           id="app-bar-title"
           class="title py-0 my-0"
-        >{{ appTitle }}</div>
+        >
+          {{ appTitle }}
+        </div>
         <div
           class="app-bar-subtitle subtitle py-0 my-0"
           v-html="appSubtitle"
-        ></div>
+        />
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
@@ -39,7 +41,9 @@
           <v-subheader
             v-else-if="item.type === 'subheader'"
             :key="i"
-          >{{item.label}}</v-subheader>
+          >
+            {{item.label}}
+          </v-subheader>
           <v-list-item
             v-else
             :key="i"
@@ -52,7 +56,26 @@
               <v-icon>{{item.icon}}</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title>{{item.label}}</v-list-item-title>
+              <!-- <v-list-item-title
+                v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
+              >
+                <v-badge :content="readyToSubmitCount" color="pink">
+                  {{ item.label }}
+                </v-badge>
+              </v-list-item-title> -->
+              <!-- <v-list-item-title v-else>
+                {{ item.label }}
+              </v-list-item-title> -->
+              <v-list-item-title>
+                {{ item.label }}
+                <v-chip
+                  v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
+                  color="accent"
+                  small
+                >
+                  {{readyToSubmitCount}}
+                </v-chip>
+              </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </template>
@@ -195,6 +218,9 @@ export default {
     };
   },
   computed: {
+    readyToSubmitCount() {
+      return this.$store.getters['submissions/readyToSubmit'].length;
+    },
     appTitle() {
       return this.$store.getters['appui/title'];
     },

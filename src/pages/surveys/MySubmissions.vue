@@ -9,7 +9,7 @@
           @click="handleSubmitCompleted"
         >
           Submit Completed
-          <v-icon class="ml-2">mdi-cloud-upload</v-icon>
+          <v-icon class="ml-2">mdi-cloud-upload-outline</v-icon>
         </v-btn>
       </v-row>
       <v-row class="d-flex flex-grow-1">
@@ -69,15 +69,21 @@
                           </v-list-item-subtitle>
                         </v-list-item-content>
                         <v-list-item-action>
-                          <v-btn
-                            v-if="readyToSubmitHas(item._id)"
-                            icon
-                            @click="() => handleSubmitClick(item._id)"
-                          >
-                            <v-icon>
-                              mdi-cloud-upload
-                            </v-icon>
-                          </v-btn>
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                              <v-btn
+                                v-if="readyToSubmitHas(item._id)"
+                                icon
+                                @click="() => handleSubmitClick(item._id)"
+                                v-on="on"
+                              >
+                                <v-icon>
+                                  mdi-cloud-upload-outline
+                                </v-icon>
+                              </v-btn>
+                            </template>
+                            <span>Upload Submission</span>
+                          </v-tooltip>
                         </v-list-item-action>
                       </v-list-item>
                       <v-divider
@@ -92,7 +98,7 @@
                   <v-pagination
                     v-model="page"
                     :length="activeTabPaginationLength"
-                    color="grey"
+                    color="grey darken-1"
                   />
                 </v-card-actions>
               </template>
@@ -128,7 +134,7 @@
                   v-model="remotePage"
                   :length="sentTabPaginationLength"
                   @input="fetchRemoteSubmissions"
-                  color="grey"
+                  color="grey darken-1"
                 />
               </template>
               <v-container

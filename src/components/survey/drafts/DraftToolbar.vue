@@ -17,10 +17,10 @@
     <v-chip
       v-if="required"
       dark
-      color="red"
+      color="error"
     >
       <span class="font-weight-bold">
-        <v-icon class="mr-2">mdi-alert-circle</v-icon>answer is required
+        <v-icon class="mr-2">mdi-alert-circle</v-icon>Answer required
       </span>
     </v-chip>
     <v-spacer></v-spacer>
