@@ -65,7 +65,6 @@ export default {
   computed: {
     items() {
       if (this.parsed) {
-        console.log('this.parsed', this.parsed);
         return this.parsed.data;
       }
       return [];
