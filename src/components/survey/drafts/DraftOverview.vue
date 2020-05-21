@@ -9,7 +9,7 @@
         <br>
         <kbd>{{ modified }}</kbd> last modified
         <br>
-        <strong><kbd>{{ submitted }}</kbd> submitted</strong>
+        <strong v-if="submission.meta.dateSubmitted"><kbd>{{ submitted }}</kbd> submitted</strong>
       </v-card-subtitle>
     </v-card>
     <v-timeline

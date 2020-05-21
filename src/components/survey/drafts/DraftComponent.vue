@@ -260,9 +260,10 @@ export default {
       // submission
       const modified = moment().toISOString(true);
       this.submission.meta.dateModified = modified;
-      console.log('setting value:', v);
+      console.log('setting value:', v, modified);
       this.submissionField.value = v;
       this.submissionField.meta.dateModified = modified;
+      console.log(this.submission.meta.dateModified);
       this.$emit('change', this.submission);
       this.persist();
 
@@ -491,10 +492,11 @@ export default {
         <span class="ml-2">${this.positions.length} Question${this.positions.length > 1 || this.positions.length < 1 ? 's' : ''}</span>
       `,
     });
-
+  },
+  mounted() {
     if (
       (this.submission.meta.dateModified && this.submission.meta.dateCreated
-      && this.submission.meta.dateCreated === this.submission.meta.dateModified)
+      && this.submission.meta.dateCreated !== this.submission.meta.dateModified)
     ) {
       this.showOverview = true;
     }
