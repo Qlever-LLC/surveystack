@@ -27,20 +27,22 @@ function removeKeys(obj, keys) {
 }
 
 function createHeaders(mergedObject) {
-  if (mergedObject.meta.survey.id) {
-    mergedObject.meta.survey.id = mergedObject.meta.survey.id.toString();
-  }
+  if (mergedObject.meta) {
+    if (mergedObject.meta.survey && mergedObject.meta.survey.id) {
+      mergedObject.meta.survey.id = mergedObject.meta.survey.id.toString();
+    }
 
-  if (mergedObject.meta.group.id) {
-    mergedObject.meta.group.id = mergedObject.meta.group.id.toString();
-  }
+    if (mergedObject.meta.group && mergedObject.meta.group.id) {
+      mergedObject.meta.group.id = mergedObject.meta.group.id.toString();
+    }
 
-  if (mergedObject.meta.creator) {
-    mergedObject.meta.creator = mergedObject.meta.creator.toString();
-  }
+    if (mergedObject.meta.creator) {
+      mergedObject.meta.creator = mergedObject.meta.creator.toString();
+    }
 
-  if (mergedObject.meta.original) {
-    mergedObject.meta.original = mergedObject.meta.original.toString();
+    if (mergedObject.meta.original) {
+      mergedObject.meta.original = mergedObject.meta.original.toString();
+    }
   }
 
   const flattened = flatten(mergedObject);

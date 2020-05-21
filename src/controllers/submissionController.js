@@ -62,6 +62,13 @@ const sanitizeMatch = (obj) => {
         obj[key] = new Date(v);
         return;
       }
+
+      if (obj[key]['$oid']) {
+        const v = obj[key]['$oid'];
+        obj[key] = new ObjectId(v);
+        return;
+      }
+
       // if (/^.*\.(creator|id)$/) {
       //   obj[key] = ObjectId(obj[key]);
       //   return;
@@ -265,19 +272,19 @@ const buildPipeline = async (req, res) => {
         => {"data.personal_group.age": 1, "data.personal_group.meta": 1}
         Furthermore, the root level "meta" should be included
       */
-      if (_.every(project, (v) => v === 1)) {
-        autoProjections.meta = 1;
-        _.map(project, (v, k) => {
-          const splits = k.split('.');
-          if (splits[0] === 'data' && splits.length > 2) {
-            let key = 'data';
-            for (let i = 1; i < splits.length - 1; i++) {
-              key += `.${splits[i]}`;
-              autoProjections[`${key}.meta`] = 1;
-            }
-          }
-        });
-      }
+      // if (_.every(project, (v) => v === 1)) {
+      //   //autoProjections.meta = 1;
+      //   _.map(project, (v, k) => {
+      //     const splits = k.split('.');
+      //     if (splits[0] === 'data' && splits.length > 2) {
+      //       let key = 'data';
+      //       for (let i = 1; i < splits.length - 1; i++) {
+      //         key += `.${splits[i]}`;
+      //         autoProjections[`${key}.meta`] = 1;
+      //       }
+      //     }
+      //   });
+      // }
       project = { ...project, ...autoProjections };
       pipeline.push({ $project: project });
     }
