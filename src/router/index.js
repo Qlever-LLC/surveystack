@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Home from '@/pages/Home.vue';
 import Test from '@/pages/Test.vue';
+import Unauthorized from '@/pages/Unauthorized.vue';
 
 import MySubmissions from '@/pages/surveys/MySubmissions.vue';
 import SurveysBrowse from '@/pages/surveys/Browse.vue';
@@ -38,6 +39,7 @@ import Invitation from '@/pages/invitations/Invitation.vue';
 
 import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
 
+
 // integrations
 import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
 import GroupIntegrationEdit from '@/pages/integrations/GroupIntegrationEdit.vue';
@@ -57,6 +59,14 @@ Vue.use(VueRouter);
 const guard = async (to, from, next) => {
   if (!store.getters['auth/isLoggedIn']) {
     next({ name: 'auth-login', params: { redirect: to } });
+  } else {
+    next();
+  }
+};
+
+const superGuard = async (to, from, next) => {
+  if (!store.getters['auth/isSuperAdmin']) {
+    next({ name: 'unauthorized', params: { allowed: 'Super Admins', to } });
   } else {
     next();
   }
@@ -178,6 +188,7 @@ const routes = [
     path: '/users',
     name: 'users-list',
     component: UserList,
+    beforeEnter: superGuard,
   },
   {
     path: '/users/new',
@@ -279,6 +290,13 @@ const routes = [
     path: '/call-for-submissions',
     name: 'call-for-submissions',
     component: CallForSubmissions,
+  },
+  // Unauthorized
+  {
+    path: '/unauthorized',
+    name: 'unauthorized',
+    component: Unauthorized,
+    props: true,
   },
   // tabula rasa
   // TODO: remove this from production
