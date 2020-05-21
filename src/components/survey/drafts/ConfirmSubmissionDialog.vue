@@ -37,6 +37,9 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </div>
+        <div v-if="dateSubmitted">
+          This submission was previously submitted on {{ new Date(dateSubmitted).toLocaleString() }}. Resubmission will archive the previous submission.
+        </div>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -80,6 +83,9 @@ export default {
       type: String,
     },
     id: {
+      type: String,
+    },
+    dateSubmitted: {
       type: String,
     },
   },

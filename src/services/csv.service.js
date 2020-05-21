@@ -89,6 +89,9 @@ function createCsv(submissions, headers) {
     if (submission.meta.creator) {
       submission.meta.creator = submission.meta.creator.toString();
     }
+    if (submission.meta.original) {
+      submission.meta.original = submission.meta.original.toString();
+    }
     removeKeys(submission.data, ['meta']);
 
     items.push(flatten(submission));

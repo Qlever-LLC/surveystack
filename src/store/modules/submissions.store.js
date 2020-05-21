@@ -1,5 +1,5 @@
 import * as db from '@/store/db';
-// import api from '@/services/api.service';
+import api from '@/services/api.service';
 
 import submissionUtils from '@/utils/submissions';
 
@@ -25,6 +25,7 @@ export const types = {
     startDraft: 'startDraft',
     get: 'get',
     update: 'update',
+    fetchRemoteSubmission: 'fetchRemoteSubmission',
   },
 };
 
@@ -55,19 +56,25 @@ const mutations = {
     state.submissions = submissions;
   },
   [types.mutations.ADD_SUBMISSION](state, submission) {
-    state.submissions.push(submission);
+    // prevent duplicates
+    const index = state.submissions.findIndex(({ _id }) => _id === submission._id);
+    if (index > -1) {
+      state.submissions[index] = submission;
+    } else {
+      state.submissions.push(submission);
+    }
   },
   [types.mutations.REMOVE_SUBMISSION](state, id) {
     const index = state.submissions.findIndex(({ _id }) => _id === id);
     state.submissions.splice(index, 1);
   },
-  // [types.mutations.SET_REMOTE_SUBMISSIONS](state, submissions) {
-  //   state.remoteSubmissions = submissions;
-  // },
   [types.mutations.UPDATE_SUBMISSION](state, submission) {
     const index = state.submissions.findIndex(({ _id }) => _id === submission._id);
     state.submissions[index] = submission;
   },
+  // [types.mutations.SET_REMOTE_SUBMISSIONS](state, submissions) {
+  //   state.remoteSubmissions = submissions;
+  // },
 
 };
 
@@ -123,6 +130,15 @@ const actions = {
     await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
     commit(types.mutations.UPDATE_SUBMISSION, submission);
     return submission;
+  },
+  async [types.actions.fetchRemoteSubmission]({ commit }, id) {
+    const { data } = await api.get(`/submissions/${id}`);
+    console.log('fetchRemoteSubmission response', data);
+    // NOTE: this means that dispatching fetchRemoteSubmission will overwrite a local draft
+    // So if a user submits a Submission, then edits it (but without resubmitting it), then we
+    // execute fetchRemoteSubmission again, their local edits will be overwritten and lost
+    commit(types.mutations.ADD_SUBMISSION, data);
+    return data;
   },
 };
 
