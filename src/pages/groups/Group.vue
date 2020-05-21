@@ -57,7 +57,6 @@
       </v-col>
 
     </v-row>
-
   </v-container>
   <v-container v-else-if="status.code === 404">
     <h1>Oh snap!</h1>
@@ -99,8 +98,7 @@ export default {
       try {
         const { data } = await api.get(`/groups/by-path/${path}?populate=true`);
         this.entity = data;
-        console.log('entity', this.entity);
-        console.log('memberships', this.groups);
+
         await this.getSubgroups();
       } catch (e) {
         this.status.code = e.response.status;
@@ -121,11 +119,11 @@ export default {
     user() {
       return this.$store.getters['auth/user'];
     },
-    memberships() {
+    userMemberships() {
       return this.$store.getters['memberships/memberships'];
     },
     editable() {
-      const g = this.memberships.find(m => m.group._id === this.entity._id);
+      const g = this.userMemberships.find(m => m.group._id === this.entity._id);
       if (g && g.role === 'admin') {
         return true;
       }
