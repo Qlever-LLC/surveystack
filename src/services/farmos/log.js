@@ -96,7 +96,7 @@ async function log(
   });
 
   if (currentAssetId) {
-    bodyString = bodyString.replace('$PLANTING', currentAssetId);
+    bodyString = bodyString.replace('$ASSET', currentAssetId);
   }
 
   console.log('substituted string', bodyString);

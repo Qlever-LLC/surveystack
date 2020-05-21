@@ -1,6 +1,6 @@
 /* eslint-disable no-unreachable */
 import * as utils from '../helpers/surveys';
-import { planting } from './farmos/planting';
+import { asset } from './farmos/planting';
 import { log } from './farmos/log';
 import { aggregatorRequest } from './farmos/request';
 import { farminfo } from './farmos/farminfo';
@@ -151,8 +151,8 @@ async function execute(apiCompose, info, terms, user, submission, currentAssetId
 
   const credentials = await getCredentials(user);
 
-  if (type === 'planting') {
-    return await planting(apiCompose, info, terms, user, credentials, submission);
+  if (type === 'asset') {
+    return await asset(apiCompose, info, terms, user, credentials, submission);
   } else if (type === 'log') {
     return await log(apiCompose, info, terms, user, credentials, submission, currentAssetId);
     // TODO create log
