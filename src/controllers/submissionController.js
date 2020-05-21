@@ -536,7 +536,7 @@ const updateSubmission = async (req, res) => {
       returnOriginal: false,
     }
   );
-  return res.send(updated);
+  return res.send(updated.value);
 };
 
 const archiveSubmission = async (req, res) => {

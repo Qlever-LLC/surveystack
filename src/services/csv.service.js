@@ -27,9 +27,21 @@ function removeKeys(obj, keys) {
 }
 
 function createHeaders(mergedObject) {
-  mergedObject.meta.survey.id = mergedObject.meta.survey.id.toString();
-  mergedObject.meta.group.id = mergedObject.meta.group.id.toString();
-  mergedObject.meta.creator = mergedObject.meta.creator.toString();
+  if (mergedObject.meta.survey.id) {
+    mergedObject.meta.survey.id = mergedObject.meta.survey.id.toString();
+  }
+
+  if (mergedObject.meta.group.id) {
+    mergedObject.meta.group.id = mergedObject.meta.group.id.toString();
+  }
+
+  if (mergedObject.meta.creator) {
+    mergedObject.meta.creator = mergedObject.meta.creator.toString();
+  }
+
+  if (mergedObject.meta.original) {
+    mergedObject.meta.original = mergedObject.meta.original.toString();
+  }
 
   const flattened = flatten(mergedObject);
   const headers = Object.keys(flattened);
@@ -90,6 +102,9 @@ function createCsv(submissions, headers) {
     }
     if (submission.meta.creator) {
       submission.meta.creator = submission.meta.creator.toString();
+    }
+    if (submission.meta.original) {
+      submission.meta.original = submission.meta.original.toString();
     }
     removeKeys(submission.data, ['meta']);
 
