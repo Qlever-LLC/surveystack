@@ -34,9 +34,12 @@
             class="my-2"
           >
             <v-btn
+              rounded
               dark
               color="primary"
               x-large
+              class="pa-4"
+              style="max-width: 100%; white-space: normal; height: 100%"
               :to="`/surveys/${p.id}`"
             >{{ p.group }}: {{ p.name }}</v-btn>
           </div>
