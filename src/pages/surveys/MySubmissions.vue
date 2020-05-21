@@ -43,14 +43,15 @@
             class="flex-grow-1 flex-column align-center justify-center align-content-center"
             style="height: 100%;"
           >
-            <v-card min-height="70vh" class="d-flex flex-column justify-space-between">
+            <v-card
+              min-height="70vh"
+              class="d-flex flex-column justify-space-between"
+            >
               <template v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
-                <v-card-text >
-                  <v-list >
+                <v-card-text>
+                  <v-list>
                     <template v-for="(item, i) in activeTabPageContent">
-                      <v-list-item
-                        :key="i"
-                      >
+                      <v-list-item :key="i">
                         <v-list-item-content
                           @click="select(item)"
                           class="cursor-pointer"
@@ -96,11 +97,9 @@
                 </v-card-actions>
               </template>
               <template v-else-if="tab.name === 'sent' && tab.content.length > 0">
-                <v-list >
+                <v-list>
                   <template v-for="(item, i) in tab.content">
-                    <v-list-item
-                      :key="i"
-                    >
+                    <v-list-item :key="i">
                       <v-list-item-content
                         @click="select(item)"
                         class="cursor-pointer"
@@ -157,8 +156,15 @@
 
           </v-tab-item>
         </v-tabs-items>
-        <v-card v-else width="100%" style="min-height: 50vh">
-          <v-card-text class="d-flex align-center justify-center" style="height: 100%">
+        <v-card
+          v-else
+          width="100%"
+          style="min-height: 50vh"
+        >
+          <v-card-text
+            class="d-flex align-center justify-center"
+            style="height: 100%"
+          >
             <v-progress-circular
               :size="50"
               color="primary"
@@ -169,7 +175,7 @@
       </v-row>
 
     </v-container>
-      <!-- @input="handleConfirmSubmissionDialogInput" -->
+    <!-- @input="handleConfirmSubmissionDialogInput" -->
     <confirm-submission-dialog
       ref="confirm-submission-dialog"
       v-if="confirmSubmissionIsVisible"
@@ -397,6 +403,8 @@ export default {
         // If we don't persist submission to IDB then it will throw an error if the user tries to refresh the page
         // But by not persisting it to IDB, we're preventing the user from creating drafts unnecessarily
         // The draft will be persisted anyways as soon as the user makes any edits to the submission.
+
+        // TODO: if implementation changes here, also adapt @/pages/submissions/List.vue's 'resubmit' method
         await this.$store.dispatch('submissions/fetchRemoteSubmission', draft._id);
       }
       this.$router.push(`/submissions/drafts/${draft._id}`);
