@@ -70,7 +70,16 @@ router.post(
 );
 router.get('/submissions/:id', catchErrors(submissionController.getSubmission));
 router.post('/submissions', catchErrors(submissionController.createSubmission));
-router.put('/submissions/:id', catchErrors(submissionController.updateSubmission));
+router.put(
+  '/submissions/:id',
+  [
+    assertAuthenticated,
+    assertIdsMatch,
+    assertEntityExists({ collection: 'submissions' }),
+    assertEntityRights,
+  ],
+  catchErrors(submissionController.updateSubmission)
+);
 router.delete(
   '/submissions/:id',
   [assertAuthenticated, assertEntityExists({ collection: 'submissions' }), assertEntityRights],

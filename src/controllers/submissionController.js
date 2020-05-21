@@ -13,6 +13,8 @@ import rolesService from '../services/roles.service';
 const col = 'submissions';
 const DEFAULT_LIMIT = 100000;
 
+// NOTE: when adding fields to a submission
+// you may need to adapt csv.service.js in both back-end and front-end
 const sanitize = async (entity) => {
   if (entity._id) {
     entity._id = new ObjectId(entity._id);
@@ -514,19 +516,27 @@ const updateSubmission = async (req, res) => {
   const { id } = req.params;
   const entity = await sanitize(req.body);
 
-  try {
-    let updated = await db.collection(col).findOneAndUpdate(
-      { _id: id },
-      { $set: entity },
-      {
-        returnOriginal: false,
-      }
-    );
-    return res.send(updated);
-  } catch (err) {
-    console.log(err);
-    return res.status(500).send({ message: 'Ouch :/' });
-  }
+  const existing = res.locals.existing;
+  const updatedRevision = existing.meta.revision + 1;
+
+  // re-insert existing submission with a new _id
+  existing._id = new ObjectId();
+  existing.meta.original = new ObjectId(id);
+  existing.meta.archived = true;
+  existing.meta.archivedReason = 'RESUBMIT';
+  await db.collection(col).insertOne(existing);
+
+  // update with upped revision
+  entity.meta.revision = updatedRevision;
+
+  const updated = await db.collection(col).findOneAndUpdate(
+    { _id: new ObjectId(id) },
+    { $set: entity },
+    {
+      returnOriginal: false,
+    }
+  );
+  return res.send(updated);
 };
 
 const archiveSubmission = async (req, res) => {
