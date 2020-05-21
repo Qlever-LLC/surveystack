@@ -2,17 +2,17 @@ export default {
   name: 'Real Food Campaign',
   domain: 'rfc',
   groupSlug: 'real-food-campaign',
-  logo: '',
+  logo: '/partners/rfc/img/logo.png',
   themes: {
     light: {
-      primary: '#D9534F',
-      secondary: '#82AF9C',
+      primary: '#26AAE2',
+      secondary: '#26AAE2',
       accent: '#FF5722',
       error: '#f44336',
       warning: '#ffc107',
-      info: '#82AF9C',
+      info: '#26AAE2',
       success: '#8bc34a',
-      appbar: '#D9534F',
+      appbar: '#ee3f28',
     },
   },
 };
