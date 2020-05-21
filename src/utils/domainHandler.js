@@ -14,9 +14,17 @@ importAll(require.context('@/partners/', false, /\.js$/));
 
 export default {
   install(vue) {
+    const appBarThemeColor = document.createElement('meta');
+    appBarThemeColor.setAttribute('name', 'theme-color');
+    appBarThemeColor.setAttribute('content', '#444444');
+
     const iconElement = document.createElement('link');
     iconElement.setAttribute('rel', 'icon');
     iconElement.setAttribute('href', '/favicon.ico');
+
+    const appleTouch = document.createElement('link');
+    appleTouch.setAttribute('rel', 'apple-touch-icon');
+    appleTouch.setAttribute('href', '/img/android-chrome-256x256.png');
 
 
     const manifestElement = document.createElement('link');
@@ -43,6 +51,9 @@ export default {
 
         manifestElement.setAttribute('href', `/partners/${subdomain}/manifest.json`);
         iconElement.setAttribute('href', `/partners/${subdomain}/images/icons/icon-72x72.png`);
+        appleTouch.setAttribute('href', `/partners/${subdomain}/images/icons/icon-512x512.png`);
+        appBarThemeColor.setAttribute('content', activePartner.themes.light.appbar);
+
         document.title = activePartner.name;
         // TODO use vuex store here
         vue.$store.dispatch('appui/setPartner', activePartner);
@@ -53,5 +64,7 @@ export default {
 
     document.head.appendChild(manifestElement);
     document.head.appendChild(iconElement);
+    document.head.appendChild(appleTouch);
+    document.head.appendChild(appBarThemeColor);
   },
 };

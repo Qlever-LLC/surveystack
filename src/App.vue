@@ -32,8 +32,11 @@ export default {
   mounted() {
     console.log('mounted');
     this.$store.dispatch('surveys/fetchPinned');
-    api.get('farmos/fields');
-    api.get('farmos/assets');
+
+    if (this.$store.getters['auth/isLoggedIn']) {
+      api.get('farmos/fields');
+      api.get('farmos/assets');
+    }
     // this.$store.dispatch('surveys/fetchPinned', ),
     // fetch pinned surveys
     // for survey, prefetch

@@ -15,7 +15,10 @@
    version="1.1"
    id="svg823"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="surveystack_temp_logo.svg">
+   sodipodi:docname="surveystack_temp_logo.svg"
+   inkscape:export-filename="/home/office/oursci/our-sci-pwa/public/img/icons/android-chrome-512x512.png"
+   inkscape:export-xdpi="1536"
+   inkscape:export-ydpi="1536">
   <defs
      id="defs817" />
   <sodipodi:namedview
@@ -26,16 +29,16 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="15.839192"
-     inkscape:cx="21.551912"
+     inkscape:cx="10.976878"
      inkscape:cy="14.617022"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="true"
      units="px"
-     inkscape:window-width="1373"
-     inkscape:window-height="845"
-     inkscape:window-x="67"
-     inkscape:window-y="27"
+     inkscape:window-width="1784"
+     inkscape:window-height="1368"
+     inkscape:window-x="2560"
+     inkscape:window-y="32"
      inkscape:window-maximized="1">
     <inkscape:grid
        type="xygrid"
@@ -50,7 +53,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
