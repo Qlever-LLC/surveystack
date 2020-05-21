@@ -16,6 +16,11 @@
       />
       <v-text-field
         outlined
+        v-model="control.title"
+        label="Title"
+      />
+      <v-text-field
+        outlined
         v-model="control.hint"
         label="Hint"
       />

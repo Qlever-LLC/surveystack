@@ -2,7 +2,7 @@
   <v-container fluid class="instructions date question">
     <v-row>
       <div class="d-block mx-auto">
-        <p class="mb-4">{{control.hint}}</p>
+        <p v-if="control.title" class="mb-4">{{control.title}}</p>
 
         <div class="text-center mb-2">{{ this.control.label }}</div>
           <!-- @change="updateDatePicker" -->
@@ -51,6 +51,7 @@
             no-title
           />
         </v-menu>
+        <p v-if="control.hint" class="mt-6">{{control.hint}}</p>
       </div>
     </v-row>
   </v-container>

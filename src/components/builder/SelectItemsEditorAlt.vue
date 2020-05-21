@@ -80,7 +80,8 @@ export default {
       const id = new ObjectId().toString();
       this.$emit('set-survey-resources', [...this.resources, {
         label: `Dropdown Items ${this.resources.length + 1}`,
-        handle: `dropdown_items_${this.resources.length + 1}`,
+        // handle: `dropdown_items_${this.resources.length + 1}`,
+        name: `dropdown_items_${this.resources.length + 1}`,
         id,
         type: 'ONTOLOGY_LIST',
         location: 'EMBEDDED',

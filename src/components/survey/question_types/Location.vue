@@ -1,6 +1,8 @@
 <template>
   <div>
-    <div id="map-root" :class="{'shorter-map': !!control.hint }">
+    <p v-if="control.title" class="mb-2">{{ control.title }}</p>
+    <div id="map-root" :class="{'shorter-map': (!!control.hint || !!control.title) }">
+
       <v-card
         id="map-header"
         dark
@@ -342,7 +344,7 @@ export default {
   grid-template-rows: auto 1fr auto;
   height: 100%;
   width: 100%;
-  min-height: 70vh;
+  min-height: 60vh;
 }
 
 

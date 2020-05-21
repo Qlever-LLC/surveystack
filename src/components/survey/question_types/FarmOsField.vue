@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <p class="mb-2">{{ control.hint }}</p>
+    <p v-if="control.title" class="mt-2">{{ control.title }}</p>
     <v-row>
       <!-- v-model="values" -->
       <v-autocomplete
@@ -35,6 +35,7 @@
       >
       </v-progress-circular>
     </v-row>
+    <p v-if="control.hint" class="mb-2">{{ control.hint }}</p>
   </v-container>
 </template>
 

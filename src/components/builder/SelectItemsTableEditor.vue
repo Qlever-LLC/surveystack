@@ -51,6 +51,15 @@
           class="display-1 flex-shrink-1"
           style="max-width: 12em;"
         />
+        <!-- TODO: validate unique data name -->
+        <v-text-field
+          :value="resource.name"
+          @input="handleUpdateName"
+          label="List Data Name"
+          persistent-hint
+          class="flex-shrink-1 ml-4"
+          style="max-width: 12em;"
+        />
         <v-spacer />
         <v-text-field
             v-model="search"
@@ -249,7 +258,15 @@ export default {
       this.$emit('change', {
         ...this.resource,
         label,
-        handle: slugify(label),
+        // handle: slugify(label),
+        // name: slugify(label),
+      });
+    },
+    handleUpdateName(name) {
+      console.log('update name', name);
+      this.$emit('change', {
+        ...this.resource,
+        name,
       });
     },
     handleFileChange(data) {

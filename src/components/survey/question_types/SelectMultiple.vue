@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="mb-4">{{ control.hint }}</p>
+    <p v-if="control.title" class="mb-4">{{ control.title }}</p>
     <v-list v-if="sourceIsValid" style="overflow: auto;">
       <div class="ml-3">
         <v-label class="ml-3">{{control.label}}</v-label>
@@ -60,6 +60,8 @@
     <div v-else>
       Invalid Select Options, please update Suvey Definition
     </div>
+    <p v-if="control.hint" class="mt-4">{{ control.hint }}</p>
+
   </div>
 </template>
 

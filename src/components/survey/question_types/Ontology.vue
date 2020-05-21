@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="mb-2">{{ control.hint }}</p>
+    <p v-if="control.title" class="mt-2">{{ control.title }}</p>
     <v-autocomplete
       :value="value"
       @change="onChange"
@@ -72,6 +72,7 @@
     <div v-else>
       Invalid Select Options, please update Suvey Definition
     </div>
+    <p v-if="control.hint" class="mt-2">{{ control.hint }}</p>
   </div>
 </template>
 

@@ -1,6 +1,6 @@
 <template>
   <div class="question question-script">
-    <p class="mb-4">{{ control.hint }}</p>
+    <p v-if="control.title" class="mb-4">{{control.title}}</p>
     <div v-if="this.source">
       <iframe
         src=""
@@ -34,6 +34,7 @@
       <v-icon color="red">mdi-close-thick</v-icon>
       There was an error loading the script.
     </div>
+    <p v-if="control.hint" class="mt-4">{{control.hint}}</p>
 
   </div>
 </template>

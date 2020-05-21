@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row>
       <v-col cols="12">
-        <p class="mb-2">{{ control.hint }}</p>
+        <p v-if="control.title" class="mb-2">{{ control.title }}</p>
         <v-text-field
           outlined
           autofocus
@@ -12,6 +12,7 @@
           v-on:input="onInput"
           @keyup.enter.prevent="submit"
         />
+        <p v-if="control.hint" class="mb-2">{{ control.hint }}</p>
       </v-col>
     </v-row>
   </v-container>

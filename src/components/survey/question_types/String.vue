@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <p>{{ control.hint }}</p>
+    <p v-if="control.title">{{ control.title }}</p>
     <v-text-field
       outlined
       autofocus
@@ -9,6 +9,7 @@
       v-on:input="onInput"
       @keyup.enter.prevent="submit"
     />
+    <p v-if="control.hint">{{ control.hint }}</p>
   </v-container>
 </template>
 
