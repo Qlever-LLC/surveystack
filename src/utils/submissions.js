@@ -108,11 +108,12 @@ const createSubmissionFromSurvey = ({
   group,
 }) => {
   const submission = {};
+  const dateNow = moment().toISOString(true);
 
   submission._id = new ObjectID().toString();
   submission.meta = {
-    dateCreated: moment().toISOString(true),
-    dateModified: moment().toISOString(true),
+    dateCreated: dateNow,
+    dateModified: dateNow,
     dateSubmitted: null,
     survey: { id: survey._id, version },
     revision: 1,
