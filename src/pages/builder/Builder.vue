@@ -268,6 +268,17 @@ export default {
           revision.controls = migratedControls;
         }
 
+        if (this.importedSurvey.meta.specVersion === 2) {
+          this.importedSurvey.resources = this.importedSurvey.resources
+            ? this.importedSurvey.resources
+              .map(({ handle, ...rest }) => ({
+                name: handle,
+                id: new ObjectId().toString(),
+                ...rest,
+              }))
+            : [];
+        }
+
         // set new ObjectIDs for all controls
         revision.controls = updateControls(
           revision.controls,
@@ -277,7 +288,7 @@ export default {
         // append imported survey definition as latest revision
         this.survey.revisions.push(revision);
         this.survey.resources = this.importedSurvey.resources
-          ? this.importedSurvey.resources.map(r => ({ ...r, id: new ObjectId().toString() }))
+          ? this.importedSurvey.resources
           : [];
         revision.version = this.survey.latestVersion + 1;
         this.freshImport = true;
