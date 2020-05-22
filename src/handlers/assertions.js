@@ -47,7 +47,7 @@ export const assertEntityRights = catchErrors(async (req, res, next) => {
     return next(); // no user and no group => free for all! may want to change this behaviour
   }
 
-  if (existing.meta.creator.equals(user)) {
+  if (existing.meta.creator && existing.meta.creator.equals(user)) {
     return next(); // user may delete their own submissions
   }
 

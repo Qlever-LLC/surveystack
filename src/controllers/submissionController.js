@@ -465,16 +465,24 @@ const getSubmission = async (req, res) => {
 const createSubmission = async (req, res) => {
   const entity = await sanitize(req.body);
 
-  // apply creator
-  if (res.locals.auth.user) {
-    entity.meta.creator = res.locals.auth.user._id;
-  } else {
-    entity.meta.creator = null;
+  const survey = await db.collection('surveys').findOne({ _id: entity.meta.survey.id });
+  if (!survey) {
+    throw boom.notFound(`No survey found with id: ${entity.meta.survey.id}`);
   }
 
-  const surveyId = entity.meta.survey.id;
+  // authenticated
+  if (res.locals.auth.isAuthenticated) {
+    entity.meta.creator = res.locals.auth.user._id;
+  }
 
-  const survey = await db.collection('surveys').findOne({ _id: surveyId });
+  // anonymous
+  if (!res.locals.auth.isAuthenticated) {
+    entity.meta.creator = null;
+    // set submission group to survey's group for now
+    if (survey.meta.group) {
+      entity.meta.group = survey.meta.group;
+    }
+  }
 
   const farmosResults = [];
   try {
@@ -493,28 +501,10 @@ const createSubmission = async (req, res) => {
 
   try {
     let r = await db.collection(col).insertOne(entity);
-    //assert.equal(1, r.insertedCount);
-
+    assert.equal(1, r.insertedCount);
     r.farmos = farmosResults;
     return res.send(r);
   } catch (err) {
-    if (err.name === 'MongoError' && err.code === 11000) {
-      // TODO: findOneAndUpdate now.. copy and up revision later
-      try {
-        let updated = await db.collection(col).findOneAndUpdate(
-          { _id: entity._id },
-          { $set: entity },
-          {
-            returnOriginal: false,
-          }
-        );
-        updated.farmos = farmosResults;
-        return res.send(updated);
-      } catch (error) {
-        throw boom.boomify(err);
-      }
-    }
-
     throw boom.boomify(err);
   }
 };
