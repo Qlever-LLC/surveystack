@@ -136,9 +136,9 @@ const requestWakeLock = async () => {
   try {
     wakeLock = await navigator.wakeLock.request('screen');
     wakeLock.addEventListener('release', () => {
-      console.log('Wake Lock was released');
+      // console.log('Wake Lock was released');
     });
-    console.log('Wake Lock is active');
+    // console.log('Wake Lock is active');
   } catch (e) {
     console.error(`${e.name}, ${e.message}`);
   }
@@ -165,9 +165,32 @@ export default {
     };
   },
   methods: {
+    geoJsonFromLngLat({ lng, lat }) {
+      return {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [lng, lat],
+        },
+        properties: {
+          accuracy: null,
+        },
+      };
+    },
+    geoJsonFromPosition({ coords }) {
+      return {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [coords.longitude, coords.latitude],
+        },
+        properties: {
+          accuracy: coords.accuracy,
+        },
+      };
+    },
     pickLocation() {
-      console.log(this.map.getCenter());
-      const loc = this.usingGPS ? this.gps : this.map.getCenter();
+      const loc = this.usingGPS ? this.gps : this.geoJsonFromLngLat(this.map.getCenter());
       this.changed(loc);
       this.location = loc;
       this.next();
@@ -208,9 +231,9 @@ export default {
       });
 
 
-      this.ctrl.on('trackuserlocationend', () => {
-        console.log('trackuserlocationend');
-      });
+      // this.ctrl.on('trackuserlocationend', () => {
+      //   console.log('trackuserlocationend');
+      // });
 
       map.on('load', () => {
         if (!value) {
@@ -261,7 +284,7 @@ export default {
       }
 
       return {
-        location: this.usingGPS ? this.gps : this.mapCenter,
+        location: this.usingGPS ? this.gps : this.geoJsonFromLngLat(this.mapCenter),
         label: this.usingGPS ? 'Using GPS' : 'Using Map Center',
       };
     },
@@ -277,13 +300,13 @@ export default {
     this.location = this.value;
   },
   mounted() {
-    console.log(`mounted, ${this.map}`);
+    // console.log(`mounted, ${this.map}`);
 
     setTimeout(() => {
 
     }, 2000);
 
-    console.log('loading map', this.index);
+    // console.log('loading map', this.index);
     mapboxgl.accessToken = 'pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA';
     this.map = new mapboxgl.Map({
       container: `map-question-${this.index}`,
@@ -294,7 +317,7 @@ export default {
 
     this.handleMap(this.map, this.value);
     if (!this.value) {
-      console.log('hiding next');
+      // console.log('hiding next');
       this.hideNext();
     }
 
@@ -303,30 +326,12 @@ export default {
 
     if (navigator.geolocation) {
       this.geolocationID = navigator.geolocation.watchPosition((position) => {
-        // console.log('pos', position.coords);
-        // this.gps = {
-        //   lat: position.coords.latitude,
-        //   lng: position.coords.longitude,
-        //   acc: position.coords.accuracy,
-        // };
-        this.gps = {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [position.coords.longitude, position.coords.latitude],
-          },
-          properties: {
-            accuracy: position.coords.accuracy,
-          },
-          // lat: position.coords.latitude,
-          // lng: position.coords.longitude,
-          // acc: position.coords.accuracy,
-        };
+        this.gps = this.geoJsonFromPosition(position);
       });
     }
   },
   beforeDestroy() {
-    console.log('removing map');
+    // console.log('removing map');
     if (navigator.geolocation) {
       navigator.geolocation.clearWatch(this.geolocationID);
     }
