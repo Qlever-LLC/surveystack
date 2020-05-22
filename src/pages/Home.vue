@@ -50,6 +50,17 @@
           outlined
           :to="`/surveys/browse`"
         >Browse All</v-btn>
+
+        <div
+          class="ma-8"
+          v-if="showInstall"
+        >
+          <v-btn
+            color="primary"
+            x-large
+            @click="install"
+          >Install App</v-btn>
+        </div>
       </v-flex>
 
     </v-layout>
@@ -95,15 +106,21 @@ export default {
     },
   },
   created() {
-    window.addEventListener('beforeinstallprompt', (e) => {
-      console.log('beforeinstall');
-      // Prevent the mini-infobar from appearing on mobile
-      e.preventDefault();
-      // Stash the event so it can be triggered later.
-      this.installPrompt = e;
-      // Update UI notify the user they can install the PWA
-      this.showInstall = true;
-    });
+    if (!localStorage.installed) {
+      window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('beforeinstall');
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        this.installPrompt = e;
+        // Update UI notify the user they can install the PWA
+        this.showInstall = true;
+      });
+
+      window.addEventListener('appinstalled', (evt) => {
+        localStorage.installed = true;
+      });
+    }
   },
 };
 </script>

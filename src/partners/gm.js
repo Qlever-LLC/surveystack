@@ -12,7 +12,7 @@ export default {
       warning: '#ffc107',
       info: '#82AF9C',
       success: '#8bc34a',
-      appbar: '#0055a7',
+      appbar: '#FFFFFF',
     },
   },
 };
