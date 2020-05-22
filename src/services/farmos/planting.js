@@ -1,43 +1,14 @@
 import { aggregatorRequest } from './request';
 
-async function createOrUpdate(farmUrl, cred, instanceId, endpoint, body) {
-  const checkExisting = await aggregatorRequest(
+async function create(farmUrl, cred, instanceId, endpoint, body) {
+  const r = await aggregatorRequest(
     cred.aggregatorURL,
     cred.aggregatorApiKey,
     farmUrl,
     endpoint,
-    'get',
-    undefined,
-    instanceId
+    'post',
+    body
   );
-
-  let id = null;
-  if (checkExisting.length !== 0) {
-    id = checkExisting[0].id; // TODO should probably check if there are several
-  }
-
-  let r;
-  if (id === null) {
-    r = await aggregatorRequest(
-      cred.aggregatorURL,
-      cred.aggregatorApiKey,
-      farmUrl,
-      endpoint,
-      'post',
-      body
-    );
-  } else {
-    // update the planting
-    Object.assign(body, { id });
-    r = await aggregatorRequest(
-      cred.aggregatorURL,
-      cred.aggregatorApiKey,
-      farmUrl,
-      endpoint,
-      'put',
-      body
-    );
-  }
 
   return r;
 }
@@ -61,7 +32,7 @@ async function asset(apiCompose, info, terms, user, credentials, submission) {
     const body = apiCompose.body;
     body.data = instanceId;
 
-    const r = await createOrUpdate(farmUrl, cred, instanceId, 'assets', body);
+    const r = await create(farmUrl, cred, instanceId, 'assets', body);
     results.push(r[0]);
     assetId = r[0].id;
 

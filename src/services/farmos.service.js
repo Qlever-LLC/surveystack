@@ -244,31 +244,12 @@ export const handle = async (res, submission, survey, user) => {
     throw error;
   }
 
-  const farmUrls = farmOsCompose
-    .map((c) => {
-      if (c.body !== undefined && typeof c.body === 'object') {
-        return c.url;
-      }
-      return null;
-    })
-    .filter((u) => u !== null);
-
-  const distinctFarms = farmUrls.filter((u, pos) => farmUrls.indexOf(u) === pos);
-
-  const termMap = {};
-  for (const f of distinctFarms) {
-    const terms = await fetchTerms(f, credentials, user);
-    termMap[f] = terms;
-    const flushed = await flushlogs(f, credentials, user, submission._id, results);
-    results.push(...flushed);
-  }
-
   let currentAssetId = null;
   for (const compose of farmOsCompose) {
     const r = await runSingle(
       compose,
       info.find((farm) => farm.url === compose.url),
-      termMap[compose.url],
+      {},
       currentAssetId
     );
 
@@ -279,6 +260,7 @@ export const handle = async (res, submission, survey, user) => {
         }
 
         if (item.resource === 'farm_asset') {
+          console.log("using asset id", item.id)
           currentAssetId = item.id;
         }
       });
