@@ -1,5 +1,8 @@
 <template>
-  <v-dialog v-model="show" :width="width">
+  <v-dialog
+    v-model="show"
+    :width="width"
+  >
     <v-card>
       <v-card-title class="headline">
         <slot name="title">Header slot content</slot>
@@ -9,9 +12,11 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn color="green darken-1" text @click="$emit('cancel')">Cancel</v-btn>
         <v-btn
-          color="green darken-1"
+          text
+          @click="$emit('cancel')"
+        >Cancel</v-btn>
+        <v-btn
           text
           @click="$emit('confirm')"
         >{{labelConfirm ? labelConfirm : 'OK'}}</v-btn>
