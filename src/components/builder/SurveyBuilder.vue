@@ -113,7 +113,7 @@
           class="code-resizer"
         >
 
-          <pane>
+          <pane size="80">
             <div style="height: 100%">
               <v-tabs
                 v-if="control.options"
@@ -159,7 +159,7 @@
             </div>
 
           </pane>
-          <pane>
+          <pane size="20">
             <console-log
               class="console-log"
               :log="log"
