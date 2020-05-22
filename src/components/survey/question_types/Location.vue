@@ -321,8 +321,9 @@ export default {
       this.hideNext();
     }
 
-
-    requestWakeLock();
+    if (wakeLock in navigator) {
+      requestWakeLock();
+    }
 
     if (navigator.geolocation) {
       this.geolocationID = navigator.geolocation.watchPosition((position) => {
