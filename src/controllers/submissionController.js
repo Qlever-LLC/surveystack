@@ -449,14 +449,27 @@ const getSubmissions = async (req, res) => {
 
 const getSubmission = async (req, res) => {
   const { id } = req.params;
-  let entity;
+  const pipeline = [];
 
-  entity = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  let user = null;
+  let roles = [];
 
+  // redact stage
+  if (res.locals.auth.isAuthenticated) {
+    user = res.locals.auth.user._id.toString();
+    roles.push(...res.locals.auth.roles);
+  }
+
+  pipeline.push({ $match: { _id: new ObjectId(id) } });
+  const redactStage = createRedactStage(user, roles);
+  pipeline.push(redactStage);
+
+  const [entity] = await db
+    .collection(col)
+    .aggregate(pipeline)
+    .toArray();
   if (!entity) {
-    return res.status(404).send({
-      message: `No entity with _id exists: ${id}`,
-    });
+    throw boom.notFound(`No entity found for id: ${id}`);
   }
 
   return res.send(entity);
