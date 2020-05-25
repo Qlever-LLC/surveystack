@@ -13,23 +13,23 @@ fi
 
 source "$ENV_FILE"
 
-if [ -z "$HOST" ]; then
-    echo "HOST is not defined";
+if [ -z "$PRODUCTION_HOST" ]; then
+    echo "PRODUCTION_HOST is not defined";
     exit 1
 fi
 
-if [ -z "$USERNAME" ]; then
-    echo "USERNAME is not defined";
+if [ -z "$PRODUCTION_USERNAME" ]; then
+    echo "PRODUCTION_USERNAME is not defined";
     exit 1
 fi
 
-if [ -z "$PASSWORD" ]; then
-    echo "PASSWORD is not defined";
+if [ -z "$PRODUCTION_PASSWORD" ]; then
+    echo "PRODUCTION_PASSWORD is not defined";
     exit 1
 fi
 
-if [ -z "$DB" ]; then
-    echo "DB is not defined";
+if [ -z "$PRODUCTION_DB" ]; then
+    echo "PRODUCTION_DB is not defined";
     exit 1
 fi
 
@@ -43,19 +43,19 @@ OUTFOLDER="dumps/$TIMESTAMP"
 
 # create backup from remote database
 echo "##"
-echo "# Creating dump of remote database $DB in folder $OUTFOLDER..."
+echo "# Creating dump of remote database $PRODUCTION_DB in folder $OUTFOLDER..."
 echo "##"
 mkdir -p "$OUTFOLDER"
-mongodump --out="$OUTFOLDER" --host="$HOST" --ssl --username="$USERNAME" --password="$PASSWORD" --authenticationDatabase=admin --db="$DB"
+mongodump --out="$OUTFOLDER" --host="$PRODUCTION_HOST" --ssl --username="$PRODUCTION_USERNAME" --password="$PRODUCTION_PASSWORD" --authenticationDatabase=admin --db="$PRODUCTION_DB"
 
 # restore into local database
 echo "##"
 echo "# Copying backup into local database $LOCAL_DB..."
 echo "##"
-mongorestore --nsFrom="$DB.*" --nsTo="$LOCAL_DB.*" "$OUTFOLDER"
+mongorestore --nsFrom="$PRODUCTION_DB.*" --nsTo="$LOCAL_DB.*" "$OUTFOLDER"
 
 echo "##"
 echo "# DONE!"
-echo "# Note: You may want to set DATABASE_NAME=$LOCAL_DB inside the root .env file of this project"
+echo "# Note: You may want to set DATABASE_NAME=$LOCAL_DB inside the root .env file of this project and restart your local server"
 echo "##"
 
