@@ -233,7 +233,6 @@ const createGroup = async (req, res) => {
   return res.send(r);
 };
 
-// TODO: only allow admins to update group
 const updateGroup = async (req, res) => {
   const { id } = req.params;
   const entity = req.body;
@@ -260,9 +259,9 @@ const updateGroup = async (req, res) => {
 
     if (existing.slug !== updated.slug) {
       // also find and modify descendants
-      let oldSubgroupDir = existing.path;
-      let newSubgroupDir = entity.path;
-      await bulkChangePaths(oldSubgroupDir, newSubgroupDir);
+      let oldPath = existing.path;
+      let newPath = entity.path;
+      await bulkChangePaths(oldPath, newPath);
     }
 
     return res.send(updated);
@@ -274,7 +273,8 @@ const updateGroup = async (req, res) => {
 
 // mongodb 4.2 now allows an aggregation pipeline inside "update"
 const bulkChangePaths = async (oldDir, newDir) => {
-  await db.collection(col).updateMany({ dir: { $regex: `^${oldDir}` } }, [
+  // groups
+  await db.collection('groups').updateMany({ dir: { $regex: `^${oldDir}` } }, [
     {
       $set: {
         dir: {
@@ -282,6 +282,26 @@ const bulkChangePaths = async (oldDir, newDir) => {
         },
         path: {
           $concat: [newDir, { $substr: ['$dir', { $strLenBytes: oldDir }, -1] }, '$slug', '/'],
+        },
+      },
+    },
+  ]);
+  // submissions
+  await db.collection('submissions').updateMany({ 'meta.group.path': { $regex: `^${oldDir}` } }, [
+    {
+      $set: {
+        'meta.group.path': {
+          $concat: [newDir, { $substr: ['$meta.group.path', { $strLenBytes: oldDir }, -1] }],
+        },
+      },
+    },
+  ]);
+  // surveys
+  await db.collection('surveys').updateMany({ 'meta.group.path': { $regex: `^${oldDir}` } }, [
+    {
+      $set: {
+        'meta.group.path': {
+          $concat: [newDir, { $substr: ['$meta.group.path', { $strLenBytes: oldDir }, -1] }],
         },
       },
     },
