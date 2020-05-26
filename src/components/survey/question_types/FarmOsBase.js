@@ -5,6 +5,7 @@ const base = type => ({
     return {
       loading: true,
       farms: [],
+      assets: [],
     };
   },
   methods: {
@@ -35,26 +36,38 @@ const base = type => ({
       const item = this.farms.find(x => x.value === value);
       return (item && item.label) || value;
     },
-    async fetchFields() {
+    async fetchAreas() {
       try {
-        const response = await api.get(`farmos/${type}`);
-        console.log(`response for ${type}`, response);
+        const response = await api.get('farmos/fields');
+        console.log('fields', response);
         this.farms = response.data.flatMap((f) => {
           // '9' => { actualResponse of FarmosInstance}
           const firstKey = Object.keys(f.data)[0];
           const data = f.data[firstKey];
-          if (type === 'fields') {
-            return data.map(farmField => ({
-              label: `<span class="blue-chip mr-4">${f.farm}</span> ${farmField.name} `,
-              value: {
-                farmName: f.farm.trim(),
-                url: f.url,
-                name: farmField.name.trim(),
-                fieldId: farmField.tid,
-              },
-            }));
-          }
-          // filter out plantings
+          return data.map(farmField => ({
+            label: `<span class="blue-chip mr-4">${f.farm}</span> ${farmField.name} `,
+            value: {
+              farmName: f.farm.trim(),
+              url: f.url,
+              name: farmField.name.trim(),
+              fieldId: farmField.tid,
+            },
+          }));
+        });
+      } catch (e) {
+        console.log('something went wrong:', e);
+        // TODO show error
+      }
+      this.loading = false;
+    },
+    async fetchAssets() {
+      try {
+        const response = await api.get('farmos/assets');
+        console.log('assets', response);
+        this.assets = response.data.flatMap((f) => {
+          // '9' => { actualResponse of FarmosInstance}
+          const firstKey = Object.keys(f.data)[0];
+          const data = f.data[firstKey];
           return data.filter(asset => asset.type === 'planting').map(planting => ({
             label: `<span class="blue-chip mr-4">${f.farm}</span> ${planting.name} `,
             value: {
@@ -62,6 +75,8 @@ const base = type => ({
               url: f.url,
               name: planting.name.trim(),
               assetId: planting.id,
+              location: planting.location,
+              farmId: firstKey,
             },
           }));
         });
@@ -79,9 +94,6 @@ const base = type => ({
           && this.farms.length > 0
           && this.farms.every(({ label, value }) => label && value);
     },
-  },
-  async created() {
-    await this.fetchFields();
   },
 });
 

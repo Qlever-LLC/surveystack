@@ -1,20 +1,23 @@
 <template>
   <v-container fluid>
-    <p v-if="control.title" class="mb-2">{{ control.title }}</p>
+    <p
+      v-if="control.title"
+      class="mb-2"
+    >{{ control.title }}</p>
     <v-row>
 
       <!-- v-model="values" -->
       <v-autocomplete
         :disabled="loading"
         :value="value"
-        @change="onChange"
-        :items="farms || []"
+        @change="localChange"
+        :items="transformed || []"
         item-text="label"
         item-value="value"
         outlined
         :chips="false"
         :label="control.label"
-        :multiple="false"
+        :multiple="true"
         @keyup.enter.prevent="submit"
       >
         <template v-slot:item="{item}">
@@ -36,7 +39,10 @@
       >
       </v-progress-circular>
     </v-row>
-    <p v-if="control.hint" class="mt-2">{{ control.hint }}</p>
+    <p
+      v-if="control.hint"
+      class="mt-2"
+    >{{ control.hint }}</p>
   </v-container>
 </template>
 
@@ -44,12 +50,104 @@
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
 
+const transform = (assets) => {
+  const areas = {};
+  assets.forEach((asset) => {
+    console.log('asset', asset);
+    asset.value.location.forEach((location) => {
+      areas[`${asset.value.farmId}.${location.id}`] = {
+        farmId: asset.value.farmId,
+        farmName: asset.value.farmName,
+        location,
+      };
+    });
+  });
+
+  return Object.keys(areas).flatMap((key) => {
+    const area = areas[key];
+
+    const matchedAssets = assets.filter((asset) => {
+      if (asset.value.farmId !== area.farmId) {
+        return false;
+      }
+
+      return asset.value.location.some(loc => loc.id === area.location.id);
+    });
+
+    console.log('matched fields', matchedAssets);
+
+    const field = {
+      value: {
+        farmId: area.farmId,
+        farmName: area.farmName,
+        location: area.location,
+        isField: true,
+      },
+      label: `<span class="blue-chip mr-4 chip-no-wrap">${area.farmName}</span>Select all in <span class="ml-2 mr-2 green-chip">${area.location.name}</span>`,
+    };
+
+    const assetItems = matchedAssets.map((asset) => {
+      const tmp = {};
+      return {
+        value: asset.value,
+        label: `<span class="green-chip mr-2 chip-no-wrap">${area.location.name}</span> ${asset.value.name} `,
+
+      };
+    });
+
+    return [field, ...assetItems];
+  });
+};
+
 export default {
   mixins: [baseQuestionComponent, farmosBase('assets')],
+  data() {
+    return {
+      transformed: [],
+    };
+  },
+  async created() {
+    await this.fetchAssets();
+    this.transformed = transform(this.assets);
+  },
+  methods: {
+    localChange(selectedItems) {
+      console.log('selectedItems', selectedItems);
+      const fields = selectedItems.filter(item => item.isField === true);
+
+      // selected assets
+      const assets = selectedItems.filter(item => !item.isField);
+
+      const assetsToSelect = fields.flatMap(field => this.transformed
+        .filter(item => !item.value.isField)
+        .filter(item => item.value.farmId === field.farmId)
+        .filter(item => item.value.location.some(loc => loc.id === field.location.id)));
+
+
+      assetsToSelect.forEach((assetToSelect) => {
+        if (assets.some(asset => asset.farmId === assetToSelect.value.farmId
+          && asset.assetId === assetToSelect.value.assetId)) {
+          // skip
+        } else {
+          assets.push(assetToSelect.value);
+        }
+      });
+
+
+      console.log('newValue', assets);
+
+
+      this.onChange(assets);
+    },
+  },
 };
 </script>
 
 <style>
+.chip-no-wrap {
+  white-space: nowrap;
+}
+
 .orange-chip,
 .green-chip,
 .blue-chip {
