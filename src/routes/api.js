@@ -36,11 +36,11 @@ router.post('/auth/send-password-reset-mail', catchErrors(authController.sendPas
 router.post('/auth/reset-password', catchErrors(authController.resetPassword));
 
 /** Debug */
-router.get('/debug', catchErrors(debugController.getDefault));
-router.get('/debug/authenticated', assertAuthenticated, catchErrors(debugController.getDefault));
-router.get('/debug/throw-error', catchErrors(debugController.throwError));
-router.post('/debug/create-dummy-submissions', catchErrors(debugController.createDummySubmissions));
-router.post('/debug/tabularasa', catchErrors(debugController.tabulaRasa));
+// router.get('/debug', catchErrors(debugController.getDefault));
+// router.get('/debug/authenticated', assertAuthenticated, catchErrors(debugController.getDefault));
+// router.get('/debug/throw-error', catchErrors(debugController.throwError));
+// router.post('/debug/create-dummy-submissions', catchErrors(debugController.createDummySubmissions));
+// router.post('/debug/tabularasa', catchErrors(debugController.tabulaRasa));
 
 /** Group */
 router.get('/groups', catchErrors(groupController.getGroups));
