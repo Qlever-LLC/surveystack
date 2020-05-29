@@ -35,7 +35,7 @@ function openDb(onSuccess) {
   };
 
   request.onsuccess = (event) => {
-    // console.log(`Success: ${event}`);
+    console.log('IDB Success', event);
     db = event.target.result;
     if (onSuccess) {
       onSuccess();
@@ -49,6 +49,7 @@ function openDb(onSuccess) {
     db = event.target.result;
     // eslint-disable-next-line no-unused-vars
     try {
+      console.log('creating submission store');
       db.createObjectStore(stores.SUBMISSIONS, { keyPath: '_id' });
     } catch (error) {
       // ignore
@@ -61,6 +62,7 @@ function openDb(onSuccess) {
     // }
 
     try {
+      console.log('creating survey store');
       db.createObjectStore(stores.SURVEYS, { keyPath: '_id' });
     } catch (error) {
       // ignore
