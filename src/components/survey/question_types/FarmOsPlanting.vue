@@ -2,9 +2,53 @@
   <v-container fluid>
     <p
       v-if="control.title"
-      class="mb-2"
-    >{{ control.title }}</p>
-    <v-row>
+      class="mb-2 display-2"
+    >{{ control.title }}
+
+    </p>
+
+    <v-progress-circular
+      v-if="loading"
+      indeterminate
+      color="primary"
+      class="align-self-center ml-4 mb-8"
+    >
+    </v-progress-circular>
+
+    <v-list style="overflow: auto;">
+      <div class="ml-3">
+        <v-label class="ml-3">{{control.label}}</v-label>
+      </div>
+      <v-list-item-group
+        v-if="!loading"
+        :disabled="loading"
+        :value="listSelection"
+        @change="localChange"
+        multiple
+      >
+        <v-list-item
+          v-for="(item, idx) in transformed"
+          :value="hashItem(item)"
+          :key="`item_${idx}`"
+        >
+          <template v-slot:default="{ active, toggle }">
+            <v-list-item-action class="mr-2">
+              <v-checkbox
+                :class="{ 'ml-4' : !item.value.isField}"
+                :input-value="active"
+                :true-value="hashItem(item)"
+                @click="toggle"
+              />
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title v-html="item.label" />
+            </v-list-item-content>
+          </template>
+        </v-list-item>
+      </v-list-item-group>
+    </v-list>
+
+    <v-row v-if="false">
 
       <!-- v-model="values" -->
       <v-autocomplete
@@ -50,10 +94,18 @@
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
 
+const hashItem = (listItem) => {
+  const { value } = listItem;
+  if (value.isField) {
+    return `FIELD:${value.farmId}.${value.location.id}`;
+  }
+
+  return `ASSET:${value.farmId}.${value.assetId}`;
+};
+
 const transform = (assets) => {
   const areas = {};
   assets.forEach((asset) => {
-    console.log('asset', asset);
     asset.value.location.forEach((location) => {
       areas[`${asset.value.farmId}.${location.id}`] = {
         farmId: asset.value.farmId,
@@ -74,7 +126,6 @@ const transform = (assets) => {
       return asset.value.location.some(loc => loc.id === area.location.id);
     });
 
-    console.log('matched fields', matchedAssets);
 
     const field = {
       value: {
@@ -83,16 +134,19 @@ const transform = (assets) => {
         location: area.location,
         isField: true,
       },
-      label: `<span class="blue-chip mr-4 chip-no-wrap">${area.farmName}</span>Select all in <span class="ml-2 mr-2 green-chip">${area.location.name}</span>`,
+      label: `<span class="blue-chip mr-4 ml-0 chip-no-wrap">${area.farmName}: ${area.location.name}</span>`,
     };
 
-    const assetItems = matchedAssets.map((asset) => {
-      const tmp = {};
-      return {
-        value: asset.value,
-        label: `<span class="green-chip mr-2 chip-no-wrap">${area.location.name}</span> ${asset.value.name} `,
+    field.value.hash = hashItem(field);
 
+    const assetItems = matchedAssets.map((asset) => {
+      const r = {
+        value: asset.value,
+        label: `${asset.value.name} `,
       };
+
+      r.value.hash = hashItem(r);
+      return r;
     });
 
     return [field, ...assetItems];
@@ -107,12 +161,33 @@ export default {
     };
   },
   async created() {
+    if (this.value === null) {
+      this.onChange([]);
+    }
     await this.fetchAssets();
     this.transformed = transform(this.assets);
   },
+  computed: {
+    listSelection() {
+      return this.value.map(v => hashItem({ value: v }));
+    },
+  },
   methods: {
-    localChange(selectedItems) {
-      console.log('selectedItems', selectedItems);
+    hashItem,
+    localChange(hashes) {
+      console.log('localchange', hashes);
+      const selectedItems = hashes.map((h) => {
+        if (typeof h !== 'string') {
+          return h;
+        }
+        return (this.transformed.find(t => t.value.hash === h)).value;
+      });
+
+
+      // console.log('selectedItems', itemId);
+      // const [farmId, assetId] = itemId.split('.');
+
+
       const fields = selectedItems.filter(item => item.isField === true);
 
       // selected assets
