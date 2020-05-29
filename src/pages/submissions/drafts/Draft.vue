@@ -19,7 +19,10 @@
         indeterminate
       />
     </div>
-    <div v-else-if="hasError" class="text-center mt-8">
+    <div
+      v-else-if="hasError"
+      class="text-center mt-8"
+    >
       Error Loading Draft Submission or Survey
     </div>
 
@@ -30,7 +33,6 @@
     >
       Are you sure you want to exit this draft?
     </confirm-leave-dialog>
-
 
     <confirm-edit-submitted-dialog
       v-if="submission && survey"
@@ -142,10 +144,7 @@ export default {
   },
   async created() {
     this.loading = true;
-    // TODO: figure out whether we need openDb?
-    await new Promise(resolve => db.openDb(() => {
-      resolve();
-    }));
+
     const { id } = this.$route.params;
 
     try {
@@ -153,11 +152,14 @@ export default {
     } catch (error) {
       console.log('Error: submssion not found');
       this.hasError = true;
+      this.loading = false;
+
       return;
     }
     if (!this.submission) {
       console.log('Error: submssion not found');
       this.hasError = true;
+      this.loading = false;
       return;
     }
 
