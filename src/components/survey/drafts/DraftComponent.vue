@@ -57,11 +57,12 @@
                 v-if="!atOverview"
                 class="flex-grow-0 flex-shrink-1 pl-2 pr-2"
               />
+                <!-- style="height: 100%; max-height: calc(100vh - 68px - 56px - 56px - 60px); overflow: auto;" -->
               <v-row
                 justify="center"
                 align="center"
                 class="mb-5 mx-0"
-                style="height: 100%; max-height: calc(100vh - 68px - 56px - 56px - 60px); overflow: auto;"
+                style="height: 100%; overflow: auto;"
               >
                 <component
                   v-if="control && !atEnd"
