@@ -1,5 +1,8 @@
 <template>
-  <div id="relative-wrapper" class="">
+  <div
+    id="relative-wrapper"
+    class=""
+  >
 
     <div
       class="full fill-height d-flex justify-center align-center"
@@ -25,7 +28,9 @@
       v-if="submission && survey"
     >
       <draft-toolbar
+        :group="groupPath"
         :required="control && control.options && control.options.required"
+        :anon="control && control.options && control.options.redacted"
         :showOverviewIcon="!atEnd"
         :questionNumber="questionNumber"
         v-if="!showOverview && index < positions.length"
@@ -36,7 +41,10 @@
         :breadcrumbs="mbreadcrumbs"
       />
       <div style="position: relative; width: 100%; height: 100%;">
-        <transition class="transition" :name="slide">
+        <transition
+          class="transition"
+          :name="slide"
+        >
           <div
             id="transition-container"
             :key="'container-'+index"
@@ -126,7 +134,7 @@
       v-model="confirmSubmissionIsVisible"
       :group="submission.meta.group.id"
       @submit="() => submit(submission)"
-      @set-group="(val) => $set(submission.meta.group, 'id', val)"
+      @set-group="setSubmissionGroup"
       :dateSubmitted="submission.meta.dateSubmitted"
     />
   </div>
@@ -245,9 +253,34 @@ export default {
     submissionField() {
       return submissionUtils.getSubmissionField(this.submission, this.survey, this.position);
     },
+    groupPath() {
+      if (this.submission.meta && this.submission.meta.group && this.submission.meta.group.path) {
+        return this.submission.meta.group.path;
+      }
+      if (this.survey.meta && this.survey.meta.group && this.survey.meta.group.path) {
+        return this.survey.meta.group.path;
+      }
+
+      return null;
+    },
   },
   methods: {
     eval() { },
+    setSubmissionGroup(groupId) {
+      const groups = this.$store.getters['memberships/groups'];
+      const group = groups.find(g => g._id === groupId);
+      console.log('selected group', group);
+      let path = '';
+      if (group) {
+        // eslint-disable-next-line prefer-destructuring
+        path = group.path;
+      }
+
+      this.$set(this.submission.meta, 'group', {
+        id: groupId,
+        path,
+      });
+    },
     showNav(visible) {
       this.mShowNav = visible;
     },
@@ -334,7 +367,7 @@ export default {
             // eslint-disable-next-line no-await-in-loop
             const r = await this.calculateApiCompose();
             const errors = r.filter(result => result.error !== undefined);
-            console.log('results with erors', errors);
+            console.log('results with errors', errors);
             if (errors.length > 0) {
               this.apiComposeErrors = errors.map(e => ({
                 title: e.control.name,
@@ -493,11 +526,13 @@ export default {
         <span class="ml-2">${this.positions.length} Question${this.positions.length > 1 || this.positions.length < 1 ? 's' : ''}</span>
       `,
     });
+
+    console.log('created done', this.survey, this.submission);
   },
   mounted() {
     if (
       (this.submission.meta.dateModified && this.submission.meta.dateCreated
-      && this.submission.meta.dateCreated !== this.submission.meta.dateModified)
+        && this.submission.meta.dateCreated !== this.submission.meta.dateModified)
     ) {
       this.showOverview = true;
     }
@@ -506,6 +541,8 @@ export default {
       console.log('this submission has been previously submitted!');
       this.showOverview = true;
     }
+
+    console.log('mounted done');
   },
   watch: {
     async showOverview() {
