@@ -25,10 +25,11 @@ On the current webserver, it is run with node process manager [pm2](http://pm2.k
 
 ```
 # example commands
-pm2 start "yarn start" --name "oursci-server-dev"
+pm2 start "yarn prod" --name "surveystack-production"
 pm2 list
-pm2 stop oursci-server-dev
-pm2 start oursci-server-dev
+pm2 stop surveystack-production
+pm2 start surveystack-production
+pm2 describe surveystack-production
 # keep process list on reboot
 pm2 startup
 pm2 save
