@@ -304,6 +304,10 @@ export default {
           text: 'Year Only',
           value: 'date-year',
         },
+        {
+          text: 'Week of Month and Year',
+          value: 'date-week-month-year',
+        },
         // {
         //   text: 'Year Only',
         //   value: 'date-year',

@@ -15,6 +15,7 @@
           :type="datePickerType"
           reactive
           no-title
+          :range="this.control.options.subtype === 'date-week-month-year'"
         />
         <!--
           use text field with menu for year picker because year picker's
@@ -58,7 +59,7 @@
 </template>
 
 <script>
-import moment from 'moment';
+// import moment from 'moment';
 import baseQuestionComponent from './BaseQuestionComponent';
 
 
@@ -71,7 +72,8 @@ export default {
   },
   computed: {
     dateFormatted() {
-      return this.value ? this.formatDate(moment(this.value).toISOString(true).substr(0, 10)) : null;
+      // return this.value ? this.formatDate(moment(this.value).toISOString(true).substring(0, 10)) : null;
+      return this.value ? this.formatDate(new Date(this.value).toISOString().substring(0, 10)) : null;
     },
     dateForPicker() {
       let substrLength;
@@ -79,13 +81,43 @@ export default {
         case 'date-month-year':
           substrLength = 7;
           break;
+        // case 'date-week-month-year':
         default:
           substrLength = 10;
           break;
       }
-      return this.value
-        ? moment(this.value).toISOString(true).substr(0, substrLength)
-        : null;
+
+      if (this.control.options.subtype === 'date-week-month-year') {
+        if (this.value) {
+          const date = new Date(this.value);
+          // // const start = date.getDate() - date.getDay() - 1; // First day is the day of the month - the day of the week
+          // const start = date.getDate();
+          // const end = start + 6; // last day is the first day + 6
+          // // const end = date.getDate() + 6; // last day is the first day + 6
+          // const startDay = new Date(date.setDate(start)).toISOString().substring(0, 10);
+          // const endDay = new Date(date.setDate(end)).toISOString().substring(0, 10);
+          // console.log(startDay, endDay);
+          // return [
+          //   new Date(date.setDate(start)).toISOString().substring(0, 10),
+          //   new Date(date.setDate(end)).toISOString().substring(0, 10),
+          // ];
+          return [
+            date.toISOString().substring(0, 10),
+            new Date(date.setDate(date.getDate() + 6)).toISOString().substring(0, 10),
+          ];
+        }
+        return [];
+      }
+
+      if (this.value) {
+        return new Date(this.value).toISOString().substring(0, substrLength);
+      }
+
+      return null;
+      // return this.value
+      //   // ? moment(this.value).toISOString(true).substring(0, substrLength)
+      //   ? new Date(this.value).toISOString().substring(0, substrLength)
+      //   : null;
     },
     dateType() {
       return (this.control
@@ -134,24 +166,38 @@ export default {
       console.log('handle change');
     },
     updateDate(date) {
-      console.log(date);
-      const newDate = moment(date).toISOString(true);
+      // console.log(date);
+      // const newDate = moment(date).toISOString(true);
+      const newDate = new Date(date).toISOString();
       this.dateFormatted = newDate;
     },
     updateDateInput(date) {
-      console.log('input', date);
-      const newDate = moment(date).toISOString(true);
+      // console.log('input', date);
+      // const newDate = moment(date).toISOString(true);
+      const newDate = new Date(date).toISOString();
       this.changed(newDate);
     },
     updateDatePicker(date) {
       this.datePickerIsVisible = false;
-      const newDate = moment(date);
+      console.log('update date picker', date);
+      // const newDate = moment(date);
+
+      const newDate = this.control.options.subtype === 'date-year'
+        ? new Date(date.replace(/^(\d{4})-(\d{2})-(\d{2})/, (match, g1) => [g1, '01', '01'].join('-'))) // set month and date to 1
+        : new Date(date);
+      console.log('new Date', newDate, newDate.toISOString());
       if (this.control.options.subtype === 'date-year') {
         this.$refs.picker.activePicker = 'YEAR';
-        // Set day of month to 1, otherwise year picker will default to current day of month
-        newDate.set('date', 1);
+      } else if (this.control.options.subtype === 'date-week-month-year') {
+        // const offset = newDate.getDay() === 0 ? -1 : 0;
+        const offset = -1;
+        console.log(newDate.toISOString().substring(0, 10), newDate.getDay(), offset);
+        newDate.setDate(newDate.getDate() - newDate.getDay() + offset);
+        // newDate.setDate(newDate.getDate() - newDate.getDay() - 1);
       }
-      this.changed(newDate.toISOString(true));
+      // this.changed(newDate.toISOString(true));
+      console.log(newDate, 'as iso', newDate.toISOString());
+      this.changed(newDate.toISOString());
     },
     formatDate(date) {
       if (!date) return null;
