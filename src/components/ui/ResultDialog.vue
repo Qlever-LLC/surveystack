@@ -22,6 +22,7 @@
             </v-card>
           </div>
         </template>
+        <div v-if="additionalMessage" v-html="additionalMessage" />
         <v-card-actions>
           <v-spacer />
           <v-btn
@@ -51,6 +52,9 @@ export default {
     to: {
       type: Object,
       default: () => ({}),
+    },
+    additionalMessage: {
+      type: String,
     },
   },
   computed: {

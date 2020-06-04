@@ -40,6 +40,9 @@
         <div v-if="dateSubmitted">
           This submission was previously submitted on {{ new Date(dateSubmitted).toLocaleString() }}. Resubmission will archive the previous submission.
         </div>
+        <div v-if="additionalMessage">
+          {{ additionalMessage }}
+        </div>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -80,6 +83,9 @@ export default {
       type: String,
     },
     'survey-name': {
+      type: String,
+    },
+    additionalMessage: {
       type: String,
     },
     id: {

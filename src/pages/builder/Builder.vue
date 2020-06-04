@@ -80,6 +80,7 @@
       v-model="showResult"
       :items="resultItems"
       title="Result of Submission"
+      additionalMessage="<span class='caption'>Note: submissions from Builder are automatically archived. Please browse archived submissions to view this result.</span>"
     />
 
     <v-snackbar
