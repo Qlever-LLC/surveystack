@@ -59,6 +59,7 @@
           persistent-hint
           class="flex-shrink-1 ml-4"
           style="max-width: 12em;"
+          :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
         />
         <v-spacer />
         <v-text-field
@@ -136,6 +137,11 @@ export default {
       required: true,
       default: () => ({ content: [] }),
     },
+    resources: {
+      type: Array,
+      required: true,
+      default: () => ([]),
+    },
   },
   components: {
     SelectItemsUploadButton,
@@ -169,7 +175,25 @@ export default {
       ],
     };
   },
+  computed: {
+    resourceNames() {
+      return this.resources.map(({ name, id }) => ({ name, id }));
+    },
+  },
   methods: {
+    nameIsUnique(val) {
+      return this.resourceNames.some(({ name, id }) => this.resource.name === name && this.resource.id !== id)
+        ? 'Name must be unique'
+        : true;
+    },
+    nameHasValidCharacters(val) {
+      const namePattern = /^[\w]*$/;
+      return namePattern.test(val) ? true : 'Data name must only contain valid charcters';
+    },
+    nameHasValidLength(val) {
+      const namePattern = /^.{4,}$/; // one character should be ok, especially within groups
+      return namePattern.test(val) ? true : 'Data name must be at least 4 character in length';
+    },
     moveItemDown({ id }) {
       const index = this.resource.content.findIndex(item => item.id === id);
       if (index > this.resource.content.length - 1) {

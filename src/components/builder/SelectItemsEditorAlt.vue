@@ -27,6 +27,7 @@
     </div>
     <v-dialog v-model="tableDialogIsVisible">
       <select-items-table-editor
+        :resources="filteredResources"
         :resource="resource"
         @change="setResource"
         @delete="removeResource"
