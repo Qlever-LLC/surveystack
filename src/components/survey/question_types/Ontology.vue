@@ -46,6 +46,7 @@
       :multiple="!!control.options.hasMultipleSelections"
       :menu-props="autocompleteMenuProps"
       v-else-if="sourceIsValid && control.options.allowCustomSelection"
+      ref="input"
     >
       <template v-slot:selection="data">
         <v-chip
@@ -92,7 +93,7 @@ export default {
       }
     },
     info(data) {
-      console.log('info------', data);
+      // console.log('info------', data);
     },
     remove(item) {
       this.changed(

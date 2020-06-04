@@ -76,6 +76,7 @@
                   :submission="submission"
                   :meta="submissionField.meta"
                   :resources="survey.resources"
+                  ref="currentControl"
                   @eval="eval"
                   @changed="setValue"
                   @setStatus="setStatus"
@@ -346,8 +347,20 @@ export default {
 
       this.calculateControl();
     },
+    blurCustomOntology() {
+      if (
+        this.control.type === 'ontology'
+        && this.control.options.allowCustomSelection
+        && this.$refs.currentControl
+        && this.$refs.currentControl.$refs.input
+        && this.$refs.currentControl.$refs.input.updateTags
+      ) {
+        this.$refs.currentControl.$refs.input.updateTags();
+      }
+    },
     async handleNext() {
-      console.log('handleNext()');
+      this.blurCustomOntology();
+
       this.slide = 'slide-in';
       this.showNav(true);
       this.showNext(true);
@@ -423,7 +436,7 @@ export default {
       }
     },
     async handlePrevious() {
-      // console.log('handlePrevious()');
+      this.blurCustomOntology();
       await this.calculateRelevance();
 
       this.slide = 'slide-out';
