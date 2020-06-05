@@ -25,20 +25,23 @@ function populatePlanting(cropAnswer, field) {
     throw 'Please select crop';
   }
 
-  if(!field.value){
-      throw 'Please select field';
+  if (!field.value) {
+    throw 'Please select field';
   }
 
 
   const crop = cropAnswer.value;
   const farmUrl = field.value.url;
 
+
   return {
     type: 'farmos',
-    farmosType: 'planting',
+    farmosType: 'asset',
     url: farmUrl,
     body: {
-      crop,
+      name: `planting: ${crop}`,
+      type: 'planting',
+      crop: [{ name: crop }], // crop name
     },
   };
 }

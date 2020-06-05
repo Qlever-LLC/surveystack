@@ -1,4 +1,6 @@
 const defaultApiCompose = `
+/* eslint-disable */
+
 /**
  * ApiCompose
  *
@@ -24,20 +26,23 @@ function populatePlanting(cropAnswer, field) {
     throw 'Please select crop';
   }
 
-  if(!field.value){
-      throw 'Please select field';
+  if (!field.value) {
+    throw 'Please select field';
   }
 
 
   const crop = cropAnswer.value;
   const farmUrl = field.value.url;
 
+
   return {
     type: 'farmos',
-    farmosType: 'planting',
+    farmosType: 'asset',
     url: farmUrl,
     body: {
-      crop,
+      name: crop
+      type: 'planting',
+      crop: [{ name: crop }], // crop name
     },
   };
 }
@@ -73,7 +78,7 @@ Other functions may be called within.
 However, we are in a sandbox here, so no requests
 outside are possible.
 
-use \`log()\` to log to console below
+use log() to log to console below
 */
 `;
 
