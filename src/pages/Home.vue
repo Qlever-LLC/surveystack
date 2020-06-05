@@ -64,6 +64,16 @@
       </v-flex>
 
     </v-layout>
+
+    <v-layout
+      text-center
+      wrap
+      class="mt-12"
+    >
+      <v-flex>
+        <v-chip style="font-family: monospace">v{{ version }}</v-chip>
+      </v-flex>
+    </v-layout>
   </v-container>
 </template>
 
@@ -84,6 +94,7 @@ export default {
           console.log('install stub');
         },
       },
+      version: process.env.VUE_APP_VERSION,
       showInstall: false,
     };
   },
