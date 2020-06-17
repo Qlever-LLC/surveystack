@@ -24,15 +24,19 @@
         :disabled="loading"
         :value="listSelection"
         @change="localChange"
-        multiple
+        :multiple="!!control.options.hasMultipleSelections"
       >
         <v-list-item
           v-for="(item, idx) in transformed"
           :value="hashItem(item)"
           :key="`item_${idx}`"
+          :disabled="!control.options.hasMultipleSelections && item.value.isField"
         >
           <template v-slot:default="{ active, toggle }">
-            <v-list-item-action class="mr-2">
+            <v-list-item-action
+              class="mr-2"
+              v-if="!!control.options.hasMultipleSelections || !item.value.isField"
+            >
               <v-checkbox
                 :class="{ 'ml-4' : !item.value.isField}"
                 :input-value="active"
@@ -95,6 +99,10 @@ import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
 
 const hashItem = (listItem) => {
+  if (listItem === null || listItem.value === null) {
+    return '';
+  }
+
   const { value } = listItem;
   if (value.isField) {
     return `FIELD:${value.farmId}.${value.location.id}`;
@@ -161,7 +169,7 @@ export default {
     };
   },
   async created() {
-    if (this.value === null) {
+    if (this.value === null && this.control.options.hasMultipleSelections) {
       this.onChange([]);
     }
     await this.fetchAssets();
@@ -169,13 +177,30 @@ export default {
   },
   computed: {
     listSelection() {
-      return this.value.map(v => hashItem({ value: v }));
+      if (Array.isArray(this.value)) {
+        return this.value.map(v => hashItem({ value: v }));
+      }
+      return hashItem({ value: this.value });
     },
   },
   methods: {
     hashItem,
-    localChange(hashes) {
-      console.log('localchange', hashes);
+    localChange(hashesArg) {
+      let hashes;
+      if (!Array.isArray(hashesArg)) {
+        if (hashesArg) {
+          hashes = [hashesArg];
+        } else {
+          this.onChange(null);
+          return;
+        }
+      } else {
+        hashes = hashesArg;
+      }
+
+      console.log('hashes', hashes);
+
+
       const selectedItems = hashes.map((h) => {
         if (typeof h !== 'string') {
           return h;
@@ -184,11 +209,9 @@ export default {
       });
 
 
-      // console.log('selectedItems', itemId);
       // const [farmId, assetId] = itemId.split('.');
 
-
-      const fields = selectedItems.filter(item => item.isField === true);
+      const fields = selectedItems.filter(item => !!item.isField);
 
       // selected assets
       const assets = selectedItems.filter(item => !item.isField);
@@ -209,10 +232,11 @@ export default {
       });
 
 
-      console.log('newValue', assets);
-
-
-      this.onChange(assets);
+      if (!Array.isArray(hashesArg)) {
+        this.onChange(assets[0]);
+      } else {
+        this.onChange(assets);
+      }
     },
   },
 };

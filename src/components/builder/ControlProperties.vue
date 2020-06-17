@@ -113,7 +113,7 @@
       <v-checkbox
         class="ma-0"
         v-model="control.options.hasMultipleSelections"
-        v-if="control.type === 'ontology'"
+        v-if="control.type === 'ontology' || control.type === 'farmOsPlanting'"
         label="Allow Multiple Selections"
       />
 
