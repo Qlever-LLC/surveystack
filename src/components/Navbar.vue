@@ -90,7 +90,10 @@
           dark
           class="grey--text"
         >
-          <p class="pt-4 pl-4">App-Version: <router-link to="/app/info">{{ version }}</router-link>
+          <p class="pt-4 pl-4">App-Version: <router-link
+              to="/app/info"
+              class="decoration-none"
+            >{{ version }}</router-link>
           </p>
         </div>
       </template>
@@ -267,6 +270,10 @@ export default {
 <style>
 .app-bar-subtitle span {
   vertical-align: middle;
+}
+
+.decoration-none {
+  text-decoration: none;
 }
 
 #home-link {
