@@ -429,24 +429,60 @@ const getSubmissions = async (req, res) => {
     .aggregate(pipeline)
     .toArray();
 
-  if (req.query.format === 'csv') {
-    const [mergedObject] = await db
-      .collection(col)
-      .aggregate([
-        ...pipeline,
-        {
-          $group: { _id: null, meta: { $mergeObjects: '$meta' }, data: { $mergeObjects: '$data' } },
-        },
-      ])
-      .toArray();
+  return res.send(entities);
+};
 
-    const headers = csvService.createHeaders(mergedObject, entities);
-    const csv = csvService.createCsv(entities, headers);
-    res.set('Content-Type', 'text/plain');
-    return res.send(csv);
+const getSubmissionsCsv = async (req, res) => {
+  let skip = 0;
+  let limit = DEFAULT_LIMIT;
+
+  const pipeline = await buildPipeline(req, res);
+
+  // skip
+  if (req.query.skip) {
+    try {
+      const querySkip = Number.parseInt(req.query.skip);
+      if (querySkip > 0) {
+        skip = querySkip;
+        pipeline.push({ $skip: skip });
+      }
+    } catch (error) {
+      throw boom.badRequest(`Bad query paramter skip: ${skip}`);
+    }
   }
 
-  return res.send(entities);
+  // limit
+  if (req.query.limit) {
+    try {
+      const queryLimit = Number.parseInt(req.query.limit);
+      if (queryLimit > 0) {
+        limit = queryLimit;
+        pipeline.push({ $limit: limit });
+      }
+    } catch (error) {
+      throw boom.badRequest(`Bad query paramter limit: ${limit}`);
+    }
+  }
+
+  const entities = await db
+    .collection(col)
+    .aggregate(pipeline)
+    .toArray();
+
+  const [mergedObject] = await db
+    .collection(col)
+    .aggregate([
+      ...pipeline,
+      {
+        $group: { _id: null, meta: { $mergeObjects: '$meta' }, data: { $mergeObjects: '$data' } },
+      },
+    ])
+    .toArray();
+
+  const headers = csvService.createHeaders(mergedObject, entities);
+  const csv = csvService.createCsv(entities, headers);
+  res.set('Content-Type', 'text/plain');
+  return res.send(csv);
 };
 
 const getSubmission = async (req, res) => {
@@ -587,6 +623,7 @@ const deleteSubmission = async (req, res) => {
 export default {
   getSubmissions,
   getSubmissionsPage,
+  getSubmissionsCsv,
   getSubmission,
   createSubmission,
   updateSubmission,
