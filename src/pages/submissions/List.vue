@@ -94,13 +94,27 @@
           color="primary"
         >QUERY!</v-btn>
       </div>
-
       <h4>API</h4>
       <a
         class="body-2"
         :href="apiUrl"
         target="_blank"
       >{{apiUrl}}</a>
+
+      <v-radio-group
+        v-model="apiSelection"
+        row
+        dense
+        style="margin-top: 0px; margin-bottom: 0px"
+        hide-details
+      >
+        <v-radio
+          v-for="item in apiSelections"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        ></v-radio>
+      </v-radio-group>
 
       <v-card
         v-if="selected.length > 0"
@@ -215,6 +229,8 @@ const defaultFilter = {
   roles: '',
 };
 
+const apiSelections = [{ label: 'CSV', value: 'csv' }, { label: 'JSON', value: 'json' }];
+
 export default {
   components: {
     appSubmissionsFilterBasic,
@@ -226,6 +242,8 @@ export default {
   },
   data() {
     return {
+      apiSelection: apiSelections[0].value,
+      apiSelections,
       showAdvancedFilters: false,
       tab: null,
       views: [
@@ -276,19 +294,33 @@ export default {
 
       return true;
     },
-    apiRequest() {
-      let req = `/submissions/page?survey=${this.survey}&match=${this.filter.match}&sort=${this.filter.sort}&project=${this.filter.project}&skip=${this.filter.skip}&limit=${this.filter.limit}`;
+    apiParams() {
+      let params = `survey=${this.survey}&match=${this.filter.match}&sort=${this.filter.sort}&project=${this.filter.project}&skip=${this.filter.skip}&limit=${this.filter.limit}`;
       if (this.showArchived) {
-        req += '&showArchived=true';
+        params += '&showArchived=true';
       }
 
       if (process.env.NODE_ENV === 'development') {
-        return `${req}&roles=${this.filter.roles}`;
+        return `${params}&roles=${this.filter.roles}`;
       }
-      return req;
+      return params;
+    },
+    apiRequest() {
+      return `/submissions/page?${this.apiParams}`;
     },
     apiUrl() {
-      return `${process.env.VUE_APP_API_URL}${this.apiRequest}`;
+      let endpoint;
+      switch (this.apiSelection) {
+        case 'csv':
+          endpoint = '/submissions/csv';
+          break;
+        case 'json':
+          endpoint = '/submissions';
+          break;
+        default:
+          endpoint = '/submissions/page';
+      }
+      return `${process.env.VUE_APP_API_URL}${endpoint}?${this.apiParams}`;
     },
     queryList() {
       if (!this.surveyEntity) {

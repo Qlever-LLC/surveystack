@@ -11,9 +11,11 @@
         <div
           id="app-bar-title"
           class="title py-0 my-0"
-          @click="$router.push('/')"
         >
-          {{ appTitle }}
+          <router-link
+            to="/"
+            id="home-link"
+          >{{appTitle}}</router-link>
         </div>
         <div
           class="app-bar-subtitle subtitle py-0 my-0"
@@ -88,7 +90,10 @@
           dark
           class="grey--text"
         >
-          <p class="pt-4 pl-4">App-Version: <router-link to="/app/info">{{ version }}</router-link>
+          <p class="pt-4 pl-4">App-Version: <router-link
+              to="/app/info"
+              class="decoration-none"
+            >{{ version }}</router-link>
           </p>
         </div>
       </template>
@@ -255,7 +260,6 @@ export default {
   font-weight: normal;
   /* color: white; */
   line-height: 1.8rem;
-  cursor: pointer;
 }
 
 .subtitle {
@@ -266,5 +270,14 @@ export default {
 <style>
 .app-bar-subtitle span {
   vertical-align: middle;
+}
+
+.decoration-none {
+  text-decoration: none;
+}
+
+#home-link {
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.87);
 }
 </style>
