@@ -9,11 +9,19 @@ import rolesService from '../services/roles.service';
 
 const common = async (endpoint, req, res) => {
   const farms = await farmosService.getCredentials(res.locals.auth.user);
+  const uniqueFarmsByURL = [];
+  farms.forEach((f) => {
+    if (!uniqueFarmsByURL.find((u) => u.url === f.url)) {
+      uniqueFarmsByURL.push(f);
+    }
+  });
+
+  console.log('farms distinct by URL', uniqueFarmsByURL);
 
   const farmosFields = [];
 
   try {
-    for (const farm of farms) {
+    for (const farm of uniqueFarmsByURL) {
       console.log('farm', farm);
       const agentOptions = {
         host: farm.aggregatorURL,
