@@ -350,6 +350,8 @@ const getSubmissionsPage = async (req, res) => {
       $facet: {
         content: [{ $skip: skip }, { $limit: limit }],
         headers: [
+          { $skip: skip },
+          { $limit: limit },
           {
             $group: {
               _id: null,
@@ -380,7 +382,7 @@ const getSubmissionsPage = async (req, res) => {
   }
 
   try {
-    const headers = csvService.createHeaders(entities.headers[0]);
+    const headers = csvService.createHeaders(entities.headers[0], entities.content);
     entities.headers = headers;
   } catch (error) {
     console.error('error creating headers', error);
@@ -438,7 +440,7 @@ const getSubmissions = async (req, res) => {
       ])
       .toArray();
 
-    const headers = csvService.createHeaders(mergedObject);
+    const headers = csvService.createHeaders(mergedObject, entities);
     const csv = csvService.createCsv(entities, headers);
     res.set('Content-Type', 'text/plain');
     return res.send(csv);

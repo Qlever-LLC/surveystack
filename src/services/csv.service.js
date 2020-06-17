@@ -26,7 +26,9 @@ function removeKeys(obj, keys) {
   }
 }
 
-function createHeaders(mergedObject) {
+function createHeaders(mergedObject, entities) {
+  console.log('merged.data');
+  console.log(mergedObject.data);
   if (mergedObject.meta) {
     if (mergedObject.meta.survey && mergedObject.meta.survey.id) {
       mergedObject.meta.survey.id = mergedObject.meta.survey.id.toString();
@@ -45,8 +47,13 @@ function createHeaders(mergedObject) {
     }
   }
 
-  const flattened = flatten(mergedObject);
-  const headers = Object.keys(flattened);
+  let merged = flatten(mergedObject);
+  entities.forEach((entity) => {
+    const flatEntityData = flatten({ data: entity.data });
+    merged = { ...merged, ...flatEntityData };
+  });
+
+  const headers = Object.keys(merged);
   return headers;
 }
 
