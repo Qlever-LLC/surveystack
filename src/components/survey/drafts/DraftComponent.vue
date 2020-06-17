@@ -766,5 +766,6 @@ export default {
   padding: 0.2rem;
   padding-left: 0.4rem;
   padding-right: 0.4rem;
+  border: 1px solid black;
 }
 </style>
