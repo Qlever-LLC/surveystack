@@ -39,6 +39,8 @@ import Invitation from '@/pages/invitations/Invitation.vue';
 
 import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
 
+import AppInfo from '@/pages/app/AppInfo.vue';
+
 
 // integrations
 import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
@@ -297,6 +299,12 @@ const routes = [
     name: 'unauthorized',
     component: Unauthorized,
     props: true,
+  },
+  // App-Info
+  {
+    path: '/app/info',
+    name: 'app-info',
+    component: AppInfo,
   },
   // tabula rasa
   // TODO: remove this from production

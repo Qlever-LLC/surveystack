@@ -3719,6 +3719,13 @@ dotenv@^8.2.0:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-8.2.0.tgz#97e619259ada750eea3e4ea3e26bceea5424b16a"
   integrity sha512-8sJ78ElpbDJBHNeBzUbUVLsqKdccaa/BXF1uPTw3GrvQTBgrQrtObr2mUrE38vzYd8cEv+m/JBfDLioYcfXoaw==
 
+dotgitconfig@^1.1.0:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/dotgitconfig/-/dotgitconfig-1.1.1.tgz#0e854a409f005c48bf820825e94f05215db41ed0"
+  integrity sha512-gkaAQMmhlE7N6NYtvckQ32f/xTX6Hv7RTtF9qKCYJEQgL/d6zJZk/D0eLFuuGPRCbpRj2PR/HcBLxtIh3MSB6Q==
+  dependencies:
+    ini "^1.3.5"
+
 duplexer@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/duplexer/-/duplexer-0.1.1.tgz#ace6ff808c1ce66b57d1ebf97977acb02334cfc1"
@@ -5289,7 +5296,7 @@ inherits@2.0.3:
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.3.tgz#633c2c83e3da42a502f52466022480f4208261de"
   integrity sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4=
 
-ini@^1.3.4:
+ini@^1.3.4, ini@^1.3.5:
   version "1.3.5"
   resolved "https://registry.yarnpkg.com/ini/-/ini-1.3.5.tgz#eee25f56db1c9ec6085e0c22778083f596abf927"
   integrity sha512-RZY5huIKCMRWDUqZlEi72f/lmXKMvuszcMBduliQ3nnWbx9X/ZBQO7DijMEYS9EhHBb2qacRUMtC7svLwe0lcw==
@@ -6377,6 +6384,13 @@ kleur@^3.0.3:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/kleur/-/kleur-3.0.3.tgz#a79c9ecc86ee1ce3fa6206d1216c501f147fc07e"
   integrity sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==
+
+last-commit-log@^3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/last-commit-log/-/last-commit-log-3.0.4.tgz#8b3f363bcf25292fc386d292e330d23f4daece37"
+  integrity sha512-NwvGT6O3eiOIALwxa/i1YcVgQuLO7w/KheP3wORmB2JM9IaG47PbkSAn2BZMa8Z8hkPYblY+awD4lFjHFFsQ9g==
+  dependencies:
+    dotgitconfig "^1.1.0"
 
 launch-editor-middleware@^2.2.1:
   version "2.2.1"

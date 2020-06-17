@@ -11,6 +11,7 @@
         <div
           id="app-bar-title"
           class="title py-0 my-0"
+          @click="$router.push('/')"
         >
           {{ appTitle }}
         </div>
@@ -87,7 +88,8 @@
           dark
           class="grey--text"
         >
-          <p class="pt-4 pl-4">App-Version: {{ version }}</p>
+          <p class="pt-4 pl-4">App-Version: <router-link to="/app/info">{{ version }}</router-link>
+          </p>
         </div>
       </template>
 
@@ -253,6 +255,7 @@ export default {
   font-weight: normal;
   /* color: white; */
   line-height: 1.8rem;
+  cursor: pointer;
 }
 
 .subtitle {

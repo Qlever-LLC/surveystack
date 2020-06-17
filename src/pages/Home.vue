@@ -71,7 +71,10 @@
       class="mt-12"
     >
       <v-flex>
-        <v-chip style="font-family: monospace">v{{ version }}</v-chip>
+        <v-chip
+          style="font-family: monospace"
+          to="/app/info"
+        >v{{ version }}</v-chip>
       </v-flex>
     </v-layout>
   </v-container>
@@ -112,7 +115,6 @@ export default {
     },
     pinned() {
       const pinned = this.$store.getters['surveys/getPinned'];
-      console.log('pinned', pinned);
       return pinned;
     },
   },

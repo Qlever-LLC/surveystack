@@ -1,8 +1,16 @@
 /* eslint-disable no-param-reassign */
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
+const LCL = require('last-commit-log');
 
 const fs = require('fs');
+
+const lcl = new LCL();
+const commit = lcl.getLastCommitSync();
+process.env.VUE_APP_GIT_HASH = commit.hash;
+process.env.VUE_APP_GIT_TAG = commit.gitTag;
+process.env.VUE_APP_GIT_DATE = commit.committer.date;
+process.env.VUE_APP_LCL = JSON.stringify(commit);
 
 const packageJson = fs.readFileSync('./package.json');
 const version = JSON.parse(packageJson).version || 0;
