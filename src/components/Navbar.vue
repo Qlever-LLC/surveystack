@@ -11,9 +11,11 @@
         <div
           id="app-bar-title"
           class="title py-0 my-0"
-          @click="$router.push('/')"
         >
-          {{ appTitle }}
+          <router-link
+            to="/"
+            id="home-link"
+          >{{appTitle}}</router-link>
         </div>
         <div
           class="app-bar-subtitle subtitle py-0 my-0"
@@ -255,7 +257,6 @@ export default {
   font-weight: normal;
   /* color: white; */
   line-height: 1.8rem;
-  cursor: pointer;
 }
 
 .subtitle {
@@ -266,5 +267,10 @@ export default {
 <style>
 .app-bar-subtitle span {
   vertical-align: middle;
+}
+
+#home-link {
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.87);
 }
 </style>
