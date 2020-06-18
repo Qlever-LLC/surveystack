@@ -393,6 +393,13 @@ const getSubmissionsPage = async (req, res) => {
 };
 
 const getSubmissions = async (req, res) => {
+  if (Object.entries(req.cookies).length === 0) {
+    // is empty
+    console.log('no cookies');
+  } else {
+    // is not empty
+    console.log('Cookies', req.cookies);
+  }
   let skip = 0;
   let limit = DEFAULT_LIMIT;
 
