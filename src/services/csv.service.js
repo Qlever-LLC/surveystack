@@ -27,8 +27,6 @@ function removeKeys(obj, keys) {
 }
 
 function createHeaders(mergedObject, entities) {
-  console.log('merged.data');
-  console.log(mergedObject.data);
   if (mergedObject.meta) {
     if (mergedObject.meta.survey && mergedObject.meta.survey.id) {
       mergedObject.meta.survey.id = mergedObject.meta.survey.id.toString();
