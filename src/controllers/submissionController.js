@@ -9,6 +9,7 @@ import { db } from '../db';
 import csvService from '../services/csv.service';
 import * as farmOsService from '../services/farmos.service';
 import rolesService from '../services/roles.service';
+import { queryParam } from '../helpers';
 
 const col = 'submissions';
 const DEFAULT_LIMIT = 100000;
@@ -216,10 +217,41 @@ const buildPipeline = async (req, res) => {
     });
   }
 
-  // redact stage
+  // Authenticated either Authorization header or Cookie
   if (res.locals.auth.isAuthenticated) {
+    // Authorization header
     user = res.locals.auth.user._id.toString();
     roles.push(...res.locals.auth.roles);
+  } else if (req.cookies.user && req.cookies.token) {
+    // Cookie
+    user = req.cookies.user;
+    const userRoles = await rolesService.getRoles(user);
+    roles.push(...userRoles);
+  }
+
+  // Add creator details if request has admin rights on survey.
+  // However, don't add creator details if pure=1 is set (e.g. for re-submissions)
+  if (user && !queryParam(req, 'pure')) {
+    const survey = await db.collection('surveys').findOne({ _id: new ObjectId(req.query.survey) });
+    const groupId = survey.meta.group.id;
+    const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
+
+    if (hasAdminRights) {
+      pipeline.push({
+        $lookup: {
+          from: 'users',
+          let: { creatorId: '$meta.creator' },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$_id', '$$creatorId'] } } },
+            { $project: { name: 1, email: 1, _id: 0 } },
+          ],
+          as: 'meta.creatorDetail',
+        },
+      });
+      pipeline.push({
+        $unwind: { path: '$meta.creatorDetail', preserveNullAndEmptyArrays: true },
+      });
+    }
   }
 
   // For development purposes
@@ -492,10 +524,40 @@ const getSubmission = async (req, res) => {
   let user = null;
   let roles = [];
 
-  // redact stage
+  // Authenticated either Authorization header or Cookie
   if (res.locals.auth.isAuthenticated) {
+    // Authorization header
     user = res.locals.auth.user._id.toString();
     roles.push(...res.locals.auth.roles);
+  } else if (req.cookies.user && req.cookies.token) {
+    // Cookie
+    user = req.cookies.user;
+    const userRoles = await rolesService.getRoles(user);
+    roles.push(...userRoles);
+  }
+
+  // Add creator details if request has admin rights on survey.
+  // However, don't add creator details if pure=1 is set (e.g. for re-submissions)
+  if (user && !queryParam(req, 'pure')) {
+    const groupId = res.locals.existing.meta.group.id;
+    const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
+
+    if (hasAdminRights) {
+      pipeline.push({
+        $lookup: {
+          from: 'users',
+          let: { creatorId: '$meta.creator' },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$_id', '$$creatorId'] } } },
+            { $project: { name: 1, email: 1, _id: 0 } },
+          ],
+          as: 'meta.creatorDetail',
+        },
+      });
+      pipeline.push({
+        $unwind: { path: '$meta.creatorDetail', preserveNullAndEmptyArrays: true },
+      });
+    }
   }
 
   pipeline.push({ $match: { _id: new ObjectId(id) } });

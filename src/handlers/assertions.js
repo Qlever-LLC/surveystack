@@ -80,3 +80,15 @@ export const assertIdsMatch = (req, res, next) => {
 
   next();
 };
+
+export const assertHasSurveyParam = catchErrors(async (req, res, next) => {
+  if (!req.query.survey) {
+    throw boom.badRequest('Query param not set: survey');
+  }
+
+  if (!ObjectId.isValid(req.query.survey)) {
+    throw boom.badRequest(`Invalid survey id: ${req.query.survey}`);
+  }
+
+  next();
+});

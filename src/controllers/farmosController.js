@@ -16,7 +16,7 @@ const common = async (endpoint, req, res) => {
     }
   });
 
-  console.log('farms distinct by URL', uniqueFarmsByURL);
+  //console.log('farms distinct by URL', uniqueFarmsByURL);
 
   const farmosFields = [];
 

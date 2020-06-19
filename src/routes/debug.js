@@ -1,16 +1,17 @@
 import { Router } from 'express';
-import _ from 'lodash';
 import { flatten } from 'flat';
 import { ObjectId } from 'mongodb';
 import papa from 'papaparse';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
+
 import { uploadToS3 } from '../services/bucket.service';
 import mailService from '../services/mail.service';
 import farmosService from '../services/farmos.service';
-import { catchErrors } from '../handlers/errorHandlers';
 import rolesService from '../services/roles.service';
+
+import { catchErrors } from '../handlers/errorHandlers';
 
 const router = Router();
 

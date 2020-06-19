@@ -26,7 +26,6 @@ const createDummySubmissions = async (req, res) => {
   return res.send(r);
 };
 
-// TODO: delete this endpoint in production!
 const tabulaRasa = async (req, res) => {
   if (process.env.NODE_ENV !== 'development') {
     throw boom.badRequest('Can only tabula rasa on development server');

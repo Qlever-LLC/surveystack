@@ -3,6 +3,7 @@ dotenv.config();
 
 import express from 'express';
 import expressStaticGzip from 'express-static-gzip';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import history from 'connect-history-api-fallback';
 
@@ -19,6 +20,7 @@ const PATH_PREFIX = process.env.PATH_PREFIX;
 const app = express();
 const frontend = expressStaticGzip('../our-sci-pwa/dist');
 
+app.use(cookieParser());
 app.use(express.json({ limit: '8mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
@@ -37,6 +39,9 @@ app.use(async (req, res, next) => {
     if (user) {
       isAuthenticated = true;
       isSuperAdmin = user.permissions.includes('super-admin');
+      const cookieOptions = { expires: new Date(Date.now() + 1000 * 3600 * 24 * 14) }; // expire after 14 days
+      res.cookie('user', user._id.toString(), cookieOptions);
+      res.cookie('token', user.token, cookieOptions);
     }
 
     if (user) {
@@ -58,7 +63,9 @@ app.use(async (req, res, next) => {
 app.use(`${PATH_PREFIX}/api`, apiRoutes);
 app.use(`${PATH_PREFIX}/api`, errorHandlers.developmentErrors);
 
-app.use('/debug', debugRoutes);
+if (process.env.NODE_ENV === 'development') {
+  app.use('/debug', debugRoutes);
+}
 
 // Serve Vue.js from dist folder
 // https://github.com/bripkens/connect-history-api-fallback/tree/master/examples/static-files-and-index-rewrite

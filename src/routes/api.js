@@ -1,12 +1,12 @@
 import { Router } from 'express';
 
+import debugController from '../controllers/debugController';
 import authController from '../controllers/authController';
 import groupController from '../controllers/groupController';
 import surveyController from '../controllers/surveyController';
 import submissionController from '../controllers/submissionController';
 import userController from '../controllers/userController';
 import scriptController from '../controllers/scriptController';
-import debugController from '../controllers/debugController';
 import rolesController from '../controllers/rolesController';
 import farmosController from '../controllers/farmosController';
 import membershipController from '../controllers/membershipController';
@@ -23,24 +23,30 @@ import {
   assertIdsMatch,
   assertNameNotEmpty,
   assertEntityRights,
+  assertHasSurveyParam,
 } from '../handlers/assertions';
 
 import { catchErrors } from '../handlers/errorHandlers';
 
 const router = Router();
 
+/** API Debug Controller*/
+if (process.env.NODE_ENV === 'development') {
+  router.get('/debug', catchErrors(debugController.getDefault));
+  router.get('/debug/authenticated', assertAuthenticated, catchErrors(debugController.getDefault));
+  router.get('/debug/throw-error', catchErrors(debugController.throwError));
+  router.post(
+    '/debug/create-dummy-submissions',
+    catchErrors(debugController.createDummySubmissions)
+  );
+  router.post('/debug/tabularasa', catchErrors(debugController.tabulaRasa));
+}
+
 /** Auth */
 router.post('/auth/register', catchErrors(authController.register));
 router.post('/auth/login', catchErrors(authController.login));
 router.post('/auth/send-password-reset-mail', catchErrors(authController.sendPasswordResetMail));
 router.post('/auth/reset-password', catchErrors(authController.resetPassword));
-
-/** Debug */
-// router.get('/debug', catchErrors(debugController.getDefault));
-// router.get('/debug/authenticated', assertAuthenticated, catchErrors(debugController.getDefault));
-// router.get('/debug/throw-error', catchErrors(debugController.throwError));
-// router.post('/debug/create-dummy-submissions', catchErrors(debugController.createDummySubmissions));
-// router.post('/debug/tabularasa', catchErrors(debugController.tabulaRasa));
 
 /** Group */
 router.get('/groups', catchErrors(groupController.getGroups));
@@ -61,15 +67,31 @@ router.put(
 router.delete('/groups/:id', assertAuthenticated, catchErrors(groupController.deleteGroup));
 
 /** Submissions */
-router.get('/submissions', catchErrors(submissionController.getSubmissions));
-router.get('/submissions/page', catchErrors(submissionController.getSubmissionsPage));
-router.get('/submissions/csv', catchErrors(submissionController.getSubmissionsCsv));
+router.get(
+  '/submissions',
+  [assertHasSurveyParam],
+  catchErrors(submissionController.getSubmissions)
+);
+router.get(
+  '/submissions/page',
+  [assertHasSurveyParam],
+  catchErrors(submissionController.getSubmissionsPage)
+);
+router.get(
+  '/submissions/csv',
+  [assertHasSurveyParam],
+  catchErrors(submissionController.getSubmissionsCsv)
+);
 router.post(
   '/submissions/:id/archive',
   [assertAuthenticated, assertEntityExists({ collection: 'submissions' }), assertEntityRights],
   catchErrors(submissionController.archiveSubmission)
 );
-router.get('/submissions/:id', catchErrors(submissionController.getSubmission));
+router.get(
+  '/submissions/:id',
+  [assertEntityExists({ collection: 'submissions' })],
+  catchErrors(submissionController.getSubmission)
+);
 router.post('/submissions', catchErrors(submissionController.createSubmission));
 router.put(
   '/submissions/:id',
