@@ -28,6 +28,8 @@ const whitelist = ['https://cdpn.io', 'https://app.our-sci.net', 'https://dashbo
 const corsOptions = {
   origin: function(origin, callback) {
     if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true); // specifically allow whitelisted origins including credentials
+    } else if (origin.startsWith('http://localhost') || origin.startsWith('http://192.168')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
