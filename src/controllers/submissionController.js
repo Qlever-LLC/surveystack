@@ -9,6 +9,7 @@ import { db } from '../db';
 import csvService from '../services/csv.service';
 import * as farmOsService from '../services/farmos.service';
 import rolesService from '../services/roles.service';
+import { queryParam } from '../helpers';
 
 const col = 'submissions';
 const DEFAULT_LIMIT = 100000;
@@ -228,8 +229,9 @@ const buildPipeline = async (req, res) => {
     roles.push(...userRoles);
   }
 
-  // Show creator details if request has admin rights on survey
-  if (user) {
+  // Add creator details if request has admin rights on survey.
+  // However, don't add creator details if pure=1 is set (e.g. for re-submissions)
+  if (user && !queryParam(req, 'pure')) {
     const survey = await db.collection('surveys').findOne({ _id: new ObjectId(req.query.survey) });
     const groupId = survey.meta.group.id;
     const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
@@ -534,8 +536,9 @@ const getSubmission = async (req, res) => {
     roles.push(...userRoles);
   }
 
-  // Show creator details if request has admin rights on survey
-  if (user) {
+  // Add creator details if request has admin rights on survey.
+  // However, don't add creator details if pure=1 is set (e.g. for re-submissions)
+  if (user && !queryParam(req, 'pure')) {
     const groupId = res.locals.existing.meta.group.id;
     const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
 
