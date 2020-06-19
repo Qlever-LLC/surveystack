@@ -32,7 +32,8 @@ const corsOptions = {
     } else if (origin.startsWith('http://localhost') || origin.startsWith('http://192.168')) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      //callback(new Error('Not allowed by CORS'));
+      callback(null, true);
     }
   },
   credentials: true,
