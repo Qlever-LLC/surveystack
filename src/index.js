@@ -39,7 +39,11 @@ app.use(async (req, res, next) => {
     if (user) {
       isAuthenticated = true;
       isSuperAdmin = user.permissions.includes('super-admin');
-      const cookieOptions = { expires: new Date(Date.now() + 1000 * 3600 * 24 * 14) }; // expire after 14 days
+      const cookieOptions = {
+        expires: new Date(Date.now() + 1000 * 3600 * 24 * 14),
+        secure: true,
+        sameSite: 'Lax',
+      }; // expire after 14 days
       res.cookie('user', user._id.toString(), cookieOptions);
       res.cookie('token', user.token, cookieOptions);
     }
