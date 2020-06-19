@@ -132,8 +132,9 @@ const actions = {
     return submission;
   },
   async [types.actions.fetchRemoteSubmission]({ commit }, id) {
-    const { data } = await api.get(`/submissions/${id}`);
-    console.log('fetchRemoteSubmission response', data);
+    // pure param makes sure the submission is suitable for re-submissions
+    // with only the original or 'pure' submission being fetched, i.e. no "meta.creatorDetail" added, etc.
+    const { data } = await api.get(`/submissions/${id}?pure=1`);
     // NOTE: this means that dispatching fetchRemoteSubmission will overwrite a local draft
     // So if a user submits a Submission, then edits it (but without resubmitting it), then we
     // execute fetchRemoteSubmission again, their local edits will be overwritten and lost
