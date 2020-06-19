@@ -63,7 +63,9 @@ app.use(async (req, res, next) => {
 app.use(`${PATH_PREFIX}/api`, apiRoutes);
 app.use(`${PATH_PREFIX}/api`, errorHandlers.developmentErrors);
 
-app.use('/debug', debugRoutes);
+if (process.env.NODE_ENV === 'development') {
+  app.use('/debug', debugRoutes);
+}
 
 // Serve Vue.js from dist folder
 // https://github.com/bripkens/connect-history-api-fallback/tree/master/examples/static-files-and-index-rewrite

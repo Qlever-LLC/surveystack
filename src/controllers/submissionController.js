@@ -216,10 +216,40 @@ const buildPipeline = async (req, res) => {
     });
   }
 
-  // redact stage
+  // Authenticated either Authorization header or Cookie
   if (res.locals.auth.isAuthenticated) {
+    // Authorization header
     user = res.locals.auth.user._id.toString();
     roles.push(...res.locals.auth.roles);
+  } else if (req.cookies.user && req.cookies.token) {
+    // Cookie
+    user = req.cookies.user;
+    const userRoles = await rolesService.getRoles(user);
+    roles.push(...userRoles);
+  }
+
+  // Show creator details if request has admin rights on survey
+  if (user) {
+    const survey = await db.collection('surveys').findOne({ _id: new ObjectId(req.query.survey) });
+    const groupId = survey.meta.group.id;
+    const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
+
+    if (hasAdminRights) {
+      pipeline.push({
+        $lookup: {
+          from: 'users',
+          let: { creatorId: '$meta.creator' },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$_id', '$$creatorId'] } } },
+            { $project: { name: 1, email: 1, _id: 0 } },
+          ],
+          as: 'meta.creatorDetail',
+        },
+      });
+      pipeline.push({
+        $unwind: { path: '$meta.creatorDetail', preserveNullAndEmptyArrays: true },
+      });
+    }
   }
 
   // For development purposes
