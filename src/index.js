@@ -42,7 +42,7 @@ app.use(async (req, res, next) => {
       const cookieOptions = {
         expires: new Date(Date.now() + 1000 * 3600 * 24 * 14),
         secure: true,
-        sameSite: 'Lax',
+        sameSite: 'None',
       }; // expire after 14 days
       res.cookie('user', user._id.toString(), cookieOptions);
       res.cookie('token', user.token, cookieOptions);
