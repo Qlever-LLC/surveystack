@@ -1,6 +1,15 @@
 import api from '@/services/api.service';
 import { AuthService, MembershipService, GroupService } from '@/services/storage.service';
 
+const deleteCookie = (name) => {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+};
+
+const deleteCookies = () => {
+  deleteCookie('user');
+  deleteCookie('token');
+};
+
 const createInitialState = () => ({
   status: AuthService.getStatus(),
   user: AuthService.getUser(),
@@ -66,6 +75,7 @@ const actions = {
     return new Promise((resolve) => {
       commit('logout');
       clearLocalData({ dispatch });
+      deleteCookies();
       resolve();
     });
   },
