@@ -30,8 +30,6 @@ const getters = {
 };
 
 const clearLocalData = ({ dispatch }) => {
-  // remove default Authentication headers
-  api.removeHeaders();
   // remove items from storage
   AuthService.clear();
   MembershipService.clear();
@@ -58,7 +56,7 @@ const actions = {
           AuthService.saveStatus('success');
           AuthService.saveUser(user);
           AuthService.saveHeader(header);
-          api.setHeader('Authorization', header);
+
 
           commit('auth_success', { user, header });
           resolve(resp.data);
@@ -73,9 +71,9 @@ const actions = {
   },
   logout({ commit, dispatch }) {
     return new Promise((resolve) => {
-      commit('logout');
       clearLocalData({ dispatch });
       deleteCookies();
+      commit('logout');
       resolve();
     });
   },
@@ -96,7 +94,6 @@ const actions = {
             shapeshiftUser: state.user,
             shapeshiftHeader: state.header,
           });
-          api.setHeader('Authorization', header);
           commit('shapeshift_push', {
             user: state.user,
             header: state.header,
@@ -130,6 +127,7 @@ const mutations = {
     state.status = 'success';
     state.user = user;
     state.header = header;
+    api.setHeader('Authorization', header);
   },
   auth_error(state) {
     state.status = 'error';
@@ -142,6 +140,7 @@ const mutations = {
     state.header = '';
     state.shapeshiftUser = {};
     state.shapeshiftHeader = '';
+    api.removeHeaders();
   },
   shapeshift_push(state, { user, header }) {
     state.shapeshiftUser = user;
