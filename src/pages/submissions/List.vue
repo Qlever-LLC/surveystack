@@ -54,7 +54,7 @@
 
       <div class="d-flex justify-end">
         <v-checkbox
-          label="Show archived"
+          label="View archived only"
           v-model="showArchived"
           dense
           hide-details
@@ -167,7 +167,30 @@
     </v-container>
 
     <v-container>
-      <v-tabs v-model="tab">
+
+      <div class="d-flex ">
+        <v-select
+          class="ml-auto"
+          style="max-width: 5rem; display: inline-block"
+          label="Page Size"
+          dense
+          :items="pageSizes"
+          hide-details
+          v-model="pageSize"
+          @change="changedPaginationSize"
+        ></v-select>
+      </div>
+
+      <div class="py-2">
+        <v-pagination
+          v-model="page"
+          :length="paginationTotalPages"
+          @input="changedPaginationPage"
+        ></v-pagination>
+      </div>
+
+      <v-tabs v-model="
+          tab">
         <v-tab
           v-for="view in views"
           :key="view.tab"
@@ -183,6 +206,7 @@
               :submissions="submissions"
               v-if="submissions"
               :selected.sync="selected"
+              :archived="showArchived"
             />
           </v-tab-item>
           <v-tab-item>
@@ -193,6 +217,13 @@
           </v-tab-item>
         </v-tabs-items>
       </v-tabs>
+      <div class="text-center py-2">
+        <v-pagination
+          v-model="page"
+          :length="paginationTotalPages"
+          @input="changedPaginationPage"
+        ></v-pagination>
+      </div>
     </v-container>
 
   </div>
@@ -220,12 +251,14 @@ import appDialog from '@/components/ui/Dialog.vue';
 
 import { createQueryList } from '@/utils/surveys';
 
+const defaultPageSize = 10;
+
 const defaultFilter = {
   match: '{}',
   project: '{}',
   sort: '{}',
   skip: 0,
-  limit: 0,
+  limit: defaultPageSize,
   roles: '',
 };
 
@@ -263,7 +296,7 @@ export default {
         project: '{}',
         sort: '{}',
         skip: 0,
-        limit: 0,
+        limit: defaultPageSize,
         roles: '',
       },
       basicFilters: [],
@@ -272,9 +305,12 @@ export default {
         pagination: {
           total: 0,
           skip: 0,
-          limit: 100000,
+          limit: defaultPageSize,
         },
       },
+      page: 1,
+      pageSizes: [1, 5, 10, 20, 50, 100, 10000],
+      pageSize: defaultPageSize,
       selected: [],
       search: '',
       showArchived: false,
@@ -328,6 +364,11 @@ export default {
       }
       const list = createQueryList(this.surveyEntity, this.surveyEntity.latestVersion);
       return list;
+    },
+    paginationTotalPages() {
+      const r = Math.floor(this.submissions.pagination.total / this.submissions.pagination.limit) + 1;
+      console.log('paginationTotalPages', r);
+      return r;
     },
   },
   methods: {
@@ -390,6 +431,18 @@ export default {
     async resubmit(submission) {
       await this.$store.dispatch('submissions/fetchRemoteSubmission', submission._id);
       this.$router.push(`/submissions/drafts/${submission._id}`);
+    },
+    changedPaginationPage(p) {
+      this.page = p;
+      this.filter.skip = (p - 1) * this.filter.limit;
+      this.fetchData();
+    },
+    changedPaginationSize() {
+      // console.log;
+      this.page = 1;
+      this.filter.limit = this.pageSize;
+      this.filter.skip = 0;
+      this.fetchData();
     },
   },
   watch: {

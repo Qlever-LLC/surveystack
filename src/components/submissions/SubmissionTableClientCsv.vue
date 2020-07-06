@@ -12,6 +12,7 @@
         v-model="tableSelected"
         @item-selected="onRowSelected"
         disable-pagination
+        :class="{archived}"
       >
         <template v-slot:top>
           <v-toolbar flat>
@@ -47,6 +48,10 @@ export default {
     selected: {
       type: Array,
       required: true,
+    },
+    archived: {
+      type: Boolean,
+      default: false,
     },
 
   },
@@ -154,4 +159,10 @@ export default {
   font-size: 12px;
 }
 */
+</style>
+
+<style scoped>
+.archived {
+  color: #777;
+}
 </style>
