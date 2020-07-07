@@ -13,6 +13,12 @@
         @item-selected="onRowSelected"
         disable-pagination
         :class="{archived}"
+        :server-items-length="submissions.pagination.total"
+        @update:sort-by="onUpdateSortBy"
+        @update:sort-desc="onUpdateSortDesc"
+        :sort-by="dataTableProps.sortBy"
+        :sort-desc="dataTableProps.sortDesc"
+        :loading="loading"
       >
         <template v-slot:top>
           <v-toolbar flat>
@@ -53,7 +59,19 @@ export default {
       type: Boolean,
       default: false,
     },
-
+    dataTableProps: {
+      type: Object,
+      default() {
+        return {
+          sortBy: [],
+          sortDesc: [false],
+        };
+      },
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -132,6 +150,12 @@ export default {
         });
       }
       this.headers = headers;
+    },
+    onUpdateSortBy(value) {
+      this.$emit('onDataTablePropsChanged', { ...this.dataTableProps, sortBy: value });
+    },
+    onUpdateSortDesc(value) {
+      this.$emit('onDataTablePropsChanged', { ...this.dataTableProps, sortDesc: value });
     },
     async fetchData() {
       if (!this.submissions) {

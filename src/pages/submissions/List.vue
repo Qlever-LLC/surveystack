@@ -207,6 +207,9 @@
               v-if="submissions"
               :selected.sync="selected"
               :archived="showArchived"
+              :dataTableProps="dateTableProps"
+              @onDataTablePropsChanged="onDataTablePropsChanged"
+              :loading="loading"
             />
           </v-tab-item>
           <v-tab-item>
@@ -316,6 +319,11 @@ export default {
       showArchived: false,
       showArchiveModal: false,
       showDeleteModal: false,
+      dateTableProps: {
+        sortBy: [],
+        sortDesc: [false],
+      },
+      loading: false,
     };
   },
   computed: {
@@ -367,17 +375,19 @@ export default {
     },
     paginationTotalPages() {
       const r = Math.floor(this.submissions.pagination.total / this.submissions.pagination.limit) + 1;
-      console.log('paginationTotalPages', r);
       return r;
     },
   },
   methods: {
     async fetchData() {
+      this.loading = true;
       try {
         const { data: submissions } = await api.get(this.apiRequest);
         this.submissions = submissions;
       } catch (e) {
         console.log('something went wrong:', e);
+      } finally {
+        this.loading = false;
       }
     },
     async deleteSubmission(submission) {
@@ -443,6 +453,26 @@ export default {
       this.filter.limit = this.pageSize;
       this.filter.skip = 0;
       this.fetchData();
+    },
+    onDataTablePropsChanged(props) {
+      const [sortBy] = props.sortBy;
+      if (sortBy && props.sortDesc.length > 0) {
+        try {
+          const [sortDesc] = props.sortDesc;
+          const sort = JSON.stringify({ [sortBy]: sortDesc ? -1 : 1 });
+          this.filter.sort = sort;
+          this.fetchData();
+        } catch (error) {
+          console.log('error parsing sort');
+        }
+      }
+
+      if (!sortBy) {
+        this.filter.sort = JSON.stringify({});
+        this.fetchData();
+      }
+
+      this.dateTableProps = props;
     },
   },
   watch: {
