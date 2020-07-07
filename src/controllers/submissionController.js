@@ -13,6 +13,7 @@ import { queryParam } from '../helpers';
 
 const col = 'submissions';
 const DEFAULT_LIMIT = 100000;
+const DEFAULT_SORT = { _id: -1 }; // reverse insert order
 
 // NOTE: when adding fields to a submission
 // you may need to adapt csv.service.js in both back-end and front-end
@@ -181,7 +182,7 @@ const buildPipeline = async (req, res) => {
 
   let match = {};
   let project = {};
-  let sort = {};
+  let sort = DEFAULT_SORT;
   let skip = 0;
   let limit = DEFAULT_LIMIT;
   let user = null;
@@ -296,27 +297,6 @@ const buildPipeline = async (req, res) => {
         throw boom.badRequest(`One can not mix and match inclusion and exclusion in project stage`);
       }
 
-      /*
-        If a nested field inside a group was marked as 1
-        then we should also include the meta data of the parents
-        e.g.
-        {"data.personal_group.age": 1}
-        => {"data.personal_group.age": 1, "data.personal_group.meta": 1}
-        Furthermore, the root level "meta" should be included
-      */
-      // if (_.every(project, (v) => v === 1)) {
-      //   //autoProjections.meta = 1;
-      //   _.map(project, (v, k) => {
-      //     const splits = k.split('.');
-      //     if (splits[0] === 'data' && splits.length > 2) {
-      //       let key = 'data';
-      //       for (let i = 1; i < splits.length - 1; i++) {
-      //         key += `.${splits[i]}`;
-      //         autoProjections[`${key}.meta`] = 1;
-      //       }
-      //     }
-      //   });
-      // }
       project = { ...project, ...autoProjections };
       pipeline.push({ $project: project });
     }
@@ -326,7 +306,9 @@ const buildPipeline = async (req, res) => {
   if (req.query.sort) {
     try {
       const s = JSON.parse(req.query.sort);
-      sort = { ...sort, ...s };
+      if (!_.isEmpty(s)) {
+        sort = s;
+      }
     } catch (error) {
       throw boom.badRequest(`Bad query paramter sort: ${sort}`);
     }
@@ -337,11 +319,9 @@ const buildPipeline = async (req, res) => {
       }
     });
 
-    if (!_.isEmpty(sort)) {
-      pipeline.push({
-        $sort: sort,
-      });
-    }
+    pipeline.push({
+      $sort: sort,
+    });
   }
   return pipeline;
 };
