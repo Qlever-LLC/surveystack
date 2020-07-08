@@ -97,9 +97,9 @@
       <h4>API</h4>
       <a
         class="body-2"
-        :href="apiUrl"
+        :href="apiDownloadUrl"
         target="_blank"
-      >{{apiUrl}}</a>
+      >{{apiDownloadUrl}}</a>
 
       <v-radio-group
         v-model="apiSelection"
@@ -115,6 +115,13 @@
           :value="item.value"
         ></v-radio>
       </v-radio-group>
+
+      <v-checkbox
+        label="current page"
+        v-model="downloadPageOnly"
+      />
+
+      <v-btn @click="startDownload">Download</v-btn>
 
       <v-card
         v-if="selected.length > 0"
@@ -242,7 +249,6 @@
  {"_id": xxx, "meta.archived": 'false', ...}
  ... it's ok for now but working with the real JSON object would make more sense
 */
-
 import api from '@/services/api.service';
 import { flattenSubmission } from '@/utils/submissions';
 import appSubmissionsFilterBasic from '@/components/submissions/SubmissionFilterBasic.vue';
@@ -324,6 +330,7 @@ export default {
         sortDesc: [],
       },
       loading: false,
+      downloadPageOnly: true,
     };
   },
   computed: {
@@ -338,7 +345,7 @@ export default {
 
       return true;
     },
-    apiParams() {
+    apiFetchParams() {
       let params = `survey=${this.survey}&match=${this.filter.match}&sort=${this.filter.sort}&project=${this.filter.project}&skip=${this.filter.skip}&limit=${this.filter.limit}`;
       if (this.showArchived) {
         params += '&showArchived=true';
@@ -349,22 +356,42 @@ export default {
       }
       return params;
     },
-    apiRequest() {
-      return `/submissions/page?${this.apiParams}`;
+    apiDownloadParams() {
+      let params = `survey=${this.survey}&match=${this.filter.match}&sort=${this.filter.sort}&project=${this.filter.project}`;
+      if (this.downloadPageOnly) {
+        params += `&skip=${this.filter.skip}&limit=${this.filter.limit}`;
+      } else {
+        params += '&skip=0&limit=0';
+      }
+
+      if (this.showArchived) {
+        params += '&showArchived=true';
+      }
+
+      if (process.env.NODE_ENV === 'development') {
+        return `${params}&roles=${this.filter.roles}`;
+      }
+      return params;
     },
-    apiUrl() {
+    apiFetchRequest() {
+      return `/submissions/page?${this.apiFetchParams}`;
+    },
+    apiEndpoint() {
       let endpoint;
       switch (this.apiSelection) {
         case 'csv':
-          endpoint = '/submissions/csv';
+          endpoint = '/api/submissions/csv';
           break;
         case 'json':
-          endpoint = '/submissions';
+          endpoint = '/api/submissions';
           break;
         default:
-          endpoint = '/submissions/page';
+          endpoint = '/api/submissions/page';
       }
-      return `${process.env.VUE_APP_API_URL}${endpoint}?${this.apiParams}`;
+      return endpoint;
+    },
+    apiDownloadUrl() {
+      return `${window.location.origin}${this.apiEndpoint}?${this.apiDownloadParams}`;
     },
     queryList() {
       if (!this.surveyEntity) {
@@ -382,7 +409,7 @@ export default {
     async fetchData() {
       this.loading = true;
       try {
-        const { data: submissions } = await api.get(this.apiRequest);
+        const { data: submissions } = await api.get(this.apiFetchRequest);
         this.submissions = submissions;
       } catch (e) {
         console.log('something went wrong:', e);
@@ -476,6 +503,19 @@ export default {
       }
 
       this.dateTableProps = props;
+    },
+    async startDownload() {
+      const element = document.createElement('a');
+
+      element.setAttribute('href', this.apiDownloadUrl);
+      element.setAttribute('download', `${this.surveyEntity.name}.csv`);
+
+      element.style.display = 'none';
+      document.body.appendChild(element);
+
+      element.click();
+
+      document.body.removeChild(element);
     },
   },
   watch: {
