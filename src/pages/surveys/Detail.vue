@@ -78,7 +78,6 @@ export default {
         return false;
       }
 
-      console.log('entity', this.entity);
       const g = this.memberships.find(m => m.group._id === this.entity.meta.group.id);
       if (g && g.role === 'admin') {
         return true;
@@ -88,11 +87,11 @@ export default {
   },
   async created() {
     const { id } = this.$route.params;
-    const s = await api.get(`/surveys/${id}`);
-    this.entity = s.data;
+    const { data: entity } = await api.get(`/surveys/${id}`);
+    this.entity = entity;
 
-    const i = await api.get(`/surveys/info?id=${id}`);
-    this.surveyInfo = i.data;
+    const { data: surveyInfo } = await api.get(`/surveys/info?id=${id}`);
+    this.surveyInfo = surveyInfo;
 
     const user = this.$store.getters['auth/user'];
     this.$store.dispatch('memberships/getUserMemberships', user._id);

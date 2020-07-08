@@ -25,11 +25,21 @@
     <v-container>
       <div class="d-flex justify-end">
         <v-btn
+          v-if="survey"
           outlined
           color="secondary"
+          :to="`/surveys/${survey}`"
+        >
+          <v-icon left>mdi-note-text-outline</v-icon>
+          View Survey
+        </v-btn>
+        <v-btn
+          outlined
+          color="secondary"
+          class="ml-2"
           @click="startDraft(survey)"
         >
-          <v-icon left>mdi-note-plus</v-icon>
+          <v-icon left>mdi-plus</v-icon>
           New submission
         </v-btn>
       </div>
