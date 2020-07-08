@@ -188,6 +188,6 @@ export default {
 
 <style scoped>
 .archived {
-  color: #777;
+  color: #777 !important;
 }
 </style>

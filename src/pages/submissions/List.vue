@@ -191,9 +191,9 @@
 
     <v-container>
 
-      <div class="d-flex ">
+      <div class="d-flex justify-end align-baseline">
+        <div class="text--secondary mr-3">total {{submissions.pagination.total}} records</div>
         <v-select
-          class="ml-auto"
           style="max-width: 5rem; display: inline-block"
           label="Page Size"
           dense

@@ -1,6 +1,5 @@
 <template>
   <v-container>
-    <div class="text-right text--secondary"><small>total {{submissions.pagination.total}} records</small></div>
     <v-card class="pa-3">
       <ul
         v-if="submissions.content.length > 0"
