@@ -492,6 +492,20 @@ const getSubmissionsCsv = async (req, res) => {
     .toArray();
 
   const headers = csvService.createHeaders(mergedObject, entities);
+
+  // Possible filter for header colunmns
+  // const filteredHeaders = headers.filter((header) => {
+  //   if (header.startsWith('meta')) {
+  //     return true;
+  //   }
+
+  //   if (header.includes('.meta')) {
+  //     return false;
+  //   }
+
+  //   return true;
+  // });
+
   const csv = csvService.createCsv(entities, headers);
   res.set('Content-Type', 'text/plain');
   return res.send(csv);
