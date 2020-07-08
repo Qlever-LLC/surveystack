@@ -321,7 +321,7 @@ export default {
       showDeleteModal: false,
       dateTableProps: {
         sortBy: [],
-        sortDesc: [false],
+        sortDesc: [],
       },
       loading: false,
     };
@@ -455,20 +455,23 @@ export default {
       this.fetchData();
     },
     onDataTablePropsChanged(props) {
-      const [sortBy] = props.sortBy;
-      if (sortBy && props.sortDesc.length > 0) {
+      const { sortBy, sortDesc } = props;
+      const sort = {};
+
+      if ((sortBy.length > 0 && sortDesc.length > 0) && sortBy.length === sortDesc.length) {
         try {
-          const [sortDesc] = props.sortDesc;
-          const sort = JSON.stringify({ [sortBy]: sortDesc ? -1 : 1 });
-          this.filter.sort = sort;
+          for (let i = 0; i < sortBy.length; i++) {
+            sort[sortBy[i]] = sortDesc[i] ? -1 : 1;
+          }
+          this.filter.sort = JSON.stringify(sort);
           this.fetchData();
         } catch (error) {
           console.log('error parsing sort');
         }
       }
 
-      if (!sortBy) {
-        this.filter.sort = JSON.stringify({});
+      if (sortBy.length === 0 && sortDesc.length === 0) {
+        this.filter.sort = JSON.stringify(sort);
         this.fetchData();
       }
 

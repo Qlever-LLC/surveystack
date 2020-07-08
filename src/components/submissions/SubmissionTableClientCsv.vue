@@ -16,6 +16,7 @@
         :server-items-length="submissions.pagination.total"
         @update:sort-by="onUpdateSortBy"
         @update:sort-desc="onUpdateSortDesc"
+        multi-sort
         :sort-by="dataTableProps.sortBy"
         :sort-desc="dataTableProps.sortDesc"
         :loading="loading"
@@ -64,7 +65,7 @@ export default {
       default() {
         return {
           sortBy: [],
-          sortDesc: [false],
+          sortDesc: [],
         };
       },
     },
