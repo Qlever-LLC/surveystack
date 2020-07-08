@@ -94,6 +94,7 @@
           color="primary"
         >QUERY!</v-btn>
       </div>
+
       <h4>API</h4>
       <a
         class="body-2"
@@ -101,47 +102,31 @@
         target="_blank"
       >{{apiDownloadUrl}}</a>
 
-      <v-radio-group
-        v-model="apiSelection"
-        row
-        dense
-        style="margin-top: 0px; margin-bottom: 0px"
-        hide-details
-      >
-        <v-radio
-          v-for="item in apiSelections"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        ></v-radio>
-      </v-radio-group>
-
-      <v-checkbox
-        label="current page"
-        v-model="downloadPageOnly"
-      />
-
-      <div class="d-flex align-center">
+      <div class="d-flex align-center justify-start mt-4">
         <v-select
           style="max-width: 5rem; display: inline-block"
           label="Format"
+          class="mr-3"
           dense
-          :items="pageSizes"
+          :items="apiDownloadFormats"
           hide-details
-          v-model="pageSize"
-          @change="changedPaginationSize"
+          v-model="apiDownloadFormat"
         ></v-select>
         <v-select
-          style="max-width: 5rem; display: inline-block"
-          label="Set"
+          style="max-width: 7rem; display: inline-block"
+          label="Range"
+          class="mr-3"
           dense
-          :items="pageSizes"
+          :items="apiDownloadRanges"
           hide-details
-          v-model="pageSize"
-          @change="changedPaginationSize"
+          v-model="apiDownloadRange"
         ></v-select>
-        <v-btn @click="startDownload">Download</v-btn>
-
+        <v-btn
+          @click="startDownload"
+          color="primary"
+        >
+          <v-icon left>mdi-download</v-icon>Download
+        </v-btn>
       </div>
 
       <v-card
@@ -292,7 +277,9 @@ const defaultFilter = {
   roles: '',
 };
 
-const apiSelections = [{ label: 'CSV', value: 'csv' }, { label: 'JSON', value: 'json' }];
+const apiDownloadFormats = [{ text: 'CSV', value: 'csv' }, { text: 'JSON', value: 'json' }];
+const apiDownloadRanges = [{ text: 'All data', value: 'all' }, { text: 'Page only', value: 'page' }];
+
 
 export default {
   components: {
@@ -305,8 +292,10 @@ export default {
   },
   data() {
     return {
-      apiSelection: apiSelections[0].value,
-      apiSelections,
+      apiDownloadFormat: apiDownloadFormats[0].value,
+      apiDownloadFormats,
+      apiDownloadRanges,
+      apiDownloadRange: apiDownloadRanges[0].value,
       showAdvancedFilters: false,
       tab: null,
       views: [
@@ -351,7 +340,6 @@ export default {
         sortDesc: [],
       },
       loading: false,
-      downloadPageOnly: true,
     };
   },
   computed: {
@@ -379,7 +367,7 @@ export default {
     },
     apiDownloadParams() {
       let params = `survey=${this.survey}&match=${this.filter.match}&sort=${this.filter.sort}&project=${this.filter.project}`;
-      if (this.downloadPageOnly) {
+      if (this.apiDownloadRange === 'page') {
         params += `&skip=${this.filter.skip}&limit=${this.filter.limit}`;
       } else {
         params += '&skip=0&limit=0';
@@ -399,7 +387,7 @@ export default {
     },
     apiEndpoint() {
       let endpoint;
-      switch (this.apiSelection) {
+      switch (this.apiDownloadFormat) {
         case 'csv':
           endpoint = '/api/submissions/csv';
           break;
