@@ -138,7 +138,6 @@
           <v-icon left>mdi-download</v-icon>Download
         </v-btn>
       </div>
-      <div class="body-2 text--secondary mt-1">total records: {{submissions.pagination.total}}</div>
 
       <v-card
         v-if="selected.length > 0"
@@ -192,25 +191,33 @@
 
     <v-container>
 
-      <div class="d-flex justify-end align-baseline">
-        <v-select
-          style="max-width: 5rem; display: inline-block"
-          label="Page Size"
-          dense
-          :items="pageSizes"
-          hide-details
-          v-model="pageSize"
-          @change="changedPaginationSize"
-        ></v-select>
-      </div>
-
-      <div class="py-2">
-        <v-pagination
-          v-model="page"
-          :length="paginationTotalPages"
-          @input="changedPaginationPage"
-        ></v-pagination>
-      </div>
+      <v-row class="mt-2">
+        <v-col cols="1">
+          <v-select
+            style="max-width: 5rem; display: inline-block"
+            label="Page Size"
+            dense
+            :items="pageSizes"
+            hide-details
+            v-model="pageSize"
+            @change="changedPaginationSize"
+          ></v-select>
+        </v-col>
+        <v-col cols="10">
+          <v-pagination
+            class="ml-0"
+            v-model="page"
+            :length="paginationTotalPages"
+            @input="changedPaginationPage"
+          ></v-pagination>
+        </v-col>
+        <v-col cols="1">
+          <div
+            class="body-2 text--secondary mt-1 d-flex align-center justify-end"
+            style="height: 100%"
+          >{{submissions.pagination.total}} total</div>
+        </v-col>
+      </v-row>
 
       <v-tabs v-model="
           tab">
@@ -243,13 +250,35 @@
           </v-tab-item>
         </v-tabs-items>
       </v-tabs>
-      <div class="text-center py-2">
-        <v-pagination
-          v-model="page"
-          :length="paginationTotalPages"
-          @input="changedPaginationPage"
-        ></v-pagination>
-      </div>
+
+      <v-row class="my-2">
+        <v-col cols="1">
+          <v-select
+            style="max-width: 5rem; display: inline-block"
+            label="Page Size"
+            dense
+            :items="pageSizes"
+            hide-details
+            v-model="pageSize"
+            @change="changedPaginationSize"
+          ></v-select>
+        </v-col>
+        <v-col cols="10">
+          <v-pagination
+            class="ml-0"
+            v-model="page"
+            :length="paginationTotalPages"
+            @input="changedPaginationPage"
+          ></v-pagination>
+        </v-col>
+        <v-col cols="1">
+          <div
+            class="body-2 text--secondary mt-1 d-flex align-center justify-end"
+            style="height: 100%"
+          >{{submissions.pagination.total}} total</div>
+        </v-col>
+      </v-row>
+
     </v-container>
 
   </div>
