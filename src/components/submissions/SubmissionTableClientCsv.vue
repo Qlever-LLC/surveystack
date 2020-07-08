@@ -190,4 +190,18 @@ export default {
 .archived {
   color: #777 !important;
 }
+
+.v-data-table >>> td {
+  white-space: nowrap;
+  /* max-width: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis; */
+}
+
+.v-data-table-truncated >>> td {
+  white-space: nowrap;
+  max-width: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 </style>
