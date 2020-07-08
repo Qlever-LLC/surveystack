@@ -37,6 +37,18 @@
           </v-toolbar>
         </template>
 
+        <!-- // need show-expand on v-data-table
+        <template v-slot:expanded-item="{ headers, item }">
+          <td></td>
+          <td></td>
+          <td
+            class="untruncated"
+            v-for="(value, idx) in item"
+            :key="idx"
+          >{{value}}</td>
+        </template>
+        -->
+
       </v-data-table>
     </v-card>
 
@@ -200,8 +212,15 @@ export default {
 
 .v-data-table-truncated >>> td {
   white-space: nowrap;
-  max-width: 1px;
+  max-width: 250px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+td.untruncated {
+  white-space: normal;
+  max-width: 250px;
+  overflow: visible;
+  text-overflow: unset;
 }
 </style>
