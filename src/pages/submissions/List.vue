@@ -121,7 +121,28 @@
         v-model="downloadPageOnly"
       />
 
-      <v-btn @click="startDownload">Download</v-btn>
+      <div class="d-flex align-center">
+        <v-select
+          style="max-width: 5rem; display: inline-block"
+          label="Format"
+          dense
+          :items="pageSizes"
+          hide-details
+          v-model="pageSize"
+          @change="changedPaginationSize"
+        ></v-select>
+        <v-select
+          style="max-width: 5rem; display: inline-block"
+          label="Set"
+          dense
+          :items="pageSizes"
+          hide-details
+          v-model="pageSize"
+          @change="changedPaginationSize"
+        ></v-select>
+        <v-btn @click="startDownload">Download</v-btn>
+
+      </div>
 
       <v-card
         v-if="selected.length > 0"
