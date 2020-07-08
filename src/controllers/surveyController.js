@@ -269,7 +269,7 @@ const getSurveyInfo = async (req, res) => {
 
   const submissions = await db
     .collection('submissions')
-    .find({ 'meta.survey.id': new ObjectId(id) })
+    .find({ 'meta.survey.id': new ObjectId(id), 'meta.archived': { $ne: true } })
     .count();
 
   const latestSubmissions = await db
