@@ -138,6 +138,7 @@
           <v-icon left>mdi-download</v-icon>Download
         </v-btn>
       </div>
+      <div class="body-2 text--secondary mt-1">total records: {{submissions.pagination.total}}</div>
 
       <v-card
         v-if="selected.length > 0"
@@ -192,7 +193,6 @@
     <v-container>
 
       <div class="d-flex justify-end align-baseline">
-        <div class="text--secondary mr-3">total {{submissions.pagination.total}} records</div>
         <v-select
           style="max-width: 5rem; display: inline-block"
           label="Page Size"
