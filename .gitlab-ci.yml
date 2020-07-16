@@ -2,9 +2,9 @@
 pages:
   stage: deploy
   script:
-    - git clone https://gitlab.com/our-sci/our-sci-pwa
+    - git clone https://gitlab.com/our-sci/our-sci-pwa.wiki
     - mkdir .public
-    - cp -r our-sci-pwa/* .public
+    - cp -r our-sci-pwa.wiki/* .public
     - mv .public public
   artifacts:
     paths:
