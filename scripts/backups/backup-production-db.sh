@@ -52,7 +52,7 @@ mongodump --out="$OUTFOLDER" --host="$PRODUCTION_HOST" --ssl --username="$PRODUC
 echo "##"
 echo "# Copying backup into local database $LOCAL_DB..."
 echo "##"
-mongorestore --nsFrom="$PRODUCTION_DB.*" --nsTo="$LOCAL_DB.*" "$OUTFOLDER"
+mongorestore --nsFrom="$PRODUCTION_DB.*" --nsTo="$LOCAL_DB.*" --drop "$OUTFOLDER"
 
 echo "##"
 echo "# DONE!"
