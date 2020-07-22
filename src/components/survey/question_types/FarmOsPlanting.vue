@@ -112,8 +112,20 @@ const hashItem = (listItem) => {
 };
 
 const transform = (assets) => {
+  console.log('transformassets', assets);
+
+  const withoutArea = [];
   const areas = {};
+
   assets.forEach((asset) => {
+    if (asset.value.location.length === 0) {
+      const tmp = Object.assign({}, asset);
+      tmp.value.hash = hashItem(asset);
+      console.log('tmp', tmp);
+      withoutArea.push(tmp);
+      return;
+    }
+
     asset.value.location.forEach((location) => {
       areas[`${asset.value.farmId}.${location.id}`] = {
         farmId: asset.value.farmId,
@@ -123,7 +135,7 @@ const transform = (assets) => {
     });
   });
 
-  return Object.keys(areas).flatMap((key) => {
+  const res = Object.keys(areas).flatMap((key) => {
     const area = areas[key];
 
     const matchedAssets = assets.filter((asset) => {
@@ -157,8 +169,41 @@ const transform = (assets) => {
       return r;
     });
 
+
     return [field, ...assetItems];
   });
+
+  /* const unassigned = {};
+  withoutArea.forEach((item) => {
+    if (!unassigned[item.farmId]) {
+      unassigned[item.farmId] = {
+        label: `<span class="blue-chip mr-4 ml-0 chip-no-wrap">${item.farmName}: Assets without field</span>`,
+        value: {
+          farmId: item.farmId,
+          farmName: item.farmName,
+          location: null,
+          isField: true,
+          hash: `UNASSIGNED:${item.farmId}`,
+        },
+        assets: [],
+      };
+    }
+
+    unassigned[item.farmId].assets.push({
+      farmId: item.farmId,
+      farmName: item.farmName,
+      location: null,
+      isField: false,
+      hash: `UNASSIGNED:${item.farmId}:${item.assetId}`,
+
+    });
+  }); */
+
+
+  res.push(...withoutArea);
+  console.log('res', res);
+
+  return res;
 };
 
 export default {
