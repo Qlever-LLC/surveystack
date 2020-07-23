@@ -5,7 +5,10 @@
         {{title}}
       </slot>
       <v-spacer />
-      <slot name="action-new" v-if="editable">
+      <slot
+        name="action-new"
+        v-if="editable"
+      >
         <v-btn
           color="primary"
           class="ml-4"
@@ -67,6 +70,9 @@ export default {
     },
     link: {
       type: Function,
+      default(e) {
+        return `/entity/${e._id}`;
+      },
     },
     labelNew: {
       type: String,

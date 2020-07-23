@@ -1,6 +1,9 @@
 <template>
   <v-app id="app">
+
     <app-navbar />
+    <div id="app-menu"></div>
+
     <v-content>
       <app-global-feedback />
       <router-view
