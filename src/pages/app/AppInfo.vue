@@ -2,7 +2,7 @@
   <v-container>
     <h1>App Info</h1>
     <p>Version <strong>{{version}}</strong><br />
-      Current commit ({{lcl.committer.relativeDate}}): <strong class="secondary--text">{{ showFullHash ? lcl.hash : lcl.shortHash }}</strong><a
+      Current commit: <strong class="secondary--text">{{ showFullHash ? lcl.hash : lcl.shortHash }}</strong><a
         @click="showFullHash = true"
         v-if="!showFullHash"
       >...</a> </p>
