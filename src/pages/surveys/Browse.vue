@@ -56,7 +56,7 @@
     </v-tabs>
     <v-card
       class="my-2"
-      v-if="activeTab === 'active-group' && pinnedSurveys.length"
+      v-if="activeTab === 'active-group' && pinnedSurveys.length && pinnedIsVisible"
     >
       <v-card-text>
         <div
@@ -162,6 +162,7 @@ export default {
       page: 1,
       search: '',
       pinnedSurveys: [],
+      pinnedIsVisible: true,
       surveys: {
         content: [],
         pagination: {
@@ -236,8 +237,13 @@ export default {
     },
   },
   watch: {
-    search() {
+    search(value) {
       this.fetchData();
+      if (value) {
+        this.pinnedIsVisible = false;
+      } else {
+        this.pinnedIsVisible = true;
+      }
     },
     // TODO: reimplement with @change listener instead of watch
     async activeTab(value) {
@@ -264,15 +270,16 @@ export default {
     },
     async getDataForTab(tab) {
       switch (tab) {
-        case 'active-group-pinned-surveys':
-          this.surveys = await this.fetchPinnedSurveys(this.activeGroupId);
-          break;
+        // case 'active-group-pinned-surveys':
+        //   this.surveys = await this.fetchPinnedSurveys(this.activeGroupId);
+        //   break;
         case 'active-group':
           // eslint-disable-next-line no-case-declarations
           const [pinnedResponse, response] = await Promise.all([
             this.fetchPinnedSurveys(this.activeGroupId),
             this.fetchData({ groups: [this.activeGroupId] }),
           ]);
+
 
           // this.surveys.content = uniqBy([
           //   ...pinnedResponse.map(r => ({ ...r, pinned: true })),
@@ -282,11 +289,14 @@ export default {
           //   ...response.pagination,
           //   total: this.surveys.content.length,
           // };
-          this.surveys = response;
-          this.pinnedSurveys = pinnedResponse.map(r => ({ ...r, pinned: true }));
+
+
+          // this.surveys = response;
+          // this.pinnedSurveys = pinnedResponse.map(r => ({ ...r, pinned: true }));
           break;
         case 'my-surveys':
-          this.surveys = await this.fetchData({ user: this.$store.getters['auth/user']._id });
+          // this.surveys = await this.fetchData({ user: this.$store.getters['auth/user']._id });
+          await this.fetchData({ user: this.$store.getters['auth/user']._id });
           break;
         case 'my-groups':
           this.surveys = await this.fetchData({
@@ -313,30 +323,42 @@ export default {
       }
       if (this.search) {
         queryParams.append('q', this.search);
+        console.log(this.search);
       }
 
       queryParams.append('skip', (this.page - 1) * PAGINATION_LIMIT);
       queryParams.append('limit', PAGINATION_LIMIT);
 
       try {
-        // const { data } = await api.get(`/surveys/page?${queryParams}`);
-        const { data } = await api.get(`/surveys/list-page?${queryParams}`);
+        const { data } = await api.get(`/surveys/page?${queryParams}`);
+        this.surveys = data;
         return data;
       } catch (e) {
         // TODO: use cached data?
         console.log('Error fetching surveys:', e);
       }
-      return [];
+      // return [];
+      return {
+        content: [],
+        pagination: {
+          parsedLimit: 10,
+          parsedSkip: 0,
+          total: 0,
+        },
+      };
     },
     async fetchPinnedSurveys(groupId) { // TODO replace with new store action (?)
       try {
+        console.log('fetch pinned');
         const { data } = await api.get(`/groups/${groupId}?populate=1`);
         if (data && data.surveys && data.surveys.pinned && Array.isArray(data.surveys.pinned)) {
-          return data.surveys.pinned;
+          this.pinnedSurveys = data.surveys.pinned.map(r => ({ ...r, pinned: true }));
+          return this.pinnedSurveys;
         }
       } catch (err) {
         console.log('Error fetching surveys:', err);
       }
+      this.pinnedSurveys = [];
       return [];
     },
   },
