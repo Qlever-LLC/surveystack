@@ -26,10 +26,7 @@
           v-if="pinned && pinned.length > 0"
           :entities="pinned"
           title="Get started with your surveys!"
-          linkNew="/surveys/browse"
-          labelNew="View all..."
           :link="e => `/surveys/${e.id}`"
-          editable
         >
           <template v-slot:entity="{ entity }">
             <v-list-item-content>
