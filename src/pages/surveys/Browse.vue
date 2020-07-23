@@ -1,17 +1,6 @@
 <template>
   <v-container>
-    <div class="px-5 py-2">
-      <v-text-field
-        v-model="search"
-        label="Search"
-        append-icon="mdi-magnify"
-      />
-      <div class="d-flex justify-end mb-4">
-        <small class="text--secondary">
-          {{surveys.pagination.total}} results
-        </small>
-      </div>
-    </div>
+
     <v-tabs
       v-model="activeTab"
       fixed-tabs
@@ -86,6 +75,7 @@
         </div>
       </v-card-text>
     </v-card>
+
     <v-card
       min-height="60vh"
       class="d-flex flex-column"
@@ -94,7 +84,18 @@
 
       </v-card-title>
       <v-card-text class="flex-grow-1">
-
+        <div class="px-5 py-2">
+          <v-text-field
+            v-model="search"
+            label="Search"
+            append-icon="mdi-magnify"
+          />
+          <div class="d-flex justify-end mb-4">
+            <small class="text--secondary">
+              {{surveys.pagination.total}} results
+            </small>
+          </div>
+        </div>
         <div
           v-for="(e, i) in surveys.content"
           :key="e._id"
