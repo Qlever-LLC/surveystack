@@ -1,10 +1,7 @@
 <template>
   <v-container>
-    <v-layout
-      text-center
-      wrap
-    >
-      <v-flex xs12>
+    <v-row>
+      <v-col>
         <v-img
           v-if="appPartner"
           :src="appPartner.logo"
@@ -19,64 +16,63 @@
           contain
           height="128"
         ></v-img>
-      </v-flex>
+      </v-col>
+    </v-row>
 
-      <v-flex my-2>
-        <div class="display-1">Get started with your surveys!</div>
-        <app-login v-if="!isLoggedIn"></app-login>
-        <div
-          v-else
-          class="ma-8"
+    <v-row>
+      <v-col align="center">
+        <app-basic-list
+          class="mw-40 text-left"
+          v-if="pinned && pinned.length > 0"
+          :entities="pinned"
+          title="Get started with your surveys!"
+          linkNew="/surveys/browse"
+          labelNew="View all..."
+          :link="e => `/surveys/${e.id}`"
+          editable
         >
-          <div
-            v-for="(p, idx) in pinned"
-            :key="'pinned_'+idx"
-            class="my-2"
-          >
-            <v-btn
-              rounded
-              dark
-              color="primary"
-              x-large
-              class="pa-4"
-              style="max-width: 100%; white-space: normal; height: 100%"
-              :to="`/surveys/${p.id}`"
-            >{{ p.group }}: {{ p.name }}</v-btn>
-          </div>
-        </div>
+          <template v-slot:entity="{ entity }">
+            <v-list-item-content>
+              <v-list-item-title>{{entity.name}}</v-list-item-title>
+              <v-list-item-subtitle>{{entity.group}}</v-list-item-subtitle>
+
+            </v-list-item-content>
+          </template>
+        </app-basic-list>
+      </v-col>
+    </v-row>
+
+    <app-login v-if="!isLoggedIn"></app-login>
+
+    <v-row>
+      <v-col align="center">
+        <v-btn
+          x-large
+          text
+          :to="`/surveys/browse`"
+        >Browse All Surveys</v-btn>
+      </v-col>
+    </v-row>
+
+    <v-row v-if="showInstall">
+      <v-col align="center">
         <v-btn
           color="primary"
           x-large
-          outlined
-          :to="`/surveys/browse`"
-        >Browse All</v-btn>
+          @click="install"
+        >Install App</v-btn>
+      </v-col>
+    </v-row>
 
-        <div
-          class="ma-8"
-          v-if="showInstall"
-        >
-          <v-btn
-            color="primary"
-            x-large
-            @click="install"
-          >Install App</v-btn>
-        </div>
-      </v-flex>
-
-    </v-layout>
-
-    <v-layout
-      text-center
-      wrap
-      class="mt-12"
-    >
-      <v-flex>
+    <v-row>
+      <v-col align="center">
         <v-chip
           style="font-family: monospace"
           to="/app/info"
         >v{{ version }}</v-chip>
-      </v-flex>
-    </v-layout>
+      </v-col>
+    </v-row>
+
   </v-container>
 </template>
 
@@ -84,10 +80,12 @@
 // @ is an alias to /src
 
 import AppLogin from '@/pages/auth/Login.vue';
+import AppBasicList from '@/components/ui/BasicList.vue';
 
 export default {
   components: {
     AppLogin,
+    AppBasicList,
   },
   name: 'home',
   data() {
