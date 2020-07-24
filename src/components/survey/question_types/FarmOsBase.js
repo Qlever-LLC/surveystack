@@ -68,7 +68,7 @@ const base = type => ({
           // '9' => { actualResponse of FarmosInstance}
           const firstKey = Object.keys(f.data)[0];
           const data = f.data[firstKey];
-          return data.filter(asset => asset.type === 'planting').map(planting => ({
+          return data.filter(asset => asset.type === 'planting' && asset.archived === '0').map(planting => ({
             label: `<span class="blue-chip mr-4">${f.farm}</span> ${planting.name} `,
             value: {
               farmName: f.farm.trim(),
@@ -77,6 +77,7 @@ const base = type => ({
               assetId: planting.id,
               location: planting.location,
               farmId: firstKey,
+              archived: planting.archived !== '0',
             },
           }));
         });
