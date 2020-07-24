@@ -210,7 +210,7 @@ const transform = (assets) => {
       location: null,
       isField: true,
     },
-    label: '<span class="blue-chip mr-4 ml-0 chip-no-wrap">Fields without Area</span>',
+    label: '<span class="blue-chip mr-4 ml-0 chip-no-wrap">Plantings without Area</span>',
   };
 
   res.push(withoutAreaSection, ...withoutArea);
