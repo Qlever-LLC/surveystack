@@ -105,6 +105,9 @@ const hashItem = (listItem) => {
 
   const { value } = listItem;
   if (value.isField) {
+    if (!value.farmId) {
+      return 'NOT_ASSIGNED';
+    }
     return `FIELD:${value.farmId}.${value.location.id}`;
   }
 
@@ -121,10 +124,10 @@ const transform = (assets) => {
     if (asset.value.location.length === 0) {
       const tmp = Object.assign({}, asset);
       tmp.value.hash = hashItem(asset);
-      console.log('tmp', tmp);
       withoutArea.push(tmp);
       return;
     }
+
 
     asset.value.location.forEach((location) => {
       areas[`${asset.value.farmId}.${location.id}`] = {
@@ -200,7 +203,17 @@ const transform = (assets) => {
   }); */
 
 
-  res.push(...withoutArea);
+  const withoutAreaSection = {
+    value: {
+      farmId: null,
+      farmName: null,
+      location: null,
+      isField: true,
+    },
+    label: '<span class="blue-chip mr-4 ml-0 chip-no-wrap">Plantings without Area</span>',
+  };
+
+  res.push(withoutAreaSection, ...withoutArea);
   console.log('res', res);
 
   return res;

@@ -43,7 +43,7 @@
           class="mt-3"
           v-model="entity.meta.invitationEmail"
           label="Invitation Email"
-          disabled
+          :disabled="entity.meta.status === 'active'"
         />
 
         <v-select
@@ -54,16 +54,6 @@
         ></v-select>
 
         <div class="d-flex mt-2">
-          <div v-if="entity.meta.status === 'pending'">
-            <v-btn
-              color="secondary"
-              outlined
-              @click="resend"
-            >
-              <v-icon left>mdi-email-send-outline</v-icon> Resend
-            </v-btn><br />
-            <span class="caption text--secondary">{{entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Not yet sent'}}</span>
-          </div>
           <v-btn
             class="ml-auto"
             text
@@ -77,7 +67,39 @@
       </v-form>
     </v-card>
 
-    <v-card>
+    <v-card
+      class="my-3 pa-2"
+      v-if="resendEnabled"
+    >
+      <v-card-title>
+        <v-icon left>mdi-account-clock</v-icon>Pending
+      </v-card-title>
+      <v-card-subtitle>Membership has not been claimed</v-card-subtitle>
+      <v-card-text>
+        You can try to resend the invitation via email. You may also view the secret invitation link and deliver it by other means.
+      </v-card-text>
+      <v-card-actions class="d-flex justify-space-between align-center">
+        <div>
+          <v-btn
+            color="primary"
+            @click="resend"
+          >
+            <v-icon left>mdi-email-send-outline</v-icon> Resend
+          </v-btn>
+          <span class="ml-1 caption text--secondary">{{entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Not yet sent'}}</span>
+        </div>
+        <div>
+          <v-btn
+            @click="dialogInvitationLink = true"
+            color="primary"
+          >
+            <v-icon left>mdi-eye-outline</v-icon>View
+          </v-btn>
+        </div>
+      </v-card-actions>
+    </v-card>
+
+    <v-card class="my-3">
       <app-integration-list
         title="Membership Integrations"
         :entities="integrations"
@@ -138,12 +160,24 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <app-dialog
+      v-model="dialogInvitationLink"
+      title="Invitation Link"
+    >
+      <p>
+        Copy the following secret invitation link. It can be used to claim this membership - either by creating a new user account, or by using an already existing user account.
+      </p>
+
+      <span class="body-1">{{invitationLink}}</span>
+    </app-dialog>
   </v-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
 import appIntegrationList from '@/components/integrations/IntegrationList.vue';
+import appDialog from '@/components/ui/Dialog.vue';
 
 const availableRoles = [
   {
@@ -170,6 +204,7 @@ const availableStatus = [
 export default {
   components: {
     appIntegrationList,
+    appDialog,
   },
   data() {
     return {
@@ -186,7 +221,27 @@ export default {
       integrations: [],
       dialogRemoval: false,
       dialogSent: false,
+      initialInvitationEmail: null,
+      dialogInvitationLink: false,
     };
+  },
+  watch: {
+    'entity.meta.invitationEmail': function (newVal, oldVal) {
+      if (!oldVal) {
+        this.initialInvitationEmail = newVal;
+      }
+    },
+  },
+  computed: {
+    resendEnabled() {
+      if (this.entity.meta.status === 'pending' && this.initialInvitationEmail === this.entity.meta.invitationEmail) {
+        return true;
+      }
+      return false;
+    },
+    invitationLink() {
+      return `${window.location.origin}/invitations?code=${this.entity.meta.invitationCode}`;
+    },
   },
   methods: {
     cancel() {

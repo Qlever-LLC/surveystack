@@ -5,7 +5,7 @@
   >
     <v-card>
       <v-card-title class="headline">
-        <slot name="title">Header slot content</slot>
+        <slot name="title">{{title}}</slot>
       </v-card-title>
       <v-card-text>
         <slot name="default">Default slot content</slot>
@@ -31,6 +31,10 @@ export default {
     value: Boolean,
     labelConfirm: String,
     width: [String, Number],
+    title: {
+      type: String,
+      default: 'Dialog title',
+    },
   },
   computed: {
     show: {
