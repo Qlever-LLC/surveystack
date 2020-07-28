@@ -112,7 +112,7 @@ async function log(
     );
 
     const response = r[0];
-    if (response == null) {
+    if (response === null) {
       results.push({
         status: 'error',
         error: {
@@ -122,6 +122,8 @@ async function log(
           },
         },
       });
+    } else {
+      results.push(response);
     }
   }
 

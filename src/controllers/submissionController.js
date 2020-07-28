@@ -380,10 +380,7 @@ const getSubmissionsPage = async (req, res) => {
 
   pipeline.push(...paginationStages);
 
-  const [entities] = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  const [entities] = await db.collection(col).aggregate(pipeline).toArray();
 
   if (!entities) {
     return res.send({
@@ -436,10 +433,7 @@ const getSubmissions = async (req, res) => {
     }
   }
 
-  const entities = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  const entities = await db.collection(col).aggregate(pipeline).toArray();
 
   return res.send(entities);
 };
@@ -476,10 +470,7 @@ const getSubmissionsCsv = async (req, res) => {
     }
   }
 
-  const entities = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  const entities = await db.collection(col).aggregate(pipeline).toArray();
 
   const [mergedObject] = await db
     .collection(col)
@@ -558,10 +549,7 @@ const getSubmission = async (req, res) => {
   const redactStage = createRedactStage(user, roles);
   pipeline.push(redactStage);
 
-  const [entity] = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  const [entity] = await db.collection(col).aggregate(pipeline).toArray();
   if (!entity) {
     throw boom.notFound(`No entity found for id: ${id}`);
   }
@@ -633,6 +621,26 @@ const updateSubmission = async (req, res) => {
   // update with upped revision
   entity.meta.revision = updatedRevision;
 
+  const survey = await db.collection('surveys').findOne({ _id: entity.meta.survey.id });
+  if (!survey) {
+    throw boom.notFound(`No survey found with id: ${entity.meta.survey.id}`);
+  }
+
+  const farmosResults = [];
+  try {
+    const results = await farmOsService.handle(res, entity, survey, res.locals.auth.user);
+    farmosResults.push(...results);
+    // could contain errors, need to pass these on to the user
+  } catch (error) {
+    // TODO what should we do if something internal fails?
+    // need to let the user somehow know
+    console.log('error handling farmos', error);
+    return res.status(503).send({
+      message: `error submitting to farmos ${error}`,
+      farmos: error.messages,
+    });
+  }
+
   const updated = await db.collection(col).findOneAndUpdate(
     { _id: new ObjectId(id) },
     { $set: entity },
@@ -640,6 +648,7 @@ const updateSubmission = async (req, res) => {
       returnOriginal: false,
     }
   );
+  updated.value.farmos = farmosResults;
   return res.send(updated.value);
 };
 

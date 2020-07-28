@@ -162,7 +162,6 @@ async function execute(apiCompose, info, terms, user, submission, currentAssetId
 }
 
 export const handle = async (res, submission, survey, user) => {
-
   const surveyVersion = submission.meta.survey.version;
 
   const { controls } = survey.revisions.find((revision) => revision.version === surveyVersion);
@@ -198,7 +197,7 @@ export const handle = async (res, submission, survey, user) => {
   });
 
   console.log('farmOsCompose', farmOsCompose);
-  if(farmOsCompose.length === 0){
+  if (farmOsCompose.length === 0) {
     return [];
   }
 
@@ -209,9 +208,11 @@ export const handle = async (res, submission, survey, user) => {
       const r = await execute(apiCompose, info, terms, user, submission, currentAssetId);
       if (Array.isArray(r)) {
         results.push(...r);
+        console.log('results interim after array spread', results);
         return r;
       } else {
         results.push(r);
+        console.log('results interim after single add', results);
         return [r];
       }
     } catch (error) {
@@ -260,7 +261,7 @@ export const handle = async (res, submission, survey, user) => {
         }
 
         if (item.resource === 'farm_asset') {
-          console.log("using asset id", item.id)
+          console.log('using asset id', item.id);
           currentAssetId = item.id;
         }
       });
