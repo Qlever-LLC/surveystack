@@ -5,7 +5,6 @@ import boom from '@hapi/boom';
 
 import { db } from '../db';
 
-import { populate } from '../helpers';
 import rolesService from '../services/roles.service';
 
 const col = 'integrations.groups';

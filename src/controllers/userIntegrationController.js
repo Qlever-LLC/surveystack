@@ -1,15 +1,11 @@
 import { ObjectId } from 'mongodb';
 import assert from 'assert';
 
-import boom from '@hapi/boom';
-
 import { db } from '../db';
-
-import { populate } from '../helpers';
 
 const col = 'integrations.users';
 
-const sanitizeIntegration = entity => {
+const sanitizeIntegration = (entity) => {
   entity._id = new ObjectId(entity._id);
   return true;
 };

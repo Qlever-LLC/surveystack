@@ -5,7 +5,7 @@ import { ObjectId } from 'mongodb';
 
 import { db } from '../db';
 
-import { populate } from '../helpers';
+import { queryParam } from '../helpers';
 import mailService from '../services/mail.service';
 import membershipService from '../services/membership.service';
 import rolesService from '../services/roles.service';
@@ -91,7 +91,7 @@ const getMemberships = async (req, res) => {
   }
 
   const pipeline = [{ $match: filter }];
-  if (populate(req)) {
+  if (queryParam(req.query.populate)) {
     pipeline.push(...createPopulationPipeline());
   }
 
@@ -174,7 +174,7 @@ const getMembership = async (req, res) => {
 
   const pipeline = [{ $match: filter }];
 
-  if (populate(req)) {
+  if (queryParam(req.query.populate)) {
     pipeline.push(...createPopulationPipeline());
   }
   const [entity] = await db

@@ -1,11 +1,7 @@
 import { ObjectId } from 'mongodb';
 import assert from 'assert';
 
-import boom from '@hapi/boom';
-
 import { db } from '../db';
-
-import { populate } from '../helpers';
 
 const col = 'integrations.memberships';
 

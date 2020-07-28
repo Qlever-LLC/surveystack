@@ -197,7 +197,7 @@ const buildPipeline = async (req, res) => {
 
   // archived
   const archivedMatch = { 'meta.archived': { $ne: true } };
-  if (req.query.showArchived && req.query.showArchived === 'true') {
+  if (queryParam(req.query.showArchived)) {
     archivedMatch['meta.archived'] = true;
   }
   pipeline.push({ $match: archivedMatch });
@@ -232,7 +232,7 @@ const buildPipeline = async (req, res) => {
 
   // Add creator details if request has admin rights on survey.
   // However, don't add creator details if pure=1 is set (e.g. for re-submissions)
-  if (user && req.query.survey && !queryParam(req.pure)) {
+  if (user && req.query.survey && !queryParam(req.query.pure)) {
     const survey = await db.collection('surveys').findOne({ _id: new ObjectId(req.query.survey) });
     const groupId = survey.meta.group.id;
     const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
@@ -532,7 +532,7 @@ const getSubmission = async (req, res) => {
 
   // Add creator details if request has admin rights on survey.
   // However, don't add creator details if pure=1 is set (e.g. for re-submissions)
-  if (user && !queryParam(req.pure)) {
+  if (user && !queryParam(req.query.pure)) {
     const groupId = res.locals.existing.meta.group.id;
     const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
 

@@ -7,8 +7,6 @@ import boom from '@hapi/boom';
 
 import { db } from '../db';
 
-import { populate } from '../helpers';
-
 const col = 'users';
 
 const getUsers = async (req, res) => {

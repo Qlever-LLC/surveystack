@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
-import { populate } from '../helpers';
+import { queryParam } from '../helpers';
 
 import membershipService from '../services/membership.service';
 import rolesService from '../services/roles.service';
@@ -149,7 +149,7 @@ const getGroupByPath = async (req, res) => {
 
   const pipeline = [{ $match: { path } }];
 
-  if (populate(req)) {
+  if (queryParam(req.query.populate)) {
     pipeline.push(...createPinnedSurveysPopulationStages());
   }
 
@@ -171,7 +171,7 @@ const getGroupById = async (req, res) => {
   const { id } = req.params;
   const pipeline = [{ $match: { _id: new ObjectId(id) } }];
 
-  if (populate(req)) {
+  if (queryParam(req.query.populate)) {
     pipeline.push(...createPinnedSurveysPopulationStages());
   }
 
