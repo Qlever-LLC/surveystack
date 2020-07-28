@@ -159,7 +159,6 @@ export default {
     return {
       selectedGroupIds: [],
       activeTab: null,
-      // groups: null,
       page: 1,
       search: '',
       pinnedSurveys: [],
@@ -172,17 +171,11 @@ export default {
           limit: 100000,
         },
       },
-
       surveysForCurrentGroup: null,
     };
   },
   computed: {
-    // activeTabHasMorePages() {
-    //   return this.surveys
-    //     && this.surveys.pagination
-    //     && this.surveys.pagination.total
-    //     && this.surveys.pagination.total > limit;
-    // }
+
     tabs() {
       const commonTabs = [
         {
