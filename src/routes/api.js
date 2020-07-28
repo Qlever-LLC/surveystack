@@ -67,21 +67,9 @@ router.put(
 router.delete('/groups/:id', assertAuthenticated, catchErrors(groupController.deleteGroup));
 
 /** Submissions */
-router.get(
-  '/submissions',
-  [assertHasSurveyParam],
-  catchErrors(submissionController.getSubmissions)
-);
-router.get(
-  '/submissions/page',
-  [assertHasSurveyParam],
-  catchErrors(submissionController.getSubmissionsPage)
-);
-router.get(
-  '/submissions/csv',
-  [assertHasSurveyParam],
-  catchErrors(submissionController.getSubmissionsCsv)
-);
+router.get('/submissions', catchErrors(submissionController.getSubmissions));
+router.get('/submissions/page', catchErrors(submissionController.getSubmissionsPage));
+router.get('/submissions/csv', catchErrors(submissionController.getSubmissionsCsv));
 router.post(
   '/submissions/:id/archive',
   [assertAuthenticated, assertEntityExists({ collection: 'submissions' }), assertEntityRights],
