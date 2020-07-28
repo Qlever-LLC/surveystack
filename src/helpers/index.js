@@ -9,9 +9,9 @@ export const populate = (req) => {
   return false;
 };
 
-export const queryParam = (req, param) => {
-  if (req.query[param]) {
-    const p = req.query[param].toLowerCase();
+export const queryParam = (param) => {
+  if (param) {
+    const p = param.toLowerCase();
     if (p === '1' || p === 'true' || p === 'yes' || p === 'y') {
       return true;
     }
