@@ -15,7 +15,8 @@
           <router-link
             to="/"
             id="home-link"
-          >{{appTitle}}</router-link>
+            v-html="appTitle"
+          />
         </div>
         <div
           class="app-bar-subtitle subtitle py-0 my-0"
