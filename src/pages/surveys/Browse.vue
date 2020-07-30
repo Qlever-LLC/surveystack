@@ -330,7 +330,7 @@ export default {
       queryParams.append('limit', PAGINATION_LIMIT);
 
       try {
-        const { data } = await api.get(`/surveys/page?${queryParams}`);
+        const { data } = await api.get(`/surveys/list-page?${queryParams}`);
         this.surveys = data;
         return data;
       } catch (e) {
