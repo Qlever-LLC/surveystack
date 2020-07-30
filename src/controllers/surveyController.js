@@ -190,7 +190,7 @@ const getSurveyPage = async (req, res) => {
 
   const entities = await db
     .collection(col)
-    .aggregate(pipeline, { allowDiskUse: true })
+    .aggregate(pipeline)
     .toArray();
 
   // empty array when ther is no match
