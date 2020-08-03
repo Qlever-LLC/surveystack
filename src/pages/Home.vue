@@ -61,6 +61,16 @@
       </v-col>
     </v-row>
 
+    <v-row v-if="false">
+      <v-col align="center">
+        <v-btn
+          color="primary"
+          x-large
+          href="surveystack://measurement"
+        >Run Measurement</v-btn>
+      </v-col>
+    </v-row>
+
     <v-row>
       <v-col align="center">
         <v-chip
@@ -76,6 +86,7 @@
 <script>
 // @ is an alias to /src
 
+import axios from 'axios';
 import AppLogin from '@/pages/auth/Login.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
 
@@ -100,6 +111,10 @@ export default {
     install() {
       this.installPrompt.prompt();
     },
+    async focused() {
+      const res = await axios.get('http://localhost:9095/measurement');
+      console.log('result', res.data);
+    },
   },
   computed: {
     appPartner() {
@@ -113,7 +128,8 @@ export default {
       return pinned;
     },
   },
-  created() {
+
+  async created() {
     if (!localStorage.installed) {
       window.addEventListener('beforeinstallprompt', (e) => {
         console.log('beforeinstall');
@@ -128,6 +144,11 @@ export default {
       window.addEventListener('appinstalled', (evt) => {
         localStorage.installed = true;
       });
+
+      window.addEventListener('focus', this.focused);
+
+      // const res = await axios.get('http://localhost:9095/measurement');
+      // console.log('res', res);
     }
   },
 };
