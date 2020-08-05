@@ -666,21 +666,25 @@ const updateSubmission = async (req, res) => {
 
 const archiveSubmission = async (req, res) => {
   const { id } = req.params;
-  let set = true;
+  const { reason } = req.query;
+  let archived = true;
 
   if (req.query.set) {
     if (req.query.set === 'false' || req.query.set === '0') {
-      set = false;
+      archived = false;
     }
   }
 
-  const updated = await db.collection(col).findOneAndUpdate(
-    { _id: new ObjectId(id) },
-    { $set: { 'meta.archived': set } },
-    {
-      returnOriginal: false,
-    }
-  );
+  const update = { $set: { 'meta.archived': archived } };
+  if (archived) {
+    update['$set']['meta.archivedReason'] = reason;
+  } else {
+    update['$unset'] = { 'meta.archivedReason': '' };
+  }
+
+  const updated = await db.collection(col).findOneAndUpdate({ _id: new ObjectId(id) }, update, {
+    returnOriginal: false,
+  });
 
   return res.send(updated);
 };
