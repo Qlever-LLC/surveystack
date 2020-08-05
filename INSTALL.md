@@ -126,7 +126,7 @@ $ pm2 startup
 We can now proceed to start the server through pm2, and also make sure to **save** the list of application so that it will **auto-start on boot**.
 
 ```
-$ pm2 start "yarn prod" --name "surveystack-production"
+$ pm2 start "yarn prod" --time --name "surveystack-production"
 $ pm2 list
 $ pm2 save
 ```
