@@ -215,10 +215,7 @@ import {
 } from 'lodash';
 import { Splitpanes, Pane } from 'splitpanes';
 
-
-import ObjectId from 'bson-objectid';
 import moment from 'moment';
-import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
 
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';

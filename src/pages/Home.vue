@@ -112,8 +112,8 @@ export default {
       this.installPrompt.prompt();
     },
     async focused() {
-      const res = await axios.get('http://localhost:9095/measurement');
-      console.log('result', res.data);
+      // const res = await axios.get('http://localhost:9095/measurement');
+      // console.log('result', res.data);
     },
   },
   computed: {
