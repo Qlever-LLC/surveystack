@@ -2,6 +2,7 @@
   <v-dialog
     v-model="show"
     :width="width"
+    :max-width="maxWidth"
   >
     <v-card>
       <v-card-title class="headline">
@@ -34,6 +35,10 @@ export default {
     title: {
       type: String,
       default: 'Dialog title',
+    },
+    maxWidth: {
+      type: [String, Number],
+      default: '',
     },
   },
   computed: {

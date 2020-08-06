@@ -2,12 +2,26 @@
   <div>
     <app-dialog
       v-model="showArchiveModal"
+      maxWidth="50rem"
+      labelConfirm="Archive"
       @cancel="showArchiveModal = false"
       @confirm="archiveSubmission(selected[0])"
     >
       <template v-slot:title>Confirm archiving</template>
       <template>
-        Do you want to archive this submission?
+
+        <h3 class="mt-3">Please choose an archive reason</h3>
+        <v-select
+          v-model="archiveReason"
+          :items="availableArchiveReasons"
+          outlined
+        />
+        <v-text-field
+          v-if="archiveReason === 'OTHER'"
+          label="Please specify other reason"
+          v-model="archiveReasonOther"
+          outlined
+        />
       </template>
     </app-dialog>
 
@@ -379,6 +393,15 @@ export default {
         sortDesc: [],
       },
       loading: false,
+      archiveReason: 'TEST_DATA',
+      archiveReasonOther: '',
+      availableArchiveReasons: [
+        'TEST_DATA',
+        'INCORRECT_DATA',
+        'EQUIPMENT_ERROR',
+        'USER_ERROR',
+        'OTHER',
+      ],
     };
   },
   computed: {
@@ -476,9 +499,14 @@ export default {
       }
     },
     async archiveSubmission(submission, value = true) {
+      let reason = this.archiveReason;
+      if (this.archiveReason === 'OTHER' && this.archiveReasonOther) {
+        reason = this.archiveReasonOther;
+      }
+
       this.showArchiveModal = false;
       try {
-        const { data: archived } = await api.post(`/submissions/${submission._id}/archive?set=${value}`);
+        const { data: archived } = await api.post(`/submissions/${submission._id}/archive?set=${value}&reason=${reason}`);
         this.selected = [];
         this.fetchData();
       } catch (err) {

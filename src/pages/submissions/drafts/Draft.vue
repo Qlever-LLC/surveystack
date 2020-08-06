@@ -34,11 +34,23 @@
       Are you sure you want to exit this draft?
     </confirm-leave-dialog>
 
-    <confirm-edit-submitted-dialog
+    <app-submission-archive-dialog
       v-if="submission && survey"
-      v-model="confirmEditSubmittedIsVisible"
-      @abort="abortEditSubmitted"
-    />
+      v-model="showResubmissionDialog"
+      maxWidth="50rem"
+      labelConfirm="Edit anyway"
+      @cancel="abortEditSubmitted"
+      @confirm="(reason) => submission.meta.archivedReason = reason"
+      reason="RESUBMIT"
+    >
+      <template v-slot:title>Confirm Submission Edit</template>
+      <template>
+        This draft has previously been submitted. Are you sure you want to edit it?
+        Submitting again will archive the original submission.
+        <h3 class="mt-3">Please choose a reason</h3>
+
+      </template>
+    </app-submission-archive-dialog>
 
     <submitting-dialog v-model="submitting" />
     <result-dialog
@@ -64,8 +76,8 @@ import resultMixin from '@/components/ui/ResultsMixin';
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
-import ConfirmEditSubmittedDialog from '@/components/survey/drafts/ConfirmEditSubmittedDialog.vue';
 import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
+import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 
 
 export default {
@@ -74,8 +86,8 @@ export default {
     appDraftComponent,
     resultDialog,
     ConfirmLeaveDialog,
-    ConfirmEditSubmittedDialog,
     SubmittingDialog,
+    appSubmissionArchiveDialog,
   },
   data() {
     return {
@@ -85,7 +97,7 @@ export default {
       submitting: false,
       isSubmitted: false,
       hasError: false,
-      confirmEditSubmittedIsVisible: false,
+      showResubmissionDialog: false,
     };
   },
   methods: {
@@ -164,7 +176,7 @@ export default {
     }
 
     if (this.submission && this.submission.meta && this.submission.meta.dateSubmitted) {
-      this.confirmEditSubmittedIsVisible = true;
+      this.showResubmissionDialog = true;
     }
 
     this.survey = await this.$store.dispatch(
