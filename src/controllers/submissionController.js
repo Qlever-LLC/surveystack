@@ -627,7 +627,7 @@ const updateSubmission = async (req, res) => {
   existing._id = new ObjectId();
   existing.meta.original = new ObjectId(id);
   existing.meta.archived = true;
-  existing.meta.archivedReason = 'RESUBMIT';
+  existing.meta.archivedReason = entity.meta.archivedReason || 'RESUBMIT';
   await db.collection(col).insertOne(existing);
 
   // update with upped revision
