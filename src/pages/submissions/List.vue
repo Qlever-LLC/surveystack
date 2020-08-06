@@ -1,29 +1,14 @@
 <template>
   <div>
-    <app-dialog
+    <app-submission-archive-dialog
       v-model="showArchiveModal"
       maxWidth="50rem"
       labelConfirm="Archive"
       @cancel="showArchiveModal = false"
-      @confirm="archiveSubmission(selected[0])"
+      @confirm="(reason) => archiveSubmission(selected[0], reason)"
     >
-      <template v-slot:title>Confirm archiving</template>
-      <template>
-
-        <h3 class="mt-3">Please choose an archive reason</h3>
-        <v-select
-          v-model="archiveReason"
-          :items="availableArchiveReasons"
-          outlined
-        />
-        <v-text-field
-          v-if="archiveReason === 'OTHER'"
-          label="Please specify other reason"
-          v-model="archiveReasonOther"
-          outlined
-        />
-      </template>
-    </app-dialog>
+      <template v-slot:title>Confirm Submission Archiving</template>
+    </app-submission-archive-dialog>
 
     <app-dialog
       v-model="showDeleteModal"
@@ -175,7 +160,7 @@
               <v-btn
                 v-if="selected[0]['meta.archived'] === 'true'"
                 text
-                @click="archiveSubmission(selected[0], false)"
+                @click="archiveSubmission(selected[0], '', false)"
               >
                 RESTORE
               </v-btn>
@@ -316,6 +301,8 @@ import appSubmissionsTableClientCsv from '@/components/submissions/SubmissionTab
 import appSubmissionsTree from '@/components/submissions/SubmissionTree.vue';
 import appSubmissionsCode from '@/components/submissions/SubmissionCode.vue';
 import appDialog from '@/components/ui/Dialog.vue';
+import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
+
 
 import { createQueryList } from '@/utils/surveys';
 
@@ -342,6 +329,7 @@ export default {
     appSubmissionsTableClientCsv,
     appSubmissionsCode,
     appDialog,
+    appSubmissionArchiveDialog,
   },
   data() {
     return {
@@ -393,15 +381,6 @@ export default {
         sortDesc: [],
       },
       loading: false,
-      archiveReason: 'TEST_DATA',
-      archiveReasonOther: '',
-      availableArchiveReasons: [
-        'TEST_DATA',
-        'INCORRECT_DATA',
-        'EQUIPMENT_ERROR',
-        'USER_ERROR',
-        'OTHER',
-      ],
     };
   },
   computed: {
@@ -498,13 +477,7 @@ export default {
         this.$store.dispatch('feedback/add', err.response.data.message);
       }
     },
-    async archiveSubmission(submission, value = true) {
-      let reason = this.archiveReason;
-      if (this.archiveReason === 'OTHER' && this.archiveReasonOther) {
-        reason = this.archiveReasonOther;
-      }
-
-      this.showArchiveModal = false;
+    async archiveSubmission(submission, reason, value = true) {
       try {
         const { data: archived } = await api.post(`/submissions/${submission._id}/archive?set=${value}&reason=${reason}`);
         this.selected = [];

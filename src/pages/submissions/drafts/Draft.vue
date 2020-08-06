@@ -42,13 +42,12 @@
       @cancel="abortEditSubmitted"
       @confirm="(reason) => submission.meta.archivedReason = reason"
       reason="RESUBMIT"
+      persistent
     >
       <template v-slot:title>Confirm Submission Edit</template>
       <template>
         This draft has previously been submitted. Are you sure you want to edit it?
         Submitting again will archive the original submission.
-        <h3 class="mt-3">Please choose a reason</h3>
-
       </template>
     </app-submission-archive-dialog>
 

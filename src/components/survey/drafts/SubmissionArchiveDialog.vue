@@ -3,14 +3,15 @@
     v-model="show"
     :width="width"
     :max-width="maxWidth"
-    persistent
+    :persistent="persistent"
   >
     <v-card>
       <v-card-title class="headline">
         <slot name="title">{{title}}</slot>
       </v-card-title>
       <v-card-text>
-        <slot name="default">Default slot content</slot>
+        <slot name="default"></slot>
+        <h3 class="mt-3">Please choose a reason</h3>
         <v-select
           v-model="archiveReason"
           :items="availableArchiveReasons"
@@ -42,6 +43,7 @@
 <script>
 export default {
   props: {
+    persistent: Boolean,
     value: Boolean,
     labelConfirm: String,
     width: [String, Number],
@@ -78,7 +80,6 @@ export default {
       if (reason === 'OTHER' && this.archiveReasonOther) {
         reason = this.archiveReasonOther;
       }
-      console.log('emitting confirm with reason', reason);
       this.$emit('confirm', reason);
       this.$emit('input', false);
     },
