@@ -80,20 +80,21 @@
       </v-col>
     </v-row>
 
+    <ios-install-banner v-model="showIosInstallBanner" />
   </v-container>
 </template>
 
 <script>
-// @ is an alias to /src
-
 import axios from 'axios';
 import AppLogin from '@/pages/auth/Login.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
+import IosInstallBanner from '@/components/ui/IosInstallBanner/IosInstallBanner.vue';
 
 export default {
   components: {
     AppLogin,
     AppBasicList,
+    IosInstallBanner,
   },
   name: 'home',
   data() {
@@ -105,6 +106,7 @@ export default {
       },
       version: process.env.VUE_APP_VERSION,
       showInstall: false,
+      showIosInstallBanner: false,
     };
   },
   methods: {
@@ -116,6 +118,8 @@ export default {
       // console.log('result', res.data);
     },
   },
+
+
   computed: {
     appPartner() {
       return this.$store.getters['appui/partner'];
@@ -126,6 +130,14 @@ export default {
     pinned() {
       const pinned = this.$store.getters['surveys/getPinned'];
       return pinned;
+    },
+    isIos() {
+      const userAgent = window.navigator.userAgent.toLowerCase();
+      return /iphone|ipad|ipod/.test(userAgent);
+    },
+    isInStandaloneMode() {
+      return ('standalone' in window.navigator)
+        && window.navigator.standalone;
     },
   },
 
@@ -149,6 +161,10 @@ export default {
 
       // const res = await axios.get('http://localhost:9095/measurement');
       // console.log('res', res);
+
+      if (this.isIos && !this.isInStandaloneMode) {
+        this.showIosInstallBanner = true;
+      }
     }
   },
 };
