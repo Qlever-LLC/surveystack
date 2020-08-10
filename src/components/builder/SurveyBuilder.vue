@@ -235,6 +235,8 @@ import * as utils from '@/utils/surveys';
 import { defaultApiCompose } from '@/utils/apiCompose';
 
 import submissionUtils from '@/utils/submissions';
+import { SPEC_VERSION_SCRIPT } from '@/constants';
+
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -496,7 +498,26 @@ export default {
       return data;
     },
     setScriptCode(data) {
-      this.scriptCode = data || { _id: null, name: 'New Script', content: '' };
+      if (!data) {
+        // default empty script...
+        // ideally we shouldnt need to instantiate inside SurveyBuilder
+        this.scriptCode = {
+          _id: null,
+          name: 'New Script',
+          meta: {
+            dateCreated: new Date(),
+            dateModified: null,
+            revision: 1,
+            creator: null,
+            group: { id: null, path: null },
+            specVersion: SPEC_VERSION_SCRIPT,
+          },
+          content: '',
+        };
+        return;
+      }
+
+      this.scriptCode = data;
     },
     duplicateControl(control) {
       const position = utils.getPosition(this.control, this.currentControls);
