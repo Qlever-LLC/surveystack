@@ -1,4 +1,4 @@
-import { MongoClient, Db } from 'mongodb';
+import { MongoClient, Db, ObjectId } from 'mongodb';
 
 /**
  * @type {Db}
@@ -23,6 +23,32 @@ const connectDatabase = async () => {
   await db.collection('submissions').createIndex({ 'meta.survey.id': 1 });
   await db.collection('submissions').createIndex({ 'meta.survey.version': 1 });
   await db.collection('submissions').createIndex({ 'meta.creator': 1 });
+
+  // migrations
+  await migrateScripts_V1toV2();
+};
+
+const migrateScripts_V1toV2 = async () => {
+  const r = await db.collection('scripts').updateMany({ specVersion: 1 }, [
+    {
+      $set: {
+        meta: {
+          dateCreated: { $toDate: '$_id' }, // create Date from id
+          dateModified: null,
+          revision: 1,
+          creator: null,
+          group: { id: null, path: null },
+          specVersion: 2, // new specVersion
+        },
+      },
+    },
+    {
+      $unset: 'specVersion', // specVersion is now under meta.specVersion and updated to version 2
+    },
+  ]);
+  if (r.modifiedCount > 0) {
+    console.log('Migration: updated this many scripts:', r.modifiedCount);
+  }
 };
 
 export { db, connectDatabase };
