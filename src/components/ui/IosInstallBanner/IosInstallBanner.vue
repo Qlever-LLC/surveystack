@@ -16,7 +16,7 @@
       >
         <v-icon>mdi-close</v-icon>
       </v-btn>
-      <div class="text-center">
+      <div class="text-center wrapper">
         <h2>Install</h2>
         <div class="d-flex align-center justify-center">
             Just tap
@@ -59,8 +59,8 @@ export default {
   width: 100%;
 }
 
-.snackbar {
-  /* position: relative; */
+.snackbar >>> .v-snack__content {
+  position: relative;
 }
 
 .close-button {
