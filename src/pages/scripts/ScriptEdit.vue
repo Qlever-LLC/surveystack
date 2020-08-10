@@ -10,6 +10,14 @@
         v-model="entity.name"
         label="Name"
         outlined
+        hide-details
+      />
+      <active-group-selector
+        class="my-4"
+        label="Group"
+        v-model="entity.meta.group"
+        outlined
+        returnObject
       />
       <code-editor
         title=""
@@ -35,7 +43,7 @@
         <v-btn
           color="primary"
           @click="submit"
-        >Submit</v-btn>
+        >Save</v-btn>
       </div>
     </v-form>
   </v-container>
@@ -43,7 +51,10 @@
 
 <script>
 import ObjectId from 'bson-objectid';
+
 import api from '@/services/api.service';
+import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
+
 import { SPEC_VERSION_SCRIPT } from '@/constants';
 
 import codeEditor from '@/components/ui/CodeEditor.vue';
@@ -59,7 +70,17 @@ export default {
       entity: {
         _id: '',
         name: '',
-        specVersion: SPEC_VERSION_SCRIPT,
+        meta: {
+          dateCreated: new Date(),
+          dateModified: null,
+          revision: 1,
+          creator: null,
+          group: {
+            id: null,
+            path: null,
+          },
+          specVersion: SPEC_VERSION_SCRIPT,
+        },
         content: `
 /**
  * Process
@@ -133,6 +154,7 @@ export function render(props, state, setState) {
   },
   components: {
     codeEditor,
+    ActiveGroupSelector,
   },
   methods: {
     cancel() {
