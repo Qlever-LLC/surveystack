@@ -78,10 +78,10 @@ module.exports = {
           urlPattern: /\/api\/.*$/,
           handler: 'NetworkFirst',
         },
-        {
-          urlPattern: /https:\/\/api\.mapbox\.com.*$/,
-          handler: 'CacheFirst',
-        },
+        // {
+        //   urlPattern: /https:\/\/api\.mapbox\.com.*$/,
+        //   handler: 'CacheFirst',
+        // },
       ],
     },
   },
