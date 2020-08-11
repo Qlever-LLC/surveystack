@@ -18,7 +18,7 @@ const sanitize = async (entity) => {
     }
 
     if (entity.meta.dateModified) {
-      entity.meta.dateModfied = new Date(entity.meta.dateModified);
+      entity.meta.dateModified = new Date(entity.meta.dateModified);
     }
 
     if (entity.meta.creator) {
@@ -39,7 +39,19 @@ const sanitize = async (entity) => {
 };
 
 const getScripts = async (req, res) => {
-  const entities = await db.collection(col).find({}).toArray();
+  const { q } = req.query;
+  const filter = {};
+  const projection = { content: 0 };
+
+  if (q) {
+    if (ObjectId.isValid(q)) {
+      filter._id = new ObjectId(q);
+    } else {
+      filter.name = { $regex: q, $options: 'i' };
+    }
+  }
+
+  const entities = await db.collection(col).find(filter).project(projection).toArray();
   return res.send(entities);
 };
 
