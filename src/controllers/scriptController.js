@@ -7,7 +7,7 @@ import { db } from '../db';
 
 const col = 'scripts';
 
-const sanitize = (entity) => {
+const sanitize = async (entity) => {
   if (entity._id) {
     entity._id = new ObjectId(entity._id);
   }
@@ -23,6 +23,17 @@ const sanitize = (entity) => {
 
     if (entity.meta.creator) {
       entity.meta.creator = new ObjectId(entity.meta.creator);
+    }
+
+    if (entity.meta.group) {
+      if (entity.meta.group.id) {
+        const _id = new ObjectId(entity.meta.group.id);
+        entity.meta.group.id = _id;
+        const group = await db.collection('groups').findOne({ _id });
+        if (group) {
+          entity.meta.group.path = group.path;
+        }
+      }
     }
   }
 };
