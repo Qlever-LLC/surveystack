@@ -65,14 +65,15 @@ import codeEditor from '@/components/ui/CodeEditor.vue';
 
 export default {
   data() {
+    const now = new Date();
     return {
       editMode: true,
       entity: {
         _id: '',
         name: '',
         meta: {
-          dateCreated: new Date(),
-          dateModified: null,
+          dateCreated: now,
+          dateModified: now,
           revision: 1,
           creator: null,
           group: {
