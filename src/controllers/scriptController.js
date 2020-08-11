@@ -7,15 +7,28 @@ import { db } from '../db';
 
 const col = 'scripts';
 
-const sanitize = entity => {
-  entity._id = new ObjectId(entity._id);
+const sanitize = (entity) => {
+  if (entity._id) {
+    entity._id = new ObjectId(entity._id);
+  }
+
+  if (entity.meta) {
+    if (entity.meta.dateCreated) {
+      entity.meta.dateCreated = new Date(entity.meta.dateCreated);
+    }
+
+    if (entity.meta.dateModified) {
+      entity.meta.dateModfied = new Date(entity.meta.dateModified);
+    }
+
+    if (entity.meta.creator) {
+      entity.meta.creator = new ObjectId(entity.meta.creator);
+    }
+  }
 };
 
 const getScripts = async (req, res) => {
-  const entities = await db
-    .collection(col)
-    .find({})
-    .toArray();
+  const entities = await db.collection(col).find({}).toArray();
   return res.send(entities);
 };
 
@@ -34,9 +47,11 @@ const getScript = async (req, res) => {
 
 const createScript = async (req, res) => {
   const entity = req.body;
+  sanitize(entity);
+  entity.meta.creator = res.locals.auth.user._id;
 
   try {
-    let r = await db.collection(col).insertOne({ ...entity, _id: new ObjectId(entity._id) });
+    let r = await db.collection(col).insertOne(entity);
     assert.equal(1, r.insertedCount);
     return res.send(r);
   } catch (err) {
@@ -53,6 +68,7 @@ const updateScript = async (req, res) => {
   const entity = req.body;
 
   sanitize(entity);
+  entity.meta.dateModified = new Date();
 
   try {
     let updated = await db.collection(col).findOneAndUpdate(
