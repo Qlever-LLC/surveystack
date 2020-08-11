@@ -4,7 +4,7 @@
       :value="value"
       @input="handleInput"
       :timeout="0"
-      color="blue"
+      color="primary lighten-1"
       fixed
       bottom
       class="snackbar"
@@ -16,7 +16,7 @@
       >
         <v-icon>mdi-close</v-icon>
       </v-btn>
-      <div class="text-center">
+      <div class="text-center wrapper">
         <h2>Install</h2>
         <div class="d-flex align-center justify-center">
             Just tap
@@ -59,8 +59,22 @@ export default {
   width: 100%;
 }
 
-.snackbar {
-  /* position: relative; */
+
+.snackbar >>> .v-snack__content {
+  position: relative;
+}
+
+.snackbar >>> .v-snack__content::after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 8px solid var(--v-primary-lighten1);
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  margin-left: -12px;
 }
 
 .close-button {
