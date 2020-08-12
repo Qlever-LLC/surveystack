@@ -350,6 +350,8 @@ export default {
   grid-template-rows: auto 1fr auto;
   height: 100%;
   width: 100%;
+  /* height: 60vh; */
+  width: 100%;
   min-height: 60vh;
 }
 

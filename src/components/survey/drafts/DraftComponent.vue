@@ -51,7 +51,7 @@
           >
             <v-container
               id="draft-body"
-              style="max-width: 50rem;"
+              style="max-width: 50rem; height: 100%;"
             >
               <v-row
                 v-if="!atOverview"

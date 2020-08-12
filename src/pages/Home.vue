@@ -106,7 +106,7 @@ export default {
       },
       version: process.env.VUE_APP_VERSION,
       showInstall: false,
-      showIosInstallBanner: true,
+      showIosInstallBanner: false,
     };
   },
   methods: {
