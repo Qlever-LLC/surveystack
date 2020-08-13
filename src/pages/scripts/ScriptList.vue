@@ -1,5 +1,11 @@
 <template>
   <v-container>
+    <v-text-field
+      label="Search"
+      v-model="q"
+      append-icon="mdi-magnify"
+      clearable
+    />
     <app-entity-list
       :entities="entities"
       collection="scripts"
@@ -18,11 +24,32 @@ export default {
   data() {
     return {
       entities: [],
+      q: '',
     };
   },
-  async created() {
-    const { data } = await api.get('/scripts');
-    this.entities = data;
+  watch: {
+    q(newVal) {
+      // clicking on the clearable icon sets q to null
+      // but we actually want an empty string
+      if (newVal === null) {
+        this.q = '';
+        return;
+      }
+      this.fetchData();
+    },
+  },
+  methods: {
+    async fetchData() {
+      const { data } = await api.get(`/scripts?q=${this.q}`);
+      this.entities = data;
+    },
+    clearQuery() {
+      console.log('clearQuery');
+      this.q = '';
+    },
+  },
+  created() {
+    this.fetchData();
   },
 };
 </script>
