@@ -51,7 +51,12 @@ const getScripts = async (req, res) => {
     }
   }
 
-  const entities = await db.collection(col).find(filter).project(projection).toArray();
+  const entities = await db
+    .collection(col)
+    .find(filter)
+    .project(projection)
+    .sort({ name: 1 })
+    .toArray();
   return res.send(entities);
 };
 
