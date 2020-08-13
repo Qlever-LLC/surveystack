@@ -51,18 +51,10 @@
           >
             <v-container
               id="draft-body"
-              style="max-width: 50rem; height: 100%;"
+              style="max-width: 50rem;"
             >
               <v-row
-                v-if="!atOverview"
-                class="flex-grow-0 flex-shrink-1 pl-2 pr-2"
-              />
-                <!-- style="height: 100%; max-height: calc(100vh - 68px - 56px - 56px - 60px); overflow: auto;" -->
-              <v-row
-                justify="center"
-                align="center"
-                class="mb-5 mx-0"
-                style="height: 100%; overflow: auto;"
+                class="mb-5 mx-0 question-wrapper"
               >
                 <component
                   v-if="control && !atEnd"
@@ -652,6 +644,7 @@ export default {
 #draft-body {
   will-change: transform;
   max-height: 100%;
+  max-width: 50rem;
   width: 100%;
   overflow: auto;
   grid-column: 1;

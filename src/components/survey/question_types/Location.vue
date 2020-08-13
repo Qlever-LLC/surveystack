@@ -344,15 +344,23 @@ export default {
 
 <style>
 @import url('~mapbox-gl/dist/mapbox-gl.css');
+
 #map-root {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: auto 1fr auto;
   height: 100%;
   width: 100%;
-  /* height: 60vh; */
-  width: 100%;
-  min-height: 60vh;
+}
+
+@media screen and (min-width: 768px) {
+  #map-root {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    height: 100%;
+    width: 100%;
+    /* height: 60vh; */
+    width: 100%;
+    min-height: 60vh;
+  }
 }
 
 
