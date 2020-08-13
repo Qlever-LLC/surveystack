@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="ontology question">
     <p v-if="control.title" class="mt-2">{{ control.title }}</p>
     <v-autocomplete
       :value="value"
@@ -143,5 +143,7 @@ export default {
 </script>
 
 <style scoped>
-
+.ontology.question {
+  padding-top: 1rem;
+}
 </style>

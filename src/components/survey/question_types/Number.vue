@@ -5,12 +5,12 @@
         <p v-if="control.title" class="mb-2">{{ control.title }}</p>
         <v-text-field
           outlined
-          autofocus
           type="number"
           :label="control.label"
           v-bind:value="value"
           v-on:input="onInput"
           @keyup.enter.prevent="submit"
+          ref="textField"
         />
         <p v-if="control.hint" class="mb-2">{{ control.hint }}</p>
       </v-col>
@@ -20,6 +20,7 @@
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
+import { isIos } from '@/utils/compatibility';
 
 export default {
   mixins: [baseQuestionComponent],
@@ -30,6 +31,18 @@ export default {
     submit() {
       this.onInput(this.value);
       this.$emit('next');
+    },
+    tryAutofocus() {
+      if (
+        typeof document === 'undefined'
+        || !this.$refs.textField.$refs.input
+        || document.activeElement === this.$refs.input
+      ) {
+        return false;
+      }
+      this.$refs.textField.$refs.input.focus({ preventScroll: true });
+
+      return true;
     },
     onInput(v) {
       if (this.value !== v) {
@@ -47,6 +60,17 @@ export default {
         this.changed(converted);
       }
     },
+  },
+  mounted() {
+    // HACK: ios doesn't respect el.focus({ preventScroll: true })
+    if (isIos()) {
+      this.$el.style.transform = 'translateY(-1000px)';
+      this.tryAutofocus();
+      this.$el.scrollTo(0, 0);
+      this.$el.style.transform = 'none';
+    } else {
+      this.tryAutofocus();
+    }
   },
 };
 </script>

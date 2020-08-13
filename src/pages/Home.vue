@@ -89,6 +89,7 @@ import axios from 'axios';
 import AppLogin from '@/pages/auth/Login.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
 import IosInstallBanner from '@/components/ui/IosInstallBanner/IosInstallBanner.vue';
+import { isIos, isInStandaloneMode } from '@/utils/compatibility';
 
 export default {
   components: {
@@ -131,14 +132,6 @@ export default {
       const pinned = this.$store.getters['surveys/getPinned'];
       return pinned;
     },
-    isIos() {
-      const userAgent = window.navigator.userAgent.toLowerCase();
-      return /iphone|ipad|ipod/.test(userAgent);
-    },
-    isInStandaloneMode() {
-      return ('standalone' in window.navigator)
-        && window.navigator.standalone;
-    },
   },
 
   async created() {
@@ -162,7 +155,7 @@ export default {
       // const res = await axios.get('http://localhost:9095/measurement');
       // console.log('res', res);
 
-      if (this.isIos && !this.isInStandaloneMode) {
+      if (isIos() && this.isInStandaloneMode()) {
         this.showIosInstallBanner = true;
       }
     }

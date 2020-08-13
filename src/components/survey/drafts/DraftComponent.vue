@@ -4,9 +4,10 @@
     class=""
   >
 
+      <!-- class="full fill-height d-flex justify-center align-center" -->
+      <!-- style="position: absolute;" -->
     <div
-      class="full fill-height d-flex justify-center align-center"
-      style="position: absolute;"
+      class="full fill-height"
       v-if="controls.length === 0"
     >
       <div class="d-flex flex-column">
@@ -40,7 +41,9 @@
         v-if="!showOverview && index < positions.length"
         :breadcrumbs="mbreadcrumbs"
       />
-      <div style="position: relative; width: 100%; height: 100%;">
+      <!-- <div style="position: relative; width: 100%; height: 100%;"> -->
+      <div style="height: calc(100% - 68px - 24px - 104px);">
+      <!-- <div> -->
         <transition
           class="transition"
           :name="slide"
@@ -49,13 +52,10 @@
             id="transition-container"
             :key="'container-'+index"
           >
-            <v-container
-              id="draft-body"
-              style="max-width: 50rem;"
+            <div
+              class="draft-body mx-auto"
             >
-              <v-row
-                class="mb-5 mx-0 question-wrapper"
-              >
+                  <!-- class="draft-control" -->
                 <component
                   v-if="control && !atEnd"
                   style="width: 100%"
@@ -80,8 +80,7 @@
                   @show-next="showNext(true)"
                   @hide-next="showNext(false)"
                 />
-              </v-row>
-            </v-container>
+            </div>
           </div>
         </transition>
       </div>
@@ -89,13 +88,12 @@
 
     <v-navigation-drawer
       v-if="survey && showOverview"
-      id="navigation-container"
       v-model="showOverview"
       clipped
       right
       touchless
       stateless
-      class="grey lighten-4"
+      class="grey lighten-4 navigation-container"
     >
       <draft-overview
         ref="overview"
@@ -573,11 +571,11 @@ export default {
 
 #relative-wrapper {
   max-width: 100%;
-  height: 100%;
+  /* height: 100%; */
   width: 100%;
   margin: 0px;
   padding: 0px !important;
-  min-height: 100%;
+  /* min-height: 100%; */
 }
 
 #footer-container {
@@ -602,6 +600,7 @@ export default {
   margin: 0px;
   padding: 0px !important;
   overflow: auto;
+  /* prevents scrollbar from appearing during slide transition */
   overflow-x: hidden;
   bottom: 68px;
   top: 0px;
@@ -610,59 +609,63 @@ export default {
   height: calc(100% - 68px - 56px);
   max-height: calc(100% - 68px - 56px);
   */
-
+/*
   grid-column: 1;
-  grid-row: 1;
+  grid-row: 1; */
 
-  display: grid;
+  /* display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto auto 1fr;
-  will-change: transform;
+   */
+  /* will-change: transform; */
 }
 
-#navigation-container {
+.navigation-container {
   position: absolute;
   width: 100% !important;
   z-index: 4;
   height: calc(100% - 68px);
   max-height: calc(100% - 68px);
   overflow: auto;
-  grid-column: 1;
-  grid-row: 1;
+  /* grid-column: 1;
+  grid-row: 1; */
 }
 
 #draft-toolbar {
-  grid-column: 1;
-  grid-row: 1;
 }
 
 #draft-breadcrumbs {
-  grid-column: 1;
-  grid-row: 2;
+
 }
 
-#draft-body {
+.draft-body {
   will-change: transform;
   max-height: 100%;
   max-width: 50rem;
   width: 100%;
   overflow: auto;
-  grid-column: 1;
-  grid-row: 3;
+
 }
 
+
 #transition-container {
-  /* position: absolute; */
   width: 100%;
   height: 100%;
-  border-left: 1px solid #aaa;
-  will-change: transform;
-  display: flex;
-  align-items: center;
-  display: -webkit-flex;
-  display: flex;
-  -webkit-align-items: center;
-  align-items: center;
+  /* border-left: 1px solid #aaa; */
+  /* will-change: transform; */
+  /* overflow-x: hidden; */
+}
+
+@media (min-width: 768px) {
+  #transition-container {
+
+    /* display: flex;
+    align-items: center;
+    display: -webkit-flex;
+    -webkit-align-items: center;
+    align-items: center;
+    justify-content: center; */
+  }
 }
 
 .full {
@@ -711,38 +714,50 @@ export default {
 
 .slide-in-enter-active,
 .slide-in-leave-active {
-  transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: 0.2s transform cubic-bezier(0.4, 0, 0.2, 1),
+    0.2s opacity cubic-bezier(0.4, 0, 0.2, 1);
+  /* transition: 1s cubic-bezier(0.4, 0, 0.2, 1); */
 }
 
 .slide-in-enter {
   transform: translateX(100vw);
+  opacity: 0;
 }
 .slide-in-leave-to {
   transform: translateX(-100vw);
+  opacity: 0;
 }
 .slide-in-leave {
   transform: translateX(0);
+  opacity: 1;
 }
 .slide-in-enter-to {
   transform: translateX(0);
+  opacity: 0;
 }
 
 .slide-out-enter-active,
 .slide-out-leave-active {
-  transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: 0.2s transform cubic-bezier(0.4, 0, 0.2, 1),
+    0.2s opacity cubic-bezier(0.4, 0, 0.2, 1);
+  /* transition: 1s cubic-bezier(0.4, 0, 0.2, 1); */
 }
 
 .slide-out-enter {
   transform: translateX(-100vw);
+  opacity: 0;
 }
 .slide-out-leave-to {
   transform: translateX(100vw);
+  opacity: 0;
 }
 .slide-out-leave {
   transform: translateX(0);
+  opacity: 1;
 }
 .slide-out-enter-to {
   transform: translateX(0);
+  opacity: 1;
 }
 </style>
 
