@@ -25,7 +25,7 @@
     </div>
 
     <div
-      id="draft-container"
+      class="draft-container"
       v-if="submission && survey"
     >
       <draft-toolbar
@@ -42,12 +42,14 @@
         :breadcrumbs="mbreadcrumbs"
       />
       <!-- <div style="position: relative; width: 100%; height: 100%;"> -->
-      <div style="height: calc(100% - 68px - 24px - 104px);">
+      <!-- <div style="height: calc(100% - 68px - 24px - 104px);"> -->
       <!-- <div> -->
+          <!-- style="height: calc(100% - 68px - 24px - 104px);" -->
         <transition
           class="transition"
           :name="slide"
         >
+            <!-- style="height: 100%" -->
           <div
             id="transition-container"
             :key="'container-'+index"
@@ -59,7 +61,7 @@
                 <component
                   v-if="control && !atEnd"
                   style="width: 100%"
-                  class="draft-control d-flex flex-column align-center justify-center"
+                  class="draft-control d-sm-flex flex-column align-center justify-center px-6"
                   :key="'question_'+index"
                   :is="componentName"
                   :control="control"
@@ -83,7 +85,7 @@
             </div>
           </div>
         </transition>
-      </div>
+      <!-- </div> -->
     </div>
 
     <v-navigation-drawer
@@ -571,7 +573,7 @@ export default {
 
 #relative-wrapper {
   max-width: 100%;
-  /* height: 100%; */
+  height: 100%;
   width: 100%;
   margin: 0px;
   padding: 0px !important;
@@ -593,7 +595,7 @@ export default {
   left: 0px;
 }
 
-#draft-container {
+.draft-container {
   /* position: absolute; */
   height: 100%;
   width: 100%;
@@ -601,7 +603,7 @@ export default {
   padding: 0px !important;
   overflow: auto;
   /* prevents scrollbar from appearing during slide transition */
-  overflow-x: hidden;
+  /* overflow-x: hidden; */
   bottom: 68px;
   top: 0px;
   left: 0px;
@@ -650,14 +652,19 @@ export default {
 
 #transition-container {
   width: 100%;
-  height: 100%;
+  position: absolute;
   /* border-left: 1px solid #aaa; */
-  /* will-change: transform; */
+  will-change: transform, opacity;
   /* overflow-x: hidden; */
 }
 
 @media (min-width: 768px) {
   #transition-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(100% - 68px - 24px - 104px);
+    /* margin-top: 2rem; */
 
     /* display: flex;
     align-items: center;
@@ -715,7 +722,7 @@ export default {
 .slide-in-enter-active,
 .slide-in-leave-active {
   transition: 0.2s transform cubic-bezier(0.4, 0, 0.2, 1),
-    0.2s opacity cubic-bezier(0.4, 0, 0.2, 1);
+    0.05s opacity cubic-bezier(0.4, 0, 0.2, 1);
   /* transition: 1s cubic-bezier(0.4, 0, 0.2, 1); */
 }
 
@@ -733,13 +740,13 @@ export default {
 }
 .slide-in-enter-to {
   transform: translateX(0);
-  opacity: 0;
+  opacity: 1;
 }
 
 .slide-out-enter-active,
 .slide-out-leave-active {
   transition: 0.2s transform cubic-bezier(0.4, 0, 0.2, 1),
-    0.2s opacity cubic-bezier(0.4, 0, 0.2, 1);
+    0.05s opacity cubic-bezier(0.4, 0, 0.2, 1);
   /* transition: 1s cubic-bezier(0.4, 0, 0.2, 1); */
 }
 
