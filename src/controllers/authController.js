@@ -1,13 +1,13 @@
 import assert from 'assert';
 import bcrypt from 'bcrypt';
 import uuidv4 from 'uuid/v4';
+import isEmail from 'isemail';
 
 import boom from '@hapi/boom';
 
 import mailService from '../services/mail.service';
 import rolesService from '../services/roles.service';
 import { db } from '../db';
-import membershipService from '../services/membership.service';
 
 const col = 'users';
 
@@ -21,6 +21,11 @@ const createPayload = async (user) => {
 const register = async (req, res) => {
   // TODO: sanity check
   const { email, name, password } = req.body;
+
+  if (!isEmail.validate(email)) {
+    throw boom.badRequest(`Invalid email address: ${email}`);
+  }
+
   const hash = bcrypt.hashSync(password, parseInt(process.env.BCRYPT_ROUNDS));
   const token = uuidv4();
   const user = {
