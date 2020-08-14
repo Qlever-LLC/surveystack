@@ -164,6 +164,9 @@ export default {
           case 409:
             this.status = error.response.data.message;
             break;
+          case 400:
+            this.status = error.response.data.message;
+            break;
           default:
             this.status = 'Unknown error :/';
         }
