@@ -35,7 +35,10 @@
           hint="URL friendly version of name"
           persistent-hint
         />
-
+        <v-checkbox
+          label="Archived"
+          v-model="entity.archived"
+        />
         <div class="d-flex justify-end pa-2">
           <v-btn
             text
@@ -141,6 +144,7 @@ export default {
         surveys: {
           pinned: [],
         },
+        archived: false,
       },
       integrations: [],
       searchResults: [],

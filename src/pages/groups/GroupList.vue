@@ -1,5 +1,13 @@
 <template>
   <v-container>
+    <div class="d-flex justify-end">
+      <v-checkbox
+        v-model="showArchived"
+        label="View archived"
+        dense
+        hide-details
+      />
+    </div>
     <app-basic-list
       editable
       class="mt-3"
@@ -32,12 +40,18 @@ export default {
   data() {
     return {
       entities: [],
+      showArchived: false,
     };
   },
   methods: {
     async fetchEntities() {
-      const r = await api.get('/groups');
-      this.entities = r.data;
+      const { data } = await api.get(`/groups?showArchived=${this.showArchived}`);
+      this.entities = data;
+    },
+  },
+  watch: {
+    showArchived() {
+      this.fetchEntities();
     },
   },
   created() {
