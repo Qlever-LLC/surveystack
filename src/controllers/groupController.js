@@ -115,8 +115,15 @@ const createPinnedSurveysPopulationStages = () => {
 };
 
 const getGroups = async (req, res) => {
+  const { showArchived } = req.query;
+
   let entities;
   let dir = '/';
+
+  let archivedQuery = { $ne: true };
+  if (queryParam(showArchived)) {
+    archivedQuery = true;
+  }
 
   if (req.query.dir) {
     dir = req.query.dir;
@@ -134,7 +141,7 @@ const getGroups = async (req, res) => {
 
   entities = await db
     .collection(col)
-    .find({ dir: dirQuery })
+    .find({ dir: dirQuery, archived: archivedQuery })
     .sort({ path: 1 })
     .toArray();
   return res.send(entities);
@@ -153,10 +160,7 @@ const getGroupByPath = async (req, res) => {
     pipeline.push(...createPinnedSurveysPopulationStages());
   }
 
-  const [entity] = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  const [entity] = await db.collection(col).aggregate(pipeline).toArray();
 
   if (!entity) {
     return res.status(404).send({
@@ -175,10 +179,7 @@ const getGroupById = async (req, res) => {
     pipeline.push(...createPinnedSurveysPopulationStages());
   }
 
-  const [entity] = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  const [entity] = await db.collection(col).aggregate(pipeline).toArray();
 
   if (!entity) {
     return res.status(404).send({
