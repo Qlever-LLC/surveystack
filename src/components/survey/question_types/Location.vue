@@ -1,34 +1,34 @@
 <template>
-  <div>
+  <div class="d-flex">
     <p v-if="control.title" class="mb-2">{{ control.title }}</p>
-    <div id="map-root" :class="{'shorter-map': (!!control.hint || !!control.title) }">
-
-      <v-card
-        id="map-header"
-        dark
-        color="gray"
-        class="body-1 font-weight-n pa-2 px-4 mt-0"
-        style="width: 100%"
-      > {{ control.label }}</v-card>
+    <p>
+      {{ control.label }}
+    </p>
+    <!-- <div
+      :class="{
+        'map-root': true,
+        'flex-grow-1': true,
+        'shorter-map': (!!control.hint || !!control.title),
+      }"
+    > -->
 
       <div
-        id="map-container"
-        class="my-2"
+        class="map-container my-2"
         v-if="!mapError"
       >
-        <div id="gps-info">
-          <app-gps
-            :expanded="false"
-            :location="currentLocation.location"
-          >{{ currentLocation.label }}</app-gps>
-        </div>
+        <app-gps
+          class="gps-info"
+          :expanded="false"
+          :location="currentLocation.location"
+        >
+          {{ currentLocation.label }}
+        </app-gps>
         <div
           style="background-color: #000"
           :id="`map-question-${index}`"
           class="map-question"
           v-if="!mapError"
         >
-
           <img
             v-if="!this.value"
             id="map-marker"
@@ -43,7 +43,6 @@
         class="my-4"
         v-else
       >
-
         <v-alert
           type="info"
           border="right"
@@ -51,19 +50,18 @@
         >
           Error loading map. Unable to load map. Using GPS coordinates.
         </v-alert>
-
         <div>
           <app-gps
             :expanded="true"
             :location="currentLocation.location"
-          >{{ currentLocation.label }}</app-gps>
+          >
+            {{ currentLocation.label }}
+          </app-gps>
         </div>
-
       </div>
 
       <v-container
-        id="map-footer"
-        class="infos grey--text text--darken-2 text-center"
+        class="map-footer infos grey--text text--darken-2 text-center"
         fluid
       >
         <template v-if="!location">
@@ -119,14 +117,14 @@
       </v-container>
       <p v-if="control.hint" class="mt-4 mb-0">{{ control.hint }}</p>
 
-    </div>
+    <!-- </div> -->
   </div>
 </template>
 <script>
 /* eslint-disable no-new */
 
 import mapboxgl from 'mapbox-gl';
-import appGps from '@/components/ui/Gps.vue';
+import AppGps from '@/components/ui/Gps.vue';
 import baseQuestionComponent from './BaseQuestionComponent';
 
 
@@ -147,7 +145,7 @@ const requestWakeLock = async () => {
 export default {
   mixins: [baseQuestionComponent],
   components: {
-    appGps,
+    AppGps,
   },
   data() {
     return {
@@ -279,7 +277,7 @@ export default {
         return {
           location: this.value,
           // label: `used ${this.value.acc ? ' GPS' : 'Map Center'}`,
-          label: `used ${this.value.properties ? ' GPS' : 'Map Center'}`,
+          label: `${this.value.properties ? 'Saved Location' : 'Current Map Center'}`,
         };
       }
 
@@ -345,66 +343,58 @@ export default {
 <style>
 @import url('~mapbox-gl/dist/mapbox-gl.css');
 
-#map-root {
-  height: 100%;
-  width: 100%;
-}
-
-@media screen and (min-width: 768px) {
-  #map-root {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto;
-    height: 100%;
-    width: 100%;
-    /* height: 60vh; */
-    width: 100%;
-    min-height: 60vh;
-  }
-}
-
-
-#map-root.shorter-map  {
-  height: 90%;
-}
-
-#map-header {
+/* .map-header {
   grid-column: 1;
   grid-row: 1;
-}
+} */
 
-#gps-info {
+.gps-info {
   position: absolute;
-  left: 0;
-  top: 0;
-  margin-left: 0.2rem;
-  margin-top: 0.2rem;
+  right: 10px;
+  top: 49px;
+  /* margin-left: 10px; */
+  /* margin-top: 10px; */
   z-index: 1;
   display: block;
 }
 
-#map-container {
+.map-container {
+  position: relative;
+  /* grid-column: 1;
+  grid-row: 2; */
+  min-height: 300px;
+  width: 100%;
+  height: 100%;
+  height: 40vh;
+  /* margin-left: -12px; */
+  /* overflow: auto; */
+
+  max-height: 100%;
+}
+
+
+@media screen and (min-height: 667px) {
+  .map-container {
+    height: 55vh;
+  }
+}
+
+@media (min-width: 768px) {
+}
+
+
+/* #map-error-alert {
   position: relative;
   grid-column: 1;
   grid-row: 2;
   height: 100%;
   overflow: auto;
   max-height: 100%;
-}
+} */
 
-
-#map-errpr-alert {
-  position: relative;
-  grid-column: 1;
-  grid-row: 2;
-  height: 100%;
-  overflow: auto;
-  max-height: 100%;
-}
-
-#map-footer {
-  grid-column: 1;
-  grid-row: 3;
+.map-footer {
+  /* grid-column: 1;
+  grid-row: 3; */
 }
 
 .map-question {
@@ -412,9 +402,14 @@ export default {
   top: 0px;
   position: absolute;
   width: 100%;
+  /* width: calc(100% - 24px); */
   padding: 0px;
   /* min-height: 100%; */
+  /* min-height: 300px; */
+
   height: 100%;
+  /* margin-left: -8px; */
+  /* margin-right: -8px; */
 }
 
 

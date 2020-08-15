@@ -1,46 +1,42 @@
 <template>
 
   <div>
-    <v-expansion-panels
-      v-if="location"
-      dark
-      color="gray"
-      class="map-container font-weight-bold pa-2"
-      v-model="expandedVal"
-    >
-      <v-expansion-panel
-        class="ma-4"
-        style="flex-basis: unset; flex-grow: 0;"
-      >
-        <v-expansion-panel-header>
+    <v-menu offset-y>
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+          v-bind="attrs"
+          v-on="on"
+          class="button"
+        >
+          <v-icon>mdi-dots-vertical</v-icon>
+        </v-btn>
+      </template>
+      <div class="menu">
+        <div>
           <slot></slot>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
-          <!-- lat: {{ location.lat.toFixed(7) }}
-          <br>
-          lng: {{ location.lng.toFixed(7) }}
-          <template v-if="location.acc">
-            <br>
-            acc: {{ location.acc.toFixed(2) }}
-          </template> -->
-          lng: {{ location.geometry.coordinates[0].toFixed(7) }}
-          <br>
-          lat: {{ location.geometry.coordinates[1].toFixed(7) }}
-          <template v-if="location.properties.accuracy">
-            <br>
-            acc: {{ location.properties.accuracy.toFixed(2) }}
-          </template>
-          <br>
-          <v-btn
-            @click="clipboard"
-            outlined
-            color="white"
-          >
-            <v-icon left>mdi-clipboard</v-icon>Copy
-          </v-btn>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </v-expansion-panels>
+        </div>
+        <div class="text-body-2 text-sm-body-1">
+          <samp>
+              lng:&nbsp;{{ location.geometry.coordinates[0].toFixed(5) }}
+              <br/>
+              lat:&nbsp;{{ location.geometry.coordinates[1].toFixed(5) }}
+              <br/>
+              <span v-if="location.properties.accuracy">
+                acc:&nbsp;{{ location.properties.accuracy.toFixed(2) }}
+              </span>
+          </samp>
+        </div>
+        <v-btn
+          @click="clipboard"
+          outlined
+          class="mt-1"
+        >
+          <v-icon left>mdi-content-copy</v-icon>Copy
+        </v-btn>
+      </div>
+
+    </v-menu>
+    <!-- TODO: fix copied snack notification -->
     <v-snackbar v-model="snackbar">
       {{ snackbarText }}
       <v-btn
@@ -63,10 +59,6 @@ export default {
       expandedVal: this.expanded ? 0 : null,
     };
   },
-  // props: [
-  //   'location',
-  //   'expanded',
-  // ],
   props: {
     location: {
       type: Object,
@@ -101,8 +93,22 @@ export default {
 };
 </script>
 <style scoped>
-.map-container {
+/* .map-container {
   font-family: monospace;
   justify-content: left;
+} */
+
+.button.v-btn {
+  min-width: unset;
+  width: 29px;
+  height: 29px;
+  padding: 0;
 }
+
+.menu {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 3px;
+}
+
 </style>

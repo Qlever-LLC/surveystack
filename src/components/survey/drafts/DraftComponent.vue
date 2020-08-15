@@ -1,11 +1,7 @@
 <template>
   <div
-    id="relative-wrapper"
-    class=""
+    class="wrapper"
   >
-
-      <!-- class="full fill-height d-flex justify-center align-center" -->
-      <!-- style="position: absolute;" -->
     <div
       class="full fill-height"
       v-if="controls.length === 0"
@@ -41,51 +37,44 @@
         v-if="!showOverview && index < positions.length"
         :breadcrumbs="mbreadcrumbs"
       />
-      <!-- <div style="position: relative; width: 100%; height: 100%;"> -->
-      <!-- <div style="height: calc(100% - 68px - 24px - 104px);"> -->
-      <!-- <div> -->
-          <!-- style="height: calc(100% - 68px - 24px - 104px);" -->
-        <transition
-          class="transition"
-          :name="slide"
+      <transition
+        class="transition"
+        :name="slide"
+      >
+        <div
+          id="transition-container"
+          :key="'container-'+index"
         >
-            <!-- style="height: 100%" -->
           <div
-            id="transition-container"
-            :key="'container-'+index"
+            class="draft-body mx-auto"
           >
-            <div
-              class="draft-body mx-auto"
-            >
-                  <!-- class="draft-control" -->
-                <component
-                  v-if="control && !atEnd"
-                  style="width: 100%"
-                  class="draft-control d-sm-flex flex-column align-center justify-center px-6"
-                  :key="'question_'+index"
-                  :is="componentName"
-                  :control="control"
-                  :value="value"
-                  :index="index"
-                  :submission="submission"
-                  :meta="submissionField.meta"
-                  :resources="survey.resources"
-                  ref="currentControl"
-                  @eval="eval"
-                  @changed="setValue"
-                  @setStatus="setStatus"
-                  @setContext="setContext"
-                  @setRenderQueue="setRenderQueue"
-                  @show-nav="showNav(true)"
-                  @hide-nav="showNav(false)"
-                  @next="handleNext"
-                  @show-next="showNext(true)"
-                  @hide-next="showNext(false)"
-                />
-            </div>
+              <component
+                v-if="control && !atEnd"
+                style="width: 100%"
+                class="draft-control d-sm-flex flex-column align-center justify-center px-2"
+                :key="'question_'+index"
+                :is="componentName"
+                :control="control"
+                :value="value"
+                :index="index"
+                :submission="submission"
+                :meta="submissionField.meta"
+                :resources="survey.resources"
+                ref="currentControl"
+                @eval="eval"
+                @changed="setValue"
+                @setStatus="setStatus"
+                @setContext="setContext"
+                @setRenderQueue="setRenderQueue"
+                @show-nav="showNav(true)"
+                @hide-nav="showNav(false)"
+                @next="handleNext"
+                @show-next="showNext(true)"
+                @hide-next="showNext(false)"
+              />
           </div>
-        </transition>
-      <!-- </div> -->
+        </div>
+      </transition>
     </div>
 
     <v-navigation-drawer
@@ -137,7 +126,7 @@
 <script>
 /* eslint-disable no-continue */
 
-import _ from 'lodash';
+import { isEqual } from 'lodash';
 import moment from 'moment';
 
 import draftOverview from '@/components/survey/drafts/DraftOverview.vue';
@@ -295,6 +284,7 @@ export default {
       this.$emit('change', this.submission);
       this.persist();
 
+      // TODO: eagerly evaluate relevance expressions here instead of in handleNext / handlePrevious
 
       const req = this.control.options.required === true;
       if (req) {
@@ -332,7 +322,7 @@ export default {
       this.showNav(true);
       this.showNext(true);
 
-      this.index = this.positions.findIndex(p => _.isEqual(p, pos));
+      this.index = this.positions.findIndex(p => isEqual(p, pos));
       this.control = utils.getControl(this.controls, pos);
       this.value = submissionUtils.getSubmissionField(this.submission, this.survey, pos).value;
       this.showOverview = false;
@@ -571,13 +561,13 @@ export default {
   width: 100%;
 }
 
-#relative-wrapper {
-  max-width: 100%;
+.wrapper {
+  /* position: relative; */
+  /* max-width: 100%;
   height: 100%;
   width: 100%;
   margin: 0px;
-  padding: 0px !important;
-  /* min-height: 100%; */
+  padding: 0px !important; */
 }
 
 #footer-container {
@@ -652,6 +642,7 @@ export default {
 
 #transition-container {
   width: 100%;
+  left: 0;
   position: absolute;
   /* border-left: 1px solid #aaa; */
   will-change: transform, opacity;
