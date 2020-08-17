@@ -6,7 +6,7 @@
       </slot>
       <v-spacer />
       <slot
-        name="action-new"
+        name="actions"
         v-if="editable"
       >
         <v-btn

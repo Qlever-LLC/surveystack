@@ -22,7 +22,7 @@ if (enable || process.env.NODE_ENV === 'production') {
     },
     updated() {
       console.log('New content is available; please refresh.');
-      window.location.reload(true);
+      // window.location.reload(true); need to figure out why this leads to a reload loop
     },
     offline() {
       console.log('No internet connection found. App is running in offline mode.');

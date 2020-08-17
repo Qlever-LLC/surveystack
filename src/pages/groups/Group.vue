@@ -14,6 +14,10 @@
       </div>
     </div>
 
+    <div
+      style="color: red;"
+      v-if="entity.archived"
+    ><strong>Please note:</strong> this group is currently archived</div>
     <h1>
       {{entity.name}}
     </h1>
@@ -21,6 +25,15 @@
 
     <v-row>
       <v-col>
+        <div class="d-flex justify-end">
+          <v-checkbox
+            class="mt-0"
+            v-model="showArchivedSubgroups"
+            label="View archived"
+            dense
+            hide-details
+          />
+        </div>
         <app-basic-list
           :editable="editable"
           :entities="subgroups"
@@ -88,8 +101,10 @@ export default {
         name: '',
         slug: '',
         path: '/',
+        archived: false,
       },
       subgroups: [],
+      showArchivedSubgroups: false,
     };
   },
   methods: {
@@ -98,7 +113,6 @@ export default {
       try {
         const { data } = await api.get(`/groups/by-path/${path}?populate=true`);
         this.entity = data;
-
         await this.getSubgroups();
       } catch (e) {
         this.status.code = e.response.status;
@@ -107,12 +121,17 @@ export default {
     },
     async getSubgroups() {
       try {
-        const { data } = await api.get(`/groups?dir=${this.entity.path}`);
+        const { data } = await api.get(`/groups?showArchived=${this.showArchivedSubgroups}&dir=${this.entity.path}`);
         this.subgroups = data;
       } catch (e) {
         this.status.code = e.response.status;
         this.status.message = e.response.data.message;
       }
+    },
+  },
+  watch: {
+    showArchivedSubgroups() {
+      this.getSubgroups();
     },
   },
   computed: {
