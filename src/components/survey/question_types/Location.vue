@@ -27,13 +27,12 @@
             src="@/assets/marker.svg"
             alt="marker"
           />
-          <div class="selection-controls">
+          <div class="selection-controls d-flex justify-center">
             <div v-if="!location">
               <v-btn
                 large
                 class="mx-4 full"
-                outlined
-                color="blue"
+                color="gray"
                 @click="skip"
               >
                 Skip
@@ -43,7 +42,7 @@
                 :disabled="disablePick"
                 :dark="!disablePick"
                 class="mx-4 full"
-                color="blue"
+                color="primary"
                 @click="pickLocation"
               >
                 Pick
@@ -53,8 +52,7 @@
               <v-btn
                 large
                 class="mx-4 full"
-                outlined
-                color="indigo"
+                color="gray"
                 @click="retake"
               >
                 Retake
