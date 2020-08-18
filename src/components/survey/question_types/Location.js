@@ -26,6 +26,7 @@ export default {
       panel: [0],
       map: null,
       mapError: false,
+      geolocationError: false,
       first: true,
       location: null,
       gps: null,
@@ -93,7 +94,8 @@ export default {
       });
 
       map.addControl(this.ctrl);
-      map.on('error', () => {
+      map.on('error', (err) => {
+        console.log(err);
         this.mapError = true;
         this.usingGPS = true;
       });
@@ -202,10 +204,21 @@ export default {
       requestWakeLock();
     }
 
+    const successHandler = (position) => {
+      this.gps = this.geoJsonFromPosition(position);
+    };
+    const errorHandler = (err) => {
+      console.warn(`Error (${err.code}): ${err.message}`);
+      // this.mapError = err;
+      this.geolocationError = err;
+    };
+
+    // TODO: this will now trigger a map error
     if (navigator.geolocation) {
-      this.geolocationID = navigator.geolocation.watchPosition((position) => {
-        this.gps = this.geoJsonFromPosition(position);
-      });
+      this.geolocationID = navigator.geolocation.watchPosition(
+        successHandler,
+        errorHandler,
+      );
     }
   },
   beforeDestroy() {
