@@ -8,7 +8,6 @@
       <app-global-feedback />
         <!-- :class="{'pa-3': $route.name !== 'submissions-drafts-detail' || $route.name !== 'surveys-detail'}" -->
       <router-view
-        style="height: 100%;"
       ></router-view>
     </v-content>
   </v-app>

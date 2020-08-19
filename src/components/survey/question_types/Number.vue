@@ -1,21 +1,17 @@
 <template>
-  <v-container fluid>
-    <v-row>
-      <v-col cols="12">
-        <p v-if="control.title" class="mb-2">{{ control.title }}</p>
-        <v-text-field
-          outlined
-          type="number"
-          :label="control.label"
-          v-bind:value="value"
-          v-on:input="onInput"
-          @keyup.enter.prevent="submit"
-          ref="textField"
-        />
-        <p v-if="control.hint" class="mb-2">{{ control.hint }}</p>
-      </v-col>
-    </v-row>
-  </v-container>
+  <div class="mt-4">
+    <p v-if="control.title" class="mb-2">{{ control.title }}</p>
+    <v-text-field
+      outlined
+      type="number"
+      :label="control.label"
+      v-bind:value="value"
+      v-on:input="onInput"
+      @keyup.enter.prevent="submit"
+      ref="textField"
+    />
+    <p v-if="control.hint" class="mb-2">{{ control.hint }}</p>
+  </div>
 </template>
 
 <script>

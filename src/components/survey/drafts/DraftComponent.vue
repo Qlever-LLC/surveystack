@@ -1,12 +1,13 @@
 <template>
   <div
     class="wrapper"
+    style="height: 100%;"
   >
     <div
-      class="full fill-height"
+      class="full-width fill-height d-flex align-center justify-center"
       v-if="controls.length === 0"
     >
-      <div class="d-flex flex-column">
+      <div class="d-flex flex-column" >
         <v-icon
           large
           color="blue"
@@ -26,7 +27,7 @@
 
     <div
       class="draft-container"
-      v-if="submission && survey"
+      v-if="submission && survey && controls.length !== 0"
     >
       <draft-toolbar
         :group="groupPath"
@@ -49,13 +50,13 @@
           id="transition-container"
           :key="'container-'+index"
         >
-          <div
-            class="draft-body mx-auto"
+          <v-container
+            class="draft-body mx-auto d-flex flex-column align-center justify-center"
+            style="min-height: 40vh;"
           >
             <component
               v-if="control && !atEnd"
-              style="width: 100%"
-              class="draft-control d-sm-flex flex-column align-center justify-center px-2"
+              class="draft-control full-width d-sm-flex flex-column align-center justify-center px-4"
               :key="'question_'+index"
               :is="componentName"
               :control="control"
@@ -76,7 +77,7 @@
               @show-next="showNext(true)"
               @hide-next="showNext(false)"
             />
-          </div>
+          </v-container>
         </div>
       </transition>
     </div>

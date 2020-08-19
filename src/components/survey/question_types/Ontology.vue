@@ -13,6 +13,7 @@
       :multiple="!!control.options.hasMultipleSelections"
       :menu-props="autocompleteMenuProps"
       v-if="sourceIsValid && !control.options.allowCustomSelection"
+      class="full-width"
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip
@@ -47,6 +48,7 @@
       :menu-props="autocompleteMenuProps"
       v-else-if="sourceIsValid && control.options.allowCustomSelection"
       ref="input"
+      class="full-width"
     >
       <template v-slot:selection="data">
         <v-chip
@@ -145,5 +147,9 @@ export default {
 <style scoped>
 .ontology.question {
   padding-top: 1rem;
+}
+
+.full-width {
+  width: 100%;
 }
 </style>

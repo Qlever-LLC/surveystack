@@ -37,3 +37,7 @@
 .mw-100 {
     max-width: 100rem !important;
 }
+
+.full-width {
+    width: 100%;
+}
