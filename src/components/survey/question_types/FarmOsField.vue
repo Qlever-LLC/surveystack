@@ -1,5 +1,9 @@
 <template>
   <v-container fluid>
+    <p
+      v-if="control.title"
+      class="mt-2"
+    >{{ control.title }}</p>
     <v-row>
       <!-- v-model="values" -->
       <v-autocomplete
@@ -13,6 +17,7 @@
         :chips="false"
         :label="control.label"
         :multiple="false"
+        @keyup.enter.prevent="submit"
       >
         <template v-slot:item="{item}">
           <div v-html="item.label"></div>
@@ -33,7 +38,10 @@
       >
       </v-progress-circular>
     </v-row>
-    <p class="mt-2">{{ control.hint }}</p>
+    <p
+      v-if="control.hint"
+      class="mb-2"
+    >{{ control.hint }}</p>
   </v-container>
 </template>
 
@@ -46,6 +54,9 @@ export default {
   data() {
     return {
     };
+  },
+  async created() {
+    await this.fetchAreas();
   },
 };
 </script>

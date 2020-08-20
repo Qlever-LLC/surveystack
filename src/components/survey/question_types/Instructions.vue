@@ -2,12 +2,13 @@
   <v-container fluid class="instructions">
     <v-row>
       <v-col cols="12">
+        <p v-if="control.title" class="mb-4">{{ control.title }}</p>
         <div
           v-if="control.options.source"
           v-html="control.options.source"
-          class="instr"
+          class="instructions"
         />
-        <p class="mt-4">{{ control.hint }}</p>
+        <p v-if="control.hint" class="mt-4">{{ control.hint }}</p>
       </v-col>
     </v-row>
   </v-container>

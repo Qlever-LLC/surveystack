@@ -3,7 +3,7 @@
     <v-card-title class="d-block">
       <div class="d-flex justify-space-between align-center">
         <div class="grey--text text--darken-2">
-          Dropdown Options
+          Dropdown List Editor
         </div>
         <div class="d-flex align-center">
           <v-tooltip bottom>
@@ -47,8 +47,19 @@
           :value="resource.label"
           @input="handleUpdateLabel"
           label="List Label"
+          persistent-hint
           class="display-1 flex-shrink-1"
           style="max-width: 12em;"
+        />
+        <!-- TODO: validate unique data name -->
+        <v-text-field
+          :value="resource.name"
+          @input="handleUpdateName"
+          label="List Data Name"
+          persistent-hint
+          class="flex-shrink-1 ml-4"
+          style="max-width: 12em;"
+          :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
         />
         <v-spacer />
         <v-text-field
@@ -126,6 +137,11 @@ export default {
       required: true,
       default: () => ({ content: [] }),
     },
+    resources: {
+      type: Array,
+      required: true,
+      default: () => ([]),
+    },
   },
   components: {
     SelectItemsUploadButton,
@@ -159,7 +175,25 @@ export default {
       ],
     };
   },
+  computed: {
+    resourceNames() {
+      return this.resources.map(({ name, id }) => ({ name, id }));
+    },
+  },
   methods: {
+    nameIsUnique(val) {
+      return this.resourceNames.some(({ name, id }) => this.resource.name === name && this.resource.id !== id)
+        ? 'Name must be unique'
+        : true;
+    },
+    nameHasValidCharacters(val) {
+      const namePattern = /^[\w]*$/;
+      return namePattern.test(val) ? true : 'Data name must only contain valid charcters';
+    },
+    nameHasValidLength(val) {
+      const namePattern = /^.{4,}$/; // one character should be ok, especially within groups
+      return namePattern.test(val) ? true : 'Data name must be at least 4 character in length';
+    },
     moveItemDown({ id }) {
       const index = this.resource.content.findIndex(item => item.id === id);
       if (index > this.resource.content.length - 1) {
@@ -244,14 +278,23 @@ export default {
       this.$emit('close-dialog');
     },
     handleUpdateLabel(label) {
+      console.log('update label');
       this.$emit('change', {
         ...this.resource,
         label,
-        handle: slugify(label),
+        // handle: slugify(label),
+        // name: slugify(label),
+      });
+    },
+    handleUpdateName(name) {
+      console.log('update name', name);
+      this.$emit('change', {
+        ...this.resource,
+        name,
       });
     },
     handleFileChange(data) {
-      console.log('table editor file change', data);
+      // console.log('table editor file change', data);
       this.appendItems(data);
     },
     handleSave() {
@@ -260,7 +303,7 @@ export default {
     },
     deleteItem(item) {
       const newItems = this.items.filter(x => x.label !== item.label && x.value !== item.value);
-      console.log('delete item, new items:', newItems);
+      // console.log('delete item, new items:', newItems);
       this.$emit('change', newItems);
     },
     filterDuplicateItems(items) {

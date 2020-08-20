@@ -1,6 +1,15 @@
 import api from '@/services/api.service';
 import { AuthService, MembershipService, GroupService } from '@/services/storage.service';
 
+const deleteCookie = (name) => {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+};
+
+const deleteCookies = () => {
+  deleteCookie('user');
+  deleteCookie('token');
+};
+
 const createInitialState = () => ({
   status: AuthService.getStatus(),
   user: AuthService.getUser(),
@@ -14,14 +23,13 @@ const initialState = createInitialState();
 const getters = {
   authStatus: state => state.status,
   isLoggedIn: state => state.status === 'success',
-  isAdmin: state => state.user && state.user.permissions.includes('admin'),
+  isAdmin: state => state.user && state.user.permissions && state.user.permissions.includes('admin'),
+  isSuperAdmin: state => state.user && state.user.permissions && state.user.permissions.includes('super-admin'),
   user: state => state.user,
   isShapeshifting: state => state.shapeshiftHeader && state.shapeshiftUser,
 };
 
 const clearLocalData = ({ dispatch }) => {
-  // remove default Authentication headers
-  api.removeHeaders();
   // remove items from storage
   AuthService.clear();
   MembershipService.clear();
@@ -48,7 +56,7 @@ const actions = {
           AuthService.saveStatus('success');
           AuthService.saveUser(user);
           AuthService.saveHeader(header);
-          api.setHeader('Authorization', header);
+
 
           commit('auth_success', { user, header });
           resolve(resp.data);
@@ -56,15 +64,16 @@ const actions = {
         .catch((err) => {
           console.log(err);
           commit('auth_error');
-          clearLocalData({ dispatch });
+          // clearLocalData({ dispatch });
           reject(err);
         });
     });
   },
   logout({ commit, dispatch }) {
     return new Promise((resolve) => {
-      commit('logout');
       clearLocalData({ dispatch });
+      deleteCookies();
+      commit('logout');
       resolve();
     });
   },
@@ -85,7 +94,6 @@ const actions = {
             shapeshiftUser: state.user,
             shapeshiftHeader: state.header,
           });
-          api.setHeader('Authorization', header);
           commit('shapeshift_push', {
             user: state.user,
             header: state.header,
@@ -95,7 +103,7 @@ const actions = {
         })
         .catch((err) => {
           commit('auth_error');
-          clearLocalData({ dispatch });
+          // clearLocalData({ dispatch });
           reject(err);
         });
     });
@@ -119,6 +127,7 @@ const mutations = {
     state.status = 'success';
     state.user = user;
     state.header = header;
+    api.setHeader('Authorization', header);
   },
   auth_error(state) {
     state.status = 'error';
@@ -131,6 +140,7 @@ const mutations = {
     state.header = '';
     state.shapeshiftUser = {};
     state.shapeshiftHeader = '';
+    api.removeHeaders();
   },
   shapeshift_push(state, { user, header }) {
     state.shapeshiftUser = user;

@@ -12,12 +12,15 @@ const scripts = [];
 
 const groups = [];
 
+// const readyToSubmit = [];
+
 
 let db = null;
 
 const stores = {
   SUBMISSIONS: 'submissions',
   SURVEYS: 'surveys',
+  READY_TO_SUBMIT: 'readyToSubmit',
 };
 
 const DATABASE_NAME = 'Database';
@@ -32,7 +35,7 @@ function openDb(onSuccess) {
   };
 
   request.onsuccess = (event) => {
-    console.log(`Success: ${event}`);
+    console.log('IDB Success', event);
     db = event.target.result;
     if (onSuccess) {
       onSuccess();
@@ -46,12 +49,20 @@ function openDb(onSuccess) {
     db = event.target.result;
     // eslint-disable-next-line no-unused-vars
     try {
+      console.log('creating submission store');
       db.createObjectStore(stores.SUBMISSIONS, { keyPath: '_id' });
     } catch (error) {
       // ignore
     }
 
+    // try {
+    //   db.createObjectStore(stores.READY_TO_SUBMIT, { keyPath: '_id' });
+    // } catch (error) {
+    //   // ignore
+    // }
+
     try {
+      console.log('creating survey store');
       db.createObjectStore(stores.SURVEYS, { keyPath: '_id' });
     } catch (error) {
       // ignore
@@ -65,18 +76,22 @@ function getObjectStore(storeName, mode) {
 }
 
 function clearObjectStore(storeName) {
-  // Get the ObjectStore
-  const store = getObjectStore(storeName, 'readwrite');
-  // Clear the ObjectStore
-  const req = store.clear();
-  // Success Handler
-  req.onsuccess = (event) => {
-    console.log(`clear successful: ${event}`);
-  };
-  // Error Handler
-  req.onerror = (event) => {
-    console.log(`clear failed: ${event}`);
-  };
+  try {
+    // Get the ObjectStore
+    const store = getObjectStore(storeName, 'readwrite');
+    // Clear the ObjectStore
+    const req = store.clear();
+    // Success Handler
+    req.onsuccess = (event) => {
+      console.log(`clear successful: ${event}`);
+    };
+    // Error Handler
+    req.onerror = (event) => {
+      console.log(`clear failed: ${event}`);
+    };
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 function clearAllSubmissions() {
@@ -86,6 +101,10 @@ function clearAllSubmissions() {
 function clearAllSurveys() {
   clearObjectStore(stores.SURVEYS);
 }
+
+// function clearAllReadyToSubmit() {
+//   clearObjectStore(stores.READY_TO_SUBMIT);
+// }
 
 
 function persist(storeName, obj) {
@@ -114,6 +133,10 @@ function persistSurvey(survey) {
   persist(stores.SURVEYS, survey);
 }
 
+// function persistReadyToSubmit(obj) {
+//   persist(stores.READY_TO_SUBMIT, obj);
+// }
+
 function getResults(storeName, success) {
   // Create an array
   const results = [];
@@ -133,6 +156,10 @@ function getResults(storeName, success) {
     }
   };
 }
+
+// function getAllReadyToSubmit(onSuccess) {
+//   getResults(stores.READY_TO_SUBMIT, onSuccess);
+// }
 
 // Read All data in ObjectStore
 function getAllSubmissions(onSuccess) {
@@ -217,6 +244,38 @@ function saveToIndexedDB(storeName, object) {
   );
 }
 
+function removeFromIndexedDB(storeName, id) {
+  return new Promise(
+    (resolve, reject) => {
+      const dbRequest = indexedDB.open(DATABASE_NAME);
+
+      dbRequest.onerror = (ev) => {
+        reject(Error('IndexedDB database error'));
+      };
+
+      dbRequest.onupgradeneeded = (ev) => {
+        const database = ev.target.result;
+        database.createObjectStore(storeName, { keyPath: '_id' });
+      };
+
+      dbRequest.onsuccess = (event) => {
+        const database = event.target.result;
+        const transaction = database.transaction(storeName, 'readwrite');
+        const objectStore = transaction.objectStore(storeName);
+        const objectRequest = objectStore.delete(id);
+
+        objectRequest.onerror = (ev) => {
+          reject(Error(`Error deleting ID ${id} from ${storeName}`));
+        };
+
+        objectRequest.onsuccess = (ev) => {
+          resolve(`Success deleting ID ${id} from ${storeName}`);
+        };
+      };
+    },
+  );
+}
+
 export {
   surveys,
   submissions,
@@ -235,4 +294,8 @@ export {
   loadFromIndexedDB,
   saveToIndexedDB,
   stores,
+  // getAllReadyToSubmit,
+  // persistReadyToSubmit,
+  // clearAllReadyToSubmit,
+  removeFromIndexedDB,
 };

@@ -1,8 +1,7 @@
 <template>
   <v-container>
     <span class="text--secondary overline">{{entity._id}}</span>
-    <h2>Invite Members to {{groupDetail.name}}</h2>
-    <h4 class="text--secondary">{{groupDetail.path}}</h4>
+    <h2>Invite people to '{{groupDetail.name}}'</h2>
     <v-card class="pa-4 mb-4">
       <v-form
         class="mt-3"
@@ -19,13 +18,40 @@
 
         <v-text-field
           class="mt-3"
-          v-model="entity.meta.sentTo"
+          v-model="entity.meta.invitationEmail"
           label="Email"
           outlined
         />
 
-        <div class="d-flex mt-2 justify-end">
+        <v-radio-group
+          v-model="sendEmail"
+          name="sendEmail"
+        >
+          <v-radio
+            label="Send an invitation email"
+            value="SEND_NOW"
+          >
+            <template v-slot:label>
+              <div>
+                <div class="font-weight-medium">Send an invitation email</div>
+                <div class="font-weight-regular caption">An email invitation will be sent right now</div>
+              </div>
+            </template>
+          </v-radio>
+          <v-radio
+            label="Do not send an invitation email at this moment"
+            value="SEND_LATER"
+          >
+            <template v-slot:label>
+              <div>
+                <div class="font-weight-medium">Do not send an invitation email now</div>
+                <div class="font-weight-regular caption">You can send an email invitation later on</div>
+              </div>
+            </template>
+          </v-radio>
+        </v-radio-group>
 
+        <div class="d-flex mt-2 justify-end">
           <v-btn
             text
             @click="cancel"
@@ -48,7 +74,7 @@
           User does not exist yet
         </v-card-title>
         <v-card-text class="mt-4">
-          Do you want to proceed to create a new user with email {{this.entity.meta.sentTo}}
+          Do you want to proceed to create a new user with email {{this.entity.meta.invitationEmail}}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -102,14 +128,16 @@ export default {
         meta: {
           status: 'pending',
           dateCreated: moment().toISOString(),
-          dateClaimed: null,
-          sentTo: null,
+          dateSent: null,
+          dateActivated: null,
           notes: '',
-          invitation: uuid(),
+          invitationEmail: null,
+          invitationCode: uuid(),
         },
       },
       groupDetail: { name: '', path: '' },
       dialogCreateUser: false,
+      sendEmail: 'SEND_NOW',
     };
   },
   methods: {
@@ -121,14 +149,14 @@ export default {
     },
     async submit() {
       const data = this.entity;
-      const url = '/memberships';
+      const url = `/memberships?sendEmail=${this.sendEmail}`;
 
       try {
         await api.post(url, data);
-
         this.$router.back();
       } catch (err) {
         if (err.response.status === 404) {
+          // legacy (no 404 will be thrown from the server)
           this.dialogCreateUser = true;
         }
         this.$store.dispatch('feedback/add', err.response.data.message);
@@ -140,7 +168,7 @@ export default {
         query: {
           group: this.entity.group,
           role: this.entity.role,
-          email: this.entity.meta.sentTo,
+          email: this.entity.meta.invitationEmail,
         },
       });
     },

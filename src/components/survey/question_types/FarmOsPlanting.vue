@@ -1,18 +1,72 @@
 <template>
   <v-container fluid>
-    <v-row>
+    <p
+      v-if="control.title"
+      class="mb-2 display-2"
+    >{{ control.title }}
+
+    </p>
+
+    <v-progress-circular
+      v-if="loading"
+      indeterminate
+      color="primary"
+      class="align-self-center ml-4 mb-8"
+    >
+    </v-progress-circular>
+
+    <v-list style="overflow: auto;">
+      <div class="ml-3">
+        <v-label class="ml-3">{{control.label}}</v-label>
+      </div>
+      <v-list-item-group
+        v-if="!loading"
+        :disabled="loading"
+        :value="listSelection"
+        @change="localChange"
+        :multiple="!!control.options.hasMultipleSelections"
+      >
+        <v-list-item
+          v-for="(item, idx) in transformed"
+          :value="hashItem(item)"
+          :key="`item_${idx}`"
+          :disabled="!control.options.hasMultipleSelections && item.value.isField"
+        >
+          <template v-slot:default="{ active, toggle }">
+            <v-list-item-action
+              class="mr-2"
+              v-if="!!control.options.hasMultipleSelections || !item.value.isField"
+            >
+              <v-checkbox
+                :class="{ 'ml-4' : !item.value.isField}"
+                :input-value="active"
+                :true-value="hashItem(item)"
+                @click="toggle"
+              />
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title v-html="item.label" />
+            </v-list-item-content>
+          </template>
+        </v-list-item>
+      </v-list-item-group>
+    </v-list>
+
+    <v-row v-if="false">
+
       <!-- v-model="values" -->
       <v-autocomplete
         :disabled="loading"
         :value="value"
-        @change="onChange"
-        :items="farms || []"
+        @change="localChange"
+        :items="transformed || []"
         item-text="label"
         item-value="value"
         outlined
         :chips="false"
         :label="control.label"
-        :multiple="false"
+        :multiple="true"
+        @keyup.enter.prevent="submit"
       >
         <template v-slot:item="{item}">
           <div v-html="item.label"></div>
@@ -33,7 +87,10 @@
       >
       </v-progress-circular>
     </v-row>
-    <p class="mt-2">{{ control.hint }}</p>
+    <p
+      v-if="control.hint"
+      class="mt-2"
+    >{{ control.hint }}</p>
   </v-container>
 </template>
 
@@ -41,12 +98,213 @@
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
 
+const hashItem = (listItem) => {
+  if (listItem === null || listItem.value === null) {
+    return '';
+  }
+
+  const { value } = listItem;
+  if (value.isField) {
+    if (!value.farmId) {
+      return 'NOT_ASSIGNED';
+    }
+    return `FIELD:${value.farmId}.${value.location.id}`;
+  }
+
+  return `ASSET:${value.farmId}.${value.assetId}`;
+};
+
+const transform = (assets) => {
+  console.log('transformassets', assets);
+
+  const withoutArea = [];
+  const areas = {};
+
+  assets.forEach((asset) => {
+    if (asset.value.location.length === 0) {
+      const tmp = Object.assign({}, asset);
+      tmp.value.hash = hashItem(asset);
+      withoutArea.push(tmp);
+      return;
+    }
+
+
+    asset.value.location.forEach((location) => {
+      areas[`${asset.value.farmId}.${location.id}`] = {
+        farmId: asset.value.farmId,
+        farmName: asset.value.farmName,
+        location,
+      };
+    });
+  });
+
+  const res = Object.keys(areas).flatMap((key) => {
+    const area = areas[key];
+
+    const matchedAssets = assets.filter((asset) => {
+      if (asset.value.farmId !== area.farmId) {
+        return false;
+      }
+
+      return asset.value.location.some(loc => loc.id === area.location.id);
+    });
+
+
+    const field = {
+      value: {
+        farmId: area.farmId,
+        farmName: area.farmName,
+        location: area.location,
+        isField: true,
+      },
+      label: `<span class="blue-chip mr-4 ml-0 chip-no-wrap">${area.farmName}: ${area.location.name}</span>`,
+    };
+
+    field.value.hash = hashItem(field);
+
+    const assetItems = matchedAssets.map((asset) => {
+      const r = {
+        value: asset.value,
+        label: `${asset.value.name} `,
+      };
+
+      r.value.hash = hashItem(r);
+      return r;
+    });
+
+
+    return [field, ...assetItems];
+  });
+
+  /* const unassigned = {};
+  withoutArea.forEach((item) => {
+    if (!unassigned[item.farmId]) {
+      unassigned[item.farmId] = {
+        label: `<span class="blue-chip mr-4 ml-0 chip-no-wrap">${item.farmName}: Assets without field</span>`,
+        value: {
+          farmId: item.farmId,
+          farmName: item.farmName,
+          location: null,
+          isField: true,
+          hash: `UNASSIGNED:${item.farmId}`,
+        },
+        assets: [],
+      };
+    }
+
+    unassigned[item.farmId].assets.push({
+      farmId: item.farmId,
+      farmName: item.farmName,
+      location: null,
+      isField: false,
+      hash: `UNASSIGNED:${item.farmId}:${item.assetId}`,
+
+    });
+  }); */
+
+
+  const withoutAreaSection = {
+    value: {
+      farmId: null,
+      farmName: null,
+      location: null,
+      isField: true,
+    },
+    label: '<span class="blue-chip mr-4 ml-0 chip-no-wrap">Plantings without Area</span>',
+  };
+
+  res.push(withoutAreaSection, ...withoutArea);
+  console.log('res', res);
+
+  return res;
+};
+
 export default {
   mixins: [baseQuestionComponent, farmosBase('assets')],
+  data() {
+    return {
+      transformed: [],
+    };
+  },
+  async created() {
+    if (this.value === null && this.control.options.hasMultipleSelections) {
+      this.onChange([]);
+    }
+    await this.fetchAssets();
+    this.transformed = transform(this.assets);
+  },
+  computed: {
+    listSelection() {
+      if (Array.isArray(this.value)) {
+        return this.value.map(v => hashItem({ value: v }));
+      }
+      return hashItem({ value: this.value });
+    },
+  },
+  methods: {
+    hashItem,
+    localChange(hashesArg) {
+      let hashes;
+      if (!Array.isArray(hashesArg)) {
+        if (hashesArg) {
+          hashes = [hashesArg];
+        } else {
+          this.onChange(null);
+          return;
+        }
+      } else {
+        hashes = hashesArg;
+      }
+
+      console.log('hashes', hashes);
+
+
+      const selectedItems = hashes.map((h) => {
+        if (typeof h !== 'string') {
+          return h;
+        }
+        return (this.transformed.find(t => t.value.hash === h)).value;
+      });
+
+
+      // const [farmId, assetId] = itemId.split('.');
+
+      const fields = selectedItems.filter(item => !!item.isField);
+
+      // selected assets
+      const assets = selectedItems.filter(item => !item.isField);
+
+      const assetsToSelect = fields.flatMap(field => this.transformed
+        .filter(item => !item.value.isField)
+        .filter(item => item.value.farmId === field.farmId)
+        .filter(item => item.value.location.some(loc => loc.id === field.location.id)));
+
+
+      assetsToSelect.forEach((assetToSelect) => {
+        if (assets.some(asset => asset.farmId === assetToSelect.value.farmId
+          && asset.assetId === assetToSelect.value.assetId)) {
+          // skip
+        } else {
+          assets.push(assetToSelect.value);
+        }
+      });
+
+
+      if (!Array.isArray(hashesArg)) {
+        this.onChange(assets[0]);
+      } else {
+        this.onChange(assets);
+      }
+    },
+  },
 };
 </script>
 
 <style>
+.chip-no-wrap {
+  white-space: nowrap;
+}
+
 .orange-chip,
 .green-chip,
 .blue-chip {

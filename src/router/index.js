@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Home from '@/pages/Home.vue';
 import Test from '@/pages/Test.vue';
+import Unauthorized from '@/pages/Unauthorized.vue';
 
 import MySubmissions from '@/pages/surveys/MySubmissions.vue';
 import SurveysBrowse from '@/pages/surveys/Browse.vue';
@@ -29,16 +30,16 @@ import GroupEdit from '@/pages/groups/GroupEdit.vue';
 
 import SubmissionList from '@/pages/submissions/List.vue';
 
-import Builder from '@/pages/builder/Builder.vue';
-
 import ScriptList from '@/pages/scripts/ScriptList.vue';
-import Script from '@/pages/scripts/Script.vue';
-import ScriptEdit from '@/pages/scripts/ScriptEdit.vue';
 
 import MembershipNew from '@/pages/memberships/MembershipNew.vue';
 import MembershipEdit from '@/pages/memberships/MembershipEdit.vue';
 
 import Invitation from '@/pages/invitations/Invitation.vue';
+
+import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
+
+import AppInfo from '@/pages/app/AppInfo.vue';
 
 
 // integrations
@@ -50,11 +51,24 @@ import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 
 import store from '@/store';
 
+const Builder = () => import('@/pages/builder/Builder.vue');
+const Script = () => import('@/pages/scripts/Script.vue');
+const ScriptEdit = () => import('@/pages/scripts/ScriptEdit.vue');
+
+
 Vue.use(VueRouter);
 
 const guard = async (to, from, next) => {
   if (!store.getters['auth/isLoggedIn']) {
     next({ name: 'auth-login', params: { redirect: to } });
+  } else {
+    next();
+  }
+};
+
+const superGuard = async (to, from, next) => {
+  if (!store.getters['auth/isSuperAdmin']) {
+    next({ name: 'unauthorized', params: { allowed: 'Super Admins', to } });
   } else {
     next();
   }
@@ -176,6 +190,7 @@ const routes = [
     path: '/users',
     name: 'users-list',
     component: UserList,
+    beforeEnter: superGuard,
   },
   {
     path: '/users/new',
@@ -272,6 +287,25 @@ const routes = [
     name: 'invitations',
     component: Invitation,
   },
+  // Request submissions
+  {
+    path: '/call-for-submissions',
+    name: 'call-for-submissions',
+    component: CallForSubmissions,
+  },
+  // Unauthorized
+  {
+    path: '/unauthorized',
+    name: 'unauthorized',
+    component: Unauthorized,
+    props: true,
+  },
+  // App-Info
+  {
+    path: '/app/info',
+    name: 'app-info',
+    component: AppInfo,
+  },
   // tabula rasa
   // TODO: remove this from production
   {
@@ -286,6 +320,12 @@ const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    return {
+      x: 0,
+      y: 0,
+    };
+  },
 });
 
 

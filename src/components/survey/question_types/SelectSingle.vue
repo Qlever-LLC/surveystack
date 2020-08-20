@@ -1,6 +1,7 @@
 <template>
-  <v-container fluid>
-    <v-row>
+  <div>
+    <p v-if="control.title" class="mb-2">{{ control.title }}</p>
+    <div>
       <v-radio-group
         :label="control.label"
         :value="value"
@@ -38,9 +39,9 @@
       <div v-else>
         Invalid Select Options, please update Suvey Definition
       </div>
-    </v-row>
-    <p class="mt-2">{{ control.hint }}</p>
-  </v-container>
+    </div>
+    <p v-if="control.hint" class="mt-2">{{ control.hint }}</p>
+  </div>
 </template>
 
 <script>

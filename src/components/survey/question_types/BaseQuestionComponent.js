@@ -3,6 +3,9 @@ export default {
     control: { type: Object, required: true },
     value: { required: true },
     index: { required: true },
+    resources: {
+      default: () => ([]),
+    },
   },
   computed: {
     // value() {
@@ -10,6 +13,10 @@ export default {
     // },
   },
   methods: {
+    submit() {
+      this.changed(this.value);
+      this.next();
+    },
     eval() {
       this.$emit('eval');
     },

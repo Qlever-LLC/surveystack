@@ -63,6 +63,7 @@
 <script>
 import appFeedback from '@/components/ui/Feedback.vue';
 import api from '@/services/api.service';
+import { autoSelectActiveGroup } from '@/utils/memberships';
 
 
 const DEFAULT_ENTITY = {
@@ -123,8 +124,23 @@ export default {
     this.invitation = invitation;
     if (invitation) {
       this.$store.dispatch('invitation/set', invitation);
-      const { data: [membership] } = await api.get(`/memberships?invitation=${invitation}&populate=true`);
+      const { data: [membership] } = await api.get(`/memberships?invitationCode=${invitation}&populate=true`);
       this.membership = membership;
+    }
+
+    // magic link login
+    const {
+      cfs, email, token, group,
+    } = this.$route.query;
+    if (cfs) {
+      await this.$store.dispatch('auth/login', {
+        url: '/auth/login',
+        user: { email: email.replace(/ /g, '+'), token }, // TODO: find a better solution for + signs
+      });
+
+      this.$store.dispatch('surveys/fetchPinned');
+      await autoSelectActiveGroup(this.$store, group);
+      this.$router.replace({ name: 'surveys-detail', params: { id: cfs } });
     }
   },
   methods: {
@@ -140,19 +156,14 @@ export default {
       }
 
       try {
-        const user = await this.$store.dispatch('auth/login', {
+        await this.$store.dispatch('auth/login', {
           url: '/auth/login',
           user: this.entity,
         });
-        const memberships = await this.$store.dispatch('memberships/getUserMemberships', user._id);
-        if (
-          // !this.$store.getters['memberships/activeGroup'] &&
-          memberships
-          && memberships.length > 0
-          && memberships[0].group
-        ) {
-          this.$store.dispatch('memberships/setActiveGroup', memberships[0].group._id);
-        }
+
+        await autoSelectActiveGroup(this.$store);
+
+        this.$store.dispatch('surveys/fetchPinned');
 
         if (this.$route.params.redirect) {
           this.$router.push(this.$route.params.redirect);
@@ -162,6 +173,7 @@ export default {
           this.$router.push('/');
         }
       } catch (error) {
+        console.log('error', error);
         switch (error.response.status) {
           case 401:
             this.status = error.response.data.message;

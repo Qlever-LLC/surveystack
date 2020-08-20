@@ -4,8 +4,12 @@
       <v-card-title>{{ survey.name }}</v-card-title>
       <v-card-subtitle>
         {{ submission._id }}
-        <br><kbd>{{ created }}</kbd> created
-        <br><kbd>{{ modified }}</kbd> last modified
+        <br>
+        <kbd>{{ created }}</kbd> created
+        <br>
+        <kbd>{{ modified }}</kbd> last modified
+        <br>
+        <strong v-if="submission.meta.dateSubmitted"><kbd>{{ submitted }}</kbd> submitted</strong>
       </v-card-subtitle>
     </v-card>
     <v-timeline
@@ -36,10 +40,10 @@
               <div class="flex-grow-1">
                 <v-card-title class="d-block">
                   <div class="ma-0 pa-0 d-flex align-stretch">
+                      <!-- color="#FF5722" -->
                     <v-chip
                       dark
                       small
-                      color="red"
                       class="mr-0 mr-1"
                     ><span
                         v-for="(crumb, ci) in display.breadcrumbs"
@@ -134,6 +138,7 @@ export default {
       controlDisplays: [],
       modified: '',
       created: '',
+      submitted: '',
     };
   },
   methods: {
@@ -157,6 +162,7 @@ export default {
     refresh() {
       this.created = moment(this.submission.meta.dateCreated).format('YYYY-MM-DD HH:mm');
       this.modified = moment(this.submission.meta.dateModified).format('YYYY-MM-DD HH:mm');
+      this.submitted = moment(this.submission.meta.dateSubmitted).format('YYYY-MM-DD HH:mm');
 
       const now = moment();
       const positions = utils.getSurveyPositions(this.survey, this.submission.meta.survey.version);
@@ -230,9 +236,10 @@ export default {
 .number-chip {
   display: inline-flex;
   box-shadow: 0 0 1px 0px white inset, 0 0 1px 0px white;
-  border: 1px solid red;
+  /* border: 1px solid red; */
+  border: 1px solid currentColor;
   background-color: white;
-  color: #ff5722;
+  /* color: #ff5722; */
   border-radius: 1rem;
   line-height: 1rem;
   font-weight: bold;

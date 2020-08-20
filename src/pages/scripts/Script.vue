@@ -1,29 +1,35 @@
 <template>
   <v-container v-if="entity">
-    <span class="text--secondary">{{entity._id}}</span>
+    <div class="d-flex justify-end">
+      <router-link :to="{ name: 'scripts-edit', params: { id: entity._id }}">
+        <v-btn color="primary">
+          <v-icon left>mdi-pencil</v-icon> Edit
+        </v-btn>
+      </router-link>
+    </div>
     <h1>{{entity.name}}</h1>
-    <p>This is a good script</p>
+    <div class="text--secondary mb-2">{{entity._id}}</div>
+
     <code-editor
       title=""
       class="code-editor"
       readonly="true"
       :code="this.entity.content"
     />
-    <router-link :to="{ name: 'scripts-edit', params: { id: entity._id }}">
-      <v-btn color="primary">
-        Edit
-      </v-btn>
-    </router-link>
+
   </v-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
-import CodeEditor from '@/components/ui/CodeEditor.vue';
+import codeEditor from '@/components/ui/CodeEditor.vue';
+
+// When lazy-loading, the code editor just keeps on growing and growing :/
+// const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
 export default {
   components: {
-    CodeEditor,
+    codeEditor,
   },
   data() {
     return {

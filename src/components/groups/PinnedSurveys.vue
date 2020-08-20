@@ -23,7 +23,8 @@
         v-for="(el, idx) in entities"
         :key="`${idx}-survey-${el._id}`"
         class="ma-2 mx-6"
-        elevation="2"
+        elevation="1"
+        outlined
       >
         <v-card-text>
           <div class="d-flex justify-space-between align-center">
@@ -32,7 +33,7 @@
               <br />
               <span class="title">{{el.name}}</span>
               <br />
-              <span class="font-weight-light grey--text text--darken-2">last modified {{ renderDateFromNow(el.dateModified) }}</span>
+              <span class="font-weight-light grey--text text--darken-2" v-if="el.meta">last modified {{ renderDateFromNow(el.meta.dateModified) }}</span>
 
             </div>
             <div class="d-flex">
@@ -50,6 +51,8 @@
     </draggable>
     <v-card
       class="ma-2"
+      outlined
+      elevation="1"
       v-else
     >
       <v-card-text>
@@ -107,7 +110,7 @@
             >
               <v-list-item-content>
                 <v-list-item-title>{{searchResult.name}}</v-list-item-title>
-                <v-list-item-subtitle>last modified {{ renderDateFromNow(searchResult.dateModified) }}</v-list-item-subtitle>
+                <v-list-item-subtitle v-if="searchResult.meta">last modified {{ renderDateFromNow(searchResult.meta.dateModified) }}</v-list-item-subtitle>
 
               </v-list-item-content>
 
@@ -149,6 +152,9 @@ export default {
     searchResults: {
       type: Array,
     },
+  },
+  mounted() {
+    console.log('entities', this.entities);
   },
   methods: {
     showDeleteModal(index) {

@@ -2,23 +2,26 @@
   <nav>
     <v-app-bar
       app
-      dark
       clipped-left
-      color="#f44336ff"
+      color="appbar"
     >
-      <v-app-bar-nav-icon
-        color="white"
-        @click="drawer = !drawer"
-      />
+      <!-- color="white" -->
+      <v-app-bar-nav-icon @click="drawer = !drawer" />
       <v-toolbar-title class="ml-2 flex-column">
         <div
           id="app-bar-title"
           class="title py-0 my-0"
-        >{{ appTitle }}</div>
+        >
+          <router-link
+            to="/"
+            id="home-link"
+            v-html="appTitle"
+          />
+        </div>
         <div
           class="app-bar-subtitle subtitle py-0 my-0"
           v-html="appSubtitle"
-        ></div>
+        />
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
@@ -42,7 +45,9 @@
           <v-subheader
             v-else-if="item.type === 'subheader'"
             :key="i"
-          >{{item.label}}</v-subheader>
+          >
+            {{item.label}}
+          </v-subheader>
           <v-list-item
             v-else
             :key="i"
@@ -55,12 +60,44 @@
               <v-icon>{{item.icon}}</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title>{{item.label}}</v-list-item-title>
+              <!-- <v-list-item-title
+                v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
+              >
+                <v-badge :content="readyToSubmitCount" color="pink">
+                  {{ item.label }}
+                </v-badge>
+              </v-list-item-title> -->
+              <!-- <v-list-item-title v-else>
+                {{ item.label }}
+              </v-list-item-title> -->
+              <v-list-item-title>
+                {{ item.label }}
+                <v-chip
+                  v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
+                  color="accent"
+                  small
+                >
+                  {{readyToSubmitCount}}
+                </v-chip>
+              </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </template>
 
       </v-list>
+
+      <template v-slot:append>
+        <div
+          dark
+          class="grey--text"
+        >
+          <p class="pt-4 pl-4">App-Version: <router-link
+              to="/app/info"
+              class="decoration-none"
+            >{{ version }}</router-link>
+          </p>
+        </div>
+      </template>
 
     </v-navigation-drawer>
   </nav>
@@ -75,6 +112,7 @@ export default {
   },
   data() {
     return {
+      version: process.env.VUE_APP_VERSION,
       drawer: false,
       sidenav: {
         collect: [
@@ -119,6 +157,12 @@ export default {
               name: 'groups-list',
             },
             icon: 'mdi-domain',
+          },
+        ],
+        superAdmin: [
+          {
+            type: 'subheader',
+            label: 'SUPER-ADMIN',
           },
           {
             type: 'link',
@@ -182,6 +226,9 @@ export default {
     };
   },
   computed: {
+    readyToSubmitCount() {
+      return this.$store.getters['submissions/readyToSubmit'].length;
+    },
     appTitle() {
       return this.$store.getters['appui/title'];
     },
@@ -196,6 +243,10 @@ export default {
         items.push(divider);
         items.push(...this.sidenav.admin);
       }
+      if (this.$store.getters['auth/isSuperAdmin']) {
+        items.push(divider);
+        items.push(...this.sidenav.superAdmin);
+      }
       // items.push(divider);
       // items.push(...this.sidenav.dev);
       return items;
@@ -208,7 +259,7 @@ export default {
 #app-bar-title {
   font-size: 1rem;
   font-weight: normal;
-  color: white;
+  /* color: white; */
   line-height: 1.8rem;
 }
 
@@ -220,5 +271,14 @@ export default {
 <style>
 .app-bar-subtitle span {
   vertical-align: middle;
+}
+
+.decoration-none {
+  text-decoration: none;
+}
+
+#home-link {
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.87);
 }
 </style>

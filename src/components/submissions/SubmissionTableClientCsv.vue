@@ -12,6 +12,14 @@
         v-model="tableSelected"
         @item-selected="onRowSelected"
         disable-pagination
+        :class="{archived}"
+        :server-items-length="submissions.pagination.total"
+        @update:sort-by="onUpdateSortBy"
+        @update:sort-desc="onUpdateSortDesc"
+        multi-sort
+        :sort-by="dataTableProps.sortBy"
+        :sort-desc="dataTableProps.sortDesc"
+        :loading="loading"
       >
         <template v-slot:top>
           <v-toolbar flat>
@@ -28,6 +36,18 @@
             </v-row>
           </v-toolbar>
         </template>
+
+        <!-- // need show-expand on v-data-table
+        <template v-slot:expanded-item="{ headers, item }">
+          <td></td>
+          <td></td>
+          <td
+            class="untruncated"
+            v-for="(value, idx) in item"
+            :key="idx"
+          >{{value}}</td>
+        </template>
+        -->
 
       </v-data-table>
     </v-card>
@@ -48,7 +68,23 @@ export default {
       type: Array,
       required: true,
     },
-
+    archived: {
+      type: Boolean,
+      default: false,
+    },
+    dataTableProps: {
+      type: Object,
+      default() {
+        return {
+          sortBy: [],
+          sortDesc: [],
+        };
+      },
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -65,7 +101,6 @@ export default {
   computed: {
     items() {
       if (this.parsed) {
-        console.log('this.parsed', this.parsed);
         return this.parsed.data;
       }
       return [];
@@ -129,6 +164,12 @@ export default {
       }
       this.headers = headers;
     },
+    onUpdateSortBy(value) {
+      this.$emit('onDataTablePropsChanged', { ...this.dataTableProps, sortBy: value });
+    },
+    onUpdateSortDesc(value) {
+      this.$emit('onDataTablePropsChanged', { ...this.dataTableProps, sortDesc: value });
+    },
     async fetchData() {
       if (!this.submissions) {
         return;
@@ -155,4 +196,31 @@ export default {
   font-size: 12px;
 }
 */
+</style>
+
+<style scoped>
+.archived {
+  color: #777 !important;
+}
+
+.v-data-table >>> td {
+  white-space: nowrap;
+  /* max-width: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis; */
+}
+
+.v-data-table-truncated >>> td {
+  white-space: nowrap;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+td.untruncated {
+  white-space: normal;
+  max-width: 250px;
+  overflow: visible;
+  text-overflow: unset;
+}
 </style>

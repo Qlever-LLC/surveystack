@@ -1,89 +1,126 @@
 <template>
   <v-container>
-    <v-text-field
-      v-model="search"
-      label="Search"
-      append-icon="mdi-magnify"
-    />
-    <div class="d-flex justify-end mb-4">
-      <small class="text--secondary">
-        {{surveys.pagination.total}} results
-      </small>
-    </div>
 
-    <!-- <v-tabs-items
+    <v-tabs
       v-model="activeTab"
+      fixed-tabs
     >
-
-    </v-tabs-items> -->
-    <!-- <v-card>
-      <v-card-text>
-        {{}}
-      </v-card-text>
-    </v-card> -->
+      <v-tab
+        v-for="tab in tabs"
+        :href="`#${tab.name}`"
+        :key="tab.name"
+      >
+        <span v-if="tab.name === 'active-group'">
+          {{ activeGroupName }}
+        </span>
+        <span v-else>
+          {{ tab.label }}
+        </span>
+      </v-tab>
+      <!-- <v-menu
+        v-if="groupsItems.length"
+        bottom
+        left
+      >
+        <template v-slot:activator="{ on }">
+          <v-btn
+            text
+            class="align-self-center mr-4"
+            v-on="on"
+          >
+            more
+            <v-icon right>mdi-menu-down</v-icon>
+          </v-btn>
+        </template>
+        <v-list class="">
+          <v-list-item
+            v-for="item in groupsItems"
+            :key="item.name"
+            @click="setMenuTab(item)"
+          >
+            {{ item.label }}
+          </v-list-item>
+        </v-list>
+      </v-menu> -->
+    </v-tabs>
     <v-card
-      min-height="70vh"
-      class="d-flex flex-column"
+      class="my-2"
+      v-if="activeTab === 'active-group' && pinnedSurveys.length && pinnedIsVisible"
     >
-      <v-card-title>
-        <v-tabs
-          v-model="activeTab"
-          fixed-tabs
-        >
-          <v-tab
-            v-for="tab in tabs"
-            :href="`#${tab.name}`"
-            :key="tab.name"
-          >
-            <span v-if="tab.name === 'active-group'">
-              {{ activeGroupName }}
-            </span>
-            <span v-else>
-              {{ tab.label }}
-            </span>
-          </v-tab>
-          <!-- <v-menu
-           v-if="groupsItems.length"
-           bottom
-           left
-          >
-            <template v-slot:activator="{ on }">
-              <v-btn
-                text
-                class="align-self-center mr-4"
-                v-on="on"
-              >
-                more
-                <v-icon right>mdi-menu-down</v-icon>
-              </v-btn>
-            </template>
-            <v-list class="">
-              <v-list-item
-                v-for="item in groupsItems"
-                :key="item.name"
-                @click="setMenuTab(item)"
-              >
-                {{ item.label }}
-              </v-list-item>
-            </v-list>
-          </v-menu> -->
-        </v-tabs>
-      </v-card-title>
-      <v-card-text class="flex-grow-1">
+      <v-card-text>
         <div
-          v-for="e in surveys.content"
-          :key="e._id"
+          v-for="(e, i) in pinnedSurveys"
+          :key="`${e._id}_pinned`"
         >
           <v-list-item :to="`/surveys/${e._id}`">
+            <v-list-item-icon>
+              <v-icon v-if="e.pinned">mdi-pin</v-icon>
+            </v-list-item-icon>
             <v-list-item-content>
-
-              <v-list-item-title>{{e.name}}</v-list-item-title>
-              <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle>
-              <small class="grey--text">Version {{e.latestVersion}}</small>
+              <div>
+                <v-list-item-title>{{e.name}}</v-list-item-title>
+                <!-- <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle> -->
+                <v-list-item-subtitle v-if="e.meta && e.meta.group && e.meta.group.id">
+                  {{ getGroupName(e.meta.group.id) }}
+                </v-list-item-subtitle>
+                <small
+                  v-if="e.latestVersion"
+                  class="grey--text"
+                >Survey Version {{e.latestVersion}}</small>
+              </div>
             </v-list-item-content>
 
           </v-list-item>
-          <v-divider />
+          <v-divider v-if="i < pinnedSurveys.length - 1" />
+        </div>
+      </v-card-text>
+    </v-card>
+
+    <v-card
+      min-height="60vh"
+      class="d-flex flex-column"
+    >
+      <v-card-title>
+
+      </v-card-title>
+      <v-card-text class="flex-grow-1">
+        <div class="px-5 py-2">
+          <v-text-field
+            v-model="search"
+            label="Search"
+            append-icon="mdi-magnify"
+          />
+          <div class="d-flex justify-end mb-4">
+            <small class="text--secondary">
+              {{surveys.pagination.total}} results
+            </small>
+          </div>
+        </div>
+        <div
+          v-for="(e, i) in surveys.content"
+          :key="e._id"
+        >
+          <v-list-item :to="`/surveys/${e._id}`">
+            <v-list-item-icon>
+              <v-icon v-if="e.pinned">mdi-pin</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <div>
+                <v-list-item-title>{{e.name}}</v-list-item-title>
+                <!-- <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle> -->
+                <v-list-item-subtitle v-if="e.meta && e.meta.group && e.meta.group.id">
+                  {{ getGroupName(e.meta.group.id) }}
+                </v-list-item-subtitle>
+                <small
+                  v-if="e.latestVersion"
+                  class="grey--text"
+                >Survey Version {{e.latestVersion}}</small>
+              </div>
+            </v-list-item-content>
+
+          </v-list-item>
+          <v-divider v-if="i < surveys.content.length - 1" />
+
         </div>
         <div
           v-if="surveys.content.length < 1"
@@ -112,18 +149,20 @@
 </template>
 
 <script>
+import { uniqBy } from 'lodash';
 import api from '@/services/api.service';
 
-const PAGINATION_LIMIT = 20;
+const PAGINATION_LIMIT = 10;
 
 export default {
   data() {
     return {
       selectedGroupIds: [],
       activeTab: null,
-      // groups: null,
       page: 1,
       search: '',
+      pinnedSurveys: [],
+      pinnedIsVisible: true,
       surveys: {
         content: [],
         pagination: {
@@ -132,11 +171,13 @@ export default {
           limit: 100000,
         },
       },
-      tabs: [
-        {
-          name: 'active-group',
-          label: 'Active Group',
-        },
+      surveysForCurrentGroup: null,
+    };
+  },
+  computed: {
+
+    tabs() {
+      const commonTabs = [
         {
           name: 'my-surveys',
           label: 'My Surveys',
@@ -149,17 +190,24 @@ export default {
           name: 'all-groups',
           label: 'All Groups',
         },
-      ],
-      surveysForCurrentGroup: null,
-    };
-  },
-  computed: {
-    // activeTabHasMorePages() {
-    //   return this.surveys
-    //     && this.surveys.pagination
-    //     && this.surveys.pagination.total
-    //     && this.surveys.pagination.total > limit;
-    // }
+      ];
+
+      if (!this.activeGroupId) {
+        return commonTabs;
+      }
+
+      return [
+        // {
+        //   name: 'active-group-pinned-surveys',
+        //   label: 'Pinned Surveys',
+        // },
+        {
+          name: 'active-group',
+          label: 'Active Group',
+        },
+        ...commonTabs,
+      ];
+    },
     activeTabPaginationLength() {
       const { total } = this.surveys.pagination;
       return total ? Math.ceil(total / PAGINATION_LIMIT) : 0;
@@ -175,33 +223,23 @@ export default {
         .map(({ _id, name, slug }) => ({ id: _id, label: name, name: slug }));
     },
     activeGroupName() {
-      const groups = this.$store.getters['memberships/groups'];
-      const group = groups.find(item => item._id === this.activeGroupId);
+      const group = this.groups.find(item => item._id === this.activeGroupId);
       if (group) {
         return group.name;
       }
       return 'No active group';
     },
-    // activeTabContent() {
-    //   switch (this.activeTab) {
-    //     case 'active-group':
-
-    //       break;
-    //     case 'my-surveys':
-    //       break;
-    //     case 'my-groups':
-    //       break;
-    //     case 'all-groups':
-    //       break;
-    //     default:
-    //   }
-    //   return '';
-    // },
   },
   watch: {
-    search() {
+    search(value) {
       this.fetchData();
+      if (value) {
+        this.pinnedIsVisible = false;
+      } else {
+        this.pinnedIsVisible = true;
+      }
     },
+    // TODO: reimplement with @change listener instead of watch
     async activeTab(value) {
       await this.getDataForTab(value);
     },
@@ -212,6 +250,13 @@ export default {
     },
   },
   methods: {
+    getGroupName(id) {
+      const group = this.groups.find(item => item._id === id);
+      if (group) {
+        return group.name;
+      }
+      return null;
+    },
     setMenuTab(tab) {
       this.activeTab = tab.name;
       this.selectedGroupIds = [tab.id];
@@ -219,14 +264,36 @@ export default {
     },
     async getDataForTab(tab) {
       switch (tab) {
+        // case 'active-group-pinned-surveys':
+        //   this.surveys = await this.fetchPinnedSurveys(this.activeGroupId);
+        //   break;
         case 'active-group':
-          await this.fetchData({ groups: [this.activeGroupId] });
+          // eslint-disable-next-line no-case-declarations
+          const [pinnedResponse, response] = await Promise.all([
+            this.fetchPinnedSurveys(this.activeGroupId),
+            this.fetchData({ groups: [this.activeGroupId] }),
+          ]);
+
+
+          // this.surveys.content = uniqBy([
+          //   ...pinnedResponse.map(r => ({ ...r, pinned: true })),
+          //   ...response.content,
+          // ], '_id');
+          // this.surveys.pagination = {
+          //   ...response.pagination,
+          //   total: this.surveys.content.length,
+          // };
+
+
+          // this.surveys = response;
+          // this.pinnedSurveys = pinnedResponse.map(r => ({ ...r, pinned: true }));
           break;
         case 'my-surveys':
+          // this.surveys = await this.fetchData({ user: this.$store.getters['auth/user']._id });
           await this.fetchData({ user: this.$store.getters['auth/user']._id });
           break;
         case 'my-groups':
-          await this.fetchData({
+          this.surveys = await this.fetchData({
             groups: this.$store.getters['memberships/groups'].map(({ _id }) => _id),
           });
           break;
@@ -234,7 +301,7 @@ export default {
           break;
         case 'all-groups':
         default:
-          await this.fetchData();
+          this.surveys = await this.fetchData();
       }
     },
     async fetchData({ user, groups = [] } = {}) {
@@ -250,24 +317,44 @@ export default {
       }
       if (this.search) {
         queryParams.append('q', this.search);
+        console.log(this.search);
       }
 
       queryParams.append('skip', (this.page - 1) * PAGINATION_LIMIT);
       queryParams.append('limit', PAGINATION_LIMIT);
 
       try {
-        // const { data } = await api.get(`/surveys/page?${queryParams}`);
         const { data } = await api.get(`/surveys/list-page?${queryParams}`);
         this.surveys = data;
+        return data;
       } catch (e) {
         // TODO: use cached data?
-        console.log('something went wrong:', e);
+        console.log('Error fetching surveys:', e);
       }
+      // return [];
+      return {
+        content: [],
+        pagination: {
+          parsedLimit: 10,
+          parsedSkip: 0,
+          total: 0,
+        },
+      };
     },
-  },
-  async created() {
-    this.selectedGroupIds = [this.activeGroupId];
-    await this.fetchData({ groups: [this.activeGroupId] });
+    async fetchPinnedSurveys(groupId) { // TODO replace with new store action (?)
+      try {
+        console.log('fetch pinned');
+        const { data } = await api.get(`/groups/${groupId}?populate=1`);
+        if (data && data.surveys && data.surveys.pinned && Array.isArray(data.surveys.pinned)) {
+          this.pinnedSurveys = data.surveys.pinned.map(r => ({ ...r, pinned: true }));
+          return this.pinnedSurveys;
+        }
+      } catch (err) {
+        console.log('Error fetching surveys:', err);
+      }
+      this.pinnedSurveys = [];
+      return [];
+    },
   },
 };
 </script>

@@ -24,7 +24,13 @@ const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  getUserMemberships({ commit }, userId) {
+  getUserMemberships({ commit, rootGetters }, userId) {
+    if (userId === null || userId === undefined) {
+      return new Promise((resolve) => {
+        resolve([]);
+      });
+    }
+
     return new Promise((resolve, reject) => {
       commit('membership_request');
       api

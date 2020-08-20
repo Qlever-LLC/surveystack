@@ -2,16 +2,22 @@
   <v-container v-if="initialized && status.code === 200">
     <div class="d-flex justify-space-between align-center">
       <app-group-breadcrumbs :path="entity.path" />
-      <v-btn
-        class="ml-auto"
-        :to="{name: 'groups-edit', params: {id: entity._id}}"
-        text
-      >
-        <v-icon>mdi-pencil</v-icon>
-        <span class="ml-2">Edit</span>
-      </v-btn>
+
+      <div v-if="editable">
+        <v-btn
+          class="ml-auto"
+          :to="{name: 'groups-edit', params: {id: entity._id}}"
+          text
+        >
+          <v-icon left>mdi-cog</v-icon> Admin
+        </v-btn>
+      </div>
     </div>
 
+    <div
+      style="color: red;"
+      v-if="entity.archived"
+    ><strong>Please note:</strong> this group is currently archived</div>
     <h1>
       {{entity.name}}
     </h1>
@@ -19,7 +25,17 @@
 
     <v-row>
       <v-col>
+        <div class="d-flex justify-end">
+          <v-checkbox
+            class="mt-0"
+            v-model="showArchivedSubgroups"
+            label="View archived"
+            dense
+            hide-details
+          />
+        </div>
         <app-basic-list
+          :editable="editable"
           :entities="subgroups"
           title="Subgroups"
           :link="(e) => `/g${e.path}`"
@@ -38,6 +54,7 @@
     <v-row>
       <v-col>
         <app-basic-list
+          :editable="editable"
           :entities="(entity.surveys && entity.surveys.pinned) ? entity.surveys.pinned : []"
           title="Pinned Surveys"
           :link="(e) => `/surveys/${e._id}`"
@@ -53,7 +70,6 @@
       </v-col>
 
     </v-row>
-
   </v-container>
   <v-container v-else-if="status.code === 404">
     <h1>Oh snap!</h1>
@@ -85,8 +101,10 @@ export default {
         name: '',
         slug: '',
         path: '/',
+        archived: false,
       },
       subgroups: [],
+      showArchivedSubgroups: false,
     };
   },
   methods: {
@@ -103,12 +121,32 @@ export default {
     },
     async getSubgroups() {
       try {
-        const { data } = await api.get(`/groups?dir=${this.entity.path}`);
+        const { data } = await api.get(`/groups?showArchived=${this.showArchivedSubgroups}&dir=${this.entity.path}`);
         this.subgroups = data;
       } catch (e) {
         this.status.code = e.response.status;
         this.status.message = e.response.data.message;
       }
+    },
+  },
+  watch: {
+    showArchivedSubgroups() {
+      this.getSubgroups();
+    },
+  },
+  computed: {
+    user() {
+      return this.$store.getters['auth/user'];
+    },
+    userMemberships() {
+      return this.$store.getters['memberships/memberships'];
+    },
+    editable() {
+      const g = this.userMemberships.find(m => m.group._id === this.entity._id);
+      if (g && g.role === 'admin') {
+        return true;
+      }
+      return false;
     },
   },
   async beforeRouteUpdate(to, from, next) {
@@ -120,6 +158,8 @@ export default {
   async created() {
     const { pathMatch } = this.$route.params;
     await this.getEntity(pathMatch);
+    const user = this.$store.getters['auth/user'];
+    this.$store.dispatch('memberships/getUserMemberships', user._id);
     this.initialized = true;
   },
 };

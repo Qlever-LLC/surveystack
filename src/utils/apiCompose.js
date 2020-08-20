@@ -1,17 +1,61 @@
 const defaultApiCompose = `
+/* eslint-disable */
+
+/**
+ * ApiCompose
+ *
+ * @param {submission} submission
+ */
+function apiCompose(submission) {
+  const request = populatePlanting(
+    submission.data.crop,
+    submission.data.field,
+  );
+
+  return request;
+}
+
+
+/**
+ * Helper function to populate the request
+ * @param {*} cropAnswer answer for the planting crop question
+ */
+
+function populatePlanting(cropAnswer, field) {
+  if (!cropAnswer.value) {
+    throw 'Please select crop';
+  }
+
+  if (!field.value) {
+    throw 'Please select field';
+  }
+
+
+  const crop = cropAnswer.value;
+  const farmUrl = field.value.url;
+
+
+  return {
+    type: 'farmos',
+    farmosType: 'asset',
+    url: farmUrl,
+    body: {
+      name: crop
+      type: 'planting',
+      crop: [{ name: crop }], // crop name
+    },
+  };
+}
+
+
+
 /*
 Simple example to demonstrate how to create a planting on farmos.
 
-The survey needs at least
-    1. One Question to pick a FarmOS field
-    2. One Question for the planting date
-    3. One Question for the crop
+The survey needs one Question for the crop.
 
 On Farmos a vocabulary entry for the crop will be created of not
 already existing.
-
-Also either a 'transplanting' or 'seeding' log will be created for
-the planting.
 
 The ID of the planting will be stored in a submission wide variable
 $PLANTING and will be accessible in logs within other apiCompose functions.
@@ -25,10 +69,6 @@ The structure to send to the surveystack-server looks like this:
   "url": "ourscitest.farmos.net",
   "body": {
     "crop": "potato",
-    "area": "8",
-    "date": "2020-04-02T00:00:00.000+02:00"
-    "method": "seeding"
-  },
 }
 
 
@@ -38,63 +78,8 @@ Other functions may be called within.
 However, we are in a sandbox here, so no requests
 outside are possible.
 
-use {log()} to log to console below
+use log() to log to console below
 */
-
-/**
- * ApiCompose
- *
- * @param {submission} submission
- */
-function apiCompose(submission) {
-  const request = populatePlanting(
-    submission.data.planting.farmos_field,
-    submission.data.planting.date,
-    submission.data.planting.crop,
-  );
-
-  return request;
-}
-
-
-/**
-   * Helper function to populate the request
-   * @param {*} fieldAnswer answer for the farmos field Question
-   * @param {*} dateAnswer answer for the planting date question
-   * @param {*} cropAnswer answer for the planting crop question
-   */
-
-function populatePlanting(fieldAnswer, dateAnswer, cropAnswer) {
-  if (!fieldAnswer.value || !fieldAnswer.value.fieldId) {
-    throw 'Please select a field';
-  }
-
-  if (!cropAnswer.value) {
-    throw 'Please select crop';
-  }
-
-  if (!dateAnswer.value) {
-    throw 'Please select a date';
-  }
-
-  const crop = cropAnswer.value;
-  const farmUrl = fieldAnswer.value.url;
-  const area = fieldAnswer.value.fieldId;
-  const date = dateAnswer.value;
-
-  return {
-    type: 'farmos',
-    farmosType: 'planting',
-    url: farmUrl,
-    body: {
-      crop,
-      area,
-      date,
-      method: 'seeding',
-    },
-  };
-}
-
 `;
 
 export {

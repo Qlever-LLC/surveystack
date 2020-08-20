@@ -1,27 +1,45 @@
 <template>
-  <v-container fluid>
-    <v-row>
-      <v-col cols="12">
-        <v-text-field
-          outlined
-          autofocus
-          type="number"
-          :label="control.label"
-          v-bind:value="value"
-          v-on:input="onInput"
-        />
-        <p class="mt-2">{{ control.hint }}</p>
-      </v-col>
-    </v-row>
-  </v-container>
+  <div class="mt-4">
+    <p v-if="control.title" class="mb-2">{{ control.title }}</p>
+    <v-text-field
+      outlined
+      type="number"
+      :label="control.label"
+      v-bind:value="value"
+      v-on:input="onInput"
+      @keyup.enter.prevent="submit"
+      ref="textField"
+    />
+    <p v-if="control.hint" class="mb-2">{{ control.hint }}</p>
+  </div>
 </template>
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
+import { isIos } from '@/utils/compatibility';
 
 export default {
   mixins: [baseQuestionComponent],
   methods: {
+    keyup(ev) {
+      console.log('key: ', ev);
+    },
+    submit() {
+      this.onInput(this.value);
+      this.$emit('next');
+    },
+    tryAutofocus() {
+      if (
+        typeof document === 'undefined'
+        || !this.$refs.textField.$refs.input
+        || document.activeElement === this.$refs.input
+      ) {
+        return false;
+      }
+      this.$refs.textField.$refs.input.focus({ preventScroll: true });
+
+      return true;
+    },
     onInput(v) {
       if (this.value !== v) {
         // TODO: implicitly parse as Integer or Float?
@@ -38,6 +56,17 @@ export default {
         this.changed(converted);
       }
     },
+  },
+  mounted() {
+    // HACK: ios doesn't respect el.focus({ preventScroll: true })
+    if (isIos()) {
+      this.$el.style.transform = 'translateY(-1000px)';
+      this.tryAutofocus();
+      this.$el.scrollTo(0, 0);
+      this.$el.style.transform = 'none';
+    } else {
+      this.tryAutofocus();
+    }
   },
 };
 </script>

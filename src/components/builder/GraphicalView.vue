@@ -1,110 +1,103 @@
 <template>
-  <div>
-    <v-dialog
-      v-model="deleteQuestionModalIsVisible"
-      max-width="290"
+  <draggable
+    v-if="controls.length !== 0 || index.length !== 0"
+    class="draggable"
+    tag="div"
+    :list="controls"
+    :group="{ name: 'g1' }"
+    :invertSwap="true"
+    @start="drag = true"
+    @end="drag = false"
+  >
+    <v-card
+      v-for="(el, idx) in controls"
+      class="control-item mb-2"
+      :class="{'control-item-selected': (el === selected)}"
+      :key="el.id || el._id"
+      @mousedown.stop.left="$emit('controlSelected', el)"
     >
-      <v-card class="">
-        <v-card-title>
-          Delete Question
-        </v-card-title>
-        <v-card-text class="mt-4">
-          Are you sure you want to remove this question?
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
+      <div class="mb-2 d-flex justify-space-between align-center">
+        <div>
+          <span class="caption grey--text text--darken-1">{{ createIndex(index, idx + 1) | displayIndex}}</span>
+          <br />
+          <span class="title">{{el.label}}</span>
+          <br />
+          <span class="font-weight-light grey--text text--darken-2">{{ el.name }} : {{ el.type }}</span>
+        </div>
+        <div class="d-flex">
           <v-btn
-            text
-            @click.stop="deleteQuestionModalIsVisible = false"
+            icon
+            v-if="selected === el"
+            @click.stop="duplicateControl(el)"
           >
-            Cancel
+            <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
           </v-btn>
           <v-btn
-            text
-            color="red"
-            @click.stop="handleConfirmDelete"
+            icon
+            v-if="selected === el"
+            @click.stop="() => showDeleteModal(idx)"
           >
-            Remove
+            <v-icon color="grey lighten-1">mdi-delete</v-icon>
           </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <draggable
-      v-if="controls.length !== 0 || index.length !== 0"
-      class="draggable list-group"
-      tag="div"
-      :list="controls"
-      :group="{ name: 'g1' }"
-      :invertSwap="true"
-      :dragOptions="{ animation: 200, }"
-      @start="drag = true"
-      @end="drag = false"
-    >
-      <!-- <transition-group
-        type="transition"
-        tag="div"
-        class="drop-area"
-        :name="!drag ? 'flip-list' : null"
-      > -->
-        <v-card
-          v-for="(el, idx) in controls"
-          class="control-item mb-2"
-          :class="{'control-item-selected': (el === selected)}"
-          :key="el._id"
-          @mousedown.stop.left="$emit('controlSelected', el)"
-        >
-          <div class="mb-2 d-flex justify-space-between align-center">
-            <div>
-              <span class="caption grey--text text--darken-1">{{ createIndex(index, idx + 1) | displayIndex}}</span>
-              <br />
-              <span class="title">{{el.label}}</span>
-              <br />
-              <span class="font-weight-light grey--text text--darken-2">{{ el.name }} : {{ el.type }}</span>
-            </div>
-            <div class="d-flex">
-              <v-btn
-                icon
-                v-if="selected === el"
-                @click.stop="duplicateControl(el)"
-              >
-                <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
-              </v-btn>
-                <!-- @click.stop="removeAt(idx)" -->
-              <v-btn
-                icon
-                v-if="selected === el"
-                @click.stop="() => showDeleteModal(idx)"
-              >
-                <v-icon color="grey lighten-1">mdi-delete</v-icon>
-              </v-btn>
-            </div>
-          </div>
+        </div>
+      </div>
 
-          <nested-draggable
-            v-if="el.type == 'group'"
-            :class="{'drop-area-border': (el.children.length === 0)}"
-            :selected="selected"
-            :controls="el.children"
-            @controlSelected="$emit('controlSelected', $event)"
-            @duplicate-control="$emit('duplicate-control', $event)"
-            :index="createIndex(index, idx + 1)"
-          />
+      <nested-draggable
+        v-if="el.type == 'group'"
+        :class="{'drop-area-border': (el.children.length === 0), 'drop-area': 1}"
+        :selected="selected"
+        :controls="el.children"
+        @controlSelected="$emit('controlSelected', $event)"
+        @duplicate-control="$emit('duplicate-control', $event)"
+        :index="createIndex(index, idx + 1)"
+      />
+
+      <v-dialog
+        v-if="deleteQuestionModalIsVisible"
+        v-model="deleteQuestionModalIsVisible"
+        max-width="290"
+      >
+        <v-card class="">
+          <v-card-title>
+            Delete Question
+          </v-card-title>
+          <v-card-text class="mt-4">
+            Are you sure you want to remove this question?
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn
+              text
+              @click.stop="deleteQuestionModalIsVisible = false"
+            >
+              Cancel
+            </v-btn>
+            <v-btn
+              text
+              color="red"
+              @click.stop="handleConfirmDelete"
+            >
+              Remove
+            </v-btn>
+          </v-card-actions>
         </v-card>
-      <!-- </transition-group> -->
-    </draggable>
-    <div v-else>
-      <v-card>
-        <v-card-title>Empty survey</v-card-title>
-        <v-card-text>
-          <div class="text--primary">You can add questions from the menu on the right.</div>
-        </v-card-text>
-      </v-card>
-    </div>
+      </v-dialog>
+    </v-card>
+  </draggable>
+  <div v-else>
+    <v-card class="text--secondary">
+      <v-card-title>Empty survey</v-card-title>
+      <v-card-text>
+        <div class="text--primary">You can add questions by clicking the <strong>plus icon</strong> below.</div>
+      </v-card-text>
+    </v-card>
   </div>
+
 </template>
 <script>
 import draggable from 'vuedraggable';
 import { cloneDeep } from 'lodash';
+import ObjectID from 'bson-objectid';
 
 export default {
   name: 'nested-draggable',
@@ -162,7 +155,24 @@ export default {
         ...cloneDeep(el),
         name: `${el.name}_copy`,
         label: `${el.label} copy`,
+        id: new ObjectID().toString(),
       };
+
+      const dive = (control, cb) => {
+        cb(control);
+        if (!control.children) {
+          return;
+        }
+        control.children.forEach((c) => {
+          dive(c, cb);
+        });
+      };
+
+      dive(copy, (control) => {
+        // eslint-disable-next-line no-param-reassign
+        control.id = new ObjectID().toString();
+      });
+
       this.$emit('duplicate-control', copy);
     },
   },

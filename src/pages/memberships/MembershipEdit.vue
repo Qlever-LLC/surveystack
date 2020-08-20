@@ -18,24 +18,32 @@
         class="mt-3"
         @keydown.enter.prevent="submit"
       >
+        <v-select
+          :items="availableStatus"
+          v-model="entity.meta.status"
+          label="Status"
+          disabled
+        />
 
         <v-text-field
           v-model="entity.group"
           label="Group"
-          outlined
           disabled
-          :hint="entity.group"
-          persistent-hint
+        />
+
+        <v-text-field
+          v-if="entity.user"
+          class="mt-3"
+          v-model="entity.user"
+          label="User"
+          disabled
         />
 
         <v-text-field
           class="mt-3"
-          v-model="entity.user"
-          label="User"
-          outlined
-          disabled
-          :hint="entity.user"
-          persistent-hint
+          v-model="entity.meta.invitationEmail"
+          label="Invitation Email"
+          :disabled="entity.meta.status === 'active'"
         />
 
         <v-select
@@ -43,18 +51,9 @@
           :items="availableRoles"
           v-model="entity.role"
           label="Role"
-          outlined
         ></v-select>
 
         <div class="d-flex mt-2">
-          <v-btn
-            color="secondary"
-            outlined
-            @click="resend"
-            v-if="entity.meta.status === 'pending'"
-          >
-            <v-icon left>mdi-email-send-outline</v-icon> Resend
-          </v-btn>
           <v-btn
             class="ml-auto"
             text
@@ -63,12 +62,44 @@
           <v-btn
             color="primary"
             @click="submit"
-          >Submit</v-btn>
+          >Save</v-btn>
         </div>
       </v-form>
     </v-card>
 
-    <v-card>
+    <v-card
+      class="my-3 pa-2"
+      v-if="resendEnabled"
+    >
+      <v-card-title>
+        <v-icon left>mdi-account-clock</v-icon>Pending
+      </v-card-title>
+      <v-card-subtitle>Membership has not been claimed</v-card-subtitle>
+      <v-card-text>
+        You can try to resend the invitation via email. You may also view the secret invitation link and deliver it by other means.
+      </v-card-text>
+      <v-card-actions class="d-flex justify-space-between align-center">
+        <div>
+          <v-btn
+            color="primary"
+            @click="resend"
+          >
+            <v-icon left>mdi-email-send-outline</v-icon> Resend
+          </v-btn>
+          <span class="ml-1 caption text--secondary">{{entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Not yet sent'}}</span>
+        </div>
+        <div>
+          <v-btn
+            @click="dialogInvitationLink = true"
+            color="primary"
+          >
+            <v-icon left>mdi-eye-outline</v-icon>View
+          </v-btn>
+        </div>
+      </v-card-actions>
+    </v-card>
+
+    <v-card class="my-3">
       <app-integration-list
         title="Membership Integrations"
         :entities="integrations"
@@ -106,12 +137,47 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog
+      v-model="dialogSent"
+      max-width="400"
+    >
+      <v-card class="">
+        <v-card-title>
+          Sent
+        </v-card-title>
+        <v-card-text class="mt-4">
+          An invitation email has been sent to<br />{{entity.meta.invitationEmail}}
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            @click.stop="dialogSent = false"
+          >
+            OK
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <app-dialog
+      v-model="dialogInvitationLink"
+      title="Invitation Link"
+    >
+      <p>
+        Copy the following secret invitation link. It can be used to claim this membership - either by creating a new user account, or by using an already existing user account.
+      </p>
+
+      <span class="body-1">{{invitationLink}}</span>
+    </app-dialog>
   </v-container>
 </template>
 
 <script>
 import api from '@/services/api.service';
 import appIntegrationList from '@/components/integrations/IntegrationList.vue';
+import appDialog from '@/components/ui/Dialog.vue';
 
 const availableRoles = [
   {
@@ -124,13 +190,26 @@ const availableRoles = [
   },
 ];
 
+const availableStatus = [
+  {
+    value: 'pending',
+    text: 'Pending',
+  },
+  {
+    value: 'active',
+    text: 'Active',
+  },
+];
+
 export default {
   components: {
     appIntegrationList,
+    appDialog,
   },
   data() {
     return {
       availableRoles,
+      availableStatus,
       entity: {
         _id: '',
         user: null,
@@ -141,7 +220,28 @@ export default {
       groupDetail: null,
       integrations: [],
       dialogRemoval: false,
+      dialogSent: false,
+      initialInvitationEmail: null,
+      dialogInvitationLink: false,
     };
+  },
+  watch: {
+    'entity.meta.invitationEmail': function (newVal, oldVal) {
+      if (!oldVal) {
+        this.initialInvitationEmail = newVal;
+      }
+    },
+  },
+  computed: {
+    resendEnabled() {
+      if (this.entity.meta.status === 'pending' && this.initialInvitationEmail === this.entity.meta.invitationEmail) {
+        return true;
+      }
+      return false;
+    },
+    invitationLink() {
+      return `${window.location.origin}/invitations?code=${this.entity.meta.invitationCode}`;
+    },
   },
   methods: {
     cancel() {
@@ -172,8 +272,12 @@ export default {
       }
     },
     async resend() {
+      this.dialogSent = false;
       try {
-        await api.post(`/memberships/${this.entity._id}/resend`);
+        const { data: updated } = await api.post(`/memberships/${this.entity._id}/resend`);
+        console.log(updated);
+        this.entity = updated;
+        this.dialogSent = true;
       } catch (err) {
         this.$store.dispatch('feedback/add', err.response.data.message);
       }

@@ -1,8 +1,8 @@
 <template>
   <div>
     <survey-builder
-      :key="sessionId"
       v-if="!loading"
+      :key="sessionId"
       :survey="survey"
       :editMode="editMode"
       :freshImport="freshImport"
@@ -13,12 +13,16 @@
       @import-survey="importSurvey"
       @export-survey="exportSurvey"
     />
-    <div v-else>
+    <div
+      v-else
+      class="d-flex align-center justify-center"
+      style="height: 100%"
+    >
       <v-progress-circular
         :size="50"
         color="primary"
         indeterminate
-      ></v-progress-circular>
+      />
     </div>
 
     <app-dialog
@@ -76,6 +80,7 @@
       v-model="showResult"
       :items="resultItems"
       title="Result of Submission"
+      additionalMessage="<span class='caption'>Note: submissions from Builder are automatically archived. Please browse archived submissions to view this result.</span>"
     />
 
     <v-snackbar
@@ -84,7 +89,7 @@
     >
       {{snackbarMessage | capitalize}}
       <v-btn
-        color="pink"
+        color="grey"
         text
         @click="showSnackbar = false"
       >Close</v-btn>
@@ -95,15 +100,15 @@
 
 <script>
 import ObjectId from 'bson-objectid';
-import moment from 'moment';
 import api from '@/services/api.service';
 
 import appDialog from '@/components/ui/Dialog.vue';
-import SurveyBuilder from '@/components/builder/SurveyBuilder.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import resultMixin from '@/components/ui/ResultsMixin';
 
-import { createSurvey } from '@/utils/surveys';
+import { createSurvey, updateControls } from '@/utils/surveys';
+
+const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
 export default {
   components: {
@@ -173,11 +178,23 @@ export default {
     },
     async submitSubmission({ payload }) {
       this.submitting = true;
+      const submission = {
+        ...payload,
+        meta: {
+          ...payload.meta,
+          archived: true,
+          archivedReason: 'SUBMISSION_FROM_BUILDER',
+        },
+      };
       try {
-        console.log('submitting', payload);
-        const response = await api.post('/submissions', payload);
+        console.log('submitting', submission);
+        const response = await api.post('/submissions', submission);
         // this.$router.push(`/surveys/${this.survey._id}`);
-        this.result({ response });
+        try {
+          this.result({ response });
+        } catch (error) {
+          console.log('error parsing result from server', error);
+        }
       } catch (error) {
         console.log('error', error);
         const { message } = error.response.data;
@@ -237,17 +254,48 @@ export default {
       }
     },
     onOverride() {
-      console.log('onOverride');
       this.showOverrideModal = false;
-
       try {
+        // only keep latest revision of survey definition
         const filtered = this.survey.revisions.filter(r => r.version <= this.survey.latestVersion);
         this.survey.revisions = filtered;
-        const revision = this.importedSurvey.revisions[this.importedSurvey.revisions.length - 1];
-        revision.version = this.survey.latestVersion + 1;
+        const revision = { ...this.importedSurvey.revisions[this.importedSurvey.revisions.length - 1] };
+
+        if (this.importedSurvey.specVersion === 1) {
+          const migratedControls = updateControls(
+            updateControls(revision.controls, { type: 'ontology', key: 'options.source', replacer: () => '' }),
+            { type: /.*/, replacer: ({ _id, ...rest }) => ({ id: new ObjectId().toString(), ...rest }) },
+          );
+          revision.controls = migratedControls;
+        }
+
+        if (this.importedSurvey.meta.specVersion === 2) {
+          this.importedSurvey.resources = this.importedSurvey.resources
+            ? this.importedSurvey.resources
+              .map(({ handle, ...rest }) => ({
+                name: handle,
+                id: new ObjectId().toString(),
+                ...rest,
+              }))
+            : [];
+        }
+
+        // set new ObjectIDs for all controls
+        revision.controls = updateControls(
+          revision.controls,
+          { type: /.*/, replacer: ({ id, ...rest }) => ({ id: new ObjectId().toString(), ...rest }) },
+        );
+
+        // append imported survey definition as latest revision
         this.survey.revisions.push(revision);
+        this.survey.resources = this.importedSurvey.resources
+          ? this.importedSurvey.resources
+          : [];
+        revision.version = this.survey.latestVersion + 1;
         this.freshImport = true;
-        this.sessionId = new ObjectId().toString();
+
+        const id = new ObjectId().toString();
+        this.sessionId = id;
       } catch (err) {
         console.error('error parsing Survey file', err);
         this.snack(`error parsing Survey file:${err}`);
@@ -284,13 +332,16 @@ export default {
       ({ name }) => name === 'surveys-new',
     );
 
-    this.survey._id = ObjectId();
-    this.survey.dateCreated = moment().toISOString(true);
+
+    this.survey._id = new ObjectId();
 
     if (this.editMode) {
       this.loading = true;
       await this.fetchData();
     }
+  },
+  beforeRouteLeave(to, from, next) {
+    next(true);
   },
 };
 </script>

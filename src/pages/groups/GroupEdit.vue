@@ -1,7 +1,16 @@
 <template>
   <v-container>
-    <h1>{{editMode ? "Edit group" : "Create group"}}</h1>
-
+    <div class="d-flex justify-space-between">
+      <h1>{{editMode ? "Edit group" : "Create group"}}</h1>
+      <v-btn
+        v-if="editMode"
+        class="ma-2"
+        :to="`/call-for-submissions?group=${entity._id}`"
+        color="secondary"
+      >
+        <v-icon left>mdi-email-multiple-outline</v-icon>Call for submissions...
+      </v-btn>
+    </div>
     <v-card class="pa-4 mb-4">
       <form
         @submit.prevent="onSubmit"
@@ -26,7 +35,10 @@
           hint="URL friendly version of name"
           persistent-hint
         />
-
+        <v-checkbox
+          label="Archived"
+          v-model="entity.archived"
+        />
         <div class="d-flex justify-end pa-2">
           <v-btn
             text
@@ -74,6 +86,7 @@
     </v-row>
 
     <app-basic-list
+      editable
       class="mb-4"
       v-if="editMode"
       :entities="members"
@@ -83,9 +96,9 @@
       :filter="filterMembers"
     >
       <template v-slot:entity="{ entity }">
-        <v-list-item-content v-if="entity.meta.status === 'pending'">
-          <v-list-item-title class="text--secondary">[Pending] Invitation</v-list-item-title>
-          <v-list-item-subtitle>sent to {{entity.meta.sentTo}}</v-list-item-subtitle>
+        <v-list-item-content v-if="entity.meta && entity.meta.status === 'pending'">
+          <v-list-item-title class="text--secondary">[Pending] {{entity.meta.invitationEmail}}</v-list-item-title>
+          <v-list-item-subtitle>{{entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'}}</v-list-item-subtitle>
         </v-list-item-content>
 
         <v-list-item-content v-else>
@@ -131,6 +144,7 @@ export default {
         surveys: {
           pinned: [],
         },
+        archived: false,
       },
       integrations: [],
       searchResults: [],
@@ -169,7 +183,7 @@ export default {
       this.$router.back();
     },
     async searchSurveys(q) {
-      const { data: searchResults } = await api.get(`/surveys?projections[]=name&projections[]=dateModified&q=${q}`);
+      const { data: searchResults } = await api.get(`/surveys?projections[]=name&projections[]=meta.dateModified&q=${q}`);
       this.searchResults = searchResults;
     },
     filterMembers(entities, q) {
@@ -187,8 +201,8 @@ export default {
           if (entity.user.email.toLowerCase().startsWith(ql)) {
             return true;
           }
-        } else if (entity.meta.sentTo) {
-          if (entity.meta.sentTo.toLowerCase().indexOf(ql) > -1) {
+        } else if (entity.meta.invitationEmail) {
+          if (entity.meta.invitationEmail.toLowerCase().indexOf(ql) > -1) {
             return true;
           }
         }

@@ -28,7 +28,7 @@
               <active-group-selector
                 class="mt-4"
                 label="Group"
-                v-model="value.group"
+                v-model="value.meta.group"
                 outlined
                 returnObject
               />
@@ -288,7 +288,7 @@ export default {
     };
   },
   async created() {
-    const { id } = this.value.group;
+    const { id } = this.value.meta.group;
     if (id) {
       const name = await this.getGroupNameById(id);
       this.surveyGroupName = name;
@@ -327,8 +327,8 @@ export default {
         //   console.log('groups are same');
         //   return;
         // }
-        if (value.group && value.group.id) {
-          this.surveyGroupName = await this.getGroupNameById(value.group.id);
+        if (value.meta.group && value.meta.group.id) {
+          this.surveyGroupName = await this.getGroupNameById(value.meta.group.id);
         }
       },
       deep: true,

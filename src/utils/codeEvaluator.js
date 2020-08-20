@@ -1,14 +1,32 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
 import * as utils from './surveys';
 import submissionUtils from './submissions';
 
 
 async function calculateField(survey, submission, positions, controls, option, fname) {
+  const ignored = [];
   const items = positions.map((pos) => {
     const control = utils.getControl(controls, pos);
     if (!control.options[option].enabled) {
       return null;
     }
+
+    // in case the field is not relevant, skip execution and return {}
+    const field = submissionUtils.getSubmissionField(submission, survey, pos);
+
+    if (fname !== 'relevance') { // if field happens to be irrelvant, but skip this if we eval relevance
+      if (field.meta.computedRelevance !== undefined && field.meta.computedRelevance === false) {
+        ignored.push({
+          control,
+          field,
+          ignore: true,
+        });
+        return null;
+      }
+    }
+
     const { code } = control.options[option];
     return {
       pos,
@@ -18,27 +36,20 @@ async function calculateField(survey, submission, positions, controls, option, f
   }).filter(item => item !== null);
 
 
-  const promises = items.map(item => new Promise((resolve, reject) => {
-    utils.execute({ code: item.code, fname, submission })
-      .then(r => resolve({
-        control: item.control,
-        pos: item.pos,
-        res: r,
-      })).catch((e) => {
-        reject(e);
-      });
-  }));
-
-
   const evaluated = [];
 
-  let idx = 0;
-  // eslint-disable-next-line no-restricted-syntax
-  for (const promise of promises) {
-    const item = items[idx];
 
+  // eslint-disable-next-line no-restricted-syntax
+  for (const item of items) {
     try {
-      const res = await promise;
+      const res = {
+        res: utils.executeUnsafe({
+          code: item.code, fname, submission, survey, log: msg => console.log(msg),
+        }),
+        pos: item.pos,
+        control: item.control,
+      };
+
       const field = submissionUtils.getSubmissionField(submission, survey, item.pos);
       const evaluatedItem = {
         control: item.control,
@@ -55,8 +66,9 @@ async function calculateField(survey, submission, positions, controls, option, f
       };
       evaluated.push(evaluatedItem);
     }
-    idx++;
   }
+
+  evaluated.push(...ignored);
 
   return evaluated;
 }
@@ -66,11 +78,20 @@ export const calculateRelevance = async (survey, submission, positions, controls
     const r = await calculateField(survey, submission, positions, controls, 'relevance', 'relevance');
     r.forEach((item) => {
       if (typeof item.res !== 'boolean') {
-        console.log('error, result is rejected', item.res);
+        console.log('error, result is rejected', item);
+        item.field.meta.relevant = true;
+      } else {
+        item.field.meta.relevant = item.res;
       }
-      // eslint-disable-next-line no-param-reassign
-      item.field.meta.relevant = item.res;
     });
+
+    // for all eval if relevant, store in field
+    for (let idx = 0; idx < positions.length; idx++) {
+      const pos = positions[idx];
+      const rel = utils.isRelevant(submission, survey, idx, positions);
+      const field = submissionUtils.getSubmissionField(submission, survey, pos);
+      field.meta.computedRelevance = rel;
+    }
   } catch (error) {
     console.log(error);
   }
@@ -80,12 +101,14 @@ export const calculateRelevance = async (survey, submission, positions, controls
 export const calculateApiCompose = async (survey, submission, positions, controls) => {
   const r = await calculateField(survey, submission, positions, controls, 'apiCompose', 'apiCompose');
   r.forEach((item) => {
-    console.log('item', item);
     if (typeof item.res !== 'object') {
       console.log('error, result is rejected', item.res);
     }
-    // eslint-disable-next-line no-param-reassign
-    item.field.meta.apiCompose = item.res;
+    if (item.ignore) {
+      item.field.meta.apiCompose = {};
+    } else {
+      item.field.meta.apiCompose = item.res;
+    }
   });
   return r;
 };

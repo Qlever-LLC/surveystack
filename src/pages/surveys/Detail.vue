@@ -1,11 +1,8 @@
 <template>
-  <v-container
-    v-if="entity"
-    class="mt-2"
-  >
+  <v-container v-if="entity">
     <div class="d-flex justify-end">
       <v-btn
-        v-if="$store.getters['auth/isLoggedIn']"
+        v-if="editable"
         class="mx-2"
         :to="`/surveys/${entity._id}/edit`"
       >
@@ -60,13 +57,44 @@ export default {
       this.$store.dispatch('submissions/startDraft', { survey, group });
     },
   },
+  computed: {
+    user() {
+      return this.$store.getters['auth/user'];
+    },
+    memberships() {
+      return this.$store.getters['memberships/memberships'];
+    },
+    editable() {
+      if (!this.$store.getters['auth/isLoggedIn']) {
+        return false;
+      }
+      const user = this.$store.getters['auth/user'];
+
+      if (this.entity && this.entity.meta && this.entity.meta.creator === user._id) {
+        return true;
+      }
+
+      if (!this.entity.meta.group || !this.entity.meta.group.id) {
+        return false;
+      }
+
+      const g = this.memberships.find(m => m.group._id === this.entity.meta.group.id);
+      if (g && g.role === 'admin') {
+        return true;
+      }
+      return false;
+    },
+  },
   async created() {
     const { id } = this.$route.params;
-    const s = await api.get(`/surveys/${id}`);
-    this.entity = s.data;
+    const { data: entity } = await api.get(`/surveys/${id}`);
+    this.entity = entity;
 
-    const i = await api.get(`/surveys/info?id=${id}`);
-    this.surveyInfo = i.data;
+    const { data: surveyInfo } = await api.get(`/surveys/info?id=${id}`);
+    this.surveyInfo = surveyInfo;
+
+    const user = this.$store.getters['auth/user'];
+    this.$store.dispatch('memberships/getUserMemberships', user._id);
   },
 
 };

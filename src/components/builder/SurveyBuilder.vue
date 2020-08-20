@@ -113,7 +113,7 @@
           class="code-resizer"
         >
 
-          <pane>
+          <pane size="80">
             <div style="height: 100%">
               <v-tabs
                 v-if="control.options"
@@ -159,7 +159,7 @@
             </div>
 
           </pane>
-          <pane>
+          <pane size="20">
             <console-log
               class="console-log"
               :log="log"
@@ -199,6 +199,13 @@
       </pane>
 
     </splitpanes>
+
+    <!-- <confirm-leave-dialog
+      ref="confirmLeaveDialog"
+      title="Confirm Leave Survey"
+    >
+      Are you sure you want to leave this survey?
+    </confirm-leave-dialog> -->
   </div>
 </template>
 
@@ -208,9 +215,8 @@ import {
 } from 'lodash';
 import { Splitpanes, Pane } from 'splitpanes';
 
-import ObjectId from 'bson-objectid';
 import moment from 'moment';
-import codeEditor from '@/components/ui/CodeEditor.vue';
+
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
 import controlAdder from '@/components/builder/ControlAdder.vue';
@@ -229,15 +235,19 @@ import * as utils from '@/utils/surveys';
 import { defaultApiCompose } from '@/utils/apiCompose';
 
 import submissionUtils from '@/utils/submissions';
+import { SPEC_VERSION_SCRIPT } from '@/constants';
 
+
+const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
 const initialRelevanceCode = variable => `\
 /**
  * ${variable.charAt(0).toUpperCase() + variable.substr(1)}
  *
  * @param {submission} submission
+ * @param {survey} survey
  */
-function ${variable}(submission) {
+function ${variable}(submission, survey) {
   return true;
 }
 `;
@@ -264,6 +274,7 @@ export default {
     draft,
     consoleLog,
     appCodeView,
+    // ConfirmLeaveDialog,
     appExamplesView,
   },
   props: [
@@ -357,7 +368,7 @@ export default {
       this.$set(this.survey, 'revisions', cloneDeep(this.initialSurvey.revisions));
 
       this.survey.revisions.push(nextVersionObj);
-      this.survey.dateModified = date;
+      this.survey.meta.dateModified = date;
     },
     initNavbarAndDirtyFlag(survey) {
       if (!survey.revisions) {
@@ -441,11 +452,12 @@ export default {
     async runCode() {
       const tab = tabMap[this.selectedTab];
       try {
-        const res = await utils.execute(
+        const res = await utils.executeUnsafe(
           {
             code: this.activeCode,
             fname: tab,
             submission: this.instance,
+            survey: this.survey,
             log: (arg) => {
               this.log = `${this.log}${arg}\n`;
             },
@@ -486,7 +498,26 @@ export default {
       return data;
     },
     setScriptCode(data) {
-      this.scriptCode = data || { _id: null, name: 'New Script', content: '' };
+      if (!data) {
+        // default empty script...
+        // ideally we shouldnt need to instantiate inside SurveyBuilder
+        this.scriptCode = {
+          _id: null,
+          name: 'New Script',
+          meta: {
+            dateCreated: new Date(),
+            dateModified: null,
+            revision: 1,
+            creator: null,
+            group: { id: null, path: null },
+            specVersion: SPEC_VERSION_SCRIPT,
+          },
+          content: '',
+        };
+        return;
+      }
+
+      this.scriptCode = data;
     },
     duplicateControl(control) {
       const position = utils.getPosition(this.control, this.currentControls);
@@ -751,7 +782,7 @@ export default {
         const resourcesAreEqual = isEqual(this.initialSurvey.resources, newVal.resources);
         const revisionsAreEqual = isEqual(this.initialSurvey.revisions, newVal.revisions);
         const surveyDetailsAreEquivalent = (this.initialSurvey.name === newVal.name)
-          && isEqual(this.initialSurvey.group, newVal.group)
+          && isEqual(this.initialSurvey.meta.group, newVal.meta.group)
           && (this.initialSurvey.description === newVal.description);
         this.surveyUnchanged = revisionsAreEqual
           && surveyDetailsAreEquivalent
@@ -772,6 +803,16 @@ export default {
     this.initNavbarAndDirtyFlag(this.survey);
     this.createInstance();
   },
+
+  // TODO: get route guard to work here, or move dirty flag up to Builder.vue
+  // beforeRouteLeave(to, from, next) {
+  //   console.log('hello');
+  //   if (true) {
+  //     this.$refs.confirmLeaveDialog.open(next);
+  //     return;
+  //   }
+  //   next(true);
+  // },
 };
 </script>
 

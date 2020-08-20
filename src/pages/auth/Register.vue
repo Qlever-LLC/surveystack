@@ -149,27 +149,22 @@ export default {
           url: '/auth/register',
           user: this.entity,
         });
-        const memberships = await this.$store.dispatch('memberships/getUserMemberships', user._id);
-        if (
-          // !this.$store.getters['memberships/activeGroup'] &&
-          memberships
-          && memberships.length > 0
-          && memberships[0].group
-        ) {
-          this.$store.dispatch('memberships/setActiveGroup', memberships[0].group._id);
-        }
 
         if (this.$route.params.redirect) {
           this.$router.push(this.$route.params.redirect);
         } else if (this.$store.getters['invitation/hasInvitation']) {
           this.$router.push({ name: 'invitations', query: { code: this.$store.getters['invitation/code'] } });
         } else {
+          this.$store.dispatch('surveys/fetchPinned');
           this.$router.push('/');
         }
       } catch (error) {
         console.log(error.response);
         switch (error.response.status) {
           case 409:
+            this.status = error.response.data.message;
+            break;
+          case 400:
             this.status = error.response.data.message;
             break;
           default:
@@ -190,7 +185,7 @@ export default {
     this.invitation = invitation;
     if (invitation) {
       this.$store.dispatch('invitation/set', invitation);
-      const { data: [membership] } = await api.get(`/memberships?invitation=${invitation}&populate=true`);
+      const { data: [membership] } = await api.get(`/memberships?invitationCode=${invitation}&populate=true`);
       this.membership = membership;
     }
   },

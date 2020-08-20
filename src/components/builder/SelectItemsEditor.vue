@@ -3,7 +3,7 @@
     <!-- <h4>Items</h4> -->
     <v-card-title class="px-0 d-flex justify-space-between">
       <span>
-        Select Options
+        Selection List
       </span>
 
     </v-card-title>

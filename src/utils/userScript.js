@@ -22,7 +22,7 @@ export default function buildScriptQuestionIframeContents({
   paramsJSON,
 }) {
   const baseURL = process.env.NODE_ENV === 'production'
-    ? 'https://dev.our-sci.net'
+    ? 'https://app.surveystack.io'
     : `http://localhost:${process.env.VUE_APP_DEV_SERVER_PORT || 8080}`;
   return `
   <head>
