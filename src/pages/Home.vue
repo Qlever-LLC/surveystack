@@ -135,6 +135,7 @@ export default {
   },
 
   async created() {
+    // vvv Next line will always evaluate as true since this isn't how you access localstorage vvv
     if (!localStorage.installed) {
       window.addEventListener('beforeinstallprompt', (e) => {
         console.log('beforeinstall');

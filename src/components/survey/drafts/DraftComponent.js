@@ -17,6 +17,8 @@ import * as utils from '@/utils/surveys';
 import submissionUtils from '@/utils/submissions';
 import * as codeEvaluator from '@/utils/codeEvaluator';
 
+import { isIos } from '@/utils/compatibility';
+
 export default {
   model: {
     prop: 'submission',
@@ -123,6 +125,9 @@ export default {
     },
   },
   methods: {
+    isIos() {
+      return isIos();
+    },
     eval() {},
     setSubmissionGroup(groupId) {
       const groups = this.$store.getters['memberships/groups'];

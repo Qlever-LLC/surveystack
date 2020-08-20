@@ -4,9 +4,13 @@
 }
 
 .wrapper {
+	height: 100%;
+	overflow-y: scroll;
+	-webkit-overflow-scrolling: touch;
 }
 
-#footer-container {
+.footer-container {
+	z-index: 1;
 	/* background-color: white; */
 	width: 100%;
 	border-top: 1px solid #eee;
@@ -19,6 +23,12 @@
 	/* top: calc(100vh - 68px); */
 	/* top: 0vh; */
 	left: 0px;
+
+}
+
+.footer-container.ios {
+	height: calc(68px + 44px);
+	top: calc(100% - 68px - 44px);
 }
 
 .draft-container {
