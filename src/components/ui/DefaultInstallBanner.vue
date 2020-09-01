@@ -44,36 +44,30 @@ export default {
     value: Boolean,
   },
   methods: {
-    handleInput(ev) {
-      this.$emit('input', ev);
-    },
     handleClose() {
-      this.$emit('input', false);
+      // this.$emit('input', false);
+      this.showDefaultInstall = false;
     },
     install() {
       this.installPrompt.prompt();
     },
     beforeInstallPrompt(e) {
-      if (!localStorage.getItem('installed')) {
-        console.log('beforeinstall');
-        // Prevent the mini-infobar from appearing on mobile
-        e.preventDefault();
-        // Stash the event so it can be triggered later.
-        this.installPrompt = e;
-        // Update UI notify the user they can install the PWA
-        this.showDefaultInstall = true;
-      }
+      // if (!localStorage.getItem('installed')) {
+      console.log('beforeinstall');
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      this.installPrompt = e;
+      // Update UI notify the user they can install the PWA
+      this.showDefaultInstall = true;
+      // }
     },
   },
   created() {
     window.addEventListener('beforeinstallprompt', this.beforeInstallPrompt);
     window.addEventListener('appinstalled', (evt) => {
       // localStorage.installed = true;
-      localStorage.setItem('installed', true);
-    });
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      console.log('beforeinstall');
+      // localStorage.setItem('installed', true);
     });
   },
 };

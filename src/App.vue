@@ -4,12 +4,11 @@
     <app-navbar />
     <div id="app-menu"></div>
 
-    <v-content>
+    <v-main>
       <app-global-feedback />
-        <!-- :class="{'pa-3': $route.name !== 'submissions-drafts-detail' || $route.name !== 'surveys-detail'}" -->
-      <router-view
-      ></router-view>
-    </v-content>
+      <router-view />
+    </v-main>
+    <install-banner />
   </v-app>
 </template>
 
@@ -21,6 +20,7 @@ import appGlobalFeedback from '@/components/GlobalFeedback.vue';
 import domainHandler from '@/utils/domainHandler';
 import api from '@/services/api.service';
 import * as db from '@/store/db';
+import InstallBanner from '@/components/ui/InstallBanner.vue';
 
 
 export default {
@@ -28,6 +28,7 @@ export default {
   components: {
     appNavbar,
     appGlobalFeedback,
+    InstallBanner,
   },
   created() {
     domainHandler.install(this);

@@ -84,7 +84,6 @@
       </v-col>
     </v-row>
 
-    <install-banner />
   </v-container>
 </template>
 
@@ -92,13 +91,11 @@
 import axios from 'axios';
 import AppLogin from '@/pages/auth/Login.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
-import InstallBanner from '@/components/ui/InstallBanner.vue';
 
 export default {
   components: {
     AppLogin,
     AppBasicList,
-    InstallBanner,
   },
   name: 'home',
   data() {

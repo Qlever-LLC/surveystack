@@ -22,7 +22,6 @@ export default {
   },
   data() {
     return {
-      // showDefaultInstall: true,
       showIosInstallBanner: false,
     };
   },
@@ -32,25 +31,6 @@ export default {
     if (isIos() && isInStandaloneMode()) {
       this.showIosInstallBanner = true;
     }
-
-    // // vvv Next line will always evaluate as true since this isn't how you access localstorage vvv
-    // if (!localStorage.installed) {
-    //   window.addEventListener('beforeinstallprompt', (e) => {
-    //     console.log('beforeinstall');
-    //     // Prevent the mini-infobar from appearing on mobile
-    //     e.preventDefault();
-    //     // Stash the event so it can be triggered later.
-    //     this.installPrompt = e;
-    //     // Update UI notify the user they can install the PWA
-    //     this.showDefaultInstall = true;
-    //   });
-
-    //   window.addEventListener('appinstalled', (evt) => {
-    //     localStorage.installed = true;
-    //   });
-
-    //   window.addEventListener('focus', this.focused);
-    // }
   },
 };
 </script>
