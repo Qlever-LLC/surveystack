@@ -1,0 +1,89 @@
+<template>
+  <v-snackbar
+    v-model="showDefaultInstall"
+    :timeout="-1"
+    color="primary lighten-1"
+    fixed
+    bottom
+    class="snackbar"
+  >
+    <v-btn
+      @click="handleClose"
+      icon
+      class="close-button"
+    >
+      <v-icon>mdi-close</v-icon>
+    </v-btn>
+    <div class="text-center wrapper">
+      <div class="d-flex align-center justify-center">
+        <v-btn
+          color="accent lighten-1"
+          dark
+          @click="install"
+        >
+          Install App
+        </v-btn>
+      </div>
+    </div>
+  </v-snackbar>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      showDefaultInstall: false,
+      installPrompt: {
+        prompt() {
+          console.log('install stub');
+        },
+      },
+    };
+  },
+  props: {
+    value: Boolean,
+  },
+  methods: {
+    handleInput(ev) {
+      this.$emit('input', ev);
+    },
+    handleClose() {
+      this.$emit('input', false);
+    },
+    install() {
+      this.installPrompt.prompt();
+    },
+    beforeInstallPrompt(e) {
+      if (!localStorage.getItem('installed')) {
+        console.log('beforeinstall');
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        this.installPrompt = e;
+        // Update UI notify the user they can install the PWA
+        this.showDefaultInstall = true;
+      }
+    },
+  },
+  created() {
+    window.addEventListener('beforeinstallprompt', this.beforeInstallPrompt);
+    window.addEventListener('appinstalled', (evt) => {
+      // localStorage.installed = true;
+      localStorage.setItem('installed', true);
+    });
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      console.log('beforeinstall');
+    });
+  },
+};
+</script>
+
+<style scoped>
+
+.close-button {
+  position: absolute;
+  right: 10px;
+  top: 3px;
+}
+</style>
