@@ -102,7 +102,6 @@
 
     <draft-footer
       class="px-4 grey lighten-5 footer-container"
-      :class="{ios: isIos()}"
       :showPrev="!atStart"
       :enableNext="mShowNext && controls.length > 0"
       :showSubmit="atEnd && controls.length > 0"

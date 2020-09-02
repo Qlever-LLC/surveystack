@@ -28,7 +28,12 @@ export default {
   methods: {
   },
   created() {
-    if (isIos() && isInStandaloneMode()) {
+    console.log(isIos());
+    if (
+      isIos()
+      && !isInStandaloneMode()
+      && !localStorage.getItem('iosInstallBannerDismissed')
+    ) {
       this.showIosInstallBanner = true;
     }
   },

@@ -16,7 +16,7 @@
       <v-icon>mdi-close</v-icon>
     </v-btn>
     <div class="text-center wrapper">
-      <h2>Install</h2>
+      <h2>Install App</h2>
       <div class="d-flex align-center justify-center">
           Just tap
           <img src="./ios-safari-center-icon.svg" alt="" class="icon"/>
@@ -39,6 +39,7 @@ export default {
     },
     handleClose() {
       this.$emit('input', false);
+      localStorage.setItem('iosInstallBannerDismissed', true);
     },
   },
 };
@@ -55,6 +56,9 @@ export default {
   width: 100%;
 }
 
+.snackbar {
+  height: auto !important;
+}
 
 .snackbar >>> .v-snack__content {
   position: relative;

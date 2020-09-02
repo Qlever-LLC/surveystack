@@ -15,13 +15,16 @@
       <v-icon>mdi-close</v-icon>
     </v-btn>
     <div class="text-center wrapper">
-      <div class="d-flex align-center justify-center">
+      <h2>Install App</h2>
+      <div class="d-flex align-center justify-center pt-2">
+        <!-- color="accent lighten-1" -->
         <v-btn
-          color="accent lighten-1"
-          dark
+          outlined
           @click="install"
+          large
         >
-          Install App
+          <v-icon class="ml-n2 mr-1" small>mdi-plus</v-icon>
+           Add to Homescreen
         </v-btn>
       </div>
     </div>
