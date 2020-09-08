@@ -13,7 +13,7 @@
 <script>
 import IosInstallBanner from '@/components/ui/IosInstallBanner/IosInstallBanner.vue';
 import DefaultInstallBanner from '@/components/ui/DefaultInstallBanner.vue';
-import { isIos, isInStandaloneMode } from '@/utils/compatibility';
+import { isIosSafari, isInStandaloneMode } from '@/utils/compatibility';
 
 export default {
   components: {
@@ -28,9 +28,8 @@ export default {
   methods: {
   },
   created() {
-    console.log(isIos());
     if (
-      isIos()
+      isIosSafari()
       && !isInStandaloneMode()
       && !localStorage.getItem('iosInstallBannerDismissed')
     ) {

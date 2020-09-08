@@ -49,21 +49,22 @@ export default {
   methods: {
     handleClose() {
       // this.$emit('input', false);
+      window.localStorage.setItem('defaultInstallBannerDismissed', true);
       this.showDefaultInstall = false;
     },
     install() {
       this.installPrompt.prompt();
     },
     beforeInstallPrompt(e) {
-      // if (!localStorage.getItem('installed')) {
       console.log('beforeinstall');
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
       // Stash the event so it can be triggered later.
       this.installPrompt = e;
       // Update UI notify the user they can install the PWA
-      this.showDefaultInstall = true;
-      // }
+      if (!window.localStorage.getItem('defaultInstallBannerDismissed')) {
+        this.showDefaultInstall = true;
+      }
     },
   },
   created() {

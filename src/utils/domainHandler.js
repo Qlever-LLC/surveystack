@@ -24,7 +24,7 @@ export default {
 
     const appleTouch = document.createElement('link');
     appleTouch.setAttribute('rel', 'apple-touch-icon');
-    appleTouch.setAttribute('href', '/img/android-chrome-256x256.png');
+    appleTouch.setAttribute('href', '/img/icons/apple-touch-icon.png');
 
 
     const manifestElement = document.createElement('link');

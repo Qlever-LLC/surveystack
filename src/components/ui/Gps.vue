@@ -15,7 +15,9 @@
         <div>
           <slot></slot>
         </div>
-        <div class="text-body-2 text-sm-body-1">
+        <div class="text-body-2 text-sm-body-1"
+          v-if="location && location.geometry && location.properties"
+        >
           <samp>
               lng:&nbsp;{{ location.geometry.coordinates[0].toFixed(5) }}
               <br/>
