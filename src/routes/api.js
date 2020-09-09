@@ -24,6 +24,7 @@ import {
   assertNameNotEmpty,
   assertEntityRights,
   assertHasSurveyParam,
+  assertSubmissionRights,
 } from '../handlers/assertions';
 
 import { catchErrors } from '../handlers/errorHandlers';
@@ -80,13 +81,18 @@ router.get(
   [assertEntityExists({ collection: 'submissions' })],
   catchErrors(submissionController.getSubmission)
 );
-router.post('/submissions', catchErrors(submissionController.createSubmission));
+router.post(
+  '/submissions',
+  [assertSubmissionRights],
+  catchErrors(submissionController.createSubmission)
+);
 router.put(
   '/submissions/:id',
   [
     assertAuthenticated,
     assertIdsMatch,
     assertEntityExists({ collection: 'submissions' }),
+    assertSubmissionRights,
     assertEntityRights,
   ],
   catchErrors(submissionController.updateSubmission)

@@ -380,10 +380,7 @@ const getSubmissionsPage = async (req, res) => {
 
   pipeline.push(...paginationStages);
 
-  const [entities] = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  const [entities] = await db.collection(col).aggregate(pipeline).toArray();
 
   if (!entities) {
     return res.send({
@@ -436,10 +433,7 @@ const getSubmissions = async (req, res) => {
     }
   }
 
-  const entities = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  const entities = await db.collection(col).aggregate(pipeline).toArray();
 
   return res.send(entities);
 };
@@ -476,10 +470,7 @@ const getSubmissionsCsv = async (req, res) => {
     }
   }
 
-  const entities = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  const entities = await db.collection(col).aggregate(pipeline).toArray();
 
   const [mergedObject] = await db
     .collection(col)
@@ -558,10 +549,7 @@ const getSubmission = async (req, res) => {
   const redactStage = createRedactStage(user, roles);
   pipeline.push(redactStage);
 
-  const [entity] = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  const [entity] = await db.collection(col).aggregate(pipeline).toArray();
   if (!entity) {
     throw boom.notFound(`No entity found for id: ${id}`);
   }

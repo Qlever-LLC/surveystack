@@ -59,6 +59,53 @@ export const assertEntityRights = catchErrors(async (req, res, next) => {
   throw boom.unauthorized(`No entity rights on: ${existing._id}`);
 });
 
+export const assertSubmissionRights = catchErrors(async (req, res, next) => {
+  const survey = await db
+    .collection('surveys')
+    .findOne({ _id: new ObjectId(req.body.meta.survey.id) });
+  if (!survey) {
+    // survey not found, boom!
+    throw boom.notFound(`No survey found: ${req.body.meta.survey.id}`);
+  }
+
+  if (!survey.meta.submissions) {
+    // no meta.submissions param set, assume everyone can submit
+    return next();
+  }
+
+  const { submissions } = survey.meta;
+  if (submissions === 'public') {
+    // everyone can submit
+    return next();
+  }
+
+  if (!res.locals.auth.isAuthenticated) {
+    // must be logged in at least, otherwise boom!
+    throw boom.unauthorized(`You must be logged in to submit to this survey`);
+  }
+
+  if (submissions === 'user') {
+    // all logged in users can submit
+    return next();
+  }
+
+  const userId = res.locals.auth.user._id;
+  const groupId = survey.meta.group.id;
+  if (!groupId) {
+    // survey has no group associated, assume users can submit
+    return next();
+  }
+
+  const hasUserRole = await rolesService.hasUserRole(userId, groupId);
+
+  if (submissions === 'group' && hasUserRole) {
+    // group members can submit
+    return next();
+  }
+
+  throw boom.unauthorized(`Only group members can submit to this survey`);
+});
+
 export const assertNameNotEmpty = catchErrors(async (req, res, next) => {
   if (!res.locals.auth.isAuthenticated) {
     throw boom.unauthorized();
