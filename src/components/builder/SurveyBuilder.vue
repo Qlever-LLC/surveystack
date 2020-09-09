@@ -633,7 +633,7 @@ export default {
       }
       if (
         (this.initialSurvey.name !== this.survey.name)
-        || (this.initialSurvey.description !== this.survey.description)
+        || (this.initialSurvey.description !== this.survey.description || (this.initialSurvey.meta.submissions !== this.survey.meta.submissions))
       ) {
         return true;
       }

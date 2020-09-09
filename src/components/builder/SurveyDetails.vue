@@ -26,17 +26,23 @@
             </v-card-title>
             <v-card-text>
               <active-group-selector
-                class="mt-4"
+                class="my-4"
                 label="Group"
                 v-model="value.meta.group"
                 outlined
                 returnObject
               />
+              <v-select
+                outlined
+                v-model="value.meta.submissions"
+                label="Allow Submissions for..."
+                :items="availableSubmissions"
+              />
               <v-textarea
                 v-model="value.description"
                 label="Description"
                 class="mt-4"
-                rows="2"
+                rows="4"
                 outlined
               />
             </v-card-text>
@@ -280,11 +286,14 @@ import SurveyNameEditor from '@/components/builder/SurveyNameEditor.vue';
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import api from '@/services/api.service';
 
+const availableSubmissions = [{ value: 'public', text: 'Everyone' }, { value: 'user', text: 'Logged in users' }, { value: 'group', text: 'Group members' }];
+
 export default {
   data() {
     return {
       editDetailsDialogIsVisible: false,
       surveyGroupName: 'Group Not Found',
+      availableSubmissions,
     };
   },
   async created() {

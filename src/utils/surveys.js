@@ -66,9 +66,7 @@ function* processJsDoc(data, namespace = 'data') {
         type = 'any';
     }
 
-    yield `@param {${type}} ${namespace === '' ? namespace : `${namespace}.`}${
-      val.name
-    }`;
+    yield `@param {${type}} ${namespace === '' ? namespace : `${namespace}.`}${val.name}`;
 
     if (val.children) {
       yield* processJsDoc(
@@ -869,6 +867,7 @@ export function createSurvey({
     meta: {
       dateCreated: currentDate,
       dateModified: currentDate,
+      submissions: 'public',
       creator,
       group,
       specVersion,

@@ -47,7 +47,9 @@
           x-large
           text
           :to="`/surveys/browse`"
-        >Browse All Surveys</v-btn>
+        >
+          <v-icon left>mdi-text-box-search-outline</v-icon>Browse All Surveys
+        </v-btn>
       </v-col>
     </v-row>
 
