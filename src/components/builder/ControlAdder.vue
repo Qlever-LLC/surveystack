@@ -56,7 +56,7 @@
             >
               {{el.icon}}
             </v-icon>
-            {{el.name}}
+            {{ el.name.replace('_', ' ') }}
           </v-btn>
         </div>
       </template>
@@ -103,7 +103,7 @@ export default {
 .button-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  width: 340px;
+  width: 380px;
 }
 
 .fab-button {

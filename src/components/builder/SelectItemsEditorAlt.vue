@@ -11,6 +11,7 @@
       <resource-selector
         :resources="filteredResources"
         :value="value"
+        newResourceType="ONTOLOGY_LIST"
         @on-new="createResourceHandler"
         @on-select="selectResourceHandler"
       />
@@ -18,10 +19,11 @@
         icon
         @click.stop="openTableDialog"
         :class="{'d-none': !value}"
+        class="ml-2 mt-3"
       >
         <!-- Edit entries -->
         <!-- <v-icon class="ml-2">mdi-table</v-icon> -->
-        <v-icon class="ml-2 mt-3">mdi-pencil</v-icon>
+        <v-icon>mdi-pencil</v-icon>
       </v-btn>
 
     </div>
@@ -38,9 +40,17 @@
 </template>
 
 <script>
-import ObjectId from 'bson-objectid';
+// import ObjectId from 'bson-objectid';
 import SelectItemsTableEditor from '@/components/builder/SelectItemsTableEditor.vue';
 import ResourceSelector from '@/components/builder/ResourceSelector.vue';
+import {
+  removeResource,
+  setResource,
+  createResource,
+  resourceTypes,
+  resourceLocations,
+  appendResource,
+} from '@/utils/resources';
 
 export default {
   components: {
@@ -54,21 +64,12 @@ export default {
   },
   methods: {
     removeResource(id) {
-      const index = this.resources.findIndex(r => r.id === id);
-      const newResources = [
-        ...this.resources.slice(0, index),
-        ...this.resources.slice(index + 1),
-      ];
+      const newResources = removeResource(this.resources, id);
       this.$emit('set-survey-resources', newResources);
       this.$emit('set-control-source', null);
     },
     setResource(resource) {
-      const index = this.resources.findIndex(r => r.id === resource.id);
-      const newResources = [
-        ...this.resources.slice(0, index),
-        resource,
-        ...this.resources.slice(index + 1),
-      ];
+      const newResources = setResource(this.resources, resource);
       this.$emit('set-survey-resources', newResources);
     },
     openTableDialog() {
@@ -78,17 +79,17 @@ export default {
       this.tableDialogIsVisible = false;
     },
     createResourceHandler() {
-      const id = new ObjectId().toString();
-      this.$emit('set-survey-resources', [...this.resources, {
-        label: `Dropdown Items ${this.resources.length + 1}`,
-        // handle: `dropdown_items_${this.resources.length + 1}`,
-        name: `dropdown_items_${this.resources.length + 1}`,
-        id,
-        type: 'ONTOLOGY_LIST',
-        location: 'EMBEDDED',
-        content: [],
-      }]);
-      this.$emit('set-control-source', id);
+      const newResource = createResource(
+        this.resources,
+        resourceTypes.ONTOLOGY_LIST,
+        resourceLocations.EMBEDDED,
+        {
+          labelPrefix: 'Dropdown Items',
+          defaultContent: [],
+        },
+      );
+      this.$emit('set-survey-resources', appendResource(this.resources, newResource));
+      this.$emit('set-control-source', newResource.id);
       this.openTableDialog();
     },
     selectResourceHandler(id) {
