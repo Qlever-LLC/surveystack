@@ -11,6 +11,7 @@ import rolesController from '../controllers/rolesController';
 import farmosController from '../controllers/farmosController';
 import membershipController from '../controllers/membershipController';
 import infoController from '../controllers/infoController';
+import resourceController from '../controllers/resourceController';
 
 import groupIntegrationController from '../controllers/groupIntegrationController';
 import membershipIntegrationController from '../controllers/membershipIntegrationController';
@@ -232,6 +233,9 @@ router.delete(
 
 // Call for submissions (CFS)
 router.post('/call-for-submissions/send', [assertAuthenticated], catchErrors(cfsController.send));
+
+// resources
+router.get('/resources', catchErrors(resourceController.getResources));
 
 // info
 router.get('/info/ip', catchErrors(infoController.getIP));
