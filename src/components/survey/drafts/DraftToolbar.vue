@@ -17,8 +17,7 @@
       <v-spacer></v-spacer>
       <v-chip
         v-if="required"
-        dark
-        color="error"
+        color="error lighten-1"
       >
         <span class="font-weight-bold">
           <v-icon class="mr-2">mdi-alert-circle</v-icon>Answer required

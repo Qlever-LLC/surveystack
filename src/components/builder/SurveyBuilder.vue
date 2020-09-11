@@ -188,6 +188,7 @@
           v-if="survey && instance"
           :submission="instance"
           :survey="survey"
+          class="builder-draft"
         ></draft>
         <v-overlay :value="enableSaveDraft">
           <v-card>

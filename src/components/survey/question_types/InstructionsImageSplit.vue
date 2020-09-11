@@ -1,7 +1,6 @@
 <template>
   <div class="instructions-image-split question">
-      <!-- class="grey lighten-5" -->
-    <v-container
+    <!-- <v-container
     >
       <v-row>
         <v-col
@@ -37,25 +36,27 @@
           />
         </v-col>
       </v-row>
-    </v-container>
-    <!-- <div class="container">
+    </v-container> -->
+
+    <div class="wrapper full-width">
 
       <div class="left">
         <div
           outlined
           v-if="control.options.source && control.options.source.images"
         >
-          {{ control.options.source.images[0] }}
+          <!-- {{ control.options.source.images[0] }} -->
           <div
             v-if="image && image.content"
           >
             <img
               :src="image.content"
               :alt="image.label"
+              class="full-width"
             />
-            <p>
+            <!-- <p>
             {{ image.label }}
-            </p>
+            </p> -->
 
           </div>
         </div>
@@ -65,9 +66,10 @@
         <div
           v-if="control.options.source && control.options.source.body"
           v-html="renderedBody"
+          class="md"
         />
       </div>
-    </div> -->
+    </div>
 
   </div>
 </template>
@@ -183,52 +185,123 @@ export default {
 </script>
 
 <style>
-.instructions-image-split .info {
-  background-color: #ffdd37;
+.md ul, .md ol {
+  margin: 1rem 0;
 }
 
-.instructions-image-split .error {
-  background-color: #ff614e;
+/* .md li {
+  margin-left:
+} */
+
+.md pre {
+  margin: 1rem 0;
+  background-color: #f0f0f0;
+  padding: 1rem 0.5rem;
+  border-radius: 4px;
 }
 
-.instructions-image-split .success {
-  background-color: #a7df65;
+.md code {
+  background-color: #f0f0f0;
+  color: unset;
+  padding: 2px 4px;
+  font-weight: unset;
+  font-size: unset;
 }
 
-.instructions-image-split .warning {
+.md blockquote {
+  padding: 1rem;
+  background-color: #eee;
+  border-radius: 3px;
+  border-left: 5px solid #bbb;
+  margin: 1rem 0;
+  color: #444;
+}
+
+.md .info {
   background-color: #9dcab7;
 }
 
-.instructions-image-split .info,
-.instructions-image-split .error,
-.instructions-image-split .success,
-.instructions-image-split .warning {
+.md .error {
+  background-color: #ff614e;
+}
+
+.md .success {
+  background-color: #a7df65;
+}
+
+.md .warning {
+  background-color: #ffdd37;
+}
+
+.md .info,
+.md .error,
+.md .success,
+.md .warning {
   padding: 0.5rem;
-  margin: 0.5rem;
+  margin: 1rem 0;
   border-radius: 3px;
 }
 
+.md blockquote p,
+.md .info p,
+.md .error p,
+.md .success p,
+.md .warning p {
+  margin-bottom: 0;
+}
 
+.md blockquote p+p,
+.md .info p+p,
+.md .error p+p,
+.md .success p+p,
+.md .warning p+p {
+  margin-bottom: 1rem;
+}
+
+.md table:not(.code) {
+  margin: 1rem 0;
+  border-collapse: collapse;
+}
+
+.md table:not(.code) th, td {
+  border: 1px solid #dbdbdb;
+}
+
+.md table:not(.code) tr th {
+  border-bottom: solid 2px #bfbfbf;
+  background-color: #f0f0f0;
+  padding: 0.5rem 1rem;
+  vertical-align: middle;
+}
+
+.md table:not(.code) tbody td {
+  border-color: #dbdbdb;
+  padding: 0.5rem 1rem;
+  vertical-align: middle;
+}
+
+.draft.builder-draft .instructions-image-split .wrapper {
+  display: block;
+}
 </style>
 
 <style scoped>
-.info, .error, .success, .warning {
-  padding: 5px;
-}
-.instructions-image-split .container {
+
+.instructions-image-split .wrapper {
   display: block;
 }
 
 .left {
-  flex-basis: 66%;
+  flex-basis: 65%;
+  margin-right: 3%;
 }
 
 .right {
-  flex-basis: 33%;
+  flex-basis: 32%;
 }
 
 @media (min-width: 768px) {
-  .instructions-image-split .container {
+  .instructions-image-split .wrapper {
     display: flex;
   }
 

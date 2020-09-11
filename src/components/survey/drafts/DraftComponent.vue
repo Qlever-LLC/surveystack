@@ -1,6 +1,6 @@
 <template>
   <div
-    class="wrapper"
+    class="draft wrapper"
     style="height: 100%;"
   >
     <div
@@ -50,13 +50,15 @@
           id="transition-container"
           :key="'container-'+index"
         >
-          <v-container
-            class="draft-body mx-auto d-flex flex-column align-center justify-center"
+            <!-- class="draft-body mx-auto d-flex flex-column align-center justify-center" -->
+          <div
+            class="draft-body mx-auto"
             style="min-height: 40vh;"
           >
             <component
               v-if="control && !atEnd"
-              class="draft-control full-width d-sm-flex flex-column align-center justify-center px-4"
+              class="draft-control full-width d-sm-flex flex-column align-center justify-center px-4 mx-auto pt-4"
+              :class="{'mw-50': control.type !== 'instructionsImageSplit'}"
               :key="'question_'+index"
               :is="componentName"
               :control="control"
@@ -77,7 +79,7 @@
               @show-next="showNext(true)"
               @hide-next="showNext(false)"
             />
-          </v-container>
+          </div>
         </div>
       </transition>
     </div>

@@ -8,6 +8,7 @@
     <div class="text-center d-flex">
       <resource-selector
         :resources="filteredResources"
+        :value="value && value.images && value.images[0]"
         newResourceType="IMAGE"
         @on-new="createResourceHandler"
         @on-select="selectResourceHandler"
@@ -28,7 +29,10 @@
       label="Instructions Body (Markdown)"
     />
 
-    <v-dialog v-model="imageDialogIsVisible">
+    <v-dialog
+      v-model="imageDialogIsVisible"
+      width="500"
+    >
       <!-- <select-items-table-editor
         :resources="filteredResources"
         :resource="resource"

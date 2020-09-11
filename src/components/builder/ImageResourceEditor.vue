@@ -1,7 +1,28 @@
 <template>
-<v-card>
-  <v-card-title>
-    Image Resource Editor
+<v-card
+  class="image-resource-editor p-relative"
+>
+  <v-card-title
+    class="d-flex"
+  >
+    <div>
+      Image Resource Editor
+    </div>
+    <v-spacer/>
+    <!-- <v-btn
+      icon
+    >
+      <v-icon>mdi-delete</v-icon>
+
+    </v-btn> -->
+    <v-btn
+      icon
+      class="p-absolute r-1 t-2"
+      @click="closeDialog"
+    >
+      <v-icon>mdi-close</v-icon>
+    </v-btn>
+
   </v-card-title>
   <v-card-text>
     <v-form
@@ -33,13 +54,32 @@
         persistent-hint
         outlined
       />
-      <v-btn
-        @click="updateResource"
-      >
-        Update
-      </v-btn>
     </v-form>
   </v-card-text>
+  <v-card-actions
+    class="px-6 pb-4"
+  >
+    <v-spacer/>
+    <v-btn
+      @click="updateResource"
+    >
+      Update
+    </v-btn>
+    <v-btn
+      @click="deleteResource"
+      color="error"
+      text
+    >
+      Delete
+    </v-btn>
+
+    <!-- <v-btn
+      @click="closeDialog"
+      text
+    >
+      Close
+    </v-btn> -->
+  </v-card-actions>
 </v-card>
 </template>
 
@@ -56,11 +96,11 @@ import {
 export default {
   data() {
     return {
-      image: {
-        label: '',
-        name: '',
-        content: '',
-      },
+      // image: {
+      //   label: '',
+      //   name: '',
+      //   content: '',
+      // },
     };
   },
   // // beforeUpdate() {
@@ -114,10 +154,19 @@ export default {
       console.log('form is valid?', this.$refs.form.validate());
       return this.$refs.form.validate();
     },
+    deleteResource() {
+      this.closeDialog();
+      this.$emit('delete', this.resource.id);
+    },
     updateResource() {
       console.log('update resource');
       if (this.validate()) {
-        this.$emit('change', this.image);
+        // this.$emit('change', this.image);
+        this.$emit('close-dialog');
+      }
+    },
+    closeDialog() {
+      if (this.validate()) {
         this.$emit('close-dialog');
       }
     },
