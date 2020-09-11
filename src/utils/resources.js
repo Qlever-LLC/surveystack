@@ -48,7 +48,7 @@ export function appendResource(resources, resource) {
 
 export function createResource(resources, type, location, options = {
   labelPrefix: 'Resource',
-  defaultContent: {},
+  defaultContent: '',
 }) {
   const id = new ObjectId().toString();
   // return [
@@ -70,4 +70,24 @@ export function createResource(resources, type, location, options = {
     location,
     content: options.defaultContent,
   };
+}
+
+
+export function nameIsUnique(resourceNames) {
+  return val => (resourceNames.some(({
+    name,
+    id,
+  }) => val === name && this.resource.id !== id)
+    ? 'Name must be unique'
+    : true);
+}
+
+export function nameHasValidCharacters(val) {
+  const namePattern = /^[\w]*$/;
+  return namePattern.test(val) ? true : 'Data name must only contain valid charcters';
+}
+
+export function nameHasValidLength(val) {
+  const namePattern = /^.{4,}$/; // one character should be ok, especially within groups
+  return namePattern.test(val) ? true : 'Data name must be at least 4 character in length';
 }

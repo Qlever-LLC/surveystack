@@ -90,7 +90,7 @@ export default {
       return this.resources.filter(resource => resource.type === 'IMAGE');
     },
     resource() {
-      return this.resources.find(resource => resource.id === this.value);
+      return this.resources.find(resource => resource.id === this.value.images[0]);
     },
   },
   methods: {
@@ -107,16 +107,16 @@ export default {
       // });
       this.$emit('set-control-source', {
         body,
-        images: this.images,
+        images: this.value.images,
       });
     },
     removeResource(id) {
       const newResources = removeResource(this.resources, id);
       this.$emit('set-survey-resources', newResources);
 
-      const newImages = this.images.filter(imageId => imageId !== id);
+      const newImages = this.value.images.filter(imageId => imageId !== id);
       this.$emit('set-control-source', {
-        body: this.body,
+        body: this.value.body,
         images: newImages,
       });
     },
@@ -131,19 +131,23 @@ export default {
         resourceLocations.REMOTE,
         {
           labelPrefix: 'Image',
-          defaultContent: {},
+          defaultContent: '',
         },
       );
       console.log(newResource);
       this.$emit('set-survey-resources', appendResource(this.resources, newResource));
       this.$emit('set-control-source', {
-        body: this.body,
+        body: this.value.body,
         images: [newResource.id],
       });
       this.openDialog();
     },
     selectResourceHandler(id) {
-      this.$emit('set-control-source', id);
+      console.log();
+      this.$emit('set-control-source', {
+        body: this.value.body,
+        images: [id],
+      });
     },
     openDialog() {
       this.imageDialogIsVisible = true;

@@ -182,7 +182,10 @@ export default {
   },
   methods: {
     nameIsUnique(val) {
-      return this.resourceNames.some(({ name, id }) => this.resource.name === name && this.resource.id !== id)
+      // return this.resourceNames.some(({ name, id }) => this.resource.name === name && this.resource.id !== id)
+      //   ? 'Name must be unique'
+      //   : true;
+      return this.resourceNames.some(({ name, id }) => val === name && this.resource.id !== id)
         ? 'Name must be unique'
         : true;
     },
