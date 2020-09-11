@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import ImageResourcePicker from '@/components/builder/ImageResourcePicker.vue';
+// import ImageResourcePicker from '@/components/builder/ImageResourcePicker.vue';
 import ResourceSelector from '@/components/builder/ResourceSelector.vue';
 import ImageResourceEditor from '@/components/builder/ImageResourceEditor.vue';
 import {
@@ -67,7 +67,7 @@ export default {
     };
   },
   components: {
-    ImageResourcePicker,
+    // ImageResourcePicker,
     ResourceSelector,
     ImageResourceEditor,
   },
