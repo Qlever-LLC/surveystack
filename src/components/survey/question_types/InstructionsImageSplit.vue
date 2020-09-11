@@ -293,12 +293,18 @@ export default {
 }
 
 .left {
-  flex-basis: 65%;
+  /* flex-basis: 65%; */
+
+  /* margin-right: 3%; */
   margin-right: 3%;
+  flex-basis: 60%;
+  flex-grow: 1;
 }
 
 .right {
-  flex-basis: 32%;
+  /* flex-basis: 32%; */
+  flex-basis: 40%;
+  flex-shrink: 1;
 }
 
 @media (min-width: 768px) {
