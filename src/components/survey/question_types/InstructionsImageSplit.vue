@@ -85,8 +85,8 @@ export default {
 </script>
 
 <style scoped>
-.instructions-image-split {
-
+.instructions-image-split .container {
+  display: block;
 }
 
 .left {

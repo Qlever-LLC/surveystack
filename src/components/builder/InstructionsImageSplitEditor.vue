@@ -1,10 +1,10 @@
 <template>
   <div class="instructions-image-split-editor">
-    <image-resource-picker
+    <!-- <image-resource-picker
       :value="value.images"
       @input="handleImagesChange"
       :resources="resources"
-    />
+    /> -->
     <div class="text-center d-flex">
       <resource-selector
         :resources="filteredResources"
