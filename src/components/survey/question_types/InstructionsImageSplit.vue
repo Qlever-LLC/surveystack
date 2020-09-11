@@ -53,6 +53,7 @@
               :src="image.content"
               :alt="image.label"
               class="full-width"
+              style="max-height: 80vh; object-fit: contain;"
             />
             <!-- <p>
             {{ image.label }}
