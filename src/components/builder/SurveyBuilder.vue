@@ -397,8 +397,9 @@ export default {
       this.setNavbarContent({
         title: this.survey.name || 'Untitled Survey',
         subtitle: `
-          <span><span class="question-title-chip">Version ${version}</span></span>
-          <span class="ml-2">${amountQuestions.length} Question${amountQuestions.length > 1 || amountQuestions.length < 1 ? 's' : ''}</span>
+          <span class="question-title-chip">Version ${version}</span>
+          <!--<span class="ml-2">${amountQuestions.length} Question${amountQuestions.length > 1 || amountQuestions.length < 1 ? 's' : ''}</span>-->
+          <!--<span class="question-title-chip">${this.groupPath}</span>-->
         `,
       });
 

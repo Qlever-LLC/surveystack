@@ -407,7 +407,8 @@ export default {
       title: `${this.survey.name}${this.submission.meta.dateSubmitted ? '&nbsp;<span class="caption">(submitted)</span>' : ''}`,
       subtitle: `
         <span><span class="question-title-chip">Version ${this.activeVersion}</span></span>
-        <span class="ml-2">${this.positions.length} Question${this.positions.length > 1 || this.positions.length < 1 ? 's' : ''}</span>
+        <!--<span class="ml-2">${this.positions.length} Question${this.positions.length > 1 || this.positions.length < 1 ? 's' : ''}</span>-->
+        <!--<span class="question-title-chip">${this.groupPath}</span>-->
       `,
     });
   },

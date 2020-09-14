@@ -96,6 +96,7 @@
         :survey="survey"
         :submission="submission"
         :position="positions[index]"
+        :group="groupPath"
         @navigate="navigate"
       />
     </v-navigation-drawer>
