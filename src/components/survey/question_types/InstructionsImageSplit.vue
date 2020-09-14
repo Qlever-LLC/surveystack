@@ -100,65 +100,6 @@ md.use(markdownItContainer, 'spoiler', {
   },
 });
 
-// function createBasicMarkdownContainer(name, additionalClasses) {
-//   return {
-//     validate(params) {
-//       // return params.trim().match(/^error\s+(.*)$/);
-//       return params.trim().match(/^error\s+(.*)$/);
-//     },
-//     render(tokens, idx) {
-//       if (tokens[idx].nesting === 1) {
-//       // opening tag
-//         return '<div class="error">\n';
-//       }
-//       // closing tag
-//       return '</div>\n';
-//     },
-//   };
-// }
-
-// md.use(markdownItContainer, 'error', {
-//   validate(params) {
-//     return params.trim().match(/^error\s+(.*)$/);
-//   },
-//   render(tokens, idx) {
-//     if (tokens[idx].nesting === 1) {
-//       // opening tag
-//       return '<div class="error">\n';
-//     }
-//     // closing tag
-//     return '</div>\n';
-//   },
-// });
-
-// md.use(markdownItContainer, 'warning', {
-//   validate(params) {
-//     return params.trim().match(/^warning\s+(.*)$/);
-//   },
-//   render(tokens, idx) {
-//     if (tokens[idx].nesting === 1) {
-//       // opening tag
-//       return '<div class="warning">\n';
-//     }
-//     // closing tag
-//     return '</div>\n';
-//   },
-// });
-
-// md.use(markdownItContainer, 'info', {
-//   validate(params) {
-//     return params.trim().match(/^info\s+(.*)$/);
-//   },
-//   render(tokens, idx) {
-//     if (tokens[idx].nesting === 1) {
-//       // opening tag
-//       return '<div class="info">\n';
-//     }
-//     // closing tag
-//     return '</div>\n';
-//   },
-// });
-
 md.use(markdownItContainer, 'error');
 md.use(markdownItContainer, 'warning');
 md.use(markdownItContainer, 'success');
@@ -264,7 +205,8 @@ export default {
   border-collapse: collapse;
 }
 
-.md table:not(.code) th, td {
+.md table:not(.code) th,
+.md table:not(.code) td {
   border: 1px solid #dbdbdb;
 }
 
