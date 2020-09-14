@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="select-single question">
     <p v-if="control.title" class="mb-2">{{ control.title }}</p>
     <div>
       <v-radio-group
@@ -104,5 +104,10 @@ export default {
 
 .v-input .text-field-other >>> label {
   top: 10px;
+}
+
+/* .select-single >>> .v-input--radio-group__input { */
+.select-single >>> .v-label {
+  height: auto;
 }
 </style>

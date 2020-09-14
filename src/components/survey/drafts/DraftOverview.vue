@@ -4,11 +4,13 @@
       <v-card-title>{{ survey.name }}</v-card-title>
       <v-card-subtitle>
         {{ submission._id }}
+        <br/>
+        Submitting to: <kbd>{{ group }}</kbd>
+        <br/>
+        Created: <kbd>{{ created }}</kbd>
         <br>
-        <kbd>{{ created }}</kbd> created
-        <br>
-        <kbd>{{ modified }}</kbd> last modified
-        <br>
+        Last modified: <kbd>{{ modified }}</kbd>
+        <br/>
         <strong v-if="submission.meta.dateSubmitted"><kbd>{{ submitted }}</kbd> submitted</strong>
       </v-card-subtitle>
     </v-card>
@@ -132,6 +134,7 @@ export default {
     'survey',
     'submission',
     'position',
+    'group',
   ],
   data() {
     return {

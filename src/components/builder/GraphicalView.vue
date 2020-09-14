@@ -20,9 +20,15 @@
         <div>
           <span class="caption grey--text text--darken-1">{{ createIndex(index, idx + 1) | displayIndex}}</span>
           <br />
-          <span class="title">{{el.label}}</span>
+          <span class="title">
+            {{el.label}}
+            <!-- <v-icon>{{ getIconForType(el.type) }}</v-icon> -->
+          </span>
           <br />
-          <span class="font-weight-light grey--text text--darken-2">{{ el.name }} : {{ el.type }}</span>
+          <span class="font-weight-light grey--text text--darken-2">
+            {{ el.name }}
+            <!-- : {{ el.type }} -->
+          </span>
         </div>
         <div class="d-flex">
           <v-btn
@@ -98,6 +104,7 @@
 import draggable from 'vuedraggable';
 import { cloneDeep } from 'lodash';
 import ObjectID from 'bson-objectid';
+import { availableControls } from '@/utils/surveyConfig';
 
 export default {
   name: 'nested-draggable',
@@ -130,6 +137,10 @@ export default {
     },
   },
   methods: {
+    getIconForType(type) {
+      const control = availableControls.find(c => c.type === type);
+      return control && control.icon;
+    },
     showDeleteModal(index) {
       this.deleteQuestionModalIsVisible = true;
       this.deleteQuestionIndex = index;

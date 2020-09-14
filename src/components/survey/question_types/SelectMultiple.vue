@@ -16,12 +16,11 @@
           :value="item.value"
           :key="item.value"
         >
-          <template v-slot:default="{ active, toggle }">
+          <template v-slot:default="{ active }">
             <v-list-item-action>
               <v-checkbox
                 :input-value="active"
                 :true-value="item"
-                @click="toggle"
               />
             </v-list-item-action>
             <v-list-item-content>
