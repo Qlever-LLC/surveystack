@@ -1,8 +1,9 @@
 # Resources
 
 Represents a general-purpose resource, for instance to be used inside a survey.
-Binary resources will be stored in an Amazon S3 bucket.
-Other resources may be stored directly inside mongodb database
+"INTERNAL" resources will be stored in an Amazon S3 bucket.
+"EXTERNAL" resources are a link to an external URL.
+"EMBEDDED" resources are stored directly inside mongodb database inside "content" field.
 
 ## Endpoints
 
@@ -21,7 +22,7 @@ API endpoint `/api/resources`
 const resources = [
   {
     _id: '5e2eed723c98557ae2c1d967', // resource id
-    name: "smiley.png"
+    name: "smiley.jpg"
     meta: {
       dateCreated: '2020-01-27T14:10:41.623Z',
       dateModified: '2020-01-27T14:11:56.301Z',
@@ -33,7 +34,16 @@ const resources = [
       },
       specVersion: 1,
     },
-    type: "image",
+    // "INTERNAL" - stored in surveystack's S3 bucket
+    // "EXTERNAL" - external URL
+    // "EMBEDDED" - directly embedded into content
+    location: "INTERNAL",
+    // MIME-Type, e.g. application/octet-stream
+    mime: "image/jpeg",
+    // not sure if label is needed?
+    label: "Smiley Face",
+    // content
+    content: "",
   },
 ];
 ```

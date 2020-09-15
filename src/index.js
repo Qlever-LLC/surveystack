@@ -15,6 +15,8 @@ import errorHandlers from './handlers/errorHandlers';
 import apiRoutes from './routes/api';
 import debugRoutes from './routes/debug';
 
+import resources from './controllers/resources';
+
 const PATH_PREFIX = process.env.PATH_PREFIX;
 
 const app = express();
@@ -26,7 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const whitelist = ['https://cdpn.io', 'https://app.our-sci.net', 'https://dashboard.our-sci.net'];
 const corsOptions = {
-  origin: function(origin, callback) {
+  origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1 || !origin) {
       callback(null, true); // specifically allow whitelisted origins including credentials
     } else if (origin.startsWith('http://localhost') || origin.startsWith('http://192.168')) {
@@ -81,6 +83,8 @@ app.use(async (req, res, next) => {
 // routes
 app.use(`${PATH_PREFIX}/api`, apiRoutes);
 app.use(`${PATH_PREFIX}/api`, errorHandlers.developmentErrors);
+
+app.use('/resources/:id', resources.serve);
 
 if (process.env.NODE_ENV === 'development') {
   app.use('/debug', debugRoutes);
