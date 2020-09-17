@@ -39,6 +39,8 @@ import Invitation from '@/pages/invitations/Invitation.vue';
 
 import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.vue';
 
+import ResourceList from '@/pages/resources/ResourceList.vue';
+
 import AppInfo from '@/pages/app/AppInfo.vue';
 
 
@@ -292,6 +294,12 @@ const routes = [
     path: '/call-for-submissions',
     name: 'call-for-submissions',
     component: CallForSubmissions,
+  },
+  // Resources
+  {
+    path: '/resources',
+    name: 'resources-list',
+    component: ResourceList,
   },
   // Unauthorized
   {
