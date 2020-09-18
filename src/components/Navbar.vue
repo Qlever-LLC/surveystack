@@ -7,7 +7,7 @@
     >
       <!-- color="white" -->
       <v-app-bar-nav-icon @click="drawer = !drawer" />
-      <v-toolbar-title class="ml-2 flex-column">
+      <v-toolbar-title class="flex-column">
         <div
           id="app-bar-title"
           class="title py-0 my-0"

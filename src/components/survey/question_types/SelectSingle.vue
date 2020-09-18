@@ -1,7 +1,7 @@
 <template>
-  <v-container fluid>
+  <div class="select-single question">
     <p v-if="control.title" class="mb-2">{{ control.title }}</p>
-    <v-row>
+    <div>
       <v-radio-group
         :label="control.label"
         :value="value"
@@ -39,9 +39,9 @@
       <div v-else>
         Invalid Select Options, please update Suvey Definition
       </div>
-    </v-row>
+    </div>
     <p v-if="control.hint" class="mt-2">{{ control.hint }}</p>
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -104,5 +104,10 @@ export default {
 
 .v-input .text-field-other >>> label {
   top: 10px;
+}
+
+/* .select-single >>> .v-input--radio-group__input { */
+.select-single >>> .v-label {
+  height: auto;
 }
 </style>

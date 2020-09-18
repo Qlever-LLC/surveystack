@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="ontology question">
     <p v-if="control.title" class="mt-2">{{ control.title }}</p>
     <v-autocomplete
       :value="value"
@@ -13,6 +13,7 @@
       :multiple="!!control.options.hasMultipleSelections"
       :menu-props="autocompleteMenuProps"
       v-if="sourceIsValid && !control.options.allowCustomSelection"
+      class="full-width"
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip
@@ -47,6 +48,7 @@
       :menu-props="autocompleteMenuProps"
       v-else-if="sourceIsValid && control.options.allowCustomSelection"
       ref="input"
+      class="full-width"
     >
       <template v-slot:selection="data">
         <v-chip
@@ -143,5 +145,11 @@ export default {
 </script>
 
 <style scoped>
+.ontology.question {
+  padding-top: 1rem;
+}
 
+.full-width {
+  width: 100%;
+}
 </style>

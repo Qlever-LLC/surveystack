@@ -53,15 +53,17 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="showInstall">
+    <!-- <v-row v-if="showInstall">
       <v-col align="center">
         <v-btn
           color="primary"
           x-large
           @click="install"
-        >Install App</v-btn>
+        >
+          Install App
+        </v-btn>
       </v-col>
-    </v-row>
+    </v-row> -->
 
     <v-row v-if="false">
       <v-col align="center">
@@ -69,7 +71,9 @@
           color="primary"
           x-large
           href="surveystack://measurement"
-        >Run Measurement</v-btn>
+        >
+          Run Measurement
+        </v-btn>
       </v-col>
     </v-row>
 
@@ -82,7 +86,6 @@
       </v-col>
     </v-row>
 
-    <ios-install-banner v-model="showIosInstallBanner" />
   </v-container>
 </template>
 
@@ -90,31 +93,19 @@
 import axios from 'axios';
 import AppLogin from '@/pages/auth/Login.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
-import IosInstallBanner from '@/components/ui/IosInstallBanner/IosInstallBanner.vue';
 
 export default {
   components: {
     AppLogin,
     AppBasicList,
-    IosInstallBanner,
   },
   name: 'home',
   data() {
     return {
-      installPrompt: {
-        prompt() {
-          console.log('install stub');
-        },
-      },
       version: process.env.VUE_APP_VERSION,
-      showInstall: false,
-      showIosInstallBanner: false,
     };
   },
   methods: {
-    install() {
-      this.installPrompt.prompt();
-    },
     async focused() {
       // const res = await axios.get('http://localhost:9095/measurement');
       // console.log('result', res.data);
@@ -133,41 +124,11 @@ export default {
       const pinned = this.$store.getters['surveys/getPinned'];
       return pinned;
     },
-    isIos() {
-      const userAgent = window.navigator.userAgent.toLowerCase();
-      return /iphone|ipad|ipod/.test(userAgent);
-    },
-    isInStandaloneMode() {
-      return ('standalone' in window.navigator)
-        && window.navigator.standalone;
-    },
   },
 
   async created() {
-    if (!localStorage.installed) {
-      window.addEventListener('beforeinstallprompt', (e) => {
-        console.log('beforeinstall');
-        // Prevent the mini-infobar from appearing on mobile
-        e.preventDefault();
-        // Stash the event so it can be triggered later.
-        this.installPrompt = e;
-        // Update UI notify the user they can install the PWA
-        this.showInstall = true;
-      });
-
-      window.addEventListener('appinstalled', (evt) => {
-        localStorage.installed = true;
-      });
-
-      window.addEventListener('focus', this.focused);
-
-      // const res = await axios.get('http://localhost:9095/measurement');
-      // console.log('res', res);
-
-      if (this.isIos && !this.isInStandaloneMode) {
-        this.showIosInstallBanner = true;
-      }
-    }
+    // const res = await axios.get('http://localhost:9095/measurement');
+    // console.log('res', res);
   },
 };
 </script>
