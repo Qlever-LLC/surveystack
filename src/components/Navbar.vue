@@ -94,7 +94,7 @@
             <v-icon>mdi-notebook-multiple</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title>Docs</v-list-item-title>
+            <v-list-item-title>Knowledge Base</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
