@@ -89,7 +89,7 @@
           class="my-1"
         />
 
-        <v-list-item href="https://docs.surveystack.io/">
+        <v-list-item href="https://docs.surveystack.io/" target="_blank">
           <v-list-item-icon>
             <v-icon>mdi-notebook-multiple</v-icon>
           </v-list-item-icon>
