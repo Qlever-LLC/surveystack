@@ -83,20 +83,12 @@
 }
 
 @media (min-width: 768px) {
-	#transition-container {
+	/* #transition-container {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		height: calc(100% - 68px - 24px - 104px);
-		/* margin-top: 2rem; */
-
-		/* display: flex;
-    align-items: center;
-    display: -webkit-flex;
-    -webkit-align-items: center;
-    align-items: center;
-    justify-content: center; */
-	}
+	} */
 }
 
 .full-width {
