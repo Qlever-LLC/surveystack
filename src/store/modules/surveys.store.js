@@ -86,6 +86,7 @@ const actions = {
               id: s._id,
               name: s.name,
               group: data.name,
+              meta: s.meta,
             });
             actions.fetchSurvey({ commit }, s._id);
           }
