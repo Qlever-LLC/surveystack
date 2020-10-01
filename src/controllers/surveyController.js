@@ -62,11 +62,7 @@ const getSurveys = async (req, res) => {
     });
   }
 
-  const entities = await db
-    .collection(col)
-    .find(filter)
-    .project(project)
-    .toArray();
+  const entities = await db.collection(col).find(filter).project(project).toArray();
   return res.send(entities);
 };
 
@@ -188,10 +184,7 @@ const getSurveyPage = async (req, res) => {
   const limit = req.query.limit || DEFAULT_LIMIT;
   const pipeline = buildPipelineForGetSurveyPage(req.query);
 
-  const entities = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  const entities = await db.collection(col).aggregate(pipeline).toArray();
 
   // empty array when ther is no match
   // however, we still want content and pagination properties
@@ -213,14 +206,12 @@ const getSurveyListPage = async (req, res) => {
       'meta.dateModified',
       'meta.group',
       'meta.creator',
+      'meta.submissions',
     ],
   };
   const pipeline = buildPipelineForGetSurveyPage(query);
 
-  const [entities] = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  const [entities] = await db.collection(col).aggregate(pipeline).toArray();
 
   // empty array when ther is no match
   // however, we still want content and pagination properties
