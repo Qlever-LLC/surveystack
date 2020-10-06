@@ -46,6 +46,20 @@ export const createControlInstance = (control) => {
 
 export const availableControls = [
   {
+    name: 'group',
+    label: 'My group',
+    type: 'group',
+    children: [],
+    icon: 'mdi-group',
+  },
+  {
+    name: 'page',
+    label: 'My page',
+    type: 'page',
+    children: [],
+    icon: 'mdi-view-list',
+  },
+  {
     name: 'instructions',
     label: 'Instructions',
     type: 'instructions',
@@ -68,13 +82,6 @@ export const availableControls = [
     label: 'Enter a date',
     type: 'date',
     icon: 'mdi-calendar',
-  },
-  {
-    name: 'group',
-    label: 'My group',
-    type: 'group',
-    children: [],
-    icon: 'mdi-group',
   },
   {
     name: 'location',

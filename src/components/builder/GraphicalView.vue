@@ -49,7 +49,7 @@
       </div>
 
       <nested-draggable
-        v-if="el.type == 'group'"
+        v-if="el.type == 'group' || el.type == 'page'"
         :class="{'drop-area-border': (el.children.length === 0), 'drop-area': 1}"
         :selected="selected"
         :controls="el.children"
