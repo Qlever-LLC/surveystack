@@ -190,11 +190,25 @@ function showQuestion(data) {
 export const getControl = (controls, position) => {
   let control;
   let currentControls = controls;
-  // let { controls } = survey;
+
+  /*
   position.forEach((i) => {
     control = currentControls[i];
     currentControls = control.children;
+    if (control.type === 'page') {
+      break;
+    }
   });
+  */
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const p of position) {
+    control = currentControls[p];
+    currentControls = control.children;
+    if (control.type === 'page') {
+      break;
+    }
+  }
 
   if (control.type !== 'group') {
     if (control.value === undefined) {
