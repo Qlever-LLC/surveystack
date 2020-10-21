@@ -13,7 +13,7 @@
         <v-form>
           <v-text-field
             label="meta.user"
-            @input="(v) => setProperty({key: 'meta.user', value: v})"
+            @input="(v) => setProperty({path: 'meta.user', value: v})"
           />
 
           <v-text-field
@@ -37,8 +37,8 @@
 <script>
 export default {
   methods: {
-    setProperty({ key, value }) {
-      this.$store.dispatch('draft/setProperty', { key, value });
+    setProperty({ path, value }) {
+      this.$store.dispatch('draft/setProperty', { path, value });
     },
   },
   computed: {
@@ -53,7 +53,7 @@ export default {
         return this.$store.getters['draft/property']('data.name').value;
       },
       set(v) {
-        this.setProperty({ key: 'data.name.value', value: v });
+        this.setProperty({ path: 'data.name.value', value: v });
       },
 
     },
@@ -63,7 +63,7 @@ export default {
       },
       set(v) {
         const n = Number(v);
-        this.setProperty({ key: 'data.age.value', value: n });
+        this.setProperty({ path: 'data.age.value', value: n });
       },
     },
     user: {
@@ -71,7 +71,7 @@ export default {
         return this.$store.getters['draft/property']('meta.user').value;
       },
       set(v) {
-        this.setProperty({ key: 'meta.user', value: v });
+        this.setProperty({ path: 'meta.user', value: v });
       },
     },
   },
