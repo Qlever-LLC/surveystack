@@ -1,13 +1,13 @@
+import LinkedList from 'dbly-linked-list';
+
 import * as utils from '@/utils/surveys';
 
 const createInitialState = () => ({
   survey: null,
   submission: null,
-  control: null,
-  path: null,
-  positions: null,
-  controls: null,
   index: 0,
+  list: null,
+  node: null,
 });
 
 const initialState = createInitialState();
@@ -25,8 +25,8 @@ const getters = {
 
     return p;
   },
-  control: state => state.control,
-  path: state => state.path,
+  control: state => state.node.getData().control,
+  path: state => state.node.getData().path,
 };
 
 const actions = {
@@ -57,12 +57,17 @@ const mutations = {
     state.survey = survey;
     state.submission = submission;
     const positions = utils.getSurveyPositions(survey, submission.meta.survey.version);
-    state.positions = positions;
-    state.controls = state.survey.revisions.find(revision => revision.version === submission.meta.survey.version)
-      .controls;
+    const { controls } = state.survey.revisions.find(revision => revision.version === submission.meta.survey.version);
+
     state.index = 0;
-    state.control = utils.getControl(state.controls, state.positions[state.index]);
-    state.path = `data.${utils.getFlatName(state.controls, state.positions[state.index])}`;
+    const list = new LinkedList();
+    for (let i = 0; i < positions.length; i++) {
+      const control = utils.getControl(controls, positions[i]);
+      const path = `data.${utils.getFlatName(controls, positions[i])}`;
+      list.insert({ path, control });
+    }
+    state.list = list;
+    state.node = state.list.getHeadNode();
   },
   SET_PROPERTY(state, { path, value }) {
     console.log(`path: ${path}`);
@@ -80,13 +85,11 @@ const mutations = {
   },
   NEXT(state) {
     state.index += 1;
-    state.control = utils.getControl(state.controls, state.positions[state.index]);
-    state.path = `data.${utils.getFlatName(state.controls, state.positions[state.index])}`;
+    state.node = state.list.findAt(state.index);
   },
   PREV(state) {
     state.index -= 1;
-    state.control = utils.getControl(state.controls, state.positions[state.index]);
-    state.path = `data.${utils.getFlatName(state.controls, state.positions[state.index])}`;
+    state.node = state.list.findAt(state.index);
   },
 };
 

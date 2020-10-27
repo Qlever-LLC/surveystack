@@ -47,6 +47,9 @@
     <div>
       {{flatNames}}
     </div>
+    <div>
+      {{control}}
+    </div>
 
   </v-container>
 </template>
