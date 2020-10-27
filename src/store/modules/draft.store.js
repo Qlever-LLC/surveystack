@@ -85,11 +85,15 @@ const mutations = {
   },
   NEXT(state) {
     state.index += 1;
-    state.node = state.list.findAt(state.index);
+    if (state.node.hasNext()) {
+      state.node = state.node.next;
+    }
   },
   PREV(state) {
     state.index -= 1;
-    state.node = state.list.findAt(state.index);
+    if (state.node.hasPrev()) {
+      state.node = state.node.prev;
+    }
   },
 };
 
