@@ -17,21 +17,9 @@
           outlined
         />
       </v-col>
-      <!--
       <v-col>
-        <div
-          v-for="controlValueKey in controlValueKeys"
-          :key="controlValueKey"
-        >
-          <v-text-field
-            :label="controlValueKey"
-            :value="$store.getters['draft/property'](controlValueKey)"
-            @input="(v) => $store.dispatch('draft/setProperty', {key: controlValueKey, value: v})"
-          />
-        </div>
-      </v-col>
-      -->
-      <v-col>
+        <v-btn @click="$store.dispatch('draft/prev')">PREV</v-btn>
+        <v-btn @click="$store.dispatch('draft/next')">NEXT</v-btn>
         <app-control
           :path="path"
           :control="control"
@@ -69,30 +57,13 @@ export default {
     submission: { type: Object },
   },
   computed: {
-    name: {
-      get() {
-        return this.$store.getters['draft/property']('data.text_1.value');
-      },
-      set(v) {
-        this.$store.dispatch('draft/setProperty', { path: 'data.text_1.value', value: v });
-      },
-
-    },
     submissionStringified() {
       return JSON.stringify(this.submission, null, 2);
     },
     surveyStringified() {
       return JSON.stringify(this.survey, null, 2);
     },
-    age: {
-      get() {
-        return this.$store.getters['draft/property']('data.number_2.value');
-      },
-      set(v) {
-        const number = Number(v) || null;
-        this.$store.dispatch('draft/setProperty', { path: 'data.number_2.value', value: number });
-      },
-    },
+
     positions() {
       return utils.getSurveyPositions(this.survey, this.activeVersion);
     },
