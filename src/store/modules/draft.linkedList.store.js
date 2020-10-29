@@ -1,4 +1,4 @@
-import TreeModel from 'tree-model';
+import LinkedList from 'dbly-linked-list';
 
 import * as utils from '@/utils/surveys';
 
@@ -6,8 +6,7 @@ const createInitialState = () => ({
   survey: null,
   submission: null,
   index: 0,
-  tree: null,
-  root: null,
+  list: null,
   node: null,
 });
 
@@ -26,12 +25,8 @@ const getters = {
 
     return p;
   },
-  control: state => state.node.model,
-  path: (state) => {
-    const p = `data${state.node.getPath().map(n => n.model.name).join('.')}`;
-    console.log('path', p);
-    return p;
-  },
+  control: state => state.node.getData().control,
+  path: state => state.node.getData().path,
 };
 
 const actions = {
@@ -65,22 +60,14 @@ const mutations = {
     const { controls } = state.survey.revisions.find(revision => revision.version === submission.meta.survey.version);
 
     state.index = 0;
-    const tree = new TreeModel();
-    const root = tree.parse({ control: null, path: null, children: controls });
-    state.root = root;
-    root.walk((node) => {
-      // console.log(node);
-    });
-    /*
+    const list = new LinkedList();
     for (let i = 0; i < positions.length; i++) {
       const control = utils.getControl(controls, positions[i]);
       const path = `data.${utils.getFlatName(controls, positions[i])}`;
       list.insert({ path, control });
     }
-    */
-    state.tree = tree;
-    state.node = root.first(n => !!n.model.name);
-    console.log('first node', state.node);
+    state.list = list;
+    state.node = state.list.getHeadNode();
   },
   SET_PROPERTY(state, { path, value }) {
     console.log(`path: ${path}`);
@@ -97,26 +84,16 @@ const mutations = {
     p[splits.pop()] = value;
   },
   NEXT(state) {
-    let previousNode = null;
-    state.root.walk((node) => {
-      if (previousNode === state.node) {
-        state.node = node;
-        return false;
-      }
-      previousNode = node;
-    });
+    state.index += 1;
+    if (state.node.hasNext()) {
+      state.node = state.node.next;
+    }
   },
   PREV(state) {
     state.index -= 1;
-
-    let previousNode = null;
-    state.root.walk((node) => {
-      if (node === state.node && !previousNode.isRoot()) {
-        state.node = previousNode;
-        return false;
-      }
-      previousNode = node;
-    });
+    if (state.node.hasPrev()) {
+      state.node = state.node.prev;
+    }
   },
 };
 
