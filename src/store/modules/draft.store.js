@@ -52,6 +52,9 @@ const actions = {
   prev({ commit }) {
     commit('PREV');
   },
+  goto({ commit }, path) {
+    commit('GOTO', path);
+  },
 };
 
 const mutations = {
@@ -66,7 +69,7 @@ const mutations = {
 
     state.index = 0;
     const tree = new TreeModel();
-    const root = tree.parse({ control: null, path: null, children: controls });
+    const root = tree.parse({ children: controls });
     state.root = root;
     root.walk((node) => {
       // console.log(node);
