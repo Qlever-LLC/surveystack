@@ -17,6 +17,10 @@ function* processPositions(data, position = []) {
     if (val.children) {
       yield* processPositions(val.children, [...position, i]);
     }
+
+    if (val.items) {
+      yield* processPositions(val.items, [...position, i]);
+    }
   }
 }
 
@@ -38,7 +42,7 @@ const getFlatName = (controls, position) => {
   let currentControls = controls;
   position.forEach((i) => {
     control = currentControls[i];
-    currentControls = control.children;
+    currentControls = control.type === 'group' ? control.children : control.items;
     flatName += `.${control.name}`;
   });
 
@@ -51,10 +55,10 @@ const getControl = (controls, position) => {
   let currentControls = controls;
   position.forEach((i) => {
     control = currentControls[i];
-    currentControls = control.children;
+    currentControls = control.type === 'group' ? control.children : control.items;
   });
 
-  if (control.type !== 'group') {
+  if (control.type !== 'group' && control.type !== 'page') {
     if (control.value === undefined) {
       control.value = null;
     }

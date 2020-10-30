@@ -70,6 +70,10 @@ const mutations = {
     const root = tree.parse({ name: 'data', children: controls });
     state.root = root;
 
+    root.all(n => !!n.parent && n.parent.model.type === 'page').forEach((node) => {
+      // node.drop();
+    });
+
     state.tree = tree;
     state.node = root.first(n => n.model.name !== 'data');
     console.log('first node', state.node);
@@ -89,26 +93,33 @@ const mutations = {
     p[splits.pop()] = value;
   },
   NEXT(state) {
-    let previousNode = null;
+    const nodes = [];
     state.root.walk((node) => {
-      if (previousNode === state.node) {
-        state.node = node;
-        return false;
-      }
-      previousNode = node;
-      return true;
+      nodes.push(node);
     });
+    const index = nodes.indexOf(state.node);
+    nodes.splice(0, index + 1);
+    for (let i = 0; i < nodes.length; i++) {
+      if (nodes[i].model.type !== 'group') {
+        state.node = nodes[i];
+        return;
+      }
+    }
   },
   PREV(state) {
-    let previousNode = null;
+    const nodes = [];
     state.root.walk((node) => {
-      if (node === state.node && !previousNode.isRoot()) {
-        state.node = previousNode;
-        return false;
-      }
-      previousNode = node;
-      return true;
+      nodes.push(node);
     });
+    const index = nodes.indexOf(state.node);
+    nodes.splice(index);
+    nodes.reverse();
+    for (let i = 0; i < nodes.length; i++) {
+      if (nodes[i].model.type !== 'group') {
+        state.node = nodes[i];
+        return;
+      }
+    }
   },
   GOTO(state, path) {
     state.root.walk((node) => {

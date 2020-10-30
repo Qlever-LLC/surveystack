@@ -56,7 +56,7 @@ export const availableControls = [
     name: 'page',
     label: 'My page',
     type: 'page',
-    children: [],
+    items: [],
     icon: 'mdi-view-list',
   },
   {

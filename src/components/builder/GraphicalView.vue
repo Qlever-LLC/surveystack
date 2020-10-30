@@ -49,10 +49,20 @@
       </div>
 
       <nested-draggable
-        v-if="el.type == 'group' || el.type == 'page'"
+        v-if="el.type == 'group'"
         :class="{'drop-area-border': (el.children.length === 0), 'drop-area': 1}"
         :selected="selected"
         :controls="el.children"
+        @controlSelected="$emit('controlSelected', $event)"
+        @duplicate-control="$emit('duplicate-control', $event)"
+        :index="createIndex(index, idx + 1)"
+      />
+
+      <nested-draggable
+        v-if="el.type == 'page'"
+        :class="{'drop-area-border': (el.items.length === 0), 'drop-area': 1}"
+        :selected="selected"
+        :controls="el.items"
         @controlSelected="$emit('controlSelected', $event)"
         @duplicate-control="$emit('duplicate-control', $event)"
         :index="createIndex(index, idx + 1)"
