@@ -18,6 +18,11 @@
         />
       </v-col>
       <v-col>
+        <div class="d-flex">
+          <v-text-field v-model="gotoPath" />
+          <v-btn @click="$store.dispatch('draft/goto', gotoPath)">GOTO</v-btn>
+        </div>
+
         <v-btn @click="$store.dispatch('draft/prev')">PREV</v-btn>
         <v-btn @click="$store.dispatch('draft/next')">NEXT</v-btn>
         <app-control
@@ -29,12 +34,7 @@
       </v-col>
 
     </v-row>
-    <div>
-      {{positions}}
-    </div>
-    <div>
-      {{flatNames}}
-    </div>
+
     <div>
       {{control}}
     </div>
@@ -43,10 +43,7 @@
 </template>
 
 <script>
-import * as utils from '@/utils/surveys';
-
 import appControl from './Control.vue';
-
 
 export default {
   components: {
@@ -56,6 +53,11 @@ export default {
     survey: { type: Object },
     submission: { type: Object },
   },
+  data() {
+    return {
+      gotoPath: '',
+    };
+  },
   computed: {
     submissionStringified() {
       return JSON.stringify(this.submission, null, 2);
@@ -64,25 +66,7 @@ export default {
       return JSON.stringify(this.survey, null, 2);
     },
 
-    positions() {
-      return utils.getSurveyPositions(this.survey, this.activeVersion);
-    },
-    controls() {
-      return this.survey.revisions.find(revision => revision.version === this.activeVersion)
-        .controls;
-    },
-    activeVersion() {
-      return this.submission.meta.survey.version;
-    },
-    flatNames() {
-      return this.positions.map(position => utils.getFlatName(this.controls, position));
-    },
-    controlKeys() {
-      return this.flatNames.map(flatName => `data.${flatName}`);
-    },
-    controlValueKeys() {
-      return this.flatNames.map(flatName => `data.${flatName}.value`);
-    },
+
     path() {
       return this.$store.getters['draft/path'];
     },
