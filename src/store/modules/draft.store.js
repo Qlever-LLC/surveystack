@@ -121,6 +121,9 @@ const mutations = {
       previousNode = node;
     });
   },
+  GOTO(path) {
+
+  },
 };
 
 export default {
