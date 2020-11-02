@@ -2,6 +2,29 @@ import TreeModel from 'tree-model';
 
 import * as utils from '@/utils/surveys';
 
+// http://blog.nicohaemhouts.com/2015/08/03/accessing-nested-javascript-objects-with-string-key/
+function getNested(theObject, path, separator = '.') {
+  try {
+    return path
+      .replace('[', separator).replace(']', '')
+      .split(separator)
+      .reduce(
+        (obj, property) => obj[property], theObject,
+      );
+  } catch (err) {
+    return undefined;
+  }
+}
+
+function setNested(theObject, path, value, separator = '.') {
+  const parentPath = path
+    .replace('[', separator).replace(']', '')
+    .split(separator);
+  const subKey = parentPath.pop();
+  const parent = getNested(theObject, parentPath.join(separator), separator);
+  parent[subKey] = value;
+}
+
 const createInitialState = () => ({
   survey: null,
   submission: null,
@@ -15,16 +38,7 @@ const initialState = createInitialState();
 const getters = {
   survey: state => state.survey,
   submission: state => state.submission,
-  property: state => (path) => {
-    const splits = path.split('.');
-
-    let p = state.submission[splits[0]];
-    for (let i = 1; i < splits.length; i++) {
-      p = p[splits[i]];
-    }
-
-    return p;
-  },
+  property: state => path => getNested(state.submission, path),
   control: state => state.node.model,
   path: (state) => {
     const p = state.node.getPath().map(n => n.model.name).join('.');
@@ -63,7 +77,6 @@ const mutations = {
   INIT(state, { survey, submission }) {
     state.survey = survey;
     state.submission = submission;
-    const positions = utils.getSurveyPositions(survey, submission.meta.survey.version);
     const { controls } = state.survey.revisions.find(revision => revision.version === submission.meta.survey.version);
 
     const tree = new TreeModel();
@@ -75,22 +88,14 @@ const mutations = {
     });
 
     state.tree = tree;
-    state.node = root.first(n => n.model.name !== 'data');
+    state.node = root.first(n => !n.isRoot());
     console.log('first node', state.node);
   },
   SET_PROPERTY(state, { path, value }) {
     console.log(`path: ${path}`);
     console.log(`value: ${value}`);
 
-    const splits = path.split('.');
-
-    let p = state.submission[splits[0]];
-
-    for (let i = 1; i < splits.length - 1; i++) {
-      p = p[splits[i]];
-    }
-
-    p[splits.pop()] = value;
+    setNested(state.submission, path, value);
   },
   NEXT(state) {
     const nodes = [];
