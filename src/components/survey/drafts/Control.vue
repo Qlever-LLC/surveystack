@@ -4,7 +4,7 @@
 
     <div v-if="control.type === 'page'">
       <div
-        v-for="(child, i) in control.items"
+        v-for="(child, i) in control.children"
         :key="i"
       >
         <app-control

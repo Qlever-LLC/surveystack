@@ -98,32 +98,49 @@ const mutations = {
     setNested(state.submission, path, value);
   },
   NEXT(state) {
-    const nodes = [];
+    const traversal = [];
     state.root.walk((node) => {
-      nodes.push(node);
-    });
-    const index = nodes.indexOf(state.node);
-    nodes.splice(0, index + 1);
-    for (let i = 0; i < nodes.length; i++) {
-      if (nodes[i].model.type !== 'group') {
-        state.node = nodes[i];
-        return;
+      if (node.isRoot() || node.model.type === 'group') {
+        return true;
       }
+
+      // getPath returns all parent nodes from root to node (including node itself)
+      // with slice(1).slice(0,-1) the root and node itself is removed
+      const insidePage = node.getPath().slice(1).slice(0, -1).find(parent => parent.model.type === 'page');
+      if (insidePage) {
+        return true;
+      }
+
+      traversal.push(node);
+      return true;
+    });
+
+    const index = traversal.indexOf(state.node);
+    if (traversal.length > index + 1) {
+      state.node = traversal[index + 1];
     }
   },
   PREV(state) {
-    const nodes = [];
+    const traversal = [];
     state.root.walk((node) => {
-      nodes.push(node);
-    });
-    const index = nodes.indexOf(state.node);
-    nodes.splice(index);
-    nodes.reverse();
-    for (let i = 0; i < nodes.length; i++) {
-      if (nodes[i].model.type !== 'group') {
-        state.node = nodes[i];
-        return;
+      if (node.isRoot() || node.model.type === 'group') {
+        return true;
       }
+
+      // getPath returns all parent nodes from root to node (including node itself)
+      // with slice(1).slice(0,-1) the root and node itself is removed
+      const insidePage = node.getPath().slice(1).slice(0, -1).find(parent => parent.model.type === 'page');
+      if (insidePage) {
+        return true;
+      }
+
+      traversal.push(node);
+      return true;
+    });
+
+    const index = traversal.indexOf(state.node);
+    if (index > 0) {
+      state.node = traversal[index - 1];
     }
   },
   GOTO(state, path) {
