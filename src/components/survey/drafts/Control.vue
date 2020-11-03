@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    {{path}}
+    <div class="overline my-2">{{path}}</div>
 
     <div v-if="control.type === 'page'">
       <div
@@ -15,11 +15,14 @@
     </div>
 
     <div v-else>
-      <v-text-field
-        :label="path"
+      <component
+        :is="getComponentName(control)"
+        :control="control"
         :value="$store.getters['draft/property'](path).value"
-        @input="setProperty"
+        :index="path"
+        @changed="setProperty"
       />
+
     </div>
 
   </v-container>
@@ -40,6 +43,9 @@ export default {
     setProperty(value) {
       const path = `${this.path}.value`;
       this.$store.dispatch('draft/setProperty', { path, value });
+    },
+    getComponentName(control) {
+      return `app-control-${control.type}`;
     },
   },
 };
