@@ -166,7 +166,7 @@ const createSubmissionFromSurvey = ({
     }
 
     const entry = { value: v || null, meta };
-    if (control.type === 'group') {
+    if (control.type === 'group' || control.type === 'page') {
       delete entry.value;
       delete entry.meta.dateModified;
     }
