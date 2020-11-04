@@ -1,7 +1,14 @@
 <template>
   <v-container class="mt-12">
+    <div class="d-flex">
+      <v-btn
+        @click="viewSurvey = !viewSurvey"
+        class="mr-2"
+      >Survey</v-btn>
+      <v-btn @click="viewSubmission = !viewSubmission">Submission</v-btn>
+    </div>
     <v-row class="mt-6">
-      <v-col>
+      <v-col v-if="viewSurvey">
         <v-textarea
           :value="surveyStringified"
           label="survey"
@@ -9,7 +16,7 @@
           outlined
         />
       </v-col>
-      <v-col>
+      <v-col v-if="viewSubmission">
         <v-textarea
           :value="submissionStringified"
           label="submission"
@@ -18,6 +25,7 @@
         />
       </v-col>
       <v-col>
+
         <div class="d-flex">
           <v-text-field v-model="gotoPath" />
           <v-btn @click="$store.dispatch('draft/goto', gotoPath)">GOTO</v-btn>
@@ -62,6 +70,8 @@ export default {
   data() {
     return {
       gotoPath: '',
+      viewSurvey: false,
+      viewSubmission: false,
     };
   },
   computed: {
