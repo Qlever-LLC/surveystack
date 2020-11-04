@@ -19,7 +19,10 @@
       </v-col>
       <v-col>
 
-        <v-card class="pa-3">
+        <v-card
+          class="pa-3"
+          color="grey lighten-4"
+        >
           <div class="d-flex pb-2 justify-center">
             <v-checkbox
               label="Survey"
@@ -93,10 +96,6 @@
       </v-col>
 
     </v-row>
-
-    <div>
-      {{control}}
-    </div>
 
   </v-container>
 </template>
