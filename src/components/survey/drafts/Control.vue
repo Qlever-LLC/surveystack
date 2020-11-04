@@ -1,8 +1,8 @@
 <template>
-  <v-container>
+  <v-container class="mx-0 px-0">
     <div class="overline my-2">{{path}}</div>
 
-    <div v-if="control.type === 'page'">
+    <div v-if="control.type === 'page' && !insidePage">
       <div
         v-for="(child, i) in control.children"
         :key="i"
@@ -11,6 +11,21 @@
           :path="`${path}.${child.name}`"
           :control="child"
           :autoFocus="i===0"
+          insidePage
+        />
+      </div>
+    </div>
+
+    <div v-else-if="control.type === 'group' && insidePage">
+      <div
+        v-for="(child, i) in control.children"
+        :key="i"
+      >
+        <app-control
+          :path="`${path}.${child.name}`"
+          :control="child"
+          :autoFocus="autoFocus && i===0"
+          insidePage
         />
       </div>
     </div>
@@ -40,6 +55,10 @@ export default {
     },
     control: {
       type: Object,
+    },
+    insidePage: {
+      type: Boolean,
+      default: false,
     },
     autoFocus: {
       type: Boolean,

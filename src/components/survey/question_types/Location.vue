@@ -1,6 +1,9 @@
 <template>
-  <div class="d-flex">
-    <div v-if="control.title" class="mb-2">{{ control.title }}</div>
+  <div>
+    <div
+      v-if="control.title"
+      class="mb-2"
+    >{{ control.title }}</div>
     <div>
       {{ control.label }}
     </div>
@@ -104,7 +107,10 @@
       </v-card>
 
     </v-overlay>
-    <div v-if="control.hint" class="mt-4 mb-0">{{ control.hint }}</div>
+    <div
+      v-if="control.hint"
+      class="mt-4 mb-0"
+    >{{ control.hint }}</div>
   </div>
 </template>
 

@@ -1,12 +1,5 @@
 <template>
   <v-container class="mt-12">
-    <div class="d-flex">
-      <v-btn
-        @click="viewSurvey = !viewSurvey"
-        class="mr-2"
-      >Survey</v-btn>
-      <v-btn @click="viewSubmission = !viewSubmission">Submission</v-btn>
-    </div>
     <v-row class="mt-6">
       <v-col v-if="viewSurvey">
         <v-textarea
@@ -26,25 +19,77 @@
       </v-col>
       <v-col>
 
-        <div class="d-flex">
-          <v-text-field v-model="gotoPath" />
-          <v-btn @click="$store.dispatch('draft/goto', gotoPath)">GOTO</v-btn>
-        </div>
+        <v-card class="pa-3">
+          <div class="d-flex pb-2 justify-center">
+            <v-checkbox
+              label="Survey"
+              dense
+              hide-details
+              class="mt-0 mx-3"
+              v-model="viewSurvey"
+            />
+            <v-checkbox
+              label="Submission"
+              dense
+              hide-details
+              class="mt-0 mx-3"
+              v-model="viewSubmission"
+            />
+          </div>
+          <div class="d-flex justify-space-between align-center">
+            <v-btn
+              @click="$store.dispatch('draft/prev')"
+              class="mr-4"
+            >PREV</v-btn>
+            <v-btn
+              @click="$store.dispatch('draft/next')"
+              class="mr-4"
+            >NEXT</v-btn>
+            <v-text-field
+              v-model="gotoPath"
+              dense
+              hide-details
+              class="mr-4"
+              label="path"
+              outlined
+            />
+            <v-btn
+              @click="$store.dispatch('draft/goto', gotoPath)"
+              class="mr-4"
+            >GOTO</v-btn>
+            <v-btn @click="submit">SUBMIT</v-btn>
+          </div>
+        </v-card>
 
-        <v-btn @click="$store.dispatch('draft/prev')">PREV</v-btn>
-        <v-btn @click="$store.dispatch('draft/next')">NEXT</v-btn>
         <app-control
           :path="path"
           :control="control"
         />
-        <v-btn @click="$store.dispatch('draft/prev')">PREV</v-btn>
-        <v-btn @click="$store.dispatch('draft/next')">NEXT</v-btn>
-        <br />
-        <v-btn
-          @click="submit"
-          class="my-2"
-          block
-        >SUBMIT</v-btn>
+        <v-card class="pa-3">
+          <div class="d-flex justify-space-between align-center">
+            <v-btn
+              @click="$store.dispatch('draft/prev')"
+              class="mr-4"
+            >PREV</v-btn>
+            <v-btn
+              @click="$store.dispatch('draft/next')"
+              class="mr-4"
+            >NEXT</v-btn>
+            <v-text-field
+              v-model="gotoPath"
+              dense
+              hide-details
+              class="mr-4"
+              label="path"
+              outlined
+            />
+            <v-btn
+              @click="$store.dispatch('draft/goto', gotoPath)"
+              class="mr-4"
+            >GOTO</v-btn>
+            <v-btn @click="submit">SUBMIT</v-btn>
+          </div>
+        </v-card>
       </v-col>
 
     </v-row>
