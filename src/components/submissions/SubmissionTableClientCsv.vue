@@ -7,7 +7,7 @@
         show-select
         item-key="_id"
         :search="search"
-        :mobile-breakpoint="NaN"
+        :mobile-breakpoint="0"
         hide-default-footer
         v-model="tableSelected"
         @item-selected="onRowSelected"
