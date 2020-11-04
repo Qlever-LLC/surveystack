@@ -51,8 +51,6 @@ export default {
     },
   },
   mounted() {
-    console.log('mounted! autoFocus', this.autoFocus);
-
     if (this.autoFocus) {
       if (isIos()) {
         this.$el.style.transform = 'translateY(-1000px)';
