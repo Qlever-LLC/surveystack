@@ -31,6 +31,12 @@
         />
         <v-btn @click="$store.dispatch('draft/prev')">PREV</v-btn>
         <v-btn @click="$store.dispatch('draft/next')">NEXT</v-btn>
+        <br />
+        <v-btn
+          @click="submit"
+          class="my-2"
+          block
+        >SUBMIT</v-btn>
       </v-col>
 
     </v-row>
@@ -65,13 +71,18 @@ export default {
     surveyStringified() {
       return JSON.stringify(this.survey, null, 2);
     },
-
-
     path() {
       return this.$store.getters['draft/path'];
     },
     control() {
       return this.$store.getters['draft/control'];
+    },
+  },
+  methods: {
+    async submit() {
+      this.$emit('submit', {
+        payload: this.submission,
+      });
     },
   },
   created() {
