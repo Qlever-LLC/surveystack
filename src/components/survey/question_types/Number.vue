@@ -1,6 +1,9 @@
 <template>
   <div class="mt-4">
-    <p v-if="control.title" class="mb-2">{{ control.title }}</p>
+    <p
+      v-if="control.title"
+      class="mb-2"
+    >{{ control.title }}</p>
     <v-text-field
       outlined
       type="number"
@@ -10,7 +13,10 @@
       @keyup.enter.prevent="submit"
       ref="textField"
     />
-    <p v-if="control.hint" class="mb-2">{{ control.hint }}</p>
+    <p
+      v-if="control.hint"
+      class="mb-2"
+    >{{ control.hint }}</p>
   </div>
 </template>
 
@@ -59,13 +65,15 @@ export default {
   },
   mounted() {
     // HACK: ios doesn't respect el.focus({ preventScroll: true })
-    if (isIos()) {
-      this.$el.style.transform = 'translateY(-1000px)';
-      this.tryAutofocus();
-      this.$el.scrollTo(0, 0);
-      this.$el.style.transform = 'none';
-    } else {
-      this.tryAutofocus();
+    if (this.autoFocus) {
+      if (isIos()) {
+        this.$el.style.transform = 'translateY(-1000px)';
+        this.tryAutofocus();
+        this.$el.scrollTo(0, 0);
+        this.$el.style.transform = 'none';
+      } else {
+        this.tryAutofocus();
+      }
     }
   },
 };

@@ -10,6 +10,7 @@
         <app-control
           :path="`${path}.${child.name}`"
           :control="child"
+          :autoFocus="i===0"
         />
       </div>
     </div>
@@ -20,7 +21,9 @@
         :control="control"
         :value="$store.getters['draft/property'](path).value"
         :index="path"
+        :key="path"
         @changed="setProperty"
+        :autoFocus="autoFocus"
       />
 
     </div>
@@ -37,6 +40,10 @@ export default {
     },
     control: {
       type: Object,
+    },
+    autoFocus: {
+      type: Boolean,
+      default: true,
     },
   },
   methods: {

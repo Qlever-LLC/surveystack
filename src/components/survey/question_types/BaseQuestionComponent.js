@@ -3,6 +3,7 @@ export default {
     control: { type: Object, required: true },
     value: { required: true },
     index: { required: true },
+    autoFocus: { type: Boolean, default: true },
     resources: {
       default: () => ([]),
     },
