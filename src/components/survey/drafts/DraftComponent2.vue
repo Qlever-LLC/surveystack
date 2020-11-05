@@ -26,7 +26,10 @@
       />
     </v-navigation-drawer>
 
-    <v-row class="mt-6">
+    <v-row
+      class="mt-6"
+      v-if="!showOverview"
+    >
       <v-col v-if="viewSurvey">
         <v-textarea
           :value="surveyStringified"
@@ -94,31 +97,7 @@
           :path="path"
           :control="control"
         />
-        <v-card class="pa-3">
-          <div class="d-flex justify-space-between align-center">
-            <v-btn
-              @click="$store.dispatch('draft/prev')"
-              class="mr-4"
-            >PREV</v-btn>
-            <v-btn
-              @click="$store.dispatch('draft/next')"
-              class="mr-4"
-            >NEXT</v-btn>
-            <v-text-field
-              v-model="gotoPath"
-              dense
-              hide-details
-              class="mr-4"
-              label="path"
-              outlined
-            />
-            <v-btn
-              @click="$store.dispatch('draft/goto', gotoPath)"
-              class="mr-4"
-            >GOTO</v-btn>
-            <v-btn @click="submit">SUBMIT</v-btn>
-          </div>
-        </v-card>
+
       </v-col>
 
     </v-row>
@@ -140,7 +119,7 @@
 <script>
 import appControl from './Control.vue';
 import appDraftFooter from '@/components/survey/drafts/DraftFooter.vue';
-import appDraftOverview from '@/components/survey/drafts/DraftOverview.vue';
+import appDraftOverview from '@/components/survey/drafts/DraftOverview2.vue';
 import appDraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 
 

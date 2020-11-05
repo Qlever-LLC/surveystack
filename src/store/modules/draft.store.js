@@ -1,6 +1,7 @@
 import TreeModel from 'tree-model';
 
-import * as utils from '@/utils/surveys';
+import * as surveyUtils from '@/utils/surveys';
+import { calculateRelevance } from '@/utils/codeEvaluator';
 
 // http://blog.nicohaemhouts.com/2015/08/03/accessing-nested-javascript-objects-with-string-key/
 function getNested(theObject, path, separator = '.') {
@@ -35,6 +36,7 @@ const createInitialState = () => ({
   atEnd: false,
   showOverview: false,
   groupPath: null,
+  compounds: null,
 });
 
 const initialState = createInitialState();
@@ -46,7 +48,6 @@ const getters = {
   control: state => state.node.model,
   path: (state) => {
     const p = state.node.getPath().map(n => n.model.name).join('.');
-    console.log('path', p);
     return p;
   },
   atStart: state => state.atStart,
@@ -88,6 +89,9 @@ const actions = {
   showOverview({ commit }, show) {
     commit('SHOW_OVERVIEW', show);
   },
+  async calculate({ commit, state }, { fname }) {
+    await calculateRelevance(state.compounds);
+  },
 };
 
 const mutations = {
@@ -109,7 +113,18 @@ const mutations = {
 
     state.tree = tree;
     state.node = root.first(n => !n.isRoot());
-    console.log('first node', state.node);
+
+    const compounds = [];
+    root.walk((node) => {
+      if (node.isRoot()) {
+        return true;
+      }
+      const path = node.getPath().map(n => n.model.name).join('.');
+      const control = node.model;
+      compounds.push({ path, control });
+      return true;
+    });
+    state.compounds = compounds;
   },
   SET_PROPERTY(state, { path, value }) {
     console.log(`path: ${path}`);
