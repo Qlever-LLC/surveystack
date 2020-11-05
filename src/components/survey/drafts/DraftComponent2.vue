@@ -1,5 +1,31 @@
 <template>
-  <v-container class="mt-12">
+  <v-container>
+    <app-draft-toolbar
+      :group="groupPath"
+      :required="control && control.options && control.options.required"
+      :anon="control && control.options && control.options.redacted"
+      :showOverviewIcon="true"
+      :questionNumber="1.2"
+      @showOverviewClicked="showOverview = !showOverview"
+    />
+    <v-navigation-drawer
+      v-if="showOverview"
+      v-model="showOverview"
+      clipped
+      right
+      touchless
+      stateless
+      class="grey lighten-4 navigation-container"
+    >
+      <app-draft-overview
+        ref="overview"
+        :survey="survey"
+        :submission="submission"
+        :position="[0]"
+        :group="groupPath"
+      />
+    </v-navigation-drawer>
+
     <v-row class="mt-6">
       <v-col v-if="viewSurvey">
         <v-textarea
@@ -97,15 +123,33 @@
 
     </v-row>
 
+    <app-draft-footer
+      class="px-4 grey lighten-5 footer-container"
+      :showPrev="!$store.getters['draft/atStart']"
+      :enableNext="true"
+      :showSubmit="false"
+      :showNav="true"
+      @next="$store.dispatch('draft/next')"
+      @prev="$store.dispatch('draft/prev')"
+      @submit="$store.dispatch('draft/next')"
+    />
+
   </v-container>
 </template>
 
 <script>
 import appControl from './Control.vue';
+import appDraftFooter from '@/components/survey/drafts/DraftFooter.vue';
+import appDraftOverview from '@/components/survey/drafts/DraftOverview.vue';
+import appDraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
+
 
 export default {
   components: {
     appControl,
+    appDraftFooter,
+    appDraftOverview,
+    appDraftToolbar,
   },
   props: {
     survey: { type: Object },
@@ -130,6 +174,17 @@ export default {
     },
     control() {
       return this.$store.getters['draft/control'];
+    },
+    groupPath() {
+      return this.$store.getters['draft/groupPath'];
+    },
+    showOverview: {
+      get() {
+        return this.$store.getters['draft/showOverview'];
+      },
+      set(v) {
+        this.$store.dispatch('draft/showOverview', v);
+      },
     },
   },
   methods: {

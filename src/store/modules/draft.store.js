@@ -31,6 +31,10 @@ const createInitialState = () => ({
   tree: null,
   root: null,
   node: null,
+  atStart: true,
+  atEnd: false,
+  showOverview: false,
+  groupPath: null,
 });
 
 const initialState = createInitialState();
@@ -44,6 +48,19 @@ const getters = {
     const p = state.node.getPath().map(n => n.model.name).join('.');
     console.log('path', p);
     return p;
+  },
+  atStart: state => state.atStart,
+  atEnd: state => state.atEnd,
+  showOverview: state => state.showOverview,
+  groupPath: (state) => {
+    if (state.submission.meta && state.submission.meta.group && state.submission.meta.group.path) {
+      return state.submission.meta.group.path;
+    }
+    if (state.survey.meta && state.survey.meta.group && state.survey.meta.group.path) {
+      return state.survey.meta.group.path;
+    }
+
+    return null;
   },
 };
 
@@ -67,6 +84,9 @@ const actions = {
   },
   goto({ commit }, path) {
     commit('GOTO', path);
+  },
+  showOverview({ commit }, show) {
+    commit('SHOW_OVERVIEW', show);
   },
 };
 
@@ -98,6 +118,11 @@ const mutations = {
     setNested(state.submission, path, value);
   },
   NEXT(state) {
+    if (state.atEnd) {
+      state.showOverview = true;
+      return;
+    }
+
     const traversal = [];
     state.root.walk((node) => {
       if (node.isRoot() || node.model.type === 'group') {
@@ -118,6 +143,27 @@ const mutations = {
     const index = traversal.indexOf(state.node);
     if (traversal.length > index + 1) {
       state.node = traversal[index + 1];
+    }
+
+    // update atStart
+    if (traversal.leng && state.node === traversal[0]) {
+      state.atStart = true;
+    } else {
+      state.atStart = false;
+    }
+
+    if (traversal.length > 0) {
+      if (state.node === traversal[0]) {
+        state.atStart = true;
+      } else {
+        state.atEnd = true;
+      }
+
+      if (state.node === traversal[traversal.length - 1]) {
+        state.atEnd = true;
+      } else {
+        state.atEnd = false;
+      }
     }
   },
   PREV(state) {
@@ -142,6 +188,20 @@ const mutations = {
     if (index > 0) {
       state.node = traversal[index - 1];
     }
+
+    if (traversal.length > 0) {
+      if (state.node === traversal[0]) {
+        state.atStart = true;
+      } else {
+        state.atEnd = true;
+      }
+
+      if (state.node === traversal[traversal.length - 1]) {
+        state.atEnd = true;
+      } else {
+        state.atEnd = false;
+      }
+    }
   },
   GOTO(state, path) {
     state.root.walk((node) => {
@@ -152,6 +212,10 @@ const mutations = {
       }
       return true;
     });
+  },
+  SHOW_OVERVIEW(state, show) {
+    console.log('SHOW_OVERVIEW', show);
+    state.showOverview = show;
   },
 };
 
