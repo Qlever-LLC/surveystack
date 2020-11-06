@@ -1,99 +1,73 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
-import * as utils from './surveys';
 import submissionUtils from './submissions';
+import * as surveyUtils from './surveys';
+import * as surveyStackUtils from './surveyStack';
 
 
-async function calculateField(survey, submission, positions, controls, option, fname) {
-  const ignored = [];
-  const items = positions.map((pos) => {
-    const control = utils.getControl(controls, pos);
+async function calculateField({
+  nodes, submission, survey, option, fname,
+}) {
+  const items = nodes.map((node) => {
+    const path = node.getPath().map(n => n.model.name).join('.');
+    const control = node.model;
+    const field = surveyStackUtils.getNested(submission, path);
+
     if (!control.options[option].enabled) {
-      return null;
+      return {
+        path,
+        control,
+        field,
+        skip: true,
+      };
     }
 
-    // in case the field is not relevant, skip execution and return {}
-    const field = submissionUtils.getSubmissionField(submission, survey, pos);
-
-    if (fname !== 'relevance') { // if field happens to be irrelvant, but skip this if we eval relevance
-      if (field.meta.computedRelevance !== undefined && field.meta.computedRelevance === false) {
-        ignored.push({
-          control,
-          field,
-          ignore: true,
-        });
-        return null;
-      }
+    // skip calculation if field was already computed as irrelevant
+    if (fname !== 'relevance' && field.meta.computedRelevance !== undefined && field.meta.computedRelevance === false) {
+      // TODO: may want to return null here too?
+      return {
+        path,
+        control,
+        field,
+        skip: true,
+      };
     }
 
     const { code } = control.options[option];
     return {
-      pos,
-      control,
-      code,
+      path, control, field, code, skip: false,
     };
-  }).filter(item => item !== null);
+  });
 
-
-  const evaluated = [];
-
-
-  // eslint-disable-next-line no-restricted-syntax
+  // start execution
   for (const item of items) {
+    if (item.skip) {
+      continue; // eslint-disable-line no-continue
+    }
     try {
-      const res = {
-        res: utils.executeUnsafe({
-          code: item.code, fname, submission, survey, log: msg => console.log(msg),
-        }),
-        pos: item.pos,
-        control: item.control,
-      };
-
-      const field = submissionUtils.getSubmissionField(submission, survey, item.pos);
-      const evaluatedItem = {
-        control: item.control,
-        field,
-        res: res.res,
-      };
-      evaluated.push(evaluatedItem);
+      const result = surveyUtils.executeUnsafe({
+        code: item.code, fname, submission, survey, log: msg => console.log(msg),
+      });
+      item.result = result;
     } catch (error) {
-      const field = submissionUtils.getSubmissionField(submission, survey, item.pos);
-      const evaluatedItem = {
-        control: item.control,
-        field,
-        error,
-      };
-      evaluated.push(evaluatedItem);
+      item.error = error;
     }
   }
 
-  evaluated.push(...ignored);
-
-  return evaluated;
+  return items;
 }
 
-export const calculateRelevance = async (survey, submission, positions, controls) => {
-  try {
-    const r = await calculateField(survey, submission, positions, controls, 'relevance', 'relevance');
-    r.forEach((item) => {
-      if (typeof item.res !== 'boolean') {
-        console.log('error, result is rejected', item);
-        item.field.meta.relevant = true;
-      } else {
-        item.field.meta.relevant = item.res;
-      }
-    });
 
-    // for all eval if relevant, store in field
-    for (let idx = 0; idx < positions.length; idx++) {
-      const pos = positions[idx];
-      const rel = utils.isRelevant(submission, survey, idx, positions);
-      const field = submissionUtils.getSubmissionField(submission, survey, pos);
-      field.meta.computedRelevance = rel;
-    }
+export const calculateRelevance = async (nodes, submission, survey) => {
+  try {
+    const calculations = await calculateField({
+      nodes, submission, survey, option: 'relevance', fname: 'relevance',
+    });
+    return calculations;
   } catch (error) {
     console.log(error);
+    return [];
   }
 };
 

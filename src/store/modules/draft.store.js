@@ -1,30 +1,7 @@
 import TreeModel from 'tree-model';
 
-import * as surveyUtils from '@/utils/surveys';
-import { calculateRelevance } from '@/utils/codeEvaluator';
-
-// http://blog.nicohaemhouts.com/2015/08/03/accessing-nested-javascript-objects-with-string-key/
-function getNested(theObject, path, separator = '.') {
-  try {
-    return path
-      .replace('[', separator).replace(']', '')
-      .split(separator)
-      .reduce(
-        (obj, property) => obj[property], theObject,
-      );
-  } catch (err) {
-    return undefined;
-  }
-}
-
-function setNested(theObject, path, value, separator = '.') {
-  const parentPath = path
-    .replace('[', separator).replace(']', '')
-    .split(separator);
-  const subKey = parentPath.pop();
-  const parent = getNested(theObject, parentPath.join(separator), separator);
-  parent[subKey] = value;
-}
+import * as surveyStackUtils from '@/utils/surveyStack';
+import { calculateRelevance } from '@/utils/codeEvaluator2';
 
 const createInitialState = () => ({
   survey: null,
@@ -44,7 +21,7 @@ const initialState = createInitialState();
 const getters = {
   survey: state => state.survey,
   submission: state => state.submission,
-  property: state => path => getNested(state.submission, path),
+  property: state => path => surveyStackUtils.getNested(state.submission, path),
   control: state => state.node.model,
   path: (state) => {
     const p = state.node.getPath().map(n => n.model.name).join('.');
@@ -74,8 +51,9 @@ const actions = {
 
     commit('INIT', { survey, submission });
   },
-  setProperty({ commit }, { path, value }) {
+  setProperty({ commit, dispatch }, { path, value }) {
     commit('SET_PROPERTY', { path, value });
+    dispatch('calculateRelevance');
   },
   next({ commit }) {
     commit('NEXT');
@@ -89,8 +67,23 @@ const actions = {
   showOverview({ commit }, show) {
     commit('SHOW_OVERVIEW', show);
   },
-  async calculate({ commit, state }, { fname }) {
-    await calculateRelevance(state.compounds);
+  async calculateRelevance({ commit, state }) {
+    const nodes = [];
+    state.root.walk((node) => {
+      if (node.isRoot()) {
+        return true;
+      }
+      nodes.push(node);
+      return true;
+    });
+    const calculations = await calculateRelevance(nodes, state.submission, state.survey);
+    calculations.forEach((calculation) => {
+      const { result, path, skip } = calculation;
+      if (!skip) {
+        console.log('set prop', `${path}.meta.relevant`, result);
+        commit('SET_PROPERTY', { path: `${path}.meta.relevant`, value: result });
+      }
+    });
   },
 };
 
@@ -130,7 +123,8 @@ const mutations = {
     console.log(`path: ${path}`);
     console.log(`value: ${value}`);
 
-    setNested(state.submission, path, value);
+    surveyStackUtils.setNested(state.submission, path, value);
+    state.submission = { ...state.submission };
   },
   NEXT(state) {
     if (state.atEnd) {

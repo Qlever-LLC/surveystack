@@ -8,6 +8,7 @@
       :questionNumber="1.2"
       @showOverviewClicked="showOverview = !showOverview"
     />
+    <v-btn @click="$store.dispatch('draft/calculateRelevance')">Calculate Relevance</v-btn>
     <v-navigation-drawer
       v-if="showOverview"
       v-model="showOverview"
