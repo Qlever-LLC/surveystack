@@ -1,7 +1,7 @@
 import TreeModel from 'tree-model';
 
 import * as surveyStackUtils from '@/utils/surveyStack';
-import { calculateRelevance } from '@/utils/codeEvaluator2';
+import * as codeEvaluator from '@/utils/codeEvaluator2';
 
 const createInitialState = () => ({
   survey: null,
@@ -68,20 +68,25 @@ const actions = {
     commit('SHOW_OVERVIEW', show);
   },
   async calculateRelevance({ commit, state }) {
-    const nodes = [];
-    state.root.walk((node) => {
-      if (node.isRoot()) {
-        return true;
+    // TODO: only calculate subset of nodes
+    const nodes = surveyStackUtils.getAllNodes(state.root);
+    const calculations = await codeEvaluator.calculateRelevance(nodes, state.submission, state.survey);
+    calculations.forEach((calculation) => {
+      const { result, path, skip } = calculation;
+      // TODO: set computedRelevance as well
+      if (!skip) {
+        commit('SET_PROPERTY', { path: `${path}.meta.relevant`, value: result });
       }
-      nodes.push(node);
-      return true;
     });
-    const calculations = await calculateRelevance(nodes, state.submission, state.survey);
+  },
+  async calculateApiCompose({ commit, state }) {
+    // TODO: only calculate subset of nodes
+    const nodes = surveyStackUtils.getAllNodes(state.root);
+    const calculations = await codeEvaluator.calculateApiCompose(nodes, state.submission, state.survey);
     calculations.forEach((calculation) => {
       const { result, path, skip } = calculation;
       if (!skip) {
-        console.log('set prop', `${path}.meta.relevant`, result);
-        commit('SET_PROPERTY', { path: `${path}.meta.relevant`, value: result });
+        commit('SET_PROPERTY', { path: `${path}.meta.apiCompose`, value: result });
       }
     });
   },

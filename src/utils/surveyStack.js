@@ -26,7 +26,20 @@ export function setNested(obj, path, value, separator = '.') {
   Vue.set(parent, subKey, value);
 }
 
+export const getAllNodes = (root) => {
+  const nodes = [];
+  root.walk((node) => {
+    if (node.isRoot()) {
+      return true;
+    }
+    nodes.push(node);
+    return true;
+  });
+  return nodes;
+};
+
 export default {
   getNested,
   setNested,
+  getAllNodes,
 };

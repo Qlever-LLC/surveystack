@@ -40,7 +40,7 @@ async function calculateField({
     };
   });
 
-  // start execution
+  // execution
   for (const item of items) {
     if (item.skip) {
       continue; // eslint-disable-line no-continue
@@ -60,29 +60,15 @@ async function calculateField({
 
 
 export const calculateRelevance = async (nodes, submission, survey) => {
-  try {
-    const calculations = await calculateField({
-      nodes, submission, survey, option: 'relevance', fname: 'relevance',
-    });
-    return calculations;
-  } catch (error) {
-    console.log(error);
-    return [];
-  }
+  const calculations = await calculateField({
+    nodes, submission, survey, option: 'relevance', fname: 'relevance',
+  });
+  return calculations;
 };
 
-
-export const calculateApiCompose = async (survey, submission, positions, controls) => {
-  const r = await calculateField(survey, submission, positions, controls, 'apiCompose', 'apiCompose');
-  r.forEach((item) => {
-    if (typeof item.res !== 'object') {
-      console.log('error, result is rejected', item.res);
-    }
-    if (item.ignore) {
-      item.field.meta.apiCompose = {};
-    } else {
-      item.field.meta.apiCompose = item.res;
-    }
+export const calculateApiCompose = async (nodes, submission, survey) => {
+  const calculations = await calculateField({
+    nodes, submission, survey, option: 'apiCompose', fname: 'apiCompose',
   });
-  return r;
+  return calculations;
 };
