@@ -12,6 +12,7 @@
       v-on:input="onInput"
       @keyup.enter.prevent="submit"
       ref="textField"
+      :disabled="!relevant"
     />
     <p
       v-if="control.hint"

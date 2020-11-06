@@ -21,7 +21,7 @@ const initialState = createInitialState();
 const getters = {
   survey: state => state.survey,
   submission: state => state.submission,
-  property: state => path => surveyStackUtils.getNested(state.submission, path),
+  property: state => (path, fallback) => surveyStackUtils.getNested(state.submission, path, fallback),
   control: state => state.node.model,
   path: (state) => {
     const p = state.node.getPath().map(n => n.model.name).join('.');
@@ -46,10 +46,11 @@ const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  init({ commit }, { survey, submission }) {
+  init({ commit, dispatch }, { survey, submission }) {
     console.log('draft.store:action:init');
 
     commit('INIT', { survey, submission });
+    dispatch('calculateRelevance');
   },
   setProperty({ commit, dispatch }, { path, value }) {
     commit('SET_PROPERTY', { path, value });

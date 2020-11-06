@@ -39,6 +39,7 @@
         :key="path"
         @changed="setProperty"
         :autoFocus="autoFocus"
+        :relevant="$store.getters['draft/property'](`${path}.meta.relevant`, true)"
       />
 
     </div>

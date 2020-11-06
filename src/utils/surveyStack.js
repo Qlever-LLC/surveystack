@@ -2,26 +2,28 @@ import Vue from 'vue';
 // TODO: try to get rid of Vue import
 // But we kind of need Vue.set for setting new properties without losing reactivity
 
+const SEPARATOR = '.';
+
 // http://blog.nicohaemhouts.com/2015/08/03/accessing-nested-javascript-objects-with-string-key/
-export function getNested(obj, path, separator = '.') {
+export function getNested(obj, path, fallback = undefined) {
   try {
     return path
-      .replace('[', separator).replace(']', '')
-      .split(separator)
+      .replace('[', SEPARATOR).replace(']', '')
+      .split(SEPARATOR)
       .reduce(
         (item, property) => item[property], obj,
       );
   } catch (err) {
-    return undefined;
+    return fallback;
   }
 }
 
-export function setNested(obj, path, value, separator = '.') {
+export function setNested(obj, path, value) {
   const parentPath = path
-    .replace('[', separator).replace(']', '')
-    .split(separator);
+    .replace('[', SEPARATOR).replace(']', '')
+    .split(SEPARATOR);
   const subKey = parentPath.pop();
-  const parent = getNested(obj, parentPath.join(separator), separator);
+  const parent = getNested(obj, parentPath.join(SEPARATOR), SEPARATOR);
   // parent[subKey] = value; // not reactive if setting properties which do not exist yet
   Vue.set(parent, subKey, value);
 }

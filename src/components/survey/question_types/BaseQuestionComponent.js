@@ -4,6 +4,7 @@ export default {
     value: { required: true },
     index: { required: true },
     autoFocus: { type: Boolean, default: true },
+    relevant: { type: Boolean, default: true },
     resources: {
       default: () => ([]),
     },
