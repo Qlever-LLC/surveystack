@@ -1,89 +1,16 @@
 <template>
-  <div
-    class="wrapper"
-    style="height: 100%;"
-  >
-    <div
-      class="full-width fill-height d-flex align-center justify-center"
-      v-if="controls.length === 0"
-    >
-      <div class="d-flex flex-column" >
-        <v-icon
-          large
-          color="blue"
-        >
-          mdi-file-multiple
-        </v-icon>
-        <v-alert
-          type="info"
-          text
-          color="blue"
-          class="ma-4"
-        >
-          No Questions yet
-        </v-alert>
-      </div>
-    </div>
-
-    <div
-      class="draft-container"
-      v-if="submission && survey && controls.length !== 0"
-    >
-      <draft-toolbar
-        :group="groupPath"
-        :required="control && control.options && control.options.required"
-        :anon="control && control.options && control.options.redacted"
-        :showOverviewIcon="!atEnd"
-        :questionNumber="questionNumber"
-        v-if="!showOverview && index < positions.length"
-        @showOverviewClicked="showOverview = !showOverview"
-      />
-      <draft-title
-        v-if="!showOverview && index < positions.length"
-        :breadcrumbs="mbreadcrumbs"
-      />
-      <transition
-        class="transition"
-        :name="slide"
-      >
-        <div
-          id="transition-container"
-          :key="'container-'+index"
-        >
-          <v-container
-            class="draft-body mx-auto d-flex flex-column align-center justify-center"
-            style="min-height: 40vh;"
-          >
-            <component
-              v-if="control && !atEnd"
-              class="draft-control full-width d-sm-flex flex-column align-center justify-center px-4"
-              :key="'question_'+index"
-              :is="componentName"
-              :control="control"
-              :value="value"
-              :index="index"
-              :submission="submission"
-              :meta="submissionField.meta"
-              :resources="survey.resources"
-              ref="currentControl"
-              @eval="eval"
-              @changed="setValue"
-              @setStatus="setStatus"
-              @setContext="setContext"
-              @setRenderQueue="setRenderQueue"
-              @show-nav="showNav(true)"
-              @hide-nav="showNav(false)"
-              @next="handleNext"
-              @show-next="showNext(true)"
-              @hide-next="showNext(false)"
-            />
-          </v-container>
-        </div>
-      </transition>
-    </div>
-
+  <v-container>
+    <app-draft-toolbar
+      :group="groupPath"
+      :required="control && control.options && control.options.required"
+      :anon="control && control.options && control.options.redacted"
+      :showOverviewIcon="true"
+      :questionNumber="1.2"
+      @showOverviewClicked="showOverview = !showOverview"
+    />
+    <v-btn @click="$store.dispatch('draft/calculateRelevance')">Calculate Relevance</v-btn>
     <v-navigation-drawer
-      v-if="survey && showOverview"
+      v-if="showOverview"
       v-model="showOverview"
       clipped
       right
@@ -91,60 +18,165 @@
       stateless
       class="grey lighten-4 navigation-container"
     >
-      <draft-overview
+      <app-draft-overview
         ref="overview"
         :survey="survey"
         :submission="submission"
-        :position="positions[index]"
+        :position="[0]"
         :group="groupPath"
-        @navigate="navigate"
       />
     </v-navigation-drawer>
 
-    <draft-footer
+    <v-row
+      class="mt-6"
+      v-if="!showOverview"
+    >
+      <v-col v-if="viewSurvey">
+        <v-textarea
+          :value="surveyStringified"
+          label="survey"
+          rows="30"
+          outlined
+        />
+      </v-col>
+      <v-col v-if="viewSubmission">
+        <v-textarea
+          :value="submissionStringified"
+          label="submission"
+          rows="30"
+          outlined
+        />
+      </v-col>
+      <v-col>
+
+        <v-card
+          class="pa-3"
+          color="grey lighten-4"
+        >
+          <div class="d-flex pb-2 justify-center">
+            <v-checkbox
+              label="Survey"
+              dense
+              hide-details
+              class="mt-0 mx-3"
+              v-model="viewSurvey"
+            />
+            <v-checkbox
+              label="Submission"
+              dense
+              hide-details
+              class="mt-0 mx-3"
+              v-model="viewSubmission"
+            />
+          </div>
+          <div class="d-flex justify-space-between align-center">
+            <v-btn
+              @click="$store.dispatch('draft/prev')"
+              class="mr-4"
+            >PREV</v-btn>
+            <v-btn
+              @click="$store.dispatch('draft/next')"
+              class="mr-4"
+            >NEXT</v-btn>
+            <v-text-field
+              v-model="gotoPath"
+              dense
+              hide-details
+              class="mr-4"
+              label="path"
+              outlined
+            />
+            <v-btn
+              @click="$store.dispatch('draft/goto', gotoPath)"
+              class="mr-4"
+            >GOTO</v-btn>
+            <v-btn @click="submit">SUBMIT</v-btn>
+          </div>
+        </v-card>
+
+        <app-control
+          :path="path"
+          :control="control"
+        />
+
+      </v-col>
+
+    </v-row>
+
+    <app-draft-footer
       class="px-4 grey lighten-5 footer-container"
-      :showPrev="!atStart"
-      :enableNext="mShowNext && controls.length > 0"
-      :showSubmit="atEnd && controls.length > 0"
-      :showNav="mShowNav"
-      @next="handleNext"
-      @prev="handlePrevious"
-      @submit="handleNext"
+      :showPrev="!$store.getters['draft/atStart']"
+      :enableNext="true"
+      :showSubmit="false"
+      :showNav="true"
+      @next="$store.dispatch('draft/next')"
+      @prev="$store.dispatch('draft/prev')"
+      @submit="$store.dispatch('draft/next')"
     />
 
-    <error-dialog
-      v-model="showApiComposeErrors"
-      :errors="apiComposeErrors"
-      title="API Compose Errors"
-    />
-
-    <confirm-submission-dialog
-      v-model="confirmSubmissionIsVisible"
-      :group="submission.meta.group.id"
-      @submit="() => submit(submission)"
-      @set-group="setSubmissionGroup"
-      :dateSubmitted="submission.meta.dateSubmitted"
-    />
-  </div>
+  </v-container>
 </template>
 
-<script src="./DraftComponent.js">
+<script>
+import appControl from './Control.vue';
+import appDraftFooter from '@/components/survey/drafts/DraftFooter.vue';
+import appDraftOverview from '@/components/survey/drafts/DraftOverview2.vue';
+import appDraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
+
+
+export default {
+  components: {
+    appControl,
+    appDraftFooter,
+    appDraftOverview,
+    appDraftToolbar,
+  },
+  props: {
+    survey: { type: Object },
+    submission: { type: Object },
+  },
+  data() {
+    return {
+      gotoPath: '',
+      viewSurvey: false,
+      viewSubmission: false,
+    };
+  },
+  computed: {
+    submissionStringified() {
+      return JSON.stringify(this.submission, null, 2);
+    },
+    surveyStringified() {
+      return JSON.stringify(this.survey, null, 2);
+    },
+    path() {
+      return this.$store.getters['draft/path'];
+    },
+    control() {
+      return this.$store.getters['draft/control'];
+    },
+    groupPath() {
+      return this.$store.getters['draft/groupPath'];
+    },
+    showOverview: {
+      get() {
+        return this.$store.getters['draft/showOverview'];
+      },
+      set(v) {
+        this.$store.dispatch('draft/showOverview', v);
+      },
+    },
+  },
+  methods: {
+    async submit() {
+      this.$emit('submit', {
+        payload: this.submission,
+      });
+    },
+  },
+  created() {
+    const { survey, submission } = this;
+    this.$store.dispatch('draft/init', { survey, submission });
+  },
+};
 </script>
-
-<style scoped src="./DraftComponent.css">
-</style>
-
-<style>
-.question-title-chip {
-  display: inline-flex;
-  /* background-color: white; */
-  /* color: #ff5722; */
-  border-radius: 0.4rem;
-  font-weight: bold;
-  font-size: 80%;
-  padding: 0.2rem;
-  padding-left: 0.4rem;
-  padding-right: 0.4rem;
-  border: 1px solid black;
-}
-</style>

@@ -68,11 +68,10 @@
 import api from '@/services/api.service';
 import appMixin from '@/components/mixin/appComponent.mixin';
 import * as db from '@/store/db';
-import * as utils from '@/utils/surveys';
 import resultMixin from '@/components/ui/ResultsMixin';
 
 
-import appDraftComponent from '@/components/survey/drafts/DraftComponent2.vue';
+import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
 import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
