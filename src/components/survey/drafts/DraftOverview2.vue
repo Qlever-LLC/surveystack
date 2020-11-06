@@ -1,16 +1,24 @@
 <template>
   <v-container>
+    <div class="d-flex justify-end">
+      <v-btn
+        class="my-2"
+        @click="$store.dispatch('draft/showOverview', false)"
+      >
+        <v-icon left>mdi-close</v-icon>Close
+      </v-btn>
+    </div>
     <v-card>
       <v-card-title>{{ survey.name }}</v-card-title>
       <v-card-subtitle>
         {{ submission._id }}
-        <br/>
+        <br />
         Submitting to: <kbd>{{ group }}</kbd>
-        <br/>
+        <br />
         Created: <kbd>{{ created }}</kbd>
         <br>
         Last modified: <kbd>{{ modified }}</kbd>
-        <br/>
+        <br />
         <strong v-if="submission.meta.dateSubmitted"><kbd>{{ submitted }}</kbd> submitted</strong>
       </v-card-subtitle>
     </v-card>
@@ -42,7 +50,7 @@
               <div class="flex-grow-1">
                 <v-card-title class="d-block">
                   <div class="ma-0 pa-0 d-flex align-stretch">
-                      <!-- color="#FF5722" -->
+                    <!-- color="#FF5722" -->
                     <v-chip
                       dark
                       small
@@ -221,6 +229,7 @@ export default {
       });
       this.controlDisplays = r;
     },
+
   },
   watch: {
     /*
@@ -231,6 +240,9 @@ export default {
       deep: true,
     },
     */
+  },
+  mounted() {
+    this.refresh();
   },
 };
 </script>

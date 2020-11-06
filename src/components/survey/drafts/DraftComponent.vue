@@ -180,3 +180,16 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.navigation-container {
+  position: absolute;
+  width: 100% !important;
+  z-index: 4;
+  height: calc(100% - 68px);
+  max-height: calc(100% - 68px);
+  overflow: auto;
+  /* grid-column: 1;
+  grid-row: 1; */
+}
+</style>
