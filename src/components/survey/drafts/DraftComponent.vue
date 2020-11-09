@@ -23,6 +23,8 @@
         :submission="submission"
         :position="[0]"
         :group="groupPath"
+        :compounds="$store.getters['draft/compounds']"
+        @goto="goto"
       />
     </v-navigation-drawer>
 
@@ -167,6 +169,10 @@ export default {
     },
   },
   methods: {
+    goto(path) {
+      this.$store.dispatch('draft/goto', path);
+      this.showOverview = false;
+    },
     async submit() {
       this.$emit('submit', {
         payload: this.submission,

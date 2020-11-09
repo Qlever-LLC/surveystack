@@ -43,6 +43,7 @@ const getters = {
 
     return null;
   },
+  compounds: state => state.compounds,
 };
 
 const actions = {
@@ -131,7 +132,7 @@ const mutations = {
       }
       const path = node.getPath().map(n => n.model.name).join('.');
       const control = node.model;
-      compounds.push({ path, control });
+      compounds.push({ node, path, control });
       return true;
     });
     state.compounds = compounds;
@@ -230,6 +231,15 @@ const mutations = {
     state.root.walk((node) => {
       const currentPath = node.getPath().map(n => n.model.name).join('.');
       if (currentPath === path) {
+        const parents = node.getPath();
+        for (let i = 0; i < parents.length; i++) {
+          const parent = parents[i];
+          if (parent.model.type === 'page') {
+            state.node = parent;
+            return false;
+          }
+        }
+
         state.node = node;
         return false;
       }

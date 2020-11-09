@@ -11,7 +11,7 @@ export function getNested(obj, path, fallback = undefined) {
       .replace('[', SEPARATOR).replace(']', '')
       .split(SEPARATOR)
       .reduce(
-        (item, property) => item[property], obj,
+        (item, property) => (item[property] === undefined ? fallback : item[property]), obj,
       );
   } catch (err) {
     return fallback;

@@ -36,7 +36,7 @@
         >
           <v-card
             v-if="display.relevant || !display.hidden"
-            @click="$emit('navigate', display.position);"
+            @click="$emit('goto', display.path)"
             :color="display.background"
             :dark="display.dark"
           >
@@ -55,13 +55,7 @@
                       dark
                       small
                       class="mr-0 mr-1"
-                    ><span
-                        v-for="(crumb, ci) in display.breadcrumbs"
-                        :key="`bread_${ci}`"
-                      >{{ crumb }} <span
-                          class="mr-1"
-                          v-if="ci < display.breadcrumbs.length - 1"
-                        >&gt;</span></span></v-chip>
+                    >{{display.path}}</v-chip>
                     <v-spacer></v-spacer>
                     <v-chip
                       small
@@ -87,7 +81,7 @@
                     {{ display.modified.format('YYYY-MM-DD HH:mm') }}<v-spacer></v-spacer>
                   </div>
                   <div class="text-right">
-                    {{ display.human }} ago
+                    {{ display.modifiedHumanized }} ago
                   </div>
                 </div>
               </div>
@@ -109,12 +103,7 @@
 </template>
 
 <script>
-import _ from 'lodash';
 import moment from 'moment';
-import colors from 'vuetify/lib/util/colors';
-import { linearControls } from '@/utils/submissions';
-import * as utils from '@/utils/surveys';
-
 
 const states = {
   done: ['mdi-check-bold', 'green'],
@@ -124,10 +113,10 @@ const states = {
   ok: ['', ''],
 };
 
-function iconify(control, relevant) {
-  if (control.value != null) {
+function iconify(value, control, relevant) {
+  if (value != null) {
     return states.done;
-  } if (relevant && (control.value == null && control.options.required)) {
+  } if (relevant && (value == null && control.options.required)) {
     return states.missing;
   } if (control.warning) {
     return states.warning;
@@ -143,6 +132,7 @@ export default {
     'submission',
     'position',
     'group',
+    'compounds',
   ],
   data() {
     return {
@@ -153,15 +143,6 @@ export default {
     };
   },
   methods: {
-    relevant(item, positions) {
-      const idx = positions.findIndex(p => _.isEqual(p, item.position));
-      if (idx === -1) {
-        return true;
-      }
-
-      const relevant = utils.isRelevant(this.submission, this.survey, idx, positions);
-      return relevant === undefined ? true : relevant;
-    },
     expand(group) {
       this.controlDisplays.filter(item => item.collateGroup === group && item.collate > 0).forEach((item) => {
         // eslint-disable-next-line no-param-reassign
@@ -170,32 +151,43 @@ export default {
         item.hidden = false;
       });
     },
+    isRelevant(node) {
+      const relevant = node.getPath().every((n) => {
+        const p = n.getPath().map(nn => nn.model.name).join('.');
+        const r = this.$store.getters['draft/property'](`${p}.meta.relevant`, true);
+        return r;
+      });
+      return relevant;
+    },
     refresh() {
       this.created = moment(this.submission.meta.dateCreated).format('YYYY-MM-DD HH:mm');
       this.modified = moment(this.submission.meta.dateModified).format('YYYY-MM-DD HH:mm');
       this.submitted = moment(this.submission.meta.dateSubmitted).format('YYYY-MM-DD HH:mm');
 
       const now = moment();
-      const positions = utils.getSurveyPositions(this.survey, this.submission.meta.survey.version);
 
       let collate = 0;
       let collateGroup = 0;
-      const controls = linearControls(this.survey, this.submission);
 
-      const r = controls.map((item, itemIndex) => {
-        const peek = itemIndex + 1 < controls.length ? controls[itemIndex + 1] : null;
-        const active = _.isEqual(item.position, this.position);
-        const rel = this.relevant(item, positions);
+      const controlDisplays = [];
+
+      for (let i = 0; i < this.compounds.length; i++) {
+        const compound = this.compounds[i];
+        const nextCompound = i + 1 < this.compounds.length ? this.compounds[i + 1] : null;
+
+        const { node, path, control } = compound;
+        if (control.type === 'group' || control.type === 'page') {
+          continue; // eslint-disable-line no-continue
+        }
+
+        const relevant = this.isRelevant(node);
+
         let lastOfCollation = false;
-        const icon = iconify(item, rel);
 
-        if (!rel) {
+        if (!relevant) {
           collate++;
-          if (peek) {
-            if (this.relevant(peek, positions)) {
-              lastOfCollation = true;
-            }
-          } else {
+          // end collation if there are no next nodes or next nodes are relevant again
+          if (!nextCompound || (nextCompound && this.isRelevant(nextCompound.node))) {
             lastOfCollation = true;
           }
         } else {
@@ -203,31 +195,34 @@ export default {
           collateGroup++;
         }
 
-        const modified = item.meta.dateModified ? moment(item.meta.dateModified) : null;
-
+        const modified = this.$store.getters['draft/property'](`${path}.meta.dateModified`, null);
+        const active = this.$store.getters['draft/node'] === compound.node;
         const background = 'white';
+        const number = node.getPath().map(n => n.getIndex() + 1).slice(1).join('.');
+        const value = this.$store.getters['draft/property'](`${compound.path}.value`);
+        const icon = iconify(value, compound.control, relevant);
 
-        return {
-          label: item.label,
-          value: item.value,
-          breadcrumbs: item.breadcrumbs,
+        controlDisplays.push({
+          path: compound.path,
+          label: compound.control.label,
+          value,
           icon: icon[0],
           color: icon[1],
-          number: item.number.join('.'),
+          number,
           background,
-          position: item.position,
           dark: false,
-          relevant: rel,
-          hidden: !rel,
+          relevant,
+          hidden: !relevant,
           collate,
           collateGroup,
           lastOfCollation,
           active,
           modified,
-          human: moment.duration(now.diff(modified)).humanize(),
-        };
-      });
-      this.controlDisplays = r;
+          modifiedHumanized: moment.duration(now.diff(modified)).humanize(),
+        });
+      }
+
+      this.controlDisplays = controlDisplays;
     },
 
   },
@@ -242,6 +237,7 @@ export default {
     */
   },
   mounted() {
+    console.log('DraftOverview mounted');
     this.refresh();
   },
 };
