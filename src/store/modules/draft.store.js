@@ -7,7 +7,7 @@ const createInitialState = () => ({
   survey: null, // current survey
   submission: null, // current submission
   root: null, // root node starting from current survey controls
-  node: null, // node pointing to current survey control
+  node: null, // node with model pointing to current survey control
   atStart: true,
   atEnd: false,
   showOverview: false,
@@ -21,7 +21,7 @@ const getters = {
   survey: state => state.survey,
   submission: state => state.submission,
   property: state => (path, fallback) => surveyStackUtils.getNested(state.submission, path, fallback),
-  control: state => state.node.model,
+  control: state => state.node.model, // current survey control
   path: (state) => {
     const p = state.node.getPath().map(n => n.model.name).join('.');
     return p;
