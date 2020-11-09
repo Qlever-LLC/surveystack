@@ -5,10 +5,9 @@
       :required="control && control.options && control.options.required"
       :anon="control && control.options && control.options.redacted"
       :showOverviewIcon="true"
-      :questionNumber="1.2"
+      :questionNumber="$store.getters['draft/questionNumber']"
       @showOverviewClicked="showOverview = !showOverview"
     />
-    <v-btn @click="$store.dispatch('draft/calculateRelevance')">Calculate Relevance</v-btn>
     <v-navigation-drawer
       v-if="showOverview"
       v-model="showOverview"

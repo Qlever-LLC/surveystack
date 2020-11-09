@@ -4,11 +4,10 @@ import * as surveyStackUtils from '@/utils/surveyStack';
 import * as codeEvaluator from '@/utils/codeEvaluator2';
 
 const createInitialState = () => ({
-  survey: null,
-  submission: null,
-  tree: null,
-  root: null,
-  node: null,
+  survey: null, // current survey
+  submission: null, // current submission
+  root: null, // root node starting from current survey controls
+  node: null, // node pointing to current survey control
   atStart: true,
   atEnd: false,
   showOverview: false,
@@ -30,6 +29,10 @@ const getters = {
   atStart: state => state.atStart,
   atEnd: state => state.atEnd,
   showOverview: state => state.showOverview,
+  questionNumber: (state) => {
+    const n = state.node.getPath().map(node => node.getIndex() + 1).slice(1).join('.');
+    return n;
+  },
   groupPath: (state) => {
     if (state.submission.meta && state.submission.meta.group && state.submission.meta.group.path) {
       return state.submission.meta.group.path;
@@ -100,18 +103,26 @@ const mutations = {
   INIT(state, { survey, submission }) {
     state.survey = survey;
     state.submission = submission;
+    state.showOverview = false;
     const { controls } = state.survey.revisions.find(revision => revision.version === submission.meta.survey.version);
 
     const tree = new TreeModel();
     const root = tree.parse({ name: 'data', children: controls });
     state.root = root;
 
+    // possible node alteration
     root.all(n => !!n.parent && n.parent.model.type === 'page').forEach((node) => {
       // node.drop();
     });
 
-    state.tree = tree;
-    state.node = root.first(n => !n.isRoot());
+    // assign current node
+    root.walk((node) => {
+      if (!node.isRoot() && node.model.type !== 'group') {
+        state.node = node;
+        return false;
+      }
+      return true;
+    });
 
     const compounds = [];
     root.walk((node) => {
@@ -126,9 +137,6 @@ const mutations = {
     state.compounds = compounds;
   },
   SET_PROPERTY(state, { path, value }) {
-    console.log(`path: ${path}`);
-    console.log(`value: ${value}`);
-
     surveyStackUtils.setNested(state.submission, path, value);
     state.submission = { ...state.submission };
   },
@@ -229,7 +237,6 @@ const mutations = {
     });
   },
   SHOW_OVERVIEW(state, show) {
-    console.log('SHOW_OVERVIEW', show);
     state.showOverview = show;
   },
 };
