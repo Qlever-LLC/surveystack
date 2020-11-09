@@ -4,13 +4,13 @@
       <v-card-title>{{ survey.name }}</v-card-title>
       <v-card-subtitle>
         {{ submission._id }}
-        <br/>
+        <br />
         Submitting to: <kbd>{{ group }}</kbd>
-        <br/>
+        <br />
         Created: <kbd>{{ created }}</kbd>
         <br>
         Last modified: <kbd>{{ modified }}</kbd>
-        <br/>
+        <br />
         <strong v-if="submission.meta.dateSubmitted"><kbd>{{ submitted }}</kbd> submitted</strong>
       </v-card-subtitle>
     </v-card>
@@ -42,7 +42,7 @@
               <div class="flex-grow-1">
                 <v-card-title class="d-block">
                   <div class="ma-0 pa-0 d-flex align-stretch">
-                      <!-- color="#FF5722" -->
+                    <!-- color="#FF5722" -->
                     <v-chip
                       dark
                       small
@@ -79,7 +79,7 @@
                     {{ display.modified.format('YYYY-MM-DD HH:mm') }}<v-spacer></v-spacer>
                   </div>
                   <div class="text-right">
-                    {{ display.human }} ago
+                    {{ display.modifiedHumanized }} ago
                   </div>
                 </div>
               </div>
@@ -216,7 +216,7 @@ export default {
           lastOfCollation,
           active,
           modified,
-          human: moment.duration(now.diff(modified)).humanize(),
+          modifiedHumanized: moment.duration(now.diff(modified)).humanize(),
         };
       });
       this.controlDisplays = r;
