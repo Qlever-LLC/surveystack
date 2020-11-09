@@ -1,5 +1,8 @@
 <template>
-  <v-container>
+  <v-container
+    style="height: 100%; min-height: 800px"
+    class="d-flex flex-column justify-space-between"
+  >
     <app-draft-toolbar
       :group="groupPath"
       :required="control && control.options && control.options.required"
@@ -26,6 +29,7 @@
         :compounds="$store.getters['draft/compounds']"
         @goto="goto"
       />
+
     </v-navigation-drawer>
 
     <v-row
@@ -101,7 +105,6 @@
         />
 
       </v-col>
-
     </v-row>
 
     <app-draft-footer

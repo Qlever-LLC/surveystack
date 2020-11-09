@@ -139,7 +139,6 @@ const mutations = {
   },
   SET_PROPERTY(state, { path, value }) {
     surveyStackUtils.setNested(state.submission, path, value);
-    state.submission = { ...state.submission };
   },
   NEXT(state) {
     if (state.atEnd) {

@@ -195,8 +195,10 @@ export default {
           collateGroup++;
         }
 
-        const modified = this.$store.getters['draft/property'](`${path}.meta.dateModified`, null);
-        const active = this.$store.getters['draft/node'] === compound.node;
+        const dateModified = this.$store.getters['draft/property'](`${path}.meta.dateModified`, null);
+        const modified = dateModified ? moment(dateModified) : null;
+
+        const active = this.$store.getters['draft/path'] === compound.path;
         const background = 'white';
         const number = node.getPath().map(n => n.getIndex() + 1).slice(1).join('.');
         const value = this.$store.getters['draft/property'](`${compound.path}.value`);

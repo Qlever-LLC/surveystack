@@ -1,7 +1,5 @@
 <template>
   <v-container class="mx-0 px-0">
-    <div class="overline my-2">{{path}}</div>
-
     <div v-if="control.type === 'page' && !insidePage">
       <div
         v-for="(child, i) in control.children"
@@ -48,6 +46,8 @@
 </template>
 
 <script>
+import moment from 'moment';
+
 export default {
   name: 'app-control',
   props: {
@@ -70,6 +70,11 @@ export default {
     setProperty(value) {
       const path = `${this.path}.value`;
       this.$store.dispatch('draft/setProperty', { path, value });
+
+      // adjust modified date
+      const modified = moment().toISOString(true);
+      this.$store.dispatch('draft/setProperty', { path: `${this.path}.meta.dateModified`, value: modified });
+      this.$store.dispatch('draft/setProperty', { path: 'meta.dateModified', value: modified });
     },
     getComponentName(control) {
       return `app-control-${control.type}`;
