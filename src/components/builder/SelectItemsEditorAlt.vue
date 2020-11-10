@@ -7,7 +7,7 @@
 
     </v-card-title>
     <div class="text-center d-flex">
-        <!-- :resourceTypes="['ONTOLOGY_LIST']" -->
+      <!-- :resourceTypes="['ONTOLOGY_LIST']" -->
       <resource-selector
         :resources="filteredResources"
         :value="value"
@@ -123,7 +123,3 @@ export default {
   },
 };
 </script>
-
-<style>
-
-</style>

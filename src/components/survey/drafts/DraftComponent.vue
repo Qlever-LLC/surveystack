@@ -1,8 +1,5 @@
 <template>
-  <v-container
-    style="height: 100%; min-height: 800px"
-    class="d-flex flex-column justify-space-between"
-  >
+  <v-container class="draft-component-wrapper">
     <app-draft-toolbar
       :group="groupPath"
       :required="control && control.options && control.options.required"
@@ -11,6 +8,7 @@
       :questionNumber="$store.getters['draft/questionNumber']"
       @showOverviewClicked="showOverview = !showOverview"
     />
+
     <v-navigation-drawer
       v-if="showOverview"
       v-model="showOverview"
@@ -29,83 +27,17 @@
         :compounds="$store.getters['draft/compounds']"
         @goto="goto"
       />
-
     </v-navigation-drawer>
 
-    <v-row
-      class="mt-6"
+    <div
+      class="mt-6 draft-content"
       v-if="!showOverview"
     >
-      <v-col v-if="viewSurvey">
-        <v-textarea
-          :value="surveyStringified"
-          label="survey"
-          rows="30"
-          outlined
-        />
-      </v-col>
-      <v-col v-if="viewSubmission">
-        <v-textarea
-          :value="submissionStringified"
-          label="submission"
-          rows="30"
-          outlined
-        />
-      </v-col>
-      <v-col>
-
-        <v-card
-          class="pa-3"
-          color="grey lighten-4"
-        >
-          <div class="d-flex pb-2 justify-center">
-            <v-checkbox
-              label="Survey"
-              dense
-              hide-details
-              class="mt-0 mx-3"
-              v-model="viewSurvey"
-            />
-            <v-checkbox
-              label="Submission"
-              dense
-              hide-details
-              class="mt-0 mx-3"
-              v-model="viewSubmission"
-            />
-          </div>
-          <div class="d-flex justify-space-between align-center">
-            <v-btn
-              @click="$store.dispatch('draft/prev')"
-              class="mr-4"
-            >PREV</v-btn>
-            <v-btn
-              @click="$store.dispatch('draft/next')"
-              class="mr-4"
-            >NEXT</v-btn>
-            <v-text-field
-              v-model="gotoPath"
-              dense
-              hide-details
-              class="mr-4"
-              label="path"
-              outlined
-            />
-            <v-btn
-              @click="$store.dispatch('draft/goto', gotoPath)"
-              class="mr-4"
-            >GOTO</v-btn>
-            <v-btn @click="submit">SUBMIT</v-btn>
-          </div>
-        </v-card>
-
-        <app-control
-          :path="path"
-          :control="control"
-        />
-
-      </v-col>
-    </v-row>
+      <app-control
+        :path="path"
+        :control="control"
+      />
+    </div>
 
     <app-draft-footer
       class="px-4 grey lighten-5 footer-container"
@@ -197,7 +129,33 @@ export default {
   height: calc(100% - 68px);
   max-height: calc(100% - 68px);
   overflow: auto;
-  /* grid-column: 1;
-  grid-row: 1; */
+}
+
+.draft-component-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-top: 0px;
+}
+
+.draft-content {
+  flex: 1;
+  overflow: auto;
+}
+
+.footer-container {
+  z-index: 1;
+  /* background-color: white; */
+  width: 100%;
+  border-top: 1px solid #eee;
+  height: 68px;
+  overflow: hidden;
+  position: fixed;
+  /* bottom: 0px; */
+  top: calc(100% - 68px);
+  /* top: 80%; */
+  /* top: calc(100vh - 68px); */
+  /* top: 0vh; */
+  left: 0px;
 }
 </style>

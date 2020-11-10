@@ -4,9 +4,7 @@
       v-if="showIosInstallBanner"
       v-model="showIosInstallBanner"
     />
-    <default-install-banner
-      v-else
-    />
+    <default-install-banner v-else />
   </div>
 </template>
 
@@ -38,7 +36,3 @@ export default {
   },
 };
 </script>
-
-<style>
-
-</style>
