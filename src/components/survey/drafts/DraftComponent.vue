@@ -42,10 +42,7 @@
     </v-navigation-drawer>
 
     <!-- Content with questions -->
-    <div
-      class="mt-6 draft-content"
-      v-if="!showOverview"
-    >
+    <div class="mt-6 draft-content">
       <app-control
         :path="path"
         :control="control"
@@ -70,7 +67,7 @@
 <script>
 import appControl from './Control.vue';
 import appDraftFooter from '@/components/survey/drafts/DraftFooter.vue';
-import appDraftOverview from '@/components/survey/drafts/DraftOverview2.vue';
+import appDraftOverview from '@/components/survey/drafts/DraftOverview.vue';
 import appDraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 import appConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 
