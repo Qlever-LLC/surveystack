@@ -53,7 +53,7 @@
     <app-draft-footer
       class="px-4 grey lighten-5 footer-container"
       :showPrev="!$store.getters['draft/atStart']"
-      :enableNext="true"
+      :enableNext="!(control.options.required && $store.getters['draft/property'](`${path}.value`) === null)"
       :showSubmit="showOverview"
       :showNav="true"
       @next="$store.dispatch('draft/next')"

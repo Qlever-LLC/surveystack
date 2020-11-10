@@ -3,6 +3,7 @@
     <p
       v-if="control.title"
       class="mb-2"
+      :class="{'text--secondary': !relevant}"
     >{{ control.title }}</p>
     <v-text-field
       outlined
