@@ -38,6 +38,7 @@
         @changed="setProperty"
         :autoFocus="autoFocus"
         :relevant="$store.getters['draft/property'](`${path}.meta.relevant`, true)"
+        @next="$store.dispatch('draft/next')"
       />
 
     </div>

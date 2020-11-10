@@ -11,6 +11,7 @@ const createInitialState = () => ({
   atStart: true,
   atEnd: false,
   showOverview: false,
+  showConfirmSubmission: false,
   groupPath: null,
   compounds: null,
 });
@@ -29,6 +30,7 @@ const getters = {
   atStart: state => state.atStart,
   atEnd: state => state.atEnd,
   showOverview: state => state.showOverview,
+  showConfirmSubmission: state => state.showConfirmSubmission,
   questionNumber: (state) => {
     const n = state.node.getPath().map(node => node.getIndex() + 1).slice(1).join('.');
     return n;
@@ -72,6 +74,9 @@ const actions = {
   showOverview({ commit }, show) {
     commit('SHOW_OVERVIEW', show);
   },
+  showConfirmSubmission({ commit }, show) {
+    commit('SHOW_CONFIRM_SUBMISSION', show);
+  },
   async calculateRelevance({ commit, state }) {
     // TODO: only calculate subset of nodes
     const nodes = surveyStackUtils.getAllNodes(state.root);
@@ -105,6 +110,9 @@ const mutations = {
     state.survey = survey;
     state.submission = submission;
     state.showOverview = false;
+    state.showConfirmSubmission = false;
+    state.atStart = true;
+    state.atEnd = false;
     const { controls } = state.survey.revisions.find(revision => revision.version === submission.meta.survey.version);
 
     const tree = new TreeModel();
@@ -247,6 +255,9 @@ const mutations = {
   },
   SHOW_OVERVIEW(state, show) {
     state.showOverview = show;
+  },
+  SHOW_CONFIRM_SUBMISSION(state, show) {
+    state.showConfirmSubmission = show;
   },
 };
 

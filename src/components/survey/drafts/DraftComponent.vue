@@ -1,5 +1,16 @@
 <template>
   <v-container class="draft-component-wrapper">
+
+    <!-- confirm submission modal -->
+    <app-confirm-submission-dialog
+      v-model="showConfirmSubmission"
+      :group="submission.meta.group.id"
+      @submit="() => submit(submission)"
+      @set-group="setSubmissionGroup"
+      :dateSubmitted="submission.meta.dateSubmitted"
+    />
+
+    <!-- Toolbar with question number and overview button -->
     <app-draft-toolbar
       :group="groupPath"
       :required="control && control.options && control.options.required"
@@ -9,6 +20,7 @@
       @showOverviewClicked="showOverview = !showOverview"
     />
 
+    <!-- Navigation drawer with overview -->
     <v-navigation-drawer
       v-if="showOverview"
       v-model="showOverview"
@@ -29,6 +41,7 @@
       />
     </v-navigation-drawer>
 
+    <!-- Content with questions -->
     <div
       class="mt-6 draft-content"
       v-if="!showOverview"
@@ -39,15 +52,16 @@
       />
     </div>
 
+    <!-- Footer with next/prev buttons -->
     <app-draft-footer
       class="px-4 grey lighten-5 footer-container"
       :showPrev="!$store.getters['draft/atStart']"
       :enableNext="true"
-      :showSubmit="false"
+      :showSubmit="showOverview"
       :showNav="true"
       @next="$store.dispatch('draft/next')"
       @prev="$store.dispatch('draft/prev')"
-      @submit="$store.dispatch('draft/next')"
+      @submit="showConfirmSubmission = true"
     />
 
   </v-container>
@@ -58,6 +72,7 @@ import appControl from './Control.vue';
 import appDraftFooter from '@/components/survey/drafts/DraftFooter.vue';
 import appDraftOverview from '@/components/survey/drafts/DraftOverview2.vue';
 import appDraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
+import appConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 
 
 export default {
@@ -66,6 +81,7 @@ export default {
     appDraftFooter,
     appDraftOverview,
     appDraftToolbar,
+    appConfirmSubmissionDialog,
   },
   props: {
     survey: { type: Object },
@@ -102,6 +118,14 @@ export default {
         this.$store.dispatch('draft/showOverview', v);
       },
     },
+    showConfirmSubmission: {
+      get() {
+        return this.$store.getters['draft/showConfirmSubmission'];
+      },
+      set(v) {
+        this.$store.dispatch('draft/showConfirmSubmission', v);
+      },
+    },
   },
   methods: {
     goto(path) {
@@ -112,6 +136,20 @@ export default {
       this.$emit('submit', {
         payload: this.submission,
       });
+    },
+    setSubmissionGroup(id) {
+      const availableGroups = this.$store.getters['memberships/groups'];
+      const found = availableGroups.find(group => group._id === id);
+
+      const group = { id, path: '' };
+
+      if (found) {
+        // eslint-disable-next-line prefer-destructuring
+        console.log('found selected group', found);
+        group.path = found.path;
+      }
+
+      this.$store.dispatch('draft/setProperty', { path: 'meta.group', value: group });
     },
   },
   created() {

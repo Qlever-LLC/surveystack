@@ -26,7 +26,7 @@
         >
           <v-btn
             :disabled="!enableNext"
-            @click="$emit('next');"
+            @click="$emit('submit');"
             class="full"
             depressed
             large
@@ -43,8 +43,8 @@
         >
           <v-btn
             :disabled="!enableNext"
-            @click="$emit('submit');"
-            @keyup.enter="$emit('submit');"
+            @click="$emit('next');"
+            @keyup.enter="$emit('next');"
             class="full"
             depressed
             large
