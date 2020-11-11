@@ -36,6 +36,7 @@
         :index="path"
         :key="path"
         @changed="setProperty"
+        @setStatus="setStatus"
         :autoFocus="autoFocus"
         :relevant="$store.getters['draft/property'](`${path}.meta.relevant`, true)"
         @next="$store.dispatch('draft/next')"
@@ -76,6 +77,16 @@ export default {
       const modified = moment().toISOString(true);
       this.$store.dispatch('draft/setProperty', { path: `${this.path}.meta.dateModified`, value: modified });
       this.$store.dispatch('draft/setProperty', { path: 'meta.dateModified', value: modified });
+    },
+    setStatus({ type, message }) {
+      this.$store.dispatch('draft/setProperty', { path: 'meta.status', value: type });
+      this.$store.dispatch('draft/setProperty', { path: 'meta.statusMessage', value: message });
+    },
+    setContext(context) {
+      this.$store.dispatch('draft/setProperty', { path: `${this.path}.meta.context`, value: context });
+    },
+    setRenderQueue(renderQueue) {
+      this.$store.dispatch('draft/setProperty', { path: `${this.path}.meta.renderQueue`, value: renderQueue });
     },
     getComponentName(control) {
       return `app-control-${control.type}`;
