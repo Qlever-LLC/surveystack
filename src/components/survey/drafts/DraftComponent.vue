@@ -36,7 +36,7 @@
         :submission="submission"
         :position="[0]"
         :group="groupPath"
-        :compounds="$store.getters['draft/compounds']"
+        :overviews="$store.getters['draft/overviews']"
         @goto="goto"
       />
     </v-navigation-drawer>
@@ -52,7 +52,7 @@
     <!-- Footer with next/prev buttons -->
     <app-draft-footer
       class="px-4 grey lighten-5 footer-container"
-      :showPrev="!$store.getters['draft/atStart']"
+      :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
       :enableNext="!(control.options.required && $store.getters['draft/property'](`${path}.value`) === null)"
       :showSubmit="showOverview"
       :showNav="true"

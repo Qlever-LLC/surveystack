@@ -8,12 +8,10 @@ const createInitialState = () => ({
   submission: null, // current submission
   root: null, // root node starting from current survey controls
   node: null, // node with model pointing to current survey control
-  atStart: true,
-  atEnd: false,
+  firstNode: null,
   showOverview: false,
   showConfirmSubmission: false,
-  groupPath: null,
-  compounds: null,
+  overviews: null,
 });
 
 const initialState = createInitialState();
@@ -27,8 +25,7 @@ const getters = {
     const p = state.node.getPath().map(n => n.model.name).join('.');
     return p;
   },
-  atStart: state => state.atStart,
-  atEnd: state => state.atEnd,
+  atStart: state => state.node === state.firstNode,
   showOverview: state => state.showOverview,
   showConfirmSubmission: state => state.showConfirmSubmission,
   questionNumber: (state) => {
@@ -45,7 +42,7 @@ const getters = {
 
     return null;
   },
-  compounds: state => state.compounds,
+  overviews: state => state.overviews,
 };
 
 const actions = {
@@ -54,7 +51,6 @@ const actions = {
   },
   init({ commit, dispatch }, { survey, submission }) {
     console.log('draft.store:action:init');
-
     commit('INIT', { survey, submission });
     dispatch('calculateRelevance');
   },
@@ -62,11 +58,105 @@ const actions = {
     commit('SET_PROPERTY', { path, value });
     dispatch('calculateRelevance');
   },
-  next({ commit }) {
-    commit('NEXT');
+  async next({ commit, state }) {
+    const traversal = [];
+    state.root.walk((node) => {
+      traversal.push(node);
+      return true;
+    });
+
+    let index = traversal.indexOf(state.node);
+    if (index < 0) {
+      return;
+    }
+
+    while (++index < traversal.length) {
+      const nextNode = traversal[index];
+
+      const [calculation] = await codeEvaluator.calculateRelevance([nextNode], state.submission, state.survey); // eslint-disable-line
+      const { result, path, skip } = calculation;
+      if (!skip) {
+        commit('SET_PROPERTY', { path: `${path}.meta.relevant`, value: result });
+      }
+
+      const hasIrrelevantParents = nextNode.getPath().slice(1).slice(0, -1).some((parent) => {
+        const parentPath = parent.getPath().map(n => n.model.name).join('.');
+        if (!surveyStackUtils.getNested(state.submission, `${parentPath}.meta.relevant`, true)) {
+          return true;
+        }
+        return false;
+      });
+
+      if (hasIrrelevantParents) {
+        continue; // eslint-disable-line no-continue
+      }
+
+      const isGroup = nextNode.model.type === 'group';
+      if (isGroup) {
+        continue; // eslint-disable-line no-continue
+      }
+
+      const isInsidePage = nextNode.getPath().slice(1).slice(0, -1).find(parent => parent.model.type === 'page');
+      if (isInsidePage) {
+        continue; // eslint-disable-line no-continue
+      }
+
+      commit('NEXT', nextNode);
+      return;
+    }
+
+    commit('SHOW_OVERVIEW', true);
   },
-  prev({ commit }) {
-    commit('PREV');
+  async prev({ commit, state }) {
+    const traversal = [];
+    state.root.walk((node) => {
+      if (node.isRoot()) {
+        return true;
+      }
+      traversal.push(node);
+      return true;
+    });
+
+    let index = traversal.indexOf(state.node);
+    if (index < 0) {
+      return;
+    }
+
+    while (--index >= 0) {
+      console.log('while', index);
+      const prevNode = traversal[index];
+
+      const [calculation] = await codeEvaluator.calculateRelevance([prevNode], state.submission, state.survey); // eslint-disable-line
+      const { result, path, skip } = calculation;
+      if (!skip) {
+        commit('SET_PROPERTY', { path: `${path}.meta.relevant`, value: result });
+      }
+
+      const hasIrrelevantParents = prevNode.getPath().slice(1).slice(0, -1).some((parent) => {
+        const parentPath = parent.getPath().map(n => n.model.name).join('.');
+        if (!surveyStackUtils.getNested(state.submission, `${parentPath}.meta.relevant`, true)) {
+          return true;
+        }
+        return false;
+      });
+
+      if (hasIrrelevantParents) {
+        continue; // eslint-disable-line no-continue
+      }
+
+      const isGroup = prevNode.model.type === 'group';
+      if (isGroup) {
+        continue; // eslint-disable-line no-continue
+      }
+
+      const isInsidePage = prevNode.getPath().slice(1).slice(0, -1).find(parent => parent.model.type === 'page');
+      if (isInsidePage) {
+        continue; // eslint-disable-line no-continue
+      }
+
+      commit('PREV', prevNode);
+      return;
+    }
   },
   goto({ commit }, path) {
     commit('GOTO', path);
@@ -111,8 +201,6 @@ const mutations = {
     state.submission = submission;
     state.showOverview = false;
     state.showConfirmSubmission = false;
-    state.atStart = true;
-    state.atEnd = false;
     const { controls } = state.survey.revisions.find(revision => revision.version === submission.meta.survey.version);
 
     const tree = new TreeModel();
@@ -124,115 +212,36 @@ const mutations = {
       // node.drop();
     });
 
-    // assign current node
+    // assign first node
     root.walk((node) => {
       if (!node.isRoot() && node.model.type !== 'group') {
         state.node = node;
+        state.firstNode = node;
         return false;
       }
       return true;
     });
 
-    const compounds = [];
+    const overviews = [];
     root.walk((node) => {
       if (node.isRoot()) {
         return true;
       }
       const path = node.getPath().map(n => n.model.name).join('.');
       const control = node.model;
-      compounds.push({ node, path, control });
+      overviews.push({ node, path, control });
       return true;
     });
-    state.compounds = compounds;
+    state.overviews = overviews;
   },
   SET_PROPERTY(state, { path, value }) {
     surveyStackUtils.setNested(state.submission, path, value);
   },
-  NEXT(state) {
-    if (state.atEnd) {
-      state.showOverview = true;
-      return;
-    }
-
-    const traversal = [];
-    state.root.walk((node) => {
-      if (node.isRoot() || node.model.type === 'group') {
-        return true;
-      }
-
-      // getPath returns all parent nodes from root to node (including node itself)
-      // with slice(1).slice(0,-1) the root and node itself is removed
-      const insidePage = node.getPath().slice(1).slice(0, -1).find(parent => parent.model.type === 'page');
-      if (insidePage) {
-        return true;
-      }
-
-      traversal.push(node);
-      return true;
-    });
-
-    const index = traversal.indexOf(state.node);
-    if (traversal.length > index + 1) {
-      state.node = traversal[index + 1];
-    }
-
-    // update atStart
-    if (traversal.leng && state.node === traversal[0]) {
-      state.atStart = true;
-    } else {
-      state.atStart = false;
-    }
-
-    if (traversal.length > 0) {
-      if (state.node === traversal[0]) {
-        state.atStart = true;
-      } else {
-        state.atEnd = true;
-      }
-
-      if (state.node === traversal[traversal.length - 1]) {
-        state.atEnd = true;
-      } else {
-        state.atEnd = false;
-      }
-    }
+  NEXT(state, node) {
+    state.node = node;
   },
-  PREV(state) {
-    const traversal = [];
-    state.root.walk((node) => {
-      if (node.isRoot() || node.model.type === 'group') {
-        return true;
-      }
-
-      // getPath returns all parent nodes from root to node (including node itself)
-      // with slice(1).slice(0,-1) the root and node itself is removed
-      const insidePage = node.getPath().slice(1).slice(0, -1).find(parent => parent.model.type === 'page');
-      if (insidePage) {
-        return true;
-      }
-
-      traversal.push(node);
-      return true;
-    });
-
-    const index = traversal.indexOf(state.node);
-    if (index > 0) {
-      state.node = traversal[index - 1];
-    }
-
-    if (traversal.length > 0) {
-      if (state.node === traversal[0]) {
-        state.atStart = true;
-      } else {
-        state.atEnd = true;
-      }
-
-      if (state.node === traversal[traversal.length - 1]) {
-        state.atEnd = true;
-      } else {
-        state.atEnd = false;
-      }
-    }
+  PREV(state, node) {
+    state.node = node;
   },
   GOTO(state, path) {
     state.root.walk((node) => {

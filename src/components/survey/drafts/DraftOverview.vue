@@ -132,7 +132,7 @@ export default {
     'submission',
     'position',
     'group',
-    'compounds',
+    'overviews',
   ],
   data() {
     return {
@@ -171,11 +171,11 @@ export default {
 
       const controlDisplays = [];
 
-      for (let i = 0; i < this.compounds.length; i++) {
-        const compound = this.compounds[i];
-        const nextCompound = i + 1 < this.compounds.length ? this.compounds[i + 1] : null;
+      for (let i = 0; i < this.overviews.length; i++) {
+        const overview = this.overviews[i];
+        const nextOverview = i + 1 < this.overviews.length ? this.overviews[i + 1] : null;
 
-        const { node, path, control } = compound;
+        const { node, path, control } = overview;
         if (control.type === 'group' || control.type === 'page') {
           continue; // eslint-disable-line no-continue
         }
@@ -187,7 +187,7 @@ export default {
         if (!relevant) {
           collate++;
           // end collation if there are no next nodes or next nodes are relevant again
-          if (!nextCompound || (nextCompound && this.isRelevant(nextCompound.node))) {
+          if (!nextOverview || (nextOverview && this.isRelevant(nextOverview.node))) {
             lastOfCollation = true;
           }
         } else {
@@ -198,15 +198,15 @@ export default {
         const dateModified = this.$store.getters['draft/property'](`${path}.meta.dateModified`, null);
         const modified = dateModified ? moment(dateModified) : null;
 
-        const active = this.$store.getters['draft/path'] === compound.path;
+        const active = this.$store.getters['draft/path'] === overview.path;
         const background = 'white';
         const number = node.getPath().map(n => n.getIndex() + 1).slice(1).join('.');
-        const value = this.$store.getters['draft/property'](`${compound.path}.value`);
-        const icon = iconify(value, compound.control, relevant);
+        const value = this.$store.getters['draft/property'](`${overview.path}.value`);
+        const icon = iconify(value, overview.control, relevant);
 
         controlDisplays.push({
-          path: compound.path,
-          label: compound.control.label,
+          path: overview.path,
+          label: overview.control.label,
           value,
           icon: icon[0],
           color: icon[1],
