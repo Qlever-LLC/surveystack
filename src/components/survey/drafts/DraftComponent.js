@@ -15,7 +15,7 @@ import appMixin from '@/components/mixin/appComponent.mixin';
 
 import * as utils from '@/utils/surveys';
 import submissionUtils from '@/utils/submissions';
-import * as codeEvaluator from '@/utils/codeEvaluator';
+import * as codeEvaluator from '@/utils/codeEvaluator.legacy';
 
 export default {
   model: {

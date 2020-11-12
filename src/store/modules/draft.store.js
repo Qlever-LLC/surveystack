@@ -1,7 +1,7 @@
 import TreeModel from 'tree-model';
 
 import * as surveyStackUtils from '@/utils/surveyStack';
-import * as codeEvaluator from '@/utils/codeEvaluator2';
+import * as codeEvaluator from '@/utils/codeEvaluator';
 
 const createInitialState = () => ({
   survey: null, // current survey
