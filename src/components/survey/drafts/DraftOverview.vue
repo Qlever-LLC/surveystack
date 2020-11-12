@@ -243,18 +243,7 @@ export default {
     },
 
   },
-  watch: {
-    /*
-    submission: {
-      handler() {
-        this.refresh();
-      },
-      deep: true,
-    },
-    */
-  },
   mounted() {
-    console.log('DraftOverview mounted');
     this.refresh();
   },
 };
