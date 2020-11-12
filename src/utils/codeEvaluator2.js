@@ -52,6 +52,7 @@ async function calculateField({
       item.result = result;
     } catch (error) {
       item.error = error;
+      console.log(error);
     }
   }
 

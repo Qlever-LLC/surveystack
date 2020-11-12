@@ -12,6 +12,7 @@ const createInitialState = () => ({
   showOverview: false,
   showConfirmSubmission: false,
   overviews: null,
+  errors: null,
 });
 
 const initialState = createInitialState();
@@ -43,6 +44,7 @@ const getters = {
     return null;
   },
   overviews: state => state.overviews,
+  errors: state => state.errors,
 };
 
 const actions = {
@@ -58,7 +60,9 @@ const actions = {
     commit('SET_PROPERTY', { path, value });
     dispatch('calculateRelevance');
   },
-  async next({ commit, state }) {
+  async next({ commit, state, dispatch }) {
+    dispatch('calculateApiCompose');
+
     const traversal = [];
     state.root.walk((node) => {
       traversal.push(node);
@@ -73,8 +77,8 @@ const actions = {
     while (++index < traversal.length) {
       const nextNode = traversal[index];
 
-      const [calculation] = await codeEvaluator.calculateRelevance([nextNode], state.submission, state.survey); // eslint-disable-line
-      const { result, path, skip } = calculation;
+      const [relevance] = await codeEvaluator.calculateRelevance([nextNode], state.submission, state.survey); // eslint-disable-line
+      const { result, path, skip } = relevance;
       if (!skip) {
         commit('SET_PROPERTY', { path: `${path}.meta.relevant`, value: result });
       }
@@ -126,8 +130,8 @@ const actions = {
       console.log('while', index);
       const prevNode = traversal[index];
 
-      const [calculation] = await codeEvaluator.calculateRelevance([prevNode], state.submission, state.survey); // eslint-disable-line
-      const { result, path, skip } = calculation;
+      const [relevance] = await codeEvaluator.calculateRelevance([prevNode], state.submission, state.survey); // eslint-disable-line
+      const { result, path, skip } = relevance;
       if (!skip) {
         commit('SET_PROPERTY', { path: `${path}.meta.relevant`, value: result });
       }
@@ -182,13 +186,24 @@ const actions = {
   async calculateApiCompose({ commit, state }) {
     // TODO: only calculate subset of nodes
     const nodes = surveyStackUtils.getAllNodes(state.root);
-    const calculations = await codeEvaluator.calculateApiCompose(nodes, state.submission, state.survey);
-    calculations.forEach((calculation) => {
-      const { result, path, skip } = calculation;
+    const apiCompositions = await codeEvaluator.calculateApiCompose(nodes, state.submission, state.survey);
+    const errors = [];
+    apiCompositions.forEach((apiComposition) => {
+      const {
+        result, path, skip, error,
+      } = apiComposition;
+      if (error) {
+        errors.push({ path, error });
+      }
       if (!skip) {
         commit('SET_PROPERTY', { path: `${path}.meta.apiCompose`, value: result });
       }
     });
+    if (errors.length > 0) {
+      commit('SET_ERRORS', errors);
+    } else {
+      commit('SET_ERRORS', null);
+    }
   },
 };
 
@@ -267,6 +282,9 @@ const mutations = {
   },
   SHOW_CONFIRM_SUBMISSION(state, show) {
     state.showConfirmSubmission = show;
+  },
+  SET_ERRORS(state, errors) {
+    state.errors = errors;
   },
 };
 

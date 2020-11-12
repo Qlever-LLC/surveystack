@@ -10,6 +10,9 @@
       :dateSubmitted="submission.meta.dateSubmitted"
     />
 
+    <!-- error dialog modal -->
+    <app-error-dialog />
+
     <!-- Toolbar with question number and overview button -->
     <app-draft-toolbar
       :group="groupPath"
@@ -54,6 +57,7 @@
       class="px-4 grey lighten-5 footer-container"
       :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
       :enableNext="!(control.options.required && $store.getters['draft/property'](`${path}.value`) === null)"
+      :enableSubmit="!$store.getters['draft/errors']"
       :showSubmit="showOverview"
       :showNav="true"
       @next="$store.dispatch('draft/next')"
@@ -69,6 +73,7 @@ import appControl from './Control.vue';
 import appDraftFooter from '@/components/survey/drafts/DraftFooter.vue';
 import appDraftOverview from '@/components/survey/drafts/DraftOverview.vue';
 import appDraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
+import appErrorDialog from '@/components/ui/Errors.vue';
 import appConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 
 
@@ -79,6 +84,7 @@ export default {
     appDraftOverview,
     appDraftToolbar,
     appConfirmSubmissionDialog,
+    appErrorDialog,
   },
   props: {
     survey: { type: Object },

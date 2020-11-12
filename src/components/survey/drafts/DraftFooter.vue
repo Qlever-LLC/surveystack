@@ -25,7 +25,7 @@
           cols="6"
         >
           <v-btn
-            :disabled="!enableNext"
+            :disabled="!enableSubmit"
             @click="$emit('submit');"
             class="full"
             depressed
@@ -44,7 +44,6 @@
           <v-btn
             :disabled="!enableNext"
             @click="$emit('next');"
-            @keyup.enter="$emit('next');"
             class="full"
             depressed
             large
@@ -64,6 +63,7 @@ export default {
   props: [
     'showPrev',
     'enableNext',
+    'enableSubmit',
     'showSubmit',
     'showNav',
   ],
