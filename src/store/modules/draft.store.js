@@ -92,17 +92,17 @@ const actions = {
       });
 
       if (hasIrrelevantParents) {
-        continue; // eslint-disable-line no-continue
+        continue;
       }
 
       const isGroup = nextNode.model.type === 'group';
       if (isGroup) {
-        continue; // eslint-disable-line no-continue
+        continue;
       }
 
       const isInsidePage = nextNode.getPath().slice(1).slice(0, -1).find(parent => parent.model.type === 'page');
       if (isInsidePage) {
-        continue; // eslint-disable-line no-continue
+        continue;
       }
 
       commit('NEXT', nextNode);
@@ -127,7 +127,6 @@ const actions = {
     }
 
     while (--index >= 0) {
-      console.log('while', index);
       const prevNode = traversal[index];
 
       const [relevance] = await codeEvaluator.calculateRelevance([prevNode], state.submission, state.survey); // eslint-disable-line
@@ -145,17 +144,17 @@ const actions = {
       });
 
       if (hasIrrelevantParents) {
-        continue; // eslint-disable-line no-continue
+        continue;
       }
 
       const isGroup = prevNode.model.type === 'group';
       if (isGroup) {
-        continue; // eslint-disable-line no-continue
+        continue;
       }
 
       const isInsidePage = prevNode.getPath().slice(1).slice(0, -1).find(parent => parent.model.type === 'page');
       if (isInsidePage) {
-        continue; // eslint-disable-line no-continue
+        continue;
       }
 
       commit('PREV', prevNode);
