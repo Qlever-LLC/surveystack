@@ -1,19 +1,23 @@
+/* eslint-disable no-unreachable */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-await-in-loop */
+
 import * as utils from './surveys';
 import submissionUtils from './submissions';
 
 
 async function calculateField(survey, submission, positions, controls, option, fname) {
   const ignored = [];
+
+  console.log('v1', submission.data.farm_info.value);
   const items = positions.map((pos) => {
     const control = utils.getControl(controls, pos);
     if (!control.options[option].enabled) {
       return null;
     }
-
     // in case the field is not relevant, skip execution and return {}
+
     const field = submissionUtils.getSubmissionField(submission, survey, pos);
 
     if (fname !== 'relevance') { // if field happens to be irrelvant, but skip this if we eval relevance
@@ -40,8 +44,12 @@ async function calculateField(survey, submission, positions, controls, option, f
 
 
   // eslint-disable-next-line no-restricted-syntax
+  let i = 0;
   for (const item of items) {
     try {
+      console.log('v', i++, submission.data.farm_info.value);
+
+
       const res = {
         res: utils.executeUnsafe({
           code: item.code, fname, submission, survey, log: msg => console.log(msg),
@@ -49,6 +57,7 @@ async function calculateField(survey, submission, positions, controls, option, f
         pos: item.pos,
         control: item.control,
       };
+
 
       const field = submissionUtils.getSubmissionField(submission, survey, item.pos);
       const evaluatedItem = {
@@ -69,7 +78,7 @@ async function calculateField(survey, submission, positions, controls, option, f
   }
 
   evaluated.push(...ignored);
-
+  console.log('v10', submission.data.farm_info.value);
   return evaluated;
 }
 

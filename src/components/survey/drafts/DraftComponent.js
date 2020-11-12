@@ -123,7 +123,7 @@ export default {
     },
   },
   methods: {
-    eval() {},
+    eval() { },
     setSubmissionGroup(groupId) {
       const groups = this.$store.getters['memberships/groups'];
       const group = groups.find(g => g._id === groupId);
@@ -224,6 +224,7 @@ export default {
       this.slide = 'slide-in';
       this.showNav(true);
       this.showNext(true);
+
       await this.calculateRelevance();
 
       try {
@@ -273,6 +274,7 @@ export default {
 
         this.index++;
 
+
         const rel = utils.isRelevant(this.submission, this.survey, this.index, this.positions);
 
         if (rel === false) {
@@ -280,8 +282,11 @@ export default {
         }
 
         this.control = utils.getControl(this.controls, this.position);
+
+        // offending line causing yes to be selected when visiting
         const field = submissionUtils.getSubmissionField(this.submission, this.survey, this
           .position);
+
 
         this.disableNextIfRequiredAndNotAnswered(field);
 
