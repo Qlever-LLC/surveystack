@@ -13,14 +13,31 @@
             :items="aggregators"
             :load-children="fetchChildren"
             transition
-            activatable
-            :active.sync="active"
             return-object
           >
-            <template v-slot:prepend="{ item }">
-              <v-icon>
-                {{ item.icon }}
-              </v-icon>
+
+            <template v-slot:label="{ item }">
+              <div
+                class="v-flex flex-column mt-4"
+                v-if="!!item.button"
+              >
+                <v-btn
+                  outlined
+                  color="primary"
+                >
+                  <v-icon left>mdi-plus</v-icon>{{ item.name }}
+                </v-btn>
+                <v-divider class="mt-4" />
+              </div>
+              <span v-else>
+                <v-icon left>
+                  {{ item.icon }}
+                </v-icon>
+                <span
+                  style="cursor: pointer"
+                  @click="active = item"
+                >{{ item.name }}</span>
+              </span>
             </template>
 
           </v-treeview>
@@ -30,22 +47,27 @@
 
         <v-col class="d-flex text-center pa-4 flex-column">
           <div
-            v-if="active.length > 0"
+            v-if="!!active"
             class="display-1"
           >
-            {{ active[0].name }}
+            {{ active.name }}
           </div>
           <app-aggregator
-            v-if="active.length > 0 && active[0].item_type === 'aggregator'"
+            v-if="!!active && active.item_type === 'aggregator'"
             @save="save"
             @testConnection="testConnection"
-            :aggregator="Object.assign({}, active[0])"
+            :aggregator="Object.assign({}, active)"
           />
           <app-farm-o-s-instance
-            v-if="active.length > 0 && active[0].item_type === 'farm'"
+            v-if="!!active && active.item_type === 'farm'"
             @save="save"
             @testConnection="testConnection"
-            :instance="Object.assign({}, active[0])"
+            :instance="Object.assign({}, active)"
+          />
+
+          <app-area
+            v-if="!!active && active.item_type === 'area'"
+            :area="Object.assign({}, active)"
           />
 
         </v-col>
@@ -57,6 +79,8 @@
 <script>
 import AppAggregator from './Aggregator.vue';
 import AppFarmOSInstance from './FarmOSInstance.vue';
+import AppArea from './FarmOSArea.vue';
+
 
 function farmOSPlanting() {
 
@@ -67,7 +91,7 @@ const fetchFarms = async aggregator => [
   {
     id: -1,
     name: 'New Farm',
-    icon: 'mdi-plus',
+    button: true,
   },
   {
     id: 10,
@@ -96,7 +120,7 @@ const fetchFields = async (aggregator, farm) => [
   {
     id: -2,
     name: 'New Area',
-    icon: 'mdi-plus',
+    button: true,
   },
   {
     id: 100,
@@ -126,7 +150,8 @@ const aggregators = [
     id: -3,
     item_type: 'aggregator',
     name: 'New Aggregator',
-    icon: 'mdi-plus',
+
+    button: true,
   },
   {
     id: 1,
@@ -175,10 +200,11 @@ export default {
   components: {
     AppAggregator,
     AppFarmOSInstance,
+    AppArea,
   },
   data: () => ({
     aggregators,
-    active: [],
+    active: null,
   }),
   methods: {
     async fetchChildren(item) {
