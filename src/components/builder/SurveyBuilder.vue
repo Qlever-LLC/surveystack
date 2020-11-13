@@ -184,19 +184,16 @@
       </pane>
       <pane class="pane pane-draft">
 
-        <v-card class="mx-1 my-1">
+        <v-card class="mx-1 my-2">
           <v-card-title>Preview</v-card-title>
         </v-card>
-        <v-card class="mx-1">
-          <v-card-text>
-            <draft
-              @submit="payload => $emit('submit', payload)"
-              v-if="survey && instance"
-              :submission="instance"
-              :survey="survey"
-            ></draft>
-          </v-card-text>
-        </v-card>
+        <app-draft-component
+          @submit="payload => $emit('submit', payload)"
+          v-if="survey && instance"
+          :submission="instance"
+          :survey="survey"
+          :persist="false"
+        ></app-draft-component>
         <v-overlay :value="enableSaveDraft">
           <v-card>
             <v-card-text>
@@ -229,7 +226,7 @@ import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
 import controlAdder from '@/components/builder/ControlAdder.vue';
 import surveyDetails from '@/components/builder/SurveyDetails.vue';
-import draft from '@/components/survey/drafts/DraftComponent.vue';
+import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 import consoleLog from '@/components/builder/ConsoleLog.vue';
 
 import appCodeView from '@/components/builder/CodeView.vue';
@@ -279,7 +276,7 @@ export default {
     controlProperties,
     controlAdder,
     surveyDetails,
-    draft,
+    appDraftComponent,
     consoleLog,
     appCodeView,
     // ConfirmLeaveDialog,
