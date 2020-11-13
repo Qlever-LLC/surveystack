@@ -79,8 +79,8 @@ export default {
       this.$store.dispatch('draft/setProperty', { path: 'meta.dateModified', value: modified });
     },
     setStatus({ type, message }) {
-      this.$store.dispatch('draft/setProperty', { path: 'meta.status', value: type });
-      this.$store.dispatch('draft/setProperty', { path: 'meta.statusMessage', value: message });
+      this.$store.dispatch('draft/setProperty', { path: `${this.path}.meta.status`, value: type });
+      this.$store.dispatch('draft/setProperty', { path: `${this.path}.meta.statusMessage`, value: message });
     },
     setContext(context) {
       this.$store.dispatch('draft/setProperty', { path: `${this.path}.meta.context`, value: context });
