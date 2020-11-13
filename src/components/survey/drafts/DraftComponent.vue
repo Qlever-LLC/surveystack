@@ -127,8 +127,6 @@ export default {
       const group = { id, path: '' };
 
       if (found) {
-        // eslint-disable-next-line prefer-destructuring
-        console.log('found selected group', found);
         group.path = found.path;
       }
 
