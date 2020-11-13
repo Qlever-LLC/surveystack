@@ -32,10 +32,21 @@
       >
 
         <template v-slot:item="{item}">
-          <div v-if="item.user">{{ item.user.name }} </div>
+          <div v-if="item.user">{{ item.user.name }} <v-chip color="grey--darken-2" dark>{{ item.user.email }}</v-chip>
+          </div>
           <div v-else>
             <v-icon left>mdi-account-clock</v-icon> {{ item.meta.invitationEmail }}
           </div>
+        </template>
+        <template v-slot:prepend-item>
+          <v-btn
+            color="primary"
+            class="ma-4"
+            outlined
+          >
+            <v-icon left>mdi-account-plus</v-icon>Invite Member to Organization
+          </v-btn>
+          <v-divider />
         </template>
       </v-autocomplete>
 
@@ -94,71 +105,3 @@ export default {
   },
 };
 </script>
-
-<style>
-/* Control color. */
-.ol-control {
-  background-color: rgba(255, 255, 255, 0.25);
-}
-.ol-control svg {
-  fill: green;
-}
-.ol-control button {
-  color: green;
-  background-color: rgba(255, 255, 255, 0.8);
-}
-.ol-control button:hover,
-.ol-control button:focus {
-  background-color: rgba(255, 255, 255, 1);
-}
-.ol-scale-line {
-  background: rgba(255, 255, 255, 0.25);
-}
-
-/* Control backgrounds. */
-.ol-geocoder .gcd-gl-btn {
-  background-image: none;
-}
-.ol-geocoder .gcd-gl-btn:after {
-  content: "\1f50d";
-}
-.layer-switcher > button {
-  background-size: 1.5em 1.5em;
-}
-
-/* Control sizing. */
-.ol-control button,
-.ol-geocoder .gcd-gl-btn {
-  height: 1.75em;
-  width: 1.75em;
-}
-.ol-geocoder .gcd-gl-control {
-  width: 2.4em;
-  height: 2.4em;
-}
-.ol-geocoder .gcd-gl-expanded {
-  width: 16em;
-  height: 2.4em;
-}
-
-/* Control positioning. */
-.ol-geolocate.ol-control {
-  left: 3.5em;
-}
-.ol-geocoder.gcd-gl-container {
-  top: 0.5em;
-  left: 6.5em;
-}
-.ol-geocoder .gcd-gl-input {
-  left: 3em;
-}
-.ol-edit.ol-control {
-  top: 5.5em;
-}
-.ol-rotate.ol-control {
-  right: 3.5em;
-}
-.layer-switcher {
-  top: 3.5em;
-}
-</style>

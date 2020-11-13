@@ -25,6 +25,13 @@
         outlined
       />
 
+      <v-text-field
+        v-model="aggregator.planKey"
+        label="Plan Key"
+        placeholder=""
+        outlined
+      />
+
       <v-btn
         class="mx-2"
         color="primary"

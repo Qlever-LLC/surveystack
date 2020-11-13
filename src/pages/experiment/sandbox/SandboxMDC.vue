@@ -8,7 +8,7 @@
         class="pa-4"
         justify="space-between"
       >
-        <v-col cols="5">
+        <v-col cols="4">
           <v-treeview
             :items="aggregators"
             :load-children="fetchChildren"
@@ -24,6 +24,7 @@
                 <v-btn
                   outlined
                   color="primary"
+                  @click="createNew(item)"
                 >
                   <v-icon left>mdi-plus</v-icon>{{ item.name }}
                 </v-btn>
@@ -45,7 +46,10 @@
 
         <v-divider vertical></v-divider>
 
-        <v-col class="d-flex text-center pa-4 flex-column">
+        <v-col
+          cols="7"
+          class="d-flex text-center pa-4 flex-column"
+        >
           <div
             v-if="!!active"
             class="display-1"
@@ -70,6 +74,12 @@
             :area="Object.assign({}, active)"
           />
 
+          <app-register
+            v-if="!!active && active.item_type === 'register'"
+            :meta='meta'
+            :instance="Object.assign({}, registerTemplate)"
+          />
+
         </v-col>
       </v-row>
     </v-card>
@@ -80,6 +90,7 @@
 import AppAggregator from './Aggregator.vue';
 import AppFarmOSInstance from './FarmOSInstance.vue';
 import AppArea from './FarmOSArea.vue';
+import AppRegister from './FarmOSRegister.vue';
 
 
 function farmOSPlanting() {
@@ -92,6 +103,7 @@ const fetchFarms = async aggregator => [
     id: -1,
     name: 'New Farm',
     button: true,
+    create: 'farm',
   },
   {
     id: 10,
@@ -196,15 +208,28 @@ const fetchChildren = async (item) => {
   }
 };
 
+const registerTemplate = {
+  url: '',
+  email: '',
+  site_name: '',
+  registrant: '',
+  units: 'us',
+  plan: 'farmos-genmills',
+  agree: false,
+};
+
 export default {
   components: {
     AppAggregator,
     AppFarmOSInstance,
     AppArea,
+    AppRegister,
   },
   data: () => ({
     aggregators,
     active: null,
+    registerTemplate,
+    meta: {},
   }),
   methods: {
     async fetchChildren(item) {
@@ -216,6 +241,16 @@ export default {
     },
     async save(item) {
       console.log('saving item', item);
+    },
+    async createNew(item) {
+      console.log('creating new item', item);
+      this.meta.groupId = '5e97401756f2b6000176e709';
+      if (item.create === 'farm') {
+        this.active = {
+          name: 'Register new Farm on Aggregator',
+          item_type: 'register',
+        };
+      }
     },
   },
 };
