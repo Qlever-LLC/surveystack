@@ -82,6 +82,7 @@ export default {
   props: {
     survey: { type: Object },
     submission: { type: Object },
+    persist: { type: Boolean },
   },
   computed: {
     path() {
@@ -134,8 +135,8 @@ export default {
     },
   },
   created() {
-    const { survey, submission } = this;
-    this.$store.dispatch('draft/init', { survey, submission });
+    const { survey, submission, persist } = this;
+    this.$store.dispatch('draft/init', { survey, submission, persist });
   },
 };
 </script>

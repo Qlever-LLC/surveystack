@@ -5,7 +5,7 @@
       v-if="!loading && !hasError"
       :survey="survey"
       :submission="submission"
-      @persist="persist"
+      :persist="true"
       @submit="submit"
     />
     <div
@@ -118,15 +118,8 @@ export default {
         },
       ];
     },
-    // removeReadyToSubmit(status) {
-    //   return status.filter(({ type }) => type !== 'READY_TO_SUBMIT');
-    // },
-    persist({ submission }) {
-      db.persistSubmission(submission);
-    },
     async submit({ payload }) {
       this.submitting = true;
-      // this.$store.dispatch('readyToSubmit/add', this.submission._id);
       this.submission.meta.status = this.addReadyToSubmit(this.submission.meta.status || []);
 
       try {

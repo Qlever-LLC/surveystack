@@ -2,10 +2,12 @@ import TreeModel from 'tree-model';
 
 import * as surveyStackUtils from '@/utils/surveyStack';
 import * as codeEvaluator from '@/utils/codeEvaluator';
+import * as db from '@/store/db';
 
 const createInitialState = () => ({
   survey: null, // current survey
   submission: null, // current submission
+  persist: false,
   root: null, // root node starting from current survey controls
   node: null, // node with model pointing to current survey control
   firstNode: null,
@@ -62,13 +64,16 @@ const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  init({ commit, dispatch }, { survey, submission }) {
+  init({ commit, dispatch }, { survey, submission, persist }) {
     console.log('draft.store:action:init');
-    commit('INIT', { survey, submission });
+    commit('INIT', { survey, submission, persist });
     dispatch('calculateRelevance');
   },
-  setProperty({ commit, dispatch }, { path, value }) {
+  setProperty({ commit, dispatch, state }, { path, value }) {
     commit('SET_PROPERTY', { path, value });
+    if (state.persist) {
+      db.persistSubmission(state.submission);
+    }
     dispatch('calculateRelevance');
   },
   async next({ commit, state, dispatch }) {
@@ -221,9 +226,11 @@ const mutations = {
   RESET(state) {
     Object.assign(state, createInitialState());
   },
-  INIT(state, { survey, submission }) {
+  INIT(state, { survey, submission, persist }) {
     state.survey = survey;
     state.submission = submission;
+    state.persist = persist;
+
     state.showOverview = false;
     state.showConfirmSubmission = false;
     const { controls } = state.survey.revisions.find(revision => revision.version === submission.meta.survey.version);
