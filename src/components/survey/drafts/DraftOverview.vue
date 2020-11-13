@@ -96,7 +96,7 @@
                 >No answer</v-card-text>
                 <div
                   v-if="display.modified"
-                  class="d-flex justify-space-between text--secondary mx-4 my-3"
+                  class="d-flex justify-space-between text--secondary mx-4 mb-3 mt-4"
                   style="font-size: 0.8rem"
                 >
                   <div>
