@@ -7,7 +7,7 @@
       class="full-width fill-height d-flex align-center justify-center"
       v-if="controls.length === 0"
     >
-      <div class="d-flex flex-column" >
+      <div class="d-flex flex-column">
         <v-icon
           large
           color="blue"
@@ -128,7 +128,7 @@
   </div>
 </template>
 
-<script src="./DraftComponent.js">
+<script src="./DraftComponent.legacy.js">
 </script>
 
 <style scoped src="./DraftComponent.css">

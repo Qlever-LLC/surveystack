@@ -32,7 +32,7 @@
         <strong v-if="submission.meta.dateSubmitted"><kbd>{{ submitted }}</kbd> submitted</strong>
       </v-card-subtitle>
       <v-card-text>
-        Submitting to: {{ group || '--' }}
+        Submitting to: {{ groupPath || '--' }}
         <br />
         Created: {{ created }}
         <br>
@@ -152,8 +152,7 @@ export default {
   props: [
     'survey',
     'submission',
-    'position',
-    'group',
+    'groupPath',
     'overviews',
   ],
   data() {

@@ -10,9 +10,6 @@
       :dateSubmitted="submission.meta.dateSubmitted"
     />
 
-    <!-- error dialog modal -->
-    <app-error-dialog />
-
     <!-- Toolbar with question number and overview button -->
     <app-draft-toolbar
       :group="groupPath"
@@ -34,11 +31,9 @@
       class="grey lighten-4 navigation-container"
     >
       <app-draft-overview
-        ref="overview"
         :survey="survey"
         :submission="submission"
-        :position="[0]"
-        :group="groupPath"
+        :groupPath="groupPath"
         :overviews="$store.getters['draft/overviews']"
         @goto="goto"
       />
@@ -73,7 +68,6 @@ import appControl from './Control.vue';
 import appDraftFooter from '@/components/survey/drafts/DraftFooter.vue';
 import appDraftOverview from '@/components/survey/drafts/DraftOverview.vue';
 import appDraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
-import appErrorDialog from '@/components/ui/Errors.vue';
 import appConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 
 
@@ -84,26 +78,12 @@ export default {
     appDraftOverview,
     appDraftToolbar,
     appConfirmSubmissionDialog,
-    appErrorDialog,
   },
   props: {
     survey: { type: Object },
     submission: { type: Object },
   },
-  data() {
-    return {
-      gotoPath: '',
-      viewSurvey: false,
-      viewSubmission: false,
-    };
-  },
   computed: {
-    submissionStringified() {
-      return JSON.stringify(this.submission, null, 2);
-    },
-    surveyStringified() {
-      return JSON.stringify(this.survey, null, 2);
-    },
     path() {
       return this.$store.getters['draft/path'];
     },
