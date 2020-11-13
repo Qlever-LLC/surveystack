@@ -11,7 +11,6 @@ const createInitialState = () => ({
   firstNode: null,
   showOverview: false,
   showConfirmSubmission: false,
-  overviews: null,
   errors: null,
 });
 
@@ -43,7 +42,19 @@ const getters = {
 
     return null;
   },
-  overviews: state => state.overviews,
+  overviews: (state) => {
+    const overviews = [];
+    state.root.walk((node) => {
+      if (node.isRoot()) {
+        return true;
+      }
+      const path = node.getPath().map(n => n.model.name).join('.');
+      const control = node.model;
+      overviews.push({ node, path, control });
+      return true;
+    });
+    return overviews;
+  },
   errors: state => state.errors,
 };
 
@@ -235,18 +246,6 @@ const mutations = {
       }
       return true;
     });
-
-    const overviews = [];
-    root.walk((node) => {
-      if (node.isRoot()) {
-        return true;
-      }
-      const path = node.getPath().map(n => n.model.name).join('.');
-      const control = node.model;
-      overviews.push({ node, path, control });
-      return true;
-    });
-    state.overviews = overviews;
   },
   SET_PROPERTY(state, { path, value }) {
     surveyStackUtils.setNested(state.submission, path, value);

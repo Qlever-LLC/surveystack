@@ -25,17 +25,20 @@
     </v-banner>
     <v-card>
       <v-card-title>{{ survey.name }}</v-card-title>
-      <v-card-subtitle>
+      <v-card-subtitle class="grey--text mt-n5">
         {{ submission._id }}
         <br />
-        Submitting to: <kbd>{{ group }}</kbd>
-        <br />
-        Created: <kbd>{{ created }}</kbd>
-        <br>
-        Last modified: <kbd>{{ modified }}</kbd>
-        <br />
+
         <strong v-if="submission.meta.dateSubmitted"><kbd>{{ submitted }}</kbd> submitted</strong>
       </v-card-subtitle>
+      <v-card-text>
+        Submitting to: {{ group || '--' }}
+        <br />
+        Created: {{ created }}
+        <br>
+        Last modified: {{ modified }}
+        <br />
+      </v-card-text>
     </v-card>
     <v-timeline
       v-if="controlDisplays"
@@ -63,14 +66,11 @@
               > </div>
 
               <div class="flex-grow-1">
-                <v-card-title class="d-block">
+                <v-card-title class="d-block mb-0 pb-0">
                   <div class="ma-0 pa-0 d-flex align-stretch">
                     <!-- color="#FF5722" -->
-                    <v-chip
-                      dark
-                      small
-                      class="mr-0 mr-1"
-                    >{{display.path}}</v-chip>
+                    <span class="caption grey--text text--darken-1">{{ display.questionNumber }}</span>
+
                     <v-spacer></v-spacer>
                     <v-chip
                       small
@@ -79,23 +79,30 @@
                       color="grey-darken-5"
                     >Irrelevant</v-chip>
                   </div>
-                  <span class="number-chip mr-2">{{ display.number }}</span>
-                  {{ display.label }}
+
+                  <div class="title">{{ display.label }}</div>
+                  <span
+                    class="font-weight-light grey--text text--darken-2 mt-n1"
+                    style="font-size: 0.9rem; position: relative; top: -10px"
+                  >{{display.path}}</span>
                 </v-card-title>
                 <v-card-text
                   class="py-0"
                   v-if="display.value"
                 ><kbd class="pa-2">{{ display.value }}</kbd></v-card-text>
-                <v-card-text v-else>No answer</v-card-text>
+                <v-card-text
+                  v-else
+                  class="text--secondary"
+                >No answer</v-card-text>
                 <div
                   v-if="display.modified"
-                  class="d-flex flex-row text--secondary pa-2"
+                  class="d-flex justify-space-between text--secondary mx-4 my-3"
                   style="font-size: 0.8rem"
                 >
-                  <div class="flex-grow-1">
-                    {{ display.modified.format('YYYY-MM-DD HH:mm') }}<v-spacer></v-spacer>
+                  <div>
+                    {{ display.modified.format('YYYY-MM-DD HH:mm') }}
                   </div>
-                  <div class="text-right">
+                  <div>
                     {{ display.modifiedHumanized }} ago
                   </div>
                 </div>
@@ -215,7 +222,7 @@ export default {
 
         const active = this.$store.getters['draft/path'] === overview.path;
         const background = 'white';
-        const number = node.getPath().map(n => n.getIndex() + 1).slice(1).join('.');
+        const questionNumber = node.getPath().map(n => n.getIndex() + 1).slice(1).join('.');
         const value = this.$store.getters['draft/property'](`${overview.path}.value`);
         const icon = iconify(value, overview.control, relevant);
 
@@ -225,7 +232,7 @@ export default {
           value,
           icon: icon[0],
           color: icon[1],
-          number,
+          questionNumber,
           background,
           dark: false,
           relevant,
