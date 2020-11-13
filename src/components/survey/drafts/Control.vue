@@ -36,7 +36,11 @@
         :index="path"
         :key="path"
         @changed="setProperty"
+        :meta="meta"
+        :submission="submission"
         @setStatus="setStatus"
+        @setContext="setContext"
+        @setRenderQueue="setRenderQueue"
         :autoFocus="autoFocus"
         :relevant="$store.getters['draft/property'](`${path}.meta.relevant`, true)"
         @next="$store.dispatch('draft/next')"
@@ -66,6 +70,14 @@ export default {
     autoFocus: {
       type: Boolean,
       default: true,
+    },
+  },
+  computed: {
+    submission() {
+      return this.$store.getters['draft/submission'];
+    },
+    meta() {
+      return this.$store.getters['draft/property'](`${this.path}.meta`);
     },
   },
   methods: {
