@@ -31,7 +31,7 @@ export const createControlInstance = (control) => {
     id: new ObjectId().toString(),
   });
 
-  if (control.type === 'selectSingle' || control.type === 'selectMultiple') {
+  if (control.type === 'selectSingle' || control.type === 'selectMultiple' || control.type === 'matrix') {
     cloneWithDefaultOptions.options.source = [];
   } else if (control.type === 'ontology') {
     cloneWithDefaultOptions.options.source = '';
@@ -113,8 +113,15 @@ export const availableControls = [
     label: 'Dropdown',
     type: 'ontology',
     icon: 'mdi-arrow-down-drop-circle',
-
   },
+  /*
+  {
+    name: 'matrix',
+    label: 'Matrix',
+    type: 'matrix',
+    icon: 'mdi-matrix',
+  },
+  */
   {
     name: 'farmos_field',
     label: 'Farmos Field',

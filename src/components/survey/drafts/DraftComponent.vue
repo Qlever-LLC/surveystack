@@ -1,5 +1,8 @@
 <template>
-  <v-container class="draft-component-wrapper">
+  <v-container
+    class="draft-component-wrapper"
+    v-if="control"
+  >
 
     <!-- confirm submission modal -->
     <app-confirm-submission-dialog

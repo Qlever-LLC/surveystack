@@ -22,7 +22,7 @@ const getters = {
   survey: state => state.survey,
   submission: state => state.submission,
   property: state => (path, fallback) => surveyStackUtils.getNested(state.submission, path, fallback),
-  control: state => state.node.model, // current survey control
+  control: state => state.node && state.node.model, // current survey control
   path: (state) => {
     const p = state.node.getPath().map(n => n.model.name).join('.');
     return p;
@@ -227,6 +227,8 @@ const mutations = {
     Object.assign(state, createInitialState());
   },
   INIT(state, { survey, submission, persist }) {
+    Object.assign(state, createInitialState());
+
     state.survey = survey;
     state.submission = submission;
     state.persist = persist;

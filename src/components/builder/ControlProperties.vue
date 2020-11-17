@@ -223,7 +223,7 @@
         v-model="control.options.source"
         class="mt-5"
       />
-        <!-- v-model="survey.resources" -->
+      <!-- v-model="survey.resources" -->
       <select-items-editor-alt
         v-else-if="isOntology"
         :value="control.options.source"
@@ -231,6 +231,12 @@
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         class="mt-5"
+      />
+
+      <select-items-editor
+        v-else-if="isMatrix"
+        v-model="control.options.source"
+        calss="mt-5"
       />
 
       <instructions-editor
@@ -343,6 +349,9 @@ export default {
     },
     isOntology() {
       return this.control.type === 'ontology';
+    },
+    isMatrix() {
+      return this.control.type === 'matrix';
     },
   },
   methods: {

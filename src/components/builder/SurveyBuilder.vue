@@ -527,7 +527,7 @@ export default {
     },
     duplicateControl(control) {
       const position = utils.getPosition(this.control, this.currentControls);
-      utils.insertControl(control, this.currentControls, position, this.control.type === 'group');
+      utils.insertControl(control, this.currentControls, position, this.control.type === 'group' || this.control.type === 'page');
       this.control = control;
     },
     controlAdded(control) {
@@ -538,7 +538,7 @@ export default {
       }
 
       const position = utils.getPosition(this.control, this.currentControls);
-      utils.insertControl(control, this.currentControls, position, this.control.type === 'group');
+      utils.insertControl(control, this.currentControls, position, this.control.type === 'group' || this.control.type === 'page');
       this.control = control;
     },
     onCancel() {
