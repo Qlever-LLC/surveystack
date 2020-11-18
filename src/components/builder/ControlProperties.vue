@@ -233,9 +233,12 @@
         class="mt-5"
       />
 
-      <select-items-editor
+      <app-matrix-properties
         v-else-if="isMatrix"
-        v-model="control.options.source"
+        :value="control.options.source"
+        :resources="survey.resources"
+        @set-control-source="(val) => $emit('set-control-source', val)"
+        @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         class="mt-5"
       />
 
@@ -252,6 +255,7 @@ import { getAdvancedCodeTemplate, findParentByChildId } from '@/utils/surveys';
 import api from '@/services/api.service';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
 import SelectItemsEditorAlt from '@/components/builder/SelectItemsEditorAlt.vue';
+import appMatrixProperties from '@/components/builder/MatrixProperties.vue';
 import InstructionsEditor from '@/components/builder/InstructionsEditor.vue';
 
 import { convertToKey } from '@/utils/builder';
@@ -261,6 +265,8 @@ export default {
     SelectItemsEditor,
     SelectItemsEditorAlt,
     InstructionsEditor,
+    appMatrixProperties,
+
   },
   props: {
     control: {
