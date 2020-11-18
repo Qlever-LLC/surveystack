@@ -35,6 +35,7 @@
         :value="$store.getters['draft/property'](path).value"
         :index="path"
         :key="path"
+        :resources="survey.resources"
         @changed="setProperty"
         :meta="meta"
         :submission="submission"
@@ -75,6 +76,9 @@ export default {
   computed: {
     submission() {
       return this.$store.getters['draft/submission'];
+    },
+    survey() {
+      return this.$store.getters['draft/survey'];
     },
     meta() {
       return this.$store.getters['draft/property'](`${this.path}.meta`);

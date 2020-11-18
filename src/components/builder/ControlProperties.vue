@@ -236,7 +236,7 @@
       <select-items-editor
         v-else-if="isMatrix"
         v-model="control.options.source"
-        calss="mt-5"
+        class="mt-5"
       />
 
       <instructions-editor
