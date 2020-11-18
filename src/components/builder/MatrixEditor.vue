@@ -12,7 +12,7 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
-                <select-items-upload-button
+                <app-matrix-editor-upload-button
                   @change="handleFileChange"
                   class="mt-4 mb-n2"
                 />
@@ -102,8 +102,8 @@
         </div>
       </div>
       <v-data-table
-        :headers="tableHeaders"
-        :items="resource.content"
+        :headers="headers"
+        :items="items"
         show-select
         v-model="selectedItems"
         :search="search"
@@ -182,7 +182,7 @@
 import { uniqWith, isEqual } from 'lodash';
 import slugify from '@/utils/slugify';
 
-import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
+import appMatrixEditorUploadButton from '@/components/builder/MatrixEditorUploadButton.vue';
 
 export default {
   props: {
@@ -198,7 +198,7 @@ export default {
     },
   },
   components: {
-    SelectItemsUploadButton,
+    appMatrixEditorUploadButton,
   },
   data() {
     return {
@@ -210,18 +210,6 @@ export default {
       editItemDialogIsVisible: false,
       tableHeaders: [
         {
-          text: 'Label',
-          value: 'label',
-        },
-        {
-          text: 'Value',
-          value: 'value',
-        },
-        {
-          text: 'Tags',
-          value: 'tags',
-        },
-        {
           text: 'Actions',
           value: 'actions',
           width: 1,
@@ -232,6 +220,21 @@ export default {
   computed: {
     resourceNames() {
       return this.resources.map(({ name, id }) => ({ name, id }));
+    },
+    items() {
+      return this.resource.content.slice(1);
+    },
+    headers() {
+      if (Array.isArray(this.resource.content) && this.resource.content.length > 0) {
+        const headers = this.resource.content[0].map(v => ({ text: v, value: v }));
+        return [...headers, {
+          text: 'actions',
+          value: 'actions',
+          width: 1,
+        }];
+      }
+
+      return [];
     },
   },
   methods: {
