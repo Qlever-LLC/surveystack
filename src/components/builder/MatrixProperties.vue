@@ -2,7 +2,7 @@
   <div>
     <v-card-title class="px-0 d-flex justify-space-between">
       <div>
-        Dropdown List
+        Matrix Resource
       </div>
 
     </v-card-title>
@@ -81,10 +81,9 @@ export default {
       const id = new ObjectId().toString();
       this.$emit('set-survey-resources', [...this.resources, {
         label: `Dropdown Items ${this.resources.length + 1}`,
-        // handle: `dropdown_items_${this.resources.length + 1}`,
         name: `dropdown_items_${this.resources.length + 1}`,
         id,
-        type: 'ONTOLOGY_LIST',
+        type: 'MATRIX',
         location: 'EMBEDDED',
         content: [],
       }]);
@@ -118,7 +117,7 @@ export default {
       return this.resources.find(resource => resource.id === this.value);
     },
     filteredResources() {
-      return this.resources.filter(resource => resource.type === 'ONTOLOGY_LIST');
+      return this.resources.filter(resource => resource.type === 'MATRIX');
     },
   },
 };

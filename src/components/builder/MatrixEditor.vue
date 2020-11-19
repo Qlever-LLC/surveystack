@@ -222,11 +222,11 @@ export default {
       return this.resources.map(({ name, id }) => ({ name, id }));
     },
     items() {
-      return this.resource.content.slice(1);
+      return this.resource.content.data;
     },
     headers() {
-      if (Array.isArray(this.resource.content) && this.resource.content.length > 0) {
-        const headers = this.resource.content[0].map(v => ({ text: v, value: v }));
+      if (Array.isArray(this.resource.content.fields) && this.resource.content.fields.length > 0) {
+        const headers = this.resource.content.fields.map(v => ({ text: v, value: v }));
         return [...headers, {
           text: 'actions',
           value: 'actions',
@@ -252,26 +252,32 @@ export default {
       return namePattern.test(val) ? true : 'Data name must be at least 4 character in length';
     },
     moveItemDown({ id }) {
-      const index = this.resource.content.findIndex(item => item.id === id);
-      if (index < this.resource.content.length - 1) {
-        const newItems = [...this.resource.content];
+      const index = this.resource.content.data.findIndex(item => item.id === id);
+      if (index < this.resource.content.data.length - 1) {
+        const newItems = [...this.resource.content.data];
         const [item] = newItems.splice(index, 1);
         newItems.splice(index + 1, 0, item);
         this.$emit('change', {
           ...this.resource,
-          content: newItems,
+          content: {
+            ...this.resource.content,
+            data: newItems,
+          },
         });
       }
     },
     moveItemUp({ id }) {
-      const index = this.resource.content.findIndex(item => item.id === id);
+      const index = this.resource.content.data.findIndex(item => item.id === id);
       if (index > 0) {
-        const newItems = [...this.resource.content];
+        const newItems = [...this.resource.content.data];
         const [item] = newItems.splice(index, 1);
         newItems.splice(index - 1, 0, item);
         this.$emit('change', {
           ...this.resource,
-          content: newItems,
+          content: {
+            ...this.resource.content,
+            data: newItems,
+          },
         });
       }
     },
@@ -351,8 +357,7 @@ export default {
       });
     },
     handleFileChange(data) {
-      // console.log('table editor file change', data);
-      this.appendItems(data);
+      this.setContent(data);
     },
     handleSave() {
       // this.$emit('close-dialog');
@@ -366,14 +371,7 @@ export default {
         content: newItems,
       });
     },
-    filterDuplicateItems(items) {
-      return uniqWith(items, isEqual);
-    },
-    appendItems(items) {
-      const content = this.filterDuplicateItems([
-        ...this.resource.content,
-        ...items,
-      ]);
+    setContent(content) {
       this.$emit('change', {
         ...this.resource,
         content,

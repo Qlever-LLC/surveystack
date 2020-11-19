@@ -29,8 +29,6 @@ import ObjectId from 'bson-objectid';
 export default {
   methods: {
     async handleFileChange({ target: { files: [file] } }) {
-      console.log('handle file change');
-      console.log(file);
       try {
         const parsed = parse(await file.text(), {
           header: true,
@@ -48,7 +46,7 @@ export default {
             ...item,
             id: new ObjectId().toString(),
           }));
-        this.$emit('change', [parsed.meta.fields, ...items]);
+        this.$emit('change', { fields: parsed.meta.fields, data: [...items] });
         this.$refs['select-items-file-input'].value = null;
       } catch (err) {
         console.error('error parsing CSV file', err);
