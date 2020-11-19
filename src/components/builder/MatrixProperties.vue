@@ -6,22 +6,22 @@
       </div>
 
     </v-card-title>
-    <div class="text-center d-flex">
-      <!-- :resourceTypes="['ONTOLOGY_LIST']" -->
-      <resource-selector
-        :resources="filteredResources"
-        :value="value"
-        @on-new="createResourceHandler"
-        @on-select="selectResourceHandler"
-      />
+    <div class="d-flex">
+      <div>
+        <resource-selector
+          :resources="filteredResources"
+          :value="value"
+          @on-new="createResourceHandler"
+          @on-select="selectResourceHandler"
+        />
+      </div>
       <v-btn
         icon
         @click.stop="openTableDialog"
+        class="mt-2 ml-2"
         :class="{'d-none': !value}"
       >
-        <!-- Edit entries -->
-        <!-- <v-icon class="ml-2">mdi-table</v-icon> -->
-        <v-icon class="ml-2 mt-3">mdi-pencil</v-icon>
+        <v-icon>mdi-pencil</v-icon>
       </v-btn>
 
     </div>

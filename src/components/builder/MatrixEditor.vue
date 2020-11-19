@@ -6,7 +6,7 @@
     <v-card-title class="d-block">
       <div class="d-flex justify-space-between align-center">
         <div class="grey--text text--darken-2">
-          Dropdown List Editor
+          Matrix Editor
         </div>
         <div class="d-flex align-center">
           <v-tooltip bottom>
@@ -66,7 +66,7 @@
         <v-text-field
           :value="resource.label"
           @input="handleUpdateLabel"
-          label="List Label"
+          label="Label"
           persistent-hint
           class="display-1 flex-shrink-1"
           style="max-width: 12em;"
@@ -75,7 +75,7 @@
         <v-text-field
           :value="resource.name"
           @input="handleUpdateName"
-          label="List Data Name"
+          label="specifier"
           persistent-hint
           class="flex-shrink-1 ml-4"
           style="max-width: 12em;"
@@ -87,11 +87,9 @@
           append-icon="mdi-magnify"
           label="Search"
           single-line
-          hide-details
         />
         <v-spacer />
         <div>
-
           <v-btn
             icon
             @click="deleteSelectedItems"
