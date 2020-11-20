@@ -42,12 +42,22 @@
               <v-select
                 v-else-if="header.type === 'dropdown'"
                 :items="getDropdownItems(header.value)"
+                :value="item[header.value]"
                 @input="v => {item[header.value] = v; onInput()}"
                 hide-details
                 solo
                 class="my-2"
                 style="min-width: 5rem"
               />
+              <v-autocomplete
+                v-else-if="header.type === 'autocomplete'"
+                :items="getDropdownItems(header.value)"
+                :value="item[header.value]"
+                @input="v => {item[header.value] = v; onInput()}"
+                hide-details
+                solo
+              />
+
               <div v-else>
                 ???
               </div>
