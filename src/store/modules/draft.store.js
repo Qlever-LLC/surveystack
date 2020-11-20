@@ -69,12 +69,14 @@ const actions = {
     commit('INIT', { survey, submission, persist });
     dispatch('calculateRelevance');
   },
-  setProperty({ commit, dispatch, state }, { path, value }) {
+  setProperty({ commit, dispatch, state }, { path, value, calculate = true }) {
     commit('SET_PROPERTY', { path, value });
     if (state.persist) {
       db.persistSubmission(state.submission);
     }
-    dispatch('calculateRelevance');
+    if (calculate) {
+      dispatch('calculateRelevance');
+    }
   },
   async next({ commit, state, dispatch }) {
     dispatch('calculateApiCompose');

@@ -35,18 +35,28 @@ export default {
           skipEmptyLines: true,
           // Normalize column headings
           transformHeader(h) {
-            return h.trim().toLowerCase();
+            return h.trim().toLowerCase().split('|')[0];
           },
         });
 
-        console.log(parsed);
+
+        const parsedHeaders = parse(await file.text(), {
+          header: true,
+          skipEmptyLines: true,
+          preview: 1,
+        });
 
         const items = parsed.data
           .map(item => ({
             ...item,
             id: new ObjectId().toString(),
           }));
-        this.$emit('change', { fields: parsed.meta.fields, data: [...items] });
+
+        const fields = parsed.meta.fields.map(field => field);
+        const headers = parsedHeaders.meta.fields.map(field => ({ text: field.split('|')[0], value: field.split('|')[0], type: field.split('|')[1] || 'text' }));
+        const data = [...items];
+
+        this.$emit('change', { fields, headers, data });
         this.$refs['select-items-file-input'].value = null;
       } catch (err) {
         console.error('error parsing CSV file', err);

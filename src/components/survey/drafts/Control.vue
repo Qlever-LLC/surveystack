@@ -91,8 +91,8 @@ export default {
 
       // adjust modified date
       const modified = moment().toISOString(true);
-      this.$store.dispatch('draft/setProperty', { path: `${this.path}.meta.dateModified`, value: modified });
-      this.$store.dispatch('draft/setProperty', { path: 'meta.dateModified', value: modified });
+      this.$store.dispatch('draft/setProperty', { path: `${this.path}.meta.dateModified`, value: modified, calculate: false });
+      this.$store.dispatch('draft/setProperty', { path: 'meta.dateModified', value: modified, calculate: false });
     },
     setStatus({ type, message }) {
       this.$store.dispatch('draft/setProperty', { path: `${this.path}.meta.status`, value: type });
