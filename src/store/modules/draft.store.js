@@ -7,13 +7,13 @@ import * as db from '@/store/db';
 const createInitialState = () => ({
   survey: null, // current survey
   submission: null, // current submission
-  persist: false,
   root: null, // root node starting from current survey controls
   node: null, // node with model pointing to current survey control
   firstNode: null,
   showOverview: false,
   showConfirmSubmission: false,
   errors: null,
+  persist: false,
 });
 
 const initialState = createInitialState();
