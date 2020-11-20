@@ -29,7 +29,7 @@
                 style="min-width: 5rem"
               />
               <v-text-field
-                v-if="header.type === 'number'"
+                v-else-if="header.type === 'number'"
                 :label="header.value"
                 :value="item[header.value]"
                 @input="v => {item[header.value] = Number(v); onInput()}"
@@ -40,15 +40,17 @@
                 style="min-width: 5rem"
               />
               <v-select
-                v-if="header.type === 'dropdown'"
-                :items="['gold', 'silver', 'bronze']"
+                v-else-if="header.type === 'dropdown'"
+                :items="getDropdownItems(header.value)"
                 @input="v => {item[header.value] = v; onInput()}"
                 hide-details
                 solo
                 class="my-2"
                 style="min-width: 5rem"
               />
-              {{header.type}}
+              <div v-else>
+                ???
+              </div>
             </td>
             <td>
               <v-btn
@@ -90,6 +92,10 @@ export default {
       const resource = this.resources.find(r => r.id === this.control.options.source);
       return resource.content.fields;
     },
+    items() {
+      const resource = this.resources.find(r => r.id === this.control.options.source);
+      return resource.content.data;
+    },
   },
   data() {
     return { rows: this.value || [] };
@@ -104,6 +110,9 @@ export default {
     remove(row) {
       this.rows.splice(row, 1);
       this.$emit('changed', this.rows);
+    },
+    getDropdownItems(field) {
+      return this.items.map(row => row[field]);
     },
     onInput() {
       this.$emit('changed', this.rows);
