@@ -85,7 +85,11 @@ export default {
         id,
         type: 'MATRIX',
         location: 'EMBEDDED',
-        content: [],
+        content: {
+          fields: [],
+          headers: [],
+          data: [],
+        },
       }]);
       this.$emit('set-control-source', id);
       this.openTableDialog();

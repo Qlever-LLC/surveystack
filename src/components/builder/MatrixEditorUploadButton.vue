@@ -36,7 +36,7 @@ export default {
         const parsed = parse(await file.text(), {
           header: true,
           skipEmptyLines: true,
-          // Normalize column headings
+          // Normalize column headings and remove TYPE from "h|TYPE"
           transformHeader(h) {
             return h.trim().toLowerCase().split('|')[0];
           },

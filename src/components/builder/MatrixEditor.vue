@@ -113,7 +113,7 @@
 
           </v-toolbar>
         </template> -->
-        <template v-slot:item.actions="{ item }">
+        <template v-slot:item._actions="{ item }">
           <div class="d-flex">
             <v-icon @click="moveItemUp(item)">mdi-arrow-up</v-icon>
             <v-icon
@@ -124,10 +124,6 @@
               class="ml-2"
               @click="openItemEditDialog(item)"
             >mdi-pencil</v-icon>
-            <v-icon
-              class="ml-2"
-              @click="deleteItem(item)"
-            >mdi-delete</v-icon>
           </div>
         </template>
       </v-data-table>
@@ -144,32 +140,34 @@
 
     <v-dialog
       v-model="editItemDialogIsVisible"
-      @input="updateEditItem"
       max-width="350"
     >
       <v-card>
         <v-card-title>Edit Item</v-card-title>
         <v-card-text>
-          <v-text-field
-            v-model="editedItem.label"
-            label="Label"
-          />
-          <v-text-field
-            v-model="editedItem.value"
-            label="Value"
-          />
-          <v-text-field
-            v-model="editedItem.tags"
-            label="Tags"
-          />
+          <div
+            v-for="header in headers"
+            :key="header.value"
+          >
+            <v-text-field
+              :value="editedItem[header.value]"
+              @input="v => {editedItem[header.value] = (header.type === 'number') ? Number(v) : v}"
+              :label="header.value"
+              v-if="!header.value.startsWith('_')"
+            />
+          </div>
+
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions class="pa-4">
+          <v-btn
+            color="error"
+            @click="editItemDialogIsVisible = false; deleteItem(editedItem.id)"
+          >DELETE</v-btn>
           <v-spacer />
           <v-btn
-            text
             color="primary"
-            @click="closeItemEditDialog"
-          >Ok</v-btn>
+            @click="editItemDialogIsVisible = false; updateEditItem()"
+          >SAVE</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -187,7 +185,13 @@ export default {
     resource: {
       type: Object,
       required: true,
-      default: () => ({ content: [] }),
+      default: () => ({
+        content: {
+          headers: [],
+          fields: [],
+          data: [],
+        },
+      }),
     },
     resources: {
       type: Array,
@@ -204,7 +208,6 @@ export default {
       search: '',
       deleteDialogIsVisible: false,
       selectedItems: [],
-      editItemId: null,
       editItemDialogIsVisible: false,
       tableHeaders: [
         {
@@ -223,16 +226,11 @@ export default {
       return this.resource.content.data;
     },
     headers() {
-      if (Array.isArray(this.resource.content.fields) && this.resource.content.fields.length > 0) {
-        const headers = this.resource.content.fields.map(v => ({ text: v, value: v }));
-        return [...headers, {
-          text: 'actions',
-          value: 'actions',
-          width: 1,
-        }];
-      }
-
-      return [];
+      return [...this.resource.content.headers, {
+        text: 'actions',
+        value: '_actions',
+        width: 1,
+      }];
     },
   },
   methods: {
@@ -289,21 +287,19 @@ export default {
     },
     deleteSelectedItems() {
       const isNotSelectedItem = item => !this.selectedItems.some(s => s.id === item.id);
-      const newItems = this.resource.content.filter(isNotSelectedItem);
+      const newItems = this.resource.content.data.filter(isNotSelectedItem);
       this.selectedItems = [];
       this.$emit('change', {
         ...this.resource,
-        content: newItems,
+        content: {
+          ...this.resource.content,
+          data: newItems,
+        },
       });
     },
     openItemEditDialog(item) {
       this.editItemDialogIsVisible = true;
-      this.editItemId = item.id;
       this.editedItem = { ...item };
-    },
-    closeItemEditDialog() {
-      this.editItemDialogIsVisible = false;
-      this.updateEditItem();
     },
     handleEditDialogInput(val) {
       if (!val) {
@@ -311,21 +307,21 @@ export default {
       }
     },
     updateEditItem() {
-      const index = this.resource.content.findIndex(item => item.id === this.editedItem.id);
-      // const index = this.resource.content.findIndex(c => c.id === this.editItemId);
+      const index = this.resource.content.data.findIndex(item => item.id === this.editedItem.id);
       if (index > -1) {
         const newItems = [
-          ...this.resource.content.slice(0, index),
+          ...this.resource.content.data.slice(0, index),
           this.editedItem,
-          ...this.resource.content.slice(index + 1),
+          ...this.resource.content.data.slice(index + 1),
         ];
         this.$emit('change', {
           ...this.resource,
-          content: newItems,
+          content: {
+            ...this.resource.content,
+            data: newItems,
+          },
         });
       }
-      this.editedItem = this.createEmptyItem();
-      this.editItemId = null;
     },
     openDeleteDialog() {
       this.deleteDialogIsVisible = true;
@@ -361,12 +357,14 @@ export default {
       // this.$emit('close-dialog');
       // this.$emit('change', this.)
     },
-    deleteItem(item) {
-      const newItems = this.resource.content.filter(x => x.label !== item.label && x.value !== item.value);
-      console.log('delete item, new items:', JSON.stringify(newItems, null, 2));
+    deleteItem(id) {
+      const newItems = this.resource.content.data.filter(x => x.id !== id);
       this.$emit('change', {
         ...this.resource,
-        content: newItems,
+        content: {
+          ...this.resource.content,
+          data: newItems,
+        },
       });
     },
     setContent(content) {
