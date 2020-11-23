@@ -25,8 +25,7 @@
                 @input="v => {item[header.value] = v; onInput()}"
                 solo
                 hide-details
-                class="my-2"
-                style="min-width: 5rem"
+                class="matrix-cell my-2"
               />
               <v-text-field
                 v-else-if="header.type === 'number'"
@@ -36,8 +35,7 @@
                 type="number"
                 solo
                 hide-details
-                class="my-2"
-                style="min-width: 5rem"
+                class="matrix-cell my-2"
               />
               <v-select
                 v-else-if="header.type === 'dropdown'"
@@ -46,8 +44,7 @@
                 @input="v => {item[header.value] = v; onInput()}"
                 hide-details
                 solo
-                class="my-2"
-                style="min-width: 5rem"
+                class="matrix-cell my-2"
               />
               <v-autocomplete
                 v-else-if="header.type === 'autocomplete'"
@@ -59,9 +56,8 @@
               />
               <div v-else-if="header.type === 'date'">
                 <v-menu
-                  ref="menu1"
-                  v-model="menu1"
                   :close-on-content-click="false"
+                  v-model="menus[`${idx}_${header.value}`]"
                   transition="scale-transition"
                   offset-y
                   max-width="290px"
@@ -80,7 +76,7 @@
                   </template>
                   <v-date-picker
                     :value="item[header.value]"
-                    @input="v => {item[header.value] = v; onInput()}"
+                    @input="v => {item[header.value] = v; menus[`${idx}_${header.value}`] = false; onInput()}"
                     no-title
                   ></v-date-picker>
                 </v-menu>
@@ -136,7 +132,7 @@ export default {
     },
   },
   data() {
-    return { rows: this.value || [] };
+    return { rows: this.value || [], menus: {} };
   },
   methods: {
     add() {
@@ -155,6 +151,15 @@ export default {
     onInput() {
       this.$emit('changed', this.rows);
     },
+    log(v) {
+      console.log(v);
+    },
   },
 };
 </script>
+
+<style scoped>
+.matrix-cell {
+  min-width: 5rem;
+}
+</style>
