@@ -57,6 +57,34 @@
                 hide-details
                 solo
               />
+              <div v-else-if="header.type === 'date'">
+                <v-menu
+                  ref="menu1"
+                  v-model="menu1"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  offset-y
+                  max-width="290px"
+                  min-width="290px"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      :value="item[header.value]"
+                      @input="v => {item[header.value] = v; onInput()}"
+                      label="Date"
+                      hide-details
+                      v-bind="attrs"
+                      v-on="on"
+                      solo
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker
+                    :value="item[header.value]"
+                    @input="v => {item[header.value] = v; onInput()}"
+                    no-title
+                  ></v-date-picker>
+                </v-menu>
+              </div>
 
               <div v-else>
                 ???
