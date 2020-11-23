@@ -18,7 +18,7 @@
                 />
               </div>
             </template>
-            CSV must have column headers 'label', 'value', and optionally 'tags'
+            CSV column headers may specify type with header|TYPE, where TYPE=text,number,date,dropdown,autocomplete
           </v-tooltip>
           <v-dialog
             v-model="deleteDialogIsVisible"
