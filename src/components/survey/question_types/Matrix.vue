@@ -132,11 +132,11 @@ export default {
   computed: {
     headers() {
       const resource = this.resources.find(r => r.id === this.control.options.source);
-      return resource.content.headers;
+      return resource.content.headers.filter(h => !h.value.startsWith('_'));
     },
     fields() {
       const resource = this.resources.find(r => r.id === this.control.options.source);
-      return resource.content.fields;
+      return resource.content.fields.filter(f => !f.startsWith('_'));
     },
     items() {
       const resource = this.resources.find(r => r.id === this.control.options.source);
