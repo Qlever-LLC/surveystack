@@ -1,5 +1,15 @@
 <template>
   <div>
+    <app-dialog
+      v-model="showConfirmDeletionDialog"
+      @confirm="remove(rowToBeDeleted)"
+      @cancel="rowToBeDeleted = -1"
+      title="Confirm Row Deletion"
+      labelConfirm="DELETE"
+    >
+      <pre>{{rows[rowToBeDeleted]}}</pre>
+    </app-dialog>
+
     <h2>{{control.label}}</h2>
     <v-data-table
       :headers="headers"
@@ -89,7 +99,7 @@
             <td>
               <v-btn
                 icon
-                @click="remove(idx)"
+                @click="rowToBeDeleted = idx"
               >
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
@@ -106,17 +116,19 @@
         <v-icon left>mdi-plus</v-icon>ADD ROW
       </v-btn>
     </div>
-    <div>
-      {{rows}}
-    </div>
   </div>
 </template>
 
 <script>
+import appDialog from '@/components/ui/Dialog.vue';
+
 import baseQuestionComponent from './BaseQuestionComponent';
 
 export default {
   mixins: [baseQuestionComponent],
+  components: {
+    appDialog,
+  },
   computed: {
     headers() {
       const resource = this.resources.find(r => r.id === this.control.options.source);
@@ -130,9 +142,22 @@ export default {
       const resource = this.resources.find(r => r.id === this.control.options.source);
       return resource.content.data;
     },
+    showConfirmDeletionDialog: {
+      get() {
+        return this.rowToBeDeleted >= 0;
+      },
+      set(v) {
+        // set from dialog close
+        this.rowToBeDeleted = -1;
+      },
+    },
   },
   data() {
-    return { rows: this.value || [], menus: {} };
+    return {
+      rows: this.value || [],
+      rowToBeDeleted: -1, //
+      menus: {}, // object to hold v-models for v-menu
+    };
   },
   methods: {
     add() {
@@ -143,6 +168,7 @@ export default {
     },
     remove(row) {
       this.rows.splice(row, 1);
+      this.rowToBeDeleted = -1;
       this.$emit('changed', this.rows);
     },
     getDropdownItems(field) {
