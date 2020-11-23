@@ -99,6 +99,9 @@ const actions = {
       const { result, path, skip } = relevance;
       if (!skip) {
         commit('SET_PROPERTY', { path: `${path}.meta.relevant`, value: result });
+        if (!result) {
+          continue;
+        }
       }
 
       const hasIrrelevantParents = nextNode.getPath().slice(1).slice(0, -1).some((parent) => {
@@ -151,6 +154,9 @@ const actions = {
       const { result, path, skip } = relevance;
       if (!skip) {
         commit('SET_PROPERTY', { path: `${path}.meta.relevant`, value: result });
+        if (!result) {
+          continue;
+        }
       }
 
       const hasIrrelevantParents = prevNode.getPath().slice(1).slice(0, -1).some((parent) => {
