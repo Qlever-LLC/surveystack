@@ -105,7 +105,32 @@
         v-model="selectedItems"
         :search="search"
         item-key="_row"
+        disable-sort
+        :mobile-breakpoint="0"
       >
+
+        <template
+          v-for="h in headers.filter(header => !header.value.startsWith('_'))"
+          v-slot:[`header.${h.value}`]="{header}"
+        >
+          <h2
+            :key="`header-value-${h.value}`"
+            class="mb-2"
+            style="color: #222"
+          >{{header.text}}</h2>
+          <v-select
+            v-model="header.type"
+            :items="['text', 'autocomplete', 'number']"
+            :key="`header-type-select-${h.value}`"
+            class="d-inline-flex mb-2"
+            label="type"
+            solo
+            dense
+            hide-details
+            style="font-size: 0.8rem; color: #666"
+          />
+        </template>
+
         <template v-slot:item._actions="{ item }">
           <div class="d-flex align-start">
             <v-icon @click="moveItemUp(item)">mdi-arrow-up</v-icon>
@@ -134,6 +159,7 @@
             >mdi-pencil</v-icon>
           </div>
         </template>
+
       </v-data-table>
     </v-card-text>
     <v-spacer />
