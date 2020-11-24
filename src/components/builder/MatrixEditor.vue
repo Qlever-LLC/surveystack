@@ -18,7 +18,7 @@
                 />
               </div>
             </template>
-            CSV column headers may specify type with header|TYPE, where TYPE=text,number,date,dropdown,autocomplete
+            CSV column headers may specify type with header|TYPE, where TYPE={{$options.MATRIX_COLUMN_TYPES.join(',')}}
           </v-tooltip>
           <v-dialog
             v-model="deleteDialogIsVisible"
@@ -113,22 +113,25 @@
           v-for="h in headers.filter(header => !header.value.startsWith('_'))"
           v-slot:[`header.${h.value}`]="{header}"
         >
-          <h2
+          <span
             :key="`header-value-${h.value}`"
             class="mb-2"
-            style="color: #222"
-          >{{header.text}}</h2>
+            style="color: #222; font-size: 1.1rem"
+          >{{header.text}}</span>
           <v-select
             v-model="header.type"
-            :items="['text', 'autocomplete', 'number']"
+            :items="$options.MATRIX_COLUMN_TYPES"
             :key="`header-type-select-${h.value}`"
-            class="d-inline-flex mb-2"
+            class="d-inline-flex mb-3"
             label="type"
             solo
             dense
             hide-details
-            style="font-size: 0.8rem; color: #666"
           />
+        </template>
+
+        <template v-slot:header._actions>
+          <h2>Actions</h2>
         </template>
 
         <template v-slot:item._actions="{ item }">
@@ -213,6 +216,8 @@ import { uniqWith, isEqual } from 'lodash';
 import slugify from '@/utils/slugify';
 
 import appMatrixEditorUploadButton from '@/components/builder/MatrixEditorUploadButton.vue';
+
+const MATRIX_COLUMN_TYPES = ['text', 'number', 'date', 'dropdown', 'autocomplete'];
 
 export default {
   props: {
@@ -408,8 +413,13 @@ export default {
       });
     },
   },
+  MATRIX_COLUMN_TYPES,
 };
 </script>
 
 <style scoped>
+>>> .theme--light.v-select .v-select__selection--comma {
+  color: #555;
+  font-size: 0.75rem;
+}
 </style>

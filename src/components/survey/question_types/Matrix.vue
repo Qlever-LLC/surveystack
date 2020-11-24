@@ -122,6 +122,7 @@
 </template>
 
 <script>
+import { cloneDeep } from 'lodash';
 import appDialog from '@/components/ui/Dialog.vue';
 
 import baseQuestionComponent from './BaseQuestionComponent';
@@ -181,10 +182,14 @@ export default {
     },
     prefill() {
       const resource = this.resources.find(r => r.id === this.control.options.source);
-      const prefilled = resource.content.data.filter(row => row._prefill);
-      prefilled.forEach((element) => { // we may want to keep _prefill
-        delete element._row; // eslint-disable-line no-param-reassign
-        delete element._prefill; // eslint-disable-line no-param-reassign
+      // need to clone, otherwise SurveyBuilder's resource is changed when removing _row/_prefill
+      const prefilled = cloneDeep(resource.content.data.filter(row => row._prefill));
+      prefilled.forEach((item) => {
+        this.headers.filter(h => h.type === 'number').forEach((h) => {
+          item[h.value] = Number(item[h.value]) || null;
+        });
+        delete item._row;
+        delete item._prefill;
       });
 
       this.rows = prefilled;
