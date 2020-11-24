@@ -99,12 +99,20 @@
               </div>
             </td>
             <td>
-              <v-btn
-                icon
-                @click="rowToBeDeleted = idx"
-              >
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
+              <div class="d-flex">
+                <v-btn
+                  icon
+                  @click="rowToBeDeleted = idx"
+                >
+                  <v-icon>mdi-trash-can-outline</v-icon>
+                </v-btn>
+                <v-btn
+                  icon
+                  @click="duplicateRow(idx)"
+                >
+                  <v-icon>mdi-content-copy</v-icon>
+                </v-btn>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -178,6 +186,11 @@ export default {
       return this.items.map(row => row[field]);
     },
     onInput() {
+      this.$emit('changed', this.rows);
+    },
+    duplicateRow(idx) {
+      const clone = cloneDeep(this.rows[idx]);
+      this.rows = [...this.rows, clone];
       this.$emit('changed', this.rows);
     },
     prefill() {
