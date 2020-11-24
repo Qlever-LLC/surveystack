@@ -83,6 +83,7 @@
                       v-bind="attrs"
                       v-on="on"
                       solo
+                      autocomplete="off"
                     ></v-text-field>
                   </template>
                   <v-date-picker
