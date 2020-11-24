@@ -62,7 +62,6 @@
 
     <v-card-text class="pt-4">
       <div class="d-flex flex-space-between align-center">
-        <!-- {{ resource.label }} -->
         <v-text-field
           :value="resource.label"
           @input="handleUpdateLabel"
@@ -107,12 +106,6 @@
         :search="search"
         item-key="_row"
       >
-        <!-- <template v-slot:top>
-          <v-toolbar flat color="white">
-            <v-toolbar-title>Edit Select Options</v-toolbar-title>
-
-          </v-toolbar>
-        </template> -->
         <template v-slot:item._actions="{ item }">
           <div class="d-flex align-start">
             <v-icon @click="moveItemUp(item)">mdi-arrow-up</v-icon>

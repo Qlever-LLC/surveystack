@@ -80,8 +80,8 @@ export default {
     createResourceHandler() {
       const id = new ObjectId().toString();
       this.$emit('set-survey-resources', [...this.resources, {
-        label: `Dropdown Items ${this.resources.length + 1}`,
-        name: `dropdown_items_${this.resources.length + 1}`,
+        label: `Matrix Items ${this.resources.length + 1}`,
+        name: `matrix_items_${this.resources.length + 1}`,
         id,
         type: 'MATRIX',
         location: 'EMBEDDED',
