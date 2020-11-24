@@ -181,7 +181,7 @@ export default {
     },
     prefill() {
       const resource = this.resources.find(r => r.id === this.control.options.source);
-      const prefilled = resource.content.data.filter(row => row._prefill === '1' || row._prefill === 'y' || row._prefill === 'Y');
+      const prefilled = resource.content.data.filter(row => row._prefill);
       prefilled.forEach((element) => { // we may want to keep _prefill
         delete element._row; // eslint-disable-line no-param-reassign
         delete element._prefill; // eslint-disable-line no-param-reassign

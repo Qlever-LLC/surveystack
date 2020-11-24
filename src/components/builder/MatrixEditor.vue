@@ -114,12 +114,27 @@
           </v-toolbar>
         </template> -->
         <template v-slot:item._actions="{ item }">
-          <div class="d-flex">
+          <div class="d-flex align-start">
             <v-icon @click="moveItemUp(item)">mdi-arrow-up</v-icon>
             <v-icon
               class="ml-2"
               @click="moveItemDown(item)"
             >mdi-arrow-down</v-icon>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-simple-checkbox
+                  v-model="item._prefill"
+                  dense
+                  hide-details
+                  :ripple="false"
+                  class="ml-1"
+                  v-bind="attrs"
+                  v-on="on"
+                />
+              </template>
+              <span>Prefill</span>
+            </v-tooltip>
+
             <v-icon
               class="ml-2"
               @click="openItemEditDialog(item)"

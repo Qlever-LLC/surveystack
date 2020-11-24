@@ -53,6 +53,7 @@ export default {
           .map(item => ({
             ...item,
             _row: new ObjectId().toString(),
+            _prefill: item._prefill === '1' || item._prefill === 'y' || item.prefill === 'Y',
           }));
 
         const fields = parsed.meta.fields.filter(f => !f.startsWith('_'));
