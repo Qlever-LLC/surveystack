@@ -2,6 +2,7 @@
   <div>
     <app-dialog
       v-model="showConfirmDeletionDialog"
+      v-if="rowToBeDeleted >= 0"
       @confirm="remove(rowToBeDeleted)"
       @cancel="rowToBeDeleted = -1"
       title="Confirm Row Deletion"
@@ -154,7 +155,7 @@ export default {
   },
   data() {
     return {
-      rows: this.value || [],
+      rows: this.value,
       rowToBeDeleted: -1, //
       menus: {}, // object to hold v-models for v-menu
     };
@@ -177,9 +178,25 @@ export default {
     onInput() {
       this.$emit('changed', this.rows);
     },
+    prefill() {
+      const resource = this.resources.find(r => r.id === this.control.options.source);
+      const prefilled = resource.content.data.filter(row => row._prefill === '1' || row._prefill === 'y' || row._prefill === 'Y');
+      prefilled.forEach((element) => { // we may want to keep _prefill
+        delete element._row; // eslint-disable-line no-param-reassign
+        delete element._prefill; // eslint-disable-line no-param-reassign
+      });
+
+      this.rows = prefilled;
+      this.$emit('changed', this.rows);
+    },
     log(v) {
       console.log(v);
     },
+  },
+  created() {
+    if (!this.rows || this.rows.length === 0) {
+      this.prefill();
+    }
   },
 };
 </script>

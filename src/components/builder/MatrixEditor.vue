@@ -105,7 +105,7 @@
         show-select
         v-model="selectedItems"
         :search="search"
-        item-key="id"
+        item-key="_row"
       >
         <!-- <template v-slot:top>
           <v-toolbar flat color="white">
@@ -161,7 +161,7 @@
         <v-card-actions class="pa-4">
           <v-btn
             color="error"
-            @click="editItemDialogIsVisible = false; deleteItem(editedItem.id)"
+            @click="editItemDialogIsVisible = false; deleteItem(editedItem)"
           >DELETE</v-btn>
           <v-spacer />
           <v-btn
@@ -247,8 +247,8 @@ export default {
       const namePattern = /^.{4,}$/; // one character should be ok, especially within groups
       return namePattern.test(val) ? true : 'Data name must be at least 4 character in length';
     },
-    moveItemDown({ id }) {
-      const index = this.resource.content.data.findIndex(item => item.id === id);
+    moveItemDown({ _row }) {
+      const index = this.resource.content.data.findIndex(item => item._row === _row);
       if (index < this.resource.content.data.length - 1) {
         const newItems = [...this.resource.content.data];
         const [item] = newItems.splice(index, 1);
@@ -262,8 +262,8 @@ export default {
         });
       }
     },
-    moveItemUp({ id }) {
-      const index = this.resource.content.data.findIndex(item => item.id === id);
+    moveItemUp({ _row }) {
+      const index = this.resource.content.data.findIndex(item => item._row === _row);
       if (index > 0) {
         const newItems = [...this.resource.content.data];
         const [item] = newItems.splice(index, 1);
@@ -286,7 +286,7 @@ export default {
       };
     },
     deleteSelectedItems() {
-      const isNotSelectedItem = item => !this.selectedItems.some(s => s.id === item.id);
+      const isNotSelectedItem = item => !this.selectedItems.some(s => s._row === item._row);
       const newItems = this.resource.content.data.filter(isNotSelectedItem);
       this.selectedItems = [];
       this.$emit('change', {
@@ -307,7 +307,7 @@ export default {
       }
     },
     updateEditItem() {
-      const index = this.resource.content.data.findIndex(item => item.id === this.editedItem.id);
+      const index = this.resource.content.data.findIndex(item => item._row === this.editedItem._row);
       if (index > -1) {
         const newItems = [
           ...this.resource.content.data.slice(0, index),
@@ -357,8 +357,8 @@ export default {
       // this.$emit('close-dialog');
       // this.$emit('change', this.)
     },
-    deleteItem(id) {
-      const newItems = this.resource.content.data.filter(x => x.id !== id);
+    deleteItem({ _row }) {
+      const newItems = this.resource.content.data.filter(x => x._row !== _row);
       this.$emit('change', {
         ...this.resource,
         content: {

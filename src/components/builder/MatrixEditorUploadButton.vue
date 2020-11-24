@@ -52,11 +52,11 @@ export default {
         const items = parsed.data
           .map(item => ({
             ...item,
-            id: new ObjectId().toString(),
+            _row: new ObjectId().toString(),
           }));
 
-        const fields = parsed.meta.fields.map(field => field);
-        const headers = parsedHeaders.meta.fields.map(field => ({ text: field.split('|')[0], value: field.split('|')[0], type: field.split('|')[1] || 'text' }));
+        const fields = parsed.meta.fields.filter(f => !f.startsWith('_'));
+        const headers = parsedHeaders.meta.fields.filter(f => !f.startsWith('_')).map(field => ({ text: field.split('|')[0], value: field.split('|')[0], type: field.split('|')[1] || 'text' }));
         const data = [...items];
 
         this.$emit('change', { fields, headers, data });

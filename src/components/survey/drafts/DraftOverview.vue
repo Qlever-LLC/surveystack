@@ -89,7 +89,10 @@
                 <v-card-text
                   class="py-0"
                   v-if="display.value"
-                ><kbd class="pa-2">{{ display.value }}</kbd></v-card-text>
+                ><kbd
+                    class="pa-2"
+                    style="background: #555"
+                  >{{ display.value }}</kbd></v-card-text>
                 <v-card-text
                   v-else
                   class="text--secondary"
