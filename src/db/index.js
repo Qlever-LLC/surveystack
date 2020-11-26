@@ -23,6 +23,7 @@ const connectDatabase = async () => {
   await db.collection('submissions').createIndex({ 'meta.survey.id': 1 });
   await db.collection('submissions').createIndex({ 'meta.survey.version': 1 });
   await db.collection('submissions').createIndex({ 'meta.creator': 1 });
+  await db.createCollection("farmos.webhookrequests", { capped : true, size : 10000, max : 5000 } )
 
   // migrations
   await migrateScripts_V1toV2();

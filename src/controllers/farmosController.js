@@ -88,8 +88,46 @@ const getIntegrationFarms = async (req, res) => {
   return res.send(farms);
 };
 
+const webhookCallback = async (req, res, next) => {
+  try {
+    const { key } = req.query  
+
+    //console.log("req", req)
+    if (!key) {
+      throw boom.unauthorized("key missing")
+    }
+
+    if (!process.env.FARMOS_CALLBACK_KEY) {
+      throw boom.badRequest("server does not support farmos webhooks")
+    }
+
+    if (key !== process.env.FARMOS_CALLBACK_KEY) {
+      throw boom.unauthorized("unauthorized")
+    }
+
+    const { url, plan, status } = req.body
+
+    if (status !== "ready") {
+      throw boom.badRequest("expecting status ready")
+    }
+
+    return farmosService.handleWebhookCallback(req, res, url, plan)
+  } catch (error) {
+    console.log("error", error)
+    if (boom.isBoom(error)) {
+      return next(error)
+    } else {
+      return res.send({
+        status: "error"
+      })
+    }
+  }
+
+}
+
 export default {
   getFields,
   getAssets,
   getIntegrationFarms,
+  webhookCallback
 };

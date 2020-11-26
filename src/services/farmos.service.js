@@ -272,4 +272,18 @@ export const handle = async (res, submission, survey, user) => {
   return results;
 };
 
-export default { handle, getCredentials };
+const handleWebhookCallback = (req, res, url, plan) => {
+  // TODO handle request, limit entries
+
+  db.collection("farmos.webhookrequests").insertOne({
+    url,
+    plan,
+    created: new Date()
+  })
+
+  return res.send({
+    status: "success"
+  })
+}
+
+export default { handle, getCredentials, handleWebhookCallback };

@@ -183,14 +183,19 @@ router.get(
   catchErrors(farmosController.getIntegrationFarms)
 );
 
+// TODO Farmos POST callback for new instance
+router.post("/farmos/callback", farmosController.webhookCallback)
+
 /** Integrations - Group */
 router.get('/group-integrations', catchErrors(groupIntegrationController.getIntegrations));
+
 router.get('/group-integrations/:id', catchErrors(groupIntegrationController.getIntegration));
 router.post(
   '/group-integrations',
   [assertNameNotEmpty],
   catchErrors(groupIntegrationController.createIntegration)
 );
+
 router.put(
   '/group-integrations/:id',
   [assertNameNotEmpty, assertIdsMatch, assertEntityExists({ collection: 'integrations.groups' })],
