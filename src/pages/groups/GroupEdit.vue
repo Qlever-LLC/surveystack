@@ -260,7 +260,7 @@ export default {
         const { data: members } = await api.get(`/memberships?group=${this.entity._id}&populate=true`);
         this.members = members;
 
-        const { data: integrations } = await api.get(`/group-integrations?group=${id}`);
+        const { data: integrations } = await api.get(`/group-integrations?group=${id}&populate=true`);
         this.integrations = integrations;
       } catch (e) {
         console.log('something went wrong:', e);
