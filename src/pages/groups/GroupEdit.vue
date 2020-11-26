@@ -75,6 +75,13 @@
           v-if="editMode"
           class="mb-4"
         >
+          <app-farm-hub-onboarding :newRoute="{name: 'farm-hub-onboarding', query: {group: entity._id}}" />
+        </v-card>
+
+        <v-card
+          v-if="editMode"
+          class="mb-4"
+        >
           <app-integration-list
             title="Group Integrations"
             :entities="integrations"
@@ -121,6 +128,7 @@ import api from '@/services/api.service';
 import appIntegrationList from '@/components/integrations/IntegrationList.vue';
 import appPinnedSurveys from '@/components/groups/PinnedSurveys.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
+import appFarmHubOnboarding from '@/components/integrations/FarmHubOnboarding.vue';
 
 
 import { handleize } from '@/utils/groups';
@@ -130,6 +138,7 @@ export default {
     appIntegrationList,
     appPinnedSurveys,
     appBasicList,
+    appFarmHubOnboarding,
   },
   data() {
     return {

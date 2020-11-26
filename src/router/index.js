@@ -43,6 +43,7 @@ import ResourceList from '@/pages/resources/ResourceList.vue';
 
 import AppInfo from '@/pages/app/AppInfo.vue';
 
+import FarmHubOnboarding from '@/pages/farmhub-onboarding/FarmHubOnboarding.vue';
 
 // integrations
 import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
@@ -256,6 +257,11 @@ const routes = [
     path: '/group-integrations/new',
     name: 'group-integrations-new',
     component: GroupIntegrationEdit,
+  },
+  {
+    path: '/farm-hub-onboarding/:id',
+    name: 'farm-hub-onboarding',
+    component: FarmHubOnboarding,
   },
   {
     path: '/group-integrations/:id/edit',
