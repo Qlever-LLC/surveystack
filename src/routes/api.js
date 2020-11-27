@@ -182,6 +182,15 @@ router.get(
   [assertAuthenticated],
   catchErrors(farmosController.getIntegrationFarms)
 );
+router.post(
+  '/farmos/test',
+  [assertAuthenticated],
+  catchErrors(farmosController.testConnection)
+);
+
+router.get('/farmos/members-by-farm', catchErrors(farmosController.getMembersByFarmAndGroup));
+
+
 
 // TODO Farmos POST callback for new instance
 router.post("/farmos/callback", farmosController.webhookCallback)
@@ -190,6 +199,7 @@ router.post("/farmos/callback", farmosController.webhookCallback)
 router.get('/group-integrations', catchErrors(groupIntegrationController.getIntegrations));
 
 router.get('/group-integrations/:id', catchErrors(groupIntegrationController.getIntegration));
+
 router.post(
   '/group-integrations',
   [assertNameNotEmpty],

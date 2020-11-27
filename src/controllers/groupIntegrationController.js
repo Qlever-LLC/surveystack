@@ -16,9 +16,8 @@ const sanitizeIntegration = (entity) => {
 };
 
 const getIntegrations = async (req, res) => {
-  const { group, type } = req.query;
+  const { group, type, populate } = req.query;
   const filter = {};
-  const options = { projection: { 'data.apiKey': 0 } }; // TODO: find better way to hide secrets
   //const options = {}; // TODO: find better way to hide secrets
 
   if (group) {
@@ -28,6 +27,15 @@ const getIntegrations = async (req, res) => {
   if (type) {
     filter.type = type;
   }
+
+  const options = { projection: { 'data': 0 } }; // TODO: find better way to hide secrets
+  if (populate && res.locals.auth.user && res.locals.auth.user._id) {
+    const access = await rolesService.hasAdminRole(res.locals.auth.user._id, group);
+    if (access) {
+      options.projection = {}
+    }
+  }
+
 
   const entities = await db
     .collection(col)
@@ -74,6 +82,7 @@ const createIntegration = async (req, res) => {
 const updateIntegration = async (req, res) => {
   const entity = req.body;
   const id = entity._id;
+
   sanitizeIntegration(entity);
 
   const access = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
@@ -93,7 +102,7 @@ const updateIntegration = async (req, res) => {
     return res.send(updated);
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ message: 'Ouch :/' });
+    return res.status(500).send({ message: 'Error updating integration' });
   }
 };
 

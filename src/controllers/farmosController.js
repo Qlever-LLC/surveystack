@@ -90,7 +90,7 @@ const getIntegrationFarms = async (req, res) => {
 
 const webhookCallback = async (req, res, next) => {
   try {
-    const { key } = req.query  
+    const { key } = req.query
 
     //console.log("req", req)
     if (!key) {
@@ -125,9 +125,115 @@ const webhookCallback = async (req, res, next) => {
 
 }
 
+const testConnection = async (req, res) => {
+  const aggregator = req.body;
+
+  if (!aggregator.data.url) {
+    throw boom.badRequest("argument data.url missing")
+  }
+
+  if (!aggregator.data.apiKey) {
+    throw boom.badRequest("argument data.apiKey missing")
+  }
+
+  const agentOptions = {
+    host: aggregator.data.url,
+    port: '443',
+    path: '/',
+    rejectUnauthorized: false,
+  };
+
+  const agent = new https.Agent(agentOptions);
+
+  try {
+    const r = await axios.get(
+      `https://${aggregator.data.url}/api/v1/farms/`,
+      {
+        headers: {
+          accept: 'application/json',
+          'api-key': aggregator.data.apiKey,
+        },
+        httpsAgent: agent,
+      }
+    );
+
+    if (r.status === 200) {
+      return res.send({
+        status: "success"
+      })
+    } else {
+      throw Error("unable to connect to aggregator")
+    }
+  } catch (error) {
+    return res.send({
+      status: "error",
+      message: error.message
+    })
+  }
+}
+
+const getMembersByFarmAndGroup = async (req, res) => {
+  const { farmUrl, group, aggregator } = req.query;
+  if (!farmUrl || !group || !aggregator) {
+    throw boom.badRequest("missing farmUrl, group or aggregator")
+  }
+
+
+  const access = await rolesService.hasAdminRole(res.locals.auth.user._id, group);
+  if (!access) {
+    throw boom.unauthorized("permission denied: not group admin")
+  }
+
+
+  const pipeline = [
+    {
+      '$match': {
+        'data.url': farmUrl,
+        'type': 'farmos-farm',
+        'data.aggregator': new ObjectId(aggregator)
+      }
+    }, {
+      '$lookup': {
+        'from': 'memberships',
+        'localField': 'membership',
+        'foreignField': '_id',
+        'as': 'm'
+      }
+    }, {
+      '$project': {
+        'membership': {
+          '$arrayElemAt': [
+            '$m', 0
+          ]
+        }
+      }
+    }, {
+      '$match': {
+        'membership.group': new ObjectId(group)
+      }
+    }, {
+      '$lookup': {
+        'from': 'users',
+        'localField': 'membership.user',
+        'foreignField': '_id',
+        'as': 'user'
+      }
+    }
+  ]
+
+  const entities = await db
+    .collection('integrations.memberships')
+    .aggregate(pipeline)
+    .toArray();
+
+  return res.send(entities);
+};
+
 export default {
   getFields,
   getAssets,
   getIntegrationFarms,
-  webhookCallback
+  webhookCallback,
+  testConnection,
+  getMembersByFarmAndGroup
 };
