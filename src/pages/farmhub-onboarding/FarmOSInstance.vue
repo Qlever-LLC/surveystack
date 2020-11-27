@@ -4,15 +4,10 @@
       class="mt-3"
       @keydown.enter.prevent="submit"
     >
-      <v-text-field
-        v-model="instance.name"
-        label="Name"
-        placeholder="Name"
-        outlined
-      />
 
       <v-text-field
         v-model="instance.url"
+        readonly
         label="URL"
         placeholder="instance URL"
         outlined
@@ -22,8 +17,8 @@
         label="Members with Access to Farm"
         v-model="activeUsers"
         :items="members"
-        item-value="_id"
-        item-text="text"
+        item-value="id"
+        item-text="name"
         outlined
         deletable-chips
         chips
@@ -32,13 +27,13 @@
       >
 
         <template v-slot:item="{item}">
-          <div v-if="item.user">{{ item.user.name }} <v-chip
+          <div v-if="item.userExists">{{ item.name }} <v-chip
               color="grey--darken-2"
               dark
-            >{{ item.user.email }}</v-chip>
+            >{{ item.email }}</v-chip>
           </div>
           <div v-else>
-            <v-icon left>mdi-account-clock</v-icon> {{ item.meta.invitationEmail }}
+            <v-icon left>mdi-account-clock</v-icon> {{ item.email }}
           </div>
         </template>
         <template v-slot:prepend-item>
@@ -64,13 +59,52 @@
 </template>
 
 <script>
-import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
+
+const remapGroupMembership = (m) => {
+  console.log('remapGroupMembership', m);
+  let username = m.meta.invitationEmail;
+  let userExists = false;
+  let email = m.meta.invitationEmail;
+  if (m.user && m.user.name) {
+    username = m.user.name;
+    userExists = true;
+    // eslint-disable-next-line prefer-destructuring
+    email = m.user.email;
+  }
+  return {
+    id: m._id,
+    name: username,
+    userExists,
+    email,
+  };
+};
+const remapFarmOSMembership = (m) => {
+  console.log('remapFarmOSMembership', m);
+  let username = m.membership.meta.invitationEmail;
+  let userExists = false;
+  let email = m.membership.meta.invitationEmail;
+  if (m.user && m.user.length > 0 && m.user[0].name) {
+    username = m.user[0].name;
+    userExists = true;
+    // eslint-disable-next-line prefer-destructuring
+    email = m.user[0].email;
+  }
+  return {
+    id: m.membership._id,
+    name: username,
+    userExists,
+    email,
+  };
+};
+
 
 export default {
   props: [
     'instance',
     'group',
+    'aggregator',
+    'id',
   ],
   data() {
     return {
@@ -85,27 +119,30 @@ export default {
     testConnection() {
       this.$emit('testConnection', this.instance);
     },
+    async load() {
+      try {
+        console.log('farmos instance', this.instance);
+        const { data } = await api.get(`/groups/${this.group}?populate=true`);
+        this.entity = { ...this.entity, ...data };
+
+        const { data: members } = (await api.get(`/memberships?group=${this.entity._id}&populate=true`));
+        this.members = members.map(remapGroupMembership);
+
+        const { data: authorizedMembers } = await api.get(`/farmos/members-by-farm/?farmUrl=${this.instance.url}&group=${this.group}&aggregator=${this.aggregator}`);
+        this.activeUsers = authorizedMembers.map(remapFarmOSMembership);
+        console.log('members with access to farm', authorizedMembers);
+      } catch (e) {
+        console.log('something went wrong:', e);
+      }
+    },
   },
-  async mounted() {
-    try {
-      console.log('farmos instance', this.instance);
-      const { data } = await api.get(`/groups/${this.group}?populate=true`);
-      this.entity = { ...this.entity, ...data };
-
-      const { data: members } = (await api.get(`/memberships?group=${this.entity._id}&populate=true`));
-      members.forEach((m) => {
-        // eslint-disable-next-line no-param-reassign
-        m.text = m.user ? m.user.name : m.meta.invitationEmail;
-      });
-
-      this.members = members;
-
-      const { data: integrations } = await api.get(`/group-integrations?group=${this.group}`);
-      this.integrations = integrations;
-      console.log('members', members);
-    } catch (e) {
-      console.log('something went wrong:', e);
-    }
+  mounted() {
+    this.load();
+  },
+  watch: {
+    id() {
+      this.load();
+    },
   },
 };
 </script>

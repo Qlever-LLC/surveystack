@@ -82,6 +82,8 @@
             @testConnection="testConnection"
             :group="active.group"
             :instance="Object.assign({}, active.payload)"
+            :aggregator="active.aggregator"
+            :id="active.id"
           />
 
           <app-area
@@ -225,6 +227,7 @@ export default {
             id: `${item.id}:${f.farm_name}`,
             payload: f,
             group: item.payload.group,
+            aggregator: item.id,
             type: 'farm',
             children: [],
           }));
