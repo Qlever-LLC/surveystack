@@ -44,6 +44,20 @@ const getters = {
 
     return null;
   },
+  relevance: state => (path, fallback = true) => {
+    // checks the relevance of the current path and its parents
+    const splits = path.split('.');
+    while (splits.length > 1) {
+      const p = splits.join('.');
+      const relevant = surveyStackUtils.getNested(state.submission, `${p}.meta.relevant`, fallback);
+      if (!relevant) {
+        return false;
+      }
+      splits.splice(-1);
+    }
+
+    return fallback;
+  },
   overviews: (state) => {
     const overviews = [];
     state.root.walk((node) => {

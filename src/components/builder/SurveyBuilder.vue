@@ -183,17 +183,16 @@
         </div>
       </pane>
       <pane class="pane pane-draft">
-
-        <v-card class="mx-1 my-2">
-          <v-card-title>Preview</v-card-title>
-        </v-card>
-        <app-draft-component
-          @submit="payload => $emit('submit', payload)"
-          v-if="survey && instance"
-          :submission="instance"
-          :survey="survey"
-          :persist="false"
-        ></app-draft-component>
+        <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
+        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px);">
+          <app-draft-component
+            @submit="payload => $emit('submit', payload)"
+            v-if="survey && instance"
+            :submission="instance"
+            :survey="survey"
+            :persist="false"
+          ></app-draft-component>
+        </div>
         <v-overlay :value="enableSaveDraft">
           <v-card>
             <v-card-text>

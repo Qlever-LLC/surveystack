@@ -1,6 +1,9 @@
 <template>
   <div>
-    <v-card-title v-if="control.title">{{ control.title }}</v-card-title>
+    <v-card-title
+      class="px-0"
+      v-if="control.title"
+    >{{ control.title }}</v-card-title>
     <v-text-field
       outlined
       :label="control.label"
@@ -9,6 +12,7 @@
       @keyup.enter.prevent="submit"
       ref="textField"
       class="full-width"
+      :disabled="!relevant"
     />
     <p v-if="control.hint">{{ control.hint }}</p>
   </div>

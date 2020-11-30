@@ -30,6 +30,7 @@
 
     <div v-else>
       <component
+        :class="{irrelevant: !$store.getters['draft/relevance'](path)}"
         :is="getComponentName(control)"
         :control="control"
         :value="$store.getters['draft/property'](path).value"
@@ -43,7 +44,7 @@
         @setContext="setContext"
         @setRenderQueue="setRenderQueue"
         :autoFocus="autoFocus"
-        :relevant="$store.getters['draft/property'](`${path}.meta.relevant`, true)"
+        :relevant="$store.getters['draft/relevance'](path)"
         @next="$store.dispatch('draft/next')"
       />
 
@@ -110,3 +111,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.irrelevant {
+  opacity: 0.4;
+}
+</style>

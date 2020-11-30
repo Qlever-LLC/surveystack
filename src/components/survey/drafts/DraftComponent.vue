@@ -43,7 +43,7 @@
     </v-navigation-drawer>
 
     <!-- Content with questions -->
-    <div class="mt-6 draft-content">
+    <div class="draft-content">
       <app-control
         :path="path"
         :control="control"
@@ -149,36 +149,34 @@ export default {
   position: absolute;
   width: 100% !important;
   z-index: 4;
-  height: calc(100% - 68px);
-  max-height: calc(100% - 68px);
+  height: calc(100% - 64px); /* 64 (header) + 64 (footer) */
+  max-height: calc(100% - 64px);
   overflow: auto;
+  top: 68px;
 }
 
 .draft-component-wrapper {
   height: 100%;
+  overflow: auto;
   display: flex;
   flex-direction: column;
-  padding-top: 0px;
+  padding: 0px !important;
 }
 
 .draft-content {
   flex: 1;
   overflow: auto;
+  padding: 0px 8px;
 }
 
 .footer-container {
   z-index: 1;
-  /* background-color: white; */
   width: 100%;
   border-top: 1px solid #eee;
-  height: 68px;
+  height: 64px;
   overflow: hidden;
   position: fixed;
-  /* bottom: 0px; */
-  top: calc(100% - 68px);
-  /* top: 80%; */
-  /* top: calc(100vh - 68px); */
-  /* top: 0vh; */
+  bottom: 0px;
   left: 0px;
 }
 </style>

@@ -1,10 +1,9 @@
 <template>
   <div class="mt-4">
-    <p
+    <v-card-title
+      class="px-0"
       v-if="control.title"
-      class="mb-2"
-      :class="{'text--secondary': !relevant}"
-    >{{ control.title }}</p>
+    >{{ control.title }}</v-card-title>
     <v-text-field
       outlined
       type="number"
