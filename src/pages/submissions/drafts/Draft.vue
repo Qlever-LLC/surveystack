@@ -1,6 +1,6 @@
 
 <template>
-  <div style="height: calc(100vh - 128px); max-height: calc(100vh - 128px);">
+  <div style="height: 100%; max-height: 100%;">
     <app-draft-component
       v-if="!loading && !hasError"
       :survey="survey"

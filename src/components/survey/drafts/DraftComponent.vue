@@ -156,29 +156,26 @@ export default {
 
 .draft-overview {
   flex: 1;
-  overflow: auto;
   width: 100% !important;
   display: flex;
   flex-direction: column;
+  margin-bottom: 68px;
 }
 
 .draft-content {
-  flex: 1;
-  overflow: auto;
+  flex: 1 0 auto;
   padding: 0px 8px;
   width: 100%;
-  /*max-width: 60rem;*/
   margin: 0rem auto;
   display: flex;
   flex-direction: column;
+  margin-bottom: 68px;
 }
 
 .draft-footer {
   z-index: 3;
+  height: 68px;
   width: 100%;
-  border-top: 1px solid #eee;
-  height: 64px;
-  overflow: hidden;
   position: fixed;
   bottom: 0px;
   left: 0px;
