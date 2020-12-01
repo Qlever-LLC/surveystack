@@ -1,5 +1,5 @@
 <template>
-  <v-container style="min-height: 600px">
+  <v-container>
     <div class="d-flex justify-end">
       <v-btn
         class="my-2"

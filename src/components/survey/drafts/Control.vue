@@ -20,7 +20,7 @@
         :class="{irrelevant: !$store.getters['draft/relevance'](path)}"
       >
         <div class="d-flex justify-end">
-          <h3 class="mr-auto">{{control.label}}</h3>
+          <span class="title mr-auto">{{control.label}}</span>
           <app-indicator
             :icon="'mdi-pencil-off'"
             v-if="!$store.getters['draft/relevance'](path)"
@@ -151,19 +151,24 @@ export default {
 
 <style scoped>
 .control {
-  border: 1px solid var(--v-primary-base);
-  padding: 1rem;
-  border-radius: 0.25rem;
+  border: 2px solid var(--v-primary-lighten2);
+  padding: 0.5rem;
+  border-radius: 4px;
 }
 
 .group {
-  border: 1px solid var(--v-primary-base);
-  padding: 1rem;
-  border-radius: 0.25rem;
+  border: 2px solid var(--v-primary-base);
+  padding: 0.5rem;
+  border-radius: 4px;
 }
 
 .irrelevant {
   opacity: 0.8;
-  border: 1px solid #aaa;
+  border-color: #aaa;
+  border-style: dotted;
+}
+
+.title {
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
 }
 </style>

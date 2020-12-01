@@ -149,7 +149,7 @@ export default {
 .navigation-container {
   position: absolute;
   width: 100% !important;
-  z-index: 4;
+  z-index: 2;
   height: calc(100% - 64px); /* 64 (header) + 64 (footer) */
   max-height: calc(100% - 64px);
   overflow: auto;
@@ -176,7 +176,7 @@ export default {
 }
 
 .footer-container {
-  z-index: 1;
+  z-index: 3;
   width: 100%;
   border-top: 1px solid #eee;
   height: 64px;
