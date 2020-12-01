@@ -1,13 +1,5 @@
 <template>
   <v-container>
-    <div class="d-flex justify-end">
-      <v-btn
-        class="my-2"
-        @click="$store.dispatch('draft/showOverview', false)"
-      >
-        <v-icon left>mdi-close</v-icon>Close
-      </v-btn>
-    </div>
     <v-banner
       class="my-2"
       v-if="$store.getters['draft/errors']"

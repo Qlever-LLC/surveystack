@@ -23,29 +23,29 @@
       @showOverviewClicked="showOverview = !showOverview"
     />
 
-    <!-- Navigation drawer with overview -->
-    <v-navigation-drawer
+    <!-- Overview -->
+    <div
       v-if="showOverview"
-      v-model="showOverview"
-      clipped
-      right
-      touchless
-      stateless
-      class="grey lighten-4 navigation-container"
+      class="grey lighten-4 draft-overview"
     >
       <app-draft-overview
+        v-if="showOverview"
         :survey="survey"
         :submission="submission"
         :groupPath="groupPath"
         :overviews="$store.getters['draft/overviews']"
         @goto="goto"
+        class="maxw-60 mx-auto"
       />
-    </v-navigation-drawer>
+    </div>
 
     <!-- Content with questions -->
-    <div class="draft-content">
+    <div
+      class="draft-content"
+      v-else
+    >
       <app-control
-        class="my-auto"
+        class="my-auto maxw-60 mx-auto"
         :path="path"
         :control="control"
       />
@@ -53,7 +53,7 @@
 
     <!-- Footer with next/prev buttons -->
     <app-draft-footer
-      class="px-4 grey lighten-5 footer-container"
+      class="draft-footer px-4 grey lighten-5"
       :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
       :enableNext="!(control.options.required && $store.getters['draft/property'](`${path}.value`) === null)"
       :enableSubmit="!$store.getters['draft/errors']"
@@ -146,16 +146,6 @@ export default {
 </script>
 
 <style scoped>
-.navigation-container {
-  position: absolute;
-  width: 100% !important;
-  z-index: 2;
-  height: calc(100% - 64px); /* 64 (header) + 64 (footer) */
-  max-height: calc(100% - 64px);
-  overflow: auto;
-  top: 68px;
-}
-
 .draft-component-wrapper {
   height: 100%;
   overflow: auto;
@@ -164,18 +154,26 @@ export default {
   padding: 0px !important;
 }
 
+.draft-overview {
+  flex: 1;
+  overflow: auto;
+  width: 100% !important;
+  display: flex;
+  flex-direction: column;
+}
+
 .draft-content {
   flex: 1;
   overflow: auto;
   padding: 0px 8px;
   width: 100%;
-  max-width: 60rem;
+  /*max-width: 60rem;*/
   margin: 0rem auto;
   display: flex;
   flex-direction: column;
 }
 
-.footer-container {
+.draft-footer {
   z-index: 3;
   width: 100%;
   border-top: 1px solid #eee;
