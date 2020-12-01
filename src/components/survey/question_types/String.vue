@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mt-4">
     <v-card-title
       class="px-0"
       v-if="control.title"

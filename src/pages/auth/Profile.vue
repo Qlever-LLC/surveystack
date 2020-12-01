@@ -1,7 +1,7 @@
 <template>
   <v-container
     v-if="isLoggedIn"
-    class="mw-40"
+    class="maxw-40"
   >
     <app-feedback
       title="Shapeshift:"

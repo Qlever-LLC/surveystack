@@ -1,5 +1,5 @@
 <template>
-  <v-container class="mx-0 px-0">
+  <v-container class="mx-0 px-0 my-2">
     <div v-if="control.type === 'page' && !insidePage">
       <div
         v-for="(child, i) in control.children"
@@ -16,37 +16,70 @@
 
     <div v-else-if="control.type === 'group' && insidePage">
       <div
-        v-for="(child, i) in control.children"
-        :key="i"
+        class="group"
+        :class="{irrelevant: !$store.getters['draft/relevance'](path)}"
       >
-        <app-control
-          :path="`${path}.${child.name}`"
-          :control="child"
-          :autoFocus="autoFocus && i===0"
-          insidePage
-        />
+        <div class="d-flex justify-end">
+          <h3 class="mr-auto">{{control.label}}</h3>
+          <app-indicator
+            :icon="'mdi-pencil-off'"
+            v-if="!$store.getters['draft/relevance'](path)"
+          >irrelevant</app-indicator>
+          <app-indicator
+            :icon="'mdi-asterisk'"
+            v-if="control.options && control.options.required"
+            color="red darken-2"
+          >required</app-indicator>
+        </div>
+
+        <div
+          v-for="(child, i) in control.children"
+          :key="i"
+        >
+          <app-control
+            :path="`${path}.${child.name}`"
+            :control="child"
+            :autoFocus="autoFocus && i===0"
+            insidePage
+          />
+        </div>
       </div>
     </div>
 
     <div v-else>
-      <component
+      <div
+        class="control"
         :class="{irrelevant: !$store.getters['draft/relevance'](path)}"
-        :is="getComponentName(control)"
-        :control="control"
-        :value="$store.getters['draft/property'](path).value"
-        :index="path"
-        :key="path"
-        :resources="survey.resources"
-        @changed="setProperty"
-        :meta="meta"
-        :submission="submission"
-        @setStatus="setStatus"
-        @setContext="setContext"
-        @setRenderQueue="setRenderQueue"
-        :autoFocus="autoFocus"
-        :relevant="$store.getters['draft/relevance'](path)"
-        @next="$store.dispatch('draft/next')"
-      />
+      >
+        <div class="d-flex justify-end">
+          <app-indicator
+            :icon="'mdi-pencil-off'"
+            v-if="!$store.getters['draft/relevance'](path)"
+          >irrelevant</app-indicator>
+          <app-indicator
+            :icon="'mdi-asterisk'"
+            v-if="control.options && control.options.required"
+            color="red darken-2"
+          >required</app-indicator>
+        </div>
+        <component
+          :is="getComponentName(control)"
+          :control="control"
+          :value="$store.getters['draft/property'](path).value"
+          :index="path"
+          :key="path"
+          :resources="survey.resources"
+          @changed="setProperty"
+          :meta="meta"
+          :submission="submission"
+          @setStatus="setStatus"
+          @setContext="setContext"
+          @setRenderQueue="setRenderQueue"
+          :autoFocus="autoFocus"
+          :relevant="$store.getters['draft/relevance'](path)"
+          @next="$store.dispatch('draft/next')"
+        />
+      </div>
 
     </div>
 
@@ -55,9 +88,13 @@
 
 <script>
 import moment from 'moment';
+import appIndicator from '@/components/survey/drafts/Indicator.vue';
 
 export default {
   name: 'app-control',
+  components: {
+    appIndicator,
+  },
   props: {
     path: {
       type: String,
@@ -113,7 +150,20 @@ export default {
 </script>
 
 <style scoped>
+.control {
+  border: 1px solid var(--v-primary-base);
+  padding: 1rem;
+  border-radius: 0.25rem;
+}
+
+.group {
+  border: 1px solid var(--v-primary-base);
+  padding: 1rem;
+  border-radius: 0.25rem;
+}
+
 .irrelevant {
-  opacity: 0.4;
+  opacity: 0.8;
+  border: 1px solid #aaa;
 }
 </style>

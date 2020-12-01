@@ -1,5 +1,5 @@
 <template>
-  <v-container
+  <div
     class="draft-component-wrapper"
     v-if="control"
   >
@@ -45,6 +45,7 @@
     <!-- Content with questions -->
     <div class="draft-content">
       <app-control
+        class="my-auto"
         :path="path"
         :control="control"
       />
@@ -63,7 +64,7 @@
       @submit="showConfirmSubmission = true"
     />
 
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -167,6 +168,11 @@ export default {
   flex: 1;
   overflow: auto;
   padding: 0px 8px;
+  width: 100%;
+  max-width: 60rem;
+  margin: 0rem auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .footer-container {
