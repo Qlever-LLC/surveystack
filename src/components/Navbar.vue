@@ -4,6 +4,7 @@
       app
       clipped-left
       color="appbar"
+      absolute
     >
       <!-- color="white" -->
       <v-app-bar-nav-icon @click="drawer = !drawer" />
@@ -32,9 +33,17 @@
     <v-navigation-drawer
       v-model="drawer"
       app
-      clipped
     >
-      <v-list>
+      <div class="d-flex justify-end mt-3 mr-3">
+        <v-btn
+          large
+          icon
+          @click="drawer = !drawer"
+        >
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </div>
+      <v-list class="mt-0 pt-0">
         <template v-for="(item, i) in items">
           <v-divider
             v-if="item.type === 'divider'"
@@ -89,7 +98,10 @@
           class="my-1"
         />
 
-        <v-list-item href="https://docs.surveystack.io/" target="_blank">
+        <v-list-item
+          href="https://docs.surveystack.io/"
+          target="_blank"
+        >
           <v-list-item-icon>
             <v-icon>mdi-notebook-multiple</v-icon>
           </v-list-item-icon>
