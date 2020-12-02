@@ -73,7 +73,11 @@
               Survey Resources
             </v-card-title>
             <v-card-text>
-              <app-resources v-model="value" />
+
+              <app-resources
+                :resources="survey.resources"
+                @set-survey-resources="(val) => $emit('set-survey-resources', val)"
+              />
             </v-card-text>
             <v-card-actions class="mr-3">
               <v-spacer />
@@ -335,6 +339,7 @@ export default {
     }
   },
   props: [
+    'survey',
     'value',
     'isNew',
     'dirty',

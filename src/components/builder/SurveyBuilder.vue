@@ -32,6 +32,7 @@
             :version="version"
             :draft="isDraft"
             v-model="survey"
+            :survey="survey"
             :isNew="!editMode"
             :dirty="dirty"
             :enableUpdate="enableUpdate"
@@ -47,6 +48,7 @@
             @publish="publish"
             @export-survey="$emit('export-survey')"
             @import-survey="(file) => $emit('import-survey', file)"
+            @set-survey-resources="setSurveyResources"
             class="mb-4"
           />
           <graphical-view

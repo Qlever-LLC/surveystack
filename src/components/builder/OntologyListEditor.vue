@@ -1,22 +1,44 @@
 <template>
-  <v-card min-height="70vh" class="d-flex flex-column">
+  <v-card
+    min-height="70vh"
+    class="d-flex flex-column"
+  >
     <v-card-title class="d-block">
       <div class="d-flex justify-space-between align-center">
         <div class="grey--text text--darken-2">
           Dropdown List Editor
         </div>
+        <div class="d-flex align-center ml-auto mr-2">
+          <v-btn
+            color="primary"
+            style="margin-top: 1px;"
+            @click="addItem"
+          >
+            <v-icon left>mdi-plus</v-icon>Add Row
+          </v-btn>
+        </div>
         <div class="d-flex align-center">
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
-                <select-items-upload-button @change="handleFileChange" class="mt-4 mb-n2" />
+                <select-items-upload-button
+                  @change="handleFileChange"
+                  class="mt-4 mb-n2"
+                />
               </div>
             </template>
             CSV must have column headers 'label', 'value', and optionally 'tags'
           </v-tooltip>
-          <v-dialog v-model="deleteDialogIsVisible" max-width="290">
+          <v-dialog
+            v-model="deleteDialogIsVisible"
+            max-width="290"
+          >
             <template v-slot:activator="{ on }">
-              <v-btn icon v-on="on" class="ml-2">
+              <v-btn
+                icon
+                v-on="on"
+                class="ml-2"
+              >
                 <v-icon>mdi-delete</v-icon>
                 <!-- Delete List -->
               </v-btn>
@@ -28,8 +50,15 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer />
-                <v-btn text color="red" @click="deleteResult">Delete</v-btn>
-                <v-btn text @click="closeDeleteDialog">Cancel</v-btn>
+                <v-btn
+                  text
+                  color="red"
+                  @click="deleteResult"
+                >Delete</v-btn>
+                <v-btn
+                  text
+                  @click="closeDeleteDialog"
+                >Cancel</v-btn>
 
               </v-card-actions>
             </v-card>
@@ -48,8 +77,7 @@
           @input="handleUpdateLabel"
           label="List Label"
           persistent-hint
-          class="display-1 flex-shrink-1"
-          style="max-width: 12em;"
+          class="mx-2"
         />
         <!-- TODO: validate unique data name -->
         <v-text-field
@@ -57,26 +85,28 @@
           @input="handleUpdateName"
           label="List Data Name"
           persistent-hint
-          class="flex-shrink-1 ml-4"
-          style="max-width: 12em;"
+          class="mx-2"
           :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
         />
-        <v-spacer />
+
         <v-text-field
-            v-model="search"
-            append-icon="mdi-magnify"
-            label="Search"
-            single-line
-            hide-details
-          />
-        <v-spacer />
+          v-model="search"
+          append-icon="mdi-magnify"
+          class="mx-4"
+          label="Search"
+        />
         <div>
 
-          <v-btn icon @click="deleteSelectedItems" :disabled="!selectedItems.length">
+          <v-btn
+            icon
+            @click="deleteSelectedItems"
+            :disabled="!selectedItems.length"
+          >
             <v-icon>mdi-delete</v-icon>
           </v-btn>
         </div>
       </div>
+
       <v-data-table
         :headers="tableHeaders"
         :items="resource.content"
@@ -94,9 +124,18 @@
         <template v-slot:item.actions="{ item }">
           <div class="d-flex">
             <v-icon @click="moveItemUp(item)">mdi-arrow-up</v-icon>
-            <v-icon class="ml-2" @click="moveItemDown(item)">mdi-arrow-down</v-icon>
-            <v-icon class="ml-2" @click="openItemEditDialog(item)">mdi-pencil</v-icon>
-            <v-icon class="ml-2" @click="deleteItem(item)">mdi-delete</v-icon>
+            <v-icon
+              class="ml-2"
+              @click="moveItemDown(item)"
+            >mdi-arrow-down</v-icon>
+            <v-icon
+              class="ml-2"
+              @click="openItemEditDialog(item)"
+            >mdi-pencil</v-icon>
+            <v-icon
+              class="ml-2"
+              @click="deleteItem(item)"
+            >mdi-delete</v-icon>
           </div>
         </template>
       </v-data-table>
@@ -104,20 +143,41 @@
     <v-spacer />
     <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
       <!-- <v-btn class="ml-4" @click="handleSave">Save</v-btn> -->
-      <v-btn text class="ml-4" @click="() => $emit('close-dialog')">Close</v-btn>
+      <v-btn
+        text
+        class="ml-4"
+        @click="() => $emit('close-dialog')"
+      >Close</v-btn>
     </v-card-actions>
 
-    <v-dialog v-model="editItemDialogIsVisible" @input="updateEditItem" max-width="350">
+    <v-dialog
+      v-model="editItemDialogIsVisible"
+      @input="updateEditItem"
+      max-width="350"
+    >
       <v-card>
         <v-card-title>Edit Item</v-card-title>
         <v-card-text>
-          <v-text-field v-model="editedItem.label" label="Label" />
-          <v-text-field v-model="editedItem.value" label="Value" />
-          <v-text-field v-model="editedItem.tags" label="Tags" />
+          <v-text-field
+            v-model="editedItem.label"
+            label="Label"
+          />
+          <v-text-field
+            v-model="editedItem.value"
+            label="Value"
+          />
+          <v-text-field
+            v-model="editedItem.tags"
+            label="Tags"
+          />
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text color="primary" @click="closeItemEditDialog">Ok</v-btn>
+          <v-btn
+            text
+            color="primary"
+            @click="closeItemEditDialog"
+          >Ok</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -126,7 +186,9 @@
 
 <script>
 import { uniqWith, isEqual } from 'lodash';
+import ObjectId from 'bson-objectid';
 import slugify from '@/utils/slugify';
+
 
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
 
@@ -183,12 +245,12 @@ export default {
   methods: {
     nameIsUnique(val) {
       return this.resourceNames.some(({ name, id }) => this.resource.name === name && this.resource.id !== id)
-        ? 'Name must be unique'
+        ? 'Name already exists'
         : true;
     },
     nameHasValidCharacters(val) {
       const namePattern = /^[\w]*$/;
-      return namePattern.test(val) ? true : 'Data name must only contain valid charcters';
+      return namePattern.test(val) ? true : 'Must only contain alphanumeric and underscores';
     },
     nameHasValidLength(val) {
       const namePattern = /^.{4,}$/; // one character should be ok, especially within groups
@@ -196,7 +258,7 @@ export default {
     },
     moveItemDown({ id }) {
       const index = this.resource.content.findIndex(item => item.id === id);
-      if (index > this.resource.content.length - 1) {
+      if (index < this.resource.content.length - 1) {
         const newItems = [...this.resource.content];
         const [item] = newItems.splice(index, 1);
         newItems.splice(index + 1, 0, item);
@@ -220,7 +282,7 @@ export default {
     },
     createEmptyItem() {
       return {
-        id: '',
+        id: new ObjectId().toString(),
         label: '',
         value: '',
         tags: '',
@@ -278,7 +340,6 @@ export default {
       this.$emit('close-dialog');
     },
     handleUpdateLabel(label) {
-      console.log('update label');
       this.$emit('change', {
         ...this.resource,
         label,
@@ -287,24 +348,30 @@ export default {
       });
     },
     handleUpdateName(name) {
-      console.log('update name', name);
       this.$emit('change', {
         ...this.resource,
         name,
       });
     },
     handleFileChange(data) {
-      // console.log('table editor file change', data);
       this.appendItems(data);
     },
     handleSave() {
       // this.$emit('close-dialog');
       // this.$emit('change', this.)
     },
+    addItem() {
+      this.$emit('change', {
+        ...this.resource,
+        content: [...this.resource.content, this.createEmptyItem()],
+      });
+    },
     deleteItem(item) {
-      const newItems = this.items.filter(x => x.label !== item.label && x.value !== item.value);
-      // console.log('delete item, new items:', newItems);
-      this.$emit('change', newItems);
+      const newItems = this.resource.content.filter(x => x.label !== item.label && x.value !== item.value);
+      this.$emit('change', {
+        ...this.resource,
+        content: newItems,
+      });
     },
     filterDuplicateItems(items) {
       return uniqWith(items, isEqual);
@@ -324,5 +391,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>
