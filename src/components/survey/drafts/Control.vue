@@ -22,10 +22,6 @@
         <div class="d-flex justify-end">
           <span class="title mr-auto">{{control.label}}</span>
           <app-indicator
-            :icon="'mdi-pencil-off'"
-            v-if="!$store.getters['draft/relevance'](path)"
-          >irrelevant</app-indicator>
-          <app-indicator
             :icon="'mdi-asterisk'"
             v-if="control.options && control.options.required"
             color="red darken-2"
@@ -52,10 +48,6 @@
         :class="{irrelevant: !$store.getters['draft/relevance'](path)}"
       >
         <div class="d-flex justify-end">
-          <app-indicator
-            :icon="'mdi-pencil-off'"
-            v-if="!$store.getters['draft/relevance'](path)"
-          >irrelevant</app-indicator>
           <app-indicator
             :icon="'mdi-asterisk'"
             v-if="control.options && control.options.required"
@@ -151,21 +143,39 @@ export default {
 
 <style scoped>
 .control {
-  border: 2px solid var(--v-primary-lighten2);
-  padding: 0.5rem;
-  border-radius: 4px;
+  padding: 1rem;
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  border-left: 4px solid #fff;
+  transition: 0.3s;
+}
+
+/* On mouse-over, add a deeper shadow */
+.control:hover {
+  box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2);
+  border-left: 4px solid var(--v-primary-base);
 }
 
 .group {
-  border: 2px solid var(--v-primary-base);
-  padding: 0.5rem;
-  border-radius: 4px;
+  padding: 1rem;
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  border-left: 4px solid #fff;
+  transition: 0.2s;
+}
+
+.group:hover {
+  box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2);
+  border-left: 4px solid var(--v-primary-base);
 }
 
 .irrelevant {
-  opacity: 0.8;
+  opacity: 0.5;
   border-color: #aaa;
-  border-style: dotted;
+  border-left: 4px solid #aaa;
+}
+
+.irrelevant:hover {
+  border-left: 4px solid #aaa;
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
 }
 
 .title {
