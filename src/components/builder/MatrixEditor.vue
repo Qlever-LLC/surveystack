@@ -1,236 +1,203 @@
 <template>
-  <v-card
-    min-height="70vh"
-    class="d-flex flex-column"
-  >
-    <v-card-title class="d-block">
-      <div class="d-flex justify-space-between align-center">
-        <div class="grey--text text--darken-2">
-          Matrix Editor
+  <div>
+    <v-dialog v-model="editorDialog">
+      <app-ontology-list-editor
+        :resources="resources"
+        :resource="ontology"
+        @change="setResource"
+        @delete="removeResource"
+        @close-dialog="editorDialog = false"
+      />
+    </v-dialog>
+
+    <v-card
+      min-height="70vh"
+      class="d-flex flex-column"
+    >
+      <v-card-title class="d-block">
+        <div class="d-flex justify-space-between align-center">
+          <div class="grey--text text--darken-2">
+            Matrix Editor
+          </div>
+          <div class="d-flex align-center ml-auto mr-2">
+            <v-btn
+              color="primary"
+              @click="addColumn"
+            >
+              <v-icon left>mdi-plus</v-icon>Add Column
+            </v-btn>
+          </div>
+          <div class="d-flex align-center">
+
+            <v-dialog
+              v-model="deleteDialogIsVisible"
+              max-width="290"
+            >
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  v-on="on"
+                  class="ml-2"
+                >
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
+              </template>
+              <v-card>
+                <v-card-title>Delete List</v-card-title>
+                <v-card-text>
+                  Are you sure you want to delete this list: <strong>{{ resource.label }}</strong>
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer />
+                  <v-btn
+                    text
+                    color="red"
+                    @click="deleteResult"
+                  >Delete</v-btn>
+                  <v-btn
+                    text
+                    @click="closeDeleteDialog"
+                  >Cancel</v-btn>
+
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </div>
+
         </div>
-        <div class="d-flex align-center">
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <div v-on="on">
-                <app-matrix-editor-upload-button
-                  @change="handleFileChange"
-                  class="mt-4 mb-n2"
-                />
-              </div>
-            </template>
-            CSV column headers may specify type with header|TYPE, where TYPE={{$options.MATRIX_COLUMN_TYPES.join(',')}}
-          </v-tooltip>
-          <v-dialog
-            v-model="deleteDialogIsVisible"
-            max-width="290"
+      </v-card-title>
+
+      <v-card-text class="pt-4">
+        <div class="d-flex flex-space-between align-center">
+          <!-- {{ resource.label }} -->
+          <v-text-field
+            :value="resource.label"
+            @input="handleUpdateLabel"
+            label="List Label"
+            persistent-hint
+            class="mx-2"
+          />
+          <!-- TODO: validate unique data name -->
+          <v-text-field
+            :value="resource.name"
+            @input="handleUpdateName"
+            label="List Data Name"
+            persistent-hint
+            class="mx-2"
+            :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
+          />
+
+        </div>
+        <div
+          v-for="(item,i) in resource.content"
+          :key="i"
+        >
+          <v-card
+            class="my-4"
+            style="border-left: 5px solid var(--v-primary-base)"
+            elevation="3"
           >
-            <template v-slot:activator="{ on }">
+            <v-card-title class="d-flex justify-space-between pb-0 mb-0">
+              Column
               <v-btn
                 icon
-                v-on="on"
-                class="ml-2"
+                @click="deleteColumn(i)"
+                tabindex="-1"
               >
                 <v-icon>mdi-delete</v-icon>
-                <!-- Delete List -->
               </v-btn>
-            </template>
-            <v-card>
-              <v-card-title>Delete List</v-card-title>
-              <v-card-text>
-                Are you sure you want to delete this list: <strong>{{ resource.label }}</strong>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer />
-                <v-btn
-                  text
-                  color="red"
-                  @click="deleteResult"
-                >Delete</v-btn>
-                <v-btn
-                  text
-                  @click="closeDeleteDialog"
-                >Cancel</v-btn>
-
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-        </div>
-
-      </div>
-      <v-divider />
-    </v-card-title>
-
-    <v-card-text class="pt-4">
-      <div class="d-flex flex-space-between align-center">
-        <v-text-field
-          :value="resource.label"
-          @input="handleUpdateLabel"
-          label="Label"
-          persistent-hint
-          class="display-1 flex-shrink-1"
-          style="max-width: 12em;"
-        />
-        <!-- TODO: validate unique data name -->
-        <v-text-field
-          :value="resource.name"
-          @input="handleUpdateName"
-          label="specifier"
-          persistent-hint
-          class="flex-shrink-1 ml-4"
-          style="max-width: 12em;"
-          :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
-        />
-        <v-spacer />
-        <v-text-field
-          v-model="search"
-          append-icon="mdi-magnify"
-          label="Search"
-          single-line
-        />
-        <v-spacer />
-        <div>
-          <v-btn
-            icon
-            @click="deleteSelectedItems"
-            :disabled="!selectedItems.length"
-          >
-            <v-icon>mdi-delete</v-icon>
-          </v-btn>
-        </div>
-      </div>
-      <v-data-table
-        :headers="headers"
-        :items="items"
-        show-select
-        v-model="selectedItems"
-        :search="search"
-        item-key="_row"
-        disable-sort
-        :mobile-breakpoint="0"
-      >
-
-        <template
-          v-for="h in headers.filter(header => !header.value.startsWith('_'))"
-          v-slot:[`header.${h.value}`]="{header}"
-        >
-          <span
-            :key="`header-value-${h.value}`"
-            class="mb-2"
-            style="color: #222; font-size: 1.1rem"
-          >{{header.text}}</span>
-          <v-select
-            v-model="header.type"
-            :items="$options.MATRIX_COLUMN_TYPES"
-            :key="`header-type-select-${h.value}`"
-            class="d-inline-flex mb-3"
-            label="type"
-            solo
-            dense
-            hide-details
-          />
-        </template>
-
-        <template v-slot:header._actions>
-          <h2>Actions</h2>
-        </template>
-
-        <template v-slot:item._actions="{ item }">
-          <div class="d-flex align-start">
-            <v-icon @click="moveItemUp(item)">mdi-arrow-up</v-icon>
-            <v-icon
-              class="ml-2"
-              @click="moveItemDown(item)"
-            >mdi-arrow-down</v-icon>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <v-simple-checkbox
-                  v-model="item._prefill"
+            </v-card-title>
+            <v-card-text>
+              <v-row dense>
+                <v-col>
+                  <v-text-field
+                    v-model="item.label"
+                    label="Label"
+                    dense
+                  />
+                </v-col>
+                <v-col>
+                  <v-text-field
+                    v-model="item.value"
+                    label="Value"
+                    dense
+                  />
+                </v-col>
+                <v-col>
+                  <v-select
+                    dense
+                    v-model="item.type"
+                    :items="$options.MATRIX_COLUMN_TYPES"
+                    label="Type"
+                  />
+                </v-col>
+              </v-row>
+              <div
+                v-if="item.type === 'dropdown' || item.type === 'autocomplete'"
+                class="d-flex"
+              >
+                <v-select
                   dense
-                  hide-details
-                  :ripple="false"
-                  class="ml-1"
-                  v-bind="attrs"
-                  v-on="on"
+                  v-model="item.resource"
+                  :items="resourceSelectItems"
+                  label="Resource"
                 />
-              </template>
-              <span>Prefill</span>
-            </v-tooltip>
+                <v-btn
+                  class="ml-3"
+                  @click="createOntology(i)"
+                  color="primary"
+                  outlined
+                >
+                  <v-icon left>mdi-plus</v-icon>New
+                </v-btn>
+                <v-btn
+                  class="ml-3"
+                  color="primary"
+                  outlined
+                  @click="openOntologyEditor(item.resource)"
+                  :disabled="!item.resource"
+                >
+                  <v-icon left>mdi-pencil</v-icon> Edit
+                </v-btn>
+              </div>
 
-            <v-icon
-              class="ml-2"
-              @click="openItemEditDialog(item)"
-            >mdi-pencil</v-icon>
-          </div>
-        </template>
+            </v-card-text>
+          </v-card>
 
-      </v-data-table>
-    </v-card-text>
-    <v-spacer />
-    <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
-      <!-- <v-btn class="ml-4" @click="handleSave">Save</v-btn> -->
-      <v-btn
-        text
-        class="ml-4"
-        @click="() => $emit('close-dialog')"
-      >Close</v-btn>
-    </v-card-actions>
-
-    <v-dialog
-      v-model="editItemDialogIsVisible"
-      max-width="350"
-    >
-      <v-card>
-        <v-card-title>Edit Item</v-card-title>
-        <v-card-text>
-          <div
-            v-for="header in headers"
-            :key="header.value"
-          >
-            <v-text-field
-              :value="editedItem[header.value]"
-              @input="v => {editedItem[header.value] = (header.type === 'number') ? Number(v) : v}"
-              :label="header.value"
-              v-if="!header.value.startsWith('_')"
-            />
-          </div>
-
-        </v-card-text>
-        <v-card-actions class="pa-4">
-          <v-btn
-            color="error"
-            @click="editItemDialogIsVisible = false; deleteItem(editedItem)"
-          >DELETE</v-btn>
-          <v-spacer />
-          <v-btn
-            color="primary"
-            @click="editItemDialogIsVisible = false; updateEditItem()"
-          >SAVE</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-card>
+        </div>
+      </v-card-text>
+      <v-spacer />
+      <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
+        <v-btn
+          text
+          class="ml-4"
+          @click="() => $emit('close-dialog')"
+        >Close</v-btn>
+      </v-card-actions>
+    </v-card>
+  </div>
 </template>
 
 <script>
-import { uniqWith, isEqual } from 'lodash';
-import slugify from '@/utils/slugify';
+import ObjectId from 'bson-objectid';
 
-import appMatrixEditorUploadButton from '@/components/builder/MatrixEditorUploadButton.vue';
+import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 
-const MATRIX_COLUMN_TYPES = ['text', 'number', 'date', 'dropdown', 'autocomplete'];
+
+const MATRIX_COLUMN_TYPES = [
+  { text: 'Ontology - Dropdown', value: 'dropdown' },
+  { text: 'Ontology - Auto Complete', value: 'autocomplete' },
+  { text: 'Text', value: 'text' },
+  { text: 'Number', value: 'number' },
+  { text: 'Date', value: 'date' },
+];
 
 export default {
   props: {
     resource: {
       type: Object,
       required: true,
-      default: () => ({
-        content: {
-          headers: [],
-          fields: [],
-          data: [],
-        },
-      }),
+      default: () => ({ content: [] }),
     },
     resources: {
       type: Array,
@@ -239,16 +206,34 @@ export default {
     },
   },
   components: {
-    appMatrixEditorUploadButton,
+    appOntologyListEditor,
   },
   data() {
     return {
-      editedItem: this.createEmptyItem(),
-      search: '',
       deleteDialogIsVisible: false,
-      selectedItems: [],
-      editItemDialogIsVisible: false,
+      editorDialog: false,
+      editOntologyId: null,
       tableHeaders: [
+        {
+          text: 'Label',
+          value: 'label',
+        },
+        {
+          text: 'Value',
+          value: 'value',
+        },
+        {
+          text: 'Type',
+          value: 'type',
+        },
+        {
+          text: 'Resource',
+          value: 'resource',
+        },
+        {
+          text: 'Tags',
+          value: 'tags',
+        },
         {
           text: 'Actions',
           value: 'actions',
@@ -261,106 +246,101 @@ export default {
     resourceNames() {
       return this.resources.map(({ name, id }) => ({ name, id }));
     },
-    items() {
-      return this.resource.content.data;
+    resourceSelectItems() {
+      return this.resources.filter(resource => resource.type === 'ONTOLOGY_LIST').map(resource => ({ text: resource.label, value: resource.id }));
     },
-    headers() {
-      return [...this.resource.content.headers, {
-        text: 'actions',
-        value: '_actions',
-        width: 1,
-      }];
+    ontology() {
+      return this.resources.find(resource => resource.id === this.editOntologyId);
     },
   },
   methods: {
+    removeResource(id) {
+      const index = this.resources.findIndex(r => r.id === id);
+      const newResources = [
+        ...this.resources.slice(0, index),
+        ...this.resources.slice(index + 1),
+      ];
+      this.$emit('set-survey-resources', newResources);
+    },
+    setResource(resource) {
+      const index = this.resources.findIndex(r => r.id === resource.id);
+      const newResources = [
+        ...this.resources.slice(0, index),
+        resource,
+        ...this.resources.slice(index + 1),
+      ];
+      this.$emit('set-survey-resources', newResources);
+    },
+    createOntology(column) {
+      const id = new ObjectId().toString();
+      this.resource.content[column].resource = id;
+      this.$emit('set-survey-resources', [...this.resources, {
+        label: `Ontology List ${this.resources.length + 1}`,
+        name: `ontology_list_${this.resources.length + 1}`,
+        id,
+        type: 'ONTOLOGY_LIST',
+        location: 'EMBEDDED',
+        content: [],
+      }]);
+      this.openOntologyEditor(id);
+    },
+    openOntologyEditor(id) {
+      this.editOntologyId = id;
+      this.editorDialog = true;
+    },
     nameIsUnique(val) {
-      return this.resourceNames.some(({ name, id }) => val === name && this.resource.id !== id)
-        ? 'Name must be unique'
+      return this.resourceNames.some(({ name, id }) => this.resource.name === name && this.resource.id !== id)
+        ? 'Name already exists'
         : true;
     },
     nameHasValidCharacters(val) {
       const namePattern = /^[\w]*$/;
-      return namePattern.test(val) ? true : 'Data name must only contain valid charcters';
+      return namePattern.test(val) ? true : 'Must only contain alphanumeric and underscores';
     },
     nameHasValidLength(val) {
       const namePattern = /^.{4,}$/; // one character should be ok, especially within groups
       return namePattern.test(val) ? true : 'Data name must be at least 4 character in length';
     },
-    moveItemDown({ _row }) {
-      const index = this.resource.content.data.findIndex(item => item._row === _row);
-      if (index < this.resource.content.data.length - 1) {
-        const newItems = [...this.resource.content.data];
+    moveItemDown({ id }) {
+      const index = this.resource.content.findIndex(item => item.id === id);
+      if (index < this.resource.content.length - 1) {
+        const newItems = [...this.resource.content];
         const [item] = newItems.splice(index, 1);
         newItems.splice(index + 1, 0, item);
         this.$emit('change', {
           ...this.resource,
-          content: {
-            ...this.resource.content,
-            data: newItems,
-          },
+          content: newItems,
         });
       }
     },
-    moveItemUp({ _row }) {
-      const index = this.resource.content.data.findIndex(item => item._row === _row);
+    moveItemUp({ id }) {
+      const index = this.resource.content.findIndex(item => item.id === id);
       if (index > 0) {
-        const newItems = [...this.resource.content.data];
+        const newItems = [...this.resource.content];
         const [item] = newItems.splice(index, 1);
         newItems.splice(index - 1, 0, item);
         this.$emit('change', {
           ...this.resource,
-          content: {
-            ...this.resource.content,
-            data: newItems,
-          },
+          content: newItems,
         });
       }
     },
-    createEmptyItem() {
+    createEmptyColumn() {
       return {
-        id: '',
+        id: new ObjectId().toString(),
         label: '',
         value: '',
+        type: '',
+        resource: '',
         tags: '',
       };
     },
-    deleteSelectedItems() {
-      const isNotSelectedItem = item => !this.selectedItems.some(s => s._row === item._row);
-      const newItems = this.resource.content.data.filter(isNotSelectedItem);
-      this.selectedItems = [];
+    deleteColumn(index) {
+      this.resource.content.splice(index, 1);
       this.$emit('change', {
         ...this.resource,
-        content: {
-          ...this.resource.content,
-          data: newItems,
-        },
+        content: this.resource.content,
       });
-    },
-    openItemEditDialog(item) {
-      this.editItemDialogIsVisible = true;
-      this.editedItem = { ...item };
-    },
-    handleEditDialogInput(val) {
-      if (!val) {
-        this.updateEditItem();
-      }
-    },
-    updateEditItem() {
-      const index = this.resource.content.data.findIndex(item => item._row === this.editedItem._row);
-      if (index > -1) {
-        const newItems = [
-          ...this.resource.content.data.slice(0, index),
-          this.editedItem,
-          ...this.resource.content.data.slice(index + 1),
-        ];
-        this.$emit('change', {
-          ...this.resource,
-          content: {
-            ...this.resource.content,
-            data: newItems,
-          },
-        });
-      }
     },
     openDeleteDialog() {
       this.deleteDialogIsVisible = true;
@@ -374,7 +354,6 @@ export default {
       this.$emit('close-dialog');
     },
     handleUpdateLabel(label) {
-      console.log('update label');
       this.$emit('change', {
         ...this.resource,
         label,
@@ -383,33 +362,15 @@ export default {
       });
     },
     handleUpdateName(name) {
-      console.log('update name', name);
       this.$emit('change', {
         ...this.resource,
         name,
       });
     },
-    handleFileChange(data) {
-      this.setContent(data);
-    },
-    handleSave() {
-      // this.$emit('close-dialog');
-      // this.$emit('change', this.)
-    },
-    deleteItem({ _row }) {
-      const newItems = this.resource.content.data.filter(x => x._row !== _row);
+    addColumn() {
       this.$emit('change', {
         ...this.resource,
-        content: {
-          ...this.resource.content,
-          data: newItems,
-        },
-      });
-    },
-    setContent(content) {
-      this.$emit('change', {
-        ...this.resource,
-        content,
+        content: [...this.resource.content, this.createEmptyColumn()],
       });
     },
   },
@@ -418,8 +379,4 @@ export default {
 </script>
 
 <style scoped>
->>> .theme--light.v-select .v-select__selection--comma {
-  color: #555;
-  font-size: 0.75rem;
-}
 </style>

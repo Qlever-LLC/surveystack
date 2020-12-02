@@ -27,11 +27,12 @@
     </div>
     <v-dialog v-model="tableDialogIsVisible">
       <app-matrix-editor
-        :resources="filteredResources"
+        :resources="resources"
         :resource="resource"
         @change="setResource"
         @delete="removeResource"
         @close-dialog="closeTableDialog"
+        @set-survey-resources="(val) => $emit('set-survey-resources', val)"
       />
     </v-dialog>
   </div>
@@ -85,11 +86,7 @@ export default {
         id,
         type: 'MATRIX',
         location: 'EMBEDDED',
-        content: {
-          fields: [],
-          headers: [],
-          data: [],
-        },
+        content: [],
       }]);
       this.$emit('set-control-source', id);
       this.openTableDialog();
