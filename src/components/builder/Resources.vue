@@ -21,6 +21,7 @@
       :items="availableFilters"
       v-model="filter"
       label="Filter"
+      disabled
     />
     <v-text-field
       v-model="search"
@@ -69,7 +70,7 @@ export default {
   data() {
     return {
       search: '',
-      filter: false,
+      filter: 'ONTOLOGY_LIST',
       availableFilters: [{ text: 'All', value: false }, { text: 'Ontology List', value: 'ONTOLOGY_LIST' }, { text: 'Matrix', value: 'MATRIX' }],
       editorDialog: false,
       selectedId: null,
