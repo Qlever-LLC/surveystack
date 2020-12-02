@@ -859,7 +859,7 @@ export default {
 .pane-survey,
 .pane-controls {
   overflow: auto;
-  width: 420px !important;
+  width: 500px !important;
 }
 
 .pane-submission-code,

@@ -1,11 +1,8 @@
 <template>
   <v-card>
     <v-card-title class="d-block pb-0">
-      <div class="d-flex justify-space-between">
-        <survey-name-editor
-          style="max-width: 81%;"
-          v-model="value.name"
-        />
+      <div class="d-flex">
+        <survey-name-editor v-model="value.name" />
         <v-spacer />
         <v-dialog
           v-model="editDetailsDialogIsVisible"
@@ -50,6 +47,38 @@
               <v-spacer />
               <v-btn
                 @click="editDetailsDialogIsVisible = false"
+                color="primary"
+                text
+              >
+                Close
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-dialog
+          v-model="resourcesDialogIsVisible"
+          width="800"
+          max-width="80%"
+        >
+          <template v-slot:activator="{ on }">
+            <v-btn
+              icon
+              v-on="on"
+            >
+              <v-icon>mdi-dresser</v-icon>
+            </v-btn>
+          </template>
+          <v-card>
+            <v-card-title>
+              Survey Resources
+            </v-card-title>
+            <v-card-text>
+              <app-resources v-model="value" />
+            </v-card-text>
+            <v-card-actions class="mr-3">
+              <v-spacer />
+              <v-btn
+                @click="resourcesDialogIsVisible = false"
                 color="primary"
                 text
               >
@@ -284,6 +313,7 @@
 <script>
 import SurveyNameEditor from '@/components/builder/SurveyNameEditor.vue';
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
+import appResources from '@/components/builder/Resources.vue';
 import api from '@/services/api.service';
 
 const availableSubmissions = [{ value: 'public', text: 'Everyone' }, { value: 'user', text: 'Logged in users' }, { value: 'group', text: 'Group members' }];
@@ -291,6 +321,7 @@ const availableSubmissions = [{ value: 'public', text: 'Everyone' }, { value: 'u
 export default {
   data() {
     return {
+      resourcesDialogIsVisible: false,
       editDetailsDialogIsVisible: false,
       surveyGroupName: 'Group Not Found',
       availableSubmissions,
@@ -346,6 +377,7 @@ export default {
   components: {
     SurveyNameEditor,
     ActiveGroupSelector,
+    appResources,
   },
   methods: {
     async getGroupNameById(id) {
