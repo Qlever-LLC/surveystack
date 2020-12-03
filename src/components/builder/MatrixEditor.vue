@@ -69,7 +69,6 @@
 
       <v-card-text class="pt-4">
         <div class="d-flex flex-space-between align-center">
-          <!-- {{ resource.label }} -->
           <v-text-field
             :value="resource.label"
             @input="handleUpdateLabel"
@@ -77,7 +76,6 @@
             persistent-hint
             class="mx-2"
           />
-          <!-- TODO: validate unique data name -->
           <v-text-field
             :value="resource.name"
             @input="handleUpdateName"
@@ -125,27 +123,23 @@
               </v-btn>
             </div>
             <v-card-text>
-
               <v-text-field
                 v-model="item.label"
                 label="Label"
                 style="font-size: 1.3rem"
                 dense
               />
-
               <v-text-field
                 v-model="item.value"
                 label="Value"
                 dense
               />
-
               <v-select
                 dense
                 v-model="item.type"
                 :items="$options.MATRIX_COLUMN_TYPES"
                 label="Type"
               />
-
               <div
                 v-if="item.type === 'dropdown' || item.type === 'autocomplete'"
                 class="d-flex flex-column"
@@ -182,12 +176,19 @@
                   hide-details
                   dense
                 />
-
               </div>
-
             </v-card-text>
           </v-card>
-
+          <v-btn
+            @click="addColumn"
+            class="align-self-center mx-4"
+            fab
+            dark
+            small
+            color="primary"
+          >
+            <v-icon dark>mdi-plus</v-icon>
+          </v-btn>
         </div>
       </v-card-text>
       <v-spacer />
@@ -237,33 +238,6 @@ export default {
       deleteDialogIsVisible: false,
       editorDialog: false,
       editOntologyId: null,
-      tableHeaders: [
-        {
-          text: 'Label',
-          value: 'label',
-        },
-        {
-          text: 'Value',
-          value: 'value',
-        },
-        {
-          text: 'Type',
-          value: 'type',
-        },
-        {
-          text: 'Resource',
-          value: 'resource',
-        },
-        {
-          text: 'Tags',
-          value: 'tags',
-        },
-        {
-          text: 'Actions',
-          value: 'actions',
-          width: 1,
-        },
-      ],
     };
   },
   computed: {
