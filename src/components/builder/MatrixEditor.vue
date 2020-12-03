@@ -101,6 +101,7 @@
               <v-btn
                 icon
                 small
+                @click="moveItemUp(item)"
               >
                 <v-icon>mdi-arrow-left</v-icon>
               </v-btn>
@@ -108,6 +109,7 @@
                 icon
                 class="ml-1"
                 small
+                @click="moveItemDown(item)"
               >
                 <v-icon>mdi-arrow-right</v-icon>
               </v-btn>

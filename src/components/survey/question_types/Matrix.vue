@@ -111,12 +111,14 @@
                 <v-btn
                   icon
                   @click="rowToBeDeleted = idx"
+                  tabindex="-1"
                 >
                   <v-icon>mdi-trash-can-outline</v-icon>
                 </v-btn>
                 <v-btn
                   icon
                   @click="duplicateRow(idx)"
+                  tabindex="-1"
                 >
                   <v-icon>mdi-content-copy</v-icon>
                 </v-btn>
