@@ -6,13 +6,13 @@
     <v-card-title class="d-block">
       <div class="d-flex justify-space-between align-center">
         <div class="grey--text text--darken-2">
-          Dropdown List Editor
+          Ontology List Editor
         </div>
         <div class="d-flex align-center ml-auto mr-2">
           <v-btn
             color="primary"
-            style="margin-top: 1px;"
-            @click="addItem"
+            style="margin-top: 2px;"
+            @click="editedItem = createEmptyItem(); editItemDialogIsVisible = true"
           >
             <v-icon left>mdi-plus</v-icon>Add Row
           </v-btn>
@@ -114,13 +114,9 @@
         v-model="selectedItems"
         :search="search"
         item-key="id"
+        disable-sort
+        :footer-props="{'items-per-page-options':[10, 20, 50, 100, -1]}"
       >
-        <!-- <template v-slot:top>
-          <v-toolbar flat color="white">
-            <v-toolbar-title>Edit Select Options</v-toolbar-title>
-
-          </v-toolbar>
-        </template> -->
         <template v-slot:item.actions="{ item }">
           <div class="d-flex">
             <v-icon @click="moveItemUp(item)">mdi-arrow-up</v-icon>
@@ -135,14 +131,13 @@
             <v-icon
               class="ml-2"
               @click="deleteItem(item)"
-            >mdi-delete</v-icon>
+            >mdi-trash-can-outline</v-icon>
           </div>
         </template>
       </v-data-table>
     </v-card-text>
     <v-spacer />
     <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
-      <!-- <v-btn class="ml-4" @click="handleSave">Save</v-btn> -->
       <v-btn
         text
         class="ml-4"
@@ -152,7 +147,6 @@
 
     <v-dialog
       v-model="editItemDialogIsVisible"
-      @input="updateEditItem"
       max-width="350"
     >
       <v-card>
@@ -175,9 +169,13 @@
           <v-spacer />
           <v-btn
             text
+            @click="editItemDialogIsVisible = false"
+          >Cancel</v-btn>
+          <v-btn
+            text
             color="primary"
-            @click="closeItemEditDialog"
-          >Ok</v-btn>
+            @click="saveItem"
+          >Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -214,7 +212,6 @@ export default {
       search: '',
       deleteDialogIsVisible: false,
       selectedItems: [],
-      editItemId: null,
       editItemDialogIsVisible: false,
       tableHeaders: [
         {
@@ -299,10 +296,9 @@ export default {
     },
     openItemEditDialog(item) {
       this.editItemDialogIsVisible = true;
-      this.editItemId = item.id;
       this.editedItem = { ...item };
     },
-    closeItemEditDialog() {
+    saveItem() {
       this.editItemDialogIsVisible = false;
       this.updateEditItem();
     },
@@ -313,12 +309,20 @@ export default {
     },
     updateEditItem() {
       const index = this.resource.content.findIndex(item => item.id === this.editedItem.id);
-      // const index = this.resource.content.findIndex(c => c.id === this.editItemId);
       if (index > -1) {
         const newItems = [
           ...this.resource.content.slice(0, index),
           this.editedItem,
           ...this.resource.content.slice(index + 1),
+        ];
+        this.$emit('change', {
+          ...this.resource,
+          content: newItems,
+        });
+      } else {
+        const newItems = [
+          ...this.resource.content,
+          this.editedItem,
         ];
         this.$emit('change', {
           ...this.resource,
@@ -343,8 +347,6 @@ export default {
       this.$emit('change', {
         ...this.resource,
         label,
-        // handle: slugify(label),
-        // name: slugify(label),
       });
     },
     handleUpdateName(name) {
@@ -355,16 +357,6 @@ export default {
     },
     handleFileChange(data) {
       this.appendItems(data);
-    },
-    handleSave() {
-      // this.$emit('close-dialog');
-      // this.$emit('change', this.)
-    },
-    addItem() {
-      this.$emit('change', {
-        ...this.resource,
-        content: [...this.resource.content, this.createEmptyItem()],
-      });
     },
     deleteItem(item) {
       const newItems = this.resource.content.filter(x => x.label !== item.label && x.value !== item.value);
