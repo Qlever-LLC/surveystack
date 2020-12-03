@@ -26,7 +26,7 @@
   </v-card-title>
   <v-card-text>
     <v-form
-      v-if="resource && resource.label && resource.name && (resource.content || resource.content === '')"
+      v-if="resource && (resource.label || resource.label === '') && (resource.name || resource.name === '') && (resource.content || resource.content === '')"
       ref="form"
     >
         <!-- v-model="image.label" -->
@@ -34,6 +34,7 @@
         :value="resource.label"
         @input="handleUpdateLabel"
         label="Image Label"
+        :rules="[nameHasValidLength]"
         persistent-hint
         outlined
       />
@@ -151,7 +152,6 @@ export default {
     nameHasValidCharacters,
     nameHasValidLength,
     validate() {
-      console.log('form is valid?', this.$refs.form.validate());
       return this.$refs.form.validate();
     },
     deleteResource() {
@@ -159,34 +159,30 @@ export default {
       this.$emit('delete', this.resource.id);
     },
     updateResource() {
-      console.log('update resource');
       if (this.validate()) {
         // this.$emit('change', this.image);
         this.$emit('close-dialog');
       }
     },
     closeDialog() {
-      if (this.validate()) {
+      if (!this.resource || this.validate()) {
         this.$emit('close-dialog');
       }
     },
     // TODO: refactor to use internal data for resource, then only update resource on survey when button is clicked
     handleUpdateLabel(label) {
-      console.log('update label', label);
       this.$emit('change', {
         ...this.resource,
         label,
       });
     },
     handleUpdateName(name) {
-      console.log('update name', name);
       this.$emit('change', {
         ...this.resource,
         name,
       });
     },
     handleUpdateContent(content) {
-      console.log('update content', content);
       this.$emit('change', {
         ...this.resource,
         content,

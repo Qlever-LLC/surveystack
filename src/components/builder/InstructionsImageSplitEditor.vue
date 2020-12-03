@@ -18,6 +18,7 @@
         @click.stop="openDialog"
         :class="{'d-none': !value}"
         class="ml-2 mt-3"
+        v-if="resource"
       >
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
@@ -123,6 +124,8 @@ export default {
         body: this.value.body,
         images: newImages,
       });
+
+      this.closeDialog();
     },
     setResource(resource) {
       const newResources = setResource(this.resources, resource);
@@ -138,7 +141,6 @@ export default {
           defaultContent: '',
         },
       );
-      console.log(newResource);
       this.$emit('set-survey-resources', appendResource(this.resources, newResource));
       this.$emit('set-control-source', {
         body: this.value.body,
@@ -147,7 +149,6 @@ export default {
       this.openDialog();
     },
     selectResourceHandler(id) {
-      console.log();
       this.$emit('set-control-source', {
         body: this.value.body,
         images: [id],
