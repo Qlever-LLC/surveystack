@@ -30,8 +30,38 @@
         >
           <template v-slot:entity="{ entity }">
             <v-list-item-content>
-              <v-list-item-title>{{entity.name}}</v-list-item-title>
-              <v-list-item-subtitle>{{entity.group}}</v-list-item-subtitle>
+              <div class="d-flex">
+                <div class="mr-2">
+                  <v-btn
+                    v-if="entity.meta.submissions === 'public' || !entity.meta.submissions"
+                    :to="`/surveys/${entity.id}`"
+                    title="Everyone can submit"
+                    icon
+                  >
+                    <v-icon>mdi-earth</v-icon>
+                  </v-btn>
+                  <v-btn
+                    v-if="entity.meta.submissions === 'user'"
+                    :to="`/surveys/${entity.id}`"
+                    title="Only signed-in users can submit"
+                    icon
+                  >
+                    <v-icon>mdi-account</v-icon>
+                  </v-btn>
+                  <v-btn
+                    v-if="entity.meta.submissions === 'group'"
+                    :to="`/surveys/${entity.id}`"
+                    title="Everyone group members can submit"
+                    icon
+                  >
+                    <v-icon>mdi-account-group</v-icon>
+                  </v-btn>
+                </div>
+                <div>
+                  <v-list-item-title>{{entity.name}}</v-list-item-title>
+                  <v-list-item-subtitle>{{entity.group}}</v-list-item-subtitle>
+                </div>
+              </div>
 
             </v-list-item-content>
           </template>

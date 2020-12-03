@@ -33,10 +33,17 @@
         x-large
         color="primary"
         @click="startDraft(entity._id)"
+        :disabled="!isAllowedToSubmit"
       >
         <v-icon>mdi-file-document-box-plus-outline</v-icon>
         <span class="ml-2">Start Survey</span>
       </v-btn>
+      <div
+        class="mt-2 text--secondary"
+        v-if="!isAllowedToSubmit"
+      >
+        {{submissionRightsHint}}
+      </div>
     </div>
   </v-container>
 </template>
@@ -83,6 +90,48 @@ export default {
         return true;
       }
       return false;
+    },
+    isAllowedToSubmit() {
+      const { submissions } = this.entity.meta;
+
+      if (!submissions || submissions === 'public') {
+        // everyone may submit
+        return true;
+      }
+
+      if (submissions === 'user' && this.$store.getters['auth/isLoggedIn']) {
+        // logged in users may submit
+        return true;
+      }
+
+      if (submissions === 'group' && this.$store.getters['auth/isLoggedIn']) {
+        const groups = this.$store.getters['memberships/groups'];
+        console.log(groups);
+        const match = groups.find(group => group._id === this.entity.meta.group.id);
+        console.log('match', match);
+        if (match) {
+          return true;
+        }
+      }
+
+      return false;
+    },
+    submissionRightsHint() {
+      const { submissions } = this.entity.meta;
+
+      if (!submissions || submissions === 'public') {
+        return 'Everyone may submit to this survey.';
+      }
+
+      if (submissions === 'user') {
+        return 'You must be signed in to submit to this survey.';
+      }
+
+      if (submissions === 'group') {
+        return 'Only group members may submit to this survey.';
+      }
+
+      return 'Probably no one can submit to this survey';
     },
   },
   async created() {

@@ -27,7 +27,7 @@
           <br />
           <span class="font-weight-light grey--text text--darken-2">
             {{ el.name }}
-            <!-- : {{ el.type }} -->
+            : {{ el.type }}
           </span>
         </div>
         <div class="d-flex">

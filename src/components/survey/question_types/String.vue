@@ -1,7 +1,6 @@
 <template>
   <div>
-    <!-- <v-card-title v-if="control.title">{{ control.title }}</v-card-title> -->
-      <!-- autofocus -->
+    <v-card-title v-if="control.title">{{ control.title }}</v-card-title>
     <v-text-field
       outlined
       :label="control.label"
@@ -11,7 +10,7 @@
       ref="textField"
       class="full-width"
     />
-    <!-- <p v-if="control.hint">{{ control.hint }}</p> -->
+    <p v-if="control.hint">{{ control.hint }}</p>
   </div>
 </template>
 
