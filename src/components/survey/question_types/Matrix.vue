@@ -61,6 +61,7 @@
                   hide-details
                   solo
                   class="matrix-cell my-2"
+                  :multiple="header.multiple"
                 />
                 <v-autocomplete
                   v-else-if="header.type === 'autocomplete'"
@@ -69,6 +70,7 @@
                   @input="v => {item[header.value] = v; onInput()}"
                   hide-details
                   solo
+                  :multiple="header.multiple"
                 />
                 <div v-else-if="header.type === 'date'">
                   <v-menu
@@ -152,7 +154,9 @@ export default {
       return resource;
     },
     headers() {
-      return this.resource.content.map(col => ({ text: col.label, value: col.value, type: col.type }));
+      return this.resource.content.map(col => ({
+        text: col.label, value: col.value, type: col.type, multiple: col.multiple,
+      }));
     },
     fields() {
       return this.resource.content.map(col => col.value);

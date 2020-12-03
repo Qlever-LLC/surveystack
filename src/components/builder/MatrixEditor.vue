@@ -86,79 +86,103 @@
             class="mx-2"
             :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
           />
-
         </div>
         <div
-          v-for="(item,i) in resource.content"
-          :key="i"
+          class="d-flex flex-row pa-2 px-4"
+          style="overflow-x: auto"
         >
           <v-card
-            class="my-4"
-            style="border-left: 5px solid var(--v-primary-base)"
+            v-for="(item,i) in resource.content"
+            :key="i"
+            width="15rem"
+            min-width="15rem"
+            class="mx-1"
             elevation="3"
           >
-            <v-card-title class="d-flex justify-space-between pb-0 mb-0">
-              Column
+            <div class="d-flex pa-2">
+              <v-btn
+                icon
+                small
+              >
+                <v-icon>mdi-arrow-left</v-icon>
+              </v-btn>
+              <v-btn
+                icon
+                class="ml-1"
+                small
+              >
+                <v-icon>mdi-arrow-right</v-icon>
+              </v-btn>
+
               <v-btn
                 icon
                 @click="deleteColumn(i)"
+                class="ml-auto"
                 tabindex="-1"
+                small
               >
-                <v-icon>mdi-delete</v-icon>
+                <v-icon>mdi-trash-can-outline</v-icon>
               </v-btn>
-            </v-card-title>
+            </div>
             <v-card-text>
-              <v-row dense>
-                <v-col>
-                  <v-text-field
-                    v-model="item.label"
-                    label="Label"
-                    dense
-                  />
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    v-model="item.value"
-                    label="Value"
-                    dense
-                  />
-                </v-col>
-                <v-col>
-                  <v-select
-                    dense
-                    v-model="item.type"
-                    :items="$options.MATRIX_COLUMN_TYPES"
-                    label="Type"
-                  />
-                </v-col>
-              </v-row>
+
+              <v-text-field
+                v-model="item.label"
+                label="Label"
+                style="font-size: 1.3rem"
+                dense
+              />
+
+              <v-text-field
+                v-model="item.value"
+                label="Value"
+                dense
+              />
+
+              <v-select
+                dense
+                v-model="item.type"
+                :items="$options.MATRIX_COLUMN_TYPES"
+                label="Type"
+              />
+
               <div
                 v-if="item.type === 'dropdown' || item.type === 'autocomplete'"
-                class="d-flex"
+                class="d-flex flex-column"
               >
-                <v-select
+                <div class="d-flex flex-row">
+                  <v-select
+                    dense
+                    v-model="item.resource"
+                    :items="resourceSelectItems"
+                    label="Resource"
+                    hide-details
+                  />
+                  <v-btn
+                    @click="createOntology(i)"
+                    small
+                    icon
+                    :color="!item.resource ? 'primary' : ''"
+                  >
+                    <v-icon>mdi-plus</v-icon>
+                  </v-btn>
+                  <v-btn
+                    @click="openOntologyEditor(item.resource)"
+                    small
+                    :disabled="!item.resource"
+                    icon
+                  >
+                    <v-icon>mdi-pencil</v-icon>
+                  </v-btn>
+                </div>
+                <v-checkbox
+                  class="mt-2"
+                  v-model="item.multiple"
+                  label="Multi-select"
+                  hide-details
                   dense
-                  v-model="item.resource"
-                  :items="resourceSelectItems"
-                  label="Resource"
                 />
-                <v-btn
-                  class="ml-3"
-                  @click="createOntology(i)"
-                  color="primary"
-                  outlined
-                >
-                  <v-icon left>mdi-plus</v-icon>New
-                </v-btn>
-                <v-btn
-                  class="ml-3"
-                  color="primary"
-                  outlined
-                  @click="openOntologyEditor(item.resource)"
-                  :disabled="!item.resource"
-                >
-                  <v-icon left>mdi-pencil</v-icon> Edit
-                </v-btn>
+
               </div>
 
             </v-card-text>
@@ -332,6 +356,7 @@ export default {
         value: '',
         type: '',
         resource: '',
+        multiple: false,
         tags: '',
       };
     },
