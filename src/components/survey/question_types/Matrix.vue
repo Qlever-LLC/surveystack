@@ -17,6 +17,7 @@
       :hide-default-footer="true"
       :items="rows"
       disable-sort
+      mobile-breakpoint="0"
     >
       <template v-slot:body="{ items, headers }">
         <tbody>
@@ -106,12 +107,13 @@
                 </div>
               </v-form>
             </td>
-            <td>
+            <td style="width: 64px; padding-left: 4px !important; padding-right: 0px;">
               <div class="d-flex">
                 <v-btn
                   icon
                   @click="rowToBeDeleted = idx"
                   tabindex="-1"
+                  small
                 >
                   <v-icon>mdi-trash-can-outline</v-icon>
                 </v-btn>
@@ -119,6 +121,7 @@
                   icon
                   @click="duplicateRow(idx)"
                   tabindex="-1"
+                  small
                 >
                   <v-icon>mdi-content-copy</v-icon>
                 </v-btn>
@@ -156,9 +159,10 @@ export default {
       return resource;
     },
     headers() {
-      return this.resource.content.map(col => ({
+      const headers = this.resource.content.map(col => ({
         text: col.label, value: col.value, type: col.type, multiple: col.multiple,
       }));
+      return headers;
     },
     fields() {
       return this.resource.content.map(col => col.value);
