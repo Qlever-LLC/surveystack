@@ -72,17 +72,24 @@
           <v-text-field
             :value="resource.label"
             @input="handleUpdateLabel"
-            label="List Label"
+            label="Label"
             persistent-hint
             class="mx-2"
           />
           <v-text-field
             :value="resource.name"
             @input="handleUpdateName"
-            label="List Data Name"
+            label="Data Name"
             persistent-hint
             class="mx-2"
             :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
+          />
+          <v-text-field
+            :value="resource.content.addRowLabel"
+            @input="handleUpdateAddRowLabel"
+            label="Add Row Label"
+            persistent-hint
+            class="mx-2"
           />
         </div>
         <div
@@ -90,7 +97,7 @@
           style="overflow-x: auto"
         >
           <v-card
-            v-for="(item,i) in resource.content"
+            v-for="(item,i) in resource.content.columns"
             :key="i"
             width="15rem"
             min-width="15rem"
@@ -224,7 +231,7 @@ export default {
     resource: {
       type: Object,
       required: true,
-      default: () => ({ content: [] }),
+      default: () => ({ content: { columns: [], addRowLabel: 'Add row' } }),
     },
     resources: {
       type: Array,
@@ -273,7 +280,7 @@ export default {
     },
     createOntology(column) {
       const id = new ObjectId().toString();
-      this.resource.content[column].resource = id;
+      this.resource.content.columns[column].resource = id;
       this.$emit('set-survey-resources', [...this.resources, {
         label: `Ontology List ${this.resources.length + 1}`,
         name: `ontology_list_${this.resources.length + 1}`,
@@ -302,26 +309,32 @@ export default {
       return namePattern.test(val) ? true : 'Data name must be at least 4 character in length';
     },
     moveItemDown({ id }) {
-      const index = this.resource.content.findIndex(item => item.id === id);
-      if (index < this.resource.content.length - 1) {
-        const newItems = [...this.resource.content];
+      const index = this.resource.content.columns.findIndex(item => item.id === id);
+      if (index < this.resource.content.columns.length - 1) {
+        const newItems = [...this.resource.content.columns];
         const [item] = newItems.splice(index, 1);
         newItems.splice(index + 1, 0, item);
         this.$emit('change', {
           ...this.resource,
-          content: newItems,
+          content: {
+            ...this.resource.content,
+            columns: newItems,
+          },
         });
       }
     },
     moveItemUp({ id }) {
-      const index = this.resource.content.findIndex(item => item.id === id);
+      const index = this.resource.content.columns.findIndex(item => item.id === id);
       if (index > 0) {
-        const newItems = [...this.resource.content];
+        const newItems = [...this.resource.content.columns];
         const [item] = newItems.splice(index, 1);
         newItems.splice(index - 1, 0, item);
         this.$emit('change', {
           ...this.resource,
-          content: newItems,
+          content: {
+            ...this.resource.content,
+            columns: newItems,
+          },
         });
       }
     },
@@ -337,10 +350,13 @@ export default {
       };
     },
     deleteColumn(index) {
-      this.resource.content.splice(index, 1);
+      this.resource.content.columns.splice(index, 1);
       this.$emit('change', {
         ...this.resource,
-        content: this.resource.content,
+        content: {
+          ...this.resource.content,
+          columns: this.resource.content.columns,
+        },
       });
     },
     openDeleteDialog() {
@@ -358,8 +374,6 @@ export default {
       this.$emit('change', {
         ...this.resource,
         label,
-        // handle: slugify(label),
-        // name: slugify(label),
       });
     },
     handleUpdateName(name) {
@@ -368,10 +382,22 @@ export default {
         name,
       });
     },
+    handleUpdateAddRowLabel(addRowLabel) {
+      this.$emit('change', {
+        ...this.resource,
+        content: {
+          ...this.resource.content,
+          addRowLabel,
+        },
+      });
+    },
     addColumn() {
       this.$emit('change', {
         ...this.resource,
-        content: [...this.resource.content, this.createEmptyColumn()],
+        content: {
+          ...this.resource.content,
+          columns: [...this.resource.content.columns, this.createEmptyColumn()],
+        },
       });
     },
   },
