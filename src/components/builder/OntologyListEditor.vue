@@ -117,20 +117,50 @@
         disable-sort
         :footer-props="{'items-per-page-options':[10, 20, 50, 100, -1]}"
       >
+        <template v-slot:item.label="{ item }">
+          <v-text-field
+            v-model="item.label"
+            solo
+            dense
+            hide-details
+          />
+        </template>
+        <template v-slot:item.value="{ item }">
+          <v-text-field
+            v-model="item.value"
+            solo
+            dense
+            hide-details
+          />
+        </template>
+        <template v-slot:item.tags="{ item }">
+          <v-text-field
+            v-model="item.tags"
+            solo
+            dense
+            hide-details
+          />
+        </template>
         <template v-slot:item.actions="{ item }">
           <div class="d-flex">
-            <v-icon @click="moveItemUp(item)">mdi-arrow-up</v-icon>
+            <v-icon
+              @click="moveItemUp(item)"
+              tabindex="-1"
+            >mdi-arrow-up</v-icon>
             <v-icon
               class="ml-2"
               @click="moveItemDown(item)"
+              tabindex="-1"
             >mdi-arrow-down</v-icon>
             <v-icon
               class="ml-2"
-              @click="openItemEditDialog(item)"
-            >mdi-pencil</v-icon>
+              @click="copyItem(item)"
+              tabindex="-1"
+            >mdi-content-copy</v-icon>
             <v-icon
               class="ml-2"
               @click="deleteItem(item)"
+              tabindex="-1"
             >mdi-trash-can-outline</v-icon>
           </div>
         </template>
@@ -285,6 +315,18 @@ export default {
         tags: '',
       };
     },
+    copyItem(item) {
+      const index = this.resource.content.findIndex(row => row.id === item.id);
+      if (index >= 0) {
+        this.resource.content.splice(index + 1, 0, {
+          id: new ObjectId().toString(), label: `${item.label} Copy`, value: `${item.value}_copy`, tags: item.tags,
+        });
+        this.$emit('change', {
+          ...this.resource,
+          content: this.resource.content,
+        });
+      }
+    },
     deleteSelectedItems() {
       const isNotSelectedItem = item => !this.selectedItems.some(s => s.id === item.id);
       const newItems = this.resource.content.filter(isNotSelectedItem);
@@ -383,4 +425,10 @@ export default {
 </script>
 
 <style scoped>
+.v-data-table >>> tbody > tr > td.text-start {
+  padding: 0px 4px;
+}
+.v-data-table >>> tbody > tr > td > .v-simple-checkbox {
+  margin-left: 12px;
+}
 </style>
