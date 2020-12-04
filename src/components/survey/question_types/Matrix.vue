@@ -11,7 +11,11 @@
       <pre>{{rows[rowToBeDeleted]}}</pre>
     </app-dialog>
 
-    <h2>{{control.label}}</h2>
+    <h2 v-if="control.title">{{control.title}}</h2>
+    <h3
+      v-if="control.label"
+      class="text--secondary"
+    >{{control.label}}</h3>
     <v-data-table
       :headers="headers"
       :hide-default-footer="true"
@@ -139,6 +143,10 @@
         <v-icon left>mdi-plus</v-icon>{{addRowLabel}}
       </v-btn>
     </div>
+    <div
+      v-if="control.hint"
+      class="my-3"
+    >{{control.hint}}</div>
   </div>
 </template>
 
