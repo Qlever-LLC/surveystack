@@ -156,15 +156,15 @@ export default {
       return resource;
     },
     headers() {
-      return this.resource.content.columns.map(col => ({
+      return this.resource.content.map(col => ({
         text: col.label, value: col.value, type: col.type, multiple: col.multiple,
       }));
     },
     fields() {
-      return this.resource.content.columns.map(col => col.value);
+      return this.resource.content.map(col => col.value);
     },
     addRowLabel() {
-      return this.resource.content.addRowLabel;
+      return this.resource.config.addRowLabel;
     },
     showConfirmDeletionDialog: {
       get() {
@@ -195,7 +195,7 @@ export default {
       this.$emit('changed', this.rows);
     },
     getDropdownItems(field) {
-      const column = this.resource.content.columns.find(col => col.value === field);
+      const column = this.resource.content.find(col => col.value === field);
       const ontology = this.resources.find(resource => resource.id === column.resource);
       return ontology.content.map(row => ({ text: row.label, value: row.value }));
     },

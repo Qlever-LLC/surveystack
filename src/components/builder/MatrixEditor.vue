@@ -67,37 +67,31 @@
         </div>
       </v-card-title>
 
-      <v-card-text class="pt-4">
-        <div class="d-flex flex-space-between align-center">
+      <v-card-text class="pt-0">
+        <div class="d-flex justify-start">
           <v-text-field
+            style="max-width: 20rem"
             :value="resource.label"
             @input="handleUpdateLabel"
             label="Label"
             persistent-hint
-            class="mx-2"
           />
           <v-text-field
+            style="max-width: 20rem; margin-left: 1rem"
             :value="resource.name"
             @input="handleUpdateName"
             label="Data Name"
             persistent-hint
-            class="mx-2"
             :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
           />
-          <v-text-field
-            :value="resource.content.addRowLabel"
-            @input="handleUpdateAddRowLabel"
-            label="Add Row Label"
-            persistent-hint
-            class="mx-2"
-          />
+
         </div>
         <div
           class="d-flex flex-row pa-2 px-4"
           style="overflow-x: auto"
         >
           <v-card
-            v-for="(item,i) in resource.content.columns"
+            v-for="(item,i) in resource.content"
             :key="i"
             width="15rem"
             min-width="15rem"
@@ -190,7 +184,7 @@
           </v-card>
           <v-btn
             @click="addColumn"
-            class="align-self-center mx-4"
+            class="align-self-center mx-4 my-6"
             fab
             dark
             small
@@ -198,6 +192,17 @@
           >
             <v-icon dark>mdi-plus</v-icon>
           </v-btn>
+        </div>
+        <div class="ml-2 mt-4">
+          <h3>Config</h3>
+          <v-text-field
+            style="width: 20rem"
+            class="my-2"
+            :value="resource.config.addRowLabel"
+            @input="handleUpdateAddRowLabel"
+            label="Add Row Label"
+            persistent-hint
+          />
         </div>
       </v-card-text>
       <v-spacer />
@@ -231,7 +236,7 @@ export default {
     resource: {
       type: Object,
       required: true,
-      default: () => ({ content: { columns: [], addRowLabel: 'Add row' } }),
+      default: () => ({ content: [], config: { addRowLabel: 'Add row' } }),
     },
     resources: {
       type: Array,
@@ -280,7 +285,7 @@ export default {
     },
     createOntology(column) {
       const id = new ObjectId().toString();
-      this.resource.content.columns[column].resource = id;
+      this.resource.content[column].resource = id;
       this.$emit('set-survey-resources', [...this.resources, {
         label: `Ontology List ${this.resources.length + 1}`,
         name: `ontology_list_${this.resources.length + 1}`,
@@ -309,32 +314,26 @@ export default {
       return namePattern.test(val) ? true : 'Data name must be at least 4 character in length';
     },
     moveItemDown({ id }) {
-      const index = this.resource.content.columns.findIndex(item => item.id === id);
-      if (index < this.resource.content.columns.length - 1) {
-        const newItems = [...this.resource.content.columns];
+      const index = this.resource.content.findIndex(item => item.id === id);
+      if (index < this.resource.content.length - 1) {
+        const newItems = [...this.resource.content];
         const [item] = newItems.splice(index, 1);
         newItems.splice(index + 1, 0, item);
         this.$emit('change', {
           ...this.resource,
-          content: {
-            ...this.resource.content,
-            columns: newItems,
-          },
+          content: newItems,
         });
       }
     },
     moveItemUp({ id }) {
-      const index = this.resource.content.columns.findIndex(item => item.id === id);
+      const index = this.resource.content.findIndex(item => item.id === id);
       if (index > 0) {
-        const newItems = [...this.resource.content.columns];
+        const newItems = [...this.resource.content];
         const [item] = newItems.splice(index, 1);
         newItems.splice(index - 1, 0, item);
         this.$emit('change', {
           ...this.resource,
-          content: {
-            ...this.resource.content,
-            columns: newItems,
-          },
+          content: newItems,
         });
       }
     },
@@ -350,13 +349,10 @@ export default {
       };
     },
     deleteColumn(index) {
-      this.resource.content.columns.splice(index, 1);
+      this.resource.content.splice(index, 1);
       this.$emit('change', {
         ...this.resource,
-        content: {
-          ...this.resource.content,
-          columns: this.resource.content.columns,
-        },
+        content: this.resource.content,
       });
     },
     openDeleteDialog() {
@@ -385,19 +381,13 @@ export default {
     handleUpdateAddRowLabel(addRowLabel) {
       this.$emit('change', {
         ...this.resource,
-        content: {
-          ...this.resource.content,
-          addRowLabel,
-        },
+        config: { ...this.resource.config, addRowLabel },
       });
     },
     addColumn() {
       this.$emit('change', {
         ...this.resource,
-        content: {
-          ...this.resource.content,
-          columns: [...this.resource.content.columns, this.createEmptyColumn()],
-        },
+        content: [...this.resource.content, this.createEmptyColumn()],
       });
     },
   },

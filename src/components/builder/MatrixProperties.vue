@@ -86,10 +86,8 @@ export default {
         id,
         type: 'MATRIX',
         location: 'EMBEDDED',
-        content: {
-          columns: [],
-          addRowLabel: 'Add row',
-        },
+        content: [],
+        config: { addRowLabel: 'Add row' },
       }]);
       this.$emit('set-control-source', id);
       this.openTableDialog();
