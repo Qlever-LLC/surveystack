@@ -40,6 +40,21 @@ export const getAllNodes = (root) => {
   return nodes;
 };
 
+export function getRelevance(submission, path, fallback = true) {
+  // checks the relevance of the current path and its parents
+  const splits = path.split('.');
+  while (splits.length > 1) {
+    const p = splits.join('.');
+    const relevant = getNested(submission, `${p}.meta.relevant`, fallback);
+    if (!relevant) {
+      return false;
+    }
+    splits.splice(-1);
+  }
+
+  return fallback;
+}
+
 export default {
   getNested,
   setNested,

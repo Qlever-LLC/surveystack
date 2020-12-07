@@ -4,6 +4,56 @@ import * as surveyStackUtils from '@/utils/surveyStack';
 import * as codeEvaluator from '@/utils/codeEvaluator';
 import * as db from '@/store/db';
 
+/*
+  README:
+  This draft store uses TreeModel https://github.com/joaonuno/tree-model-js
+  for creating a tree model of the current survey controls (a.k.a questions).
+
+  The current survey controls are dependant on the survey version and located inside the survey.revisions.
+  Survey controls are an array containing controls for questions such as String/Number/etc.
+  If the control type is of type 'group' or 'page', it may contain other nested controls as children.
+
+  By using a tree model of the survey controls, we can traverse the tree more easily,
+  and make use of utilits such as .getPath(), .parent, .hasChildren(), etc.
+
+  NOTE: The tree model is ONLY used for the hierarchical survey controls, not for the submission object (see below).
+
+  When filling out a survey, the answered questions are stored inside a 'submission' object under the data property.
+
+  Example:
+
+  Survey definition with survey controls defining the questions:
+  controls = [
+    { type: 'string', name: 'favorite_animal' },
+    { type: 'group',
+      name: 'address',
+      children: [
+        { type: 'string', name: 'city' },
+        { type: 'number', name: 'postal' },
+      ]
+    }
+  ];
+
+  Submission object containing the filled out questions under the data property:
+  submission = {
+    meta: {...},
+    data: {
+      favorite_animal: { value: 'cat' },
+      address: {
+        city: { value: 'Baden' },
+        postal: { value: 5400 },
+      }
+    }
+  }
+
+  When traversing the survey controls, one can determine the corresponding 'path' inside the submission object like this:
+  > node.getPath().map(n => n.model.name).join('.');
+  For instance, with the current node being 'city', the corresponding path will be 'data.address.city'.
+  To get the actual value, one would append '.value', so that the full path is 'data.address.city.value'.
+  (the survey controls' tree model root node is initialized with name 'data', and thus the determined path above will start with 'data.')
+
+*/
+
 const createInitialState = () => ({
   survey: null, // current survey
   submission: null, // current submission
@@ -44,19 +94,39 @@ const getters = {
 
     return null;
   },
-  relevance: state => (path, fallback = true) => {
-    // checks the relevance of the current path and its parents
-    const splits = path.split('.');
-    while (splits.length > 1) {
-      const p = splits.join('.');
-      const relevant = surveyStackUtils.getNested(state.submission, `${p}.meta.relevant`, fallback);
-      if (!relevant) {
-        return false;
+  relevance: state => (path, fallback = true) => surveyStackUtils.getRelevance(state.submission, path, fallback),
+  hasRequiredUnanswered: (state) => {
+    if (state.node.hasChildren()) {
+      const requiredAndUnansweredPaths = [];
+      state.node.walk((c) => {
+        const path = c.getPath().map(n => n.model.name).join('.');
+        const value = surveyStackUtils.getNested(state.submission, `${path}.value`);
+
+        if (c.model.options.required && !value) {
+          requiredAndUnansweredPaths.push(path);
+        }
+      });
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const path of requiredAndUnansweredPaths) {
+        const relevant = surveyStackUtils.getRelevance(state.submission, path, true);
+        if (relevant) {
+          return true;
+        }
       }
-      splits.splice(-1);
+
+      return false;
     }
 
-    return fallback;
+    const path = state.node.getPath().map(n => n.model.name).join('.');
+    const { required } = state.node.model.options;
+    const value = surveyStackUtils.getNested(state.submission, `${path}.value`);
+
+    if (required && value === null) {
+      return true;
+    }
+
+    return false;
   },
   overviews: (state) => {
     const overviews = [];
