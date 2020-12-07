@@ -369,7 +369,7 @@ export default {
         },
       },
       page: 1,
-      pageSizes: [1, 5, 10, 20, 50, 100, 10000],
+      pageSizes: [1, 5, 10, 20, 50, 100, 1000, 'All'].map(n => ({ text: n, value: Number(n) || 0 })),
       pageSize: defaultPageSize,
       selected: [],
       search: '',
