@@ -8,13 +8,39 @@
         class="pa-4"
         justify="space-between"
       >
-        <v-col cols="4">
+        <v-col
+          cols="4"
+          style="max-height: 70vh; overflow-y: scroll"
+        >
+          <v-sheet class="pa-2" outlined>
+            <v-text-field
+              v-model="search"
+              label="Search"
+              flat
+              hide-details
+              clearable
+              clear-icon="mdi-close-circle-outline"
+            ></v-text-field>
+            <v-checkbox
+              v-model="caseSensitive"
+              hide-details
+              label="Case sensitive search"
+            ></v-checkbox>
+          </v-sheet>
+
           <v-treeview
             :items="aggregators"
             :load-children="fetchChildren"
             transition
+            :filter="filter"
+            :search="search"
             return-object
           >
+            <template v-slot:prepend="{ item }">
+              <v-icon v-if="item.type === 'farm'">mdi-home-variant</v-icon>
+              <v-icon v-if="item.type === 'aggregator'">mdi-account-multiple</v-icon>
+
+            </template>
 
             <template v-slot:label="{ item }">
               <div
@@ -78,7 +104,7 @@
           <app-farm-o-s-instance
             :busy="busy"
             v-if="!!active && active.type === 'farm'"
-            @save="save"
+            @dialog="(title, text) => showDialog(title, text)"
             @testConnection="testConnection"
             :group="active.group"
             :instance="Object.assign({}, active.payload)"
@@ -185,8 +211,15 @@ export default {
     },
     loadingAggregators: [],
     farms: {},
+    caseSensitive: false,
+    search: null,
   }),
   computed: {
+    filter() {
+      return this.caseSensitive
+        ? (item, search, textKey) => item[textKey].indexOf(search) > -1
+        : undefined;
+    },
     hubaggregators() {
       if (!this.integrations) {
         return [];
@@ -197,6 +230,7 @@ export default {
         type: 'aggregator',
         children: this.farms[integration._id] || [],
         loading: this.loadingAggregators.includes(integration._id),
+        name: integration.name,
       }));
 
       return ag;
@@ -215,6 +249,11 @@ export default {
     },
   },
   methods: {
+    showDialog(title, text) {
+      this.dialog.text = text;
+      this.dialog.title = title;
+      this.dialog.show = true;
+    },
     async fetchChildren(item) {
       console.log('selected', this.tree);
       console.log('fetching children', item);
@@ -230,6 +269,7 @@ export default {
             aggregator: item.id,
             type: 'farm',
             children: [],
+            name: f.farm_name,
           }));
           console.log('children', children);
 
