@@ -557,7 +557,7 @@ export default {
       const element = document.createElement('a');
 
       element.setAttribute('href', this.apiDownloadUrl);
-      element.setAttribute('download', `${this.surveyEntity.name}.csv`);
+      element.setAttribute('download', `${this.surveyEntity.name}.${this.apiDownloadFormat}`);
 
       element.style.display = 'none';
       document.body.appendChild(element);
