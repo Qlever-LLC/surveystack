@@ -21,11 +21,7 @@
       >
         <div class="d-flex justify-end">
           <span class="title mr-auto">{{control.label}}</span>
-          <app-indicator
-            :icon="'mdi-asterisk'"
-            v-if="control.options && control.options.required"
-            color="red darken-2"
-          >required</app-indicator>
+          <app-required v-if="control.options && control.options.required" />
         </div>
 
         <div
@@ -48,11 +44,7 @@
         :class="{irrelevant: !$store.getters['draft/relevance'](path)}"
       >
         <div class="d-flex justify-end">
-          <app-indicator
-            :icon="'mdi-asterisk'"
-            v-if="control.options && control.options.required"
-            color="red darken-2"
-          >required</app-indicator>
+          <app-required v-if="$store.getters['draft/relevance'](path) && control.options && control.options.required" />
         </div>
         <component
           :is="getComponentName(control)"
@@ -80,12 +72,12 @@
 
 <script>
 import moment from 'moment';
-import appIndicator from '@/components/survey/drafts/Indicator.vue';
+import appRequired from '@/components/survey/drafts/Required.vue';
 
 export default {
   name: 'app-control',
   components: {
-    appIndicator,
+    appRequired,
   },
   props: {
     path: {

@@ -6,8 +6,8 @@
   >
     <span class="font-weight-bold white--text">
       <v-icon
-        left
         x-small
+        left
       >{{icon}}</v-icon>
       <slot>???</slot>
     </span>
