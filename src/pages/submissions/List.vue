@@ -21,6 +21,28 @@
       </template>
     </app-dialog>
 
+    <app-dialog
+      v-model="reassignment.showModal"
+      @cancel="reassignment.showModal = false"
+      @confirm="reassign(selected[0])"
+      labelConfirm="Reassign"
+    >
+      <template v-slot:title>Reassign Submission</template>
+      <template>
+        <v-select
+          :items="reassignment.groups"
+          v-model="reassignment.group"
+          label="Group"
+        />
+        <v-select
+          :disabled="reassignment.group === null"
+          :items="reassignment.users"
+          v-model="reassignment.user"
+          label="User"
+        />
+      </template>
+    </app-dialog>
+
     <v-container>
       <div class="d-flex justify-end">
         <v-btn
@@ -172,6 +194,7 @@
               >
                 ARCHIVE
               </v-btn>
+              <v-btn @click="reassignment.showModal = true">REASSIGN...</v-btn>
               <v-btn
                 v-if="selected[0]['meta.archived'] !== 'true'"
                 text
@@ -381,6 +404,13 @@ export default {
         sortDesc: [],
       },
       loading: false,
+      reassignment: {
+        showModal: false,
+        group: null,
+        user: null,
+        groups: [{ text: '[No Group]', value: null }, ...this.$store.getters['memberships/memberships'].filter(m => m.role === 'admin').map(m => ({ text: m.group.name, value: m.group._id }))],
+        users: [],
+      },
     };
   },
   computed: {
@@ -467,6 +497,10 @@ export default {
         this.loading = false;
       }
     },
+    async fetchUsers(groupId) {
+      const { data: memberships } = await api.get(`/memberships?group=${groupId}&populate=true`);
+      this.reassignment.users = memberships.filter(m => m.user).map(m => ({ text: `${m.user.email} - ${m.user.name}`, value: m.user._id }));
+    },
     async deleteSubmission(submission) {
       this.showDeleteModal = false;
       try {
@@ -518,13 +552,28 @@ export default {
       await this.$store.dispatch('submissions/fetchRemoteSubmission', submission._id);
       this.$router.push(`/submissions/drafts/${submission._id}`);
     },
+    async reassign(submission) {
+      console.log(`reassigning submission id ${submission._id}`);
+      this.reassignment.showModal = false;
+      try {
+        const { data: updatedSubmission } = await api.get(`/submissions/${submission._id}?pure=1`);
+        updatedSubmission.meta.archivedReason = 'REASSIGNMENT';
+        updatedSubmission.meta.creator = this.reassignment.user;
+        updatedSubmission.meta.group.id = this.reassignment.group;
+        updatedSubmission.meta.group.path = null; // will be filled by the server's sanitize function
+        await api.put(`/submissions/${updatedSubmission._id}`, updatedSubmission);
+        this.selected = [];
+        this.fetchData();
+      } catch (err) {
+        this.$store.dispatch('feedback/add', err.response.data.message);
+      }
+    },
     changedPaginationPage(p) {
       this.page = p;
       this.filter.skip = (p - 1) * this.filter.limit;
       this.fetchData();
     },
     changedPaginationSize() {
-      // console.log;
       this.page = 1;
       this.filter.limit = this.pageSize;
       this.filter.skip = 0;
@@ -571,6 +620,16 @@ export default {
     showArchived() {
       this.selected = [];
       this.fetchData();
+    },
+    'reassignment.group': function (val) {
+      this.reassignment.user = null;
+
+      if (!val) {
+        this.reassignment.users = [];
+        return;
+      }
+
+      this.fetchUsers(val);
     },
   },
   async created() {
