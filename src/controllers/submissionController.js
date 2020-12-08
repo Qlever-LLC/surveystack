@@ -628,6 +628,8 @@ const updateSubmission = async (req, res) => {
 
   const farmosResults = [];
   try {
+    // TODO: should we use the currently logged in user or the submission's user?
+    // probably the submission's user (for instance if submission is re-assigned with a different user)
     const results = await farmOsService.handle(res, entity, survey, res.locals.auth.user);
     farmosResults.push(...results);
     // could contain errors, need to pass these on to the user
