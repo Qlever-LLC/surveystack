@@ -66,7 +66,7 @@ router.put(
   ],
   catchErrors(groupController.updateGroup)
 );
-router.delete('/groups/:id', assertAuthenticated, catchErrors(groupController.deleteGroup));
+// router.delete('/groups/:id', assertAuthenticated, catchErrors(groupController.deleteGroup));
 
 /** Submissions */
 router.get('/submissions', catchErrors(submissionController.getSubmissions));
@@ -182,18 +182,12 @@ router.get(
   [assertAuthenticated],
   catchErrors(farmosController.getIntegrationFarms)
 );
-router.post(
-  '/farmos/test',
-  [assertAuthenticated],
-  catchErrors(farmosController.testConnection)
-);
+router.post('/farmos/test', [assertAuthenticated], catchErrors(farmosController.testConnection));
 
 router.get('/farmos/members-by-farm', catchErrors(farmosController.getMembersByFarmAndGroup));
 
-
-
 // TODO Farmos POST callback for new instance
-router.post("/farmos/callback", farmosController.webhookCallback)
+router.post('/farmos/callback', farmosController.webhookCallback);
 
 /** Integrations - Group */
 router.get('/group-integrations', catchErrors(groupIntegrationController.getIntegrations));
