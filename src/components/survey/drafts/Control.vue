@@ -21,7 +21,6 @@
       >
         <div class="d-flex justify-end">
           <span class="title mr-auto">{{control.label}}</span>
-          <app-required v-if="control.options && control.options.required" />
           <app-redacted v-if="control.options && control.options.redacted" />
         </div>
 
@@ -45,8 +44,11 @@
         :class="{irrelevant: !$store.getters['draft/relevance'](path)}"
       >
         <div class="d-flex justify-end">
+          <app-redacted
+            class="mx-2"
+            v-if="control.options && control.options.redacted"
+          />
           <app-required v-if="$store.getters['draft/relevance'](path) && control.options && control.options.required" />
-          <app-redacted v-if="control.options && control.options.redacted" />
         </div>
         <component
           :is="getComponentName(control)"
