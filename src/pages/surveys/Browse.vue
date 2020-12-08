@@ -138,7 +138,8 @@
                 <small
                   v-if="e.latestVersion"
                   class="grey--text"
-                >Survey Version {{e.latestVersion}}</small>
+                >Survey Version {{e.latestVersion}}</small><br>
+                <small class="grey--text">created {{ e.createdAgo }} ago</small>
               </div>
             </v-list-item-content>
 
@@ -174,6 +175,7 @@
 
 <script>
 import { uniqBy } from 'lodash';
+import moment from 'moment';
 import api from '@/services/api.service';
 
 const PAGINATION_LIMIT = 10;
@@ -181,6 +183,7 @@ const PAGINATION_LIMIT = 10;
 export default {
   data() {
     return {
+      now: moment(),
       selectedGroupIds: [],
       activeTab: null,
       page: 1,
@@ -331,7 +334,7 @@ export default {
     async fetchData({ user, groups = [] } = {}) {
       //  TODO create two lists, filter by active group and others
       // const groupsParam = (groups || [this.activeGroupId]).map(group => `group[]=${group}`).join('&');
-
+      const now = moment();
       const queryParams = new URLSearchParams();
       if (user) {
         queryParams.append('creator', user);
@@ -350,6 +353,13 @@ export default {
       try {
         const { data } = await api.get(`/surveys/list-page?${queryParams}`);
         this.surveys = data;
+        this.surveys.content.forEach((s) => {
+          if (!s.meta || !s.meta.dateCreated) {
+            return;
+          }
+          // eslint-disable-next-line no-param-reassign
+          s.createdAgo = moment.duration(now.diff(s.meta.dateCreated)).humanize();
+        });
         return data;
       } catch (e) {
         // TODO: use cached data?
