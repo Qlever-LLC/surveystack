@@ -29,17 +29,25 @@
     >
       <template v-slot:title>Reassign Submission</template>
       <template>
-        <v-select
+        <v-autocomplete
           :items="reassignment.groups"
           v-model="reassignment.group"
           label="Group"
-        />
-        <v-select
+          :filter="reassignGroupFilter"
+        >
+          <template v-slot:item="{item}">
+            <div class="d-flex flex-column py-1">
+              <div>{{item.text}}</div>
+              <div class="text--secondary caption">{{item.path}}</div>
+            </div>
+          </template>
+        </v-autocomplete>
+        <v-autocomplete
           :disabled="reassignment.group === null"
           :items="reassignment.users"
           v-model="reassignment.user"
           label="User"
-        />
+        ></v-autocomplete>
       </template>
     </app-dialog>
 
@@ -408,7 +416,7 @@ export default {
         showModal: false,
         group: null,
         user: null,
-        groups: [{ text: '[No Group]', value: null }, ...this.$store.getters['memberships/memberships'].filter(m => m.role === 'admin').map(m => ({ text: m.group.name, value: m.group._id }))],
+        groups: this.$store.getters['memberships/memberships'].filter(m => m.role === 'admin').map(m => ({ text: m.group.name, value: m.group._id, path: m.group.path })),
         users: [],
       },
     };
@@ -499,7 +507,7 @@ export default {
     },
     async fetchUsers(groupId) {
       const { data: memberships } = await api.get(`/memberships?group=${groupId}&populate=true`);
-      this.reassignment.users = memberships.filter(m => m.user).map(m => ({ text: `${m.user.email} - ${m.user.name}`, value: m.user._id }));
+      this.reassignment.users = memberships.filter(m => m.user).map(m => ({ text: `${m.user.name} <${m.user.email}>`, value: m.user._id }));
     },
     async deleteSubmission(submission) {
       this.showDeleteModal = false;
@@ -556,17 +564,18 @@ export default {
       console.log(`reassigning submission id ${submission._id}`);
       this.reassignment.showModal = false;
       try {
-        const { data: updatedSubmission } = await api.get(`/submissions/${submission._id}?pure=1`);
-        updatedSubmission.meta.archivedReason = 'REASSIGNMENT';
-        updatedSubmission.meta.creator = this.reassignment.user;
-        updatedSubmission.meta.group.id = this.reassignment.group;
-        updatedSubmission.meta.group.path = null; // will be filled by the server's sanitize function
-        await api.put(`/submissions/${updatedSubmission._id}`, updatedSubmission);
+        await api.post(`/submissions/${submission._id}/reassign`, { group: this.reassignment.group, creator: this.reassignment.user });
         this.selected = [];
         this.fetchData();
       } catch (err) {
         this.$store.dispatch('feedback/add', err.response.data.message);
       }
+    },
+    reassignGroupFilter(item, queryText, itemText) {
+      return `${itemText} ${item.path}`.toLocaleLowerCase().indexOf(queryText.toLocaleLowerCase()) > -1;
+    },
+    reassignUserFilter(item, queryText, itemText) {
+      return `${itemText} ${item.email}`.toLocaleLowerCase().indexOf(queryText.toLocaleLowerCase()) > -1;
     },
     changedPaginationPage(p) {
       this.page = p;
