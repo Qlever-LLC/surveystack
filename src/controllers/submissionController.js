@@ -654,6 +654,67 @@ const updateSubmission = async (req, res) => {
   return res.send(updated.value);
 };
 
+const reassignSubmission = async (req, res) => {
+  const { id } = req.params;
+  const { body } = req;
+
+  const existing = res.locals.existing;
+  const updatedRevision = existing.meta.revision + 1;
+
+  const survey = await db.collection('surveys').findOne({ _id: existing.meta.survey.id });
+  if (!survey) {
+    throw boom.notFound(`No survey found with id: ${existing.meta.survey.id}`);
+  }
+
+  // re-insert existing submission with a new _id
+  existing._id = new ObjectId();
+  existing.meta.original = new ObjectId(id);
+  existing.meta.archived = true;
+  existing.meta.archivedReason = 'REASSIGN';
+  await db.collection(col).insertOne(existing);
+
+  const farmosResults = [];
+  try {
+    // TODO: should we use the currently logged in user or the submission's user?
+    // probably the submission's user (for instance if submission is re-assigned with a different user)
+    const results = await farmOsService.handle(res, existing, survey, res.locals.auth.user);
+    farmosResults.push(...results);
+    // could contain errors, need to pass these on to the user
+  } catch (error) {
+    // TODO what should we do if something internal fails?
+    // need to let the user somehow know
+    console.log('error handling farmos', error);
+    return res.status(503).send({
+      message: `error submitting to farmos ${error}`,
+      farmos: error.messages,
+    });
+  }
+
+  const updateOperation = { 'meta.revision': updatedRevision };
+  if (body.group) {
+    const group = await db.collection('groups').findOne({ _id: new ObjectId(body.group) });
+    if (group) {
+      updateOperation['meta.group.id'] = group._id;
+      updateOperation['meta.group.path'] = group.path;
+    }
+  }
+  if (body.creator) {
+    updateOperation['meta.creator'] = ObjectId(body.creator);
+  }
+
+  const updated = await db.collection(col).findOneAndUpdate(
+    { _id: new ObjectId(id) },
+    {
+      $set: updateOperation,
+    },
+    {
+      returnOriginal: false,
+    }
+  );
+  updated.value.farmos = farmosResults;
+  return res.send(updated.value);
+};
+
 const archiveSubmission = async (req, res) => {
   const { id } = req.params;
   const { reason } = req.query;
@@ -698,6 +759,7 @@ export default {
   getSubmission,
   createSubmission,
   updateSubmission,
+  reassignSubmission,
   archiveSubmission,
   deleteSubmission,
 };
