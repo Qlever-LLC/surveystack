@@ -22,6 +22,7 @@
         <div class="d-flex justify-end">
           <span class="title mr-auto">{{control.label}}</span>
           <app-required v-if="control.options && control.options.required" />
+          <app-redacted v-if="control.options && control.options.redacted" />
         </div>
 
         <div
@@ -45,6 +46,7 @@
       >
         <div class="d-flex justify-end">
           <app-required v-if="$store.getters['draft/relevance'](path) && control.options && control.options.required" />
+          <app-redacted v-if="control.options && control.options.redacted" />
         </div>
         <component
           :is="getComponentName(control)"
@@ -73,11 +75,14 @@
 <script>
 import moment from 'moment';
 import appRequired from '@/components/survey/drafts/Required.vue';
+import appRedacted from '@/components/survey/drafts/Redacted.vue';
+
 
 export default {
   name: 'app-control',
   components: {
     appRequired,
+    appRedacted,
   },
   props: {
     path: {
