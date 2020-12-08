@@ -33,7 +33,9 @@ export const createControlInstance = (control) => {
 
   if (control.type === 'selectSingle' || control.type === 'selectMultiple') {
     cloneWithDefaultOptions.options.source = [];
-  } else if (control.type === 'ontology' || control.type === 'matrix') {
+  } else if (control.type === 'matrix') {
+    cloneWithDefaultOptions.options.source = { config: { addRowLabel: 'Add row' }, content: [] };
+  } else if (control.type === 'ontology') {
     cloneWithDefaultOptions.options.source = '';
   } else if (control.type === 'instructions') {
     cloneWithDefaultOptions.options.source = '';

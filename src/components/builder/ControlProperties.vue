@@ -235,7 +235,7 @@
 
       <app-matrix-properties
         v-else-if="isMatrix"
-        :value="control.options.source"
+        v-model="control.options.source"
         :resources="survey.resources"
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"

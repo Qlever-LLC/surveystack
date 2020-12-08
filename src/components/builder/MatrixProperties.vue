@@ -2,55 +2,43 @@
   <div>
     <v-card-title class="px-0 d-flex justify-space-between">
       <div>
-        Matrix Resource
+        Matrix
       </div>
 
     </v-card-title>
     <div class="d-flex">
-      <div>
-        <resource-selector
-          :resources="filteredResources"
-          :value="value"
-          @on-new="createResourceHandler"
-          @on-select="selectResourceHandler"
-        />
-      </div>
-      <v-btn
-        icon
-        @click.stop="openTableDialog"
-        class="mt-2 ml-2"
-        :class="{'d-none': !value}"
-      >
-        <v-icon>mdi-pencil</v-icon>
-      </v-btn>
-
+      <v-btn color="primary" @click="matrixEditorDialog = true">Open Column Editor</v-btn>
     </div>
-    <v-dialog v-model="tableDialogIsVisible">
+    <v-dialog v-model="matrixEditorDialog">
       <app-matrix-editor
         :resources="resources"
-        :resource="resource"
+        v-model="value"
         @change="setResource"
         @delete="removeResource"
-        @close-dialog="closeTableDialog"
+        @close-dialog="matrixEditorDialog = false"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
       />
     </v-dialog>
+    <h4 class="mt-4">Config</h4>
+    <v-text-field
+      style="width: 20rem"
+      class="my-2"
+      v-model="value.config.addRowLabel"
+      label="Add Row Label"
+    />
   </div>
 </template>
 
 <script>
-import ObjectId from 'bson-objectid';
 import appMatrixEditor from '@/components/builder/MatrixEditor.vue';
-import ResourceSelector from '@/components/builder/ResourceSelector.vue';
 
 export default {
   components: {
     appMatrixEditor,
-    ResourceSelector,
   },
   data() {
     return {
-      tableDialogIsVisible: false,
+      matrixEditorDialog: false,
     };
   },
   methods: {
@@ -72,42 +60,13 @@ export default {
       ];
       this.$emit('set-survey-resources', newResources);
     },
-    openTableDialog() {
-      this.tableDialogIsVisible = true;
-    },
-    closeTableDialog() {
-      this.tableDialogIsVisible = false;
-    },
-    createResourceHandler() {
-      const id = new ObjectId().toString();
-      this.$emit('set-survey-resources', [...this.resources, {
-        label: `Matrix Items ${this.resources.length + 1}`,
-        name: `matrix_items_${this.resources.length + 1}`,
-        id,
-        type: 'MATRIX',
-        location: 'EMBEDDED',
-        content: [],
-        config: { addRowLabel: 'Add row' },
-      }]);
-      this.$emit('set-control-source', id);
-      this.openTableDialog();
-    },
     selectResourceHandler(id) {
       this.$emit('set-control-source', id);
     },
   },
-  // model: {
-  //   // prop: 'items',
-  //   event: 'set-control-source',
-  //   // event: 'change',
-  // },
   props: {
-    // value: {
-    //   type: Array,
-    //   required: true,
-    // },
     value: {
-      type: String,
+      type: Object,
     },
     resources: {
       type: Array,

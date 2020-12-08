@@ -29,39 +29,7 @@
           </div>
           <div class="d-flex align-center">
 
-            <v-dialog
-              v-model="deleteDialogIsVisible"
-              max-width="290"
-            >
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  icon
-                  v-on="on"
-                  class="ml-2"
-                >
-                  <v-icon>mdi-delete</v-icon>
-                </v-btn>
-              </template>
-              <v-card>
-                <v-card-title>Delete List</v-card-title>
-                <v-card-text>
-                  Are you sure you want to delete this list: <strong>{{ resource.label }}</strong>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer />
-                  <v-btn
-                    text
-                    color="red"
-                    @click="deleteResult"
-                  >Delete</v-btn>
-                  <v-btn
-                    text
-                    @click="closeDeleteDialog"
-                  >Cancel</v-btn>
 
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
           </div>
 
         </div>
@@ -69,21 +37,7 @@
 
       <v-card-text class="pt-0">
         <div class="d-flex justify-start">
-          <v-text-field
-            style="max-width: 20rem"
-            :value="resource.label"
-            @input="handleUpdateLabel"
-            label="Label"
-            persistent-hint
-          />
-          <v-text-field
-            style="max-width: 20rem; margin-left: 1rem"
-            :value="resource.name"
-            @input="handleUpdateName"
-            label="Data Name"
-            persistent-hint
-            :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
-          />
+
 
         </div>
         <div
@@ -91,7 +45,7 @@
           style="overflow-x: auto"
         >
           <v-card
-            v-for="(item,i) in resource.content"
+            v-for="(item,i) in value.content"
             :key="i"
             width="15rem"
             min-width="15rem"
@@ -198,8 +152,7 @@
           <v-text-field
             style="width: 20rem"
             class="my-2"
-            :value="resource.config.addRowLabel"
-            @input="handleUpdateAddRowLabel"
+            v-model="value.config.addRowLabel"
             label="Add Row Label"
             persistent-hint
           />
@@ -233,7 +186,7 @@ const MATRIX_COLUMN_TYPES = [
 
 export default {
   props: {
-    resource: {
+    value: {
       type: Object,
       required: true,
       default: () => ({ content: [], config: { addRowLabel: 'Add row' } }),
@@ -300,41 +253,22 @@ export default {
       this.editOntologyId = id;
       this.editorDialog = true;
     },
-    nameIsUnique(val) {
-      return this.resourceNames.some(({ name, id }) => this.resource.name === name && this.resource.id !== id)
-        ? 'Name already exists'
-        : true;
-    },
-    nameHasValidCharacters(val) {
-      const namePattern = /^[\w]*$/;
-      return namePattern.test(val) ? true : 'Must only contain alphanumeric and underscores';
-    },
-    nameHasValidLength(val) {
-      const namePattern = /^.{4,}$/; // one character should be ok, especially within groups
-      return namePattern.test(val) ? true : 'Data name must be at least 4 character in length';
-    },
     moveItemDown({ id }) {
-      const index = this.resource.content.findIndex(item => item.id === id);
-      if (index < this.resource.content.length - 1) {
-        const newItems = [...this.resource.content];
+      const index = this.value.content.findIndex(item => item.id === id);
+      if (index < this.value.content.length - 1) {
+        const newItems = [...this.value.content];
         const [item] = newItems.splice(index, 1);
         newItems.splice(index + 1, 0, item);
-        this.$emit('change', {
-          ...this.resource,
-          content: newItems,
-        });
+        this.value.content = newItems;
       }
     },
     moveItemUp({ id }) {
-      const index = this.resource.content.findIndex(item => item.id === id);
+      const index = this.value.content.findIndex(item => item.id === id);
       if (index > 0) {
-        const newItems = [...this.resource.content];
+        const newItems = [...this.value.content];
         const [item] = newItems.splice(index, 1);
         newItems.splice(index - 1, 0, item);
-        this.$emit('change', {
-          ...this.resource,
-          content: newItems,
-        });
+        this.value.content = newItems;
       }
     },
     createEmptyColumn() {
@@ -349,46 +283,10 @@ export default {
       };
     },
     deleteColumn(index) {
-      this.resource.content.splice(index, 1);
-      this.$emit('change', {
-        ...this.resource,
-        content: this.resource.content,
-      });
-    },
-    openDeleteDialog() {
-      this.deleteDialogIsVisible = true;
-    },
-    closeDeleteDialog() {
-      this.deleteDialogIsVisible = false;
-    },
-    deleteResult() {
-      this.closeDeleteDialog();
-      this.$emit('delete', this.resource.id);
-      this.$emit('close-dialog');
-    },
-    handleUpdateLabel(label) {
-      this.$emit('change', {
-        ...this.resource,
-        label,
-      });
-    },
-    handleUpdateName(name) {
-      this.$emit('change', {
-        ...this.resource,
-        name,
-      });
-    },
-    handleUpdateAddRowLabel(addRowLabel) {
-      this.$emit('change', {
-        ...this.resource,
-        config: { ...this.resource.config, addRowLabel },
-      });
+      this.value.content.splice(index, 1);
     },
     addColumn() {
-      this.$emit('change', {
-        ...this.resource,
-        content: [...this.resource.content, this.createEmptyColumn()],
-      });
+      this.value.content = [...this.value.content, this.createEmptyColumn()];
     },
   },
   MATRIX_COLUMN_TYPES,
