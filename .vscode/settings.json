@@ -1,19 +1,20 @@
 {
     "prettier.requireConfig": true,
     "eslint.run": "onType",
-    "eslint.autoFixOnSave": true,
     "eslint.validate": [
         "javascript",
-        {
-            "language": "vue",
-            "autoFix": true
-        },
+        "vue"
     ],
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true
     },
     "vetur.format.defaultFormatter.js": "vscode-typescript",
     "vetur.format.defaultFormatter.html": "js-beautify-html",
+    "vetur.format.defaultFormatterOptions": {
+        "prettyhtml": {
+            "printWidth": 250, // No line exceeds 260 characters
+        }
+      },
     "[javascript]": {
         "editor.tabSize": 2,
         "editor.insertSpaces": true,
