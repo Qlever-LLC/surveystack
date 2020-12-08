@@ -176,7 +176,7 @@
           <div class="d-flex align-center">
             <div><span class="subtitle-2">ACTIONS</span><br />{{selected.length}} {{selected.length === 1 ? 'submission' : 'submissions'}} selected</div>
             <div
-              class="ml-auto"
+              class="ml-auto d-flex flex-column flex-sm-row"
               v-if="selected.length === 1"
             >
               <v-btn
@@ -202,14 +202,18 @@
               >
                 ARCHIVE
               </v-btn>
-              <v-btn @click="reassignment.showModal = true">REASSIGN...</v-btn>
+              <v-btn
+                @click="reassignment.showModal = true"
+                text
+                color="secondary"
+              >REASSIGN</v-btn>
               <v-btn
                 v-if="selected[0]['meta.archived'] !== 'true'"
                 text
-                color="secondary"
+                color="primary"
                 @click="resubmit(selected[0])"
               >
-                RESUBMIT...
+                RESUBMIT
               </v-btn>
 
             </div>
