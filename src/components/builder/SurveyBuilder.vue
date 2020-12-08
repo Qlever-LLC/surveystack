@@ -32,6 +32,7 @@
             :version="version"
             :draft="isDraft"
             v-model="survey"
+            :survey="survey"
             :isNew="!editMode"
             :dirty="dirty"
             :enableUpdate="enableUpdate"
@@ -47,6 +48,7 @@
             @publish="publish"
             @export-survey="$emit('export-survey')"
             @import-survey="(file) => $emit('import-survey', file)"
+            @set-survey-resources="setSurveyResources"
             class="mb-4"
           />
           <graphical-view
@@ -183,12 +185,16 @@
         </div>
       </pane>
       <pane class="pane pane-draft">
-        <draft
-          @submit="payload => $emit('submit', payload)"
-          v-if="survey && instance"
-          :submission="instance"
-          :survey="survey"
-        ></draft>
+        <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
+        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px);">
+          <app-draft-component
+            @submit="payload => $emit('submit', payload)"
+            v-if="survey && instance"
+            :submission="instance"
+            :survey="survey"
+            :persist="false"
+          ></app-draft-component>
+        </div>
         <v-overlay :value="enableSaveDraft">
           <v-card>
             <v-card-text>
@@ -221,7 +227,7 @@ import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
 import controlAdder from '@/components/builder/ControlAdder.vue';
 import surveyDetails from '@/components/builder/SurveyDetails.vue';
-import draft from '@/components/survey/drafts/DraftComponent.vue';
+import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 import consoleLog from '@/components/builder/ConsoleLog.vue';
 
 import appCodeView from '@/components/builder/CodeView.vue';
@@ -271,7 +277,7 @@ export default {
     controlProperties,
     controlAdder,
     surveyDetails,
-    draft,
+    appDraftComponent,
     consoleLog,
     appCodeView,
     // ConfirmLeaveDialog,
@@ -522,7 +528,7 @@ export default {
     },
     duplicateControl(control) {
       const position = utils.getPosition(this.control, this.currentControls);
-      utils.insertControl(control, this.currentControls, position, this.control.type === 'group');
+      utils.insertControl(control, this.currentControls, position, this.control.type === 'group' || this.control.type === 'page');
       this.control = control;
     },
     controlAdded(control) {
@@ -533,7 +539,7 @@ export default {
       }
 
       const position = utils.getPosition(this.control, this.currentControls);
-      utils.insertControl(control, this.currentControls, position, this.control.type === 'group');
+      utils.insertControl(control, this.currentControls, position, this.control.type === 'group' || this.control.type === 'page');
       this.control = control;
     },
     onCancel() {
@@ -855,7 +861,7 @@ export default {
 .pane-survey,
 .pane-controls {
   overflow: auto;
-  width: 420px !important;
+  width: 500px !important;
 }
 
 .pane-submission-code,
@@ -882,12 +888,13 @@ export default {
 .pane-draft {
   width: 100vw;
   align-self: center;
+  overflow: auto;
 }
 
 .pane-draft,
 .draft {
   max-width: 500px;
-  max-height: 1000px;
+  /*max-height: 1000px;*/
 }
 
 .hide-pane {

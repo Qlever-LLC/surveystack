@@ -223,9 +223,18 @@
         v-model="control.options.source"
         class="mt-5"
       />
-        <!-- v-model="survey.resources" -->
+      <!-- v-model="survey.resources" -->
       <select-items-editor-alt
         v-else-if="isOntology"
+        :value="control.options.source"
+        :resources="survey.resources"
+        @set-control-source="(val) => $emit('set-control-source', val)"
+        @set-survey-resources="(val) => $emit('set-survey-resources', val)"
+        class="mt-5"
+      />
+
+      <app-matrix-properties
+        v-else-if="isMatrix"
         :value="control.options.source"
         :resources="survey.resources"
         @set-control-source="(val) => $emit('set-control-source', val)"
@@ -246,6 +255,7 @@ import { getAdvancedCodeTemplate, findParentByChildId } from '@/utils/surveys';
 import api from '@/services/api.service';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
 import SelectItemsEditorAlt from '@/components/builder/SelectItemsEditorAlt.vue';
+import appMatrixProperties from '@/components/builder/MatrixProperties.vue';
 import InstructionsEditor from '@/components/builder/InstructionsEditor.vue';
 
 import { convertToKey } from '@/utils/builder';
@@ -255,6 +265,8 @@ export default {
     SelectItemsEditor,
     SelectItemsEditorAlt,
     InstructionsEditor,
+    appMatrixProperties,
+
   },
   props: {
     control: {
@@ -343,6 +355,9 @@ export default {
     },
     isOntology() {
       return this.control.type === 'ontology';
+    },
+    isMatrix() {
+      return this.control.type === 'matrix';
     },
   },
   methods: {

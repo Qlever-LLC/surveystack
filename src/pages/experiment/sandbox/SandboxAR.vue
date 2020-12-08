@@ -1,77 +1,83 @@
 <template>
   <v-container>
-    <a
-      class="body-2"
-      :href="apiUrl"
-      target="_blank"
-    >{{apiUrl}}</a>
+    <h1>Test</h1>
     <v-row>
       <v-col>
-        <v-card>
-          <v-list>
-            <v-list-item
-              v-for="e in tree"
-              :key="e._id"
-              :to="`/g${e.group.path}`"
-            >
-              <v-list-item-content :class="`ml-${getIndentation(e.group.path) * 2}`">
-                <v-list-item-title>
-                  {{e.group.name}}
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  {{e.group.path}}
-                </v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-        </v-card>
-      </v-col>
-      <v-col>
-        <app-json-editor
-          v-model="tree"
-          :rows="16"
+        <v-textarea
+          :value="submissionText"
+          rows="30"
+          outlined
         />
       </v-col>
+      <v-col>
+        <v-form>
+          <v-text-field
+            label="meta.user"
+            @input="(v) => setProperty({path: 'meta.user', value: v})"
+          />
+
+          <v-text-field
+            v-model="name"
+            label="data.name.value"
+          />
+          <v-text-field
+            v-model="age"
+            label="data.age.value"
+            type="number"
+          />
+
+        </v-form>
+      </v-col>
+
     </v-row>
+
   </v-container>
 </template>
 
 <script>
-import api from '@/services/api.service';
-import appJsonEditor from '@/components/ui/JsonEditor.vue';
-
-
 export default {
-  components: {
-    appJsonEditor,
-  },
-  data() {
-    return {
-      tree: [],
-    };
-  },
   methods: {
-    getIndentation(path) {
-      // const i = [...path].filter(c => c === '/').length - 2; // much ES6
-      const i = path.split('/').length - 2;
-      return i;
-    },
-    stringify(obj) {
-      return JSON.stringify(obj);
+    setProperty({ path, value }) {
+      this.$store.dispatch('draft/setProperty', { path, value });
     },
   },
   computed: {
-    apiUrl() {
-      if (this.$store.getters['auth/isLoggedIn']) {
-        const uid = this.$store.getters['auth/user']._id;
-        return `${process.env.VUE_APP_API_URL}/memberships/tree?user=${uid}`;
-      }
-      return `${process.env.VUE_APP_API_URL}/api/memberships/tree`;
+    submission() {
+      return this.$store.getters['draft/submission'];
+    },
+    submissionText() {
+      return JSON.stringify(this.submission, null, 2);
+    },
+    name: {
+      get() {
+        return this.$store.getters['draft/property']('data.name').value;
+      },
+      set(v) {
+        this.setProperty({ path: 'data.name.value', value: v });
+      },
+
+    },
+    age: {
+      get() {
+        return this.$store.getters['draft/property']('data.age').value;
+      },
+      set(v) {
+        const n = Number(v);
+        this.setProperty({ path: 'data.age.value', value: n });
+      },
+    },
+    user: {
+      get() {
+        return this.$store.getters['draft/property']('meta.user').value;
+      },
+      set(v) {
+        this.setProperty({ path: 'meta.user', value: v });
+      },
     },
   },
-  async created() {
-    const { data: tree } = await api.get('/memberships/tree');
-    this.tree = tree;
+  created() {
+    const submission = { meta: { user: 'Andreas' }, data: { age: { value: 36 }, name: { value: 'Andreas' } } };
+    this.$store.dispatch('draft/init', { submission });
   },
 };
 </script>

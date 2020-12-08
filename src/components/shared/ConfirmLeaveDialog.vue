@@ -9,7 +9,7 @@
         {{ title }}
       </v-card-title>
       <v-card-text>
-        <slot/>
+        <slot />
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -66,7 +66,3 @@ export default {
   },
 };
 </script>
-
-<style>
-
-</style>

@@ -1,5 +1,5 @@
 <template>
-  <v-container class="mw-40">
+  <v-container class="maxw-40">
     <v-card class="pa-5">
       <h1>New password</h1>
       <p>Set a new password for {{this.email}}</p>

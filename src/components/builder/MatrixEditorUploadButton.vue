@@ -10,7 +10,7 @@
           color="primary"
         >
           <v-icon left>mdi-upload</v-icon>
-          Add CSV
+          Import CSV
         </v-btn>
       </label>
       <input
@@ -29,47 +29,38 @@
 import { parse } from 'papaparse';
 import ObjectId from 'bson-objectid';
 
-const columns = ['label', 'value', 'tags'];
-function columnIsValid(name) {
-  return RegExp(this.columns.join('|')).test(name);
-}
-
 export default {
-  data() {
-    return {
-      columns,
-    };
-  },
   methods: {
-    columnIsValid,
-    filterItemsKeys(items) {
-      return items.map(({ label, value, tags }) => ({ label, value, tags }));
-    },
     async handleFileChange({ target: { files: [file] } }) {
-      console.log('handle file change');
-      console.log(file);
-      console.log(this.columns);
       try {
-        const data = parse(await file.text(), {
+        const parsed = parse(await file.text(), {
           header: true,
           skipEmptyLines: true,
-          // Normalize keys / column headings
-          transformHeader(header) {
-            return columns.reduce(
-              (r, x) => r.replace(RegExp(x, 'i'), x),
-              header,
-            );
+          // Normalize column headings and remove TYPE from "h|TYPE"
+          transformHeader(h) {
+            return h.trim().toLowerCase().split('|')[0];
           },
-
         });
 
 
-        const items = this.filterItemsKeys(data.data)
+        const parsedHeaders = parse(await file.text(), {
+          header: true,
+          skipEmptyLines: true,
+          preview: 1,
+        });
+
+        const items = parsed.data
           .map(item => ({
             ...item,
-            id: new ObjectId().toString(),
+            _row: new ObjectId().toString(),
+            _prefill: item._prefill === '1' || item._prefill === 'y' || item.prefill === 'Y',
           }));
-        this.$emit('change', items);
+
+        const fields = parsed.meta.fields.filter(f => !f.startsWith('_'));
+        const headers = parsedHeaders.meta.fields.filter(f => !f.startsWith('_')).map(field => ({ text: field.split('|')[0], value: field.split('|')[0], type: field.split('|')[1] || 'text' }));
+        const data = [...items];
+
+        this.$emit('change', { fields, headers, data });
         this.$refs['select-items-file-input'].value = null;
       } catch (err) {
         console.error('error parsing CSV file', err);

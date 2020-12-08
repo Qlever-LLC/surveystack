@@ -1,7 +1,40 @@
 <template>
   <footer v-if="showNav">
     <v-container class="pa-0">
-      <v-row>
+      <v-row v-if="showSubmit">
+        <v-col
+          class="text-center"
+          cols="6"
+        >
+          <v-btn
+            @click="$store.dispatch('draft/showOverview', false)"
+            class="full"
+            outlined
+            depressed
+            large
+            color="primary"
+          >
+            Cancel
+          </v-btn>
+        </v-col>
+        <v-col
+          class="text-center"
+          cols="6"
+        >
+          <v-btn
+            :disabled="!enableSubmit"
+            @click="$emit('submit');"
+            class="full"
+            depressed
+            large
+            color="primary"
+          >
+            Submit
+          </v-btn>
+        </v-col>
+      </v-row>
+
+      <v-row v-else>
         <v-col
           class="text-center"
           cols="6"
@@ -18,33 +51,13 @@
             Previous
           </v-btn>
         </v-col>
-
         <v-col
-          v-if="showSubmit"
           class="text-center"
           cols="6"
         >
           <v-btn
             :disabled="!enableNext"
             @click="$emit('next');"
-            class="full"
-            depressed
-            large
-            color="primary"
-          >
-            Submit
-          </v-btn>
-        </v-col>
-
-        <v-col
-          v-else
-          class="text-center"
-          cols="6"
-        >
-          <v-btn
-            :disabled="!enableNext"
-            @click="$emit('submit');"
-            @keyup.enter="$emit('submit');"
             class="full"
             depressed
             large
@@ -64,6 +77,7 @@ export default {
   props: [
     'showPrev',
     'enableNext',
+    'enableSubmit',
     'showSubmit',
     'showNav',
   ],

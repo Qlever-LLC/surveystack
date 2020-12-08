@@ -1,11 +1,11 @@
 <template>
-    <!-- v-if="state.isEditing" -->
+  <!-- v-if="state.isEditing" -->
   <v-text-field
     :value="value"
     @input="emitInput"
     @blur="setIsEditing(false)"
     placeholder="Untitled Survey"
-    class="display-1"
+    class="display-1 pt-0 mt-0"
     :rules="[rules.hasOnlyValidCharacters, rules.hasValidLength]"
     :autofocus="value === ''"
   />

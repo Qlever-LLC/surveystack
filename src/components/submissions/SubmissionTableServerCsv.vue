@@ -8,7 +8,7 @@
         show-select
         item-key="_id"
         :search="search"
-        :mobile-breakpoint="NaN"
+        :mobile-breakpoint="0"
       >
         <template v-slot:top>
           <v-toolbar flat>

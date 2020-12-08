@@ -15,7 +15,7 @@ import appMixin from '@/components/mixin/appComponent.mixin';
 
 import * as utils from '@/utils/surveys';
 import submissionUtils from '@/utils/submissions';
-import * as codeEvaluator from '@/utils/codeEvaluator';
+import * as codeEvaluator from '@/utils/codeEvaluator.legacy';
 
 export default {
   model: {
@@ -156,7 +156,7 @@ export default {
       this.submissionField.value = v;
       this.submissionField.meta.dateModified = modified;
       console.log(this.submission.meta.dateModified);
-      this.$emit('change', this.submission);
+      // this.$emit('change', this.submission);
       this.persist();
 
       // TODO: eagerly evaluate relevance expressions here instead of in handleNext / handlePrevious
@@ -201,8 +201,8 @@ export default {
       this.showNext(true);
 
       this.index = this.positions.findIndex(p => isEqual(p, pos));
-      this.control = utils.getControl(this.controls, pos);
-      this.value = submissionUtils.getSubmissionField(this.submission, this.survey, pos).value;
+      this.control = utils.getControl(this.controls, this.position);
+      this.value = submissionUtils.getSubmissionField(this.submission, this.survey, this.position).value;
       this.showOverview = false;
 
       this.calculateControl();
@@ -297,6 +297,18 @@ export default {
           continue;
         }
 
+        // check if inside page
+        if (this.position.length > 1) {
+          const parentPosition = [...this.position];
+          parentPosition.pop();
+
+          const parent = utils.getControl(this.controls, parentPosition);
+
+          if (parent.type === 'page') {
+            continue;
+          }
+        }
+
         this.calculateControl();
         return;
       }
@@ -334,6 +346,18 @@ export default {
         if (this.control.type === 'group') {
           // eslint-disable-next-line no-continue
           continue;
+        }
+
+        // check if inside page
+        if (this.position.length > 1) {
+          const parentPosition = [...this.position];
+          parentPosition.pop();
+
+          const parent = utils.getControl(this.controls, parentPosition);
+
+          if (parent.type === 'page') {
+            continue;
+          }
         }
 
         return;

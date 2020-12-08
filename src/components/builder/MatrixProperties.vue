@@ -2,36 +2,37 @@
   <div>
     <v-card-title class="px-0 d-flex justify-space-between">
       <div>
-        Dropdown List
+        Matrix Resource
       </div>
 
     </v-card-title>
-    <div class="text-center d-flex">
-      <!-- :resourceTypes="['ONTOLOGY_LIST']" -->
-      <resource-selector
-        :resources="filteredResources"
-        :value="value"
-        @on-new="createResourceHandler"
-        @on-select="selectResourceHandler"
-      />
+    <div class="d-flex">
+      <div>
+        <resource-selector
+          :resources="filteredResources"
+          :value="value"
+          @on-new="createResourceHandler"
+          @on-select="selectResourceHandler"
+        />
+      </div>
       <v-btn
         icon
         @click.stop="openTableDialog"
+        class="mt-2 ml-2"
         :class="{'d-none': !value}"
       >
-        <!-- Edit entries -->
-        <!-- <v-icon class="ml-2">mdi-table</v-icon> -->
-        <v-icon class="ml-2 mt-3">mdi-pencil</v-icon>
+        <v-icon>mdi-pencil</v-icon>
       </v-btn>
 
     </div>
     <v-dialog v-model="tableDialogIsVisible">
-      <select-items-table-editor
-        :resources="filteredResources"
+      <app-matrix-editor
+        :resources="resources"
         :resource="resource"
         @change="setResource"
         @delete="removeResource"
         @close-dialog="closeTableDialog"
+        @set-survey-resources="(val) => $emit('set-survey-resources', val)"
       />
     </v-dialog>
   </div>
@@ -39,12 +40,12 @@
 
 <script>
 import ObjectId from 'bson-objectid';
-import SelectItemsTableEditor from '@/components/builder/SelectItemsTableEditor.vue';
+import appMatrixEditor from '@/components/builder/MatrixEditor.vue';
 import ResourceSelector from '@/components/builder/ResourceSelector.vue';
 
 export default {
   components: {
-    SelectItemsTableEditor,
+    appMatrixEditor,
     ResourceSelector,
   },
   data() {
@@ -80,13 +81,13 @@ export default {
     createResourceHandler() {
       const id = new ObjectId().toString();
       this.$emit('set-survey-resources', [...this.resources, {
-        label: `Dropdown Items ${this.resources.length + 1}`,
-        // handle: `dropdown_items_${this.resources.length + 1}`,
-        name: `dropdown_items_${this.resources.length + 1}`,
+        label: `Matrix Items ${this.resources.length + 1}`,
+        name: `matrix_items_${this.resources.length + 1}`,
         id,
-        type: 'ONTOLOGY_LIST',
+        type: 'MATRIX',
         location: 'EMBEDDED',
         content: [],
+        config: { addRowLabel: 'Add row' },
       }]);
       this.$emit('set-control-source', id);
       this.openTableDialog();
@@ -118,7 +119,7 @@ export default {
       return this.resources.find(resource => resource.id === this.value);
     },
     filteredResources() {
-      return this.resources.filter(resource => resource.type === 'ONTOLOGY_LIST');
+      return this.resources.filter(resource => resource.type === 'MATRIX');
     },
   },
 };

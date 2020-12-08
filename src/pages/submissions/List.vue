@@ -21,6 +21,36 @@
       </template>
     </app-dialog>
 
+    <app-dialog
+      v-model="reassignment.showModal"
+      @cancel="reassignment.showModal = false"
+      @confirm="reassign(selected[0])"
+      labelConfirm="Reassign"
+    >
+      <template v-slot:title>Reassign Submission</template>
+      <template>
+        <v-autocomplete
+          :items="reassignment.groups"
+          v-model="reassignment.group"
+          label="Group"
+          :filter="reassignGroupFilter"
+        >
+          <template v-slot:item="{item}">
+            <div class="d-flex flex-column py-1">
+              <div>{{item.text}}</div>
+              <div class="text--secondary caption">{{item.path}}</div>
+            </div>
+          </template>
+        </v-autocomplete>
+        <v-autocomplete
+          :disabled="reassignment.group === null"
+          :items="reassignment.users"
+          v-model="reassignment.user"
+          label="User"
+        ></v-autocomplete>
+      </template>
+    </app-dialog>
+
     <v-container>
       <div class="d-flex justify-end">
         <v-btn
@@ -172,6 +202,7 @@
               >
                 ARCHIVE
               </v-btn>
+              <v-btn @click="reassignment.showModal = true">REASSIGN...</v-btn>
               <v-btn
                 v-if="selected[0]['meta.archived'] !== 'true'"
                 text
@@ -369,7 +400,7 @@ export default {
         },
       },
       page: 1,
-      pageSizes: [1, 5, 10, 20, 50, 100, 10000],
+      pageSizes: [1, 5, 10, 50, 100, 1000, 'All'].map(n => ({ text: n, value: Number(n) || 0 })),
       pageSize: defaultPageSize,
       selected: [],
       search: '',
@@ -381,6 +412,13 @@ export default {
         sortDesc: [],
       },
       loading: false,
+      reassignment: {
+        showModal: false,
+        group: null,
+        user: null,
+        groups: this.$store.getters['memberships/memberships'].filter(m => m.role === 'admin').map(m => ({ text: m.group.name, value: m.group._id, path: m.group.path })),
+        users: [],
+      },
     };
   },
   computed: {
@@ -467,6 +505,10 @@ export default {
         this.loading = false;
       }
     },
+    async fetchUsers(groupId) {
+      const { data: memberships } = await api.get(`/memberships?group=${groupId}&populate=true`);
+      this.reassignment.users = memberships.filter(m => m.user).map(m => ({ text: `${m.user.name} <${m.user.email}>`, value: m.user._id }));
+    },
     async deleteSubmission(submission) {
       this.showDeleteModal = false;
       try {
@@ -518,13 +560,29 @@ export default {
       await this.$store.dispatch('submissions/fetchRemoteSubmission', submission._id);
       this.$router.push(`/submissions/drafts/${submission._id}`);
     },
+    async reassign(submission) {
+      console.log(`reassigning submission id ${submission._id}`);
+      this.reassignment.showModal = false;
+      try {
+        await api.post(`/submissions/${submission._id}/reassign`, { group: this.reassignment.group, creator: this.reassignment.user });
+        this.selected = [];
+        this.fetchData();
+      } catch (err) {
+        this.$store.dispatch('feedback/add', err.response.data.message);
+      }
+    },
+    reassignGroupFilter(item, queryText, itemText) {
+      return `${itemText} ${item.path}`.toLocaleLowerCase().indexOf(queryText.toLocaleLowerCase()) > -1;
+    },
+    reassignUserFilter(item, queryText, itemText) {
+      return `${itemText} ${item.email}`.toLocaleLowerCase().indexOf(queryText.toLocaleLowerCase()) > -1;
+    },
     changedPaginationPage(p) {
       this.page = p;
       this.filter.skip = (p - 1) * this.filter.limit;
       this.fetchData();
     },
     changedPaginationSize() {
-      // console.log;
       this.page = 1;
       this.filter.limit = this.pageSize;
       this.filter.skip = 0;
@@ -557,7 +615,7 @@ export default {
       const element = document.createElement('a');
 
       element.setAttribute('href', this.apiDownloadUrl);
-      element.setAttribute('download', `${this.surveyEntity.name}.csv`);
+      element.setAttribute('download', `${this.surveyEntity.name}.${this.apiDownloadFormat}`);
 
       element.style.display = 'none';
       document.body.appendChild(element);
@@ -571,6 +629,16 @@ export default {
     showArchived() {
       this.selected = [];
       this.fetchData();
+    },
+    'reassignment.group': function (val) {
+      this.reassignment.user = null;
+
+      if (!val) {
+        this.reassignment.users = [];
+        return;
+      }
+
+      this.fetchUsers(val);
     },
   },
   async created() {

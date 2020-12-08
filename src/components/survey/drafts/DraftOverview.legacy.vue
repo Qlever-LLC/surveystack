@@ -1,36 +1,18 @@
 <template>
   <v-container>
-    <v-banner
-      class="my-2"
-      v-if="$store.getters['draft/errors']"
-      color="red"
-      dark
-      rounded
-    >
-      <h3>Api Compose Errors</h3>
-      <li
-        v-for="(error, i) in $store.getters['draft/errors']"
-        :key="i"
-      >
-        <strong>{{error.path}}</strong> {{error.error.name}}: {{error.error.message}} <br />
-      </li>
-    </v-banner>
     <v-card>
       <v-card-title>{{ survey.name }}</v-card-title>
-      <v-card-subtitle class="grey--text mt-n5">
+      <v-card-subtitle>
         {{ submission._id }}
         <br />
-
+        Submitting to: <kbd>{{ group }}</kbd>
+        <br />
+        Created: <kbd>{{ created }}</kbd>
+        <br>
+        Last modified: <kbd>{{ modified }}</kbd>
+        <br />
         <strong v-if="submission.meta.dateSubmitted"><kbd>{{ submitted }}</kbd> submitted</strong>
       </v-card-subtitle>
-      <v-card-text>
-        Submitting to: {{ groupPath || '--' }}
-        <br />
-        Created: {{ created }}
-        <br>
-        Last modified: {{ modified }}
-        <br />
-      </v-card-text>
     </v-card>
     <v-timeline
       v-if="controlDisplays"
@@ -46,7 +28,7 @@
         >
           <v-card
             v-if="display.relevant || !display.hidden"
-            @click="$emit('goto', display.path)"
+            @click="$emit('navigate', display.position);"
             :color="display.background"
             :dark="display.dark"
           >
@@ -58,11 +40,20 @@
               > </div>
 
               <div class="flex-grow-1">
-                <v-card-title class="d-block mb-0 pb-0">
+                <v-card-title class="d-block">
                   <div class="ma-0 pa-0 d-flex align-stretch">
                     <!-- color="#FF5722" -->
-                    <span class="caption grey--text text--darken-1">{{ display.questionNumber }}</span>
-
+                    <v-chip
+                      dark
+                      small
+                      class="mr-0 mr-1"
+                    ><span
+                        v-for="(crumb, ci) in display.breadcrumbs"
+                        :key="`bread_${ci}`"
+                      >{{ crumb }} <span
+                          class="mr-1"
+                          v-if="ci < display.breadcrumbs.length - 1"
+                        >&gt;</span></span></v-chip>
                     <v-spacer></v-spacer>
                     <v-chip
                       small
@@ -71,33 +62,23 @@
                       color="grey-darken-5"
                     >Irrelevant</v-chip>
                   </div>
-
-                  <div class="title">{{ display.label }}</div>
-                  <span
-                    class="font-weight-light grey--text text--darken-2 mt-n1"
-                    style="font-size: 0.9rem; position: relative; top: -10px"
-                  >{{display.path}}</span>
+                  <span class="number-chip mr-2">{{ display.number }}</span>
+                  {{ display.label }}
                 </v-card-title>
                 <v-card-text
                   class="py-0"
                   v-if="display.value"
-                ><kbd
-                    class="pa-2"
-                    style="background: #555"
-                  >{{ display.value }}</kbd></v-card-text>
-                <v-card-text
-                  v-else
-                  class="text--secondary"
-                >No answer</v-card-text>
+                ><kbd class="pa-2">{{ display.value }}</kbd></v-card-text>
+                <v-card-text v-else>No answer</v-card-text>
                 <div
                   v-if="display.modified"
-                  class="d-flex justify-space-between text--secondary mx-4 mb-3 mt-4"
+                  class="d-flex flex-row text--secondary pa-2"
                   style="font-size: 0.8rem"
                 >
-                  <div>
-                    {{ display.modified.format('YYYY-MM-DD HH:mm') }}
+                  <div class="flex-grow-1">
+                    {{ display.modified.format('YYYY-MM-DD HH:mm') }}<v-spacer></v-spacer>
                   </div>
-                  <div>
+                  <div class="text-right">
                     {{ display.modifiedHumanized }} ago
                   </div>
                 </div>
@@ -120,7 +101,12 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import moment from 'moment';
+import colors from 'vuetify/lib/util/colors';
+import { linearControls } from '@/utils/submissions';
+import * as utils from '@/utils/surveys';
+
 
 const states = {
   done: ['mdi-check-bold', 'green'],
@@ -130,10 +116,10 @@ const states = {
   ok: ['', ''],
 };
 
-function iconify(value, control, relevant) {
-  if (value != null) {
+function iconify(control, relevant) {
+  if (control.value != null) {
     return states.done;
-  } if (relevant && (value == null && control.options.required)) {
+  } if (relevant && (control.value == null && control.options.required)) {
     return states.missing;
   } if (control.warning) {
     return states.warning;
@@ -147,8 +133,8 @@ export default {
   props: [
     'survey',
     'submission',
-    'groupPath',
-    'overviews',
+    'position',
+    'group',
   ],
   data() {
     return {
@@ -159,6 +145,15 @@ export default {
     };
   },
   methods: {
+    relevant(item, positions) {
+      const idx = positions.findIndex(p => _.isEqual(p, item.position));
+      if (idx === -1) {
+        return true;
+      }
+
+      const relevant = utils.isRelevant(this.submission, this.survey, idx, positions);
+      return relevant === undefined ? true : relevant;
+    },
     expand(group) {
       this.controlDisplays.filter(item => item.collateGroup === group && item.collate > 0).forEach((item) => {
         // eslint-disable-next-line no-param-reassign
@@ -167,43 +162,32 @@ export default {
         item.hidden = false;
       });
     },
-    isRelevant(node) {
-      const relevant = node.getPath().every((n) => {
-        const p = n.getPath().map(nn => nn.model.name).join('.');
-        const r = this.$store.getters['draft/property'](`${p}.meta.relevant`, true);
-        return r;
-      });
-      return relevant;
-    },
     refresh() {
       this.created = moment(this.submission.meta.dateCreated).format('YYYY-MM-DD HH:mm');
       this.modified = moment(this.submission.meta.dateModified).format('YYYY-MM-DD HH:mm');
       this.submitted = moment(this.submission.meta.dateSubmitted).format('YYYY-MM-DD HH:mm');
 
       const now = moment();
+      const positions = utils.getSurveyPositions(this.survey, this.submission.meta.survey.version);
 
       let collate = 0;
       let collateGroup = 0;
+      const controls = linearControls(this.survey, this.submission);
 
-      const controlDisplays = [];
-
-      for (let i = 0; i < this.overviews.length; i++) {
-        const overview = this.overviews[i];
-        const nextOverview = i + 1 < this.overviews.length ? this.overviews[i + 1] : null;
-
-        const { node, path, control } = overview;
-        if (control.type === 'group' || control.type === 'page') {
-          continue; // eslint-disable-line no-continue
-        }
-
-        const relevant = this.isRelevant(node);
-
+      const r = controls.map((item, itemIndex) => {
+        const peek = itemIndex + 1 < controls.length ? controls[itemIndex + 1] : null;
+        const active = _.isEqual(item.position, this.position);
+        const rel = this.relevant(item, positions);
         let lastOfCollation = false;
+        const icon = iconify(item, rel);
 
-        if (!relevant) {
+        if (!rel) {
           collate++;
-          // end collation if there are no next nodes or next nodes are relevant again
-          if (!nextOverview || (nextOverview && this.isRelevant(nextOverview.node))) {
+          if (peek) {
+            if (this.relevant(peek, positions)) {
+              lastOfCollation = true;
+            }
+          } else {
             lastOfCollation = true;
           }
         } else {
@@ -211,41 +195,42 @@ export default {
           collateGroup++;
         }
 
-        const dateModified = this.$store.getters['draft/property'](`${path}.meta.dateModified`, null);
-        const modified = dateModified ? moment(dateModified) : null;
+        const modified = item.meta.dateModified ? moment(item.meta.dateModified) : null;
 
-        const active = this.$store.getters['draft/path'] === overview.path;
         const background = 'white';
-        const questionNumber = node.getPath().map(n => n.getIndex() + 1).slice(1).join('.');
-        const value = this.$store.getters['draft/property'](`${overview.path}.value`);
-        const icon = iconify(value, overview.control, relevant);
 
-        controlDisplays.push({
-          path: overview.path,
-          label: overview.control.label,
-          value,
+        return {
+          label: item.label,
+          value: item.value,
+          breadcrumbs: item.breadcrumbs,
           icon: icon[0],
           color: icon[1],
-          questionNumber,
+          number: item.number.join('.'),
           background,
+          position: item.position,
           dark: false,
-          relevant,
-          hidden: !relevant,
+          relevant: rel,
+          hidden: !rel,
           collate,
           collateGroup,
           lastOfCollation,
           active,
           modified,
           modifiedHumanized: moment.duration(now.diff(modified)).humanize(),
-        });
-      }
-
-      this.controlDisplays = controlDisplays;
+        };
+      });
+      this.controlDisplays = r;
     },
-
   },
-  mounted() {
-    this.refresh();
+  watch: {
+    /*
+    submission: {
+      handler() {
+        this.refresh();
+      },
+      deep: true,
+    },
+    */
   },
 };
 </script>

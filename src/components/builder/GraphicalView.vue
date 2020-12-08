@@ -58,6 +58,16 @@
         :index="createIndex(index, idx + 1)"
       />
 
+      <nested-draggable
+        v-if="el.type == 'page'"
+        :class="{'drop-area-border': (el.children.length === 0), 'drop-area': 1}"
+        :selected="selected"
+        :controls="el.children"
+        @controlSelected="$emit('controlSelected', $event)"
+        @duplicate-control="$emit('duplicate-control', $event)"
+        :index="createIndex(index, idx + 1)"
+      />
+
       <v-dialog
         v-if="deleteQuestionModalIsVisible"
         v-model="deleteQuestionModalIsVisible"

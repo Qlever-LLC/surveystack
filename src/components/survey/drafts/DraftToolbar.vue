@@ -6,7 +6,10 @@
       flat
       tile
     >
-      <v-toolbar-title id="draft-toolbar" class="ml-n3">
+      <v-toolbar-title
+        id="draft-toolbar"
+        class="ml-n3"
+      >
         <div class="infos grey--text text--darken-2">
           <div class="d-flex">
             <span class="number-chip mr-2">{{ questionNumber }}</span>
@@ -44,27 +47,7 @@
         <v-icon>mdi-format-list-numbered</v-icon>
       </v-btn>
 
-      <!-- <v-btn icon>
-      <v-icon>mdi-dots-vertical</v-icon>
-    </v-btn> -->
     </v-toolbar>
-
-    <!-- <div
-      color="grey lighten-4"
-      class="flex-grow-0 flex-shrink-0 pt-1"
-    >
-      <v-chip
-        v-if="group"
-        class="mr-2 mb-1"
-        dark
-        color="secondary"
-      >
-        <span class="font-weight-bold">
-          <v-icon class="mr-2">mdi-account-multiple</v-icon> {{ group }}
-        </span>
-      </v-chip>
-
-    </div> -->
   </div>
 
 </template>
@@ -76,7 +59,7 @@ export default {
     'questionNumber',
     'required',
     'anon',
-    'group',
+    'groupPath',
   ],
 };
 </script>

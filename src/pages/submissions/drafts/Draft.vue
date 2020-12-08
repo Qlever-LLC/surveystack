@@ -1,11 +1,11 @@
 
 <template>
-  <div style="height: 100%;">
+  <div style="height: 100%; max-height: 100%;">
     <app-draft-component
       v-if="!loading && !hasError"
       :survey="survey"
       :submission="submission"
-      @persist="persist"
+      :persist="true"
       @submit="submit"
     />
     <div
@@ -68,7 +68,6 @@
 import api from '@/services/api.service';
 import appMixin from '@/components/mixin/appComponent.mixin';
 import * as db from '@/store/db';
-import * as utils from '@/utils/surveys';
 import resultMixin from '@/components/ui/ResultsMixin';
 
 
@@ -119,15 +118,8 @@ export default {
         },
       ];
     },
-    // removeReadyToSubmit(status) {
-    //   return status.filter(({ type }) => type !== 'READY_TO_SUBMIT');
-    // },
-    persist({ submission }) {
-      db.persistSubmission(submission);
-    },
     async submit({ payload }) {
       this.submitting = true;
-      // this.$store.dispatch('readyToSubmit/add', this.submission._id);
       this.submission.meta.status = this.addReadyToSubmit(this.submission.meta.status || []);
 
       try {

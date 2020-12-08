@@ -54,7 +54,7 @@ const getControl = (controls, position) => {
     currentControls = control.children;
   });
 
-  if (control.type !== 'group') {
+  if (control.type !== 'group' && control.type !== 'page') {
     if (control.value === undefined) {
       control.value = null;
     }
@@ -166,7 +166,7 @@ const createSubmissionFromSurvey = ({
     }
 
     const entry = { value: v || null, meta };
-    if (control.type === 'group') {
+    if (control.type === 'group' || control.type === 'page') {
       delete entry.value;
       delete entry.meta.dateModified;
     }

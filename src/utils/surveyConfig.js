@@ -33,7 +33,7 @@ export const createControlInstance = (control) => {
 
   if (control.type === 'selectSingle' || control.type === 'selectMultiple') {
     cloneWithDefaultOptions.options.source = [];
-  } else if (control.type === 'ontology') {
+  } else if (control.type === 'ontology' || control.type === 'matrix') {
     cloneWithDefaultOptions.options.source = '';
   } else if (control.type === 'instructions') {
     cloneWithDefaultOptions.options.source = '';
@@ -45,6 +45,20 @@ export const createControlInstance = (control) => {
 
 
 export const availableControls = [
+  {
+    name: 'group',
+    label: 'My group',
+    type: 'group',
+    children: [],
+    icon: 'mdi-group',
+  },
+  {
+    name: 'page',
+    label: 'My page',
+    type: 'page',
+    children: [],
+    icon: 'mdi-view-list',
+  },
   {
     name: 'instructions',
     label: 'Instructions',
@@ -68,13 +82,6 @@ export const availableControls = [
     label: 'Enter a date',
     type: 'date',
     icon: 'mdi-calendar',
-  },
-  {
-    name: 'group',
-    label: 'My group',
-    type: 'group',
-    children: [],
-    icon: 'mdi-group',
   },
   {
     name: 'location',
@@ -106,7 +113,12 @@ export const availableControls = [
     label: 'Dropdown',
     type: 'ontology',
     icon: 'mdi-arrow-down-drop-circle',
-
+  },
+  {
+    name: 'matrix',
+    label: 'Matrix',
+    type: 'matrix',
+    icon: 'mdi-matrix',
   },
   {
     name: 'farmos_field',

@@ -1,6 +1,9 @@
 <template>
-  <div>
-    <v-card-title v-if="control.title">{{ control.title }}</v-card-title>
+  <div class="mt-4">
+    <v-card-title
+      class="px-0"
+      v-if="control.title"
+    >{{ control.title }}</v-card-title>
     <v-text-field
       outlined
       :label="control.label"
@@ -9,6 +12,7 @@
       @keyup.enter.prevent="submit"
       ref="textField"
       class="full-width"
+      :disabled="!relevant"
     />
     <p v-if="control.hint">{{ control.hint }}</p>
   </div>
@@ -43,17 +47,23 @@ export default {
       this.$refs.textField.$refs.input.focus({ preventScroll: true });
 
 
+      // could we use this instead?
+      // this.$nextTick(() => this.$refs.textField.$refs.input.focus());
+
+
       return true;
     },
   },
   mounted() {
-    if (isIos()) {
-      this.$el.style.transform = 'translateY(-1000px)';
-      this.tryAutofocus();
-      this.$el.scrollTo(0, 0);
-      this.$el.style.transform = 'none';
-    } else {
-      this.tryAutofocus();
+    if (this.autoFocus) {
+      if (isIos()) {
+        this.$el.style.transform = 'translateY(-1000px)';
+        this.tryAutofocus();
+        this.$el.scrollTo(0, 0);
+        this.$el.style.transform = 'none';
+      } else {
+        this.tryAutofocus();
+      }
     }
   },
 };

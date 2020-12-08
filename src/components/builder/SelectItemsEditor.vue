@@ -59,10 +59,9 @@
         class="ml-auto mr-0 d-block mb-3"
         @click="addItem"
       >
-        +&nbsp;Add Item
+        <v-icon left>mdi-plus</v-icon>Add Item
       </v-btn>
     </v-row>
-
 
   </div>
 

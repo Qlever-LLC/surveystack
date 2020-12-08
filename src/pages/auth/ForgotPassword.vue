@@ -1,5 +1,5 @@
 <template>
-  <v-container class="mw-40">
+  <v-container class="maxw-40">
     <v-card class="pa-5">
       <h1>Password forgotten</h1>
       <p>Enter your email address and we will send you a link for setting a new password.</p>

@@ -9,6 +9,19 @@
       v-if="control.hint"
       class="mt-2"
     >{{ control.hint }}</p>
+
+    <div
+      v-for="child in control.children"
+      :key="child.name"
+    >
+      <component
+        :is="`app-control-${child.type}`"
+        :control="child"
+        :value="child.value"
+        :index="index"
+        @changed="setValue"
+      />
+    </div>
   </v-container>
 </template>
 
@@ -18,5 +31,12 @@ import baseQuestionComponent from './BaseQuestionComponent';
 
 export default {
   mixins: [baseQuestionComponent],
+  methods: {
+    setValue(newValue) {
+      console.log(newValue);
+      this.$emit('changed', newValue);
+    },
+  },
+
 };
 </script>

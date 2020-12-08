@@ -1,150 +1,183 @@
 <template>
   <div
-    class="wrapper"
-    style="height: 100%;"
+    class="draft-component-wrapper"
+    v-if="control"
   >
-    <div
-      class="full-width fill-height d-flex align-center justify-center"
-      v-if="controls.length === 0"
-    >
-      <div class="d-flex flex-column" >
-        <v-icon
-          large
-          color="blue"
-        >
-          mdi-file-multiple
-        </v-icon>
-        <v-alert
-          type="info"
-          text
-          color="blue"
-          class="ma-4"
-        >
-          No Questions yet
-        </v-alert>
-      </div>
-    </div>
 
-    <div
-      class="draft-container"
-      v-if="submission && survey && controls.length !== 0"
-    >
-      <draft-toolbar
-        :group="groupPath"
-        :required="control && control.options && control.options.required"
-        :anon="control && control.options && control.options.redacted"
-        :showOverviewIcon="!atEnd"
-        :questionNumber="questionNumber"
-        v-if="!showOverview && index < positions.length"
-        @showOverviewClicked="showOverview = !showOverview"
-      />
-      <draft-title
-        v-if="!showOverview && index < positions.length"
-        :breadcrumbs="mbreadcrumbs"
-      />
-      <transition
-        class="transition"
-        :name="slide"
-      >
-        <div
-          id="transition-container"
-          :key="'container-'+index"
-        >
-          <v-container
-            class="draft-body mx-auto d-flex flex-column align-center justify-center"
-            style="min-height: 40vh;"
-          >
-            <component
-              v-if="control && !atEnd"
-              class="draft-control full-width d-sm-flex flex-column align-center justify-center px-4"
-              :key="'question_'+index"
-              :is="componentName"
-              :control="control"
-              :value="value"
-              :index="index"
-              :submission="submission"
-              :meta="submissionField.meta"
-              :resources="survey.resources"
-              ref="currentControl"
-              @eval="eval"
-              @changed="setValue"
-              @setStatus="setStatus"
-              @setContext="setContext"
-              @setRenderQueue="setRenderQueue"
-              @show-nav="showNav(true)"
-              @hide-nav="showNav(false)"
-              @next="handleNext"
-              @show-next="showNext(true)"
-              @hide-next="showNext(false)"
-            />
-          </v-container>
-        </div>
-      </transition>
-    </div>
-
-    <v-navigation-drawer
-      v-if="survey && showOverview"
-      v-model="showOverview"
-      clipped
-      right
-      touchless
-      stateless
-      class="grey lighten-4 navigation-container"
-    >
-      <draft-overview
-        ref="overview"
-        :survey="survey"
-        :submission="submission"
-        :position="positions[index]"
-        :group="groupPath"
-        @navigate="navigate"
-      />
-    </v-navigation-drawer>
-
-    <draft-footer
-      class="px-4 grey lighten-5 footer-container"
-      :showPrev="!atStart"
-      :enableNext="mShowNext && controls.length > 0"
-      :showSubmit="atEnd && controls.length > 0"
-      :showNav="mShowNav"
-      @next="handleNext"
-      @prev="handlePrevious"
-      @submit="handleNext"
-    />
-
-    <error-dialog
-      v-model="showApiComposeErrors"
-      :errors="apiComposeErrors"
-      title="API Compose Errors"
-    />
-
-    <confirm-submission-dialog
-      v-model="confirmSubmissionIsVisible"
+    <!-- confirm submission modal -->
+    <app-confirm-submission-dialog
+      v-model="showConfirmSubmission"
       :group="submission.meta.group.id"
       @submit="() => submit(submission)"
       @set-group="setSubmissionGroup"
       :dateSubmitted="submission.meta.dateSubmitted"
     />
+
+    <!-- Toolbar with question number and overview button -->
+    <app-draft-toolbar
+      :group="groupPath"
+      :required="control && control.options && control.options.required"
+      :anon="control && control.options && control.options.redacted"
+      :showOverviewIcon="true"
+      :questionNumber="$store.getters['draft/questionNumber']"
+      @showOverviewClicked="showOverview = !showOverview"
+    />
+
+    <!-- Overview -->
+    <div
+      v-if="showOverview"
+      class="grey lighten-4 draft-overview"
+    >
+      <app-draft-overview
+        v-if="showOverview"
+        :survey="survey"
+        :submission="submission"
+        :groupPath="groupPath"
+        :overviews="$store.getters['draft/overviews']"
+        @goto="goto"
+        class="maxw-60 mx-auto"
+      />
+    </div>
+
+    <!-- Content with questions -->
+    <div
+      class="draft-content"
+      v-else
+    >
+      <app-control
+        class="my-auto maxw-60 mx-auto"
+        :path="path"
+        :control="control"
+      />
+    </div>
+
+    <!-- Footer with next/prev buttons -->
+    <app-draft-footer
+      class="draft-footer px-4 grey lighten-5"
+      :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
+      :enableNext="!$store.getters['draft/hasRequiredUnanswered']"
+      :enableSubmit="!$store.getters['draft/errors']"
+      :showSubmit="showOverview"
+      :showNav="true"
+      @next="$store.dispatch('draft/next')"
+      @prev="$store.dispatch('draft/prev')"
+      @submit="showConfirmSubmission = true"
+    />
+
   </div>
 </template>
 
-<script src="./DraftComponent.js">
+<script>
+import appControl from './Control.vue';
+import appDraftFooter from '@/components/survey/drafts/DraftFooter.vue';
+import appDraftOverview from '@/components/survey/drafts/DraftOverview.vue';
+import appDraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
+import appConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
+
+
+export default {
+  components: {
+    appControl,
+    appDraftFooter,
+    appDraftOverview,
+    appDraftToolbar,
+    appConfirmSubmissionDialog,
+  },
+  props: {
+    survey: { type: Object },
+    submission: { type: Object },
+    persist: { type: Boolean },
+  },
+  computed: {
+    path() {
+      return this.$store.getters['draft/path'];
+    },
+    control() {
+      return this.$store.getters['draft/control'];
+    },
+    groupPath() {
+      return this.$store.getters['draft/groupPath'];
+    },
+    showOverview: {
+      get() {
+        return this.$store.getters['draft/showOverview'];
+      },
+      set(v) {
+        this.$store.dispatch('draft/showOverview', v);
+      },
+    },
+    showConfirmSubmission: {
+      get() {
+        return this.$store.getters['draft/showConfirmSubmission'];
+      },
+      set(v) {
+        this.$store.dispatch('draft/showConfirmSubmission', v);
+      },
+    },
+  },
+  methods: {
+    goto(path) {
+      this.$store.dispatch('draft/goto', path);
+      this.showOverview = false;
+    },
+    async submit() {
+      this.$emit('submit', {
+        payload: this.submission,
+      });
+    },
+    setSubmissionGroup(id) {
+      const availableGroups = this.$store.getters['memberships/groups'];
+      const found = availableGroups.find(group => group._id === id);
+
+      const group = { id, path: '' };
+
+      if (found) {
+        group.path = found.path;
+      }
+
+      this.$store.dispatch('draft/setProperty', { path: 'meta.group', value: group });
+    },
+  },
+  created() {
+    const { survey, submission, persist } = this;
+    this.$store.dispatch('draft/init', { survey, submission, persist });
+  },
+};
 </script>
 
-<style scoped src="./DraftComponent.css">
-</style>
+<style scoped>
+.draft-component-wrapper {
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0px !important;
+}
 
-<style>
-.question-title-chip {
-  display: inline-flex;
-  /* background-color: white; */
-  /* color: #ff5722; */
-  border-radius: 0.4rem;
-  font-weight: bold;
-  font-size: 80%;
-  padding: 0.2rem;
-  padding-left: 0.4rem;
-  padding-right: 0.4rem;
-  border: 1px solid black;
+.draft-overview {
+  flex: 1;
+  width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 68px;
+}
+
+.draft-content {
+  flex: 1 0 auto;
+  padding: 0px 8px;
+  width: 100%;
+  margin: 0rem auto;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 68px;
+}
+
+.draft-footer {
+  z-index: 3;
+  height: 68px;
+  width: 100%;
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
 }
 </style>

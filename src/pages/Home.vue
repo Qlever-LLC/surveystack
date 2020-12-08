@@ -22,7 +22,7 @@
     <v-row>
       <v-col align="center">
         <app-basic-list
-          class="mw-40 text-left"
+          class="maxw-40 text-left"
           v-if="pinned && pinned.length > 0"
           :entities="pinned"
           title="Get started with your surveys!"
