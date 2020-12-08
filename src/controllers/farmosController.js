@@ -32,6 +32,8 @@ const common = async (endpoint, req, res) => {
 
       const agent = new https.Agent(agentOptions);
 
+      console.log("fetching fields", farm.aggregatorURL, endpoint, farm.url);
+
       const r = await axios.get(
         `https://${farm.aggregatorURL}/api/v1/farms/${endpoint}/?farm_url=${encodeURIComponent(
           farm.url
@@ -88,6 +90,12 @@ const getIntegrationFarms = async (req, res) => {
   return res.send(farms);
 };
 
+
+const runPendingFarmOSOperations = async (url, plan) => {
+  // TODO run field creation
+  // TODO update farmId in membership integrations (resolve group, aggregator?)
+}
+
 const webhookCallback = async (req, res, next) => {
   try {
     const { key } = req.query
@@ -111,7 +119,28 @@ const webhookCallback = async (req, res, next) => {
       throw boom.badRequest("expecting status ready")
     }
 
-    return farmosService.handleWebhookCallback(req, res, url, plan)
+    if (!url) {
+      throw boom.badRequest("url is missing")
+    }
+
+    if (!plan) {
+      throw boom.badRequest("plan is missing")
+    }
+
+
+    db.collection("farmos.webhookrequests").insertOne({
+      url,
+      plan,
+      created: new Date()
+    })
+
+    await runPendingFarmOSOperations(url, plan);
+
+    return res.send({
+      status: "success"
+    })
+
+
   } catch (error) {
     console.log("error", error)
     if (boom.isBoom(error)) {
@@ -125,67 +154,49 @@ const webhookCallback = async (req, res, next) => {
 
 }
 
+
 const testConnection = async (req, res) => {
-  const aggregator = req.body;
+  const aggregator = req.body.data;
 
-  if (!aggregator.data.url) {
-    throw boom.badRequest("argument data.url missing")
+  if (!aggregator.url) {
+    throw boom.badRequest("argument url missing")
   }
 
-  if (!aggregator.data.apiKey) {
-    throw boom.badRequest("argument data.apiKey missing")
+  if (!aggregator.apiKey) {
+    throw boom.badRequest("argument apiKey missing")
   }
-
-  const agentOptions = {
-    host: aggregator.data.url,
-    port: '443',
-    path: '/',
-    rejectUnauthorized: false,
-  };
-
-  const agent = new https.Agent(agentOptions);
 
   try {
-    const r = await axios.get(
-      `https://${aggregator.data.url}/api/v1/farms/`,
-      {
-        headers: {
-          accept: 'application/json',
-          'api-key': aggregator.data.apiKey,
-        },
-        httpsAgent: agent,
-      }
-    );
+    await farmosService.testAggregatorConnection(aggregator.url, aggregator.apiKey);
 
-    if (r.status === 200) {
-      return res.send({
-        status: "success"
-      })
-    } else {
-      throw Error("unable to connect to aggregator")
+    if (aggregator.planName && aggregator.planKey) {
+      try {
+        await farmosService.isFarmosUrlAvailable("oursci", aggregator.planKey);
+        return res.send({
+          status: "success"
+        })
+      } catch (error) {
+        console.log("inner error", error);
+        return res.send({
+          status: "error",
+          message: "plan key unauthorized"
+        })
+      }
     }
-  } catch (error) {
     return res.send({
+      status: "success"
+    })
+  } catch (error) {
+    console.log("outer error", error);
+    res.send({
       status: "error",
       message: error.message
     })
   }
 }
 
-const getMembersByFarmAndGroup = async (req, res) => {
-  const { farmUrl, group, aggregator } = req.query;
-  if (!farmUrl || !group || !aggregator) {
-    throw boom.badRequest("missing farmUrl, group or aggregator")
-  }
-
-
-  const access = await rolesService.hasAdminRole(res.locals.auth.user._id, group);
-  if (!access) {
-    throw boom.unauthorized("permission denied: not group admin")
-  }
-
-
-  const pipeline = [
+const buildMembersByFarmAndGroupPipeline = (farmUrl, aggregator, group) => {
+  return [
     {
       '$match': {
         'data.url': farmUrl,
@@ -220,6 +231,22 @@ const getMembersByFarmAndGroup = async (req, res) => {
       }
     }
   ]
+}
+
+const getMembersByFarmAndGroup = async (req, res) => {
+  const { farmUrl, group, aggregator } = req.query;
+  if (!farmUrl || !group || !aggregator) {
+    throw boom.badRequest("missing farmUrl, group or aggregator")
+  }
+
+
+  const access = await rolesService.hasAdminRole(res.locals.auth.user._id, group);
+  if (!access) {
+    throw boom.unauthorized("permission denied: not group admin")
+  }
+
+
+  const pipeline = buildMembersByFarmAndGroupPipeline(farmUrl, aggregator, group)
 
   const entities = await db
     .collection('integrations.memberships')
@@ -229,11 +256,178 @@ const getMembersByFarmAndGroup = async (req, res) => {
   return res.send(entities);
 };
 
+const setFarmMemberships = async (req, res) => {
+  const { memberships, group, farmUrl, farmId, aggregator } = req.body
+
+  if (!group) {
+    throw boom.badRequest("missing group")
+  }
+
+  const access = await rolesService.hasAdminRole(res.locals.auth.user._id, group);
+  if (!access) {
+    throw boom.unauthorized("permission denied: not group admin")
+  }
+
+  if (!farmUrl || !farmId || !aggregator) {
+    throw boom.badRequest("parameter missing (farmUrl || farmId || aggregator)")
+  }
+
+  if (!memberships || !Array.isArray(memberships)) {
+    throw boom.badRequest("memberships must be an array of strings")
+  }
+
+  const r = /^[a-f\d]{24}$/
+  if (!memberships.every(m => typeof m === "string") || !memberships.every(m => r.test(m))) {
+    throw boom.badRequest("memberships must be an array of ObjectId")
+  }
+
+  // clear all membership integrations of farm,aggregator in group
+  const pipeline = buildMembersByFarmAndGroupPipeline(farmUrl, aggregator, group)
+
+
+  const entities = await db
+    .collection('integrations.memberships')
+    .aggregate(pipeline)
+    .toArray()
+
+  const toDelete = entities.map(e => new ObjectId(e._id))
+  console.log("deleting", toDelete)
+
+  const delRes = await db.collection('integrations.memberships').deleteMany({
+    _id: {
+      $in: toDelete
+    }
+  })
+
+  if (!delRes.ok === 1) {
+    throw boom.internal("error updating memberships, delete entries failed")
+  }
+
+  const toInsert = memberships.map(m => ({
+    name: farmUrl,
+    membership: new ObjectId(m),
+    type: "farmos-farm",
+    data: {
+      name: farmUrl,
+      url: farmUrl,
+      aggregator: new ObjectId(aggregator),
+      farm: farmId
+    }
+
+  }))
+  // add all new integrations for farm,aggregator in group for membership
+  const created = await db.collection('integrations.memberships').insertMany(toInsert)
+  res.send(created)
+}
+
+const checkUrl = async (req, res) => {
+  console.log("checking url");
+
+  const { url, apiKey } = req.body;
+
+  if (!url || !apiKey) {
+    throw boom.badRequest("missing url or apikey");
+  }
+
+  try {
+    return res.send({
+      status: await farmosService.isFarmosUrlAvailable(url, apiKey) ? "free" : "taken"
+    })
+
+  } catch (error) {
+    return res.send({
+      status: "error",
+      message: error.message
+    })
+  }
+}
+
+const createFarmOsInstance = async (req, res) => {
+
+  console.log("creating farmos instance", req.body)
+
+
+  const nameRule = s => !/[!"#$%()*+,\-./:;<=>?@[\\\]^_{|}~]/gi.test(`${s}`);
+  const validEmail = (e) => /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(e + '')
+
+
+
+  const { url, email, site_name, registrant, location, units, plan, apiKey, group, aggregator } = req.body;
+
+  if (!nameRule(site_name)) {
+    throw boom.badData("site_name contains invalid characters")
+  }
+
+  if (!nameRule(registrant)) {
+    throw boom.badData("registrant contains invalid characters")
+  }
+
+  if (!nameRule(location)) {
+    throw boom.badData("location contains invalid characters")
+  }
+
+  if (!validEmail(email)) {
+    throw boom.badData("invalid email address")
+  }
+
+  const access = await rolesService.hasAdminRole(res.locals.auth.user._id, group);
+  if (!access) {
+    throw boom.unauthorized("permission denied: not group admin")
+  }
+
+  const agentOptions = {
+    host: "account.farmos.net",
+    port: '443',
+    path: '/',
+    rejectUnauthorized: false,
+  };
+
+  const agent = new https.Agent(agentOptions);
+
+  try {
+    const r = await axios.post(
+      `https://account.farmos.net/api/v1/farms`,
+      {
+        url: `${url}.farmos.net`,
+        email,
+        site_name,
+        registrant,
+        location,
+        units,
+        plan,
+        agree: true,
+      },
+      {
+        headers: {
+          accept: 'application/json',
+          apikey: apiKey
+        },
+        httpsAgent: agent,
+      }
+    );
+
+    // TODO add farmos instance to "pending" list
+
+    res.send({
+      "status": "success",
+      response: r.data
+    })
+  } catch (error) {
+    return res.send({
+      status: "error",
+      message: error.message
+    })
+  }
+}
+
 export default {
   getFields,
   getAssets,
   getIntegrationFarms,
   webhookCallback,
   testConnection,
-  getMembersByFarmAndGroup
+  getMembersByFarmAndGroup,
+  setFarmMemberships,
+  checkUrl,
+  createFarmOsInstance
 };

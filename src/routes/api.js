@@ -190,9 +190,9 @@ router.post(
 
 router.get('/farmos/members-by-farm', catchErrors(farmosController.getMembersByFarmAndGroup));
 
-
-
-// TODO Farmos POST callback for new instance
+router.post('/farmos/set-memberships', catchErrors(farmosController.setFarmMemberships));
+router.post('/farmos/checkurl', catchErrors(farmosController.checkUrl));
+router.post('/farmos/create-instance', catchErrors(farmosController.createFarmOsInstance));
 router.post("/farmos/callback", farmosController.webhookCallback)
 
 /** Integrations - Group */
