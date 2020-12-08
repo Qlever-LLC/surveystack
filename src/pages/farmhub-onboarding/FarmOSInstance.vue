@@ -90,7 +90,6 @@ import appDialog from '@/components/ui/Dialog.vue';
 
 
 const remapGroupMembership = (m) => {
-  console.log('remapGroupMembership', m);
   let username = m.meta.invitationEmail;
   let userExists = false;
   const email = m.meta.invitationEmail;
@@ -108,7 +107,6 @@ const remapGroupMembership = (m) => {
   };
 };
 const remapFarmOSMembership = (m) => {
-  console.log('remapFarmOSMembership', m);
   let username = m.membership.meta.invitationEmail;
   let userExists = false;
   const email = m.membership.meta.invitationEmail;

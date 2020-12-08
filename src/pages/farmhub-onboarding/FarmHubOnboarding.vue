@@ -12,7 +12,10 @@
           cols="4"
           style="max-height: 70vh; overflow-y: scroll"
         >
-          <v-sheet class="pa-2" outlined>
+          <v-sheet
+            class="pa-2"
+            outlined
+          >
             <v-text-field
               v-model="search"
               label="Search"
@@ -89,14 +92,14 @@
           class="pa-4"
         >
           <div
-            v-if="!!active"
+            v-if="!!active && active.payload && active.payload.name"
             class="display-1 text-center"
           >
             {{ active.payload.name }}
           </div>
           <app-aggregator
             :busy="busy"
-            v-if="!!active && active.payload.type === 'farmos-aggregator'"
+            v-if="!!active && active.payload && active.payload.type === 'farmos-aggregator'"
             @save="(a) => saveAggregator(a)"
             @testConnection="(a) => testConnection(a)"
             :aggregator="active.payload"
@@ -118,8 +121,9 @@
           />
 
           <app-register
+            @dialog="(title, text) => showDialog(title, text)"
             v-if="!!active && active.item_type === 'register'"
-            :meta='meta'
+            :group='groupId'
             :instance="Object.assign({}, registerTemplate)"
           />
 
@@ -183,7 +187,7 @@ const registerTemplate = {
   site_name: '',
   registrant: '',
   units: 'us',
-  plan: 'farmos-genmills',
+  plan: '',
   agree: false,
 };
 
@@ -279,6 +283,7 @@ export default {
             item_type: 'farm',
             name: 'New Farm',
             button: true,
+            aggregator: item.payload,
           }, ...children];
         } catch (error) {
           console.log('error', error);
@@ -343,11 +348,13 @@ export default {
     },
     async createNew(item) {
       console.log('creating new item', item);
-      this.meta.groupId = '5e97401756f2b6000176e709';
-      if (item.create === 'farm') {
+      if (item.item_type === 'farm') {
+        this.registerTemplate.aggregator = item.aggregator;
+
         this.active = {
           name: 'Register new Farm on Aggregator',
           item_type: 'register',
+          aggregator: item.aggregator,
         };
       }
     },

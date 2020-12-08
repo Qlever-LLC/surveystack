@@ -73,6 +73,7 @@
 </template>
 
 <script>
+
 export default {
   props: [
     'aggregator',
