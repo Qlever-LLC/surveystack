@@ -1,10 +1,14 @@
 /* eslint-disable no-unreachable */
+import boom from '@hapi/boom';
+import axios from "axios";
+import https from "https"
+
 import * as utils from '../helpers/surveys';
 import { asset } from './farmos/planting';
 import { log } from './farmos/log';
 import { aggregatorRequest } from './farmos/request';
 import { farminfo } from './farmos/farminfo';
-import boom from '@hapi/boom';
+
 
 import { db } from '../db';
 
@@ -272,18 +276,72 @@ export const handle = async (res, submission, survey, user) => {
   return results;
 };
 
-const handleWebhookCallback = (req, res, url, plan) => {
-  // TODO handle request, limit entries
 
-  db.collection("farmos.webhookrequests").insertOne({
-    url,
-    plan,
-    created: new Date()
-  })
+const testAggregatorConnection = async (url, apiKey) => {
+  const agentOptions = {
+    host: url,
+    port: '443',
+    path: '/',
+    rejectUnauthorized: false,
+  };
 
-  return res.send({
-    status: "success"
-  })
+  const agent = new https.Agent(agentOptions);
+
+  const r = await axios.get(
+    `https://${url}/api/v1/farms/`,
+    {
+      headers: {
+        accept: 'application/json',
+        'api-key': apiKey,
+      },
+      httpsAgent: agent,
+    }
+  );
+
+  if (r.status === 200) {
+    return true;
+  } else {
+    throw Error("unable to connect to aggregator")
+  }
 }
 
-export default { handle, getCredentials, handleWebhookCallback };
+const isFarmosUrlAvailable = async (url, apiKey) => {
+  const agentOptions = {
+    host: "account.farmos.net",
+    port: '443',
+    path: '/',
+    rejectUnauthorized: false,
+  };
+
+  const agent = new https.Agent(agentOptions);
+
+  try {
+    const r = await axios.post(
+      `https://account.farmos.net/api/v1/utils/validate-farm-url`,
+      {
+        url: `${url}.farmos.net`
+      },
+      {
+        headers: {
+          accept: 'application/json',
+          apikey: apiKey
+        },
+        httpsAgent: agent,
+      }
+    );
+
+    if (r.status === 200) {
+      return true;
+    } else {
+      throw Error("unable to connect to aggregator")
+    }
+  } catch (error) {
+    if (error && error.response && error.response.status && error.response.status === 400) {
+      return false
+    }
+    throw error
+  }
+
+}
+
+export default { isFarmosUrlAvailable, handle, getCredentials, testAggregatorConnection };
