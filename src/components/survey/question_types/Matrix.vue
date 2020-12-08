@@ -162,21 +162,20 @@ export default {
     appDialog,
   },
   computed: {
-    resource() {
-      const resource = this.resources.find(r => r.id === this.control.options.source);
-      return resource;
+    source() {
+      return this.control.options.source;
     },
     headers() {
-      const headers = this.resource.content.map(col => ({
+      const headers = this.source.content.map(col => ({
         text: col.label, value: col.value, type: col.type, multiple: col.multiple,
       }));
       return headers;
     },
     fields() {
-      return this.resource.content.map(col => col.value);
+      return this.source.content.map(col => col.value);
     },
     addRowLabel() {
-      return this.resource.config.addRowLabel;
+      return this.source.config.addRowLabel;
     },
     showConfirmDeletionDialog: {
       get() {
@@ -207,7 +206,7 @@ export default {
       this.$emit('changed', this.rows);
     },
     getDropdownItems(field) {
-      const column = this.resource.content.find(col => col.value === field);
+      const column = this.source.content.find(col => col.value === field);
       const ontology = this.resources.find(resource => resource.id === column.resource);
       return ontology.content.map(row => ({ text: row.label, value: row.value }));
     },
@@ -218,9 +217,6 @@ export default {
       const clone = cloneDeep(this.rows[idx]);
       this.rows = [...this.rows, clone];
       this.$emit('changed', this.rows);
-    },
-    log(v) {
-      console.log(v);
     },
   },
 };

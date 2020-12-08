@@ -10,10 +10,7 @@
       />
     </v-dialog>
 
-    <v-card
-      min-height="70vh"
-      class="d-flex flex-column"
-    >
+    <v-card class="d-flex flex-column">
       <v-card-title class="d-block">
         <div class="d-flex justify-space-between align-center">
           <div class="grey--text text--darken-2">
@@ -29,7 +26,6 @@
           </div>
           <div class="d-flex align-center">
 
-
           </div>
 
         </div>
@@ -37,7 +33,6 @@
 
       <v-card-text class="pt-0">
         <div class="d-flex justify-start">
-
 
         </div>
         <div
@@ -147,16 +142,6 @@
             <v-icon dark>mdi-plus</v-icon>
           </v-btn>
         </div>
-        <div class="ml-2 mt-4">
-          <h3>Config</h3>
-          <v-text-field
-            style="width: 20rem"
-            class="my-2"
-            v-model="value.config.addRowLabel"
-            label="Add Row Label"
-            persistent-hint
-          />
-        </div>
       </v-card-text>
       <v-spacer />
       <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
@@ -238,7 +223,7 @@ export default {
     },
     createOntology(column) {
       const id = new ObjectId().toString();
-      this.resource.content[column].resource = id;
+      this.value.content[column].resource = id;
       this.$emit('set-survey-resources', [...this.resources, {
         label: `Ontology List ${this.resources.length + 1}`,
         name: `ontology_list_${this.resources.length + 1}`,

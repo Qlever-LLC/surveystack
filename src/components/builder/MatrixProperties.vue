@@ -7,7 +7,12 @@
 
     </v-card-title>
     <div class="d-flex">
-      <v-btn color="primary" @click="matrixEditorDialog = true">Open Column Editor</v-btn>
+      <v-btn
+        color="primary"
+        @click="matrixEditorDialog = true"
+      >
+        <v-icon left>mdi-view-column</v-icon>Open Editor
+      </v-btn>
     </div>
     <v-dialog v-model="matrixEditorDialog">
       <app-matrix-editor

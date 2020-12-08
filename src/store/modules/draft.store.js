@@ -122,8 +122,6 @@ const getters = {
     const { required } = state.node.model.options;
     const value = surveyStackUtils.getNested(state.submission, `${path}.value`);
 
-    console.log(`path: ${path}, value: ${value}`);
-
     if (required && value === null) {
       return true;
     }
