@@ -18,6 +18,7 @@ module.exports = {
     'no-continue': 0,
     'no-param-reassign': 1,
     'padded-blocks': 1,
+    'brace-style': 1,
   },
   parserOptions: {
     parser: 'babel-eslint',
