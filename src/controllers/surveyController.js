@@ -116,7 +116,7 @@ const buildPipelineForGetSurveyPage = ({ q, groups, projections, creator, skip, 
   pipeline.push(
     ...[
       { $addFields: { name_lowercase: { $toLower: '$name' } } },
-      { $sort: { name_lowercase: 1 } },
+      { $sort: { 'meta.dateCreated': -1 } },
       { $project: { name_lowercase: 0 } },
     ]
   );
@@ -204,6 +204,7 @@ const getSurveyListPage = async (req, res) => {
       'name',
       'latestVersion',
       'meta.dateModified',
+      'meta.dateCreated',
       'meta.group',
       'meta.creator',
       'meta.submissions',
