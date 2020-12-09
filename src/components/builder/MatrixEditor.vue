@@ -172,6 +172,7 @@ const MATRIX_COLUMN_TYPES = [
   { text: 'Number', value: 'number' },
   { text: 'Date', value: 'date' },
   { text: 'Farmos Field', value: 'farmos_field' },
+  { text: 'Farmos Planting', value: 'farmos_planting' },
 ];
 
 export default {

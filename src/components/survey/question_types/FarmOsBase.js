@@ -62,6 +62,7 @@ const base = type => ({
       this.loading = false;
     },
     async fetchAssets() {
+      this.loading = true;
       try {
         const response = await api.get('farmos/assets');
         console.log('assets', response);

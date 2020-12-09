@@ -99,6 +99,28 @@
                     ></div>
                   </template>
                 </v-autocomplete>
+                <v-autocomplete
+                  v-else-if="header.type === 'farmos_planting'"
+                  :label="header.value"
+                  :value="item[header.value]"
+                  @input="v => {item[header.value] = localChange(v); onInput()}"
+                  :items="farmosTransformedPlantings || []"
+                  item-text="label"
+                  item-value="value"
+                  hide-details
+                  solo
+                  :disabled="loading"
+                >
+                  <template v-slot:item="{item}">
+                    <div v-html="item.label"></div>
+                  </template>
+                  <template v-slot:selection="{item}">
+                    <div
+                      v-html="item.label"
+                      class="d-flex align-center"
+                    ></div>
+                  </template>
+                </v-autocomplete>
                 <div v-else-if="header.type === 'date'">
                   <v-menu
                     :close-on-content-click="false"
@@ -178,7 +200,7 @@
         color="primary"
         size="24"
       />
-      <div class="ml-2 text--secondary">Loading farmOS fields</div>
+      <div class="ml-2 text--secondary">Loading farmOS data</div>
     </div>
 
   </div>
@@ -190,6 +212,103 @@ import appDialog from '@/components/ui/Dialog.vue';
 
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
+
+/* copied from FarmOsPlanting.vue */
+const hashItem = (listItem) => {
+  if (listItem === null || listItem.value === null) {
+    return '';
+  }
+
+  const { value } = listItem;
+  if (value.isField) {
+    if (!value.farmId) {
+      return 'NOT_ASSIGNED';
+    }
+    return `FIELD:${value.farmId}.${value.location.id}`;
+  }
+
+  return `ASSET:${value.farmId}.${value.assetId}`;
+};
+
+/* copied from FarmOsPlanting.vue */
+const transform = (assets) => {
+  console.log('transformassets', assets);
+
+  const withoutArea = [];
+  const areas = {};
+
+  assets.forEach((asset) => {
+    if (asset.value.location.length === 0) {
+      const tmp = Object.assign({}, asset);
+      tmp.value.hash = hashItem(asset);
+      withoutArea.push(tmp);
+      return;
+    }
+
+
+    asset.value.location.forEach((location) => {
+      areas[`${asset.value.farmId}.${location.id}`] = {
+        farmId: asset.value.farmId,
+        farmName: asset.value.farmName,
+        location,
+      };
+    });
+  });
+
+  const res = Object.keys(areas).flatMap((key) => {
+    const area = areas[key];
+
+    const matchedAssets = assets.filter((asset) => {
+      if (asset.value.farmId !== area.farmId) {
+        return false;
+      }
+
+      return asset.value.location.some(loc => loc.id === area.location.id);
+    });
+
+
+    const field = {
+      value: {
+        farmId: area.farmId,
+        farmName: area.farmName,
+        location: area.location,
+        isField: true,
+      },
+      label: `<span class="blue-chip mr-4 ml-0 chip-no-wrap">${area.farmName}: ${area.location.name}</span>`,
+    };
+
+    field.value.hash = hashItem(field);
+
+    const assetItems = matchedAssets.map((asset) => {
+      const r = {
+        value: asset.value,
+        label: `${asset.value.name} `,
+      };
+
+      r.value.hash = hashItem(r);
+      return r;
+    });
+
+
+    return [field, ...assetItems];
+  });
+
+  const withoutAreaSection = {
+    value: {
+      farmId: null,
+      farmName: null,
+      location: null,
+      isField: true,
+    },
+    label: '<span class="blue-chip mr-4 ml-0 chip-no-wrap">Plantings without Area</span>',
+  };
+
+  res.push(withoutAreaSection, ...withoutArea);
+  console.log('res', res);
+
+  return res;
+};
+
 
 export default {
   mixins: [baseQuestionComponent, farmosBase('fields')],
@@ -226,8 +345,9 @@ export default {
   data() {
     return {
       rows: this.value || [],
-      rowToBeDeleted: -1, //
+      rowToBeDeleted: -1,
       menus: {}, // object to hold v-models for v-menu
+      farmosTransformedPlantings: [],
     };
   },
   methods: {
@@ -254,10 +374,68 @@ export default {
       this.rows = [...this.rows, clone];
       this.$emit('changed', this.rows);
     },
+    // copied from FarmOsPlanting.vue
+    localChange(hashesArg) {
+      let hashes;
+      if (!Array.isArray(hashesArg)) {
+        if (hashesArg) {
+          hashes = [hashesArg];
+        } else {
+          return null;
+        }
+      } else {
+        hashes = hashesArg;
+      }
+
+      console.log('hashes', hashes);
+
+
+      const selectedItems = hashes.map((h) => {
+        if (typeof h !== 'string') {
+          return h;
+        }
+        return (this.transformed.find(t => t.value.hash === h)).value;
+      });
+
+
+      // const [farmId, assetId] = itemId.split('.');
+
+      const fields = selectedItems.filter(item => !!item.isField);
+
+      // selected assets
+      const assets = selectedItems.filter(item => !item.isField);
+
+      const assetsToSelect = fields.flatMap(field => this.transformed
+        .filter(item => !item.value.isField)
+        .filter(item => item.value.farmId === field.farmId)
+        .filter(item => item.value.location.some(loc => loc.id === field.location.id)));
+
+
+      assetsToSelect.forEach((assetToSelect) => {
+        if (assets.some(asset => asset.farmId === assetToSelect.value.farmId
+          && asset.assetId === assetToSelect.value.assetId)) {
+          // skip
+        } else {
+          assets.push(assetToSelect.value);
+        }
+      });
+
+
+      if (!Array.isArray(hashesArg)) {
+        return assets[0];
+      }
+
+      return assets;
+    },
   },
-  created() {
+  async created() {
     if (this.headers.find(header => header.type === 'farmos_field')) {
       this.fetchAreas();
+    }
+
+    if (this.headers.find(header => header.type === 'farmos_planting')) {
+      await this.fetchAssets();
+      this.farmosTransformedPlantings = transform(this.assets);
     }
   },
 };
