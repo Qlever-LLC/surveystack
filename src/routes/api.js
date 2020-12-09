@@ -77,6 +77,11 @@ router.post(
   [assertAuthenticated, assertEntityExists({ collection: 'submissions' }), assertEntityRights],
   catchErrors(submissionController.archiveSubmission)
 );
+router.post(
+  '/submissions/:id/reassign',
+  [assertEntityExists({ collection: 'submissions' }), assertEntityRights],
+  catchErrors(submissionController.reassignSubmission)
+);
 router.get(
   '/submissions/:id',
   [assertEntityExists({ collection: 'submissions' })],
