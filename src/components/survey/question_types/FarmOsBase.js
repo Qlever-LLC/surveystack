@@ -3,7 +3,7 @@ import api from '@/services/api.service';
 const base = type => ({
   data() {
     return {
-      loading: true,
+      loading: false,
       farms: [],
       assets: [],
     };
@@ -37,6 +37,7 @@ const base = type => ({
       return (item && item.label) || value;
     },
     async fetchAreas() {
+      this.loading = true;
       try {
         const response = await api.get('farmos/fields');
         console.log('fields', response);

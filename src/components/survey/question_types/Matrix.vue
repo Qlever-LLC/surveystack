@@ -77,6 +77,28 @@
                   solo
                   :multiple="header.multiple"
                 />
+                <v-autocomplete
+                  v-else-if="header.type === 'farmos_field'"
+                  :label="header.value"
+                  :items="farms || []"
+                  :value="item[header.value]"
+                  @input="v => {item[header.value] = v; onInput()}"
+                  item-text="label"
+                  item-value="value"
+                  hide-details
+                  solo
+                  :disabled="loading"
+                >
+                  <template v-slot:item="{item}">
+                    <div v-html="item.label"></div>
+                  </template>
+                  <template v-slot:selection="{item}">
+                    <div
+                      v-html="item.label"
+                      class="d-flex align-center"
+                    ></div>
+                  </template>
+                </v-autocomplete>
                 <div v-else-if="header.type === 'date'">
                   <v-menu
                     :close-on-content-click="false"
@@ -147,6 +169,18 @@
       v-if="control.hint"
       class="my-3"
     >{{control.hint}}</div>
+    <div
+      class="d-flex flex-row align-center"
+      v-if="loading"
+    >
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        size="24"
+      />
+      <div class="ml-2 text--secondary">Loading farmOS fields</div>
+    </div>
+
   </div>
 </template>
 
@@ -155,9 +189,10 @@ import { cloneDeep } from 'lodash';
 import appDialog from '@/components/ui/Dialog.vue';
 
 import baseQuestionComponent from './BaseQuestionComponent';
+import farmosBase from './FarmOsBase';
 
 export default {
-  mixins: [baseQuestionComponent],
+  mixins: [baseQuestionComponent, farmosBase('fields')],
   components: {
     appDialog,
   },
@@ -169,6 +204,7 @@ export default {
       const headers = this.source.content.map(col => ({
         text: col.label, value: col.value, type: col.type, multiple: col.multiple,
       }));
+
       return headers;
     },
     fields() {
@@ -218,6 +254,11 @@ export default {
       this.rows = [...this.rows, clone];
       this.$emit('changed', this.rows);
     },
+  },
+  created() {
+    if (this.headers.find(header => header.type === 'farmos_field')) {
+      this.fetchAreas();
+    }
   },
 };
 </script>

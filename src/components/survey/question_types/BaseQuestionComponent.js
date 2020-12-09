@@ -9,11 +9,6 @@ export default {
       default: () => ([]),
     },
   },
-  computed: {
-    // value() {
-    //   return this.control.value;
-    // },
-  },
   methods: {
     submit() {
       this.changed(this.value);
