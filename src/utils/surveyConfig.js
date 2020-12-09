@@ -23,6 +23,18 @@ export const defaultControlOptions = {
   },
 };
 
+const createDefaultMatrixSource = () => ({
+  config: { addRowLabel: 'Add row' },
+  content: [
+    {
+      label: 'Sample', value: 'sample', tags: '', type: 'number', resource: '', multiple: false,
+    },
+    {
+      label: 'Description', value: 'description', tags: '', type: 'text', resource: '', multiple: false,
+    },
+  ],
+});
+
 export const createControlInstance = (control) => {
   const clone = cloneDeep(control);
 
@@ -34,7 +46,7 @@ export const createControlInstance = (control) => {
   if (control.type === 'selectSingle' || control.type === 'selectMultiple') {
     cloneWithDefaultOptions.options.source = [];
   } else if (control.type === 'matrix') {
-    cloneWithDefaultOptions.options.source = { config: { addRowLabel: 'Add row' }, content: [] };
+    cloneWithDefaultOptions.options.source = createDefaultMatrixSource();
   } else if (control.type === 'ontology') {
     cloneWithDefaultOptions.options.source = '';
   } else if (control.type === 'instructions') {

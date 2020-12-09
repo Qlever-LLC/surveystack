@@ -14,7 +14,7 @@
       <v-card-title class="d-block">
         <div class="d-flex justify-space-between align-center">
           <div class="grey--text text--darken-2">
-            Matrix Editor
+            Matrix Column Editor
           </div>
           <div class="d-flex align-center ml-auto mr-2">
             <v-btn
@@ -51,7 +51,9 @@
               <v-btn
                 icon
                 small
-                @click="moveItemUp(item)"
+                @click="moveItemLeft(i)"
+                :disabled="i === 0"
+                tabindex="-1"
               >
                 <v-icon>mdi-arrow-left</v-icon>
               </v-btn>
@@ -59,7 +61,9 @@
                 icon
                 class="ml-1"
                 small
-                @click="moveItemDown(item)"
+                @click="moveItemRight(i)"
+                :disabled="i === (value.content.length - 1)"
+                tabindex="-1"
               >
                 <v-icon>mdi-arrow-right</v-icon>
               </v-btn>
@@ -193,9 +197,6 @@ export default {
     };
   },
   computed: {
-    resourceNames() {
-      return this.resources.map(({ name, id }) => ({ name, id }));
-    },
     resourceSelectItems() {
       return this.resources.filter(resource => resource.type === 'ONTOLOGY_LIST').map(resource => ({ text: resource.label, value: resource.id }));
     },
@@ -238,33 +239,30 @@ export default {
       this.editOntologyId = id;
       this.editorDialog = true;
     },
-    moveItemDown({ id }) {
-      const index = this.value.content.findIndex(item => item.id === id);
-      if (index < this.value.content.length - 1) {
-        const newItems = [...this.value.content];
-        const [item] = newItems.splice(index, 1);
-        newItems.splice(index + 1, 0, item);
-        this.value.content = newItems;
+    moveItemLeft(index) {
+      if (index === 0) {
+        return;
       }
+      const newItems = [...this.value.content];
+      [newItems[index - 1], newItems[index]] = [newItems[index], newItems[index - 1]]; // swap in place
+      this.value.content = newItems;
     },
-    moveItemUp({ id }) {
-      const index = this.value.content.findIndex(item => item.id === id);
-      if (index > 0) {
-        const newItems = [...this.value.content];
-        const [item] = newItems.splice(index, 1);
-        newItems.splice(index - 1, 0, item);
-        this.value.content = newItems;
+    moveItemRight(index) {
+      if (index >= this.value.content.length - 1) {
+        return;
       }
+      const newItems = [...this.value.content];
+      [newItems[index + 1], newItems[index]] = [newItems[index], newItems[index + 1]]; // swap in place
+      this.value.content = newItems;
     },
     createEmptyColumn() {
       return {
-        id: new ObjectId().toString(),
         label: '',
         value: '',
+        tags: '',
         type: '',
         resource: '',
         multiple: false,
-        tags: '',
       };
     },
     deleteColumn(index) {
