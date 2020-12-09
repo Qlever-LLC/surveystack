@@ -103,7 +103,9 @@
             @save="(a) => saveAggregator(a)"
             @testConnection="(a) => testConnection(a)"
             :aggregator="active.payload"
+            @delete="(a) => deleteAggregator(a)"
           />
+
           <app-farm-o-s-instance
             :busy="busy"
             v-if="!!active && active.type === 'farm'"
@@ -140,6 +142,7 @@
       <template v-slot:title>{{ dialog.title }}</template>
       {{ dialog.text }}
     </app-dialog>
+
   </v-container>
 </template>
 
@@ -189,6 +192,19 @@ const registerTemplate = {
   units: 'us',
   plan: '',
   agree: false,
+};
+
+const registerAggregator = {
+  _id: null,
+  type: 'farmos-aggregator',
+  name: '',
+  data: {
+    url: '',
+    apiKey: '',
+    parameters: '',
+    planKey: '',
+    planName: '',
+  },
 };
 
 export default {
@@ -290,7 +306,8 @@ export default {
         }
 
         this.loadingAggregators = this.loadingAggregators.filter(e => e !== item.id);
-      } else if (item.item_type === 'farm') {
+      } else if (item.type === 'farm') {
+        console.log('fetching fields', item);
         const areas = await fetchFields();
         item.children.push(...areas);
       }
@@ -329,7 +346,7 @@ export default {
       console.log('updated', updated);
 
       try {
-        const r = await api.put(`/group-integrations/${item._id}`, updated);
+        const r = item._id === null ? await api.post('/group-integrations', updated) : await api.put(`/group-integrations/${item._id}`, updated);
         console.log('response', r);
         if (r.data && r.data.ok === 1) {
           this.dialog.text = 'Updated Aggregator';
@@ -344,6 +361,8 @@ export default {
         this.dialog.title = 'Error';
         this.dialog.show = true;
       }
+
+      this.loadRoot();
       this.busy = false;
     },
     async createNew(item) {
@@ -356,27 +375,40 @@ export default {
           item_type: 'register',
           aggregator: item.aggregator,
         };
+      } else if (item.item_type === 'aggregator') {
+        console.log('creating new aggregator');
+        const payload = Object.assign({}, registerAggregator);
+        payload.group = this.groupId;
+        this.active = {
+          payload,
+        };
       }
+    },
+    async loadRoot() {
+      const { group } = this.$route.query;
+      if (group) {
+        this.groupId = group;
+      }
+
+      try {
+        const { data } = await api.get(`/groups/${group}?populate=true`);
+        this.group = { ...data };
+
+        const { data: members } = await api.get(`/memberships?group=${group}&populate=true`);
+        this.members = members;
+
+        const { data: integrations } = await api.get(`/group-integrations?group=${group}&populate=true`);
+        this.integrations = integrations;
+      } catch (e) {
+        console.log('something went wrong:', e);
+      }
+    },
+    async deleteAggregator() {
+      // TODO delete an aggregator
     },
   },
   async created() {
-    const { group } = this.$route.query;
-    if (group) {
-      this.groupId = group;
-    }
-
-    try {
-      const { data } = await api.get(`/groups/${group}?populate=true`);
-      this.group = { ...data };
-
-      const { data: members } = await api.get(`/memberships?group=${group}&populate=true`);
-      this.members = members;
-
-      const { data: integrations } = await api.get(`/group-integrations?group=${group}&populate=true`);
-      this.integrations = integrations;
-    } catch (e) {
-      console.log('something went wrong:', e);
-    }
+    this.loadRoot();
   },
 };
 </script>
