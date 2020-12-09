@@ -66,7 +66,6 @@ const getAssets = async (req, res) => {
 
 const getIntegrationFarms = async (req, res) => {
   const { id } = req.params;
-  const { tags } = req.query;
 
   const aggregator = await db
     .collection('integrations.groups')
@@ -87,7 +86,28 @@ const getIntegrationFarms = async (req, res) => {
       'api-key': aggregator.data.apiKey,
     },
   });
-  return res.send(farms);
+
+  const tags = aggregator.data.parameters;
+  if (!tags) {
+    return res.send(farms);
+  }
+
+  console.log("filtering for tags", tags);
+  const arr = tags.split(",");
+  return res.send(farms.filter(f => {
+    if (!f.tags) {
+      return false;
+    }
+
+    const farr = f.tags.toLowerCase().split(",");
+    for (const t of arr) {
+      if (farr.includes(t)) {
+        return true;
+      }
+    }
+
+    return false;
+  }))
 };
 
 

@@ -116,6 +116,7 @@ const deleteIntegration = async (req, res) => {
   }
 
   try {
+    // TODO do we need to delete all references to this integration first?
     let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
     assert.equal(1, r.deletedCount);
     return res.send({ message: 'OK' });
