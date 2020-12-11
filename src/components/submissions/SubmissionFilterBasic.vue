@@ -24,7 +24,7 @@
       <div class="d-flex justify-end">
         <v-btn
           class="ma-2"
-          @click="$emit('showAdvanced', true)"
+          @click="$emit('show-advanced', true)"
           text
         >Advanced</v-btn>
         <v-btn

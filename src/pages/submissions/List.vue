@@ -77,7 +77,7 @@
       <app-submissions-filter-basic
         v-if="!showAdvancedFilters && queryList"
         :queryList="queryList"
-        @showAdvanced="(ev) => showAdvancedFilters = ev"
+        @show-advanced="(ev) => showAdvancedFilters = ev"
         :basicFilters="basicFilters"
         @apply-basic-filters="applyBasicFilters"
         @reset="reset"
@@ -86,7 +86,7 @@
       <app-submissions-filter-advanced
         v-if="showAdvancedFilters"
         v-model="filter"
-        @showAdvanced="(ev) => showAdvancedFilters = ev"
+        @show-advanced="(ev) => showAdvancedFilters = ev"
         @apply-advanced-filters="fetchData"
         @reset="reset"
       />
@@ -94,7 +94,7 @@
       <div class="d-flex justify-end">
         <v-checkbox
           label="View archived only"
-          v-model="showArchived"
+          v-model="filter.showArchived"
           dense
           hide-details
         />
@@ -270,7 +270,7 @@
               :submissions="submissions"
               v-if="submissions"
               :selected.sync="selected"
-              :archived="showArchived"
+              :archived="filter.showArchived"
               :dataTableProps="dateTableProps"
               @onDataTablePropsChanged="onDataTablePropsChanged"
               :loading="loading"
@@ -343,14 +343,16 @@ import { createQueryList } from '@/utils/surveys';
 
 const defaultPageSize = 10;
 
-const defaultFilter = {
+const createDefaultFilter = () => ({
   match: '{}',
   project: '{}',
   sort: '{}',
   skip: 0,
   limit: defaultPageSize,
+  showArchived: false,
+  showIrrelevant: false,
   roles: '',
-};
+});
 
 const apiDownloadFormats = [{ text: 'CSV', value: 'csv' }, { text: 'JSON', value: 'json' }];
 const apiDownloadRanges = [{ text: 'All data', value: 'all' }, { text: 'Page only', value: 'page' }];
@@ -386,14 +388,7 @@ export default {
         { title: 'JSON', value: 'json' },
       ],
       selectedFormat: 0,
-      filter: {
-        match: '{}',
-        project: '{}',
-        sort: '{}',
-        skip: 0,
-        limit: defaultPageSize,
-        roles: '',
-      },
+      filter: createDefaultFilter(),
       basicFilters: [],
       submissions: {
         content: [],
@@ -408,7 +403,6 @@ export default {
       pageSize: defaultPageSize,
       selected: [],
       search: '',
-      showArchived: false,
       showArchiveModal: false,
       showDeleteModal: false,
       dateTableProps: {
@@ -438,32 +432,18 @@ export default {
       return true;
     },
     apiFetchParams() {
-      let params = `survey=${this.survey}&match=${this.filter.match}&sort=${this.filter.sort}&project=${this.filter.project}&skip=${this.filter.skip}&limit=${this.filter.limit}`;
-      if (this.showArchived) {
-        params += '&showArchived=true';
-      }
-
-      if (process.env.NODE_ENV === 'development') {
-        return `${params}&roles=${this.filter.roles}`;
-      }
-      return params;
+      const baseParams = this.getApiBaseParams();
+      return baseParams.filter(p => p.include).map(p => `${p.key}=${p.value}`).join('&');
     },
     apiDownloadParams() {
-      let params = `survey=${this.survey}&match=${this.filter.match}&sort=${this.filter.sort}&project=${this.filter.project}`;
-      if (this.apiDownloadRange === 'page') {
-        params += `&skip=${this.filter.skip}&limit=${this.filter.limit}`;
-      } else {
-        params += '&skip=0&limit=0';
+      const baseParams = this.getApiBaseParams();
+      if (this.apiDownloadRange === 'all') {
+        const skipParam = baseParams.find(p => p.key === 'skip');
+        skipParam.include = false;
+        const limitParam = baseParams.find(p => p.key === 'limit');
+        limitParam.include = false;
       }
-
-      if (this.showArchived) {
-        params += '&showArchived=true';
-      }
-
-      if (process.env.NODE_ENV === 'development') {
-        return `${params}&roles=${this.filter.roles}`;
-      }
-      return params;
+      return baseParams.filter(p => p.include).map(p => `${p.key}=${p.value}`).join('&');
     },
     apiFetchRequest() {
       return `/submissions/page?${this.apiFetchParams}`;
@@ -513,6 +493,21 @@ export default {
       const { data: memberships } = await api.get(`/memberships?group=${groupId}&populate=true`);
       this.reassignment.users = memberships.filter(m => m.user).map(m => ({ text: `${m.user.name} <${m.user.email}>`, value: m.user._id }));
     },
+    getApiBaseParams() {
+      const params = [
+        { key: 'survey', value: this.survey, include: true },
+        { key: 'match', value: this.filter.match, include: this.filter.match !== '{}' },
+        { key: 'sort', value: this.filter.sort, include: this.filter.sort !== '{}' },
+        { key: 'project', value: this.filter.project, include: this.filter.project !== '{}' },
+        { key: 'skip', value: this.filter.skip, include: this.filter.skip !== 0 },
+        { key: 'limit', value: this.filter.limit, include: this.filter.limit !== 0 },
+        { key: 'showIrrelevant', value: this.filter.showIrrelevant, include: this.filter.showIrrelevant },
+        { key: 'showArchived', value: this.filter.showArchived, include: this.filter.showArchived },
+        { key: 'roles', value: this.filter.roles, include: (process.env.NODE_ENV === 'development') && this.filter.roles !== '' },
+      ];
+
+      return params;
+    },
     async deleteSubmission(submission) {
       this.showDeleteModal = false;
       try {
@@ -549,7 +544,7 @@ export default {
       }
     },
     reset() {
-      Object.assign(this.filter, defaultFilter);
+      this.filter = createDefaultFilter();
       this.basicFilters = [];
       this.fetchData();
     },
@@ -630,10 +625,12 @@ export default {
     },
   },
   watch: {
-    showArchived() {
+    // eslint-disable-next-line func-names
+    'filter.showArchived': function () {
       this.selected = [];
       this.fetchData();
     },
+    // eslint-disable-next-line func-names
     'reassignment.group': function (val) {
       this.reassignment.user = null;
 

@@ -40,6 +40,16 @@
           </v-col>
         </v-row>
 
+        <v-row dense>
+          <v-col>
+            <v-checkbox
+              label="Show irrelevant fields"
+              v-model="value.showIrrelevant"
+              class="my-0"
+            />
+          </v-col>
+        </v-row>
+
         <v-row v-if="showRolesDebug">
           <v-col cols="6">
             <v-text-field
@@ -53,7 +63,7 @@
         <div class="d-flex justify-end">
           <v-btn
             class="ma-2"
-            @click="$emit('showAdvanced', false)"
+            @click="$emit('show-advanced', false)"
             text
           >Basic</v-btn>
           <v-btn
