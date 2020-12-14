@@ -21,8 +21,7 @@
           <span class="caption grey--text text--darken-1">{{ createIndex(index, idx + 1) | displayIndex}}</span>
           <br />
           <span class="title">
-            {{el.title}}
-            <!-- <v-icon>{{ getIconForType(el.type) }}</v-icon> -->
+            {{ getDisplay(el) }}
           </span>
           <br />
           <span class="font-weight-light grey--text text--darken-2">
@@ -150,6 +149,9 @@ export default {
     getIconForType(type) {
       const control = availableControls.find(c => c.type === type);
       return control && control.icon;
+    },
+    getDisplay(control) {
+      return control.title || control.label || control.type;
     },
     showDeleteModal(index) {
       this.deleteQuestionModalIsVisible = true;
