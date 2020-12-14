@@ -11,13 +11,13 @@
       />
       <v-text-field
         outlined
-        v-model="control.label"
-        label="Label"
+        v-model="control.title"
+        label="Title"
       />
       <v-text-field
         outlined
-        v-model="control.title"
-        label="Title"
+        v-model="control.label"
+        label="Label"
       />
       <v-text-field
         outlined
@@ -223,8 +223,8 @@
         v-model="control.options.source"
         class="mt-5"
       />
-      <!-- v-model="survey.resources" -->
-      <select-items-editor-alt
+
+      <app-ontology-properties
         v-else-if="isOntology"
         :value="control.options.source"
         :resources="survey.resources"
@@ -254,8 +254,8 @@
 import { getAdvancedCodeTemplate, findParentByChildId } from '@/utils/surveys';
 import api from '@/services/api.service';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
-import SelectItemsEditorAlt from '@/components/builder/SelectItemsEditorAlt.vue';
 import appMatrixProperties from '@/components/builder/MatrixProperties.vue';
+import appOntologyProperties from '@/components/builder/OntologyProperties.vue';
 import InstructionsEditor from '@/components/builder/InstructionsEditor.vue';
 
 import { convertToKey } from '@/utils/builder';
@@ -263,8 +263,8 @@ import { convertToKey } from '@/utils/builder';
 export default {
   components: {
     SelectItemsEditor,
-    SelectItemsEditorAlt,
     InstructionsEditor,
+    appOntologyProperties,
     appMatrixProperties,
 
   },

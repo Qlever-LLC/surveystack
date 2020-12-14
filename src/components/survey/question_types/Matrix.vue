@@ -189,7 +189,7 @@
     </div>
     <div
       v-if="control.hint"
-      class="my-3"
+      class="my-3 text--secondary"
     >{{control.hint}}</div>
     <div
       class="d-flex flex-row align-center"

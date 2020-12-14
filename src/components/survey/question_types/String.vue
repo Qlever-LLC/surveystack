@@ -14,7 +14,10 @@
       class="full-width"
       :disabled="!relevant"
     />
-    <p v-if="control.hint">{{ control.hint }}</p>
+    <p
+      v-if="control.hint"
+      class="text--secondary"
+    >{{ control.hint }}</p>
   </div>
 </template>
 

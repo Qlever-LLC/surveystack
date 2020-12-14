@@ -1,6 +1,9 @@
 <template>
   <div class="ontology question">
-    <p v-if="control.title" class="mt-2">{{ control.title }}</p>
+    <v-card-title
+      class="px-0"
+      v-if="control.title"
+    >{{ control.title }}</v-card-title>
     <v-autocomplete
       :value="value"
       @change="onChange"
@@ -15,7 +18,10 @@
       v-if="sourceIsValid && !control.options.allowCustomSelection"
       class="full-width"
     >
-      <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
+      <template
+        v-slot:selection="data"
+        v-if="!!control.options.hasMultipleSelections"
+      >
         <v-chip
           v-bind="data.attrs"
           :input-value="data.selected"
@@ -26,7 +32,10 @@
           {{ data.item.label }}
         </v-chip>
       </template>
-      <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
+      <template
+        v-slot:item="data"
+        v-if="!!control.options.hasMultipleSelections"
+      >
         <v-list-item-content>
           <v-list-item-title v-html="data.item.label" />
           <!-- <v-list-item-subtitle v-html="data.item.group"></v-list-item-subtitle> -->
@@ -65,17 +74,26 @@
           {{ getLabelForItemValue(data.item) }}
         </div>
       </template>
-      <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
+      <template
+        v-slot:item="data"
+        v-if="!!control.options.hasMultipleSelections"
+      >
         <v-list-item-content>
           <v-list-item-title v-html="data.item.label" />
-          <!-- <v-list-item-subtitle v-html="data.item.group"></v-list-item-subtitle> -->
         </v-list-item-content>
       </template>
     </v-combobox>
-    <div v-else>
-      Invalid Select Options, please update Suvey Definition
-    </div>
-    <p v-if="control.hint" class="mt-2">{{ control.hint }}</p>
+    <v-banner
+      v-else
+      color="red lighten-2"
+      dark
+    >
+      <v-icon class="mr-2">mdi-alert</v-icon>Invalid select options, please update Suvey Definition
+    </v-banner>
+    <p
+      v-if="control.hint"
+      class="mt-2 text--secondary"
+    >{{ control.hint }}</p>
   </div>
 </template>
 

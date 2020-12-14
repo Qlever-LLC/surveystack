@@ -21,7 +21,7 @@
           <span class="caption grey--text text--darken-1">{{ createIndex(index, idx + 1) | displayIndex}}</span>
           <br />
           <span class="title">
-            {{el.label}}
+            {{el.title}}
             <!-- <v-icon>{{ getIconForType(el.type) }}</v-icon> -->
           </span>
           <br />
