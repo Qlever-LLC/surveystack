@@ -1,10 +1,6 @@
 <template>
   <v-flex>
-    <v-form
-      class="mt-3"
-      @keydown.enter.prevent="submit"
-    >
-
+    <v-form class="mt-3" @keydown.enter.prevent="submit">
       <v-text-field
         v-model="instance.url"
         readonly
@@ -27,12 +23,10 @@
         :loading="loading"
         ref="members"
       >
-
-        <template v-slot:item="{item}">
-          <div v-if="item.userExists">{{ item.name }} <v-chip
-              color="grey--darken-2"
-              dark
-            >{{ item.email }}</v-chip>
+        <template v-slot:item="{ item }">
+          <div v-if="item.userExists">
+            {{ item.name }}
+            <v-chip color="grey--darken-2" dark>{{ item.email }}</v-chip>
           </div>
           <div v-else>
             <v-icon left>mdi-account-clock</v-icon> {{ item.email }}
@@ -52,16 +46,13 @@
           <v-divider />
         </template>
         <template v-slot:append-outer>
-          <v-btn
-            fab
-            color="primary"
-            style="margin-top: -16px"
-            @click="load"
-          >
+          <v-btn fab color="primary" style="margin-top: -16px" @click="load">
             <v-icon>mdi-refresh</v-icon>
           </v-btn>
         </template>
       </v-autocomplete>
+
+      <app-kml-importer v-model="wkt" @chosen="fieldChosen"></app-kml-importer>
 
       <app-dialog
         labelConfirm="Refresh Members"
@@ -74,19 +65,16 @@
         To show new members in the dropdown, please press refresh.
       </app-dialog>
 
-      <v-btn
-        class="mx-2"
-        color="primary"
-        @click="save"
-      >Save Changes</v-btn>
+      <v-btn class="mx-2" color="primary" @click="save">Save Changes</v-btn>
     </v-form>
-
   </v-flex>
 </template>
 
 <script>
+
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
+import appKmlImporter from './KmlImporter.vue';
 
 
 const remapGroupMembership = (m) => {
@@ -128,6 +116,7 @@ const remapFarmOSMembership = (m) => {
 export default {
   components: {
     appDialog,
+    appKmlImporter,
   },
   props: [
     'instance',
@@ -141,6 +130,8 @@ export default {
       members: [],
       loading: false,
       invite: false,
+      kml: '',
+      wkt: '',
     };
   },
   methods: {

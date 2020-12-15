@@ -10,6 +10,7 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "@mapbox/togeojson": "^0.16.0",
     "@mdi/font": "^5.0.45",
     "@vue/composition-api": "^0.5.0",
     "axios": "^0.19.0",
@@ -39,7 +40,8 @@
     "vuedraggable": "^2.23.2",
     "vuetify": "2.3.8",
     "vuex": "^3.1.2",
-    "vuex-shared-mutations": "^1.0.2"
+    "vuex-shared-mutations": "^1.0.2",
+    "wkx": "^0.5.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.149",
