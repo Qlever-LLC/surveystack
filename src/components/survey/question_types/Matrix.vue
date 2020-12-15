@@ -445,4 +445,30 @@ export default {
 .matrix-cell {
   min-width: 5rem;
 }
+
+/*
+  'scrollbar-color' and 'scrollbar-width' should be working on Firefox Android since version 64
+  https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Scrollbars#Browser_compatibility
+  It works with Firefox on Desktop, but apparently it does not work on Firefox Android version 84
+*/
+/*
+>>> .v-data-table__wrapper {
+  scrollbar-color: red blue !important;
+  scrollbar-width: auto;
+}
+*/
+
+>>> .v-data-table__wrapper::-webkit-scrollbar {
+  height: 12px;
+}
+
+>>> .v-data-table__wrapper::-webkit-scrollbar-track {
+  border-radius: 3px;
+  background: #eee;
+}
+
+>>> .v-data-table__wrapper::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: #bbb;
+}
 </style>
