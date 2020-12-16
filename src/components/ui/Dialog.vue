@@ -14,6 +14,7 @@
       <v-card-actions>
         <v-spacer />
         <v-btn
+          v-if="!hideCancel"
           text
           @click="$emit('cancel')"
         >Cancel</v-btn>
@@ -39,6 +40,10 @@ export default {
     maxWidth: {
       type: [String, Number],
       default: '',
+    },
+    hideCancel: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {

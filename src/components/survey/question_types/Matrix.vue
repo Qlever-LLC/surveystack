@@ -5,11 +5,69 @@
       v-if="rowToBeDeleted >= 0"
       @confirm="remove(rowToBeDeleted)"
       @cancel="rowToBeDeleted = -1"
-      title="Confirm Row Deletion"
+      title="Confirm Deletion"
       labelConfirm="DELETE"
     >
       <pre>{{rows[rowToBeDeleted]}}</pre>
     </app-dialog>
+
+    <v-dialog
+      v-model="showEditItemDialog"
+      title="Edit"
+      hideCancel
+      @confirm="showEditItemDialog = false"
+    >
+      <v-card>
+        <v-card-title>
+          Edit
+          <v-spacer />
+          <v-btn
+            @click="duplicateRow(editedIndex)"
+            text
+            color="primary"
+          >
+            <v-icon left>mdi-content-copy</v-icon>Duplicate
+          </v-btn>
+        </v-card-title>
+        <v-card-text>
+          <v-form
+            autocomplete="off"
+            @submit.prevent=""
+          >
+            <div
+              v-for="(header, idx) in headers"
+              :key="header.value"
+            >
+              <h4>{{header.text}}</h4>
+              <app-matrix-cell
+                :header="header"
+                :item="editedItem"
+                :getDropdownItems="getDropdownItems"
+                :farmos="farmos"
+                :index="idx"
+                @changed="onInput"
+              />
+            </div>
+          </v-form>
+        </v-card-text>
+        <v-card-actions class="d-flex justify-space-between">
+          <v-btn
+            text
+            @click="rowToBeDeleted = editedIndex"
+            class="ma-2"
+          >
+            <v-icon left>mdi-trash-can-outline</v-icon>Delete
+          </v-btn>
+          <v-btn
+            text
+            @click="showEditItemDialog = false"
+            class="ma-2"
+          >
+            <v-icon left>mdi-close</v-icon> Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <h2 v-if="control.title">{{control.title}}</h2>
     <h3
@@ -28,6 +86,7 @@
           <tr
             v-for="(item,idx) in items"
             :key="idx"
+            @click="isMobile ? editItem(idx) : () => {}"
           >
             <td
               v-for="(header,key) in headers"
@@ -38,124 +97,21 @@
                 autocomplete="off"
                 @submit.prevent=""
               >
-                <v-text-field
-                  v-if="header.type === 'text'"
-                  :label="header.value"
-                  :value="item[header.value]"
-                  @input="v => {item[header.value] = v; onInput()}"
-                  solo
-                  hide-details
-                  class="matrix-cell my-2"
-                  autocomplete="off"
+                <app-matrix-cell
+                  :header="header"
+                  :item="item"
+                  :getDropdownItems="getDropdownItems"
+                  :farmos="farmos"
+                  :index="idx"
+                  @changed="onInput"
+                  :disabled="isMobile"
                 />
-                <v-text-field
-                  v-else-if="header.type === 'number'"
-                  :label="header.value"
-                  :value="item[header.value]"
-                  @input="v => {item[header.value] = Number(v); onInput()}"
-                  type="number"
-                  solo
-                  hide-details
-                  class="matrix-cell my-2"
-                />
-                <v-select
-                  v-else-if="header.type === 'dropdown'"
-                  :items="getDropdownItems(header.value)"
-                  :value="item[header.value]"
-                  @input="v => {item[header.value] = v; onInput()}"
-                  hide-details
-                  solo
-                  class="matrix-cell my-2"
-                  :multiple="header.multiple"
-                />
-                <v-autocomplete
-                  v-else-if="header.type === 'autocomplete'"
-                  :items="getDropdownItems(header.value)"
-                  :value="item[header.value]"
-                  @input="v => {item[header.value] = v; onInput()}"
-                  hide-details
-                  solo
-                  :multiple="header.multiple"
-                />
-                <v-autocomplete
-                  v-else-if="header.type === 'farmos_field'"
-                  :label="header.value"
-                  :items="farms || []"
-                  :value="item[header.value]"
-                  @input="v => {item[header.value] = v; onInput()}"
-                  item-text="label"
-                  item-value="value"
-                  hide-details
-                  solo
-                  :disabled="loading"
-                >
-                  <template v-slot:item="{item}">
-                    <div v-html="item.label"></div>
-                  </template>
-                  <template v-slot:selection="{item}">
-                    <div
-                      v-html="item.label"
-                      class="d-flex align-center"
-                    ></div>
-                  </template>
-                </v-autocomplete>
-                <v-autocomplete
-                  v-else-if="header.type === 'farmos_planting'"
-                  :label="header.value"
-                  :value="item[header.value]"
-                  @input="v => {item[header.value] = localChange(v); onInput()}"
-                  :items="farmosTransformedPlantings || []"
-                  item-text="label"
-                  item-value="value"
-                  hide-details
-                  solo
-                  :disabled="loading"
-                >
-                  <template v-slot:item="{item}">
-                    <div v-html="item.label"></div>
-                  </template>
-                  <template v-slot:selection="{item}">
-                    <div
-                      v-html="item.label"
-                      class="d-flex align-center"
-                    ></div>
-                  </template>
-                </v-autocomplete>
-                <div v-else-if="header.type === 'date'">
-                  <v-menu
-                    :close-on-content-click="false"
-                    v-model="menus[`${idx}_${header.value}`]"
-                    transition="scale-transition"
-                    offset-y
-                    max-width="290px"
-                    min-width="290px"
-                  >
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-text-field
-                        :value="item[header.value]"
-                        @input="v => {item[header.value] = v; onInput()}"
-                        label="Date"
-                        hide-details
-                        v-bind="attrs"
-                        v-on="on"
-                        solo
-                        autocomplete="off"
-                      ></v-text-field>
-                    </template>
-                    <v-date-picker
-                      :value="item[header.value]"
-                      @input="v => {item[header.value] = v; menus[`${idx}_${header.value}`] = false; onInput()}"
-                      no-title
-                    ></v-date-picker>
-                  </v-menu>
-                </div>
-
-                <div v-else>
-                  ???
-                </div>
               </v-form>
             </td>
-            <td style="width: 64px; padding-left: 4px !important; padding-right: 0px;">
+            <td
+              v-if="!isMobile"
+              style="width: 64px; padding-left: 4px !important; padding-right: 0px;"
+            >
               <div class="d-flex">
                 <v-btn
                   icon
@@ -209,6 +165,8 @@
 <script>
 import { cloneDeep } from 'lodash';
 import appDialog from '@/components/ui/Dialog.vue';
+import appMatrixCell from '@/components/survey/question_types/MatrixCell.vue';
+
 
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
@@ -314,6 +272,7 @@ export default {
   mixins: [baseQuestionComponent, farmosBase('fields')],
   components: {
     appDialog,
+    appMatrixCell,
   },
   computed: {
     source() {
@@ -341,6 +300,12 @@ export default {
         this.rowToBeDeleted = -1;
       },
     },
+    isMobile() {
+      return !this.$vuetify.breakpoint.smAndUp;
+    },
+    farmos() {
+      return { farms: this.farms, plantings: this.farmosTransformedPlantings };
+    },
   },
   data() {
     return {
@@ -348,6 +313,9 @@ export default {
       rowToBeDeleted: -1,
       menus: {}, // object to hold v-models for v-menu
       farmosTransformedPlantings: [],
+      showEditItemDialog: false,
+      editedIndex: -1,
+      editedItem: null,
     };
   },
   methods: {
@@ -355,11 +323,20 @@ export default {
       // create empty row object from headers
       const newRow = this.fields.reduce((accu, current) => ({ ...accu, [current]: null }), {});
       this.rows.push(newRow);
+      if (this.isMobile) {
+        this.editItem(this.rows.length - 1);
+      }
     },
     remove(row) {
+      this.showEditItemDialog = false;
       this.rows.splice(row, 1);
       this.rowToBeDeleted = -1;
       this.$emit('changed', this.rows);
+    },
+    editItem(index) {
+      this.editedIndex = index;
+      this.editedItem = this.rows[index];
+      this.showEditItemDialog = true;
     },
     getDropdownItems(field) {
       const column = this.source.content.find(col => col.value === field);
@@ -367,65 +344,14 @@ export default {
       return ontology.content.map(row => ({ text: row.label, value: row.value }));
     },
     onInput() {
+      console.log('onInput', this.rows);
       this.$emit('changed', this.rows);
     },
     duplicateRow(idx) {
+      this.showEditItemDialog = false;
       const clone = cloneDeep(this.rows[idx]);
       this.rows = [...this.rows, clone];
       this.$emit('changed', this.rows);
-    },
-    // copied from FarmOsPlanting.vue
-    localChange(hashesArg) {
-      let hashes;
-      if (!Array.isArray(hashesArg)) {
-        if (hashesArg) {
-          hashes = [hashesArg];
-        } else {
-          return null;
-        }
-      } else {
-        hashes = hashesArg;
-      }
-
-      console.log('hashes', hashes);
-
-
-      const selectedItems = hashes.map((h) => {
-        if (typeof h !== 'string') {
-          return h;
-        }
-        return (this.transformed.find(t => t.value.hash === h)).value;
-      });
-
-
-      // const [farmId, assetId] = itemId.split('.');
-
-      const fields = selectedItems.filter(item => !!item.isField);
-
-      // selected assets
-      const assets = selectedItems.filter(item => !item.isField);
-
-      const assetsToSelect = fields.flatMap(field => this.transformed
-        .filter(item => !item.value.isField)
-        .filter(item => item.value.farmId === field.farmId)
-        .filter(item => item.value.location.some(loc => loc.id === field.location.id)));
-
-
-      assetsToSelect.forEach((assetToSelect) => {
-        if (assets.some(asset => asset.farmId === assetToSelect.value.farmId
-          && asset.assetId === assetToSelect.value.assetId)) {
-          // skip
-        } else {
-          assets.push(assetToSelect.value);
-        }
-      });
-
-
-      if (!Array.isArray(hashesArg)) {
-        return assets[0];
-      }
-
-      return assets;
     },
   },
   async created() {
