@@ -2,6 +2,7 @@
   <div
     class="draft-component-wrapper"
     v-if="control"
+    ref="wrapper"
   >
 
     <!-- confirm submission modal -->
@@ -115,6 +116,17 @@ export default {
       },
     },
   },
+  /*
+  watch: {
+    path() {
+      setTimeout(() => {
+        const body = document.getElementsByTagName('body')[0];
+        const { clientHeight, scrollHeight } = body;
+        console.log(clientHeight, scrollHeight);
+      }, 100);
+    },
+  },
+  */
   methods: {
     goto(path) {
       this.$store.dispatch('draft/goto', path);
@@ -137,10 +149,18 @@ export default {
 
       this.$store.dispatch('draft/setProperty', { path: 'meta.group', value: group });
     },
+    isOverflown({
+      clientWidth, clientHeight, scrollWidth, scrollHeight,
+    }) {
+      return scrollHeight > clientHeight || scrollWidth > clientWidth;
+    },
   },
   created() {
     const { survey, submission, persist } = this;
     this.$store.dispatch('draft/init', { survey, submission, persist });
+  },
+  mounted() {
+    // console.log('wrapper', this.$refs.wrapper.clientHeight, this.$refs.wrapper.scrollHeight);
   },
 };
 </script>
