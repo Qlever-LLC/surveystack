@@ -27,7 +27,7 @@ const connectDatabase = async () => {
 
   // migrations
   await migrateScripts_V1toV2();
-  //await migrateSurveys_VXtoV4();
+  await migrateSurveys_VXtoV4();
 };
 
 const migrateScripts_V1toV2 = async () => {
@@ -58,7 +58,12 @@ const migrateSurveys_VXtoV4 = async () => {
     .collection('surveys')
     .find({ 'meta.specVersion': { $lte: 3 } })
     .toArray();
-  console.log('migrateSurveys_VXtoV4', surveys.length);
+
+  if (surveys.length === 0) {
+    return;
+  }
+
+  console.log('migrateSurveys_VXtoV4: migrating surveys: ', surveys.length);
 
   for (const survey of surveys) {
     console.log(`Migrating: ${survey.name}`);
