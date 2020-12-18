@@ -1,24 +1,17 @@
 <template>
-  <v-container fluid>
-    <p
-      v-if="control.title"
-      class="mb-2 display-2"
-    >{{ control.title }}
-
-    </p>
+  <div>
+    <app-control-label :value="control.label" />
+    <app-control-hint :value="control.hint" />
 
     <v-progress-circular
       v-if="loading"
       indeterminate
       color="primary"
-      class="align-self-center ml-4 mb-8"
+      class="my-8"
     >
     </v-progress-circular>
 
     <v-list style="overflow: auto;">
-      <div class="ml-3">
-        <v-label class="ml-3">{{control.label}}</v-label>
-      </div>
       <v-list-item-group
         v-if="!loading"
         :disabled="loading"
@@ -52,9 +45,8 @@
       </v-list-item-group>
     </v-list>
 
+    <!--
     <v-row v-if="false">
-
-      <!-- v-model="values" -->
       <v-autocomplete
         :disabled="loading"
         :value="value"
@@ -87,11 +79,10 @@
       >
       </v-progress-circular>
     </v-row>
-    <p
-      v-if="control.hint"
-      class="mt-2"
-    >{{ control.hint }}</p>
-  </v-container>
+    -->
+
+    <app-control-more-info :value="control.moreInfo" />
+  </div>
 </template>
 
 <script>

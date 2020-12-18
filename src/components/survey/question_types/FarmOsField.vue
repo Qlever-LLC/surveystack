@@ -1,48 +1,33 @@
 <template>
-  <v-container fluid>
-    <p
-      v-if="control.title"
-      class="mt-2"
-    >{{ control.title }}</p>
-    <v-row>
-      <!-- v-model="values" -->
-      <v-autocomplete
-        :disabled="loading"
-        :value="value"
-        @change="onChange"
-        :items="farms || []"
-        item-text="label"
-        item-value="value"
-        outlined
-        :chips="false"
-        :label="control.label"
-        :multiple="false"
-        @keyup.enter.prevent="submit"
-      >
-        <template v-slot:item="{item}">
-          <div v-html="item.label"></div>
-        </template>
-        <template v-slot:selection="{item}">
-          <div
-            v-html="item.label"
-            class="d-flex align-center"
-          ></div>
-        </template>
-      </v-autocomplete>
+  <div>
+    <app-control-label :value="control.label" />
+    <v-autocomplete
+      :disabled="loading"
+      :value="value"
+      @change="onChange"
+      :items="farms || []"
+      item-text="label"
+      item-value="value"
+      outlined
+      :chips="false"
+      :label="control.hint"
+      :multiple="false"
+      @keyup.enter.prevent="submit"
+      :loading="loading"
+    >
+      <template v-slot:item="{item}">
+        <div v-html="item.label"></div>
+      </template>
+      <template v-slot:selection="{item}">
+        <div
+          v-html="item.label"
+          class="d-flex align-center"
+        ></div>
+      </template>
+    </v-autocomplete>
 
-      <v-progress-circular
-        v-if="loading"
-        indeterminate
-        color="primary"
-        class="align-self-center ml-4 mb-8"
-      >
-      </v-progress-circular>
-    </v-row>
-    <p
-      v-if="control.hint"
-      class="mb-2"
-    >{{ control.hint }}</p>
-  </v-container>
+    <app-control-more-info :value="control.moreInfo" />
+  </div>
 </template>
 
 <script>

@@ -1,9 +1,7 @@
 <template>
   <div class="ontology question">
-    <v-card-title
-      class="px-0"
-      v-if="control.title"
-    >{{ control.title }}</v-card-title>
+    <app-control-label :value="control.label" />
+
     <v-autocomplete
       :value="value"
       @change="onChange"
@@ -12,7 +10,7 @@
       item-value="value"
       outlined
       :chips="!!control.options.hasMultipleSelections"
-      :label="control.label"
+      :label="control.hint"
       :multiple="!!control.options.hasMultipleSelections"
       :menu-props="autocompleteMenuProps"
       v-if="sourceIsValid && !control.options.allowCustomSelection"
@@ -52,7 +50,7 @@
       :delimiters="[',']"
       :return-object="false"
       :chips="!!control.options.hasMultipleSelections"
-      :label="control.label"
+      :label="control.hint"
       :multiple="!!control.options.hasMultipleSelections"
       :menu-props="autocompleteMenuProps"
       v-else-if="sourceIsValid && control.options.allowCustomSelection"
@@ -90,10 +88,8 @@
     >
       <v-icon class="mr-2">mdi-alert</v-icon>Invalid select options, please update Suvey Definition
     </v-banner>
-    <p
-      v-if="control.hint"
-      class="mt-2 text--secondary"
-    >{{ control.hint }}</p>
+    <app-control-more-info :value="control.moreInfo" />
+
   </div>
 </template>
 
@@ -163,10 +159,6 @@ export default {
 </script>
 
 <style scoped>
-.ontology.question {
-  padding-top: 1rem;
-}
-
 .full-width {
   width: 100%;
 }

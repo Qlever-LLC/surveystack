@@ -1,10 +1,11 @@
 <template>
   <div>
-    <p v-if="control.title" class="mb-4">{{ control.title }}</p>
-    <v-list v-if="sourceIsValid" style="overflow: auto;">
-      <div class="ml-3">
-        <v-label class="ml-3">{{control.label}}</v-label>
-      </div>
+    <app-control-label :value="control.label" />
+    <v-list
+      v-if="sourceIsValid"
+      style="overflow: auto;"
+    >
+      <app-control-hint :value="control.hint" />
 
       <v-list-item-group
         :value="value"
@@ -32,7 +33,6 @@
         <v-list-item
           v-if="control.options.allowCustomSelection"
           :value="customSelection || 'other'"
-
         >
           <template v-slot:default="{ active, toggle }">
             <v-list-item-action>
@@ -58,11 +58,8 @@
         </v-list-item>
       </v-list-item-group>
     </v-list>
-    <div v-else>
-      Invalid Select Options, please update Suvey Definition
-    </div>
-    <p v-if="control.hint" class="mt-4">{{ control.hint }}</p>
-
+    <app-control-error v-else>No options specified, please update suvey definition</app-control-error>
+    <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
 
@@ -130,5 +127,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

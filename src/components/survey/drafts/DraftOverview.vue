@@ -222,7 +222,7 @@ export default {
 
         controlDisplays.push({
           path: overview.path,
-          label: overview.control.title || overview.control.label || overview.control.type,
+          label: overview.control.label || overview.control.hint || overview.control.type,
           value,
           icon: icon[0],
           color: icon[1],

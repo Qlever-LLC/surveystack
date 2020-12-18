@@ -151,7 +151,7 @@ export default {
       return control && control.icon;
     },
     getDisplay(control) {
-      return control.title || control.label || control.type;
+      return control.label || control.hint || control.type;
     },
     showDeleteModal(index) {
       this.deleteQuestionModalIsVisible = true;

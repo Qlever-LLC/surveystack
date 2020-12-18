@@ -1,6 +1,8 @@
 <template>
   <div class="question question-script">
-    <p v-if="control.title" class="mb-4">{{control.title}}</p>
+    <app-control-label :value="control.label" />
+    <app-control-hint :value="control.hint" />
+
     <div v-if="this.source">
       <iframe
         src=""
@@ -19,22 +21,28 @@
       </v-btn>
       <p class="status">
         status: {{ meta && meta.status }}
-        <br/>
+        <br />
         status message: {{ meta && meta.statusMessage }}
       </p>
     </div>
-    <div v-else-if="isLoading" class="d-flex align-center justify-center">
+    <div
+      v-else-if="isLoading"
+      class="d-flex align-center justify-center"
+    >
       <v-progress-circular
         indeterminate
         color="primary"
         class="ma-5"
       />
     </div>
-    <div v-else-if="loadingSourceFailed" class="text-center">
+    <div
+      v-else-if="loadingSourceFailed"
+      class="text-center"
+    >
       <v-icon color="red">mdi-close-thick</v-icon>
       There was an error loading the script.
     </div>
-    <p v-if="control.hint" class="mt-4">{{control.hint}}</p>
+    <app-control-more-info :value="control.moreInfo" />
 
   </div>
 </template>
@@ -176,7 +184,6 @@ iframe {
 }
 
 .status {
-
 }
 
 .run-button {

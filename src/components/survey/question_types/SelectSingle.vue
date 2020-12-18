@@ -1,12 +1,13 @@
 <template>
   <div class="select-single question">
-    <p v-if="control.title" class="mb-2">{{ control.title }}</p>
+    <app-control-label :value="control.label" />
+    <app-control-hint :value="control.hint" />
     <div>
       <v-radio-group
-        :label="control.label"
         :value="value"
         @change="onChange"
         v-if="sourceIsValid"
+        class="mt-0"
       >
         <v-radio
           v-for="(item) in filteredSource"
@@ -20,7 +21,6 @@
           v-if="control.options.allowCustomSelection"
         >
           <template v-slot:label>
-              <!-- v-model="customSelection" -->
             <v-text-field
               class="text-field-other"
               :value="customSelection"
@@ -29,18 +29,20 @@
               outlined
               dense
             >
-              <template v-slot:label class="something">
+              <template
+                v-slot:label
+                class="something"
+              >
                 <div class="top-10">Other</div>
               </template>
             </v-text-field>
           </template>
         </v-radio>
       </v-radio-group>
-      <div v-else>
-        Invalid Select Options, please update Suvey Definition
-      </div>
+      <app-control-error v-else>No options specified, please update suvey definition</app-control-error>
     </div>
-    <p v-if="control.hint" class="mt-2">{{ control.hint }}</p>
+    <app-control-more-info :value="control.moreInfo" />
+
   </div>
 </template>
 

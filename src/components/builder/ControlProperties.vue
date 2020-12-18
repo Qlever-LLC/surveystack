@@ -11,11 +11,6 @@
       />
       <v-text-field
         outlined
-        v-model="control.title"
-        label="Title"
-      />
-      <v-text-field
-        outlined
         v-model="control.label"
         label="Label"
       />
@@ -23,6 +18,11 @@
         outlined
         v-model="control.hint"
         label="Hint"
+      />
+      <v-text-field
+        outlined
+        v-model="control.moreInfo"
+        label="More info"
       />
       <div
         class="d-flex align-start"

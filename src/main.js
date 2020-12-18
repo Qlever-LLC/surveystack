@@ -13,6 +13,17 @@ import api from './services/api.service';
 
 // Auto include components for questions types
 import '@/components/survey/question_types';
+import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
+import appControlHint from '@/components/survey/drafts/ControlHint.vue';
+import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
+import appControlError from '@/components/survey/drafts/ControlError.vue';
+
+
+Vue.component('app-control-label', appControlLabel);
+Vue.component('app-control-hint', appControlHint);
+Vue.component('app-control-more-info', appControlMoreInfo);
+Vue.component('app-control-error', appControlError);
+
 
 api.init(process.env.VUE_APP_API_URL);
 

@@ -1,23 +1,19 @@
 <template>
-  <div class="mt-4">
-    <v-card-title
-      class="px-0"
-      v-if="control.title"
-    >{{ control.title }}</v-card-title>
+  <div>
+    <app-control-label :value="control.label" />
+
     <v-text-field
       outlined
       type="number"
-      :label="control.label"
+      :label="control.hint"
       v-bind:value="value"
       v-on:input="onInput"
       @keyup.enter.prevent="submit"
       ref="textField"
       :disabled="!relevant"
     />
-    <p
-      v-if="control.hint"
-      class="mb-2"
-    >{{ control.hint }}</p>
+    <app-control-more-info :value="control.moreInfo" />
+
   </div>
 </template>
 

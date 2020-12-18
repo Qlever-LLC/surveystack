@@ -1,12 +1,9 @@
 <template>
-  <div class="mt-4">
-    <v-card-title
-      class="px-0"
-      v-if="control.title"
-    >{{ control.title }}</v-card-title>
+  <div>
+    <app-control-label :value="control.label" />
     <v-text-field
       outlined
-      :label="control.label"
+      :label="control.hint"
       v-bind:value="value"
       v-on:input="onInput"
       @keyup.enter.prevent="submit"
@@ -14,10 +11,7 @@
       class="full-width"
       :disabled="!relevant"
     />
-    <p
-      v-if="control.hint"
-      class="text--secondary"
-    >{{ control.hint }}</p>
+    <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
 

@@ -1,12 +1,8 @@
 <template>
   <div>
-    <div
-      v-if="control.title"
-      class="mb-2"
-    >{{ control.title }}</div>
-    <div>
-      {{ control.label }}
-    </div>
+    <app-control-label :value="control.label" />
+    <app-control-hint :value="control.hint" />
+
     <div
       class="map-container my-2"
       v-if="!mapError"
@@ -107,10 +103,8 @@
       </v-card>
 
     </v-overlay>
-    <div
-      v-if="control.hint"
-      class="mt-4 mb-0"
-    >{{ control.hint }}</div>
+    <app-control-more-info :value="control.moreInfo" />
+
   </div>
 </template>
 

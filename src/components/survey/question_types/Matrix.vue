@@ -70,11 +70,9 @@
       </v-card>
     </v-dialog>
 
-    <h2 v-if="control.title">{{control.title}}</h2>
-    <h3
-      v-if="control.label"
-      class="text--secondary"
-    >{{control.label}}</h3>
+    <app-control-label :value="control.label" />
+    <app-control-hint :value="control.hint" />
+
     <v-data-table
       :headers="headers"
       :hide-default-footer="true"
@@ -106,6 +104,7 @@
                   :index="idx"
                   @changed="onInput"
                   :disabled="isMobile"
+                  class="matrix-cell my-2"
                 />
               </v-form>
             </td>
@@ -144,10 +143,8 @@
         <v-icon left>mdi-plus</v-icon>{{addRowLabel}}
       </v-btn>
     </div>
-    <div
-      v-if="control.hint"
-      class="my-3 text--secondary"
-    >{{control.hint}}</div>
+    <app-control-more-info :value="control.moreInfo" />
+
     <div
       class="d-flex flex-row align-center"
       v-if="loading"

@@ -5,14 +5,14 @@
   >
     <v-row>
       <div class="d-block mx-auto">
-        <p
-          v-if="control.title"
-          class="mb-4"
-        >{{control.title}}</p>
-
-        <div class="text-center mb-2">{{ this.control.label }}</div>
-        <!-- @change="updateDatePicker" -->
-        <!-- @input="updateDateInput" -->
+        <app-control-label
+          :value="control.label"
+          class="text-center"
+        />
+        <app-control-hint
+          :value="control.hint"
+          class="text-center"
+        />
 
         <v-date-picker
           v-if="control.options.subtype !== 'date-year'"
@@ -21,7 +21,8 @@
           :type="datePickerType"
           reactive
           no-title
-          :range="this.control.options.subtype === 'date-week-month-year'"
+          :range="control.options.subtype === 'date-week-month-year'"
+          class="mt-2"
         />
         <!--
           use text field with menu for year picker because year picker's
@@ -58,17 +59,16 @@
             no-title
           />
         </v-menu>
-        <p
-          v-if="control.hint"
-          class="mt-6"
-        >{{control.hint}}</p>
+        <app-control-more-info
+          :value="control.moreInfo"
+          class="text-center"
+        />
       </div>
     </v-row>
   </v-container>
 </template>
 
 <script>
-// import moment from 'moment';
 import baseQuestionComponent from './BaseQuestionComponent';
 
 
@@ -81,7 +81,6 @@ export default {
   },
   computed: {
     dateFormatted() {
-      // return this.value ? this.formatDate(moment(this.value).toISOString(true).substring(0, 10)) : null;
       return this.value ? this.formatDate(new Date(this.value).toISOString().substring(0, 10)) : null;
     },
     dateForPicker() {
@@ -123,10 +122,6 @@ export default {
       }
 
       return null;
-      // return this.value
-      //   // ? moment(this.value).toISOString(true).substring(0, substrLength)
-      //   ? new Date(this.value).toISOString().substring(0, substrLength)
-      //   : null;
     },
     dateType() {
       return (this.control
@@ -175,21 +170,16 @@ export default {
       console.log('handle change');
     },
     updateDate(date) {
-      // console.log(date);
-      // const newDate = moment(date).toISOString(true);
       const newDate = new Date(date).toISOString();
       this.dateFormatted = newDate;
     },
     updateDateInput(date) {
-      // console.log('input', date);
-      // const newDate = moment(date).toISOString(true);
       const newDate = new Date(date).toISOString();
       this.changed(newDate);
     },
     updateDatePicker(date) {
       this.datePickerIsVisible = false;
       console.log('update date picker', date);
-      // const newDate = moment(date);
 
       const newDate = this.control.options.subtype === 'date-year'
         ? new Date(date.replace(/^(\d{4})-(\d{2})-(\d{2})/, (match, g1) => [g1, '01', '01'].join('-'))) // set month and date to 1
