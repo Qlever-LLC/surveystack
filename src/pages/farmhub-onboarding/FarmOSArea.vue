@@ -2,14 +2,15 @@
   <div style="width: 100%">
     <v-form>
       <v-text-field
-        v-model="area.name"
+        v-model="farm.properties.name"
         label="Name"
         placeholder="Name"
         outlined
       />
-
+      <p>{{farm}}</p>
     </v-form>
     <div
+      v-if="farm != null"
       id="farmos-map"
       style="width: 100%; height: 500px"
     ></div>
@@ -25,6 +26,7 @@ import createMap from '@/external/instance/instance';
 export default {
   props: [
     'area',
+    'farm',
   ],
   data() {
     return {
@@ -33,6 +35,7 @@ export default {
   },
   methods: {
     log() {
+      console.log('aaa', this.props);
       console.log('layer', this.layer);
     },
   },
@@ -48,7 +51,15 @@ export default {
     map.addBehavior('measure', { layer: drawingLayer });
     this.layer = drawingLayer;
     console.log('created map');
+    // const wktOpts = {
+    //   title: 'my-polygon', // defaults to 'wkt'
+    //   wkt: this.props[1].geometry, // REQUIRED!
+    //   color: 'orange', // defaults to 'orange'
+    //   visible: true, // defaults to true
+    // };
+    // map.addLayer('wtk', wktOpts);
   },
+
 };
 </script>
 
