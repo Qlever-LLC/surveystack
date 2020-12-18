@@ -46,6 +46,7 @@
                 :farmos="farmos"
                 :index="idx"
                 @changed="onInput"
+                class="matrix-cell my-2"
               />
             </div>
           </v-form>
@@ -369,7 +370,7 @@ export default {
 
 <style scoped>
 .matrix-cell {
-  min-width: 5rem;
+  min-width: 10rem;
 }
 
 /*

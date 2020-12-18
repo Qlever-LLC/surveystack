@@ -5,7 +5,6 @@
     @input="v => {item[header.value] = v; onInput()}"
     solo
     hide-details
-    class="matrix-cell my-2"
     autocomplete="off"
     :disabled="disabled"
   />
@@ -16,7 +15,6 @@
     type="number"
     solo
     hide-details
-    class="matrix-cell my-2"
     :disabled="disabled"
   />
   <v-select
@@ -26,7 +24,6 @@
     @input="v => {item[header.value] = v; onInput()}"
     hide-details
     solo
-    class="matrix-cell my-2"
     :multiple="header.multiple"
     :disabled="disabled"
   />
