@@ -7,7 +7,6 @@
         placeholder="Name"
         outlined
       />
-      <p>{{farm}}</p>
     </v-form>
     <div
       v-if="farm != null"
@@ -51,13 +50,14 @@ export default {
     map.addBehavior('measure', { layer: drawingLayer });
     this.layer = drawingLayer;
     console.log('created map');
-    // const wktOpts = {
-    //   title: 'my-polygon', // defaults to 'wkt'
-    //   wkt: this.props[1].geometry, // REQUIRED!
-    //   color: 'orange', // defaults to 'orange'
-    //   visible: true, // defaults to true
-    // };
-    // map.addLayer('wtk', wktOpts);
+    const wktOpts = {
+      title: 'field', // defaults to 'wkt'
+      wkt: this.area, // REQUIRED!
+      color: 'orange', // defaults to 'orange'
+      visible: true, // defaults to true
+    };
+    const layer = map.addLayer('wkt', wktOpts);
+    map.zoomToLayer(layer);
   },
 
 };

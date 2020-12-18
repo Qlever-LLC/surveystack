@@ -89,6 +89,7 @@ export default {
       const wktString = wkx.Geometry.parseGeoJSON(this.farm.geometry);
       console.log('WKT', wktString);
       this.wkt = wktString.toWkt();
+      // console.log(wktString);
     },
     async getFile(e) {
       const holder = await e.text();
