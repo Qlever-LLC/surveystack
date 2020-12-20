@@ -20,7 +20,7 @@
 </template>
 <script>
 
-import togeogson from '@mapbox/togeojson';
+import togeojson from '@mapbox/togeojson';
 import wkx from 'wkx';
 import appDialog from '@/components/ui/Dialog.vue';
 
@@ -52,7 +52,7 @@ export default {
     importKml() {
       console.log('importing');
       const dom = (new DOMParser()).parseFromString(this.kml, 'text/xml');
-      const geojson = togeogson.kml(dom);
+      const geojson = togeojson.kml(dom);
       console.log('imported geojson', geojson);
 
       // TODO import geojson and export WKT

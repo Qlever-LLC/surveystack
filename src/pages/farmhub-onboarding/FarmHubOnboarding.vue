@@ -4,18 +4,9 @@
       <v-card-title class="headline primary white--text">
         {{ group.name }} : Farm Hub Onboarding
       </v-card-title>
-      <v-row
-        class="pa-4"
-        justify="space-between"
-      >
-        <v-col
-          cols="4"
-          style="max-height: 70vh; overflow-y: scroll"
-        >
-          <v-sheet
-            class="pa-2"
-            outlined
-          >
+      <v-row class="pa-4" justify="space-between">
+        <v-col cols="4" style="max-height: 70vh; overflow-y: scroll">
+          <v-sheet class="pa-2" outlined>
             <v-text-field
               v-model="search"
               label="Search"
@@ -32,6 +23,7 @@
           </v-sheet>
 
           <v-treeview
+            ref="treeview"
             :items="aggregators"
             :load-children="fetchChildren"
             transition
@@ -41,36 +33,25 @@
           >
             <template v-slot:prepend="{ item }">
               <v-icon v-if="item.type === 'farm'">mdi-home-variant</v-icon>
-              <v-icon v-if="item.type === 'aggregator'">mdi-account-multiple</v-icon>
-
+              <v-icon v-if="item.type === 'aggregator'"
+                >mdi-account-multiple</v-icon
+              >
+              <v-icon v-if="item.area_type && item.area_type === 'field'"
+                >mdi-map</v-icon
+              >
             </template>
 
             <template v-slot:label="{ item }">
-              <div
-                class="d-flex flex-column mt-4"
-                v-if="!!item.button"
-              >
-                <v-btn
-                  outlined
-                  color="primary"
-                  @click="createNew(item)"
-                >
+              <div class="d-flex flex-column mt-4" v-if="!!item.button">
+                <v-btn outlined color="primary" @click="createNew(item)">
                   <v-icon left>mdi-plus</v-icon>{{ item.name }}
                 </v-btn>
                 <v-divider class="mt-4" />
               </div>
               <span v-else>
-                <v-icon left>
-                  {{ item.icon }}
-                </v-icon>
-                <span
-                  style="cursor: pointer"
-                  @click="active = item"
-                >{{ item.payload.name || item.payload.farm_name }}
-                  <v-progress-circular
-                    indeterminate
-                    v-if="!!item.loading"
-                  />
+                <span style="cursor: pointer" @click="active = item">
+                  {{ item.name || item.payload.name || item.payload.farm_name }}
+                  <v-progress-circular indeterminate v-if="!!item.loading" />
                 </span>
               </span>
             </template>
@@ -87,10 +68,7 @@
 
         <v-divider vertical></v-divider>
 
-        <v-col
-          cols="7"
-          class="pa-4"
-        >
+        <v-col cols="7" class="pa-4">
           <div
             v-if="!!active && active.payload && active.payload.name"
             class="display-1 text-center"
@@ -99,7 +77,11 @@
           </div>
           <app-aggregator
             :busy="busy"
-            v-if="!!active && active.payload && active.payload.type === 'farmos-aggregator'"
+            v-if="
+              !!active &&
+              active.payload &&
+              active.payload.type === 'farmos-aggregator'
+            "
             @save="(a) => saveAggregator(a)"
             @testConnection="(a) => testConnection(a)"
             :aggregator="active.payload"
@@ -125,10 +107,9 @@
           <app-register
             @dialog="(title, text) => showDialog(title, text)"
             v-if="!!active && active.item_type === 'register'"
-            :group='groupId'
+            :group="groupId"
             :instance="Object.assign({}, registerTemplate)"
           />
-
         </v-col>
       </v-row>
     </v-card>
@@ -142,7 +123,6 @@
       <template v-slot:title>{{ dialog.title }}</template>
       {{ dialog.text }}
     </app-dialog>
-
   </v-container>
 </template>
 
@@ -216,6 +196,7 @@ export default {
     appDialog,
   },
   data: () => ({
+    fields: {},
     busy: false,
     active: null,
     registerTemplate,
@@ -307,9 +288,29 @@ export default {
 
         this.loadingAggregators = this.loadingAggregators.filter(e => e !== item.id);
       } else if (item.type === 'farm') {
-        console.log('fetching fields', item);
-        const areas = await fetchFields();
-        item.children.push(...areas);
+        try {
+          console.log('fetching fields', item);
+          // const farm = this.farms[item.aggregator].find(f => f.id === item.id);
+          // // eslint-disable-next-line no-param-reassign
+          // farm.children = await fetchFields();
+          // this.$forceUpdate();
+
+
+          const r = await api.get(`/farmos/areas/${item.aggregator}/${item.payload.url}`);
+          const farm = this.farms[item.aggregator].find(f => f.id === item.id);
+          const fields = Object.keys(r.data.areas).flatMap((key) => {
+            const areas = r.data.areas[key];
+            return areas.filter(a => a.area_type === 'field').map(a => ({
+              ...a,
+              id: `${item.id}.${a.tid}`,
+            }));
+          });
+
+          // const aggregator = this.aggregators.find(a => a.id === item.aggregator);
+          farm.children = fields;
+        } catch (error) {
+          console.log('error', error);
+        }
       }
     },
     async testConnection(item) {
