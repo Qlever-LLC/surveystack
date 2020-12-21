@@ -54,7 +54,7 @@
           small
           fixed
           style="bottom: 76px; right: 12px; z-index: 150"
-          @click="scrollY(150); overflowing = false"
+          @click="scrollY(500); overflowing = false"
         >
           <v-icon>mdi-arrow-down</v-icon>
         </v-btn>
@@ -179,7 +179,7 @@ export default {
       return scrollHeight > clientHeight || scrollWidth > clientWidth;
     },
     scrollY(val) {
-      window.scrollBy(0, val);
+      window.scrollBy({ top: val, left: 0, behavior: 'smooth' });
     },
   },
   created() {
