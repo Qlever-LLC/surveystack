@@ -1,19 +1,9 @@
 <template>
-  <v-container
-    fluid
-    class="instructions date question"
-  >
+  <div>
+    <app-control-label :value="control.label" />
+    <app-control-hint :value="control.hint" />
     <v-row>
-      <div class="d-block mx-auto">
-        <app-control-label
-          :value="control.label"
-          class="text-center"
-        />
-        <app-control-hint
-          :value="control.hint"
-          class="text-center"
-        />
-
+      <div :class="{'mx-auto': centered}">
         <v-date-picker
           v-if="control.options.subtype !== 'date-year'"
           :value="dateForPicker"
@@ -22,7 +12,7 @@
           reactive
           no-title
           :range="control.options.subtype === 'date-week-month-year'"
-          class="mt-2"
+          class="mt-5"
         />
         <!--
           use text field with menu for year picker because year picker's
@@ -59,13 +49,11 @@
             no-title
           />
         </v-menu>
-        <app-control-more-info
-          :value="control.moreInfo"
-          class="text-center"
-        />
       </div>
     </v-row>
-  </v-container>
+
+    <app-control-more-info :value="control.moreInfo" />
+  </div>
 </template>
 
 <script>
@@ -74,6 +62,7 @@ import baseQuestionComponent from './BaseQuestionComponent';
 
 export default {
   mixins: [baseQuestionComponent],
+  props: { centered: { type: Boolean, default: true } },
   data() {
     return {
       datePickerIsVisible: false,
