@@ -25,6 +25,18 @@
         outlined
       />
 
+      <v-combobox
+        item-color="primary"
+        label="Tags"
+        placeholder="Enter Aggregator Tags"
+        outlined
+        v-model="params"
+        chips
+        deletable-chips
+        multiple
+      >
+      </v-combobox>
+
       <v-card
         outlined
         class="px-4 mb-4"
@@ -68,6 +80,18 @@
         @click="testConnection"
       >Test Connection</v-btn>
 
+      <v-btn
+        v-if="false"
+        outlined
+        :loading="busy"
+        :disabled="busy"
+        class="mx-2"
+        color="red"
+        @click="testConnection"
+      >
+        <v-icon left>mdi-delete</v-icon>Delete
+      </v-btn>
+
     </v-form>
   </v-flex>
 </template>
@@ -75,16 +99,41 @@
 <script>
 
 export default {
+  data() {
+    return {
+      params: [],
+    };
+  },
   props: [
     'aggregator',
     'busy',
   ],
   methods: {
     save() {
+      this.aggregator.data.parameters = this.params.join(',');
       this.$emit('save', this.aggregator);
     },
     testConnection() {
       this.$emit('testConnection', this.aggregator);
+    },
+    delete() {
+      this.$emit('delete', this.aggregator);
+    },
+    mapTags() {
+      const p = this.aggregator.data.parameters;
+      if (!p) {
+        this.params = [];
+      } else {
+        this.params = p.split(',');
+      }
+    },
+  },
+  mounted() {
+    this.mapTags();
+  },
+  watch: {
+    aggregator() {
+      this.mapTags();
     },
   },
 };

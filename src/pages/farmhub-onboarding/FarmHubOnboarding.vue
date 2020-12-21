@@ -4,18 +4,9 @@
       <v-card-title class="headline primary white--text">
         {{ group.name }} : Farm Hub Onboarding
       </v-card-title>
-      <v-row
-        class="pa-4"
-        justify="space-between"
-      >
-        <v-col
-          cols="4"
-          style="max-height: 70vh; overflow-y: scroll"
-        >
-          <v-sheet
-            class="pa-2"
-            outlined
-          >
+      <v-row class="pa-4" justify="space-between">
+        <v-col cols="4" style="max-height: 70vh; overflow-y: scroll">
+          <v-sheet class="pa-2" outlined>
             <v-text-field
               v-model="search"
               label="Search"
@@ -32,6 +23,8 @@
           </v-sheet>
 
           <v-treeview
+            :open.sync="open"
+            ref="treeview"
             :items="aggregators"
             :load-children="fetchChildren"
             transition
@@ -41,36 +34,25 @@
           >
             <template v-slot:prepend="{ item }">
               <v-icon v-if="item.type === 'farm'">mdi-home-variant</v-icon>
-              <v-icon v-if="item.type === 'aggregator'">mdi-account-multiple</v-icon>
-
+              <v-icon v-if="item.type === 'aggregator'"
+                >mdi-account-multiple</v-icon
+              >
+              <v-icon v-if="item.area_type && item.area_type === 'field'"
+                >mdi-map</v-icon
+              >
             </template>
 
             <template v-slot:label="{ item }">
-              <div
-                class="d-flex flex-column mt-4"
-                v-if="!!item.button"
-              >
-                <v-btn
-                  outlined
-                  color="primary"
-                  @click="createNew(item)"
-                >
+              <div class="d-flex flex-column mt-4" v-if="!!item.button">
+                <v-btn outlined color="primary" @click="createNew(item)">
                   <v-icon left>mdi-plus</v-icon>{{ item.name }}
                 </v-btn>
                 <v-divider class="mt-4" />
               </div>
               <span v-else>
-                <v-icon left>
-                  {{ item.icon }}
-                </v-icon>
-                <span
-                  style="cursor: pointer"
-                  @click="active = item"
-                >{{ item.payload.name || item.payload.farm_name }}
-                  <v-progress-circular
-                    indeterminate
-                    v-if="!!item.loading"
-                  />
+                <span style="cursor: pointer" @click="active = item">
+                  {{ item.name || item.payload.name || item.payload.farm_name }}
+                  <v-progress-circular indeterminate v-if="!!item.loading" />
                 </span>
               </span>
             </template>
@@ -87,10 +69,7 @@
 
         <v-divider vertical></v-divider>
 
-        <v-col
-          cols="7"
-          class="pa-4"
-        >
+        <v-col cols="7" class="pa-4">
           <div
             v-if="!!active && active.payload && active.payload.name"
             class="display-1 text-center"
@@ -99,11 +78,17 @@
           </div>
           <app-aggregator
             :busy="busy"
-            v-if="!!active && active.payload && active.payload.type === 'farmos-aggregator'"
+            v-if="
+              !!active &&
+              active.payload &&
+              active.payload.type === 'farmos-aggregator'
+            "
             @save="(a) => saveAggregator(a)"
             @testConnection="(a) => testConnection(a)"
             :aggregator="active.payload"
+            @delete="(a) => deleteAggregator(a)"
           />
+
           <app-farm-o-s-instance
             :busy="busy"
             v-if="!!active && active.type === 'farm'"
@@ -123,10 +108,9 @@
           <app-register
             @dialog="(title, text) => showDialog(title, text)"
             v-if="!!active && active.item_type === 'register'"
-            :group='groupId'
+            :group="groupId"
             :instance="Object.assign({}, registerTemplate)"
           />
-
         </v-col>
       </v-row>
     </v-card>
@@ -191,6 +175,19 @@ const registerTemplate = {
   agree: false,
 };
 
+const registerAggregator = {
+  _id: null,
+  type: 'farmos-aggregator',
+  name: '',
+  data: {
+    url: '',
+    apiKey: '',
+    parameters: '',
+    planKey: '',
+    planName: '',
+  },
+};
+
 export default {
   components: {
     appAggregator,
@@ -200,6 +197,8 @@ export default {
     appDialog,
   },
   data: () => ({
+    open: [],
+    fields: {},
     busy: false,
     active: null,
     registerTemplate,
@@ -290,10 +289,66 @@ export default {
         }
 
         this.loadingAggregators = this.loadingAggregators.filter(e => e !== item.id);
-      } else if (item.item_type === 'farm') {
-        const areas = await fetchFields();
-        item.children.push(...areas);
+      } else if (item.type === 'farm') {
+        try {
+          console.log('fetching fields', item);
+          // const farm = this.farms[item.aggregator].find(f => f.id === item.id);
+          // // eslint-disable-next-line no-param-reassign
+          // item.children = await fetchFields();
+          // // this.$refs.treeview.updateAll(false);
+          // console.log('open id', item.aggregator, item.id);
+          // // this.open = [item.aggregator];
+          // // this.$forceUpdate();
+
+
+          // const r = await api.get(`/farmos/areas/${item.aggregator}/${item.payload.url}`);
+          // // const farm = this.farms[item.aggregator].find(f => f.id === item.id);
+          // const fields = Object.keys(r.data.areas).flatMap((key) => {
+          //   const areas = r.data.areas[key];
+          //   return areas.filter(a => a.area_type === 'field').map(a => ({
+          //     ...a,
+          //     id: `${item.id}.${a.tid}`,
+          //   }));
+          // });
+
+          // // const aggregator = this.aggregators.find(a => a.id === item.aggregator);
+          // // eslint-disable-next-line no-param-reassign
+          // item.children = fields;
+          // // console.log('item with children', item);
+
+          return api.get(`/farmos/areas/${item.aggregator}/${item.payload.url}`)
+            .then((r) => {
+              const fields = Object.keys(r.data.areas).flatMap((key) => {
+                const areas = r.data.areas[key];
+                return areas.filter(a => a.area_type === 'field').map(a => ({
+                  ...a,
+                  id: `${item.id}.${a.tid}`,
+                }));
+              });
+              // eslint-disable-next-line no-param-reassign
+              const parentNode = this.$refs.treeview.nodes[item.id];
+
+              // const newArea = {
+              //   id: `${item.id}:new`,
+              //   name: 'New Area',
+              //   button: true,
+              // };
+
+              fields.forEach((f) => {
+                console.log('pushing field');
+                const childNode = { ...parentNode, item: f, vnode: null };
+                this.$refs.treeview.nodes[f.id] = childNode;
+              });
+
+              item.children.push(...fields);
+              console.log('item with children', item);
+            })
+            .catch(e => console.log('error', e));
+        } catch (error) {
+          console.log('error', error);
+        }
       }
+      return null;
     },
     async testConnection(item) {
       console.log('testing connection for item', item);
@@ -329,7 +384,7 @@ export default {
       console.log('updated', updated);
 
       try {
-        const r = await api.put(`/group-integrations/${item._id}`, updated);
+        const r = item._id === null ? await api.post('/group-integrations', updated) : await api.put(`/group-integrations/${item._id}`, updated);
         console.log('response', r);
         if (r.data && r.data.ok === 1) {
           this.dialog.text = 'Updated Aggregator';
@@ -344,6 +399,8 @@ export default {
         this.dialog.title = 'Error';
         this.dialog.show = true;
       }
+
+      this.loadRoot();
       this.busy = false;
     },
     async createNew(item) {
@@ -356,27 +413,40 @@ export default {
           item_type: 'register',
           aggregator: item.aggregator,
         };
+      } else if (item.item_type === 'aggregator') {
+        console.log('creating new aggregator');
+        const payload = Object.assign({}, registerAggregator);
+        payload.group = this.groupId;
+        this.active = {
+          payload,
+        };
       }
+    },
+    async loadRoot() {
+      const { group } = this.$route.query;
+      if (group) {
+        this.groupId = group;
+      }
+
+      try {
+        const { data } = await api.get(`/groups/${group}?populate=true`);
+        this.group = { ...data };
+
+        const { data: members } = await api.get(`/memberships?group=${group}&populate=true`);
+        this.members = members;
+
+        const { data: integrations } = await api.get(`/group-integrations?group=${group}&populate=true`);
+        this.integrations = integrations;
+      } catch (e) {
+        console.log('something went wrong:', e);
+      }
+    },
+    async deleteAggregator() {
+      // TODO delete an aggregator
     },
   },
   async created() {
-    const { group } = this.$route.query;
-    if (group) {
-      this.groupId = group;
-    }
-
-    try {
-      const { data } = await api.get(`/groups/${group}?populate=true`);
-      this.group = { ...data };
-
-      const { data: members } = await api.get(`/memberships?group=${group}&populate=true`);
-      this.members = members;
-
-      const { data: integrations } = await api.get(`/group-integrations?group=${group}&populate=true`);
-      this.integrations = integrations;
-    } catch (e) {
-      console.log('something went wrong:', e);
-    }
+    this.loadRoot();
   },
 };
 </script>
