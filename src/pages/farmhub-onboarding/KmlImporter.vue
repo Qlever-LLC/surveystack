@@ -1,58 +1,33 @@
 <template>
-  <v-row>
-    <v-col>
-      <v-sheet outlined class="pa-8">
-        <div class="display-1">KML Importer</div>
-        <v-row>
-          <v-file-input
-            label="Upload klm file"
-            @change="getFile"
-          ></v-file-input>
-        </v-row>
-        <v-row v-if="kml !== ''">
-          <v-autocomplete
-              v-model="farm"
-              :items="selectArr"
-              outlined
-              label="Select farm"
-              @change="select"
-            ></v-autocomplete>
-        </v-row>
-        <v-row>
-          <app-farm-area
-            v-if="wkt"
-            :farm="farm"
-            :area="wkt"
-          ></app-farm-area>
-        </v-row>
-      </v-sheet>
-    </v-col>
-
-    <app-dialog
-      labelConfirm="OK"
-      class="primary--text mx-4"
-      v-model="dialog"
-      @cancel="cancel"
-      @confirm="confirm"
-      width="400"
-    >
-      Dialog Text
-    </app-dialog>
-  </v-row>
+  <v-sheet outlined class="pa-8">
+    <div class="display-1">KML Importer</div>
+    <v-row>
+      <v-file-input label="Upload KML file" @change="getFile"></v-file-input>
+    </v-row>
+    <template v-if="kml !== ''">
+      <v-row>
+        <v-autocomplete
+          v-model="field"
+          :items="fields"
+          outlined
+          label="Select Field"
+          @change="selected"
+        ></v-autocomplete>
+      </v-row>
+      <v-row class="text-center">
+        <v-col
+          ><v-btn @click="$emit('change')" color="primary">Import</v-btn></v-col
+        >
+      </v-row>
+    </template>
+  </v-sheet>
 </template>
 <script>
 
 import togeojson from '@mapbox/togeojson';
 import wkx from 'wkx';
-import appDialog from '@/components/ui/Dialog.vue';
-import farmArea from './FarmOSArea.vue';
-
 
 export default {
-  components: {
-    appDialog,
-    appFarmArea: farmArea,
-  },
   props: [
     'value',
   ],
@@ -60,21 +35,14 @@ export default {
     return {
       kml: '', // string of KML
       dialog: null,
-      wkt: '',
+      wkt: null,
       geojson: {},
-      selectArr: [],
-      farm: null,
+      fields: [],
+      field: null,
+      name: '',
     };
   },
   methods: {
-    confirm() {
-      // TODO emit after picking field
-      this.value = this.wkt;
-      this.$emit('chosen');
-    },
-    cancel() {
-      // TODO cancel selection
-    },
     importKml() {
       console.log('importing');
       const dom = (new DOMParser()).parseFromString(this.kml, 'text/xml');
@@ -85,17 +53,23 @@ export default {
       // TODO import geojson and export WKT
       // see https://github.com/cschwarz/wkx
     },
-    select() {
-      const wktString = wkx.Geometry.parseGeoJSON(this.farm.geometry);
+    selected() {
+      const wktString = wkx.Geometry.parseGeoJSON(this.field.geometry);
       console.log('WKT', wktString);
       this.wkt = wktString.toWkt();
-      // console.log(wktString);
+      this.name = (this.field && this.field.properties && this.field.properties.name) || '';
+
+      this.$emit('input', {
+        name: this.name,
+        wkt: this.wkt,
+      });
+      console.log(wktString);
     },
     async getFile(e) {
       const holder = await e.text();
       this.kml = holder;
       this.importKml();
-      this.selectArr = this.geojson.features.map(el => ({
+      this.fields = this.geojson.features.map(el => ({
         name: el.properties.name,
         text: el.properties.name,
         value: el,

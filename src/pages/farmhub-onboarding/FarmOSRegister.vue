@@ -1,12 +1,11 @@
 <template>
-  <v-flex>
+  <v-row>
     <v-form
       v-model="valid"
       ref="form"
       class="mt-8"
       @keydown.enter.prevent="submit"
     >
-
       <v-text-field
         v-model="instance.url"
         label="Instance URL"
@@ -17,14 +16,17 @@
         outlined
         :rules="urlRules"
       >
-
         <template v-slot:append-outer>
           <v-icon
             style="margin-top: -8px"
             v-if="!!urlState"
             :color="urlState === 'free' ? 'green' : 'red'"
             large
-          > {{ urlState === 'free' ? "mdi-check" : "mdi-alert-octagon" }}</v-icon>
+          >
+            {{
+              urlState === "free" ? "mdi-check" : "mdi-alert-octagon"
+            }}</v-icon
+          >
         </template>
       </v-text-field>
 
@@ -61,19 +63,9 @@
       />
 
       <div class="text-left text--secondary">Unit System to use</div>
-      <v-radio-group
-        v-model="instance.units"
-        col
-      >
-
-        <v-radio
-          label="Metric"
-          value="metric"
-        ></v-radio>
-        <v-radio
-          label="US"
-          value="us"
-        ></v-radio>
+      <v-radio-group v-model="instance.units" col>
+        <v-radio label="Metric" value="metric"></v-radio>
+        <v-radio label="US" value="us"></v-radio>
       </v-radio-group>
 
       <v-text-field
@@ -83,26 +75,6 @@
         placeholder="Partner Plan"
         disabled
       />
-
-      <v-checkbox
-        :rules="agreeRules"
-        v-model="instance.agree"
-        label="Agree to Terms of Service and Privacy Policy of Farmos"
-      >
-        <template v-slot:label>
-        </template>
-      </v-checkbox>
-      <div class="text-left mb-4">
-        Visit
-        <a
-          href="https://farmier.com/terms"
-          target="blank"
-        >Terms of Service</a> and <a
-          href="https://farmier.com/privacy"
-          target="blank"
-        >Privacy Policy</a>.
-      </div>
-
       <v-autocomplete
         label="Members with Access to Farm"
         v-model="activeUsers"
@@ -117,12 +89,10 @@
         :loading="loading"
         ref="members"
       >
-
-        <template v-slot:item="{item}">
-          <div v-if="item.userExists">{{ item.name }} <v-chip
-              color="grey--darken-2"
-              dark
-            >{{ item.email }}</v-chip>
+        <template v-slot:item="{ item }">
+          <div v-if="item.userExists">
+            {{ item.name }}
+            <v-chip color="grey--darken-2" dark>{{ item.email }}</v-chip>
           </div>
           <div v-else>
             <v-icon left>mdi-account-clock</v-icon> {{ item.email }}
@@ -153,6 +123,26 @@
         </template>
       </v-autocomplete>
 
+      <v-divider class="my-4"></v-divider>
+
+      <app-field-list v-if="fields.length > 0" v-model="fields">
+      </app-field-list>
+
+      <v-btn class="mx-2" @click="importFields = true" v-if="!importFields"
+        >Add / Import Field</v-btn
+      >
+
+      <app-field-creator
+        v-show="importFields"
+        :loading="loading"
+        ref="field-creator"
+        v-model="field"
+        @done="fieldImported"
+        @cancel="cancelFieldImport"
+      ></app-field-creator>
+
+      <v-divider class="my-4"></v-divider>
+
       <app-dialog
         labelConfirm="Refresh Members"
         class="primary--text mx-4"
@@ -164,20 +154,44 @@
         To show new members in the dropdown, please press refresh.
       </app-dialog>
 
-      <v-btn
-        class="mx-2"
-        color="primary"
-        :disabled="!valid"
-        @click="save"
-      >Register FarmOS Instance</v-btn>
-    </v-form>
+      <v-checkbox
+        :rules="agreeRules"
+        v-model="instance.agree"
+        label="Agree to Terms of Service and Privacy Policy of Farmos"
+      >
+        <template v-slot:label> </template>
+      </v-checkbox>
+      <div class="text-left mb-4">
+        Visit
+        <a href="https://farmier.com/terms" target="blank">Terms of Service</a>
+        and
+        <a href="https://farmier.com/privacy" target="blank">Privacy Policy</a>.
+      </div>
 
-  </v-flex>
+      <v-btn class="mx-2" color="primary" :disabled="!valid" @click="save"
+        >Register FarmOS Instance</v-btn
+      >
+    </v-form>
+    <app-dialog
+      title="Field Import"
+      labelConfirm="OK"
+      class="primary--text mx-4"
+      v-model="successDialog"
+      @cancel="successDialog = false"
+      @confirm="successDialog = false"
+      width="400"
+    >
+      {{ successMessage }}
+    </app-dialog>
+  </v-row>
 </template>
 
 <script>
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
+import appFieldCreator from './FieldCreator.vue';
+import appFieldList from './FieldList.vue';
+
 
 const nameRule = s => !/[!"#$%()*+,\-./:;<=>?@[\\\]^_{|}~]/gi.test(`${s}`);
 const punctFree = s => !/[!"#$%&'()*+,\-./:;<=>?@[\\\]^_‘{|}~]/gi.test(`${s}`);
@@ -210,9 +224,19 @@ export default {
   ],
   components: {
     appDialog,
+    appFieldCreator,
+    appFieldList,
   },
   data() {
     return {
+      fields: [],
+      field: {
+        wkt: '',
+        name: '',
+      },
+      importFields: false,
+      successDialog: false,
+      successMessage: '',
       valid: false,
       activeUsers: [],
       members: [],
@@ -239,6 +263,24 @@ export default {
     };
   },
   methods: {
+    cancelFieldImport() {
+      this.field = {
+        wkt: '',
+        name: '',
+      };
+
+      this.$refs['field-creator'].clear();
+    },
+    async fieldImported() {
+      this.fields.push(this.field);
+      this.field = {
+        wkt: '',
+        name: '',
+      };
+
+      this.$refs['field-creator'].clear();
+      this.loading = false;
+    },
     onInvite() {
       this.invite = true;
     },
@@ -257,6 +299,7 @@ export default {
       const aggregator = this.instance.aggregator._id;
       const apiKey = this.instance.aggregator.data.planKey;
       const plan = this.instance.aggregator.data.planName;
+      const { fields } = this;
 
 
       try {
@@ -272,6 +315,7 @@ export default {
           apiKey,
           aggregator,
           group,
+          fields,
         });
 
         if (r.data && r.data.status === 'success') {

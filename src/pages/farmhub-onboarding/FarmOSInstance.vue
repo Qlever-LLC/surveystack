@@ -52,7 +52,17 @@
         </template>
       </v-autocomplete>
 
-      <app-kml-importer v-model="wkt" @chosen="fieldChosen"></app-kml-importer>
+      <v-divider class="my-4"></v-divider>
+      <div class="text-h5">Create new Field</div>
+
+      <app-field-creator
+        :loading="loading"
+        ref="field-creator"
+        :center="farmLocation"
+        v-model="field"
+        @done="fieldImported"
+        @cancel="cancelFieldImport"
+      ></app-field-creator>
 
       <app-dialog
         labelConfirm="Refresh Members"
@@ -65,8 +75,20 @@
         To show new members in the dropdown, please press refresh.
       </app-dialog>
 
+      <v-divider class="my-8"></v-divider>
       <v-btn class="mx-2" color="primary" @click="save">Save Changes</v-btn>
     </v-form>
+    <app-dialog
+      title="Field Import"
+      labelConfirm="OK"
+      class="primary--text mx-4"
+      v-model="successDialog"
+      @cancel="successDialog = false"
+      @confirm="successDialog = false"
+      width="400"
+    >
+      {{ successMessage }}
+    </app-dialog>
   </v-flex>
 </template>
 
@@ -74,7 +96,7 @@
 
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
-import appKmlImporter from './KmlImporter.vue';
+import appFieldCreator from './FieldCreator.vue';
 
 
 const remapGroupMembership = (m) => {
@@ -116,7 +138,7 @@ const remapFarmOSMembership = (m) => {
 export default {
   components: {
     appDialog,
-    appKmlImporter,
+    appFieldCreator,
   },
   props: [
     'instance',
@@ -126,15 +148,55 @@ export default {
   ],
   data() {
     return {
+      successDialog: false,
+      successMessage: '',
       activeUsers: [],
       members: [],
       loading: false,
       invite: false,
       kml: '',
-      wkt: '',
+      farmLocation: null,
+      field: {
+        wkt: '',
+        name: '',
+      },
     };
   },
   methods: {
+    cancelFieldImport() {
+      this.field = {
+        wkt: '',
+        name: '',
+      };
+
+      this.$refs['field-creator'].clear();
+    },
+    async fieldImported() {
+      this.loading = true;
+      console.log('imported field', this.field);
+      try {
+        const { data } = await api.post(`/farmos/areas/${this.aggregator}/${this.instance.url}`, this.field);
+        console.log('reponse', data);
+        this.successDialog = true;
+        if (data.status === 'success') {
+          this.successMessage = `Successfully created field: ${this.field.name} on ${this.instance.url}`;
+        } else {
+          this.successMessage = `Error creating field: ${this.field.name} on ${this.instance.url}, ${data.message}`;
+        }
+      } catch (error) {
+        this.successDialog = true;
+        this.successMessage = `Error creating field: ${this.field.name} on ${this.instance.url}, ${error.message}`;
+      }
+
+
+      this.field = {
+        wkt: '',
+        name: '',
+      };
+
+      this.$refs['field-creator'].clear();
+      this.loading = false;
+    },
     onInvite() {
       this.invite = true;
     },
@@ -166,6 +228,13 @@ export default {
       this.loading = true;
       this.activeUsers = [];
 
+      this.field = {
+        wkt: '',
+        name: '',
+      };
+
+      this.$refs['field-creator'].clear();
+
       try {
         console.log('farmos instance', this.instance);
         const { data } = await api.get(`/groups/${this.group}?populate=true`);
@@ -179,6 +248,19 @@ export default {
         console.log('members with access to farm', authorizedMembers);
       } catch (e) {
         console.log('something went wrong:', e);
+      }
+
+      try {
+        const { data } = await api.get(`/farmos/areas/${this.aggregator}/${this.instance.url}`);
+        if (!data.status === 'success') {
+          throw new Error(`request failed: ${data.message}`);
+        }
+
+        const areas = data.areas[Object.keys(data.areas)[0]];
+        console.log('areas', areas);
+        this.farmLocation = areas.find(a => a.area_type === 'property').geofield[0].geom;
+      } catch (error) {
+        console.log('error', error);
       }
       this.loading = false;
     },

@@ -23,6 +23,7 @@
           </v-sheet>
 
           <v-treeview
+            :open.sync="open"
             ref="treeview"
             :items="aggregators"
             :load-children="fetchChildren"
@@ -196,6 +197,7 @@ export default {
     appDialog,
   },
   data: () => ({
+    open: [],
     fields: {},
     busy: false,
     active: null,
@@ -292,26 +294,61 @@ export default {
           console.log('fetching fields', item);
           // const farm = this.farms[item.aggregator].find(f => f.id === item.id);
           // // eslint-disable-next-line no-param-reassign
-          // farm.children = await fetchFields();
-          // this.$forceUpdate();
+          // item.children = await fetchFields();
+          // // this.$refs.treeview.updateAll(false);
+          // console.log('open id', item.aggregator, item.id);
+          // // this.open = [item.aggregator];
+          // // this.$forceUpdate();
 
 
-          const r = await api.get(`/farmos/areas/${item.aggregator}/${item.payload.url}`);
-          const farm = this.farms[item.aggregator].find(f => f.id === item.id);
-          const fields = Object.keys(r.data.areas).flatMap((key) => {
-            const areas = r.data.areas[key];
-            return areas.filter(a => a.area_type === 'field').map(a => ({
-              ...a,
-              id: `${item.id}.${a.tid}`,
-            }));
-          });
+          // const r = await api.get(`/farmos/areas/${item.aggregator}/${item.payload.url}`);
+          // // const farm = this.farms[item.aggregator].find(f => f.id === item.id);
+          // const fields = Object.keys(r.data.areas).flatMap((key) => {
+          //   const areas = r.data.areas[key];
+          //   return areas.filter(a => a.area_type === 'field').map(a => ({
+          //     ...a,
+          //     id: `${item.id}.${a.tid}`,
+          //   }));
+          // });
 
-          // const aggregator = this.aggregators.find(a => a.id === item.aggregator);
-          farm.children = fields;
+          // // const aggregator = this.aggregators.find(a => a.id === item.aggregator);
+          // // eslint-disable-next-line no-param-reassign
+          // item.children = fields;
+          // // console.log('item with children', item);
+
+          return api.get(`/farmos/areas/${item.aggregator}/${item.payload.url}`)
+            .then((r) => {
+              const fields = Object.keys(r.data.areas).flatMap((key) => {
+                const areas = r.data.areas[key];
+                return areas.filter(a => a.area_type === 'field').map(a => ({
+                  ...a,
+                  id: `${item.id}.${a.tid}`,
+                }));
+              });
+              // eslint-disable-next-line no-param-reassign
+              const parentNode = this.$refs.treeview.nodes[item.id];
+
+              // const newArea = {
+              //   id: `${item.id}:new`,
+              //   name: 'New Area',
+              //   button: true,
+              // };
+
+              fields.forEach((f) => {
+                console.log('pushing field');
+                const childNode = { ...parentNode, item: f, vnode: null };
+                this.$refs.treeview.nodes[f.id] = childNode;
+              });
+
+              item.children.push(...fields);
+              console.log('item with children', item);
+            })
+            .catch(e => console.log('error', e));
         } catch (error) {
           console.log('error', error);
         }
       }
+      return null;
     },
     async testConnection(item) {
       console.log('testing connection for item', item);
