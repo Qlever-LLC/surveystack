@@ -74,6 +74,9 @@ const getters = {
   property: state => (path, fallback) => surveyStackUtils.getNested(state.submission, path, fallback),
   control: state => state.node && state.node.model, // current survey control
   path: (state) => {
+    if (!state.node) {
+      return null;
+    }
     const p = state.node.getPath().map(n => n.model.name).join('.');
     return p;
   },
