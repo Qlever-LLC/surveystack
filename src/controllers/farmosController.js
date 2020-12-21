@@ -64,6 +64,165 @@ const getAssets = async (req, res) => {
   return common('assets', req, res);
 };
 
+
+const getAreas = async (req, res) => {
+  const { aggregator, farmurl } = req.params;
+
+  const ag = await db
+    .collection('integrations.groups')
+    .findOne({ _id: new ObjectId(aggregator), type: 'farmos-aggregator' });
+
+  if (!ag) {
+    throw boom.notFound();
+  }
+
+  const hasAdminRole = await rolesService.hasAdminRole(res.locals.auth.user._id, ag.group);
+  if (!hasAdminRole) {
+    throw boom.unauthorized();
+  }
+
+
+  const apiKey = ag.data.apiKey;
+  if (!apiKey) {
+    throw boom.internal('api key missing for aggregator ' + ag._id);
+  }
+
+
+  try {
+    const agentOptions = {
+      host: ag.data.url,
+      port: '443',
+      path: '/',
+      rejectUnauthorized: false,
+    };
+
+    const agent = new https.Agent(agentOptions);
+
+    const r = await axios.get(
+      `https://${ag.data.url}/api/v1/farms/areas/?farm_url=${encodeURIComponent(
+        farmurl
+      )}`,
+      {
+        headers: {
+          accept: 'application/json',
+          'api-key': apiKey,
+        },
+        httpsAgent: agent,
+      }
+    );
+    return res.send({
+      status: "success",
+      areas: r.data
+    })
+  } catch (exception) {
+    console.error(exception);
+    throw boom.badData();
+  }
+};
+
+
+const createFieldRequest = async (ag, apiKey, farmurl, name, wkt) => {
+  const agentOptions = {
+    host: ag.data.url,
+    port: '443',
+    path: '/',
+    rejectUnauthorized: false,
+  };
+
+  const agent = new https.Agent(agentOptions);
+
+  const vr = await axios.get(
+    `https://${ag.data.url}/api/v1/farms/info/?use_cached=false&farm_url=${encodeURIComponent(
+      farmurl
+    )}`,
+    {
+      headers: {
+        accept: 'application/json',
+        'api-key': apiKey,
+      },
+      httpsAgent: agent,
+    }
+  );
+
+  console.log("ag", ag);
+  console.log("url", farmurl);
+  console.log("info response", vr.data);
+
+  const fid = Object.keys(vr.data)[0];
+  const vid = vr.data[fid]['info']['resources']['taxonomy_term']['farm_areas'].vid;
+
+
+  const r = await axios.post(
+    `https://${ag.data.url}/api/v1/farms/areas/?farm_url=${encodeURIComponent(
+      farmurl
+    )}`,
+    {
+      "vocabulary": vid + "",
+      "name": name,
+      "description": "",
+      "area_type": "field",
+      "geofield": [
+        {
+          "geom": wkt,
+        },
+      ],
+    },
+    {
+      headers: {
+        accept: 'application/json',
+        'api-key': apiKey,
+      },
+      httpsAgent: agent,
+    }
+  );
+
+  return r;
+}
+
+
+const createField = async (req, res) => {
+  const { aggregator, farmurl } = req.params;
+  const { name, wkt } = req.body;
+
+  const ag = await db
+    .collection('integrations.groups')
+    .findOne({ _id: new ObjectId(aggregator), type: 'farmos-aggregator' });
+
+  if (!ag) {
+    throw boom.notFound();
+  }
+
+  const hasAdminRole = await rolesService.hasAdminRole(res.locals.auth.user._id, ag.group);
+  if (!hasAdminRole) {
+    throw boom.unauthorized();
+  }
+
+
+  const apiKey = ag.data.apiKey;
+  if (!apiKey) {
+    throw boom.internal('api key missing for aggregator ' + ag._id);
+  }
+
+  if (!name) {
+    boom.badData("missing name");
+  }
+
+  if (!wkt) {
+    boom.badData("missing wkt");
+  }
+
+  try {
+    const r = await createFieldRequest(ag, apiKey, farmurl, name, wkt);
+    return res.send({
+      status: "success",
+      areas: r.data
+    })
+  } catch (exception) {
+    console.error(exception);
+    throw boom.badData(exception.message);
+  }
+};
+
 const getIntegrationFarms = async (req, res) => {
   const { id } = req.params;
 
@@ -112,8 +271,61 @@ const getIntegrationFarms = async (req, res) => {
 
 
 const runPendingFarmOSOperations = async (url, plan) => {
-  // TODO run field creation
-  // TODO update farmId in membership integrations (resolve group, aggregator?)
+  console.log("running pending ops")
+
+  try {
+    const pendingOp = await db
+      .collection('farmos.fields')
+      .findOne({ url: url });
+
+    if (!pendingOp) {
+      return; // success, no pending ops
+    }
+
+    const { fields, aggregator } = pendingOp;
+    const ag = await db
+      .collection('integrations.groups')
+      .findOne({ _id: new ObjectId(aggregator), type: 'farmos-aggregator' });
+
+    const apiKey = ag.data.apiKey;
+    if (!apiKey) {
+      throw new Error('api key missing for aggregator ' + ag._id);
+    }
+
+
+    for (const field of fields) {
+      try {
+        await createFieldRequest(ag, apiKey, `${url}`, field.name, field.wkt)
+        db.collection("farmos.webhookrequests").insertOne({
+          url,
+          plan,
+          created: new Date(),
+          state: "success",
+          message: `created field ${field.name} for ${url}`,
+        })
+      } catch (error) {
+        db.collection("farmos.webhookrequests").insertOne({
+          url,
+          plan,
+          created: new Date(),
+          state: "failed-field",
+          message: error.message,
+        })
+      }
+    }
+  } catch (error) {
+    console.log("error");
+    db.collection("farmos.webhookrequests").insertOne({
+      url,
+      plan,
+      created: new Date(),
+      state: "failed",
+      message: error.message,
+    })
+  }
+
+  // finally delete all entries with url
+  await db.collection('farmos.fields').deleteMany({ url });
 }
 
 const webhookCallback = async (req, res, next) => {
@@ -372,7 +584,7 @@ const createFarmOsInstance = async (req, res) => {
 
 
 
-  const { url, email, site_name, registrant, location, units, plan, apiKey, group, aggregator } = req.body;
+  const { url, email, site_name, registrant, location, units, plan, apiKey, group, fields, aggregator } = req.body;
 
   if (!nameRule(site_name)) {
     throw boom.badData("site_name contains invalid characters")
@@ -380,10 +592,6 @@ const createFarmOsInstance = async (req, res) => {
 
   if (!nameRule(registrant)) {
     throw boom.badData("registrant contains invalid characters")
-  }
-
-  if (!nameRule(location)) {
-    throw boom.badData("location contains invalid characters")
   }
 
   if (!validEmail(email)) {
@@ -427,6 +635,13 @@ const createFarmOsInstance = async (req, res) => {
     );
 
     // TODO add farmos instance to "pending" list
+    db.collection("farmos.fields").insertOne({
+      url: `${url}.farmos.net`,
+      created: new Date(),
+      fields,
+      aggregator,
+    })
+
 
     res.send({
       "status": "success",
@@ -442,6 +657,7 @@ const createFarmOsInstance = async (req, res) => {
 
 export default {
   getFields,
+  getAreas,
   getAssets,
   getIntegrationFarms,
   webhookCallback,
@@ -449,5 +665,6 @@ export default {
   getMembersByFarmAndGroup,
   setFarmMemberships,
   checkUrl,
-  createFarmOsInstance
+  createFarmOsInstance,
+  createField
 };

@@ -249,6 +249,9 @@ export const handle = async (res, submission, survey, user) => {
     throw error;
   }
 
+  // TODO, for all farms flush logs with data == submissionId
+  // flushlogs()
+
   let currentAssetId = null;
   for (const compose of farmOsCompose) {
     const r = await runSingle(

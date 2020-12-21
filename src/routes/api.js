@@ -194,7 +194,10 @@ router.get('/farmos/members-by-farm', catchErrors(farmosController.getMembersByF
 router.post('/farmos/set-memberships', catchErrors(farmosController.setFarmMemberships));
 router.post('/farmos/checkurl', catchErrors(farmosController.checkUrl));
 router.post('/farmos/create-instance', catchErrors(farmosController.createFarmOsInstance));
-router.post("/farmos/callback", farmosController.webhookCallback)
+router.post("/farmos/callback", catchErrors(farmosController.webhookCallback))
+router.get("/farmos/areas/:aggregator/:farmurl", catchErrors(farmosController.getAreas))
+router.post("/farmos/areas/:aggregator/:farmurl", catchErrors(farmosController.createField))
+
 
 /** Integrations - Group */
 router.get('/group-integrations', catchErrors(groupIntegrationController.getIntegrations));
