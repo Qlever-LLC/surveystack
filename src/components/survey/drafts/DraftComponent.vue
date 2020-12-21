@@ -45,6 +45,20 @@
       class="draft-content"
       v-else
     >
+      <v-fab-transition>
+        <v-btn
+          v-show="overflowing"
+          color="pink"
+          fab
+          dark
+          small
+          fixed
+          style="bottom: 76px; right: 12px; z-index: 150"
+          @click="scrollY(150); overflowing = false"
+        >
+          <v-icon>mdi-arrow-down</v-icon>
+        </v-btn>
+      </v-fab-transition>
       <app-control
         class="my-auto maxw-60 mx-auto"
         :path="path"
@@ -89,6 +103,11 @@ export default {
     submission: { type: Object },
     persist: { type: Boolean },
   },
+  data() {
+    return {
+      overflowing: false,
+    };
+  },
   computed: {
     path() {
       return this.$store.getters['draft/path'];
@@ -116,17 +135,22 @@ export default {
       },
     },
   },
-  /*
   watch: {
     path() {
+      const vm = this;
+      vm.overflowing = false;
       setTimeout(() => {
         const body = document.getElementsByTagName('body')[0];
         const { clientHeight, scrollHeight } = body;
         console.log(clientHeight, scrollHeight);
-      }, 100);
+        if (scrollHeight - 100 > clientHeight) {
+          vm.overflowing = true;
+        } else {
+          vm.overflowing = false;
+        }
+      }, 500);
     },
   },
-  */
   methods: {
     goto(path) {
       this.$store.dispatch('draft/goto', path);
@@ -153,6 +177,9 @@ export default {
       clientWidth, clientHeight, scrollWidth, scrollHeight,
     }) {
       return scrollHeight > clientHeight || scrollWidth > clientWidth;
+    },
+    scrollY(val) {
+      window.scrollBy(0, val);
     },
   },
   created() {
