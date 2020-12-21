@@ -18,6 +18,8 @@ else
   echo "Found public hostname: $SERVER"
 fi
 
+echo "Will use this server: $SERVER"
+
 print_usage() {
   printf "Usage: $0 [ -s ]\n"
   printf "  -s   updates server module only (skip building and uploading client)\n"
@@ -41,9 +43,21 @@ if [ $server_only -eq 0 ]; then
     echo "Building production dist folder locally..."
     cd ..
     cd ../our-sci-pwa
-    yarn build
-    echo "Transfer dist folder to server..."
-    scp -i "$PEM_FILE" -r dist/ "$USER@$SERVER:$SERVER_PWA_DIR/"
+    yarn build || exit 1
+    
+    TMP_ARCHIVE=/tmp/our-sci-pwa-dist.tar.gz
+    rm $TMP_ARCHIVE 2>/dev/null
+    tar -czvf $TMP_ARCHIVE dist
+
+    echo "Transfering $TMP_ARCHIVE to server..."
+    scp -i "$PEM_FILE" $TMP_ARCHIVE "$USER@$SERVER:$TMP_ARCHIVE"
+    echo "Extracting $TMP_ARCHIVE on server..."
+    ssh -i "$PEM_FILE" "$USER@$SERVER" "
+    cd $SERVER_PWA_DIR
+    rm -rf dist/*
+    tar -xvf $TMP_ARCHIVE
+    rm $TMP_ARCHIVE
+    "
 fi
 
 # run script on server to stop pm2 service, pull from repo, install and restart

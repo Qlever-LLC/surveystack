@@ -177,6 +177,18 @@ const createRedactStage = (user, roles) => {
   };
 };
 
+const createRelevanceStage = () => {
+  return {
+    $redact: {
+      $cond: {
+        if: { $eq: ['$meta.relevant', false] },
+        then: '$$PRUNE',
+        else: '$$DESCEND',
+      },
+    },
+  };
+};
+
 const buildPipeline = async (req, res) => {
   const pipeline = [];
 
@@ -253,6 +265,13 @@ const buildPipeline = async (req, res) => {
         $unwind: { path: '$meta.creatorDetail', preserveNullAndEmptyArrays: true },
       });
     }
+  }
+
+  // Hide fields with meta.relevant = false (and below) by default
+  // However, don't hide if query showIrrelevant=1 or pure=1
+  if (!queryParam(req.query.showIrrelevant) && !queryParam(req.query.pure)) {
+    const relevanceStage = createRelevanceStage();
+    pipeline.push(relevanceStage);
   }
 
   // For development purposes
@@ -543,6 +562,13 @@ const getSubmission = async (req, res) => {
         $unwind: { path: '$meta.creatorDetail', preserveNullAndEmptyArrays: true },
       });
     }
+  }
+
+  // Hide fields with meta.relevant = false (and below) by default
+  // However, don't hide if query showIrrelevant=1 or pure=1
+  if (!queryParam(req.query.showIrrelevant) && !queryParam(req.query.pure)) {
+    const relevanceStage = createRelevanceStage();
+    pipeline.push(relevanceStage);
   }
 
   pipeline.push({ $match: { _id: new ObjectId(id) } });

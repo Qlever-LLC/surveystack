@@ -23,10 +23,11 @@ const connectDatabase = async () => {
   await db.collection('submissions').createIndex({ 'meta.survey.id': 1 });
   await db.collection('submissions').createIndex({ 'meta.survey.version': 1 });
   await db.collection('submissions').createIndex({ 'meta.creator': 1 });
-  await db.createCollection("farmos.webhookrequests", { capped : true, size : 10000, max : 5000 } )
+  await db.createCollection('farmos.webhookrequests', { capped: true, size: 10000, max: 5000 });
 
   // migrations
   await migrateScripts_V1toV2();
+  await migrateSurveys_VXtoV4();
 };
 
 const migrateScripts_V1toV2 = async () => {
@@ -49,6 +50,62 @@ const migrateScripts_V1toV2 = async () => {
   ]);
   if (r.modifiedCount > 0) {
     console.log('Migration: updated this many scripts:', r.modifiedCount);
+  }
+};
+
+const migrateSurveys_VXtoV4 = async () => {
+  const surveys = await db
+    .collection('surveys')
+    .find({ 'meta.specVersion': { $lte: 3 } })
+    .toArray();
+
+  if (surveys.length === 0) {
+    return;
+  }
+
+  console.log('migrateSurveys_VXtoV4: migrating surveys: ', surveys.length);
+
+  for (const survey of surveys) {
+    console.log(`Migrating: ${survey.name}`);
+
+    for (const revision of survey.revisions) {
+      console.log(`  Revision`);
+
+      for (const control of revision.controls) {
+        migrateSurveys_VXtoV4_control(control);
+      }
+    }
+
+    survey.meta.specVersion = 4;
+    await db.collection('surveys').updateOne(
+      { _id: survey._id },
+      {
+        $set: {
+          revisions: survey.revisions,
+          'meta.specVersion': 4,
+        },
+      }
+    );
+  }
+};
+
+const migrateSurveys_VXtoV4_control = (control, depth = 0) => {
+  console.log(`    ${'  '.repeat(depth)}${control.name}`);
+
+  const newLabel = control.title || '';
+  const newHint = control.label || '';
+  const newMoreInfo = control.hint || '';
+
+  control.label = newLabel;
+  control.hint = newHint;
+  control.moreInfo = newMoreInfo;
+
+  delete control.title;
+
+  if (control.children && control.children.length > 0) {
+    for (const child of control.children) {
+      migrateSurveys_VXtoV4_control(child, depth + 1);
+    }
   }
 };
 
