@@ -68,7 +68,7 @@
 
     <!-- Footer with next/prev buttons -->
     <app-draft-footer
-      class="draft-footer px-4 grey lighten-5"
+      class="draft-footer px-4 grey lighten-4"
       :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
       :enableNext="!$store.getters['draft/hasRequiredUnanswered']"
       :enableSubmit="!$store.getters['draft/errors']"
