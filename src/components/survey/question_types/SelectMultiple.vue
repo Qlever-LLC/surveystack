@@ -1,63 +1,48 @@
 <template>
   <div>
     <app-control-label :value="control.label" />
-    <v-list
-      v-if="sourceIsValid"
-      style="overflow: auto;"
-    >
-      <app-control-hint :value="control.hint" />
 
-      <v-list-item-group
-        :value="value"
-        @change="onChange"
-        multiple
-      >
-        <v-list-item
-          v-for="(item) in filteredSource"
-          :value="item.value"
+    <div
+      v-if="sourceIsValid"
+      class="py-2"
+    >
+      <div class="select-multiple-source">
+        <div
+          v-for="item in selections"
           :key="item.value"
         >
-          <template v-slot:default="{ active }">
-            <v-list-item-action>
-              <v-checkbox
-                :input-value="active"
-                :true-value="item"
-              />
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title v-text="item.label" />
-            </v-list-item-content>
-          </template>
-        </v-list-item>
+          <v-checkbox
+            v-model="item.selected"
+            :label="item.label"
+            @change="onChange"
+            hide-details
+            class="my-1"
+          />
+        </div>
+      </div>
 
-        <v-list-item
-          v-if="control.options.allowCustomSelection"
-          :value="customSelection || 'other'"
-        >
-          <template v-slot:default="{ active, toggle }">
-            <v-list-item-action>
-              <v-checkbox
-                :input-value="active"
-                :true-value="customSelection"
-                @click="toggle"
-              />
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-text-field
-                label="Other"
-                :value="customSelection"
-                @input="handleCustomSelectionChange"
-                outlined
-                dense
-                class="mb-0"
-                hide-details
-                @click.stop
-              />
-            </v-list-item-content>
-          </template>
-        </v-list-item>
-      </v-list-item-group>
-    </v-list>
+      <div
+        v-if="control.options.allowCustomSelection"
+        class="select-multiple-custom mt-2 d-flex align-center"
+      >
+        <v-checkbox
+          v-model="customSelected"
+          @change="onChange"
+          hide-details
+          class="mt-0"
+          :disabled="!customValue"
+        />
+        <v-text-field
+          label="other"
+          v-model="customValue"
+          outlined
+          dense
+          hide-details
+          @input="onCustomChange"
+        />
+      </div>
+    </div>
+
     <app-control-error v-else>No options specified, please update suvey definition</app-control-error>
     <app-control-more-info :value="control.moreInfo" />
   </div>
@@ -71,28 +56,28 @@ export default {
   data() {
     return {
       customSelection: 'other',
+      customValue: 'other',
+      customSelected: false,
+      selections: [],
     };
   },
   methods: {
-    onChange(v) {
-      console.log(v);
-      if (this.value !== v) {
-        this.changed(v.sort());
+    onChange() {
+      const newValues = this.selections.filter(s => s.selected).map(s => s.value).sort();
+      if (this.customSelected && this.customValue) {
+        newValues.push(this.customValue);
       }
+      this.changed(newValues);
     },
-    sourceHasValue(value) {
+    findSource(value) {
       return this.control.options.source.find(x => x.value === value);
     },
-    sourceHasValue2(v) {
+    sourceContains(v) {
       return this.control.options.source.map(({ value }) => value).includes(v);
     },
-    handleCustomSelectionChange(value) {
-      // console.log('handle custom selection change', value);
-      this.customSelection = value;
-      if (this.valueIncludesCustom) {
-        const nonCustomValues = this.value.filter(this.sourceHasValue);
-        this.changed([...nonCustomValues, value || 'other']);
-      }
+    onCustomChange(v) {
+      this.customSelected = !!v;
+      this.onChange();
     },
   },
   computed: {
@@ -106,25 +91,52 @@ export default {
         && this.control.options.source.every(({ label, value }) => label && value);
     },
     valueIncludesCustom() {
-      // // returns true if a val exists in `this.value` array which is not present in select options array `this.control.options.source`
-      // return Array.isArray(this.value)
-      //   && Array.isArray(this.control.options.source)
-      //   && !this.value.every(this.sourceHasValue);
-
       return Array.isArray(this.value)
         && Array.isArray(this.control.options.source)
-        && !this.value.every(this.sourceHasValue2);
+        && !this.value.every(this.sourceContains);
     },
   },
   created() {
-    // set `customSelection` value to submission question value if we allow the user to enter custom selections
-    // and the current question value is set to a value that is not in entries of `control.options.source`
+    if (!this.sourceIsValid) {
+      return;
+    }
+
+    this.selections = this.filteredSource.map(s => ({ value: s.value, label: s.label, selected: false }));
+
+    if (!Array.isArray(this.value)) {
+      return;
+    }
+
+    // fill pre-defined
+    this.value.forEach((v) => {
+      const selection = this.selections.find(s => s.value === v);
+      if (selection) {
+        selection.selected = true;
+      }
+    });
+
+    // fill custom
     if (this.control.options.allowCustomSelection && this.valueIncludesCustom) {
-      [this.customSelection] = this.value.filter(x => !this.sourceHasValue(x));
+      [this.customValue] = this.value.filter(x => !this.findSource(x));
+      if (this.customValue) {
+        this.customSelected = true;
+      }
     }
   },
 };
 </script>
 
 <style scoped>
+>>> .v-list-item {
+  min-height: initial;
+  padding: 0px;
+}
+
+>>> .v-list-item__content {
+  padding: 0px;
+}
+
+>>> .v-list-item__action {
+  margin: 4px 8px 4px 0px !important;
+}
 </style>

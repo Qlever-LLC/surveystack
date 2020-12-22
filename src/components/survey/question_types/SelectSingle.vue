@@ -2,12 +2,13 @@
   <div class="select-single question">
     <app-control-label :value="control.label" />
     <app-control-hint :value="control.hint" />
-    <div>
+    <div class="py-2">
       <v-radio-group
         :value="value"
         @change="onChange"
         v-if="sourceIsValid"
         class="mt-0"
+        hide-details
       >
         <v-radio
           v-for="(item) in filteredSource"
@@ -16,7 +17,7 @@
           :key="item.key"
         />
         <v-radio
-          label="Other"
+          label="other"
           :value="customSelection"
           v-if="control.options.allowCustomSelection"
         >
@@ -33,7 +34,7 @@
                 v-slot:label
                 class="something"
               >
-                <div class="top-10">Other</div>
+                <div class="top-10">other</div>
               </template>
             </v-text-field>
           </template>
