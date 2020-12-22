@@ -101,8 +101,9 @@
           />
 
           <app-area
-            v-if="!!active && active.item_type === 'area'"
-            :area="Object.assign({}, active)"
+            ref="farmos-field"
+            v-if="selectedField"
+            v-model="selectedField"
           />
 
           <app-register
@@ -216,7 +217,26 @@ export default {
     farms: {},
     caseSensitive: false,
     search: null,
+    selectedField: null,
   }),
+  watch: {
+    active() {
+      console.log('active', this.active);
+
+      if (!!this.active && this.active.area_type === 'field') {
+        if (this.selectedField) {
+          this.$refs['farmos-field'].clear();
+        }
+        this.selectedField = {
+          name: this.active.name,
+          wkt: this.active.geofield[0].geom,
+        };
+      } else if (this.selectedField) {
+        this.$refs['farmos-field'].clear();
+        this.selectedField = null;
+      }
+    },
+  },
   computed: {
     filter() {
       return this.caseSensitive
