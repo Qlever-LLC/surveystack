@@ -24,25 +24,6 @@
         indeterminate
       />
     </div>
-
-    <!-- <v-dialog
-      v-model
-    >
-
-    </v-dialog> -->
-    <!-- <app-dialog
-      max-width="500px"
-      v-model="showInvalidPlatformModal"
-      @cancel="showInvalidPlatformModal = false"
-      @confirm="showInvalidPlatformModal = false"
-    >
-        <template v-slot:title>
-          Unsupported Browser
-        </template>
-
-          Safari is not currently supported in the Survey Builder, please use Firefox, Chrome, or another Chromium-based browser.
-
-    </app-dialog> -->
     <app-dialog
       v-model="showConflictModal"
       @cancel="showConflictModal = false"
