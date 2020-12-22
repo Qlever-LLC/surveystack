@@ -5,6 +5,8 @@ export default {
     index: { required: true },
     autoFocus: { type: Boolean, default: true },
     relevant: { type: Boolean, default: true },
+    required: { type: Boolean, default: false },
+    redacted: { type: Boolean, default: false },
     resources: {
       default: () => ([]),
     },

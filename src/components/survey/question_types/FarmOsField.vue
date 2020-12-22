@@ -1,6 +1,10 @@
 <template>
   <div>
-    <app-control-label :value="control.label" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+    />
     <v-autocomplete
       :disabled="loading"
       :value="value"

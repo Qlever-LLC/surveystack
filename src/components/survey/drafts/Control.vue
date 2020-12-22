@@ -19,10 +19,11 @@
         class="group"
         :class="{irrelevant: !$store.getters['draft/relevance'](path)}"
       >
-        <div class="d-flex justify-end">
-          <span class="title mr-auto">{{control.label}}</span>
-          <app-redacted v-if="control.options && control.options.redacted" />
-        </div>
+        <app-control-label
+          :value="control.label"
+          :redacted="control.options && control.options.redacted"
+        />
+        <app-control-hint :value="control.hint" />
 
         <div
           v-for="(child, i) in control.children"
@@ -35,6 +36,8 @@
             insidePage
           />
         </div>
+
+        <app-control-more-info :value="control.moreInfo" />
       </div>
     </div>
 
@@ -43,13 +46,6 @@
         class="control"
         :class="{irrelevant: !$store.getters['draft/relevance'](path)}"
       >
-        <div class="d-flex justify-end">
-          <app-redacted
-            class="mx-2"
-            v-if="control.options && control.options.redacted"
-          />
-          <app-required v-if="$store.getters['draft/relevance'](path) && control.options && control.options.required" />
-        </div>
         <component
           :is="getComponentName(control)"
           :control="control"
@@ -66,6 +62,8 @@
           :autoFocus="autoFocus"
           :relevant="$store.getters['draft/relevance'](path)"
           @next="$store.dispatch('draft/next')"
+          :redacted="control.options && control.options.redacted"
+          :required="$store.getters['draft/relevance'](path) && control.options && control.options.required"
         />
       </div>
 

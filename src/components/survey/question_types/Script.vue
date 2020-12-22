@@ -1,6 +1,10 @@
 <template>
   <div class="question question-script">
-    <app-control-label :value="control.label" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+    />
     <app-control-hint :value="control.hint" />
 
     <div v-if="this.source">

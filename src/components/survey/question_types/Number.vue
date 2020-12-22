@@ -1,7 +1,10 @@
 <template>
   <div>
-    <app-control-label :value="control.label" />
-
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+    />
     <v-text-field
       outlined
       type="number"
@@ -11,6 +14,7 @@
       @keyup.enter.prevent="submit"
       ref="textField"
       :disabled="!relevant"
+      hide-details
     />
     <app-control-more-info :value="control.moreInfo" />
 

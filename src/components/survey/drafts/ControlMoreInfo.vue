@@ -16,5 +16,6 @@ export default {
 <style scoped>
 .control-more-info {
   color: rgba(0, 0, 0, 0.6);
+  margin-top: 12px;
 }
 </style>

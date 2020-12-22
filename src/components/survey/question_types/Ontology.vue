@@ -1,7 +1,10 @@
 <template>
   <div class="ontology question">
-    <app-control-label :value="control.label" />
-
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+    />
     <v-autocomplete
       :value="value"
       @change="onChange"

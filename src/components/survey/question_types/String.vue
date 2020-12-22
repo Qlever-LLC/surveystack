@@ -1,6 +1,10 @@
 <template>
   <div>
-    <app-control-label :value="control.label" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+    />
     <v-text-field
       outlined
       :label="control.hint"
@@ -10,6 +14,7 @@
       ref="textField"
       class="full-width"
       :disabled="!relevant"
+      hide-details
     />
     <app-control-more-info :value="control.moreInfo" />
   </div>

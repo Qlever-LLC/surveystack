@@ -5,8 +5,11 @@
   >
     <v-row>
       <v-col cols="12">
-        <app-control-label :value="control.label" />
-
+        <app-control-label
+          :value="control.label"
+          :redacted="redacted"
+          :required="required"
+        />
         <div
           v-if="control.options.source"
           v-html="control.options.source"
