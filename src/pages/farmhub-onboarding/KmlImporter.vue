@@ -1,6 +1,14 @@
 <template>
   <v-sheet outlined class="pa-8">
-    <div class="display-1">KML Importer</div>
+    <div class="display-1">
+      KML Importer
+      <app-tooltip
+        >Upload KML File. Note that KML Files may come as .kmz Files. Be sure to
+        extract the .kml from the .kmz first.</app-tooltip
+      >
+    </div>
+    <!-- TODO add small piece of info describing that kml often come in kmz -->
+
     <v-row>
       <v-file-input label="Upload KML file" @change="getFile"></v-file-input>
     </v-row>
@@ -27,7 +35,12 @@
 import togeojson from '@mapbox/togeojson';
 import wkx from 'wkx';
 
+import appTooltip from '@/components/ui/Tooltip.vue';
+
 export default {
+  components: {
+    appTooltip,
+  },
   props: [
     'value',
   ],
