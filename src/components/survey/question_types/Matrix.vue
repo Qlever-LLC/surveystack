@@ -13,61 +13,70 @@
 
     <v-dialog
       v-model="showEditItemDialog"
+      v-if="showEditItemDialog"
       title="Edit"
       hideCancel
       @confirm="showEditItemDialog = false"
     >
-      <v-card>
-        <v-card-title>
-          Edit
-          <v-spacer />
-          <v-btn
-            @click="duplicateRow(editedIndex)"
-            text
-            color="primary"
-          >
-            <v-icon left>mdi-content-copy</v-icon>Duplicate
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <v-form
-            autocomplete="off"
-            @submit.prevent=""
-          >
-            <div
-              v-for="(header, idx) in headers"
-              :key="header.value"
+      <div style="background: #1867c0; padding: 4px 0px">
+        <v-card>
+          <v-card-title>
+            <v-btn
+              @click="duplicateRow(editedIndex)"
+              text
+              color="primary"
             >
-              <h4>{{header.text}}</h4>
-              <app-matrix-cell
-                :header="header"
-                :item="editedItem"
-                :getDropdownItems="getDropdownItems"
-                :farmos="farmos"
-                :index="idx"
-                @changed="onInput"
-                class="matrix-cell my-2"
-              />
-            </div>
-          </v-form>
-        </v-card-text>
-        <v-card-actions class="d-flex justify-space-between">
-          <v-btn
-            text
-            @click="rowToBeDeleted = editedIndex"
-            class="ma-2"
-          >
-            <v-icon left>mdi-trash-can-outline</v-icon>Delete
-          </v-btn>
-          <v-btn
-            text
-            @click="showEditItemDialog = false"
-            class="ma-2"
-          >
-            <v-icon left>mdi-close</v-icon> Close
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+              <v-icon left>mdi-content-copy</v-icon>Duplicate
+            </v-btn>
+            <v-spacer />
+            <v-btn
+              text
+              @click="showEditItemDialog = false"
+            >
+              Close <v-icon right>mdi-close</v-icon>
+            </v-btn>
+          </v-card-title>
+          <v-card-text>
+            <v-form
+              autocomplete="off"
+              @submit.prevent=""
+            >
+              <div
+                v-for="(header, idx) in headers"
+                :key="header.value"
+              >
+                <h4>{{header.text}}</h4>
+                <app-matrix-cell
+                  :header="header"
+                  :item="editedItem"
+                  :getDropdownItems="getDropdownItems"
+                  :farmos="farmos"
+                  :index="idx"
+                  @changed="onInput"
+                  class="matrix-cell my-2"
+                />
+              </div>
+            </v-form>
+          </v-card-text>
+          <v-card-actions class="d-flex justify-space-between">
+            <v-btn
+              text
+              @click="rowToBeDeleted = editedIndex"
+              class="ma-2"
+              color="error"
+            >
+              <v-icon left>mdi-trash-can-outline</v-icon>Delete
+            </v-btn>
+            <v-btn
+              text
+              @click="showEditItemDialog = false"
+              class="ma-2"
+            >
+              Close <v-icon right>mdi-close</v-icon>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </div>
     </v-dialog>
 
     <app-control-label :value="control.label" />
