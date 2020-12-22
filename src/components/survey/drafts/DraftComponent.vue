@@ -142,7 +142,6 @@ export default {
       setTimeout(() => {
         const body = document.getElementsByTagName('body')[0];
         const { clientHeight, scrollHeight } = body;
-        console.log(clientHeight, scrollHeight);
         if (scrollHeight - 100 > clientHeight) {
           vm.overflowing = true;
         } else {
