@@ -16,12 +16,17 @@
         <v-icon>mdi-table</v-icon>
         <span class="ml-2">Results</span>
       </v-btn>
-
     </div>
 
     <h1>{{entity.name}}</h1>
     <div v-if="surveyInfo">
-      {{surveyInfo.submissions}} {{surveyInfo.submissions === 1 ? 'submission' : 'submissions'}}
+      <div
+        class="survey-description"
+        v-if="surveyInfo.description"
+      >{{surveyInfo.description}}</div>
+      <div class="text--secondary">
+        {{surveyInfo.submissions}} {{surveyInfo.submissions === 1 ? 'submission' : 'submissions'}}
+      </div>
       <div
         v-if="surveyInfo.latestSubmission"
         class="text--secondary"
@@ -148,3 +153,10 @@ export default {
 
 };
 </script>
+
+<style scoped>
+.survey-description {
+  margin: 16px 0px;
+  white-space: pre-wrap;
+}
+</style>
