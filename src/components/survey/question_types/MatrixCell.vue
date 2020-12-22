@@ -27,8 +27,18 @@
     :multiple="header.multiple"
     :disabled="disabled"
   />
+  <v-combobox
+    v-else-if="(header.type === 'autocomplete') && header.custom"
+    :items="getDropdownItems(header.value)"
+    :value="item[header.value]"
+    @input="v => {onInputCombobox(item, header, v)}"
+    hide-details
+    solo
+    :multiple="header.multiple"
+    :disabled="disabled"
+  />
   <v-autocomplete
-    v-else-if="header.type === 'autocomplete'"
+    v-else-if="(header.type === 'autocomplete') && !header.custom"
     :items="getDropdownItems(header.value)"
     :value="item[header.value]"
     @input="v => {item[header.value] = v; onInput()}"
@@ -146,6 +156,19 @@ export default {
   methods: {
     onInput() {
       this.$emit('changed');
+    },
+    onInputCombobox(item, header, input) {
+      console.log('combobox - item', item);
+      console.log('combobox - header', header);
+      console.log('combobox - input', input);
+
+      if (header.multiple) {
+        item[header.value] = input.map(i => i.value || i);
+      } else {
+        item[header.value] = input.value || input;
+      }
+
+      this.onInput();
     },
     // copied/adapted from FarmOsPlanting.vue
     localChange(hashesArg) {

@@ -132,6 +132,14 @@
                   hide-details
                   dense
                 />
+                <v-checkbox
+                  v-if="item.type === 'autocomplete'"
+                  class="mt-1"
+                  v-model="item.custom"
+                  label="Custom inputs"
+                  hide-details
+                  dense
+                />
               </div>
             </v-card-text>
           </v-card>
@@ -265,6 +273,7 @@ export default {
         type: '',
         resource: '',
         multiple: false,
+        custom: false,
       };
     },
     deleteColumn(index) {

@@ -278,7 +278,7 @@ export default {
     },
     headers() {
       const headers = this.source.content.map(col => ({
-        text: col.label, value: col.value, type: col.type, multiple: col.multiple,
+        text: col.label, value: col.value, type: col.type, multiple: col.multiple, custom: col.custom,
       }));
 
       return headers;
