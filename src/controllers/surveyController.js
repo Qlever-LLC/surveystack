@@ -256,7 +256,15 @@ const getSurveyInfo = async (req, res) => {
     .collection('surveys')
     .findOne(
       { _id: new ObjectId(id) },
-      { projection: { name: 1, latestVersion: 1, 'meta.dateModified': 1, 'meta.dateCreated': 1 } }
+      {
+        projection: {
+          name: 1,
+          latestVersion: 1,
+          'meta.dateModified': 1,
+          'meta.dateCreated': 1,
+          description: 1,
+        },
+      }
     );
 
   const submissions = await db
