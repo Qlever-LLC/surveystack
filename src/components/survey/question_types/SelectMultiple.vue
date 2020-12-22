@@ -23,7 +23,7 @@
 
       <div
         v-if="control.options.allowCustomSelection"
-        class="select-multiple-custom mt-2 d-flex align-center"
+        class="select-multiple-custom mt-3 d-flex align-center"
       >
         <v-checkbox
           v-model="customSelected"

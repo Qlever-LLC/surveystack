@@ -20,6 +20,7 @@
           label="other"
           :value="customSelection"
           v-if="control.options.allowCustomSelection"
+          class="mt-1"
         >
           <template v-slot:label>
             <v-text-field
@@ -29,14 +30,9 @@
               hide-details
               outlined
               dense
-            >
-              <template
-                v-slot:label
-                class="something"
-              >
-                <div class="top-10">other</div>
-              </template>
-            </v-text-field>
+              label="other"
+            />
+
           </template>
         </v-radio>
       </v-radio-group>
@@ -108,9 +104,9 @@ export default {
 
 .v-input .text-field-other >>> label {
   top: 10px;
+  line-height: 24px;
 }
 
-/* .select-single >>> .v-input--radio-group__input { */
 .select-single >>> .v-label {
   height: auto;
 }
