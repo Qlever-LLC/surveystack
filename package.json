@@ -10,6 +10,7 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "@mapbox/mapbox-gl-geocoder": "^4.7.0",
     "@mapbox/togeojson": "^0.16.0",
     "@mdi/font": "^5.0.45",
     "@vue/composition-api": "^0.5.0",

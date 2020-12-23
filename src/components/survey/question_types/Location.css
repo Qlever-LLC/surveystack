@@ -1,12 +1,29 @@
 @import url('~mapbox-gl/dist/mapbox-gl.css');
+@import url('~@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css');
+
 
 .gps-info {
 	position: absolute;
 	right: 10px;
-	top: 49px;
+	top: 88px;
 	z-index: 1;
 	display: block;
 }
+
+.layer-switch {
+	position: absolute;
+	right: 10px;
+	top: 49px;
+	z-index: 1;
+}
+
+.layer-switch.v-btn {
+	min-width: unset;
+	width: 29px;
+	height: 29px;
+	padding: 0;
+}
+
 
 .map-container {
 	position: relative;

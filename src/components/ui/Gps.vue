@@ -15,17 +15,18 @@
         <div>
           <slot></slot>
         </div>
-        <div class="text-body-2 text-sm-body-1"
+        <div
+          class="text-body-2 text-sm-body-1"
           v-if="location && location.geometry && location.properties"
         >
           <samp>
-              lng:&nbsp;{{ location.geometry.coordinates[0].toFixed(5) }}
-              <br/>
-              lat:&nbsp;{{ location.geometry.coordinates[1].toFixed(5) }}
-              <br/>
-              <span v-if="location.properties.accuracy">
-                acc:&nbsp;{{ location.properties.accuracy.toFixed(2) }}
-              </span>
+            lng:&nbsp;{{ location.geometry.coordinates[0].toFixed(5) }}
+            <br />
+            lat:&nbsp;{{ location.geometry.coordinates[1].toFixed(5) }}
+            <br />
+            <span v-if="location.properties.accuracy">
+              acc:&nbsp;{{ location.properties.accuracy.toFixed(2) }}
+            </span>
           </samp>
         </div>
         <v-btn
@@ -85,8 +86,9 @@ export default {
         ? `${this.location.geometry.coordinates[0]}, ${this.location.geometry.coordinates[1]}, ${this.location.properties.accuracy}`
         : `${this.location.geometry.coordinates[0]}, ${this.location.geometry.coordinates[1]}`;
       navigator.clipboard.writeText(text).then(() => {
-        this.snackbarText = 'Copied Text to Clipboard';
-        this.snackbar = true;
+        // TODO: snackbar appears behind prev/next buttons and not sure how to fix this right now
+        // this.snackbarText = 'Copied Text to Clipboard';
+        // this.snackbar = true;
       }, (err) => {
         console.error('Async: Could not copy text: ', err);
       });
@@ -112,5 +114,4 @@ export default {
   padding: 1rem;
   border-radius: 3px;
 }
-
 </style>

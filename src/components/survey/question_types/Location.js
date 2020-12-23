@@ -1,4 +1,6 @@
 import mapboxgl from 'mapbox-gl';
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+
 import AppGps from '@/components/ui/Gps.vue';
 import baseQuestionComponent from './BaseQuestionComponent';
 
@@ -15,6 +17,8 @@ const requestWakeLock = async () => {
     console.error(`${e.name}, ${e.message}`);
   }
 };
+
+const MAP_STYLES = ['satellite', 'streets', 'outdoors'];
 
 export default {
   mixins: [baseQuestionComponent],
@@ -35,6 +39,7 @@ export default {
       usingGPS: true,
       marker: null,
       ctrl: null,
+      mapStyle: MAP_STYLES[0],
     };
   },
   methods: {
@@ -71,10 +76,12 @@ export default {
       const loc = this.usingGPS ? this.gps : this.geoJsonFromLngLat(this.map.getCenter());
       this.changed(loc);
       this.location = loc;
-      this.next();
-    },
-    skip() {
-      this.next();
+
+      if (this.location) {
+        this.marker = new mapboxgl.Marker()
+          .setLngLat([this.location.geometry.coordinates[0], this.location.geometry.coordinates[1]])
+          .addTo(this.map);
+      }
     },
     retake() {
       this.changed(null);
@@ -82,7 +89,6 @@ export default {
         this.marker.remove();
       }
       this.location = null;
-      this.hideNext();
       this.ctrl.trigger();
     },
     handleMap(map, value) {
@@ -94,6 +100,17 @@ export default {
       });
 
       map.addControl(this.ctrl);
+
+      const geocoder = new MapboxGeocoder({ // Initialize the geocoder
+        accessToken: mapboxgl.accessToken, // Set the access token
+        mapboxgl: map, // Set the mapbox-gl instance
+        marker: false, // Do not use the default marker style
+      });
+
+      // Add the geocoder above the map
+      // document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+      document.getElementById(`map-question-geocoder-${this.index}`).appendChild(geocoder.onAdd(map));
+
       map.on('error', (err) => {
         console.log(err);
         this.mapError = true;
@@ -135,13 +152,6 @@ export default {
       });
 
       if (value) {
-        // this.marker = new mapboxgl.Marker()
-        //   .setLngLat([value.lng, value.lat])
-        //   .addTo(map);
-
-        // map.jumpTo({
-        //   center: [value.lng, value.lat],
-        // });
         this.marker = new mapboxgl.Marker()
           .setLngLat([value.geometry.coordinates[0], value.geometry.coordinates[1]])
           .addTo(map);
@@ -150,6 +160,12 @@ export default {
           center: [value.geometry.coordinates[0], value.geometry.coordinates[1]],
         });
       }
+    },
+    switchMapStyle() {
+      const index = MAP_STYLES.indexOf(this.mapStyle);
+      const newIndex = (index + 1) % MAP_STYLES.length;
+      this.mapStyle = MAP_STYLES[newIndex];
+      this.map.setStyle(`mapbox://styles/mapbox/${this.mapStyle}-v9`);
     },
   },
   computed: {
@@ -179,26 +195,19 @@ export default {
     this.location = this.value;
   },
   mounted() {
-    // console.log(`mounted, ${this.map}`);
-
     setTimeout(() => {
 
     }, 2000);
 
-    // console.log('loading map', this.index);
     mapboxgl.accessToken = 'pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA';
     this.map = new mapboxgl.Map({
       container: `map-question-${this.index}`,
-      style: 'mapbox://styles/mapbox/satellite-v9',
+      style: `mapbox://styles/mapbox/${this.mapStyle}-v9`,
       // center: [8.311068, 47.462507],
       zoom: 15,
     });
 
     this.handleMap(this.map, this.value);
-    if (!this.value) {
-      // console.log('hiding next');
-      this.hideNext();
-    }
 
     if (wakeLock in navigator) {
       requestWakeLock();
@@ -209,7 +218,6 @@ export default {
     };
     const errorHandler = (err) => {
       console.warn(`Error (${err.code}): ${err.message}`);
-      // this.mapError = err;
       this.geolocationError = err;
     };
 
@@ -222,7 +230,6 @@ export default {
     }
   },
   beforeDestroy() {
-    // console.log('removing map');
     if (navigator.geolocation) {
       navigator.geolocation.clearWatch(this.geolocationID);
     }

@@ -8,6 +8,12 @@
     <app-control-hint :value="control.hint" />
 
     <div
+      :id="`map-question-geocoder-${index}`"
+      class="geocoder"
+      style="z-index: 200"
+    />
+
+    <div
       class="map-container my-2"
       v-if="!mapError"
     >
@@ -18,28 +24,29 @@
       >
         {{ currentLocation.label }}
       </app-gps>
+
+      <v-btn
+        class="layer-switch"
+        @click="switchMapStyle"
+      >
+        <v-icon>mdi-layers-outline</v-icon>
+      </v-btn>
+
       <div
         style="background-color: #000"
         :id="`map-question-${index}`"
         class="map-question"
         v-if="!mapError"
       >
+
         <img
-          v-if="!this.value"
+          v-if="!value"
           id="map-marker"
           src="@/assets/marker.svg"
           alt="marker"
         />
         <div class="selection-controls d-flex justify-center">
           <div v-if="!location">
-            <v-btn
-              large
-              class="mx-4 full"
-              color="gray"
-              @click="skip"
-            >
-              Skip
-            </v-btn>
             <v-btn
               large
               :disabled="disablePick"
