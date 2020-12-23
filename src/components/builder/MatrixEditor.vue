@@ -42,8 +42,8 @@
           <v-card
             v-for="(item,i) in value.content"
             :key="i"
-            width="15rem"
-            min-width="15rem"
+            width="16rem"
+            min-width="16rem"
             class="mx-1"
             elevation="3"
           >
@@ -100,19 +100,21 @@
                 v-if="item.type === 'dropdown' || item.type === 'autocomplete'"
                 class="d-flex flex-column"
               >
-                <div class="d-flex flex-row">
+                <div class="d-flex flex-row flex-wrap">
                   <v-select
                     dense
                     v-model="item.resource"
                     :items="resourceSelectItems"
                     label="Resource"
                     hide-details
+                    style="max-width: 10rem"
                   />
                   <v-btn
                     @click="createOntology(i)"
                     small
                     icon
                     :color="!item.resource ? 'primary' : ''"
+                    class="ml-auto"
                   >
                     <v-icon>mdi-plus</v-icon>
                   </v-btn>
