@@ -29,17 +29,22 @@
           :key="`item_${idx}`"
           :disabled="!control.options.hasMultipleSelections && item.value.isField"
         >
-          <template v-slot:default="{ active, toggle }">
+          <template v-slot:default="{ active }">
             <v-list-item-action
-              class="mr-2"
-              v-if="!!control.options.hasMultipleSelections || !item.value.isField"
+              class="ml-2 mr-2"
+              v-if="!item.value.isField"
             >
               <v-checkbox
-                :class="{ 'ml-4' : !item.value.isField}"
+                v-if="control.options.hasMultipleSelections "
                 :input-value="active"
                 :true-value="hashItem(item)"
-                @click="toggle"
               />
+              <v-radio-group
+                v-else
+                :value="active"
+              >
+                <v-radio :value="true" />
+              </v-radio-group>
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-title v-html="item.label" />
@@ -239,6 +244,7 @@ export default {
   methods: {
     hashItem,
     localChange(hashesArg) {
+      console.log('localChange', hashesArg);
       let hashes;
       if (!Array.isArray(hashesArg)) {
         if (hashesArg) {
@@ -286,8 +292,10 @@ export default {
 
 
       if (!Array.isArray(hashesArg)) {
+        console.log('onChange', assets[0]);
         this.onChange(assets[0]);
       } else {
+        console.log('onChange', assets);
         this.onChange(assets);
       }
     },
