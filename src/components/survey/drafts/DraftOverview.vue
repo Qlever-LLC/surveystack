@@ -60,7 +60,6 @@
               <div class="flex-grow-1">
                 <v-card-title class="d-block mb-0 pb-0">
                   <div class="ma-0 pa-0 d-flex align-stretch">
-                    <!-- color="#FF5722" -->
                     <span class="caption grey--text text--darken-1">{{ display.questionNumber }}</span>
 
                     <v-spacer></v-spacer>
@@ -72,7 +71,12 @@
                     >Irrelevant</v-chip>
                   </div>
 
-                  <div class="title">{{ display.label }}</div>
+                  <app-control-label
+                    class="mb-1"
+                    :value="display.label"
+                    :redacted="display.redacted"
+                    :required="display.required"
+                  />
                   <span
                     class="font-weight-light grey--text text--darken-2 mt-n1"
                     style="font-size: 0.9rem; position: relative; top: -10px"
@@ -237,6 +241,8 @@ export default {
           active,
           modified,
           modifiedHumanized: moment.duration(now.diff(modified)).humanize(),
+          redacted: overview.control.options && overview.control.options.redacted,
+          required: overview.control.options && overview.control.options.required,
         });
       }
 

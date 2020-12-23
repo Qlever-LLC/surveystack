@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="value || required || redacted"
-    class="d-flex align-center mb-3"
+    class="d-flex align-center control-label-wrapper"
   >
     <div
       class="control-label"
@@ -27,6 +27,10 @@ export default {
 </script>
 
 <style scoped>
+.control-label-wrapper {
+  margin-bottom: 12px;
+}
+
 .control-label {
   font-size: 1.25rem;
   line-height: 2rem;

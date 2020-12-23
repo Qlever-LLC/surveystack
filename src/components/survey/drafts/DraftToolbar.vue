@@ -17,27 +17,7 @@
         </div>
       </v-toolbar-title>
 
-      <v-spacer></v-spacer>
-      <v-chip
-        v-if="required"
-        dark
-        color="error"
-      >
-        <span class="font-weight-bold">
-          <v-icon class="mr-2">mdi-asterisk</v-icon>Required
-        </span>
-      </v-chip>
-      <v-chip
-        v-if="anon"
-        class="mr-2 ml-2"
-        dark
-        color="primary"
-      >
-        <span class="font-weight-bold">
-          <v-icon class="mr-2">mdi-eye-off</v-icon>Private
-        </span>
-      </v-chip>
-      <v-spacer></v-spacer>
+      <v-spacer />
 
       <v-btn
         icon
