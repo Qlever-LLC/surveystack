@@ -1,8 +1,8 @@
 <template>
   <v-text-field
     v-if="header.type === 'text'"
-    :value="item[header.value]"
-    @input="v => {item[header.value] = v; onInput()}"
+    :value="item[header.value].value"
+    @input="v => {item[header.value].value = v; onInput()}"
     solo
     hide-details
     autocomplete="off"
@@ -10,8 +10,8 @@
   />
   <v-text-field
     v-else-if="header.type === 'number'"
-    :value="item[header.value]"
-    @input="v => {item[header.value] = Number(v); onInput()}"
+    :value="item[header.value].value"
+    @input="v => {item[header.value].value = Number(v); onInput()}"
     type="number"
     solo
     hide-details
@@ -20,8 +20,8 @@
   <v-select
     v-else-if="header.type === 'dropdown'"
     :items="getDropdownItems(header.value)"
-    :value="item[header.value]"
-    @input="v => {item[header.value] = v; onInput()}"
+    :value="item[header.value].value"
+    @input="v => {item[header.value].value = v; onInput()}"
     hide-details
     solo
     :multiple="header.multiple"
@@ -30,7 +30,7 @@
   <v-combobox
     v-else-if="(header.type === 'autocomplete') && header.custom"
     :items="getDropdownItems(header.value)"
-    :value="item[header.value]"
+    :value="item[header.value].value"
     @input="v => {onInputCombobox(item, header, v)}"
     hide-details
     solo
@@ -40,8 +40,8 @@
   <v-autocomplete
     v-else-if="(header.type === 'autocomplete') && !header.custom"
     :items="getDropdownItems(header.value)"
-    :value="item[header.value]"
-    @input="v => {item[header.value] = v; onInput()}"
+    :value="item[header.value].value"
+    @input="v => {item[header.value].value = v; onInput()}"
     hide-details
     solo
     :multiple="header.multiple"
@@ -50,8 +50,8 @@
   <v-autocomplete
     v-else-if="header.type === 'farmos_field'"
     :items="farmos.farms || []"
-    :value="item[header.value]"
-    @input="v => {item[header.value] = v; onInput()}"
+    :value="item[header.value].value"
+    @input="v => {item[header.value].value = v; onInput()}"
     item-text="label"
     item-value="value"
     hide-details
@@ -70,8 +70,8 @@
   </v-autocomplete>
   <v-autocomplete
     v-else-if="header.type === 'farmos_planting'"
-    :value="item[header.value]"
-    @input="v => {item[header.value] = localChange(v); onInput()}"
+    :value="item[header.value].value"
+    @input="v => {item[header.value].value = localChange(v); onInput()}"
     :items="farmos.plantings || []"
     item-text="label"
     item-value="value"
@@ -100,8 +100,8 @@
     >
       <template v-slot:activator="{ on, attrs }">
         <v-text-field
-          :value="item[header.value]"
-          @input="v => {item[header.value] = v; onInput()}"
+          :value="item[header.value].value"
+          @input="v => {item[header.value].value = v; onInput()}"
           hide-details
           v-bind="attrs"
           v-on="on"
@@ -111,8 +111,8 @@
         ></v-text-field>
       </template>
       <v-date-picker
-        :value="item[header.value]"
-        @input="v => {item[header.value] = v; menus[`${index}_${header.value}`] = false; onInput()}"
+        :value="item[header.value].value"
+        @input="v => {item[header.value].value = v; menus[`${index}_${header.value}`] = false; onInput()}"
         no-title
       ></v-date-picker>
     </v-menu>
@@ -163,9 +163,9 @@ export default {
       console.log('combobox - input', input);
 
       if (header.multiple) {
-        item[header.value] = input.map(i => i.value || i);
+        item[header.value].value = input.map(i => i.value || i);
       } else {
-        item[header.value] = input.value || input;
+        item[header.value].value = input.value || input;
       }
 
       this.onInput();

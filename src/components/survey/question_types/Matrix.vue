@@ -291,7 +291,7 @@ export default {
     },
     headers() {
       const headers = this.source.content.map(col => ({
-        text: col.label, value: col.value, type: col.type, multiple: col.multiple, custom: col.custom,
+        text: col.label, value: col.value, type: col.type, multiple: col.multiple, custom: col.custom, required: col.required, redacted: col.redacted,
       }));
 
       return headers;
@@ -332,7 +332,19 @@ export default {
   methods: {
     add() {
       // create empty row object from headers
-      const newRow = this.fields.reduce((accu, current) => ({ ...accu, [current]: null }), {});
+      const newRow = this.fields.reduce((accu, current) => ({ ...accu, [current]: { value: null } }), {});
+      console.log(newRow);
+
+      // eslint-disable-next-line
+      for (const key of Object.keys(newRow)) {
+        console.log(key);
+        const header = this.headers.find(h => h.value === key);
+
+        if (header && header.redacted) {
+          newRow[key].meta = { permissions: ['admin'] };
+        }
+      }
+
       this.rows.push(newRow);
       if (this.isMobile) {
         this.editItem(this.rows.length - 1);

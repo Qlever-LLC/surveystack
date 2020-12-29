@@ -128,7 +128,7 @@
                   </v-btn>
                 </div>
                 <v-checkbox
-                  class="mt-2"
+                  class="mt-2 ml-2"
                   v-model="item.multiple"
                   label="Multi-select"
                   hide-details
@@ -136,13 +136,30 @@
                 />
                 <v-checkbox
                   v-if="item.type === 'autocomplete'"
-                  class="mt-1"
+                  class="mt-0 ml-2"
                   v-model="item.custom"
                   label="Custom inputs"
                   hide-details
                   dense
                 />
               </div>
+              <!--
+              <v-checkbox
+                v-if="false"
+                v-model="item.required"
+                label="Required"
+                class="mt-2"
+                hide-details
+              />
+              <v-checkbox
+                v-model="item.redacted"
+                label="Private"
+                class="mt-2"
+                hint="Visible to submitters and admins only"
+                persistent-hint
+              />
+              //-->
+
             </v-card-text>
           </v-card>
           <v-btn
@@ -276,6 +293,8 @@ export default {
         resource: '',
         multiple: false,
         custom: false,
+        required: false,
+        redacted: false,
       };
     },
     deleteColumn(index) {
