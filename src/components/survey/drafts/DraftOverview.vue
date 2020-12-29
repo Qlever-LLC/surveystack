@@ -49,6 +49,7 @@
             @click="$emit('goto', display.path)"
             :color="display.background"
             :dark="display.dark"
+            :style="{opacity: display.relevant ? 1.0 : 0.5}"
           >
             <div class="d-flex flex-row">
               <div
@@ -59,40 +60,41 @@
 
               <div class="flex-grow-1">
                 <v-card-title class="d-block mb-0 pb-0">
-                  <div class="ma-0 pa-0 d-flex align-stretch">
-                    <span class="caption grey--text text--darken-1">{{ display.questionNumber }}</span>
-
-                    <v-spacer></v-spacer>
-                    <v-chip
-                      small
-                      dark
-                      v-if="display.collate > 0"
-                      color="grey-darken-5"
-                    >Irrelevant</v-chip>
+                  <div class="d-flex flex-row align-baseline">
+                    <span
+                      class="grey--text text--darken-1 mr-1"
+                      style="font-weight: initial; font-size: initial"
+                    >{{ display.questionNumber }}</span>
+                    <app-control-label
+                      class="ml-2 mb-0 flex-grow-1"
+                      :value="display.label"
+                      :redacted="display.redacted"
+                      :required="display.required"
+                    />
                   </div>
-
-                  <app-control-label
-                    class="mb-1"
-                    :value="display.label"
-                    :redacted="display.redacted"
-                    :required="display.required"
-                  />
+                  <!--
                   <span
                     class="font-weight-light grey--text text--darken-2 mt-n1"
                     style="font-size: 0.9rem; position: relative; top: -10px"
                   >{{display.path}}</span>
+                  -->
                 </v-card-title>
+
+                <!-- Value -->
                 <v-card-text
-                  class="py-0"
+                  class="py-0 mt-2"
                   v-if="display.value"
-                ><kbd
+                >
+                  <kbd
                     class="pa-2"
-                    style="background: #555"
-                  >{{ display.value }}</kbd></v-card-text>
+                    style="background: #555;"
+                  >{{ display.value }}</kbd>
+                </v-card-text>
                 <v-card-text
                   v-else
                   class="text--secondary"
                 >No answer</v-card-text>
+
                 <div
                   v-if="display.modified"
                   class="d-flex justify-space-between text--secondary mx-4 mb-3 mt-4"

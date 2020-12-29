@@ -1,5 +1,8 @@
 <template>
-  <v-container class="mx-0 px-0 my-2">
+  <div
+    class="mx-0 px-0 my-2"
+    style="width: 100%"
+  >
     <div v-if="control.type === 'page' && !insidePage">
       <div
         v-for="(child, i) in control.children"
@@ -69,7 +72,7 @@
 
     </div>
 
-  </v-container>
+  </div>
 </template>
 
 <script>

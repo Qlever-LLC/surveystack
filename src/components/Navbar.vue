@@ -138,7 +138,6 @@ export default {
   data() {
     return {
       version: process.env.VUE_APP_VERSION,
-      drawer: false,
       sidenav: {
         collect: [
           {
@@ -251,6 +250,14 @@ export default {
     };
   },
   computed: {
+    drawer: {
+      get() {
+        return this.$store.getters['appui/menu'];
+      },
+      set(value) {
+        this.$store.dispatch('appui/setMenu', value);
+      },
+    },
     readyToSubmitCount() {
       return this.$store.getters['submissions/readyToSubmit'].length;
     },

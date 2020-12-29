@@ -68,7 +68,8 @@
 
     <!-- Footer with next/prev buttons -->
     <app-draft-footer
-      class="draft-footer px-4 grey lighten-4"
+      class="draft-footer px-0 grey lighten-4"
+      :style="{left: moveFooter ? '256px' : '0px', width: moveFooter ? 'calc(100% - 256px)' : '100%'}"
       :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
       :enableNext="!$store.getters['draft/hasRequiredUnanswered']"
       :enableSubmit="!$store.getters['draft/errors']"
@@ -133,6 +134,12 @@ export default {
       set(v) {
         this.$store.dispatch('draft/showConfirmSubmission', v);
       },
+    },
+    moveFooter() {
+      // we want a fixed footer, but this causes issues when the menu side bar is shown...
+      // Basically, we need to move the footer to the left and calculate its width if the menu is shown,
+      // However, if display breakpoint is 'md' or less, we do not move the footer
+      return this.$store.getters['appui/menu'] && !this.$vuetify.breakpoint.mdAndDown;
     },
   },
   watch: {

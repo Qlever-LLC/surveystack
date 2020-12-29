@@ -1,73 +1,70 @@
 <template>
-  <footer v-if="showNav">
-    <v-container class="pa-0">
-      <v-row v-if="showSubmit">
-        <v-col
-          class="text-center"
-          cols="6"
-        >
+  <footer
+    v-if="showNav"
+    class="d-flex align-center"
+  >
+    <div class="full maxw-60 mx-auto">
+      <div
+        v-if="showSubmit"
+        class="d-flex flex-row"
+      >
+        <div class="half pr-1">
           <v-btn
             @click="$store.dispatch('draft/showOverview', false)"
-            class="full"
             outlined
             depressed
             large
             color="primary"
+            class="full"
           >
             Cancel
           </v-btn>
-        </v-col>
-        <v-col
-          class="text-center"
-          cols="6"
-        >
+        </div>
+
+        <div class="half pl-1">
           <v-btn
             :disabled="!enableSubmit"
             @click="$emit('submit');"
-            class="full"
             depressed
             large
             color="primary"
+            class="full"
           >
             Submit
           </v-btn>
-        </v-col>
-      </v-row>
-
-      <v-row v-else>
-        <v-col
-          class="text-center"
-          cols="6"
-        >
+        </div>
+      </div>
+      <div
+        v-else
+        class="d-flex flex-row"
+      >
+        <div class="half pr-1">
           <v-btn
             v-show="showPrev"
             @click="$emit('prev');"
-            class="full"
             outlined
             depressed
             large
             color="primary"
+            class="full"
           >
             Previous
           </v-btn>
-        </v-col>
-        <v-col
-          class="text-center"
-          cols="6"
-        >
+        </div>
+        <div class="half pl-1">
           <v-btn
             :disabled="!enableNext"
             @click="$emit('next');"
-            class="full"
             depressed
             large
             color="primary"
+            class="full"
           >
             Next
           </v-btn>
-        </v-col>
-      </v-row>
-    </v-container>
+        </div>
+      </div>
+    </div>
   </footer>
 </template>
 
@@ -86,5 +83,8 @@ export default {
 <style scoped>
 .full {
   width: 100%;
+}
+.half {
+  width: 50%;
 }
 </style>

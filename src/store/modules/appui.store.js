@@ -1,14 +1,9 @@
-const types = {
-  SET_TITLE: 'SET_TITLE',
-  SET_SUBTITLE: 'SET_SUBTITLE',
-  SET_PARTNER: 'SET_PARTNER',
-  RESET: 'RESET',
-};
-
 const createInitialState = () => ({
   title: 'SurveyStack',
   subtitle: '',
   partner: null,
+  menu: false,
+  fixedFooter: false,
 });
 
 
@@ -18,20 +13,24 @@ const getters = {
   title: state => state.title,
   subtitle: state => state.subtitle,
   partner: state => state.partner,
+  menu: state => state.menu,
 };
 
 const actions = {
   reset({ commit }) {
-    commit(types.RESET);
+    commit('RESET');
   },
   setTitle({ commit }, title) {
-    commit(types.SET_TITLE, title);
+    commit('SET_TITLE', title);
   },
   setSubtitle({ commit }, subtitle) {
-    commit(types.SET_SUBTITLE, subtitle);
+    commit('SET_SUBTITLE', subtitle);
   },
   setPartner({ commit }, partner) {
-    commit(types.SET_PARTNER, partner);
+    commit('SET_PARTNER', partner);
+  },
+  setMenu({ commit }, show) {
+    commit('SET_MENU', show);
   },
 };
 
@@ -44,14 +43,17 @@ const mutations = {
       state.title = partner.name;
     }
   },
-  [types.SET_TITLE](state, title) {
+  SET_TITLE(state, title) {
     state.title = title;
   },
-  [types.SET_SUBTITLE](state, subtitle) {
+  SET_SUBTITLE(state, subtitle) {
     state.subtitle = subtitle;
   },
-  [types.SET_PARTNER](state, partner) {
+  SET_PARTNER(state, partner) {
     state.partner = partner;
+  },
+  SET_MENU(state, show) {
+    state.menu = show;
   },
 };
 
