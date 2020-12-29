@@ -35,6 +35,7 @@
     <v-timeline
       v-if="controlDisplays"
       dense
+      class="width: 100%"
     >
       <template v-for="(display, idx) in controlDisplays">
         <v-timeline-item
@@ -49,66 +50,86 @@
             @click="$emit('goto', display.path)"
             :color="display.background"
             :dark="display.dark"
-            :style="{opacity: display.relevant ? 1.0 : 0.5}"
+            :style="{opacity: display.relevant ? 1.0 : 0.5, 'border-left': display.active ? '4px solid green !important' : ''}"
+            class="pb-1"
           >
-            <div class="d-flex flex-row">
+            <!-- title -->
+            <v-card-title class="d-block mb-0 pb-0">
+              <div class="d-flex flex-row align-baseline">
+                <span
+                  class="grey--text text--darken-1 mr-1"
+                  style="font-weight: initial; font-size: initial"
+                >{{ display.questionNumber }}</span>
+                <app-control-label
+                  class="ml-2 mb-0 flex-grow-1"
+                  :value="display.label"
+                  :redacted="display.redacted"
+                  :required="display.required"
+                />
+              </div>
+            </v-card-title>
+
+            <!-- path (not shown) -->
+            <v-card-text
+              v-if="false"
+              class="my-0 py-0"
+            >
+              <span
+                class="font-weight-light grey--text text--darken-2 mt-n1"
+                style="font-size: 0.9rem; position: relative;"
+              >{{display.path}}</span>
+            </v-card-text>
+
+            <!-- value -->
+            <v-card-text
+              v-if="display.value && display.ellipsis"
+              class="pb-7"
+            >
               <div
-                v-if="display.active"
-                style="width: 1rem;"
-                class="green"
-              > </div>
-
-              <div class="flex-grow-1">
-                <v-card-title class="d-block mb-0 pb-0">
-                  <div class="d-flex flex-row align-baseline">
-                    <span
-                      class="grey--text text--darken-1 mr-1"
-                      style="font-weight: initial; font-size: initial"
-                    >{{ display.questionNumber }}</span>
-                    <app-control-label
-                      class="ml-2 mb-0 flex-grow-1"
-                      :value="display.label"
-                      :redacted="display.redacted"
-                      :required="display.required"
-                    />
-                  </div>
-                  <!--
-                  <span
-                    class="font-weight-light grey--text text--darken-2 mt-n1"
-                    style="font-size: 0.9rem; position: relative; top: -10px"
-                  >{{display.path}}</span>
-                  -->
-                </v-card-title>
-
-                <!-- Value -->
-                <v-card-text
-                  class="py-0 mt-2"
-                  v-if="display.value"
-                >
-                  <kbd
-                    class="pa-2"
-                    style="background: #555;"
-                  >{{ display.value }}</kbd>
-                </v-card-text>
-                <v-card-text
-                  v-else
-                  class="text--secondary"
-                >No answer</v-card-text>
-
-                <div
-                  v-if="display.modified"
-                  class="d-flex justify-space-between text--secondary mx-4 mb-3 mt-4"
-                  style="font-size: 0.8rem"
-                >
-                  <div>
-                    {{ display.modified.format('YYYY-MM-DD HH:mm') }}
-                  </div>
-                  <div>
-                    {{ display.modifiedHumanized }} ago
-                  </div>
+                class="d-flex"
+                style="max-width: 100%; position: absolute"
+                @click.stop="display.ellipsis = !display.ellipsis"
+              >
+                <div class="overview-value overview-value-ellipsis">
+                  {{ display.value }}
                 </div>
               </div>
-            </div>
+
+            </v-card-text>
+
+            <v-card-text
+              v-else-if="display.value && !display.ellipsis"
+              style="padding-bottom: 2px"
+            >
+              <div
+                class="d-flex"
+                @click.stop="display.ellipsis = !display.ellipsis"
+              >
+                <div class="overview-value">{{display.value}}</div>
+              </div>
+            </v-card-text>
+
+            <v-card-text v-else>
+              No answer
+            </v-card-text>
+
+            <!-- date modified -->
+            <v-card-text
+              class="pt-1 pb-0"
+              v-if="display.modified"
+            >
+              <div
+                class="d-flex justify-space-between text--secondary"
+                style="font-size: 0.8rem"
+              >
+                <div>
+                  {{ display.modified.format('YYYY-MM-DD HH:mm') }}
+                </div>
+                <div>
+                  {{ display.modifiedHumanized }} ago
+                </div>
+              </div>
+            </v-card-text>
           </v-card>
 
           <v-chip
@@ -245,6 +266,7 @@ export default {
           modifiedHumanized: moment.duration(now.diff(modified)).humanize(),
           redacted: overview.control.options && overview.control.options.redacted,
           required: overview.control.options && overview.control.options.required,
+          ellipsis: true,
         });
       }
 
@@ -273,5 +295,24 @@ export default {
   padding: 0.2rem;
   padding-left: 0.4rem;
   padding-right: 0.4rem;
+}
+
+.overview-value {
+  color: white;
+  font-family: monospace;
+  font-size: 11.9px;
+  line-height: 22px;
+  letter-spacing: 0.1px;
+  text-rendering: optimizeLegibility;
+  font-weight: 900;
+  background: #555;
+  padding: 2px 4px;
+}
+
+.overview-value-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 32px;
 }
 </style>
