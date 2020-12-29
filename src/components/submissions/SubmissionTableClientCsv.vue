@@ -1,43 +1,42 @@
 <template>
-  <div>
-    <v-card class="py-2">
-      <v-data-table
-        :headers="headers"
-        :items="items"
-        show-select
-        item-key="_id"
-        :search="search"
-        :mobile-breakpoint="0"
-        hide-default-footer
-        v-model="tableSelected"
-        @item-selected="onRowSelected"
-        disable-pagination
-        :class="{archived}"
-        :server-items-length="submissions.pagination.total"
-        @update:sort-by="onUpdateSortBy"
-        @update:sort-desc="onUpdateSortDesc"
-        multi-sort
-        :sort-by="dataTableProps.sortBy"
-        :sort-desc="dataTableProps.sortDesc"
-        :loading="loading"
-      >
-        <template v-slot:top>
-          <v-toolbar flat>
-            <v-row>
-              <v-col>
-                <div class="d-flex justify-end">
-                  <v-switch
-                    v-model="excludeMeta"
-                    label="Hide meta"
-                    class="mt-2"
-                  ></v-switch>
-                </div>
-              </v-col>
-            </v-row>
-          </v-toolbar>
-        </template>
+  <v-card>
+    <v-data-table
+      :headers="headers"
+      :items="items"
+      show-select
+      item-key="_id"
+      :search="search"
+      :mobile-breakpoint="0"
+      hide-default-footer
+      v-model="tableSelected"
+      @item-selected="onRowSelected"
+      disable-pagination
+      :class="{archived}"
+      :server-items-length="submissions.pagination.total"
+      @update:sort-by="onUpdateSortBy"
+      @update:sort-desc="onUpdateSortDesc"
+      multi-sort
+      :sort-by="dataTableProps.sortBy"
+      :sort-desc="dataTableProps.sortDesc"
+      :loading="loading"
+    >
+      <template v-slot:top>
+        <v-toolbar flat>
+          <v-row>
+            <v-col>
+              <div class="d-flex justify-end">
+                <v-switch
+                  v-model="excludeMeta"
+                  label="Hide meta"
+                  class="mt-2"
+                ></v-switch>
+              </div>
+            </v-col>
+          </v-row>
+        </v-toolbar>
+      </template>
 
-        <!-- // need show-expand on v-data-table
+      <!-- // need show-expand on v-data-table
         <template v-slot:expanded-item="{ headers, item }">
           <td></td>
           <td></td>
@@ -49,10 +48,8 @@
         </template>
         -->
 
-      </v-data-table>
-    </v-card>
-
-  </div>
+    </v-data-table>
+  </v-card>
 </template>
 
 <script>

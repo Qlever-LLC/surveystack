@@ -274,7 +274,9 @@
               :dataTableProps="dateTableProps"
               @onDataTablePropsChanged="onDataTablePropsChanged"
               :loading="loading"
+              style="margin: 3px 2px"
             />
+
           </v-tab-item>
           <v-tab-item>
             <app-submissions-tree :submissions="submissions" />
