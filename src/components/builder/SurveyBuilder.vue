@@ -193,6 +193,7 @@
             :submission="instance"
             :survey="survey"
             :persist="false"
+            builder
           ></app-draft-component>
         </div>
         <v-overlay :value="enableSaveDraft">

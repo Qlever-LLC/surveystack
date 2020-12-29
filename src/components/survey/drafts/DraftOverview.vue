@@ -87,7 +87,7 @@
             >
               <div
                 class="d-flex"
-                style="max-width: 100%; position: absolute"
+                style="max-width: 99%; position: absolute"
                 @click.stop="display.ellipsis = !display.ellipsis"
               >
                 <div class="overview-value overview-value-ellipsis">

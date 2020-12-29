@@ -103,6 +103,7 @@ export default {
     survey: { type: Object },
     submission: { type: Object },
     persist: { type: Boolean },
+    builder: { type: Boolean },
   },
   data() {
     return {
@@ -136,6 +137,9 @@ export default {
       },
     },
     moveFooter() {
+      if (this.builder) {
+        return false;
+      }
       // we want a fixed footer, but this causes issues when the menu side bar is shown...
       // Basically, we need to move the footer to the left and calculate its width if the menu is shown,
       // However, if display breakpoint is 'md' or less, we do not move the footer
