@@ -89,10 +89,30 @@
     <v-data-table
       :headers="headers"
       :hide-default-footer="true"
+      hide-default-header
       :items="rows"
       disable-sort
       mobile-breakpoint="0"
     >
+      <template v-slot:header="{props: {headers}}">
+        <thead>
+          <tr>
+            <th
+              v-for="h in headers"
+              :key="h.value"
+            >
+              <v-tooltip top>
+                <template v-slot:activator="{ on }">
+                  <span v-on="on">{{h.text}}</span>
+                </template>
+                <span>{{h.type}}</span>
+              </v-tooltip>
+              <app-redacted v-if="h.redacted" />
+              <app-required v-if="h.required" />
+            </th>
+          </tr>
+        </thead>
+      </template>
       <template v-slot:body="{ items, headers }">
         <tbody>
           <tr
@@ -177,6 +197,8 @@
 import { cloneDeep } from 'lodash';
 import appDialog from '@/components/ui/Dialog.vue';
 import appMatrixCell from '@/components/survey/question_types/MatrixCell.vue';
+import appRequired from '@/components/survey/drafts/Required.vue';
+import appRedacted from '@/components/survey/drafts/Redacted.vue';
 
 
 import baseQuestionComponent from './BaseQuestionComponent';
@@ -284,6 +306,8 @@ export default {
   components: {
     appDialog,
     appMatrixCell,
+    appRequired,
+    appRedacted,
   },
   computed: {
     source() {

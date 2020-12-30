@@ -8,8 +8,14 @@
       v-if="value"
     >{{value}}</div>
     <v-spacer />
-    <app-redacted v-if="redacted" />
-    <app-required v-if="required" />
+    <app-redacted
+      v-if="redacted"
+      bottom
+    />
+    <app-required
+      v-if="required"
+      bottom
+    />
   </div>
 </template>
 

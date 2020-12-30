@@ -143,7 +143,7 @@
                   dense
                 />
               </div>
-              <!--
+
               <v-checkbox
                 v-if="false"
                 v-model="item.required"
@@ -155,10 +155,9 @@
                 v-model="item.redacted"
                 label="Private"
                 class="mt-2"
-                hint="Visible to submitters and admins only"
+                hint="Visible to submitter and admins only"
                 persistent-hint
               />
-              //-->
 
             </v-card-text>
           </v-card>

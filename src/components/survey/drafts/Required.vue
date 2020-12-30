@@ -1,6 +1,10 @@
 <template>
-
-  <v-tooltip bottom>
+  <v-tooltip
+    :top="top || fallback"
+    :right="right"
+    :bottom="bottom"
+    :left="left"
+  >
     <template v-slot:activator="{ on, attrs }">
       <v-icon
         small
@@ -14,3 +18,29 @@
     <span>Required</span>
   </v-tooltip>
 </template>
+
+<script>
+export default {
+  props: {
+    top: {
+      type: Boolean,
+    },
+    right: {
+      type: Boolean,
+    },
+    bottom: {
+      type: Boolean,
+    },
+    left: {
+      type: Boolean,
+    },
+  },
+  computed: {
+    fallback() {
+      const hasLocationSet = ['top', 'right', 'bottom', 'left'].map(loc => this[loc]).some(v => v);
+      return !hasLocationSet;
+    },
+  },
+
+};
+</script>
