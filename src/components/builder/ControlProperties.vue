@@ -246,6 +246,14 @@
         v-else-if="isInstructions"
         v-model="control.options.source"
       />
+
+      <instructions-image-split-editor
+        v-else-if="isInstructionsImageSplit"
+        v-model="control.options.source"
+        :resources="survey.resources"
+        @set-survey-resources="(val) => $emit('set-survey-resources', val)"
+        @set-control-source="(val) => $emit('set-control-source', val)"
+      />
     </v-form>
     <div v-else>...</div>
   </div>
@@ -257,6 +265,7 @@ import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
 import appMatrixProperties from '@/components/builder/MatrixProperties.vue';
 import appOntologyProperties from '@/components/builder/OntologyProperties.vue';
 import InstructionsEditor from '@/components/builder/InstructionsEditor.vue';
+import InstructionsImageSplitEditor from '@/components/builder/InstructionsImageSplitEditor.vue';
 
 import { convertToKey } from '@/utils/builder';
 
@@ -266,7 +275,7 @@ export default {
     InstructionsEditor,
     appOntologyProperties,
     appMatrixProperties,
-
+    InstructionsImageSplitEditor,
   },
   props: {
     control: {
@@ -358,6 +367,9 @@ export default {
     },
     isMatrix() {
       return this.control.type === 'matrix';
+    },
+    isInstructionsImageSplit() {
+      return this.control.type === 'instructionsImageSplit';
     },
   },
   methods: {

@@ -8,6 +8,10 @@ export function isIosSafari() {
   return /(iphone|ipad|ipod).*version/.test(userAgent);
 }
 
+export function isSafari() {
+  return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+}
+
 export function isInStandaloneMode() {
   return ('standalone' in window.navigator)
     && window.navigator.standalone;

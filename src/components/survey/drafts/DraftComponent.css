@@ -61,7 +61,7 @@
 .draft-body {
 	will-change: transform;
 	max-height: 100%;
-	max-width: 50rem;
+	/* max-width: 50rem; */
 	width: 100%;
 	overflow: auto;
 }
@@ -69,7 +69,7 @@
 @media (min-width: 768px) {
 
 	.draft-body {
-		overflow: unset;
+		/* overflow: unset; */
 	}
 }
 

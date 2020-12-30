@@ -52,3 +52,97 @@ body {
 .full-width {
     width: 100%;
 }
+
+.p-relative {
+    position: relative;
+}
+
+.p-absolute {
+    position: absolute;
+}
+
+.t-1 {
+    top: 4px;
+}
+.t-2 {
+    top: 8px;
+}
+.t-3 {
+    top: 12px;
+}
+.t-4 {
+    top: 16px;
+}
+.t-5 {
+    top: 20px;
+}
+.t-6 {
+    top: 24px;
+}
+
+.b-1 {
+    bottom: 4px;
+}
+.b-2 {
+    bottom: 8px;
+}
+.b-3 {
+    bottom: 12px;
+}
+.b-4 {
+    bottom: 16px;
+}
+.b-5 {
+    bottom: 20px;
+}
+.b-6 {
+    bottom: 24px;
+}
+
+.l-1 {
+    left: 4px;
+}
+
+.l-2 {
+    left: 8px;
+}
+
+.l-3 {
+    left: 12px;
+}
+
+.l-4 {
+    left: 16px;
+}
+
+.l-5 {
+    left: 20px;
+}
+
+.l-6 {
+    left: 24px;
+}
+
+.r-1 {
+    right: 4px;
+}
+
+.r-2 {
+    right: 8px;
+}
+
+.r-3 {
+    right: 12px;
+}
+
+.r-4 {
+    right: 16px;
+}
+
+.r-5 {
+    right: 20px;
+}
+
+.r-6 {
+    right: 24px;
+}

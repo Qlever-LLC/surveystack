@@ -5,7 +5,7 @@
     item-value="id"
     :value="value"
     @input="handleSelect"
-    placeholder="Choose a list"
+    placeholder="Choose a resource"
     outlined
   />
 </template>
@@ -24,6 +24,10 @@ export default {
     resourceTypes: {
       type: Array,
       default: () => ([]),
+    },
+    newResourceType: {
+      type: String,
+      required: true,
     },
     // onNew: {
     //   type: Function,
@@ -49,14 +53,14 @@ export default {
         ...this.filteredResources,
         {
           label: '+ New',
-          id: 'NEW_ONTOLOGY_LIST',
+          id: `NEW_${this.newResourceType}`,
         },
       ];
     },
   },
   methods: {
     handleSelect(val) {
-      if (val === 'NEW_ONTOLOGY_LIST') {
+      if (val === `NEW_${this.newResourceType}`) {
         this.$emit('on-new');
       } else {
         this.$emit('on-select', val);

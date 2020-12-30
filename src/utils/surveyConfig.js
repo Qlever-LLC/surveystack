@@ -51,6 +51,11 @@ export const createControlInstance = (control) => {
     cloneWithDefaultOptions.options.source = '';
   } else if (control.type === 'instructions') {
     cloneWithDefaultOptions.options.source = '';
+  } else if (control.type === 'instructionsImageSplit') {
+    cloneWithDefaultOptions.options.source = {
+      body: '',
+      images: [],
+    };
   }
 
   delete cloneWithDefaultOptions.icon;
@@ -146,5 +151,11 @@ export const availableControls = [
     label: 'Farmos Planting',
     type: 'farmOsPlanting',
     icon: 'mdi-leaf',
+  },
+  {
+    name: 'instructions_split',
+    label: 'Instructions Split',
+    type: 'instructionsImageSplit',
+    icon: 'mdi-view-split-vertical',
   },
 ];

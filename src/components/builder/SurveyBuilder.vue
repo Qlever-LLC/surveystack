@@ -193,6 +193,7 @@
             :submission="instance"
             :survey="survey"
             :persist="false"
+            class="builder-draft"
             builder
           ></app-draft-component>
         </div>

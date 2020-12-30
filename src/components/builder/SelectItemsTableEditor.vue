@@ -14,26 +14,6 @@
             </template>
             CSV must have column headers 'label', 'value', and optionally 'tags'
           </v-tooltip>
-          <v-dialog v-model="deleteDialogIsVisible" max-width="290">
-            <template v-slot:activator="{ on }">
-              <v-btn icon v-on="on" class="ml-2">
-                <v-icon>mdi-delete</v-icon>
-                <!-- Delete List -->
-              </v-btn>
-            </template>
-            <v-card>
-              <v-card-title>Delete List</v-card-title>
-              <v-card-text>
-                Are you sure you want to delete this list: <strong>{{ resource.label }}</strong>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer />
-                <v-btn text color="red" @click="deleteResult">Delete</v-btn>
-                <v-btn text @click="closeDeleteDialog">Cancel</v-btn>
-
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
         </div>
 
       </div>
@@ -66,13 +46,15 @@
             v-model="search"
             append-icon="mdi-magnify"
             label="Search"
-            single-line
-            hide-details
           />
         <v-spacer />
         <div>
 
-          <v-btn icon @click="deleteSelectedItems" :disabled="!selectedItems.length">
+          <v-btn
+            icon
+            @click="deleteSelectedItems"
+            :disabled="!selectedItems.length"
+          >
             <v-icon>mdi-delete</v-icon>
           </v-btn>
         </div>
@@ -103,6 +85,32 @@
     </v-card-text>
     <v-spacer />
     <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
+      <v-dialog v-model="deleteDialogIsVisible" max-width="290">
+        <template v-slot:activator="{ on }">
+          <v-btn
+            text
+            v-on="on"
+            color="error"
+            class="ml-2"
+          >
+            <!-- <v-icon>mdi-delete</v-icon> -->
+            Delete
+            <!-- Delete List -->
+          </v-btn>
+        </template>
+        <v-card>
+          <v-card-title>Delete List</v-card-title>
+          <v-card-text>
+            Are you sure you want to delete this list: <strong>{{ resource.label }}</strong>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn text color="red" @click="deleteResult">Delete</v-btn>
+            <v-btn text @click="closeDeleteDialog">Cancel</v-btn>
+
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
       <!-- <v-btn class="ml-4" @click="handleSave">Save</v-btn> -->
       <v-btn text class="ml-4" @click="() => $emit('close-dialog')">Close</v-btn>
     </v-card-actions>
@@ -182,7 +190,10 @@ export default {
   },
   methods: {
     nameIsUnique(val) {
-      return this.resourceNames.some(({ name, id }) => this.resource.name === name && this.resource.id !== id)
+      // return this.resourceNames.some(({ name, id }) => this.resource.name === name && this.resource.id !== id)
+      //   ? 'Name must be unique'
+      //   : true;
+      return this.resourceNames.some(({ name, id }) => val === name && this.resource.id !== id)
         ? 'Name must be unique'
         : true;
     },
@@ -196,7 +207,7 @@ export default {
     },
     moveItemDown({ id }) {
       const index = this.resource.content.findIndex(item => item.id === id);
-      if (index > this.resource.content.length - 1) {
+      if (index < this.resource.content.length - 1) {
         const newItems = [...this.resource.content];
         const [item] = newItems.splice(index, 1);
         newItems.splice(index + 1, 0, item);
@@ -302,9 +313,12 @@ export default {
       // this.$emit('change', this.)
     },
     deleteItem(item) {
-      const newItems = this.items.filter(x => x.label !== item.label && x.value !== item.value);
-      // console.log('delete item, new items:', newItems);
-      this.$emit('change', newItems);
+      const newItems = this.resource.content.filter(x => x.label !== item.label && x.value !== item.value);
+      console.log('delete item, new items:', JSON.stringify(newItems, null, 2));
+      this.$emit('change', {
+        ...this.resource,
+        content: newItems,
+      });
     },
     filterDuplicateItems(items) {
       return uniqWith(items, isEqual);

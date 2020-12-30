@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="!showInvalidPlatformModal">
     <survey-builder
       v-if="!loading"
       :key="sessionId"
@@ -24,7 +24,6 @@
         indeterminate
       />
     </div>
-
     <app-dialog
       v-model="showConflictModal"
       @cancel="showConflictModal = false"
@@ -96,6 +95,24 @@
     </v-snackbar>
 
   </div>
+  <div
+    v-else
+    class="d-flex justify-center align-center overlay-bg "
+    style="background: rbga(0, 0, 0, 0.45); height: 100%;"
+  >
+    <v-card max-width="500">
+      <v-card-title>
+        <v-icon class="mr-2 error--text">mdi-close-octagon</v-icon>
+        Unsupported browser
+      </v-card-title>
+      <!-- <v-alert type="error">
+        Unsupported browser
+      </v-alert> -->
+      <v-card-text>
+          Safari is not currently supported in the Survey Builder, please use Firefox, Chrome, or another Chromium-based browser.
+      </v-card-text>
+    </v-card>
+  </div>
 </template>
 
 <script>
@@ -107,6 +124,8 @@ import resultDialog from '@/components/ui/ResultDialog.vue';
 import resultMixin from '@/components/ui/ResultsMixin';
 
 import { createSurvey, updateControls } from '@/utils/surveys';
+import { isIos, isSafari } from '@/utils/compatibility';
+
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
@@ -137,7 +156,14 @@ export default {
       importedSurvey: null,
       freshImport: false,
       submitting: false,
+      showInvalidPlatformModal: false,
+      isIos: () => isIos(),
     };
+  },
+  mounted() {
+    if (isIos() || isSafari()) {
+      this.showInvalidPlatformModal = true;
+    }
   },
   methods: {
     getActiveGroupSimpleObject() {
@@ -345,3 +371,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.overlay-bg {
+  background-color: rgba(0, 0, 0, 0.45);
+}
+</style>

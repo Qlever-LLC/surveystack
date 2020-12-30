@@ -1,6 +1,6 @@
 <template>
   <div
-    class="draft-component-wrapper"
+    class="draft-component-wrapper draft wrapper"
     v-if="control"
     ref="wrapper"
   >
