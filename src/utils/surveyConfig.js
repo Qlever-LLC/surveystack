@@ -85,6 +85,12 @@ export const availableControls = [
     icon: 'mdi-clipboard-text-outline',
   },
   {
+    name: 'instructions_split',
+    label: 'Instructions Split',
+    type: 'instructionsImageSplit',
+    icon: 'mdi-view-split-vertical',
+  },
+  {
     name: 'text',
     label: 'Enter some text',
     type: 'string',
@@ -108,12 +114,7 @@ export const availableControls = [
     type: 'location',
     icon: 'mdi-map-marker-plus',
   },
-  {
-    name: 'script',
-    label: 'Script',
-    type: 'script',
-    icon: 'mdi-code-braces',
-  },
+
   {
     name: 'multiple_choice',
     label: 'Multiple Choice',
@@ -140,6 +141,12 @@ export const availableControls = [
     icon: 'mdi-matrix',
   },
   {
+    name: 'script',
+    label: 'Script',
+    type: 'script',
+    icon: 'mdi-code-braces',
+  },
+  {
     name: 'farmos_field',
     label: 'Farmos Field',
     type: 'farmOsField',
@@ -152,10 +159,5 @@ export const availableControls = [
     type: 'farmOsPlanting',
     icon: 'mdi-leaf',
   },
-  {
-    name: 'instructions_split',
-    label: 'Instructions Split',
-    type: 'instructionsImageSplit',
-    icon: 'mdi-view-split-vertical',
-  },
+
 ];
