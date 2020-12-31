@@ -45,7 +45,11 @@
                 v-for="(header, idx) in headers"
                 :key="header.value"
               >
-                <h4>{{header.text}}</h4>
+                <div class="d-flex align-center">
+                  <h4>{{header.text}}</h4>
+                  <app-redacted v-if="header.redacted" />
+                  <app-required v-if="header.required" />
+                </div>
                 <app-matrix-cell
                   :header="header"
                   :item="editedItem"
