@@ -57,7 +57,7 @@
             <v-card-title class="d-block mb-0 pb-0">
               <div class="d-flex flex-row align-baseline">
                 <span
-                  class="grey--text text--darken-1 mr-1"
+                  class="grey--text text--darken-1 mr-1 text-no-wrap"
                   style="font-weight: initial; font-size: initial"
                 >{{ display.questionNumber }}</span>
                 <app-control-label
