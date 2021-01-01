@@ -1,5 +1,5 @@
 <template>
-  <div class="instructions-image-split-editor">
+  <div class="instructions-image-split-editor mt-4">
     <!-- <image-resource-picker
       :value="value.images"
       @input="handleImagesChange"
@@ -165,5 +165,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

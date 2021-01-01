@@ -1,6 +1,6 @@
 <template>
   <div
-    class="mx-0 px-0 my-2"
+    class="mx-0 px-0"
     style="width: 100%"
   >
     <div v-if="control.type === 'page' && !insidePage">
@@ -143,6 +143,7 @@ export default {
 
 <style scoped>
 .control {
+  margin: 8px 0px;
   padding: 1rem;
   box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
   border-left: 4px solid #fff;

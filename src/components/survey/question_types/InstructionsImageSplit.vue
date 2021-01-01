@@ -1,43 +1,11 @@
 <template>
   <div class="instructions-image-split question">
-    <!-- <v-container
-    >
-      <v-row>
-        <v-col
-          cols="12"
-          md="8"
-        >
-          <div
-            outlined
-            v-if="control.options.source && control.options.source.images"
-          >
-            {{ control.options.source.images[0] }}
-            <div
-              v-if="image && image.content"
-            >
-              <img
-                :src="image.content"
-                :alt="image.label"
-              />
-              <p>
-                {{ image.label }}
-              </p>
-            </div>
-          </div>
-        </v-col>
-
-        <v-col
-          cols="12"
-          md="4"
-        >
-          <div
-            v-if="control.options.source && control.options.source.body"
-            v-html="renderedBody"
-          />
-        </v-col>
-      </v-row>
-    </v-container> -->
-
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+    />
+    <app-control-hint :value="control.hint" />
     <div class="wrapper full-width">
 
       <div class="left">
@@ -45,19 +13,13 @@
           outlined
           v-if="control.options.source && control.options.source.images"
         >
-          <!-- {{ control.options.source.images[0] }} -->
-          <div
-            v-if="image && image.content"
-          >
+          <div v-if="image && image.content">
             <img
               :src="image.content"
               :alt="image.label"
               class="full-width"
               style="max-height: 80vh; object-fit: contain;"
             />
-            <!-- <p>
-            {{ image.label }}
-            </p> -->
 
           </div>
         </div>
@@ -71,6 +33,8 @@
         />
       </div>
     </div>
+
+    <app-control-more-info :value="control.moreInfo" />
 
   </div>
 </template>
@@ -127,7 +91,8 @@ export default {
 </script>
 
 <style>
-.md ul, .md ol {
+.md ul,
+.md ol {
   margin: 1rem 0;
 }
 
@@ -192,11 +157,11 @@ export default {
   margin-bottom: 0;
 }
 
-.md blockquote p+p,
-.md .info p+p,
-.md .error p+p,
-.md .success p+p,
-.md .warning p+p {
+.md blockquote p + p,
+.md .info p + p,
+.md .error p + p,
+.md .success p + p,
+.md .warning p + p {
   margin-bottom: 1rem;
 }
 
@@ -229,7 +194,6 @@ export default {
 </style>
 
 <style scoped>
-
 .instructions-image-split .wrapper {
   display: block;
 }
@@ -253,6 +217,5 @@ export default {
   .instructions-image-split .wrapper {
     display: flex;
   }
-
 }
 </style>

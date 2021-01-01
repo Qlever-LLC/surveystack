@@ -1,87 +1,77 @@
 <template>
-<v-card
-  class="image-resource-editor p-relative"
->
-  <v-card-title
-    class="d-flex"
-  >
-    <div>
-      Image Resource Editor
-    </div>
-    <v-spacer/>
-    <!-- <v-btn
-      icon
-    >
-      <v-icon>mdi-delete</v-icon>
+  <v-card class="image-resource-editor p-relative">
+    <v-card-title class="d-flex">
+      <div>
+        Image Resource Editor
+      </div>
+      <v-spacer />
 
-    </v-btn> -->
-    <v-btn
-      icon
-      class="p-absolute r-1 t-2"
-      @click="closeDialog"
-    >
-      <v-icon>mdi-close</v-icon>
-    </v-btn>
+      <v-btn
+        icon
+        @click="closeDialog"
+      >
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
 
-  </v-card-title>
-  <v-card-text>
-    <v-form
-      v-if="resource && (resource.label || resource.label === '') && (resource.name || resource.name === '') && (resource.content || resource.content === '')"
-      ref="form"
-    >
+    </v-card-title>
+    <v-card-text>
+      <v-form
+        v-if="resource && (resource.label || resource.label === '') && (resource.name || resource.name === '') && (resource.content || resource.content === '')"
+        ref="form"
+      >
         <!-- v-model="image.label" -->
-      <v-text-field
-        :value="resource.label"
-        @input="handleUpdateLabel"
-        label="Image Label"
-        :rules="[nameHasValidLength]"
-        persistent-hint
-        outlined
-      />
+        <v-text-field
+          :value="resource.label"
+          @input="handleUpdateLabel"
+          label="Image Label"
+          :rules="[nameHasValidLength]"
+          persistent-hint
+          outlined
+        />
         <!-- v-model="image.name" -->
-      <v-text-field
-        :value="resource.name"
-        @input="handleUpdateName"
-        label="Image Data Name"
-        persistent-hint
-        outlined
-        :rules="[nameIsUnique(resourceNames), nameHasValidCharacters, nameHasValidLength]"
-      />
+        <v-text-field
+          :value="resource.name"
+          @input="handleUpdateName"
+          label="Image Data Name"
+          persistent-hint
+          outlined
+          :rules="[nameIsUnique(resourceNames), nameHasValidCharacters, nameHasValidLength]"
+        />
         <!-- v-model="image.content" -->
-      <v-text-field
-        :value="resource.content"
-        @input="handleUpdateContent"
-        label="Image URL"
-        persistent-hint
-        outlined
-      />
-    </v-form>
-  </v-card-text>
-  <v-card-actions
-    class="px-6 pb-4"
-  >
-    <v-spacer/>
-    <v-btn
-      @click="updateResource"
-    >
-      Update
-    </v-btn>
-    <v-btn
-      @click="deleteResource"
-      color="error"
-      text
-    >
-      Delete
-    </v-btn>
+        <v-text-field
+          :value="resource.content"
+          @input="handleUpdateContent"
+          label="Image URL"
+          persistent-hint
+          outlined
+        />
+      </v-form>
+    </v-card-text>
+    <v-card-actions class="d-flex justify-space-between px-6 pb-4">
+      <v-btn
+        @click="deleteResource"
+        color="error"
+        text
+        tabindex="-1"
+      >
+        Delete
+      </v-btn>
+      <v-btn
+        @click="updateResource"
+        text
+        color="primary"
+      >
+        Update
+      </v-btn>
 
-    <!-- <v-btn
+      <!-- <v-btn
       @click="closeDialog"
       text
     >
       Close
     </v-btn> -->
-  </v-card-actions>
-</v-card>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script>
@@ -193,5 +183,4 @@ export default {
 </script>
 
 <style>
-
 </style>
