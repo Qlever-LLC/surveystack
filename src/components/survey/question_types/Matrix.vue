@@ -7,8 +7,9 @@
       @cancel="rowToBeDeleted = -1"
       title="Confirm Deletion"
       labelConfirm="DELETE"
+      :maxWidth="400"
     >
-      <pre>{{rows[rowToBeDeleted]}}</pre>
+      Do you want to delete this row?
     </app-dialog>
 
     <v-dialog
