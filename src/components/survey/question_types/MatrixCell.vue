@@ -97,17 +97,20 @@
       offset-y
       max-width="290px"
       min-width="290px"
+      ref="datepickermenu"
     >
       <template v-slot:activator="{ on, attrs }">
         <v-text-field
           :value="item[header.value].value"
           @input="v => {item[header.value].value = v; onInput()}"
+          @click="setActivePickerMonth"
           hide-details
           v-bind="attrs"
           v-on="on"
           solo
           autocomplete="off"
           :disabled="disabled"
+          readonly
         ></v-text-field>
       </template>
       <v-date-picker
@@ -169,6 +172,11 @@ export default {
       }
 
       this.onInput();
+    },
+    setActivePickerMonth() {
+      setTimeout(() => {
+        this.$refs.datepickermenu.$children[1].$children[0].activePicker = 'MONTH';
+      });
     },
     // copied/adapted from FarmOsPlanting.vue
     localChange(hashesArg) {
