@@ -100,6 +100,8 @@ async function flushlogs(farmUrl, credentials, user, id) {
     id
   );
 
+  console.log("res from logs operation", logs);
+
   if (logs.length === 0) {
     return results;
   }
@@ -122,7 +124,13 @@ async function flushlogs(farmUrl, credentials, user, id) {
     query
   );
 
-  results.push(r[0]);
+  console.log("res[0] from delete operation", JSON.stringify(r));
+
+  // response format
+  // [{"1406":[]}]
+
+  // TODO how to catch errors here?
+  // results.push(r);
   return results;
 }
 
@@ -247,6 +255,20 @@ export const handle = async (res, submission, survey, user) => {
   } catch (error) {
     console.log('error fetching farm info from aggregator');
     throw error;
+  }
+
+  console.log("compose", farmOsCompose);
+
+  const farmUrlMap = {};
+  farmOsCompose.forEach(c => {
+    const items = farmUrlMap[c.url];
+    farmUrlMap[c.url] = items === undefined ? 1 : items + 1;
+  })
+  for (const farmUrl of Object.keys(farmUrlMap)) {
+    const res = await flushlogs(farmUrl, credentials, user, submission._id);
+    if (res.length > 0) {
+      results.push(res);
+    }
   }
 
   // TODO, for all farms flush logs with data == submissionId
