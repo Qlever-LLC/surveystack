@@ -8,7 +8,7 @@
         v-if="showSubmit"
         class="d-flex flex-row"
       >
-        <div class="half pr-1">
+        <div class="half px-1">
           <v-btn
             @click="$store.dispatch('draft/showOverview', false)"
             outlined
@@ -21,7 +21,7 @@
           </v-btn>
         </div>
 
-        <div class="half pl-1">
+        <div class="half px-1">
           <v-btn
             :disabled="!enableSubmit"
             @click="$emit('submit');"
@@ -38,7 +38,7 @@
         v-else
         class="d-flex flex-row"
       >
-        <div class="half pr-1">
+        <div class="half px-1">
           <v-btn
             v-show="showPrev"
             @click="$emit('prev');"
@@ -51,7 +51,7 @@
             Previous
           </v-btn>
         </div>
-        <div class="half pl-1">
+        <div class="half px-1">
           <v-btn
             :disabled="!enableNext"
             @click="$emit('next');"

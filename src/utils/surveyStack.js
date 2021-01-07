@@ -55,8 +55,22 @@ export function getRelevance(submission, path, fallback = true) {
   return fallback;
 }
 
+export function queueAction(store, action, payload = null) {
+  const hasCustomOntologies = document.querySelector('.custom-ontology');
+  if (hasCustomOntologies) {
+    // super ugly but kind of needed hack to allow custom ontology selection to lose focus and update their values
+    setTimeout(() => {
+      store.dispatch(action, payload);
+    }, 100);
+    return;
+  }
+
+  store.dispatch(action, payload);
+}
+
 export default {
   getNested,
   setNested,
   getAllNodes,
+  queueAction,
 };

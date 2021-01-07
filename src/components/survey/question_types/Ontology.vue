@@ -7,7 +7,8 @@
     />
     <v-autocomplete
       :value="value"
-      @change="onChange"
+      @change="(v) => {comboboxSearch = null; onChange(v)}"
+      :search-input.sync="comboboxSearch"
       :items="items"
       item-text="label"
       item-value="value"
@@ -18,6 +19,8 @@
       :menu-props="autocompleteMenuProps"
       v-if="sourceIsValid && !control.options.allowCustomSelection"
       class="full-width"
+      hide-details
+      single-line
     >
       <template
         v-slot:selection="data"
@@ -44,8 +47,10 @@
       </template>
     </v-autocomplete>
     <v-combobox
+      v-else-if="sourceIsValid && control.options.allowCustomSelection"
       :value="value"
-      @change="onChange"
+      @change="(v) => {comboboxSearch = null; onChange(v)}"
+      :search-input.sync="comboboxSearch"
       :items="items"
       item-text="label"
       item-value="value"
@@ -56,9 +61,10 @@
       :label="control.hint"
       :multiple="!!control.options.hasMultipleSelections"
       :menu-props="autocompleteMenuProps"
-      v-else-if="sourceIsValid && control.options.allowCustomSelection"
       ref="input"
-      class="full-width"
+      class="full-width custom-ontology"
+      hide-details
+      single-line
     >
       <template v-slot:selection="data">
         <v-chip
@@ -101,6 +107,11 @@ import baseQuestionComponent from './BaseQuestionComponent';
 
 export default {
   mixins: [baseQuestionComponent],
+  data() {
+    return {
+      comboboxSearch: null,
+    };
+  },
   methods: {
     onChange(v) {
       if (this.value !== v) {
