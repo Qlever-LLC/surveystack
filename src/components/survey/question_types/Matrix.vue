@@ -362,11 +362,9 @@ export default {
     add() {
       // create empty row object from headers
       const newRow = this.fields.reduce((accu, current) => ({ ...accu, [current]: { value: null } }), {});
-      console.log(newRow);
 
       // eslint-disable-next-line
       for (const key of Object.keys(newRow)) {
-        console.log(key);
         const header = this.headers.find(h => h.value === key);
 
         if (header && header.redacted) {

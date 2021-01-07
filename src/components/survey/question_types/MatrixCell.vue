@@ -31,21 +31,28 @@
     v-else-if="(header.type === 'autocomplete') && header.custom"
     :items="getDropdownItems(header.value)"
     :value="item[header.value].value"
-    @input="v => {onInputCombobox(item, header, v)}"
-    hide-details
-    solo
+    @input="v => {comboboxSearch = null; item[header.value].value = v; onInput()}"
+    :delimiters="[',']"
     :multiple="header.multiple"
     :disabled="disabled"
+    :return-object="false"
+    :search-input.sync="comboboxSearch"
+    single-line
+    :chips="header.multiple"
+    :deletable-chips="header.multiple"
+    solo
+    hide-details
   />
   <v-autocomplete
     v-else-if="(header.type === 'autocomplete') && !header.custom"
     :items="getDropdownItems(header.value)"
     :value="item[header.value].value"
-    @input="v => {item[header.value].value = v; onInput()}"
+    @input="v => {comboboxSearch = null; item[header.value].value = v; onInput()}"
     hide-details
     solo
     :multiple="header.multiple"
     :disabled="disabled"
+    :search-input.sync="comboboxSearch"
   />
   <v-autocomplete
     v-else-if="header.type === 'farmos_field'"
@@ -154,6 +161,7 @@ export default {
   data() {
     return {
       menus: {}, // object to hold v-models for v-menu
+      comboboxSearch: null,
     };
   },
   methods: {
