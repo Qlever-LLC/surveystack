@@ -75,8 +75,8 @@
       :enableSubmit="!$store.getters['draft/errors']"
       :showSubmit="showOverview"
       :showNav="true"
-      @next="$store.dispatch('draft/next')"
-      @prev="$store.dispatch('draft/prev')"
+      @next="next"
+      @prev="prev"
       @submit="showConfirmSubmission = true"
     />
 
@@ -89,6 +89,8 @@ import appDraftFooter from '@/components/survey/drafts/DraftFooter.vue';
 import appDraftOverview from '@/components/survey/drafts/DraftOverview.vue';
 import appDraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 import appConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
+
+import { queueAction } from '@/utils/surveyStack';
 
 
 export default {
@@ -125,7 +127,8 @@ export default {
         return this.$store.getters['draft/showOverview'];
       },
       set(v) {
-        this.$store.dispatch('draft/showOverview', v);
+        // this.$store.dispatch('draft/showOverview', v);
+        queueAction(this.$store, 'draft/showOverview', v);
       },
     },
     showConfirmSubmission: {
@@ -162,6 +165,14 @@ export default {
     },
   },
   methods: {
+    next() {
+      // this.$store.dispatch('draft/next')
+      queueAction(this.$store, 'draft/next');
+    },
+    prev() {
+      // this.$store.dispatch('draft/prev')
+      queueAction(this.$store, 'draft/prev');
+    },
     goto(path) {
       this.$store.dispatch('draft/goto', path);
       this.showOverview = false;

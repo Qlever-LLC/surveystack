@@ -42,6 +42,7 @@
     :deletable-chips="header.multiple"
     solo
     hide-details
+    class="custom-ontology"
   />
   <v-autocomplete
     v-else-if="(header.type === 'autocomplete') && !header.custom"

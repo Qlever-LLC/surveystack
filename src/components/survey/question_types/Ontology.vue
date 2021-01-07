@@ -47,6 +47,7 @@
       </template>
     </v-autocomplete>
     <v-combobox
+      v-else-if="sourceIsValid && control.options.allowCustomSelection"
       :value="value"
       @change="(v) => {comboboxSearch = null; onChange(v)}"
       :search-input.sync="comboboxSearch"
@@ -60,9 +61,8 @@
       :label="control.hint"
       :multiple="!!control.options.hasMultipleSelections"
       :menu-props="autocompleteMenuProps"
-      v-else-if="sourceIsValid && control.options.allowCustomSelection"
       ref="input"
-      class="full-width"
+      class="full-width custom-ontology"
       hide-details
       single-line
     >
