@@ -93,7 +93,8 @@
 
     <v-data-table
       :headers="headers"
-      :hide-default-footer="true"
+      disable-pagination
+      hide-default-footer
       hide-default-header
       :items="rows"
       disable-sort
