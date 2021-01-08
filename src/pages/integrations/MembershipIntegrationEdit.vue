@@ -146,7 +146,7 @@ export default {
         if (newVal === 'farmos-farm') {
           const m = await api.get(`/memberships/${this.entity.membership}`);
 
-          const gi = await api.get(`/group-integrations?group=${m.data.group}&type=farmos-aggregator`);
+          const gi = await api.get(`/group-integrations?group=${m.data.group}&type=farmos-aggregator&populate=true`);
           this.aggregators = [];
           gi.data.forEach(async (aggregator) => {
             const { data } = await api.get(`/farmos/integrations/${aggregator._id}/farms`);
