@@ -28,7 +28,8 @@ function match(answers, thisValue) {
 export function checkIfAny(question, ...answers) { // answers is always passed as an array!
   let values = question.value;
   // return false if question is not relevant
-  if (typeof question.meta.computedRelevance !== 'undefined'
+  if (typeof question.meta !== 'undefined'
+    && typeof question.meta.computedRelevance !== 'undefined'
     && question.meta.computedRelevance === false) {
     // console.log(`answer: ${JSON.stringify(answers)}
     // question.value: ${JSON.stringify(values)}
@@ -84,7 +85,8 @@ export function checkIfAny(question, ...answers) { // answers is always passed a
 export function checkIfNone(question, ...answers) {
   let values = question.value;
   // return false if question is not relevant
-  if (typeof question.meta.computedRelevance !== 'undefined'
+  if (typeof question.meta !== 'undefined'
+    && typeof question.meta.computedRelevance !== 'undefined'
     && question.meta.computedRelevance === false) {
     // console.log(`answer: ${JSON.stringify(answers)}
     // question.value: ${JSON.stringify(values)}
@@ -137,7 +139,8 @@ export function checkIfNone(question, ...answers) {
 export function getCleanArray(chooseMult) {
   let thisAnswer = chooseMult.value;
   // if it's not relevant or null, set it to empty string
-  if (typeof chooseMult.meta.computedRelevance !== 'undefined'
+  if (typeof chooseMult.meta !== 'undefined'
+    && typeof chooseMult.meta.computedRelevance !== 'undefined'
     && chooseMult.meta.computedRelevance === false) {
     thisAnswer = [];
   }
@@ -153,7 +156,8 @@ export function getCleanArray(chooseMult) {
  */
 export function getClean(chooseOne) {
   let thisAnswer = chooseOne.value;
-  if (typeof chooseOne.meta.computedRelevance !== 'undefined'
+  if (typeof chooseOne.meta !== 'undefined'
+    && typeof chooseOne.meta.computedRelevance !== 'undefined'
     && chooseOne.meta.computedRelevance === false) {
     thisAnswer = '';
   }
