@@ -146,7 +146,7 @@ export function getCleanArray(chooseMult) {
         && chooseMult.meta.computedRelevance === false) {
         return thisAnswer;
     }
-    if (thisAnswer === null) {
+    if (chooseMult.value === null) {
         return thisAnswer; // question is null
     }
     thisAnswer = chooseMult.value;  // if it's passed all that, set it to the value
@@ -169,7 +169,7 @@ function getClean(chooseOne) {
         && chooseOne.meta.computedRelevance === false) {
         return thisAnswer;
     }
-    if (thisAnswer === null) {
+    if (chooseOne.value === null) {
         return thisAnswer; // question is null
     }
     thisAnswer = chooseOne.value;  // if it's passed all that, set it to the value
