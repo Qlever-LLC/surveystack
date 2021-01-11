@@ -190,6 +190,10 @@ export const handle = async (res, submission, survey, user) => {
 
     const compose = [];
 
+    if (field.meta.relevant === false) {
+      return;
+    }
+
     if (Array.isArray(field.meta.apiCompose)) {
       for (const c of field.meta.apiCompose) {
         compose.push(c);
