@@ -337,11 +337,11 @@ const buildPipeline = async (req, res) => {
         throw boom.badRequest(`Bad query paramter sort, value must be either 1 or -1`);
       }
     });
-
-    pipeline.push({
-      $sort: sort,
-    });
   }
+
+  pipeline.push({
+    $sort: sort,
+  });
   return pipeline;
 };
 
