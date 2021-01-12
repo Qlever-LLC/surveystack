@@ -22,6 +22,7 @@
         @delete="removeResource"
         @close-dialog="matrixEditorDialog = false"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
+        @set-control-required="(val) => $emit('set-control-required')"
       />
     </v-dialog>
     <h4 class="mt-4">Config</h4>

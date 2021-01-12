@@ -240,6 +240,7 @@
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         class="mt-5"
+        @set-control-required="control.options.required = true"
       />
 
       <instructions-editor
@@ -373,6 +374,9 @@ export default {
     },
   },
   methods: {
+    log(v) {
+      console.log(v);
+    },
     nameIsUnique(val) {
       const hasSameNameAndDifferentId = control => control.name === this.control.name && control.id !== this.control.id;
       const parent = findParentByChildId(this.control.id, this.controls);
