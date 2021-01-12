@@ -9,8 +9,8 @@
 
 function match(answers, thisValue) {
   if ((typeof thisValue === 'string'
-    || typeof thisValue === 'number')
-    && answers.includes(thisValue)) {
+        || typeof thisValue === 'number')
+        && answers.includes(thisValue)) {
     return true;
   }
   return false;
@@ -142,8 +142,8 @@ export function getCleanArray(chooseMult) {
   if (typeof chooseMult === 'undefined') { // question doesnt' exist
     return thisAnswer;
   } if (typeof chooseMult.meta !== 'undefined' // question not relevant
-    && typeof chooseMult.meta.computedRelevance !== 'undefined'
-    && chooseMult.meta.computedRelevance === false) {
+        && typeof chooseMult.meta.computedRelevance !== 'undefined'
+        && chooseMult.meta.computedRelevance === false) {
     return thisAnswer;
   }
   if (chooseMult.value === null) {
@@ -165,8 +165,8 @@ function getClean(chooseOne) {
   if (typeof chooseOne === 'undefined') { // question doesnt' exist
     return thisAnswer;
   } if (typeof chooseOne.meta !== 'undefined' // question not relevant
-    && typeof chooseOne.meta.computedRelevance !== 'undefined'
-    && chooseOne.meta.computedRelevance === false) {
+        && typeof chooseOne.meta.computedRelevance !== 'undefined'
+        && chooseOne.meta.computedRelevance === false) {
     return thisAnswer;
   }
   if (chooseOne.value === null) {
