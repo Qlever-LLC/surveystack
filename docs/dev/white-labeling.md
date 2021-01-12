@@ -2,12 +2,14 @@
 
 ## Domain / Operations
 
-- create new CNAME entry pointing to AWS
-- create Loadbalancer Entry pointing to production in EC2
+- create new CNAME entry pointing to AWS, (deprecated, has wildcard now)
+- create Loadbalancer Entry pointing to production in EC2 (deprecated, has wildcard now)
 
 
 ## Customizing
 
-- Create Logo and Manifest with https://maskable.app/editor
+- create `icon.svg` in `public/partners/<partner>/`
+- change into directory
+- run `../gen-icon.sh icon.svg` to generate scaled versions
 - Store in `public/partners` (create subfolder matching subdomain)
 - Add new `js` in `src/partners`.

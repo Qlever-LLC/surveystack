@@ -17,7 +17,7 @@ async function calculateField(survey, submission, positions, controls, option, f
     const field = submissionUtils.getSubmissionField(submission, survey, pos);
 
     if (fname !== 'relevance') { // if field happens to be irrelvant, but skip this if we eval relevance
-      if (field.meta.computedRelevance !== undefined && field.meta.computedRelevance === false) {
+      if (field.meta.relevant !== undefined && field.meta.relevant === false) {
         ignored.push({
           control,
           field,

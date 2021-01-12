@@ -9,8 +9,8 @@
 
 function match(answers, thisValue) {
   if ((typeof thisValue === 'string'
-        || typeof thisValue === 'number')
-        && answers.includes(thisValue)) {
+    || typeof thisValue === 'number')
+    && answers.includes(thisValue)) {
     return true;
   }
   return false;
@@ -137,42 +137,42 @@ export function checkIfNone(question, ...answers) {
  * @param {chooseMult} multiple choice select answer root (not .value!)
  */
 export function getCleanArray(chooseMult) {
-    let thisAnswer = [];
-    // if it's not relevant or null, set it to empty array
-    if (typeof chooseMult === 'undefined') {  // question doesnt' exist
-        return thisAnswer;
-    } else if (typeof chooseMult.meta !== 'undefined' // question not relevant
-        && typeof chooseMult.meta.computedRelevance !== 'undefined'
-        && chooseMult.meta.computedRelevance === false) {
-        return thisAnswer;
-    }
-    if (chooseMult.value === null) {
-        return thisAnswer; // question is null
-    }
-    thisAnswer = chooseMult.value;  // if it's passed all that, set it to the value
-    // this is a bug... but if it's a string, set it to an array with that string in it
-    if (!Array.isArray(thisAnswer)) thisAnswer = [thisAnswer]; // ensure it's an array
-    console.log(`clean ${chooseMult.value} to ${JSON.stringify(thisAnswer)}`);
+  let thisAnswer = [];
+  // if it's not relevant or null, set it to empty array
+  if (typeof chooseMult === 'undefined') { // question doesnt' exist
     return thisAnswer;
+  } if (typeof chooseMult.meta !== 'undefined' // question not relevant
+    && typeof chooseMult.meta.computedRelevance !== 'undefined'
+    && chooseMult.meta.computedRelevance === false) {
+    return thisAnswer;
+  }
+  if (chooseMult.value === null) {
+    return thisAnswer; // question is null
+  }
+  thisAnswer = chooseMult.value; // if it's passed all that, set it to the value
+  // this is a bug... but if it's a string, set it to an array with that string in it
+  if (!Array.isArray(thisAnswer)) thisAnswer = [thisAnswer]; // ensure it's an array
+  console.log(`clean ${chooseMult.value} to ${JSON.stringify(thisAnswer)}`);
+  return thisAnswer;
 }
 /**
  * clean result (check existence, check string, check relevance) from single choice select answer
  * @param {chooseOne} single choice select answer root (not .value!)
  */
 function getClean(chooseOne) {
-    let thisAnswer = '';
-    // if it's not relevant or null, set it to empty string
-    if (typeof chooseOne === 'undefined') {  // question doesnt' exist
-        return thisAnswer;
-    } else if (typeof chooseOne.meta !== 'undefined' // question not relevant
-        && typeof chooseOne.meta.computedRelevance !== 'undefined'
-        && chooseOne.meta.computedRelevance === false) {
-        return thisAnswer;
-    }
-    if (chooseOne.value === null) {
-        return thisAnswer; // question is null
-    }
-    thisAnswer = chooseOne.value;  // if it's passed all that, set it to the value
-    console.log(`clean "${chooseOne.value}" to "${thisAnswer}"`);
+  let thisAnswer = '';
+  // if it's not relevant or null, set it to empty string
+  if (typeof chooseOne === 'undefined') { // question doesnt' exist
     return thisAnswer;
+  } if (typeof chooseOne.meta !== 'undefined' // question not relevant
+    && typeof chooseOne.meta.computedRelevance !== 'undefined'
+    && chooseOne.meta.computedRelevance === false) {
+    return thisAnswer;
+  }
+  if (chooseOne.value === null) {
+    return thisAnswer; // question is null
+  }
+  thisAnswer = chooseOne.value; // if it's passed all that, set it to the value
+  console.log(`clean "${chooseOne.value}" to "${thisAnswer}"`);
+  return thisAnswer;
 }
