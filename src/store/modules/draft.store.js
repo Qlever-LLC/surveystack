@@ -103,9 +103,8 @@ const getters = {
       const requiredAndUnansweredPaths = [];
       state.node.walk((c) => {
         const path = c.getPath().map(n => n.model.name).join('.');
-        const value = surveyStackUtils.getNested(state.submission, `${path}.value`);
 
-        if (c.model.options.required && value === null) {
+        if (c.model.options.required && !surveyStackUtils.isAnswered(c, state.submission)) {
           requiredAndUnansweredPaths.push(path);
         }
       });
@@ -121,11 +120,9 @@ const getters = {
       return false;
     }
 
-    const path = state.node.getPath().map(n => n.model.name).join('.');
     const { required } = state.node.model.options;
-    const value = surveyStackUtils.getNested(state.submission, `${path}.value`);
 
-    if (required && value === null) {
+    if (required && !surveyStackUtils.isAnswered(state.node, state.submission)) {
       return true;
     }
 

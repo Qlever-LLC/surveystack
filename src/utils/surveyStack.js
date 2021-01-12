@@ -68,9 +68,35 @@ export function queueAction(store, action, payload = null) {
   store.dispatch(action, payload);
 }
 
+export function isAnswered(node, submission) {
+  const { type } = node.model;
+  const path = node.getPath().map(n => n.model.name).join('.');
+  const value = getNested(submission, `${path}.value`, null);
+
+  if (type === 'matrix') {
+    if (!value || (Array.isArray(value) && value.length === 0)) {
+      return false;
+    }
+    console.log(value);
+    const requiredCols = node.model.options.source.content.filter(h => h.required).map(h => h.value);
+    let answered = true;
+    value.forEach((row) => {
+      requiredCols.forEach((col) => {
+        if (row[col] === null) {
+          answered = false;
+        }
+      });
+    });
+    return answered;
+  }
+
+  return value != null;
+}
+
 export default {
   getNested,
   setNested,
   getAllNodes,
   queueAction,
+  isAnswered,
 };

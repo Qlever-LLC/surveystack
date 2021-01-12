@@ -145,7 +145,6 @@
               </div>
 
               <v-checkbox
-                v-if="false"
                 v-model="item.required"
                 label="Required"
                 class="mt-2"
