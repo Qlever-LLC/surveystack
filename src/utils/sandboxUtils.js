@@ -159,7 +159,7 @@ export function getCleanArray(chooseMult) {
  * clean result (check existence, check string, check relevance) from single choice select answer
  * @param {chooseOne} single choice select answer root (not .value!)
  */
-function getClean(chooseOne) {
+export function getClean(chooseOne) {
   let thisAnswer = '';
   // if it's not relevant or null, set it to empty string
   if (typeof chooseOne === 'undefined') { // question doesnt' exist
