@@ -23,9 +23,11 @@ async function calculateField({
       };
     }
 
+    const relevant = surveyStackUtils.getRelevance(submission, path, true);
     // skip calculation if field was already computed as irrelevant
-    if (fname !== 'relevance' && field.meta.computedRelevance !== undefined && field.meta.computedRelevance === false) {
+    if (fname !== 'relevance' && !relevant) {
       // TODO: may want to return null here too?
+      console.log('skipping, not relevant', path);
       return {
         path,
         control,
