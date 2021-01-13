@@ -297,13 +297,17 @@ const actions = {
     const errors = [];
     apiCompositions.forEach((apiComposition) => {
       const {
-        result, path, skip, error,
+        result, path, skip, error, clear,
       } = apiComposition;
       if (error) {
         errors.push({ path, error });
       }
       if (!skip) {
         commit('SET_PROPERTY', { path: `${path}.meta.apiCompose`, value: result });
+      }
+
+      if (clear) {
+        commit('SET_PROPERTY', { path: `${path}.meta.apiCompose`, value: null });
       }
     });
     if (errors.length > 0) {
