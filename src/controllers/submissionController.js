@@ -644,8 +644,9 @@ const updateSubmission = async (req, res) => {
   existing.meta.archivedReason = entity.meta.archivedReason || 'RESUBMIT';
   await db.collection(col).insertOne(existing);
 
-  // update with upped revision
+  // update with upped revision and resubmitter
   entity.meta.revision = updatedRevision;
+  entity.meta.resubmitter = new ObjectId(res.locals.auth.user._id);
 
   const survey = await db.collection('surveys').findOne({ _id: entity.meta.survey.id });
   if (!survey) {
@@ -654,9 +655,9 @@ const updateSubmission = async (req, res) => {
 
   const farmosResults = [];
   try {
-    // TODO: should we use the currently logged in user or the submission's user?
-    // probably the submission's user (for instance if submission is re-assigned with a different user)
-    const results = await farmOsService.handle(res, entity, survey, res.locals.auth.user);
+    // re-run with original creator user
+    const creator = await db.collection('users').findOne({ _id: entity.meta.creator });
+    const results = await farmOsService.handle(res, entity, survey, creator);
     farmosResults.push(...results);
     // could contain errors, need to pass these on to the user
   } catch (error) {

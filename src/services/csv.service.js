@@ -43,6 +43,10 @@ function createHeaders(mergedObject, entities) {
     if (mergedObject.meta.original) {
       mergedObject.meta.original = mergedObject.meta.original.toString();
     }
+
+    if (mergedObject.meta.resubmitter) {
+      mergedObject.meta.resubmitter = mergedObject.meta.resubmitter.toString();
+    }
   }
 
   let merged = flatten(mergedObject);
@@ -122,6 +126,10 @@ function createCsv(submissions, headers) {
 
       if (s.meta.original) {
         s.meta.original = s.meta.original.toString();
+      }
+
+      if (s.meta.resubmitter) {
+        s.meta.resubmitter = s.meta.resubmitter.toString();
       }
     }
 
