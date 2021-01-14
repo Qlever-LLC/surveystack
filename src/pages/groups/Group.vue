@@ -16,7 +16,7 @@
 
     <div
       style="color: red;"
-      v-if="entity.archived"
+      v-if="entity.meta.archived"
     ><strong>Please note:</strong> this group is currently archived</div>
     <h1>
       {{entity.name}}
