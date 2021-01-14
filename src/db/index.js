@@ -28,6 +28,7 @@ const connectDatabase = async () => {
   // migrations
   await migrateScripts_V1toV2();
   await migrateSurveys_VXtoV4();
+  await migrateGroups_VXtoV2();
 };
 
 const migrateScripts_V1toV2 = async () => {
@@ -106,6 +107,27 @@ const migrateSurveys_VXtoV4_control = (control, depth = 0) => {
     for (const child of control.children) {
       migrateSurveys_VXtoV4_control(child, depth + 1);
     }
+  }
+};
+
+const migrateGroups_VXtoV2 = async () => {
+  const r = await db.collection('groups').updateMany({ 'meta.specVersion': null }, [
+    {
+      $set: {
+        meta: {
+          archived: { $ifNull: ['$archived', false] },
+          specVersion: 2,
+          invitationOnly: true,
+        },
+      },
+    },
+    {
+      $unset: 'archived',
+    },
+  ]);
+
+  if (r.modifiedCount > 0) {
+    console.log('Migration: updated this many groups:', r.modifiedCount);
   }
 };
 

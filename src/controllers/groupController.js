@@ -120,9 +120,9 @@ const getGroups = async (req, res) => {
   let entities;
   let dir = '/';
 
-  let archivedQuery = { $ne: true };
+  let archived = false;
   if (queryParam(showArchived)) {
-    archivedQuery = true;
+    archived = true;
   }
 
   if (req.query.dir) {
@@ -141,7 +141,7 @@ const getGroups = async (req, res) => {
 
   entities = await db
     .collection(col)
-    .find({ dir: dirQuery, archived: archivedQuery })
+    .find({ dir: dirQuery, 'meta.archived': archived })
     .sort({ path: 1 })
     .toArray();
   return res.send(entities);
