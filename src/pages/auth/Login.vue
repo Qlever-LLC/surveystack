@@ -1,5 +1,5 @@
 <template>
-  <v-container class="maxw-40">
+  <v-container class="maxw-40 px-0">
     <v-card class="pa-5">
       <h1>Login</h1>
       <v-form>

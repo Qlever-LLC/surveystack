@@ -36,6 +36,7 @@ const actions = {
 
 const mutations = {
   RESET(state) {
+    // a logout calls a global reset, but we still want to keep any whitelabel specifics
     const { partner } = state;
     Object.assign(state, createInitialState());
     state.partner = partner;

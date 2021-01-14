@@ -58,6 +58,9 @@ export default {
         // TODO use vuex store here
         vue.$store.dispatch('appui/setPartner', activePartner);
         vue.$store.dispatch('appui/setTitle', activePartner.name);
+
+        // set whitelabel
+        vue.$store.dispatch('whitelabel/setPartner', activePartner);
       }
     }
 

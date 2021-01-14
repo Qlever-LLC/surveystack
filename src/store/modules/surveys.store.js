@@ -1,23 +1,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable-next-line no-await-in-loop */
-
-
 import api from '@/services/api.service';
-
-
-export const types = {
-  FETCH_SURVEY: 'FETCH_SURVEY',
-  FETCH_SURVEYS: 'FETCH_SURVEYS',
-  // GET_SURVEY: 'GET_SURVEY',
-  SET_SURVEY: 'SET_SURVEY',
-  SET_PINNED: 'SET_PINNED',
-  RESET: 'RESET',
-  REMOVE_SURVEY: 'REMOVE_SURVEY',
-  ADD_SURVEY: 'ADD_SURVEY',
-  SET_SURVEYS: 'SET_SURVEYS',
-  CREATE_SURVEY: 'CREATE_SURVEY',
-};
 
 const createInitialState = () => ({
   surveys: [],
@@ -31,37 +15,18 @@ const getters = {
   getPinned: state => state.pinned,
 };
 
-const mutations = {
-  [types.RESET](state) {
-    Object.assign(state, createInitialState());
-  },
-  [types.ADD_SURVEY](state, survey) {
-    state.surveys.push(survey);
-  },
-  [types.SET_SURVEYS](state, surveys) {
-    state.surveys = surveys;
-  },
-  [types.REMOVE_SURVEY](state, id) {
-    const index = state.surveys.findIndex(survey => survey._id === id);
-    state.submissions.splice(index, 1);
-  },
-  [types.SET_PINNED](state, pinned) {
-    state.pinned = pinned;
-  },
-};
-
 const actions = {
   reset({ commit }) {
-    commit(types.RESET);
+    commit('RESET');
   },
   async fetchSurveys({ commit }) {
     const response = await api.get('/surveys');
-    commit(types.SET_SURVEYS, response.data);
+    commit('SET_SURVEYS', response.data);
     return response.data;
   },
   async fetchSurvey({ commit }, id) {
     const response = await api.get(`/surveys/${id}`);
-    commit(types.ADD_SURVEY, response.data);
+    commit('ADD_SURVEY', response.data);
     return response.data;
   },
   async fetchPinned({
@@ -96,14 +61,34 @@ const actions = {
       }
     }
 
-    commit(types.SET_PINNED, pinned);
+    commit('SET_PINNED', pinned);
 
     return pinned;
   },
   removeSurvey({ commit }, id) {
-    commit(types.REMOVE_SURVEY, id);
+    commit('REMOVE_SURVEY', id);
   },
 };
+
+const mutations = {
+  RESET(state) {
+    Object.assign(state, createInitialState());
+  },
+  ADD_SURVEY(state, survey) {
+    state.surveys.push(survey);
+  },
+  SET_SURVEYS(state, surveys) {
+    state.surveys = surveys;
+  },
+  REMOVE_SURVEY(state, id) {
+    const index = state.surveys.findIndex(survey => survey._id === id);
+    state.submissions.splice(index, 1);
+  },
+  SET_PINNED(state, pinned) {
+    state.pinned = pinned;
+  },
+};
+
 
 export default {
   namespaced: true,
@@ -111,5 +96,4 @@ export default {
   getters,
   actions,
   mutations,
-  types,
 };
