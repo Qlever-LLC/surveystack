@@ -1,3 +1,4 @@
+/* eslint no-restricted-syntax: 0 */
 import Vue from 'vue';
 // TODO: try to get rid of Vue import
 // But we kind of need Vue.set for setting new properties without losing reactivity
@@ -79,13 +80,15 @@ export function isAnswered(node, submission) {
     }
     const requiredCols = node.model.options.source.content.filter(h => h.required).map(h => h.value);
     let answered = true;
-    value.forEach((row) => {
-      requiredCols.forEach((col) => {
-        if (row[col] === null) {
+    for (const row of value) {
+      for (const requiredCol of requiredCols) {
+        console.log(`row[${requiredCol}].value`, row[requiredCol].value);
+        if (row[requiredCol].value === null) {
           answered = false;
         }
-      });
-    });
+      }
+    }
+
     return answered;
   }
 
