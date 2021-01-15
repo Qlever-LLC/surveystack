@@ -145,8 +145,8 @@
               </div>
 
               <v-checkbox
-                @change="(v) => {v && $emit('set-control-required'); item.required = v}"
-                :value="item.required"
+                v-model="item.required"
+                @change="(v) => { v && $emit('set-control-required')}"
                 label="Required"
                 class="mt-2"
                 hide-details
