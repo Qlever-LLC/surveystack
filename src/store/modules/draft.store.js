@@ -103,9 +103,8 @@ const getters = {
       const requiredAndUnansweredPaths = [];
       state.node.walk((c) => {
         const path = c.getPath().map(n => n.model.name).join('.');
-        const value = surveyStackUtils.getNested(state.submission, `${path}.value`);
 
-        if (c.model.options.required && value === null) {
+        if (c.model.options.required && !surveyStackUtils.isAnswered(c, state.submission)) {
           requiredAndUnansweredPaths.push(path);
         }
       });
@@ -121,11 +120,9 @@ const getters = {
       return false;
     }
 
-    const path = state.node.getPath().map(n => n.model.name).join('.');
     const { required } = state.node.model.options;
-    const value = surveyStackUtils.getNested(state.submission, `${path}.value`);
 
-    if (required && value === null) {
+    if (required && !surveyStackUtils.isAnswered(state.node, state.submission)) {
       return true;
     }
 
@@ -287,9 +284,9 @@ const actions = {
     const calculations = await codeEvaluator.calculateRelevance(nodes, state.submission, state.survey);
     calculations.forEach((calculation) => {
       const { result, path, skip } = calculation;
-      // TODO: set computedRelevance as well
       if (!skip) {
         commit('SET_PROPERTY', { path: `${path}.meta.relevant`, value: result });
+        // commit('SET_PROPERTY', { path: `${path}.meta.computedRelevance`, value: result }); // TODO: set computedRelevance as well?
       }
     });
   },
@@ -300,13 +297,17 @@ const actions = {
     const errors = [];
     apiCompositions.forEach((apiComposition) => {
       const {
-        result, path, skip, error,
+        result, path, skip, error, clear,
       } = apiComposition;
       if (error) {
         errors.push({ path, error });
       }
       if (!skip) {
         commit('SET_PROPERTY', { path: `${path}.meta.apiCompose`, value: result });
+      }
+
+      if (clear) {
+        commit('SET_PROPERTY', { path: `${path}.meta.apiCompose`, value: null });
       }
     });
     if (errors.length > 0) {

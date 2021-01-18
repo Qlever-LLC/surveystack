@@ -145,8 +145,8 @@
               </div>
 
               <v-checkbox
-                v-if="false"
                 v-model="item.required"
+                @change="(v) => { v && $emit('set-control-required')}"
                 label="Required"
                 class="mt-2"
                 hide-details
@@ -233,6 +233,9 @@ export default {
     },
   },
   methods: {
+    log(v) {
+      console.log(v);
+    },
     removeResource(id) {
       const index = this.resources.findIndex(r => r.id === id);
       const newResources = [

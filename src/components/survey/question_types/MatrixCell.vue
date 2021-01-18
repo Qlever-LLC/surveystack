@@ -59,7 +59,7 @@
     v-else-if="header.type === 'farmos_field'"
     :items="farmos.farms || []"
     :value="item[header.value].value"
-    @input="v => {item[header.value].value = v; onInput()}"
+    @input="v => {item[header.value].value = v || {}; onInput()}"
     item-text="label"
     item-value="value"
     hide-details
@@ -79,7 +79,7 @@
   <v-autocomplete
     v-else-if="header.type === 'farmos_planting'"
     :value="item[header.value].value"
-    @input="v => {item[header.value].value = localChange(v); onInput()}"
+    @input="v => {item[header.value].value = localChange(v) || {}; onInput()}"
     :items="farmos.plantings || []"
     item-text="label"
     item-value="value"

@@ -23,14 +23,16 @@ async function calculateField({
       };
     }
 
+    const relevant = surveyStackUtils.getRelevance(submission, path, true);
     // skip calculation if field was already computed as irrelevant
-    if (fname !== 'relevance' && field.meta.computedRelevance !== undefined && field.meta.computedRelevance === false) {
+    if (fname !== 'relevance' && !relevant) {
       // TODO: may want to return null here too?
       return {
         path,
         control,
         field,
         skip: true,
+        clear: true,
       };
     }
 
@@ -42,7 +44,10 @@ async function calculateField({
 
   // execution
   for (const item of items) {
-    if (item.skip) {
+    if (item.skip && item.clear) {
+      item.result = null;
+      continue; // eslint-disable-line no-continue
+    } else if (item.skip) {
       continue; // eslint-disable-line no-continue
     }
     try {

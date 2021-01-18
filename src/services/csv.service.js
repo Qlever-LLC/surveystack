@@ -99,6 +99,10 @@ function createCsv(submissions, headers) {
       if (submission.meta.original) {
         submission.meta.original = submission.meta.original.toString();
       }
+
+      if (submission.meta.resubmitter) {
+        submission.meta.resubmitter = submission.meta.resubmitter.toString();
+      }
     }
 
     removeKeys(submission.data, ['meta']);

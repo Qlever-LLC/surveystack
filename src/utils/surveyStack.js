@@ -1,3 +1,4 @@
+/* eslint no-restricted-syntax: 0 */
 import Vue from 'vue';
 // TODO: try to get rid of Vue import
 // But we kind of need Vue.set for setting new properties without losing reactivity
@@ -68,9 +69,42 @@ export function queueAction(store, action, payload = null) {
   store.dispatch(action, payload);
 }
 
+export function isAnswered(node, submission) {
+  const { type } = node.model;
+  const path = node.getPath().map(n => n.model.name).join('.');
+  const value = getNested(submission, `${path}.value`, null);
+
+  if (type === 'matrix') {
+    if (!value || (Array.isArray(value) && value.length === 0)) {
+      return false;
+    }
+    const requiredCols = node.model.options.source.content.filter(h => h.required).map(h => h.value);
+    let answered = true;
+    for (const row of value) {
+      for (const requiredCol of requiredCols) {
+        console.log(`row[${requiredCol}].value`, row[requiredCol].value);
+        if (row[requiredCol].value === null) {
+          answered = false;
+        }
+      }
+    }
+
+    return answered;
+  }
+
+  if (type === 'page' || type === 'instructions' || type === 'instructionsImageSplit') {
+    // we may want to have a "instructions read" checkbox or similar at one point
+    // for now, just assume this is answered so users can progress further
+    return true;
+  }
+
+  return value != null;
+}
+
 export default {
   getNested,
   setNested,
   getAllNodes,
   queueAction,
+  isAnswered,
 };

@@ -36,8 +36,14 @@
           persistent-hint
         />
         <v-checkbox
+          label="Invitation Only"
+          v-model="entity.meta.invitationOnly"
+          :hint="entity.meta.invitationOnly ? 'Users can only join through an invitation' : 'Everybody may join this group'"
+          persistent-hint
+        />
+        <v-checkbox
           label="Archived"
-          v-model="entity.archived"
+          v-model="entity.meta.archived"
         />
         <div class="d-flex justify-end pa-2">
           <v-btn
@@ -132,6 +138,7 @@ import appFarmHubOnboarding from '@/components/integrations/FarmHubOnboarding.vu
 
 
 import { handleize } from '@/utils/groups';
+import { SPEC_VERSION_GROUP } from '@/constants';
 
 export default {
   components: {
@@ -146,6 +153,11 @@ export default {
       editMode: true,
       entity: {
         _id: '',
+        meta: {
+          archived: false,
+          specVersion: SPEC_VERSION_GROUP,
+          invitationOnly: true,
+        },
         name: '',
         slug: '',
         dir: '/',
@@ -153,7 +165,6 @@ export default {
         surveys: {
           pinned: [],
         },
-        archived: false,
       },
       integrations: [],
       searchResults: [],
