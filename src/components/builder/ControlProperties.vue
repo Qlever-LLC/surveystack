@@ -73,7 +73,7 @@
       <v-checkbox
         class="my-1"
         outlined
-        v-if="control.type !== 'group'"
+        v-if="showRequiredOption"
         v-model="control.options.required"
         label="Required"
         color="grey darken-1"
@@ -371,6 +371,18 @@ export default {
     },
     isInstructionsImageSplit() {
       return this.control.type === 'instructionsImageSplit';
+    },
+    showRequiredOption() {
+      if (this.control.options.required) {
+        // if current state is required, add possibility to clear required
+        return true;
+      }
+
+      if (['group', 'page', 'instructions', 'instructionsImageSplit'].includes(this.control.type)) {
+        return false;
+      }
+
+      return true;
     },
   },
   methods: {
