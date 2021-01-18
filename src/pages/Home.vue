@@ -3,8 +3,8 @@
     <v-row>
       <v-col>
         <v-img
-          v-if="appPartner"
-          :src="appPartner.logo"
+          v-if="isWhitelabel"
+          :src="$store.getters['whitelabel/partner'].logo"
           class="my-3"
           contain
           height="128"
@@ -194,9 +194,6 @@ export default {
 
 
   computed: {
-    appPartner() {
-      return this.$store.getters['appui/partner'];
-    },
     isLoggedIn() {
       return this.$store.getters['auth/isLoggedIn'];
     },

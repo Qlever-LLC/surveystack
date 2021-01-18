@@ -20,9 +20,12 @@ const getters = {
 
 const actions = {
   reset({ commit }) {
-    // commit('RESET');
+    commit('RESET');
   },
-  async setPartner({ commit }, partner) {
+  async setPartner({ commit, dispatch }, partner) {
+    commit('SET_PARTNER', partner);
+    dispatch('appui/setTitle', partner.name, { root: true });
+
     const { data } = await api.get(`/groups/by-path/${partner.groupSlug}?populate=1`);
     const pinnedSurveys = [];
     if (data && data.surveys && data.surveys.pinned && Array.isArray(data.surveys.pinned)) {
@@ -38,13 +41,12 @@ const actions = {
     }
 
     commit('SET_PINNED_SURVEYS', pinnedSurveys);
-    commit('SET_PARTNER', partner);
   },
 };
 
 const mutations = {
   RESET(state) {
-    // a logout calls a global RESET, but we want to keep any whitelabel specifics
+    // a logout calls a global reset action, but we want to keep any whitelabel specifics
   },
   SET_PARTNER(state, partner) {
     state.partner = partner;

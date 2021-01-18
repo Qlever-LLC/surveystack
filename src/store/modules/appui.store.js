@@ -1,7 +1,6 @@
 const createInitialState = () => ({
   title: 'SurveyStack',
   subtitle: '',
-  partner: null,
   menu: false,
   fixedFooter: false,
 });
@@ -12,22 +11,22 @@ const initialState = createInitialState();
 const getters = {
   title: state => state.title,
   subtitle: state => state.subtitle,
-  partner: state => state.partner,
   menu: state => state.menu,
 };
 
 const actions = {
-  reset({ commit }) {
+  reset({ commit, rootGetters }) {
     commit('RESET');
+    if (rootGetters['whitelabel/isWhitelabel']) {
+      // if this is a whitelabel app, keep the title
+      commit('SET_TITLE', rootGetters['whitelabel/partner'].name);
+    }
   },
   setTitle({ commit }, title) {
     commit('SET_TITLE', title);
   },
   setSubtitle({ commit }, subtitle) {
     commit('SET_SUBTITLE', subtitle);
-  },
-  setPartner({ commit }, partner) {
-    commit('SET_PARTNER', partner);
   },
   setMenu({ commit }, show) {
     commit('SET_MENU', show);
@@ -36,22 +35,13 @@ const actions = {
 
 const mutations = {
   RESET(state) {
-    // a logout calls a global reset, but we still want to keep any whitelabel specifics
-    const { partner } = state;
     Object.assign(state, createInitialState());
-    state.partner = partner;
-    if (state.partner) {
-      state.title = partner.name;
-    }
   },
   SET_TITLE(state, title) {
     state.title = title;
   },
   SET_SUBTITLE(state, subtitle) {
     state.subtitle = subtitle;
-  },
-  SET_PARTNER(state, partner) {
-    state.partner = partner;
   },
   SET_MENU(state, show) {
     state.menu = show;
