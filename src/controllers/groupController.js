@@ -115,7 +115,6 @@ const createPinnedSurveysPopulationStages = () => {
 };
 
 const getGroups = async (req, res) => {
-  console.log(req.query);
   const { showArchived, prefix } = req.query;
 
   let entities;
