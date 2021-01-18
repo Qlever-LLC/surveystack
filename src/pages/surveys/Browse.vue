@@ -1,6 +1,5 @@
 <template>
   <v-container>
-
     <v-tabs
       v-model="activeTab"
       fixed-tabs
@@ -202,7 +201,6 @@ export default {
     };
   },
   computed: {
-
     tabs() {
       const commonTabs = [
         {
@@ -224,10 +222,6 @@ export default {
       }
 
       return [
-        // {
-        //   name: 'active-group-pinned-surveys',
-        //   label: 'Pinned Surveys',
-        // },
         {
           name: 'active-group',
           label: 'Active Group',
@@ -259,15 +253,12 @@ export default {
   },
   watch: {
     search(value) {
-      this.fetchData();
-      if (value) {
-        this.pinnedIsVisible = false;
-      } else {
-        this.pinnedIsVisible = true;
-      }
+      this.page = 1;
+      this.getDataForTab(this.activeTab);
     },
     // TODO: reimplement with @change listener instead of watch
     async activeTab(value) {
+      this.page = 1;
       await this.getDataForTab(value);
     },
     async activeGroupId(value) {
@@ -291,40 +282,20 @@ export default {
     },
     async getDataForTab(tab) {
       switch (tab) {
-        // case 'active-group-pinned-surveys':
-        //   this.surveys = await this.fetchPinnedSurveys(this.activeGroupId);
-        //   break;
         case 'active-group':
           // eslint-disable-next-line no-case-declarations
           const [pinnedResponse, response] = await Promise.all([
             this.fetchPinnedSurveys(this.activeGroupId),
             this.fetchData({ groups: [this.activeGroupId] }),
           ]);
-
-
-          // this.surveys.content = uniqBy([
-          //   ...pinnedResponse.map(r => ({ ...r, pinned: true })),
-          //   ...response.content,
-          // ], '_id');
-          // this.surveys.pagination = {
-          //   ...response.pagination,
-          //   total: this.surveys.content.length,
-          // };
-
-
-          // this.surveys = response;
-          // this.pinnedSurveys = pinnedResponse.map(r => ({ ...r, pinned: true }));
           break;
         case 'my-surveys':
-          // this.surveys = await this.fetchData({ user: this.$store.getters['auth/user']._id });
           await this.fetchData({ user: this.$store.getters['auth/user']._id });
           break;
         case 'my-groups':
           this.surveys = await this.fetchData({
             groups: this.$store.getters['memberships/groups'].map(({ _id }) => _id),
           });
-          break;
-        case 'select-group':
           break;
         case 'all-groups':
         default:
@@ -392,3 +363,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+/* fix tabs indentation on mobile */
+>>> .v-slide-group__prev {
+  display: none !important;
+}
+</style>
