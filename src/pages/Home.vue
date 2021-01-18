@@ -23,9 +23,9 @@
       <v-col align="center">
         <app-basic-list
           class="maxw-40 text-left"
-          v-if="false && isWhitelabel && pinnedWhitelabelSurveys.length > 0"
+          v-if="isWhitelabel && pinnedWhitelabelSurveys.length > 0"
           :entities="pinnedWhitelabelSurveys"
-          title="Get started with your surveys! (whitelabel)"
+          :title="`Pinned by ${whitelabelPartner.name}`"
           :link="e => `/surveys/${e.id}`"
         >
           <template v-slot:entity="{ entity }">
@@ -203,6 +203,9 @@ export default {
     },
     isWhitelabel() {
       return this.$store.getters['whitelabel/isWhitelabel'];
+    },
+    whitelabelPartner() {
+      return this.$store.getters['whitelabel/partner'];
     },
     pinnedWhitelabelSurveys() {
       return this.$store.getters['whitelabel/pinnedSurveys'];
