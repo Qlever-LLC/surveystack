@@ -32,9 +32,10 @@
       >
 
         <v-list-item
-          v-for="item in groupItems"
+          v-for="(item, i) in groupItems"
           :key="item.text"
           @click="() => handleInput(item.value)"
+          :value="i"
         >
           <v-list-item-icon>
             <v-icon>mdi-account-group</v-icon>
@@ -62,7 +63,11 @@ export default {
     },
     activeItem: {
       get() {
-        return this.groupItems.findIndex(item => item.value === this.activeGroup || item.value.id === this.activeGroup);
+        if (this.returnObject) {
+          return this.groupItems.findIndex(item => item.value.id === this.activeGroup);
+        }
+
+        return this.groupItems.findIndex(item => item.value === this.activeGroup);
       },
     },
     groupItems() {
