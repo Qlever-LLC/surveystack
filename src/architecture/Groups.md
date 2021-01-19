@@ -23,6 +23,11 @@ Paths are unique, also note how the rule for building the path is always `dir + 
 const groups = [
   {
     _id: '5e6f8bbeea14550001470c28',
+    meta: {
+      archived: false,
+      specVersion: 2,
+      invitationOnly: true,
+    },
     name: 'Our-Sci LLC',
     slug: 'our-sci',
     dir: '/',
@@ -33,6 +38,11 @@ const groups = [
   },
   {
     _id: '5e6f8bbeea14550001470c32',
+    meta: {
+      archived: false,
+      specVersion: 2,
+      invitationOnly: true,
+    },
     name: 'Our-Sci Lab',
     slug: 'lab',
     dir: '/our-sci/',
@@ -43,6 +53,11 @@ const groups = [
   },
   {
     _id: '5e6f8bbeea14550001470c34',
+    meta: {
+      archived: false,
+      specVersion: 2,
+      invitationOnly: true,
+    },
     name: 'Our-Sci Lab Testing',
     slug: 'testing',
     dir: '/our-sci/lab/',
@@ -50,9 +65,15 @@ const groups = [
     surveys: {
       pinned: [],
     },
+    invitationOnly: true,
   },
   {
     _id: '5e6f8bbeea14550001470c36',
+    meta: {
+      archived: false,
+      specVersion: 2,
+      invitationOnly: true,
+    },
     name: 'Our-Sci Lab Results',
     slug: 'results',
     dir: '/our-sci/lab/',
@@ -63,6 +84,11 @@ const groups = [
   },
   {
     _id: '5e6f8bbeea14550001470c38',
+    meta: {
+      archived: false,
+      specVersion: 2,
+      invitationOnly: true,
+    },
     name: 'Nexus-Computing GmbH',
     slug: 'nexus-computing',
     dir: '/',

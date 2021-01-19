@@ -115,14 +115,14 @@ const createPinnedSurveysPopulationStages = () => {
 };
 
 const getGroups = async (req, res) => {
-  const { showArchived } = req.query;
+  const { showArchived, prefix } = req.query;
 
   let entities;
   let dir = '/';
 
-  let archivedQuery = { $ne: true };
+  let archived = false;
   if (queryParam(showArchived)) {
-    archivedQuery = true;
+    archived = true;
   }
 
   if (req.query.dir) {
@@ -135,15 +135,20 @@ const getGroups = async (req, res) => {
 
   let dirQuery = dir;
   if (req.query.tree) {
-    console.log('setting dirQuery');
     dirQuery = { $regex: `^${dir}` };
   }
 
-  entities = await db
-    .collection(col)
-    .find({ dir: dirQuery, archived: archivedQuery })
-    .sort({ path: 1 })
-    .toArray();
+  const findQuery = {
+    dir: dirQuery,
+    'meta.archived': archived,
+  };
+
+  if (prefix) {
+    delete findQuery.dir;
+    findQuery.path = { $regex: `^${prefix}` };
+  }
+
+  entities = await db.collection(col).find(findQuery).sort({ path: 1 }).toArray();
   return res.send(entities);
 };
 

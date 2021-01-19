@@ -95,10 +95,7 @@ const getMemberships = async (req, res) => {
     pipeline.push(...createPopulationPipeline());
   }
 
-  const entities = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  const entities = await db.collection(col).aggregate(pipeline).toArray();
 
   return res.send(entities);
 };
@@ -149,10 +146,7 @@ const getTree = async (req, res) => {
     ]
   );
 
-  const memberships = await db
-    .collection(col)
-    .aggregate(membershipPipeline)
-    .toArray();
+  const memberships = await db.collection(col).aggregate(membershipPipeline).toArray();
 
   const m = await db
     .collection(col)
@@ -177,10 +171,7 @@ const getMembership = async (req, res) => {
   if (queryParam(req.query.populate)) {
     pipeline.push(...createPopulationPipeline());
   }
-  const [entity] = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  const [entity] = await db.collection(col).aggregate(pipeline).toArray();
 
   console.log(entity);
 
@@ -210,6 +201,40 @@ const createMembership = async (req, res) => {
   if (sendEmail === 'SEND_NOW') {
     await sendMembershipInvitation({ membership: entity, origin: req.headers.origin });
     entity.meta.dateSent = new Date();
+  }
+
+  try {
+    let r = await db.collection(col).insertOne(entity);
+    assert.equal(1, r.insertedCount);
+    return res.send(r);
+  } catch (err) {
+    if (err.name === 'MongoError' && err.code === 11000) {
+      throw boom.conflict(`Entity with _id already exists: ${entity._id}`);
+    }
+  }
+
+  throw boom.internal();
+};
+
+// Work in progress
+const createMembershipForOpenGroup = async (req, res) => {
+  const entity = req.body;
+  sanitize(entity);
+
+  // enforce user role
+  entity.role = 'user';
+
+  if (!entity.meta.invitationEmail) {
+    throw boom.badRequest('Need to supply an email address');
+  }
+
+  const group = await db.collection('groups').findOne(entity.group);
+  if (!group) {
+    throw boom.badRequest('Group not found');
+  }
+
+  if (group.meta.invitationOnly) {
+    throw boom.badRequest('Group is set to invitation only');
   }
 
   try {
