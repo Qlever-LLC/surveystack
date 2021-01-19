@@ -20,6 +20,8 @@
   <v-select
     v-else-if="header.type === 'dropdown'"
     :items="getDropdownItems(header.value)"
+    item-text="label"
+    item-value="value"
     :value="item[header.value].value"
     @input="v => {item[header.value].value = v; onInput()}"
     hide-details
@@ -30,6 +32,8 @@
   <v-combobox
     v-else-if="(header.type === 'autocomplete') && header.custom"
     :items="getDropdownItems(header.value)"
+    item-text="label"
+    item-value="value"
     :value="item[header.value].value"
     @input="v => {comboboxSearch = null; item[header.value].value = v; onInput()}"
     :delimiters="[',']"
@@ -43,10 +47,28 @@
     solo
     hide-details
     class="custom-ontology"
-  />
+  >
+    <template v-slot:selection="data">
+      <v-chip
+        v-if="header.multiple"
+        v-bind="data.attrs"
+        :input-value="data.selected"
+        close
+        @click="data.select"
+        @click:close="removeValue(item, header, data.item)"
+      >
+        {{ getLabel(header, data.item) }}
+      </v-chip>
+      <div v-else>
+        {{ getLabel(header, data.item) }}
+      </div>
+    </template>
+  </v-combobox>
   <v-autocomplete
     v-else-if="(header.type === 'autocomplete') && !header.custom"
     :items="getDropdownItems(header.value)"
+    item-text="label"
+    item-value="value"
     :value="item[header.value].value"
     @input="v => {comboboxSearch = null; item[header.value].value = v; onInput()}"
     hide-details
@@ -169,18 +191,16 @@ export default {
     onInput() {
       this.$emit('changed');
     },
-    onInputCombobox(item, header, input) {
-      console.log('combobox - item', item);
-      console.log('combobox - header', header);
-      console.log('combobox - input', input);
-
-      if (header.multiple) {
-        item[header.value].value = input.map(i => i.value || i);
-      } else {
-        item[header.value].value = input.value || input;
-      }
-
-      this.onInput();
+    removeValue(item, header, value) {
+      item[header.value].value = item[header.value].value.filter(v => v !== value);
+    },
+    getLabel(header, value) {
+      const dropdownItems = this.getDropdownItems(header.value);
+      const found = dropdownItems.find(i => i.value === value);
+      return found ? found.label : value;
+    },
+    log(v) {
+      console.log('LOG:', v);
     },
     setActivePickerMonth() {
       setTimeout(() => {
@@ -200,7 +220,7 @@ export default {
         hashes = hashesArg;
       }
 
-      console.log('hashes', hashes);
+      // console.log('hashes', hashes);
 
 
       const selectedItems = hashes.map((h) => {

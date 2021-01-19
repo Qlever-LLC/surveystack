@@ -392,7 +392,7 @@ export default {
     getDropdownItems(field) {
       const column = this.source.content.find(col => col.value === field);
       const ontology = this.resources.find(resource => resource.id === column.resource);
-      return ontology.content.map(row => ({ text: row.label, value: row.value }));
+      return ontology.content.map(row => ({ label: row.label, value: row.value }));
     },
     onInput() {
       console.log('onInput', this.rows);
