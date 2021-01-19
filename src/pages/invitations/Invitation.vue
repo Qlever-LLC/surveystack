@@ -105,7 +105,12 @@ export default {
       this.$store.dispatch('invitation/clear');
       // TODO: display status/errors
       await api.post('/memberships/activate', { code: this.code });
-      await autoSelectActiveGroup(this.$store);
+      // Set joined group as active group
+      // For some very weird reason this does set the activeGroup correctly...
+      // But the focus in NavbarUserMenu.vue may still be on any previous active group,
+      // even though this does exactly the same thing as the selector inside Profile.vue
+      // where the focus shifts immediately
+      await autoSelectActiveGroup(this.$store, this.membership.group._id);
       this.$store.dispatch('surveys/fetchPinned');
       this.$router.push('/');
     },

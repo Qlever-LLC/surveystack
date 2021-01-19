@@ -25,7 +25,7 @@ const actions = {
     commit('RESET');
   },
   getUserMemberships({ commit, rootGetters }, userId) {
-    if (userId === null || userId === undefined) {
+    if (!userId) {
       return new Promise((resolve) => {
         resolve([]);
       });
