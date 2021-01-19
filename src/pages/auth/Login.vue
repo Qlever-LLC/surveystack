@@ -36,7 +36,10 @@
         </div>
       </v-form>
 
-      <div class="text-center text-muted mt-5">
+      <div
+        class="text-center text-muted mt-5"
+        v-if="registrationEnabled"
+      >
         Don't have an account?
         <router-link :to="registerLink">Register now</router-link>
       </div>
@@ -90,6 +93,7 @@ export default {
       },
       invitation: '',
       membership: null,
+      registrationEnabled: false,
     };
   },
   computed: {
@@ -114,7 +118,7 @@ export default {
       }
       return link;
     },
-    iswhitelabel() {
+    isWhitelabel() {
       return this.$store.getters['whitelabel/isWhitelabel'];
     },
     whitelabelPartner() {
@@ -132,6 +136,17 @@ export default {
       this.$store.dispatch('invitation/set', invitation);
       const { data: [membership] } = await api.get(`/memberships?invitationCode=${invitation}&populate=true`);
       this.membership = membership;
+    }
+
+    console.log('created', this.isWhitelabel);
+
+    if (this.isWhitelabel) {
+      const { data } = await api.get(`/groups/${this.whitelabelPartner.id}`);
+      if (!data.meta.invitationOnly) {
+        this.registrationEnabled = true;
+      }
+    } else {
+      this.registrationEnabled = true;
     }
 
     // magic link login
@@ -167,7 +182,7 @@ export default {
           user: this.entity,
         });
 
-        await autoSelectActiveGroup(this.$store, this.iswhitelabel ? this.whitelabelPartner.id : null);
+        await autoSelectActiveGroup(this.$store, this.isWhitelabel ? this.whitelabelPartner.id : null);
 
         this.$store.dispatch('surveys/fetchPinned');
 

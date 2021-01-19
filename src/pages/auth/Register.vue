@@ -123,6 +123,12 @@ export default {
       }
       return link;
     },
+    isWhitelabel() {
+      return this.$store.getters['whitelabel/isWhitelabel'];
+    },
+    whitelabelPartner() {
+      return this.$store.getters['whitelabel/partner'];
+    },
   },
   methods: {
     async submit() {
