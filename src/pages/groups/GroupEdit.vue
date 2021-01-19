@@ -34,6 +34,7 @@
           @click:append="editSlug = !editSlug"
           hint="URL friendly version of name"
           persistent-hint
+          :disabled="isWhitelabel && entity.slug === whitelabelPartner.slug"
         />
         <v-checkbox
           label="Invitation Only"
@@ -245,6 +246,14 @@ export default {
         const handle = handleize(newVal);
         this.entity.slug = handle;
       },
+    },
+  },
+  computed: {
+    isWhitelabel() {
+      return this.$store.getters['whitelabel/isWhitelabel'];
+    },
+    whitelabelPartner() {
+      return this.$store.getters['whitelabel/partner'];
     },
   },
   async created() {

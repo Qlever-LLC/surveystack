@@ -46,8 +46,8 @@ export default {
   methods: {
     async fetchEntities() {
       if (this.isWhitelabel) {
-        const { groupSlug } = this.whitelabelPartner;
-        const { data } = await api.get(`/groups?showArchived=${this.showArchived}&prefix=/${groupSlug}/`);
+        const { slug } = this.whitelabelPartner;
+        const { data } = await api.get(`/groups?showArchived=${this.showArchived}&prefix=/${slug}/`);
         this.entities = data;
         return;
       }
@@ -65,7 +65,7 @@ export default {
     },
     rootDir() {
       if (this.isWhitelabel) {
-        return `/${this.whitelabelPartner.groupSlug}/`;
+        return `/${this.whitelabelPartner.slug}/`;
       }
 
       return '/';

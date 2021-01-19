@@ -1,7 +1,8 @@
 export default {
   name: 'Beneficial Bio',
   domain: 'beneficialbio',
-  groupSlug: 'beneficialbio',
+  slug: 'beneficialbio',
+  id: '5ff3403ce02c9c0001189fc8',
   logo: '/partners/beneficialbio/img/logo.png',
   themes: {
     light: {

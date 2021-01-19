@@ -1,7 +1,8 @@
 export default {
   name: 'Million Acre Challenge',
   domain: 'millionacrechallenge',
-  groupSlug: 'million-acre-challenge',
+  slug: 'million-acre-challenge',
+  id: '5ed66b0d5e03ea00017ceb91',
   logo: '/partners/mac/img/logo.png',
   themes: {
     light: {

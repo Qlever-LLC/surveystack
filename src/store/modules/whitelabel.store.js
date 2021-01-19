@@ -26,7 +26,7 @@ const actions = {
     commit('SET_PARTNER', partner);
     dispatch('appui/setTitle', partner.name, { root: true });
 
-    const { data } = await api.get(`/groups/by-path/${partner.groupSlug}?populate=1`);
+    const { data } = await api.get(`/groups/by-path/${partner.slug}?populate=1`);
     const pinnedSurveys = [];
     if (data && data.surveys && data.surveys.pinned && Array.isArray(data.surveys.pinned)) {
       for (const s of data.surveys.pinned) {

@@ -114,6 +114,12 @@ export default {
       }
       return link;
     },
+    iswhitelabel() {
+      return this.$store.getters['whitelabel/isWhitelabel'];
+    },
+    whitelabelPartner() {
+      return this.$store.getters['whitelabel/partner'];
+    },
   },
   async created() {
     if (this.initialEmail) {
@@ -161,7 +167,7 @@ export default {
           user: this.entity,
         });
 
-        await autoSelectActiveGroup(this.$store);
+        await autoSelectActiveGroup(this.$store, this.iswhitelabel ? this.whitelabelPartner.id : null);
 
         this.$store.dispatch('surveys/fetchPinned');
 
