@@ -1,5 +1,7 @@
 import api from '@/services/api.service';
 
+import { getValueOrNull } from '@/utils/surveyStack';
+
 const base = type => ({
   data() {
     return {
@@ -9,9 +11,10 @@ const base = type => ({
     };
   },
   methods: {
+    getValueOrNull,
     onChange(v) {
       if (this.value !== v) {
-        this.changed(v);
+        this.changed(this.getValueOrNull(v));
       }
     },
     info(data) {

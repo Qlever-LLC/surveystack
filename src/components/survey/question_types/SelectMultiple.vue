@@ -56,6 +56,8 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 
+import { getValueOrNull } from '@/utils/surveyStack';
+
 export default {
   mixins: [baseQuestionComponent],
   data() {
@@ -67,12 +69,13 @@ export default {
     };
   },
   methods: {
+    getValueOrNull,
     onChange() {
       const newValues = this.selections.filter(s => s.selected).map(s => s.value).sort();
       if (this.customSelected && this.customValue) {
         newValues.push(this.customValue);
       }
-      this.changed(newValues);
+      this.changed(this.getValueOrNull(newValues));
     },
     findSource(value) {
       return this.control.options.source.find(x => x.value === value);
