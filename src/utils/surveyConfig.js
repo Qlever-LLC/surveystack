@@ -27,10 +27,10 @@ const createDefaultMatrixSource = () => ({
   config: { addRowLabel: 'Add row' },
   content: [
     {
-      label: 'Sample', value: 'sample', tags: '', type: 'number', resource: '', multiple: false, required: false, redacted: false, minWidthRem: 0,
+      label: 'Sample', value: 'sample', tags: '', type: 'number', resource: '', multiple: false, required: false, redacted: false, scaleWidth: 100,
     },
     {
-      label: 'Description', value: 'description', tags: '', type: 'text', resource: '', multiple: false, required: false, redacted: false, minWidthRem: 0,
+      label: 'Description', value: 'description', tags: '', type: 'text', resource: '', multiple: false, required: false, redacted: false, scaleWidth: 100,
     },
   ],
 });

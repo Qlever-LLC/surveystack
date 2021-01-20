@@ -161,11 +161,11 @@
               <h4 class="mt-6 mb-4">Display Options</h4>
               <v-text-field
                 type="number"
-                v-model.number="item.minWidthRem"
-                label="Minimum width"
+                v-model.number="item.scaleWidth"
+                label="Scale minimum width %"
                 dense
                 autocomplete="off"
-                hint="Try values 1-30 (0 for default value)"
+                hint="Default 100"
                 persistent-hint
               />
 
@@ -307,7 +307,7 @@ export default {
         custom: false,
         required: false,
         redacted: false,
-        minWidthRem: 0,
+        scaleWidth: 100,
       };
     },
     deleteColumn(index) {
