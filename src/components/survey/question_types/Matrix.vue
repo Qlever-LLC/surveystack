@@ -146,6 +146,7 @@
                   :disabled="isMobile"
                   class="matrix-cell my-2"
                   :style="{minWidth: header.scaleWidth ? `calc(10rem * ${header.scaleWidth}/100)` : '10rem'}"
+                  :loading="loading"
                 />
               </v-form>
             </td>

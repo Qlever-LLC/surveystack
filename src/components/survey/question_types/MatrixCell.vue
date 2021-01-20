@@ -2,7 +2,7 @@
   <v-text-field
     v-if="header.type === 'text'"
     :value="item[header.value].value"
-    @input="v => {item[header.value].value = v; onInput()}"
+    @input="v => {item[header.value].value = getValueOrNull(v); onInput()}"
     solo
     hide-details
     autocomplete="off"
@@ -23,7 +23,7 @@
     item-text="label"
     item-value="value"
     :value="item[header.value].value"
-    @input="v => {item[header.value].value = v; onInput()}"
+    @input="v => {item[header.value].value = getValueOrNull(v); onInput()}"
     hide-details
     solo
     :multiple="header.multiple"
@@ -35,7 +35,7 @@
     item-text="label"
     item-value="value"
     :value="item[header.value].value"
-    @input="v => {comboboxSearch = null; item[header.value].value = v; onInput()}"
+    @input="v => {comboboxSearch = null; item[header.value].value = getValueOrNull(v); onInput()}"
     :delimiters="[',']"
     :multiple="header.multiple"
     :disabled="disabled"
@@ -70,7 +70,7 @@
     item-text="label"
     item-value="value"
     :value="item[header.value].value"
-    @input="v => {comboboxSearch = null; item[header.value].value = v; onInput()}"
+    @input="v => {comboboxSearch = null; item[header.value].value = getValueOrNull(v); onInput()}"
     hide-details
     solo
     :multiple="header.multiple"
@@ -81,7 +81,7 @@
     v-else-if="header.type === 'farmos_field'"
     :items="farmos.farms || []"
     :value="item[header.value].value"
-    @input="v => {item[header.value].value = v || {}; onInput()}"
+    @input="v => {item[header.value].value = getValueOrNull(v); onInput()}"
     item-text="label"
     item-value="value"
     hide-details
@@ -101,7 +101,7 @@
   <v-autocomplete
     v-else-if="header.type === 'farmos_planting'"
     :value="item[header.value].value"
-    @input="v => {item[header.value].value = localChange(v) || {}; onInput()}"
+    @input="v => {item[header.value].value = getValueOrNull(localChange(v)); onInput()}"
     :items="farmos.plantings || []"
     item-text="label"
     item-value="value"
@@ -157,6 +157,8 @@
 </template>
 
 <script>
+import { getValueOrNull } from '@/utils/surveyStack';
+
 export default {
   props: {
     header: {
@@ -180,6 +182,9 @@ export default {
     disabled: {
       type: Boolean,
     },
+    loading: {
+      type: Boolean,
+    },
   },
   data() {
     return {
@@ -188,11 +193,13 @@ export default {
     };
   },
   methods: {
+    getValueOrNull,
     onInput() {
       this.$emit('changed');
     },
     removeValue(item, header, value) {
-      item[header.value].value = item[header.value].value.filter(v => v !== value);
+      const filtered = item[header.value].value.filter(v => v !== value);
+      item[header.value].value = this.getValueOrNull(filtered);
     },
     getLabel(header, value) {
       const dropdownItems = this.getDropdownItems(header.value);

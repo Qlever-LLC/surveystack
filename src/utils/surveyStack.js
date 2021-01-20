@@ -101,10 +101,25 @@ export function isAnswered(node, submission) {
   return value != null;
 }
 
+export function getValueOrNull(v) {
+  if (Array.isArray(v) && v.length === 0) {
+    return null;
+  }
+
+  if (v === '' || v === undefined) {
+    return null;
+  }
+
+  // should we also check for empty object and return null instead?
+
+  return v;
+}
+
 export default {
   getNested,
   setNested,
   getAllNodes,
   queueAction,
   isAnswered,
+  getValueOrNull,
 };
