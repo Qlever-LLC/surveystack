@@ -78,6 +78,9 @@
 import appFeedback from '@/components/ui/Feedback.vue';
 import api from '@/services/api.service';
 
+import { autoSelectActiveGroup } from '@/utils/memberships';
+
+
 const DEFAULT_ENTITY = {
   email: '',
   name: '',
@@ -155,6 +158,17 @@ export default {
           url: '/auth/register',
           user: this.entity,
         });
+
+        // try to auto join group if this is a whitelabel
+        if (this.isWhitelabel) {
+          try {
+            const { data } = await api.post(`/memberships/join-group?id=${this.whitelabelPartner.id}`);
+            console.log(data);
+            await autoSelectActiveGroup(this.$store, this.whitelabelPartner.id);
+          } catch (error) {
+            console.log(error.response.data.message);
+          }
+        }
 
         if (this.$route.params.redirect) {
           this.$router.push(this.$route.params.redirect);
