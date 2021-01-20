@@ -254,11 +254,12 @@ const getIntegrationFarms = async (req, res) => {
   console.log("filtering for tags", tags);
   const arr = tags.split(",");
   return res.send(farms.filter(f => {
+    console.log('farm tags', f.tags)
     if (!f.tags) {
       return false;
     }
 
-    const farr = f.tags.toLowerCase().split(",");
+    const farr = f.tags.toLowerCase().split(" ");
     for (const t of arr) {
       if (farr.includes(t)) {
         return true;
@@ -603,6 +604,13 @@ const createFarmOsInstance = async (req, res) => {
     throw boom.unauthorized("permission denied: not group admin")
   }
 
+  const groupId = typeof group === 'string' ? new ObjectId(group) : group;
+  const groupEntity = await db.collection('groups').findOne({ _id: groupId });
+  const { path: groupPath } = groupEntity;
+
+  console.log("groupPath", groupEntity, groupPath)
+
+
   const agentOptions = {
     host: "account.farmos.net",
     port: '443',
@@ -611,20 +619,24 @@ const createFarmOsInstance = async (req, res) => {
   };
 
   const agent = new https.Agent(agentOptions);
+  const body = {
+    url: `${url}.farmos.net`,
+    email,
+    site_name,
+    registrant,
+    location,
+    units,
+    plan,
+    tags: [groupPath],
+    agree: true,
+  }
+
+  console.log("body for request", body)
 
   try {
     const r = await axios.post(
       `https://account.farmos.net/api/v1/farms`,
-      {
-        url: `${url}.farmos.net`,
-        email,
-        site_name,
-        registrant,
-        location,
-        units,
-        plan,
-        agree: true,
-      },
+      body,
       {
         headers: {
           accept: 'application/json',
