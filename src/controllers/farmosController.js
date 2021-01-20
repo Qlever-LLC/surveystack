@@ -254,11 +254,12 @@ const getIntegrationFarms = async (req, res) => {
   console.log("filtering for tags", tags);
   const arr = tags.split(",");
   return res.send(farms.filter(f => {
+    console.log('farm tags', f.tags)
     if (!f.tags) {
       return false;
     }
 
-    const farr = f.tags.toLowerCase().split(",");
+    const farr = f.tags.toLowerCase().split(" ");
     for (const t of arr) {
       if (farr.includes(t)) {
         return true;
