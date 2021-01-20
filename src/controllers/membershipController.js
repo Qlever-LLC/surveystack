@@ -205,7 +205,7 @@ const createMembership = async (req, res) => {
 
   try {
     let r = await db.collection(col).insertOne(entity);
-    assert.equal(1, r.insertedCount);
+    assert.strictEqual(1, r.insertedCount);
     return res.send(r);
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
@@ -217,18 +217,10 @@ const createMembership = async (req, res) => {
 };
 
 // Work in progress
-const createMembershipForOpenGroup = async (req, res) => {
-  const entity = req.body;
-  sanitize(entity);
+const joinGroup = async (req, res) => {
+  const { id: groupId } = req.query;
 
-  // enforce user role
-  entity.role = 'user';
-
-  if (!entity.meta.invitationEmail) {
-    throw boom.badRequest('Need to supply an email address');
-  }
-
-  const group = await db.collection('groups').findOne(entity.group);
+  const group = await db.collection('groups').findOne({ _id: new ObjectId(groupId) });
   if (!group) {
     throw boom.badRequest('Group not found');
   }
@@ -237,13 +229,31 @@ const createMembershipForOpenGroup = async (req, res) => {
     throw boom.badRequest('Group is set to invitation only');
   }
 
+  const { user } = res.locals.auth;
+
+  const membership = {
+    user: user._id,
+    group: group._id,
+    role: 'user',
+    meta: {
+      status: 'active',
+      dateCreated: new Date(),
+      dateSent: null,
+      dateActivated: new Date(),
+      notes: '',
+      invitationEmail: null,
+      invitationCode: null,
+    },
+  };
+
   try {
-    let r = await db.collection(col).insertOne(entity);
-    assert.equal(1, r.insertedCount);
+    let r = await db.collection(col).insertOne(membership);
+    assert.strictEqual(1, r.insertedCount);
+    console.log(r);
     return res.send(r);
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
-      throw boom.conflict(`Entity with _id already exists: ${entity._id}`);
+      throw boom.conflict(`Entity with _id already exists`);
     }
   }
 
@@ -354,4 +364,5 @@ export default {
   activateMembership,
   getTree,
   resendInvitation,
+  joinGroup,
 };

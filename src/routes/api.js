@@ -175,6 +175,11 @@ router.put(
   catchErrors(membershipController.updateMembership)
 );
 router.delete('/memberships/:id', catchErrors(membershipController.deleteMembership));
+router.post(
+  '/memberships/join-group',
+  [assertAuthenticated],
+  catchErrors(membershipController.joinGroup)
+);
 
 /** Roles */
 router.get('/roles', catchErrors(rolesController.getRoles));
@@ -194,10 +199,9 @@ router.get('/farmos/members-by-farm', catchErrors(farmosController.getMembersByF
 router.post('/farmos/set-memberships', catchErrors(farmosController.setFarmMemberships));
 router.post('/farmos/checkurl', catchErrors(farmosController.checkUrl));
 router.post('/farmos/create-instance', catchErrors(farmosController.createFarmOsInstance));
-router.post("/farmos/callback", catchErrors(farmosController.webhookCallback))
-router.get("/farmos/areas/:aggregator/:farmurl", catchErrors(farmosController.getAreas))
-router.post("/farmos/areas/:aggregator/:farmurl", catchErrors(farmosController.createField))
-
+router.post('/farmos/callback', catchErrors(farmosController.webhookCallback));
+router.get('/farmos/areas/:aggregator/:farmurl', catchErrors(farmosController.getAreas));
+router.post('/farmos/areas/:aggregator/:farmurl', catchErrors(farmosController.createField));
 
 /** Integrations - Group */
 router.get('/group-integrations', catchErrors(groupIntegrationController.getIntegrations));
