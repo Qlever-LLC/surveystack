@@ -66,7 +66,15 @@ const getSurveys = async (req, res) => {
   return res.send(entities);
 };
 
-const buildPipelineForGetSurveyPage = ({ q, groups, projections, creator, skip, limit }) => {
+const buildPipelineForGetSurveyPage = ({
+  q,
+  groups,
+  projections,
+  creator,
+  skip,
+  limit,
+  prefix,
+}) => {
   const match = {};
   const project = {};
   let parsedSkip = 0;
@@ -87,6 +95,12 @@ const buildPipelineForGetSurveyPage = ({ q, groups, projections, creator, skip, 
 
   if (creator) {
     match['meta.creator'] = new ObjectId(creator);
+  }
+
+  if (prefix) {
+    match['meta.group.path'] = {
+      $regex: `^${prefix}`,
+    };
   }
 
   const pipeline = [
@@ -214,7 +228,7 @@ const getSurveyListPage = async (req, res) => {
 
   const [entities] = await db.collection(col).aggregate(pipeline).toArray();
 
-  // empty array when ther is no match
+  // empty array when there is no match
   // however, we still want content and pagination properties
   if (!entities) {
     return res.send({
@@ -252,20 +266,18 @@ const getSurveyInfo = async (req, res) => {
     throw boom.badRequest(`query param not set: id`);
   }
 
-  const entity = await db
-    .collection('surveys')
-    .findOne(
-      { _id: new ObjectId(id) },
-      {
-        projection: {
-          name: 1,
-          latestVersion: 1,
-          'meta.dateModified': 1,
-          'meta.dateCreated': 1,
-          description: 1,
-        },
-      }
-    );
+  const entity = await db.collection('surveys').findOne(
+    { _id: new ObjectId(id) },
+    {
+      projection: {
+        name: 1,
+        latestVersion: 1,
+        'meta.dateModified': 1,
+        'meta.dateCreated': 1,
+        description: 1,
+      },
+    }
+  );
 
   const submissions = await db
     .collection('submissions')
