@@ -231,6 +231,12 @@ export default {
     isLoggedIn() {
       return this.$store.getters['auth/isLoggedIn'];
     },
+    isWhitelabel() {
+      return this.$store.getters['whitelabel/isWhitelabel'];
+    },
+    whitelabelPartner() {
+      return this.$store.getters['whitelabel/partner'];
+    },
   },
   watch: {
     search(value) {
@@ -298,12 +304,14 @@ export default {
         queryParams.append('q', this.search);
         console.log(this.search);
       }
+      if (this.isWhitelabel) {
+        queryParams.append('prefix', this.whitelabelPartner.path);
+      }
 
       queryParams.append('skip', (this.page - 1) * PAGINATION_LIMIT);
       queryParams.append('limit', PAGINATION_LIMIT);
 
       try {
-        console.log('querParams', queryParams);
         const { data } = await api.get(`/surveys/list-page?${queryParams}`);
         this.surveys = data;
         this.surveys.content.forEach((s) => {
