@@ -46,14 +46,14 @@ export default {
   methods: {
     async fetchEntities() {
       if (this.isWhitelabel) {
-        const { slug } = this.whitelabelPartner;
-        const { data } = await api.get(`/groups?showArchived=${this.showArchived}&prefix=/${slug}/`);
-        this.entities = data;
+        const { path } = this.whitelabelPartner;
+        const { data: entities } = await api.get(`/groups?showArchived=${this.showArchived}&prefix=${path}`);
+        this.entities = entities;
         return;
       }
 
-      const { data } = await api.get(`/groups?showArchived=${this.showArchived}`);
-      this.entities = data;
+      const { data: entities } = await api.get(`/groups?showArchived=${this.showArchived}`);
+      this.entities = entities;
     },
   },
   computed: {
@@ -65,7 +65,7 @@ export default {
     },
     rootDir() {
       if (this.isWhitelabel) {
-        return `/${this.whitelabelPartner.slug}/`;
+        return this.whitelabelPartner.path;
       }
 
       return '/';

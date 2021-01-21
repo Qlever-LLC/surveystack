@@ -128,7 +128,7 @@ export default {
   data() {
     let groupsLink = { name: 'groups-list' };
     if (this.$store.getters['whitelabel/isWhitelabel']) {
-      groupsLink = `/g/${this.$store.getters['whitelabel/partner'].slug}/`;
+      groupsLink = `/g${this.$store.getters['whitelabel/partner'].path}`;
     }
 
     return {

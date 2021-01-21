@@ -34,7 +34,7 @@
           @click:append="editSlug = !editSlug"
           hint="URL friendly version of name"
           persistent-hint
-          :disabled="isWhitelabel && entity.slug === whitelabelPartner.slug"
+          :disabled="isWhitelabel && entity.path === whitelabelPartner.path"
         />
         <v-checkbox
           label="Invitation Only"

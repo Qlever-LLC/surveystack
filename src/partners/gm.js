@@ -1,8 +1,9 @@
 export default {
   name: 'General Mills',
   domain: 'gm',
-  slug: 'general-mills-regen-ag',
   id: '5ea71be34d8640000186369f',
+  slug: 'general-mills-regen-ag',
+  path: '/general-mills-regen-ag/',
   logo: '/partners/gm/img/logo.png',
   themes: {
     light: {
