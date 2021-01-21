@@ -38,7 +38,7 @@
 
       <div
         class="text-center text-muted mt-5"
-        v-if="registrationEnabled"
+        v-if="registrationEnabled || hasInvitation"
       >
         Don't have an account?
         <router-link :to="registerLink">Register now</router-link>
@@ -124,6 +124,9 @@ export default {
     whitelabelPartner() {
       return this.$store.getters['whitelabel/partner'];
     },
+    hasInvitation() {
+      return this.$store.getters['invitation/hasInvitation'];
+    },
   },
   async created() {
     if (this.initialEmail) {
@@ -188,7 +191,7 @@ export default {
 
         if (this.$route.params.redirect) {
           this.$router.push(this.$route.params.redirect);
-        } else if (this.$store.getters['invitation/hasInvitation']) {
+        } else if (this.hasInvitation) {
           this.$router.push({ name: 'invitations', query: { code: this.$store.getters['invitation/code'] } });
         } else {
           this.$router.push('/');
