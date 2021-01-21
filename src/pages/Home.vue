@@ -198,7 +198,7 @@ export default {
       return this.$store.getters['auth/isLoggedIn'];
     },
     pinned() {
-      const pinned = this.$store.getters['surveys/getPinned'];
+      const pinned = this.$store.getters['surveys/pinned'];
       return pinned;
     },
     isWhitelabel() {

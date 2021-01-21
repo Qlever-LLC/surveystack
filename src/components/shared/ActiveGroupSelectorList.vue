@@ -58,7 +58,7 @@ export default {
   computed: {
     groups() {
       if (this.isWhitelabel) {
-        return this.$store.getters['memberships/prefixedGroups'](this.whitelabelPartner.path);
+        return this.$store.getters['memberships/getPrefixedGroups'](this.whitelabelPartner.path);
       }
       return this.$store.getters['memberships/groups'];
     },
