@@ -16,31 +16,6 @@
           {{ tab.label }}
         </span>
       </v-tab>
-      <!-- <v-menu
-        v-if="groupsItems.length"
-        bottom
-        left
-      >
-        <template v-slot:activator="{ on }">
-          <v-btn
-            text
-            class="align-self-center mr-4"
-            v-on="on"
-          >
-            more
-            <v-icon right>mdi-menu-down</v-icon>
-          </v-btn>
-        </template>
-        <v-list class="">
-          <v-list-item
-            v-for="item in groupsItems"
-            :key="item.name"
-            @click="setMenuTab(item)"
-          >
-            {{ item.label }}
-          </v-list-item>
-        </v-list>
-      </v-menu> -->
     </v-tabs>
     <v-card
       class="my-2"
@@ -58,8 +33,7 @@
             <v-list-item-content>
               <div>
                 <v-list-item-title>{{e.name}}</v-list-item-title>
-                <!-- <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle> -->
-                <v-list-item-subtitle v-if="e.meta && e.meta.group && e.meta.group.id">
+                <v-list-item-subtitle v-if="e.meta.group && e.meta.group.id">
                   {{ getGroupName(e.meta.group.id) }}
                 </v-list-item-subtitle>
                 <small
@@ -202,7 +176,14 @@ export default {
   },
   computed: {
     tabs() {
-      const commonTabs = [
+      const tabs = [
+        {
+          name: 'all-groups',
+          label: 'All Groups',
+        },
+      ];
+
+      const loggedInTabs = [
         {
           name: 'my-surveys',
           label: 'My Surveys',
@@ -211,23 +192,23 @@ export default {
           name: 'my-groups',
           label: 'My Groups',
         },
-        {
-          name: 'all-groups',
-          label: 'All Groups',
-        },
       ];
 
-      if (!this.activeGroupId) {
-        return commonTabs;
-      }
-
-      return [
+      const activeGroupTabs = [
         {
           name: 'active-group',
           label: 'Active Group',
         },
-        ...commonTabs,
       ];
+
+      if (this.isLoggedIn) {
+        tabs.unshift(...loggedInTabs);
+        if (this.activeGroupId) {
+          tabs.unshift(...activeGroupTabs);
+        }
+      }
+
+      return tabs;
     },
     activeTabPaginationLength() {
       const { total } = this.surveys.pagination;
@@ -249,6 +230,9 @@ export default {
         return group.name;
       }
       return 'No active group';
+    },
+    isLoggedIn() {
+      return this.$store.getters['auth/isLoggedIn'];
     },
   },
   watch: {
