@@ -103,12 +103,19 @@ export default {
     },
     async join() {
       this.$store.dispatch('invitation/clear');
-      // TODO: display status/errors
-      await api.post('/memberships/activate', { code: this.code });
+
+      try {
+        // TODO: display status/errors
+        await api.post('/memberships/activate', { code: this.code });
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+
       // Set joined group as active group
       // autoSelectActiveGroup also fetches the user's groups, so we are using this instead of
       // just dispatching 'memberships/setActiveGroup'
       await autoSelectActiveGroup(this.$store, this.membership.group._id);
+
       this.$store.dispatch('surveys/fetchPinned');
       this.$router.push('/');
     },

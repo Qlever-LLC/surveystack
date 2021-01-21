@@ -132,6 +132,9 @@ export default {
     whitelabelPartner() {
       return this.$store.getters['whitelabel/partner'];
     },
+    hasInvitation() {
+      return this.$store.getters['invitation/hasInvitation'];
+    },
   },
   methods: {
     async submit() {
@@ -163,7 +166,6 @@ export default {
         if (this.isWhitelabel) {
           try {
             const { data } = await api.post(`/memberships/join-group?id=${this.whitelabelPartner.id}`);
-            console.log(data);
             await autoSelectActiveGroup(this.$store, this.whitelabelPartner.id);
           } catch (error) {
             console.log(error.response.data.message);
@@ -172,7 +174,7 @@ export default {
 
         if (this.$route.params.redirect) {
           this.$router.push(this.$route.params.redirect);
-        } else if (this.$store.getters['invitation/hasInvitation']) {
+        } else if (this.hasInvitation) {
           this.$router.push({ name: 'invitations', query: { code: this.$store.getters['invitation/code'] } });
         } else {
           this.$store.dispatch('surveys/fetchPinned');
