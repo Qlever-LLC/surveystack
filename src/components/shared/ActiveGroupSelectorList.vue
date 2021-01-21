@@ -38,7 +38,7 @@
 export default {
   props: {
     value: {
-      type: String || Object,
+      type: [String, Object],
     },
     // with returnObject=true the v-model value returns an object {id: groupId, path: groupPath},
     // otherwise v-model value returns the groupId as a string

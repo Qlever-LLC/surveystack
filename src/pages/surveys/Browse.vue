@@ -110,7 +110,6 @@
             <v-list-item-content>
               <div>
                 <v-list-item-title>{{e.name}}</v-list-item-title>
-                <!-- <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle> -->
                 <v-list-item-subtitle v-if="e.meta && e.meta.group && e.meta.group.id">
                   {{ getGroupName(e.meta.group.id) }}
                 </v-list-item-subtitle>
@@ -142,18 +141,10 @@
         />
       </v-card-actions>
     </v-card>
-    <!-- <v-row>
-      <v-spacer />
-      <v-btn
-        outlined
-        class="ma-8"
-      >Show Others</v-btn>
-    </v-row> -->
   </v-container>
 </template>
 
 <script>
-import { uniqBy } from 'lodash';
 import moment from 'moment';
 import api from '@/services/api.service';
 
@@ -312,6 +303,7 @@ export default {
       queryParams.append('limit', PAGINATION_LIMIT);
 
       try {
+        console.log('querParams', queryParams);
         const { data } = await api.get(`/surveys/list-page?${queryParams}`);
         this.surveys = data;
         this.surveys.content.forEach((s) => {
