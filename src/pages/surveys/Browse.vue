@@ -9,10 +9,16 @@
         :href="`#${tab.name}`"
         :key="tab.name"
       >
-        <span v-if="tab.name === 'active-group'">
+        <span
+          v-if="tab.name === 'active-group'"
+          class="text-no-wrap"
+        >
           {{ activeGroupName }}
         </span>
-        <span v-else>
+        <span
+          v-else
+          class="text-no-wrap"
+        >
           {{ tab.label }}
         </span>
       </v-tab>
