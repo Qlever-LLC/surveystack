@@ -465,6 +465,9 @@ export default {
       return endpoint;
     },
     apiDownloadUrl() {
+      if (process.env.NODE_ENV === 'development') {
+        return `http://localhost:${process.env.VUE_APP_DEV_API_SERVER_PORT}${this.apiEndpoint}?${this.apiDownloadParams}`;
+      }
       return `${window.location.origin}${this.apiEndpoint}?${this.apiDownloadParams}`;
     },
     queryList() {

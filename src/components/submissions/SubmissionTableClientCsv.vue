@@ -36,18 +36,6 @@
         </v-toolbar>
       </template>
 
-      <!-- // need show-expand on v-data-table
-        <template v-slot:expanded-item="{ headers, item }">
-          <td></td>
-          <td></td>
-          <td
-            class="untruncated"
-            v-for="(value, idx) in item"
-            :key="idx"
-          >{{value}}</td>
-        </template>
-        -->
-
     </v-data-table>
   </v-card>
 </template>
@@ -125,13 +113,6 @@ export default {
     },
   },
   methods: {
-    hello(value, field) {
-      this.searchFields[field] = value;
-      // this.$set(this.searchFields, field, value);
-
-      console.log(field);
-      console.log(value);
-    },
     onRowSelected({ value, item }) {
       if (value) {
         console.log(`selected ${item._id}`);
@@ -155,7 +136,7 @@ export default {
           if (this.excludeMeta && (header.startsWith('meta') || header.includes('meta'))) {
             return;
           }
-          this.$set(this.searchFields, header, '');
+          this.$set(this.searchFields, header, ''); // v-data-table search/filter is not used at this moment
           headers.push({ text: header, value: header, filter: this.createCustomFilter(header) });
         });
       }
