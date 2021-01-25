@@ -3,6 +3,7 @@
 import papa from 'papaparse';
 import _ from 'lodash';
 import { flatten } from 'flat';
+import { ObjectId } from 'mongodb';
 
 function removeKeys(obj, keys) {
   if (!obj) {
@@ -26,31 +27,32 @@ function removeKeys(obj, keys) {
   }
 }
 
-function createHeaders(mergedObject, entities) {
-  if (mergedObject.meta) {
-    if (mergedObject.meta.survey && mergedObject.meta.survey.id) {
-      mergedObject.meta.survey.id = mergedObject.meta.survey.id.toString();
-    }
-
-    if (mergedObject.meta.group && mergedObject.meta.group.id) {
-      mergedObject.meta.group.id = mergedObject.meta.group.id.toString();
-    }
-
-    if (mergedObject.meta.creator) {
-      mergedObject.meta.creator = mergedObject.meta.creator.toString();
-    }
-
-    if (mergedObject.meta.original) {
-      mergedObject.meta.original = mergedObject.meta.original.toString();
-    }
-
-    if (mergedObject.meta.resubmitter) {
-      mergedObject.meta.resubmitter = mergedObject.meta.resubmitter.toString();
+//
+function stringifyObjectIds(obj) {
+  if (!obj) {
+    return;
+  }
+  for (const prop of Object.keys(obj)) {
+    switch (typeof obj[prop]) {
+      case 'object':
+        if (obj[prop] && obj[prop]._bsontype === 'ObjectID') {
+          obj[prop] = obj[prop].toString();
+        } else {
+          stringifyObjectIds(obj[prop]);
+        }
+        break;
+      default:
+        break;
     }
   }
+}
+
+function createHeaders(mergedObject, entities) {
+  stringifyObjectIds(mergedObject);
 
   let merged = flatten(mergedObject);
   entities.forEach((entity) => {
+    stringifyObjectIds(entity);
     const flatEntityData = flatten({ data: entity.data });
     merged = { ...merged, ...flatEntityData };
   });
@@ -104,37 +106,16 @@ function createCsvLegacy(submissions) {
 
 function createCsv(submissions, headers) {
   const items = [];
-  submissions.forEach((submission) => {
-    const s = _.cloneDeep(submission);
+  submissions.forEach((ss) => {
+    const submission = _.cloneDeep(ss);
 
-    if (s._id) {
-      s._id = s._id.toString();
-    }
+    // when flattening a submission, special BSON types such as ObjectId are flattened into
+    // {_bsontype: 'ObjectID', id: <Buffer ...>}
+    // This is to make sure ObjectIds are stringified for CSV output
+    stringifyObjectIds(submission);
 
-    if (s.meta) {
-      if (s.meta.survey && s.meta.survey.id) {
-        s.meta.survey.id = s.meta.survey.id.toString();
-      }
-
-      if (s.meta.group && s.meta.group.id) {
-        s.meta.group.id = s.meta.group.id.toString();
-      }
-
-      if (s.meta.creator) {
-        s.meta.creator = s.meta.creator.toString();
-      }
-
-      if (s.meta.original) {
-        s.meta.original = s.meta.original.toString();
-      }
-
-      if (s.meta.resubmitter) {
-        s.meta.resubmitter = s.meta.resubmitter.toString();
-      }
-    }
-
-    removeKeys(s.data, ['meta']);
-    items.push(flatten(s));
+    // removeKeys(submission.data, ['meta']); // remove meta fields below data
+    items.push(flatten(submission));
   });
 
   let csv = '';

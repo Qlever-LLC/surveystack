@@ -189,6 +189,18 @@ const createRelevanceStage = () => {
   };
 };
 
+const createDataMetaStage = () => {
+  return {
+    $redact: {
+      $cond: {
+        if: { $eq: ['$CURRENT', false] },
+        then: '$$PRUNE',
+        else: '$$DESCEND',
+      },
+    },
+  };
+};
+
 const buildPipeline = async (req, res) => {
   const pipeline = [];
 
@@ -272,6 +284,13 @@ const buildPipeline = async (req, res) => {
   if (!queryParam(req.query.showIrrelevant) && !queryParam(req.query.pure)) {
     const relevanceStage = createRelevanceStage();
     pipeline.push(relevanceStage);
+  }
+
+  // Hide fields with meta.relevant = false (and below) by default
+  // However, don't hide if query showDataMeta=1 or pure=1
+  if (!queryParam(req.query.showDataMeta) && !queryParam(req.query.pure)) {
+    //const relevanceStage = createRelevanceStage();
+    //pipeline.push(relevanceStage);
   }
 
   // For development purposes
