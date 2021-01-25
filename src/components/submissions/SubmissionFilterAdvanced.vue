@@ -46,6 +46,18 @@
               label="Show irrelevant fields"
               v-model="value.showIrrelevant"
               class="my-0"
+              hide-details
+            />
+          </v-col>
+        </v-row>
+
+        <v-row dense>
+          <v-col>
+            <v-checkbox
+              label="Show data meta (CSV)"
+              v-model="value.showCsvDataMeta"
+              class="my-0"
+              hide-details
             />
           </v-col>
         </v-row>
