@@ -47,7 +47,7 @@ function stringifyObjectIds(obj) {
   }
 }
 
-function createHeaders(mergedObject, entities) {
+function createHeaders(mergedObject, entities, options = { excludeDataMeta: false }) {
   stringifyObjectIds(mergedObject);
 
   let merged = flatten(mergedObject);
@@ -58,6 +58,11 @@ function createHeaders(mergedObject, entities) {
   });
 
   const headers = Object.keys(merged);
+  if (options.excludeDataMeta) {
+    const filtered = headers.filter((h) => !h.includes('.meta'));
+    return filtered;
+  }
+
   return headers;
 }
 

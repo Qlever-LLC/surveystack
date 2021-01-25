@@ -286,13 +286,6 @@ const buildPipeline = async (req, res) => {
     pipeline.push(relevanceStage);
   }
 
-  // Hide fields with meta.relevant = false (and below) by default
-  // However, don't hide if query showDataMeta=1 or pure=1
-  if (!queryParam(req.query.showDataMeta) && !queryParam(req.query.pure)) {
-    //const relevanceStage = createRelevanceStage();
-    //pipeline.push(relevanceStage);
-  }
-
   // For development purposes
   if (process.env.NODE_ENV === 'development' && req.query.roles) {
     try {
@@ -429,7 +422,9 @@ const getSubmissionsPage = async (req, res) => {
   }
 
   try {
-    const headers = csvService.createHeaders(entities.headers[0], entities.content);
+    const headers = csvService.createHeaders(entities.headers[0], entities.content, {
+      excludeDataMeta: !queryParam(req.query.showCsvDataMeta),
+    });
     entities.headers = headers;
   } catch (error) {
     console.error('error creating headers', error);
@@ -520,7 +515,9 @@ const getSubmissionsCsv = async (req, res) => {
     ])
     .toArray();
 
-  const headers = csvService.createHeaders(mergedObject, entities);
+  const headers = csvService.createHeaders(mergedObject, entities, {
+    excludeDataMeta: !queryParam(req.query.showCsvDataMeta),
+  });
 
   // Possible filter for header colunmns
   // const filteredHeaders = headers.filter((header) => {
