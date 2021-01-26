@@ -34,7 +34,7 @@ function arrayMax(arr) {
   return max;
 }
 
-const getHeaders = async (surveyId, entities = []) => {
+const getHeaders = async (surveyId, entities, options = { excludeDataMeta: false }) => {
   if (!surveyId) {
     return [];
   }
@@ -61,9 +61,8 @@ const getHeaders = async (surveyId, entities = []) => {
   const tree = new TreeModel();
   const root = tree.parse({ name: 'data', children: controls });
 
-  const surveyHeaders = {};
+  const surveyHeaders = { _id: [], meta: [] };
 
-  // assign first node
   root.walk((node) => {
     const header = node
       .getPath()
@@ -77,15 +76,18 @@ const getHeaders = async (surveyId, entities = []) => {
     surveyHeaders[`${header}.value`] = [];
   });
 
-  delete surveyHeaders['data'];
-  delete surveyHeaders['data.meta'];
+  //console.log('surveyHeaders before', surveyHeaders);
 
-  let mergedObject = {};
+  delete surveyHeaders['data.meta'];
+  delete surveyHeaders['data.value'];
+
+  //console.log('surveyHeaders after', surveyHeaders);
+
+  let mergedObject = { _id: null };
 
   entities.forEach((entity) => {
     stringifyObjectIds(entity);
-    const flatEntityData = flatten({ data: entity.data });
-    mergedObject = { ...mergedObject, ...flatEntityData };
+    mergedObject = { ...mergedObject, ...flatten(entity) };
   });
 
   const submissionHeaders = Object.keys(mergedObject);
@@ -99,19 +101,30 @@ const getHeaders = async (surveyId, entities = []) => {
         const i = submissionHeaders.indexOf(m);
 
         if (i >= 0) {
-          submissionHeaders.splice(i, 1);
+          submissionHeaders.splice(i, 1); // remove from submissionHeaders
         }
       }
     }
   }
 
-  const headers = ['_id', 'meta.dateCreated'];
+  const headers = [];
   for (const k of Object.keys(surveyHeaders)) {
     headers.push(...surveyHeaders[k]);
   }
 
   // any possible remaining headers - ideally submissionHeaders should be cleared by now
   headers.push(...submissionHeaders);
+
+  if (options.excludeDataMeta) {
+    const headersWithoutDataMeta = headers.filter((h) => {
+      // exclude any headers starting with data and including 'meta'
+      if (h.startsWith('data') && (h.includes('.meta.') || h.endsWith('.meta'))) {
+        return false;
+      }
+      return true;
+    });
+    return headersWithoutDataMeta;
+  }
 
   // console.log(headers, surveyHeaders, submissionHeaders);
 

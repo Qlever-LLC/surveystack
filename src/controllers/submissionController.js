@@ -412,7 +412,9 @@ const getSubmissionsPage = async (req, res) => {
   }
 
   try {
-    const headers = await headerService.getHeaders(req.query.survey, entities.content);
+    const headers = await headerService.getHeaders(req.query.survey, entities.content, {
+      excludeDataMeta: !queryParam(req.query.showCsvDataMeta),
+    });
     entities.headers = headers;
   } catch (error) {
     console.error('error creating headers', error);
@@ -493,7 +495,9 @@ const getSubmissionsCsv = async (req, res) => {
 
   const entities = await db.collection(col).aggregate(pipeline).toArray();
 
-  const headers = await headerService.getHeaders(req.query.survey, entities);
+  const headers = await headerService.getHeaders(req.query.survey, entities, {
+    excludeDataMeta: !queryParam(req.query.showCsvDataMeta),
+  });
 
   const csv = csvService.createCsv(entities, headers);
   res.set('Content-Type', 'text/plain');
