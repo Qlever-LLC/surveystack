@@ -19,7 +19,19 @@
       v-if="entity.meta.archived"
     ><strong>Please note:</strong> this group is currently archived</div>
     <h1>
-      {{entity.name}}
+      <span>{{entity.name}}</span>
+      <v-chip
+        v-if="isPremium"
+        class="ml-2"
+        color="success"
+      >
+        <v-icon
+          small
+          left
+        >
+          mdi-octagram
+        </v-icon>Premium
+      </v-chip>
     </h1>
     <h3 class="text--secondary">{{entity.path}}</h3>
 
@@ -144,6 +156,18 @@ export default {
     editable() {
       const g = this.userMemberships.find(m => m.group._id === this.entity._id);
       if (g && g.role === 'admin') {
+        return true;
+      }
+      return false;
+    },
+    isWhitelabel() {
+      return this.$store.getters['whitelabel/isWhitelabel'];
+    },
+    whitelabelPartner() {
+      return this.$store.getters['whitelabel/partner'];
+    },
+    isPremium() {
+      if (this.isWhitelabel && (this.entity.path.startsWith(this.whitelabelPartner.path) || this.entity.dir.startsWith(this.whitelabelPartner.path))) {
         return true;
       }
       return false;
