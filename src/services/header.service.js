@@ -23,7 +23,7 @@ function stringifyObjectIds(obj) {
   }
 }
 
-const getHeaders = async (id) => {
+const getHeaders = async (id, entities = []) => {
   const survey = await db.collection('surveys').findOne({ _id: new ObjectId(id) });
   if (!survey) {
     return null;
@@ -53,10 +53,12 @@ const getHeaders = async (id) => {
   delete surveyHeaders['data'];
   delete surveyHeaders['data.meta'];
 
+  /*
   const entities = await db
     .collection('submissions')
     .find({ 'meta.survey.id': ObjectId(id) })
     .toArray();
+    */
 
   let mergedObject = {};
 
@@ -84,7 +86,7 @@ const getHeaders = async (id) => {
     }
   }
 
-  const headers = [];
+  const headers = ['_id', 'meta.dateCreated'];
   for (const k of Object.keys(surveyHeaders)) {
     headers.push(...surveyHeaders[k]);
   }
@@ -92,7 +94,9 @@ const getHeaders = async (id) => {
   // any possible remaining headers - but submissionHeaders should be cleared by now
   headers.push(...submissionHeaders);
 
-  return { headers, surveyHeaders, submissionHeaders };
+  // console.log(headers, surveyHeaders, submissionHeaders);
+
+  return headers;
 };
 
 export default {

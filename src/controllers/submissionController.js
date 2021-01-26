@@ -7,6 +7,7 @@ import boom from '@hapi/boom';
 
 import { db } from '../db';
 import csvService from '../services/csv.service';
+import headerService from '../services/header.service';
 import * as farmOsService from '../services/farmos.service';
 import rolesService from '../services/roles.service';
 import { queryParam } from '../helpers';
@@ -392,17 +393,6 @@ const getSubmissionsPage = async (req, res) => {
     {
       $facet: {
         content: [{ $skip: skip }, { $limit: limit }],
-        headers: [
-          { $skip: skip },
-          { $limit: limit },
-          {
-            $group: {
-              _id: null,
-              meta: { $mergeObjects: '$meta' },
-              data: { $mergeObjects: '$data' },
-            },
-          },
-        ],
         pagination: [{ $count: 'total' }, { $addFields: { skip, limit } }],
       },
     },
@@ -422,9 +412,7 @@ const getSubmissionsPage = async (req, res) => {
   }
 
   try {
-    const headers = csvService.createHeaders(entities.headers[0], entities.content, {
-      excludeDataMeta: !queryParam(req.query.showCsvDataMeta),
-    });
+    const headers = await headerService.getHeaders(req.query.survey, entities.content);
     entities.headers = headers;
   } catch (error) {
     console.error('error creating headers', error);
@@ -505,32 +493,7 @@ const getSubmissionsCsv = async (req, res) => {
 
   const entities = await db.collection(col).aggregate(pipeline).toArray();
 
-  const [mergedObject] = await db
-    .collection(col)
-    .aggregate([
-      ...pipeline,
-      {
-        $group: { _id: null, meta: { $mergeObjects: '$meta' }, data: { $mergeObjects: '$data' } },
-      },
-    ])
-    .toArray();
-
-  const headers = csvService.createHeaders(mergedObject, entities, {
-    excludeDataMeta: !queryParam(req.query.showCsvDataMeta),
-  });
-
-  // Possible filter for header colunmns
-  // const filteredHeaders = headers.filter((header) => {
-  //   if (header.startsWith('meta')) {
-  //     return true;
-  //   }
-
-  //   if (header.includes('.meta')) {
-  //     return false;
-  //   }
-
-  //   return true;
-  // });
+  const headers = await headerService.getHeaders(req.query.survey, entities);
 
   const csv = csvService.createCsv(entities, headers);
   res.set('Content-Type', 'text/plain');
