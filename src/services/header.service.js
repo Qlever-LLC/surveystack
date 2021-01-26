@@ -23,13 +23,40 @@ function stringifyObjectIds(obj) {
   }
 }
 
-const getHeaders = async (id, entities = []) => {
-  const survey = await db.collection('surveys').findOne({ _id: new ObjectId(id) });
-  if (!survey) {
-    return null;
+function arrayMax(arr) {
+  var len = arr.length,
+    max = 0;
+  while (len--) {
+    if (arr[len] > max) {
+      max = arr[len];
+    }
+  }
+  return max;
+}
+
+const getHeaders = async (surveyId, entities = []) => {
+  if (!surveyId) {
+    return [];
   }
 
-  const { controls } = survey.revisions[survey.revisions.length - 1];
+  const survey = await db.collection('surveys').findOne({ _id: new ObjectId(surveyId) });
+  if (!survey) {
+    return [];
+  }
+
+  let version = survey.latestVersion;
+  try {
+    const maxSurveyVersionFromEntities = arrayMax(entities.map((e) => e.meta.survey.version));
+    if (maxSurveyVersionFromEntities > 0) {
+      version = maxSurveyVersionFromEntities;
+    } else {
+      throw new Error();
+    }
+  } catch (error) {
+    console.log(`could not determine max survey version from entities, using version ${version}`);
+  }
+
+  const { controls } = survey.revisions.find((r) => r.version === version);
 
   const tree = new TreeModel();
   const root = tree.parse({ name: 'data', children: controls });
@@ -53,13 +80,6 @@ const getHeaders = async (id, entities = []) => {
   delete surveyHeaders['data'];
   delete surveyHeaders['data.meta'];
 
-  /*
-  const entities = await db
-    .collection('submissions')
-    .find({ 'meta.survey.id': ObjectId(id) })
-    .toArray();
-    */
-
   let mergedObject = {};
 
   entities.forEach((entity) => {
@@ -79,7 +99,6 @@ const getHeaders = async (id, entities = []) => {
         const i = submissionHeaders.indexOf(m);
 
         if (i >= 0) {
-          console.log('splicing ', m);
           submissionHeaders.splice(i, 1);
         }
       }
@@ -91,7 +110,7 @@ const getHeaders = async (id, entities = []) => {
     headers.push(...surveyHeaders[k]);
   }
 
-  // any possible remaining headers - but submissionHeaders should be cleared by now
+  // any possible remaining headers - ideally submissionHeaders should be cleared by now
   headers.push(...submissionHeaders);
 
   // console.log(headers, surveyHeaders, submissionHeaders);
