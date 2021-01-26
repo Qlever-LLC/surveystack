@@ -76,12 +76,8 @@ const getHeaders = async (surveyId, entities, options = { excludeDataMeta: false
     surveyHeaders[`${header}.value`] = [];
   });
 
-  //console.log('surveyHeaders before', surveyHeaders);
-
   delete surveyHeaders['data.meta'];
   delete surveyHeaders['data.value'];
-
-  //console.log('surveyHeaders after', surveyHeaders);
 
   let mergedObject = { _id: null };
 
@@ -109,7 +105,11 @@ const getHeaders = async (surveyId, entities, options = { excludeDataMeta: false
 
   const headers = [];
   for (const k of Object.keys(surveyHeaders)) {
-    headers.push(...surveyHeaders[k]);
+    if (k === 'meta') {
+      headers.push(...surveyHeaders[k]);
+    } else {
+      headers.push(...surveyHeaders[k].sort());
+    }
   }
 
   // any possible remaining headers - ideally submissionHeaders should be cleared by now
