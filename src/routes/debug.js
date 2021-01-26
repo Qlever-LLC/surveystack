@@ -12,6 +12,7 @@ import farmosService from '../services/farmos.service';
 import rolesService from '../services/roles.service';
 
 import { catchErrors } from '../handlers/errorHandlers';
+import headerService from '../services/header.service';
 
 const router = Router();
 
@@ -81,10 +82,7 @@ router.get('/submissions', async (req, res) => {
     filter.survey = new ObjectId(req.query.survey);
   }
 
-  const submissions = await db
-    .collection('submissions')
-    .find(filter)
-    .toArray();
+  const submissions = await db.collection('submissions').find(filter).toArray();
 
   const items = [];
   submissions.forEach((submission) => {
@@ -192,6 +190,14 @@ router.get('/roles/check', async (req, res) => {
   const { user, group, role } = req.query;
   const ret = await rolesService.hasRole(user, group, role);
   return res.send(ret);
+});
+
+router.get('/headers/get', async (req, res) => {
+  console.log('/headers/get ...');
+
+  const headers = await headerService.getHeaders(req.query.id);
+
+  return res.send(headers);
 });
 
 export default router;

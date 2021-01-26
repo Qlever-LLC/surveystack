@@ -1749,6 +1749,11 @@ find-cache-dir@^2.0.0:
     make-dir "^2.0.0"
     pkg-dir "^3.0.0"
 
+find-insert-index@0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/find-insert-index/-/find-insert-index-0.0.1.tgz#16cd34664c2ac233905ab2b39745bcec721362de"
+  integrity sha1-Fs00ZkwqwjOQWrKzl0W87HITYt4=
+
 find-up@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/find-up/-/find-up-3.0.0.tgz#49169f1d7993430646da61ecc5ae355c21c97b73"
@@ -2514,6 +2519,11 @@ merge-descriptors@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/merge-descriptors/-/merge-descriptors-1.0.1.tgz#b00aaa556dd8b44568150ec9d1b953f3f90cbb61"
   integrity sha1-sAqqVW3YtEVoFQ7J0blT8/kMu2E=
+
+mergesort@0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/mergesort/-/mergesort-0.0.1.tgz#364ecc31b297dc7f44e511d365176f1c39d08fc2"
+  integrity sha1-Nk7MMbKX3H9E5RHTZRdvHDnQj8I=
 
 methods@~1.1.2:
   version "1.1.2"
@@ -3755,6 +3765,14 @@ touch@^3.1.0:
   integrity sha512-WBx8Uy5TLtOSRtIq+M03/sKDrXCLHxwDcquSP2c43Le03/9serjQBIztjRz6FkJez9D/hleyAXTBGLwwZUw9lA==
   dependencies:
     nopt "~1.0.10"
+
+tree-model@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/tree-model/-/tree-model-1.0.7.tgz#45b2307aa2dfc2da8ceb6a631c1e2b15550dce88"
+  integrity sha512-oP4LUbCVtD2gcjcRaeI4L5hY60tHzB+AK/bthIJ2Pq1EUUOio5/xFzPWnGoBZlhtqpqbOkhFDzKIwKLOn0kccQ==
+  dependencies:
+    find-insert-index "0.0.1"
+    mergesort "0.0.1"
 
 tslib@^1.9.0:
   version "1.10.0"
