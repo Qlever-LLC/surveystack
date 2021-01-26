@@ -307,7 +307,7 @@ import appDialog from '@/components/ui/Dialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 
 
-import { createQueryList } from '@/utils/surveys';
+import { createBasicQueryList } from '@/utils/surveyStack';
 
 const defaultPageSize = 10;
 
@@ -440,7 +440,7 @@ export default {
       if (!this.surveyEntity) {
         return null;
       }
-      const list = createQueryList(this.surveyEntity, this.surveyEntity.latestVersion);
+      const list = createBasicQueryList(this.surveyEntity, this.surveyEntity.latestVersion);
       return list;
     },
     paginationTotalPages() {

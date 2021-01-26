@@ -3,6 +3,8 @@ import Vue from 'vue';
 // TODO: try to get rid of Vue import
 // But we kind of need Vue.set for setting new properties without losing reactivity
 
+import TreeModel from 'tree-model';
+
 const SEPARATOR = '.';
 
 // http://blog.nicohaemhouts.com/2015/08/03/accessing-nested-javascript-objects-with-string-key/
@@ -115,6 +117,52 @@ export function getValueOrNull(v) {
   return v;
 }
 
+const defaultBasicQueryList = [
+  { name: 'meta.dateCreated', key: 'meta.dateCreated', type: '$date' },
+  { name: 'meta.dateModified', key: 'meta.dateModified', type: '$date' },
+  { name: 'meta.dateSubmitted', key: 'meta.dateSubmitted', type: '$date' },
+  { name: 'meta.creator', key: 'meta.creator', type: '$oid' },
+  { name: 'meta.creatorDetail.email', key: 'meta.creatorDetail.email', type: 'string' },
+  { name: 'meta.creatorDetail.name', key: 'meta.creatorDetail.name', type: 'string' },
+  { name: 'meta.group.id', key: 'meta.group.id', type: '$oid' },
+  { name: 'meta.group.path', key: 'meta.group.path', type: 'string' },
+  { name: 'meta.survey.id', key: 'meta.survey.id', type: '$oid' },
+  { name: 'meta.survey.version', key: 'meta.survey.version', type: 'number' },
+  { name: 'meta.revision', key: 'meta.revision', type: 'number' },
+  { name: '_id', key: '_id', type: '$oid' },
+
+];
+
+export const createBasicQueryList = (survey, version = 1) => {
+  const { controls } = survey.revisions.find(r => r.version === version);
+
+  const tree = new TreeModel();
+  const root = tree.parse({ name: 'data', children: controls });
+
+  const items = [];
+
+  root.walk((node) => {
+    if (node.hasChildren()) {
+      return;
+    }
+
+    if (node.model.type === 'group' || node.model.type === 'page') {
+      return;
+    }
+
+    const path = node
+      .getPath()
+      .map(n => n.model.name)
+      .join('.');
+
+    items.push({ name: `${path}.value`, key: `${path}.value`, type: node.model.type });
+  });
+
+  items.push(...defaultBasicQueryList);
+
+  return items;
+};
+
 export default {
   getNested,
   setNested,
@@ -122,4 +170,5 @@ export default {
   queueAction,
   isAnswered,
   getValueOrNull,
+  createBasicQueryList,
 };
