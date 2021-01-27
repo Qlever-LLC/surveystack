@@ -11,7 +11,7 @@
   <v-text-field
     v-else-if="header.type === 'number'"
     :value="item[header.value].value"
-    @input="v => {item[header.value].value = Number(v); onInput()}"
+    @input="v => {item[header.value].value = handleNumberInput(v); onInput()}"
     type="number"
     solo
     hide-details
@@ -196,6 +196,20 @@ export default {
     getValueOrNull,
     onInput() {
       this.$emit('changed');
+    },
+    handleNumberInput(v) {
+      if (v === '') {
+        return null;
+      }
+
+      const n = Number(v);
+
+      // eslint-disable-next-line
+      if (isNaN(n)) {
+        return null;
+      }
+
+      return n;
     },
     removeValue(item, header, value) {
       const filtered = item[header.value].value.filter(v => v !== value);
