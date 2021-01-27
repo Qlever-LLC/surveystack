@@ -97,7 +97,7 @@
       disable-pagination
       hide-default-footer
       hide-default-header
-      :items="rows"
+      :items="rows || []"
       disable-sort
       mobile-breakpoint="0"
     >
@@ -349,7 +349,7 @@ export default {
   },
   data() {
     return {
-      rows: this.value || [],
+      rows: this.value,
       rowToBeDeleted: -1,
       menus: {}, // object to hold v-models for v-menu
       farmosTransformedPlantings: [],
@@ -372,7 +372,11 @@ export default {
         }
       }
 
+      if (this.rows === null) {
+        this.rows = [];
+      }
       this.rows.push(newRow);
+      this.$emit('changed', this.rows);
       if (this.isMobile) {
         this.editItem(this.rows.length - 1);
       }
@@ -381,6 +385,9 @@ export default {
       this.showEditItemDialog = false;
       this.rows.splice(row, 1);
       this.rowToBeDeleted = -1;
+      if (this.rows.length === 0) {
+        this.rows = null;
+      }
       this.$emit('changed', this.rows);
     },
     editItem(index) {
