@@ -118,6 +118,8 @@ export default {
     requestRunSurveyStackKit({ script }) {
       console.log('running script', script);
       this.scriptId = script;
+
+      this.$refs.scriptLink.href = `http://localhost:9020/kit/${script}`;
       this.$refs.scriptLink.click();
     },
     handleRequestSetContext({ context }) {
