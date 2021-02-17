@@ -108,6 +108,17 @@ export function requestLogMessage(...messages) {
   }, '*');
 }
 
+
+export function requestRunSurveyStackKit(script) {
+  // const [origin] = window.location.ancestorOrigins;
+  window.parent.postMessage({
+    type: 'REQUEST_RUN_SURVEY_STACK_KIT',
+    payload: {
+      script,
+    },
+  }, '*');
+}
+
 export function listen() {
   window.addEventListener('message', (event) => {
     // if (event.data && event.data.type && event.data.type === 'RESET_SCRIPT') {

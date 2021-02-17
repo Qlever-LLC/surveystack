@@ -7,12 +7,19 @@
     />
     <app-control-hint :value="control.hint" />
 
+    <a
+      ref="scriptLink"
+      :href="`http://localhost:9020/kit/${scriptId}`"
+      style="display: none"
+      >Run Surveystack Script</a
+    >
+
     <div v-if="this.source">
       <iframe
         src=""
         frameborder="0"
         ref="iframe"
-        sandbox="allow-scripts"
+        sandbox="allow-scripts allow-same-origin allow-popups"
       />
       <v-btn
         @click="requestRunScript"
@@ -29,25 +36,14 @@
         status message: {{ meta && meta.statusMessage }}
       </p>
     </div>
-    <div
-      v-else-if="isLoading"
-      class="d-flex align-center justify-center"
-    >
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        class="ma-5"
-      />
+    <div v-else-if="isLoading" class="d-flex align-center justify-center">
+      <v-progress-circular indeterminate color="primary" class="ma-5" />
     </div>
-    <div
-      v-else-if="loadingSourceFailed"
-      class="text-center"
-    >
+    <div v-else-if="loadingSourceFailed" class="text-center">
       <v-icon color="red">mdi-close-thick</v-icon>
       There was an error loading the script.
     </div>
     <app-control-more-info :value="control.moreInfo" />
-
   </div>
 </template>
 
@@ -82,6 +78,7 @@ export default {
       messageEventListeners: [],
       isLoading: false,
       loadingSourceFailed: false,
+      scriptId: '',
     };
   },
   methods: {
@@ -118,6 +115,11 @@ export default {
     handleRequestLogMessage({ messages }) {
       console.log(...messages);
     },
+    requestRunSurveyStackKit({ script }) {
+      console.log('running script', script);
+      this.scriptId = script;
+      this.$refs.scriptLink.click();
+    },
     handleRequestSetContext({ context }) {
       // TODO: ensure `context` is sanitized
       this.$emit('setContext', context);
@@ -151,7 +153,9 @@ export default {
         onMessage('REQUEST_SET_QUESTION_VALUE', this.handleRequestSetQuestionValue),
         onMessage('REQUEST_SET_QUESTION_STATUS', this.handleRequestSetQuestionStatus),
         onMessage('REQUEST_LOG_MESSAGE', this.handleRequestLogMessage),
+        onMessage('REQUEST_RUN_SURVEY_STACK_KIT', this.requestRunSurveyStackKit),
         onMessage('REQUEST_SET_QUESTION_CONTEXT', this.handleRequestSetContext),
+        onMessage('REQUEST_SET_QUESTION_RENDER_QUEUE', this.handleRequestSetRenderQueue),
         onMessage('REQUEST_SET_QUESTION_RENDER_QUEUE', this.handleRequestSetRenderQueue),
       );
     },

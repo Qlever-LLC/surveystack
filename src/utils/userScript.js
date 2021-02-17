@@ -42,6 +42,7 @@ export default function buildScriptQuestionIframeContents({
           requestSetContext,
           requestSetRenderQueue,
           requestLogMessage,
+          requestRunSurveyStackKit,
           onMessage,
           handleLoaded,
           statusTypes,
@@ -55,6 +56,7 @@ export default function buildScriptQuestionIframeContents({
         import * as ui from '${baseURL}/iframeUI.js';
 
         window.log = requestLogMessage;
+        window.runSurveyStackKit = requestRunSurveyStackKit;
 
         function getInitialState() {
           return {

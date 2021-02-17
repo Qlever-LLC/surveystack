@@ -51,7 +51,7 @@ import GroupIntegrationEdit from '@/pages/integrations/GroupIntegrationEdit.vue'
 
 
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
-
+import Kit from '@/pages/Kit.vue';
 import store from '@/store';
 
 const Builder = () => import('@/pages/builder/Builder.vue');
@@ -326,6 +326,12 @@ const routes = [
     path: '/tabularasa',
     name: 'tabula-rasa',
     component: TabulaRasa,
+  },
+
+  {
+    path: '/kit/*',
+    name: 'kit',
+    component: Kit,
   },
 
 ];
