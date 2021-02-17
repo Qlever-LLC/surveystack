@@ -78,6 +78,9 @@
 import appFeedback from '@/components/ui/Feedback.vue';
 import api from '@/services/api.service';
 
+import { autoSelectActiveGroup } from '@/utils/memberships';
+
+
 const DEFAULT_ENTITY = {
   email: '',
   name: '',
@@ -123,6 +126,15 @@ export default {
       }
       return link;
     },
+    isWhitelabel() {
+      return this.$store.getters['whitelabel/isWhitelabel'];
+    },
+    whitelabelPartner() {
+      return this.$store.getters['whitelabel/partner'];
+    },
+    hasInvitation() {
+      return this.$store.getters['invitation/hasInvitation'];
+    },
   },
   methods: {
     async submit() {
@@ -150,9 +162,19 @@ export default {
           user: this.entity,
         });
 
+        // try to auto join group if this is a whitelabel
+        if (this.isWhitelabel) {
+          try {
+            const { data } = await api.post(`/memberships/join-group?id=${this.whitelabelPartner.id}`);
+            await autoSelectActiveGroup(this.$store, this.whitelabelPartner.id);
+          } catch (error) {
+            console.log(error.response.data.message);
+          }
+        }
+
         if (this.$route.params.redirect) {
           this.$router.push(this.$route.params.redirect);
-        } else if (this.$store.getters['invitation/hasInvitation']) {
+        } else if (this.hasInvitation) {
           this.$router.push({ name: 'invitations', query: { code: this.$store.getters['invitation/code'] } });
         } else {
           this.$store.dispatch('surveys/fetchPinned');

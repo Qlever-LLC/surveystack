@@ -100,40 +100,6 @@
         />
       </div>
 
-      <div
-        class="d-flex justify-end"
-        v-if="false"
-      >
-        <v-menu
-          offset-y
-          class="mb-3"
-        >
-          <template v-slot:activator="{ on }">
-            <v-btn
-              v-on="on"
-              class="mr-2"
-              outlined
-            >
-              <v-icon left>mdi-chevron-down</v-icon>{{formats[selectedFormat].title}}
-            </v-btn>
-          </template>
-          <v-list>
-            <v-list-item
-              v-for="(item, index) in formats"
-              :key="index"
-              @click="() => setFormat(index)"
-            >
-              <v-list-item-title>{{ item.title }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-        <v-btn
-          @click="fetchData"
-          :disabled="!validQuery"
-          color="primary"
-        >QUERY!</v-btn>
-      </div>
-
       <h4>API</h4>
       <a
         class="body-2"
@@ -341,7 +307,7 @@ import appDialog from '@/components/ui/Dialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 
 
-import { createQueryList } from '@/utils/surveys';
+import { createBasicQueryList } from '@/utils/surveyStack';
 
 const defaultPageSize = 10;
 
@@ -353,6 +319,7 @@ const createDefaultFilter = () => ({
   limit: defaultPageSize,
   showArchived: false,
   showIrrelevant: false,
+  showCsvDataMeta: false,
   roles: '',
 });
 
@@ -389,7 +356,6 @@ export default {
         { title: 'CSV', value: 'csv' },
         { title: 'JSON', value: 'json' },
       ],
-      selectedFormat: 0,
       filter: createDefaultFilter(),
       basicFilters: [],
       submissions: {
@@ -465,13 +431,16 @@ export default {
       return endpoint;
     },
     apiDownloadUrl() {
+      if (process.env.NODE_ENV === 'development') {
+        return `http://localhost:${process.env.VUE_APP_DEV_API_SERVER_PORT}${this.apiEndpoint}?${this.apiDownloadParams}`;
+      }
       return `${window.location.origin}${this.apiEndpoint}?${this.apiDownloadParams}`;
     },
     queryList() {
       if (!this.surveyEntity) {
         return null;
       }
-      const list = createQueryList(this.surveyEntity, this.surveyEntity.latestVersion);
+      const list = createBasicQueryList(this.surveyEntity, this.surveyEntity.latestVersion);
       return list;
     },
     paginationTotalPages() {
@@ -505,7 +474,9 @@ export default {
         { key: 'limit', value: this.filter.limit, include: this.filter.limit !== 0 },
         { key: 'showIrrelevant', value: this.filter.showIrrelevant, include: this.filter.showIrrelevant },
         { key: 'showArchived', value: this.filter.showArchived, include: this.filter.showArchived },
+        { key: 'showCsvDataMeta', value: this.filter.showCsvDataMeta, include: this.filter.showCsvDataMeta },
         { key: 'roles', value: this.filter.roles, include: (process.env.NODE_ENV === 'development') && this.filter.roles !== '' },
+
       ];
 
       return params;
@@ -528,9 +499,6 @@ export default {
       } catch (err) {
         this.$store.dispatch('feedback/add', err.response.data.message);
       }
-    },
-    setFormat(ev) {
-      this.selectedFormat = ev;
     },
     applyBasicFilters(basicFilters) {
       const match = {};

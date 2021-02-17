@@ -7,7 +7,6 @@ import router from '@/router';
 
 export const types = {
   mutations: {
-    RESET: 'RESET',
     SET_SUBMISSIONS: 'SET_SUBMISSIONS',
     ADD_SUBMISSION: 'ADD_SUBMISSION',
     GET_SUBMISSION: 'GET_SUBMISSION',
@@ -17,7 +16,6 @@ export const types = {
     SET_READY_TO_SUBMIT: 'SET_READY_TO_SUBMIT',
   },
   actions: {
-    reset: 'reset',
     add: 'add',
     remove: 'remove',
     fetchLocalSubmission: 'fetchLocalSubmission',
@@ -49,7 +47,7 @@ const getters = {
 };
 
 const mutations = {
-  [types.mutations.RESET](state) {
+  RESET(state) {
     Object.assign(state, createInitialState());
   },
   [types.mutations.SET_SUBMISSIONS](state, submissions) {
@@ -79,8 +77,8 @@ const mutations = {
 };
 
 const actions = {
-  [types.actions.reset]({ commit }) {
-    commit(types.mutations.RESET);
+  reset({ commit }) {
+    commit('RESET');
   },
   async [types.actions.fetchLocalSubmissions]({ commit }/* , userId */) {
     // const response = await api.get('/submissions');

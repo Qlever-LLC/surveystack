@@ -164,6 +164,8 @@
     <app-dialog
       v-model="dialogInvitationLink"
       title="Invitation Link"
+      @cancel="dialogInvitationLink = false"
+      @confirm="dialogInvitationLink = false"
     >
       <p>
         Copy the following secret invitation link. It can be used to claim this membership - either by creating a new user account, or by using an already existing user account.

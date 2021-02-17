@@ -1,23 +1,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable-next-line no-await-in-loop */
-
-
 import api from '@/services/api.service';
-
-
-export const types = {
-  FETCH_SURVEY: 'FETCH_SURVEY',
-  FETCH_SURVEYS: 'FETCH_SURVEYS',
-  // GET_SURVEY: 'GET_SURVEY',
-  SET_SURVEY: 'SET_SURVEY',
-  SET_PINNED: 'SET_PINNED',
-  RESET: 'RESET',
-  REMOVE_SURVEY: 'REMOVE_SURVEY',
-  ADD_SURVEY: 'ADD_SURVEY',
-  SET_SURVEYS: 'SET_SURVEYS',
-  CREATE_SURVEY: 'CREATE_SURVEY',
-};
 
 const createInitialState = () => ({
   surveys: [],
@@ -28,40 +12,26 @@ const initialState = createInitialState();
 
 const getters = {
   getSurvey: state => id => state.surveys.find(survey => survey._id === id),
-  getPinned: state => state.pinned,
-};
-
-const mutations = {
-  [types.RESET](state) {
-    Object.assign(state, createInitialState());
-  },
-  [types.ADD_SURVEY](state, survey) {
-    state.surveys.push(survey);
-  },
-  [types.SET_SURVEYS](state, surveys) {
-    state.surveys = surveys;
-  },
-  [types.REMOVE_SURVEY](state, id) {
-    const index = state.surveys.findIndex(survey => survey._id === id);
-    state.submissions.splice(index, 1);
-  },
-  [types.SET_PINNED](state, pinned) {
-    state.pinned = pinned;
+  pinned: state => state.pinned,
+  getPinned: state => (prefix = '', excludePath = '') => {
+    const prefixed = state.pinned.filter(s => s.meta.group.path && s.meta.group.path.startsWith(prefix));
+    const excluded = prefixed.filter(s => s.meta.group.path !== excludePath);
+    return excluded;
   },
 };
 
 const actions = {
   reset({ commit }) {
-    commit(types.RESET);
+    commit('RESET');
   },
   async fetchSurveys({ commit }) {
     const response = await api.get('/surveys');
-    commit(types.SET_SURVEYS, response.data);
+    commit('SET_SURVEYS', response.data);
     return response.data;
   },
   async fetchSurvey({ commit }, id) {
     const response = await api.get(`/surveys/${id}`);
-    commit(types.ADD_SURVEY, response.data);
+    commit('ADD_SURVEY', response.data);
     return response.data;
   },
   async fetchPinned({
@@ -74,10 +44,22 @@ const actions = {
     }
 
     const userId = rootState.auth.user._id;
-    dispatch('memberships/getUserMemberships', userId, { root: true });
-    const memberships = rootGetters['memberships/memberships'];
+    await dispatch('memberships/getUserMemberships', userId, { root: true });
 
-    for (const membership of memberships) {
+    const memberships = rootGetters['memberships/memberships'];
+    let filteredMemberships = memberships;
+
+    if (rootGetters['whitelabel/isWhitelabel']) {
+      // get any subgroup memberships of this whitelabel
+      // and later use those to find their pinned surveys
+      // (the whitelabel root group's pinned surveys are fetched separately inside whitelabel.store.js)
+      const { path } = rootGetters['whitelabel/partner'];
+      const prefixed = memberships.filter(m => m.group.path.startsWith(path)); // find any memberships in this whitelabel
+      const excluded = prefixed.filter(m => m.group.path !== path); // ... but exclude the whitelabel root group membership
+      filteredMemberships = excluded;
+    }
+
+    for (const membership of filteredMemberships) {
       try {
         const { data } = await api.get(`/groups/${membership.group._id}?populate=1`);
         if (data && data.surveys && data.surveys.pinned && Array.isArray(data.surveys.pinned)) {
@@ -96,14 +78,34 @@ const actions = {
       }
     }
 
-    commit(types.SET_PINNED, pinned);
+    commit('SET_PINNED', pinned);
 
     return pinned;
   },
   removeSurvey({ commit }, id) {
-    commit(types.REMOVE_SURVEY, id);
+    commit('REMOVE_SURVEY', id);
   },
 };
+
+const mutations = {
+  RESET(state) {
+    Object.assign(state, createInitialState());
+  },
+  ADD_SURVEY(state, survey) {
+    state.surveys.push(survey);
+  },
+  SET_SURVEYS(state, surveys) {
+    state.surveys = surveys;
+  },
+  REMOVE_SURVEY(state, id) {
+    const index = state.surveys.findIndex(survey => survey._id === id);
+    state.submissions.splice(index, 1);
+  },
+  SET_PINNED(state, pinned) {
+    state.pinned = pinned;
+  },
+};
+
 
 export default {
   namespaced: true,
@@ -111,5 +113,4 @@ export default {
   getters,
   actions,
   mutations,
-  types,
 };

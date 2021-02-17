@@ -12,7 +12,6 @@ const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-
   add({ commit }, feedback) {
     if (typeof feedback === 'string') {
       commit('add', { title: 'Error', type: 'error', message: feedback });

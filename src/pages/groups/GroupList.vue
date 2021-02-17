@@ -14,7 +14,7 @@
       :entities="entities"
       title="Groups"
       :link="(e) => `/g${e.path}`"
-      :linkNew="{name: 'groups-new', query: {dir: '/'}}"
+      :linkNew="{name: 'groups-new', query: {dir: rootDir}}"
     >
 
       <template v-slot:entity="{ entity }">
@@ -45,8 +45,30 @@ export default {
   },
   methods: {
     async fetchEntities() {
-      const { data } = await api.get(`/groups?showArchived=${this.showArchived}`);
-      this.entities = data;
+      if (this.isWhitelabel) {
+        const { path } = this.whitelabelPartner;
+        const { data: entities } = await api.get(`/groups?showArchived=${this.showArchived}&prefix=${path}`);
+        this.entities = entities;
+        return;
+      }
+
+      const { data: entities } = await api.get(`/groups?showArchived=${this.showArchived}`);
+      this.entities = entities;
+    },
+  },
+  computed: {
+    isWhitelabel() {
+      return this.$store.getters['whitelabel/isWhitelabel'];
+    },
+    whitelabelPartner() {
+      return this.$store.getters['whitelabel/partner'];
+    },
+    rootDir() {
+      if (this.isWhitelabel) {
+        return this.whitelabelPartner.path;
+      }
+
+      return '/';
     },
   },
   watch: {

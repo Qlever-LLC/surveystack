@@ -1,16 +1,4 @@
 <template>
-  <!-- <div class="survey-group-selector-list"> -->
-  <!-- <v-select
-      :value="value"
-      @input="handleInput"
-      :items="groupItems"
-      item-text="text"
-      item-value="value"
-      :label="label"
-      :outlined="outlined"
-      hide-details
-    >
-    </v-select> -->
   <v-list-group
     prepend-icon="mdi-account-check"
     :value="true"
@@ -23,18 +11,16 @@
       flat
       class="pt-0"
     >
-      <!-- <v-subheader class="text-uppercase px-0">Groups</v-subheader> -->
-      <!-- v-model="activeItem" -->
       <v-list-item-group
         :value="activeItem"
         color="primary"
         mandatory
       >
-
         <v-list-item
-          v-for="item in groupItems"
+          v-for="(item, i) in groupItems"
           :key="item.text"
           @click="() => handleInput(item.value)"
+          :value="i"
         >
           <v-list-item-icon>
             <v-icon>mdi-account-group</v-icon>
@@ -45,24 +31,44 @@
         </v-list-item>
       </v-list-item-group>
     </v-list-item>
-    <!-- </div> -->
   </v-list-group>
 </template>
 
 <script>
 export default {
-  data() {
-    return {
-      // activeItem: this.groupItems.findIndex(item => item.value === this.activeGroup || item.value.id === this.activeGroup),
-    };
+  props: {
+    value: {
+      type: [String, Object],
+    },
+    // with returnObject=true the v-model value returns an object {id: groupId, path: groupPath},
+    // otherwise v-model value returns the groupId as a string
+    returnObject: {
+      type: Boolean,
+      default: false,
+    },
+    label: {
+      type: String,
+      default: 'Active Group',
+    },
+    outlined: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     groups() {
+      if (this.isWhitelabel) {
+        return this.$store.getters['memberships/getPrefixedGroups'](this.whitelabelPartner.path);
+      }
       return this.$store.getters['memberships/groups'];
     },
     activeItem: {
       get() {
-        return this.groupItems.findIndex(item => item.value === this.activeGroup || item.value.id === this.activeGroup);
+        if (this.returnObject) {
+          return this.groupItems.findIndex(item => item.value.id === this.activeGroup);
+        }
+
+        return this.groupItems.findIndex(item => item.value === this.activeGroup);
       },
     },
     groupItems() {
@@ -83,9 +89,6 @@ export default {
         };
       });
     },
-    // memberships() {
-    //   return this.$store.getters['memberships/memberships'];
-    // },
     activeGroup() {
       return this.$store.getters['memberships/activeGroup'];
     },
@@ -94,7 +97,7 @@ export default {
         return '';
       }
 
-      // it's possible that a membership that a membership was deleted on the server
+      // it's possible that a membership was deleted on the server
       // so check if it still exists first
       const group = this.groups.find(g => g._id === this.activeGroup);
       if (group) {
@@ -102,24 +105,11 @@ export default {
       }
       return '';
     },
-  },
-  props: {
-    value: {
+    isWhitelabel() {
+      return this.$store.getters['whitelabel/isWhitelabel'];
     },
-    // surveyGroup: {
-    //   type: String,
-    // },
-    returnObject: {
-      type: Boolean,
-      default: false,
-    },
-    label: {
-      type: String,
-      default: 'Active Group',
-    },
-    outlined: {
-      type: Boolean,
-      default: false,
+    whitelabelPartner() {
+      return this.$store.getters['whitelabel/partner'];
     },
   },
   methods: {
@@ -127,7 +117,10 @@ export default {
       this.$emit('input', val);
     },
     isActiveGroup(value) {
-      return value === this.activeGroup || value.id === this.activeGroup;
+      if (this.returnObject) {
+        return value.id === this.activeGroup;
+      }
+      return value === this.activeGroup;
     },
   },
   created() {

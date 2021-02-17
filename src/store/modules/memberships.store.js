@@ -15,9 +15,12 @@ const initialState = createInitialState();
 
 const getters = {
   status: state => state.status,
-  memberships: state => state.memberships,
   activeGroup: state => state.activeGroup,
-  groups: state => state.memberships.map(membership => membership.group),
+  memberships: state => state.memberships,
+  getPrefixedMemberships: state => (prefix = '/') => state.memberships.filter(m => m.group.path && m.group.path.startsWith(prefix)),
+  groups: state => state.memberships.map(m => m.group),
+  getPrefixedGroups: state => (prefix = '/') => state.memberships.filter(m => m.group.path && m.group.path.startsWith(prefix)).map(m => m.group),
+
 };
 
 const actions = {
@@ -25,7 +28,7 @@ const actions = {
     commit('RESET');
   },
   getUserMemberships({ commit, rootGetters }, userId) {
-    if (userId === null || userId === undefined) {
+    if (!userId) {
       return new Promise((resolve) => {
         resolve([]);
       });

@@ -2,7 +2,7 @@
   <v-card>
     <v-card-title>Basic Filters</v-card-title>
     <v-card-text>
-      <v-select
+      <v-autocomplete
         :items="fieldItems"
         label="Field"
         v-model="selectedField"
@@ -135,6 +135,10 @@ export default {
       let v = this.selectedValue;
       if (type === 'number') {
         v = Number(v);
+      } else if (type === '$oid') {
+        v = { $oid: v };
+      } else if (type === '$date') {
+        v = { $date: v };
       }
       console.log(this.selectedOperator);
 

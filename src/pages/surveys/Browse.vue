@@ -1,6 +1,5 @@
 <template>
   <v-container>
-
     <v-tabs
       v-model="activeTab"
       fixed-tabs
@@ -10,38 +9,19 @@
         :href="`#${tab.name}`"
         :key="tab.name"
       >
-        <span v-if="tab.name === 'active-group'">
+        <span
+          v-if="tab.name === 'active-group'"
+          class="text-no-wrap"
+        >
           {{ activeGroupName }}
         </span>
-        <span v-else>
+        <span
+          v-else
+          class="text-no-wrap"
+        >
           {{ tab.label }}
         </span>
       </v-tab>
-      <!-- <v-menu
-        v-if="groupsItems.length"
-        bottom
-        left
-      >
-        <template v-slot:activator="{ on }">
-          <v-btn
-            text
-            class="align-self-center mr-4"
-            v-on="on"
-          >
-            more
-            <v-icon right>mdi-menu-down</v-icon>
-          </v-btn>
-        </template>
-        <v-list class="">
-          <v-list-item
-            v-for="item in groupsItems"
-            :key="item.name"
-            @click="setMenuTab(item)"
-          >
-            {{ item.label }}
-          </v-list-item>
-        </v-list>
-      </v-menu> -->
     </v-tabs>
     <v-card
       class="my-2"
@@ -59,8 +39,7 @@
             <v-list-item-content>
               <div>
                 <v-list-item-title>{{e.name}}</v-list-item-title>
-                <!-- <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle> -->
-                <v-list-item-subtitle v-if="e.meta && e.meta.group && e.meta.group.id">
+                <v-list-item-subtitle v-if="e.meta.group && e.meta.group.id">
                   {{ getGroupName(e.meta.group.id) }}
                 </v-list-item-subtitle>
                 <small
@@ -131,7 +110,6 @@
             <v-list-item-content>
               <div>
                 <v-list-item-title>{{e.name}}</v-list-item-title>
-                <!-- <v-list-item-subtitle>{{e._id}}</v-list-item-subtitle> -->
                 <v-list-item-subtitle v-if="e.meta && e.meta.group && e.meta.group.id">
                   {{ getGroupName(e.meta.group.id) }}
                 </v-list-item-subtitle>
@@ -163,18 +141,10 @@
         />
       </v-card-actions>
     </v-card>
-    <!-- <v-row>
-      <v-spacer />
-      <v-btn
-        outlined
-        class="ma-8"
-      >Show Others</v-btn>
-    </v-row> -->
   </v-container>
 </template>
 
 <script>
-import { uniqBy } from 'lodash';
 import moment from 'moment';
 import api from '@/services/api.service';
 
@@ -202,9 +172,15 @@ export default {
     };
   },
   computed: {
-
     tabs() {
-      const commonTabs = [
+      const tabs = [
+        {
+          name: 'all-groups',
+          label: 'All Groups',
+        },
+      ];
+
+      const loggedInTabs = [
         {
           name: 'my-surveys',
           label: 'My Surveys',
@@ -213,27 +189,23 @@ export default {
           name: 'my-groups',
           label: 'My Groups',
         },
-        {
-          name: 'all-groups',
-          label: 'All Groups',
-        },
       ];
 
-      if (!this.activeGroupId) {
-        return commonTabs;
-      }
-
-      return [
-        // {
-        //   name: 'active-group-pinned-surveys',
-        //   label: 'Pinned Surveys',
-        // },
+      const activeGroupTabs = [
         {
           name: 'active-group',
           label: 'Active Group',
         },
-        ...commonTabs,
       ];
+
+      if (this.isLoggedIn) {
+        tabs.unshift(...loggedInTabs);
+        if (this.activeGroupId) {
+          tabs.unshift(...activeGroupTabs);
+        }
+      }
+
+      return tabs;
     },
     activeTabPaginationLength() {
       const { total } = this.surveys.pagination;
@@ -256,18 +228,24 @@ export default {
       }
       return 'No active group';
     },
+    isLoggedIn() {
+      return this.$store.getters['auth/isLoggedIn'];
+    },
+    isWhitelabel() {
+      return this.$store.getters['whitelabel/isWhitelabel'];
+    },
+    whitelabelPartner() {
+      return this.$store.getters['whitelabel/partner'];
+    },
   },
   watch: {
     search(value) {
-      this.fetchData();
-      if (value) {
-        this.pinnedIsVisible = false;
-      } else {
-        this.pinnedIsVisible = true;
-      }
+      this.page = 1;
+      this.getDataForTab(this.activeTab);
     },
     // TODO: reimplement with @change listener instead of watch
     async activeTab(value) {
+      this.page = 1;
       await this.getDataForTab(value);
     },
     async activeGroupId(value) {
@@ -291,40 +269,20 @@ export default {
     },
     async getDataForTab(tab) {
       switch (tab) {
-        // case 'active-group-pinned-surveys':
-        //   this.surveys = await this.fetchPinnedSurveys(this.activeGroupId);
-        //   break;
         case 'active-group':
           // eslint-disable-next-line no-case-declarations
           const [pinnedResponse, response] = await Promise.all([
             this.fetchPinnedSurveys(this.activeGroupId),
             this.fetchData({ groups: [this.activeGroupId] }),
           ]);
-
-
-          // this.surveys.content = uniqBy([
-          //   ...pinnedResponse.map(r => ({ ...r, pinned: true })),
-          //   ...response.content,
-          // ], '_id');
-          // this.surveys.pagination = {
-          //   ...response.pagination,
-          //   total: this.surveys.content.length,
-          // };
-
-
-          // this.surveys = response;
-          // this.pinnedSurveys = pinnedResponse.map(r => ({ ...r, pinned: true }));
           break;
         case 'my-surveys':
-          // this.surveys = await this.fetchData({ user: this.$store.getters['auth/user']._id });
           await this.fetchData({ user: this.$store.getters['auth/user']._id });
           break;
         case 'my-groups':
           this.surveys = await this.fetchData({
             groups: this.$store.getters['memberships/groups'].map(({ _id }) => _id),
           });
-          break;
-        case 'select-group':
           break;
         case 'all-groups':
         default:
@@ -345,6 +303,9 @@ export default {
       if (this.search) {
         queryParams.append('q', this.search);
         console.log(this.search);
+      }
+      if (this.isWhitelabel) {
+        queryParams.append('prefix', this.whitelabelPartner.path);
       }
 
       queryParams.append('skip', (this.page - 1) * PAGINATION_LIMIT);
@@ -392,3 +353,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+/* fix tabs indentation on mobile */
+>>> .v-slide-group__prev {
+  display: none !important;
+}
+</style>

@@ -21,10 +21,10 @@
           :key="item.key"
         />
         <v-radio
-          label="other"
-          :value="customSelection"
+          :value="customSelection || 'other'"
           v-if="control.options.allowCustomSelection"
           class="mt-1"
+          @change="customSelection = customSelection || 'other'"
         >
           <template v-slot:label>
             <v-text-field
@@ -36,9 +36,9 @@
               dense
               label="other"
             />
-
           </template>
         </v-radio>
+
       </v-radio-group>
       <app-control-error v-else>No options specified, please update suvey definition</app-control-error>
     </div>
@@ -50,29 +50,40 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 
+import { getValueOrNull } from '@/utils/surveyStack';
+
+
 export default {
   mixins: [baseQuestionComponent],
   data() {
     return {
-      customSelection: '',
+      customSelection: 'other',
     };
   },
   methods: {
+    log(v) {
+      console.log(v);
+    },
+    getValueOrNull,
     onChange(v) {
       if (this.value !== v) {
-        this.changed(v);
+        this.changed(this.getValueOrNull(v));
       }
     },
     handleCustomSelectionInput(value) {
       this.customSelection = value;
       // set submission question value if the current question value doesn't match one of the entries in `control.options.source`
+      /*
       if (
         this.control.options.source
         && Array.isArray(this.control.options.source)
         && this.valueIsCustom
       ) {
-        this.changed(value);
+        this.changed(this.getValueOrNull(value));
       }
+      */
+
+      this.changed(this.getValueOrNull(value));
     },
   },
   computed: {
@@ -94,7 +105,7 @@ export default {
     // set `customSelection` value to submission question value if we allow the user to enter custom selections
     // and the current question value is set to a value that is not in entries of `control.options.source`
     console.log('value', this.value);
-    if (this.control.options.allowCustomSelection && this.valueIsCustom) {
+    if (this.value && this.control.options.allowCustomSelection && this.valueIsCustom) {
       this.customSelection = this.value;
     }
   },

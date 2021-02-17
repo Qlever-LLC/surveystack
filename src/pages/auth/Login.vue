@@ -1,5 +1,5 @@
 <template>
-  <v-container class="maxw-40">
+  <v-container class="maxw-40 px-0">
     <v-card class="pa-5">
       <h1>Login</h1>
       <v-form>
@@ -36,7 +36,10 @@
         </div>
       </v-form>
 
-      <div class="text-center text-muted mt-5">
+      <div
+        class="text-center text-muted mt-5"
+        v-if="registrationEnabled || hasInvitation"
+      >
         Don't have an account?
         <router-link :to="registerLink">Register now</router-link>
       </div>
@@ -90,6 +93,7 @@ export default {
       },
       invitation: '',
       membership: null,
+      registrationEnabled: false,
     };
   },
   computed: {
@@ -114,6 +118,15 @@ export default {
       }
       return link;
     },
+    isWhitelabel() {
+      return this.$store.getters['whitelabel/isWhitelabel'];
+    },
+    whitelabelPartner() {
+      return this.$store.getters['whitelabel/partner'];
+    },
+    hasInvitation() {
+      return this.$store.getters['invitation/hasInvitation'];
+    },
   },
   async created() {
     if (this.initialEmail) {
@@ -126,6 +139,17 @@ export default {
       this.$store.dispatch('invitation/set', invitation);
       const { data: [membership] } = await api.get(`/memberships?invitationCode=${invitation}&populate=true`);
       this.membership = membership;
+    }
+
+    console.log('created', this.isWhitelabel);
+
+    if (this.isWhitelabel) {
+      const { data } = await api.get(`/groups/${this.whitelabelPartner.id}`);
+      if (!data.meta.invitationOnly) {
+        this.registrationEnabled = true;
+      }
+    } else {
+      this.registrationEnabled = true;
     }
 
     // magic link login
@@ -161,13 +185,13 @@ export default {
           user: this.entity,
         });
 
-        await autoSelectActiveGroup(this.$store);
+        await autoSelectActiveGroup(this.$store, this.isWhitelabel ? this.whitelabelPartner.id : null);
 
         this.$store.dispatch('surveys/fetchPinned');
 
         if (this.$route.params.redirect) {
           this.$router.push(this.$route.params.redirect);
-        } else if (this.$store.getters['invitation/hasInvitation']) {
+        } else if (this.hasInvitation) {
           this.$router.push({ name: 'invitations', query: { code: this.$store.getters['invitation/code'] } });
         } else {
           this.$router.push('/');

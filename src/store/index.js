@@ -11,10 +11,10 @@ export default new Vuex.Store({
   modules,
   state: {},
   actions: {
-    reset({ commit }) {
+    reset({ dispatch }) {
       // resets state of all the modules
       console.log('!!! resetting state of all modules !!!');
-      Object.keys(modules).forEach(moduleName => commit(`${moduleName}/RESET`));
+      Object.keys(modules).forEach(moduleName => dispatch(`${moduleName}/reset`));
     },
   },
   mutations: {},

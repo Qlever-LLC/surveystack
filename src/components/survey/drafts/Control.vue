@@ -64,7 +64,7 @@
           @setRenderQueue="setRenderQueue"
           :autoFocus="autoFocus"
           :relevant="$store.getters['draft/relevance'](path)"
-          @next="$store.dispatch('draft/next')"
+          @next="!$store.getters['draft/hasRequiredUnanswered'] && $store.dispatch('draft/next')"
           :redacted="control.options && control.options.redacted"
           :required="$store.getters['draft/relevance'](path) && control.options && control.options.required"
         />

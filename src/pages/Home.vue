@@ -3,8 +3,8 @@
     <v-row>
       <v-col>
         <v-img
-          v-if="appPartner"
-          :src="appPartner.logo"
+          v-if="isWhitelabel"
+          :src="$store.getters['whitelabel/partner'].logo"
           class="my-3"
           contain
           height="128"
@@ -16,6 +16,56 @@
           contain
           height="128"
         ></v-img>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col align="center">
+        <app-basic-list
+          class="maxw-40 text-left"
+          v-if="isWhitelabel && pinnedWhitelabelSurveys.length > 0"
+          :entities="pinnedWhitelabelSurveys"
+          :title="`Pinned by ${whitelabelPartner.name}`"
+          :link="e => `/surveys/${e.id}`"
+        >
+          <template v-slot:entity="{ entity }">
+            <v-list-item-content>
+              <div class="d-flex">
+                <div class="mr-2">
+                  <v-btn
+                    v-if="entity.meta.submissions === 'public' || !entity.meta.submissions"
+                    :to="`/surveys/${entity.id}`"
+                    title="Everyone can submit"
+                    icon
+                  >
+                    <v-icon>mdi-earth</v-icon>
+                  </v-btn>
+                  <v-btn
+                    v-if="entity.meta.submissions === 'user'"
+                    :to="`/surveys/${entity.id}`"
+                    title="Only signed-in users can submit"
+                    icon
+                  >
+                    <v-icon>mdi-account</v-icon>
+                  </v-btn>
+                  <v-btn
+                    v-if="entity.meta.submissions === 'group'"
+                    :to="`/surveys/${entity.id}`"
+                    title="Everyone group members can submit"
+                    icon
+                  >
+                    <v-icon>mdi-account-group</v-icon>
+                  </v-btn>
+                </div>
+                <div>
+                  <v-list-item-title>{{entity.name}}</v-list-item-title>
+                  <v-list-item-subtitle>{{entity.group}}</v-list-item-subtitle>
+                </div>
+              </div>
+
+            </v-list-item-content>
+          </template>
+        </app-basic-list>
       </v-col>
     </v-row>
 
@@ -144,15 +194,21 @@ export default {
 
 
   computed: {
-    appPartner() {
-      return this.$store.getters['appui/partner'];
-    },
     isLoggedIn() {
       return this.$store.getters['auth/isLoggedIn'];
     },
     pinned() {
-      const pinned = this.$store.getters['surveys/getPinned'];
+      const pinned = this.$store.getters['surveys/pinned'];
       return pinned;
+    },
+    isWhitelabel() {
+      return this.$store.getters['whitelabel/isWhitelabel'];
+    },
+    whitelabelPartner() {
+      return this.$store.getters['whitelabel/partner'];
+    },
+    pinnedWhitelabelSurveys() {
+      return this.$store.getters['whitelabel/pinnedSurveys'];
     },
   },
 

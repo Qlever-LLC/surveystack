@@ -13,7 +13,6 @@ const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-
   set({ commit }, invitation) {
     commit('set', invitation);
   },

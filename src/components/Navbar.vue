@@ -69,16 +69,6 @@
               <v-icon>{{item.icon}}</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
-              <!-- <v-list-item-title
-                v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
-              >
-                <v-badge :content="readyToSubmitCount" color="pink">
-                  {{ item.label }}
-                </v-badge>
-              </v-list-item-title> -->
-              <!-- <v-list-item-title v-else>
-                {{ item.label }}
-              </v-list-item-title> -->
               <v-list-item-title>
                 {{ item.label }}
                 <v-chip
@@ -136,6 +126,11 @@ export default {
     NavbarUserMenu,
   },
   data() {
+    let groupsLink = { name: 'groups-list' };
+    if (this.$store.getters['whitelabel/isWhitelabel']) {
+      groupsLink = `/g${this.$store.getters['whitelabel/partner'].path}`;
+    }
+
     return {
       version: process.env.VUE_APP_VERSION,
       sidenav: {
@@ -177,9 +172,12 @@ export default {
           {
             type: 'link',
             label: 'Groups',
+            /*
             to: {
               name: 'groups-list',
             },
+            */
+            to: groupsLink,
             icon: 'mdi-domain',
           },
         ],

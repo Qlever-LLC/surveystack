@@ -105,6 +105,8 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 
+import { getValueOrNull } from '@/utils/surveyStack';
+
 export default {
   mixins: [baseQuestionComponent],
   data() {
@@ -113,12 +115,13 @@ export default {
     };
   },
   methods: {
+    getValueOrNull,
     onChange(v) {
       if (this.value !== v) {
         if (Array.isArray(v)) {
-          this.changed(v.sort());
+          this.changed(this.getValueOrNull(v.sort()));
         } else {
-          this.changed(v);
+          this.changed(this.getValueOrNull(v));
         }
       }
     },
@@ -127,12 +130,12 @@ export default {
     },
     remove(item) {
       this.changed(
-        this.value.filter(v => v !== item.value),
+        this.getValueOrNull(this.value.filter(v => v !== item.value)),
       );
     },
     removeValue(value) {
       this.changed(
-        this.value.filter(v => v !== value),
+        this.getValueOrNull(this.value.filter(v => v !== value)),
       );
     },
     getLabelForItemValue(value) {

@@ -1,7 +1,40 @@
 <template>
   <v-container>
+    <app-dialog
+      v-model="learnMoreDialog"
+      title="Premium Features"
+      @confirm="learnMoreDialog = false"
+      @cancel="learnMoreDialog = false"
+    >
+      <p>
+        With a paid subscription you can upgrade to <strong>your own white-labelled app</strong> with a <strong>custom url</strong>, and your <strong>branding</strong> and <strong>color scheme</strong>.
+        You will also benefit from more administrative tools to improve project and data management:
+      </p>
+      <ul class="my-3">
+        <li>Allow any user to join your group from your custom url.</li>
+        <li>See all your group and pinned surveys without being logged in to your app.</li>
+        <li>Automatically associate data submitted to your custom url to your group so that you have proper administrative controls over data privacy.</li>
+      </ul>
+      <p>
+        To learn more about paid subscriptions please contact Dan TerAvest (<a href="mailto:dan@our-sci.net">dan@our-sci.net</a>) or Greg Austic (<a href="mailto:greg@our-sci.net">greg@our-sci.net</a>)
+      </p>
+    </app-dialog>
     <div class="d-flex justify-space-between">
-      <h1>{{editMode ? "Edit group" : "Create group"}}</h1>
+      <h1>
+        <span>{{editMode ? "Edit group" : "Create group"}}</span>
+        <v-chip
+          v-if="isPremium"
+          class="ml-2"
+          color="success"
+        >
+          <v-icon
+            small
+            left
+          >
+            mdi-octagram
+          </v-icon>Premium
+        </v-chip>
+      </h1>
       <v-btn
         v-if="editMode"
         class="ma-2"
@@ -34,13 +67,27 @@
           @click:append="editSlug = !editSlug"
           hint="URL friendly version of name"
           persistent-hint
+          :disabled="isWhitelabel && entity.path === whitelabelPartner.path"
         />
-        <v-checkbox
-          label="Invitation Only"
-          v-model="entity.meta.invitationOnly"
-          :hint="entity.meta.invitationOnly ? 'Users can only join through an invitation' : 'Everybody may join this group'"
-          persistent-hint
-        />
+        <div class="d-flex align-center mt-6">
+          <v-checkbox
+            label="Invitation Only"
+            v-model="entity.meta.invitationOnly"
+            :hint="entity.meta.invitationOnly ? 'Users can only join through an invitation' : 'Everybody may join this group'"
+            persistent-hint
+            :disabled="!isPremium"
+            class="d-inline mt-0"
+          />
+          <div class="ml-auto ml-sm-6">
+            <v-btn
+              small
+              v-if="!isPremium"
+              @click="learnMoreDialog = true"
+              outlined
+              color="primary"
+            >Learn more...</v-btn>
+          </div>
+        </div>
         <v-checkbox
           label="Archived"
           v-model="entity.meta.archived"
@@ -134,6 +181,7 @@ import api from '@/services/api.service';
 import appIntegrationList from '@/components/integrations/IntegrationList.vue';
 import appPinnedSurveys from '@/components/groups/PinnedSurveys.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
+import appDialog from '@/components/ui/Dialog.vue';
 import appFarmHubOnboarding from '@/components/integrations/FarmHubOnboarding.vue';
 
 
@@ -145,6 +193,7 @@ export default {
     appIntegrationList,
     appPinnedSurveys,
     appBasicList,
+    appDialog,
     appFarmHubOnboarding,
   },
   data() {
@@ -169,6 +218,7 @@ export default {
       integrations: [],
       searchResults: [],
       members: [],
+      learnMoreDialog: false,
     };
   },
   methods: {
@@ -245,6 +295,20 @@ export default {
         const handle = handleize(newVal);
         this.entity.slug = handle;
       },
+    },
+  },
+  computed: {
+    isWhitelabel() {
+      return this.$store.getters['whitelabel/isWhitelabel'];
+    },
+    whitelabelPartner() {
+      return this.$store.getters['whitelabel/partner'];
+    },
+    isPremium() {
+      if (this.isWhitelabel && (this.entity.path.startsWith(this.whitelabelPartner.path) || this.entity.dir.startsWith(this.whitelabelPartner.path))) {
+        return true;
+      }
+      return false;
     },
   },
   async created() {

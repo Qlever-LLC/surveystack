@@ -1,7 +1,9 @@
 export default {
   name: 'Real Food Campaign',
   domain: 'rfc',
-  groupSlug: 'real-food-campaign',
+  id: '5e97401756f2b6000176e709',
+  slug: 'real-food-campaign',
+  path: '/real-food-campaign/',
   logo: '/partners/rfc/img/logo.png',
   themes: {
     light: {

@@ -105,7 +105,7 @@ function createCsv(submissions, headers) {
       }
     }
 
-    removeKeys(submission.data, ['meta']);
+    // removeKeys(submission.data, ['meta']); // remove any meta fields below data
     items.push(flatten(submission));
   });
 

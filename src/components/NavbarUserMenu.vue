@@ -41,10 +41,7 @@
         </v-list-item>
         <v-divider />
         <v-subheader>Active Group</v-subheader>
-        <active-group-selector-list
-          class=""
-          v-model="activeGroup"
-        />
+        <active-group-selector-list v-model="activeGroup" />
         <v-divider />
         <v-list-item
           link

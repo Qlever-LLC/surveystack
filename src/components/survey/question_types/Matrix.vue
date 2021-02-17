@@ -47,7 +47,7 @@
                 :key="header.value"
               >
                 <div class="d-flex align-center">
-                  <h4>{{header.text}}</h4>
+                  <h4>{{header.label}}</h4>
                   <app-redacted v-if="header.redacted" />
                   <app-required v-if="header.required" />
                 </div>
@@ -93,10 +93,11 @@
 
     <v-data-table
       :headers="headers"
+      header
       disable-pagination
       hide-default-footer
       hide-default-header
-      :items="rows"
+      :items="rows || []"
       disable-sort
       mobile-breakpoint="0"
     >
@@ -109,7 +110,7 @@
             >
               <v-tooltip top>
                 <template v-slot:activator="{ on }">
-                  <span v-on="on">{{h.text}}</span>
+                  <span v-on="on">{{h.label}}</span>
                 </template>
                 <span>{{h.type}}</span>
               </v-tooltip>
@@ -144,6 +145,8 @@
                   @changed="onInput"
                   :disabled="isMobile"
                   class="matrix-cell my-2"
+                  :style="{minWidth: header.scaleWidth ? `calc(10rem * ${header.scaleWidth}/100)` : '10rem'}"
+                  :loading="loading"
                 />
               </v-form>
             </td>
@@ -320,11 +323,7 @@ export default {
       return this.control.options.source;
     },
     headers() {
-      const headers = this.source.content.map(col => ({
-        text: col.label, value: col.value, type: col.type, multiple: col.multiple, custom: col.custom, required: col.required, redacted: col.redacted,
-      }));
-
-      return headers;
+      return this.source.content;
     },
     fields() {
       return this.source.content.map(col => col.value);
@@ -350,7 +349,7 @@ export default {
   },
   data() {
     return {
-      rows: this.value || [],
+      rows: this.value,
       rowToBeDeleted: -1,
       menus: {}, // object to hold v-models for v-menu
       farmosTransformedPlantings: [],
@@ -373,7 +372,11 @@ export default {
         }
       }
 
+      if (this.rows === null) {
+        this.rows = [];
+      }
       this.rows.push(newRow);
+      this.$emit('changed', this.rows);
       if (this.isMobile) {
         this.editItem(this.rows.length - 1);
       }
@@ -382,6 +385,9 @@ export default {
       this.showEditItemDialog = false;
       this.rows.splice(row, 1);
       this.rowToBeDeleted = -1;
+      if (this.rows.length === 0) {
+        this.rows = null;
+      }
       this.$emit('changed', this.rows);
     },
     editItem(index) {
@@ -392,7 +398,7 @@ export default {
     getDropdownItems(field) {
       const column = this.source.content.find(col => col.value === field);
       const ontology = this.resources.find(resource => resource.id === column.resource);
-      return ontology.content.map(row => ({ text: row.label, value: row.value }));
+      return ontology.content.map(row => ({ label: row.label, value: row.value }));
     },
     onInput() {
       console.log('onInput', this.rows);
@@ -420,7 +426,7 @@ export default {
 
 <style scoped>
 .matrix-cell {
-  min-width: 10rem;
+  /*min-width: 11rem;*/
 }
 
 /*

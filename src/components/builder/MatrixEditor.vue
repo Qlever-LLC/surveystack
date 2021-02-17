@@ -158,6 +158,16 @@
                 hint="Visible to submitter and admins only"
                 persistent-hint
               />
+              <h4 class="mt-6 mb-4">Display Options</h4>
+              <v-text-field
+                type="number"
+                v-model.number="item.scaleWidth"
+                label="Scale minimum width %"
+                dense
+                autocomplete="off"
+                hint="Default 100"
+                persistent-hint
+              />
 
             </v-card-text>
           </v-card>
@@ -297,6 +307,7 @@ export default {
         custom: false,
         required: false,
         redacted: false,
+        scaleWidth: 100,
       };
     },
     deleteColumn(index) {

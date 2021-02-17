@@ -24,16 +24,19 @@
 import baseQuestionComponent from './BaseQuestionComponent';
 import { isIos } from '@/utils/compatibility';
 
+import { getValueOrNull } from '@/utils/surveyStack';
+
 export default {
   mixins: [baseQuestionComponent],
   methods: {
+    getValueOrNull,
     submit() {
       this.onInput(this.value);
       this.$emit('next');
     },
     onInput(v) {
       if (this.value !== v) {
-        this.changed(v);
+        this.changed(getValueOrNull(v));
       }
     },
     tryAutofocus() {
@@ -44,14 +47,11 @@ export default {
       ) {
         return false;
       }
-      // setTimeout(() => {
-      //   }, 100);
-      this.$refs.textField.$refs.input.focus({ preventScroll: true });
 
+      this.$refs.textField.$refs.input.focus({ preventScroll: true });
 
       // could we use this instead?
       // this.$nextTick(() => this.$refs.textField.$refs.input.focus());
-
 
       return true;
     },
