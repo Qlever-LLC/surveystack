@@ -1,17 +1,11 @@
 <template>
-  <div
-    class="mx-0 px-0"
-    style="width: 100%"
-  >
+  <div class="mx-0 px-0" style="width: 100%">
     <div v-if="control.type === 'page' && !insidePage">
-      <div
-        v-for="(child, i) in control.children"
-        :key="i"
-      >
+      <div v-for="(child, i) in control.children" :key="i">
         <app-control
           :path="`${path}.${child.name}`"
           :control="child"
-          :autoFocus="i===0"
+          :autoFocus="i === 0"
           insidePage
         />
       </div>
@@ -20,7 +14,7 @@
     <div v-else-if="control.type === 'group' && insidePage">
       <div
         class="group"
-        :class="{irrelevant: !$store.getters['draft/relevance'](path)}"
+        :class="{ irrelevant: !$store.getters['draft/relevance'](path) }"
       >
         <app-control-label
           :value="control.label"
@@ -28,14 +22,11 @@
         />
         <app-control-hint :value="control.hint" />
 
-        <div
-          v-for="(child, i) in control.children"
-          :key="i"
-        >
+        <div v-for="(child, i) in control.children" :key="i">
           <app-control
             :path="`${path}.${child.name}`"
             :control="child"
-            :autoFocus="autoFocus && i===0"
+            :autoFocus="autoFocus && i === 0"
             insidePage
           />
         </div>
@@ -47,12 +38,16 @@
     <div v-else>
       <div
         class="control"
-        :class="{irrelevant: !$store.getters['draft/relevance'](path)}"
+        :class="{ irrelevant: !$store.getters['draft/relevance'](path) }"
       >
         <component
           :is="getComponentName(control)"
           :control="control"
-          :value="$store.getters['draft/property'](path).value"
+          :value="
+            $store.getters['draft/property'](path)
+              ? $store.getters['draft/property'](path).value
+              : null
+          "
           :index="path"
           :key="path"
           :resources="survey.resources"
@@ -64,14 +59,19 @@
           @setRenderQueue="setRenderQueue"
           :autoFocus="autoFocus"
           :relevant="$store.getters['draft/relevance'](path)"
-          @next="!$store.getters['draft/hasRequiredUnanswered'] && $store.dispatch('draft/next')"
+          @next="
+            !$store.getters['draft/hasRequiredUnanswered'] &&
+              $store.dispatch('draft/next')
+          "
           :redacted="control.options && control.options.redacted"
-          :required="$store.getters['draft/relevance'](path) && control.options && control.options.required"
+          :required="
+            $store.getters['draft/relevance'](path) &&
+            control.options &&
+            control.options.required
+          "
         />
       </div>
-
     </div>
-
   </div>
 </template>
 

@@ -4,7 +4,6 @@
     v-if="control"
     ref="wrapper"
   >
-
     <!-- confirm submission modal -->
     <app-confirm-submission-dialog
       v-model="showConfirmSubmission"
@@ -25,10 +24,7 @@
     />
 
     <!-- Overview -->
-    <div
-      v-if="showOverview"
-      class="grey lighten-4 draft-overview"
-    >
+    <div v-if="showOverview" class="grey lighten-4 draft-overview">
       <app-draft-overview
         v-if="showOverview"
         :survey="survey"
@@ -41,10 +37,7 @@
     </div>
 
     <!-- Content with questions -->
-    <div
-      class="draft-content"
-      v-else
-    >
+    <div class="draft-content" v-else>
       <v-fab-transition>
         <v-btn
           v-show="overflowing"
@@ -54,7 +47,10 @@
           small
           fixed
           style="bottom: 76px; right: 12px; z-index: 150"
-          @click="scrollY(500); overflowing = false"
+          @click="
+            scrollY(500);
+            overflowing = false;
+          "
         >
           <v-icon>mdi-arrow-down</v-icon>
         </v-btn>
@@ -69,8 +65,14 @@
     <!-- Footer with next/prev buttons -->
     <app-draft-footer
       class="draft-footer px-0 grey lighten-4"
-      :style="{left: moveFooter ? '256px' : '0px', width: moveFooter ? 'calc(100% - 256px)' : '100%'}"
-      :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
+      :style="{
+        left: moveFooter ? '256px' : '0px',
+        width: moveFooter ? 'calc(100% - 256px)' : '100%',
+      }"
+      :showPrev="
+        !$store.getters['draft/atStart'] &&
+        !$store.getters['draft/showOverview']
+      "
       :enableNext="!$store.getters['draft/hasRequiredUnanswered']"
       :enableSubmit="!$store.getters['draft/errors']"
       :showSubmit="showOverview"
@@ -79,7 +81,6 @@
       @prev="prev"
       @submit="showConfirmSubmission = true"
     />
-
   </div>
 </template>
 
@@ -190,6 +191,9 @@ export default {
 
       if (found) {
         group.path = found.path;
+      } else {
+        // TODO: what if no group matches? This can happen during resubmission
+        return;
       }
 
       this.$store.dispatch('draft/setProperty', { path: 'meta.group', value: group });

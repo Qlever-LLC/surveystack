@@ -356,9 +356,11 @@ const mutations = {
     surveyStackUtils.setNested(state.submission, path, value);
   },
   NEXT(state, node) {
+    // console.log('next', node, state);
     state.node = node;
   },
   PREV(state, node) {
+    // console.log('prev', node, state);
     state.node = node;
   },
   GOTO(state, path) {
