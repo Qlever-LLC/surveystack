@@ -43,6 +43,10 @@ export const assertEntityRights = catchErrors(async (req, res, next) => {
   const { existing } = res.locals;
   const user = res.locals.auth.user._id;
 
+  if (!res.locals.auth.isSuperAdmin) {
+    return next(); // allow super admins to reassign
+  }
+
   if ((!existing.meta.group || !existing.meta.group.id) && !existing.meta.creator) {
     return next(); // no user and no group => free for all! may want to change this behaviour
   }
