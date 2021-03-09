@@ -9,7 +9,7 @@
 
     <a
       ref="scriptLink"
-      :href="`http://localhost:9020/kit/${scriptId}`"
+      :href="`http://app.surveystack.io/kit/${scriptId}`"
       style="display: none"
       >Run Surveystack Script</a
     >
@@ -119,7 +119,7 @@ export default {
       console.log('running script', script);
       this.scriptId = script;
 
-      this.$refs.scriptLink.href = `http://localhost:9020/kit/${script}`;
+      this.$refs.scriptLink.href = `http://app.surveystack.io/kit/${script}`;
       this.$refs.scriptLink.click();
     },
     handleRequestSetContext({ context }) {
