@@ -65,6 +65,13 @@ export const createControlInstance = (control) => {
 
 export const availableControls = [
   {
+    name: 'library',
+    label: 'search question library',
+    type: 'library',
+    children: [],
+    icon: 'mdi-group',
+  },
+  {
     name: 'group',
     label: 'My group',
     type: 'group',

@@ -25,6 +25,17 @@
           <v-btn
             dark
             color="white"
+            key="library"
+            @click="addControl(library)"
+            class="ma-1 d-inline-block shadow green span-button"
+            outlined
+            small
+          >
+            search question library
+          </v-btn>
+          <v-btn
+            dark
+            color="white"
             key="group"
             @click="addControl(group)"
             class="ma-1 indigo--text bg-white shadow"
@@ -68,13 +79,15 @@
 import { createControlInstance, availableControls } from '@/utils/surveyConfig';
 
 const group = availableControls.find(c => c.type === 'group');
-const rest = availableControls.filter(c => c.type !== 'group');
+const library = availableControls.find(c => c.type === 'library');
+const rest = availableControls.filter(c => c.type !== 'group' && c.type !== 'library');
 
 export default {
   data() {
     return {
       rest,
       group,
+      library,
       sequence: 0,
       fabIsOpen: false,
     };
@@ -104,6 +117,10 @@ export default {
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: 380px;
+}
+
+.span-button {
+  grid-column: 1 / span 2;
 }
 
 .fab-button {
