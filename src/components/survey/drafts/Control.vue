@@ -14,7 +14,7 @@
     <div v-else-if="control.type === 'group' && insidePage">
       <div
         class="group"
-        :class="{ irrelevant: !$store.getters['draft/relevance'](path) }"
+        :class="{ irrelevant: !$store.getters['draft/relevance'](path), hidden: !$store.getters['draft/relevance'](path) && insidePage }"
       >
         <app-control-label
           :value="control.label"
@@ -38,7 +38,7 @@
     <div v-else>
       <div
         class="control"
-        :class="{ irrelevant: !$store.getters['draft/relevance'](path) }"
+        :class="{ irrelevant: !$store.getters['draft/relevance'](path), hidden: !$store.getters['draft/relevance'](path) && insidePage}"
       >
         <component
           :is="getComponentName(control)"
@@ -172,6 +172,11 @@ export default {
   opacity: 0.5;
   border-color: #aaa;
   border-left: 4px solid #aaa;
+}
+
+
+.hidden {
+  display: none;
 }
 
 .irrelevant:hover {
