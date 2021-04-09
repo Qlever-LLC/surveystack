@@ -267,6 +267,23 @@
             </template>
             <span>Save a new draft <strong>version</strong> of the Survey</span>
           </v-tooltip>
+
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <div v-on="on">
+                <v-btn
+                  :dark="enableSaveDraft"
+                  @click="$emit('addToLibrary')"
+                  color="default"
+                  :disabled="false"
+                  class="my-1 mr-1"
+                >
+                  <v-icon class="mr-1">mdi-content-save</v-icon>
+                  Add to library
+                </v-btn>
+              </div>
+            </template>
+          </v-tooltip>
           <!-- <v-tooltip bottom v-if="validationErrors.length > 0">
             <template v-slot:activator="{ on }">
               <div v-on="on">

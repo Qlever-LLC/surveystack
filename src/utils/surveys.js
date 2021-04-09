@@ -238,7 +238,6 @@ export const getFlatName = (controls, position) => {
     flatName += `.${control.name}`;
   });
 
-
   return flatName.substr(1);
 };
 

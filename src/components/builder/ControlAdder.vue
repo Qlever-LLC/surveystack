@@ -26,7 +26,7 @@
             dark
             color="white"
             key="library"
-            @click="addControl(library)"
+            @click="openLibrary()"
             class="ma-1 d-inline-block shadow green span-button"
             outlined
             small
@@ -79,7 +79,6 @@
 import { createControlInstance, availableControls } from '@/utils/surveyConfig';
 
 const group = availableControls.find(c => c.type === 'group');
-const library = availableControls.find(c => c.type === 'library');
 const rest = availableControls.filter(c => c.type !== 'group' && c.type !== 'library');
 
 export default {
@@ -87,7 +86,6 @@ export default {
     return {
       rest,
       group,
-      library,
       sequence: 0,
       fabIsOpen: false,
     };
@@ -107,6 +105,9 @@ export default {
       };
 
       this.$emit('controlAdded', sequencedControl);
+    },
+    openLibrary() {
+      this.$emit('openLibrary');
     },
   },
 };
