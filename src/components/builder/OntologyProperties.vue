@@ -11,11 +11,13 @@
       <resource-selector
         :resources="filteredResources"
         :value="value"
+        :disabled="disabled"
         @on-new="createResourceHandler"
         @on-select="selectResourceHandler"
       />
       <v-btn
         icon
+        :disabled="disabled"
         @click.stop="openTableDialog"
         :class="{'d-none': !value}"
       >
@@ -114,6 +116,9 @@ export default {
     resources: {
       type: Array,
       default: () => ([]),
+    },
+    disabled: {
+      required: false,
     },
   },
   computed: {

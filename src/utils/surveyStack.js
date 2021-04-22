@@ -43,6 +43,20 @@ export const getAllNodes = (root) => {
   return nodes;
 };
 
+export function getParentPath(path) {
+  let parentPath = null;
+  const pathElements = path
+    .replace('[', SEPARATOR).replace(']', '')
+    .split(SEPARATOR);
+  if (pathElements.length > 1) {
+    pathElements.pop();
+    parentPath = pathElements.join(SEPARATOR);
+  } else {
+    parentPath = null;
+  }
+  return parentPath;
+}
+
 export function getRelevance(submission, path, fallback = true) {
   // checks the relevance of the current path and its parents
   const splits = path.split('.');

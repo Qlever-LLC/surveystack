@@ -145,6 +145,89 @@
                 </v-btn>
               </v-list-item-title>
             </v-list-item>
+            <v-list-item>
+              <v-list-item-title>
+                <v-dialog
+                  v-model="editLibraryDialogIsVisible"
+                  width="500"
+                  max-width="75%"
+                >
+                  <template v-slot:activator="{ on }">
+                    <v-btn
+                      v-on="on"
+                      text
+                    >
+                      <v-icon color="grey">mdi-library</v-icon>
+                      <div class="ml-1" v-if="!value.meta.isLibrary">
+                        add to library
+                      </div>
+                      <div class="ml-1" v-if="value.meta.isLibrary">
+                        edit library data
+                      </div>
+                    </v-btn>
+                  </template>
+                  <v-card>
+                    <v-card-title>
+                      Add Survey To Library
+                    </v-card-title>
+                    <v-card-text>
+                      <v-text-field
+                        :value="value.name"
+                        label="Title"
+                        readonly
+                        disabled>
+                      </v-text-field>
+                      <v-textarea
+                        v-model="value.meta.libraryDescription"
+                        label="Description"
+                        class="mt-4"
+                        rows="4"
+                        outlined
+                      />
+                      <v-textarea
+                        v-model="value.meta.libraryApplications"
+                        label="Applications"
+                        class="mt-4"
+                        rows="4"
+                        outlined
+                      />
+                      <v-textarea
+                        v-model="value.meta.libraryMaintainers"
+                        label="Maintainers"
+                        class="mt-4"
+                        rows="2"
+                        outlined
+                      />
+                      <v-textarea
+                        v-model="value.meta.libraryHistory"
+                        label="Version history"
+                        class="mt-4"
+                        rows="2"
+                        outlined
+                      />
+                    </v-card-text>
+                    <v-card-actions class="mr-3">
+                      <v-spacer />
+                      <v-btn
+                        @click="$emit('addToLibrary');editLibraryDialogIsVisible = false;"
+                        color="primary"
+                        text
+                      >
+                        <span v-if="!value.meta.isLibrary">Add to library</span>
+                        <span v-if="value.meta.isLibrary">Save</span>
+                      </v-btn>
+                      <v-btn
+                        @click="editLibraryDialogIsVisible = false"
+                        color="primary"
+                        text
+                      >
+                        Cancel
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+              </v-list-item-title>
+            </v-list-item>
             <v-list-item v-if="!isNew">
               <v-list-item-title>
                 <v-btn
@@ -267,23 +350,6 @@
             </template>
             <span>Save a new draft <strong>version</strong> of the Survey</span>
           </v-tooltip>
-
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <div v-on="on">
-                <v-btn
-                  :dark="enableSaveDraft"
-                  @click="$emit('addToLibrary')"
-                  color="default"
-                  :disabled="false"
-                  class="my-1 mr-1"
-                >
-                  <v-icon class="mr-1">mdi-content-save</v-icon>
-                  Add to library
-                </v-btn>
-              </div>
-            </template>
-          </v-tooltip>
           <!-- <v-tooltip bottom v-if="validationErrors.length > 0">
             <template v-slot:activator="{ on }">
               <div v-on="on">
@@ -344,6 +410,7 @@ export default {
     return {
       resourcesDialogIsVisible: false,
       editDetailsDialogIsVisible: false,
+      editLibraryDialogIsVisible: false,
       surveyGroupName: 'Group Not Found',
       availableSubmissions,
     };

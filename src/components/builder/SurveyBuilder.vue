@@ -70,7 +70,8 @@
         <div class="px-4">
           <question-library
             :survey="survey"
-            @addToSurvey="addQuestionsFromLibrary"/>
+            @addToSurvey="addQuestionsFromLibrary"
+            @cancel="closeLibrary"/>
         </div>
       </pane>
 
@@ -258,6 +259,7 @@ import { defaultApiCompose } from '@/utils/apiCompose';
 import submissionUtils from '@/utils/submissions';
 import { SPEC_VERSION_SCRIPT } from '@/constants';
 import { availableControls, createControlInstance } from '@/utils/surveyConfig';
+import * as surveyStackUtils from '@/utils/surveyStack';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -267,8 +269,9 @@ const initialRelevanceCode = variable => `\
  *
  * @param {submission} submission
  * @param {survey} survey
+ * @param {parent} parent
  */
-function ${variable}(submission, survey) {
+function ${variable}(submission, survey, parent) {
   return true;
 }
 `;
@@ -399,9 +402,18 @@ export default {
       this.saveDraft();
     },
     async addQuestionsFromLibrary(librarySurveyId) {
-      // get library questions from service
+      // load library survey
       const { data } = await api.get(`/surveys/${librarySurveyId}`);
-      const controlsFromLibrary = data.revisions[data.latestVersion - 1].controls;
+
+      // copy resources from library survey
+      // TODO MH overwrite resources with same libraryId
+      data.resources.forEach((r) => {
+        r.libraryId = data._id;
+      });
+      this.survey.resources = this.survey.resources.concat(data.resources);
+
+      // copy controls from library survey
+      const controlsFromLibrary = data.revisions[data.latestVersion].controls;
 
       // create question group
       const group = createControlInstance(
@@ -409,16 +421,36 @@ export default {
       );
       group.name = data.name;
       group.label = data.name;
+      group.isLibraryRoot = true;
       group.libraryId = data._id;
-      this.duplicateControl(group);
+
+      // add recursive function for children
+      const dive = (control, cb) => {
+        cb(control);
+        if (!control.children) {
+          return;
+        }
+        control.children.forEach((c) => {
+          dive(c, cb);
+        });
+      };
 
       // copy questions from library survey to question group
       for (let i = 0; i < controlsFromLibrary.length; i++) {
         const controlToAdd = controlsFromLibrary[i];
         controlToAdd.id = new ObjectID().toString();
         controlToAdd.libraryId = data._id;
-        this.duplicateControl(controlToAdd);
+        dive(controlToAdd, (control) => {
+          // eslint-disable-next-line no-param-reassign
+          control.id = new ObjectID().toString();
+          control.libraryId = data._id;
+        });
+        group.children.push(controlToAdd);
       }
+      this.duplicateControl(group);
+      this.library = false;
+    },
+    closeLibrary() {
       this.library = false;
     },
     initNavbarAndDirtyFlag(survey) {
@@ -510,6 +542,7 @@ export default {
             fname: tab,
             submission: this.instance,
             survey: this.survey,
+            parent: this.parent,
             log: (arg) => {
               this.log = `${this.log}${arg}\n`;
             },
@@ -767,7 +800,16 @@ export default {
 
       // const data = `const Data = ${JSON.stringify(this.instance.data, null, 2)}`;
       const submission = `const submission = ${JSON.stringify(this.instance, null, 2)}`;
-      return `${submission}\n`;
+      const parent = `const parent = ${JSON.stringify(this.parent, null, 2)}`;
+      return `${submission};\n\n${parent};\n`;
+    },
+    parent() {
+      console.log('parent() called');
+      const position = utils.getPosition(this.control, this.currentControls);
+      const path = utils.getFlatName(this.currentControls, position);
+      const parentPath = surveyStackUtils.getParentPath(path);
+      const parentData = surveyStackUtils.getNested(this.instance.data, parentPath);
+      return parentData;
     },
   },
   watch: {

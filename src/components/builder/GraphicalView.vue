@@ -2,6 +2,8 @@
   <draggable
     v-if="controls.length !== 0 || index.length !== 0"
     class="draggable"
+    :class="controls"
+    :disabled="readOnly"
     tag="div"
     :list="controls"
     :group="{ name: 'g1' }"
@@ -12,7 +14,7 @@
     <v-card
       v-for="(el, idx) in controls"
       class="control-item mb-2"
-      :class="{'control-item-selected': (el === selected)}"
+      :class="[{'control-item-selected': (el === selected)},{'library-border': el.isLibraryRoot}]"
       :key="el.id || el._id"
       @mousedown.stop.left="$emit('controlSelected', el)"
     >
@@ -32,14 +34,14 @@
         <div class="d-flex">
           <v-btn
             icon
-            v-if="selected === el"
+            v-if="selected === el && !el.libraryId"
             @click.stop="duplicateControl(el)"
           >
             <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
           </v-btn>
           <v-btn
             icon
-            v-if="selected === el"
+            v-if="selected === el && (!el.libraryId || el.isLibraryRoot)"
             @click.stop="() => showDeleteModal(idx)"
           >
             <v-icon color="grey lighten-1">mdi-delete</v-icon>
@@ -52,6 +54,7 @@
         :class="{'drop-area-border': (el.children.length === 0), 'drop-area': 1}"
         :selected="selected"
         :controls="el.children"
+        :readOnly="readOnly || !!el.libraryId"
         @controlSelected="$emit('controlSelected', $event)"
         @duplicate-control="$emit('duplicate-control', $event)"
         :index="createIndex(index, idx + 1)"
@@ -62,6 +65,7 @@
         :class="{'drop-area-border': (el.children.length === 0), 'drop-area': 1}"
         :selected="selected"
         :controls="el.children"
+        :readOnly="readOnly"
         @controlSelected="$emit('controlSelected', $event)"
         @duplicate-control="$emit('duplicate-control', $event)"
         :index="createIndex(index, idx + 1)"
@@ -102,12 +106,11 @@
   <div v-else>
     <v-card class="text--secondary">
       <v-card-title>Empty survey</v-card-title>
-      <v-card-text>
+      <v-card-text v-if="!readOnly">
         <div class="text--primary">You can add questions by clicking the <strong>plus icon</strong> below.</div>
       </v-card-text>
     </v-card>
   </div>
-
 </template>
 <script>
 import draggable from 'vuedraggable';
@@ -138,6 +141,10 @@ export default {
       default() {
         return [];
       },
+    },
+    readOnly: {
+      type: Boolean,
+      default: false,
     },
   },
   filters: {
@@ -209,6 +216,11 @@ export default {
 .drop-area-border {
   border-radius: 0.25rem;
   border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.library-border {
+  border-width:2px !important;
+  border-color:#4CAF50 !important;
 }
 
 .draggable {

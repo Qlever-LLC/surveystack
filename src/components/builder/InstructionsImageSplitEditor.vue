@@ -9,6 +9,7 @@
       <resource-selector
         :resources="filteredResources"
         :value="value && value.images && value.images[0]"
+        :disabled="disabled"
         newResourceType="IMAGE"
         @on-new="createResourceHandler"
         @on-select="selectResourceHandler"
@@ -16,6 +17,7 @@
       <v-btn
         icon
         @click.stop="openDialog"
+        :disabled="disabled"
         :class="{'d-none': !value}"
         class="ml-2 mt-3"
         v-if="resource"
@@ -25,6 +27,7 @@
     </div>
     <v-textarea
       :value="value.body"
+      :disabled="disabled"
       @input="handleBodyChange"
       outlined
       label="Instructions Body (Markdown)"
@@ -88,6 +91,9 @@ export default {
     resources: {
       type: Array,
       default: () => ([]),
+    },
+    disabled: {
+      required: false,
     },
   },
   computed: {

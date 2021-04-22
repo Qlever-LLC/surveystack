@@ -2,7 +2,23 @@
   <div>
     <v-card-title class="pl-0">
       <v-icon class="mr-1">mdi-library</v-icon>
-      Question Library</v-card-title>
+      Question Library
+      <v-spacer></v-spacer>
+      <v-btn
+        icon
+        key="library"
+        @click="$emit('cancel')"
+        class="mt-n5 mr-n6"
+        :depressed="true"
+        small
+        tile
+        elevation="0"
+      >
+        <v-icon>
+          mdi-close
+        </v-icon>
+      </v-btn>
+    </v-card-title>
 
     <v-text-field
       v-model="search"
@@ -17,35 +33,38 @@
     <v-container fluid class="pa-0">
       <v-row dense>
         <v-col
-          v-for="e in surveys.content"
-          :key="e._id"
-          cols="4"
+          v-for="c in surveys.content"
+          :key="c._id"
+          :cols="!selectedSurvey?4:12"
         >
           <v-card
+            @click="toggleCard(c)"
+            v-show="!selectedSurvey || selectedSurvey._id==c._id"
             class="control-item mb-2"
             elevation="7"
           >
             <v-row>
               <v-col>
-                <small>number</small>
+                <small class="grey--text">{{ c._id }}</small>
                 <br>
-                {{e.name}}
+                {{c.name}}
                 <br>
-                <small>groups</small>
-                <br>
+                <!--TODO MH what groups? what impact?-->
+                <small>groups tbd</small>
+              </v-col>
+              <v-col align="right">
                 <v-btn
                   dark
+                  v-if="selectedSurvey && selectedSurvey._id===c._id"
                   color="white"
                   key="library"
-                  @click="addToSurvey(e._id)"
-                  class="ma-1 d-inline-block shadow green span-button"
+                  @click="addToSurvey(c._id)"
+                  class="mt-n5 mr-n7 d-inline-block shadow green span-button"
                   outlined
                   small
                 >
                   add to survey
                 </v-btn>
-              </v-col>
-              <v-col align="right">
                 <div>
                   <v-icon class="mr-1">mdi-account-group</v-icon>
                   34
@@ -54,6 +73,32 @@
                   <v-icon class="mr-1">mdi-note-multiple-outline</v-icon>
                   343
                 </div>
+              </v-col>
+            </v-row>
+            <v-row
+              v-if="selectedSurvey && selectedSurvey._id===c._id"
+              >
+              <v-col>
+                <h4>Description</h4>
+                <small>{{selectedSurvey.meta.libraryDescription}}</small>
+                <br><br>
+                <h4>Applications</h4>
+                <small>{{selectedSurvey.meta.libraryApplications}}</small>
+                <br><br>
+                <h4>Maintainers</h4>
+                <small>{{selectedSurvey.meta.libraryMaintainers}}</small>
+                <br><br>
+                <h4>Updates</h4>
+                <small>{{selectedSurvey.meta.libraryHistory}}</small>
+              </v-col>
+              <v-col>
+                <h4>Questions</h4>
+                <graphical-view
+                  :readOnly="true"
+                  v-if="selectedSurvey && selectedSurvey._id===c._id"
+                  class="graphical-view"
+                  :controls="selectedSurvey.revisions[selectedSurvey.revisions.length - 1].controls"
+                />
               </v-col>
             </v-row>
           </v-card>
@@ -65,12 +110,13 @@
 <script>
 import moment from 'moment';
 import api from '@/services/api.service';
+import graphicalView from '@/components/builder/GraphicalView.vue';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
   components: {
-
+    graphicalView,
   },
   props: [
     'survey',
@@ -87,6 +133,7 @@ export default {
           limit: 100000,
         },
       },
+      selectedSurvey: null,
     };
   },
   computed: {
@@ -101,10 +148,6 @@ export default {
       }
 
       queryParams.append('isLibrary', 'true');
-      if (this.isWhitelabel) {
-        queryParams.append('prefix', this.whitelabelPartner.path);
-      }
-
       queryParams.append('skip', (this.page - 1) * PAGINATION_LIMIT);
       queryParams.append('limit', PAGINATION_LIMIT);
 
@@ -136,6 +179,14 @@ export default {
     addToSurvey(librarySurveyId) {
       this.$emit('addToSurvey', librarySurveyId);
     },
+    async toggleCard(survey) {
+      if (this.selectedSurvey && survey._id === this.selectedSurvey._id) {
+        this.selectedSurvey = null; // deselect card
+      } else {
+        const { data } = await api.get(`/surveys/${survey._id}`);
+        this.selectedSurvey = data; // select card
+      }
+    },
   },
   watch: {
     search(value) {
@@ -149,7 +200,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .control-item:first-child {
   border-top-left-radius: 0.25rem;
   border-top-right-radius: 0.25rem;
@@ -172,4 +223,15 @@ position: relative;
 .control-item-selected {
 border-left: 2px solid var(--v-primary-base);
 }*/
+.graphical-view {
+  overflow: auto;
+  transform: scale(0.75);
+  transform-origin: top left;
+  margin-top:6px;
+  margin-bottom: -60%;
+  margin-right: -33%;
+}
+.v-card:focus:before {
+  opacity: 0 !important;
+}
 </style>

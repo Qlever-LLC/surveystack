@@ -7,6 +7,7 @@
         outlined
         v-model="control.name"
         label="Data name"
+        :disabled="!!control.libraryId && !control.isLibraryRoot"
         :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
       />
       <v-text-field
@@ -78,6 +79,7 @@
         label="Required"
         color="grey darken-1"
         hide-details
+        :disabled="!!control.libraryId && !control.isLibraryRoot"
       >
         <template slot="label">
           <div>
@@ -92,6 +94,7 @@
         color="grey darken-1"
         v-model="control.options.redacted"
         label="Private"
+        :disabled="!!control.libraryId && !control.isLibraryRoot"
       >
         <template slot="label">
           <div>
@@ -108,6 +111,7 @@
         v-if="isSelect || isOntology"
         outlined
         label="Allow Custom Entry"
+        :disabled="!!control.libraryId && !control.isLibraryRoot"
       />
 
       <v-checkbox
@@ -115,6 +119,7 @@
         v-model="control.options.hasMultipleSelections"
         v-if="control.type === 'ontology' || control.type === 'farmOsPlanting'"
         label="Allow Multiple Selections"
+        :disabled="!!control.libraryId && !control.isLibraryRoot"
       />
 
       <v-select
@@ -123,6 +128,7 @@
         label="Type"
         v-model="control.options.subtype"
         outlined
+        :disabled="!!control.libraryId && !control.isLibraryRoot"
       />
 
       <div
@@ -152,6 +158,7 @@
             outlined
             v-model="relevance.enabled"
             label="Relevance Expression"
+            :disabled="!!control.libraryId && !control.isLibraryRoot"
           />
           <v-spacer />
           <v-icon
@@ -164,13 +171,13 @@
         </div>
 
         <div class="d-flex">
-
           <v-checkbox
             color="grey darken-1"
             class="ma-0"
             outlined
             v-model="calculate.enabled"
             label="Calculate Expression"
+            :disabled="!!control.libraryId && !control.isLibraryRoot"
           />
           <v-spacer />
           <v-icon
@@ -189,6 +196,7 @@
             outlined
             v-model="constraint.enabled"
             label="Constraint Expression"
+            :disabled="!!control.libraryId && !control.isLibraryRoot"
           />
           <v-spacer />
           <v-icon
@@ -207,6 +215,7 @@
             outlined
             v-model="apiCompose.enabled"
             label="Api Compose Expression"
+            :disabled="!!control.libraryId && !control.isLibraryRoot"
           />
           <v-spacer />
           <v-icon
@@ -221,37 +230,38 @@
       <select-items-editor
         v-if="isSelect"
         v-model="control.options.source"
+        :disabled="!!control.libraryId && !control.isLibraryRoot"
         class="mt-5"
       />
-
       <app-ontology-properties
         v-else-if="isOntology"
         :value="control.options.source"
         :resources="survey.resources"
+        :disabled="!!control.libraryId && !control.isLibraryRoot"
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         class="mt-5"
       />
-
       <app-matrix-properties
         v-else-if="isMatrix"
         v-model="control.options.source"
         :resources="survey.resources"
+        :disabled="!!control.libraryId && !control.isLibraryRoot"
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         class="mt-5"
         @set-control-required="control.options.required = true"
       />
-
+      <!-- TODO MH disabled instead of hide?-->
       <instructions-editor
-        v-else-if="isInstructions"
+        v-else-if="isInstructions && !control.libraryId"
         v-model="control.options.source"
       />
-
       <instructions-image-split-editor
         v-else-if="isInstructionsImageSplit"
         v-model="control.options.source"
         :resources="survey.resources"
+        :disabled="!!control.libraryId && !control.isLibraryRoot"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         @set-control-source="(val) => $emit('set-control-source', val)"
       />

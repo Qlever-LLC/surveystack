@@ -4,6 +4,7 @@
     item-text="label"
     item-value="id"
     :value="value"
+    :disabled="disabled"
     @input="handleSelect"
     placeholder="Choose a resource"
     outlined
@@ -28,6 +29,9 @@ export default {
     newResourceType: {
       type: String,
       required: true,
+    },
+    disabled: {
+      required: false,
     },
     // onNew: {
     //   type: Function,
