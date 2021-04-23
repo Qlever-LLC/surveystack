@@ -44,16 +44,23 @@ export const getAllNodes = (root) => {
 };
 
 export function getParentPath(path) {
-  let parentPath = null;
-  const pathElements = path
-    .replace('[', SEPARATOR).replace(']', '')
-    .split(SEPARATOR);
-  if (pathElements.length > 1) {
-    pathElements.pop();
-    parentPath = pathElements.join(SEPARATOR);
-  } else {
-    parentPath = null;
+  let parentPath = path;
+
+  // remove leading data.
+  let idx = parentPath.indexOf('data.');
+  if (idx === 0) {
+    parentPath = parentPath.replace('data.', '');
   }
+
+  // remove trailing path element
+  idx = parentPath.lastIndexOf('.');
+  if (idx > 0) {
+    parentPath = parentPath.substring(0, idx);
+    parentPath = `data.${parentPath}`;
+  } else {
+    parentPath = 'data';
+  }
+
   return parentPath;
 }
 

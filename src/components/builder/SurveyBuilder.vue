@@ -808,7 +808,7 @@ export default {
       const position = utils.getPosition(this.control, this.currentControls);
       const path = utils.getFlatName(this.currentControls, position);
       const parentPath = surveyStackUtils.getParentPath(path);
-      const parentData = surveyStackUtils.getNested(this.instance.data, parentPath);
+      const parentData = surveyStackUtils.getNested(this.instance, parentPath);
       return parentData;
     },
   },
