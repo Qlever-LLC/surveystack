@@ -443,6 +443,7 @@ export default {
             code: this.activeCode,
             fname: tab,
             submission: this.instance,
+            parent: this.parent,
             survey: this.survey,
             log: (arg) => {
               this.log = `${this.log}${arg}\n`;
