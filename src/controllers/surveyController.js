@@ -74,7 +74,6 @@ const buildPipelineForGetSurveyPage = ({
   skip,
   limit,
   prefix,
-  isLibrary,
 }) => {
   const match = {};
   const project = {};
@@ -104,22 +103,11 @@ const buildPipelineForGetSurveyPage = ({
     };
   }
 
-  if (isLibrary) {
-    match['meta.isLibrary'] = (isLibrary === "true");
-  }
-
   const pipeline = [
     {
       $match: match,
     },
   ];
-  if (isLibrary === "true") {
-    pipeline.push({
-      $sort: {
-        libraryUsageCount: 1,
-      },
-    });
-  }
   if (!q) {
     pipeline.push({
       $sort: {
@@ -234,7 +222,6 @@ const getSurveyListPage = async (req, res) => {
       'meta.group',
       'meta.creator',
       'meta.submissions',
-      'meta.isLibrary',
     ],
   };
   const pipeline = buildPipelineForGetSurveyPage(query);
