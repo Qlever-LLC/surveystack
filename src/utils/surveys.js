@@ -343,7 +343,7 @@ export function compileSandboxSingleLine(src) {
 }
 
 export function compileSandbox(src, fname) {
-  const wrappedSource = `with (sandbox) { ${src}\nreturn ${fname}(arg1, arg2); }`;
+  const wrappedSource = `with (sandbox) { ${src}\nreturn ${fname}(arg1, arg2, arg3); }`;
   const code = new Function('sandbox', wrappedSource);
 
   return function (sandbox) {
@@ -371,7 +371,7 @@ export const simplify = (submissionItem) => {
 };
 
 export function executeUnsafe({
-  code, fname, submission, survey, log,
+  code, fname, submission, survey, parent, log,
 }) {
   console.log('execute unsafe called');
   const sandbox = compileSandbox(code, fname);
@@ -379,6 +379,7 @@ export function executeUnsafe({
   const res = sandbox({
     arg1: submission,
     arg2: survey,
+    arg3: parent,
     log,
     ...supplySandbox,
   });
@@ -387,7 +388,7 @@ export function executeUnsafe({
 }
 
 export function execute({
-  code, fname, submission, log, survey,
+  code, fname, submission, log, survey, parent,
 }) {
   console.log('execute safe called');
   const worker = new Worker('/worker.js');
@@ -428,6 +429,7 @@ export function execute({
         fname,
         arg1: submission,
         arg2: survey,
+        arg3: parent,
         code,
       },
     );
