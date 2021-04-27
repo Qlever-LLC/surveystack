@@ -108,18 +108,12 @@ const buildPipelineForGetSurveyPage = ({
     match['meta.isLibrary'] = (isLibrary === "true");
   }
 
-  const pipeline = [
-    {
-      $match: match,
-    },
-  ];
-  if (isLibrary === "true") {
-    pipeline.push({
-      $sort: {
-        libraryUsageCount: 1,
-      },
-    });
-  }
+    const pipeline = [
+        {
+            $match: match,
+        },
+    ];
+
   if (!q) {
     pipeline.push({
       $sort: {
@@ -146,6 +140,81 @@ const buildPipelineForGetSurveyPage = ({
       { $project: { name_lowercase: 0 } },
     ]
   );
+
+    if (isLibrary === "true") {
+        // add to pipeline the aggregation for number of referencing survey
+        // count surveys containing a control with libraryId=current._id and isLibraryRoot=true
+        const agg = [
+            {
+                '$lookup': {
+                    'from': 'surveys',
+                    'let': {
+                        'libId': {
+                            '$toString': '$_id'
+                        }
+                    },
+                    'pipeline': [
+                        {
+                            '$unwind': '$revisions'
+                        }, {
+                            '$addFields': {
+                                'latestVersion': {
+                                    '$add': [
+                                        '$latestVersion', 1
+                                    ]
+                                }
+                            }
+                        }, {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        '$revisions.version', '$latestVersion'
+                                    ]
+                                }
+                            }
+                        }, {
+                            '$unwind': '$revisions.controls'
+                        }, {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        '$revisions.controls.isLibraryRoot', true
+                                    ]
+                                }
+                            }
+                        }, {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        '$revisions.controls.libraryId', '$$libId'
+                                    ]
+                                }
+                            }
+                        }, {
+                            '$count': 'usages'
+                        }
+                    ],
+                    'as': 'meta.libraryUsageCountSurveys'
+                }
+            }, {
+                '$unwind': {
+                    'path': '$meta.libraryUsageCountSurveys',
+                    'preserveNullAndEmptyArrays': true
+                }
+            }, {
+                '$addFields': {
+                    'meta.libraryUsageCountSurveys': '$meta.libraryUsageCountSurveys.usages'
+                }
+            }, {
+                '$sort': {
+                    'meta.libraryUsageCountSurveys': -1
+                }
+            }
+        ];
+        pipeline.push(...agg);
+        // TODO add to pipeline the aggregation for number of submissions of referencing surveys
+
+    }
 
   // skip
   if (skip) {
