@@ -108,11 +108,11 @@ const buildPipelineForGetSurveyPage = ({
     match['meta.isLibrary'] = (isLibrary === "true");
   }
 
-    const pipeline = [
-        {
-            $match: match,
-        },
-    ];
+  const pipeline = [
+    {
+      $match: match,
+    },
+  ];
 
   if (!q) {
     pipeline.push({
