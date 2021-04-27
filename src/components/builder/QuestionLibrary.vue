@@ -67,11 +67,11 @@
                 </v-btn>
                 <div>
                   <v-icon class="mr-1">mdi-account-group</v-icon>
-                  34
+                  {{ c.meta.libraryUsageCountSurveys }}
                 </div>
                 <div>
                   <v-icon class="mr-1">mdi-note-multiple-outline</v-icon>
-                  343
+                  000
                 </div>
               </v-col>
             </v-row>
