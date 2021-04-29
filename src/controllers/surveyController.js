@@ -144,7 +144,7 @@ const buildPipelineForGetSurveyPage = ({
     if (isLibrary === "true") {
         // add to pipeline the aggregation for number of referencing survey
         // count surveys containing a control with libraryId=current._id and isLibraryRoot=true
-        const agg = [
+        const aggregateSurveyCount = [
             {
                 '$lookup': {
                     'from': 'surveys',
@@ -211,9 +211,97 @@ const buildPipelineForGetSurveyPage = ({
                 }
             }
         ];
-        pipeline.push(...agg);
-        // TODO add to pipeline the aggregation for number of submissions of referencing surveys
+        pipeline.push(...aggregateSurveyCount);
 
+        // add to pipeline the aggregation for number of submissions of referencing surveys
+        const aggregateSubmissionCount = [
+            {
+                '$lookup': {
+                    'from': 'surveys',
+                    'let': {
+                        'libId': {
+                            '$toString': '$_id'
+                        }
+                    },
+                    'pipeline': [
+                        {
+                            '$unwind': '$revisions'
+                        }, {
+                            '$addFields': {
+                                'latestVersion': {
+                                    '$add': [
+                                        '$latestVersion', 1
+                                    ]
+                                }
+                            }
+                        }, {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        '$revisions.version', '$latestVersion'
+                                    ]
+                                }
+                            }
+                        }, {
+                            '$unwind': '$revisions.controls'
+                        }, {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        '$revisions.controls.isLibraryRoot', true
+                                    ]
+                                }
+                            }
+                        }, {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        '$revisions.controls.libraryId', '$$libId'
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    'as': 'meta.libraryUsageSurveys'
+                }
+            }, {
+                '$unwind': {
+                    'path': '$meta.libraryUsageSurveys',
+                    'preserveNullAndEmptyArrays': true
+                }
+            }, {
+                '$lookup': {
+                    'from': 'submissions',
+                    'let': {
+                        'surveyId': '$meta.libraryUsageSurveys._id'
+                    },
+                    'pipeline': [
+                        {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        '$meta.survey.id', '$$surveyId'
+                                    ]
+                                }
+                            }
+                        }, {
+                            '$count': 'usages'
+                        }
+                    ],
+                    'as': 'meta.libraryUsageCountSubmissions'
+                }
+            }, {
+                '$unwind': {
+                    'path': '$meta.libraryUsageCountSubmissions',
+                    'preserveNullAndEmptyArrays': true
+                }
+            }, {
+                '$addFields': {
+                    'meta.libraryUsageCountSubmissions': '$meta.libraryUsageCountSubmissions.usages'
+                }
+            }
+        ];
+        pipeline.push(...aggregateSubmissionCount);
     }
 
   // skip
