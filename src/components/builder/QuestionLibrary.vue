@@ -43,14 +43,14 @@
             class="control-item mb-2"
             elevation="7"
           >
-            <v-row>
+            <v-row style="min-height:96px;">
               <v-col>
                 <small class="grey--text">{{ c._id }}</small>
                 <br>
                 {{c.name}}
-                <br>
-                <!--TODO MH what groups? what impact?-->
-                <small>groups tbd</small>
+                <!--br>
+                <TODO maybe add group based QSL access restrictions?>
+                <small>groups tbd</small-->
               </v-col>
               <v-col align="right">
                 <v-btn
@@ -67,11 +67,11 @@
                 </v-btn>
                 <div>
                   <v-icon class="mr-1">mdi-account-group</v-icon>
-                  {{ c.meta.libraryUsageCountSurveys }}
+                  {{ c.meta.libraryUsageCountSurveys?c.meta.libraryUsageCountSurveys:0 }}
                 </div>
                 <div>
                   <v-icon class="mr-1">mdi-note-multiple-outline</v-icon>
-                  000
+                  {{ c.meta.libraryUsageCountSubmissions?c.meta.libraryUsageCountSubmissions:0 }}
                 </div>
               </v-col>
             </v-row>
