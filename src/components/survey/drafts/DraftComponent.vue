@@ -169,10 +169,12 @@ export default {
     next() {
       // this.$store.dispatch('draft/next')
       queueAction(this.$store, 'draft/next');
+      window.scrollTo(0, 0);
     },
     prev() {
       // this.$store.dispatch('draft/prev')
       queueAction(this.$store, 'draft/prev');
+      window.scrollTo(0, 0);
     },
     goto(path) {
       this.$store.dispatch('draft/goto', path);
