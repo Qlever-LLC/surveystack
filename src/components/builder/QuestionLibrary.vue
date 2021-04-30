@@ -66,12 +66,32 @@
                   add to survey
                 </v-btn>
                 <div>
-                  <v-icon class="mr-1">mdi-account-group</v-icon>
-                  {{ c.meta.libraryUsageCountSurveys?c.meta.libraryUsageCountSurveys:0 }}
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                    <div
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      <v-icon class="mr-1">mdi-account-group</v-icon>
+                      {{ c.meta.libraryUsageCountSurveys?c.meta.libraryUsageCountSurveys:0 }}
+                    </div>
+                    </template>
+                    <span>Number of surveys using this</span>
+                  </v-tooltip>
                 </div>
                 <div>
-                  <v-icon class="mr-1">mdi-note-multiple-outline</v-icon>
-                  {{ c.meta.libraryUsageCountSubmissions?c.meta.libraryUsageCountSubmissions:0 }}
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <div
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                       <v-icon class="mr-1">mdi-note-multiple-outline</v-icon>
+                       {{ c.meta.libraryUsageCountSubmissions?c.meta.libraryUsageCountSubmissions:0 }}
+                      </div>
+                    </template>
+                    <span>Number of submission using this</span>
+                  </v-tooltip>
                 </div>
               </v-col>
             </v-row>
