@@ -52,7 +52,7 @@
                 <TODO maybe add group based QSL access restrictions?>
                 <small>groups tbd</small-->
               </v-col>
-              <v-col align="right">
+              <v-col align="right" md="auto">
                 <v-btn
                   dark
                   v-if="selectedSurvey && selectedSurvey._id===c._id"
@@ -66,13 +66,13 @@
                   add to survey
                 </v-btn>
                 <div>
-                  <v-tooltip top>
+                  <v-tooltip bottom>
                     <template v-slot:activator="{ on, attrs }">
                     <div
                       v-bind="attrs"
                       v-on="on"
                     >
-                      <v-icon class="mr-1">mdi-account-group</v-icon>
+                      <v-icon class="mr-1 pb-1">mdi-account-group</v-icon>
                       {{ c.meta.libraryUsageCountSurveys?c.meta.libraryUsageCountSurveys:0 }}
                     </div>
                     </template>
@@ -80,7 +80,7 @@
                   </v-tooltip>
                 </div>
                 <div>
-                  <v-tooltip top>
+                  <v-tooltip bottom>
                     <template v-slot:activator="{ on, attrs }">
                       <div
                         v-bind="attrs"
@@ -140,6 +140,7 @@ export default {
   },
   props: [
     'survey',
+    'libraryId',
   ],
   data() {
     return {
@@ -173,14 +174,23 @@ export default {
 
       try {
         const { data } = await api.get(`/surveys/list-page?${queryParams}`);
-        this.surveys = data;
-        this.surveys.content.forEach((s) => {
+
+        for (let i = 0; i < data.content.length; i++) {
+          const s = data.content[i];
           if (!s.meta || !s.meta.dateCreated) {
-            return;
+            continue;
           }
           // eslint-disable-next-line no-param-reassign
           s.createdAgo = moment.duration(now.diff(s.meta.dateCreated)).humanize();
-        });
+
+          // set selected survey
+          if (this.libraryId && s._id === this.libraryId) {
+            this.toggleCard(s);
+          }
+        }
+
+        this.surveys = data;
+
         return data;
       } catch (e) {
         // TODO: use cached data?

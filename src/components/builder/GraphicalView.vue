@@ -41,6 +41,13 @@
           </v-btn>
           <v-btn
             icon
+            v-if="selected === el && el.isLibraryRoot"
+            @click.stop="openLibrary(el.libraryId)"
+          >
+            <v-icon color="grey lighten-1">mdi-library</v-icon>
+          </v-btn>
+          <v-btn
+            icon
             v-if="selected === el && (!el.libraryId || el.isLibraryRoot)"
             @click.stop="() => showDeleteModal(idx)"
           >
@@ -204,6 +211,9 @@ export default {
       });
 
       this.$emit('duplicate-control', copy);
+    },
+    openLibrary(libraryId) {
+      this.$emit('open-library', libraryId);
     },
   },
 };

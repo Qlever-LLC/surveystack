@@ -59,6 +59,7 @@
             :controls="currentControls"
             @controlSelected="controlSelected"
             @duplicate-control="duplicateControl"
+            @open-library="openLibrary"
           />
         </div>
       </pane>
@@ -70,6 +71,7 @@
         <div class="px-4">
           <question-library
             :survey="survey"
+            :libraryId="libraryId"
             @addToSurvey="addQuestionsFromLibrary"
             @cancel="closeLibrary"/>
         </div>
@@ -320,6 +322,7 @@ export default {
       // currently selected control
       control: null,
       library: false,
+      libraryId: null,
       // code stuff
       log: '',
       codeError: null,
@@ -625,9 +628,14 @@ export default {
       this.control = control;
       this.library = false;
     },
-    openLibrary() {
+    openLibrary(libraryId) {
       this.control = null;
       this.library = true;
+      if (libraryId) {
+        this.libraryId = libraryId;
+      } else {
+        this.libraryId = null;
+      }
     },
     onCancel() {
       this.$router.push('/surveys/browse');
