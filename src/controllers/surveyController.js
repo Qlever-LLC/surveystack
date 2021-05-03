@@ -216,6 +216,14 @@ const buildPipelineForGetSurveyPage = ({
         // add to pipeline the aggregation for number of submissions of referencing surveys
         const aggregateSubmissionCount = [
             {
+                '$match': {
+                    '$expr': {
+                        '$eq': [
+                            '$meta.isLibrary', true
+                        ]
+                    }
+                }
+            }, {
                 '$lookup': {
                     'from': 'surveys',
                     'let': {
@@ -260,47 +268,46 @@ const buildPipelineForGetSurveyPage = ({
                                     ]
                                 }
                             }
-                        }
-                    ],
-                    'as': 'meta.libraryUsageSurveys'
-                }
-            }, {
-                '$unwind': {
-                    'path': '$meta.libraryUsageSurveys',
-                    'preserveNullAndEmptyArrays': true
-                }
-            }, {
-                '$lookup': {
-                    'from': 'submissions',
-                    'let': {
-                        'surveyId': '$meta.libraryUsageSurveys._id'
-                    },
-                    'pipeline': [
-                        {
-                            '$match': {
-                                '$expr': {
-                                    '$eq': [
-                                        '$meta.survey.id', '$$surveyId'
-                                    ]
-                                }
+                        }, {
+                            '$lookup': {
+                                'from': 'submissions',
+                                'let': {
+                                    'surveyId': '$_id'
+                                },
+                                'pipeline': [
+                                    {
+                                        '$match': {
+                                            '$expr': {
+                                                '$eq': [
+                                                    '$meta.survey.id', '$$surveyId'
+                                                ]
+                                            }
+                                        }
+                                    }, {
+                                        '$count': 'usages'
+                                    }
+                                ],
+                                'as': 'count'
                             }
                         }, {
-                            '$count': 'usages'
+                            '$addFields': {
+                                'count': {
+                                    '$sum': '$count.usages'
+                                }
+                            }
                         }
                     ],
                     'as': 'meta.libraryUsageCountSubmissions'
                 }
             }, {
-                '$unwind': {
-                    'path': '$meta.libraryUsageCountSubmissions',
-                    'preserveNullAndEmptyArrays': true
-                }
-            }, {
                 '$addFields': {
-                    'meta.libraryUsageCountSubmissions': '$meta.libraryUsageCountSubmissions.usages'
+                    'meta.libraryUsageCountSubmissions': {
+                        '$sum': '$meta.libraryUsageCountSubmissions.count'
+                    }
                 }
             }
         ];
+
         pipeline.push(...aggregateSubmissionCount);
     }
 
