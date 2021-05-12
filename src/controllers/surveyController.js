@@ -157,14 +157,6 @@ const buildPipelineForGetSurveyPage = ({
                         {
                             '$unwind': '$revisions'
                         }, {
-                            '$addFields': {
-                                'latestVersion': {
-                                    '$add': [
-                                        '$latestVersion', 1
-                                    ]
-                                }
-                            }
-                        }, {
                             '$match': {
                                 '$expr': {
                                     '$eq': [
@@ -234,14 +226,6 @@ const buildPipelineForGetSurveyPage = ({
                     'pipeline': [
                         {
                             '$unwind': '$revisions'
-                        }, {
-                            '$addFields': {
-                                'latestVersion': {
-                                    '$add': [
-                                        '$latestVersion', 1
-                                    ]
-                                }
-                            }
                         }, {
                             '$match': {
                                 '$expr': {

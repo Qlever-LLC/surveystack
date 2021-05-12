@@ -226,7 +226,7 @@ const buildPipeline = async (req, res) => {
     archivedMatch['meta.archived'] = true;
   }
   pipeline.push({ $match: archivedMatch });
-
+  
   if (req.query.creator) {
     pipeline.push({
       $match: {
@@ -604,14 +604,99 @@ const createSubmission = async (req, res) => {
   }
 
   try {
+    // insert the submission
     let r = await db.collection(col).insertOne(entity);
     assert.equal(1, r.insertedCount);
+    // copy submission to library survey
+    let controls = survey.revisions[entity.meta.survey.version-1].controls;
+    await copySubmissionToLibrarySurveys(controls, entity);
+    // set formosResults to result
     r.farmos = farmosResults;
     return res.send(r);
   } catch (err) {
     throw boom.boomify(err);
   }
 };
+
+// if submission contains question set library questions, submit a subset copy to each question set library
+const copySubmissionToLibrarySurveys = async (controls, submission) => {
+  // for each component in survey.revisions[meta.survey.version]
+  controls.forEach(function(control) {
+    // for each library root control which is not deleted
+    if (control.isLibraryRoot && !control.options.redacted) {
+      // create a copy of submission
+      let submissionCopy = JSON.parse(JSON.stringify(submission));
+      // remember submission id in original
+      submissionCopy.meta.original = new ObjectId(submissionCopy._id);
+      // set new id
+      submissionCopy._id = new ObjectId();
+      // remember survey id in origin_id and set survey id to the qsl survey
+      submissionCopy.meta.survey.origin = new ObjectId(submissionCopy.meta.survey.id);
+      submissionCopy.meta.survey.id = new ObjectId(control.libraryId);
+      submissionCopy.meta.survey.version = control.libraryVersion; // must be version of the library survey, not the consuming survey
+      // remove all data with a name not in values array (except meta)
+      let dataNamesOfThisLibrary = [];
+      collectDataNamesOfGivenLibraryId(control, control.libraryId, dataNamesOfThisLibrary);
+      //remove libraryRoot container including meta child
+      submissionCopy.data = findVal(submissionCopy.data, control.name);
+      delete submissionCopy.data['meta'];
+      //remove all data not in dataNamesOfThisLibrary
+      removePrivateData(submissionCopy.data, dataNamesOfThisLibrary);
+
+      // do not store if no data is left
+      if(Object.keys(submissionCopy.data).length==0) {
+        return;
+      }
+
+      // TODO if qsl survey is not found, we are probably on an on-premise-system, so try to find the survey on the central surveystack system
+
+      // store
+      console.log('create submission copy '+submissionCopy._id);
+      db.collection(col).insertOne(submissionCopy);
+    } else if(control.children) {
+      // recursively go through the children
+      copySubmissionToLibrarySurveys(control.children, submission);
+    }
+  });
+};
+
+const collectDataNamesOfGivenLibraryId = (control, libraryId, collection) => {
+  if(control.libraryId===libraryId && !control.isLibraryRoot) {
+    collection.push(control.name);
+  }
+  if(control.children) {
+    control.children.forEach(child => {
+      collectDataNamesOfGivenLibraryId(child, libraryId, collection);
+    })
+  }
+}
+
+const removePrivateData = (submissionData, dataNamesToInclude) => {
+  Object.keys(submissionData).forEach(key => {
+    if(key!='meta' &&  key!='value') {
+      if(dataNamesToInclude.indexOf(key)==-1) {
+        delete submissionData[key];
+      } else {
+        removePrivateData(submissionData[key], dataNamesToInclude);
+      }
+    }
+  });
+};
+
+const findVal = (obj, keyToFind) => {
+  if(!obj) {
+    return false;
+  }
+  if (obj[keyToFind]) return obj[keyToFind];
+
+  for (let key in obj) {
+    if (typeof obj[key] === 'object') {
+      const value = findVal(obj[key], keyToFind);
+      if (value) return value;
+    }
+  }
+  return false;
+}
 
 const updateSubmission = async (req, res) => {
   const { id } = req.params;
@@ -661,8 +746,30 @@ const updateSubmission = async (req, res) => {
     }
   );
   updated.value.farmos = farmosResults;
+
+  await updateSubmissionToLibrarySurveys(survey, entity);
+
   return res.send(updated.value);
 };
+
+const updateSubmissionToLibrarySurveys = async (survey, submission) => {
+  // find library submissions to be updated
+  //const librarySubmissions =  await db.collection('submissions').find({'meta.original':submission._id }).toArray();
+  const librarySubmissions =  await db.collection('submissions').find({'meta.survey.origin':survey._id }).toArray();
+
+  // archive current library submissions
+  await librarySubmissions.forEach(function(librarySubmission) {
+    // re-insert existing submissions with a new _id
+    //librarySubmission.meta.original = new ObjectId(librarySubmission._id);
+    //librarySubmission._id = new ObjectId();
+    librarySubmission.meta.archived = true;
+    librarySubmission.meta.archivedReason = submission.meta.archivedReason || 'RESUBMIT';
+    db.collection(col).replaceOne({"_id":librarySubmission._id}, librarySubmission);
+  });
+  // create new library submissions
+  let controls = survey.revisions[submission.meta.survey.version-1].controls;
+  await copySubmissionToLibrarySurveys(controls, submission);
+}
 
 const reassignSubmission = async (req, res) => {
   const { id } = req.params;
@@ -746,6 +853,8 @@ const archiveSubmission = async (req, res) => {
   const updated = await db.collection(col).findOneAndUpdate({ _id: new ObjectId(id) }, update, {
     returnOriginal: false,
   });
+
+  // TODO archive / unarchive library submissions as well?
 
   return res.send(updated);
 };
