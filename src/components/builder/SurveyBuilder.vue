@@ -412,11 +412,12 @@ export default {
       // TODO MH overwrite resources with same libraryId
       data.resources.forEach((r) => {
         r.libraryId = data._id;
+        r.libraryVersion = data.latestVersion;
       });
       this.survey.resources = this.survey.resources.concat(data.resources);
 
       // copy controls from library survey
-      const controlsFromLibrary = data.revisions[data.latestVersion].controls;
+      const controlsFromLibrary = data.revisions[data.latestVersion - 1].controls;
 
       // create question group
       const group = createControlInstance(
@@ -426,6 +427,7 @@ export default {
       group.label = data.name;
       group.isLibraryRoot = true;
       group.libraryId = data._id;
+      group.libraryVersion = data.latestVersion;
 
       // add recursive function for children
       const dive = (control, cb) => {
@@ -447,6 +449,7 @@ export default {
           // eslint-disable-next-line no-param-reassign
           control.id = new ObjectID().toString();
           control.libraryId = data._id;
+          control.libraryVersion = data.latestVersion;
         });
         group.children.push(controlToAdd);
       }
