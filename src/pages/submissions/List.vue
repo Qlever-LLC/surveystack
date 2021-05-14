@@ -147,6 +147,7 @@
             >
               <v-btn
                 v-if="selected[0]['meta.archived'] === 'true'"
+                :disabled="surveyEntity.meta.isLibrary"
                 color="error"
                 text
                 @click="showDeleteModal = true"
@@ -155,6 +156,7 @@
               </v-btn>
               <v-btn
                 v-if="selected[0]['meta.archived'] === 'true'"
+                :disabled="surveyEntity.meta.isLibrary"
                 text
                 @click="archiveSubmission(selected[0], '', false)"
               >
@@ -162,6 +164,7 @@
               </v-btn>
               <v-btn
                 v-if="selected[0]['meta.archived'] !== 'true'"
+                :disabled="surveyEntity.meta.isLibrary"
                 color="error"
                 text
                 @click="showArchiveModal = true"
@@ -170,11 +173,13 @@
               </v-btn>
               <v-btn
                 @click="reassignment.showModal = true"
+                :disabled="surveyEntity.meta.isLibrary"
                 text
                 color="secondary"
               >REASSIGN</v-btn>
               <v-btn
                 v-if="selected[0]['meta.archived'] !== 'true'"
+                :disabled="surveyEntity.meta.isLibrary"
                 text
                 color="primary"
                 @click="resubmit(selected[0])"

@@ -97,7 +97,11 @@ export default {
       return false;
     },
     isAllowedToSubmit() {
-      const { submissions } = this.entity.meta;
+      const { submissions, isLibrary } = this.entity.meta;
+
+      if (isLibrary) {
+        return false;
+      }
 
       if (!submissions || submissions === 'public') {
         // everyone may submit
@@ -122,7 +126,11 @@ export default {
       return false;
     },
     submissionRightsHint() {
-      const { submissions } = this.entity.meta;
+      const { submissions, isLibrary } = this.entity.meta;
+
+      if (isLibrary) {
+        return 'This is a library survey, please choose another survey to submit.';
+      }
 
       if (!submissions || submissions === 'public') {
         return 'Everyone may submit to this survey.';

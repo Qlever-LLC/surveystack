@@ -22,7 +22,8 @@
         <div>
           <span class="caption grey--text text--darken-1">{{ createIndex(index, idx + 1) | displayIndex}}</span>
           <br />
-          <span class="title">
+          <span class="title"
+                :class="{ 'grey--text': el.options.hidden }">
             {{ getDisplay(el) }}
           </span>
           <br />

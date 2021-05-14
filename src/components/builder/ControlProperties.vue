@@ -105,6 +105,38 @@
       </v-checkbox>
 
       <v-checkbox
+        class="my-1"
+        color="grey darken-1"
+        v-if="survey.meta.isLibrary"
+        v-model="control.options.allowHide"
+        hide-details
+        label="Allow hide"
+      >
+        <template slot="label">
+          <div>
+            <div class="text--primary">Allow hide</div>
+            <div class="body-2">Allow users of this question set to hide this question</div>
+          </div>
+        </template>
+      </v-checkbox>
+
+      <v-checkbox
+        class="my-1"
+        color="grey darken-1"
+        v-if="control.libraryId && control.options.allowHide"
+        v-model="control.options.hidden"
+        hide-details
+        label="Hidden"
+      >
+        <template slot="label">
+          <div>
+            <div class="text--primary">Hidden</div>
+            <div class="body-2">Submitters can not see this field. This option is intentionally allowed by the question set designer</div>
+          </div>
+        </template>
+      </v-checkbox>
+
+      <v-checkbox
         class="ma-0"
         color="grey darken-1"
         v-model="control.options.allowCustomSelection"
