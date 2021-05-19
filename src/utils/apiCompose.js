@@ -5,10 +5,8 @@ const defaultApiCompose = `
  * ApiCompose
  *
  * @param {submission} submission
- * @param {survey} survey
- * @param {parent} parent
  */
-function apiCompose(submission, survey, parent) {
+function apiCompose(submission) {
   const request = populatePlanting(
     submission.data.crop,
     submission.data.field,

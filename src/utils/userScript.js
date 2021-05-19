@@ -16,7 +16,6 @@ export function onMessage(type, callback) {
 export default function buildScriptQuestionIframeContents({
   scriptSource,
   submissionJSON,
-  parentJSON,
   valueJSON,
   contextJSON,
   controlJSON,
@@ -71,7 +70,6 @@ export default function buildScriptQuestionIframeContents({
           submission: ${submissionJSON},
           control: ${controlJSON},
           params: ${paramsJSON},
-          parent: ${parentJSON},
         };
 
         ${scriptSource}

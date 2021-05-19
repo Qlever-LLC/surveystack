@@ -1,5 +1,8 @@
 <template>
-  <div class="screen-root" style="padding: 0px 12px 0px 0px !important">
+  <div
+    class="screen-root"
+    style="padding: 0px 12px 0px 0px !important"
+  >
     <v-dialog v-model="viewCode">
       <app-code-view v-model="survey" />
     </v-dialog>
@@ -11,12 +14,19 @@
       />
     </v-dialog>
 
-    <splitpanes style="padding: 0px !important" class="pane-root" vertical>
+    <splitpanes
+      style="padding: 0px !important"
+      class="pane-root"
+      vertical
+    >
       <pane
         class="pane pane-survey"
         style="position: relative; overflow: hidden"
       >
-        <div class="pane-fixed-wrapper pr-2" style="position: relative">
+        <div
+          class="pane-fixed-wrapper pr-2"
+          style="position: relative;"
+        >
           <control-adder @controlAdded="controlAdded" />
           <survey-details
             :version="version"
@@ -52,9 +62,12 @@
         </div>
       </pane>
 
-      <pane class="pane pane-controls" v-if="control">
+      <pane
+        class="pane pane-controls"
+        v-if="control"
+      >
         <v-card class="pb-3 mb-3">
-          <div class="px-4">
+          <div class=" px-4">
             <!-- <v-card-title class="pl-0">Details</v-card-title> -->
             <control-properties
               v-if="control"
@@ -93,8 +106,15 @@
         </code-editor>
       </pane>
 
-      <pane class="pane pane-main-code" v-if="hasCode && !hideCode">
-        <splitpanes horizontal class="code-resizer">
+      <pane
+        class="pane pane-main-code"
+        v-if="hasCode && !hideCode"
+      >
+        <splitpanes
+          horizontal
+          class="code-resizer"
+        >
+
           <pane size="80">
             <div style="height: 100%">
               <v-tabs
@@ -118,7 +138,9 @@
                 >
                   API Compose
                 </v-tab>
-                <v-tab v-if="control.type === 'script'"> Script </v-tab>
+                <v-tab v-if="control.type === 'script'">
+                  Script
+                </v-tab>
               </v-tabs>
 
               <code-editor
@@ -137,9 +159,14 @@
               >
               </code-editor>
             </div>
+
           </pane>
           <pane size="20">
-            <console-log class="console-log" :log="log" @clear="log = ''" />
+            <console-log
+              class="console-log"
+              :log="log"
+              @clear="log = ''"
+            />
           </pane>
         </splitpanes>
       </pane>
@@ -159,11 +186,9 @@
       </pane>
       <pane class="pane pane-draft">
         <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
-        <div
-          style="height: calc(100vh - 182px); max-height: calc(100vh - 182px)"
-        >
+        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px);">
           <app-draft-component
-            @submit="(payload) => $emit('submit', payload)"
+            @submit="payload => $emit('submit', payload)"
             v-if="survey && instance"
             :submission="instance"
             :survey="survey"
@@ -180,6 +205,7 @@
           </v-card>
         </v-overlay>
       </pane>
+
     </splitpanes>
 
     <!-- <confirm-leave-dialog
@@ -219,8 +245,6 @@ import { defaultApiCompose } from '@/utils/apiCompose';
 import submissionUtils from '@/utils/submissions';
 import { SPEC_VERSION_SCRIPT } from '@/constants';
 
-import * as surveyStackUtils from '@/utils/surveyStack';
-
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -230,9 +254,8 @@ const initialRelevanceCode = variable => `\
  *
  * @param {submission} submission
  * @param {survey} survey
- * @param {parent} parent
  */
-function ${variable}(submission, survey, parent) {
+function ${variable}(submission, survey) {
   return true;
 }
 `;
@@ -692,16 +715,7 @@ export default {
 
       // const data = `const Data = ${JSON.stringify(this.instance.data, null, 2)}`;
       const submission = `const submission = ${JSON.stringify(this.instance, null, 2)}`;
-      const parent = `const parent = ${JSON.stringify(this.parent, null, 2)}`;
-      return `${submission};\n\n${parent};\n`;
-    },
-    parent() {
-      console.log('parent() called');
-      const position = utils.getPosition(this.control, this.currentControls);
-      const path = utils.getFlatName(this.currentControls, position);
-      const parentPath = surveyStackUtils.getParentPath(path);
-      const parentData = surveyStackUtils.getNested(this.instance.data, parentPath);
-      return parentData;
+      return `${submission}\n`;
     },
   },
   watch: {
