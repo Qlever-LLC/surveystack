@@ -7,7 +7,9 @@ cd ..
 pm2 stop oursci-server-dev
 
 # Pull from repo
-git pull
+git fetch
+git checkout develop
+git merge origin/develop
 
 # NOTE: not building on server because memory limits
 # install node modules in client
