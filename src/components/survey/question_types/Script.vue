@@ -199,7 +199,7 @@ export default {
 iframe {
   width: 100%;
   display: block;
-  height: 45vh;
+  height: 50vh;
 }
 
 .status {
