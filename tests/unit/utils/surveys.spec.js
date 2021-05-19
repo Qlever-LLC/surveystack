@@ -48,7 +48,7 @@ const controls = [{
   value: null,
 }];
 
-describe('surveys', () => {
+describe.skip('surveys', () => {
   test('findControlById works', () => {
     const control = findControlById('5e8508eeba06570001c46b16', controls);
     expect(control.name).toBe('group_5');
