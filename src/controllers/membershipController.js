@@ -70,24 +70,6 @@ const createPopulationPipeline = () => {
   return pipeline;
 };
 
-const getAdminOfParentGroups = async (groupId) => {
-  const adminsOfParentGroups = [];
-
-  /*
-  const parentGroups = await rolesService.getParentGroups(groupId);
-
-  for (const parentGroup of parentGroups) {
-    if (adminsOfParentGroups.find((m) => m.group._id == parentGroup._id)) {
-      continue;
-    }
-
-    const cpy = { ...e };
-    cpy.group = { ...subgroup };
-    adminsOfParentGroups.push(cpy);
-  }
-  */
-  return adminsOfParentGroups;
-};
 
 const getAdminOfSubGroups = async (entities) => {
   const adminOfSubGroups = [];
@@ -127,9 +109,9 @@ const getMemberships = async (req, res) => {
   const { group, user, invitationCode, status } = req.query;
   if (group) {
     const parentGroups = await rolesService.getParentGroups(group);
-    console.log('parentGroups', parentGroups);
+    // console.log('parentGroups', parentGroups);
     filter.group = { $in: parentGroups.map((g) => new ObjectId(g._id)) };
-    console.log('filter', filter);
+    // console.log('filter', filter);
   }
 
   if (user) {
@@ -192,7 +174,7 @@ const getMemberships = async (req, res) => {
       ) {
         continue;
       }
-      
+
       if (admins.find((adm) => `${adm._id}` === `${member._id}`)) {
         continue;
       }
