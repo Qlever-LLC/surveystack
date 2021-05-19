@@ -16,6 +16,7 @@ export function onMessage(type, callback) {
 export default function buildScriptQuestionIframeContents({
   scriptSource,
   submissionJSON,
+  parentJSON,
   valueJSON,
   contextJSON,
   controlJSON,
@@ -68,6 +69,7 @@ export default function buildScriptQuestionIframeContents({
         const state = getInitialState();
         const props = {
           submission: ${submissionJSON},
+          parent: ${parentJSON},
           control: ${controlJSON},
           params: ${paramsJSON},
         };

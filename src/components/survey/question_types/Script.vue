@@ -51,6 +51,7 @@
 import buildScriptQuestionIframeContents, { onMessage } from '@/utils/userScript';
 import api from '@/services/api.service';
 import BaseQuestionComponent from './BaseQuestionComponent';
+import * as surveyStackUtils from '@/utils/surveyStack';
 
 export default {
   mixins: [BaseQuestionComponent],
@@ -70,6 +71,11 @@ export default {
         type: this.meta.status,
         message: this.meta.statusMessage,
       };
+    },
+    parent() {
+      const parentPath = surveyStackUtils.getParentPath(this.$vnode.key);
+      const parentData = surveyStackUtils.getNested(this.submission, parentPath);
+      return parentData;
     },
   },
   data() {
@@ -118,7 +124,6 @@ export default {
     requestRunSurveyStackKit({ script }) {
       console.log('running script', script);
       this.scriptId = script;
-
       this.$refs.scriptLink.href = `http://app.surveystack.io/kit/${script}`;
       this.$refs.scriptLink.click();
     },
@@ -134,6 +139,7 @@ export default {
     initializeIframe() {
       const { iframe } = this.$refs;
       const submissionJSON = JSON.stringify(this.submission);
+      const parentJSON = JSON.stringify(this.parent);
       const valueJSON = JSON.stringify(this.value);
       const contextJSON = JSON.stringify(this.meta.context || {});
       const controlJSON = JSON.stringify(this.control);
@@ -142,6 +148,7 @@ export default {
       const html = buildScriptQuestionIframeContents({
         scriptSource: this.source.content,
         submissionJSON,
+        parentJSON,
         valueJSON,
         contextJSON,
         controlJSON,

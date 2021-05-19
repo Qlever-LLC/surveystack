@@ -22,6 +22,7 @@
                   <v-text-field
                     label="Label"
                     :value="item.label"
+                    :disabled="disabled"
                     @input="(value) => handleItemInput(index, 'label', value)"
                     :rules="[rules.notEmpty]"
                     outlined
@@ -32,6 +33,7 @@
                   <v-text-field
                     label="Value"
                     :value="item.value"
+                    :disabled="disabled"
                     @input="(value) => handleItemInput(index, 'value', value)"
                     :rules="[rules.notEmpty]"
                     outlined
@@ -45,6 +47,7 @@
               <v-btn icon>
                 <v-icon
                   color="grey"
+                  :disabled="disabled"
                   @click="() => deleteItem(index)"
                 >mdi-delete</v-icon>
               </v-btn>
@@ -57,6 +60,7 @@
 
       <v-btn
         class="ml-auto mr-0 d-block mb-3"
+        :disabled="disabled"
         @click="addItem"
       >
         <v-icon left>mdi-plus</v-icon>Add Item
@@ -126,6 +130,9 @@ export default {
     value: {
       type: Array,
       required: true,
+    },
+    disabled: {
+      required: false,
     },
   },
 };

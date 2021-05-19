@@ -43,6 +43,27 @@ export const getAllNodes = (root) => {
   return nodes;
 };
 
+export function getParentPath(path) {
+  let parentPath = path;
+
+  // remove leading data.
+  let idx = parentPath.indexOf('data.');
+  if (idx === 0) {
+    parentPath = parentPath.replace('data.', '');
+  }
+
+  // remove trailing path element
+  idx = parentPath.lastIndexOf('.');
+  if (idx > 0) {
+    parentPath = parentPath.substring(0, idx);
+    parentPath = `data.${parentPath}`;
+  } else {
+    parentPath = 'data';
+  }
+
+  return parentPath;
+}
+
 export function getRelevance(submission, path, fallback = true) {
   // checks the relevance of the current path and its parents
   const splits = path.split('.');

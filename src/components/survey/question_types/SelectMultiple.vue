@@ -48,7 +48,7 @@
       </div>
     </div>
 
-    <app-control-error v-else>No options specified, please update suvey definition</app-control-error>
+    <app-control-error v-else>No options specified, please update survey definition</app-control-error>
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>

@@ -210,6 +210,11 @@ const actions = {
         continue;
       }
 
+      const isHidden = nextNode.model.options.hidden;
+      if (isHidden) {
+        continue;
+      }
+
       commit('NEXT', nextNode);
       return;
     }

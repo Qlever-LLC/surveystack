@@ -98,7 +98,7 @@
   <div
     v-else
     class="d-flex justify-center align-center overlay-bg "
-    style="background: rbga(0, 0, 0, 0.45); height: 100%;"
+    style="background: rgba(0, 0, 0, 0.45); height: 100%;"
   >
     <v-card max-width="500">
       <v-card-title>
@@ -357,7 +357,6 @@ export default {
     this.editMode = !this.$route.matched.some(
       ({ name }) => name === 'surveys-new',
     );
-
 
     this.survey._id = new ObjectId();
 
