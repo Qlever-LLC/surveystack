@@ -25,6 +25,13 @@
         v-model="control.moreInfo"
         label="More info"
       />
+      <v-checkbox
+        v-if="isText"
+        outlined
+        v-model="control.options.enableQr"
+        label="QR Code"
+      />
+
       <div
         class="d-flex align-start"
         v-if="isScript"
@@ -395,6 +402,9 @@ export default {
     },
     isDate() {
       return this.control.type === 'date';
+    },
+    isText() {
+      return this.control.type === 'string';
     },
     isScript() {
       return this.control.type === 'script';

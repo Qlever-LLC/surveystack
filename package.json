@@ -34,6 +34,7 @@
     "ol-popup": "^4.0.0",
     "olgm": "github:mstenta/ol3-google-maps#farmOS-map",
     "papaparse": "^5.1.1",
+    "qr-scanner": "^1.2.0",
     "register-service-worker": "^1.6.2",
     "roboto-fontface": "*",
     "splitpanes": "^2.2.1",
