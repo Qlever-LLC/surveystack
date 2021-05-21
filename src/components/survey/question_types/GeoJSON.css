@@ -77,7 +77,15 @@
   align-items: center;
 }
 
-
+ /* deep selector is required to pierce component boundary for scoped styles 
+but jest doesn't understand the deep selector (>>>)
+ */
+.hide-polygon >>> .ol-edit-polygon,
+.hide-point >>> .ol-edit-point,
+.hide-line >>> .ol-edit-line,
+.hide-circle >>> .ol-edit-circle,
+.hide-modify >>> .ol-edit-modify,
+.hide-move >>> .ol-edit-move,
 .hide-polygon .ol-edit-polygon,
 .hide-point .ol-edit-point,
 .hide-line .ol-edit-line,

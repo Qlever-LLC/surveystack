@@ -2,7 +2,7 @@ import { renderWithVuetify } from '../../../../tests/renderWithVuetify';
 import GeoJSON, { 
   addBaseLayer, 
   getNextValue,
-  hello,
+  addDrawingLayer,
 } from './GeoJSON.vue';
 
 
@@ -121,7 +121,6 @@ describe('GeoJSON Question', () => {
         await updateProps({ 
           control: getControlProps({ [key]: false }),
         });
-  
         expect(getByTitle(text)).not.toBeVisible();
       });
     });
@@ -137,28 +136,29 @@ describe('GeoJSON Question', () => {
   // functions take map as arg to make testing easy
 
   describe('calls functions', () => {
+    const featureCollection = { 
+      type: 'FeatureCollection', 
+      features: [
+        { 
+          type: 'Feature', 
+          geometry: {
+            type: 'Point',
+            coordinates: [125.6, 10.1]
+          },
+        },
+      ],
+    };
+
     it('getNextValue returns null for empty feature collection', () => {
       expect(
         getNextValue({ type: 'FeatureCollection', features: []})
       ).toBeNull();
     });
     it('getNextValue returns geojson for non empty feature collection', () => {
-      const featureCollection = { 
-        type: 'FeatureCollection', 
-        features: [
-          { 
-            type: 'Feature', 
-            geometry: {
-              type: 'Point',
-              coordinates: [125.6, 10.1]
-            },
-          },
-        ],
-      };
       expect(getNextValue(featureCollection)).toBe(featureCollection);
     });
 
-    it('addBaseLayer', () => {
+    it('addBaseLayer creates xyz layer', () => {
       const map = {
         addLayer: jest.fn(),
       };
@@ -168,7 +168,33 @@ describe('GeoJSON Question', () => {
       expect(map.addLayer.mock.calls[0][1].base).toBe(true);
     });
 
+    it('adds drawing layer with empty value', () => {
+      const map = {
+        zoomToLayer: jest.fn(),
+        addLayer: jest.fn(),
+        addBehavior: jest.fn(),
+      };
+      addDrawingLayer(map);
 
+      expect(map.addLayer).toHaveBeenCalled();
+      expect(map.addLayer.mock.calls[0][0]).toBe('vector');
+      expect(map.addLayer.mock.calls[0][1].geojson).toBe(undefined);
+      expect(map.addBehavior).toHaveBeenCalled();
+    });
+
+    it('adds drawing layer with features from value', () => {
+      const map = {
+        zoomToLayer: jest.fn(),
+        addLayer: jest.fn(),
+        addBehavior: jest.fn(),
+      };
+      addDrawingLayer(map, featureCollection);
+
+      expect(map.addLayer).toHaveBeenCalled();
+      expect(map.addLayer.mock.calls[0][0]).toBe('vector');
+      expect(map.addLayer.mock.calls[0][1].geojson).toBe(featureCollection);
+      expect(map.addBehavior).toHaveBeenCalled();
+    });
   });
 
   // describe('calls map change handler', () => {
