@@ -5,6 +5,6 @@ module.exports = {
   // transformIgnorePatterns: ['/node_modules/'],
   setupFiles: ['jest-canvas-mock'],
   setupFilesAfterEnv: ['./tests/setup.js'],
-  resetMocks: true,
+  clearMocks: true,
   resetModules: true,
 };

@@ -49,14 +49,13 @@ export function addDrawingLayer(map, value) {
     color: 'blue',
     visible: true,
   };
-  // const layer = map.addLayer('vector', opts);
-  // map.zoomToLayer(layer);
+  const layer = map.addLayer('vector', opts);
+  map.zoomToLayer(layer);
 
-  // map.addBehavior('edit', { layer });
-  // map.addBehavior('measure', { layer });
-  // map.zoomToLayer(layer);
-  // return layer;
-  return null;
+  map.addBehavior('edit', { layer });
+  map.addBehavior('measure', { layer });
+  map.zoomToLayer(layer);
+  return layer;
 }
 
 export function getNextValue(geojson) {
@@ -126,7 +125,7 @@ export default {
       // map.addBehavior('measure', { layer });
       // this.layer = layer;
 
-      let layer;
+      // let layer;
       // let wktOpts;
       // if (this.value && this.value) {
       //   // wktOpts = {
@@ -148,16 +147,16 @@ export default {
       // map.addBehavior('edit', { layer });
       // map.addBehavior('measure', { layer });
 
-      const wkt = 'POLYGON ((-75.53643733263014 42.54424760416683, -75.5360350012779 42.54427527000766, -75.53589016199109 42.54412508386721, -75.53588747978209 42.54302634269183, -75.53643733263014 42.54424760416683))';
-      const wktOpts = {
-        title: 'my-polygon', // defaults to 'wkt'
-        wkt, // REQUIRED!
-        color: 'orange', // defaults to 'orange'
-        visible: true, // defaults to true
-      };
-      const wktLayer = map.addLayer('wkt', wktOpts);
+      // const wkt = 'POLYGON ((-75.53643733263014 42.54424760416683, -75.5360350012779 42.54427527000766, -75.53589016199109 42.54412508386721, -75.53588747978209 42.54302634269183, -75.53643733263014 42.54424760416683))';
+      // const wktOpts = {
+      //   title: 'my-polygon', // defaults to 'wkt'
+      //   wkt, // REQUIRED!
+      //   color: 'orange', // defaults to 'orange'
+      //   visible: true, // defaults to true
+      // };
+      // const wktLayer = map.addLayer('wkt', wktOpts);
 
-      this.layer = layer;
+      // this.layer = layer;
       // map.zoomToLayer(layer);
 
       const mapChangeHandler = geojson => this.changed(getNextValue(geojson));

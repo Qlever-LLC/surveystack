@@ -76,7 +76,7 @@ describe('GeoJSON Question', () => {
       container.append(style);
     })
 
-    it.only('shows drawing controls by default', () => {
+    it('shows drawing controls by default', () => {
       expect(getByTitle('Draw a Polygon')).toBeVisible();
       expect(getByTitle('Draw a Line')).toBeVisible();
       expect(getByTitle('Draw a Point')).toBeVisible();
@@ -136,7 +136,7 @@ describe('GeoJSON Question', () => {
   // Import and test them
   // functions take map as arg to make testing easy
 
-  describe.skip('calls functions', () => {
+  describe('calls functions', () => {
     it('getNextValue returns null for empty feature collection', () => {
       expect(
         getNextValue({ type: 'FeatureCollection', features: []})
