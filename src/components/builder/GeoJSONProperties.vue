@@ -1,111 +1,61 @@
 <template>
   <div>
+    <div class="text--primary">
+      Map Options
+    </div>
     <v-checkbox
+      v-for="opt in options"
+      :key="opt.key"
       class="my-1"
       outlined
-      v-model="value.showPolygon"
-      label="Show polygon control"
+      v-model="value[opt.key]"
+      :label="opt.text"
       color="grey darken-1"
       hide-details
-    >
-      <template slot="label">
-      <div>
-        <div class="text--primary">Show polygon control</div>
-        <!-- <div class="body-2">Make this a required field</div> -->
-      </div>
-      </template>
-    </v-checkbox>
-    <v-checkbox
-      class="my-1"
-      outlined
-      v-model="value.showLine"
-      label="Show polygon control"
-      color="grey darken-1"
-      hide-details
-    >
-      <template slot="label">
-      <div>
-        <div class="text--primary">Show line control</div>
-        <!-- <div class="body-2">Make this a required field</div> -->
-      </div>
-      </template>
-    </v-checkbox>
-    <v-checkbox
-      class="my-1"
-      outlined
-      v-model="value.showPoint"
-      label="Show polygon control"
-      color="grey darken-1"
-      hide-details
-    >
-      <template slot="label">
-      <div>
-        <div class="text--primary">Show point control</div>
-        <!-- <div class="body-2">Make this a required field</div> -->
-      </div>
-      </template>
-    </v-checkbox>
-    <v-checkbox
-      class="my-1"
-      outlined
-      v-model="value.showCircle"
-      label="Show polygon control"
-      color="grey darken-1"
-      hide-details
-    >
-      <template slot="label">
-      <div>
-        <div class="text--primary">Show circle control</div>
-        <!-- <div class="body-2">Make this a required field</div> -->
-      </div>
-      </template>
-    </v-checkbox>
-    <v-checkbox
-      class="my-1"
-      outlined
-      v-model="value.showModify"
-      label="Show modify control"
-      color="grey darken-1"
-      hide-details
-    >
-      <template slot="label">
-      <div>
-        <div class="text--primary">Show modify control</div>
-        <!-- <div class="body-2">Make this a required field</div> -->
-      </div>
-      </template>
-    </v-checkbox>
-    <v-checkbox
-      class="my-1"
-      outlined
-      v-model="value.showMove"
-      label="Show move control"
-      color="grey darken-1"
-      hide-details
-    >
-      <template slot="label">
-      <div>
-        <div class="text--primary">Show move control</div>
-        <!-- <div class="body-2">Make this a required field</div> -->
-      </div>
-      </template>
-    </v-checkbox>
+    />
   </div>
 </template>
 
 <script>
+export const options = [
+  {
+    key: 'showPolygon',
+    text: 'Show polygon control',
+  },
+  {
+    key: 'showLine',
+    text: 'Show line control',
+  },
+  {
+    key: 'showPoint',
+    text: 'Show point control',
+  },
+  {
+    key: 'showCircle',
+    text: 'Show circle control',
+  },
+  {
+    key: 'showModify',
+    text: 'Show modify control',
+  },
+  {
+    key: 'showMove',
+    text: 'Show move control',
+  },
+];
+
 export default {
   name: 'geojson-properties',
+  data() {
+    return {
+      options,
+    };
+  },
   props: {
     value: {
       type: Object,
       required: true,
     },
-  },
-  mounted() {
-    if (this.value === null) {
-      this.$emit('input', {});
-    }
   },
 };
 </script>

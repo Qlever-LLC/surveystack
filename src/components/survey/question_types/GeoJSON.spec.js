@@ -127,14 +127,6 @@ describe('GeoJSON Question', () => {
    
   })
 
-  // PSYCHE, probably not worth it to test
-  // test event change handler and make sure that this.value gets updated
-
-  // TODO: 
-  // Extract out component logic into functions and export them
-  // Import and test them
-  // functions take map as arg to make testing easy
-
   describe('calls functions', () => {
     const featureCollection = { 
       type: 'FeatureCollection', 
@@ -196,33 +188,4 @@ describe('GeoJSON Question', () => {
       expect(map.addBehavior).toHaveBeenCalled();
     });
   });
-
-  // describe('calls map change handler', () => {
-  //   it('does thing', () => {
-  //     const renderOptions = {
-  //       propsData: {
-  //         control: getControlProps(),
-  //         value: null,
-  //         index: 'data.geojson_1',
-  //       },
-  //     };
-  
-  //     const { 
-  //       getByTitle, 
-  //       getByText, 
-  //       getByRole, 
-  //       container, 
-  //       debug,
-  //       updateProps,
-  //     } = renderWithVuetify(GeoJSON, renderOptions);
-
-  //     const wrapper = mount(GeoJSON, renderOptions);
-  //     console.log(wrapper.vm.map);
-  //     console.log(wrapper.vm.edit);
-  //     // wrapper.vm.map.dispatchEvent(new Event('drawend', {
-  //     //   type: 'FeatureCollection',
-  //     //   features: [],
-  //     // }));
-  //   });
-  // })
 });
