@@ -31,6 +31,9 @@ import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 
+/**
+ * Add base tile layer to map
+ */
 export function addBaseLayer(map) {
   const xyzOpts = {
     title: 'mapbox',
@@ -38,9 +41,15 @@ export function addBaseLayer(map) {
     visible: true,
     base: true,
   };
-  const xyzLayer = map.addLayer('xyz', xyzOpts);
+  return map.addLayer('xyz', xyzOpts);
 }
 
+/**
+ * Add drawing layer to OpenLayers map
+ * @param {ol.Map} map
+ * @param {string|undefined|null} value: stringified geojson used to initialize drawing layer
+ * @returns {ol.Layer} drawing layer created
+ */
 export function addDrawingLayer(map, value) {
   const opts = {
     title: 'features',
@@ -48,7 +57,8 @@ export function addDrawingLayer(map, value) {
     color: 'blue',
     visible: true,
   };
-  const layer = map.addLayer('vector', opts);
+  const layerType = value ? 'geojson' : 'vector';
+  const layer = map.addLayer(layerType, opts);
 
   if (value) {
     map.zoomToLayer(layer);
@@ -59,8 +69,16 @@ export function addDrawingLayer(map, value) {
   return layer;
 }
 
+/**
+ * Calculate the next value to assign to component's `this.value`
+ * @param {string} geojson: stringified geojson FeatureCollection emitted from map
+ * @returns {string|null} next value to assign to components `this.value`
+ */
 export function getNextValue(geojson) {
-  const geojsonIsEmpty = geojson && geojson.features && geojson.features.length === 0;
+  const parsedGeoJSON = geojson && JSON.parse(geojson);
+  const geojsonIsEmpty = geojson
+    && parsedGeoJSON.features
+    && parsedGeoJSON.features.length === 0;
   return geojsonIsEmpty ? null : geojson;
 }
 

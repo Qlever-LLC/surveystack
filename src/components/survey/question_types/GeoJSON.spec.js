@@ -128,7 +128,7 @@ describe('GeoJSON Question', () => {
   })
 
   describe('calls functions', () => {
-    const featureCollection = { 
+    const featureCollection = JSON.stringify({ 
       type: 'FeatureCollection', 
       features: [
         { 
@@ -139,11 +139,11 @@ describe('GeoJSON Question', () => {
           },
         },
       ],
-    };
+    });
 
     it('getNextValue returns null for empty feature collection', () => {
       expect(
-        getNextValue({ type: 'FeatureCollection', features: []})
+        getNextValue(JSON.stringify({ type: 'FeatureCollection', features: []}))
       ).toBeNull();
     });
     it('getNextValue returns geojson for non empty feature collection', () => {
@@ -183,7 +183,7 @@ describe('GeoJSON Question', () => {
       addDrawingLayer(map, featureCollection);
 
       expect(map.addLayer).toHaveBeenCalled();
-      expect(map.addLayer.mock.calls[0][0]).toBe('vector');
+      expect(map.addLayer.mock.calls[0][0]).toBe('geojson');
       expect(map.addLayer.mock.calls[0][1].geojson).toBe(featureCollection);
       expect(map.addBehavior).toHaveBeenCalled();
     });
