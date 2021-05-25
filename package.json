@@ -10,7 +10,6 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "@farmos.org/farmos-map": "file:///home/will/projects/our-sci/farmOS-map",
     "@mapbox/mapbox-gl-geocoder": "^4.7.0",
     "@mapbox/togeojson": "^0.16.0",
     "@mdi/font": "^5.0.45",

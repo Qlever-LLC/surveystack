@@ -24,7 +24,6 @@
 </template>
 
 <script>
-// import 'ol/ol.css';
 import baseQuestionComponent from './BaseQuestionComponent';
 import createMap from '@/external/instance/instance';
 import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
