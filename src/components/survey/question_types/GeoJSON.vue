@@ -14,8 +14,8 @@
         'hide-line': !control.options.geoJSON.showLine,
         'hide-point': !control.options.geoJSON.showPoint,
         'hide-circle': !control.options.geoJSON.showCircle,
-        'hide-move': !control.options.geoJSON.showMove,
-        'hide-modify': !control.options.geoJSON.showModify,
+        'hide-move': !hasSomeDrawControl,
+        'hide-modify': !hasSomeDrawControl,
       }"
       role="application"
     />
@@ -52,7 +52,7 @@ export function addBaseLayer(map) {
 export function addDrawingLayer(map, value) {
   const opts = {
     title: 'features',
-    ...(value && { geojson: value }),
+    ...(value && { geojson: JSON.stringify(value) }),
     color: 'blue',
     visible: true,
   };
@@ -78,7 +78,7 @@ export function getNextValue(geojson) {
   const geojsonIsEmpty = geojson
     && parsedGeoJSON.features
     && parsedGeoJSON.features.length === 0;
-  return geojsonIsEmpty ? null : geojson;
+  return geojsonIsEmpty ? null : parsedGeoJSON;
 }
 
 export default {
@@ -93,6 +93,17 @@ export default {
       map: null,
       mapId: `farmos-map-${Math.floor(Math.random() * 1e4)}`,
     };
+  },
+  computed: {
+    hasSomeDrawControl() {
+      const {
+        showPolygon,
+        showLine,
+        showCircle,
+        showPoint,
+      } = this.control.options.geoJSON;
+      return showPolygon || showLine || showCircle || showPoint;
+    },
   },
   mounted() {
     this.load();

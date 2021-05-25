@@ -34,14 +34,6 @@ export const options = [
     key: 'showCircle',
     text: 'Show circle control',
   },
-  {
-    key: 'showModify',
-    text: 'Show modify control',
-  },
-  {
-    key: 'showMove',
-    text: 'Show move control',
-  },
 ];
 
 export default {

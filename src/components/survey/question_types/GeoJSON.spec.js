@@ -25,8 +25,6 @@ const getControlProps = (opts) => {
     showLine: true,
     showPoint: true,
     showCircle: true,
-    showMove: true,
-    showModify: true,
     ...opts,
   }
   return {
@@ -41,8 +39,6 @@ const getControlProps = (opts) => {
         showLine: options.showLine,
         showPoint: options.showPoint,
         showCircle: options.showCircle,
-        showMove: options.showMove,
-        showModify: options.showModify,
       }
     },
     type: 'GeoJSON',
@@ -106,14 +102,14 @@ describe('GeoJSON Question', () => {
         key: 'showCircle',
         text: 'Draw a Circle',
       },
-      {
-        key: 'showModify',
-        text: 'Modify features',
-      },
-      {
-        key: 'showMove',
-        text: 'Move features',
-      },
+      // {
+      //   key: 'showModify',
+      //   text: 'Modify features',
+      // },
+      // {
+      //   key: 'showMove',
+      //   text: 'Move features',
+      // },
     ];
 
     thingsToTest.forEach(({key, text}) => {
@@ -122,13 +118,15 @@ describe('GeoJSON Question', () => {
           control: getControlProps({ [key]: false }),
         });
         expect(getByTitle(text)).not.toBeVisible();
+        expect(getByTitle('Modify features')).toBeVisible();
+        expect(getByTitle('Move features')).toBeVisible();
       });
     });
    
   })
 
   describe('calls functions', () => {
-    const featureCollection = JSON.stringify({ 
+    const featureCollection = { 
       type: 'FeatureCollection', 
       features: [
         { 
@@ -139,7 +137,7 @@ describe('GeoJSON Question', () => {
           },
         },
       ],
-    });
+    };
 
     it('getNextValue returns null for empty feature collection', () => {
       expect(
@@ -147,7 +145,9 @@ describe('GeoJSON Question', () => {
       ).toBeNull();
     });
     it('getNextValue returns geojson for non empty feature collection', () => {
-      expect(getNextValue(featureCollection)).toBe(featureCollection);
+      expect(
+        getNextValue(JSON.stringify(featureCollection))
+      ).toStrictEqual(featureCollection);
     });
 
     it('addBaseLayer creates xyz layer', () => {
@@ -184,7 +184,8 @@ describe('GeoJSON Question', () => {
 
       expect(map.addLayer).toHaveBeenCalled();
       expect(map.addLayer.mock.calls[0][0]).toBe('geojson');
-      expect(map.addLayer.mock.calls[0][1].geojson).toBe(featureCollection);
+      expect(map.addLayer.mock.calls[0][1].geojson)
+        .toBe(JSON.stringify(featureCollection));
       expect(map.addBehavior).toHaveBeenCalled();
     });
   });

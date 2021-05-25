@@ -57,8 +57,6 @@ export const createControlInstance = (control) => {
       showLine: true,
       showCircle: true,
       showPoint: true,
-      showModify: true,
-      showMove: true,
     };
   } else if (control.type === 'instructionsImageSplit') {
     cloneWithDefaultOptions.options.source = {
@@ -168,8 +166,8 @@ export const availableControls = [
     icon: 'mdi-leaf',
   },
   {
-    name: 'geojson',
-    label: 'GeoJSON',
+    name: 'map',
+    label: 'Map',
     type: 'geoJSON',
     icon: 'mdi-map',
   },
