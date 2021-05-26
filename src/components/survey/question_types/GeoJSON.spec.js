@@ -5,10 +5,8 @@ import GeoJSON, {
   addDrawingLayer,
 } from './GeoJSON.vue';
 
-
 import fs from 'fs';
 import path from 'path';
-import { mount } from '@vue/test-utils';
 
 const cssFile = fs.readFileSync(
   path.resolve(__dirname, './GeoJSON.css'),
@@ -102,14 +100,6 @@ describe('GeoJSON Question', () => {
         key: 'showCircle',
         text: 'Draw a Circle',
       },
-      // {
-      //   key: 'showModify',
-      //   text: 'Modify features',
-      // },
-      // {
-      //   key: 'showMove',
-      //   text: 'Move features',
-      // },
     ];
 
     thingsToTest.forEach(({key, text}) => {
