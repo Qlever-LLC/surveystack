@@ -51,6 +51,13 @@ export const createControlInstance = (control) => {
     cloneWithDefaultOptions.options.source = '';
   } else if (control.type === 'instructions') {
     cloneWithDefaultOptions.options.source = '';
+  } else if (control.type === 'geoJSON') {
+    cloneWithDefaultOptions.options.geoJSON = {
+      showPolygon: true,
+      showLine: true,
+      showCircle: true,
+      showPoint: true,
+    };
   } else if (control.type === 'instructionsImageSplit') {
     cloneWithDefaultOptions.options.source = {
       body: '',
@@ -151,7 +158,6 @@ export const availableControls = [
     label: 'Farmos Field',
     type: 'farmOsField',
     icon: 'mdi-leaf',
-
   },
   {
     name: 'farmos_planting',
@@ -159,5 +165,10 @@ export const availableControls = [
     type: 'farmOsPlanting',
     icon: 'mdi-leaf',
   },
-
+  {
+    name: 'map',
+    label: 'Map',
+    type: 'geoJSON',
+    icon: 'mdi-map',
+  },
 ];
