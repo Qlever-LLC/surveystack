@@ -205,8 +205,51 @@ const actions = {
         continue;
       }
 
+      const isPage = nextNode.model.type === 'page';
+
+
+      if (isPage) {
+        let cidx = index + 1;
+        let skipPage = true;
+
+        console.log('cidx', cidx);
+        // lookahead
+        while (cidx < traversal.length) {
+          const lookahead = traversal[cidx++];
+          const isInsidePage = lookahead.getPath().slice(1).slice(0, -1).find(parent => parent.model.type === 'page');
+          if (!isInsidePage) {
+            break;
+          }
+
+          const [relevance] = await codeEvaluator.calculateRelevance([lookahead], state.submission, state.survey); // eslint-disable-line
+          console.log('relevance is', relevance);
+          const { result: innerResult, path: innerPath, skip: innerSkip } = relevance;
+
+          if (!innerSkip) {
+            commit('SET_PROPERTY', { path: `${innerPath}.meta.relevant`, value: innerResult });
+            if (innerResult) {
+              skipPage = false;
+              break;
+            }
+          } else {
+            skipPage = false;
+            break;
+          }
+        }
+
+        if (skipPage) {
+          continue;
+        }
+      }
+
+
       const isInsidePage = nextNode.getPath().slice(1).slice(0, -1).find(parent => parent.model.type === 'page');
       if (isInsidePage) {
+        continue;
+      }
+
+      const isHidden = nextNode.model.options.hidden;
+      if (isHidden) {
         continue;
       }
 

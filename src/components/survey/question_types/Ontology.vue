@@ -95,7 +95,7 @@
       color="red lighten-2"
       dark
     >
-      <v-icon class="mr-2">mdi-alert</v-icon>Invalid select options, please update Suvey Definition
+      <v-icon class="mr-2">mdi-alert</v-icon>Invalid select options, please update Survey Definition
     </v-banner>
     <app-control-more-info :value="control.moreInfo" />
 

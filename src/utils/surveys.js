@@ -238,7 +238,6 @@ export const getFlatName = (controls, position) => {
     flatName += `.${control.name}`;
   });
 
-
   return flatName.substr(1);
 };
 
@@ -392,7 +391,6 @@ export function execute({
 }) {
   console.log('execute safe called');
   const worker = new Worker('/worker.js');
-
 
   return new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {

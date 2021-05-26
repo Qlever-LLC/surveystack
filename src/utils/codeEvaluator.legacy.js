@@ -43,8 +43,9 @@ async function calculateField(survey, submission, positions, controls, option, f
   for (const item of items) {
     try {
       const res = {
+        // TODO MH pass parent instead of null?
         res: utils.executeUnsafe({
-          code: item.code, fname, submission, survey, log: msg => console.log(msg),
+          code: item.code, fname, submission, survey, null, log: msg => console.log(msg),
         }),
         pos: item.pos,
         control: item.control,

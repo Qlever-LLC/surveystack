@@ -9,7 +9,7 @@
 
     <a
       ref="scriptLink"
-      :href="`http://app.surveystack.io/kit/${scriptId}`"
+      :href="`surveystack://kit/${scriptId}`"
       style="display: none"
       >Run Surveystack Script</a
     >
@@ -23,17 +23,17 @@
       />
       <v-btn
         @click="requestRunScript"
-        class="full run-button"
+        class="full run-button mt-4"
         depressed
         large
         color="primary"
       >
         Run Script
       </v-btn>
-      <p class="status">
-        status: {{ meta && meta.status }}
+      <p class="status" v-if="meta.status || meta.statusMessage">
+        <v-chip dark> {{ meta && meta.status }}</v-chip>
         <br />
-        status message: {{ meta && meta.statusMessage }}
+        <v-chip dark class="mt-4"> <v-icon small left>mdi-message-bulleted</v-icon> {{ meta && meta.statusMessage }}</v-chip>
       </p>
     </div>
     <div v-else-if="isLoading" class="d-flex align-center justify-center">
@@ -124,8 +124,7 @@ export default {
     requestRunSurveyStackKit({ script }) {
       console.log('running script', script);
       this.scriptId = script;
-
-      this.$refs.scriptLink.href = `http://app.surveystack.io/kit/${script}`;
+      this.$refs.scriptLink.href = `surveystack://kit/${script}`;
       this.$refs.scriptLink.click();
     },
     handleRequestSetContext({ context }) {
@@ -140,12 +139,11 @@ export default {
     initializeIframe() {
       const { iframe } = this.$refs;
       const submissionJSON = JSON.stringify(this.submission);
+      const parentJSON = JSON.stringify(this.parent);
       const valueJSON = JSON.stringify(this.value);
       const contextJSON = JSON.stringify(this.meta.context || {});
       const controlJSON = JSON.stringify(this.control);
       const paramsJSON = JSON.stringify((this.control.options && this.control.options.params) || {});
-      const parentJSON = JSON.stringify(this.parent);
-
 
       const html = buildScriptQuestionIframeContents({
         scriptSource: this.source.content,
@@ -199,7 +197,7 @@ export default {
 iframe {
   width: 100%;
   display: block;
-  height: 45vh;
+  height: 40vh;
 }
 
 .status {

@@ -34,6 +34,7 @@
           v-for="resource in filteredResources"
           :key="resource.id"
           two-line
+          :disabled="resource.libraryId"
           @click="openEditor(resource.id)"
         >
           <v-list-item-content>

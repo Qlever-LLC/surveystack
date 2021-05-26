@@ -40,7 +40,7 @@
         </v-radio>
 
       </v-radio-group>
-      <app-control-error v-else>No options specified, please update suvey definition</app-control-error>
+      <app-control-error v-else>No options specified, please update survey definition</app-control-error>
     </div>
     <app-control-more-info :value="control.moreInfo" />
 

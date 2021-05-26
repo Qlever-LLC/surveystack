@@ -10,6 +10,7 @@
       <v-btn
         color="primary"
         @click="matrixEditorDialog = true"
+        :disabled="disabled"
       >
         <v-icon left>mdi-view-column</v-icon>Open Editor
       </v-btn>
@@ -30,6 +31,7 @@
       style="width: 20rem"
       class="my-2"
       v-model="value.config.addRowLabel"
+      :disabled="disabled"
       label="Add Row Label"
     />
   </div>
@@ -77,6 +79,9 @@ export default {
     resources: {
       type: Array,
       default: () => ([]),
+    },
+    disabled: {
+      required: false,
     },
   },
   computed: {

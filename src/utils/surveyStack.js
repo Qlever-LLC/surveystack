@@ -64,7 +64,6 @@ export function getParentPath(path) {
   return parentPath;
 }
 
-
 export function getRelevance(submission, path, fallback = true) {
   // checks the relevance of the current path and its parents
   const splits = path.split('.');

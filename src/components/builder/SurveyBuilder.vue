@@ -1,5 +1,8 @@
 <template>
-  <div class="screen-root" style="padding: 0px 12px 0px 0px !important">
+  <div
+    class="screen-root"
+    style="padding: 0px 12px 0px 0px !important"
+  >
     <v-dialog v-model="viewCode">
       <app-code-view v-model="survey" />
     </v-dialog>
@@ -11,13 +14,20 @@
       />
     </v-dialog>
 
-    <splitpanes style="padding: 0px !important" class="pane-root" vertical>
+    <splitpanes
+      style="padding: 0px !important"
+      class="pane-root"
+      vertical
+    >
       <pane
         class="pane pane-survey"
         style="position: relative; overflow: hidden"
       >
-        <div class="pane-fixed-wrapper pr-2" style="position: relative">
-          <control-adder @controlAdded="controlAdded" />
+        <div
+          class="pane-fixed-wrapper pr-2"
+          style="position: relative;"
+        >
+          <control-adder @controlAdded="controlAdded" @openLibrary="openLibrary"/>
           <survey-details
             :version="version"
             :draft="isDraft"
@@ -39,6 +49,7 @@
             @export-survey="$emit('export-survey')"
             @import-survey="(file) => $emit('import-survey', file)"
             @set-survey-resources="setSurveyResources"
+            @addToLibrary="addToLibrary"
             class="mb-4"
           />
           <graphical-view
@@ -48,11 +59,28 @@
             :controls="currentControls"
             @controlSelected="controlSelected"
             @duplicate-control="duplicateControl"
+            @open-library="openLibrary"
           />
         </div>
       </pane>
 
-      <pane class="pane pane-controls" v-if="control">
+      <pane
+        class="pane pane-library"
+        v-if="library"
+      >
+        <div class="px-4">
+          <question-library
+            :survey="survey"
+            :libraryId="libraryId"
+            @addToSurvey="addQuestionsFromLibrary"
+            @cancel="closeLibrary"/>
+        </div>
+      </pane>
+
+      <pane
+        class="pane pane-controls"
+        v-if="control"
+      >
         <v-card class="pb-3 mb-3">
           <div class="px-4">
             <!-- <v-card-title class="pl-0">Details</v-card-title> -->
@@ -93,8 +121,15 @@
         </code-editor>
       </pane>
 
-      <pane class="pane pane-main-code" v-if="hasCode && !hideCode">
-        <splitpanes horizontal class="code-resizer">
+      <pane
+        class="pane pane-main-code"
+        v-if="hasCode && !hideCode"
+      >
+        <splitpanes
+          horizontal
+          class="code-resizer"
+        >
+
           <pane size="80">
             <div style="height: 100%">
               <v-tabs
@@ -118,7 +153,9 @@
                 >
                   API Compose
                 </v-tab>
-                <v-tab v-if="control.type === 'script'"> Script </v-tab>
+                <v-tab v-if="control.type === 'script'">
+                  Script
+                </v-tab>
               </v-tabs>
 
               <code-editor
@@ -139,7 +176,11 @@
             </div>
           </pane>
           <pane size="20">
-            <console-log class="console-log" :log="log" @clear="log = ''" />
+            <console-log
+              class="console-log"
+              :log="log"
+              @clear="log = ''"
+            />
           </pane>
         </splitpanes>
       </pane>
@@ -159,11 +200,9 @@
       </pane>
       <pane class="pane pane-draft">
         <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
-        <div
-          style="height: calc(100vh - 182px); max-height: calc(100vh - 182px)"
-        >
+        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px);">
           <app-draft-component
-            @submit="(payload) => $emit('submit', payload)"
+            @submit="payload => $emit('submit', payload)"
             v-if="survey && instance"
             :submission="instance"
             :survey="survey"
@@ -180,6 +219,7 @@
           </v-card>
         </v-overlay>
       </pane>
+
     </splitpanes>
 
     <!-- <confirm-leave-dialog
@@ -199,8 +239,10 @@ import { Splitpanes, Pane } from 'splitpanes';
 
 import moment from 'moment';
 
+import ObjectID from 'bson-objectid';
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
+import questionLibrary from '@/components/builder/QuestionLibrary.vue';
 import controlAdder from '@/components/builder/ControlAdder.vue';
 import surveyDetails from '@/components/builder/SurveyDetails.vue';
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
@@ -218,9 +260,8 @@ import { defaultApiCompose } from '@/utils/apiCompose';
 
 import submissionUtils from '@/utils/submissions';
 import { SPEC_VERSION_SCRIPT } from '@/constants';
-
+import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 import * as surveyStackUtils from '@/utils/surveyStack';
-
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -253,6 +294,7 @@ export default {
     Pane,
     codeEditor,
     graphicalView,
+    questionLibrary,
     controlProperties,
     controlAdder,
     surveyDetails,
@@ -279,6 +321,8 @@ export default {
       viewCode: false,
       // currently selected control
       control: null,
+      library: false,
+      libraryId: null,
       // code stuff
       log: '',
       codeError: null,
@@ -354,6 +398,66 @@ export default {
 
       this.survey.revisions.push(nextVersionObj);
       this.survey.meta.dateModified = date;
+    },
+    addToLibrary() {
+      console.log('add to library');
+      this.survey.meta.isLibrary = true;
+      this.saveDraft();
+    },
+    async addQuestionsFromLibrary(librarySurveyId) {
+      // load library survey
+      const { data } = await api.get(`/surveys/${librarySurveyId}`);
+
+      // copy resources from library survey
+      // TODO MH overwrite resources with same libraryId
+      data.resources.forEach((r) => {
+        r.libraryId = data._id;
+        r.libraryVersion = data.latestVersion;
+      });
+      this.survey.resources = this.survey.resources.concat(data.resources);
+
+      // copy controls from library survey
+      const controlsFromLibrary = data.revisions[data.latestVersion - 1].controls;
+
+      // create question group
+      const group = createControlInstance(
+        availableControls.find(c => c.type === 'group'),
+      );
+      group.name = data.name;
+      group.label = data.name;
+      group.isLibraryRoot = true;
+      group.libraryId = data._id;
+      group.libraryVersion = data.latestVersion;
+
+      // add recursive function for children
+      const dive = (control, cb) => {
+        cb(control);
+        if (!control.children) {
+          return;
+        }
+        control.children.forEach((c) => {
+          dive(c, cb);
+        });
+      };
+
+      // copy questions from library survey to question group
+      for (let i = 0; i < controlsFromLibrary.length; i++) {
+        const controlToAdd = controlsFromLibrary[i];
+        controlToAdd.id = new ObjectID().toString();
+        controlToAdd.libraryId = data._id;
+        dive(controlToAdd, (control) => {
+          // eslint-disable-next-line no-param-reassign
+          control.id = new ObjectID().toString();
+          control.libraryId = data._id;
+          control.libraryVersion = data.latestVersion;
+        });
+        group.children.push(controlToAdd);
+      }
+      this.duplicateControl(group);
+      this.library = false;
+    },
+    closeLibrary() {
+      this.library = false;
     },
     initNavbarAndDirtyFlag(survey) {
       if (!survey.revisions) {
@@ -443,8 +547,8 @@ export default {
             code: this.activeCode,
             fname: tab,
             submission: this.instance,
-            parent: this.parent,
             survey: this.survey,
+            parent: this.parent,
             log: (arg) => {
               this.log = `${this.log}${arg}\n`;
             },
@@ -507,8 +611,12 @@ export default {
       this.scriptCode = data;
     },
     duplicateControl(control) {
-      const position = utils.getPosition(this.control, this.currentControls);
-      utils.insertControl(control, this.currentControls, position, this.control.type === 'group' || this.control.type === 'page');
+      if (this.control && this.currentControls.length > 0) {
+        const position = utils.getPosition(this.control, this.currentControls);
+        utils.insertControl(control, this.currentControls, position, this.control.type === 'group' || this.control.type === 'page');
+      } else {
+        utils.insertControl(control, this.currentControls, 0, false);
+      }
       this.control = control;
     },
     controlAdded(control) {
@@ -521,6 +629,16 @@ export default {
       const position = utils.getPosition(this.control, this.currentControls);
       utils.insertControl(control, this.currentControls, position, this.control.type === 'group' || this.control.type === 'page');
       this.control = control;
+      this.library = false;
+    },
+    openLibrary(libraryId) {
+      this.control = null;
+      this.library = true;
+      if (libraryId) {
+        this.libraryId = libraryId;
+      } else {
+        this.libraryId = null;
+      }
     },
     onCancel() {
       this.$router.push('/surveys/browse');
@@ -851,6 +969,14 @@ export default {
 .pane-controls {
   overflow: auto;
   width: 500px !important;
+}
+
+.pane-library {
+  overflow: auto;
+  width: 1000px !important;
+  border-style:solid !important;
+  border-width:5px !important;
+  border-color:#4CAF50 !important;
 }
 
 .pane-submission-code,

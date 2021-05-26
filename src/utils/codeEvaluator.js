@@ -53,7 +53,6 @@ async function calculateField({
     try {
       const parentPath = surveyStackUtils.getParentPath(item.path);
       const parentData = surveyStackUtils.getNested(submission, parentPath);
-
       const result = surveyUtils.executeUnsafe({
         code: item.code, fname, submission, survey, parent: parentData, log: msg => console.log(msg),
       });

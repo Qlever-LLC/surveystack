@@ -69,9 +69,9 @@ export default function buildScriptQuestionIframeContents({
         const state = getInitialState();
         const props = {
           submission: ${submissionJSON},
+          parent: ${parentJSON},
           control: ${controlJSON},
           params: ${paramsJSON},
-          parent: ${parentJSON},
         };
 
         ${scriptSource}
