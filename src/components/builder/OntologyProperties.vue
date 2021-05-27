@@ -4,7 +4,6 @@
       <div>
         Dropdown List
       </div>
-
     </v-card-title>
     <div class="text-center d-flex">
       <resource-selector
@@ -13,68 +12,85 @@
         :disabled="disabled"
         @on-new="createResourceHandler"
         @on-select="selectResourceHandler"
-        :newResourceTypes="['ONTOLOGY_LIST', 'SURVEY_REFERENCE']"
+        :newResourceTypes="[resourceTypes.ONTOLOGY_LIST, resourceTypes.SURVEY_REFERENCE]"
       />
       <v-btn
         icon
         :disabled="disabled"
-        @click.stop="openTableDialog"
+        @click.stop="editResourceHandler"
         :class="{'d-none': !value}"
       >
         <!-- Edit entries -->
         <v-icon class="ml-2 mt-3">mdi-pencil</v-icon>
       </v-btn>
-
     </div>
-    <v-dialog v-model="tableDialogIsVisible">
-
-      <app-ontology-list-editor
+    <v-dialog
+      v-model="tableDialogIsVisible"
+      v-if="this.resource && this.resource.type === resourceTypes.ONTOLOGY_LIST"
+    >
+      <ontology-list-editor
         :resources="resources"
         :resource="resource"
         @change="setResource"
         @delete="removeResource"
         @close-dialog="closeTableDialog"
       />
-
+    </v-dialog>
+    <v-dialog
+      v-model="referenceDialogIsVisible"
+      v-else-if="this.resource && this.resource.type === resourceTypes.SURVEY_REFERENCE"
+    >
+      <ontology-reference-editor
+        :resources="resources"
+        :resource="resource"
+        @change="setResource"
+        @delete="removeResource"
+        @close-dialog="closeReferenceDialog"
+      />
     </v-dialog>
   </div>
 </template>
 
 <script>
-import ObjectId from 'bson-objectid';
 import ResourceSelector from '@/components/builder/ResourceSelector.vue';
-
-import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
-import { createResource } from '@/utils/resources';
+import OntologyListEditor from '@/components/builder/OntologyListEditor.vue';
+import OntologyReferenceEditor from '@/components/builder/OntologyReferenceEditor.vue';
+import {
+  createResource,
+  resourceTypes,
+  resourceLocations,
+  setResource,
+  removeResource,
+} from '@/utils/resources';
 
 export default {
   components: {
-    appOntologyListEditor,
+    OntologyListEditor,
+    OntologyReferenceEditor,
     ResourceSelector,
   },
   data() {
     return {
       tableDialogIsVisible: false,
+      referenceDialogIsVisible: false,
+      resourceTypes,
     };
   },
   methods: {
+    editResourceHandler() {
+      if (this.resource && this.resource.type === resourceTypes.ONTOLOGY_LIST) {
+        this.openTableDialog();
+      } else if (this.resource && this.resource.type === resourceTypes.SURVEY_REFERENCE) {
+        this.openReferenceDialog();
+      }
+    },
     removeResource(id) {
-      const index = this.resources.findIndex(r => r.id === id);
-      const newResources = [
-        ...this.resources.slice(0, index),
-        ...this.resources.slice(index + 1),
-      ];
-      this.$emit('set-survey-resources', newResources);
+      this.$emit('set-survey-resources', removeResource(this.resources, id));
       this.$emit('set-control-source', null);
     },
     setResource(resource) {
-      const index = this.resources.findIndex(r => r.id === resource.id);
-      const newResources = [
-        ...this.resources.slice(0, index),
-        resource,
-        ...this.resources.slice(index + 1),
-      ];
-      this.$emit('set-survey-resources', newResources);
+      console.log('setResource', resource);
+      this.$emit('set-survey-resources', setResource(this.resources, resource));
     },
     openTableDialog() {
       this.tableDialogIsVisible = true;
@@ -82,33 +98,23 @@ export default {
     closeTableDialog() {
       this.tableDialogIsVisible = false;
     },
-    // createResource(type, id = new ObjectId().toString) {
-    //   console.log(type);
-    //   const resourceLabel = type === 'ONTOLOGY_LIST'
-    //     ? 'Dropdown Items'
-    //     : 'Survey Reference';
-
-    //   return {
-    //     label: `${resourceLabel} ${this.resources.length + 1}`,
-    //     name: `${resourceLabel.toLowerCase().replace(' ', '_')}_${this.resources.length + 1}`,
-    //     id,
-    //     type,
-    //     location: 'EMBEDDED',
-    //     content: [],
-    //   };
-    // },
+    openReferenceDialog() {
+      this.referenceDialogIsVisible = true;
+    },
+    closeReferenceDialog() {
+      this.referenceDialogIsVisible = false;
+    },
     createResourceHandler(type) {
       console.log('createResourceHandler', type);
-      // const id = new ObjectId().toString();
 
       let newResource;
-      if (type === 'ONTOLOGY_LIST') {
-        newResource = createResource(this.resources, type, 'EMBEDDED', {
+      if (type === resourceTypes.ONTOLOGY_LIST) {
+        newResource = createResource(this.resources, type, resourceLocations.EMBEDDED, {
           labelPrefix: 'Dropdown Items',
           defaultContent: [],
         });
-      } else if (type === 'SURVEY_REFERENCE') {
-        newResource = createResource(this.resources, type, 'EMBEDDED', {
+      } else if (type === resourceTypes.SURVEY_REFERENCE) {
+        newResource = createResource(this.resources, type, resourceLocations.REMOTE, {
           labelPrefix: 'Survey Reference',
           defaultContent: [],
         });
@@ -119,29 +125,17 @@ export default {
         [
           ...this.resources,
           newResource,
-          // {
-          //   label: `Dropdown Items ${this.resources.length + 1}`,
-          //   name: `dropdown_items_${this.resources.length + 1}`,
-          //   id,
-          //   type,
-          //   location: 'EMBEDDED',
-          //   content: [],
-          // },
         ],
       );
       this.$emit('set-control-source', newResource.id);
-      // this.$nextTick(() => {
-      //   // Prevent opening the table dialog if somehow the ResourceSelector didn't
-      //   // set a resource id
-      //   if (this.value) {
-      this.openTableDialog();
-      // }
-      // });
-      // if (this.value) {
-      // this.openTableDialog();
-      // }
+      if (type === resourceTypes.ONTOLOGY_LIST) {
+        this.openTableDialog();
+      } else if (type === resourceTypes.SURVEY_REFERENCE) {
+        this.openReferenceDialog();
+      }
     },
     selectResourceHandler(id) {
+      console.log(id);
       this.$emit('set-control-source', id);
     },
   },
@@ -162,7 +156,10 @@ export default {
       return this.resources.find(resource => resource.id === this.value);
     },
     filteredResources() {
-      return this.resources.filter(resource => resource.type === 'ONTOLOGY_LIST');
+      return this.resources && this.resources.filter(
+        resource => resource.type === resourceTypes.ONTOLOGY_LIST
+          || resource.type === resourceTypes.SURVEY_REFERENCE,
+      );
     },
   },
 };

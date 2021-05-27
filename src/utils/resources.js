@@ -4,6 +4,7 @@ import slugify from '@/utils/slugify';
 export const resourceTypes = {
   ONTOLOGY_LIST: 'ONTOLOGY_LIST',
   IMAGE: 'IMAGE',
+  SURVEY_REFERENCE: 'SURVEY_REFERENCE',
 };
 
 export const resourceLocations = {
@@ -20,6 +21,10 @@ export function filterResourcesByTypes(resources, types = []) {
       type => type === resource.type,
     ),
   );
+}
+
+export function getResource(resources, id) {
+  return resources.find(r => r.id === id);
 }
 
 export function removeResource(resources, id) {
