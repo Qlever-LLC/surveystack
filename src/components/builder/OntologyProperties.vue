@@ -39,6 +39,7 @@
     <v-dialog
       v-model="referenceDialogIsVisible"
       v-else-if="this.resource && this.resource.type === resourceTypes.SURVEY_REFERENCE"
+      max-width="50%"
     >
       <ontology-reference-editor
         :resources="resources"
@@ -89,7 +90,6 @@ export default {
       this.$emit('set-control-source', null);
     },
     setResource(resource) {
-      console.log('setResource', resource);
       this.$emit('set-survey-resources', setResource(this.resources, resource));
     },
     openTableDialog() {
@@ -105,8 +105,6 @@ export default {
       this.referenceDialogIsVisible = false;
     },
     createResourceHandler(type) {
-      console.log('createResourceHandler', type);
-
       let newResource;
       if (type === resourceTypes.ONTOLOGY_LIST) {
         newResource = createResource(this.resources, type, resourceLocations.EMBEDDED, {
@@ -119,7 +117,6 @@ export default {
           defaultContent: [],
         });
       }
-      console.log(newResource);
       this.$emit(
         'set-survey-resources',
         [
@@ -135,7 +132,6 @@ export default {
       }
     },
     selectResourceHandler(id) {
-      console.log(id);
       this.$emit('set-control-source', id);
     },
   },

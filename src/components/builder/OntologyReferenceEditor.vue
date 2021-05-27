@@ -1,37 +1,9 @@
 <template>
-  <v-card min-height="50vh">
+  <v-card>
     <v-card-title>
       Survey Reference Editor
-      <!-- <v-spacer />
-      <v-btn
-        icon
-        @click="$emit('delete', resource.id)"
-      >
-        <v-icon>mdi-delete</v-icon>
-      </v-btn> -->
     </v-card-title>
     <v-card-text>
-      <!-- <v-select
-        label="Select Survey"
-        outlined
-        :items="surveys"
-        v-model="surveyId"
-        @change="surveyChanged()"
-        :loading="loading"
-        item-value="_id"
-        item-text="name"
-      >
-        <template slot="append-outer">
-          <v-chip
-            style="margin-top: -10px;"
-            dark
-            color="green"
-            v-if="surveyVersion"
-          >
-            Survey Version {{ surveyVersion }}
-          </v-chip>
-        </template>
-      </v-select> -->
       <v-autocomplete
         label="Select Survey"
         outlined
@@ -55,7 +27,7 @@
       </v-autocomplete>
 
       <template v-if="surveyId">
-        <v-select
+        <v-autocomplete
           label="Select Path"
           outlined
           @change="updateResource"

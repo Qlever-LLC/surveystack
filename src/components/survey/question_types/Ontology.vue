@@ -91,6 +91,9 @@
         </v-list-item-content>
       </template>
     </v-combobox>
+    <v-banner v-else-if="isLoading">
+      <v-icon class="mr-2 mdi-spin">mdi-loading</v-icon>Loading
+    </v-banner>
     <v-banner
       v-else
       color="red lighten-2"
@@ -104,10 +107,14 @@
 </template>
 
 <script>
+import TreeModel from 'tree-model';
 import baseQuestionComponent from './BaseQuestionComponent';
 import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
-import { getValueOrNull } from '@/utils/surveyStack';
+import { getValueOrNull, getNested } from '@/utils/surveyStack';
+import { resourceTypes } from '@/utils/resources';
+import api from '@/services/api.service';
+
 
 export default {
   mixins: [baseQuestionComponent],
@@ -117,7 +124,9 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       comboboxSearch: null,
+      submissionItems: [],
     };
   },
   methods: {
@@ -146,6 +155,40 @@ export default {
       const item = this.items.find(x => x.value === value);
       return (item && item.label) || value;
     },
+    async fetchSubmissions(surveyId, path) {
+      const userId = this.$store.getters['auth/user']._id;
+      // http://localhost:9020/api/submissions/page?survey=6011d6b33d7ed10001d7ada9&project={%22data.reference_1.value%22:1}&limit=10&showArchived=true
+      const base = `&project={"${path}.value":1}`;
+      const query = base;
+      // const query = userId && this.control.options.reference.limitToOwn
+      //   ? `&match={"meta.creator":{"$oid":"${userId}"}}${base}`
+      //   : base;
+      console.log('userID', userId);
+      const r = await api.get(`/submissions?survey=${surveyId}${query}`);
+      const { data } = r;
+
+      // const items = data.map((item) => {
+      //   const value = getNested(item, `${path}.value`, null);
+      //   return {
+      //     id: item._id,
+      //     name: value,
+      //   };
+      // });
+      const items = data.map((item) => {
+        const value = getNested(item, `${path}.value`, null);
+        return {
+          id: item._id,
+          label: value,
+          value,
+        };
+      });
+
+      console.log('submissions', data);
+      console.log('items', items);
+      // this.submissionItems = items;
+      return items;
+    },
+
   },
   computed: {
     getValue() {
@@ -153,9 +196,27 @@ export default {
         ? this.value
         : this.value && this.value[0];
     },
+    resource() {
+      return this.resources.find(r => r.id === this.control.options.source);
+    },
+    hasReference() {
+      // const resource = this.resources.find(r => r.id === this.control.options.source);
+      return !!this.resource && this.resource.type === resourceTypes.SURVEY_REFERENCE;
+    },
+    // submissionItems() {
+    //   if (this.resource && this.resource.content && this.resource.content.path) {
+    //     return this.submissions.map(s => ({
+    //       id: s.id,
+    //       label: s[path],
+    //     }));
+    //   }
+    // },
     items() {
-      const resource = this.resources.find(r => r.id === this.control.options.source);
-      return (resource && resource.content) || [];
+      if (this.hasReference) {
+        return this.submissionItems;
+      }
+
+      return (this.resource && this.resource.content) || [];
     },
     sourceIsValid() {
       return this.items
@@ -180,6 +241,18 @@ export default {
       }
       return defaultProps;
     },
+  },
+  async mounted() {
+    if (this.resource && this.hasReference) {
+      console.log(this.resource);
+      const { id, path } = this.resource.content;
+      this.isLoading = true;
+      try {
+        this.submissionItems = await this.fetchSubmissions(id, path);
+      } finally {
+        this.isLoading = false;
+      }
+    }
   },
 };
 </script>
