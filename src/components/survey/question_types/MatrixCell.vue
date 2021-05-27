@@ -2,16 +2,63 @@
   <v-text-field
     v-if="header.type === 'text'"
     :value="item[header.value].value"
-    @input="v => {item[header.value].value = getValueOrNull(v); onInput()}"
+    @input="
+      (v) => {
+        item[header.value].value = getValueOrNull(v);
+        onInput();
+      }
+    "
     solo
     hide-details
     autocomplete="off"
     :disabled="disabled"
   />
+  <div v-else-if="header.type === 'qrcode'" style="display: flex">
+    <div style="flex: 1">
+      <v-text-field
+        ref="text-qrcode"
+        :value="item[header.value].value"
+        @input="
+          (v) => {
+            item[header.value].value = getValueOrNull(v);
+            onInput();
+          }
+        "
+        @click="
+          () => {
+            $refs['scan-button'].click();
+          }
+        "
+        solo
+        hide-details
+        autocomplete="off"
+        :disabled="disabled"
+      />
+    </div>
+    <div style="flex: 0">
+      <app-qr-scanner
+        v-show="false"
+        ref="scan-button"
+        @codeDetected="
+          (v) => {
+            // console.log('value is', v);
+            item[header.value].value = getValueOrNull(v);
+            onInput();
+          }
+        "
+      />
+    </div>
+  </div>
+
   <v-text-field
     v-else-if="header.type === 'number'"
     :value="item[header.value].value"
-    @input="v => {item[header.value].value = handleNumberInput(v); onInput()}"
+    @input="
+      (v) => {
+        item[header.value].value = handleNumberInput(v);
+        onInput();
+      }
+    "
     type="number"
     solo
     hide-details
@@ -23,19 +70,30 @@
     item-text="label"
     item-value="value"
     :value="item[header.value].value"
-    @input="v => {item[header.value].value = getValueOrNull(v); onInput()}"
+    @input="
+      (v) => {
+        item[header.value].value = getValueOrNull(v);
+        onInput();
+      }
+    "
     hide-details
     solo
     :multiple="header.multiple"
     :disabled="disabled"
   />
   <v-combobox
-    v-else-if="(header.type === 'autocomplete') && header.custom"
+    v-else-if="header.type === 'autocomplete' && header.custom"
     :items="getDropdownItems(header.value)"
     item-text="label"
     item-value="value"
     :value="item[header.value].value"
-    @input="v => {comboboxSearch = null; item[header.value].value = getValueOrNull(v); onInput()}"
+    @input="
+      (v) => {
+        comboboxSearch = null;
+        item[header.value].value = getValueOrNull(v);
+        onInput();
+      }
+    "
     :delimiters="[',']"
     :multiple="header.multiple"
     :disabled="disabled"
@@ -65,12 +123,18 @@
     </template>
   </v-combobox>
   <v-autocomplete
-    v-else-if="(header.type === 'autocomplete') && !header.custom"
+    v-else-if="header.type === 'autocomplete' && !header.custom"
     :items="getDropdownItems(header.value)"
     item-text="label"
     item-value="value"
     :value="item[header.value].value"
-    @input="v => {comboboxSearch = null; item[header.value].value = getValueOrNull(v); onInput()}"
+    @input="
+      (v) => {
+        comboboxSearch = null;
+        item[header.value].value = getValueOrNull(v);
+        onInput();
+      }
+    "
     hide-details
     solo
     :multiple="header.multiple"
@@ -81,27 +145,34 @@
     v-else-if="header.type === 'farmos_field'"
     :items="farmos.farms || []"
     :value="item[header.value].value"
-    @input="v => {item[header.value].value = getValueOrNull(v); onInput()}"
+    @input="
+      (v) => {
+        item[header.value].value = getValueOrNull(v);
+        onInput();
+      }
+    "
     item-text="label"
     item-value="value"
     hide-details
     solo
     :disabled="disabled || loading"
   >
-    <template v-slot:item="{item}">
+    <template v-slot:item="{ item }">
       <div v-html="item.label"></div>
     </template>
-    <template v-slot:selection="{item}">
-      <div
-        v-html="item.label"
-        class="d-flex align-center"
-      ></div>
+    <template v-slot:selection="{ item }">
+      <div v-html="item.label" class="d-flex align-center"></div>
     </template>
   </v-autocomplete>
   <v-autocomplete
     v-else-if="header.type === 'farmos_planting'"
     :value="item[header.value].value"
-    @input="v => {item[header.value].value = getValueOrNull(localChange(v)); onInput()}"
+    @input="
+      (v) => {
+        item[header.value].value = getValueOrNull(localChange(v));
+        onInput();
+      }
+    "
     :items="farmos.plantings || []"
     item-text="label"
     item-value="value"
@@ -109,14 +180,11 @@
     solo
     :disabled="disabled || loading"
   >
-    <template v-slot:item="{item}">
+    <template v-slot:item="{ item }">
       <div v-html="item.label"></div>
     </template>
-    <template v-slot:selection="{item}">
-      <div
-        v-html="item.label"
-        class="d-flex align-center"
-      ></div>
+    <template v-slot:selection="{ item }">
+      <div v-html="item.label" class="d-flex align-center"></div>
     </template>
   </v-autocomplete>
   <div v-else-if="header.type === 'date'">
@@ -132,7 +200,12 @@
       <template v-slot:activator="{ on, attrs }">
         <v-text-field
           :value="item[header.value].value"
-          @input="v => {item[header.value].value = v; onInput()}"
+          @input="
+            (v) => {
+              item[header.value].value = v;
+              onInput();
+            }
+          "
           @click="setActivePickerMonth"
           hide-details
           v-bind="attrs"
@@ -145,21 +218,29 @@
       </template>
       <v-date-picker
         :value="item[header.value].value"
-        @input="v => {item[header.value].value = v; menus[`${index}_${header.value}`] = false; onInput()}"
+        @input="
+          (v) => {
+            item[header.value].value = v;
+            menus[`${index}_${header.value}`] = false;
+            onInput();
+          }
+        "
         no-title
       ></v-date-picker>
     </v-menu>
   </div>
 
-  <div v-else>
-    ???
-  </div>
+  <div v-else>???</div>
 </template>
 
 <script>
 import { getValueOrNull } from '@/utils/surveyStack';
+import appQrScanner from '@/components/ui/QrScanner.vue';
 
 export default {
+  components: {
+    appQrScanner,
+  },
   props: {
     header: {
       type: Object,
@@ -243,14 +324,12 @@ export default {
 
       // console.log('hashes', hashes);
 
-
       const selectedItems = hashes.map((h) => {
         if (typeof h !== 'string') {
           return h;
         }
-        return (this.farmos.plantings.find(t => t.value.hash === h)).value;
+        return this.farmos.plantings.find(t => t.value.hash === h).value;
       });
-
 
       // const [farmId, assetId] = itemId.split('.');
 
@@ -264,16 +343,18 @@ export default {
         .filter(item => item.value.farmId === field.farmId)
         .filter(item => item.value.location.some(loc => loc.id === field.location.id)));
 
-
       assetsToSelect.forEach((assetToSelect) => {
-        if (assets.some(asset => asset.farmId === assetToSelect.value.farmId
-          && asset.assetId === assetToSelect.value.assetId)) {
+        if (
+          assets.some(
+            asset => asset.farmId === assetToSelect.value.farmId
+              && asset.assetId === assetToSelect.value.assetId,
+          )
+        ) {
           // skip
         } else {
           assets.push(assetToSelect.value);
         }
       });
-
 
       if (!Array.isArray(hashesArg)) {
         return assets[0];
