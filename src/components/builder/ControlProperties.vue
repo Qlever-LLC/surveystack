@@ -304,6 +304,11 @@
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         @set-control-source="(val) => $emit('set-control-source', val)"
       />
+
+      <geojson-properties
+        v-if="isGeoJSON"
+        v-model="control.options.geoJSON"
+      />
     </v-form>
     <div v-else>...</div>
   </div>
@@ -316,6 +321,7 @@ import appMatrixProperties from '@/components/builder/MatrixProperties.vue';
 import appOntologyProperties from '@/components/builder/OntologyProperties.vue';
 import InstructionsEditor from '@/components/builder/InstructionsEditor.vue';
 import InstructionsImageSplitEditor from '@/components/builder/InstructionsImageSplitEditor.vue';
+import GeoJSONProperties from '@/components/builder/GeoJSONProperties.vue';
 
 import { convertToKey } from '@/utils/builder';
 
@@ -326,6 +332,7 @@ export default {
     appOntologyProperties,
     appMatrixProperties,
     InstructionsImageSplitEditor,
+    'geojson-properties': GeoJSONProperties,
   },
   props: {
     control: {
@@ -420,6 +427,9 @@ export default {
     },
     isMatrix() {
       return this.control.type === 'matrix';
+    },
+    isGeoJSON() {
+      return this.control.type === 'geoJSON';
     },
     isInstructionsImageSplit() {
       return this.control.type === 'instructionsImageSplit';
