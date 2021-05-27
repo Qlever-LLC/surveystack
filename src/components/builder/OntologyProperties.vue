@@ -24,11 +24,9 @@
         <v-icon class="ml-2 mt-3">mdi-pencil</v-icon>
       </v-btn>
     </div>
-    <v-dialog
-      v-model="tableDialogIsVisible"
-      v-if="this.resource && this.resource.type === resourceTypes.ONTOLOGY_LIST"
-    >
+    <v-dialog v-model="tableDialogIsVisible">
       <ontology-list-editor
+        v-if="tableDialogIsVisible && resource && resource.type === resourceTypes.ONTOLOGY_LIST"
         :resources="resources"
         :resource="resource"
         @change="setResource"
@@ -38,10 +36,10 @@
     </v-dialog>
     <v-dialog
       v-model="referenceDialogIsVisible"
-      v-else-if="this.resource && this.resource.type === resourceTypes.SURVEY_REFERENCE"
       max-width="50%"
     >
       <ontology-reference-editor
+        v-if="referenceDialogIsVisible && resource && resource.type === resourceTypes.SURVEY_REFERENCE"
         :resources="resources"
         :resource="resource"
         @change="setResource"
@@ -75,6 +73,7 @@ export default {
       tableDialogIsVisible: false,
       referenceDialogIsVisible: false,
       resourceTypes,
+      isEditing: false,
     };
   },
   methods: {

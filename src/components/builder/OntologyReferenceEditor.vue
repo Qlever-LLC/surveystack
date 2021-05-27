@@ -44,7 +44,7 @@
       <v-spacer />
       <v-btn
         text
-        @click="() => $emit('close-dialog')"
+        @click="closeHandler"
       >
         Close
       </v-btn>
@@ -99,6 +99,10 @@ export default {
   methods: {
     deleteResource() {
       this.$emit('delete', this.resource.id);
+      this.$emit('close-dialog');
+      this.clearUserState();
+    },
+    closeHandler() {
       this.$emit('close-dialog');
       this.clearUserState();
     },
@@ -170,16 +174,11 @@ export default {
   },
   async mounted() {
     // console.log('mounted', this.value);
+    console.log('mounted', { ...this.resource.content });
     if (this.resource.content) {
-    // if (this.value) {
-      // this.surveyId = this.value.surveyId || '';
-      // this.path = this.value.path || '';
-      // this.surveyVersion = this.value.surveyVersion || '';
-      // // this.limitToOwn = this.value.limitToOwn || false;
-      this.surveyId = this.resource.content.surveyId || '';
+      this.surveyId = this.resource.content.id || '';
       this.path = this.resource.content.path || '';
-      this.surveyVersion = this.resource.content.surveyVersion || '';
-
+      this.surveyVersion = this.resource.content.version || '';
 
       console.log('running surveyChanged', this.surveyVersion, this.surveyId);
       if (this.surveyVersion) {
