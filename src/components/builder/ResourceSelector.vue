@@ -12,6 +12,8 @@
 </template>
 
 <script>
+const NEW_RESOURCE_PREFIX = 'NEW_';
+
 export default {
   props: {
     value: {
@@ -26,21 +28,14 @@ export default {
       type: Array,
       default: () => ([]),
     },
-    newResourceType: {
-      type: String,
+    newResourceTypes: {
+      type: Array,
       required: true,
+      validator: prop => prop.every(p => typeof p === 'string'),
     },
     disabled: {
       required: false,
     },
-    // onNew: {
-    //   type: Function,
-    //   default: () => {},
-    // },
-    // onSelect: {
-    //   type: Function,
-    //   default: () => {},
-    // },
   },
   computed: {
     filteredResources() {
@@ -55,17 +50,24 @@ export default {
     items() {
       return [
         ...this.filteredResources,
-        {
-          label: '+ New',
-          id: `NEW_${this.newResourceType}`,
-        },
+        // {
+        //   label: '+ New ',
+        //   id: `${NEW_RESOURCE_PREFIX}${this.newResourceTypes[0]}`,
+        // },
+        ...(this.newResourceTypes.map((type, i) => ({
+          // label: i === 0
+          //   ? '+ New '
+          //   : `+ New ${type.toLowerCase().split('_').join(' ')}`,
+          label: `+ New ${type.toLowerCase().split('_').join(' ')}`,
+          id: `${NEW_RESOURCE_PREFIX}${type}`,
+        }))),
       ];
     },
   },
   methods: {
     handleSelect(val) {
-      if (val === `NEW_${this.newResourceType}`) {
-        this.$emit('on-new');
+      if (val.includes(NEW_RESOURCE_PREFIX)) {
+        this.$emit('on-new', val.replace(NEW_RESOURCE_PREFIX, ''));
       } else {
         this.$emit('on-select', val);
       }

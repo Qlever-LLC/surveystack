@@ -51,17 +51,6 @@ export function createResource(resources, type, location, options = {
   defaultContent: '',
 }) {
   const id = new ObjectId().toString();
-  // return [
-  //   ...resources,
-  //   {
-  //     label: `Dropdown Items ${resources.length + 1}`,
-  //     name: `dropdown_items_${resources.length + 1}`,
-  //     id,
-  //     type,
-  //     location,
-  //     content: [],
-  //   },
-  // ];
   return {
     label: `${options.labelPrefix} ${resources.length + 1}`,
     name: `${slugify(options.labelPrefix)}_${resources.length + 1}`,
