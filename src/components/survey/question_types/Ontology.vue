@@ -6,7 +6,8 @@
       :required="required"
     />
     <v-autocomplete
-      :value="value"
+      v-if="sourceIsValid && !control.options.allowCustomSelection"
+      :value="getValue"
       @change="(v) => {comboboxSearch = null; onChange(v)}"
       :search-input.sync="comboboxSearch"
       :items="items"
@@ -17,10 +18,10 @@
       :label="control.hint"
       :multiple="!!control.options.hasMultipleSelections"
       :menu-props="autocompleteMenuProps"
-      v-if="sourceIsValid && !control.options.allowCustomSelection"
       class="full-width"
       hide-details
       single-line
+      data-test-id="autocomplete"
     >
       <template
         v-slot:selection="data"
@@ -42,13 +43,12 @@
       >
         <v-list-item-content>
           <v-list-item-title v-html="data.item.label" />
-          <!-- <v-list-item-subtitle v-html="data.item.group"></v-list-item-subtitle> -->
         </v-list-item-content>
       </template>
     </v-autocomplete>
     <v-combobox
       v-else-if="sourceIsValid && control.options.allowCustomSelection"
-      :value="value"
+      :value="getValue"
       @change="(v) => {comboboxSearch = null; onChange(v)}"
       :search-input.sync="comboboxSearch"
       :items="items"
@@ -65,6 +65,7 @@
       class="full-width custom-ontology"
       hide-details
       single-line
+      data-test-id="combobox"
     >
       <template v-slot:selection="data">
         <v-chip
@@ -72,7 +73,7 @@
           :input-value="data.selected"
           close
           @click="data.select"
-          @click:close="removeValue(data.item); info(data)"
+          @click:close="removeValue(data.item)"
           v-if="!!control.options.hasMultipleSelections"
         >
           {{ getLabelForItemValue(data.item) }}
@@ -104,11 +105,16 @@
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
-
+import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
+import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import { getValueOrNull } from '@/utils/surveyStack';
 
 export default {
   mixins: [baseQuestionComponent],
+  components: {
+    appControlLabel,
+    appControlMoreInfo,
+  },
   data() {
     return {
       comboboxSearch: null,
@@ -121,12 +127,10 @@ export default {
         if (Array.isArray(v)) {
           this.changed(this.getValueOrNull(v.sort()));
         } else {
-          this.changed(this.getValueOrNull(v));
+          const nextValue = this.getValueOrNull(v);
+          this.changed(nextValue ? [nextValue] : nextValue);
         }
       }
-    },
-    info(data) {
-      // console.log('info------', data);
     },
     remove(item) {
       this.changed(
@@ -144,6 +148,11 @@ export default {
     },
   },
   computed: {
+    getValue() {
+      return this.control.options.hasMultipleSelections
+        ? this.value
+        : this.value && this.value[0];
+    },
     items() {
       const resource = this.resources.find(r => r.id === this.control.options.source);
       return (resource && resource.content) || [];
