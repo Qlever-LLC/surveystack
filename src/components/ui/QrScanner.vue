@@ -3,12 +3,13 @@
     <v-btn
       ref="scannerButton"
       aria-label="Open QR Scanner"
-      x-large
+      :x-large="!small"
+      :small="!!small"
       dark
       color="primary"
       @click="isScannerOpen = true"
     >
-      <v-icon>mdi-qrcode-scan</v-icon>
+      <v-icon :x-large="!small" :small="!!small">mdi-qrcode-scan</v-icon>
     </v-btn>
 
     <v-dialog v-model="isScannerOpen" fullscreen>
@@ -70,6 +71,13 @@ QrScanner.WORKER_PATH = URL.createObjectURL(
 
 export default defineComponent({
   emits: ['codeDetected'],
+  props: {
+    small: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
   setup(props, { emit }) {
     const videoContainerElement = ref(null);
     const videoElement = ref(null);

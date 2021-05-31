@@ -24,21 +24,17 @@
             onInput();
           }
         "
-        @click="
-          () => {
-            $refs['scan-button'].click();
-          }
-        "
         solo
         hide-details
         autocomplete="off"
         :disabled="disabled"
       />
     </div>
-    <div style="flex: 0">
+    <div style="flex: 0; display: flex; align-items: center;">
       <app-qr-scanner
-        v-show="false"
+        class="mx-2 py-2"
         ref="scan-button"
+        small
         @codeDetected="
           (v) => {
             // console.log('value is', v);
