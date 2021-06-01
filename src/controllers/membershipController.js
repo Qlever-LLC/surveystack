@@ -95,6 +95,7 @@ const getAdminOfSubGroups = async (entities) => {
 
         const cpy = { ...e };
         cpy.group = { ...subgroup };
+        e.projected = true;
         adminOfSubGroups.push(cpy);
       }
     }
@@ -150,7 +151,7 @@ const getMemberships = async (req, res) => {
       if (member.role !== 'admin') {
         continue;
       }
-
+      
       if (
         member.user &&
         admins.find((adm) => !adm.user || `${adm.user._id}` === `${member.user._id}`)
