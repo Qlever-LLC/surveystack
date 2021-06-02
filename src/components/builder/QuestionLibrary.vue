@@ -62,6 +62,18 @@
                 <v-btn
                   dark
                   v-if="selectedSurvey && selectedSurvey._id===c._id"
+                  color="grey"
+                  key="close"
+                  @click.stop="toggleCard(c)"
+                  class="mt-n5 mr-1 d-inline-block shadow white span-button"
+                  outlined
+                  small
+                >
+                  back
+                </v-btn>
+                <v-btn
+                  dark
+                  v-if="selectedSurvey && selectedSurvey._id===c._id"
                   color="white"
                   key="library"
                   @click="addToSurvey(c._id)"
