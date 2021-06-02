@@ -1,6 +1,6 @@
 <template>
   <div class="mx-0 px-0" style="width: 100%">
-    <div v-if="control.type === 'page' && !insidePage">
+    <div v-if="control.type === 'page' && !insidePage && !control.options.hidden">
       <div v-for="(child, i) in control.children" :key="i">
         <app-control
           :path="`${path}.${child.name}`"
@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <div v-else-if="control.type === 'group' && insidePage">
+    <div v-else-if="control.type === 'group' && insidePage && !control.options.hidden">
       <div
         class="group"
         :class="{ irrelevant: !$store.getters['draft/relevance'](path) }"
@@ -35,7 +35,7 @@
       </div>
     </div>
 
-    <div v-else>
+    <div v-else-if="!control.options.hidden">
       <div
         class="control"
         :class="{ irrelevant: !$store.getters['draft/relevance'](path) }"
