@@ -48,9 +48,15 @@
                 <small class="grey--text">{{ c._id }}</small>
                 <br>
                 {{c.name}}
-                <!--br>
-                <TODO maybe add group based QSL access restrictions?>
-                <small>groups tbd</small-->
+                <small v-show="selectedSurvey && selectedSurvey._id==c._id" class="grey--text"><br>Version {{c.latestVersion}}</small>
+                <!--v-chip
+                  dark
+                  small
+                  outlined
+                  color="grey"
+                >
+                  Version {{ c.latestVersion }}
+                </v-chip-->
               </v-col>
               <v-col align="right" md="auto">
                 <v-btn
@@ -117,7 +123,7 @@
                   :readOnly="true"
                   v-if="selectedSurvey && selectedSurvey._id===c._id"
                   class="graphical-view"
-                  :controls="selectedSurvey.revisions[selectedSurvey.revisions.length - 1].controls"
+                  :controls="selectedSurvey.revisions[selectedSurvey.latestVersion - 1].controls"
                 />
               </v-col>
             </v-row>
