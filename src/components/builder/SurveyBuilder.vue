@@ -253,7 +253,7 @@ import appExamplesView from '@/components/builder/ExamplesView.vue';
 
 import appMixin from '@/components/mixin/appComponent.mixin';
 import api from '@/services/api.service';
-
+import slugify from '@/utils/slugify';
 
 import * as utils from '@/utils/surveys';
 import { defaultApiCompose } from '@/utils/apiCompose';
@@ -423,7 +423,7 @@ export default {
       const group = createControlInstance(
         availableControls.find(c => c.type === 'group'),
       );
-      group.name = data.name;
+      group.name = slugify(data.name);
       group.label = data.name;
       group.isLibraryRoot = true;
       group.libraryId = data._id;
