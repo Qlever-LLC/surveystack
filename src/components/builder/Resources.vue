@@ -4,6 +4,7 @@
       <app-ontology-list-editor
         :resources="resources"
         :resource="resource"
+        :disabled="resource!=null && resource.libraryId!=null"
         @change="setResource"
         @delete="removeResource"
         @close-dialog="editorDialog = false"
@@ -34,14 +35,13 @@
           v-for="resource in filteredResources"
           :key="resource.id"
           two-line
-          :disabled="resource.libraryId"
           @click="openEditor(resource.id)"
         >
           <v-list-item-content>
             <v-list-item-title>{{resource.label}}</v-list-item-title>
             <v-list-item-subtitle>{{resource.name}} : {{resource.type}}</v-list-item-subtitle>
           </v-list-item-content>
-
+          <v-icon v-if="resource.libraryId" color="grey lighten-1">mdi-library</v-icon>
         </v-list-item>
       </template>
       <v-list-item v-else>

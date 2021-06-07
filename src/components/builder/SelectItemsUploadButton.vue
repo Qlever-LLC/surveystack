@@ -8,6 +8,7 @@
         <v-btn
           class="pointer-events-none"
           color="primary"
+          :disabled="disabled"
         >
           <v-icon left>mdi-upload</v-icon>
           Add CSV
@@ -35,6 +36,13 @@ function columnIsValid(name) {
 }
 
 export default {
+  props: {
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: () => (false),
+    },
+  },
   data() {
     return {
       columns,
