@@ -284,10 +284,10 @@
         class="mt-5"
         @set-control-required="control.options.required = true"
       />
-      <!-- TODO MH disabled instead of hide?-->
       <instructions-editor
-        v-else-if="isInstructions && !control.libraryId"
+        v-else-if="isInstructions"
         v-model="control.options.source"
+        :disabled="control.libraryId!=null"
       />
       <instructions-image-split-editor
         v-else-if="isInstructionsImageSplit"
@@ -307,7 +307,7 @@ import api from '@/services/api.service';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
 import appMatrixProperties from '@/components/builder/MatrixProperties.vue';
 import appOntologyProperties from '@/components/builder/OntologyProperties.vue';
-import InstructionsEditor from '@/components/builder/InstructionsEditor.vue';
+import InstructionsEditor from '@/components/builder/TipTapEditor.vue';
 import InstructionsImageSplitEditor from '@/components/builder/InstructionsImageSplitEditor.vue';
 
 import { convertToKey } from '@/utils/builder';

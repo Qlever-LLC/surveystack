@@ -118,16 +118,16 @@
               >
               <v-col>
                 <h4>Description</h4>
-                <small>{{selectedSurvey.meta.libraryDescription}}</small>
-                <br><br>
+                <small v-html="selectedSurvey.meta.libraryDescription"></small>
+                <br>
                 <h4>Applications</h4>
-                <small>{{selectedSurvey.meta.libraryApplications}}</small>
-                <br><br>
+                <small v-html="selectedSurvey.meta.libraryApplications"></small>
+                <br>
                 <h4>Maintainers</h4>
-                <small>{{selectedSurvey.meta.libraryMaintainers}}</small>
-                <br><br>
+                <small v-html="selectedSurvey.meta.libraryMaintainers"></small>
+                <br>
                 <h4>Updates</h4>
-                <small>{{selectedSurvey.meta.libraryHistory}}</small>
+                <small v-html="selectedSurvey.meta.libraryHistory"></small>
               </v-col>
               <v-col>
                 <h4>Questions</h4>
