@@ -19,7 +19,6 @@
         v-if="resource && (resource.label || resource.label === '') && (resource.name || resource.name === '') && (resource.content || resource.content === '')"
         ref="form"
       >
-        <!-- v-model="image.label" -->
         <v-text-field
           :value="resource.label"
           @input="handleUpdateLabel"
@@ -28,7 +27,6 @@
           persistent-hint
           outlined
         />
-        <!-- v-model="image.name" -->
         <v-text-field
           :value="resource.name"
           @input="handleUpdateName"
@@ -37,7 +35,6 @@
           outlined
           :rules="[nameIsUnique(resourceNames), nameHasValidCharacters, nameHasValidLength]"
         />
-        <!-- v-model="image.content" -->
         <v-text-field
           :value="resource.content"
           @input="handleUpdateContent"
@@ -63,22 +60,12 @@
       >
         Update
       </v-btn>
-
-      <!-- <v-btn
-      @click="closeDialog"
-      text
-    >
-      Close
-    </v-btn> -->
     </v-card-actions>
   </v-card>
 </template>
 
 <script>
-import ObjectId from 'bson-objectid';
 import {
-  resourceTypes,
-  resourceLocations,
   nameIsUnique,
   nameHasValidCharacters,
   nameHasValidLength,
@@ -86,50 +73,14 @@ import {
 
 export default {
   data() {
-    return {
-      // image: {
-      //   label: '',
-      //   name: '',
-      //   content: '',
-      // },
-    };
+    return {};
   },
-  // // beforeUpdate() {
-  // //   this.image = {
-  // //     ...this.resource,
-  // //   };
-  // // },
-  // created() {
-  //   // this.image = {
-  //   //   ...this.resource,
-  //   // };
-  // },
-  // watch: {
-  //   resource(newVal) {
-  //     this.image = {
-  //       ...newVal,
-  //     };
-  //   },
-  // },
   props: {
     resources: {
       type: Array,
     },
     resource: {
       type: Object,
-      // default: () => {
-      //   const id = ObjectId().toString();
-      //   return {
-      //     content: '',
-      //     // label: `Image ${id.substring(20)}`,
-      //     // name: `image_${id.substring(20)}`,
-      //     label: `Image ${this.resources.length + 1}`,
-      //     name: `image_${this.resources.length + 1}`,
-      //     id,
-      //     type: resourceTypes.IMAGE,
-      //     location: resourceLocations.REMOTE,
-      //   };
-      // },
     },
   },
   computed: {
@@ -150,7 +101,6 @@ export default {
     },
     updateResource() {
       if (this.validate()) {
-        // this.$emit('change', this.image);
         this.$emit('close-dialog');
       }
     },
@@ -181,6 +131,3 @@ export default {
   },
 };
 </script>
-
-<style>
-</style>
