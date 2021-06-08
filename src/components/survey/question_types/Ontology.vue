@@ -107,7 +107,6 @@
 </template>
 
 <script>
-import TreeModel from 'tree-model';
 import baseQuestionComponent from './BaseQuestionComponent';
 import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
@@ -157,23 +156,11 @@ export default {
     },
     async fetchSubmissions(surveyId, path) {
       const userId = this.$store.getters['auth/user']._id;
-      // http://localhost:9020/api/submissions/page?survey=6011d6b33d7ed10001d7ada9&project={%22data.reference_1.value%22:1}&limit=10&showArchived=true
       const base = `&project={"${path}.value":1}`;
       const query = base;
-      // const query = userId && this.control.options.reference.limitToOwn
-      //   ? `&match={"meta.creator":{"$oid":"${userId}"}}${base}`
-      //   : base;
       console.log('userID', userId);
       const r = await api.get(`/submissions?survey=${surveyId}${query}`);
       const { data } = r;
-
-      // const items = data.map((item) => {
-      //   const value = getNested(item, `${path}.value`, null);
-      //   return {
-      //     id: item._id,
-      //     name: value,
-      //   };
-      // });
       const items = data.map((item) => {
         const value = getNested(item, `${path}.value`, null);
         return {
@@ -182,10 +169,6 @@ export default {
           value,
         };
       });
-
-      console.log('submissions', data);
-      console.log('items', items);
-      // this.submissionItems = items;
       return items;
     },
 
@@ -200,17 +183,8 @@ export default {
       return this.resources.find(r => r.id === this.control.options.source);
     },
     hasReference() {
-      // const resource = this.resources.find(r => r.id === this.control.options.source);
       return !!this.resource && this.resource.type === resourceTypes.SURVEY_REFERENCE;
     },
-    // submissionItems() {
-    //   if (this.resource && this.resource.content && this.resource.content.path) {
-    //     return this.submissions.map(s => ({
-    //       id: s.id,
-    //       label: s[path],
-    //     }));
-    //   }
-    // },
     items() {
       if (this.hasReference) {
         return this.submissionItems;

@@ -17,8 +17,8 @@ const NEW_RESOURCE_PREFIX = 'NEW_';
 export default {
   props: {
     value: {
-      // required: true,
-      // validator: prop => typeof prop === 'string' || prop === null,
+      required: true,
+      validator: prop => typeof prop === 'string' || prop === null,
     },
     resources: {
       type: Array,
@@ -30,7 +30,7 @@ export default {
     },
     newResourceTypes: {
       type: Array,
-      required: true,
+      default: () => ([]),
       validator: prop => prop.every(p => typeof p === 'string'),
     },
     disabled: {
@@ -50,14 +50,7 @@ export default {
     items() {
       return [
         ...this.filteredResources,
-        // {
-        //   label: '+ New ',
-        //   id: `${NEW_RESOURCE_PREFIX}${this.newResourceTypes[0]}`,
-        // },
         ...(this.newResourceTypes.map((type, i) => ({
-          // label: i === 0
-          //   ? '+ New '
-          //   : `+ New ${type.toLowerCase().split('_').join(' ')}`,
           label: `+ New ${type.toLowerCase().split('_').join(' ')}`,
           id: `${NEW_RESOURCE_PREFIX}${type}`,
         }))),
