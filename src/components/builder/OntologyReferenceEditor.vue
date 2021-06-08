@@ -82,10 +82,6 @@ export default {
       required: true,
       default: () => ([]),
     },
-    // value: {
-    //   type: Object,
-    //   required: true,
-    // },
   },
   data: () => ({
     surveyId: '',
@@ -94,7 +90,6 @@ export default {
     loading: false,
     surveys: [],
     paths: [],
-    // limitToOwn: false,
   }),
   methods: {
     deleteResource() {
@@ -126,7 +121,6 @@ export default {
       this.$emit('close-dialog');
     },
     async surveyChanged(version) {
-      console.log('surveychanged', this.surveyId);
       const { data } = await api.get(`/surveys/${this.surveyId}`);
       if (!version) {
         this.surveyVersion = data.latestVersion;
@@ -159,28 +153,14 @@ export default {
       });
 
       this.paths = paths;
-      console.log('paths', paths);
-    },
-    async pathChanged() {
-      // console.log('path changed');
-
-      // this.$emit('input', {
-      //   surveyId: this.surveyId,
-      //   surveyVersion: this.surveyVersion,
-      //   path: this.path,
-      //   // limitToOwn: this.limitToOwn,
-      // });
     },
   },
   async mounted() {
-    // console.log('mounted', this.value);
-    console.log('mounted', { ...this.resource.content });
     if (this.resource.content) {
       this.surveyId = this.resource.content.id || '';
       this.path = this.resource.content.path || '';
       this.surveyVersion = this.resource.content.version || '';
 
-      console.log('running surveyChanged', this.surveyVersion, this.surveyId);
       if (this.surveyVersion) {
         await this.surveyChanged(this.surveyVersion);
       }
