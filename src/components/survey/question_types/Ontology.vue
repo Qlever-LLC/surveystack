@@ -107,6 +107,7 @@
 </template>
 
 <script>
+import { groupBy, map } from 'lodash';
 import baseQuestionComponent from './BaseQuestionComponent';
 import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
@@ -155,21 +156,38 @@ export default {
       return (item && item.label) || value;
     },
     async fetchSubmissions(surveyId, path) {
-      const userId = this.$store.getters['auth/user']._id;
       const base = `&project={"${path}.value":1}`;
       const query = base;
-      console.log('userID', userId);
       const r = await api.get(`/submissions?survey=${surveyId}${query}`);
       const { data } = r;
       const items = data.map((item) => {
         const value = getNested(item, `${path}.value`, null);
         return {
           id: item._id,
-          label: value,
+          label: JSON.stringify(value).replace(/^"(.+(?="$))"$/, '$1'),
           value,
         };
-      });
-      return items;
+      }).filter(item => item.value !== null);
+
+      // const explodeItem = item => item.value.map((v, i) => ({
+      //   id: `${item.id}__${i}`,
+      //   label: JSON.stringify(v).replace(/^"(.+(?="$))"$/, '$1'),
+      //   value: v,
+      // }));
+
+      // const explodedItems = items
+      //   .map(it => (Array.isArray(it.value) ? explodeItem(it) : [it]))
+      //   .reduce((acc, curr) => [...acc, ...curr], []);
+
+      // console.log('exploded', explodedItems);
+
+      const uniqueItems = Object.values(groupBy(items, 'value'))
+        .map(group => ({
+          ...group[0],
+          // count: group.length,
+          label: `${group[0].label}${group.length > 1 ? ` (${group.length})` : ''}`,
+        }));
+      return uniqueItems;
     },
 
   },
@@ -218,7 +236,6 @@ export default {
   },
   async mounted() {
     if (this.resource && this.hasReference) {
-      console.log(this.resource);
       const { id, path } = this.resource.content;
       this.isLoading = true;
       try {
