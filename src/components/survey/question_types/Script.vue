@@ -22,7 +22,7 @@
         sandbox="allow-scripts allow-same-origin allow-popups"
       />
 
-      <div class="android-button-container">
+      <div class="android-button-container" v-if="!this.value">
         <v-btn
           v-if="control.options.isNativeScript"
           class=""
@@ -52,7 +52,7 @@
       <p class="status" v-if="meta.status || meta.statusMessage">
         <v-chip dark> {{ meta && meta.status }}</v-chip>
         <br />
-        <v-chip dark class="mt-4">
+        <v-chip dark class="mt-1">
           <v-icon small left>mdi-message-bulleted</v-icon>
           {{ meta && meta.statusMessage }}</v-chip
         >
