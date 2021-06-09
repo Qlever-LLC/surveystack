@@ -177,33 +177,25 @@
                         readonly
                         disabled>
                       </v-text-field>
-                      <v-textarea
+                      <h3>Description</h3>
+                      <tip-tap-editor
                         v-model="value.meta.libraryDescription"
-                        label="Description"
-                        class="mt-4"
-                        rows="4"
-                        outlined
+                        class="mb-4"
                       />
-                      <v-textarea
+                      <h3>Applications</h3>
+                      <tip-tap-editor
                         v-model="value.meta.libraryApplications"
-                        label="Applications"
-                        class="mt-4"
-                        rows="4"
-                        outlined
+                        class="mb-4"
                       />
-                      <v-textarea
+                      <h3>Maintainers</h3>
+                      <tip-tap-editor
                         v-model="value.meta.libraryMaintainers"
-                        label="Maintainers"
-                        class="mt-4"
-                        rows="2"
-                        outlined
+                        class="mb-4"
                       />
-                      <v-textarea
+                      <h3>Version history</h3>
+                      <tip-tap-editor
                         v-model="value.meta.libraryHistory"
-                        label="Version history"
-                        class="mt-4"
-                        rows="2"
-                        outlined
+                        class="mb-4"
                       />
                     </v-card-text>
                     <v-card-actions class="mr-3">
@@ -401,6 +393,7 @@
 import SurveyNameEditor from '@/components/builder/SurveyNameEditor.vue';
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import appResources from '@/components/builder/Resources.vue';
+import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import api from '@/services/api.service';
 
 const availableSubmissions = [{ value: 'public', text: 'Everyone' }, { value: 'user', text: 'Logged in users' }, { value: 'group', text: 'Group members' }];
@@ -467,6 +460,7 @@ export default {
     SurveyNameEditor,
     ActiveGroupSelector,
     appResources,
+    TipTapEditor,
   },
   methods: {
     async getGroupNameById(id) {

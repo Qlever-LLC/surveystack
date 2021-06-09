@@ -1,7 +1,7 @@
 <template>
   <v-card
     outlined
-    class="instructions-editor"
+    class="tiptap-editor"
   >
     <v-card-title class="pa-0">
       <editor-menu-bar
@@ -10,8 +10,10 @@
       >
         <v-toolbar
           color="grey lighten-3"
+          style="zoom:0.75;"
           flat
           dense
+          v-if="!disabled"
           class="pa-0 editor-toolbar"
         >
           <v-toolbar-items
@@ -25,6 +27,7 @@
                 class="menubar__button"
                 :class="{ 'v-btn--active': isActive.paragraph() }"
                 @click="commands.paragraph"
+                :disabled="disabled"
               >
                 <v-icon>mdi-format-pilcrow</v-icon>
               </v-btn>
@@ -348,6 +351,7 @@
         </div>
       </editor-menu-bubble>
       <editor-content
+        :disabled="!disabled"
         :editor="editor"
         class="tiptap-editor"
         style="width: 100%; height: 100%;"
@@ -401,9 +405,14 @@ export default {
       type: String,
       required: true,
     },
+    disabled: {
+      type: Boolean,
+      required: false,
+    },
   },
   mounted() {
     this.editor = new Editor({
+      editable: !this.disabled,
       extensions: [
         new Blockquote(),
         new BulletList(),
@@ -507,8 +516,14 @@ export default {
   /* background-color: blue; */
   width: 100%;
   height: 100%;
-  min-height: 150px;
+  min-height: 120px;
   padding: 16px;
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.content {
+  border-color: red !important;
 }
 
 .tiptap-editor >>> .ProseMirror blockquote {
@@ -575,10 +590,10 @@ export default {
   color: var(--color-white);
 }
 
-.instructions-editor >>> .editor-toolbar .v-toolbar__items {
+.tiptap-editor >>> .editor-toolbar .v-toolbar__items {
   width: 100%;
 }
-.instructions-editor >>> .editor-toolbar .v-toolbar__content {
+.tiptap-editor >>> .editor-toolbar .v-toolbar__content {
   padding-left: 4px;
   padding-right: 4px;
   width: 100%;

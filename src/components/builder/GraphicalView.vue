@@ -18,12 +18,11 @@
       :key="el.id || el._id"
       @mousedown.stop.left="$emit('controlSelected', el)"
     >
-      <div class="mb-2 d-flex justify-space-between align-center">
-        <div>
+      <div class="d-flex justify-space-between align-center">
+        <div class="mb-2" v-if="!el.options.hidden">
           <span class="caption grey--text text--darken-1">{{ createIndex(index, idx + 1) | displayIndex}}</span>
           <br />
-          <span class="title"
-                :class="{ 'grey--text': el.options.hidden }">
+          <span class="title">
             {{ getDisplay(el) }}
           </span>
           <br />
@@ -31,6 +30,9 @@
             {{ el.name }}
             : {{ el.type }}
           </span>
+        </div>
+        <div class="grey--text text--darken-1" v-if="el.options.hidden">
+          {{ createIndex(index, idx + 1) | displayIndex}} &nbsp; {{ getDisplay(el) }}
         </div>
         <div class="d-flex">
           <v-btn
@@ -54,11 +56,20 @@
           >
             <v-icon color="grey lighten-1">mdi-delete</v-icon>
           </v-btn>
+          <v-btn
+            text
+            x-small
+            v-if="el.options.hidden"
+            @click.stop="el.options.hidden=false"
+            color="grey lighten-1"
+          >
+            unhide
+          </v-btn>
         </div>
       </div>
 
       <nested-draggable
-        v-if="el.type == 'group'"
+        v-if="el.type == 'group' && !el.options.hidden"
         :class="{'drop-area-border': (el.children.length === 0), 'drop-area': 1}"
         :selected="selected"
         :controls="el.children"
@@ -69,7 +80,7 @@
       />
 
       <nested-draggable
-        v-if="el.type == 'page'"
+        v-if="el.type == 'page' && !el.options.hidden"
         :class="{'drop-area-border': (el.children.length === 0), 'drop-area': 1}"
         :selected="selected"
         :controls="el.children"

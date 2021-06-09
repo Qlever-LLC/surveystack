@@ -96,7 +96,7 @@
         label="Required"
         color="grey darken-1"
         hide-details
-        :disabled="!!control.libraryId && !control.isLibraryRoot"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       >
         <template slot="label">
           <div>
@@ -111,7 +111,7 @@
         color="grey darken-1"
         v-model="control.options.redacted"
         label="Private"
-        :disabled="!!control.libraryId && !control.isLibraryRoot"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       >
         <template slot="label">
           <div>
@@ -144,6 +144,22 @@
       <v-checkbox
         class="my-1"
         color="grey darken-1"
+        v-if="survey.meta.isLibrary"
+        v-model="control.options.allowModify"
+        hide-details
+        label="Allow modify"
+      >
+        <template slot="label">
+          <div>
+            <div class="text--primary">Allow modify</div>
+            <div class="body-2">Allow users of this question set to modify this question</div>
+          </div>
+        </template>
+      </v-checkbox>
+
+      <v-checkbox
+        class="my-1"
+        color="grey darken-1"
         v-if="control.libraryId && control.options.allowHide"
         v-model="control.options.hidden"
         hide-details
@@ -167,7 +183,7 @@
         v-if="isSelect || isOntology"
         outlined
         label="Allow Custom Entry"
-        :disabled="!!control.libraryId && !control.isLibraryRoot"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
 
       <v-checkbox
@@ -175,7 +191,7 @@
         v-model="control.options.hasMultipleSelections"
         v-if="control.type === 'ontology' || control.type === 'farmOsPlanting'"
         label="Allow Multiple Selections"
-        :disabled="!!control.libraryId && !control.isLibraryRoot"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
 
       <v-select
@@ -184,7 +200,7 @@
         label="Type"
         v-model="control.options.subtype"
         outlined
-        :disabled="!!control.libraryId && !control.isLibraryRoot"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
 
       <div v-if="!showAdvanced" class="d-flex justify-end mt-4">
@@ -205,7 +221,7 @@
             outlined
             v-model="relevance.enabled"
             label="Relevance Expression"
-            :disabled="!!control.libraryId && !control.isLibraryRoot"
+            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
           />
           <v-spacer />
           <v-icon
@@ -224,7 +240,7 @@
             outlined
             v-model="calculate.enabled"
             label="Calculate Expression"
-            :disabled="!!control.libraryId && !control.isLibraryRoot"
+            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
           />
           <v-spacer />
           <v-icon
@@ -243,7 +259,7 @@
             outlined
             v-model="constraint.enabled"
             label="Constraint Expression"
-            :disabled="!!control.libraryId && !control.isLibraryRoot"
+            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
           />
           <v-spacer />
           <v-icon
@@ -262,7 +278,7 @@
             outlined
             v-model="apiCompose.enabled"
             label="Api Compose Expression"
-            :disabled="!!control.libraryId && !control.isLibraryRoot"
+            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
           />
           <v-spacer />
           <v-icon
@@ -277,14 +293,14 @@
       <select-items-editor
         v-if="isSelect"
         v-model="control.options.source"
-        :disabled="!!control.libraryId && !control.isLibraryRoot"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         class="mt-5"
       />
       <app-ontology-properties
         v-else-if="isOntology"
         :value="control.options.source"
         :resources="survey.resources"
-        :disabled="!!control.libraryId && !control.isLibraryRoot"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         class="mt-5"
@@ -293,22 +309,22 @@
         v-else-if="isMatrix"
         v-model="control.options.source"
         :resources="survey.resources"
-        :disabled="!!control.libraryId && !control.isLibraryRoot"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         class="mt-5"
         @set-control-required="control.options.required = true"
       />
-      <!-- TODO MH disabled instead of hide?-->
       <instructions-editor
-        v-else-if="isInstructions && !control.libraryId"
+        v-else-if="isInstructions"
         v-model="control.options.source"
+        :disabled="control.libraryId!=null"
       />
       <instructions-image-split-editor
         v-else-if="isInstructionsImageSplit"
         v-model="control.options.source"
         :resources="survey.resources"
-        :disabled="!!control.libraryId && !control.isLibraryRoot"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         @set-control-source="(val) => $emit('set-control-source', val)"
       />
@@ -324,7 +340,7 @@ import api from '@/services/api.service';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
 import appMatrixProperties from '@/components/builder/MatrixProperties.vue';
 import appOntologyProperties from '@/components/builder/OntologyProperties.vue';
-import InstructionsEditor from '@/components/builder/InstructionsEditor.vue';
+import InstructionsEditor from '@/components/builder/TipTapEditor.vue';
 import InstructionsImageSplitEditor from '@/components/builder/InstructionsImageSplitEditor.vue';
 import GeoJSONProperties from '@/components/builder/GeoJSONProperties.vue';
 

@@ -48,11 +48,29 @@
                 <small class="grey--text">{{ c._id }}</small>
                 <br>
                 {{c.name}}
-                <!--br>
-                <TODO maybe add group based QSL access restrictions?>
-                <small>groups tbd</small-->
+                <small v-show="selectedSurvey && selectedSurvey._id==c._id" class="grey--text"><br>Version {{c.latestVersion}}</small>
+                <!--v-chip
+                  dark
+                  small
+                  outlined
+                  color="grey"
+                >
+                  Version {{ c.latestVersion }}
+                </v-chip-->
               </v-col>
               <v-col align="right" md="auto">
+                <v-btn
+                  dark
+                  v-if="selectedSurvey && selectedSurvey._id===c._id"
+                  color="grey"
+                  key="close"
+                  @click.stop="toggleCard(c)"
+                  class="mt-n5 mr-1 d-inline-block shadow white span-button"
+                  outlined
+                  small
+                >
+                  back
+                </v-btn>
                 <v-btn
                   dark
                   v-if="selectedSurvey && selectedSurvey._id===c._id"
@@ -100,16 +118,16 @@
               >
               <v-col>
                 <h4>Description</h4>
-                <small>{{selectedSurvey.meta.libraryDescription}}</small>
-                <br><br>
+                <small v-html="selectedSurvey.meta.libraryDescription"></small>
+                <br>
                 <h4>Applications</h4>
-                <small>{{selectedSurvey.meta.libraryApplications}}</small>
-                <br><br>
+                <small v-html="selectedSurvey.meta.libraryApplications"></small>
+                <br>
                 <h4>Maintainers</h4>
-                <small>{{selectedSurvey.meta.libraryMaintainers}}</small>
-                <br><br>
+                <small v-html="selectedSurvey.meta.libraryMaintainers"></small>
+                <br>
                 <h4>Updates</h4>
-                <small>{{selectedSurvey.meta.libraryHistory}}</small>
+                <small v-html="selectedSurvey.meta.libraryHistory"></small>
               </v-col>
               <v-col>
                 <h4>Questions</h4>
@@ -117,7 +135,7 @@
                   :readOnly="true"
                   v-if="selectedSurvey && selectedSurvey._id===c._id"
                   class="graphical-view"
-                  :controls="selectedSurvey.revisions[selectedSurvey.revisions.length - 1].controls"
+                  :controls="selectedSurvey.revisions[selectedSurvey.latestVersion - 1].controls"
                 />
               </v-col>
             </v-row>

@@ -13,6 +13,7 @@
             color="primary"
             style="margin-top: 2px;"
             @click="editedItem = createEmptyItem(); editItemDialogIsVisible = true"
+            :disabled="disabled"
           >
             <v-icon left>mdi-plus</v-icon>Add Row
           </v-btn>
@@ -24,6 +25,7 @@
                 <select-items-upload-button
                   @change="handleFileChange"
                   class="mt-4 mb-n2"
+                  :disabled="disabled"
                 />
               </div>
             </template>
@@ -38,6 +40,7 @@
                 icon
                 v-on="on"
                 class="ml-2"
+                :disabled="disabled"
               >
                 <v-icon>mdi-delete</v-icon>
                 <!-- Delete List -->
@@ -74,6 +77,7 @@
         <!-- {{ resource.label }} -->
         <v-text-field
           :value="resource.label"
+          :disabled="disabled"
           @input="handleUpdateLabel"
           label="List Label"
           persistent-hint
@@ -82,6 +86,7 @@
         <!-- TODO: validate unique data name -->
         <v-text-field
           :value="resource.name"
+          :disabled="disabled"
           @input="handleUpdateName"
           label="List Data Name"
           persistent-hint
@@ -100,7 +105,7 @@
           <v-btn
             icon
             @click="deleteSelectedItems"
-            :disabled="!selectedItems.length"
+            :disabled="!selectedItems.length || disabled"
           >
             <v-icon>mdi-delete</v-icon>
           </v-btn>
@@ -120,6 +125,7 @@
         <template v-slot:item.label="{ item }">
           <v-text-field
             v-model="item.label"
+            :disabled="disabled"
             solo
             dense
             hide-details
@@ -128,6 +134,7 @@
         <template v-slot:item.value="{ item }">
           <v-text-field
             v-model="item.value"
+            :disabled="disabled"
             solo
             dense
             hide-details
@@ -136,6 +143,7 @@
         <template v-slot:item.tags="{ item }">
           <v-text-field
             v-model="item.tags"
+            :disabled="disabled"
             solo
             dense
             hide-details
@@ -146,21 +154,25 @@
             <v-icon
               @click="moveItemUp(item)"
               tabindex="-1"
+              :disabled="disabled"
             >mdi-arrow-up</v-icon>
             <v-icon
               class="ml-2"
               @click="moveItemDown(item)"
               tabindex="-1"
+              :disabled="disabled"
             >mdi-arrow-down</v-icon>
             <v-icon
               class="ml-2"
               @click="copyItem(item)"
               tabindex="-1"
+              :disabled="disabled"
             >mdi-content-copy</v-icon>
             <v-icon
               class="ml-2"
               @click="deleteItem(item)"
               tabindex="-1"
+              :disabled="disabled"
             >mdi-trash-can-outline</v-icon>
           </div>
         </template>
@@ -228,6 +240,11 @@ export default {
       type: Array,
       required: true,
       default: () => ([]),
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: () => (false),
     },
   },
   components: {
