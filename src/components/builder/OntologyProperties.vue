@@ -17,7 +17,6 @@
       />
       <v-btn
         icon
-        :disabled="disabled"
         @click.stop="openTableDialog"
         :class="{'d-none': !value}"
       >
@@ -32,6 +31,7 @@
       <app-ontology-list-editor
         :resources="resources"
         :resource="resource"
+        :disabled="disabled"
         @change="setResource"
         @delete="removeResource"
         @close-dialog="closeTableDialog"
