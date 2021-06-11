@@ -152,7 +152,12 @@ export default {
       if (!this.submissions) {
         return;
       }
-      this.csv = csvService.createCsv(this.submissions.content, this.submissions.headers);
+      const replaceGeoJsonPath = str => str.replace(/(value\.features\.\d).*/, '$1');
+      // Remove GeoJSON question type paths from headers
+      const headers = Array.isArray(this.submissions.headers)
+        ? [...new Set(this.submissions.headers.map(replaceGeoJsonPath))]
+        : this.submissions.headers;
+      this.csv = csvService.createCsv(this.submissions.content, headers);
       this.parsed = papa.parse(this.csv, { header: true });
       this.createHeaders();
     },
