@@ -14,7 +14,7 @@
     <v-card
       v-for="(el, idx) in controls"
       class="control-item mb-2"
-      :class="[{'control-item-selected': (el === selected)},{'library-border': el.isLibraryRoot}]"
+      :class="[{'control-item-selected': (el === selected)},{'library-border': el.isLibraryRoot}, {'control-item-library':el.libraryId}]"
       :key="el.id || el._id"
       @mousedown.stop.left="$emit('controlSelected', el)"
     >
@@ -243,13 +243,13 @@ export default {
 .library-border {
   border-width:2px !important;
   border-color:#4CAF50 !important;
+  background-color: #b4ecb6 !important;
 }
 
 .draggable {
   text-align: left;
   cursor: grab;
   line-height: 1.125rem;
-  background: #fff;
 }
 
 .control-item:first-child {
@@ -264,6 +264,10 @@ export default {
   /* border-left: 2px solid transparent; */
   border-left-width: 2px;
   position: relative;
+}
+
+.control-item-library {
+  background-color: #d5f5d6 !important;
 }
 
 .control-item:hover::before,
