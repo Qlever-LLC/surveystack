@@ -47,6 +47,25 @@ function stringifyObjectIds(obj) {
   }
 }
 
+function transformQuestionTypes(obj, typeHandlers) {
+  if (!obj) {
+    return;
+  }
+  console.log(obj)
+  for (const key of Object.keys(obj)) {
+    if (typeof obj[key] === 'object' && obj[key] !== null) {
+      const typeHandler = 'meta' in obj[key]
+        && obj[key].meta.type in typeHandlers
+        && typeHandlers[obj[key].meta.type];
+      if (typeHandler) {
+        obj[key] = typeHandler(obj[key]);
+      } else {
+        transformQuestionTypes(obj[key], typeHandlers);
+      }
+    }
+  }
+}
+
 function createHeaders(mergedObject, entities, options = { excludeDataMeta: false }) {
   stringifyObjectIds(mergedObject);
 
@@ -135,4 +154,9 @@ function createCsv(submissions, headers) {
   return csv;
 }
 
-export default { createCsv, createCsvLegacy, createHeaders };
+export default { 
+  createCsv, 
+  createCsvLegacy, 
+  createHeaders,
+  transformQuestionTypes,
+};

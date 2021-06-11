@@ -494,10 +494,23 @@ const getSubmissionsCsv = async (req, res) => {
   }
 
   const entities = await db.collection(col).aggregate(pipeline).toArray();
+  csvService.transformQuestionTypes(
+    entities, 
+    { 
+      geoJSON: (o) => ({ 
+        ...o, 
+        value: { 
+          ...o.value,
+          features: o.value.features.map(JSON.stringify),
+        },
+      }),
+    },
+  );
 
   const headers = await headerService.getHeaders(req.query.survey, entities, {
     excludeDataMeta: !queryParam(req.query.showCsvDataMeta),
   });
+  console.log(headers);
 
   const csv = csvService.createCsv(entities, headers);
   res.set('Content-Type', 'text/plain');
