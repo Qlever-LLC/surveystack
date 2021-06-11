@@ -78,6 +78,23 @@ module.exports = {
           urlPattern: /\/api\/.*$/,
           handler: 'NetworkFirst',
         },
+        {
+          urlPattern: /^https:\/\/app\.surveystack\.io\/iframeStyles\.css$/,
+          handler: 'NetworkFirst',
+        },
+        {
+          urlPattern: /^https:\/\/app\.surveystack\.io\/iframeMessaging\.js$/,
+          handler: 'NetworkFirst',
+        },
+        {
+          urlPattern: /^https:\/\/app\.surveystack\.io\/iframeUI\.js$/,
+          handler: 'NetworkFirst',
+        },
+        {
+          urlPattern: /^https:\/\/cdn\.plot\.ly\/plotly-latest.min\.js$/,
+          handler: 'NetworkFirst',
+        },
+
         // {
         //   urlPattern: /https:\/\/api\.mapbox\.com.*$/,
         //   handler: 'CacheFirst',
