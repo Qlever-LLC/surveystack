@@ -854,7 +854,10 @@ const archiveSubmission = async (req, res) => {
     returnOriginal: false,
   });
 
-  // TODO archive / unarchive library submissions as well?
+  // archive / unarchive library submissions as well
+  const updatedLibrarySubmissions = await db.collection(col).findOneAndUpdate({ 'meta.original': new ObjectId(id) }, update, {
+    returnOriginal: false,
+  });
 
   return res.send(updated);
 };
@@ -865,6 +868,8 @@ const deleteSubmission = async (req, res) => {
   try {
     let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
     assert.equal(1, r.deletedCount);
+    // delete library submissions as well
+    let rqsl = await db.collection(col).deleteOne({ 'meta.original': new ObjectId(id) });
     return res.send({ message: 'OK' });
   } catch (error) {
     throw boom.internal(`deleteSubmission: unknown error`);
