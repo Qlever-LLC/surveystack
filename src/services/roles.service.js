@@ -2,10 +2,52 @@ import { ObjectId } from 'mongodb';
 
 import { db } from '../db';
 
-const getDescendantGroups = async (group) => {
+const isParent = (parent, child) => {
+  return child.startsWith(parent);
+};
+
+const getParentGroups = async (groupId) => {
+  //console.log("group id", groupId);
+  const groups = await db.collection('groups').find({ _id: new ObjectId(groupId) }).toArray();
+
+  if (groups.length != 1) {
+    return [];
+  }
+
+  const group = groups[0];
+  //console.log("result group", group);
+
+  const parts = group.path.split('/');
+  //console.log("parts", parts);
+  if (parts.length < 2) {
+    return [];
+  }
+
+  if (parts[1] == '') {
+    return [];
+  }
+
+  const root = `/${parts[1]}/`;
+
+
+  //console.log("root", root);
+
   const descendants = await db
     .collection('groups')
-    .find({ path: { $regex: `^${group.path}/` } })
+    .find({ path: { $regex: `^${root}` } })
+    .toArray();
+
+  //console.log("descendants", descendants);
+
+  return descendants.filter((d) => isParent(d.path, group.path));
+};
+
+const getDescendantGroups = async (group) => {
+  // console.log("group path", group, group.path);
+
+  const descendants = await db
+    .collection('groups')
+    .find({ path: { $regex: `^${group.path}` } })
     .toArray();
   return descendants;
 };
@@ -36,8 +78,21 @@ export const hasRole = async (user, group, role) => {
 };
 
 export const hasAdminRole = async (user, group) => {
+  const groups = getDescendantGroups(group);
+
   const ret = await hasRole(user, group, 'admin');
-  return ret;
+  if (ret) {
+    return true;
+  }
+
+  for (const g of groups) {
+    const ret = await hasRole(user, g, 'admin');
+    if (ret) {
+      return true;
+    }
+  }
+
+  return false;
 };
 
 export const hasUserRole = async (user, group) => {
@@ -75,4 +130,6 @@ export default {
   hasRole,
   hasAdminRole,
   hasUserRole,
+  getDescendantGroups,
+  getParentGroups,
 };

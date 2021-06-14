@@ -70,12 +70,49 @@ const createPopulationPipeline = () => {
   return pipeline;
 };
 
+
+const getAdminOfSubGroups = async (entities) => {
+  const adminOfSubGroups = [];
+  for (const e of [...entities]) {
+    if (e.role === 'admin') {
+      const subgroups = await rolesService.getDescendantGroups(e.group);
+
+      for (const subgroup of subgroups) {
+        // console.log('subgroup', subgroup._id);
+        // console.log('entities', entities);
+        // console.log('adminOfSubGroups', adminOfSubGroups);
+
+        if (adminOfSubGroups.find((m) => m.group._id == subgroup._id)) {
+          continue;
+        }
+
+        const presentEntity = entities.find((e) => `${e.group._id}` == `${subgroup._id}`);
+        // console.log('found entity', presentEntity);
+
+        if (presentEntity) {
+          continue;
+        }
+
+        const cpy = { ...e };
+        cpy.group = { ...subgroup };
+        e.projected = true;
+        adminOfSubGroups.push(cpy);
+      }
+    }
+  }
+
+  return adminOfSubGroups;
+};
+
 const getMemberships = async (req, res) => {
   const filter = {};
 
   const { group, user, invitationCode, status } = req.query;
   if (group) {
-    filter.group = new ObjectId(group);
+    const parentGroups = await rolesService.getParentGroups(group);
+    // console.log('parentGroups', parentGroups);
+    filter.group = { $in: parentGroups.map((g) => new ObjectId(g._id)) };
+    // console.log('filter', filter);
   }
 
   if (user) {
@@ -96,6 +133,58 @@ const getMemberships = async (req, res) => {
   }
 
   const entities = await db.collection(col).aggregate(pipeline).toArray();
+
+  if (user) {
+    const adminOfSubGroups = await getAdminOfSubGroups(entities);
+    entities.push(...adminOfSubGroups);
+  }
+
+  if (group) {
+    const filteredMemberships = entities.filter(
+      (e) => !(e.role != 'admin' && e.group._id != group)
+    );
+
+    const otherMembers = [];
+    const admins = [];
+
+    for (const member of filteredMemberships) {
+      if (member.role !== 'admin') {
+        continue;
+      }
+      
+      if (
+        member.user &&
+        admins.find((adm) => !adm.user || `${adm.user._id}` === `${member.user._id}`)
+      ) {
+        continue;
+      }
+
+      if (admins.find((adm) => `${adm._id}` === `${member._id}`)) {
+        continue;
+      }
+
+      admins.push(member);
+    }
+
+    console.log('admins', admins);
+
+    for (const member of filteredMemberships) {
+      if (
+        member.user &&
+        admins.find((adm) => !adm.user || `${adm.user._id}` === `${member.user._id}`)
+      ) {
+        continue;
+      }
+
+      if (admins.find((adm) => `${adm._id}` === `${member._id}`)) {
+        continue;
+      }
+
+      otherMembers.push(member);
+    }
+
+    return res.send([...admins, ...otherMembers]);
+  }
 
   return res.send(entities);
 };

@@ -72,6 +72,8 @@ export const assertSubmissionRights = catchErrors(async (req, res, next) => {
     throw boom.notFound(`No survey found: ${req.body.meta.survey.id}`);
   }
 
+  
+
   if (!survey.meta.submissions) {
     // no meta.submissions param set, assume everyone can submit
     return next();
@@ -101,8 +103,10 @@ export const assertSubmissionRights = catchErrors(async (req, res, next) => {
   }
 
   const hasUserRole = await rolesService.hasUserRole(userId, groupId);
+  const hasAdminRole = await rolesService.hasAdminRole(userId, groupId);
+  console.log("")
 
-  if (submissions === 'group' && hasUserRole) {
+  if (submissions === 'group' && (hasUserRole || hasAdminRole)) {
     // group members can submit
     return next();
   }
