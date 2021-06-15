@@ -33,6 +33,7 @@
           v-model="scriptSourceId"
           v-if="isScript"
           :items="scriptSourceItems"
+          :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
           label="Script Source"
           item-text="name"
           item-value="_id"
@@ -69,6 +70,7 @@
         v-if="isScript"
         label="Parameters"
         :rules="[validateScriptParams]"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         outlined
       />
       <v-checkbox
