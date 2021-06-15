@@ -1,36 +1,28 @@
 <template>
-  <v-container v-if="entity">
+  <v-container v-if="entity && show">
     <div class="d-flex justify-end">
-      <v-btn
-        v-if="editable"
-        class="mx-2"
-        :to="`/surveys/${entity._id}/edit`"
-      >
+      <v-btn v-if="editable" class="mx-2" :to="`/surveys/${entity._id}/edit`">
         <v-icon>mdi-pencil</v-icon>
         <span class="ml-2">Edit</span>
       </v-btn>
-      <v-btn
-        class="mx-2"
-        :to="`/submissions?survey=${entity._id}`"
-      >
+      <v-btn class="mx-2" :to="`/submissions?survey=${entity._id}`">
         <v-icon>mdi-table</v-icon>
         <span class="ml-2">Results</span>
       </v-btn>
     </div>
 
-    <h1>{{entity.name}}</h1>
+    <h1>{{ entity.name }}</h1>
     <div v-if="surveyInfo">
-      <div
-        class="survey-description"
-        v-if="surveyInfo.description"
-      >{{surveyInfo.description}}</div>
-      <div class="text--secondary">
-        {{surveyInfo.submissions}} {{surveyInfo.submissions === 1 ? 'submission' : 'submissions'}}
+      <div class="survey-description" v-if="surveyInfo.description">
+        {{ surveyInfo.description }}
       </div>
-      <div
-        v-if="surveyInfo.latestSubmission"
-        class="text--secondary"
-      >Latest submission on {{surveyInfo.latestSubmission.dateModified}}</div>
+      <div class="text--secondary">
+        {{ surveyInfo.submissions }}
+        {{ surveyInfo.submissions === 1 ? "submission" : "submissions" }}
+      </div>
+      <div v-if="surveyInfo.latestSubmission" class="text--secondary">
+        Latest submission on {{ surveyInfo.latestSubmission.dateModified }}
+      </div>
     </div>
 
     <div class="mt-4">
@@ -43,11 +35,8 @@
         <v-icon>mdi-file-document-box-plus-outline</v-icon>
         <span class="ml-2">Start Survey</span>
       </v-btn>
-      <div
-        class="mt-2 text--secondary"
-        v-if="!isAllowedToSubmit"
-      >
-        {{submissionRightsHint}}
+      <div class="mt-2 text--secondary" v-if="!isAllowedToSubmit">
+        {{ submissionRightsHint }}
       </div>
     </div>
   </v-container>
@@ -61,6 +50,7 @@ export default {
     return {
       entity: null,
       surveyInfo: null,
+      show: false,
     };
   },
   methods: {
@@ -82,7 +72,11 @@ export default {
       }
       const user = this.$store.getters['auth/user'];
 
-      if (this.entity && this.entity.meta && this.entity.meta.creator === user._id) {
+      if (
+        this.entity
+        && this.entity.meta
+        && this.entity.meta.creator === user._id
+      ) {
         return true;
       }
 
@@ -90,7 +84,9 @@ export default {
         return false;
       }
 
-      const g = this.memberships.find(m => m.group._id === this.entity.meta.group.id);
+      const g = this.memberships.find(
+        m => m.group._id === this.entity.meta.group.id,
+      );
       if (g && g.role === 'admin') {
         return true;
       }
@@ -116,7 +112,9 @@ export default {
       if (submissions === 'group' && this.$store.getters['auth/isLoggedIn']) {
         const groups = this.$store.getters['memberships/groups'];
         console.log(groups);
-        const match = groups.find(group => group._id === this.entity.meta.group.id);
+        const match = groups.find(
+          group => group._id === this.entity.meta.group.id,
+        );
         console.log('match', match);
         if (match) {
           return true;
@@ -157,11 +155,27 @@ export default {
 
     const user = this.$store.getters['auth/user'];
     this.$store.dispatch('memberships/getUserMemberships', user._id);
-  },
 
+    const { submissions, isLibrary } = this.entity.meta;
+
+    if (!submissions || submissions === 'public' || isLibrary) {
+      this.show = true;
+      return;
+    }
+
+    if (this.$store.getters['auth/isLoggedIn']) { // let ui handle issues if user is already logged in
+      this.show = true;
+      return;
+    }
+
+    this.$router.push({
+      name: 'auth-login',
+      params: { redirect: this.$route.path },
+    });
+  },
 };
 </script>
-
+,
 <style scoped>
 .survey-description {
   margin: 16px 0px;
