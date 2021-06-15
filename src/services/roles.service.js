@@ -78,7 +78,7 @@ export const hasRole = async (user, group, role) => {
 };
 
 export const hasAdminRole = async (user, group) => {
-  const groups = getDescendantGroups(group);
+  const groups = await getDescendantGroups(group);
 
   const ret = await hasRole(user, group, 'admin');
   if (ret) {
