@@ -215,6 +215,11 @@ const actions = {
         continue;
       }
 
+      const hasHiddenParents = nextNode.getPath().slice(1).slice(0, -1).find(parent => parent.model.options.hidden === true);
+      if (hasHiddenParents) {
+        continue;
+      }
+
       commit('NEXT', nextNode);
       return;
     }
@@ -267,6 +272,16 @@ const actions = {
 
       const isInsidePage = prevNode.getPath().slice(1).slice(0, -1).find(parent => parent.model.type === 'page');
       if (isInsidePage) {
+        continue;
+      }
+
+      const isHidden = prevNode.model.options.hidden;
+      if (isHidden) {
+        continue;
+      }
+
+      const hasHiddenParents = prevNode.getPath().slice(1).slice(0, -1).find(parent => parent.model.options.hidden === true);
+      if (hasHiddenParents) {
         continue;
       }
 
