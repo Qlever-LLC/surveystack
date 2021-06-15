@@ -6,7 +6,7 @@ import { ObjectId } from 'mongodb';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
-import csvService from '../services/csv.service';
+import csvService, { geojsonTransformer } from '../services/csv.service';
 import headerService from '../services/header.service';
 import * as farmOsService from '../services/farmos.service';
 import rolesService from '../services/roles.service';
@@ -56,7 +56,6 @@ const sanitize = async (entity) => {
 
 const sanitizeMatch = (obj) => {
   Object.keys(obj).forEach((key) => {
-    //console.log(`key: ${key}, value: ${obj[key]}`);
     if (typeof obj[key] === 'object') {
       // check for {"$date": "2020-01-30"}
       // and transform it into new Date("2020-01-30")
@@ -494,23 +493,16 @@ const getSubmissionsCsv = async (req, res) => {
   }
 
   const entities = await db.collection(col).aggregate(pipeline).toArray();
-  csvService.transformQuestionTypes(
+  csvService.transformSubmissionQuestionTypes(
     entities, 
     { 
-      geoJSON: (o) => ({ 
-        ...o, 
-        value: { 
-          ...o.value,
-          features: o.value.features.map(JSON.stringify),
-        },
-      }),
+      geoJSON: csvService.geojsonTransformer,
     },
   );
 
   const headers = await headerService.getHeaders(req.query.survey, entities, {
     excludeDataMeta: !queryParam(req.query.showCsvDataMeta),
   });
-  console.log(headers);
 
   const csv = csvService.createCsv(entities, headers);
   res.set('Content-Type', 'text/plain');

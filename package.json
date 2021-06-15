@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "NODE_ENV=development nodemon --exec babel-node src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "prod": "NODE_ENV=production nodemon --exec babel-node src/index.js"
   },
   "keywords": [],
@@ -16,6 +16,7 @@
     "@babel/node": "^7.6.3",
     "@babel/preset-env": "^7.6.3",
     "eslint": "^6.5.1",
+    "jest": "^27.0.4",
     "nodemon": "^1.19.3"
   },
   "dependencies": {

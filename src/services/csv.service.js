@@ -47,23 +47,43 @@ function stringifyObjectIds(obj) {
   }
 }
 
-function transformQuestionTypes(obj, typeHandlers) {
-  if (!obj) {
-    return;
-  }
-  console.log(obj)
-  for (const key of Object.keys(obj)) {
-    if (typeof obj[key] === 'object' && obj[key] !== null) {
+/**
+ *
+ * @param {*} o submission question object e.g. { meta: { type: 'geoJSON', ...}, value: {...}}
+ * @returns updated submission question object
+ */
+ export function geojsonTransformer(o) {
+  return {
+    ...o,
+    value: {
+      ...o.value,
+      features: o.value.features.map(JSON.stringify),
+    },
+  };
+}
+
+/**
+ * transform submission object for presentation in csv
+ * @param {*} obj: submission object to transform
+ * @param {{[string]: function}} typeHandlers: object with keys for question types to match
+ * and values of transform functions to apply to those question types. Transform functions
+ * should return the updated value for the question value
+ * @returns updated submission object
+ */
+ export function transformSubmissionQuestionTypes(obj, typeHandlers) {
+  return Object.entries(obj).map(([key, val]) => {
+    if (typeof val === 'object' && val !== null) {
       const typeHandler = 'meta' in obj[key]
         && obj[key].meta.type in typeHandlers
         && typeHandlers[obj[key].meta.type];
       if (typeHandler) {
-        obj[key] = typeHandler(obj[key]);
-      } else {
-        transformQuestionTypes(obj[key], typeHandlers);
+        return { [key]: typeHandler(val) };
       }
+      return { [key]: transformSubmissionQuestionTypes(val, typeHandlers) };
     }
-  }
+    return { [key]: val };
+  }) // Flatten objects
+    .reduce((r, x) => ({ ...r, ...x }), {});
 }
 
 function createHeaders(mergedObject, entities, options = { excludeDataMeta: false }) {
@@ -158,5 +178,5 @@ export default {
   createCsv, 
   createCsvLegacy, 
   createHeaders,
-  transformQuestionTypes,
+  transformSubmissionQuestionTypes,
 };
