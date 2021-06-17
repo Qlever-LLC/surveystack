@@ -13,7 +13,7 @@ async function create(farmUrl, cred, instanceId, endpoint, body) {
   return r;
 }
 
-async function asset(apiCompose, info, terms, user, credentials, submission, currentAreaId) {
+async function asset(apiCompose, info, terms, user, credentials, submission) {
   const farmUrl = apiCompose.url;
 
   const cred = credentials.find((c) => c.url === farmUrl);
@@ -32,13 +32,7 @@ async function asset(apiCompose, info, terms, user, credentials, submission, cur
     const body = apiCompose.body;
     body.data = instanceId;
 
-    let bodyString = JSON.stringify(body, null, 4);
-    console.log('stringified body', bodyString);
-    if (currentAreaId) {
-      bodyString = bodyString.replace('$AREA', currentAreaId);
-    }
-
-    const r = await create(farmUrl, cred, instanceId, 'assets', JSON.parse(bodyString));
+    const r = await create(farmUrl, cred, instanceId, 'assets', body);
     results.push(r[0]);
     assetId = r[0].id;
 
