@@ -12,7 +12,7 @@
     </div>
 
 
-    <div class="mt-4">
+    <div class="mt-8 mb-4 d-flex justify-center">
       <v-btn
         x-large
         color="primary"
