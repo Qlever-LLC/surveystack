@@ -7,6 +7,43 @@
     />
     <app-control-hint :value="control.hint" />
 
+    <app-dialog
+      :maxWidth="600"
+      labelConfirm="Close"
+      :hideCancel="true"
+      v-model="showAndroidInstallDialog"
+      @cancel="showAndroidInstallDialog = false"
+      @confirm="showAndroidInstallDialog = false"
+    >
+      <template v-slot:title>Installing Android App</template>
+      <template>
+        <p class="text--primary">
+          Installing the Android Application allows to connect to Bluetooth and
+          USB Devices for taking measurements.
+
+          <br /><br />
+          When installing you will be asked to allow installing applications
+          from unknown sources.
+        </p>
+
+        <v-alert outlined class="pa-4" type="success" color="blue">
+            If you have already instelled the Android App once, you don't need
+            install the App again.
+        </v-alert>
+
+        <br />
+        <v-btn
+          x-large
+          color="green"
+          href="https://gitlab.com/our-sci/software/surveystack-kit/-/jobs/artifacts/master/raw/app/build/outputs/apk/debug/app-debug.apk?job=assembleDebug"
+          outlined
+        >
+          <v-icon left class="mr-4" x-large>mdi-android</v-icon>
+          Download APK
+        </v-btn>
+      </template>
+    </app-dialog>
+
     <a
       ref="scriptLink"
       :href="`surveystack://kit/${scriptId}`"
@@ -28,8 +65,8 @@
           class=""
           x-large
           color="green"
-          href="https://gitlab.com/our-sci/software/surveystack-kit/-/jobs/artifacts/master/raw/app/build/outputs/apk/debug/app-debug.apk?job=assembleDebug"
           outlined
+          @click="showAndroidInstallDialog = true"
         >
           <v-icon left class="mr-4" x-large>mdi-android</v-icon>
           Install Android App
@@ -76,9 +113,13 @@ import buildScriptQuestionIframeContents, {
 import api from '@/services/api.service';
 import BaseQuestionComponent from './BaseQuestionComponent';
 import * as surveyStackUtils from '@/utils/surveyStack';
+import appDialog from '@/components/ui/Dialog.vue';
 
 export default {
   mixins: [BaseQuestionComponent],
+  components: {
+    appDialog,
+  },
   props: {
     submission: {
       type: Object,
@@ -112,6 +153,7 @@ export default {
       isLoading: false,
       loadingSourceFailed: false,
       scriptId: '',
+      showAndroidInstallDialog: false,
     };
   },
   methods: {

@@ -11,19 +11,6 @@
       </v-btn>
     </div>
 
-    <h1>{{ entity.name }}</h1>
-    <div v-if="surveyInfo">
-      <div class="survey-description" v-if="surveyInfo.description">
-        {{ surveyInfo.description }}
-      </div>
-      <div class="text--secondary">
-        {{ surveyInfo.submissions }}
-        {{ surveyInfo.submissions === 1 ? "submission" : "submissions" }}
-      </div>
-      <div v-if="surveyInfo.latestSubmission" class="text--secondary">
-        Latest submission on {{ surveyInfo.latestSubmission.dateModified }}
-      </div>
-    </div>
 
     <div class="mt-4">
       <v-btn
@@ -39,6 +26,21 @@
         {{ submissionRightsHint }}
       </div>
     </div>
+
+    <h1>{{ entity.name }}</h1>
+    <div v-if="surveyInfo">
+      <div class="survey-description" v-if="surveyInfo.description">
+        {{ surveyInfo.description }}
+      </div>
+      <div class="text--secondary">
+        {{ surveyInfo.submissions }}
+        {{ surveyInfo.submissions === 1 ? "submission" : "submissions" }}
+      </div>
+      <div v-if="surveyInfo.latestSubmission" class="text--secondary">
+        Latest submission on {{ surveyInfo.latestSubmission.dateModified }}
+      </div>
+    </div>
+
   </v-container>
 </template>
 
@@ -157,6 +159,7 @@ export default {
     this.$store.dispatch('memberships/getUserMemberships', user._id);
 
     const { submissions, isLibrary } = this.entity.meta;
+
 
     if (!submissions || submissions === 'public' || isLibrary) {
       this.show = true;
