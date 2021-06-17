@@ -153,7 +153,7 @@ async function fetchTerms(farmUrl, credentials, user) {
   );
 }
 
-async function execute(apiCompose, info, terms, user, submission, currentAssetId) {
+async function execute(apiCompose, info, terms, user, submission, currentAssetId, currentAreaId) {
   const url = apiCompose.url;
   const type = apiCompose.farmosType;
 
@@ -166,7 +166,7 @@ async function execute(apiCompose, info, terms, user, submission, currentAssetId
   if (type === 'asset') {
     return await asset(apiCompose, info, terms, user, credentials, submission);
   } else if (type === 'log') {
-    return await log(apiCompose, info, terms, user, credentials, submission, currentAssetId);
+    return await log(apiCompose, info, terms, user, credentials, submission, currentAssetId, currentAreaId);
     // TODO create log
     // TODO check all terms, create if not existing
     // TODO replace terms in body
@@ -223,9 +223,9 @@ export const handle = async (res, submission, survey, user) => {
 
   const results = [];
 
-  const runSingle = async (apiCompose, info, terms, currentAssetId) => {
+  const runSingle = async (apiCompose, info, terms, currentAssetId, currentAreaId) => {
     try {
-      const r = await execute(apiCompose, info, terms, user, submission, currentAssetId);
+      const r = await execute(apiCompose, info, terms, user, submission, currentAssetId, currentAreaId);
       if (Array.isArray(r)) {
         results.push(...r);
         console.log('results interim after array spread', results);
@@ -283,12 +283,15 @@ export const handle = async (res, submission, survey, user) => {
   // flushlogs()
 
   let currentAssetId = null;
+  let currentAreaId = null;
+
   for (const compose of farmOsCompose) {
     const r = await runSingle(
       compose,
       info.find((farm) => farm.url === compose.url),
       {},
-      currentAssetId
+      currentAssetId,
+      currentAreaId
     );
 
     if (r) {
@@ -300,6 +303,9 @@ export const handle = async (res, submission, survey, user) => {
         if (item.resource === 'farm_asset') {
           console.log('using asset id', item.id);
           currentAssetId = item.id;
+        } else if(item.resource === 'farm_area') {
+          console.log('using area id', item.id);
+          currentAreaId = item.id;
         }
       });
     }
