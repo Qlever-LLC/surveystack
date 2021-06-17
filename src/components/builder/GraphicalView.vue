@@ -10,11 +10,12 @@
     :invertSwap="true"
     @start="drag = true"
     @end="drag = false"
+    draggable=".draggable-item"
   >
     <v-card
       v-for="(el, idx) in controls"
       class="control-item mb-2"
-      :class="[{'control-item-selected': (el === selected)},{'library-border': el.isLibraryRoot}, {'control-item-library':el.libraryId}]"
+      :class="[{'control-item-selected': (el === selected)},{'library-border': el.isLibraryRoot}, {'control-item-library':el.libraryId}, {'draggable-item':(!el.libraryId || el.isLibraryRoot)}]"
       :key="el.id || el._id"
       @mousedown.stop.left="$emit('controlSelected', el)"
     >
@@ -70,10 +71,10 @@
 
       <nested-draggable
         v-if="el.type == 'group' && !el.options.hidden"
-        :class="{'drop-area-border': (el.children.length === 0), 'drop-area': 1}"
+        :class="[{'drop-area-border': (el.children.length === 0), 'drop-area': 1}, {'draggable-item':(!el.libraryId || el.isLibraryRoot)}]"
         :selected="selected"
         :controls="el.children"
-        :readOnly="readOnly || !!el.libraryId"
+        :readOnly="readOnly"
         @controlSelected="$emit('controlSelected', $event)"
         @duplicate-control="$emit('duplicate-control', $event)"
         :index="createIndex(index, idx + 1)"
@@ -81,7 +82,7 @@
 
       <nested-draggable
         v-if="el.type == 'page' && !el.options.hidden"
-        :class="{'drop-area-border': (el.children.length === 0), 'drop-area': 1}"
+        :class="[{'drop-area-border': (el.children.length === 0), 'drop-area': 1}, {'draggable-item':(!el.libraryId || el.isLibraryRoot)}]"
         :selected="selected"
         :controls="el.children"
         :readOnly="readOnly"
