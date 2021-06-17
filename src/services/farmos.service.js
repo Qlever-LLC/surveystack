@@ -1,14 +1,14 @@
 /* eslint-disable no-unreachable */
 import boom from '@hapi/boom';
-import axios from "axios";
-import https from "https"
+import axios from 'axios';
+import https from 'https';
 
 import * as utils from '../helpers/surveys';
 import { asset } from './farmos/planting';
 import { log } from './farmos/log';
+import { area } from './farmos/area';
 import { aggregatorRequest } from './farmos/request';
 import { farminfo } from './farmos/farminfo';
-
 
 import { db } from '../db';
 
@@ -100,7 +100,7 @@ async function flushlogs(farmUrl, credentials, user, id) {
     id
   );
 
-  console.log("res from logs operation", logs);
+  console.log('res from logs operation', logs);
 
   if (logs.length === 0) {
     return results;
@@ -124,7 +124,7 @@ async function flushlogs(farmUrl, credentials, user, id) {
     query
   );
 
-  console.log("res[0] from delete operation", JSON.stringify(r));
+  console.log('res[0] from delete operation', JSON.stringify(r));
 
   // response format
   // [{"1406":[]}]
@@ -164,8 +164,13 @@ async function execute(apiCompose, info, terms, user, submission, currentAssetId
   const credentials = await getCredentials(user);
 
   if (type === 'asset') {
-    return await asset(apiCompose, info, terms, user, credentials, submission);
+    console.log("running farmos asset");
+    return await asset(apiCompose, info, terms, user, credentials, submission, currentAreaId);
+  } else if (type === 'area') {
+    console.log("running farmos area");
+    return await area(apiCompose, info, terms, user, credentials, submission);
   } else if (type === 'log') {
+    console.log("running farmos log");
     return await log(apiCompose, info, terms, user, credentials, submission, currentAssetId, currentAreaId);
     // TODO create log
     // TODO check all terms, create if not existing
@@ -194,10 +199,10 @@ export const handle = async (res, submission, survey, user) => {
       return;
     }
 
-    if(!field.meta.apiCompose){
+    if (!field.meta.apiCompose) {
       return;
     }
-    
+
     if (Array.isArray(field.meta.apiCompose)) {
       for (const c of field.meta.apiCompose) {
         compose.push(c);
@@ -226,6 +231,7 @@ export const handle = async (res, submission, survey, user) => {
   const runSingle = async (apiCompose, info, terms, currentAssetId, currentAreaId) => {
     try {
       const r = await execute(apiCompose, info, terms, user, submission, currentAssetId, currentAreaId);
+      
       if (Array.isArray(r)) {
         results.push(...r);
         console.log('results interim after array spread', results);
@@ -265,13 +271,13 @@ export const handle = async (res, submission, survey, user) => {
     throw error;
   }
 
-  console.log("compose", farmOsCompose);
+  console.log('compose', farmOsCompose);
 
   const farmUrlMap = {};
-  farmOsCompose.forEach(c => {
+  farmOsCompose.forEach((c) => {
     const items = farmUrlMap[c.url];
     farmUrlMap[c.url] = items === undefined ? 1 : items + 1;
-  })
+  });
   for (const farmUrl of Object.keys(farmUrlMap)) {
     const res = await flushlogs(farmUrl, credentials, user, submission._id);
     if (res.length > 0) {
@@ -284,7 +290,6 @@ export const handle = async (res, submission, survey, user) => {
 
   let currentAssetId = null;
   let currentAreaId = null;
-
   for (const compose of farmOsCompose) {
     const r = await runSingle(
       compose,
@@ -303,9 +308,11 @@ export const handle = async (res, submission, survey, user) => {
         if (item.resource === 'farm_asset') {
           console.log('using asset id', item.id);
           currentAssetId = item.id;
-        } else if(item.resource === 'farm_area') {
+        }
+
+        if(compose.farmosType === 'area') {
           console.log('using area id', item.id);
-          currentAreaId = item.id;
+          currentAreaId = item.id;  
         }
       });
     }
@@ -314,7 +321,6 @@ export const handle = async (res, submission, survey, user) => {
   console.log('results', results);
   return results;
 };
-
 
 const testAggregatorConnection = async (url, apiKey) => {
   const agentOptions = {
@@ -326,27 +332,24 @@ const testAggregatorConnection = async (url, apiKey) => {
 
   const agent = new https.Agent(agentOptions);
 
-  const r = await axios.get(
-    `https://${url}/api/v1/farms/`,
-    {
-      headers: {
-        accept: 'application/json',
-        'api-key': apiKey,
-      },
-      httpsAgent: agent,
-    }
-  );
+  const r = await axios.get(`https://${url}/api/v1/farms/`, {
+    headers: {
+      accept: 'application/json',
+      'api-key': apiKey,
+    },
+    httpsAgent: agent,
+  });
 
   if (r.status === 200) {
     return true;
   } else {
-    throw Error("unable to connect to aggregator")
+    throw Error('unable to connect to aggregator');
   }
-}
+};
 
 const isFarmosUrlAvailable = async (url, apiKey) => {
   const agentOptions = {
-    host: "account.farmos.net",
+    host: 'account.farmos.net',
     port: '443',
     path: '/',
     rejectUnauthorized: false,
@@ -358,12 +361,12 @@ const isFarmosUrlAvailable = async (url, apiKey) => {
     const r = await axios.post(
       `https://account.farmos.net/api/v1/utils/validate-farm-url`,
       {
-        url: `${url}.farmos.net`
+        url: `${url}.farmos.net`,
       },
       {
         headers: {
           accept: 'application/json',
-          apikey: apiKey
+          apikey: apiKey,
         },
         httpsAgent: agent,
       }
@@ -372,15 +375,14 @@ const isFarmosUrlAvailable = async (url, apiKey) => {
     if (r.status === 200) {
       return true;
     } else {
-      throw Error("unable to connect to aggregator")
+      throw Error('unable to connect to aggregator');
     }
   } catch (error) {
     if (error && error.response && error.response.status && error.response.status === 400) {
-      return false
+      return false;
     }
-    throw error
+    throw error;
   }
-
-}
+};
 
 export default { isFarmosUrlAvailable, handle, getCredentials, testAggregatorConnection };

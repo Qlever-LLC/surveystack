@@ -54,9 +54,11 @@ async function log(
 ) {
   const results = [];
   const farmUrl = apiCompose.url;
-
+  
+  console.log("credentials", credentials)
   const cred = credentials.find((c) => c.url === farmUrl);
   if (!cred) {
+    console.log("credentials missing", farmUrl)
     return;
   }
 
@@ -64,6 +66,7 @@ async function log(
   const termMap = {};
   if (terms) {
     for (const t of terms) {
+      console.log("ensuring terms")
       const id = await ensureTerm(t.name, t.machine, info, availableTerms, farmUrl, cred);
       console.log('term', t);
       console.log('id', id);
@@ -100,7 +103,8 @@ async function log(
     bodyString = bodyString.replace('$ASSET', currentAssetId);
   }
 
-  if(currentAreaId) {
+
+  if (currentAreaId) {
     bodyString = bodyString.replace('$AREA', currentAreaId);
   }
 
