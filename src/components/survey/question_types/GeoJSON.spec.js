@@ -47,6 +47,21 @@ const getControlProps = (opts) => {
   };
 };
 
+function mockFeatureCollection() {
+  return {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [125.6, 10.1],
+        },
+      },
+    ],
+  };
+}
+
 function mockControl() {
   return {
     name: 'map_1',
@@ -219,19 +234,68 @@ describe('GeoJSON Question', () => {
     });
   });
 
-  describe('calls functions', () => {
-    const featureCollection = {
-      type: 'FeatureCollection',
-      features: [
-        {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [125.6, 10.1],
-          },
+  describe('automatic initialization behavior', () => {
+    it('activates geolocate control and geocoder has focus for null value', () => {
+      const renderOptions = {
+        propsData: {
+          control: getControlProps(),
+          value: null,
+          index: 'data.geojson_1',
         },
-      ],
-    };
+      };
+
+      const {
+        getByTitle,
+        getByText,
+        getByRole,
+        getByPlaceholderText,
+        container,
+        updateProps,
+      } = renderWithVuetify(GeoJSON, renderOptions);
+
+      expect(getByTitle('Geolocate').parentElement.classList.contains('active'))
+        .toBe(true);
+      // expect(input).toHaveFocus() doesn't seem to be working, even though element has focus in browser
+      expect(
+        getByPlaceholderText('Search for address...')
+          .parentElement
+          .classList
+          .contains('gcd-gl-expanded'),
+      ).toBe(true);
+    });
+
+    it('does not activate geolocate control and geocoder is not expanded when value exists', () => {
+      const renderOptions = {
+        propsData: {
+          control: getControlProps(),
+          value: mockFeatureCollection(),
+          index: 'data.geojson_1',
+        },
+      };
+
+      const {
+        getByTitle,
+        getByText,
+        getByRole,
+        getByPlaceholderText,
+        container,
+        updateProps,
+      } = renderWithVuetify(GeoJSON, renderOptions);
+
+      expect(getByTitle('Geolocate').parentElement.classList.contains('active'))
+        .toBe(false);
+      // expect(input).toHaveFocus() doesn't seem to be working, even though element has focus in browser
+      expect(
+        getByPlaceholderText('Search for address...')
+          .parentElement
+          .classList
+          .contains('gcd-gl-expanded'),
+      ).toBe(false);
+    });
+  });
+
+  describe('utility functions', () => {
+    const featureCollection = mockFeatureCollection();
 
     it('getNextValue returns null for empty feature collection', () => {
       expect(
