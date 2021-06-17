@@ -185,7 +185,17 @@ export default {
           user: this.entity,
         });
 
-        await autoSelectActiveGroup(this.$store, this.isWhitelabel ? this.whitelabelPartner.id : null);
+        // try to auto join group if this is a whitelabel
+        console.log('trying autojoin');
+        if (this.isWhitelabel) {
+          try {
+            const { data } = await api.post(`/memberships/join-group?id=${this.whitelabelPartner.id}`);
+            console.log('data', data);
+            await autoSelectActiveGroup(this.$store, this.whitelabelPartner.id);
+          } catch (error) {
+            console.log(error.response.data.message);
+          }
+        }
 
         this.$store.dispatch('surveys/fetchPinned');
 

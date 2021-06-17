@@ -170,7 +170,7 @@ export default {
 
     this.$router.push({
       name: 'auth-login',
-      params: { redirect: this.$route.path },
+      params: { redirect: this.$route.path, autoJoin: true },
     });
   },
 };
