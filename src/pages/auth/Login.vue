@@ -1,7 +1,8 @@
 <template>
   <v-container class="maxw-40 px-0">
     <v-card class="pa-5">
-      <h1>Login</h1>
+      <h1 v-if="isWhitelabel && registrationEnabled">Login and join {{ whitelabelPartner.name }}</h1>
+      <h1 v-else>Login</h1>
       <v-form>
         <v-text-field
           label="E-Mail"
@@ -19,20 +20,19 @@
           @click:append="showPasswords = !showPasswords"
         />
         <small>
-          <router-link :to="{name: 'auth-forgot-password', query: {email: entity.email}}">Forgot password?</router-link>
+          <router-link
+            :to="{
+              name: 'auth-forgot-password',
+              query: { email: entity.email },
+            }"
+            >Forgot password?</router-link
+          >
         </small>
         <div class="d-flex justify-end">
-          <v-btn
-            type="button"
-            class="mr-2"
-            text
-            @click="reset"
-          >Reset</v-btn>
-          <v-btn
-            type="submit"
-            @click.prevent="submit"
-            color="primary"
-          >Login</v-btn>
+          <v-btn type="button" class="mr-2" text @click="reset">Reset</v-btn>
+          <v-btn type="submit" @click.prevent="submit" color="primary"
+            >Login</v-btn
+          >
         </div>
       </v-form>
 
@@ -45,19 +45,15 @@
       </div>
     </v-card>
 
-    <v-alert
-      class="mt-4"
-      outlined
-      v-if="membership"
-      type="info"
-    >Your code is eligible to join <strong>{{membership.group.name}}</strong></v-alert>
+    <v-alert class="mt-4" outlined v-if="membership" type="info"
+      >Your code is eligible to join
+      <strong>{{ membership.group.name }}</strong></v-alert
+    >
 
     <transition name="fade">
-      <app-feedback
-        v-if="status"
-        class="mt-5"
-        @closed="status = ''"
-      >{{status}}</app-feedback>
+      <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{
+        status
+      }}</app-feedback>
     </transition>
   </v-container>
 </template>
@@ -67,7 +63,6 @@
 import appFeedback from '@/components/ui/Feedback.vue';
 import api from '@/services/api.service';
 import { autoSelectActiveGroup } from '@/utils/memberships';
-
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -137,7 +132,11 @@ export default {
     this.invitation = invitation;
     if (invitation) {
       this.$store.dispatch('invitation/set', invitation);
-      const { data: [membership] } = await api.get(`/memberships?invitationCode=${invitation}&populate=true`);
+      const {
+        data: [membership],
+      } = await api.get(
+        `/memberships?invitationCode=${invitation}&populate=true`,
+      );
       this.membership = membership;
     }
 
@@ -186,10 +185,13 @@ export default {
         });
 
         // try to auto join group if this is a whitelabel
-        console.log('trying autojoin');
-        if (this.isWhitelabel) {
+        if (this.isWhitelabel && this.registrationEnabled) {
+          console.log('trying autojoin');
+
           try {
-            const { data } = await api.post(`/memberships/join-group?id=${this.whitelabelPartner.id}`);
+            const { data } = await api.post(
+              `/memberships/join-group?id=${this.whitelabelPartner.id}`,
+            );
             console.log('data', data);
             await autoSelectActiveGroup(this.$store, this.whitelabelPartner.id);
           } catch (error) {
@@ -202,7 +204,10 @@ export default {
         if (this.$route.params.redirect) {
           this.$router.push(this.$route.params.redirect);
         } else if (this.hasInvitation) {
-          this.$router.push({ name: 'invitations', query: { code: this.$store.getters['invitation/code'] } });
+          this.$router.push({
+            name: 'invitations',
+            query: { code: this.$store.getters['invitation/code'] },
+          });
         } else {
           this.$router.push('/');
         }

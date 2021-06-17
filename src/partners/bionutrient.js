@@ -1,7 +1,7 @@
 export default {
   name: 'Real Food Campaign',
   domain: 'bionutrient',
-  id: '608d7e971c6a18000147f33a',
+  id: '60c8d419335605000148b072',
   slug: 'bionutrient',
   path: '/bionutrient/',
   logo: '/partners/bionutrient/img/logo.png',
