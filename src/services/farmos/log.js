@@ -49,8 +49,7 @@ async function log(
   user,
   credentials,
   submission,
-  currentAssetId,
-  currentAreaId
+  currentAssetId
 ) {
   const results = [];
   const farmUrl = apiCompose.url;
@@ -98,10 +97,6 @@ async function log(
 
   if (currentAssetId) {
     bodyString = bodyString.replace('$ASSET', currentAssetId);
-  }
-
-  if(currentAreaId) {
-    bodyString = bodyString.replace('$AREA', currentAreaId);
   }
 
   console.log('substituted string', bodyString);
