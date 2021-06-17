@@ -27,7 +27,7 @@
         </p>
 
         <v-alert outlined class="pa-4" type="success" color="blue">
-            If you have already instelled the Android App once, you don't need
+            If you have already installed the Android App once, you don't need
             install the App again.
         </v-alert>
 
