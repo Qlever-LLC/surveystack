@@ -70,7 +70,6 @@ const createPopulationPipeline = () => {
   return pipeline;
 };
 
-
 const getAdminOfSubGroups = async (entities) => {
   const adminOfSubGroups = [];
   for (const e of [...entities]) {
@@ -151,7 +150,7 @@ const getMemberships = async (req, res) => {
       if (member.role !== 'admin') {
         continue;
       }
-      
+
       if (
         member.user &&
         admins.find((adm) => !adm.user || `${adm.user._id}` === `${member.user._id}`)
@@ -319,6 +318,17 @@ const joinGroup = async (req, res) => {
   }
 
   const { user } = res.locals.auth;
+
+  let r = await db.collection(col).findOne({
+    group: group._id,
+    user: user._id,
+  });
+  console.log("user in group findone result: ", r)
+  if(r) {
+    return res.send({
+      status: "ok"
+    })
+  }
 
   const membership = {
     user: user._id,
