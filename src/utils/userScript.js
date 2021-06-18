@@ -27,7 +27,6 @@ export default function buildScriptQuestionIframeContents({
     : `http://localhost:${process.env.VUE_APP_DEV_SERVER_PORT || 8080}`;
   return `
   <head>
-    <!-- <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet"> -->
     <link href="${baseURL}/iframeStyles.css" rel="stylesheet">
   </head>
   <body>
@@ -55,6 +54,7 @@ export default function buildScriptQuestionIframeContents({
 
         import { createUI } from '${baseURL}/iframeUI.js';
         import * as ui from '${baseURL}/iframeUI.js';
+        import * as utils from '${baseURL}/iframeUtils.js';
 
         window.log = requestLogMessage;
         window.runSurveyStackKit = requestRunSurveyStackKit;

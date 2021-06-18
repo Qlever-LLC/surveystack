@@ -50,6 +50,10 @@ export default {
     // for survey, prefetch
 
     // TODO prefetch iframemessaging
+    // fetch('/iframeMessaging.js');
+    // fetch('/iframeUtils.js');
+    // fetch('/iframeUI.js');
+    // fetch('/iframeStyles.css');
   },
 };
 </script>
