@@ -29,6 +29,7 @@
         v-if="tableDialogIsVisible && resource && resource.type === resourceTypes.ONTOLOGY_LIST"
         :resources="resources"
         :resource="resource"
+        :disabled="disabled"
         @change="setResource"
         @delete="removeResource"
         @close-dialog="closeTableDialog"
