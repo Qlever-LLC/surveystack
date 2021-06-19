@@ -7,6 +7,18 @@ import https from 'https';
 import farmosService from '../services/farmos.service';
 import rolesService from '../services/roles.service';
 
+const getFarms = async (req, res) => {
+  let farms;
+  try {
+    farms = await farmosService.getCredentials(res.locals.auth.user);
+  } catch (exception) {
+    console.error(exception);
+    throw boom.badData();
+  }
+
+  return res.send(farms.map(f => ({ name: f.name, url: f.url })));
+}
+
 const common = async (endpoint, req, res) => {
   const farms = await farmosService.getCredentials(res.locals.auth.user);
   const uniqueFarmsByURL = [];
@@ -678,5 +690,6 @@ export default {
   setFarmMemberships,
   checkUrl,
   createFarmOsInstance,
-  createField
+  createField,
+  getFarms,
 };

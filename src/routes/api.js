@@ -185,6 +185,7 @@ router.post(
 router.get('/roles', catchErrors(rolesController.getRoles));
 
 /** farmos */
+router.get('/farmos/farms', catchErrors(farmosController.getFarms));
 router.get('/farmos/fields', catchErrors(farmosController.getFields));
 router.get('/farmos/assets', catchErrors(farmosController.getAssets));
 router.get(
