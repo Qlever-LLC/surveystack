@@ -86,6 +86,24 @@ function stringifyObjectIds(obj) {
     .reduce((r, x) => ({ ...r, ...x }), {});
 }
 
+
+// export function transformSubmissionQuestionTypes(obj, typeHandlers) {
+//   return Object.fromEntries(
+//     Object.entries(obj).map(([key, val]) => {
+//       if (typeof val === 'object' && val !== null) {
+//         const typeHandler = 'meta' in obj[key]
+//           && obj[key].meta.type in typeHandlers
+//           && typeHandlers[obj[key].meta.type];
+//         if (typeHandler) {
+//           return [key, typeHandler(val)];
+//         }
+//         return [key, transformSubmissionQuestionTypes(val, typeHandlers)];
+//       }
+//       return [key, val];
+//     })
+//   );
+// }
+
 function createHeaders(mergedObject, entities, options = { excludeDataMeta: false }) {
   stringifyObjectIds(mergedObject);
 

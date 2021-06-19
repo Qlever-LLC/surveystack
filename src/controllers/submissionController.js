@@ -6,7 +6,7 @@ import { ObjectId } from 'mongodb';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
-import csvService, { geojsonTransformer } from '../services/csv.service';
+import csvService from '../services/csv.service';
 import headerService from '../services/header.service';
 import * as farmOsService from '../services/farmos.service';
 import rolesService from '../services/roles.service';
@@ -493,12 +493,14 @@ const getSubmissionsCsv = async (req, res) => {
   }
 
   const entities = await db.collection(col).aggregate(pipeline).toArray();
-  csvService.transformSubmissionQuestionTypes(
-    entities, 
-    { 
-      geoJSON: csvService.geojsonTransformer,
-    },
+  const transformer = (entity) => csvService.transformSubmissionQuestionTypes(
+    entity, 
+    { geoJSON: csvService.geojsonTransformer },
   );
+  const transformedEntities = entities.map(transformer);
+  console.log(entities[0].data.map_1.value.features);
+  console.log('---');
+  console.log(transformedEntities[0].data.map_1.value.features);
 
   const headers = await headerService.getHeaders(req.query.survey, entities, {
     excludeDataMeta: !queryParam(req.query.showCsvDataMeta),
