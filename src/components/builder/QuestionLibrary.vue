@@ -30,7 +30,18 @@
         {{surveys.pagination.total}} results
       </small>
     </div>
-    <v-container fluid class="pa-0">
+    <v-container
+      v-if="loading"
+      class="d-flex align-center justify-center"
+      style="height: 100%"
+    >
+      <v-progress-circular
+        :size="50"
+        color="primary"
+        indeterminate
+      />
+    </v-container>
+    <v-container fluid class="pa-0" v-else>
       <v-row dense>
         <v-col
           v-for="c in surveys.content"
@@ -171,6 +182,7 @@ export default {
           skip: 0,
           limit: 100000,
         },
+        loading: false,
       },
       selectedSurvey: null,
     };
@@ -191,7 +203,9 @@ export default {
       queryParams.append('limit', PAGINATION_LIMIT);
 
       try {
+        this.loading = true;
         const { data } = await api.get(`/surveys/list-page?${queryParams}`);
+        this.loading = false;
 
         for (let i = 0; i < data.content.length; i++) {
           const s = data.content[i];
@@ -222,6 +236,7 @@ export default {
           parsedSkip: 0,
           total: 0,
         },
+        loading: false,
       };
     },
     addToSurvey(librarySurveyId) {
