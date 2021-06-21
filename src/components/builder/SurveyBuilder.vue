@@ -410,8 +410,9 @@ export default {
       // load library survey
       const { data } = await api.get(`/surveys/${librarySurveyId}`);
 
+      // remove old resources copied from the library survey
+      this.survey.resources = this.survey.resources.filter(value => value.libraryId !== librarySurveyId);
       // copy resources from library survey
-      // TODO MH overwrite resources with same libraryId
       data.resources.forEach((r) => {
         r.libraryId = data._id;
         r.libraryVersion = data.latestVersion;
