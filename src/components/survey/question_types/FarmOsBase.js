@@ -17,9 +17,6 @@ const base = type => ({
         this.changed(this.getValueOrNull(v));
       }
     },
-    info(data) {
-      console.log('info------', data);
-    },
     remove(item) {
       this.changed(
         this.value.filter(v => v !== item.value),
@@ -39,11 +36,23 @@ const base = type => ({
       const item = this.farms.find(x => x.value === value);
       return (item && item.label) || value;
     },
+    async fetchFarms() {
+      this.loading = true;
+      try {
+        const response = await api.get('farmos/farms');
+        this.farms = response.data.map(({ name, url }) => ({
+          label: name,
+          value: url,
+        }));
+      } catch (err) {
+        console.error(err);
+      }
+      this.loading = false;
+    },
     async fetchAreas() {
       this.loading = true;
       try {
         const response = await api.get('farmos/fields');
-        console.log('fields', response);
         this.farms = response.data.flatMap((f) => {
           // '9' => { actualResponse of FarmosInstance}
           const firstKey = Object.keys(f.data)[0];
