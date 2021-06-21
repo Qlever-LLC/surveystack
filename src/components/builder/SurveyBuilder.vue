@@ -647,7 +647,6 @@ export default {
       this.$router.push('/surveys/browse');
     },
     async setControlSource(value) {
-      console.log('setControlSource', value);
       this.$set(this.control.options, 'source', value);
       if (this.control.type === 'script') {
         const data = await this.fetchScript(value);

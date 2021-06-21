@@ -43,7 +43,7 @@ Vue.use(Vuetify);
 const localVue = createLocalVue();
 
 
-describe('Date Question Type', () => {
+describe.skip('Date Question Type', () => {
   let vuetify;
   beforeEach(() => {
     vuetify = new Vuetify();

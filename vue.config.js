@@ -85,10 +85,5 @@ module.exports = {
       ],
     },
   },
-  pluginOptions: {
-    webpackBundleAnalyzer: {
-      openAnalyzer: false,
-      // analyzerMode: 'static',
-    },
-  },
+  pluginOptions: {},
 };

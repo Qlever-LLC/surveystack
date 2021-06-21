@@ -227,9 +227,6 @@
 <script>
 import { uniqWith, isEqual } from 'lodash';
 import ObjectId from 'bson-objectid';
-import slugify from '@/utils/slugify';
-
-
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
 
 export default {

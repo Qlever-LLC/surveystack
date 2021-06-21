@@ -10,25 +10,18 @@
         :disabled="!!control.libraryId && !control.isLibraryRoot"
         :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
       />
-      <v-text-field
+      <v-text-field outlined v-model="control.label" label="Label" />
+      <v-text-field outlined v-model="control.hint" label="Hint" />
+      <v-text-field outlined v-model="control.moreInfo" label="More info" />
+      <v-checkbox
+        v-if="isText"
         outlined
-        v-model="control.label"
-        label="Label"
+        v-model="control.options.enableQr"
+        :disabled="!!control.libraryId && !control.isLibraryRoot"
+        label="QR Code"
       />
-      <v-text-field
-        outlined
-        v-model="control.hint"
-        label="Hint"
-      />
-      <v-text-field
-        outlined
-        v-model="control.moreInfo"
-        label="More info"
-      />
-      <div
-        class="d-flex align-start"
-        v-if="isScript"
-      >
+
+      <div class="d-flex align-start" v-if="isScript">
         <v-autocomplete
           v-model="scriptSourceId"
           v-if="isScript"
@@ -64,6 +57,30 @@
         </v-btn> -->
       </div>
       <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
+
+      <v-text-field
+        v-if="control.type === 'script'"
+        outlined
+        v-model="control.options.buttonLabel"
+        label="Run Button Label"
+      />
+
+      <v-checkbox
+        class="ma-0 text--primary"
+        v-model="control.options.isNativeScript"
+        v-if="control.type === 'script'"
+        color="grey darken-1"
+        label="Native Script"
+        :disabled="!!control.libraryId && !control.isLibraryRoot"
+      >
+        <template slot="label">
+          <div>
+            <div class="text--primary">Native Script</div>
+            <div class="body-2">Show Download Link for Surveystack Kit APK</div>
+          </div>
+        </template>
+      </v-checkbox>
+
       <v-textarea
         v-model="scriptParams"
         @change="handleScriptParamsChange"
@@ -101,7 +118,9 @@
         <template slot="label">
           <div>
             <div class="text--primary">Private</div>
-            <div class="body-2">Only admins and original submitters can see this field</div>
+            <div class="body-2">
+              Only admins and original submitters can see this field
+            </div>
           </div>
         </template>
       </v-checkbox>
@@ -117,7 +136,9 @@
         <template slot="label">
           <div>
             <div class="text--primary">Allow hide</div>
-            <div class="body-2">Allow users of this question set to hide this question</div>
+            <div class="body-2">
+              Allow users of this question set to hide this question
+            </div>
           </div>
         </template>
       </v-checkbox>
@@ -149,7 +170,10 @@
         <template slot="label">
           <div>
             <div class="text--primary">Hidden</div>
-            <div class="body-2">Submitters can not see this field. This option is intentionally allowed by the question set designer</div>
+            <div class="body-2">
+              Submitters can not see this field. This option is intentionally
+              allowed by the question set designer
+            </div>
           </div>
         </template>
       </v-checkbox>
@@ -181,21 +205,12 @@
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
 
-      <div
-        v-if="!showAdvanced"
-        class="d-flex justify-end mt-4"
-      >
-        <v-btn
-          @click="showAdvanced = true"
-          color="grey darken-1"
-          small
-          text
-        >advanced</v-btn>
+      <div v-if="!showAdvanced" class="d-flex justify-end mt-4">
+        <v-btn @click="showAdvanced = true" color="grey darken-1" small text
+          >advanced</v-btn
+        >
       </div>
-      <div
-        v-if="showAdvanced"
-        class="mt-2"
-      >
+      <div v-if="showAdvanced" class="mt-2">
         <div class="d-flex justify-space-between">
           <v-card-title class="d-flex">Advanced Options</v-card-title>
           <v-icon @click.stop="showAdvanced = false">mdi-close</v-icon>
@@ -315,6 +330,8 @@
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         @set-control-source="(val) => $emit('set-control-source', val)"
       />
+
+      <geojson-properties v-if="isGeoJSON" v-model="control.options.geoJSON" />
     </v-form>
     <div v-else>...</div>
   </div>
@@ -327,6 +344,7 @@ import appMatrixProperties from '@/components/builder/MatrixProperties.vue';
 import appOntologyProperties from '@/components/builder/OntologyProperties.vue';
 import InstructionsEditor from '@/components/builder/TipTapEditor.vue';
 import InstructionsImageSplitEditor from '@/components/builder/InstructionsImageSplitEditor.vue';
+import GeoJSONProperties from '@/components/builder/GeoJSONProperties.vue';
 
 import { convertToKey } from '@/utils/builder';
 
@@ -337,23 +355,16 @@ export default {
     appOntologyProperties,
     appMatrixProperties,
     InstructionsImageSplitEditor,
+    'geojson-properties': GeoJSONProperties,
   },
   props: {
     control: {
       required: false,
     },
-    calculate: {
-
-    },
-    relevance: {
-
-    },
-    constraint: {
-
-    },
-    apiCompose: {
-
-    },
+    calculate: {},
+    relevance: {},
+    constraint: {},
+    apiCompose: {},
     survey: {
       required: true,
     },
@@ -369,7 +380,10 @@ export default {
       showAdvanced: false,
       // if we migrate to using Vue Composition API, the script functionality could be extracted out into a `useScriptProperties` hook
       scriptSourceId: null,
-      scriptParams: (this.control && this.control.options && JSON.stringify(this.control.options.params))
+      scriptParams:
+        (this.control
+          && this.control.options
+          && JSON.stringify(this.control.options.params))
         || JSON.stringify({}),
       scriptSourceIsLoading: false,
       scriptSourceItems: [],
@@ -414,6 +428,9 @@ export default {
     isDate() {
       return this.control.type === 'date';
     },
+    isText() {
+      return this.control.type === 'string';
+    },
     isScript() {
       return this.control.type === 'script';
     },
@@ -429,6 +446,9 @@ export default {
     isMatrix() {
       return this.control.type === 'matrix';
     },
+    isGeoJSON() {
+      return this.control.type === 'geoJSON';
+    },
     isInstructionsImageSplit() {
       return this.control.type === 'instructionsImageSplit';
     },
@@ -438,7 +458,11 @@ export default {
         return true;
       }
 
-      if (['group', 'page', 'instructions', 'instructionsImageSplit'].includes(this.control.type)) {
+      if (
+        ['group', 'page', 'instructions', 'instructionsImageSplit'].includes(
+          this.control.type,
+        )
+      ) {
         return false;
       }
 
@@ -462,11 +486,15 @@ export default {
     },
     nameHasValidCharacters(val) {
       const namePattern = /^[\w]*$/;
-      return namePattern.test(val) ? true : 'Data name must only contain valid charcters';
+      return namePattern.test(val)
+        ? true
+        : 'Data name must only contain valid charcters';
     },
     nameHasValidLength(val) {
       const namePattern = /^.{1,}$/; // one character should be ok, especially within groups
-      return namePattern.test(val) ? true : 'Data name must be at least 1 characters in length';
+      return namePattern.test(val)
+        ? true
+        : 'Data name must be at least 1 characters in length';
     },
     openAdvancedEditor() {
       // TODO: can't pass params to new window
