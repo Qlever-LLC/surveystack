@@ -111,7 +111,7 @@
       >
         <code-editor
           :saveable="true"
-          :readonly="!!control.libraryId && !control.options.allowModify"
+          :readonly="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
           @close="() => setScriptIsVisible(false)"
           :code="scriptCode.content"
           class="main-code-editor"
@@ -163,7 +163,7 @@
                 v-if="selectedTab !== null"
                 @close="hideCode = true"
                 :code="activeCode"
-                :readonly="!!control.libraryId && !control.options.allowModify"
+                :readonly="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
                 class="main-code-editor"
                 :refresh="codeRefreshCounter"
                 runnable="true"
