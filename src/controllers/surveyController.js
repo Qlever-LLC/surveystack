@@ -207,15 +207,7 @@ const buildPipelineForGetSurveyPage = ({
 
         // add to pipeline the aggregation for number of submissions of referencing surveys
         const aggregateSubmissionCount = [
-            {
-                '$match': {
-                    '$expr': {
-                        '$eq': [
-                            '$meta.isLibrary', true
-                        ]
-                    }
-                }
-            }, {
+           {
                 '$lookup': {
                     'from': 'surveys',
                     'let': {
