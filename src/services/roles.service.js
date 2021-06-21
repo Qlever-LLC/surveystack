@@ -8,7 +8,10 @@ const isParent = (parent, child) => {
 
 const getParentGroups = async (groupId) => {
   //console.log("group id", groupId);
-  const groups = await db.collection('groups').find({ _id: new ObjectId(groupId) }).toArray();
+  const groups = await db
+    .collection('groups')
+    .find({ _id: new ObjectId(groupId) })
+    .toArray();
 
   if (groups.length != 1) {
     return [];
@@ -28,7 +31,6 @@ const getParentGroups = async (groupId) => {
   }
 
   const root = `/${parts[1]}/`;
-
 
   //console.log("root", root);
 
@@ -68,7 +70,9 @@ export const hasRole = async (user, group, role) => {
   roles.forEach((r) => {
     if (targetRole.startsWith(r)) {
       console.log(
-        `targetRole '${targetRole}' starts with '${r}'\n  => User ${userId} is granted ${role}@${groupEntity.path}`
+        `targetRole '${targetRole}' starts with '${r}'\n  => User ${userId} is granted ${role}@${
+          groupEntity.path
+        }`
       );
       ret = true;
     }
@@ -78,6 +82,9 @@ export const hasRole = async (user, group, role) => {
 };
 
 export const hasAdminRole = async (user, group) => {
+  if (!group) {
+    return false;
+  }
   const groups = await getDescendantGroups(group);
 
   const ret = await hasRole(user, group, 'admin');
