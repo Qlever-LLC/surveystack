@@ -48,6 +48,8 @@ export default {
     // this.$store.dispatch('surveys/fetchPinned', ),
     // fetch pinned surveys
     // for survey, prefetch
+
+    // TODO prefetch iframemessaging
   },
 };
 </script>

@@ -205,6 +205,7 @@ const MATRIX_COLUMN_TYPES = [
   { text: 'Ontology - Dropdown', value: 'dropdown' },
   { text: 'Ontology - Auto Complete', value: 'autocomplete' },
   { text: 'Text', value: 'text' },
+  { text: 'Text and QR-Code', value: 'qrcode' },
   { text: 'Number', value: 'number' },
   { text: 'Date', value: 'date' },
   { text: 'Farmos Field', value: 'farmos_field' },

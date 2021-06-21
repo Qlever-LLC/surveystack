@@ -11,7 +11,7 @@
       <resource-selector
         :resources="filteredResources"
         :value="value"
-        newResourceType="ONTOLOGY_LIST"
+        newResourceTypes="['ONTOLOGY_LIST']"
         @on-new="createResourceHandler"
         @on-select="selectResourceHandler"
       />

@@ -5,17 +5,28 @@
       :redacted="redacted"
       :required="required"
     />
-    <v-text-field
-      outlined
-      :label="control.hint"
-      v-bind:value="value"
-      v-on:input="onInput"
-      @keyup.enter.prevent="submit"
-      ref="textField"
-      class="full-width"
-      :disabled="!relevant"
-      hide-details
-    />
+    <div style="display: flex">
+      <div style="flex: 1">
+        <v-text-field
+          outlined
+          :label="control.hint"
+          v-bind:value="value"
+          v-on:input="onInput"
+          @keyup.enter.prevent="submit"
+          ref="textField"
+          class="full-width"
+          :disabled="!relevant"
+          hide-details
+        />
+      </div>
+      <app-qr-scanner
+        style="flex: 0"
+        class="ml-4"
+        v-if="control.options.enableQr"
+        @codeDetected="onQrCodeScanned"
+      ></app-qr-scanner>
+    </div>
+
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
@@ -23,16 +34,23 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 import { isIos } from '@/utils/compatibility';
+import appQrScanner from '@/components/ui/QrScanner.vue';
 
 import { getValueOrNull } from '@/utils/surveyStack';
 
 export default {
   mixins: [baseQuestionComponent],
+  components: {
+    appQrScanner,
+  },
   methods: {
     getValueOrNull,
     submit() {
       this.onInput(this.value);
       this.$emit('next');
+    },
+    onQrCodeScanned(code) {
+      this.changed(code);
     },
     onInput(v) {
       if (this.value !== v) {

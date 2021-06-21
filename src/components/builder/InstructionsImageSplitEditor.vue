@@ -10,7 +10,7 @@
         :resources="filteredResources"
         :value="value && value.images && value.images[0]"
         :disabled="disabled"
-        newResourceType="IMAGE"
+        :newResourceTypes="['IMAGE']"
         @on-new="createResourceHandler"
         @on-select="selectResourceHandler"
       />
