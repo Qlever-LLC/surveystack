@@ -11,24 +11,8 @@
       </v-btn>
     </div>
 
-
-    <div class="mt-8 mb-4 d-flex justify-center">
-      <v-btn
-        x-large
-        color="primary"
-        @click="startDraft(entity._id)"
-        :disabled="!isAllowedToSubmit"
-      >
-        <v-icon>mdi-file-document-box-plus-outline</v-icon>
-        <span class="ml-2">Start Survey</span>
-      </v-btn>
-      <div class="mt-2 text--secondary" v-if="!isAllowedToSubmit">
-        {{ submissionRightsHint }}
-      </div>
-    </div>
-
     <h1>{{ entity.name }}</h1>
-    <div v-if="surveyInfo">
+    <div v-if="surveyInfo" class="survey-info">
       <div class="survey-description" v-if="surveyInfo.description">
         {{ surveyInfo.description }}
       </div>
@@ -38,6 +22,25 @@
       </div>
       <div v-if="surveyInfo.latestSubmission" class="text--secondary">
         Latest submission on {{ surveyInfo.latestSubmission.dateModified }}
+      </div>
+    </div>
+
+
+    <div class="pt-8 pb-4 d-flex justify-center start-button-container">
+      <div class="text-center">
+        <v-btn
+          x-large
+          color="primary"
+          @click="startDraft(entity._id)"
+          :disabled="!isAllowedToSubmit"
+          class="start-button"
+        >
+          <v-icon>mdi-file-document-box-plus-outline</v-icon>
+          <span class="ml-2">Start Survey</span>
+        </v-btn>
+        <div class="mt-2 text--secondary text-center" v-if="!isAllowedToSubmit">
+          {{ submissionRightsHint }}
+        </div>
       </div>
     </div>
 
@@ -183,5 +186,17 @@ export default {
 .survey-description {
   margin: 16px 0px;
   white-space: pre-wrap;
+}
+
+.start-button-container {
+  background: linear-gradient(to bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,0.85) 50%);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+.survey-info {
+  padding-bottom: 100px;
 }
 </style>
