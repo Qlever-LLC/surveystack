@@ -153,12 +153,12 @@ const getMemberships = async (req, res) => {
 
       if (
         member.user &&
-        admins.find((adm) => !adm.user || `${adm.user._id}` === `${member.user._id}`)
+        admins.find((m) => !m.user || `${m.user._id}` === `${member.user._id}`)
       ) {
         continue;
       }
 
-      if (admins.find((adm) => `${adm._id}` === `${member._id}`)) {
+      if (admins.find((m) => `${m._id}` === `${member._id}`)) {
         continue;
       }
 
@@ -168,14 +168,18 @@ const getMemberships = async (req, res) => {
     console.log('admins', admins);
 
     for (const member of filteredMemberships) {
+      if (member.role !== 'user') {
+        continue;
+      }
+
       if (
         member.user &&
-        admins.find((adm) => !adm.user || `${adm.user._id}` === `${member.user._id}`)
+          otherMembers.find((m) => !m.user || `${m.user._id}` === `${member.user._id}`)
       ) {
         continue;
       }
 
-      if (admins.find((adm) => `${adm._id}` === `${member._id}`)) {
+      if (otherMembers.find((m) => `${m._id}` === `${member._id}`)) {
         continue;
       }
 
