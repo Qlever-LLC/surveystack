@@ -169,19 +169,17 @@ export default {
         };
       }).filter(item => item.value !== null);
 
-      // const explodeItem = item => item.value.map((v, i) => ({
-      //   id: `${item.id}__${i}`,
-      //   label: JSON.stringify(v).replace(/^"(.+(?="$))"$/, '$1'),
-      //   value: v,
-      // }));
+      const explodeItem = item => item.value.map((v, i) => ({
+        id: `${item.id}__${i}`,
+        label: JSON.stringify(v).replace(/^"(.+(?="$))"$/, '$1'),
+        value: v,
+      }));
 
-      // const explodedItems = items
-      //   .map(it => (Array.isArray(it.value) ? explodeItem(it) : [it]))
-      //   .reduce((acc, curr) => [...acc, ...curr], []);
+      const explodedItems = items
+        .map(it => (Array.isArray(it.value) ? explodeItem(it) : [it]))
+        .reduce((acc, curr) => [...acc, ...curr], []);
 
-      // console.log('exploded', explodedItems);
-
-      const uniqueItems = Object.values(groupBy(items, 'value'))
+      const uniqueItems = Object.values(groupBy(explodedItems, 'label'))
         .map(group => ({
           ...group[0],
           // count: group.length,
@@ -213,7 +211,6 @@ export default {
     sourceIsValid() {
       return this.items
         && Array.isArray(this.items)
-        && this.items.length > 0
         && this.items.every(({ label, value }) => label && value);
     },
     autocompleteMenuProps() {
