@@ -70,6 +70,15 @@
 import TreeModel from 'tree-model';
 import api from '@/services/api.service';
 
+function getSurveyById(surveys, id) {
+  return surveys.find(s => s._id === id);
+}
+
+function getPathByPath(paths, path) {
+  return paths.find(p => p.path === path);
+}
+
+
 export default {
   props: {
     resource: {
@@ -107,8 +116,11 @@ export default {
       this.path = '';
     },
     updateResource() {
+      const survey = getSurveyById(this.surveys, this.surveyId);
+      const path = getPathByPath(this.paths, this.path);
       this.$emit('change', {
         ...this.resource,
+        label: `${survey && survey.name} - ${path.control.label}`,
         content: {
           id: this.surveyId,
           version: this.surveyVersion,
@@ -147,7 +159,10 @@ export default {
         const control = node.model;
         const name = `${control.label} (${path})`;
         paths.push({
-          node, path, control, name,
+          node,
+          path,
+          control,
+          name,
         });
         return true;
       });
