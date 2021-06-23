@@ -115,6 +115,36 @@ import { getValueOrNull, getNested } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import api from '@/services/api.service';
 
+export async function fetchSubmissions(apiService, surveyId, path) {
+  const query = `&project={"${path}.value":1}`;
+  const { data } = await apiService.get(`/submissions?survey=${surveyId}${query}`);
+  const items = data.map((item) => {
+    const value = getNested(item, `${path}.value`, null);
+    return {
+      id: item._id,
+      label: JSON.stringify(value).replace(/^"(.+(?="$))"$/, '$1'),
+      value,
+    };
+  }).filter(item => item.value !== null);
+
+  const explodeItem = item => item.value.map((v, i) => ({
+    id: `${item.id}__${i}`,
+    // stringify and remove wrapping quote characters so that strings are rendered without quotation marks
+    label: JSON.stringify(v).replace(/^"(.+(?="$))"$/, '$1'),
+    value: v,
+  }));
+
+  const explodedItems = items
+    .map(it => (Array.isArray(it.value) ? explodeItem(it) : [it]))
+    .reduce((acc, curr) => [...acc, ...curr], []);
+
+  const uniqueItems = Object.values(groupBy(explodedItems, 'label'))
+    .map(group => ({
+      ...group[0],
+      label: `${group[0].label}${group.length > 1 ? ` (${group.length})` : ''}`,
+    }));
+  return uniqueItems;
+}
 
 export default {
   mixins: [baseQuestionComponent],
@@ -155,39 +185,7 @@ export default {
       const item = this.items.find(x => x.value === value);
       return (item && item.label) || value;
     },
-    async fetchSubmissions(surveyId, path) {
-      const base = `&project={"${path}.value":1}`;
-      const query = base;
-      const r = await api.get(`/submissions?survey=${surveyId}${query}`);
-      const { data } = r;
-      const items = data.map((item) => {
-        const value = getNested(item, `${path}.value`, null);
-        return {
-          id: item._id,
-          label: JSON.stringify(value).replace(/^"(.+(?="$))"$/, '$1'),
-          value,
-        };
-      }).filter(item => item.value !== null);
-
-      const explodeItem = item => item.value.map((v, i) => ({
-        id: `${item.id}__${i}`,
-        label: JSON.stringify(v).replace(/^"(.+(?="$))"$/, '$1'),
-        value: v,
-      }));
-
-      const explodedItems = items
-        .map(it => (Array.isArray(it.value) ? explodeItem(it) : [it]))
-        .reduce((acc, curr) => [...acc, ...curr], []);
-
-      const uniqueItems = Object.values(groupBy(explodedItems, 'label'))
-        .map(group => ({
-          ...group[0],
-          // count: group.length,
-          label: `${group[0].label}${group.length > 1 ? ` (${group.length})` : ''}`,
-        }));
-      return uniqueItems;
-    },
-
+    fetchSubmissions,
   },
   computed: {
     getValue() {
@@ -236,7 +234,7 @@ export default {
       const { id, path } = this.resource.content;
       this.isLoading = true;
       try {
-        this.submissionItems = await this.fetchSubmissions(id, path);
+        this.submissionItems = await this.fetchSubmissions(api, id, path);
       } finally {
         this.isLoading = false;
       }
