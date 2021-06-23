@@ -1,6 +1,6 @@
 <template>
   <v-container v-if="entity && show">
-    <div class="d-flex justify-end">
+    <div class="d-flex justify-end mb-4">
       <v-btn v-if="editable" class="mx-2" :to="`/surveys/${entity._id}/edit`">
         <v-icon>mdi-pencil</v-icon>
         <span class="ml-2">Edit</span>
@@ -38,7 +38,7 @@
           <v-icon>mdi-file-document-box-plus-outline</v-icon>
           <span class="ml-2">Start Survey</span>
         </v-btn>
-        <div class="mt-2 text--secondary text-center" v-if="!isAllowedToSubmit">
+        <div class="mt-2 text--secondary text-center submission-rights-hint" v-if="!isAllowedToSubmit">
           {{ submissionRightsHint }}
         </div>
       </div>
@@ -190,6 +190,7 @@ export default {
 
 .start-button-container {
   background: linear-gradient(to bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,0.85) 50%);
+
   position: fixed;
   bottom: 0;
   left: 0;
@@ -197,6 +198,15 @@ export default {
 }
 
 .survey-info {
-  padding-bottom: 100px;
+  padding-bottom: 150px;
+}
+
+/* vuetify default for disabled buttons makes them */
+.theme--light.v-btn.v-btn--disabled:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
+  background-color: #ccc !important;
+}
+
+.submission-rights-hint {
+  max-width: 500px;
 }
 </style>
