@@ -234,8 +234,10 @@ describe('Ontology question', () => {
     it('fetchSubmissions handles items for checkboxes of strings', async () => {
       const mockApiService = { get: jest.fn(() => mockApiGetCheckboxesSubmissions()) };
       const items = await fetchSubmissions(mockApiService, 'my-survey-id', 'data.checkboxes_1');
-      expect(items[0].label).toBe('cat (5)');
-      expect(items[1].label).toBe('dog (3)');
+      expect(items[0].label).toBe('cat');
+      expect(items[0].count).toBe(5);
+      expect(items[1].label).toBe('dog');
+      expect(items[1].count).toBe(3);
     });
   });
 });

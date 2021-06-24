@@ -42,7 +42,12 @@
         v-if="!!control.options.hasMultipleSelections"
       >
         <v-list-item-content>
-          <v-list-item-title v-html="data.item.label" />
+          <v-list-item-title>
+            {{ data.item.label }}
+            <v-chip v-if="data.item.count" small class="ma-2">
+              {{ data.item.count }}
+            </v-chip>
+          </v-list-item-title>
         </v-list-item-content>
       </template>
     </v-autocomplete>
@@ -87,7 +92,12 @@
         v-if="!!control.options.hasMultipleSelections"
       >
         <v-list-item-content>
-          <v-list-item-title v-html="data.item.label" />
+          <v-list-item-title>
+            {{ data.item.label }}
+            <v-chip v-if="data.item.count" small class="ma-2">
+              {{ data.item.count }}
+            </v-chip>
+          </v-list-item-title>
         </v-list-item-content>
       </template>
     </v-combobox>
@@ -141,7 +151,8 @@ export async function fetchSubmissions(apiService, surveyId, path) {
   const uniqueItems = Object.values(groupBy(explodedItems, 'label'))
     .map(group => ({
       ...group[0],
-      label: `${group[0].label}${group.length > 1 ? ` (${group.length})` : ''}`,
+      label: group[0].label,
+      count: group.length,
     }));
   return uniqueItems;
 }
