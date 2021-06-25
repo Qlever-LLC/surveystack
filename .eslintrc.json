@@ -6,7 +6,8 @@
   "extends": "eslint:recommended",
   "globals": {
     "Atomics": "readonly",
-    "SharedArrayBuffer": "readonly"
+    "SharedArrayBuffer": "readonly",
+    "jest/globals": true
   },
   "parserOptions": {
     "ecmaVersion": 2018,
@@ -14,5 +15,8 @@
   },
   "rules": {
     "no-unused-vars": [1]
+  },
+  "plugins": {
+    ["jest"]
   }
 }

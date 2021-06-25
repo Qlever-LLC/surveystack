@@ -4,6 +4,5 @@ module.exports = {
 	resetModules: true,
 	resetMocks: true,
 	moduleFileExtensions: ['js'],
-	// preset: 'ts-jest',
-	// setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
+	setupFilesAfterEnv: ['./tests/setupTests.js'],
 };

@@ -52,7 +52,7 @@ function stringifyObjectIds(obj) {
  * @param {*} o submission question object e.g. { meta: { type: 'geoJSON', ...}, value: {...}}
  * @returns updated submission question object
  */
- export function geojsonTransformer(o) {
+function geojsonTransformer(o) {
   return {
     ...o,
     value: {
@@ -62,6 +62,7 @@ function stringifyObjectIds(obj) {
   };
 }
 
+
 /**
  * transform submission object for presentation in csv
  * @param {*} obj: submission object to transform
@@ -70,39 +71,22 @@ function stringifyObjectIds(obj) {
  * should return the updated value for the question value
  * @returns updated submission object
  */
- export function transformSubmissionQuestionTypes(obj, typeHandlers) {
-  return Object.entries(obj).map(([key, val]) => {
-    if (typeof val === 'object' && val !== null) {
-      const typeHandler = 'meta' in obj[key]
-        && obj[key].meta.type in typeHandlers
-        && typeHandlers[obj[key].meta.type];
-      if (typeHandler) {
-        return { [key]: typeHandler(val) };
+function transformSubmissionQuestionTypes(obj, typeHandlers) {
+  return Object.fromEntries(
+    Object.entries(obj).map(([key, val]) => {
+      if (typeof val === 'object' && val !== null) {
+        const typeHandler = 'meta' in val
+          && val.meta.type in typeHandlers
+          && typeHandlers[val.meta.type];
+        if (typeHandler) {
+          return [key, typeHandler(val)];
+        }
+        return [key, transformSubmissionQuestionTypes(val, typeHandlers)];
       }
-      return { [key]: transformSubmissionQuestionTypes(val, typeHandlers) };
-    }
-    return { [key]: val };
-  }) // Flatten objects
-    .reduce((r, x) => ({ ...r, ...x }), {});
+      return [key, val];
+    })
+  );
 }
-
-
-// export function transformSubmissionQuestionTypes(obj, typeHandlers) {
-//   return Object.fromEntries(
-//     Object.entries(obj).map(([key, val]) => {
-//       if (typeof val === 'object' && val !== null) {
-//         const typeHandler = 'meta' in obj[key]
-//           && obj[key].meta.type in typeHandlers
-//           && typeHandlers[obj[key].meta.type];
-//         if (typeHandler) {
-//           return [key, typeHandler(val)];
-//         }
-//         return [key, transformSubmissionQuestionTypes(val, typeHandlers)];
-//       }
-//       return [key, val];
-//     })
-//   );
-// }
 
 function createHeaders(mergedObject, entities, options = { excludeDataMeta: false }) {
   stringifyObjectIds(mergedObject);
@@ -192,9 +176,10 @@ function createCsv(submissions, headers) {
   return csv;
 }
 
-export default { 
+export { 
   createCsv, 
   createCsvLegacy, 
   createHeaders,
   transformSubmissionQuestionTypes,
+  geojsonTransformer,
 };

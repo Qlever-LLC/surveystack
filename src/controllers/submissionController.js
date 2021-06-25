@@ -6,7 +6,7 @@ import { ObjectId } from 'mongodb';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
-import csvService from '../services/csv.service';
+import * as csvService from '../services/csv.service';
 import headerService from '../services/header.service';
 import * as farmOsService from '../services/farmos.service';
 import rolesService from '../services/roles.service';
@@ -207,8 +207,6 @@ const buildPipeline = async (req, res) => {
   let match = {};
   let project = {};
   let sort = DEFAULT_SORT;
-  let skip = 0;
-  let limit = DEFAULT_LIMIT;
   let user = null;
   let roles = [];
 
@@ -460,16 +458,11 @@ const getSubmissions = async (req, res) => {
   return res.send(entities);
 };
 
-const getSubmissionsCsv = async (req, res) => {
+const addSkipToPipeline = (pipeline, reqSkip) => {
   let skip = 0;
-  let limit = DEFAULT_LIMIT;
-
-  const pipeline = await buildPipeline(req, res);
-
-  // skip
-  if (req.query.skip) {
+  if (reqSkip) {
     try {
-      const querySkip = Number.parseInt(req.query.skip);
+      const querySkip = Number.parseInt(reqSkip);
       if (querySkip > 0) {
         skip = querySkip;
         pipeline.push({ $skip: skip });
@@ -478,11 +471,13 @@ const getSubmissionsCsv = async (req, res) => {
       throw boom.badRequest(`Bad query paramter skip: ${skip}`);
     }
   }
+};
 
-  // limit
-  if (req.query.limit) {
+const addLimitToPipeline = (pipeline, reqLimit) => {
+  let limit = DEFAULT_LIMIT;
+  if (reqLimit) {
     try {
-      const queryLimit = Number.parseInt(req.query.limit);
+      const queryLimit = Number.parseInt(reqLimit);
       if (queryLimit > 0) {
         limit = queryLimit;
         pipeline.push({ $limit: limit });
@@ -491,22 +486,28 @@ const getSubmissionsCsv = async (req, res) => {
       throw boom.badRequest(`Bad query paramter limit: ${limit}`);
     }
   }
+};
+
+const getSubmissionsCsv = async (req, res) => {
+  const pipeline = await buildPipeline(req, res);
+  addSkipToPipeline(pipeline, req.query.skip);
+  addLimitToPipeline(pipeline, req.query.limit);
 
   const entities = await db.collection(col).aggregate(pipeline).toArray();
-  const transformer = (entity) => csvService.transformSubmissionQuestionTypes(
-    entity, 
-    { geoJSON: csvService.geojsonTransformer },
-  );
+  const transformer = (entity) => ({
+    ...entity,
+    data: csvService.transformSubmissionQuestionTypes(
+      entity.data, 
+      { geoJSON: csvService.geojsonTransformer },
+    ),
+  });
   const transformedEntities = entities.map(transformer);
-  console.log(entities[0].data.map_1.value.features);
-  console.log('---');
-  console.log(transformedEntities[0].data.map_1.value.features);
 
-  const headers = await headerService.getHeaders(req.query.survey, entities, {
+  const headers = await headerService.getHeaders(req.query.survey, transformedEntities, {
     excludeDataMeta: !queryParam(req.query.showCsvDataMeta),
   });
 
-  const csv = csvService.createCsv(entities, headers);
+  const csv = csvService.createCsv(transformedEntities, headers);
   res.set('Content-Type', 'text/plain');
   return res.send(csv);
 };
