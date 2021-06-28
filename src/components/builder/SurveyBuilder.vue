@@ -220,6 +220,23 @@
             </v-card-text>
           </v-card>
         </v-overlay>
+
+        <!-- <v-snackbar
+          v-model="infoSnack"
+        >
+          hello
+
+          <template v-slot:action="{ attrs }">
+            <v-btn
+              color="red"
+              text
+              v-bind="attrs"
+              @click="infoSnack = false"
+            >
+              Close
+            </v-btn>
+          </template>
+        </v-snackbar> -->
       </pane>
 
     </splitpanes>
