@@ -230,7 +230,7 @@ export default {
 .draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary::after {
   background-color: gray;
   position: absolute;
-  content: 'Submissions from the \a Builder will not be saved';
+  content: "Builder submissions not visible in 'Results'.  Check 'archived' to view.";
   white-space: pre-wrap;
   padding: 8px;
   border-radius: 5px;
@@ -239,7 +239,7 @@ export default {
   text-align: center;
   letter-spacing: 0;
   top: -65px;
-  right: 38px;
+  width: 100%;
   color: white;
   font-size: 14px;
   opacity: 0;
