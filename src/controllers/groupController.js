@@ -331,6 +331,75 @@ const deleteGroup = async (req, res) => {
   }
 };
 
+const addDocLink = async (req, res) => {
+  const { groupid, doc, addToDescendants } = req.body;
+
+  try {
+    //
+    // add doc to given group
+    const existing = await db.collection(col).findOne({ _id: new ObjectId(groupid) });
+
+    let updated = null;
+
+    if (addToDescendants) {
+      // find all descendant sub groups and add doc too
+      const groupAndSubgroups = await rolesService.getDescendantGroups(existing);
+      for (const subgroup of groupAndSubgroups) {
+        updated = await addDocLinkInternal(subgroup, doc);
+      }
+    } else {
+      updated = await addDocLinkInternal(existing, doc);
+    }
+
+    return res.send(updated);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ message: 'Ouch :/' });
+  }
+}
+
+const addDocLinkInternal = async (group, doc) => {
+  if (!group.docs) {
+    group.docs = [];
+  }
+  group.docs.push(doc);
+  let updated = await db.collection(col).findOneAndUpdate(
+    { _id: new ObjectId(group._id) },
+    { $set: group },
+    {
+      returnOriginal: false,
+    }
+  );
+  return updated;
+}
+
+const removeDocLink = async (req, res) => {
+  const { groupid, doc } = req.body;
+
+  try {
+    const existing = await db.collection(col).findOne({ _id: new ObjectId(groupid) });
+    if (!existing) {
+      return res.status(404).send({
+        message: `No entity with _id exists: ${groupid}`,
+      });
+    }
+    existing.docs = existing.docs.filter(function (currentDoc) {
+      return currentDoc.link !== doc.link;
+    });
+
+    await db.collection(col).findOneAndUpdate(
+      { _id: new ObjectId(groupid) },
+      { $set: existing },
+      {
+        returnOriginal: false,
+      }
+    );
+    return res.send({ message: 'OK' });
+  } catch (error) {
+    return res.status(500).send({ message: 'Ouch :/' });
+  }
+}
+
 export default {
   getGroups,
   getGroupByPath,
@@ -338,4 +407,6 @@ export default {
   createGroup,
   updateGroup,
   deleteGroup,
+  addDocLink,
+  removeDocLink
 };
