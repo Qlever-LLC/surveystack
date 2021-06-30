@@ -112,6 +112,13 @@
       </form>
     </v-card>
 
+    <app-doc-links
+      class="mb-4"
+      v-if="editMode"
+      :group="entity"
+    >
+    </app-doc-links>
+
     <v-row>
       <v-col cols="12" lg="6">
         <app-pinned-surveys
@@ -192,6 +199,7 @@ import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import appIntegrationList from '@/components/integrations/IntegrationList.vue';
 import appPinnedSurveys from '@/components/groups/PinnedSurveys.vue';
+import appDocLinks from '@/components/groups/DocLinks.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import appFarmHubOnboarding from '@/components/integrations/FarmHubOnboarding.vue';
@@ -205,6 +213,7 @@ export default {
   components: {
     appIntegrationList,
     appPinnedSurveys,
+    appDocLinks,
     appBasicList,
     appDialog,
     appFarmHubOnboarding,

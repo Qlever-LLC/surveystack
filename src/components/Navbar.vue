@@ -88,17 +88,50 @@
           class="my-1"
         />
 
-        <v-list-item
-          href="https://docs.surveystack.io/"
-          target="_blank"
-        >
-          <v-list-item-icon>
-            <v-icon>mdi-notebook-multiple</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>Knowledge Base</v-list-item-title>
-          </v-list-item-content>
+        <v-list-item style="padding:0">
+          <v-expansion-panels
+            class="pa-0 ma-0"
+            flat
+            accordion
+            :value="docs.length>2?undefined:0">
+            <v-expansion-panel>
+              <v-expansion-panel-header class="pa-0 ma-0">
+                <v-subheader>
+                  DOCUMENTATION
+                </v-subheader>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content class="pa-0 ma-0">
+                <v-list class="pa-0 ma-0">
+                  <v-list-item
+                    v-for="(doc, index) in docs" :key="doc.link+index"
+                    :href="doc.link"
+                    target="_blank"
+                  >
+                    <v-list-item-icon>
+                      <v-icon>mdi-notebook</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                      <v-list-item-title>{{ doc.label }}</v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item
+                    href="https://our-sci.gitlab.io/software/surveystack_tutorials/"
+                    target="_blank"
+                  >
+                    <v-list-item-icon>
+                      <v-icon>mdi-notebook-multiple</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                      <v-list-item-title>SurveyStack Docs</v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
         </v-list-item>
+
       </v-list>
 
       <template v-slot:append>
@@ -281,7 +314,20 @@ export default {
       // items.push(...this.sidenav.dev);
       return items;
     },
+    docs() {
+      const groups = this.$store.getters['memberships/groups'];
 
+      const docs = new Map();
+      // add all docs of all groups to a map to make them distinct
+      groups.forEach((group) => {
+        if (group.docs) {
+          group.docs.forEach((doc) => {
+            docs.set(doc.label + doc.link, doc);
+          });
+        }
+      });
+      return Array.from(docs.values());
+    },
   },
 };
 </script>
