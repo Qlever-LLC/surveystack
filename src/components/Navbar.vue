@@ -55,7 +55,7 @@
             v-else-if="item.type === 'subheader'"
             :key="i"
           >
-            {{ item.label }}
+            {{item.label}}
           </v-subheader>
           <v-list-item
             v-else
@@ -66,17 +66,17 @@
               v-if="item.icon"
               :class="item.class"
             >
-              <v-icon>{{ item.icon }}</v-icon>
+              <v-icon>{{item.icon}}</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
               <v-list-item-title>
-                {{ item.label }}
+                {{item.label}}
                 <v-chip
                   v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
                   color="accent"
                   small
                 >
-                  {{ readyToSubmitCount }}
+                  {{readyToSubmitCount}}
                 </v-chip>
               </v-list-item-title>
             </v-list-item-content>
@@ -111,7 +111,7 @@
                       <v-icon>mdi-notebook</v-icon>
                     </v-list-item-icon>
                     <v-list-item-content>
-                      <v-list-item-title>{{ doc.label }}</v-list-item-title>
+                      <v-list-item-title>{{doc.label}}</v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
 
@@ -143,7 +143,7 @@
             <router-link
               to="/app/info"
               class="decoration-none"
-            >{{ version }}
+            >{{version}}
             </router-link>
           </p>
         </div>
@@ -361,9 +361,10 @@ export default {
 }
 
 .v-expansion-panel-content__wrap {
-  padding:0 !important;
+  padding: 0 !important;
 }
+
 .v-expansion-panel {
-  background-color: rgba(0,0,0,0) !important;
+  background-color: rgba(0, 0, 0, 0) !important;
 }
 </style>
