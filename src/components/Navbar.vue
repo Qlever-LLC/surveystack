@@ -7,7 +7,7 @@
       absolute
     >
       <!-- color="white" -->
-      <v-app-bar-nav-icon @click="drawer = !drawer" />
+      <v-app-bar-nav-icon @click="drawer = !drawer"/>
       <v-toolbar-title class="flex-column">
         <div
           id="app-bar-title"
@@ -26,7 +26,7 @@
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
-      <navbar-user-menu />
+      <navbar-user-menu/>
 
     </v-app-bar>
 
@@ -55,7 +55,7 @@
             v-else-if="item.type === 'subheader'"
             :key="i"
           >
-            {{item.label}}
+            {{ item.label }}
           </v-subheader>
           <v-list-item
             v-else
@@ -66,7 +66,7 @@
               v-if="item.icon"
               :class="item.class"
             >
-              <v-icon>{{item.icon}}</v-icon>
+              <v-icon>{{ item.icon }}</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
               <v-list-item-title>
@@ -76,7 +76,7 @@
                   color="accent"
                   small
                 >
-                  {{readyToSubmitCount}}
+                  {{ readyToSubmitCount }}
                 </v-chip>
               </v-list-item-title>
             </v-list-item-content>
@@ -139,10 +139,12 @@
           dark
           class="grey--text"
         >
-          <p class="pt-4 pl-4">App-Version: <router-link
+          <p class="pt-4 pl-4">App-Version:
+            <router-link
               to="/app/info"
               class="decoration-none"
-            >{{ version }}</router-link>
+            >{{ version }}
+            </router-link>
           </p>
         </div>
       </template>
@@ -356,5 +358,12 @@ export default {
 #home-link {
   text-decoration: none;
   color: rgba(0, 0, 0, 0.87);
+}
+
+.v-expansion-panel-content__wrap {
+  padding:0 !important;
+}
+.v-expansion-panel {
+  background-color: rgba(0,0,0,0) !important;
 }
 </style>
