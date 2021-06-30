@@ -22,12 +22,22 @@ export default function buildScriptQuestionIframeContents({
   controlJSON,
   paramsJSON,
 }) {
-  const baseURL = process.env.NODE_ENV === 'production'
-    ? process.env.BASE_URL
-    : `http://localhost:${process.env.VUE_APP_DEV_SERVER_PORT || 8080}/`;
+  let baseURL;
+  switch (process.env.NODE_ENV) {
+    case 'production':
+      baseURL = 'https://app.surveystack.io';
+      break;
+    case 'review':
+      baseURL = 'https://dev.surveystack.io';
+      break;
+    default:
+      baseURL = `http://localhost:${process.env.VUE_APP_DEV_SERVER_PORT || 8080}`;
+      break;
+  }
+
   return `
   <head>
-    <link href="${baseURL}iframeStyles.css" rel="stylesheet">
+    <link href="${baseURL}/iframeStyles.css" rel="stylesheet">
   </head>
   <body>
       <div class="spinner-container">
