@@ -42,7 +42,10 @@ const base = type => ({
         const response = await api.get('farmos/farms');
         this.farms = response.data.map(({ name, url }) => ({
           label: name,
-          value: url,
+          value: {
+            farmName: name,
+            url,
+          },
         }));
       } catch (err) {
         console.error(err);
