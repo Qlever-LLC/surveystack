@@ -11,7 +11,6 @@ const getFarms = async (req, res) => {
   let farms;
   try {
     farms = await farmosService.getCredentials(res.locals.auth.user);
-    console.log(farms);
   } catch (exception) {
     console.error(exception);
     throw boom.badData();
