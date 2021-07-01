@@ -190,8 +190,9 @@
 
       <v-checkbox
         class="ma-0"
+        color="grey darken-1"
         v-model="control.options.hasMultipleSelections"
-        v-if="control.type === 'ontology' || control.type === 'farmOsPlanting' || control.type === 'farmOsFarm'"
+        v-if="control.type === 'ontology' || control.type === 'farmOsPlanting' || control.type === 'farmOsFarm' || control.type === 'farmOsField'"
         label="Allow Multiple Selections"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />

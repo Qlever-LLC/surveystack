@@ -13,9 +13,11 @@ const base = type => ({
   methods: {
     getValueOrNull,
     onChange(v) {
-      if (this.value !== v) {
-        this.changed(this.getValueOrNull(v));
-      }
+      const nextValue = Array.isArray(v)
+        ? getValueOrNull(v)
+        : [getValueOrNull(v)];
+
+      this.changed(nextValue);
     },
     remove(item) {
       this.changed(
@@ -106,6 +108,11 @@ const base = type => ({
     },
   },
   computed: {
+    getValue() {
+      return this.control.options.hasMultipleSelections
+        ? this.value
+        : this.value && this.value[0];
+    },
     sourceIsValid() {
       return this.farms
           && Array.isArray(this.farms)
