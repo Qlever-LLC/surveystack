@@ -153,7 +153,7 @@ const getMemberships = async (req, res) => {
 
       if (
         member.user &&
-        admins.find((m) => !m.user || `${m.user._id}` === `${member.user._id}`)
+        admins.find((m) => m.user && `${m.user._id}` === `${member.user._id}`)
       ) {
         continue;
       }
@@ -174,7 +174,7 @@ const getMemberships = async (req, res) => {
 
       if (
         member.user &&
-          otherMembers.find((m) => !m.user || `${m.user._id}` === `${member.user._id}`)
+          otherMembers.find((m) => m.user && `${m.user._id}` === `${member.user._id}`)
       ) {
         continue;
       }
