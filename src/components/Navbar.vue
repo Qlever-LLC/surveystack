@@ -88,9 +88,9 @@
           class="my-1"
         />
 
-        <v-list-item style="padding:0">
+        <v-list-item class="pa-0">
           <v-expansion-panels
-            class="pa-0 ma-0"
+            class="pa-0 ma-0 no-background"
             flat
             accordion
             :value="docs.length>2?undefined:0">
@@ -100,7 +100,7 @@
                   DOCUMENTATION
                 </v-subheader>
               </v-expansion-panel-header>
-              <v-expansion-panel-content class="pa-0 ma-0">
+              <v-expansion-panel-content class="pa-0 ma-0 no-padding">
                 <v-list class="pa-0 ma-0">
                   <v-list-item
                     v-for="(doc, index) in docs" :key="doc.link+index"
@@ -360,11 +360,11 @@ export default {
   color: rgba(0, 0, 0, 0.87);
 }
 
-.v-expansion-panel-content__wrap {
-  padding: 0 !important;
+.no-padding .v-expansion-panel-content__wrap {
+  padding: 0;
 }
 
-.v-expansion-panel {
-  background-color: rgba(0, 0, 0, 0) !important;
+.no-background.theme--light.v-expansion-panels .v-expansion-panel {
+  background-color: rgba(0, 0, 0, 0);
 }
 </style>
