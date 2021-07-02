@@ -68,13 +68,20 @@
           Remove Documentation
         </v-card-title>
         <v-card-text class="mt-4">
+          <v-checkbox
+            v-model="removeFromDescendants"
+            label="Also remove this documentation link from all descendant groups"
+            hide-details
+          ></v-checkbox>
+        </v-card-text>
+          <v-card-text class="mt-4">
           Are you sure you want to remove this documentation link?
         </v-card-text>
         <v-card-actions>
           <v-spacer/>
           <v-btn
             text
-            @click.stop="deleteModalIsVisible = false"
+            @click.stop="cancelDeleteEntry"
           >
             Cancel
           </v-btn>
@@ -168,6 +175,7 @@ export default {
         link: null,
       },
       addToDescendants: false,
+      removeFromDescendants: false,
       newIsValid: false,
       labelRules: [
         v => !!v || 'Label is required',
@@ -214,6 +222,10 @@ export default {
       this.addToDescendants = false;
       this.$refs.form.resetValidation();
     },
+    cancelDeleteEntry() {
+      this.deleteModalIsVisible = false;
+      this.removeFromDescendants = false;
+    },
     showDeleteModal(index) {
       this.deleteModalIsVisible = true;
       this.deleteIndex = index;
@@ -223,8 +235,9 @@ export default {
       this.deleteModalIsVisible = false;
     },
     async removeAt(idx) {
-      await api.post('/groups/remove-doc-link', { groupid: this.group._id, doc: this.group.docs[idx] });
+      await api.post('/groups/remove-doc-link', { groupid: this.group._id, doc: this.group.docs[idx], removeFromDescendants: this.removeFromDescendants });
       this.group.docs.splice(idx, 1);
+      this.removeFromDescendants = false;
     },
   },
 };

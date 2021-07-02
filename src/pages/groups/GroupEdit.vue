@@ -112,13 +112,6 @@
       </form>
     </v-card>
 
-    <app-doc-links
-      class="mb-4"
-      v-if="editMode"
-      :group="entity"
-    >
-    </app-doc-links>
-
     <v-row>
       <v-col cols="12" lg="6">
         <app-pinned-surveys
@@ -191,6 +184,13 @@
         </v-list-item-action>
       </template>
     </app-basic-list>
+
+    <app-doc-links
+      class="mb-4"
+      v-if="editMode"
+      :group="entity"
+    >
+    </app-doc-links>
   </v-container>
 </template>
 
