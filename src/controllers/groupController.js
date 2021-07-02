@@ -335,67 +335,61 @@ const addDocLink = async (req, res) => {
   const { groupid, doc, addToDescendants } = req.body;
 
   try {
-    //
     // add doc to given group
     const existing = await db.collection(col).findOne({ _id: new ObjectId(groupid) });
 
-    let updated = null;
+    let groupIdsToUpdate = [];
 
     if (addToDescendants) {
       // find all descendant sub groups and add doc too
       const groupAndSubgroups = await rolesService.getDescendantGroups(existing);
       for (const subgroup of groupAndSubgroups) {
-        updated = await addDocLinkInternal(subgroup, doc);
+        groupIdsToUpdate.push(subgroup._id);
       }
     } else {
-      updated = await addDocLinkInternal(existing, doc);
+      existing.docs ? existing.docs.push(doc) : existing.docs = [doc];
+      groupIdsToUpdate.push(existing._id);
     }
 
-    return res.send(updated);
+    let result = await db.collection(col).updateMany(
+      { '_id': { $in: groupIdsToUpdate } },
+      { $addToSet: { docs: doc } }
+    );
+
+    return res.send(result);
   } catch (err) {
     console.log(err);
     return res.status(500).send({ message: 'Ouch :/' });
   }
 }
 
-const addDocLinkInternal = async (group, doc) => {
-  if (!group.docs) {
-    group.docs = [];
-  }
-  group.docs.push(doc);
-  let updated = await db.collection(col).findOneAndUpdate(
-    { _id: new ObjectId(group._id) },
-    { $set: group },
-    {
-      returnOriginal: false,
-    }
-  );
-  return updated;
-}
-
 const removeDocLink = async (req, res) => {
-  const { groupid, doc } = req.body;
+  const { groupid, doc, removeFromDescendants } = req.body;
 
   try {
     const existing = await db.collection(col).findOne({ _id: new ObjectId(groupid) });
-    if (!existing) {
-      return res.status(404).send({
-        message: `No entity with _id exists: ${groupid}`,
-      });
-    }
-    existing.docs = existing.docs.filter(function (currentDoc) {
-      return currentDoc.link !== doc.link;
-    });
 
-    await db.collection(col).findOneAndUpdate(
-      { _id: new ObjectId(groupid) },
-      { $set: existing },
-      {
-        returnOriginal: false,
+    let groupIdsToUpdate = [];
+
+    if (removeFromDescendants) {
+      // find all descendant sub groups and add doc too
+      const groupAndSubgroups = await rolesService.getDescendantGroups(existing);
+      for (const subgroup of groupAndSubgroups) {
+        groupIdsToUpdate.push(subgroup._id);
       }
+    } else {
+      existing.docs ? existing.docs.push(doc) : existing.docs = [doc];
+      groupIdsToUpdate.push(existing._id);
+    }
+
+    let result = await db.collection(col).updateMany(
+      { '_id': { $in: groupIdsToUpdate } },
+      { $pull: { docs: {link : doc.link } } }
     );
-    return res.send({ message: 'OK' });
-  } catch (error) {
+
+    return res.send(result);
+  } catch (err) {
+    console.log(err);
     return res.status(500).send({ message: 'Ouch :/' });
   }
 }
