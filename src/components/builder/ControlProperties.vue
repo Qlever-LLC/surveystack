@@ -48,13 +48,6 @@
         >
           <v-icon>mdi-open-in-new</v-icon>
         </v-btn>
-        <!-- <v-btn
-          icon
-          class="mt-2"
-          @click="refreshScript"
-        >
-          <v-icon>mdi-refresh</v-icon>
-        </v-btn> -->
       </div>
       <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
 
@@ -83,7 +76,7 @@
 
       <v-textarea
         v-model="scriptParams"
-        @change="handleScriptParamsChange"
+        @input="handleScriptParamsChange"
         v-if="isScript"
         label="Parameters"
         :rules="[validateScriptParams]"
@@ -380,11 +373,7 @@ export default {
       showAdvanced: false,
       // if we migrate to using Vue Composition API, the script functionality could be extracted out into a `useScriptProperties` hook
       scriptSourceId: null,
-      scriptParams:
-        (this.control
-          && this.control.options
-          && JSON.stringify(this.control.options.params))
-        || JSON.stringify({}),
+      scriptParams: this.getScriptParams(),
       scriptSourceIsLoading: false,
       scriptSourceItems: [],
       dateTypes: [
@@ -470,9 +459,6 @@ export default {
     },
   },
   methods: {
-    log(v) {
-      console.log(v);
-    },
     nameIsUnique(val) {
       const hasSameNameAndDifferentId = control => control.name === this.control.name && control.id !== this.control.id;
       const parent = findParentByChildId(this.control.id, this.controls);
@@ -522,11 +508,9 @@ export default {
       this.$emit('set-control-source', id);
     },
     handleScriptParamsChange(params) {
-      // TODO: review safety, security
       // Validate params is valid json object
       try {
         this.$emit('set-control-params', JSON.parse(params));
-        // this.control.options.params = JSON.parse(params);
       } catch (error) {
         console.warn('script params not valid JSON', error);
       }
@@ -539,28 +523,37 @@ export default {
       }
       return true;
     },
-    handleSelectItemsChange(ev) {
-      console.log('handleSelectItemsChange', ev);
+    getScriptParams() {
+      return (this.control
+          && this.control.options
+          && JSON.stringify(this.control.options.params))
+        || JSON.stringify({});
     },
-    refreshScript() {
-      this.fetchScripts();
-      this.$emit('set-control-source', null);
+    updateScript() {
+      if (this.isScript) {
+        this.fetchScripts();
+      }
+      this.scriptSourceId = this.control.options.source;
+      this.scriptParams = this.getScriptParams();
     },
   },
   watch: {
     'control.name': {
       handler(newVal, oldVal) {
         const key = convertToKey(newVal);
-        // console.log(`setting control.name to "${key}"`);
         this.control.name = key;
+      },
+    },
+    'control.id': {
+      handler(newVal, oldVal) {
+        if (this.isScript && newVal !== oldVal) {
+          this.updateScript();
+        }
       },
     },
   },
   created() {
-    if (this.isScript) {
-      this.fetchScripts();
-    }
-    this.scriptSourceId = this.control.options.source;
+    this.updateScript();
   },
 };
 </script>
