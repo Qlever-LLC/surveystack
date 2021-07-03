@@ -58,6 +58,7 @@
       title="Result of Submission"
       persistent
       :to="survey && {name: 'surveys-detail', params: { id: survey._id }}"
+      @close="onCloseResultDialog"
     />
   </div>
 
@@ -118,26 +119,30 @@ export default {
         },
       ];
     },
+    onCloseResultDialog() {
+      // send message to parent iframe that submission was completed
+      window.parent.postMessage({
+        type: 'SUBMISSION_RESULT_CLOSE',
+        payload: {
+          isSubmitted: this.isSubmitted,
+          submission: this.submission,
+          submissionId: this.submission._id,
+        },
+      }, '*');
+    },
     async submit({ payload }) {
       this.submitting = true;
       this.submission.meta.status = this.addReadyToSubmit(this.submission.meta.status || []);
 
       try {
-        // console.log('submitting', payload);
         const response = payload.meta.dateSubmitted
           ? await api.put(`/submissions/${payload._id}`, payload)
           : await api.post('/submissions', payload);
         this.result({ response });
         this.isSubmitted = true;
         await this.$store.dispatch('submissions/remove', this.submission._id);
-        // await Promise.all([
-
-        //   // this.$store.dispatch('readyToSubmit/remove', this.submission._id),
-        // ]);
       } catch (error) {
         console.log('Draft submit error:', error);
-        // const { message } = error.response.data;
-        // this.snack(message); // does not exists here?
         await db.persistSubmission(this.submission);
         this.result({ error });
       } finally {
@@ -147,6 +152,13 @@ export default {
   },
   async created() {
     this.loading = true;
+
+    // // console.log(window.parent);
+    // window.setInterval(() => {
+    //   console.log(window.parent.postessage);
+    //   const something = window.parent.postMessage('ping', '*');
+    //   console.log('-', something);
+    // }, 2000);
 
     const { id } = this.$route.params;
 

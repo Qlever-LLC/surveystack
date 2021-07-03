@@ -6,7 +6,7 @@
       :persistent="persistent"
     >
       <v-card class="pa-4">
-        <v-card-title class="headline">{{title}}</v-card-title>
+        <v-card-title class="headline" v-if="title">{{title}}</v-card-title>
         <template v-for="(item, idx) in items">
           <div :key="'item_'+idx">
             <v-card
@@ -28,8 +28,7 @@
           <v-btn
             text
             color="primary"
-            :to="persistent ? to : null"
-            @click="show = null"
+            @click="onClose"
           >
             Ok
           </v-btn>
@@ -42,8 +41,14 @@
 <script>
 export default {
   props: {
-    value: Boolean,
-    items: Array,
+    value: {
+      required: true,
+    },
+    items: {
+      type: Array,
+      default: () => ([]),
+      validator: item => item.every(({ title, body }) => !!title && !!body),
+    },
     title: String,
     persistent: {
       type: Boolean,
@@ -65,6 +70,14 @@ export default {
       set(value) {
         this.$emit('input', value);
       },
+    },
+  },
+  methods: {
+    onClose() {
+      this.show = null;
+      this.$emit('close');
+      const nextRoute = this.persistent ? this.to : null;
+      this.$router.push(nextRoute);
     },
   },
 };
