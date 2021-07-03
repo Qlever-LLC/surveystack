@@ -318,11 +318,12 @@ export default {
     },
     docs() {
       const groups = this.$store.getters['memberships/groups'];
+      const activeGroupId = this.$store.getters['memberships/activeGroup'];
 
       const docs = new Map();
       // add all docs of all groups to a map to make them distinct
       groups.forEach((group) => {
-        if (group.docs) {
+        if (group._id === activeGroupId && group.docs) {
           group.docs.forEach((doc) => {
             docs.set(doc.label + doc.link, doc);
           });
