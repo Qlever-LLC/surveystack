@@ -402,7 +402,7 @@ const mutations = {
 
     // assign first node
     root.walk((node) => {
-      if (!node.isRoot() && node.model.type !== 'group') {
+      if (!node.isRoot() && node.model.type !== 'group' && !node.model.options.hidden) {
         state.node = node;
         state.firstNode = node;
         return false;
