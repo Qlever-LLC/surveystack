@@ -331,6 +331,69 @@ const deleteGroup = async (req, res) => {
   }
 };
 
+const addDocLink = async (req, res) => {
+  const { groupid, doc, addToDescendants } = req.body;
+
+  try {
+    // add doc to given group
+    const existing = await db.collection(col).findOne({ _id: new ObjectId(groupid) });
+
+    let groupIdsToUpdate = [];
+
+    if (addToDescendants) {
+      // find all descendant sub groups and add doc too
+      const groupAndSubgroups = await rolesService.getDescendantGroups(existing);
+      for (const subgroup of groupAndSubgroups) {
+        groupIdsToUpdate.push(subgroup._id);
+      }
+    } else {
+      existing.docs ? existing.docs.push(doc) : existing.docs = [doc];
+      groupIdsToUpdate.push(existing._id);
+    }
+
+    let result = await db.collection(col).updateMany(
+      { '_id': { $in: groupIdsToUpdate } },
+      { $addToSet: { docs: doc } }
+    );
+
+    return res.send(result);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ message: 'Ouch :/' });
+  }
+}
+
+const removeDocLink = async (req, res) => {
+  const { groupid, doc, removeFromDescendants } = req.body;
+
+  try {
+    const existing = await db.collection(col).findOne({ _id: new ObjectId(groupid) });
+
+    let groupIdsToUpdate = [];
+
+    if (removeFromDescendants) {
+      // find all descendant sub groups and add doc too
+      const groupAndSubgroups = await rolesService.getDescendantGroups(existing);
+      for (const subgroup of groupAndSubgroups) {
+        groupIdsToUpdate.push(subgroup._id);
+      }
+    } else {
+      existing.docs ? existing.docs.push(doc) : existing.docs = [doc];
+      groupIdsToUpdate.push(existing._id);
+    }
+
+    let result = await db.collection(col).updateMany(
+      { '_id': { $in: groupIdsToUpdate } },
+      { $pull: { docs: {link : doc.link } } }
+    );
+
+    return res.send(result);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ message: 'Ouch :/' });
+  }
+}
+
 export default {
   getGroups,
   getGroupByPath,
@@ -338,4 +401,6 @@ export default {
   createGroup,
   updateGroup,
   deleteGroup,
+  addDocLink,
+  removeDocLink
 };

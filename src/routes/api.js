@@ -66,6 +66,8 @@ router.put(
   ],
   catchErrors(groupController.updateGroup)
 );
+router.post('/groups/add-doc-link', assertAuthenticated, catchErrors(groupController.addDocLink));
+router.post('/groups/remove-doc-link', assertAuthenticated, catchErrors(groupController.removeDocLink));
 // router.delete('/groups/:id', assertAuthenticated, catchErrors(groupController.deleteGroup));
 
 /** Submissions */
