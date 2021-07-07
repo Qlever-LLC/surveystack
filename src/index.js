@@ -17,10 +17,41 @@ import debugRoutes from './routes/debug';
 
 import resources from './controllers/resources';
 
+const subdomainRedirect = {
+  rfc: 'bionutrient',
+};
+
 const PATH_PREFIX = process.env.PATH_PREFIX;
 
 const app = express();
 const frontend = expressStaticGzip('../our-sci-pwa/dist');
+
+/**
+ * Hard-Redirect certain subdomains after migration.
+ * To test this locally, build the client and serve it using the server.
+ * Modify /etc/hosts to achieve subdomain behavihour.
+ */
+app.use(async (req, res, next) => {
+  const { host } = req.headers;
+  const protocol = req.protocol;
+
+  // console.log('host header', host);
+  const keys = Object.keys(subdomainRedirect);
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    const subdomain = req.subdomains.join('.');
+    // console.log('subdomain', req.subdomains, subdomain);
+    // console.log('key', key);
+    if (subdomain === key) {
+      const redirect = `${protocol}://${subdomainRedirect[key]}${host.substring(subdomain.length)}`;
+      // console.log('redirecting to ', redirect);
+      res.writeHead(301, { Location: redirect });
+      return res.end();
+    }
+  }
+
+  next();
+});
 
 app.use(cookieParser());
 app.use(express.json({ limit: '8mb' }));
