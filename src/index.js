@@ -34,9 +34,7 @@ const frontend = expressStaticGzip('../our-sci-pwa/dist');
 app.use(async (req, res, next) => {
   const { host } = req.headers;
   const protocol = req.protocol;
-
-  // console.log('host header', host);
-  const keys = Object.keys(subdomainRedirect);
+  
   const subdomain = req.subdomains.join('.');
   const key = Object.keys(subdomainRedirect).find(k => k === subdomain);
   if (key) {
