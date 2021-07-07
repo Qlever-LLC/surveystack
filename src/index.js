@@ -37,17 +37,12 @@ app.use(async (req, res, next) => {
 
   // console.log('host header', host);
   const keys = Object.keys(subdomainRedirect);
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
-    const subdomain = req.subdomains.join('.');
-    // console.log('subdomain', req.subdomains, subdomain);
-    // console.log('key', key);
-    if (subdomain === key) {
-      const redirect = `${protocol}://${subdomainRedirect[key]}${host.substring(subdomain.length)}`;
-      // console.log('redirecting to ', redirect);
-      res.writeHead(301, { Location: redirect });
-      return res.end();
-    }
+  const subdomain = req.subdomains.join('.');
+  const key = Object.keys(subdomainRedirect).find(k => k === subdomain);
+  if (key) {
+    const redirect = `${protocol}://${subdomainRedirect[key]}${host.substring(subdomain.length)}`;
+    res.writeHead(301, { Location: redirect });
+    return res.end();
   }
 
   next();
