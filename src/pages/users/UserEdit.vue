@@ -1,21 +1,14 @@
 <template>
   <v-container>
-    <h1>{{ editMode ? "Edit user" : "Create user" }}</h1>
-    <div
-      v-if="hasMembership && groupEntity"
-      class="subtitle-1"
-    >... with role <span class="font-weight-bold">{{$route.query.role}}</span> @ <span class="font-weight-bold">{{groupEntity.name}}</span></div>
+    <h1>{{ editMode ? 'Edit user' : 'Create user' }}</h1>
+    <div v-if="hasMembership && groupEntity" class="subtitle-1">
+      ... with role <span class="font-weight-bold">{{ $route.query.role }}</span> @
+      <span class="font-weight-bold">{{ groupEntity.name }}</span>
+    </div>
     <v-card class="pa-4 mb-4 mt-2">
-
       <v-form>
-        <v-text-field
-          v-model="entity.email"
-          label="E-Mail"
-        />
-        <v-text-field
-          v-model="entity.name"
-          label="Name"
-        />
+        <v-text-field v-model="entity.email" label="E-Mail" />
+        <v-text-field v-model="entity.name" label="Name" />
         <v-text-field
           v-model="entity.password"
           :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
@@ -36,31 +29,16 @@
           persistent-hint
         />
 
-        <v-checkbox
-          v-if="hasMembership"
-          v-model="sendMail"
-          label="[NOT_IMPLEMENTED] Also send a welcome email"
-        />
+        <v-checkbox v-if="hasMembership" v-model="sendMail" label="[NOT_IMPLEMENTED] Also send a welcome email" />
 
         <div class="d-flex mt-2 justify-end">
-
-          <v-btn
-            text
-            @click="cancel"
-          >Cancel</v-btn>
-          <v-btn
-            color="primary"
-            @click="submit"
-          >Submit</v-btn>
+          <v-btn text @click="cancel">Cancel</v-btn>
+          <v-btn color="primary" @click="submit">Submit</v-btn>
         </div>
       </v-form>
     </v-card>
     <transition name="fade">
-      <app-feedback
-        v-if="status"
-        class="mt-5"
-        @closed="status = ''"
-      >{{status}}</app-feedback>
+      <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{ status }}</app-feedback>
     </transition>
   </v-container>
 </template>
@@ -69,7 +47,6 @@
 import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import appFeedback from '@/components/ui/Feedback.vue';
-
 
 export default {
   components: {
@@ -138,9 +115,7 @@ export default {
     },
   },
   async created() {
-    this.editMode = !this.$route.matched.some(
-      ({ name }) => name === 'users-new',
-    );
+    this.editMode = !this.$route.matched.some(({ name }) => name === 'users-new');
 
     this.entity._id = new ObjectId();
 

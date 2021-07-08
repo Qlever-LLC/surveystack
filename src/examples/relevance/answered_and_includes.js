@@ -5,7 +5,6 @@
  * Note: assume crops is a dropdown question
  */
 
-
 /**
  * Relevance
  *
@@ -16,11 +15,12 @@
  * @param {submission} submission
  */
 function relevance(submission) {
-  return submission.data.planting_group.crop.value !== null && submission.data.planting_group.crop.value.includes('corn');
+  return (
+    submission.data.planting_group.crop.value !== null && submission.data.planting_group.crop.value.includes('corn')
+  );
   // ALTERNATIVE with helper function
-  return answeredAndIncludes(submission.data.planting_group.crop);
+  // return answeredAndIncludes(submission.data.planting_group.crop);
 }
-
 
 /**
  * Helper function to call instead

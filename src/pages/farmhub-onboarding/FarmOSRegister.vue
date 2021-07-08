@@ -1,11 +1,6 @@
 <template>
   <v-row>
-    <v-form
-      v-model="valid"
-      ref="form"
-      class="mt-8"
-      @keydown.enter.prevent="submit"
-    >
+    <v-form v-model="valid" ref="form" class="mt-8" @keydown.enter.prevent="submit">
       <v-text-field
         v-model="instance.url"
         label="Instance URL"
@@ -17,15 +12,8 @@
         :rules="urlRules"
       >
         <template v-slot:append-outer>
-          <v-icon
-            style="margin-top: -8px"
-            v-if="!!urlState"
-            :color="urlState === 'free' ? 'green' : 'red'"
-            large
-          >
-            {{
-              urlState === "free" ? "mdi-check" : "mdi-alert-octagon"
-            }}</v-icon
+          <v-icon style="margin-top: -8px" v-if="!!urlState" :color="urlState === 'free' ? 'green' : 'red'" large>
+            {{ urlState === 'free' ? 'mdi-check' : 'mdi-alert-octagon' }}</v-icon
           >
         </template>
       </v-text-field>
@@ -94,9 +82,7 @@
             {{ item.name }}
             <v-chip color="grey--darken-2" dark>{{ item.email }}</v-chip>
           </div>
-          <div v-else>
-            <v-icon left>mdi-account-clock</v-icon> {{ item.email }}
-          </div>
+          <div v-else><v-icon left>mdi-account-clock</v-icon> {{ item.email }}</div>
         </template>
         <template v-slot:prepend-item>
           <v-btn
@@ -112,12 +98,7 @@
           <v-divider />
         </template>
         <template v-slot:append-outer>
-          <v-btn
-            fab
-            color="primary"
-            style="margin-top: -16px"
-            @click="loadMembers"
-          >
+          <v-btn fab color="primary" style="margin-top: -16px" @click="loadMembers">
             <v-icon>mdi-refresh</v-icon>
           </v-btn>
         </template>
@@ -125,12 +106,9 @@
 
       <v-divider class="my-4"></v-divider>
 
-      <app-field-list v-if="fields.length > 0" v-model="fields">
-      </app-field-list>
+      <app-field-list v-if="fields.length > 0" v-model="fields"> </app-field-list>
 
-      <v-btn class="mx-2" @click="importFields = true" v-if="!importFields"
-        >Add / Import Field</v-btn
-      >
+      <v-btn class="mx-2" @click="importFields = true" v-if="!importFields">Add / Import Field</v-btn>
 
       <app-field-creator
         v-show="importFields"
@@ -168,9 +146,7 @@
         <a href="https://farmier.com/privacy" target="blank">Privacy Policy</a>.
       </div>
 
-      <v-btn class="mx-2" color="primary" :disabled="!valid" @click="save"
-        >Register FarmOS Instance</v-btn
-      >
+      <v-btn class="mx-2" color="primary" :disabled="!valid" @click="save">Register FarmOS Instance</v-btn>
     </v-form>
     <app-dialog
       title="Field Import"
@@ -192,11 +168,9 @@ import appDialog from '@/components/ui/Dialog.vue';
 import appFieldCreator from './FieldCreator.vue';
 import appFieldList from './FieldList.vue';
 
-
-const nameRule = s => !/[!"#$%()*+,\-./:;<=>?@[\\\]^_{|}~]/gi.test(`${s}`);
-const punctFree = s => !/[!"#$%&'()*+,\-./:;<=>?@[\\\]^_‘{|}~]/gi.test(`${s}`);
-const xesc = input => (`${input}`).replace(/[!"#$%&'()*+,\-./:;<=>?@[\\\]^_‘{|}~]/gi, '');
-
+const nameRule = (s) => !/[!"#$%()*+,\-./:;<=>?@[\\\]^_{|}~]/gi.test(`${s}`);
+const punctFree = (s) => !/[!"#$%&'()*+,\-./:;<=>?@[\\\]^_‘{|}~]/gi.test(`${s}`);
+const xesc = (input) => `${input}`.replace(/[!"#$%&'()*+,\-./:;<=>?@[\\\]^_‘{|}~]/gi, '');
 
 const remapGroupMembership = (m) => {
   let username = m.meta.invitationEmail;
@@ -216,12 +190,8 @@ const remapGroupMembership = (m) => {
   };
 };
 
-
 export default {
-  props: [
-    'instance',
-    'group',
-  ],
+  props: ['instance', 'group'],
   components: {
     appDialog,
     appFieldCreator,
@@ -244,22 +214,17 @@ export default {
       checkingUrl: false,
       loading: false,
       invite: false,
-      urlRules: [
-        () => this.urlState === 'free' || 'URL must be available',
-      ],
+      urlRules: [() => this.urlState === 'free' || 'URL must be available'],
       emailRules: [
-        v => !!v || 'E-mail is required',
-        v => /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(`${v}`) || 'E-mail must be valid (check for leading / trailing white space)',
+        (v) => !!v || 'E-mail is required',
+        (v) =>
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+            `${v}`
+          ) || 'E-mail must be valid (check for leading / trailing white space)',
       ],
-      nameRules: [
-        v => !!v || 'Name Required',
-      ],
-      addressRules: [
-        v => !!v || 'Address Required',
-      ],
-      agreeRules: [
-        v => !!v || 'Must agree to ToS',
-      ],
+      nameRules: [(v) => !!v || 'Name Required'],
+      addressRules: [(v) => !!v || 'Address Required'],
+      agreeRules: [(v) => !!v || 'Must agree to ToS'],
     };
   },
   methods: {
@@ -301,7 +266,6 @@ export default {
       const plan = this.instance.aggregator.data.planName;
       const { fields } = this;
 
-
       try {
         const r = await api.post('/farmos/create-instance', {
           url,
@@ -319,7 +283,11 @@ export default {
         });
 
         if (r.data && r.data.status === 'success') {
-          this.$emit('dialog', 'Success', `Sucessfully created ${this.instance.url}. FarmOS Instance is now being created.`);
+          this.$emit(
+            'dialog',
+            'Success',
+            `Sucessfully created ${this.instance.url}. FarmOS Instance is now being created.`
+          );
           this.persistMemberships();
         } else {
           throw new Error('Error creating instance');
@@ -369,7 +337,7 @@ export default {
         const { data } = await api.get(`/groups/${this.group}?populate=true`);
         this.entity = { ...this.entity, ...data };
 
-        const { data: members } = (await api.get(`/memberships?group=${this.group}&populate=true`));
+        const { data: members } = await api.get(`/memberships?group=${this.group}&populate=true`);
         this.members = members.map(remapGroupMembership);
       } catch (e) {
         console.log('error', e);
@@ -379,7 +347,7 @@ export default {
     },
 
     async persistMemberships() {
-      const memberships = this.activeUsers.map(a => a.id);
+      const memberships = this.activeUsers.map((a) => a.id);
       const data = await api.post('/farmos/set-memberships', {
         group: this.group,
         memberships,
@@ -401,13 +369,10 @@ export default {
         return false;
       }
 
-
       return true;
     },
   },
-  watch: {
-
-  },
+  watch: {},
   async mounted() {
     this.loadMembers();
   },

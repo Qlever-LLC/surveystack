@@ -14,19 +14,10 @@ import 'ol-geocoder/dist/ol-geocoder.css';
 import Geocoder from 'ol-geocoder';
 
 // Import OL controls.
-import {
-  defaults as defaultControls,
-  FullScreen,
-  Rotate,
-  ScaleLine,
-} from 'ol/control';
+import { defaults as defaultControls, FullScreen, Rotate, ScaleLine } from 'ol/control';
 
 // Import OL interactions.
-import {
-  defaults as defaultInteractions,
-  DragRotateAndZoom,
-  PinchRotate,
-} from 'ol/interaction';
+import { defaults as defaultInteractions, DragRotateAndZoom, PinchRotate } from 'ol/interaction';
 
 // Import Geolocate control.
 import Geolocate from '../control/Geolocate/Geolocate';
@@ -37,7 +28,6 @@ import rememberLayer from '../behavior/rememberLayer';
 // Define an object that contains the default layers, controls, interactions,
 // and behaviors that will be added to all farmOS maps.
 const defaults = {
-
   // Layers.
   layers() {
     return [
@@ -57,7 +47,6 @@ const defaults = {
 
   // Controls.
   controls(options) {
-
     // Define default farmOS controls.
     const farmMapDefaults = [
       new LayerSwitcher(options.layerSwitcher),
@@ -92,7 +81,11 @@ const defaults = {
     // If a callback function is provided, pass it the defaults
     // and return what it evaluates to.
     if (typeof options.controls === 'function') {
-      return options.controls(defaultControls().extend(farmMapDefaults).getArray());
+      return options.controls(
+        defaultControls()
+          .extend(farmMapDefaults)
+          .getArray()
+      );
     }
 
     // Otherwise just return the defaults.
@@ -101,12 +94,8 @@ const defaults = {
 
   // Interactions.
   interactions(options) {
-
     // Define default farmOS interactions.
-    const farmMapDefaults = [
-      new DragRotateAndZoom(),
-      new PinchRotate(),
-    ];
+    const farmMapDefaults = [new DragRotateAndZoom(), new PinchRotate()];
 
     // If interactions were set to 'false', don't attach any interactions.
     if (options.interactions === false) {
@@ -127,7 +116,11 @@ const defaults = {
     // If a callback function is provided, pass it the defaults
     // and return what it evaluates to.
     if (typeof options.interactions === 'function') {
-      return options.interactions(defaultInteractions().extend(farmMapDefaults).getArray());
+      return options.interactions(
+        defaultInteractions()
+          .extend(farmMapDefaults)
+          .getArray()
+      );
     }
 
     // Otherwise just return the defaults.
@@ -138,9 +131,7 @@ const defaults = {
   // These are custom sets of map behavior logic provided by farmOS-map in the
   // src/behavior directory.
   behaviors() {
-    return [
-      rememberLayer,
-    ];
+    return [rememberLayer];
   },
 };
 export default defaults;

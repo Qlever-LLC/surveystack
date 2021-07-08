@@ -8,16 +8,15 @@
         Submitting to: <kbd>{{ group }}</kbd>
         <br />
         Created: <kbd>{{ created }}</kbd>
-        <br>
+        <br />
         Last modified: <kbd>{{ modified }}</kbd>
         <br />
-        <strong v-if="submission.meta.dateSubmitted"><kbd>{{ submitted }}</kbd> submitted</strong>
+        <strong v-if="submission.meta.dateSubmitted"
+          ><kbd>{{ submitted }}</kbd> submitted</strong
+        >
       </v-card-subtitle>
     </v-card>
-    <v-timeline
-      v-if="controlDisplays"
-      dense
-    >
+    <v-timeline v-if="controlDisplays" dense>
       <template v-for="(display, idx) in controlDisplays">
         <v-timeline-item
           v-if="display.collate === 0 || display.lastOfCollation || !display.hidden"
@@ -28,72 +27,43 @@
         >
           <v-card
             v-if="display.relevant || !display.hidden"
-            @click="$emit('navigate', display.position);"
+            @click="$emit('navigate', display.position)"
             :color="display.background"
             :dark="display.dark"
           >
             <div class="d-flex flex-row">
-              <div
-                v-if="display.active"
-                style="width: 1rem;"
-                class="green"
-              > </div>
+              <div v-if="display.active" style="width: 1rem;" class="green"></div>
 
               <div class="flex-grow-1">
                 <v-card-title class="d-block">
                   <div class="ma-0 pa-0 d-flex align-stretch">
                     <!-- color="#FF5722" -->
-                    <v-chip
-                      dark
-                      small
-                      class="mr-0 mr-1"
-                    ><span
-                        v-for="(crumb, ci) in display.breadcrumbs"
-                        :key="`bread_${ci}`"
-                      >{{ crumb }} <span
-                          class="mr-1"
-                          v-if="ci < display.breadcrumbs.length - 1"
-                        >&gt;</span></span></v-chip>
+                    <v-chip dark small class="mr-0 mr-1"
+                      ><span v-for="(crumb, ci) in display.breadcrumbs" :key="`bread_${ci}`"
+                        >{{ crumb }} <span class="mr-1" v-if="ci < display.breadcrumbs.length - 1">&gt;</span></span
+                      ></v-chip
+                    >
                     <v-spacer></v-spacer>
-                    <v-chip
-                      small
-                      dark
-                      v-if="display.collate > 0"
-                      color="grey-darken-5"
-                    >Irrelevant</v-chip>
+                    <v-chip small dark v-if="display.collate > 0" color="grey-darken-5">Irrelevant</v-chip>
                   </div>
                   <span class="number-chip mr-2">{{ display.number }}</span>
                   {{ display.label }}
                 </v-card-title>
-                <v-card-text
-                  class="py-0"
-                  v-if="display.value"
-                ><kbd class="pa-2">{{ display.value }}</kbd></v-card-text>
-                <v-card-text v-else>No answer</v-card-text>
-                <div
-                  v-if="display.modified"
-                  class="d-flex flex-row text--secondary pa-2"
-                  style="font-size: 0.8rem"
+                <v-card-text class="py-0" v-if="display.value"
+                  ><kbd class="pa-2">{{ display.value }}</kbd></v-card-text
                 >
-                  <div class="flex-grow-1">
-                    {{ display.modified.format('YYYY-MM-DD HH:mm') }}<v-spacer></v-spacer>
-                  </div>
-                  <div class="text-right">
-                    {{ display.modifiedHumanized }} ago
-                  </div>
+                <v-card-text v-else>No answer</v-card-text>
+                <div v-if="display.modified" class="d-flex flex-row text--secondary pa-2" style="font-size: 0.8rem">
+                  <div class="flex-grow-1">{{ display.modified.format('YYYY-MM-DD HH:mm') }}<v-spacer></v-spacer></div>
+                  <div class="text-right">{{ display.modifiedHumanized }} ago</div>
                 </div>
               </div>
             </div>
           </v-card>
 
-          <v-chip
-            v-else
-            @click="expand(display.collateGroup)"
-            dark
-            small
-            color="grey"
-            class="mr-0 mr-1"
-          >{{ display.collate }} Irrelevant Questions</v-chip>
+          <v-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1"
+            >{{ display.collate }} Irrelevant Questions</v-chip
+          >
         </v-timeline-item>
       </template>
     </v-timeline>
@@ -107,7 +77,6 @@ import colors from 'vuetify/lib/util/colors';
 import { linearControls } from '@/utils/submissions';
 import * as utils from '@/utils/surveys';
 
-
 const states = {
   done: ['mdi-check-bold', 'green'],
   missing: ['mdi-alert-decagram', 'orange'],
@@ -119,23 +88,21 @@ const states = {
 function iconify(control, relevant) {
   if (control.value != null) {
     return states.done;
-  } if (relevant && (control.value == null && control.options.required)) {
+  }
+  if (relevant && control.value == null && control.options.required) {
     return states.missing;
-  } if (control.warning) {
+  }
+  if (control.warning) {
     return states.warning;
-  } if (control.error) {
+  }
+  if (control.error) {
     return states.error;
   }
   return states.ok;
 }
 
 export default {
-  props: [
-    'survey',
-    'submission',
-    'position',
-    'group',
-  ],
+  props: ['survey', 'submission', 'position', 'group'],
   data() {
     return {
       controlDisplays: [],
@@ -146,7 +113,7 @@ export default {
   },
   methods: {
     relevant(item, positions) {
-      const idx = positions.findIndex(p => _.isEqual(p, item.position));
+      const idx = positions.findIndex((p) => _.isEqual(p, item.position));
       if (idx === -1) {
         return true;
       }
@@ -155,12 +122,14 @@ export default {
       return relevant === undefined ? true : relevant;
     },
     expand(group) {
-      this.controlDisplays.filter(item => item.collateGroup === group && item.collate > 0).forEach((item) => {
-        // eslint-disable-next-line no-param-reassign
-        item.collate = 1;
-        // eslint-disable-next-line no-param-reassign
-        item.hidden = false;
-      });
+      this.controlDisplays
+        .filter((item) => item.collateGroup === group && item.collate > 0)
+        .forEach((item) => {
+          // eslint-disable-next-line no-param-reassign
+          item.collate = 1;
+          // eslint-disable-next-line no-param-reassign
+          item.hidden = false;
+        });
     },
     refresh() {
       this.created = moment(this.submission.meta.dateCreated).format('YYYY-MM-DD HH:mm');

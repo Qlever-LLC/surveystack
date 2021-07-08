@@ -49,7 +49,6 @@ import FarmHubOnboarding from '@/pages/farmhub-onboarding/FarmHubOnboarding.vue'
 import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
 import GroupIntegrationEdit from '@/pages/integrations/GroupIntegrationEdit.vue';
 
-
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 import Kit from '@/pages/Kit.vue';
 import store from '@/store';
@@ -57,7 +56,6 @@ import store from '@/store';
 const Builder = () => import('@/pages/builder/Builder.vue');
 const Script = () => import('@/pages/scripts/Script.vue');
 const ScriptEdit = () => import('@/pages/scripts/ScriptEdit.vue');
-
 
 Vue.use(VueRouter);
 
@@ -333,7 +331,6 @@ const routes = [
     name: 'kit',
     component: Kit,
   },
-
 ];
 
 const router = new VueRouter({
@@ -347,6 +344,5 @@ const router = new VueRouter({
     };
   },
 });
-
 
 export default router;

@@ -29,11 +29,13 @@ setWithCredentials(true);
 
 // Add a Vector layer to the map.
 function addVectorLayer({
-  title = 'vector', color = 'orange', styleFunction = null, visible = true, attribution = '',
+  title = 'vector',
+  color = 'orange',
+  styleFunction = null,
+  visible = true,
+  attribution = '',
 }) {
-  const style = styleFunction
-    ? (feature, resolution) => styleFunction(feature, resolution, Style)
-    : colorStyles(color);
+  const style = styleFunction ? (feature, resolution) => styleFunction(feature, resolution, Style) : colorStyles(color);
   const attributions = [attribution];
   const source = new VectorSource({
     attributions,
@@ -48,9 +50,7 @@ function addVectorLayer({
 }
 
 // Add a cluster layer to the map.
-function addClusterLayer({
-  title = 'cluster', url, styleFunction = clusterStyle, visible = true, attribution = '',
-}) {
+function addClusterLayer({ title = 'cluster', url, styleFunction = clusterStyle, visible = true, attribution = '' }) {
   const style = (feature, resolution) => styleFunction(feature, resolution, Style);
   const format = new GeoJSON();
   const attributions = [attribution];
@@ -74,11 +74,15 @@ function addClusterLayer({
 
 // Add a GeoJSON feature layer to the map.
 function addGeoJSONLayer({
-  title = 'geojson', url = '', geojson = {}, color = 'orange', styleFunction = null, visible = true, attribution = '',
+  title = 'geojson',
+  url = '',
+  geojson = {},
+  color = 'orange',
+  styleFunction = null,
+  visible = true,
+  attribution = '',
 }) {
-  const style = styleFunction
-    ? (feature, resolution) => styleFunction(feature, resolution, Style)
-    : colorStyles(color);
+  const style = styleFunction ? (feature, resolution) => styleFunction(feature, resolution, Style) : colorStyles(color);
   const format = new GeoJSON();
   const attributions = [attribution];
   let source;
@@ -90,7 +94,7 @@ function addGeoJSONLayer({
     });
   } else {
     source = new VectorSource({
-      features: (new GeoJSON()).readFeatures(geojson, projection),
+      features: new GeoJSON().readFeatures(geojson, projection),
       format,
       attributions,
     });
@@ -106,7 +110,12 @@ function addGeoJSONLayer({
 
 // Add a Tile ArcGIS MapServer layer to the map.
 function addTileArcGISMapServerLayer({
-  title = 'arcgis-tile', url, params, visible = true, base = false, attribution = '',
+  title = 'arcgis-tile',
+  url,
+  params,
+  visible = true,
+  base = false,
+  attribution = '',
 }) {
   const attributions = [attribution];
   const source = new TileArcGISRest({
@@ -124,16 +133,13 @@ function addTileArcGISMapServerLayer({
 }
 
 // Add Well Known Text (WKT) geometry to the map.
-function addWKTLayer({
-  title = 'wkt', wkt, color = 'orange', styleFunction = null, visible = true, attribution = '',
-}) {
-  const style = styleFunction
-    ? (feature, resolution) => styleFunction(feature, resolution, Style)
-    : colorStyles(color);
-  const isMultipart = wkt.includes('MULTIPOINT')
-    || wkt.includes('MULTILINESTRING')
-    || wkt.includes('MULTIPOLYGON')
-    || wkt.includes('GEOMETRYCOLLECTION');
+function addWKTLayer({ title = 'wkt', wkt, color = 'orange', styleFunction = null, visible = true, attribution = '' }) {
+  const style = styleFunction ? (feature, resolution) => styleFunction(feature, resolution, Style) : colorStyles(color);
+  const isMultipart =
+    wkt.includes('MULTIPOINT') ||
+    wkt.includes('MULTILINESTRING') ||
+    wkt.includes('MULTIPOLYGON') ||
+    wkt.includes('GEOMETRYCOLLECTION');
   const features = isMultipart
     ? new WKT({ splitCollection: true }).readFeatures(wkt, projection)
     : [new WKT().readFeature(wkt, projection)];
@@ -152,9 +158,7 @@ function addWKTLayer({
 }
 
 // Add a WMS tile layer to the map.
-function addWMSTileLayer({
-  title = 'wms', url, params, visible = true, base = false, attribution = '',
-}) {
+function addWMSTileLayer({ title = 'wms', url, params, visible = true, base = false, attribution = '' }) {
   const attributions = [attribution];
   const source = new TileWMS({
     url,
@@ -171,9 +175,7 @@ function addWMSTileLayer({
 }
 
 // Add an XYZ tile layer to the map.
-function addXYZTileLayer({
-  title = 'xyz', url, tileSize = 256, visible = true, base = false, attribution = '',
-}) {
+function addXYZTileLayer({ title = 'xyz', url, tileSize = 256, visible = true, base = false, attribution = '' }) {
   const attributions = [attribution];
   const source = new XYZ({
     url,
@@ -257,7 +259,6 @@ export default function addLayer(type, opts = {}) {
 
   // If a layer was created, add it to the map.
   if (layer) {
-
     // If a layer group is specified, create it if it doesn't already exist.
     if (opts.group) {
       let group;

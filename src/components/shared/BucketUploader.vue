@@ -4,18 +4,17 @@
 <template>
   <div>
     <!--UPLOAD-->
-    <form
-      enctype="multipart/form-data"
-      novalidate
-      class="h-100"
-    >
+    <form enctype="multipart/form-data" novalidate class="h-100">
       <div class="dropbox">
         <input
           type="file"
           multiple
           :name="uploadFieldName"
           :disabled="isSaving"
-          @change="filesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length"
+          @change="
+            filesChange($event.target.name, $event.target.files);
+            fileCount = $event.target.files.length;
+          "
           accept="image/*"
           class="input-file"
         />
@@ -127,10 +126,6 @@ export default {
 }
 
 .dropbox:hover {
-  background: rgb(
-    203,
-    255,
-    255
-  ); /* when mouse over to the drop zone, change color */
+  background: rgb(203, 255, 255); /* when mouse over to the drop zone, change color */
 }
 </style>

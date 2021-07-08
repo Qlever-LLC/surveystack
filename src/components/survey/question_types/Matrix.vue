@@ -22,32 +22,17 @@
       <div style="background: #1867c0; padding: 4px 0px">
         <v-card>
           <v-card-title>
-            <v-btn
-              @click="duplicateRow(editedIndex)"
-              text
-              color="primary"
-            >
+            <v-btn @click="duplicateRow(editedIndex)" text color="primary">
               <v-icon left>mdi-content-copy</v-icon>Duplicate
             </v-btn>
             <v-spacer />
-            <v-btn
-              text
-              @click="showEditItemDialog = false"
-            >
-              Close <v-icon right>mdi-close</v-icon>
-            </v-btn>
+            <v-btn text @click="showEditItemDialog = false"> Close <v-icon right>mdi-close</v-icon> </v-btn>
           </v-card-title>
           <v-card-text>
-            <v-form
-              autocomplete="off"
-              @submit.prevent=""
-            >
-              <div
-                v-for="(header, idx) in headers"
-                :key="header.value"
-              >
+            <v-form autocomplete="off" @submit.prevent="">
+              <div v-for="(header, idx) in headers" :key="header.value">
                 <div class="d-flex align-center">
-                  <h4>{{header.label}}</h4>
+                  <h4>{{ header.label }}</h4>
                   <app-redacted v-if="header.redacted" />
                   <app-required v-if="header.required" />
                 </div>
@@ -64,19 +49,10 @@
             </v-form>
           </v-card-text>
           <v-card-actions class="d-flex justify-space-between">
-            <v-btn
-              text
-              @click="rowToBeDeleted = editedIndex"
-              class="ma-2"
-              color="error"
-            >
+            <v-btn text @click="rowToBeDeleted = editedIndex" class="ma-2" color="error">
               <v-icon left>mdi-trash-can-outline</v-icon>Delete
             </v-btn>
-            <v-btn
-              text
-              @click="showEditItemDialog = false"
-              class="ma-2"
-            >
+            <v-btn text @click="showEditItemDialog = false" class="ma-2">
               Close <v-icon right>mdi-close</v-icon>
             </v-btn>
           </v-card-actions>
@@ -84,11 +60,7 @@
       </div>
     </v-dialog>
 
-    <app-control-label
-      :value="control.label"
-      :redacted="redacted"
-      :required="required"
-    />
+    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
 
     <v-data-table
@@ -101,18 +73,15 @@
       disable-sort
       mobile-breakpoint="0"
     >
-      <template v-slot:header="{props: {headers}}">
+      <template v-slot:header="{ props: { headers } }">
         <thead>
           <tr>
-            <th
-              v-for="h in headers"
-              :key="h.value"
-            >
+            <th v-for="h in headers" :key="h.value">
               <v-tooltip top>
                 <template v-slot:activator="{ on }">
-                  <span v-on="on">{{h.label}}</span>
+                  <span v-on="on">{{ h.label }}</span>
                 </template>
-                <span>{{h.type}}</span>
+                <span>{{ h.type }}</span>
               </v-tooltip>
               <app-redacted v-if="h.redacted" />
               <app-required v-if="h.required" />
@@ -122,20 +91,9 @@
       </template>
       <template v-slot:body="{ items, headers }">
         <tbody>
-          <tr
-            v-for="(item,idx) in items"
-            :key="idx"
-            @click="isMobile ? editItem(idx) : () => {}"
-          >
-            <td
-              v-for="(header,key) in headers"
-              :key="key"
-              class="py-0 px-1"
-            >
-              <v-form
-                autocomplete="off"
-                @submit.prevent=""
-              >
+          <tr v-for="(item, idx) in items" :key="idx" @click="isMobile ? editItem(idx) : () => {}">
+            <td v-for="(header, key) in headers" :key="key" class="py-0 px-1">
+              <v-form autocomplete="off" @submit.prevent="">
                 <app-matrix-cell
                   :header="header"
                   :item="item"
@@ -145,30 +103,17 @@
                   @changed="onInput"
                   :disabled="isMobile"
                   class="matrix-cell my-2"
-                  :style="{minWidth: header.scaleWidth ? `calc(10rem * ${header.scaleWidth}/100)` : '10rem'}"
+                  :style="{ minWidth: header.scaleWidth ? `calc(10rem * ${header.scaleWidth}/100)` : '10rem' }"
                   :loading="loading"
                 />
               </v-form>
             </td>
-            <td
-              v-if="!isMobile"
-              style="width: 64px; padding-left: 4px !important; padding-right: 0px;"
-            >
+            <td v-if="!isMobile" style="width: 64px; padding-left: 4px !important; padding-right: 0px;">
               <div class="d-flex">
-                <v-btn
-                  icon
-                  @click="rowToBeDeleted = idx"
-                  tabindex="-1"
-                  small
-                >
+                <v-btn icon @click="rowToBeDeleted = idx" tabindex="-1" small>
                   <v-icon>mdi-trash-can-outline</v-icon>
                 </v-btn>
-                <v-btn
-                  icon
-                  @click="duplicateRow(idx)"
-                  tabindex="-1"
-                  small
-                >
+                <v-btn icon @click="duplicateRow(idx)" tabindex="-1" small>
                   <v-icon>mdi-content-copy</v-icon>
                 </v-btn>
               </div>
@@ -178,27 +123,14 @@
       </template>
     </v-data-table>
     <div class="mt-4 mb-12">
-      <v-btn
-        @click="add"
-        color="primary"
-      >
-        <v-icon left>mdi-plus</v-icon>{{addRowLabel}}
-      </v-btn>
+      <v-btn @click="add" color="primary"> <v-icon left>mdi-plus</v-icon>{{ addRowLabel }} </v-btn>
     </div>
     <app-control-more-info :value="control.moreInfo" />
 
-    <div
-      class="d-flex flex-row align-center"
-      v-if="loading"
-    >
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        size="24"
-      />
+    <div class="d-flex flex-row align-center" v-if="loading">
+      <v-progress-circular indeterminate color="primary" size="24" />
       <div class="ml-2 text--secondary">Loading farmOS data</div>
     </div>
-
   </div>
 </template>
 
@@ -208,7 +140,6 @@ import appDialog from '@/components/ui/Dialog.vue';
 import appMatrixCell from '@/components/survey/question_types/MatrixCell.vue';
 import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
-
 
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
@@ -245,7 +176,6 @@ const transform = (assets) => {
       return;
     }
 
-
     asset.value.location.forEach((location) => {
       areas[`${asset.value.farmId}.${location.id}`] = {
         farmId: asset.value.farmId,
@@ -263,9 +193,8 @@ const transform = (assets) => {
         return false;
       }
 
-      return asset.value.location.some(loc => loc.id === area.location.id);
+      return asset.value.location.some((loc) => loc.id === area.location.id);
     });
-
 
     const field = {
       value: {
@@ -289,7 +218,6 @@ const transform = (assets) => {
       return r;
     });
 
-
     return [field, ...assetItems];
   });
 
@@ -309,7 +237,6 @@ const transform = (assets) => {
   return res;
 };
 
-
 export default {
   mixins: [baseQuestionComponent, farmosBase('fields')],
   components: {
@@ -326,7 +253,7 @@ export default {
       return this.source.content;
     },
     fields() {
-      return this.source.content.map(col => col.value);
+      return this.source.content.map((col) => col.value);
     },
     addRowLabel() {
       return this.source.config.addRowLabel;
@@ -365,7 +292,7 @@ export default {
 
       // eslint-disable-next-line
       for (const key of Object.keys(newRow)) {
-        const header = this.headers.find(h => h.value === key);
+        const header = this.headers.find((h) => h.value === key);
 
         if (header && header.redacted) {
           newRow[key].meta = { permissions: ['admin'] };
@@ -396,9 +323,9 @@ export default {
       this.showEditItemDialog = true;
     },
     getDropdownItems(field) {
-      const column = this.source.content.find(col => col.value === field);
-      const ontology = this.resources.find(resource => resource.id === column.resource);
-      return ontology.content.map(row => ({ label: row.label, value: row.value }));
+      const column = this.source.content.find((col) => col.value === field);
+      const ontology = this.resources.find((resource) => resource.id === column.resource);
+      return ontology.content.map((row) => ({ label: row.label, value: row.value }));
     },
     onInput() {
       console.log('onInput', this.rows);
@@ -412,11 +339,11 @@ export default {
     },
   },
   async created() {
-    if (this.headers.find(header => header.type === 'farmos_field')) {
+    if (this.headers.find((header) => header.type === 'farmos_field')) {
       this.fetchAreas();
     }
 
-    if (this.headers.find(header => header.type === 'farmos_planting')) {
+    if (this.headers.find((header) => header.type === 'farmos_planting')) {
       await this.fetchAssets();
       this.farmosTransformedPlantings = transform(this.assets);
     }

@@ -1,12 +1,7 @@
 <template>
   <v-container>
     <div class="d-flex justify-end">
-      <v-checkbox
-        v-model="showArchived"
-        label="View archived"
-        dense
-        hide-details
-      />
+      <v-checkbox v-model="showArchived" label="View archived" dense hide-details />
     </div>
     <app-basic-list
       editable
@@ -14,18 +9,15 @@
       :entities="entities"
       title="Groups"
       :link="(e) => `/g${e.path}`"
-      :linkNew="{name: 'groups-new', query: {dir: rootDir}}"
+      :linkNew="{ name: 'groups-new', query: { dir: rootDir } }"
     >
-
       <template v-slot:entity="{ entity }">
         <v-list-item-content>
-          <v-list-item-title>{{entity.name}}</v-list-item-title>
-          <v-list-item-subtitle>{{entity.path}}</v-list-item-subtitle>
+          <v-list-item-title>{{ entity.name }}</v-list-item-title>
+          <v-list-item-subtitle>{{ entity.path }}</v-list-item-subtitle>
         </v-list-item-content>
       </template>
-
     </app-basic-list>
-
   </v-container>
 </template>
 

@@ -4,11 +4,9 @@ import Edit from '../control/Edit/Edit';
 // Import replaceToEPSG4326().
 import replaceToEPSG4326 from '../projection/replaceToEPSG4326';
 
-
 // Edit control behavior.
 export default {
   attach(instance, { layer } = {}) {
-
     /**
      * Replace the OpenLayers core toEPSG4326() function.
      * @see https://github.com/farmOS/farmOS-map/issues/49
@@ -24,7 +22,7 @@ export default {
     const drawingLayer = layer || instance.addLayer('vector', opts);
 
     // Get the units from instance options.
-    const units = (instance.options.units === 'us') ? 'us' : 'metric';
+    const units = instance.options.units === 'us' ? 'us' : 'metric';
 
     // Create the Edit control and add it to the map.
     // Make it available at instance.edit.

@@ -2,7 +2,6 @@
 /* eslint-disable no-new-func */
 /* eslint-disable no-bitwise */
 
-
 import { unflatten } from 'flat';
 import { clone, cloneDeep, set } from 'lodash';
 import moment from 'moment';
@@ -35,10 +34,7 @@ function* processSurveyNamesFull(data, namespace = '') {
     yield `${namespace === '' ? '' : `${namespace}.`}${val.name}`;
 
     if (val.children) {
-      yield* processSurveyNamesFull(
-        val.children,
-        `${namespace === '' ? '' : `${namespace}.`}${val.name}`,
-      );
+      yield* processSurveyNamesFull(val.children, `${namespace === '' ? '' : `${namespace}.`}${val.name}`);
     }
   }
 }
@@ -69,10 +65,7 @@ function* processJsDoc(data, namespace = 'data') {
     yield `@param {${type}} ${namespace === '' ? namespace : `${namespace}.`}${val.name}`;
 
     if (val.children) {
-      yield* processJsDoc(
-        val.children,
-        `${namespace === '' ? namespace : `${namespace}.`}${val.name}`,
-      );
+      yield* processJsDoc(val.children, `${namespace === '' ? namespace : `${namespace}.`}${val.name}`);
     }
   }
 }
@@ -106,10 +99,7 @@ function* processData(data, namespace = '') {
     };
 
     if (val.children) {
-      yield* processData(
-        val.children,
-        `${namespace === '' ? '' : `${namespace}.`}${val.name}`,
-      );
+      yield* processData(val.children, `${namespace === '' ? '' : `${namespace}.`}${val.name}`);
     }
   }
 }
@@ -152,10 +142,9 @@ export const getControlPositions = (controls) => {
 };
 
 export const getSurveyPositions = (survey, version = 1) => {
-  const positions = getControlPositions(survey.revisions.find(revision => revision.version === version).controls);
+  const positions = getControlPositions(survey.revisions.find((revision) => revision.version === version).controls);
   return positions;
 };
-
 
 export const getJsDoc = (survey, namespace = 'data') => {
   const it = processJsDoc(survey.controls, namespace);
@@ -166,7 +155,7 @@ export const getJsDoc = (survey, namespace = 'data') => {
     res = it.next();
   }
 
-  const doc = annotations.map(annotation => ` * ${annotation}`).join('\n');
+  const doc = annotations.map((annotation) => ` * ${annotation}`).join('\n');
 
   return `/**
  * @param {Object} ${namespace}
@@ -277,7 +266,6 @@ export const getBreadcrumbs = (survey, position) => {
   return breadcrumbs;
 };
 
-
 export const getInstanceIndex = (survey, position) => {
   const breadcrumbs = [];
   let { controls } = survey;
@@ -289,7 +277,6 @@ export const getInstanceIndex = (survey, position) => {
   return breadcrumbs.join('.');
 };
 
-
 function objectFromChild(child) {
   const v = {};
   if (child.type !== 'group') {
@@ -297,12 +284,12 @@ function objectFromChild(child) {
     return v;
   }
 
-  v[`${child.name}`] = Object.assign({}, ...(child.children.map(c => objectFromChild(c))));
+  v[`${child.name}`] = Object.assign({}, ...child.children.map((c) => objectFromChild(c)));
   return v;
 }
 
 export const codeFromSubmission = (submission) => {
-  const values = Object.assign({}, ...(submission.data.map(d => objectFromChild(d))));
+  const values = Object.assign({}, ...submission.data.map((d) => objectFromChild(d)));
   return values;
 };
 
@@ -316,7 +303,7 @@ export const uuid = () => {
     if (c === 'x') {
       return r.toString(16);
     }
-    return (r & 0x3 | 0x8).toString(16);
+    return ((r & 0x3) | 0x8).toString(16);
   });
   return `${u}.${new Date().getTime().toString(16)}`;
 };
@@ -335,7 +322,7 @@ export function compileSandboxSingleLine(src) {
   const wrappedSource = `with (sandbox) { return ${src}}`;
   const code = new Function('sandbox', wrappedSource);
 
-  return function (sandbox) {
+  return function(sandbox) {
     const sandboxProxy = new Proxy(sandbox, { _has, _get });
     return code(sandboxProxy);
   };
@@ -345,7 +332,7 @@ export function compileSandbox(src, fname) {
   const wrappedSource = `with (sandbox) { ${src}\nreturn ${fname}(arg1, arg2, arg3); }`;
   const code = new Function('sandbox', wrappedSource);
 
-  return function (sandbox) {
+  return function(sandbox) {
     const sandboxProxy = new Proxy(sandbox, { _has, _get });
     return code(sandboxProxy);
   };
@@ -362,16 +349,14 @@ export const simplify = (submissionItem) => {
   }
 
   const ret = {};
-  const keys = Object.keys(submissionItem).filter(k => k !== 'value' && k !== 'meta');
+  const keys = Object.keys(submissionItem).filter((k) => k !== 'value' && k !== 'meta');
   keys.forEach((k) => {
     ret[k] = simplify(submissionItem[k]);
   });
   return ret;
 };
 
-export function executeUnsafe({
-  code, fname, submission, survey, parent, log,
-}) {
+export function executeUnsafe({ code, fname, submission, survey, parent, log }) {
   console.log('execute unsafe called');
   const sandbox = compileSandbox(code, fname);
 
@@ -386,9 +371,7 @@ export function executeUnsafe({
   return res;
 }
 
-export function execute({
-  code, fname, submission, log, survey, parent,
-}) {
+export function execute({ code, fname, submission, log, survey, parent }) {
   console.log('execute safe called');
   const worker = new Worker('/worker.js');
 
@@ -422,15 +405,13 @@ export function execute({
       }
     };
 
-    worker.postMessage(
-      {
-        fname,
-        arg1: submission,
-        arg2: survey,
-        arg3: parent,
-        code,
-      },
-    );
+    worker.postMessage({
+      fname,
+      arg1: submission,
+      arg2: survey,
+      arg3: parent,
+      code,
+    });
   });
 }
 
@@ -442,13 +423,13 @@ export const calculateControl = (control) => {
   }
 };
 
-
 const firstParentWithRelevance = (submission, survey, index, positions) => {
   const pos = clone(positions[index]);
   const len = pos.length - 1;
   const parts = [];
   parts.push(clone(pos));
-  for (let i = 0; i < len; i++) { // swim to the top
+  for (let i = 0; i < len; i++) {
+    // swim to the top
     pos.splice(-1, 1);
     parts.push(clone(pos));
   }
@@ -468,7 +449,7 @@ export const isRelevant = (submission, survey, index, positions) => {
 };
 
 export const createQueryList = (survey, version = 1) => {
-  const { controls } = survey.revisions.find(revision => revision.version === version);
+  const { controls } = survey.revisions.find((revision) => revision.version === version);
   const positions = getControlPositions(controls);
   const items = [];
   positions.forEach((position) => {
@@ -480,7 +461,6 @@ export const createQueryList = (survey, version = 1) => {
   });
   return items;
 };
-
 
 export const mockSurvey = {
   _id: '5dadc4c9988f9df9527f07ac',
@@ -664,7 +644,6 @@ const mockInstance = {
       ],
     },
   ],
-
 };
 const DBG = false;
 
@@ -732,10 +711,7 @@ export function findControlById(controlId, controls) {
         return [x, ...r];
       }
       if (x.type === 'group') {
-        return [
-          ...x.children.reduce(reducer(id), []),
-          ...r,
-        ];
+        return [...x.children.reduce(reducer(id), []), ...r];
       }
       return r;
     };
@@ -755,7 +731,7 @@ export function findParentByChildId(controlId, controls) {
   function fpr(id) {
     return (r, x) => {
       if (x.type === 'group') {
-        if (x.children.some(child => child.id === id)) {
+        if (x.children.some((child) => child.id === id)) {
           return [x, ...r];
         }
         return [...x.children.reduce(fpr(id), []), ...r];
@@ -777,11 +753,7 @@ export function getGroups(controls) {
     // console.log(i, r);
     if (x.type === 'group') {
       // return [x, ...r];
-      return [
-        ...x.children.reduce(reducer, []),
-        x,
-        ...r,
-      ];
+      return [...x.children.reduce(reducer, []), x, ...r];
     }
     return r;
   }
@@ -817,9 +789,12 @@ export function getGroups(controls) {
  * @param {function({})} options.replacer function to replace the value for the control's key.
  *    takes the control as an argument and returns the replacement value
  */
-export function updateControls(controls = [], options = {
-  replacer: () => null,
-}) {
+export function updateControls(
+  controls = [],
+  options = {
+    replacer: () => null,
+  }
+) {
   // equivalent to doing `obj = newObj`, mutating the original object, without reassigning it
   function mutateObj(left, newVal) {
     Object.keys(left).forEach((k) => {
@@ -832,16 +807,9 @@ export function updateControls(controls = [], options = {
     });
   }
 
-  function modify({
-    type,
-    key,
-    replacer,
-  }) {
+  function modify({ type, key, replacer }) {
     return (control) => {
-      if (
-        control.type === type
-        || (type instanceof RegExp && type.test(control.type))
-      ) {
+      if (control.type === type || (type instanceof RegExp && type.test(control.type))) {
         if (key) {
           set(control, key, replacer(control));
         } else {
@@ -866,11 +834,7 @@ export function updateControls(controls = [], options = {
  * @param {object} options.group.path group path
  * @param {number} options.specVersion specification version for survey definition
  */
-export function createSurvey({
-  creator = null,
-  group = null,
-  specVersion = SPEC_VERSION_SURVEY,
-}) {
+export function createSurvey({ creator = null, group = null, specVersion = SPEC_VERSION_SURVEY }) {
   const currentDate = moment().toISOString(true);
   return {
     _id: '',
@@ -885,10 +849,12 @@ export function createSurvey({
       specVersion,
     },
     resources: [],
-    revisions: [{
-      dateCreated: currentDate,
-      version: 1,
-      controls: [],
-    }],
+    revisions: [
+      {
+        dateCreated: currentDate,
+        version: 1,
+        controls: [],
+      },
+    ],
   };
 }

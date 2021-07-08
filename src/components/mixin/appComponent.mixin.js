@@ -7,8 +7,6 @@ export default {
       this.$store.dispatch('appui/setTitle', title);
       this.$store.dispatch('appui/setSubtitle', subtitle);
     },
-    getSurveys() {
-
-    },
+    getSurveys() {},
   },
 };

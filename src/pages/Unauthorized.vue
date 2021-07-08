@@ -1,7 +1,8 @@
 <template>
   <v-container>
     <h1>Access denied</h1>
-    Only {{allowed}} are allowed on <strong>{{to.path}}</strong>. Goodbye!
+    Only {{ allowed }} are allowed on <strong>{{ to.path }}</strong
+    >. Goodbye!
   </v-container>
 </template>
 

@@ -7,7 +7,7 @@ function loadLayerVisibility(layer) {
   if (title) {
     const itemName = `farmOS.map.layers.${title}.visible`;
     if (localStorage.getItem(itemName) !== null) {
-      const visible = (JSON.parse(localStorage.getItem(itemName)) === true);
+      const visible = JSON.parse(localStorage.getItem(itemName)) === true;
       layer.setVisible(visible);
     }
   }
@@ -26,7 +26,6 @@ function saveLayerVisibility(layer) {
 // Remember layer behavior.
 export default {
   attach(instance) {
-
     // Update layer visibility.
     this.update(instance);
 
@@ -46,7 +45,6 @@ export default {
 
   // Update all layer visibility states.
   update(instance) {
-
     // Remember visibility state of base layers.
     forEachLayer(instance.map.getLayerGroup(), (layer) => {
       if (layer.get('type') === 'base') {

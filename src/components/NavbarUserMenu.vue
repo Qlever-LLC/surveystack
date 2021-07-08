@@ -1,26 +1,14 @@
 <template>
   <div>
-    <v-menu
-      left
-      attach="#app-menu"
-      offset-y
-      v-if="$store.getters['auth/isLoggedIn']"
-      :close-on-content-click="false"
-    >
+    <v-menu left attach="#app-menu" offset-y v-if="$store.getters['auth/isLoggedIn']" :close-on-content-click="false">
       <template v-slot:activator="{ on }">
-        <v-btn
-          text
-          v-on="on"
-        >
-          <span class="d-none d-md-inline mr-1">{{$store.getters['auth/user'].email}}</span>
+        <v-btn text v-on="on">
+          <span class="d-none d-md-inline mr-1">{{ $store.getters['auth/user'].email }}</span>
           <v-icon>mdi-account</v-icon>
         </v-btn>
       </template>
       <v-list flat>
-        <v-list-item
-          link
-          :to="{name: 'auth-profile'}"
-        >
+        <v-list-item link :to="{ name: 'auth-profile' }">
           <v-list-item-icon>
             <v-icon>mdi-account-circle</v-icon>
           </v-list-item-icon>
@@ -28,10 +16,7 @@
             Profile
           </v-list-item-title>
         </v-list-item>
-        <v-list-item
-          link
-          :to="{name: 'users-edit', params: { id: this.$store.state.auth.user._id }}"
-        >
+        <v-list-item link :to="{ name: 'users-edit', params: { id: this.$store.state.auth.user._id } }">
           <v-list-item-icon>
             <v-icon>mdi-account-edit</v-icon>
           </v-list-item-icon>
@@ -43,11 +28,7 @@
         <v-subheader>Active Group</v-subheader>
         <active-group-selector-list v-model="activeGroup" />
         <v-divider />
-        <v-list-item
-          link
-          @click="logout"
-          class="mt-2"
-        >
+        <v-list-item link @click="logout" class="mt-2">
           <v-list-item-icon>
             <v-icon>mdi-logout-variant</v-icon>
           </v-list-item-icon>
@@ -61,11 +42,7 @@
       <!-- </v-card> -->
     </v-menu>
 
-    <v-btn
-      v-else
-      :to="{name: 'auth-login'}"
-      text
-    >
+    <v-btn v-else :to="{ name: 'auth-login' }" text>
       <v-icon>mdi-login-variant</v-icon>
       <span class="ml-2">Login</span>
     </v-btn>

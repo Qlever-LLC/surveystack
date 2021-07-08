@@ -18,7 +18,7 @@
         icon
         @click.stop="openDialog"
         :disabled="disabled"
-        :class="{'d-none': !value}"
+        :class="{ 'd-none': !value }"
         class="ml-2 mt-3"
         v-if="resource"
       >
@@ -33,10 +33,7 @@
       label="Instructions Body (Markdown)"
     />
 
-    <v-dialog
-      v-model="imageDialogIsVisible"
-      width="500"
-    >
+    <v-dialog v-model="imageDialogIsVisible" width="500">
       <!-- <select-items-table-editor
         :resources="filteredResources"
         :resource="resource"
@@ -90,7 +87,7 @@ export default {
     },
     resources: {
       type: Array,
-      default: () => ([]),
+      default: () => [],
     },
     disabled: {
       required: false,
@@ -98,10 +95,10 @@ export default {
   },
   computed: {
     filteredResources() {
-      return this.resources.filter(resource => resource.type === 'IMAGE');
+      return this.resources.filter((resource) => resource.type === 'IMAGE');
     },
     resource() {
-      return this.resources.find(resource => resource.id === this.value.images[0]);
+      return this.resources.find((resource) => resource.id === this.value.images[0]);
     },
   },
   methods: {
@@ -125,7 +122,7 @@ export default {
       const newResources = removeResource(this.resources, id);
       this.$emit('set-survey-resources', newResources);
 
-      const newImages = this.value.images.filter(imageId => imageId !== id);
+      const newImages = this.value.images.filter((imageId) => imageId !== id);
       this.$emit('set-control-source', {
         body: this.value.body,
         images: newImages,
@@ -138,15 +135,10 @@ export default {
       this.$emit('set-survey-resources', newResources);
     },
     createResourceHandler() {
-      const newResource = createResource(
-        this.resources,
-        resourceTypes.IMAGE,
-        resourceLocations.REMOTE,
-        {
-          labelPrefix: 'Image',
-          defaultContent: '',
-        },
-      );
+      const newResource = createResource(this.resources, resourceTypes.IMAGE, resourceLocations.REMOTE, {
+        labelPrefix: 'Image',
+        defaultContent: '',
+      });
       this.$emit('set-survey-resources', appendResource(this.resources, newResource));
       this.$emit('set-control-source', {
         body: this.value.body,
@@ -170,5 +162,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

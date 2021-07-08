@@ -15,12 +15,7 @@
         item-text="name"
       >
         <template slot="append-outer">
-          <v-chip
-            style="margin-top: -10px;"
-            dark
-            color="green"
-            v-if="surveyVersion"
-          >
+          <v-chip style="margin-top: -10px;" dark color="green" v-if="surveyVersion">
             Survey Version {{ surveyVersion }}
           </v-chip>
         </template>
@@ -42,24 +37,13 @@
     <v-spacer />
     <v-card-actions>
       <v-spacer />
-      <v-btn
-        text
-        @click="closeHandler"
-      >
+      <v-btn text @click="closeHandler">
         Close
       </v-btn>
-      <v-btn
-        text
-        color="error"
-        @click="deleteResource"
-      >
+      <v-btn text color="error" @click="deleteResource">
         Delete
       </v-btn>
-      <v-btn
-        text
-        color="primary"
-        @click="updateAndClose"
-      >
+      <v-btn text color="primary" @click="updateAndClose">
         Save
       </v-btn>
     </v-card-actions>
@@ -71,13 +55,12 @@ import TreeModel from 'tree-model';
 import api from '@/services/api.service';
 
 function getSurveyById(surveys, id) {
-  return surveys.find(s => s._id === id);
+  return surveys.find((s) => s._id === id);
 }
 
 function getPathByPath(paths, path) {
-  return paths.find(p => p.path === path);
+  return paths.find((p) => p.path === path);
 }
-
 
 export default {
   props: {
@@ -89,7 +72,7 @@ export default {
     resources: {
       type: Array,
       required: true,
-      default: () => ([]),
+      default: () => [],
     },
   },
   data: () => ({
@@ -155,7 +138,10 @@ export default {
         if (node.hasChildren()) {
           return true;
         }
-        const path = node.getPath().map(n => n.model.name).join('.');
+        const path = node
+          .getPath()
+          .map((n) => n.model.name)
+          .join('.');
         const control = node.model;
         const name = `${control.label} (${path})`;
         paths.push({
@@ -189,6 +175,4 @@ export default {
 };
 </script>
 
-<style>
-
-</style>
+<style></style>

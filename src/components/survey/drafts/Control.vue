@@ -2,33 +2,23 @@
   <div class="mx-0 px-0" style="width: 100%">
     <div v-if="control.type === 'page' && !insidePage && !control.options.hidden">
       <div v-for="(child, i) in control.children" :key="i">
-        <app-control
-          :path="`${path}.${child.name}`"
-          :control="child"
-          :autoFocus="i === 0"
-          insidePage
-        />
+        <app-control :path="`${path}.${child.name}`" :control="child" :autoFocus="i === 0" insidePage />
       </div>
     </div>
 
     <div v-else-if="control.type === 'group' && insidePage && !control.options.hidden">
       <div
         class="group"
-        :class="{ irrelevant: !$store.getters['draft/relevance'](path), hidden: !$store.getters['draft/relevance'](path) && insidePage }"
+        :class="{
+          irrelevant: !$store.getters['draft/relevance'](path),
+          hidden: !$store.getters['draft/relevance'](path) && insidePage,
+        }"
       >
-        <app-control-label
-          :value="control.label"
-          :redacted="control.options && control.options.redacted"
-        />
+        <app-control-label :value="control.label" :redacted="control.options && control.options.redacted" />
         <app-control-hint :value="control.hint" />
 
         <div v-for="(child, i) in control.children" :key="i">
-          <app-control
-            :path="`${path}.${child.name}`"
-            :control="child"
-            :autoFocus="autoFocus && i === 0"
-            insidePage
-          />
+          <app-control :path="`${path}.${child.name}`" :control="child" :autoFocus="autoFocus && i === 0" insidePage />
         </div>
 
         <app-control-more-info :value="control.moreInfo" />
@@ -38,16 +28,15 @@
     <div v-else-if="!control.options.hidden">
       <div
         class="control"
-        :class="{ irrelevant: !$store.getters['draft/relevance'](path), hidden: !$store.getters['draft/relevance'](path) && insidePage}"
+        :class="{
+          irrelevant: !$store.getters['draft/relevance'](path),
+          hidden: !$store.getters['draft/relevance'](path) && insidePage,
+        }"
       >
         <component
           :is="getComponentName(control)"
           :control="control"
-          :value="
-            $store.getters['draft/property'](path)
-              ? $store.getters['draft/property'](path).value
-              : null
-          "
+          :value="$store.getters['draft/property'](path) ? $store.getters['draft/property'](path).value : null"
           :index="path"
           :key="path"
           :resources="survey.resources"
@@ -59,16 +48,9 @@
           @setRenderQueue="setRenderQueue"
           :autoFocus="autoFocus"
           :relevant="$store.getters['draft/relevance'](path)"
-          @next="
-            !$store.getters['draft/hasRequiredUnanswered'] &&
-              $store.dispatch('draft/next')
-          "
+          @next="!$store.getters['draft/hasRequiredUnanswered'] && $store.dispatch('draft/next')"
           :redacted="control.options && control.options.redacted"
-          :required="
-            $store.getters['draft/relevance'](path) &&
-            control.options &&
-            control.options.required
-          "
+          :required="$store.getters['draft/relevance'](path) && control.options && control.options.required"
         />
       </div>
     </div>
@@ -79,7 +61,6 @@
 import moment from 'moment';
 import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
-
 
 export default {
   name: 'app-control',
@@ -121,7 +102,11 @@ export default {
 
       // adjust modified date
       const modified = moment().toISOString(true);
-      this.$store.dispatch('draft/setProperty', { path: `${this.path}.meta.dateModified`, value: modified, calculate: false });
+      this.$store.dispatch('draft/setProperty', {
+        path: `${this.path}.meta.dateModified`,
+        value: modified,
+        calculate: false,
+      });
       this.$store.dispatch('draft/setProperty', { path: 'meta.dateModified', value: modified, calculate: false });
     },
     setStatus({ type, message }) {
@@ -174,7 +159,6 @@ export default {
   border-left: 4px solid #aaa;
 }
 
-
 .hidden {
   display: none;
 }
@@ -185,6 +169,6 @@ export default {
 }
 
 .title {
-  font-family: "Google Sans", Roboto, Arial, sans-serif;
+  font-family: 'Google Sans', Roboto, Arial, sans-serif;
 }
 </style>

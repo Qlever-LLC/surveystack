@@ -18,13 +18,12 @@
       </div>
       <div class="text--secondary">
         {{ surveyInfo.submissions }}
-        {{ surveyInfo.submissions === 1 ? "submission" : "submissions" }}
+        {{ surveyInfo.submissions === 1 ? 'submission' : 'submissions' }}
       </div>
       <div v-if="surveyInfo.latestSubmission" class="text--secondary">
         Latest submission on {{ surveyInfo.latestSubmission.dateModified }}
       </div>
     </div>
-
 
     <div class="pt-8 pb-4 d-flex justify-center start-button-container">
       <div class="text-center">
@@ -43,7 +42,6 @@
         </div>
       </div>
     </div>
-
   </v-container>
 </template>
 
@@ -77,11 +75,7 @@ export default {
       }
       const user = this.$store.getters['auth/user'];
 
-      if (
-        this.entity
-        && this.entity.meta
-        && this.entity.meta.creator === user._id
-      ) {
+      if (this.entity && this.entity.meta && this.entity.meta.creator === user._id) {
         return true;
       }
 
@@ -89,9 +83,7 @@ export default {
         return false;
       }
 
-      const g = this.memberships.find(
-        m => m.group._id === this.entity.meta.group.id,
-      );
+      const g = this.memberships.find((m) => m.group._id === this.entity.meta.group.id);
       if (g && g.role === 'admin') {
         return true;
       }
@@ -117,9 +109,7 @@ export default {
       if (submissions === 'group' && this.$store.getters['auth/isLoggedIn']) {
         const groups = this.$store.getters['memberships/groups'];
         console.log(groups);
-        const match = groups.find(
-          group => group._id === this.entity.meta.group.id,
-        );
+        const match = groups.find((group) => group._id === this.entity.meta.group.id);
         console.log('match', match);
         if (match) {
           return true;
@@ -163,13 +153,13 @@ export default {
 
     const { submissions, isLibrary } = this.entity.meta;
 
-
     if (!submissions || submissions === 'public' || isLibrary) {
       this.show = true;
       return;
     }
 
-    if (this.$store.getters['auth/isLoggedIn']) { // let ui handle issues if user is already logged in
+    if (this.$store.getters['auth/isLoggedIn']) {
+      // let ui handle issues if user is already logged in
       this.show = true;
       return;
     }
@@ -189,7 +179,7 @@ export default {
 }
 
 .start-button-container {
-  background: linear-gradient(to bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,0.85) 50%);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.85) 50%);
 
   position: fixed;
   bottom: 0;
