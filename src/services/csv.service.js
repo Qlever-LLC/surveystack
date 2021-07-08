@@ -76,7 +76,6 @@ function createCsvLegacy(submissions) {
   return csv;
 }
 
-
 function createCsv(submissions, headers) {
   const items = [];
   submissions.forEach((s) => {

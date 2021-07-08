@@ -1,10 +1,6 @@
 <template>
   <div>
-    <app-control-label
-      :value="control.label"
-      :redacted="redacted"
-      :required="required"
-    />
+    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <v-autocomplete
       :disabled="loading"
       :value="value"
@@ -19,14 +15,11 @@
       @keyup.enter.prevent="submit"
       :loading="loading"
     >
-      <template v-slot:item="{item}">
+      <template v-slot:item="{ item }">
         <div v-html="item.label"></div>
       </template>
-      <template v-slot:selection="{item}">
-        <div
-          v-html="item.label"
-          class="d-flex align-center"
-        ></div>
+      <template v-slot:selection="{ item }">
+        <div v-html="item.label" class="d-flex align-center"></div>
       </template>
     </v-autocomplete>
 
@@ -41,8 +34,7 @@ import farmosBase from './FarmOsBase';
 export default {
   mixins: [baseQuestionComponent, farmosBase('fields')],
   data() {
-    return {
-    };
+    return {};
   },
   async created() {
     await this.fetchAreas();

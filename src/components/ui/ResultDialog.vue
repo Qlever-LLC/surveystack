@@ -1,21 +1,11 @@
 <template>
   <div>
-    <v-dialog
-      v-model="show"
-      max-width="350"
-      :persistent="persistent"
-    >
+    <v-dialog v-model="show" max-width="350" :persistent="persistent">
       <v-card class="pa-4">
-        <v-card-title class="headline" v-if="title">{{title}}</v-card-title>
+        <v-card-title class="headline" v-if="title">{{ title }}</v-card-title>
         <template v-for="(item, idx) in items">
-          <div :key="'item_'+idx">
-            <v-card
-              flat
-              dark
-              outlined
-              class="mb-2"
-              :color="item.error ? 'red darken-4' : 'green'"
-            >
+          <div :key="'item_' + idx">
+            <v-card flat dark outlined class="mb-2" :color="item.error ? 'red darken-4' : 'green'">
               <v-card-text class="white--text">
                 <span style="font-weight: bold">{{ item.title }}</span> {{ item.body }}
               </v-card-text>
@@ -25,11 +15,7 @@
         <div v-if="additionalMessage" v-html="additionalMessage" />
         <v-card-actions>
           <v-spacer />
-          <v-btn
-            text
-            color="primary"
-            @click="onClose"
-          >
+          <v-btn text color="primary" @click="onClose">
             Ok
           </v-btn>
         </v-card-actions>
@@ -46,8 +32,8 @@ export default {
     },
     items: {
       type: Array,
-      default: () => ([]),
-      validator: item => item.every(({ title, body }) => !!title && !!body),
+      default: () => [],
+      validator: (item) => item.every(({ title, body }) => !!title && !!body),
     },
     title: String,
     persistent: {

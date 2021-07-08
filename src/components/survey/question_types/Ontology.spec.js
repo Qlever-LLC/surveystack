@@ -82,9 +82,7 @@ function mockApiGetCheckboxesSubmissions() {
         _id: '60bfc84cfc482000010a3099',
         data: {
           checkboxes_1: {
-            value: [
-              'cat',
-            ],
+            value: ['cat'],
           },
         },
       },
@@ -92,9 +90,7 @@ function mockApiGetCheckboxesSubmissions() {
         _id: '60bfc41ae47e630001bbb41e',
         data: {
           checkboxes_1: {
-            value: [
-              'cat',
-            ],
+            value: ['cat'],
           },
         },
       },
@@ -102,10 +98,7 @@ function mockApiGetCheckboxesSubmissions() {
         _id: '60afbdf7ac16af0001203bfd',
         data: {
           checkboxes_1: {
-            value: [
-              'cat',
-              'dog',
-            ],
+            value: ['cat', 'dog'],
           },
         },
       },
@@ -113,10 +106,7 @@ function mockApiGetCheckboxesSubmissions() {
         _id: '60afbde7ac16af0001203bfc',
         data: {
           checkboxes_1: {
-            value: [
-              'cat',
-              'dog',
-            ],
+            value: ['cat', 'dog'],
           },
         },
       },
@@ -124,10 +114,7 @@ function mockApiGetCheckboxesSubmissions() {
         _id: '60afbdd4ac16af0001203bfb',
         data: {
           checkboxes_1: {
-            value: [
-              'cat',
-              'dog',
-            ],
+            value: ['cat', 'dog'],
           },
         },
       },
@@ -168,10 +155,13 @@ describe('Ontology question', () => {
     });
 
     it('sets autocomplete input from value in single selection, custom mode', () => {
-      const wrapper = shallowMount(Ontology, getMountOpts({
-        value: ['custom'],
-        allowCustomSelection: true,
-      }));
+      const wrapper = shallowMount(
+        Ontology,
+        getMountOpts({
+          value: ['custom'],
+          allowCustomSelection: true,
+        })
+      );
       const dropDown = wrapper.find('[data-test-id="combobox"]');
       expect(dropDown.vm.value).toBe('custom');
     });
@@ -184,48 +174,63 @@ describe('Ontology question', () => {
     });
 
     it('sets autocomplete value from value in multiple selection, non-custom mode', () => {
-      const wrapper = shallowMount(Ontology, getMountOpts({
-        hasMultipleSelections: true,
-        value: ['cat', 'dog'],
-      }));
+      const wrapper = shallowMount(
+        Ontology,
+        getMountOpts({
+          hasMultipleSelections: true,
+          value: ['cat', 'dog'],
+        })
+      );
       const dropDown = wrapper.find('[data-test-id="autocomplete"]');
       expect(dropDown.vm.value).toEqual(['cat', 'dog']);
     });
 
     it('sets autocomplete with chips from value in multiple selection, non-custom mode', () => {
-      const wrapper = mount(Ontology, getMountOpts({
-        hasMultipleSelections: true,
-        value: ['cat', 'dog'],
-      }));
+      const wrapper = mount(
+        Ontology,
+        getMountOpts({
+          hasMultipleSelections: true,
+          value: ['cat', 'dog'],
+        })
+      );
       expect(wrapper.findAll('.v-chip').wrappers.length).toBe(2);
     });
 
     it('sets value as an array in mutliple selection, custom mode', () => {
-      const wrapper = shallowMount(Ontology, getMountOpts({
-        hasMultipleSelections: true,
-        allowCustomSelection: true,
-      }));
+      const wrapper = shallowMount(
+        Ontology,
+        getMountOpts({
+          hasMultipleSelections: true,
+          allowCustomSelection: true,
+        })
+      );
       const dropDown = wrapper.find('[data-test-id="combobox"]');
       dropDown.vm.$emit('change', ['custom', 'dog']);
       expect(wrapper.emitted().changed[0][0]).toEqual(['custom', 'dog']);
     });
 
     it('sets autocomplete value from value in multiple selection, custom mode', () => {
-      const wrapper = shallowMount(Ontology, getMountOpts({
-        hasMultipleSelections: true,
-        allowCustomSelection: true,
-        value: ['custom', 'dog'],
-      }));
+      const wrapper = shallowMount(
+        Ontology,
+        getMountOpts({
+          hasMultipleSelections: true,
+          allowCustomSelection: true,
+          value: ['custom', 'dog'],
+        })
+      );
       const dropDown = wrapper.find('[data-test-id="combobox"]');
       expect(dropDown.vm.value).toEqual(['custom', 'dog']);
     });
 
     it('sets autocomplete with chips from value in multiple selection, custom mode', () => {
-      const wrapper = mount(Ontology, getMountOpts({
-        hasMultipleSelections: true,
-        allowCustomSelection: true,
-        value: ['custom', 'dog'],
-      }));
+      const wrapper = mount(
+        Ontology,
+        getMountOpts({
+          hasMultipleSelections: true,
+          allowCustomSelection: true,
+          value: ['custom', 'dog'],
+        })
+      );
       expect(wrapper.findAll('.v-chip').wrappers.length).toBe(2);
     });
   });

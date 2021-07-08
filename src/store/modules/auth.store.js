@@ -21,12 +21,12 @@ const createInitialState = () => ({
 const initialState = createInitialState();
 
 const getters = {
-  authStatus: state => state.status,
-  isLoggedIn: state => state.status === 'success',
-  isAdmin: state => state.user && state.user.permissions && state.user.permissions.includes('admin'),
-  isSuperAdmin: state => state.user && state.user.permissions && state.user.permissions.includes('super-admin'),
-  user: state => state.user,
-  isShapeshifting: state => state.shapeshiftHeader && state.shapeshiftUser,
+  authStatus: (state) => state.status,
+  isLoggedIn: (state) => state.status === 'success',
+  isAdmin: (state) => state.user && state.user.permissions && state.user.permissions.includes('admin'),
+  isSuperAdmin: (state) => state.user && state.user.permissions && state.user.permissions.includes('super-admin'),
+  user: (state) => state.user,
+  isShapeshifting: (state) => state.shapeshiftHeader && state.shapeshiftUser,
 };
 
 const clearLocalData = ({ dispatch }) => {
@@ -56,7 +56,6 @@ const actions = {
           AuthService.saveStatus('success');
           AuthService.saveUser(user);
           AuthService.saveHeader(header);
-
 
           commit('auth_success', { user, header });
           resolve(resp.data);

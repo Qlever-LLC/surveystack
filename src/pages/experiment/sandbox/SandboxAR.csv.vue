@@ -17,44 +17,25 @@
                 <v-toolbar-title>Simple CSV</v-toolbar-title>
               </v-col>
               <v-col>
-                <v-text-field
-                  v-model="search"
-                  append-icon="mdi-search"
-                  label="Search"
-                  single-line
-                  autocomplete="off"
-                />
+                <v-text-field v-model="search" append-icon="mdi-search" label="Search" single-line autocomplete="off" />
               </v-col>
               <v-col :cols="2">
-                <v-switch
-                  v-model="excludeMeta"
-                  label="Hide meta"
-                  class="mt-2"
-                ></v-switch>
+                <v-switch v-model="excludeMeta" label="Hide meta" class="mt-2"></v-switch>
               </v-col>
             </v-row>
-
           </v-toolbar>
         </template>
         <template v-slot:header="{ props: { headers } }">
           <thead>
             <tr>
-              <th
-                v-for="(header,i) in headers"
-                :key="header.text"
-              >
-                <v-text-field
-                  v-if="i > 0"
-                  @input="(v) => hello(v, header.text)"
-                />
-
+              <th v-for="(header, i) in headers" :key="header.text">
+                <v-text-field v-if="i > 0" @input="(v) => hello(v, header.text)" />
               </th>
             </tr>
           </thead>
         </template>
       </v-data-table>
     </v-card>
-
   </v-container>
 </template>
 

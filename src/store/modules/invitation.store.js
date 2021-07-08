@@ -5,8 +5,8 @@ const createInitialState = () => ({
 const initialState = createInitialState();
 
 const getters = {
-  hasInvitation: state => state.invitation !== null,
-  code: state => state.invitation,
+  hasInvitation: (state) => state.invitation !== null,
+  code: (state) => state.invitation,
 };
 
 const actions = {

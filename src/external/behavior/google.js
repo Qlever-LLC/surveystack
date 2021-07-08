@@ -12,7 +12,6 @@ import './google.css';
 // page with a valid API key. See README.md.
 export default {
   attach(instance) {
-
     // Get the map from the instance.
     const { map } = instance;
 

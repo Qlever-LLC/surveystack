@@ -1,17 +1,10 @@
 import { renderWithVuetify } from '../../../../tests/renderWithVuetify';
-import GeoJSON, { 
-  addBaseLayer, 
-  getNextValue,
-  addDrawingLayer,
-} from './GeoJSON.vue';
+import GeoJSON, { addBaseLayer, getNextValue, addDrawingLayer } from './GeoJSON.vue';
 
 import fs from 'fs';
 import path from 'path';
 
-const cssFile = fs.readFileSync(
-  path.resolve(__dirname, './GeoJSON.css'),
-  'utf8'
-);
+const cssFile = fs.readFileSync(path.resolve(__dirname, './GeoJSON.css'), 'utf8');
 
 const style = document.createElement('style');
 style.setAttribute('type', 'text/css');
@@ -19,12 +12,12 @@ style.innerHTML = cssFile;
 
 const getControlProps = (opts) => {
   const options = {
-    showPolygon: true, 
+    showPolygon: true,
     showLine: true,
     showPoint: true,
     showCircle: true,
     ...opts,
-  }
+  };
   return {
     hint: 'hint',
     id: '1',
@@ -37,12 +30,12 @@ const getControlProps = (opts) => {
         showLine: options.showLine,
         showPoint: options.showPoint,
         showCircle: options.showCircle,
-      }
+      },
     },
     type: 'GeoJSON',
     value: null,
   };
-}
+};
 
 describe('GeoJSON Question', () => {
   describe('hides controls', () => {
@@ -59,16 +52,10 @@ describe('GeoJSON Question', () => {
           index: 'data.geojson_1',
         },
       };
-  
-      ({ 
-        getByTitle, 
-        getByText, 
-        getByRole, 
-        container, 
-        updateProps,
-      } = renderWithVuetify(GeoJSON, renderOptions));
+
+      ({ getByTitle, getByText, getByRole, container, updateProps } = renderWithVuetify(GeoJSON, renderOptions));
       container.append(style);
-    })
+    });
 
     it('shows drawing controls by default', () => {
       expect(getByTitle('Draw a Polygon')).toBeVisible();
@@ -102,9 +89,9 @@ describe('GeoJSON Question', () => {
       },
     ];
 
-    thingsToTest.forEach(({key, text}) => {
+    thingsToTest.forEach(({ key, text }) => {
       it(`hides ${text} control`, async () => {
-        await updateProps({ 
+        await updateProps({
           control: getControlProps({ [key]: false }),
         });
         expect(getByTitle(text)).not.toBeVisible();
@@ -112,32 +99,27 @@ describe('GeoJSON Question', () => {
         expect(getByTitle('Move features')).toBeVisible();
       });
     });
-   
-  })
+  });
 
   describe('calls functions', () => {
-    const featureCollection = { 
-      type: 'FeatureCollection', 
+    const featureCollection = {
+      type: 'FeatureCollection',
       features: [
-        { 
-          type: 'Feature', 
+        {
+          type: 'Feature',
           geometry: {
             type: 'Point',
-            coordinates: [125.6, 10.1]
+            coordinates: [125.6, 10.1],
           },
         },
       ],
     };
 
     it('getNextValue returns null for empty feature collection', () => {
-      expect(
-        getNextValue(JSON.stringify({ type: 'FeatureCollection', features: []}))
-      ).toBeNull();
+      expect(getNextValue(JSON.stringify({ type: 'FeatureCollection', features: [] }))).toBeNull();
     });
     it('getNextValue returns geojson for non empty feature collection', () => {
-      expect(
-        getNextValue(JSON.stringify(featureCollection))
-      ).toStrictEqual(featureCollection);
+      expect(getNextValue(JSON.stringify(featureCollection))).toStrictEqual(featureCollection);
     });
 
     it('addBaseLayer creates xyz layer', () => {
@@ -174,8 +156,7 @@ describe('GeoJSON Question', () => {
 
       expect(map.addLayer).toHaveBeenCalled();
       expect(map.addLayer.mock.calls[0][0]).toBe('geojson');
-      expect(map.addLayer.mock.calls[0][1].geojson)
-        .toBe(JSON.stringify(featureCollection));
+      expect(map.addLayer.mock.calls[0][1].geojson).toBe(JSON.stringify(featureCollection));
       expect(map.addBehavior).toHaveBeenCalled();
     });
   });

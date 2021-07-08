@@ -9,7 +9,6 @@
 </template>
 
 <script>
-
 export default {
   props: {
     path: {
@@ -30,7 +29,6 @@ export default {
           to: `/g${splits.join('/')}`,
         });
       }
-
 
       links.reverse();
 

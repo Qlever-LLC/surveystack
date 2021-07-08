@@ -9,13 +9,12 @@ const createInitialState = () => ({
   pinnedSurveys: [],
 });
 
-
 const initialState = createInitialState();
 
 const getters = {
-  isWhitelabel: state => state.partner !== null,
-  partner: state => state.partner,
-  pinnedSurveys: state => state.pinnedSurveys,
+  isWhitelabel: (state) => state.partner !== null,
+  partner: (state) => state.partner,
+  pinnedSurveys: (state) => state.pinnedSurveys,
 };
 
 const actions = {

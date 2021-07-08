@@ -1,46 +1,28 @@
 <template>
-  <v-container
-    v-if="isLoggedIn"
-    class="maxw-40"
-  >
-    <app-feedback
-      title="Shapeshift:"
-      type="info"
-      v-if="showFeedback && isShapeshifting"
-      @closed="showFeedback = false"
-    >
+  <v-container v-if="isLoggedIn" class="maxw-40">
+    <app-feedback title="Shapeshift:" type="info" v-if="showFeedback && isShapeshifting" @closed="showFeedback = false">
       You are currently shapeshifting...
-      <a
-        href="/shapeshift?mode=off"
-        class="text-info"
-        @click.prevent="$store.dispatch('auth/leaveShapeshift')"
-      >Click to return as '{{$store.state.auth.shapeshiftUser.email}}'</a>
+      <a href="/shapeshift?mode=off" class="text-info" @click.prevent="$store.dispatch('auth/leaveShapeshift')"
+        >Click to return as '{{ $store.state.auth.shapeshiftUser.email }}'</a
+      >
     </app-feedback>
     <h1>Profile</h1>
     <p class="mt-4 mb-6">
       You are logged in as
-      <strong>{{ user.email }}</strong>.
+      <strong>{{ user.email }}</strong
+      >.
     </p>
 
-    <active-group-selector
-      class="my-4"
-      v-model="activeGroup"
-      outlined
-    />
+    <active-group-selector class="my-4" v-model="activeGroup" outlined />
 
     <div class="d-flex justify-end">
-      <v-btn
-        text
-        @click="goToEditSelf"
-      >Edit</v-btn>
-      <v-btn
-        color="primary"
-        @click="logout"
-      >Logout</v-btn>
+      <v-btn text @click="goToEditSelf">Edit</v-btn>
+      <v-btn color="primary" @click="logout">Logout</v-btn>
     </div>
   </v-container>
   <v-container v-else>
-    <h1>Profile</h1>You are not logged in... <router-link to="/auth/login">Go to Login</router-link>
+    <h1>Profile</h1>
+    You are not logged in... <router-link to="/auth/login">Go to Login</router-link>
   </v-container>
 </template>
 

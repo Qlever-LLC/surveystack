@@ -15,7 +15,6 @@
             CSV must have column headers 'label', 'value', and optionally 'tags'
           </v-tooltip>
         </div>
-
       </div>
       <v-divider />
     </v-card-title>
@@ -42,19 +41,10 @@
           :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
         />
         <v-spacer />
-        <v-text-field
-            v-model="search"
-            append-icon="mdi-magnify"
-            label="Search"
-          />
+        <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" />
         <v-spacer />
         <div>
-
-          <v-btn
-            icon
-            @click="deleteSelectedItems"
-            :disabled="!selectedItems.length"
-          >
+          <v-btn icon @click="deleteSelectedItems" :disabled="!selectedItems.length">
             <v-icon>mdi-delete</v-icon>
           </v-btn>
         </div>
@@ -87,12 +77,7 @@
     <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
       <v-dialog v-model="deleteDialogIsVisible" max-width="290">
         <template v-slot:activator="{ on }">
-          <v-btn
-            text
-            v-on="on"
-            color="error"
-            class="ml-2"
-          >
+          <v-btn text v-on="on" color="error" class="ml-2">
             <!-- <v-icon>mdi-delete</v-icon> -->
             Delete
             <!-- Delete List -->
@@ -107,7 +92,6 @@
             <v-spacer />
             <v-btn text color="red" @click="deleteResult">Delete</v-btn>
             <v-btn text @click="closeDeleteDialog">Cancel</v-btn>
-
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -148,7 +132,7 @@ export default {
     resources: {
       type: Array,
       required: true,
-      default: () => ([]),
+      default: () => [],
     },
   },
   components: {
@@ -206,7 +190,7 @@ export default {
       return namePattern.test(val) ? true : 'Data name must be at least 4 character in length';
     },
     moveItemDown({ id }) {
-      const index = this.resource.content.findIndex(item => item.id === id);
+      const index = this.resource.content.findIndex((item) => item.id === id);
       if (index < this.resource.content.length - 1) {
         const newItems = [...this.resource.content];
         const [item] = newItems.splice(index, 1);
@@ -218,7 +202,7 @@ export default {
       }
     },
     moveItemUp({ id }) {
-      const index = this.resource.content.findIndex(item => item.id === id);
+      const index = this.resource.content.findIndex((item) => item.id === id);
       if (index > 0) {
         const newItems = [...this.resource.content];
         const [item] = newItems.splice(index, 1);
@@ -238,7 +222,7 @@ export default {
       };
     },
     deleteSelectedItems() {
-      const isNotSelectedItem = item => !this.selectedItems.some(s => s.id === item.id);
+      const isNotSelectedItem = (item) => !this.selectedItems.some((s) => s.id === item.id);
       const newItems = this.resource.content.filter(isNotSelectedItem);
       this.selectedItems = [];
       this.$emit('change', {
@@ -261,7 +245,7 @@ export default {
       }
     },
     updateEditItem() {
-      const index = this.resource.content.findIndex(item => item.id === this.editedItem.id);
+      const index = this.resource.content.findIndex((item) => item.id === this.editedItem.id);
       // const index = this.resource.content.findIndex(c => c.id === this.editItemId);
       if (index > -1) {
         const newItems = [
@@ -313,7 +297,7 @@ export default {
       // this.$emit('change', this.)
     },
     deleteItem(item) {
-      const newItems = this.resource.content.filter(x => x.label !== item.label && x.value !== item.value);
+      const newItems = this.resource.content.filter((x) => x.label !== item.label && x.value !== item.value);
       console.log('delete item, new items:', JSON.stringify(newItems, null, 2));
       this.$emit('change', {
         ...this.resource,
@@ -324,10 +308,7 @@ export default {
       return uniqWith(items, isEqual);
     },
     appendItems(items) {
-      const content = this.filterDuplicateItems([
-        ...this.resource.content,
-        ...items,
-      ]);
+      const content = this.filterDuplicateItems([...this.resource.content, ...items]);
       this.$emit('change', {
         ...this.resource,
         content,
@@ -337,6 +318,4 @@ export default {
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

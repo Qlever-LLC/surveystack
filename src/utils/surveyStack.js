@@ -11,11 +11,10 @@ const SEPARATOR = '.';
 export function getNested(obj, path, fallback = undefined) {
   try {
     return path
-      .replace('[', SEPARATOR).replace(']', '')
+      .replace('[', SEPARATOR)
+      .replace(']', '')
       .split(SEPARATOR)
-      .reduce(
-        (item, property) => (item[property] === undefined ? fallback : item[property]), obj,
-      );
+      .reduce((item, property) => (item[property] === undefined ? fallback : item[property]), obj);
   } catch (err) {
     return fallback;
   }
@@ -23,7 +22,8 @@ export function getNested(obj, path, fallback = undefined) {
 
 export function setNested(obj, path, value) {
   const parentPath = path
-    .replace('[', SEPARATOR).replace(']', '')
+    .replace('[', SEPARATOR)
+    .replace(']', '')
     .split(SEPARATOR);
   const subKey = parentPath.pop();
   const parent = getNested(obj, parentPath.join(SEPARATOR), SEPARATOR);
@@ -94,14 +94,17 @@ export function queueAction(store, action, payload = null) {
 
 export function isAnswered(node, submission) {
   const { type } = node.model;
-  const path = node.getPath().map(n => n.model.name).join('.');
+  const path = node
+    .getPath()
+    .map((n) => n.model.name)
+    .join('.');
   const value = getNested(submission, `${path}.value`, null);
 
   if (type === 'matrix') {
     if (!value || (Array.isArray(value) && value.length === 0)) {
       return false;
     }
-    const requiredCols = node.model.options.source.content.filter(h => h.required).map(h => h.value);
+    const requiredCols = node.model.options.source.content.filter((h) => h.required).map((h) => h.value);
     let answered = true;
     for (const row of value) {
       for (const requiredCol of requiredCols) {
@@ -151,11 +154,10 @@ const defaultBasicQueryList = [
   { name: 'meta.survey.version', key: 'meta.survey.version', type: 'number' },
   { name: 'meta.revision', key: 'meta.revision', type: 'number' },
   { name: '_id', key: '_id', type: '$oid' },
-
 ];
 
 export const createBasicQueryList = (survey, version = 1) => {
-  const { controls } = survey.revisions.find(r => r.version === version);
+  const { controls } = survey.revisions.find((r) => r.version === version);
 
   const tree = new TreeModel();
   const root = tree.parse({ name: 'data', children: controls });
@@ -173,7 +175,7 @@ export const createBasicQueryList = (survey, version = 1) => {
 
     const path = node
       .getPath()
-      .map(n => n.model.name)
+      .map((n) => n.model.name)
       .join('.');
 
     items.push({ name: `${path}.value`, key: `${path}.value`, type: node.model.type });

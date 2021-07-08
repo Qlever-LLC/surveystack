@@ -9,13 +9,7 @@
           contain
           height="128"
         ></v-img>
-        <v-img
-          v-else
-          :src="require('../assets/surveystack_temp_logo.svg')"
-          class="my-3"
-          contain
-          height="128"
-        ></v-img>
+        <v-img v-else :src="require('../assets/surveystack_temp_logo.svg')" class="my-3" contain height="128"></v-img>
       </v-col>
     </v-row>
 
@@ -26,7 +20,7 @@
           v-if="isWhitelabel && pinnedWhitelabelSurveys.length > 0"
           :entities="pinnedWhitelabelSurveys"
           :title="`Pinned by ${whitelabelPartner.name}`"
-          :link="e => `/surveys/${e.id}`"
+          :link="(e) => `/surveys/${e.id}`"
         >
           <template v-slot:entity="{ entity }">
             <v-list-item-content>
@@ -58,11 +52,10 @@
                   </v-btn>
                 </div>
                 <div>
-                  <v-list-item-title>{{entity.name}}</v-list-item-title>
-                  <v-list-item-subtitle>{{entity.group}}</v-list-item-subtitle>
+                  <v-list-item-title>{{ entity.name }}</v-list-item-title>
+                  <v-list-item-subtitle>{{ entity.group }}</v-list-item-subtitle>
                 </div>
               </div>
-
             </v-list-item-content>
           </template>
         </app-basic-list>
@@ -76,7 +69,7 @@
           v-if="pinned && pinned.length > 0"
           :entities="pinned"
           title="Get started with your surveys!"
-          :link="e => `/surveys/${e.id}`"
+          :link="(e) => `/surveys/${e.id}`"
         >
           <template v-slot:entity="{ entity }">
             <v-list-item-content>
@@ -108,11 +101,10 @@
                   </v-btn>
                 </div>
                 <div>
-                  <v-list-item-title>{{entity.name}}</v-list-item-title>
-                  <v-list-item-subtitle>{{entity.group}}</v-list-item-subtitle>
+                  <v-list-item-title>{{ entity.name }}</v-list-item-title>
+                  <v-list-item-subtitle>{{ entity.group }}</v-list-item-subtitle>
                 </div>
               </div>
-
             </v-list-item-content>
           </template>
         </app-basic-list>
@@ -123,11 +115,7 @@
 
     <v-row>
       <v-col align="center">
-        <v-btn
-          x-large
-          text
-          :to="`/surveys/browse`"
-        >
+        <v-btn x-large text :to="`/surveys/browse`">
           <v-icon left>mdi-text-box-search-outline</v-icon>Browse All Surveys
         </v-btn>
       </v-col>
@@ -147,11 +135,7 @@
 
     <v-row v-if="false">
       <v-col align="center">
-        <v-btn
-          color="primary"
-          x-large
-          href="surveystack://measurement"
-        >
+        <v-btn color="primary" x-large href="surveystack://measurement">
           Run Measurement
         </v-btn>
       </v-col>
@@ -159,13 +143,9 @@
 
     <v-row>
       <v-col align="center">
-        <v-chip
-          style="font-family: monospace"
-          to="/app/info"
-        >v{{ version }}</v-chip>
+        <v-chip style="font-family: monospace" to="/app/info">v{{ version }}</v-chip>
       </v-col>
     </v-row>
-
   </v-container>
 </template>
 
@@ -191,7 +171,6 @@ export default {
       // console.log('result', res.data);
     },
   },
-
 
   computed: {
     isLoggedIn() {

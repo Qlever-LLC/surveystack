@@ -1,18 +1,10 @@
 <template>
   <div class="instructions-image-split question">
-    <app-control-label
-      :value="control.label"
-      :redacted="redacted"
-      :required="required"
-    />
+    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
     <div class="wrapper full-width">
-
       <div class="left">
-        <div
-          outlined
-          v-if="control.options.source && control.options.source.images"
-        >
+        <div outlined v-if="control.options.source && control.options.source.images">
           <div v-if="image && image.content">
             <img
               :src="image.content"
@@ -20,22 +12,16 @@
               class="full-width"
               style="max-height: 80vh; object-fit: contain;"
             />
-
           </div>
         </div>
       </div>
 
       <div class="right">
-        <div
-          v-if="control.options.source && control.options.source.body"
-          v-html="renderedBody"
-          class="md"
-        />
+        <div v-if="control.options.source && control.options.source.body" v-html="renderedBody" class="md" />
       </div>
     </div>
 
     <app-control-more-info :value="control.moreInfo" />
-
   </div>
 </template>
 
@@ -46,7 +32,6 @@ import markdownItContainer from 'markdown-it-container';
 import baseQuestionComponent from './BaseQuestionComponent';
 
 const md = new MarkdownIt();
-
 
 md.use(markdownItContainer, 'spoiler', {
   validate(params) {
@@ -73,18 +58,22 @@ export default {
   mixins: [baseQuestionComponent],
   computed: {
     renderedBody() {
-      return this.control
-        && this.control.options
-        && this.control.options.source
-        && this.control.options.source.body
-        && md.render(this.control.options.source.body);
+      return (
+        this.control &&
+        this.control.options &&
+        this.control.options.source &&
+        this.control.options.source.body &&
+        md.render(this.control.options.source.body)
+      );
     },
     image() {
-      return this.control
-        && this.control.options
-        && this.control.options.source
-        && this.control.options.source.images
-        && this.resources.find(({ id }) => id === this.control.options.source.images[0]);
+      return (
+        this.control &&
+        this.control.options &&
+        this.control.options.source &&
+        this.control.options.source.images &&
+        this.resources.find(({ id }) => id === this.control.options.source.images[0])
+      );
     },
   },
 };

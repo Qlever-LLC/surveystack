@@ -1,18 +1,10 @@
 <template>
   <div class="full">
-    <v-card
-      dark
-      color="dark-blue--lighten-2"
-      class="card-height"
-      slot="paneL"
-    >
-      <v-card-title>{{ title || "" }}
+    <v-card dark color="dark-blue--lighten-2" class="card-height" slot="paneL">
+      <v-card-title
+        >{{ title || '' }}
 
-        <v-chip
-          v-if="result !== null && typeof result === 'boolean'"
-          class="mx-4"
-          :color="result ? 'green' : 'red'"
-        >
+        <v-chip v-if="result !== null && typeof result === 'boolean'" class="mx-4" :color="result ? 'green' : 'red'">
           {{ result }}
         </v-chip>
 
@@ -25,24 +17,16 @@
           Result Object (click to expand)
         </v-chip>
 
-        <v-dialog
-          v-model="dialog"
-          width="800"
-        >
+        <v-dialog v-model="dialog" width="800">
           <v-card>
             <v-card-title class="headline">Object Created</v-card-title>
             <div style="width: 100%; height: 60vh;">
-              <app-code-view :value="result">
-              </app-code-view>
+              <app-code-view :value="result"> </app-code-view>
             </div>
 
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn
-                color="green darken-1"
-                text
-                @click="dialog = false"
-              >
+              <v-btn color="green darken-1" text @click="dialog = false">
                 Close
               </v-btn>
             </v-card-actions>
@@ -50,40 +34,17 @@
         </v-dialog>
 
         <v-spacer></v-spacer>
-        <v-icon
-          v-if="saveable"
-          class="mr-4"
-          @click="$emit('save', model.getValue())"
-        >mdi-content-save</v-icon>
-        <v-btn
-          class="mr-2"
-          outlined
-          color="white"
-          v-if="examples"
-          @click="$emit('examples')"
-        >
+        <v-icon v-if="saveable" class="mr-4" @click="$emit('save', model.getValue())">mdi-content-save</v-icon>
+        <v-btn class="mr-2" outlined color="white" v-if="examples" @click="$emit('examples')">
           <v-icon left>mdi-code-braces</v-icon>Examples
         </v-btn>
-        <v-btn
-          class="mr-2"
-          outlined
-          color="white"
-          v-if="runnable"
-          @click="$emit('run', model.getValue())"
-        >
+        <v-btn class="mr-2" outlined color="white" v-if="runnable" @click="$emit('run', model.getValue())">
           <v-icon left>mdi-play</v-icon> Run
         </v-btn>
         <v-icon @click="$emit('close')">mdi-close-circle-outline</v-icon>
       </v-card-title>
-      <div
-        class="error red text--white pa-2"
-        v-if="error"
-      >{{ error }}
-      </div>
-      <div
-        class="editor-height"
-        :id="'monaco-editor-'+_uid"
-      > </div>
+      <div class="error red text--white pa-2" v-if="error">{{ error }}</div>
+      <div class="editor-height" :id="'monaco-editor-' + _uid"></div>
     </v-card>
   </div>
 </template>
@@ -91,8 +52,8 @@
 <style scoped>
 .error {
   width: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI",
-    "HelveticaNeue-Light", "Ubuntu", "Droid Sans", sans-serif !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'HelveticaNeue-Light', 'Ubuntu', 'Droid Sans',
+    sans-serif !important;
 }
 
 .full {
@@ -110,10 +71,8 @@
 </style>
 
 <script>
-
 import * as monaco from 'monaco-editor';
 import appCodeView from '@/components/builder/CodeView.vue';
-
 
 /*
 // TODO: make sure scripts editor still works
@@ -132,12 +91,15 @@ monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
 monaco.languages.typescript.javascriptDefaults.setEagerModelSync(true);
 */
 
-monaco.editor.createModel(`
+monaco.editor.createModel(
+  `
 /**
  * logs a message
  */
 function log(message){};
-`, 'javascript');
+`,
+  'javascript'
+);
 
 export default {
   components: {

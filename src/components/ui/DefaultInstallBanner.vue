@@ -1,30 +1,15 @@
 <template>
-  <v-snackbar
-    v-model="showDefaultInstall"
-    :timeout="-1"
-    color="primary lighten-1"
-    fixed
-    bottom
-    class="snackbar"
-  >
-    <v-btn
-      @click="handleClose"
-      icon
-      class="close-button"
-    >
+  <v-snackbar v-model="showDefaultInstall" :timeout="-1" color="primary lighten-1" fixed bottom class="snackbar">
+    <v-btn @click="handleClose" icon class="close-button">
       <v-icon>mdi-close</v-icon>
     </v-btn>
     <div class="text-center wrapper">
       <h2>Install App</h2>
       <div class="d-flex align-center justify-center pt-2">
         <!-- color="accent lighten-1" -->
-        <v-btn
-          outlined
-          @click="install"
-          large
-        >
+        <v-btn outlined @click="install" large>
           <v-icon class="ml-n2 mr-1" small>mdi-plus</v-icon>
-           Add to Homescreen
+          Add to Homescreen
         </v-btn>
       </div>
     </div>
@@ -78,7 +63,6 @@ export default {
 </script>
 
 <style scoped>
-
 .close-button {
   position: absolute;
   right: 10px;

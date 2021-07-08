@@ -1,15 +1,8 @@
 <template>
   <div>
     <v-input>
-      <label
-        for="select-items-file-input"
-        class="cursor-pointer"
-      >
-        <v-btn
-          class="pointer-events-none"
-          color="primary"
-          :disabled="disabled"
-        >
+      <label for="select-items-file-input" class="cursor-pointer">
+        <v-btn class="pointer-events-none" color="primary" :disabled="disabled">
           <v-icon left>mdi-upload</v-icon>
           Add CSV
         </v-btn>
@@ -40,7 +33,7 @@ export default {
     disabled: {
       type: Boolean,
       required: false,
-      default: () => (false),
+      default: () => false,
     },
   },
   data() {
@@ -53,7 +46,11 @@ export default {
     filterItemsKeys(items) {
       return items.map(({ label, value, tags }) => ({ label, value, tags }));
     },
-    async handleFileChange({ target: { files: [file] } }) {
+    async handleFileChange({
+      target: {
+        files: [file],
+      },
+    }) {
       console.log('handle file change');
       console.log(file);
       console.log(this.columns);
@@ -63,20 +60,14 @@ export default {
           skipEmptyLines: true,
           // Normalize keys / column headings
           transformHeader(header) {
-            return columns.reduce(
-              (r, x) => r.replace(RegExp(x, 'i'), x),
-              header,
-            );
+            return columns.reduce((r, x) => r.replace(RegExp(x, 'i'), x), header);
           },
-
         });
 
-
-        const items = this.filterItemsKeys(data.data)
-          .map(item => ({
-            ...item,
-            id: new ObjectId().toString(),
-          }));
+        const items = this.filterItemsKeys(data.data).map((item) => ({
+          ...item,
+          id: new ObjectId().toString(),
+        }));
         this.$emit('change', items);
         this.$refs['select-items-file-input'].value = null;
       } catch (err) {

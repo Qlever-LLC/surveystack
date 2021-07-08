@@ -15,13 +15,18 @@
     <v-card
       v-for="(el, idx) in controls"
       class="control-item mb-2"
-      :class="[{'control-item-selected': (el === selected)},{'library-border': el.isLibraryRoot}, {'control-item-library':el.libraryId}, {'draggable-item':(!el.libraryId || el.isLibraryRoot)}]"
+      :class="[
+        { 'control-item-selected': el === selected },
+        { 'library-border': el.isLibraryRoot },
+        { 'control-item-library': el.libraryId },
+        { 'draggable-item': !el.libraryId || el.isLibraryRoot },
+      ]"
       :key="el.id || el._id"
       @mousedown.stop.left="$emit('controlSelected', el)"
     >
       <div class="d-flex justify-space-between align-center">
         <div class="mb-2" v-if="!el.options.hidden">
-          <span class="caption grey--text text--darken-1">{{ createIndex(index, idx + 1) | displayIndex}}</span>
+          <span class="caption grey--text text--darken-1">{{ createIndex(index, idx + 1) | displayIndex }}</span>
           <br />
           <span class="title">
             {{ getDisplay(el) }}
@@ -33,21 +38,13 @@
           </span>
         </div>
         <div class="grey--text text--darken-1" v-if="el.options.hidden">
-          {{ createIndex(index, idx + 1) | displayIndex}} &nbsp; {{ getDisplay(el) }}
+          {{ createIndex(index, idx + 1) | displayIndex }} &nbsp; {{ getDisplay(el) }}
         </div>
         <div class="d-flex">
-          <v-btn
-            icon
-            v-if="selected === el && !el.libraryId"
-            @click.stop="duplicateControl(el)"
-          >
+          <v-btn icon v-if="selected === el && !el.libraryId" @click.stop="duplicateControl(el)">
             <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
           </v-btn>
-          <v-btn
-            icon
-            v-if="selected === el && el.isLibraryRoot"
-            @click.stop="openLibrary(el.libraryId)"
-          >
+          <v-btn icon v-if="selected === el && el.isLibraryRoot" @click.stop="openLibrary(el.libraryId)">
             <v-icon color="grey lighten-1">mdi-library</v-icon>
           </v-btn>
           <v-btn
@@ -57,13 +54,7 @@
           >
             <v-icon color="grey lighten-1">mdi-delete</v-icon>
           </v-btn>
-          <v-btn
-            text
-            x-small
-            v-if="el.options.hidden"
-            @click.stop="el.options.hidden=false"
-            color="grey lighten-1"
-          >
+          <v-btn text x-small v-if="el.options.hidden" @click.stop="el.options.hidden = false" color="grey lighten-1">
             unhide
           </v-btn>
         </div>
@@ -71,7 +62,10 @@
 
       <nested-draggable
         v-if="el.type == 'group' && !el.options.hidden"
-        :class="[{'drop-area-border': (el.children.length === 0), 'drop-area': 1}, {'draggable-item':(!el.libraryId || el.isLibraryRoot)}]"
+        :class="[
+          { 'drop-area-border': el.children.length === 0, 'drop-area': 1 },
+          { 'draggable-item': !el.libraryId || el.isLibraryRoot },
+        ]"
         :selected="selected"
         :controls="el.children"
         :readOnly="readOnly"
@@ -82,7 +76,10 @@
 
       <nested-draggable
         v-if="el.type == 'page' && !el.options.hidden"
-        :class="[{'drop-area-border': (el.children.length === 0), 'drop-area': 1}, {'draggable-item':(!el.libraryId || el.isLibraryRoot)}]"
+        :class="[
+          { 'drop-area-border': el.children.length === 0, 'drop-area': 1 },
+          { 'draggable-item': !el.libraryId || el.isLibraryRoot },
+        ]"
         :selected="selected"
         :controls="el.children"
         :readOnly="readOnly"
@@ -91,11 +88,7 @@
         :index="createIndex(index, idx + 1)"
       />
 
-      <v-dialog
-        v-if="deleteQuestionModalIsVisible"
-        v-model="deleteQuestionModalIsVisible"
-        max-width="290"
-      >
+      <v-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
         <v-card class="">
           <v-card-title>
             Delete Question
@@ -105,17 +98,10 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <v-btn
-              text
-              @click.stop="deleteQuestionModalIsVisible = false"
-            >
+            <v-btn text @click.stop="deleteQuestionModalIsVisible = false">
               Cancel
             </v-btn>
-            <v-btn
-              text
-              color="red"
-              @click.stop="handleConfirmDelete"
-            >
+            <v-btn text color="red" @click.stop="handleConfirmDelete">
               Remove
             </v-btn>
           </v-card-actions>
@@ -174,7 +160,7 @@ export default {
   },
   methods: {
     getIconForType(type) {
-      const control = availableControls.find(c => c.type === type);
+      const control = availableControls.find((c) => c.type === type);
       return control && control.icon;
     },
     getDisplay(control) {
@@ -242,8 +228,8 @@ export default {
 }
 
 .library-border {
-  border-width:2px !important;
-  border-color:#4CAF50 !important;
+  border-width: 2px !important;
+  border-color: #4caf50 !important;
   background-color: #b4ecb6 !important;
 }
 
@@ -274,8 +260,8 @@ export default {
 .control-item:hover::before,
 .control-item-selected::before {
   position: absolute;
-  content: "\F01DD";
-  font-family: "Material Design Icons";
+  content: '\F01DD';
+  font-family: 'Material Design Icons';
   font-size: 28px;
   color: #bbb;
   top: 50%;
@@ -287,7 +273,6 @@ export default {
   border-left: 2px solid var(--v-primary-base);
 }
 </style>
-
 
 <style>
 .flip-list-move {

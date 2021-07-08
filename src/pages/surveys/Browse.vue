@@ -1,84 +1,47 @@
 <template>
   <v-container>
-    <v-tabs
-      v-model="activeTab"
-      fixed-tabs
-    >
-      <v-tab
-        v-for="tab in tabs"
-        :href="`#${tab.name}`"
-        :key="tab.name"
-      >
-        <span
-          v-if="tab.name === 'active-group'"
-          class="text-no-wrap"
-        >
+    <v-tabs v-model="activeTab" fixed-tabs>
+      <v-tab v-for="tab in tabs" :href="`#${tab.name}`" :key="tab.name">
+        <span v-if="tab.name === 'active-group'" class="text-no-wrap">
           {{ activeGroupName }}
         </span>
-        <span
-          v-else
-          class="text-no-wrap"
-        >
+        <span v-else class="text-no-wrap">
           {{ tab.label }}
         </span>
       </v-tab>
     </v-tabs>
-    <v-card
-      class="my-2"
-      v-if="activeTab === 'active-group' && pinnedSurveys.length && pinnedIsVisible"
-    >
+    <v-card class="my-2" v-if="activeTab === 'active-group' && pinnedSurveys.length && pinnedIsVisible">
       <v-card-text>
-        <div
-          v-for="(e, i) in pinnedSurveys"
-          :key="`${e._id}_pinned`"
-        >
+        <div v-for="(e, i) in pinnedSurveys" :key="`${e._id}_pinned`">
           <v-list-item :to="`/surveys/${e._id}`">
             <v-list-item-icon>
               <v-icon v-if="e.pinned">mdi-pin</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
               <div>
-                <v-list-item-title>{{e.name}}</v-list-item-title>
+                <v-list-item-title>{{ e.name }}</v-list-item-title>
                 <v-list-item-subtitle v-if="e.meta.group && e.meta.group.id">
                   {{ getGroupName(e.meta.group.id) }}
                 </v-list-item-subtitle>
-                <small
-                  v-if="e.latestVersion"
-                  class="grey--text"
-                >Survey Version {{e.latestVersion}}</small>
+                <small v-if="e.latestVersion" class="grey--text">Survey Version {{ e.latestVersion }}</small>
               </div>
             </v-list-item-content>
-
           </v-list-item>
           <v-divider v-if="i < pinnedSurveys.length - 1" />
         </div>
       </v-card-text>
     </v-card>
 
-    <v-card
-      min-height="60vh"
-      class="d-flex flex-column"
-    >
-      <v-card-title>
-
-      </v-card-title>
+    <v-card min-height="60vh" class="d-flex flex-column">
+      <v-card-title> </v-card-title>
       <v-card-text class="flex-grow-1">
         <div class="px-5 py-2">
-          <v-text-field
-            v-model="search"
-            label="Search"
-            append-icon="mdi-magnify"
-          />
+          <v-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
           <div class="d-flex justify-end mb-4">
-            <small class="text--secondary">
-              {{surveys.pagination.total}} results
-            </small>
+            <small class="text--secondary"> {{ surveys.pagination.total }} results </small>
           </div>
         </div>
-        <div
-          v-for="(e, i) in surveys.content"
-          :key="e._id"
-        >
+        <div v-for="(e, i) in surveys.content" :key="e._id">
           <v-list-item :to="`/surveys/${e._id}`">
             <v-list-item-icon>
               <v-icon v-if="e.pinned">mdi-pin</v-icon>
@@ -109,26 +72,19 @@
             </v-list-item-icon>
             <v-list-item-content>
               <div>
-                <v-list-item-title>{{e.name}}</v-list-item-title>
+                <v-list-item-title>{{ e.name }}</v-list-item-title>
                 <v-list-item-subtitle v-if="e.meta && e.meta.group && e.meta.group.id">
                   {{ getGroupName(e.meta.group.id) }}
                 </v-list-item-subtitle>
-                <small
-                  v-if="e.latestVersion"
-                  class="grey--text"
-                >Survey Version {{e.latestVersion}}</small><br>
+                <small v-if="e.latestVersion" class="grey--text">Survey Version {{ e.latestVersion }}</small
+                ><br />
                 <small class="grey--text">created {{ e.createdAgo }} ago</small>
               </div>
             </v-list-item-content>
-
           </v-list-item>
           <v-divider v-if="i < surveys.content.length - 1" />
-
         </div>
-        <div
-          v-if="surveys.content.length < 1"
-          class="py-12 text-center"
-        >
+        <div v-if="surveys.content.length < 1" class="py-12 text-center">
           No surveys available
         </div>
       </v-card-text>
@@ -218,11 +174,10 @@ export default {
       return this.$store.getters['memberships/groups'];
     },
     groupsItems() {
-      return this.groups
-        .map(({ _id, name, slug }) => ({ id: _id, label: name, name: slug }));
+      return this.groups.map(({ _id, name, slug }) => ({ id: _id, label: name, name: slug }));
     },
     activeGroupName() {
-      const group = this.groups.find(item => item._id === this.activeGroupId);
+      const group = this.groups.find((item) => item._id === this.activeGroupId);
       if (group) {
         return group.name;
       }
@@ -256,7 +211,7 @@ export default {
   },
   methods: {
     getGroupName(id) {
-      const group = this.groups.find(item => item._id === id);
+      const group = this.groups.find((item) => item._id === id);
       if (group) {
         return group.name;
       }
@@ -298,7 +253,7 @@ export default {
         queryParams.append('creator', user);
       }
       if (groups.length > 0) {
-        groups.filter(group => group !== null).forEach(group => queryParams.append('groups[]', group));
+        groups.filter((group) => group !== null).forEach((group) => queryParams.append('groups[]', group));
       }
       if (this.search) {
         queryParams.append('q', this.search);
@@ -336,12 +291,13 @@ export default {
         },
       };
     },
-    async fetchPinnedSurveys(groupId) { // TODO replace with new store action (?)
+    async fetchPinnedSurveys(groupId) {
+      // TODO replace with new store action (?)
       try {
         console.log('fetch pinned');
         const { data } = await api.get(`/groups/${groupId}?populate=1`);
         if (data && data.surveys && data.surveys.pinned && Array.isArray(data.surveys.pinned)) {
-          this.pinnedSurveys = data.surveys.pinned.map(r => ({ ...r, pinned: true }));
+          this.pinnedSurveys = data.surveys.pinned.map((r) => ({ ...r, pinned: true }));
           return this.pinnedSurveys;
         }
       } catch (err) {

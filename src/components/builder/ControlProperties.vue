@@ -41,11 +41,7 @@
             <div>{{ item.name }}</div>
           </template>
         </v-autocomplete>
-        <v-btn
-          icon
-          class="mt-2"
-          @click="(ev) => $emit('set-script-editor-is-visible', true)"
-        >
+        <v-btn icon class="mt-2" @click="(ev) => $emit('set-script-editor-is-visible', true)">
           <v-icon>mdi-open-in-new</v-icon>
         </v-btn>
       </div>
@@ -164,8 +160,7 @@
           <div>
             <div class="text--primary">Hidden</div>
             <div class="body-2">
-              Submitters can not see this field. This option is intentionally
-              allowed by the question set designer
+              Submitters can not see this field. This option is intentionally allowed by the question set designer
             </div>
           </div>
         </template>
@@ -199,9 +194,7 @@
       />
 
       <div v-if="!showAdvanced" class="d-flex justify-end mt-4">
-        <v-btn @click="showAdvanced = true" color="grey darken-1" small text
-          >advanced</v-btn
-        >
+        <v-btn @click="showAdvanced = true" color="grey darken-1" small text>advanced</v-btn>
       </div>
       <div v-if="showAdvanced" class="mt-2">
         <div class="d-flex justify-space-between">
@@ -219,11 +212,7 @@
             :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
           />
           <v-spacer />
-          <v-icon
-            class="align-self-start"
-            color="grey darken-1"
-            @click="$emit('code-relevance')"
-          >
+          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-relevance')">
             mdi-open-in-new
           </v-icon>
         </div>
@@ -238,11 +227,7 @@
             :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
           />
           <v-spacer />
-          <v-icon
-            class="align-self-start"
-            color="grey darken-1"
-            @click="$emit('code-calculate')"
-          >
+          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-calculate')">
             mdi-open-in-new
           </v-icon>
         </div>
@@ -257,11 +242,7 @@
             :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
           />
           <v-spacer />
-          <v-icon
-            class="align-self-start"
-            color="grey darken-1"
-            @click="$emit('code-constraint')"
-          >
+          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-constraint')">
             mdi-open-in-new
           </v-icon>
         </div>
@@ -276,11 +257,7 @@
             :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
           />
           <v-spacer />
-          <v-icon
-            class="align-self-start"
-            color="grey darken-1"
-            @click="$emit('code-api-compose')"
-          >
+          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-api-compose')">
             mdi-open-in-new
           </v-icon>
         </div>
@@ -313,7 +290,7 @@
       <instructions-editor
         v-else-if="isInstructions"
         v-model="control.options.source"
-        :disabled="control.libraryId!=null"
+        :disabled="control.libraryId != null"
       />
       <instructions-image-split-editor
         v-else-if="isInstructionsImageSplit"
@@ -409,7 +386,7 @@ export default {
   },
   computed: {
     controlNames() {
-      return this.controls.map(control => control.name);
+      return this.controls.map((control) => control.name);
     },
     isGroup() {
       return this.control.type === 'group';
@@ -447,11 +424,7 @@ export default {
         return true;
       }
 
-      if (
-        ['group', 'page', 'instructions', 'instructionsImageSplit'].includes(
-          this.control.type,
-        )
-      ) {
+      if (['group', 'page', 'instructions', 'instructionsImageSplit'].includes(this.control.type)) {
         return false;
       }
 
@@ -460,27 +433,22 @@ export default {
   },
   methods: {
     nameIsUnique(val) {
-      const hasSameNameAndDifferentId = control => control.name === this.control.name && control.id !== this.control.id;
+      const hasSameNameAndDifferentId = (control) =>
+        control.name === this.control.name && control.id !== this.control.id;
       const parent = findParentByChildId(this.control.id, this.controls);
 
       const controlsWithSameName = parent
         ? parent.children.filter(hasSameNameAndDifferentId)
         : this.controls.filter(hasSameNameAndDifferentId);
-      return controlsWithSameName.length > 0
-        ? 'Data name must be unique'
-        : true;
+      return controlsWithSameName.length > 0 ? 'Data name must be unique' : true;
     },
     nameHasValidCharacters(val) {
       const namePattern = /^[\w]*$/;
-      return namePattern.test(val)
-        ? true
-        : 'Data name must only contain valid charcters';
+      return namePattern.test(val) ? true : 'Data name must only contain valid charcters';
     },
     nameHasValidLength(val) {
       const namePattern = /^.{1,}$/; // one character should be ok, especially within groups
-      return namePattern.test(val)
-        ? true
-        : 'Data name must be at least 1 characters in length';
+      return namePattern.test(val) ? true : 'Data name must be at least 1 characters in length';
     },
     openAdvancedEditor() {
       // TODO: can't pass params to new window
@@ -524,10 +492,9 @@ export default {
       return true;
     },
     getScriptParams() {
-      return (this.control
-          && this.control.options
-          && JSON.stringify(this.control.options.params))
-        || JSON.stringify({});
+      return (
+        (this.control && this.control.options && JSON.stringify(this.control.options.params)) || JSON.stringify({})
+      );
     },
     updateScript() {
       if (this.isScript) {

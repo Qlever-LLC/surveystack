@@ -4,16 +4,9 @@
       <div class="d-flex">
         <survey-name-editor v-model="value.name" />
         <v-spacer />
-        <v-dialog
-          v-model="editDetailsDialogIsVisible"
-          width="500"
-          max-width="75%"
-        >
+        <v-dialog v-model="editDetailsDialogIsVisible" width="500" max-width="75%">
           <template v-slot:activator="{ on }">
-            <v-btn
-              icon
-              v-on="on"
-            >
+            <v-btn icon v-on="on">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
           </template>
@@ -22,49 +15,26 @@
               Edit Survey Details
             </v-card-title>
             <v-card-text>
-              <active-group-selector
-                class="my-4"
-                label="Group"
-                v-model="value.meta.group"
-                outlined
-                returnObject
-              />
+              <active-group-selector class="my-4" label="Group" v-model="value.meta.group" outlined returnObject />
               <v-select
                 outlined
                 v-model="value.meta.submissions"
                 label="Allow Submissions for..."
                 :items="availableSubmissions"
               />
-              <v-textarea
-                v-model="value.description"
-                label="Description"
-                class="mt-4"
-                rows="4"
-                outlined
-              />
+              <v-textarea v-model="value.description" label="Description" class="mt-4" rows="4" outlined />
             </v-card-text>
             <v-card-actions class="mr-3">
               <v-spacer />
-              <v-btn
-                @click="editDetailsDialogIsVisible = false"
-                color="primary"
-                text
-              >
+              <v-btn @click="editDetailsDialogIsVisible = false" color="primary" text>
                 Close
               </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
-        <v-dialog
-          v-model="resourcesDialogIsVisible"
-          width="800"
-          max-width="80%"
-        >
+        <v-dialog v-model="resourcesDialogIsVisible" width="800" max-width="80%">
           <template v-slot:activator="{ on }">
-            <v-btn
-              icon
-              v-on="on"
-            >
+            <v-btn icon v-on="on">
               <v-icon>mdi-dresser</v-icon>
             </v-btn>
           </template>
@@ -73,7 +43,6 @@
               Survey Resources
             </v-card-title>
             <v-card-text>
-
               <app-resources
                 :resources="survey.resources"
                 @set-survey-resources="(val) => $emit('set-survey-resources', val)"
@@ -81,25 +50,15 @@
             </v-card-text>
             <v-card-actions class="mr-3">
               <v-spacer />
-              <v-btn
-                @click="resourcesDialogIsVisible = false"
-                color="primary"
-                text
-              >
+              <v-btn @click="resourcesDialogIsVisible = false" color="primary" text>
                 Close
               </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
-        <v-menu
-          offset-y
-          left
-        >
+        <v-menu offset-y left>
           <template v-slot:activator="{ on }">
-            <v-btn
-              icon
-              v-on="on"
-            >
+            <v-btn icon v-on="on">
               <v-icon>mdi-dots-vertical</v-icon>
             </v-btn>
           </template>
@@ -107,14 +66,8 @@
             <v-list-item class="d-flex align-center">
               <v-list-item-title>
                 <v-input hide-details>
-                  <label
-                    for="select-items-file-input-surveydetails"
-                    class="cursor-pointer"
-                  >
-                    <v-btn
-                      class="pointer-events-none"
-                      text
-                    >
+                  <label for="select-items-file-input-surveydetails" class="cursor-pointer">
+                    <v-btn class="pointer-events-none" text>
                       <v-icon color="grey">mdi-file-upload</v-icon>
                       <div class="ml-1">
                         Import
@@ -134,10 +87,7 @@
             </v-list-item>
             <v-list-item>
               <v-list-item-title>
-                <v-btn
-                  @click="$emit('export-survey')"
-                  text
-                >
+                <v-btn @click="$emit('export-survey')" text>
                   <v-icon color="grey">mdi-file-download</v-icon>
                   <div class="ml-1">
                     Export
@@ -147,16 +97,9 @@
             </v-list-item>
             <v-list-item>
               <v-list-item-title>
-                <v-dialog
-                  v-model="editLibraryDialogIsVisible"
-                  width="500"
-                  max-width="75%"
-                >
+                <v-dialog v-model="editLibraryDialogIsVisible" width="500" max-width="75%">
                   <template v-slot:activator="{ on }">
-                    <v-btn
-                      v-on="on"
-                      text
-                    >
+                    <v-btn v-on="on" text>
                       <v-icon color="grey">mdi-library</v-icon>
                       <div class="ml-1" v-if="!value.meta.isLibrary">
                         add to library
@@ -171,48 +114,30 @@
                       Add Survey To Library
                     </v-card-title>
                     <v-card-text>
-                      <v-text-field
-                        :value="value.name"
-                        label="Title"
-                        readonly
-                        disabled>
-                      </v-text-field>
+                      <v-text-field :value="value.name" label="Title" readonly disabled> </v-text-field>
                       <h3>Description</h3>
-                      <tip-tap-editor
-                        v-model="value.meta.libraryDescription"
-                        class="mb-4"
-                      />
+                      <tip-tap-editor v-model="value.meta.libraryDescription" class="mb-4" />
                       <h3>Applications</h3>
-                      <tip-tap-editor
-                        v-model="value.meta.libraryApplications"
-                        class="mb-4"
-                      />
+                      <tip-tap-editor v-model="value.meta.libraryApplications" class="mb-4" />
                       <h3>Maintainers</h3>
-                      <tip-tap-editor
-                        v-model="value.meta.libraryMaintainers"
-                        class="mb-4"
-                      />
+                      <tip-tap-editor v-model="value.meta.libraryMaintainers" class="mb-4" />
                       <h3>Version history</h3>
-                      <tip-tap-editor
-                        v-model="value.meta.libraryHistory"
-                        class="mb-4"
-                      />
+                      <tip-tap-editor v-model="value.meta.libraryHistory" class="mb-4" />
                     </v-card-text>
                     <v-card-actions class="mr-3">
                       <v-spacer />
                       <v-btn
-                        @click="$emit('addToLibrary');editLibraryDialogIsVisible = false;"
+                        @click="
+                          $emit('addToLibrary');
+                          editLibraryDialogIsVisible = false;
+                        "
                         color="primary"
                         text
                       >
                         <span v-if="!value.meta.isLibrary">Add to library</span>
                         <span v-if="value.meta.isLibrary">Save</span>
                       </v-btn>
-                      <v-btn
-                        @click="editLibraryDialogIsVisible = false"
-                        color="primary"
-                        text
-                      >
+                      <v-btn @click="editLibraryDialogIsVisible = false" color="primary" text>
                         Cancel
                       </v-btn>
                     </v-card-actions>
@@ -222,10 +147,7 @@
             </v-list-item>
             <v-list-item v-if="!isNew">
               <v-list-item-title>
-                <v-btn
-                  text
-                  @click="$emit('delete')"
-                >
+                <v-btn text @click="$emit('delete')">
                   <v-icon color="grey">mdi-delete</v-icon>
                   <div class="ml-1">
                     Delete
@@ -235,22 +157,13 @@
             </v-list-item>
           </v-list>
         </v-menu>
-
       </div>
       <div class="d-flex justify-space-between align-center mt-n1">
-
         <div class="body-2 grey--text caption">
           {{ value._id }}
         </div>
         <div class="text-left ">
-          <v-chip
-            dark
-            small
-            outlined
-            color="grey"
-          >
-            Version {{ version }}
-          </v-chip>
+          <v-chip dark small outlined color="grey"> Version {{ version }} </v-chip>
         </div>
       </div>
     </v-card-title>
@@ -271,10 +184,7 @@
             @click="$emit('cancel')"
             text
           >Cancel</v-btn> -->
-          <v-tooltip
-            bottom
-            v-if="!isNew"
-          >
+          <v-tooltip bottom v-if="!isNew">
             <template v-slot:activator="{ on }">
               <div v-on="on">
                 <v-btn
@@ -290,9 +200,11 @@
                 </v-btn>
               </div>
             </template>
-            <span>Override an existing <strong>published</strong> Survey.
-              <br>
-              Updating is only possible <em>only</em> when changing Labels of a Question.</span>
+            <span
+              >Override an existing <strong>published</strong> Survey.
+              <br />
+              Updating is only possible <em>only</em> when changing Labels of a Question.</span
+            >
           </v-tooltip>
 
           <!-- <v-btn
@@ -358,31 +270,18 @@
         </div>
       </div>
 
-      <v-tooltip
-        bottom
-        v-if="validationErrors.length > 0"
-      >
+      <v-tooltip bottom v-if="validationErrors.length > 0">
         <template v-slot:activator="{ on }">
           <!-- <div v-on="on" class="text-center mt-4 error--text" >
             <v-icon color="error">mdi-exclamation</v-icon>
             Survey contains errors
           </div> -->
-          <v-alert
-            type="error"
-            colored-border
-            border="left"
-            class="mt-2"
-            elevation="2"
-            v-on="on"
-          >
+          <v-alert type="error" colored-border border="left" class="mt-2" elevation="2" v-on="on">
             Survey contains errors
           </v-alert>
         </template>
-        <div
-          v-for="error in validationErrors"
-          :key="error"
-        >
-          {{error}}
+        <div v-for="error in validationErrors" :key="error">
+          {{ error }}
         </div>
       </v-tooltip>
     </v-card-text>
@@ -396,7 +295,11 @@ import appResources from '@/components/builder/Resources.vue';
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import api from '@/services/api.service';
 
-const availableSubmissions = [{ value: 'public', text: 'Everyone' }, { value: 'user', text: 'Logged in users' }, { value: 'group', text: 'Group members' }];
+const availableSubmissions = [
+  { value: 'public', text: 'Everyone' },
+  { value: 'user', text: 'Logged in users' },
+  { value: 'group', text: 'Group members' },
+];
 
 export default {
   data() {
@@ -433,7 +336,6 @@ export default {
     //   const groups = this.$store.getters['memberships/groups'];
     //   const { name } = groups.find(({ _id }) => id === _id);
     //   if (!name) {
-
     //   }
     //   return name;
     // },
