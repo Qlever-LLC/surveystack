@@ -5,31 +5,36 @@ module.exports = {
   },
   extends: [
     'plugin:vue/essential',
-    '@vue/airbnb',
+    'eslint:recommended',
+    '@vue/prettier',
+  ],
+  plugins: [
+    'import',
   ],
   rules: {
+    'import/no-cycle': 'error',
     'no-console': process.env.NODE_ENV === 'production' ? 'off' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'import/prefer-default-export': 1,
     'max-len': 0,
     'no-underscore-dangle': 0,
     'no-plusplus': 0,
     'no-unused-vars': 1,
     'no-continue': 0,
     'no-param-reassign': 1,
-    'padded-blocks': 1,
     'brace-style': 1,
   },
+  globals: {},
   parserOptions: {
     parser: 'babel-eslint',
   },
-  overrides: [{
-    files: [
-      '**/__tests__/*.{j,t}s?(x)',
-      '**/tests/unit/**/*.spec.{j,t}s?(x)',
-    ],
-    env: {
-      jest: true,
+  overrides: [
+    {
+      files: [
+        '**/*.spec.js',
+      ],
+      env: {
+        jest: true,
+      },
     },
-  },],
+  ],
 };
