@@ -16,45 +16,36 @@ export function filterResourcesByTypes(resources, types = []) {
   if (types.length === 0) {
     return resources;
   }
-  return resources.filter(
-    resource => types.some(
-      type => type === resource.type,
-    ),
-  );
+  return resources.filter((resource) => types.some((type) => type === resource.type));
 }
 
 export function getResource(resources, id) {
-  return resources.find(r => r.id === id);
+  return resources.find((r) => r.id === id);
 }
 
 export function removeResource(resources, id) {
-  const index = resources.findIndex(r => r.id === id);
-  return [
-    ...resources.slice(0, index),
-    ...resources.slice(index + 1),
-  ];
+  const index = resources.findIndex((r) => r.id === id);
+  return [...resources.slice(0, index), ...resources.slice(index + 1)];
 }
 
 export function setResource(resources, resource) {
-  const index = resources.findIndex(r => r.id === resource.id);
-  return [
-    ...resources.slice(0, index),
-    resource,
-    ...resources.slice(index + 1),
-  ];
+  const index = resources.findIndex((r) => r.id === resource.id);
+  return [...resources.slice(0, index), resource, ...resources.slice(index + 1)];
 }
 
 export function appendResource(resources, resource) {
-  return [
-    ...resources,
-    resource,
-  ];
+  return [...resources, resource];
 }
 
-export function createResource(resources, type, location, options = {
-  labelPrefix: 'Resource',
-  defaultContent: '',
-}) {
+export function createResource(
+  resources,
+  type,
+  location,
+  options = {
+    labelPrefix: 'Resource',
+    defaultContent: '',
+  }
+) {
   const id = new ObjectId().toString();
   return {
     label: `${options.labelPrefix} ${resources.length + 1}`,
@@ -66,14 +57,9 @@ export function createResource(resources, type, location, options = {
   };
 }
 
-
 export function nameIsUnique(resourceNames) {
-  return val => (resourceNames.some(({
-    name,
-    id,
-  }) => val === name && this.resource.id !== id)
-    ? 'Name must be unique'
-    : true);
+  return (val) =>
+    resourceNames.some(({ name, id }) => val === name && this.resource.id !== id) ? 'Name must be unique' : true;
 }
 
 export function nameHasValidCharacters(val) {

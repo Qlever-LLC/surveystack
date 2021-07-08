@@ -4,62 +4,37 @@
       <v-icon class="mr-1">mdi-library</v-icon>
       Question Library
       <v-spacer></v-spacer>
-      <v-btn
-        icon
-        key="library"
-        @click="$emit('cancel')"
-        class="mt-n5 mr-n6"
-        :depressed="true"
-        small
-        tile
-        elevation="0"
-      >
+      <v-btn icon key="library" @click="$emit('cancel')" class="mt-n5 mr-n6" :depressed="true" small tile elevation="0">
         <v-icon>
           mdi-close
         </v-icon>
       </v-btn>
     </v-card-title>
 
-    <v-text-field
-      v-model="search"
-      label="Search"
-      append-icon="mdi-magnify"
-    />
+    <v-text-field v-model="search" label="Search" append-icon="mdi-magnify" />
     <div class="d-flex justify-end mb-4">
-      <small class="text--secondary">
-        {{surveys.pagination.total}} results
-      </small>
+      <small class="text--secondary"> {{ surveys.pagination.total }} results </small>
     </div>
-    <v-container
-      v-if="loading"
-      class="d-flex align-center justify-center"
-      style="height: 100%"
-    >
-      <v-progress-circular
-        :size="50"
-        color="primary"
-        indeterminate
-      />
+    <v-container v-if="loading" class="d-flex align-center justify-center" style="height: 100%">
+      <v-progress-circular :size="50" color="primary" indeterminate />
     </v-container>
     <v-container fluid class="pa-0" v-else>
       <v-row dense>
-        <v-col
-          v-for="c in surveys.content"
-          :key="c._id"
-          :cols="!selectedSurvey?4:12"
-        >
+        <v-col v-for="c in surveys.content" :key="c._id" :cols="!selectedSurvey ? 4 : 12">
           <v-card
             @click="toggleCard(c)"
-            v-show="!selectedSurvey || selectedSurvey._id==c._id"
+            v-show="!selectedSurvey || selectedSurvey._id == c._id"
             class="control-item mb-2"
             elevation="7"
           >
             <v-row style="min-height:96px;">
               <v-col>
                 <small class="grey--text">{{ c._id }}</small>
-                <br>
-                {{c.name}}
-                <small v-show="selectedSurvey && selectedSurvey._id==c._id" class="grey--text"><br>Version {{c.latestVersion}}</small>
+                <br />
+                {{ c.name }}
+                <small v-show="selectedSurvey && selectedSurvey._id == c._id" class="grey--text"
+                  ><br />Version {{ c.latestVersion }}</small
+                >
                 <!--v-chip
                   dark
                   small
@@ -72,7 +47,7 @@
               <v-col align="right" md="auto">
                 <v-btn
                   dark
-                  v-if="selectedSurvey && selectedSurvey._id===c._id"
+                  v-if="selectedSurvey && selectedSurvey._id === c._id"
                   color="grey"
                   key="close"
                   @click.stop="toggleCard(c)"
@@ -84,7 +59,7 @@
                 </v-btn>
                 <v-btn
                   dark
-                  v-if="selectedSurvey && selectedSurvey._id===c._id"
+                  v-if="selectedSurvey && selectedSurvey._id === c._id"
                   color="white"
                   key="library"
                   @click="addToSurvey(c._id)"
@@ -97,13 +72,10 @@
                 <div>
                   <v-tooltip bottom>
                     <template v-slot:activator="{ on, attrs }">
-                    <div
-                      v-bind="attrs"
-                      v-on="on"
-                    >
-                      <v-icon class="mr-1 pb-1">mdi-account-group</v-icon>
-                      {{ c.meta.libraryUsageCountSurveys?c.meta.libraryUsageCountSurveys:0 }}
-                    </div>
+                      <div v-bind="attrs" v-on="on">
+                        <v-icon class="mr-1 pb-1">mdi-account-group</v-icon>
+                        {{ c.meta.libraryUsageCountSurveys ? c.meta.libraryUsageCountSurveys : 0 }}
+                      </div>
                     </template>
                     <span>Number of surveys using this</span>
                   </v-tooltip>
@@ -111,12 +83,9 @@
                 <div>
                   <v-tooltip bottom>
                     <template v-slot:activator="{ on, attrs }">
-                      <div
-                        v-bind="attrs"
-                        v-on="on"
-                      >
-                       <v-icon class="mr-1">mdi-note-multiple-outline</v-icon>
-                       {{ c.meta.libraryUsageCountSubmissions?c.meta.libraryUsageCountSubmissions:0 }}
+                      <div v-bind="attrs" v-on="on">
+                        <v-icon class="mr-1">mdi-note-multiple-outline</v-icon>
+                        {{ c.meta.libraryUsageCountSubmissions ? c.meta.libraryUsageCountSubmissions : 0 }}
                       </div>
                     </template>
                     <span>Number of submission using this</span>
@@ -124,19 +93,17 @@
                 </div>
               </v-col>
             </v-row>
-            <v-row
-              v-if="selectedSurvey && selectedSurvey._id===c._id"
-              >
+            <v-row v-if="selectedSurvey && selectedSurvey._id === c._id">
               <v-col>
                 <h4>Description</h4>
                 <small v-html="selectedSurvey.meta.libraryDescription"></small>
-                <br>
+                <br />
                 <h4>Applications</h4>
                 <small v-html="selectedSurvey.meta.libraryApplications"></small>
-                <br>
+                <br />
                 <h4>Maintainers</h4>
                 <small v-html="selectedSurvey.meta.libraryMaintainers"></small>
-                <br>
+                <br />
                 <h4>Updates</h4>
                 <small v-html="selectedSurvey.meta.libraryHistory"></small>
               </v-col>
@@ -144,7 +111,7 @@
                 <h4>Questions</h4>
                 <graphical-view
                   :readOnly="true"
-                  v-if="selectedSurvey && selectedSurvey._id===c._id"
+                  v-if="selectedSurvey && selectedSurvey._id === c._id"
                   class="graphical-view"
                   :controls="selectedSurvey.revisions[selectedSurvey.latestVersion - 1].controls"
                 />
@@ -167,10 +134,7 @@ export default {
   components: {
     graphicalView,
   },
-  props: [
-    'survey',
-    'libraryId',
-  ],
+  props: ['survey', 'libraryId'],
   data() {
     return {
       page: 1,
@@ -187,8 +151,7 @@ export default {
       selectedSurvey: null,
     };
   },
-  computed: {
-  },
+  computed: {},
   methods: {
     async fetchData() {
       const now = moment();
@@ -270,17 +233,17 @@ export default {
 }
 
 .control-item {
-padding: 0.75rem 1.25rem;
-border: 1px solid rgba(0, 0, 0, 0.125);
-margin-bottom: -1px;
-/* border-left: 2px solid transparent; */
-border-left-width: 2px;
-position: relative;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  margin-bottom: -1px;
+  /* border-left: 2px solid transparent; */
+  border-left-width: 2px;
+  position: relative;
 }
 
 .control-item:hover::before,
 .control-item-selected::before {
-  border-color:#4CAF50 !important;
+  border-color: #4caf50 !important;
 }
 /*
 .control-item-selected {
@@ -290,7 +253,7 @@ border-left: 2px solid var(--v-primary-base);
   overflow: auto;
   transform: scale(0.75);
   transform-origin: top left;
-  margin-top:6px;
+  margin-top: 6px;
   margin-bottom: -60%;
   margin-right: -33%;
 }

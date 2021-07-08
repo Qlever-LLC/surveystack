@@ -1,14 +1,15 @@
 <template>
   <div class="ontology question">
-    <app-control-label
-      :value="control.label"
-      :redacted="redacted"
-      :required="required"
-    />
+    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <v-autocomplete
       v-if="sourceIsValid && !control.options.allowCustomSelection"
       :value="getValue"
-      @change="(v) => {comboboxSearch = null; onChange(v)}"
+      @change="
+        (v) => {
+          comboboxSearch = null;
+          onChange(v);
+        }
+      "
       :search-input.sync="comboboxSearch"
       :items="items"
       item-text="label"
@@ -23,10 +24,7 @@
       single-line
       data-test-id="autocomplete"
     >
-      <template
-        v-slot:selection="data"
-        v-if="!!control.options.hasMultipleSelections"
-      >
+      <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip
           v-bind="data.attrs"
           :input-value="data.selected"
@@ -37,19 +35,26 @@
           {{ data.item.label }}
         </v-chip>
       </template>
-      <template
-        v-slot:item="data"
-        v-if="!!control.options.hasMultipleSelections"
-      >
+      <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
         <v-list-item-content>
-          <v-list-item-title v-html="data.item.label" />
+          <v-list-item-title>
+            {{ data.item.label }}
+            <v-chip v-if="data.item.count" small class="ma-2">
+              {{ data.item.count }}
+            </v-chip>
+          </v-list-item-title>
         </v-list-item-content>
       </template>
     </v-autocomplete>
     <v-combobox
       v-else-if="sourceIsValid && control.options.allowCustomSelection"
       :value="getValue"
-      @change="(v) => {comboboxSearch = null; onChange(v)}"
+      @change="
+        (v) => {
+          comboboxSearch = null;
+          onChange(v);
+        }
+      "
       :search-input.sync="comboboxSearch"
       :items="items"
       item-text="label"
@@ -82,27 +87,22 @@
           {{ getLabelForItemValue(data.item) }}
         </div>
       </template>
-      <template
-        v-slot:item="data"
-        v-if="!!control.options.hasMultipleSelections"
-      >
+      <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
         <v-list-item-content>
-          <v-list-item-title v-html="data.item.label" />
+          <v-list-item-title>
+            {{ data.item.label }}
+            <v-chip v-if="data.item.count" small class="ma-2">
+              {{ data.item.count }}
+            </v-chip>
+          </v-list-item-title>
         </v-list-item-content>
       </template>
     </v-combobox>
-    <v-banner v-else-if="isLoading">
-      <v-icon class="mr-2 mdi-spin">mdi-loading</v-icon>Loading
-    </v-banner>
-    <v-banner
-      v-else
-      color="red lighten-2"
-      dark
-    >
+    <v-banner v-else-if="isLoading"> <v-icon class="mr-2 mdi-spin">mdi-loading</v-icon>Loading </v-banner>
+    <v-banner v-else color="red lighten-2" dark>
       <v-icon class="mr-2">mdi-alert</v-icon>Invalid select options, please update Survey Definition
     </v-banner>
     <app-control-more-info :value="control.moreInfo" />
-
   </div>
 </template>
 
@@ -115,6 +115,39 @@ import { getValueOrNull, getNested } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
 import api from '@/services/api.service';
 
+export async function fetchSubmissions(apiService, surveyId, path) {
+  const query = `&project={"${path}.value":1}`;
+  const { data } = await apiService.get(`/submissions?survey=${surveyId}${query}`);
+  const items = data
+    .map((item) => {
+      const value = getNested(item, `${path}.value`, null);
+      return {
+        id: item._id,
+        label: JSON.stringify(value).replace(/^"(.+(?="$))"$/, '$1'),
+        value,
+      };
+    })
+    .filter((item) => item.value !== null);
+
+  const explodeItem = (item) =>
+    item.value.map((v, i) => ({
+      id: `${item.id}__${i}`,
+      // stringify and remove wrapping quote characters so that strings are rendered without quotation marks
+      label: JSON.stringify(v).replace(/^"(.+(?="$))"$/, '$1'),
+      value: v,
+    }));
+
+  const explodedItems = items
+    .map((it) => (Array.isArray(it.value) ? explodeItem(it) : [it]))
+    .reduce((acc, curr) => [...acc, ...curr], []);
+
+  const uniqueItems = Object.values(groupBy(explodedItems, 'label')).map((group) => ({
+    ...group[0],
+    label: group[0].label,
+    count: group.length,
+  }));
+  return uniqueItems;
+}
 
 export default {
   mixins: [baseQuestionComponent],
@@ -142,63 +175,23 @@ export default {
       }
     },
     remove(item) {
-      this.changed(
-        this.getValueOrNull(this.value.filter(v => v !== item.value)),
-      );
+      this.changed(this.getValueOrNull(this.value.filter((v) => v !== item.value)));
     },
     removeValue(value) {
-      this.changed(
-        this.getValueOrNull(this.value.filter(v => v !== value)),
-      );
+      this.changed(this.getValueOrNull(this.value.filter((v) => v !== value)));
     },
     getLabelForItemValue(value) {
-      const item = this.items.find(x => x.value === value);
+      const item = this.items.find((x) => x.value === value);
       return (item && item.label) || value;
     },
-    async fetchSubmissions(surveyId, path) {
-      const base = `&project={"${path}.value":1}`;
-      const query = base;
-      const r = await api.get(`/submissions?survey=${surveyId}${query}`);
-      const { data } = r;
-      const items = data.map((item) => {
-        const value = getNested(item, `${path}.value`, null);
-        return {
-          id: item._id,
-          label: JSON.stringify(value).replace(/^"(.+(?="$))"$/, '$1'),
-          value,
-        };
-      }).filter(item => item.value !== null);
-
-      // const explodeItem = item => item.value.map((v, i) => ({
-      //   id: `${item.id}__${i}`,
-      //   label: JSON.stringify(v).replace(/^"(.+(?="$))"$/, '$1'),
-      //   value: v,
-      // }));
-
-      // const explodedItems = items
-      //   .map(it => (Array.isArray(it.value) ? explodeItem(it) : [it]))
-      //   .reduce((acc, curr) => [...acc, ...curr], []);
-
-      // console.log('exploded', explodedItems);
-
-      const uniqueItems = Object.values(groupBy(items, 'value'))
-        .map(group => ({
-          ...group[0],
-          // count: group.length,
-          label: `${group[0].label}${group.length > 1 ? ` (${group.length})` : ''}`,
-        }));
-      return uniqueItems;
-    },
-
+    fetchSubmissions,
   },
   computed: {
     getValue() {
-      return this.control.options.hasMultipleSelections
-        ? this.value
-        : this.value && this.value[0];
+      return this.control.options.hasMultipleSelections ? this.value : this.value && this.value[0];
     },
     resource() {
-      return this.resources.find(r => r.id === this.control.options.source);
+      return this.resources.find((r) => r.id === this.control.options.source);
     },
     hasReference() {
       return !!this.resource && this.resource.type === resourceTypes.SURVEY_REFERENCE;
@@ -211,10 +204,7 @@ export default {
       return (this.resource && this.resource.content) || [];
     },
     sourceIsValid() {
-      return this.items
-        && Array.isArray(this.items)
-        && this.items.length > 0
-        && this.items.every(({ label, value }) => label && value);
+      return this.items && Array.isArray(this.items) && this.items.every(({ label, value }) => label && value);
     },
     autocompleteMenuProps() {
       // default properties copied from the vuetify-autocomplete docs
@@ -239,7 +229,7 @@ export default {
       const { id, path } = this.resource.content;
       this.isLoading = true;
       try {
-        this.submissionItems = await this.fetchSubmissions(id, path);
+        this.submissionItems = await this.fetchSubmissions(api, id, path);
       } finally {
         this.isLoading = false;
       }

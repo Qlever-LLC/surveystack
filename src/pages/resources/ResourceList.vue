@@ -1,9 +1,6 @@
 <template>
   <v-container>
-    <app-basic-list
-      :entities="entities"
-      title="Resources"
-    />
+    <app-basic-list :entities="entities" title="Resources" />
   </v-container>
 </template>
 

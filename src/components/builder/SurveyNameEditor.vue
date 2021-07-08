@@ -39,7 +39,7 @@ export default {
 
     return {
       state,
-      emitInput: val => context.emit('input', val),
+      emitInput: (val) => context.emit('input', val),
       setIsEditing,
       rules: {
         hasOnlyValidCharacters(val) {

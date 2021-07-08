@@ -4,89 +4,66 @@
       <app-group-breadcrumbs :path="entity.path" />
 
       <div v-if="editable">
-        <v-btn
-          class="ml-auto"
-          :to="{name: 'groups-edit', params: {id: entity._id}}"
-          text
-        >
+        <v-btn class="ml-auto" :to="{ name: 'groups-edit', params: { id: entity._id } }" text>
           <v-icon left>mdi-cog</v-icon> Admin
         </v-btn>
       </div>
     </div>
 
-    <div
-      style="color: red;"
-      v-if="entity.meta.archived"
-    ><strong>Please note:</strong> this group is currently archived</div>
+    <div style="color: red;" v-if="entity.meta.archived">
+      <strong>Please note:</strong> this group is currently archived
+    </div>
     <h1>
-      <span>{{entity.name}}</span>
-      <v-chip
-        v-if="isPremium"
-        class="ml-2"
-        color="success"
-      >
-        <v-icon
-          small
-          left
-        >
-          mdi-octagram
-        </v-icon>Premium
-      </v-chip>
+      <span>{{ entity.name }}</span>
+      <v-chip v-if="isPremium" class="ml-2" color="success"> <v-icon small left> mdi-octagram </v-icon>Premium </v-chip>
     </h1>
-    <h3 class="text--secondary">{{entity.path}}</h3>
+    <h3 class="text--secondary">{{ entity.path }}</h3>
 
     <v-row>
       <v-col>
         <div class="d-flex justify-end">
-          <v-checkbox
-            class="mt-0"
-            v-model="showArchivedSubgroups"
-            label="View archived"
-            dense
-            hide-details
-          />
+          <v-checkbox class="mt-0" v-model="showArchivedSubgroups" label="View archived" dense hide-details />
         </div>
         <app-basic-list
           :editable="editable"
           :entities="subgroups"
           title="Subgroups"
           :link="(e) => `/g${e.path}`"
-          :linkNew="{name: 'groups-new', query: {dir: entity.path}}"
+          :linkNew="{ name: 'groups-new', query: { dir: entity.path } }"
         >
           <template v-slot:entity="{ entity }">
             <v-list-item-content>
-              <v-list-item-title>{{entity.name}}</v-list-item-title>
-              <v-list-item-subtitle>{{entity.path}}</v-list-item-subtitle>
+              <v-list-item-title>{{ entity.name }}</v-list-item-title>
+              <v-list-item-subtitle>{{ entity.path }}</v-list-item-subtitle>
             </v-list-item-content>
           </template>
         </app-basic-list>
       </v-col>
-
     </v-row>
     <v-row>
       <v-col>
         <app-basic-list
           :editable="editable"
-          :entities="(entity.surveys && entity.surveys.pinned) ? entity.surveys.pinned : []"
+          :entities="entity.surveys && entity.surveys.pinned ? entity.surveys.pinned : []"
           title="Pinned Surveys"
           :link="(e) => `/surveys/${e._id}`"
           :linkNew="`/groups/edit/${entity._id}`"
         >
           <template v-slot:entity="{ entity }">
             <v-list-item-content>
-              <v-list-item-title>{{entity.name}}</v-list-item-title>
-              <v-list-item-subtitle>{{entity._id}}</v-list-item-subtitle>
+              <v-list-item-title>{{ entity.name }}</v-list-item-title>
+              <v-list-item-subtitle>{{ entity._id }}</v-list-item-subtitle>
             </v-list-item-content>
           </template>
         </app-basic-list>
       </v-col>
-
     </v-row>
   </v-container>
   <v-container v-else-if="status.code === 404">
     <h1>Oh snap!</h1>
-    <p>No group under <strong>{{$route.params.pathMatch}}</strong> was found :/ </p>
-
+    <p>
+      No group under <strong>{{ $route.params.pathMatch }}</strong> was found :/
+    </p>
   </v-container>
 </template>
 
@@ -154,7 +131,7 @@ export default {
       return this.$store.getters['memberships/memberships'];
     },
     editable() {
-      const g = this.userMemberships.find(m => m.group._id === this.entity._id);
+      const g = this.userMemberships.find((m) => m.group._id === this.entity._id);
       if (g && g.role === 'admin') {
         return true;
       }
@@ -167,7 +144,11 @@ export default {
       return this.$store.getters['whitelabel/partner'];
     },
     isPremium() {
-      if (this.isWhitelabel && (this.entity.path.startsWith(this.whitelabelPartner.path) || this.entity.dir.startsWith(this.whitelabelPartner.path))) {
+      if (
+        this.isWhitelabel &&
+        (this.entity.path.startsWith(this.whitelabelPartner.path) ||
+          this.entity.dir.startsWith(this.whitelabelPartner.path))
+      ) {
         return true;
       }
       return false;

@@ -5,22 +5,22 @@ const selectSource = [
   {
     value: 'dog',
     label: 'Dog',
-  }, 
+  },
   {
     value: 'cat',
     label: 'Cat',
-  }, 
+  },
   {
     value: 'lizard',
     label: 'Lizard',
-  }
+  },
 ];
 
 function getMountOpts(opts = {}) {
   const options = {
     allowCustomSelection: opts.allowCustomSelection || false,
     value: opts.value || null,
-  }
+  };
   return {
     propsData: {
       control: {
@@ -37,7 +37,7 @@ function getMountOpts(opts = {}) {
       value: options.value,
       index: 'data.multiple_choice_1',
     },
-  }
+  };
 }
 
 describe('SelectSingle question', () => {
@@ -49,10 +49,7 @@ describe('SelectSingle question', () => {
   });
 
   it('sets custom input value as array', () => {
-    const wrapper = mount(
-      SelectSingle, 
-      getMountOpts({ allowCustomSelection: true }),
-    );
+    const wrapper = mount(SelectSingle, getMountOpts({ allowCustomSelection: true }));
     const customInput = wrapper.find('[data-test-id="custom-input"]');
     customInput.setValue('custom input');
     // Apparently this doesn't matter?
@@ -61,21 +58,18 @@ describe('SelectSingle question', () => {
   });
 
   it('sets active radio button based on value as array', () => {
-    const wrapper = shallowMount(
-      SelectSingle, 
-      getMountOpts({ value: ['dog'] }),
-    );
+    const wrapper = shallowMount(SelectSingle, getMountOpts({ value: ['dog'] }));
     const radioGroup = wrapper.find('[data-test-id="radio-group"]');
     expect(radioGroup.vm.value).toBe('dog');
   });
 
   it('sets custom selection radio button as active for custom value', () => {
     const wrapper = shallowMount(
-      SelectSingle, 
-      getMountOpts({ 
-        value: ['custom'], 
+      SelectSingle,
+      getMountOpts({
+        value: ['custom'],
         allowCustomSelection: true,
-      }),
+      })
     );
     const customInputRadio = wrapper.find('[data-test-id="custom-input-radio"]');
     expect(customInputRadio.vm.value).toBe('custom');
@@ -83,11 +77,11 @@ describe('SelectSingle question', () => {
 
   it('sets custom selection text input for custom value', () => {
     const wrapper = mount(
-      SelectSingle, 
-      getMountOpts({ 
-        value: ['custom'], 
+      SelectSingle,
+      getMountOpts({
+        value: ['custom'],
         allowCustomSelection: true,
-      }),
+      })
     );
     const customInput = wrapper.find('[data-test-id="custom-input"]');
     expect(customInput.element.value).toBe('custom');
@@ -104,4 +98,4 @@ describe('SelectSingle question', () => {
   it('getNextValue returns array for number', () => {
     expect(getNextValue(5)).toEqual([5]);
   });
-})
+});

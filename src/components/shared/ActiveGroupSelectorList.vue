@@ -1,27 +1,12 @@
 <template>
-  <v-list-group
-    prepend-icon="mdi-account-check"
-    :value="true"
-  >
+  <v-list-group prepend-icon="mdi-account-check" :value="true">
     <template v-slot:activator>
-      <v-list-item-title v-if="activeGroup">{{activeGroupName}}</v-list-item-title>
+      <v-list-item-title v-if="activeGroup">{{ activeGroupName }}</v-list-item-title>
       <v-list-item-title v-else>No Group selected</v-list-item-title>
     </template>
-    <v-list-item
-      flat
-      class="pt-0"
-    >
-      <v-list-item-group
-        :value="activeItem"
-        color="primary"
-        mandatory
-      >
-        <v-list-item
-          v-for="(item, i) in groupItems"
-          :key="item.text"
-          @click="() => handleInput(item.value)"
-          :value="i"
-        >
+    <v-list-item flat class="pt-0">
+      <v-list-item-group :value="activeItem" color="primary" mandatory>
+        <v-list-item v-for="(item, i) in groupItems" :key="item.text" @click="() => handleInput(item.value)" :value="i">
           <v-list-item-icon>
             <v-icon>mdi-account-group</v-icon>
           </v-list-item-icon>
@@ -65,10 +50,10 @@ export default {
     activeItem: {
       get() {
         if (this.returnObject) {
-          return this.groupItems.findIndex(item => item.value.id === this.activeGroup);
+          return this.groupItems.findIndex((item) => item.value.id === this.activeGroup);
         }
 
-        return this.groupItems.findIndex(item => item.value === this.activeGroup);
+        return this.groupItems.findIndex((item) => item.value === this.activeGroup);
       },
     },
     groupItems() {
@@ -99,7 +84,7 @@ export default {
 
       // it's possible that a membership was deleted on the server
       // so check if it still exists first
-      const group = this.groups.find(g => g._id === this.activeGroup);
+      const group = this.groups.find((g) => g._id === this.activeGroup);
       if (group) {
         return group.name;
       }

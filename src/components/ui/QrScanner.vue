@@ -15,24 +15,13 @@
     <v-dialog v-model="isScannerOpen" fullscreen>
       <v-card>
         <v-toolbar dark color="primary">
-          <v-btn
-            aria-label="Close QR Scanner"
-            icon
-            dark
-            @click="isScannerOpen = false"
-          >
+          <v-btn aria-label="Close QR Scanner" icon dark @click="isScannerOpen = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
           <v-toolbar-title>QR Code Scanner</v-toolbar-title>
           <v-spacer></v-spacer>
         </v-toolbar>
-        <v-alert
-          v-if="hasCameraError"
-          border="left"
-          colored-border
-          type="error"
-          elevation="2"
-        >
+        <v-alert v-if="hasCameraError" border="left" colored-border type="error" elevation="2">
           No camera detected.
         </v-alert>
         <v-container class="pa-0" v-if="!hasCameraError">
@@ -54,20 +43,12 @@
 </template>
 
 <script>
-import {
-  defineComponent,
-  onBeforeUpdate,
-  onUpdated,
-  onUnmounted,
-  ref,
-} from '@vue/composition-api';
+import { defineComponent, onBeforeUpdate, onUpdated, onUnmounted, ref } from '@vue/composition-api';
 import QrScanner from 'qr-scanner';
 /* eslint-disable import/no-webpack-loader-syntax, import/extensions */
 import qrScannerWorkerSource from '!!raw-loader!@/../node_modules/qr-scanner/qr-scanner-worker.min.js';
 
-QrScanner.WORKER_PATH = URL.createObjectURL(
-  new Blob([qrScannerWorkerSource], { type: 'application/javascript' }),
-);
+QrScanner.WORKER_PATH = URL.createObjectURL(new Blob([qrScannerWorkerSource], { type: 'application/javascript' }));
 
 export default defineComponent({
   emits: ['codeDetected'],
@@ -88,16 +69,9 @@ export default defineComponent({
 
     function setScanRegionSizeCSSVar() {
       const scanRegionSize = Math.round(
-        (2 / 3)
-          * Math.min(
-            videoElement.value.clientWidth,
-            videoElement.value.clientHeight,
-          ),
+        (2 / 3) * Math.min(videoElement.value.clientWidth, videoElement.value.clientHeight)
       );
-      videoContainerElement.value.style.setProperty(
-        '--scan-region-size',
-        `${scanRegionSize}px`,
-      );
+      videoContainerElement.value.style.setProperty('--scan-region-size', `${scanRegionSize}px`);
     }
 
     function handleScanSuccess(result) {
@@ -125,7 +99,7 @@ export default defineComponent({
             setScanRegionSizeCSSVar();
           }
         },
-        { once: true },
+        { once: true }
       );
 
       if (qrScanner === null) {

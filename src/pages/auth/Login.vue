@@ -30,34 +30,25 @@
         </small>
         <div class="d-flex justify-end">
           <v-btn type="button" class="mr-2" text @click="reset">Reset</v-btn>
-          <v-btn type="submit" @click.prevent="submit" color="primary"
-            >Login</v-btn
-          >
+          <v-btn type="submit" @click.prevent="submit" color="primary">Login</v-btn>
         </div>
       </v-form>
 
-      <div
-        class="text-center text-muted mt-5"
-        v-if="registrationEnabled || hasInvitation"
-      >
+      <div class="text-center text-muted mt-5" v-if="registrationEnabled || hasInvitation">
         Don't have an account?
         <router-link :to="registerLink">Register now</router-link>
       </div>
     </v-card>
 
     <v-alert class="mt-4" outlined v-if="membership" type="info"
-      >Your code is eligible to join
-      <strong>{{ membership.group.name }}</strong></v-alert
+      >Your code is eligible to join <strong>{{ membership.group.name }}</strong></v-alert
     >
 
     <transition name="fade">
-      <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{
-        status
-      }}</app-feedback>
+      <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{ status }}</app-feedback>
     </transition>
   </v-container>
 </template>
-
 
 <script>
 import appFeedback from '@/components/ui/Feedback.vue';
@@ -134,9 +125,7 @@ export default {
       this.$store.dispatch('invitation/set', invitation);
       const {
         data: [membership],
-      } = await api.get(
-        `/memberships?invitationCode=${invitation}&populate=true`,
-      );
+      } = await api.get(`/memberships?invitationCode=${invitation}&populate=true`);
       this.membership = membership;
     }
 
@@ -152,9 +141,7 @@ export default {
     }
 
     // magic link login
-    const {
-      cfs, email, token, group,
-    } = this.$route.query;
+    const { cfs, email, token, group } = this.$route.query;
     if (cfs) {
       await this.$store.dispatch('auth/login', {
         url: '/auth/login',
@@ -189,9 +176,7 @@ export default {
           console.log('trying autojoin');
 
           try {
-            const { data } = await api.post(
-              `/memberships/join-group?id=${this.whitelabelPartner.id}`,
-            );
+            const { data } = await api.post(`/memberships/join-group?id=${this.whitelabelPartner.id}`);
             console.log('data', data);
             await autoSelectActiveGroup(this.$store, this.whitelabelPartner.id);
           } catch (error) {

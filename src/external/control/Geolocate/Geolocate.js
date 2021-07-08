@@ -9,7 +9,6 @@ import VectorSource from 'ol/source/Vector';
 
 import './Geolocate.css';
 
-
 /**
  * @typedef {Object} Options
  * @property {string} [className='ol-geolocate'] CSS class name.
@@ -19,7 +18,6 @@ import './Geolocate.css';
  * control to be rendered outside of the map's viewport.
  */
 
-
 /**
  * @classdesc
  * OpenLayers Geolocate Control.
@@ -27,7 +25,6 @@ import './Geolocate.css';
  * @api
  */
 class Geolocate extends Control {
-
   /**
    * @param {Options=} opts Geolocate options.
    */
@@ -44,7 +41,9 @@ class Geolocate extends Control {
     const className = options.className || 'ol-geolocate';
 
     // Define default button label and tooltip.
-    const label = options.label || '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>';
+    const label =
+      options.label ||
+      '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>';
     const tooltip = options.tooltip || 'Geolocate';
 
     // Create the geolocate button element.
@@ -96,24 +95,28 @@ class Geolocate extends Control {
     const map = this.getMap();
 
     // Create a geolocation object.
-    this.geolocation = this.geolocation || new Geolocation({
-      trackingOptions: {
-        enableHighAccuracy: true,
-      },
-      projection: map.getView().getProjection(),
-    });
+    this.geolocation =
+      this.geolocation ||
+      new Geolocation({
+        trackingOptions: {
+          enableHighAccuracy: true,
+        },
+        projection: map.getView().getProjection(),
+      });
 
     // Create position and accuracy features.
     this.positionFeature = this.positionFeature || new Feature();
     this.accuracyFeature = this.accuracyFeature || new Feature();
 
     // Draw the position and accuracy features on the map.
-    this.geolocateLayer = this.geolocateLayer || new VectorLayer({
-      map,
-      source: new VectorSource({
-        features: [this.positionFeature, this.accuracyFeature],
-      }),
-    });
+    this.geolocateLayer =
+      this.geolocateLayer ||
+      new VectorLayer({
+        map,
+        source: new VectorSource({
+          features: [this.positionFeature, this.accuracyFeature],
+        }),
+      });
 
     // Turn on geo tracking.
     this.geolocation.setTracking(true);
@@ -155,7 +158,6 @@ class Geolocate extends Control {
    * @private
    */
   updateFeatures() {
-
     // Get the geolocated coordinates.
     this.coordinates = this.geolocation.getPosition();
 

@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="code-editor pa-0"
-    :id="'monaco-editor-'+_uid"
-  ></div>
+  <div class="code-editor pa-0" :id="'monaco-editor-' + _uid"></div>
 </template>
 <script>
 import * as monaco from 'monaco-editor';

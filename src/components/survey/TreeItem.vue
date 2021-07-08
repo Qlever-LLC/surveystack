@@ -1,17 +1,11 @@
 <template>
   <ul v-if="item">
     <li>
-      <div
-        @click="toggle"
-        @dblclick="makeFolder"
-      >
+      <div @click="toggle" @dblclick="makeFolder">
         <span class="grey--text text--darken-2">{{ name }}:</span> <strong>{{ item.value }}</strong>
         <span v-if="isFolder">[{{ isOpen ? '-' : '+' }}]</span>
       </div>
-      <ul
-        v-show="isOpen"
-        v-if="isFolder"
-      >
+      <ul v-show="isOpen" v-if="isFolder">
         <tree-item
           class="item"
           v-for="(child, name, index) in getChildren(item)"
@@ -74,7 +68,6 @@ export default {
       return children;
     },
   },
-
 };
 </script>
 

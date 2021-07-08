@@ -1,9 +1,7 @@
 <template>
   <v-container>
     <v-card v-if="group">
-      <v-card-title class="headline primary white--text">
-        {{ group.name }} : Farm Hub Onboarding
-      </v-card-title>
+      <v-card-title class="headline primary white--text"> {{ group.name }} : Farm Hub Onboarding </v-card-title>
       <v-row class="pa-4" justify="space-between">
         <v-col cols="4" style="max-height: 70vh; overflow-y: scroll">
           <v-sheet class="pa-2" outlined>
@@ -15,11 +13,7 @@
               clearable
               clear-icon="mdi-close-circle-outline"
             ></v-text-field>
-            <v-checkbox
-              v-model="caseSensitive"
-              hide-details
-              label="Case sensitive search"
-            ></v-checkbox>
+            <v-checkbox v-model="caseSensitive" hide-details label="Case sensitive search"></v-checkbox>
           </v-sheet>
 
           <v-treeview
@@ -34,12 +28,8 @@
           >
             <template v-slot:prepend="{ item }">
               <v-icon v-if="item.type === 'farm'">mdi-home-variant</v-icon>
-              <v-icon v-if="item.type === 'aggregator'"
-                >mdi-account-multiple</v-icon
-              >
-              <v-icon v-if="item.area_type && item.area_type === 'field'"
-                >mdi-map</v-icon
-              >
+              <v-icon v-if="item.type === 'aggregator'">mdi-account-multiple</v-icon>
+              <v-icon v-if="item.area_type && item.area_type === 'field'">mdi-map</v-icon>
             </template>
 
             <template v-slot:label="{ item }">
@@ -59,30 +49,19 @@
           </v-treeview>
 
           <div class="d-flex justify-center">
-            <v-progress-circular
-              indeterminate
-              color="primary"
-              v-if="aggregators.length < 2"
-            />
+            <v-progress-circular indeterminate color="primary" v-if="aggregators.length < 2" />
           </div>
         </v-col>
 
         <v-divider vertical></v-divider>
 
         <v-col cols="7" class="pa-4">
-          <div
-            v-if="!!active && active.payload && active.payload.name"
-            class="display-1 text-center"
-          >
+          <div v-if="!!active && active.payload && active.payload.name" class="display-1 text-center">
             {{ active.payload.name }}
           </div>
           <app-aggregator
             :busy="busy"
-            v-if="
-              !!active &&
-              active.payload &&
-              active.payload.type === 'farmos-aggregator'
-            "
+            v-if="!!active && active.payload && active.payload.type === 'farmos-aggregator'"
             @save="(a) => saveAggregator(a)"
             @testConnection="(a) => testConnection(a)"
             :aggregator="active.payload"
@@ -100,11 +79,7 @@
             :id="active.id"
           />
 
-          <app-area
-            ref="farmos-field"
-            v-if="selectedField"
-            v-model="selectedField"
-          />
+          <app-area ref="farmos-field" v-if="selectedField" v-model="selectedField" />
 
           <app-register
             @dialog="(title, text) => showDialog(title, text)"
@@ -116,12 +91,7 @@
       </v-row>
     </v-card>
 
-    <app-dialog
-      v-model="dialog.show"
-      @cancel="dialog.show = false"
-      @confirm="dialog.show = false"
-      width="400"
-    >
+    <app-dialog v-model="dialog.show" @cancel="dialog.show = false" @confirm="dialog.show = false" width="400">
       <template v-slot:title>{{ dialog.title }}</template>
       {{ dialog.text }}
     </app-dialog>
@@ -129,14 +99,12 @@
 </template>
 
 <script>
-
 import appAggregator from './Aggregator.vue';
 import appFarmOSInstance from './FarmOSInstance.vue';
 import appArea from './FarmOSArea.vue';
 import appRegister from './FarmOSRegister.vue';
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
-
 
 const fetchFields = async (aggregator, farm) => [
   {
@@ -147,23 +115,17 @@ const fetchFields = async (aggregator, farm) => [
   {
     id: 100,
     name: 'East Field',
-    geometries: [
-
-    ],
+    geometries: [],
     item_type: 'area',
     icon: 'mdi-map-search',
   },
   {
     id: 200,
     name: 'West Field',
-    geometries: [
-
-    ],
+    geometries: [],
     item_type: 'area',
     icon: 'mdi-map-search',
-
   },
-
 ];
 
 const registerTemplate = {
@@ -239,22 +201,22 @@ export default {
   },
   computed: {
     filter() {
-      return this.caseSensitive
-        ? (item, search, textKey) => item[textKey].indexOf(search) > -1
-        : undefined;
+      return this.caseSensitive ? (item, search, textKey) => item[textKey].indexOf(search) > -1 : undefined;
     },
     hubaggregators() {
       if (!this.integrations) {
         return [];
       }
-      const ag = this.integrations.filter(integration => integration.type === 'farmos-aggregator').map(integration => ({
-        id: integration._id,
-        payload: integration,
-        type: 'aggregator',
-        children: this.farms[integration._id] || [],
-        loading: this.loadingAggregators.includes(integration._id),
-        name: integration.name,
-      }));
+      const ag = this.integrations
+        .filter((integration) => integration.type === 'farmos-aggregator')
+        .map((integration) => ({
+          id: integration._id,
+          payload: integration,
+          type: 'aggregator',
+          children: this.farms[integration._id] || [],
+          loading: this.loadingAggregators.includes(integration._id),
+          name: integration.name,
+        }));
 
       return ag;
     },
@@ -285,7 +247,7 @@ export default {
         try {
           const r = await api.get(`/farmos/integrations/${item.id}/farms`);
           const farms = r.data;
-          const children = farms.map(f => ({
+          const children = farms.map((f) => ({
             id: `${item.id}:${f.farm_name}`,
             payload: f,
             group: item.payload.group,
@@ -297,18 +259,21 @@ export default {
           console.log('children', children);
 
           // eslint-disable-next-line no-param-reassign
-          this.farms[item.id] = [{
-            id: -1,
-            item_type: 'farm',
-            name: 'New Farm',
-            button: true,
-            aggregator: item.payload,
-          }, ...children];
+          this.farms[item.id] = [
+            {
+              id: -1,
+              item_type: 'farm',
+              name: 'New Farm',
+              button: true,
+              aggregator: item.payload,
+            },
+            ...children,
+          ];
         } catch (error) {
           console.log('error', error);
         }
 
-        this.loadingAggregators = this.loadingAggregators.filter(e => e !== item.id);
+        this.loadingAggregators = this.loadingAggregators.filter((e) => e !== item.id);
       } else if (item.type === 'farm') {
         try {
           console.log('fetching fields', item);
@@ -319,7 +284,6 @@ export default {
           // console.log('open id', item.aggregator, item.id);
           // // this.open = [item.aggregator];
           // // this.$forceUpdate();
-
 
           // const r = await api.get(`/farmos/areas/${item.aggregator}/${item.payload.url}`);
           // // const farm = this.farms[item.aggregator].find(f => f.id === item.id);
@@ -336,14 +300,17 @@ export default {
           // item.children = fields;
           // // console.log('item with children', item);
 
-          return api.get(`/farmos/areas/${item.aggregator}/${item.payload.url}`)
+          return api
+            .get(`/farmos/areas/${item.aggregator}/${item.payload.url}`)
             .then((r) => {
               const fields = Object.keys(r.data.areas).flatMap((key) => {
                 const areas = r.data.areas[key];
-                return areas.filter(a => a.area_type === 'field').map(a => ({
-                  ...a,
-                  id: `${item.id}.${a.tid}`,
-                }));
+                return areas
+                  .filter((a) => a.area_type === 'field')
+                  .map((a) => ({
+                    ...a,
+                    id: `${item.id}.${a.tid}`,
+                  }));
               });
               // eslint-disable-next-line no-param-reassign
               const parentNode = this.$refs.treeview.nodes[item.id];
@@ -363,7 +330,7 @@ export default {
               item.children.push(...fields);
               console.log('item with children', item);
             })
-            .catch(e => console.log('error', e));
+            .catch((e) => console.log('error', e));
         } catch (error) {
           console.log('error', error);
         }
@@ -398,13 +365,15 @@ export default {
     async saveAggregator(item) {
       this.busy = true;
 
-
       console.log('saving', item);
       const updated = Object.assign({}, item);
       console.log('updated', updated);
 
       try {
-        const r = item._id === null ? await api.post('/group-integrations', updated) : await api.put(`/group-integrations/${item._id}`, updated);
+        const r =
+          item._id === null
+            ? await api.post('/group-integrations', updated)
+            : await api.put(`/group-integrations/${item._id}`, updated);
         console.log('response', r);
         if (r.data && r.data.ok === 1) {
           this.dialog.text = 'Updated Aggregator';

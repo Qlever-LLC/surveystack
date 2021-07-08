@@ -5,13 +5,12 @@ const createInitialState = () => ({
   fixedFooter: false,
 });
 
-
 const initialState = createInitialState();
 
 const getters = {
-  title: state => state.title,
-  subtitle: state => state.subtitle,
-  menu: state => state.menu,
+  title: (state) => state.title,
+  subtitle: (state) => state.subtitle,
+  menu: (state) => state.menu,
 };
 
 const actions = {

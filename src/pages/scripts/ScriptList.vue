@@ -1,15 +1,7 @@
 <template>
   <v-container>
-    <v-text-field
-      label="Search"
-      v-model="q"
-      append-icon="mdi-magnify"
-      clearable
-    />
-    <app-entity-list
-      :entities="entities"
-      collection="scripts"
-    />
+    <v-text-field label="Search" v-model="q" append-icon="mdi-magnify" clearable />
+    <app-entity-list :entities="entities" collection="scripts" />
   </v-container>
 </template>
 

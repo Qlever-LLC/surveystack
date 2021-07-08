@@ -1,6 +1,5 @@
 <template>
   <v-app id="app">
-
     <app-navbar />
     <div id="app-menu"></div>
 
@@ -21,7 +20,6 @@ import domainHandler from '@/utils/domainHandler';
 import api from '@/services/api.service';
 import * as db from '@/store/db';
 import InstallBanner from '@/components/ui/InstallBanner.vue';
-
 
 export default {
   name: 'App',
@@ -50,10 +48,14 @@ export default {
     // for survey, prefetch
 
     // TODO prefetch iframemessaging
+    // fetch('/iframeMessaging.js');
+    // fetch('/iframeUtils.js');
+    // fetch('/iframeUI.js');
+    // fetch('/iframeStyles.css');
   },
 };
 </script>
 
 <style>
-@import "./css/main.css";
+@import './css/main.css';
 </style>

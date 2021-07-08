@@ -1,56 +1,33 @@
 <template>
   <v-container>
     <v-card class="pa-4 mb-4">
-      <span class="text--secondary overline">{{this.entity._id}}</span>
-      <h1>{{ editMode ? "Edit Membership Integration" : "Create Membership Integration" }}</h1>
+      <span class="text--secondary overline">{{ this.entity._id }}</span>
+      <h1>{{ editMode ? 'Edit Membership Integration' : 'Create Membership Integration' }}</h1>
 
-      <v-form
-        class="mt-3"
-        @keydown.enter.prevent="submit"
-      >
-        <v-text-field
-          v-model="entity.name"
-          label="Name"
-          placeholder="Untitled integration"
-          outlined
-        />
+      <v-form class="mt-3" @keydown.enter.prevent="submit">
+        <v-text-field v-model="entity.name" label="Name" placeholder="Untitled integration" outlined />
 
-        <v-select
-          :items="integrationTypes"
-          v-model="entity.type"
-          label="Type"
-          outlined
-        ></v-select>
+        <v-select :items="integrationTypes" v-model="entity.type" label="Type" outlined></v-select>
 
         <app-farmos-farm-picker
           v-if="entity.type === 'farmos-farm'"
           :aggregators="aggregators"
           :data="entity.data"
-          @farm-selected="(ev) => {entity.data = ev; entity.name = ev.name}"
+          @farm-selected="
+            (ev) => {
+              entity.data = ev;
+              entity.name = ev.name;
+            }
+          "
         />
-        <app-json-editor
-          v-model="entity.data"
-          class="mt-3"
-        />
+        <app-json-editor v-model="entity.data" class="mt-3" />
 
         <div class="d-flex ma-2">
-          <v-btn
-            v-if="editMode"
-            color="error"
-            outlined
-            @click="deleteEntity"
-          >
+          <v-btn v-if="editMode" color="error" outlined @click="deleteEntity">
             <v-icon left>mdi-trash-can-outline</v-icon> Delete
           </v-btn>
-          <v-btn
-            class="ml-auto"
-            text
-            @click="cancel"
-          >Cancel</v-btn>
-          <v-btn
-            color="primary"
-            @click="submit"
-          >Submit</v-btn>
+          <v-btn class="ml-auto" text @click="cancel">Cancel</v-btn>
+          <v-btn color="primary" @click="submit">Submit</v-btn>
         </div>
       </v-form>
     </v-card>
@@ -64,7 +41,6 @@ import api from '@/services/api.service';
 
 import appJsonEditor from '@/components/ui/JsonEditor.vue';
 import appFarmosFarmPicker from '@/components/integrations/FarmosFarmPicker.vue';
-
 
 const exampleIntegration = {
   type: 'farmos-aggregator',
@@ -99,9 +75,7 @@ export default {
         name: '',
         membership: '',
         type: 'generic',
-        data: {
-
-        },
+        data: {},
       },
       aggregators: [],
     };
@@ -151,7 +125,11 @@ export default {
           gi.data.forEach(async (aggregator) => {
             const { data } = await api.get(`/farmos/integrations/${aggregator._id}/farms`);
             const a = {
-              _id: aggregator._id, text: aggregator.name, value: aggregator._id, url: aggregator.data.url, farms: [...data],
+              _id: aggregator._id,
+              text: aggregator.name,
+              value: aggregator._id,
+              url: aggregator.data.url,
+              farms: [...data],
             };
             this.aggregators.push(a);
           });
@@ -160,9 +138,7 @@ export default {
     },
   },
   async created() {
-    this.editMode = !this.$route.matched.some(
-      ({ name }) => name === 'membership-integrations-new',
-    );
+    this.editMode = !this.$route.matched.some(({ name }) => name === 'membership-integrations-new');
 
     this.entity._id = new ObjectId();
     const { membership } = this.$route.query;

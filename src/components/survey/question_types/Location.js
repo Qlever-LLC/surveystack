@@ -43,10 +43,7 @@ export default {
     };
   },
   methods: {
-    geoJsonFromLngLat({
-      lng,
-      lat,
-    }) {
+    geoJsonFromLngLat({ lng, lat }) {
       return {
         type: 'Feature',
         geometry: {
@@ -58,9 +55,7 @@ export default {
         },
       };
     },
-    geoJsonFromPosition({
-      coords,
-    }) {
+    geoJsonFromPosition({ coords }) {
       return {
         type: 'Feature',
         geometry: {
@@ -101,7 +96,8 @@ export default {
 
       map.addControl(this.ctrl);
 
-      const geocoder = new MapboxGeocoder({ // Initialize the geocoder
+      const geocoder = new MapboxGeocoder({
+        // Initialize the geocoder
         accessToken: mapboxgl.accessToken, // Set the access token
         mapboxgl: map, // Set the mapbox-gl instance
         marker: false, // Do not use the default marker style
@@ -125,7 +121,6 @@ export default {
       this.ctrl.on('trackuserlocationstart', () => {
         this.usingGPS = true;
       });
-
 
       // this.ctrl.on('trackuserlocationend', () => {
       //   console.log('trackuserlocationend');
@@ -195,9 +190,7 @@ export default {
     this.location = this.value;
   },
   mounted() {
-    setTimeout(() => {
-
-    }, 2000);
+    setTimeout(() => {}, 2000);
 
     mapboxgl.accessToken = 'pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA';
     this.map = new mapboxgl.Map({
@@ -223,10 +216,7 @@ export default {
 
     // TODO: this will now trigger a map error
     if (navigator.geolocation) {
-      this.geolocationID = navigator.geolocation.watchPosition(
-        successHandler,
-        errorHandler,
-      );
+      this.geolocationID = navigator.geolocation.watchPosition(successHandler, errorHandler);
     }
   },
   beforeDestroy() {

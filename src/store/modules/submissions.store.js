@@ -27,7 +27,6 @@ export const types = {
   },
 };
 
-
 const createInitialState = () => ({
   submissions: [],
   // remoteSubmissions: [],
@@ -37,13 +36,14 @@ const createInitialState = () => ({
 const initialState = createInitialState();
 
 const getters = {
-  drafts: state => state.submissions.filter(s => s),
-  outbox: state => state.submissions.filter(s => s),
+  drafts: (state) => state.submissions.filter((s) => s),
+  outbox: (state) => state.submissions.filter((s) => s),
   // TODO should this search previously uploaded submissions
-  getSubmission: state => id => state.submissions.find(submission => submission._id === id),
-  readyToSubmit: state => state.submissions.filter(
-    ({ meta }) => meta.status && meta.status.find(({ type }) => type === 'READY_TO_SUBMIT'),
-  ).map(({ _id }) => _id),
+  getSubmission: (state) => (id) => state.submissions.find((submission) => submission._id === id),
+  readyToSubmit: (state) =>
+    state.submissions
+      .filter(({ meta }) => meta.status && meta.status.find(({ type }) => type === 'READY_TO_SUBMIT'))
+      .map(({ _id }) => _id),
 };
 
 const mutations = {
@@ -73,20 +73,19 @@ const mutations = {
   // [types.mutations.SET_REMOTE_SUBMISSIONS](state, submissions) {
   //   state.remoteSubmissions = submissions;
   // },
-
 };
 
 const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  async [types.actions.fetchLocalSubmissions]({ commit }/* , userId */) {
+  async [types.actions.fetchLocalSubmissions]({ commit } /* , userId */) {
     // const response = await api.get('/submissions');
 
     // TODO reject if timeout here
     const response = await new Promise((resolve) => {
       db.openDb(() => {
-        db.getAllSubmissions(results => resolve(results));
+        db.getAllSubmissions((results) => resolve(results));
       });
     });
     commit(types.mutations.SET_SUBMISSIONS, response);
@@ -104,17 +103,16 @@ const actions = {
     commit(types.mutations.REMOVE_SUBMISSION, id);
   },
   async [types.actions.fetchLocalSubmission]({ state, dispatch }, id) {
-    const submissions = state.submissions.length > 0
-      ? state.submissions
-      : await dispatch(types.actions.fetchLocalSubmissions);
-    return submissions.find(submission => submission._id === id);
+    const submissions =
+      state.submissions.length > 0 ? state.submissions : await dispatch(types.actions.fetchLocalSubmissions);
+    return submissions.find((submission) => submission._id === id);
   },
   // Create a draft, store it in database and Vuex store, then navigate to draft
   // TODO: figure out where and when to persist to database and store.
   // Also, should this even be a Vuex action or should it reside somewhere else?
   async [types.actions.startDraft]({ dispatch }, { survey, version = 0, group }) {
     const surveyEntity = await dispatch('surveys/fetchSurvey', survey, { root: true });
-    const activeVersion = (version === 0) ? surveyEntity.latestVersion : version;
+    const activeVersion = version === 0 ? surveyEntity.latestVersion : version;
     const submission = submissionUtils.createSubmissionFromSurvey({
       survey: surveyEntity,
       version: activeVersion,

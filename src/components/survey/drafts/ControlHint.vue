@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="control-hint"
-    v-if="value"
-  >
+  <div class="control-hint" v-if="value">
     {{ value }}
   </div>
 </template>

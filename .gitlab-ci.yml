@@ -12,3 +12,55 @@ pages:
       - public
   only:
     - master
+
+variables:
+  GIT_DEPTH: "3"
+
+image:
+  name: "node:15"
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "master"'
+
+.cache-policy:
+  cache:
+    # cache per branch
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+
+.pull-cache-only:
+  extends: .cache-policy
+  cache:
+    # pull and use the cache, but do not update it
+    policy: pull
+
+stages:
+  - install
+  - lint
+  - test
+  - deploy
+
+yarn install:
+  extends: .cache-policy
+  stage: install
+  script:
+    - yarn
+  
+lint:
+  extends: .pull-cache-only
+  stage: lint
+  script:
+    - yarn lint
+  needs:
+    - yarn install
+
+test:
+  extends: .pull-cache-only
+  stage: test
+  script:
+    - yarn test:unit
+  needs:
+    - yarn install

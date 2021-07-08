@@ -1,9 +1,5 @@
 <template>
-  <div
-    class="draft-component-wrapper draft wrapper"
-    v-if="control"
-    ref="wrapper"
-  >
+  <div class="draft-component-wrapper draft wrapper" :class="{ builder: builder }" v-if="control" ref="wrapper">
     <!-- confirm submission modal -->
     <app-confirm-submission-dialog
       v-model="showConfirmSubmission"
@@ -55,24 +51,18 @@
           <v-icon>mdi-arrow-down</v-icon>
         </v-btn>
       </v-fab-transition>
-      <app-control
-        class="my-auto maxw-60 mx-auto"
-        :path="path"
-        :control="control"
-      />
+      <app-control class="my-auto maxw-60 mx-auto" :path="path" :control="control" />
     </div>
 
     <!-- Footer with next/prev buttons -->
     <app-draft-footer
       class="draft-footer px-0 grey lighten-4"
+      :class="{ 'show-submit': showOverview }"
       :style="{
         left: moveFooter ? '256px' : '0px',
         width: moveFooter ? 'calc(100% - 256px)' : '100%',
       }"
-      :showPrev="
-        !$store.getters['draft/atStart'] &&
-        !$store.getters['draft/showOverview']
-      "
+      :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
       :enableNext="!$store.getters['draft/hasRequiredUnanswered']"
       :enableSubmit="!$store.getters['draft/errors']"
       :showSubmit="showOverview"
@@ -92,7 +82,6 @@ import appDraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 import appConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 
 import { queueAction } from '@/utils/surveyStack';
-
 
 export default {
   components: {
@@ -187,7 +176,7 @@ export default {
     },
     setSubmissionGroup(id) {
       const availableGroups = this.$store.getters['memberships/groups'];
-      const found = availableGroups.find(group => group._id === id);
+      const found = availableGroups.find((group) => group._id === id);
 
       const group = { id, path: '' };
 
@@ -200,9 +189,7 @@ export default {
 
       this.$store.dispatch('draft/setProperty', { path: 'meta.group', value: group });
     },
-    isOverflown({
-      clientWidth, clientHeight, scrollWidth, scrollHeight,
-    }) {
+    isOverflown({ clientWidth, clientHeight, scrollWidth, scrollHeight }) {
       return scrollHeight > clientHeight || scrollWidth > clientWidth;
     },
     scrollY(val) {
@@ -220,6 +207,51 @@ export default {
 </script>
 
 <style scoped>
+.draft-component-wrapper.builder >>> .draft-footer.show-submit .full {
+  position: relative;
+}
+
+.draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary::after {
+  background-color: gray;
+  position: absolute;
+  content: "Builder submissions not visible in 'Results'.  Check 'archived' to view.";
+  white-space: pre-wrap;
+  padding: 8px;
+  border-radius: 5px;
+  text-transform: none;
+  font-weight: normal;
+  text-align: center;
+  letter-spacing: 0;
+  top: -65px;
+  width: 100%;
+  color: white;
+  font-size: 14px;
+  opacity: 0;
+}
+.draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary::before {
+  position: absolute;
+  content: '';
+  text-transform: none;
+  top: -10px;
+  left: 111px;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid gray;
+}
+
+.draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary::after,
+.draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary::before {
+  transition: opacity 0.25s;
+}
+
+.draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary:hover::after,
+.draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary:hover::before {
+  opacity: 1;
+}
+
 .draft-component-wrapper {
   height: 100%;
   overflow: auto;

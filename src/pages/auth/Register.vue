@@ -12,12 +12,7 @@
           @input="entity.email = $event.toLowerCase()"
         />
 
-        <v-text-field
-          label="Name"
-          type="text"
-          class="form-control"
-          v-model="entity.name"
-        />
+        <v-text-field label="Name" type="text" class="form-control" v-model="entity.name" />
 
         <v-text-field
           label="Password"
@@ -39,9 +34,7 @@
 
         <div class="d-flex justify-end">
           <v-btn type="button" class="mr-2" text @click="reset">Reset</v-btn>
-          <v-btn type="submit" @click.prevent="submit" color="primary"
-            >Sign up</v-btn
-          >
+          <v-btn type="submit" @click.prevent="submit" color="primary">Sign up</v-btn>
         </div>
       </v-form>
       <div class="text-center text-muted mt-5">
@@ -51,14 +44,11 @@
     </v-card>
 
     <v-alert class="mt-4" outlined v-if="membership" type="info"
-      >Your code is eligible to join
-      <strong>{{ membership.group.name }}</strong></v-alert
+      >Your code is eligible to join <strong>{{ membership.group.name }}</strong></v-alert
     >
 
     <transition name="fade">
-      <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{
-        status
-      }}</app-feedback>
+      <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{ status }}</app-feedback>
     </transition>
   </v-container>
 </template>
@@ -153,9 +143,7 @@ export default {
         // try to auto join group if this is a whitelabel
         if (this.isWhitelabel) {
           try {
-            const { data } = await api.post(
-              `/memberships/join-group?id=${this.whitelabelPartner.id}`,
-            );
+            const { data } = await api.post(`/memberships/join-group?id=${this.whitelabelPartner.id}`);
             await autoSelectActiveGroup(this.$store, this.whitelabelPartner.id);
           } catch (error) {
             console.log(error.response.data.message);
@@ -202,9 +190,7 @@ export default {
       this.$store.dispatch('invitation/set', invitation);
       const {
         data: [membership],
-      } = await api.get(
-        `/memberships?invitationCode=${invitation}&populate=true`,
-      );
+      } = await api.get(`/memberships?invitationCode=${invitation}&populate=true`);
       this.membership = membership;
     }
   },

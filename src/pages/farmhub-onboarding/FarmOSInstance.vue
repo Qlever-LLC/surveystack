@@ -1,13 +1,7 @@
 <template>
   <v-flex>
     <v-form class="mt-3" @keydown.enter.prevent="submit">
-      <v-text-field
-        v-model="instance.url"
-        readonly
-        label="URL"
-        placeholder="instance URL"
-        outlined
-      />
+      <v-text-field v-model="instance.url" readonly label="URL" placeholder="instance URL" outlined />
 
       <v-autocomplete
         label="Members with Access to Farm"
@@ -28,9 +22,7 @@
             {{ item.name }}
             <v-chip color="grey--darken-2" dark>{{ item.email }}</v-chip>
           </div>
-          <div v-else>
-            <v-icon left>mdi-account-clock</v-icon> {{ item.email }}
-          </div>
+          <div v-else><v-icon left>mdi-account-clock</v-icon> {{ item.email }}</div>
         </template>
         <template v-slot:prepend-item>
           <v-btn
@@ -93,11 +85,9 @@
 </template>
 
 <script>
-
 import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
 import appFieldCreator from './FieldCreator.vue';
-
 
 const remapGroupMembership = (m) => {
   let username = m.meta.invitationEmail;
@@ -134,18 +124,12 @@ const remapFarmOSMembership = (m) => {
   };
 };
 
-
 export default {
   components: {
     appDialog,
     appFieldCreator,
   },
-  props: [
-    'instance',
-    'group',
-    'aggregator',
-    'id',
-  ],
+  props: ['instance', 'group', 'aggregator', 'id'],
   data() {
     return {
       successDialog: false,
@@ -188,7 +172,6 @@ export default {
         this.successMessage = `Error creating field: ${this.field.name} on ${this.instance.url}, ${error.message}`;
       }
 
-
       this.field = {
         wkt: '',
         name: '',
@@ -212,7 +195,7 @@ export default {
       this.$emit('testConnection', this.instance);
     },
     async persistMemberships() {
-      const memberships = this.activeUsers.map(a => a.id);
+      const memberships = this.activeUsers.map((a) => a.id);
       const data = await api.post('/farmos/set-memberships', {
         group: this.group,
         memberships,
@@ -240,10 +223,12 @@ export default {
         const { data } = await api.get(`/groups/${this.group}?populate=true`);
         this.entity = { ...this.entity, ...data };
 
-        const { data: members } = (await api.get(`/memberships?group=${this.entity._id}&populate=true`));
+        const { data: members } = await api.get(`/memberships?group=${this.entity._id}&populate=true`);
         this.members = members.map(remapGroupMembership);
 
-        const { data: authorizedMembers } = await api.get(`/farmos/members-by-farm/?farmUrl=${this.instance.url}&group=${this.group}&aggregator=${this.aggregator}`);
+        const { data: authorizedMembers } = await api.get(
+          `/farmos/members-by-farm/?farmUrl=${this.instance.url}&group=${this.group}&aggregator=${this.aggregator}`
+        );
         this.activeUsers = authorizedMembers.map(remapFarmOSMembership);
         console.log('members with access to farm', authorizedMembers);
       } catch (e) {
@@ -258,7 +243,7 @@ export default {
 
         const areas = data.areas[Object.keys(data.areas)[0]];
         console.log('areas', areas);
-        this.farmLocation = areas.find(a => a.area_type === 'property').geofield[0].geom;
+        this.farmLocation = areas.find((a) => a.area_type === 'property').geofield[0].geom;
       } catch (error) {
         console.log('error', error);
       }

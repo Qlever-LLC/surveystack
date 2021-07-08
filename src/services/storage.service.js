@@ -30,10 +30,7 @@ const AuthService = {
     return JSON.parse(localStorage.getItem(AUTH_SHAPESHIFT_USER_KEY)) || {};
   },
   saveShapeshiftUser(shapeshiftUser) {
-    localStorage.setItem(
-      AUTH_SHAPESHIFT_USER_KEY,
-      JSON.stringify(shapeshiftUser),
-    );
+    localStorage.setItem(AUTH_SHAPESHIFT_USER_KEY, JSON.stringify(shapeshiftUser));
   },
   getShapeshiftHeader() {
     return localStorage.getItem(AUTH_SHAPESHIFT_HEADER_KEY) || '';
@@ -48,9 +45,7 @@ const AuthService = {
     localStorage.removeItem(AUTH_SHAPESHIFT_USER_KEY);
     localStorage.removeItem(AUTH_SHAPESHIFT_HEADER_KEY);
   },
-  shapeshiftPush({
-    status, user, header, shapeshiftUser, shapeshiftHeader,
-  }) {
+  shapeshiftPush({ status, user, header, shapeshiftUser, shapeshiftHeader }) {
     this.saveStatus(status);
     this.saveUser(user);
     this.saveHeader(header);
@@ -99,8 +94,4 @@ const GroupService = {
   },
 };
 
-export {
-  AuthService,
-  MembershipService,
-  GroupService,
-};
+export { AuthService, MembershipService, GroupService };

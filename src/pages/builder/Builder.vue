@@ -13,38 +13,21 @@
       @import-survey="importSurvey"
       @export-survey="exportSurvey"
     />
-    <div
-      v-else
-      class="d-flex align-center justify-center"
-      style="height: 100%"
-    >
-      <v-progress-circular
-        :size="50"
-        color="primary"
-        indeterminate
-      />
+    <div v-else class="d-flex align-center justify-center" style="height: 100%">
+      <v-progress-circular :size="50" color="primary" indeterminate />
     </div>
-    <app-dialog
-      v-model="showConflictModal"
-      @cancel="showConflictModal = false"
-      @confirm="generateId"
-    >
+    <app-dialog v-model="showConflictModal" @cancel="showConflictModal = false" @confirm="generateId">
       <template v-slot:title>Conflict 409</template>
       <template>
         A survey with id
-        <strong>{{survey._id}}</strong> already exists. Do you want to generate a different id?
+        <strong>{{ survey._id }}</strong> already exists. Do you want to generate a different id?
       </template>
     </app-dialog>
 
-    <app-dialog
-      v-model="showDeleteModal"
-      @cancel="showDeleteModal = false"
-      @confirm="onDelete"
-      width="400"
-    >
+    <app-dialog v-model="showDeleteModal" @cancel="showDeleteModal = false" @confirm="onDelete" width="400">
       <template v-slot:title>Confirm your action</template>
       Are you sure you want to delete survey
-      <strong>{{survey.name}}</strong> ({{survey._id}})?
+      <strong>{{ survey.name }}</strong> ({{ survey._id }})?
     </app-dialog>
 
     <app-dialog
@@ -58,19 +41,11 @@
       You have unpublished changes in your Draft. Importing a survey will dismiss these.
     </app-dialog>
 
-    <v-dialog
-      v-model="submitting"
-      hide-overlay
-      persistent
-      width="300"
-    >
+    <v-dialog v-model="submitting" hide-overlay persistent width="300">
       <v-card>
         <v-card-text class="pa-4">
           <span>Submitting Builder</span>
-          <v-progress-linear
-            indeterminate
-            class="mb-0"
-          ></v-progress-linear>
+          <v-progress-linear indeterminate class="mb-0"></v-progress-linear>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -82,18 +57,10 @@
       additionalMessage="<span class='caption'>Note: submissions from Builder are automatically archived. Please browse archived submissions to view this result.</span>"
     />
 
-    <v-snackbar
-      v-model="showSnackbar"
-      :timeout="4000"
-    >
-      {{snackbarMessage | capitalize}}
-      <v-btn
-        color="grey"
-        text
-        @click="showSnackbar = false"
-      >Close</v-btn>
+    <v-snackbar v-model="showSnackbar" :timeout="4000">
+      {{ snackbarMessage | capitalize }}
+      <v-btn color="grey" text @click="showSnackbar = false">Close</v-btn>
     </v-snackbar>
-
   </div>
   <div
     v-else
@@ -109,7 +76,8 @@
         Unsupported browser
       </v-alert> -->
       <v-card-text>
-          Safari is not currently supported in the Survey Builder, please use Firefox, Chrome, or another Chromium-based browser.
+        Safari is not currently supported in the Survey Builder, please use Firefox, Chrome, or another Chromium-based
+        browser.
       </v-card-text>
     </v-card>
   </div>
@@ -126,7 +94,6 @@ import resultMixin from '@/components/ui/ResultsMixin';
 import { createSurvey, updateControls } from '@/utils/surveys';
 import { isIos, isSafari } from '@/utils/compatibility';
 
-
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
 export default {
@@ -135,9 +102,7 @@ export default {
     appDialog,
     resultDialog,
   },
-  mixins: [
-    resultMixin,
-  ],
+  mixins: [resultMixin],
   data() {
     return {
       editMode: true,
@@ -243,7 +208,9 @@ export default {
 
       try {
         await api.customRequest({
-          method, url, data: tmp,
+          method,
+          url,
+          data: tmp,
         });
         if (!this.editMode) {
           this.editMode = true;
@@ -265,7 +232,11 @@ export default {
       this.survey = { ...tmp };
     },
 
-    async importSurvey({ target: { files: [file] } }) {
+    async importSurvey({
+      target: {
+        files: [file],
+      },
+    }) {
       try {
         const importedSurvey = JSON.parse(await file.text());
         this.importedSurvey = importedSurvey;
@@ -283,22 +254,21 @@ export default {
       this.showOverrideModal = false;
       try {
         // only keep latest revision of survey definition
-        const filtered = this.survey.revisions.filter(r => r.version <= this.survey.latestVersion);
+        const filtered = this.survey.revisions.filter((r) => r.version <= this.survey.latestVersion);
         this.survey.revisions = filtered;
         const revision = { ...this.importedSurvey.revisions[this.importedSurvey.revisions.length - 1] };
 
         if (this.importedSurvey.specVersion === 1) {
           const migratedControls = updateControls(
             updateControls(revision.controls, { type: 'ontology', key: 'options.source', replacer: () => '' }),
-            { type: /.*/, replacer: ({ _id, ...rest }) => ({ id: new ObjectId().toString(), ...rest }) },
+            { type: /.*/, replacer: ({ _id, ...rest }) => ({ id: new ObjectId().toString(), ...rest }) }
           );
           revision.controls = migratedControls;
         }
 
         if (this.importedSurvey.meta.specVersion === 2) {
           this.importedSurvey.resources = this.importedSurvey.resources
-            ? this.importedSurvey.resources
-              .map(({ handle, ...rest }) => ({
+            ? this.importedSurvey.resources.map(({ handle, ...rest }) => ({
                 name: handle,
                 id: new ObjectId().toString(),
                 ...rest,
@@ -307,16 +277,14 @@ export default {
         }
 
         // set new ObjectIDs for all controls
-        revision.controls = updateControls(
-          revision.controls,
-          { type: /.*/, replacer: ({ id, ...rest }) => ({ id: new ObjectId().toString(), ...rest }) },
-        );
+        revision.controls = updateControls(revision.controls, {
+          type: /.*/,
+          replacer: ({ id, ...rest }) => ({ id: new ObjectId().toString(), ...rest }),
+        });
 
         // append imported survey definition as latest revision
         this.survey.revisions.push(revision);
-        this.survey.resources = this.importedSurvey.resources
-          ? this.importedSurvey.resources
-          : [];
+        this.survey.resources = this.importedSurvey.resources ? this.importedSurvey.resources : [];
         revision.version = this.survey.latestVersion + 1;
         this.freshImport = true;
 
@@ -354,9 +322,7 @@ export default {
     },
   },
   async created() {
-    this.editMode = !this.$route.matched.some(
-      ({ name }) => name === 'surveys-new',
-    );
+    this.editMode = !this.$route.matched.some(({ name }) => name === 'surveys-new');
 
     this.survey._id = new ObjectId();
 

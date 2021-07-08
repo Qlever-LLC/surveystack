@@ -1,13 +1,7 @@
 <template>
   <div style="width: 100%">
     <v-form>
-      <v-text-field
-        @input="(val) => updateName(val)"
-        :value="value.name"
-        label="Name"
-        placeholder="Name"
-        outlined
-      />
+      <v-text-field @input="(val) => updateName(val)" :value="value.name" label="Name" placeholder="Name" outlined />
     </v-form>
     <div id="farmos-map" style="width: 100%; height: 500px"></div>
   </div>
@@ -16,12 +10,8 @@
 <script>
 import createMap from '@/external/instance/instance';
 
-
 export default {
-  props: [
-    'value',
-    'center',
-  ],
+  props: ['value', 'center'],
   data() {
     return {
       layer: null,
@@ -45,16 +35,15 @@ export default {
     load() {
       const map = createMap({
         target: 'farmos-map',
-        options: {
-
-        },
+        options: {},
       });
       this.map = map;
 
       // Adding an XYZ layer.
       const xyzOpts = {
         title: 'mapbox', // defaults to 'xyz'
-        url: 'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA', // REQUIRED!
+        url:
+          'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA', // REQUIRED!
         visible: true, // defaults to true
         base: true, // defaults to false
       };
@@ -142,7 +131,7 @@ export default {
   background-image: none;
 }
 .ol-geocoder .gcd-gl-btn:after {
-  content: "\1f50d";
+  content: '\1f50d';
 }
 .layer-switcher > button {
   background-size: 1.5em 1.5em;

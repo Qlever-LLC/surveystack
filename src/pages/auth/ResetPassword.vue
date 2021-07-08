@@ -2,7 +2,7 @@
   <v-container class="maxw-40">
     <v-card class="pa-5">
       <h1>New password</h1>
-      <p>Set a new password for {{this.email}}</p>
+      <p>Set a new password for {{ this.email }}</p>
       <v-form @submit.prevent="submit">
         <v-text-field
           v-model="newPassword"
@@ -19,35 +19,24 @@
           @click:append="showPasswords = !showPasswords"
         />
         <div class="d-flex justify-end">
-          <v-btn
-            type="submit"
-            color="primary"
-          >Set password</v-btn>
+          <v-btn type="submit" color="primary">Set password</v-btn>
         </div>
       </v-form>
     </v-card>
     <transition name="fade">
-      <app-feedback
-        v-if="status"
-        class="mt-5"
-        @closed="status = null"
-        :type="status.type"
-      >{{status.message}}</app-feedback>
+      <app-feedback v-if="status" class="mt-5" @closed="status = null" :type="status.type">{{
+        status.message
+      }}</app-feedback>
     </transition>
     <transition name="fade">
-      <app-feedback
-        v-if="showSuccessMessage"
-        class="mt-5"
-        :closeable="false"
-        type="success"
-      >
-        Your new password has been set! <router-link :to="{name: 'auth-login', params: {initialEmail: email}}">Continue to log in area</router-link>.
+      <app-feedback v-if="showSuccessMessage" class="mt-5" :closeable="false" type="success">
+        Your new password has been set!
+        <router-link :to="{ name: 'auth-login', params: { initialEmail: email } }">Continue to log in area</router-link
+        >.
       </app-feedback>
     </transition>
-
   </v-container>
 </template>
-
 
 <script>
 import axios from 'axios';
@@ -88,12 +77,11 @@ export default {
       }
 
       try {
-        await axios.post(`${process.env.VUE_APP_API_URL}/auth/reset-password`,
-          {
-            email: this.email,
-            token: this.token,
-            newPassword: this.newPassword,
-          });
+        await axios.post(`${process.env.VUE_APP_API_URL}/auth/reset-password`, {
+          email: this.email,
+          token: this.token,
+          newPassword: this.newPassword,
+        });
         this.showSuccessMessage = true;
       } catch (error) {
         console.log(error.response);

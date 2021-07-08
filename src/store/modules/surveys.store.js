@@ -11,11 +11,11 @@ const createInitialState = () => ({
 const initialState = createInitialState();
 
 const getters = {
-  getSurvey: state => id => state.surveys.find(survey => survey._id === id),
-  pinned: state => state.pinned,
-  getPinned: state => (prefix = '', excludePath = '') => {
-    const prefixed = state.pinned.filter(s => s.meta.group.path && s.meta.group.path.startsWith(prefix));
-    const excluded = prefixed.filter(s => s.meta.group.path !== excludePath);
+  getSurvey: (state) => (id) => state.surveys.find((survey) => survey._id === id),
+  pinned: (state) => state.pinned,
+  getPinned: (state) => (prefix = '', excludePath = '') => {
+    const prefixed = state.pinned.filter((s) => s.meta.group.path && s.meta.group.path.startsWith(prefix));
+    const excluded = prefixed.filter((s) => s.meta.group.path !== excludePath);
     return excluded;
   },
 };
@@ -34,9 +34,7 @@ const actions = {
     commit('ADD_SURVEY', response.data);
     return response.data;
   },
-  async fetchPinned({
-    commit, dispatch, rootState, rootGetters,
-  }) {
+  async fetchPinned({ commit, dispatch, rootState, rootGetters }) {
     const pinned = [];
 
     if (!rootGetters['auth/isLoggedIn']) {
@@ -54,8 +52,8 @@ const actions = {
       // and later use those to find their pinned surveys
       // (the whitelabel root group's pinned surveys are fetched separately inside whitelabel.store.js)
       const { path } = rootGetters['whitelabel/partner'];
-      const prefixed = memberships.filter(m => m.group.path.startsWith(path)); // find any memberships in this whitelabel
-      const excluded = prefixed.filter(m => m.group.path !== path); // ... but exclude the whitelabel root group membership
+      const prefixed = memberships.filter((m) => m.group.path.startsWith(path)); // find any memberships in this whitelabel
+      const excluded = prefixed.filter((m) => m.group.path !== path); // ... but exclude the whitelabel root group membership
       filteredMemberships = excluded;
     }
 
@@ -98,14 +96,13 @@ const mutations = {
     state.surveys = surveys;
   },
   REMOVE_SURVEY(state, id) {
-    const index = state.surveys.findIndex(survey => survey._id === id);
+    const index = state.surveys.findIndex((survey) => survey._id === id);
     state.submissions.splice(index, 1);
   },
   SET_PINNED(state, pinned) {
     state.pinned = pinned;
   },
 };
-
 
 export default {
   namespaced: true,
