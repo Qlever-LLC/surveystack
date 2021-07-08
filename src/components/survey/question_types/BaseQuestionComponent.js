@@ -8,7 +8,7 @@ export default {
     required: { type: Boolean, default: false },
     redacted: { type: Boolean, default: false },
     resources: {
-      default: () => ([]),
+      default: () => [],
     },
   },
   methods: {

@@ -84,6 +84,4 @@ use log() to log to console below
 */
 `;
 
-export {
-  defaultApiCompose,
-};
+export { defaultApiCompose };

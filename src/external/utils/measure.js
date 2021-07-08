@@ -71,11 +71,9 @@ export function measureGeometry(geom, units = 'metric') {
   let measurement;
   if (geom instanceof Polygon) {
     measurement = formatArea(geom, units);
-  }
-  else if (geom instanceof LineString) {
+  } else if (geom instanceof LineString) {
     measurement = formatLength(geom, units);
-  }
-  else {
+  } else {
     measurement = '';
   }
   return measurement;

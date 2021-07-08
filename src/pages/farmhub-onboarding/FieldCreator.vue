@@ -2,10 +2,7 @@
   <v-row class="text-center">
     <template v-if="state === states.IDLE">
       <v-col cols="12">
-        <app-kml-importer
-          v-model="importedField"
-          @change="onImport"
-        ></app-kml-importer>
+        <app-kml-importer v-model="importedField" @change="onImport"></app-kml-importer>
       </v-col>
       <v-col cols="12"> OR </v-col>
       <v-col cols="12">
@@ -24,38 +21,23 @@
       </v-col>
 
       <v-col cols="6">
-        <v-btn color="primary" @click="$emit('done')" :loading="loading"
-          >Add Field to FarmOS Instance</v-btn
-        >
+        <v-btn color="primary" @click="$emit('done')" :loading="loading">Add Field to FarmOS Instance</v-btn>
       </v-col>
 
       <v-col cols="6">
-        <v-btn
-          color="primary"
-          outlined
-          @click="$emit('cancel')"
-          :loading="loading"
-          >Cancel</v-btn
-        >
+        <v-btn color="primary" outlined @click="$emit('cancel')" :loading="loading">Cancel</v-btn>
       </v-col>
     </template>
 
-    <app-dialog
-      labelConfirm="OK"
-      class="primary--text mx-4"
-      v-model="dialog"
-      width="400"
-    >
+    <app-dialog labelConfirm="OK" class="primary--text mx-4" v-model="dialog" width="400">
       Dialog Text
     </app-dialog>
   </v-row>
 </template>
 <script>
-
 import appDialog from '@/components/ui/Dialog.vue';
 import appFarmArea from './FarmOSArea.vue';
 import appKmlImporter from './KmlImporter.vue';
-
 
 const states = {
   IDLE: 0,
@@ -71,11 +53,7 @@ export default {
     appFarmArea,
     appKmlImporter,
   },
-  props: [
-    'value',
-    'center',
-    'loading',
-  ],
+  props: ['value', 'center', 'loading'],
   data() {
     return {
       states,

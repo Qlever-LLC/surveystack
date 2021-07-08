@@ -1,6 +1,7 @@
 <template>
   <div>
-    <h2>Hi</h2>Add Feedback to store
+    <h2>Hi</h2>
+    Add Feedback to store
     <v-text-field v-model="message" @keyup.enter="addFeedback(message)" placeholder="Feedback..." />
     <v-btn @click="addFeedback(message)">ADD</v-btn>
   </div>

@@ -3,34 +3,17 @@
     <h1>Test</h1>
     <v-row>
       <v-col>
-        <v-textarea
-          :value="submissionText"
-          rows="30"
-          outlined
-        />
+        <v-textarea :value="submissionText" rows="30" outlined />
       </v-col>
       <v-col>
         <v-form>
-          <v-text-field
-            label="meta.user"
-            @input="(v) => setProperty({path: 'meta.user', value: v})"
-          />
+          <v-text-field label="meta.user" @input="(v) => setProperty({ path: 'meta.user', value: v })" />
 
-          <v-text-field
-            v-model="name"
-            label="data.name.value"
-          />
-          <v-text-field
-            v-model="age"
-            label="data.age.value"
-            type="number"
-          />
-
+          <v-text-field v-model="name" label="data.name.value" />
+          <v-text-field v-model="age" label="data.age.value" type="number" />
         </v-form>
       </v-col>
-
     </v-row>
-
   </v-container>
 </template>
 
@@ -55,7 +38,6 @@ export default {
       set(v) {
         this.setProperty({ path: 'data.name.value', value: v });
       },
-
     },
     age: {
       get() {

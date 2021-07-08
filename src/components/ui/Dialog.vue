@@ -1,27 +1,16 @@
 <template>
-  <v-dialog
-    v-model="show"
-    :width="width"
-    :max-width="maxWidth"
-  >
+  <v-dialog v-model="show" :width="width" :max-width="maxWidth">
     <v-card>
       <v-card-title class="headline">
-        <slot name="title">{{title}}</slot>
+        <slot name="title">{{ title }}</slot>
       </v-card-title>
       <v-card-text>
         <slot name="default">Default slot content</slot>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn
-          v-if="!hideCancel"
-          text
-          @click="$emit('cancel')"
-        >Cancel</v-btn>
-        <v-btn
-          text
-          @click="$emit('confirm')"
-        >{{labelConfirm ? labelConfirm : 'OK'}}</v-btn>
+        <v-btn v-if="!hideCancel" text @click="$emit('cancel')">Cancel</v-btn>
+        <v-btn text @click="$emit('confirm')">{{ labelConfirm ? labelConfirm : 'OK' }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

@@ -1,8 +1,5 @@
 <template>
-  <v-card
-    min-height="70vh"
-    class="d-flex flex-column"
-  >
+  <v-card min-height="70vh" class="d-flex flex-column">
     <v-card-title class="d-block">
       <div class="d-flex justify-space-between align-center">
         <div class="grey--text text--darken-2">
@@ -12,7 +9,10 @@
           <v-btn
             color="primary"
             style="margin-top: 2px;"
-            @click="editedItem = createEmptyItem(); editItemDialogIsVisible = true"
+            @click="
+              editedItem = createEmptyItem();
+              editItemDialogIsVisible = true;
+            "
             :disabled="disabled"
           >
             <v-icon left>mdi-plus</v-icon>Add Row
@@ -22,26 +22,14 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
-                <select-items-upload-button
-                  @change="handleFileChange"
-                  class="mt-4 mb-n2"
-                  :disabled="disabled"
-                />
+                <select-items-upload-button @change="handleFileChange" class="mt-4 mb-n2" :disabled="disabled" />
               </div>
             </template>
             CSV must have column headers 'label', 'value', and optionally 'tags'
           </v-tooltip>
-          <v-dialog
-            v-model="deleteDialogIsVisible"
-            max-width="290"
-          >
+          <v-dialog v-model="deleteDialogIsVisible" max-width="290">
             <template v-slot:activator="{ on }">
-              <v-btn
-                icon
-                v-on="on"
-                class="ml-2"
-                :disabled="disabled"
-              >
+              <v-btn icon v-on="on" class="ml-2" :disabled="disabled">
                 <v-icon>mdi-delete</v-icon>
                 <!-- Delete List -->
               </v-btn>
@@ -53,21 +41,12 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer />
-                <v-btn
-                  text
-                  color="red"
-                  @click="deleteResult"
-                >Delete</v-btn>
-                <v-btn
-                  text
-                  @click="closeDeleteDialog"
-                >Cancel</v-btn>
-
+                <v-btn text color="red" @click="deleteResult">Delete</v-btn>
+                <v-btn text @click="closeDeleteDialog">Cancel</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
         </div>
-
       </div>
       <v-divider />
     </v-card-title>
@@ -94,19 +73,9 @@
           :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
         />
 
-        <v-text-field
-          v-model="search"
-          append-icon="mdi-magnify"
-          class="mx-4"
-          label="Search"
-        />
+        <v-text-field v-model="search" append-icon="mdi-magnify" class="mx-4" label="Search" />
         <div>
-
-          <v-btn
-            icon
-            @click="deleteSelectedItems"
-            :disabled="!selectedItems.length || disabled"
-          >
+          <v-btn icon @click="deleteSelectedItems" :disabled="!selectedItems.length || disabled">
             <v-icon>mdi-delete</v-icon>
           </v-btn>
         </div>
@@ -120,104 +89,46 @@
         :search="search"
         item-key="id"
         disable-sort
-        :footer-props="{'items-per-page-options':[10, 20, 50, 100, -1]}"
+        :footer-props="{ 'items-per-page-options': [10, 20, 50, 100, -1] }"
       >
         <template v-slot:item.label="{ item }">
-          <v-text-field
-            v-model="item.label"
-            :disabled="disabled"
-            solo
-            dense
-            hide-details
-          />
+          <v-text-field v-model="item.label" :disabled="disabled" solo dense hide-details />
         </template>
         <template v-slot:item.value="{ item }">
-          <v-text-field
-            v-model="item.value"
-            :disabled="disabled"
-            solo
-            dense
-            hide-details
-          />
+          <v-text-field v-model="item.value" :disabled="disabled" solo dense hide-details />
         </template>
         <template v-slot:item.tags="{ item }">
-          <v-text-field
-            v-model="item.tags"
-            :disabled="disabled"
-            solo
-            dense
-            hide-details
-          />
+          <v-text-field v-model="item.tags" :disabled="disabled" solo dense hide-details />
         </template>
         <template v-slot:item.actions="{ item }">
           <div class="d-flex">
-            <v-icon
-              @click="moveItemUp(item)"
-              tabindex="-1"
-              :disabled="disabled"
-            >mdi-arrow-up</v-icon>
-            <v-icon
-              class="ml-2"
-              @click="moveItemDown(item)"
-              tabindex="-1"
-              :disabled="disabled"
-            >mdi-arrow-down</v-icon>
-            <v-icon
-              class="ml-2"
-              @click="copyItem(item)"
-              tabindex="-1"
-              :disabled="disabled"
-            >mdi-content-copy</v-icon>
-            <v-icon
-              class="ml-2"
-              @click="deleteItem(item)"
-              tabindex="-1"
-              :disabled="disabled"
-            >mdi-trash-can-outline</v-icon>
+            <v-icon @click="moveItemUp(item)" tabindex="-1" :disabled="disabled">mdi-arrow-up</v-icon>
+            <v-icon class="ml-2" @click="moveItemDown(item)" tabindex="-1" :disabled="disabled">mdi-arrow-down</v-icon>
+            <v-icon class="ml-2" @click="copyItem(item)" tabindex="-1" :disabled="disabled">mdi-content-copy</v-icon>
+            <v-icon class="ml-2" @click="deleteItem(item)" tabindex="-1" :disabled="disabled"
+              >mdi-trash-can-outline</v-icon
+            >
           </div>
         </template>
       </v-data-table>
     </v-card-text>
     <v-spacer />
     <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
-      <v-btn
-        text
-        class="ml-4"
-        @click="() => $emit('close-dialog')"
-      >Close</v-btn>
+      <v-btn text class="ml-4" @click="() => $emit('close-dialog')">Close</v-btn>
     </v-card-actions>
 
-    <v-dialog
-      v-model="editItemDialogIsVisible"
-      max-width="350"
-    >
+    <v-dialog v-model="editItemDialogIsVisible" max-width="350">
       <v-card>
         <v-card-title>Edit Item</v-card-title>
         <v-card-text>
-          <v-text-field
-            v-model="editedItem.label"
-            label="Label"
-          />
-          <v-text-field
-            v-model="editedItem.value"
-            label="Value"
-          />
-          <v-text-field
-            v-model="editedItem.tags"
-            label="Tags"
-          />
+          <v-text-field v-model="editedItem.label" label="Label" />
+          <v-text-field v-model="editedItem.value" label="Value" />
+          <v-text-field v-model="editedItem.tags" label="Tags" />
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn
-            text
-            @click="editItemDialogIsVisible = false"
-          >Cancel</v-btn>
-          <v-btn
-            text
-            color="primary"
-            @click="saveItem"
-          >Save</v-btn>
+          <v-btn text @click="editItemDialogIsVisible = false">Cancel</v-btn>
+          <v-btn text color="primary" @click="saveItem">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -239,12 +150,12 @@ export default {
     resources: {
       type: Array,
       required: true,
-      default: () => ([]),
+      default: () => [],
     },
     disabled: {
       type: Boolean,
       required: false,
-      default: () => (false),
+      default: () => false,
     },
   },
   components: {
@@ -298,7 +209,7 @@ export default {
       return namePattern.test(val) ? true : 'Data name must be at least 4 character in length';
     },
     moveItemDown({ id }) {
-      const index = this.resource.content.findIndex(item => item.id === id);
+      const index = this.resource.content.findIndex((item) => item.id === id);
       if (index < this.resource.content.length - 1) {
         const newItems = [...this.resource.content];
         const [item] = newItems.splice(index, 1);
@@ -310,7 +221,7 @@ export default {
       }
     },
     moveItemUp({ id }) {
-      const index = this.resource.content.findIndex(item => item.id === id);
+      const index = this.resource.content.findIndex((item) => item.id === id);
       if (index > 0) {
         const newItems = [...this.resource.content];
         const [item] = newItems.splice(index, 1);
@@ -330,10 +241,13 @@ export default {
       };
     },
     copyItem(item) {
-      const index = this.resource.content.findIndex(row => row.id === item.id);
+      const index = this.resource.content.findIndex((row) => row.id === item.id);
       if (index >= 0) {
         this.resource.content.splice(index + 1, 0, {
-          id: new ObjectId().toString(), label: `${item.label} Copy`, value: `${item.value}_copy`, tags: item.tags,
+          id: new ObjectId().toString(),
+          label: `${item.label} Copy`,
+          value: `${item.value}_copy`,
+          tags: item.tags,
         });
         this.$emit('change', {
           ...this.resource,
@@ -342,7 +256,7 @@ export default {
       }
     },
     deleteSelectedItems() {
-      const isNotSelectedItem = item => !this.selectedItems.some(s => s.id === item.id);
+      const isNotSelectedItem = (item) => !this.selectedItems.some((s) => s.id === item.id);
       const newItems = this.resource.content.filter(isNotSelectedItem);
       this.selectedItems = [];
       this.$emit('change', {
@@ -364,7 +278,7 @@ export default {
       }
     },
     updateEditItem() {
-      const index = this.resource.content.findIndex(item => item.id === this.editedItem.id);
+      const index = this.resource.content.findIndex((item) => item.id === this.editedItem.id);
       if (index > -1) {
         const newItems = [
           ...this.resource.content.slice(0, index),
@@ -376,10 +290,7 @@ export default {
           content: newItems,
         });
       } else {
-        const newItems = [
-          ...this.resource.content,
-          this.editedItem,
-        ];
+        const newItems = [...this.resource.content, this.editedItem];
         this.$emit('change', {
           ...this.resource,
           content: newItems,
@@ -415,7 +326,7 @@ export default {
       this.appendItems(data);
     },
     deleteItem(item) {
-      const newItems = this.resource.content.filter(x => x.label !== item.label && x.value !== item.value);
+      const newItems = this.resource.content.filter((x) => x.label !== item.label && x.value !== item.value);
       this.$emit('change', {
         ...this.resource,
         content: newItems,
@@ -425,10 +336,7 @@ export default {
       return uniqWith(items, isEqual);
     },
     appendItems(items) {
-      const content = this.filterDuplicateItems([
-        ...this.resource.content,
-        ...items,
-      ]);
+      const content = this.filterDuplicateItems([...this.resource.content, ...items]);
       this.$emit('change', {
         ...this.resource,
         content,

@@ -26,17 +26,15 @@ export default {
     appleTouch.setAttribute('rel', 'apple-touch-icon');
     appleTouch.setAttribute('href', '/img/icons/apple-touch-icon.png');
 
-
     const manifestElement = document.createElement('link');
     manifestElement.setAttribute('rel', 'manifest');
     const parts = window.location.host.split('.');
     manifestElement.setAttribute('href', '/manifest.json');
 
-
     // console.log('parts', parts);
     if (parts.length > 0) {
       const subdomain = parts[0];
-      const activePartner = partners.find(p => p.domain === subdomain);
+      const activePartner = partners.find((p) => p.domain === subdomain);
 
       if (activePartner) {
         // every property needs to be set manually to force a reactive update
@@ -60,7 +58,6 @@ export default {
         vue.$store.dispatch('whitelabel/setPartner', activePartner);
       }
     }
-
 
     document.head.appendChild(manifestElement);
     document.head.appendChild(iconElement);

@@ -5,7 +5,6 @@
  * Note: assume crops is a dropdown question
  */
 
-
 /**
  * Relevance
  *

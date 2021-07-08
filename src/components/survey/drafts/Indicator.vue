@@ -1,14 +1,7 @@
 <template>
-  <v-chip
-    class="px-4 mx-1"
-    small
-    :color="color"
-  >
+  <v-chip class="px-4 mx-1" small :color="color">
     <span class="font-weight-bold white--text">
-      <v-icon
-        x-small
-        left
-      >{{icon}}</v-icon>
+      <v-icon x-small left>{{ icon }}</v-icon>
       <slot>???</slot>
     </span>
   </v-chip>

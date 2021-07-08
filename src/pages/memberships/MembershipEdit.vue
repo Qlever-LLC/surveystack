@@ -1,43 +1,20 @@
 <template>
   <v-container>
-    <span class="text--secondary overline">{{entity._id}}</span>
+    <span class="text--secondary overline">{{ entity._id }}</span>
     <h1>Edit Membership</h1>
 
     <v-card class="pa-4 mb-4">
       <div class="d-flex">
-        <v-btn
-          class="ml-auto"
-          color="error"
-          outlined
-          @click="dialogRemoval = true"
-        >
+        <v-btn class="ml-auto" color="error" outlined @click="dialogRemoval = true">
           <v-icon left>mdi-trash-can-outline</v-icon> Delete
         </v-btn>
       </div>
-      <v-form
-        class="mt-3"
-        @keydown.enter.prevent="submit"
-      >
-        <v-select
-          :items="availableStatus"
-          v-model="entity.meta.status"
-          label="Status"
-          disabled
-        />
+      <v-form class="mt-3" @keydown.enter.prevent="submit">
+        <v-select :items="availableStatus" v-model="entity.meta.status" label="Status" disabled />
 
-        <v-text-field
-          v-model="entity.group"
-          label="Group"
-          disabled
-        />
+        <v-text-field v-model="entity.group" label="Group" disabled />
 
-        <v-text-field
-          v-if="entity.user"
-          class="mt-3"
-          v-model="entity.user"
-          label="User"
-          disabled
-        />
+        <v-text-field v-if="entity.user" class="mt-3" v-model="entity.user" label="User" disabled />
 
         <v-text-field
           class="mt-3"
@@ -46,53 +23,31 @@
           :disabled="entity.meta.status === 'active'"
         />
 
-        <v-select
-          class="mt-3"
-          :items="availableRoles"
-          v-model="entity.role"
-          label="Role"
-        ></v-select>
+        <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role"></v-select>
 
         <div class="d-flex mt-2">
-          <v-btn
-            class="ml-auto"
-            text
-            @click="cancel"
-          >Cancel</v-btn>
-          <v-btn
-            color="primary"
-            @click="submit"
-          >Save</v-btn>
+          <v-btn class="ml-auto" text @click="cancel">Cancel</v-btn>
+          <v-btn color="primary" @click="submit">Save</v-btn>
         </div>
       </v-form>
     </v-card>
 
-    <v-card
-      class="my-3 pa-2"
-      v-if="resendEnabled"
-    >
-      <v-card-title>
-        <v-icon left>mdi-account-clock</v-icon>Pending
-      </v-card-title>
+    <v-card class="my-3 pa-2" v-if="resendEnabled">
+      <v-card-title> <v-icon left>mdi-account-clock</v-icon>Pending </v-card-title>
       <v-card-subtitle>Membership has not been claimed</v-card-subtitle>
       <v-card-text>
-        You can try to resend the invitation via email. You may also view the secret invitation link and deliver it by other means.
+        You can try to resend the invitation via email. You may also view the secret invitation link and deliver it by
+        other means.
       </v-card-text>
       <v-card-actions class="d-flex justify-space-between align-center">
         <div>
-          <v-btn
-            color="primary"
-            @click="resend"
-          >
-            <v-icon left>mdi-email-send-outline</v-icon> Resend
-          </v-btn>
-          <span class="ml-1 caption text--secondary">{{entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Not yet sent'}}</span>
+          <v-btn color="primary" @click="resend"> <v-icon left>mdi-email-send-outline</v-icon> Resend </v-btn>
+          <span class="ml-1 caption text--secondary">{{
+            entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Not yet sent'
+          }}</span>
         </div>
         <div>
-          <v-btn
-            @click="dialogInvitationLink = true"
-            color="primary"
-          >
+          <v-btn @click="dialogInvitationLink = true" color="primary">
             <v-icon left>mdi-eye-outline</v-icon>View
           </v-btn>
         </div>
@@ -103,15 +58,12 @@
       <app-integration-list
         title="Membership Integrations"
         :entities="integrations"
-        :newRoute="{name: 'membership-integrations-new', query: {membership: entity._id}}"
+        :newRoute="{ name: 'membership-integrations-new', query: { membership: entity._id } }"
         integrationType="membership"
       />
     </v-card>
 
-    <v-dialog
-      v-model="dialogRemoval"
-      max-width="290"
-    >
+    <v-dialog v-model="dialogRemoval" max-width="290">
       <v-card class="">
         <v-card-title>
           Delete Membership
@@ -121,40 +73,27 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn
-            text
-            @click.stop="dialogRemoval = false"
-          >
+          <v-btn text @click.stop="dialogRemoval = false">
             Cancel
           </v-btn>
-          <v-btn
-            text
-            color="red"
-            @click.stop="remove"
-          >
+          <v-btn text color="red" @click.stop="remove">
             Delete
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
-    <v-dialog
-      v-model="dialogSent"
-      max-width="400"
-    >
+    <v-dialog v-model="dialogSent" max-width="400">
       <v-card class="">
         <v-card-title>
           Sent
         </v-card-title>
         <v-card-text class="mt-4">
-          An invitation email has been sent to<br />{{entity.meta.invitationEmail}}
+          An invitation email has been sent to<br />{{ entity.meta.invitationEmail }}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn
-            text
-            @click.stop="dialogSent = false"
-          >
+          <v-btn text @click.stop="dialogSent = false">
             OK
           </v-btn>
         </v-card-actions>
@@ -168,10 +107,11 @@
       @confirm="dialogInvitationLink = false"
     >
       <p>
-        Copy the following secret invitation link. It can be used to claim this membership - either by creating a new user account, or by using an already existing user account.
+        Copy the following secret invitation link. It can be used to claim this membership - either by creating a new
+        user account, or by using an already existing user account.
       </p>
 
-      <span class="body-1">{{invitationLink}}</span>
+      <span class="body-1">{{ invitationLink }}</span>
     </app-dialog>
   </v-container>
 </template>
@@ -228,7 +168,7 @@ export default {
     };
   },
   watch: {
-    'entity.meta.invitationEmail': function (newVal, oldVal) {
+    'entity.meta.invitationEmail': function(newVal, oldVal) {
       if (!oldVal) {
         this.initialInvitationEmail = newVal;
       }

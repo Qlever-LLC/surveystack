@@ -1,10 +1,6 @@
 <template>
   <div class="farm-os-field">
-    <app-control-label
-      :value="control.label"
-      :redacted="redacted"
-      :required="required"
-    />
+    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <v-autocomplete
       :disabled="loading"
       :value="getValue"
@@ -19,10 +15,7 @@
       @keyup.enter.prevent="submit"
       :loading="loading"
     >
-      <template
-        v-slot:selection="data"
-        v-if="!!control.options.hasMultipleSelections"
-      >
+      <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip
           close
           v-bind="data.attrs"
@@ -35,31 +28,18 @@
           </template>
         </v-chip>
       </template>
-      <template
-        v-slot:selection="{item}"
-        v-else
-      >
-        <div
-          v-html="item.label"
-          class="d-flex align-center autocomplete-selection"
-        ></div>
+      <template v-slot:selection="{ item }" v-else>
+        <div v-html="item.label" class="d-flex align-center autocomplete-selection"></div>
       </template>
 
-      <template
-        v-slot:item="data"
-        v-if="!!control.options.hasMultipleSelections"
-      >
+      <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
         <v-list-item-content>
           <v-list-item-title v-html="data.item.label" />
         </v-list-item-content>
       </template>
-      <template
-        v-slot:item="{item}"
-        v-else
-      >
+      <template v-slot:item="{ item }" v-else>
         <div v-html="item.label"></div>
       </template>
-
     </v-autocomplete>
 
     <app-control-more-info :value="control.moreInfo" />
@@ -73,15 +53,12 @@ import farmosBase from './FarmOsBase';
 export default {
   mixins: [baseQuestionComponent, farmosBase('fields')],
   data() {
-    return {
-    };
+    return {};
   },
   methods: {
     remove(item) {
-      const isNotItem = v => JSON.stringify(v) !== JSON.stringify(item.value);
-      this.changed(
-        this.getValueOrNull(this.value.filter(isNotItem)),
-      );
+      const isNotItem = (v) => JSON.stringify(v) !== JSON.stringify(item.value);
+      this.changed(this.getValueOrNull(this.value.filter(isNotItem)));
     },
   },
   async created() {

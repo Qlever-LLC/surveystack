@@ -1,15 +1,11 @@
 <template>
   <div>
-    <app-control-label
-      :value="control.label"
-      :redacted="redacted"
-      :required="required"
-    />
+    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
     <div
       :id="mapId"
       :class="{
-        'map': true,
+        map: true,
         'hide-polygon': !control.options.geoJSON.showPolygon,
         'hide-line': !control.options.geoJSON.showLine,
         'hide-point': !control.options.geoJSON.showPoint,
@@ -36,7 +32,8 @@ import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 export function addBaseLayer(map) {
   const xyzOpts = {
     title: 'mapbox',
-    url: 'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA',
+    url:
+      'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA',
     visible: true,
     base: true,
   };
@@ -75,9 +72,7 @@ export function addDrawingLayer(map, value) {
  */
 export function getNextValue(geojson) {
   const parsedGeoJSON = geojson && JSON.parse(geojson);
-  const geojsonIsEmpty = geojson
-    && parsedGeoJSON.features
-    && parsedGeoJSON.features.length === 0;
+  const geojsonIsEmpty = geojson && parsedGeoJSON.features && parsedGeoJSON.features.length === 0;
   return geojsonIsEmpty ? null : parsedGeoJSON;
 }
 
@@ -96,12 +91,7 @@ export default {
   },
   computed: {
     hasSomeDrawControl() {
-      const {
-        showPolygon,
-        showLine,
-        showCircle,
-        showPoint,
-      } = this.control.options.geoJSON;
+      const { showPolygon, showLine, showCircle, showPoint } = this.control.options.geoJSON;
       return showPolygon || showLine || showCircle || showPoint;
     },
   },
@@ -124,7 +114,7 @@ export default {
       addBaseLayer(this.map);
       addDrawingLayer(this.map, this.value);
 
-      const mapChangeHandler = geojson => this.changed(getNextValue(geojson));
+      const mapChangeHandler = (geojson) => this.changed(getNextValue(geojson));
       this.map.edit.geoJSONOn('drawend', mapChangeHandler);
       this.map.edit.geoJSONOn('modifyend', mapChangeHandler);
       this.map.edit.geoJSONOn('translateend', mapChangeHandler);

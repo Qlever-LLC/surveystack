@@ -1,24 +1,16 @@
 <template>
   <v-container>
     <h1>Tabula Rasa</h1>
-    <p>This will clear all surveys and all submissions. And furthermore create an example survey with corresponding submissions.</p>
-    <v-checkbox
-      label="Activate"
-      v-model="activate"
-    />
+    <p>
+      This will clear all surveys and all submissions. And furthermore create an example survey with corresponding
+      submissions.
+    </p>
+    <v-checkbox label="Activate" v-model="activate" />
 
-    <v-btn
-      color="primary"
-      @click="submit"
-      :disabled="!activate"
-    >{{activate ? "CONFIRM!" : "Activate first"}}</v-btn>
+    <v-btn color="primary" @click="submit" :disabled="!activate">{{ activate ? 'CONFIRM!' : 'Activate first' }}</v-btn>
 
     <transition name="fade">
-      <app-feedback
-        v-if="status"
-        class="mt-5"
-        @closed="status = ''"
-      >{{status}}</app-feedback>
+      <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{ status }}</app-feedback>
     </transition>
   </v-container>
 </template>
@@ -27,7 +19,6 @@
 import api from '@/services/api.service';
 import * as db from '@/store/db';
 import appFeedback from '@/components/ui/Feedback.vue';
-
 
 export default {
   components: {

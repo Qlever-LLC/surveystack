@@ -1,21 +1,8 @@
 <template>
   <div class="control-adder">
-    <v-speed-dial
-      v-model="fabIsOpen"
-      fixed
-      bottom
-      direction="top"
-      transition="fade"
-      class="fab-button"
-      :style="{  }"
-    >
+    <v-speed-dial v-model="fabIsOpen" fixed bottom direction="top" transition="fade" class="fab-button" :style="{}">
       <template v-slot:activator>
-        <v-btn
-          v-model="fabIsOpen"
-          fab
-          color="blue darken-2"
-          dark
-        >
+        <v-btn v-model="fabIsOpen" fab color="blue darken-2" dark>
           <v-icon v-if="fabIsOpen">mdi-close</v-icon>
           <v-icon v-else>mdi-plus</v-icon>
         </v-btn>
@@ -42,12 +29,8 @@
             outlined
             small
           >
-            <v-icon
-              left
-              v-if="group.icon"
-              color="indigo lighten-2"
-            >
-              {{group.icon}}
+            <v-icon left v-if="group.icon" color="indigo lighten-2">
+              {{ group.icon }}
             </v-icon>
             Group
           </v-btn>
@@ -60,12 +43,8 @@
             @click="addControl(el)"
             class="ma-1 d-inline-block shadow"
           >
-            <v-icon
-              dark
-              left
-              v-if="el.icon"
-            >
-              {{el.icon}}
+            <v-icon dark left v-if="el.icon">
+              {{ el.icon }}
             </v-icon>
             {{ el.name.replace('_', ' ') }}
           </v-btn>
@@ -78,8 +57,8 @@
 <script>
 import { createControlInstance, availableControls } from '@/utils/surveyConfig';
 
-const group = availableControls.find(c => c.type === 'group');
-const rest = availableControls.filter(c => c.type !== 'group' && c.type !== 'library');
+const group = availableControls.find((c) => c.type === 'group');
+const rest = availableControls.filter((c) => c.type !== 'group' && c.type !== 'library');
 
 export default {
   data() {

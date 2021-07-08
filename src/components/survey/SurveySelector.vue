@@ -1,28 +1,26 @@
 <template>
-  <v-dialog
-    max-width="500"
-    v-model="dialog"
-  >
+  <v-dialog max-width="500" v-model="dialog">
     <v-card>
       <v-card-title>Search surveys</v-card-title>
       <v-card-text>
-        <v-text-field
-          v-model="q"
-          append-icon="mdi-magnify"
-          @input="(e) => $emit('search', e)"
-        />
+        <v-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
         <v-list>
           <v-list-item
             v-for="searchResult in searchResults"
             :key="searchResult._id"
-            @click="() => { $emit('selected', searchResult); dialog = false}"
+            @click="
+              () => {
+                $emit('selected', searchResult);
+                dialog = false;
+              }
+            "
           >
             <v-list-item-content>
-              <v-list-item-title>{{searchResult.name}}</v-list-item-title>
-              <v-list-item-subtitle>last modified {{ renderDateFromNow(searchResult.meta.dateModified) }}</v-list-item-subtitle>
-
+              <v-list-item-title>{{ searchResult.name }}</v-list-item-title>
+              <v-list-item-subtitle
+                >last modified {{ renderDateFromNow(searchResult.meta.dateModified) }}</v-list-item-subtitle
+              >
             </v-list-item-content>
-
           </v-list-item>
         </v-list>
       </v-card-text>

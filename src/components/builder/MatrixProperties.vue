@@ -4,14 +4,9 @@
       <div>
         Matrix
       </div>
-
     </v-card-title>
     <div class="d-flex">
-      <v-btn
-        color="primary"
-        @click="matrixEditorDialog = true"
-        :disabled="disabled"
-      >
+      <v-btn color="primary" @click="matrixEditorDialog = true" :disabled="disabled">
         <v-icon left>mdi-view-column</v-icon>Open Editor
       </v-btn>
     </div>
@@ -51,21 +46,14 @@ export default {
   },
   methods: {
     removeResource(id) {
-      const index = this.resources.findIndex(r => r.id === id);
-      const newResources = [
-        ...this.resources.slice(0, index),
-        ...this.resources.slice(index + 1),
-      ];
+      const index = this.resources.findIndex((r) => r.id === id);
+      const newResources = [...this.resources.slice(0, index), ...this.resources.slice(index + 1)];
       this.$emit('set-survey-resources', newResources);
       this.$emit('set-control-source', null);
     },
     setResource(resource) {
-      const index = this.resources.findIndex(r => r.id === resource.id);
-      const newResources = [
-        ...this.resources.slice(0, index),
-        resource,
-        ...this.resources.slice(index + 1),
-      ];
+      const index = this.resources.findIndex((r) => r.id === resource.id);
+      const newResources = [...this.resources.slice(0, index), resource, ...this.resources.slice(index + 1)];
       this.$emit('set-survey-resources', newResources);
     },
     selectResourceHandler(id) {
@@ -78,7 +66,7 @@ export default {
     },
     resources: {
       type: Array,
-      default: () => ([]),
+      default: () => [],
     },
     disabled: {
       required: false,
@@ -86,10 +74,10 @@ export default {
   },
   computed: {
     resource() {
-      return this.resources.find(resource => resource.id === this.value);
+      return this.resources.find((resource) => resource.id === this.value);
     },
     filteredResources() {
-      return this.resources.filter(resource => resource.type === 'MATRIX');
+      return this.resources.filter((resource) => resource.type === 'MATRIX');
     },
   },
 };

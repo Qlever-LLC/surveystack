@@ -13,6 +13,5 @@ export function isSafari() {
 }
 
 export function isInStandaloneMode() {
-  return ('standalone' in window.navigator)
-    && window.navigator.standalone;
+  return 'standalone' in window.navigator && window.navigator.standalone;
 }

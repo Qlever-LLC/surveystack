@@ -1,8 +1,5 @@
 <template>
-  <v-card
-    min-height="70vh"
-    class="d-flex flex-column"
-  >
+  <v-card min-height="70vh" class="d-flex flex-column">
     <v-card-title class="d-block">
       <div class="d-flex justify-space-between align-center">
         <div class="grey--text text--darken-2">
@@ -12,24 +9,16 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
-                <app-matrix-editor-upload-button
-                  @change="handleFileChange"
-                  class="mt-4 mb-n2"
-                />
+                <app-matrix-editor-upload-button @change="handleFileChange" class="mt-4 mb-n2" />
               </div>
             </template>
-            CSV column headers may specify type with header|TYPE, where TYPE={{$options.MATRIX_COLUMN_TYPES.join(',')}}
+            CSV column headers may specify type with header|TYPE, where TYPE={{
+              $options.MATRIX_COLUMN_TYPES.join(',')
+            }}
           </v-tooltip>
-          <v-dialog
-            v-model="deleteDialogIsVisible"
-            max-width="290"
-          >
+          <v-dialog v-model="deleteDialogIsVisible" max-width="290">
             <template v-slot:activator="{ on }">
-              <v-btn
-                icon
-                v-on="on"
-                class="ml-2"
-              >
+              <v-btn icon v-on="on" class="ml-2">
                 <v-icon>mdi-delete</v-icon>
                 <!-- Delete List -->
               </v-btn>
@@ -41,21 +30,12 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer />
-                <v-btn
-                  text
-                  color="red"
-                  @click="deleteResult"
-                >Delete</v-btn>
-                <v-btn
-                  text
-                  @click="closeDeleteDialog"
-                >Cancel</v-btn>
-
+                <v-btn text color="red" @click="deleteResult">Delete</v-btn>
+                <v-btn text @click="closeDeleteDialog">Cancel</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
         </div>
-
       </div>
       <v-divider />
     </v-card-title>
@@ -81,19 +61,10 @@
           :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
         />
         <v-spacer />
-        <v-text-field
-          v-model="search"
-          append-icon="mdi-magnify"
-          label="Search"
-          single-line
-        />
+        <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line />
         <v-spacer />
         <div>
-          <v-btn
-            icon
-            @click="deleteSelectedItems"
-            :disabled="!selectedItems.length"
-          >
+          <v-btn icon @click="deleteSelectedItems" :disabled="!selectedItems.length">
             <v-icon>mdi-delete</v-icon>
           </v-btn>
         </div>
@@ -108,16 +79,13 @@
         disable-sort
         :mobile-breakpoint="0"
       >
-
         <template
-          v-for="h in headers.filter(header => !header.value.startsWith('_'))"
-          v-slot:[`header.${h.value}`]="{header}"
+          v-for="h in headers.filter((header) => !header.value.startsWith('_'))"
+          v-slot:[`header.${h.value}`]="{ header }"
         >
-          <span
-            :key="`header-value-${h.value}`"
-            class="mb-2"
-            style="color: #222; font-size: 1.1rem"
-          >{{header.text}}</span>
+          <span :key="`header-value-${h.value}`" class="mb-2" style="color: #222; font-size: 1.1rem">{{
+            header.text
+          }}</span>
           <v-select
             v-model="header.type"
             :items="$options.MATRIX_COLUMN_TYPES"
@@ -137,10 +105,7 @@
         <template v-slot:item._actions="{ item }">
           <div class="d-flex align-start">
             <v-icon @click="moveItemUp(item)">mdi-arrow-up</v-icon>
-            <v-icon
-              class="ml-2"
-              @click="moveItemDown(item)"
-            >mdi-arrow-down</v-icon>
+            <v-icon class="ml-2" @click="moveItemDown(item)">mdi-arrow-down</v-icon>
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
                 <v-simple-checkbox
@@ -156,55 +121,52 @@
               <span>Prefill</span>
             </v-tooltip>
 
-            <v-icon
-              class="ml-2"
-              @click="openItemEditDialog(item)"
-            >mdi-pencil</v-icon>
+            <v-icon class="ml-2" @click="openItemEditDialog(item)">mdi-pencil</v-icon>
           </div>
         </template>
-
       </v-data-table>
     </v-card-text>
     <v-spacer />
     <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
       <!-- <v-btn class="ml-4" @click="handleSave">Save</v-btn> -->
-      <v-btn
-        text
-        class="ml-4"
-        @click="() => $emit('close-dialog')"
-      >Close</v-btn>
+      <v-btn text class="ml-4" @click="() => $emit('close-dialog')">Close</v-btn>
     </v-card-actions>
 
-    <v-dialog
-      v-model="editItemDialogIsVisible"
-      max-width="350"
-    >
+    <v-dialog v-model="editItemDialogIsVisible" max-width="350">
       <v-card>
         <v-card-title>Edit Item</v-card-title>
         <v-card-text>
-          <div
-            v-for="header in headers"
-            :key="header.value"
-          >
+          <div v-for="header in headers" :key="header.value">
             <v-text-field
               :value="editedItem[header.value]"
-              @input="v => {editedItem[header.value] = (header.type === 'number') ? Number(v) : v}"
+              @input="
+                (v) => {
+                  editedItem[header.value] = header.type === 'number' ? Number(v) : v;
+                }
+              "
               :label="header.value"
               v-if="!header.value.startsWith('_')"
             />
           </div>
-
         </v-card-text>
         <v-card-actions class="pa-4">
           <v-btn
             color="error"
-            @click="editItemDialogIsVisible = false; deleteItem(editedItem)"
-          >DELETE</v-btn>
+            @click="
+              editItemDialogIsVisible = false;
+              deleteItem(editedItem);
+            "
+            >DELETE</v-btn
+          >
           <v-spacer />
           <v-btn
             color="primary"
-            @click="editItemDialogIsVisible = false; updateEditItem()"
-          >SAVE</v-btn>
+            @click="
+              editItemDialogIsVisible = false;
+              updateEditItem();
+            "
+            >SAVE</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -235,7 +197,7 @@ export default {
     resources: {
       type: Array,
       required: true,
-      default: () => ([]),
+      default: () => [],
     },
   },
   components: {
@@ -265,11 +227,14 @@ export default {
       return this.resource.content.data;
     },
     headers() {
-      return [...this.resource.content.headers, {
-        text: 'actions',
-        value: '_actions',
-        width: 1,
-      }];
+      return [
+        ...this.resource.content.headers,
+        {
+          text: 'actions',
+          value: '_actions',
+          width: 1,
+        },
+      ];
     },
   },
   methods: {
@@ -287,7 +252,7 @@ export default {
       return namePattern.test(val) ? true : 'Data name must be at least 4 character in length';
     },
     moveItemDown({ _row }) {
-      const index = this.resource.content.data.findIndex(item => item._row === _row);
+      const index = this.resource.content.data.findIndex((item) => item._row === _row);
       if (index < this.resource.content.data.length - 1) {
         const newItems = [...this.resource.content.data];
         const [item] = newItems.splice(index, 1);
@@ -302,7 +267,7 @@ export default {
       }
     },
     moveItemUp({ _row }) {
-      const index = this.resource.content.data.findIndex(item => item._row === _row);
+      const index = this.resource.content.data.findIndex((item) => item._row === _row);
       if (index > 0) {
         const newItems = [...this.resource.content.data];
         const [item] = newItems.splice(index, 1);
@@ -325,7 +290,7 @@ export default {
       };
     },
     deleteSelectedItems() {
-      const isNotSelectedItem = item => !this.selectedItems.some(s => s._row === item._row);
+      const isNotSelectedItem = (item) => !this.selectedItems.some((s) => s._row === item._row);
       const newItems = this.resource.content.data.filter(isNotSelectedItem);
       this.selectedItems = [];
       this.$emit('change', {
@@ -346,7 +311,7 @@ export default {
       }
     },
     updateEditItem() {
-      const index = this.resource.content.data.findIndex(item => item._row === this.editedItem._row);
+      const index = this.resource.content.data.findIndex((item) => item._row === this.editedItem._row);
       if (index > -1) {
         const newItems = [
           ...this.resource.content.data.slice(0, index),
@@ -397,7 +362,7 @@ export default {
       // this.$emit('change', this.)
     },
     deleteItem({ _row }) {
-      const newItems = this.resource.content.data.filter(x => x._row !== _row);
+      const newItems = this.resource.content.data.filter((x) => x._row !== _row);
       this.$emit('change', {
         ...this.resource,
         content: {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span v-for="(v, i) in value.slice(0, -1)" :key="i">{{v}} ‣&nbsp;</span>
+    <span v-for="(v, i) in value.slice(0, -1)" :key="i">{{ v }} ‣&nbsp;</span>
   </div>
 </template>
 

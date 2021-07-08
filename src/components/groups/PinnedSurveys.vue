@@ -1,12 +1,9 @@
 <template>
   <v-card class="pb-2">
-    <v-card-title>Pinned Surveys
+    <v-card-title
+      >Pinned Surveys
       <v-spacer />
-      <v-btn
-        color="primary"
-        text
-        @click="openSearchDialog"
-      >New..</v-btn>
+      <v-btn color="primary" text @click="openSearchDialog">New..</v-btn>
     </v-card-title>
     <draggable
       v-if="entities.length !== 0"
@@ -15,33 +12,24 @@
       :list="entities"
       :group="{ name: 'g1' }"
       :invertSwap="true"
-      :dragOptions="{ animation: 200, }"
+      :dragOptions="{ animation: 200 }"
       @start="drag = true"
       @end="drag = false"
     >
-      <v-card
-        v-for="(el, idx) in entities"
-        :key="`${idx}-survey-${el._id}`"
-        class="ma-2 mx-6"
-        elevation="1"
-        outlined
-      >
+      <v-card v-for="(el, idx) in entities" :key="`${idx}-survey-${el._id}`" class="ma-2 mx-6" elevation="1" outlined>
         <v-card-text>
           <div class="d-flex justify-space-between align-center">
             <div>
-              <span class="caption grey--text text--darken-1">{{el._id}}</span>
+              <span class="caption grey--text text--darken-1">{{ el._id }}</span>
               <br />
-              <span class="title">{{el.name}}</span>
+              <span class="title">{{ el.name }}</span>
               <br />
-              <span class="font-weight-light grey--text text--darken-2" v-if="el.meta">last modified {{ renderDateFromNow(el.meta.dateModified) }}</span>
-
+              <span class="font-weight-light grey--text text--darken-2" v-if="el.meta"
+                >last modified {{ renderDateFromNow(el.meta.dateModified) }}</span
+              >
             </div>
             <div class="d-flex">
-
-              <v-btn
-                icon
-                @click.stop="() => showDeleteModal(idx)"
-              >
+              <v-btn icon @click.stop="() => showDeleteModal(idx)">
                 <v-icon color="grey lighten-1">mdi-delete</v-icon>
               </v-btn>
             </div>
@@ -49,21 +37,15 @@
         </v-card-text>
       </v-card>
     </draggable>
-    <v-card
-      class="ma-2"
-      outlined
-      elevation="1"
-      v-else
-    >
+    <v-card class="ma-2" outlined elevation="1" v-else>
       <v-card-text>
         <span class="title text--secondary">No pinned surveys yet</span><br />
-        <span class="font-weight-light grey--text text--darken-2">You can add surveys from the menu in the top right</span>
+        <span class="font-weight-light grey--text text--darken-2"
+          >You can add surveys from the menu in the top right</span
+        >
       </v-card-text>
     </v-card>
-    <v-dialog
-      v-model="deleteQuestionModalIsVisible"
-      max-width="290"
-    >
+    <v-dialog v-model="deleteQuestionModalIsVisible" max-width="290">
       <v-card>
         <v-card-title>
           Remove Pinned Survey
@@ -73,47 +55,29 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn
-            text
-            @click.stop="deleteQuestionModalIsVisible = false"
-          >
+          <v-btn text @click.stop="deleteQuestionModalIsVisible = false">
             Cancel
           </v-btn>
-          <v-btn
-            text
-            color="red"
-            @click.stop="handleConfirmDelete"
-          >
+          <v-btn text color="red" @click.stop="handleConfirmDelete">
             Remove
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
-    <v-dialog
-      v-model="showSearchDialog"
-      max-width="500"
-    >
+    <v-dialog v-model="showSearchDialog" max-width="500">
       <v-card>
         <v-card-title>Search surveys</v-card-title>
         <v-card-text>
-          <v-text-field
-            v-model="q"
-            append-icon="mdi-magnify"
-            @input="(e) => $emit('search', e)"
-          />
+          <v-text-field v-model="q" append-icon="mdi-magnify" @input="(e) => $emit('search', e)" />
           <v-list>
-            <v-list-item
-              v-for="searchResult in searchResults"
-              :key="searchResult._id"
-              @click="pinSurvey(searchResult)"
-            >
+            <v-list-item v-for="searchResult in searchResults" :key="searchResult._id" @click="pinSurvey(searchResult)">
               <v-list-item-content>
-                <v-list-item-title>{{searchResult.name}}</v-list-item-title>
-                <v-list-item-subtitle v-if="searchResult.meta">last modified {{ renderDateFromNow(searchResult.meta.dateModified) }}</v-list-item-subtitle>
-
+                <v-list-item-title>{{ searchResult.name }}</v-list-item-title>
+                <v-list-item-subtitle v-if="searchResult.meta"
+                  >last modified {{ renderDateFromNow(searchResult.meta.dateModified) }}</v-list-item-subtitle
+                >
               </v-list-item-content>
-
             </v-list-item>
           </v-list>
         </v-card-text>
@@ -123,7 +87,6 @@
       <div></div>
     </slot>
   </v-card>
-
 </template>
 
 <script>
@@ -180,6 +143,5 @@ export default {
       this.showSearchDialog = false;
     },
   },
-
 };
 </script>

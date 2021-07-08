@@ -16,8 +16,7 @@ export default {
         hasErrors = true;
         this.resultItems.push({
           title: 'Error',
-          body: (error.response && error.response.data && error.response.data.message)
-            || error,
+          body: (error.response && error.response.data && error.response.data.message) || error,
           error: true,
         });
         return;

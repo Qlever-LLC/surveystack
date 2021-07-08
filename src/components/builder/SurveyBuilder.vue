@@ -1,33 +1,17 @@
 <template>
-  <div
-    class="screen-root"
-    style="padding: 0px 12px 0px 0px !important"
-  >
+  <div class="screen-root" style="padding: 0px 12px 0px 0px !important">
     <v-dialog v-model="viewCode">
       <app-code-view v-model="survey" />
     </v-dialog>
 
     <v-dialog v-model="showExamples">
-      <app-examples-view
-        @close="showExamples = false"
-        :category="tabMap[selectedTab]"
-      />
+      <app-examples-view @close="showExamples = false" :category="tabMap[selectedTab]" />
     </v-dialog>
 
-    <splitpanes
-      style="padding: 0px !important"
-      class="pane-root"
-      vertical
-    >
-      <pane
-        class="pane pane-survey"
-        style="position: relative; overflow: hidden"
-      >
-        <div
-          class="pane-fixed-wrapper pr-2"
-          style="position: relative;"
-        >
-          <control-adder @controlAdded="controlAdded" @openLibrary="openLibrary"/>
+    <splitpanes style="padding: 0px !important" class="pane-root" vertical>
+      <pane class="pane pane-survey" style="position: relative; overflow: hidden">
+        <div class="pane-fixed-wrapper pr-2" style="position: relative;">
+          <control-adder @controlAdded="controlAdded" @openLibrary="openLibrary" />
           <survey-details
             :version="version"
             :draft="isDraft"
@@ -64,23 +48,18 @@
         </div>
       </pane>
 
-      <pane
-        class="pane pane-library"
-        v-if="library"
-      >
+      <pane class="pane pane-library" v-if="library">
         <div class="px-4">
           <question-library
             :survey="survey"
             :libraryId="libraryId"
             @addToSurvey="addQuestionsFromLibrary"
-            @cancel="closeLibrary"/>
+            @cancel="closeLibrary"
+          />
         </div>
       </pane>
 
-      <pane
-        class="pane pane-controls"
-        v-if="control"
-      >
+      <pane class="pane pane-controls" v-if="control">
         <v-card class="pb-3 mb-3">
           <div class="px-4">
             <!-- <v-card-title class="pl-0">Details</v-card-title> -->
@@ -105,10 +84,7 @@
           </div>
         </v-card>
       </pane>
-      <pane
-        class="pane pane-script"
-        v-if="hasScript && scriptEditorIsVisible && scriptCode !== null"
-      >
+      <pane class="pane pane-script" v-if="hasScript && scriptEditorIsVisible && scriptCode !== null">
         <code-editor
           :saveable="true"
           :readonly="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
@@ -122,23 +98,11 @@
         </code-editor>
       </pane>
 
-      <pane
-        class="pane pane-main-code"
-        v-if="hasCode && !hideCode"
-      >
-        <splitpanes
-          horizontal
-          class="code-resizer"
-        >
-
+      <pane class="pane pane-main-code" v-if="hasCode && !hideCode">
+        <splitpanes horizontal class="code-resizer">
           <pane size="80">
             <div style="height: 100%">
-              <v-tabs
-                v-if="control.options"
-                v-model="selectedTab"
-                background-color="blue-grey darken-4"
-                dark
-              >
+              <v-tabs v-if="control.options" v-model="selectedTab" background-color="blue-grey darken-4" dark>
                 <v-tab :disabled="!control.options.relevance.enabled">
                   Relevance
                 </v-tab>
@@ -148,10 +112,7 @@
                 <v-tab :disabled="!control.options.constraint.enabled">
                   Constraint
                 </v-tab>
-                <v-tab
-                  v-if="control.options.apiCompose"
-                  :disabled="!control.options.apiCompose.enabled"
-                >
+                <v-tab v-if="control.options.apiCompose" :disabled="!control.options.apiCompose.enabled">
                   API Compose
                 </v-tab>
                 <v-tab v-if="control.type === 'script'">
@@ -178,11 +139,7 @@
             </div>
           </pane>
           <pane size="20">
-            <console-log
-              class="console-log"
-              :log="log"
-              @clear="log = ''"
-            />
+            <console-log class="console-log" :log="log" @clear="log = ''" />
           </pane>
         </splitpanes>
       </pane>
@@ -204,7 +161,7 @@
         <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
         <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px);">
           <app-draft-component
-            @submit="payload => $emit('submit', payload)"
+            @submit="(payload) => $emit('submit', payload)"
             v-if="survey && instance"
             :submission="instance"
             :survey="survey"
@@ -220,8 +177,24 @@
             </v-card-text>
           </v-card>
         </v-overlay>
-      </pane>
 
+        <!-- <v-snackbar
+          v-model="infoSnack"
+        >
+          hello
+
+          <template v-slot:action="{ attrs }">
+            <v-btn
+              color="red"
+              text
+              v-bind="attrs"
+              @click="infoSnack = false"
+            >
+              Close
+            </v-btn>
+          </template>
+        </v-snackbar> -->
+      </pane>
     </splitpanes>
 
     <!-- <confirm-leave-dialog
@@ -234,9 +207,7 @@
 </template>
 
 <script>
-import {
-  cloneDeep, isEqualWith, isEqual, uniqBy,
-} from 'lodash';
+import { cloneDeep, isEqualWith, isEqual, uniqBy } from 'lodash';
 import { Splitpanes, Pane } from 'splitpanes';
 
 import moment from 'moment';
@@ -267,7 +238,7 @@ import * as surveyStackUtils from '@/utils/surveyStack';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
-const initialRelevanceCode = variable => `\
+const initialRelevanceCode = (variable) => `\
 /**
  * ${variable.charAt(0).toUpperCase() + variable.substr(1)}
  *
@@ -280,17 +251,10 @@ function ${variable}(submission, survey, parent) {
 }
 `;
 
-const tabMap = [
-  'relevance',
-  'calculate',
-  'constraint',
-  'apiCompose',
-];
+const tabMap = ['relevance', 'calculate', 'constraint', 'apiCompose'];
 
 export default {
-  mixins: [
-    appMixin,
-  ],
+  mixins: [appMixin],
   components: {
     Splitpanes,
     Pane,
@@ -306,11 +270,7 @@ export default {
     // ConfirmLeaveDialog,
     appExamplesView,
   },
-  props: [
-    'survey',
-    'editMode',
-    'freshImport',
-  ],
+  props: ['survey', 'editMode', 'freshImport'],
   data() {
     return {
       tabMap,
@@ -392,7 +352,7 @@ export default {
       const nextVersion = latestVersion + 1;
       const date = moment().toISOString(true);
 
-      const nextVersionObj = this.survey.revisions.find(revision => revision.version === latestVersion);
+      const nextVersionObj = this.survey.revisions.find((revision) => revision.version === latestVersion);
       nextVersionObj.version = nextVersion;
       nextVersionObj.dateCreated = date;
 
@@ -411,7 +371,7 @@ export default {
       const { data } = await api.get(`/surveys/${librarySurveyId}`);
 
       // remove old resources copied from the library survey
-      this.survey.resources = this.survey.resources.filter(value => value.libraryId !== librarySurveyId);
+      this.survey.resources = this.survey.resources.filter((value) => value.libraryId !== librarySurveyId);
       // copy resources from library survey
       data.resources.forEach((r) => {
         r.libraryId = data._id;
@@ -423,9 +383,7 @@ export default {
       const controlsFromLibrary = data.revisions[data.latestVersion - 1].controls;
 
       // create question group
-      const group = createControlInstance(
-        availableControls.find(c => c.type === 'group'),
-      );
+      const group = createControlInstance(availableControls.find((c) => c.type === 'group'));
       group.name = slugify(data.name);
       group.label = data.name;
       group.isLibraryRoot = true;
@@ -472,7 +430,12 @@ export default {
         this.dirty = survey.revisions[len - 1].version !== survey.latestVersion;
       }
 
-      if (!this.dirty && !isEqualWith(survey.revisions, this.initialSurvey.revisions, (value1, value2, key) => ((key === 'label') ? true : undefined))) {
+      if (
+        !this.dirty &&
+        !isEqualWith(survey.revisions, this.initialSurvey.revisions, (value1, value2, key) =>
+          key === 'label' ? true : undefined
+        )
+      ) {
         this.createDraft();
       }
 
@@ -490,7 +453,9 @@ export default {
         title: this.survey.name || 'Untitled Survey',
         subtitle: `
           <span class="question-title-chip">Version ${version}</span>
-          <!--<span class="ml-2">${amountQuestions.length} Question${amountQuestions.length > 1 || amountQuestions.length < 1 ? 's' : ''}</span>-->
+          <!--<span class="ml-2">${amountQuestions.length} Question${
+          amountQuestions.length > 1 || amountQuestions.length < 1 ? 's' : ''
+        }</span>-->
           <!--<span class="question-title-chip">${this.groupPath}</span>-->
         `,
       });
@@ -502,16 +467,13 @@ export default {
       this.activeCode = code;
     },
     highlightNext() {
-      [
-        this.optionsRelevance,
-        this.optionsCalculate,
-        this.optionsConstraint,
-        this.optionsApiCompose,
-      ].filter(o => o !== undefined).forEach((item, idx) => {
-        if (item.enabled) {
-          this.selectedTab = idx;
-        }
-      });
+      [this.optionsRelevance, this.optionsCalculate, this.optionsConstraint, this.optionsApiCompose]
+        .filter((o) => o !== undefined)
+        .forEach((item, idx) => {
+          if (item.enabled) {
+            this.selectedTab = idx;
+          }
+        });
     },
     highlight(tab, select = true) {
       this.codeError = null;
@@ -545,20 +507,18 @@ export default {
     async runCode() {
       const tab = tabMap[this.selectedTab];
       try {
-        const res = await utils.executeUnsafe(
-          {
-            code: this.activeCode,
-            fname: tab,
-            submission: this.instance,
-            survey: this.survey,
-            parent: this.parent,
-            log: (arg) => {
-              this.log = `${this.log}${arg}\n`;
-            },
+        const res = await utils.executeUnsafe({
+          code: this.activeCode,
+          fname: tab,
+          submission: this.instance,
+          survey: this.survey,
+          parent: this.parent,
+          log: (arg) => {
+            this.log = `${this.log}${arg}\n`;
           },
-        );
+        });
         if (tab === 'apiCompose') {
-          if ((typeof res !== 'object')) {
+          if (typeof res !== 'object') {
             throw Error('Function must return an object');
           }
         } else if (typeof res !== 'boolean') {
@@ -616,7 +576,12 @@ export default {
     duplicateControl(control) {
       if (this.control && this.currentControls.length > 0) {
         const position = utils.getPosition(this.control, this.currentControls);
-        utils.insertControl(control, this.currentControls, position, this.control.type === 'group' || this.control.type === 'page');
+        utils.insertControl(
+          control,
+          this.currentControls,
+          position,
+          this.control.type === 'group' || this.control.type === 'page'
+        );
       } else {
         utils.insertControl(control, this.currentControls, 0, false);
       }
@@ -630,7 +595,12 @@ export default {
       }
 
       const position = utils.getPosition(this.control, this.currentControls);
-      utils.insertControl(control, this.currentControls, position, this.control.type === 'group' || this.control.type === 'page');
+      utils.insertControl(
+        control,
+        this.currentControls,
+        position,
+        this.control.type === 'group' || this.control.type === 'page'
+      );
       this.control = control;
       this.library = false;
     },
@@ -660,33 +630,27 @@ export default {
       this.control.options.params = params;
     },
     validateSurveyName() {
-      return !!this.survey.name && /^[\w-\s]{5,}$/.test(this.survey.name)
-        ? true
-        : 'Survey name is invalid';
+      return !!this.survey.name && /^[\w-\s]{5,}$/.test(this.survey.name) ? true : 'Survey name is invalid';
     },
     validateSurveyQuestions() {
       const namePattern = /^[\w-]{1,}$/; // one character should be ok, especially within groups
       const currentControls = this.survey.revisions[this.survey.revisions.length - 1].controls;
       const uniqueNames = uniqBy(currentControls, 'name');
       const hasOnlyUniqueNames = uniqueNames.length === currentControls.length;
-      const allNamesContainOnlyValidCharacters = !currentControls.some(
-        control => !namePattern.test(control.name),
-      );
+      const allNamesContainOnlyValidCharacters = !currentControls.some((control) => !namePattern.test(control.name));
 
       const groupedQuestionsAreValid = utils.getGroups(currentControls).reduce((r, group) => {
         const uniqueNamesInGroup = uniqBy(group.children, 'name');
         const groupHasOnlyUniqueNames = uniqueNamesInGroup.length === group.children.length;
         const allNamesInGroupContainOnlyValidCharacters = !group.children.some(
-          control => !namePattern.test(control.name),
+          (control) => !namePattern.test(control.name)
         );
-        return r
-          && groupHasOnlyUniqueNames
-          && allNamesInGroupContainOnlyValidCharacters;
+        return r && groupHasOnlyUniqueNames && allNamesInGroupContainOnlyValidCharacters;
       }, true);
 
-      return (hasOnlyUniqueNames
-        && allNamesContainOnlyValidCharacters
-        && groupedQuestionsAreValid) ? true : 'Questions list contains an invalid data name';
+      return hasOnlyUniqueNames && allNamesContainOnlyValidCharacters && groupedQuestionsAreValid
+        ? true
+        : 'Questions list contains an invalid data name';
     },
     setSurveyName(value) {
       this.$set(this.survey, 'name', value);
@@ -703,7 +667,10 @@ export default {
       const group = this.$store.getters['memberships/activeGroup'];
 
       this.instance = submissionUtils.createSubmissionFromSurvey({
-        survey: this.survey, version, group, instance: this.instance,
+        survey: this.survey,
+        version,
+        group,
+        instance: this.instance,
       });
     },
   },
@@ -713,11 +680,8 @@ export default {
       return !(this.surveyValidationErrors.length > 0);
     },
     surveyValidationErrors() {
-      const validations = [
-        this.validateSurveyName(),
-        this.validateSurveyQuestions(),
-      ];
-      return validations.filter(validation => validation !== true);
+      const validations = [this.validateSurveyName(), this.validateSurveyQuestions()];
+      return validations.filter((validation) => validation !== true);
     },
     enableDismissDraft() {
       return this.isDraft;
@@ -739,8 +703,9 @@ export default {
         return false;
       }
       if (
-        (this.initialSurvey.name !== this.survey.name)
-        || (this.initialSurvey.description !== this.survey.description || (this.initialSurvey.meta.submissions !== this.survey.meta.submissions))
+        this.initialSurvey.name !== this.survey.name ||
+        this.initialSurvey.description !== this.survey.description ||
+        this.initialSurvey.meta.submissions !== this.survey.meta.submissions
       ) {
         return true;
       }
@@ -758,7 +723,8 @@ export default {
         return true;
       }
 
-      if (!this.editMode) { // if survey new
+      if (!this.editMode) {
+        // if survey new
         if (this.initialSurvey.name !== this.survey.name) {
           return true;
         }
@@ -789,10 +755,12 @@ export default {
       if (!this.control) {
         return false;
       }
-      return this.control.options.relevance.enabled
-        || this.control.options.calculate.enabled
-        || this.control.options.constraint.enabled
-        || this.control.options.apiCompose.enabled;
+      return (
+        this.control.options.relevance.enabled ||
+        this.control.options.calculate.enabled ||
+        this.control.options.constraint.enabled ||
+        this.control.options.apiCompose.enabled
+      );
     },
     hasScript() {
       if (!this.control) {
@@ -897,12 +865,11 @@ export default {
 
         const resourcesAreEqual = isEqual(this.initialSurvey.resources, newVal.resources);
         const revisionsAreEqual = isEqual(this.initialSurvey.revisions, newVal.revisions);
-        const surveyDetailsAreEquivalent = (this.initialSurvey.name === newVal.name)
-          && isEqual(this.initialSurvey.meta.group, newVal.meta.group)
-          && (this.initialSurvey.description === newVal.description);
-        this.surveyUnchanged = revisionsAreEqual
-          && surveyDetailsAreEquivalent
-          && resourcesAreEqual;
+        const surveyDetailsAreEquivalent =
+          this.initialSurvey.name === newVal.name &&
+          isEqual(this.initialSurvey.meta.group, newVal.meta.group) &&
+          this.initialSurvey.description === newVal.description;
+        this.surveyUnchanged = revisionsAreEqual && surveyDetailsAreEquivalent && resourcesAreEqual;
 
         const current = newVal.revisions[newVal.revisions.length - 1];
         if (current.controls.length === 0) {
@@ -976,9 +943,9 @@ export default {
 .pane-library {
   overflow: auto;
   width: 1000px !important;
-  border-style:solid !important;
-  border-width:5px !important;
-  border-color:#4CAF50 !important;
+  border-style: solid !important;
+  border-width: 5px !important;
+  border-color: #4caf50 !important;
 }
 
 .pane-submission-code,
@@ -1144,7 +1111,7 @@ export default {
 }
 .splitpanes.default-theme .splitpanes__splitter:after,
 .splitpanes.default-theme .splitpanes__splitter:before {
-  content: "";
+  content: '';
   position: absolute;
   top: 50%;
   left: 50%;

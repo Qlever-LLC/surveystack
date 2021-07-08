@@ -76,7 +76,6 @@ function createMeasure(feature) {
  * @param {ol.Feature} feature The feature being measured.
  */
 export function startMeasure(feature) {
-
   // Get the feature ID.
   const id = getFeatureId(feature);
 
@@ -86,7 +85,7 @@ export function startMeasure(feature) {
   }
 
   // Listen for changes to the feature, and update its measurement.
-  measureListeners[id] = feature.getGeometry().on('change', e => updateMeasure(measures[id], e.target));
+  measureListeners[id] = feature.getGeometry().on('change', (e) => updateMeasure(measures[id], e.target));
 }
 
 /**
@@ -96,13 +95,11 @@ export function startMeasure(feature) {
  * event fires, because the new feature is not yet added to the source layer.
  */
 export function stopMeasure(feature = false) {
-
   // Stop listening for measurement changes.
-  measureListeners.forEach(listener => unByKey(listener));
+  measureListeners.forEach((listener) => unByKey(listener));
 
   // Remove any overlays that no longer correspond to drawn features.
   Object.keys(measures).forEach((id) => {
-
     // If a feature with this ID exists in the source, skip it.
     if (layer.getSource().getFeatureById(id)) {
       return;
@@ -122,15 +119,17 @@ export function stopMeasure(feature = false) {
 // Measure behavior.
 export default {
   attach(instance, options = {}) {
-
     // Save the map, drawing layer, and system of measurement for later use.
     ({ map, units } = instance);
     ({ layer } = options);
 
     // If the drawing layer contains any features, add measurements for each.
-    layer.getSource().getFeatures().forEach((feature) => {
-      createMeasure(feature);
-    });
+    layer
+      .getSource()
+      .getFeatures()
+      .forEach((feature) => {
+        createMeasure(feature);
+      });
 
     // If the instance has an Edit control, attach listeners to the map
     // interactions so that we can apply measurements to the features.

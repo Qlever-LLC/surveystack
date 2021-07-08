@@ -2,22 +2,12 @@
   <div>
     <v-card>
       <v-card-title>
-        {{title}}
+        {{ title }}
         <v-spacer />
-        <v-btn
-          color="primary"
-          class="ml-4"
-          :to="newRoute"
-          text
-        >New...</v-btn>
+        <v-btn color="primary" class="ml-4" :to="newRoute" text>New...</v-btn>
       </v-card-title>
       <v-card-text>
-        <v-text-field
-          label="Search"
-          v-model="q"
-          id="oursci-group-list-search"
-          append-icon="mdi-magnify"
-        />
+        <v-text-field label="Search" v-model="q" id="oursci-group-list-search" append-icon="mdi-magnify" />
         <template v-if="entities && entities.length > 0">
           <v-list-item
             v-for="integration in integrations"
@@ -26,18 +16,14 @@
             :to="`/${integrationType}-integrations/${integration._id}/edit`"
           >
             <v-list-item-content>
-              <v-list-item-title>{{integration.name}}</v-list-item-title>
-              <v-list-item-subtitle>{{integration.type}}</v-list-item-subtitle>
+              <v-list-item-title>{{ integration.name }}</v-list-item-title>
+              <v-list-item-subtitle>{{ integration.type }}</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
         </template>
-        <div
-          v-else
-          class="grey--text"
-        >No {{title}} yet</div>
+        <div v-else class="grey--text">No {{ title }} yet</div>
       </v-card-text>
     </v-card>
-
   </div>
 </template>
 
@@ -65,7 +51,7 @@ export default {
         return this.entities;
       }
 
-      return this.entities.filter(entity => entity.name.toLowerCase().indexOf(this.q.toLowerCase()) > -1);
+      return this.entities.filter((entity) => entity.name.toLowerCase().indexOf(this.q.toLowerCase()) > -1);
     },
   },
   data() {

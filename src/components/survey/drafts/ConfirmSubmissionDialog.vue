@@ -23,8 +23,7 @@
         </div>
         <div v-if="dateSubmitted">
           This submission was previously submitted on
-          {{ new Date(dateSubmitted).toLocaleString() }}. Resubmission will
-          archive the previous submission.
+          {{ new Date(dateSubmitted).toLocaleString() }}. Resubmission will archive the previous submission.
         </div>
         <div v-if="additionalMessage">
           {{ additionalMessage }}
@@ -82,14 +81,14 @@ export default {
         return null;
       }
 
-
-      const group = this.groups.find(g => g._id === this.group);
-      if (!group) { // TODO verify what to do if group cannot be found
+      const group = this.groups.find((g) => g._id === this.group);
+      if (!group) {
+        // TODO verify what to do if group cannot be found
         return null;
       }
 
       console.log('group', group, this.groups);
-      const { name } = this.groups.find(g => g._id === this.group);
+      const { name } = this.groups.find((g) => g._id === this.group);
       return name || this.group;
     },
   },
