@@ -10,11 +10,7 @@
       <template v-slot:title>Confirm Submission Archiving</template>
     </app-submission-archive-dialog>
 
-    <app-dialog
-      v-model="showDeleteModal"
-      @cancel="showDeleteModal = false"
-      @confirm="deleteSubmission(selected[0])"
-    >
+    <app-dialog v-model="showDeleteModal" @cancel="showDeleteModal = false" @confirm="deleteSubmission(selected[0])">
       <template v-slot:title>Confirm deletion</template>
       <template>
         Are you sure you want to delete this submission? This can not be undone.
@@ -35,10 +31,10 @@
           label="Group"
           :filter="reassignGroupFilter"
         >
-          <template v-slot:item="{item}">
+          <template v-slot:item="{ item }">
             <div class="d-flex flex-column py-1">
-              <div>{{item.text}}</div>
-              <div class="text--secondary caption">{{item.path}}</div>
+              <div>{{ item.text }}</div>
+              <div class="text--secondary caption">{{ item.path }}</div>
             </div>
           </template>
         </v-autocomplete>
@@ -53,31 +49,21 @@
 
     <v-container>
       <div class="d-flex justify-end">
-        <v-btn
-          v-if="survey"
-          outlined
-          color="secondary"
-          :to="`/surveys/${survey}`"
-        >
+        <v-btn v-if="survey" outlined color="secondary" :to="`/surveys/${survey}`">
           <v-icon left>mdi-note-text-outline</v-icon>
           View Survey
         </v-btn>
-        <v-btn
-          outlined
-          color="secondary"
-          class="ml-2"
-          @click="startDraft(survey)"
-        >
+        <v-btn outlined color="secondary" class="ml-2" @click="startDraft(survey)">
           <v-icon left>mdi-plus</v-icon>
           New submission
         </v-btn>
       </div>
-      <h1 v-if="surveyEntity">{{surveyEntity.name}}</h1>
+      <h1 v-if="surveyEntity">{{ surveyEntity.name }}</h1>
 
       <app-submissions-filter-basic
         v-if="!showAdvancedFilters && queryList"
         :queryList="queryList"
-        @show-advanced="(ev) => showAdvancedFilters = ev"
+        @show-advanced="(ev) => (showAdvancedFilters = ev)"
         :basicFilters="basicFilters"
         @apply-basic-filters="applyBasicFilters"
         @reset="reset"
@@ -86,26 +72,17 @@
       <app-submissions-filter-advanced
         v-if="showAdvancedFilters"
         v-model="filter"
-        @show-advanced="(ev) => showAdvancedFilters = ev"
+        @show-advanced="(ev) => (showAdvancedFilters = ev)"
         @apply-advanced-filters="fetchData"
         @reset="reset"
       />
 
       <div class="d-flex justify-end">
-        <v-checkbox
-          label="View archived only"
-          v-model="filter.showArchived"
-          dense
-          hide-details
-        />
+        <v-checkbox label="View archived only" v-model="filter.showArchived" dense hide-details />
       </div>
 
       <h4>API</h4>
-      <a
-        class="body-2"
-        :href="apiDownloadUrl"
-        target="_blank"
-      >{{apiDownloadUrl}}</a>
+      <a class="body-2" :href="apiDownloadUrl" target="_blank">{{ apiDownloadUrl }}</a>
 
       <div class="d-flex align-center justify-start mt-4">
         <v-select
@@ -126,25 +103,17 @@
           hide-details
           v-model="apiDownloadRange"
         ></v-select>
-        <v-btn
-          @click="startDownload"
-          color="primary"
-        >
-          <v-icon left>mdi-download</v-icon>Download
-        </v-btn>
+        <v-btn @click="startDownload" color="primary"> <v-icon left>mdi-download</v-icon>Download </v-btn>
       </div>
 
-      <v-card
-        v-if="selected.length > 0"
-        class="mt-4"
-      >
+      <v-card v-if="selected.length > 0" class="mt-4">
         <v-card-text>
           <div class="d-flex align-center">
-            <div><span class="subtitle-2">ACTIONS</span><br />{{selected.length}} {{selected.length === 1 ? 'submission' : 'submissions'}} selected</div>
-            <div
-              class="ml-auto d-flex flex-column flex-sm-row"
-              v-if="selected.length === 1"
-            >
+            <div>
+              <span class="subtitle-2">ACTIONS</span><br />{{ selected.length }}
+              {{ selected.length === 1 ? 'submission' : 'submissions' }} selected
+            </div>
+            <div class="ml-auto d-flex flex-column flex-sm-row" v-if="selected.length === 1">
               <v-btn
                 v-if="selected[0]['meta.archived'] === 'true'"
                 :disabled="surveyEntity.meta.isLibrary"
@@ -176,7 +145,8 @@
                 :disabled="surveyEntity.meta.isLibrary"
                 text
                 color="secondary"
-              >REASSIGN</v-btn>
+                >REASSIGN</v-btn
+              >
               <v-btn
                 v-if="selected[0]['meta.archived'] !== 'true'"
                 :disabled="surveyEntity.meta.isLibrary"
@@ -186,16 +156,13 @@
               >
                 RESUBMIT
               </v-btn>
-
             </div>
           </div>
         </v-card-text>
       </v-card>
-
     </v-container>
 
     <v-container>
-
       <v-row class="mt-2">
         <v-col cols="1">
           <v-select
@@ -217,25 +184,17 @@
           ></v-pagination>
         </v-col>
         <v-col cols="1">
-          <div
-            class="body-2 text--secondary mt-1 d-flex align-center justify-end"
-            style="height: 100%"
-          >{{submissions.pagination.total}} total</div>
+          <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
+            {{ submissions.pagination.total }} total
+          </div>
         </v-col>
       </v-row>
 
-      <v-tabs v-model="
-          tab">
-        <v-tab
-          v-for="view in views"
-          :key="view.tab"
-        >
-          {{view.tab}}
+      <v-tabs v-model="tab">
+        <v-tab v-for="view in views" :key="view.tab">
+          {{ view.tab }}
         </v-tab>
-        <v-tabs-items
-          v-model="tab"
-          touchless
-        >
+        <v-tabs-items v-model="tab" touchless>
           <v-tab-item>
             <app-submissions-table-client-csv
               :submissions="submissions"
@@ -247,7 +206,6 @@
               :loading="loading"
               style="margin: 3px 2px"
             />
-
           </v-tab-item>
           <v-tab-item>
             <app-submissions-tree :submissions="submissions" />
@@ -279,18 +237,14 @@
           ></v-pagination>
         </v-col>
         <v-col cols="1">
-          <div
-            class="body-2 text--secondary mt-1 d-flex align-center justify-end"
-            style="height: 100%"
-          >{{submissions.pagination.total}} total</div>
+          <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
+            {{ submissions.pagination.total }} total
+          </div>
         </v-col>
       </v-row>
-
     </v-container>
-
   </div>
 </template>
-
 
 <script>
 /* eslint-disable no-unused-vars */
@@ -311,7 +265,6 @@ import appSubmissionsCode from '@/components/submissions/SubmissionCode.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 
-
 import { createBasicQueryList } from '@/utils/surveyStack';
 
 const defaultPageSize = 10;
@@ -328,9 +281,14 @@ const createDefaultFilter = () => ({
   roles: '',
 });
 
-const apiDownloadFormats = [{ text: 'CSV', value: 'csv' }, { text: 'JSON', value: 'json' }];
-const apiDownloadRanges = [{ text: 'All data', value: 'all' }, { text: 'Page only', value: 'page' }];
-
+const apiDownloadFormats = [
+  { text: 'CSV', value: 'csv' },
+  { text: 'JSON', value: 'json' },
+];
+const apiDownloadRanges = [
+  { text: 'All data', value: 'all' },
+  { text: 'Page only', value: 'page' },
+];
 
 export default {
   components: {
@@ -372,7 +330,7 @@ export default {
         },
       },
       page: 1,
-      pageSizes: [1, 5, 10, 50, 100, 1000, 'All'].map(n => ({ text: n, value: Number(n) || 0 })),
+      pageSizes: [1, 5, 10, 50, 100, 1000, 'All'].map((n) => ({ text: n, value: Number(n) || 0 })),
       pageSize: defaultPageSize,
       selected: [],
       search: '',
@@ -387,7 +345,9 @@ export default {
         showModal: false,
         group: null,
         user: null,
-        groups: this.$store.getters['memberships/memberships'].filter(m => m.role === 'admin').map(m => ({ text: m.group.name, value: m.group._id, path: m.group.path })),
+        groups: this.$store.getters['memberships/memberships']
+          .filter((m) => m.role === 'admin')
+          .map((m) => ({ text: m.group.name, value: m.group._id, path: m.group.path })),
         users: [],
       },
     };
@@ -406,17 +366,23 @@ export default {
     },
     apiFetchParams() {
       const baseParams = this.getApiBaseParams();
-      return baseParams.filter(p => p.include).map(p => `${p.key}=${p.value}`).join('&');
+      return baseParams
+        .filter((p) => p.include)
+        .map((p) => `${p.key}=${p.value}`)
+        .join('&');
     },
     apiDownloadParams() {
       const baseParams = this.getApiBaseParams();
       if (this.apiDownloadRange === 'all') {
-        const skipParam = baseParams.find(p => p.key === 'skip');
+        const skipParam = baseParams.find((p) => p.key === 'skip');
         skipParam.include = false;
-        const limitParam = baseParams.find(p => p.key === 'limit');
+        const limitParam = baseParams.find((p) => p.key === 'limit');
         limitParam.include = false;
       }
-      return baseParams.filter(p => p.include).map(p => `${p.key}=${p.value}`).join('&');
+      return baseParams
+        .filter((p) => p.include)
+        .map((p) => `${p.key}=${p.value}`)
+        .join('&');
     },
     apiFetchRequest() {
       return `/submissions/page?${this.apiFetchParams}`;
@@ -467,7 +433,9 @@ export default {
     },
     async fetchUsers(groupId) {
       const { data: memberships } = await api.get(`/memberships?group=${groupId}&populate=true`);
-      this.reassignment.users = memberships.filter(m => m.user).map(m => ({ text: `${m.user.name} <${m.user.email}>`, value: m.user._id }));
+      this.reassignment.users = memberships
+        .filter((m) => m.user)
+        .map((m) => ({ text: `${m.user.name} <${m.user.email}>`, value: m.user._id }));
     },
     getApiBaseParams() {
       const params = [
@@ -480,8 +448,11 @@ export default {
         { key: 'showIrrelevant', value: this.filter.showIrrelevant, include: this.filter.showIrrelevant },
         { key: 'showArchived', value: this.filter.showArchived, include: this.filter.showArchived },
         { key: 'showCsvDataMeta', value: this.filter.showCsvDataMeta, include: this.filter.showCsvDataMeta },
-        { key: 'roles', value: this.filter.roles, include: (process.env.NODE_ENV === 'development') && this.filter.roles !== '' },
-
+        {
+          key: 'roles',
+          value: this.filter.roles,
+          include: process.env.NODE_ENV === 'development' && this.filter.roles !== '',
+        },
       ];
 
       return params;
@@ -498,7 +469,9 @@ export default {
     },
     async archiveSubmission(submission, reason, value = true) {
       try {
-        const { data: archived } = await api.post(`/submissions/${submission._id}/archive?set=${value}&reason=${reason}`);
+        const { data: archived } = await api.post(
+          `/submissions/${submission._id}/archive?set=${value}&reason=${reason}`
+        );
         this.selected = [];
         this.fetchData();
       } catch (err) {
@@ -538,7 +511,10 @@ export default {
       console.log(`reassigning submission id ${submission._id}`);
       this.reassignment.showModal = false;
       try {
-        await api.post(`/submissions/${submission._id}/reassign`, { group: this.reassignment.group, creator: this.reassignment.user });
+        await api.post(`/submissions/${submission._id}/reassign`, {
+          group: this.reassignment.group,
+          creator: this.reassignment.user,
+        });
         this.selected = [];
         this.fetchData();
       } catch (err) {
@@ -566,7 +542,7 @@ export default {
       const { sortBy, sortDesc } = props;
       const sort = {};
 
-      if ((sortBy.length > 0 && sortDesc.length > 0) && sortBy.length === sortDesc.length) {
+      if (sortBy.length > 0 && sortDesc.length > 0 && sortBy.length === sortDesc.length) {
         try {
           for (let i = 0; i < sortBy.length; i++) {
             sort[sortBy[i]] = sortDesc[i] ? -1 : 1;
@@ -601,12 +577,12 @@ export default {
   },
   watch: {
     // eslint-disable-next-line func-names
-    'filter.showArchived': function () {
+    'filter.showArchived': function() {
       this.selected = [];
       this.fetchData();
     },
     // eslint-disable-next-line func-names
-    'reassignment.group': function (val) {
+    'reassignment.group': function(val) {
       this.reassignment.user = null;
 
       if (!val) {

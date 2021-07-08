@@ -42,7 +42,6 @@ const getFlatName = (controls, position) => {
     flatName += `.${control.name}`;
   });
 
-
   return flatName.substr(1);
 };
 
@@ -63,7 +62,6 @@ const getControl = (controls, position) => {
   return control;
 };
 
-
 export const getBreadcrumbsForSubmission = (controls, position) => {
   let currentControls = controls;
   const breadcrumbs = [];
@@ -74,7 +72,6 @@ export const getBreadcrumbsForSubmission = (controls, position) => {
 
   return breadcrumbs;
 };
-
 
 export const flattenSubmission = (submission, delimiter = '.') => {
   const res = {};
@@ -93,7 +90,6 @@ export const flattenSubmission = (submission, delimiter = '.') => {
   return res;
 };
 
-
 /**
  * Creates and returns a new submission based off a specific survey version
  * @param {Object} survey
@@ -101,12 +97,7 @@ export const flattenSubmission = (submission, delimiter = '.') => {
  *
  * @returns {Object} A submission for a specific survey version.
  */
-const createSubmissionFromSurvey = ({
-  survey,
-  version = 1,
-  instance,
-  group,
-}) => {
+const createSubmissionFromSurvey = ({ survey, version = 1, instance, group }) => {
   const submission = {};
   const dateNow = moment().toISOString(true);
 
@@ -127,15 +118,13 @@ const createSubmissionFromSurvey = ({
   };
 
   // TODO: handle version not found
-  const { controls } = survey.revisions.find(revision => revision.version === version);
+  const { controls } = survey.revisions.find((revision) => revision.version === version);
   const positions = getControlPositions(controls);
-
 
   let flattenedInstance;
   if (instance) {
     flattenedInstance = flatten(instance.data);
   }
-
 
   const objects = [];
   positions.forEach((position) => {
@@ -143,11 +132,12 @@ const createSubmissionFromSurvey = ({
     const flatName = getFlatName(controls, position);
     let v = null;
     if (flattenedInstance) {
-      const keys = Object.keys(flattenedInstance).filter(o => o.startsWith(`${flatName}.value`));
+      const keys = Object.keys(flattenedInstance).filter((o) => o.startsWith(`${flatName}.value`));
       if (keys.length === 1) {
         // eslint-disable-next-line prefer-destructuring
         v = flattenedInstance[keys[0]];
-      } else { // if this is an object
+      } else {
+        // if this is an object
         const inner = {};
         // eslint-disable-next-line no-restricted-syntax
         for (const k of keys) {
@@ -190,7 +180,7 @@ const createSubmissionFromSurvey = ({
  */
 const getSubmissionField = (submission, survey, position) => {
   // TODO: handle version not found
-  const { controls } = survey.revisions.find(revision => revision.version === submission.meta.survey.version);
+  const { controls } = survey.revisions.find((revision) => revision.version === submission.meta.survey.version);
 
   const flatName = getFlatName(controls, position);
   const splits = flatName.split('.');
@@ -206,7 +196,7 @@ const getSubmissionField = (submission, survey, position) => {
 
 export const linearControls = (survey, submission) => {
   const res = [];
-  const { controls } = survey.revisions.find(revision => revision.version === submission.meta.survey.version);
+  const { controls } = survey.revisions.find((revision) => revision.version === submission.meta.survey.version);
   const positions = getControlPositions(controls);
   positions.forEach((p) => {
     const control = cloneDeep(getControl(controls, p));
@@ -217,7 +207,7 @@ export const linearControls = (survey, submission) => {
       const r = Object.assign(control, {
         breadcrumbs,
         key,
-        number: p.map(value => value + 1),
+        number: p.map((value) => value + 1),
         position: p,
         value: submissionField.value,
         meta: submissionField.meta,
@@ -227,7 +217,6 @@ export const linearControls = (survey, submission) => {
   });
   return res;
 };
-
 
 export default {
   createSubmissionFromSurvey,

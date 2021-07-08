@@ -9,7 +9,7 @@ const requireComponent = require.context(
   '.',
   // but not in subdirectories
   false,
-  /\.vue$/,
+  /\.vue$/
 );
 
 // For each matching file name...
@@ -17,12 +17,11 @@ requireComponent.keys().forEach((fileName) => {
   // Get the component config
   const componentConfig = requireComponent(fileName);
   // Get the PascalCase version of the component name
-  const componentName = `AppControl${
-    fileName
+  const componentName = `AppControl${fileName
     // Remove the "./_" from the beginning
-      .replace(/^\.\//, '')
+    .replace(/^\.\//, '')
     // Remove the file extension from the end
-      .replace(/\.\w+$/, '')}`;
+    .replace(/\.\w+$/, '')}`;
 
   // Globally register the component
   Vue.component(componentName, componentConfig.default || componentConfig);

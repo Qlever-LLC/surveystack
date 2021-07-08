@@ -6,17 +6,18 @@
       </div>
       <v-spacer />
 
-      <v-btn
-        icon
-        @click="closeDialog"
-      >
+      <v-btn icon @click="closeDialog">
         <v-icon>mdi-close</v-icon>
       </v-btn>
-
     </v-card-title>
     <v-card-text>
       <v-form
-        v-if="resource && (resource.label || resource.label === '') && (resource.name || resource.name === '') && (resource.content || resource.content === '')"
+        v-if="
+          resource &&
+            (resource.label || resource.label === '') &&
+            (resource.name || resource.name === '') &&
+            (resource.content || resource.content === '')
+        "
         ref="form"
       >
         <v-text-field
@@ -45,19 +46,10 @@
       </v-form>
     </v-card-text>
     <v-card-actions class="d-flex justify-space-between px-6 pb-4">
-      <v-btn
-        @click="deleteResource"
-        color="error"
-        text
-        tabindex="-1"
-      >
+      <v-btn @click="deleteResource" color="error" text tabindex="-1">
         Delete
       </v-btn>
-      <v-btn
-        @click="updateResource"
-        text
-        color="primary"
-      >
+      <v-btn @click="updateResource" text color="primary">
         Update
       </v-btn>
     </v-card-actions>
@@ -65,11 +57,7 @@
 </template>
 
 <script>
-import {
-  nameIsUnique,
-  nameHasValidCharacters,
-  nameHasValidLength,
-} from '@/utils/resources';
+import { nameIsUnique, nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
 
 export default {
   data() {

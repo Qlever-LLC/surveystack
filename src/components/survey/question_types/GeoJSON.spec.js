@@ -2,19 +2,12 @@ import fs from 'fs';
 import path from 'path';
 import { fireEvent } from '@testing-library/vue';
 import { renderWithVuetify } from '../../../../tests/renderWithVuetify';
-import GeoJSON, {
-  addBaseLayer,
-  getNextValue,
-  addDrawingLayer,
-} from './GeoJSON.vue';
+import GeoJSON, { addBaseLayer, getNextValue, addDrawingLayer } from './GeoJSON.vue';
 
 import ControlProperties from '../../builder/ControlProperties.vue';
 import { createControlInstance } from '../../../utils/surveyConfig';
 
-const cssFile = fs.readFileSync(
-  path.resolve(__dirname, './GeoJSON.css'),
-  'utf8',
-);
+const cssFile = fs.readFileSync(path.resolve(__dirname, './GeoJSON.css'), 'utf8');
 
 const style = document.createElement('style');
 style.setAttribute('type', 'text/css');
@@ -117,52 +110,56 @@ function mockSurvey() {
       specVersion: 4,
     },
     resources: [],
-    revisions: [{
-      dateCreated: '1970-01-01T00:00:00.000Z',
-      version: 1,
-      controls: [],
-    }, {
-      dateCreated: '1970-01-01T00:00:00.000Z',
-      version: 2,
-      controls: [{
-        name: 'map_1',
-        label: 'Map 1',
-        type: 'geoJSON',
-        options: {
-          readOnly: false,
-          required: false,
-          redacted: false,
-          relevance: {
-            enabled: false,
-            code: '',
+    revisions: [
+      {
+        dateCreated: '1970-01-01T00:00:00.000Z',
+        version: 1,
+        controls: [],
+      },
+      {
+        dateCreated: '1970-01-01T00:00:00.000Z',
+        version: 2,
+        controls: [
+          {
+            name: 'map_1',
+            label: 'Map 1',
+            type: 'geoJSON',
+            options: {
+              readOnly: false,
+              required: false,
+              redacted: false,
+              relevance: {
+                enabled: false,
+                code: '',
+              },
+              constraint: {
+                enabled: false,
+                code: '',
+              },
+              calculate: {
+                enabled: false,
+                code: '',
+              },
+              apiCompose: {
+                enabled: false,
+                code: '',
+              },
+              geoJSON: {
+                showPolygon: true,
+                showLine: true,
+                showCircle: true,
+                showPoint: true,
+              },
+            },
+            id: '60b524795575f00001f504dc',
+            hint: '',
+            value: null,
           },
-          constraint: {
-            enabled: false,
-            code: '',
-          },
-          calculate: {
-            enabled: false,
-            code: '',
-          },
-          apiCompose: {
-            enabled: false,
-            code: '',
-          },
-          geoJSON: {
-            showPolygon: true,
-            showLine: true,
-            showCircle: true,
-            showPoint: true,
-          },
-        },
-        id: '60b524795575f00001f504dc',
-        hint: '',
-        value: null,
-      }],
-    }],
+        ],
+      },
+    ],
   };
 }
-
 
 describe('GeoJSON Question', () => {
   describe('hides controls', () => {
@@ -180,13 +177,7 @@ describe('GeoJSON Question', () => {
         },
       };
 
-      ({
-        getByTitle,
-        getByText,
-        getByRole,
-        container,
-        updateProps,
-      } = renderWithVuetify(GeoJSON, renderOptions));
+      ({ getByTitle, getByText, getByRole, container, updateProps } = renderWithVuetify(GeoJSON, renderOptions));
       container.append(style);
     });
 
@@ -244,24 +235,16 @@ describe('GeoJSON Question', () => {
         },
       };
 
-      const {
-        getByTitle,
-        getByText,
-        getByRole,
-        getByPlaceholderText,
-        container,
-        updateProps,
-      } = renderWithVuetify(GeoJSON, renderOptions);
+      const { getByTitle, getByText, getByRole, getByPlaceholderText, container, updateProps } = renderWithVuetify(
+        GeoJSON,
+        renderOptions
+      );
 
-      expect(getByTitle('Geolocate').parentElement.classList.contains('active'))
-        .toBe(true);
+      expect(getByTitle('Geolocate').parentElement.classList.contains('active')).toBe(true);
       // expect(input).toHaveFocus() doesn't seem to be working, even though element has focus in browser
-      expect(
-        getByPlaceholderText('Search for address...')
-          .parentElement
-          .classList
-          .contains('gcd-gl-expanded'),
-      ).toBe(true);
+      expect(getByPlaceholderText('Search for address...').parentElement.classList.contains('gcd-gl-expanded')).toBe(
+        true
+      );
     });
 
     it('does not activate geolocate control and geocoder is not expanded when value exists', () => {
@@ -273,24 +256,16 @@ describe('GeoJSON Question', () => {
         },
       };
 
-      const {
-        getByTitle,
-        getByText,
-        getByRole,
-        getByPlaceholderText,
-        container,
-        updateProps,
-      } = renderWithVuetify(GeoJSON, renderOptions);
+      const { getByTitle, getByText, getByRole, getByPlaceholderText, container, updateProps } = renderWithVuetify(
+        GeoJSON,
+        renderOptions
+      );
 
-      expect(getByTitle('Geolocate').parentElement.classList.contains('active'))
-        .toBe(false);
+      expect(getByTitle('Geolocate').parentElement.classList.contains('active')).toBe(false);
       // expect(input).toHaveFocus() doesn't seem to be working, even though element has focus in browser
-      expect(
-        getByPlaceholderText('Search for address...')
-          .parentElement
-          .classList
-          .contains('gcd-gl-expanded'),
-      ).toBe(false);
+      expect(getByPlaceholderText('Search for address...').parentElement.classList.contains('gcd-gl-expanded')).toBe(
+        false
+      );
     });
   });
 
@@ -298,14 +273,10 @@ describe('GeoJSON Question', () => {
     const featureCollection = mockFeatureCollection();
 
     it('getNextValue returns null for empty feature collection', () => {
-      expect(
-        getNextValue(JSON.stringify({ type: 'FeatureCollection', features: [] })),
-      ).toBeNull();
+      expect(getNextValue(JSON.stringify({ type: 'FeatureCollection', features: [] }))).toBeNull();
     });
     it('getNextValue returns geojson for non empty feature collection', () => {
-      expect(
-        getNextValue(JSON.stringify(featureCollection)),
-      ).toStrictEqual(featureCollection);
+      expect(getNextValue(JSON.stringify(featureCollection))).toStrictEqual(featureCollection);
     });
 
     it('addBaseLayer creates xyz layer', () => {
@@ -342,8 +313,7 @@ describe('GeoJSON Question', () => {
 
       expect(map.addLayer).toHaveBeenCalled();
       expect(map.addLayer.mock.calls[0][0]).toBe('geojson');
-      expect(map.addLayer.mock.calls[0][1].geojson)
-        .toBe(JSON.stringify(featureCollection));
+      expect(map.addLayer.mock.calls[0][1].geojson).toBe(JSON.stringify(featureCollection));
       expect(map.addBehavior).toHaveBeenCalled();
     });
   });
@@ -395,13 +365,12 @@ describe('GeoJSON Question', () => {
     });
 
     it('creates question with correct default options', () => {
-      expect(createControlInstance({ type: 'geoJSON' }).options.geoJSON)
-        .toEqual({
-          showPolygon: true,
-          showLine: true,
-          showCircle: true,
-          showPoint: true,
-        });
+      expect(createControlInstance({ type: 'geoJSON' }).options.geoJSON).toEqual({
+        showPolygon: true,
+        showLine: true,
+        showCircle: true,
+        showPoint: true,
+      });
     });
   });
 });

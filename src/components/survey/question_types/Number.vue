@@ -1,10 +1,6 @@
 <template>
   <div>
-    <app-control-label
-      :value="control.label"
-      :redacted="redacted"
-      :required="required"
-    />
+    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <v-text-field
       outlined
       type="number"
@@ -17,7 +13,6 @@
       hide-details
     />
     <app-control-more-info :value="control.moreInfo" />
-
   </div>
 </template>
 
@@ -37,9 +32,9 @@ export default {
     },
     tryAutofocus() {
       if (
-        typeof document === 'undefined'
-        || !this.$refs.textField.$refs.input
-        || document.activeElement === this.$refs.input
+        typeof document === 'undefined' ||
+        !this.$refs.textField.$refs.input ||
+        document.activeElement === this.$refs.input
       ) {
         return false;
       }

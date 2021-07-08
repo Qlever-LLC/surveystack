@@ -5,7 +5,7 @@ const createInitialState = () => ({
 const initialState = createInitialState();
 
 const getters = {
-  hasFeedback: state => state.items.length > 0,
+  hasFeedback: (state) => state.items.length > 0,
 };
 
 const actions = {

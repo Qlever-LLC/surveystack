@@ -24,7 +24,6 @@ function apiCompose(submission) {
 
   farmosRequest.url = submission.data.planting_group.field.value.url;
 
-
   farmosRequest.body = {
     date: submission.data.planting_group.planting_date.value,
     name: 'Tillage',

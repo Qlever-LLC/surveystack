@@ -1,11 +1,7 @@
 <template>
   <div class="pa-3">
-    <textarea
-      :value="valueString"
-      rows="30"
-      readonly
-    />
-    </div>
+    <textarea :value="valueString" rows="30" readonly />
+  </div>
 </template>
 <script>
 export default {
@@ -20,7 +16,6 @@ export default {
       return JSON.stringify(this.submissions.content, null, 2);
     },
   },
-
 };
 </script>
 

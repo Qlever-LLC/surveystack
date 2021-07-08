@@ -35,18 +35,18 @@ function removeKeys(obj, keys) {
  * @returns updated submission object
  */
 export function transformSubmissionQuestionTypes(obj, typeHandlers) {
-  return Object.entries(obj).map(([key, val]) => {
-    if (typeof val === 'object' && val !== null) {
-      const typeHandler = 'meta' in obj[key]
-        && obj[key].meta.type in typeHandlers
-        && typeHandlers[obj[key].meta.type];
-      if (typeHandler) {
-        return { [key]: typeHandler(val) };
+  return Object.entries(obj)
+    .map(([key, val]) => {
+      if (typeof val === 'object' && val !== null) {
+        const typeHandler =
+          'meta' in obj[key] && obj[key].meta.type in typeHandlers && typeHandlers[obj[key].meta.type];
+        if (typeHandler) {
+          return { [key]: typeHandler(val) };
+        }
+        return { [key]: transformSubmissionQuestionTypes(val, typeHandlers) };
       }
-      return { [key]: transformSubmissionQuestionTypes(val, typeHandlers) };
-    }
-    return { [key]: val };
-  }) // Flatten objects
+      return { [key]: val };
+    }) // Flatten objects
     .reduce((r, x) => ({ ...r, ...x }), {});
 }
 
@@ -139,17 +139,17 @@ function createCsv(submissions, headers) {
 
     // transform GeoJSON question type result table output to only flatten
     // down to the level of each Feature in the FeatureCollection
-    const transformedSubmissionData = transformSubmissionQuestionTypes(
-      submission.data,
-      { geoJSON: geojsonTransformer },
+    const transformedSubmissionData = transformSubmissionQuestionTypes(submission.data, {
+      geoJSON: geojsonTransformer,
+    });
+
+    items.push(
+      flatten({
+        ...submission,
+        data: transformedSubmissionData,
+      })
     );
-
-    items.push(flatten({
-      ...submission,
-      data: transformedSubmissionData,
-    }));
   });
-
 
   let csv = '';
   try {

@@ -69,22 +69,29 @@ const createInitialState = () => ({
 const initialState = createInitialState();
 
 const getters = {
-  survey: state => state.survey,
-  submission: state => state.submission,
-  property: state => (path, fallback) => surveyStackUtils.getNested(state.submission, path, fallback),
-  control: state => state.node && state.node.model, // current survey control
+  survey: (state) => state.survey,
+  submission: (state) => state.submission,
+  property: (state) => (path, fallback) => surveyStackUtils.getNested(state.submission, path, fallback),
+  control: (state) => state.node && state.node.model, // current survey control
   path: (state) => {
     if (!state.node) {
       return null;
     }
-    const p = state.node.getPath().map(n => n.model.name).join('.');
+    const p = state.node
+      .getPath()
+      .map((n) => n.model.name)
+      .join('.');
     return p;
   },
-  atStart: state => state.node === state.firstNode,
-  showOverview: state => state.showOverview,
-  showConfirmSubmission: state => state.showConfirmSubmission,
+  atStart: (state) => state.node === state.firstNode,
+  showOverview: (state) => state.showOverview,
+  showConfirmSubmission: (state) => state.showConfirmSubmission,
   questionNumber: (state) => {
-    const n = state.node.getPath().map(node => node.getIndex() + 1).slice(1).join('.');
+    const n = state.node
+      .getPath()
+      .map((node) => node.getIndex() + 1)
+      .slice(1)
+      .join('.');
     return n;
   },
   groupPath: (state) => {
@@ -97,12 +104,15 @@ const getters = {
 
     return null;
   },
-  relevance: state => (path, fallback = true) => surveyStackUtils.getRelevance(state.submission, path, fallback),
+  relevance: (state) => (path, fallback = true) => surveyStackUtils.getRelevance(state.submission, path, fallback),
   hasRequiredUnanswered: (state) => {
     if (state.node.hasChildren()) {
       const requiredAndUnansweredPaths = [];
       state.node.walk((c) => {
-        const path = c.getPath().map(n => n.model.name).join('.');
+        const path = c
+          .getPath()
+          .map((n) => n.model.name)
+          .join('.');
 
         if (c.model.options.required && !surveyStackUtils.isAnswered(c, state.submission)) {
           requiredAndUnansweredPaths.push(path);
@@ -134,14 +144,17 @@ const getters = {
       if (node.isRoot()) {
         return true;
       }
-      const path = node.getPath().map(n => n.model.name).join('.');
+      const path = node
+        .getPath()
+        .map((n) => n.model.name)
+        .join('.');
       const control = node.model;
       overviews.push({ node, path, control });
       return true;
     });
     return overviews;
   },
-  errors: state => state.errors,
+  errors: (state) => state.errors,
 };
 
 const actions = {
@@ -188,13 +201,20 @@ const actions = {
         }
       }
 
-      const hasIrrelevantParents = nextNode.getPath().slice(1).slice(0, -1).some((parent) => {
-        const parentPath = parent.getPath().map(n => n.model.name).join('.');
-        if (!surveyStackUtils.getNested(state.submission, `${parentPath}.meta.relevant`, true)) {
-          return true;
-        }
-        return false;
-      });
+      const hasIrrelevantParents = nextNode
+        .getPath()
+        .slice(1)
+        .slice(0, -1)
+        .some((parent) => {
+          const parentPath = parent
+            .getPath()
+            .map((n) => n.model.name)
+            .join('.');
+          if (!surveyStackUtils.getNested(state.submission, `${parentPath}.meta.relevant`, true)) {
+            return true;
+          }
+          return false;
+        });
 
       if (hasIrrelevantParents) {
         continue;
@@ -207,7 +227,6 @@ const actions = {
 
       const isPage = nextNode.model.type === 'page';
 
-
       if (isPage) {
         let cidx = index + 1;
         let skipPage = true;
@@ -216,7 +235,11 @@ const actions = {
         // lookahead
         while (cidx < traversal.length) {
           const lookahead = traversal[cidx++];
-          const isInsidePage = lookahead.getPath().slice(1).slice(0, -1).find(parent => parent.model.type === 'page');
+          const isInsidePage = lookahead
+            .getPath()
+            .slice(1)
+            .slice(0, -1)
+            .find((parent) => parent.model.type === 'page');
           if (!isInsidePage) {
             break;
           }
@@ -242,8 +265,11 @@ const actions = {
         }
       }
 
-
-      const isInsidePage = nextNode.getPath().slice(1).slice(0, -1).find(parent => parent.model.type === 'page');
+      const isInsidePage = nextNode
+        .getPath()
+        .slice(1)
+        .slice(0, -1)
+        .find((parent) => parent.model.type === 'page');
       if (isInsidePage) {
         continue;
       }
@@ -253,7 +279,11 @@ const actions = {
         continue;
       }
 
-      const hasHiddenParents = nextNode.getPath().slice(1).slice(0, -1).find(parent => parent.model.options.hidden === true);
+      const hasHiddenParents = nextNode
+        .getPath()
+        .slice(1)
+        .slice(0, -1)
+        .find((parent) => parent.model.options.hidden === true);
       if (hasHiddenParents) {
         continue;
       }
@@ -291,13 +321,20 @@ const actions = {
         }
       }
 
-      const hasIrrelevantParents = prevNode.getPath().slice(1).slice(0, -1).some((parent) => {
-        const parentPath = parent.getPath().map(n => n.model.name).join('.');
-        if (!surveyStackUtils.getNested(state.submission, `${parentPath}.meta.relevant`, true)) {
-          return true;
-        }
-        return false;
-      });
+      const hasIrrelevantParents = prevNode
+        .getPath()
+        .slice(1)
+        .slice(0, -1)
+        .some((parent) => {
+          const parentPath = parent
+            .getPath()
+            .map((n) => n.model.name)
+            .join('.');
+          if (!surveyStackUtils.getNested(state.submission, `${parentPath}.meta.relevant`, true)) {
+            return true;
+          }
+          return false;
+        });
 
       if (hasIrrelevantParents) {
         continue;
@@ -308,7 +345,11 @@ const actions = {
         continue;
       }
 
-      const isInsidePage = prevNode.getPath().slice(1).slice(0, -1).find(parent => parent.model.type === 'page');
+      const isInsidePage = prevNode
+        .getPath()
+        .slice(1)
+        .slice(0, -1)
+        .find((parent) => parent.model.type === 'page');
       if (isInsidePage) {
         continue;
       }
@@ -318,7 +359,11 @@ const actions = {
         continue;
       }
 
-      const hasHiddenParents = prevNode.getPath().slice(1).slice(0, -1).find(parent => parent.model.options.hidden === true);
+      const hasHiddenParents = prevNode
+        .getPath()
+        .slice(1)
+        .slice(0, -1)
+        .find((parent) => parent.model.options.hidden === true);
       if (hasHiddenParents) {
         continue;
       }
@@ -354,9 +399,7 @@ const actions = {
     const apiCompositions = await codeEvaluator.calculateApiCompose(nodes, state.submission, state.survey);
     const errors = [];
     apiCompositions.forEach((apiComposition) => {
-      const {
-        result, path, skip, error, clear,
-      } = apiComposition;
+      const { result, path, skip, error, clear } = apiComposition;
       if (error) {
         errors.push({ path, error });
       }
@@ -389,16 +432,18 @@ const mutations = {
 
     state.showOverview = false;
     state.showConfirmSubmission = false;
-    const { controls } = state.survey.revisions.find(revision => revision.version === submission.meta.survey.version);
+    const { controls } = state.survey.revisions.find((revision) => revision.version === submission.meta.survey.version);
 
     const tree = new TreeModel();
     const root = tree.parse({ name: 'data', children: controls });
     state.root = root;
 
     // possible node alteration
-    root.all(n => !!n.parent && n.parent.model.type === 'page').forEach((node) => {
-      // node.drop();
-    });
+    root
+      .all((n) => !!n.parent && n.parent.model.type === 'page')
+      .forEach((node) => {
+        // node.drop();
+      });
 
     // assign first node
     root.walk((node) => {
@@ -423,7 +468,10 @@ const mutations = {
   },
   GOTO(state, path) {
     state.root.walk((node) => {
-      const currentPath = node.getPath().map(n => n.model.name).join('.');
+      const currentPath = node
+        .getPath()
+        .map((n) => n.model.name)
+        .join('.');
       if (currentPath === path) {
         const parents = node.getPath();
         for (let i = 0; i < parents.length; i++) {

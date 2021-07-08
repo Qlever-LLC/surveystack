@@ -1,18 +1,9 @@
 <template>
   <v-container>
-    <v-banner
-      class="my-2"
-      v-if="$store.getters['draft/errors']"
-      color="red"
-      dark
-      rounded
-    >
+    <v-banner class="my-2" v-if="$store.getters['draft/errors']" color="red" dark rounded>
       <h3>Api Compose Errors</h3>
-      <li
-        v-for="(error, i) in $store.getters['draft/errors']"
-        :key="i"
-      >
-        <strong>{{error.path}}</strong> {{error.error.name}}: {{error.error.message}} <br />
+      <li v-for="(error, i) in $store.getters['draft/errors']" :key="i">
+        <strong>{{ error.path }}</strong> {{ error.error.name }}: {{ error.error.message }} <br />
       </li>
     </v-banner>
     <v-card>
@@ -21,22 +12,20 @@
         {{ submission._id }}
         <br />
 
-        <strong v-if="submission.meta.dateSubmitted"><kbd>{{ submitted }}</kbd> submitted</strong>
+        <strong v-if="submission.meta.dateSubmitted"
+          ><kbd>{{ submitted }}</kbd> submitted</strong
+        >
       </v-card-subtitle>
       <v-card-text>
         Submitting to: {{ groupPath || '--' }}
         <br />
         Created: {{ created }}
-        <br>
+        <br />
         Last modified: {{ modified }}
         <br />
       </v-card-text>
     </v-card>
-    <v-timeline
-      v-if="controlDisplays"
-      dense
-      class="width: 100%"
-    >
+    <v-timeline v-if="controlDisplays" dense class="width: 100%">
       <template v-for="(display, idx) in controlDisplays">
         <v-timeline-item
           v-if="display.collate === 0 || display.lastOfCollation || !display.hidden"
@@ -50,7 +39,10 @@
             @click="$emit('goto', display.path)"
             :color="display.background"
             :dark="display.dark"
-            :style="{opacity: display.relevant ? 1.0 : 0.5, 'border-left': display.active ? '4px solid green !important' : ''}"
+            :style="{
+              opacity: display.relevant ? 1.0 : 0.5,
+              'border-left': display.active ? '4px solid green !important' : '',
+            }"
             class="pb-1"
           >
             <!-- title -->
@@ -59,7 +51,8 @@
                 <span
                   class="grey--text text--darken-1 mr-1 text-no-wrap"
                   style="font-weight: initial; font-size: initial"
-                >{{ display.questionNumber }}</span>
+                  >{{ display.questionNumber }}</span
+                >
                 <app-control-label
                   class="ml-2 mb-0 flex-grow-1"
                   :value="display.label"
@@ -70,21 +63,16 @@
             </v-card-title>
 
             <!-- path (not shown) -->
-            <v-card-text
-              v-if="false"
-              class="my-0 py-0"
-            >
+            <v-card-text v-if="false" class="my-0 py-0">
               <span
                 class="font-weight-light grey--text text--darken-2 mt-n1"
                 style="font-size: 0.9rem; position: relative;"
-              >{{display.path}}</span>
+                >{{ display.path }}</span
+              >
             </v-card-text>
 
             <!-- value -->
-            <v-card-text
-              v-if="display.value && display.ellipsis"
-              class="pb-7"
-            >
+            <v-card-text v-if="display.value && display.ellipsis" class="pb-7">
               <div
                 class="d-flex"
                 style="max-width: 99%; position: absolute"
@@ -94,18 +82,11 @@
                   {{ display.value }}
                 </div>
               </div>
-
             </v-card-text>
 
-            <v-card-text
-              v-else-if="display.value && !display.ellipsis"
-              style="padding-bottom: 2px"
-            >
-              <div
-                class="d-flex"
-                @click.stop="display.ellipsis = !display.ellipsis"
-              >
-                <div class="overview-value">{{display.value}}</div>
+            <v-card-text v-else-if="display.value && !display.ellipsis" style="padding-bottom: 2px">
+              <div class="d-flex" @click.stop="display.ellipsis = !display.ellipsis">
+                <div class="overview-value">{{ display.value }}</div>
               </div>
             </v-card-text>
 
@@ -114,32 +95,19 @@
             </v-card-text>
 
             <!-- date modified -->
-            <v-card-text
-              class="pt-1 pb-0"
-              v-if="display.modified"
-            >
-              <div
-                class="d-flex justify-space-between text--secondary"
-                style="font-size: 0.8rem"
-              >
+            <v-card-text class="pt-1 pb-0" v-if="display.modified">
+              <div class="d-flex justify-space-between text--secondary" style="font-size: 0.8rem">
                 <div>
                   {{ display.modified.format('YYYY-MM-DD HH:mm') }}
                 </div>
-                <div>
-                  {{ display.modifiedHumanized }} ago
-                </div>
+                <div>{{ display.modifiedHumanized }} ago</div>
               </div>
             </v-card-text>
           </v-card>
 
-          <v-chip
-            v-else
-            @click="expand(display.collateGroup)"
-            dark
-            small
-            color="grey"
-            class="mr-0 mr-1"
-          >{{ display.collate }} Irrelevant Questions</v-chip>
+          <v-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1"
+            >{{ display.collate }} Irrelevant Questions</v-chip
+          >
         </v-timeline-item>
       </template>
     </v-timeline>
@@ -160,23 +128,21 @@ const states = {
 function iconify(value, control, relevant) {
   if (value != null) {
     return states.done;
-  } if (relevant && (value == null && control.options.required)) {
+  }
+  if (relevant && value == null && control.options.required) {
     return states.missing;
-  } if (control.warning) {
+  }
+  if (control.warning) {
     return states.warning;
-  } if (control.error) {
+  }
+  if (control.error) {
     return states.error;
   }
   return states.ok;
 }
 
 export default {
-  props: [
-    'survey',
-    'submission',
-    'groupPath',
-    'overviews',
-  ],
+  props: ['survey', 'submission', 'groupPath', 'overviews'],
   data() {
     return {
       controlDisplays: [],
@@ -187,16 +153,21 @@ export default {
   },
   methods: {
     expand(group) {
-      this.controlDisplays.filter(item => item.collateGroup === group && item.collate > 0).forEach((item) => {
-        // eslint-disable-next-line no-param-reassign
-        item.collate = 1;
-        // eslint-disable-next-line no-param-reassign
-        item.hidden = false;
-      });
+      this.controlDisplays
+        .filter((item) => item.collateGroup === group && item.collate > 0)
+        .forEach((item) => {
+          // eslint-disable-next-line no-param-reassign
+          item.collate = 1;
+          // eslint-disable-next-line no-param-reassign
+          item.hidden = false;
+        });
     },
     isRelevant(node) {
       const relevant = node.getPath().every((n) => {
-        const p = n.getPath().map(nn => nn.model.name).join('.');
+        const p = n
+          .getPath()
+          .map((nn) => nn.model.name)
+          .join('.');
         const r = this.$store.getters['draft/property'](`${p}.meta.relevant`, true);
         return r;
       });
@@ -243,7 +214,11 @@ export default {
 
         const active = this.$store.getters['draft/path'] === overview.path;
         const background = 'white';
-        const questionNumber = node.getPath().map(n => n.getIndex() + 1).slice(1).join('.');
+        const questionNumber = node
+          .getPath()
+          .map((n) => n.getIndex() + 1)
+          .slice(1)
+          .join('.');
         const value = this.$store.getters['draft/property'](`${overview.path}.value`);
         const icon = iconify(value, overview.control, relevant);
 
@@ -272,7 +247,6 @@ export default {
 
       this.controlDisplays = controlDisplays;
     },
-
   },
   mounted() {
     this.refresh();

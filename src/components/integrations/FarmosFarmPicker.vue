@@ -20,7 +20,6 @@
       :hint="`Found ${farms.length} farms`"
       persistent-hint
     ></v-select>
-
   </div>
 </template>
 
@@ -32,7 +31,7 @@ export default {
     },
     data: {
       type: Object,
-      default: () => { },
+      default: () => {},
     },
   },
   data() {
@@ -51,19 +50,24 @@ export default {
         return [];
       }
 
-      return this.aggregators.find(aggregator => aggregator._id === this.selectedAggregator).farms.map(farm => ({
-        text: `${farm.farm_name} - ${farm.url}`,
-        value: farm.id,
-      }));
+      return this.aggregators
+        .find((aggregator) => aggregator._id === this.selectedAggregator)
+        .farms.map((farm) => ({
+          text: `${farm.farm_name} - ${farm.url}`,
+          value: farm.id,
+        }));
     },
   },
   watch: {
     selectedFarm: {
       async handler(newVal, oldVal) {
-        const a = this.aggregators.find(aggregator => aggregator._id === this.selectedAggregator);
-        const f = a.farms.find(farm => farm.id === this.selectedFarm);
+        const a = this.aggregators.find((aggregator) => aggregator._id === this.selectedAggregator);
+        const f = a.farms.find((farm) => farm.id === this.selectedFarm);
         const data = {
-          name: f.farm_name, url: f.url, aggregator: a._id, farm: f.id,
+          name: f.farm_name,
+          url: f.url,
+          aggregator: a._id,
+          farm: f.id,
         };
         this.$emit('farm-selected', data);
       },

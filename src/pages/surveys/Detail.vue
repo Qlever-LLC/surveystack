@@ -1,6 +1,6 @@
 <template>
   <v-container v-if="entity && show">
-    <div class="d-flex justify-end">
+    <div class="d-flex justify-end mb-4">
       <v-btn v-if="editable" class="mx-2" :to="`/surveys/${entity._id}/edit`">
         <v-icon>mdi-pencil</v-icon>
         <span class="ml-2">Edit</span>
@@ -11,36 +11,37 @@
       </v-btn>
     </div>
 
-
-    <div class="mt-8 mb-4 d-flex justify-center">
-      <v-btn
-        x-large
-        color="primary"
-        @click="startDraft(entity._id)"
-        :disabled="!isAllowedToSubmit"
-      >
-        <v-icon>mdi-file-document-box-plus-outline</v-icon>
-        <span class="ml-2">Start Survey</span>
-      </v-btn>
-      <div class="mt-2 text--secondary" v-if="!isAllowedToSubmit">
-        {{ submissionRightsHint }}
-      </div>
-    </div>
-
     <h1>{{ entity.name }}</h1>
-    <div v-if="surveyInfo">
+    <div v-if="surveyInfo" class="survey-info">
       <div class="survey-description" v-if="surveyInfo.description">
         {{ surveyInfo.description }}
       </div>
       <div class="text--secondary">
         {{ surveyInfo.submissions }}
-        {{ surveyInfo.submissions === 1 ? "submission" : "submissions" }}
+        {{ surveyInfo.submissions === 1 ? 'submission' : 'submissions' }}
       </div>
       <div v-if="surveyInfo.latestSubmission" class="text--secondary">
         Latest submission on {{ surveyInfo.latestSubmission.dateModified }}
       </div>
     </div>
 
+    <div class="pt-8 pb-4 d-flex justify-center start-button-container">
+      <div class="text-center">
+        <v-btn
+          x-large
+          color="primary"
+          @click="startDraft(entity._id)"
+          :disabled="!isAllowedToSubmit"
+          class="start-button"
+        >
+          <v-icon>mdi-file-document-box-plus-outline</v-icon>
+          <span class="ml-2">Start Survey</span>
+        </v-btn>
+        <div class="mt-2 text--secondary text-center submission-rights-hint" v-if="!isAllowedToSubmit">
+          {{ submissionRightsHint }}
+        </div>
+      </div>
+    </div>
   </v-container>
 </template>
 
@@ -74,11 +75,7 @@ export default {
       }
       const user = this.$store.getters['auth/user'];
 
-      if (
-        this.entity
-        && this.entity.meta
-        && this.entity.meta.creator === user._id
-      ) {
+      if (this.entity && this.entity.meta && this.entity.meta.creator === user._id) {
         return true;
       }
 
@@ -86,9 +83,7 @@ export default {
         return false;
       }
 
-      const g = this.memberships.find(
-        m => m.group._id === this.entity.meta.group.id,
-      );
+      const g = this.memberships.find((m) => m.group._id === this.entity.meta.group.id);
       if (g && g.role === 'admin') {
         return true;
       }
@@ -114,9 +109,7 @@ export default {
       if (submissions === 'group' && this.$store.getters['auth/isLoggedIn']) {
         const groups = this.$store.getters['memberships/groups'];
         console.log(groups);
-        const match = groups.find(
-          group => group._id === this.entity.meta.group.id,
-        );
+        const match = groups.find((group) => group._id === this.entity.meta.group.id);
         console.log('match', match);
         if (match) {
           return true;
@@ -160,13 +153,13 @@ export default {
 
     const { submissions, isLibrary } = this.entity.meta;
 
-
     if (!submissions || submissions === 'public' || isLibrary) {
       this.show = true;
       return;
     }
 
-    if (this.$store.getters['auth/isLoggedIn']) { // let ui handle issues if user is already logged in
+    if (this.$store.getters['auth/isLoggedIn']) {
+      // let ui handle issues if user is already logged in
       this.show = true;
       return;
     }
@@ -183,5 +176,27 @@ export default {
 .survey-description {
   margin: 16px 0px;
   white-space: pre-wrap;
+}
+
+.start-button-container {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.85) 50%);
+
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+.survey-info {
+  padding-bottom: 150px;
+}
+
+/* vuetify default for disabled buttons makes them */
+.theme--light.v-btn.v-btn--disabled:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
+  background-color: #ccc !important;
+}
+
+.submission-rights-hint {
+  max-width: 500px;
 }
 </style>

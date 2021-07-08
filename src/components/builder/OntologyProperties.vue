@@ -14,12 +14,7 @@
         @on-select="selectResourceHandler"
         :newResourceTypes="[resourceTypes.ONTOLOGY_LIST, resourceTypes.SURVEY_REFERENCE]"
       />
-      <v-btn
-        icon
-        :disabled="disabled"
-        @click.stop="editResourceHandler"
-        :class="{'d-none': !value}"
-      >
+      <v-btn icon :disabled="disabled" @click.stop="editResourceHandler" :class="{ 'd-none': !value }">
         <!-- Edit entries -->
         <v-icon class="ml-2 mt-3">mdi-pencil</v-icon>
       </v-btn>
@@ -35,10 +30,7 @@
         @close-dialog="closeTableDialog"
       />
     </v-dialog>
-    <v-dialog
-      v-model="referenceDialogIsVisible"
-      max-width="50%"
-    >
+    <v-dialog v-model="referenceDialogIsVisible" max-width="50%">
       <ontology-reference-editor
         v-if="referenceDialogIsVisible && resource && resource.type === resourceTypes.SURVEY_REFERENCE"
         :resources="resources"
@@ -55,13 +47,7 @@
 import ResourceSelector from '@/components/builder/ResourceSelector.vue';
 import OntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import OntologyReferenceEditor from '@/components/builder/OntologyReferenceEditor.vue';
-import {
-  createResource,
-  resourceTypes,
-  resourceLocations,
-  setResource,
-  removeResource,
-} from '@/utils/resources';
+import { createResource, resourceTypes, resourceLocations, setResource, removeResource } from '@/utils/resources';
 
 export default {
   components: {
@@ -117,13 +103,7 @@ export default {
           defaultContent: [],
         });
       }
-      this.$emit(
-        'set-survey-resources',
-        [
-          ...this.resources,
-          newResource,
-        ],
-      );
+      this.$emit('set-survey-resources', [...this.resources, newResource]);
       this.$emit('set-control-source', newResource.id);
       if (type === resourceTypes.ONTOLOGY_LIST) {
         this.openTableDialog();
@@ -141,7 +121,7 @@ export default {
     },
     resources: {
       type: Array,
-      default: () => ([]),
+      default: () => [],
     },
     disabled: {
       required: false,
@@ -149,12 +129,15 @@ export default {
   },
   computed: {
     resource() {
-      return this.resources.find(resource => resource.id === this.value);
+      return this.resources.find((resource) => resource.id === this.value);
     },
     filteredResources() {
-      return this.resources && this.resources.filter(
-        resource => resource.type === resourceTypes.ONTOLOGY_LIST
-          || resource.type === resourceTypes.SURVEY_REFERENCE,
+      return (
+        this.resources &&
+        this.resources.filter(
+          (resource) =>
+            resource.type === resourceTypes.ONTOLOGY_LIST || resource.type === resourceTypes.SURVEY_REFERENCE
+        )
       );
     },
   },

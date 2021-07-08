@@ -14,7 +14,6 @@ const groups = [];
 
 // const readyToSubmit = [];
 
-
 let db = null;
 
 const stores = {
@@ -106,16 +105,11 @@ function clearAllSurveys() {
 //   clearObjectStore(stores.READY_TO_SUBMIT);
 // }
 
-
 function persist(storeName, obj) {
   const store = getObjectStore(storeName, 'readwrite');
   let req;
 
-  try {
-    req = store.put(obj);
-  } catch (e) {
-    throw e;
-  }
+  req = store.put(obj);
 
   req.onsuccess = (evt) => {
     console.log(`Insertion in DB successful: ${evt}`);
@@ -166,7 +160,6 @@ function getAllSubmissions(onSuccess) {
   getResults(stores.SUBMISSIONS, onSuccess);
 }
 
-
 function getAllSurveys(onSuccess) {
   getResults(stores.SURVEYS, onSuccess);
 }
@@ -177,103 +170,97 @@ function getAllSurveys(onSuccess) {
   Also, we may want to add a "db" module to the Vuex store?
 */
 function loadFromIndexedDB(storeName, id) {
-  return new Promise(
-    ((resolve, reject) => {
-      const dbRequest = indexedDB.open(DATABASE_NAME);
+  return new Promise((resolve, reject) => {
+    const dbRequest = indexedDB.open(DATABASE_NAME);
 
-      dbRequest.onerror = (ev) => {
+    dbRequest.onerror = (ev) => {
+      reject(Error('Error text'));
+    };
+
+    dbRequest.onupgradeneeded = (ev) => {
+      // Objectstore does not exist. Nothing to load
+      ev.target.transaction.abort();
+      reject(Error('Not found'));
+    };
+
+    dbRequest.onsuccess = (ev) => {
+      const database = ev.target.result;
+      const transaction = database.transaction([storeName]);
+      const objectStore = transaction.objectStore(storeName);
+      const objectRequest = objectStore.get(id);
+
+      objectRequest.onerror = () => {
         reject(Error('Error text'));
       };
 
-      dbRequest.onupgradeneeded = (ev) => {
-        // Objectstore does not exist. Nothing to load
-        ev.target.transaction.abort();
-        reject(Error('Not found'));
+      objectRequest.onsuccess = () => {
+        if (objectRequest.result) resolve(objectRequest.result);
+        else reject(Error('object not found'));
       };
-
-      dbRequest.onsuccess = (ev) => {
-        const database = ev.target.result;
-        const transaction = database.transaction([storeName]);
-        const objectStore = transaction.objectStore(storeName);
-        const objectRequest = objectStore.get(id);
-
-        objectRequest.onerror = () => {
-          reject(Error('Error text'));
-        };
-
-        objectRequest.onsuccess = () => {
-          if (objectRequest.result) resolve(objectRequest.result);
-          else reject(Error('object not found'));
-        };
-      };
-    }),
-  );
+    };
+  });
 }
 
 function saveToIndexedDB(storeName, object) {
-  return new Promise(
-    ((resolve, reject) => {
-      const dbRequest = indexedDB.open(DATABASE_NAME);
+  return new Promise((resolve, reject) => {
+    const dbRequest = indexedDB.open(DATABASE_NAME);
 
-      if (object._id === undefined) reject(Error('object has no _id.'));
+    if (object._id === undefined) reject(Error('object has no _id.'));
 
-      dbRequest.onerror = (ev) => {
-        reject(Error('IndexedDB database error'));
+    dbRequest.onerror = (ev) => {
+      reject(Error('IndexedDB database error'));
+    };
+
+    dbRequest.onupgradeneeded = (ev) => {
+      const database = ev.target.result;
+      const objectStore = database.createObjectStore(storeName, { keyPath: '_id' });
+    };
+
+    dbRequest.onsuccess = (event) => {
+      const database = event.target.result;
+      const transaction = database.transaction(storeName, 'readwrite');
+      const objectStore = transaction.objectStore(storeName);
+      const objectRequest = objectStore.put(object); // Overwrite if exists
+
+      objectRequest.onerror = (ev) => {
+        reject(Error('Error text'));
       };
 
-      dbRequest.onupgradeneeded = (ev) => {
-        const database = ev.target.result;
-        const objectStore = database.createObjectStore(storeName, { keyPath: '_id' });
+      objectRequest.onsuccess = (ev) => {
+        resolve('Data saved OK');
       };
-
-      dbRequest.onsuccess = (event) => {
-        const database = event.target.result;
-        const transaction = database.transaction(storeName, 'readwrite');
-        const objectStore = transaction.objectStore(storeName);
-        const objectRequest = objectStore.put(object); // Overwrite if exists
-
-        objectRequest.onerror = (ev) => {
-          reject(Error('Error text'));
-        };
-
-        objectRequest.onsuccess = (ev) => {
-          resolve('Data saved OK');
-        };
-      };
-    }),
-  );
+    };
+  });
 }
 
 function removeFromIndexedDB(storeName, id) {
-  return new Promise(
-    (resolve, reject) => {
-      const dbRequest = indexedDB.open(DATABASE_NAME);
+  return new Promise((resolve, reject) => {
+    const dbRequest = indexedDB.open(DATABASE_NAME);
 
-      dbRequest.onerror = (ev) => {
-        reject(Error('IndexedDB database error'));
+    dbRequest.onerror = (ev) => {
+      reject(Error('IndexedDB database error'));
+    };
+
+    dbRequest.onupgradeneeded = (ev) => {
+      const database = ev.target.result;
+      database.createObjectStore(storeName, { keyPath: '_id' });
+    };
+
+    dbRequest.onsuccess = (event) => {
+      const database = event.target.result;
+      const transaction = database.transaction(storeName, 'readwrite');
+      const objectStore = transaction.objectStore(storeName);
+      const objectRequest = objectStore.delete(id);
+
+      objectRequest.onerror = (ev) => {
+        reject(Error(`Error deleting ID ${id} from ${storeName}`));
       };
 
-      dbRequest.onupgradeneeded = (ev) => {
-        const database = ev.target.result;
-        database.createObjectStore(storeName, { keyPath: '_id' });
+      objectRequest.onsuccess = (ev) => {
+        resolve(`Success deleting ID ${id} from ${storeName}`);
       };
-
-      dbRequest.onsuccess = (event) => {
-        const database = event.target.result;
-        const transaction = database.transaction(storeName, 'readwrite');
-        const objectStore = transaction.objectStore(storeName);
-        const objectRequest = objectStore.delete(id);
-
-        objectRequest.onerror = (ev) => {
-          reject(Error(`Error deleting ID ${id} from ${storeName}`));
-        };
-
-        objectRequest.onsuccess = (ev) => {
-          resolve(`Success deleting ID ${id} from ${storeName}`);
-        };
-      };
-    },
-  );
+    };
+  });
 }
 
 export {

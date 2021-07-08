@@ -1,56 +1,27 @@
 <template>
   <v-container>
-
     <v-card class="pa-4 mb-4">
-      <span class="text--secondary overline">{{this.entity._id}}</span>
+      <span class="text--secondary overline">{{ this.entity._id }}</span>
 
-      <h1>{{ editMode ? "Edit Group Integration" : "Create Group Integration" }}</h1>
+      <h1>{{ editMode ? 'Edit Group Integration' : 'Create Group Integration' }}</h1>
 
-      <v-form
-        class="mt-3"
-        @keydown.enter.prevent="submit"
-      >
-        <v-text-field
-          v-model="entity.name"
-          label="Name"
-          placeholder="Untitled integration"
-          outlined
-        />
+      <v-form class="mt-3" @keydown.enter.prevent="submit">
+        <v-text-field v-model="entity.name" label="Name" placeholder="Untitled integration" outlined />
 
-        <v-select
-          :items="integrationTypes"
-          v-model="entity.type"
-          label="Type"
-          outlined
-        ></v-select>
+        <v-select :items="integrationTypes" v-model="entity.type" label="Type" outlined></v-select>
 
         <app-json-editor v-model="entity.data" />
         <div class="d-flex ma-2">
-          <v-btn
-            color="error"
-            outlined
-            class="mr-auto"
-            @click="deleteEntity"
-          >
+          <v-btn color="error" outlined class="mr-auto" @click="deleteEntity">
             <v-icon left>mdi-trash-can-outline</v-icon> Delete
           </v-btn>
-          <v-btn
-            text
-            @click="cancel"
-          >Cancel</v-btn>
-          <v-btn
-            color="primary"
-            @click="submit"
-          >Submit</v-btn>
+          <v-btn text @click="cancel">Cancel</v-btn>
+          <v-btn color="primary" @click="submit">Submit</v-btn>
         </div>
       </v-form>
     </v-card>
     <transition name="fade">
-      <app-feedback
-        v-if="status"
-        class="mt-5"
-        @closed="status = ''"
-      >{{status}}</app-feedback>
+      <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{ status }}</app-feedback>
     </transition>
   </v-container>
 </template>
@@ -61,7 +32,6 @@ import api from '@/services/api.service';
 
 import appJsonEditor from '@/components/ui/JsonEditor.vue';
 import appFeedback from '@/components/ui/Feedback.vue';
-
 
 const exampleIntegration = {
   type: 'farmos-aggregator',
@@ -148,9 +118,7 @@ export default {
     },
   },
   async created() {
-    this.editMode = !this.$route.matched.some(
-      ({ name }) => name === 'group-integrations-new',
-    );
+    this.editMode = !this.$route.matched.some(({ name }) => name === 'group-integrations-new');
 
     this.entity._id = new ObjectId();
     const { group } = this.$route.query;

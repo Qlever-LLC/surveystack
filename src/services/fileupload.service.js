@@ -6,8 +6,8 @@ function upload(url, formData) {
   return (
     api
       .post(url, formData)
-    // get data
-      .then(x => x.data)
+      // get data
+      .then((x) => x.data)
   );
 }
 

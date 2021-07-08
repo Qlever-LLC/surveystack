@@ -11,7 +11,7 @@
       v-model="tableSelected"
       @item-selected="onRowSelected"
       disable-pagination
-      :class="{archived}"
+      :class="{ archived }"
       :server-items-length="submissions.pagination.total"
       @update:sort-by="onUpdateSortBy"
       @update:sort-desc="onUpdateSortDesc"
@@ -25,17 +25,12 @@
           <v-row>
             <v-col>
               <div class="d-flex justify-end">
-                <v-switch
-                  v-model="excludeMeta"
-                  label="Hide meta"
-                  class="mt-2"
-                ></v-switch>
+                <v-switch v-model="excludeMeta" label="Hide meta" class="mt-2"></v-switch>
               </div>
             </v-col>
           </v-row>
         </v-toolbar>
       </template>
-
     </v-data-table>
   </v-card>
 </template>
@@ -45,11 +40,9 @@ import papa from 'papaparse';
 import csvService from '@/services/csv.service';
 
 export function transformHeaders(headers) {
-  const replaceGeoJsonPath = str => str.replace(/(value\.features\.\d).*/, '$1');
+  const replaceGeoJsonPath = (str) => str.replace(/(value\.features\.\d).*/, '$1');
   // Remove GeoJSON question type paths from headers
-  return Array.isArray(headers)
-    ? [...new Set(headers.map(replaceGeoJsonPath))]
-    : headers;
+  return Array.isArray(headers) ? [...new Set(headers.map(replaceGeoJsonPath))] : headers;
 }
 
 export default {
@@ -121,8 +114,7 @@ export default {
     },
   },
   methods: {
-    onRowSelected({ value, item }) {
-    },
+    onRowSelected({ value, item }) {},
     createCustomFilter(field) {
       return (value, search, item) => {
         if (!this.searchFields[field]) {

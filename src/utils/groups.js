@@ -5,8 +5,11 @@ export const handleize = (str) => {
 };
 */
 
-
 export const handleize = (str) => {
-  const handle = str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-$/, '').replace(/^-/, '');
+  const handle = str
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-$/, '')
+    .replace(/^-/, '');
   return handle;
 };

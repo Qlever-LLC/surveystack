@@ -34,9 +34,7 @@ module.exports = {
       new CompressionPlugin(),
     ],
   },
-  transpileDependencies: [
-    'vuetify',
-  ],
+  transpileDependencies: ['vuetify'],
   devServer: {
     port: process.env.VUE_APP_DEV_SERVER_PORT || 8080,
     disableHostCheck: true,

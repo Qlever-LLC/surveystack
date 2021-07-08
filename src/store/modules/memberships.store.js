@@ -1,9 +1,6 @@
 import api from '@/services/api.service';
 
-import {
-  MembershipService,
-  GroupService,
-} from '@/services/storage.service';
+import { MembershipService, GroupService } from '@/services/storage.service';
 
 const createInitialState = () => ({
   status: MembershipService.getStatus(),
@@ -14,13 +11,14 @@ const createInitialState = () => ({
 const initialState = createInitialState();
 
 const getters = {
-  status: state => state.status,
-  activeGroup: state => state.activeGroup,
-  memberships: state => state.memberships,
-  getPrefixedMemberships: state => (prefix = '/') => state.memberships.filter(m => m.group.path && m.group.path.startsWith(prefix)),
-  groups: state => state.memberships.map(m => m.group),
-  getPrefixedGroups: state => (prefix = '/') => state.memberships.filter(m => m.group.path && m.group.path.startsWith(prefix)).map(m => m.group),
-
+  status: (state) => state.status,
+  activeGroup: (state) => state.activeGroup,
+  memberships: (state) => state.memberships,
+  getPrefixedMemberships: (state) => (prefix = '/') =>
+    state.memberships.filter((m) => m.group.path && m.group.path.startsWith(prefix)),
+  groups: (state) => state.memberships.map((m) => m.group),
+  getPrefixedGroups: (state) => (prefix = '/') =>
+    state.memberships.filter((m) => m.group.path && m.group.path.startsWith(prefix)).map((m) => m.group),
 };
 
 const actions = {

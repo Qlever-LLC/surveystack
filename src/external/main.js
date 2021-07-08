@@ -11,7 +11,6 @@ if (typeof window.farmOS === 'undefined') {
 
 // Add a farmOS.map object that is available globaly.
 window.farmOS.map = {
-
   // Initialize an array of farmOS map instances.
   instances: [],
 
@@ -31,14 +30,14 @@ window.farmOS.map = {
 
     // Attach behaviors from farmOS.map.behaviors to the instance.
     // Sort by an optional weight value on each behavior.
-    const behaviors = Object.keys(this.behaviors).map(i => this.behaviors[i]);
+    const behaviors = Object.keys(this.behaviors).map((i) => this.behaviors[i]);
     behaviors.sort((first, second) => {
       const firstWeight = first.weight || 0;
       const secondWeight = second.weight || 0;
       if (firstWeight === secondWeight) {
         return 0;
       }
-      return (firstWeight < secondWeight) ? -1 : 1;
+      return firstWeight < secondWeight ? -1 : 1;
     });
     behaviors.forEach((behavior) => {
       instance.attachBehavior(behavior);
@@ -59,6 +58,6 @@ window.farmOS.map = {
 
   // Look up an instance index based on its target element ID.
   targetIndex(target) {
-    return this.instances.findIndex(instance => instance.target === target);
+    return this.instances.findIndex((instance) => instance.target === target);
   },
 };

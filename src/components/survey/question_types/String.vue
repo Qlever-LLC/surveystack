@@ -1,10 +1,6 @@
 <template>
   <div>
-    <app-control-label
-      :value="control.label"
-      :redacted="redacted"
-      :required="required"
-    />
+    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <div style="display: flex">
       <div style="flex: 1">
         <v-text-field
@@ -59,9 +55,9 @@ export default {
     },
     tryAutofocus() {
       if (
-        typeof document === 'undefined'
-        || !this.$refs.textField.$refs.input
-        || document.activeElement === this.$refs.input
+        typeof document === 'undefined' ||
+        !this.$refs.textField.$refs.input ||
+        document.activeElement === this.$refs.input
       ) {
         return false;
       }
