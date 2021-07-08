@@ -14,9 +14,7 @@
 
         <v-list-item-action>
           <v-btn icon>
-            <v-icon color="grey lighten-1" @click="remove(field)"
-              >mdi-delete</v-icon
-            >
+            <v-icon color="grey lighten-1" @click="remove(field)">mdi-delete</v-icon>
           </v-btn>
         </v-list-item-action>
       </v-list-item>
@@ -26,12 +24,10 @@
 
 <script>
 export default {
-  props: [
-    'value',
-  ],
+  props: ['value'],
   methods: {
     remove(e) {
-      const arr = this.value.filter(v => v !== e);
+      const arr = this.value.filter((v) => v !== e);
       this.$emit('input', arr);
     },
   },

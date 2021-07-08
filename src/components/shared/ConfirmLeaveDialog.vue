@@ -1,9 +1,5 @@
 <template>
-  <v-dialog
-    v-model="isVisible"
-    persistent
-    width="300"
-  >
+  <v-dialog v-model="isVisible" persistent width="300">
     <v-card>
       <v-card-title>
         {{ title }}
@@ -13,17 +9,10 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn
-          text
-          @click.stop="handleAbort"
-        >
+        <v-btn text @click.stop="handleAbort">
           Cancel
         </v-btn>
-        <v-btn
-          text
-          color="primary"
-          @click.stop="handleConfirm"
-        >
+        <v-btn text color="primary" @click.stop="handleConfirm">
           {{ confirmText }}
         </v-btn>
       </v-card-actions>

@@ -3,8 +3,8 @@
     <div class="display-1">
       KML Importer
       <app-tooltip
-        >Upload KML File. Note that KML Files may come as .kmz Files. Be sure to
-        extract the .kml from the .kmz first.</app-tooltip
+        >Upload KML File. Note that KML Files may come as .kmz Files. Be sure to extract the .kml from the .kmz
+        first.</app-tooltip
       >
     </div>
     <!-- TODO add small piece of info describing that kml often come in kmz -->
@@ -23,15 +23,12 @@
         ></v-autocomplete>
       </v-row>
       <v-row class="text-center">
-        <v-col
-          ><v-btn @click="$emit('change')" color="primary">Import</v-btn></v-col
-        >
+        <v-col><v-btn @click="$emit('change')" color="primary">Import</v-btn></v-col>
       </v-row>
     </template>
   </v-sheet>
 </template>
 <script>
-
 import togeojson from '@mapbox/togeojson';
 import wkx from 'wkx';
 
@@ -41,9 +38,7 @@ export default {
   components: {
     appTooltip,
   },
-  props: [
-    'value',
-  ],
+  props: ['value'],
   data() {
     return {
       kml: '', // string of KML
@@ -58,7 +53,7 @@ export default {
   methods: {
     importKml() {
       console.log('importing');
-      const dom = (new DOMParser()).parseFromString(this.kml, 'text/xml');
+      const dom = new DOMParser().parseFromString(this.kml, 'text/xml');
       const geojson = togeojson.kml(dom);
       console.log('imported geojson', geojson);
       this.geojson = geojson;
@@ -82,7 +77,7 @@ export default {
       const holder = await e.text();
       this.kml = holder;
       this.importKml();
-      this.fields = this.geojson.features.map(el => ({
+      this.fields = this.geojson.features.map((el) => ({
         name: el.properties.name,
         text: el.properties.name,
         value: el,

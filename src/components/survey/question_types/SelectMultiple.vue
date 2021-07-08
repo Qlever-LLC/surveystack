@@ -1,50 +1,18 @@
 <template>
   <div>
-    <app-control-label
-      :value="control.label"
-      :redacted="redacted"
-      :required="required"
-    />
+    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
 
-    <div
-      v-if="sourceIsValid"
-      class="py-2"
-    >
+    <div v-if="sourceIsValid" class="py-2">
       <div class="select-multiple-source">
-        <div
-          v-for="item in selections"
-          :key="item.value"
-        >
-          <v-checkbox
-            v-model="item.selected"
-            :label="item.label"
-            @change="onChange"
-            hide-details
-            class="my-1"
-          />
+        <div v-for="item in selections" :key="item.value">
+          <v-checkbox v-model="item.selected" :label="item.label" @change="onChange" hide-details class="my-1" />
         </div>
       </div>
 
-      <div
-        v-if="control.options.allowCustomSelection"
-        class="select-multiple-custom mt-3 d-flex align-center"
-      >
-        <v-checkbox
-          v-model="customSelected"
-          @change="onChange"
-          hide-details
-          class="mt-0"
-          :disabled="!customValue"
-        />
-        <v-text-field
-          label="other"
-          v-model="customValue"
-          outlined
-          dense
-          hide-details
-          @input="onCustomChange"
-        />
+      <div v-if="control.options.allowCustomSelection" class="select-multiple-custom mt-3 d-flex align-center">
+        <v-checkbox v-model="customSelected" @change="onChange" hide-details class="mt-0" :disabled="!customValue" />
+        <v-text-field label="other" v-model="customValue" outlined dense hide-details @input="onCustomChange" />
       </div>
     </div>
 
@@ -71,14 +39,17 @@ export default {
   methods: {
     getValueOrNull,
     onChange() {
-      const newValues = this.selections.filter(s => s.selected).map(s => s.value).sort();
+      const newValues = this.selections
+        .filter((s) => s.selected)
+        .map((s) => s.value)
+        .sort();
       if (this.customSelected && this.customValue) {
         newValues.push(this.customValue);
       }
       this.changed(this.getValueOrNull(newValues));
     },
     findSource(value) {
-      return this.control.options.source.find(x => x.value === value);
+      return this.control.options.source.find((x) => x.value === value);
     },
     sourceContains(v) {
       return this.control.options.source.map(({ value }) => value).includes(v);
@@ -93,15 +64,19 @@ export default {
       return this.control.options.source.filter(({ value, label }) => value && label);
     },
     sourceIsValid() {
-      return this.control.options.source
-        && Array.isArray(this.control.options.source)
-        && this.control.options.source.length > 0
-        && this.control.options.source.every(({ label, value }) => label && value);
+      return (
+        this.control.options.source &&
+        Array.isArray(this.control.options.source) &&
+        this.control.options.source.length > 0 &&
+        this.control.options.source.every(({ label, value }) => label && value)
+      );
     },
     valueIncludesCustom() {
-      return Array.isArray(this.value)
-        && Array.isArray(this.control.options.source)
-        && !this.value.every(this.sourceContains);
+      return (
+        Array.isArray(this.value) &&
+        Array.isArray(this.control.options.source) &&
+        !this.value.every(this.sourceContains)
+      );
     },
   },
   created() {
@@ -109,7 +84,7 @@ export default {
       return;
     }
 
-    this.selections = this.filteredSource.map(s => ({ value: s.value, label: s.label, selected: false }));
+    this.selections = this.filteredSource.map((s) => ({ value: s.value, label: s.label, selected: false }));
 
     if (!Array.isArray(this.value)) {
       return;
@@ -117,7 +92,7 @@ export default {
 
     // fill pre-defined
     this.value.forEach((v) => {
-      const selection = this.selections.find(s => s.value === v);
+      const selection = this.selections.find((s) => s.value === v);
       if (selection) {
         selection.selected = true;
       }
@@ -125,7 +100,7 @@ export default {
 
     // fill custom
     if (this.control.options.allowCustomSelection && this.valueIncludesCustom) {
-      [this.customValue] = this.value.filter(x => !this.findSource(x));
+      [this.customValue] = this.value.filter((x) => !this.findSource(x));
       if (this.customValue) {
         this.customSelected = true;
       }

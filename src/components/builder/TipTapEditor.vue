@@ -1,25 +1,9 @@
 <template>
-  <v-card
-    outlined
-    class="tiptap-editor"
-  >
+  <v-card outlined class="tiptap-editor">
     <v-card-title class="pa-0">
-      <editor-menu-bar
-        :editor="editor"
-        v-slot="{ commands, isActive }"
-      >
-        <v-toolbar
-          color="grey lighten-3"
-          style="zoom:0.75;"
-          flat
-          dense
-          v-if="!disabled"
-          class="pa-0 editor-toolbar"
-        >
-          <v-toolbar-items
-            class="pa-0 align-center justify-space-between"
-            color="grey lighten-3"
-          >
+      <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
+        <v-toolbar color="grey lighten-3" style="zoom:0.75;" flat dense v-if="!disabled" class="pa-0 editor-toolbar">
+          <v-toolbar-items class="pa-0 align-center justify-space-between" color="grey lighten-3">
             <div>
               <v-btn
                 icon
@@ -50,7 +34,6 @@
                 @click="commands.heading({ level: 2 })"
               >
                 <v-icon>mdi-format-header-2</v-icon>
-
               </v-btn>
 
               <v-btn
@@ -61,7 +44,6 @@
                 @click="commands.heading({ level: 3 })"
               >
                 <v-icon>mdi-format-header-3</v-icon>
-
               </v-btn>
             </div>
 
@@ -202,7 +184,6 @@
               >
                 <v-icon>mdi-minus</v-icon>
               </v-btn> -->
-
           </v-toolbar-items>
         </v-toolbar>
         <!--
@@ -316,20 +297,10 @@
                   ref="linkInput"
                   @keydown.esc="hideLinkMenu"
                 />
-                <v-btn
-                  small
-                  class="menububble__button"
-                  @click="setLinkUrl(commands.link, linkUrl)"
-                  icon
-                >
+                <v-btn small class="menububble__button" @click="setLinkUrl(commands.link, linkUrl)" icon>
                   <v-icon>mdi-check</v-icon>
                 </v-btn>
-                <v-btn
-                  small
-                  class="menububble__button mr-1"
-                  @click="setLinkUrl(commands.link, null)"
-                  icon
-                >
+                <v-btn small class="menububble__button mr-1" @click="setLinkUrl(commands.link, null)" icon>
                   <v-icon>mdi-close</v-icon>
                 </v-btn>
               </form>
@@ -341,32 +312,21 @@
                   :class="{ 'is-active': isActive.link() }"
                   icon
                 >
-                  <span>{{ isActive.link() ? 'Update Link' : 'Add Link'}}</span>
+                  <span>{{ isActive.link() ? 'Update Link' : 'Add Link' }}</span>
                   <v-icon>mdi-link</v-icon>
                 </v-btn>
               </template>
             </v-card-text>
           </v-card>
-
         </div>
       </editor-menu-bubble>
-      <editor-content
-        :disabled="!disabled"
-        :editor="editor"
-        class="tiptap-editor"
-        style="width: 100%; height: 100%;"
-      />
+      <editor-content :disabled="!disabled" :editor="editor" class="tiptap-editor" style="width: 100%; height: 100%;" />
     </v-card-text>
   </v-card>
 </template>
 
 <script>
-import {
-  Editor,
-  EditorContent,
-  EditorMenuBar,
-  EditorMenuBubble,
-} from 'tiptap';
+import { Editor, EditorContent, EditorMenuBar, EditorMenuBubble } from 'tiptap';
 import {
   Blockquote,
   CodeBlock,
@@ -392,7 +352,6 @@ import {
 } from 'tiptap-extensions';
 
 import CustomLink from '@/utils/TipTapCustomLink';
-
 
 export default {
   components: {

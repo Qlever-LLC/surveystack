@@ -1,5 +1,7 @@
 export default function slugify(text) {
-  return text.toString().toLowerCase()
+  return text
+    .toString()
+    .toLowerCase()
     .replace(/\s+/g, '_') // Replace spaces with -
     .replace(/[^\w_]+/g, '') // Remove all non-word chars
     .replace(/__+/g, '-') // Replace multiple - with single -

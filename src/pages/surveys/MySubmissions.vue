@@ -3,39 +3,19 @@
     <v-container>
       <v-row class="my-2">
         <v-spacer />
-        <v-btn
-          color="primary"
-          v-if="activeTab !== 'sent' && readyToSubmit.length"
-          @click="handleSubmitCompleted"
-        >
+        <v-btn color="primary" v-if="activeTab !== 'sent' && readyToSubmit.length" @click="handleSubmitCompleted">
           Submit Completed
           <v-icon class="ml-2">mdi-cloud-upload-outline</v-icon>
         </v-btn>
       </v-row>
       <v-row class="d-flex flex-grow-1">
-        <v-tabs
-          flat
-          v-model="activeTab"
-          centered
-          icons-and-text
-          grow
-          @change="updateActiveTab"
-        >
-          <v-tab
-            v-for="tab in tabs"
-            :key="tab.name"
-            :href="`#${tab.name}`"
-          >
+        <v-tabs flat v-model="activeTab" centered icons-and-text grow @change="updateActiveTab">
+          <v-tab v-for="tab in tabs" :key="tab.name" :href="`#${tab.name}`">
             {{ tab.title }}
             <v-icon>{{ tab.icon }}</v-icon>
           </v-tab>
         </v-tabs>
-        <v-tabs-items
-          v-model="activeTab"
-          style="height: 100%;"
-          class="flex-grow-1"
-          v-if="!isLoading"
-        >
+        <v-tabs-items v-model="activeTab" style="height: 100%;" class="flex-grow-1" v-if="!isLoading">
           <v-tab-item
             v-for="tab in tabs"
             :key="tab.name"
@@ -43,29 +23,22 @@
             class="flex-grow-1 flex-column align-center justify-center align-content-center"
             style="height: 100%;"
           >
-            <v-card
-              min-height="70vh"
-              class="d-flex flex-column justify-space-between"
-            >
+            <v-card min-height="70vh" class="d-flex flex-column justify-space-between">
               <template v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
                 <v-card-text>
                   <v-list>
                     <template v-for="(item, i) in activeTabPageContent">
                       <v-list-item :key="i">
-                        <v-list-item-content
-                          @click="select(item)"
-                          class="cursor-pointer"
-                          two-line
-                        >
+                        <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                           <v-list-item-title v-if="surveyForSubmission(item)">
-                            {{ surveyForSubmission(item).name}}
+                            {{ surveyForSubmission(item).name }}
                           </v-list-item-title>
                           <v-list-item-title v-else>
                             Loading name
                           </v-list-item-title>
                           <v-list-item-subtitle>
-                            ID: {{ item._id }} <br>
-                            {{ (new Date(item.meta.dateCreated)).toLocaleString() }}
+                            ID: {{ item._id }} <br />
+                            {{ new Date(item.meta.dateCreated).toLocaleString() }}
                           </v-list-item-subtitle>
                         </v-list-item-content>
                         <v-list-item-action>
@@ -86,47 +59,33 @@
                           </v-tooltip>
                         </v-list-item-action>
                       </v-list-item>
-                      <v-divider
-                        v-if="i + 1 < tab.content.length"
-                        :key="`divider_${i}`"
-                      ></v-divider>
+                      <v-divider v-if="i + 1 < tab.content.length" :key="`divider_${i}`"></v-divider>
                     </template>
                   </v-list>
                 </v-card-text>
                 <v-spacer class="flex-grow-1" />
                 <v-card-actions>
-                  <v-pagination
-                    v-model="page"
-                    :length="activeTabPaginationLength"
-                    color="grey darken-1"
-                  />
+                  <v-pagination v-model="page" :length="activeTabPaginationLength" color="grey darken-1" />
                 </v-card-actions>
               </template>
               <template v-else-if="tab.name === 'sent' && tab.content.length > 0">
                 <v-list>
                   <template v-for="(item, i) in tab.content">
                     <v-list-item :key="i">
-                      <v-list-item-content
-                        @click="select(item)"
-                        class="cursor-pointer"
-                        two-line
-                      >
+                      <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                         <v-list-item-title v-if="surveyForSubmission(item)">
-                          {{ surveyForSubmission(item).name}}
+                          {{ surveyForSubmission(item).name }}
                         </v-list-item-title>
                         <v-list-item-title v-else>
                           Loading name
                         </v-list-item-title>
                         <v-list-item-subtitle>
-                          ID: {{ item._id }} <br>
-                          {{ (new Date(item.meta.dateCreated)).toLocaleString() }}
+                          ID: {{ item._id }} <br />
+                          {{ new Date(item.meta.dateCreated).toLocaleString() }}
                         </v-list-item-subtitle>
                       </v-list-item-content>
                     </v-list-item>
-                    <v-divider
-                      v-if="i + 1 < tab.content.length"
-                      :key="`divider_${i}`"
-                    ></v-divider>
+                    <v-divider v-if="i + 1 < tab.content.length" :key="`divider_${i}`"></v-divider>
                   </template>
                 </v-list>
                 <v-spacer />
@@ -137,49 +96,25 @@
                   color="grey darken-1"
                 />
               </template>
-              <v-container
-                fill-height
-                fluid
-                v-else
-              >
-                <v-row
-                  align="center"
-                  justify="center"
-                >
+              <v-container fill-height fluid v-else>
+                <v-row align="center" justify="center">
                   <v-col>
                     <div class="d-flex flex-column align-center">
                       <v-icon large>mdi-file-multiple</v-icon>
-                      <v-alert
-                        type="info"
-                        text
-                        class="ma-4"
-                      >No drafts yet</v-alert>
+                      <v-alert type="info" text class="ma-4">No drafts yet</v-alert>
                     </div>
                   </v-col>
                 </v-row>
               </v-container>
             </v-card>
-
           </v-tab-item>
         </v-tabs-items>
-        <v-card
-          v-else
-          width="100%"
-          style="min-height: 50vh"
-        >
-          <v-card-text
-            class="d-flex align-center justify-center"
-            style="height: 100%"
-          >
-            <v-progress-circular
-              :size="50"
-              color="primary"
-              indeterminate
-            />
+        <v-card v-else width="100%" style="min-height: 50vh">
+          <v-card-text class="d-flex align-center justify-center" style="height: 100%">
+            <v-progress-circular :size="50" color="primary" indeterminate />
           </v-card-text>
         </v-card>
       </v-row>
-
     </v-container>
     <!-- @input="handleConfirmSubmissionDialogInput" -->
     <confirm-submission-dialog
@@ -214,7 +149,6 @@ import ConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissio
 import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
-
 
 const PAGINATION_LIMIT = 10;
 
@@ -272,7 +206,7 @@ export default {
       return this.$store.getters['submissions/readyToSubmit'];
     },
     activeTabBody() {
-      return this.tabs.find(t => t.name === this.activeTab);
+      return this.tabs.find((t) => t.name === this.activeTab);
     },
     activeTabPageContent() {
       if (this.activeTab === 'drafts') {
@@ -398,9 +332,7 @@ export default {
       }
     },
     surveyForSubmission(submission) {
-      return this.$store.state.surveys.surveys.find(
-        survey => survey._id === submission.meta.survey.id,
-      );
+      return this.$store.state.surveys.surveys.find((survey) => survey._id === submission.meta.survey.id);
     },
     async select(draft) {
       console.log('select', draft._id, this.getSubmission(draft._id));
@@ -417,7 +349,7 @@ export default {
     },
     sortSubmissions(submissions) {
       return [...submissions].sort(
-        (a, b) => (new Date(b.meta.dateModified)).valueOf() - (new Date(a.meta.dateModified)).valueOf(),
+        (a, b) => new Date(b.meta.dateModified).valueOf() - new Date(a.meta.dateModified).valueOf()
       );
     },
     async setSubmissionGroup(id, groupId) {

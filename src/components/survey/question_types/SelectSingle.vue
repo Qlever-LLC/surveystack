@@ -1,10 +1,6 @@
 <template>
   <div class="select-single question">
-    <app-control-label
-      :value="control.label"
-      :redacted="redacted"
-      :required="required"
-    />
+    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
     <div class="py-2">
       <v-radio-group
@@ -15,12 +11,7 @@
         data-test-id="radio-group"
         hide-details
       >
-        <v-radio
-          v-for="(item) in filteredSource"
-          :label="item.label"
-          :value="item.value"
-          :key="item.key"
-        />
+        <v-radio v-for="item in filteredSource" :label="item.label" :value="item.value" :key="item.key" />
         <v-radio
           :value="customSelection || 'other'"
           v-if="control.options.allowCustomSelection"
@@ -41,12 +32,10 @@
             />
           </template>
         </v-radio>
-
       </v-radio-group>
       <app-control-error v-else>No options specified, please update survey definition</app-control-error>
     </div>
     <app-control-more-info :value="control.moreInfo" />
-
   </div>
 </template>
 
@@ -106,25 +95,22 @@ export default {
       return this.control.options.source.filter(({ value, label }) => value && label);
     },
     sourceIsValid() {
-      return this.control.options.source
-        && Array.isArray(this.control.options.source)
-        && this.control.options.source.length > 0
-        && this.control.options.source.every(({ label, value }) => label && value);
+      return (
+        this.control.options.source &&
+        Array.isArray(this.control.options.source) &&
+        this.control.options.source.length > 0 &&
+        this.control.options.source.every(({ label, value }) => label && value)
+      );
     },
     valueIsCustom() {
       // Submission question value is not present in the list of entries in `control.options.source`
-      return !this.control.options.source.some(item => this.value && item.value === this.value[0]);
+      return !this.control.options.source.some((item) => this.value && item.value === this.value[0]);
     },
   },
   created() {
     // set `customSelection` value to submission question value if we allow the user to enter custom selections
     // and the current question value is set to a value that is not in entries of `control.options.source`
-    if (
-      this.value
-      && this.value[0]
-      && this.control.options.allowCustomSelection
-      && this.valueIsCustom
-    ) {
+    if (this.value && this.value[0] && this.control.options.allowCustomSelection && this.valueIsCustom) {
       [this.customSelection] = this.value;
     }
   },

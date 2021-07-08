@@ -1,24 +1,10 @@
 <template>
   <v-container>
-    <h1>{{ editMode ? "Edit script" : "Create script" }}</h1>
-    <span class="text--secondary">{{this.entity._id}}</span>
-    <v-form
-      class="mt-3"
-      @keydown.enter.prevent="submit"
-    >
-      <v-text-field
-        v-model="entity.name"
-        label="Name"
-        outlined
-        hide-details
-      />
-      <active-group-selector
-        class="my-4"
-        label="Group"
-        v-model="entity.meta.group"
-        outlined
-        returnObject
-      />
+    <h1>{{ editMode ? 'Edit script' : 'Create script' }}</h1>
+    <span class="text--secondary">{{ this.entity._id }}</span>
+    <v-form class="mt-3" @keydown.enter.prevent="submit">
+      <v-text-field v-model="entity.name" label="Name" outlined hide-details />
+      <active-group-selector class="my-4" label="Group" v-model="entity.meta.group" outlined returnObject />
       <code-editor
         title=""
         class="code-editor"
@@ -35,15 +21,8 @@
         :rows="15"
       /> -->
       <div class="d-flex mt-2 justify-end">
-
-        <v-btn
-          text
-          @click="cancel"
-        >Cancel</v-btn>
-        <v-btn
-          color="primary"
-          @click="submit"
-        >Save</v-btn>
+        <v-btn text @click="cancel">Cancel</v-btn>
+        <v-btn color="primary" @click="submit">Save</v-btn>
       </div>
     </v-form>
   </v-container>
@@ -61,7 +40,6 @@ import codeEditor from '@/components/ui/CodeEditor.vue';
 
 // When lazy-loading, the code editor just keeps on growing and growing :/
 // const codeEditor = () => import('@/components/ui/CodeEditor.vue');
-
 
 export default {
   data() {
@@ -101,7 +79,7 @@ export async function process(props, state) {
     value: null,
     status: {
       type: statusTypes.SUCCESS,
-      message: \`script successfully executed at ${(new Date().toISOString(true))}\`,
+      message: \`script successfully executed at ${new Date().toISOString(true)}\`,
     },
   }
 }
@@ -198,9 +176,7 @@ export function render(props, state, setState) {
     },
   },
   async created() {
-    this.editMode = !this.$route.matched.some(
-      ({ name }) => name === 'scripts-new',
-    );
+    this.editMode = !this.$route.matched.some(({ name }) => name === 'scripts-new');
 
     this.entity._id = new ObjectId();
 

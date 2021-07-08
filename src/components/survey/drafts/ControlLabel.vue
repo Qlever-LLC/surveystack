@@ -1,21 +1,9 @@
 <template>
-  <div
-    v-if="value || required || redacted"
-    class="d-flex align-center control-label-wrapper"
-  >
-    <div
-      class="control-label"
-      v-if="value"
-    >{{value}}</div>
+  <div v-if="value || required || redacted" class="d-flex align-center control-label-wrapper">
+    <div class="control-label" v-if="value">{{ value }}</div>
     <v-spacer />
-    <app-redacted
-      v-if="redacted"
-      bottom
-    />
-    <app-required
-      v-if="required"
-      bottom
-    />
+    <app-redacted v-if="redacted" bottom />
+    <app-required v-if="required" bottom />
   </div>
 </template>
 

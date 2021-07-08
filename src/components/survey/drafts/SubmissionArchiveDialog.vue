@@ -1,22 +1,13 @@
 <template>
-  <v-dialog
-    v-model="show"
-    :width="width"
-    :max-width="maxWidth"
-    :persistent="persistent"
-  >
+  <v-dialog v-model="show" :width="width" :max-width="maxWidth" :persistent="persistent">
     <v-card>
       <v-card-title class="headline">
-        <slot name="title">{{title}}</slot>
+        <slot name="title">{{ title }}</slot>
       </v-card-title>
       <v-card-text>
         <slot name="default"></slot>
         <h3 class="mt-3">Please choose a reason</h3>
-        <v-select
-          v-model="archiveReason"
-          :items="availableArchiveReasons"
-          outlined
-        />
+        <v-select v-model="archiveReason" :items="availableArchiveReasons" outlined />
         <v-text-field
           v-if="archiveReason === 'OTHER'"
           label="Please specify other reason"
@@ -26,15 +17,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn
-          text
-          @click="$emit('cancel')"
-        >Cancel</v-btn>
-        <v-btn
-          text
-          @click="confirm"
-          color="error"
-        >{{labelConfirm ? labelConfirm : 'OK'}}</v-btn>
+        <v-btn text @click="$emit('cancel')">Cancel</v-btn>
+        <v-btn text @click="confirm" color="error">{{ labelConfirm ? labelConfirm : 'OK' }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -64,14 +48,7 @@ export default {
     return {
       archiveReason: this.reason,
       archiveReasonOther: '',
-      availableArchiveReasons: [
-        'TEST_DATA',
-        'INCORRECT_DATA',
-        'EQUIPMENT_ERROR',
-        'USER_ERROR',
-        'RESUBMIT',
-        'OTHER',
-      ],
+      availableArchiveReasons: ['TEST_DATA', 'INCORRECT_DATA', 'EQUIPMENT_ERROR', 'USER_ERROR', 'RESUBMIT', 'OTHER'],
     };
   },
   methods: {

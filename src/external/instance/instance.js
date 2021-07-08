@@ -14,9 +14,8 @@ import { measureGeometry } from '../utils/measure';
 
 // Define an object that represents a single farmOS map instance.
 const createInstance = ({ target, options = {} }) => {
-
   // Get the system of measurement from options, if provided, or set a default.
-  const units = (options.units === 'us') ? 'us' : 'metric';
+  const units = options.units === 'us' ? 'us' : 'metric';
 
   // Validate the units that are stored in the options, which is passed into
   // other functions below.
@@ -25,7 +24,6 @@ const createInstance = ({ target, options = {} }) => {
 
   // Create the instance object.
   const instance = {
-
     // Set the map's system of measurement.
     units,
 

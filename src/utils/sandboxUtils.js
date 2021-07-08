@@ -6,11 +6,8 @@
 // checkIfAll --> all these things (other things may also be, but all these things)
 //
 
-
 function match(answers, thisValue) {
-  if ((typeof thisValue === 'string'
-        || typeof thisValue === 'number')
-        && answers.includes(thisValue)) {
+  if ((typeof thisValue === 'string' || typeof thisValue === 'number') && answers.includes(thisValue)) {
     return true;
   }
   return false;
@@ -25,12 +22,15 @@ function match(answers, thisValue) {
  * @param {object} question you're asking about
  * @param {answer} answer(s) (strings or numbers) to check against
  */
-export function checkIfAny(question, ...answers) { // answers is always passed as an array!
+export function checkIfAny(question, ...answers) {
+  // answers is always passed as an array!
   let values = question.value;
   // return false if question is not relevant
-  if (typeof question.meta !== 'undefined'
-    && typeof question.meta.computedRelevance !== 'undefined'
-    && question.meta.computedRelevance === false) {
+  if (
+    typeof question.meta !== 'undefined' &&
+    typeof question.meta.computedRelevance !== 'undefined' &&
+    question.meta.computedRelevance === false
+  ) {
     // console.log(`answer: ${JSON.stringify(answers)}
     // question.value: ${JSON.stringify(values)}
     // returned: false
@@ -58,7 +58,9 @@ export function checkIfAny(question, ...answers) { // answers is always passed a
     // returned: false
     // reason: relevant but unanswered`);
     return false;
-  } if (values.some(thisValue => match(answers, thisValue))) { // works for 0, 'a string', '',
+  }
+  if (values.some((thisValue) => match(answers, thisValue))) {
+    // works for 0, 'a string', '',
     // console.log(`answer: ${JSON.stringify(answers)}
     // question.value: ${JSON.stringify(values)}
     // returned: true
@@ -72,7 +74,6 @@ export function checkIfAny(question, ...answers) { // answers is always passed a
   return false;
 }
 
-
 /**
  * checkIfNone  checks the answer from the question against 'answers' provided and says true only if 1) it's answered, 2) NONE of the answers provided are there, and 3) the question is relevant
  * works with strings and arrays (for array, use .includes())
@@ -85,9 +86,11 @@ export function checkIfAny(question, ...answers) { // answers is always passed a
 export function checkIfNone(question, ...answers) {
   let values = question.value;
   // return false if question is not relevant
-  if (typeof question.meta !== 'undefined'
-    && typeof question.meta.computedRelevance !== 'undefined'
-    && question.meta.computedRelevance === false) {
+  if (
+    typeof question.meta !== 'undefined' &&
+    typeof question.meta.computedRelevance !== 'undefined' &&
+    question.meta.computedRelevance === false
+  ) {
     // console.log(`answer: ${JSON.stringify(answers)}
     // question.value: ${JSON.stringify(values)}
     // returned: false
@@ -115,7 +118,8 @@ export function checkIfNone(question, ...answers) {
     // returned: false
     // reason: relevant but is unanswered (null)`);
     return false;
-  } if (!values.some(thisValue => match(answers, thisValue))) {
+  }
+  if (!values.some((thisValue) => match(answers, thisValue))) {
     // console.log(`answer: ${JSON.stringify(answers)}
     // question.value: ${JSON.stringify(values)}
     // returned: true
@@ -129,7 +133,6 @@ export function checkIfNone(question, ...answers) {
   return false;
 }
 
-
 // /////////////// API COMPOSE //////////////////////////
 
 /**
@@ -139,11 +142,15 @@ export function checkIfNone(question, ...answers) {
 export function getCleanArray(chooseMult) {
   let thisAnswer = [];
   // if it's not relevant or null, set it to empty array
-  if (typeof chooseMult === 'undefined') { // question doesnt' exist
+  if (typeof chooseMult === 'undefined') {
+    // question doesnt' exist
     return thisAnswer;
-  } if (typeof chooseMult.meta !== 'undefined' // question not relevant
-        && typeof chooseMult.meta.computedRelevance !== 'undefined'
-        && chooseMult.meta.computedRelevance === false) {
+  }
+  if (
+    typeof chooseMult.meta !== 'undefined' && // question not relevant
+    typeof chooseMult.meta.computedRelevance !== 'undefined' &&
+    chooseMult.meta.computedRelevance === false
+  ) {
     return thisAnswer;
   }
   if (chooseMult.value === null) {
@@ -162,11 +169,15 @@ export function getCleanArray(chooseMult) {
 export function getClean(chooseOne) {
   let thisAnswer = '';
   // if it's not relevant or null, set it to empty string
-  if (typeof chooseOne === 'undefined') { // question doesnt' exist
+  if (typeof chooseOne === 'undefined') {
+    // question doesnt' exist
     return thisAnswer;
-  } if (typeof chooseOne.meta !== 'undefined' // question not relevant
-        && typeof chooseOne.meta.computedRelevance !== 'undefined'
-        && chooseOne.meta.computedRelevance === false) {
+  }
+  if (
+    typeof chooseOne.meta !== 'undefined' && // question not relevant
+    typeof chooseOne.meta.computedRelevance !== 'undefined' &&
+    chooseOne.meta.computedRelevance === false
+  ) {
     return thisAnswer;
   }
   if (chooseOne.value === null) {

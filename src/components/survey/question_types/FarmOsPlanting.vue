@@ -1,19 +1,9 @@
 <template>
   <div>
-    <app-control-label
-      :value="control.label"
-      :redacted="redacted"
-      :required="required"
-    />
+    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
 
-    <v-progress-circular
-      v-if="loading"
-      indeterminate
-      color="primary"
-      class="my-8"
-    >
-    </v-progress-circular>
+    <v-progress-circular v-if="loading" indeterminate color="primary" class="my-8"> </v-progress-circular>
 
     <v-list style="overflow: auto;">
       <v-list-item-group
@@ -30,19 +20,13 @@
           :disabled="!control.options.hasMultipleSelections && item.value.isField"
         >
           <template v-slot:default="{ active }">
-            <v-list-item-action
-              class="ml-2 mr-2"
-              v-if="!item.value.isField"
-            >
+            <v-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
               <v-checkbox
-                v-if="control.options.hasMultipleSelections "
+                v-if="control.options.hasMultipleSelections"
                 :input-value="active"
                 :true-value="hashItem(item)"
               />
-              <v-radio-group
-                v-else
-                :value="active"
-              >
+              <v-radio-group v-else :value="active">
                 <v-radio :value="true" />
               </v-radio-group>
             </v-list-item-action>
@@ -128,7 +112,6 @@ const transform = (assets) => {
       return;
     }
 
-
     asset.value.location.forEach((location) => {
       areas[`${asset.value.farmId}.${location.id}`] = {
         farmId: asset.value.farmId,
@@ -146,9 +129,8 @@ const transform = (assets) => {
         return false;
       }
 
-      return asset.value.location.some(loc => loc.id === area.location.id);
+      return asset.value.location.some((loc) => loc.id === area.location.id);
     });
-
 
     const field = {
       value: {
@@ -171,7 +153,6 @@ const transform = (assets) => {
       r.value.hash = hashItem(r);
       return r;
     });
-
 
     return [field, ...assetItems];
   });
@@ -201,7 +182,6 @@ const transform = (assets) => {
 
     });
   }); */
-
 
   const withoutAreaSection = {
     value: {
@@ -236,7 +216,7 @@ export default {
   computed: {
     listSelection() {
       if (Array.isArray(this.value)) {
-        return this.value.map(v => hashItem({ value: v }));
+        return this.value.map((v) => hashItem({ value: v }));
       }
       return hashItem({ value: this.value });
     },
@@ -259,37 +239,38 @@ export default {
 
       console.log('hashes', hashes);
 
-
       const selectedItems = hashes.map((h) => {
         if (typeof h !== 'string') {
           return h;
         }
-        return (this.transformed.find(t => t.value.hash === h)).value;
+        return this.transformed.find((t) => t.value.hash === h).value;
       });
-
 
       // const [farmId, assetId] = itemId.split('.');
 
-      const fields = selectedItems.filter(item => !!item.isField);
+      const fields = selectedItems.filter((item) => !!item.isField);
 
       // selected assets
-      const assets = selectedItems.filter(item => !item.isField);
+      const assets = selectedItems.filter((item) => !item.isField);
 
-      const assetsToSelect = fields.flatMap(field => this.transformed
-        .filter(item => !item.value.isField)
-        .filter(item => item.value.farmId === field.farmId)
-        .filter(item => item.value.location.some(loc => loc.id === field.location.id)));
-
+      const assetsToSelect = fields.flatMap((field) =>
+        this.transformed
+          .filter((item) => !item.value.isField)
+          .filter((item) => item.value.farmId === field.farmId)
+          .filter((item) => item.value.location.some((loc) => loc.id === field.location.id))
+      );
 
       assetsToSelect.forEach((assetToSelect) => {
-        if (assets.some(asset => asset.farmId === assetToSelect.value.farmId
-          && asset.assetId === assetToSelect.value.assetId)) {
+        if (
+          assets.some(
+            (asset) => asset.farmId === assetToSelect.value.farmId && asset.assetId === assetToSelect.value.assetId
+          )
+        ) {
           // skip
         } else {
           assets.push(assetToSelect.value);
         }
       });
-
 
       if (!Array.isArray(hashesArg)) {
         console.log('onChange', assets[0]);

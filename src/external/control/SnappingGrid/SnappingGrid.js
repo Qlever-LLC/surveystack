@@ -4,12 +4,7 @@ import Draw from 'ol/interaction/Draw';
 import Snap from 'ol/interaction/Snap';
 import { CLASS_CONTROL, CLASS_UNSELECTABLE } from 'ol/css';
 import EventType from 'ol/events/EventType';
-import {
-  Circle as CircleStyle,
-  Fill,
-  Stroke,
-  Style,
-} from 'ol/style';
+import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 
@@ -23,14 +18,12 @@ import forEachLayer from '../../utils/forEachLayer';
 
 import './SnappingGrid.css';
 
-
 /**
  * @typedef {Object} Options
  * @property {string} [units] The system of measurement - either 'us' or 'metric'.
  * @property {HTMLElement|string} [target] Specify a target if you want the
  * control to be rendered outside of the map's viewport.
  */
-
 
 /**
  * @classdesc
@@ -39,7 +32,6 @@ import './SnappingGrid.css';
  * @api
  */
 class SnappingGrid extends Control {
-
   /**
    * @param {Options=} opts SnappingGrid options.
    */
@@ -120,7 +112,7 @@ class SnappingGrid extends Control {
       addUnit('ft');
       addUnit('in');
 
-      unitSelector.value = (options.units === 'us' ? 'ft' : 'm');
+      unitSelector.value = options.units === 'us' ? 'ft' : 'm';
       unitSelector.classList.add('collabsible');
 
       unitSelector.addEventListener('change', self.handleUnitsChanged.bind(this), false);
@@ -191,9 +183,11 @@ class SnappingGrid extends Control {
   handleMouseLeave() {
     this.mouseIsOver = false;
 
-    if (document.activeElement === this.innerControlElements.xInput
-        || document.activeElement === this.innerControlElements.yInput
-        || document.activeElement === this.innerControlElements.unitSelector) {
+    if (
+      document.activeElement === this.innerControlElements.xInput ||
+      document.activeElement === this.innerControlElements.yInput ||
+      document.activeElement === this.innerControlElements.unitSelector
+    ) {
       return;
     }
 
@@ -264,15 +258,15 @@ class SnappingGrid extends Control {
       const updateState = () => {
         const mapHasOtherDrawInteractions = this.mapHasOtherDrawInteractions();
 
-        const mapInteractions = this.getMap().getInteractions().getArray();
+        const mapInteractions = this.getMap()
+          .getInteractions()
+          .getArray();
 
         const mapHasOurDrawInteraction = mapInteractions.some(
-          interaction => interaction === this.drawSnappingOriginsInteraction,
+          (interaction) => interaction === this.drawSnappingOriginsInteraction
         );
 
-        const mapHasOurGridInteraction = mapInteractions.some(
-          interaction => interaction === this.grid,
-        );
+        const mapHasOurGridInteraction = mapInteractions.some((interaction) => interaction === this.grid);
 
         if (mapHasOtherDrawInteractions && mapHasOurDrawInteraction) {
           this.resetDrawInteraction();
@@ -286,8 +280,7 @@ class SnappingGrid extends Control {
           this.innerControlElements.activateButton.title = 'Enable the Snapping Grid';
         }
 
-        this.innerControlElements.activateButton.disabled = mapHasOtherDrawInteractions
-          && !mapHasOurGridInteraction;
+        this.innerControlElements.activateButton.disabled = mapHasOtherDrawInteractions && !mapHasOurGridInteraction;
 
         this.grid.setActive(mapHasOurGridInteraction);
 
@@ -302,7 +295,6 @@ class SnappingGrid extends Control {
 
         this.updateGridSnapInteraction();
       }
-
     }
   }
 
@@ -332,19 +324,23 @@ class SnappingGrid extends Control {
       return -1;
     }
 
-    const otherDrawInteractionLastIdx = findLastIndex(mapInteractionsArr,
-      interaction => typeof interaction.finishDrawing === 'function'
-        && interaction !== this.drawSnappingOriginsInteraction);
+    const otherDrawInteractionLastIdx = findLastIndex(
+      mapInteractionsArr,
+      (interaction) =>
+        typeof interaction.finishDrawing === 'function' && interaction !== this.drawSnappingOriginsInteraction
+    );
 
-    const otherSnapInteractionLastIdx = findLastIndex(mapInteractionsArr,
-      interaction => typeof interaction.snapTo === 'function'
-        && interaction !== this.gridSnapInteraction);
+    const otherSnapInteractionLastIdx = findLastIndex(
+      mapInteractionsArr,
+      (interaction) => typeof interaction.snapTo === 'function' && interaction !== this.gridSnapInteraction
+    );
 
-    const ourSnapInteractionLastIdx = findLastIndex(mapInteractionsArr,
-      interaction => interaction === this.gridSnapInteraction);
+    const ourSnapInteractionLastIdx = findLastIndex(
+      mapInteractionsArr,
+      (interaction) => interaction === this.gridSnapInteraction
+    );
 
-    if (Math.max(otherDrawInteractionLastIdx, otherSnapInteractionLastIdx)
-        > ourSnapInteractionLastIdx) {
+    if (Math.max(otherDrawInteractionLastIdx, otherSnapInteractionLastIdx) > ourSnapInteractionLastIdx) {
       // Make sure our snap interaction is always on top of other draw/snap interactions
       this.getMap().addInteraction(this.gridSnapInteraction);
       if (ourSnapInteractionLastIdx !== -1) {
@@ -434,9 +430,11 @@ class SnappingGrid extends Control {
    * @private
    */
   mapHasOtherDrawInteractions() {
-    const otherDrawInteractions = this.getMap().getInteractions().getArray()
-      .filter(interaction => typeof interaction.finishDrawing === 'function')
-      .filter(interaction => interaction !== this.drawSnappingOriginsInteraction);
+    const otherDrawInteractions = this.getMap()
+      .getInteractions()
+      .getArray()
+      .filter((interaction) => typeof interaction.finishDrawing === 'function')
+      .filter((interaction) => interaction !== this.drawSnappingOriginsInteraction);
 
     return !!otherDrawInteractions.length;
   }
@@ -496,8 +494,7 @@ class SnappingGrid extends Control {
    * @private
    */
   getXDim() {
-    return parseFloat(this.innerControlElements.xInput.value)
-      * this.getSelectedUnitConversionFactor();
+    return parseFloat(this.innerControlElements.xInput.value) * this.getSelectedUnitConversionFactor();
   }
 
   /**
@@ -505,8 +502,7 @@ class SnappingGrid extends Control {
    * @private
    */
   getYDim() {
-    return parseFloat(this.innerControlElements.yInput.value)
-      * this.getSelectedUnitConversionFactor();
+    return parseFloat(this.innerControlElements.yInput.value) * this.getSelectedUnitConversionFactor();
   }
 
   /**
@@ -554,7 +550,6 @@ class SnappingGrid extends Control {
     map.addInteraction(this.grid);
     this.grid.setActive(true);
   }
-
 }
 
 export default SnappingGrid;

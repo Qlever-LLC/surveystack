@@ -1,9 +1,6 @@
 <template>
   <div>
-    <ios-install-banner
-      v-if="showIosInstallBanner"
-      v-model="showIosInstallBanner"
-    />
+    <ios-install-banner v-if="showIosInstallBanner" v-model="showIosInstallBanner" />
     <default-install-banner v-else />
   </div>
 </template>
@@ -23,14 +20,9 @@ export default {
       showIosInstallBanner: false,
     };
   },
-  methods: {
-  },
+  methods: {},
   created() {
-    if (
-      isIosSafari()
-      && !isInStandaloneMode()
-      && !localStorage.getItem('iosInstallBannerDismissed')
-    ) {
+    if (isIosSafari() && !isInStandaloneMode() && !localStorage.getItem('iosInstallBannerDismissed')) {
       this.showIosInstallBanner = true;
     }
   },

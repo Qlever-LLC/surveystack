@@ -1,10 +1,6 @@
 <template>
   <div class="question question-script">
-    <app-control-label
-      :value="control.label"
-      :redacted="redacted"
-      :required="required"
-    />
+    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
 
     <app-dialog
@@ -18,17 +14,14 @@
       <template v-slot:title>Installing Android App</template>
       <template>
         <p class="text--primary">
-          Installing the Android Application allows to connect to Bluetooth and
-          USB Devices for taking measurements.
+          Installing the Android Application allows to connect to Bluetooth and USB Devices for taking measurements.
 
           <br /><br />
-          When installing you will be asked to allow installing applications
-          from unknown sources.
+          When installing you will be asked to allow installing applications from unknown sources.
         </p>
 
         <v-alert outlined class="pa-4" type="success" color="blue">
-            If you have already installed the Android App once, you don't need
-            install the App again.
+          If you have already installed the Android App once, you don't need install the App again.
         </v-alert>
 
         <br />
@@ -44,20 +37,10 @@
       </template>
     </app-dialog>
 
-    <a
-      ref="scriptLink"
-      :href="`surveystack://kit/${scriptId}`"
-      style="display: none"
-      >Run Surveystack Script</a
-    >
+    <a ref="scriptLink" :href="`surveystack://kit/${scriptId}`" style="display: none">Run Surveystack Script</a>
 
     <div v-if="this.source">
-      <iframe
-        src=""
-        frameborder="0"
-        ref="iframe"
-        sandbox="allow-scripts allow-same-origin allow-popups"
-      />
+      <iframe src="" frameborder="0" ref="iframe" sandbox="allow-scripts allow-same-origin allow-popups" />
 
       <div class="android-button-container" v-if="!this.value">
         <v-btn
@@ -73,18 +56,8 @@
         </v-btn>
       </div>
 
-      <v-btn
-        @click="requestRunScript"
-        class="full center-button mt-4"
-        depressed
-        large
-        color="primary"
-      >
-        {{
-          control.options.buttonLabel
-            ? control.options.buttonLabel
-            : "Run Script"
-        }}
+      <v-btn @click="requestRunScript" class="full center-button mt-4" depressed large color="primary">
+        {{ control.options.buttonLabel ? control.options.buttonLabel : 'Run Script' }}
       </v-btn>
       <p class="status" v-if="meta.status || meta.statusMessage">
         <v-chip dark> {{ meta && meta.status }}</v-chip>
@@ -107,9 +80,7 @@
 </template>
 
 <script>
-import buildScriptQuestionIframeContents, {
-  onMessage,
-} from '@/utils/userScript';
+import buildScriptQuestionIframeContents, { onMessage } from '@/utils/userScript';
 import api from '@/services/api.service';
 import BaseQuestionComponent from './BaseQuestionComponent';
 import * as surveyStackUtils from '@/utils/surveyStack';
@@ -139,10 +110,7 @@ export default {
     },
     parent() {
       const parentPath = surveyStackUtils.getParentPath(this.$vnode.key);
-      const parentData = surveyStackUtils.getNested(
-        this.submission,
-        parentPath,
-      );
+      const parentData = surveyStackUtils.getNested(this.submission, parentPath);
       return parentData;
     },
   },
@@ -167,7 +135,7 @@ export default {
             status: this.status || { type: null, message: null },
           },
         },
-        '*',
+        '*'
       );
     },
     requestRenderScript() {
@@ -179,7 +147,7 @@ export default {
             context: this.meta.context || {},
           },
         },
-        '*',
+        '*'
       );
     },
     handleScriptHasLoaded() {
@@ -218,9 +186,7 @@ export default {
       const valueJSON = JSON.stringify(this.value);
       const contextJSON = JSON.stringify(this.meta.context || {});
       const controlJSON = JSON.stringify(this.control);
-      const paramsJSON = JSON.stringify(
-        (this.control.options && this.control.options.params) || {},
-      );
+      const paramsJSON = JSON.stringify((this.control.options && this.control.options.params) || {});
 
       const html = buildScriptQuestionIframeContents({
         scriptSource: this.source.content,
@@ -236,28 +202,13 @@ export default {
       // onMessage returns the message listener function so that the listener can be removed on destroyed lifecycle method
       this.messageEventListeners.push(
         onMessage('SCRIPT_HAS_LOADED', this.handleScriptHasLoaded),
-        onMessage(
-          'REQUEST_SET_QUESTION_VALUE',
-          this.handleRequestSetQuestionValue,
-        ),
-        onMessage(
-          'REQUEST_SET_QUESTION_STATUS',
-          this.handleRequestSetQuestionStatus,
-        ),
+        onMessage('REQUEST_SET_QUESTION_VALUE', this.handleRequestSetQuestionValue),
+        onMessage('REQUEST_SET_QUESTION_STATUS', this.handleRequestSetQuestionStatus),
         onMessage('REQUEST_LOG_MESSAGE', this.handleRequestLogMessage),
-        onMessage(
-          'REQUEST_RUN_SURVEY_STACK_KIT',
-          this.requestRunSurveyStackKit,
-        ),
+        onMessage('REQUEST_RUN_SURVEY_STACK_KIT', this.requestRunSurveyStackKit),
         onMessage('REQUEST_SET_QUESTION_CONTEXT', this.handleRequestSetContext),
-        onMessage(
-          'REQUEST_SET_QUESTION_RENDER_QUEUE',
-          this.handleRequestSetRenderQueue,
-        ),
-        onMessage(
-          'REQUEST_SET_QUESTION_RENDER_QUEUE',
-          this.handleRequestSetRenderQueue,
-        ),
+        onMessage('REQUEST_SET_QUESTION_RENDER_QUEUE', this.handleRequestSetRenderQueue),
+        onMessage('REQUEST_SET_QUESTION_RENDER_QUEUE', this.handleRequestSetRenderQueue)
       );
     },
     async fetchScriptSource() {
@@ -279,7 +230,7 @@ export default {
     }
   },
   destroyed() {
-    this.messageEventListeners.forEach(handler => window.removeEventListener('message', handler));
+    this.messageEventListeners.forEach((handler) => window.removeEventListener('message', handler));
   },
 };
 </script>

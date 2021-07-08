@@ -8,29 +8,24 @@
     >
       <p>
         With a paid subscription you can upgrade to
-        <strong>your own white-labelled app</strong> with a
-        <strong>custom url</strong>, and your <strong>branding</strong> and
-        <strong>color scheme</strong>. You will also benefit from more
-        administrative tools to improve project and data management:
+        <strong>your own white-labelled app</strong> with a <strong>custom url</strong>, and your
+        <strong>branding</strong> and <strong>color scheme</strong>. You will also benefit from more administrative
+        tools to improve project and data management:
       </p>
       <ul class="my-3">
         <li>Allow any user to join your group from your custom url.</li>
         <li>
-          See all your group and pinned surveys without being logged in to your
-          app.
+          See all your group and pinned surveys without being logged in to your app.
         </li>
         <li>
-          Automatically associate data submitted to your custom url to your
-          group so that you have proper administrative controls over data
-          privacy.
+          Automatically associate data submitted to your custom url to your group so that you have proper administrative
+          controls over data privacy.
         </li>
       </ul>
       <p>
-        To learn more about paid subscriptions please contact Dan TerAvest (<a
-          href="mailto:dan@our-sci.net"
+        To learn more about paid subscriptions please contact Dan TerAvest (<a href="mailto:dan@our-sci.net"
           >dan@our-sci.net</a
-        >) or Greg Austic (<a href="mailto:greg@our-sci.net">greg@our-sci.net</a
-        >)
+        >) or Greg Austic (<a href="mailto:greg@our-sci.net">greg@our-sci.net</a>)
       </p>
     </app-dialog>
 
@@ -40,17 +35,12 @@
 
     <div class="d-flex justify-space-between">
       <h1>
-        <span>{{ editMode ? "Edit group" : "Create group" }}</span>
+        <span>{{ editMode ? 'Edit group' : 'Create group' }}</span>
         <v-chip v-if="isPremium" class="ml-2" color="success">
           <v-icon small left> mdi-octagram </v-icon>Premium
         </v-chip>
       </h1>
-      <v-btn
-        v-if="editMode"
-        class="ma-2"
-        :to="`/call-for-submissions?group=${entity._id}`"
-        color="secondary"
-      >
+      <v-btn v-if="editMode" class="ma-2" :to="`/call-for-submissions?group=${entity._id}`" color="secondary">
         <v-icon left>mdi-email-multiple-outline</v-icon>Call for submissions...
       </v-btn>
     </div>
@@ -69,9 +59,7 @@
           id="group-slug"
           v-model="entity.slug"
           :readonly="!editSlug"
-          :append-icon="
-            editSlug ? 'mdi-pencil-off-outline' : 'mdi-pencil-outline'
-          "
+          :append-icon="editSlug ? 'mdi-pencil-off-outline' : 'mdi-pencil-outline'"
           autocomplete="off"
           @click:append="editSlug = !editSlug"
           hint="URL friendly version of name"
@@ -83,21 +71,14 @@
             label="Invitation Only"
             v-model="entity.meta.invitationOnly"
             :hint="
-              entity.meta.invitationOnly
-                ? 'Users can only join through an invitation'
-                : 'Everybody may join this group'
+              entity.meta.invitationOnly ? 'Users can only join through an invitation' : 'Everybody may join this group'
             "
             persistent-hint
             :disabled="!isPremium"
             class="d-inline mt-0"
           />
           <div class="ml-auto ml-sm-6">
-            <v-btn
-              small
-              v-if="!isPremium"
-              @click="learnMoreDialog = true"
-              outlined
-              color="primary"
+            <v-btn small v-if="!isPremium" @click="learnMoreDialog = true" outlined color="primary"
               >Learn more...</v-btn
             >
           </div>
@@ -105,9 +86,7 @@
         <v-checkbox label="Archived" v-model="entity.meta.archived" />
         <div class="d-flex justify-end pa-2">
           <v-btn text @click="cancel">Cancel</v-btn>
-          <v-btn color="primary" type="submit">{{
-            editMode ? "Save" : "Create"
-          }}</v-btn>
+          <v-btn color="primary" type="submit">{{ editMode ? 'Save' : 'Create' }}</v-btn>
         </div>
       </form>
     </v-card>
@@ -161,16 +140,10 @@
       :filter="filterMembers"
     >
       <template v-slot:entity="{ entity }">
-        <v-list-item-content
-          v-if="entity.meta && entity.meta.status === 'pending'"
-        >
-          <v-list-item-title class="text--secondary"
-            >[Pending] {{ entity.meta.invitationEmail }}</v-list-item-title
-          >
+        <v-list-item-content v-if="entity.meta && entity.meta.status === 'pending'">
+          <v-list-item-title class="text--secondary">[Pending] {{ entity.meta.invitationEmail }}</v-list-item-title>
           <v-list-item-subtitle>{{
-            entity.meta.dateSent
-              ? `sent ${entity.meta.dateSent}`
-              : "Invitation not sent yet"
+            entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'
           }}</v-list-item-subtitle>
         </v-list-item-content>
 
@@ -185,12 +158,7 @@
       </template>
     </app-basic-list>
 
-    <app-doc-links
-      class="mb-4"
-      v-if="editMode"
-      :group="entity"
-    >
-    </app-doc-links>
+    <app-doc-links class="mb-4" v-if="editMode" :group="entity"> </app-doc-links>
   </v-container>
 </template>
 
@@ -204,7 +172,6 @@ import appBasicList from '@/components/ui/BasicList.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import appFarmHubOnboarding from '@/components/integrations/FarmHubOnboarding.vue';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
-
 
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
@@ -277,7 +244,7 @@ export default {
     },
     async searchSurveys(q) {
       const { data: searchResults } = await api.get(
-        `/surveys?projections[]=name&projections[]=meta.dateModified&q=${q}`,
+        `/surveys?projections[]=name&projections[]=meta.dateModified&q=${q}`
       );
       this.searchResults = searchResults;
     },
@@ -331,9 +298,9 @@ export default {
     },
     isPremium() {
       if (
-        this.isWhitelabel
-        && (this.entity.path.startsWith(this.whitelabelPartner.path)
-          || this.entity.dir.startsWith(this.whitelabelPartner.path))
+        this.isWhitelabel &&
+        (this.entity.path.startsWith(this.whitelabelPartner.path) ||
+          this.entity.dir.startsWith(this.whitelabelPartner.path))
       ) {
         return true;
       }
@@ -341,9 +308,7 @@ export default {
     },
   },
   async created() {
-    this.editMode = !this.$route.matched.some(
-      ({ name }) => name === 'groups-new',
-    );
+    this.editMode = !this.$route.matched.some(({ name }) => name === 'groups-new');
 
     const { dir } = this.$route.query;
     if (dir) {
@@ -361,14 +326,10 @@ export default {
         const { data } = await api.get(`/groups/${id}?populate=true`);
         this.entity = { ...this.entity, ...data };
 
-        const { data: members } = await api.get(
-          `/memberships?group=${this.entity._id}&populate=true`,
-        );
+        const { data: members } = await api.get(`/memberships?group=${this.entity._id}&populate=true`);
         this.members = members;
 
-        const { data: integrations } = await api.get(
-          `/group-integrations?group=${id}&populate=true`,
-        );
+        const { data: integrations } = await api.get(`/group-integrations?group=${id}&populate=true`);
         this.integrations = integrations;
       } catch (e) {
         console.log('something went wrong:', e);

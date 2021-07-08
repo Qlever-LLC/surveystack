@@ -289,12 +289,12 @@ export default {
       return n;
     },
     removeValue(item, header, value) {
-      const filtered = item[header.value].value.filter(v => v !== value);
+      const filtered = item[header.value].value.filter((v) => v !== value);
       item[header.value].value = this.getValueOrNull(filtered);
     },
     getLabel(header, value) {
       const dropdownItems = this.getDropdownItems(header.value);
-      const found = dropdownItems.find(i => i.value === value);
+      const found = dropdownItems.find((i) => i.value === value);
       return found ? found.label : value;
     },
     log(v) {
@@ -324,26 +324,27 @@ export default {
         if (typeof h !== 'string') {
           return h;
         }
-        return this.farmos.plantings.find(t => t.value.hash === h).value;
+        return this.farmos.plantings.find((t) => t.value.hash === h).value;
       });
 
       // const [farmId, assetId] = itemId.split('.');
 
-      const fields = selectedItems.filter(item => !!item.isField);
+      const fields = selectedItems.filter((item) => !!item.isField);
 
       // selected assets
-      const assets = selectedItems.filter(item => !item.isField);
+      const assets = selectedItems.filter((item) => !item.isField);
 
-      const assetsToSelect = fields.flatMap(field => this.farmos.plantings
-        .filter(item => !item.value.isField)
-        .filter(item => item.value.farmId === field.farmId)
-        .filter(item => item.value.location.some(loc => loc.id === field.location.id)));
+      const assetsToSelect = fields.flatMap((field) =>
+        this.farmos.plantings
+          .filter((item) => !item.value.isField)
+          .filter((item) => item.value.farmId === field.farmId)
+          .filter((item) => item.value.location.some((loc) => loc.id === field.location.id))
+      );
 
       assetsToSelect.forEach((assetToSelect) => {
         if (
           assets.some(
-            asset => asset.farmId === assetToSelect.value.farmId
-              && asset.assetId === assetToSelect.value.assetId,
+            (asset) => asset.farmId === assetToSelect.value.farmId && asset.assetId === assetToSelect.value.assetId
           )
         ) {
           // skip

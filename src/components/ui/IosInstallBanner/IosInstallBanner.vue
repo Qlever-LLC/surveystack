@@ -1,28 +1,15 @@
 <template>
-  <v-snackbar
-    :value="value"
-    @input="handleInput"
-    :timeout="-1"
-    color="primary lighten-1"
-    fixed
-    bottom
-    class="snackbar"
-  >
-    <v-btn
-      @click="handleClose"
-      icon
-      class="close-button"
-    >
+  <v-snackbar :value="value" @input="handleInput" :timeout="-1" color="primary lighten-1" fixed bottom class="snackbar">
+    <v-btn @click="handleClose" icon class="close-button">
       <v-icon>mdi-close</v-icon>
     </v-btn>
     <div class="text-center wrapper">
       <h2>Install App</h2>
       <div class="d-flex align-center justify-center">
-          Just tap
-          <img src="./ios-safari-center-icon.svg" alt="" class="icon"/>
-          then
-          Add To Homescreen
-          <img src="./ios-safari-add-icon.svg" alt="" class="icon" />
+        Just tap
+        <img src="./ios-safari-center-icon.svg" alt="" class="icon" />
+        then Add To Homescreen
+        <img src="./ios-safari-add-icon.svg" alt="" class="icon" />
       </div>
     </div>
   </v-snackbar>

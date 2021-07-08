@@ -1,58 +1,26 @@
 <template>
-  <div
-    id="screen-root"
-    style="width: 100%; height: 100%; padding: 0px !important; margin: 0px;"
-  >
-    <div
-      class="dflex pa-4 align-center"
-      j
-      style="width: 100%"
-    >
-      <v-btn
-        dark
-        primary
-        color="blue"
-        large
-        @click="show=!show"
-      > show</v-btn>
+  <div id="screen-root" style="width: 100%; height: 100%; padding: 0px !important; margin: 0px;">
+    <div class="dflex pa-4 align-center" j style="width: 100%">
+      <v-btn dark primary color="blue" large @click="show = !show"> show</v-btn>
     </div>
     <transition :name="slide">
-      <v-container
-        :key="show"
-        style="position: absolute; will-change: transform"
-        fluid
-        height="100%"
-      >
-        <v-alert
-          v-if="show"
-          class="ma-10 pa-12"
-          dark
-          color="red"
-          prominent
-        >Hello</v-alert>
+      <v-container :key="show" style="position: absolute; will-change: transform" fluid height="100%">
+        <v-alert v-if="show" class="ma-10 pa-12" dark color="red" prominent>Hello</v-alert>
 
-        <v-alert
-          v-else
-          class="ma-10 pa-12"
-          dark
-          color="green"
-          prominent
-        >Hello</v-alert>
+        <v-alert v-else class="ma-10 pa-12" dark color="green" prominent>Hello</v-alert>
       </v-container>
     </transition>
   </div>
 </template>
 
 <script>
-
 export default {
-  components: {
-  },
+  components: {},
   data() {
-    return ({
+    return {
       slide: 'slide-in',
       show: false,
-    });
+    };
   },
 };
 </script>

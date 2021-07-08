@@ -3,14 +3,8 @@ module.exports = {
   env: {
     node: true,
   },
-  extends: [
-    'plugin:vue/essential',
-    'eslint:recommended',
-    '@vue/prettier',
-  ],
-  plugins: [
-    'import',
-  ],
+  extends: ['plugin:vue/essential', 'eslint:recommended', '@vue/prettier'],
+  plugins: ['import'],
   rules: {
     'import/no-cycle': 'error',
     'no-console': process.env.NODE_ENV === 'production' ? 'off' : 'off',
@@ -29,9 +23,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: [
-        '**/*.spec.js',
-      ],
+      files: ['**/*.spec.js'],
       env: {
         jest: true,
       },

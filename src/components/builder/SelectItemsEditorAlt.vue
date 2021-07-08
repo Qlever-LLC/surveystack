@@ -4,7 +4,6 @@
       <div>
         Dropdown List
       </div>
-
     </v-card-title>
     <div class="text-center d-flex">
       <!-- :resourceTypes="['ONTOLOGY_LIST']" -->
@@ -15,17 +14,11 @@
         @on-new="createResourceHandler"
         @on-select="selectResourceHandler"
       />
-      <v-btn
-        icon
-        @click.stop="openTableDialog"
-        :class="{'d-none': !value}"
-        class="ml-2 mt-3"
-      >
+      <v-btn icon @click.stop="openTableDialog" :class="{ 'd-none': !value }" class="ml-2 mt-3">
         <!-- Edit entries -->
         <!-- <v-icon class="ml-2">mdi-table</v-icon> -->
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
-
     </div>
     <v-dialog v-model="tableDialogIsVisible">
       <select-items-table-editor
@@ -79,15 +72,10 @@ export default {
       this.tableDialogIsVisible = false;
     },
     createResourceHandler() {
-      const newResource = createResource(
-        this.resources,
-        resourceTypes.ONTOLOGY_LIST,
-        resourceLocations.EMBEDDED,
-        {
-          labelPrefix: 'Dropdown Items',
-          defaultContent: [],
-        },
-      );
+      const newResource = createResource(this.resources, resourceTypes.ONTOLOGY_LIST, resourceLocations.EMBEDDED, {
+        labelPrefix: 'Dropdown Items',
+        defaultContent: [],
+      });
       this.$emit('set-survey-resources', appendResource(this.resources, newResource));
       this.$emit('set-control-source', newResource.id);
       this.openTableDialog();
@@ -111,15 +99,15 @@ export default {
     },
     resources: {
       type: Array,
-      default: () => ([]),
+      default: () => [],
     },
   },
   computed: {
     resource() {
-      return this.resources.find(resource => resource.id === this.value);
+      return this.resources.find((resource) => resource.id === this.value);
     },
     filteredResources() {
-      return this.resources.filter(resource => resource.type === 'ONTOLOGY_LIST');
+      return this.resources.filter((resource) => resource.type === 'ONTOLOGY_LIST');
     },
   },
 };

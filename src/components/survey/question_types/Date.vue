@@ -1,13 +1,9 @@
 <template>
   <div>
-    <app-control-label
-      :value="control.label"
-      :redacted="redacted"
-      :required="required"
-    />
+    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
     <v-row>
-      <div :class="{'mx-auto': centered}">
+      <div :class="{ 'mx-auto': centered }">
         <v-date-picker
           v-if="control.options.subtype !== 'date-year'"
           :value="dateForPicker"
@@ -63,7 +59,6 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 
-
 export default {
   mixins: [baseQuestionComponent],
   props: { centered: { type: Boolean, default: true } },
@@ -117,10 +112,7 @@ export default {
       return null;
     },
     dateType() {
-      return (this.control
-        && this.control.options
-        && this.control.options.subtype)
-        || 'date';
+      return (this.control && this.control.options && this.control.options.subtype) || 'date';
     },
     datePickerType() {
       switch (this.control.options.subtype) {
@@ -174,9 +166,10 @@ export default {
       this.datePickerIsVisible = false;
       console.log('update date picker', date);
 
-      const newDate = this.control.options.subtype === 'date-year'
-        ? new Date(date.replace(/^(\d{4})-(\d{2})-(\d{2})/, (match, g1) => [g1, '01', '01'].join('-'))) // set month and date to 1
-        : new Date(date);
+      const newDate =
+        this.control.options.subtype === 'date-year'
+          ? new Date(date.replace(/^(\d{4})-(\d{2})-(\d{2})/, (match, g1) => [g1, '01', '01'].join('-'))) // set month and date to 1
+          : new Date(date);
       console.log('new Date', newDate, newDate.toISOString());
       if (this.control.options.subtype === 'date-year') {
         this.$refs.picker.activePicker = 'YEAR';

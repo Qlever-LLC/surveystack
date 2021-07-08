@@ -5,16 +5,10 @@
       <span>
         Selection List
       </span>
-
     </v-card-title>
     <v-list>
       <draggable :list="value">
-        <v-card
-          v-for="(item, index) in value"
-          :key="index"
-          class="mb-2 draggable-cursor"
-          outlined
-        >
+        <v-card v-for="(item, index) in value" :key="index" class="mb-2 draggable-cursor" outlined>
           <v-list-item class="draggable-cursor px-1">
             <v-list-item-content class="pb-1">
               <v-row>
@@ -40,16 +34,11 @@
                     dense
                   />
                 </v-col>
-
               </v-row>
             </v-list-item-content>
             <v-list-item-action class="mt-n3">
               <v-btn icon>
-                <v-icon
-                  color="grey"
-                  :disabled="disabled"
-                  @click="() => deleteItem(index)"
-                >mdi-delete</v-icon>
+                <v-icon color="grey" :disabled="disabled" @click="() => deleteItem(index)">mdi-delete</v-icon>
               </v-btn>
             </v-list-item-action>
           </v-list-item>
@@ -57,18 +46,11 @@
       </draggable>
     </v-list>
     <v-row>
-
-      <v-btn
-        class="ml-auto mr-0 d-block mb-3"
-        :disabled="disabled"
-        @click="addItem"
-      >
+      <v-btn class="ml-auto mr-0 d-block mb-3" :disabled="disabled" @click="addItem">
         <v-icon left>mdi-plus</v-icon>Add Item
       </v-btn>
     </v-row>
-
   </div>
-
 </template>
 
 <script>
@@ -81,7 +63,7 @@ export default {
   data() {
     return {
       rules: {
-        notEmpty: val => ((val !== null && val !== '') ? true : 'Please enter a string'),
+        notEmpty: (val) => (val !== null && val !== '' ? true : 'Please enter a string'),
       },
     };
   },
@@ -97,10 +79,7 @@ export default {
       };
     },
     addItem() {
-      this.$emit('set-control-source', [
-        ...this.value,
-        this.createItem(),
-      ]);
+      this.$emit('set-control-source', [...this.value, this.createItem()]);
     },
     deleteItem(index) {
       const newItems = this.value.filter((item, i) => index !== i);
@@ -112,14 +91,9 @@ export default {
         ...this.value[index],
         [type]: value,
       };
-      const newItems = [
-        ...this.value.slice(0, index),
-        newItem,
-        ...this.value.slice(index + 1, this.value.length),
-      ];
+      const newItems = [...this.value.slice(0, index), newItem, ...this.value.slice(index + 1, this.value.length)];
       this.$emit('set-control-source', newItems);
     },
-
   },
   model: {
     // prop: 'items',

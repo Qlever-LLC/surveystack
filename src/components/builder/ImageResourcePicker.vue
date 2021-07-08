@@ -2,10 +2,7 @@
   <div class="image-resource-picker">
     Image resource picker
     <v-list>
-      <v-list-item
-        v-for="image in value"
-        :key="image.src"
-      >
+      <v-list-item v-for="image in value" :key="image.src">
         <v-list-item-avatar>
           <v-icon>mdi-image</v-icon>
         </v-list-item-avatar>
@@ -17,12 +14,8 @@
         </v-list-item-action>
       </v-list-item>
     </v-list>
-    <v-btn
-      class="ml-auto mr-0 d-block mb-3"
-      @click="handleAddImage"
-    >
-      +&nbsp;
-      Add Image
+    <v-btn class="ml-auto mr-0 d-block mb-3" @click="handleAddImage">
+      +&nbsp; Add Image
     </v-btn>
   </div>
 </template>
@@ -37,17 +30,13 @@ export default {
   props: {
     value: {
       type: Array,
-      default: () => ([]),
+      default: () => [],
     },
   },
   methods: {
-    handleAddImage() {
-
-    },
+    handleAddImage() {},
   },
 };
 </script>
 
-<style>
-
-</style>
+<style></style>
