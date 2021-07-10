@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 const LCL = require('last-commit-log');
 
 const fs = require('fs');
@@ -32,6 +33,14 @@ module.exports = {
         features: [],
       }),
       new CompressionPlugin(),
+      new CopyPlugin({
+        patterns: [
+          {
+            from: 'src/utils/sandboxUtils.js',
+            to: 'public/iframeUtils.js',
+          },
+        ],
+      }),
     ],
   },
   transpileDependencies: ['vuetify'],
