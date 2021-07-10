@@ -1,10 +1,11 @@
 // /////////////// RELEVANCE //////////////////////////
 
-// others:
-// check --> relevant and answered.  All 'check' functions check this in addition to whatever they specify.
-// checkIfOnly --> only these things and nothing else
-// checkIfAll --> all these things (other things may also be, but all these things)
-//
+// KNOWN BUGS TO IMPROVE
+// if relevance is turned off up the chain, then we won't catch it.
+// if relevance is false, then false
+// if relevance is true, then true
+// if relevance is undefined, then walk back the tree.  If anywhere there is
+// relevance = false, then set false.  Otherwise, set true.
 
 function match(answers, thisValue) {
   if ((typeof thisValue === 'string' || typeof thisValue === 'number') && answers.includes(thisValue)) {
@@ -28,8 +29,8 @@ export function checkIfAny(question, ...answers) {
   // return false if question is not relevant
   if (
     typeof question.meta !== 'undefined' &&
-    typeof question.meta.computedRelevance !== 'undefined' &&
-    question.meta.computedRelevance === false
+    typeof question.meta.relevant !== 'undefined' &&
+    question.meta.relevant === false
   ) {
     // console.log(`answer: ${JSON.stringify(answers)}
     // question.value: ${JSON.stringify(values)}
@@ -88,8 +89,8 @@ export function checkIfNone(question, ...answers) {
   // return false if question is not relevant
   if (
     typeof question.meta !== 'undefined' &&
-    typeof question.meta.computedRelevance !== 'undefined' &&
-    question.meta.computedRelevance === false
+    typeof question.meta.relevant !== 'undefined' &&
+    question.meta.relevant === false
   ) {
     // console.log(`answer: ${JSON.stringify(answers)}
     // question.value: ${JSON.stringify(values)}
@@ -148,8 +149,8 @@ export function getCleanArray(chooseMult) {
   }
   if (
     typeof chooseMult.meta !== 'undefined' && // question not relevant
-    typeof chooseMult.meta.computedRelevance !== 'undefined' &&
-    chooseMult.meta.computedRelevance === false
+    typeof chooseMult.meta.relevant !== 'undefined' &&
+    chooseMult.meta.relevant === false
   ) {
     return thisAnswer;
   }
@@ -175,15 +176,21 @@ export function getClean(chooseOne) {
   }
   if (
     typeof chooseOne.meta !== 'undefined' && // question not relevant
-    typeof chooseOne.meta.computedRelevance !== 'undefined' &&
-    chooseOne.meta.computedRelevance === false
+    typeof chooseOne.meta.relevant !== 'undefined' &&
+    chooseOne.meta.relevant === false
   ) {
     return thisAnswer;
   }
   if (chooseOne.value === null) {
     return thisAnswer; // question is null
   }
-  thisAnswer = chooseOne.value; // if it's passed all that, set it to the value
-  console.log(`clean "${chooseOne.value}" to "${thisAnswer}"`);
-  return thisAnswer;
+  if (Array.isArray(chooseOne.value)) { // if this happens to be an array, return the first item only
+    thisAnswer = chooseOne.value[0]; // set it to the first object in the array
+    console.log(`clean "${chooseOne.value[0]}" to "${thisAnswer}"`);
+    return thisAnswer;
+  } else {
+    thisAnswer = chooseOne.value; // if it's a single string/number, return that
+    console.log(`clean "${chooseOne.value}" to "${thisAnswer}"`);
+    return thisAnswer;
+  }
 }
