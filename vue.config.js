@@ -34,12 +34,7 @@ module.exports = {
       }),
       new CompressionPlugin(),
       new CopyPlugin({
-        patterns: [
-          {
-            from: 'src/utils/sandboxUtils.js',
-            to: 'public/iframeUtils.js',
-          },
-        ],
+        patterns: ['src/utils/sandboxUtils.js'],
       }),
     ],
   },
