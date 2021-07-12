@@ -165,7 +165,7 @@ const getMemberships = async (req, res) => {
       admins.push(member);
     }
 
-    console.log('admins', admins);
+    // console.log('admins', admins);
 
     for (const member of filteredMemberships) {
       if (member.role !== 'user') {

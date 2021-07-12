@@ -22,7 +22,7 @@ const common = async (endpoint, req, res) => {
 
   try {
     for (const farm of uniqueFarmsByURL) {
-      console.log('farm', farm);
+      //console.log('farm', farm);
       const agentOptions = {
         host: farm.aggregatorURL,
         port: '443',
@@ -251,10 +251,10 @@ const getIntegrationFarms = async (req, res) => {
     return res.send(farms);
   }
 
-  console.log("filtering for tags", tags);
+  // console.log("filtering for tags", tags);
   const arr = tags.split(",");
   return res.send(farms.filter(f => {
-    console.log('farm tags', f.tags)
+    //console.log('farm tags', f.tags)
     if (!f.tags) {
       return false;
     }
