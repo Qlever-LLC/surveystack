@@ -13,8 +13,12 @@ const base = (type) => ({
   methods: {
     getValueOrNull,
     onChange(v) {
-      const nextValue = Array.isArray(v) ? getValueOrNull(v) : [getValueOrNull(v)];
+      if (!v) {
+        this.changed(null);
+        return;
+      }
 
+      const nextValue = Array.isArray(v) ? getValueOrNull(v) : [getValueOrNull(v)];
       this.changed(nextValue);
     },
     remove(item) {
