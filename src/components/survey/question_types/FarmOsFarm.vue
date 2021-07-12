@@ -1,14 +1,10 @@
 <template>
   <div>
-    <app-control-label
-      :value="control.label"
-      :redacted="redacted"
-      :required="required"
-    />
+    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <v-autocomplete
       :disabled="loading"
       :value="getValue"
-      @change="handleChange"
+      @change="onChange"
       :items="farms || []"
       item-text="label"
       item-value="value"
@@ -19,7 +15,33 @@
       :deletable-chips="control.options.hasMultipleSelections"
       @keyup.enter.prevent="submit"
       :loading="loading"
-    />
+    >
+      <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
+        <v-chip
+          close
+          v-bind="data.attrs"
+          :input-value="data.selected"
+          @click="data.select"
+          @click:close="remove(data.item)"
+        >
+          <template v-slot:default>
+            <span v-html="data.item.label" />
+          </template>
+        </v-chip>
+      </template>
+      <template v-slot:selection="{ item }" v-else>
+        <div v-html="item.label" class="d-flex align-center autocomplete-selection"></div>
+      </template>
+
+      <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
+        <v-list-item-content>
+          <v-list-item-title v-html="data.item.label" />
+        </v-list-item-content>
+      </template>
+      <template v-slot:item="{ item }" v-else>
+        <div v-html="item.label"></div>
+      </template>
+    </v-autocomplete>
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
@@ -27,34 +49,11 @@
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
-import { getValueOrNull } from '@/utils/surveyStack';
 
 export default {
   mixins: [baseQuestionComponent, farmosBase()],
-  data() {
-    return {
-      farms: [],
-    };
-  },
   async created() {
     await this.fetchFarms();
-  },
-  methods: {
-    fetch,
-    handleChange(v) {
-      const nextValue = Array.isArray(v)
-        ? getValueOrNull(v)
-        : [getValueOrNull(v)];
-
-      this.changed(nextValue);
-    },
-  },
-  computed: {
-    getValue() {
-      return this.control.options.hasMultipleSelections
-        ? this.value
-        : this.value && this.value[0];
-    },
   },
 };
 </script>

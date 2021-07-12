@@ -52,15 +52,6 @@ import farmosBase from './FarmOsBase';
 
 export default {
   mixins: [baseQuestionComponent, farmosBase('fields')],
-  data() {
-    return {};
-  },
-  methods: {
-    remove(item) {
-      const isNotItem = (v) => JSON.stringify(v) !== JSON.stringify(item.value);
-      this.changed(this.getValueOrNull(this.value.filter(isNotItem)));
-    },
-  },
   async created() {
     await this.fetchAreas();
   },

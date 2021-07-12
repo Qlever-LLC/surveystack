@@ -22,10 +22,8 @@ const base = (type) => ({
       this.changed(nextValue);
     },
     remove(item) {
-      this.changed(this.value.filter((v) => v !== item.value));
-    },
-    removeValue(value) {
-      this.changed(this.value.filter((v) => v !== value));
+      const isNotItem = (v) => JSON.stringify(v) !== JSON.stringify(item.value);
+      this.changed(this.getValueOrNull(this.value.filter(isNotItem)));
     },
     getLabelForItemValue(value) {
       const item = this.farms.find((x) => x.value === value);
