@@ -226,40 +226,8 @@ const actions = {
       }
 
       const isPage = nextNode.model.type === 'page';
-
       if (isPage) {
-        let cidx = index + 1;
-        let skipPage = true;
-
-        console.log('cidx', cidx);
-        // lookahead
-        while (cidx < traversal.length) {
-          const lookahead = traversal[cidx++];
-          const isInsidePage = lookahead
-            .getPath()
-            .slice(1)
-            .slice(0, -1)
-            .find((parent) => parent.model.type === 'page');
-          if (!isInsidePage) {
-            break;
-          }
-
-          const [relevance] = await codeEvaluator.calculateRelevance([lookahead], state.submission, state.survey); // eslint-disable-line
-          console.log('relevance is', relevance);
-          const { result: innerResult, path: innerPath, skip: innerSkip } = relevance;
-
-          if (!innerSkip) {
-            commit('SET_PROPERTY', { path: `${innerPath}.meta.relevant`, value: innerResult });
-            if (innerResult) {
-              skipPage = false;
-              break;
-            }
-          } else {
-            skipPage = false;
-            break;
-          }
-        }
-
+        let skipPage = await actions.isSkipPage(commit, index, traversal, state);
         if (skipPage) {
           continue;
         }
@@ -271,20 +239,6 @@ const actions = {
         .slice(0, -1)
         .find((parent) => parent.model.type === 'page');
       if (isInsidePage) {
-        continue;
-      }
-
-      const isHidden = nextNode.model.options.hidden;
-      if (isHidden) {
-        continue;
-      }
-
-      const hasHiddenParents = nextNode
-        .getPath()
-        .slice(1)
-        .slice(0, -1)
-        .find((parent) => parent.model.options.hidden === true);
-      if (hasHiddenParents) {
         continue;
       }
 
@@ -345,26 +299,20 @@ const actions = {
         continue;
       }
 
+      const isPage = prevNode.model.type === 'page';
+      if (isPage) {
+        let skipPage = await actions.isSkipPage(commit, index, traversal, state);
+        if (skipPage) {
+          continue;
+        }
+      }
+
       const isInsidePage = prevNode
         .getPath()
         .slice(1)
         .slice(0, -1)
         .find((parent) => parent.model.type === 'page');
       if (isInsidePage) {
-        continue;
-      }
-
-      const isHidden = prevNode.model.options.hidden;
-      if (isHidden) {
-        continue;
-      }
-
-      const hasHiddenParents = prevNode
-        .getPath()
-        .slice(1)
-        .slice(0, -1)
-        .find((parent) => parent.model.options.hidden === true);
-      if (hasHiddenParents) {
         continue;
       }
 
@@ -380,6 +328,40 @@ const actions = {
   },
   showConfirmSubmission({ commit }, show) {
     commit('SHOW_CONFIRM_SUBMISSION', show);
+  },
+  async isSkipPage(commit, index, traversal, state) {
+    let cidx = index + 1;
+    let skipPage = true;
+
+    console.log('cidx', cidx);
+    // lookahead
+    while (cidx < traversal.length) {
+      const lookahead = traversal[cidx++];
+      const isInsidePage = lookahead
+        .getPath()
+        .slice(1)
+        .slice(0, -1)
+        .find((parent) => parent.model.type === 'page');
+      if (!isInsidePage) {
+        break;
+      }
+      const [relevance] = await codeEvaluator.calculateRelevance([lookahead], state.submission, state.survey); // eslint-disable-line
+      console.log('relevance is', relevance);
+      const { result: innerResult, path: innerPath, skip: innerSkip } = relevance;
+
+      if (!innerSkip) {
+        commit('SET_PROPERTY', { path: `${innerPath}.meta.relevant`, value: innerResult });
+        if (innerResult) {
+          skipPage = false;
+          break;
+        }
+      } else {
+        skipPage = false;
+        break;
+      }
+    }
+
+    return skipPage;
   },
   async calculateRelevance({ commit, state }) {
     // TODO: only calculate subset of nodes
@@ -447,7 +429,7 @@ const mutations = {
 
     // assign first node
     root.walk((node) => {
-      if (!node.isRoot() && node.model.type !== 'group' && !node.model.options.hidden) {
+      if (!node.isRoot() && node.model.type !== 'group') {
         state.node = node;
         state.firstNode = node;
         return false;
