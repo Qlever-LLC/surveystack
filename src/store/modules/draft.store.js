@@ -333,7 +333,6 @@ const actions = {
     let cidx = index + 1;
     let skipPage = true;
 
-    console.log('cidx', cidx);
     // lookahead
     while (cidx < traversal.length) {
       const lookahead = traversal[cidx++];
@@ -346,7 +345,6 @@ const actions = {
         break;
       }
       const [relevance] = await codeEvaluator.calculateRelevance([lookahead], state.submission, state.survey); // eslint-disable-line
-      console.log('relevance is', relevance);
       const { result: innerResult, path: innerPath, skip: innerSkip } = relevance;
 
       if (!innerSkip) {
