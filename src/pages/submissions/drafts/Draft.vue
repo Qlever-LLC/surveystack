@@ -101,17 +101,16 @@ export default {
     },
     onCloseResultDialog() {
       // send message to parent iframe that submission was completed
-      window.parent.postMessage(
-        {
-          type: 'SUBMISSION_RESULT_CLOSE',
-          payload: {
-            isSubmitted: this.isSubmitted,
-            submission: this.submission,
-            submissionId: this.submission._id,
-          },
-        },
-        '*'
-      );
+      const message = this.isSubmitted
+        ? {
+            type: 'SUBMISSION_RESULT_SUCCESS_CLOSE',
+            payload: { submissionId: this.submission._id },
+          }
+        : {
+            type: 'SUBMISSION_RESULT_ERROR_CLOSE',
+            payload: {},
+          };
+      window.parent.postMessage(message, '*');
     },
     async submit({ payload }) {
       this.submitting = true;
@@ -135,14 +134,6 @@ export default {
   },
   async created() {
     this.loading = true;
-
-    // // console.log(window.parent);
-    // window.setInterval(() => {
-    //   console.log(window.parent.postessage);
-    //   const something = window.parent.postMessage('ping', '*');
-    //   console.log('-', something);
-    // }, 2000);
-
     const { id } = this.$route.params;
 
     try {
