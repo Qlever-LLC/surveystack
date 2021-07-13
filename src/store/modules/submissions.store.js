@@ -120,7 +120,11 @@ const actions = {
     });
     await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
     dispatch(types.actions.add, submission);
-    router.push({ name: 'submissions-drafts-detail', params: { id: submission._id } });
+    router.push({
+      name: 'submissions-drafts-detail',
+      params: { id: submission._id },
+      query: { ...router.currentRoute.query },
+    });
   },
   async [types.actions.update]({ commit, dispatch }, submission) {
     await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);

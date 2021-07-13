@@ -1,5 +1,5 @@
 <template>
-  <nav>
+  <nav class="app-navbar">
     <v-app-bar app clipped-left color="appbar" absolute>
       <!-- color="white" -->
       <v-app-bar-nav-icon @click="drawer = !drawer" />
