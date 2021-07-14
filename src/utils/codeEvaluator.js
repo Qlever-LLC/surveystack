@@ -14,6 +14,16 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
     const control = node.model;
     const field = surveyStackUtils.getNested(submission, path);
 
+    // if control is hidden set relevance to false and skip further calculatiosn
+    if (fname === 'relevance' && control.options.hidden) {
+      return {
+        path,
+        control,
+        field,
+        skip: false,
+      };
+    }
+
     if (!control.options[option].enabled) {
       return {
         path,
@@ -54,6 +64,11 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
     } else if (item.skip) {
       continue; // eslint-disable-line no-continue
     }
+    if (fname === 'relevance' && item.control.options.hidden) {
+      item.result = false;
+      continue;
+    }
+
     try {
       const parentPath = surveyStackUtils.getParentPath(item.path);
       const parentData = surveyStackUtils.getNested(submission, parentPath);
