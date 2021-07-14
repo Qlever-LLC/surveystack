@@ -41,7 +41,13 @@
       :items="resultItems"
       title="Result of Submission"
       persistent
-      :to="survey && { name: 'surveys-detail', params: { id: survey._id } }"
+      :to="
+        survey && {
+          name: 'surveys-detail',
+          params: { id: survey._id },
+          query: { minimal_ui: $route.query.minimal_ui },
+        }
+      "
       @close="onCloseResultDialog"
     />
   </div>
@@ -116,6 +122,7 @@ export default {
       this.submitting = true;
       this.submission.meta.status = this.addReadyToSubmit(this.submission.meta.status || []);
 
+      let message;
       try {
         const response = payload.meta.dateSubmitted
           ? await api.put(`/submissions/${payload._id}`, payload)
@@ -123,12 +130,22 @@ export default {
         this.result({ response });
         this.isSubmitted = true;
         await this.$store.dispatch('submissions/remove', this.submission._id);
+        message = {
+          type: 'SUBMISSION_SUBMIT_SUCCESS',
+          payload: { submissionId: this.submission._id },
+        };
       } catch (error) {
         console.log('Draft submit error:', error);
         await db.persistSubmission(this.submission);
         this.result({ error });
+        message = {
+          type: 'SUBMISSION_SUBMIT_ERROR',
+          payload: {},
+        };
       } finally {
         this.submitting = false;
+        // Sent message to parent frame that Submission succeeded or failed
+        window.parent.postMessage(message, '*');
       }
     },
   },
