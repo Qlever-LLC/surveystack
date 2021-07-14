@@ -1,8 +1,6 @@
-// import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
 import { fireEvent } from '@testing-library/vue';
 import ResultDialog from './ResultDialog.vue';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
-
 
 describe('ResultDialog', () => {
   it('displays basic data', () => {

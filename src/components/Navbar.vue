@@ -1,7 +1,6 @@
 <template>
   <nav class="app-navbar">
     <v-app-bar app clipped-left color="appbar" absolute>
-      <!-- color="white" -->
       <v-app-bar-nav-icon @click="drawer = !drawer" />
       <v-toolbar-title class="flex-column">
         <div id="app-bar-title" class="title py-0 my-0">
