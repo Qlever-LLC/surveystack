@@ -13,18 +13,17 @@ const base = (type) => ({
   methods: {
     getValueOrNull,
     onChange(v) {
-      if (this.value !== v) {
-        this.changed(this.getValueOrNull(v));
+      if (!v) {
+        this.changed(null);
+        return;
       }
-    },
-    info(data) {
-      console.log('info------', data);
+
+      const nextValue = Array.isArray(v) ? getValueOrNull(v) : [getValueOrNull(v)];
+      this.changed(nextValue);
     },
     remove(item) {
-      this.changed(this.value.filter((v) => v !== item.value));
-    },
-    removeValue(value) {
-      this.changed(this.value.filter((v) => v !== value));
+      const isNotItem = (v) => JSON.stringify(v) !== JSON.stringify(item.value);
+      this.changed(this.getValueOrNull(this.value.filter(isNotItem)));
     },
     getLabelForItemValue(value) {
       const item = this.farms.find((x) => x.value === value);
@@ -35,11 +34,26 @@ const base = (type) => ({
       const item = this.farms.find((x) => x.value === value);
       return (item && item.label) || value;
     },
+    async fetchFarms() {
+      this.loading = true;
+      try {
+        const response = await api.get('farmos/farms');
+        this.farms = response.data.map(({ name, url }) => ({
+          label: name,
+          value: {
+            farmName: name,
+            url,
+          },
+        }));
+      } catch (err) {
+        console.error(err);
+      }
+      this.loading = false;
+    },
     async fetchAreas() {
       this.loading = true;
       try {
         const response = await api.get('farmos/fields');
-        console.log('fields', response);
         this.farms = response.data.flatMap((f) => {
           // '9' => { actualResponse of FarmosInstance}
           const firstKey = Object.keys(f.data)[0];
@@ -92,6 +106,9 @@ const base = (type) => ({
     },
   },
   computed: {
+    getValue() {
+      return this.control.options.hasMultipleSelections ? this.value : this.value && this.value[0];
+    },
     sourceIsValid() {
       return (
         this.farms &&

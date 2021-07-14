@@ -1,5 +1,5 @@
 <template>
-  <div class="farm-os-field">
+  <div>
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <v-autocomplete
       :disabled="loading"
@@ -10,8 +10,9 @@
       item-value="value"
       outlined
       :label="control.hint"
-      :chips="this.control.options.hasMultipleSelections"
-      :multiple="this.control.options.hasMultipleSelections"
+      :chips="control.options.hasMultipleSelections"
+      :multiple="control.options.hasMultipleSelections"
+      :deletable-chips="control.options.hasMultipleSelections"
       @keyup.enter.prevent="submit"
       :loading="loading"
     >
@@ -41,7 +42,6 @@
         <div v-html="item.label"></div>
       </template>
     </v-autocomplete>
-
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
@@ -51,39 +51,9 @@ import baseQuestionComponent from './BaseQuestionComponent';
 import farmosBase from './FarmOsBase';
 
 export default {
-  mixins: [baseQuestionComponent, farmosBase('fields')],
+  mixins: [baseQuestionComponent, farmosBase()],
   async created() {
-    await this.fetchAreas();
+    await this.fetchFarms();
   },
 };
 </script>
-
-<style scoped>
-div >>> .blue-chip,
-div >>> .orange-chip,
-div >>> .green-chip {
-  display: inline-flex;
-  border: 1px #466cb3 solid;
-  background: none;
-  color: #466cb3;
-  border-radius: 0.4rem;
-  font-weight: bold;
-  font-size: 80%;
-  padding: 0.2rem;
-  padding-left: 0.4rem;
-  padding-right: 0.4rem;
-  vertical-align: middle;
-  margin-top: 0.4rem;
-  margin-bottom: 0.4rem;
-}
-
-div >>> .green-chip {
-  color: #46b355;
-  border: 1px #46b355 solid;
-}
-
-div >>> .orange-chip {
-  color: #f38d49;
-  border: 1px #f38d49 solid;
-}
-</style>
