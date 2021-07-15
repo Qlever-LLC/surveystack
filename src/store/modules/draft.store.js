@@ -172,7 +172,7 @@ const actions = {
       try {
         db.persistSubmission(state.submission);
       } catch (err) {
-        console.log('unable to persist submission to IDB');
+        console.warn('unable to persist submission to IDB');
       }
     }
     if (calculate) {

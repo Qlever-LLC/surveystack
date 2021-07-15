@@ -95,14 +95,11 @@ const actions = {
     // TODO: submissions should be a unique collection, we shouldn't just push
     commit(types.mutations.ADD_SUBMISSION, submission);
   },
-  // [types.actions.remove]({ commit }, id) {
-  //   commit(types.mutations.REMOVE_SUBMISSION, id);
-  // },
   async [types.actions.remove]({ commit }, id) {
     try {
       await db.removeFromIndexedDB(db.stores.SUBMISSIONS, id);
     } catch (err) {
-      console.log('unable to remove submission from IDB');
+      console.warn('unable to remove submission from IDB');
     }
     commit(types.mutations.REMOVE_SUBMISSION, id);
   },
@@ -126,7 +123,7 @@ const actions = {
     try {
       await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
     } catch (err) {
-      console.log('failed to save submission to IDB');
+      console.warn('failed to save submission to IDB');
     }
 
     dispatch(types.actions.add, submission);

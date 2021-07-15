@@ -119,7 +119,7 @@ function persist(storeName, obj) {
       console.log('Insertion in DB Failed ', this.error);
     };
   } catch (err) {
-    console.log('unable to persist to IDB');
+    console.warn('unable to persist to IDB');
   }
 }
 
