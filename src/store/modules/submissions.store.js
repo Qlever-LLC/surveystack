@@ -99,7 +99,11 @@ const actions = {
   //   commit(types.mutations.REMOVE_SUBMISSION, id);
   // },
   async [types.actions.remove]({ commit }, id) {
-    await db.removeFromIndexedDB(db.stores.SUBMISSIONS, id);
+    try {
+      await db.removeFromIndexedDB(db.stores.SUBMISSIONS, id);
+    } catch (err) {
+      console.log('unable to remove submission from IDB');
+    }
     commit(types.mutations.REMOVE_SUBMISSION, id);
   },
   async [types.actions.fetchLocalSubmission]({ state, dispatch }, id) {
@@ -118,7 +122,13 @@ const actions = {
       version: activeVersion,
       group,
     });
-    await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
+
+    try {
+      await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
+    } catch (err) {
+      console.log('failed to save submission to IDB');
+    }
+
     dispatch(types.actions.add, submission);
     router.push({
       name: 'submissions-drafts-detail',
