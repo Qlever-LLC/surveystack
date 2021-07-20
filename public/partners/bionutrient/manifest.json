@@ -1,7 +1,7 @@
 {
   "name": "Real Food Campaign SurveyStack",
   "short_name": "RFC SurveyStack",
-  "theme_color": "#ef4129",
+  "theme_color": "#899856",
   "background_color": "#ffffff",
   "display": "standalone",
   "Scope": "/",
