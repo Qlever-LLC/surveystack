@@ -2,7 +2,7 @@
   <div>
     <v-dialog v-model="show" max-width="350" :persistent="persistent">
       <v-card class="pa-4">
-        <v-card-title class="headline">{{ title }}</v-card-title>
+        <v-card-title class="headline" v-if="title">{{ title }}</v-card-title>
         <template v-for="(item, idx) in items">
           <div :key="'item_' + idx">
             <v-card flat dark outlined class="mb-2" :color="item.error ? 'red darken-4' : 'green'">
@@ -15,7 +15,7 @@
         <div v-if="additionalMessage" v-html="additionalMessage" />
         <v-card-actions>
           <v-spacer />
-          <v-btn text color="primary" :to="persistent ? to : null" @click="show = null">
+          <v-btn text color="primary" @click="onClose">
             Ok
           </v-btn>
         </v-card-actions>
@@ -27,8 +27,14 @@
 <script>
 export default {
   props: {
-    value: Boolean,
-    items: Array,
+    value: {
+      required: true,
+    },
+    items: {
+      type: Array,
+      default: () => [],
+      validator: (item) => item.every(({ title, body }) => !!title && !!body),
+    },
     title: String,
     persistent: {
       type: Boolean,
@@ -50,6 +56,14 @@ export default {
       set(value) {
         this.$emit('input', value);
       },
+    },
+  },
+  methods: {
+    onClose() {
+      this.show = null;
+      this.$emit('close');
+      const nextRoute = this.persistent ? this.to : null;
+      this.$router.push(nextRoute);
     },
   },
 };

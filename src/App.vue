@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app">
+  <v-app id="app" :class="{ 'minimal-ui': $route.query.minimal_ui }">
     <app-navbar />
     <div id="app-menu"></div>
 
@@ -30,11 +30,9 @@ export default {
   },
   created() {
     domainHandler.install(this);
-
-    console.log('opening db');
     // Testing: http://gm.localhost:9020/surveys/5ec83ee6c4431b000146046e
     // TODO: figure out whether we need openDb?
-    db.openDb(() => console.log('indexdb opened'));
+    db.openDb(() => {});
   },
   mounted() {
     this.$store.dispatch('surveys/fetchPinned');

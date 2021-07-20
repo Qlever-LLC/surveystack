@@ -95,11 +95,12 @@ const actions = {
     // TODO: submissions should be a unique collection, we shouldn't just push
     commit(types.mutations.ADD_SUBMISSION, submission);
   },
-  // [types.actions.remove]({ commit }, id) {
-  //   commit(types.mutations.REMOVE_SUBMISSION, id);
-  // },
   async [types.actions.remove]({ commit }, id) {
-    await db.removeFromIndexedDB(db.stores.SUBMISSIONS, id);
+    try {
+      await db.removeFromIndexedDB(db.stores.SUBMISSIONS, id);
+    } catch (err) {
+      console.warn('unable to remove submission from IDB');
+    }
     commit(types.mutations.REMOVE_SUBMISSION, id);
   },
   async [types.actions.fetchLocalSubmission]({ state, dispatch }, id) {
@@ -118,9 +119,19 @@ const actions = {
       version: activeVersion,
       group,
     });
-    await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
+
+    try {
+      await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
+    } catch (err) {
+      console.warn('failed to save submission to IDB');
+    }
+
     dispatch(types.actions.add, submission);
-    router.push({ name: 'submissions-drafts-detail', params: { id: submission._id } });
+    router.push({
+      name: 'submissions-drafts-detail',
+      params: { id: submission._id },
+      query: { minimal_ui: router.currentRoute.query.minimal_ui },
+    });
   },
   async [types.actions.update]({ commit, dispatch }, submission) {
     await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
