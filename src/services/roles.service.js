@@ -69,11 +69,13 @@ export const hasRole = async (user, group, role) => {
   let ret = false;
   roles.forEach((r) => {
     if (targetRole.startsWith(r)) {
+      /*
       console.log(
         `targetRole '${targetRole}' starts with '${r}'\n  => User ${userId} is granted ${role}@${
           groupEntity.path
         }`
       );
+      */
       ret = true;
     }
   });
