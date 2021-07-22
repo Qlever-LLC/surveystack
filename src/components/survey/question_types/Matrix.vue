@@ -250,7 +250,8 @@ export default {
       return this.control.options.source;
     },
     headers() {
-      return this.source.content;
+      // remove all hidden headers
+      return this.source.content.filter((header) => !header.hidden);
     },
     fields() {
       return this.source.content.map((col) => col.value);
@@ -339,10 +340,11 @@ export default {
     },
   },
   async created() {
+    //load farmos field areas
     if (this.headers.find((header) => header.type === 'farmos_field')) {
       this.fetchAreas();
     }
-
+    // load farmos assets
     if (this.headers.find((header) => header.type === 'farmos_planting')) {
       await this.fetchAssets();
       this.farmosTransformedPlantings = transform(this.assets);

@@ -282,6 +282,7 @@
         v-model="control.options.source"
         :resources="survey.resources"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        :allowSetAllowHide="!!survey.meta.isLibrary"
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         class="mt-5"
