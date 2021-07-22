@@ -810,7 +810,9 @@ const updateSubmissionToLibrarySurveys = async (survey, submission) => {
   // create new library submissions
   let controls = survey.revisions[submission.meta.survey.version-1].controls;
   const QSLSubmissions = prepareSubmissionsToQSLs(controls, submission);
-  await db.collection(col).insertMany(QSLSubmissions);
+  if (QSLSubmissions.length !== 0) {
+    await db.collection(col).insertMany(QSLSubmissions);
+  }
 }
 
 const reassignSubmission = async (req, res) => {
