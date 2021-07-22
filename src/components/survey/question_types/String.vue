@@ -13,6 +13,7 @@
           class="full-width"
           :disabled="!relevant"
           hide-details
+          color="accent"
         />
       </div>
       <app-qr-scanner

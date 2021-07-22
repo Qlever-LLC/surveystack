@@ -1,10 +1,10 @@
 <template>
-  <v-container>
+  <v-container class="home" :fluid="true">
     <v-row>
       <v-col>
         <v-img
           v-if="isWhitelabel"
-          :src="$store.getters['whitelabel/partner'].logo"
+          :src="$store.getters['whitelabel/partner'].hero || $store.getters['whitelabel/partner'].logo"
           class="my-3"
           contain
           height="128"
@@ -19,44 +19,44 @@
           class="maxw-40 text-left"
           v-if="isWhitelabel && pinnedWhitelabelSurveys.length > 0"
           :entities="pinnedWhitelabelSurveys"
-          :title="`Pinned by ${whitelabelPartner.name}`"
+          title="Get Started"
           :link="(e) => `/surveys/${e.id}`"
+          :searchable="false"
         >
           <template v-slot:entity="{ entity }">
+            <v-list-item-icon class="mr-2 d-flex align-center mb-2">
+              <v-btn
+                v-if="entity.meta.submissions === 'public' || !entity.meta.submissions"
+                :to="`/surveys/${entity.id}`"
+                title="Everyone can submit"
+                icon
+              >
+                <v-icon>mdi-earth</v-icon>
+              </v-btn>
+              <v-btn
+                v-if="entity.meta.submissions === 'user'"
+                :to="`/surveys/${entity.id}`"
+                title="Only signed-in users can submit"
+                icon
+              >
+                <v-icon>mdi-account</v-icon>
+              </v-btn>
+              <v-btn
+                v-if="entity.meta.submissions === 'group'"
+                :to="`/surveys/${entity.id}`"
+                title="Everyone group members can submit"
+                icon
+              >
+                <v-icon>mdi-account-group</v-icon>
+              </v-btn>
+            </v-list-item-icon>
             <v-list-item-content>
-              <div class="d-flex">
-                <div class="mr-2">
-                  <v-btn
-                    v-if="entity.meta.submissions === 'public' || !entity.meta.submissions"
-                    :to="`/surveys/${entity.id}`"
-                    title="Everyone can submit"
-                    icon
-                  >
-                    <v-icon>mdi-earth</v-icon>
-                  </v-btn>
-                  <v-btn
-                    v-if="entity.meta.submissions === 'user'"
-                    :to="`/surveys/${entity.id}`"
-                    title="Only signed-in users can submit"
-                    icon
-                  >
-                    <v-icon>mdi-account</v-icon>
-                  </v-btn>
-                  <v-btn
-                    v-if="entity.meta.submissions === 'group'"
-                    :to="`/surveys/${entity.id}`"
-                    title="Everyone group members can submit"
-                    icon
-                  >
-                    <v-icon>mdi-account-group</v-icon>
-                  </v-btn>
-                </div>
-                <div>
-                  <v-list-item-title>{{ entity.name }}</v-list-item-title>
-                  <v-list-item-subtitle>{{ entity.group }}</v-list-item-subtitle>
-                </div>
-              </div>
+              <v-list-item-title>{{ entity.name }}</v-list-item-title>
+              <v-list-item-subtitle>{{ entity.group }}</v-list-item-subtitle>
             </v-list-item-content>
+            <div class="d-flex align-center ml-3">
+              <v-btn color="primary" small>Take Survey</v-btn>
+            </div>
           </template>
         </app-basic-list>
       </v-col>
@@ -68,7 +68,7 @@
           class="maxw-40 text-left"
           v-if="pinned && pinned.length > 0"
           :entities="pinned"
-          title="Get started with your surveys!"
+          title="More Surveys"
           :link="(e) => `/surveys/${e.id}`"
         >
           <template v-slot:entity="{ entity }">
@@ -111,7 +111,9 @@
       </v-col>
     </v-row>
 
-    <app-login v-if="!isLoggedIn"></app-login>
+    <v-dialog v-if="!isLoggedIn" v-model="loginIsVisible" class="login-dialog">
+      <app-login />
+    </v-dialog>
 
     <v-row>
       <v-col align="center">
@@ -120,18 +122,6 @@
         </v-btn>
       </v-col>
     </v-row>
-
-    <!-- <v-row v-if="showInstall">
-      <v-col align="center">
-        <v-btn
-          color="primary"
-          x-large
-          @click="install"
-        >
-          Install App
-        </v-btn>
-      </v-col>
-    </v-row> -->
 
     <v-row v-if="false">
       <v-col align="center">
@@ -143,14 +133,13 @@
 
     <v-row>
       <v-col align="center">
-        <v-chip style="font-family: monospace" to="/app/info">v{{ version }}</v-chip>
+        <v-btn text style="font-family: monospace" to="/app/info">v{{ version }}</v-btn>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
-import axios from 'axios';
 import AppLogin from '@/pages/auth/Login.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
 
@@ -163,6 +152,7 @@ export default {
   data() {
     return {
       version: process.env.VUE_APP_VERSION,
+      loginIsVisible: this.$store.getters['auth/isLoggedIn'] || true,
     };
   },
   methods: {
@@ -197,3 +187,19 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.home {
+  background-color: var(--v-background-base);
+  height: 100%;
+}
+
+>>> .v-dialog {
+  width: auto;
+  height: auto;
+}
+
+>>> .container {
+  padding: 0;
+}
+</style>

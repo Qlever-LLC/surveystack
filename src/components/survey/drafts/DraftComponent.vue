@@ -37,7 +37,7 @@
       <v-fab-transition>
         <v-btn
           v-show="overflowing"
-          color="pink"
+          color="primary"
           fab
           dark
           small
@@ -276,6 +276,7 @@ export default {
   display: flex;
   flex-direction: column;
   margin-bottom: 68px;
+  background-color: var(--v-background-base);
 }
 
 .draft-footer {

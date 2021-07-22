@@ -1,7 +1,6 @@
 <template>
   <nav>
     <v-app-bar app clipped-left color="appbar" absolute>
-      <!-- color="white" -->
       <v-app-bar-nav-icon @click="drawer = !drawer" />
       <v-toolbar-title class="flex-column">
         <div id="app-bar-title" class="title py-0 my-0">
@@ -275,6 +274,10 @@ export default {
 };
 </script>
 <style scoped>
+.title {
+  font-size: 1rem !important;
+}
+
 #app-bar-title {
   font-size: 1rem;
   font-weight: normal;

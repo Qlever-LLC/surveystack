@@ -46,6 +46,7 @@ export default {
         vue.$vuetify.theme.themes.light.info = activePartner.themes.light.info;
         vue.$vuetify.theme.themes.light.success = activePartner.themes.light.success;
         vue.$vuetify.theme.themes.light.appbar = activePartner.themes.light.appbar;
+        vue.$vuetify.theme.themes.light.background = activePartner.themes.light.background || '#ffffff';
 
         manifestElement.setAttribute('href', `/partners/${subdomain}/manifest.json`);
         iconElement.setAttribute('href', `/partners/${subdomain}/images/icons/icon-72x72.png`);
