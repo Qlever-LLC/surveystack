@@ -29,6 +29,8 @@ const connectDatabase = async () => {
   await migrateScripts_V1toV2();
   await migrateSurveys_VXtoV4();
   await migrateGroups_VXtoV2();
+  await migrateLibraryIds();
+  await migrateResourceLibraryIds();
 };
 
 const migrateScripts_V1toV2 = async () => {
@@ -131,4 +133,75 @@ const migrateGroups_VXtoV2 = async () => {
   }
 };
 
+const migrateLibraryIds = async () => {
+  const surveys = await db
+    .collection('surveys')
+    .find({"$and": [{ "revisions.controls.libraryId": { $exists: true }}, {"revisions.controls.libraryId" : { $not: {$type:"objectId" }}}] })
+    .toArray();
+
+  let modifiedCount = 0;
+
+  for (const survey of surveys) {
+    for (const revision of survey.revisions) {
+      for (const control of revision.controls) {
+        if (control.libraryId && ObjectId.isValid(control.libraryId)) {
+          await changeLibraryIdToObjectId(control);
+        }
+      }
+    }
+
+    await db.collection('surveys').findOneAndUpdate({ '_id': new ObjectId(survey._id) }, { $set: survey }, {
+      returnOriginal: false,
+    });
+
+    modifiedCount++;
+
+    console.log(`Migrated control.library to objectId of survey: ${survey.name}`);
+  }
+
+  if (modifiedCount > 0) {
+    console.log('Migrated control.library to objectId of this many surveys:', modifiedCount);
+  }
+};
+
+const changeLibraryIdToObjectId = async (control) => {
+  if (control.libraryId && ObjectId.isValid(control.libraryId)) {
+    control.libraryId = ObjectId(control.libraryId);
+  }
+
+  if (control.children && control.children.length > 0) {
+    for (const child of control.children) {
+      await changeLibraryIdToObjectId(child);
+    }
+  }
+}
+
+const migrateResourceLibraryIds = async () => {
+  const surveys = await db
+    .collection('surveys')
+    .find({"$and": [{ "resources.libraryId": { $exists: true }}, {"resources.libraryId" : { $not: {$type:"objectId" }}}] })
+    .toArray();
+
+  let modifiedCount = 0;
+
+  for (const survey of surveys) {
+    for (const resource of survey.resources) {
+      if (resource.libraryId && ObjectId.isValid(resource.libraryId)) {
+        resource.libraryId = ObjectId(resource.libraryId);
+      }
+    }
+
+    await db.collection('surveys').findOneAndUpdate({ '_id': new ObjectId(survey._id) }, { $set: survey }, {
+      returnOriginal: false,
+    });
+
+    modifiedCount++;
+
+    console.log(`Migrated resource.library to objectId of survey: ${survey.name}`);
+  }
+
+  if (modifiedCount > 0) {
+    console.log('Migrated resource.library to objectId of this many surveys', modifiedCount);
+  }
+};
 export { db, connectDatabase };
