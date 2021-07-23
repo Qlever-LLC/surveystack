@@ -34,9 +34,6 @@
             @click:append="showPasswords = !showPasswords"
             color="focus"
           />
-          <!-- outlined
-          background-color="white"
-          rounded -->
           <small>
             <router-link
               :to="{
@@ -244,9 +241,6 @@ export default {
 a {
   text-decoration: none;
 }
-/* .v-card.login-card {
-  background-color: var(--v-background-base);
-} */
 
 .wrapper {
   background-color: var(--v-background-base);
