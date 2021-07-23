@@ -13,6 +13,7 @@
           no-title
           :range="control.options.subtype === 'date-week-month-year'"
           class="mt-5"
+          color="focus"
         />
         <!--
           use text field with menu for year picker because year picker's
@@ -38,6 +39,7 @@
               v-on="on"
               readonly
               outlined
+              color="focus"
             />
           </template>
           <v-date-picker
@@ -47,6 +49,7 @@
             ref="picker"
             reactive
             no-title
+            color="focus"
           />
         </v-menu>
       </div>

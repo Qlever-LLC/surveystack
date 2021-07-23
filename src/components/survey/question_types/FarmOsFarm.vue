@@ -15,6 +15,8 @@
       :deletable-chips="control.options.hasMultipleSelections"
       @keyup.enter.prevent="submit"
       :loading="loading"
+      color="focus"
+      class="autocomplete"
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip
@@ -57,3 +59,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+>>> .v-list-item.v-list-item--active {
+  color: var(--v-focus-base) !important;
+}
+</style>

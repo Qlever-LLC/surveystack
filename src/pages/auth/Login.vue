@@ -1,19 +1,21 @@
 <template>
   <div class="wrapper">
-    <v-container class="maxw-40 px-0 pt-2">
-      <v-img
-        v-if="isWhitelabel"
-        :src="$store.getters['whitelabel/partner'].hero || $store.getters['whitelabel/partner'].logo"
-        class="my-3 mx-2"
-        contain
-        height="128"
-      />
-      <v-img v-else :src="require('../../assets/surveystack_temp_logo.svg')" class="my-3 mx-2" contain height="128" />
+    <v-container class="maxw-40 px-0" :class="{ 'pt-2': showHero }">
+      <div v-if="showHero">
+        <v-img
+          v-if="isWhitelabel"
+          :src="$store.getters['whitelabel/partner'].hero || $store.getters['whitelabel/partner'].logo"
+          class="my-3 mx-2"
+          contain
+          height="128"
+        />
+        <v-img v-else :src="require('../../assets/surveystack_temp_logo.svg')" class="my-3 mx-2" contain height="128" />
+      </div>
       <v-card class="pa-5 login-card">
-        <h1 class="secondary--text text-center" v-if="isWhitelabel && registrationEnabled">
+        <h1 class="heading--text text-center" v-if="isWhitelabel && registrationEnabled">
           Login &amp; Join {{ whitelabelPartner.name }}
         </h1>
-        <h1 class="secondary--text" v-else>Login</h1>
+        <h1 class="heading--text" v-else>Login</h1>
         <v-form>
           <v-text-field
             label="E-Mail"
@@ -21,6 +23,7 @@
             class="form-control"
             :value="entity.email"
             @input="entity.email = $event.toLowerCase()"
+            color="focus"
           />
           <v-text-field
             label="Password"
@@ -29,6 +32,7 @@
             v-model="entity.password"
             :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
             @click:append="showPasswords = !showPasswords"
+            color="focus"
           />
           <!-- outlined
           background-color="white"
@@ -86,7 +90,7 @@ export default {
     },
     showHero: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
   data() {

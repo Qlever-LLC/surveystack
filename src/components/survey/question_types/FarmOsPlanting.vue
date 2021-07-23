@@ -3,7 +3,7 @@
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
 
-    <v-progress-circular v-if="loading" indeterminate color="primary" class="my-8"> </v-progress-circular>
+    <v-progress-circular v-if="loading" indeterminate color="secondary" class="my-8"> </v-progress-circular>
 
     <v-list style="overflow: auto;">
       <v-list-item-group
@@ -25,9 +25,10 @@
                 v-if="control.options.hasMultipleSelections"
                 :input-value="active"
                 :true-value="hashItem(item)"
+                color="focus"
               />
               <v-radio-group v-else :value="active">
-                <v-radio :value="true" />
+                <v-radio :value="true" color="focus" />
               </v-radio-group>
             </v-list-item-action>
             <v-list-item-content>
@@ -250,9 +251,9 @@ export default {
 .farm-os-planting >>> .v-list-item__title .green-chip,
 .farm-os-planting >>> .v-list-item__title .blue-chip {
   display: inline-flex;
-  border: 1px #466cb3 solid;
+  border: 1px var(--v-focus-base) solid;
   background-color: white;
-  color: #466cb3;
+  color: var(--v-focus-base);
   border-radius: 0.4rem;
   font-weight: bold;
   font-size: 80%;

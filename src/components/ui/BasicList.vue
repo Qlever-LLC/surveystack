@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-card-title class="secondary--text">
+    <v-card-title class="heading--text">
       <slot name="title">
         {{ title }}
       </slot>

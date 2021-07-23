@@ -11,7 +11,7 @@
       ref="textField"
       :disabled="!relevant"
       hide-details
-      color="accent"
+      color="focus"
     />
     <app-control-more-info :value="control.moreInfo" />
   </div>

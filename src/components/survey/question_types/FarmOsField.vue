@@ -14,6 +14,7 @@
       :multiple="this.control.options.hasMultipleSelections"
       @keyup.enter.prevent="submit"
       :loading="loading"
+      color="focus"
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip
@@ -63,9 +64,9 @@ div >>> .blue-chip,
 div >>> .orange-chip,
 div >>> .green-chip {
   display: inline-flex;
-  border: 1px #466cb3 solid;
+  border: 1px var(--v-focus-base) solid;
   background: none;
-  color: #466cb3;
+  color: var(--v-focus-base);
   border-radius: 0.4rem;
   font-weight: bold;
   font-size: 80%;
@@ -85,5 +86,9 @@ div >>> .green-chip {
 div >>> .orange-chip {
   color: #f38d49;
   border: 1px #f38d49 solid;
+}
+
+>>> .v-list-item.v-list-item--active {
+  color: var(--v-focus-base) !important;
 }
 </style>

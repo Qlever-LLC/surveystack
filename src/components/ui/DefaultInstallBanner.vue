@@ -6,7 +6,6 @@
     <div class="text-center wrapper">
       <h2>Install App</h2>
       <div class="d-flex align-center justify-center pt-2">
-        <!-- color="accent lighten-1" -->
         <v-btn outlined @click="install" large>
           <v-icon class="ml-n2 mr-1" small>mdi-plus</v-icon>
           Add to Homescreen

@@ -112,7 +112,7 @@
     </v-row>
 
     <v-dialog v-if="!isLoggedIn" v-model="loginIsVisible" class="login-dialog">
-      <app-login />
+      <app-login :showHero="false" />
     </v-dialog>
 
     <v-row>

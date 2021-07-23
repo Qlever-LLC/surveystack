@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="wrapper">
     <v-banner class="my-2" v-if="$store.getters['draft/errors']" color="red" dark rounded>
       <h3>Api Compose Errors</h3>
       <li v-for="(error, i) in $store.getters['draft/errors']" :key="i">
@@ -288,5 +288,9 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   margin-right: 32px;
+}
+
+.wrapper {
+  background-color: var(--v-background-darken1);
 }
 </style>
