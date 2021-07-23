@@ -155,46 +155,24 @@ const buildPipelineForGetSurveyPage = ({
 
   if (isLibrary === "true") {
     // add to pipeline the aggregation for number of referencing survey and for number of submissions of referencing surveys
-    // count surveys containing a control with libraryId=current._id and isLibraryRoot=true
+    // TODO further reduce meta.libraryUsageCountSurveys by revisions.controls.isLibraryRoot=true and revisions.version=latestVersion
     const aggregateCounts = [
       {
+        '$match': {
+          'meta.isLibrary': true
+        }
+      }, {
         '$lookup': {
           'from': 'surveys',
-          'let': {
-            'libId': '$_id'
-          },
-          'pipeline': [
-            {
-              '$unwind': '$revisions'
-            }, {
-              '$match': {
-                '$expr': {
-                  '$eq': [
-                    '$revisions.version', '$latestVersion'
-                  ]
-                }
-              }
-            }, {
-              '$unwind': '$revisions.controls'
-            }, {
-              '$match': {
-                '$expr': {
-                  '$eq': [
-                    '$revisions.controls.isLibraryRoot', true
-                  ]
-                }
-              }
-            }, {
-              '$match': {
-                '$expr': {
-                  '$eq': [
-                    '$revisions.controls.libraryId', '$$libId'
-                  ]
-                }
-              }
-            }
-          ],
+          'localField': '_id',
+          'foreignField': 'revisions.controls.libraryId',
           'as': 'meta.libraryUsageCountSurveys'
+        }
+      }, {
+        '$addFields': {
+          'meta.libraryUsageCountSurveys': {
+            '$size': '$meta.libraryUsageCountSurveys'
+          }
         }
       }, {
         '$lookup': {
@@ -202,12 +180,6 @@ const buildPipelineForGetSurveyPage = ({
           'localField': '_id',
           'foreignField': 'meta.survey.id',
           'as': 'meta.libraryUsageCountSubmissions'
-        }
-      }, {
-        '$addFields': {
-          'meta.libraryUsageCountSurveys': {
-            '$size': '$meta.libraryUsageCountSurveys'
-          }
         }
       }, {
         '$addFields': {
