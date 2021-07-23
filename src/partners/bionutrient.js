@@ -2,7 +2,7 @@ export default {
   name: 'BFA',
   domain: 'bionutrient',
   id: '608d7e971c6a18000147f33a',
-  // id: '60f89604eb0f2c000199807e',
+  // id: '60f89604eb0f2c000199807e', // TODO: remove, TESTING ONLY
   slug: 'bionutrient',
   path: '/bionutrient/',
   logo: '/partners/bionutrient/img/logo.png',

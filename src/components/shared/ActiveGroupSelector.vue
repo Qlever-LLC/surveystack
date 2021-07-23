@@ -9,6 +9,7 @@
       :label="label"
       :outlined="outlined"
       hide-details
+      color="focus"
     >
     </v-select>
   </div>
