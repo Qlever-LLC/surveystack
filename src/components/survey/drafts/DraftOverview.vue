@@ -291,6 +291,6 @@ export default {
 }
 
 .wrapper {
-  background-color: var(--v-background-darken1);
+  background-color: var(--v-background);
 }
 </style>
