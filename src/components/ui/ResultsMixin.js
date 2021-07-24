@@ -49,7 +49,7 @@ export default {
       if (!hasErrors) {
         this.resultItems.push({
           title: 'Success',
-          body: 'Sucessful submission',
+          body: 'Successful submission',
         });
       }
     },

@@ -41,7 +41,14 @@
       :items="resultItems"
       title="Result of Submission"
       persistent
-      :to="survey && { name: 'surveys-detail', params: { id: survey._id } }"
+      :to="
+        survey && {
+          name: 'surveys-detail',
+          params: { id: survey._id },
+          query: { minimal_ui: $route.query.minimal_ui },
+        }
+      "
+      @close="onCloseResultDialog"
     />
   </div>
 </template>
@@ -98,36 +105,52 @@ export default {
         },
       ];
     },
+    onCloseResultDialog() {
+      // send message to parent iframe that submission was completed
+      const message = this.isSubmitted
+        ? {
+            type: 'SUBMISSION_RESULT_SUCCESS_CLOSE',
+            payload: { submissionId: this.submission._id },
+          }
+        : {
+            type: 'SUBMISSION_RESULT_ERROR_CLOSE',
+            payload: {},
+          };
+      window.parent.postMessage(message, '*');
+    },
     async submit({ payload }) {
       this.submitting = true;
       this.submission.meta.status = this.addReadyToSubmit(this.submission.meta.status || []);
 
+      let message;
       try {
-        // console.log('submitting', payload);
         const response = payload.meta.dateSubmitted
           ? await api.put(`/submissions/${payload._id}`, payload)
           : await api.post('/submissions', payload);
         this.result({ response });
         this.isSubmitted = true;
         await this.$store.dispatch('submissions/remove', this.submission._id);
-        // await Promise.all([
-
-        //   // this.$store.dispatch('readyToSubmit/remove', this.submission._id),
-        // ]);
+        message = {
+          type: 'SUBMISSION_SUBMIT_SUCCESS',
+          payload: { submissionId: this.submission._id },
+        };
       } catch (error) {
         console.log('Draft submit error:', error);
-        // const { message } = error.response.data;
-        // this.snack(message); // does not exists here?
         await db.persistSubmission(this.submission);
         this.result({ error });
+        message = {
+          type: 'SUBMISSION_SUBMIT_ERROR',
+          payload: {},
+        };
       } finally {
         this.submitting = false;
+        // Sent message to parent frame that Submission succeeded or failed
+        window.parent.postMessage(message, '*');
       }
     },
   },
   async created() {
     this.loading = true;
-
     const { id } = this.$route.params;
 
     try {

@@ -169,7 +169,11 @@ const actions = {
   setProperty({ commit, dispatch, state }, { path, value, calculate = true }) {
     commit('SET_PROPERTY', { path, value });
     if (state.persist) {
-      db.persistSubmission(state.submission);
+      try {
+        db.persistSubmission(state.submission);
+      } catch (err) {
+        console.warn('unable to persist submission to IDB');
+      }
     }
     if (calculate) {
       dispatch('calculateRelevance');
