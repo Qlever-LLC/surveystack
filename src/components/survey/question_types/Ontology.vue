@@ -19,10 +19,11 @@
       :label="control.hint"
       :multiple="!!control.options.hasMultipleSelections"
       :menu-props="autocompleteMenuProps"
-      class="full-width"
+      class="full-width dropdown"
       hide-details
       single-line
       data-test-id="autocomplete"
+      color="focus"
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip
@@ -67,10 +68,11 @@
       :multiple="!!control.options.hasMultipleSelections"
       :menu-props="autocompleteMenuProps"
       ref="input"
-      class="full-width custom-ontology"
+      class="full-width custom-ontology dropdown"
       hide-details
       single-line
       data-test-id="combobox"
+      color="focus"
     >
       <template v-slot:selection="data">
         <v-chip
@@ -214,6 +216,7 @@ export default {
         disableKeys: true,
         openOnClick: false,
         maxHeight: 304,
+        color: 'focus',
       };
 
       if (this.$vuetify.breakpoint.smAndDown) {
@@ -241,5 +244,9 @@ export default {
 <style scoped>
 .full-width {
   width: 100%;
+}
+
+>>> .v-list-item.v-list-item--active {
+  color: var(--v-focus-base) !important;
 }
 </style>

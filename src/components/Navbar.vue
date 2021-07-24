@@ -274,6 +274,10 @@ export default {
 };
 </script>
 <style scoped>
+.title {
+  font-size: 1rem !important;
+}
+
 #app-bar-title {
   font-size: 1rem;
   font-weight: normal;

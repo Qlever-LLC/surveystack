@@ -4,7 +4,7 @@ export default {
   id: '5ed66b0d5e03ea00017ceb91',
   slug: 'million-acre-challenge',
   path: '/million-acre-challenge/',
-  logo: '/partners/mac/img/logo.png',
+  logo: '/partners/millionacrechallenge/img/logo.png',
   themes: {
     light: {
       primary: '#6d3a35',

@@ -46,6 +46,9 @@ export default {
         vue.$vuetify.theme.themes.light.info = activePartner.themes.light.info;
         vue.$vuetify.theme.themes.light.success = activePartner.themes.light.success;
         vue.$vuetify.theme.themes.light.appbar = activePartner.themes.light.appbar;
+        vue.$vuetify.theme.themes.light.background = activePartner.themes.light.background || '#f5f5f5';
+        vue.$vuetify.theme.themes.light.focus = activePartner.themes.light.focus || activePartner.themes.light.primary;
+        vue.$vuetify.theme.themes.light.heading = activePartner.themes.light.heading || '#212121';
 
         manifestElement.setAttribute('href', `/partners/${subdomain}/manifest.json`);
         iconElement.setAttribute('href', `/partners/${subdomain}/images/icons/icon-72x72.png`);

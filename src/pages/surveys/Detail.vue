@@ -11,7 +11,7 @@
       </v-btn>
     </div>
 
-    <h1>{{ entity.name }}</h1>
+    <h1 class="heading--text">{{ entity.name }}</h1>
     <div v-if="surveyInfo" class="survey-info">
       <div class="survey-description" v-if="surveyInfo.description">
         {{ surveyInfo.description }}

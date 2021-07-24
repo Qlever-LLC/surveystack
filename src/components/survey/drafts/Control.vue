@@ -133,12 +133,13 @@ export default {
   box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
   border-left: 4px solid #fff;
   transition: 0.3s;
+  background-color: #ffffff;
 }
 
 /* On mouse-over, add a deeper shadow */
 .control:hover {
   box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2);
-  border-left: 4px solid var(--v-primary-base);
+  border-left: 4px solid var(--v-focus-base);
 }
 
 .group {

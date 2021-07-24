@@ -11,13 +11,14 @@
         data-test-id="radio-group"
         hide-details
       >
-        <v-radio v-for="item in filteredSource" :label="item.label" :value="item.value" :key="item.key" />
+        <v-radio v-for="item in filteredSource" :label="item.label" :value="item.value" :key="item.key" color="focus" />
         <v-radio
           :value="customSelection || 'other'"
           v-if="control.options.allowCustomSelection"
           class="mt-1"
           @change="customSelection = customSelection || 'other'"
           data-test-id="custom-input-radio"
+          color="focus"
         >
           <template v-slot:label>
             <v-text-field
@@ -29,6 +30,7 @@
               outlined
               dense
               label="other"
+              color="focus"
             />
           </template>
         </v-radio>

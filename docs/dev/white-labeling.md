@@ -11,5 +11,6 @@
 - create `icon.svg` in `public/partners/<partner>/`
 - change into directory
 - run `../gen-icon.sh icon.svg` to generate scaled versions
+- run `../gen-hero.sh hero.svg` to generate scaled hero image
 - Store in `public/partners` (create subfolder matching subdomain)
 - Add new `js` in `src/partners`.
