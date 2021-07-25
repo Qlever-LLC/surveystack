@@ -7,6 +7,18 @@ import https from 'https';
 import farmosService from '../services/farmos.service';
 import rolesService from '../services/roles.service';
 
+const getFarms = async (req, res) => {
+  let farms;
+  try {
+    farms = await farmosService.getCredentials(res.locals.auth.user);
+  } catch (exception) {
+    console.error(exception);
+    throw boom.badData();
+  }
+
+  return res.send(farms.map(f => ({ name: f.name, url: f.url })));
+}
+
 const common = async (endpoint, req, res) => {
   const farms = await farmosService.getCredentials(res.locals.auth.user);
   const uniqueFarmsByURL = [];
@@ -22,7 +34,7 @@ const common = async (endpoint, req, res) => {
 
   try {
     for (const farm of uniqueFarmsByURL) {
-      console.log('farm', farm);
+      //console.log('farm', farm);
       const agentOptions = {
         host: farm.aggregatorURL,
         port: '443',
@@ -251,10 +263,10 @@ const getIntegrationFarms = async (req, res) => {
     return res.send(farms);
   }
 
-  console.log("filtering for tags", tags);
+  // console.log("filtering for tags", tags);
   const arr = tags.split(",");
   return res.send(farms.filter(f => {
-    console.log('farm tags', f.tags)
+    //console.log('farm tags', f.tags)
     if (!f.tags) {
       return false;
     }
@@ -678,5 +690,6 @@ export default {
   setFarmMemberships,
   checkUrl,
   createFarmOsInstance,
-  createField
+  createField,
+  getFarms,
 };

@@ -66,6 +66,8 @@ router.put(
   ],
   catchErrors(groupController.updateGroup)
 );
+router.post('/groups/add-doc-link', assertAuthenticated, catchErrors(groupController.addDocLink));
+router.post('/groups/remove-doc-link', assertAuthenticated, catchErrors(groupController.removeDocLink));
 // router.delete('/groups/:id', assertAuthenticated, catchErrors(groupController.deleteGroup));
 
 /** Submissions */
@@ -185,6 +187,7 @@ router.post(
 router.get('/roles', catchErrors(rolesController.getRoles));
 
 /** farmos */
+router.get('/farmos/farms', catchErrors(farmosController.getFarms));
 router.get('/farmos/fields', catchErrors(farmosController.getFields));
 router.get('/farmos/assets', catchErrors(farmosController.getAssets));
 router.get(

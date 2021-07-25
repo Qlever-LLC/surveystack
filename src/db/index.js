@@ -1,9 +1,14 @@
-import { MongoClient, Db, ObjectId } from 'mongodb';
+import { MongoClient, Db } from 'mongodb';
 
 /**
  * @type {Db}
  */
 let db = null;
+
+/**
+ * @type {MongoClient}
+ */
+ let mongoClient = null;
 
 /**
  * https://stackoverflow.com/a/33780894
@@ -12,9 +17,9 @@ let db = null;
 const connectDatabase = async () => {
   const url = process.env.DATABASE_URL;
   const dbName = process.env.DATABASE_NAME;
-  const client = new MongoClient(url, { poolSize: 10, useNewUrlParser: true });
-  await client.connect();
-  db = client.db(dbName);
+  mongoClient = new MongoClient(url, { poolSize: 10, useNewUrlParser: true });
+  await mongoClient.connect();
+  db = mongoClient.db(dbName);
   await db.collection('users').createIndex({ email: 1 }, { unique: true });
   // may want unique compound index for dir & slug too
   await db.collection('groups').createIndex({ path: 1 }, { unique: true });
@@ -131,4 +136,4 @@ const migrateGroups_VXtoV2 = async () => {
   }
 };
 
-export { db, connectDatabase };
+export { db, connectDatabase, mongoClient };

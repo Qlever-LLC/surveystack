@@ -5,8 +5,9 @@ import { ObjectId } from 'mongodb';
 
 import boom from '@hapi/boom';
 
-import { db } from '../db';
-import * as csvService from '../services/csv.service';
+import { db, mongoClient } from '../db';
+import { withTransaction, withSession } from '../db/helpers';
+import csvService from '../services/csv.service';
 import headerService from '../services/header.service';
 import * as farmOsService from '../services/farmos.service';
 import rolesService from '../services/roles.service';
@@ -574,21 +575,17 @@ const getSubmission = async (req, res) => {
   return res.send(entity);
 };
 
-const createSubmission = async (req, res) => {
-  const entity = await sanitize(req.body);
-
+const prepareCreateSubmissionEntity = async (submission, res) => {
+  const entity = await sanitize(submission);
+  
   const survey = await db.collection('surveys').findOne({ _id: entity.meta.survey.id });
   if (!survey) {
     throw boom.notFound(`No survey found with id: ${entity.meta.survey.id}`);
   }
 
-  // authenticated
   if (res.locals.auth.isAuthenticated) {
     entity.meta.creator = res.locals.auth.user._id;
-  }
-
-  // anonymous
-  if (!res.locals.auth.isAuthenticated) {
+  } else {
     entity.meta.creator = null;
     // set submission group to survey's group for now
     if (survey.meta.group) {
@@ -596,11 +593,27 @@ const createSubmission = async (req, res) => {
     }
   }
 
-  const farmosResults = [];
+  return { entity, survey };
+};
+
+const createSubmission = async(req, res) => {
+  const submissions = Array.isArray(req.body) ? req.body : [req.body];
+
+  const submissionEntities = await Promise.all(
+    submissions.map(submission => prepareCreateSubmissionEntity(submission, res))
+  );
+
+  let farmOsResults;
   try {
-    const results = await farmOsService.handle(res, entity, survey, res.locals.auth.user);
-    farmosResults.push(...results);
-    // could contain errors, need to pass these on to the user
+    farmOsResults = await Promise.all(
+      submissionEntities.map(({ entity, survey }) =>
+        farmOsService.handle({
+          submission: entity,
+          survey,
+          user: res.locals.auth.user
+        })
+      )
+    );
   } catch (error) {
     // TODO what should we do if something internal fails?
     // need to let the user somehow know
@@ -611,25 +624,50 @@ const createSubmission = async (req, res) => {
     });
   }
 
-  try {
-    // insert the submission
-    let r = await db.collection(col).insertOne(entity);
-    assert.equal(1, r.insertedCount);
-    // copy submission to library survey
-    let controls = survey.revisions[entity.meta.survey.version-1].controls;
-    await copySubmissionToLibrarySurveys(controls, entity);
-    // set formosResults to result
-    r.farmos = farmosResults;
-    return res.send(r);
-  } catch (err) {
-    throw boom.boomify(err);
-  }
-};
+  const submissionsToQSLs = submissionEntities
+    .map(({ entity, survey }) => {
+      const controls = survey.revisions[entity.meta.survey.version-1].controls;
+      return prepareSubmissionsToQSLs(controls, entity);
+    })
+    .flat();
 
-// if submission contains question set library questions, submit a subset copy to each question set library
-const copySubmissionToLibrarySurveys = async (controls, submission) => {
-  // for each component in survey.revisions[meta.survey.version]
-  controls.forEach(function(control) {
+  const results = await withSession(mongoClient, async (session) => {
+    try {
+      return await withTransaction(session, async () => {
+        const submissionsToInsert = [
+          ...submissionEntities.map(({ entity }) => entity),
+          ...submissionsToQSLs,
+        ];
+
+        const result = await db.collection(col).insertMany(submissionsToInsert);
+        
+        if (submissionsToInsert.length !== result.insertedCount) {
+          await session.abortTransaction();
+          return;
+        }
+
+        return result;
+      });
+    } catch (error) {
+      throw boom.boomify(error);
+    }
+  });
+
+  if (!results) {
+    throw boom.internal('The transaction was intentionally aborted.');
+  }
+
+  res.send({
+    ...results,
+    farmos: farmOsResults.flat()
+  });
+}
+
+// if submission contains question set library questions, return a submission subset for each question set library
+const prepareSubmissionsToQSLs = (controls, submission) => {
+  const submissionsToQSLSurveys = [];
+
+  function createSubmissionsFromControl(control) {
     // for each library root control which is not deleted
     if (control.isLibraryRoot && !control.options.redacted) {
       // create a copy of submission
@@ -651,21 +689,24 @@ const copySubmissionToLibrarySurveys = async (controls, submission) => {
       //remove all data not in dataNamesOfThisLibrary
       removePrivateData(submissionCopy.data, dataNamesOfThisLibrary);
 
-      // do not store if no data is left
-      if(Object.keys(submissionCopy.data).length==0) {
+      // do not return copy if no data is left
+      if(Object.keys(submissionCopy.data).length === 0) {
         return;
       }
 
       // TODO if qsl survey is not found, we are probably on an on-premise-system, so try to find the survey on the central surveystack system
 
-      // store
-      console.log('create submission copy '+submissionCopy._id);
-      db.collection(col).insertOne(submissionCopy);
+      submissionsToQSLSurveys.push(submissionCopy);
     } else if(control.children) {
       // recursively go through the children
-      copySubmissionToLibrarySurveys(control.children, submission);
+      createSubmissionsFromControl(control.children);
     }
-  });
+  }
+
+  // for each component in survey.revisions[meta.survey.version]
+  controls.forEach(createSubmissionsFromControl);
+
+  return submissionsToQSLSurveys;
 };
 
 const collectDataNamesOfGivenLibraryId = (control, libraryId, collection) => {
@@ -733,7 +774,7 @@ const updateSubmission = async (req, res) => {
   try {
     // re-run with original creator user
     const creator = await db.collection('users').findOne({ _id: entity.meta.creator });
-    const results = await farmOsService.handle(res, entity, survey, creator);
+    const results = await farmOsService.handle({submission: entity, survey, user: creator });
     farmosResults.push(...results);
     // could contain errors, need to pass these on to the user
   } catch (error) {
@@ -776,7 +817,10 @@ const updateSubmissionToLibrarySurveys = async (survey, submission) => {
   });
   // create new library submissions
   let controls = survey.revisions[submission.meta.survey.version-1].controls;
-  await copySubmissionToLibrarySurveys(controls, submission);
+  const QSLSubmissions = prepareSubmissionsToQSLs(controls, submission);
+  if (QSLSubmissions.length !== 0) {
+    await db.collection(col).insertMany(QSLSubmissions);
+  }
 }
 
 const reassignSubmission = async (req, res) => {
@@ -802,7 +846,7 @@ const reassignSubmission = async (req, res) => {
   try {
     // TODO: should we use the currently logged in user or the submission's user?
     // probably the submission's user (for instance if submission is re-assigned with a different user)
-    const results = await farmOsService.handle(res, existing, survey, res.locals.auth.user);
+    const results = await farmOsService.handle({ submission: existing, survey, user: res.locals.auth.user });
     farmosResults.push(...results);
     // could contain errors, need to pass these on to the user
   } catch (error) {

@@ -178,7 +178,7 @@ async function execute(apiCompose, info, terms, user, submission, currentAssetId
   }
 }
 
-export const handle = async (res, submission, survey, user) => {
+export const handle = async ({ submission, survey, user }) => {
   const surveyVersion = submission.meta.survey.version;
 
   const { controls } = survey.revisions.find((revision) => revision.version === surveyVersion);
