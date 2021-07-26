@@ -31,7 +31,6 @@ export default {
     const parts = window.location.host.split('.');
     manifestElement.setAttribute('href', '/manifest.json');
 
-    // console.log('parts', parts);
     if (parts.length > 0) {
       const subdomain = parts[0];
       const activePartner = partners.find((p) => p.domain === subdomain);
@@ -46,9 +45,11 @@ export default {
         vue.$vuetify.theme.themes.light.info = activePartner.themes.light.info;
         vue.$vuetify.theme.themes.light.success = activePartner.themes.light.success;
         vue.$vuetify.theme.themes.light.appbar = activePartner.themes.light.appbar;
-        vue.$vuetify.theme.themes.light.background = activePartner.themes.light.background || '#f5f5f5';
+        vue.$vuetify.theme.themes.light.background =
+          activePartner.themes.light.background || vue.$vuetify.theme.themes.light.background;
         vue.$vuetify.theme.themes.light.focus = activePartner.themes.light.focus || activePartner.themes.light.primary;
-        vue.$vuetify.theme.themes.light.heading = activePartner.themes.light.heading || '#212121';
+        vue.$vuetify.theme.themes.light.heading =
+          activePartner.themes.light.heading || vue.$vuetify.theme.themes.light.heading;
 
         manifestElement.setAttribute('href', `/partners/${subdomain}/manifest.json`);
         iconElement.setAttribute('href', `/partners/${subdomain}/images/icons/icon-72x72.png`);

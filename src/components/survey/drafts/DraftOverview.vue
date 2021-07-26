@@ -289,8 +289,4 @@ export default {
   text-overflow: ellipsis;
   margin-right: 32px;
 }
-
-.wrapper {
-  background-color: var(--v-background);
-}
 </style>
