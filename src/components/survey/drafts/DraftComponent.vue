@@ -20,7 +20,7 @@
     />
 
     <!-- Overview -->
-    <div v-if="showOverview" class="grey lighten-4 draft-overview">
+    <div v-if="showOverview" class="draft-overview">
       <app-draft-overview
         v-if="showOverview"
         :survey="survey"
@@ -266,6 +266,7 @@ export default {
   display: flex;
   flex-direction: column;
   margin-bottom: 68px;
+  background-color: var(--v-background-base);
 }
 
 .draft-content {
