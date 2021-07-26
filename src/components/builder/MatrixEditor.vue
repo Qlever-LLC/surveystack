@@ -103,6 +103,22 @@
                 hint="Visible to submitter and admins only"
                 persistent-hint
               />
+              <v-checkbox
+                v-if="allowSetAllowHide"
+                v-model="item.allowHide"
+                label="Allow hide"
+                class="mt-2"
+                hint="Allow users of this question set to hide this column"
+                persistent-hint
+              />
+              <v-checkbox
+                v-if="!allowSetAllowHide && item.allowHide"
+                v-model="item.hidden"
+                label="Hidden"
+                class="mt-2"
+                hint="Submitters can not see this column. This option is intentionally allowed by the question set designer"
+                persistent-hint
+              />
               <h4 class="mt-6 mb-4">Display Options</h4>
               <v-text-field
                 type="number"
@@ -155,6 +171,10 @@ export default {
       type: Array,
       required: true,
       default: () => [],
+    },
+    allowSetAllowHide: {
+      type: Boolean,
+      required: true,
     },
   },
   components: {
