@@ -1,12 +1,12 @@
 <template>
   <div class="mx-0 px-0" style="width: 100%">
-    <div v-if="control.type === 'page' && !insidePage && !control.options.hidden">
+    <div v-if="control.type === 'page' && !insidePage">
       <div v-for="(child, i) in control.children" :key="i">
         <app-control :path="`${path}.${child.name}`" :control="child" :autoFocus="i === 0" insidePage />
       </div>
     </div>
 
-    <div v-else-if="control.type === 'group' && insidePage && !control.options.hidden">
+    <div v-else-if="control.type === 'group' && insidePage">
       <div
         class="group"
         :class="{
@@ -25,7 +25,7 @@
       </div>
     </div>
 
-    <div v-else-if="!control.options.hidden">
+    <div v-else>
       <div
         class="control"
         :class="{
@@ -133,12 +133,13 @@ export default {
   box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
   border-left: 4px solid #fff;
   transition: 0.3s;
+  background-color: #ffffff;
 }
 
 /* On mouse-over, add a deeper shadow */
 .control:hover {
   box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2);
-  border-left: 4px solid var(--v-primary-base);
+  border-left: 4px solid var(--v-focus-base);
 }
 
 .group {

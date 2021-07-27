@@ -64,7 +64,7 @@ export default function buildScriptQuestionIframeContents({
 
         import { createUI } from '${baseURL}/iframeUI.js';
         import * as ui from '${baseURL}/iframeUI.js';
-        import * as utils from '${baseURL}/iframeUtils.js';
+        import * as utils from '${baseURL}/sandboxUtils.js';
 
         window.log = requestLogMessage;
         window.runSurveyStackKit = requestRunSurveyStackKit;

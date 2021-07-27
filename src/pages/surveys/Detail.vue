@@ -1,6 +1,6 @@
 <template>
-  <v-container v-if="entity && show">
-    <div class="d-flex justify-end mb-4">
+  <v-container v-if="entity && show" class="survey-detail">
+    <div class="d-flex justify-end mb-4 survey-detail-nav">
       <v-btn v-if="editable" class="mx-2" :to="`/surveys/${entity._id}/edit`">
         <v-icon>mdi-pencil</v-icon>
         <span class="ml-2">Edit</span>
@@ -11,16 +11,16 @@
       </v-btn>
     </div>
 
-    <h1>{{ entity.name }}</h1>
+    <h1 class="heading--text">{{ entity.name }}</h1>
     <div v-if="surveyInfo" class="survey-info">
       <div class="survey-description" v-if="surveyInfo.description">
         {{ surveyInfo.description }}
       </div>
-      <div class="text--secondary">
+      <div class="text--secondary survey-info-submissions-count">
         {{ surveyInfo.submissions }}
         {{ surveyInfo.submissions === 1 ? 'submission' : 'submissions' }}
       </div>
-      <div v-if="surveyInfo.latestSubmission" class="text--secondary">
+      <div v-if="surveyInfo.latestSubmission" class="text--secondary survey-info-latest-submission">
         Latest submission on {{ surveyInfo.latestSubmission.dateModified }}
       </div>
     </div>

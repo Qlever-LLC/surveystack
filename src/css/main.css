@@ -146,3 +146,13 @@ body {
 .r-6 {
     right: 24px;
 }
+
+.minimal-ui .survey-detail-nav {
+    display: none !important;
+}
+
+.minimal-ui .app-navbar,
+.minimal-ui .survey-detail .survey-info-submissions-count,
+.minimal-ui .survey-detail .survey-info-latest-submission {
+    display: none;
+}

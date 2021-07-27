@@ -13,6 +13,7 @@
     <v-dialog v-model="matrixEditorDialog">
       <app-matrix-editor
         :resources="resources"
+        :allowSetAllowHide="allowSetAllowHide"
         v-model="value"
         @change="setResource"
         @delete="removeResource"
@@ -69,7 +70,12 @@ export default {
       default: () => [],
     },
     disabled: {
+      type: Boolean,
       required: false,
+    },
+    allowSetAllowHide: {
+      type: Boolean,
+      required: true,
     },
   },
   computed: {

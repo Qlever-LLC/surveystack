@@ -15,6 +15,7 @@ export default {
       info: '#26AAE2',
       success: '#8bc34a',
       appbar: '#FFFFFF',
+      // background: '#004578',
     },
   },
 };

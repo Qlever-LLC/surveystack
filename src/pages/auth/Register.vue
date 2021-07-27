@@ -1,8 +1,8 @@
 <template>
-  <v-container class="maxw-40">
+  <v-container class="maxw-40 wrapper">
     <v-card class="pa-5">
-      <h1 v-if="isWhitelabel">Register to join {{ whitelabelPartner.name }}</h1>
-      <h1 v-else>Register</h1>
+      <h1 class="heading--text" v-if="isWhitelabel">Register to join {{ whitelabelPartner.name }}</h1>
+      <h1 class="heading--text" v-else>Register</h1>
       <v-form class="mb-5">
         <v-text-field
           label="E-Mail"
@@ -10,9 +10,10 @@
           class="form-control"
           :value="entity.email.toLowerCase()"
           @input="entity.email = $event.toLowerCase()"
+          color="focus"
         />
 
-        <v-text-field label="Name" type="text" class="form-control" v-model="entity.name" />
+        <v-text-field label="Name" type="text" class="form-control" v-model="entity.name" color="focus" />
 
         <v-text-field
           label="Password"
@@ -21,6 +22,7 @@
           v-model="entity.password"
           :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
           @click:append="showPasswords = !showPasswords"
+          color="focus"
         />
 
         <v-text-field
@@ -30,6 +32,7 @@
           v-model="passwordConfirmation"
           :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
           @click:append="showPasswords = !showPasswords"
+          color="focus"
         />
 
         <div class="d-flex justify-end">
@@ -200,5 +203,10 @@ export default {
 <style scoped>
 a {
   text-decoration: none;
+}
+
+.wrapper {
+  background-color: var(--v-background-base);
+  height: 100%;
 }
 </style>

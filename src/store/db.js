@@ -106,17 +106,21 @@ function clearAllSurveys() {
 // }
 
 function persist(storeName, obj) {
-  const store = getObjectStore(storeName, 'readwrite');
-  let req;
+  try {
+    const store = getObjectStore(storeName, 'readwrite');
+    let req;
 
-  req = store.put(obj);
+    req = store.put(obj);
 
-  req.onsuccess = (evt) => {
-    console.log(`Insertion in DB successful: ${evt}`);
-  };
-  req.onerror = () => {
-    console.log('Insertion in DB Failed ', this.error);
-  };
+    req.onsuccess = (evt) => {
+      console.log(`Insertion in DB successful: ${evt}`);
+    };
+    req.onerror = () => {
+      console.log('Insertion in DB Failed ', this.error);
+    };
+  } catch (err) {
+    console.warn('unable to persist to IDB');
+  }
 }
 
 function persistSubmission(submission) {

@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-card-title>
+    <v-card-title class="heading--text">
       <slot name="title">
         {{ title }}
       </slot>
@@ -10,16 +10,19 @@
       </slot>
     </v-card-title>
     <v-card-text>
-      <v-text-field label="Search" v-model="q" append-icon="mdi-magnify" />
+      <v-text-field label="Search" v-model="q" append-icon="mdi-magnify" v-if="searchable" />
       <template v-if="entities.length > 0">
-        <v-list-item v-for="(entity, idx) in filteredEntities" :key="idx" two-line :to="link(entity)">
-          <slot name="entity" v-bind:entity="entity">
-            <v-list-item-content>
-              <v-list-item-title>Title #{{ idx }}</v-list-item-title>
-              <v-list-item-subtitle>Subtitle</v-list-item-subtitle>
-            </v-list-item-content>
-          </slot>
-        </v-list-item>
+        <template v-for="(entity, idx) in filteredEntities">
+          <v-list-item :key="idx" two-line :to="link(entity)">
+            <slot name="entity" v-bind:entity="entity">
+              <v-list-item-content>
+                <v-list-item-title>Title #{{ idx }}</v-list-item-title>
+                <v-list-item-subtitle>Subtitle</v-list-item-subtitle>
+              </v-list-item-content>
+            </slot>
+          </v-list-item>
+          <v-divider v-if="idx < filteredEntities.length - 1" :key="`d-${idx}`" />
+        </template>
       </template>
       <div v-else class="grey--text">No {{ title }} yet</div>
     </v-card-text>

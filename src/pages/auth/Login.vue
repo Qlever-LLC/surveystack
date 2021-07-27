@@ -1,53 +1,69 @@
 <template>
-  <v-container class="maxw-40 px-0">
-    <v-card class="pa-5">
-      <h1 v-if="isWhitelabel && registrationEnabled">Login and join {{ whitelabelPartner.name }}</h1>
-      <h1 v-else>Login</h1>
-      <v-form>
-        <v-text-field
-          label="E-Mail"
-          type="text"
-          class="form-control"
-          :value="entity.email"
-          @input="entity.email = $event.toLowerCase()"
+  <div class="wrapper">
+    <v-container class="maxw-40 px-0" :class="{ 'pt-2': showHero }">
+      <div v-if="showHero">
+        <v-img
+          v-if="isWhitelabel"
+          :src="$store.getters['whitelabel/partner'].hero || $store.getters['whitelabel/partner'].logo"
+          class="my-3 mx-2"
+          contain
+          height="128"
         />
-        <v-text-field
-          label="Password"
-          :type="passwordInputType"
-          class="form-control"
-          v-model="entity.password"
-          :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-          @click:append="showPasswords = !showPasswords"
-        />
-        <small>
-          <router-link
-            :to="{
-              name: 'auth-forgot-password',
-              query: { email: entity.email },
-            }"
-            >Forgot password?</router-link
-          >
-        </small>
-        <div class="d-flex justify-end">
-          <v-btn type="button" class="mr-2" text @click="reset">Reset</v-btn>
-          <v-btn type="submit" @click.prevent="submit" color="primary">Login</v-btn>
-        </div>
-      </v-form>
-
-      <div class="text-center text-muted mt-5" v-if="registrationEnabled || hasInvitation">
-        Don't have an account?
-        <router-link :to="registerLink">Register now</router-link>
+        <v-img v-else :src="require('../../assets/surveystack_temp_logo.svg')" class="my-3 mx-2" contain height="128" />
       </div>
-    </v-card>
+      <v-card class="pa-5 login-card">
+        <h1 class="heading--text text-center" v-if="isWhitelabel && registrationEnabled">
+          Login &amp; Join {{ whitelabelPartner.name }}
+        </h1>
+        <h1 class="heading--text" v-else>Login</h1>
+        <v-form>
+          <v-text-field
+            label="E-Mail"
+            type="text"
+            class="form-control"
+            :value="entity.email"
+            @input="entity.email = $event.toLowerCase()"
+            color="focus"
+          />
+          <v-text-field
+            label="Password"
+            :type="passwordInputType"
+            class="form-control"
+            v-model="entity.password"
+            :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+            @click:append="showPasswords = !showPasswords"
+            color="focus"
+          />
+          <small>
+            <router-link
+              :to="{
+                name: 'auth-forgot-password',
+                query: { email: entity.email },
+              }"
+              >Forgot password?</router-link
+            >
+          </small>
+          <div class="d-flex justify-end">
+            <v-btn type="button" class="mr-2" text @click="reset">Reset</v-btn>
+            <v-btn type="submit" @click.prevent="submit" color="primary">Login</v-btn>
+          </div>
+        </v-form>
 
-    <v-alert class="mt-4" outlined v-if="membership" type="info"
-      >Your code is eligible to join <strong>{{ membership.group.name }}</strong></v-alert
-    >
+        <div class="text-center text-muted mt-5" v-if="registrationEnabled || hasInvitation">
+          Don't have an account?
+          <router-link :to="registerLink">Register now</router-link>
+        </div>
+      </v-card>
 
-    <transition name="fade">
-      <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{ status }}</app-feedback>
-    </transition>
-  </v-container>
+      <v-alert class="mt-4" outlined v-if="membership" type="info"
+        >Your code is eligible to join <strong>{{ membership.group.name }}</strong></v-alert
+      >
+
+      <transition name="fade">
+        <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{ status }}</app-feedback>
+      </transition>
+    </v-container>
+  </div>
 </template>
 
 <script>
@@ -68,6 +84,10 @@ export default {
     initialEmail: {
       type: String,
       required: false,
+    },
+    showHero: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
@@ -220,5 +240,10 @@ export default {
 <style scoped>
 a {
   text-decoration: none;
+}
+
+.wrapper {
+  background-color: var(--v-background-base);
+  height: 100%;
 }
 </style>

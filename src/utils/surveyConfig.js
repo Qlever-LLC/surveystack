@@ -180,6 +180,12 @@ export const availableControls = [
     icon: 'mdi-leaf',
   },
   {
+    name: 'farmos_farm',
+    label: 'Farmos Farm',
+    type: 'farmOsFarm',
+    icon: 'mdi-leaf',
+  },
+  {
     name: 'map',
     label: 'Map',
     type: 'geoJSON',
