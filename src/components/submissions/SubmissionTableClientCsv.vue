@@ -39,6 +39,12 @@
 import papa from 'papaparse';
 import csvService from '@/services/csv.service';
 
+export function transformHeaders(headers) {
+  const replaceGeoJsonPath = (str) => str.replace(/(value\.features\.\d).*/, '$1');
+  // Remove GeoJSON question type paths from headers
+  return Array.isArray(headers) ? [...new Set(headers.map(replaceGeoJsonPath))] : headers;
+}
+
 export default {
   props: {
     submissions: {
@@ -108,13 +114,7 @@ export default {
     },
   },
   methods: {
-    onRowSelected({ value, item }) {
-      if (value) {
-        console.log(`selected ${item._id}`);
-      } else {
-        console.log(`de-selected ${item._id}`);
-      }
-    },
+    onRowSelected({ value, item }) {},
     createCustomFilter(field) {
       return (value, search, item) => {
         if (!this.searchFields[field]) {
@@ -147,7 +147,8 @@ export default {
       if (!this.submissions) {
         return;
       }
-      this.csv = csvService.createCsv(this.submissions.content, this.submissions.headers);
+      const headers = transformHeaders(this.submissions.headers);
+      this.csv = csvService.createCsv(this.submissions.content, headers);
       this.parsed = papa.parse(this.csv, { header: true });
       this.createHeaders();
     },

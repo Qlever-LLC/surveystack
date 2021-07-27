@@ -1,7 +1,7 @@
 /* eslint no-restricted-syntax: 0 */
 /* eslint no-param-reassign: 0 */
 import papa from 'papaparse';
-import _ from 'lodash';
+import { cloneDeep } from 'lodash';
 import { flatten } from 'flat';
 
 function removeKeys(obj, keys) {
@@ -26,16 +26,34 @@ function removeKeys(obj, keys) {
   }
 }
 
-function createHeaders(mergedObject) {
-  const flattened = flatten(mergedObject);
-  const headers = Object.keys(flattened);
-  return headers;
+/**
+ * transform submission object for presentation in csv
+ * @param {*} obj: submission object to transform
+ * @param {{[string]: function}} typeHandlers: object with keys for question types to match
+ * and values of transform functions to apply to those question types. Transform functions
+ * should return the updated value for the question value
+ * @returns updated submission object
+ */
+export function transformSubmissionQuestionTypes(obj, typeHandlers) {
+  return Object.entries(obj)
+    .map(([key, val]) => {
+      if (typeof val === 'object' && val !== null) {
+        const typeHandler =
+          'meta' in obj[key] && obj[key].meta.type in typeHandlers && typeHandlers[obj[key].meta.type];
+        if (typeHandler) {
+          return { [key]: typeHandler(val) };
+        }
+        return { [key]: transformSubmissionQuestionTypes(val, typeHandlers) };
+      }
+      return { [key]: val };
+    }) // Flatten objects
+    .reduce((r, x) => ({ ...r, ...x }), {});
 }
 
 function createCsvLegacy(submissions) {
   const items = [];
   submissions.forEach((s) => {
-    const submission = _.cloneDeep(s);
+    const submission = cloneDeep(s);
     submission._id = submission._id.toString();
 
     if (submission.survey) {
@@ -76,10 +94,25 @@ function createCsvLegacy(submissions) {
   return csv;
 }
 
+/**
+ *
+ * @param {*} o submission question object e.g. { meta: { type: 'geoJSON', ...}, value: {...}}
+ * @returns updated submission question object
+ */
+export function geojsonTransformer(o) {
+  return {
+    ...o,
+    value: {
+      ...o.value,
+      features: o.value.features.map(JSON.stringify),
+    },
+  };
+}
+
 function createCsv(submissions, headers) {
   const items = [];
   submissions.forEach((s) => {
-    const submission = _.cloneDeep(s);
+    const submission = cloneDeep(s);
     submission._id = submission._id.toString();
 
     if (submission.meta) {
@@ -104,8 +137,18 @@ function createCsv(submissions, headers) {
       }
     }
 
-    // removeKeys(submission.data, ['meta']); // remove any meta fields below data
-    items.push(flatten(submission));
+    // transform GeoJSON question type result table output to only flatten
+    // down to the level of each Feature in the FeatureCollection
+    const transformedSubmissionData = transformSubmissionQuestionTypes(submission.data, {
+      geoJSON: geojsonTransformer,
+    });
+
+    items.push(
+      flatten({
+        ...submission,
+        data: transformedSubmissionData,
+      })
+    );
   });
 
   let csv = '';
@@ -120,4 +163,7 @@ function createCsv(submissions, headers) {
   return csv;
 }
 
-export default { createCsv, createCsvLegacy };
+export default {
+  createCsv,
+  createCsvLegacy,
+};

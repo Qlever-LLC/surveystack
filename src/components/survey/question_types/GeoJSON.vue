@@ -119,6 +119,26 @@ export default {
       this.map.edit.geoJSONOn('modifyend', mapChangeHandler);
       this.map.edit.geoJSONOn('translateend', mapChangeHandler);
       this.map.edit.geoJSONOn('delete', mapChangeHandler);
+
+      // If no features exist in value, run automatic behaviors
+      if (!this.value) {
+        this.map.attachBehavior({
+          attach(instance) {
+            const controls = instance.map.getControls().getArray();
+            const geolocateControl = controls && controls.find((control) => control.constructor.name === 'Geolocate');
+            if (geolocateControl) {
+              // Trigger geolocation
+              geolocateControl.activate();
+            }
+          },
+        });
+
+        // Autofocus geocoder for desktop
+        if (window.innerWidth > 600) {
+          document.querySelector('#gcd-button-control').click();
+          document.querySelector('#gcd-input-query').focus();
+        }
+      }
     },
   },
 };
