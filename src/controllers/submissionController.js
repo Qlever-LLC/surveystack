@@ -7,7 +7,7 @@ import boom from '@hapi/boom';
 
 import { db, mongoClient } from '../db';
 import { withTransaction, withSession } from '../db/helpers';
-import csvService from '../services/csv.service';
+import * as csvService from '../services/csv.service';
 import headerService from '../services/header.service';
 import * as farmOsService from '../services/farmos.service';
 import rolesService from '../services/roles.service';
