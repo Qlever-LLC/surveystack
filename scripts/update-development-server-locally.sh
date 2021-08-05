@@ -21,6 +21,7 @@ git merge origin/develop
 
 # install node modules in webserver
 yarn install
+yarn build
 
 # Restart pm2 service
 pm2 start oursci-server-dev
