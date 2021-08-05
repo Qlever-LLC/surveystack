@@ -15,6 +15,18 @@ const sanitize = async (entity) => {
 
   entity.revisions.forEach((version) => {
     version.dateCreated = new Date(entity.dateCreated);
+
+    version.controls.forEach((control) => {
+      if (control.libraryId) {
+        control.libraryId = new ObjectId(control.libraryId);
+      }
+    });
+  });
+
+  entity.resources.forEach((resource) => {
+    if (resource.libraryId) {
+      resource.libraryId = new ObjectId(resource.libraryId);
+    }
   });
 
   if (entity.meta) {
@@ -67,15 +79,15 @@ const getSurveys = async (req, res) => {
 };
 
 const buildPipelineForGetSurveyPage = ({
-  q,
-  groups,
-  projections,
-  creator,
-  skip,
-  limit,
-  prefix,
-  isLibrary,
-}) => {
+                                         q,
+                                         groups,
+                                         projections,
+                                         creator,
+                                         skip,
+                                         limit,
+                                         prefix,
+                                         isLibrary,
+                                       }) => {
   const match = {};
   const project = {};
   let parsedSkip = 0;
@@ -141,151 +153,48 @@ const buildPipelineForGetSurveyPage = ({
     ]
   );
 
-    if (isLibrary === "true") {
-        // add to pipeline the aggregation for number of referencing survey
-        // count surveys containing a control with libraryId=current._id and isLibraryRoot=true
-        const aggregateSurveyCount = [
-            {
-                '$lookup': {
-                    'from': 'surveys',
-                    'let': {
-                        'libId': {
-                            '$toString': '$_id'
-                        }
-                    },
-                    'pipeline': [
-                        {
-                            '$unwind': '$revisions'
-                        }, {
-                            '$match': {
-                                '$expr': {
-                                    '$eq': [
-                                        '$revisions.version', '$latestVersion'
-                                    ]
-                                }
-                            }
-                        }, {
-                            '$unwind': '$revisions.controls'
-                        }, {
-                            '$match': {
-                                '$expr': {
-                                    '$eq': [
-                                        '$revisions.controls.isLibraryRoot', true
-                                    ]
-                                }
-                            }
-                        }, {
-                            '$match': {
-                                '$expr': {
-                                    '$eq': [
-                                        '$revisions.controls.libraryId', '$$libId'
-                                    ]
-                                }
-                            }
-                        }, {
-                            '$count': 'usages'
-                        }
-                    ],
-                    'as': 'meta.libraryUsageCountSurveys'
-                }
-            }, {
-                '$unwind': {
-                    'path': '$meta.libraryUsageCountSurveys',
-                    'preserveNullAndEmptyArrays': true
-                }
-            }, {
-                '$addFields': {
-                    'meta.libraryUsageCountSurveys': '$meta.libraryUsageCountSurveys.usages'
-                }
-            }, {
-                '$sort': {
-                    'meta.libraryUsageCountSurveys': -1
-                }
-            }
-        ];
-        pipeline.push(...aggregateSurveyCount);
-
-        // add to pipeline the aggregation for number of submissions of referencing surveys
-        const aggregateSubmissionCount = [
-           {
-                '$lookup': {
-                    'from': 'surveys',
-                    'let': {
-                        'libId': {
-                            '$toString': '$_id'
-                        }
-                    },
-                    'pipeline': [
-                        {
-                            '$unwind': '$revisions'
-                        }, {
-                            '$match': {
-                                '$expr': {
-                                    '$eq': [
-                                        '$revisions.version', '$latestVersion'
-                                    ]
-                                }
-                            }
-                        }, {
-                            '$unwind': '$revisions.controls'
-                        }, {
-                            '$match': {
-                                '$expr': {
-                                    '$eq': [
-                                        '$revisions.controls.isLibraryRoot', true
-                                    ]
-                                }
-                            }
-                        }, {
-                            '$match': {
-                                '$expr': {
-                                    '$eq': [
-                                        '$revisions.controls.libraryId', '$$libId'
-                                    ]
-                                }
-                            }
-                        }, {
-                            '$lookup': {
-                                'from': 'submissions',
-                                'let': {
-                                    'surveyId': '$_id'
-                                },
-                                'pipeline': [
-                                    {
-                                        '$match': {
-                                            '$expr': {
-                                                '$eq': [
-                                                    '$meta.survey.id', '$$surveyId'
-                                                ]
-                                            }
-                                        }
-                                    }, {
-                                        '$count': 'usages'
-                                    }
-                                ],
-                                'as': 'count'
-                            }
-                        }, {
-                            '$addFields': {
-                                'count': {
-                                    '$sum': '$count.usages'
-                                }
-                            }
-                        }
-                    ],
-                    'as': 'meta.libraryUsageCountSubmissions'
-                }
-            }, {
-                '$addFields': {
-                    'meta.libraryUsageCountSubmissions': {
-                        '$sum': '$meta.libraryUsageCountSubmissions.count'
-                    }
-                }
-            }
-        ];
-
-        pipeline.push(...aggregateSubmissionCount);
-    }
+  if (isLibrary === "true") {
+    // add to pipeline the aggregation for number of referencing survey and for number of submissions of referencing surveys
+    // TODO further reduce meta.libraryUsageCountSurveys by revisions.controls.isLibraryRoot=true and revisions.version=latestVersion
+    const aggregateCounts = [
+      {
+        '$match': {
+          'meta.isLibrary': true
+        }
+      }, {
+        '$lookup': {
+          'from': 'surveys',
+          'localField': '_id',
+          'foreignField': 'revisions.controls.libraryId',
+          'as': 'meta.libraryUsageCountSurveys'
+        }
+      }, {
+        '$addFields': {
+          'meta.libraryUsageCountSurveys': {
+            '$size': '$meta.libraryUsageCountSurveys'
+          }
+        }
+      }, {
+        '$lookup': {
+          'from': 'submissions',
+          'localField': '_id',
+          'foreignField': 'meta.survey.id',
+          'as': 'meta.libraryUsageCountSubmissions'
+        }
+      }, {
+        '$addFields': {
+          'meta.libraryUsageCountSubmissions': {
+            '$size': '$meta.libraryUsageCountSubmissions'
+          }
+        }
+      }, {
+        '$sort': {
+          'meta.libraryUsageCountSurveys': -1
+        }
+      }
+    ];
+    pipeline.push(...aggregateCounts);
+  }
 
   // skip
   if (skip) {
