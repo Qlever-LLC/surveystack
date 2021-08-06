@@ -1,41 +1,44 @@
 <template>
-  <v-container class="maxw-40">
-    <v-card class="pa-5">
-      <h1>New password</h1>
-      <p>Set a new password for {{ this.email }}</p>
-      <v-form @submit.prevent="submit">
-        <v-text-field
-          v-model="newPassword"
-          label="Password"
-          :type="passwordInputType"
-          :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-          @click:append="showPasswords = !showPasswords"
-        />
-        <v-text-field
-          v-model="newPasswordConfirmation"
-          label="Password confirmation"
-          :type="passwordInputType"
-          :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-          @click:append="showPasswords = !showPasswords"
-        />
-        <div class="d-flex justify-end">
-          <v-btn type="submit" color="primary">Set password</v-btn>
-        </div>
-      </v-form>
-    </v-card>
-    <transition name="fade">
-      <app-feedback v-if="status" class="mt-5" @closed="status = null" :type="status.type">{{
-        status.message
-      }}</app-feedback>
-    </transition>
-    <transition name="fade">
-      <app-feedback v-if="showSuccessMessage" class="mt-5" :closeable="false" type="success">
-        Your new password has been set!
-        <router-link :to="{ name: 'auth-login', params: { initialEmail: email } }">Continue to log in area</router-link
-        >.
-      </app-feedback>
-    </transition>
-  </v-container>
+  <div class="wrapper">
+    <v-container class="maxw-40">
+      <v-card class="pa-5">
+        <h1>New password</h1>
+        <p>Set a new password for {{ this.email }}</p>
+        <v-form @submit.prevent="submit">
+          <v-text-field
+            v-model="newPassword"
+            label="Password"
+            :type="passwordInputType"
+            :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+            @click:append="showPasswords = !showPasswords"
+          />
+          <v-text-field
+            v-model="newPasswordConfirmation"
+            label="Password confirmation"
+            :type="passwordInputType"
+            :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+            @click:append="showPasswords = !showPasswords"
+          />
+          <div class="d-flex justify-end">
+            <v-btn type="submit" color="primary">Set password</v-btn>
+          </div>
+        </v-form>
+      </v-card>
+      <transition name="fade">
+        <app-feedback v-if="status" class="mt-5" @closed="status = null" :type="status.type">{{
+          status.message
+        }}</app-feedback>
+      </transition>
+      <transition name="fade">
+        <app-feedback v-if="showSuccessMessage" class="mt-5" :closeable="false" type="success">
+          Your new password has been set!
+          <router-link :to="{ name: 'auth-login', params: { initialEmail: email } }"
+            >Continue to log in area</router-link
+          >.
+        </app-feedback>
+      </transition>
+    </v-container>
+  </div>
 </template>
 
 <script>
@@ -99,3 +102,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.wrapper {
+  height: 100%;
+  background-color: var(--v-background-base);
+}
+</style>
