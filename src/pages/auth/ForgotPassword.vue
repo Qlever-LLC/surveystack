@@ -1,22 +1,24 @@
 <template>
-  <v-container class="maxw-40">
-    <v-card class="pa-5">
-      <h1>Password forgotten</h1>
-      <p>Enter your email address and we will send you a link for setting a new password.</p>
+  <div class="wrapper">
+    <v-container class="maxw-40">
+      <v-card class="pa-5">
+        <h1>Password forgotten</h1>
+        <p>Enter your email address and we will send you a link for setting a new password.</p>
 
-      <v-form @submit.prevent="submit">
-        <v-text-field v-model="email" label="Email" />
-        <div class="d-flex justify-end">
-          <v-btn type="submit" color="primary">Submit</v-btn>
-        </div>
-      </v-form>
-    </v-card>
-    <transition name="fade">
-      <app-feedback v-if="status" class="mt-5" @closed="status = null" :type="status.type">{{
-        status.message
-      }}</app-feedback>
-    </transition>
-  </v-container>
+        <v-form @submit.prevent="submit">
+          <v-text-field v-model="email" label="Email" />
+          <div class="d-flex justify-end">
+            <v-btn type="submit" color="primary">Submit</v-btn>
+          </div>
+        </v-form>
+      </v-card>
+      <transition name="fade">
+        <app-feedback v-if="status" class="mt-5" @closed="status = null" :type="status.type">{{
+          status.message
+        }}</app-feedback>
+      </transition>
+    </v-container>
+  </div>
 </template>
 
 <script>
@@ -76,3 +78,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.wrapper {
+  height: 100%;
+  background-color: var(--v-background-base);
+}
+</style>
