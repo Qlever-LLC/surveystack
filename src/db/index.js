@@ -28,7 +28,12 @@ const connectDatabase = async () => {
   await db.collection('submissions').createIndex({ 'meta.survey.id': 1 });
   await db.collection('submissions').createIndex({ 'meta.survey.version': 1 });
   await db.collection('submissions').createIndex({ 'meta.creator': 1 });
-  await db.createCollection('farmos.webhookrequests', { capped: true, size: 10000, max: 5000 });
+  // const farmOsWebhookRequestsCollectionExists = await db.listCollections().toArray().some(({ name }) => name === 'farmos.webhookrequests')
+  const farmOsWebhookRequestsCollectionName = 'farmos.webhookrequests'
+  const farmOsWebhookRequestsCollectionExists = await db.listCollections({ name: farmOsWebhookRequestsCollectionName }).hasNext();
+  if (!farmOsWebhookRequestsCollectionExists) {
+    await db.createCollection(farmOsWebhookRequestsCollectionName, { capped: true, size: 10000, max: 5000 });
+  }
 
   // migrations
   await migrateScripts_V1toV2();
