@@ -710,7 +710,7 @@ const prepareSubmissionsToQSLs = (controls, submission) => {
 };
 
 const collectDataNamesOfGivenLibraryId = (control, libraryId, collection) => {
-  if(control.libraryId===libraryId && !control.isLibraryRoot) {
+  if(control.libraryId && control.libraryId.toString()===libraryId.toString() && !control.isLibraryRoot) {
     collection.push(control.name);
   }
   if(control.children) {
