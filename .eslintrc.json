@@ -15,8 +15,5 @@
   },
   "rules": {
     "no-unused-vars": [1]
-  },
-  "plugins": {
-    ["jest"]
   }
 }
