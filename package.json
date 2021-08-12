@@ -12,6 +12,6 @@
     "lint-staged": "^11.1.2"
   },
   "scripts": {
-    "prepare": "husky install"
+    "prepare": "husky install; git config --local include.path ../.gitconfig"
   }
 }
