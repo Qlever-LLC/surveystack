@@ -6,7 +6,7 @@ const LCL = require('last-commit-log');
 
 const fs = require('fs');
 
-const lcl = new LCL();
+const lcl = new LCL('../');
 const commit = lcl.getLastCommitSync();
 process.env.VUE_APP_GIT_HASH = commit.hash;
 process.env.VUE_APP_GIT_TAG = commit.gitTag;
