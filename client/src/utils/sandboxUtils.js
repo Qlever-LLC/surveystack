@@ -184,7 +184,8 @@ export function getClean(chooseOne) {
   if (chooseOne.value === null) {
     return thisAnswer; // question is null
   }
-  if (Array.isArray(chooseOne.value)) { // if this happens to be an array, return the first item only
+  if (Array.isArray(chooseOne.value)) {
+    // if this happens to be an array, return the first item only
     thisAnswer = chooseOne.value[0]; // set it to the first object in the array
     console.log(`clean "${chooseOne.value[0]}" to "${thisAnswer}"`);
     return thisAnswer;

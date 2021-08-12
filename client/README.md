@@ -87,45 +87,6 @@ We have a list of manual QA testing before pushing changes to the production ser
 
 Read and follow the QA prior to deployment, and add as features are expanded or better examples or test cases become available.
 
-## Coding guidelines
-
-Our-Sci PWA adheres to airbnb coding style guidelines. For development, we recommend using Visual Studio Code with the following workspace settings under `.vscode/settings.json`:
-
-```
-{
-    "prettier.requireConfig": true,
-    "eslint.run": "onType",
-    "eslint.autoFixOnSave": true,
-    "eslint.validate": [
-        "javascript",
-        {
-            "language": "vue",
-            "autoFix": true
-        },
-    ],
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
-    },
-    "vetur.format.defaultFormatter.js": "vscode-typescript",
-    "vetur.format.defaultFormatter.html": "js-beautify-html",
-}
-```
-
-> **NOTE:** This settings file is not commited to git, so feel free to customize. **Edit** 3 Feb 2020: It is now commited anyway
-
-The above config disables prettier (if installed) as we do not use a .prettierrc config file. Otherwise prettier and eslint keep battling each other... There may be a better approach, but for now this will do. Also you may need to **disable Prettier for this workspace** since there is currently (Jan 2020) a bug, where Prettier formatting is applied anyhow even though there is no prettier config file.
-
-Furthermore, we recommend using the [Vetur](https://vuejs.github.io/vetur) extension for Visual Studio Code. We are using the following settings **Default Formatters** for Vetur (vetur.format.defaultFormatter)
-- CSS = prettier
-- HTML = **js-beautify-html**
-- JS = prettier
-- LESS = prettier
-- Postcss = prettier
-- SCSS = prettier
-- Stylus = stylus-supremacy
-- TS = prettier
-
-
 ## Vuetify
 
 This project uses Vuetify 
