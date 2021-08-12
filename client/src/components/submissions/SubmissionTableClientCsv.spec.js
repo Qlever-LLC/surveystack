@@ -48,7 +48,6 @@ function mockHeaders() {
   ];
 }
 
-
 describe('SubmissionTableClientCsv', () => {
   describe('transformHeaders', () => {
     it('collapses geojson features', () => {
