@@ -1,18 +1,4 @@
 
-pages:
-  stage: deploy
-  script:
-    - git clone https://gitlab.com/our-sci/our-sci-pwa.wiki
-    - mkdir .public
-    - rm -rf public
-    - cp -r our-sci-pwa.wiki/* .public
-    - mv .public public
-  artifacts:
-    paths:
-      - public
-  only:
-    - master
-
 variables:
   GIT_DEPTH: "3"
 
@@ -29,6 +15,7 @@ workflow:
     # cache per branch
     key: ${CI_COMMIT_REF_SLUG}
     paths:
+      - client/node_modules/
       - node_modules/
 
 .pull-cache-only:
@@ -41,26 +28,26 @@ stages:
   - install
   - lint
   - test
-  - deploy
 
-yarn install:
+lerna bootstrap:
   extends: .cache-policy
   stage: install
   script:
     - yarn
+    - yarn lerna bootstrap
   
 lint:
   extends: .pull-cache-only
   stage: lint
   script:
-    - yarn lint
+    - yarn client:lint
   needs:
-    - yarn install
+    - lerna bootstrap
 
 test:
   extends: .pull-cache-only
   stage: test
   script:
-    - yarn test:unit
+    - yarn client:test
   needs:
-    - yarn install
+    - lerna bootstrap
