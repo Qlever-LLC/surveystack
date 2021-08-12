@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg8"
+   version="1.1"
+   viewBox="0 0 105.56875 139.39717"
+   height="139.39717mm"
+   width="105.56875mm">
+  <defs
+     id="defs2">
+    <symbol
+       viewBox="0 0 384 512"
+       id="map-marker-alt">
+      <title
+         id="map-marker-alt-title">Map Marker-alt</title>
+      <path
+         id="path7568"
+         d="M 45.579242,132.73352 C 7.1358125,77.001952 0,71.28219 0,50.8 0,22.743848 22.743848,0 50.8,0 c 28.056152,0 50.8,22.743848 50.8,50.8 0,20.48219 -7.135813,26.201952 -45.579242,81.93352 -2.522802,3.64437 -7.918979,3.64411 -10.441516,0 z M 50.8,71.966667 c 11.690085,0 21.166667,-9.476582 21.166667,-21.166667 0,-11.690085 -9.476582,-21.166667 -21.166667,-21.166667 -11.690085,0 -21.166667,9.476582 -21.166667,21.166667 0,11.690085 9.476582,21.166667 21.166667,21.166667 z"
+         style="stroke-width:1" />
+    </symbol>
+  </defs>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-53.916368,-74.98)"
+     id="layer1">
+    <g
+       style="fill:#ff2a2a;stroke:#ffffff;stroke-width:3.96875;stroke-miterlimit:4;stroke-dasharray:none"
+       transform="translate(55.900743,76.964375)"
+       id="use11215">
+      <title
+         id="title11217">Map Marker-alt</title>
+      <path
+         style="fill:#ff2a2a;stroke:#ffffff;stroke-width:3.96875;stroke-miterlimit:4;stroke-dasharray:none"
+         d="M 45.579242,132.73352 C 7.1358125,77.001952 0,71.28219 0,50.8 0,22.743848 22.743848,0 50.8,0 c 28.056152,0 50.8,22.743848 50.8,50.8 0,20.48219 -7.135813,26.201952 -45.579242,81.93352 -2.522802,3.64437 -7.918979,3.64411 -10.441516,0 z M 50.8,71.966667 c 11.690085,0 21.166667,-9.476582 21.166667,-21.166667 0,-11.690085 -9.476582,-21.166667 -21.166667,-21.166667 -11.690085,0 -21.166667,9.476582 -21.166667,21.166667 0,11.690085 9.476582,21.166667 21.166667,21.166667 z"
+         id="path11219" />
+    </g>
+  </g>
+</svg>
