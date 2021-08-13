@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+  app:
+    # image: ${IMAGE_APP_TAG}
+    image: surveystack
+    build: .
+    environment:
+      # - SOME_SERVICE=${EXTERNAL_SERVICE_KEY}
+      - PORT=3009
+      - DATABASE_URL=mongodb://localhost:27017/oursci-server-local 
+      - DATABASE_NAME=oursci-server-local 
+      - PATH_PREFIX= 
+      - BCRYPT_ROUNDS=12
+      - ADMIN_USERNAME=root
+      # - ADMIN_PASSWORD=''
+      - ADMIN_EMAIL=admin@our-sci.net
+    # ports:
+    #   - "3000:3000" # map host port : container port
+    network_mode: host
+    deploy: 
+      restart_policy:
+        condition: on-failure
