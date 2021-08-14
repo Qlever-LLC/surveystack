@@ -43,7 +43,7 @@ export const assertEntityRights = catchErrors(async (req, res, next) => {
   const { existing } = res.locals;
   const user = res.locals.auth.user._id;
 
-  if (!res.locals.auth.isSuperAdmin) {
+  if (res.locals.auth.isSuperAdmin) {
     return next(); // allow super admins to reassign
   }
 
