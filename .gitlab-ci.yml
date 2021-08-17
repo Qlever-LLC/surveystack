@@ -1,9 +1,9 @@
 
 variables:
-  GIT_DEPTH: "3"
+  GIT_DEPTH: "1"
 
 image:
-  name: "node:15"
+  name: "node:14"
 
 workflow:
   rules:
@@ -13,7 +13,8 @@ workflow:
 .cache-policy:
   cache:
     # cache per branch
-    key: ${CI_COMMIT_REF_SLUG}
+    # key: ${CI_COMMIT_REF_SLUG}
+    key: testing_stuff
     paths:
       - node_modules/
       - client/node_modules/
@@ -56,7 +57,8 @@ build container:
     # volume mount in `config.toml`.
     DOCKER_TLS_CERTDIR: "/certs"
 
-deploy to review 1: 
+deploy to review 1:
+  stage: deploy
   script:
     # Install ssh-agent if not already installed, it is required by Docker.
     # (change apt-get to yum if you use a CentOS-based image)
@@ -67,13 +69,15 @@ deploy to review 1:
     - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
     # - echo "EXTERNAL_SERVICE_KEY=$EXTERNAL_SERVICE_STAGE_KEY" >> .env
     - echo "IMAGE_APP_TAG=$IMAGE_APP_TAG" >> .env
+    - echo "DATABASE_URL=mongodb+srv://$DATABASE_CREDENTIALS@$DATABASE_URI" >> .env
+    - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
     - docker-compose -H "ssh://$SERVER_USER@$SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$SERVER_IP" up -d
   environment:
     name: review 1
     # url: ${SERVER_IP}:3000
-    url: http://3.87.72.221:3000
+    url: ${SERVER_IP}:3000
   when: manual
   image: docker:19.03.12
   services:
@@ -88,6 +92,9 @@ deploy to review 1:
     # /certs/client so we only need to share this directory with the
     # volume mount in `config.toml`.
     DOCKER_TLS_CERTDIR: "/certs"
+  needs: 
+    - build container
+
 
 
 build client:
