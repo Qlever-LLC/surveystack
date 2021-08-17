@@ -12,6 +12,8 @@ services:
       - BCRYPT_ROUNDS=12
       - ADMIN_USERNAME=root
       - ADMIN_EMAIL=admin@our-sci.net
+      - DATABASE_URL=${DATABASE_URL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     # ports:
     #   - "3000:3000" # map host port : container port
     network_mode: host

@@ -29,12 +29,13 @@ workflow:
     policy: pull
 
 stages:
+  # TODO: move this last
+  - deploy
   - install
   - lint
   - test
   - build
   - dockerize
-  - deploy
 
 build container:
   extends: .pull-cache-only
@@ -56,6 +57,9 @@ build container:
     # /certs/client so we only need to share this directory with the
     # volume mount in `config.toml`.
     DOCKER_TLS_CERTDIR: "/certs"
+  needs:
+    - build client
+    - build server
 
 deploy to review 1:
   stage: deploy
@@ -92,8 +96,11 @@ deploy to review 1:
     # /certs/client so we only need to share this directory with the
     # volume mount in `config.toml`.
     DOCKER_TLS_CERTDIR: "/certs"
-  needs: 
-    - build container
+  # TODO: uncomment
+  # needs: 
+  #   - build container
+  #   - lint client
+  #   - test client
 
 
 
@@ -104,8 +111,6 @@ build client:
     - yarn client:build
   needs: 
     - lerna bootstrap
-    - lint client
-    - test client
 
 build server:
   extends: .cache-policy
