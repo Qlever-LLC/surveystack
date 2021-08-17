@@ -13,8 +13,7 @@ workflow:
 .cache-policy:
   cache:
     # cache per branch
-    # key: ${CI_COMMIT_REF_SLUG}
-    key: testing_stuff
+    key: ${CI_COMMIT_REF_SLUG}
     paths:
       - node_modules/
       - client/node_modules/
@@ -29,13 +28,12 @@ workflow:
     policy: pull
 
 stages:
-  # TODO: move this last
-  - deploy
   - install
   - lint
   - test
   - build
   - dockerize
+  - deploy
 
 build container:
   extends: .pull-cache-only
@@ -80,7 +78,6 @@ deploy to review 1:
     - docker-compose -H "ssh://$SERVER_USER@$SERVER_IP" up -d
   environment:
     name: review 1
-    # url: ${SERVER_IP}:3000
     url: ${SERVER_IP}:3000
   when: manual
   image: docker:19.03.12
@@ -96,11 +93,10 @@ deploy to review 1:
     # /certs/client so we only need to share this directory with the
     # volume mount in `config.toml`.
     DOCKER_TLS_CERTDIR: "/certs"
-  # TODO: uncomment
-  # needs: 
-  #   - build container
-  #   - lint client
-  #   - test client
+  needs: 
+    - build container
+    - lint client
+    - test client
 
 
 
