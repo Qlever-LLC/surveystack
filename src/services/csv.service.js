@@ -101,9 +101,7 @@ function createCsvLegacy(submissions) {
  */
 export function geojsonTransformer(o) {
   if (!o.value) {
-    return {
-      ...o,
-    };
+    return o;
   }
   return {
     ...o,
