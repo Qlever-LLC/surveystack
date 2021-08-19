@@ -53,6 +53,9 @@ function stringifyObjectIds(obj) {
  * @returns updated submission question object
  */
 function geojsonTransformer(o) {
+  if (!o.value) {
+    return o;
+  }
   return {
     ...o,
     value: {
