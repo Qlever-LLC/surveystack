@@ -100,6 +100,11 @@ function createCsvLegacy(submissions) {
  * @returns updated submission question object
  */
 export function geojsonTransformer(o) {
+  if (!o.value) {
+    return {
+      ...o,
+    };
+  }
   return {
     ...o,
     value: {
