@@ -1,66 +1,115 @@
-import {
-  transformSubmissionQuestionTypes,
-  geojsonTransformer,
-} from './csv.service';
+import { transformSubmissionQuestionTypes, geojsonTransformer } from './csv.service';
 
 function mockSubmissions() {
-  return [{
-    _id: '60b52489fe387f0001339266',
-    meta: {
-      dateCreated: '2021-05-31T18:01:45.771Z',
-      dateModified: '2021-05-31T18:01:51.153Z',
-      dateSubmitted: '2021-05-31T18:01:54.979Z',
-      survey: {
-        id: '60b524715575f00001f504da',
-        version: 2,
-      },
-      revision: 1,
-      permissions: [],
-      status: [{
-        type: 'READY_TO_SUBMIT',
-        value: {
-          at: '2021-05-31T18:01:54.902Z',
+  return [
+    {
+      _id: '60b52489fe387f0001339266',
+      meta: {
+        dateCreated: '2021-05-31T18:01:45.771Z',
+        dateModified: '2021-05-31T18:01:51.153Z',
+        dateSubmitted: '2021-05-31T18:01:54.979Z',
+        survey: {
+          id: '60b524715575f00001f504da',
+          version: 2,
         },
-      }],
-      group: {
-        id: '5e6f8bbeea14550001470c28',
-        path: '/our-sci/',
-      },
-      specVersion: 3,
-      creator: '5e452119c5117c000185f275',
-      creatorDetail: {
-        email: 'bob@our-sci.net',
-        name: 'Bob',
-      },
-    },
-    data: {
-      map_1: {
-        value: {
-          type: 'FeatureCollection',
-          features: [{
-            type: 'Feature',
-            geometry: {
-              type: 'Polygon',
-              coordinates: [
-                [
-                  [-6.562507152557395, 30.54964053646397],
-                  [16.406257152557362, 5.382682618676981],
-                  [-18.281250000000018, 5.382682618676981],
-                  [-6.562507152557395, 30.54964053646397],
-                ],
-              ],
+        revision: 1,
+        permissions: [],
+        status: [
+          {
+            type: 'READY_TO_SUBMIT',
+            value: {
+              at: '2021-05-31T18:01:54.902Z',
             },
-            properties: null,
-            id: 'measureFeature0',
-          }],
+          },
+        ],
+        group: {
+          id: '5e6f8bbeea14550001470c28',
+          path: '/our-sci/',
         },
-        meta: {
-          type: 'geoJSON',
-          dateModified: '2021-05-31T14:01:51.153-04:00',
+        specVersion: 3,
+        creator: '5e452119c5117c000185f275',
+        creatorDetail: {
+          email: 'bob@our-sci.net',
+          name: 'Bob',
+        },
+      },
+      data: {
+        map_1: {
+          value: {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'Polygon',
+                  coordinates: [
+                    [
+                      [-6.562507152557395, 30.54964053646397],
+                      [16.406257152557362, 5.382682618676981],
+                      [-18.281250000000018, 5.382682618676981],
+                      [-6.562507152557395, 30.54964053646397],
+                    ],
+                  ],
+                },
+                properties: null,
+                id: 'measureFeature0',
+              },
+            ],
+          },
+          meta: {
+            type: 'geoJSON',
+            dateModified: '2021-05-31T14:01:51.153-04:00',
+          },
         },
       },
     },
-  }];
+  ];
+}
+
+function mockNullValueSubmissions() {
+  return [
+    {
+      _id: '60b52489fe387f0001339266',
+      meta: {
+        dateCreated: '2021-05-31T18:01:45.771Z',
+        dateModified: '2021-05-31T18:01:51.153Z',
+        dateSubmitted: '2021-05-31T18:01:54.979Z',
+        survey: {
+          id: '60b524715575f00001f504da',
+          version: 2,
+        },
+        revision: 1,
+        permissions: [],
+        status: [
+          {
+            type: 'READY_TO_SUBMIT',
+            value: {
+              at: '2021-05-31T18:01:54.902Z',
+            },
+          },
+        ],
+        group: {
+          id: '5e6f8bbeea14550001470c28',
+          path: '/our-sci/',
+        },
+        specVersion: 3,
+        creator: '5e452119c5117c000185f275',
+        creatorDetail: {
+          email: 'bob@our-sci.net',
+          name: 'Bob',
+        },
+      },
+      data: {
+        map_1: {
+          value: null,
+          meta: {
+            type: 'geoJSON',
+            dateModified: '2021-05-31T14:01:51.153-04:00',
+          },
+        },
+      },
+    },
+  ];
 }
 
 function mockSubmissionsNested() {
@@ -111,22 +160,10 @@ function mockSubmissionsNested() {
                     type: 'Polygon',
                     coordinates: [
                       [
-                        [
-                          -53.27271580696107,
-                          17.17991416542307,
-                        ],
-                        [
-                          -68.61362099647523,
-                          -9.991468170475883,
-                        ],
-                        [
-                          -71.80963397026063,
-                          21.995843855472643,
-                        ],
-                        [
-                          -53.27271580696107,
-                          17.17991416542307,
-                        ],
+                        [-53.27271580696107, 17.17991416542307],
+                        [-68.61362099647523, -9.991468170475883],
+                        [-71.80963397026063, 21.995843855472643],
+                        [-53.27271580696107, 17.17991416542307],
                       ],
                     ],
                   },
@@ -139,22 +176,10 @@ function mockSubmissionsNested() {
                     type: 'Polygon',
                     coordinates: [
                       [
-                        [
-                          -34.416164159774794,
-                          -2.37136642189715,
-                        ],
-                        [
-                          -17.796853780746478,
-                          -37.47986176111076,
-                        ],
-                        [
-                          1.059676408767693,
-                          -1.1687685082695793,
-                        ],
-                        [
-                          -34.416164159774794,
-                          -2.37136642189715,
-                        ],
+                        [-34.416164159774794, -2.37136642189715],
+                        [-17.796853780746478, -37.47986176111076],
+                        [1.059676408767693, -1.1687685082695793],
+                        [-34.416164159774794, -2.37136642189715],
                       ],
                     ],
                   },
@@ -231,22 +256,10 @@ function mockSubmissionsNested() {
                     type: 'Polygon',
                     coordinates: [
                       [
-                        [
-                          -0.8579313755035645,
-                          26.081006368966726,
-                        ],
-                        [
-                          35.89631438255311,
-                          -1.0935721366739273,
-                        ],
-                        [
-                          -16.198836565017714,
-                          -9.045876654517969,
-                        ],
-                        [
-                          -0.8579313755035645,
-                          26.081006368966726,
-                        ],
+                        [-0.8579313755035645, 26.081006368966726],
+                        [35.89631438255311, -1.0935721366739273],
+                        [-16.198836565017714, -9.045876654517969],
+                        [-0.8579313755035645, 26.081006368966726],
                       ],
                     ],
                   },
@@ -284,36 +297,32 @@ describe('CSV Service', () => {
   describe('transformQuestionTypes', () => {
     it('applies geojsonTransformer function to submissions object', () => {
       const submissions = mockSubmissions();
-      const actual = transformSubmissionQuestionTypes(
-        submissions[0].data,
-        { geoJSON: geojsonTransformer },
-      );
+      const actual = transformSubmissionQuestionTypes(submissions[0].data, { geoJSON: geojsonTransformer });
       expect(actual.map_1.value.features.length).toBe(1);
-      expect(actual.map_1.value.features[0]).toBe(
-        JSON.stringify(submissions[0].data.map_1.value.features[0]),
-      );
+      expect(actual.map_1.value.features[0]).toBe(JSON.stringify(submissions[0].data.map_1.value.features[0]));
+    });
+
+    it('geojsonTransformer does not throw for null values', () => {
+      const submissions = mockNullValueSubmissions();
+      expect(() =>
+        transformSubmissionQuestionTypes(submissions[0].data, { geoJSON: geojsonTransformer })
+      ).not.toThrow();
     });
 
     it('applies geojsonTransformer function correctly to nested submissions object', () => {
       const submissions = mockSubmissionsNested();
-      const actual = transformSubmissionQuestionTypes(
-        submissions[0].data,
-        { geoJSON: geojsonTransformer },
-      );
+      const actual = transformSubmissionQuestionTypes(submissions[0].data, { geoJSON: geojsonTransformer });
       expect(actual.group_1.map_2.value.features[0]).toBe(
-        JSON.stringify(submissions[0].data.group_1.map_2.value.features[0]),
+        JSON.stringify(submissions[0].data.group_1.map_2.value.features[0])
       );
       expect(actual.group_1.map_2.value.features[1]).toBe(
-        JSON.stringify(submissions[0].data.group_1.map_2.value.features[1]),
+        JSON.stringify(submissions[0].data.group_1.map_2.value.features[1])
       );
     });
 
     it('does not modify structure incorrectly', () => {
       const submissions = mockSubmissionsNested();
-      const actual = transformSubmissionQuestionTypes(
-        submissions[0].data,
-        { geoJSON: geojsonTransformer },
-      );
+      const actual = transformSubmissionQuestionTypes(submissions[0].data, { geoJSON: geojsonTransformer });
 
       expect(actual).toMatchObject({
         group_1: {
