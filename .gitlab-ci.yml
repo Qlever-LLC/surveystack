@@ -1,6 +1,8 @@
 variables:
   GIT_DEPTH: "1"
-  IMAGE_APP_TAG: $($CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH && echo "prod" || echo "$CI_COMMIT_REF_NAME")
+  # IMAGE_APP_TAG: $($CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH && echo "prod" || echo $CI_COMMIT_BRANCH)
+  IMAGE_APP_TAG: $CI_COMMIT_REF_NAME
+  
   # PROD_IMAGE_APP_TAG: registry.gitlab.com/our-sci/software/surveystack:prod,
   # STAGE_IMAGE_APP_TAG: registry.gitlab.com/our-sci/software/surveystack:stage,
   # REVIEW_1_IMAGE_APP_TAG: registry.gitlab.com/our-sci/software/surveystack:review_1,
@@ -8,16 +10,16 @@ variables:
 image:
   name: "node:14"
 
-workflow:
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-    # - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    #   variables:
-    #     IMAGE_APP_TAG: 'prod'
-    # - if $CI_COMMIT_REF_NAME == 'stage'
-    #   variables:
-    #     IMAGE_APP_TAG: 'stage'
+# workflow:
+#   rules:
+#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+#     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+#     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+#       variables:
+#         IMAGE_APP_TAG: 'prod'
+#     - if $CI_COMMIT_REF_NAME == 'stage'
+#       variables:
+#         IMAGE_APP_TAG: 'stage'
 
 # # https://docs.gitlab.com/ee/ci/yaml/#rulesvariables
 # # TODO: refactor with this? https://docs.gitlab.com/ee/ci/environments/#scope-environments-with-specs
@@ -31,6 +33,17 @@ workflow:
 #     - if $CI_COMMIT_REF_NAME == 'stage'
 #       variables:
 #         IMAGE_APP_TAG: 'stage'
+
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      variables:
+        IMAGE_APP_TAG: "prod"  # Override globally-defined DEPLOY_VARIABLE
+    # - if: $CI_COMMIT_REF_NAME =~ /feature/
+    #   variables:
+    #     IS_A_FEATURE: "true"                  # Define a new variable.
+    - when: always                            # Run the pipeline in other cases
 
 
 
@@ -64,7 +77,7 @@ build container:
   stage: dockerize
   script: 
     - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
-    - docker build -t "registry.gitlab.com/our-sci/software/surveystack:$APP_IMAGE_TAG" .
+    - docker build -t "registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" .
     - docker push registry.gitlab.com/our-sci/software/surveystack
   image: docker:19.03.12
   services:
