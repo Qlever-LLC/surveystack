@@ -1,6 +1,6 @@
-
 variables:
   GIT_DEPTH: "1"
+  IMAGE_APP_TAG: $($CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH && echo "prod" || echo "$CI_COMMIT_REF_NAME")
   # PROD_IMAGE_APP_TAG: registry.gitlab.com/our-sci/software/surveystack:prod,
   # STAGE_IMAGE_APP_TAG: registry.gitlab.com/our-sci/software/surveystack:stage,
   # REVIEW_1_IMAGE_APP_TAG: registry.gitlab.com/our-sci/software/surveystack:review_1,
@@ -8,31 +8,31 @@ variables:
 image:
   name: "node:14"
 
-# https://docs.gitlab.com/ee/ci/yaml/#rulesvariables
-# TODO: refactor with this? https://docs.gitlab.com/ee/ci/environments/#scope-environments-with-specs
-job:
-  variables:
-    # DEPLOY_VARIABLE: "default-deploy"
-    IMAGE_APP_TAG: $CI_COMMIT_REF_NAME
-  rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-      variables:                              # Override DEPLOY_VARIABLE defined
-        # DEPLOY_VARIABLE: "deploy-production"  # at the job level.
-        IMAGE_APP_TAG: 'prod'
-    - if $CI_COMMIT_REF_NAME == 'stage'
-      variables:
-        IMAGE_APP_TAG: 'stage'
-    # - if: $CI_COMMIT_REF_NAME =~ /feature/
-    #   variables:
-    #     IS_A_FEATURE: "true"                  # Define a new variable.
-  script:
-    - echo "Run script with $DEPLOY_VARIABLE as an argument"
-    - echo "Run another script if $IS_A_FEATURE exists"
-
 workflow:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    # - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    #   variables:
+    #     IMAGE_APP_TAG: 'prod'
+    # - if $CI_COMMIT_REF_NAME == 'stage'
+    #   variables:
+    #     IMAGE_APP_TAG: 'stage'
+
+# # https://docs.gitlab.com/ee/ci/yaml/#rulesvariables
+# # TODO: refactor with this? https://docs.gitlab.com/ee/ci/environments/#scope-environments-with-specs
+# job:
+#   variables:
+#     IMAGE_APP_TAG: $CI_COMMIT_REF_NAME
+#   rules:
+#     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+#       variables:
+#         IMAGE_APP_TAG: 'prod'
+#     - if $CI_COMMIT_REF_NAME == 'stage'
+#       variables:
+#         IMAGE_APP_TAG: 'stage'
+
+
 
 .cache-policy:
   cache:
