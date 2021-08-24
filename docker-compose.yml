@@ -2,8 +2,8 @@ version: '3.7'
 
 services:
   app:
-    # image: ${IMAGE_APP_TAG}
-    image: registry.gitlab.com/our-sci/software/surveystack:prod
+    image: ${IMAGE_APP}
+    # image: registry.gitlab.com/our-sci/software/surveystack:prod
     environment:
       # - SOME_SERVICE=${EXTERNAL_SERVICE_KEY}
       - PORT=3000

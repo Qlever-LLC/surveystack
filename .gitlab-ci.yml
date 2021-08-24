@@ -1,9 +1,33 @@
 
 variables:
   GIT_DEPTH: "1"
+  # PROD_IMAGE_APP_TAG: registry.gitlab.com/our-sci/software/surveystack:prod,
+  # STAGE_IMAGE_APP_TAG: registry.gitlab.com/our-sci/software/surveystack:stage,
+  # REVIEW_1_IMAGE_APP_TAG: registry.gitlab.com/our-sci/software/surveystack:review_1,
 
 image:
   name: "node:14"
+
+# https://docs.gitlab.com/ee/ci/yaml/#rulesvariables
+# TODO: refactor with this? https://docs.gitlab.com/ee/ci/environments/#scope-environments-with-specs
+job:
+  variables:
+    # DEPLOY_VARIABLE: "default-deploy"
+    IMAGE_APP_TAG: $CI_COMMIT_REF_NAME
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      variables:                              # Override DEPLOY_VARIABLE defined
+        # DEPLOY_VARIABLE: "deploy-production"  # at the job level.
+        IMAGE_APP_TAG: 'prod'
+    - if $CI_COMMIT_REF_NAME == 'stage'
+      variables:
+        IMAGE_APP_TAG: 'stage'
+    # - if: $CI_COMMIT_REF_NAME =~ /feature/
+    #   variables:
+    #     IS_A_FEATURE: "true"                  # Define a new variable.
+  script:
+    - echo "Run script with $DEPLOY_VARIABLE as an argument"
+    - echo "Run another script if $IS_A_FEATURE exists"
 
 workflow:
   rules:
@@ -40,7 +64,7 @@ build container:
   stage: dockerize
   script: 
     - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
-    - docker build -t registry.gitlab.com/our-sci/software/surveystack:prod .
+    - docker build -t "registry.gitlab.com/our-sci/software/surveystack:$APP_IMAGE_TAG" .
     - docker push registry.gitlab.com/our-sci/software/surveystack
   image: docker:19.03.12
   services:
@@ -59,6 +83,87 @@ build container:
     - build client
     - build server
 
+deploy to prod:
+  stage: deploy
+  script:
+    # Install ssh-agent if not already installed, it is required by Docker.
+    # (change apt-get to yum if you use a CentOS-based image)
+    # - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - apk add docker-compose
+    - eval $(ssh-agent -s)
+    - echo "$STAGE_SSH_SERVER_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
+    # - echo "EXTERNAL_SERVICE_KEY=$EXTERNAL_SERVICE_STAGE_KEY" >> .env
+    - echo "IMAGE_APP_TAG=$IMAGE_APP_TAG" >> .env
+    - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
+    - echo "DATABASE_URL=mongodb+srv://$STAGE_DATABASE_CREDENTIALS@$STAGE_DATABASE_URI" >> .env
+    - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
+    - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" down --remove-orphans
+    - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" pull
+    - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" up -d
+  environment:
+    name: production
+    url: ${PROD_SERVER_IP}:3000
+  when: manual
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  variables:
+    # Need to specify following vars to use DIND service, see
+    # https://about.gitlab.com/blog/2019/07/31/docker-in-docker-with-docker-19-dot-03/
+    # https://medium.com/@ZiXianZeroX/a-more-secure-way-to-deploy-your-own-shared-gitlab-ci-runner-with-docker-executor-as-a-container-1ca4ab1e316d
+    DOCKER_DRIVER: overlay2
+    # Create the certificates inside this directory for both the server
+    # and client. The certificates used by the client will be created in
+    # /certs/client so we only need to share this directory with the
+    # volume mount in `config.toml`.
+    DOCKER_TLS_CERTDIR: "/certs"
+  needs: 
+    - build container
+    - lint client
+    - test client
+
+
+deploy to stage:
+  stage: deploy
+  script:
+    # Install ssh-agent if not already installed, it is required by Docker.
+    # (change apt-get to yum if you use a CentOS-based image)
+    # - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - apk add docker-compose
+    - eval $(ssh-agent -s)
+    - echo "$STAGE_SSH_SERVER_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
+    # - echo "EXTERNAL_SERVICE_KEY=$EXTERNAL_SERVICE_STAGE_KEY" >> .env
+    - echo "IMAGE_APP_TAG=$IMAGE_APP_TAG" >> .env
+    - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
+    - echo "DATABASE_URL=mongodb+srv://$STAGE_DATABASE_CREDENTIALS@$STAGE_DATABASE_URI" >> .env
+    - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
+    - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" down --remove-orphans
+    - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" pull
+    - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" up -d
+  environment:
+    name: staging
+    url: ${STAGE_SERVER_IP}:3000
+  when: manual
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  variables:
+    # Need to specify following vars to use DIND service, see
+    # https://about.gitlab.com/blog/2019/07/31/docker-in-docker-with-docker-19-dot-03/
+    # https://medium.com/@ZiXianZeroX/a-more-secure-way-to-deploy-your-own-shared-gitlab-ci-runner-with-docker-executor-as-a-container-1ca4ab1e316d
+    DOCKER_DRIVER: overlay2
+    # Create the certificates inside this directory for both the server
+    # and client. The certificates used by the client will be created in
+    # /certs/client so we only need to share this directory with the
+    # volume mount in `config.toml`.
+    DOCKER_TLS_CERTDIR: "/certs"
+  needs: 
+    - build container
+    - lint client
+    - test client
+
 deploy to review 1:
   stage: deploy
   script:
@@ -67,18 +172,19 @@ deploy to review 1:
     # - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - apk add docker-compose
     - eval $(ssh-agent -s)
-    - echo "$SSH_SERVER_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - echo "$REVIEW_SSH_SERVER_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
     - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
     # - echo "EXTERNAL_SERVICE_KEY=$EXTERNAL_SERVICE_STAGE_KEY" >> .env
     - echo "IMAGE_APP_TAG=$IMAGE_APP_TAG" >> .env
-    - echo "DATABASE_URL=mongodb+srv://$DATABASE_CREDENTIALS@$DATABASE_URI" >> .env
+    - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
+    - echo "DATABASE_URL=mongodb+srv://$REVIEW_DATABASE_CREDENTIALS@$REVIEW_DATABASE_URI" >> .env
     - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
-    - docker-compose -H "ssh://$SERVER_USER@$SERVER_IP" down --remove-orphans
-    - docker-compose -H "ssh://$SERVER_USER@$SERVER_IP" pull
-    - docker-compose -H "ssh://$SERVER_USER@$SERVER_IP" up -d
+    - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" down --remove-orphans
+    - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" pull
+    - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" up -d
   environment:
     name: review 1
-    url: ${SERVER_IP}:3000
+    url: ${REVIEW_SERVER_IP}:3000
   when: manual
   image: docker:19.03.12
   services:
