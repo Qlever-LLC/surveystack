@@ -27,13 +27,18 @@ workflow:
   cache:
     # cache per branch
     # key: ${CI_COMMIT_REF_SLUG}
-    key: ${CI_COMMIT_SHORT_SHA}
-    paths:
-      - node_modules/
-      - client/node_modules/
-      - server/node_modules/
-      - client/dist/
-      - server/dist/
+    - key: ${CI_COMMIT_SHORT_SHA}
+      paths:
+        - node_modules/
+        - client/node_modules/
+        - server/node_modules/
+    - key: CLIENT-$CI_COMMIT_SHORT_SHA
+      paths:  
+        - client/dist/
+    - key: SERVER-$CI_COMMIT_SHORT_SHA
+      paths:
+        - server/dist/
+
 
 .pull-cache-only:
   extends: .cache-policy
