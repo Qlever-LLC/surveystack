@@ -20,3 +20,8 @@ services:
     deploy: 
       restart_policy:
         condition: on-failure
+  # mongo:
+  #   # ... config
+  # blob_store:
+  #   image: minio
+  
