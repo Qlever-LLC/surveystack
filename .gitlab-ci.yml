@@ -61,7 +61,7 @@ stages:
   - deploy
 
 build container:
-  extends: .pull-cache-only
+  extends: .cache-policy
   stage: dockerize
   script: 
     - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
