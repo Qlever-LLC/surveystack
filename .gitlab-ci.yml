@@ -43,8 +43,14 @@ workflow:
 .pull-cache-only:
   extends: .cache-policy
   cache:
-    # pull and use the cache, but do not update it
-    policy: pull
+    # # pull and use the cache, but do not update it
+    # policy: pull
+    - key: ${CI_COMMIT_SHORT_SHA}
+      policy: pull
+    - key: CLIENT-$CI_COMMIT_SHORT_SHA
+      policy: pull
+    - key: SERVER-$CI_COMMIT_SHORT_SHA
+      policy: pull
 
 stages:
   - install
