@@ -40,17 +40,17 @@ workflow:
         - server/dist/
 
 
-.pull-cache-only:
-  extends: .cache-policy
-  cache:
-    # # pull and use the cache, but do not update it
-    # policy: pull
-    - key: ${CI_COMMIT_SHORT_SHA}
-      policy: pull
-    - key: CLIENT-$CI_COMMIT_SHORT_SHA
-      policy: pull
-    - key: SERVER-$CI_COMMIT_SHORT_SHA
-      policy: pull
+# .pull-cache-only:
+#   extends: .cache-policy
+#   cache:
+#     # # pull and use the cache, but do not update it
+#     # policy: pull
+#     - key: ${CI_COMMIT_SHORT_SHA}
+#       policy: pull
+#     - key: CLIENT-$CI_COMMIT_SHORT_SHA
+#       policy: pull
+#     - key: SERVER-$CI_COMMIT_SHORT_SHA
+#       policy: pull
 
 stages:
   - install
@@ -232,7 +232,7 @@ lerna bootstrap:
   
 
 lint client:
-  extends: .pull-cache-only
+  extends: .cache-policy
   stage: lint
   script:
     - yarn client:lint
@@ -240,7 +240,7 @@ lint client:
     - lerna bootstrap
 
 test client:
-  extends: .pull-cache-only
+  extends: .cache-policy
   stage: test
   script:
     - yarn client:test
