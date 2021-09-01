@@ -21,8 +21,6 @@ workflow:
     #     IS_A_FEATURE: "true"                  # Define a new variable.
     - when: always                            # Run the pipeline in other cases
 
-
-
 .cache-policy:
   cache:
     # cache per branch
@@ -33,30 +31,12 @@ workflow:
       - client/node_modules/
       - server/node_modules/
 
-.cache-policy-client:
+.pull-cache-only:
+  extends: .cache-policy
   cache:
-    key: CLIENT-$CI_COMMIT_SHORT_SHA
-    paths:  
-      - client/dist/
+    # # pull and use the cache, but do not update it
+    policy: pull
 
-.cache-policy-server:
-  cache:
-    key: SERVER-$CI_COMMIT_SHORT_SHA
-    paths:
-      - server/dist/
-
-
-# .pull-cache-only:
-#   extends: .cache-policy
-#   cache:
-#     # # pull and use the cache, but do not update it
-#     # policy: pull
-#     - key: ${CI_COMMIT_SHORT_SHA}
-#       policy: pull
-#     - key: CLIENT-$CI_COMMIT_SHORT_SHA
-#       policy: pull
-#     - key: SERVER-$CI_COMMIT_SHORT_SHA
-#       policy: pull
 
 stages:
   - install
@@ -67,10 +47,7 @@ stages:
   - deploy
 
 build container:
-  extends: 
-    - .cache-policy-server
-    - .cache-policy-client
-    - .cache-policy
+  extends: .pull-cache-only
   stage: dockerize
   script: 
     - ls server/dist
@@ -218,9 +195,10 @@ deploy to review 1:
 
 
 build client:
-  extends: 
-    - .cache-policy-client
-    - .cache-policy
+  extends: .pull-cache-only
+  artifacts:
+    paths:
+      - client/dist/
   stage: build
   script: 
     - yarn client:build
@@ -228,9 +206,10 @@ build client:
     - lerna bootstrap
 
 build server:
-  extends: 
-    - .cache-policy-server
-    - .cache-policy
+  extends: .pull-cache-only
+  artifacts:
+    paths:
+      - server/dist/
   stage: build
   script: 
     - yarn server:build
@@ -246,7 +225,7 @@ lerna bootstrap:
   
 
 lint client:
-  extends: .cache-policy
+  extends: .pull-cache-only
   stage: lint
   script:
     - yarn client:lint
@@ -254,7 +233,7 @@ lint client:
     - lerna bootstrap
 
 test client:
-  extends: .cache-policy
+  extends: .pull-cache-only
   stage: test
   script:
     - yarn client:test
