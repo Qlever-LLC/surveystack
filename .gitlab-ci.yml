@@ -64,6 +64,7 @@ build container:
   extends: .cache-policy
   stage: dockerize
   script: 
+    - ls server/dist
     - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
     - docker build -t "registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" .
     - docker push registry.gitlab.com/our-sci/software/surveystack
