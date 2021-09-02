@@ -79,12 +79,12 @@ deploy to prod:
     # - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - apk add docker-compose
     - eval $(ssh-agent -s)
-    - echo "$STAGE_SSH_SERVER_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - echo "$PROD_SSH_SERVER_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
     - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
     # - echo "EXTERNAL_SERVICE_KEY=$EXTERNAL_SERVICE_STAGE_KEY" >> .env
     - echo "IMAGE_APP_TAG=$IMAGE_APP_TAG" >> .env
     - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
-    - echo "DATABASE_URL=mongodb+srv://$STAGE_DATABASE_CREDENTIALS@$STAGE_DATABASE_URI" >> .env
+    - echo "DATABASE_URL=mongodb+srv://$PROD_DATABASE_CREDENTIALS@$PROD_DATABASE_URI" >> .env
     - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" pull
