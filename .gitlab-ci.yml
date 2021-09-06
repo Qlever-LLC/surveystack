@@ -81,9 +81,9 @@ deploy to prod:
     - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
     - echo "DATABASE_URL=mongodb+srv://$PROD_DATABASE_CREDENTIALS@$PROD_DATABASE_URI" >> .env
     - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
-    - docker stack deploy --compose-file docker-compose.yml -H "ssh://$SERVER_USER@$PROD_SERVER_IP" down --remove-orphans
-    - docker stack deploy --compose-file docker-compose.yml -H "ssh://$SERVER_USER@$PROD_SERVER_IP" pull
-    - docker stack deploy --compose-file docker-compose.yml -H "ssh://$SERVER_USER@$PROD_SERVER_IP" up -d
+    - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" down --remove-orphans
+    - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" pull
+    - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" up -d
   environment:
     name: production
     url: ${PROD_SERVER_IP}:3000
@@ -122,9 +122,9 @@ deploy to stage:
     - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
     - echo "DATABASE_URL=mongodb+srv://$STAGE_DATABASE_CREDENTIALS@$STAGE_DATABASE_URI" >> .env
     - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
-    - docker stack deploy --compose-file docker-compose.yml -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" down --remove-orphans
-    - docker stack deploy --compose-file docker-compose.yml -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" pull
-    - docker stack deploy --compose-file docker-compose.yml -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" up -d
+    - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" down --remove-orphans
+    - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" pull
+    - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" up -d
   environment:
     name: staging
     url: ${STAGE_SERVER_IP}:3000
@@ -162,9 +162,9 @@ deploy to review 1:
     - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
     - echo "DATABASE_URL=mongodb+srv://$REVIEW_DATABASE_CREDENTIALS@$REVIEW_DATABASE_URI" >> .env
     - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
-    - docker stack deploy --compose-file docker-compose.yml -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" down --remove-orphans
-    - docker stack deploy --compose-file docker-compose.yml -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" pull
-    - docker stack deploy --compose-file docker-compose.yml -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" up -d
+    - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" down --remove-orphans
+    - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" pull
+    - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" up -d
   environment:
     name: review 1
     url: ${REVIEW_SERVER_IP}:3000
