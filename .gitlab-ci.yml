@@ -1,33 +1,211 @@
-
 variables:
-  GIT_DEPTH: "3"
+  GIT_DEPTH: "1"
+  IMAGE_APP_TAG: $CI_COMMIT_REF_NAME
 
 image:
-  name: "node:15"
+  name: "node:14"
 
 workflow:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        IMAGE_APP_TAG: prod-$CI_COMMIT_SHORT_SHA # Override globally-defined IMAGE_APP_TAG
 
 .cache-policy:
   cache:
-    # cache per branch
-    key: ${CI_COMMIT_REF_SLUG}
+    key: ${CI_COMMIT_SHORT_SHA}
     paths:
-      - client/node_modules/
       - node_modules/
+      - client/node_modules/
+      - server/node_modules/
 
 .pull-cache-only:
   extends: .cache-policy
   cache:
-    # pull and use the cache, but do not update it
+    # # pull and use the cache, but do not update it
     policy: pull
+
 
 stages:
   - install
   - lint
   - test
+  - build
+  - dockerize
+  - deploy
+
+build container:
+  extends: .pull-cache-only
+  stage: dockerize
+  script: 
+    - ls server/dist
+    - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
+    - docker build -t "registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" .
+    - docker push registry.gitlab.com/our-sci/software/surveystack
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  variables:
+    # Need to specify following vars to use DIND service, see
+    # https://about.gitlab.com/blog/2019/07/31/docker-in-docker-with-docker-19-dot-03/
+    # https://medium.com/@ZiXianZeroX/a-more-secure-way-to-deploy-your-own-shared-gitlab-ci-runner-with-docker-executor-as-a-container-1ca4ab1e316d
+    DOCKER_DRIVER: overlay2
+    # Create the certificates inside this directory for both the server
+    # and client. The certificates used by the client will be created in
+    # /certs/client so we only need to share this directory with the
+    # volume mount in `config.toml`.
+    DOCKER_TLS_CERTDIR: "/certs"
+  needs:
+    - build client
+    - build server
+
+deploy to prod:
+  stage: deploy
+  script:
+    - apk add docker-compose
+    - eval $(ssh-agent -s)
+    - echo "$PROD_SSH_SERVER_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir ~/.ssh
+    - ssh-keyscan -H $PROD_SERVER_IP >> ~/.ssh/known_hosts
+    - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
+    - echo "IMAGE_APP_TAG=$IMAGE_APP_TAG" >> .env
+    - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
+    - echo "DATABASE_URL=mongodb+srv://$PROD_DATABASE_CREDENTIALS@$PROD_DATABASE_URI" >> .env
+    - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
+    - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" down --remove-orphans
+    - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" pull
+    - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" up -d
+    - ssh $SERVER_USER@$PROD_SERVER_IP "docker container prune -f"
+    - ssh $SERVER_USER@$PROD_SERVER_IP "docker image prune -a -f"
+  environment:
+    name: production
+    url: http://107.20.42.245:3000
+  when: manual
+  only:
+    - $CI_DEFAULT_BRANCH
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  variables:
+    # Need to specify following vars to use DIND service, see
+    # https://about.gitlab.com/blog/2019/07/31/docker-in-docker-with-docker-19-dot-03/
+    # https://medium.com/@ZiXianZeroX/a-more-secure-way-to-deploy-your-own-shared-gitlab-ci-runner-with-docker-executor-as-a-container-1ca4ab1e316d
+    DOCKER_DRIVER: overlay2
+    # Create the certificates inside this directory for both the server
+    # and client. The certificates used by the client will be created in
+    # /certs/client so we only need to share this directory with the
+    # volume mount in `config.toml`.
+    DOCKER_TLS_CERTDIR: "/certs"
+  needs: 
+    - build container
+    - lint client
+    - test client
+
+
+deploy to stage:
+  stage: deploy
+  script:
+    - apk add docker-compose
+    - eval $(ssh-agent -s)
+    - echo "$STAGE_SSH_SERVER_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir ~/.ssh
+    - ssh-keyscan -H $STAGE_SERVER_IP >> ~/.ssh/known_hosts
+    - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
+    - echo "IMAGE_APP_TAG=$IMAGE_APP_TAG" >> .env
+    - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
+    - echo "DATABASE_URL=mongodb+srv://$STAGE_DATABASE_CREDENTIALS@$STAGE_DATABASE_URI" >> .env
+    - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
+    - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" down --remove-orphans
+    - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" pull
+    - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" up -d
+    - ssh $SERVER_USER@$STAGE_SERVER_IP "docker container prune -f"
+    - ssh $SERVER_USER@$STAGE_SERVER_IP "docker image prune -a -f"
+  environment:
+    name: staging
+    url: http://18.206.205.172:3000
+  when: manual
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  variables:
+    # Need to specify following vars to use DIND service, see
+    # https://about.gitlab.com/blog/2019/07/31/docker-in-docker-with-docker-19-dot-03/
+    # https://medium.com/@ZiXianZeroX/a-more-secure-way-to-deploy-your-own-shared-gitlab-ci-runner-with-docker-executor-as-a-container-1ca4ab1e316d
+    DOCKER_DRIVER: overlay2
+    # Create the certificates inside this directory for both the server
+    # and client. The certificates used by the client will be created in
+    # /certs/client so we only need to share this directory with the
+    # volume mount in `config.toml`.
+    DOCKER_TLS_CERTDIR: "/certs"
+  needs: 
+    - build container
+    - lint client
+    - test client
+
+deploy to review 1:
+  stage: deploy
+  script:
+    - apk add docker-compose
+    - eval $(ssh-agent -s)
+    - echo "$REVIEW_SSH_SERVER_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir ~/.ssh
+    - ssh-keyscan -H $REVIEW_SERVER_IP >> ~/.ssh/known_hosts
+    - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
+    - echo "IMAGE_APP_TAG=$IMAGE_APP_TAG" >> .env
+    - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
+    - echo "DATABASE_URL=mongodb+srv://$REVIEW_DATABASE_CREDENTIALS@$REVIEW_DATABASE_URI" >> .env
+    - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
+    - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" down --remove-orphans
+    - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" pull
+    - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" up -d
+    - ssh $SERVER_USER@$REVIEW_SERVER_IP "docker container prune -f"
+    - ssh $SERVER_USER@$REVIEW_SERVER_IP "docker image prune -a -f"
+  environment:
+    name: review 1
+    url: http://3.87.72.221:3000
+  when: manual
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  variables:
+    # Need to specify following vars to use DIND service, see
+    # https://about.gitlab.com/blog/2019/07/31/docker-in-docker-with-docker-19-dot-03/
+    # https://medium.com/@ZiXianZeroX/a-more-secure-way-to-deploy-your-own-shared-gitlab-ci-runner-with-docker-executor-as-a-container-1ca4ab1e316d
+    DOCKER_DRIVER: overlay2
+    # Create the certificates inside this directory for both the server
+    # and client. The certificates used by the client will be created in
+    # /certs/client so we only need to share this directory with the
+    # volume mount in `config.toml`.
+    DOCKER_TLS_CERTDIR: "/certs"
+  needs: 
+    - build container
+    - lint client
+    - test client
+
+
+
+build client:
+  extends: .pull-cache-only
+  artifacts:
+    paths:
+      - client/dist/
+  stage: build
+  script: 
+    - yarn client:build
+  needs: 
+    - lerna bootstrap
+
+build server:
+  extends: .pull-cache-only
+  artifacts:
+    paths:
+      - server/dist/
+  stage: build
+  script: 
+    - yarn server:build
+  needs: 
+    - lerna bootstrap 
 
 lerna bootstrap:
   extends: .cache-policy
@@ -36,7 +214,8 @@ lerna bootstrap:
     - yarn
     - yarn lerna bootstrap
   
-lint:
+
+lint client:
   extends: .pull-cache-only
   stage: lint
   script:
@@ -44,7 +223,7 @@ lint:
   needs:
     - lerna bootstrap
 
-test:
+test client:
   extends: .pull-cache-only
   stage: test
   script:

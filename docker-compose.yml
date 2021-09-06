@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  app:
+    image: ${IMAGE_APP}
+    environment:
+      - PORT=3000
+      - DATABASE_NAME=oursci-server-local 
+      - PATH_PREFIX= 
+      - BCRYPT_ROUNDS=12
+      - ADMIN_USERNAME=root
+      - ADMIN_EMAIL=admin@our-sci.net
+      - DATABASE_URL=${DATABASE_URL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    network_mode: host
+    deploy: 
+      restart_policy:
+        condition: on-failure
