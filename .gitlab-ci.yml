@@ -6,7 +6,7 @@ image:
   name: "node:14"
 
 # TODO:
-# - switch to using commit hash (CI_COMMIT_SHORT_SHA) for image tag
+# - [x] switch to using commit hash (CI_COMMIT_SHORT_SHA) for image tag
 # - cleanup old images (set non-main branch image builds to expire after a week)
 # - cleanup old images on servers as part of deploy (run docker rmi for old images)
 # - pull new changes from old client and server repos into monorepo
@@ -16,7 +16,7 @@ workflow:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       variables:
-        IMAGE_APP_TAG: $CI_COMMIT_SHORT_SHA # Override globally-defined IMAGE_APP_TAG
+        IMAGE_APP_TAG: prod-$CI_COMMIT_SHORT_SHA # Override globally-defined IMAGE_APP_TAG
 
 .cache-policy:
   cache:
@@ -84,6 +84,8 @@ deploy to prod:
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" up -d
+    - docker -H "ssh://$SERVER_USER@$PROD_SERVER_IP" container prune -y  
+    - docker -H "ssh://$SERVER_USER@$PROD_SERVER_IP" image prune -a 
   environment:
     name: production
     url: ${PROD_SERVER_IP}:3000
@@ -125,6 +127,8 @@ deploy to stage:
     - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" up -d
+    - docker -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" container prune -y  
+    - docker -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" image prune -a 
   environment:
     name: staging
     url: ${STAGE_SERVER_IP}:3000
@@ -165,6 +169,8 @@ deploy to review 1:
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" up -d
+    - docker -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" container prune -y  
+    - docker -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" image prune -a 
   environment:
     name: review 1
     url: ${REVIEW_SERVER_IP}:3000
