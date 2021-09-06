@@ -85,8 +85,8 @@ deploy to prod:
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" up -d
-    - docker -H "ssh://$SERVER_USER@$PROD_SERVER_IP" container prune -f
-    - docker -H "ssh://$SERVER_USER@$PROD_SERVER_IP" image prune -a -f
+    - ssh $SERVER_USER@$PROD_SERVER_IP "docker container prune -f"
+    - ssh $SERVER_USER@$PROD_SERVER_IP "docker image prune -a -f"
   environment:
     name: production
     url: ${PROD_SERVER_IP}:3000
@@ -128,8 +128,8 @@ deploy to stage:
     - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" up -d
-    - docker -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" container prune -f
-    - docker -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" image prune -a -f
+    - ssh $SERVER_USER@$STAGE_SERVER_IP "docker container prune -f"
+    - ssh $SERVER_USER@$STAGE_SERVER_IP "docker image prune -a -f"
   environment:
     name: staging
     url: ${STAGE_SERVER_IP}:3000
@@ -170,8 +170,8 @@ deploy to review 1:
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" up -d
-    - docker -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" container prune -f
-    - docker -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" image prune -a -f
+    - ssh $SERVER_USER@$REVIEW_SERVER_IP "docker container prune -f"
+    - ssh $SERVER_USER@$REVIEW_SERVER_IP "docker image prune -a -f"
   environment:
     name: review 1
     url: ${REVIEW_SERVER_IP}:3000
