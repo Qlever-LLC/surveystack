@@ -76,6 +76,7 @@ deploy to prod:
     - apk add docker-compose
     - eval $(ssh-agent -s)
     - echo "$PROD_SSH_SERVER_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - ssh-keyscan -H $PROD_SERVER_IP >> ~/.ssh/known_hosts
     - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
     # - echo "EXTERNAL_SERVICE_KEY=$EXTERNAL_SERVICE_STAGE_KEY" >> .env
     - echo "IMAGE_APP_TAG=$IMAGE_APP_TAG" >> .env
@@ -119,6 +120,7 @@ deploy to stage:
     - apk add docker-compose
     - eval $(ssh-agent -s)
     - echo "$STAGE_SSH_SERVER_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - ssh-keyscan -H $STAGE_SERVER_IP >> ~/.ssh/known_hosts
     - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
     # - echo "EXTERNAL_SERVICE_KEY=$EXTERNAL_SERVICE_STAGE_KEY" >> .env
     - echo "IMAGE_APP_TAG=$IMAGE_APP_TAG" >> .env
@@ -161,6 +163,7 @@ deploy to review 1:
     - apk add docker-compose
     - eval $(ssh-agent -s)
     - echo "$REVIEW_SSH_SERVER_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - ssh-keyscan -H $REVIEW_SERVER_IP >> ~/.ssh/known_hosts
     - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
     # - echo "EXTERNAL_SERVICE_KEY=$EXTERNAL_SERVICE_STAGE_KEY" >> .env
     - echo "IMAGE_APP_TAG=$IMAGE_APP_TAG" >> .env
