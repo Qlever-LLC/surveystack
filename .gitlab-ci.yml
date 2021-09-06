@@ -13,18 +13,13 @@ image:
 
 workflow:
   rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       variables:
-        IMAGE_APP_TAG: "prod"  # Override globally-defined DEPLOY_VARIABLE
-    # - if: $CI_COMMIT_REF_NAME =~ /feature/
-    #   variables:
-    #     IS_A_FEATURE: "true"                  # Define a new variable.
-    - when: always                            # Run the pipeline in other cases
+        IMAGE_APP_TAG: $CI_COMMIT_SHORT_SHA # Override globally-defined IMAGE_APP_TAG
 
 .cache-policy:
   cache:
-    # cache per branch
-    # key: ${CI_COMMIT_REF_SLUG}
     key: ${CI_COMMIT_SHORT_SHA}
     paths:
       - node_modules/
@@ -86,9 +81,9 @@ deploy to prod:
     - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
     - echo "DATABASE_URL=mongodb+srv://$PROD_DATABASE_CREDENTIALS@$PROD_DATABASE_URI" >> .env
     - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
-    - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" down --remove-orphans
-    - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" pull
-    - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" up -d
+    - docker stack deploy --compose-file docker-compose.yml -H "ssh://$SERVER_USER@$PROD_SERVER_IP" down --remove-orphans
+    - docker stack deploy --compose-file docker-compose.yml -H "ssh://$SERVER_USER@$PROD_SERVER_IP" pull
+    - docker stack deploy --compose-file docker-compose.yml -H "ssh://$SERVER_USER@$PROD_SERVER_IP" up -d
   environment:
     name: production
     url: ${PROD_SERVER_IP}:3000
@@ -127,9 +122,9 @@ deploy to stage:
     - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
     - echo "DATABASE_URL=mongodb+srv://$STAGE_DATABASE_CREDENTIALS@$STAGE_DATABASE_URI" >> .env
     - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
-    - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" down --remove-orphans
-    - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" pull
-    - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" up -d
+    - docker stack deploy --compose-file docker-compose.yml -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" down --remove-orphans
+    - docker stack deploy --compose-file docker-compose.yml -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" pull
+    - docker stack deploy --compose-file docker-compose.yml -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" up -d
   environment:
     name: staging
     url: ${STAGE_SERVER_IP}:3000
@@ -167,9 +162,9 @@ deploy to review 1:
     - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
     - echo "DATABASE_URL=mongodb+srv://$REVIEW_DATABASE_CREDENTIALS@$REVIEW_DATABASE_URI" >> .env
     - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
-    - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" down --remove-orphans
-    - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" pull
-    - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" up -d
+    - docker stack deploy --compose-file docker-compose.yml -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" down --remove-orphans
+    - docker stack deploy --compose-file docker-compose.yml -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" pull
+    - docker stack deploy --compose-file docker-compose.yml -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" up -d
   environment:
     name: review 1
     url: ${REVIEW_SERVER_IP}:3000
