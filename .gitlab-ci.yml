@@ -70,15 +70,12 @@ build container:
 deploy to prod:
   stage: deploy
   script:
-    # Install ssh-agent if not already installed, it is required by Docker.
-    # (change apt-get to yum if you use a CentOS-based image)
-    # - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - apk add docker-compose
     - eval $(ssh-agent -s)
     - echo "$PROD_SSH_SERVER_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir ~/.ssh
     - ssh-keyscan -H $PROD_SERVER_IP >> ~/.ssh/known_hosts
     - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
-    # - echo "EXTERNAL_SERVICE_KEY=$EXTERNAL_SERVICE_STAGE_KEY" >> .env
     - echo "IMAGE_APP_TAG=$IMAGE_APP_TAG" >> .env
     - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
     - echo "DATABASE_URL=mongodb+srv://$PROD_DATABASE_CREDENTIALS@$PROD_DATABASE_URI" >> .env
@@ -90,7 +87,7 @@ deploy to prod:
     - ssh $SERVER_USER@$PROD_SERVER_IP "docker image prune -a -f"
   environment:
     name: production
-    url: ${PROD_SERVER_IP}:3000
+    url: http://107.20.42.245:3000
   when: manual
   image: docker:19.03.12
   services:
@@ -114,15 +111,12 @@ deploy to prod:
 deploy to stage:
   stage: deploy
   script:
-    # Install ssh-agent if not already installed, it is required by Docker.
-    # (change apt-get to yum if you use a CentOS-based image)
-    # - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - apk add docker-compose
     - eval $(ssh-agent -s)
     - echo "$STAGE_SSH_SERVER_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir ~/.ssh
     - ssh-keyscan -H $STAGE_SERVER_IP >> ~/.ssh/known_hosts
     - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
-    # - echo "EXTERNAL_SERVICE_KEY=$EXTERNAL_SERVICE_STAGE_KEY" >> .env
     - echo "IMAGE_APP_TAG=$IMAGE_APP_TAG" >> .env
     - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
     - echo "DATABASE_URL=mongodb+srv://$STAGE_DATABASE_CREDENTIALS@$STAGE_DATABASE_URI" >> .env
@@ -134,7 +128,7 @@ deploy to stage:
     - ssh $SERVER_USER@$STAGE_SERVER_IP "docker image prune -a -f"
   environment:
     name: staging
-    url: ${STAGE_SERVER_IP}:3000
+    url: http://18.206.205.172:3000
   when: manual
   image: docker:19.03.12
   services:
@@ -157,15 +151,12 @@ deploy to stage:
 deploy to review 1:
   stage: deploy
   script:
-    # Install ssh-agent if not already installed, it is required by Docker.
-    # (change apt-get to yum if you use a CentOS-based image)
-    # - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - apk add docker-compose
     - eval $(ssh-agent -s)
     - echo "$REVIEW_SSH_SERVER_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir ~/.ssh
     - ssh-keyscan -H $REVIEW_SERVER_IP >> ~/.ssh/known_hosts
     - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
-    # - echo "EXTERNAL_SERVICE_KEY=$EXTERNAL_SERVICE_STAGE_KEY" >> .env
     - echo "IMAGE_APP_TAG=$IMAGE_APP_TAG" >> .env
     - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
     - echo "DATABASE_URL=mongodb+srv://$REVIEW_DATABASE_CREDENTIALS@$REVIEW_DATABASE_URI" >> .env
@@ -177,7 +168,7 @@ deploy to review 1:
     - ssh $SERVER_USER@$REVIEW_SERVER_IP "docker image prune -a -f"
   environment:
     name: review 1
-    url: ${REVIEW_SERVER_IP}:3000
+    url: http://3.87.72.221:3000
   when: manual
   image: docker:19.03.12
   services:
