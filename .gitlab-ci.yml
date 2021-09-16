@@ -73,6 +73,15 @@ deploy to prod:
     - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
     - echo "DATABASE_URL=mongodb+srv://$PROD_DATABASE_CREDENTIALS@$PROD_DATABASE_URI" >> .env
     - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
+    - echo "PORT=$PROD_PORT" >> .env
+    - echo "SMTP_HOST=$PROD_SMTP_HOST" >> .env
+    - echo "SMTP_PORT=$PROD_SMTP_PORT" >> .env
+    - echo "SMTP_SECURE=$PROD_SMTP_SECURE" >> .env
+    - echo "SMTP_USER=$PROD_SMTP_USER" >> .env
+    - echo "SMTP_PASS=$PROD_SMTP_PASS" >> .env
+    - echo "SMTP_DEFAULT_SENDER=$PROD_SMTP_DEFAULT_SENDER" >> .env
+    - echo "FARMOS_AGGREGATOR_APIKEY=$PROD_FARMOS_AGGREGATOR_APIKEY" >> .env
+    - echo "FARMOS_CALLBACK_KEY=$PROD_FARMOS_CALLBACK_KEY" >> .env
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" up -d
@@ -116,6 +125,15 @@ deploy to stage:
     - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
     - echo "DATABASE_URL=mongodb+srv://$STAGE_DATABASE_CREDENTIALS@$STAGE_DATABASE_URI" >> .env
     - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
+    - echo "PORT=$STAGE_PORT" >> .env
+    - echo "SMTP_HOST=$STAGE_SMTP_HOST" >> .env
+    - echo "SMTP_PORT=$STAGE_SMTP_PORT" >> .env
+    - echo "SMTP_SECURE=$STAGE_SMTP_SECURE" >> .env
+    - echo "SMTP_USER=$STAGE_SMTP_USER" >> .env
+    - echo "SMTP_PASS=$STAGE_SMTP_PASS" >> .env
+    - echo "SMTP_DEFAULT_SENDER=$STAGE_SMTP_DEFAULT_SENDER" >> .env
+    - echo "FARMOS_AGGREGATOR_APIKEY=$STAGE_FARMOS_AGGREGATOR_APIKEY" >> .env
+    - echo "FARMOS_CALLBACK_KEY=$STAGE_FARMOS_CALLBACK_KEY" >> .env
     - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" up -d
@@ -158,6 +176,15 @@ deploy to review 1:
     - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
     - echo "DATABASE_URL=mongodb+srv://$REVIEW_DATABASE_CREDENTIALS@$REVIEW_DATABASE_URI" >> .env
     - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
+    - echo "PORT=$REVIEW_PORT" >> .env
+    - echo "SMTP_HOST=$REVIEW_SMTP_HOST" >> .env
+    - echo "SMTP_PORT=$REVIEW_SMTP_PORT" >> .env
+    - echo "SMTP_SECURE=$REVIEW_SMTP_SECURE" >> .env
+    - echo "SMTP_USER=$REVIEW_SMTP_USER" >> .env
+    - echo "SMTP_PASS=$REVIEW_SMTP_PASS" >> .env
+    - echo "SMTP_DEFAULT_SENDER=$REVIEW_SMTP_DEFAULT_SENDER" >> .env
+    - echo "FARMOS_AGGREGATOR_APIKEY=$REVIEW_FARMOS_AGGREGATOR_APIKEY" >> .env
+    - echo "FARMOS_CALLBACK_KEY=$REVIEW_FARMOS_CALLBACK_KEY" >> .env
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" up -d

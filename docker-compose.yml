@@ -4,7 +4,6 @@ services:
   app:
     image: ${IMAGE_APP}
     environment:
-      - PORT=3000
       - DATABASE_NAME=oursci-server-local 
       - PATH_PREFIX= 
       - BCRYPT_ROUNDS=12
@@ -12,6 +11,15 @@ services:
       - ADMIN_EMAIL=admin@our-sci.net
       - DATABASE_URL=${DATABASE_URL}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - PORT=${PORT}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_SECURE=${SMTP_SECURE}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_DEFAULT_SENDER=${SMTP_DEFAULT_SENDER}
+      - FARMOS_AGGREGATOR_APIKEY=${FARMOS_AGGREGATOR_APIKEY}
+      - FARMOS_CALLBACK_KEY=${FARMOS_CALLBACK_KEY}
     network_mode: host
     deploy: 
       restart_policy:
