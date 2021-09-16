@@ -117,47 +117,23 @@ const createPinnedSurveysPopulationStages = () => {
 const getGroups = async (req, res) => {
   const { showArchived, prefix } = req.query;
 
-  let entities;
-  let dir = '/';
-
-  let archived = false;
-  if (queryParam(showArchived)) {
-    archived = true;
-  }
-
-  if (req.query.dir) {
-    dir = req.query.dir;
-  }
+  let dir = req.query.dir || '/';
+  const archived = queryParam(showArchived);
 
   if (!dir.endsWith('/')) {
     dir += '/';
   }
 
-  let dirQuery = dir;
-  if (req.query.tree) {
-    dirQuery = { $regex: `^${dir}` };
-  }
+  const findQuery = prefix
+    ? { 'meta.archived': archived, path: { $regex: `^${prefix}` } }
+    : { 'meta.archived': archived, dir: req.query.tree ? { $regex: `^${dir}` } : dir };
 
-  const findQuery = {
-    dir: dirQuery,
-    'meta.archived': archived,
-  };
-
-  if (prefix) {
-    delete findQuery.dir;
-    findQuery.path = { $regex: `^${prefix}` };
-  }
-
-  entities = await db.collection(col).find(findQuery).sort({ path: 1 }).toArray();
+  const entities = await db.collection(col).find(findQuery).sort({ path: 1 }).toArray();
   return res.send(entities);
 };
 
 const getGroupByPath = async (req, res) => {
-  let path = req.params[0];
-
-  if (!path.endsWith('/')) {
-    path += '/';
-  }
+  const path = req.params[0].endsWith('/') ? req.params[0] : `${req.params[0]}/`;
 
   const pipeline = [{ $match: { path } }];
 

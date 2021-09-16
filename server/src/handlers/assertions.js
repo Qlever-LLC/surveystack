@@ -192,18 +192,6 @@ export const assertIdsMatch = (req, res, next) => {
   next();
 };
 
-export const assertHasSurveyParam = catchErrors(async (req, res, next) => {
-  if (!req.query.survey) {
-    throw boom.badRequest('Query param not set: survey');
-  }
-
-  if (!ObjectId.isValid(req.query.survey)) {
-    throw boom.badRequest(`Invalid survey id: ${req.query.survey}`);
-  }
-
-  next();
-});
-
 export const validateBulkReassignRequestBody = (req, res, next) => {
   if (!req.body.ids || req.body.ids.length === 0) {
     throw boom.badRequest('You must specify ids.');

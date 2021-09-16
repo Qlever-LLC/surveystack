@@ -24,7 +24,6 @@ import {
   assertIdsMatch,
   assertNameNotEmpty,
   assertEntityRights,
-  assertHasSurveyParam,
   assertSubmissionRights,
   assertEntitiesExist,
   assertEntitiesRights,
