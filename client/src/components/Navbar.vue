@@ -1,6 +1,7 @@
 <template>
-  <nav class="app-navbar">
+  <nav>
     <v-app-bar app clipped-left color="appbar" absolute>
+      <!-- color="white" -->
       <v-app-bar-nav-icon @click="drawer = !drawer" />
       <v-toolbar-title class="flex-column">
         <div id="app-bar-title" class="title py-0 my-0">
@@ -71,6 +72,18 @@
                     </v-list-item-icon>
                     <v-list-item-content>
                       <v-list-item-title>SurveyStack Docs</v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item
+                    href="https://our-sci.gitlab.io/manufacturing/reflectometer-tutorials/getting_started/"
+                    target="_blank"
+                  >
+                    <v-list-item-icon>
+                      <v-icon>mdi-notebook-multiple</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                      <v-list-item-title>Reflectometer Docs</v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
                 </v-list>
@@ -274,10 +287,6 @@ export default {
 };
 </script>
 <style scoped>
-.title {
-  font-size: 1rem !important;
-}
-
 #app-bar-title {
   font-size: 1rem;
   font-weight: normal;
