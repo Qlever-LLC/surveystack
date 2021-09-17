@@ -117,7 +117,7 @@
       <v-checkbox
         class="my-1"
         color="grey darken-1"
-        v-if="survey.meta.isLibrary"
+        v-if="survey.meta.isLibrary && !control.libraryIsInherited"
         v-model="control.options.allowHide"
         hide-details
         label="Allow hide"
@@ -135,7 +135,7 @@
       <v-checkbox
         class="my-1"
         color="grey darken-1"
-        v-if="survey.meta.isLibrary"
+        v-if="survey.meta.isLibrary && !control.libraryIsInherited"
         v-model="control.options.allowModify"
         hide-details
         label="Allow modify"

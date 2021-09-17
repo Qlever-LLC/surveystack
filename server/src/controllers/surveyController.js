@@ -4,7 +4,7 @@ import boom from '@hapi/boom';
 
 import { db } from '../db';
 
-import { checkSurvey } from '../helpers/surveys';
+import { checkSurvey, forAllControlsRecursive } from '../helpers/surveys';
 import rolesService from '../services/roles.service';
 
 const col = 'surveys';
@@ -17,9 +17,11 @@ const sanitize = async (entity) => {
     version.dateCreated = new Date(entity.dateCreated);
 
     version.controls.forEach((control) => {
-      if (control.libraryId) {
-        control.libraryId = new ObjectId(control.libraryId);
-      }
+      forAllControlsRecursive(control, (control)=> {
+        if (control.libraryId) {
+          control.libraryId = new ObjectId(control.libraryId);
+        }
+      })
     });
   });
 
@@ -156,6 +158,7 @@ const buildPipelineForGetSurveyPage = ({
   if (isLibrary === "true") {
     // add to pipeline the aggregation for number of referencing survey and for number of submissions of referencing surveys
     // TODO further reduce meta.libraryUsageCountSurveys by revisions.controls.isLibraryRoot=true and revisions.version=latestVersion
+    // TODO also count revisions.controls.children.libraryId
     const aggregateCounts = [
       {
         '$match': {
@@ -375,6 +378,22 @@ const getSurveyInfo = async (req, res) => {
   return res.send(entity);
 };
 
+const getSurveyLibraryConsumers = async (req, res) => {
+  // TODO only check highest or latestVersion ?
+  const { id } = req.query;
+  // TODO naive and limited (to 3 child levels) implementation for deeply nested question sets - try to find elegant query which is still performing well
+  const filter = {
+    $or: [
+      { $and: [{ "revisions.controls.libraryId": new ObjectId(id) }, { "revisions.controls.isLibraryRoot": true }] },
+      { $and: [{ "revisions.controls.children.libraryId": new ObjectId(id) }, { "revisions.controls.children.isLibraryRoot": true }] },
+      { $and: [{ "revisions.controls.children.children.libraryId": new ObjectId(id) }, { "revisions.controls.children.children.isLibraryRoot": true }] },
+      { $and: [{ "revisions.controls.children.children.children.libraryId": new ObjectId(id) }, { "revisions.controls.children.children.children.isLibraryRoot": true }] },
+    ]
+  };
+  const entities = await db.collection(col).find(filter).toArray();
+  return res.send(entities);
+};
+
 const createSurvey = async (req, res) => {
   const entity = await sanitize(req.body);
   // apply creator (endpoint already has assertAuthenticated, so auth.user._id must exist)
@@ -466,6 +485,7 @@ export default {
   getSurveyPage,
   getSurveyListPage,
   getSurvey,
+  getSurveyLibraryConsumers,
   getSurveyInfo,
   createSurvey,
   updateSurvey,
