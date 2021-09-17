@@ -69,7 +69,7 @@
                 >
                   add to survey
                 </v-btn>
-                <div>
+                <div @click.stop="showLibraryConsumersDialog(c)">
                   <v-tooltip bottom>
                     <template v-slot:activator="{ on, attrs }">
                       <div v-bind="attrs" v-on="on">
@@ -121,17 +121,38 @@
         </v-col>
       </v-row>
     </v-container>
+
+    <v-dialog
+      v-if="libraryConsumersDialogIsVisible"
+      v-model="libraryConsumersDialogIsVisible"
+      width="500"
+      max-width="75%"
+      :retain-focus="false"
+    >
+      <v-card>
+        <question-library-consumers v-model="libraryConsumersDialogSurveyId" />
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn @click="libraryConsumersDialogIsVisible = false" color="primary" text>
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 <script>
 import moment from 'moment';
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
+import QuestionLibraryConsumers from '@/components/builder/QuestionLibraryConsumers';
 
 const PAGINATION_LIMIT = 10;
 
 export default {
   components: {
+    QuestionLibraryConsumers,
     graphicalView,
   },
   props: ['survey', 'libraryId'],
@@ -149,6 +170,8 @@ export default {
         loading: false,
       },
       selectedSurvey: null,
+      libraryConsumersDialogIsVisible: false,
+      libraryConsumersDialogSurveyId: null,
     };
   },
   computed: {},
@@ -203,7 +226,7 @@ export default {
       };
     },
     addToSurvey(librarySurveyId) {
-      this.$emit('addToSurvey', librarySurveyId);
+      this.$emit('add-questions-from-library', librarySurveyId);
     },
     async toggleCard(survey) {
       if (this.selectedSurvey && survey._id === this.selectedSurvey._id) {
@@ -212,6 +235,10 @@ export default {
         const { data } = await api.get(`/surveys/${survey._id}`);
         this.selectedSurvey = data; // select card
       }
+    },
+    async showLibraryConsumersDialog(survey) {
+      this.libraryConsumersDialogIsVisible = true;
+      this.libraryConsumersDialogSurveyId = survey._id;
     },
   },
   watch: {

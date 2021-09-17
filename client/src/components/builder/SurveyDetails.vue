@@ -97,7 +97,7 @@
             </v-list-item>
             <v-list-item>
               <v-list-item-title>
-                <v-dialog v-model="editLibraryDialogIsVisible" width="500" max-width="75%">
+                <v-dialog v-model="editLibraryDialogIsVisible" width="700" max-width="75%">
                   <template v-slot:activator="{ on }">
                     <v-btn v-on="on" text>
                       <v-icon color="grey">mdi-library</v-icon>
@@ -139,6 +139,30 @@
                       </v-btn>
                       <v-btn @click="editLibraryDialogIsVisible = false" color="primary" text>
                         Cancel
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+              </v-list-item-title>
+            </v-list-item>
+            <v-list-item v-if="value.meta.isLibrary">
+              <v-list-item-title>
+                <v-dialog v-model="libraryConsumersDialogIsVisible" width="500" max-width="75%">
+                  <template v-slot:activator="{ on }">
+                    <v-btn v-on="on" text>
+                      <v-icon color="grey">mdi-layers-search</v-icon>
+                      <div class="ml-1">
+                        Question Set Users
+                      </div>
+                    </v-btn>
+                  </template>
+                  <v-card>
+                    <question-library-consumers v-model="value._id" />
+                    <v-divider></v-divider>
+                    <v-card-actions>
+                      <v-spacer />
+                      <v-btn @click="libraryConsumersDialogIsVisible = false" color="primary" text>
+                        Close
                       </v-btn>
                     </v-card-actions>
                   </v-card>
@@ -294,6 +318,7 @@ import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import appResources from '@/components/builder/Resources.vue';
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import api from '@/services/api.service';
+import QuestionLibraryConsumers from '@/components/builder/QuestionLibraryConsumers';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -307,6 +332,7 @@ export default {
       resourcesDialogIsVisible: false,
       editDetailsDialogIsVisible: false,
       editLibraryDialogIsVisible: false,
+      libraryConsumersDialogIsVisible: false,
       surveyGroupName: 'Group Not Found',
       availableSubmissions,
     };
@@ -359,6 +385,7 @@ export default {
     },
   },
   components: {
+    QuestionLibraryConsumers,
     SurveyNameEditor,
     ActiveGroupSelector,
     appResources,
