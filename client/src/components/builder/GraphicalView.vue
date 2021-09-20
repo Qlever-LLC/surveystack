@@ -17,9 +17,9 @@
       class="control-item mb-2"
       :class="[
         { 'control-item-selected': el === selected },
-        { 'library-border': el.isLibraryRoot },
+        { 'library-border': el.isLibraryRoot && !el.libraryIsInherited },
         { 'control-item-library': el.libraryId },
-        { 'draggable-item': !el.libraryId || el.isLibraryRoot },
+        { 'draggable-item': !el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited) },
       ]"
       :key="el.id || el._id"
       @mousedown.stop.left="$emit('control-selected', el)"
@@ -44,18 +44,21 @@
             </v-btn>
             <v-btn
               icon
-              v-if="selected === el && el.isLibraryRoot"
+              v-if="selected === el && el.isLibraryRoot && !el.libraryIsInherited"
               @click.stop="openLibrary(el.libraryId)"
-              title="View in library"
             >
               <v-icon color="grey lighten-1">mdi-library</v-icon>
             </v-btn>
-            <v-btn icon v-if="selected === el && el.isLibraryRoot" @click.stop="updateLibrary(idx)" title="Update">
+            <v-btn
+              icon
+              v-if="selected === el && el.isLibraryRoot && !el.libraryIsInherited"
+              @click.stop="updateLibrary(idx)"
+            >
               <v-icon color="grey lighten-1">mdi-refresh</v-icon>
             </v-btn>
             <v-btn
               icon
-              v-if="selected === el && (!el.libraryId || el.isLibraryRoot)"
+              v-if="selected === el && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
               @click.stop="() => showDeleteModal(idx)"
             >
               <v-icon color="grey lighten-1">mdi-delete</v-icon>
@@ -65,7 +68,7 @@
             </v-btn>
           </div>
           <v-chip
-            v-if="selected === el && el.isLibraryRoot"
+            v-if="selected === el && el.isLibraryRoot && !el.libraryIsInherited"
             class="align-center text-align-center text-center"
             dark
             small
@@ -81,7 +84,7 @@
         v-if="el.type == 'group' && !el.options.hidden"
         :class="[
           { 'drop-area-border': el.children.length === 0, 'drop-area': 1 },
-          { 'draggable-item': !el.libraryId || el.isLibraryRoot },
+          { 'draggable-item': !el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited) },
         ]"
         :selected="selected"
         :controls="el.children"
@@ -97,7 +100,7 @@
         v-if="el.type == 'page' && !el.options.hidden"
         :class="[
           { 'drop-area-border': el.children.length === 0, 'drop-area': 1 },
-          { 'draggable-item': !el.libraryId || el.isLibraryRoot },
+          { 'draggable-item': !el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited) },
         ]"
         :selected="selected"
         :controls="el.children"

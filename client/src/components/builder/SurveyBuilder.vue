@@ -373,8 +373,12 @@ export default {
       this.survey.resources = this.survey.resources.filter((value) => value.libraryId !== librarySurveyId);
       // copy resources from library survey
       data.resources.forEach((r) => {
-        r.libraryId = data._id;
-        r.libraryVersion = data.latestVersion;
+        if (r.libraryId) {
+          r.libraryIsInherited = true;
+        } else {
+          r.libraryId = data._id;
+          r.libraryVersion = data.latestVersion;
+        }
       });
       this.survey.resources = this.survey.resources.concat(data.resources);
 
@@ -409,12 +413,24 @@ export default {
       for (let i = 0; i < controlsFromLibrary.length; i++) {
         const controlToAdd = controlsFromLibrary[i];
         controlToAdd.id = new ObjectID().toString();
-        controlToAdd.libraryId = data._id;
+        if (controlToAdd.libraryId) {
+          controlToAdd.libraryIsInherited = true;
+        } else {
+          controlToAdd.libraryId = data._id;
+          controlToAdd.libraryVersion = data.latestVersion;
+        }
+
+        //TODO remove this, wrong turn: controlToAdd.isLibraryRoot = false;
         dive(controlToAdd, (control) => {
           // eslint-disable-next-line no-param-reassign
           control.id = new ObjectID().toString();
-          control.libraryId = data._id;
-          control.libraryVersion = data.latestVersion;
+          if (control.libraryId) {
+            control.libraryIsInherited = true;
+          } else {
+            //set library data if not yet set, if set, do not overwrite cause it references another library the inherited library consists of
+            control.libraryId = data._id;
+            control.libraryVersion = data.latestVersion;
+          }
         });
         rootGroup.children.push(controlToAdd);
       }

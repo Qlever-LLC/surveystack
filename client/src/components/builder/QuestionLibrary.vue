@@ -20,7 +20,7 @@
     </v-container>
     <v-container fluid class="pa-0" v-else>
       <v-row dense>
-        <v-col v-for="c in surveys.content" :key="c._id" :cols="!selectedSurvey ? 4 : 12">
+        <v-col v-for="c in surveys.content" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
           <v-card
             @click="toggleCard(c)"
             v-show="!selectedSurvey || selectedSurvey._id == c._id"
@@ -69,7 +69,7 @@
                 >
                   add to survey
                 </v-btn>
-                <div @click.stop="showLibraryConsumersDialog(c)">
+                <div>
                   <v-tooltip bottom>
                     <template v-slot:activator="{ on, attrs }">
                       <div v-bind="attrs" v-on="on">
@@ -121,38 +121,23 @@
         </v-col>
       </v-row>
     </v-container>
-
-    <v-dialog
-      v-if="libraryConsumersDialogIsVisible"
-      v-model="libraryConsumersDialogIsVisible"
-      width="500"
-      max-width="75%"
-      :retain-focus="false"
-    >
-      <v-card>
-        <question-library-consumers v-model="libraryConsumersDialogSurveyId" />
-        <v-divider></v-divider>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn @click="libraryConsumersDialogIsVisible = false" color="primary" text>
-            Close
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <v-pagination
+      v-if="surveys.content.length > 0 && !selectedSurvey"
+      v-model="page"
+      :length="activeTabPaginationLength"
+      @input="() => fetchData()"
+    />
   </div>
 </template>
 <script>
 import moment from 'moment';
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
-import QuestionLibraryConsumers from '@/components/builder/QuestionLibraryConsumers';
 
-const PAGINATION_LIMIT = 10;
+const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
-    QuestionLibraryConsumers,
     graphicalView,
   },
   props: ['survey', 'libraryId'],
@@ -170,11 +155,14 @@ export default {
         loading: false,
       },
       selectedSurvey: null,
-      libraryConsumersDialogIsVisible: false,
-      libraryConsumersDialogSurveyId: null,
     };
   },
-  computed: {},
+  computed: {
+    activeTabPaginationLength() {
+      const { total } = this.surveys.pagination;
+      return total ? Math.ceil(total / PAGINATION_LIMIT) : 0;
+    },
+  },
   methods: {
     async fetchData() {
       const now = moment();
@@ -235,10 +223,6 @@ export default {
         const { data } = await api.get(`/surveys/${survey._id}`);
         this.selectedSurvey = data; // select card
       }
-    },
-    async showLibraryConsumersDialog(survey) {
-      this.libraryConsumersDialogIsVisible = true;
-      this.libraryConsumersDialogSurveyId = survey._id;
     },
   },
   watch: {
