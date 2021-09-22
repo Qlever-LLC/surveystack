@@ -1,7 +1,6 @@
 import { ObjectId } from 'mongodb';
 import boom from '@hapi/boom';
 
-import canUser from '../helpers/canUser';
 import { catchErrors } from '../handlers/errorHandlers';
 
 import rolesService from '../services/roles.service';
@@ -15,6 +14,33 @@ export const assertAuthenticated = catchErrors(async (req, res, next) => {
   next();
 });
 
+const getEntity = async (id, collection) => {
+  return await db.collection(collection).findOne({ _id: new ObjectId(id) });
+}
+
+const getEntities = async (ids, collection) => {
+  const query = { _id: { $in: ids.map(ObjectId) } };
+  const cursor = await db.collection(collection).find(query);
+  return cursor.toArray();
+}
+
+export const assertEntitiesExist = ({ collection }) =>
+  catchErrors(async (req, res, next) => {
+    const { ids } = req.body;
+
+    const entities = await getEntities(ids, collection);
+
+    if (entities.length !== ids.length) {
+      throw boom.notFound(
+        `assertEntitiesExist: One or more entities not found in ${collection} collection.`
+      );
+    }
+
+    res.locals.existing = entities;
+
+    next();
+  });
+
 export const assertEntityExists = ({ collection }) =>
   catchErrors(async (req, res, next) => {
     const { id } = req.params;
@@ -27,40 +53,61 @@ export const assertEntityExists = ({ collection }) =>
       throw boom.badImplementation();
     }
 
-    const existing = await db.collection(collection).findOne({ _id: new ObjectId(id) });
-    if (!existing) {
+    const entity = await getEntity(id, collection);
+    if (!entity) {
       throw boom.notFound(
         `assertEntityExists: No entity exists for collection/id: ${collection}/${id}`
       );
     }
 
-    res.locals.existing = existing;
+    res.locals.existing = entity;
 
     next();
   });
 
-export const assertEntityRights = catchErrors(async (req, res, next) => {
-  const { existing } = res.locals;
-  const user = res.locals.auth.user._id;
-
-  if (res.locals.auth.isSuperAdmin) {
-    return next(); // allow super admins to reassign
+const hasEntityRights = async ({ entity, auth }) => {
+  if (auth.isSuperAdmin) {
+    return true;
   }
 
-  if ((!existing.meta.group || !existing.meta.group.id) && !existing.meta.creator) {
-    return next(); // no user and no group => free for all! may want to change this behaviour
+  if (entity.meta.creator?.equals(auth.user._id)) {
+    return true;
   }
-
-  if (existing.meta.creator && existing.meta.creator.equals(user)) {
-    return next(); // user may delete their own submissions
+  
+  if (!entity.meta.group?.id && !entity.meta.creator) {
+    return true;
   }
-
-  const hasAdminRole = await rolesService.hasAdminRole(user, existing.meta.group.id);
+  
+  const hasAdminRole = await rolesService.hasAdminRole(auth.user._id, entity.meta.group?.id);
   if (hasAdminRole) {
-    return next(); // group admins may delete submissions
+    return true;
   }
 
-  throw boom.unauthorized(`No entity rights on: ${existing._id}`);
+  return false;
+};
+
+export const assertEntitiesRights = catchErrors(async (req, res, next) => {
+  const entities = res.locals.existing;
+
+  const rights = await Promise.all(
+    entities.map(entity => hasEntityRights({ entity, auth: res.locals.auth }))
+  );
+
+  if (rights.every(Boolean)) {
+    return next();
+  }
+
+  throw boom.unauthorized(`Missing entity rights.`);
+});
+
+export const assertEntityRights = catchErrors(async (req, res, next) => {
+  const entity = res.locals.existing;
+
+  if (await hasEntityRights({ entity, auth: res.locals.auth })) {
+    return next();
+  }
+
+  throw boom.unauthorized(`No entity rights on: ${entity.id}`);
 });
 
 const hasSubmissionRights = async (submission, res) => {
@@ -156,3 +203,15 @@ export const assertHasSurveyParam = catchErrors(async (req, res, next) => {
 
   next();
 });
+
+export const validateBulkReassignRequestBody = (req, res, next) => {
+  if (!req.body.ids || req.body.ids.length === 0) {
+    throw boom.badRequest('You must specify ids.');
+  }
+
+  if(!(req.body.group || req.body.creator)) {
+    throw boom.badRequest('You must specify a group, a creator, or both.')
+  }
+  
+  next();
+}
