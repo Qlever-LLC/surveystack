@@ -56,6 +56,34 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
+        <v-dialog v-model="updateLibraryDialogIsVisible" width="700" max-width="75%">
+          <v-card>
+            <v-card-title>
+              Publish Update To Library
+            </v-card-title>
+            <v-card-text>
+              <v-text-field :value="value.name" label="Title" readonly disabled> </v-text-field>
+              <h3>Version history</h3>
+              <tip-tap-editor v-model="value.meta.libraryHistory" class="mb-4" />
+            </v-card-text>
+            <v-card-actions class="mr-3">
+              <v-spacer />
+              <v-btn
+                @click="
+                  publishUpdateToLibrary();
+                  updateLibraryDialogIsVisible = false;
+                "
+                color="primary"
+                text
+              >
+                <span>Publish update to library</span>
+              </v-btn>
+              <v-btn @click="updateLibraryDialogIsVisible = false" color="primary" text>
+                Cancel
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
         <v-menu offset-y left>
           <template v-slot:activator="{ on }">
             <v-btn icon v-on="on">
@@ -273,7 +301,7 @@
                 <v-btn
                   :dark="enablePublish"
                   class="my-1 mr-1"
-                  @click="$emit('publish')"
+                  @click="publish"
                   color="green"
                   :disabled="!enablePublish"
                 >
@@ -356,6 +384,7 @@ export default {
       resourcesDialogIsVisible: false,
       editDetailsDialogIsVisible: false,
       editLibraryDialogIsVisible: false,
+      updateLibraryDialogIsVisible: false,
       libraryConsumersDialogIsVisible: false,
       libraryConsumers: [],
       surveyGroupName: 'Group Not Found',
@@ -432,6 +461,19 @@ export default {
       }
       const response = await api.get(`/groups/${id}`);
       return response.data.name;
+    },
+    publish() {
+      if (this.value.meta.isLibrary) {
+        //show update library dialog, ask for release notes
+        //todo extend dialog counters of added, changed, deleted questions
+        //todo add selection of change type (major change, minor change, small fix)
+        this.updateLibraryDialogIsVisible = true;
+      } else {
+        this.$emit('publish');
+      }
+    },
+    publishUpdateToLibrary() {
+      this.$emit('publish');
     },
     updateSurveyName(name) {
       this.$emit('set-survey-name', name);

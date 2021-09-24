@@ -54,7 +54,9 @@
               v-if="selected === el && el.isLibraryRoot && !el.libraryIsInherited"
               @click.stop="updateLibrary(idx)"
             >
-              <v-icon color="grey lighten-1">mdi-refresh</v-icon>
+              <v-icon :color="availableLibraryUpdates[el.libraryId] > el.libraryVersion ? 'warning' : 'grey lighten-1'"
+                >mdi-refresh</v-icon
+              >
             </v-btn>
             <v-btn
               icon
@@ -72,8 +74,12 @@
             class="align-center text-align-center text-center"
             dark
             small
-            outlined
-            color="grey"
+            :color="availableLibraryUpdates[el.libraryId] > el.libraryVersion ? 'warning' : 'grey'"
+            :title="
+              availableLibraryUpdates[el.libraryId]
+                ? 'new version ' + availableLibraryUpdates[el.libraryId] + ' available'
+                : 'newest available version'
+            "
           >
             Version {{ el.libraryVersion }}
           </v-chip>
@@ -175,6 +181,13 @@ export default {
     readOnly: {
       type: Boolean,
       default: false,
+    },
+    availableLibraryUpdates: {
+      required: false,
+      type: Object,
+      default() {
+        return {};
+      },
     },
   },
   filters: {

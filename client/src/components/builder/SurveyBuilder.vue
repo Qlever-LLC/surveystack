@@ -8,6 +8,10 @@
       <app-examples-view @close="showExamples = false" :category="tabMap[selectedTab]" />
     </v-dialog>
 
+    <v-alert v-if="Object.keys(availableLibraryUpdates).length > 0" type="warning" dismissible>
+      This survey uses an outdated question library set. Consider reviewing the new version and updating it.
+    </v-alert>
+
     <splitpanes style="padding: 0px !important" class="pane-root" vertical>
       <pane class="pane pane-survey" style="position: relative; overflow: hidden">
         <div class="pane-fixed-wrapper pr-2" style="position: relative;">
@@ -41,6 +45,7 @@
             v-if="!viewCode"
             :selected="control"
             :controls="currentControls"
+            :availableLibraryUpdates="availableLibraryUpdates"
             @control-selected="controlSelected"
             @duplicate-control="duplicateControl"
             @open-library="openLibrary"
@@ -304,6 +309,7 @@ export default {
       initialSurvey: cloneDeep(this.survey),
       surveyUnchanged: true,
       showExamples: false,
+      availableLibraryUpdates: {},
     };
   },
   methods: {
@@ -443,6 +449,10 @@ export default {
     },
     closeLibrary() {
       this.library = false;
+    },
+    async checkForLibraryUpdates(survey) {
+      const { data } = await api.get(`/surveys/check-for-updates/${survey._id}`);
+      this.availableLibraryUpdates = data;
     },
     initNavbarAndDirtyFlag(survey) {
       if (!survey.revisions) {
@@ -900,6 +910,7 @@ export default {
   created() {
     this.initNavbarAndDirtyFlag(this.survey);
     this.createInstance();
+    this.checkForLibraryUpdates(this.survey);
   },
 
   // TODO: get route guard to work here, or move dirty flag up to Builder.vue
@@ -921,6 +932,7 @@ export default {
   overflow-x: auto;
   overflow-y: hidden;
 }
+
 .pane-root {
   height: 100%;
   padding: 12px;
@@ -1074,24 +1086,28 @@ export default {
   width: 100%;
   height: 100%;
 }
+
 .splitpanes--vertical {
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
   -ms-flex-direction: row;
   flex-direction: row;
 }
+
 .splitpanes--horizontal {
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
 }
+
 .splitpanes--dragging * {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
 }
+
 .splitpanes__pane {
   width: 100%;
   height: 100%;
@@ -1099,31 +1115,38 @@ export default {
   -webkit-transition: width 0.2s ease-out, height 0.2s ease-out;
   transition: width 0.2s ease-out, height 0.2s ease-out;
 }
+
 .splitpanes--dragging .splitpanes__pane {
   -webkit-transition: none;
   transition: none;
 }
+
 .splitpanes__splitter {
   -ms-touch-action: none;
   touch-action: none;
 }
+
 .splitpanes--vertical > .splitpanes__splitter {
   min-width: 1px;
   cursor: col-resize;
 }
+
 .splitpanes--horizontal > .splitpanes__splitter {
   min-height: 1px;
   cursor: row-resize;
 }
+
 .splitpanes.default-theme .splitpanes__pane {
   background-color: #f2f2f2;
 }
+
 .splitpanes.default-theme .splitpanes__splitter {
   background-color: #fff;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   position: relative;
 }
+
 .splitpanes.default-theme .splitpanes__splitter:after,
 .splitpanes.default-theme .splitpanes__splitter:before {
   content: '';
@@ -1134,19 +1157,23 @@ export default {
   -webkit-transition: background-color 0.3s;
   transition: background-color 0.3s;
 }
+
 .splitpanes.default-theme .splitpanes__splitter:hover:after,
 .splitpanes.default-theme .splitpanes__splitter:hover:before {
   background-color: rgba(0, 0, 0, 0.25);
 }
+
 .default-theme.splitpanes .splitpanes .splitpanes__splitter {
   z-index: 1;
 }
+
 .default-theme.splitpanes--vertical > .splitpanes__splitter,
 .default-theme .splitpanes--vertical > .splitpanes__splitter {
   width: 9px;
   border-left: 1px solid #eee;
   margin-left: -1px;
 }
+
 .default-theme.splitpanes--vertical > .splitpanes__splitter:after,
 .default-theme .splitpanes--vertical > .splitpanes__splitter:after,
 .default-theme.splitpanes--vertical > .splitpanes__splitter:before,
@@ -1156,20 +1183,24 @@ export default {
   width: 1px;
   height: 30px;
 }
+
 .default-theme.splitpanes--vertical > .splitpanes__splitter:before,
 .default-theme .splitpanes--vertical > .splitpanes__splitter:before {
   margin-left: -2px;
 }
+
 .default-theme.splitpanes--vertical > .splitpanes__splitter:after,
 .default-theme .splitpanes--vertical > .splitpanes__splitter:after {
   margin-left: 1px;
 }
+
 .default-theme.splitpanes--horizontal > .splitpanes__splitter,
 .default-theme .splitpanes--horizontal > .splitpanes__splitter {
   height: 9px;
   border-top: 1px solid #eee;
   margin-top: -1px;
 }
+
 .default-theme.splitpanes--horizontal > .splitpanes__splitter:after,
 .default-theme .splitpanes--horizontal > .splitpanes__splitter:after,
 .default-theme.splitpanes--horizontal > .splitpanes__splitter:before,
@@ -1179,10 +1210,12 @@ export default {
   width: 30px;
   height: 1px;
 }
+
 .default-theme.splitpanes--horizontal > .splitpanes__splitter:before,
 .default-theme .splitpanes--horizontal > .splitpanes__splitter:before {
   margin-top: -2px;
 }
+
 .default-theme.splitpanes--horizontal > .splitpanes__splitter:after,
 .default-theme .splitpanes--horizontal > .splitpanes__splitter:after {
   margin-top: 1px;

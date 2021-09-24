@@ -311,9 +311,7 @@ const getSurveyListPage = async (req, res) => {
 
 const getSurvey = async (req, res) => {
   const { id } = req.params;
-  let entity;
-
-  entity = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  let entity = await db.collection(col).findOne({ _id: new ObjectId(id) });
 
   if (!entity) {
     return res.status(404).send({
@@ -480,6 +478,40 @@ const deleteSurvey = async (req, res) => {
   }
 };
 
+const checkForLibraryUpdates = async (req, res) => {
+  const { id } = req.params;
+  let survey = await db.collection(col).findOne({ _id: new ObjectId(id) });
+
+  if (!survey) {
+    return res.status(404).send({
+      message: `No entity with _id exists: ${id}`,
+    });
+  }
+
+  // get latest revision of survey controls, even if draft
+  const latestRevision = survey.revisions[survey.revisions.length - 1];
+
+  //for each question set library used in the given survey
+  let updatableSurveys = {};
+
+  await Promise.all(latestRevision.controls.map(async (control) => {
+    if(control.isLibraryRoot && !control.libraryIsInherited) {
+      //check if used library survey version is old
+      const librarySurvey = await db.collection(col).findOne({ _id: new ObjectId(control.libraryId) });
+      if(control.libraryVersion<librarySurvey.latestVersion) {
+        //library is updatable, add to result set
+        updatableSurveys[control.libraryId] = librarySurvey.latestVersion;
+        /*updatableSurveys.push({
+          id: control.libraryId,
+          latestVersion: librarySurvey.latestVersion,
+        })*/
+      }
+    }
+  }));
+
+  return res.send(updatableSurveys);
+};
+
 export default {
   getSurveys,
   getSurveyPage,
@@ -490,4 +522,5 @@ export default {
   createSurvey,
   updateSurvey,
   deleteSurvey,
+  checkForLibraryUpdates,
 };
