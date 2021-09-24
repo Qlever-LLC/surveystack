@@ -65,6 +65,12 @@
               <v-text-field :value="value.name" label="Title" readonly disabled> </v-text-field>
               <h3>Version history</h3>
               <tip-tap-editor v-model="value.meta.libraryHistory" class="mb-4" />
+              <v-select
+                outlined
+                v-model="value.meta.libraryLastChangeType"
+                label="Change type"
+                :items="availableLibraryChangeTypes"
+              />
             </v-card-text>
             <v-card-actions class="mr-3">
               <v-spacer />
@@ -151,6 +157,13 @@
                       <tip-tap-editor v-model="value.meta.libraryMaintainers" class="mb-4" />
                       <h3>Version history</h3>
                       <tip-tap-editor v-model="value.meta.libraryHistory" class="mb-4" />
+                      <v-select
+                        v-if="value.meta.isLibrary"
+                        outlined
+                        v-model="value.meta.libraryLastChangeType"
+                        label="Latest change type"
+                        :items="availableLibraryChangeTypes"
+                      />
                     </v-card-text>
                     <v-card-actions class="mr-3">
                       <v-spacer />
@@ -378,6 +391,12 @@ const availableSubmissions = [
   { value: 'group', text: 'Group members' },
 ];
 
+const availableLibraryChangeTypes = [
+  { value: 'major', text: 'Major change' },
+  { value: 'minor', text: 'Minor change' },
+  { value: 'patch', text: 'Small fix' },
+];
+
 export default {
   data() {
     return {
@@ -389,6 +408,7 @@ export default {
       libraryConsumers: [],
       surveyGroupName: 'Group Not Found',
       availableSubmissions,
+      availableLibraryChangeTypes,
     };
   },
   async created() {
