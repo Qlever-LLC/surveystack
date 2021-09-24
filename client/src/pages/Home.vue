@@ -112,7 +112,7 @@
     </v-row>
 
     <v-dialog v-if="!isLoggedIn" v-model="loginIsVisible" class="login-dialog">
-      <app-login :showHero="false" />
+      <auth-selector @change="handleChange" />
     </v-dialog>
 
     <v-row>
@@ -140,12 +140,12 @@
 </template>
 
 <script>
-import AppLogin from '@/pages/auth/Login.vue';
+import AuthSelector from '@/components/ui/AuthSelector.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
 
 export default {
   components: {
-    AppLogin,
+    AuthSelector,
     AppBasicList,
   },
   name: 'home',
@@ -159,6 +159,9 @@ export default {
     async focused() {
       // const res = await axios.get('http://localhost:9095/measurement');
       // console.log('result', res.data);
+    },
+    handleChange(log) {
+      console.log(log, 'HOME');
     },
   },
 
@@ -195,11 +198,17 @@ export default {
 }
 
 >>> .v-dialog {
-  width: auto;
   height: auto;
 }
 
 >>> .container {
   padding: 0;
+}
+
+@media (min-width: 600px) {
+  >>> .v-dialog {
+    width: auto;
+    max-width: 40rem;
+  }
 }
 </style>
