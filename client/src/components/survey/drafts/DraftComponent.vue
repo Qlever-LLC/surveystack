@@ -56,12 +56,8 @@
 
     <!-- Footer with next/prev buttons -->
     <app-draft-footer
-      class="draft-footer px-0 grey lighten-4"
-      :class="{ 'show-submit': showOverview }"
-      :style="{
-        left: moveFooter ? '256px' : '0px',
-        width: moveFooter ? 'calc(100% - 256px)' : '100%',
-      }"
+      class="px-0 grey lighten-4"
+      :class="{ 'show-submit': showOverview, 'draft-footer': !onBuilding, 'footer-full-width': onBuilding }"
       :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
       :enableNext="!$store.getters['draft/hasRequiredUnanswered']"
       :enableSubmit="!$store.getters['draft/errors']"
@@ -138,6 +134,9 @@ export default {
       // However, if display breakpoint is 'md' or less, we do not move the footer
       return this.$store.getters['appui/menu'] && !this.$vuetify.breakpoint.mdAndDown;
     },
+    onBuilding() {
+      return this.builder;
+    },
   },
   watch: {
     path() {
@@ -159,11 +158,13 @@ export default {
       // this.$store.dispatch('draft/next')
       queueAction(this.$store, 'draft/next');
       window.scrollTo(0, 0);
+      this.$emit('setImage');
     },
     prev() {
       // this.$store.dispatch('draft/prev')
       queueAction(this.$store, 'draft/prev');
       window.scrollTo(0, 0);
+      this.$emit('setImage');
     },
     goto(path) {
       this.$store.dispatch('draft/goto', path);
@@ -254,6 +255,7 @@ export default {
 
 .draft-component-wrapper {
   height: 100%;
+  width: 100%;
   overflow: auto;
   display: flex;
   flex-direction: column;
@@ -277,7 +279,7 @@ export default {
   display: flex;
   flex-direction: column;
   margin-bottom: 68px;
-  background-color: var(--v-background-base);
+  background-color: white;
 }
 
 .draft-footer {
@@ -285,7 +287,29 @@ export default {
   height: 68px;
   width: 100%;
   position: fixed;
-  bottom: 0px;
-  left: 0px;
+  bottom: 0;
+  left: 0;
+}
+
+.footer-full-width {
+  z-index: 3;
+  height: 68px;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+}
+
+@media (min-width: 960px) {
+  .draft-overview,
+  .draft-content {
+    margin-bottom: 0px;
+  }
+  .draft-footer {
+    padding: 20px;
+    width: 100%;
+    position: sticky;
+    bottom: 0;
+  }
 }
 </style>

@@ -1,12 +1,26 @@
 <template>
-  <div style="height: 100%; max-height: 100%;">
-    <app-draft-component
-      v-if="!loading && !hasError"
-      :survey="survey"
-      :submission="submission"
-      :persist="true"
-      @submit="submit"
-    />
+  <div style="height:100%; max-height:100%">
+    <div class="d-flex flex-column-reverse flex-md-row" v-if="!loading && !hasError">
+      <div class="d-flex flex-column flex-item-left">
+        <app-navbar :positionSticky="true" />
+        <app-draft-component
+          class="flex-item-left"
+          :survey="survey"
+          :submission="submission"
+          :persist="true"
+          @submit="submit"
+          @setImage="setImage"
+        />
+      </div>
+
+      <image-container
+        class="flex-item-right"
+        :imageDesktop="imageSet[selectedImageSetId].desktop"
+        :imageMobile="imageSet[selectedImageSetId].mobile"
+        :imageFallbackColor="imageSet[selectedImageSetId].fallbackColor"
+      />
+      <!-- uses css to set background image, or maybe <img srcset={} /> -->
+    </div>
     <div v-else-if="loading && !hasError" class="d-flex align-center justify-center" style="height: 100%">
       <v-progress-circular :size="50" color="primary" indeterminate />
     </div>
@@ -54,6 +68,7 @@
 </template>
 
 <script>
+import appNavbar from '@/components/Navbar.vue';
 import api from '@/services/api.service';
 import appMixin from '@/components/mixin/appComponent.mixin';
 import * as db from '@/store/db';
@@ -64,15 +79,18 @@ import resultDialog from '@/components/ui/ResultDialog.vue';
 import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
 import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
+import imageContainer from '@/components/survey/drafts/ImageContainer';
 
 export default {
   mixins: [appMixin, resultMixin],
   components: {
+    appNavbar,
     appDraftComponent,
     resultDialog,
     ConfirmLeaveDialog,
     SubmittingDialog,
     appSubmissionArchiveDialog,
+    imageContainer,
   },
   data() {
     return {
@@ -83,6 +101,66 @@ export default {
       isSubmitted: false,
       hasError: false,
       showResubmissionDialog: false,
+      // each question will have imageSet defined
+      imageSet: [
+        //src: https://www.responsivebreakpoints.com/
+        {
+          desktop: 'https://res.cloudinary.com/responsivebreakpoints/image/upload/c_scale,w_1400/v1451080425/dog.jpg',
+          mobile: 'https://res.cloudinary.com/responsivebreakpoints/image/upload/c_scale,w_591/v1451080425/dog.jpg',
+          fallbackColor: '#ff0000',
+        },
+        {
+          desktop:
+            'https://res.cloudinary.com/responsivebreakpoints/image/upload/c_scale,w_1400/v1452003467/woman_glasses.jpg',
+          mobile:
+            'https://res.cloudinary.com/responsivebreakpoints/image/upload/c_scale,w_590/v1452003467/woman_glasses.jpg',
+          fallbackColor: '#ff0000',
+        },
+        {
+          desktop:
+            'https://res.cloudinary.com/responsivebreakpoints/image/upload/c_scale,w_1400/v1451071843/castle.jpg',
+          mobile: 'https://res.cloudinary.com/responsivebreakpoints/image/upload/c_scale,w_503/v1451071843/castle.jpg',
+          fallbackColor: '#ff0000',
+        },
+        {
+          desktop: 'https://res.cloudinary.com/responsivebreakpoints/image/upload/c_scale,w_1400/v1453714657/robot.png',
+          mobile: 'https://res.cloudinary.com/responsivebreakpoints/image/upload/c_scale,w_540/v1453714657/robot.png',
+          fallbackColor: '#ff0000',
+        },
+      ],
+      selectedImageSetId: 0,
+      /*
+      // example survey def
+      {
+        resources: [
+          {
+            type: 'IMAGE_REMOTE',
+            id: 'asdf12345',
+            value: 'http://placekitten.com/700/700',
+          },
+          // ....
+        ]
+        revisions: [
+          controls: [
+            // ....
+            { // example question object
+              type: 'number',
+              options: {
+                //imageSet: 'asdf12345', // resource id, defined at survey definition top level
+                imageSet: {
+                  desktop: 'asdf12345',
+                  mobile: 'asdf12346',
+                  fallbackColor: '#ff0000',
+                }
+              }
+            },
+            // ...
+          ]
+        ]
+      }
+
+
+      */
     };
   },
   methods: {
@@ -93,6 +171,10 @@ export default {
       // which deleted the submission from the store, then when prompted whether they want to leave the current draft
       // they can also click cancel, which may cause an error
       this.$router.push({ name: 'my-submissions' });
+    },
+    setImage() {
+      const id = parseInt(Math.random() * 100) % this.imageSet.length;
+      this.selectedImageSetId = id;
     },
     addReadyToSubmit(status) {
       return [
@@ -189,3 +271,29 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.flex-item-left {
+  flex: 100%;
+  padding: 0px;
+}
+
+.flex-item-right {
+  height: 25vh;
+  margin: 56px 0px 0px;
+}
+
+@media (min-width: 960px) {
+  .flex-item-right,
+  .flex-item-left {
+    flex: 50%;
+  }
+  .flex-item-left {
+    height: 100vh;
+  }
+  .flex-item-right {
+    margin: 0px;
+    height: 100vh;
+  }
+}
+</style>

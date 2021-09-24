@@ -1,12 +1,16 @@
 <template>
   <v-app id="app" :class="{ 'minimal-ui': $route.query.minimal_ui }">
-    <app-navbar />
+    <app-navbar v-if="!$route.path.includes('draft')" />
     <div id="app-menu"></div>
 
-    <v-main>
+    <v-main v-if="!$route.path.includes('draft')">
       <app-global-feedback />
       <router-view />
     </v-main>
+    <div v-else style="padding: 0; height: 100%; max-height: 100%">
+      <app-global-feedback />
+      <router-view />
+    </div>
     <install-banner />
   </v-app>
 </template>
