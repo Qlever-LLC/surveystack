@@ -26,6 +26,9 @@ import {
   assertEntityRights,
   assertHasSurveyParam,
   assertSubmissionRights,
+  assertEntitiesExist,
+  assertEntitiesRights,
+  validateBulkReassignRequestBody,
 } from '../handlers/assertions';
 
 import { catchErrors } from '../handlers/errorHandlers';
@@ -83,6 +86,15 @@ router.post(
   '/submissions/:id/reassign',
   [assertEntityExists({ collection: 'submissions' }), assertEntityRights],
   catchErrors(submissionController.reassignSubmission)
+);
+router.post(
+  '/submissions/bulk-reassign',
+  [
+    validateBulkReassignRequestBody,
+    assertEntitiesExist({ collection: 'submissions' }),
+    assertEntitiesRights,
+  ],
+  catchErrors(submissionController.bulkReassignSubmissions),
 );
 router.get(
   '/submissions/:id',
