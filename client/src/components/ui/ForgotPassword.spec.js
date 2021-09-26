@@ -1,4 +1,4 @@
-// yarn test:unit src/components/ui/ForgotPassword.spec.js
+// yarn client:test -- -- client/src/components/ui/ForgotPassword.spec.js
 
 import { fireEvent } from '@testing-library/vue';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
@@ -67,15 +67,16 @@ describe('ForgotPassword component', () => {
 
   describe('mock axios', () => {
     const emailData = 'email@mail.com';
-
     const TransitionStub = {
       render(h) {
         return h('transition-stub', this.$slots.default);
       },
     };
-
     it('displays success message when submit is called with a non empty email', async () => {
-      const wrapper = shallowMount(ForgotPassword, {
+      mockAxios.post.mockImplementation(() => Promise.resolve());
+      const { getByLabelText, getByText } = renderWithVuetify(ForgotPassword, {
+        propsData: {},
+        store: {},
         mocks: {
           $route: {
             query: {},
@@ -86,12 +87,75 @@ describe('ForgotPassword component', () => {
           transition: TransitionStub,
         },
       });
-      mockAxios.post.mockImplementationOnce(() => Promise.resolve());
+      const emailInput = getByLabelText('Email');
+      fireEvent.update(emailInput, emailData);
+      expect(emailInput.value).toBe(emailData);
+      const button = getByText('Submit');
+      await fireEvent.click(button);
+      getByText(`Check your inbox on ${emailData}`);
 
+      /*const wrapper = shallowMount(ForgotPassword, {
+        mocks: {
+          $route: {
+            query: {},
+          },
+        },
+        stubs: {
+          RouterLink: RouterLinkStub,
+          transition: TransitionStub,
+        },
+      });
       wrapper.setData({ email: emailData });
       await wrapper.vm.submit();
-      console.log('RESULT', wrapper.vm.status.message);
-      await expect(wrapper.html()).toContain(`Check your inbox on ${emailData}`);
+      //console.log('RESULT', wrapper.vm.status.message);
+      expect(wrapper.html()).toContain(`Check your inbox on ${emailData}`);
+    */
+    });
+    it('displays error message status 404 when submit is called with a "wrong" email', async () => {
+      let error404 = { response: { status: 404 } };
+      mockAxios.post.mockImplementation(() => Promise.reject(error404));
+      const { getByLabelText, getByText } = renderWithVuetify(ForgotPassword, {
+        propsData: {},
+        store: {},
+        mocks: {
+          $route: {
+            query: {},
+          },
+        },
+        stubs: {
+          RouterLink: RouterLinkStub,
+          transition: TransitionStub,
+        },
+      });
+      const emailInput = getByLabelText('Email');
+      fireEvent.update(emailInput, 'such_a_email_that_returns_status_404');
+      expect(emailInput.value).toBe('such_a_email_that_returns_status_404');
+      const button = getByText('Submit');
+      await fireEvent.click(button);
+      getByText(`invalid email`);
+    });
+    it('displays error message status default when submit is called with a "wrong" email', async () => {
+      let error500 = { response: { status: 500 } };
+      mockAxios.post.mockImplementation(() => Promise.reject(error500));
+      const { getByLabelText, getByText } = renderWithVuetify(ForgotPassword, {
+        propsData: {},
+        store: {},
+        mocks: {
+          $route: {
+            query: {},
+          },
+        },
+        stubs: {
+          RouterLink: RouterLinkStub,
+          transition: TransitionStub,
+        },
+      });
+      const emailInput = getByLabelText('Email');
+      fireEvent.update(emailInput, 'such_a_email_that_returns_status_default');
+      expect(emailInput.value).toBe('such_a_email_that_returns_status_default');
+      const button = getByText('Submit');
+      await fireEvent.click(button);
+      getByText(`Unknown error :/`);
     });
   });
 });

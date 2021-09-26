@@ -83,7 +83,6 @@ export default {
 
       try {
         await api.post('/auth/send-password-reset-mail', { email: this.email });
-        console.log('ag');
         this.status = {
           type: 'success',
           message: `Check your inbox on ${this.email}`,

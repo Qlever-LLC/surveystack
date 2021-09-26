@@ -125,7 +125,6 @@ export default {
   methods: {
     async submit() {
       this.status = '';
-      console.log('submitting');
 
       if (this.entity.email === '') {
         this.status = 'Email must not be empty.';
@@ -170,7 +169,6 @@ export default {
           this.$router.push('/');
         }
       } catch (error) {
-        console.log(error.response);
         switch (error.response.status) {
           case 409:
             this.status = error.response.data.message;

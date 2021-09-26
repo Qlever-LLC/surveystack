@@ -39,7 +39,6 @@ export default {
   methods: {
     updateComp(newComp) {
       this.activeComponent = newComp;
-      console.log('UpdateComp', newComp);
       this.$emit('change', newComp);
     },
   },

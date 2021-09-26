@@ -244,7 +244,6 @@ export default {
           this.$router.push('/');
         }
       } catch (error) {
-        console.log('error', error);
         switch (error.response.status) {
           case 401:
             this.status = 'Invalid email or password'; //error.response.data.message;

@@ -1,5 +1,5 @@
-// yarn test:unit src/components/ui/AuthSelector.spec.js
-// yarn test:unit --watch
+// yarn client:test -- -- client/src/components/ui/AuthSelector.spec.js
+// yarn client:test -- -- --watch
 
 import { fireEvent } from '@testing-library/vue';
 import AuthSelector from '@/components/ui/AuthSelector.vue';

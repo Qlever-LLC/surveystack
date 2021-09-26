@@ -1,4 +1,4 @@
-// yarn test:unit src/components/ui/Register.spec.js
+// yarn client:test -- -- client/src/components/ui/Register.spec.js
 
 import { fireEvent } from '@testing-library/vue';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
