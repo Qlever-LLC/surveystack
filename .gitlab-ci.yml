@@ -72,6 +72,7 @@ deploy to prod:
     - echo "IMAGE_APP_TAG=$IMAGE_APP_TAG" >> .env
     - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
     - echo "DATABASE_URL=mongodb+srv://$PROD_DATABASE_CREDENTIALS@$PROD_DATABASE_URI" >> .env
+    - echo "DATABASE_NAME=$PROD_DATABASE_NAME" >> .env
     - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
     - echo "PORT=$PROD_PORT" >> .env
     - echo "SMTP_HOST=$PROD_SMTP_HOST" >> .env
@@ -124,6 +125,7 @@ deploy to stage:
     - echo "IMAGE_APP_TAG=$IMAGE_APP_TAG" >> .env
     - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
     - echo "DATABASE_URL=mongodb+srv://$STAGE_DATABASE_CREDENTIALS@$STAGE_DATABASE_URI" >> .env
+    - echo "DATABASE_NAME=$STAGE_DATABASE_NAME" >> .env
     - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
     - echo "PORT=$STAGE_PORT" >> .env
     - echo "SMTP_HOST=$STAGE_SMTP_HOST" >> .env
@@ -175,6 +177,7 @@ deploy to review 1:
     - echo "IMAGE_APP_TAG=$IMAGE_APP_TAG" >> .env
     - echo "IMAGE_APP=registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" >> .env
     - echo "DATABASE_URL=mongodb+srv://$REVIEW_DATABASE_CREDENTIALS@$REVIEW_DATABASE_URI" >> .env
+    - echo "DATABASE_NAME=$REVIEW_DATABASE_NAME" >> .env
     - echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
     - echo "PORT=$REVIEW_PORT" >> .env
     - echo "SMTP_HOST=$REVIEW_SMTP_HOST" >> .env
