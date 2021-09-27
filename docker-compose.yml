@@ -4,7 +4,6 @@ services:
   app:
     image: ${IMAGE_APP}
     environment:
-      - DATABASE_NAME=oursci-server-local 
       - PATH_PREFIX= 
       - BCRYPT_ROUNDS=12
       - ADMIN_USERNAME=root
