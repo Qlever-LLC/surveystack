@@ -10,6 +10,7 @@ services:
       - ADMIN_USERNAME=root
       - ADMIN_EMAIL=admin@our-sci.net
       - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_NAME=${DATABASE_NAME}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - PORT=${PORT}
       - SMTP_HOST=${SMTP_HOST}
