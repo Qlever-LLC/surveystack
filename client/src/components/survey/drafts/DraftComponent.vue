@@ -3,8 +3,8 @@
     <!-- confirm submission modal -->
     <app-confirm-submission-dialog
       v-model="showConfirmSubmission"
-      :group="submission.meta.group.id"
-      @submit="() => submit(submission)"
+      :groupId="submission.meta.group.id"
+      @submit="() => submitConfirmed(submission)"
       @set-group="setSubmissionGroup"
       :dateSubmitted="submission.meta.dateSubmitted"
     />
@@ -69,7 +69,7 @@
       :showNav="true"
       @next="next"
       @prev="prev"
-      @submit="showConfirmSubmission = true"
+      @submit="submit"
     />
   </div>
 </template>
@@ -169,7 +169,24 @@ export default {
       this.$store.dispatch('draft/goto', path);
       this.showOverview = false;
     },
-    async submit() {
+    submit() {
+      // propose group settings
+      if (this.submission.meta.group.id) {
+        // if groupName is already set on the submission draft, return this
+      } else {
+        // if group is not yet set, select the user's selected group if set
+        const activeGroup = this.$store.getters['memberships/activeGroup'];
+        if (activeGroup) {
+          this.submission.meta.group.id = activeGroup._id;
+          this.submission.meta.group.path = activeGroup.path;
+        } else {
+          //user has not group selected, or is not logged in
+        }
+      }
+
+      this.showConfirmSubmission = true;
+    },
+    async submitConfirmed() {
       this.$emit('submit', {
         payload: this.submission,
       });

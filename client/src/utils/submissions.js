@@ -97,7 +97,7 @@ export const flattenSubmission = (submission, delimiter = '.') => {
  *
  * @returns {Object} A submission for a specific survey version.
  */
-const createSubmissionFromSurvey = ({ survey, version = 1, instance, group }) => {
+const createSubmissionFromSurvey = ({ survey, version = 1, instance }) => {
   const submission = {};
   const dateNow = moment().toISOString(true);
 
@@ -111,8 +111,8 @@ const createSubmissionFromSurvey = ({ survey, version = 1, instance, group }) =>
     permissions: [],
     status: [],
     group: {
-      id: group,
-      path: null,
+      id: survey.meta.group.id,
+      path: survey.meta.group.path,
     },
     specVersion: constants.SPEC_VERSION_SUBMISSION,
   };
