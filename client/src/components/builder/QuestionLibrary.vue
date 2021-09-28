@@ -20,7 +20,7 @@
     </v-container>
     <v-container fluid class="pa-0" v-else>
       <v-row dense>
-        <v-col v-for="c in surveys.content" :key="c._id" :cols="!selectedSurvey ? 4 : 12">
+        <v-col v-for="c in surveys.content" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
           <v-card
             @click="toggleCard(c)"
             v-show="!selectedSurvey || selectedSurvey._id == c._id"
@@ -121,6 +121,12 @@
         </v-col>
       </v-row>
     </v-container>
+    <v-pagination
+      v-if="surveys.content.length > 0 && !selectedSurvey"
+      v-model="page"
+      :length="activeTabPaginationLength"
+      @input="() => fetchData()"
+    />
   </div>
 </template>
 <script>
@@ -128,7 +134,7 @@ import moment from 'moment';
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
 
-const PAGINATION_LIMIT = 10;
+const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
@@ -151,7 +157,12 @@ export default {
       selectedSurvey: null,
     };
   },
-  computed: {},
+  computed: {
+    activeTabPaginationLength() {
+      const { total } = this.surveys.pagination;
+      return total ? Math.ceil(total / PAGINATION_LIMIT) : 0;
+    },
+  },
   methods: {
     async fetchData() {
       const now = moment();
@@ -203,7 +214,7 @@ export default {
       };
     },
     addToSurvey(librarySurveyId) {
-      this.$emit('addToSurvey', librarySurveyId);
+      this.$emit('add-questions-from-library', librarySurveyId);
     },
     async toggleCard(survey) {
       if (this.selectedSurvey && survey._id === this.selectedSurvey._id) {

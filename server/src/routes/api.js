@@ -127,8 +127,14 @@ router.delete(
 router.get('/surveys', catchErrors(surveyController.getSurveys));
 router.get('/surveys/info', catchErrors(surveyController.getSurveyInfo));
 router.get('/surveys/list-page', catchErrors(surveyController.getSurveyListPage));
+router.get(
+  '/surveys/list-library-consumers',
+  [assertAuthenticated],
+  catchErrors(surveyController.getSurveyLibraryConsumers)
+);
 router.get('/surveys/page', catchErrors(surveyController.getSurveyPage));
 router.get('/surveys/:id', catchErrors(surveyController.getSurvey));
+router.get('/surveys/check-for-updates/:id', catchErrors(surveyController.checkForLibraryUpdates));
 router.post(
   '/surveys',
   [assertAuthenticated, assertNameNotEmpty],

@@ -121,7 +121,7 @@
       ref="confirm-submission-dialog"
       v-if="confirmSubmissionIsVisible"
       @set-group="(val) => setSubmissionGroup(activeSubmissionId, val)"
-      :group="activeSubmission.meta.group.id"
+      :groupId="activeSubmission.meta.group.id"
       :id="activeSubmissionId"
       :dateSubmitted="activeSubmission.meta.dateSubmitted"
       v-model="confirmSubmissionIsVisible"

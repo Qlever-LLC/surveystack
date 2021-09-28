@@ -56,6 +56,40 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
+        <v-dialog v-model="updateLibraryDialogIsVisible" width="700" max-width="75%">
+          <v-card>
+            <v-card-title>
+              Publish Update To Library
+            </v-card-title>
+            <v-card-text>
+              <v-text-field :value="value.name" label="Title" readonly disabled> </v-text-field>
+              <h3>Version history</h3>
+              <tip-tap-editor v-model="value.meta.libraryHistory" class="mb-4" />
+              <v-select
+                outlined
+                v-model="value.meta.libraryLastChangeType"
+                label="Change type"
+                :items="availableLibraryChangeTypes"
+              />
+            </v-card-text>
+            <v-card-actions class="mr-3">
+              <v-spacer />
+              <v-btn
+                @click="
+                  publishUpdateToLibrary();
+                  updateLibraryDialogIsVisible = false;
+                "
+                color="primary"
+                text
+              >
+                <span>Publish update to library</span>
+              </v-btn>
+              <v-btn @click="updateLibraryDialogIsVisible = false" color="primary" text>
+                Cancel
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
         <v-menu offset-y left>
           <template v-slot:activator="{ on }">
             <v-btn icon v-on="on">
@@ -97,7 +131,7 @@
             </v-list-item>
             <v-list-item>
               <v-list-item-title>
-                <v-dialog v-model="editLibraryDialogIsVisible" width="500" max-width="75%">
+                <v-dialog v-model="editLibraryDialogIsVisible" width="700" max-width="75%">
                   <template v-slot:activator="{ on }">
                     <v-btn v-on="on" text>
                       <v-icon color="grey">mdi-library</v-icon>
@@ -123,6 +157,13 @@
                       <tip-tap-editor v-model="value.meta.libraryMaintainers" class="mb-4" />
                       <h3>Version history</h3>
                       <tip-tap-editor v-model="value.meta.libraryHistory" class="mb-4" />
+                      <v-select
+                        v-if="value.meta.isLibrary"
+                        outlined
+                        v-model="value.meta.libraryLastChangeType"
+                        label="Latest change type"
+                        :items="availableLibraryChangeTypes"
+                      />
                     </v-card-text>
                     <v-card-actions class="mr-3">
                       <v-spacer />
@@ -139,6 +180,55 @@
                       </v-btn>
                       <v-btn @click="editLibraryDialogIsVisible = false" color="primary" text>
                         Cancel
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+              </v-list-item-title>
+            </v-list-item>
+            <v-list-item v-if="value.meta.isLibrary">
+              <v-list-item-title>
+                <v-dialog v-model="libraryConsumersDialogIsVisible" width="500" max-width="75%">
+                  <template v-slot:activator="{ on }">
+                    <v-btn v-on="on" text>
+                      <v-icon color="grey">mdi-layers-search</v-icon>
+                      <div class="ml-1">
+                        list library consumers
+                      </div>
+                    </v-btn>
+                  </template>
+                  <v-card>
+                    <v-card-title>
+                      List library consumers
+                    </v-card-title>
+                    <v-divider></v-divider>
+                    <v-card-text>
+                      <v-list dense style="max-height: 500px" class="overflow-y-auto">
+                        <v-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
+                          <v-list-item-content>
+                            <small class="grey--text">{{ c._id }}</small>
+                            <v-list-item-title>{{ c.name }}</v-list-item-title>
+                            <!--small class="grey--text"
+                              >Using question set version ??? {{ c.version }} of {{ version }}
+                              <span v-if="version !== c.version">(OUTDATED)</span>
+                            </small-->
+                          </v-list-item-content>
+                          <!--v-list-item-content>
+                            <v-btn icon v-on:click.stop="refreshConsumer" title="UPDATE">
+                              <v-icon color="grey">mdi-refresh</v-icon>
+                            </v-btn>
+                            <v-btn icon v-on:click.stop="goToSurvey(c._id)" title="OPEN">
+                              <v-icon color="grey">mdi-open-in-new</v-icon>
+                            </v-btn>
+                          </v-list-item-content-->
+                        </v-list-item>
+                      </v-list>
+                    </v-card-text>
+                    <v-divider></v-divider>
+                    <v-card-actions>
+                      <v-spacer />
+                      <v-btn @click="libraryConsumersDialogIsVisible = false" color="primary" text>
+                        Close
                       </v-btn>
                     </v-card-actions>
                   </v-card>
@@ -224,7 +314,7 @@
                 <v-btn
                   :dark="enablePublish"
                   class="my-1 mr-1"
-                  @click="$emit('publish')"
+                  @click="publish"
                   color="green"
                   :disabled="!enablePublish"
                 >
@@ -294,11 +384,18 @@ import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import appResources from '@/components/builder/Resources.vue';
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import api from '@/services/api.service';
+import { getGroupNameById } from '@/utils/groups';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
   { value: 'user', text: 'Logged in users' },
   { value: 'group', text: 'Group members' },
+];
+
+const availableLibraryChangeTypes = [
+  { value: 'major', text: 'Major change' },
+  { value: 'minor', text: 'Minor change' },
+  { value: 'patch', text: 'Small fix' },
 ];
 
 export default {
@@ -307,8 +404,12 @@ export default {
       resourcesDialogIsVisible: false,
       editDetailsDialogIsVisible: false,
       editLibraryDialogIsVisible: false,
+      updateLibraryDialogIsVisible: false,
+      libraryConsumersDialogIsVisible: false,
+      libraryConsumers: [],
       surveyGroupName: 'Group Not Found',
       availableSubmissions,
+      availableLibraryChangeTypes,
     };
   },
   async created() {
@@ -357,6 +458,13 @@ export default {
       },
       deep: true,
     },
+    libraryConsumersDialogIsVisible: {
+      async handler(value, oldValue) {
+        if (value === true && !oldValue) {
+          await this.loadLibraryConsumers();
+        }
+      },
+    },
   },
   components: {
     SurveyNameEditor,
@@ -366,14 +474,20 @@ export default {
   },
   methods: {
     async getGroupNameById(id) {
-      const groups = this.$store.getters['memberships/groups'];
-      // const { name } = groups.find(({ _id }) => id === _id);
-      const result = groups.find(({ _id }) => id === _id);
-      if (result) {
-        return result.name;
+      return await getGroupNameById(id);
+    },
+    publish() {
+      if (this.value.meta.isLibrary) {
+        //show update library dialog, ask for release notes
+        //todo extend dialog counters of added, changed, deleted questions
+        //todo add selection of change type (major change, minor change, small fix)
+        this.updateLibraryDialogIsVisible = true;
+      } else {
+        this.$emit('publish');
       }
-      const response = await api.get(`/groups/${id}`);
-      return response.data.name;
+    },
+    publishUpdateToLibrary() {
+      this.$emit('publish');
     },
     updateSurveyName(name) {
       this.$emit('set-survey-name', name);
@@ -386,6 +500,14 @@ export default {
     updateSurveyDescription(description) {
       this.$emit('set-survey-description', description);
       // this.$set(this.value, 'description', description);
+    },
+    async loadLibraryConsumers() {
+      const response = await api.get(`/surveys/list-library-consumers?id=${this.value._id}`);
+      this.libraryConsumers = response.data;
+    },
+    goToSurvey(survey_id) {
+      let route = this.$router.resolve(`/surveys/${survey_id}`);
+      window.open(route.href, '_blank');
     },
   },
 };
