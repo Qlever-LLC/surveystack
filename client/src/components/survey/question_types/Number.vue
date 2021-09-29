@@ -10,8 +10,9 @@
       @keyup.enter.prevent="submit"
       ref="textField"
       :disabled="!relevant"
-      hide-details
+      hide-details="auto"
       color="focus"
+      :rules="[isValidNumber]"
     />
     <app-control-more-info :value="control.moreInfo" />
   </div>
@@ -43,21 +44,29 @@ export default {
 
       return true;
     },
+    parseInputToNumber(v) {
+      // TODO: implicitly parse as Integer or Float?
+      // Maybe add a separate question type like inputInteger, inputFloat?
+      const converted = Number(v);
+      if (v === '' || v === null || Number.isNaN(converted)) {
+        return false;
+      }
+      return converted;
+    },
     onInput(v) {
       if (this.value !== v) {
-        // TODO: implicitly parse as Integer or Float?
-        // Maybe add a separate question type like inputInteger, inputFloat?
-        const converted = Number(v);
+        let converted = this.parseInputToNumber(v);
 
-        if (v === '' || Number.isNaN(converted)) {
-          // Empty strings is converted to 0
-          // but we rather want no value at all
+        if (converted === false) {
+          // Report no value when the input is invald or empty
           this.changed(null);
           return;
         }
-
         this.changed(converted);
       }
+    },
+    isValidNumber(val) {
+      return (val === this.parseInputToNumber(val)) === false ? 'The value has to be a number' : true;
     },
   },
   mounted() {
