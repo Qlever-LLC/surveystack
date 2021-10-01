@@ -52,6 +52,8 @@ router.post('/auth/register', catchErrors(authController.register));
 router.post('/auth/login', catchErrors(authController.login));
 router.post('/auth/send-password-reset-mail', catchErrors(authController.sendPasswordResetMail));
 router.post('/auth/reset-password', catchErrors(authController.resetPassword));
+router.get('/auth/oauth-login', catchErrors(authController.oAuthLogin));
+router.get('/auth/oauth-callback', catchErrors(authController.oAuthCallback));
 
 /** Group */
 router.get('/groups', catchErrors(groupController.getGroups));
@@ -70,7 +72,11 @@ router.put(
   catchErrors(groupController.updateGroup)
 );
 router.post('/groups/add-doc-link', assertAuthenticated, catchErrors(groupController.addDocLink));
-router.post('/groups/remove-doc-link', assertAuthenticated, catchErrors(groupController.removeDocLink));
+router.post(
+  '/groups/remove-doc-link',
+  assertAuthenticated,
+  catchErrors(groupController.removeDocLink)
+);
 // router.delete('/groups/:id', assertAuthenticated, catchErrors(groupController.deleteGroup));
 
 /** Submissions */
@@ -94,7 +100,7 @@ router.post(
     assertEntitiesExist({ collection: 'submissions' }),
     assertEntitiesRights,
   ],
-  catchErrors(submissionController.bulkReassignSubmissions),
+  catchErrors(submissionController.bulkReassignSubmissions)
 );
 router.get(
   '/submissions/:id',

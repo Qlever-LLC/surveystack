@@ -49,6 +49,8 @@
           </div>
         </v-form>
 
+        <app-o-auth-logins />
+
         <div class="text-center text-muted mt-5" v-if="registrationEnabled || hasInvitation">
           Don't have an account?
           <router-link :to="registerLink">Register now</router-link>
@@ -68,6 +70,7 @@
 
 <script>
 import appFeedback from '@/components/ui/Feedback.vue';
+import appOAuthLogins from './OAuthLogins.vue';
 import api from '@/services/api.service';
 import { autoSelectActiveGroup } from '@/utils/memberships';
 
@@ -79,6 +82,7 @@ const DEFAULT_ENTITY = {
 export default {
   components: {
     appFeedback,
+    appOAuthLogins,
   },
   props: {
     initialEmail: {

@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import { decode as decodeBase64 } from 'js-base64';
 import Home from '@/pages/Home.vue';
 import Test from '@/pages/Test.vue';
 import Unauthorized from '@/pages/Unauthorized.vue';
@@ -164,6 +165,16 @@ const routes = [
     path: '/auth/reset-password',
     name: 'auth-reset-password',
     component: ResetPassword,
+  },
+  {
+    path: '/auth/accept-login/:user',
+    name: 'auth-accept-login',
+    redirect: async (to) => {
+      // TODO handle when decoding fails
+      const user = JSON.parse(decodeBase64(to.params.user));
+      await store.dispatch('auth/loginWithUserObject', user);
+      return '/';
+    },
   },
   // experiment
   {

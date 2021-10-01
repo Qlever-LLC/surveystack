@@ -43,30 +43,27 @@ const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  login({ commit, dispatch }, auth) {
-    return new Promise((resolve, reject) => {
-      commit('auth_request');
-      api
-        .post(auth.url, auth.user)
-        .then((resp) => {
-          const user = resp.data;
-          const { email, token } = user;
-          const header = `${email} ${token}`;
+  async login({ commit, dispatch }, auth) {
+    commit('auth_request');
+    const resp = await api.post(auth.url, auth.user);
+    return dispatch('loginWithUserObject', resp.data);
+  },
+  async loginWithUserObject({ commit }, user) {
+    try {
+      const { email, token } = user;
+      const header = `${email} ${token}`;
 
-          AuthService.saveStatus('success');
-          AuthService.saveUser(user);
-          AuthService.saveHeader(header);
+      AuthService.saveStatus('success');
+      AuthService.saveUser(user);
+      AuthService.saveHeader(header);
 
-          commit('auth_success', { user, header });
-          resolve(resp.data);
-        })
-        .catch((err) => {
-          console.log(err);
-          commit('auth_error');
-          // clearLocalData({ dispatch });
-          reject(err);
-        });
-    });
+      commit('auth_success', { user, header });
+      return user;
+    } catch (err) {
+      console.log(err);
+      commit('auth_error');
+      throw err;
+    }
   },
   logout({ commit, dispatch }) {
     return new Promise((resolve) => {
