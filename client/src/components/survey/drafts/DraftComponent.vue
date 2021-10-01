@@ -2,6 +2,7 @@
   <div class="draft-component-wrapper draft wrapper" :class="{ builder: builder }" v-if="control" ref="wrapper">
     <!-- confirm submission modal -->
     <app-confirm-submission-dialog
+      v-if="showConfirmSubmission"
       v-model="showConfirmSubmission"
       :groupId="submission.meta.group.id"
       @submit="() => submitConfirmed(submission)"
@@ -170,17 +171,16 @@ export default {
       this.showOverview = false;
     },
     submit() {
-      // propose group settings
-      if (this.submission.meta.group.id) {
-        // if groupName is already set on the submission draft, return this
-      } else {
-        // if group is not yet set, select the user's selected group if set
-        const activeGroup = this.$store.getters['memberships/activeGroup'];
-        if (activeGroup) {
-          this.submission.meta.group.id = activeGroup._id;
-          this.submission.meta.group.path = activeGroup.path;
-        } else {
-          //user has not group selected, or is not logged in
+      // if group is not yet set, select the user's selected group if set
+      if (!this.submission.meta.group.id) {
+        const activeGroupId = this.$store.getters['memberships/activeGroup'];
+        if (activeGroupId) {
+          const allGroups = this.$store.getters['memberships/groups'];
+          const activeGroup = allGroups.find(({ _id }) => _id === activeGroupId);
+          if (activeGroup) {
+            this.submission.meta.group.id = activeGroup._id;
+            this.submission.meta.group.path = activeGroup.path;
+          }
         }
       }
 
