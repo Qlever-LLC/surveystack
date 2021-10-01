@@ -21,6 +21,4 @@ services:
       - FARMOS_AGGREGATOR_APIKEY=${FARMOS_AGGREGATOR_APIKEY}
       - FARMOS_CALLBACK_KEY=${FARMOS_CALLBACK_KEY}
     network_mode: host
-    deploy: 
-      restart_policy:
-        condition: on-failure
+    restart: always
