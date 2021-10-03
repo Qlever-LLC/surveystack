@@ -2,6 +2,9 @@
   <v-container>
     <v-text-field label="Search" v-model="q" append-icon="mdi-magnify" clearable />
     <app-entity-list :entities="entities" collection="scripts" />
+    <div v-if="entities.length < 1" class="py-12 text-center">
+      {{ loadingError ? 'There was an error, please refresh the page' : 'No scripts available' }}
+    </div>
   </v-container>
 </template>
 
@@ -17,6 +20,7 @@ export default {
     return {
       entities: [],
       q: '',
+      loadingError: false,
     };
   },
   watch: {
@@ -32,8 +36,13 @@ export default {
   },
   methods: {
     async fetchData() {
-      const { data } = await api.get(`/scripts?q=${this.q}`);
-      this.entities = data;
+      try {
+        const { data } = await api.get(`/scripts?q=${this.q}`);
+        this.entities = data;
+        this.loadingError = false;
+      } catch {
+        this.loadingError = true;
+      }
     },
     clearQuery() {
       console.log('clearQuery');

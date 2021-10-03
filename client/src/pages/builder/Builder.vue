@@ -96,6 +96,10 @@ import { isIos, isSafari } from '@/utils/compatibility';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
+const niceNetworkErrorMessage = (error) => {
+  return error.response.data.message || 'There was an error, please refresh the page.';
+};
+
 export default {
   components: {
     SurveyBuilder,
@@ -188,8 +192,7 @@ export default {
         }
       } catch (error) {
         console.log('error', error);
-        const { message } = error.response.data;
-        this.snack(message);
+        this.snack(niceNetworkErrorMessage(error));
         console.log(error);
       }
       this.submitting = false;
@@ -222,8 +225,7 @@ export default {
         if (error.response.status === 409) {
           this.showConflictModal = true;
         } else {
-          const { message } = error.response.data;
-          this.snack(message);
+          this.snack(niceNetworkErrorMessage(error));
         }
         return;
       }
