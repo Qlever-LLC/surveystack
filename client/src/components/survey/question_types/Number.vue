@@ -13,6 +13,7 @@
       hide-details="auto"
       color="focus"
       :rules="[isValidNumber]"
+      data-test-id="input"
     />
     <app-control-more-info :value="control.moreInfo" />
   </div>
@@ -20,10 +21,16 @@
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
+import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
+import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import { isIos } from '@/utils/compatibility';
 
 export default {
   mixins: [baseQuestionComponent],
+  components: {
+    appControlLabel,
+    appControlMoreInfo,
+  },
   methods: {
     keyup(ev) {
       console.log('key: ', ev);
@@ -66,7 +73,7 @@ export default {
       }
     },
     isValidNumber(val) {
-      return (val === this.parseInputToNumber(val)) === false ? 'The value has to be a number' : true;
+      return this.parseInputToNumber(val) === false ? 'The value has to be a number' : true;
     },
   },
   mounted() {
