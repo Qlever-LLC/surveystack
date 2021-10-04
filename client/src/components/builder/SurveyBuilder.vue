@@ -677,10 +677,10 @@ export default {
   computed: {
     surveyIsValid() {
       // return this.invalidValidations.length > 0 ? invalidValidations : true;
-      return !(this.surveyValidationErrors.length > 0);
+      return !(this.surveyValidationErrors.length > 0) && this.validateSurveyName() === true;
     },
     surveyValidationErrors() {
-      const validations = [this.validateSurveyName(), this.validateSurveyQuestions()];
+      const validations = [this.validateSurveyQuestions()];
       return validations.filter((validation) => validation !== true);
     },
     enableDismissDraft() {
