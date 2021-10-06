@@ -92,7 +92,7 @@ export default {
     isAllowedToSubmit() {
       const { submissions, isLibrary } = this.entity.meta;
 
-      if (isLibrary) {
+      if (isLibrary || this.isPublishedVersionEmpty) {
         return false;
       }
 
@@ -118,11 +118,19 @@ export default {
 
       return false;
     },
+    isPublishedVersionEmpty() {
+      const publishedVersion = this.entity.revisions.find((revision) => revision.version === this.entity.latestVersion);
+      return publishedVersion.controls.length === 0;
+    },
     submissionRightsHint() {
       const { submissions, isLibrary } = this.entity.meta;
 
       if (isLibrary) {
         return 'This is a library survey, please choose another survey to submit.';
+      }
+
+      if (this.isPublishedVersionEmpty) {
+        return 'The latest published version of this survey is empty. Please publish a new version to start a submission.';
       }
 
       if (!submissions || submissions === 'public') {
