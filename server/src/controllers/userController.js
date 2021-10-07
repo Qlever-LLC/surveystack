@@ -153,6 +153,7 @@ const updateUser = async (req, res) => {
     delete entity.password;
   } else {
     entity.password = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS));
+    entity.token = uuidv4();
   }
 
   try {
