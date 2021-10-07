@@ -664,12 +664,10 @@ export default {
     },
     createInstance() {
       const { version } = this.survey.revisions[this.survey.revisions.length - 1];
-      const group = this.$store.getters['memberships/activeGroup'];
 
       this.instance = submissionUtils.createSubmissionFromSurvey({
         survey: this.survey,
         version,
-        group,
         instance: this.instance,
       });
     },

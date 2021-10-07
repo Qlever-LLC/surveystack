@@ -500,8 +500,7 @@ export default {
       this.selectedSubmissions = submissions;
     },
     startDraft(survey) {
-      const group = this.$store.getters['memberships/activeGroup'];
-      this.$store.dispatch('submissions/startDraft', { survey, group });
+      this.$store.dispatch('submissions/startDraft', { survey });
     },
     async resubmit(submission) {
       await this.$store.dispatch('submissions/fetchRemoteSubmission', submission._id);

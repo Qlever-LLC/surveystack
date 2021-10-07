@@ -294,6 +294,7 @@ import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import appResources from '@/components/builder/Resources.vue';
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import api from '@/services/api.service';
+import { getGroupNameById } from '@/utils/groups';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -366,14 +367,7 @@ export default {
   },
   methods: {
     async getGroupNameById(id) {
-      const groups = this.$store.getters['memberships/groups'];
-      // const { name } = groups.find(({ _id }) => id === _id);
-      const result = groups.find(({ _id }) => id === _id);
-      if (result) {
-        return result.name;
-      }
-      const response = await api.get(`/groups/${id}`);
-      return response.data.name;
+      return await getGroupNameById(id);
     },
     updateSurveyName(name) {
       this.$emit('set-survey-name', name);
