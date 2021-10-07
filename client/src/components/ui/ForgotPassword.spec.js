@@ -5,7 +5,6 @@ import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 import ForgotPassword from './ForgotPassword.vue';
 import { RouterLinkStub } from '@vue/test-utils';
 import mockAxios from 'axios';
-import { shallowMount } from '@vue/test-utils';
 
 describe('ForgotPassword component', () => {
   describe('navigation links and buttons', () => {
@@ -93,23 +92,6 @@ describe('ForgotPassword component', () => {
       const button = getByText('Submit');
       await fireEvent.click(button);
       getByText(`Check your inbox on ${emailData}`);
-
-      /*const wrapper = shallowMount(ForgotPassword, {
-        mocks: {
-          $route: {
-            query: {},
-          },
-        },
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
-        },
-      });
-      wrapper.setData({ email: emailData });
-      await wrapper.vm.submit();
-      //console.log('RESULT', wrapper.vm.status.message);
-      expect(wrapper.html()).toContain(`Check your inbox on ${emailData}`);
-    */
     });
     it('displays error message status 404 when submit is called with a "wrong" email', async () => {
       let error404 = { response: { status: 404 } };
