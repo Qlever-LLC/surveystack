@@ -65,6 +65,21 @@ function geojsonTransformer(o) {
   };
 }
 
+function matrixTransformer(o) {
+  if (!o.value) {
+    return o;
+  }
+  // get all the column names
+  const keys = _.chain(o.value).map(_.keys).flatten().uniq().value();
+  // collect each column into one cell
+  const values = keys.map(key => JSON.stringify(o.value.map(v => key in v ? v[key].value : null)));
+  const value = _.zipObject(keys, values)
+
+  return {
+    ...o,
+    value,
+  };
+}
 
 /**
  * transform submission object for presentation in csv
@@ -179,10 +194,11 @@ function createCsv(submissions, headers) {
   return csv;
 }
 
-export { 
-  createCsv, 
-  createCsvLegacy, 
+export {
+  createCsv,
+  createCsvLegacy,
   createHeaders,
   transformSubmissionQuestionTypes,
   geojsonTransformer,
+  matrixTransformer,
 };

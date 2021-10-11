@@ -497,10 +497,10 @@ const getSubmissionsCsv = async (req, res) => {
   const entities = await db.collection(col).aggregate(pipeline).toArray();
   const transformer = (entity) => ({
     ...entity,
-    data: csvService.transformSubmissionQuestionTypes(
-      entity.data, 
-      { geoJSON: csvService.geojsonTransformer },
-    ),
+    data: csvService.transformSubmissionQuestionTypes(entity.data, {
+      geoJSON: csvService.geojsonTransformer,
+      matrix: csvService.matrixTransformer,
+    }),
   });
   const transformedEntities = entities.map(transformer);
 

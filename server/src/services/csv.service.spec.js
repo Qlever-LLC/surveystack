@@ -1,7 +1,21 @@
 import {
   transformSubmissionQuestionTypes,
   geojsonTransformer,
+  matrixTransformer,
 } from './csv.service';
+
+function mockMatrix(header, rows) {
+  const value = rows.map((row) =>
+    header.reduce((rowValue, colName, i) => ({ ...rowValue, [colName]: { value: row[i] } }), {})
+  );
+  return {
+    value,
+    meta: {
+      type: 'matrix',
+      dateModified: '2021-10-11T16:11:52.123+02:00',
+    },
+  };
+}
 
 function mockSubmissions() {
   return [{
@@ -354,6 +368,75 @@ describe('CSV Service', () => {
           },
         },
       });
+    });
+
+    describe('matrixTransformer', () => {
+      it('collects columns into a single cell', () => {
+        const header = ['foo', 'bar'];
+        const rows = [
+          [1, 2],
+          [3, 4],
+        ];
+        const submissionData = {
+          matrix_1: mockMatrix(header, rows),
+        };
+
+        const actual = transformSubmissionQuestionTypes(submissionData, {
+          matrix: matrixTransformer,
+        });
+
+        for (const [i, col] of header.entries()) {
+          const cell = rows.map((row) => row[i]);
+          expect(actual.matrix_1.value[col]).toBe(JSON.stringify(cell));
+        }
+      });
+
+      it('keeps null values', () => {
+        const header = ['foo', 'bar', 'quz'];
+        const rows = [
+          [1, null, "baz"],
+          [null, "fuz", null],
+          [null, null, null]
+        ];
+        const submissionData = {
+          matrix_1: mockMatrix(header, rows),
+        };
+
+        const actual = transformSubmissionQuestionTypes(submissionData, {
+          matrix: matrixTransformer,
+        });
+
+        for (const [i, col] of header.entries()) {
+          const cell = rows.map((row) => row[i]);
+          expect(actual.matrix_1.value[col]).toBe(JSON.stringify(cell));
+        }
+      });
+
+      it('handles when row has missing fields', () => {
+        const header = ['col1', 'col2', 'col3'];
+        const rows = [
+          ['a1', null, null],
+          ['b1', null, 'b3'],
+          ['c1', 'c2', 'c3'],
+        ];
+        const submissionData = {
+          matrix_1: mockMatrix(header, rows),
+        };
+        delete submissionData.matrix_1.value[0].col2
+        delete submissionData.matrix_1.value[0].col3
+        delete submissionData.matrix_1.value[1].col2
+
+        const actual = transformSubmissionQuestionTypes(submissionData, {
+          matrix: matrixTransformer,
+        });
+
+        for (const [i, col] of header.entries()) {
+          const cell = rows.map((row) => row[i]);
+          expect(actual.matrix_1.value[col]).toBe(JSON.stringify(cell));
+        }
+      });
+
+      // TODO test all possible column data types
     });
   });
 });
