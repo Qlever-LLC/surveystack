@@ -31,6 +31,27 @@
           </v-row>
         </v-toolbar>
       </template>
+      <template slot="item" slot-scope="props">
+        <tr v-for="id in items" :key="id.text">
+          <v-checkbox color="#777" multiple v-model="tableSelected" :value="id" class="custom-tr"></v-checkbox>
+          <td
+            v-for="header in headers"
+            :key="header.text"
+            :class="addClass(props.item[header.value])"
+            @click="showDetails(props.item[header.value], header)"
+          >
+            {{ props.item[header.value] | truncate(textTruncateLength, '...') }}
+          </td>
+        </tr>
+        <v-dialog v-model="showDialog" width="500">
+          <v-card>
+            <v-card-title class="text-h5 grey lighten-2">{{ toolTipHeader }}</v-card-title>
+            <v-card-text>
+              {{ truncatedValue }}
+            </v-card-text>
+          </v-card>
+        </v-dialog>
+      </template>
     </v-data-table>
   </v-card>
 </template>
@@ -74,6 +95,10 @@ export default {
   },
   data() {
     return {
+      showDialog: false,
+      truncatedValue: '',
+      toolTipHeader: '',
+      textTruncateLength: 36,
       excludeMeta: true,
       csv: null,
       parsed: null,
@@ -87,7 +112,9 @@ export default {
   computed: {
     items() {
       if (this.parsed) {
-        return this.parsed.data;
+        return this.parsed.data.map((n) => {
+          return this.cleanTableRecords(n);
+        });
       }
       return [];
     },
@@ -114,7 +141,34 @@ export default {
     },
   },
   methods: {
-    onRowSelected({ value, item }) {},
+    showDetails(value, { text }) {
+      if (value.length > this.textTruncateLength) {
+        this.showDialog = true;
+        this.truncatedValue = value;
+        this.toolTipHeader = text;
+      }
+    },
+    cleanTableRecords(object) {
+      Object.entries(object).forEach(([k, v]) => {
+        if (v === '[object Object]') {
+          v = {};
+        }
+        if (v && typeof v === 'object') this.cleanTableRecords(v);
+        if ((v && typeof v === 'object' && !Object.keys(v).length) || v === null || v === undefined || v.length === 0) {
+          if (Array.isArray(object)) object.splice(k, 1);
+          else if (!(v instanceof Date)) delete object[k];
+        }
+      });
+      return object;
+    },
+    addClass(value) {
+      if (value !== undefined && value.length > this.textTruncateLength) return 'truncate';
+      else return '';
+    },
+
+    onRowSelected({ value, item }) {
+      console.log({ value });
+    },
     createCustomFilter(field) {
       return (value, search, item) => {
         if (!this.searchFields[field]) {
@@ -132,7 +186,13 @@ export default {
             return;
           }
           this.$set(this.searchFields, header, ''); // v-data-table search/filter is not used at this moment
-          headers.push({ text: header, value: header, filter: this.createCustomFilter(header) });
+
+          headers.push({
+            text: header,
+            value: header,
+            filter: this.createCustomFilter(header),
+            class: 'custom-header-class',
+          });
         });
       }
       this.headers = headers;
@@ -196,5 +256,16 @@ td.untruncated {
   max-width: 250px;
   overflow: visible;
   text-overflow: unset;
+}
+
+.v-data-table >>> .custom-header-class span {
+  display: inline-block;
+  max-width: 190px;
+}
+.truncate {
+  cursor: pointer;
+}
+.custom-tr {
+  margin-left: 1rem;
 }
 </style>
