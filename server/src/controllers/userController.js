@@ -6,6 +6,7 @@ import uuidv4 from 'uuid/v4';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
+import { cookieOptions } from '../constants'
 
 const col = 'users';
 
@@ -153,7 +154,11 @@ const updateUser = async (req, res) => {
     delete entity.password;
   } else {
     entity.password = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS));
+
+    // create a new user token when password changes
     entity.token = uuidv4();
+    // udpate the token in the cookie header for backward compatibility: https://gitlab.com/our-sci/software/surveystack/-/merge_requests/33#note_700125477
+    res.cookie('token', entity.token, cookieOptions);
   }
 
   try {
