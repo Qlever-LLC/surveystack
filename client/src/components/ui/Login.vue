@@ -237,6 +237,9 @@ export default {
           console.log('trying autojoin');
           await api.post(`/memberships/join-group?id=${this.whitelabelPartner.id}`);
           await autoSelectActiveGroup(this.$store, this.whitelabelPartner.id);
+        } else {
+          // auto select the first group of the user
+          await autoSelectActiveGroup(this.$store, null, true);
         }
       } catch (error) {
         console.log(error.response.data.message);

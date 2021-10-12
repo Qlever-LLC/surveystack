@@ -14,7 +14,7 @@ export const uuid = () => {
   return `${u}.${new Date().getTime().toString(16)}`;
 };
 
-export const autoSelectActiveGroup = async (store, preferredGroupId = null) => {
+export const autoSelectActiveGroup = async (store, preferredGroupId = null, preferFirstActivatedGroup = false) => {
   const user = store.getters['auth/user'];
   const memberships = await store.dispatch('memberships/getUserMemberships', user._id);
   if (memberships && memberships.length > 0) {
@@ -26,6 +26,21 @@ export const autoSelectActiveGroup = async (store, preferredGroupId = null) => {
       if (isMemberOfPreferredGroup) {
         groupId = preferredGroupId;
       }
+    } else if (preferFirstActivatedGroup) {
+      memberships.sort((a, b) => {
+        if (a.meta.dateActivated && !b.meta.dateActivated) {
+          return -1;
+        } else if (!a.meta.dateActivated && b.meta.dateActivated) {
+          return 1;
+        } else if (a.meta.dateActivated < b.meta.dateActivated) {
+          return -1;
+        } else if (a.meta.dateActivated > b.meta.dateActivated) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+      groupId = memberships[0].group._id;
     }
 
     store.dispatch('memberships/setActiveGroup', groupId);
