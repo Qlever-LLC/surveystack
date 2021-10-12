@@ -165,9 +165,8 @@ describe('Login component', () => {
 
       const button = getByText('Login');
       await fireEvent.click(button);
-      // TODO: figure out why we have to click button twice, otherwise mock doesn't
-      // get checked in time
-      await fireEvent.click(button);
+      // wait for Promise for pending result
+      await new Promise((resolve) => setTimeout(resolve, 0));
       expect(push).toHaveBeenCalledWith('/');
     });
 
