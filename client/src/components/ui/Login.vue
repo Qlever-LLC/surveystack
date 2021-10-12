@@ -217,32 +217,6 @@ export default {
           url: '/auth/login',
           user: this.entity,
         });
-
-        // try to auto join group if this is a whitelabel
-        if (this.isWhitelabel && this.registrationEnabled) {
-          console.log('trying autojoin');
-
-          try {
-            const { data } = await api.post(`/memberships/join-group?id=${this.whitelabelPartner.id}`);
-            console.log('data', data);
-            await autoSelectActiveGroup(this.$store, this.whitelabelPartner.id);
-          } catch (error) {
-            console.log(error.response.data.message);
-          }
-        }
-
-        this.$store.dispatch('surveys/fetchPinned');
-
-        if (this.$route.params.redirect) {
-          this.$router.push(this.$route.params.redirect);
-        } else if (this.hasInvitation) {
-          this.$router.push({
-            name: 'invitations',
-            query: { code: this.$store.getters['invitation/code'] },
-          });
-        } else {
-          this.$router.push('/');
-        }
       } catch (error) {
         switch (error.response.status) {
           case 401:
@@ -254,6 +228,31 @@ export default {
           default:
             this.status = 'An error occured'; //'Unknown error :/';
         }
+        return;
+      }
+
+      try {
+        // try to auto join group if this is a whitelabel
+        if (this.isWhitelabel && this.registrationEnabled) {
+          console.log('trying autojoin');
+          await api.post(`/memberships/join-group?id=${this.whitelabelPartner.id}`);
+          await autoSelectActiveGroup(this.$store, this.whitelabelPartner.id);
+        }
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+
+      this.$store.dispatch('surveys/fetchPinned');
+
+      if (this.$route.params.redirect) {
+        this.$router.push(this.$route.params.redirect);
+      } else if (this.hasInvitation) {
+        this.$router.push({
+          name: 'invitations',
+          query: { code: this.$store.getters['invitation/code'] },
+        });
+      } else {
+        this.$router.push('/');
       }
     },
     reset() {

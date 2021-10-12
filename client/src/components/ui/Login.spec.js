@@ -6,6 +6,7 @@ import Login from './Login.vue';
 import { RouterLinkStub } from '@vue/test-utils';
 import { mount } from '@vue/test-utils';
 import mockAxios from 'axios';
+jest.mock('@/utils/memberships');
 
 const TransitionStub = {
   render(h) {
@@ -123,57 +124,32 @@ describe('Login component', () => {
       getByText('E-Mail must not be empty.');
     });
 
-    /*it("try to submit and get the redirection '/'", async () => {
-      const mockF = jest.fn(() => Promise.resolve());
-      mockAxios.post.mockImplementation(() => Promise.resolve({ data: 'dummy_data' }));
-      const wrapper = mount(Login, {
-        data() {
-          return {
-            registrationEnabled: true,
-          };
-        },
-        computed: {
-          passwordInputType() {
-            return '';
-          },
-          registerLink() {
-            return '';
-          },
-          isWhitelabel() {
-            return true;
-          },
-          whitelabelPartner() {
-            return { id: 1 };
-          },
-          hasInvitation() {
-            return false;
-          },
-        },
-        methods: {},
+    it("try to submit and get the redirection '/' ", async () => {
+      let res = { data: { meta: { invitationOnly: false } } };
+      mockAxios.get.mockImplementation(() => Promise.resolve(res));
+      mockAxios.post.mockImplementation(() => Promise.resolve());
+      const push = jest.fn();
+      const { getByLabelText, getByText, findByText } = renderWithVuetify(Login, {
         store: {
           getters: {
-            'auth/user': {
-              _id: 'value_1',
-            },
+            'whitelabel/isWhitelabel': () => true,
+            'whitelabel/partner': () => ({
+              id: 1,
+            }),
           },
           actions: {
-            'memberships/getUserMemberships': mockF,
-            'memberships/setActiveGroup': mockF,
-
-            'auth/login': mockF,
-            'surveys/fetchPinned': mockF,
+            'auth/login': jest.fn(() => Promise.resolve()),
+            'surveys/fetchPinned': jest.fn(),
           },
         },
+        propsData: {},
         mocks: {
           $route: {
-            query: { code: 123 },
             params: { redirect: false },
+            query: {},
           },
-          //$router : { push: jest.fn(), },
-          $store: {
-            dispatch: () => {
-              dummyData: 'dummyData';
-            },
+          $router: {
+            push,
           },
         },
         stubs: {
@@ -181,20 +157,19 @@ describe('Login component', () => {
           transition: TransitionStub,
         },
       });
-      const routerPushSpy = jest.spyOn(wrapper.vm.$router, 'push');
-      //wrapper.vm.autoSelectActiveGroup = jest.fn(() => console.log('autoSelectActiveGroup simulated'));;
+      const emailInput = getByLabelText('E-Mail');
+      fireEvent.update(emailInput, 'someValidMail@mail.com');
 
-      wrapper.setData({ entity: { email: 'email' } });
-      wrapper.setData({ entity: { password: 'password' } });
-      const button = wrapper.find('button.text-capitalize');
-      await button.trigger('click');
-      //expect(wrapper.vm.autoSelectActiveGroup).toHaveBeenCalled();
-      //check route that is pushed
-      expect(routerPushSpy).toHaveBeenCalledTimes(1);
-      //expect(wrapper.vm.$router.push).toHaveBeenCalledWith('/');
-      console.log('the $route ', wrapper.vm.$route);
-      console.log('the $router ', wrapper.vm.$router);
-    });*/
+      const pwdInput = getByLabelText('Password');
+      fireEvent.update(pwdInput, 'wrongPassword');
+
+      const button = getByText('Login');
+      await fireEvent.click(button);
+      // TODO: figure out why we have to click button twice, otherwise mock doesn't
+      // get checked in time
+      await fireEvent.click(button);
+      expect(push).toHaveBeenCalledWith('/');
+    });
 
     it('displays an error when incorrect password is submitted (status 401)', async () => {
       const authLoginMock = jest.fn();
