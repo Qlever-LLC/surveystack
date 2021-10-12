@@ -803,6 +803,94 @@ const updateSubmissionToLibrarySurveys = async (survey, submission) => {
   }
 }
 
+const bulkReassignSubmissions = async (req, res) => {
+  const { group, creator, ids } = req.body;
+  const submissions = res.locals.existing;
+
+  const surveyIds = [ ...new Set(submissions.map(submission => submission.meta.survey.id.toString())) ];
+  const surveys = await db.collection('surveys').find({
+    _id: { $in: surveyIds.map(ObjectId) }
+  }).toArray();
+  if (surveys.length !== surveyIds.length) {
+    throw boom.notFound(`Survey referenced by submission not found.`);
+  }
+
+  let farmOsResults;
+  try {
+    const farmOsResponses = await Promise.all(submissions.map(
+      submission => farmOsService.handle({
+        submission,
+        survey: surveys.find(({ _id }) => submission.meta.survey.id.toString() === _id.toString()),
+        user: res.locals.auth.user
+      })
+    ));
+    farmOsResults = farmOsResponses.flat();
+  } catch (error) {
+    console.log('error handling farmos', error);
+    return res.status(503).send({
+      message: `Error submitting to farmos ${error}`,
+      farmos: error.messages,
+    });
+  }
+
+  const results = await withSession(mongoClient, async (session) => {
+    try {
+      return await withTransaction(session, async () => {
+        const submissionsToArchive = submissions.map(submission => ({
+          ...submission,
+          _id: new ObjectId(),
+          meta: {
+            ...submission.meta,
+            original: new ObjectId(submission.id),
+            archived: true,
+            archivedReason: 'REASSIGN',
+          },
+        }));
+
+        const insertResult = await db.collection(col).insertMany(submissionsToArchive);
+        
+        if (submissionsToArchive.length !== insertResult.insertedCount) {
+          await session.abortTransaction();
+          return;
+        }
+
+        const { _id: groupId, path: groupPath } = group
+          ? await db.collection('groups').findOne({ _id: new ObjectId(group) })
+          : {};
+
+        const updateResult = await db.collection(col).updateMany(
+          { _id: { $in: ids.map(ObjectId) } },
+          {
+            $set: {
+              ...(group ? { 'meta.group.id': groupId, 'meta.group.path': groupPath } : {}),
+              ...(creator ? { 'meta.group.creator': ObjectId(creator) } : {}),
+            },
+            $inc: { 'meta.revision': 1 },
+          },
+        );
+
+        if (submissions.length !== updateResult.modifiedCount) {
+          await session.abortTransaction();
+          return;
+        }
+
+        return updateResult;
+      });
+    } catch (error) {
+      throw boom.boomify(error);
+    }
+  });
+
+  if (!results) {
+    throw boom.internal('The transaction was intentionally aborted.');
+  }
+
+  res.send({
+    result: results.result,
+    farmos: farmOsResults.flat(),
+  });
+};
+
 const reassignSubmission = async (req, res) => {
   const { id } = req.params;
   const { body } = req;
@@ -912,6 +1000,7 @@ export default {
   createSubmission,
   updateSubmission,
   reassignSubmission,
+  bulkReassignSubmissions,
   archiveSubmission,
   deleteSubmission,
 };

@@ -681,12 +681,10 @@ export default {
     },
     createInstance() {
       const { version } = this.survey.revisions[this.survey.revisions.length - 1];
-      const group = this.$store.getters['memberships/activeGroup'];
 
       this.instance = submissionUtils.createSubmissionFromSurvey({
         survey: this.survey,
         version,
-        group,
         instance: this.instance,
       });
     },
@@ -694,10 +692,10 @@ export default {
   computed: {
     surveyIsValid() {
       // return this.invalidValidations.length > 0 ? invalidValidations : true;
-      return !(this.surveyValidationErrors.length > 0);
+      return !(this.surveyValidationErrors.length > 0) && this.validateSurveyName() === true;
     },
     surveyValidationErrors() {
-      const validations = [this.validateSurveyName(), this.validateSurveyQuestions()];
+      const validations = [this.validateSurveyQuestions()];
       return validations.filter((validation) => validation !== true);
     },
     enableDismissDraft() {
