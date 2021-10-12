@@ -65,16 +65,32 @@ function geojsonTransformer(o) {
   };
 }
 
-function matrixTransformer(o) {
+/**
+ * Aggregate the columns of the matrix into one cell
+ * @param {*} o matrix question object e.g. { meta: { type: 'matrix', ...}, value: [{{value: 11}, cell12}, {cell21, cell22}]}
+ * @returns updated matrix question object
+ */
+ function matrixTransformer(o) {
   if (!o.value) {
     return o;
   }
-  // get all the column names
-  const keys = _.chain(o.value).map(_.keys).flatten().uniq().value();
-  // collect each column into one cell
-  const values = keys.map(key => JSON.stringify(o.value.map(v => key in v ? v[key].value : null)));
-  const value = _.zipObject(keys, values)
 
+  const flatRows = o.value.map((row) => {
+    // remove the value nesting [{foo: {value: bar}}] -> [{foo: bar}]
+    const denseRow = _.mapValues(row, (cell) => cell.value);
+    // flatten object values {fuz: {baz: quz}} -> {"fuz.baz": quz}
+    return flatten(denseRow);
+  });
+
+  // get all the column names
+  const keys = _.chain(flatRows)
+    .map(_.keys) // get name of each column
+    .flatten()
+    .uniq() // create a list of uniq column names
+    .value();
+  // collect each column into one cell
+  const values = keys.map((key) => JSON.stringify(flatRows.map((row) => _.get(row, key, null))));
+  const value = _.zipObject(keys, values);
   return {
     ...o,
     value,

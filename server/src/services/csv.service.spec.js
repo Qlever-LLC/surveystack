@@ -394,9 +394,9 @@ describe('CSV Service', () => {
       it('keeps null values', () => {
         const header = ['foo', 'bar', 'quz'];
         const rows = [
-          [1, null, "baz"],
-          [null, "fuz", null],
-          [null, null, null]
+          [1, null, 'baz'],
+          [null, 'fuz', null],
+          [null, null, null],
         ];
         const submissionData = {
           matrix_1: mockMatrix(header, rows),
@@ -422,9 +422,9 @@ describe('CSV Service', () => {
         const submissionData = {
           matrix_1: mockMatrix(header, rows),
         };
-        delete submissionData.matrix_1.value[0].col2
-        delete submissionData.matrix_1.value[0].col3
-        delete submissionData.matrix_1.value[1].col2
+        delete submissionData.matrix_1.value[0].col2;
+        delete submissionData.matrix_1.value[0].col3;
+        delete submissionData.matrix_1.value[1].col2;
 
         const actual = transformSubmissionQuestionTypes(submissionData, {
           matrix: matrixTransformer,
@@ -432,6 +432,40 @@ describe('CSV Service', () => {
 
         for (const [i, col] of header.entries()) {
           const cell = rows.map((row) => row[i]);
+          expect(actual.matrix_1.value[col]).toBe(JSON.stringify(cell));
+        }
+      });
+
+      it('handles when values are objects', () => {
+        const header = ['col1', 'col2'];
+        const rows = [
+          [
+            { a: 1, b: 2 },
+            { c: 3, d: { e: 4, f: { g: 5 } } },
+          ],
+          [
+            { a: 6, b: 7 },
+            { c: 8, d: { e: 9, f: { g: 10 } } },
+          ],
+          [{ a: 11 }, { c: 12, d: { e: 13 } }],
+        ];
+        const submissionData = {
+          matrix_1: mockMatrix(header, rows),
+        };
+
+        const expected_header = ['col1.a', 'col1.b', 'col2.c', 'col2.d.e', 'col2.d.f.g'];
+        const expected_rows = [
+          [1, 2, 3, 4, 5],
+          [6, 7, 8, 9, 10],
+          [11, null, 12, 13, null],
+        ];
+
+        const actual = transformSubmissionQuestionTypes(submissionData, {
+          matrix: matrixTransformer,
+        });
+
+        for (const [i, col] of expected_header.entries()) {
+          const cell = expected_rows.map((row) => row[i]);
           expect(actual.matrix_1.value[col]).toBe(JSON.stringify(cell));
         }
       });
