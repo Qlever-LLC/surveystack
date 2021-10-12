@@ -56,7 +56,6 @@ router.post('/auth/reset-password', catchErrors(authController.resetPassword));
 /** Group */
 router.get('/groups', catchErrors(groupController.getGroups));
 router.get('/groups/by-path*', catchErrors(groupController.getGroupByPath));
-//router.get('/groups/:id/users', catchErrors(groupController.getUsers));
 router.get('/groups/:id', catchErrors(groupController.getGroupById));
 router.post('/groups', assertAuthenticated, catchErrors(groupController.createGroup));
 router.put(
