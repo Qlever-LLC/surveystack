@@ -7,6 +7,7 @@ import boom from '@hapi/boom';
 
 import { db } from '../db';
 import { cookieOptions } from '../constants'
+import _ from 'lodash';
 
 const col = 'users';
 
@@ -157,6 +158,14 @@ const updateUser = async (req, res) => {
 
     // create a new user token when password changes
     entity.token = uuidv4();
+
+    // remove the previously set token header
+    // use a try-catch because it's accessing undocumented API and failing is non-critical
+    try {
+      _.remove(res._headers['set-cookie'], (c) => c.startsWith('token='));
+    } catch (e) {
+      console.warn(e);
+    }
     // udpate the token in the cookie header for backward compatibility: https://gitlab.com/our-sci/software/surveystack/-/merge_requests/33#note_700125477
     res.cookie('token', entity.token, cookieOptions);
   }
