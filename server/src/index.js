@@ -24,7 +24,7 @@ const subdomainRedirect = {
 const PATH_PREFIX = process.env.PATH_PREFIX;
 
 const app = express();
-const frontend = expressStaticGzip('../client/dist');
+const frontend = expressStaticGzip('../client/dist', { index: false });
 
 /**
  * Hard-Redirect certain subdomains after migration.
