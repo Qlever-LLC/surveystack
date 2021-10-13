@@ -16,6 +16,7 @@ import apiRoutes from './routes/api';
 import debugRoutes from './routes/debug';
 
 import resources from './controllers/resources';
+import { cookieOptions } from './constants';
 
 const subdomainRedirect = {
   rfc: 'bionutrient',
@@ -80,11 +81,6 @@ app.use(async (req, res, next) => {
     if (user) {
       isAuthenticated = true;
       isSuperAdmin = user.permissions.includes('super-admin');
-      const cookieOptions = {
-        expires: new Date(Date.now() + 1000 * 3600 * 24 * 14),
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'None',
-      }; // expire after 14 days
       res.cookie('user', user._id.toString(), cookieOptions);
       res.cookie('token', user.token, cookieOptions);
     }
