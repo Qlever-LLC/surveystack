@@ -34,7 +34,7 @@ function arrayMax(arr) {
   return max;
 }
 
-const getHeaders = async (surveyId, entities, options = { excludeDataMeta: false }) => {
+const getHeaders = async (surveyId, entities) => {
   if (!surveyId) {
     return [];
   }
@@ -114,17 +114,6 @@ const getHeaders = async (surveyId, entities, options = { excludeDataMeta: false
 
   // any possible remaining headers - ideally submissionHeaders should be cleared by now
   headers.push(...submissionHeaders);
-
-  if (options.excludeDataMeta) {
-    const headersWithoutDataMeta = headers.filter((h) => {
-      // exclude any headers starting with data and including 'meta'
-      if (h.startsWith('data') && (h.includes('.meta.') || h.endsWith('.meta'))) {
-        return false;
-      }
-      return true;
-    });
-    return headersWithoutDataMeta;
-  }
 
   // console.log(headers, surveyHeaders, submissionHeaders);
 

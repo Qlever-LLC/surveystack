@@ -495,14 +495,22 @@ const getSubmissionsCsv = async (req, res) => {
   addLimitToPipeline(pipeline, req.query.limit);
 
   const entities = await db.collection(col).aggregate(pipeline).toArray();
-  const transformer = (entity) => ({
-    ...entity,
-    data: csvService.transformSubmissionQuestionTypes(entity.data, {
+  const transformer = (entity) => {
+    let data = csvService.transformSubmissionQuestionTypes(entity.data, {
       geoJSON: csvService.geojsonTransformer,
       matrix: csvService.matrixTransformer,
-    }),
-  });
-  const transformedEntities = entities.map(transformer);
+    });
+
+    if (!queryParam(req.query.showCsvDataMeta)) {
+      data = csvService.removeMetaFromQuestionTypes(data);
+    }
+
+    return {
+      ...entity,
+      data,
+    };
+  };
+  let transformedEntities = entities.map(transformer);
 
   const headers = await headerService.getHeaders(req.query.survey, transformedEntities, {
     excludeDataMeta: !queryParam(req.query.showCsvDataMeta),

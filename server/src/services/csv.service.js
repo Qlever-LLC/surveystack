@@ -122,6 +122,51 @@ function transformSubmissionQuestionTypes(obj, typeHandlers) {
   );
 }
 
+/**
+ * Removes the `meta` object from the submission questions
+ * For simple question types (`{meta: {...}, value: ...}`) it also removes the 
+ *  intermediary `value` field: `{num: {meta, value: 6}} -> {num: 6}`
+ * @param {Object} the `data` field of a submission 
+ * @returns updated data field of a submission
+ */
+function removeMetaFromQuestionTypes(data) {
+  // TODO these should come from some global constants, (or if we forbid to use
+  // 'meta' and 'value' as data-name, we can use logic instead of these lists)
+  const groupTypes = ['group', 'page'];
+  const valueTypes = [
+    'date',
+    'farmOsFarm',
+    'farmOsField',
+    'farmOsPlanting',
+    'geoJSON',
+    'instructions',
+    'instructionsImageSplit',
+    'location',
+    'matrix',
+    'number',
+    'ontology',
+    'script',
+    'selectMultiple',
+    'selectSingle',
+    'string',
+  ];
+
+  const removeMeta = (data) => {
+    if (!_.isObjectLike(data) || !('meta' in data)) {
+      return data;
+    } else {
+      if (groupTypes.includes(data.meta.type)) {
+        const { meta, ...values } = data;
+        return _.mapValues(values, removeMeta);
+      } else if (valueTypes.includes(data.meta.type)) {
+        return data.value;
+      }
+    }
+  };
+
+  return _.mapValues(data, removeMeta);
+}
+
 function createHeaders(mergedObject, entities, options = { excludeDataMeta: false }) {
   stringifyObjectIds(mergedObject);
 
@@ -217,4 +262,5 @@ export {
   transformSubmissionQuestionTypes,
   geojsonTransformer,
   matrixTransformer,
+  removeMetaFromQuestionTypes,
 };
