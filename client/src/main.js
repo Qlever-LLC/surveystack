@@ -37,17 +37,6 @@ Vue.filter('showNull', (value) => {
   return value;
 });
 
-const filter = function(text, length, clamp) {
-  if (text !== undefined) {
-    clamp = clamp || '...';
-    const node = document.createElement('div');
-    node.innerHTML = text;
-    const content = node.textContent;
-    return content.length > length ? content.slice(0, length) + clamp : content;
-  }
-};
-Vue.filter('truncate', filter);
-
 Vue.config.productionTip = false;
 Vue.use(CompositionApi);
 

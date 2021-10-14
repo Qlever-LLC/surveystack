@@ -33,21 +33,21 @@
       </template>
       <template slot="item" slot-scope="props">
         <tr v-for="id in items" :key="id.text">
-          <v-checkbox color="#777" multiple v-model="tableSelected" :value="id" class="custom-tr"></v-checkbox>
+          <v-checkbox color="#777" multiple v-model="tableSelected" :value="id" class="custom-checkbox"> </v-checkbox>
           <td
             v-for="header in headers"
             :key="header.text"
-            :class="addClass(props.item[header.value])"
+            class="truncate"
             @click="showDetails(props.item[header.value], header)"
           >
-            {{ props.item[header.value] | truncate(textTruncateLength, '...') }}
+            {{ truncate(props.item[header.value], textTruncateLength, '...') }}
           </td>
         </tr>
         <v-dialog v-model="showDialog" width="500">
           <v-card>
             <v-card-title class="text-h5 grey lighten-2">{{ toolTipHeader }}</v-card-title>
             <v-card-text>
-              {{ truncatedValue }}
+              {{ fullText }}
             </v-card-text>
           </v-card>
         </v-dialog>
@@ -96,7 +96,7 @@ export default {
   data() {
     return {
       showDialog: false,
-      truncatedValue: '',
+      fullText: '',
       toolTipHeader: '',
       textTruncateLength: 36,
       excludeMeta: true,
@@ -141,25 +141,32 @@ export default {
     },
   },
   methods: {
+    truncate(text, length, clamp) {
+      if (text !== undefined) {
+        clamp = clamp || '...';
+        return text.length > length ? text.slice(0, length) + clamp : text;
+      }
+      return text;
+    },
     showDetails(value, { text }) {
       if (value.length > this.textTruncateLength) {
         this.showDialog = true;
-        this.truncatedValue = value;
+        this.fullText = value;
         this.toolTipHeader = text;
       }
     },
     cleanTableRecords(object) {
-      Object.entries(object).forEach(([k, v]) => {
+      const copy = { ...object };
+      Object.entries(copy).forEach(([k, v]) => {
         if (v === '[object Object]') {
           v = {};
         }
-        if (v && typeof v === 'object') this.cleanTableRecords(v);
         if ((v && typeof v === 'object' && !Object.keys(v).length) || v === null || v === undefined || v.length === 0) {
-          if (Array.isArray(object)) object.splice(k, 1);
-          else if (!(v instanceof Date)) delete object[k];
+          if (Array.isArray(copy)) copy.splice(k, 1);
+          else if (!(v instanceof Date)) delete copy[k];
         }
       });
-      return object;
+      return copy;
     },
     addClass(value) {
       if (value !== undefined && value.length > this.textTruncateLength) return 'truncate';
@@ -265,7 +272,7 @@ td.untruncated {
 .truncate {
   cursor: pointer;
 }
-.custom-tr {
+.custom-checkbox {
   margin-left: 1rem;
 }
 </style>
