@@ -212,6 +212,15 @@ export const assertHasSurveyParam = catchErrors(async (req, res, next) => {
   next();
 });
 
+export const assertHasIds = (req, res, next) => {
+  if (!req.body.ids || req.body.ids.length === 0) {
+    throw boom.badRequest('You must specify ids.');
+  }
+
+  next();
+};
+
+
 export const validateBulkReassignRequestBody = (req, res, next) => {
   if (!req.body.ids || req.body.ids.length === 0) {
     throw boom.badRequest('You must specify ids.');

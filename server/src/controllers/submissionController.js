@@ -12,6 +12,7 @@ import headerService from '../services/header.service';
 import * as farmOsService from '../services/farmos.service';
 import rolesService from '../services/roles.service';
 import { queryParam } from '../helpers';
+import { suppressDeprecationWarnings } from 'moment';
 
 const col = 'submissions';
 const DEFAULT_LIMIT = 100000;
@@ -838,7 +839,7 @@ const bulkReassignSubmissions = async (req, res) => {
           _id: new ObjectId(),
           meta: {
             ...submission.meta,
-            original: new ObjectId(submission.id),
+            original: new ObjectId(submission._id),
             archived: true,
             archivedReason: 'REASSIGN',
           },
@@ -945,15 +946,18 @@ const reassignSubmission = async (req, res) => {
   return res.send(updated.value);
 };
 
-const archiveSubmission = async (req, res) => {
+const archiveSubmissions = async (req, res) => {
   const { id } = req.params;
+  const { ids } = req.body;
+  if (!ids) {
+    ids = [id];
+  }
+
   const { reason } = req.query;
   let archived = true;
 
-  if (req.query.set) {
-    if (req.query.set === 'false' || req.query.set === '0') {
-      archived = false;
-    }
+  if (req.query.set === 'false' || req.query.set === '0') {
+    archived = false;
   }
 
   const update = { $set: { 'meta.archived': archived } };
@@ -963,30 +967,43 @@ const archiveSubmission = async (req, res) => {
     update['$unset'] = { 'meta.archivedReason': '' };
   }
 
-  const updated = await db.collection(col).findOneAndUpdate({ _id: new ObjectId(id) }, update, {
-    returnOriginal: false,
-  });
+  const idSelector = { $in: ids.map(ObjectId) };
+
+  await db.collection(col).updateMany({ _id: idSelector }, update);
 
   // archive / unarchive library submissions as well
-  const updatedLibrarySubmissions = await db.collection(col).findOneAndUpdate({ 'meta.original': new ObjectId(id) }, update, {
-    returnOriginal: false,
-  });
+  await db
+    .collection(col)
+    .findOneAndUpdate({ 'meta.original': idSelector }, update, {
+      returnOriginal: false,
+    });
 
-  return res.send(updated);
+  return res.send({ message: 'OK' });
 };
 
-const deleteSubmission = async (req, res) => {
-  const { id } = req.params;
 
-  try {
-    let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
-    assert.equal(1, r.deletedCount);
-    // delete library submissions as well
-    let rqsl = await db.collection(col).deleteOne({ 'meta.original': new ObjectId(id) });
-    return res.send({ message: 'OK' });
-  } catch (error) {
-    throw boom.internal(`deleteSubmission: unknown error`);
+const deleteSubmissions = async (req, res) => {
+  const { id } = req.params;
+  const { ids } = req.body;
+  if (!ids) {
+    ids = [id];
   }
+
+  const idSelector = { $in: ids.map(ObjectId) };
+  const submissionQuery = { _id: idSelector };
+  // TODO use transactions instead of this pre-check
+  let result = await db.collection(col).countDocuments(submissionQuery);
+  if (ids.length !== result) {
+    throw boom.internal('abort because of ambiguous match results', result);
+  }
+
+  await db.collection(col).deleteMany(submissionQuery);
+
+  // delete library submissions as well
+
+  await db.collection(col).deleteMany({ 'meta.original': idSelector });
+
+  return res.send({ message: 'OK' });
 };
 
 export default {
@@ -998,7 +1015,7 @@ export default {
   updateSubmission,
   reassignSubmission,
   bulkReassignSubmissions,
-  archiveSubmission,
-  deleteSubmission,
+  archiveSubmissions,
+  deleteSubmissions,
   prepareSubmissionsToQSLs,
 };
