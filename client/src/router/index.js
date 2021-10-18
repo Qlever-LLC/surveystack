@@ -7,6 +7,7 @@ import Unauthorized from '@/pages/Unauthorized.vue';
 import MySubmissions from '@/pages/surveys/MySubmissions.vue';
 import SurveysBrowse from '@/pages/surveys/Browse.vue';
 import SurveysDetail from '@/pages/surveys/Detail.vue';
+import SurveysDiff from '@/pages/surveys/SurveyDiff.vue';
 import DraftSubmission from '@/pages/submissions/drafts/Draft.vue';
 
 import Login from '@/pages/auth/Login.vue';
@@ -131,6 +132,11 @@ const routes = [
     path: '/surveys/:id',
     name: 'surveys-detail',
     component: SurveysDetail,
+  },
+  {
+    path: '/surveys/diff/:id/:oldVersion/:newVersion',
+    name: 'surveys-diff',
+    component: SurveysDiff,
   },
 
   {
