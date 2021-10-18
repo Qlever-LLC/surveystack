@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import boom from '@hapi/boom';
+import { getControlPositions, getControl } from './surveys';
 
 export const changeType = {
   CHANGED: 'changed',
@@ -106,23 +107,25 @@ export const diffControls = (oldControl, newControl) => {
 };
 
 export const normalizedSurveyControls = (survey, version) => {
-  const revision = survey.revisions.find((revision) => parseInt(revision.version) === parseInt(version));
+  const revision = survey.revisions.find(
+    (revision) => parseInt(revision.version) === parseInt(version)
+  );
   if (!revision) {
-      throw boom.notFound("Can't find selected survey revision", {
-          selectedVersion: version,
-          availableVersions: survey.revisions.map(r => r.version)
-      })
+    throw boom.notFound("Can't find selected survey revision", {
+      selectedVersion: version,
+      availableVersions: survey.revisions.map((r) => r.version),
+    });
   }
   const { controls } = revision;
 
-  const normalize = (controls) => {
+  const normalize = (controls, parentId = null) => {
     let normalized = {};
-    for (const control of controls) {
-      normalized[control.id] = control;
+    for (const [childIndex, control] of controls.entries()) {
+      normalized[control.id] = { control, parentId, childIndex };
 
       // "page" and "group" types
       if (_.isArray(control.children)) {
-        normalized = { ...normalized, ...normalize(control.children) };
+        normalized = { ...normalized, ...normalize(control.children, control.id) };
       }
     }
     return normalized;
@@ -141,12 +144,29 @@ export const diffSurveyVersions = (survey, oldVersion, newVersion) => {
 
   const results = [];
   for (const id of commonIds) {
-    const oldControl = oldControls[id];
-    const newControl = newControls[id];
+    const {
+      control: oldControl,
+      parentId: oldParentId,
+      childIndex: oldChildIndex,
+    } = oldControls[id];
+    const {
+      control: newControl,
+      parentId: newParentId,
+      childIndex: newChildIndex,
+    } = newControls[id];
     const diff = diffControls(oldControl, newControl);
-    // TODO check it unchanged
-    const changeType = CHANGED;
-    results.push({ changeType, diff, oldControl, newControl });
+    const changed = Object.values(diff).some(({ changeType }) => changeType !== UNCHANGED);
+    const changeType = changed ? CHANGED : UNCHANGED;
+    results.push({
+      changeType,
+      diff,
+      oldControl,
+      newControl,
+      oldParentId,
+      newParentId,
+      oldChildIndex,
+      newChildIndex,
+    });
   }
 
   for (id of removedIds) {

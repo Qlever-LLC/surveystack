@@ -1,26 +1,16 @@
 <template>
-  <!-- <v-treeview
-    v-model="tree"
-    :open="initiallyOpen"
-    :items="items"
-    activatable
-    item-key="name"
-    open-on-click
-  >
-    <template v-slot:prepend="{ item, open }">
-      <v-icon v-if="!item.file">
-        {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
-      </v-icon>
-      <v-icon v-else>
-        {{ files[item.file] }}
+  <v-treeview v-model="tree" :open="initiallyOpen" :items="items" activatable open-on-click>
+    <template v-slot:prepend="{ item }">
+      <v-icon :color="item.color">
+        {{ item.icon }}
       </v-icon>
     </template>
-  </v-treeview> -->
-  <v-treeview :items="items"></v-treeview>
+  </v-treeview>
 </template>
 
 <script>
 import api from '@/services/api.service';
+import { createControlInstance, availableControls } from '@/utils/surveyConfig';
 
 export default {
   data() {
@@ -37,14 +27,32 @@ export default {
       if (!this.diff) {
         return [];
       }
-      const convert = (controls) => {
-        return controls.map((control) => ({
-          id: control.newControl._id,
-          name: control.newControl.name,
-          children: control.newControl.children ? convert(control.newControl.children) : null,
-        }));
+
+      const childrenOf = (parent) => this.diff.filter((d) => d.newParentId === parent); //TODO sort
+      const findIcon = (control) => {
+        const match = availableControls.find((c) => c.type === control.type);
+        return match ? match.icon : '';
       };
-      return convert(this.diff);
+      const changeColors = {
+        changed: 'amber',
+        added: 'green',
+        removed: 'red',
+      };
+      const convert = (diffs) => {
+        return diffs.map((controlDiff) => {
+          const control = controlDiff.newControl || controlDiff.oldControl;
+          return {
+            controlDiff,
+            id: control._id,
+            name: control.name,
+            icon: findIcon(control),
+            color: changeColors[controlDiff.changeType],
+            changeType: controlDiff.changeType,
+            children: convert(childrenOf(control.id)),
+          };
+        });
+      };
+      return convert(childrenOf(null));
     },
   },
 
