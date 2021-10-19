@@ -149,7 +149,7 @@ export default {
   },
   async created() {
     const { id } = this.$route.params;
-    const { data: entity } = await api.get(`/surveys/${id}`);
+    const { data: entity } = await api.get(`/surveys/${id}?version=latest`);
     this.entity = entity;
 
     const { data: surveyInfo } = await api.get(`/surveys/info?id=${id}`);

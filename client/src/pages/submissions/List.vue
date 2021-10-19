@@ -594,7 +594,7 @@ export default {
   },
   async created() {
     this.survey = this.$route.query.survey;
-    const { data: surveyEntity } = await api.get(`/surveys/${this.survey}`);
+    const { data: surveyEntity } = await api.get(`/surveys/${this.survey}?version=latest`);
     this.surveyEntity = surveyEntity;
     await this.fetchData();
   },

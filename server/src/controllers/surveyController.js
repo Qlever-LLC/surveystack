@@ -308,9 +308,29 @@ const getSurveyListPage = async (req, res) => {
 
 const getSurvey = async (req, res) => {
   const { id } = req.params;
-  let entity;
+  const { version } = req.query;
 
-  entity = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  // TODO: update so that the $slice is for the element where 
+  // revision.version === latestVersion
+  // TODO: if version is not 'latest' use version query param for querying mongo
+  const versionProjection = version ? {
+    projection: {
+      name: 1,
+      latestVersion: 1,
+      meta: 1,
+      description: 1,
+      revisions: {
+        $slice: [ '$revisions', -1]
+      }
+    },
+  } : {};
+
+  const entity = await db.collection(col).findOne(
+    { _id: new ObjectId(id) },
+    {
+      ...versionProjection,
+    }
+  );
 
   if (!entity) {
     return res.status(404).send({
