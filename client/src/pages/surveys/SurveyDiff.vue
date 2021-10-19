@@ -1,14 +1,43 @@
 <template>
   <v-row>
-    <v-treeview open-all :items="items" activatable @update:active="handleSelect">
+    <v-treeview open-all :items="items" activatable @update:active="handleSelectControl">
       <template v-slot:prepend="{ item }">
         <v-icon :color="item.color">
           {{ item.icon }}
         </v-icon>
       </template>
     </v-treeview>
-    <v-col>
-      <app-control v-if="selectedControl" :control="selectedControl" :path="selectedControlPath" :survey="survey" />
+    <v-col v-if="previewVersion">
+      <v-btn-toggle v-model="previewVersion" tile color="deep-purple accent-3" group>
+        <v-btn :value="oldVersion"> Version {{ oldVersion }} </v-btn>
+
+        <v-btn :value="newVersion"> Version {{ newVersion }} </v-btn>
+      </v-btn-toggle>
+      <app-control
+        v-if="selectedControl && survey"
+        :control="selectedControl"
+        :path="selectedControlPath"
+        :survey="survey"
+        :key="selectedControlPath + '@' + previewVersion"
+      />
+      <v-simple-table fixed-header height="300px">
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th class="text-left">
+                Property
+              </th>
+              <th class="text-left">Change from v{{ oldVersion }} to v{{ newVersion }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="change in selectedChangeList" :key="change.key">
+              <td>{{ change.key }}</td>
+              <td>{{ change.oldValue }} -> {{ change.newValue }}</td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
     </v-col>
   </v-row>
 </template>
@@ -30,7 +59,9 @@ export default {
       diff: null,
       survey: null,
       selectedControlId: null,
-      watchNew: true,
+      oldVersion: null,
+      newVersion: null,
+      previewVersion: null,
     };
   },
 
@@ -40,7 +71,7 @@ export default {
         return [];
       }
 
-      const childrenOf = (parent) => this.diff.filter((d) => (d.newParentId || d.oldParentId) === parent); //TODO sort
+      const childrenOf = (parent) => this.diff.filter((d) => (d.newParentId || d.oldParentId || null) === parent); //TODO sort
       const findIcon = (control) => {
         const match = availableControls.find((c) => c.type === control.type);
         return match ? match.icon : '';
@@ -73,35 +104,70 @@ export default {
     selectedControl() {
       return (
         this.selectedControlDiff &&
-        (this.watchNew ? this.selectedControlDiff.newControl : this.selectedControlDiff.oldControl)
+        (this.previewVersion === this.newVersion
+          ? this.selectedControlDiff.newControl
+          : this.selectedControlDiff.oldControl)
       );
     },
     selectedControlPath() {
       return (
         this.selectedControlDiff &&
-        (this.watchNew ? this.selectedControlDiff.newPath : this.selectedControlDiff.oldPath)
+        (this.previewVersion === this.newVersion ? this.selectedControlDiff.newPath : this.selectedControlDiff.oldPath)
       );
+    },
+    selectedChangeList() {
+      if (!this.selectedControlDiff || !this.selectedControlDiff.diff) {
+        return [];
+      }
+      return Object.entries(this.selectedControlDiff.diff)
+        .map(([key, change]) => {
+          if (change.changeType === 'changed') {
+            return {
+              key,
+              oldValue: JSON.stringify(change.oldValue),
+              newValue: JSON.stringify(change.newValue),
+            };
+          }
+          return null;
+        })
+        .filter((c) => c !== null);
+    },
+    previewResources() {
+      return {
+        survey: this.survey,
+        previewVersion: this.previewVersion,
+      };
+    },
+  },
+  watch: {
+    previewResources({ survey, previewVersion }) {
+      console.log({ survey, previewVersion });
+      if (survey && previewVersion) {
+        const submission = submissionUtils.createSubmissionFromSurvey({
+          survey,
+          version: previewVersion,
+          instance: null,
+        });
+        this.$store.dispatch('draft/init', { survey, submission, persist: false });
+      }
     },
   },
   methods: {
-    handleSelect([controlId]) {
+    handleSelectControl([controlId]) {
       this.selectedControlId = controlId;
     },
   },
   async created() {
     // TODO handle error
     const { id, oldVersion, newVersion } = this.$route.params;
+    this.oldVersion = parseInt(oldVersion);
+    this.newVersion = parseInt(newVersion);
+    this.previewVersion = this.newVersion;
     // TODO load through $store
     const { data: diff } = await api.get(`/surveys/diff/${id}/${oldVersion}/${newVersion}`);
     this.diff = diff;
     const { data: survey } = await api.get(`/surveys/${id}`);
     this.survey = survey;
-    const submission = submissionUtils.createSubmissionFromSurvey({
-      survey: this.survey,
-      version: 1,
-      instance: null,
-    });
-    this.$store.dispatch('draft/init', { survey, submission, persist: false });
   },
 };
 </script>
