@@ -783,7 +783,6 @@ const updateSubmission = async (req, res) => {
 const updateSubmissionToLibrarySurveys = async (survey, submission) => {
   // find library submissions to be updated
   const librarySubmissions =  await db.collection('submissions').find({'meta.original':submission._id }).toArray();
-  //const librarySubmissions =  await db.collection('submissions').find({'meta.survey.origin':survey._id }).toArray();
 
   // archive current library submissions
   await librarySubmissions.forEach(function(librarySubmission) {

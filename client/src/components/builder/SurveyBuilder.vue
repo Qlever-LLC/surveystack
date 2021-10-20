@@ -420,7 +420,6 @@ export default {
           controlToAdd.libraryVersion = data.latestVersion;
         }
 
-        //TODO remove this, wrong turn: controlToAdd.isLibraryRoot = false;
         dive(controlToAdd, (control) => {
           // eslint-disable-next-line no-param-reassign
           control.id = new ObjectID().toString();
