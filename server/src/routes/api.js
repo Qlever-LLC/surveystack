@@ -128,7 +128,6 @@ router.get('/surveys', catchErrors(surveyController.getSurveys));
 router.get('/surveys/info', catchErrors(surveyController.getSurveyInfo));
 router.get('/surveys/list-page', catchErrors(surveyController.getSurveyListPage));
 router.get('/surveys/page', catchErrors(surveyController.getSurveyPage));
-router.get('/surveys/diff/:id/:oldVersion/:newVersion', catchErrors(surveyController.getSurveyDiff));
 router.get('/surveys/:id', catchErrors(surveyController.getSurvey));
 router.post(
   '/surveys',

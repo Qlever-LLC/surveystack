@@ -1,6 +1,4 @@
 import _ from 'lodash';
-import boom from '@hapi/boom';
-import { getControlPositions, getControl } from './surveys';
 
 export const changeType = {
   CHANGED: 'changed',
@@ -95,10 +93,7 @@ export const diffControls = (oldControl, newControl) => {
       'redacted',
       'scaleWidth',
     ];
-    const colCount = Math.max(
-      oldControl.options.source.content.length,
-      newControl.options.source.content.length
-    );
+    const colCount = Math.max(oldControl.options.source.content.length, newControl.options.source.content.length);
     for (let i = 0; i < colCount; ++i) {
       addToDiff(MATRIX_COL_FIELDS.map((f) => `options.config.source.content[${i}].${f}`));
     }
@@ -106,16 +101,7 @@ export const diffControls = (oldControl, newControl) => {
   return diff;
 };
 
-export const normalizedSurveyControls = (survey, version) => {
-  const revision = survey.revisions.find(
-    (revision) => parseInt(revision.version) === parseInt(version)
-  );
-  if (!revision) {
-    throw boom.notFound("Can't find selected survey revision", {
-      selectedVersion: version,
-      availableVersions: survey.revisions.map((r) => r.version),
-    });
-  }
+export const normalizedSurveyControls = (revision) => {
   const { controls } = revision;
 
   const normalize = (controls, parentId = null, parentPath = ['data']) => {
@@ -134,9 +120,9 @@ export const normalizedSurveyControls = (survey, version) => {
   return normalize(controls);
 };
 
-export const diffSurveyVersions = (survey, oldVersion, newVersion) => {
-  const oldControls = normalizedSurveyControls(survey, oldVersion);
-  const newControls = normalizedSurveyControls(survey, newVersion);
+export const diffSurveyVersions = (oldRevision, newRevision) => {
+  const oldControls = normalizedSurveyControls(oldRevision);
+  const newControls = normalizedSurveyControls(newRevision);
   const oldControlIds = Object.keys(oldControls);
   const newControlIds = Object.keys(newControls);
   const commonIds = _.intersection(oldControlIds, newControlIds);
@@ -146,12 +132,7 @@ export const diffSurveyVersions = (survey, oldVersion, newVersion) => {
     const result = { controlId: id };
 
     if (oldControlIds.includes(id)) {
-      const {
-        control: oldControl,
-        parentId: oldParentId,
-        childIndex: oldChildIndex,
-        path: oldPath,
-      } = oldControls[id];
+      const { control: oldControl, parentId: oldParentId, childIndex: oldChildIndex, path: oldPath } = oldControls[id];
       Object.assign(result, {
         oldControl,
         oldParentId,
@@ -162,12 +143,7 @@ export const diffSurveyVersions = (survey, oldVersion, newVersion) => {
     }
 
     if (newControlIds.includes(id)) {
-      const {
-        control: newControl,
-        parentId: newParentId,
-        childIndex: newChildIndex,
-        path: newPath,
-      } = newControls[id];
+      const { control: newControl, parentId: newParentId, childIndex: newChildIndex, path: newPath } = newControls[id];
       Object.assign(result, {
         newControl,
         newParentId,

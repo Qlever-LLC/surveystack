@@ -1,71 +1,95 @@
 <template>
-  <v-row>
-    <v-treeview open-all :items="items" activatable @update:active="handleSelectControl">
-      <template v-slot:prepend="{ item }">
-        <v-icon :color="item.color">
-          {{ item.icon }}
-        </v-icon>
-      </template>
-    </v-treeview>
-    <v-col v-if="previewVersion">
-      <v-btn-toggle v-model="previewVersion" tile color="deep-purple accent-3" group>
-        <v-btn :value="oldVersion"> Version {{ oldVersion }} </v-btn>
-
-        <v-btn :value="newVersion"> Version {{ newVersion }} </v-btn>
-      </v-btn-toggle>
-      <app-control
-        v-if="selectedControl && survey"
-        :control="selectedControl"
-        :path="selectedControlPath"
-        :survey="survey"
-        :key="selectedControlPath + '@' + previewVersion"
-      />
-      <v-simple-table fixed-header height="300px">
-        <template v-slot:default>
-          <thead>
-            <tr>
-              <th class="text-left">
-                Property
-              </th>
-              <th class="text-left">Change from v{{ oldVersion }} to v{{ newVersion }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="change in selectedChangeList" :key="change.key">
-              <td>{{ change.key }}</td>
-              <td>{{ change.oldValue }} -> {{ change.newValue }}</td>
-            </tr>
-          </tbody>
-        </template>
-      </v-simple-table>
-    </v-col>
-  </v-row>
+  <v-expansion-panels flat>
+    <v-expansion-panel>
+      <v-expansion-panel-header class="pl-0 pt-0">
+        <h3>Change details</h3>
+      </v-expansion-panel-header>
+      <v-expansion-panel-content>
+        <v-expansion-panels>
+          <v-expansion-panel v-for="item in items" :key="item.id">
+            <v-expansion-panel-header>
+              <v-row>
+                <div class="v-treeview-node__level" v-for="index in item.depth" :key="index" />
+                <th>
+                  <v-icon :color="item.color">
+                    {{ item.icon }}
+                  </v-icon>
+                  {{ item.name }}
+                </th>
+              </v-row>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-simple-table fixed-header height="300px">
+                <template v-slot:default>
+                  <thead>
+                    <tr>
+                      <th class="text-left">Property</th>
+                      <th class="text-left">Change from v{{ oldRevision.version }} to v{{ newRevision.version }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="change in getControlChangeList(item.id)" :key="change.key">
+                      <td>{{ change.key }}</td>
+                      <td>{{ change.oldValue }} -> {{ change.newValue }}</td>
+                    </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+  </v-expansion-panels>
 </template>
 
 <script>
-import api from '@/services/api.service';
 import appControl from '@/components/survey/drafts/Control.vue';
-import { createControlInstance, availableControls } from '@/utils/surveyConfig';
-import submissionUtils from '@/utils/submissions';
+import { availableControls } from '@/utils/surveyConfig';
+import { diffSurveyVersions } from '@/utils/surveyDiff';
 import _ from 'lodash';
+
+import { createSurvey } from '@/utils/surveys';
+import { createControlInstance } from '@/utils/surveyConfig';
+const oldRevision = { ...createSurvey({}).revisions[0], version: 1 };
+oldRevision.controls.push(
+  createControlInstance({ type: 'number', name: 'number_1' }),
+  createControlInstance({ type: 'string', name: 'string_1' }),
+  createControlInstance({
+    type: 'page',
+    name: 'page_1',
+    children: [
+      createControlInstance({ type: 'number', name: 'number_2' }),
+      createControlInstance({ type: 'string', name: 'string_2' }),
+    ],
+  })
+);
+const newRevision = _.cloneDeep(oldRevision);
+newRevision.controls[0].name = 'changed_name';
+newRevision.controls.splice(1, 1);
 
 export default {
   name: 'app-survey-diff',
-  components: {
-    appControl,
+  // components: {
+  //   appControl,
+  // },
+  props: {
+    oldRevision: { type: Object, default: oldRevision },
+    newRevision: { type: Object, default: newRevision },
   },
   data() {
     return {
-      diff: null,
-      survey: null,
       selectedControlId: null,
-      oldVersion: null,
-      newVersion: null,
-      previewVersion: null,
     };
   },
 
   computed: {
+    diff() {
+      if (this.oldRevision && this.newRevision) {
+        return diffSurveyVersions(this.oldRevision, this.newRevision);
+      }
+      return [];
+    },
     items() {
       if (!this.diff) {
         return [];
@@ -81,45 +105,55 @@ export default {
         added: 'green',
         removed: 'red',
       };
-      const convert = (diffs) => {
-        return diffs.map((controlDiff) => {
-          const control = controlDiff.newControl || controlDiff.oldControl;
-          return {
-            controlDiff,
-            id: control.id,
-            name: control.name,
-            icon: findIcon(control),
-            color: changeColors[controlDiff.changeType],
-            changeType: controlDiff.changeType,
-            path: controlDiff.path,
-            children: convert(childrenOf(control.id)),
-          };
-        });
+      const convert = (diffs, depth = 0) => {
+        return diffs
+          .map((controlDiff) => {
+            const control = controlDiff.newControl || controlDiff.oldControl;
+            return [
+              {
+                controlDiff,
+                id: control.id,
+                name: control.name,
+                icon: findIcon(control),
+                color: changeColors[controlDiff.changeType],
+                changeType: controlDiff.changeType,
+                path: controlDiff.path,
+                depth,
+              },
+              ...convert(childrenOf(control.id), depth + 1),
+            ];
+          })
+          .flat();
       };
       return convert(childrenOf(null));
     },
-    selectedControlDiff() {
-      return this.diff && this.diff.find((d) => d.controlId === this.selectedControlId);
-    },
-    selectedControl() {
-      return (
-        this.selectedControlDiff &&
-        (this.previewVersion === this.newVersion
-          ? this.selectedControlDiff.newControl
-          : this.selectedControlDiff.oldControl)
-      );
-    },
-    selectedControlPath() {
-      return (
-        this.selectedControlDiff &&
-        (this.previewVersion === this.newVersion ? this.selectedControlDiff.newPath : this.selectedControlDiff.oldPath)
-      );
-    },
-    selectedChangeList() {
-      if (!this.selectedControlDiff || !this.selectedControlDiff.diff) {
+    // previewResources() {
+    //   return {
+    //     survey: this.survey,
+    //     previewVersion: this.previewVersion,
+    //   };
+    // },
+  },
+  // watch: {
+  //   previewResources({ survey, previewVersion }) {
+  //     console.log({ survey, previewVersion });
+  //     if (survey && previewVersion) {
+  //       const submission = submissionUtils.createSubmissionFromSurvey({
+  //         survey,
+  //         version: previewVersion,
+  //         instance: null,
+  //       });
+  //       // this.$store.dispatch('draft/init', { survey, submission, persist: false });
+  //     }
+  //   },
+  // },
+  methods: {
+    getControlChangeList(controlId) {
+      const controlDiff = this.diff && this.diff.find((d) => d.controlId === controlId);
+      if (!controlDiff || !controlDiff.diff) {
         return [];
       }
-      return Object.entries(this.selectedControlDiff.diff)
+      return Object.entries(controlDiff.diff)
         .map(([key, change]) => {
           if (change.changeType === 'changed') {
             return {
@@ -132,42 +166,6 @@ export default {
         })
         .filter((c) => c !== null);
     },
-    previewResources() {
-      return {
-        survey: this.survey,
-        previewVersion: this.previewVersion,
-      };
-    },
-  },
-  watch: {
-    previewResources({ survey, previewVersion }) {
-      console.log({ survey, previewVersion });
-      if (survey && previewVersion) {
-        const submission = submissionUtils.createSubmissionFromSurvey({
-          survey,
-          version: previewVersion,
-          instance: null,
-        });
-        this.$store.dispatch('draft/init', { survey, submission, persist: false });
-      }
-    },
-  },
-  methods: {
-    handleSelectControl([controlId]) {
-      this.selectedControlId = controlId;
-    },
-  },
-  async created() {
-    // TODO handle error
-    const { id, oldVersion, newVersion } = this.$route.params;
-    this.oldVersion = parseInt(oldVersion);
-    this.newVersion = parseInt(newVersion);
-    this.previewVersion = this.newVersion;
-    // TODO load through $store
-    const { data: diff } = await api.get(`/surveys/diff/${id}/${oldVersion}/${newVersion}`);
-    this.diff = diff;
-    const { data: survey } = await api.get(`/surveys/${id}`);
-    this.survey = survey;
   },
 };
 </script>
