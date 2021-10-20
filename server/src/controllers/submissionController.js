@@ -624,13 +624,12 @@ const createSubmission = async(req, res) => {
     });
   }
 
-  let submissionsToQSLs = await Promise.all(
+  const submissionsToQSLs = await Promise.all(
     submissionEntities.map(({ entity, survey }) => {
       const controls = survey.revisions[entity.meta.survey.version - 1].controls;
       return prepareSubmissionsToQSLs(controls, entity);
     })
-  );
-  submissionsToQSLs = submissionsToQSLs.flat();
+  ).flat();
 
   const results = await withSession(mongoClient, async (session) => {
     try {
