@@ -62,15 +62,9 @@
               Publish Update To Library
             </v-card-title>
             <v-card-text>
-              <v-text-field :value="value.name" label="Title" readonly disabled> </v-text-field>
               <h3>Version history</h3>
               <tip-tap-editor v-model="value.meta.libraryHistory" class="mb-4" />
-              <v-select
-                outlined
-                v-model="value.meta.libraryLastChangeType"
-                label="Change type"
-                :items="availableLibraryChangeTypes"
-              />
+              <library-change-type-selector v-model="value.meta.libraryLastChangeType" :disabled="false" />
             </v-card-text>
             <v-card-actions class="mr-3">
               <v-spacer />
@@ -82,7 +76,7 @@
                 color="primary"
                 text
               >
-                <span>Publish update to library</span>
+                <span>Publish update to library {{ value.name }}</span>
               </v-btn>
               <v-btn @click="updateLibraryDialogIsVisible = false" color="primary" text>
                 Cancel
@@ -148,7 +142,7 @@
                       Add Survey To Library
                     </v-card-title>
                     <v-card-text>
-                      <v-text-field :value="value.name" label="Title" readonly disabled> </v-text-field>
+                      <v-text-field :value="value.name" label="Title" readonly />
                       <h3>Description</h3>
                       <tip-tap-editor v-model="value.meta.libraryDescription" class="mb-4" />
                       <h3>Applications</h3>
@@ -157,12 +151,11 @@
                       <tip-tap-editor v-model="value.meta.libraryMaintainers" class="mb-4" />
                       <h3>Version history</h3>
                       <tip-tap-editor v-model="value.meta.libraryHistory" class="mb-4" />
-                      <v-select
+                      <library-change-type-selector
                         v-if="value.meta.isLibrary"
-                        outlined
                         v-model="value.meta.libraryLastChangeType"
+                        :disabled="false"
                         label="Latest change type"
-                        :items="availableLibraryChangeTypes"
                       />
                     </v-card-text>
                     <v-card-actions class="mr-3">
@@ -385,17 +378,12 @@ import appResources from '@/components/builder/Resources.vue';
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import api from '@/services/api.service';
 import { getGroupNameById } from '@/utils/groups';
+import LibraryChangeTypeSelector from '@/components/builder/LibraryChangeTypeSelector';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
   { value: 'user', text: 'Logged in users' },
   { value: 'group', text: 'Group members' },
-];
-
-const availableLibraryChangeTypes = [
-  { value: 'major', text: 'Major change' },
-  { value: 'minor', text: 'Minor change' },
-  { value: 'patch', text: 'Small fix' },
 ];
 
 export default {
@@ -409,7 +397,6 @@ export default {
       libraryConsumers: [],
       surveyGroupName: 'Group Not Found',
       availableSubmissions,
-      availableLibraryChangeTypes,
     };
   },
   async created() {
@@ -467,6 +454,7 @@ export default {
     },
   },
   components: {
+    LibraryChangeTypeSelector,
     SurveyNameEditor,
     ActiveGroupSelector,
     appResources,

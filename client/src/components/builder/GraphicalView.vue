@@ -52,7 +52,7 @@
             <v-btn
               icon
               v-if="selected === el && el.isLibraryRoot && !el.libraryIsInherited"
-              @click.stop="updateLibrary(idx)"
+              @click.stop="updateLibrary(idx, el)"
             >
               <v-icon :color="availableLibraryUpdates[el.libraryId] > el.libraryVersion ? 'warning' : 'grey lighten-1'"
                 >mdi-refresh</v-icon
@@ -137,6 +137,37 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+
+      <v-dialog v-if="updateLibraryDialogIsVisible" v-model="updateLibraryDialogIsVisible" width="700" max-width="75%">
+        <v-card>
+          <v-card-title>
+            Update question set from Version {{ updateControl.libraryVersion }} to Version
+            {{ updateToLibrary.latestVersion }}
+          </v-card-title>
+          <v-card-text class="pb-0">
+            <h3 class="mt-5 mb-2">Updates from maintainer of question set "{{ updateToLibrary.name }}":</h3>
+            <tip-tap-editor disabled v-model="updateToLibrary.meta.libraryHistory" class="mb-4" />
+            <library-change-type-selector v-model="updateToLibrary.meta.libraryLastChangeType" :disabled="true" />
+          </v-card-text>
+          <v-card-text>
+            <h3>
+              <v-icon color="warning">mdi-alert</v-icon>&nbsp;<b
+                >If you have modified this question set, your modifications will be reset.</b
+              >
+              Note all your modifications if you wish to re-apply them after updating.
+            </h3>
+          </v-card-text>
+          <v-card-actions class="mr-3">
+            <v-spacer />
+            <v-btn @click="updateLibraryConfirmed" color="primary" text>
+              <span>update library</span>
+            </v-btn>
+            <v-btn @click="updateLibraryCancelled" color="primary" text>
+              Cancel
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-card>
   </draggable>
   <div v-else>
@@ -153,10 +184,15 @@ import draggable from 'vuedraggable';
 import { cloneDeep } from 'lodash';
 import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
+import api from '@/services/api.service';
+import TipTapEditor from '@/components/builder/TipTapEditor';
+import LibraryChangeTypeSelector from '@/components/builder/LibraryChangeTypeSelector';
 
 export default {
   name: 'nested-draggable',
   components: {
+    LibraryChangeTypeSelector,
+    TipTapEditor,
     draggable,
   },
   data() {
@@ -164,6 +200,9 @@ export default {
       drag: false,
       deleteQuestionModalIsVisible: false,
       deleteQuestionIndex: null,
+      updateLibraryDialogIsVisible: false,
+      updateToLibrary: null,
+      updateControl: null,
     };
   },
   props: {
@@ -251,8 +290,22 @@ export default {
     openLibrary(libraryId) {
       this.$emit('open-library', libraryId);
     },
-    updateLibrary(idx, libraryId) {
-      this.$emit('update-library-questions', this.controls[idx]);
+    async updateLibrary(idx, control) {
+      this.updateControl = control;
+      const { data } = await api.get(`/surveys/${control.libraryId}`);
+      this.updateToLibrary = data;
+      this.updateLibraryDialogIsVisible = true;
+    },
+    updateLibraryConfirmed() {
+      this.updateToLibrary = null;
+      this.updateLibraryDialogIsVisible = false;
+      this.$emit('update-library-questions', this.updateControl);
+      this.updateControl = null;
+    },
+    updateLibraryCancelled() {
+      this.updateToLibrary = null;
+      this.updateLibraryDialogIsVisible = false;
+      this.updateControl = null;
     },
   },
 };

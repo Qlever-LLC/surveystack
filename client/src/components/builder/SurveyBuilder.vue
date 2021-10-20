@@ -444,6 +444,7 @@ export default {
       this.library = false;
     },
     updateLibraryQuestions(control) {
+      //clear selected control and re-add questions from library
       control.children = [];
       this.addQuestionsFromLibrary(control.libraryId, control);
     },
