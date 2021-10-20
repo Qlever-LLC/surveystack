@@ -18,6 +18,7 @@
     "client:build": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run build --no-prefix --stream",
     "client:test": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run test --no-prefix --stream",
     "client:lint": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run lint --no-prefix --stream",
+    "client:storybook": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run storybook --no-prefix --stream",
     "server:start": "cross-env FORCE_COLOR=1 lerna --scope surveystack-server run start --no-prefix --stream",
     "server:build": "cross-env FORCE_COLOR=1 lerna --scope surveystack-server run build --no-prefix --stream",
     "build": "cross-env FORCE_COLOR=1 lerna run build --parallel --stream"
