@@ -410,8 +410,8 @@ export default {
       };
 
       // copy questions from library survey to question group
-      for (let i = 0; i < controlsFromLibrary.length; i++) {
-        const controlToAdd = controlsFromLibrary[i];
+      rootGroup.children = controlsFromLibrary.map((control) => {
+        let controlToAdd = { ...control }; //create shallow copy
         controlToAdd.id = new ObjectID().toString();
         if (controlToAdd.libraryId) {
           controlToAdd.libraryIsInherited = true;
@@ -431,8 +431,8 @@ export default {
             control.libraryVersion = data.latestVersion;
           }
         });
-        rootGroup.children.push(controlToAdd);
-      }
+        return controlToAdd;
+      });
 
       this.library = false;
     },
