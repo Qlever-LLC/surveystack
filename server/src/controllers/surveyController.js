@@ -5,7 +5,6 @@ import boom from '@hapi/boom';
 import { db } from '../db';
 
 import { checkSurvey, forAllControlsRecursive } from '../helpers/surveys';
-import { diffSurveyVersions } from '../helpers/surveyDiff';
 import rolesService from '../services/roles.service';
 
 const col = 'surveys';
@@ -513,18 +512,6 @@ const checkForLibraryUpdates = async (req, res) => {
   return res.send(updatableSurveys);
 };
 
-const getSurveyDiff = async (req, res) => {
-  const { id, oldVersion, newVersion } = req.params;
-
-  const survey = await db.collection(col).findOne({ _id: new ObjectId(id) });
-  if (!survey) {
-    throw boom.notFound(`No entity with _id exists: ${id}`);
-  }
-
-  const diff = diffSurveyVersions(survey, oldVersion, newVersion)
-  return res.send(diff);
-}
-
 export default {
   getSurveys,
   getSurveyPage,
@@ -536,5 +523,4 @@ export default {
   updateSurvey,
   deleteSurvey,
   checkForLibraryUpdates,
-  getSurveyDiff,
 };

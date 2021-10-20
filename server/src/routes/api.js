@@ -133,7 +133,6 @@ router.get(
   catchErrors(surveyController.getSurveyLibraryConsumers)
 );
 router.get('/surveys/page', catchErrors(surveyController.getSurveyPage));
-router.get('/surveys/diff/:id/:oldVersion/:newVersion', catchErrors(surveyController.getSurveyDiff));
 router.get('/surveys/:id', catchErrors(surveyController.getSurvey));
 router.get('/surveys/check-for-updates/:id', catchErrors(surveyController.checkForLibraryUpdates));
 router.post(

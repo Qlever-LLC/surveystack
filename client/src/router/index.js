@@ -129,14 +129,14 @@ const routes = [
     beforeEnter: guard,
   },
   {
+    path: '/surveys/diff',
+    name: 'surveys-diff',
+    component: SurveysDiff,
+  },
+  {
     path: '/surveys/:id',
     name: 'surveys-detail',
     component: SurveysDetail,
-  },
-  {
-    path: '/surveys/diff/:id/:oldVersion/:newVersion',
-    name: 'surveys-diff',
-    component: SurveysDiff,
   },
 
   {
