@@ -1,8 +1,15 @@
 <template>
-  <v-expansion-panels flat multiple v-model="mainPanelOpen">
+  <v-expansion-panels flat multiple v-model="mainPanelState">
     <v-expansion-panel>
       <v-expansion-panel-header class="pl-0 pt-0">
         <h3>Change details</h3>
+        <v-switch
+          class="flex-grow-0 mr-6"
+          v-if="isOpen"
+          @click.native.stop=""
+          v-model="showUnchangeds"
+          :label="`show unchangeds`"
+        ></v-switch>
       </v-expansion-panel-header>
       <v-expansion-panel-content>
         <v-expansion-panels>
@@ -19,7 +26,7 @@
               </v-row>
             </v-expansion-panel-header>
             <v-expansion-panel-content>
-              <v-simple-table fixed-header height="300px">
+              <v-simple-table fixed-header>
                 <template v-slot:default>
                   <thead>
                     <tr>
@@ -45,7 +52,7 @@
 
 <script>
 import { availableControls } from '@/utils/surveyConfig';
-import { diffSurveyVersions } from '@/utils/surveyDiff';
+import { diffSurveyVersions, changeType } from '@/utils/surveyDiff';
 import _ from 'lodash';
 
 import { createSurvey } from '@/utils/surveys';
@@ -76,11 +83,15 @@ export default {
     oldRevision: { type: Object, default: oldRevision },
     newRevision: { type: Object, default: newRevision },
     defaultOpen: Boolean,
+    defaultShowUnchangeds: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
-      selectedControlId: null,
-      mainPanelOpen: [],
+      isOpen: this.defaultOpen,
+      showUnchangeds: this.defaultShowUnchangeds,
     };
   },
 
@@ -126,28 +137,21 @@ export default {
           })
           .flat();
       };
-      return convert(childrenOf(null));
+      let result = convert(childrenOf(null));
+      if (!this.showUnchangeds) {
+        result = result.filter((diff) => diff.changeType !== changeType.UNCHANGED);
+      }
+      return result;
     },
-    // previewResources() {
-    //   return {
-    //     survey: this.survey,
-    //     previewVersion: this.previewVersion,
-    //   };
-    // },
+    mainPanelState: {
+      get() {
+        return this.isOpen ? [0] : [];
+      },
+      set(state) {
+        this.isOpen = state.includes(0);
+      },
+    },
   },
-  // watch: {
-  //   previewResources({ survey, previewVersion }) {
-  //     console.log({ survey, previewVersion });
-  //     if (survey && previewVersion) {
-  //       const submission = submissionUtils.createSubmissionFromSurvey({
-  //         survey,
-  //         version: previewVersion,
-  //         instance: null,
-  //       });
-  //       // this.$store.dispatch('draft/init', { survey, submission, persist: false });
-  //     }
-  //   },
-  // },
   methods: {
     getControlChangeList(controlId) {
       const controlDiff = this.diff && this.diff.find((d) => d.controlId === controlId);
@@ -167,11 +171,6 @@ export default {
         })
         .filter((c) => c !== null);
     },
-  },
-  mounted() {
-    if (this.defaultOpen) {
-      this.mainPanelOpen = [0];
-    }
   },
 };
 </script>
