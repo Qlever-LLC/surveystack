@@ -44,6 +44,7 @@ const newRevision = _.cloneDeep(oldRevision);
 newRevision.controls[0].name = 'changed_name';
 newRevision.controls[2].children[0].options.readOnly = true;
 newRevision.controls.splice(1, 1);
+newRevision.controls.push(createControlInstance({ type: 'number', name: 'number_3' }));
 Primary.args = {
   oldRevision,
   newRevision,

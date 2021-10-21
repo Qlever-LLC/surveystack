@@ -2,7 +2,20 @@
   <v-expansion-panels flat multiple v-model="mainPanelState">
     <v-expansion-panel>
       <v-expansion-panel-header class="pl-0 pt-0">
-        <h3>Change details</h3>
+        <h3 class="flex-grow-0 mr-4">Change details</h3>
+
+        <v-tooltip bottom v-for="{ icon, color, count, tooltip } in changeSummaryList" :key="icon">
+          <template v-slot:activator="{ on, attrs }">
+            <span class="flex-grow-0 mr-2" v-bind="attrs" v-on="on"
+              ><v-badge overlap :color="color" :content="count.toString()">
+                <v-icon :color="color">{{ icon }}</v-icon>
+              </v-badge></span
+            >
+          </template>
+          <span>{{ tooltip }}</span>
+        </v-tooltip>
+
+        <v-spacer />
         <v-switch
           class="flex-grow-0 mr-6"
           v-if="isOpen"
@@ -92,6 +105,11 @@ export default {
     return {
       isOpen: this.defaultOpen,
       showUnchangeds: this.defaultShowUnchangeds,
+      colors: {
+        changed: 'amber lighten-1',
+        added: 'green lighten-1',
+        removed: 'red lighten-1',
+      },
     };
   },
 
@@ -112,11 +130,6 @@ export default {
         const match = availableControls.find((c) => c.type === control.type);
         return match ? match.icon : '';
       };
-      const changeColors = {
-        changed: 'amber',
-        added: 'green',
-        removed: 'red',
-      };
       const convert = (diffs, depth = 0) => {
         return diffs
           .map((controlDiff) => {
@@ -127,7 +140,7 @@ export default {
                 id: control.id,
                 name: control.name,
                 icon: findIcon(control),
-                color: changeColors[controlDiff.changeType],
+                color: this.colors[controlDiff.changeType],
                 changeType: controlDiff.changeType,
                 path: controlDiff.path,
                 depth,
@@ -142,6 +155,30 @@ export default {
         result = result.filter((diff) => diff.changeType !== changeType.UNCHANGED);
       }
       return result;
+    },
+    changeSummaryList() {
+      let changed = 0;
+      let removed = 0;
+      let added = 0;
+      for (const item of this.items) {
+        switch (item.changeType) {
+          case changeType.CHANGED:
+            changed++;
+            break;
+          case changeType.REMOVED:
+            removed++;
+            break;
+          case changeType.ADDED:
+            added++;
+            break;
+        }
+      }
+      const info = (count, color, icon, tooltip) => ({ count, color, icon, tooltip });
+      return [
+        info(added, this.colors.added, 'mdi-book-plus', `${changed} added`),
+        info(changed, this.colors.changed, 'mdi-book-edit', `${changed} changed`),
+        info(removed, this.colors.removed, 'mdi-book-remove', `${changed} removed`),
+      ].filter((i) => i.count > 0);
     },
     mainPanelState: {
       get() {
