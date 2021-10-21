@@ -42,9 +42,11 @@ oldRevision.controls.push(
 );
 const newRevision = _.cloneDeep(oldRevision);
 newRevision.controls[0].name = 'changed_name';
+newRevision.controls[2].children[0].options.readOnly = true;
 newRevision.controls.splice(1, 1);
 Primary.args = {
   oldRevision,
   newRevision,
   defaultOpen: true,
+  showUnchangeds: false,
 };
