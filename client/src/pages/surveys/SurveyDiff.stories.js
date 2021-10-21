@@ -13,6 +13,7 @@ export default {
   argTypes: {
     oldRevision: 'object',
     newRevision: 'object',
+    defaultOpen: Boolean,
   },
 };
 
@@ -45,4 +46,5 @@ newRevision.controls.splice(1, 1);
 Primary.args = {
   oldRevision,
   newRevision,
+  defaultOpen: true,
 };

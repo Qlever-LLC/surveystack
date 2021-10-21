@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panels flat>
+  <v-expansion-panels flat multiple v-model="mainPanelOpen">
     <v-expansion-panel>
       <v-expansion-panel-header class="pl-0 pt-0">
         <h3>Change details</h3>
@@ -44,7 +44,6 @@
 </template>
 
 <script>
-import appControl from '@/components/survey/drafts/Control.vue';
 import { availableControls } from '@/utils/surveyConfig';
 import { diffSurveyVersions } from '@/utils/surveyDiff';
 import _ from 'lodash';
@@ -76,10 +75,12 @@ export default {
   props: {
     oldRevision: { type: Object, default: oldRevision },
     newRevision: { type: Object, default: newRevision },
+    defaultOpen: Boolean,
   },
   data() {
     return {
       selectedControlId: null,
+      mainPanelOpen: [],
     };
   },
 
@@ -166,6 +167,11 @@ export default {
         })
         .filter((c) => c !== null);
     },
+  },
+  mounted() {
+    if (this.defaultOpen) {
+      this.mainPanelOpen = [0];
+    }
   },
 };
 </script>
