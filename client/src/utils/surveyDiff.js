@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import flatten from 'flat';
 
 export const changeType = {
   CHANGED: 'changed',
@@ -9,7 +10,6 @@ export const changeType = {
 const { CHANGED, REMOVED, ADDED, UNCHANGED } = changeType;
 
 const diffObject = (oldObj, newObj, fields) => {
-  // TODO read change types from constants
   return fields.reduce((diff, field) => {
     const oldValue = _.get(oldObj, field);
     const newValue = _.get(newObj, field);
@@ -45,62 +45,45 @@ const diffObject = (oldObj, newObj, fields) => {
 
 class CantCompareError extends Error {}
 
+const getComparableFields = (a, b) => {
+  const [flatA, flatB] = [a, b].map((c) => flatten(c, { safe: true }));
+  return Object.keys({ ...flatA, ...flatB });
+};
+
 export const diffControls = (oldControl, newControl) => {
   if (oldControl.type !== newControl.type) {
     throw new CantCompareError("Control types don't match");
   }
   const controlType = oldControl.type;
-  const COMMON_CONTROL_FIELDS = [
-    'name',
-    'label',
-    'hint',
-    'options.readOnly',
-    'options.required',
-    'options.redacted',
-    'options.relevance.enabled',
-    'options.relevance.code',
-    'options.constraint.enabled',
-    'options.constraint.code',
-    'options.calculate.enabled',
-    'options.calculate.code',
-    'options.apiCompose.enabled',
-    'options.apiCompose.code',
-  ];
 
-  let diff = {};
-  const addToDiff = (fields) => {
-    diff = { ...diffObject(oldControl, newControl, fields), ...diff };
-  };
+  // Collect all the object paths that we should compare
+  let diffFields = [];
+  let addFileds = (fields) => (diffFields = _.uniq([...diffFields, ...fields]));
+  let removeFileds = (fields) => _.pull(diffFields, ...fields);
 
-  addToDiff(COMMON_CONTROL_FIELDS);
+  // get all the object paths from the controls
+  // once we have schemas for the control object, we shoul use that instead
+  addFileds(getComparableFields(oldControl, newControl));
+  // remove fields we don't need in the diff
+  removeFileds(['hint', 'children']);
 
-  if (['string', 'number', 'script'].includes(controlType)) {
-    addToDiff(['value']);
-  }
-  if ('selectSingle' === controlType) {
-    addToDiff(['options.allowCustomSelection']);
-  }
   if ('matrix' === controlType) {
-    addToDiff(['options.config.addRowLabel']);
-    const MATRIX_COL_FIELDS = [
-      'label',
-      'value',
-      'tags',
-      'type',
-      'resource',
-      'multiple',
-      'required',
-      'redacted',
-      'scaleWidth',
-    ];
     const colCount = Math.max(oldControl.options.source.content.length, newControl.options.source.content.length);
+    removeFileds(['options.source.content']);
     for (let i = 0; i < colCount; ++i) {
-      addToDiff(MATRIX_COL_FIELDS.map((f) => `options.config.source.content[${i}].${f}`));
+      const path = `options.source.content[${i}]`;
+      const fields = getComparableFields(_.get(oldControl, path), _.get(newControl, path));
+      addFileds(fields.map((f) => `${path}.${f}`));
     }
   }
-  return diff;
+  return diffObject(oldControl, newControl, diffFields);
 };
 
+/**
+ * Returns a flat list of all the controls in the revision
+ * @param {Object} revision
+ * @returns [{control: Object, parentId: string, childIndex: number, path: string}, ...]
+ */
 export const normalizedSurveyControls = (revision) => {
   const { controls } = revision;
 
@@ -131,6 +114,7 @@ export const diffSurveyVersions = (oldRevision, newRevision) => {
   for (const id of _.union(newControlIds, oldControlIds)) {
     const result = { controlId: id };
 
+    // Add the old version to the result
     if (oldControlIds.includes(id)) {
       const { control: oldControl, parentId: oldParentId, childIndex: oldChildIndex, path: oldPath } = oldControls[id];
       Object.assign(result, {
@@ -142,6 +126,7 @@ export const diffSurveyVersions = (oldRevision, newRevision) => {
       });
     }
 
+    // Add the new version to the result
     if (newControlIds.includes(id)) {
       const { control: newControl, parentId: newParentId, childIndex: newChildIndex, path: newPath } = newControls[id];
       Object.assign(result, {
@@ -153,6 +138,7 @@ export const diffSurveyVersions = (oldRevision, newRevision) => {
       });
     }
 
+    // Add the diff to the result
     if (commonIds.includes(id)) {
       const diff = diffControls(result.oldControl, result.newControl);
       const changed = Object.values(diff).some(({ changeType }) => changeType !== UNCHANGED);
