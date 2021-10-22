@@ -30,8 +30,7 @@ const buildStory = (args) => {
 };
 
 export const Simple = buildStory(() => {
-  const oldRevision = createRevision(1);
-  oldRevision.controls.push(
+  const oldControls = [
     createControlInstance({ type: 'number', name: 'number_1' }),
     createControlInstance({ type: 'string', name: 'string_1' }),
     createControlInstance({
@@ -41,47 +40,46 @@ export const Simple = buildStory(() => {
         createControlInstance({ type: 'number', name: 'number_2' }),
         createControlInstance({ type: 'string', name: 'string_2' }),
       ],
-    })
-  );
+    }),
+  ];
 
-  const newRevision = _.cloneDeep(oldRevision);
-  newRevision.controls[0].name = 'changed_name';
-  newRevision.controls[2].children[0].options.readOnly = true;
-  newRevision.controls.splice(1, 1);
-  newRevision.controls.unshift(createControlInstance({ type: 'number', name: 'number_3' }));
+  const newControls = _.cloneDeep(oldControls);
+  newControls[0].name = 'changed_name';
+  newControls[2].children[0].options.readOnly = true;
+  newControls.splice(1, 1);
+  newControls.unshift(createControlInstance({ type: 'number', name: 'number_3' }));
 
   return {
-    oldRevision,
-    newRevision,
+    oldControls,
+    newControls,
     defaultOpen: true,
     showUnchanged: false,
   };
 });
 
 export const Matrix = buildStory(() => {
-  const oldRevision = createRevision(1);
-  oldRevision.controls.push(
+  const oldControls = [
     createControlInstance({ type: 'matrix', name: 'matrix_1' }),
     createControlInstance({
       type: 'page',
       name: 'page_1',
       children: [createControlInstance({ type: 'matrix', name: 'matrix_2' })],
-    })
-  );
+    }),
+  ];
 
-  const newRevision = _.cloneDeep(oldRevision);
-  newRevision.controls[0].name = 'changed_name';
-  newRevision.controls[0].options.source.content[0].label = 'Col One';
-  newRevision.controls[0].options.source.content[0].type = 'text';
-  newRevision.controls[1].children[0].options.readOnly = true;
-  newRevision.controls[1].children[0].options.source.content[0].label = 'First Col';
-  newRevision.controls[1].children[0].options.source.content[0].type = 'text';
-  newRevision.controls[1].children[0].options.source.content[0].scaleWidth = 120;
-  newRevision.controls[1].children[0].options.source.content[1].multiple = true;
+  const newControls = _.cloneDeep(oldControls);
+  newControls[0].name = 'changed_name';
+  newControls[0].options.source.content[0].label = 'Col One';
+  newControls[0].options.source.content[0].type = 'text';
+  newControls[1].children[0].options.readOnly = true;
+  newControls[1].children[0].options.source.content[0].label = 'First Col';
+  newControls[1].children[0].options.source.content[0].type = 'text';
+  newControls[1].children[0].options.source.content[0].scaleWidth = 120;
+  newControls[1].children[0].options.source.content[1].multiple = true;
 
   return {
-    oldRevision,
-    newRevision,
+    oldControls,
+    newControls,
     defaultOpen: true,
     showUnchanged: false,
   };
@@ -92,8 +90,8 @@ const bigRevisions = [{"dateCreated":{"$date":"1970-01-01T00:00:00.000Z"},"versi
 
 export const AllTypes = buildStory(() => {
   return {
-    oldRevision: bigRevisions[0],
-    newRevision: bigRevisions[2],
+    oldControls: bigRevisions[0].controls,
+    newControls: bigRevisions[2].controls,
     defaultOpen: true,
     showUnchanged: false,
   };

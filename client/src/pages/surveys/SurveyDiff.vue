@@ -72,30 +72,11 @@ import { availableControls } from '@/utils/surveyConfig';
 import { diffSurveyVersions, changeType } from '@/utils/surveyDiff';
 import _ from 'lodash';
 
-import { createSurvey } from '@/utils/surveys';
-import { createControlInstance } from '@/utils/surveyConfig';
-const oldRevision = { ...createSurvey({}).revisions[0], version: 1 };
-oldRevision.controls.push(
-  createControlInstance({ type: 'number', name: 'number_1' }),
-  createControlInstance({ type: 'string', name: 'string_1' }),
-  createControlInstance({
-    type: 'page',
-    name: 'page_1',
-    children: [
-      createControlInstance({ type: 'number', name: 'number_2' }),
-      createControlInstance({ type: 'string', name: 'string_2' }),
-    ],
-  })
-);
-const newRevision = _.cloneDeep(oldRevision);
-newRevision.controls[0].name = 'changed_name';
-newRevision.controls.splice(1, 1);
-
 export default {
   name: 'survey-diff',
   props: {
-    oldRevision: { type: Object, default: oldRevision },
-    newRevision: { type: Object, default: newRevision },
+    oldControls: Array,
+    newControls: Array,
     defaultOpen: Boolean,
     defaultShowUnchanged: {
       type: Boolean,
@@ -116,8 +97,8 @@ export default {
 
   computed: {
     diff() {
-      if (this.oldRevision && this.newRevision) {
-        return diffSurveyVersions(this.oldRevision, this.newRevision);
+      if (this.oldControls && this.newControls) {
+        return diffSurveyVersions(this.oldControls, this.newControls);
       }
       return [];
     },

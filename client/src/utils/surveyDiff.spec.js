@@ -2,15 +2,6 @@ import { normalizedSurveyControls, diffControls, changeType, diffSurveyVersions 
 import _, { defaults } from 'lodash';
 import { createControlInstance } from './surveyConfig';
 
-function createRevision(overrides) {
-  const defaults = {
-    dateCreated: new Date(),
-    version: 1,
-    controls: [],
-  };
-  return { ...defaults, ...overrides };
-}
-
 function sameItems(arr1, arr2) {
   return expect(new Set(arr1)).toEqual(new Set(arr2));
 }
@@ -21,7 +12,7 @@ describe.only('surveyDiff', () => {
       const num = createControlInstance({ type: 'number', name: 'number_1' });
       const str = createControlInstance({ type: 'string', name: 'string_1' });
       const page = createControlInstance({ type: 'page', name: 'page_1', children: [num, str] });
-      const normalized = normalizedSurveyControls(createRevision({ controls: [page] }));
+      const normalized = normalizedSurveyControls([page]);
       sameItems(Object.keys(normalized), [num.id, str.id, page.id]);
     });
   });
@@ -44,10 +35,8 @@ describe.only('surveyDiff', () => {
       const oldNum = createControlInstance({ type: 'number', name: 'number_1', label: 'foo' });
       const newNum = _.cloneDeep(oldNum);
       newNum.name += 'changed';
-      const oldRevision = createRevision({ version: 1, controls: [oldNum] });
-      const newRevision = createRevision({ version: 2, controls: [newNum] });
 
-      const diff = diffSurveyVersions(oldRevision, newRevision);
+      const diff = diffSurveyVersions([oldNum], [newNum]);
 
       expect(diff).toHaveLength(1);
       const numDiff = diff[0];
@@ -63,10 +52,8 @@ describe.only('surveyDiff', () => {
       const newMat = _.cloneDeep(oldMat);
       newMat.options.source.config.addRowLabel = 'Insert Row';
       newMat.options.source.content[0].label = 'First Col';
-      const oldRevision = createRevision({ version: 1, controls: [oldMat] });
-      const newRevision = createRevision({ version: 2, controls: [newMat] });
 
-      const diff = diffSurveyVersions(oldRevision, newRevision);
+      const diff = diffSurveyVersions([oldMat], [newMat]);
 
       expect(diff).toHaveLength(1);
       const matDiff = diff[0];

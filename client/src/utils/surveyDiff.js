@@ -81,12 +81,10 @@ export const diffControls = (oldControl, newControl) => {
 
 /**
  * Returns a flat list of all the controls in the revision
- * @param {Object} revision
+ * @param {Array} controls
  * @returns [{control: Object, parentId: string, childIndex: number, path: string}, ...]
  */
-export const normalizedSurveyControls = (revision) => {
-  const { controls } = revision;
-
+export const normalizedSurveyControls = (controls) => {
   const normalize = (controls, parentId = null, parentPath = ['data']) => {
     let normalized = {};
     for (const [childIndex, control] of controls.entries()) {
@@ -103,9 +101,9 @@ export const normalizedSurveyControls = (revision) => {
   return normalize(controls);
 };
 
-export const diffSurveyVersions = (oldRevision, newRevision) => {
-  const oldControls = normalizedSurveyControls(oldRevision);
-  const newControls = normalizedSurveyControls(newRevision);
+export const diffSurveyVersions = (oldControls, newControls) => {
+  oldControls = normalizedSurveyControls(oldControls);
+  newControls = normalizedSurveyControls(newControls);
   const oldControlIds = Object.keys(oldControls);
   const newControlIds = Object.keys(newControls);
   const commonIds = _.intersection(oldControlIds, newControlIds);
