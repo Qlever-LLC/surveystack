@@ -72,7 +72,7 @@ export const diffControls = (oldControl, newControl) => {
     removeFileds(['options.source.content']);
     for (let i = 0; i < colCount; ++i) {
       const path = `options.source.content[${i}]`;
-      const fields = getComparableFields(_.get(oldControl, path), _.get(newControl, path));
+      const fields = getComparableFields(_.get(oldControl, path, {}), _.get(newControl, path, {}));
       addFileds(fields.map((f) => `${path}.${f}`));
     }
   }
