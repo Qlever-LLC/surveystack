@@ -21,12 +21,16 @@
           v-if="isOpen"
           @click.native.stop=""
           v-model="showUnchangeds"
-          :label="`show unchangeds`"
+          label="show unchanged"
         ></v-switch>
       </v-expansion-panel-header>
       <v-expansion-panel-content>
         <v-expansion-panels>
-          <v-expansion-panel v-for="item in items" :disabled="!item.isChanged" :key="item.id">
+          <v-expansion-panel
+            v-for="item in showUnchangeds ? items : changedItems"
+            :disabled="!item.isChanged"
+            :key="item.id"
+          >
             <v-expansion-panel-header>
               <v-row>
                 <div class="v-treeview-node__level" v-for="index in item.depth" :key="index" />
@@ -44,7 +48,7 @@
                   <thead>
                     <tr>
                       <th class="text-left">Property</th>
-                      <th class="text-left">Change from v{{ oldRevision.version }} to v{{ newRevision.version }}</th>
+                      <th class="text-left">Change</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -93,7 +97,7 @@ export default {
     oldRevision: { type: Object, default: oldRevision },
     newRevision: { type: Object, default: newRevision },
     defaultOpen: Boolean,
-    defaultShowUnchangeds: {
+    defaultShowUnchanged: {
       type: Boolean,
       default: true,
     },
@@ -101,7 +105,7 @@ export default {
   data() {
     return {
       isOpen: this.defaultOpen,
-      showUnchangeds: this.defaultShowUnchangeds,
+      showUnchangeds: this.defaultShowUnchanged,
       colors: {
         changed: 'amber lighten-1',
         added: 'green lighten-1',
@@ -149,11 +153,26 @@ export default {
           })
           .flat();
       };
-      let result = convert(childrenOf(null));
-      if (!this.showUnchangeds) {
-        result = result.filter((diff) => diff.changeType !== changeType.UNCHANGED);
-      }
-      return result;
+      return convert(childrenOf(null));
+    },
+    changedItems() {
+      const hasChange = (itemIdx) => {
+        const item = this.items[itemIdx];
+        // check if the item is changed
+        if (item.changeType !== changeType.UNCHANGED) {
+          return true;
+        }
+        // check if any of its children are changed
+        let nextIdx = itemIdx + 1;
+        while (nextIdx < this.items.length && this.items[nextIdx].depth > item.depth) {
+          if (this.items[itemIdx].changeType !== changeType.UNCHANGED) {
+            return true;
+          }
+          nextIdx++;
+        }
+        return false;
+      };
+      return this.items.filter((_, idx) => hasChange(idx));
     },
     changeSummaryList() {
       let changed = 0;
