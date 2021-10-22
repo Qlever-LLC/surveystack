@@ -54,7 +54,7 @@ export const Simple = buildStory(() => {
     oldRevision,
     newRevision,
     defaultOpen: true,
-    showUnchangeds: false,
+    showUnchanged: false,
   };
 });
 
@@ -83,7 +83,7 @@ export const Matrix = buildStory(() => {
     oldRevision,
     newRevision,
     defaultOpen: true,
-    showUnchangeds: false,
+    showUnchanged: false,
   };
 });
 
@@ -95,6 +95,6 @@ export const AllTypes = buildStory(() => {
     oldRevision: bigRevisions[0],
     newRevision: bigRevisions[2],
     defaultOpen: true,
-    showUnchangeds: false,
+    showUnchanged: false,
   };
 });

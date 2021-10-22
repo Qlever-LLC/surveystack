@@ -1,7 +1,7 @@
 <template>
   <v-expansion-panels flat multiple v-model="mainPanelState">
     <v-expansion-panel>
-      <v-expansion-panel-header class="pl-0 pt-0">
+      <v-expansion-panel-header class="pt-0">
         <h3 class="flex-grow-0 mr-6">Change details</h3>
 
         <v-tooltip bottom v-for="{ icon, color, count, tooltip } in changeSummaryList" :key="icon">
@@ -20,14 +20,14 @@
           class="flex-grow-0 mr-6"
           v-if="isOpen"
           @click.native.stop=""
-          v-model="showUnchangeds"
+          v-model="showUnchanged"
           label="show unchanged"
         ></v-switch>
       </v-expansion-panel-header>
       <v-expansion-panel-content>
         <v-expansion-panels>
           <v-expansion-panel
-            v-for="item in showUnchangeds ? items : changedItems"
+            v-for="item in showUnchanged ? items : changedItems"
             :disabled="!item.isChanged"
             :key="item.id"
           >
@@ -92,7 +92,7 @@ newRevision.controls[0].name = 'changed_name';
 newRevision.controls.splice(1, 1);
 
 export default {
-  name: 'app-survey-diff',
+  name: 'survey-diff',
   props: {
     oldRevision: { type: Object, default: oldRevision },
     newRevision: { type: Object, default: newRevision },
@@ -105,7 +105,7 @@ export default {
   data() {
     return {
       isOpen: this.defaultOpen,
-      showUnchangeds: this.defaultShowUnchanged,
+      showUnchanged: this.defaultShowUnchanged,
       colors: {
         changed: 'amber lighten-1',
         added: 'green lighten-1',
