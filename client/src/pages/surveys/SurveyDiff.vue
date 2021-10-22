@@ -116,10 +116,10 @@ export default {
         const match = availableControls.find((c) => c.type === control.type);
         return match ? match.icon : '';
       };
+      const getSortKey = (diff) => (_.isNumber(diff.newChildIndex) ? diff.newChildIndex : diff.oldChildIndex);
       const convert = (diffs, depth = 0) => {
         // sort to make the order similart to the original
-        // TODO find a better way to do this
-        return _.sortBy(diffs, ['newChildIndex', 'oldChildIndex'])
+        return _.sortBy(diffs, getSortKey)
           .map((controlDiff) => {
             const control = controlDiff.newControl || controlDiff.oldControl;
             return [
