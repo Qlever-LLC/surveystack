@@ -2,12 +2,12 @@
   <v-expansion-panels flat multiple v-model="mainPanelState">
     <v-expansion-panel>
       <v-expansion-panel-header class="pl-0 pt-0">
-        <h3 class="flex-grow-0 mr-4">Change details</h3>
+        <h3 class="flex-grow-0 mr-6">Change details</h3>
 
         <v-tooltip bottom v-for="{ icon, color, count, tooltip } in changeSummaryList" :key="icon">
           <template v-slot:activator="{ on, attrs }">
             <span class="flex-grow-0 mr-2" v-bind="attrs" v-on="on"
-              ><v-badge overlap :color="color" :content="count.toString()">
+              ><v-badge overlap bordered left :color="color" :content="count.toString()">
                 <v-icon :color="color">{{ icon }}</v-icon>
               </v-badge></span
             >
@@ -26,7 +26,7 @@
       </v-expansion-panel-header>
       <v-expansion-panel-content>
         <v-expansion-panels>
-          <v-expansion-panel v-for="item in items" :key="item.id">
+          <v-expansion-panel v-for="item in items" :disabled="!item.isChanged" :key="item.id">
             <v-expansion-panel-header>
               <v-row>
                 <div class="v-treeview-node__level" v-for="index in item.depth" :key="index" />
@@ -89,9 +89,6 @@ newRevision.controls.splice(1, 1);
 
 export default {
   name: 'app-survey-diff',
-  // components: {
-  //   appControl,
-  // },
   props: {
     oldRevision: { type: Object, default: oldRevision },
     newRevision: { type: Object, default: newRevision },
@@ -142,9 +139,11 @@ export default {
                 icon: findIcon(control),
                 color: this.colors[controlDiff.changeType],
                 changeType: controlDiff.changeType,
+                isChanged: controlDiff.changeType === changeType.CHANGED,
                 path: controlDiff.path,
                 depth,
               },
+              // TODO sort children by old/newChildIndex
               ...convert(childrenOf(control.id), depth + 1),
             ];
           })
@@ -175,9 +174,9 @@ export default {
       }
       const info = (count, color, icon, tooltip) => ({ count, color, icon, tooltip });
       return [
-        info(added, this.colors.added, 'mdi-book-plus', `${changed} added`),
+        info(added, this.colors.added, 'mdi-book-plus', `${added} added`),
         info(changed, this.colors.changed, 'mdi-book-edit', `${changed} changed`),
-        info(removed, this.colors.removed, 'mdi-book-remove', `${changed} removed`),
+        info(removed, this.colors.removed, 'mdi-book-remove', `${removed} removed`),
       ].filter((i) => i.count > 0);
     },
     mainPanelState: {
