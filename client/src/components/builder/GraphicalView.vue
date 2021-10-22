@@ -162,9 +162,7 @@ import { cloneDeep } from 'lodash';
 import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
 import api from '@/services/api.service';
-import TipTapEditor from '@/components/builder/TipTapEditor';
-import LibraryChangeTypeSelector from '@/components/builder/LibraryChangeTypeSelector';
-import UpdateLibraryDialog from '@/components/builder/UpdateLibraryDialog';
+import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
 
 export default {
   name: 'nested-draggable',

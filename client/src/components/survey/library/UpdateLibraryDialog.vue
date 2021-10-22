@@ -18,9 +18,18 @@
           Note all your modifications if you wish to re-apply them after updating.
         </h3>
       </v-card-text>
-      <survey-diff :old-revision="fromLibraryControl.children" :new-revision="toLibraryRevision.controls"></survey-diff>
+      <survey-diff
+        :old-controls="fromLibraryControl.children"
+        :new-controls="toLibraryRevision.controls"
+        :default-open="false"
+        :default-show-unchanged="false"
+      ></survey-diff>
       <v-card-actions class="mr-3">
-        <v-btn small href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank" text
+        <v-btn
+          small
+          href="https://our-sci.gitlab.io/software/surveystack_tutorials/question_types/"
+          target="_blank"
+          text
           >Learn more...</v-btn
         >
         <v-spacer />
@@ -42,9 +51,9 @@
 
 <script>
 import TipTapEditor from '@/components/builder/TipTapEditor';
-import LibraryChangeTypeSelector from '@/components/builder/LibraryChangeTypeSelector';
+import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
 import SurveyDiff from '@/pages/surveys/SurveyDiff';
-import { toRefs, computed, reactive } from '@vue/composition-api';
+import { computed } from '@vue/composition-api';
 export default {
   components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor },
   props: {
@@ -63,14 +72,10 @@ export default {
   },
   emits: ['ok', 'cancel'],
   setup(props) {
-    const state = reactive({
-      toLibraryRevision: computed(() =>
-        props.toSurvey.revisions.find((revision) => revision.version === props.toSurvey.latestVersion)
-      ),
-    });
-
     return {
-      ...toRefs(state),
+      toLibraryRevision: computed(() => {
+        return props.toSurvey.revisions.find((revision) => revision.version === props.toSurvey.latestVersion);
+      }),
     };
   },
 };

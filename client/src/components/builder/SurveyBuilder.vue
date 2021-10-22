@@ -221,7 +221,7 @@ import moment from 'moment';
 import ObjectID from 'bson-objectid';
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
-import questionLibrary from '@/components/builder/QuestionLibrary.vue';
+import questionLibrary from '@/components/survey/library/QuestionLibrary.vue';
 import controlAdder from '@/components/builder/ControlAdder.vue';
 import surveyDetails from '@/components/builder/SurveyDetails.vue';
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';

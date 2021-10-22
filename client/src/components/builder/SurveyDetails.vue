@@ -125,58 +125,15 @@
             </v-list-item>
             <v-list-item>
               <v-list-item-title>
-                <v-dialog v-model="editLibraryDialogIsVisible" width="700" max-width="75%">
-                  <template v-slot:activator="{ on }">
-                    <v-btn v-on="on" text>
-                      <v-icon color="grey">mdi-library</v-icon>
-                      <div class="ml-1" v-if="!value.meta.isLibrary">
-                        add to library
-                      </div>
-                      <div class="ml-1" v-if="value.meta.isLibrary">
-                        edit library data
-                      </div>
-                    </v-btn>
-                  </template>
-                  <v-card>
-                    <v-card-title>
-                      Add Survey To Library
-                    </v-card-title>
-                    <v-card-text>
-                      <v-text-field :value="value.name" label="Title" readonly />
-                      <h3>Description</h3>
-                      <tip-tap-editor v-model="value.meta.libraryDescription" class="mb-4" />
-                      <h3>Applications</h3>
-                      <tip-tap-editor v-model="value.meta.libraryApplications" class="mb-4" />
-                      <h3>Maintainers</h3>
-                      <tip-tap-editor v-model="value.meta.libraryMaintainers" class="mb-4" />
-                      <h3>Version history</h3>
-                      <tip-tap-editor v-model="value.meta.libraryHistory" class="mb-4" />
-                      <library-change-type-selector
-                        v-if="value.meta.isLibrary"
-                        v-model="value.meta.libraryLastChangeType"
-                        :disabled="false"
-                        label="Latest change type"
-                      />
-                    </v-card-text>
-                    <v-card-actions class="mr-3">
-                      <v-spacer />
-                      <v-btn
-                        @click="
-                          $emit('addToLibrary');
-                          editLibraryDialogIsVisible = false;
-                        "
-                        color="primary"
-                        text
-                      >
-                        <span v-if="!value.meta.isLibrary">Add to library</span>
-                        <span v-if="value.meta.isLibrary">Save</span>
-                      </v-btn>
-                      <v-btn @click="editLibraryDialogIsVisible = false" color="primary" text>
-                        Cancel
-                      </v-btn>
-                    </v-card-actions>
-                  </v-card>
-                </v-dialog>
+                <v-btn @click="editLibraryDialogIsVisible = true" text>
+                  <v-icon color="grey">mdi-library</v-icon>
+                  <div class="ml-1" v-if="!value.meta.isLibrary">
+                    add to library
+                  </div>
+                  <div class="ml-1" v-if="value.meta.isLibrary">
+                    edit library data
+                  </div>
+                </v-btn>
               </v-list-item-title>
             </v-list-item>
             <v-list-item v-if="value.meta.isLibrary">
@@ -240,6 +197,13 @@
             </v-list-item>
           </v-list>
         </v-menu>
+        <edit-library-dialog
+          v-if="editLibraryDialogIsVisible"
+          v-model="editLibraryDialogIsVisible"
+          :library-survey="value"
+          @ok="addToLibrary"
+          @cancel="editLibraryDialogIsVisible = false"
+        />
       </div>
       <div class="d-flex justify-space-between align-center mt-n1">
         <div class="body-2 grey--text caption">
@@ -378,7 +342,8 @@ import appResources from '@/components/builder/Resources.vue';
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import api from '@/services/api.service';
 import { getGroupNameById } from '@/utils/groups';
-import LibraryChangeTypeSelector from '@/components/builder/LibraryChangeTypeSelector';
+import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
+import EditLibraryDialog from '@/components/survey/library/EditLibraryDialog';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -454,6 +419,7 @@ export default {
     },
   },
   components: {
+    EditLibraryDialog,
     LibraryChangeTypeSelector,
     SurveyNameEditor,
     ActiveGroupSelector,
@@ -496,6 +462,11 @@ export default {
     goToSurvey(survey_id) {
       let route = this.$router.resolve(`/surveys/${survey_id}`);
       window.open(route.href, '_blank');
+    },
+    addToLibrary(library) {
+      this.value = library;
+      this.$emit('addToLibrary');
+      this.editLibraryDialogIsVisible = false;
     },
   },
 };
