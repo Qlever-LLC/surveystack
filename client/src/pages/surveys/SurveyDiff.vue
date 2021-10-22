@@ -82,6 +82,10 @@ export default {
       type: Boolean,
       default: true,
     },
+    useControlPathAsId: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -98,7 +102,7 @@ export default {
   computed: {
     diff() {
       if (this.oldControls && this.newControls) {
-        return diffSurveyVersions(this.oldControls, this.newControls);
+        return diffSurveyVersions(this.oldControls, this.newControls, { useControlPathAsId: this.useControlPathAsId });
       }
       return [];
     },
@@ -113,13 +117,15 @@ export default {
         return match ? match.icon : '';
       };
       const convert = (diffs, depth = 0) => {
-        return diffs
+        // sort to make the order similart to the original
+        // TODO find a better way to do this
+        return _.sortBy(diffs, ['newChildIndex', 'oldChildIndex'])
           .map((controlDiff) => {
             const control = controlDiff.newControl || controlDiff.oldControl;
             return [
               {
                 controlDiff,
-                id: control.id,
+                id: controlDiff.matchId,
                 name: control.name,
                 icon: findIcon(control),
                 color: this.colors[controlDiff.changeType],
@@ -189,8 +195,8 @@ export default {
     },
   },
   methods: {
-    getControlChangeList(controlId) {
-      const controlDiff = this.diff && this.diff.find((d) => d.controlId === controlId);
+    getControlChangeList(matchId) {
+      const controlDiff = this.diff && this.diff.find((d) => d.matchId === matchId);
       if (!controlDiff || !controlDiff.diff) {
         return [];
       }

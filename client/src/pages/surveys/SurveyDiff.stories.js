@@ -1,7 +1,8 @@
 import SurveyDiff from './SurveyDiff.vue';
-import { createSurvey } from '@/utils/surveys';
+import { createSurvey, updateControls } from '@/utils/surveys';
 import { createControlInstance } from '@/utils/surveyConfig';
 import _ from 'lodash';
+import ObjectId from 'bson-objectid';
 
 const createRevision = (version = 1) => ({ ...createSurvey({}).revisions[0], version });
 
@@ -11,9 +12,10 @@ export default {
   component: SurveyDiff,
   // More on argTypes: https://storybook.js.org/docs/vue/api/argtypes
   argTypes: {
-    oldRevision: 'object',
-    newRevision: 'object',
+    oldControls: 'object',
+    newControls: 'object',
     defaultOpen: Boolean,
+    useControlPathAsId: Boolean,
   },
 };
 
@@ -82,6 +84,42 @@ export const Matrix = buildStory(() => {
     newControls,
     defaultOpen: true,
     showUnchanged: false,
+  };
+});
+
+export const ControlIdsDifferent = buildStory(() => {
+  const oldControls = [
+    createControlInstance({ type: 'number', name: 'number_1' }),
+    createControlInstance({ type: 'string', name: 'string_1' }),
+    createControlInstance({
+      type: 'page',
+      name: 'page_1',
+      children: [
+        createControlInstance({ type: 'number', name: 'number_2' }),
+        createControlInstance({ type: 'string', name: 'string_2' }),
+      ],
+    }),
+  ];
+
+  let newControls = _.cloneDeep(oldControls);
+  newControls[0].name = 'changed_name';
+  newControls[1].type = 'number';
+  newControls[2].children[0].options.readOnly = true;
+
+  // set new ObjectIDs for all controls
+  newControls = updateControls(newControls, {
+    type: /.*/,
+    replacer: ({ id, ...rest }) => ({ id: new ObjectId().toString(), ...rest }),
+  });
+  // change the type of a control
+  // newControls[0] = createControlInstance({ type: 'string', name: newControls[0].name })
+
+  return {
+    oldControls,
+    newControls,
+    defaultOpen: true,
+    showUnchanged: false,
+    useControlPathAsId: true,
   };
 });
 

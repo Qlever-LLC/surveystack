@@ -65,7 +65,7 @@ export const diffControls = (oldControl, newControl) => {
   // once we have schemas for the control object, we shoul use that instead
   addFileds(getComparableFields(oldControl, newControl));
   // remove fields we don't need in the diff
-  removeFileds(['hint', 'children']);
+  removeFileds(['id', 'hint', 'children']);
 
   if ('matrix' === controlType) {
     const colCount = Math.max(oldControl.options.source.content.length, newControl.options.source.content.length);
@@ -80,16 +80,18 @@ export const diffControls = (oldControl, newControl) => {
 };
 
 /**
- * Returns a flat list of all the controls in the revision
+ * Returns a flat object containing all the controls in the revision
  * @param {Array} controls
- * @returns [{control: Object, parentId: string, childIndex: number, path: string}, ...]
+ * @returns {[id|path]: {control: Object, parentId: string, childIndex: number, path: string}}
  */
-export const normalizedSurveyControls = (controls) => {
-  const normalize = (controls, parentId = null, parentPath = ['data']) => {
+export const normalizedSurveyControls = (controls, { useControlPathAsId } = {}) => {
+  const normalize = (controls, parentId = null, parentPath = []) => {
     let normalized = {};
     for (const [childIndex, control] of controls.entries()) {
       const path = [...parentPath, control.name];
-      normalized[control.id] = { control, parentId, childIndex, path: path.join('.') };
+      const strPath = path.join('.');
+      const key = useControlPathAsId ? strPath : control.id;
+      normalized[key] = { control, parentId, childIndex, path: strPath };
 
       // "page" and "group" types
       if (_.isArray(control.children)) {
@@ -101,54 +103,56 @@ export const normalizedSurveyControls = (controls) => {
   return normalize(controls);
 };
 
-export const diffSurveyVersions = (oldControls, newControls) => {
-  oldControls = normalizedSurveyControls(oldControls);
-  newControls = normalizedSurveyControls(newControls);
+export const diffSurveyVersions = (oldControls, newControls, { useControlPathAsId } = {}) => {
+  oldControls = normalizedSurveyControls(oldControls, { useControlPathAsId });
+  newControls = normalizedSurveyControls(newControls, { useControlPathAsId });
   const oldControlIds = Object.keys(oldControls);
   const newControlIds = Object.keys(newControls);
-  const commonIds = _.intersection(oldControlIds, newControlIds);
-  const results = [];
+  const matchedIds = _.intersection(oldControlIds, newControlIds)
+    // don't add controls with different types to matches (can happen when useControlPathAsId: true)
+    .filter((id) => oldControls[id].control.type === newControls[id].control.type);
+  const removedIds = _.without(oldControlIds, ...matchedIds);
+  const addedIds = _.without(newControlIds, ...matchedIds);
 
-  for (const id of _.union(newControlIds, oldControlIds)) {
-    const result = { controlId: id };
+  const getOldProps = (id) => {
+    const { control: oldControl, parentId: oldParentId, childIndex: oldChildIndex, path: oldPath } = oldControls[id];
+    return {
+      oldControl,
+      oldParentId,
+      oldChildIndex,
+      oldPath,
+    };
+  };
 
-    // Add the old version to the result
-    if (oldControlIds.includes(id)) {
-      const { control: oldControl, parentId: oldParentId, childIndex: oldChildIndex, path: oldPath } = oldControls[id];
-      Object.assign(result, {
-        oldControl,
-        oldParentId,
-        oldChildIndex,
-        oldPath,
-        changeType: REMOVED,
-      });
-    }
+  const getNewProps = (id) => {
+    const { control: newControl, parentId: newParentId, childIndex: newChildIndex, path: newPath } = newControls[id];
+    return {
+      newControl,
+      newParentId,
+      newChildIndex,
+      newPath,
+    };
+  };
 
-    // Add the new version to the result
-    if (newControlIds.includes(id)) {
-      const { control: newControl, parentId: newParentId, childIndex: newChildIndex, path: newPath } = newControls[id];
-      Object.assign(result, {
-        newControl,
-        newParentId,
-        newChildIndex,
-        newPath,
-        changeType: ADDED,
-      });
-    }
+  const matcheds = matchedIds.map((id) => {
+    const result = {
+      ...getOldProps(id),
+      ...getNewProps(id),
+      matchId: id,
+    };
 
-    // Add the diff to the result
-    if (commonIds.includes(id)) {
-      const diff = diffControls(result.oldControl, result.newControl);
-      const changed = Object.values(diff).some(({ changeType }) => changeType !== UNCHANGED);
-      const changeType = changed ? CHANGED : UNCHANGED;
-      Object.assign(result, {
-        diff,
-        changeType,
-      });
-    }
+    const diff = diffControls(result.oldControl, result.newControl);
+    const changed = Object.values(diff).some(({ changeType }) => changeType !== UNCHANGED);
+    const changeType = changed ? CHANGED : UNCHANGED;
 
-    results.push(result);
-  }
+    return {
+      ...result,
+      diff,
+      changeType,
+    };
+  });
+  const removeds = removedIds.map((id) => ({ changeType: REMOVED, ...getOldProps(id) }));
+  const addeds = addedIds.map((id) => ({ changeType: ADDED, ...getNewProps(id) }));
 
-  return results;
+  return [...matcheds, ...addeds, ...removeds];
 };
