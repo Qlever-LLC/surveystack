@@ -23,6 +23,7 @@
         :new-controls="toLibraryRevision.controls"
         :default-open="false"
         :default-show-unchanged="false"
+        use-control-path-as-id
       ></survey-diff>
       <v-card-actions class="mr-3">
         <v-btn
@@ -41,9 +42,7 @@
         >
           <span>update library</span>
         </v-btn>
-        <v-btn @click="$emit('cancel')" color="primary" text>
-          Cancel
-        </v-btn>
+        <v-btn @click="$emit('cancel')" color="primary" text> Cancel </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

@@ -26,9 +26,9 @@ const diffObject = (oldObj, newObj, fields) => {
       }
     }
 
-    if (oldValue !== newValue) {
-      const oldExist = _.isNil(oldValue);
-      const newExist = _.isNil(newValue);
+    if (!_.isEqual(oldValue, newValue)) {
+      const oldExist = !_.isNil(oldValue);
+      const newExist = !_.isNil(newValue);
       let changeType = CHANGED;
       if (oldExist && !newExist) {
         changeType = REMOVED;
@@ -65,7 +65,7 @@ export const diffControls = (oldControl, newControl) => {
   // once we have schemas for the control object, we shoul use that instead
   addFileds(getComparableFields(oldControl, newControl));
   // remove fields we don't need in the diff
-  removeFileds(['id', 'hint', 'children']);
+  removeFileds(['id', 'hint', 'children', 'libraryId', 'libraryIsInherited', 'libraryVersion']);
 
   if ('matrix' === controlType) {
     const colCount = Math.max(oldControl.options.source.content.length, newControl.options.source.content.length);
@@ -76,6 +76,7 @@ export const diffControls = (oldControl, newControl) => {
       addFileds(fields.map((f) => `${path}.${f}`));
     }
   }
+  // TODO selectMultiple/options.source
   return diffObject(oldControl, newControl, diffFields);
 };
 

@@ -1,5 +1,9 @@
 <template>
-  <v-expansion-panels flat multiple v-model="mainPanelState">
+  <v-card-text v-if="changedItems.length === 0" class="d-flex">
+    <v-icon color="success" class="mr-1">mdi-check-bold</v-icon>
+    <h3 class="flex-grow-0 mr-6">No changes detected</h3>
+  </v-card-text>
+  <v-expansion-panels v-else flat multiple v-model="mainPanelState">
     <v-expansion-panel>
       <v-expansion-panel-header class="pt-0">
         <h3 class="flex-grow-0 mr-6">Change details</h3>
@@ -48,13 +52,15 @@
                   <thead>
                     <tr>
                       <th class="text-left">Property</th>
-                      <th class="text-left">Change</th>
+                      <th class="text-left">Previous</th>
+                      <th class="text-left">Next</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="change in getControlChangeList(item.id)" :key="change.key">
                       <td>{{ change.key }}</td>
-                      <td>{{ change.oldValue }} -> {{ change.newValue }}</td>
+                      <td>{{ change.oldValue }}</td>
+                      <td>{{ change.newValue }}</td>
                     </tr>
                   </tbody>
                 </template>
@@ -181,7 +187,7 @@ export default {
       const info = (count, color, icon, tooltip) => ({ count, color, icon, tooltip });
       return [
         info(added, this.colors.added, 'mdi-book-plus', `${added} added`),
-        info(changed, this.colors.changed, 'mdi-book-edit', `${changed} changed`),
+        info(changed, this.colors.changed, 'mdi-book', `${changed} changed`),
         info(removed, this.colors.removed, 'mdi-book-remove', `${removed} removed`),
       ].filter((i) => i.count > 0);
     },
@@ -202,7 +208,7 @@ export default {
       }
       return Object.entries(controlDiff.diff)
         .map(([key, change]) => {
-          if (change.changeType === 'changed') {
+          if (change.changeType !== changeType.UNCHANGED) {
             return {
               key,
               oldValue: JSON.stringify(change.oldValue),

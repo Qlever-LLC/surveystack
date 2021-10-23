@@ -1,3 +1,5 @@
+// TODO cleanup the tests once the requirements are filalized
+
 import { normalizedSurveyControls, diffControls, changeType, diffSurveyVersions } from './surveyDiff';
 import _, { defaults } from 'lodash';
 import { createControlInstance } from './surveyConfig';
@@ -36,6 +38,15 @@ describe.only('surveyDiff', () => {
       expect(diff).toHaveProperty('name.oldValue', oldNum.name);
       expect(diff).toHaveProperty('name.newValue', newNum.name);
       expect(diff).toHaveProperty('label.changeType', changeType.UNCHANGED);
+    });
+    it('works with array values', () => {
+      const oldControl = createControlInstance({ type: 'selectMultiple', name: 'sm_1' });
+      oldControl.options.source.push({ a: 1 }, { b: 2 }, { c: 3 });
+      const newControl = _.cloneDeep(oldControl);
+
+      const diff = diffControls(oldControl, newControl);
+
+      expect(diff).toHaveProperty(['options.source', 'changeType'], changeType.UNCHANGED);
     });
   });
   describe('diffSurveyVersions', () => {
