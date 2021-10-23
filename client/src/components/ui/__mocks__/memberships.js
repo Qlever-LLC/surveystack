@@ -1,3 +1,3 @@
 export function autoSelectActiveGroup() {
-  return jest.fn();
+  return jest.fn(); // eslint-disable-line no-undef
 }
