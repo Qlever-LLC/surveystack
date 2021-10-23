@@ -199,7 +199,6 @@ export default {
 
         return data;
       } catch (e) {
-        // TODO: use cached data?
         console.log('Error fetching surveys:', e);
       }
       // return [];

@@ -433,8 +433,6 @@ export default {
     publish() {
       if (this.value.meta.isLibrary) {
         //show update library dialog, ask for release notes
-        //todo extend dialog counters of added, changed, deleted questions
-        //todo add selection of change type (major change, minor change, small fix)
         this.updateLibraryDialogIsVisible = true;
       } else {
         this.$emit('publish');

@@ -52,7 +52,7 @@
 <script>
 import TipTapEditor from '@/components/builder/TipTapEditor';
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
-import SurveyDiff from '@/pages/surveys/SurveyDiff';
+import SurveyDiff from '@/components/survey/SurveyDiff';
 import { computed } from '@vue/composition-api';
 export default {
   components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor },
