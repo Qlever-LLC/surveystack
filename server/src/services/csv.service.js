@@ -3,7 +3,9 @@
 import papa from 'papaparse';
 import _ from 'lodash';
 import { flatten } from 'flat';
-import { ObjectId } from 'mongodb';
+
+// Marker class to flag cells to be expanded into new rows in post processing
+class ExpandableCell extends Array {}
 
 function removeKeys(obj, keys) {
   if (!obj) {
@@ -70,32 +72,35 @@ function geojsonTransformer(o) {
  * @param {*} o matrix question object e.g. { meta: { type: 'matrix', ...}, value: [{{value: 11}, cell12}, {cell21, cell22}]}
  * @returns updated matrix question object
  */
- function matrixTransformer(o) {
-  if (!o.value) {
-    return o;
-  }
+ function matrixTransformer(question, dataName, { expandAllMatrices = false, expandMatrix = [] }) {
+   if (!question.value) {
+     return question;
+   }
 
-  const flatRows = o.value.map((row) => {
-    // remove the value nesting [{foo: {value: bar}}] -> [{foo: bar}]
-    const denseRow = _.mapValues(row, (cell) => cell.value);
-    // flatten object values {fuz: {baz: quz}} -> {"fuz.baz": quz}
-    return flatten(denseRow);
-  });
+   // When no expanding required, convert the matrix value to JSON
+   if (!expandAllMatrices && !expandMatrix.includes(dataName)) {
+     return { ...question, value: JSON.stringify(question.value) };
+   }
+   const flatRows = question.value.map((row) => {
+     // remove the value nesting [{foo: {value: bar}}] -> [{foo: bar}]
+     const denseRow = _.mapValues(row, (cell) => cell.value);
+     // flatten object values {fuz: {baz: quz}} -> {"fuz.baz": quz}
+     return flatten(denseRow);
+   });
 
-  // get all the column names
-  const keys = _.chain(flatRows)
-    .map(_.keys) // get name of each column
-    .flatten()
-    .uniq() // create a list of uniq column names
-    .value();
-  // collect each column into one cell
-  const values = keys.map((key) => JSON.stringify(flatRows.map((row) => _.get(row, key, null))));
-  const value = _.zipObject(keys, values);
-  return {
-    ...o,
-    value,
-  };
-}
+   // get all the column names
+   const keys = _.chain(flatRows)
+     .map(_.keys) // get name of each column
+     .flatten()
+     .uniq() // create a list of uniq column names
+     .value();
+   // collect each column into one cell
+   const values = keys.map((key) =>
+     ExpandableCell.from(flatRows.map((row) => _.get(row, key, null)))
+   );
+   const value = _.zipObject(keys, values);
+   return { ...question, value };
+ }
 
 /**
  * transform submission object for presentation in csv
@@ -105,7 +110,7 @@ function geojsonTransformer(o) {
  * should return the updated value for the question value
  * @returns updated submission object
  */
-function transformSubmissionQuestionTypes(obj, typeHandlers) {
+function transformSubmissionQuestionTypes(obj, typeHandlers, formatOptions) {
   return Object.fromEntries(
     Object.entries(obj).map(([key, val]) => {
       if (typeof val === 'object' && val !== null) {
@@ -113,7 +118,7 @@ function transformSubmissionQuestionTypes(obj, typeHandlers) {
           && val.meta.type in typeHandlers
           && typeHandlers[val.meta.type];
         if (typeHandler) {
-          return [key, typeHandler(val)];
+          return [key, typeHandler(val, key, formatOptions)];
         }
         return [key, transformSubmissionQuestionTypes(val, typeHandlers)];
       }
@@ -229,19 +234,46 @@ function createCsvLegacy(submissions) {
   return csv;
 }
 
+function expandCells(flatSubmissions) {
+  return flatSubmissions
+    .map((submissionRow) => {
+      const expCells = Object.entries(submissionRow).filter(
+        ([_, cell]) => cell instanceof ExpandableCell
+      );
+      // find the longest column to decide how many rows we have to add
+      const maxRows = Math.max(0, ...expCells.map(([_, cell]) => cell.length));
+      // clear the expandable cells in the submission row
+      for (const [key, _] of expCells) {
+        submissionRow[key] = undefined;
+      }
+      // create the expanded extra rows
+      const expandedRows = _.range(maxRows).map((i) =>
+        Object.fromEntries(expCells.map(([key, values]) => [key, values[i]]))
+      );
+
+      return [submissionRow, ...expandedRows];
+    })
+    .flat();
+}
+
 function createCsv(submissions, headers) {
-  const items = [];
+  let items = [];
   submissions.forEach((ss) => {
     const submission = _.cloneDeep(ss);
-
     // when flattening a submission, special BSON types such as ObjectId are flattened into
     // {_bsontype: 'ObjectID', id: <Buffer ...>}
     // This is to make sure ObjectIds are stringified for CSV output
     stringifyObjectIds(submission);
 
     // removeKeys(submission.data, ['meta']); // remove meta fields below data
-    items.push(flatten(submission));
+
+    // Flatten the submission, without expanding arrays inside the `data` field
+    const { data, ...submissionRest } = submission;
+    const flatData = flatten({ data }, { safe: true });
+    const flatSubmissionRest = flatten(submissionRest);
+    items.push({ ...flatSubmissionRest, ...flatData });
   });
+  items = expandCells(items);
 
   let csv = '';
   try {

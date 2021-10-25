@@ -34,7 +34,7 @@ function arrayMax(arr) {
   return max;
 }
 
-const getHeaders = async (surveyId, entities) => {
+const getHeaders = async (surveyId, entities, options = { excludeDataMeta: false, splitValueFiledFromQuestions: false }) => {
   if (!surveyId) {
     return [];
   }
@@ -69,21 +69,24 @@ const getHeaders = async (surveyId, entities) => {
       .map((n) => n.model.name)
       .join('.');
     if (node.model.type === 'group' || node.model.type === 'page') {
-      surveyHeaders[`${header}.meta`] = [];
       return;
     }
-    surveyHeaders[`${header}.meta`] = [];
-    surveyHeaders[`${header}.value`] = [];
+    if (options.splitValueFiledFromQuestions) {
+      surveyHeaders[header] = [];
+    }
+    else {
+      surveyHeaders[`${header}.value`] = [];
+    }
   });
 
-  delete surveyHeaders['data.meta'];
   delete surveyHeaders['data.value'];
+  delete surveyHeaders['data'];
 
   let mergedObject = { _id: null };
 
   entities.forEach((entity) => {
     stringifyObjectIds(entity);
-    mergedObject = { ...mergedObject, ...flatten(entity) };
+    mergedObject = { ...mergedObject, ...flatten(entity, {safe: true}) };
   });
 
   const submissionHeaders = Object.keys(mergedObject);
@@ -114,6 +117,17 @@ const getHeaders = async (surveyId, entities) => {
 
   // any possible remaining headers - ideally submissionHeaders should be cleared by now
   headers.push(...submissionHeaders);
+
+  if (options.excludeDataMeta) {
+    const headersWithoutDataMeta = headers.filter((h) => {
+      // exclude any headers starting with data and including 'meta'
+      if (h.startsWith('data') && (h.includes('.meta.') || h.endsWith('.meta'))) {
+        return false;
+      }
+      return true;
+    });
+    return headersWithoutDataMeta;
+  }
 
   // console.log(headers, surveyHeaders, submissionHeaders);
 
