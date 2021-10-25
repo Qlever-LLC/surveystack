@@ -39,7 +39,6 @@ Vue.filter('showNull', (value) => {
 
 Vue.config.productionTip = false;
 Vue.use(CompositionApi);
-
 new Vue({
   router,
   store,

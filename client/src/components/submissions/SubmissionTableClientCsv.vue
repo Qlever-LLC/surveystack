@@ -40,7 +40,7 @@
             class="truncate"
             @click="showDetails(props.item[header.value], header)"
           >
-            {{ truncate(props.item[header.value], textTruncateLength, '...') }}
+            {{ truncateMethod(props.item[header.value], textTruncateLength, '...') }}
           </td>
         </tr>
         <v-dialog v-model="showDialog" width="500">
@@ -64,6 +64,28 @@ export function transformHeaders(headers) {
   const replaceGeoJsonPath = (str) => str.replace(/(value\.features\.\d).*/, '$1');
   // Remove GeoJSON question type paths from headers
   return Array.isArray(headers) ? [...new Set(headers.map(replaceGeoJsonPath))] : headers;
+}
+
+export function truncate(text, length, clamp) {
+  if (text !== undefined) {
+    clamp = clamp || '...';
+    return text.length > length ? text.slice(0, length) + clamp : text;
+  }
+  return text;
+}
+
+export function cleanTableRecords(object) {
+  const copy = { ...object };
+  Object.entries(copy).forEach(([k, v]) => {
+    if (v === '[object Object]') {
+      v = {};
+    }
+    if ((v && typeof v === 'object' && !Object.keys(v).length) || v === null || v === undefined || v.length === 0) {
+      if (Array.isArray(copy)) copy.splice(k, 1);
+      else if (!(v instanceof Date)) delete copy[k];
+    }
+  });
+  return copy;
 }
 
 export default {
@@ -113,7 +135,7 @@ export default {
     items() {
       if (this.parsed) {
         return this.parsed.data.map((n) => {
-          return this.cleanTableRecords(n);
+          return cleanTableRecords(n);
         });
       }
       return [];
@@ -141,12 +163,8 @@ export default {
     },
   },
   methods: {
-    truncate(text, length, clamp) {
-      if (text !== undefined) {
-        clamp = clamp || '...';
-        return text.length > length ? text.slice(0, length) + clamp : text;
-      }
-      return text;
+    truncateMethod(text, length, clamp) {
+      return truncate(text, length, clamp);
     },
     showDetails(value, { text }) {
       if (value.length > this.textTruncateLength) {
@@ -154,19 +172,6 @@ export default {
         this.fullText = value;
         this.toolTipHeader = text;
       }
-    },
-    cleanTableRecords(object) {
-      const copy = { ...object };
-      Object.entries(copy).forEach(([k, v]) => {
-        if (v === '[object Object]') {
-          v = {};
-        }
-        if ((v && typeof v === 'object' && !Object.keys(v).length) || v === null || v === undefined || v.length === 0) {
-          if (Array.isArray(copy)) copy.splice(k, 1);
-          else if (!(v instanceof Date)) delete copy[k];
-        }
-      });
-      return copy;
     },
     addClass(value) {
       if (value !== undefined && value.length > this.textTruncateLength) return 'truncate';
