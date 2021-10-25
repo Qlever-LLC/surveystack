@@ -3,7 +3,7 @@ import Vuetify from 'vuetify/lib';
 
 Vue.use(Vuetify);
 
-export const preset = {
+export default new Vuetify({
   theme: {
     options: {
       customProperties: true,
@@ -25,6 +25,4 @@ export const preset = {
       },
     },
   },
-};
-
-export default new Vuetify(preset);
+});
