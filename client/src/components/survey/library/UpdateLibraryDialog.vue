@@ -19,7 +19,7 @@
         </h3>
       </v-card-text>
       <survey-diff
-        :old-controls="fromLibraryControl.children"
+        :old-controls="fromLibraryRevision.controls"
         :new-controls="toLibraryRevision.controls"
         :default-open="false"
         :default-show-unchanged="false"
@@ -72,6 +72,11 @@ export default {
   emits: ['ok', 'cancel'],
   setup(props) {
     return {
+      fromLibraryRevision: computed(() => {
+        return props.toSurvey.revisions.find(
+          (revision) => revision.version === props.fromLibraryControl.libraryVersion
+        );
+      }),
       toLibraryRevision: computed(() => {
         return props.toSurvey.revisions.find((revision) => revision.version === props.toSurvey.latestVersion);
       }),
