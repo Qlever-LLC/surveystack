@@ -75,8 +75,15 @@ export const diffControls = (oldControl, newControl) => {
       const fields = getComparableFields(_.get(oldControl, path, {}), _.get(newControl, path, {}));
       addFileds(fields.map((f) => `${path}.${f}`));
     }
+  } else if ('selectSingle' === controlType) {
+    const optionCount = Math.max(oldControl.options.source.length, newControl.options.source.length);
+    removeFileds(['options.source']);
+    for (let i = 0; i < optionCount; ++i) {
+      const path = `options.source[${i}]`;
+      const fields = getComparableFields(_.get(oldControl, path, {}), _.get(newControl, path, {}));
+      addFileds(fields.map((f) => `${path}.${f}`));
+    }
   }
-  // TODO selectMultiple/options.source
   return diffObject(oldControl, newControl, diffFields);
 };
 
