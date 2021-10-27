@@ -2,20 +2,9 @@ import {
   transformSubmissionQuestionTypes,
   geojsonTransformer,
   matrixTransformer,
+  ExpandableCell,
 } from './csv.service';
 
-function mockMatrix(header, rows) {
-  const value = rows.map((row) =>
-    header.reduce((rowValue, colName, i) => ({ ...rowValue, [colName]: { value: row[i] } }), {})
-  );
-  return {
-    value,
-    meta: {
-      type: 'matrix',
-      dateModified: '2021-10-11T16:11:52.123+02:00',
-    },
-  };
-}
 
 function mockSubmissions() {
   return [{
@@ -294,7 +283,7 @@ function mockSubmissionsNested() {
   ];
 }
 
-describe('CSV Service', () => {
+describe('CSV Service ', () => {
   describe('transformQuestionTypes', () => {
     // it('applies function to submissions object', () => {
     //   const submissions = mockSubmissions();
@@ -371,106 +360,111 @@ describe('CSV Service', () => {
     });
 
     describe('matrixTransformer', () => {
-      it('collects columns into a single cell', () => {
-        const header = ['foo', 'bar'];
-        const rows = [
-          [1, 2],
-          [3, 4],
-        ];
-        const submissionData = {
-          matrix_1: mockMatrix(header, rows),
+      const mockMatrix = (headers, rows) => {
+        const value = rows.map((row) =>
+          headers.reduce(
+            (rowValue, colName, i) => ({ ...rowValue, [colName]: { value: row[i] } }),
+            {}
+          )
+        );
+        return {
+          value,
+          meta: {
+            type: 'matrix',
+            dateModified: '2021-10-11T16:11:52.123+02:00',
+          },
         };
+      };
 
-        const actual = transformSubmissionQuestionTypes(submissionData, {
-          matrix: matrixTransformer,
+      describe('test options', () => {
+        [
+          [{}, false],
+          [{ expandAllMatrices: true }, true],
+          [{ expandMatrix: ['matrix_1'] }, true],
+          [{ expandMatrix: ['other_matrix'] }, false],
+        ].forEach(([options, shouldExpand]) => {
+          it(`${
+            shouldExpand ? 'Expands' : "Doesn't expand"
+          } 'matrix_1' when options=${JSON.stringify(options)}`, () => {
+            const matrix = mockMatrix(
+              ['foo', 'bar'],
+              [
+                [1, 2],
+                [3, 4],
+              ]
+            );
+            const transformed = matrixTransformer(matrix, 'matrix_1', options);
+
+            if (shouldExpand) {
+              expect(transformed.value.foo).toBeInstanceOf(ExpandableCell);
+              expect(transformed.value.foo.read()).toEqual([1, 3]);
+              expect(transformed.value.bar.read()).toEqual([2, 4]);
+            } else {
+              expect(transformed.value).toBe(JSON.stringify(matrix.value));
+            }
+          });
         });
-
-        for (const [i, col] of header.entries()) {
-          const cell = rows.map((row) => row[i]);
-          expect(actual.matrix_1.value[col]).toBe(JSON.stringify(cell));
-        }
       });
 
-      it('keeps null values', () => {
-        const header = ['foo', 'bar', 'quz'];
-        const rows = [
-          [1, null, 'baz'],
-          [null, 'fuz', null],
-          [null, null, null],
-        ];
-        const submissionData = {
-          matrix_1: mockMatrix(header, rows),
-        };
+      describe('test expanding', () => {
+        const matchHeadersAndRows = (matrix, headers, rows) => {
+          const transformed = matrixTransformer(matrix, 'matrix_1', { expandAllMatrices: true });
 
-        const actual = transformSubmissionQuestionTypes(submissionData, {
-          matrix: matrixTransformer,
+          for (const [i, colName] of headers.entries()) {
+            const col = rows.map((row) => row[i]);
+            expect(transformed.value[colName].read()).toEqual(col);
+          }
+        };
+        it('keeps null values', () => {
+          const headers = ['foo', 'bar', 'quz'];
+          const rows = [
+            [1, null, 'baz'],
+            [null, 'fuz', null],
+            [null, null, null],
+          ];
+          const matrix = mockMatrix(headers, rows);
+          matchHeadersAndRows(matrix, headers, rows);
         });
 
-        for (const [i, col] of header.entries()) {
-          const cell = rows.map((row) => row[i]);
-          expect(actual.matrix_1.value[col]).toBe(JSON.stringify(cell));
-        }
-      });
+        it('handles when row has missing fields', () => {
+          const headers = ['col1', 'col2', 'col3'];
+          const rows = [
+            ['a1', null, null],
+            ['b1', null, 'b3'],
+            ['c1', 'c2', 'c3'],
+          ];
+          const matrix = mockMatrix(headers, rows);
+          delete matrix.value[0].col2;
+          delete matrix.value[0].col3;
+          delete matrix.value[1].col2;
 
-      it('handles when row has missing fields', () => {
-        const header = ['col1', 'col2', 'col3'];
-        const rows = [
-          ['a1', null, null],
-          ['b1', null, 'b3'],
-          ['c1', 'c2', 'c3'],
-        ];
-        const submissionData = {
-          matrix_1: mockMatrix(header, rows),
-        };
-        delete submissionData.matrix_1.value[0].col2;
-        delete submissionData.matrix_1.value[0].col3;
-        delete submissionData.matrix_1.value[1].col2;
-
-        const actual = transformSubmissionQuestionTypes(submissionData, {
-          matrix: matrixTransformer,
+          matchHeadersAndRows(matrix, headers, rows);
         });
 
-        for (const [i, col] of header.entries()) {
-          const cell = rows.map((row) => row[i]);
-          expect(actual.matrix_1.value[col]).toBe(JSON.stringify(cell));
-        }
-      });
+        it('handles when values are objects', () => {
+          const headers = ['col1', 'col2'];
+          const rows = [
+            [
+              { a: 1, b: 2 },
+              { c: 3, d: { e: 4, f: { g: 5 } } },
+            ],
+            [
+              { a: 6, b: 7 },
+              { c: 8, d: { e: 9, f: { g: 10 } } },
+            ],
+            [{ a: 11 }, { c: 12, d: { e: 13 } }],
+          ];
+          const matrix = mockMatrix(headers, rows);
 
-      it('handles when values are objects', () => {
-        const header = ['col1', 'col2'];
-        const rows = [
-          [
-            { a: 1, b: 2 },
-            { c: 3, d: { e: 4, f: { g: 5 } } },
-          ],
-          [
-            { a: 6, b: 7 },
-            { c: 8, d: { e: 9, f: { g: 10 } } },
-          ],
-          [{ a: 11 }, { c: 12, d: { e: 13 } }],
-        ];
-        const submissionData = {
-          matrix_1: mockMatrix(header, rows),
-        };
-
-        const expected_header = ['col1.a', 'col1.b', 'col2.c', 'col2.d.e', 'col2.d.f.g'];
-        const expected_rows = [
-          [1, 2, 3, 4, 5],
-          [6, 7, 8, 9, 10],
-          [11, null, 12, 13, null],
-        ];
-
-        const actual = transformSubmissionQuestionTypes(submissionData, {
-          matrix: matrixTransformer,
+          const expected_headers = ['col1.a', 'col1.b', 'col2.c', 'col2.d.e', 'col2.d.f.g'];
+          const expected_rows = [
+            [1, 2, 3, 4, 5],
+            [6, 7, 8, 9, 10],
+            [11, null, 12, 13, null],
+          ];
+          matchHeadersAndRows(matrix, expected_headers, expected_rows);
         });
-
-        for (const [i, col] of expected_header.entries()) {
-          const cell = expected_rows.map((row) => row[i]);
-          expect(actual.matrix_1.value[col]).toBe(JSON.stringify(cell));
-        }
       });
-
-      // TODO test all possible column data types
     });
   });
 });
