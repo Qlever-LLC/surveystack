@@ -5,7 +5,14 @@ import _ from 'lodash';
 import { flatten } from 'flat';
 
 // Marker class to flag cells to be expanded into new rows in post processing
-class ExpandableCell extends Array {}
+export class ExpandableCell extends String {
+  constructor(data) {
+    super(JSON.stringify(data))
+  }
+  read() {
+    return JSON.parse(this)
+  }
+}
 
 function removeKeys(obj, keys) {
   if (!obj) {
@@ -96,7 +103,7 @@ function geojsonTransformer(o) {
      .value();
    // collect each column into one cell
    const values = keys.map((key) =>
-     ExpandableCell.from(flatRows.map((row) => _.get(row, key, null)))
+     new ExpandableCell(flatRows.map((row) => _.get(row, key, null)))
    );
    const value = _.zipObject(keys, values);
    return { ...question, value };
@@ -237,9 +244,9 @@ function createCsvLegacy(submissions) {
 function expandCells(flatSubmissions) {
   return flatSubmissions
     .map((submissionRow) => {
-      const expCells = Object.entries(submissionRow).filter(
-        ([_, cell]) => cell instanceof ExpandableCell
-      );
+      const expCells = Object.entries(submissionRow)
+        .filter(([_, cell]) => cell instanceof ExpandableCell)
+        .map((cell) => cell.read());
       // find the longest column to decide how many rows we have to add
       const maxRows = Math.max(0, ...expCells.map(([_, cell]) => cell.length));
       // clear the expandable cells in the submission row
@@ -267,12 +274,9 @@ function createCsv(submissions, headers) {
 
     // removeKeys(submission.data, ['meta']); // remove meta fields below data
 
-    // Flatten the submission, without expanding arrays inside the `data` field
-    const { data, ...submissionRest } = submission;
-    const flatData = flatten({ data }, { safe: true });
-    const flatSubmissionRest = flatten(submissionRest);
-    items.push({ ...flatSubmissionRest, ...flatData });
+    items.push(flatten(submission));
   });
+
   items = expandCells(items);
 
   let csv = '';

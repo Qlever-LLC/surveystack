@@ -495,7 +495,7 @@ const getSubmissionsCsv = async (req, res) => {
   addLimitToPipeline(pipeline, req.query.limit);
 
   const formatOptions = {
-    expandAllMatrices: !!req.query.expandAllMatrices,
+    expandAllMatrices: queryParam(req.query.expandAllMatrices),
     expandMatrix: _.isArray(req.query.expandMatrix)
       ? req.query.expandMatrix
       : _.isString(req.query.expandMatrix)
