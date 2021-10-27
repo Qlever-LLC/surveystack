@@ -41,55 +41,6 @@ const getUsers = async (req, res) => {
   return res.send(entities);
 };
 
-/*
-// TODO: secure this route
-const getUsersByGroup = async (req, res) => {
-  const { group } = req.params;
-
-  const entities = await db
-    .collection('users')
-    .aggregate([
-      {
-        $match: {
-          $or: [{ 'group.user': new ObjectId(group) }, { 'group.admin': new ObjectId(group) }],
-        },
-      },
-      {
-        $lookup: {
-          from: 'groups',
-          let: { usergroups: { $ifNull: ['$group.user', []] } },
-          pipeline: [
-            { $match: { $expr: { $in: ['$_id', '$$usergroups'] } } },
-            { $project: { slug: 0 } },
-          ],
-          as: 'group.user',
-        },
-      },
-      {
-        $lookup: {
-          from: 'groups',
-          let: { admingroups: { $ifNull: ['$group.admin', []] } },
-          pipeline: [
-            { $match: { $expr: { $in: ['$_id', '$$admingroups'] } } },
-            { $project: { slug: 0 } },
-          ],
-          as: 'group.admin',
-        },
-      },
-      {
-        $project: {
-          email: 1,
-          name: 1,
-          group: 1,
-        },
-      },
-    ])
-    .toArray();
-
-  return res.send(entities);
-};
-*/
-
 const getUser = async (req, res) => {
   const { id } = req.params;
 
@@ -206,7 +157,6 @@ const deleteUser = async (req, res) => {
 export default {
   getUsers,
   getUser,
-  //getUsersByGroup,
   createUser,
   updateUser,
   deleteUser,
