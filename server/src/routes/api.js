@@ -159,7 +159,7 @@ router.put(
   [assertAuthenticated, assertIdsMatch, assertEntityExists({ collection: 'users' })],
   catchErrors(userController.updateUser)
 );
-router.delete('/users/:id', [assertAuthenticated], catchErrors(userController.deleteUser));
+router.delete('/users/:id', [assertAuthenticated, assertIsSuperAdmin], catchErrors(userController.deleteUser));
 
 /** Scripts */
 router.get('/scripts', catchErrors(scriptController.getScripts));
