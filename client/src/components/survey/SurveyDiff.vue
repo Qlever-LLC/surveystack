@@ -92,6 +92,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    oldVersionName: {
+      type: String,
+      required: true,
+    },
+    newVersionName: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {

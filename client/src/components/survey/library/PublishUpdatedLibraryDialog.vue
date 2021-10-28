@@ -1,9 +1,7 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%">
     <v-card>
-      <v-card-title>
-        Publish Update To Library
-      </v-card-title>
+      <v-card-title> Publish Update To Library </v-card-title>
       <v-card-text class="pb-0">
         <h3>Version history</h3>
         <tip-tap-editor v-model="localLibrarySurvey.meta.libraryHistory" class="mb-4" />
@@ -17,6 +15,8 @@
         :new-controls="localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].controls"
         :default-open="false"
         :default-show-unchanged="false"
+        old-version-name="Version localLibrarySurvey.latestVersion"
+        new-version-name="Version localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].version "
         :use-control-path-as-id="false"
       ></survey-diff>
       <v-card-actions class="mr-3">
@@ -24,9 +24,7 @@
         <v-btn @click="$emit('ok', localLibrarySurvey)" color="primary" text>
           <span>Publish update to library {{ value.name }}</span>
         </v-btn>
-        <v-btn @click="$emit('cancel')" color="primary" text>
-          Cancel
-        </v-btn>
+        <v-btn @click="$emit('cancel')" color="primary" text> Cancel </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

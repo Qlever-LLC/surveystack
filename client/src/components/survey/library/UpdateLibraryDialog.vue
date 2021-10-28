@@ -21,6 +21,8 @@
       <survey-diff
         :old-controls="fromLibraryRevision.controls"
         :new-controls="toLibraryRevision.controls"
+        old-version-name="Your version"
+        new-version-name="Version TODO"
         :default-open="false"
         :default-show-unchanged="false"
         use-control-path-as-id
