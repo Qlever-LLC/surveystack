@@ -151,7 +151,7 @@ function transformSubmissionQuestionTypes(obj, typeHandlers, formatOptions) {
  * @param {Object} the `data` field of a submission 
  * @returns updated data field of a submission
  */
-function removeMetaFromQuestionTypes(data) {
+function removeMetaFromQuestions(data) {
   // TODO these should come from some global constants, (or if we forbid to use
   // 'meta' and 'value' as data-name, we can use logic instead of these lists)
   const groupTypes = ['group', 'page'];
@@ -308,6 +308,6 @@ export {
   transformSubmissionQuestionTypes,
   geojsonTransformer,
   matrixTransformer,
-  removeMetaFromQuestionTypes,
+  removeMetaFromQuestions,
   expandCells,
 };

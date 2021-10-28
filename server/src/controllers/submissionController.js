@@ -510,7 +510,7 @@ const getSubmissionsCsv = async (req, res) => {
       matrix: csvService.matrixTransformer,
     }, formatOptions);
 
-    data = csvService.removeMetaFromQuestionTypes(data);
+    data = csvService.removeMetaFromQuestions(data);
 
     const result = {
       _id: entity._id,

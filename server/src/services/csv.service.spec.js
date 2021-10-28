@@ -3,7 +3,7 @@ import {
   geojsonTransformer,
   matrixTransformer,
   ExpandableCell,
-  removeMetaFromQuestionTypes,
+  removeMetaFromQuestions,
   expandCells,
 } from './csv.service';
 import _ from 'lodash';
@@ -544,7 +544,7 @@ describe('CSV Service', () => {
 
 
 
-  describe('removeMetaFromQuestionTypes(data)', () => {
+  describe('removeMetaFromQuestions(data)', () => {
     const getData = () => ({
       group_1: {
         meta: {
@@ -575,7 +575,7 @@ describe('CSV Service', () => {
     });
     it('removes unnecessary fields from question data', () => {
       const data = getData();
-      const transformed = removeMetaFromQuestionTypes(data);
+      const transformed = removeMetaFromQuestions(data);
       expect(transformed.group_1.meta).toBeUndefined();
       expect(transformed.group_1.map_2).toEqual(data.group_1.map_2.value);
       expect(transformed.group_1.text_1).toEqual(data.group_1.text_1.value);
@@ -584,7 +584,7 @@ describe('CSV Service', () => {
     it("doesn't modify questions with unknown types", () => {
       const data = getData();
       data.text_3.meta.type = 'unknown type';
-      const transformed = removeMetaFromQuestionTypes(data);
+      const transformed = removeMetaFromQuestions(data);
       expect(transformed.text_3.meta).toEqual(data.text_3.meta);
       expect(transformed.text_3.value).toEqual(data.text_3.value);
     });
