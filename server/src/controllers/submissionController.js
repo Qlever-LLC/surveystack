@@ -624,13 +624,11 @@ const createSubmission = async(req, res) => {
     });
   }
 
-  let submissionsToQSLs = await Promise.all(
-    submissionEntities.map(({ entity, survey }) => {
-      const controls = survey.revisions[entity.meta.survey.version - 1].controls;
-      return prepareSubmissionsToQSLs(controls, entity);
-    })
-  );
-  submissionsToQSLs = submissionsToQSLs.flat();
+  const mapSubmissionToQSL = ({ entity, survey }) => {
+    const controls = survey.revisions[entity.meta.survey.version - 1].controls;
+    return prepareSubmissionsToQSLs(controls, entity);
+  };
+  const submissionsToQSLs = (await Promise.all(submissionEntities.map(mapSubmissionToQSL))).flat();
 
   const results = await withSession(mongoClient, async (session) => {
     try {
