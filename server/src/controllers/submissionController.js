@@ -1000,4 +1000,5 @@ export default {
   bulkReassignSubmissions,
   archiveSubmission,
   deleteSubmission,
+  prepareSubmissionsToQSLs,
 };
