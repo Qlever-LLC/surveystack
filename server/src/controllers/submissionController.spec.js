@@ -114,7 +114,7 @@ describe('submissionController', () => {
     it('returns expected CSV for geojson question type', async () => {
       
       const mockReq = { 
-        query: { showCsvDataMeta: 'true' }, 
+        query: { showCsvMeta: 'true' }, 
         cookies: {}
       };
       const mockRes = {

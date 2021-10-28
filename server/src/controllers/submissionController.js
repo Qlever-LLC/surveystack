@@ -517,7 +517,7 @@ const getSubmissionsCsv = async (req, res) => {
       data,
     }
 
-    if (queryParam(req.query.showCsvDataMeta)) {
+    if (queryParam(req.query.showCsvMeta)) {
       result.meta = entity.meta
     }
 
@@ -525,7 +525,6 @@ const getSubmissionsCsv = async (req, res) => {
   };
   let transformedEntities = entities.map(transformer);
 
-  // TODO don't use getHeaders
   const headers = await headerService.getHeaders(req.query.survey, transformedEntities, {
     excludeDataMeta: false,
     splitValueFiledFromQuestions: true,
