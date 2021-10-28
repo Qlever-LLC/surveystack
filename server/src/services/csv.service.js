@@ -5,8 +5,8 @@ import _ from 'lodash';
 import { flatten } from 'flat';
 
 // Marker class to flag cells to be expanded into new rows in post processing
-// NOTE: It stores data as JSON string, because I didn't find a less hacky way 
-//   to prevent `flatten` from expanding certain arrays.
+// NOTE: It stores data as JSON string. I didn't find a less hacky way 
+//   to prevent `flatten` from flattening certain arrays.
 export class ExpandableCell extends String {
   static fromArray(data) {
     if (!Array.isArray(data)) {
@@ -80,9 +80,13 @@ function geojsonTransformer(o) {
 }
 
 /**
- * Aggregate the columns of the matrix into one cell
- * @param {*} o matrix question object e.g. { meta: { type: 'matrix', ...}, value: [{{value: 11}, cell12}, {cell21, cell22}]}
- * @returns updated matrix question object
+ * Spreads the values in the selected matrix questions into new columns
+ * and converts each column data into ExpandableRow which can be converted
+ * into new rows with the `expandCells()` function later in post processing
+ * @param {Object} question matrix question object
+ * @param {string} dataName the data name of the question
+ * @param {Object} options {expandAllMatrices: Boolean} or { expandMatrix: [...dataNames] }
+ * @returns 
  */
  function matrixTransformer(question, dataName, { expandAllMatrices = false, expandMatrix = [] }) {
    if (!question.value) {
@@ -93,6 +97,7 @@ function geojsonTransformer(o) {
    if (!expandAllMatrices && !expandMatrix.includes(dataName)) {
      return { ...question, value: JSON.stringify(question.value) };
    }
+
    const flatRows = question.value.map((row) => {
      // remove the value nesting [{foo: {value: bar}}] -> [{foo: bar}]
      const denseRow = _.mapValues(row, (cell) => cell.value);

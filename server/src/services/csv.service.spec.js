@@ -286,7 +286,7 @@ function mockSubmissionsNested() {
   ];
 }
 
-describe('CSV Service ', () => {
+describe('CSV Service', () => {
   describe('transformQuestionTypes', () => {
     // it('applies function to submissions object', () => {
     //   const submissions = mockSubmissions();
