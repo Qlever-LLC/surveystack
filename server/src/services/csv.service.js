@@ -5,11 +5,16 @@ import _ from 'lodash';
 import { flatten } from 'flat';
 
 // Marker class to flag cells to be expanded into new rows in post processing
+// NOTE: It stores data as JSON string, because I didn't find a less hacky way 
+//   to prevent `flatten` from expanding certain arrays.
 export class ExpandableCell extends String {
-  constructor(data) {
-    super(JSON.stringify(data))
+  static fromArray(data) {
+    if (!Array.isArray(data)) {
+      throw new Error("Cell data has to be an array")
+    }
+    return new ExpandableCell(JSON.stringify(data))
   }
-  read() {
+  toArray() {
     return JSON.parse(this)
   }
 }
@@ -103,7 +108,7 @@ function geojsonTransformer(o) {
      .value();
    // collect each column into one cell
    const values = keys.map((key) =>
-     new ExpandableCell(flatRows.map((row) => _.get(row, key, null)))
+     ExpandableCell.fromArray(flatRows.map((row) => _.get(row, key, null)))
    );
    const value = _.zipObject(keys, values);
    return { ...question, value };
@@ -127,7 +132,7 @@ function transformSubmissionQuestionTypes(obj, typeHandlers, formatOptions) {
         if (typeHandler) {
           return [key, typeHandler(val, key, formatOptions)];
         }
-        return [key, transformSubmissionQuestionTypes(val, typeHandlers)];
+        return [key, transformSubmissionQuestionTypes(val, typeHandlers, formatOptions)];
       }
       return [key, val];
     })
@@ -172,6 +177,8 @@ function removeMetaFromQuestionTypes(data) {
         return _.mapValues(values, removeMeta);
       } else if (valueTypes.includes(data.meta.type)) {
         return data.value;
+      } else {
+        return data;
       }
     }
   };
@@ -246,19 +253,17 @@ function expandCells(flatSubmissions) {
     .map((submissionRow) => {
       const expCells = Object.entries(submissionRow)
         .filter(([_, cell]) => cell instanceof ExpandableCell)
-        .map((cell) => cell.read());
+        .map(([key, cell]) => [key, cell.toArray()]);
       // find the longest column to decide how many rows we have to add
       const maxRows = Math.max(0, ...expCells.map(([_, cell]) => cell.length));
-      // clear the expandable cells in the submission row
-      for (const [key, _] of expCells) {
-        submissionRow[key] = undefined;
-      }
+      // clear the expandable cells from the first submission row
+      const mainRow = _.omit(submissionRow, expCells.map(([key,_]) => key))
       // create the expanded extra rows
       const expandedRows = _.range(maxRows).map((i) =>
         Object.fromEntries(expCells.map(([key, values]) => [key, values[i]]))
       );
 
-      return [submissionRow, ...expandedRows];
+      return [mainRow, ...expandedRows];
     })
     .flat();
 }
@@ -299,4 +304,5 @@ export {
   geojsonTransformer,
   matrixTransformer,
   removeMetaFromQuestionTypes,
+  expandCells,
 };

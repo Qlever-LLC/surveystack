@@ -3,7 +3,10 @@ import {
   geojsonTransformer,
   matrixTransformer,
   ExpandableCell,
+  removeMetaFromQuestionTypes,
+  expandCells,
 } from './csv.service';
+import _ from 'lodash';
 
 
 function mockSubmissions() {
@@ -397,8 +400,8 @@ describe('CSV Service ', () => {
 
             if (shouldExpand) {
               expect(transformed.value.foo).toBeInstanceOf(ExpandableCell);
-              expect(transformed.value.foo.read()).toEqual([1, 3]);
-              expect(transformed.value.bar.read()).toEqual([2, 4]);
+              expect(transformed.value.foo.toArray()).toEqual([1, 3]);
+              expect(transformed.value.bar.toArray()).toEqual([2, 4]);
             } else {
               expect(transformed.value).toBe(JSON.stringify(matrix.value));
             }
@@ -412,7 +415,7 @@ describe('CSV Service ', () => {
 
           for (const [i, colName] of headers.entries()) {
             const col = rows.map((row) => row[i]);
-            expect(transformed.value[colName].read()).toEqual(col);
+            expect(transformed.value[colName].toArray()).toEqual(col);
           }
         };
         it('keeps null values', () => {
@@ -465,6 +468,151 @@ describe('CSV Service ', () => {
           matchHeadersAndRows(matrix, expected_headers, expected_rows);
         });
       });
+    });
+  });
+
+  describe('expandCells(flatSubmissions)', () => {
+    it('expands ExpandableCell types into new rows', () => {
+      const flatSubmission = {
+        foo: 'bar',
+        baz: ExpandableCell.fromArray([1, 2, 3]),
+      };
+      const transformed = expandCells([flatSubmission]);
+
+      expect(transformed).toHaveLength(flatSubmission.baz.toArray().length + 1);
+      expect(transformed[0].foo).toBe(flatSubmission.foo);
+      expect(transformed[0].baz).toBeUndefined();
+      expect(transformed[1].baz).toBe(flatSubmission.baz.toArray()[0]);
+      expect(transformed[2].baz).toBe(flatSubmission.baz.toArray()[1]);
+      expect(transformed[3].baz).toBe(flatSubmission.baz.toArray()[2]);
+    });
+
+    it('handles when submission has no expandable cells', () => {
+      const flatSubmission = {
+        foo: 'bar',
+        fuz: 'baz',
+      };
+      const transformed = expandCells([flatSubmission]);
+      expect(transformed).toHaveLength(1);
+      expect(transformed[0]).toEqual(flatSubmission);
+    });
+
+    it('adds as many rows as the longes column requires', () => {
+      const flatSubmission = {
+        foo: 'bar',
+        baz1: ExpandableCell.fromArray(['a', 'b', 'c']),
+        baz2: ExpandableCell.fromArray(['d', 'e', 'f', 'g', 'h', 'i']),
+      };
+      const transformed = expandCells([flatSubmission]);
+      expect(transformed).toHaveLength(flatSubmission.baz2.toArray().length + 1);
+      expect(transformed[3]).toEqual({ baz1: 'c', baz2: 'f' });
+      expect(transformed[4]).toEqual({ baz2: 'g' });
+      expect(transformed[6]).toEqual({ baz2: 'i' });
+    });
+
+    it('handles empty ExpandapleCell', () => {
+      const flatSubmission = {
+        foo: 'bar',
+        baz: ExpandableCell.fromArray([]),
+      };
+      const transformed = expandCells([flatSubmission]);
+      expect(transformed).toHaveLength(1);
+      expect(transformed[0]).toEqual({ foo: 'bar' });
+    });
+
+    it('transfoms all submissions', () => {
+      const flatSubmissions = [
+        {
+          foo: 'bar1',
+          baz: ExpandableCell.fromArray([1, 2]),
+        },
+        {
+          foo: 'bar2',
+          baz: ExpandableCell.fromArray([3, 4, 5]),
+        },
+        {
+          foo: 'bar3',
+          baz: ExpandableCell.fromArray([6]),
+        },
+      ];
+      const transformed = expandCells(flatSubmissions);
+      expect(transformed).toHaveLength(9);
+      expect(transformed[7]).toEqual({ foo: 'bar3' });
+      expect(transformed[8]).toEqual({ baz: 6 });
+    });
+  });
+
+
+
+  describe('removeMetaFromQuestionTypes(data)', () => {
+    const getData = () => ({
+      group_1: {
+        meta: {
+          type: 'group',
+        },
+        map_2: {
+          value: { foo: 'bar' },
+          meta: {
+            type: 'geoJSON',
+            dateModified: '2021-06-14T21:12:30.817-04:00',
+          },
+        },
+        text_1: {
+          value: 'ss',
+          meta: {
+            type: 'string',
+            dateModified: '2021-06-14T21:12:33.839-04:00',
+          },
+        },
+      },
+      text_3: {
+        value: 'mvmvmv',
+        meta: {
+          type: 'string',
+          dateModified: '2021-06-14T21:12:36.811-04:00',
+        },
+      },
+    });
+    it('removes unnecessary fields from question data', () => {
+      const data = getData();
+      const transformed = removeMetaFromQuestionTypes(data);
+      expect(transformed.group_1.meta).toBeUndefined();
+      expect(transformed.group_1.map_2).toEqual(data.group_1.map_2.value);
+      expect(transformed.group_1.text_1).toEqual(data.group_1.text_1.value);
+      expect(transformed.text_3).toEqual(data.text_3.value);
+    });
+    it("doesn't modify questions with unknown types", () => {
+      const data = getData();
+      data.text_3.meta.type = 'unknown type';
+      const transformed = removeMetaFromQuestionTypes(data);
+      expect(transformed.text_3.meta).toEqual(data.text_3.meta);
+      expect(transformed.text_3.value).toEqual(data.text_3.value);
+    });
+  });
+
+  describe('ExpandableCell', () => {
+    it('returns an equal array', () => {
+      const data = [1, 'foo', { aa: { bb: true } }];
+      const cell = ExpandableCell.fromArray(data);
+      expect(cell.toArray()).toEqual(data);
+    });
+
+    it('is also a String type', () => {
+      const cell = ExpandableCell.fromArray([]);
+      expect(cell).toBeInstanceOf(String);
+      expect(cell).toBeInstanceOf(ExpandableCell);
+    });
+
+    it('throws if data is not array', () => {
+      const error = 'Cell data has to be an array';
+      expect(() => ExpandableCell.fromArray('string')).toThrow(error);
+      expect(() => ExpandableCell.fromArray({})).toThrow(error);
+    });
+
+    it('can be cloned with lodash', () => {
+      const cell = ExpandableCell.fromArray([1, 2, 3]);
+      const cloned = _.clone(cell);
+      expect(cloned.toArray()).toEqual(cell.toArray());
     });
   });
 });
