@@ -43,10 +43,7 @@
   </v-dialog>
 </template>
 <script>
-import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
-import TipTapEditor from '@/components/builder/TipTapEditor.vue';
 import { reactive, toRefs } from '@vue/composition-api';
-import SurveyDiff from '@/components/survey/SurveyDiff';
 import api from '@/services/api.service';
 
 export default {
