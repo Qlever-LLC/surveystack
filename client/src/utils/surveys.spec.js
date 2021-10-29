@@ -1,4 +1,4 @@
-import { findControlById, findParentByChildId, findGroups } from '@/utils/surveys';
+import { findControlById, findParentByChildId, getPosition, insertControl } from './surveys';
 
 const controls = [
   {
@@ -55,19 +55,49 @@ const controls = [
   },
 ];
 
-describe.skip('surveys', () => {
-  test('findControlById works', () => {
+describe('surveys', () => {
+  test.skip('findControlById works', () => {
     const control = findControlById('5e8508eeba06570001c46b16', controls);
     expect(control.name).toBe('group_5');
   });
-
-  test('findParentByChildId works', () => {
+  test.skip('findParentByChildId works', () => {
     const parent = findParentByChildId('5e8508f7ba06570001c46b19', controls);
     expect(parent.name).toBe('group_5');
   });
-
-  test('findGroups works', () => {
-    const groups = findGroups(controls);
-    console.log(JSON.stringify(groups, null, 2));
+  test('insertControl into nested works', () => {
+    const control = {
+      name: 'instructions_2',
+      label: 'Instructions 2',
+      type: 'instructions',
+      _id: '5e8509f98ff5690001eeda5a',
+      value: null,
+    };
+    const position = [0];
+    insertControl(control, controls, position, false);
+    expect(controls.length).toBe(3);
+  });
+  test('insertControl of a group is inserted into the selected group', () => {
+    const newGroup = {
+      name: 'group_new',
+      label: 'My new group',
+      type: 'group',
+      _id: '5e8508eeba06570001c46b17',
+    };
+    const selectedControl = controls[0];
+    const position = getPosition(selectedControl, controls);
+    insertControl(newGroup, controls, position, true);
+    expect(controls[0].children[1].name).toBe(newGroup.name);
+  });
+  test('insertControl of a page is inserted after the selected component, not in selected component', () => {
+    const newPage = {
+      name: 'page_new',
+      label: 'My new page',
+      type: 'page',
+      _id: '5e8508eeba06570001c46b17',
+    };
+    const selectedControl = controls[0];
+    const position = getPosition(selectedControl, controls);
+    insertControl(newPage, controls, position, true);
+    expect(controls[1].name).toBe(newPage.name);
   });
 });

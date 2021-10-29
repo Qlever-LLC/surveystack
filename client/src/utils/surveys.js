@@ -230,7 +230,7 @@ export const getFlatName = (controls, position) => {
   return flatName.substr(1);
 };
 
-export const insertControl = (control, controls, position, selectedControlIsGroup) => {
+export const insertControl = (controlToInsert, controls, position, selectedControlIsGroup) => {
   let currentControl;
   let currentControls = controls;
   let index = position[0];
@@ -241,7 +241,7 @@ export const insertControl = (control, controls, position, selectedControlIsGrou
     currentControl = currentControls[position[i]];
     index = position[i];
     if (currentControl.type === 'group' || currentControl.type === 'page') {
-      if (exit || control.type === 'page') {
+      if (exit || controlToInsert.type === 'page') {
         break;
       }
       if (i === position.length - 1 && !selectedControlIsGroup) {
@@ -252,7 +252,7 @@ export const insertControl = (control, controls, position, selectedControlIsGrou
     }
   }
 
-  currentControls.splice(index + 1, 0, control);
+  currentControls.splice(index + 1, 0, controlToInsert);
 };
 
 export const getBreadcrumbs = (survey, position) => {
