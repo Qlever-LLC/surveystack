@@ -109,8 +109,8 @@ function mockGetHeaders() {
   ];
 }
 
-const sampleQSLConsumerControls = [
-  {
+function mockQSLConsumerControls() {
+  return [{
     "name": "text_3",
     "label": "Enter some text 3",
     "type": "string",
@@ -491,9 +491,10 @@ const sampleQSLConsumerControls = [
     "libraryId": "617aa9965487fa000118821f",
     "libraryVersion": 4
   }
-];
+]}
 
-const sampleSubmissionContainingQsl = {
+function mockSubmissionContainingQsl() {
+  return {
   "_id": "617ab24178c2ff00016bd417",
   "meta": {
     "dateCreated": "2021-10-28T14:22:57.082Z",
@@ -593,7 +594,7 @@ const sampleSubmissionContainingQsl = {
       }
     }
   }
-};
+}}
 
 describe('submissionController', () => {
   describe('getSubmissionsCsv', () => {
@@ -624,20 +625,20 @@ describe('submissionController', () => {
   });
   describe('prepareSubmissionsToQSLs', () => {
     it('returns no submission for empty params', async () => {
-      let controls = [];
-      let submission = {};
+      const controls = [];
+      const submission = {};
       const QSLSubmissions = await prepareSubmissionsToQSLs(controls, submission);
       expect(QSLSubmissions.length).toBe(0);
     });
     it('returns one submission for each used question set library in controls', async () => {
-      let controls = sampleQSLConsumerControls; //contains 5 qsl usages
-      let submission = sampleSubmissionContainingQsl;
+      const controls = mockQSLConsumerControls(); //contains 5 qsl usages
+      const submission = mockSubmissionContainingQsl();
       const QSLSubmissions = await prepareSubmissionsToQSLs(controls, submission);
       expect(QSLSubmissions.length).toBe(5);
     });
     it('keeps private data marked with permissions=admin for all child submissions', async () => {
-      let controls = sampleQSLConsumerControls; //contains 5 qsl usages
-      let submission = sampleSubmissionContainingQsl;
+      const controls = mockQSLConsumerControls(); //contains 5 qsl usages
+      const submission = mockSubmissionContainingQsl();
       const QSLSubmissions = await prepareSubmissionsToQSLs(controls, submission);
       expect(QSLSubmissions[1].data.text_1.meta.permissions).toStrictEqual(['admin']);
       expect(QSLSubmissions[2].data.text_1.meta.permissions).toStrictEqual(['admin']);
