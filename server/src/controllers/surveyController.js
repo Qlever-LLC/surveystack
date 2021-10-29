@@ -501,10 +501,6 @@ const checkForLibraryUpdates = async (req, res) => {
       if(control.libraryVersion<librarySurvey.latestVersion) {
         //library is updatable, add to result set
         updatableSurveys[control.libraryId] = librarySurvey.latestVersion;
-        /*updatableSurveys.push({
-          id: control.libraryId,
-          latestVersion: librarySurvey.latestVersion,
-        })*/
       }
     }
   }));
