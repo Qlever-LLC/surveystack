@@ -624,12 +624,11 @@ const createSubmission = async(req, res) => {
     });
   }
 
-  const submissionsToQSLs = submissionEntities
-    .map(({ entity, survey }) => {
-      const controls = survey.revisions[entity.meta.survey.version-1].controls;
-      return prepareSubmissionsToQSLs(controls, entity);
-    })
-    .flat();
+  const mapSubmissionToQSL = ({ entity, survey }) => {
+    const controls = survey.revisions[entity.meta.survey.version - 1].controls;
+    return prepareSubmissionsToQSLs(controls, entity);
+  };
+  const submissionsToQSLs = (await Promise.all(submissionEntities.map(mapSubmissionToQSL))).flat();
 
   const results = await withSession(mongoClient, async (session) => {
     try {
@@ -664,10 +663,10 @@ const createSubmission = async(req, res) => {
 }
 
 // if submission contains question set library questions, return a submission subset for each question set library
-const prepareSubmissionsToQSLs = (controls, submission) => {
+const prepareSubmissionsToQSLs = async (controls, submission) => {
   const submissionsToQSLSurveys = [];
 
-  function createSubmissionsFromControl(control, submissionCopy) {
+  async function createSubmissionsFromControl(control, submissionCopy) {
     // for each library root control which is not deleted
     if (control.isLibraryRoot && !control.options.redacted) {
       // create a copy of submission
@@ -691,17 +690,23 @@ const prepareSubmissionsToQSLs = (controls, submission) => {
 
       // TODO if qsl survey is not found, we are probably on an on-premise-system, so try to find the survey on the central surveystack system
 
+      //sanitize copy (e.g. convert string id's to object id
+      submissionCopy = await sanitize(submissionCopy)
       submissionsToQSLSurveys.push(submissionCopy);
     }
 
     // recursively go through the children
-    if(control.children) {
-      control.children.forEach((child)=>createSubmissionsFromControl(child, submissionCopy));
+    if (control.children) {
+      await Promise.all(control.children.map(async (child) => {
+        await createSubmissionsFromControl(child, submissionCopy);
+      }));
     }
   }
 
-  // for each component in survey.revisions[meta.survey.version]
-  controls.forEach((control)=>createSubmissionsFromControl(control, submission));
+  // for each component in survey.revisions[meta.survey.version], create submission in parallel
+  await Promise.all(controls.map(async (control) => {
+    await createSubmissionsFromControl(control, submission);
+  }));
 
   return submissionsToQSLSurveys;
 };
@@ -776,7 +781,6 @@ const updateSubmission = async (req, res) => {
 const updateSubmissionToLibrarySurveys = async (survey, submission) => {
   // find library submissions to be updated
   const librarySubmissions =  await db.collection('submissions').find({'meta.original':submission._id }).toArray();
-  //const librarySubmissions =  await db.collection('submissions').find({'meta.survey.origin':survey._id }).toArray();
 
   // archive current library submissions
   await librarySubmissions.forEach(function(librarySubmission) {
@@ -789,8 +793,8 @@ const updateSubmissionToLibrarySurveys = async (survey, submission) => {
     db.collection(col).replaceOne({"_id":librarySubmission._id}, librarySubmission);
   });
   // create new library submissions with a new id
-  let controls = survey.revisions[submission.meta.survey.version-1].controls;
-  const QSLSubmissions = prepareSubmissionsToQSLs(controls, submission);
+  let controls = survey.revisions[submission.meta.survey.version - 1].controls;
+  const QSLSubmissions = await prepareSubmissionsToQSLs(controls, submission);
   if (QSLSubmissions.length !== 0) {
     await db.collection(col).insertMany(QSLSubmissions);
   }
@@ -996,4 +1000,5 @@ export default {
   bulkReassignSubmissions,
   archiveSubmission,
   deleteSubmission,
+  prepareSubmissionsToQSLs,
 };

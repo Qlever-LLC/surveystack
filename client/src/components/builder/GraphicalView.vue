@@ -161,6 +161,7 @@ import draggable from 'vuedraggable';
 import { cloneDeep } from 'lodash';
 import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
+import * as utils from '@/utils/surveys';
 import api from '@/services/api.service';
 import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
 
@@ -245,18 +246,7 @@ export default {
         id: new ObjectID().toString(),
       };
 
-      const dive = (control, cb) => {
-        cb(control);
-        if (!control.children) {
-          return;
-        }
-        control.children.forEach((c) => {
-          dive(c, cb);
-        });
-      };
-
-      dive(copy, (control) => {
-        // eslint-disable-next-line no-param-reassign
+      utils.changeRecursive(copy, (control) => {
         control.id = new ObjectID().toString();
       });
 

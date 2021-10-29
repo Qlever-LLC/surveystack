@@ -404,20 +404,9 @@ export default {
         this.controlAdded(rootGroup);
       }
 
-      // add recursive function for children
-      const dive = (control, cb) => {
-        cb(control);
-        if (!control.children) {
-          return;
-        }
-        control.children.forEach((c) => {
-          dive(c, cb);
-        });
-      };
-
       // copy questions from library survey to question group
-      for (let i = 0; i < controlsFromLibrary.length; i++) {
-        const controlToAdd = controlsFromLibrary[i];
+      rootGroup.children = controlsFromLibrary.map((control) => {
+        let controlToAdd = { ...control }; //create shallow copy
         controlToAdd.id = new ObjectID().toString();
         if (controlToAdd.libraryId) {
           controlToAdd.libraryIsInherited = true;
@@ -426,9 +415,7 @@ export default {
           controlToAdd.libraryVersion = data.latestVersion;
         }
 
-        //TODO remove this, wrong turn: controlToAdd.isLibraryRoot = false;
-        dive(controlToAdd, (control) => {
-          // eslint-disable-next-line no-param-reassign
+        utils.changeRecursive(controlToAdd, (control) => {
           control.id = new ObjectID().toString();
           if (control.libraryId) {
             control.libraryIsInherited = true;
@@ -438,8 +425,8 @@ export default {
             control.libraryVersion = data.latestVersion;
           }
         });
-        rootGroup.children.push(controlToAdd);
-      }
+        return controlToAdd;
+      });
 
       this.library = false;
     },

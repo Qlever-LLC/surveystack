@@ -105,6 +105,21 @@ function* processData(data, namespace = '') {
 }
 
 /**
+ * Calls changeFn for the passed control and recursively on its descendants controls. ChangeFn can mutate control
+ * @param control to call changeFn on
+ * @param changeFn(control) function to be called on control and its descendants
+ */
+export const changeRecursive = (control, changeFn) => {
+  changeFn(control);
+  if (!control.children) {
+    return;
+  }
+  control.children.forEach((c) => {
+    changeRecursive(c, changeFn);
+  });
+};
+
+/**
  * Returns a data object with keys and values from the instance controls.
  * e.g.
  *  instance = {data: [{name: "msg", value: "hello"}, {name: "age", value: 30}], ...}
@@ -230,7 +245,7 @@ export const getFlatName = (controls, position) => {
   return flatName.substr(1);
 };
 
-export const insertControl = (control, controls, position, selectedControlIsGroup) => {
+export const insertControl = (controlToInsert, controls, position, selectedControlIsGroup) => {
   let currentControl;
   let currentControls = controls;
   let index = position[0];
@@ -241,7 +256,7 @@ export const insertControl = (control, controls, position, selectedControlIsGrou
     currentControl = currentControls[position[i]];
     index = position[i];
     if (currentControl.type === 'group' || currentControl.type === 'page') {
-      if (exit || control.type === 'page') {
+      if (exit || controlToInsert.type === 'page') {
         break;
       }
       if (i === position.length - 1 && !selectedControlIsGroup) {
@@ -252,7 +267,7 @@ export const insertControl = (control, controls, position, selectedControlIsGrou
     }
   }
 
-  currentControls.splice(index + 1, 0, control);
+  currentControls.splice(index + 1, 0, controlToInsert);
 };
 
 export const getBreadcrumbs = (survey, position) => {
