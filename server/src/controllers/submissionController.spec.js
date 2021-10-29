@@ -625,7 +625,7 @@ describe('submissionController', () => {
   describe('prepareSubmissionsToQSLs', () => {
     it('returns no submission for empty params', async () => {
       const controls = [];
-      let submission = {};
+      const submission = {};
       const QSLSubmissions = await prepareSubmissionsToQSLs(controls, submission);
       expect(QSLSubmissions.length).toBe(0);
     });
