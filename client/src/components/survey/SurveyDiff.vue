@@ -76,7 +76,7 @@
 <script>
 import { availableControls } from '@/utils/surveyConfig';
 import { diffSurveyVersions, changeType } from '@/utils/surveyDiff';
-import _ from 'lodash';
+import { isNumber, sortBy } from 'lodash';
 
 export default {
   name: 'survey-diff',
@@ -125,15 +125,15 @@ export default {
         return [];
       }
 
-      const childrenOf = (parent) => this.diff.filter((d) => (d.newParentId || d.oldParentId || null) === parent); //TODO sort
+      const childrenOf = (parent) => this.diff.filter((d) => (d.newParentId || d.oldParentId || null) === parent);
       const findIcon = (control) => {
         const match = availableControls.find((c) => c.type === control.type);
         return match ? match.icon : '';
       };
-      const getSortKey = (diff) => (_.isNumber(diff.newChildIndex) ? diff.newChildIndex : diff.oldChildIndex);
+      const getSortKey = (diff) => (isNumber(diff.newChildIndex) ? diff.newChildIndex : diff.oldChildIndex);
       const convert = (diffs, depth = 0) => {
         // sort to make the order similart to the original
-        return _.sortBy(diffs, getSortKey)
+        return sortBy(diffs, getSortKey)
           .map((controlDiff) => {
             const control = controlDiff.newControl || controlDiff.oldControl;
             return [
@@ -148,7 +148,6 @@ export default {
                 path: controlDiff.path,
                 depth,
               },
-              // TODO sort children by old/newChildIndex
               ...convert(childrenOf(control.id), depth + 1),
             ];
           })
@@ -164,12 +163,13 @@ export default {
           return true;
         }
         // check if any of its children are changed
-        let nextIdx = itemIdx + 1;
-        while (nextIdx < this.items.length && this.items[nextIdx].depth > item.depth) {
-          if (this.items[itemIdx].changeType !== changeType.UNCHANGED) {
+        for (let i = itemIdx; i < this.items.length; i++) {
+          if (this.items[i].depth <= item.depth) {
+            break;
+          }
+          if (this.items[i].changeType !== changeType.UNCHANGED) {
             return true;
           }
-          nextIdx++;
         }
         return false;
       };

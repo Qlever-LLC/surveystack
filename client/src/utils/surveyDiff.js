@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { get, isObjectLike, isEqual, isNil, toPath, uniq, pull, isArray, intersection, without } from 'lodash';
 import flatten from 'flat';
 
 export const changeType = {
@@ -11,14 +11,14 @@ const { CHANGED, REMOVED, ADDED, UNCHANGED } = changeType;
 
 const diffObject = (oldObj, newObj, fields) => {
   return fields.reduce((diff, field) => {
-    const oldValue = _.get(oldObj, field);
-    const newValue = _.get(newObj, field);
+    const oldValue = get(oldObj, field);
+    const newValue = get(newObj, field);
 
-    const path = _.toPath(field);
+    const path = toPath(field);
     for (let i = 0; i < path.length - 1; ++i) {
       const subPath = path.slice(0, i);
-      const oldExist = _.isObjectLike(_.get(oldValue, subPath));
-      const newExist = _.isObjectLike(_.get(newValue, subPath));
+      const oldExist = isObjectLike(get(oldValue, subPath));
+      const newExist = isObjectLike(get(newValue, subPath));
       if (oldExist && !newExist) {
         diff[subPath.join('.')] = { changeType: REMOVED };
       } else if (!oldExist && newExist) {
@@ -26,9 +26,9 @@ const diffObject = (oldObj, newObj, fields) => {
       }
     }
 
-    if (!_.isEqual(oldValue, newValue)) {
-      const oldExist = !_.isNil(oldValue);
-      const newExist = !_.isNil(newValue);
+    if (!isEqual(oldValue, newValue)) {
+      const oldExist = !isNil(oldValue);
+      const newExist = !isNil(newValue);
       let changeType = CHANGED;
       if (oldExist && !newExist) {
         changeType = REMOVED;
@@ -58,8 +58,8 @@ export const diffControls = (oldControl, newControl) => {
 
   // Collect all the object paths that we should compare
   let diffFields = [];
-  let addFileds = (fields) => (diffFields = _.uniq([...diffFields, ...fields]));
-  let removeFileds = (fields) => _.pull(diffFields, ...fields);
+  let addFileds = (fields) => (diffFields = uniq([...diffFields, ...fields]));
+  let removeFileds = (fields) => pull(diffFields, ...fields);
 
   // get all the object paths from the controls
   // once we have schemas for the control object, we shoul use that instead
@@ -72,7 +72,7 @@ export const diffControls = (oldControl, newControl) => {
     removeFileds(['options.source.content']);
     for (let i = 0; i < colCount; ++i) {
       const path = `options.source.content[${i}]`;
-      const fields = getComparableFields(_.get(oldControl, path, {}), _.get(newControl, path, {}));
+      const fields = getComparableFields(get(oldControl, path, {}), get(newControl, path, {}));
       addFileds(fields.map((f) => `${path}.${f}`));
     }
   } else if ('selectSingle' === controlType) {
@@ -80,7 +80,7 @@ export const diffControls = (oldControl, newControl) => {
     removeFileds(['options.source']);
     for (let i = 0; i < optionCount; ++i) {
       const path = `options.source[${i}]`;
-      const fields = getComparableFields(_.get(oldControl, path, {}), _.get(newControl, path, {}));
+      const fields = getComparableFields(get(oldControl, path, {}), get(newControl, path, {}));
       addFileds(fields.map((f) => `${path}.${f}`));
     }
   }
@@ -102,7 +102,7 @@ export const normalizedSurveyControls = (controls, { useControlPathAsId } = {}) 
       normalized[key] = { control, parentId, childIndex, path: strPath };
 
       // "page" and "group" types
-      if (_.isArray(control.children)) {
+      if (isArray(control.children)) {
         normalized = { ...normalized, ...normalize(control.children, control.id, path) };
       }
     }
@@ -116,11 +116,11 @@ export const diffSurveyVersions = (oldControls, newControls, { useControlPathAsI
   newControls = normalizedSurveyControls(newControls, { useControlPathAsId });
   const oldControlIds = Object.keys(oldControls);
   const newControlIds = Object.keys(newControls);
-  const matchedIds = _.intersection(oldControlIds, newControlIds)
+  const matchedIds = intersection(oldControlIds, newControlIds)
     // don't add controls with different types to matches (can happen when useControlPathAsId: true)
     .filter((id) => oldControls[id].control.type === newControls[id].control.type);
-  const removedIds = _.without(oldControlIds, ...matchedIds);
-  const addedIds = _.without(newControlIds, ...matchedIds);
+  const removedIds = without(oldControlIds, ...matchedIds);
+  const addedIds = without(newControlIds, ...matchedIds);
 
   const getOldProps = (id) => {
     const { control: oldControl, parentId: oldParentId, childIndex: oldChildIndex, path: oldPath } = oldControls[id];
