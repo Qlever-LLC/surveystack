@@ -105,6 +105,21 @@ function* processData(data, namespace = '') {
 }
 
 /**
+ * Calls changeFn for the passed control and recursively on its descendants controls. ChangeFn can mutate control
+ * @param control to call changeFn on
+ * @param changeFn(control) function to be called on control and its descendants
+ */
+export const changeRecursive = (control, changeFn) => {
+  changeFn(control);
+  if (!control.children) {
+    return;
+  }
+  control.children.forEach((c) => {
+    changeRecursive(c, changeFn);
+  });
+};
+
+/**
  * Returns a data object with keys and values from the instance controls.
  * e.g.
  *  instance = {data: [{name: "msg", value: "hello"}, {name: "age", value: 30}], ...}
