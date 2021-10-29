@@ -6,6 +6,8 @@ import uuidv4 from 'uuid/v4';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
+import { cookieOptions } from '../constants'
+import _ from 'lodash';
 
 const col = 'users';
 
@@ -38,55 +40,6 @@ const getUsers = async (req, res) => {
     .toArray();
   return res.send(entities);
 };
-
-/*
-// TODO: secure this route
-const getUsersByGroup = async (req, res) => {
-  const { group } = req.params;
-
-  const entities = await db
-    .collection('users')
-    .aggregate([
-      {
-        $match: {
-          $or: [{ 'group.user': new ObjectId(group) }, { 'group.admin': new ObjectId(group) }],
-        },
-      },
-      {
-        $lookup: {
-          from: 'groups',
-          let: { usergroups: { $ifNull: ['$group.user', []] } },
-          pipeline: [
-            { $match: { $expr: { $in: ['$_id', '$$usergroups'] } } },
-            { $project: { slug: 0 } },
-          ],
-          as: 'group.user',
-        },
-      },
-      {
-        $lookup: {
-          from: 'groups',
-          let: { admingroups: { $ifNull: ['$group.admin', []] } },
-          pipeline: [
-            { $match: { $expr: { $in: ['$_id', '$$admingroups'] } } },
-            { $project: { slug: 0 } },
-          ],
-          as: 'group.admin',
-        },
-      },
-      {
-        $project: {
-          email: 1,
-          name: 1,
-          group: 1,
-        },
-      },
-    ])
-    .toArray();
-
-  return res.send(entities);
-};
-*/
 
 const getUser = async (req, res) => {
   const { id } = req.params;
@@ -153,6 +106,19 @@ const updateUser = async (req, res) => {
     delete entity.password;
   } else {
     entity.password = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS));
+
+    // create a new user token when password changes
+    entity.token = uuidv4();
+
+    // remove the previously set token header
+    // use a try-catch because it's accessing undocumented API and failing is non-critical
+    try {
+      _.remove(res._headers['set-cookie'], (c) => c.startsWith('token='));
+    } catch (e) {
+      console.warn(e);
+    }
+    // udpate the token in the cookie header for backward compatibility: https://gitlab.com/our-sci/software/surveystack/-/merge_requests/33#note_700125477
+    res.cookie('token', entity.token, cookieOptions);
   }
 
   try {
@@ -191,7 +157,6 @@ const deleteUser = async (req, res) => {
 export default {
   getUsers,
   getUser,
-  //getUsersByGroup,
   createUser,
   updateUser,
   deleteUser,

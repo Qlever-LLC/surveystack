@@ -297,7 +297,7 @@
       <instructions-editor
         v-else-if="isInstructions"
         v-model="control.options.source"
-        :disabled="control.libraryId != null"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
       <instructions-image-split-editor
         v-else-if="isInstructionsImageSplit"

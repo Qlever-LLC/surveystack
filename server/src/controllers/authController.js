@@ -125,7 +125,7 @@ const resetPassword = async (req, res) => {
   try {
     let updated = await db.collection(col).findOneAndUpdate(
       { _id: existingUser._id },
-      { $set: { password: hash } },
+      { $set: { password: hash, token: uuidv4() } },
       {
         returnOriginal: false,
       }

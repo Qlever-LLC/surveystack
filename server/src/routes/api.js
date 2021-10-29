@@ -20,6 +20,7 @@ import cfsController from '../controllers/cfsController';
 
 import {
   assertAuthenticated,
+  assertIsSuperAdmin,
   assertEntityExists,
   assertIdsMatch,
   assertNameNotEmpty,
@@ -56,7 +57,6 @@ router.post('/auth/reset-password', catchErrors(authController.resetPassword));
 /** Group */
 router.get('/groups', catchErrors(groupController.getGroups));
 router.get('/groups/by-path*', catchErrors(groupController.getGroupByPath));
-//router.get('/groups/:id/users', catchErrors(groupController.getUsers));
 router.get('/groups/:id', catchErrors(groupController.getGroupById));
 router.post('/groups', assertAuthenticated, catchErrors(groupController.createGroup));
 router.put(
@@ -157,7 +157,7 @@ router.delete(
 );
 
 /** Users */
-router.get('/users', catchErrors(userController.getUsers));
+router.get('/users', assertIsSuperAdmin, catchErrors(userController.getUsers));
 router.get('/users/:id', catchErrors(userController.getUser));
 router.post('/users', [assertNameNotEmpty], catchErrors(userController.createUser));
 router.put(
@@ -165,7 +165,7 @@ router.put(
   [assertAuthenticated, assertIdsMatch, assertEntityExists({ collection: 'users' })],
   catchErrors(userController.updateUser)
 );
-router.delete('/users/:id', [assertAuthenticated], catchErrors(userController.deleteUser));
+router.delete('/users/:id', [assertAuthenticated, assertIsSuperAdmin], catchErrors(userController.deleteUser));
 
 /** Scripts */
 router.get('/scripts', catchErrors(scriptController.getScripts));
