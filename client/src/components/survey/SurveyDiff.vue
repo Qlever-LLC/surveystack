@@ -1,12 +1,12 @@
 <template>
-  <v-card-text v-if="changedItems.length === 0" class="d-flex">
+  <v-card-text v-if="!haveChanges" class="d-flex">
     <v-icon color="success" class="mr-1">mdi-check-bold</v-icon>
     <h3 class="flex-grow-0 mr-6">No changes detected</h3>
   </v-card-text>
   <v-expansion-panels v-else flat multiple v-model="mainPanelState">
     <v-expansion-panel>
       <v-expansion-panel-header class="pt-0">
-        <h3 class="flex-grow-0 mr-6">Change details</h3>
+        <h3 class="flex-grow-0 mr-6">Update details</h3>
 
         <v-tooltip bottom v-for="{ icon, color, count, tooltip } in changeSummaryList" :key="icon">
           <template v-slot:activator="{ on, attrs }">
@@ -24,69 +24,37 @@
           class="flex-grow-0 mr-6"
           v-if="isOpen"
           @click.native.stop=""
-          v-model="showUnchanged"
-          label="show unchanged"
+          v-model="showChangesOnly"
+          label="changes only"
         ></v-switch>
       </v-expansion-panel-header>
       <v-expansion-panel-content>
-        <v-expansion-panels>
-          <v-expansion-panel
-            v-for="item in showUnchanged ? items : changedItems"
-            :disabled="!item.isChanged"
-            :key="item.id"
-          >
-            <v-expansion-panel-header>
-              <v-row>
-                <div class="v-treeview-node__level" v-for="index in item.depth" :key="index" />
-                <th>
-                  <v-icon :color="item.color">
-                    {{ item.icon }}
-                  </v-icon>
-                  {{ item.name }}
-                </th>
-              </v-row>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <v-simple-table fixed-header>
-                <template v-slot:default>
-                  <thead>
-                    <tr>
-                      <th class="text-left">Property</th>
-                      <th class="text-left">Previous</th>
-                      <th class="text-left">Next</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="change in getControlChangeList(item.id)" :key="change.key">
-                      <td>{{ change.key }}</td>
-                      <td>{{ change.oldValue }}</td>
-                      <td>{{ change.newValue }}</td>
-                    </tr>
-                  </tbody>
-                </template>
-              </v-simple-table>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
+        <survey-diff-card-tree
+          :diffInfoTree="showChangesOnly ? diffInfoTreeWithoutUnchangeds : diffInfoTree"
+          v-bind="{ oldVersionName, newVersionName }"
+        />
       </v-expansion-panel-content>
     </v-expansion-panel>
   </v-expansion-panels>
 </template>
 
 <script>
-import { availableControls } from '@/utils/surveyConfig';
 import { diffSurveyVersions, changeType } from '@/utils/surveyDiff';
 import { isNumber, sortBy } from 'lodash';
+import SurveyDiffCardTree from './SurveyDiffCardTree';
 
 export default {
   name: 'survey-diff',
+  components: {
+    SurveyDiffCardTree,
+  },
   props: {
     oldControls: Array,
     newControls: Array,
     defaultOpen: Boolean,
     defaultShowUnchanged: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     useControlPathAsId: {
       type: Boolean,
@@ -104,7 +72,7 @@ export default {
   data() {
     return {
       isOpen: this.defaultOpen,
-      showUnchanged: this.defaultShowUnchanged,
+      showChangesOnly: !this.defaultShowUnchanged,
       colors: {
         changed: 'amber lighten-1',
         added: 'green lighten-1',
@@ -120,67 +88,60 @@ export default {
       }
       return [];
     },
-    items() {
+    haveChanges() {
+      return this.diff.some((diff) => diff.changeType !== changeType.UNCHANGED);
+    },
+    diffInfoTree() {
       if (!this.diff) {
         return [];
       }
 
       const childrenOf = (parent) => this.diff.filter((d) => (d.newParentId || d.oldParentId || null) === parent);
-      const findIcon = (control) => {
-        const match = availableControls.find((c) => c.type === control.type);
-        return match ? match.icon : '';
-      };
       const getSortKey = (diff) => (isNumber(diff.newChildIndex) ? diff.newChildIndex : diff.oldChildIndex);
-      const convert = (diffs, depth = 0) => {
+      const convert = (diffs, parentIdxPath = []) => {
         // sort to make the order similart to the original
-        return sortBy(diffs, getSortKey)
-          .map((controlDiff) => {
-            const control = controlDiff.newControl || controlDiff.oldControl;
-            return [
-              {
-                controlDiff,
-                id: controlDiff.matchId,
-                name: control.name,
-                icon: findIcon(control),
-                color: this.colors[controlDiff.changeType],
-                changeType: controlDiff.changeType,
-                isChanged: controlDiff.changeType === changeType.CHANGED,
-                path: controlDiff.path,
-                depth,
-              },
-              ...convert(childrenOf(control.id), depth + 1),
-            ];
-          })
-          .flat();
+        return sortBy(diffs, getSortKey).map((controlDiff) => {
+          const control = controlDiff.newControl || controlDiff.oldControl;
+          const idx = controlDiff.newControl ? controlDiff.newChildIndex : controlDiff.oldChildIndex;
+          const idxPath = [...parentIdxPath, idx + 1];
+          return {
+            id: controlDiff.matchId,
+            name: control.name,
+            label: control.label,
+            controlType: control.type,
+            color: this.colors[controlDiff.changeType],
+            changeType: controlDiff.changeType,
+            changeList: this.getControlChangeList(controlDiff.matchId),
+            indexPath: idxPath.join('.'),
+            children: convert(childrenOf(control.id), idxPath),
+          };
+        });
       };
       return convert(childrenOf(null));
     },
-    changedItems() {
-      const hasChange = (itemIdx) => {
-        const item = this.items[itemIdx];
-        // check if the item is changed
-        if (item.changeType !== changeType.UNCHANGED) {
-          return true;
-        }
-        // check if any of its children are changed
-        for (let i = itemIdx; i < this.items.length; i++) {
-          if (this.items[i].depth <= item.depth) {
-            break;
-          }
-          if (this.items[i].changeType !== changeType.UNCHANGED) {
-            return true;
-          }
-        }
-        return false;
+    diffInfoTreeWithoutUnchangeds() {
+      const filterUnchangeds = (diffInfoTree) => {
+        return diffInfoTree
+          .map((changeItem) => {
+            const children = filterUnchangeds(changeItem.children);
+            if (changeItem.changeType !== changeType.UNCHANGED || children.length > 0) {
+              return {
+                ...changeItem,
+                children,
+              };
+            }
+            return null;
+          })
+          .filter((c) => c !== null);
       };
-      return this.items.filter((_, idx) => hasChange(idx));
+      return filterUnchangeds(this.diffInfoTree);
     },
     changeSummaryList() {
       let changed = 0;
       let removed = 0;
       let added = 0;
-      for (const item of this.items) {
-        switch (item.changeType) {
+      for (const diffItem of this.diff) {
+        switch (diffItem.changeType) {
           case changeType.CHANGED:
             changed++;
             break;

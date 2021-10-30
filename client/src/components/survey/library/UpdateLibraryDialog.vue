@@ -10,7 +10,7 @@
         <tip-tap-editor disabled v-model="toSurvey.meta.libraryHistory" class="mb-4" />
         <library-change-type-selector v-model="toSurvey.meta.libraryLastChangeType" :disabled="true" />
       </v-card-text>
-      <v-card-text>
+      <v-card-text v-if="selectedRevisionsHaveDifference">
         <h3>
           <v-icon color="warning">mdi-alert</v-icon>&nbsp;<b
             >If you have modified this question set, your modifications will be reset.</b
@@ -22,9 +22,8 @@
         :old-controls="fromLibraryRevision.controls"
         :new-controls="toLibraryRevision.controls"
         old-version-name="Your version"
-        new-version-name="Version TODO"
+        :new-version-name="`Version ${toLibraryRevision.version}`"
         :default-open="false"
-        :default-show-unchanged="false"
         use-control-path-as-id
       ></survey-diff>
       <v-card-actions class="mr-3">
@@ -54,6 +53,7 @@
 import TipTapEditor from '@/components/builder/TipTapEditor';
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
 import SurveyDiff from '@/components/survey/SurveyDiff';
+import { controlListsHaveChanges } from '@/utils/surveyDiff';
 import { computed } from '@vue/composition-api';
 export default {
   components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor },
@@ -83,6 +83,11 @@ export default {
         return props.toSurvey.revisions.find((revision) => revision.version === props.toSurvey.latestVersion);
       }),
     };
+  },
+  computed: {
+    selectedRevisionsHaveDifference() {
+      return controlListsHaveChanges(this.fromLibraryRevision.controls, this.toLibraryRevision.controls);
+    },
   },
 };
 </script>

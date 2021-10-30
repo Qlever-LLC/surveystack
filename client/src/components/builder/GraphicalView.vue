@@ -25,15 +25,13 @@
       @mousedown.stop.left="$emit('control-selected', el)"
     >
       <div class="d-flex justify-space-between align-center">
-        <div class="mb-2" v-if="!el.options.hidden">
-          <span class="caption grey--text text--darken-1">{{ createIndex(index, idx + 1) | displayIndex }}</span>
-          <br />
-          <span class="title">
-            {{ getDisplay(el) }}
-          </span>
-          <br />
-          <span class="font-weight-light grey--text text--darken-2"> {{ el.name }} : {{ el.type }} </span>
-        </div>
+        <control-card-header
+          v-if="!el.options.hidden"
+          :index="createIndex(index, idx + 1) | displayIndex"
+          :title="getDisplay(el)"
+          :type="el.type"
+          :dataName="el.name"
+        />
         <div class="grey--text text--darken-1" v-if="el.options.hidden">
           {{ createIndex(index, idx + 1) | displayIndex }} &nbsp; {{ getDisplay(el) }}
         </div>
@@ -164,12 +162,14 @@ import { availableControls } from '@/utils/surveyConfig';
 import * as utils from '@/utils/surveys';
 import api from '@/services/api.service';
 import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
+import ControlCardHeader from './ControlCardHeader';
 
 export default {
   name: 'nested-draggable',
   components: {
     UpdateLibraryDialog,
     draggable,
+    ControlCardHeader,
   },
   data() {
     return {

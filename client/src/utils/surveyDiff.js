@@ -75,7 +75,7 @@ export const diffControls = (oldControl, newControl) => {
       const fields = getComparableFields(get(oldControl, path, {}), get(newControl, path, {}));
       addFileds(fields.map((f) => `${path}.${f}`));
     }
-  } else if ('selectSingle' === controlType) {
+  } else if (['selectSingle', 'selectMultiple'].includes(controlType)) {
     const optionCount = Math.max(oldControl.options.source.length, newControl.options.source.length);
     removeFileds(['options.source']);
     for (let i = 0; i < optionCount; ++i) {
@@ -164,3 +164,7 @@ export const diffSurveyVersions = (oldControls, newControls, { useControlPathAsI
 
   return [...matcheds, ...addeds, ...removeds];
 };
+
+export function controlListsHaveChanges(oldControls, newControls) {
+  return diffSurveyVersions(oldControls, newControls).some((diff) => diff.changeType !== changeType.UNCHANGED);
+}

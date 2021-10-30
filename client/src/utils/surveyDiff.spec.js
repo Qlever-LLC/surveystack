@@ -1,4 +1,4 @@
-// TODO cleanup the tests once the requirements are filalized
+// TODO cleanup the tests once the requirements are finalized
 
 import { normalizedSurveyControls, diffControls, changeType, diffSurveyVersions } from './surveyDiff';
 import _, { defaults } from 'lodash';
@@ -45,8 +45,7 @@ describe.only('surveyDiff', () => {
       const newControl = _.cloneDeep(oldControl);
 
       const diff = diffControls(oldControl, newControl);
-
-      expect(diff).toHaveProperty(['options.source', 'changeType'], changeType.UNCHANGED);
+      expect(diff).toHaveProperty(['options.source[0].a', 'changeType'], changeType.UNCHANGED);
     });
   });
   describe('diffSurveyVersions', () => {
@@ -98,7 +97,7 @@ describe.only('surveyDiff', () => {
         newMat.options.source.content[0].label
       );
     });
-
+    // TODO 'selectSingle', 'selectMultiple'
     describe('works with path ids', () => {
       const num1 = createControlInstance({ type: 'number', name: 'number_1', label: 'foo' });
       const num2 = createControlInstance({ type: 'number', name: 'number_2', label: 'foo' });
