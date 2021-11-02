@@ -37,7 +37,7 @@
 <script>
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
-import { reactive, toRefs } from '@vue/composition-api';
+import { ref } from '@vue/composition-api';
 
 export default {
   name: 'edit-library-dialog',
@@ -54,28 +54,16 @@ export default {
   },
   emits: ['ok', 'cancel'],
   setup(props) {
-    const state = reactive({
-      localLibrarySurvey: props.librarySurvey,
-    });
+    const localLibrarySurvey = ref(props.librarySurvey);
 
-    if (!state.localLibrarySurvey.meta.libraryDescription) {
-      state.localLibrarySurvey.meta.libraryDescription = '';
-    }
-    if (!state.localLibrarySurvey.meta.libraryApplications) {
-      state.localLibrarySurvey.meta.libraryApplications = '';
-    }
-    if (!state.localLibrarySurvey.meta.libraryMaintainers) {
-      state.localLibrarySurvey.meta.libraryMaintainers = '';
-    }
-    if (!state.localLibrarySurvey.meta.libraryHistory) {
-      state.localLibrarySurvey.meta.libraryHistory = '';
-    }
-    if (!state.localLibrarySurvey.meta.libraryLastChangeType) {
-      state.localLibrarySurvey.meta.libraryLastChangeType = '';
-    }
+    localLibrarySurvey.value.meta.libraryDescription = localLibrarySurvey.value.meta.libraryDescription || '';
+    localLibrarySurvey.value.meta.libraryApplications = localLibrarySurvey.value.meta.libraryApplications || '';
+    localLibrarySurvey.value.meta.libraryMaintainers = localLibrarySurvey.value.meta.libraryMaintainers || '';
+    localLibrarySurvey.value.meta.libraryHistory = localLibrarySurvey.value.meta.libraryHistory || '';
+    localLibrarySurvey.value.meta.libraryLastChangeType = localLibrarySurvey.value.meta.libraryLastChangeType || '';
 
     return {
-      ...toRefs(state),
+      localLibrarySurvey,
     };
   },
 };
