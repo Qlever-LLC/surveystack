@@ -97,7 +97,7 @@
             </v-list-item>
             <v-list-item>
               <v-list-item-title>
-                <v-dialog v-model="editLibraryDialogIsVisible" width="500" max-width="75%">
+                <v-dialog v-model="editLibraryDialogIsVisible" width="700" max-width="75%">
                   <template v-slot:activator="{ on }">
                     <v-btn v-on="on" text>
                       <v-icon color="grey">mdi-library</v-icon>
@@ -139,6 +139,43 @@
                       </v-btn>
                       <v-btn @click="editLibraryDialogIsVisible = false" color="primary" text>
                         Cancel
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+              </v-list-item-title>
+            </v-list-item>
+            <v-list-item v-if="value.meta.isLibrary">
+              <v-list-item-title>
+                <v-dialog v-model="libraryConsumersDialogIsVisible" width="500" max-width="75%">
+                  <template v-slot:activator="{ on }">
+                    <v-btn v-on="on" text>
+                      <v-icon color="grey">mdi-layers-search</v-icon>
+                      <div class="ml-1">
+                        list library consumers
+                      </div>
+                    </v-btn>
+                  </template>
+                  <v-card>
+                    <v-card-title>
+                      List library consumers
+                    </v-card-title>
+                    <v-divider></v-divider>
+                    <v-card-text>
+                      <v-list dense style="max-height: 500px" class="overflow-y-auto">
+                        <v-list-item v-for="c in libraryConsumers" :key="c._id" @click="goToSurvey(c._id)">
+                          <v-list-item-content>
+                            <small class="grey--text">{{ c._id }}</small>
+                            <v-list-item-title>{{ c.name }}</v-list-item-title>
+                          </v-list-item-content>
+                        </v-list-item>
+                      </v-list>
+                    </v-card-text>
+                    <v-divider></v-divider>
+                    <v-card-actions>
+                      <v-spacer />
+                      <v-btn @click="libraryConsumersDialogIsVisible = false" color="primary" text>
+                        Close
                       </v-btn>
                     </v-card-actions>
                   </v-card>
@@ -308,6 +345,8 @@ export default {
       resourcesDialogIsVisible: false,
       editDetailsDialogIsVisible: false,
       editLibraryDialogIsVisible: false,
+      libraryConsumersDialogIsVisible: false,
+      libraryConsumers: [],
       surveyGroupName: 'Group Not Found',
       availableSubmissions,
     };
@@ -358,6 +397,13 @@ export default {
       },
       deep: true,
     },
+    libraryConsumersDialogIsVisible: {
+      async handler(value, oldValue) {
+        if (value === true && !oldValue) {
+          await this.loadLibraryConsumers();
+        }
+      },
+    },
   },
   components: {
     SurveyNameEditor,
@@ -380,6 +426,14 @@ export default {
     updateSurveyDescription(description) {
       this.$emit('set-survey-description', description);
       // this.$set(this.value, 'description', description);
+    },
+    async loadLibraryConsumers() {
+      const response = await api.get(`/surveys/list-library-consumers?id=${this.value._id}`);
+      this.libraryConsumers = response.data;
+    },
+    goToSurvey(survey_id) {
+      let route = this.$router.resolve(`/surveys/${survey_id}`);
+      window.open(route.href, '_blank');
     },
   },
 };

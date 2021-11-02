@@ -125,3 +125,13 @@ export const getSubmissionField = (submission, survey, position) => {
 
   return obj;
 };
+
+export const forAllControlsRecursive = (control, actionFn) => {
+  actionFn(control);
+
+  if(control.children) {
+    control.children.forEach((childControl) => {
+      forAllControlsRecursive(childControl, actionFn);
+    });
+  }
+};
