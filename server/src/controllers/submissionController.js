@@ -972,11 +972,7 @@ const archiveSubmissions = async (req, res) => {
   await db.collection(col).updateMany({ _id: idSelector }, update);
 
   // archive / unarchive library submissions as well
-  await db
-    .collection(col)
-    .findOneAndUpdate({ 'meta.original': idSelector }, update, {
-      returnOriginal: false,
-    });
+  await db.collection(col).updateMany({ 'meta.original': idSelector }, update);
 
   return res.send({ message: 'OK' });
 };
