@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import boom from '@hapi/boom';
+import { isString, isArray } from 'lodash'
 
 import { catchErrors } from '../handlers/errorHandlers';
 
@@ -213,8 +214,12 @@ export const assertHasSurveyParam = catchErrors(async (req, res, next) => {
 });
 
 export const assertHasIds = (req, res, next) => {
-  if (!req.body.ids || req.body.ids.length === 0) {
+  if (!isArray(req.body.ids) || req.body.ids.length === 0) {
     throw boom.badRequest('You must specify ids.');
+  }
+
+  if (!req.body.ids.every(isString)) {
+    throw boom.badRequest('Each ID must be a string');
   }
 
   next();
