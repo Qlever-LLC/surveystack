@@ -33,7 +33,7 @@
       </template>
       <template slot="item" slot-scope="props">
         <tr v-for="id in items" :key="id.text">
-          <v-checkbox color="#777" multiple v-model="tableSelected" :value="id" class="custom-checkbox"> </v-checkbox>
+          <v-checkbox color="#777" multiple v-model="tableSelected" :value="id" class="custom-checkbox" />
           <td
             v-for="header in headers"
             :key="header.text"
@@ -43,16 +43,14 @@
             {{ truncateMethod(props.item[header.value], textTruncateLength, '...') }}
           </td>
         </tr>
-        <v-dialog v-model="showDialog" width="500">
-          <v-card>
-            <v-card-title class="text-h5 grey lighten-2">{{ toolTipHeader }}</v-card-title>
-            <v-card-text>
-              {{ fullText }}
-            </v-card-text>
-          </v-card>
-        </v-dialog>
       </template>
     </v-data-table>
+
+    <div class="text-center">
+      <v-snackbar :timeout="-1" v-model="snackbar" color="white" elevation="24" absolute top>
+        <span class="black--text">{{ fullText }}</span>
+      </v-snackbar>
+    </div>
   </v-card>
 </template>
 
@@ -72,20 +70,6 @@ export function truncate(text, length, clamp) {
     return text.length > length ? text.slice(0, length) + clamp : text;
   }
   return text;
-}
-
-export function cleanTableRecords(object) {
-  const copy = { ...object };
-  Object.entries(copy).forEach(([k, v]) => {
-    if (v === '[object Object]') {
-      v = {};
-    }
-    if ((v && typeof v === 'object' && !Object.keys(v).length) || v === null || v === undefined || v.length === 0) {
-      if (Array.isArray(copy)) copy.splice(k, 1);
-      else if (!(v instanceof Date)) delete copy[k];
-    }
-  });
-  return copy;
 }
 
 export default {
@@ -117,9 +101,9 @@ export default {
   },
   data() {
     return {
+      snackbar: false,
       showDialog: false,
       fullText: '',
-      toolTipHeader: '',
       textTruncateLength: 36,
       excludeMeta: true,
       csv: null,
@@ -135,7 +119,7 @@ export default {
     items() {
       if (this.parsed) {
         return this.parsed.data.map((n) => {
-          return cleanTableRecords(n);
+          return n;
         });
       }
       return [];
@@ -168,14 +152,12 @@ export default {
     },
     showDetails(value, { text }) {
       if (value.length > this.textTruncateLength) {
-        this.showDialog = true;
+        this.toggleSnackBar();
         this.fullText = value;
-        this.toolTipHeader = text;
       }
     },
-    addClass(value) {
-      if (value !== undefined && value.length > this.textTruncateLength) return 'truncate';
-      else return '';
+    toggleSnackBar() {
+      this.snackbar = !this.snackbar;
     },
 
     onRowSelected({ value, item }) {
@@ -186,7 +168,6 @@ export default {
         if (!this.searchFields[field]) {
           return true;
         }
-
         return value.toLowerCase().startsWith(this.searchFields[field].toLowerCase());
       };
     },
@@ -232,19 +213,10 @@ export default {
 </script>
 
 <style scoped>
-/* https://vue-loader.vuejs.org/guide/scoped-css.html#child-component-root-elements */
 .v-data-table >>> td {
   font-family: monospace;
 }
 
-/*
-.v-data-table >>> .v-label {
-  font-size: 12px;
-}
-*/
-</style>
-
-<style scoped>
 .archived {
   color: #777 !important;
 }

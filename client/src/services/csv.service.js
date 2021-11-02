@@ -34,18 +34,25 @@ function removeKeys(obj, keys) {
  * should return the updated value for the question value
  * @returns updated submission object
  */
+function isEmpty(obj) {
+  if (typeof obj === 'object' && obj !== null) {
+    return Object.keys(obj).length === 0;
+  }
+}
 export function transformSubmissionQuestionTypes(obj, typeHandlers) {
   return Object.entries(obj)
     .map(([key, val]) => {
-      if (typeof val === 'object' && val !== null) {
-        const typeHandler =
-          'meta' in obj[key] && obj[key].meta.type in typeHandlers && typeHandlers[obj[key].meta.type];
-        if (typeHandler) {
-          return { [key]: typeHandler(val) };
+      if (!isEmpty(obj[key])) {
+        if (typeof val === 'object' && val !== null) {
+          const typeHandler =
+            'meta' in obj[key] && obj[key].meta.type in typeHandlers && typeHandlers[obj[key].meta.type];
+          if (typeHandler) {
+            return { [key]: typeHandler(val) };
+          }
+          return { [key]: transformSubmissionQuestionTypes(val, typeHandlers) };
         }
-        return { [key]: transformSubmissionQuestionTypes(val, typeHandlers) };
+        return { [key]: val };
       }
-      return { [key]: val };
     }) // Flatten objects
     .reduce((r, x) => ({ ...r, ...x }), {});
 }
