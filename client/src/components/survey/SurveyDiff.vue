@@ -156,7 +156,7 @@ export default {
       const info = (count, color, icon, tooltip) => ({ count, color, icon, tooltip });
       return [
         info(added, this.colors.added, 'mdi-book-plus', `${added} added`),
-        info(changed, this.colors.changed, 'mdi-book', `${changed} changed`),
+        info(changed, this.colors.changed, 'mdi-book-edit', `${changed} changed`),
         info(removed, this.colors.removed, 'mdi-book-remove', `${removed} removed`),
       ].filter((i) => i.count > 0);
     },

@@ -98,7 +98,7 @@ export const availableControls = [
     label: 'My page',
     type: 'page',
     children: [],
-    icon: 'mdi-view-list',
+    icon: 'mdi-file-outline',
   },
   {
     name: 'instructions',
@@ -153,7 +153,7 @@ export const availableControls = [
     name: 'dropdown',
     label: 'Dropdown',
     type: 'ontology',
-    icon: 'mdi-arrow-down-drop-circle',
+    icon: 'mdi-arrow-down-drop-circle-outline',
   },
   {
     name: 'matrix',

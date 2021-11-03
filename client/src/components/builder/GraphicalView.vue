@@ -303,7 +303,7 @@ export default {
 }
 
 .control-item {
-  padding: 0.75rem 1.25rem;
+  padding: 0.25rem 1.25rem;
   border: 1px solid rgba(0, 0, 0, 0.125);
   margin-bottom: -1px;
   /* border-left: 2px solid transparent; */
