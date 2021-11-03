@@ -92,6 +92,6 @@ export default function buildScriptQuestionIframeContents({
 
         document.addEventListener('DOMContentLoaded', handleLoaded);
       </script>
-      <script async src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+      <script async src="https://cdn.plot.ly/plotly-1.58.5.min.js"></script>
     </body>`;
 }
