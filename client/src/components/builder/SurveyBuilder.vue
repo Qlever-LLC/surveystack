@@ -54,7 +54,7 @@
         </div>
       </pane>
 
-      <pane class="pane pane-library" v-if="library">
+      <pane class="pane pane-library" v-if="showLibrary">
         <div class="px-4">
           <question-library
             :survey="survey"
@@ -218,7 +218,6 @@ import { Splitpanes, Pane } from 'splitpanes';
 
 import moment from 'moment';
 
-import ObjectID from 'bson-objectid';
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
 import questionLibrary from '@/components/survey/library/QuestionLibrary.vue';
@@ -234,13 +233,22 @@ import appMixin from '@/components/mixin/appComponent.mixin';
 import api from '@/services/api.service';
 import slugify from '@/utils/slugify';
 
-import * as utils from '@/utils/surveys';
 import { defaultApiCompose } from '@/utils/apiCompose';
 
 import submissionUtils from '@/utils/submissions';
 import { SPEC_VERSION_SCRIPT } from '@/constants';
 import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 import * as surveyStackUtils from '@/utils/surveyStack';
+import {
+  executeUnsafe,
+  getFlatName,
+  getGroups,
+  getPosition,
+  getPreparedLibraryControls,
+  getPreparedLibraryResources,
+  getSurveyPositions,
+  insertControl,
+} from '@/utils/surveys';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -289,7 +297,7 @@ export default {
       viewCode: false,
       // currently selected control
       control: null,
-      library: false,
+      showLibrary: false,
       libraryId: null,
       // code stuff
       log: '',
@@ -376,21 +384,12 @@ export default {
       const { data } = await api.get(`/surveys/${librarySurveyId}`);
 
       // remove old resources copied from the library survey
-      this.survey.resources = this.survey.resources.filter((value) => value.libraryId !== librarySurveyId);
-      // copy resources from library survey
-      data.resources.forEach((r) => {
-        if (r.libraryId) {
-          r.libraryIsInherited = true;
-        } else {
-          r.libraryId = data._id;
-          r.libraryVersion = data.latestVersion;
-        }
-      });
-      this.survey.resources = this.survey.resources.concat(data.resources);
+      this.survey.resources = this.survey.resources.filter((resource) => resource.libraryId !== librarySurveyId);
 
-      // copy controls from library survey
-      const controlsFromLibrary = data.revisions[data.latestVersion - 1].controls;
+      // add resources from library survey
+      this.survey.resources = this.survey.resources.concat(getPreparedLibraryResources(data));
 
+      // prepare root group for the library questions to be inserted into
       if (rootGroup) {
         rootGroup.libraryVersion = data.latestVersion;
       } else {
@@ -404,31 +403,10 @@ export default {
         this.controlAdded(rootGroup);
       }
 
-      // copy questions from library survey to question group
-      rootGroup.children = controlsFromLibrary.map((control) => {
-        let controlToAdd = { ...control }; //create shallow copy
-        controlToAdd.id = new ObjectID().toString();
-        if (controlToAdd.libraryId) {
-          controlToAdd.libraryIsInherited = true;
-        } else {
-          controlToAdd.libraryId = data._id;
-          controlToAdd.libraryVersion = data.latestVersion;
-        }
+      // add questions from library survey to question group
+      rootGroup.children = getPreparedLibraryControls(data);
 
-        utils.changeRecursive(controlToAdd, (control) => {
-          control.id = new ObjectID().toString();
-          if (control.libraryId) {
-            control.libraryIsInherited = true;
-          } else {
-            //set library data if not yet set, if set, do not overwrite cause it references another library the inherited library consists of
-            control.libraryId = data._id;
-            control.libraryVersion = data.latestVersion;
-          }
-        });
-        return controlToAdd;
-      });
-
-      this.library = false;
+      this.showLibrary = false;
     },
     updateLibraryQuestions(control) {
       //clear selected control and re-add questions from library
@@ -436,7 +414,7 @@ export default {
       this.addQuestionsFromLibrary(control.libraryId, control);
     },
     closeLibrary() {
-      this.library = false;
+      this.showLibrary = false;
     },
     async checkForLibraryUpdates(survey) {
       const { data } = await api.get(`/surveys/check-for-updates/${survey._id}`);
@@ -469,7 +447,7 @@ export default {
       this.version = version;
 
       const v = this.survey.revisions[this.survey.revisions.length - 1].version;
-      const amountQuestions = utils.getSurveyPositions(this.survey, v);
+      const amountQuestions = getSurveyPositions(this.survey, v);
       this.setNavbarContent({
         title: this.survey.name || 'Untitled Survey',
         subtitle: `
@@ -524,7 +502,7 @@ export default {
     async runCode() {
       const tab = tabMap[this.selectedTab];
       try {
-        const res = await utils.executeUnsafe({
+        const res = await executeUnsafe({
           code: this.activeCode,
           fname: tab,
           submission: this.instance,
@@ -590,15 +568,15 @@ export default {
     },
     duplicateControl(control) {
       if (this.control && this.currentControls.length > 0) {
-        const position = utils.getPosition(this.control, this.currentControls);
-        utils.insertControl(
+        const position = getPosition(this.control, this.currentControls);
+        insertControl(
           control,
           this.currentControls,
           position,
           this.control.type === 'group' || this.control.type === 'page'
         );
       } else {
-        utils.insertControl(control, this.currentControls, 0, false);
+        insertControl(control, this.currentControls, 0, false);
       }
       this.control = control;
     },
@@ -609,19 +587,19 @@ export default {
         return;
       }
 
-      const position = utils.getPosition(this.control, this.currentControls);
-      utils.insertControl(
+      const position = getPosition(this.control, this.currentControls);
+      insertControl(
         control,
         this.currentControls,
         position,
         this.control.type === 'group' || this.control.type === 'page'
       );
       this.control = control;
-      this.library = false;
+      this.showLibrary = false;
     },
     openLibrary(libraryId) {
       this.control = null;
-      this.library = true;
+      this.showLibrary = true;
       if (libraryId) {
         this.libraryId = libraryId;
       } else {
@@ -654,7 +632,7 @@ export default {
       const hasOnlyUniqueNames = uniqueNames.length === currentControls.length;
       const allNamesContainOnlyValidCharacters = !currentControls.some((control) => !namePattern.test(control.name));
 
-      const groupedQuestionsAreValid = utils.getGroups(currentControls).reduce((r, group) => {
+      const groupedQuestionsAreValid = getGroups(currentControls).reduce((r, group) => {
         const uniqueNamesInGroup = uniqBy(group.children, 'name');
         const groupHasOnlyUniqueNames = uniqueNamesInGroup.length === group.children.length;
         const allNamesInGroupContainOnlyValidCharacters = !group.children.some(
@@ -759,8 +737,8 @@ export default {
       return this.dirty;
     },
     controlId() {
-      const position = utils.getPosition(this.control, this.currentControls);
-      const id = utils.getFlatName(this.currentControls, position);
+      const position = getPosition(this.control, this.currentControls);
+      const id = getFlatName(this.currentControls, position);
       console.log('controlId', id);
       return id;
     },
@@ -798,8 +776,8 @@ export default {
       return `${submission};\n\n${parent};\n`;
     },
     parent() {
-      const position = utils.getPosition(this.control, this.currentControls);
-      const path = utils.getFlatName(this.currentControls, position);
+      const position = getPosition(this.control, this.currentControls);
+      const path = getFlatName(this.currentControls, position);
       const parentPath = surveyStackUtils.getParentPath(path);
       const parentData = surveyStackUtils.getNested(this.instance, parentPath);
       return parentData;

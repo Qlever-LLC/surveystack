@@ -4,7 +4,7 @@ import boom from '@hapi/boom';
 
 import { db } from '../db';
 
-import { checkSurvey, forAllControlsRecursive } from '../helpers/surveys';
+import { checkSurvey, changeRecursive } from '../helpers/surveys';
 import rolesService from '../services/roles.service';
 
 const col = 'surveys';
@@ -17,7 +17,7 @@ const sanitize = async (entity) => {
     version.dateCreated = new Date(entity.dateCreated);
 
     version.controls.forEach((control) => {
-      forAllControlsRecursive(control, (control)=> {
+      changeRecursive(control, (control)=> {
         if (control.libraryId) {
           control.libraryId = new ObjectId(control.libraryId);
         }

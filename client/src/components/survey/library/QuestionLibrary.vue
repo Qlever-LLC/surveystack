@@ -169,7 +169,6 @@ export default {
       const queryParams = new URLSearchParams();
       if (this.search) {
         queryParams.append('q', this.search);
-        console.log(this.search);
       }
 
       queryParams.append('isLibrary', 'true');
