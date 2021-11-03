@@ -41,7 +41,6 @@
             class="mb-4"
           />
           <graphical-view
-            class="graphical-view"
             v-if="!viewCode"
             :selected="control"
             :controls="currentControls"
@@ -953,10 +952,6 @@ export default {
 }
 
 .pane-survey {
-  overflow: auto;
-}
-
-.graphical-view {
   overflow: auto;
 }
 

@@ -6,9 +6,9 @@
       </template>
       <span>{{ typeName }}</span>
     </v-tooltip>
-    <v-col class="text-truncate">
+    <v-col class="body-1 text-truncate">
       <div class="font-weight-light grey--text text--darken-2 text-truncate">{{ index }}: {{ dataName }}</div>
-      <div class="subtitle-1 text-truncate">
+      <div class="text-truncate">
         {{ title }}
       </div>
     </v-col>
