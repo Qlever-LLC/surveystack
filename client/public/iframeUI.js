@@ -1,4 +1,4 @@
-import marked from 'https://cdn.jsdelivr.net/npm/marked@latest/lib/marked.esm.js';
+import { marked } from 'https://cdn.jsdelivr.net/npm/marked@4.0.0/lib/marked.esm.js';
 
 export function card(content, { header, meta, footer } = {}) {
   const node = document.createElement('div');
@@ -7,23 +7,34 @@ export function card(content, { header, meta, footer } = {}) {
 
   node.innerHTML = `
     <div class="px-4 py-4">
-      ${header ? `<div class="font-bold text-xl mb-2">
+      ${
+        header
+          ? `<div class="font-bold text-xl mb-2">
         ${header}
-      </div>` : ''}
-      ${meta ? `<div class="text-gray-600 -mt-2 mb-2">
+      </div>`
+          : ''
+      }
+      ${
+        meta
+          ? `<div class="text-gray-600 -mt-2 mb-2">
         ${meta}
-      </div>` : ''}
+      </div>`
+          : ''
+      }
       <p class="text-gray-700 text-base">
         ${content}
       </p>
-      ${footer ? `<div class="text-gray-700">
+      ${
+        footer
+          ? `<div class="text-gray-700">
         ${footer}
-      </div>` : ''}
+      </div>`
+          : ''
+      }
     </div>
   `;
   return node;
 }
-
 
 export function message(content, { type = null, header } = {}) {
   const node = document.createElement('div');
@@ -72,7 +83,6 @@ export function md(content) {
   return node;
 }
 
-
 export function createUI() {
   return {
     node: document.createElement('div'),
@@ -82,7 +92,7 @@ export function createUI() {
     markdown,
     md,
     add(...elements) {
-      elements.forEach(el => this.node.appendChild(el));
+      elements.forEach((el) => this.node.appendChild(el));
     },
   };
 }
