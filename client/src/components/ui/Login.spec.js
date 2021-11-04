@@ -238,7 +238,7 @@ describe('Login component', () => {
   });
 
   describe('submit form and check submit() method behaviour based on try to auto join group if this is a whitelabel', () => {
-    it('submit and trying autojoin if this.isWhitelabel && this.registrationEnabled ', async () => {
+    it('submit and trying autojoin if this.isWhitelabel && this.registrationEnabled', async () => {
       let res = { data: { meta: { invitationOnly: false } } };
       mockAxios.get.mockImplementation(() => Promise.resolve(res));
       mockAxios.post.mockImplementation(() => Promise.resolve());
