@@ -20,6 +20,7 @@
     "client:lint": "cross-env FORCE_COLOR=1 lerna --scope surveystack-client run lint --no-prefix --stream",
     "server:start": "cross-env FORCE_COLOR=1 lerna --scope surveystack-server run start --no-prefix --stream",
     "server:build": "cross-env FORCE_COLOR=1 lerna --scope surveystack-server run build --no-prefix --stream",
-    "build": "cross-env FORCE_COLOR=1 lerna run build --parallel --stream"
+    "build": "cross-env FORCE_COLOR=1 lerna run build --parallel --stream",
+    "generate": "node client/generatePartner.js"
   }
 }
