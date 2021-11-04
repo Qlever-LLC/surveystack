@@ -2,7 +2,7 @@
   <!-- v-if="state.isEditing" -->
   <v-text-field
     :value="value"
-    @input="emitInput"
+    @input="$emit('input', $event)"
     @blur="setIsEditing(false)"
     placeholder="Untitled Survey"
     class="display-1 pt-0 mt-0"
@@ -28,7 +28,17 @@ export default {
   props: {
     value: String,
   },
-  setup(props, context) {
+  data: () => ({
+    rules: {
+      hasOnlyValidCharacters(val) {
+        return /^[\w-\s]*$/.test(val) ? true : 'Survey name cannot contain special characters';
+      },
+      hasValidLength(val) {
+        return val.length > 4 ? true : 'Survey name must be at least 5 characters long';
+      },
+    },
+  }),
+  setup(props) {
     const state = reactive({
       isEditing: !props.value || false,
     });
@@ -39,16 +49,7 @@ export default {
 
     return {
       state,
-      emitInput: (val) => context.emit('input', val),
       setIsEditing,
-      rules: {
-        hasOnlyValidCharacters(val) {
-          return /^[\w-\s]*$/.test(val) ? true : 'Survey name cannot contain special characters';
-        },
-        hasValidLength(val) {
-          return val.length > 4 ? true : 'Survey name must be at least 5 characters long';
-        },
-      },
     };
   },
 };
