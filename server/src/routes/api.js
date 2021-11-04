@@ -20,6 +20,7 @@ import cfsController from '../controllers/cfsController';
 
 import {
   assertAuthenticated,
+  assertIsSuperAdmin,
   assertEntityExists,
   assertIdsMatch,
   assertNameNotEmpty,
@@ -56,7 +57,6 @@ router.post('/auth/reset-password', catchErrors(authController.resetPassword));
 /** Group */
 router.get('/groups', catchErrors(groupController.getGroups));
 router.get('/groups/by-path*', catchErrors(groupController.getGroupByPath));
-//router.get('/groups/:id/users', catchErrors(groupController.getUsers));
 router.get('/groups/:id', catchErrors(groupController.getGroupById));
 router.post('/groups', assertAuthenticated, catchErrors(groupController.createGroup));
 router.put(
@@ -127,6 +127,11 @@ router.delete(
 router.get('/surveys', catchErrors(surveyController.getSurveys));
 router.get('/surveys/info', catchErrors(surveyController.getSurveyInfo));
 router.get('/surveys/list-page', catchErrors(surveyController.getSurveyListPage));
+router.get(
+  '/surveys/list-library-consumers',
+  [assertAuthenticated],
+  catchErrors(surveyController.getSurveyLibraryConsumers)
+);
 router.get('/surveys/page', catchErrors(surveyController.getSurveyPage));
 router.get('/surveys/:id', catchErrors(surveyController.getSurvey));
 router.post(
@@ -151,7 +156,7 @@ router.delete(
 );
 
 /** Users */
-router.get('/users', catchErrors(userController.getUsers));
+router.get('/users', assertIsSuperAdmin, catchErrors(userController.getUsers));
 router.get('/users/:id', catchErrors(userController.getUser));
 router.post('/users', [assertNameNotEmpty], catchErrors(userController.createUser));
 router.put(
@@ -159,7 +164,7 @@ router.put(
   [assertAuthenticated, assertIdsMatch, assertEntityExists({ collection: 'users' })],
   catchErrors(userController.updateUser)
 );
-router.delete('/users/:id', [assertAuthenticated], catchErrors(userController.deleteUser));
+router.delete('/users/:id', [assertAuthenticated, assertIsSuperAdmin], catchErrors(userController.deleteUser));
 
 /** Scripts */
 router.get('/scripts', catchErrors(scriptController.getScripts));

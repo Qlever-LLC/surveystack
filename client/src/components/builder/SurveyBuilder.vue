@@ -41,9 +41,10 @@
             v-if="!viewCode"
             :selected="control"
             :controls="currentControls"
-            @controlSelected="controlSelected"
+            @control-selected="controlSelected"
             @duplicate-control="duplicateControl"
             @open-library="openLibrary"
+            @update-library-questions="updateLibraryQuestions"
           />
         </div>
       </pane>
@@ -53,7 +54,7 @@
           <question-library
             :survey="survey"
             :libraryId="libraryId"
-            @addToSurvey="addQuestionsFromLibrary"
+            @add-questions-from-library="addQuestionsFromLibrary"
             @cancel="closeLibrary"
           />
         </div>
@@ -330,7 +331,6 @@ export default {
       }
     },
     setScriptIsVisible(val) {
-      console.log('hello');
       this.scriptEditorIsVisible = val;
     },
     updateScriptCode(code) {
@@ -362,11 +362,10 @@ export default {
       this.survey.meta.dateModified = date;
     },
     addToLibrary() {
-      console.log('add to library');
       this.survey.meta.isLibrary = true;
       this.saveDraft();
     },
-    async addQuestionsFromLibrary(librarySurveyId) {
+    async addQuestionsFromLibrary(librarySurveyId, rootGroup) {
       // load library survey
       const { data } = await api.get(`/surveys/${librarySurveyId}`);
 
@@ -374,48 +373,60 @@ export default {
       this.survey.resources = this.survey.resources.filter((value) => value.libraryId !== librarySurveyId);
       // copy resources from library survey
       data.resources.forEach((r) => {
-        r.libraryId = data._id;
-        r.libraryVersion = data.latestVersion;
+        if (r.libraryId) {
+          r.libraryIsInherited = true;
+        } else {
+          r.libraryId = data._id;
+          r.libraryVersion = data.latestVersion;
+        }
       });
       this.survey.resources = this.survey.resources.concat(data.resources);
 
       // copy controls from library survey
       const controlsFromLibrary = data.revisions[data.latestVersion - 1].controls;
 
-      // create question group
-      const group = createControlInstance(availableControls.find((c) => c.type === 'group'));
-      group.name = slugify(data.name);
-      group.label = data.name;
-      group.isLibraryRoot = true;
-      group.libraryId = data._id;
-      group.libraryVersion = data.latestVersion;
-
-      // add recursive function for children
-      const dive = (control, cb) => {
-        cb(control);
-        if (!control.children) {
-          return;
-        }
-        control.children.forEach((c) => {
-          dive(c, cb);
-        });
-      };
+      if (rootGroup) {
+        rootGroup.libraryVersion = data.latestVersion;
+      } else {
+        // create question group
+        rootGroup = createControlInstance(availableControls.find((c) => c.type === 'group'));
+        rootGroup.name = slugify(data.name);
+        rootGroup.label = data.name;
+        rootGroup.isLibraryRoot = true;
+        rootGroup.libraryId = data._id;
+        rootGroup.libraryVersion = data.latestVersion;
+        this.controlAdded(rootGroup);
+      }
 
       // copy questions from library survey to question group
-      for (let i = 0; i < controlsFromLibrary.length; i++) {
-        const controlToAdd = controlsFromLibrary[i];
+      rootGroup.children = controlsFromLibrary.map((control) => {
+        let controlToAdd = { ...control }; //create shallow copy
         controlToAdd.id = new ObjectID().toString();
-        controlToAdd.libraryId = data._id;
-        dive(controlToAdd, (control) => {
-          // eslint-disable-next-line no-param-reassign
+        if (controlToAdd.libraryId) {
+          controlToAdd.libraryIsInherited = true;
+        } else {
+          controlToAdd.libraryId = data._id;
+          controlToAdd.libraryVersion = data.latestVersion;
+        }
+
+        utils.changeRecursive(controlToAdd, (control) => {
           control.id = new ObjectID().toString();
-          control.libraryId = data._id;
-          control.libraryVersion = data.latestVersion;
+          if (control.libraryId) {
+            control.libraryIsInherited = true;
+          } else {
+            //set library data if not yet set, if set, do not overwrite cause it references another library the inherited library consists of
+            control.libraryId = data._id;
+            control.libraryVersion = data.latestVersion;
+          }
         });
-        group.children.push(controlToAdd);
-      }
-      this.duplicateControl(group);
+        return controlToAdd;
+      });
+
       this.library = false;
+    },
+    updateLibraryQuestions(control) {
+      control.children = [];
+      this.addQuestionsFromLibrary(control.libraryId, control);
     },
     closeLibrary() {
       this.library = false;
@@ -448,7 +459,6 @@ export default {
 
       const v = this.survey.revisions[this.survey.revisions.length - 1].version;
       const amountQuestions = utils.getSurveyPositions(this.survey, v);
-      // console.log('amount: ', amountQuestions);
       this.setNavbarContent({
         title: this.survey.name || 'Untitled Survey',
         subtitle: `
@@ -459,8 +469,6 @@ export default {
           <!--<span class="question-title-chip">${this.groupPath}</span>-->
         `,
       });
-
-      // console.log('version is', version);
     },
     updateSelectedCode(code) {
       this.control.options[tabMap[this.selectedTab]].code = code;
@@ -488,10 +496,8 @@ export default {
 
       this.selectedTab = tabMap.indexOf(tab);
 
-      console.log('options', this.control.options);
       if (!this.control.options[tab].code) {
         let initalCode;
-        console.log('tab is', tab);
         if (tab === 'apiCompose') {
           initalCode = defaultApiCompose;
         } else {
@@ -536,9 +542,7 @@ export default {
       console.log(value);
     },
     async controlSelected(control) {
-      // console.log('selected control', control);
       this.control = control;
-      console.log('controlSelected', control);
       if (control && control.type === 'script' && control.options.source) {
         const data = await this.fetchScript(control.options.source);
         this.scriptEditorIsVisible = false;
@@ -664,12 +668,10 @@ export default {
     },
     createInstance() {
       const { version } = this.survey.revisions[this.survey.revisions.length - 1];
-      const group = this.$store.getters['memberships/activeGroup'];
 
       this.instance = submissionUtils.createSubmissionFromSurvey({
         survey: this.survey,
         version,
-        group,
         instance: this.instance,
       });
     },
@@ -785,7 +787,6 @@ export default {
       return `${submission};\n\n${parent};\n`;
     },
     parent() {
-      console.log('parent() called');
       const position = utils.getPosition(this.control, this.currentControls);
       const path = utils.getFlatName(this.currentControls, position);
       const parentPath = surveyStackUtils.getParentPath(path);
@@ -795,7 +796,6 @@ export default {
   },
   watch: {
     selectedTab(tab) {
-      console.log('selecting tab', tab);
       this.highlight(tabMap[tab]);
     },
     optionsRelevance: {

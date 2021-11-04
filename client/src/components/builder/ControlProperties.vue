@@ -117,7 +117,7 @@
       <v-checkbox
         class="my-1"
         color="grey darken-1"
-        v-if="survey.meta.isLibrary"
+        v-if="survey.meta.isLibrary && !control.libraryIsInherited"
         v-model="control.options.allowHide"
         hide-details
         label="Allow hide"
@@ -135,7 +135,7 @@
       <v-checkbox
         class="my-1"
         color="grey darken-1"
-        v-if="survey.meta.isLibrary"
+        v-if="survey.meta.isLibrary && !control.libraryIsInherited"
         v-model="control.options.allowModify"
         hide-details
         label="Allow modify"
@@ -297,7 +297,7 @@
       <instructions-editor
         v-else-if="isInstructions"
         v-model="control.options.source"
-        :disabled="control.libraryId != null"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
       <instructions-image-split-editor
         v-else-if="isInstructionsImageSplit"

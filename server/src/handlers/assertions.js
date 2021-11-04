@@ -14,6 +14,14 @@ export const assertAuthenticated = catchErrors(async (req, res, next) => {
   next();
 });
 
+export const assertIsSuperAdmin = (req, res, next) => {
+  if (!res.locals.auth.isSuperAdmin) {
+    throw boom.unauthorized();
+  }
+
+  next();
+}
+
 const getEntity = async (id, collection) => {
   return await db.collection(collection).findOne({ _id: new ObjectId(id) });
 }

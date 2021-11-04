@@ -2,9 +2,10 @@
   <div class="draft-component-wrapper draft wrapper" :class="{ builder: builder }" v-if="control" ref="wrapper">
     <!-- confirm submission modal -->
     <app-confirm-submission-dialog
+      v-if="showConfirmSubmission"
       v-model="showConfirmSubmission"
-      :group="submission.meta.group.id"
-      @submit="() => submit(submission)"
+      :groupId="submission.meta.group.id"
+      @submit="() => submitConfirmed(submission)"
       @set-group="setSubmissionGroup"
       :dateSubmitted="submission.meta.dateSubmitted"
     />
@@ -69,7 +70,7 @@
       :showNav="true"
       @next="next"
       @prev="prev"
-      @submit="showConfirmSubmission = true"
+      @submit="submit"
     />
   </div>
 </template>
@@ -169,7 +170,23 @@ export default {
       this.$store.dispatch('draft/goto', path);
       this.showOverview = false;
     },
-    async submit() {
+    submit() {
+      // if group is not yet set, select the user's selected group if set
+      if (!this.submission.meta.group.id) {
+        const activeGroupId = this.$store.getters['memberships/activeGroup'];
+        if (activeGroupId) {
+          const allGroups = this.$store.getters['memberships/groups'];
+          const activeGroup = allGroups.find(({ _id }) => _id === activeGroupId);
+          if (activeGroup) {
+            this.submission.meta.group.id = activeGroup._id;
+            this.submission.meta.group.path = activeGroup.path;
+          }
+        }
+      }
+
+      this.showConfirmSubmission = true;
+    },
+    async submitConfirmed() {
       this.$emit('submit', {
         payload: this.submission,
       });

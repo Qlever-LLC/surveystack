@@ -17,12 +17,12 @@
       class="control-item mb-2"
       :class="[
         { 'control-item-selected': el === selected },
-        { 'library-border': el.isLibraryRoot },
+        { 'library-border': el.isLibraryRoot && !el.libraryIsInherited },
         { 'control-item-library': el.libraryId },
-        { 'draggable-item': !el.libraryId || el.isLibraryRoot },
+        { 'draggable-item': !el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited) },
       ]"
       :key="el.id || el._id"
-      @mousedown.stop.left="$emit('controlSelected', el)"
+      @mousedown.stop.left="$emit('control-selected', el)"
     >
       <div class="d-flex justify-space-between align-center">
         <div class="mb-2" v-if="!el.options.hidden">
@@ -32,31 +32,51 @@
             {{ getDisplay(el) }}
           </span>
           <br />
-          <span class="font-weight-light grey--text text--darken-2">
-            {{ el.name }}
-            : {{ el.type }}
-          </span>
+          <span class="font-weight-light grey--text text--darken-2"> {{ el.name }} : {{ el.type }} </span>
         </div>
         <div class="grey--text text--darken-1" v-if="el.options.hidden">
           {{ createIndex(index, idx + 1) | displayIndex }} &nbsp; {{ getDisplay(el) }}
         </div>
-        <div class="d-flex">
-          <v-btn icon v-if="selected === el && !el.libraryId" @click.stop="duplicateControl(el)">
-            <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
-          </v-btn>
-          <v-btn icon v-if="selected === el && el.isLibraryRoot" @click.stop="openLibrary(el.libraryId)">
-            <v-icon color="grey lighten-1">mdi-library</v-icon>
-          </v-btn>
-          <v-btn
-            icon
-            v-if="selected === el && (!el.libraryId || el.isLibraryRoot)"
-            @click.stop="() => showDeleteModal(idx)"
+        <div class="mb-2 context-actions">
+          <div>
+            <v-btn icon v-if="selected === el && !el.libraryId" @click.stop="duplicateControl(el)">
+              <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
+            </v-btn>
+            <v-btn
+              icon
+              v-if="selected === el && el.isLibraryRoot && !el.libraryIsInherited"
+              @click.stop="openLibrary(el.libraryId)"
+            >
+              <v-icon color="grey lighten-1">mdi-library</v-icon>
+            </v-btn>
+            <v-btn
+              icon
+              v-if="selected === el && el.isLibraryRoot && !el.libraryIsInherited"
+              @click.stop="updateLibrary(idx)"
+            >
+              <v-icon color="grey lighten-1">mdi-refresh</v-icon>
+            </v-btn>
+            <v-btn
+              icon
+              v-if="selected === el && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
+              @click.stop="() => showDeleteModal(idx)"
+            >
+              <v-icon color="grey lighten-1">mdi-delete</v-icon>
+            </v-btn>
+            <v-btn text x-small v-if="el.options.hidden" @click.stop="el.options.hidden = false" color="grey lighten-1">
+              unhide
+            </v-btn>
+          </div>
+          <v-chip
+            v-if="selected === el && el.isLibraryRoot && !el.libraryIsInherited"
+            class="align-center text-align-center text-center"
+            dark
+            small
+            outlined
+            color="grey"
           >
-            <v-icon color="grey lighten-1">mdi-delete</v-icon>
-          </v-btn>
-          <v-btn text x-small v-if="el.options.hidden" @click.stop="el.options.hidden = false" color="grey lighten-1">
-            unhide
-          </v-btn>
+            Version {{ el.libraryVersion }}
+          </v-chip>
         </div>
       </div>
 
@@ -64,13 +84,15 @@
         v-if="el.type == 'group' && !el.options.hidden"
         :class="[
           { 'drop-area-border': el.children.length === 0, 'drop-area': 1 },
-          { 'draggable-item': !el.libraryId || el.isLibraryRoot },
+          { 'draggable-item': !el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited) },
         ]"
         :selected="selected"
         :controls="el.children"
         :readOnly="readOnly"
-        @controlSelected="$emit('controlSelected', $event)"
+        @control-selected="$emit('control-selected', $event)"
         @duplicate-control="$emit('duplicate-control', $event)"
+        @open-library="$emit('open-library', $event)"
+        @update-library-questions="$emit('update-library-questions', $event)"
         :index="createIndex(index, idx + 1)"
       />
 
@@ -78,13 +100,15 @@
         v-if="el.type == 'page' && !el.options.hidden"
         :class="[
           { 'drop-area-border': el.children.length === 0, 'drop-area': 1 },
-          { 'draggable-item': !el.libraryId || el.isLibraryRoot },
+          { 'draggable-item': !el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited) },
         ]"
         :selected="selected"
         :controls="el.children"
         :readOnly="readOnly"
-        @controlSelected="$emit('controlSelected', $event)"
+        @control-selected="$emit('control-selected', $event)"
         @duplicate-control="$emit('duplicate-control', $event)"
+        @open-library="$emit('open-library', $event)"
+        @update-library-questions="$emit('update-library-questions', $event)"
         :index="createIndex(index, idx + 1)"
       />
 
@@ -123,6 +147,7 @@ import draggable from 'vuedraggable';
 import { cloneDeep } from 'lodash';
 import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
+import * as utils from '@/utils/surveys';
 
 export default {
   name: 'nested-draggable',
@@ -179,7 +204,7 @@ export default {
     },
     removeAt(idx) {
       this.controls.splice(idx, 1);
-      this.$emit('controlSelected', null);
+      this.$emit('control-selected', null);
     },
     createIndex(current, idx) {
       const newIndex = [...current];
@@ -194,18 +219,7 @@ export default {
         id: new ObjectID().toString(),
       };
 
-      const dive = (control, cb) => {
-        cb(control);
-        if (!control.children) {
-          return;
-        }
-        control.children.forEach((c) => {
-          dive(c, cb);
-        });
-      };
-
-      dive(copy, (control) => {
-        // eslint-disable-next-line no-param-reassign
+      utils.changeRecursive(copy, (control) => {
         control.id = new ObjectID().toString();
       });
 
@@ -213,6 +227,9 @@ export default {
     },
     openLibrary(libraryId) {
       this.$emit('open-library', libraryId);
+    },
+    updateLibrary(idx, libraryId) {
+      this.$emit('update-library-questions', this.controls[idx]);
     },
   },
 };
@@ -271,6 +288,11 @@ export default {
 
 .control-item-selected {
   border-left: 2px solid var(--v-primary-base);
+}
+
+.context-actions {
+  min-width: 108px;
+  text-align: right;
 }
 </style>
 
