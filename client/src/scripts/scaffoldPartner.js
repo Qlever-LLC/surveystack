@@ -1,4 +1,27 @@
 const fs = require('fs');
+const path = require('path');
+const chalk = require('chalk');
+
+const log = console.log;
+
+function printFolderContents(dir) {
+  //passsing directoryPath and callback function
+  fs.readdir(dir, function(err, files) {
+    //handling error
+    if (err) {
+      return log(chalk.bold.red(`Unable to scan directory:  ${err}`));
+    }
+    //listing all files using forEach
+    files.forEach(function(file) {
+      // print file
+      if (fs.lstatSync(path.resolve(dir, file)).isDirectory()) {
+        log(chalk.bold.keyword('orange')(` 📁 ${file}`));
+      } else {
+        log(chalk.bold.green(` 🗄  ${file}`));
+      }
+    });
+  });
+}
 /**
  *
  * Generate Partner folders in /client/public/partners directory
@@ -6,24 +29,21 @@ const fs = require('fs');
  *
  */
 function generatePartnerFolders(partnerName, folders, manifestContent) {
-  const basePath = process.cwd() + '/client/public/partners/';
+  const basePath = `${process.cwd()}/public/partners/`;
   folders.forEach((folder) => {
     if (folder.split('.').includes('json')) {
-      fs.writeFileSync(basePath + partnerName + '/' + folder, manifestContent, function (err) {
-        if (err) {
-          throw new Error(err)
-        } else {
-          console.log('File Created successfully');
-        }
-      });
+      try {
+        fs.writeFileSync(`${basePath}/${partnerName}/${folder}`, manifestContent);
+        printFolderContents(`${basePath}/${process.argv[2]}`);
+      } catch (error) {
+        log(chalk.bold.red(error));
+      }
     } else {
-      fs.mkdirSync(basePath + partnerName + '/' + folder, { recursive: true }, function (err) {
-        if (err) {
-          throw new Error(err);
-        } else {
-          console.log('Folders Created successfully');
-        }
-      });
+      try {
+        fs.mkdirSync(`${basePath}${partnerName}/${folder}`, { recursive: true });
+      } catch (error) {
+        log(chalk.bold.red(error));
+      }
     }
   });
 }
@@ -31,22 +51,22 @@ function generatePartnerFolders(partnerName, folders, manifestContent) {
 /**
  *
  * Generate Partner file in /client/src/partners directory
- * @param {partnerFile: string, content: string} 
+ * @param {partnerFile: string, content: string}
  *
  */
 function generatePartnerFile(partnerFile, content) {
-  const basePath = process.cwd() + '/client/src/partners/';
-  fs.writeFileSync(basePath + partnerFile, content, function (err) {
-    if (err) {
-      console.log('err', err);
-    } else {
-      console.log('success');
-    }
-  });
+  const basePath = `${process.cwd()}/src/partners`;
+  try {
+    fs.writeFileSync(`${basePath}/${partnerFile}`, content);
+    log(chalk.bold.blue('Generated files and folders'));
+    log(chalk.bold.green(` 🗄  ${process.argv[2]}.js`));
+  } catch (error) {
+    log(chalk.bold.red(error));
+  }
 }
 
 generatePartnerFolders(
-  process.argv[2], // send the partner name from your package.json file ("generate": "node ./client/generatePartner")
+  process.argv[2], // send the partner name from your package.json file
   ['images', 'img', 'manifest.json'], // folders and manifest.json to be generated
   `{
       "name": "${process.argv[2]}",
@@ -103,7 +123,7 @@ generatePartnerFolders(
 `
 );
 generatePartnerFile(
-  process.argv[2] + '.js', // partner file to be generated (/client/src/partners)
+  `${process.argv[2]}.js`, // partner file to be generated (/client/src/partners)
   `export default {
   name: '${process.argv[2]}', 
   domain: '${process.argv[2]}',

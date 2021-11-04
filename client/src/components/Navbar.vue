@@ -243,11 +243,15 @@ export default {
       const items = [];
       const divider = { type: 'divider' };
       items.push(...this.sidenav.collect);
-      if (this.$store.getters['auth/isLoggedIn']) {
+      console.log(JSON.parse(localStorage.getItem('auth_user')));
+      const isDefaultAdmin = JSON.parse(localStorage.getItem('auth_user')).name === 'Default Super Admin';
+      const isSuperAdmin = JSON.parse(localStorage.getItem('auth_user')).name === 'Super Admin';
+      console.log(isDefaultAdmin, '==>');
+      if (this.$store.getters['auth/isLoggedIn'] && isDefaultAdmin) {
         items.push(divider);
         items.push(...this.sidenav.admin);
       }
-      if (this.$store.getters['auth/isSuperAdmin']) {
+      if (this.$store.getters['auth/isSuperAdmin'] && isSuperAdmin) {
         items.push(divider);
         items.push(...this.sidenav.superAdmin);
       }
