@@ -45,6 +45,7 @@
             @duplicate-control="duplicateControl"
             @open-library="openLibrary"
             @update-library-questions="updateLibraryQuestions"
+            data-testid="graphical-view"
           />
         </div>
       </pane>
@@ -81,6 +82,7 @@
               @set-survey-resources="setSurveyResources"
               @set-control-params="setControlParams"
               @set-script-editor-is-visible="setScriptIsVisible"
+              data-testid="control-properties"
             />
           </div>
         </v-card>
