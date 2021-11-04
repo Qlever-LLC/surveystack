@@ -4,6 +4,13 @@ const chalk = require('chalk');
 
 const log = console.log;
 
+/**
+ *
+ * function to print generated files
+ * @param {dir: string}
+ *
+ */
+
 function printFolderContents(dir) {
   //passsing directoryPath and callback function
   fs.readdir(dir, function(err, files) {
