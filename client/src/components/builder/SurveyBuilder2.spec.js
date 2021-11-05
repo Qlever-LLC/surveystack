@@ -1,13 +1,13 @@
-import { render, fireEvent, prettyDOM, findByText, getByTestId, getByLabelText } from '@testing-library/vue';
+import { render, fireEvent, prettyDOM, findByText, getByTestId, getByLabelText, within } from '@testing-library/vue';
 import SurveyBuilder from './SurveyBuilder.vue';
 import { createSurvey } from '@/utils/surveys';
 import { createStoreObject } from '@/store';
 import vuetify from '@/plugins/vuetify';
-import { availableControls } from '@/utils/surveyConfig';
+import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 import router from '@/router';
-import { isString, last } from 'lodash';
+import { isString } from 'lodash';
 
-// Example test with vue-testing-utils
+// Example test  with vue-testing-utils
 import { mount } from '@vue/test-utils';
 import Vuex from 'vuex';
 import SurveyNameEditor from '@/components/builder/SurveyNameEditor.vue';
@@ -21,39 +21,54 @@ test('vue-test-utils example', () => {
   expect(input.vm.value).toBe(survey.name);
 });
 
-describe('add control', () => {
-  const addControl = async (container, type, { dataName, label, hint, moreInfo } = {}) => {
-    await fireEvent.click(getByTestId(container, 'control-adder-open'));
-    await fireEvent.click(getByTestId(container, `add-control-${type}`));
+const addControl = async (container, type, { dataName, label, hint, moreInfo } = {}) => {
+  await fireEvent.click(getByTestId(container, 'control-adder-open'));
+  await fireEvent.click(getByTestId(container, `add-control-${type}`));
 
-    const fields = [
-      [dataName, 'Data name'],
-      [label, 'Label'],
-      [hint, 'Hint'],
-      [moreInfo, 'More info'],
-    ];
-    for (const [value, domLabel] of fields) {
-      if (isString(value)) {
-        const props = getByTestId(container, 'control-properties');
-        await fireEvent.update(getByLabelText(props, domLabel), value);
-      }
+  const fields = [
+    [dataName, 'Data name'],
+    [label, 'Label'],
+    [hint, 'Hint'],
+    [moreInfo, 'More info'],
+  ];
+  for (const [value, domLabel] of fields) {
+    if (isString(value)) {
+      const props = getByTestId(container, 'control-properties');
+      await fireEvent.update(getByLabelText(props, domLabel), value);
     }
-  };
+  }
+};
 
+const optionsWithControls = (controls = []) => {
+  const survey = {
+    ...createSurvey({ group: { id: null, path: null } }),
+    name: 'survey name',
+    id: 'survey_id',
+    latestVersion: 2,
+  };
+  survey.revisions.push({
+    dateCreated: survey.revisions[0].currentDate,
+    version: 2,
+    controls,
+  });
+  const props = { survey };
+  const store = createStoreObject();
+  return {
+    props,
+    router,
+    vuetify,
+    store,
+  };
+};
+
+describe('add control', () => {
   availableControls
     .filter(({ type }) => type !== 'script') // TODO load scripts from vuex instead of getting them from the server
     .forEach((info) => {
       it(`can add ${info.type} type control`, async () => {
-        const survey = { ...createSurvey({ group: { id: null, path: null } }), name: 'survey name', id: 'survey_id' };
-        const props = { survey };
-        const store = createStoreObject();
-        const spyDraftInit = jest.spyOn(store.modules.draft.actions, 'init');
-        const { getByTestId, container, getByText } = render(SurveyBuilder, {
-          props,
-          router,
-          vuetify,
-          store,
-        });
+        const options = optionsWithControls();
+        const spyDraftInit = jest.spyOn(options.store.modules.draft.actions, 'init');
+        const { getByTestId, container, getByText } = render(SurveyBuilder, options);
 
         const label = `Test add ${info.type}`;
         const dataName = 'some_control';
@@ -65,8 +80,34 @@ describe('add control', () => {
         // saves the control to the draft store
         await fireEvent.click(getByText('Save'));
         expect(spyDraftInit).toHaveBeenCalled();
-        const control = last(spyDraftInit.mock.calls)[1].survey.revisions[1].controls[0];
+        const control = spyDraftInit.mock.calls.at(-1)[1].survey.revisions.at(-1).controls[0];
         expect(control).toEqual(expect.objectContaining({ name: dataName, label, type: info.type }));
       });
     });
+
+  ['page', 'group'].forEach((parentType) => {
+    it.only(`inserts control into selected ${parentType}`, async () => {
+      const parent = createControlInstance({ type: parentType, name: 'parent_control', children: [] });
+      const options = optionsWithControls([parent]);
+      const { getByTestId, container, getByText } = render(SurveyBuilder, options);
+      const parentCard = getByTestId(`control-card-${parent.id}`);
+
+      // select the parent card
+      await fireEvent.mouseDown(parentCard);
+      await new Promise((r) => setTimeout(r, 2000));
+      // add a new control
+      const label = 'Child Control';
+      await addControl(container, 'number', { label });
+      // new card appears inside the parent card
+      expect(within(parentCard).queryByText(label)).not.toBeNull();
+
+      // saves the controls to the draft store
+      await fireEvent.click(getByText('Save'));
+      const draftRevision = options.store.modules.draft.state.survey.revisions.at(-1);
+      const parentControl = draftRevision.controls[0];
+      expect(parentControl).toEqual(expect.objectContaining({ id: parent.id }));
+      expect(parentControl.children).toHaveLength(1);
+      expect(parentControl.children[0]).toEqual(expect.objectContaining({ label, type: 'number' }));
+    });
+  });
 });
