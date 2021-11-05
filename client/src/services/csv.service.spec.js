@@ -1,4 +1,4 @@
-import { transformSubmissionQuestionTypes, geojsonTransformer } from './csv.service';
+import { transformSubmissionQuestionTypes, geojsonTransformer, isEmpty } from './csv.service';
 
 function mockSubmissions() {
   return [
@@ -355,6 +355,19 @@ describe('CSV Service', () => {
           },
         },
       });
+    });
+
+    it('returns true if an empty object is passed', () => {
+      const obj = {};
+      const result = isEmpty(obj);
+      expect(result).toEqual(true);
+    });
+    it('returns false if object is not empty', () => {
+      const obj = {
+        value: 'Lorem 10',
+      };
+      const result = isEmpty(obj);
+      expect(result).toEqual(false);
     });
   });
 });

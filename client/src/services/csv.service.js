@@ -34,7 +34,7 @@ function removeKeys(obj, keys) {
  * should return the updated value for the question value
  * @returns updated submission object
  */
-function isEmpty(obj) {
+export function isEmpty(obj) {
   if (typeof obj === 'object' && obj !== null) {
     return Object.keys(obj).length === 0;
   }
