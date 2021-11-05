@@ -1,6 +1,5 @@
 import _ from 'lodash';
 
-import assert from 'assert';
 import { ObjectId } from 'mongodb';
 
 import boom from '@hapi/boom';
@@ -12,8 +11,6 @@ import headerService from '../services/header.service';
 import * as farmOsService from '../services/farmos.service';
 import rolesService from '../services/roles.service';
 import { queryParam } from '../helpers';
-import { suppressDeprecationWarnings } from 'moment';
-
 const col = 'submissions';
 const DEFAULT_LIMIT = 100000;
 const DEFAULT_SORT = { _id: -1 }; // reverse insert order
