@@ -91,7 +91,7 @@ export const availableControls = [
     label: 'My group',
     type: 'group',
     children: [],
-    icon: 'mdi-group',
+    icon: 'mdi-format-list-group',
   },
   {
     name: 'page',
