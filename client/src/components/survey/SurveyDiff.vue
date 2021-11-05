@@ -1,0 +1,193 @@
+<template>
+  <v-card-text v-if="!haveChanges" class="d-flex">
+    <v-icon color="success" class="mr-1">mdi-check-bold</v-icon>
+    <h3 class="flex-grow-0 mr-6">No changes detected</h3>
+  </v-card-text>
+  <v-expansion-panels v-else flat multiple v-model="mainPanelState">
+    <v-expansion-panel>
+      <v-expansion-panel-header class="pt-0">
+        <h3 class="flex-grow-0 mr-6">Update details</h3>
+
+        <v-tooltip bottom v-for="{ icon, color, count, tooltip } in changeSummaryList" :key="icon">
+          <template v-slot:activator="{ on, attrs }">
+            <span class="flex-grow-0 mr-2" v-bind="attrs" v-on="on"
+              ><v-badge overlap bordered left :color="color" :content="count.toString()">
+                <v-icon :color="color">{{ icon }}</v-icon>
+              </v-badge></span
+            >
+          </template>
+          <span>{{ tooltip }}</span>
+        </v-tooltip>
+
+        <v-spacer />
+        <v-switch
+          class="flex-grow-0 mr-6"
+          v-if="isOpen"
+          @click.native.stop=""
+          v-model="showChangesOnly"
+          label="changes only"
+        ></v-switch>
+      </v-expansion-panel-header>
+      <v-expansion-panel-content>
+        <survey-diff-card-tree
+          :diffInfoTree="showChangesOnly ? diffInfoTreeWithoutUnchangeds : diffInfoTree"
+          v-bind="{ oldVersionName, newVersionName }"
+        />
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+  </v-expansion-panels>
+</template>
+
+<script>
+import { diffSurveyVersions, changeType } from '@/utils/surveyDiff';
+import { isNumber, sortBy } from 'lodash';
+import SurveyDiffCardTree from './SurveyDiffCardTree';
+
+export default {
+  name: 'survey-diff',
+  components: {
+    SurveyDiffCardTree,
+  },
+  props: {
+    oldControls: Array,
+    newControls: Array,
+    defaultOpen: Boolean,
+    defaultShowUnchanged: {
+      type: Boolean,
+      default: false,
+    },
+    useControlPathAsId: {
+      type: Boolean,
+      default: false,
+    },
+    oldVersionName: {
+      type: String,
+      required: true,
+    },
+    newVersionName: {
+      type: String,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      isOpen: this.defaultOpen,
+      showChangesOnly: !this.defaultShowUnchanged,
+      colors: {
+        changed: 'amber lighten-1',
+        added: 'green lighten-1',
+        removed: 'red lighten-1',
+      },
+    };
+  },
+
+  computed: {
+    diff() {
+      if (this.oldControls && this.newControls) {
+        return diffSurveyVersions(this.oldControls, this.newControls, { useControlPathAsId: this.useControlPathAsId });
+      }
+      return [];
+    },
+    haveChanges() {
+      return this.diff.some((diff) => diff.changeType !== changeType.UNCHANGED);
+    },
+    diffInfoTree() {
+      if (!this.diff) {
+        return [];
+      }
+
+      const childrenOf = (parent) => this.diff.filter((d) => (d.newParentId || d.oldParentId || null) === parent);
+      const getSortKey = (diff) => (isNumber(diff.newChildIndex) ? diff.newChildIndex : diff.oldChildIndex);
+      const convert = (diffs, parentIdxPath = []) => {
+        // sort to make the order similart to the original
+        return sortBy(diffs, getSortKey).map((controlDiff) => {
+          const control = controlDiff.newControl || controlDiff.oldControl;
+          const idx = controlDiff.newControl ? controlDiff.newChildIndex : controlDiff.oldChildIndex;
+          const idxPath = [...parentIdxPath, idx + 1];
+          return {
+            id: controlDiff.matchId,
+            name: control.name,
+            label: control.label,
+            controlType: control.type,
+            color: this.colors[controlDiff.changeType],
+            changeType: controlDiff.changeType,
+            changeList: this.getControlChangeList(controlDiff.matchId),
+            indexPath: idxPath.join('.'),
+            children: convert(childrenOf(control.id), idxPath),
+          };
+        });
+      };
+      return convert(childrenOf(null));
+    },
+    diffInfoTreeWithoutUnchangeds() {
+      const filterUnchangeds = (diffInfoTree) => {
+        return diffInfoTree
+          .map((changeItem) => {
+            const children = filterUnchangeds(changeItem.children);
+            if (changeItem.changeType !== changeType.UNCHANGED || children.length > 0) {
+              return {
+                ...changeItem,
+                children,
+              };
+            }
+            return null;
+          })
+          .filter((c) => c !== null);
+      };
+      return filterUnchangeds(this.diffInfoTree);
+    },
+    changeSummaryList() {
+      let changed = 0;
+      let removed = 0;
+      let added = 0;
+      for (const diffItem of this.diff) {
+        switch (diffItem.changeType) {
+          case changeType.CHANGED:
+            changed++;
+            break;
+          case changeType.REMOVED:
+            removed++;
+            break;
+          case changeType.ADDED:
+            added++;
+            break;
+        }
+      }
+      const info = (count, color, icon, tooltip) => ({ count, color, icon, tooltip });
+      return [
+        info(added, this.colors.added, 'mdi-book-plus', `${added} added`),
+        info(changed, this.colors.changed, 'mdi-book-edit', `${changed} changed`),
+        info(removed, this.colors.removed, 'mdi-book-remove', `${removed} removed`),
+      ].filter((i) => i.count > 0);
+    },
+    mainPanelState: {
+      get() {
+        return this.isOpen ? [0] : [];
+      },
+      set(state) {
+        this.isOpen = state.includes(0);
+      },
+    },
+  },
+  methods: {
+    getControlChangeList(matchId) {
+      const controlDiff = this.diff && this.diff.find((d) => d.matchId === matchId);
+      if (!controlDiff || !controlDiff.diff) {
+        return [];
+      }
+      return Object.entries(controlDiff.diff)
+        .map(([key, change]) => {
+          if (change.changeType !== changeType.UNCHANGED) {
+            return {
+              key,
+              oldValue: JSON.stringify(change.oldValue),
+              newValue: JSON.stringify(change.newValue),
+            };
+          }
+          return null;
+        })
+        .filter((c) => c !== null);
+    },
+  },
+};
+</script>

@@ -8,6 +8,7 @@ import moment from 'moment';
 import submissionUtils from './submissions';
 import { SPEC_VERSION_SURVEY } from '@/constants';
 import supplySandbox from './supplySandbox';
+import ObjectID from 'bson-objectid';
 
 function* processSurveyNames(data) {
   if (!data) {
@@ -111,11 +112,55 @@ function* processData(data, namespace = '') {
  */
 export const changeRecursive = (control, changeFn) => {
   changeFn(control);
-  if (!control.children) {
-    return;
+
+  if (control.children) {
+    control.children.forEach((childControl) => {
+      changeRecursive(childControl, changeFn);
+    });
   }
-  control.children.forEach((c) => {
-    changeRecursive(c, changeFn);
+};
+
+/**
+ * Prepares the passed library control or resource to be consumed in another survey
+ * @param controlOrResource control to be prepared, mutating
+ * @param libraryId
+ * @param libraryVersion
+ */
+export const prepareToAddFromLibrary = (controlOrResource, libraryId, libraryVersion) => {
+  controlOrResource.id = new ObjectID().toString();
+  if (controlOrResource.libraryId) {
+    // do not overwrite the libraryId cause it references another library the inherited library consists of
+    controlOrResource.libraryIsInherited = true;
+  } else {
+    // set library data
+    controlOrResource.libraryId = libraryId;
+    controlOrResource.libraryVersion = libraryVersion;
+  }
+};
+
+/**
+ * Returns new resources copied from library survey
+ * @param librarySurvey
+ * @returns [resources]
+ */
+export const getPreparedLibraryResources = (librarySurvey) => {
+  return librarySurvey.resources.map((r) => {
+    prepareToAddFromLibrary(r, librarySurvey._id, librarySurvey.latestVersion);
+    return r;
+  });
+};
+
+/**
+ * Returns new controls copied from library survey
+ * @param librarySurvey
+ * @returns [controls]
+ */
+export const getPreparedLibraryControls = (librarySurvey) => {
+  return librarySurvey.revisions[librarySurvey.latestVersion - 1].controls.map((controlToAdd) => {
+    changeRecursive(controlToAdd, (control) => {
+      prepareToAddFromLibrary(control, librarySurvey._id, librarySurvey.latestVersion);
+    });
+    return controlToAdd;
   });
 };
 
@@ -754,6 +799,7 @@ export function findParentByChildId(controlId, controls) {
       return r;
     };
   }
+
   const [result] = controls.reduce(fpr(controlId), []);
   return result || null;
 }
