@@ -49,7 +49,13 @@
             </v-btn>
             <v-btn
               icon
-              v-if="selected === el && el.isLibraryRoot && !el.libraryIsInherited"
+              v-if="
+                selected === el &&
+                  el.isLibraryRoot &&
+                  !el.libraryIsInherited &&
+                  availableLibraryUpdates[el.libraryId] &&
+                  availableLibraryUpdates[el.libraryId] !== null
+              "
               @click.stop="updateLibrary(idx, el)"
             >
               <v-icon :color="availableLibraryUpdates[el.libraryId] > el.libraryVersion ? 'warning' : 'grey lighten-1'"
@@ -61,7 +67,9 @@
               v-if="selected === el && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
               @click.stop="() => showDeleteModal(idx)"
             >
-              <v-icon color="grey lighten-1">mdi-delete</v-icon>
+              <v-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey lighten-1'"
+                >mdi-delete</v-icon
+              >
             </v-btn>
             <v-btn text x-small v-if="el.options.hidden" @click.stop="el.options.hidden = false" color="grey lighten-1">
               unhide
@@ -72,9 +80,17 @@
             class="align-center text-align-center text-center"
             dark
             small
-            :color="availableLibraryUpdates[el.libraryId] > el.libraryVersion ? 'warning' : 'grey'"
+            :color="
+              availableLibraryUpdates[el.libraryId] === null
+                ? 'error'
+                : availableLibraryUpdates[el.libraryId] > el.libraryVersion
+                ? 'warning'
+                : 'grey'
+            "
             :title="
-              availableLibraryUpdates[el.libraryId]
+              availableLibraryUpdates[el.libraryId] === null
+                ? 'question set has been deleted in the library'
+                : availableLibraryUpdates[el.libraryId]
                 ? 'new version ' + availableLibraryUpdates[el.libraryId] + ' available'
                 : 'newest available version'
             "

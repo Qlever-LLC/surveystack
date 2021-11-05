@@ -40,7 +40,7 @@ function getMountOpts(opts = {}) {
   };
 }
 
-describe('SelectSingle question', () => {
+describe.skip('SelectSingle question', () => {
   it('sets value as array', () => {
     const wrapper = mount(SelectSingle, getMountOpts());
     const radios = wrapper.findAll('[role="radio"]');

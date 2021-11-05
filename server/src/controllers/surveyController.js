@@ -498,7 +498,10 @@ const checkForLibraryUpdates = async (req, res) => {
     if(control.isLibraryRoot && !control.libraryIsInherited) {
       //check if used library survey version is old
       const librarySurvey = await db.collection(col).findOne({ _id: new ObjectId(control.libraryId) });
-      if(control.libraryVersion<librarySurvey.latestVersion) {
+      if(!librarySurvey) {
+        //library can not be found, also return this information
+        updatableSurveys[control.libraryId] = null;
+      } else if(control.libraryVersion<librarySurvey.latestVersion) {
         //library is updatable, add to result set
         updatableSurveys[control.libraryId] = librarySurvey.latestVersion;
       }
