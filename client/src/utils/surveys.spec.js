@@ -411,14 +411,14 @@ describe('surveys', () => {
     expect(librarySurvey.revisions[1].controls[0].libraryId).toBe(librarySurvey._id);
     expect(librarySurvey.revisions[1].controls[0].libraryIsInherited).toBe(undefined);
   });
-  test.skip('prepareToAddFromLibrary sets libraryIsInherited to true for resources/controls of nested question sets and leaves libraryId as is', () => {
+  test('prepareToAddFromLibrary sets libraryIsInherited to true for resources/controls of nested question sets and leaves libraryId as is', () => {
     let librarySurvey = mockLibrarySurvey();
     prepareToAddFromLibrary(librarySurvey.resources[1], librarySurvey._id, librarySurvey.latestVersion);
     expect(librarySurvey.resources[1].libraryId).toBe(librarySurvey.revisions[1].controls[2].libraryId);
     expect(librarySurvey.resources[1].libraryIsInherited).toBe(true);
-    prepareToAddFromLibrary(librarySurvey.revisions[1].controls[1], librarySurvey._id, librarySurvey.latestVersion);
-    expect(librarySurvey.revisions[1].controls[1].libraryId).toBe(librarySurvey.revisions[1].controls[1].libraryId);
-    expect(librarySurvey.revisions[1].controls[1].libraryIsInherited).toBe(true);
+    prepareToAddFromLibrary(librarySurvey.revisions[1].controls[2], librarySurvey._id, librarySurvey.latestVersion);
+    expect(librarySurvey.revisions[1].controls[2].libraryId).toBe(librarySurvey.revisions[1].controls[2].libraryId);
+    expect(librarySurvey.revisions[1].controls[2].libraryIsInherited).toBe(true);
   });
   test('getPreparedLibraryResources works', () => {
     let librarySurvey = mockLibrarySurvey();
