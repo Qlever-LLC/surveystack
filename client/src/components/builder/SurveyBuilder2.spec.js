@@ -6,6 +6,7 @@ import vuetify from '@/plugins/vuetify';
 import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 import router from '@/router';
 import { isString } from 'lodash';
+import '@/components/survey/question_types';
 
 // Example test  with vue-testing-utils
 import { mount } from '@vue/test-utils';
@@ -15,7 +16,7 @@ test('vue-test-utils example', () => {
   const survey = { ...createSurvey({ group: { id: null, path: null } }), name: 'survey name', id: 'survey_id' };
   const propsData = { survey };
   const store = new Vuex.Store(createStoreObject());
-  const wrapper = mount(SurveyBuilder, { propsData, store });
+  const wrapper = mount(SurveyBuilder, { propsData, store, vuetify });
   expect(wrapper.vm.saveDraft).toBeInstanceOf(Function);
   const input = wrapper.findComponent(SurveyNameEditor);
   expect(input.vm.value).toBe(survey.name);
@@ -86,7 +87,7 @@ describe('add control', () => {
     });
 
   ['page', 'group'].forEach((parentType) => {
-    it.only(`inserts control into selected ${parentType}`, async () => {
+    it(`inserts control into selected ${parentType}`, async () => {
       const parent = createControlInstance({ type: parentType, name: 'parent_control', children: [] });
       const options = optionsWithControls([parent]);
       const { getByTestId, container, getByText } = render(SurveyBuilder, options);
