@@ -6,4 +6,8 @@ module.exports = {
   setupFilesAfterEnv: ['./tests/setup.js'],
   clearMocks: true,
   resetModules: true,
+  moduleNameMapper: {
+    'monaco-editor': 'monaco-editor/esm/vs/editor/editor.api.js',
+    '^!!raw-loader!.*': 'jest-raw-loader',
+  },
 };
