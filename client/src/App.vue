@@ -3,7 +3,7 @@
     <app-navbar />
     <div id="app-menu"></div>
 
-    <v-main>
+    <v-main style="background: #D9D9D9">
       <app-global-feedback />
       <router-view />
     </v-main>

@@ -1,5 +1,5 @@
 <template>
-  <v-container style="height: 100%">
+  <v-container style="height: 100%;">
     <v-container>
       <v-row class="my-2">
         <v-spacer />
@@ -10,9 +10,12 @@
       </v-row>
       <v-row class="d-flex flex-grow-1">
         <v-tabs flat v-model="activeTab" centered icons-and-text grow @change="updateActiveTab">
-          <v-tab v-for="tab in tabs" :key="tab.name" :href="`#${tab.name}`">
-            {{ tab.title }}
-            <v-icon>{{ tab.icon }}</v-icon>
+          <v-tab v-for="tab in tabs" :key="tab.name" :href="`#${tab.name}`" style="background-color: #D9D9D9">
+            <!-- styling the tab items -->
+            <span class="d-flex flex-row align-center font-weight-bold">
+              <v-icon class="mr-2">{{ tab.icon }}</v-icon
+              >{{ tab.title }}
+            </span>
           </v-tab>
         </v-tabs>
         <v-tabs-items v-model="activeTab" style="height: 100%;" class="flex-grow-1" v-if="!isLoading">
@@ -23,9 +26,36 @@
             class="flex-grow-1 flex-column align-center justify-center align-content-center"
             style="height: 100%;"
           >
-            <v-card min-height="70vh" class="d-flex flex-column justify-space-between">
-              <template v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
+            <v-card
+              min-height="70vh"
+              class="d-flex flex-column justify-space-between"
+              style="background-color: #D9D9D9"
+            >
+              <template v-if="tab.name !== 'sent'">
+                <v-card :elevation="3" class="py-3 px-4 mt-6">
+                  <v-list-item-title class="text-h6 mb-1">
+                    Embedded question test
+                  </v-list-item-title>
+                  <v-list-item-subtitle class="font-weight-light mb-1">ID: hyd767363663710os</v-list-item-subtitle>
+                  <v-list-item-subtitle class="font-weight-light">7/12/1995 10:00:29am</v-list-item-subtitle>
+                </v-card>
+                <v-card :elevation="3" class="py-3 px-4 mt-6">
+                  <v-list-item-title class="text-h6 mb-1">
+                    Embedded question test
+                  </v-list-item-title>
+                  <v-list-item-subtitle class="font-weight-light mb-1">ID: hyd767363663710os</v-list-item-subtitle>
+                  <v-list-item-subtitle class="font-weight-light">7/12/1995 10:00:29am</v-list-item-subtitle>
+                </v-card>
+                <v-card :elevation="3" class="py-3 px-4 mt-6">
+                  <v-list-item-title class="text-h6 mb-1">
+                    Embedded question test
+                  </v-list-item-title>
+                  <v-list-item-subtitle class="font-weight-light mb-1">ID: hyd767363663710os</v-list-item-subtitle>
+                  <v-list-item-subtitle class="font-weight-light">7/12/1995 10:00:29am</v-list-item-subtitle>
+                </v-card>
+                <!-- 
                 <v-card-text>
+                <template v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
                   <v-list>
                     <template v-for="(item, i) in activeTabPageContent">
                       <v-list-item :key="i">
@@ -63,6 +93,7 @@
                     </template>
                   </v-list>
                 </v-card-text>
+                 -->
                 <v-spacer class="flex-grow-1" />
                 <v-card-actions>
                   <v-pagination v-model="page" :length="activeTabPaginationLength" color="grey darken-1" />
@@ -76,9 +107,7 @@
                         <v-list-item-title v-if="surveyForSubmission(item)">
                           {{ surveyForSubmission(item).name }}
                         </v-list-item-title>
-                        <v-list-item-title v-else>
-                          Loading name
-                        </v-list-item-title>
+                        <v-list-item-title v-else> Loading name </v-list-item-title>
                         <v-list-item-subtitle>
                           ID: {{ item._id }} <br />
                           {{ new Date(item.meta.dateCreated).toLocaleString() }}
@@ -99,9 +128,12 @@
               <v-container fill-height fluid v-else>
                 <v-row align="center" justify="center">
                   <v-col>
-                    <div class="d-flex flex-column align-center">
-                      <v-icon large>mdi-file-multiple</v-icon>
-                      <v-alert type="info" text class="ma-4">No drafts yet</v-alert>
+                    <div class="ma-4 black--text pa-4 rounded-lg" style="width:100%;background:#BDCED0;">
+                      <p class="mb-0 font-weight-bold">No sent submissions yet</p>
+                      <!-- 
+                       <v-icon large>mdi-file-multiple</v-icon>
+                      <v-alert type="info" class="ma-4 black--text" style="width:100%;background:#BDCED0;">No sent submissions yet</v-alert>
+                      -->
                     </div>
                   </v-col>
                 </v-row>
