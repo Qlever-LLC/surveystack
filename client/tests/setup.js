@@ -7,4 +7,4 @@ Vue.use(Vuetify);
 window.scrollTo = () => {};
 
 // until this gets closed https://github.com/jsdom/jsdom/issues/1721
-global.URL.createObjectURL = jest.fn();
+global.URL.createObjectURL = () => {};
