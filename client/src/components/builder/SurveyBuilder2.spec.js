@@ -5,7 +5,7 @@ import { createStoreObject } from '@/store';
 import vuetify from '@/plugins/vuetify';
 import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 import router from '@/router';
-import { isString } from 'lodash';
+import { isString, last } from 'lodash';
 import '@/components/survey/question_types';
 
 // Example test  with vue-testing-utils
@@ -81,7 +81,7 @@ describe('add control', () => {
         // saves the control to the draft store
         await fireEvent.click(getByText('Save'));
         expect(spyDraftInit).toHaveBeenCalled();
-        const control = spyDraftInit.mock.calls.at(-1)[1].survey.revisions.at(-1).controls[0];
+        const control = last(last(spyDraftInit.mock.calls)[1].survey.revisions).controls[0];
         expect(control).toEqual(expect.objectContaining({ name: dataName, label, type: info.type }));
       });
     });
@@ -104,7 +104,7 @@ describe('add control', () => {
 
       // saves the controls to the draft store
       await fireEvent.click(getByText('Save'));
-      const draftRevision = options.store.modules.draft.state.survey.revisions.at(-1);
+      const draftRevision = last(options.store.modules.draft.state.survey.revisions);
       const parentControl = draftRevision.controls[0];
       expect(parentControl).toEqual(expect.objectContaining({ id: parent.id }));
       expect(parentControl.children).toHaveLength(1);
