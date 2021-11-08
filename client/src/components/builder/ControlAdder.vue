@@ -17,6 +17,7 @@
             class="ma-1 d-inline-block shadow green span-button"
             outlined
             small
+            data-testid="add-control-library"
           >
             search question library
           </v-btn>

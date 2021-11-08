@@ -1,4 +1,6 @@
-import { render, fireEvent, prettyDOM, findByText, getByTestId, getByLabelText, within } from '@testing-library/vue';
+jest.mock('../../services/api.service.js');
+
+import { render, fireEvent, findByText, getByLabelText, screen, within } from '@testing-library/vue';
 import SurveyBuilder from './SurveyBuilder.vue';
 import { createSurvey } from '@/utils/surveys';
 import { createStoreObject } from '@/store';
@@ -7,6 +9,7 @@ import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 import router from '@/router';
 import { isString, last } from 'lodash';
 import '@/components/survey/question_types';
+import api from '../../services/api.service.js';
 
 // Example test  with vue-testing-utils
 import { mount } from '@vue/test-utils';
@@ -22,9 +25,9 @@ test('vue-test-utils example', () => {
   expect(input.vm.value).toBe(survey.name);
 });
 
-const addControl = async (container, type, { dataName, label, hint, moreInfo } = {}) => {
-  await fireEvent.click(getByTestId(container, 'control-adder-open'));
-  await fireEvent.click(getByTestId(container, `add-control-${type}`));
+const addControl = async (type, { dataName, label, hint, moreInfo } = {}) => {
+  await fireEvent.click(screen.getByTestId('control-adder-open'));
+  await fireEvent.click(screen.getByTestId(`add-control-${type}`));
 
   const fields = [
     [dataName, 'Data name'],
@@ -34,10 +37,16 @@ const addControl = async (container, type, { dataName, label, hint, moreInfo } =
   ];
   for (const [value, domLabel] of fields) {
     if (isString(value)) {
-      const props = getByTestId(container, 'control-properties');
+      const props = screen.getByTestId('control-properties');
       await fireEvent.update(getByLabelText(props, domLabel), value);
     }
   }
+};
+
+// saves the survey to the draft store and returns the newly created revision
+const saveDraft = async (store) => {
+  await fireEvent.click(screen.getByText('Save'));
+  return last(store.modules.draft.state.survey.revisions);
 };
 
 const optionsWithControls = (controls = []) => {
@@ -103,12 +112,79 @@ describe('add control', () => {
       expect(within(parentCard).queryByText(label)).not.toBeNull();
 
       // saves the controls to the draft store
-      await fireEvent.click(getByText('Save'));
-      const draftRevision = last(options.store.modules.draft.state.survey.revisions);
+      const draftRevision = saveDraft(options.store);
       const parentControl = draftRevision.controls[0];
       expect(parentControl).toEqual(expect.objectContaining({ id: parent.id }));
       expect(parentControl.children).toHaveLength(1);
       expect(parentControl.children[0]).toEqual(expect.objectContaining({ label, type: 'number' }));
     });
+  });
+});
+
+describe('add QSL', () => {
+  it.only('can add a library', async () => {
+    // mocked library data
+    const qsl = {
+      ...createSurvey({}),
+      name: 'test_survey_name',
+      _id: 'test_survey_id',
+      latestVersion: 2,
+      isLibrary: true,
+    };
+    const controlInQsl = createControlInstance({ type: 'number', name: 'number_1' });
+    qsl.revisions.push({
+      version: qsl.latestVersion,
+      controls: [controlInQsl],
+    });
+    const qslListResponse = {
+      data: {
+        content: [qsl],
+        pagination: { total: 1, parsedSkip: 0, parsedLimit: 12 },
+      },
+    };
+    // mock api responses
+    api.get.setResponse('/surveys/list-page?isLibrary=true&skip=0&limit=12', qslListResponse);
+    api.get.setResponse(`/surveys/${qsl._id}`, { data: qsl });
+
+    // render the component
+    const options = optionsWithControls();
+    render(SurveyBuilder, options);
+
+    // add a qsl to the survey like a user would
+    await fireEvent.click(screen.getByTestId('control-adder-open'));
+    await fireEvent.click(screen.getByTestId('add-control-library'));
+    const questionLibrary = screen.getByTestId('question-library');
+    const libCard = await findByText(questionLibrary, qsl.name);
+    await fireEvent.click(libCard);
+    const addBtn = await within(questionLibrary).findByText(/add to survey/i);
+    fireEvent.click(addBtn);
+
+    // save draft and get the value from vuex
+    const savedRevision = await saveDraft(options.store);
+
+    expect(savedRevision).toEqual(
+      expect.objectContaining({
+        version: options.props.survey.latestVersion + 1,
+        controls: expect.arrayContaining([
+          expect.objectContaining({
+            name: qsl.name,
+            type: 'group',
+            isLibraryRoot: true,
+            libraryId: qsl._id,
+            libraryVersion: qsl.latestVersion,
+            children: expect.arrayContaining([
+              expect.objectContaining({
+                id: expect.not.stringMatching(controlInQsl.id), // control id has to change
+                type: controlInQsl.type,
+                name: controlInQsl.name,
+                libraryId: qsl._id,
+                libraryIsInherited: true,
+                libraryVersion: qsl.latestVersion,
+              }),
+            ]),
+          }),
+        ]),
+      })
+    );
   });
 });

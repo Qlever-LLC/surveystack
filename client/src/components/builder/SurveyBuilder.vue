@@ -61,6 +61,7 @@
             :libraryId="libraryId"
             @add-questions-from-library="addQuestionsFromLibrary"
             @cancel="closeLibrary"
+            data-testid="question-library"
           />
         </div>
       </pane>
