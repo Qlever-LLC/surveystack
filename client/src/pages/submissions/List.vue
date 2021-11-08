@@ -5,12 +5,12 @@
       maxWidth="50rem"
       labelConfirm="Archive"
       @cancel="showArchiveModal = false"
-      @confirm="(reason) => archiveSubmission(selected[0], reason)"
+      @confirm="(reason) => archiveSubmissions(selected, reason)"
     >
       <template v-slot:title>Confirm Submission Archiving</template>
     </app-submission-archive-dialog>
 
-    <app-dialog v-model="showDeleteModal" @cancel="showDeleteModal = false" @confirm="deleteSubmission(selected[0])">
+    <app-dialog v-model="showDeleteModal" @cancel="showDeleteModal = false" @confirm="deleteSubmissions(selected)">
       <template v-slot:title>Confirm deletion</template>
       <template>
         Are you sure you want to delete this submission? This can not be undone.
@@ -20,7 +20,7 @@
     <app-dialog
       v-model="reassignment.showModal"
       @cancel="reassignment.showModal = false"
-      @confirm="reassign(selected[0])"
+      @confirm="reassign(selected)"
       labelConfirm="Reassign"
     >
       <template v-slot:title>Reassign Submission</template>
@@ -113,7 +113,7 @@
               <span class="subtitle-2">ACTIONS</span><br />{{ selected.length }}
               {{ selected.length === 1 ? 'submission' : 'submissions' }} selected
             </div>
-            <div class="ml-auto d-flex flex-column flex-sm-row" v-if="selected.length === 1">
+            <div class="ml-auto d-flex flex-column flex-sm-row">
               <v-btn
                 v-if="selected[0]['meta.archived'] === 'true'"
                 :disabled="surveyEntity.meta.isLibrary"
@@ -127,7 +127,7 @@
                 v-if="selected[0]['meta.archived'] === 'true'"
                 :disabled="surveyEntity.meta.isLibrary"
                 text
-                @click="archiveSubmission(selected[0], '', false)"
+                @click="archiveSubmissions(selected, '', false)"
               >
                 RESTORE
               </v-btn>
@@ -148,7 +148,7 @@
                 >REASSIGN</v-btn
               >
               <v-btn
-                v-if="selected[0]['meta.archived'] !== 'true'"
+                v-if="selected[0]['meta.archived'] !== 'true' && selected.length === 1"
                 :disabled="surveyEntity.meta.isLibrary"
                 text
                 color="primary"
@@ -457,21 +457,21 @@ export default {
 
       return params;
     },
-    async deleteSubmission(submission) {
+    async deleteSubmissions(submissions) {
       this.showDeleteModal = false;
       try {
-        await api.delete(`/submissions/${submission._id}`);
+        const ids = submissions.map((s) => s._id);
+        await api.post('/submissions/bulk-delete', { ids });
         this.selected = [];
         this.fetchData();
       } catch (err) {
         this.$store.dispatch('feedback/add', err.response.data.message);
       }
     },
-    async archiveSubmission(submission, reason, value = true) {
+    async archiveSubmissions(submissions, reason, value = true) {
       try {
-        const { data: archived } = await api.post(
-          `/submissions/${submission._id}/archive?set=${value}&reason=${reason}`
-        );
+        const ids = submissions.map((s) => s._id);
+        await api.post(`/submissions/bulk-archive?set=${value}&reason=${reason}`, { ids });
         this.selected = [];
         this.fetchData();
       } catch (err) {
@@ -506,11 +506,12 @@ export default {
       await this.$store.dispatch('submissions/fetchRemoteSubmission', submission._id);
       this.$router.push(`/submissions/drafts/${submission._id}`);
     },
-    async reassign(submission) {
-      console.log(`reassigning submission id ${submission._id}`);
+    async reassign(submissions) {
       this.reassignment.showModal = false;
+      const ids = submissions.map((s) => s._id);
       try {
-        await api.post(`/submissions/${submission._id}/reassign`, {
+        await api.post(`/submissions/bulk-reassign`, {
+          ids,
           group: this.reassignment.group,
           creator: this.reassignment.user,
         });
