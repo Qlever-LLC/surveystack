@@ -108,7 +108,7 @@ function geojsonTransformer(o) {
    // get all the column names
    const keys = _.chain(flatRows)
      .map(_.keys) // get name of each column
-     .flatten()
+     .flatten() // concat keys from each submission into one list
      .uniq() // create a list of uniq column names
      .value();
    // collect each column into one cell
