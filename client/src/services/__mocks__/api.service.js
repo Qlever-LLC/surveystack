@@ -1,14 +1,16 @@
+import { cloneDeep } from 'lodash';
+
 function createMockableCommand() {
   let presets = [];
 
-  // epmty the presets before each test
+  // epmty the presets after each test
   /* eslint-disable-next-line */
-  beforeEach(() => (presets = []));
+  afterEach(() => (presets = []));
 
   const fn = (reqUrl) => {
     for (const { url, response } of presets) {
       if (reqUrl === url) {
-        return Promise.resolve(response);
+        return Promise.resolve(cloneDeep(response));
       }
     }
     throw Error(`Don't have a mocked response for "${reqUrl}" ${JSON.stringify(presets)}`);
