@@ -35,12 +35,12 @@
                   <v-list-item :key="i" style="padding: 0 0; width: 1210px">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                       <v-card :elevation="3" class="py-3 px-4">
-                        <v-list-item-title class="text-h6 mb-1" v-if="surveyForSubmission(item)">
+                        <v-list-item-title class="text-h6 mb-2" v-if="surveyForSubmission(item)">
                           {{ surveyForSubmission(item).name }}
                         </v-list-item-title>
                         <v-list-item-title v-else> Loading name </v-list-item-title>
-                        <v-list-item-subtitle class="font-weight-light mb-1">
-                          ID: {{ item._id }} <br />
+                        <v-list-item-subtitle class="font-weight-light mb-2"> ID: {{ item._id }} </v-list-item-subtitle>
+                        <v-list-item-subtitle class="font-weight-light mb-2">
                           {{ new Date(item.meta.dateCreated).toLocaleString() }}
                         </v-list-item-subtitle>
                       </v-card>
@@ -93,15 +93,13 @@
                   color="grey darken-1"
                 />
               </template>
-              <v-container fill-height fluid v-else>
+              <div v-else>
                 <v-row align="center" justify="center">
                   <v-col>
-                    <div class="ma-4 black--text pa-4 rounded-lg" style="width: 100%; background: #bdced0">
-                      No sent submissions yet
-                    </div>
+                    <v-alert color="info" class="black-text" text>No sent submissions yet</v-alert>
                   </v-col>
                 </v-row>
-              </v-container>
+              </div>
             </v-card>
           </v-tab-item>
         </v-tabs-items>
@@ -190,9 +188,6 @@ export default {
   },
   beforeDestroy() {
     this.$store.dispatch('appui/reset');
-  },
-  mounted() {
-    console.log(this.activeTabBody.content, '==> nono');
   },
   computed: {
     // activeSubmission() {
@@ -373,5 +368,11 @@ export default {
 <style scoped>
 .cursor-pointer {
   cursor: pointer;
+}
+>>> .v-alert__content {
+  color: black !important;
+}
+>>> .v-tabs-slider-wrapper {
+  height: 4px !important;
 }
 </style>
