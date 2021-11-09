@@ -7,7 +7,7 @@ import { createStoreObject } from '@/store';
 import vuetify from '@/plugins/vuetify';
 import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 import router from '@/router';
-import { isString, last, cloneDeep } from 'lodash';
+import { isString, last, cloneDeep, find, uniqueId, startCase } from 'lodash';
 import '@/components/survey/question_types';
 import api from '../../services/api.service.js';
 
@@ -43,6 +43,13 @@ const addControl = async (type, { dataName, label, hint, moreInfo } = {}) => {
   }
 };
 
+const makeControl = ({ type, ...options }) => ({
+  ...createControlInstance({ type }),
+  name: `${type}_${uniqueId()}`,
+  children: ['page', 'group'].includes(type) ? [] : undefined,
+  ...options,
+});
+
 // saves the survey to the draft store and returns the newly created revision
 const saveDraft = async (store) => {
   await fireEvent.click(screen.getByText('Save'));
@@ -71,13 +78,12 @@ const optionsWithControls = (controls = []) => {
   };
 };
 
-describe.only('add control', () => {
+describe('add control', () => {
   describe('for each control type', () => {
     availableControls
       .filter(({ type }) => type !== 'script') // TODO load scripts from vuex instead of getting them from the server
       .forEach((info) => {
         it(`can add ${info.type} type control`, async () => {
-          console.log(info.type);
           const options = optionsWithControls();
           const spyDraftInit = jest.spyOn(options.store.modules.draft.actions, 'init');
           const { getByTestId, container, getByText } = render(SurveyBuilder, options);
@@ -98,28 +104,105 @@ describe.only('add control', () => {
       });
   });
 
-  ['page', 'group'].forEach((parentType) => {
-    it(`inserts control into selected ${parentType}`, async () => {
-      const parent = createControlInstance({ type: parentType, name: 'parent_control', children: [] });
-      const options = optionsWithControls([parent]);
-      const { getByTestId, container, getByText } = render(SurveyBuilder, options);
-      const parentCard = getByTestId(`control-card-${parent.id}`);
+  describe('inserting new control based on current selection (NGC = non group/page type control)', () => {
+    const SELECTED = 'selected_control_id';
+    [
+      {
+        name: 'inserts NGC into the selected page',
+        addType: 'number',
+        controls: [makeControl({ type: 'page', id: SELECTED })],
+        expectedPosition: [0, 0],
+      },
+      {
+        name: 'inserts NGC into the selected group',
+        addType: 'string',
+        controls: [makeControl({ type: 'group', id: SELECTED })],
+        expectedPosition: [0, 0],
+      },
+      {
+        name: 'inserts page at the root level when a page is selected',
+        addType: 'page',
+        controls: [makeControl({ type: 'page', id: SELECTED })],
+        expectedPosition: [1],
+      },
+      {
+        name: 'inserts page at the root level when a group is selected',
+        addType: 'page',
+        controls: [makeControl({ type: 'group', id: SELECTED })],
+        expectedPosition: [1],
+      },
+      {
+        name: 'inserts page at the root level when a group/group/NGC is selected',
+        addType: 'page',
+        controls: [
+          makeControl({
+            type: 'group',
+            children: [makeControl({ type: 'group', children: [makeControl({ type: 'group', id: SELECTED })] })],
+          }),
+        ],
+        expectedPosition: [1],
+      },
+      {
+        name: 'inserts NGC right after the selected NGC',
+        addType: 'date',
+        controls: [
+          makeControl({ type: 'number' }),
+          makeControl({ type: 'string', id: SELECTED }),
+          makeControl({ type: 'location' }),
+        ],
+        expectedPosition: [2],
+      },
+      {
+        name: 'inserts NGC right after the selected NGC in a group',
+        addType: 'date',
+        controls: [
+          makeControl({
+            type: 'group',
+            children: [
+              makeControl({ type: 'number', id: SELECTED }),
+              makeControl({ type: 'string' }),
+              makeControl({ type: 'location' }),
+            ],
+          }),
+        ],
+        expectedPosition: [0, 1],
+      },
+      {
+        name: 'inserts control at the end of the root when nothing is selected',
+        addType: 'ontology',
+        controls: [makeControl({ type: 'selectSingle' }), makeControl({ type: 'group' })],
+        expectedPosition: [2],
+      },
+    ].forEach(({ name, addType, controls, expectedPosition }) => {
+      it(name, async () => {
+        const options = optionsWithControls(controls);
+        render(SurveyBuilder, options);
 
-      // select the parent card
-      await fireEvent.mouseDown(parentCard);
-      await new Promise((r) => setTimeout(r, 2000));
-      // add a new control
-      const label = 'Child Control';
-      await addControl('number', { label });
-      // new card appears inside the parent card
-      expect(within(parentCard).queryByText(label)).not.toBeNull();
+        // select the parent card
+        const selectedCard = screen.queryByTestId(`control-card-${SELECTED}`);
+        if (selectedCard) {
+          await fireEvent.mouseDown(selectedCard);
+        }
+        // add the new control
+        const label = 'Child Control';
+        await addControl(addType, { label });
+        // new card appears
+        expect(within(screen.getByTestId('graphical-view')).queryByText(label)).toBeInTheDocument();
 
-      // saves the controls to the draft store
-      const draftRevision = await saveDraft(options.store);
-      const parentControl = draftRevision.controls[0];
-      expect(parentControl).toEqual(expect.objectContaining({ id: parent.id }));
-      expect(parentControl.children).toHaveLength(1);
-      expect(parentControl.children[0]).toEqual(expect.objectContaining({ label, type: 'number' }));
+        const draftRevision = await saveDraft(options.store);
+
+        // build the minimal expected control tree
+        const expectedControls = cloneDeep(controls);
+        // push the new control into the expected position
+        expectedPosition.reduce((parentChildren, pos, index, list) => {
+          if (index === list.length - 1) {
+            parentChildren[pos] = { type: addType, label };
+          } else {
+            return parentChildren[pos].children;
+          }
+        }, expectedControls);
+        expect(draftRevision.controls).toMatchObject(expectedControls);
+      });
     });
   });
 });
