@@ -13,7 +13,11 @@ function createMockableCommand() {
         return Promise.resolve(cloneDeep(response));
       }
     }
-    throw Error(`Don't have a mocked response for "${reqUrl}" ${JSON.stringify(presets)}`);
+    let help = '';
+    if (presets.length) {
+      help = '\ncurrently set presets:\n' + presets.map((p) => ` - ${p[0]}`).join('\n');
+    }
+    throw Error(`Don't have a mocked response for "${reqUrl}"${help}`);
   };
   // set the response for a request
   // example: `api.get.setResponse('/foo/bar?baz=4', {fux: 5})

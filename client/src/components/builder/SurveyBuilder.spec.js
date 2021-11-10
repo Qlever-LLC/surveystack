@@ -25,6 +25,7 @@ test('vue-test-utils example', () => {
   expect(input.vm.value).toBe(survey.name);
 });
 
+// add a control and set its base parameters like a user would
 const addControl = async (type, { dataName, label, hint, moreInfo } = {}) => {
   await fireEvent.click(screen.getByTestId('control-adder-open'));
   await fireEvent.click(screen.getByTestId(`add-control-${type}`));
@@ -43,19 +44,13 @@ const addControl = async (type, { dataName, label, hint, moreInfo } = {}) => {
   }
 };
 
-const makeControl = ({ type, ...options }) => ({
-  ...createControlInstance({ type }),
-  name: `${type}_${uniqueId()}`,
-  children: ['page', 'group'].includes(type) ? [] : undefined,
-  ...options,
-});
-
 // saves the survey to the draft store and returns the newly created revision
 const saveDraft = async (store) => {
   await fireEvent.click(screen.getByText('Save'));
   return last(store.modules.draft.state.survey.revisions);
 };
 
+// creates the default mounting options
 const optionsWithControls = (controls = []) => {
   const survey = {
     ...createSurvey({ group: { id: null, path: null } }),
@@ -78,30 +73,42 @@ const optionsWithControls = (controls = []) => {
   };
 };
 
+const makeControl = ({ type, ...options }) => ({
+  ...createControlInstance({ type }),
+  name: `${type}_${uniqueId()}`,
+  children: ['page', 'group'].includes(type) ? [] : undefined,
+  ...options,
+});
+
+beforeEach(() => {
+  // atm, ControlProperties.vue throws when trying to fetch /scrips for script type controls
+  api.get.setResponse(`/scripts`, { data: [] });
+});
+
 describe('add control', () => {
   describe('for each control type', () => {
-    availableControls
-      .filter(({ type }) => type !== 'script') // TODO load scripts from vuex instead of getting them from the server
-      .forEach((info) => {
-        it(`can add ${info.type} type control`, async () => {
-          const options = optionsWithControls();
-          const spyDraftInit = jest.spyOn(options.store.modules.draft.actions, 'init');
-          const { getByTestId, container, getByText } = render(SurveyBuilder, options);
+    availableControls.forEach((info) => {
+      it(`can add ${info.type} type control`, async () => {
+        // render the component and spy on the draft/init vuex action
+        const options = optionsWithControls();
+        const spyDraftInit = jest.spyOn(options.store.modules.draft.actions, 'init');
+        render(SurveyBuilder, options);
 
-          const label = `Test add ${info.type}`;
-          const dataName = 'some_control';
-          await addControl(info.type, { label, dataName });
+        // add the new control
+        const label = `Test add ${info.type}`;
+        const dataName = 'some_control';
+        await addControl(info.type, { label, dataName });
 
-          // adds control to the graphical view
-          await findByText(getByTestId('graphical-view'), label);
+        // control added to the graphical view
+        await findByText(screen.getByTestId('graphical-view'), label);
 
-          // saves the control to the draft store
-          await fireEvent.click(getByText('Save'));
-          expect(spyDraftInit).toHaveBeenCalled();
-          const control = last(last(spyDraftInit.mock.calls)[1].survey.revisions).controls[0];
-          expect(control).toEqual(expect.objectContaining({ name: dataName, label, type: info.type }));
-        });
+        // the control is saved in the draft store
+        await fireEvent.click(screen.getByText('Save'));
+        expect(spyDraftInit).toHaveBeenCalled();
+        const controls = last(last(spyDraftInit.mock.calls)[1].survey.revisions).controls;
+        expect(controls).toMatchObject([{ name: dataName, label, type: info.type }]);
       });
+    });
   });
 
   describe('inserting new control based on current selection (NGC = non group/page type control)', () => {
@@ -154,14 +161,14 @@ describe('add control', () => {
       },
       {
         name: 'inserts NGC right after the selected NGC in a group',
-        addType: 'date',
+        addType: 'script',
         controls: [
           makeControl({
             type: 'group',
             children: [
-              makeControl({ type: 'number', id: SELECTED }),
-              makeControl({ type: 'string' }),
-              makeControl({ type: 'location' }),
+              makeControl({ type: 'selectSingle', id: SELECTED }),
+              makeControl({ type: 'selectMultiple' }),
+              makeControl({ type: 'instructionsImageSplit' }),
             ],
           }),
         ],
@@ -218,7 +225,7 @@ describe('question set library', () => {
       latestVersion: 2,
       isLibrary: true,
     };
-    controlInQsl = createControlInstance({ type: 'number', name: 'number_1' });
+    controlInQsl = makeControl({ type: 'number', name: 'number_1' });
     qsl.revisions.push({
       version: qsl.latestVersion,
       controls: [controlInQsl],
