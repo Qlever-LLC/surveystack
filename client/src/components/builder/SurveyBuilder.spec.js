@@ -7,7 +7,7 @@ import { createStoreObject } from '@/store';
 import vuetify from '@/plugins/vuetify';
 import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 import router from '@/router';
-import { isString, last, cloneDeep, find, uniqueId, startCase } from 'lodash';
+import { isString, last, cloneDeep, uniqueId, set } from 'lodash';
 import '@/components/survey/question_types';
 import api from '../../services/api.service.js';
 
@@ -38,10 +38,18 @@ const addControl = async (type, { dataName, label, hint, moreInfo } = {}) => {
   ];
   for (const [value, domLabel] of fields) {
     if (isString(value)) {
-      const props = screen.getByTestId('control-properties');
-      await fireEvent.update(getByLabelText(props, domLabel), value);
+      await updateProperty(domLabel, value);
     }
   }
+};
+
+const updateProperty = async (label, value, openAdvanced) => {
+  const props = screen.getByTestId('control-properties');
+  if (openAdvanced) {
+    await fireEvent.click(within(props).getByText(/advanced/i));
+  }
+  const input = within(props).getByLabelText(label);
+  await fireEvent.update(input, value);
 };
 
 // saves the survey to the draft store and returns the newly created revision
@@ -107,6 +115,89 @@ describe('add control', () => {
         expect(spyDraftInit).toHaveBeenCalled();
         const controls = last(last(spyDraftInit.mock.calls)[1].survey.revisions).controls;
         expect(controls).toMatchObject([{ name: dataName, label, type: info.type }]);
+      });
+    });
+  });
+
+  describe('update properties', () => {
+    // all the string/bool props with arbitrary control types
+    [
+      { inputLabel: 'Data name', type: 'number', value: 'control_name', propPath: 'name' },
+      { inputLabel: 'Label', type: 'string', value: 'Foo Bar', propPath: 'label' },
+      { inputLabel: 'Hint', type: 'page', value: 'Heads up!', propPath: 'hint' },
+      { inputLabel: 'More info', type: 'instructionsImageSplit', value: 'Info', propPath: 'moreInfo' },
+      { inputLabel: 'QR Code', type: 'string', value: true, propPath: 'options.enableQr' },
+      { inputLabel: 'Required', type: 'matrix', value: true, propPath: 'options.required' },
+      { inputLabel: 'Private', type: 'matrix', value: true, propPath: 'options.redacted' },
+      {
+        inputLabel: 'Relevance Expression',
+        type: 'number',
+        value: true,
+        propPath: 'options.relevance',
+        propValue: { enabled: true, code: expect.any(String) },
+        openAdvanced: true,
+      },
+      {
+        inputLabel: 'Calculate Expression',
+        type: 'number',
+        value: true,
+        propPath: 'options.calculate',
+        propValue: { enabled: true, code: expect.any(String) },
+        openAdvanced: true,
+      },
+      {
+        inputLabel: 'Constraint Expression',
+        type: 'number',
+        value: true,
+        propPath: 'options.constraint',
+        propValue: { enabled: true, code: expect.any(String) },
+        openAdvanced: true,
+      },
+      {
+        inputLabel: 'Api Compose Expression',
+        type: 'number',
+        value: true,
+        propPath: 'options.apiCompose',
+        propValue: { enabled: true, code: expect.any(String) },
+        openAdvanced: true,
+      },
+      {
+        inputLabel: 'Allow Multiple Selections',
+        type: 'farmOsFarm',
+        value: true,
+        propPath: 'options.hasMultipleSelections',
+      },
+      { inputLabel: 'Run Button Label', type: 'script', value: 'Go', propPath: 'options.buttonLabel' },
+      {
+        inputLabel: 'Allow Multiple Selections',
+        type: 'ontology',
+        value: true,
+        propPath: 'options.hasMultipleSelections',
+      },
+      { inputLabel: 'Show Polygon Control', type: 'geoJSON', value: false, propPath: 'options.geoJSON.showPolygon' },
+      { inputLabel: 'Show Line Control', type: 'geoJSON', value: false, propPath: 'options.geoJSON.showLine' },
+      { inputLabel: 'Show Point Control', type: 'geoJSON', value: false, propPath: 'options.geoJSON.showPoint' },
+      { inputLabel: 'Show Circle Control', type: 'geoJSON', value: false, propPath: 'options.geoJSON.showCircle' },
+      { inputLabel: 'Type', type: 'date', value: 'date-year', propPath: 'options.subtype' },
+    ].forEach(({ type, inputLabel, value, propPath, propValue = null, openAdvanced = false }) => {
+      if (propValue === null) {
+        propValue = value;
+      }
+      it(`can update the "${inputLabel}" property of a ${type} control`, async () => {
+        // render the component and spy on the draft/init vuex action
+        const options = optionsWithControls();
+        render(SurveyBuilder, options);
+
+        // add the new control
+        await addControl(type);
+        // update the property
+        updateProperty(new RegExp(inputLabel, 'i'), value, openAdvanced);
+
+        // get the saved draft controls from the vuex store
+        const draftRevision = await saveDraft(options.store);
+        const expectedControl = { type };
+        set(expectedControl, propPath, propValue);
+        expect(draftRevision.controls).toMatchObject([expectedControl]);
       });
     });
   });
