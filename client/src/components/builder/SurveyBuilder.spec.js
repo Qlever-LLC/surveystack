@@ -478,6 +478,10 @@ describe('question set library', () => {
             children: [{ ...childSrt, ...libInfo, id: expect.not.stringMatching(childSrt.id) }],
           },
         ]);
+        // TODO add test back when `feature-versioning` gets merged
+        // expect(addedGroup.children[0].libraryIsInherited).toBeFalsy();
+        // expect(addedGroup.children[1].libraryIsInherited).toBeFalsy();
+        // expect(addedGroup.children[1].children[0].libraryIsInherited).toBeFalsy();
       });
 
       newOrUpdate('sets the inherited flag if the QSL control comes from another QSL', async (runMethod) => {
@@ -505,6 +509,8 @@ describe('question set library', () => {
             children: [{ ...childSrt, id: expect.not.stringMatching(childSrt.id), libraryIsInherited: true }],
           },
         ]);
+        // TODO add test back when `feature-versioning` gets merged
+        // expect(addedGroup.children[0].libraryIsInherited).toBeFalsy();
       });
     });
   });
