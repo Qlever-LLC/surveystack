@@ -3,6 +3,7 @@
     v-if="controls.length !== 0 || index.length !== 0"
     class="draggable"
     :class="controls"
+    :style="scaleStyles"
     :disabled="readOnly"
     tag="div"
     :list="controls"
@@ -159,6 +160,7 @@ export default {
       drag: false,
       deleteQuestionModalIsVisible: false,
       deleteQuestionIndex: null,
+      scaleStyles: {},
     };
   },
   props: {
@@ -176,6 +178,10 @@ export default {
     readOnly: {
       type: Boolean,
       default: false,
+    },
+    scale: {
+      type: Number,
+      default: 1.0,
     },
   },
   filters: {
@@ -231,6 +237,18 @@ export default {
     updateLibrary(idx, libraryId) {
       this.$emit('update-library-questions', this.controls[idx]);
     },
+  },
+  mounted() {
+    const { width, height } = this.$el.getBoundingClientRect();
+    this.scaleStyles =
+      this.style === 1.0
+        ? {}
+        : {
+            transform: `scale(${this.scale})`,
+            transformOrigin: 'top left',
+            marginRight: `-${width * (1.0 - this.scale)}px`,
+            marginBottom: `-${height * (1.0 - this.scale)}px`,
+          };
   },
 };
 </script>
