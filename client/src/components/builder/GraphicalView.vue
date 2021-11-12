@@ -25,7 +25,11 @@
       :key="el.id || el._id"
       @mousedown.stop.left="$emit('control-selected', el)"
     >
-      <div class="d-flex justify-space-between align-center">
+      <div
+        class="d-flex justify-space-between align-center"
+        @mouseover.stop="handleCardHoverChange({ control: el, isHovering: true })"
+        @mouseleave.stop="handleCardHoverChange({ control: el, isHovering: false })"
+      >
         <div class="mb-2" v-if="!el.options.hidden">
           <span class="caption grey--text text--darken-1">{{ createIndex(index, idx + 1) | displayIndex }}</span>
           <br />
@@ -40,26 +44,26 @@
         </div>
         <div class="mb-2 context-actions">
           <div>
-            <v-btn icon v-if="selected === el && !el.libraryId" @click.stop="duplicateControl(el)">
+            <v-btn icon v-if="actionsVisible(el) && !el.libraryId" @click.stop="duplicateControl(el)">
               <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
             </v-btn>
             <v-btn
               icon
-              v-if="selected === el && el.isLibraryRoot && !el.libraryIsInherited"
+              v-if="actionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
               @click.stop="openLibrary(el.libraryId)"
             >
               <v-icon color="grey lighten-1">mdi-library</v-icon>
             </v-btn>
             <v-btn
               icon
-              v-if="selected === el && el.isLibraryRoot && !el.libraryIsInherited"
+              v-if="actionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
               @click.stop="updateLibrary(idx)"
             >
               <v-icon color="grey lighten-1">mdi-refresh</v-icon>
             </v-btn>
             <v-btn
               icon
-              v-if="selected === el && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
+              v-if="actionsVisible(el) && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
               @click.stop="() => showDeleteModal(idx)"
             >
               <v-icon color="grey lighten-1">mdi-delete</v-icon>
@@ -69,7 +73,7 @@
             </v-btn>
           </div>
           <v-chip
-            v-if="selected === el && el.isLibraryRoot && !el.libraryIsInherited"
+            v-if="actionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
             class="align-center text-align-center text-center"
             dark
             small
@@ -94,6 +98,8 @@
         @duplicate-control="$emit('duplicate-control', $event)"
         @open-library="$emit('open-library', $event)"
         @update-library-questions="$emit('update-library-questions', $event)"
+        :reportHoverChange="handleCardHoverChange"
+        :hoveredControlFromParent="hoveredControl"
         :index="createIndex(index, idx + 1)"
       />
 
@@ -110,6 +116,8 @@
         @duplicate-control="$emit('duplicate-control', $event)"
         @open-library="$emit('open-library', $event)"
         @update-library-questions="$emit('update-library-questions', $event)"
+        :reportHoverChange="handleCardHoverChange"
+        :hoveredControlFromParent="hoveredControl"
         :index="createIndex(index, idx + 1)"
       />
 
@@ -161,6 +169,8 @@ export default {
       deleteQuestionModalIsVisible: false,
       deleteQuestionIndex: null,
       scaleStyles: {},
+      /* The control currently hovered. Only set for the root GraphicalView component */
+      hoveredControlSource: null,
     };
   },
   props: {
@@ -183,10 +193,27 @@ export default {
       type: Number,
       default: 1.0,
     },
+    /* passed down to the recursively nested children */
+    reportHoverChange: {
+      type: Function,
+      required: false,
+    },
+    /* passed down to the recursively nested children */
+    hoveredControlFromParent: {
+      type: Object,
+      required: false,
+    },
   },
   filters: {
     displayIndex(value) {
       return value.join('.');
+    },
+  },
+  computed: {
+    hoveredControl() {
+      // hoveredControlSource will be set if this component is the root,
+      // and hoveredControlFromParent if it's a child
+      return this.hoveredControlSource || this.hoveredControlFromParent;
     },
   },
   methods: {
@@ -196,6 +223,9 @@ export default {
     },
     getDisplay(control) {
       return control.label || control.hint || control.type;
+    },
+    actionsVisible(control) {
+      return this.hoveredControl === control || this.selected === control;
     },
     showDeleteModal(index) {
       this.deleteQuestionModalIsVisible = true;
@@ -236,6 +266,19 @@ export default {
     },
     updateLibrary(idx, libraryId) {
       this.$emit('update-library-questions', this.controls[idx]);
+    },
+    handleCardHoverChange(change) {
+      // if this is a child GraphicalView, propagate the hover
+      if (this.reportHoverChange) {
+        this.reportHoverChange(change);
+      } else {
+        const { control, isHovering } = change;
+        if (isHovering) {
+          this.hoveredControlSource = control;
+        } else if (this.hoveredControlSource === control) {
+          this.hoveredControlSource = null;
+        }
+      }
     },
   },
   mounted() {
