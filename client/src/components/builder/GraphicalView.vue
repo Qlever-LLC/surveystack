@@ -44,26 +44,26 @@
         </div>
         <div class="mb-2 context-actions">
           <div>
-            <v-btn icon v-if="hoveredControl === el && !el.libraryId" @click.stop="duplicateControl(el)">
+            <v-btn icon v-if="areActionsVisible(el) && !el.libraryId" @click.stop="duplicateControl(el)">
               <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
             </v-btn>
             <v-btn
               icon
-              v-if="hoveredControl === el && el.isLibraryRoot && !el.libraryIsInherited"
+              v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
               @click.stop="openLibrary(el.libraryId)"
             >
               <v-icon color="grey lighten-1">mdi-library</v-icon>
             </v-btn>
             <v-btn
               icon
-              v-if="hoveredControl === el && el.isLibraryRoot && !el.libraryIsInherited"
+              v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
               @click.stop="updateLibrary(idx)"
             >
               <v-icon color="grey lighten-1">mdi-refresh</v-icon>
             </v-btn>
             <v-btn
               icon
-              v-if="hoveredControl === el && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
+              v-if="areActionsVisible(el) && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
               @click.stop="() => showDeleteModal(idx)"
             >
               <v-icon color="grey lighten-1">mdi-delete</v-icon>
@@ -73,7 +73,7 @@
             </v-btn>
           </div>
           <v-chip
-            v-if="hoveredControl === el && el.isLibraryRoot && !el.libraryIsInherited"
+            v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
             class="align-center text-align-center text-center"
             dark
             small
@@ -261,6 +261,9 @@ export default {
       } else if (this.hoveredControl === control) {
         this.hoveredControl = null;
       }
+    },
+    areActionsVisible(control) {
+      return !this.readOnly && this.hoveredControl === control;
     },
   },
   mounted() {
