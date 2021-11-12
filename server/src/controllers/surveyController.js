@@ -180,14 +180,19 @@ const buildPipelineForGetSurveyPage = ({
       }, {
         '$lookup': {
           'from': 'submissions',
-          'localField': '_id',
-          'foreignField': 'meta.survey.id',
-          'as': 'meta.libraryUsageCountSubmissions'
-        }
+          'let': {
+            'surveyId': '$_id',
+          },
+          'pipeline': [
+            { '$match': { '$expr': { '$eq': ['$meta.survey.id', '$$surveyId'] } } },
+            { '$count': 'count' },
+          ],
+          'as': "meta.libraryUsageCountSubmissions",
+        },
       }, {
         '$addFields': {
           'meta.libraryUsageCountSubmissions': {
-            '$size': '$meta.libraryUsageCountSubmissions'
+            '$arrayElemAt': ['$meta.libraryUsageCountSubmissions.count', 0]
           }
         }
       }, {
