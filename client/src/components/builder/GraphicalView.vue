@@ -44,26 +44,26 @@
         </div>
         <div class="mb-2 context-actions">
           <div>
-            <v-btn icon v-if="actionsVisible(el) && !el.libraryId" @click.stop="duplicateControl(el)">
+            <v-btn icon v-if="hoveredControl === el && !el.libraryId" @click.stop="duplicateControl(el)">
               <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
             </v-btn>
             <v-btn
               icon
-              v-if="actionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
+              v-if="hoveredControl === el && el.isLibraryRoot && !el.libraryIsInherited"
               @click.stop="openLibrary(el.libraryId)"
             >
               <v-icon color="grey lighten-1">mdi-library</v-icon>
             </v-btn>
             <v-btn
               icon
-              v-if="actionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
+              v-if="hoveredControl === el && el.isLibraryRoot && !el.libraryIsInherited"
               @click.stop="updateLibrary(idx)"
             >
               <v-icon color="grey lighten-1">mdi-refresh</v-icon>
             </v-btn>
             <v-btn
               icon
-              v-if="actionsVisible(el) && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
+              v-if="hoveredControl === el && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
               @click.stop="() => showDeleteModal(idx)"
             >
               <v-icon color="grey lighten-1">mdi-delete</v-icon>
@@ -73,7 +73,7 @@
             </v-btn>
           </div>
           <v-chip
-            v-if="actionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
+            v-if="hoveredControl === el && el.isLibraryRoot && !el.libraryIsInherited"
             class="align-center text-align-center text-center"
             dark
             small
@@ -98,8 +98,6 @@
         @duplicate-control="$emit('duplicate-control', $event)"
         @open-library="$emit('open-library', $event)"
         @update-library-questions="$emit('update-library-questions', $event)"
-        :reportHoverChange="handleCardHoverChange"
-        :hoveredControlFromParent="hoveredControl"
         :index="createIndex(index, idx + 1)"
       />
 
@@ -116,8 +114,6 @@
         @duplicate-control="$emit('duplicate-control', $event)"
         @open-library="$emit('open-library', $event)"
         @update-library-questions="$emit('update-library-questions', $event)"
-        :reportHoverChange="handleCardHoverChange"
-        :hoveredControlFromParent="hoveredControl"
         :index="createIndex(index, idx + 1)"
       />
 
@@ -171,6 +167,7 @@ export default {
       scaleStyles: {},
       /* The control currently hovered. Only set for the root GraphicalView component */
       hoveredControlSource: null,
+      hoveredControl: null,
     };
   },
   props: {
@@ -209,13 +206,6 @@ export default {
       return value.join('.');
     },
   },
-  computed: {
-    hoveredControl() {
-      // hoveredControlSource will be set if this component is the root,
-      // and hoveredControlFromParent if it's a child
-      return this.hoveredControlSource || this.hoveredControlFromParent;
-    },
-  },
   methods: {
     getIconForType(type) {
       const control = availableControls.find((c) => c.type === type);
@@ -223,9 +213,6 @@ export default {
     },
     getDisplay(control) {
       return control.label || control.hint || control.type;
-    },
-    actionsVisible(control) {
-      return this.hoveredControl === control || this.selected === control;
     },
     showDeleteModal(index) {
       this.deleteQuestionModalIsVisible = true;
@@ -268,16 +255,11 @@ export default {
       this.$emit('update-library-questions', this.controls[idx]);
     },
     handleCardHoverChange(change) {
-      // if this is a child GraphicalView, propagate the hover
-      if (this.reportHoverChange) {
-        this.reportHoverChange(change);
-      } else {
-        const { control, isHovering } = change;
-        if (isHovering) {
-          this.hoveredControlSource = control;
-        } else if (this.hoveredControlSource === control) {
-          this.hoveredControlSource = null;
-        }
+      const { control, isHovering } = change;
+      if (isHovering) {
+        this.hoveredControl = control;
+      } else if (this.hoveredControl === control) {
+        this.hoveredControl = null;
       }
     },
   },
