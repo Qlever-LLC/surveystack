@@ -254,8 +254,7 @@ export default {
     updateLibrary(idx, libraryId) {
       this.$emit('update-library-questions', this.controls[idx]);
     },
-    handleCardHoverChange(change) {
-      const { control, isHovering } = change;
+    handleCardHoverChange({ control, isHovering }) {
       if (isHovering) {
         this.hoveredControl = control;
       } else if (this.hoveredControl === control) {
