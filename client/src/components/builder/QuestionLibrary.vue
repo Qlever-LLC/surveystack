@@ -28,8 +28,13 @@
             elevation="7"
           >
             <v-row style="min-height:96px;">
-              <v-col>
-                <div class="title">{{ c.name }}</div>
+              <v-col :style="{ minWidth: '0px' }">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <div v-bind="attrs" v-on="on" class="title text-truncate">{{ c.name }}</div>
+                  </template>
+                  <span>{{ c.name }}</span>
+                </v-tooltip>
                 <div>
                   <small class="grey--text">{{ c._id }}</small>
                 </div>
