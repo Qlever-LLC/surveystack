@@ -1,11 +1,12 @@
 // TODO cleanup the tests once the requirements are finalized
 
 import { normalizedSurveyControls, diffControls, changeType, diffSurveyVersions } from './surveyDiff';
-import { cloneDeep, find } from 'lodash';
+import { cloneDeep, find, uniqueId, set } from 'lodash';
 import { createControlInstance } from './surveyConfig';
 
 const createControl = ({ type, ...overrides }) => ({
   ...createControlInstance({ type }),
+  name: `${type}_${uniqueId()}`,
   ...overrides,
 });
 
@@ -17,7 +18,7 @@ const changeAllControlIds = (controls) =>
     }
   });
 
-describe.only('surveyDiff', () => {
+describe('surveyDiff', () => {
   describe('normalizedSurveyControls', () => {
     function sameItems(arr1, arr2) {
       return expect(new Set(arr1)).toEqual(new Set(arr2));
@@ -97,26 +98,137 @@ describe.only('surveyDiff', () => {
       expect(normalized['num_3'].control).toBe(controls[2]);
     });
   });
+
   describe('diffControls', () => {
-    it('works', () => {
-      const oldNum = createControlInstance({ type: 'number', name: 'number_1', label: 'foo' });
+    it("throws when control types don't match", () => {
+      expect(() => diffControls(createControl({ type: 'number' }), createControl({ type: 'string' }))).toThrow(
+        "Control types don't match"
+      );
+    });
+    it('compares all the common fileds', () => {
+      const commonFields = [
+        'type',
+        'name',
+        'label',
+        'options.readOnly',
+        'options.required',
+        'options.redacted',
+        'options.relevance.enabled',
+        'options.relevance.code',
+        'options.constraint.enabled',
+        'options.constraint.code',
+        'options.calculate.enabled',
+        'options.calculate.code',
+        'options.apiCompose.enabled',
+        'options.apiCompose.code',
+      ];
+      const control = createControl({ type: 'number', label: 'number label' });
+
+      const diff = diffControls(control, control);
+      console.log(diff);
+      commonFields.forEach((field) => {
+        expect(diff).toHaveProperty([field, 'changeType'], changeType.UNCHANGED);
+      });
+    });
+    it('does not compare blacklisted fileds', () => {
+      const blacklisteds = ['id', 'hint', 'children', 'libraryId', 'libraryIsInherited', 'libraryVersion'];
+      const control = createControl({
+        type: 'group',
+        hint: 'this is a hint',
+        libraryId: 'lib-id',
+        libraryIsInherited: true,
+        libraryVersion: 5,
+      });
+
+      const diff = diffControls(control, control);
+      blacklisteds.forEach((field) => {
+        expect(diff).not.toHaveProperty([field, 'changeType'], changeType.UNCHANGED);
+      });
+    });
+    it('reports change', () => {
+      const oldNum = createControl({ type: 'number', name: 'number_1' });
       const newNum = cloneDeep(oldNum);
       newNum.name += 'changed';
 
       const diff = diffControls(oldNum, newNum);
 
-      expect(diff).toHaveProperty('name.changeType', changeType.CHANGED);
-      expect(diff).toHaveProperty('name.oldValue', oldNum.name);
-      expect(diff).toHaveProperty('name.newValue', newNum.name);
-      expect(diff).toHaveProperty('label.changeType', changeType.UNCHANGED);
+      expect(diff.name).toMatchObject({
+        changeType: changeType.CHANGED,
+        oldValue: oldNum.name,
+        newValue: newNum.name,
+      });
     });
-    it('works with array values', () => {
-      const oldControl = createControlInstance({ type: 'selectMultiple', name: 'sm_1' });
-      oldControl.options.source.push({ a: 1 }, { b: 2 }, { c: 3 });
-      const newControl = cloneDeep(oldControl);
+    it('reports no-change', () => {
+      const control = createControl({ type: 'number', name: 'number_1' });
 
-      const diff = diffControls(oldControl, newControl);
-      expect(diff).toHaveProperty(['options.source[0].a', 'changeType'], changeType.UNCHANGED);
+      const diff = diffControls(control, control);
+
+      expect(diff.name).toMatchObject({
+        changeType: changeType.UNCHANGED,
+        value: control.name,
+      });
+    });
+    it('reports removal', () => {
+      const oldNum = createControl({ type: 'number', label: 'some_value' });
+      const newNum = cloneDeep(oldNum);
+      delete newNum.label;
+
+      const diff = diffControls(oldNum, newNum);
+
+      expect(diff.label).toMatchObject({
+        changeType: changeType.REMOVED,
+        oldValue: oldNum.label,
+        newValue: undefined,
+      });
+    });
+    it('reports addition', () => {
+      const oldNum = createControl({ type: 'number', label: 'some_value' });
+      const newNum = cloneDeep(oldNum);
+      delete oldNum.label;
+
+      const diff = diffControls(oldNum, newNum);
+
+      expect(diff.label).toMatchObject({
+        changeType: changeType.ADDED,
+        oldValue: undefined,
+        newValue: newNum.label,
+      });
+    });
+    describe('controls with array type source', () => {
+      [
+        ['matrix', 'source.content'],
+        ['selectSingle', 'source'],
+        ['selectMultiple', 'source'],
+      ].forEach(([type, srcPath]) => {
+        it(`diffs options.${srcPath} of ${type} control`, () => {
+          const oldControl = createControl({ type, name: 'control_1' });
+          set(oldControl.options, srcPath, [{ foo: 1 }, { bar: 2 }, { baz: 3 }]);
+          const newControl = cloneDeep(oldControl);
+          set(newControl.options, `${srcPath}[1].bar`, 5);
+          set(newControl.options, `${srcPath}[2].bux`, 6);
+          set(newControl.options, `${srcPath}[2].baz`, null);
+
+          const diff = diffControls(oldControl, newControl);
+          expect(diff[`options.${srcPath}[0].foo`]).toMatchObject({
+            changeType: changeType.UNCHANGED,
+          });
+          expect(diff[`options.${srcPath}[1].bar`]).toMatchObject({
+            changeType: changeType.CHANGED,
+            oldValue: 2,
+            newValue: 5,
+          });
+          expect(diff[`options.${srcPath}[2].baz`]).toMatchObject({
+            changeType: changeType.REMOVED,
+            oldValue: 3,
+            newValue: null,
+          });
+          expect(diff[`options.${srcPath}[2].bux`]).toMatchObject({
+            changeType: changeType.ADDED,
+            oldValue: undefined,
+            newValue: 6,
+          });
+        });
+      });
     });
   });
   describe('diffSurveyVersions', () => {

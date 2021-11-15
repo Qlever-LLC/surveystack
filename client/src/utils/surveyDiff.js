@@ -43,8 +43,6 @@ const diffObject = (oldObj, newObj, fields) => {
   }, {});
 };
 
-class CantCompareError extends Error {}
-
 const getComparableFields = (a, b) => {
   const [flatA, flatB] = [a, b].map((c) => flatten(c, { safe: true }));
   return Object.keys({ ...flatA, ...flatB });
@@ -52,7 +50,7 @@ const getComparableFields = (a, b) => {
 
 export const diffControls = (oldControl, newControl) => {
   if (oldControl.type !== newControl.type) {
-    throw new CantCompareError("Control types don't match");
+    throw new Error("Control types don't match");
   }
   const controlType = oldControl.type;
 
