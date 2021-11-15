@@ -164,6 +164,7 @@ const actions = {
   init({ commit, dispatch }, { survey, submission, persist }) {
     console.log('draft.store:action:init');
     commit('INIT', { survey, submission, persist });
+    dispatch('next');
     dispatch('calculateRelevance');
   },
   setProperty({ commit, dispatch, state }, { path, value, calculate = true }) {
@@ -188,7 +189,9 @@ const actions = {
       return true;
     });
 
-    let index = traversal.indexOf(state.node);
+    // when state.node is not set, this is the initial step
+    // setting the index to 0 will let the next loop to select the first relevant node
+    let index = state.node ? traversal.indexOf(state.node) : 0;
     if (index < 0) {
       return;
     }
@@ -428,16 +431,6 @@ const mutations = {
       .forEach((node) => {
         // node.drop();
       });
-
-    // assign first node
-    root.walk((node) => {
-      if (!node.isRoot() && node.model.type !== 'group') {
-        state.node = node;
-        state.firstNode = node;
-        return false;
-      }
-      return true;
-    });
   },
   SET_PROPERTY(state, { path, value }) {
     surveyStackUtils.setNested(state.submission, path, value);
@@ -445,6 +438,10 @@ const mutations = {
   NEXT(state, node) {
     // console.log('next', node, state);
     state.node = node;
+    // if firstNode is not set, this is the initial step and the given node is the first node
+    if (!state.firstNode) {
+      state.firstNode = node;
+    }
   },
   PREV(state, node) {
     // console.log('prev', node, state);
