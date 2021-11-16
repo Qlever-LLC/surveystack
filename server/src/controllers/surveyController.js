@@ -316,7 +316,7 @@ const getSurveyListPage = async (req, res) => {
 
 const getSurvey = async (req, res) => {
   const { id } = req.params;
-  let entity = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  const entity = await db.collection(col).findOne({ _id: new ObjectId(id) });
 
   if (!entity) {
     return res.status(404).send({
