@@ -125,7 +125,6 @@ describe('surveyDiff', () => {
       const control = createControl({ type: 'number', label: 'number label' });
 
       const diff = diffControls(control, control);
-      console.log(diff);
       commonFields.forEach((field) => {
         expect(diff).toHaveProperty([field, 'changeType'], changeType.UNCHANGED);
       });
