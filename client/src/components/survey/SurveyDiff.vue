@@ -97,7 +97,7 @@ export default {
       }
 
       const childrenOf = (parent) => this.diff.filter((d) => (d.newParentId || d.oldParentId || null) === parent);
-      const getSortKey = (diff) => (isNumber(diff.newChildIndex) ? diff.newChildIndex : diff.oldChildIndex);
+      const getSortKey = (diff) => (isNumber(diff.newChildIndex) ? diff.newChildIndex : diff.oldChildIndex - 0.5);
       const convert = (diffs, parentIdxPath = []) => {
         // sort to make the order similart to the original
         return sortBy(diffs, getSortKey).map((controlDiff) => {
@@ -105,7 +105,7 @@ export default {
           const idx = controlDiff.newControl ? controlDiff.newChildIndex : controlDiff.oldChildIndex;
           const idxPath = [...parentIdxPath, idx + 1];
           return {
-            id: controlDiff.matchId,
+            id: controlDiff.matchId || control.id,
             name: control.name,
             label: control.label,
             controlType: control.type,

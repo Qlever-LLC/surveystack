@@ -1,5 +1,5 @@
 <template>
-  <v-card class="control-item d-flex flex-column">
+  <v-card class="control-item d-flex flex-column" :data-testid="`diff-card-${diffInfo.id}`">
     <button @click="isOpen = !isOpen" :disabled="!haveChangeDetails">
       <v-row>
         <control-card-header
