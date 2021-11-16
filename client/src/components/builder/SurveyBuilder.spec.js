@@ -179,13 +179,17 @@ describe('add control', () => {
       { inputLabel: 'Show Point Control', type: 'geoJSON', value: false, propPath: 'options.geoJSON.showPoint' },
       { inputLabel: 'Show Circle Control', type: 'geoJSON', value: false, propPath: 'options.geoJSON.showCircle' },
       { inputLabel: 'Type', type: 'date', value: 'date-year', propPath: 'options.subtype' },
-    ].forEach(({ type, inputLabel, value, propPath, propValue = null, openAdvanced = false }) => {
+      { inputLabel: 'Allow hide', type: 'number', value: true, propPath: 'options.allowHide', isLibrary: true },
+      { inputLabel: 'Allow modify', type: 'date', value: true, propPath: 'options.allowModify', isLibrary: true },
+      // TODO test changing options.hidden
+    ].forEach(({ type, inputLabel, value, propPath, propValue = null, openAdvanced = false, isLibrary = false }) => {
       if (propValue === null) {
         propValue = value;
       }
       it(`can update the "${inputLabel}" property of a ${type} control`, async () => {
         // render the component and spy on the draft/init vuex action
         const options = optionsWithControls();
+        options.props.survey.meta.isLibrary = isLibrary;
         render(SurveyBuilder, options);
 
         // add the new control
