@@ -3,6 +3,7 @@
     v-if="controls.length !== 0 || index.length !== 0"
     class="draggable"
     :class="controls"
+    :style="scaleStyles"
     :disabled="readOnly"
     tag="div"
     :list="controls"
@@ -24,7 +25,11 @@
       :key="el.id || el._id"
       @mousedown.stop.left="$emit('control-selected', el)"
     >
-      <div class="d-flex justify-space-between align-center">
+      <div
+        class="d-flex justify-space-between align-center"
+        @mouseover.stop="handleCardHoverChange({ control: el, isHovering: true })"
+        @mouseleave.stop="handleCardHoverChange({ control: el, isHovering: false })"
+      >
         <control-card-header
           v-if="!el.options.hidden"
           :index="createIndex(index, idx + 1) | displayIndex"
@@ -37,12 +42,12 @@
         </div>
         <div class="mb-2 context-actions">
           <div>
-            <v-btn icon v-if="selected === el && !el.libraryId" @click.stop="duplicateControl(el)">
+            <v-btn icon v-if="areActionsVisible(el) && !el.libraryId" @click.stop="duplicateControl(el)">
               <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
             </v-btn>
             <v-btn
               icon
-              v-if="selected === el && el.isLibraryRoot && !el.libraryIsInherited"
+              v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
               @click.stop="openLibrary(el.libraryId)"
             >
               <v-icon color="grey lighten-1">mdi-library</v-icon>
@@ -50,13 +55,12 @@
             <v-btn
               icon
               v-if="
-                selected === el &&
+                areActionsVisible(el) &&
                   el.isLibraryRoot &&
                   !el.libraryIsInherited &&
-                  availableLibraryUpdates[el.libraryId] &&
-                  availableLibraryUpdates[el.libraryId] !== null
+                  availableLibraryUpdates[el.libraryId]
               "
-              @click.stop="updateLibrary(idx, el)"
+              @click.stop="updateLibrary(el)"
             >
               <v-icon :color="availableLibraryUpdates[el.libraryId] > el.libraryVersion ? 'warning' : 'grey lighten-1'"
                 >mdi-refresh</v-icon
@@ -64,7 +68,7 @@
             </v-btn>
             <v-btn
               icon
-              v-if="selected === el && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
+              v-if="areActionsVisible(el) && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
               @click.stop="() => showDeleteModal(idx)"
             >
               <v-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey lighten-1'"
@@ -76,7 +80,7 @@
             </v-btn>
           </div>
           <v-chip
-            v-if="selected === el && el.isLibraryRoot && !el.libraryIsInherited"
+            v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
             class="align-center text-align-center text-center"
             dark
             small
@@ -195,6 +199,8 @@ export default {
       updateLibraryDialogIsVisible: false,
       updateToLibrary: null,
       updateControl: null,
+      scaleStyles: {},
+      hoveredControl: null,
     };
   },
   props: {
@@ -219,6 +225,10 @@ export default {
       default() {
         return {};
       },
+    },
+    scale: {
+      type: Number,
+      default: 1.0,
     },
   },
   filters: {
@@ -271,7 +281,7 @@ export default {
     openLibrary(libraryId) {
       this.$emit('open-library', libraryId);
     },
-    async updateLibrary(idx, control) {
+    async updateLibrary(control) {
       this.updateControl = control;
       const { data } = await api.get(`/surveys/${control.libraryId}`);
       this.updateToLibrary = data;
@@ -288,6 +298,28 @@ export default {
       this.updateLibraryDialogIsVisible = false;
       this.updateControl = null;
     },
+    handleCardHoverChange({ control, isHovering }) {
+      if (isHovering) {
+        this.hoveredControl = control;
+      } else if (this.hoveredControl === control) {
+        this.hoveredControl = null;
+      }
+    },
+    areActionsVisible(control) {
+      return !this.readOnly && this.hoveredControl === control;
+    },
+  },
+  mounted() {
+    const { width, height } = this.$el.getBoundingClientRect();
+    this.scaleStyles =
+      this.style === 1.0
+        ? {}
+        : {
+            transform: `scale(${this.scale})`,
+            transformOrigin: 'top left',
+            marginRight: `-${width * (1.0 - this.scale)}px`,
+            marginBottom: `-${height * (1.0 - this.scale)}px`,
+          };
   },
 };
 </script>
