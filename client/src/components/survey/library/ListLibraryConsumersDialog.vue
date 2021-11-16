@@ -15,19 +15,7 @@
               <v-list-item-content>
                 <small class="grey--text">{{ c._id }}</small>
                 <v-list-item-title>{{ c.name }}</v-list-item-title>
-                <!--small class="grey--text"
-                >Using question set version ??? {{ c.version }} of {{ version }}
-                <span v-if="version !== c.version">(OUTDATED)</span>
-              </small-->
               </v-list-item-content>
-              <!--v-list-item-content>
-              <v-btn icon v-on:click.stop="refreshConsumer" title="UPDATE">
-                <v-icon color="grey">mdi-refresh</v-icon>
-              </v-btn>
-              <v-btn icon v-on:click.stop="goToSurvey(c._id)" title="OPEN">
-                <v-icon color="grey">mdi-open-in-new</v-icon>
-              </v-btn>
-            </v-list-item-content-->
             </v-list-item>
           </template>
         </v-list>
