@@ -109,7 +109,7 @@
                 <h4>Questions</h4>
                 <graphical-view
                   :readOnly="true"
-                  scale="0.75"
+                  :scale="0.75"
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
                   class="graphical-view"
                   :controls="selectedSurvey.revisions[selectedSurvey.latestVersion - 1].controls"
@@ -168,7 +168,6 @@ export default {
       const queryParams = new URLSearchParams();
       if (this.search) {
         queryParams.append('q', this.search);
-        console.log(this.search);
       }
 
       queryParams.append('isLibrary', 'true');
@@ -198,7 +197,6 @@ export default {
 
         return data;
       } catch (e) {
-        // TODO: use cached data?
         console.log('Error fetching surveys:', e);
       }
       // return [];

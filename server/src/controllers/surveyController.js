@@ -4,7 +4,7 @@ import boom from '@hapi/boom';
 
 import { db } from '../db';
 
-import { checkSurvey, forAllControlsRecursive } from '../helpers/surveys';
+import { checkSurvey, changeRecursive } from '../helpers/surveys';
 import rolesService from '../services/roles.service';
 
 const col = 'surveys';
@@ -17,7 +17,7 @@ const sanitize = async (entity) => {
     version.dateCreated = new Date(entity.dateCreated);
 
     version.controls.forEach((control) => {
-      forAllControlsRecursive(control, (control) => {
+      changeRecursive(control, (control)=> {
         if (control.libraryId) {
           control.libraryId = new ObjectId(control.libraryId);
         }
@@ -316,9 +316,7 @@ const getSurveyListPage = async (req, res) => {
 
 const getSurvey = async (req, res) => {
   const { id } = req.params;
-  let entity;
-
-  entity = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  const entity = await db.collection(col).findOne({ _id: new ObjectId(id) });
 
   if (!entity) {
     return res.status(404).send({
@@ -485,6 +483,39 @@ const deleteSurvey = async (req, res) => {
   }
 };
 
+const checkForLibraryUpdates = async (req, res) => {
+  const { id } = req.params;
+  let survey = await db.collection(col).findOne({ _id: new ObjectId(id) });
+
+  if (!survey) {
+    return res.status(404).send({
+      message: `No entity with _id exists: ${id}`,
+    });
+  }
+
+  // get latest revision of survey controls, even if draft
+  const latestRevision = survey.revisions[survey.revisions.length - 1];
+
+  //for each question set library used in the given survey
+  let updatableSurveys = {};
+
+  await Promise.all(latestRevision.controls.map(async (control) => {
+    if(control.isLibraryRoot && !control.libraryIsInherited) {
+      //check if used library survey version is old
+      const librarySurvey = await db.collection(col).findOne({ _id: new ObjectId(control.libraryId) });
+      if(!librarySurvey) {
+        //library can not be found, also return this information
+        updatableSurveys[control.libraryId] = null;
+      } else if(control.libraryVersion<librarySurvey.latestVersion) {
+        //library is updatable, add to result set
+        updatableSurveys[control.libraryId] = librarySurvey.latestVersion;
+      }
+    }
+  }));
+
+  return res.send(updatableSurveys);
+};
+
 export default {
   getSurveys,
   getSurveyPage,
@@ -495,4 +526,5 @@ export default {
   createSurvey,
   updateSurvey,
   deleteSurvey,
+  checkForLibraryUpdates,
 };

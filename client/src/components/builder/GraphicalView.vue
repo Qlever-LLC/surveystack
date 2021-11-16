@@ -30,15 +30,13 @@
         @mouseover.stop="handleCardHoverChange({ control: el, isHovering: true })"
         @mouseleave.stop="handleCardHoverChange({ control: el, isHovering: false })"
       >
-        <div class="mb-2" v-if="!el.options.hidden">
-          <span class="caption grey--text text--darken-1">{{ createIndex(index, idx + 1) | displayIndex }}</span>
-          <br />
-          <span class="title">
-            {{ getDisplay(el) }}
-          </span>
-          <br />
-          <span class="font-weight-light grey--text text--darken-2"> {{ el.name }} : {{ el.type }} </span>
-        </div>
+        <control-card-header
+          v-if="!el.options.hidden"
+          :index="createIndex(index, idx + 1) | displayIndex"
+          :title="getDisplay(el)"
+          :type="el.type"
+          :dataName="el.name"
+        />
         <div class="grey--text text--darken-1" v-if="el.options.hidden">
           {{ createIndex(index, idx + 1) | displayIndex }} &nbsp; {{ getDisplay(el) }}
         </div>
@@ -56,17 +54,26 @@
             </v-btn>
             <v-btn
               icon
-              v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
-              @click.stop="updateLibrary(idx)"
+              v-if="
+                areActionsVisible(el) &&
+                  el.isLibraryRoot &&
+                  !el.libraryIsInherited &&
+                  availableLibraryUpdates[el.libraryId]
+              "
+              @click.stop="updateLibrary(el)"
             >
-              <v-icon color="grey lighten-1">mdi-refresh</v-icon>
+              <v-icon :color="availableLibraryUpdates[el.libraryId] > el.libraryVersion ? 'warning' : 'grey lighten-1'"
+                >mdi-refresh</v-icon
+              >
             </v-btn>
             <v-btn
               icon
               v-if="areActionsVisible(el) && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
               @click.stop="() => showDeleteModal(idx)"
             >
-              <v-icon color="grey lighten-1">mdi-delete</v-icon>
+              <v-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey lighten-1'"
+                >mdi-delete</v-icon
+              >
             </v-btn>
             <v-btn text x-small v-if="el.options.hidden" @click.stop="el.options.hidden = false" color="grey lighten-1">
               unhide
@@ -77,8 +84,20 @@
             class="align-center text-align-center text-center"
             dark
             small
-            outlined
-            color="grey"
+            :color="
+              availableLibraryUpdates[el.libraryId] === null
+                ? 'error'
+                : availableLibraryUpdates[el.libraryId] > el.libraryVersion
+                ? 'warning'
+                : 'grey'
+            "
+            :title="
+              availableLibraryUpdates[el.libraryId] === null
+                ? 'question set has been deleted in the library'
+                : availableLibraryUpdates[el.libraryId]
+                ? 'new version ' + availableLibraryUpdates[el.libraryId] + ' available'
+                : 'newest available version'
+            "
           >
             Version {{ el.libraryVersion }}
           </v-chip>
@@ -136,6 +155,14 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <update-library-dialog
+        v-if="updateLibraryDialogIsVisible"
+        v-model="updateLibraryDialogIsVisible"
+        :from-library-control="updateControl"
+        :to-survey="updateToLibrary"
+        @ok="updateLibraryConfirmed"
+        @cancel="updateLibraryCancelled"
+      />
     </v-card>
   </draggable>
   <div v-else>
@@ -153,20 +180,26 @@ import { cloneDeep } from 'lodash';
 import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
 import * as utils from '@/utils/surveys';
+import api from '@/services/api.service';
+import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
+import ControlCardHeader from './ControlCardHeader';
 
 export default {
   name: 'nested-draggable',
   components: {
+    UpdateLibraryDialog,
     draggable,
+    ControlCardHeader,
   },
   data() {
     return {
       drag: false,
       deleteQuestionModalIsVisible: false,
       deleteQuestionIndex: null,
+      updateLibraryDialogIsVisible: false,
+      updateToLibrary: null,
+      updateControl: null,
       scaleStyles: {},
-      /* The control currently hovered. Only set for the root GraphicalView component */
-      hoveredControlSource: null,
       hoveredControl: null,
     };
   },
@@ -186,19 +219,16 @@ export default {
       type: Boolean,
       default: false,
     },
+    availableLibraryUpdates: {
+      required: false,
+      type: Object,
+      default() {
+        return {};
+      },
+    },
     scale: {
       type: Number,
       default: 1.0,
-    },
-    /* passed down to the recursively nested children */
-    reportHoverChange: {
-      type: Function,
-      required: false,
-    },
-    /* passed down to the recursively nested children */
-    hoveredControlFromParent: {
-      type: Object,
-      required: false,
     },
   },
   filters: {
@@ -251,8 +281,22 @@ export default {
     openLibrary(libraryId) {
       this.$emit('open-library', libraryId);
     },
-    updateLibrary(idx, libraryId) {
-      this.$emit('update-library-questions', this.controls[idx]);
+    async updateLibrary(control) {
+      this.updateControl = control;
+      const { data } = await api.get(`/surveys/${control.libraryId}`);
+      this.updateToLibrary = data;
+      this.updateLibraryDialogIsVisible = true;
+    },
+    updateLibraryConfirmed() {
+      this.updateToLibrary = null;
+      this.updateLibraryDialogIsVisible = false;
+      this.$emit('update-library-questions', this.updateControl);
+      this.updateControl = null;
+    },
+    updateLibraryCancelled() {
+      this.updateToLibrary = null;
+      this.updateLibraryDialogIsVisible = false;
+      this.updateControl = null;
     },
     handleCardHoverChange({ control, isHovering }) {
       if (isHovering) {
@@ -307,7 +351,7 @@ export default {
 }
 
 .control-item {
-  padding: 0.75rem 1.25rem;
+  padding: 0.25rem 1.25rem;
   border: 1px solid rgba(0, 0, 0, 0.125);
   margin-bottom: -1px;
   /* border-left: 2px solid transparent; */
