@@ -492,18 +492,40 @@ const getSubmissionsCsv = async (req, res) => {
   addSkipToPipeline(pipeline, req.query.skip);
   addLimitToPipeline(pipeline, req.query.limit);
 
+  const formatOptions = {
+    expandAllMatrices: queryParam(req.query.expandAllMatrices),
+    expandMatrix: _.isArray(req.query.expandMatrix)
+      ? req.query.expandMatrix
+      : _.isString(req.query.expandMatrix)
+      ? [req.query.expandMatrix]
+      : [],
+  };
+
   const entities = await db.collection(col).aggregate(pipeline).toArray();
-  const transformer = (entity) => ({
-    ...entity,
-    data: csvService.transformSubmissionQuestionTypes(
-      entity.data, 
-      { geoJSON: csvService.geojsonTransformer },
-    ),
-  });
-  const transformedEntities = entities.map(transformer);
+  const transformer = (entity) => {
+    let data = csvService.transformSubmissionQuestionTypes(entity.data, {
+      geoJSON: csvService.geojsonTransformer,
+      matrix: csvService.matrixTransformer,
+    }, formatOptions);
+
+    data = csvService.removeMetaFromQuestions(data);
+
+    const result = {
+      _id: entity._id,
+      data,
+    }
+
+    if (queryParam(req.query.showCsvMeta)) {
+      result.meta = entity.meta
+    }
+
+    return result;
+  };
+  let transformedEntities = entities.map(transformer);
 
   const headers = await headerService.getHeaders(req.query.survey, transformedEntities, {
-    excludeDataMeta: !queryParam(req.query.showCsvDataMeta),
+    excludeDataMeta: false,
+    splitValueFieldFromQuestions: true,
   });
 
   const csv = csvService.createCsv(transformedEntities, headers);
