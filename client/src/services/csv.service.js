@@ -147,12 +147,12 @@ function createCsv(submissions, headers) {
       geoJSON: geojsonTransformer,
     });
 
-    const flattenedSubmissionData = flatten({
+    const flattenSubmissionData = flatten({
       ...submission,
       data: transformedSubmissionData,
     });
 
-    const finalSubmissionData = omitBy(flattenedSubmissionData, (value) => isObject(value) && isEmpty(value));
+    const finalSubmissionData = omitBy(flattenSubmissionData, (value) => isObject(value) && isEmpty(value));
 
     items.push(finalSubmissionData);
   });
