@@ -1,7 +1,7 @@
 /* eslint no-restricted-syntax: 0 */
 /* eslint no-param-reassign: 0 */
 import papa from 'papaparse';
-import { cloneDeep } from 'lodash';
+import _, { cloneDeep } from 'lodash';
 import { flatten } from 'flat';
 
 function removeKeys(obj, keys) {
@@ -34,25 +34,18 @@ function removeKeys(obj, keys) {
  * should return the updated value for the question value
  * @returns updated submission object
  */
-export function isEmpty(obj) {
-  if (typeof obj === 'object' && obj !== null) {
-    return Object.keys(obj).length === 0;
-  }
-}
 export function transformSubmissionQuestionTypes(obj, typeHandlers) {
   return Object.entries(obj)
     .map(([key, val]) => {
-      if (!isEmpty(obj[key])) {
-        if (typeof val === 'object' && val !== null) {
-          const typeHandler =
-            'meta' in obj[key] && obj[key].meta.type in typeHandlers && typeHandlers[obj[key].meta.type];
-          if (typeHandler) {
-            return { [key]: typeHandler(val) };
-          }
-          return { [key]: transformSubmissionQuestionTypes(val, typeHandlers) };
+      if (typeof val === 'object' && val !== null) {
+        const typeHandler =
+          'meta' in obj[key] && obj[key].meta.type in typeHandlers && typeHandlers[obj[key].meta.type];
+        if (typeHandler) {
+          return { [key]: typeHandler(val) };
         }
-        return { [key]: val };
+        return { [key]: transformSubmissionQuestionTypes(val, typeHandlers) };
       }
+      return { [key]: val };
     }) // Flatten objects
     .reduce((r, x) => ({ ...r, ...x }), {});
 }
@@ -119,6 +112,20 @@ export function geojsonTransformer(o) {
   };
 }
 
+/**
+ *
+ * @param {*} obj submission question object
+ * @returns updated submission question object that are not empty
+ */
+function removeEmptyObjects(obj) {
+  return _(obj)
+    .pickBy(_.isObject) // selects only objects
+    .mapValues(removeEmptyObjects) // call only for object values
+    .omitBy(_.isEmpty) // remove all empty objects
+    .assign(_.omitBy(obj, _.isObject)) // assign back primitive values
+    .value();
+}
+
 function createCsv(submissions, headers) {
   const items = [];
   submissions.forEach((s) => {
@@ -149,16 +156,19 @@ function createCsv(submissions, headers) {
 
     // transform GeoJSON question type result table output to only flatten
     // down to the level of each Feature in the FeatureCollection
+
     const transformedSubmissionData = transformSubmissionQuestionTypes(submission.data, {
       geoJSON: geojsonTransformer,
     });
 
-    items.push(
-      flatten({
-        ...submission,
-        data: transformedSubmissionData,
-      })
-    );
+    const flattenedSubmissionData = flatten({
+      ...submission,
+      data: transformedSubmissionData,
+    });
+
+    const finalSubmissionData = removeEmptyObjects(flattenedSubmissionData);
+
+    items.push(finalSubmissionData);
   });
 
   let csv = '';
