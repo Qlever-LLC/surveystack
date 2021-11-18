@@ -112,13 +112,6 @@ export function geojsonTransformer(o) {
   };
 }
 
-/**
- *
- * @param {*} obj submission question object
- * @returns updated submission question object that are not empty
- */
-export const removeEmptyObjects = (obj) => mapValues(omitBy(obj, (value) => isObject(value) && isEmpty(value)));
-
 function createCsv(submissions, headers) {
   const items = [];
   submissions.forEach((s) => {
@@ -159,7 +152,7 @@ function createCsv(submissions, headers) {
       data: transformedSubmissionData,
     });
 
-    const finalSubmissionData = removeEmptyObjects(flattenedSubmissionData);
+    const finalSubmissionData = omitBy(flattenedSubmissionData, (value) => isObject(value) && isEmpty(value));
 
     items.push(finalSubmissionData);
   });

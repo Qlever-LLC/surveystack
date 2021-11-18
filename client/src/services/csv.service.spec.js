@@ -356,17 +356,5 @@ describe('CSV Service', () => {
         },
       });
     });
-
-    describe('removeEmptyObjects', () => {
-      it('should remove empty objects from objects collection', () => {
-        const obj = {
-          success: {},
-          error: {},
-          city: 'Berlin',
-        };
-        const result = removeEmptyObjects(obj);
-        expect(result).toEqual({ city: 'Berlin' });
-      });
-    });
   });
 });
