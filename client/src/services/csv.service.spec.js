@@ -1,4 +1,4 @@
-import { transformSubmissionQuestionTypes, geojsonTransformer, isEmpty } from './csv.service';
+import { transformSubmissionQuestionTypes, geojsonTransformer, removeEmptyObjects } from './csv.service';
 
 function mockSubmissions() {
   return [
@@ -354,6 +354,18 @@ describe('CSV Service', () => {
             dateModified: '2021-06-14T21:12:36.811-04:00',
           },
         },
+      });
+    });
+
+    describe('', () => {
+      it('returns true if an empty object is passed', () => {
+        const obj = {
+          success: {},
+          error: {},
+          city: 'Berlin',
+        };
+        const result = removeEmptyObjects(obj);
+        expect(result).toEqual({ city: 'Berlin' });
       });
     });
   });

@@ -1,7 +1,7 @@
 /* eslint no-restricted-syntax: 0 */
 /* eslint no-param-reassign: 0 */
 import papa from 'papaparse';
-import _, { cloneDeep } from 'lodash';
+import { cloneDeep, mapValues, omitBy, isObject, isEmpty } from 'lodash';
 import { flatten } from 'flat';
 
 function removeKeys(obj, keys) {
@@ -117,14 +117,7 @@ export function geojsonTransformer(o) {
  * @param {*} obj submission question object
  * @returns updated submission question object that are not empty
  */
-function removeEmptyObjects(obj) {
-  return _(obj)
-    .pickBy(_.isObject) // selects only objects
-    .mapValues(removeEmptyObjects) // call only for object values
-    .omitBy(_.isEmpty) // remove all empty objects
-    .assign(_.omitBy(obj, _.isObject)) // assign back primitive values
-    .value();
-}
+export const removeEmptyObjects = (obj) => mapValues(omitBy(obj, (value) => isObject(value) && isEmpty(value)));
 
 function createCsv(submissions, headers) {
   const items = [];
