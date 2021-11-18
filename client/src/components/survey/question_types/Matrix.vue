@@ -43,7 +43,7 @@
                   :farmos="farmos"
                   :index="idx"
                   @changed="onInput"
-                  class="matrix-cell my-2"
+                  class="my-2"
                 />
               </div>
             </v-form>
@@ -63,9 +63,38 @@
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
 
+    <app-matrix-table :headers="headers" :rows="rows || []">
+      <template v-slot:header-cell="{ header }">
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <span v-on="on">{{ header.label }}</span>
+          </template>
+          <span>{{ header.type }}</span>
+        </v-tooltip>
+        <app-redacted v-if="header.redacted" />
+        <app-required v-if="header.required" />
+      </template>
+      <template v-slot:row-cell="{ header, row, colIdx }">
+        <v-form autocomplete="off" @submit.prevent="">
+          <app-matrix-cell
+            :header="header"
+            :item="row"
+            :getDropdownItems="getDropdownItems"
+            :farmos="farmos"
+            :index="colIdx"
+            @changed="onInput"
+            :disabled="isMobile"
+            class="my-2"
+            :loading="loading"
+          />
+        </v-form>
+      </template>
+    </app-matrix-table>
     <v-data-table
+      v-if="false"
       :headers="headers"
       header
+      height="300"
       disable-pagination
       hide-default-footer
       hide-default-header
@@ -102,7 +131,7 @@
                   :index="idx"
                   @changed="onInput"
                   :disabled="isMobile"
-                  class="matrix-cell my-2"
+                  class="my-2"
                   :style="{ minWidth: header.scaleWidth ? `calc(10rem * ${header.scaleWidth}/100)` : '10rem' }"
                   :loading="loading"
                 />
@@ -138,6 +167,7 @@
 import { cloneDeep } from 'lodash';
 import appDialog from '@/components/ui/Dialog.vue';
 import appMatrixCell from '@/components/survey/question_types/MatrixCell.vue';
+import appMatrixTable from '@/components/survey/question_types/MatrixTable.vue';
 import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
 
@@ -242,6 +272,7 @@ export default {
   components: {
     appDialog,
     appMatrixCell,
+    appMatrixTable,
     appRequired,
     appRedacted,
   },
@@ -354,10 +385,6 @@ export default {
 </script>
 
 <style scoped>
-.matrix-cell {
-  /*min-width: 11rem;*/
-}
-
 /*
   'scrollbar-color' and 'scrollbar-width' should be working on Firefox Android since version 64
   https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Scrollbars#Browser_compatibility
