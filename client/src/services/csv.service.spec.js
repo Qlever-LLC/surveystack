@@ -357,8 +357,8 @@ describe('CSV Service', () => {
       });
     });
 
-    describe('', () => {
-      it('returns true if an empty object is passed', () => {
+    describe('removeEmptyObjects', () => {
+      it('remove empty objects from objects collection', () => {
         const obj = {
           success: {},
           error: {},
