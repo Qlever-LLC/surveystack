@@ -11,20 +11,6 @@ import { isString, last, cloneDeep, uniqueId, set } from 'lodash';
 import '@/components/survey/question_types';
 import api from '../../services/api.service.js';
 
-// Example test  with vue-testing-utils
-import { mount } from '@vue/test-utils';
-import Vuex from 'vuex';
-import SurveyNameEditor from '@/components/builder/SurveyNameEditor.vue';
-test('vue-test-utils example', () => {
-  const survey = { ...createSurvey({ group: { id: null, path: null } }), name: 'survey name', id: 'survey_id' };
-  const propsData = { survey };
-  const store = new Vuex.Store(createStoreObject());
-  const wrapper = mount(SurveyBuilder, { propsData, store, vuetify });
-  expect(wrapper.vm.saveDraft).toBeInstanceOf(Function);
-  const input = wrapper.findComponent(SurveyNameEditor);
-  expect(input.vm.value).toBe(survey.name);
-});
-
 // add a control and set its base parameters like a user would
 const addControl = async (type, { dataName, label, hint, moreInfo } = {}) => {
   await fireEvent.click(screen.getByTestId('control-adder-open'));
