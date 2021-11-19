@@ -88,10 +88,24 @@ const makeControl = ({ type, ...options }) => ({
   ...options,
 });
 
-beforeEach(() => {
-  // atm, ControlProperties.vue throws when trying to fetch /scrips for script type controls
-  api.get.setResponse(`/scripts`, { data: [] });
-});
+const createApiGetMock = (reqResMap) => {
+  reqResMap = {
+    // atm, ControlProperties.vue throws when trying to fetch /scrips for script type controls
+    '/scripts': {data: []},
+    // the SurveyBuilder component always calls this url when it's mounted
+    [`/surveys/check-for-updates/${optionsWithControls().props.survey._id}`]: {data: {}},
+    ...reqResMap
+  }
+  return jest.fn((url) => {
+    if (url in reqResMap) {
+      return reqResMap[url]
+    }
+    throw Error(`Don't have a mocked response for "${url}"`)
+  })
+}
+
+// setup the default api mocks for all tests
+beforeEach(() => api.get.mockImplementation(createApiGetMock()));
 
 describe('add control', () => {
   describe('for each control type', () => {
@@ -333,8 +347,11 @@ describe('question set library', () => {
         pagination: { total: 1, parsedSkip: 0, parsedLimit: 12 },
       },
     };
-    api.get.setResponse('/surveys/list-page?isLibrary=true&skip=0&limit=12', qslListResponse);
-    api.get.setResponse(`/surveys/${qsl._id}`, { data: qsl });
+
+    api.get.mockImplementation(createApiGetMock({
+      '/surveys/list-page?isLibrary=true&skip=0&limit=12': qslListResponse,
+      [`/surveys/${qsl._id}`]: { data: qsl },
+    }));
   });
 
   it('can add a question set library', async () => {
