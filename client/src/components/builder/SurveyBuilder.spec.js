@@ -1,6 +1,6 @@
 jest.mock('../../services/api.service.js');
 
-import { render, fireEvent, findByText, getByLabelText, screen, within } from '@testing-library/vue';
+import { render, fireEvent, findByText, screen, within } from '@testing-library/vue';
 import SurveyBuilder from './SurveyBuilder.vue';
 import { createSurvey } from '@/utils/surveys';
 import { createStoreObject } from '@/store';
