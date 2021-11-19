@@ -98,7 +98,7 @@ const createApiGetMock = (reqResMap) => {
   };
   return jest.fn((url) => {
     if (url in reqResMap) {
-      return reqResMap[url];
+      return cloneDeep(reqResMap[url]);
     }
     throw Error(`Don't have a mocked response for "${url}"`);
   });
