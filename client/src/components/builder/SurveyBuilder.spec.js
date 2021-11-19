@@ -91,18 +91,18 @@ const makeControl = ({ type, ...options }) => ({
 const createApiGetMock = (reqResMap) => {
   reqResMap = {
     // atm, ControlProperties.vue throws when trying to fetch /scrips for script type controls
-    '/scripts': {data: []},
+    '/scripts': { data: [] },
     // the SurveyBuilder component always calls this url when it's mounted
-    [`/surveys/check-for-updates/${optionsWithControls().props.survey._id}`]: {data: {}},
-    ...reqResMap
-  }
+    [`/surveys/check-for-updates/${optionsWithControls().props.survey._id}`]: { data: {} },
+    ...reqResMap,
+  };
   return jest.fn((url) => {
     if (url in reqResMap) {
-      return reqResMap[url]
+      return reqResMap[url];
     }
-    throw Error(`Don't have a mocked response for "${url}"`)
-  })
-}
+    throw Error(`Don't have a mocked response for "${url}"`);
+  });
+};
 
 // setup the default api mocks for all tests
 beforeEach(() => api.get.mockImplementation(createApiGetMock()));
@@ -348,10 +348,12 @@ describe('question set library', () => {
       },
     };
 
-    api.get.mockImplementation(createApiGetMock({
-      '/surveys/list-page?isLibrary=true&skip=0&limit=12': qslListResponse,
-      [`/surveys/${qsl._id}`]: { data: qsl },
-    }));
+    api.get.mockImplementation(
+      createApiGetMock({
+        '/surveys/list-page?isLibrary=true&skip=0&limit=12': qslListResponse,
+        [`/surveys/${qsl._id}`]: { data: qsl },
+      })
+    );
   });
 
   it('can add a question set library', async () => {
@@ -499,10 +501,9 @@ describe('question set library', () => {
             children: [{ ...childSrt, ...libInfo, id: expect.not.stringMatching(childSrt.id) }],
           },
         ]);
-        // TODO add test back when `feature-versioning` gets merged
-        // expect(addedGroup.children[0].libraryIsInherited).toBeFalsy();
-        // expect(addedGroup.children[1].libraryIsInherited).toBeFalsy();
-        // expect(addedGroup.children[1].children[0].libraryIsInherited).toBeFalsy();
+        expect(addedGroup.children[0].libraryIsInherited).toBeFalsy();
+        expect(addedGroup.children[1].libraryIsInherited).toBeFalsy();
+        expect(addedGroup.children[1].children[0].libraryIsInherited).toBeFalsy();
       });
 
       newOrUpdate('sets the inherited flag if the QSL control comes from another QSL', async (runMethod) => {
@@ -530,8 +531,7 @@ describe('question set library', () => {
             children: [{ ...childSrt, id: expect.not.stringMatching(childSrt.id), libraryIsInherited: true }],
           },
         ]);
-        // TODO add test back when `feature-versioning` gets merged
-        // expect(addedGroup.children[0].libraryIsInherited).toBeFalsy();
+        expect(addedGroup.children[0].libraryIsInherited).toBeFalsy();
       });
     });
   });
