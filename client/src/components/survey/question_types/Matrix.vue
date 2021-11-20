@@ -63,7 +63,7 @@
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
 
-    <app-matrix-table :headers="headers" :rows="rows || []">
+    <app-matrix-table :headers="headers" :rows="rows || []" :rowActionsWidth="64">
       <template v-slot:header-cell="{ header }">
         <v-tooltip top>
           <template v-slot:activator="{ on }">
@@ -89,9 +89,21 @@
           />
         </v-form>
       </template>
+      <template v-if="!isMobile" v-slot:row-actions="{ rowIdx }">
+        <div style="width: 64px; padding-left: 4px !important; padding-right: 0px;">
+          <div class="d-flex">
+            <v-btn icon @click="rowToBeDeleted = rowIdx" tabindex="-1" small>
+              <v-icon>mdi-trash-can-outline</v-icon>
+            </v-btn>
+            <v-btn icon @click="duplicateRow(rowIdx)" tabindex="-1" small>
+              <v-icon>mdi-content-copy</v-icon>
+            </v-btn>
+          </div>
+        </div>
+      </template>
     </app-matrix-table>
     <v-data-table
-      v-if="false"
+      v-if="true"
       :headers="headers"
       header
       height="300"

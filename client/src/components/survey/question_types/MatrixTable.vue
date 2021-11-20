@@ -11,15 +11,24 @@
           {{ colIdx }}
         </slot>
       </div>
+      <div :style="headerLeftSpacerStyles" />
     </div>
-    <v-divider />
-    <v-virtual-scroll v-scroll.self="onScroll" :items="rowsWithId" height="300" item-height="64">
+    <v-virtual-scroll ref="body" v-scroll.self="onScroll" :items="rowsWithId" height="300" item-height="64">
       <template v-slot="{ item }">
         <div class="mt-row">
           <div class="px-1 mt-cell" v-for="(header, colIdx) in headers" :key="colIdx" :style="colStyles[colIdx]">
             <slot name="row-cell" v-bind:header="header" v-bind:row="item" v-bind:colIdx="colIdx">
               {{ ' / ' + colIdx }}
             </slot>
+          </div>
+          <div
+            v-if="$scopedSlots['row-actions']"
+            class="mt-fixed-right px-1 mt-cell flex-grow-0 flex-shrink-0"
+            :style="actionBlockStyles"
+          >
+            <div :style="actionStickStyles" class="d-flex align-center">
+              <slot name="row-actions" v-bind:rowIdx="item.id"> </slot>
+            </div>
           </div>
         </div>
       </template>
@@ -47,6 +56,17 @@ export default {
       type: Array,
       required: true,
     },
+    rowActionsWidth: {
+      type: Number,
+      default: 0, // TODO validate: required if actions slot set
+    },
+  },
+  data() {
+    return {
+      verticalScrollbarWidth: 0,
+      scrollLeft: 0,
+      scrollRight: 0,
+    };
   },
   computed: {
     rowsWithId() {
@@ -57,10 +77,43 @@ export default {
         flexBasis: `${defaultColumnWidth(type) * (scaleWidth / 100)}px`,
       }));
     },
+    actionBlockStyles() {
+      return {
+        flexBasis: `${this.rowActionsWidth}px`,
+        flexGrow: 0,
+        flexShrink: 0,
+      };
+    },
+    actionStickStyles() {
+      return {
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'background',
+        transform: `translateX(-${this.scrollRight}px)`,
+      };
+    },
+    headerLeftSpacerStyles() {
+      return {
+        flexBasis: `${this.rowActionsWidth + this.verticalScrollbarWidth}px`,
+        flexGrow: 0,
+        flexShrink: 0,
+      };
+    },
   },
   methods: {
     onScroll(e) {
       this.$refs.header.scrollLeft = e.target.scrollLeft;
+      this.scrollLeft = e.target.scrollLeft;
+      this.scrollRight = e.target.scrollLeftMax - e.target.scrollLeft;
+    },
+  },
+  watch: {
+    rows() {
+      this.$nextTick(() => {
+        // TODO is this the best way to do this?
+        const { offsetWidth, clientWidth } = this.$refs.body.$el;
+        this.verticalScrollbarWidth = offsetWidth - clientWidth;
+      });
     },
   },
 };
@@ -99,5 +152,10 @@ export default {
   top: 0;
   z-index: 1;
   overflow-x: hidden;
+}
+
+.mt-fixed-right {
+  /* position: sticky;
+  right: 0px; */
 }
 </style>
