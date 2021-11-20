@@ -1,13 +1,13 @@
 <template>
   <div class="wrap" :style="cssVariables">
-    <div ref="header" class="mt-heading mt-row">
+    <div ref="header" class="mt-heading mt-divider mt-row">
       <div
-        class="caption font-weight-bold text--secondary px-4 mt-cell mt-header mt-divider"
+        class="caption font-weight-bold text--secondary mt-cell mt-header"
         v-for="(header, colIdx) in headers"
         :key="colIdx"
         :style="colStyles[colIdx]"
       >
-        <div class="mt-full" :class="{ 'mt-fix-left': fixCols[colIdx] }">
+        <div class="white px-4" :class="fixCols[colIdx] ? `mt-fix-left elevation-${scrollLeft === 0 ? 0 : 3}` : ''">
           <slot name="header-cell" v-bind:header="header" v-bind:colIdx="colIdx">
             {{ colIdx }}
           </slot>
@@ -17,14 +17,12 @@
     </div>
     <v-virtual-scroll ref="body" v-scroll.self="onScroll" :items="rowsWithId" height="300" item-height="64">
       <template v-slot="{ item }">
-        <div class="mt-row">
-          <div
-            class="px-1 mt-cell  mt-divider"
-            v-for="(header, colIdx) in headers"
-            :key="colIdx"
-            :style="colStyles[colIdx]"
-          >
-            <div class="mt-full" :class="{ 'mt-fix-left': fixCols[colIdx] }">
+        <div class="mt-row mt-divider">
+          <div class="mt-cell" v-for="(header, colIdx) in headers" :key="colIdx" :style="colStyles[colIdx]">
+            <div
+              class="mt-fill d-flex align-center white px-1"
+              :class="fixCols[colIdx] ? `mt-fix-left elevation-${scrollLeft === 0 ? 0 : 3}` : ''"
+            >
               <slot name="row-cell" v-bind:header="header" v-bind:row="item" v-bind:colIdx="colIdx">
                 {{ ' / ' + colIdx }}
               </slot>
@@ -32,10 +30,13 @@
           </div>
           <div
             v-if="$scopedSlots['row-actions']"
-            class="mt-fixed-right px-1 mt-cell flex-grow-0 flex-shrink-0"
+            class="mt-fixed-right ml-1 mt-cell flex-grow-0 flex-shrink-0"
             :style="actionBlockStyles"
           >
-            <div class="mt-fix-right mt-fill mt-divider d-flex align-center">
+            <div
+              class="mt-fix-right mt-fill mt-divider d-flex align-center white"
+              :class="`elevation-${scrollRight === 0 ? 0 : 3}`"
+            >
               <slot name="row-actions" v-bind:rowIdx="item.id"> </slot>
             </div>
           </div>
@@ -183,15 +184,17 @@ export default {
 .mt-fill {
   width: 100%;
   height: 100%;
-  background-color: whitesmoke;
+  transition: box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
 }
 
 .mt-fix-right {
   transform: translateX(var(--mt-scroll-right));
+  clip-path: inset(0px 0px 0px -5px);
 }
 
 .mt-fix-left {
   transform: translateX(var(--mt-scroll-left));
+  clip-path: inset(0px -5px 0px 0px);
   /* keep it above the other input cells */
   z-index: 1;
   position: relative;
