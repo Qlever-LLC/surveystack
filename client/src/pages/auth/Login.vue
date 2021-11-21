@@ -1,15 +1,6 @@
 <template>
   <div class="wrapper">
-    <div class="py-3 px-2">
-      <v-img
-        v-if="isWhitelabel"
-        :src="$store.getters['whitelabel/partner'].hero || $store.getters['whitelabel/partner'].logo"
-        contain
-        height="128"
-      />
-      <v-img v-else :src="require('../../assets/surveystack_temp_logo.svg')" contain height="128" />
-    </div>
-    <div class="d-flex justify-center">
+    <div class="py-2 d-flex justify-center">
       <app-login :useLink="true" />
     </div>
   </div>
