@@ -95,6 +95,9 @@ export default {
           const membership = { user: newUser._id, group, role };
           await api.post('/memberships', membership);
         }
+        if (this.editMode) {
+          this.$store.dispatch('auth/updateToken', newUser.value);
+        }
         this.$router.back();
       } catch (err) {
         console.log(err);

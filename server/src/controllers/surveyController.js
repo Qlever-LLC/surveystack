@@ -4,7 +4,7 @@ import boom from '@hapi/boom';
 
 import { db } from '../db';
 
-import { checkSurvey } from '../helpers/surveys';
+import { checkSurvey, changeRecursive } from '../helpers/surveys';
 import rolesService from '../services/roles.service';
 
 const col = 'surveys';
@@ -17,9 +17,11 @@ const sanitize = async (entity) => {
     version.dateCreated = new Date(entity.dateCreated);
 
     version.controls.forEach((control) => {
-      if (control.libraryId) {
-        control.libraryId = new ObjectId(control.libraryId);
-      }
+      changeRecursive(control, (control)=> {
+        if (control.libraryId) {
+          control.libraryId = new ObjectId(control.libraryId);
+        }
+      })
     });
   });
 
@@ -156,6 +158,7 @@ const buildPipelineForGetSurveyPage = ({
   if (isLibrary === "true") {
     // add to pipeline the aggregation for number of referencing survey and for number of submissions of referencing surveys
     // TODO further reduce meta.libraryUsageCountSurveys by revisions.controls.isLibraryRoot=true and revisions.version=latestVersion
+    // TODO also count revisions.controls.children.libraryId
     const aggregateCounts = [
       {
         '$match': {
@@ -177,14 +180,19 @@ const buildPipelineForGetSurveyPage = ({
       }, {
         '$lookup': {
           'from': 'submissions',
-          'localField': '_id',
-          'foreignField': 'meta.survey.id',
-          'as': 'meta.libraryUsageCountSubmissions'
-        }
+          'let': {
+            'surveyId': '$_id',
+          },
+          'pipeline': [
+            { '$match': { '$expr': { '$eq': ['$meta.survey.id', '$$surveyId'] } } },
+            { '$count': 'count' },
+          ],
+          'as': "meta.libraryUsageCountSubmissions",
+        },
       }, {
         '$addFields': {
           'meta.libraryUsageCountSubmissions': {
-            '$size': '$meta.libraryUsageCountSubmissions'
+            '$arrayElemAt': ['$meta.libraryUsageCountSubmissions.count', 0]
           }
         }
       }, {
@@ -308,9 +316,7 @@ const getSurveyListPage = async (req, res) => {
 
 const getSurvey = async (req, res) => {
   const { id } = req.params;
-  let entity;
-
-  entity = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  const entity = await db.collection(col).findOne({ _id: new ObjectId(id) });
 
   if (!entity) {
     return res.status(404).send({
@@ -373,6 +379,22 @@ const getSurveyInfo = async (req, res) => {
   entity.submissions = submissions;
 
   return res.send(entity);
+};
+
+const getSurveyLibraryConsumers = async (req, res) => {
+  // TODO only check highest or latestVersion ?
+  const { id } = req.query;
+  // TODO naive and limited (to 3 child levels) implementation for deeply nested question sets - try to find elegant query which is still performing well
+  const filter = {
+    $or: [
+      { $and: [{ "revisions.controls.libraryId": new ObjectId(id) }, { "revisions.controls.isLibraryRoot": true }] },
+      { $and: [{ "revisions.controls.children.libraryId": new ObjectId(id) }, { "revisions.controls.children.isLibraryRoot": true }] },
+      { $and: [{ "revisions.controls.children.children.libraryId": new ObjectId(id) }, { "revisions.controls.children.children.isLibraryRoot": true }] },
+      { $and: [{ "revisions.controls.children.children.children.libraryId": new ObjectId(id) }, { "revisions.controls.children.children.children.isLibraryRoot": true }] },
+    ]
+  };
+  const entities = await db.collection(col).find(filter).toArray();
+  return res.send(entities);
 };
 
 const createSurvey = async (req, res) => {
@@ -461,13 +483,48 @@ const deleteSurvey = async (req, res) => {
   }
 };
 
+const checkForLibraryUpdates = async (req, res) => {
+  const { id } = req.params;
+  let survey = await db.collection(col).findOne({ _id: new ObjectId(id) });
+
+  if (!survey) {
+    return res.status(404).send({
+      message: `No entity with _id exists: ${id}`,
+    });
+  }
+
+  // get latest revision of survey controls, even if draft
+  const latestRevision = survey.revisions[survey.revisions.length - 1];
+
+  //for each question set library used in the given survey
+  let updatableSurveys = {};
+
+  await Promise.all(latestRevision.controls.map(async (control) => {
+    if(control.isLibraryRoot && !control.libraryIsInherited) {
+      //check if used library survey version is old
+      const librarySurvey = await db.collection(col).findOne({ _id: new ObjectId(control.libraryId) });
+      if(!librarySurvey) {
+        //library can not be found, also return this information
+        updatableSurveys[control.libraryId] = null;
+      } else if(control.libraryVersion<librarySurvey.latestVersion) {
+        //library is updatable, add to result set
+        updatableSurveys[control.libraryId] = librarySurvey.latestVersion;
+      }
+    }
+  }));
+
+  return res.send(updatableSurveys);
+};
+
 export default {
   getSurveys,
   getSurveyPage,
   getSurveyListPage,
   getSurvey,
+  getSurveyLibraryConsumers,
   getSurveyInfo,
   createSurvey,
   updateSurvey,
   deleteSurvey,
+  checkForLibraryUpdates,
 };

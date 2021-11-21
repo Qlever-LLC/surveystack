@@ -111,6 +111,7 @@ deploy to prod:
     - build container
     - lint client
     - test client
+    - test server
 
 
 deploy to stage:
@@ -144,7 +145,6 @@ deploy to stage:
   environment:
     name: staging
     url: http://18.206.205.172:3000
-  when: manual
   only:
     - master
   image: docker:19.03.12
@@ -164,6 +164,7 @@ deploy to stage:
     - build container
     - lint client
     - test client
+    - test server
 
 deploy to review 1:
   stage: deploy
@@ -214,6 +215,7 @@ deploy to review 1:
     - build container
     - lint client
     - test client
+    - test server
 
 
 
@@ -260,5 +262,13 @@ test client:
   stage: test
   script:
     - yarn client:test
+  needs:
+    - lerna bootstrap
+
+test server:
+  extends: .pull-cache-only
+  stage: test
+  script:
+    - yarn server:test
   needs:
     - lerna bootstrap

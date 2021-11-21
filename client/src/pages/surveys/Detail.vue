@@ -58,8 +58,7 @@ export default {
   },
   methods: {
     startDraft(survey) {
-      const group = this.$store.getters['memberships/activeGroup'];
-      this.$store.dispatch('submissions/startDraft', { survey, group });
+      this.$store.dispatch('submissions/startDraft', { survey });
     },
   },
   computed: {

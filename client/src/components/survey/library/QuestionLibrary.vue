@@ -20,7 +20,7 @@
     </v-container>
     <v-container fluid class="pa-0" v-else>
       <v-row dense>
-        <v-col v-for="c in surveys.content" :key="c._id" :cols="!selectedSurvey ? 4 : 12">
+        <v-col v-for="c in surveys.content" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
           <v-card
             @click="toggleCard(c)"
             v-show="!selectedSurvey || selectedSurvey._id == c._id"
@@ -28,21 +28,19 @@
             elevation="7"
           >
             <v-row style="min-height:96px;">
-              <v-col>
-                <small class="grey--text">{{ c._id }}</small>
-                <br />
-                {{ c.name }}
-                <small v-show="selectedSurvey && selectedSurvey._id == c._id" class="grey--text"
-                  ><br />Version {{ c.latestVersion }}</small
-                >
-                <!--v-chip
-                  dark
-                  small
-                  outlined
-                  color="grey"
-                >
+              <v-col :style="{ minWidth: '0px' }">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <div v-bind="attrs" v-on="on" class="title text-truncate">{{ c.name }}</div>
+                  </template>
+                  <span>{{ c.name }}</span>
+                </v-tooltip>
+                <div>
+                  <small class="grey--text">{{ c._id }}</small>
+                </div>
+                <v-chip dark small outlined color="grey" class="font-weight-medium mt-1">
                   Version {{ c.latestVersion }}
-                </v-chip-->
+                </v-chip>
               </v-col>
               <v-col align="right" md="auto">
                 <v-btn
@@ -63,7 +61,7 @@
                   color="white"
                   key="library"
                   @click="addToSurvey(c._id)"
-                  class="mt-n5 mr-n7 d-inline-block shadow green span-button"
+                  class="mt-n5 d-inline-block shadow green span-button"
                   outlined
                   small
                 >
@@ -111,6 +109,7 @@
                 <h4>Questions</h4>
                 <graphical-view
                   :readOnly="true"
+                  :scale="0.75"
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
                   class="graphical-view"
                   :controls="selectedSurvey.revisions[selectedSurvey.latestVersion - 1].controls"
@@ -121,6 +120,12 @@
         </v-col>
       </v-row>
     </v-container>
+    <v-pagination
+      v-if="surveys.content.length > 0 && !selectedSurvey"
+      v-model="page"
+      :length="activeTabPaginationLength"
+      @input="() => fetchData()"
+    />
   </div>
 </template>
 <script>
@@ -128,7 +133,7 @@ import moment from 'moment';
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
 
-const PAGINATION_LIMIT = 10;
+const PAGINATION_LIMIT = 12;
 
 export default {
   components: {
@@ -151,14 +156,18 @@ export default {
       selectedSurvey: null,
     };
   },
-  computed: {},
+  computed: {
+    activeTabPaginationLength() {
+      const { total } = this.surveys.pagination;
+      return total ? Math.ceil(total / PAGINATION_LIMIT) : 0;
+    },
+  },
   methods: {
     async fetchData() {
       const now = moment();
       const queryParams = new URLSearchParams();
       if (this.search) {
         queryParams.append('q', this.search);
-        console.log(this.search);
       }
 
       queryParams.append('isLibrary', 'true');
@@ -188,7 +197,6 @@ export default {
 
         return data;
       } catch (e) {
-        // TODO: use cached data?
         console.log('Error fetching surveys:', e);
       }
       // return [];
@@ -203,7 +211,7 @@ export default {
       };
     },
     addToSurvey(librarySurveyId) {
-      this.$emit('addToSurvey', librarySurveyId);
+      this.$emit('add-questions-from-library', librarySurveyId);
     },
     async toggleCard(survey) {
       if (this.selectedSurvey && survey._id === this.selectedSurvey._id) {
@@ -251,11 +259,7 @@ border-left: 2px solid var(--v-primary-base);
 }*/
 .graphical-view {
   overflow: auto;
-  transform: scale(0.75);
-  transform-origin: top left;
   margin-top: 6px;
-  margin-bottom: -60%;
-  margin-right: -33%;
 }
 .v-card:focus:before {
   opacity: 0 !important;

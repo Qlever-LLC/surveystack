@@ -2,25 +2,20 @@
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="300">
     <v-card>
       <v-card-title> Confirm Submission </v-card-title>
-      <v-card-text v-if="!currentGroupName"> Submit Survey </v-card-text>
+      <v-card-text v-if="!groupChangeAllowed"> Submit Survey </v-card-text>
       <v-card-text v-else>
         Submit this draft <strong>{{ id }}</strong> to
-        <strong>{{ currentGroupName }}</strong>
-        <div class="d-inline-flex align-end">
-          <active-group-selector
-            v-if="groupEditorIsVisible"
-            label="Group"
-            class="d-inline-block"
-            :value="group"
-            @input="setGroup"
-          />
-          <v-btn icon @click="handleEditGroup" v-if="!groupEditorIsVisible">
-            <v-icon small>mdi-pencil</v-icon>
-          </v-btn>
-          <v-btn icon @click="handleCloseGroupEditor" v-else>
+        <strong v-if="groupName">{{ groupName }}</strong>
+        <strong v-else>no group</strong>
+        <div class="d-inline-flex align-end" v-if="groupEditorIsVisible">
+          <active-group-selector label="Group" class="d-inline-block" :value="groupId" @input="setGroup" />
+          <v-btn icon @click="handleCloseGroupEditor">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </div>
+        <v-btn icon @click="handleEditGroup" v-if="groupChangeAllowed && !groupEditorIsVisible">
+          <v-icon small>mdi-pencil</v-icon>
+        </v-btn>
         <div v-if="dateSubmitted">
           This submission was previously submitted on
           {{ new Date(dateSubmitted).toLocaleString() }}. Resubmission will archive the previous submission.
@@ -40,11 +35,14 @@
 
 <script>
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
+import { getGroupNameById } from '@/utils/groups';
 
 export default {
   data() {
     return {
       groupEditorIsVisible: false,
+      groupName: null,
+      groupChangeAllowed: false,
     };
   },
   props: {
@@ -52,7 +50,7 @@ export default {
       required: true,
       type: Boolean,
     },
-    group: {
+    groupId: {
       required: false,
       type: String,
     },
@@ -72,26 +70,17 @@ export default {
   components: {
     ActiveGroupSelector,
   },
-  computed: {
-    groups() {
-      return this.$store.getters['memberships/groups'];
-    },
-    currentGroupName() {
-      if (!this.groups || this.groups.length === 0) {
-        return null;
-      }
-
-      const group = this.groups.find((g) => g._id === this.group);
-      if (!group) {
-        // TODO verify what to do if group cannot be found
-        return null;
-      }
-
-      console.log('group', group, this.groups);
-      const { name } = this.groups.find((g) => g._id === this.group);
-      return name || this.group;
-    },
+  created() {
+    if (this.groupId) {
+      getGroupNameById(this.groupId).then((response) => (this.groupName = response));
+    }
+    if (this.$store.getters['auth/isLoggedIn']) {
+      this.groupChangeAllowed = true;
+    } else {
+      this.groupChangeAllowed = false;
+    }
   },
+  computed: {},
   methods: {
     handleConfirm() {
       this.$emit('input', false);
@@ -102,7 +91,8 @@ export default {
       this.$emit('input', false);
       this.$emit('close', { done: true });
     },
-    setGroup(v) {
+    async setGroup(v) {
+      await getGroupNameById(v).then((response) => (this.groupName = response));
       this.$emit('set-group', v);
     },
     handleEditGroup() {

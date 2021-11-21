@@ -15,3 +15,5 @@ A monorepo containing the surveystack client and surveystack server.
   - `yarn client:test`: Runs tests for the client
   - `yarn client:lint`: Runs the linter for the client
   - `yarn server:start`: Starts the server
+  - `yarn server:test`: Runs tests for the server
+  - `yarn server:test-watch`: Runs tests for the server continuously

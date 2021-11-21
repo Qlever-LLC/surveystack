@@ -125,3 +125,19 @@ export const getSubmissionField = (submission, survey, position) => {
 
   return obj;
 };
+
+/**
+ * Calls changeFn for the passed control and recursively on its descendants controls. ChangeFn can mutate control
+ * @param control to call changeFn on
+ * @param changeFn(control) function to be called on control and its descendants
+ */
+export const changeRecursive = (control, changeFn) => {
+  changeFn(control);
+
+  if(control.children) {
+    control.children.forEach((childControl) => {
+      changeRecursive(childControl, changeFn);
+    });
+  }
+};
+

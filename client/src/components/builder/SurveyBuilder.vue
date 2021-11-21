@@ -8,6 +8,10 @@
       <app-examples-view @close="showExamples = false" :category="tabMap[selectedTab]" />
     </v-dialog>
 
+    <v-alert v-if="Object.keys(availableLibraryUpdates).length > 0" type="warning" dismissible>
+      This survey uses an outdated question library set. Consider reviewing the new version and updating it.
+    </v-alert>
+
     <splitpanes style="padding: 0px !important" class="pane-root" vertical>
       <pane class="pane pane-survey" style="position: relative; overflow: hidden">
         <div class="pane-fixed-wrapper pr-2" style="position: relative;">
@@ -37,23 +41,24 @@
             class="mb-4"
           />
           <graphical-view
-            class="graphical-view"
             v-if="!viewCode"
             :selected="control"
             :controls="currentControls"
-            @controlSelected="controlSelected"
+            :availableLibraryUpdates="availableLibraryUpdates"
+            @control-selected="controlSelected"
             @duplicate-control="duplicateControl"
             @open-library="openLibrary"
+            @update-library-questions="updateLibraryQuestions"
           />
         </div>
       </pane>
 
-      <pane class="pane pane-library" v-if="library">
+      <pane class="pane pane-library" v-if="showLibrary">
         <div class="px-4">
           <question-library
             :survey="survey"
             :libraryId="libraryId"
-            @addToSurvey="addQuestionsFromLibrary"
+            @add-questions-from-library="addQuestionsFromLibrary"
             @cancel="closeLibrary"
           />
         </div>
@@ -212,10 +217,9 @@ import { Splitpanes, Pane } from 'splitpanes';
 
 import moment from 'moment';
 
-import ObjectID from 'bson-objectid';
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
-import questionLibrary from '@/components/builder/QuestionLibrary.vue';
+import questionLibrary from '@/components/survey/library/QuestionLibrary.vue';
 import controlAdder from '@/components/builder/ControlAdder.vue';
 import surveyDetails from '@/components/builder/SurveyDetails.vue';
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
@@ -228,13 +232,22 @@ import appMixin from '@/components/mixin/appComponent.mixin';
 import api from '@/services/api.service';
 import slugify from '@/utils/slugify';
 
-import * as utils from '@/utils/surveys';
 import { defaultApiCompose } from '@/utils/apiCompose';
 
 import submissionUtils from '@/utils/submissions';
 import { SPEC_VERSION_SCRIPT } from '@/constants';
 import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 import * as surveyStackUtils from '@/utils/surveyStack';
+import {
+  executeUnsafe,
+  getFlatName,
+  getGroups,
+  getPosition,
+  getPreparedLibraryControls,
+  getPreparedLibraryResources,
+  getSurveyPositions,
+  insertControl,
+} from '@/utils/surveys';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -283,7 +296,7 @@ export default {
       viewCode: false,
       // currently selected control
       control: null,
-      library: false,
+      showLibrary: false,
       libraryId: null,
       // code stuff
       log: '',
@@ -303,6 +316,7 @@ export default {
       initialSurvey: cloneDeep(this.survey),
       surveyUnchanged: true,
       showExamples: false,
+      availableLibraryUpdates: {},
     };
   },
   methods: {
@@ -330,7 +344,6 @@ export default {
       }
     },
     setScriptIsVisible(val) {
-      console.log('hello');
       this.scriptEditorIsVisible = val;
     },
     updateScriptCode(code) {
@@ -362,63 +375,49 @@ export default {
       this.survey.meta.dateModified = date;
     },
     addToLibrary() {
-      console.log('add to library');
       this.survey.meta.isLibrary = true;
       this.saveDraft();
     },
-    async addQuestionsFromLibrary(librarySurveyId) {
+    async addQuestionsFromLibrary(librarySurveyId, rootGroup) {
       // load library survey
       const { data } = await api.get(`/surveys/${librarySurveyId}`);
 
       // remove old resources copied from the library survey
-      this.survey.resources = this.survey.resources.filter((value) => value.libraryId !== librarySurveyId);
-      // copy resources from library survey
-      data.resources.forEach((r) => {
-        r.libraryId = data._id;
-        r.libraryVersion = data.latestVersion;
-      });
-      this.survey.resources = this.survey.resources.concat(data.resources);
+      this.survey.resources = this.survey.resources.filter((resource) => resource.libraryId !== librarySurveyId);
 
-      // copy controls from library survey
-      const controlsFromLibrary = data.revisions[data.latestVersion - 1].controls;
+      // add resources from library survey
+      this.survey.resources = this.survey.resources.concat(getPreparedLibraryResources(data));
 
-      // create question group
-      const group = createControlInstance(availableControls.find((c) => c.type === 'group'));
-      group.name = slugify(data.name);
-      group.label = data.name;
-      group.isLibraryRoot = true;
-      group.libraryId = data._id;
-      group.libraryVersion = data.latestVersion;
-
-      // add recursive function for children
-      const dive = (control, cb) => {
-        cb(control);
-        if (!control.children) {
-          return;
-        }
-        control.children.forEach((c) => {
-          dive(c, cb);
-        });
-      };
-
-      // copy questions from library survey to question group
-      for (let i = 0; i < controlsFromLibrary.length; i++) {
-        const controlToAdd = controlsFromLibrary[i];
-        controlToAdd.id = new ObjectID().toString();
-        controlToAdd.libraryId = data._id;
-        dive(controlToAdd, (control) => {
-          // eslint-disable-next-line no-param-reassign
-          control.id = new ObjectID().toString();
-          control.libraryId = data._id;
-          control.libraryVersion = data.latestVersion;
-        });
-        group.children.push(controlToAdd);
+      // prepare root group for the library questions to be inserted into
+      if (rootGroup) {
+        rootGroup.libraryVersion = data.latestVersion;
+      } else {
+        // create question group
+        rootGroup = createControlInstance(availableControls.find((c) => c.type === 'group'));
+        rootGroup.name = slugify(data.name);
+        rootGroup.label = data.name;
+        rootGroup.isLibraryRoot = true;
+        rootGroup.libraryId = data._id;
+        rootGroup.libraryVersion = data.latestVersion;
+        this.controlAdded(rootGroup);
       }
-      this.duplicateControl(group);
-      this.library = false;
+
+      // add questions from library survey to question group
+      rootGroup.children = getPreparedLibraryControls(data);
+
+      this.showLibrary = false;
+    },
+    updateLibraryQuestions(control) {
+      //clear selected control and re-add questions from library
+      control.children = [];
+      this.addQuestionsFromLibrary(control.libraryId, control);
     },
     closeLibrary() {
-      this.library = false;
+      this.showLibrary = false;
+    },
+    async checkForLibraryUpdates(survey) {
+      const { data } = await api.get(`/surveys/check-for-updates/${survey._id}`);
+      this.availableLibraryUpdates = data;
     },
     initNavbarAndDirtyFlag(survey) {
       if (!survey.revisions) {
@@ -447,8 +446,7 @@ export default {
       this.version = version;
 
       const v = this.survey.revisions[this.survey.revisions.length - 1].version;
-      const amountQuestions = utils.getSurveyPositions(this.survey, v);
-      // console.log('amount: ', amountQuestions);
+      const amountQuestions = getSurveyPositions(this.survey, v);
       this.setNavbarContent({
         title: this.survey.name || 'Untitled Survey',
         subtitle: `
@@ -459,8 +457,6 @@ export default {
           <!--<span class="question-title-chip">${this.groupPath}</span>-->
         `,
       });
-
-      // console.log('version is', version);
     },
     updateSelectedCode(code) {
       this.control.options[tabMap[this.selectedTab]].code = code;
@@ -488,10 +484,8 @@ export default {
 
       this.selectedTab = tabMap.indexOf(tab);
 
-      console.log('options', this.control.options);
       if (!this.control.options[tab].code) {
         let initalCode;
-        console.log('tab is', tab);
         if (tab === 'apiCompose') {
           initalCode = defaultApiCompose;
         } else {
@@ -507,7 +501,7 @@ export default {
     async runCode() {
       const tab = tabMap[this.selectedTab];
       try {
-        const res = await utils.executeUnsafe({
+        const res = await executeUnsafe({
           code: this.activeCode,
           fname: tab,
           submission: this.instance,
@@ -536,9 +530,7 @@ export default {
       console.log(value);
     },
     async controlSelected(control) {
-      // console.log('selected control', control);
       this.control = control;
-      console.log('controlSelected', control);
       if (control && control.type === 'script' && control.options.source) {
         const data = await this.fetchScript(control.options.source);
         this.scriptEditorIsVisible = false;
@@ -575,15 +567,15 @@ export default {
     },
     duplicateControl(control) {
       if (this.control && this.currentControls.length > 0) {
-        const position = utils.getPosition(this.control, this.currentControls);
-        utils.insertControl(
+        const position = getPosition(this.control, this.currentControls);
+        insertControl(
           control,
           this.currentControls,
           position,
           this.control.type === 'group' || this.control.type === 'page'
         );
       } else {
-        utils.insertControl(control, this.currentControls, 0, false);
+        insertControl(control, this.currentControls, 0, false);
       }
       this.control = control;
     },
@@ -594,19 +586,19 @@ export default {
         return;
       }
 
-      const position = utils.getPosition(this.control, this.currentControls);
-      utils.insertControl(
+      const position = getPosition(this.control, this.currentControls);
+      insertControl(
         control,
         this.currentControls,
         position,
         this.control.type === 'group' || this.control.type === 'page'
       );
       this.control = control;
-      this.library = false;
+      this.showLibrary = false;
     },
     openLibrary(libraryId) {
       this.control = null;
-      this.library = true;
+      this.showLibrary = true;
       if (libraryId) {
         this.libraryId = libraryId;
       } else {
@@ -639,7 +631,7 @@ export default {
       const hasOnlyUniqueNames = uniqueNames.length === currentControls.length;
       const allNamesContainOnlyValidCharacters = !currentControls.some((control) => !namePattern.test(control.name));
 
-      const groupedQuestionsAreValid = utils.getGroups(currentControls).reduce((r, group) => {
+      const groupedQuestionsAreValid = getGroups(currentControls).reduce((r, group) => {
         const uniqueNamesInGroup = uniqBy(group.children, 'name');
         const groupHasOnlyUniqueNames = uniqueNamesInGroup.length === group.children.length;
         const allNamesInGroupContainOnlyValidCharacters = !group.children.some(
@@ -664,12 +656,10 @@ export default {
     },
     createInstance() {
       const { version } = this.survey.revisions[this.survey.revisions.length - 1];
-      const group = this.$store.getters['memberships/activeGroup'];
 
       this.instance = submissionUtils.createSubmissionFromSurvey({
         survey: this.survey,
         version,
-        group,
         instance: this.instance,
       });
     },
@@ -746,8 +736,8 @@ export default {
       return this.dirty;
     },
     controlId() {
-      const position = utils.getPosition(this.control, this.currentControls);
-      const id = utils.getFlatName(this.currentControls, position);
+      const position = getPosition(this.control, this.currentControls);
+      const id = getFlatName(this.currentControls, position);
       console.log('controlId', id);
       return id;
     },
@@ -785,9 +775,8 @@ export default {
       return `${submission};\n\n${parent};\n`;
     },
     parent() {
-      console.log('parent() called');
-      const position = utils.getPosition(this.control, this.currentControls);
-      const path = utils.getFlatName(this.currentControls, position);
+      const position = getPosition(this.control, this.currentControls);
+      const path = getFlatName(this.currentControls, position);
       const parentPath = surveyStackUtils.getParentPath(path);
       const parentData = surveyStackUtils.getNested(this.instance, parentPath);
       return parentData;
@@ -795,7 +784,6 @@ export default {
   },
   watch: {
     selectedTab(tab) {
-      console.log('selecting tab', tab);
       this.highlight(tabMap[tab]);
     },
     optionsRelevance: {
@@ -885,6 +873,7 @@ export default {
   created() {
     this.initNavbarAndDirtyFlag(this.survey);
     this.createInstance();
+    this.checkForLibraryUpdates(this.survey);
   },
 
   // TODO: get route guard to work here, or move dirty flag up to Builder.vue
@@ -906,6 +895,7 @@ export default {
   overflow-x: auto;
   overflow-y: hidden;
 }
+
 .pane-root {
   height: 100%;
   padding: 12px;
@@ -962,10 +952,6 @@ export default {
 }
 
 .pane-survey {
-  overflow: auto;
-}
-
-.graphical-view {
   overflow: auto;
 }
 
@@ -1059,24 +1045,28 @@ export default {
   width: 100%;
   height: 100%;
 }
+
 .splitpanes--vertical {
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
   -ms-flex-direction: row;
   flex-direction: row;
 }
+
 .splitpanes--horizontal {
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
 }
+
 .splitpanes--dragging * {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
 }
+
 .splitpanes__pane {
   width: 100%;
   height: 100%;
@@ -1084,31 +1074,38 @@ export default {
   -webkit-transition: width 0.2s ease-out, height 0.2s ease-out;
   transition: width 0.2s ease-out, height 0.2s ease-out;
 }
+
 .splitpanes--dragging .splitpanes__pane {
   -webkit-transition: none;
   transition: none;
 }
+
 .splitpanes__splitter {
   -ms-touch-action: none;
   touch-action: none;
 }
+
 .splitpanes--vertical > .splitpanes__splitter {
   min-width: 1px;
   cursor: col-resize;
 }
+
 .splitpanes--horizontal > .splitpanes__splitter {
   min-height: 1px;
   cursor: row-resize;
 }
+
 .splitpanes.default-theme .splitpanes__pane {
   background-color: #f2f2f2;
 }
+
 .splitpanes.default-theme .splitpanes__splitter {
   background-color: #fff;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   position: relative;
 }
+
 .splitpanes.default-theme .splitpanes__splitter:after,
 .splitpanes.default-theme .splitpanes__splitter:before {
   content: '';
@@ -1119,19 +1116,23 @@ export default {
   -webkit-transition: background-color 0.3s;
   transition: background-color 0.3s;
 }
+
 .splitpanes.default-theme .splitpanes__splitter:hover:after,
 .splitpanes.default-theme .splitpanes__splitter:hover:before {
   background-color: rgba(0, 0, 0, 0.25);
 }
+
 .default-theme.splitpanes .splitpanes .splitpanes__splitter {
   z-index: 1;
 }
+
 .default-theme.splitpanes--vertical > .splitpanes__splitter,
 .default-theme .splitpanes--vertical > .splitpanes__splitter {
   width: 9px;
   border-left: 1px solid #eee;
   margin-left: -1px;
 }
+
 .default-theme.splitpanes--vertical > .splitpanes__splitter:after,
 .default-theme .splitpanes--vertical > .splitpanes__splitter:after,
 .default-theme.splitpanes--vertical > .splitpanes__splitter:before,
@@ -1141,20 +1142,24 @@ export default {
   width: 1px;
   height: 30px;
 }
+
 .default-theme.splitpanes--vertical > .splitpanes__splitter:before,
 .default-theme .splitpanes--vertical > .splitpanes__splitter:before {
   margin-left: -2px;
 }
+
 .default-theme.splitpanes--vertical > .splitpanes__splitter:after,
 .default-theme .splitpanes--vertical > .splitpanes__splitter:after {
   margin-left: 1px;
 }
+
 .default-theme.splitpanes--horizontal > .splitpanes__splitter,
 .default-theme .splitpanes--horizontal > .splitpanes__splitter {
   height: 9px;
   border-top: 1px solid #eee;
   margin-top: -1px;
 }
+
 .default-theme.splitpanes--horizontal > .splitpanes__splitter:after,
 .default-theme .splitpanes--horizontal > .splitpanes__splitter:after,
 .default-theme.splitpanes--horizontal > .splitpanes__splitter:before,
@@ -1164,10 +1169,12 @@ export default {
   width: 30px;
   height: 1px;
 }
+
 .default-theme.splitpanes--horizontal > .splitpanes__splitter:before,
 .default-theme .splitpanes--horizontal > .splitpanes__splitter:before {
   margin-top: -2px;
 }
+
 .default-theme.splitpanes--horizontal > .splitpanes__splitter:after,
 .default-theme .splitpanes--horizontal > .splitpanes__splitter:after {
   margin-top: 1px;

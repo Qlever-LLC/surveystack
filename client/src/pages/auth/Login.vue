@@ -202,6 +202,9 @@ export default {
           } catch (error) {
             console.log(error.response.data.message);
           }
+        } else {
+          // auto select the first group of the user
+          await autoSelectActiveGroup(this.$store, null, true);
         }
 
         this.$store.dispatch('surveys/fetchPinned');
