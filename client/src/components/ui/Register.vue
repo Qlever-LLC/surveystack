@@ -3,7 +3,7 @@
     <v-card class="pa-6 pa-sm-12">
       <h1 class="heading--text" v-if="isWhitelabel">Join {{ whitelabelPartner.name }}</h1>
       <h1 class="heading--text" v-else>Join SurveyStack</h1>
-      <v-form class="mb-5">
+      <v-form>
         <v-text-field
           label="E-Mail"
           type="text"
@@ -25,14 +25,19 @@
           color="focus"
         />
 
-        <div class="d-flex justify-end">
-          <v-btn type="submit" @click.prevent="submit" color="primary" class="text-capitalize px-8">Sign up</v-btn>
+        <div class="d-flex justify-space-around align-center">
+          <router-link v-if="useLink" :to="signInLink" class="font-weight-medium" role="link">Sign in</router-link>
+          <a v-else text @click.stop="$emit('updateActive', 'login')" class="font-weight-medium" role="button">
+            Sign in
+          </a>
+          <v-btn type="submit" @click.prevent="submit" color="primary" class="text-capitalize px-8">
+            Sign up
+          </v-btn>
         </div>
       </v-form>
-      <div class="text-center text-muted mt-5">
-        Already have an account?
-        <router-link v-if="useLink" :to="signInLink" class="font-weight-medium" role="link">Sign in</router-link>
-        <a v-else text @click.stop="$emit('updateActive', 'login')" class="font-weight-medium" role="button">Sign in</a>
+      <div class="d-flex justify-space-around align-center">
+        <span><span class="mdi mdi-share mdi-rotate-270 mdi-36px"></span> Already have an account? </span>
+        <span></span>
       </div>
       <v-alert class="mt-4" outlined v-if="membership" type="info"
         >Your code is eligible to join <strong>{{ membership.group.name }}</strong></v-alert
