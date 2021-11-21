@@ -114,8 +114,6 @@ export function geojsonTransformer(o) {
 
 export function createCsv(submissions, headers) {
   const items = [];
-  console.log({ submissions });
-  console.log({ headers });
   submissions.forEach((s) => {
     const submission = cloneDeep(s);
     submission._id = submission._id.toString();
@@ -167,7 +165,6 @@ export function createCsv(submissions, headers) {
   } catch (error) {
     console.log(error);
   }
-  console.log({ csv });
   return csv;
 }
 
