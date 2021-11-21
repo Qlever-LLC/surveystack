@@ -92,75 +92,6 @@ describe('Register component', () => {
       await fireEvent.click(button);
       getByText('Password must not be empty.');
     });
-
-    it('shows an error when email is passed with password and password confirmation who are different', async () => {
-      const { getByLabelText, getByText, queryByText } = renderWithVuetify(Register, {
-        propsData: {},
-        store: {},
-        mocks: {
-          $route: {
-            query: {},
-          },
-        },
-        stubs: {
-          RouterLink: RouterLinkStub,
-        },
-      });
-      const emailInput = getByLabelText('E-Mail');
-      fireEvent.update(emailInput, 'email.error@error.com');
-      expect(emailInput.value).toBe('email.error@error.com');
-      const passwordInput = getByLabelText('Password');
-      fireEvent.update(passwordInput, 'somePassword');
-      expect(passwordInput.value).toBe('somePassword');
-      const passwordConfirmationInput = getByLabelText('Password confirmation');
-      fireEvent.update(passwordConfirmationInput, 'otherPassword');
-      expect(passwordConfirmationInput.value).toBe('otherPassword');
-
-      expect(queryByText('Password must not be empty.')).toBeNull();
-      expect(queryByText('E-Mail must not be empty.')).toBeNull();
-      expect(queryByText('Passwords do not match.')).toBeNull();
-      const button = getByText('Sign up');
-      await fireEvent.click(button);
-      getByText('Passwords do not match.');
-    });
-
-    it("don't shows an error when email is passed with password and password confirmation who are the same", async () => {
-      const authLoginMock = jest.fn();
-      authLoginMock.mockRejectedValue({
-        message: 'Success',
-        response: { status: 200 },
-      });
-      const { getByLabelText, getByText, queryByText } = renderWithVuetify(Register, {
-        propsData: {},
-        store: {
-          actions: {
-            'auth/login': authLoginMock,
-          },
-        },
-        mocks: {
-          $route: {
-            query: {},
-          },
-        },
-        stubs: {
-          RouterLink: RouterLinkStub,
-        },
-      });
-      const emailInput = getByLabelText('E-Mail');
-      fireEvent.update(emailInput, 'email.error@error.com');
-      expect(emailInput.value).toBe('email.error@error.com');
-      const passwordInput = getByLabelText('Password');
-      fireEvent.update(passwordInput, 'samePassword');
-      expect(passwordInput.value).toBe('samePassword');
-      const passwordConfirmationInput = getByLabelText('Password confirmation');
-      fireEvent.update(passwordConfirmationInput, 'samePassword');
-      expect(passwordConfirmationInput.value).toBe('samePassword');
-
-      expect(queryByText('Passwords do not match.')).toBeNull();
-      const button = getByText('Sign up');
-      await fireEvent.click(button);
-      expect(queryByText('Passwords do not match.')).toBeNull();
-    });
   });
 
   describe('submit form and check submit() method behaviour based on try to auto join group if this is a whitelabel', () => {
@@ -201,8 +132,6 @@ describe('Register component', () => {
       fireEvent.update(emailInput, 'email@mail.com');
       const passwordInput = getByLabelText('Password');
       fireEvent.update(passwordInput, 'samePassword');
-      const passwordConfirmationInput = getByLabelText('Password confirmation');
-      fireEvent.update(passwordConfirmationInput, 'samePassword');
 
       const button = getByText('Sign up');
       await fireEvent.click(button);
@@ -254,8 +183,6 @@ describe('Register component', () => {
       fireEvent.update(emailInput, 'email@mail.com');
       const passwordInput = getByLabelText('Password');
       fireEvent.update(passwordInput, 'samePassword');
-      const passwordConfirmationInput = getByLabelText('Password confirmation');
-      fireEvent.update(passwordConfirmationInput, 'samePassword');
 
       const button = getByText('Sign up');
       await fireEvent.click(button);
@@ -299,8 +226,6 @@ describe('Register component', () => {
       fireEvent.update(emailInput, 'email@mail.com');
       const passwordInput = getByLabelText('Password');
       fireEvent.update(passwordInput, 'samePassword');
-      const passwordConfirmationInput = getByLabelText('Password confirmation');
-      fireEvent.update(passwordConfirmationInput, 'samePassword');
 
       const button = getByText('Sign up');
       await fireEvent.click(button);
@@ -341,8 +266,6 @@ describe('Register component', () => {
       fireEvent.update(emailInput, 'email@mail.com');
       const passwordInput = getByLabelText('Password');
       fireEvent.update(passwordInput, 'samePassword');
-      const passwordConfirmationInput = getByLabelText('Password confirmation');
-      fireEvent.update(passwordConfirmationInput, 'samePassword');
 
       const button = getByText('Sign up');
       await fireEvent.click(button);
@@ -382,8 +305,6 @@ describe('Register component', () => {
       fireEvent.update(emailInput, 'email@mail.com');
       const passwordInput = getByLabelText('Password');
       fireEvent.update(passwordInput, 'samePassword');
-      const passwordConfirmationInput = getByLabelText('Password confirmation');
-      fireEvent.update(passwordConfirmationInput, 'samePassword');
 
       const button = getByText('Sign up');
       await fireEvent.click(button);
@@ -420,8 +341,6 @@ describe('Register component', () => {
       fireEvent.update(emailInput, 'email@mail.com');
       const passwordInput = getByLabelText('Password');
       fireEvent.update(passwordInput, 'samePassword');
-      const passwordConfirmationInput = getByLabelText('Password confirmation');
-      fireEvent.update(passwordConfirmationInput, 'samePassword');
 
       const button = getByText('Sign up');
       await fireEvent.click(button);
@@ -454,8 +373,6 @@ describe('Register component', () => {
       fireEvent.update(emailInput, 'email@mail.com');
       const passwordInput = getByLabelText('Password');
       fireEvent.update(passwordInput, 'samePassword');
-      const passwordConfirmationInput = getByLabelText('Password confirmation');
-      fireEvent.update(passwordConfirmationInput, 'samePassword');
 
       const button = getByText('Sign up');
       await fireEvent.click(button);
@@ -488,8 +405,6 @@ describe('Register component', () => {
       fireEvent.update(emailInput, 'email@mail.com');
       const passwordInput = getByLabelText('Password');
       fireEvent.update(passwordInput, 'samePassword');
-      const passwordConfirmationInput = getByLabelText('Password confirmation');
-      fireEvent.update(passwordConfirmationInput, 'samePassword');
 
       const button = getByText('Sign up');
       await fireEvent.click(button);

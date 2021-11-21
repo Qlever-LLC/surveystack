@@ -25,16 +25,6 @@
           color="focus"
         />
 
-        <v-text-field
-          label="Password confirmation"
-          :type="passwordInputType"
-          class="form-control"
-          v-model="passwordConfirmation"
-          :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-          @click:append="showPasswords = !showPasswords"
-          color="focus"
-        />
-
         <div class="d-flex justify-end">
           <v-btn type="submit" @click.prevent="submit" color="primary" class="text-capitalize px-8">Sign up</v-btn>
         </div>
@@ -76,7 +66,6 @@ export default {
   data() {
     return {
       status: '',
-      passwordConfirmation: '',
       showPasswords: false,
       entity: { ...DEFAULT_ENTITY },
       invitation: '',
@@ -133,11 +122,6 @@ export default {
 
       if (this.entity.password === '') {
         this.status = 'Password must not be empty.';
-        return;
-      }
-
-      if (this.entity.password !== this.passwordConfirmation) {
-        this.status = 'Passwords do not match.';
         return;
       }
 
