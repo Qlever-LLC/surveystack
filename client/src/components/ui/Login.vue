@@ -25,7 +25,7 @@
               @click:append="showPasswords = !showPasswords"
               color="focus"
             />
-            <div class="d-flex justify-space-between align-center">
+            <div class="colUnderW340 d-flex align-center">
               <router-link
                 v-if="useLink"
                 :to="{
@@ -44,7 +44,11 @@
                 role="button"
                 >Forgot password?</a
               >
-              <v-btn type="submit" @click.prevent="submit" color="primary" class="ml-6 text-capitalize px-8"
+              <v-btn
+                type="submit"
+                @click.prevent="submit"
+                color="primary"
+                class="text-capitalize px-8 marginb10UnderW340"
                 >Login</v-btn
               >
             </div>
@@ -279,6 +283,24 @@ a {
   border-top: 2px solid rgb(180, 180, 180);
   width: 40%;
   margin-top: -1px;
+}
+
+.colUnderW340 {
+  flex-direction: column-reverse;
+}
+.marginb10UnderW340 {
+  margin-bottom: 10px;
+}
+
+@media (min-width: 340px) {
+  /* Forgot passwd next to Login */
+  .colUnderW340 {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .marginb10UnderW340 {
+    margin: 0;
+  }
 }
 
 @media (min-width: 600px) {
