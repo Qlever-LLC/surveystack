@@ -1,7 +1,7 @@
 /* eslint no-restricted-syntax: 0 */
 /* eslint no-param-reassign: 0 */
 import papa from 'papaparse';
-import { cloneDeep, mapValues, omitBy, isObject, isEmpty } from 'lodash';
+import { cloneDeep, omitBy, isObject, isEmpty } from 'lodash';
 import { flatten } from 'flat';
 
 function removeKeys(obj, keys) {
@@ -112,8 +112,10 @@ export function geojsonTransformer(o) {
   };
 }
 
-function createCsv(submissions, headers) {
+export function createCsv(submissions, headers) {
   const items = [];
+  console.log({ submissions });
+  console.log({ headers });
   submissions.forEach((s) => {
     const submission = cloneDeep(s);
     submission._id = submission._id.toString();
@@ -165,7 +167,7 @@ function createCsv(submissions, headers) {
   } catch (error) {
     console.log(error);
   }
-
+  console.log({ csv });
   return csv;
 }
 
