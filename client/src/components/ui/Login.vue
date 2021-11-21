@@ -40,7 +40,7 @@
                 v-else
                 text
                 @click.stop="$emit('updateActive', 'forgot-password')"
-                class="white-space-nowrap font-weight-medium"
+                class="white-space-nowrap font-weight-medium mr-4"
                 role="button"
                 >Forgot password?</a
               >
