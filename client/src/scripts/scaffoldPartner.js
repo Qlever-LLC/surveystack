@@ -1,8 +1,7 @@
 const fs = require('fs');
-const path = require('path');
 const chalk = require('chalk');
 
-const log = console.log;
+const filesChalkColor = chalk.hex('#DCE5E7');
 
 /**
  *
@@ -16,16 +15,13 @@ function printFolderContents(dir) {
   fs.readdir(dir, function(err, files) {
     //handling error
     if (err) {
-      return log(chalk.bold.red(`Unable to scan directory:  ${err}`));
+      console.log(filesChalkColor(`Unable to scan directory:  ${err}`));
+      return;
     }
     //listing all files using forEach
     files.forEach(function(file) {
       // print file
-      if (fs.lstatSync(path.resolve(dir, file)).isDirectory()) {
-        log(chalk.bold.keyword('orange')(` 📁 ${file}`));
-      } else {
-        log(chalk.bold.green(` 🗄  ${file}`));
-      }
+      console.log(filesChalkColor(`client/public/partners/${process.argv[2]}/${file}`));
     });
   });
 }
@@ -43,13 +39,13 @@ function generatePartnerFolders(partnerName, folders, manifestContent) {
         fs.writeFileSync(`${basePath}/${partnerName}/${folder}`, manifestContent);
         printFolderContents(`${basePath}/${process.argv[2]}`);
       } catch (error) {
-        log(chalk.bold.red(error));
+        console.log(chalk.bold.red(error));
       }
     } else {
       try {
         fs.mkdirSync(`${basePath}${partnerName}/${folder}`, { recursive: true });
       } catch (error) {
-        log(chalk.bold.red(error));
+        console.log(chalk.bold.red(error));
       }
     }
   });
@@ -65,10 +61,10 @@ function generatePartnerFile(partnerFile, content) {
   const basePath = `${process.cwd()}/src/partners`;
   try {
     fs.writeFileSync(`${basePath}/${partnerFile}`, content);
-    log(chalk.bold.blue('Generated files and folders'));
-    log(chalk.bold.green(` 🗄  ${process.argv[2]}.js`));
+    console.log(chalk.bold.blue('Generated files and folders'));
+    console.log(filesChalkColor(`client/src/partners/${process.argv[2]}.js`));
   } catch (error) {
-    log(chalk.bold.red(error));
+    console.log(chalk.bold.red(error));
   }
 }
 
