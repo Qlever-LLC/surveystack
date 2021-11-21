@@ -25,14 +25,14 @@
               @click:append="showPasswords = !showPasswords"
               color="focus"
             />
-            <div class="colUnderW340 d-flex align-center">
+            <div class="colUnderW340 d-flex justify-space-between align-center">
               <router-link
                 v-if="useLink"
                 :to="{
                   name: 'auth-forgot-password',
                   query: { email: entity.email },
                 }"
-                class="white-space-nowrap font-weight-medium"
+                class="white-space-nowrap font-weight-medium mr-4"
                 role="link"
                 >Forgot password?</router-link
               >
@@ -296,7 +296,6 @@ a {
   /* Forgot passwd next to Login */
   .colUnderW340 {
     flex-direction: row;
-    justify-content: space-between;
   }
   .marginb10UnderW340 {
     margin: 0;
