@@ -8,7 +8,7 @@
         onInput();
       }
     "
-    solo
+    outlined
     hide-details
     autocomplete="off"
     :disabled="disabled"
@@ -24,7 +24,7 @@
             onInput();
           }
         "
-        solo
+        outlined
         hide-details
         autocomplete="off"
         :disabled="disabled"
@@ -56,7 +56,7 @@
       }
     "
     type="number"
-    solo
+    outlined
     hide-details
     :disabled="disabled"
   />
@@ -73,7 +73,7 @@
       }
     "
     hide-details
-    solo
+    outlined
     :multiple="header.multiple"
     :disabled="disabled"
   />
@@ -98,7 +98,7 @@
     single-line
     :chips="header.multiple"
     :deletable-chips="header.multiple"
-    solo
+    outlined
     hide-details
     class="custom-ontology"
   >
@@ -132,7 +132,7 @@
       }
     "
     hide-details
-    solo
+    outlined
     :multiple="header.multiple"
     :disabled="disabled"
     :search-input.sync="comboboxSearch"
@@ -147,17 +147,15 @@
         onInput();
       }
     "
-    item-text="label"
+    :label="item[header.value].value ? item[header.value].value.farmName : null"
+    item-text="value.name"
     item-value="value"
     hide-details
-    solo
+    outlined
     :disabled="disabled || loading"
   >
     <template v-slot:item="{ item }">
       <div v-html="item.label"></div>
-    </template>
-    <template v-slot:selection="{ item }">
-      <div v-html="item.label" class="d-flex align-center"></div>
     </template>
   </v-autocomplete>
   <v-autocomplete
@@ -170,17 +168,15 @@
       }
     "
     :items="farmos.plantings || []"
-    item-text="label"
+    :label="item[header.value].value ? item[header.value].value.farmName : null"
+    item-text="value.name"
     item-value="value"
     hide-details
-    solo
+    outlined
     :disabled="disabled || loading"
   >
     <template v-slot:item="{ item }">
       <div v-html="item.label"></div>
-    </template>
-    <template v-slot:selection="{ item }">
-      <div v-html="item.label" class="d-flex align-center"></div>
     </template>
   </v-autocomplete>
   <div v-else-if="header.type === 'date'">
@@ -206,7 +202,7 @@
           hide-details
           v-bind="attrs"
           v-on="on"
-          solo
+          outlined
           autocomplete="off"
           :disabled="disabled"
           readonly
