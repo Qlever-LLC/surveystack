@@ -7,10 +7,7 @@
         :key="colIdx"
         :style="colStyles[colIdx]"
       >
-        <div
-          class="white px-4 d-flex flex-nowrap"
-          :class="isFixColumn(colIdx) ? `mt-fix-left elevation-${scrollLeft === 0 ? 0 : 3}` : ''"
-        >
+        <div class="white px-4 d-flex flex-nowrap" :class="leftFixClasses(colIdx)">
           <slot name="header-cell" v-bind:header="header" v-bind:colIdx="colIdx">
             {{ colIdx }}
           </slot>
@@ -20,12 +17,9 @@
     </div>
     <v-virtual-scroll ref="body" v-scroll.self="onScroll" :items="rowsWithId" height="300" item-height="64">
       <template v-slot="{ item }">
-        <div class="mt-row mt-divider" @click="isMobile && $emit('showEditDialog', item.id)">
+        <div class="mt-row" @click="isMobile && $emit('showEditDialog', item.id)">
           <div class="mt-cell" v-for="(header, colIdx) in headers" :key="colIdx" :style="colStyles[colIdx]">
-            <div
-              class="mt-fill d-flex align-center white px-1"
-              :class="isFixColumn(colIdx) ? `mt-fix-left elevation-${scrollLeft === 0 ? 0 : 3}` : ''"
-            >
+            <div class="mt-fill d-flex align-center white px-1" :class="leftFixClasses(colIdx)">
               <slot name="row-cell" v-bind:header="header" v-bind:row="item" v-bind:colIdx="colIdx">
                 {{ ' / ' + colIdx }}
               </slot>
@@ -35,10 +29,7 @@
             v-if="$scopedSlots['row-actions']"
             class="mt-row-actions mt-fixed-right ml-1 mt-cell flex-grow-0 flex-shrink-0"
           >
-            <div
-              class="mt-fix-right mt-fill mt-divider d-flex align-center white"
-              :class="`elevation-${scrollRight === 0 ? 0 : 3}`"
-            >
+            <div class="mt-fix-right mt-fill d-flex align-center white" :class="{ 'mt-elevated': scrollRight !== 0 }">
               <slot name="row-actions" v-bind:rowIdx="item.id"> </slot>
             </div>
           </div>
@@ -128,6 +119,15 @@ export default {
     isFixColumn(colIdx) {
       return !this.isMobile && this.fixedColumns > colIdx;
     },
+    leftFixClasses(colIdx) {
+      if (!this.isFixColumn(colIdx)) {
+        return '';
+      }
+      return {
+        'mt-fix-left': true,
+        'mt-elevated': this.scrollLeft !== 0,
+      };
+    },
   },
   watch: {
     rows() {
@@ -174,7 +174,7 @@ export default {
 }
 
 .mt-heading {
-  height: 50px;
+  height: 48px;
   position: sticky;
   top: 0;
   z-index: 1;
@@ -204,5 +204,9 @@ export default {
   flex-basis: var(--mt-row-actions-width);
   flex-grow: 0;
   flex-shrink: 0;
+}
+
+.mt-elevated {
+  box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.18);
 }
 </style>
