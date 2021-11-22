@@ -7,7 +7,10 @@
         :key="colIdx"
         :style="colStyles[colIdx]"
       >
-        <div class="white px-4" :class="isFixColumn(colIdx) ? `mt-fix-left elevation-${scrollLeft === 0 ? 0 : 3}` : ''">
+        <div
+          class="white px-4 d-flex flex-nowrap"
+          :class="isFixColumn(colIdx) ? `mt-fix-left elevation-${scrollLeft === 0 ? 0 : 3}` : ''"
+        >
           <slot name="header-cell" v-bind:header="header" v-bind:colIdx="colIdx">
             {{ colIdx }}
           </slot>
@@ -96,6 +99,7 @@ export default {
     colStyles() {
       return this.headers.map(({ scaleWidth = 100, type }) => ({
         flexBasis: `${defaultColumnWidth(type) * (scaleWidth / 100)}px`,
+        minWidth: `${defaultColumnWidth(type) * (scaleWidth / 100)}px`,
       }));
     },
     headerLeftSpacerStyles() {
@@ -153,7 +157,6 @@ export default {
 }
 
 .mt-cell {
-  flex-shrink: 0;
   flex-grow: 0;
 }
 
@@ -175,7 +178,7 @@ export default {
   position: sticky;
   top: 0;
   z-index: 1;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .mt-fill {

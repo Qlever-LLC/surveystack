@@ -74,9 +74,9 @@
       <template v-slot:header-cell="{ header }">
         <v-tooltip top>
           <template v-slot:activator="{ on }">
-            <span v-on="on">{{ header.label }}</span>
+            <span class="flex-grow-1 text-truncate " v-on="on">{{ header.label }}</span>
           </template>
-          <span>{{ header.type }}</span>
+          <span>{{ header.type }}: {{ header.label }}</span>
         </v-tooltip>
         <app-redacted v-if="header.redacted" />
         <app-required v-if="header.required" />
