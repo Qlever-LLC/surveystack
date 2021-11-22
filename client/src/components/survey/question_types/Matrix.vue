@@ -63,7 +63,13 @@
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
 
-    <app-matrix-table :headers="headers" :rows="rows || []" :rowActionsWidth="64">
+    <app-matrix-table
+      :headers="headers"
+      :rows="rows || []"
+      :fixedColumns="fixedColumns"
+      :isMobile="isMobile"
+      :rowActionsWidth="64"
+    >
       <template v-slot:header-cell="{ header }">
         <v-tooltip top>
           <template v-slot:activator="{ on }">
@@ -103,7 +109,7 @@
       </template>
     </app-matrix-table>
     <v-data-table
-      v-if="true"
+      v-if="false"
       :headers="headers"
       header
       height="300"
@@ -301,6 +307,9 @@ export default {
     },
     addRowLabel() {
       return this.source.config.addRowLabel;
+    },
+    fixedColumns() {
+      return this.source.config.fixedColumns;
     },
     showConfirmDeletionDialog: {
       get() {

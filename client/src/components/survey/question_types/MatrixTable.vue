@@ -7,7 +7,7 @@
         :key="colIdx"
         :style="colStyles[colIdx]"
       >
-        <div class="white px-4" :class="fixCols[colIdx] ? `mt-fix-left elevation-${scrollLeft === 0 ? 0 : 3}` : ''">
+        <div class="white px-4" :class="isFixColumn(colIdx) ? `mt-fix-left elevation-${scrollLeft === 0 ? 0 : 3}` : ''">
           <slot name="header-cell" v-bind:header="header" v-bind:colIdx="colIdx">
             {{ colIdx }}
           </slot>
@@ -15,13 +15,13 @@
       </div>
       <div :style="headerLeftSpacerStyles" />
     </div>
-    <v-virtual-scroll ref="body" v-scroll.self="onScroll" :items="rowsWithId" height="300" item-height="64">
+    <v-virtual-scroll ref="body" v-scroll.self="onScroll" :items="rows" height="300" item-height="64">
       <template v-slot="{ item }">
         <div class="mt-row mt-divider">
           <div class="mt-cell" v-for="(header, colIdx) in headers" :key="colIdx" :style="colStyles[colIdx]">
             <div
               class="mt-fill d-flex align-center white px-1"
-              :class="fixCols[colIdx] ? `mt-fix-left elevation-${scrollLeft === 0 ? 0 : 3}` : ''"
+              :class="isFixColumn(colIdx) ? `mt-fix-left elevation-${scrollLeft === 0 ? 0 : 3}` : ''"
             >
               <slot name="row-cell" v-bind:header="header" v-bind:row="item" v-bind:colIdx="colIdx">
                 {{ ' / ' + colIdx }}
@@ -30,8 +30,7 @@
           </div>
           <div
             v-if="$scopedSlots['row-actions']"
-            class="mt-fixed-right ml-1 mt-cell flex-grow-0 flex-shrink-0"
-            :style="actionBlockStyles"
+            class="mt-row-actions mt-fixed-right ml-1 mt-cell flex-grow-0 flex-shrink-0"
           >
             <div
               class="mt-fix-right mt-fill mt-divider d-flex align-center white"
@@ -66,9 +65,21 @@ export default {
       type: Array,
       required: true,
     },
+    fixedColumns: {
+      type: Number,
+      default: 0,
+    },
     rowActionsWidth: {
       type: Number,
       default: 0, // TODO validate: required if actions slot set
+    },
+    isMobile: {
+      type: Boolean,
+      default: false,
+    },
+    rowHeight: {
+      type: Number,
+      default: 64,
     },
   },
   data() {
@@ -79,33 +90,10 @@ export default {
     };
   },
   computed: {
-    rowsWithId() {
-      return this.rows.map((row, id) => ({ ...row, id }));
-    },
-    fixCols() {
-      return [true];
-    },
     colStyles() {
       return this.headers.map(({ scaleWidth = 100, type }) => ({
         flexBasis: `${defaultColumnWidth(type) * (scaleWidth / 100)}px`,
       }));
-    },
-    actionBlockStyles() {
-      return {
-        flexBasis: `${this.rowActionsWidth}px`,
-        flexGrow: 0,
-        flexShrink: 0,
-      };
-    },
-    stickRight() {
-      return {
-        transform: `translateX(-${this.scrollRight}px)`,
-      };
-    },
-    stickLeft() {
-      return {
-        transform: `translateX(${this.scrollLeft}px)`,
-      };
     },
     headerLeftSpacerStyles() {
       return {
@@ -118,6 +106,8 @@ export default {
       return {
         '--mt-scroll-left': `${this.scrollLeft}px`,
         '--mt-scroll-right': `${-this.scrollRight}px`,
+        '--mt-row-actions-width': `${this.rowActionsWidth}px`,
+        '--mt-row-height': this.rowHeight,
       };
     },
   },
@@ -127,6 +117,9 @@ export default {
       this.scrollLeft = e.target.scrollLeft;
       const scrollLeftMax = e.target.scrollWidth - e.target.clientWidth;
       this.scrollRight = scrollLeftMax - e.target.scrollLeft;
+    },
+    isFixColumn(colIdx) {
+      return !this.isMobile && this.fixedColumns > colIdx;
     },
   },
   watch: {
@@ -153,11 +146,12 @@ export default {
 .mt-row {
   display: flex;
   flex-wrap: nowrap;
+  height: calc(var(--mt-row-height) * 1px);
 }
 
 .mt-cell {
   flex-shrink: 0;
-  flex-grow: 1;
+  flex-grow: 0;
 }
 
 .mt-header {
@@ -198,5 +192,11 @@ export default {
   /* keep it above the other input cells */
   z-index: 1;
   position: relative;
+}
+
+.mt-row-actions {
+  flex-basis: var(--mt-row-actions-width);
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 </style>
