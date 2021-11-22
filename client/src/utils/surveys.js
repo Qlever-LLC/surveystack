@@ -123,11 +123,15 @@ export const changeRecursive = (control, changeFn) => {
 /**
  * Prepares the passed library control or resource to be consumed in another survey
  * @param controlOrResource control to be prepared, mutating
- * @param libraryId
- * @param libraryVersion
+ * @param libraryId the library id the control/resource originated from
+ * @param libraryVersion the library version the control/resource originated from
+ * @param createNewId true creates a new id, false keeps to current id of the control/resource
  */
-export const prepareToAddFromLibrary = (controlOrResource, libraryId, libraryVersion) => {
-  controlOrResource.id = new ObjectID().toString();
+export const prepareToAddFromLibrary = (controlOrResource, libraryId, libraryVersion, createNewId) => {
+  if (createNewId) {
+    controlOrResource.id = new ObjectID().toString();
+  }
+
   if (controlOrResource.libraryId) {
     // do not overwrite the libraryId cause it references another library the inherited library consists of
     controlOrResource.libraryIsInherited = true;
@@ -145,7 +149,7 @@ export const prepareToAddFromLibrary = (controlOrResource, libraryId, libraryVer
  */
 export const getPreparedLibraryResources = (librarySurvey) => {
   return librarySurvey.resources.map((r) => {
-    prepareToAddFromLibrary(r, librarySurvey._id, librarySurvey.latestVersion);
+    prepareToAddFromLibrary(r, librarySurvey._id, librarySurvey.latestVersion, false);
     return r;
   });
 };
@@ -158,7 +162,7 @@ export const getPreparedLibraryResources = (librarySurvey) => {
 export const getPreparedLibraryControls = (librarySurvey) => {
   return librarySurvey.revisions[librarySurvey.latestVersion - 1].controls.map((controlToAdd) => {
     changeRecursive(controlToAdd, (control) => {
-      prepareToAddFromLibrary(control, librarySurvey._id, librarySurvey.latestVersion);
+      prepareToAddFromLibrary(control, librarySurvey._id, librarySurvey.latestVersion, true);
     });
     return controlToAdd;
   });

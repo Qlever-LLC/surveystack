@@ -404,19 +404,29 @@ describe('surveys', () => {
   });
   test('prepareToAddFromLibrary sets libraryId to librarySurvey.id for resources/controls not inherited from nested question sets and does not set libraryIsInherited', () => {
     let librarySurvey = mockLibrarySurvey();
-    prepareToAddFromLibrary(librarySurvey.resources[0], librarySurvey._id, librarySurvey.latestVersion);
+    prepareToAddFromLibrary(librarySurvey.resources[0], librarySurvey._id, librarySurvey.latestVersion, false);
     expect(librarySurvey.resources[0].libraryId).toBe(librarySurvey._id);
     expect(librarySurvey.resources[0].libraryIsInherited).toBe(undefined);
-    prepareToAddFromLibrary(librarySurvey.revisions[1].controls[0], librarySurvey._id, librarySurvey.latestVersion);
+    prepareToAddFromLibrary(
+      librarySurvey.revisions[1].controls[0],
+      librarySurvey._id,
+      librarySurvey.latestVersion,
+      false
+    );
     expect(librarySurvey.revisions[1].controls[0].libraryId).toBe(librarySurvey._id);
     expect(librarySurvey.revisions[1].controls[0].libraryIsInherited).toBe(undefined);
   });
   test('prepareToAddFromLibrary sets libraryIsInherited to true for resources/controls of nested question sets and leaves libraryId as is', () => {
     let librarySurvey = mockLibrarySurvey();
-    prepareToAddFromLibrary(librarySurvey.resources[1], librarySurvey._id, librarySurvey.latestVersion);
+    prepareToAddFromLibrary(librarySurvey.resources[1], librarySurvey._id, librarySurvey.latestVersion, true);
     expect(librarySurvey.resources[1].libraryId).toBe(librarySurvey.revisions[1].controls[2].libraryId);
     expect(librarySurvey.resources[1].libraryIsInherited).toBe(true);
-    prepareToAddFromLibrary(librarySurvey.revisions[1].controls[2], librarySurvey._id, librarySurvey.latestVersion);
+    prepareToAddFromLibrary(
+      librarySurvey.revisions[1].controls[2],
+      librarySurvey._id,
+      librarySurvey.latestVersion,
+      true
+    );
     expect(librarySurvey.revisions[1].controls[2].libraryId).toBe(librarySurvey.revisions[1].controls[2].libraryId);
     expect(librarySurvey.revisions[1].controls[2].libraryIsInherited).toBe(true);
   });
