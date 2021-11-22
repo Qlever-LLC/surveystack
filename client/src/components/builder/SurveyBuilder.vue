@@ -406,7 +406,7 @@ export default {
       }
 
       // add questions from library survey to question group
-      rootGroup.children = getPreparedLibraryControls(data);
+      rootGroup.children = getPreparedLibraryControls(data, this.survey.resources);
 
       this.showLibrary = false;
     },

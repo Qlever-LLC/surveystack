@@ -123,8 +123,8 @@ export const changeRecursive = (control, changeFn) => {
 /**
  * Prepares the passed library control or resource to be consumed in another survey
  * @param controlOrResource control to be prepared, mutating
- * @param libraryId
- * @param libraryVersion
+ * @param libraryId the library id the control/resource originated from
+ * @param libraryVersion the library version the control/resource originated from
  */
 export const prepareToAddFromLibrary = (controlOrResource, libraryId, libraryVersion) => {
   controlOrResource.id = new ObjectID().toString();
@@ -141,10 +141,11 @@ export const prepareToAddFromLibrary = (controlOrResource, libraryId, libraryVer
 /**
  * Returns new resources copied from library survey
  * @param librarySurvey
- * @returns [resources]
+ * @returns [resources] with property origin set to the original id of the resource before copying
  */
 export const getPreparedLibraryResources = (librarySurvey) => {
   return librarySurvey.resources.map((r) => {
+    r.origin = r.id;
     prepareToAddFromLibrary(r, librarySurvey._id, librarySurvey.latestVersion);
     return r;
   });
@@ -153,15 +154,32 @@ export const getPreparedLibraryResources = (librarySurvey) => {
 /**
  * Returns new controls copied from library survey
  * @param librarySurvey
+ * @param newResources an array of resources containing updated id's, with the old id stored in the origin property
  * @returns [controls]
  */
-export const getPreparedLibraryControls = (librarySurvey) => {
+export const getPreparedLibraryControls = (librarySurvey, newResources) => {
   return librarySurvey.revisions[librarySurvey.latestVersion - 1].controls.map((controlToAdd) => {
     changeRecursive(controlToAdd, (control) => {
       prepareToAddFromLibrary(control, librarySurvey._id, librarySurvey.latestVersion);
+      replaceResourceReferenceId(control, newResources);
     });
     return controlToAdd;
   });
+};
+
+/**
+ * Updates a control's references to resources
+ * @param control the control to update
+ * @param newResources an array of resources containing updated id's, with the old id stored in the origin property
+ * @returns [controls]
+ */
+export const replaceResourceReferenceId = (control, newResources) => {
+  if (control && control.options && control.options.source && newResources) {
+    let matchingResource = newResources.find((r) => r.origin === control.options.source);
+    if (matchingResource) {
+      control.options.source = matchingResource.id; // replace the control's reference by the new id of the resource
+    }
+  }
 };
 
 /**
