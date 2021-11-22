@@ -161,7 +161,7 @@ export default {
     },
 
     onRowSelected({ value, item }) {
-      console.log({ value });
+      // console.log({ value });
     },
     createCustomFilter(field) {
       return (value, search, item) => {
