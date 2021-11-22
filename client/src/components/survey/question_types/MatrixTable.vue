@@ -15,7 +15,7 @@
       </div>
       <div :style="headerLeftSpacerStyles" />
     </div>
-    <v-virtual-scroll ref="body" v-scroll.self="onScroll" :items="rows" height="300" item-height="64">
+    <v-virtual-scroll ref="body" v-scroll.self="onScroll" :items="rowsWithId" height="300" item-height="64">
       <template v-slot="{ item }">
         <div class="mt-row mt-divider">
           <div class="mt-cell" v-for="(header, colIdx) in headers" :key="colIdx" :style="colStyles[colIdx]">
@@ -90,6 +90,9 @@ export default {
     };
   },
   computed: {
+    rowsWithId() {
+      return this.rows.map((row, id) => ({ ...row, id }));
+    },
     colStyles() {
       return this.headers.map(({ scaleWidth = 100, type }) => ({
         flexBasis: `${defaultColumnWidth(type) * (scaleWidth / 100)}px`,
