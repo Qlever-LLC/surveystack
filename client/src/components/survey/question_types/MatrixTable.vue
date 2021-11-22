@@ -15,8 +15,10 @@
       </div>
       <div :style="headerLeftSpacerStyles" />
     </div>
-    <v-virtual-scroll ref="body" v-scroll.self="onScroll" :items="rowsWithId" height="300" item-height="64">
-      <template v-slot="{ item }">
+    <!-- <v-virtual-scroll ref="body" v-scroll.self="onScroll" :items="rowsWithId" height="300" item-height="64"> -->
+    <!-- <template v-slot="{ item }"> -->
+    <div ref="body" v-scroll.self="onScroll" :style="{ overflowX: 'auto' }">
+      <div v-for="item in rowsWithId" :key="item.id">
         <div class="mt-row" @click="isMobile && $emit('showEditDialog', item.id)">
           <div class="mt-cell" v-for="(header, colIdx) in headers" :key="colIdx" :style="colStyles[colIdx]">
             <div class="mt-fill d-flex align-center white px-1" :class="leftFixClasses(colIdx)">
@@ -34,8 +36,10 @@
             </div>
           </div>
         </div>
-      </template>
-    </v-virtual-scroll>
+      </div>
+    </div>
+    <!-- </template> -->
+    <!-- </v-virtual-scroll> -->
   </div>
 </template>
 
@@ -103,7 +107,7 @@ export default {
     cssVariables() {
       return {
         '--mt-scroll-left': `${this.scrollLeft}px`,
-        '--mt-scroll-right': `${-this.scrollRight}px`,
+        '--mt-scroll-right': `${this.scrollRight}px`,
         '--mt-row-actions-width': `${this.rowActionsWidth}px`,
         '--mt-row-height': this.rowHeight,
       };
@@ -177,7 +181,7 @@ export default {
   height: 48px;
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 2;
   overflow: hidden;
 }
 
@@ -188,12 +192,13 @@ export default {
 }
 
 .mt-fix-right {
-  transform: translateX(var(--mt-scroll-right));
+  position: relative;
+  right: var(--mt-scroll-right);
   clip-path: inset(0px 0px 0px -5px);
 }
 
 .mt-fix-left {
-  transform: translateX(var(--mt-scroll-left));
+  left: var(--mt-scroll-left);
   clip-path: inset(0px -5px 0px 0px);
   /* keep it above the other input cells */
   z-index: 1;
