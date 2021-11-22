@@ -24,6 +24,7 @@
       ]"
       :key="el.id || el._id"
       @mousedown.stop.left="$emit('control-selected', el)"
+      :data-testid="`control-card-${el.id}`"
     >
       <div
         class="d-flex justify-space-between align-center"
