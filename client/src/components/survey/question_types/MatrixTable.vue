@@ -17,7 +17,7 @@
     </div>
     <v-virtual-scroll ref="body" v-scroll.self="onScroll" :items="rowsWithId" height="300" item-height="64">
       <template v-slot="{ item }">
-        <div class="mt-row mt-divider">
+        <div class="mt-row mt-divider" @click="isMobile && $emit('showEditDialog', item.id)">
           <div class="mt-cell" v-for="(header, colIdx) in headers" :key="colIdx" :style="colStyles[colIdx]">
             <div
               class="mt-fill d-flex align-center white px-1"

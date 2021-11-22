@@ -69,6 +69,7 @@
       :fixedColumns="fixedColumns"
       :isMobile="isMobile"
       :rowActionsWidth="64"
+      @showEditDialog="(rowIdx) => editItem(rowIdx)"
     >
       <template v-slot:header-cell="{ header }">
         <v-tooltip top>
