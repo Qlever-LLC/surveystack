@@ -162,7 +162,6 @@ const actions = {
     commit('RESET');
   },
   init({ commit, dispatch }, { survey, submission, persist }) {
-    console.log('draft.store:action:init');
     commit('INIT', { survey, submission, persist });
     dispatch('next');
     dispatch('calculateRelevance');
