@@ -84,7 +84,7 @@
         <app-required v-if="header.required" />
       </template>
       <template v-slot:row-cell="{ header, row, colIdx }">
-        <v-form autocomplete="off" @submit.prevent="">
+        <v-form autocomplete="off" @submit.prevent="" :style="{ width: '100%' }">
           <app-matrix-cell
             :header="header"
             :item="row"

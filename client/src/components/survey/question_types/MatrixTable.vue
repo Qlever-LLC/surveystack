@@ -44,8 +44,10 @@
     <!-- </template> -->
     <!-- </v-virtual-scroll> -->
 
-    <div class="mt-fix-bottom py-4 mb-8" :style="{pointerEvents: 'none'}">
-      <v-btn @click="$emit('addRow')" color="primary" :style="{pointerEvents: 'auto'}"> <v-icon left>mdi-plus</v-icon>{{ addRowLabel }} </v-btn>
+    <div class="mt-fix-bottom py-4 mb-8" :style="{ pointerEvents: 'none' }">
+      <v-btn @click="$emit('addRow')" color="primary" :style="{ pointerEvents: 'auto' }">
+        <v-icon left>mdi-plus</v-icon>{{ addRowLabel }}
+      </v-btn>
     </div>
   </div>
 </template>
@@ -165,12 +167,11 @@ export default {
     },
   },
   mounted() {
-    this.onScrollX()
-    this.onScrollY()
-    document.addEventListener('scroll', this.onScrollY)
-  }
+    this.onScrollX();
+    this.onScrollY();
+    document.addEventListener('scroll', this.onScrollY);
+  },
 };
-
 </script>
 
 <style scoped>
@@ -209,6 +210,7 @@ export default {
   height: 48px;
   position: sticky;
   top: 0;
+  background-color: white;
   /* should be above the all the input cells and actions */
   z-index: 2;
   overflow: hidden;
