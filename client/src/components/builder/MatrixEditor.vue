@@ -36,17 +36,24 @@
             draggable=".draggable-column"
           >
             <div class="draggable-column" v-for="(item, i) in columns" :key="i">
-              <v-card
-                v-if="item.isFixedUntilMarker"
-                width="26px"
-                height="100%"
-                class="mx-1 py-3 d-flex flex-column justify-space-around align-center"
-                elevation="3"
-              >
-                <v-divider vertical class="lock-line-decor" />
-                <v-icon class="my-1">mdi-arrow-horizontal-lock</v-icon>
-                <v-divider vertical class="lock-line-decor" />
-              </v-card>
+              <v-tooltip v-if="item.isFixedUntilMarker" top open-delay="500">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-card
+                    width="26px"
+                    height="100%"
+                    class="mx-1 py-3 d-flex flex-column justify-space-around align-center"
+                    elevation="3"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    <v-divider vertical class="lock-line-decor" />
+                    <v-icon class="my-1">mdi-arrow-horizontal-lock</v-icon>
+                    <v-divider vertical class="lock-line-decor" />
+                  </v-card>
+                </template>
+                <span>Columns left to this line will always be visible</span>
+              </v-tooltip>
+
               <div v-else>
                 <v-card width="16rem" min-width="16rem" class="mx-1" elevation="3">
                   <div class="d-flex pa-2">
@@ -63,8 +70,8 @@
                     >
                       <v-icon>mdi-arrow-right</v-icon>
                     </v-btn>
-
-                    <v-btn icon @click="deleteColumn(i)" class="ml-auto" tabindex="-1" small>
+                    <v-spacer />
+                    <v-btn icon @click="deleteColumn(i)" tabindex="-1" small>
                       <v-icon>mdi-trash-can-outline</v-icon>
                     </v-btn>
                   </div>
@@ -223,6 +230,7 @@ export default {
     ontology() {
       return this.resources.find((resource) => resource.id === this.editOntologyId);
     },
+    // get/set the position of the columns and the "lock-to-left" marker
     columns: {
       get() {
         const columns = [...this.value.content];
@@ -277,17 +285,18 @@ export default {
       if (index === 0) {
         return;
       }
-      const newItems = [...this.value.content];
-      [newItems[index - 1], newItems[index]] = [newItems[index], newItems[index - 1]]; // swap in place
-      this.value.content = newItems;
+      this.swapColumns(index - 1, index);
     },
     moveItemRight(index) {
       if (index >= this.value.content.length - 1) {
         return;
       }
-      const newItems = [...this.value.content];
-      [newItems[index + 1], newItems[index]] = [newItems[index], newItems[index + 1]]; // swap in place
-      this.value.content = newItems;
+      this.swapColumns(index + 1, index);
+    },
+    swapColumns(idx1, idx2) {
+      const columns = [...this.columns];
+      [columns[idx1], columns[idx2]] = [columns[idx2], columns[idx1]];
+      this.columns = columns;
     },
     createEmptyColumn() {
       return {
