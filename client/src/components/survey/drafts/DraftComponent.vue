@@ -271,7 +271,6 @@ export default {
 
 .draft-component-wrapper {
   height: 100%;
-  overflow: auto;
   display: flex;
   flex-direction: column;
   padding: 0px !important;
