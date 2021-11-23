@@ -174,10 +174,21 @@ export const getPreparedLibraryControls = (librarySurvey, newResources) => {
  * @returns [controls]
  */
 export const replaceResourceReferenceId = (control, newResources) => {
-  if (control && control.options && control.options.source && newResources) {
-    let matchingResource = newResources.find((r) => r.origin === control.options.source);
-    if (matchingResource) {
-      control.options.source = matchingResource.id; // replace the control's reference by the new id of the resource
+  if (newResources && control && control.options && control.options.source) {
+    if (control.type === 'matrix') {
+      control.options.source.content.forEach((col) => {
+        if (col.resource) {
+          let matchingResource = newResources.find((r) => r.origin === col.resource);
+          if (matchingResource) {
+            col.resource = matchingResource.id; // replace the control's reference by the new id of the resource
+          }
+        }
+      });
+    } else {
+      let matchingResource = newResources.find((r) => r.origin === control.options.source);
+      if (matchingResource) {
+        control.options.source = matchingResource.id; // replace the control's reference by the new id of the resource
+      }
     }
   }
 };
