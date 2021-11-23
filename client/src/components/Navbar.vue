@@ -244,11 +244,19 @@ export default {
       const items = [];
       const divider = { type: 'divider' };
       items.push(...this.sidenav.collect);
-      if (this.$store.getters['auth/isLoggedIn'] && this.$store.getters['auth/admin']) {
+      // if (this.$store.getters['auth/isLoggedIn'] && this.$store.getters['auth/admin']) {
+      //   items.push(divider);
+      //   items.push(...this.sidenav.admin);
+      // }
+      if (this.$store.getters['auth/isLoggedIn']) {
         items.push(divider);
         items.push(...this.sidenav.admin);
       }
-      if (this.$store.getters['auth/isLoggedIn'] && this.$store.getters['auth/isSuperAdmin']) {
+      // if (this.$store.getters['auth/isLoggedIn'] && this.$store.getters['auth/isSuperAdmin']) {
+      //   items.push(divider);
+      //   items.push(...this.sidenav.superAdmin);
+      // }
+      if (this.$store.getters['auth/isSuperAdmin']) {
         items.push(divider);
         items.push(...this.sidenav.superAdmin);
       }
