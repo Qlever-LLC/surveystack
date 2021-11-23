@@ -69,7 +69,9 @@
       :fixedColumns="fixedColumns"
       :isMobile="isMobile"
       :rowActionsWidth="64"
+      :addRowLabel="addRowLabel"
       @showEditDialog="(rowIdx) => editItem(rowIdx)"
+      @addRow="add"
     >
       <template v-slot:header-cell="{ header }">
         <v-tooltip top>
@@ -170,9 +172,6 @@
         </tbody>
       </template>
     </v-data-table>
-    <div class="mt-4 mb-12">
-      <v-btn @click="add" color="primary"> <v-icon left>mdi-plus</v-icon>{{ addRowLabel }} </v-btn>
-    </div>
     <app-control-more-info :value="control.moreInfo" />
 
     <div class="d-flex flex-row align-center" v-if="loading">
