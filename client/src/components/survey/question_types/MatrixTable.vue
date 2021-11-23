@@ -190,7 +190,7 @@ export default {
 }
 
 .mt-cell {
-  flex-grow: 0;
+  flex-grow: 1;
 }
 
 .mt-header {
