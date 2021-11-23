@@ -53,55 +53,48 @@
             >
               <v-icon color="grey lighten-1">mdi-library</v-icon>
             </v-btn>
-            <v-btn
-              icon
-              v-if="
-                areActionsVisible(el) &&
-                  el.isLibraryRoot &&
-                  !el.libraryIsInherited &&
-                  availableLibraryUpdates[el.libraryId]
+            <v-chip
+              v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
+              class="align-center text-align-center text-center"
+              dark
+              small
+              :color="
+                availableLibraryUpdates[el.libraryId] === null
+                  ? 'error'
+                  : availableLibraryUpdates[el.libraryId] > el.libraryVersion
+                  ? 'warning'
+                  : 'grey'
               "
-              @click.stop="updateLibrary(el)"
+              :title="
+                availableLibraryUpdates[el.libraryId] === null
+                  ? 'question set has been deleted in the library'
+                  : availableLibraryUpdates[el.libraryId]
+                  ? 'new version ' + availableLibraryUpdates[el.libraryId] + ' available'
+                  : 'newest available version'
+              "
             >
-              <v-icon :color="availableLibraryUpdates[el.libraryId] > el.libraryVersion ? 'warning' : 'grey lighten-1'"
-                >mdi-refresh</v-icon
+              <v-icon
+                v-if="availableLibraryUpdates[el.libraryId] > el.libraryVersion"
+                @click.stop="updateLibrary(el)"
+                left
               >
-            </v-btn>
+                mdi-refresh
+              </v-icon>
+              Version {{ el.libraryVersion }}
+            </v-chip>
             <v-btn
               icon
               v-if="areActionsVisible(el) && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
               @click.stop="() => showDeleteModal(idx)"
             >
               <v-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey lighten-1'"
-                >mdi-delete</v-icon
-              >
+                >mdi-delete
+              </v-icon>
             </v-btn>
             <v-btn text x-small v-if="el.options.hidden" @click.stop="el.options.hidden = false" color="grey lighten-1">
               unhide
             </v-btn>
           </div>
-          <v-chip
-            v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
-            class="align-center text-align-center text-center"
-            dark
-            small
-            :color="
-              availableLibraryUpdates[el.libraryId] === null
-                ? 'error'
-                : availableLibraryUpdates[el.libraryId] > el.libraryVersion
-                ? 'warning'
-                : 'grey'
-            "
-            :title="
-              availableLibraryUpdates[el.libraryId] === null
-                ? 'question set has been deleted in the library'
-                : availableLibraryUpdates[el.libraryId]
-                ? 'new version ' + availableLibraryUpdates[el.libraryId] + ' available'
-                : 'newest available version'
-            "
-          >
-            Version {{ el.libraryVersion }}
-          </v-chip>
         </div>
       </div>
 
@@ -390,6 +383,7 @@ export default {
 .flip-list-move {
   transition: transform 0.5s;
 }
+
 .no-move {
   transition: transform 0s;
 }
