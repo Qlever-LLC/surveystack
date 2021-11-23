@@ -43,6 +43,10 @@
     </div>
     <!-- </template> -->
     <!-- </v-virtual-scroll> -->
+
+    <div class="mt-fix-bottom py-4 mb-8">
+      <v-btn @click="$emit('addRow')" color="primary"> <v-icon left>mdi-plus</v-icon>{{ addRowLabel }} </v-btn>
+    </div>
   </div>
 </template>
 
@@ -81,6 +85,10 @@ export default {
     rowHeight: {
       type: Number,
       default: 64,
+    },
+    addRowLabel: {
+      type: String,
+      default: 'Add row',
     },
   },
   data() {
@@ -143,7 +151,7 @@ export default {
     rows() {
       this.$nextTick(() => {
         // TODO is this the best way to do this?
-        const { offsetWidth, clientWidth } = this.$refs.body.$el;
+        const { offsetWidth, clientWidth } = this.$refs.body;
         this.verticalScrollbarWidth = offsetWidth - clientWidth;
       });
     },
@@ -187,9 +195,17 @@ export default {
   height: 48px;
   position: sticky;
   top: 0;
-  /* above the all the input cells and actions */
+  /* should be above the all the input cells and actions */
   z-index: 2;
   overflow: hidden;
+}
+
+.mt-fix-bottom {
+  position: sticky;
+  /* floating footer size */
+  bottom: 68px;
+  /* should be above all input cells */
+  z-index: 2;
 }
 
 .mt-fill {
@@ -212,7 +228,7 @@ export default {
 .mt-fix-left-elevation {
   box-shadow: var(--mt-left-fix-shadow);
   clip-path: inset(0px -5px 0px 0px);
-  /* keep it above the other input cells */
+  /* should be above non-fixed input cells */
   z-index: 1;
   position: relative;
 }
