@@ -2,7 +2,7 @@
   <div class="wrap" :style="cssVariables">
     <div ref="header" class="mt-heading mt-divider mt-row">
       <div
-        class="caption font-weight-bold text--secondary mt-cell mt-header"
+        class="mt-cell mt-header caption font-weight-bold text--secondary"
         v-for="(header, colIdx) in headers"
         :key="colIdx"
         :style="colStyles[colIdx]"
@@ -18,9 +18,9 @@
       </div>
       <div :style="headerLeftSpacerStyles" />
     </div>
-    <!-- <v-virtual-scroll ref="body" v-scroll.self="onScroll" :items="rowsWithId" height="300" item-height="64"> -->
+    <!-- <v-virtual-scroll ref="body" v-scroll.self="onScrollX" :items="rowsWithId" height="300" item-height="64"> -->
     <!-- <template v-slot="{ item }"> -->
-    <div ref="body" v-scroll.self="onScroll" :style="{ overflowX: 'auto', overflowY: 'hidden' }">
+    <div ref="body" v-scroll.self="onScrollX" :style="{ overflowX: 'auto', overflowY: 'hidden' }">
       <div v-for="item in rowsWithId" :key="item.id">
         <div class="mt-row" @click="isMobile && $emit('showEditDialog', item.id)">
           <div class="mt-cell" v-for="(header, colIdx) in headers" :key="colIdx" :style="colStyles[colIdx]">
@@ -44,8 +44,8 @@
     <!-- </template> -->
     <!-- </v-virtual-scroll> -->
 
-    <div class="mt-fix-bottom py-4 mb-8">
-      <v-btn @click="$emit('addRow')" color="primary"> <v-icon left>mdi-plus</v-icon>{{ addRowLabel }} </v-btn>
+    <div class="mt-fix-bottom py-4 mb-8" :style="{pointerEvents: 'none'}">
+      <v-btn @click="$emit('addRow')" color="primary" :style="{pointerEvents: 'auto'}"> <v-icon left>mdi-plus</v-icon>{{ addRowLabel }} </v-btn>
     </div>
   </div>
 </template>
@@ -96,6 +96,7 @@ export default {
       verticalScrollbarWidth: 0,
       scrollLeft: 0,
       scrollRight: 0,
+      isHeaderFloating: false,
     };
   },
   computed: {
@@ -116,22 +117,29 @@ export default {
       };
     },
     cssVariables() {
-      const elevationShadow = '0px 0px 2px 2px rgba(0, 0, 0, 0.18)';
+      const sideElevationShadow = '0px 0px 2px 2px rgba(0, 0, 0, 0.18)';
+      const topElevationShadow = '0px 0px 2px 0px rgba(0, 0, 0, 0.18)';
       return {
         '--mt-scroll-left': `${this.scrollLeft}px`,
         '--mt-scroll-right': `${this.scrollRight}px`,
-        '--mt-left-fix-shadow': this.scrollLeft === 0 ? '' : elevationShadow,
-        // '--mt-is-scrolled-right': this.scrollRight === 0 ? 0 : 1,
+        '--mt-left-fix-shadow': this.scrollLeft === 0 ? '' : sideElevationShadow,
+        '--mt-right-fix-shadow': this.scrollRight === 0 ? '' : sideElevationShadow,
+        '--mt-top-fix-shadow': this.isHeaderFloating ? topElevationShadow : '',
         '--mt-row-actions-width': `${this.rowActionsWidth}px`,
         '--mt-row-height': this.rowHeight,
       };
     },
   },
   methods: {
-    onScroll(e) {
-      this.scrollLeft = e.target.scrollLeft;
-      const scrollLeftMax = e.target.scrollWidth - e.target.clientWidth;
-      this.scrollRight = scrollLeftMax - e.target.scrollLeft;
+    onScrollX() {
+      const body = this.$refs.body;
+      this.scrollLeft = body.scrollLeft;
+      const scrollLeftMax = body.scrollWidth - body.clientWidth;
+      this.scrollRight = scrollLeftMax - body.scrollLeft;
+    },
+    onScrollY() {
+      const { top } = this.$el.getBoundingClientRect();
+      this.isHeaderFloating = top < 0;
     },
     isFixColumn(colIdx) {
       return !this.isMobile && this.fixedColumns > colIdx;
@@ -156,7 +164,13 @@ export default {
       });
     },
   },
+  mounted() {
+    this.onScrollX()
+    this.onScrollY()
+    document.addEventListener('scroll', this.onScrollY)
+  }
 };
+
 </script>
 
 <style scoped>
@@ -198,6 +212,9 @@ export default {
   /* should be above the all the input cells and actions */
   z-index: 2;
   overflow: hidden;
+  box-shadow: var(--mt-top-fix-shadow);
+
+  clip-path: inset(0px 0px -5px 0px);
 }
 
 .mt-fix-bottom {
