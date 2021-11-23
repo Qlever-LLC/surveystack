@@ -14,7 +14,8 @@
     </v-app-bar>
 
     <v-navigation-drawer v-model="drawer" app>
-      <div class="d-flex justify-end mt-3 mr-3">
+      <div class="d-flex justify-space-between w-full">
+        <img v-if="isWhitelabel" :src="$store.getters['whitelabel/partner'].logo" class="my-3 mx-4" height="30" />
         <v-btn large icon @click="drawer = !drawer">
           <v-icon>mdi-close</v-icon>
         </v-btn>
@@ -243,11 +244,11 @@ export default {
       const items = [];
       const divider = { type: 'divider' };
       items.push(...this.sidenav.collect);
-      if (this.$store.getters['auth/isLoggedIn']) {
+      if (this.$store.getters['auth/isLoggedIn'] && this.$store.getters['auth/admin']) {
         items.push(divider);
         items.push(...this.sidenav.admin);
       }
-      if (this.$store.getters['auth/isSuperAdmin']) {
+      if (this.$store.getters['auth/isLoggedIn'] && this.$store.getters['auth/isSuperAdmin']) {
         items.push(divider);
         items.push(...this.sidenav.superAdmin);
       }
@@ -269,6 +270,9 @@ export default {
         }
       });
       return Array.from(docs.values());
+    },
+    isWhitelabel() {
+      return this.$store.getters['whitelabel/isWhitelabel'];
     },
   },
 };
