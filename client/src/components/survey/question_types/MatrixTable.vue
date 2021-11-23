@@ -7,7 +7,10 @@
         :key="colIdx"
         :style="colStyles[colIdx]"
       >
-        <div class="white px-4 d-flex flex-nowrap" :class="leftFixClasses(colIdx)">
+        <div
+          class="white px-4 d-flex flex-nowrap"
+          :class="{ 'mt-fix-left-elevation': colIdx === fixedColumns - 1, 'mt-follow-scroll-x': !isFixColumn(colIdx) }"
+        >
           <slot name="header-cell" v-bind:header="header" v-bind:colIdx="colIdx">
             {{ colIdx }}
           </slot>
@@ -17,7 +20,7 @@
     </div>
     <!-- <v-virtual-scroll ref="body" v-scroll.self="onScroll" :items="rowsWithId" height="300" item-height="64"> -->
     <!-- <template v-slot="{ item }"> -->
-    <div ref="body" v-scroll.self="onScroll" :style="{ overflowX: 'auto' }">
+    <div ref="body" v-scroll.self="onScroll" :style="{ overflowX: 'auto', overflowY: 'hidden' }">
       <div v-for="item in rowsWithId" :key="item.id">
         <div class="mt-row" @click="isMobile && $emit('showEditDialog', item.id)">
           <div class="mt-cell" v-for="(header, colIdx) in headers" :key="colIdx" :style="colStyles[colIdx]">
@@ -105,9 +108,12 @@ export default {
       };
     },
     cssVariables() {
+      const elevationShadow = '0px 0px 2px 2px rgba(0, 0, 0, 0.18)';
       return {
         '--mt-scroll-left': `${this.scrollLeft}px`,
         '--mt-scroll-right': `${this.scrollRight}px`,
+        '--mt-left-fix-shadow': this.scrollLeft === 0 ? '' : elevationShadow,
+        // '--mt-is-scrolled-right': this.scrollRight === 0 ? 0 : 1,
         '--mt-row-actions-width': `${this.rowActionsWidth}px`,
         '--mt-row-height': this.rowHeight,
       };
@@ -115,7 +121,6 @@ export default {
   },
   methods: {
     onScroll(e) {
-      this.$refs.header.scrollLeft = e.target.scrollLeft;
       this.scrollLeft = e.target.scrollLeft;
       const scrollLeftMax = e.target.scrollWidth - e.target.clientWidth;
       this.scrollRight = scrollLeftMax - e.target.scrollLeft;
@@ -129,6 +134,7 @@ export default {
       }
       return {
         'mt-fix-left': true,
+        'mt-fix-left-elevation': true,
         'mt-elevated': this.scrollLeft !== 0,
       };
     },
@@ -181,6 +187,7 @@ export default {
   height: 48px;
   position: sticky;
   top: 0;
+  /* above the all the input cells and actions */
   z-index: 2;
   overflow: hidden;
 }
@@ -198,11 +205,21 @@ export default {
 }
 
 .mt-fix-left {
+  position: relative;
   left: var(--mt-scroll-left);
+}
+
+.mt-fix-left-elevation {
+  box-shadow: var(--mt-left-fix-shadow);
   clip-path: inset(0px -5px 0px 0px);
   /* keep it above the other input cells */
   z-index: 1;
   position: relative;
+}
+
+.mt-follow-scroll-x {
+  position: relative;
+  left: calc(var(--mt-scroll-left) * -1);
 }
 
 .mt-row-actions {
