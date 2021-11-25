@@ -1,30 +1,48 @@
 <template>
-  <div class="wrap" :style="cssVariables">
-    <div ref="header" class="mt-heading mt-divider mt-row">
+  <div class="mt-wrapper" :style="cssVariables">
+    <div ref="header" class="mt-heading mt-divider" :class="{ 'mt-heading-shadow': isHeaderFloating }">
       <div
-        class="mt-cell mt-header caption font-weight-bold text--secondary"
+        class="caption font-weight-bold text--secondary mt-header"
         v-for="(header, colIdx) in headers"
         :key="colIdx"
-        :style="colStyles[colIdx]"
+        :style="thStyles[colIdx]"
       >
-        <div
-          class="white px-4 d-flex flex-nowrap"
-          :class="{ 'mt-fix-left-elevation': colIdx === fixedColumns - 1, 'mt-follow-scroll-x': !isFixColumn(colIdx) }"
-        >
+        <div ref="headerCells" class="white px-4 d-flex flex-nowrap" :style="{ position: 'relative' }">
           <slot name="header-cell" v-bind:header="header" v-bind:colIdx="colIdx">
             {{ colIdx }}
           </slot>
         </div>
       </div>
-      <div :style="headerLeftSpacerStyles" />
+      <div class="mt-header-left-spacer" />
     </div>
+
+    <!-- <table cellspacing="0" :style="{ tableLayout: 'fixed', minWidth: '100%' }">
+      <colgroup>
+        <col v-for="(width, colIdx) in colMinWidths" :width="`${width}px*`" :key="colIdx" />
+      </colgroup>
+      <thead>
+        <th
+          class="caption font-weight-bold text--secondary mt-header text-left"
+          v-for="(header, colIdx) in headers"
+          :key="colIdx"
+          :style="cellWidthStyles[colIdx]"
+        >
+          <div ref="headerCells" class="white px-4 d-flex flex-nowrap" :style="{ position: 'relative' }">
+            <slot name="header-cell" v-bind:header="header" v-bind:colIdx="colIdx">
+              {{ colIdx }}
+            </slot>
+          </div>
+        </th>
+        <th class="mt-header-left-spacer" />
+      </thead>
+    </table> -->
     <!-- <v-virtual-scroll ref="body" v-scroll.self="onScrollX" :items="rowsWithId" height="300" item-height="64"> -->
     <!-- <template v-slot="{ item }"> -->
-    <div ref="body" v-scroll.self="onScrollX" :style="{ overflowX: 'auto', overflowY: 'hidden' }">
+    <!-- <div v-if="false" ref="body" v-scroll.self="onScrollX" :style="{ overflowX: 'auto', overflowY: 'hidden' }">
       <div v-for="(item, rowIdx) in rows" :key="rowIdx">
         <div class="mt-row" @click="isMobile && $emit('showEditDialog', rowIdx)">
           <div class="mt-cell" v-for="(header, colIdx) in headers" :key="colIdx" :style="colStyles[colIdx]">
-            <div class="mt-fill d-flex align-center white px-1" :class="leftFixClasses(colIdx)">
+            <div ref="fixCells" class="mt-fill d-flex align-center white px-1" :class="leftFixClasses(colIdx)">
               <slot
                 v-if="!cellVisibility[rowIdx] || cellVisibility[rowIdx][colIdx]"
                 name="row-cell"
@@ -40,16 +58,37 @@
             v-if="$scopedSlots['row-actions']"
             class="mt-row-actions mt-fixed-right ml-1 mt-cell flex-grow-0 flex-shrink-0"
           >
-            <div class="mt-fix-right mt-fill d-flex align-center white" :class="{ 'mt-elevated': scrollRight !== 0 }">
+            <div class="mt-fix-right mt-fill d-flex align-center white">
               <slot name="row-actions" v-bind:rowIdx="rowIdx"> </slot>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
     <!-- </template> -->
     <!-- </v-virtual-scroll> -->
-
+    <div :style="{ width: '100%', overflow: 'auto' }" v-scroll.self="onScrollX" ref="body">
+      <table cellspacing="0" :style="{ tableLayout: 'fixed', minWidth: '100%' }">
+        <tbody>
+          <tr v-for="(item, rowIdx) in rows" :key="rowIdx">
+            <td v-for="(header, colIdx) in headers" class="white" :style="tdStyles[colIdx]" :key="colIdx">
+              <slot
+                v-if="!cellVisibility[rowIdx] || cellVisibility[rowIdx][colIdx]"
+                name="row-cell"
+                v-bind:header="header"
+                v-bind:row="item"
+                v-bind:colIdx="colIdx"
+              >
+                {{ ' / ' + colIdx }}
+              </slot>
+            </td>
+            <td class="white" :style="actionsStyle">
+              <slot name="row-actions" v-bind:rowIdx="rowIdx"> </slot>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <div class="mt-fix-bottom py-4 mb-8" :style="{ pointerEvents: 'none' }">
       <v-btn @click="$emit('addRow')" color="primary" :style="{ pointerEvents: 'auto' }">
         <v-icon left>mdi-plus</v-icon>{{ addRowLabel }}
@@ -59,6 +98,8 @@
 </template>
 
 <script>
+import { sum } from 'lodash';
+
 function defaultColumnWidth(type) {
   switch (type) {
     case 'farmos_planting':
@@ -101,9 +142,8 @@ export default {
   },
   data() {
     return {
-      verticalScrollbarWidth: 0,
-      scrollLeft: 0,
-      scrollRight: 0,
+      isLeftFloating: false,
+      isRightFloating: false,
       isHeaderFloating: false,
       cellVisibility: [],
     };
@@ -112,11 +152,66 @@ export default {
     colMinWidths() {
       return this.headers.map(({ scaleWidth = 100, type }) => defaultColumnWidth(type) * (scaleWidth / 100));
     },
-    colStyles() {
-      return this.colMinWidths.map((minWidth) => ({
-        flexBasis: `${minWidth}px`,
+    mtElevationLeft() {
+      return {
+        boxShadow: '0px 0px 2px 2px rgba(0, 0, 0, 0.18)',
+        clipPath: 'inset(0px -5px 0px 0px)',
+      };
+    },
+    cellWidthStyles() {
+      return this.colMinWidths.map((minWidth, colIdx) => ({
         minWidth: `${minWidth}px`,
+        width: `${(minWidth / (this.minRowWidth - this.rowActionsWidth)) * 100}%`,
       }));
+    },
+    thStyles() {
+      return this.colMinWidths.map((minWidth, colIdx) => {
+        let style = {
+          minWidth: `${minWidth}px`,
+          flexBasis: `${minWidth}px`,
+          flexGrow: (1 / minWidth) * 1000,
+        };
+
+        if (colIdx < this.fixedColumns) {
+          style.zIndex = 2;
+        }
+        if (this.isLeftFloating && colIdx === this.fixedColumns - 1) {
+          style = { ...style, ...this.mtElevationLeft };
+        }
+        return style;
+      });
+    },
+    tdStyles() {
+      return this.colMinWidths.map((minWidth, colIdx) => {
+        let style = {
+          minWidth: `${minWidth}px`,
+          flexBasis: `${minWidth}px`,
+          height: `${this.rowHeight}px`,
+          padding: '0 1px',
+        };
+        if (colIdx < this.fixedColumns) {
+          style.position = 'sticky';
+          style.left = `${sum(this.colMinWidths.slice(0, colIdx))}px`;
+          /* should be above non-fixed input cells */
+          style.zIndex = 1;
+        }
+        if (this.isLeftFloating && colIdx === this.fixedColumns - 1) {
+          style = { ...style, ...this.mtElevationLeft };
+        }
+        return style;
+      });
+    },
+    actionsStyle() {
+      const style = {
+        position: 'sticky',
+        right: 0,
+        width: 'var(--mt-row-actions-width)',
+      };
+      if (this.isRightFloating) {
+        style.boxShadow = '0px 0px 2px 2px rgba(0, 0, 0, 0.18)';
+        style.clipPath = 'inset(0px 0px 0px -5px)';
+      }
+      return style;
     },
     minRowWidth() {
       return this.colMinWidths.reduce((sum, width) => sum + width, 0);
@@ -126,7 +221,7 @@ export default {
     },
     headerLeftSpacerStyles() {
       return {
-        flexBasis: `${this.rowActionsWidth + this.verticalScrollbarWidth}px`,
+        flexBasis: `${this.rowActionsWidth}px`,
         flexGrow: 0,
         flexShrink: 0,
       };
@@ -135,28 +230,41 @@ export default {
       const sideElevationShadow = '0px 0px 2px 2px rgba(0, 0, 0, 0.18)';
       const topElevationShadow = '0px 0px 2px 0px rgba(0, 0, 0, 0.18)';
       return {
-        '--mt-scroll-left': `${this.scrollLeft}px`,
-        '--mt-scroll-right': `${this.scrollRight}px`,
-        '--mt-left-fix-shadow': this.scrollLeft === 0 ? '' : sideElevationShadow,
-        '--mt-right-fix-shadow': this.scrollRight === 0 ? '' : sideElevationShadow,
+        '--mt-left-fix-shadow': this.isLeftFloating === 0 ? '' : sideElevationShadow,
+        '--mt-right-fix-shadow': this.isRightFloating === 0 ? '' : sideElevationShadow,
         '--mt-top-fix-shadow': this.isHeaderFloating ? topElevationShadow : '',
         '--mt-row-actions-width': `${this.rowActionsWidth}px`,
-        '--mt-row-height': this.rowHeight,
+        '--mt-row-height': `${this.rowHeight}px`,
       };
     },
   },
   methods: {
     onScrollX() {
-      const body = this.$refs.body;
-      this.scrollLeft = body.scrollLeft;
-      const scrollLeftMax = body.scrollWidth - body.clientWidth;
-      this.scrollRight = scrollLeftMax - body.scrollLeft;
-      this.updateCellVisibility();
+      if (!this.rafIdScrollX) {
+        this.rafIdScrollX = window.requestAnimationFrame(() => {
+          const body = this.$refs.body;
+          this.isLeftFloating = body.scrollLeft > 0;
+          const scrollLeftMax = body.scrollWidth - body.clientWidth;
+          this.isRightFloating = scrollLeftMax > body.scrollLeft;
+          this.$refs.headerCells.forEach((el, colIdx) => {
+            if (colIdx >= this.fixedColumns) {
+              // TODO use scrollLeft on the whole header?
+              el.style.left = `${-body.scrollLeft}px`;
+            }
+          });
+          this.rafIdScrollX = null;
+        });
+      }
     },
     onScrollY() {
-      const { top } = this.$el.getBoundingClientRect();
-      this.isHeaderFloating = top < 0;
-      this.updateCellVisibility();
+      if (!this.rafIdScrollY) {
+        this.rafIdScrollY = window.requestAnimationFrame(() => {
+          const { top } = this.$el.getBoundingClientRect();
+          this.isHeaderFloating = top < 0;
+          // this.updateCellVisibility();
+          this.rafIdScrollY = null;
+        });
+      }
     },
     // create a 2d boolean matrix where true marks the cells visible on the scren
     updateCellVisibility() {
@@ -197,54 +305,45 @@ export default {
     isFixColumn(colIdx) {
       return !this.isMobile && this.fixedColumns > colIdx;
     },
-    leftFixClasses(colIdx) {
-      if (!this.isFixColumn(colIdx)) {
-        return '';
-      }
-      return {
-        'mt-fix-left': true,
-        'mt-fix-left-elevation': true,
-        'mt-elevated': this.scrollLeft !== 0,
-      };
-    },
-  },
-  watch: {
-    rows() {
-      this.$nextTick(() => {
-        // TODO is this the best way to do this?
-        const { offsetWidth, clientWidth } = this.$refs.body;
-        this.verticalScrollbarWidth = offsetWidth - clientWidth;
-      });
-    },
+    // leftFixClasses(colIdx) {
+    //   if (!this.isFixColumn(colIdx)) {
+    //     return '';
+    //   }
+    //   return {
+    //     'mt-fix-left': true,
+    //     'mt-fix-left-elevation': true,
+    //     // 'mt-elevated': this.scrollLeft !== 0,
+    //   };
+    // },
   },
   mounted() {
     this.onScrollX();
     this.onScrollY();
     document.addEventListener('scroll', this.onScrollY);
   },
+  beforeDestroy() {
+    document.removeEventListener('scroll', this.onScrollY);
+  },
 };
 </script>
 
 <style scoped>
+.mt-header-left-spacer {
+  flex-grow: 0;
+  flex-shrink: 0;
+  width: var(--mt-row-actions-width);
+  min-width: var(--mt-row-actions-width);
+}
 .vue-recycle-scroller {
   height: 300px;
   overflow: auto;
 }
-.wrap {
+.mt-wrapper {
   position: relative;
 }
 
-.mt-row {
-  display: flex;
-  flex-wrap: nowrap;
-  height: calc(var(--mt-row-height) * 1px);
-}
-
-.mt-cell {
-  flex-grow: 1;
-}
-
 .mt-header {
+  flex-grow: 1;
   height: 48px;
   line-height: 48px;
 }
@@ -262,11 +361,15 @@ export default {
   position: sticky;
   top: 0;
   background-color: white;
+  display: flex;
+  flex-wrap: nowrap;
   /* should be above the all the input cells and actions */
   z-index: 2;
   overflow: hidden;
-  box-shadow: var(--mt-top-fix-shadow);
+}
 
+.mt-heading-shadow {
+  box-shadow: var(--mt-top-fix-shadow);
   clip-path: inset(0px 0px -5px 0px);
 }
 
@@ -278,21 +381,15 @@ export default {
   z-index: 2;
 }
 
-.mt-fill {
-  width: 100%;
-  height: 100%;
-  transition: box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
-}
-
 .mt-fix-right {
   position: relative;
-  right: var(--mt-scroll-right);
+  /* right: var(--mt-scroll-right); */
   clip-path: inset(0px 0px 0px -5px);
 }
 
 .mt-fix-left {
   position: relative;
-  left: var(--mt-scroll-left);
+  /* left: var(--mt-scroll-left); */
 }
 
 .mt-fix-left-elevation {
@@ -303,18 +400,14 @@ export default {
   position: relative;
 }
 
-.mt-follow-scroll-x {
-  position: relative;
-  left: calc(var(--mt-scroll-left) * -1);
-}
-
 .mt-row-actions {
   flex-basis: var(--mt-row-actions-width);
   flex-grow: 0;
   flex-shrink: 0;
 }
 
-.mt-elevated {
-  box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.18);
+.mt-elevated-left {
+  boxshadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.18);
+  clippath: inset(0px -5px 0px 0px);
 }
 </style>
