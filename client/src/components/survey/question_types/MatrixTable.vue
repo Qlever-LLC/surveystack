@@ -17,7 +17,7 @@
           </slot>
         </div>
       </div>
-      <div class="mt-header-left-spacer" />
+      <div v-if="$scopedSlots['row-actions']" class="mt-header-left-spacer" />
     </div>
     <div ref="body" class="mt-body" v-scroll.self="onScrollX" :style="{ overflowX: 'auto', overflowY: 'hidden' }">
       <div
@@ -35,7 +35,7 @@
         >
           <div class="mt-cell d-flex align-center white px-1">
             <slot
-              v-if="!cellVisibility[rowIdx] || cellVisibility[rowIdx][colIdx]"
+              v-if="shouldRenderCell(rowIdx, colIdx)"
               name="row-cell"
               v-bind:header="header"
               v-bind:row="item"
@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import { sum } from 'lodash';
+import { sum, debounce } from 'lodash';
 
 function defaultColumnWidth(type) {
   switch (type) {
@@ -105,13 +105,18 @@ export default {
       type: String,
       default: 'Add row',
     },
+    // skip rendering the cells that aren't visible on the screen
+    dontRenderOffScreenCells: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       isLeftFloating: false,
       isRightFloating: false,
       isHeaderFloating: false,
-      cellVisibility: [],
+      cellVisibilityMask: [],
     };
   },
   computed: {
@@ -137,10 +142,10 @@ export default {
       });
     },
     minRowWidth() {
-      return this.colMinWidths.reduce((sum, width) => sum + width, 0) + this.rowActionsWidth;
+      return sum(this.colMinWidths) + (this.isMobile ? 0 : this.rowActionsWidth);
     },
     fixColsWidth() {
-      return this.colMinWidths.slice(0, this.fixedColumns).reduce((sum, width) => sum + width, 0);
+      return sum(this.colMinWidths.slice(0, this.fixedColumns));
     },
     fixColMask() {
       return this.headers.map((_, colIdx) => !this.isMobile && this.fixedColumns > colIdx);
@@ -169,6 +174,7 @@ export default {
               el.style.left = `${-body.scrollLeft}px`;
             }
           });
+          this.updateCellVisibility();
           this.rafIdScrollX = null;
         });
       }
@@ -178,21 +184,33 @@ export default {
         this.rafIdScrollY = window.requestAnimationFrame(() => {
           const { top } = this.$el.getBoundingClientRect();
           this.isHeaderFloating = top < 0;
-          // this.updateCellVisibility();
+          this.updateCellVisibility();
           this.rafIdScrollY = null;
         });
       }
     },
+    shouldRenderCell(rowIdx, colIdx) {
+      return (
+        !this.dontRenderOffScreenCells || !this.cellVisibilityMask[rowIdx] || this.cellVisibilityMask[rowIdx][colIdx]
+      );
+    },
     // create a 2d boolean matrix where true marks the cells visible on the scren
-    updateCellVisibility() {
-      const full = this.$el.getBoundingClientRect();
+    updateCellVisibility: debounce(function() {
+      if (!this.dontRenderOffScreenCells) {
+        return;
+      }
+      const { width, top } = this.$el.getBoundingClientRect();
+      const { scrollLeft } = this.$refs.body;
       const cols = this.headers.length;
       const rows = this.rows.length;
 
+      const bufferColsPx = 300;
+      const bufferRows = 3;
+
       let onScreenRow;
-      if (this.minRowWidth > full.width) {
-        const xStartPx = this.scrollLeft + this.fixColsWidth;
-        const xEndPx = this.scrollLeft + full.width - this.rowActionsWidth;
+      if (this.minRowWidth > width) {
+        const xStartPx = scrollLeft + this.fixColsWidth - bufferColsPx;
+        const xEndPx = scrollLeft + width - this.rowActionsWidth + bufferColsPx;
         onScreenRow = [];
         let xAt = 0;
         this.colMinWidths.forEach((width, colIdx) => {
@@ -205,20 +223,20 @@ export default {
       }
       const offScreenRow = new Array(cols).fill(false);
 
-      const cellVisibility = [];
-      const yStart = Math.max(0, Math.floor(-full.top / this.rowHeight));
-      const yEnd = Math.min(rows, Math.ceil((window.innerHeight - full.top) / this.rowHeight));
+      const cellVisibilityMask = [];
+      const yStart = Math.max(0, Math.floor(-top / this.rowHeight) - bufferRows);
+      const yEnd = Math.min(rows, Math.ceil((window.innerHeight - top) / this.rowHeight) + bufferRows);
       for (let i = 0; i < yStart; ++i) {
-        cellVisibility.push(offScreenRow);
+        cellVisibilityMask.push(offScreenRow);
       }
       for (let i = 0; i < yEnd - yStart; ++i) {
-        cellVisibility.push(onScreenRow);
+        cellVisibilityMask.push(onScreenRow);
       }
       for (let i = 0; i < rows - yEnd; ++i) {
-        cellVisibility.push(offScreenRow);
+        cellVisibilityMask.push(offScreenRow);
       }
-      this.cellVisibility = cellVisibility;
-    },
+      this.cellVisibilityMask = cellVisibilityMask;
+    }, 300),
   },
   mounted() {
     this.onScrollX();
@@ -295,6 +313,7 @@ export default {
 }
 
 .mt-body .mt-row {
+  height: var(--mt-row-height);
   min-width: var(--mt-min-row-width);
 }
 
