@@ -115,7 +115,6 @@
       v-if="false"
       :headers="headers"
       header
-      height="300"
       disable-pagination
       hide-default-footer
       hide-default-header
