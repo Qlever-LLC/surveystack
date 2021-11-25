@@ -167,7 +167,7 @@
       </pane>
       <pane class="pane pane-draft">
         <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
-        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px);">
+        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px); overflow: auto;">
           <app-draft-component
             @submit="(payload) => $emit('submit', payload)"
             v-if="survey && instance"
