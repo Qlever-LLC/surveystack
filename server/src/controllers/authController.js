@@ -2,12 +2,14 @@ import assert from 'assert';
 import bcrypt from 'bcrypt';
 import uuidv4 from 'uuid/v4';
 import isEmail from 'isemail';
+import crypto from 'crypto';
+import { encodeURI as b64EncodeURI } from 'js-base64';
 
 import boom from '@hapi/boom';
 
 import mailService from '../services/mail.service';
 import rolesService from '../services/roles.service';
-import { db } from '../db';
+import { db, COLL_ACCESS_CODES } from '../db';
 
 const col = 'users';
 
@@ -17,6 +19,17 @@ const createPayload = async (user) => {
   user.roles = roles;
   return user;
 };
+
+const createUserDoc = (overrides) => ({
+  email: '',
+  name: '',
+  token: null,
+  password: null,
+  permissions: [],
+  authProviders: [],
+  memberships: [],
+  ...overrides,
+});
 
 const register = async (req, res) => {
   // TODO: sanity check
@@ -28,15 +41,12 @@ const register = async (req, res) => {
 
   const hash = bcrypt.hashSync(password, parseInt(process.env.BCRYPT_ROUNDS));
   const token = uuidv4();
-  const user = {
+  const user = createUserDoc({
     email,
     name,
     token,
     password: hash,
-    permissions: [],
-    authProviders: [],
-    memberships: [],
-  };
+  });
 
   try {
     let r = await db.collection(col).insertOne(user);
@@ -137,9 +147,72 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const requestMagicLink = async (req, res) => {
+  const { email, expiresAfterDays = 1, returnUrl = null } = req.body;
+
+  if (!isEmail.validate(email)) {
+    throw boom.badRequest(`Invalid email address: ${email}`);
+  }
+
+  const { origin } = req.headers;
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + expiresAfterDays);
+  const code = crypto.randomBytes(32).toString('hex');
+
+  await db.collection(COLL_ACCESS_CODES).insertOne({
+    code,
+    expiresAt,
+    email,
+  });
+
+  const magicLink = `${origin}/api/auth/enter-with-magic-link?code=${code}&returnUrl=${encodeURIComponent(
+    returnUrl
+  )}`;
+
+  // TODO send email
+  console.log('MAGIC', magicLink); //TODO remove
+
+  res.send({ ok: true });
+};
+
+const enterWithMagicLink = async (req, res) => {
+  const { code, returnUrl } = req.query;
+  const { value: accessCode } = await db.collection(COLL_ACCESS_CODES).findOneAndDelete({ code });
+
+  if (!accessCode) {
+    throw boom.notAcceptable('Magic link is expired. Please request a new one!');
+  }
+
+  const { email } = accessCode;
+
+  // Insert the user if it isn't registered yet
+  await db.collection(col).updateOne(
+    { email },
+    {
+      $setOnInsert: createUserDoc({
+        email,
+        name: email.split('@')[0], // use the first part of the email as the default name
+        token: uuidv4(),
+      }),
+    },
+    { upsert: true }
+  );
+
+  const user = await db.collection(col).findOne({ email });
+
+  let userPayload = await createPayload(user);
+  userPayload = JSON.stringify(userPayload);
+  userPayload = b64EncodeURI(userPayload);
+  res.redirect(
+    `/auth/accept-magic-link?user=${userPayload}&returnUrl=${encodeURIComponent(returnUrl)}`
+  );
+};
+
 export default {
   register,
   login,
   resetPassword,
   sendPasswordResetMail,
+  requestMagicLink,
+  enterWithMagicLink,
 };

@@ -24,6 +24,7 @@
     "dbly-linked-list": "^0.3.4",
     "esm": "^3.2.25",
     "flat": "^5.0.0",
+    "js-base64": "^3.7.2",
     "lodash": "^4.17.15",
     "mapbox-gl": "^1.6.1",
     "markdown-it": "^11.0.0",
