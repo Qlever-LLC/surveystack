@@ -57,14 +57,7 @@ export const hasRole = async (userId, groupId, role) => {
   const groupEntity = await db.collection('groups').findOne({ _id: groupObjectId });
   const targetRole = `${role}@${groupEntity.path}`;
 
-  let ret = false;
-  roles.forEach((r) => {
-    if (targetRole.startsWith(r)) {
-      ret = true;
-    }
-  });
-
-  return ret;
+  return roles.some((role) => targetRole.startsWith(role));
 };
 
 export const hasAdminRole = (userId, groupId) => hasRole(userId, groupId, 'admin');
