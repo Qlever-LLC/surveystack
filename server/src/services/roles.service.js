@@ -67,23 +67,8 @@ export const hasRole = async (user, group, role) => {
   return ret;
 };
 
-export const hasAdminRole = async (user, group) => {
-  if (!group) {
-    return false;
-  }
-  
-  const ret = await hasRole(user, group, 'admin');
-  if (ret) {
-    return true;
-  }
-
-  return false;
-};
-
-export const hasUserRole = async (user, group) => {
-  const ret = await hasRole(user, group, 'user');
-  return ret;
-};
+export const hasAdminRole = (user, group) => hasRole(user, group, 'admin');
+export const hasUserRole = (user, group) => hasRole(user, group, 'user');
 
 export const getRoles = async (user) => {
   const roles = ['public'];
