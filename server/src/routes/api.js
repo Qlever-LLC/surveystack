@@ -54,6 +54,9 @@ router.post('/auth/register', catchErrors(authController.register));
 router.post('/auth/login', catchErrors(authController.login));
 router.post('/auth/send-password-reset-mail', catchErrors(authController.sendPasswordResetMail));
 router.post('/auth/reset-password', catchErrors(authController.resetPassword));
+router.post('/auth/request-magic-link', catchErrors(authController.requestMagicLink));
+router.get('/auth/enter-with-magic-link', catchErrors(authController.enterWithMagicLink));
+
 
 /** Group */
 router.get('/groups', catchErrors(groupController.getGroups));
