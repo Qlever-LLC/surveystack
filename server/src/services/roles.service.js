@@ -45,16 +45,16 @@ const getDescendantGroups = async (group) => {
   return descendants;
 };
 
-export const hasRole = async (user, group, role) => {
-  if (!user || !group || !role) {
+export const hasRole = async (userId, groupId, role) => {
+  if (!userId || !groupId || !role) {
     return false;
   }
 
-  const userId = typeof user === 'string' ? new ObjectId(user) : user;
-  const groupId = typeof group === 'string' ? new ObjectId(group) : group;
+  const userObjectId = typeof userId === 'string' ? new ObjectId(userId) : userId;
+  const groupObjectId = typeof groupId === 'string' ? new ObjectId(groupId) : groupId;
 
-  const roles = await getRoles(userId);
-  const groupEntity = await db.collection('groups').findOne({ _id: groupId });
+  const roles = await getRoles(userObjectId);
+  const groupEntity = await db.collection('groups').findOne({ _id: groupObjectId });
   const targetRole = `${role}@${groupEntity.path}`;
 
   let ret = false;
@@ -67,8 +67,8 @@ export const hasRole = async (user, group, role) => {
   return ret;
 };
 
-export const hasAdminRole = (user, group) => hasRole(user, group, 'admin');
-export const hasUserRole = (user, group) => hasRole(user, group, 'user');
+export const hasAdminRole = (userId, groupId) => hasRole(userId, groupId, 'admin');
+export const hasUserRole = (userId, groupId) => hasRole(userId, groupId, 'user');
 
 export const getRoles = async (user) => {
   const roles = ['public'];
