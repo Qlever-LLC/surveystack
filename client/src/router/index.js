@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import { decode as b64Decode } from 'js-base64';
 import Home from '@/pages/Home.vue';
 import Test from '@/pages/Test.vue';
 import Unauthorized from '@/pages/Unauthorized.vue';
@@ -164,6 +165,18 @@ const routes = [
     path: '/auth/reset-password',
     name: 'auth-reset-password',
     component: ResetPassword,
+  },
+  {
+    path: '/auth/accept-magic-link',
+    name: 'accept-magic-link',
+    redirect: async (to) => {
+      let { user, returnUrl = '/' } = to.query;
+      // TODO handle when decoding fails
+      user = JSON.parse(b64Decode(user));
+      returnUrl = decodeURIComponent(returnUrl);
+      await store.dispatch('auth/loginWithUserObject', user);
+      return '/';
+    },
   },
   // experiment
   {
