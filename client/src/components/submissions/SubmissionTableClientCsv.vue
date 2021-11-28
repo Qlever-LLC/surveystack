@@ -19,6 +19,7 @@
       :sort-by="dataTableProps.sortBy"
       :sort-desc="dataTableProps.sortDesc"
       :loading="loading"
+      hide-default-header
     >
       <template v-slot:top>
         <v-toolbar flat>
@@ -37,20 +38,14 @@
           <td
             v-for="header in headers"
             :key="header.text"
-            class="truncate"
-            @click="showDetails(props.item[header.value], header)"
+            :class="truncate(props.item[header.value]) ? 'truncate' : ''"
+            :data-value="props.item[header.value]"
           >
-            {{ truncateMethod(props.item[header.value], textTruncateLength, '...') }}
+            {{ props.item[header.value] }}
           </td>
         </tr>
       </template>
     </v-data-table>
-
-    <div class="text-center">
-      <v-snackbar :timeout="-1" v-model="snackbar" color="white" elevation="24" absolute top>
-        <span class="black--text">{{ fullText }}</span>
-      </v-snackbar>
-    </div>
   </v-card>
 </template>
 
@@ -101,9 +96,7 @@ export default {
   },
   data() {
     return {
-      snackbar: false,
       showDialog: false,
-      fullText: '',
       textTruncateLength: 36,
       excludeMeta: true,
       csv: null,
@@ -155,6 +148,9 @@ export default {
         this.toggleSnackBar();
         this.fullText = value;
       }
+    },
+    truncate(value) {
+      return value.length > this.textTruncateLength;
     },
     toggleSnackBar() {
       this.snackbar = !this.snackbar;
@@ -223,32 +219,80 @@ export default {
 
 .v-data-table >>> td {
   white-space: nowrap;
-  /* max-width: 1px;
-  overflow: hidden;
-  text-overflow: ellipsis; */
-}
-
-.v-data-table-truncated >>> td {
-  white-space: nowrap;
-  max-width: 250px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-td.untruncated {
-  white-space: normal;
-  max-width: 250px;
-  overflow: visible;
-  text-overflow: unset;
 }
 
 .v-data-table >>> .custom-header-class span {
   display: inline-block;
   max-width: 190px;
 }
+.v-data-table {
+  position: relative;
+}
+
+/*
 .truncate {
   cursor: pointer;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
+.truncate:hover::after{
+  content: attr(data-value);
+  background-color: white;
+  padding:1rem;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+  position: absolute;
+  z-index: 20;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 60%;
+  height: 200px;
+  white-space: initial;
+}
+*/
+
+.truncate {
+  cursor: pointer;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.truncate::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+.truncate::after {
+  content: attr(data-value);
+  position: absolute;
+  left: 0;
+  top: -2.5rem;
+  font-size: 0.85rem;
+  background: white;
+  border-radius: 5px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  padding: 1rem 1.5rem 1rem 1.5rem;
+}
+.truncate:hover::before,
+.truncate:hover::after {
+  opacity: 1;
+  box-shadow: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
+  position: absolute;
+  z-index: 20;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  white-space: initial;
+  font-family: system-ui, -apple-system;
+  line-height: 25px;
+}
+
 .custom-checkbox {
   margin-left: 1rem;
 }
