@@ -58,14 +58,6 @@ export function transformHeaders(headers) {
   return Array.isArray(headers) ? [...new Set(headers.map(replaceGeoJsonPath))] : headers;
 }
 
-export function truncate(text, length, clamp) {
-  if (text !== undefined) {
-    clamp = clamp || '...';
-    return text.length > length ? text.slice(0, length) + clamp : text;
-  }
-  return text;
-}
-
 export default {
   props: {
     submissions: {
