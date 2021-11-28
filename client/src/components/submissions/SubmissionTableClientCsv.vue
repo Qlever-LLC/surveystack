@@ -19,7 +19,6 @@
       :sort-by="dataTableProps.sortBy"
       :sort-desc="dataTableProps.sortDesc"
       :loading="loading"
-      hide-default-header
     >
       <template v-slot:top>
         <v-toolbar flat>
@@ -33,7 +32,7 @@
         </v-toolbar>
       </template>
       <template slot="item" slot-scope="props">
-        <tr v-for="id in items" :key="id.text">
+        <tr>
           <v-checkbox color="#777" multiple v-model="tableSelected" :value="id" class="custom-checkbox" />
           <td
             v-for="header in headers"
@@ -140,22 +139,9 @@ export default {
     },
   },
   methods: {
-    truncateMethod(text, length, clamp) {
-      return truncate(text, length, clamp);
-    },
-    showDetails(value, { text }) {
-      if (value.length > this.textTruncateLength) {
-        this.toggleSnackBar();
-        this.fullText = value;
-      }
-    },
     truncate(value) {
       return value.length > this.textTruncateLength;
     },
-    toggleSnackBar() {
-      this.snackbar = !this.snackbar;
-    },
-
     onRowSelected({ value, item }) {
       console.log({ value });
     },
@@ -228,31 +214,6 @@ export default {
 .v-data-table {
   position: relative;
 }
-
-/*
-.truncate {
-  cursor: pointer;
-  max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.truncate:hover::after{
-  content: attr(data-value);
-  background-color: white;
-  padding:1rem;
-  border-radius: 5px;
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-  position: absolute;
-  z-index: 20;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  max-width: 60%;
-  height: 200px;
-  white-space: initial;
-}
-*/
 
 .truncate {
   cursor: pointer;
