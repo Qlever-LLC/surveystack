@@ -6,18 +6,11 @@
       <v-alert class="mt-4" outlined v-if="membership" type="info"
         >This code allows you to join <strong>{{ membership.group.name }}</strong
         >!
-        <div v-if="!$store.getters['auth/isLoggedIn']">
-          Please proceed to <strong>login</strong> or <strong>create</strong> an account.
-        </div>
       </v-alert>
 
-      <div v-if="$store.getters['auth/isLoggedIn']" class="d-flex justify-end">
+      <div class="d-flex justify-end">
         <v-btn text @click="cancel">Cancel</v-btn>
         <v-btn color="primary" @click="join">Join {{ membership.group.name }}</v-btn>
-      </div>
-      <div v-else class="d-flex justify-end">
-        <v-btn text :to="{ name: 'auth-login', query: { invitation: code } }">Login</v-btn>
-        <v-btn color="primary" :to="{ name: 'auth-register', query: { invitation: code } }">Create account</v-btn>
       </div>
     </div>
     <div v-else>
@@ -71,7 +64,12 @@ export default {
 
       try {
         // TODO: display status/errors
-        await api.post('/memberships/activate', { code: this.code });
+        const { data } = await api.post('/memberships/activate', { code: this.code });
+        // Log in with the user linked to the membership
+        // The endpoint returns a login payload when the user is not logged in, or logged in with a different user
+        if (data.token) {
+          await this.$store.dispatch('auth/loginWithUserObject', data);
+        }
       } catch (error) {
         console.log(error.response.data.message);
       }

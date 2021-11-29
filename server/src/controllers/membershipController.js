@@ -9,6 +9,7 @@ import { queryParam } from '../helpers';
 import mailService from '../services/mail.service';
 import membershipService from '../services/membership.service';
 import rolesService from '../services/roles.service';
+import { createLoginPayload, createUserIfNotExist } from '../services/auth.service';
 
 const col = 'memberships';
 
@@ -174,7 +175,7 @@ const getMemberships = async (req, res) => {
 
       if (
         member.user &&
-          otherMembers.find((m) => m.user && `${m.user._id}` === `${member.user._id}`)
+        otherMembers.find((m) => m.user && `${m.user._id}` === `${member.user._id}`)
       ) {
         continue;
       }
@@ -451,16 +452,33 @@ const deleteMembership = async (req, res) => {
 
 const activateMembership = async (req, res) => {
   const { code } = req.body;
-  const user = res.locals.auth.user._id;
+  let user;
+  let loginPayload = null;
 
+  // TODO handle when authenticated with a different user
+  if (res.locals.auth.isAuthenticated) {
+    user = res.locals.auth.user._id;
+  } else {
+    const membership = await db.collection(col).findOne({ 'meta.invitationCode': code });
+    const userObject = await createUserIfNotExist(
+      membership.meta.invitationEmail,
+      membership.meta.invitationName
+    );
+    loginPayload = await createLoginPayload(userObject);
+    user = userObject._id;
+  }
   await membershipService.activateMembership({ code, user });
 
-  return res.send('OK');
+  if (loginPayload) {
+    res.send(loginPayload);
+  } else {
+    res.send({ message: 'ok' });
+  }
 };
 
 export default {
   getMemberships,
-  getMembership,
+  getMembership,  
   createMembership,
   updateMembership,
   deleteMembership,
