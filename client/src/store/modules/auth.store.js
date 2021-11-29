@@ -50,7 +50,7 @@ const actions = {
     const resp = await api.post(auth.url, auth.user);
     return dispatch('loginWithUserObject', resp.data);
   },
-  async loginWithUserObject({ commit }, user) {
+  loginWithUserObject({ commit }, user) {
     try {
       const { email, token } = user;
       const header = createAuthHeader(email, token);

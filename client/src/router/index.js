@@ -169,13 +169,14 @@ const routes = [
   {
     path: '/auth/accept-magic-link',
     name: 'accept-magic-link',
-    redirect: async (to) => {
+    redirect: (to) => {
       let { user, returnUrl = '/' } = to.query;
       // TODO handle when decoding fails
       user = JSON.parse(b64Decode(user));
       returnUrl = decodeURIComponent(returnUrl);
-      await store.dispatch('auth/loginWithUserObject', user);
-      return '/';
+      store.dispatch('auth/loginWithUserObject', user);
+      // TODO use react router
+      window.location.replace(`${location.origin}${returnUrl}`);
     },
   },
   // experiment

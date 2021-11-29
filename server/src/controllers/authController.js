@@ -2,7 +2,6 @@ import assert from 'assert';
 import bcrypt from 'bcrypt';
 import uuidv4 from 'uuid/v4';
 import isEmail from 'isemail';
-import crypto from 'crypto';
 import { encodeURI as b64EncodeURI } from 'js-base64';
 
 import boom from '@hapi/boom';
@@ -10,7 +9,7 @@ import boom from '@hapi/boom';
 import mailService from '../services/mail.service';
 import { createUserDoc, createUserIfNotExist } from '../services/auth.service';
 import { db, COLL_ACCESS_CODES } from '../db';
-import { createLoginPayload } from '../services/auth.service';
+import { createLoginPayload, createMagicLink } from '../services/auth.service';
 
 const col = 'users';
 
@@ -138,22 +137,19 @@ const requestMagicLink = async (req, res) => {
   }
 
   const { origin } = req.headers;
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + expiresAfterDays);
-  const code = crypto.randomBytes(32).toString('hex');
+  const magicLink = await createMagicLink({origin, email, expiresAfterDays, returnUrl})
 
-  await db.collection(COLL_ACCESS_CODES).insertOne({
-    code,
-    expiresAt,
-    email,
+  // TODO update copy
+  await mailService.send({
+    to: membership.meta.invitationEmail,
+    subject: `Surveystack invitation to group ${group.name}`,
+    text: `Hello
+
+Continue to log into SurveyStack with this link:
+${magicLink}
+
+Best Regards`,
   });
-
-  const magicLink = `${origin}/api/auth/enter-with-magic-link?code=${code}&returnUrl=${encodeURIComponent(
-    returnUrl
-  )}`;
-
-  // TODO send email
-  console.log('MAGIC', magicLink); //TODO remove
 
   res.send({ ok: true });
 };
@@ -173,8 +169,8 @@ const enterWithMagicLink = async (req, res) => {
   let loginPayload = await createLoginPayload(userObject);
   loginPayload = JSON.stringify(loginPayload);
   loginPayload = b64EncodeURI(loginPayload);
-  returnUrl = encodeURIComponent(returnUrl);
-  const loginUrl = `/auth/accept-magic-link?user=${loginPayload}&returnUrl=${returnUrl}`;
+  const escapedReturnUrl = encodeURIComponent(returnUrl);
+  const loginUrl = `/auth/accept-magic-link?user=${loginPayload}&returnUrl=${escapedReturnUrl}`;
 
   res.redirect(loginUrl);
 };

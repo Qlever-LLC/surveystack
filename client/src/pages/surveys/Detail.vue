@@ -47,6 +47,7 @@
 
 <script>
 import api from '@/services/api.service';
+import { autoSelectActiveGroup } from '@/utils/memberships';
 
 export default {
   data() {
@@ -149,6 +150,13 @@ export default {
   },
   async created() {
     const { id } = this.$route.params;
+    const { group } = this.$route.query;
+
+    if (group) {
+      this.$store.dispatch('surveys/fetchPinned'); // TODO do we need fetchPinned?
+      await autoSelectActiveGroup(this.$store, group);
+    }
+
     const { data: entity } = await api.get(`/surveys/${id}`);
     this.entity = entity;
 
