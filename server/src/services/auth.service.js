@@ -1,7 +1,8 @@
 import uuidv4 from 'uuid/v4';
 import { startCase } from 'lodash';
-import { db } from '../db';
+import { db, COLL_ACCESS_CODES } from '../db';
 import rolesService from '../services/roles.service';
+import crypto from 'crypto';
 
 const col = 'users';
 
@@ -34,6 +35,28 @@ export const createUserIfNotExist = async (email, name = null) => {
     { upsert: true }
   );
   return await db.collection(col).findOne({ email });
+};
+
+export const createMagicLink = async ({ origin, email, expiresAfterDays = 7, returnUrl = null }) => {
+  if (!origin) {
+    throw new Error('createMagicLink: "origin" parameter is required');
+  }
+  if (!email) {
+    throw new Error('createMagicLink: "email" parameter is required');
+  }
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + expiresAfterDays);
+  const code = crypto.randomBytes(32).toString('hex');
+
+  await db.collection(COLL_ACCESS_CODES).insertOne({
+    code,
+    expiresAt,
+    email,
+  });
+
+  return `${origin}/api/auth/enter-with-magic-link?code=${code}&returnUrl=${encodeURIComponent(
+    returnUrl
+  )}`;
 };
 
 export const createLoginPayload = async (userObject) => {

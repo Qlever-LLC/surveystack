@@ -1,17 +1,16 @@
 import { ObjectId } from 'mongodb';
-import boom from '@hapi/boom';
 
 /* Call for Submissions (CFS) */
 
 import mailService from '../services/mail.service';
-import rolesService from '../services/roles.service';
 import { db } from '../db';
+import { createMagicLink } from '../services/auth.service';
 
-const createText = (text, { origin, survey, group, token, email }) => {
-  return text.replace(
-    /%CFS_MAGIC_LINK%/g,
-    `${origin}/auth/login?cfs=${survey}&group=${group}&token=${token}&email=${email}`
-  );
+const createText = async (text, { origin, survey, group, email }) => {
+  const returnUrl = `/surveys/${survey}?group=${group}`;
+  const magicLink = await createMagicLink({ origin, email, expiresAfterDays: 14, returnUrl });
+
+  return text.replace(/%CFS_MAGIC_LINK%/g, magicLink);
 };
 
 const send = async (req, res) => {
@@ -24,14 +23,14 @@ const send = async (req, res) => {
       { $match: { _id: { $in: members.map((member) => new ObjectId(member)) } } },
       { $lookup: { from: 'users', localField: 'user', foreignField: '_id', as: 'user' } },
       { $unwind: '$user' },
-      { $project: { 'user.email': 1, 'user.token': 1 } },
+      { $project: { 'user.email': 1 } },
     ])
     .toArray();
 
   //const promises = [];
   for (const membership of memberships) {
-    const { email, token } = membership.user;
-    const text = createText(body, { origin, survey, group, token, email });
+    const { email } = membership.user;
+    const text = await createText(body, { origin, survey, group, email });
 
     // TODO: find a better way to send bulk emails
     await mailService.send({
@@ -42,8 +41,8 @@ const send = async (req, res) => {
   }
 
   if (copy) {
-    const { email, token } = res.locals.auth.user;
-    const text = createText(body, { origin, survey, group, token, email });
+    const { email } = res.locals.auth.user;
+    const text = await createText(body, { origin, survey, group, email });
 
     await mailService.send({
       to: email,
