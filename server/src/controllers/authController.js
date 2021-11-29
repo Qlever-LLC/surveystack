@@ -8,28 +8,11 @@ import { encodeURI as b64EncodeURI } from 'js-base64';
 import boom from '@hapi/boom';
 
 import mailService from '../services/mail.service';
-import rolesService from '../services/roles.service';
+import { createUserDoc, createUserIfNotExist } from '../services/auth.service';
 import { db, COLL_ACCESS_CODES } from '../db';
+import { createLoginPayload } from '../services/auth.service';
 
 const col = 'users';
-
-const createPayload = async (user) => {
-  delete user.password;
-  const roles = await rolesService.getRoles(user._id);
-  user.roles = roles;
-  return user;
-};
-
-const createUserDoc = (overrides) => ({
-  email: '',
-  name: '',
-  token: null,
-  password: null,
-  permissions: [],
-  authProviders: [],
-  memberships: [],
-  ...overrides,
-});
 
 const register = async (req, res) => {
   // TODO: sanity check
@@ -51,7 +34,7 @@ const register = async (req, res) => {
   try {
     let r = await db.collection(col).insertOne(user);
     assert.equal(1, r.insertedCount);
-    const payload = await createPayload(r.ops[0]);
+    const payload = await createLoginPayload(r.ops[0]);
     return res.send(payload);
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
@@ -70,7 +53,7 @@ const login = async (req, res) => {
     if (!existingUser) {
       throw boom.notFound(`No user found with matching email and token: [${email}, ${token}]`);
     }
-    const payload = await createPayload(existingUser);
+    const payload = await createLoginPayload(existingUser);
     return res.send(payload);
   }
 
@@ -89,7 +72,7 @@ const login = async (req, res) => {
     throw boom.unauthorized(`Incorrect password for user: ${email}`);
   }
 
-  const payload = await createPayload(existingUser);
+  const payload = await createLoginPayload(existingUser);
   return res.send(payload);
 };
 
@@ -185,27 +168,15 @@ const enterWithMagicLink = async (req, res) => {
 
   const { email } = accessCode;
 
-  // Insert the user if it isn't registered yet
-  await db.collection(col).updateOne(
-    { email },
-    {
-      $setOnInsert: createUserDoc({
-        email,
-        name: email.split('@')[0], // use the first part of the email as the default name
-        token: uuidv4(),
-      }),
-    },
-    { upsert: true }
-  );
+  let userObject = await createUserIfNotExist(email);
 
-  const user = await db.collection(col).findOne({ email });
+  let loginPayload = await createLoginPayload(userObject);
+  loginPayload = JSON.stringify(loginPayload);
+  loginPayload = b64EncodeURI(loginPayload);
+  returnUrl = encodeURIComponent(returnUrl);
+  const loginUrl = `/auth/accept-magic-link?user=${loginPayload}&returnUrl=${returnUrl}`;
 
-  let userPayload = await createPayload(user);
-  userPayload = JSON.stringify(userPayload);
-  userPayload = b64EncodeURI(userPayload);
-  res.redirect(
-    `/auth/accept-magic-link?user=${userPayload}&returnUrl=${encodeURIComponent(returnUrl)}`
-  );
+  res.redirect(loginUrl);
 };
 
 export default {
