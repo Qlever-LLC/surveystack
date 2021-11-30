@@ -455,11 +455,14 @@ const activateMembership = async (req, res) => {
   let user;
   let loginPayload = null;
 
-  // TODO handle when authenticated with a different user
-  if (res.locals.auth.isAuthenticated) {
+  const membership = await db.collection(col).findOne({ 'meta.invitationCode': code });
+  // is authenticated with the user that owns the invitation
+  if (
+    res.locals.auth.isAuthenticated &&
+    res.locals.auth.user.email === membership.meta.invitationEmail
+  ) {
     user = res.locals.auth.user._id;
   } else {
-    const membership = await db.collection(col).findOne({ 'meta.invitationCode': code });
     const userObject = await createUserIfNotExist(
       membership.meta.invitationEmail,
       membership.meta.invitationName
