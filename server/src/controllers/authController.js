@@ -158,8 +158,16 @@ const enterWithMagicLink = async (req, res) => {
   const { code, returnUrl } = req.query;
   const { value: accessCode } = await db.collection(COLL_ACCESS_CODES).findOneAndDelete({ code });
 
+  const withReturnUrl = (url) => {
+    if (returnUrl) {
+      return url + `&returnUrl=${encodeURIComponent(returnUrl)}`;
+    }
+    return url;
+  };
+
   if (!accessCode) {
-    throw boom.notAcceptable('Magic link is expired. Please request a new one!');
+    res.redirect(withReturnUrl('/auth/login?magicLinkExpired'));
+    return;
   }
 
   const { email } = accessCode;
@@ -169,10 +177,7 @@ const enterWithMagicLink = async (req, res) => {
   let loginPayload = await createLoginPayload(userObject);
   loginPayload = JSON.stringify(loginPayload);
   loginPayload = b64EncodeURI(loginPayload);
-  let loginUrl = `/auth/accept-magic-link?user=${loginPayload}`;
-  if (returnUrl) {
-    loginUrl += `&returnUrl=${encodeURIComponent(returnUrl)}`
-  }
+  let loginUrl = withReturnUrl(`/auth/accept-magic-link?user=${loginPayload}`);
 
   res.redirect(loginUrl);
 };

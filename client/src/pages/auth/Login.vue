@@ -12,10 +12,14 @@
         <v-img v-else :src="require('../../assets/surveystack_temp_logo.svg')" class="my-3 mx-2" contain height="128" />
       </div>
       <v-card class="pa-5 login-card">
+        <v-alert v-if="!usePassword && 'magicLinkExpired' in $route.query" dense type="error">
+          Your magic link is expired. Please request a new one!
+        </v-alert>
         <h1 class="heading--text text-center" v-if="isWhitelabel && registrationEnabled">
           Login &amp; Join {{ whitelabelPartner.name }}
         </h1>
         <h1 class="heading--text" v-else>Login</h1>
+
         <v-form>
           <v-text-field
             label="E-Mail"
@@ -216,7 +220,7 @@ export default {
       }
 
       if (!this.usePassword) {
-        const returnUrl = this.$route.params.redirect;
+        const returnUrl = this.$route.params.redirect || this.$route.query.returnUrl;
         await this.$store.dispatch('auth/sendMagicLink', { email: this.entity.email, returnUrl });
         this.signInLinkSent = true;
         return;
