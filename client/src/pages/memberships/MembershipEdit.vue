@@ -23,6 +23,14 @@
           :disabled="entity.meta.status === 'active'"
         />
 
+        <v-text-field
+          v-if="entity.meta.status === 'pending'"
+          class="mt-3"
+          v-model="entity.meta.invitationName"
+          label="Invitation Name"
+          hint="Default name for newly registered users"
+        />
+
         <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role"></v-select>
 
         <div class="d-flex mt-2">
