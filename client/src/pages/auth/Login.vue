@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <v-container class="maxw-40 px-0" :class="{ 'pt-2': showHero }">
+    <v-container v-if="!signInLinkSent" class="maxw-40 px-0" :class="{ 'pt-2': showHero }">
       <div v-if="showHero">
         <v-img
           v-if="isWhitelabel"
@@ -26,6 +26,7 @@
             color="focus"
           />
           <v-text-field
+            v-if="usePassword"
             label="Password"
             :type="passwordInputType"
             class="form-control"
@@ -34,7 +35,7 @@
             @click:append="showPasswords = !showPasswords"
             color="focus"
           />
-          <small>
+          <small v-if="usePassword">
             <router-link
               :to="{
                 name: 'auth-forgot-password',
@@ -45,13 +46,16 @@
           </small>
           <div class="d-flex justify-end">
             <v-btn type="button" class="mr-2" text @click="reset">Reset</v-btn>
-            <v-btn type="submit" @click.prevent="submit" color="primary">Login</v-btn>
+            <v-btn type="submit" @click.prevent="handleSubmitClick" color="primary" :loading="isSubmitting">{{
+              usePassword ? 'Login' : 'Email me sign in link'
+            }}</v-btn>
           </div>
         </v-form>
 
         <div class="text-center text-muted mt-5" v-if="registrationEnabled || hasInvitation">
-          Don't have an account?
-          <router-link :to="registerLink">Register now</router-link>
+          <v-btn text small color="primary" @click="usePassword = !usePassword">
+            {{ usePassword ? 'sign in with email instead' : 'sign in with password instead' }}
+          </v-btn>
         </div>
       </v-card>
 
@@ -62,6 +66,25 @@
       <transition name="fade">
         <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{ status }}</app-feedback>
       </transition>
+    </v-container>
+
+    <!-- TODO move this into another component -->
+    <v-container v-else class="maxw-40 px-0" :class="{ 'pt-2': showHero }">
+      <v-card class="pa-5 login-card">
+        <h1 class="heading--text text-center" v-if="isWhitelabel && registrationEnabled">
+          Login &amp; Join {{ whitelabelPartner.name }}
+        </h1>
+        <h1 class="heading--text" v-else>Magic link sent!</h1>
+        <p class="body-1 my-6">
+          Follow the link we sent you at <span class="font-weight-medium">{{ entity.email }}</span> to finish logging
+          in!
+        </p>
+        <div class="text-center text-muted mt-5">
+          <v-btn text small @click="signInLinkSent = false">
+            Back to login
+          </v-btn>
+        </div>
+      </v-card>
     </v-container>
   </div>
 </template>
@@ -93,6 +116,9 @@ export default {
   data() {
     return {
       status: '',
+      usePassword: false,
+      signInLinkSent: false,
+      isSubmitting: false,
       showPasswords: false,
       entity: {
         ...DEFAULT_ENTITY,
@@ -139,6 +165,7 @@ export default {
       this.entity.email = this.initialEmail;
     }
 
+    // TODO remove invitation related code
     const { invitation } = this.$route.query;
     this.invitation = invitation;
     if (invitation) {
@@ -174,9 +201,23 @@ export default {
     }
   },
   methods: {
+    async handleSubmitClick() {
+      this.isSubmitting = true;
+      try {
+        await this.submit();
+      } finally {
+        this.isSubmitting = false;
+      }
+    },
     async submit() {
       if (this.entity.email === '') {
         this.status = 'E-Mail must not be empty.';
+        return;
+      }
+
+      if (!this.usePassword) {
+        await this.$store.dispatch('auth/sendMagicLink', { email: this.entity.email });
+        this.signInLinkSent = true;
         return;
       }
 

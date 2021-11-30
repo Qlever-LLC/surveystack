@@ -66,6 +66,9 @@ const actions = {
       throw err;
     }
   },
+  async sendMagicLink(_, { email }) {
+    await api.post('/auth/request-magic-link', { email });
+  },
   logout({ commit, dispatch }) {
     return new Promise((resolve) => {
       clearLocalData({ dispatch });
