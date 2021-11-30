@@ -29,6 +29,9 @@ export default {
   data() {
     return {
       status: '',
+      usePassword: false,
+      signInLinkSent: false,
+      isSubmitting: false,
       showPasswords: false,
       entity: {
         ...DEFAULT_ENTITY,
@@ -75,6 +78,7 @@ export default {
       this.entity.email = this.initialEmail;
     }
 
+    // TODO remove invitation related code
     const { invitation } = this.$route.query;
     this.invitation = invitation;
     if (invitation) {
