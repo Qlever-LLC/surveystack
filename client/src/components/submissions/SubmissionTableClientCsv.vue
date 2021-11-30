@@ -9,7 +9,6 @@
       :mobile-breakpoint="0"
       hide-default-footer
       v-model="tableSelected"
-      @item-selected="onRowSelected"
       disable-pagination
       :class="{ archived }"
       :server-items-length="submissions.pagination.total"
@@ -19,6 +18,8 @@
       :sort-by="dataTableProps.sortBy"
       :sort-desc="dataTableProps.sortDesc"
       :loading="loading"
+      hide-default-header
+      @click:row="rowClick"
     >
       <template v-slot:top>
         <v-toolbar flat>
@@ -31,9 +32,17 @@
           </v-row>
         </v-toolbar>
       </template>
+      <!--  -->
+      <template slot="header" :headers="headers">
+        <tr>
+          <v-checkbox color="#777" class="custom-checkbox" />
+          <th v-for="header in headers" v-bind:key="header.text">{{ header.text }}</th>
+        </tr>
+      </template>
+
       <template slot="item" slot-scope="props">
         <tr>
-          <v-checkbox color="#777" multiple v-model="tableSelected" :value="id" class="custom-checkbox" />
+          <v-checkbox color="#777" class="custom-checkbox" />
           <td
             v-for="header in headers"
             :key="header.text"
@@ -87,8 +96,10 @@ export default {
   },
   data() {
     return {
+      checkedNames: [],
       showDialog: false,
       textTruncateLength: 36,
+      selecteds: [],
       excludeMeta: true,
       csv: null,
       parsed: null,
@@ -102,9 +113,7 @@ export default {
   computed: {
     items() {
       if (this.parsed) {
-        return this.parsed.data.map((n) => {
-          return n;
-        });
+        return this.parsed.data;
       }
       return [];
     },
@@ -131,11 +140,15 @@ export default {
     },
   },
   methods: {
+    rowClick(value) {
+      console.log({ value });
+    },
+    handleClick(data) {
+      this.selecteds.push([...this.selecteds, data.item]);
+      this.$emit('update:selected', this.selecteds);
+    },
     truncate(value) {
       return value.length > this.textTruncateLength;
-    },
-    onRowSelected({ value, item }) {
-      console.log({ value });
     },
     createCustomFilter(field) {
       return (value, search, item) => {
@@ -248,5 +261,10 @@ export default {
 
 .custom-checkbox {
   margin-left: 1rem;
+}
+th {
+  font-size: 0.85rem;
+  text-align: left;
+  transform: translateX(17px);
 }
 </style>
