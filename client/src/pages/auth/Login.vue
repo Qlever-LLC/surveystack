@@ -216,7 +216,8 @@ export default {
       }
 
       if (!this.usePassword) {
-        await this.$store.dispatch('auth/sendMagicLink', { email: this.entity.email });
+        const returnUrl = this.$route.params.redirect;
+        await this.$store.dispatch('auth/sendMagicLink', { email: this.entity.email, returnUrl });
         this.signInLinkSent = true;
         return;
       }
