@@ -25,6 +25,7 @@
             class="flex-grow-1 flex-column align-center justify-center align-content-center"
             style="height: 100%"
           >
+            <!-- -->
             <v-card
               min-height="10vh"
               class="d-flex flex-column justify-space-between"
@@ -39,8 +40,10 @@
                           {{ surveyForSubmission(item).name }}
                         </v-list-item-title>
                         <v-list-item-title v-else> Loading name </v-list-item-title>
-                        <v-list-item-subtitle class="font-weight-light mb-2"> ID: {{ item._id }} </v-list-item-subtitle>
-                        <v-list-item-subtitle class="font-weight-light mb-2">
+                        <v-list-item-subtitle class="font-weight-regular mb-2">
+                          ID: {{ item._id }}
+                        </v-list-item-subtitle>
+                        <v-list-item-subtitle class="font-weight-regular mb-2">
                           {{ new Date(item.meta.dateCreated).toLocaleString() }}
                         </v-list-item-subtitle>
                       </v-card>
@@ -62,30 +65,31 @@
                     </v-list-item-action>
                   </v-list-item>
                 </template>
+
                 <v-spacer class="flex-grow-1" />
                 <v-card-actions>
                   <v-pagination v-model="page" :length="activeTabPaginationLength" color="grey darken-1" />
                 </v-card-actions>
               </template>
               <template v-else-if="tab.name === 'sent' && tab.content.length > 0">
-                <v-list>
-                  <template v-for="(item, i) in tab.content">
-                    <v-list-item :key="i">
-                      <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
-                        <v-list-item-title v-if="surveyForSubmission(item)">
+                <template v-for="(item, i) in tab.content">
+                  <v-list-item :key="i" style="padding: 0 0; width: 1210px">
+                    <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
+                      <v-card :elevation="3" class="py-3 px-4">
+                        <v-list-item-title class="text-h6 mb-2" v-if="surveyForSubmission(item)">
                           {{ surveyForSubmission(item).name }}
                         </v-list-item-title>
                         <v-list-item-title v-else> Loading name </v-list-item-title>
-                        <v-list-item-subtitle>
-                          ID: {{ item._id }} <br />
+                        <v-list-item-subtitle class="font-weight-regular mb-2">
+                          ID: {{ item._id }}
+                        </v-list-item-subtitle>
+                        <v-list-item-subtitle class="font-weight-regular mb-2">
                           {{ new Date(item.meta.dateCreated).toLocaleString() }}
                         </v-list-item-subtitle>
-                      </v-list-item-content>
-                    </v-list-item>
-                    <v-divider v-if="i + 1 < tab.content.length" :key="`divider_${i}`"></v-divider>
-                  </template>
-                </v-list>
-                <v-spacer />
+                      </v-card>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
                 <v-pagination
                   v-model="remotePage"
                   :length="sentTabPaginationLength"
