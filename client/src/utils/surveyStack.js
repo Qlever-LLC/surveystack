@@ -104,7 +104,7 @@ export function isAnswered(node, submission) {
     if (!value || (Array.isArray(value) && value.length === 0)) {
       return false;
     }
-    const requiredCols = node.model.options.source.content.filter((h) => h.required).map((h) => h.value);
+    const requiredCols = node.model.options.source.content.filter((h) => h.required && !h.hidden).map((h) => h.value);
     let answered = true;
     for (const row of value) {
       for (const requiredCol of requiredCols) {

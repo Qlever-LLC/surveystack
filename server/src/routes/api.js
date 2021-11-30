@@ -29,6 +29,7 @@ import {
   assertSubmissionRights,
   assertEntitiesExist,
   assertEntitiesRights,
+  assertHasIds,
   validateBulkReassignRequestBody,
 } from '../handlers/assertions';
 
@@ -80,7 +81,12 @@ router.get('/submissions/csv', catchErrors(submissionController.getSubmissionsCs
 router.post(
   '/submissions/:id/archive',
   [assertAuthenticated, assertEntityExists({ collection: 'submissions' }), assertEntityRights],
-  catchErrors(submissionController.archiveSubmission)
+  catchErrors(submissionController.archiveSubmissions)
+);
+router.post(
+  '/submissions/bulk-archive',
+  [assertHasIds, assertEntitiesExist({ collection: 'submissions' }), assertEntitiesRights],
+  catchErrors(submissionController.archiveSubmissions)
 );
 router.post(
   '/submissions/:id/reassign',
@@ -120,7 +126,12 @@ router.put(
 router.delete(
   '/submissions/:id',
   [assertAuthenticated, assertEntityExists({ collection: 'submissions' }), assertEntityRights],
-  catchErrors(submissionController.deleteSubmission)
+  catchErrors(submissionController.deleteSubmissions)
+);
+router.post(
+  '/submissions/bulk-delete',
+  [assertHasIds, assertEntitiesExist({ collection: 'submissions' }), assertEntitiesRights],
+  catchErrors(submissionController.deleteSubmissions)
 );
 
 /** Surveys */
@@ -134,6 +145,7 @@ router.get(
 );
 router.get('/surveys/page', catchErrors(surveyController.getSurveyPage));
 router.get('/surveys/:id', catchErrors(surveyController.getSurvey));
+router.get('/surveys/check-for-updates/:id', catchErrors(surveyController.checkForLibraryUpdates));
 router.post(
   '/surveys',
   [assertAuthenticated, assertNameNotEmpty],

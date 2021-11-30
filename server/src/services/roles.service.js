@@ -7,7 +7,6 @@ const isParent = (parent, child) => {
 };
 
 const getParentGroups = async (groupId) => {
-  //console.log("group id", groupId);
   const groups = await db
     .collection('groups')
     .find({ _id: new ObjectId(groupId) })
@@ -18,10 +17,8 @@ const getParentGroups = async (groupId) => {
   }
 
   const group = groups[0];
-  //console.log("result group", group);
 
   const parts = group.path.split('/');
-  //console.log("parts", parts);
   if (parts.length < 2) {
     return [];
   }
@@ -32,21 +29,15 @@ const getParentGroups = async (groupId) => {
 
   const root = `/${parts[1]}/`;
 
-  //console.log("root", root);
-
   const descendants = await db
     .collection('groups')
     .find({ path: { $regex: `^${root}` } })
     .toArray();
 
-  //console.log("descendants", descendants);
-
   return descendants.filter((d) => isParent(d.path, group.path));
 };
 
 const getDescendantGroups = async (group) => {
-  // console.log("group path", group, group.path);
-
   const descendants = await db
     .collection('groups')
     .find({ path: { $regex: `^${group.path}` } })
@@ -54,60 +45,23 @@ const getDescendantGroups = async (group) => {
   return descendants;
 };
 
-export const hasRole = async (user, group, role) => {
-  if (!user || !group || !role) {
+export const hasRole = async (userId, groupId, role) => {
+  if (!userId || !groupId || !role) {
     return false;
   }
 
-  const userId = typeof user === 'string' ? new ObjectId(user) : user;
-  const groupId = typeof group === 'string' ? new ObjectId(group) : group;
+  const userObjectId = typeof userId === 'string' ? new ObjectId(userId) : userId;
+  const groupObjectId = typeof groupId === 'string' ? new ObjectId(groupId) : groupId;
 
-  const roles = await getRoles(userId);
-  const groupEntity = await db.collection('groups').findOne({ _id: groupId });
+  const roles = await getRoles(userObjectId);
+  const groupEntity = await db.collection('groups').findOne({ _id: groupObjectId });
   const targetRole = `${role}@${groupEntity.path}`;
 
-  let ret = false;
-  roles.forEach((r) => {
-    if (targetRole.startsWith(r)) {
-      /*
-      console.log(
-        `targetRole '${targetRole}' starts with '${r}'\n  => User ${userId} is granted ${role}@${
-          groupEntity.path
-        }`
-      );
-      */
-      ret = true;
-    }
-  });
-
-  return ret;
+  return roles.some((role) => targetRole.startsWith(role));
 };
 
-export const hasAdminRole = async (user, group) => {
-  if (!group) {
-    return false;
-  }
-  const groups = await getDescendantGroups(group);
-
-  const ret = await hasRole(user, group, 'admin');
-  if (ret) {
-    return true;
-  }
-
-  for (const g of groups) {
-    const ret = await hasRole(user, g, 'admin');
-    if (ret) {
-      return true;
-    }
-  }
-
-  return false;
-};
-
-export const hasUserRole = async (user, group) => {
-  const ret = await hasRole(user, group, 'user');
-  return ret;
-};
+export const hasAdminRole = (userId, groupId) => hasRole(userId, groupId, 'admin');
+export const hasUserRole = (userId, groupId) => hasRole(userId, groupId, 'user');
 
 export const getRoles = async (user) => {
   const roles = ['public'];

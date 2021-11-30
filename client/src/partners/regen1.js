@@ -1,7 +1,7 @@
 export default {
-  name: 'Regen One',
+  name: 'regen1',
   domain: 'regen1',
-  id: '618aaf1a16dcc10001aaa517',
+  id: '5ff3403ce02c9c0001189fc8',
   slug: 'regen1',
   path: '/regen1/',
   logo: '/partners/regen1/img/logo.png',
@@ -15,7 +15,6 @@ export default {
       info: '#26AAE2',
       success: '#8bc34a',
       appbar: '#FFFFFF',
-      // background: '#004578',
     },
   },
 };
