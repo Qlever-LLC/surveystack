@@ -137,12 +137,12 @@ const requestMagicLink = async (req, res) => {
   }
 
   const { origin } = req.headers;
-  const magicLink = await createMagicLink({origin, email, expiresAfterDays, returnUrl})
+  const magicLink = await createMagicLink({ origin, email, expiresAfterDays, returnUrl });
 
   // TODO update copy
   await mailService.send({
-    to: membership.meta.invitationEmail,
-    subject: `Surveystack invitation to group ${group.name}`,
+    to: email,
+    subject: `Surveystack sign in`,
     text: `Hello
 
 Continue to log into SurveyStack with this link:
@@ -169,8 +169,10 @@ const enterWithMagicLink = async (req, res) => {
   let loginPayload = await createLoginPayload(userObject);
   loginPayload = JSON.stringify(loginPayload);
   loginPayload = b64EncodeURI(loginPayload);
-  const escapedReturnUrl = encodeURIComponent(returnUrl);
-  const loginUrl = `/auth/accept-magic-link?user=${loginPayload}&returnUrl=${escapedReturnUrl}`;
+  let loginUrl = `/auth/accept-magic-link?user=${loginPayload}`;
+  if (returnUrl) {
+    loginUrl += `&returnUrl=${encodeURIComponent(returnUrl)}`
+  }
 
   res.redirect(loginUrl);
 };

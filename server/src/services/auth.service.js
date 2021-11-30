@@ -37,7 +37,12 @@ export const createUserIfNotExist = async (email, name = null) => {
   return await db.collection(col).findOne({ email });
 };
 
-export const createMagicLink = async ({ origin, email, expiresAfterDays = 7, returnUrl = null }) => {
+export const createMagicLink = async ({
+  origin,
+  email,
+  expiresAfterDays = 7,
+  returnUrl = null,
+}) => {
   if (!origin) {
     throw new Error('createMagicLink: "origin" parameter is required');
   }
@@ -54,9 +59,12 @@ export const createMagicLink = async ({ origin, email, expiresAfterDays = 7, ret
     email,
   });
 
-  return `${origin}/api/auth/enter-with-magic-link?code=${code}&returnUrl=${encodeURIComponent(
-    returnUrl
-  )}`;
+  let link = `${origin}/api/auth/enter-with-magic-link?code=${code}`;
+  if (returnUrl) {
+    link += `&returnUrl=${encodeURIComponent(returnUrl)}`;
+  }
+
+  return link;
 };
 
 export const createLoginPayload = async (userObject) => {
