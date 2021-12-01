@@ -18,9 +18,7 @@
       :sort-by="dataTableProps.sortBy"
       :sort-desc="dataTableProps.sortDesc"
       :loading="loading"
-      @click:row="rowClick"
     >
-      <!-- 
       <template v-slot:top>
         <v-toolbar flat>
           <v-row>
@@ -32,14 +30,7 @@
           </v-row>
         </v-toolbar>
       </template>
-     
-      <template slot="header" :headers="headers">
-        <tr>
-          <v-checkbox color="#777" class="custom-checkbox" />
-          <th v-for="header in headers" v-bind:key="header.text">{{ header.text }}</th>
-        </tr>
-      </template>
-       
+      <!-- 
      <template v-for="header in headers" v-slot:[`header.${header.value}`]="{ header }">
         <v-tooltip v-if="headerTooltips[header.value]" bottom :key="header.value">
           <template v-slot:activator="{ on }">
@@ -52,12 +43,11 @@
     -->
 
       <template v-for="header in headers" v-slot:[`header.${header.value}`]="{ header }">
-        <v-tooltip bottom :key="header.value">
-          <template v-slot:activator="{ on }">
-            <span v-on="on">{{ header.text.toUpperCase() }}</span>
-            <v-btn>button</v-btn>
+        <div :key="header.value">
+          <template>
+            <span>{{ header.text }}</span>
           </template>
-        </v-tooltip>
+        </div>
       </template>
 
       <template slot="item" slot-scope="props">
@@ -160,9 +150,6 @@ export default {
     },
   },
   methods: {
-    rowClick(value) {
-      console.log({ value });
-    },
     handleClick(data) {
       this.selecteds.push([...this.selecteds, data.item]);
       this.$emit('update:selected', this.selecteds);
@@ -222,14 +209,11 @@ export default {
 <style scoped>
 .v-data-table >>> td {
   font-family: monospace;
+  white-space: nowrap;
 }
 
 .archived {
   color: #777 !important;
-}
-
-.v-data-table >>> td {
-  white-space: nowrap;
 }
 
 .v-data-table >>> .custom-header-class span {
@@ -281,10 +265,16 @@ export default {
 
 .custom-checkbox {
   margin-left: 1rem;
+  position: relative;
 }
 th {
   font-size: 0.85rem;
   text-align: left;
   transform: translateX(17px);
+}
+.ico {
+  position: absolute;
+  top: 0%;
+  left: 50%;
 }
 </style>
