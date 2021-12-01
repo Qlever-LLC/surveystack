@@ -55,6 +55,7 @@
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "mongodb": "^3.3.3",
+    "mongodb-memory-server": "^8.0.4",
     "nodemailer": "^6.4.3",
     "papaparse": "^5.1.1",
     "tree-model": "^1.0.7",
