@@ -222,4 +222,7 @@ const migrateResourceLibraryIds = async () => {
     console.log('Migrated resource.library to objectId of this many surveys', modifiedCount);
   }
 };
+
+export const getDb = () => db;
+
 export { db, connectDatabase, mongoClient };
