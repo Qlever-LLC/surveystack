@@ -10,6 +10,8 @@ import mailService from '../services/mail.service';
 import membershipService from '../services/membership.service';
 import rolesService from '../services/roles.service';
 import { createLoginPayload, createUserIfNotExist } from '../services/auth.service';
+import { pick } from 'lodash';
+import flatten from 'flat'
 
 const col = 'memberships';
 
@@ -403,19 +405,21 @@ const resendInvitation = async (req, res) => {
 
 const updateMembership = async (req, res) => {
   const { id } = req.params;
-  const entity = req.body;
+  const { group } = req.body;
 
-  sanitize(entity);
-
-  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
+  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, group);
   if (!adminAccess) {
     throw boom.unauthorized(`Only group admins can update memberships`);
   }
 
+  // select the fields that are updateable by the user
+  // TODO validate role (user/admin?)
+  const update = flatten(pick(req.body, ['role', 'meta.invitationName']));
+
   try {
     let updated = await db
       .collection(col)
-      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: entity }, { returnOriginal: false });
+      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: update }, { returnOriginal: false });
     return res.send(updated);
   } catch (err) {
     console.log(err);
