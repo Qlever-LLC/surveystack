@@ -18,9 +18,9 @@
       :sort-by="dataTableProps.sortBy"
       :sort-desc="dataTableProps.sortDesc"
       :loading="loading"
-      hide-default-header
       @click:row="rowClick"
     >
+      <!-- 
       <template v-slot:top>
         <v-toolbar flat>
           <v-row>
@@ -32,12 +32,32 @@
           </v-row>
         </v-toolbar>
       </template>
-      <!--  -->
+     
       <template slot="header" :headers="headers">
         <tr>
           <v-checkbox color="#777" class="custom-checkbox" />
           <th v-for="header in headers" v-bind:key="header.text">{{ header.text }}</th>
         </tr>
+      </template>
+       
+     <template v-for="header in headers" v-slot:[`header.${header.value}`]="{ header }">
+        <v-tooltip v-if="headerTooltips[header.value]" bottom :key="header.value">
+          <template v-slot:activator="{ on }">
+            <span v-on="on">{{ header.text }}</span>
+          </template>
+          <span>{{ headerTooltips[header.value] }}</span>
+        </v-tooltip>
+        <span v-else>{{ header.text }}<span>
+      </template>
+    -->
+
+      <template v-for="header in headers" v-slot:[`header.${header.value}`]="{ header }">
+        <v-tooltip bottom :key="header.value">
+          <template v-slot:activator="{ on }">
+            <span v-on="on">{{ header.text.toUpperCase() }}</span>
+            <v-btn>button</v-btn>
+          </template>
+        </v-tooltip>
       </template>
 
       <template slot="item" slot-scope="props">
