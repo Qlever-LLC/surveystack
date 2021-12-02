@@ -50,6 +50,8 @@ export default {
         vue.$vuetify.theme.themes.light.focus = activePartner.themes.light.focus || activePartner.themes.light.primary;
         vue.$vuetify.theme.themes.light.heading =
           activePartner.themes.light.heading || vue.$vuetify.theme.themes.light.heading;
+        vue.$vuetify.theme.themes.light.sidenavbackground = activePartner.themes.light.sidenavbackground;
+        vue.$vuetify.theme.themes.light.sidenavcolor = activePartner.themes.light.sidenavcolor;
 
         manifestElement.setAttribute('href', `/partners/${subdomain}/manifest.json`);
         iconElement.setAttribute('href', `/partners/${subdomain}/images/icons/icon-72x72.png`);
