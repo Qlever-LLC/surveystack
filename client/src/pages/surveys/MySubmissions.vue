@@ -36,14 +36,14 @@
                   <v-list-item :key="i" style="padding: 0 0; width: 1210px">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                       <v-card :elevation="3" class="py-3 px-4">
-                        <v-list-item-title class="text-h6 mb-2" v-if="surveyForSubmission(item)">
+                        <v-list-item-title class="text-h6 mb-2 font-weight-black" v-if="surveyForSubmission(item)">
                           {{ surveyForSubmission(item).name }}
                         </v-list-item-title>
-                        <v-list-item-title v-else> Loading name </v-list-item-title>
-                        <v-list-item-subtitle class="font-weight-regular mb-2">
+                        <v-list-item-title class="font-weight-black" v-else> Loading name </v-list-item-title>
+                        <v-list-item-subtitle class="font-weight-regular mt-2">
                           ID: {{ item._id }}
                         </v-list-item-subtitle>
-                        <v-list-item-subtitle class="font-weight-regular mb-2">
+                        <v-list-item-subtitle class="font-weight-regular mt-2">
                           {{ new Date(item.meta.dateCreated).toLocaleString() }}
                         </v-list-item-subtitle>
                       </v-card>
@@ -76,14 +76,14 @@
                   <v-list-item :key="i" style="padding: 0 0; width: 1210px">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                       <v-card :elevation="3" class="py-3 px-4">
-                        <v-list-item-title class="text-h6 mb-2" v-if="surveyForSubmission(item)">
+                        <v-list-item-title class="text-h6 mb-2 font-weight-black" v-if="surveyForSubmission(item)">
                           {{ surveyForSubmission(item).name }}
                         </v-list-item-title>
-                        <v-list-item-title v-else> Loading name </v-list-item-title>
-                        <v-list-item-subtitle class="font-weight-regular mb-2">
+                        <v-list-item-title class="font-weight-black" v-else> Loading name </v-list-item-title>
+                        <v-list-item-subtitle class="font-weight-regular mt-2">
                           ID: {{ item._id }}
                         </v-list-item-subtitle>
-                        <v-list-item-subtitle class="font-weight-regular mb-2">
+                        <v-list-item-subtitle class="font-weight-regular mt-2">
                           {{ new Date(item.meta.dateCreated).toLocaleString() }}
                         </v-list-item-subtitle>
                       </v-card>
