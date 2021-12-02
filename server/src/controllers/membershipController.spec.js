@@ -42,10 +42,29 @@ const createGroup = async (_overrides = {}) => {
   };
 
   const result = await db.collection('groups').insertOne(doc);
-  return result.ops[0];
+
+  const createUserMember = async ({ userOverrides, membershipOverrides } = {}) => {
+    const user = await createUser(userOverrides);
+    const membership = await createMembership({
+      user,
+      group: result.insertedId,
+      role: 'user',
+      ...membershipOverrides,
+    });
+    return { user, membership };
+  };
+  const createAdminMember = async ({ userOverrides, membershipOverrides } = {}) => {
+    return await createUserMember({
+      userOverrides,
+      membershipOverrides: { role: 'admin', ...membershipOverrides },
+    });
+  };
+
+  return { ...result.ops[0], createUserMember, createAdminMember };
 };
 
-const toId = (source) => new ObjectId(typeof source === 'string' ? source : source._id);
+const toId = (source) =>
+  source instanceof ObjectId ? source : ObjectId(typeof source === 'string' ? source : source._id);
 
 const createMembership = async (_overrides = {}) => {
   const { user, group, ...overrides } = _overrides;
@@ -65,6 +84,7 @@ const createMembership = async (_overrides = {}) => {
     ...overrides,
   };
   const result = await db.collection('memberships').insertOne(doc);
+
   return result.ops[0];
 };
 
@@ -85,27 +105,50 @@ const createRes = async ({ user = null } = {}) => ({
   },
 });
 
-describe.only('updateMembership', () => {
-  it.only('works', async () => {
-    const adminMember = await createUser();
-    const userMember = await createUser();
+describe('updateMembership', () => {
+  it('can update editable fields', async () => {
     const group = await createGroup();
-    await createMembership({ user: adminMember, group, role: 'admin' });
-    const userMembership = await createMembership({ user: userMember, group, role: 'user' });
+    const admin = await group.createAdminMember();
+    const user = await group.createUserMember();
+
     const req = createReq({
       body: {
         group: group._id,
         role: 'admin',
+        meta: {
+          invitationName: 'Changed Name',
+          invitationEmail: 'something.different@email.com',
+        },
       },
-      params: { id: userMembership._id },
+      params: { id: user.membership._id },
     });
-    const res = await createRes({ user: adminMember })
+    const res = await createRes({ user: admin.user });
 
     await updateMembership(req, res);
 
     const updatedUserMembership = await db
       .collection('memberships')
-      .findOne({ _id: toId(userMembership) });
+      .findOne({ _id: toId(user.membership) });
     expect(updatedUserMembership.role).toBe('admin');
+    expect(updatedUserMembership.meta.invitationName).toBe('Changed Name');
+    expect(updatedUserMembership.meta.invitationEmail).toBe(user.membership.meta.invitationEmail);
+  });
+
+  it("throws if the user isn't group admin", async () => {
+    const group = await createGroup();
+    const user1 = await group.createUserMember();
+    const user2 = await group.createUserMember();
+    const req = createReq({
+      body: {
+        group: group._id,
+        role: 'admin',
+      },
+      params: { id: user2.membership._id },
+    });
+    const res = await createRes({ user: user1.user });
+
+    await expect(updateMembership(req, res)).rejects.toThrow(
+      'Only group admins can update memberships'
+    );
   });
 });
