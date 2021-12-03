@@ -34,6 +34,7 @@
             @start="drag = true"
             @end="drag = false"
             draggable=".draggable-column"
+            handle=".draggable-handle"
           >
             <div class="draggable-column" v-for="(item, i) in columns" :key="i">
               <v-tooltip v-if="item.isFixedUntilMarker" top open-delay="500">
@@ -41,7 +42,7 @@
                   <v-card
                     width="26px"
                     height="100%"
-                    class="mx-1 py-3 d-flex flex-column justify-space-around align-center"
+                    class="draggable-handle mx-1 py-3 d-flex flex-column justify-space-around align-center"
                     elevation="3"
                     v-bind="attrs"
                     v-on="on"
@@ -56,7 +57,7 @@
 
               <div v-else>
                 <v-card width="16rem" min-width="16rem" class="mx-1" elevation="3">
-                  <div class="d-flex pa-2">
+                  <div class="draggable-handle d-flex pa-2">
                     <v-btn icon small @click="moveItemLeft(i)" :disabled="i === 0" tabindex="-1">
                       <v-icon>mdi-arrow-left</v-icon>
                     </v-btn>
@@ -313,7 +314,9 @@ export default {
       };
     },
     deleteColumn(index) {
-      this.value.content.splice(index, 1);
+      const columns = [...this.columns];
+      columns.splice(index, 1);
+      this.columns = columns;
     },
     addColumn() {
       this.value.content = [...this.value.content, this.createEmptyColumn()];
