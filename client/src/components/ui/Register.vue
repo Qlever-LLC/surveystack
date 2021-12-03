@@ -1,5 +1,5 @@
 <template>
-  <v-container class="maxw-40 wrapper">
+  <v-container>
     <v-card class="pa-6 pa-sm-12">
       <h1 class="heading--text" v-if="isWhitelabel">Join {{ whitelabelPartner.name }}</h1>
       <h1 class="heading--text" v-else>Join SurveyStack</h1>
@@ -195,10 +195,5 @@ export default {
 <style scoped>
 a {
   text-decoration: none;
-}
-
-.wrapper {
-  background-color: var(--v-background-base);
-  height: 100%;
 }
 </style>

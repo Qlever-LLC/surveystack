@@ -199,16 +199,11 @@ export default {
 
 >>> .v-dialog {
   height: auto;
+  width: auto;
+  max-width: 40rem;
 }
 
 >>> .container {
   padding: 0;
-}
-
-@media (min-width: 600px) {
-  >>> .v-dialog {
-    width: auto;
-    max-width: 40rem;
-  }
 }
 </style>

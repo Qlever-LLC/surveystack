@@ -274,11 +274,6 @@ a {
   text-decoration: none;
 }
 
-.wrapper {
-  background-color: var(--v-background-base);
-  height: 100%;
-}
-
 .line {
   border-top: 2px solid rgb(180, 180, 180);
   width: 40%;
