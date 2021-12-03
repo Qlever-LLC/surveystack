@@ -94,21 +94,22 @@ const createUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const entity = req.body;
-  const id = entity._id;
+  const { _id: id, password } = req.body;
+
+  const updatedUser = {
+    email: req.body.email,
+    name: req.body.name,
+  };
 
   if (!res.locals.auth.isSuperAdmin && res.locals.auth.user._id != id) {
     throw boom.unauthorized(`Not allowed to put user: ${id}`);
   }
 
-  const { password } = entity;
-  if (password === '') {
-    delete entity.password;
-  } else {
-    entity.password = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS));
+  if (password !== '') {
+    updatedUser.password = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS));
 
     // create a new user token when password changes
-    entity.token = uuidv4();
+    updatedUser.token = uuidv4();
 
     // remove the previously set token header
     // use a try-catch because it's accessing undocumented API and failing is non-critical
@@ -118,17 +119,14 @@ const updateUser = async (req, res) => {
       console.warn(e);
     }
     // udpate the token in the cookie header for backward compatibility: https://gitlab.com/our-sci/software/surveystack/-/merge_requests/33#note_700125477
-    res.cookie('token', entity.token, cookieOptions);
+    res.cookie('token', updatedUser.token, cookieOptions);
   }
 
   try {
-    delete entity._id;
-    let updated = await db.collection(col).findOneAndUpdate(
+    const updated = await db.collection(col).findOneAndUpdate(
       { _id: new ObjectId(id) },
-      { $set: entity },
-      {
-        returnOriginal: false,
-      }
+      { $set: updatedUser },
+      { returnOriginal: false }
     );
     return res.send(updated);
   } catch (err) {

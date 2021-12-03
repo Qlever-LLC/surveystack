@@ -1,5 +1,5 @@
 <template>
-  <v-container style="height: 100%">
+  <v-container>
     <v-container>
       <v-row class="my-2">
         <v-spacer />
@@ -10,30 +10,25 @@
       </v-row>
       <v-row class="d-flex flex-grow-1">
         <v-tabs flat v-model="activeTab" centered icons-and-text grow @change="updateActiveTab">
-          <v-tab v-for="tab in tabs" :key="tab.name" :href="`#${tab.name}`" style="background-color: #d9d9d9">
+          <v-tab v-for="tab in tabs" :key="tab.name" :href="`#${tab.name}`" class="background">
             <span class="d-flex flex-row align-center font-weight-bold">
               <v-icon class="mr-2">{{ tab.icon }}</v-icon
               >{{ tab.title }}
             </span>
           </v-tab>
         </v-tabs>
-        <v-tabs-items v-model="activeTab" style="height: 100%" class="flex-grow-1" v-if="!isLoading">
+        <v-tabs-items v-model="activeTab" class="flex-grow-1" v-if="!isLoading">
           <v-tab-item
             v-for="tab in tabs"
             :key="tab.name"
             :value="tab.name"
             class="flex-grow-1 flex-column align-center justify-center align-content-center"
-            style="height: 100%"
           >
             <!-- -->
-            <v-card
-              min-height="10vh"
-              class="d-flex flex-column justify-space-between"
-              style="background-color: #d9d9d9"
-            >
+            <v-card class="d-flex flex-column justify-space-between background">
               <template v-if="tab.name !== 'sent' && activeTabPageContent.length > 0">
                 <template v-for="(item, i) in activeTabPageContent">
-                  <v-list-item :key="i" style="padding: 0 0; width: 1210px">
+                  <v-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                       <v-card :elevation="3" class="py-3 px-4">
                         <v-list-item-title class="text-h6 mb-2 font-weight-black" v-if="surveyForSubmission(item)">
@@ -73,7 +68,7 @@
               </template>
               <template v-else-if="tab.name === 'sent' && tab.content.length > 0">
                 <template v-for="(item, i) in tab.content">
-                  <v-list-item :key="i" style="padding: 0 0; width: 1210px">
+                  <v-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                       <v-card :elevation="3" class="py-3 px-4">
                         <v-list-item-title class="text-h6 mb-2 font-weight-black" v-if="surveyForSubmission(item)">
@@ -100,15 +95,15 @@
               <div v-else>
                 <v-row align="center" justify="center">
                   <v-col>
-                    <v-alert color="info" class="black-text" text>No sent submissions yet</v-alert>
+                    <v-alert color="primary" class="black-text" text>No sent submissions yet</v-alert>
                   </v-col>
                 </v-row>
               </div>
             </v-card>
           </v-tab-item>
         </v-tabs-items>
-        <v-card v-else width="100%" style="min-height: 50vh">
-          <v-card-text class="d-flex align-center justify-center" style="height: 100%">
+        <v-card v-else>
+          <v-card-text class="d-flex align-center justify-center">
             <v-progress-circular :size="50" color="primary" indeterminate />
           </v-card-text>
         </v-card>
@@ -373,10 +368,12 @@ export default {
 .cursor-pointer {
   cursor: pointer;
 }
->>> .v-alert__content {
-  color: black !important;
+.v-tabs-items,
+.v-tab-item {
+  height: 100%;
 }
->>> .v-tabs-slider-wrapper {
-  height: 4px !important;
+.v-list-item,
+.v-list-item {
+  padding: 0 0;
 }
 </style>

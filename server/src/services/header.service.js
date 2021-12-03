@@ -34,7 +34,9 @@ function arrayMax(arr) {
   return max;
 }
 
-const getHeaders = async (surveyId, entities, options = { excludeDataMeta: false }) => {
+// Lists the headers that exist both in the submissions and the selected version of survey.
+// It tries to select the latest survey version used by the submission. If that fails it uses the latest survey version.
+const getHeaders = async (surveyId, entities, options = { excludeDataMeta: false, splitValueFieldFromQuestions: false }) => {
   if (!surveyId) {
     return [];
   }
@@ -69,15 +71,18 @@ const getHeaders = async (surveyId, entities, options = { excludeDataMeta: false
       .map((n) => n.model.name)
       .join('.');
     if (node.model.type === 'group' || node.model.type === 'page') {
-      surveyHeaders[`${header}.meta`] = [];
       return;
     }
-    surveyHeaders[`${header}.meta`] = [];
-    surveyHeaders[`${header}.value`] = [];
+    if (options.splitValueFieldFromQuestions) {
+      surveyHeaders[header] = [];
+    }
+    else {
+      surveyHeaders[`${header}.value`] = [];
+    }
   });
 
-  delete surveyHeaders['data.meta'];
   delete surveyHeaders['data.value'];
+  delete surveyHeaders['data'];
 
   let mergedObject = { _id: null };
 

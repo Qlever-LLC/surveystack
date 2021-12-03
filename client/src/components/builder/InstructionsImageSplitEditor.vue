@@ -8,7 +8,7 @@
     <div class="text-center d-flex">
       <resource-selector
         :resources="filteredResources"
-        :value="value && value.images && value.images[0]"
+        :value="(value && value.images && value.images[0]) || null"
         :disabled="disabled"
         :newResourceTypes="['IMAGE']"
         @on-new="createResourceHandler"

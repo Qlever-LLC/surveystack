@@ -3,6 +3,7 @@
     v-if="controls.length !== 0 || index.length !== 0"
     class="draggable"
     :class="controls"
+    :style="scaleStyles"
     :disabled="readOnly"
     tag="div"
     :list="controls"
@@ -23,60 +24,77 @@
       ]"
       :key="el.id || el._id"
       @mousedown.stop.left="$emit('control-selected', el)"
+      :data-testid="`control-card-${el.id}`"
     >
-      <div class="d-flex justify-space-between align-center">
-        <div class="mb-2" v-if="!el.options.hidden">
-          <span class="caption grey--text text--darken-1">{{ createIndex(index, idx + 1) | displayIndex }}</span>
-          <br />
-          <span class="title">
-            {{ getDisplay(el) }}
-          </span>
-          <br />
-          <span class="font-weight-light grey--text text--darken-2"> {{ el.name }} : {{ el.type }} </span>
-        </div>
+      <div
+        class="d-flex justify-space-between align-center"
+        @mouseover.stop="handleCardHoverChange({ control: el, isHovering: true })"
+        @mouseleave.stop="handleCardHoverChange({ control: el, isHovering: false })"
+      >
+        <control-card-header
+          v-if="!el.options.hidden"
+          :index="createIndex(index, idx + 1) | displayIndex"
+          :title="getDisplay(el)"
+          :type="el.type"
+          :dataName="el.name"
+        />
         <div class="grey--text text--darken-1" v-if="el.options.hidden">
           {{ createIndex(index, idx + 1) | displayIndex }} &nbsp; {{ getDisplay(el) }}
         </div>
         <div class="mb-2 context-actions">
           <div>
-            <v-btn icon v-if="selected === el && !el.libraryId" @click.stop="duplicateControl(el)">
+            <v-btn icon v-if="areActionsVisible(el) && !el.libraryId" @click.stop="duplicateControl(el)">
               <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
             </v-btn>
             <v-btn
               icon
-              v-if="selected === el && el.isLibraryRoot && !el.libraryIsInherited"
+              v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
               @click.stop="openLibrary(el.libraryId)"
             >
               <v-icon color="grey lighten-1">mdi-library</v-icon>
             </v-btn>
-            <v-btn
-              icon
-              v-if="selected === el && el.isLibraryRoot && !el.libraryIsInherited"
-              @click.stop="updateLibrary(idx)"
+            <v-chip
+              v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
+              class="align-center text-align-center text-center"
+              dark
+              small
+              :color="
+                availableLibraryUpdates[el.libraryId] === null
+                  ? 'error'
+                  : availableLibraryUpdates[el.libraryId] > el.libraryVersion
+                  ? 'warning'
+                  : 'grey'
+              "
+              :title="
+                availableLibraryUpdates[el.libraryId] === null
+                  ? 'question set has been deleted in the library'
+                  : availableLibraryUpdates[el.libraryId]
+                  ? 'new version ' + availableLibraryUpdates[el.libraryId] + ' available'
+                  : 'newest available version'
+              "
             >
-              <v-icon color="grey lighten-1">mdi-refresh</v-icon>
-            </v-btn>
+              <v-icon
+                v-if="availableLibraryUpdates[el.libraryId] > el.libraryVersion"
+                @click.stop="updateLibrary(el)"
+                left
+              >
+                mdi-refresh
+              </v-icon>
+              Version {{ el.libraryVersion }}
+            </v-chip>
             <v-btn
               icon
-              v-if="selected === el && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
+              v-if="areActionsVisible(el) && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
               @click.stop="() => showDeleteModal(idx)"
             >
-              <v-icon color="grey lighten-1">mdi-delete</v-icon>
+              <v-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey lighten-1'"
+                >mdi-delete
+              </v-icon>
             </v-btn>
             <v-btn text x-small v-if="el.options.hidden" @click.stop="el.options.hidden = false" color="grey lighten-1">
               unhide
             </v-btn>
           </div>
-          <v-chip
-            v-if="selected === el && el.isLibraryRoot && !el.libraryIsInherited"
-            class="align-center text-align-center text-center"
-            dark
-            small
-            outlined
-            color="grey"
-          >
-            Version {{ el.libraryVersion }}
-          </v-chip>
         </div>
       </div>
 
@@ -131,6 +149,14 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <update-library-dialog
+        v-if="updateLibraryDialogIsVisible"
+        v-model="updateLibraryDialogIsVisible"
+        :from-library-control="updateControl"
+        :to-survey="updateToLibrary"
+        @ok="updateLibraryConfirmed"
+        @cancel="updateLibraryCancelled"
+      />
     </v-card>
   </draggable>
   <div v-else>
@@ -148,17 +174,27 @@ import { cloneDeep } from 'lodash';
 import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
 import * as utils from '@/utils/surveys';
+import api from '@/services/api.service';
+import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
+import ControlCardHeader from './ControlCardHeader';
 
 export default {
   name: 'nested-draggable',
   components: {
+    UpdateLibraryDialog,
     draggable,
+    ControlCardHeader,
   },
   data() {
     return {
       drag: false,
       deleteQuestionModalIsVisible: false,
       deleteQuestionIndex: null,
+      updateLibraryDialogIsVisible: false,
+      updateToLibrary: null,
+      updateControl: null,
+      scaleStyles: {},
+      hoveredControl: null,
     };
   },
   props: {
@@ -176,6 +212,17 @@ export default {
     readOnly: {
       type: Boolean,
       default: false,
+    },
+    availableLibraryUpdates: {
+      required: false,
+      type: Object,
+      default() {
+        return {};
+      },
+    },
+    scale: {
+      type: Number,
+      default: 1.0,
     },
   },
   filters: {
@@ -228,9 +275,45 @@ export default {
     openLibrary(libraryId) {
       this.$emit('open-library', libraryId);
     },
-    updateLibrary(idx, libraryId) {
-      this.$emit('update-library-questions', this.controls[idx]);
+    async updateLibrary(control) {
+      this.updateControl = control;
+      const { data } = await api.get(`/surveys/${control.libraryId}`);
+      this.updateToLibrary = data;
+      this.updateLibraryDialogIsVisible = true;
     },
+    updateLibraryConfirmed() {
+      this.updateToLibrary = null;
+      this.updateLibraryDialogIsVisible = false;
+      this.$emit('update-library-questions', this.updateControl);
+      this.updateControl = null;
+    },
+    updateLibraryCancelled() {
+      this.updateToLibrary = null;
+      this.updateLibraryDialogIsVisible = false;
+      this.updateControl = null;
+    },
+    handleCardHoverChange({ control, isHovering }) {
+      if (isHovering) {
+        this.hoveredControl = control;
+      } else if (this.hoveredControl === control) {
+        this.hoveredControl = null;
+      }
+    },
+    areActionsVisible(control) {
+      return !this.readOnly && this.hoveredControl === control;
+    },
+  },
+  mounted() {
+    const { width, height } = this.$el.getBoundingClientRect();
+    this.scaleStyles =
+      this.style === 1.0
+        ? {}
+        : {
+            transform: `scale(${this.scale})`,
+            transformOrigin: 'top left',
+            marginRight: `-${width * (1.0 - this.scale)}px`,
+            marginBottom: `-${height * (1.0 - this.scale)}px`,
+          };
   },
 };
 </script>
@@ -262,7 +345,7 @@ export default {
 }
 
 .control-item {
-  padding: 0.75rem 1.25rem;
+  padding: 0.25rem 1.25rem;
   border: 1px solid rgba(0, 0, 0, 0.125);
   margin-bottom: -1px;
   /* border-left: 2px solid transparent; */
@@ -300,6 +383,7 @@ export default {
 .flip-list-move {
   transition: transform 0.5s;
 }
+
 .no-move {
   transition: transform 0s;
 }

@@ -28,21 +28,19 @@
             elevation="7"
           >
             <v-row style="min-height:96px;">
-              <v-col>
-                <small class="grey--text">{{ c._id }}</small>
-                <br />
-                {{ c.name }}
-                <small v-show="selectedSurvey && selectedSurvey._id == c._id" class="grey--text"
-                  ><br />Version {{ c.latestVersion }}</small
-                >
-                <!--v-chip
-                  dark
-                  small
-                  outlined
-                  color="grey"
-                >
+              <v-col :style="{ minWidth: '0px' }">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <div v-bind="attrs" v-on="on" class="title text-truncate">{{ c.name }}</div>
+                  </template>
+                  <span>{{ c.name }}</span>
+                </v-tooltip>
+                <div>
+                  <small class="grey--text">{{ c._id }}</small>
+                </div>
+                <v-chip dark small outlined color="grey" class="font-weight-medium mt-1">
                   Version {{ c.latestVersion }}
-                </v-chip-->
+                </v-chip>
               </v-col>
               <v-col align="right" md="auto">
                 <v-btn
@@ -63,7 +61,7 @@
                   color="white"
                   key="library"
                   @click="addToSurvey(c._id)"
-                  class="mt-n5 mr-n7 d-inline-block shadow green span-button"
+                  class="mt-n5 d-inline-block shadow green span-button"
                   outlined
                   small
                 >
@@ -111,6 +109,7 @@
                 <h4>Questions</h4>
                 <graphical-view
                   :readOnly="true"
+                  :scale="0.75"
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
                   class="graphical-view"
                   :controls="selectedSurvey.revisions[selectedSurvey.latestVersion - 1].controls"
@@ -169,7 +168,6 @@ export default {
       const queryParams = new URLSearchParams();
       if (this.search) {
         queryParams.append('q', this.search);
-        console.log(this.search);
       }
 
       queryParams.append('isLibrary', 'true');
@@ -199,7 +197,6 @@ export default {
 
         return data;
       } catch (e) {
-        // TODO: use cached data?
         console.log('Error fetching surveys:', e);
       }
       // return [];
@@ -262,11 +259,7 @@ border-left: 2px solid var(--v-primary-base);
 }*/
 .graphical-view {
   overflow: auto;
-  transform: scale(0.75);
-  transform-origin: top left;
   margin-top: 6px;
-  margin-bottom: -60%;
-  margin-right: -33%;
 }
 .v-card:focus:before {
   opacity: 0 !important;
