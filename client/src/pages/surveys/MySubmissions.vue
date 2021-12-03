@@ -11,7 +11,7 @@
       <v-row class="d-flex flex-grow-1">
         <v-tabs flat v-model="activeTab" centered icons-and-text grow @change="updateActiveTab">
           <v-tab v-for="tab in tabs" :key="tab.name" :href="`#${tab.name}`" class="background">
-            <span class="d-flex flex-row align-center font-weight-bold">
+            <span class="d-flex flex-row align-center font-weight-regular">
               <v-icon class="mr-2">{{ tab.icon }}</v-icon
               >{{ tab.title }}
             </span>
@@ -31,10 +31,10 @@
                   <v-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                       <v-card :elevation="3" class="py-3 px-4">
-                        <v-list-item-title class="text-h6 mb-2 font-weight-black" v-if="surveyForSubmission(item)">
+                        <v-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="surveyForSubmission(item)">
                           {{ surveyForSubmission(item).name }}
                         </v-list-item-title>
-                        <v-list-item-title class="font-weight-black" v-else> Loading name </v-list-item-title>
+                        <v-list-item-title class="font-weight-regular" v-else> Loading name </v-list-item-title>
                         <v-list-item-subtitle class="font-weight-regular mt-2">
                           ID: {{ item._id }}
                         </v-list-item-subtitle>
@@ -71,10 +71,10 @@
                   <v-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                       <v-card :elevation="3" class="py-3 px-4">
-                        <v-list-item-title class="text-h6 mb-2 font-weight-black" v-if="surveyForSubmission(item)">
+                        <v-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="surveyForSubmission(item)">
                           {{ surveyForSubmission(item).name }}
                         </v-list-item-title>
-                        <v-list-item-title class="font-weight-black" v-else> Loading name </v-list-item-title>
+                        <v-list-item-title class="font-weight-regular" v-else> Loading name </v-list-item-title>
                         <v-list-item-subtitle class="font-weight-regular mt-2">
                           ID: {{ item._id }}
                         </v-list-item-subtitle>
