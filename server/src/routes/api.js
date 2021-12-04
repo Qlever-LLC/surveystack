@@ -9,6 +9,8 @@ import userController from '../controllers/userController';
 import scriptController from '../controllers/scriptController';
 import rolesController from '../controllers/rolesController';
 import farmosController from '../controllers/farmosController';
+import farmos2Controller from '../controllers/farmos2Controller';
+
 import membershipController from '../controllers/membershipController';
 import infoController from '../controllers/infoController';
 import resourceController from '../controllers/resourceController';
@@ -225,6 +227,8 @@ router.get(
   catchErrors(farmosController.getIntegrationFarms)
 );
 router.post('/farmos/test', [assertAuthenticated], catchErrors(farmosController.testConnection));
+
+router.get('/farmos/v2', [assertAuthenticated], catchErrors(farmosController.testConnection));
 
 router.get('/farmos/members-by-farm', catchErrors(farmosController.getMembersByFarmAndGroup));
 
