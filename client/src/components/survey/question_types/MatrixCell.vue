@@ -1,10 +1,10 @@
 <template>
   <v-text-field
     v-if="header.type === 'text'"
-    :value="item[header.value].value"
+    :value="value"
     @input="
       (v) => {
-        item[header.value].value = getValueOrNull(v);
+        value = getValueOrNull(v);
         onInput();
       }
     "
@@ -17,10 +17,10 @@
     <div style="flex: 1">
       <v-text-field
         ref="text-qrcode"
-        :value="item[header.value].value"
+        :value="value"
         @input="
           (v) => {
-            item[header.value].value = getValueOrNull(v);
+            value = getValueOrNull(v);
             onInput();
           }
         "
@@ -38,7 +38,7 @@
         @codeDetected="
           (v) => {
             // console.log('value is', v);
-            item[header.value].value = getValueOrNull(v);
+            value = getValueOrNull(v);
             onInput();
           }
         "
@@ -48,10 +48,10 @@
 
   <v-text-field
     v-else-if="header.type === 'number'"
-    :value="item[header.value].value"
+    :value="value"
     @input="
       (v) => {
-        item[header.value].value = handleNumberInput(v);
+        value = handleNumberInput(v);
         onInput();
       }
     "
@@ -62,13 +62,13 @@
   />
   <v-select
     v-else-if="header.type === 'dropdown'"
-    :items="getDropdownItems(header.value)"
+    :items="items"
     item-text="label"
     item-value="value"
-    :value="item[header.value].value"
+    :value="value"
     @input="
       (v) => {
-        item[header.value].value = getValueOrNull(v);
+        value = getValueOrNull(v);
         onInput();
       }
     "
@@ -76,17 +76,24 @@
     outlined
     :multiple="header.multiple"
     :disabled="disabled"
-  />
+  >
+    <template v-slot:selection="{ item, index }">
+      <span v-if="index === 0" class="mr-1">{{ item.label }}</span>
+      <span v-if="index === 1" class="grey--text text-caption others">
+        (+{{ value.length - 1 }} {{ value.length > 2 ? 'others' : 'other' }})
+      </span>
+    </template>
+  </v-select>
   <v-combobox
     v-else-if="header.type === 'autocomplete' && header.custom"
-    :items="getDropdownItems(header.value)"
+    :items="items"
     item-text="label"
     item-value="value"
-    :value="item[header.value].value"
+    :value="value"
     @input="
       (v) => {
         comboboxSearch = null;
-        item[header.value].value = getValueOrNull(v);
+        value = getValueOrNull(v);
         onInput();
       }
     "
@@ -95,14 +102,10 @@
     :disabled="disabled"
     :return-object="false"
     :search-input.sync="comboboxSearch"
-    single-line
-    :chips="header.multiple"
-    :deletable-chips="header.multiple"
     outlined
-    hide-details
     class="custom-ontology"
   >
-    <template v-slot:selection="data">
+    <!-- <template v-slot:selection="data">
       <v-chip
         v-if="header.multiple"
         v-bind="data.attrs"
@@ -116,18 +119,34 @@
       <div v-else>
         {{ getLabel(header, data.item) }}
       </div>
+    </template> -->
+    <template v-slot:selection="{ item, index }">
+      <span v-if="index === 0" class="mr-1">{{ getLabel(header, item) }}</span>
+      <span v-if="index === 1" class="grey--text text-caption others">
+        (+{{ value.length - 1 }} {{ value.length > 2 ? 'others' : 'other' }})
+      </span>
+    </template>
+    <template v-slot:no-data>
+      <v-list-item>
+        <v-list-item-content>
+          <v-list-item-title>
+            No values matching "<strong>{{ comboboxSearch }}</strong
+            >". Press <kbd>enter</kbd> <span v-if="header.multiple">or <kbd>,</kbd></span> to create a new one
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
     </template>
   </v-combobox>
   <v-autocomplete
     v-else-if="header.type === 'autocomplete' && !header.custom"
-    :items="getDropdownItems(header.value)"
+    :items="items"
     item-text="label"
     item-value="value"
-    :value="item[header.value].value"
+    :value="value"
     @input="
       (v) => {
         comboboxSearch = null;
-        item[header.value].value = getValueOrNull(v);
+        value = getValueOrNull(v);
         onInput();
       }
     "
@@ -136,18 +155,25 @@
     :multiple="header.multiple"
     :disabled="disabled"
     :search-input.sync="comboboxSearch"
-  />
+  >
+    <template v-slot:selection="{ item, index }">
+      <span v-if="index === 0" class="mr-1">{{ item.label }}</span>
+      <span v-if="index === 1" class="grey--text text-caption others">
+        (+{{ value.length - 1 }} {{ value.length > 2 ? 'others' : 'other' }})
+      </span>
+    </template>
+  </v-autocomplete>
   <v-autocomplete
     v-else-if="header.type === 'farmos_field'"
     :items="farmos.farms || []"
-    :value="item[header.value].value"
+    :value="value"
     @input="
       (v) => {
-        item[header.value].value = getValueOrNull(v);
+        value = getValueOrNull(v);
         onInput();
       }
     "
-    :label="item[header.value].value ? item[header.value].value.farmName : null"
+    :label="value ? value.farmName : null"
     item-text="value.name"
     item-value="value"
     hide-details
@@ -160,15 +186,15 @@
   </v-autocomplete>
   <v-autocomplete
     v-else-if="header.type === 'farmos_planting'"
-    :value="item[header.value].value"
+    :value="value"
     @input="
       (v) => {
-        item[header.value].value = getValueOrNull(localChange(v));
+        value = getValueOrNull(localChange(v));
         onInput();
       }
     "
     :items="farmos.plantings || []"
-    :label="item[header.value].value ? item[header.value].value.farmName : null"
+    :label="value ? value.farmName : null"
     item-text="value.name"
     item-value="value"
     hide-details
@@ -191,10 +217,10 @@
     >
       <template v-slot:activator="{ on, attrs }">
         <v-text-field
-          :value="item[header.value].value"
+          :value="value"
           @input="
             (v) => {
-              item[header.value].value = v;
+              value = v;
               onInput();
             }
           "
@@ -209,10 +235,10 @@
         ></v-text-field>
       </template>
       <v-date-picker
-        :value="item[header.value].value"
+        :value="value"
         @input="
           (v) => {
-            item[header.value].value = v;
+            value = v;
             menus[`${index}_${header.value}`] = false;
             onInput();
           }
@@ -265,6 +291,19 @@ export default {
       comboboxSearch: null,
     };
   },
+  computed: {
+    value: {
+      get() {
+        return this.item[this.header.value].value;
+      },
+      set(value) {
+        this.item[this.header.value].value = value;
+      },
+    },
+    items() {
+      return this.getDropdownItems(this.header.value, Array.isArray(this.value) ? this.value : [this.value]);
+    },
+  },
   methods: {
     getValueOrNull,
     onInput() {
@@ -285,16 +324,13 @@ export default {
       return n;
     },
     removeValue(item, header, value) {
-      const filtered = item[header.value].value.filter((v) => v !== value);
-      item[header.value].value = this.getValueOrNull(filtered);
+      const filtered = value.filter((v) => v !== value);
+      value = this.getValueOrNull(filtered);
     },
     getLabel(header, value) {
-      const dropdownItems = this.getDropdownItems(header.value);
+      const dropdownItems = this.items;
       const found = dropdownItems.find((i) => i.value === value);
       return found ? found.label : value;
-    },
-    log(v) {
-      console.log('LOG:', v);
     },
     setActivePickerMonth() {
       setTimeout(() => {
@@ -358,3 +394,14 @@ export default {
   },
 };
 </script>
+
+<style>
+.v-select__selections {
+  flex-wrap: nowrap;
+}
+.v-select__selections span {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+</style>

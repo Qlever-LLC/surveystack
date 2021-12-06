@@ -181,7 +181,7 @@
 </template>
 
 <script>
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isNil, sortBy, uniq, without } from 'lodash';
 import appDialog from '@/components/ui/Dialog.vue';
 import appMatrixCell from '@/components/survey/question_types/MatrixCell.vue';
 import appMatrixTable from '@/components/survey/question_types/MatrixTable.vue';
@@ -374,10 +374,27 @@ export default {
       this.editedItem = this.rows[index];
       this.showEditItemDialog = true;
     },
-    getDropdownItems(field) {
+    getDropdownItems(field, values = []) {
       const column = this.source.content.find((col) => col.value === field);
       const ontology = this.resources.find((resource) => resource.id === column.resource);
-      return ontology.content.map((row) => ({ label: row.label, value: row.value }));
+      const defaultItems = ontology.content.map((row) => ({ label: row.label, value: row.value }));
+      const usedValues = this.rows
+        .map((row) => row[field].value) // get the value from each row
+        .map((value) => (Array.isArray(value) ? value : [value])) // convert individual values to list
+        .flat(); // convert the values of each row into one list
+      // All the custom items the users typed in
+      const customItems = without(
+        uniq(usedValues).filter((v) => !isNil(v)), // get all the uniq non-empty values
+        ...defaultItems.map((i) => i.value) // without the default values
+      ).map((value) => ({ label: value, value }));
+      const allItems = sortBy(
+        [...defaultItems, ...customItems],
+        [
+          (a) => !values.includes(a.value), // move selected items first
+          'label',
+        ]
+      );
+      return allItems;
     },
     onInput() {
       console.log('onInput', this.rows);

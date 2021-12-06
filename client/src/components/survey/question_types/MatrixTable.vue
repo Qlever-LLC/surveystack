@@ -70,6 +70,8 @@ function defaultColumnWidth(type) {
   switch (type) {
     case 'farmos_planting':
     case 'farmos_field':
+    case 'dropdown':
+    case 'autocomplete':
       return 240;
     default:
       return 160;
