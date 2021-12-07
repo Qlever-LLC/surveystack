@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 
 /* Call for Submissions (CFS) */
 
-import mailService from '../services/mail.service';
+import mailService from '../services/mail/mail.service';
 import { db } from '../db';
 import { createMagicLink } from '../services/auth.service';
 

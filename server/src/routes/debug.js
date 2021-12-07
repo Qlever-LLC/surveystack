@@ -7,7 +7,7 @@ import boom from '@hapi/boom';
 import { db } from '../db';
 
 import { uploadToS3 } from '../services/bucket.service';
-import mailService from '../services/mail.service';
+import mailService from '../services/mail/mail.service';
 import farmosService from '../services/farmos.service';
 import rolesService from '../services/roles.service';
 
