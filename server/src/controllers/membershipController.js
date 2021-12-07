@@ -6,7 +6,7 @@ import { ObjectId } from 'mongodb';
 import { db } from '../db';
 
 import { queryParam } from '../helpers';
-import mailService from '../services/mail.service';
+import mailService from '../services/mail/mail.service';
 import membershipService from '../services/membership.service';
 import rolesService from '../services/roles.service';
 import { createLoginPayload, createUserIfNotExist } from '../services/auth.service';
@@ -369,17 +369,13 @@ const sendMembershipInvitation = async ({ membership, origin }) => {
     throw boom.badRequest(`Group does not exist: ${membership.group}`);
   }
 
-  await mailService.send({
+  await mailService.sendLink({
     to: membership.meta.invitationEmail,
     subject: `Surveystack invitation to group ${group.name}`,
-    text: `Hello
-
-You have been invited to join group '${group.name}'!
-
-Please use the following link to activate your invitation:
-${origin}/invitations?code=${membership.meta.invitationCode}
-
-Best Regards`,
+    link: `${origin}/invitations?code=${membership.meta.invitationCode}`,
+    actionDescriptionHtml: `You have been invited to join group '${group.name}'!`,
+    actionDescriptionText: `You have been invited to join group '${group.name}'!\nFollow this link to activate your invitation:`,
+    btnText: 'Join',
   });
 };
 

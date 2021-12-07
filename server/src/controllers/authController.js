@@ -6,7 +6,7 @@ import { encodeURI as b64EncodeURI } from 'js-base64';
 
 import boom from '@hapi/boom';
 
-import mailService from '../services/mail.service';
+import mailService from '../services/mail/mail.service';
 import { createUserDoc, createUserIfNotExist } from '../services/auth.service';
 import { db, COLL_ACCESS_CODES } from '../db';
 import { createLoginPayload, createMagicLink } from '../services/auth.service';
@@ -139,16 +139,13 @@ const requestMagicLink = async (req, res) => {
   const { origin } = req.headers;
   const magicLink = await createMagicLink({ origin, email, expiresAfterDays, returnUrl });
 
-  // TODO update copy
-  await mailService.send({
+  await mailService.sendLink({
     to: email,
     subject: `Surveystack sign in`,
-    text: `Hello
-
-Continue to log into SurveyStack with this link:
-${magicLink}
-
-Best Regards`,
+    link: magicLink,
+    actionDescriptionHtml: 'Continue to <b>SurveyStack</b>:',
+    actionDescriptionText: 'Continue to log into SurveyStack with this link:',
+    btnText: 'Sign in',
   });
 
   res.send({ ok: true });
