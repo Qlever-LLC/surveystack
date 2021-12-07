@@ -50,8 +50,9 @@ export default {
         vue.$vuetify.theme.themes.light.focus = activePartner.themes.light.focus || activePartner.themes.light.primary;
         vue.$vuetify.theme.themes.light.heading =
           activePartner.themes.light.heading || vue.$vuetify.theme.themes.light.heading;
-        vue.$vuetify.theme.themes.light.sidenavbackground = activePartner.themes.light.sidenavbackground;
-        vue.$vuetify.theme.themes.light.sidenavcolor = activePartner.themes.light.sidenavcolor;
+        vue.$vuetify.theme.themes.light.sideNavBackground = activePartner.themes.light.sideNavBackground;
+        vue.$vuetify.theme.themes.light.sideNavTextColor =
+          activePartner.themes.light.sideNavTextColor || vue.$vuetify.theme.themes.light.heading;
 
         manifestElement.setAttribute('href', `/partners/${subdomain}/manifest.json`);
         iconElement.setAttribute('href', `/partners/${subdomain}/images/icons/icon-72x72.png`);

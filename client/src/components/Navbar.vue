@@ -13,26 +13,26 @@
       <navbar-user-menu />
     </v-app-bar>
 
-    <v-navigation-drawer v-model="drawer" app color="sidenavbackground">
+    <v-navigation-drawer v-model="drawer" app color="sideNavBackground">
       <div class="d-flex justify-space-between w-full">
         <img v-if="isWhitelabel" :src="$store.getters['whitelabel/partner'].logo" class="my-3 mx-4" height="30" />
         <img v-if="!isWhitelabel" src="../assets/surveystack_temp_logo.svg" class="my-3 mx-4" height="30" />
         <v-btn large icon @click="drawer = !drawer">
-          <v-icon class="sidenavcolor--text">mdi-close</v-icon>
+          <v-icon class="sideNavTextColor--text">mdi-close</v-icon>
         </v-btn>
       </div>
       <v-list class="mt-0 pt-0">
         <template v-for="(item, i) in items">
           <v-divider v-if="item.type === 'divider'" :key="i" dark class="my-1" />
-          <v-subheader v-else-if="item.type === 'subheader'" :key="i" class="sidenavcolor--text">
+          <v-subheader v-else-if="item.type === 'subheader'" :key="i" class="sideNavTextColor--text">
             {{ item.label }}
           </v-subheader>
           <v-list-item v-else :key="i" :to="item.to">
             <v-list-item-icon v-if="item.icon" :class="item.class">
-              <v-icon class="sidenavcolor--text">{{ item.icon }}</v-icon>
+              <v-icon class="sideNavTextColor--text">{{ item.icon }}</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title class="sidenavcolor--text">
+              <v-list-item-title class="sideNavTextColor--text">
                 {{ item.label }}
                 <v-chip
                   v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
@@ -54,19 +54,19 @@
               <v-list class="pa-0 ma-0">
                 <v-list-item v-for="(doc, index) in docs" :key="doc.link + index" :href="doc.link" target="_blank">
                   <v-list-item-icon>
-                    <v-icon class="sidenavcolor--text">mdi-notebook</v-icon>
+                    <v-icon class="sideNavTextColor--text">mdi-notebook</v-icon>
                   </v-list-item-icon>
                   <v-list-item-content>
-                    <v-list-item-title class="sidenavcolor--text">{{ doc.label }}</v-list-item-title>
+                    <v-list-item-title class="sideNavTextColor--text">{{ doc.label }}</v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
 
                 <v-list-item href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
                   <v-list-item-icon>
-                    <v-icon class="sidenavcolor--text">mdi-notebook-multiple</v-icon>
+                    <v-icon class="sideNavTextColor--text">mdi-notebook-multiple</v-icon>
                   </v-list-item-icon>
                   <v-list-item-content>
-                    <v-list-item-title class="sidenavcolor--text">SurveyStack Docs</v-list-item-title>
+                    <v-list-item-title class="sideNavTextColor--text">SurveyStack Docs</v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
               </v-list>
@@ -76,10 +76,10 @@
       </v-list>
 
       <template v-slot:append>
-        <div dark class="sidenavcolor--text">
+        <div dark class="sideNavTextColor--text">
           <p class="pt-4 pl-4">
             App-Version:
-            <router-link to="/app/info" class="decoration-none sidenavcolor--text">{{ version }} </router-link>
+            <router-link to="/app/info" class="decoration-none sideNavTextColor--text">{{ version }} </router-link>
           </p>
         </div>
       </template>
@@ -287,6 +287,9 @@ export default {
 .subtitle {
   font-size: 0.8rem;
   line-height: 0.8rem;
+}
+.v-icon {
+  opacity: 0.55;
 }
 </style>
 <style>

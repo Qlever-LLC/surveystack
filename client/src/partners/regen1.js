@@ -15,8 +15,8 @@ export default {
       info: '#26AAE2',
       success: '#8bc34a',
       appbar: '#FFFFFF',
-      sidenavbackground: '#026C72',
-      sidenavcolor: '#FFFFFF',
+      sideNavBackground: '#026C72',
+      sideNavTextColor: '#FFFFFF',
     },
   },
 };

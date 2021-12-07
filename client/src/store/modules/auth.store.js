@@ -22,7 +22,10 @@ const initialState = createInitialState();
 
 const getters = {
   authStatus: (state) => state.status,
-  isLoggedIn: (state) => state.status === 'success',
+  isLoggedIn: (state) => {
+    console.log({ state });
+    return state.status === 'success';
+  },
   isAdmin: (state) => state.user && state.user.permissions && state.user.permissions.includes('admin'),
   isSuperAdmin: (state) => state.user && state.user.permissions && state.user.permissions.includes('super-admin'),
   user: (state) => state.user,
