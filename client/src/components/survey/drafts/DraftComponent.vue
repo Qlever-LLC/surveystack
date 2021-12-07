@@ -73,6 +73,17 @@
       @submit="submit"
     />
   </div>
+  <v-alert v-else border="left" prominent text type="error">
+    <v-row align="center">
+      <v-col class="grow">
+        This survey has no visible questions. Please check the "Relevance Expression" and "Hidden" settings in the
+        editor.
+      </v-col>
+      <v-col class="shrink">
+        <v-btn :to="`/surveys/${survey._id}`">back</v-btn>
+      </v-col>
+    </v-row>
+  </v-alert>
 </template>
 
 <script>
