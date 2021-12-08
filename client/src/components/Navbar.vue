@@ -1,6 +1,6 @@
 <template>
   <nav class="app-navbar">
-    <v-app-bar app clipped-left color="appbar" absolute>
+    <v-app-bar app clipped-left color="appbar" :class="{ sticky: positionSticky }" :absolute="!positionSticky">
       <v-app-bar-nav-icon @click="drawer = !drawer" />
       <v-toolbar-title class="flex-column">
         <div id="app-bar-title" class="title py-0 my-0">
@@ -98,6 +98,12 @@ import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
 export default {
   components: {
     NavbarUserMenu,
+  },
+  props: {
+    positionSticky: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     let groupsLink = { name: 'groups-list' };
@@ -288,6 +294,12 @@ export default {
 .subtitle {
   font-size: 0.8rem;
   line-height: 0.8rem;
+}
+@media (min-width: 960px) {
+  >>> .sticky {
+    position: sticky !important;
+    top: 0;
+  }
 }
 </style>
 <style>
