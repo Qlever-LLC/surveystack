@@ -7,9 +7,13 @@ import { encodeURI as b64EncodeURI } from 'js-base64';
 import boom from '@hapi/boom';
 
 import mailService from '../services/mail/mail.service';
-import { createUserDoc, createUserIfNotExist } from '../services/auth.service';
+import {
+  createUserDoc,
+  createUserIfNotExist,
+  createLoginPayload,
+  createMagicLink,
+} from '../services/auth.service';
 import { db, COLL_ACCESS_CODES } from '../db';
-import { createLoginPayload, createMagicLink } from '../services/auth.service';
 
 const col = 'users';
 

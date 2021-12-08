@@ -51,8 +51,8 @@ const sendLink = async ({
           <tr>
               <td style="background-color: #f9f9f9; border-radius: 7px; padding: 32px">
                 <h3>${greeting}</h3>
-                <table style="width:100%;margin-bottom:32px;"><tbody>
-                <tr><td style="text-align:center;    ">
+                <table style="width:100%;margin-bottom:32px"><tbody>
+                <tr><td style="text-align:center">
                   <h2>${actionDescriptionHtml}</h2>
                   <a href="${link}" style="color: white; font-weight: bold; text-decoration: none; word-break: break-word; font-size: 17px; line-height: 24px; background-color: #ff5555; border-color: #ff2a2a; letter-spacing: 1px; min-width: 80px; text-align: center; border-radius: 4px; padding: 10px 22px; font-family: 'Roboto', sans-serif;" target="_blank">
                   ${btnText}
