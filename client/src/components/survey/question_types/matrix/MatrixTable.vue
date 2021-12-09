@@ -19,7 +19,7 @@
       </div>
       <div v-if="$scopedSlots['row-actions']" class="mt-header-left-spacer" />
     </div>
-    <div ref="body" class="mt-body" v-scroll.self="onScrollX" :style="{ overflowX: 'auto', overflowY: 'hidden' }">
+    <div ref="body" class="mt-body pb-1" v-scroll.self="onScrollX" :style="{ overflowX: 'auto', overflowY: 'hidden' }">
       <div
         class="mt-row"
         v-for="(item, rowIdx) in rows"
@@ -356,5 +356,21 @@ export default {
 .mt-actions-wrap .mt-actions {
   width: 100%;
   height: 100%;
+}
+
+/** 
+ Make sure the horizontal scrollbar is visible on macOS. 
+ Same solution that the Vuetify data-table uses
+ */
+.mt-body::-webkit-scrollbar {
+  height: 12px;
+}
+.mt-body::-webkit-scrollbar-track {
+  border-radius: 3px;
+  background: #eee;
+}
+.mt-body::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: #bbb;
 }
 </style>
