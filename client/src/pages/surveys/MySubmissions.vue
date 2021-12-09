@@ -66,6 +66,14 @@
                   <v-pagination v-model="page" :length="activeTabPaginationLength" color="grey darken-1" />
                 </v-card-actions>
               </template>
+              <div v-else-if="tab.name !== 'sent' && activeTabPageContent.length < 0">
+                <v-row align="center" justify="center">
+                  <v-col>
+                    <v-alert color="primary" class="black-text" text>No Drafts</v-alert>
+                  </v-col>
+                </v-row>
+              </div>
+
               <template v-else-if="tab.name === 'sent' && tab.content.length > 0">
                 <template v-for="(item, i) in tab.content">
                   <v-list-item :key="i">
@@ -95,7 +103,7 @@
               <div v-else>
                 <v-row align="center" justify="center">
                   <v-col>
-                    <v-alert color="primary" class="black-text" text>No sent submissions yet</v-alert>
+                    <v-alert color="primary" class="black-text" text>No Submissions</v-alert>
                   </v-col>
                 </v-row>
               </div>
