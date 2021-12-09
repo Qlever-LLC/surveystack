@@ -93,7 +93,7 @@
             :index="colIdx"
             @changed="onInput"
             :disabled="isMobile"
-            class="my-2"
+            class="mt-2"
             :loading="loading"
           />
         </v-form>
