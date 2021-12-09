@@ -43,11 +43,12 @@
     -->
 
       <template v-for="header in headers" v-slot:[`header.${header.value}`]="{ header }">
-        <div :key="header.value">
+        <span :key="header.value">
           <template>
             <span>{{ header.text }}</span>
+            <v-btn @click.stop="onClick">click</v-btn>
           </template>
-        </div>
+        </span>
       </template>
 
       <template slot="item" slot-scope="props">
@@ -150,6 +151,9 @@ export default {
     },
   },
   methods: {
+    onClick(event) {
+      console.log('hi');
+    },
     handleClick(data) {
       this.selecteds.push([...this.selecteds, data.item]);
       this.$emit('update:selected', this.selecteds);
