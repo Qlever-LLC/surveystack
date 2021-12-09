@@ -149,9 +149,11 @@ export default {
     minRowWidth() {
       return sum(this.colMinWidths) + (this.isMobile ? 0 : this.rowActionsWidth);
     },
+    // Combined width of fixed columns
     fixColsWidth() {
       return sum(this.colMinWidths.slice(0, this.fixedColumns));
     },
+    // Boolean array where true means: the column on the same index is fixed to the left
     fixColMask() {
       return this.headers.map((_, colIdx) => !this.isMobile && this.fixedColumns > colIdx);
     },
@@ -165,6 +167,7 @@ export default {
   },
   methods: {
     onScrollX() {
+      // make sure it only runs once per RAF
       if (!this.rafIdScrollX) {
         this.rafIdScrollX = window.requestAnimationFrame(() => {
           const body = this.$refs.body;
@@ -175,7 +178,6 @@ export default {
 
           this.$refs.headerCells.forEach((el, colIdx) => {
             if (!this.fixColMask[colIdx]) {
-              // TODO use scrollLeft on the whole header?
               el.style.left = `${-body.scrollLeft}px`;
             }
           });
@@ -185,6 +187,7 @@ export default {
       }
     },
     onScrollY() {
+      // make sure it only runs once per RAF
       if (!this.rafIdScrollY) {
         this.rafIdScrollY = window.requestAnimationFrame(() => {
           const { top } = this.$el.getBoundingClientRect();
@@ -359,8 +362,8 @@ export default {
 }
 
 /** 
- Make sure the horizontal scrollbar is visible on macOS. 
- Same solution that the Vuetify data-table uses
+ Make sure the horizontal scrollbar is visible on macOS/webkit. 
+ Same solution the Vuetify data-table uses
  */
 .mt-body::-webkit-scrollbar {
   height: 12px;
