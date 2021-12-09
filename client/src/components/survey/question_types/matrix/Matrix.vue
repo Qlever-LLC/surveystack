@@ -123,13 +123,13 @@
 <script>
 import { cloneDeep, isNil, sortBy, uniq, without } from 'lodash';
 import appDialog from '@/components/ui/Dialog.vue';
-import appMatrixCell from '@/components/survey/question_types/MatrixCell.vue';
-import appMatrixTable from '@/components/survey/question_types/MatrixTable.vue';
+import appMatrixCell from '@/components/survey/question_types/matrix/MatrixCell.vue';
+import appMatrixTable from '@/components/survey/question_types/matrix/MatrixTable.vue';
 import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
 
-import baseQuestionComponent from './BaseQuestionComponent';
-import farmosBase from './FarmOsBase';
+import baseQuestionComponent from '../BaseQuestionComponent';
+import farmosBase from '../FarmOsBase';
 
 /* copied from FarmOsPlanting.vue */
 const hashItem = (listItem) => {
