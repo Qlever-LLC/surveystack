@@ -10,7 +10,7 @@ export default {
   props: {
     label: String,
     index: Number,
-    value: Array,
+    value: [Array, String],
   },
 };
 </script>
