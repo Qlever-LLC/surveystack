@@ -78,10 +78,7 @@
     :disabled="disabled"
   >
     <template v-slot:selection="{ item, index }">
-      <span v-if="index === 0" class="mr-1">{{ item.label }}</span>
-      <span v-if="index === 1" class="grey--text text-caption others">
-        (+{{ value.length - 1 }} {{ value.length > 2 ? 'others' : 'other' }})
-      </span>
+      <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
     </template>
   </v-select>
   <v-combobox
@@ -106,10 +103,7 @@
     class="custom-ontology"
   >
     <template v-slot:selection="{ item, index }">
-      <span v-if="index === 0" class="mr-1">{{ getLabel(item) }}</span>
-      <span v-if="index === 1" class="grey--text text-caption others">
-        (+{{ value.length - 1 }} {{ value.length > 2 ? 'others' : 'other' }})
-      </span>
+      <matrix-cell-selection-label :label="getLabel(item)" :index="index" :value="value" />
     </template>
     <template v-slot:no-data>
       <v-list-item>
@@ -142,10 +136,7 @@
     :search-input.sync="comboboxSearch"
   >
     <template v-slot:selection="{ item, index }">
-      <span v-if="index === 0" class="mr-1">{{ item.label }}</span>
-      <span v-if="index === 1" class="grey--text text-caption others">
-        (+{{ value.length - 1 }} {{ value.length > 2 ? 'others' : 'other' }})
-      </span>
+      <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
     </template>
   </v-autocomplete>
   <v-autocomplete
@@ -239,10 +230,12 @@
 <script>
 import { getValueOrNull } from '@/utils/surveyStack';
 import appQrScanner from '@/components/ui/QrScanner.vue';
+import MatrixCellSelectionLabel from './MatrixCellSelectionLabel.vue';
 
 export default {
   components: {
     appQrScanner,
+    MatrixCellSelectionLabel,
   },
   props: {
     header: {
