@@ -111,66 +111,6 @@
         </div>
       </template>
     </app-matrix-table>
-    <v-data-table
-      v-if="false"
-      :headers="headers"
-      header
-      disable-pagination
-      hide-default-footer
-      hide-default-header
-      :items="rows || []"
-      disable-sort
-      mobile-breakpoint="0"
-    >
-      <template v-slot:header="{ props: { headers } }">
-        <thead>
-          <tr>
-            <th v-for="h in headers" :key="h.value">
-              <v-tooltip top>
-                <template v-slot:activator="{ on }">
-                  <span v-on="on">{{ h.label }}</span>
-                </template>
-                <span>{{ h.type }}</span>
-              </v-tooltip>
-              <app-redacted v-if="h.redacted" />
-              <app-required v-if="h.required" />
-            </th>
-          </tr>
-        </thead>
-      </template>
-      <template v-slot:body="{ items, headers }">
-        <tbody>
-          <tr v-for="(item, idx) in items" :key="idx" @click="isMobile ? editItem(idx) : () => {}">
-            <td v-for="(header, key) in headers" :key="key" class="py-0 px-1">
-              <v-form autocomplete="off" @submit.prevent="">
-                <app-matrix-cell
-                  :header="header"
-                  :item="item"
-                  :getDropdownItems="getDropdownItems"
-                  :farmos="farmos"
-                  :index="idx"
-                  @changed="onInput"
-                  :disabled="isMobile"
-                  class="my-2"
-                  :style="{ minWidth: header.scaleWidth ? `calc(10rem * ${header.scaleWidth}/100)` : '10rem' }"
-                  :loading="loading"
-                />
-              </v-form>
-            </td>
-            <td v-if="!isMobile" style="width: 64px; padding-left: 4px !important; padding-right: 0px;">
-              <div class="d-flex">
-                <v-btn icon @click="rowToBeDeleted = idx" tabindex="-1" small>
-                  <v-icon>mdi-trash-can-outline</v-icon>
-                </v-btn>
-                <v-btn icon @click="duplicateRow(idx)" tabindex="-1" small>
-                  <v-icon>mdi-content-copy</v-icon>
-                </v-btn>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </template>
-    </v-data-table>
     <app-control-more-info :value="control.moreInfo" />
 
     <div class="d-flex flex-row align-center" v-if="loading">
@@ -397,7 +337,6 @@ export default {
       return allItems;
     },
     onInput() {
-      console.log('onInput', this.rows);
       this.$emit('changed', this.rows);
     },
     duplicateRow(idx) {

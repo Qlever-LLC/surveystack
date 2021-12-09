@@ -87,13 +87,15 @@ export default {
       type: Array,
       required: true,
     },
+    // number of columns fixed to the left
     fixedColumns: {
       type: Number,
       default: 0,
     },
+    // width of the row action column
     rowActionsWidth: {
       type: Number,
-      default: 0, // TODO validate: required if actions slot set
+      default: 0,
     },
     isMobile: {
       type: Boolean,
@@ -107,7 +109,8 @@ export default {
       type: String,
       default: 'Add row',
     },
-    // skip rendering the cells that aren't visible on the screen
+    // (experimental optimization) skip rendering the cells that aren't visible on the screen
+    // TODO test this on a device that has visible performance issues with large matrices
     dontRenderOffScreenCells: {
       type: Boolean,
       default: false,
@@ -176,7 +179,7 @@ export default {
               el.style.left = `${-body.scrollLeft}px`;
             }
           });
-          this.updateCellVisibility();
+          this.updateCellVisibilityMask();
           this.rafIdScrollX = null;
         });
       }
@@ -186,7 +189,7 @@ export default {
         this.rafIdScrollY = window.requestAnimationFrame(() => {
           const { top } = this.$el.getBoundingClientRect();
           this.isHeaderFloating = top < 0;
-          this.updateCellVisibility();
+          this.updateCellVisibilityMask();
           this.rafIdScrollY = null;
         });
       }
@@ -196,8 +199,8 @@ export default {
         !this.dontRenderOffScreenCells || !this.cellVisibilityMask[rowIdx] || this.cellVisibilityMask[rowIdx][colIdx]
       );
     },
-    // create a 2d boolean matrix where true marks the cells visible on the scren
-    updateCellVisibility: debounce(function() {
+    // create a 2d boolean matrix where true marks the cells visible on the scren (experimenal)
+    updateCellVisibilityMask: debounce(function() {
       if (!this.dontRenderOffScreenCells) {
         return;
       }

@@ -37,6 +37,7 @@
             handle=".draggable-handle"
           >
             <div class="draggable-column" v-for="(item, i) in columns" :key="i">
+              <!-- vertical bar indicating which columns are locked to the left -->
               <v-tooltip v-if="item.isFixedUntilMarker" top open-delay="500">
                 <template v-slot:activator="{ on, attrs }">
                   <v-card

@@ -105,23 +105,8 @@
     outlined
     class="custom-ontology"
   >
-    <!-- <template v-slot:selection="data">
-      <v-chip
-        v-if="header.multiple"
-        v-bind="data.attrs"
-        :input-value="data.selected"
-        close
-        @click="data.select"
-        @click:close="removeValue(item, header, data.item)"
-      >
-        {{ getLabel(header, data.item) }}
-      </v-chip>
-      <div v-else>
-        {{ getLabel(header, data.item) }}
-      </div>
-    </template> -->
     <template v-slot:selection="{ item, index }">
-      <span v-if="index === 0" class="mr-1">{{ getLabel(header, item) }}</span>
+      <span v-if="index === 0" class="mr-1">{{ getLabel(item) }}</span>
       <span v-if="index === 1" class="grey--text text-caption others">
         (+{{ value.length - 1 }} {{ value.length > 2 ? 'others' : 'other' }})
       </span>
@@ -323,11 +308,7 @@ export default {
 
       return n;
     },
-    removeValue(item, header, value) {
-      const filtered = value.filter((v) => v !== value);
-      value = this.getValueOrNull(filtered);
-    },
-    getLabel(header, value) {
+    getLabel(value) {
       const dropdownItems = this.items;
       const found = dropdownItems.find((i) => i.value === value);
       return found ? found.label : value;
