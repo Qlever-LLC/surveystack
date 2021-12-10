@@ -1,7 +1,9 @@
-import { createUserIfNotExist, createMagicLink } from './auth.service';
-import { createUser } from '../db/testUtils';
+import { createUserIfNotExist, createMagicLink, createLoginPayload } from './auth.service';
+import { createGroup, createUser } from '../db/testUtils';
 import { db, COLL_ACCESS_CODES } from '../db';
 import url from 'url';
+import rolesService from './roles.service';
+import { pick } from 'lodash';
 
 describe('createUserIfNotExist', () => {
   it('creates a new user if it does not exeist', async () => {
@@ -93,6 +95,28 @@ describe('createMagicLink', () => {
       expect(link.pathname).toBe('/api/auth/enter-with-magic-link');
       expect(link.searchParams.get('code')).toEqual(expect.any(String));
       expect(link.searchParams.get('returnUrl')).toBe(returnUrl);
+    });
+  });
+
+  describe('createLoginPayload', () => {
+    it('removes password from user', async () => {
+      const user = await createUser();
+      const payload = await createLoginPayload(user);
+      expect(payload.password).toBeUndefined();
+    });
+
+    it('includes roles', async () => {
+      const group = await createGroup();
+      const { user } = await group.createAdminMember();
+      const payload = await createLoginPayload(user);
+      const roles = await rolesService.getRoles(user._id);
+      expect(payload.roles).toMatchObject(roles);
+    });
+
+    it('includes the user object', async () => {
+      const user = await createUser();
+      const payload = await createLoginPayload(user);
+      expect(payload).toMatchObject(pick(user, '_id', 'email', 'name', 'token'));
     });
   });
 });

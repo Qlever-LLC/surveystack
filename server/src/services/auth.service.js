@@ -52,7 +52,7 @@ export const createMagicLink = async ({
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + expiresAfterDays);
   const code = crypto.randomBytes(32).toString('hex');
-
+  
   await db.collection(COLL_ACCESS_CODES).insertOne({
     code,
     expiresAt,
@@ -68,8 +68,8 @@ export const createMagicLink = async ({
 };
 
 export const createLoginPayload = async (userObject) => {
-  delete userObject.password;
+  // TODO pick only the fields that the client needs
+  const { password, ...payload } = userObject;
   const roles = await rolesService.getRoles(userObject._id);
-  userObject.roles = roles;
-  return userObject;
+  return { ...payload, roles };
 };
