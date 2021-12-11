@@ -3,10 +3,18 @@ import Matrix from './Matrix.vue';
 
 describe('Matrix question', () => {
   describe('methods.getDropdownItems', () => {
-    const run = ({ options, numCols = 3, colIdx = 1, numRows = 5, rowIdx = 0, valuesInRows = [] }) => {
+    const run = ({
+      options,
+      numCols = 3,
+      colIdx = 1,
+      numRows = 5,
+      rowIdx = 0,
+      valuesInRows = [],
+      mapComponent = null,
+    }) => {
       const field = `val_${colIdx}`;
       // fake the necessary parts of the component
-      const component = {
+      let component = {
         source: {
           content: range(numCols).map((i) => ({
             value: `val_${i}`,
@@ -21,6 +29,10 @@ describe('Matrix question', () => {
         ],
         rows: range(numRows).map((ri) => ({ [field]: { value: valuesInRows[ri] } })),
       };
+
+      if (mapComponent) {
+        component = mapComponent(component);
+      }
 
       return Matrix.methods.getDropdownItems.call(component, field, valuesInRows[rowIdx]);
     };
@@ -50,6 +62,14 @@ describe('Matrix question', () => {
       const options = [item('beta'), item('theta'), item('delta'), item('alpha'), item('eta')];
       const items = run({ options, rowIdx: 0, valuesInRows: [['eta', 'delta']] });
       expect(items).toMatchObject([item('delta'), item('eta'), item('alpha'), item('beta'), item('theta')]);
+    });
+
+    it('return empty array for unknown resource', () => {
+      const options = [item('value_1', 'label_1'), item('value_2', 'label_2')];
+      // remove resources from the component
+      const mapComponent = (component) => ({ ...component, resources: [] });
+      const items = run({ options, mapComponent });
+      expect(items).toMatchObject([]);
     });
   });
 });

@@ -317,6 +317,9 @@ export default {
     getDropdownItems(field, values = []) {
       const column = this.source.content.find((col) => col.value === field);
       const ontology = this.resources.find((resource) => resource.id === column.resource);
+      if (!ontology) {
+        return [];
+      }
       const defaultItems = ontology.content.map((row) => ({ label: row.label, value: row.value }));
       const usedValues = this.rows
         .map((row) => row[field].value) // get the value from each row
