@@ -53,7 +53,7 @@
                     <v-divider vertical class="lock-line-decor" />
                   </v-card>
                 </template>
-                <span>Columns left to this line will always be visible</span>
+                <span>Columns to the left of this line will always be visible</span>
               </v-tooltip>
 
               <div v-else>
