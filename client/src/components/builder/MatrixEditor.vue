@@ -67,7 +67,7 @@
                       class="ml-1"
                       small
                       @click="moveItemRight(i)"
-                      :disabled="i === value.content.length - 1"
+                      :disabled="i === columns.length - 1"
                       tabindex="-1"
                     >
                       <v-icon>mdi-arrow-right</v-icon>
@@ -265,7 +265,7 @@ export default {
     },
     createOntology(column) {
       const id = new ObjectId().toString();
-      this.value.content[column].resource = id;
+      this.columns[column].resource = id;
       this.$emit('set-survey-resources', [
         ...this.resources,
         {
@@ -290,7 +290,7 @@ export default {
       this.swapColumns(index - 1, index);
     },
     moveItemRight(index) {
-      if (index >= this.value.content.length - 1) {
+      if (index >= this.columns.length - 1) {
         return;
       }
       this.swapColumns(index + 1, index);
