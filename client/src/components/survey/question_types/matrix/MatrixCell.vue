@@ -224,7 +224,7 @@
     </v-menu>
   </div>
 
-  <div v-else>???</div>
+  <v-text-field v-else value="unknown cell type" outlined hide-details disabled />
 </template>
 
 <script>
