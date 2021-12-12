@@ -190,6 +190,7 @@
       max-width="290px"
       min-width="290px"
       ref="datepickermenu"
+      :disabled="disabled"
     >
       <template v-slot:activator="{ on, attrs }">
         <v-text-field
@@ -207,6 +208,7 @@
           outlined
           autocomplete="off"
           :disabled="disabled"
+          :style="{pointerEvents: disabled ? 'none' : 'auto'}"
           readonly
         ></v-text-field>
       </template>
