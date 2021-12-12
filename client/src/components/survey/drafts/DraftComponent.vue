@@ -18,7 +18,10 @@
       :showOverviewIcon="true"
       :questionNumber="$store.getters['draft/questionNumber']"
       @showOverviewClicked="showOverview = !showOverview"
-    />
+    >
+      <!-- forward all the slots -->
+      <slot v-for="(_, name) in $slots" :name="name" :slot="name" />
+    </app-draft-toolbar>
 
     <!-- Overview -->
     <div v-if="showOverview" class="draft-overview">
