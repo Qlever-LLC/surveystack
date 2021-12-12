@@ -246,6 +246,14 @@ export default {
       this.cellVisibilityMask = cellVisibilityMask;
     }, 300),
   },
+  watch: {
+    // check the width on adding the first row
+    rows(_, oldRows) {
+      if (oldRows.length === 0) {
+        this.onScrollX()
+      }
+    }
+  },
   mounted() {
     this.onScrollX();
     this.onScrollY();
