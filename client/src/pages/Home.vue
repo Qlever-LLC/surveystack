@@ -112,7 +112,7 @@
     </v-row>
 
     <v-dialog v-if="!isLoggedIn" v-model="loginIsVisible" class="login-dialog">
-      <auth-selector @change="handleChange" />
+      <auth-selector />
     </v-dialog>
 
     <v-row>
@@ -155,16 +155,6 @@ export default {
       loginIsVisible: this.$store.getters['auth/isLoggedIn'] || true,
     };
   },
-  methods: {
-    async focused() {
-      // const res = await axios.get('http://localhost:9095/measurement');
-      // console.log('result', res.data);
-    },
-    handleChange(log) {
-      console.log(log, 'HOME');
-    },
-  },
-
   computed: {
     isLoggedIn() {
       return this.$store.getters['auth/isLoggedIn'];
@@ -182,11 +172,6 @@ export default {
     pinnedWhitelabelSurveys() {
       return this.$store.getters['whitelabel/pinnedSurveys'];
     },
-  },
-
-  async created() {
-    // const res = await axios.get('http://localhost:9095/measurement');
-    // console.log('res', res);
   },
 };
 </script>

@@ -1,5 +1,3 @@
-// yarn client:test -- -- client/src/components/ui/ForgotPassword.spec.js
-
 import { fireEvent } from '@testing-library/vue';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 import ForgotPassword from './ForgotPassword.vue';

@@ -180,8 +180,6 @@ export default {
       this.membership = membership;
     }
 
-    // console.log('created', this.isWhitelabel);
-
     if (this.isWhitelabel) {
       const { data } = await api.get(`/groups/${this.whitelabelPartner.id}`);
       if (!data.meta.invitationOnly) {
@@ -238,7 +236,6 @@ export default {
       try {
         // try to auto join group if this is a whitelabel
         if (this.isWhitelabel && this.registrationEnabled) {
-          console.log('trying autojoin');
           await api.post(`/memberships/join-group?id=${this.whitelabelPartner.id}`);
           await autoSelectActiveGroup(this.$store, this.whitelabelPartner.id);
         } else {

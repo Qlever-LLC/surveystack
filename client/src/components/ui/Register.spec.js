@@ -1,5 +1,3 @@
-// yarn client:test -- -- client/src/components/ui/Register.spec.js
-
 import { fireEvent } from '@testing-library/vue';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 import Register from './Register.vue';
@@ -137,7 +135,7 @@ describe('Register component', () => {
       await fireEvent.click(button);
       // wait for Promise for pending result
       await new Promise((resolve) => setTimeout(resolve, 0));
-      expect(mockAxios.post).toHaveBeenCalledTimes(1); // .toHaveBeenCalled();
+      expect(mockAxios.post).toHaveBeenCalledTimes(1);
       expect(autoSelectActiveGroup).toHaveBeenCalledTimes(1);
       expect(push).toHaveBeenCalledWith('/');
     });

@@ -1,6 +1,3 @@
-// yarn client:test -- -- client/src/components/ui/AuthSelector.spec.js
-// yarn client:test -- -- --watch
-
 import { fireEvent } from '@testing-library/vue';
 import AuthSelector from '@/components/ui/AuthSelector.vue';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';

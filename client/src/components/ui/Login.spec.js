@@ -1,5 +1,3 @@
-// yarn client:test -- -- client/src/components/ui/Login.spec.js
-
 import { fireEvent } from '@testing-library/vue';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 import Login from './Login.vue';

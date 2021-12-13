@@ -85,8 +85,6 @@ export default {
       this.membership = membership;
     }
 
-    // console.log('created', this.isWhitelabel);
-
     if (this.isWhitelabel) {
       const { data } = await api.get(`/groups/${this.whitelabelPartner.id}`);
       if (!data.meta.invitationOnly) {
