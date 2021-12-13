@@ -111,6 +111,7 @@ deploy to prod:
     - build container
     - lint client
     - test client
+    - test server
 
 
 deploy to stage:
@@ -163,6 +164,7 @@ deploy to stage:
     - build container
     - lint client
     - test client
+    - test server
 
 deploy to review 1:
   stage: deploy
@@ -213,6 +215,7 @@ deploy to review 1:
     - build container
     - lint client
     - test client
+    - test server
 
 
 
@@ -259,5 +262,13 @@ test client:
   stage: test
   script:
     - yarn client:test
+  needs:
+    - lerna bootstrap
+
+test server:
+  extends: .pull-cache-only
+  stage: test
+  script:
+    - yarn server:test
   needs:
     - lerna bootstrap

@@ -39,6 +39,8 @@ const clearLocalData = ({ dispatch }) => {
   dispatch('reset', null, { root: true });
 };
 
+const createAuthHeader = (email, token) => `${email} ${token}`;
+
 const actions = {
   reset({ commit }) {
     commit('RESET');
@@ -51,7 +53,7 @@ const actions = {
         .then((resp) => {
           const user = resp.data;
           const { email, token } = user;
-          const header = `${email} ${token}`;
+          const header = createAuthHeader(email, token);
 
           AuthService.saveStatus('success');
           AuthService.saveUser(user);
@@ -75,6 +77,15 @@ const actions = {
       commit('logout');
       resolve();
     });
+  },
+  updateToken({ commit }, user) {
+    const { email, token } = user;
+    const header = createAuthHeader(email, token);
+
+    AuthService.saveUser(user);
+    AuthService.saveHeader(header);
+
+    commit('update_token', { token, header });
   },
   enterShapeshift({ commit, dispatch, state }, id) {
     return new Promise((resolve, reject) => {
@@ -140,6 +151,11 @@ const mutations = {
     state.shapeshiftUser = {};
     state.shapeshiftHeader = '';
     api.removeHeaders();
+  },
+  update_token(state, { token, header }) {
+    state.user.token = token;
+    state.header = header;
+    api.setHeader('Authorization', header);
   },
   shapeshift_push(state, { user, header }) {
     state.shapeshiftUser = user;

@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import boom from '@hapi/boom';
+import { isString, isArray } from 'lodash'
 
 import { catchErrors } from '../handlers/errorHandlers';
 
@@ -13,6 +14,14 @@ export const assertAuthenticated = catchErrors(async (req, res, next) => {
 
   next();
 });
+
+export const assertIsSuperAdmin = (req, res, next) => {
+  if (!res.locals.auth.isSuperAdmin) {
+    throw boom.unauthorized();
+  }
+
+  next();
+}
 
 const getEntity = async (id, collection) => {
   return await db.collection(collection).findOne({ _id: new ObjectId(id) });
@@ -203,6 +212,19 @@ export const assertHasSurveyParam = catchErrors(async (req, res, next) => {
 
   next();
 });
+
+export const assertHasIds = (req, res, next) => {
+  if (!isArray(req.body.ids) || req.body.ids.length === 0) {
+    throw boom.badRequest('You must specify ids.');
+  }
+
+  if (!req.body.ids.every(isString)) {
+    throw boom.badRequest('Each ID must be a string');
+  }
+
+  next();
+};
+
 
 export const validateBulkReassignRequestBody = (req, res, next) => {
   if (!req.body.ids || req.body.ids.length === 0) {
