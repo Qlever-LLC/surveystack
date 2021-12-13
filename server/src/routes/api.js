@@ -289,8 +289,10 @@ router.delete(
 // Call for submissions (CFS)
 router.post('/call-for-submissions/send', [assertAuthenticated], catchErrors(cfsController.send));
 
-// resources (/api/resources) - not to be confused with /resources
+// resources
 router.get('/resources', catchErrors(resourceController.getResources));
+router.get('/resources/download-url', catchErrors(resourceController.getDownloadURL));
+router.get('/resources/upload-url', catchErrors(resourceController.getUploadURL));
 
 // info
 router.get('/info/ip', catchErrors(infoController.getIP));
