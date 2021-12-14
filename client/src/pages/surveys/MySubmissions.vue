@@ -116,9 +116,6 @@
           </v-card-text>
         </v-card>
       </v-row>
-      <!-- 
-    </v-container>
-   @input="handleConfirmSubmissionDialogInput" -->
       <confirm-submission-dialog
         ref="confirm-submission-dialog"
         v-if="confirmSubmissionIsVisible"
