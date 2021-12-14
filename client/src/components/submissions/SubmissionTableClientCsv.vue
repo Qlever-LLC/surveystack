@@ -43,11 +43,11 @@
     -->
 
       <template v-for="header in headers" v-slot:[`header.${header.value}`]="{ header }">
-        <span :key="header.value">
-          <template>
-            <span>{{ header.text }}</span>
-            <v-btn @click.stop="onClick">click</v-btn>
-          </template>
+        <span :key="header.value" class="header" :class="clickedColumn === header.text ? 'pin' : 'move'">
+          <span>
+            {{ header.text }}
+            <img class="header-pin-icon" @click.stop="onClick($event, header)" src="../../assets/pin_icon.svg" />
+          </span>
         </span>
       </template>
 
@@ -107,6 +107,9 @@ export default {
   },
   data() {
     return {
+      active: false,
+      clickedColumn: '',
+      iconColor: 'grey lighten-1',
       checkedNames: [],
       showDialog: false,
       textTruncateLength: 36,
@@ -151,8 +154,11 @@ export default {
     },
   },
   methods: {
-    onClick(event) {
-      console.log('hi');
+    onClick(event, header) {
+      console.log(event.target.parentNode.parentNode, '==');
+      console.log(header.text, 'header.class');
+      this.clickedColumn = header.text;
+      this.active = !this.active;
     },
     handleClick(data) {
       this.selecteds.push([...this.selecteds, data.item]);
@@ -211,6 +217,10 @@ export default {
 </script>
 
 <style scoped>
+.pin {
+  position: absolute;
+  left: 0;
+}
 .v-data-table >>> td {
   font-family: monospace;
   white-space: nowrap;
@@ -222,7 +232,7 @@ export default {
 
 .v-data-table >>> .custom-header-class span {
   display: inline-block;
-  max-width: 190px;
+  max-width: 250px;
 }
 .v-data-table {
   position: relative;
@@ -276,9 +286,17 @@ th {
   text-align: left;
   transform: translateX(17px);
 }
-.ico {
-  position: absolute;
-  top: 0%;
-  left: 50%;
+
+.header-pin-icon {
+  width: 14px;
+  height: 14px;
+  transform: translateY(5px);
+  display: none;
+}
+th:hover .header-pin-icon {
+  display: inline;
+}
+.mystyle {
+  display: none !important;
 }
 </style>
