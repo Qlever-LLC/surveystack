@@ -217,10 +217,6 @@ export default {
 </script>
 
 <style scoped>
-.pin {
-  position: absolute;
-  left: 0;
-}
 .v-data-table >>> td {
   font-family: monospace;
   white-space: nowrap;
