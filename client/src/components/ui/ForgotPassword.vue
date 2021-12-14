@@ -11,20 +11,34 @@
         </div>
       </v-form>
       <div class="text-center text-muted mt-5">
-        Back to
-        <router-link v-if="useLink" :to="signInLink" class="font-weight-medium" role="link">Sign in</router-link>
-        <a v-else text @click.stop="$emit('updateActive', 'login')" class="font-weight-medium" role="button">Sign in</a>
+        <router-link v-if="useLink" :to="signInLink" class="font-weight-medium" role="link"
+          >Back to Sign in</router-link
+        >
+        <a v-else text @click.stop="$emit('updateActive', 'login')" class="font-weight-medium" role="button"
+          >Back to Sign in</a
+        >
       </div>
       <transition name="fade">
         <app-feedback
           :elevation="0"
           color="red lighten-4"
-          v-if="status"
+          v-if="status.type === 'error'"
           class="mt-5"
           @closed="status = null"
           :type="status.type"
-          >{{ status.message }}</app-feedback
         >
+          {{ status.message }}
+        </app-feedback>
+        <app-feedback
+          :elevation="0"
+          color="green lighten-1"
+          v-if="status.type === 'success'"
+          class="mt-5"
+          @closed="status = null"
+          :type="status.type"
+        >
+          {{ status.message }}
+        </app-feedback>
       </transition>
     </v-card>
   </v-container>
@@ -41,7 +55,7 @@ export default {
   },
   data() {
     return {
-      status: null,
+      status: { type: null, message: null },
       email: '',
     };
   },
