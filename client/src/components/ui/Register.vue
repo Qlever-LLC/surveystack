@@ -25,20 +25,18 @@
           color="focus"
         />
 
-        <div class="d-flex justify-space-around align-center">
-          <router-link v-if="useLink" :to="signInLink" class="font-weight-medium" role="link">Sign in</router-link>
+        <div class="linkBlock d-flex justify-space-around align-center">
+          <router-link v-if="useLink" :to="signInLink" class="font-weight-medium" role="link">
+            Already have an account?
+          </router-link>
           <a v-else text @click.stop="$emit('updateActive', 'login')" class="font-weight-medium" role="button">
-            Sign in
+            Already have an account?
           </a>
-          <v-btn type="submit" @click.prevent="submit" color="primary" class="text-capitalize px-8">
+          <v-btn type="submit" @click.prevent="submit" color="primary" class="signUpCSS text-capitalize px-8">
             Sign up
           </v-btn>
         </div>
       </v-form>
-      <div class="d-flex justify-space-around align-center">
-        <span><span class="mdi mdi-share mdi-rotate-270 mdi-36px"></span> Already have an account? </span>
-        <span></span>
-      </div>
       <v-alert class="mt-4" outlined v-if="membership" type="info"
         >Your code is eligible to join <strong>{{ membership.group.name }}</strong></v-alert
       >
@@ -195,5 +193,23 @@ export default {
 <style scoped>
 a {
   text-decoration: none;
+}
+
+.linkBlock {
+  flex-direction: column-reverse;
+}
+.signUpCSS {
+  margin-bottom: 16px;
+  margin-left: 0px;
+}
+
+@media (min-width: 425px) {
+  .linkBlock {
+    flex-direction: row;
+  }
+  .signUpCSS {
+    margin-bottom: 0px;
+    margin-left: 16px;
+  }
 }
 </style>

@@ -32,7 +32,7 @@
                   name: 'auth-forgot-password',
                   query: { email: entity.email },
                 }"
-                class="white-space-nowrap font-weight-medium mr-4"
+                class="white-space-nowrap font-weight-medium ForgotPassword"
                 role="link"
                 >Forgot password?</router-link
               >
@@ -40,7 +40,7 @@
                 v-else
                 text
                 @click.stop="$emit('updateActive', 'forgot-password')"
-                class="white-space-nowrap font-weight-medium mr-4"
+                class="white-space-nowrap font-weight-medium ForgotPassword"
                 role="button"
                 >Forgot password?</a
               >
@@ -291,6 +291,9 @@ a {
   }
   .marginb10UnderW340 {
     margin: 0;
+  }
+  .ForgotPassword {
+    margin-right: 16px;
   }
 }
 
