@@ -21,10 +21,10 @@
       <transition name="fade">
         <app-feedback
           :elevation="0"
-          color="red lighten-4"
+          color="red lighten-1"
           v-if="status.type === 'error'"
           class="mt-5"
-          @closed="status = null"
+          @closed="status = {}"
           :type="status.type"
         >
           {{ status.message }}
@@ -34,7 +34,7 @@
           color="green lighten-1"
           v-if="status.type === 'success'"
           class="mt-5"
-          @closed="status = null"
+          @closed="status = {}"
           :type="status.type"
         >
           {{ status.message }}
@@ -87,7 +87,7 @@ export default {
     async submit() {
       this.status = { type: '' };
 
-      if (this.email.trim() === '') {
+      if (!this.email || this.email.trim() === '') {
         this.status = {
           type: 'error',
           message: 'Please enter a valid email address',

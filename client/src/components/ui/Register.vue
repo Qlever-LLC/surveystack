@@ -42,7 +42,7 @@
       >
 
       <transition name="fade">
-        <app-feedback :elevation="0" color="red lighten-4" v-if="status" class="mt-5" @closed="status = ''">{{
+        <app-feedback :elevation="0" color="red lighten-1" v-if="status" class="mt-5" @closed="status = ''">{{
           status
         }}</app-feedback>
       </transition>

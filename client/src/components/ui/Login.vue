@@ -89,7 +89,7 @@
         Login or Register to join <strong>{{ membership.group.name }}</strong></app-feedback
       >
       <transition name="fade">
-        <app-feedback :elevation="0" v-if="status" class="mt-5 red lighten-4" @closed="status = ''">{{
+        <app-feedback :elevation="0" v-if="status" class="mt-5 red lighten-1" @closed="status = ''">{{
           status
         }}</app-feedback>
       </transition>

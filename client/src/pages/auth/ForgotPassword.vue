@@ -29,7 +29,7 @@ export default {
     async submit() {
       this.status = null;
 
-      if (this.email.trim() === '') {
+      if (!this.email || this.email.trim() === '') {
         this.status = {
           type: 'error',
           message: 'Please enter a valid email address',
