@@ -73,7 +73,6 @@ export default {
       this.$router.back();
     },
     async submit() {
-      const data = this.entity;
       const method = this.editMode ? 'put' : 'post';
       const url = this.editMode ? `/users/${this.entity._id}` : '/users';
 
@@ -83,10 +82,11 @@ export default {
       }
 
       try {
+        const { _id, email, name, password } = this.entity;
         const { data: newUser } = await api.customRequest({
           method,
           url,
-          data,
+          data: { _id, email, name, password },
         });
 
         // also may want to create membership
@@ -133,8 +133,10 @@ export default {
     if (this.editMode) {
       try {
         const { id } = this.$route.params;
-        const { data } = await api.get(`/users/${id}`);
-        this.entity = { ...this.entity, ...data };
+        const {
+          data: { _id, email, name },
+        } = await api.get(`/users/${id}`);
+        this.entity = { ...this.entity, _id, email, name };
       } catch (e) {
         console.log('something went wrong:', e);
       }

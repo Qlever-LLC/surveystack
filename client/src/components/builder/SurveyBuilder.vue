@@ -49,6 +49,7 @@
             @duplicate-control="duplicateControl"
             @open-library="openLibrary"
             @update-library-questions="updateLibraryQuestions"
+            data-testid="graphical-view"
           />
         </div>
       </pane>
@@ -60,6 +61,7 @@
             :libraryId="libraryId"
             @add-questions-from-library="addQuestionsFromLibrary"
             @cancel="closeLibrary"
+            data-testid="question-library"
           />
         </div>
       </pane>
@@ -85,6 +87,7 @@
               @set-survey-resources="setSurveyResources"
               @set-control-params="setControlParams"
               @set-script-editor-is-visible="setScriptIsVisible"
+              data-testid="control-properties"
             />
           </div>
         </v-card>
@@ -403,7 +406,7 @@ export default {
       }
 
       // add questions from library survey to question group
-      rootGroup.children = getPreparedLibraryControls(data);
+      rootGroup.children = getPreparedLibraryControls(data, this.survey.resources);
 
       this.showLibrary = false;
     },
