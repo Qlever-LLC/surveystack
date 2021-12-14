@@ -55,7 +55,7 @@ export default {
   },
   data() {
     return {
-      status: { type: null, message: null },
+      status: { type: '' },
       email: '',
     };
   },
@@ -85,7 +85,7 @@ export default {
   },
   methods: {
     async submit() {
-      this.status = null;
+      this.status = { type: '' };
 
       if (this.email.trim() === '') {
         this.status = {
@@ -94,7 +94,6 @@ export default {
         };
         return;
       }
-
       try {
         await api.post('/auth/send-password-reset-mail', { email: this.email });
         this.status = {

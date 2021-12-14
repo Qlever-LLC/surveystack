@@ -75,7 +75,7 @@ describe('AuthSelector', () => {
         routes: noRoutes,
       });
       getByText(registerViewTitle);
-      const button = getByText('Sign in');
+      const button = getByText('Already have an account?');
       await fireEvent.click(button);
       getByText(loginViewTitle);
     });
@@ -86,7 +86,7 @@ describe('AuthSelector', () => {
         routes: noRoutes,
       });
       getByText(forgotPasswordViewTitle);
-      const button = getByText('Sign in');
+      const button = getByText('Back to Sign in');
       await fireEvent.click(button);
       getByText(loginViewTitle);
     });

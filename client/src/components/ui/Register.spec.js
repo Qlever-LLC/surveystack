@@ -27,7 +27,7 @@ describe('Register component', () => {
           RouterLink: RouterLinkStub,
         },
       });
-      getByRole('link', { name: 'Sign in' });
+      getByRole('link', { name: 'Already have an account?' });
     });
     it('Renders button to Register when useLink is false', async () => {
       const { getByRole } = renderWithVuetify(Register, {
@@ -42,7 +42,7 @@ describe('Register component', () => {
           RouterLink: RouterLinkStub,
         },
       });
-      getByRole('button', { name: 'Sign in' });
+      getByRole('button', { name: 'Already have an account?' });
     });
   });
 
