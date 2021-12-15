@@ -168,7 +168,7 @@
       </pane>
       <pane class="pane pane-draft">
         <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
-        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px);">
+        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px); overflow: auto;">
           <app-draft-component
             @submit="(payload) => $emit('submit', payload)"
             v-if="survey && instance"
@@ -177,8 +177,15 @@
             :persist="false"
             class="builder-draft"
             builder
-          ></app-draft-component>
+          >
+            <template v-slot:toolbar-actions>
+              <v-btn icon @click="isDraftFullscreen = true">
+                <v-icon>mdi-fullscreen</v-icon>
+              </v-btn>
+            </template>
+          </app-draft-component>
         </div>
+
         <v-overlay :value="enableSaveDraft">
           <v-card>
             <v-card-text>
@@ -186,32 +193,27 @@
             </v-card-text>
           </v-card>
         </v-overlay>
-
-        <!-- <v-snackbar
-          v-model="infoSnack"
-        >
-          hello
-
-          <template v-slot:action="{ attrs }">
-            <v-btn
-              color="red"
-              text
-              v-bind="attrs"
-              @click="infoSnack = false"
-            >
-              Close
-            </v-btn>
-          </template>
-        </v-snackbar> -->
       </pane>
     </splitpanes>
 
-    <!-- <confirm-leave-dialog
-      ref="confirmLeaveDialog"
-      title="Confirm Leave Survey"
-    >
-      Are you sure you want to leave this survey?
-    </confirm-leave-dialog> -->
+    <!-- Full screen view of the draft component -->
+    <v-dialog v-model="isDraftFullscreen" fullscreen transition="dialog-bottom-transition">
+      <app-draft-component
+        @submit="(payload) => $emit('submit', payload)"
+        v-if="survey && instance"
+        :submission="instance"
+        :survey="survey"
+        :persist="false"
+        builder
+        :style="{maxWidth: 'initial'}"
+      >
+        <template v-slot:toolbar-actions>
+          <v-btn icon @click="isDraftFullscreen = false">
+            <v-icon>mdi-fullscreen-exit</v-icon>
+          </v-btn>
+        </template>
+      </app-draft-component>
+    </v-dialog>
   </div>
 </template>
 
@@ -321,6 +323,7 @@ export default {
       surveyUnchanged: true,
       showExamples: false,
       availableLibraryUpdates: {},
+      isDraftFullscreen: false,
     };
   },
   methods: {
