@@ -39,6 +39,7 @@
             @set-survey-resources="setSurveyResources"
             @addToLibrary="addToLibrary"
             class="mb-4"
+            data-testid="survey-details"
           />
           <graphical-view
             v-if="!viewCode"
