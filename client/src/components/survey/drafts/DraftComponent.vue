@@ -73,6 +73,42 @@
       @submit="submit"
     />
   </div>
+  <div v-else-if="builder" class="d-flex flex-column justify-space-around" style="height: 100%">
+    <v-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded
+      ><div class="text-body-1 my-4 text-center">
+        Click on the
+        <v-btn fab dark x-small color="blue darken-2" style="pointer-events:none">
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
+        to add questions to your survey
+      </div>
+      <div class="text-body-1 my-4 text-center">
+        <v-btn dark small color="primary" class="my-1 mr-1" style="pointer-events:none">
+          <v-icon class="mr-1">mdi-content-save</v-icon>
+          Save
+        </v-btn>
+        to create a draft
+      </div>
+      <div class="text-body-1 my-4 text-center">
+        <v-btn dark small class="my-1 mr-1" color="green" style="pointer-events:none">
+          <v-icon class="mr-1">mdi-cloud-upload</v-icon>
+          Publish
+        </v-btn>
+        to allow users to submit to your survey
+      </div></v-sheet
+    >
+  </div>
+  <v-alert v-else border="left" prominent text type="error">
+    <v-row align="center">
+      <v-col class="grow">
+        This survey has no visible questions. Please check the "Relevance Expression" and "Hidden" settings in the
+        editor.
+      </v-col>
+      <v-col class="shrink">
+        <v-btn :to="`/surveys/${survey._id}`">back</v-btn>
+      </v-col>
+    </v-row>
+  </v-alert>
 </template>
 
 <script>
