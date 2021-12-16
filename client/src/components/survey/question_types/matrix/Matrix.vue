@@ -18,6 +18,7 @@
       title="Edit"
       hideCancel
       @confirm="showEditItemDialog = false"
+      max-width="800px"
     >
       <div style="background: #1867c0; padding: 4px 0px">
         <v-card>
