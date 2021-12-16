@@ -52,6 +52,7 @@
           :redacted="control.options && control.options.redacted"
           :required="$store.getters['draft/relevance'](path) && control.options && control.options.required"
           :forceMobile="forceMobile"
+          :isInBuilder="isInBuilder"
         />
       </div>
     </div>
@@ -85,6 +86,10 @@ export default {
       default: true,
     },
     forceMobile: {
+      type: Boolean,
+      default: false,
+    },
+    isInBuilder: {
       type: Boolean,
       default: false,
     },

@@ -70,6 +70,7 @@
       :fixedColumns="fixedColumns"
       :isMobile="isMobile"
       :rowActionsWidth="64"
+      :floatingFooterSize="isInBuilder ? 0 : 64"
       :addRowLabel="addRowLabel"
       @showEditDialog="(rowIdx) => editItem(rowIdx)"
       @addRow="add"

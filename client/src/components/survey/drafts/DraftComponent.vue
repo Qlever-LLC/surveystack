@@ -55,7 +55,13 @@
           <v-icon>mdi-arrow-down</v-icon>
         </v-btn>
       </v-fab-transition>
-      <app-control class="my-auto maxw-60 mx-auto" :path="path" :control="control" :forceMobile="forceMobile" />
+      <app-control
+        class="my-auto maxw-60 mx-auto"
+        :path="path"
+        :control="control"
+        :forceMobile="forceMobile"
+        :isInBuilder="builder"
+      />
     </div>
 
     <!-- Footer with next/prev buttons -->
