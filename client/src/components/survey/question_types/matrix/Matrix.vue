@@ -150,8 +150,6 @@ const hashItem = (listItem) => {
 
 /* copied from FarmOsPlanting.vue */
 const transform = (assets) => {
-  console.log('transformassets', assets);
-
   const withoutArea = [];
   const areas = {};
 
@@ -219,7 +217,6 @@ const transform = (assets) => {
   };
 
   res.push(withoutAreaSection, ...withoutArea);
-  console.log('res', res);
 
   return res;
 };
@@ -260,7 +257,7 @@ export default {
       },
     },
     isMobile() {
-      return !this.$vuetify.breakpoint.smAndUp;
+      return !this.$vuetify.breakpoint.smAndUp || this.forceMobile;
     },
     farmos() {
       return { farms: this.farms, plantings: this.farmosTransformedPlantings };

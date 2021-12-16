@@ -177,6 +177,7 @@
             :persist="false"
             class="builder-draft"
             builder
+            forceMobile
           >
             <template v-slot:toolbar-actions>
               <v-btn icon @click="isDraftFullscreen = true">
@@ -205,7 +206,7 @@
         :survey="survey"
         :persist="false"
         builder
-        :style="{maxWidth: 'initial'}"
+        :style="{ maxWidth: 'initial' }"
       >
         <template v-slot:toolbar-actions>
           <v-btn icon @click="isDraftFullscreen = false">
