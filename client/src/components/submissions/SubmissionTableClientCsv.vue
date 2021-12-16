@@ -30,44 +30,27 @@
           </v-row>
         </v-toolbar>
       </template>
-      <!-- 
-     <template v-for="header in headers" v-slot:[`header.${header.value}`]="{ header }">
-        <v-tooltip v-if="headerTooltips[header.value]" bottom :key="header.value">
-          <template v-slot:activator="{ on }">
-            <span v-on="on">{{ header.text }}</span>
-          </template>
-          <span>{{ headerTooltips[header.value] }}</span>
-        </v-tooltip>
-        <span v-else>{{ header.text }}<span>
-      </template>
-    -->
 
-      <template v-for="header in headers" v-slot:[`header.${header.value}`]="{ header }">
-        <span :key="header.value" class="header" :class="clickedColumn === header.text ? 'pin' : 'move'">
-          <span>
-            {{ header.text }}
-            <img class="header-pin-icon" @click.stop="onClick($event, header)" src="../../assets/pin_icon.svg" />
-          </span>
-        </span>
-      </template>
-
-      <template slot="item" slot-scope="props">
-        <tr>
-          <v-checkbox color="#777" class="custom-checkbox" />
-          <td
-            v-for="header in headers"
-            :key="header.text"
-            :class="truncate(props.item[header.value]) ? 'truncate' : ''"
-            :data-value="props.item[header.value]"
-          >
-            {{ props.item[header.value] }}
-          </td>
-        </tr>
+      <template v-slot:body="props">
+        <tbody>
+          <tr v-for="item in props.items" :key="item._id">
+            <td>
+              <v-checkbox v-model="tableSelected" :value="item" color="#777" class="custom-checkbox" hide-details />
+            </td>
+            <td
+              v-for="header in headers"
+              :key="header.text"
+              :class="truncate(item[header.value]) ? 'truncate' : ''"
+              :data-value="item[header.value]"
+            >
+              {{ item[header.value] }}
+            </td>
+          </tr>
+        </tbody>
       </template>
     </v-data-table>
   </v-card>
 </template>
-
 <script>
 import papa from 'papaparse';
 import csvService from '@/services/csv.service';
@@ -154,17 +137,11 @@ export default {
     },
   },
   methods: {
-    onClick(event, header) {
-      console.log(event.target.parentNode.parentNode, '==');
-      console.log(header.text, 'header.class');
-      this.clickedColumn = header.text;
-      this.active = !this.active;
-    },
     handleClick(data) {
       this.selecteds.push([...this.selecteds, data.item]);
       this.$emit('update:selected', this.selecteds);
     },
-    truncate(value) {
+    truncate(value, item) {
       return value.length > this.textTruncateLength;
     },
     createCustomFilter(field) {
@@ -240,13 +217,7 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.truncate::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
-}
+
 .truncate::after {
   content: attr(data-value);
   position: absolute;
@@ -274,25 +245,6 @@ export default {
 }
 
 .custom-checkbox {
-  margin-left: 1rem;
-  position: relative;
-}
-th {
-  font-size: 0.85rem;
-  text-align: left;
-  transform: translateX(17px);
-}
-
-.header-pin-icon {
-  width: 14px;
-  height: 14px;
-  transform: translateY(5px);
-  display: none;
-}
-th:hover .header-pin-icon {
-  display: inline;
-}
-.mystyle {
-  display: none !important;
+  margin-top: -0.3rem;
 }
 </style>
