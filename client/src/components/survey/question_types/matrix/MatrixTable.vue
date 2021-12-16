@@ -183,9 +183,7 @@ export default {
           this.isRightFloating = !this.isMobile && scrollLeftMax > body.scrollLeft;
 
           this.$refs.headerCells.forEach((el, colIdx) => {
-            if (!this.fixColMask[colIdx]) {
-              el.style.left = `${-body.scrollLeft}px`;
-            }
+            el.style.left = `${this.fixColMask[colIdx] ? 0 : -body.scrollLeft}px`;
           });
           this.updateCellVisibilityMask();
           this.rafIdScrollX = null;
@@ -258,6 +256,10 @@ export default {
       if (oldRows.length === 0) {
         this.onScrollX();
       }
+    },
+    // check the width on adding the first row
+    isMobile() {
+      this.onScrollX();
     },
   },
   mounted() {
