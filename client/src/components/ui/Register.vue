@@ -1,15 +1,60 @@
 <template>
-  <div class="wrapper">
-    <register :useLink="true" class="maxw-40" />
-  </div>
+  <v-container>
+    <v-card class="pa-6 pa-sm-12">
+      <h1 class="heading--text" v-if="isWhitelabel">Join {{ whitelabelPartner.name }}</h1>
+      <h1 class="heading--text" v-else>Join SurveyStack</h1>
+      <v-form>
+        <v-text-field
+          label="E-Mail"
+          type="text"
+          class="form-control"
+          :value="entity.email.toLowerCase()"
+          @input="entity.email = $event.toLowerCase()"
+          color="focus"
+        />
+
+        <v-text-field label="Name" type="text" class="form-control" v-model="entity.name" color="focus" />
+
+        <v-text-field
+          label="Password"
+          :type="passwordInputType"
+          class="form-control"
+          v-model="entity.password"
+          :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+          @click:append="showPasswords = !showPasswords"
+          color="focus"
+        />
+
+        <div class="linkBlock d-flex justify-space-around align-center">
+          <router-link v-if="useLink" :to="signInLink" class="font-weight-medium" role="link">
+            Already have an account?
+          </router-link>
+          <a v-else text @click.stop="$emit('updateActive', 'login')" class="font-weight-medium" role="button">
+            Already have an account?
+          </a>
+          <v-btn type="submit" @click.prevent="submit" color="primary" class="signUpCSS text-capitalize px-8">
+            Sign up
+          </v-btn>
+        </div>
+      </v-form>
+      <v-alert class="mt-4" outlined v-if="membership" type="info"
+        >Your code is eligible to join <strong>{{ membership.group.name }}</strong></v-alert
+      >
+
+      <transition name="fade">
+        <app-feedback :elevation="0" color="red lighten-1" v-if="status" class="mt-5" @closed="status = ''">{{
+          status
+        }}</app-feedback>
+      </transition>
+    </v-card>
+  </v-container>
 </template>
 
 <script>
+import appFeedback from '@/components/ui/Feedback.vue';
 import api from '@/services/api.service';
 
 import { autoSelectActiveGroup } from '@/utils/memberships';
-
-import Register from '@/components/ui/Register.vue';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -19,12 +64,11 @@ const DEFAULT_ENTITY = {
 
 export default {
   components: {
-    Register,
+    appFeedback,
   },
   data() {
     return {
       status: '',
-      passwordConfirmation: '',
       showPasswords: false,
       entity: { ...DEFAULT_ENTITY },
       invitation: '',
@@ -35,6 +79,10 @@ export default {
     initialEmail: {
       type: String,
       required: false,
+    },
+    useLink: {
+      type: Boolean,
+      default: true,
     },
   },
   computed: {
@@ -69,7 +117,6 @@ export default {
   methods: {
     async submit() {
       this.status = '';
-      console.log('submitting');
 
       if (this.entity.email === '') {
         this.status = 'Email must not be empty.';
@@ -78,11 +125,6 @@ export default {
 
       if (this.entity.password === '') {
         this.status = 'Password must not be empty.';
-        return;
-      }
-
-      if (this.entity.password !== this.passwordConfirmation) {
-        this.status = 'Passwords do not match.';
         return;
       }
 
@@ -114,7 +156,6 @@ export default {
           this.$router.push('/');
         }
       } catch (error) {
-        console.log(error.response);
         switch (error.response.status) {
           case 409:
             this.status = error.response.data.message;
@@ -150,8 +191,25 @@ export default {
 </script>
 
 <style scoped>
-.wrapper {
-  background-color: var(--v-background-base);
-  height: 100%;
+a {
+  text-decoration: none;
+}
+
+.linkBlock {
+  flex-direction: column-reverse;
+}
+.signUpCSS {
+  margin-bottom: 16px;
+  margin-left: 0px;
+}
+
+@media (min-width: 425px) {
+  .linkBlock {
+    flex-direction: row;
+  }
+  .signUpCSS {
+    margin-bottom: 0px;
+    margin-left: 16px;
+  }
 }
 </style>
