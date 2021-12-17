@@ -56,7 +56,7 @@ describe('AuthSelector', () => {
         routes: noRoutes,
       });
       getByText(forgotPasswordViewTitle);
-      const button = getByText('Back to Sign in');
+      const button = getByText('Back to login');
       await fireEvent.click(button);
       getByText(loginViewTitle);
     });

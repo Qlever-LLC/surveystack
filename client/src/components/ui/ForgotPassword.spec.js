@@ -19,7 +19,7 @@ describe('ForgotPassword component', () => {
           RouterLink: RouterLinkStub,
         },
       });
-      getByRole('link', { name: 'Back to Sign in' });
+      getByRole('link', { name: 'Back to login' });
     });
     it('Renders button to ForgotPassword when useLink is false', async () => {
       const { getByRole } = renderWithVuetify(ForgotPassword, {
@@ -34,7 +34,7 @@ describe('ForgotPassword component', () => {
           RouterLink: RouterLinkStub,
         },
       });
-      getByRole('button', { name: 'Back to Sign in' });
+      getByRole('button', { name: 'Back to login' });
     });
   });
 
