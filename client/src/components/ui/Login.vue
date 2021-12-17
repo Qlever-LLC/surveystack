@@ -1,31 +1,30 @@
 <template>
-  <div>
-    <v-card class="pa-6 pa-sm-7 login-card">
-      <div class="d-sm-flex justify-center">
-        <div class="pl-sm-5 pr-sm-10 py-6">
-          <h1 class="heading--text text-center" v-if="isWhitelabel && registrationEnabled">
-            Login &amp; Join {{ whitelabelPartner.name }}
-          </h1>
-          <h1 class="heading--text" v-else>Welcome Back</h1>
-          <v-form>
-            <v-text-field
-              label="E-Mail"
-              type="text"
-              class="form-control"
-              :value="entity.email"
-              @input="entity.email = $event.toLowerCase()"
-              color="focus"
-            />
-            <v-text-field
-              label="Password"
-              :type="passwordInputType"
-              class="form-control"
-              v-model="entity.password"
-              :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-              @click:append="showPasswords = !showPasswords"
-              color="focus"
-            />
-            <div class="colUnderW340 d-flex justify-space-between align-center">
+  <v-card v-if="!signInLinkSent" class="pa-2 pa-sm-7">
+    <template>
+      <div class="py-sm-5 py-6">
+        <h1 class="heading--text text-center" v-if="isWhitelabel">Login &amp; Join {{ whitelabelPartner.name }}</h1>
+        <h1 class="heading--text mb-4" v-else>Welcome Back</h1>
+        <v-form>
+          <v-text-field
+            label="E-Mail"
+            type="text"
+            class="form-control"
+            :value="entity.email"
+            @input="entity.email = $event.toLowerCase()"
+            color="focus"
+          />
+          <v-text-field
+            v-if="usePassword"
+            label="Password"
+            :type="passwordInputType"
+            class="form-control"
+            v-model="entity.password"
+            :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+            @click:append="showPasswords = !showPasswords"
+            color="focus"
+          />
+          <div class="colUnderW340 d-flex justify-space-around align-center">
+            <template v-if="usePassword">
               <router-link
                 v-if="useLink"
                 :to="{
@@ -44,57 +43,51 @@
                 role="button"
                 >Forgot password?</a
               >
-              <v-btn
-                type="submit"
-                @click.prevent="submit"
-                color="primary"
-                class="text-capitalize px-8 marginb10UnderW340"
-                >Login</v-btn
-              >
-            </div>
-          </v-form>
-        </div>
-        <div class="d-flex flex-sm-column align-center justify-space-around">
-          <div class="line"></div>
-          Or
-          <div class="line"></div>
-        </div>
-        <div
-          class="d-flex justify-center pr-sm-5 pl-sm-10 py-6 d-flex flex-column align-center flex-wrap"
-          v-if="registrationEnabled || hasInvitation"
-        >
-          <p class="white-space-nowrap">Don't have an account?</p>
-          <v-btn v-if="useLink" :to="registerLink" color="primary" class="text-capitalize px-8" role="link">
-            Register now
-          </v-btn>
-          <v-btn
-            v-else
-            @click.stop="$emit('updateActive', 'register')"
-            color="primary"
-            class="text-capitalize px-8"
-            role="button"
-          >
-            Register now
-          </v-btn>
-        </div>
+            </template>
+            <v-btn
+              type="submit"
+              @click.prevent="handleSubmitClick"
+              color="primary"
+              :loading="isSubmitting"
+              class="text-capitalize px-8 marginb10UnderW340"
+              >{{ usePassword ? 'Login' : 'Email me sign in link' }}</v-btn
+            >
+          </div>
+        </v-form>
       </div>
-      <app-feedback
-        :elevation="0"
-        class="mt-4 info lighten-4"
-        color="info"
-        v-if="membership"
-        icon="mdi-information"
-        :closeable="false"
-      >
-        Login or Register to join <strong>{{ membership.group.name }}</strong></app-feedback
-      >
-      <transition name="fade">
-        <app-feedback :elevation="0" v-if="status" class="mt-5 red lighten-1" @closed="status = ''">{{
-          status
-        }}</app-feedback>
-      </transition>
-    </v-card>
-  </div>
+      <div class="text-center text-muted mt-5">
+        <v-btn text small color="primary" @click="usePassword = !usePassword" data-testid="toggle-method">
+          {{ usePassword ? 'sign in with email instead' : 'sign in with password instead' }}
+        </v-btn>
+      </div>
+    </template>
+
+    <transition name="fade">
+      <app-feedback :elevation="0" v-if="status" class="mt-5 red lighten-1" @closed="status = ''">{{
+        status
+      }}</app-feedback>
+    </transition>
+  </v-card>
+  <v-alert
+    v-else
+    icon="mdi-email-fast"
+    style="max-width: 400px"
+    prominent
+    colored-border
+    color="success"
+    border="left"
+    elevation="2"
+  >
+    <h1>Magic link sent!</h1>
+    <p class="body-1 my-6">
+      Follow the link we sent you at <span class="font-weight-medium">{{ entity.email }}</span> to finish logging in!
+    </p>
+    <div class="text-right text-muted mt-5">
+      <v-btn text small @click="signInLinkSent = false">
+        Back to login
+      </v-btn>
+    </div>
+  </v-alert>
 </template>
 
 <script>
@@ -131,6 +124,9 @@ export default {
       invitation: '',
       membership: null,
       registrationEnabled: false,
+      usePassword: false,
+      signInLinkSent: false,
+      isSubmitting: false,
     };
   },
   computed: {
@@ -203,9 +199,30 @@ export default {
     }
   },
   methods: {
+    async handleSubmitClick() {
+      this.isSubmitting = true;
+      try {
+        await this.submit();
+      } finally {
+        this.isSubmitting = false;
+      }
+    },
     async submit() {
       if (this.entity.email === '') {
         this.status = 'E-Mail must not be empty.';
+        return;
+      }
+
+      // email sign-in link
+      if (!this.usePassword) {
+        const returnUrl = this.$route.params.redirect || this.$route.query.returnUrl;
+
+        try {
+          await this.$store.dispatch('auth/sendMagicLink', { email: this.entity.email, returnUrl });
+          this.signInLinkSent = true;
+        } catch (e) {
+          this.status = (e.response && e.response.message) || 'An error occured, please try again later.';
+        }
         return;
       }
 

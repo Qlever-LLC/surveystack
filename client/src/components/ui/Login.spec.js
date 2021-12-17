@@ -1,4 +1,4 @@
-import { fireEvent } from '@testing-library/vue';
+import { fireEvent, screen } from '@testing-library/vue';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 import Login from './Login.vue';
 import { RouterLinkStub } from '@vue/test-utils';
@@ -12,39 +12,10 @@ const TransitionStub = {
   },
 };
 
+const switchLoginMethod = () => fireEvent.click(screen.getByTestId('toggle-method'));
+
 describe('Login component', () => {
   describe('navigation links and buttons', () => {
-    it('Renders link to Register by default', async () => {
-      const { getByRole } = renderWithVuetify(Login, {
-        store: {},
-        propsData: {},
-        mocks: {
-          $route: {
-            query: {},
-          },
-        },
-        stubs: {
-          RouterLink: RouterLinkStub,
-        },
-      });
-      getByRole('link', { name: 'Register now' });
-    });
-    it('Renders button to Register when useLink is false', async () => {
-      const { getByRole } = renderWithVuetify(Login, {
-        store: {},
-        propsData: { useLink: false },
-        mocks: {
-          $route: {
-            query: {},
-          },
-        },
-        stubs: {
-          RouterLink: RouterLinkStub,
-        },
-      });
-      getByRole('button', { name: 'Register now' });
-    });
-
     it('Renders link to Forgot Password by default', async () => {
       const { getByRole } = renderWithVuetify(Login, {
         store: {},
@@ -58,6 +29,7 @@ describe('Login component', () => {
           RouterLink: RouterLinkStub,
         },
       });
+      await switchLoginMethod();
       getByRole('link', { name: 'Forgot password?' });
     });
 
@@ -74,6 +46,7 @@ describe('Login component', () => {
           RouterLink: RouterLinkStub,
         },
       });
+      await switchLoginMethod();
       getByRole('button', { name: 'Forgot password?' });
     });
   });
@@ -92,6 +65,7 @@ describe('Login component', () => {
           RouterLink: RouterLinkStub,
         },
       });
+      await switchLoginMethod();
       const emailInput = getByLabelText('E-Mail');
       fireEvent.update(emailInput, 'email.error@error.com');
       expect(emailInput.value).toBe('email.error@error.com');
@@ -114,6 +88,7 @@ describe('Login component', () => {
           RouterLink: RouterLinkStub,
         },
       });
+      await switchLoginMethod();
       const passwordInput = getByLabelText('Password');
       fireEvent.update(passwordInput, 'somePassword');
       expect(passwordInput.value).toBe('somePassword');
@@ -147,6 +122,7 @@ describe('Login component', () => {
           transition: TransitionStub,
         },
       });
+      await switchLoginMethod();
       const emailInput = getByLabelText('E-Mail');
       fireEvent.update(emailInput, 'someValidMail@mail.com');
       expect(emailInput.value).toBe('someValidMail@mail.com');
@@ -184,6 +160,7 @@ describe('Login component', () => {
           transition: TransitionStub,
         },
       });
+      await switchLoginMethod();
       const emailInput = getByLabelText('E-Mail');
       fireEvent.update(emailInput, 'email.error@error.com');
       expect(emailInput.value).toBe('email.error@error.com');
@@ -221,6 +198,7 @@ describe('Login component', () => {
           transition: TransitionStub,
         },
       });
+      await switchLoginMethod();
       const emailInput = getByLabelText('E-Mail');
       fireEvent.update(emailInput, 'email@mail.com');
       expect(emailInput.value).toBe('email@mail.com');
@@ -269,6 +247,8 @@ describe('Login component', () => {
           transition: TransitionStub,
         },
       });
+      await switchLoginMethod();
+
       const emailInput = getByLabelText('E-Mail');
       fireEvent.update(emailInput, 'someValidMail@mail.com');
 
@@ -279,7 +259,7 @@ describe('Login component', () => {
       await fireEvent.click(button);
       // wait for Promise for pending result
       await new Promise((resolve) => setTimeout(resolve, 0));
-      expect(mockAxios.post).toHaveBeenCalledTimes(1); // .toHaveBeenCalled();
+      expect(mockAxios.post).toHaveBeenCalledTimes(1);
       expect(autoSelectActiveGroup).toHaveBeenCalledTimes(1);
       expect(push).toHaveBeenCalledWith('/');
     });
@@ -321,6 +301,8 @@ describe('Login component', () => {
           transition: TransitionStub,
         },
       });
+      await switchLoginMethod();
+
       const emailInput = getByLabelText('E-Mail');
       fireEvent.update(emailInput, 'someValidMail@mail.com');
 
@@ -363,6 +345,8 @@ describe('Login component', () => {
           transition: TransitionStub,
         },
       });
+      await switchLoginMethod();
+
       const emailInput = getByLabelText('E-Mail');
       fireEvent.update(emailInput, 'someValidMail@mail.com');
 
@@ -406,6 +390,8 @@ describe('Login component', () => {
           transition: TransitionStub,
         },
       });
+      await switchLoginMethod();
+
       const emailInput = getByLabelText('E-Mail');
       fireEvent.update(emailInput, 'someValidMail@mail.com');
 
@@ -446,6 +432,8 @@ describe('Login component', () => {
           transition: TransitionStub,
         },
       });
+      await switchLoginMethod();
+
       const emailInput = getByLabelText('E-Mail');
       fireEvent.update(emailInput, 'someValidMail@mail.com');
 
@@ -487,6 +475,8 @@ describe('Login component', () => {
           transition: TransitionStub,
         },
       });
+      await switchLoginMethod();
+
       const emailInput = getByLabelText('E-Mail');
       fireEvent.update(emailInput, 'someValidMail@mail.com');
 
