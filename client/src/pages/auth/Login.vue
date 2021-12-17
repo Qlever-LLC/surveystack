@@ -29,9 +29,6 @@ export default {
   data() {
     return {
       status: '',
-      usePassword: false,
-      signInLinkSent: false,
-      isSubmitting: false,
       showPasswords: false,
       entity: {
         ...DEFAULT_ENTITY,
