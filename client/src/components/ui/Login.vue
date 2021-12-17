@@ -1,7 +1,7 @@
 <template>
-  <v-card v-if="!signInLinkSent" class="pa-2 pa-sm-7">
+  <v-card v-if="!signInLinkSent" class="pa-6 card-width">
     <template>
-      <div class="py-sm-5 py-6">
+      <div class="py-6">
         <h1 class="heading--text text-center" v-if="isWhitelabel">Login &amp; Join {{ whitelabelPartner.name }}</h1>
         <h1 class="heading--text mb-4" v-else>Welcome Back</h1>
         <v-form>
@@ -23,7 +23,7 @@
             @click:append="showPasswords = !showPasswords"
             color="focus"
           />
-          <div class="colUnderW340 d-flex justify-space-around align-center">
+          <div class="d-flex justify-space-around align-center">
             <template v-if="usePassword">
               <router-link
                 v-if="useLink"
@@ -31,7 +31,7 @@
                   name: 'auth-forgot-password',
                   query: { email: entity.email },
                 }"
-                class="white-space-nowrap font-weight-medium ForgotPassword"
+                class="white-space-nowrap font-weight-medium mr-4"
                 role="link"
                 >Forgot password?</router-link
               >
@@ -39,44 +39,44 @@
                 v-else
                 text
                 @click.stop="$emit('updateActive', 'forgot-password')"
-                class="white-space-nowrap font-weight-medium ForgotPassword"
+                class="white-space-nowrap font-weight-medium mr-4"
                 role="button"
                 >Forgot password?</a
               >
             </template>
-            <v-btn
-              type="submit"
-              @click.prevent="handleSubmitClick"
-              color="primary"
-              :loading="isSubmitting"
-              class="text-capitalize px-8 marginb10UnderW340"
-              >{{ usePassword ? 'Login' : 'Email me sign in link' }}</v-btn
-            >
+            <v-btn type="submit" @click.prevent="handleSubmitClick" color="primary" :loading="isSubmitting">{{
+              usePassword ? 'Login' : 'Email me sign in link'
+            }}</v-btn>
           </div>
         </v-form>
       </div>
       <div class="text-center text-muted mt-5">
-        <v-btn text small color="primary" @click="usePassword = !usePassword" data-testid="toggle-method">
+        <v-btn
+          text
+          small
+          color="primary"
+          @click="
+            usePassword = !usePassword;
+            status = null;
+          "
+          data-testid="toggle-method"
+        >
           {{ usePassword ? 'sign in with email instead' : 'sign in with password instead' }}
         </v-btn>
       </div>
     </template>
 
-    <transition name="fade">
-      <app-feedback :elevation="0" v-if="status" class="mt-5 red lighten-1" @closed="status = ''">{{
-        status
-      }}</app-feedback>
-    </transition>
+    <v-alert v-if="status" class="mt-4" mode="fade" text type="error">{{ status }}</v-alert>
   </v-card>
   <v-alert
     v-else
     icon="mdi-email-fast"
-    style="max-width: 400px"
     prominent
     colored-border
     color="success"
     border="left"
     elevation="2"
+    class="card-width"
   >
     <h1>Magic link sent!</h1>
     <p class="body-1 my-6">
@@ -91,7 +91,6 @@
 </template>
 
 <script>
-import appFeedback from '@/components/ui/Feedback.vue';
 import api from '@/services/api.service';
 import { autoSelectActiveGroup } from '@/utils/memberships';
 
@@ -101,9 +100,6 @@ const DEFAULT_ENTITY = {
 };
 
 export default {
-  components: {
-    appFeedback,
-  },
   props: {
     initialEmail: {
       type: String,
@@ -287,42 +283,8 @@ export default {
 a {
   text-decoration: none;
 }
-
-.line {
-  border-top: 2px solid rgb(180, 180, 180);
-  width: 40%;
-  margin-top: -1px;
-}
-
-.colUnderW340 {
-  flex-direction: column-reverse;
-}
-.marginb10UnderW340 {
-  margin-bottom: 10px;
-}
-
-@media (min-width: 340px) {
-  /* Forgot passwd next to Login */
-  .colUnderW340 {
-    flex-direction: row;
-  }
-  .marginb10UnderW340 {
-    margin: 0;
-  }
-  .ForgotPassword {
-    margin-right: 16px;
-  }
-}
-
-@media (min-width: 600px) {
-  .line {
-    /* reset previous values */
-    border-top: none;
-    width: auto;
-    margin-top: 0;
-    border-left: 2px solid rgb(180, 180, 180);
-    height: 40%;
-    margin-left: -1px;
-  }
+.card-width {
+  width: 400px;
+  max-width: 92vw;
 }
 </style>
