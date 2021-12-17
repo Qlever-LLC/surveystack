@@ -19,7 +19,7 @@ const check = async () => {
 };
 
 const send = async ({ to, subject, text }) => {
-  const message = { from: process.env.SMTP_DEFAULT_SENDER, to, subject, text, html };
+  const message = { from: process.env.SMTP_DEFAULT_SENDER, to, subject, text };
   await transport.sendMail(message);
 };
 
