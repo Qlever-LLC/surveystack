@@ -1,3 +1,5 @@
+// DEPRECATED:, remove a few weeks after https://gitlab.com/our-sci/software/surveystack/-/merge_requests/67  was deployed
+
 const createInitialState = () => ({
   invitation: null,
 });

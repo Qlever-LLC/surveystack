@@ -56,11 +56,11 @@ export default {
       this.initialized = true;
     },
     cancel() {
-      this.$store.dispatch('invitation/clear');
+      this.$store.dispatch('invitation/clear'); // DEPRECATED:, remove a few weeks after https://gitlab.com/our-sci/software/surveystack/-/merge_requests/67  was deployed
       this.$router.push('/');
     },
     async join() {
-      this.$store.dispatch('invitation/clear');
+      this.$store.dispatch('invitation/clear'); // DEPRECATED:, remove a few weeks after https://gitlab.com/our-sci/software/surveystack/-/merge_requests/67  was deployed
 
       try {
         // TODO: display status/errors
