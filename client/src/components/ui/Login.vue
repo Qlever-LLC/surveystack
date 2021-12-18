@@ -93,6 +93,7 @@
 <script>
 import api from '@/services/api.service';
 import { autoSelectActiveGroup } from '@/utils/memberships';
+import { get } from 'lodash';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -162,6 +163,10 @@ export default {
       this.entity.email = this.initialEmail;
     }
 
+    if ('magicLinkExpired' in this.$route.query) {
+      this.status = 'Your magic link is expired. Please request a new one.';
+    }
+
     const { invitation } = this.$route.query;
     this.invitation = invitation;
     if (invitation) {
@@ -217,7 +222,7 @@ export default {
           await this.$store.dispatch('auth/sendMagicLink', { email: this.entity.email, returnUrl });
           this.signInLinkSent = true;
         } catch (e) {
-          this.status = (e.response && e.response.message) || 'An error occured, please try again later.';
+          this.status = get(e, 'response.data.message') || 'An error occured, please try again later.';
         }
         return;
       }
@@ -271,9 +276,6 @@ export default {
       } else {
         this.$router.push('/');
       }
-    },
-    reset() {
-      this.entity = { ...DEFAULT_ENTITY };
     },
   },
 };

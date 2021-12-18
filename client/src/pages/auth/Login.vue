@@ -108,11 +108,6 @@ export default {
       this.$router.replace({ name: 'surveys-detail', params: { id: cfs } });
     }
   },
-  methods: {
-    reset() {
-      this.entity = { ...DEFAULT_ENTITY };
-    },
-  },
 };
 </script>
 
