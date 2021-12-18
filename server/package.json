@@ -7,7 +7,7 @@
     "start": "cross-env NODE_ENV=development nodemon --inspect --exec babel-node src/index.js",
     "prod": "cross-env NODE_ENV=production node ./dist/index.js",
     "clean": "rm -rf dist && mkdir dist",
-    "build-server": "babel -d ./dist src -s --copy-files",
+    "build-server": "babel -d ./dist src -s --ignore 'src/**/*.spec.js' --copy-files --no-copy-ignored",
     "build": "yarn clean && yarn build-server",
     "test": "jest",
     "test-watch": "jest --watch",

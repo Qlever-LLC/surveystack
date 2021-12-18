@@ -1,8 +1,8 @@
-import { createUserDoc } from '../../services/auth.service';
-import { db } from '..';
-import { deburr, kebabCase, uniqueId } from 'lodash';
-import { getRoles } from '../../services/roles.service';
-import { ObjectId } from 'mongodb';
+const { deburr, kebabCase, uniqueId } = jest.requireActual('lodash');
+const { ObjectId } = jest.requireActual('mongodb');
+const { getDb }  = jest.requireActual('..');
+const { createUserDoc } = jest.requireActual('../../services/auth.service');
+const { getRoles } = jest.requireActual('../../services/roles.service');
 
 export const createSuperAdmin = async () => {
   return await createUser({ permissions: ['super-admin'] });
@@ -15,7 +15,7 @@ export const createUser = async (overrides = {}) => {
     name: `User Number${fakeId}`,
   };
   const user = createUserDoc({ ...defaults, ...overrides });
-  const result = await db.collection('users').insertOne(user);
+  const result = await getDb().collection('users').insertOne(user);
   return result.ops[0];
 };
 
@@ -39,7 +39,7 @@ export const createGroup = async (_overrides = {}) => {
     ...overrides,
   };
 
-  const result = await db.collection('groups').insertOne(doc);
+  const result = await getDb().collection('groups').insertOne(doc);
 
   const createUserMember = async ({ userOverrides, membershipOverrides } = {}) => {
     const user = await createUser(userOverrides);
@@ -81,7 +81,7 @@ export const createMembership = async (_overrides = {}) => {
     },
     ...overrides,
   };
-  const result = await db.collection('memberships').insertOne(doc);
+  const result = await getDb().collection('memberships').insertOne(doc);
 
   return result.ops[0];
 };

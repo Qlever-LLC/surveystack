@@ -13,7 +13,6 @@ import DraftSubmission from '@/pages/submissions/drafts/Draft.vue';
 import Login from '@/pages/auth/Login.vue';
 import Profile from '@/pages/auth/Profile.vue';
 import ForgotPassword from '@/pages/auth/ForgotPassword.vue';
-import ResetPassword from '@/pages/auth/ResetPassword.vue';
 
 import Experiment from '@/pages/experiment/Experiments.vue';
 import SandboxAR from '@/pages/experiment/sandbox/SandboxAR.vue';
@@ -153,11 +152,6 @@ const routes = [
     path: '/auth/forgot-password',
     name: 'auth-forgot-password',
     component: ForgotPassword,
-  },
-  {
-    path: '/auth/reset-password',
-    name: 'auth-reset-password',
-    component: ResetPassword,
   },
   {
     path: '/auth/accept-magic-link',
