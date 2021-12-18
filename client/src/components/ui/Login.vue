@@ -118,8 +118,6 @@ export default {
       entity: {
         ...DEFAULT_ENTITY,
       },
-      invitation: '',
-      membership: null,
       registrationEnabled: false,
       usePassword: false,
       signInLinkSent: false,
@@ -130,30 +128,13 @@ export default {
     passwordInputType() {
       return this.showPasswords ? 'text' : 'password';
     },
-    registerLink() {
-      const link = {
-        name: 'auth-register',
-        params: {
-          initialEmail: this.entity.email,
-          initialPassword: this.entity.password,
-        },
-      };
-
-      if (this.$route.params && this.$route.params.redirect) {
-        link.params.redirect = this.$route.params.redirect;
-      }
-
-      if (this.invitation) {
-        link.query = { invitation: this.invitation };
-      }
-      return link;
-    },
     isWhitelabel() {
       return this.$store.getters['whitelabel/isWhitelabel'];
     },
     whitelabelPartner() {
       return this.$store.getters['whitelabel/partner'];
     },
+    // DEPRECATED:, remove a few weeks after https://gitlab.com/our-sci/software/surveystack/-/merge_requests/67  was deployed
     hasInvitation() {
       return this.$store.getters['invitation/hasInvitation'];
     },
@@ -167,14 +148,10 @@ export default {
       this.status = 'Your magic link is expired. Please request a new one.';
     }
 
+    // DEPRECATED:, remove a few weeks after https://gitlab.com/our-sci/software/surveystack/-/merge_requests/67  was deployed
     const { invitation } = this.$route.query;
-    this.invitation = invitation;
     if (invitation) {
       this.$store.dispatch('invitation/set', invitation);
-      const {
-        data: [membership],
-      } = await api.get(`/memberships?invitationCode=${invitation}&populate=true`);
-      this.membership = membership;
     }
 
     if (this.isWhitelabel) {
@@ -186,7 +163,7 @@ export default {
       this.registrationEnabled = true;
     }
 
-    // magic link login
+    // DEPRECATED:, remove a few weeks after https://gitlab.com/our-sci/software/surveystack/-/merge_requests/67  was deployed
     const { cfs, email, token, group } = this.$route.query;
     if (cfs) {
       await this.$store.dispatch('auth/login', {
@@ -268,6 +245,7 @@ export default {
 
       if (this.$route.params.redirect) {
         this.$router.push(this.$route.params.redirect);
+        // DEPRECATED:, remove a few weeks after https://gitlab.com/our-sci/software/surveystack/-/merge_requests/67  was deployed
       } else if (this.hasInvitation) {
         this.$router.push({
           name: 'invitations',
