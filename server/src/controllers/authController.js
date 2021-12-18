@@ -63,7 +63,8 @@ const login = async (req, res) => {
   if (email.trim() === '' || password.trim() === '') {
     throw boom.badRequest('Email and password must not be empty');
   }
-
+  // TODO the client shows the same error message weather the email or the pw doesn't match (since https://gitlab.com/our-sci/software/surveystack/-/merge_requests/19)
+  //  We should also send the same error from the server to get less vulnerable against dictionary attacks
   const existingUser = await db.collection(col).findOne({ email });
   if (!existingUser) {
     throw boom.notFound(`No user with email exists: ${email}`);
@@ -81,27 +82,27 @@ const login = async (req, res) => {
 
 const sendPasswordResetMail = async (req, res) => {
   const { email } = req.body;
-  const { origin } = req.headers;
   const existingUser = await db.collection(col).findOne({ email });
-  if (!existingUser) {
-    throw boom.notFound(`No user with email exists: ${email}`);
+  
+  // Fail silently when the email is not in the DB
+  if (existingUser) {
+    const { origin } = req.headers;
+    const returnUrl = `/users/${existingUser._id}/edit`;
+    const magicLink = await createMagicLink({ origin, email, expiresAfterDays: 3, returnUrl });
+
+    await mailService.sendLink({
+      to: email,
+      subject: `Link to reset your password`,
+      link: magicLink,
+      actionDescriptionHtml: 'Continue to reset your password at <b>SurveyStack</b>:',
+      actionDescriptionText: 'Use the following link to set a new password:',
+      btnText: 'Reset password',
+    });
   }
-  await mailService.send({
-    to: email,
-    subject: 'Link to reset your password',
-    text: `Hello,
-
-Use the following link to set a new password:
-
-${origin}/auth/reset-password?token=${existingUser.token}&email=${existingUser.email}
-
-If you did not request this email, you can safely ignore it.
-
-Best Regards`,
-  });
-  return res.send('OK');
+  return res.send({ ok: true });
 };
 
+// TODO deprecated, the SurveyStack browser client doesn't use it anymore. Can we remove it, or there are other clients still using it?
 const resetPassword = async (req, res) => {
   const { email, token, newPassword } = req.body;
   const existingUser = await db.collection(col).findOne({ email });

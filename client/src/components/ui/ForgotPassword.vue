@@ -70,22 +70,14 @@ export default {
         await api.post('/auth/send-password-reset-mail', { email: this.email });
         this.status = {
           type: 'success',
-          message: `Check your inbox on ${this.email}`,
+          message:
+            'If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes.',
         };
       } catch (error) {
-        switch (error.response.status) {
-          case 404:
-            this.status = {
-              type: 'error',
-              message: 'invalid email', //error.response.data.message,
-            };
-            break;
-          default:
-            this.status = {
-              type: 'error',
-              message: 'Unknown error :/',
-            };
-        }
+        this.status = {
+          type: 'error',
+          message: 'An error occured, please try again later.',
+        };
       }
     },
   },
