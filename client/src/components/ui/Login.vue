@@ -76,7 +76,7 @@
     color="success"
     border="left"
     elevation="2"
-    class="card-width"
+    class="card-width mb-0"
   >
     <h1>Magic link sent!</h1>
     <p class="body-1 my-6">
