@@ -2,7 +2,7 @@ import url from 'url';
 import authController from './authController';
 const { enterWithMagicLink } = authController;
 import { db } from '../db'
-import { createReq, createRes, createUser } from '../db/testUtils';
+import { createReq, createRes, createUser } from '../testUtils';
 import { createMagicLink } from '../services/auth.service';
 import { decode } from 'js-base64';
 import { uniqueId } from 'lodash';

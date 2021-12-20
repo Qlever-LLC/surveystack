@@ -1,7 +1,7 @@
 import membershipController from './membershipController';
 const { updateMembership } = membershipController;
 import { db } from '../db';
-import { createGroup, createReq, createRes, asMongoId } from '../db/testUtils'
+import { createGroup, createReq, createRes, asMongoId } from '../testUtils'
 
 describe('updateMembership', () => {
   it('can update editable fields', async () => {
