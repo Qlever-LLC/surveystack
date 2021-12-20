@@ -1,5 +1,5 @@
 import { createUserIfNotExist, createMagicLink, createLoginPayload } from './auth.service';
-import { createGroup, createUser } from '../db/testUtils';
+import { createGroup, createUser } from '../testUtils';
 import { db, COLL_ACCESS_CODES } from '../db';
 import url from 'url';
 import rolesService from './roles.service';

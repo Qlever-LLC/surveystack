@@ -1,6 +1,6 @@
 import authController from './authController';
 const { sendPasswordResetMail } = authController;
-import { createReq, createRes, createUser } from '../db/testUtils';
+import { createReq, createRes, createUser } from '../testUtils';
 import mailService from '../services/mail/mail.service';
 import { createMagicLink } from '../services/auth.service';
 jest.mock('../services/mail/mail.service');

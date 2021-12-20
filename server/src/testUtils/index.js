@@ -1,8 +1,8 @@
 const { deburr, kebabCase, uniqueId } = jest.requireActual('lodash');
 const { ObjectId } = jest.requireActual('mongodb');
-const { getDb }  = jest.requireActual('..');
-const { createUserDoc } = jest.requireActual('../../services/auth.service');
-const { getRoles } = jest.requireActual('../../services/roles.service');
+const { getDb }  = jest.requireActual('../db');
+const { createUserDoc } = jest.requireActual('../services/auth.service');
+const { getRoles } = jest.requireActual('../services/roles.service');
 
 export const createSuperAdmin = async () => {
   return await createUser({ permissions: ['super-admin'] });

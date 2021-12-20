@@ -1,6 +1,6 @@
 import authController from './authController';
 const { requestMagicLink } = authController;
-import { createReq, createRes } from '../db/testUtils';
+import { createReq, createRes } from '../testUtils';
 import mailService from '../services/mail/mail.service';
 import { createMagicLink } from '../services/auth.service';
 jest.mock('../services/mail/mail.service');
