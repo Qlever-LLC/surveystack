@@ -100,6 +100,9 @@ const DEFAULT_ENTITY = {
   password: '',
 };
 
+// LocalStorage key for saving the preferred login method
+const LS_DEFAULT_USE_PASSWORD = 'use-password-on-login-page-by-default';
+
 export default {
   props: {
     initialEmail: {
@@ -119,7 +122,7 @@ export default {
         ...DEFAULT_ENTITY,
       },
       registrationEnabled: false,
-      usePassword: false,
+      usePassword: localStorage[LS_DEFAULT_USE_PASSWORD] === 'true',
       signInLinkSent: false,
       isSubmitting: false,
     };
@@ -254,6 +257,11 @@ export default {
       } else {
         this.$router.push('/');
       }
+    },
+  },
+  watch: {
+    usePassword(newValue) {
+      localStorage[LS_DEFAULT_USE_PASSWORD] = newValue;
     },
   },
 };
