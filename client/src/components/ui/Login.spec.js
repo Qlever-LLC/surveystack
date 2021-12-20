@@ -14,6 +14,8 @@ const TransitionStub = {
 
 const switchLoginMethod = () => fireEvent.click(screen.getByTestId('toggle-method'));
 
+beforeEach(() => localStorage.clear());
+
 describe('Login component', () => {
   describe('navigation links and buttons', () => {
     it('Renders link to Forgot Password by default', async () => {
