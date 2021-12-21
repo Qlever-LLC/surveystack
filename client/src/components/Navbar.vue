@@ -280,7 +280,6 @@ export default {
 #app-bar-title {
   font-size: 1rem;
   font-weight: normal;
-  /* color: white; */
   line-height: 1.8rem;
 }
 
@@ -289,7 +288,7 @@ export default {
   line-height: 0.8rem;
 }
 .v-icon {
-  opacity: 0.55;
+  opacity: 0.95;
 }
 </style>
 <style>
