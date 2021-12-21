@@ -3,8 +3,9 @@
     <template>
       <div class="py-6">
         <h1 class="heading--text text-center" v-if="isWhitelabel">Login &amp; Join {{ whitelabelPartner.name }}</h1>
-        <h1 class="heading--text mb-4" v-else>Welcome Back</h1>
+        <h1 class="heading--text" v-else>{{ usePassword ? 'Welcome Back!' : 'Welcome!' }}</h1>
         <v-form>
+          <p v-if="!usePassword">Enter your email below to <b>sign in</b> or <b>register</b>.</p>
           <v-text-field
             label="E-Mail"
             type="text"
