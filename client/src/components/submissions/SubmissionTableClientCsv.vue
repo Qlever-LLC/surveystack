@@ -37,13 +37,16 @@
             <td>
               <v-checkbox v-model="tableSelected" :value="item" color="#777" class="custom-checkbox" hide-details />
             </td>
-            <td
-              v-for="header in headers"
-              :key="header.text"
-              :class="truncate(item[header.value]) ? 'truncate' : ''"
-              :data-value="item[header.value]"
-            >
-              {{ item[header.value] }}
+            <td v-for="header in headers" :key="header.text">
+              <div :class="truncate(item[header.value]) ? 'truncate' : ''">
+                {{ item[header.value] }}
+              </div>
+              <div
+                v-if="truncate(item[header.value])"
+                :class="truncate(item[header.value]) ? 'truncate-full-text' : ''"
+              >
+                {{ item[header.value] }}
+              </div>
             </td>
           </tr>
         </tbody>
@@ -217,31 +220,22 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-.truncate::after {
-  content: attr(data-value);
+.truncate-full-text {
   position: absolute;
+  top: 0;
   left: 0;
-  top: -2.5rem;
-  font-size: 0.85rem;
-  background: white;
-  border-radius: 5px;
   opacity: 0;
-  transition: opacity 0.3s ease-in-out;
-  padding: 1rem 1.5rem 1rem 1.5rem;
-}
-.truncate:hover::before,
-.truncate:hover::after {
-  opacity: 1;
+
+  margin-bottom: 5rem;
+  background-color: white;
+  padding: 1em 0rem 1rem 2rem;
   box-shadow: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
-  position: absolute;
-  z-index: 20;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+}
+
+td:hover .truncate-full-text {
+  opacity: 1;
   white-space: initial;
-  font-family: system-ui, -apple-system;
-  line-height: 25px;
+  width: 100%;
 }
 
 .custom-checkbox {
