@@ -23,7 +23,14 @@ const actions = {
   },
   async setPartner({ commit, dispatch }, partner) {
     commit('SET_PARTNER', partner);
-    dispatch('appui/setTitle', partner.name, { root: true });
+    const title = partner.navLogo
+      ? `<img 
+           src=${partner.navLogo} 
+           width="70px" height="30px" 
+           style="object-fit:contain;margin-top:10px;"
+        />`
+      : partner.name;
+    dispatch('appui/setTitle', title, { root: true });
 
     const { data } = await api.get(`/groups/${partner.id}?populate=1`);
     const pinnedSurveys = [];

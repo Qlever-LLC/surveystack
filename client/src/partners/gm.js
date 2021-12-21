@@ -5,6 +5,7 @@ export default {
   slug: 'general-mills-regen-ag',
   path: '/general-mills-regen-ag/',
   logo: '/partners/gm/img/logo.png',
+  navLogo: '/partners/gm/img/logo.png',
   themes: {
     light: {
       primary: '#0055a7',

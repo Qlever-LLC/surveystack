@@ -182,13 +182,13 @@ export default {
   height: 100%;
 }
 
->>> .v-dialog {
+.v-dialog {
   height: auto;
   width: auto;
   max-width: 40rem;
 }
 
->>> .container {
+.container {
   padding: 0;
 }
 </style>
