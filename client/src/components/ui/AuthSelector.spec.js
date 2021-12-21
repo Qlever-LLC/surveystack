@@ -5,8 +5,9 @@ import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 const store = {};
 const noRoutes = [];
 
-const loginViewTitle = 'Welcome Back';
-const forgotPasswordViewTitle = 'Forgot Password';
+const pwLoginViewTitle = 'Welcome Back!';
+const emailLoginViewTitle = 'Welcome!';
+const forgotPasswordViewTitle = 'Forgot Password?';
 
 describe('AuthSelector', () => {
   describe('AuthSelector renders expected views', () => {
@@ -16,7 +17,7 @@ describe('AuthSelector', () => {
         store,
         routes: noRoutes,
       });
-      getByText(loginViewTitle);
+      getByText(emailLoginViewTitle);
     });
     it('Renders Login view for init prop', async () => {
       const { getByText } = renderWithVuetify(AuthSelector, {
@@ -24,7 +25,7 @@ describe('AuthSelector', () => {
         store,
         routes: noRoutes,
       });
-      getByText(loginViewTitle);
+      getByText(emailLoginViewTitle);
     });
     it('Renders Forgot Password view for init prop', async () => {
       const { getByText } = renderWithVuetify(AuthSelector, {
@@ -44,7 +45,7 @@ describe('AuthSelector', () => {
         routes: noRoutes,
       });
       await fireEvent.click(screen.getByTestId('toggle-method'));
-      getByText(loginViewTitle);
+      getByText(pwLoginViewTitle);
       const button = getByText('Forgot password?');
       await fireEvent.click(button);
       getByText(forgotPasswordViewTitle);
@@ -58,7 +59,7 @@ describe('AuthSelector', () => {
       getByText(forgotPasswordViewTitle);
       const button = getByText('Back to login');
       await fireEvent.click(button);
-      getByText(loginViewTitle);
+      getByText(pwLoginViewTitle);
     });
   });
 });
