@@ -40,7 +40,8 @@ const updateProperty = async (label, value, openAdvanced) => {
 
 // saves the survey to the draft store and returns the newly created revision
 const saveDraft = async (store) => {
-  await fireEvent.click(screen.getByText('Save'));
+  const surveyDetails = screen.getByTestId('survey-details');
+  await fireEvent.click(within(surveyDetails).getByText('Save'));
   return last(store.modules.draft.state.survey.revisions);
 };
 
@@ -111,7 +112,8 @@ describe('add control', () => {
         await findByText(screen.getByTestId('graphical-view'), label);
 
         // the control is saved in the draft store
-        await fireEvent.click(screen.getByText('Save'));
+        const surveyDetails = screen.getByTestId('survey-details');
+        await fireEvent.click(within(surveyDetails).getByText('Save'));
         expect(spyDraftInit).toHaveBeenCalled();
         const controls = last(last(spyDraftInit.mock.calls)[1].survey.revisions).controls;
         expect(controls).toMatchObject([{ name: dataName, label, type: info.type }]);

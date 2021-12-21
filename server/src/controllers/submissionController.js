@@ -880,7 +880,7 @@ const bulkReassignSubmissions = async (req, res) => {
           {
             $set: {
               ...(group ? { 'meta.group.id': groupId, 'meta.group.path': groupPath } : {}),
-              ...(creator ? { 'meta.group.creator': ObjectId(creator) } : {}),
+              ...(creator ? { 'meta.creator': ObjectId(creator) } : {}),
             },
             $inc: { 'meta.revision': 1 },
           },
