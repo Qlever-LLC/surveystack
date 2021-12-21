@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-card class="pa-6 pa-sm-12">
-      <h1>Forgot Password</h1>
+      <h1>Forgot Password?</h1>
       <p>Enter your email address and we will send you a link for setting a new password.</p>
 
       <v-form @submit.prevent="submit">
