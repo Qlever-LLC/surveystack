@@ -116,7 +116,7 @@
             <div class="ml-auto d-flex flex-column flex-sm-row">
               <v-btn
                 v-if="selected[0]['meta.archived'] === 'true'"
-                :disabled="surveyEntity.meta.isLibrary"
+                :disabled="surveyEntity.meta.isLibrary || !editable"
                 color="error"
                 text
                 @click="showDeleteModal = true"
@@ -125,7 +125,7 @@
               </v-btn>
               <v-btn
                 v-if="selected[0]['meta.archived'] === 'true'"
-                :disabled="surveyEntity.meta.isLibrary"
+                :disabled="surveyEntity.meta.isLibrary || !editable"
                 text
                 @click="archiveSubmissions(selected, '', false)"
               >
@@ -133,7 +133,7 @@
               </v-btn>
               <v-btn
                 v-if="selected[0]['meta.archived'] !== 'true'"
-                :disabled="surveyEntity.meta.isLibrary"
+                :disabled="surveyEntity.meta.isLibrary || !editable"
                 color="error"
                 text
                 @click="showArchiveModal = true"
@@ -142,14 +142,14 @@
               </v-btn>
               <v-btn
                 @click="reassignment.showModal = true"
-                :disabled="surveyEntity.meta.isLibrary"
+                :disabled="surveyEntity.meta.isLibrary || !editable"
                 text
                 color="secondary"
                 >REASSIGN</v-btn
               >
               <v-btn
                 v-if="selected[0]['meta.archived'] !== 'true' && selected.length === 1"
-                :disabled="surveyEntity.meta.isLibrary"
+                :disabled="surveyEntity.meta.isLibrary || !editable"
                 text
                 color="primary"
                 @click="resubmit(selected[0])"
@@ -417,6 +417,24 @@ export default {
     paginationTotalPages() {
       const r = Math.floor(this.submissions.pagination.total / this.submissions.pagination.limit) + 1;
       return r;
+    },
+    user() {
+      return this.$store.getters['auth/user'];
+    },
+    userMemberships() {
+      return this.$store.getters['memberships/memberships'];
+    },
+    editable() {
+      // allow submissions editing to survey's group admins and all selected submissions creator
+      const g = this.userMemberships.find((m) => m.group._id === this.surveyEntity.meta.group.id);
+      const u = this.user;
+      if (g && g.role === 'admin') {
+        return true;
+      } else if (u && this.selected.every((s) => s['meta.creator'] === u._id)) {
+        return true;
+      } else {
+        return false;
+      }
     },
   },
   methods: {
