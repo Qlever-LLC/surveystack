@@ -112,7 +112,7 @@
     </v-row>
 
     <v-dialog v-if="!isLoggedIn" v-model="loginIsVisible" class="login-dialog">
-      <app-login :showHero="false" />
+      <auth-selector />
     </v-dialog>
 
     <v-row>
@@ -140,12 +140,12 @@
 </template>
 
 <script>
-import AppLogin from '@/pages/auth/Login.vue';
+import AuthSelector from '@/components/ui/AuthSelector.vue';
 import AppBasicList from '@/components/ui/BasicList.vue';
 
 export default {
   components: {
-    AppLogin,
+    AuthSelector,
     AppBasicList,
   },
   name: 'home',
@@ -155,13 +155,6 @@ export default {
       loginIsVisible: this.$store.getters['auth/isLoggedIn'] || true,
     };
   },
-  methods: {
-    async focused() {
-      // const res = await axios.get('http://localhost:9095/measurement');
-      // console.log('result', res.data);
-    },
-  },
-
   computed: {
     isLoggedIn() {
       return this.$store.getters['auth/isLoggedIn'];
@@ -180,11 +173,6 @@ export default {
       return this.$store.getters['whitelabel/pinnedSurveys'];
     },
   },
-
-  async created() {
-    // const res = await axios.get('http://localhost:9095/measurement');
-    // console.log('res', res);
-  },
 };
 </script>
 
@@ -195,8 +183,9 @@ export default {
 }
 
 >>> .v-dialog {
-  width: auto;
   height: auto;
+  width: auto;
+  max-width: 40rem;
 }
 
 >>> .container {

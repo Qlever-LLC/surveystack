@@ -43,7 +43,7 @@
                   :farmos="farmos"
                   :index="idx"
                   @changed="onInput"
-                  class="matrix-cell my-2"
+                  class="my-2"
                 />
               </div>
             </v-form>
@@ -63,68 +63,54 @@
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
 
-    <v-data-table
+    <app-matrix-table
       :headers="headers"
-      header
-      disable-pagination
-      hide-default-footer
-      hide-default-header
-      :items="rows || []"
-      disable-sort
-      mobile-breakpoint="0"
+      :rows="rows || []"
+      :fixedColumns="fixedColumns"
+      :isMobile="isMobile"
+      :rowActionsWidth="64"
+      :addRowLabel="addRowLabel"
+      @showEditDialog="(rowIdx) => editItem(rowIdx)"
+      @addRow="add"
     >
-      <template v-slot:header="{ props: { headers } }">
-        <thead>
-          <tr>
-            <th v-for="h in headers" :key="h.value">
-              <v-tooltip top>
-                <template v-slot:activator="{ on }">
-                  <span v-on="on">{{ h.label }}</span>
-                </template>
-                <span>{{ h.type }}</span>
-              </v-tooltip>
-              <app-redacted v-if="h.redacted" />
-              <app-required v-if="h.required" />
-            </th>
-          </tr>
-        </thead>
+      <template v-slot:header-cell="{ header }">
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <span class="flex-grow-1 text-truncate " v-on="on">{{ header.label }}</span>
+          </template>
+          <span>{{ header.type }}: {{ header.label }}</span>
+        </v-tooltip>
+        <app-redacted v-if="header.redacted" />
+        <app-required v-if="header.required" />
       </template>
-      <template v-slot:body="{ items, headers }">
-        <tbody>
-          <tr v-for="(item, idx) in items" :key="idx" @click="isMobile ? editItem(idx) : () => {}">
-            <td v-for="(header, key) in headers" :key="key" class="py-0 px-1">
-              <v-form autocomplete="off" @submit.prevent="">
-                <app-matrix-cell
-                  :header="header"
-                  :item="item"
-                  :getDropdownItems="getDropdownItems"
-                  :farmos="farmos"
-                  :index="idx"
-                  @changed="onInput"
-                  :disabled="isMobile"
-                  class="matrix-cell my-2"
-                  :style="{ minWidth: header.scaleWidth ? `calc(10rem * ${header.scaleWidth}/100)` : '10rem' }"
-                  :loading="loading"
-                />
-              </v-form>
-            </td>
-            <td v-if="!isMobile" style="width: 64px; padding-left: 4px !important; padding-right: 0px;">
-              <div class="d-flex">
-                <v-btn icon @click="rowToBeDeleted = idx" tabindex="-1" small>
-                  <v-icon>mdi-trash-can-outline</v-icon>
-                </v-btn>
-                <v-btn icon @click="duplicateRow(idx)" tabindex="-1" small>
-                  <v-icon>mdi-content-copy</v-icon>
-                </v-btn>
-              </div>
-            </td>
-          </tr>
-        </tbody>
+      <template v-slot:row-cell="{ header, row, colIdx }">
+        <v-form autocomplete="off" @submit.prevent="" :style="{ width: '100%' }">
+          <app-matrix-cell
+            :header="header"
+            :item="row"
+            :getDropdownItems="getDropdownItems"
+            :farmos="farmos"
+            :index="colIdx"
+            @changed="onInput"
+            :disabled="isMobile"
+            class="mt-2"
+            :loading="loading"
+          />
+        </v-form>
       </template>
-    </v-data-table>
-    <div class="mt-4 mb-12">
-      <v-btn @click="add" color="primary"> <v-icon left>mdi-plus</v-icon>{{ addRowLabel }} </v-btn>
-    </div>
+      <template v-if="!isMobile" v-slot:row-actions="{ rowIdx }">
+        <div style="width: 64px; padding-left: 4px !important; padding-right: 0px;">
+          <div class="d-flex">
+            <v-btn icon @click="rowToBeDeleted = rowIdx" tabindex="-1" small>
+              <v-icon>mdi-trash-can-outline</v-icon>
+            </v-btn>
+            <v-btn icon @click="duplicateRow(rowIdx)" tabindex="-1" small>
+              <v-icon>mdi-content-copy</v-icon>
+            </v-btn>
+          </div>
+        </div>
+      </template>
+    </app-matrix-table>
     <app-control-more-info :value="control.moreInfo" />
 
     <div class="d-flex flex-row align-center" v-if="loading">
@@ -135,14 +121,15 @@
 </template>
 
 <script>
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isNil, sortBy, uniq, without } from 'lodash';
 import appDialog from '@/components/ui/Dialog.vue';
-import appMatrixCell from '@/components/survey/question_types/MatrixCell.vue';
+import appMatrixCell from '@/components/survey/question_types/matrix/MatrixCell.vue';
+import appMatrixTable from '@/components/survey/question_types/matrix/MatrixTable.vue';
 import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
 
-import baseQuestionComponent from './BaseQuestionComponent';
-import farmosBase from './FarmOsBase';
+import baseQuestionComponent from '../BaseQuestionComponent';
+import farmosBase from '../FarmOsBase';
 
 /* copied from FarmOsPlanting.vue */
 const hashItem = (listItem) => {
@@ -242,6 +229,7 @@ export default {
   components: {
     appDialog,
     appMatrixCell,
+    appMatrixTable,
     appRequired,
     appRedacted,
   },
@@ -258,6 +246,9 @@ export default {
     },
     addRowLabel() {
       return this.source.config.addRowLabel;
+    },
+    fixedColumns() {
+      return this.source.config.fixedColumns;
     },
     showConfirmDeletionDialog: {
       get() {
@@ -323,13 +314,32 @@ export default {
       this.editedItem = this.rows[index];
       this.showEditItemDialog = true;
     },
-    getDropdownItems(field) {
+    getDropdownItems(field, values = []) {
       const column = this.source.content.find((col) => col.value === field);
       const ontology = this.resources.find((resource) => resource.id === column.resource);
-      return ontology.content.map((row) => ({ label: row.label, value: row.value }));
+      if (!ontology) {
+        return [];
+      }
+      const defaultItems = ontology.content.map((row) => ({ label: row.label, value: row.value }));
+      const usedValues = this.rows
+        .map((row) => row[field].value) // get the value from each row
+        .map((value) => (Array.isArray(value) ? value : [value])) // convert individual values to list
+        .flat(); // convert the values of each row into one list
+      // All the custom items the users typed in
+      const customItems = without(
+        uniq(usedValues).filter((v) => !isNil(v)), // get all the uniq non-empty values
+        ...defaultItems.map((i) => i.value) // without the default values
+      ).map((value) => ({ label: value, value }));
+      const allItems = sortBy(
+        [...defaultItems, ...customItems],
+        [
+          (a) => !values.includes(a.value), // move selected items first
+          'label',
+        ]
+      );
+      return allItems;
     },
     onInput() {
-      console.log('onInput', this.rows);
       this.$emit('changed', this.rows);
     },
     duplicateRow(idx) {
@@ -354,10 +364,6 @@ export default {
 </script>
 
 <style scoped>
-.matrix-cell {
-  /*min-width: 11rem;*/
-}
-
 /*
   'scrollbar-color' and 'scrollbar-width' should be working on Firefox Android since version 64
   https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Scrollbars#Browser_compatibility

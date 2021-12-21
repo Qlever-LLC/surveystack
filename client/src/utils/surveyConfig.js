@@ -24,7 +24,7 @@ export const defaultControlOptions = {
 };
 
 const createDefaultMatrixSource = () => ({
-  config: { addRowLabel: 'Add row' },
+  config: { addRowLabel: 'Add row', fixedColumns: 1 },
   content: [
     {
       label: 'Sample',
