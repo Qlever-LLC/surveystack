@@ -25,7 +25,7 @@ describe('sendPasswordResetMail', () => {
       origin,
       email: user.email,
       expiresAfterDays: 3,
-      returnUrl: `/users/${user._id}/edit`,
+      landingPath: `/users/${user._id}/edit`,
     });
   });
 

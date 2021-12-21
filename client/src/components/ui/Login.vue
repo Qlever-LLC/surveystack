@@ -197,10 +197,10 @@ export default {
 
       // email sign-in link
       if (!this.usePassword) {
-        const returnUrl = this.$route.params.redirect || this.$route.query.returnUrl;
+        const landingPath = this.$route.params.redirect || this.$route.query.landingPath;
 
         try {
-          await this.$store.dispatch('auth/sendMagicLink', { email: this.entity.email, returnUrl });
+          await this.$store.dispatch('auth/sendMagicLink', { email: this.entity.email, landingPath });
           this.signInLinkSent = true;
         } catch (e) {
           this.status = get(e, 'response.data.message') || 'An error occured, please try again later.';

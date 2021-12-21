@@ -41,7 +41,7 @@ export const createMagicLink = async ({
   origin,
   email,
   expiresAfterDays = 7,
-  returnUrl = null,
+  landingPath = null,
 }) => {
   if (!origin) {
     throw new Error('createMagicLink: "origin" parameter is required');
@@ -60,8 +60,8 @@ export const createMagicLink = async ({
   });
 
   let link = `${origin}/api/auth/enter-with-magic-link?code=${code}`;
-  if (returnUrl) {
-    link += `&returnUrl=${encodeURIComponent(returnUrl)}`;
+  if (landingPath) {
+    link += `&landingPath=${encodeURIComponent(landingPath)}`;
   }
 
   return link;

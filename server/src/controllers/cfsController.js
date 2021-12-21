@@ -7,8 +7,8 @@ import { db } from '../db';
 import { createMagicLink } from '../services/auth.service';
 
 const createText = async (text, { origin, survey, group, email }) => {
-  const returnUrl = `/surveys/${survey}?group=${group}`;
-  const magicLink = await createMagicLink({ origin, email, expiresAfterDays: 14, returnUrl });
+  const landingPath = `/surveys/${survey}?group=${group}`;
+  const magicLink = await createMagicLink({ origin, email, expiresAfterDays: 14, landingPath });
 
   return text.replace(/%CFS_MAGIC_LINK%/g, magicLink);
 };

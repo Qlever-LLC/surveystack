@@ -18,9 +18,9 @@ describe('enterWithMagicLink', () => {
 
   it('adds returnPath to the expired page URL', async () => {
     const res = await createRes();
-    const returnUrl = '/some/where';
-    await enterWithMagicLink(createReq({ query: { code: 'invalid', returnUrl } }), res);
-    expect(res.redirect).toHaveBeenCalledWith(`/auth/login?magicLinkExpired&returnUrl=${encodeURIComponent(returnUrl)}`);
+    const landingPath = '/some/where';
+    await enterWithMagicLink(createReq({ query: { code: 'invalid', landingPath } }), res);
+    expect(res.redirect).toHaveBeenCalledWith(`/auth/login?magicLinkExpired&landingPath=${encodeURIComponent(landingPath)}`);
   });
 
 
@@ -53,13 +53,13 @@ describe('enterWithMagicLink', () => {
     expect(redirect.pathname).toBe('/auth/accept-magic-link');
     const user = JSON.parse(decode(redirect.query.user));
     expect(user.email).toBe(email);
-    expect(user.returnUrl).toBeFalsy();
+    expect(user.landingPath).toBeFalsy();
   });
 
   withNewOrExistingUser('adds returnPath to the accept route URL', async (email) => {
     const res = await createRes();
-    const returnUrl = '/some/where';
-    const magicLink = await createMagicLink({ origin: 'https://foo.bar', email, returnUrl });
+    const landingPath = '/some/where';
+    const magicLink = await createMagicLink({ origin: 'https://foo.bar', email, landingPath });
     const { query } = url.parse(magicLink, true);
 
     await enterWithMagicLink(createReq({ query }), res);
@@ -69,6 +69,6 @@ describe('enterWithMagicLink', () => {
     expect(redirect.pathname).toBe('/auth/accept-magic-link');
     const user = JSON.parse(decode(redirect.query.user));
     expect(user.email).toBe(email);
-    expect(redirect.query.returnUrl).toBe(returnUrl);
+    expect(redirect.query.landingPath).toBe(landingPath);
   });
 });

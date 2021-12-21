@@ -81,20 +81,20 @@ describe('createMagicLink', () => {
   });
 
   describe('returns the link in the correct format', () => {
-    it('without returnUrl', async () => {
+    it('without landingPath', async () => {
       const link = new URL(await createMagicLink({ email, origin }));
       expect(link.origin).toBe(origin);
       expect(link.pathname).toBe('/api/auth/enter-with-magic-link');
       expect(link.searchParams.get('code')).toEqual(expect.any(String));
-      expect(link.searchParams.get('returnUrl')).toBeNull();
+      expect(link.searchParams.get('landingPath')).toBeNull();
     });
-    it('witt returnUrl', async () => {
-      const returnUrl = '/in/app/path';
-      const link = new URL(await createMagicLink({ email, origin, returnUrl }));
+    it('witt landingPath', async () => {
+      const landingPath = '/in/app/path';
+      const link = new URL(await createMagicLink({ email, origin, landingPath }));
       expect(link.origin).toBe(origin);
       expect(link.pathname).toBe('/api/auth/enter-with-magic-link');
       expect(link.searchParams.get('code')).toEqual(expect.any(String));
-      expect(link.searchParams.get('returnUrl')).toBe(returnUrl);
+      expect(link.searchParams.get('landingPath')).toBe(landingPath);
     });
   });
 
