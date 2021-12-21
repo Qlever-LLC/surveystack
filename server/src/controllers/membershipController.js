@@ -374,7 +374,7 @@ const sendMembershipInvitation = async ({ membership, origin }) => {
 
   await mailService.sendLink({
     to: membership.meta.invitationEmail,
-    subject: `Surveystack invitation to group ${group.name}`,
+    subject: `SurveyStack invitation to group ${group.name}`,
     link: `${origin}/invitations?code=${membership.meta.invitationCode}`,
     actionDescriptionHtml: `You have been invited to join group '${group.name}'!`,
     actionDescriptionText: `You have been invited to join group '${group.name}'!\nFollow this link to activate your invitation:`,

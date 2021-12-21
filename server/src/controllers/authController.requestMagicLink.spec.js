@@ -26,23 +26,23 @@ describe('requestMagicLink', () => {
         origin,
         email,
         expiresAfterDays: 1,
-        returnUrl: null,
+        landingPath: null,
       });
     });
 
     it('with all options', async () => {
       const email = 'foo@bar.com';
       const origin = 'http://foo.com';
-      const returnUrl = '/foo/bar';
+      const landingPath = '/foo/bar';
       const expiresAfterDays = '8';
-      const req = createReq({ body: { email, returnUrl, expiresAfterDays }, headers: { origin } });
+      const req = createReq({ body: { email, landingPath, expiresAfterDays }, headers: { origin } });
       await requestMagicLink(req, await createRes());
       expect(createMagicLink).toHaveBeenCalledTimes(1);
       expect(createMagicLink).toHaveBeenCalledWith({
         origin,
         email,
         expiresAfterDays,
-        returnUrl,
+        landingPath,
       });
     });
   });

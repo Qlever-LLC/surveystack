@@ -87,8 +87,8 @@ const sendPasswordResetMail = async (req, res) => {
   // Fail silently when the email is not in the DB
   if (existingUser) {
     const { origin } = req.headers;
-    const returnUrl = `/users/${existingUser._id}/edit`;
-    const magicLink = await createMagicLink({ origin, email, expiresAfterDays: 3, returnUrl });
+    const landingPath = `/users/${existingUser._id}/edit`;
+    const magicLink = await createMagicLink({ origin, email, expiresAfterDays: 3, landingPath });
 
     await mailService.sendLink({
       to: email,
@@ -135,18 +135,18 @@ const resetPassword = async (req, res) => {
 };
 
 const requestMagicLink = async (req, res) => {
-  const { email, expiresAfterDays = 1, returnUrl = null } = req.body;
+  const { email, expiresAfterDays = 1, landingPath = null } = req.body;
 
   if (!isEmail.validate(email)) {
     throw boom.badRequest(`Invalid email address: ${email}`);
   }
 
   const { origin } = req.headers;
-  const magicLink = await createMagicLink({ origin, email, expiresAfterDays, returnUrl });
+  const magicLink = await createMagicLink({ origin, email, expiresAfterDays, landingPath });
 
   await mailService.sendLink({
     to: email,
-    subject: `Surveystack sign in`,
+    subject: `SurveyStack sign in`,
     link: magicLink,
     actionDescriptionHtml: 'Continue to <b>SurveyStack</b>:',
     actionDescriptionText: 'Continue to log into SurveyStack with this link:',
@@ -157,18 +157,18 @@ const requestMagicLink = async (req, res) => {
 };
 
 const enterWithMagicLink = async (req, res) => {
-  const { code, returnUrl } = req.query;
+  const { code, landingPath } = req.query;
   const { value: accessCode } = await db.collection(COLL_ACCESS_CODES).findOneAndDelete({ code });
 
-  const withReturnUrl = (url) => {
-    if (returnUrl) {
-      return url + `&returnUrl=${encodeURIComponent(returnUrl)}`;
+  const withLandingPath = (url) => {
+    if (landingPath) {
+      return url + `&landingPath=${encodeURIComponent(landingPath)}`;
     }
     return url;
   };
 
   if (!accessCode) {
-    res.redirect(withReturnUrl('/auth/login?magicLinkExpired'));
+    res.redirect(withLandingPath('/auth/login?magicLinkExpired'));
     return;
   }
 
@@ -179,7 +179,7 @@ const enterWithMagicLink = async (req, res) => {
   let loginPayload = await createLoginPayload(userObject);
   loginPayload = JSON.stringify(loginPayload);
   loginPayload = b64EncodeURI(loginPayload);
-  let loginUrl = withReturnUrl(`/auth/accept-magic-link?user=${loginPayload}`);
+  let loginUrl = withLandingPath(`/auth/accept-magic-link?user=${loginPayload}`);
 
   res.redirect(loginUrl);
 };

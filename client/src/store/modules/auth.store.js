@@ -66,8 +66,8 @@ const actions = {
       throw err;
     }
   },
-  async sendMagicLink(_, { email, returnUrl = null }) {
-    await api.post('/auth/request-magic-link', { email, returnUrl });
+  async sendMagicLink(_, { email, landingPath = null }) {
+    await api.post('/auth/request-magic-link', { email, landingPath });
   },
   logout({ commit, dispatch }) {
     return new Promise((resolve) => {
