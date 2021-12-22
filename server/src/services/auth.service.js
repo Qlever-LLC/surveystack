@@ -1,5 +1,5 @@
 import uuidv4 from 'uuid/v4';
-import { startCase } from 'lodash';
+import { startCase, pick } from 'lodash';
 import { db, COLL_ACCESS_CODES } from '../db';
 import rolesService from '../services/roles.service';
 import crypto from 'crypto';
@@ -68,8 +68,7 @@ export const createMagicLink = async ({
 };
 
 export const createLoginPayload = async (userObject) => {
-  // TODO pick only the fields that the client needs
-  const { password, ...payload } = userObject;
+  const payload = pick(userObject, 'email', 'name', 'token', '_id');
   const roles = await rolesService.getRoles(userObject._id);
   return { ...payload, roles };
 };
