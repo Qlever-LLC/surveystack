@@ -1,5 +1,4 @@
-import dotenv from 'dotenv-defaults';
-dotenv.config();
+import dotenv from 'dotenv-defaults/config';
 
 import express from 'express';
 import expressStaticGzip from 'express-static-gzip';
@@ -11,6 +10,7 @@ import { connectDatabase, db } from './db';
 import { initAdmins } from './services/admin.service';
 import { getRoles } from './services/roles.service';
 import errorHandlers from './handlers/errorHandlers';
+import { initLogging } from './middleware/logging';
 
 import apiRoutes from './routes/api';
 import debugRoutes from './routes/debug';
@@ -26,6 +26,8 @@ const PATH_PREFIX = process.env.PATH_PREFIX;
 
 const app = express();
 const frontend = expressStaticGzip('../client/dist', { index: false });
+
+app.use(initLogging);
 
 /**
  * Hard-Redirect certain subdomains after migration.

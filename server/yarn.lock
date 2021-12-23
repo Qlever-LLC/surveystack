@@ -1125,6 +1125,16 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@elastic/elasticsearch@^7.16.0":
+  version "7.16.0"
+  resolved "https://registry.yarnpkg.com/@elastic/elasticsearch/-/elasticsearch-7.16.0.tgz#c1c64b6f0343c0f5ca6893fb77ceecd763455024"
+  integrity sha512-lMY2MFZZFG3om7QNHninxZZOXYx3NdIUwEISZxqaI9dXPoL3DNhU31keqjvx1gN6T74lGXAzrRNP4ag8CJ/VXw==
+  dependencies:
+    debug "^4.3.1"
+    hpagent "^0.1.1"
+    ms "^2.1.3"
+    secure-json-parse "^2.4.0"
+
 "@hapi/boom@^8.0.1":
   version "8.0.1"
   resolved "https://registry.yarnpkg.com/@hapi/boom/-/boom-8.0.1.tgz#13f1f2f2a3abfb0787c79e35e238c8aff6aa1661"
@@ -2418,6 +2428,13 @@ debug@^3.2.6:
   dependencies:
     ms "^2.1.1"
 
+debug@^4.3.1:
+  version "4.3.3"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.3.tgz#04266e0b70a98d4462e6e288e38259213332b664"
+  integrity sha512-/zxw5+vh1Tfv+4Qn7a5nsbcJKPaSvCDhojn6FEl9vupwK2VCSDtEiEtqr8DFtzYFOdz63LBkxec7DYuc2jon6Q==
+  dependencies:
+    ms "2.1.2"
+
 decimal.js@^10.2.1:
   version "10.3.1"
   resolved "https://registry.yarnpkg.com/decimal.js/-/decimal.js-10.3.1.tgz#d8c3a444a9c6774ba60ca6ad7261c3a94fd5e783"
@@ -2827,6 +2844,11 @@ expect@^27.3.1:
     jest-matcher-utils "^27.3.1"
     jest-message-util "^27.3.1"
     jest-regex-util "^27.0.6"
+
+express-mung@^0.5.1:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/express-mung/-/express-mung-0.5.1.tgz#403ca3710745a208c676f1024314f1ead139919a"
+  integrity sha512-5M8Oi2s9ePuP86YMyLT+hefWPPGxuxW3Vnuni/Hq3r2nGE0L4qulG0HkWuc4PIOpzZuZTwONwyfBFtR2xlnfgg==
 
 express-static-gzip@^2.0.6:
   version "2.1.1"
@@ -3320,6 +3342,11 @@ homedir-polyfill@^1.0.1:
   integrity sha512-eSmmWE5bZTK2Nou4g0AI3zZ9rswp7GRKoKXS1BLUkvPviOqs4YTN1djQIqrXy9k5gEtdLPy86JjRwsNM9tnDcA==
   dependencies:
     parse-passwd "^1.0.0"
+
+hpagent@^0.1.1:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/hpagent/-/hpagent-0.1.2.tgz#cab39c66d4df2d4377dbd212295d878deb9bdaa9"
+  integrity sha512-ePqFXHtSQWAFXYmj+JtOTHr84iNrII4/QRlAAPPE+zqnKy4xJo7Ie1Y4kC7AdB+LxLxSTTzBMASsEcy0q8YyvQ==
 
 html-encoding-sniffer@^2.0.1:
   version "2.0.1"
@@ -4667,7 +4694,7 @@ ms@2.1.2:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
-ms@^2.1.1:
+ms@^2.1.1, ms@^2.1.3:
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.3.tgz#574c8138ce1d2b5861f0b44579dbadd60c6615b2"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
@@ -5524,6 +5551,11 @@ saxes@^5.0.1:
   integrity sha512-5LBh1Tls8c9xgGjw3QrMwETmTMVk0oFgvrFSvWx62llR2hcEInrKNZ2GZCCuuy2lvWrdl5jhbpeqc5hRYKFOcw==
   dependencies:
     xmlchars "^2.2.0"
+
+secure-json-parse@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/secure-json-parse/-/secure-json-parse-2.4.0.tgz#5aaeaaef85c7a417f76271a4f5b0cc3315ddca85"
+  integrity sha512-Q5Z/97nbON5t/L/sH6mY2EacfjVGwrCcSi5D3btRO2GZ8pf1K1UN7Z9H5J57hjVU2Qzxr1xO+FmBhOvEkzCMmg==
 
 semver-diff@^2.0.0:
   version "2.1.0"
