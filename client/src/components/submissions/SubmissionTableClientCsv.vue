@@ -37,7 +37,7 @@
             <td>
               <v-checkbox v-model="tableSelected" :value="item" color="#777" class="custom-checkbox" hide-details />
             </td>
-            <td v-for="header in headers" :key="header.text">
+            <td v-for="header in headers" :key="header.text" @click="onClick">
               <div :class="truncate(item[header.value]) ? 'truncate' : ''">
                 {{ item[header.value] }}
               </div>
@@ -140,6 +140,9 @@ export default {
     },
   },
   methods: {
+    onClick(event) {
+      console.log(event);
+    },
     handleClick(data) {
       this.selecteds.push([...this.selecteds, data.item]);
       this.$emit('update:selected', this.selecteds);
@@ -210,7 +213,10 @@ export default {
   display: inline-block;
   max-width: 250px;
 }
-.v-data-table {
+
+tbody {
+}
+td {
   position: relative;
 }
 
@@ -222,19 +228,28 @@ export default {
 }
 .truncate-full-text {
   position: absolute;
-  top: 0;
+  top: -50%;
   left: 0;
-  opacity: 0;
-
-  margin-bottom: 5rem;
+  right: 0;
+  bottom: 0;
+  display: none;
   background-color: white;
-  padding: 1em 0rem 1rem 2rem;
+  padding: 1rem 1rem 1rem 1rem;
   box-shadow: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
+  overflow: auto;
+  height: 5rem;
+  min-width: 600px;
+  border-radius: 5px;
 }
 
 td:hover .truncate-full-text {
   opacity: 1;
   white-space: initial;
+  top: -5rem;
+  left: 0%;
+  z-index: 1500;
+  overflow: auto;
+  display: block;
   width: 100%;
 }
 
