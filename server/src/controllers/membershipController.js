@@ -317,10 +317,6 @@ const joinGroup = async (req, res) => {
     throw boom.badRequest('Group not found');
   }
 
-  if (group.meta.invitationOnly) {
-    throw boom.badRequest('Group is set to invitation only');
-  }
-
   const { user } = res.locals.auth;
 
   let r = await db.collection(col).findOne({
@@ -332,6 +328,10 @@ const joinGroup = async (req, res) => {
     return res.send({
       status: 'ok',
     });
+  }
+
+  if (group.meta.invitationOnly) {
+    throw boom.badRequest('Group is set to invitation only');
   }
 
   const membership = {

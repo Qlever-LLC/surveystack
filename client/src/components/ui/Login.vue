@@ -232,19 +232,6 @@ export default {
         return;
       }
 
-      try {
-        // try to auto join group if this is a whitelabel
-        if (this.isWhitelabel && this.registrationEnabled) {
-          await api.post(`/memberships/join-group?id=${this.whitelabelPartner.id}`);
-          await autoSelectActiveGroup(this.$store, this.whitelabelPartner.id);
-        } else {
-          // auto select the first group of the user
-          await autoSelectActiveGroup(this.$store, null, true);
-        }
-      } catch (error) {
-        console.log(error.response.data.message);
-      }
-
       this.$store.dispatch('surveys/fetchPinned');
 
       if (this.$route.params.redirect) {

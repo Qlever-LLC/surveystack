@@ -50,7 +50,7 @@ const actions = {
     const resp = await api.post(auth.url, auth.user);
     return dispatch('loginWithUserObject', resp.data);
   },
-  loginWithUserObject({ commit }, user) {
+  async loginWithUserObject({ commit, dispatch }, user) {
     try {
       const { email, token } = user;
       const header = createAuthHeader(email, token);
@@ -60,6 +60,9 @@ const actions = {
       AuthService.saveHeader(header);
 
       commit('auth_success', { user, header });
+
+      await dispatch('memberships/tryAutoJoinAndSelectGroup', {}, { root: true });
+
       return user;
     } catch (err) {
       commit('auth_error');

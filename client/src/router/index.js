@@ -156,13 +156,17 @@ const routes = [
   {
     path: '/auth/accept-magic-link',
     name: 'accept-magic-link',
-    redirect: (to) => {
+    redirect: async (to) => {
       let { user, landingPath = '/' } = to.query;
-      // TODO handle when decoding fails
-      user = JSON.parse(b64Decode(user));
+      try {
+        user = JSON.parse(b64Decode(user));
+      } catch (e) {
+        store.dispatch('feedback/add', 'Failed to validate the login data');
+        return '/auth/login?magicLinkExpired';
+      }
       landingPath = decodeURIComponent(landingPath);
-      store.dispatch('auth/loginWithUserObject', user);
-      // TODO use react router
+      await store.dispatch('auth/loginWithUserObject', user);
+
       window.location.replace(`${location.origin}${landingPath}`);
     },
   },

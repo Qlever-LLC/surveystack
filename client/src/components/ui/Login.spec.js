@@ -217,6 +217,7 @@ describe('Login component', () => {
 
   describe('submit form and check submit() method behaviour based on try to auto join group if this is a whitelabel', () => {
     it('submit and trying autojoin if this.isWhitelabel && this.registrationEnabled', async () => {
+      const login = jest.fn(() => Promise.resolve());
       let res = { data: { meta: { invitationOnly: false } } };
       mockAxios.get.mockImplementation(() => Promise.resolve(res));
       mockAxios.post.mockImplementation(() => Promise.resolve());
@@ -231,7 +232,7 @@ describe('Login component', () => {
             'invitation/hasInvitation': () => false,
           },
           actions: {
-            'auth/login': jest.fn(() => Promise.resolve()),
+            'auth/login': login,
             'surveys/fetchPinned': jest.fn(),
           },
         },
@@ -251,77 +252,27 @@ describe('Login component', () => {
       });
       await switchLoginMethod();
 
+      const email = 'someValidMail@mail.com';
+      const password = 'aPassword';
+
       const emailInput = getByLabelText('E-Mail');
-      fireEvent.update(emailInput, 'someValidMail@mail.com');
+      fireEvent.update(emailInput, email);
 
       const pwdInput = getByLabelText('Password');
-      fireEvent.update(pwdInput, 'aPassword');
+      fireEvent.update(pwdInput, password);
 
       const button = getByText('Login');
       await fireEvent.click(button);
-      // wait for Promise for pending result
-      await new Promise((resolve) => setTimeout(resolve, 0));
-      expect(mockAxios.post).toHaveBeenCalledTimes(1);
-      expect(autoSelectActiveGroup).toHaveBeenCalledTimes(1);
-      expect(push).toHaveBeenCalledWith('/');
-    });
-
-    it('submit and trying autojoin if this.isWhitelabel && this.registrationEnabled BUT post throw an error', async () => {
-      let res = { data: { meta: { invitationOnly: false } } };
-      mockAxios.get.mockImplementation(() => Promise.resolve(res));
-      mockAxios.post.mockImplementation(() =>
-        Promise.reject({
-          response: { data: { message: 'an error message' } },
-        })
+      expect(login).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ url: '/auth/login', user: { email: email.toLowerCase(), password } })
       );
-      const push = jest.fn();
-      const { getByLabelText, getByText } = renderWithVuetify(Login, {
-        store: {
-          getters: {
-            'whitelabel/isWhitelabel': () => true,
-            'whitelabel/partner': () => ({
-              id: 1,
-            }),
-            'invitation/hasInvitation': () => false,
-          },
-          actions: {
-            'auth/login': jest.fn(() => Promise.resolve()),
-            'surveys/fetchPinned': jest.fn(),
-          },
-        },
-        mocks: {
-          $route: {
-            params: { redirect: false },
-            query: {},
-          },
-          $router: {
-            push,
-          },
-        },
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
-        },
-      });
-      await switchLoginMethod();
-
-      const emailInput = getByLabelText('E-Mail');
-      fireEvent.update(emailInput, 'someValidMail@mail.com');
-
-      const pwdInput = getByLabelText('Password');
-      fireEvent.update(pwdInput, 'aPassword');
-
-      const button = getByText('Login');
-      await fireEvent.click(button);
-      // wait for Promise for pending result
-      await new Promise((resolve) => setTimeout(resolve, 0));
-      expect(mockAxios.post).toHaveBeenCalledTimes(1);
-      expect(autoSelectActiveGroup).toHaveBeenCalledTimes(0);
       expect(push).toHaveBeenCalledWith('/');
     });
 
     it('submit and trying autojoin if this.isWhitelabel === false', async () => {
       const push = jest.fn();
+      const login = jest.fn(() => Promise.resolve());
       const { getByLabelText, getByText } = renderWithVuetify(Login, {
         store: {
           getters: {
@@ -329,7 +280,7 @@ describe('Login component', () => {
             'invitation/hasInvitation': () => false,
           },
           actions: {
-            'auth/login': jest.fn(() => Promise.resolve()),
+            'auth/login': login,
             'surveys/fetchPinned': jest.fn(),
           },
         },
@@ -349,17 +300,21 @@ describe('Login component', () => {
       });
       await switchLoginMethod();
 
+      const email = 'someValidMail@mail.com';
+      const password = 'aPassword';
+
       const emailInput = getByLabelText('E-Mail');
-      fireEvent.update(emailInput, 'someValidMail@mail.com');
+      fireEvent.update(emailInput, email);
 
       const pwdInput = getByLabelText('Password');
-      fireEvent.update(pwdInput, 'aPassword');
+      fireEvent.update(pwdInput, password);
 
       const button = getByText('Login');
       await fireEvent.click(button);
-      // wait for Promise for pending result
-      await new Promise((resolve) => setTimeout(resolve, 0));
-      expect(autoSelectActiveGroup).toHaveBeenCalledTimes(1);
+      expect(login).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ url: '/auth/login', user: { email: email.toLowerCase(), password } })
+      );
       expect(push).toHaveBeenCalledWith('/');
     });
   });
