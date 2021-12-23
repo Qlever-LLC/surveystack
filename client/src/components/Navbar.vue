@@ -288,7 +288,7 @@ export default {
   line-height: 0.8rem;
 }
 .v-icon {
-  opacity: 0.95;
+  opacity: 0.75;
 }
 </style>
 <style>
