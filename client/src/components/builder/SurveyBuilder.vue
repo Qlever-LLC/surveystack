@@ -166,7 +166,7 @@
           ></code-editor>
         </div>
       </pane>
-      <pane class="pane pane-draft" :class="isPreviewMobile ? 'mobile' : 'desktop'">
+      <pane class="pane pane-draft" :style="{ width: isPreviewMobile ? '375px' : '800px' }">
         <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
         <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px); overflow: auto;">
           <app-draft-component
@@ -962,16 +962,6 @@ export default {
   width: 100vw;
   align-self: center;
   overflow: auto;
-}
-
-.pane-draft.mobile {
-  max-width: 375px;
-  min-width: 375px;
-}
-
-.pane-draft.desktop {
-  max-width: 800px;
-  min-width: 800px;
 }
 
 .hide-pane {
