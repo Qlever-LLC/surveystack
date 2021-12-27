@@ -21,7 +21,7 @@ function match(answers, thisValue) {
  * 'answer' is optional, if not provided it just checks for relevance
  *
  * @param {object} question you're asking about
- * @param {answer} answer(s) (strings or numbers) to check against
+ * @param {answers} answer(s) (strings or numbers) to check against
  */
 export function checkIfAny(question, ...answers) {
   // answers is always passed as an array!
@@ -82,7 +82,7 @@ export function checkIfAny(question, ...answers) {
  * if question isn't answered (=== null), will also return false
  *
  * @param {object} question you're asking about
- * @param {answer} answer(s) (strings or numbers) to check against
+ * @param {answers} answer(s) (strings or numbers) to check against
  */
 export function checkIfNone(question, ...answers) {
   let values = question.value;
@@ -195,3 +195,63 @@ export function getClean(chooseOne) {
     return thisAnswer;
   }
 }
+
+// /////////////// SUBMISSION NAVIGATION //////////////////////////
+
+/*
+* Find a nested item inside a JSON object.
+* Pass the object and the string referencing the location.
+* Returns the object in that location.
+*
+* ### Example
+* let submission = { this: { that: { theOther: 55} } }
+* dig(submission, 'this.that.theOther'); // returns 55
+* dig(submission, 'this.that[theOther]'); // returns 55 (this notation also works!)
+* now imagine we are passed the full reference and want to use dig.  Let's use getRoot and removeRoot also -->
+* refText = submission.this.that.theother;
+* dig(getRoot(refText), removeRoot(refText)); // returns 55
+* @param {object} the JSON object your looking in - this is usually 'submission' or 'parent'
+* @param {string} the location in the object.
+*/
+function dig(object, path, defaultValue = null) {
+  const chunks = path
+    .split(/\.|\[|\]/)
+    .filter(d => d.length !== 0)
+    ;
+  try {
+    const value = chunks.reduce((current, chunk) => current[chunk], object);
+    if (value !== undefined) {
+      return value;
+    } else {
+      return defaultValue;
+    }
+  } catch (e) {
+    return defaultValue;
+  }
+};
+
+/*
+* identify object root as referencing parent or the submission
+* return parent or submission objects
+* @param {string} the location in the object.
+*/
+function getRoot(path) {
+  if ((/^parent+/g).test(path)) {
+    return parent;
+  } else if ((/^submission+/g).test(path)) {
+    return submission;
+  } else { // if neither, assume parent.  add error checking here also
+    return parent;
+  }
+};
+
+/*
+* remove the survey root and return the text
+* useful when using dig() function
+* @param {string} the string you want the root removed from.
+*/
+function removeRoot(path) {
+  path = path.replace(/(^submission\.|^submission|^parent\.|^parent)+/g, '');
+  return path;
+};
+
