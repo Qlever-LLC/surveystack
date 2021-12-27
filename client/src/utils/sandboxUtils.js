@@ -198,12 +198,13 @@ export function getClean(chooseOne) {
 
 // /////////////// SUBMISSION NAVIGATION //////////////////////////
 
-/*
-* Find a nested item inside a JSON object.
-* Pass the object and the string referencing the location.
-* Returns the object in that location.
-*
-* ### Example
+
+  /*
+   * Find a nested item inside a JSON object.
+   * Pass the object and the string referencing the location.
+   * Returns the object in that location.
+   *
+   * ### Example
 * let submission = { this: { that: { theOther: 55} } }
 * dig(submission, 'this.that.theOther'); // returns 55
 * dig(submission, 'this.that[theOther]'); // returns 55 (this notation also works!)
@@ -212,7 +213,8 @@ export function getClean(chooseOne) {
 * dig(getRoot(refText), removeRoot(refText)); // returns 55
 * @param {object} the JSON object your looking in - this is usually 'submission' or 'parent'
 * @param {string} the location in the object.
-*/
+   * robust, can accept null, undefined and will always pass back null
+   */
 function dig(object, path, defaultValue = null) {
   const chunks = path
     .split(/\.|\[|\]/)
@@ -230,28 +232,35 @@ function dig(object, path, defaultValue = null) {
   }
 };
 
-/*
-* identify object root as referencing parent or the submission
-* return parent or submission objects
-* @param {string} the location in the object.
-*/
-function getRoot(path) {
-  if ((/^parent+/g).test(path)) {
-    return parent;
-  } else if ((/^submission+/g).test(path)) {
-    return submission;
-  } else { // if neither, assume parent.  add error checking here also
-    return parent;
+  /*
+   * identify object root as referencing parent or the submission
+   * return parent or submission objects
+   * robust, can accept null, undefined and will always pass back null
+   * @param {string} the location in the object.
+   */
+  function getRoot(path, defaultValue = null) {
+    if (typeof path !== 'string') {
+      return defaultValue;
+    } else if ((/^parent+/g).test(path)) {
+      return parent;
+    } else if ((/^submission+/g).test(path)) {
+      return submission;
+    } else { // if neither, assume parent.  add error checking here also
+      return parent;
+    }
   }
-};
 
-/*
-* remove the survey root and return the text
-* useful when using dig() function
-* @param {string} the string you want the root removed from.
-*/
-function removeRoot(path) {
-  path = path.replace(/(^submission\.|^submission|^parent\.|^parent)+/g, '');
-  return path;
-};
-
+  /*
+   * remove the survey root and return the text
+   * useful when using dig() function
+   * robust, can accept null, undefined and will always pass back null
+   * @param {string} the string you want the root removed from.
+   */
+  function removeRoot(path, defaultValue = null) {
+    try {
+      path = path.replace(/(^submission\.|^submission|^parent\.|^parent)+/g, '');
+      return path;
+    } catch (e) {
+      return defaultValue;
+    }
+  }
