@@ -10,7 +10,10 @@
     "build-server": "babel -d ./dist src -s",
     "build": "yarn clean && yarn build-server",
     "test": "jest",
-    "test-watch": "jest --watch"
+    "test-watch": "jest --watch",
+    "lint": "eslint",
+    "lint-fix": "eslint --fix",
+    "lint-all": "eslint src/**/*.js"
   },
   "keywords": [],
   "author": "",
@@ -21,9 +24,12 @@
     "@babel/node": "^7.6.3",
     "@babel/preset-env": "^7.6.3",
     "cross-env": "^7.0.3",
-    "eslint": "^6.5.1",
+    "eslint": "^8.5.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
     "jest": "^27.3.1",
     "nodemon": "^1.19.3",
+    "prettier": "^2.5.1",
     "regenerator-runtime": "^0.13.7"
   },
   "dependencies": {
