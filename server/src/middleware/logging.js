@@ -21,7 +21,7 @@ function initializeLoggingMessage(req) {
 };
 
 function initLogging(req, res, next) {
-	if (process.env.ELASTIC_ENABLE_LOGGING) {
+	if (process.env.ELASTIC_ENABLE_LOGGING === 'true') {
 		res.locals.loggingMessage = initializeLoggingMessage(req);
 		res.on('finish', function () {
 			res.locals.loggingMessage.httpStatus = res.statusCode;
@@ -36,7 +36,7 @@ function initLogging(req, res, next) {
 // Consider log volume, index lifecycle policy (duration to keep logs), and available storage before using this middleware.
 const appendResponseBodyToLoggingMessage = mung.json(
 	(resBody, req, res) => {
-		if (process.env.ELASTIC_ENABLE_LOGGING) {
+		if (process.env.ELASTIC_ENABLE_LOGGING === 'true') {
 			res.locals.loggingMessage.resBody = JSON.stringify(resBody);
 		}
 	},

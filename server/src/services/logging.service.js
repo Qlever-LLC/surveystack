@@ -3,7 +3,7 @@ import { Client } from '@elastic/elasticsearch';
 let client;
 let isAuthenticationValid = true;
 
-if (process.env.ELASTIC_ENABLE_LOGGING) {
+if (process.env.ELASTIC_ENABLE_LOGGING === 'true') {
 	try {
 		client = new Client({
 			cloud: {
@@ -24,7 +24,7 @@ if (process.env.ELASTIC_ENABLE_LOGGING) {
 }
 
 function log(message) {
-	if (process.env.ELASTIC_ENABLE_LOGGING && client && isAuthenticationValid) {
+	if (process.env.ELASTIC_ENABLE_LOGGING === 'true' && client && isAuthenticationValid) {
 		client
 			.index({
 				index: process.env.ELASTIC_INDEX_NAME,
