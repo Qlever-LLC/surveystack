@@ -215,7 +215,7 @@ export function getClean(chooseOne) {
 * @param {string} the location in the object.
  * robust, can accept null, undefined and will always pass back null
  */
-function dig(object, path, defaultValue = null) {
+export function dig(object, path, defaultValue = null) {
   const chunks = path
     .split(/\.|\[|\]/)
     .filter(d => d.length !== 0)
@@ -238,7 +238,7 @@ function dig(object, path, defaultValue = null) {
  * robust, can accept null, undefined and will always pass back null
  * @param {string} the location in the object.
  */
-function getRoot(path, defaultValue = null) {
+export function getRoot(path, defaultValue = null) {
   if (typeof path !== 'string') {
     return defaultValue;
   } else if ((/^parent+/g).test(path)) {
@@ -256,7 +256,7 @@ function getRoot(path, defaultValue = null) {
  * robust, can accept null, undefined and will always pass back null
  * @param {string} the string you want the root removed from.
  */
-function removeRoot(path, defaultValue = null) {
+export function removeRoot(path, defaultValue = null) {
   try {
     path = path.replace(/(^submission\.|^submission|^parent\.|^parent)+/g, '');
     return path;
