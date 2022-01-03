@@ -34,6 +34,11 @@ const connectDatabase = async () => {
   if (!farmOsWebhookRequestsCollectionExists) {
     await db.createCollection(farmOsWebhookRequestsCollectionName, { capped: true, size: 10000, max: 5000 });
   }
+  const resourcesCollectionName = 'resources'
+  const resourcesCollectionExists = await db.listCollections({ name: resourcesCollectionName }).hasNext();
+  if (!resourcesCollectionExists) {
+    await db.createCollection(resourcesCollectionName);
+  }
 
   // migrations
   await migrateScripts_V1toV2();
