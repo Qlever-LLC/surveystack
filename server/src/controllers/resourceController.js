@@ -20,9 +20,11 @@ const getDownloadURL = async (req, res) => {
 };
 
 const getUploadURL = async (req, res) => {
-  const { filename, contentlength, contenttype } = req.query;
-  let key = 'resources/surveys/'+uuidv4()+filename;
-
+  // TODO add survey id to resource
+  const { surveyId, filename, contentlength, contenttype } = req.body;
+  // define s3 file key containing unique uuid to prevent filename collision, allowed characters see https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
+  let key = 'resources/surveys/' + surveyId + '/' + uuidv4() + '_' + filename;
+  // get signed upload url for a fixed contenttype and contentlength
   let signedUrl = await bucketService.getUploadUrl(key, contenttype, contentlength);
   return res.send(signedUrl);
 };
