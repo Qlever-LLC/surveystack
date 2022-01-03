@@ -26,7 +26,7 @@ function mockRes() {
   }
 }
 
-describe('resourceController', () => {
+describe.skip('resourceController', () => {
   //TODO mock db or cleanup test entries after tests
   beforeAll(async () => {
     await connectDatabase();
