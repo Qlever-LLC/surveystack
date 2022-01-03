@@ -28,19 +28,15 @@ const getIntegrations = async (req, res) => {
     filter.type = type;
   }
 
-  const options = { projection: { 'data': 0 } }; // TODO: find better way to hide secrets
+  const options = { projection: { data: 0 } }; // TODO: find better way to hide secrets
   if (populate && res.locals.auth.user && res.locals.auth.user._id) {
     const access = await rolesService.hasAdminRole(res.locals.auth.user._id, group);
     if (access) {
-      options.projection = {}
+      options.projection = {};
     }
   }
 
-
-  const entities = await db
-    .collection(col)
-    .find(filter, options)
-    .toArray();
+  const entities = await db.collection(col).find(filter, options).toArray();
   return res.send(entities);
 };
 

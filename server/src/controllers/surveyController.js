@@ -17,11 +17,11 @@ const sanitize = async (entity) => {
     version.dateCreated = new Date(entity.dateCreated);
 
     version.controls.forEach((control) => {
-      changeRecursive(control, (control)=> {
+      changeRecursive(control, (control) => {
         if (control.libraryId) {
           control.libraryId = new ObjectId(control.libraryId);
         }
-      })
+      });
     });
   });
 
@@ -81,15 +81,15 @@ const getSurveys = async (req, res) => {
 };
 
 const buildPipelineForGetSurveyPage = ({
-                                         q,
-                                         groups,
-                                         projections,
-                                         creator,
-                                         skip,
-                                         limit,
-                                         prefix,
-                                         isLibrary,
-                                       }) => {
+  q,
+  groups,
+  projections,
+  creator,
+  skip,
+  limit,
+  prefix,
+  isLibrary,
+}) => {
   const match = {};
   const project = {};
   let parsedSkip = 0;
@@ -119,7 +119,7 @@ const buildPipelineForGetSurveyPage = ({
   }
 
   if (isLibrary) {
-    match['meta.isLibrary'] = (isLibrary === "true");
+    match['meta.isLibrary'] = isLibrary === 'true';
   }
 
   const pipeline = [
@@ -155,51 +155,56 @@ const buildPipelineForGetSurveyPage = ({
     ]
   );
 
-  if (isLibrary === "true") {
+  if (isLibrary === 'true') {
     // add to pipeline the aggregation for number of referencing survey and for number of submissions of referencing surveys
     // TODO further reduce meta.libraryUsageCountSurveys by revisions.controls.isLibraryRoot=true and revisions.version=latestVersion
     // TODO also count revisions.controls.children.libraryId
     const aggregateCounts = [
       {
-        '$match': {
-          'meta.isLibrary': true
-        }
-      }, {
-        '$lookup': {
-          'from': 'surveys',
-          'localField': '_id',
-          'foreignField': 'revisions.controls.libraryId',
-          'as': 'meta.libraryUsageCountSurveys'
-        }
-      }, {
-        '$addFields': {
-          'meta.libraryUsageCountSurveys': {
-            '$size': '$meta.libraryUsageCountSurveys'
-          }
-        }
-      }, {
-        '$lookup': {
-          'from': 'submissions',
-          'let': {
-            'surveyId': '$_id',
-          },
-          'pipeline': [
-            { '$match': { '$expr': { '$eq': ['$meta.survey.id', '$$surveyId'] } } },
-            { '$count': 'count' },
-          ],
-          'as': "meta.libraryUsageCountSubmissions",
+        $match: {
+          'meta.isLibrary': true,
         },
-      }, {
-        '$addFields': {
+      },
+      {
+        $lookup: {
+          from: 'surveys',
+          localField: '_id',
+          foreignField: 'revisions.controls.libraryId',
+          as: 'meta.libraryUsageCountSurveys',
+        },
+      },
+      {
+        $addFields: {
+          'meta.libraryUsageCountSurveys': {
+            $size: '$meta.libraryUsageCountSurveys',
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'submissions',
+          let: {
+            surveyId: '$_id',
+          },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$meta.survey.id', '$$surveyId'] } } },
+            { $count: 'count' },
+          ],
+          as: 'meta.libraryUsageCountSubmissions',
+        },
+      },
+      {
+        $addFields: {
           'meta.libraryUsageCountSubmissions': {
-            '$arrayElemAt': ['$meta.libraryUsageCountSubmissions.count', 0]
-          }
-        }
-      }, {
-        '$sort': {
-          'meta.libraryUsageCountSurveys': -1
-        }
-      }
+            $arrayElemAt: ['$meta.libraryUsageCountSubmissions.count', 0],
+          },
+        },
+      },
+      {
+        $sort: {
+          'meta.libraryUsageCountSurveys': -1,
+        },
+      },
     ];
     pipeline.push(...aggregateCounts);
   }
@@ -387,11 +392,31 @@ const getSurveyLibraryConsumers = async (req, res) => {
   // TODO naive and limited (to 3 child levels) implementation for deeply nested question sets - try to find elegant query which is still performing well
   const filter = {
     $or: [
-      { $and: [{ "revisions.controls.libraryId": new ObjectId(id) }, { "revisions.controls.isLibraryRoot": true }] },
-      { $and: [{ "revisions.controls.children.libraryId": new ObjectId(id) }, { "revisions.controls.children.isLibraryRoot": true }] },
-      { $and: [{ "revisions.controls.children.children.libraryId": new ObjectId(id) }, { "revisions.controls.children.children.isLibraryRoot": true }] },
-      { $and: [{ "revisions.controls.children.children.children.libraryId": new ObjectId(id) }, { "revisions.controls.children.children.children.isLibraryRoot": true }] },
-    ]
+      {
+        $and: [
+          { 'revisions.controls.libraryId': new ObjectId(id) },
+          { 'revisions.controls.isLibraryRoot': true },
+        ],
+      },
+      {
+        $and: [
+          { 'revisions.controls.children.libraryId': new ObjectId(id) },
+          { 'revisions.controls.children.isLibraryRoot': true },
+        ],
+      },
+      {
+        $and: [
+          { 'revisions.controls.children.children.libraryId': new ObjectId(id) },
+          { 'revisions.controls.children.children.isLibraryRoot': true },
+        ],
+      },
+      {
+        $and: [
+          { 'revisions.controls.children.children.children.libraryId': new ObjectId(id) },
+          { 'revisions.controls.children.children.children.isLibraryRoot': true },
+        ],
+      },
+    ],
   };
   const entities = await db.collection(col).find(filter).toArray();
   return res.send(entities);
@@ -499,19 +524,23 @@ const checkForLibraryUpdates = async (req, res) => {
   //for each question set library used in the given survey
   let updatableSurveys = {};
 
-  await Promise.all(latestRevision.controls.map(async (control) => {
-    if(control.isLibraryRoot && !control.libraryIsInherited) {
-      //check if used library survey version is old
-      const librarySurvey = await db.collection(col).findOne({ _id: new ObjectId(control.libraryId) });
-      if(!librarySurvey) {
-        //library can not be found, also return this information
-        updatableSurveys[control.libraryId] = null;
-      } else if(control.libraryVersion<librarySurvey.latestVersion) {
-        //library is updatable, add to result set
-        updatableSurveys[control.libraryId] = librarySurvey.latestVersion;
+  await Promise.all(
+    latestRevision.controls.map(async (control) => {
+      if (control.isLibraryRoot && !control.libraryIsInherited) {
+        //check if used library survey version is old
+        const librarySurvey = await db
+          .collection(col)
+          .findOne({ _id: new ObjectId(control.libraryId) });
+        if (!librarySurvey) {
+          //library can not be found, also return this information
+          updatableSurveys[control.libraryId] = null;
+        } else if (control.libraryVersion < librarySurvey.latestVersion) {
+          //library is updatable, add to result set
+          updatableSurveys[control.libraryId] = librarySurvey.latestVersion;
+        }
       }
-    }
-  }));
+    })
+  );
 
   return res.send(updatableSurveys);
 };

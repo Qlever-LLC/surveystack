@@ -36,7 +36,11 @@ function arrayMax(arr) {
 
 // Lists the headers that exist both in the submissions and the selected version of survey.
 // It tries to select the latest survey version used by the submission. If that fails it uses the latest survey version.
-const getHeaders = async (surveyId, entities, options = { excludeDataMeta: false, splitValueFieldFromQuestions: false }) => {
+const getHeaders = async (
+  surveyId,
+  entities,
+  options = { excludeDataMeta: false, splitValueFieldFromQuestions: false }
+) => {
   if (!surveyId) {
     return [];
   }
@@ -75,8 +79,7 @@ const getHeaders = async (surveyId, entities, options = { excludeDataMeta: false
     }
     if (options.splitValueFieldFromQuestions) {
       surveyHeaders[header] = [];
-    }
-    else {
+    } else {
       surveyHeaders[`${header}.value`] = [];
     }
   });

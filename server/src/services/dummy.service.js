@@ -2,10 +2,7 @@ import { ObjectId } from 'mongodb';
 
 import { db } from '../db';
 
-const randomString = () =>
-  Math.random()
-    .toString(36)
-    .substring(7);
+const randomString = () => Math.random().toString(36).substring(7);
 
 const exampleSurvey = {
   _id: ObjectId('5dad91cd925e13de6f174644'),
@@ -40,7 +37,7 @@ const exampleSurvey = {
 
 const createSurveyResult = ({ surveyObject }) => {
   const data = [];
-  surveyObject.controls.forEach(control => {
+  surveyObject.controls.forEach((control) => {
     const { name, type } = control;
     const value = randomString();
 

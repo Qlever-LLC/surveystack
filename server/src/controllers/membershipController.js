@@ -151,10 +151,7 @@ const getMemberships = async (req, res) => {
         continue;
       }
 
-      if (
-        member.user &&
-        admins.find((m) => m.user && `${m.user._id}` === `${member.user._id}`)
-      ) {
+      if (member.user && admins.find((m) => m.user && `${m.user._id}` === `${member.user._id}`)) {
         continue;
       }
 
@@ -174,7 +171,7 @@ const getMemberships = async (req, res) => {
 
       if (
         member.user &&
-          otherMembers.find((m) => m.user && `${m.user._id}` === `${member.user._id}`)
+        otherMembers.find((m) => m.user && `${m.user._id}` === `${member.user._id}`)
       ) {
         continue;
       }
@@ -327,11 +324,11 @@ const joinGroup = async (req, res) => {
     group: group._id,
     user: user._id,
   });
-  console.log("user in group findone result: ", r)
-  if(r) {
+  console.log('user in group findone result: ', r);
+  if (r) {
     return res.send({
-      status: "ok"
-    })
+      status: 'ok',
+    });
   }
 
   const membership = {
