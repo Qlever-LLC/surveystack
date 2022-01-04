@@ -109,6 +109,11 @@ export default {
       type: String,
       default: 'Add row',
     },
+    // how much sooner the bottom has to start floating to avoid being coverd by the footer
+    floatingFooterSize: {
+      type: Number,
+      default: 68,
+    },
     // (experimental optimization) skip rendering the cells that aren't visible on the screen
     // TODO test this on a device that has visible performance issues with large matrices
     dontRenderOffScreenCells: {
@@ -162,6 +167,7 @@ export default {
         '--mt-row-actions-width': `${this.rowActionsWidth}px`,
         '--mt-row-height': `${this.rowHeight}px`,
         '--mt-min-row-width': `${this.minRowWidth}px`,
+        '--mt-floating-footer-size': `${this.floatingFooterSize}px`,
       };
     },
   },
@@ -177,9 +183,7 @@ export default {
           this.isRightFloating = !this.isMobile && scrollLeftMax > body.scrollLeft;
 
           this.$refs.headerCells.forEach((el, colIdx) => {
-            if (!this.fixColMask[colIdx]) {
-              el.style.left = `${-body.scrollLeft}px`;
-            }
+            el.style.left = `${this.fixColMask[colIdx] ? 0 : -body.scrollLeft}px`;
           });
           this.updateCellVisibilityMask();
           this.rafIdScrollX = null;
@@ -252,6 +256,10 @@ export default {
       if (oldRows.length === 0) {
         this.onScrollX();
       }
+    },
+    // check the width on adding the first row
+    isMobile() {
+      this.onScrollX();
     },
   },
   mounted() {
@@ -346,8 +354,7 @@ export default {
 
 .mt-fix-bottom {
   position: sticky;
-  /* floating footer size of the submission page */
-  bottom: 68px;
+  bottom: var(--mt-floating-footer-size);
   /* should be above all input cells */
   z-index: 2;
 }

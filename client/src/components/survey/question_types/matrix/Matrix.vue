@@ -18,6 +18,7 @@
       title="Edit"
       hideCancel
       @confirm="showEditItemDialog = false"
+      max-width="800px"
     >
       <div style="background: #1867c0; padding: 4px 0px">
         <v-card>
@@ -69,6 +70,7 @@
       :fixedColumns="fixedColumns"
       :isMobile="isMobile"
       :rowActionsWidth="64"
+      :floatingFooterSize="isInBuilder ? 0 : 64"
       :addRowLabel="addRowLabel"
       @showEditDialog="(rowIdx) => editItem(rowIdx)"
       @addRow="add"
@@ -150,8 +152,6 @@ const hashItem = (listItem) => {
 
 /* copied from FarmOsPlanting.vue */
 const transform = (assets) => {
-  console.log('transformassets', assets);
-
   const withoutArea = [];
   const areas = {};
 
@@ -219,7 +219,6 @@ const transform = (assets) => {
   };
 
   res.push(withoutAreaSection, ...withoutArea);
-  console.log('res', res);
 
   return res;
 };
@@ -260,7 +259,7 @@ export default {
       },
     },
     isMobile() {
-      return !this.$vuetify.breakpoint.smAndUp;
+      return !this.$vuetify.breakpoint.smAndUp || this.forceMobile;
     },
     farmos() {
       return { farms: this.farms, plantings: this.farmosTransformedPlantings };

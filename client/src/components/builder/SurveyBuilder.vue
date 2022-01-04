@@ -166,7 +166,7 @@
           ></code-editor>
         </div>
       </pane>
-      <pane class="pane pane-draft">
+      <pane class="pane pane-draft" :style="{ width: isPreviewMobile ? '375px' : '800px' }">
         <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
         <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px); overflow: auto;">
           <app-draft-component
@@ -177,11 +177,26 @@
             :persist="false"
             class="builder-draft"
             builder
+            :forceMobile="isPreviewMobile"
           >
             <template v-slot:toolbar-actions>
-              <v-btn icon @click="isDraftFullscreen = true">
-                <v-icon>mdi-fullscreen</v-icon>
-              </v-btn>
+              <v-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
+                <v-btn :value="false" dense>
+                  <span class="hidden-sm-and-down">desktop</span>
+
+                  <v-icon right>
+                    mdi-monitor
+                  </v-icon>
+                </v-btn>
+
+                <v-btn :value="true">
+                  <span class="hidden-sm-and-down">mobile</span>
+
+                  <v-icon right>
+                    mdi-cellphone
+                  </v-icon>
+                </v-btn>
+              </v-btn-toggle>
             </template>
           </app-draft-component>
         </div>
@@ -195,25 +210,6 @@
         </v-overlay>
       </pane>
     </splitpanes>
-
-    <!-- Full screen view of the draft component -->
-    <v-dialog v-model="isDraftFullscreen" fullscreen transition="dialog-bottom-transition">
-      <app-draft-component
-        @submit="(payload) => $emit('submit', payload)"
-        v-if="survey && instance"
-        :submission="instance"
-        :survey="survey"
-        :persist="false"
-        builder
-        :style="{ maxWidth: 'initial' }"
-      >
-        <template v-slot:toolbar-actions>
-          <v-btn icon @click="isDraftFullscreen = false">
-            <v-icon>mdi-fullscreen-exit</v-icon>
-          </v-btn>
-        </template>
-      </app-draft-component>
-    </v-dialog>
   </div>
 </template>
 
@@ -323,7 +319,7 @@ export default {
       surveyUnchanged: true,
       showExamples: false,
       availableLibraryUpdates: {},
-      isDraftFullscreen: false,
+      isPreviewMobile: false,
     };
   },
   methods: {
@@ -966,12 +962,6 @@ export default {
   width: 100vw;
   align-self: center;
   overflow: auto;
-}
-
-.pane-draft,
-.draft {
-  max-width: 500px;
-  /*max-height: 1000px;*/
 }
 
 .hide-pane {
