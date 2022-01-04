@@ -3,3 +3,6 @@
 
 # bulk reformat - run linter with new rules on client project
 94b24608c91fb2c6f5c45e0596346d148948919b
+
+# bulk reformat - run linter in server package
+0d52efad91a9fade1950bb1f19d5bdd53f942821

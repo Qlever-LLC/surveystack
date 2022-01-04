@@ -164,14 +164,23 @@ async function execute(apiCompose, info, terms, user, submission, currentAssetId
   const credentials = await getCredentials(user);
 
   if (type === 'asset') {
-    console.log("running farmos asset");
+    console.log('running farmos asset');
     return await asset(apiCompose, info, terms, user, credentials, submission, currentAreaId);
   } else if (type === 'area') {
-    console.log("running farmos area");
+    console.log('running farmos area');
     return await area(apiCompose, info, terms, user, credentials, submission);
   } else if (type === 'log') {
-    console.log("running farmos log");
-    return await log(apiCompose, info, terms, user, credentials, submission, currentAssetId, currentAreaId);
+    console.log('running farmos log');
+    return await log(
+      apiCompose,
+      info,
+      terms,
+      user,
+      credentials,
+      submission,
+      currentAssetId,
+      currentAreaId
+    );
     // TODO create log
     // TODO check all terms, create if not existing
     // TODO replace terms in body
@@ -230,8 +239,16 @@ export const handle = async ({ submission, survey, user }) => {
 
   const runSingle = async (apiCompose, info, terms, currentAssetId, currentAreaId) => {
     try {
-      const r = await execute(apiCompose, info, terms, user, submission, currentAssetId, currentAreaId);
-      
+      const r = await execute(
+        apiCompose,
+        info,
+        terms,
+        user,
+        submission,
+        currentAssetId,
+        currentAreaId
+      );
+
       if (Array.isArray(r)) {
         results.push(...r);
         console.log('results interim after array spread', results);
@@ -310,9 +327,9 @@ export const handle = async ({ submission, survey, user }) => {
           currentAssetId = item.id;
         }
 
-        if(compose.farmosType === 'area') {
+        if (compose.farmosType === 'area') {
           console.log('using area id', item.id);
-          currentAreaId = item.id;  
+          currentAreaId = item.id;
         }
       });
     }

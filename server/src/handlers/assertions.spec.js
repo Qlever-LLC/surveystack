@@ -27,7 +27,7 @@ describe('assertHasIds', () => {
   [
     ['not set', {}, unsetError],
     ['a string', { ids: 'not array' }, unsetError],
-    ['an object', { ids: {length: 4} }, unsetError],
+    ['an object', { ids: { length: 4 } }, unsetError],
     ['an empty array', { ids: [] }, unsetError],
     ['containing objects', { ids: ['good', {}] }, invalidError],
     ['containing numbers', { ids: ['good', 4] }, invalidError],
