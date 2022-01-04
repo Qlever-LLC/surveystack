@@ -30,10 +30,10 @@ Vue.component('AppControlLocation', Location);
 import MatrixLegacy from './Matrix.legacy.vue';
 Vue.component('AppControlMatrix.legacy', MatrixLegacy);
 
-import Matrix from './Matrix.vue';
+import Matrix from './matrix/Matrix.vue';
 Vue.component('AppControlMatrix', Matrix);
 
-import MatrixCell from './MatrixCell.vue';
+import MatrixCell from './matrix/MatrixCell.vue';
 Vue.component('AppControlMatrixCell', MatrixCell);
 
 import _Number from './Number.vue';

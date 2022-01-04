@@ -1,14 +1,14 @@
 <template>
   <v-text-field
     v-if="header.type === 'text'"
-    :value="item[header.value].value"
+    :value="value"
     @input="
       (v) => {
-        item[header.value].value = getValueOrNull(v);
+        value = getValueOrNull(v);
         onInput();
       }
     "
-    solo
+    outlined
     hide-details
     autocomplete="off"
     :disabled="disabled"
@@ -17,14 +17,14 @@
     <div style="flex: 1">
       <v-text-field
         ref="text-qrcode"
-        :value="item[header.value].value"
+        :value="value"
         @input="
           (v) => {
-            item[header.value].value = getValueOrNull(v);
+            value = getValueOrNull(v);
             onInput();
           }
         "
-        solo
+        outlined
         hide-details
         autocomplete="off"
         :disabled="disabled"
@@ -38,7 +38,7 @@
         @codeDetected="
           (v) => {
             // console.log('value is', v);
-            item[header.value].value = getValueOrNull(v);
+            value = getValueOrNull(v);
             onInput();
           }
         "
@@ -48,45 +48,49 @@
 
   <v-text-field
     v-else-if="header.type === 'number'"
-    :value="item[header.value].value"
+    :value="value"
     @input="
       (v) => {
-        item[header.value].value = handleNumberInput(v);
+        value = handleNumberInput(v);
         onInput();
       }
     "
     type="number"
-    solo
+    outlined
     hide-details
     :disabled="disabled"
   />
   <v-select
     v-else-if="header.type === 'dropdown'"
-    :items="getDropdownItems(header.value)"
+    :items="items"
     item-text="label"
     item-value="value"
-    :value="item[header.value].value"
+    :value="value"
     @input="
       (v) => {
-        item[header.value].value = getValueOrNull(v);
+        value = getValueOrNull(v);
         onInput();
       }
     "
     hide-details
-    solo
+    outlined
     :multiple="header.multiple"
     :disabled="disabled"
-  />
+  >
+    <template v-slot:selection="{ item, index }">
+      <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
+    </template>
+  </v-select>
   <v-combobox
     v-else-if="header.type === 'autocomplete' && header.custom"
-    :items="getDropdownItems(header.value)"
+    :items="items"
     item-text="label"
     item-value="value"
-    :value="item[header.value].value"
+    :value="value"
     @input="
       (v) => {
         comboboxSearch = null;
-        item[header.value].value = getValueOrNull(v);
+        value = getValueOrNull(v);
         onInput();
       }
     "
@@ -95,92 +99,86 @@
     :disabled="disabled"
     :return-object="false"
     :search-input.sync="comboboxSearch"
-    single-line
-    :chips="header.multiple"
-    :deletable-chips="header.multiple"
-    solo
-    hide-details
+    outlined
     class="custom-ontology"
   >
-    <template v-slot:selection="data">
-      <v-chip
-        v-if="header.multiple"
-        v-bind="data.attrs"
-        :input-value="data.selected"
-        close
-        @click="data.select"
-        @click:close="removeValue(item, header, data.item)"
-      >
-        {{ getLabel(header, data.item) }}
-      </v-chip>
-      <div v-else>
-        {{ getLabel(header, data.item) }}
-      </div>
+    <template v-slot:selection="{ item, index }">
+      <matrix-cell-selection-label :label="getLabel(item)" :index="index" :value="value" />
+    </template>
+    <template v-slot:no-data>
+      <v-list-item>
+        <v-list-item-content>
+          <v-list-item-title>
+            No values matching "<strong>{{ comboboxSearch }}</strong
+            >". Press <kbd>enter</kbd> <span v-if="header.multiple">or <kbd>,</kbd></span> to create a new one
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
     </template>
   </v-combobox>
   <v-autocomplete
     v-else-if="header.type === 'autocomplete' && !header.custom"
-    :items="getDropdownItems(header.value)"
+    :items="items"
     item-text="label"
     item-value="value"
-    :value="item[header.value].value"
+    :value="value"
     @input="
       (v) => {
         comboboxSearch = null;
-        item[header.value].value = getValueOrNull(v);
+        value = getValueOrNull(v);
         onInput();
       }
     "
     hide-details
-    solo
+    outlined
     :multiple="header.multiple"
     :disabled="disabled"
     :search-input.sync="comboboxSearch"
-  />
+  >
+    <template v-slot:selection="{ item, index }">
+      <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
+    </template>
+  </v-autocomplete>
   <v-autocomplete
     v-else-if="header.type === 'farmos_field'"
     :items="farmos.farms || []"
-    :value="item[header.value].value"
+    :value="value"
     @input="
       (v) => {
-        item[header.value].value = getValueOrNull(v);
+        value = getValueOrNull(v);
         onInput();
       }
     "
-    item-text="label"
+    :label="value ? value.farmName : null"
+    item-text="value.name"
     item-value="value"
     hide-details
-    solo
+    outlined
     :disabled="disabled || loading"
   >
     <template v-slot:item="{ item }">
       <div v-html="item.label"></div>
-    </template>
-    <template v-slot:selection="{ item }">
-      <div v-html="item.label" class="d-flex align-center"></div>
     </template>
   </v-autocomplete>
   <v-autocomplete
     v-else-if="header.type === 'farmos_planting'"
-    :value="item[header.value].value"
+    :value="value"
     @input="
       (v) => {
-        item[header.value].value = getValueOrNull(localChange(v));
+        value = getValueOrNull(localChange(v));
         onInput();
       }
     "
     :items="farmos.plantings || []"
-    item-text="label"
+    :label="value ? value.farmName : null"
+    item-text="value.name"
     item-value="value"
     hide-details
-    solo
+    outlined
     :disabled="disabled || loading"
   >
     <template v-slot:item="{ item }">
       <div v-html="item.label"></div>
-    </template>
-    <template v-slot:selection="{ item }">
-      <div v-html="item.label" class="d-flex align-center"></div>
     </template>
   </v-autocomplete>
   <div v-else-if="header.type === 'date'">
@@ -192,13 +190,14 @@
       max-width="290px"
       min-width="290px"
       ref="datepickermenu"
+      :disabled="disabled"
     >
       <template v-slot:activator="{ on, attrs }">
         <v-text-field
-          :value="item[header.value].value"
+          :value="value"
           @input="
             (v) => {
-              item[header.value].value = v;
+              value = v;
               onInput();
             }
           "
@@ -206,17 +205,18 @@
           hide-details
           v-bind="attrs"
           v-on="on"
-          solo
+          outlined
           autocomplete="off"
           :disabled="disabled"
+          :style="{ pointerEvents: disabled ? 'none' : 'auto' }"
           readonly
         ></v-text-field>
       </template>
       <v-date-picker
-        :value="item[header.value].value"
+        :value="value"
         @input="
           (v) => {
-            item[header.value].value = v;
+            value = v;
             menus[`${index}_${header.value}`] = false;
             onInput();
           }
@@ -226,16 +226,18 @@
     </v-menu>
   </div>
 
-  <div v-else>???</div>
+  <v-text-field v-else value="unknown cell type" outlined hide-details disabled />
 </template>
 
 <script>
 import { getValueOrNull } from '@/utils/surveyStack';
 import appQrScanner from '@/components/ui/QrScanner.vue';
+import MatrixCellSelectionLabel from './MatrixCellSelectionLabel.vue';
 
 export default {
   components: {
     appQrScanner,
+    MatrixCellSelectionLabel,
   },
   props: {
     header: {
@@ -269,6 +271,19 @@ export default {
       comboboxSearch: null,
     };
   },
+  computed: {
+    value: {
+      get() {
+        return this.item[this.header.value].value;
+      },
+      set(value) {
+        this.item[this.header.value].value = value;
+      },
+    },
+    items() {
+      return this.getDropdownItems(this.header.value, Array.isArray(this.value) ? this.value : [this.value]);
+    },
+  },
   methods: {
     getValueOrNull,
     onInput() {
@@ -288,17 +303,10 @@ export default {
 
       return n;
     },
-    removeValue(item, header, value) {
-      const filtered = item[header.value].value.filter((v) => v !== value);
-      item[header.value].value = this.getValueOrNull(filtered);
-    },
-    getLabel(header, value) {
-      const dropdownItems = this.getDropdownItems(header.value);
+    getLabel(value) {
+      const dropdownItems = this.items;
       const found = dropdownItems.find((i) => i.value === value);
       return found ? found.label : value;
-    },
-    log(v) {
-      console.log('LOG:', v);
     },
     setActivePickerMonth() {
       setTimeout(() => {
@@ -362,3 +370,14 @@ export default {
   },
 };
 </script>
+
+<style>
+.v-select__selections {
+  flex-wrap: nowrap;
+}
+.v-select__selections span {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+</style>
