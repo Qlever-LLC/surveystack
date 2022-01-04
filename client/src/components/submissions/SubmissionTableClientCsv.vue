@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card id="container">
     <v-data-table
       :headers="headers"
       :items="items"
@@ -31,20 +31,14 @@
         </v-toolbar>
       </template>
 
-      <template v-slot:body="props">
+      <template v-slot:body="props" v-click-outside="onClickOutside">
         <tbody>
           <tr v-for="item in props.items" :key="item._id">
             <td>
               <v-checkbox v-model="tableSelected" :value="item" color="#777" class="custom-checkbox" hide-details />
             </td>
-            <td v-for="header in headers" :key="header.text" @click="onClick">
+            <td v-for="header in headers" :key="header.text" @click.stop="showFullText(item[header.value])">
               <div :class="truncate(item[header.value]) ? 'truncate' : ''">
-                {{ item[header.value] }}
-              </div>
-              <div
-                v-if="truncate(item[header.value])"
-                :class="truncate(item[header.value]) ? 'truncate-full-text' : ''"
-              >
                 {{ item[header.value] }}
               </div>
             </td>
@@ -52,6 +46,12 @@
         </tbody>
       </template>
     </v-data-table>
+
+    <div class="snackbar">
+      <v-snackbar :timeout="-1" v-model="isSnackbarVisible" color="white" elevation="24" absolute top>
+        <span class="black--text">{{ truncatedValue }}</span>
+      </v-snackbar>
+    </div>
   </v-card>
 </template>
 <script>
@@ -93,11 +93,15 @@ export default {
   },
   data() {
     return {
+      models: {
+        base: false,
+        conditional: false,
+      },
+      isSnackbarVisible: false,
       active: false,
-      clickedColumn: '',
+      truncatedValue: '',
       iconColor: 'grey lighten-1',
       checkedNames: [],
-      showDialog: false,
       textTruncateLength: 36,
       selecteds: [],
       excludeMeta: true,
@@ -140,8 +144,11 @@ export default {
     },
   },
   methods: {
-    onClick(event) {
-      console.log(event);
+    showFullText(value) {
+      if (value.length > this.textTruncateLength) {
+        this.truncatedValue = value;
+        this.isSnackbarVisible = !this.isSnackbarVisible;
+      }
     },
     handleClick(data) {
       this.selecteds.push([...this.selecteds, data.item]);
@@ -196,6 +203,13 @@ export default {
   async created() {
     this.fetchData();
   },
+  mounted() {
+    document.addEventListener('click', (event) => {
+      if (!document.getElementsByClassName('snackbar')[0].contains(event.target)) {
+        this.isSnackbarVisible = false;
+      }
+    });
+  },
 };
 </script>
 
@@ -204,20 +218,12 @@ export default {
   font-family: monospace;
   white-space: nowrap;
 }
-
 .archived {
   color: #777 !important;
 }
-
 .v-data-table >>> .custom-header-class span {
   display: inline-block;
   max-width: 250px;
-}
-
-tbody {
-}
-td {
-  position: relative;
 }
 
 .truncate {
@@ -225,32 +231,6 @@ td {
   max-width: 250px;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-.truncate-full-text {
-  position: absolute;
-  top: -50%;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: none;
-  background-color: white;
-  padding: 1rem 1rem 1rem 1rem;
-  box-shadow: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
-  overflow: auto;
-  height: 5rem;
-  min-width: 600px;
-  border-radius: 5px;
-}
-
-td:hover .truncate-full-text {
-  opacity: 1;
-  white-space: initial;
-  top: -5rem;
-  left: 0%;
-  z-index: 1500;
-  overflow: auto;
-  display: block;
-  width: 100%;
 }
 
 .custom-checkbox {
