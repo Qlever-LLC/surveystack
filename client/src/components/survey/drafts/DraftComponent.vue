@@ -55,7 +55,13 @@
           <v-icon>mdi-arrow-down</v-icon>
         </v-btn>
       </v-fab-transition>
-      <app-control class="my-auto maxw-60 mx-auto" :path="path" :control="control" />
+      <app-control
+        class="my-auto maxw-60 mx-auto"
+        :path="path"
+        :control="control"
+        :forceMobile="forceMobile"
+        :isInBuilder="builder"
+      />
     </div>
 
     <!-- Footer with next/prev buttons -->
@@ -136,6 +142,7 @@ export default {
     submission: { type: Object },
     persist: { type: Boolean },
     builder: { type: Boolean },
+    forceMobile: { type: Boolean, default: false },
   },
   data() {
     return {
