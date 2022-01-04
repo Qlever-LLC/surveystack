@@ -24,10 +24,9 @@ const actions = {
   async setPartner({ commit, dispatch }, partner) {
     commit('SET_PARTNER', partner);
     const title = partner.navLogo
-      ? `<img 
+      ? `<img
+          class="logo" 
            src=${partner.navLogo} 
-           width="70px" height="30px" 
-           style="object-fit:contain;margin-top:10px;"
         />`
       : partner.name;
     dispatch('appui/setTitle', title, { root: true });

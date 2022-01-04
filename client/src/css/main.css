@@ -160,3 +160,9 @@ body {
 .white-space-nowrap {
   white-space: nowrap;
 }
+.logo {
+  width: 70px;
+  height: 30px;
+  object-fit: contain;
+  margin-top: 10px;
+}
