@@ -37,9 +37,9 @@ app.use(initLogging);
 app.use(async (req, res, next) => {
   const { host } = req.headers;
   const protocol = req.protocol;
-  
+
   const subdomain = req.subdomains.join('.');
-  const key = Object.keys(subdomainRedirect).find(k => k === subdomain);
+  const key = Object.keys(subdomainRedirect).find((k) => k === subdomain);
   if (key) {
     const redirect = `${protocol}://${subdomainRedirect[key]}${host.substring(subdomain.length)}`;
     res.writeHead(301, { Location: redirect });
