@@ -31,7 +31,7 @@
         </v-toolbar>
       </template>
 
-      <template v-slot:body="props" v-click-outside="onClickOutside">
+      <template v-slot:body="props">
         <tbody>
           <tr v-for="item in props.items" :key="item._id">
             <td>
@@ -93,12 +93,7 @@ export default {
   },
   data() {
     return {
-      models: {
-        base: false,
-        conditional: false,
-      },
       isSnackbarVisible: false,
-      active: false,
       truncatedValue: '',
       iconColor: 'grey lighten-1',
       checkedNames: [],
