@@ -1,5 +1,4 @@
-import dotenv from 'dotenv-defaults';
-dotenv.config();
+import dotenv from 'dotenv-defaults/config';
 
 import express from 'express';
 import expressStaticGzip from 'express-static-gzip';
@@ -11,6 +10,7 @@ import { connectDatabase, db } from './db';
 import { initAdmins } from './services/admin.service';
 import { getRoles } from './services/roles.service';
 import errorHandlers from './handlers/errorHandlers';
+import { initLogging } from './middleware/logging';
 
 import apiRoutes from './routes/api';
 import debugRoutes from './routes/debug';
@@ -27,6 +27,8 @@ const PATH_PREFIX = process.env.PATH_PREFIX;
 const app = express();
 const frontend = expressStaticGzip('../client/dist', { index: false });
 
+app.use(initLogging);
+
 /**
  * Hard-Redirect certain subdomains after migration.
  * To test this locally, build the client and serve it using the server.
@@ -35,9 +37,9 @@ const frontend = expressStaticGzip('../client/dist', { index: false });
 app.use(async (req, res, next) => {
   const { host } = req.headers;
   const protocol = req.protocol;
-  
+
   const subdomain = req.subdomains.join('.');
-  const key = Object.keys(subdomainRedirect).find(k => k === subdomain);
+  const key = Object.keys(subdomainRedirect).find((k) => k === subdomain);
   if (key) {
     const redirect = `${protocol}://${subdomainRedirect[key]}${host.substring(subdomain.length)}`;
     res.writeHead(301, { Location: redirect });

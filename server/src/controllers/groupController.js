@@ -347,21 +347,20 @@ const addDocLink = async (req, res) => {
         groupIdsToUpdate.push(subgroup._id);
       }
     } else {
-      existing.docs ? existing.docs.push(doc) : existing.docs = [doc];
+      existing.docs ? existing.docs.push(doc) : (existing.docs = [doc]);
       groupIdsToUpdate.push(existing._id);
     }
 
-    let result = await db.collection(col).updateMany(
-      { '_id': { $in: groupIdsToUpdate } },
-      { $addToSet: { docs: doc } }
-    );
+    let result = await db
+      .collection(col)
+      .updateMany({ _id: { $in: groupIdsToUpdate } }, { $addToSet: { docs: doc } });
 
     return res.send(result);
   } catch (err) {
     console.log(err);
     return res.status(500).send({ message: 'Ouch :/' });
   }
-}
+};
 
 const removeDocLink = async (req, res) => {
   const { groupid, doc, removeFromDescendants } = req.body;
@@ -378,21 +377,20 @@ const removeDocLink = async (req, res) => {
         groupIdsToUpdate.push(subgroup._id);
       }
     } else {
-      existing.docs ? existing.docs.push(doc) : existing.docs = [doc];
+      existing.docs ? existing.docs.push(doc) : (existing.docs = [doc]);
       groupIdsToUpdate.push(existing._id);
     }
 
-    let result = await db.collection(col).updateMany(
-      { '_id': { $in: groupIdsToUpdate } },
-      { $pull: { docs: {link : doc.link } } }
-    );
+    let result = await db
+      .collection(col)
+      .updateMany({ _id: { $in: groupIdsToUpdate } }, { $pull: { docs: { link: doc.link } } });
 
     return res.send(result);
   } catch (err) {
     console.log(err);
     return res.status(500).send({ message: 'Ouch :/' });
   }
-}
+};
 
 export default {
   getGroups,
@@ -402,5 +400,5 @@ export default {
   updateGroup,
   deleteGroup,
   addDocLink,
-  removeDocLink
+  removeDocLink,
 };

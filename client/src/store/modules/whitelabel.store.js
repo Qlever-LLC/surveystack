@@ -25,7 +25,7 @@ const actions = {
     commit('SET_PARTNER', partner);
     const title = partner.navLogo
       ? `<img
-          class="logo" 
+          class="sidenav-partner-logo" 
            src=${partner.navLogo} 
         />`
       : partner.name;

@@ -24,7 +24,7 @@ export function uploadToS3(keyPrefix, filePath) {
   //                    ex: "my-bucket/my-pictures-folder/my-picture.png"
   var keyName = path.join(keyPrefix, fileName);
 
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     fileStream.once('error', reject);
     s3.upload({
       Bucket: AWS_BUCKET_NAME,
