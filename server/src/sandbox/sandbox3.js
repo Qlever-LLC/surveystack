@@ -283,8 +283,7 @@ const submission = {
           climateRegion: 'East North Central',
           olmLayers: {
             soil: {
-              url:
-                'predicted250m&regex=sol_grtgroup_usda.soiltax_c_250m_s0..0cm_1950..2017_v0.2.tif',
+              url: 'predicted250m&regex=sol_grtgroup_usda.soiltax_c_250m_s0..0cm_1950..2017_v0.2.tif',
               data: 'info',
               display: ['Group', 'Suborder', 'Order'],
             },

@@ -39,10 +39,7 @@ const getIntegrations = async (req, res) => {
     filter.membership = new ObjectId(membership);
   }
 
-  const entities = await db
-    .collection(col)
-    .find(filter)
-    .toArray();
+  const entities = await db.collection(col).find(filter).toArray();
   return res.send(entities);
 };
 

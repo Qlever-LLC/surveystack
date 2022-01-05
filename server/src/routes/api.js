@@ -70,7 +70,11 @@ router.put(
   catchErrors(groupController.updateGroup)
 );
 router.post('/groups/add-doc-link', assertAuthenticated, catchErrors(groupController.addDocLink));
-router.post('/groups/remove-doc-link', assertAuthenticated, catchErrors(groupController.removeDocLink));
+router.post(
+  '/groups/remove-doc-link',
+  assertAuthenticated,
+  catchErrors(groupController.removeDocLink)
+);
 // router.delete('/groups/:id', assertAuthenticated, catchErrors(groupController.deleteGroup));
 
 /** Submissions */
@@ -99,7 +103,7 @@ router.post(
     assertEntitiesExist({ collection: 'submissions' }),
     assertEntitiesRights,
   ],
-  catchErrors(submissionController.bulkReassignSubmissions),
+  catchErrors(submissionController.bulkReassignSubmissions)
 );
 router.get(
   '/submissions/:id',
@@ -175,7 +179,11 @@ router.put(
   [assertAuthenticated, assertIdsMatch, assertEntityExists({ collection: 'users' })],
   catchErrors(userController.updateUser)
 );
-router.delete('/users/:id', [assertAuthenticated, assertIsSuperAdmin], catchErrors(userController.deleteUser));
+router.delete(
+  '/users/:id',
+  [assertAuthenticated, assertIsSuperAdmin],
+  catchErrors(userController.deleteUser)
+);
 
 /** Scripts */
 router.get('/scripts', catchErrors(scriptController.getScripts));

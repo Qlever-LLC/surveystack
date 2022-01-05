@@ -6,7 +6,7 @@ import uuidv4 from 'uuid/v4';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
-import { cookieOptions } from '../constants'
+import { cookieOptions } from '../constants';
 import _ from 'lodash';
 
 const col = 'users';
@@ -33,11 +33,7 @@ const getUsers = async (req, res) => {
     return res.send(entities);
   }
 
-  entities = await db
-    .collection(col)
-    .find({})
-    .project(projection)
-    .toArray();
+  entities = await db.collection(col).find({}).project(projection).toArray();
   return res.send(entities);
 };
 
@@ -48,10 +44,7 @@ const getUser = async (req, res) => {
   pipeline.push({ $match: { _id: new ObjectId(id) } });
   pipeline.push({ $project: { email: 1, name: 1 } });
 
-  const [entity] = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  const [entity] = await db.collection(col).aggregate(pipeline).toArray();
 
   if (!entity) {
     throw boom.notFound(`No user found for id: ${id}`);
@@ -123,11 +116,13 @@ const updateUser = async (req, res) => {
   }
 
   try {
-    const updated = await db.collection(col).findOneAndUpdate(
-      { _id: new ObjectId(id) },
-      { $set: updatedUser },
-      { returnOriginal: false }
-    );
+    const updated = await db
+      .collection(col)
+      .findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: updatedUser },
+        { returnOriginal: false }
+      );
     return res.send(updated);
   } catch (err) {
     console.log(err);
