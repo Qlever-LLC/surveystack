@@ -40,13 +40,10 @@ const connectDatabase = async () => {
       max: 5000,
     });
   }
-  const resourcesCollectionName = 'resources'
-  const resourcesCollectionExists = await db.listCollections({ name: resourcesCollectionName }).hasNext();
-  if (!resourcesCollectionExists) {
-    await db.createCollection(resourcesCollectionName);
-  }
-  const resourcesCollectionName = 'resources'
-  const resourcesCollectionExists = await db.listCollections({ name: resourcesCollectionName }).hasNext();
+  const resourcesCollectionName = 'resources';
+  const resourcesCollectionExists = await db
+    .listCollections({ name: resourcesCollectionName })
+    .hasNext();
   if (!resourcesCollectionExists) {
     await db.createCollection(resourcesCollectionName);
   }

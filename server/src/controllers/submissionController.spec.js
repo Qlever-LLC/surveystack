@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb'
+import { ObjectId } from 'mongodb';
 import submissionController from './submissionController';
 
 const { getSubmissionsCsv, prepareSubmissionsToQSLs } = submissionController;

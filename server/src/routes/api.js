@@ -299,14 +299,21 @@ router.post('/call-for-submissions/send', [assertAuthenticated], catchErrors(cfs
 // resources
 router.get('/resources/:surveyId', catchErrors(resourceController.getResources));
 router.get('/resources/download-url/:key', catchErrors(resourceController.getDownloadURL));
-router.post('/resources/upload-url', [assertAuthenticated], catchErrors(resourceController.getUploadURL));
-router.put('/resources/commit/:id',[assertAuthenticated], catchErrors(resourceController.commitResource));
+router.post(
+  '/resources/upload-url',
+  [assertAuthenticated],
+  catchErrors(resourceController.getUploadURL)
+);
+router.put(
+  '/resources/commit/:id',
+  [assertAuthenticated],
+  catchErrors(resourceController.commitResource)
+);
 router.delete(
   '/resources/:id',
   [assertAuthenticated],
   catchErrors(resourceController.deleteResource)
 );
-
 
 // info
 router.get('/info/ip', catchErrors(infoController.getIP));

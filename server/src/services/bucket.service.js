@@ -1,19 +1,24 @@
 import dotenv from 'dotenv-defaults';
-import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 dotenv.config();
 
-const AWS_S3_REGION=process.env.AWS_S3_REGION;
-const AWS_S3_BUCKET_NAME=process.env.AWS_S3_BUCKET_NAME;
-const AWS_S3_ACCESS_KEY_ID=process.env.AWS_S3_ACCESS_KEY_ID;
-const AWS_S3_SECRET_ACCESS_KEY=process.env.AWS_S3_SECRET_ACCESS_KEY;
-const AWS_S3_ENDPOINT_OVERRIDE=process.env.AWS_S3_ENDPOINT_OVERRIDE;
+const AWS_S3_REGION = process.env.AWS_S3_REGION;
+const AWS_S3_BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
+const AWS_S3_ACCESS_KEY_ID = process.env.AWS_S3_ACCESS_KEY_ID;
+const AWS_S3_SECRET_ACCESS_KEY = process.env.AWS_S3_SECRET_ACCESS_KEY;
+const AWS_S3_ENDPOINT_OVERRIDE = process.env.AWS_S3_ENDPOINT_OVERRIDE;
 
 const s3Client = getS3Client();
 
 function getS3Client() {
-  if(AWS_S3_ENDPOINT_OVERRIDE) {
+  if (AWS_S3_ENDPOINT_OVERRIDE) {
     /*console.log(AWS_S3_ENDPOINT_OVERRIDE);
     console.log(AWS_S3_ACCESS_KEY_ID);
     console.log(AWS_S3_SECRET_ACCESS_KEY);
@@ -21,18 +26,18 @@ function getS3Client() {
     return new S3Client({
       credentials: {
         accessKeyId: AWS_S3_ACCESS_KEY_ID,
-        secretAccessKey: AWS_S3_SECRET_ACCESS_KEY
+        secretAccessKey: AWS_S3_SECRET_ACCESS_KEY,
       },
       region: AWS_S3_REGION,
       endpoint: AWS_S3_ENDPOINT_OVERRIDE,
       sslEnabled: false,
-      forcePathStyle: true
+      forcePathStyle: true,
     });
   } else {
     return new S3Client({
       credentials: {
         accessKeyId: AWS_S3_ACCESS_KEY_ID,
-        secretAccessKey: AWS_S3_SECRET_ACCESS_KEY
+        secretAccessKey: AWS_S3_SECRET_ACCESS_KEY,
       },
       region: AWS_S3_REGION,
     });
@@ -40,7 +45,12 @@ function getS3Client() {
 }
 
 export async function getUploadUrl(key, contentType, contentLength) {
-  const command = new PutObjectCommand({ Bucket: AWS_S3_BUCKET_NAME, Key: key, ContentType: contentType, ContentLength: contentLength});
+  const command = new PutObjectCommand({
+    Bucket: AWS_S3_BUCKET_NAME,
+    Key: key,
+    ContentType: contentType,
+    ContentLength: contentLength,
+  });
   return await getSignedUrl(s3Client, command, {
     expiresIn: 3600, //in seconds, eq 1 hour
   });
@@ -54,9 +64,7 @@ export async function getDownloadUrl(key) {
 }
 
 export async function deleteObject(key) {
-  return await s3Client.send(
-    new DeleteObjectCommand({ Bucket: AWS_S3_BUCKET_NAME, Key: key})
-  );
+  return await s3Client.send(new DeleteObjectCommand({ Bucket: AWS_S3_BUCKET_NAME, Key: key }));
 }
 
 export default {
