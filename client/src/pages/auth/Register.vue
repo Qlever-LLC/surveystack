@@ -1,66 +1,15 @@
 <template>
-  <v-container class="maxw-40 wrapper">
-    <v-card class="pa-5">
-      <h1 class="heading--text" v-if="isWhitelabel">Register to join {{ whitelabelPartner.name }}</h1>
-      <h1 class="heading--text" v-else>Register</h1>
-      <v-form class="mb-5">
-        <v-text-field
-          label="E-Mail"
-          type="text"
-          class="form-control"
-          :value="entity.email.toLowerCase()"
-          @input="entity.email = $event.toLowerCase()"
-          color="focus"
-        />
-
-        <v-text-field label="Name" type="text" class="form-control" v-model="entity.name" color="focus" />
-
-        <v-text-field
-          label="Password"
-          :type="passwordInputType"
-          class="form-control"
-          v-model="entity.password"
-          :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-          @click:append="showPasswords = !showPasswords"
-          color="focus"
-        />
-
-        <v-text-field
-          label="Password confirmation"
-          :type="passwordInputType"
-          class="form-control"
-          v-model="passwordConfirmation"
-          :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-          @click:append="showPasswords = !showPasswords"
-          color="focus"
-        />
-
-        <div class="d-flex justify-end">
-          <v-btn type="button" class="mr-2" text @click="reset">Reset</v-btn>
-          <v-btn type="submit" @click.prevent="submit" color="primary">Sign up</v-btn>
-        </div>
-      </v-form>
-      <div class="text-center text-muted mt-5">
-        Already have an account?
-        <router-link :to="signInLink">Sign in</router-link>
-      </div>
-    </v-card>
-
-    <v-alert class="mt-4" outlined v-if="membership" type="info"
-      >Your code is eligible to join <strong>{{ membership.group.name }}</strong></v-alert
-    >
-
-    <transition name="fade">
-      <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{ status }}</app-feedback>
-    </transition>
-  </v-container>
+  <div class="wrapper">
+    <register :useLink="true" class="maxw-40" />
+  </div>
 </template>
 
 <script>
-import appFeedback from '@/components/ui/Feedback.vue';
 import api from '@/services/api.service';
 
 import { autoSelectActiveGroup } from '@/utils/memberships';
+
+import Register from '@/components/ui/Register.vue';
 
 const DEFAULT_ENTITY = {
   email: '',
@@ -70,7 +19,7 @@ const DEFAULT_ENTITY = {
 
 export default {
   components: {
-    appFeedback,
+    Register,
   },
   data() {
     return {
@@ -201,10 +150,6 @@ export default {
 </script>
 
 <style scoped>
-a {
-  text-decoration: none;
-}
-
 .wrapper {
   background-color: var(--v-background-base);
   height: 100%;

@@ -219,7 +219,7 @@ export default {
         color: 'focus',
       };
 
-      if (this.$vuetify.breakpoint.smAndDown) {
+      if (this.$vuetify.breakpoint.smAndDown || this.forceMobile) {
         defaultProps.maxHeight = 130;
         defaultProps.top = true;
         defaultProps.closeOnContentClick = true;

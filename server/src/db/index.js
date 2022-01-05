@@ -8,7 +8,7 @@ let db = null;
 /**
  * @type {MongoClient}
  */
- let mongoClient = null;
+let mongoClient = null;
 
 /**
  * https://stackoverflow.com/a/33780894
@@ -29,10 +29,16 @@ const connectDatabase = async () => {
   await db.collection('submissions').createIndex({ 'meta.survey.version': 1 });
   await db.collection('submissions').createIndex({ 'meta.creator': 1 });
   // const farmOsWebhookRequestsCollectionExists = await db.listCollections().toArray().some(({ name }) => name === 'farmos.webhookrequests')
-  const farmOsWebhookRequestsCollectionName = 'farmos.webhookrequests'
-  const farmOsWebhookRequestsCollectionExists = await db.listCollections({ name: farmOsWebhookRequestsCollectionName }).hasNext();
+  const farmOsWebhookRequestsCollectionName = 'farmos.webhookrequests';
+  const farmOsWebhookRequestsCollectionExists = await db
+    .listCollections({ name: farmOsWebhookRequestsCollectionName })
+    .hasNext();
   if (!farmOsWebhookRequestsCollectionExists) {
-    await db.createCollection(farmOsWebhookRequestsCollectionName, { capped: true, size: 10000, max: 5000 });
+    await db.createCollection(farmOsWebhookRequestsCollectionName, {
+      capped: true,
+      size: 10000,
+      max: 5000,
+    });
   }
   const resourcesCollectionName = 'resources'
   const resourcesCollectionExists = await db.listCollections({ name: resourcesCollectionName }).hasNext();
@@ -151,7 +157,12 @@ const migrateGroups_VXtoV2 = async () => {
 const migrateLibraryIds = async () => {
   const surveys = await db
     .collection('surveys')
-    .find({"$and": [{ "revisions.controls.libraryId": { $exists: true }}, {"revisions.controls.libraryId" : { $not: {$type:"objectId" }}}] })
+    .find({
+      $and: [
+        { 'revisions.controls.libraryId': { $exists: true } },
+        { 'revisions.controls.libraryId': { $not: { $type: 'objectId' } } },
+      ],
+    })
     .toArray();
 
   let modifiedCount = 0;
@@ -165,9 +176,13 @@ const migrateLibraryIds = async () => {
       }
     }
 
-    await db.collection('surveys').findOneAndUpdate({ '_id': new ObjectId(survey._id) }, { $set: survey }, {
-      returnOriginal: false,
-    });
+    await db.collection('surveys').findOneAndUpdate(
+      { _id: new ObjectId(survey._id) },
+      { $set: survey },
+      {
+        returnOriginal: false,
+      }
+    );
 
     modifiedCount++;
 
@@ -189,12 +204,17 @@ const changeLibraryIdToObjectId = async (control) => {
       await changeLibraryIdToObjectId(child);
     }
   }
-}
+};
 
 const migrateResourceLibraryIds = async () => {
   const surveys = await db
     .collection('surveys')
-    .find({"$and": [{ "resources.libraryId": { $exists: true }}, {"resources.libraryId" : { $not: {$type:"objectId" }}}] })
+    .find({
+      $and: [
+        { 'resources.libraryId': { $exists: true } },
+        { 'resources.libraryId': { $not: { $type: 'objectId' } } },
+      ],
+    })
     .toArray();
 
   let modifiedCount = 0;
@@ -206,9 +226,13 @@ const migrateResourceLibraryIds = async () => {
       }
     }
 
-    await db.collection('surveys').findOneAndUpdate({ '_id': new ObjectId(survey._id) }, { $set: survey }, {
-      returnOriginal: false,
-    });
+    await db.collection('surveys').findOneAndUpdate(
+      { _id: new ObjectId(survey._id) },
+      { $set: survey },
+      {
+        returnOriginal: false,
+      }
+    );
 
     modifiedCount++;
 

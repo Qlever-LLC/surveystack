@@ -222,7 +222,7 @@ const buildPipeline = async (req, res) => {
     archivedMatch['meta.archived'] = true;
   }
   pipeline.push({ $match: archivedMatch });
-  
+
   if (req.query.creator) {
     pipeline.push({
       $match: {
@@ -503,20 +503,24 @@ const getSubmissionsCsv = async (req, res) => {
 
   const entities = await db.collection(col).aggregate(pipeline).toArray();
   const transformer = (entity) => {
-    let data = csvService.transformSubmissionQuestionTypes(entity.data, {
-      geoJSON: csvService.geojsonTransformer,
-      matrix: csvService.matrixTransformer,
-    }, formatOptions);
+    let data = csvService.transformSubmissionQuestionTypes(
+      entity.data,
+      {
+        geoJSON: csvService.geojsonTransformer,
+        matrix: csvService.matrixTransformer,
+      },
+      formatOptions
+    );
 
     data = csvService.removeMetaFromQuestions(data);
 
     const result = {
       _id: entity._id,
       data,
-    }
+    };
 
     if (queryParam(req.query.showCsvMeta)) {
-      result.meta = entity.meta
+      result.meta = entity.meta;
     }
 
     return result;
@@ -597,7 +601,7 @@ const getSubmission = async (req, res) => {
 
 const prepareCreateSubmissionEntity = async (submission, res) => {
   const entity = await sanitize(submission);
-  
+
   const survey = await db.collection('surveys').findOne({ _id: entity.meta.survey.id });
   if (!survey) {
     throw boom.notFound(`No survey found with id: ${entity.meta.survey.id}`);
@@ -616,11 +620,11 @@ const prepareCreateSubmissionEntity = async (submission, res) => {
   return { entity, survey };
 };
 
-const createSubmission = async(req, res) => {
+const createSubmission = async (req, res) => {
   const submissions = Array.isArray(req.body) ? req.body : [req.body];
 
   const submissionEntities = await Promise.all(
-    submissions.map(submission => prepareCreateSubmissionEntity(submission, res))
+    submissions.map((submission) => prepareCreateSubmissionEntity(submission, res))
   );
 
   let farmOsResults;
@@ -630,7 +634,7 @@ const createSubmission = async(req, res) => {
         farmOsService.handle({
           submission: entity,
           survey,
-          user: res.locals.auth.user
+          user: res.locals.auth.user,
         })
       )
     );
@@ -659,7 +663,7 @@ const createSubmission = async(req, res) => {
         ];
 
         const result = await db.collection(col).insertMany(submissionsToInsert);
-        
+
         if (submissionsToInsert.length !== result.insertedCount) {
           await session.abortTransaction();
           return;
@@ -678,9 +682,9 @@ const createSubmission = async(req, res) => {
 
   res.send({
     ...results,
-    farmos: farmOsResults.flat()
+    farmos: farmOsResults.flat(),
   });
-}
+};
 
 // if submission contains question set library questions, return a submission subset for each question set library
 const prepareSubmissionsToQSLs = async (controls, submission) => {
@@ -704,35 +708,39 @@ const prepareSubmissionsToQSLs = async (controls, submission) => {
       delete submissionCopy.data['meta'];
 
       // do not return copy if no data is left
-      if(Object.keys(submissionCopy.data).length === 0) {
+      if (Object.keys(submissionCopy.data).length === 0) {
         return;
       }
 
       // TODO if qsl survey is not found, we are probably on an on-premise-system, so try to find the survey on the central surveystack system
 
       //sanitize copy (e.g. convert string id's to object id
-      submissionCopy = await sanitize(submissionCopy)
+      submissionCopy = await sanitize(submissionCopy);
       submissionsToQSLSurveys.push(submissionCopy);
     }
 
     // recursively go through the children
     if (control.children) {
-      await Promise.all(control.children.map(async (child) => {
-        await createSubmissionsFromControl(child, submissionCopy);
-      }));
+      await Promise.all(
+        control.children.map(async (child) => {
+          await createSubmissionsFromControl(child, submissionCopy);
+        })
+      );
     }
   }
 
   // for each component in survey.revisions[meta.survey.version], create submission in parallel
-  await Promise.all(controls.map(async (control) => {
-    await createSubmissionsFromControl(control, submission);
-  }));
+  await Promise.all(
+    controls.map(async (control) => {
+      await createSubmissionsFromControl(control, submission);
+    })
+  );
 
   return submissionsToQSLSurveys;
 };
 
 const findVal = (obj, keyToFind) => {
-  if(!obj) {
+  if (!obj) {
     return false;
   }
   if (obj[keyToFind]) return obj[keyToFind];
@@ -744,7 +752,7 @@ const findVal = (obj, keyToFind) => {
     }
   }
   return false;
-}
+};
 
 const updateSubmission = async (req, res) => {
   const { id } = req.params;
@@ -771,7 +779,11 @@ const updateSubmission = async (req, res) => {
   try {
     // re-run with original creator user
     const creator = await db.collection('users').findOne({ _id: newSubmission.meta.creator });
-    const results = await farmOsService.handle({submission: newSubmission, survey, user: creator });
+    const results = await farmOsService.handle({
+      submission: newSubmission,
+      survey,
+      user: creator,
+    });
     farmosResults.push(...results);
     // could contain errors, need to pass these on to the user
   } catch (error) {
@@ -800,17 +812,20 @@ const updateSubmission = async (req, res) => {
 
 const updateSubmissionToLibrarySurveys = async (survey, submission) => {
   // find library submissions to be updated
-  const librarySubmissions =  await db.collection('submissions').find({'meta.original':submission._id }).toArray();
+  const librarySubmissions = await db
+    .collection('submissions')
+    .find({ 'meta.original': submission._id })
+    .toArray();
 
   // archive current library submissions
-  await librarySubmissions.forEach(function(librarySubmission) {
+  await librarySubmissions.forEach(function (librarySubmission) {
     // re-insert existing submissions as archived
     // in contrast to the general archiving function, here we don't move the old id to the new submission and we don't
     // change the origin as this is occupied by the root submission origin, otherwise, the find above would not find
     // this for a further resubmit
     librarySubmission.meta.archived = true;
     librarySubmission.meta.archivedReason = submission.meta.archivedReason || 'RESUBMIT';
-    db.collection(col).replaceOne({"_id":librarySubmission._id}, librarySubmission);
+    db.collection(col).replaceOne({ _id: librarySubmission._id }, librarySubmission);
   });
   // create new library submissions with a new id
   let controls = survey.revisions[submission.meta.survey.version - 1].controls;
@@ -818,29 +833,38 @@ const updateSubmissionToLibrarySurveys = async (survey, submission) => {
   if (QSLSubmissions.length !== 0) {
     await db.collection(col).insertMany(QSLSubmissions);
   }
-}
+};
 
 const bulkReassignSubmissions = async (req, res) => {
   const { group, creator, ids } = req.body;
   const submissions = res.locals.existing;
 
-  const surveyIds = [ ...new Set(submissions.map(submission => submission.meta.survey.id.toString())) ];
-  const surveys = await db.collection('surveys').find({
-    _id: { $in: surveyIds.map(ObjectId) }
-  }).toArray();
+  const surveyIds = [
+    ...new Set(submissions.map((submission) => submission.meta.survey.id.toString())),
+  ];
+  const surveys = await db
+    .collection('surveys')
+    .find({
+      _id: { $in: surveyIds.map(ObjectId) },
+    })
+    .toArray();
   if (surveys.length !== surveyIds.length) {
     throw boom.notFound(`Survey referenced by submission not found.`);
   }
 
   let farmOsResults;
   try {
-    const farmOsResponses = await Promise.all(submissions.map(
-      submission => farmOsService.handle({
-        submission,
-        survey: surveys.find(({ _id }) => submission.meta.survey.id.toString() === _id.toString()),
-        user: res.locals.auth.user
-      })
-    ));
+    const farmOsResponses = await Promise.all(
+      submissions.map((submission) =>
+        farmOsService.handle({
+          submission,
+          survey: surveys.find(
+            ({ _id }) => submission.meta.survey.id.toString() === _id.toString()
+          ),
+          user: res.locals.auth.user,
+        })
+      )
+    );
     farmOsResults = farmOsResponses.flat();
   } catch (error) {
     console.log('error handling farmos', error);
@@ -853,7 +877,7 @@ const bulkReassignSubmissions = async (req, res) => {
   const results = await withSession(mongoClient, async (session) => {
     try {
       return await withTransaction(session, async () => {
-        const submissionsToArchive = submissions.map(submission => ({
+        const submissionsToArchive = submissions.map((submission) => ({
           ...submission,
           _id: new ObjectId(),
           meta: {
@@ -865,7 +889,7 @@ const bulkReassignSubmissions = async (req, res) => {
         }));
 
         const insertResult = await db.collection(col).insertMany(submissionsToArchive);
-        
+
         if (submissionsToArchive.length !== insertResult.insertedCount) {
           await session.abortTransaction();
           return;
@@ -883,7 +907,7 @@ const bulkReassignSubmissions = async (req, res) => {
               ...(creator ? { 'meta.creator': ObjectId(creator) } : {}),
             },
             $inc: { 'meta.revision': 1 },
-          },
+          }
         );
 
         if (submissions.length !== updateResult.modifiedCount) {
@@ -931,7 +955,11 @@ const reassignSubmission = async (req, res) => {
   try {
     // TODO: should we use the currently logged in user or the submission's user?
     // probably the submission's user (for instance if submission is re-assigned with a different user)
-    const results = await farmOsService.handle({ submission: existing, survey, user: res.locals.auth.user });
+    const results = await farmOsService.handle({
+      submission: existing,
+      survey,
+      user: res.locals.auth.user,
+    });
     farmosResults.push(...results);
     // could contain errors, need to pass these on to the user
   } catch (error) {
@@ -956,18 +984,20 @@ const reassignSubmission = async (req, res) => {
     updateOperation['meta.creator'] = ObjectId(body.creator);
   }
 
-  const updated = await db.collection(col).findOneAndUpdate(
-    { _id: new ObjectId(id) },
-    { $set: updateOperation },
-    { returnOriginal: false }
-  );
+  const updated = await db
+    .collection(col)
+    .findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set: updateOperation },
+      { returnOriginal: false }
+    );
   updated.value.farmos = farmosResults;
   return res.send(updated.value);
 };
 
 const archiveSubmissions = async (req, res) => {
   const { id } = req.params;
-  const { ids } = req.body;
+  let { ids } = req.body;
   if (!ids) {
     ids = [id];
   }
@@ -996,10 +1026,9 @@ const archiveSubmissions = async (req, res) => {
   return res.send({ message: 'OK' });
 };
 
-
 const deleteSubmissions = async (req, res) => {
   const { id } = req.params;
-  const { ids } = req.body;
+  let { ids } = req.body;
   if (!ids) {
     ids = [id];
   }

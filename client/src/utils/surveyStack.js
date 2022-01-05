@@ -108,7 +108,6 @@ export function isAnswered(node, submission) {
     let answered = true;
     for (const row of value) {
       for (const requiredCol of requiredCols) {
-        console.log(`row[${requiredCol}].value`, row[requiredCol].value);
         if (row[requiredCol].value === null) {
           answered = false;
         }

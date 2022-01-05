@@ -7,6 +7,8 @@ export default {
     relevant: { type: Boolean, default: true },
     required: { type: Boolean, default: false },
     redacted: { type: Boolean, default: false },
+    forceMobile: { type: Boolean, default: false },
+    isInBuilder: { type: Boolean, default: false },
     resources: {
       default: () => [],
     },
