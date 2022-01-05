@@ -25,7 +25,12 @@
           <v-row>
             <v-col>
               <div class="d-flex justify-end">
-                <v-switch v-model="excludeMeta" label="Hide meta" class="mt-2"></v-switch>
+                <v-switch
+                  :input-value="excludeMeta"
+                  @change="$emit('excludeMetaChange', $event)"
+                  label="Hide meta"
+                  class="mt-2"
+                ></v-switch>
               </div>
             </v-col>
           </v-row>
@@ -71,10 +76,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    excludeMeta: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
-      excludeMeta: true,
       csv: null,
       parsed: null,
       search: '',
