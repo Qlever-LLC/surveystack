@@ -37,7 +37,7 @@
             <td>
               <v-checkbox v-model="tableSelected" :value="item" color="#777" class="custom-checkbox" hide-details />
             </td>
-            <td v-for="header in headers" :key="header.text" @click.stop="showFullText(item[header.value])">
+            <td v-for="header in headers" :key="header.text" @click.stop="showFullText(item[header.value], $event)">
               <div :class="truncate(item[header.value]) ? 'truncate' : ''">
                 {{ item[header.value] }}
               </div>
@@ -47,10 +47,16 @@
       </template>
     </v-data-table>
 
-    <div class="snackbar">
-      <v-snackbar :timeout="-1" v-model="isSnackbarVisible" color="white" elevation="24" absolute top>
-        <span class="black--text">{{ truncatedValue }}</span>
-      </v-snackbar>
+    <div
+      v-if="isSnackbarVisible"
+      :style="{
+        left: `${truncatedPosition[0]}px`,
+        top: `${truncatedPosition[1]}px`,
+        position: 'absolute',
+        transorm: 'translate(-50%, -50%)',
+      }"
+    >
+      <span class="black--text">{{ truncatedValue }}</span>
     </div>
   </v-card>
 </template>
@@ -94,6 +100,7 @@ export default {
   data() {
     return {
       isSnackbarVisible: false,
+      truncatedPosition: [0, 0],
       truncatedValue: '',
       iconColor: 'grey lighten-1',
       checkedNames: [],
@@ -139,10 +146,12 @@ export default {
     },
   },
   methods: {
-    showFullText(value) {
+    showFullText(value, event) {
+      console.log(event, 'event');
       if (value.length > this.textTruncateLength) {
         this.truncatedValue = value;
         this.isSnackbarVisible = !this.isSnackbarVisible;
+        this.truncatedPosition = [event.pageX, event.pageY];
       }
     },
     handleClick(data) {
