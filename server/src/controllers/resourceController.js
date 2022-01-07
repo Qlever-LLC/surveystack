@@ -26,11 +26,17 @@ const getUploadURL = async (req, res) => {
   const { resourceName, contentLength, contentType } = req.body;
   // define s3 file key containing unique uuid to prevent filename collision, allowed characters see https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
   let resourceId = new ObjectId();
-  let key = 'resources/' + resourceId +'/' + resourceName;
+  let key = 'resources/' + resourceId + '/' + resourceName;
   // get signed upload url for a fixed contenttype and contentlength
   let signedUrl = await bucketService.getUploadUrl(key, contentType, contentLength);
   // add resource entry to our db
-  await addResource(resourceId, key, resourceName, contentLength, contentType, res.locals.auth.user._id);
+  await addResource(
+    resourceId,
+    key,
+    resourceName,
+    contentLength,
+    contentType,
+    res.locals.auth.user._id);
   return res.send({ signedUrl, resourceId });
 };
 
@@ -68,7 +74,7 @@ const commitResource = async (req, res) => {
     {
       $set: {
         state: 'committed',
-        "meta.dateModified": new Date()
+        "meta.dateModified": new Date(),
       },
     }
   );
