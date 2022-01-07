@@ -298,7 +298,7 @@ router.post('/call-for-submissions/send', [assertAuthenticated], catchErrors(cfs
 
 // resources
 router.get('/resources/:id', catchErrors(resourceController.getResource));
-router.get('/resources/download-url/:key', catchErrors(resourceController.getDownloadURL));
+router.post('/resources/download-url', catchErrors(resourceController.getDownloadURL));
 router.post(
   '/resources/upload-url',
   [assertAuthenticated],
