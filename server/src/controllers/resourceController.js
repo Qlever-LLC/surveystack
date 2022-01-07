@@ -7,17 +7,14 @@ import slugify from '../helpers/slugify';
 const col = 'resources';
 
 const getResource = async (req, res) => {
-  const { id } = req.query;
-  // load resources
-  const resources = await db
-    .collection(col)
-    .find({ _id: new ObjectId(id), state: 'committed' })
-    .toArray();
-  return res.send(resources);
+  const { id } = req.params;
+  // load committed resource
+  const resource = await db.collection(col).findOne({ _id: new ObjectId(id), state: 'committed' });
+  return res.send(resource);
 };
 
 const getDownloadURL = async (req, res) => {
-  const { key } = req.query;
+  const { key } = req.body;
   let downloadURL = await bucketService.getDownloadUrl(key);
   return res.send(downloadURL);
 };
@@ -63,7 +60,7 @@ const addResource = async (resourceId, key, resourceName, contentLength, content
 
 const commitResource = async (req, res) => {
   const { id } = req.params;
-  const resource = await db.collection(col).findOne({ _id: id });
+  const resource = await db.collection(col).findOne({ _id: new ObjectId(id) });
   if (!resource) {
     return res.status(404).send({
       message: `No entity with _id exists: ${id}`,
@@ -71,7 +68,7 @@ const commitResource = async (req, res) => {
   }
   // TODO find a good pattern in use for error handling
   await db.collection(col).updateOne(
-    { _id: id },
+    { _id: new ObjectId(id) },
     {
       $set: {
         state: 'committed',
