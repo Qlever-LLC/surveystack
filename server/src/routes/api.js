@@ -297,7 +297,7 @@ router.delete(
 router.post('/call-for-submissions/send', [assertAuthenticated], catchErrors(cfsController.send));
 
 // resources
-router.get('/resources/:surveyId', catchErrors(resourceController.getResources));
+router.get('/resources/:id', catchErrors(resourceController.getResource));
 router.get('/resources/download-url/:key', catchErrors(resourceController.getDownloadURL));
 router.post(
   '/resources/upload-url',
