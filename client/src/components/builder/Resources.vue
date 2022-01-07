@@ -1,23 +1,73 @@
 <template>
   <div>
-    <v-dialog v-model="editorDialog">
+    <v-dialog v-model="ontologyEditorDialog">
       <app-ontology-list-editor
         :resources="resources"
         :resource="resource"
         :disabled="resource != null && resource.libraryId != null"
         @change="setResource"
         @delete="removeResource"
-        @close-dialog="editorDialog = false"
+        @close-dialog="ontologyEditorDialog = false"
       />
     </v-dialog>
     <div class="d-flex justify-end">
-      <v-btn class="primary" @click="createOntology"> <v-icon left>mdi-plus</v-icon> Create Ontology </v-btn>
+      <v-menu offset-y left>
+        <template v-slot:activator="{ on }">
+          <v-btn color="primary" v-on="on">
+            <v-icon left>mdi-plus</v-icon>
+            Add resource
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item class="d-flex align-center">
+            <v-list-item-title>
+              <v-btn text @click="importResource">
+                <v-icon color="grey">mdi-plus</v-icon>
+                <div class="ml-1">
+                  Import Existing Resource
+                </div>
+              </v-btn>
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item class="d-flex align-center">
+            <v-list-item-title>
+              <v-input hide-details>
+                <label for="upload-resource" class="cursor-pointer">
+                  <v-btn class="pointer-events-none" text>
+                    <v-icon color="grey">mdi-upload</v-icon>
+                    <div class="ml-1">
+                      Create File Resource
+                    </div>
+                  </v-btn>
+                </label>
+                <input
+                  type="file"
+                  id="upload-resource"
+                  ref="upload-resource"
+                  class="d-none"
+                  @change="createFileResource"
+                />
+              </v-input>
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item class="d-flex align-center">
+            <v-list-item-title>
+              <v-btn text @click="createOntology">
+                <v-icon color="grey">mdi-plus</v-icon>
+                <div class="ml-1">
+                  Create Ontology
+                </div>
+              </v-btn>
+            </v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </div>
-    <v-select :items="availableFilters" v-model="filter" label="Filter" disabled />
-    <v-text-field v-model="search" label="Search" autocomplete="off" />
+    <!--v-select :items="availableFilters" v-model="filter" label="Filter" />
+    <v-text-field v-model="search" label="Search" autocomplete="off" /-->
     <v-list>
       <template v-if="filteredResources.length > 0">
-        <v-list-item v-for="resource in filteredResources" :key="resource.id" two-line @click="openEditor(resource.id)">
+        <v-list-item v-for="resource in filteredResources" :key="resource.id" two-line @click="openResource(resource)">
           <v-list-item-content>
             <v-list-item-title>{{ resource.label }}</v-list-item-title>
             <v-list-item-subtitle>{{ resource.name }} : {{ resource.type }}</v-list-item-subtitle>
@@ -37,6 +87,9 @@
 <script>
 import ObjectId from 'bson-objectid';
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
+import api from '@/services/api.service';
+import axios from 'axios';
+import slugify from '@/utils/slugify';
 
 export default {
   components: {
@@ -50,13 +103,14 @@ export default {
   data() {
     return {
       search: '',
-      filter: 'ONTOLOGY_LIST',
+      filter: false,
       availableFilters: [
         { text: 'All', value: false },
         { text: 'Ontology List', value: 'ONTOLOGY_LIST' },
         { text: 'Matrix', value: 'MATRIX' },
+        { text: 'Remote', value: 'REMOTE' },
       ],
-      editorDialog: false,
+      ontologyEditorDialog: false,
       selectedId: null,
     };
   },
@@ -71,6 +125,64 @@ export default {
       const newResources = [...this.resources.slice(0, index), resource, ...this.resources.slice(index + 1)];
       this.$emit('set-survey-resources', newResources);
     },
+    async test() {
+      console.log('test');
+    },
+    async createFileResource({
+      target: {
+        files: [file],
+      },
+    }) {
+      // request upload url from server
+      const body = {
+        resourceName: file.name,
+        contentLength: file.size,
+        contentType: file.type,
+      };
+      let { data: uploadData } = await api.post('/resources/upload-url', body);
+      // upload file to url and set resource to committed if upload is successful
+      await axios
+        .create()
+        .put(uploadData.signedUrl, file)
+        .then(async (response) => {
+          // resource to committed
+          await api.put(`/resources/commit/${uploadData.resourceId}`, { dummy: '' });
+          // add survey resource
+          this.$emit('set-survey-resources', [
+            ...this.resources,
+            {
+              label: file.name,
+              name: slugify(file.name),
+              id: new ObjectId(uploadData.resourceId),
+              type: file.type,
+              location: 'REMOTE',
+              //content: [],
+            },
+          ]);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      this.$refs['upload-resource'].value = null;
+    },
+    openResource(resource) {
+      if (resource.type === 'ONTOLOGY_LIST') {
+        this.openOntologyEditor(resource.id);
+      } else {
+        this.openResourceInTab(resource);
+      }
+    },
+    async openResourceInTab(surveyResource) {
+      // fetch resource
+      let response = await api.get(`/resources/${surveyResource.id}`);
+      // get download url
+      response = await api.post(`/resources/download-url`, { key: response.data.key });
+      // open url in new tab
+      window.open(response.data, '_blank');
+    },
+    importResource() {
+      // show dialog with resource list / search
+    },
     createOntology() {
       const id = new ObjectId().toString();
       this.$emit('set-survey-resources', [
@@ -84,11 +196,11 @@ export default {
           content: [],
         },
       ]);
-      this.openEditor(id);
+      this.openOntologyEditor(id);
     },
-    openEditor(id) {
+    openOntologyEditor(id) {
       this.selectedId = id;
-      this.editorDialog = true;
+      this.ontologyEditorDialog = true;
     },
   },
   computed: {
@@ -112,3 +224,13 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.pointer-events-none {
+  pointer-events: none !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+</style>
