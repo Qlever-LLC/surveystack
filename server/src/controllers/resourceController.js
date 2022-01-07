@@ -1,17 +1,17 @@
 import bucketService from '../services/bucket.service';
-import uuidv4 from 'uuid/v4';
 import { db } from '../db';
 import { ObjectId } from 'mongodb';
 import assert from 'assert';
+import slugify from '../helpers/slugify';
 
 const col = 'resources';
 
-const getResources = async (req, res) => {
-  const { surveyId } = req.query;
+const getResource = async (req, res) => {
+  const { id } = req.query;
   // load resources
   const resources = await db
     .collection(col)
-    .find({ surveyId: new ObjectId(surveyId), state: 'committed' })
+    .find({ _id: new ObjectId(id), state: 'committed' })
     .toArray();
   return res.send(resources);
 };
@@ -23,23 +23,27 @@ const getDownloadURL = async (req, res) => {
 };
 
 const getUploadURL = async (req, res) => {
-  const { surveyId, filename, contentlength, contenttype } = req.body;
+  const { resourceName, contentLength, contentType } = req.body;
   // define s3 file key containing unique uuid to prevent filename collision, allowed characters see https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
-  let key = 'resources/surveys/' + surveyId + '/' + uuidv4() + '_' + filename;
+  let resourceId = new ObjectId();
+  let key = 'resources/' + resourceId +'/' + resourceName;
   // get signed upload url for a fixed contenttype and contentlength
-  let signedUrl = await bucketService.getUploadUrl(key, contenttype, contentlength);
+  let signedUrl = await bucketService.getUploadUrl(key, contentType, contentLength);
   // add resource entry to our db
-  let resourceId = await addResource(surveyId, key, res.locals.auth.user._id);
+  await addResource(resourceId, key, resourceName, contentLength, contentType, res.locals.auth.user._id);
   return res.send({ signedUrl, resourceId });
 };
 
-const addResource = async (surveyId, key, userId) => {
+const addResource = async (resourceId, key, resourceName, contentLength, contentType, userId) => {
   //insert resource entry with state=pending
   let resource = {
-    _id: new ObjectId(),
-    surveyId: surveyId,
+    _id: resourceId,
+    name: slugify(resourceName),
+    label: resourceName,
     state: 'pending',
     key: key,
+    contentLength: contentLength,
+    contentType: contentType,
     meta: {
       creator: new ObjectId(userId),
       dateCreated: new Date(),
@@ -47,8 +51,7 @@ const addResource = async (surveyId, key, userId) => {
     },
   };
   // TODO find a good pattern in use for error handling
-  let r = await db.collection(col).insertOne(resource);
-  return r.insertedId;
+  await db.collection(col).insertOne(resource);
 };
 
 const commitResource = async (req, res) => {
@@ -65,7 +68,7 @@ const commitResource = async (req, res) => {
     {
       $set: {
         state: 'committed',
-        dateModified: new Date(),
+        "meta.dateModified": new Date()
       },
     }
   );
@@ -97,7 +100,7 @@ const deleteResource = async (req, res) => {
 };
 
 export default {
-  getResources,
+  getResource,
   getDownloadURL,
   getUploadURL,
   commitResource,

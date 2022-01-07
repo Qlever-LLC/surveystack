@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import resourceController from './resourceController';
 import { connectDatabase, db } from '../db';
 
-const { getResources, getUploadURL, commitResource, deleteResource, col } = resourceController;
+const { getResource, getUploadURL, commitResource, deleteResource, col } = resourceController;
 
 function mockRes() {
   return {
@@ -33,16 +33,14 @@ describe.skip('resourceController', () => {
   });
 
   let signedUrl, resourceId;
-  const surveyId = new ObjectId();
 
   describe('getUploadURL', () => {
     it('returns an url', async () => {
       const req = {
         body: {
-          surveyId: surveyId,
-          filename: 'testimage.png',
-          contentlength: 1234,
-          contenttype: 'image/png',
+          resourceName: 'testimage.png',
+          contentLength: 1234,
+          contentType: 'image/png',
         },
       };
       let res = mockRes();
@@ -69,21 +67,21 @@ describe.skip('resourceController', () => {
     });
   });
 
-  describe('getResources', () => {
-    it('sends an empty array for a random surveyId', async () => {
+  describe('getResource', () => {
+    it('sends an empty array for a random resourceId', async () => {
       let req = {
-        query: { surveyId: new ObjectId() },
+        query: { id: new ObjectId() },
       };
       let res = mockRes();
-      await getResources(req, res);
+      await getResource(req, res);
       expect(res.data).toStrictEqual([]);
     });
-    it('return one resource for the given surveyId', async () => {
+    it('return one resource for the given resourceId', async () => {
       let req = {
-        query: { surveyId: surveyId },
+        query: { id: resourceId },
       };
       let res = mockRes();
-      await getResources(req, res);
+      await getResource(req, res);
       expect(res.data).toHaveLength(1);
     });
   });
