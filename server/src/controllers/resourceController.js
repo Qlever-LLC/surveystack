@@ -36,7 +36,8 @@ const getUploadURL = async (req, res) => {
     resourceName,
     contentLength,
     contentType,
-    res.locals.auth.user._id);
+    res.locals.auth.user._id
+  );
   return res.send({ signedUrl, resourceId });
 };
 
@@ -74,7 +75,7 @@ const commitResource = async (req, res) => {
     {
       $set: {
         state: 'committed',
-        "meta.dateModified": new Date(),
+        'meta.dateModified': new Date(),
       },
     }
   );
