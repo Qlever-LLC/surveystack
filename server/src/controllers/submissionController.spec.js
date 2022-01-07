@@ -1,8 +1,5 @@
-import { db } from '../db';
 import { ObjectId } from 'mongodb';
-import headerService from '../services/header.service';
 import submissionController from './submissionController';
-import { expectationFailed } from '@hapi/boom';
 
 const { getSubmissionsCsv, prepareSubmissionsToQSLs } = submissionController;
 

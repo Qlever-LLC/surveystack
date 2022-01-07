@@ -25,7 +25,6 @@ import {
   assertIdsMatch,
   assertNameNotEmpty,
   assertEntityRights,
-  assertHasSurveyParam,
   assertSubmissionRights,
   assertEntitiesExist,
   assertEntitiesRights,
@@ -297,8 +296,24 @@ router.delete(
 // Call for submissions (CFS)
 router.post('/call-for-submissions/send', [assertAuthenticated], catchErrors(cfsController.send));
 
-// resources (/api/resources) - not to be confused with /resources
-router.get('/resources', catchErrors(resourceController.getResources));
+// resources
+router.get('/resources/:surveyId', catchErrors(resourceController.getResources));
+router.get('/resources/download-url/:key', catchErrors(resourceController.getDownloadURL));
+router.post(
+  '/resources/upload-url',
+  [assertAuthenticated],
+  catchErrors(resourceController.getUploadURL)
+);
+router.put(
+  '/resources/commit/:id',
+  [assertAuthenticated],
+  catchErrors(resourceController.commitResource)
+);
+router.delete(
+  '/resources/:id',
+  [assertAuthenticated],
+  catchErrors(resourceController.deleteResource)
+);
 
 // info
 router.get('/info/ip', catchErrors(infoController.getIP));
