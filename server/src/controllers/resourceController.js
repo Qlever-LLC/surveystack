@@ -1,15 +1,18 @@
 import bucketService from '../services/bucket.service';
 import uuidv4 from 'uuid/v4';
 import { db } from '../db';
-import { ObjectId } from "mongodb";
-import assert from "assert";
+import { ObjectId } from 'mongodb';
+import assert from 'assert';
 
 const col = 'resources';
 
 const getResources = async (req, res) => {
   const { surveyId } = req.query;
   // load resources
-  const resources = await db.collection(col).find({ surveyId: new ObjectId(surveyId), state: 'committed' }).toArray();
+  const resources = await db
+    .collection(col)
+    .find({ surveyId: new ObjectId(surveyId), state: 'committed' })
+    .toArray();
   return res.send(resources);
 };
 
@@ -42,10 +45,10 @@ const addResource = async (surveyId, key, userId) => {
       dateCreated: new Date(),
       dateModified: null,
     },
-  }
+  };
   // TODO find a good pattern in use for error handling
   let r = await db.collection(col).insertOne(resource);
-  return r.insertedId
+  return r.insertedId;
 };
 
 const commitResource = async (req, res) => {
@@ -62,7 +65,8 @@ const commitResource = async (req, res) => {
     {
       $set: {
         state: 'committed',
-      }
+        dateModified: new Date(),
+      },
     }
   );
   res.send({ message: 'OK' });
