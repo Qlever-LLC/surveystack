@@ -11,19 +11,7 @@
       />
     </v-dialog>
     <div class="d-flex justify-end">
-      <v-input>
-        <label for="upload-resource" class="cursor-pointer">
-          <v-btn class="pointer-events-none" color="primary">
-            <v-icon left>mdi-upload</v-icon>
-            Create File Resource
-          </v-btn>
-        </label>
-        <input type="file" id="upload-resource" ref="upload-resource" class="d-none" @change="createFileResource" />
-      </v-input>
-      <v-btn class="primary" @click="createOntology">
-        <v-icon left>mdi-plus</v-icon>
-        Create Ontology
-      </v-btn>
+      <v-btn class="primary" @click="createOntology"> <v-icon left>mdi-plus</v-icon> Create Ontology </v-btn>
     </div>
     <v-select :items="availableFilters" v-model="filter" label="Filter" disabled />
     <v-text-field v-model="search" label="Search" autocomplete="off" />
@@ -49,8 +37,6 @@
 <script>
 import ObjectId from 'bson-objectid';
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
-import api from '@/services/api.service';
-import axios from 'axios';
 
 export default {
   components: {
@@ -84,30 +70,6 @@ export default {
       const index = this.resources.findIndex((r) => r.id === resource.id);
       const newResources = [...this.resources.slice(0, index), resource, ...this.resources.slice(index + 1)];
       this.$emit('set-survey-resources', newResources);
-    },
-    async test() {
-      console.log('test');
-    },
-    async createFileResource({
-      target: {
-        files: [file],
-      },
-    }) {
-      //let file = new File(['hello world from client'], 'textfile.txt', { type: 'text/plain' });
-      let { data: uploadUrl } = await api.get(
-        `/resources/upload-url?filename=${file.name}&contentlength=${file.size}&contenttype=${file.type}`
-      );
-
-      await axios
-        .create()
-        .put(uploadUrl, file)
-        .then((response) => {
-          console.log(response);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      this.$refs['upload-resource'].value = null;
     },
     createOntology() {
       const id = new ObjectId().toString();
@@ -150,13 +112,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.pointer-events-none {
-  pointer-events: none !important;
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-</style>
