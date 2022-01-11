@@ -1,15 +1,18 @@
 <template>
-  <app-forgot-password v-if="activeComponent === 'forgot-password'" @updateActive="updateComp" :useLink="false" />
+  <app-register v-if="activeComponent === 'register'" @updateActive="updateComp" :useLink="false" />
+  <app-forgot-password v-else-if="activeComponent === 'forgot-password'" @updateActive="updateComp" :useLink="false" />
   <app-login v-else @updateActive="updateComp" :useLink="false" />
 </template>
 
 <script>
 import AppLogin from '@/components/ui/Login.vue';
+import AppRegister from '@/components/ui/Register.vue';
 import AppForgotPassword from '@/components/ui/ForgotPassword.vue';
 
 export default {
   components: {
     AppLogin,
+    AppRegister,
     AppForgotPassword,
   },
   props: {

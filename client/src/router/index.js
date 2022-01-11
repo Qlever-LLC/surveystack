@@ -11,6 +11,7 @@ import SurveysDetail from '@/pages/surveys/Detail.vue';
 import DraftSubmission from '@/pages/submissions/drafts/Draft.vue';
 
 import Login from '@/pages/auth/Login.vue';
+import Register from '@/pages/auth/Register.vue';
 import Profile from '@/pages/auth/Profile.vue';
 import ForgotPassword from '@/pages/auth/ForgotPassword.vue';
 
@@ -141,6 +142,12 @@ const routes = [
     path: '/auth/login',
     name: 'auth-login',
     component: Login,
+    props: true,
+  },
+  {
+    path: '/auth/register',
+    name: 'auth-register',
+    component: Register,
     props: true,
   },
   {
