@@ -63,7 +63,6 @@ export default {
       status: '',
       showPasswords: false,
       entity: { ...DEFAULT_ENTITY },
-      invitation: '',
       membership: null,
     };
   },
@@ -91,9 +90,6 @@ export default {
         link.params.redirect = this.$route.params.redirect;
       }
 
-      if (this.invitation) {
-        link.query = { invitation: this.invitation };
-      }
       return link;
     },
     isWhitelabel() {
@@ -101,9 +97,6 @@ export default {
     },
     whitelabelPartner() {
       return this.$store.getters['whitelabel/partner'];
-    },
-    hasInvitation() {
-      return this.$store.getters['invitation/hasInvitation'];
     },
   },
   methods: {
@@ -138,11 +131,6 @@ export default {
 
         if (this.$route.params.redirect) {
           this.$router.push(this.$route.params.redirect);
-        } else if (this.hasInvitation) {
-          this.$router.push({
-            name: 'invitations',
-            query: { code: this.$store.getters['invitation/code'] },
-          });
         } else {
           this.$store.dispatch('surveys/fetchPinned');
           this.$router.push('/');
@@ -167,16 +155,6 @@ export default {
   async created() {
     if (this.initialEmail) {
       this.entity.email = this.initialEmail;
-    }
-
-    const { invitation } = this.$route.query;
-    this.invitation = invitation;
-    if (invitation) {
-      this.$store.dispatch('invitation/set', invitation);
-      const {
-        data: [membership],
-      } = await api.get(`/memberships?invitationCode=${invitation}&populate=true`);
-      this.membership = membership;
     }
   },
 };

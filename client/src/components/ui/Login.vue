@@ -77,7 +77,7 @@
         </div>
         <div
           class="d-flex justify-center pr-sm-5 pl-sm-10 py-6 d-flex flex-column align-center flex-wrap"
-          v-if="registrationEnabled || hasInvitation"
+          v-if="registrationEnabled"
         >
           <p class="white-space-nowrap">Don't have an account?</p>
           <v-btn v-if="useLink" :to="registerLink" color="primary" class="px-8" role="link">
@@ -168,9 +168,6 @@ export default {
         link.params.redirect = this.$route.params.redirect;
       }
 
-      if (this.invitation) {
-        link.query = { invitation: this.invitation };
-      }
       return link;
     },
     isWhitelabel() {
@@ -178,10 +175,6 @@ export default {
     },
     whitelabelPartner() {
       return this.$store.getters['whitelabel/partner'];
-    },
-    // DEPRECATED:, remove a few weeks after https://gitlab.com/our-sci/software/surveystack/-/merge_requests/67  was deployed
-    hasInvitation() {
-      return this.$store.getters['invitation/hasInvitation'];
     },
   },
   async created() {
@@ -191,12 +184,6 @@ export default {
 
     if ('magicLinkExpired' in this.$route.query) {
       this.status = 'Your magic link is expired. Please request a new one.';
-    }
-
-    // DEPRECATED:, remove a few weeks after https://gitlab.com/our-sci/software/surveystack/-/merge_requests/67  was deployed
-    const { invitation } = this.$route.query;
-    if (invitation) {
-      this.$store.dispatch('invitation/set', invitation);
     }
 
     if (this.isWhitelabel) {
@@ -278,12 +265,6 @@ export default {
 
       if (this.$route.params.redirect) {
         this.$router.push(this.$route.params.redirect);
-        // DEPRECATED:, remove a few weeks after https://gitlab.com/our-sci/software/surveystack/-/merge_requests/67  was deployed
-      } else if (this.hasInvitation) {
-        this.$router.push({
-          name: 'invitations',
-          query: { code: this.$store.getters['invitation/code'] },
-        });
       } else {
         this.$router.push('/');
       }
