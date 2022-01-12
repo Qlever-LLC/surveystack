@@ -24,6 +24,8 @@ function match(answers, thisValue) {
  * @param {answers} answer(s) (strings or numbers) to check against
  */
 export function checkIfAny(question, ...answers) {
+  // if the reference in the survey is missing or false, then return false
+  if (!question?.value) return false; 
   // answers is always passed as an array!
   let values = question.value;
   // return false if question is not relevant
@@ -85,6 +87,8 @@ export function checkIfAny(question, ...answers) {
  * @param {answers} answer(s) (strings or numbers) to check against
  */
 export function checkIfNone(question, ...answers) {
+  // if the reference in the survey is missing or false, then return false
+  if (!question?.value) return false; 
   let values = question.value;
   // return false if question is not relevant
   if (
