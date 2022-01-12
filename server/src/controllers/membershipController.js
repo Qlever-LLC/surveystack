@@ -319,12 +319,12 @@ const joinGroup = async (req, res) => {
 
   const { user } = res.locals.auth;
 
-  let r = await db.collection(col).findOne({
+  let existingMembership = await db.collection(col).findOne({
     group: group._id,
     user: user._id,
   });
-  console.log('user in group findone result: ', r);
-  if (r) {
+
+  if(existingMembership) {
     return res.send({
       status: 'ok',
     });
