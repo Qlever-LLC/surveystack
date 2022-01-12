@@ -133,6 +133,11 @@ export default {
       type: String,
       required: false,
     },
+    // true: start with user/pw login, false: start with magic link login
+    defaultUsePassword: {
+      type: Boolean,
+      default: null,
+    },
     useLink: {
       type: Boolean,
       default: true,
@@ -146,7 +151,8 @@ export default {
         ...DEFAULT_ENTITY,
       },
       registrationEnabled: false,
-      usePassword: localStorage[LS_DEFAULT_USE_PASSWORD] === 'true',
+      usePassword:
+        this.defaultUsePassword !== null ? this.defaultUsePassword : localStorage[LS_DEFAULT_USE_PASSWORD] === 'true',
       signInLinkSent: false,
       isSubmitting: false,
     };
@@ -230,10 +236,10 @@ export default {
         try {
           await this.$store.dispatch('auth/sendMagicLink', { email: this.entity.email, landingPath });
           this.signInLinkSent = true;
+          this.status = '';
         } catch (e) {
           this.status = get(e, 'response.data.message') || 'An error occured, please try again later.';
         }
-        this.status = '';
         return;
       }
 

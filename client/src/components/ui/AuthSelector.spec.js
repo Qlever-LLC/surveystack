@@ -5,8 +5,8 @@ import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 const store = {};
 const noRoutes = [];
 
-const pwLoginViewTitle = 'Welcome Back!';
-const emailLoginViewTitle = 'Welcome!';
+const loginViewTitle = 'Welcome Back!';
+const registerViewTitle = 'Sign up';
 const forgotPasswordViewTitle = 'Forgot Password?';
 
 describe('AuthSelector', () => {
@@ -17,7 +17,7 @@ describe('AuthSelector', () => {
         store,
         routes: noRoutes,
       });
-      getByText(emailLoginViewTitle);
+      getByText(loginViewTitle);
     });
     it('Renders Login view for init prop', async () => {
       const { getByText } = renderWithVuetify(AuthSelector, {
@@ -25,7 +25,15 @@ describe('AuthSelector', () => {
         store,
         routes: noRoutes,
       });
-      getByText(emailLoginViewTitle);
+      getByText(loginViewTitle);
+    });
+    it('Renders Register view for init prop', async () => {
+      const { getByText } = renderWithVuetify(AuthSelector, {
+        propsData: { init: 'register' },
+        store,
+        routes: noRoutes,
+      });
+      getByText(registerViewTitle);
     });
     it('Renders Forgot Password view for init prop', async () => {
       const { getByText } = renderWithVuetify(AuthSelector, {
@@ -38,6 +46,17 @@ describe('AuthSelector', () => {
   });
 
   describe('AuthSelector navigation with internal state', () => {
+    it('Navigates from Login view to Register view when user clicks Register now button', async () => {
+      const { getByText } = renderWithVuetify(AuthSelector, {
+        propsData: {},
+        store,
+        routes: noRoutes,
+      });
+      getByText(loginViewTitle);
+      const button = getByText('Register now');
+      await fireEvent.click(button);
+      getByText(registerViewTitle);
+    });
     it('Navigates from Login view to Forgot Password view when user clicks Forgot Password button', async () => {
       const { getByText } = renderWithVuetify(AuthSelector, {
         propsData: {},
@@ -45,10 +64,21 @@ describe('AuthSelector', () => {
         routes: noRoutes,
       });
       await fireEvent.click(screen.getByTestId('toggle-method'));
-      getByText(pwLoginViewTitle);
+      getByText(loginViewTitle);
       const button = getByText('Forgot password?');
       await fireEvent.click(button);
       getByText(forgotPasswordViewTitle);
+    });
+    it('Navigates from Register view to Login view when user clicks Sign in button', async () => {
+      const { getByText } = renderWithVuetify(AuthSelector, {
+        propsData: { init: 'register' },
+        store,
+        routes: noRoutes,
+      });
+      getByText(registerViewTitle);
+      const button = getByText('Already have an account?');
+      await fireEvent.click(button);
+      getByText(loginViewTitle);
     });
     it('Navigates from Forgot Password view to Login view when user clicks Sign in button', async () => {
       const { getByText } = renderWithVuetify(AuthSelector, {
@@ -59,7 +89,7 @@ describe('AuthSelector', () => {
       getByText(forgotPasswordViewTitle);
       const button = getByText('Back to login');
       await fireEvent.click(button);
-      getByText(pwLoginViewTitle);
+      getByText(loginViewTitle);
     });
   });
 });
