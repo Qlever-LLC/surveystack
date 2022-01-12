@@ -59,12 +59,9 @@ export default {
       this.initialized = true;
     },
     cancel() {
-      this.$store.dispatch('invitation/clear'); // DEPRECATED:, remove a few weeks after https://gitlab.com/our-sci/software/surveystack/-/merge_requests/67  was deployed
       this.$router.push('/');
     },
     async join() {
-      this.$store.dispatch('invitation/clear'); // DEPRECATED:, remove a few weeks after https://gitlab.com/our-sci/software/surveystack/-/merge_requests/67  was deployed
-
       try {
         const { data } = await api.post('/memberships/activate', { code: this.code });
         // Log in with the user linked to the membership

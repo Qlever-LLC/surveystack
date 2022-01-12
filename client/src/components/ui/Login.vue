@@ -201,7 +201,8 @@ export default {
       this.registrationEnabled = true;
     }
 
-    // DEPRECATED:, remove a few weeks after https://gitlab.com/our-sci/software/surveystack/-/merge_requests/67  was deployed
+    // DEPRECATED: remove a few weeks after https://gitlab.com/our-sci/software/surveystack/-/merge_requests/67  was deployed
+    //  reason: we use magic links for CFS now
     const { cfs, email, token, group } = this.$route.query;
     if (cfs) {
       await this.$store.dispatch('auth/login', {
