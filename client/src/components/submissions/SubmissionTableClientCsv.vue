@@ -24,7 +24,12 @@
           <v-row>
             <v-col>
               <div class="d-flex justify-end">
-                <v-switch v-model="excludeMeta" label="Hide meta" class="mt-2"></v-switch>
+                <v-switch
+                  :input-value="excludeMeta"
+                  @change="$emit('excludeMetaChange', $event)"
+                  label="Hide meta"
+                  class="mt-2"
+                ></v-switch>
               </div>
             </v-col>
           </v-row>
@@ -37,9 +42,18 @@
             <td>
               <v-checkbox v-model="tableSelected" :value="item" color="#777" class="custom-checkbox" hide-details />
             </td>
-            <td v-for="header in headers" :key="header.text" @click.stop="showFullText(item[header.value], $event)">
+            <td
+              v-for="header in headers"
+              :key="header.text"
+              @click.stop="showFullText(item[header.value], header, item)"
+            >
               <div :class="truncate(item[header.value]) ? 'truncate' : ''">
                 {{ item[header.value] }}
+              </div>
+              <div class="modal" v-if="uniqueTableCell[0] === header.value && uniqueTableCell[1] === item._id">
+                <div class="modal-content">
+                  <span class="black--text">{{ truncatedValue }}</span>
+                </div>
               </div>
             </td>
           </tr>
@@ -47,17 +61,7 @@
       </template>
     </v-data-table>
 
-    <div
-      v-if="isSnackbarVisible"
-      :style="{
-        left: `${truncatedPosition[0]}px`,
-        top: `${truncatedPosition[1]}px`,
-        position: 'absolute',
-        transorm: 'translate(-50%, -50%)',
-      }"
-    >
-      <span class="black--text">{{ truncatedValue }}</span>
-    </div>
+    <!--   -->
   </v-card>
 </template>
 <script>
@@ -96,17 +100,21 @@ export default {
       type: Boolean,
       default: false,
     },
+    excludeMeta: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
-      isSnackbarVisible: false,
-      truncatedPosition: [0, 0],
+      show: false,
+      closeOnContentClick: true,
+      uniqueTableCell: [],
       truncatedValue: '',
       iconColor: 'grey lighten-1',
       checkedNames: [],
       textTruncateLength: 36,
       selecteds: [],
-      excludeMeta: true,
       csv: null,
       parsed: null,
       search: '',
@@ -146,12 +154,10 @@ export default {
     },
   },
   methods: {
-    showFullText(value, event) {
-      console.log(event, 'event');
+    showFullText(value, header, item) {
       if (value.length > this.textTruncateLength) {
         this.truncatedValue = value;
-        this.isSnackbarVisible = !this.isSnackbarVisible;
-        this.truncatedPosition = [event.pageX, event.pageY];
+        this.uniqueTableCell = [header.value, item._id];
       }
     },
     handleClick(data) {
@@ -209,8 +215,8 @@ export default {
   },
   mounted() {
     document.addEventListener('click', (event) => {
-      if (!document.getElementsByClassName('snackbar')[0].contains(event.target)) {
-        this.isSnackbarVisible = false;
+      if (!document.getElementsByClassName('modal-content')[0].contains(event.target)) {
+        this.uniqueTableCell = [];
       }
     });
   },
@@ -239,5 +245,26 @@ export default {
 
 .custom-checkbox {
   margin-top: -0.3rem;
+}
+td {
+  position: relative;
+}
+.v-data-table__wrapper {
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+.modal {
+  position: absolute;
+  z-index: 100;
+  width: 500px;
+  top: -100%;
+  right: 20%;
+}
+.modal-content {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  background-color: white;
+  width: 100%;
+  padding: 0.5rem;
+  white-space: initial;
 }
 </style>

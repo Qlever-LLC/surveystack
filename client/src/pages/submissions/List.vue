@@ -203,6 +203,8 @@
               :archived="filter.showArchived"
               :dataTableProps="dateTableProps"
               @onDataTablePropsChanged="onDataTablePropsChanged"
+              @excludeMetaChange="filter.showCsvMeta = !$event"
+              :excludeMeta="!filter.showCsvMeta"
               :loading="loading"
               style="margin: 3px 2px"
             />
@@ -278,6 +280,7 @@ const createDefaultFilter = () => ({
   showArchived: false,
   showIrrelevant: false,
   showCsvDataMeta: false,
+  showCsvMeta: false,
   roles: '',
 });
 
@@ -448,6 +451,7 @@ export default {
         { key: 'showIrrelevant', value: this.filter.showIrrelevant, include: this.filter.showIrrelevant },
         { key: 'showArchived', value: this.filter.showArchived, include: this.filter.showArchived },
         { key: 'showCsvDataMeta', value: this.filter.showCsvDataMeta, include: this.filter.showCsvDataMeta },
+        { key: 'showCsvMeta', value: this.filter.showCsvMeta, include: this.filter.showCsvMeta },
         {
           key: 'roles',
           value: this.filter.roles,

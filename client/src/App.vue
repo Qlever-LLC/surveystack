@@ -2,7 +2,6 @@
   <v-app id="app" :class="{ 'minimal-ui': $route.query.minimal_ui }">
     <app-navbar />
     <div id="app-menu"></div>
-
     <v-main>
       <app-global-feedback />
       <router-view />
