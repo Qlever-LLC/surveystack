@@ -622,4 +622,8 @@ ul {
   line-height: 1.5em;
   list-style-type: dot;
 }
+
+>>> .v-window {
+  overflow: unset;
+}
 </style>

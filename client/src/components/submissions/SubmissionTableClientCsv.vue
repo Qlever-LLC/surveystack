@@ -247,18 +247,21 @@ export default {
   margin-top: -0.3rem;
 }
 td {
-  position: relative;
+  /* position: relative; */
 }
 .v-data-table__wrapper {
   overflow-x: hidden;
   overflow-y: hidden;
 }
 .modal {
-  position: absolute;
+  /* position: absolute; */
   z-index: 100;
   width: 500px;
-  top: -100%;
+  /* top: -100%; */
+  top: 70%;
   right: 20%;
+  height: 0;
+  width: 0;
 }
 .modal-content {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
@@ -266,5 +269,10 @@ td {
   width: 100%;
   padding: 0.5rem;
   white-space: initial;
+
+  position: absolute;
+  z-index: 1;
+  height: 100px;
+  width: 300px;
 }
 </style>
