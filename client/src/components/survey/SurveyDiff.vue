@@ -51,7 +51,10 @@ export default {
   props: {
     oldControls: Array,
     newControls: Array,
-    defaultOpen: Boolean,
+    defaultOpen: {
+      type: Boolean,
+      default: false,
+    },
     defaultShowUnchanged: {
       type: Boolean,
       default: false,
