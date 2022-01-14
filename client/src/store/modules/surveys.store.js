@@ -57,24 +57,42 @@ const actions = {
       filteredMemberships = excluded;
     }
 
+
+    const surveys = {};
+
     for (const membership of filteredMemberships) {
       try {
         const { data } = await api.get(`/groups/${membership.group._id}?populate=1`);
         if (data && data.surveys && data.surveys.pinned && Array.isArray(data.surveys.pinned)) {
           for (const s of data.surveys.pinned) {
+
+            let skipFetch = false;
+            if (pinned.find(p => p.id == s._id)) {
+              skipFetch = true;
+            }
+
             pinned.push({
               id: s._id,
               name: s.name,
               group: data.name,
               meta: s.meta,
             });
+
+            if (skipFetch) {
+              continue
+            }
+
+
             actions.fetchSurvey({ commit }, s._id);
           }
         }
       } catch (err) {
         console.log('Error fetching surveys:', err);
       }
+
+
     }
+
 
     commit('SET_PINNED', pinned);
 
