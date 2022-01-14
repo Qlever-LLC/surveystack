@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
+import _ from 'lodash';
 
 import { checkSurvey, changeRecursive } from '../helpers/surveys';
 import rolesService from '../services/roles.service';
@@ -545,9 +546,60 @@ const checkForLibraryUpdates = async (req, res) => {
   return res.send(updatableSurveys);
 };
 
+const getPinned = async (req, res) => {
+  const userId = res.locals.auth.user._id;
+  const pinned = [];
+
+  if (!userId) {
+    // TODO what if user is not signed in?
+    return res.send({
+      status: 'success',
+      pinned,
+    });
+  }
+
+  // Pipeline
+  // 1. find all memberships
+  // 2. for all memberships find all groups
+  // 3. for all groups find all pinned surveys
+
+  const memberships = await db
+    .collection('memberships')
+    .find({ user: new ObjectId(userId) })
+    .project({ group: 1 })
+    .toArray();
+
+  console.log('memberships', memberships);
+
+  const groupIds = _.uniq(memberships.map((m) => m.group)).map((g) => new ObjectId(g));
+  const groupsPinned = await db
+    .collection('groups')
+    .find({ _id: { $in: groupIds } })
+    .project({ name: 1, 'surveys.pinned': 1 })
+    .toArray();
+
+  const r = groupsPinned.map((g) => {
+    if (!g.surveys || !g.surveys.pinned) {
+      return [];
+    }
+
+    return { group_id: g._id, group_name: g.name, pinned: g.surveys.pinned };
+  });
+
+  pinned.push(...r);
+
+  console.log('pinned', pinned);
+
+  return res.send({
+    status: 'success',
+    pinned,
+  });
+};
+
 export default {
   getSurveys,
   getSurveyPage,
+  getPinned,
   getSurveyListPage,
   getSurvey,
   getSurveyLibraryConsumers,
