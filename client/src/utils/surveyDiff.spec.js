@@ -273,6 +273,7 @@ describe('surveyDiff', () => {
           newChildIndex: 0,
           newPath: num.name,
           newParentId: null,
+          matchId: `${num.id}-added`,
         },
       ]);
     });
@@ -288,6 +289,7 @@ describe('surveyDiff', () => {
           oldChildIndex: 0,
           oldPath: num.name,
           oldParentId: null,
+          matchId: `${num.id}-removed`,
         },
       ]);
     });
@@ -362,9 +364,11 @@ describe('surveyDiff', () => {
         const { diff, oldControls, newControls } = createDiff();
         const num1OldDiff = find(diff, { oldPath: 'number_1' });
         expect(num1OldDiff).toHaveProperty('changeType', changeType.REMOVED);
+        expect(num1OldDiff).toHaveProperty('matchId', 'number_1-removed');
         expect(num1OldDiff).toHaveProperty('oldControl.type', oldControls[0].type);
         const num1NewDiff = find(diff, { newPath: 'number_1' });
         expect(num1NewDiff).toHaveProperty('changeType', changeType.ADDED);
+        expect(num1NewDiff).toHaveProperty('matchId', 'number_1-added');
         expect(num1NewDiff).toHaveProperty('newControl.type', newControls[0].type);
       });
     });

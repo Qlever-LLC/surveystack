@@ -157,8 +157,12 @@ export const diffSurveyVersions = (oldControls, newControls, { useControlPathAsI
       changeType,
     };
   });
-  const removeds = removedIds.map((id) => ({ changeType: REMOVED, ...getOldProps(id) }));
-  const addeds = addedIds.map((id) => ({ changeType: ADDED, ...getNewProps(id) }));
+
+  // NOTE - to avoid comparing controls with different types,
+  //  when control.type changes, we generate an ADDED and a REMOVED type diff instead of one CHANGED
+  //  This would result in two diffs with the same matchId, so we add '-added' '-removed' postfixes to the matchId
+  const removeds = removedIds.map((id) => ({ changeType: REMOVED, matchId: `${id}-removed`, ...getOldProps(id) }));
+  const addeds = addedIds.map((id) => ({ changeType: ADDED, matchId: `${id}-added`, ...getNewProps(id) }));
 
   return [...matcheds, ...addeds, ...removeds];
 };

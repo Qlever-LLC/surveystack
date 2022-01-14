@@ -105,7 +105,7 @@ export default {
           const idx = controlDiff.newControl ? controlDiff.newChildIndex : controlDiff.oldChildIndex;
           const idxPath = [...parentIdxPath, idx + 1];
           return {
-            id: controlDiff.matchId || control.id,
+            id: controlDiff.matchId,
             name: control.name,
             label: control.label,
             controlType: control.type,
