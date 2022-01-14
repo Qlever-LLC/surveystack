@@ -24,7 +24,7 @@
               <v-btn text @click="importResource">
                 <v-icon color="grey">mdi-plus</v-icon>
                 <div class="ml-1">
-                  Import Existing Resource
+                  Use Existing Resource
                 </div>
               </v-btn>
             </v-list-item-title>
@@ -73,6 +73,11 @@
             <v-list-item-subtitle>{{ resource.name }} : {{ resource.type }}</v-list-item-subtitle>
           </v-list-item-content>
           <v-icon v-if="resource.libraryId" color="grey lighten-1">mdi-library</v-icon>
+          <v-list-item-action v-if="resource.location === 'REMOTE'">
+            <v-btn icon>
+              <v-icon color="grey lighten-1" @click.stop="removeRemoteResource(resource)">mdi-delete</v-icon>
+            </v-btn>
+          </v-list-item-action>
         </v-list-item>
       </template>
       <v-list-item v-else>
@@ -181,7 +186,14 @@ export default {
       window.open(response.data, '_blank');
     },
     importResource() {
-      // show dialog with resource list / search
+      // TODO show dialog with resource list / search
+    },
+    removeRemoteResource(resource) {
+      // delete the resource reference
+      const index = this.resources.findIndex((r) => r.id === resource.id);
+      const newResources = [...this.resources.slice(0, index), ...this.resources.slice(index + 1)];
+      this.$emit('set-survey-resources', newResources);
+      // TODO delete the resource eventually
     },
     createOntology() {
       const id = new ObjectId().toString();
