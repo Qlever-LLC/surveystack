@@ -59,16 +59,19 @@ describe('createMagicLink', () => {
     });
   });
 
-  it('creates accessCode with the correct expire date', async () => {
-    const DAY_IN_MS = 24 * 60 * 60 * 1000;
+  describe('creates accessCode with the correct expire date', () => {
     for (let expiresAfterDays of [1, 3, 92]) {
-      const link = await createMagicLink({ email, origin, expiresAfterDays });
-      const {
-        query: { code },
-      } = url.parse(link, true);
-      const { expiresAt } = await db.collection(COLL_ACCESS_CODES).findOne({ code });
-      // allow a second difference between the expected and the actual value
-      expect(expiresAt.getTime()).toBeCloseTo(Date.now() + expiresAfterDays * DAY_IN_MS, -3);
+      it(`${expiresAfterDays} days`, async () => {
+        const link = await createMagicLink({ email, origin, expiresAfterDays });
+        const {
+          query: { code },
+        } = url.parse(link, true);
+        const { expiresAt } = await db.collection(COLL_ACCESS_CODES).findOne({ code });
+        // allow a second difference between the expected and the actual value
+        const expected = new Date();
+        expected.setDate(expected.getDate() + expiresAfterDays);
+        expect(expiresAt.getTime()).toBeCloseTo(expected.getTime(), -3);
+      });
     }
   });
 
