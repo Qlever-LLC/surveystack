@@ -92,8 +92,8 @@ const fetchPinned = async (commit) => {
     }
   }
 
-  console.log('fetched', fetched);
-  console.log('pinned', pinned);
+  // console.log('fetched', fetched);
+  // console.log('pinned', pinned);
   return pinned;
 };
 
