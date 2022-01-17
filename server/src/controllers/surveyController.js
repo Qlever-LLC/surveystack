@@ -547,6 +547,10 @@ const checkForLibraryUpdates = async (req, res) => {
 };
 
 const getPinned = async (req, res) => {
+  if (!res.locals.auth || !res.locals.auth.user) {
+    return [];
+  }
+
   const userId = res.locals.auth.user._id;
   const pinned = [];
 
