@@ -570,7 +570,7 @@ const getPinned = async (req, res) => {
     .project({ group: 1 })
     .toArray();
 
-  console.log('memberships', memberships);
+  // console.log('memberships', memberships);
 
   const groupIds = _.uniq(memberships.map((m) => m.group)).map((g) => new ObjectId(g));
   const groupsPinned = await db
@@ -589,7 +589,7 @@ const getPinned = async (req, res) => {
 
   pinned.push(...r);
 
-  console.log('pinned', pinned);
+  // console.log('pinned', pinned);
 
   return res.send({
     status: 'success',
