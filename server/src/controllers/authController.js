@@ -83,7 +83,7 @@ const login = async (req, res) => {
 const sendPasswordResetMail = async (req, res) => {
   const { email } = req.body;
   const existingUser = await db.collection(col).findOne({ email });
-  
+
   // Fail silently when the email is not in the DB
   if (existingUser) {
     const { origin } = req.headers;

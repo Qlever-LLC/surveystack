@@ -1,7 +1,7 @@
 import url from 'url';
 import authController from './authController';
 const { enterWithMagicLink } = authController;
-import { db } from '../db'
+import { db } from '../db';
 import { createReq, createRes, createUser } from '../testUtils';
 import { createMagicLink } from '../services/auth.service';
 import { decode } from 'js-base64';
@@ -15,14 +15,14 @@ describe('enterWithMagicLink', () => {
     expect(res.redirect).toHaveBeenCalledWith('/auth/login?magicLinkExpired');
   });
 
-
   it('adds returnPath to the expired page URL', async () => {
     const res = await createRes();
     const landingPath = '/some/where';
     await enterWithMagicLink(createReq({ query: { code: 'invalid', landingPath } }), res);
-    expect(res.redirect).toHaveBeenCalledWith(`/auth/login?magicLinkExpired&landingPath=${encodeURIComponent(landingPath)}`);
+    expect(res.redirect).toHaveBeenCalledWith(
+      `/auth/login?magicLinkExpired&landingPath=${encodeURIComponent(landingPath)}`
+    );
   });
-
 
   const withNewOrExistingUser = (description, test) => {
     describe('with new user', () => {

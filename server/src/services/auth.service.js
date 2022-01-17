@@ -52,7 +52,7 @@ export const createMagicLink = async ({
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + expiresAfterDays);
   const code = crypto.randomBytes(32).toString('hex');
-  
+
   await db.collection(COLL_ACCESS_CODES).insertOne({
     code,
     expiresAt,

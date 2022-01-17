@@ -6,7 +6,6 @@ import { createMagicLink } from '../services/auth.service';
 jest.mock('../services/mail/mail.service');
 jest.mock('../services/auth.service');
 
-
 describe('requestMagicLink', () => {
   it('throws for invalid email address', async () => {
     const req = createReq({ body: { email: '#invalid email' } });
@@ -35,7 +34,10 @@ describe('requestMagicLink', () => {
       const origin = 'http://foo.com';
       const landingPath = '/foo/bar';
       const expiresAfterDays = '8';
-      const req = createReq({ body: { email, landingPath, expiresAfterDays }, headers: { origin } });
+      const req = createReq({
+        body: { email, landingPath, expiresAfterDays },
+        headers: { origin },
+      });
       await requestMagicLink(req, await createRes());
       expect(createMagicLink).toHaveBeenCalledTimes(1);
       expect(createMagicLink).toHaveBeenCalledWith({

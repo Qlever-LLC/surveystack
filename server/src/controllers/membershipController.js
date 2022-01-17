@@ -11,7 +11,7 @@ import membershipService from '../services/membership.service';
 import rolesService from '../services/roles.service';
 import { createLoginPayload, createUserIfNotExist } from '../services/auth.service';
 import { pick } from 'lodash';
-import flatten from 'flat'
+import flatten from 'flat';
 
 const col = 'memberships';
 
@@ -324,7 +324,7 @@ const joinGroup = async (req, res) => {
     user: user._id,
   });
 
-  if(existingMembership) {
+  if (existingMembership) {
     return res.send({
       status: 'ok',
     });
@@ -478,7 +478,7 @@ const activateMembership = async (req, res) => {
 
 export default {
   getMemberships,
-  getMembership,  
+  getMembership,
   createMembership,
   updateMembership,
   deleteMembership,
