@@ -547,20 +547,17 @@ const checkForLibraryUpdates = async (req, res) => {
 };
 
 const getPinned = async (req, res) => {
-  if (!res.locals.auth || !res.locals.auth.user) {
-    return [];
-  }
-
-  const userId = res.locals.auth.user._id;
   const pinned = [];
 
-  if (!userId) {
-    // TODO what if user is not signed in?
+  if (!res.locals.auth || !res.locals.auth.user || !res.locals.auth.user._id) {
+    // user not signed in, send empty array
     return res.send({
       status: 'success',
       pinned,
     });
   }
+
+  const userId = res.locals.auth.user._id;
 
   // Pipeline
   // 1. find all memberships
