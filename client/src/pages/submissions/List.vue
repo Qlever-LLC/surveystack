@@ -163,7 +163,6 @@
     </v-container>
 
     <v-container>
-      <!-- 
       <v-row class="mt-2">
         <v-col cols="1">
           <v-select
@@ -190,7 +189,6 @@
           </div>
         </v-col>
       </v-row>
--->
       <v-tabs v-model="tab">
         <v-tab v-for="view in views" :key="view.tab">
           {{ view.tab }}

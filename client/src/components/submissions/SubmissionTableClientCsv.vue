@@ -50,9 +50,11 @@
               <div :class="truncate(item[header.value]) ? 'truncate' : ''">
                 {{ item[header.value] }}
               </div>
-              <div class="modal" v-if="openModal(header.value, item._id)">
+
+              <div class="modal" v-if="isModalOpen(header.value, item._id)">
+                <div class="overlay" @click.stop="closeModal()"></div>
                 <div class="modal-content">
-                  <span class="black--text">{{ truncatedValue }}</span>
+                  <span class="black--text">{{ item[header.value] }}</span>
                 </div>
               </div>
             </td>
@@ -107,9 +109,8 @@ export default {
   },
   data() {
     return {
-      isModalOpen: false,
       clickedTableCell: [],
-      truncatedValue: '',
+      activeTableCell: null,
       iconColor: 'grey lighten-1',
       checkedNames: [],
       textTruncateLength: 36,
@@ -155,13 +156,18 @@ export default {
   methods: {
     showFullText(value, header, item) {
       if (value.length > this.textTruncateLength) {
-        this.truncatedValue = value;
-        this.clickedTableCell = [header.value, item._id];
-        this.isModalOpen = !this.isModalOpen;
+        // this.clickedTableCell = [header.value, item._id];
+        this.activeTableCell = `${header.value}_${item._id}`;
+        // this.isModalOpen = !this.isModalOpen;
       }
     },
-    openModal(headerValue, itemId) {
-      return this.clickedTableCell[0] === headerValue && this.clickedTableCell[1] === itemId && this.isModalOpen;
+    isModalOpen(headerValue, itemId) {
+      // return this.clickedTableCell[0] === headerValue && this.clickedTableCell[1] === itemId && this.isModalOpen;
+      return this.activeTableCell === `${headerValue}_${itemId}`;
+    },
+    closeModal() {
+      console.log('hi');
+      this.activeTableCell = null;
     },
     handleClick(data) {
       this.selecteds.push([...this.selecteds, data.item]);
@@ -216,14 +222,6 @@ export default {
   async created() {
     this.fetchData();
   },
-  mounted() {
-    document.addEventListener('click', (event) => {
-      if (!document.getElementsByClassName('modal')[0].contains(event.target)) {
-        this.clickedTableCell = [];
-        this.isModalOpen = false;
-      }
-    });
-  },
 };
 </script>
 
@@ -270,5 +268,13 @@ export default {
   height: 100px;
   width: 500px;
   overflow: scroll;
+}
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100;
 }
 </style>
