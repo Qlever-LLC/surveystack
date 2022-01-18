@@ -50,7 +50,7 @@
               <div :class="truncate(item[header.value]) ? 'truncate' : ''">
                 {{ item[header.value] }}
               </div>
-              <div class="modal" v-if="uniqueTableCell[0] === header.value && uniqueTableCell[1] === item._id">
+              <div class="modal" v-if="openModal(header.value, item._id)">
                 <div class="modal-content">
                   <span class="black--text">{{ truncatedValue }}</span>
                 </div>
@@ -107,9 +107,8 @@ export default {
   },
   data() {
     return {
-      show: false,
-      closeOnContentClick: true,
-      uniqueTableCell: [],
+      isModalOpen: false,
+      clickedTableCell: [],
       truncatedValue: '',
       iconColor: 'grey lighten-1',
       checkedNames: [],
@@ -157,8 +156,12 @@ export default {
     showFullText(value, header, item) {
       if (value.length > this.textTruncateLength) {
         this.truncatedValue = value;
-        this.uniqueTableCell = [header.value, item._id];
+        this.clickedTableCell = [header.value, item._id];
+        this.isModalOpen = !this.isModalOpen;
       }
+    },
+    openModal(headerValue, itemId) {
+      return this.clickedTableCell[0] === headerValue && this.clickedTableCell[1] === itemId && this.isModalOpen;
     },
     handleClick(data) {
       this.selecteds.push([...this.selecteds, data.item]);
@@ -215,8 +218,9 @@ export default {
   },
   mounted() {
     document.addEventListener('click', (event) => {
-      if (!document.getElementsByClassName('modal-content')[0].contains(event.target)) {
-        this.uniqueTableCell = [];
+      if (!document.getElementsByClassName('modal')[0].contains(event.target)) {
+        this.clickedTableCell = [];
+        this.isModalOpen = false;
       }
     });
   },
@@ -246,20 +250,12 @@ export default {
 .custom-checkbox {
   margin-top: -0.3rem;
 }
-td {
-  /* position: relative; */
-}
+
 .v-data-table__wrapper {
   overflow-x: hidden;
   overflow-y: hidden;
 }
 .modal {
-  /* position: absolute; */
-  z-index: 100;
-  width: 500px;
-  /* top: -100%; */
-  top: 70%;
-  right: 20%;
   height: 0;
   width: 0;
 }
@@ -269,10 +265,10 @@ td {
   width: 100%;
   padding: 0.5rem;
   white-space: initial;
-
   position: absolute;
   z-index: 1;
   height: 100px;
-  width: 300px;
+  width: 500px;
+  overflow: scroll;
 }
 </style>
