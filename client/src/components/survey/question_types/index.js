@@ -1,5 +1,8 @@
 import Vue from 'vue';
 
+import _File from './File.vue';
+Vue.component('AppControlFile', _File);
+
 import _Date from './Date.vue';
 Vue.component('AppControlDate', _Date);
 

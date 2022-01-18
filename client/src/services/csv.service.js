@@ -112,6 +112,21 @@ export function geojsonTransformer(o) {
   };
 }
 
+/**
+ *
+ * @param {*} o submission question object e.g. { meta: { type: 'file', ...}, value: {...}}
+ * @returns updated submission question object
+ */
+export function fileTransformer(o) {
+  if (!o.value) {
+    return o;
+  }
+  let changedValues = o.value.map((r) => 'ResourceId:' + r);
+  return {
+    value: changedValues,
+  };
+}
+
 function createCsv(submissions, headers) {
   const items = [];
   submissions.forEach((s) => {
@@ -144,6 +159,7 @@ function createCsv(submissions, headers) {
     // down to the level of each Feature in the FeatureCollection
     const transformedSubmissionData = transformSubmissionQuestionTypes(submission.data, {
       geoJSON: geojsonTransformer,
+      file: fileTransformer,
     });
 
     items.push(

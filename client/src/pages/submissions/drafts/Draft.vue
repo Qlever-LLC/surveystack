@@ -64,6 +64,7 @@ import resultDialog from '@/components/ui/ResultDialog.vue';
 import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
 import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
+import { uploadFileResources } from '@/utils/resources';
 
 export default {
   mixins: [appMixin, resultMixin],
@@ -124,9 +125,10 @@ export default {
 
       let message;
       try {
-        const response = payload.meta.dateSubmitted
-          ? await api.put(`/submissions/${payload._id}`, payload)
-          : await api.post('/submissions', payload);
+        const payloadTransformed = await uploadFileResources(payload);
+        const response = payloadTransformed.meta.dateSubmitted
+          ? await api.put(`/submissions/${payloadTransformed._id}`, payloadTransformed)
+          : await api.post('/submissions', payloadTransformed);
         this.result({ response });
         this.isSubmitted = true;
         await this.$store.dispatch('submissions/remove', this.submission._id);

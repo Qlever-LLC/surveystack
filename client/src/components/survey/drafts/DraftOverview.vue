@@ -106,8 +106,8 @@
           </v-card>
 
           <v-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1"
-            >{{ display.collate }} Irrelevant Questions</v-chip
-          >
+            >{{ display.collate }} Irrelevant Questions
+          </v-chip>
         </v-timeline-item>
       </template>
     </v-timeline>
@@ -219,7 +219,12 @@ export default {
           .map((n) => n.getIndex() + 1)
           .slice(1)
           .join('.');
-        const value = this.$store.getters['draft/property'](`${overview.path}.value`);
+        let value = this.$store.getters['draft/property'](`${overview.path}.value`);
+        //in case of a file array, display the names
+        if (Array.isArray(value) && value.length > 0 && value[0] instanceof File) {
+          value = value.map((file) => file.name);
+          value = JSON.stringify(value);
+        }
         const icon = iconify(value, overview.control, relevant);
 
         controlDisplays.push({

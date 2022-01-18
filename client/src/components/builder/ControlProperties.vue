@@ -268,6 +268,12 @@
           </v-icon>
         </div>
       </div>
+      <app-file-properties
+        v-if="isFile"
+        v-model="control.options.source"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        class="mt-5"
+      />
       <select-items-editor
         v-if="isSelect"
         v-model="control.options.source"
@@ -316,6 +322,7 @@
 <script>
 import { getAdvancedCodeTemplate, findParentByChildId } from '@/utils/surveys';
 import api from '@/services/api.service';
+import AppFileProperties from '@/components/builder/FileProperties.vue';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
 import appMatrixProperties from '@/components/builder/MatrixProperties.vue';
 import appOntologyProperties from '@/components/builder/OntologyProperties.vue';
@@ -327,6 +334,7 @@ import { convertToKey } from '@/utils/builder';
 
 export default {
   components: {
+    AppFileProperties,
     SelectItemsEditor,
     InstructionsEditor,
     appOntologyProperties,
@@ -397,6 +405,9 @@ export default {
     },
     isGroup() {
       return this.control.type === 'group';
+    },
+    isFile() {
+      return this.control.type === 'file';
     },
     isDate() {
       return this.control.type === 'date';

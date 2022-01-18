@@ -79,6 +79,11 @@ export const createControlInstance = (control) => {
       body: '',
       images: [],
     };
+  } else if (control.type === 'file') {
+    cloneWithDefaultOptions.options.source = {
+      types: ['image/*'],
+      allowMultiple: false,
+    };
   }
 
   delete cloneWithDefaultOptions.icon;
@@ -160,6 +165,12 @@ export const availableControls = [
     label: 'Matrix',
     type: 'matrix',
     icon: 'mdi-matrix',
+  },
+  {
+    name: 'file',
+    label: 'Upload a file',
+    type: 'file',
+    icon: 'mdi-file-upload-outline',
   },
   {
     name: 'script',

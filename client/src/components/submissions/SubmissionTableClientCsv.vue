@@ -36,6 +36,22 @@
           </v-row>
         </v-toolbar>
       </template>
+
+      <template v-slot:body="props">
+        <tbody>
+          <tr v-for="item in props.items" :key="item._id">
+            <td>
+              <v-checkbox v-model="tableSelected" :value="item" color="#777" class="custom-checkbox" hide-details />
+            </td>
+            <td v-for="header in headers" :key="header.text">
+              <div v-if="item[header.value].includes('ResourceId:')">
+                <a @click="openResource(item[header.value])"> {{ item[header.value] }}</a>
+              </div>
+              <div v-else>{{ item[header.value] }}</div>
+            </td>
+          </tr>
+        </tbody>
+      </template>
     </v-data-table>
   </v-card>
 </template>
@@ -43,6 +59,7 @@
 <script>
 import papa from 'papaparse';
 import csvService from '@/services/csv.service';
+import { downloadResource } from '@/utils/resources';
 
 export function transformHeaders(headers) {
   const replaceGeoJsonPath = (str) => str.replace(/(value\.features\.\d).*/, '$1');
@@ -159,6 +176,10 @@ export default {
       this.csv = csvService.createCsv(this.submissions.content, headers);
       this.parsed = papa.parse(this.csv, { header: true });
       this.createHeaders();
+    },
+    async openResource(value) {
+      let resourceId = value.replace('ResourceId:', '');
+      await downloadResource(resourceId);
     },
   },
   async created() {

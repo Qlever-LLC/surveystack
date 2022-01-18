@@ -93,6 +93,7 @@ import resultMixin from '@/components/ui/ResultsMixin';
 
 import { createSurvey, updateControls } from '@/utils/surveys';
 import { isIos, isSafari } from '@/utils/compatibility';
+import { uploadFileResources } from '@/utils/resources';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
@@ -169,18 +170,17 @@ export default {
     },
     async submitSubmission({ payload }) {
       this.submitting = true;
-      const submission = {
-        ...payload,
-        meta: {
-          ...payload.meta,
-          archived: true,
-          archivedReason: 'SUBMISSION_FROM_BUILDER',
-        },
-      };
       try {
-        console.log('submitting', submission);
+        const transformedPayload = await uploadFileResources(payload);
+        const submission = {
+          ...transformedPayload,
+          meta: {
+            ...transformedPayload.meta,
+            archived: true,
+            archivedReason: 'SUBMISSION_FROM_BUILDER',
+          },
+        };
         const response = await api.post('/submissions', submission);
-        // this.$router.push(`/surveys/${this.survey._id}`);
         try {
           this.result({ response });
         } catch (error) {
