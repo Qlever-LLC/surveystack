@@ -53,7 +53,9 @@ export default {
           data: [membership],
         } = await api.get(`/memberships?invitationCode=${this.code}&populate=true`);
         this.membership = membership;
-        this.errorMsg = membership ? null : "We didn't find any invitation with this code";
+        this.errorMsg = membership
+          ? null
+          : "We couldn't find an invitation matching this code. Your invitation may have expired.";
       }
 
       this.initialized = true;
@@ -70,7 +72,7 @@ export default {
           await this.$store.dispatch('auth/loginWithUserObject', data);
         }
       } catch (error) {
-        this.errorMsg = error?.response?.data?.message || 'An error occured, please try again later.';
+        this.errorMsg = get(error, 'response.data.message') || 'An error occured, please try again later.';
         return;
       }
 

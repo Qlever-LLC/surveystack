@@ -47,8 +47,13 @@ const actions = {
   },
   async login({ commit, dispatch }, auth) {
     commit('auth_request');
-    const resp = await api.post(auth.url, auth.user);
-    return dispatch('loginWithUserObject', resp.data);
+    try {
+      const resp = await api.post(auth.url, auth.user);
+      return dispatch('loginWithUserObject', resp.data);
+    } catch (err) {
+      commit('auth_error');
+      throw err;
+    }
   },
   async loginWithUserObject({ commit, dispatch }, user) {
     try {

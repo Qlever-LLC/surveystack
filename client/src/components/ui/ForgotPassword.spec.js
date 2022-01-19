@@ -114,7 +114,7 @@ describe('ForgotPassword component', () => {
       expect(emailInput.value).toBe('such_a_email_that_returns_status_default');
       const button = getByText('Submit');
       await fireEvent.click(button);
-      getByText('An error occured, please try again later.');
+      getByText('An error occurred, please try again later.');
     });
   });
 });
