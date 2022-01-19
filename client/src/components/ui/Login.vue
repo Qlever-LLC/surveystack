@@ -234,7 +234,7 @@ export default {
           this.signInLinkSent = true;
           this.status = '';
         } catch (e) {
-          this.status = get(e, 'response.data.message') || 'An error occured, please try again later.';
+          this.status = e?.response?.data?.message || 'An error occured, please try again later.';
         }
         return;
       }

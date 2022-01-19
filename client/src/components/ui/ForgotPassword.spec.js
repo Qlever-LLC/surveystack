@@ -93,7 +93,7 @@ describe('ForgotPassword component', () => {
         'If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes.'
       );
     });
-    it('displays error message submit returns with an error', async () => {
+    it('displays error message when submit returns with an error', async () => {
       let error500 = { response: { status: 500 } };
       mockAxios.post.mockImplementation(() => Promise.reject(error500));
       const { getByLabelText, getByText } = renderWithVuetify(ForgotPassword, {

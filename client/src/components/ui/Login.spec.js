@@ -246,7 +246,7 @@ describe('Login component', () => {
         await findByText('Invalid email or password');
       });
 
-      it('displays an error when an error occured on the login, that is different to 401 and 404 (ex: status 500)', async () => {
+      it('displays an error when an error occurred on the login, that is different to 401 and 404 (ex: status 500)', async () => {
         const authLoginMock = jest.fn();
         authLoginMock.mockRejectedValue({
           message: 'An error occured',

@@ -76,7 +76,7 @@ export default {
       } catch (error) {
         this.status = {
           type: 'error',
-          message: 'An error occured, please try again later.',
+          message: 'An error occurred, please try again later.',
         };
       }
     },

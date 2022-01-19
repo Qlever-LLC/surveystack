@@ -70,7 +70,7 @@ export default {
           await this.$store.dispatch('auth/loginWithUserObject', data);
         }
       } catch (error) {
-        this.errorMsg = get(error, 'response.data.message') || 'An error occured, please try again later.';
+        this.errorMsg = error?.response?.data?.message || 'An error occured, please try again later.';
         return;
       }
 
