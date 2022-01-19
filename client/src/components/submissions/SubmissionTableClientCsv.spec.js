@@ -1,4 +1,4 @@
-import { transformHeaders } from './SubmissionTableClientCsv.vue';
+import { transformHeaders, clickedRecord } from './SubmissionTableClientCsv.vue';
 
 function mockHeaders() {
   return [
@@ -75,6 +75,13 @@ describe('SubmissionTableClientCsv', () => {
         'data.text_3.value',
       ];
       expect(transformHeaders(mockHeaders())).toEqual(expected);
+    });
+  });
+
+  describe('clickedRecord', () => {
+    it('should return the correct header value and item Id that was clicked', () => {
+      const expected = clickedRecord('header value', 'item id');
+      expect(expected).toEqual('header value_item id');
     });
   });
 });

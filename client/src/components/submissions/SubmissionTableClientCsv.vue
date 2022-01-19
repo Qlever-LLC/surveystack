@@ -76,6 +76,10 @@ export function transformHeaders(headers) {
   return Array.isArray(headers) ? [...new Set(headers.map(replaceGeoJsonPath))] : headers;
 }
 
+export function clickedRecord(headerValue, itemId) {
+  return `${headerValue}_${itemId}`;
+}
+
 export default {
   props: {
     submissions: {
@@ -156,24 +160,20 @@ export default {
   methods: {
     showFullText(value, header, item) {
       if (value.length > this.textTruncateLength) {
-        // this.clickedTableCell = [header.value, item._id];
         this.activeTableCell = `${header.value}_${item._id}`;
-        // this.isModalOpen = !this.isModalOpen;
       }
     },
     isModalOpen(headerValue, itemId) {
-      // return this.clickedTableCell[0] === headerValue && this.clickedTableCell[1] === itemId && this.isModalOpen;
-      return this.activeTableCell === `${headerValue}_${itemId}`;
+      return this.activeTableCell === clickedRecord(headerValue, itemId);
     },
     closeModal() {
-      console.log('hi');
       this.activeTableCell = null;
     },
     handleClick(data) {
       this.selecteds.push([...this.selecteds, data.item]);
       this.$emit('update:selected', this.selecteds);
     },
-    truncate(value, item) {
+    truncate(value) {
       return value.length > this.textTruncateLength;
     },
     createCustomFilter(field) {
