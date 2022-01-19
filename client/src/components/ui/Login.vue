@@ -1,84 +1,79 @@
 <template>
   <v-card v-if="!signInLinkSent" class="pa-6 card-width">
-    <template>
-      <div class="d-sm-flex justify-center">
-        <div class="pl-sm-5 pr-sm-10 py-6">
-          <h1 class="heading--text text-center" v-if="isWhitelabel">Login &amp; Join {{ whitelabelPartner.name }}</h1>
-          <h1 class="heading--text" v-else>Welcome Back!</h1>
-          <v-form>
-            <v-text-field
-              label="E-Mail"
-              type="text"
-              class="form-control"
-              :value="entity.email"
-              @input="entity.email = $event.toLowerCase()"
-              color="focus"
-            />
-            <div v-if="!usePassword" class="font-italic text-body-2 mb-4">
-              We'll send you an email to sign you in - no password needed! <b>Click send</b> then
-              <b>check your email</b>.
-            </div>
-            <v-text-field
-              v-if="usePassword"
-              label="Password"
-              :type="passwordInputType"
-              class="form-control"
-              v-model="entity.password"
-              :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
-              @click:append="showPasswords = !showPasswords"
-              color="focus"
-            />
-            <div class="d-flex justify-space-around align-center">
-              <template v-if="usePassword">
-                <router-link
-                  v-if="useLink"
-                  :to="{
-                    name: 'auth-forgot-password',
-                    query: { email: entity.email },
-                  }"
-                  class="white-space-nowrap font-weight-medium mr-4"
-                  role="link"
-                  >Forgot password?</router-link
-                >
-                <a
-                  v-else
-                  text
-                  @click.stop="$emit('updateActive', 'forgot-password')"
-                  class="white-space-nowrap font-weight-medium mr-4"
-                  role="button"
-                  >Forgot password?</a
-                >
-              </template>
-              <v-btn type="submit" @click.prevent="handleSubmitClick" color="primary" :loading="isSubmitting">{{
-                usePassword ? 'Login' : 'Send Link'
-              }}</v-btn>
-            </div>
-          </v-form>
-          <div class="text-center text-muted mt-5">
-            <v-btn
-              text
-              small
-              color="primary"
-              @click="
-                usePassword = !usePassword;
-                status = null;
-              "
-              data-testid="toggle-method"
-            >
-              {{ usePassword ? 'email me a sign in link instead' : 'sign in with password instead' }}
-            </v-btn>
+    <div class="d-sm-flex justify-center">
+      <div class="pl-sm-5 pr-sm-10 py-6">
+        <h1 class="heading--text text-center" v-if="isWhitelabel">Login &amp; Join {{ whitelabelPartner.name }}</h1>
+        <h1 class="heading--text" v-else>Welcome Back!</h1>
+        <v-form>
+          <v-text-field
+            label="E-Mail"
+            type="text"
+            class="form-control"
+            :value="entity.email"
+            @input="entity.email = $event.toLowerCase()"
+            color="focus"
+          />
+          <div v-if="!usePassword" class="font-italic text-body-2 mb-4">
+            We'll send you an email to sign you in - no password needed! <b>Click send</b> then <b>check your email</b>.
           </div>
+          <v-text-field
+            v-if="usePassword"
+            label="Password"
+            :type="passwordInputType"
+            class="form-control"
+            v-model="entity.password"
+            :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
+            @click:append="showPasswords = !showPasswords"
+            color="focus"
+          />
+          <div class="d-flex justify-space-around align-center">
+            <template v-if="usePassword">
+              <router-link
+                v-if="useLink"
+                :to="{
+                  name: 'auth-forgot-password',
+                  query: { email: entity.email },
+                }"
+                class="white-space-nowrap font-weight-medium mr-4"
+                role="link"
+                >Forgot password?</router-link
+              >
+              <a
+                v-else
+                text
+                @click.stop="$emit('updateActive', 'forgot-password')"
+                class="white-space-nowrap font-weight-medium mr-4"
+                role="button"
+                >Forgot password?</a
+              >
+            </template>
+            <v-btn type="submit" @click.prevent="handleSubmitClick" color="primary" :loading="isSubmitting">{{
+              usePassword ? 'Login' : 'Send Link'
+            }}</v-btn>
+          </div>
+        </v-form>
+        <div class="text-center text-muted mt-5">
+          <v-btn
+            text
+            small
+            color="primary"
+            @click="
+              usePassword = !usePassword;
+              status = null;
+            "
+            data-testid="toggle-method"
+          >
+            {{ usePassword ? 'email me a sign in link instead' : 'sign in with password instead' }}
+          </v-btn>
         </div>
-
-        <div class="d-flex flex-sm-column align-center justify-space-around">
+      </div>
+      <template v-if="registrationEnabled">
+        <div class="d-flex flex-sm-column align-center justify-space-around" data-testid="separator">
           <div class="line"></div>
           Or
           <div class="line"></div>
         </div>
-        <div
-          class="d-flex justify-center pr-sm-5 pl-sm-10 py-6 d-flex flex-column align-center flex-wrap"
-          v-if="registrationEnabled"
-        >
+        <div class="d-flex justify-center pr-sm-5 pl-sm-10 py-6 d-flex flex-column align-center flex-wrap">
           <p class="white-space-nowrap">Don't have an account?</p>
           <v-btn v-if="useLink" :to="registerLink" color="primary" class="px-8" role="link">
             Register now
@@ -87,8 +82,8 @@
             Register now
           </v-btn>
         </div>
-      </div>
-    </template>
+      </template>
+    </div>
 
     <v-alert v-if="status" class="mt-4" mode="fade" text type="error">{{ status }}</v-alert>
   </v-card>

@@ -37,12 +37,14 @@ const renderLogin = ({ propsData, params, query, getters, actions, $router } = {
   });
 
 // run the test with defaultUsePassword=false and =true
-const testBothSides = (description, settings, test) => {
+const testBothSides = (description, settings, test, beforeBoth = () => {}) => {
   describe('with magic link', () => {
+    beforeEach(beforeBoth);
     const linkSettings = { ...settings, propsData: { ...settings.propsData, defaultUsePassword: false } };
     it(description, async () => await test(renderLogin(linkSettings), false));
   });
   describe('with user/password', () => {
+    beforeEach(beforeBoth);
     const pwSettings = { ...settings, propsData: { ...settings.propsData, defaultUsePassword: true } };
     it(description, async () => await test(renderLogin(pwSettings), true));
   });
@@ -50,9 +52,40 @@ const testBothSides = (description, settings, test) => {
 
 describe('Login component', () => {
   describe('navigation links and buttons', () => {
-    testBothSides('Renders link to Register by default', { propsData: { useLink: true } }, async ({ getByRole }) => {
-      getByRole('link', { name: /Register now/i });
+    testBothSides('Renders link to Register by default', { propsData: { useLink: true } }, async () => {
+      screen.getByRole('link', { name: /Register now/i });
     });
+
+    [true, false].map((invitationOnly) =>
+      testBothSides(
+        `${
+          invitationOnly ? "Don't" : 'Do'
+        } render the Register section when the whitelabel is "invitationOnly: ${invitationOnly}"`,
+        {
+          propsData: { useLink: true },
+          getters: {
+            'whitelabel/isWhitelabel': () => true,
+            'whitelabel/partner': () => ({
+              id: 1,
+            }),
+          },
+        },
+        async () => {
+          if (invitationOnly) {
+            expect(screen.queryByRole('link', { name: /Register now/i })).not.toBeInTheDocument();
+            expect(screen.queryByTestId('separator')).not.toBeInTheDocument();
+          } else {
+            waitFor(() => screen.getByRole('link', { name: /Register now/i }));
+            waitFor(() => screen.getByTestId('separator'));
+          }
+        },
+        () => {
+          let res = { data: { meta: { invitationOnly } } };
+          mockAxios.get.mockImplementation(() => Promise.resolve(res));
+          mockAxios.post.mockImplementation(() => Promise.resolve());
+        }
+      )
+    );
 
     testBothSides(
       'Renders button to Register when useLink is false',
