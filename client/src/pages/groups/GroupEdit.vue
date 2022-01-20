@@ -170,8 +170,10 @@ import appPinnedSurveys from '@/components/groups/PinnedSurveys.vue';
 import appDocLinks from '@/components/groups/DocLinks.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
 import appDialog from '@/components/ui/Dialog.vue';
-import appFarmHubOnboarding from '@/components/integrations/FarmHubOnboarding.vue';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
+
+const appFarmHubOnboarding = () => import('@/components/integrations/FarmHubOnboarding.vue');
+
 
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
