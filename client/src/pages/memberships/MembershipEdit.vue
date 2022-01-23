@@ -22,7 +22,7 @@
           v-if="entity.meta.status === 'pending'"
           class="mt-3"
           v-model="entity.meta.invitationName"
-          label="Invitation Name"
+          label="Invitee Name"
           hint="Default name for newly registered users"
         />
 
