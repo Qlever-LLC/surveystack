@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import sanitizeHtml from 'sanitize-html';
 
 import dotenv from 'dotenv-defaults';
 dotenv.config();
@@ -37,10 +38,14 @@ const sendLink = async ({
   btnText,
   greeting = 'Hi there,',
 }) => {
+  // remove all html tags
+  const s = (text) => sanitizeHtml(text, { allowedTags: [] });
+
   await transport.sendMail({
     from: process.env.SMTP_DEFAULT_SENDER,
     to,
     subject,
+    // Note: Basic html email. We should probably use some templating engine if we decide to create more complicated emails
     html: `
       <table style="max-width: 600px; margin: 0 auto;"width="100%; font-size: 17px;" border="0" cellspacing="0" cellpadding="0">
           <tr>
@@ -50,16 +55,20 @@ const sendLink = async ({
           </tr>
           <tr>
               <td style="background-color: #f9f9f9; border-radius: 7px; padding: 32px">
-                <h3>${greeting}</h3>
+                <h3>${s(greeting)}</h3>
                 <table style="width:100%;margin-bottom:32px"><tbody>
                 <tr><td style="text-align:center">
-                  <h2>${actionDescriptionHtml}</h2>
-                  <a href="${link}" style="color: white; font-weight: bold; text-decoration: none; word-break: break-word; font-size: 17px; line-height: 24px; background-color: #ff5555; border-color: #ff2a2a; letter-spacing: 1px; min-width: 80px; text-align: center; border-radius: 4px; padding: 10px 22px; font-family: 'Roboto', sans-serif;" target="_blank">
-                  ${btnText}
+                  <h2>${s(actionDescriptionHtml)}</h2>
+                  <a href="${s(
+                    link
+                  )}" style="color: white; font-weight: bold; text-decoration: none; word-break: break-word; font-size: 17px; line-height: 24px; background-color: #ff5555; border-color: #ff2a2a; letter-spacing: 1px; min-width: 80px; text-align: center; border-radius: 4px; padding: 10px 22px; font-family: 'Roboto', sans-serif;" target="_blank">
+                  ${s(btnText)}
                   </a>
                 </td></tr>
                 <tr><td align="center" style="padding-top: 32px">
-                  <small style="padding-top:18px">Alternatively, you can follow this link: ${link}</small>
+                  <small style="padding-top:18px">Alternatively, you can follow this link: ${s(
+                    link
+                  )}</small>
                 </td></tr>
                 </tbody></table>
               </td>
