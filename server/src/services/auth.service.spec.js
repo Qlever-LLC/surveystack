@@ -119,7 +119,7 @@ describe('createMagicLink', () => {
     it('includes the user object', async () => {
       const user = await createUser();
       const payload = await createLoginPayload(user);
-      expect(payload).toMatchObject(pick(user, '_id', 'email', 'name', 'token'));
+      expect(payload).toMatchObject(pick(user, '_id', 'email', 'name', 'token', 'permissions'));
     });
   });
 });

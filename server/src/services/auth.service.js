@@ -68,7 +68,7 @@ export const createMagicLink = async ({
 };
 
 export const createLoginPayload = async (userObject) => {
-  const payload = pick(userObject, 'email', 'name', 'token', '_id');
+  const payload = pick(userObject, 'email', 'name', 'token', '_id', 'permissions');
   const roles = await rolesService.getRoles(userObject._id);
   return { ...payload, roles };
 };
