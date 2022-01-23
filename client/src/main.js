@@ -9,6 +9,8 @@ import { startToggle } from './plugins/toggle';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '@mdi/font/css/materialdesignicons.css';
 import './css/transitions.css';
+import * as Sentry from '@sentry/vue';
+import { Integrations } from '@sentry/tracing';
 
 import api from './services/api.service';
 
