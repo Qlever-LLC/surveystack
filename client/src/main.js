@@ -8,6 +8,8 @@ import vuetify from './plugins/vuetify';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '@mdi/font/css/materialdesignicons.css';
 import './css/transitions.css';
+import * as Sentry from '@sentry/vue';
+import { Integrations } from '@sentry/tracing';
 
 import api from './services/api.service';
 
@@ -17,6 +19,21 @@ import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlError from '@/components/survey/drafts/ControlError.vue';
+
+Sentry.init({
+  Vue,
+  dsn: 'https://examplePublicKey@o0.ingest.sentry.io/0',
+  integrations: [
+    new Integrations.BrowserTracing({
+      routingInstrumentation: Sentry.vueRouterInstrumentation(router),
+      tracingOrigins: ['localhost', 'my-site-url.com', /^\//],
+    }),
+  ],
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+});
 
 Vue.component('app-control-label', appControlLabel);
 Vue.component('app-control-hint', appControlHint);
