@@ -91,7 +91,7 @@ describe('createMagicLink', () => {
       expect(link.searchParams.get('code')).toEqual(expect.any(String));
       expect(link.searchParams.get('landingPath')).toBeNull();
     });
-    it('witt landingPath', async () => {
+    it('with landingPath', async () => {
       const landingPath = '/in/app/path';
       const link = new URL(await createMagicLink({ email, origin, landingPath }));
       expect(link.origin).toBe(origin);

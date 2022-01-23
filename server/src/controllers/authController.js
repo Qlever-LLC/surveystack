@@ -102,7 +102,7 @@ const sendPasswordResetMail = async (req, res) => {
   return res.send({ ok: true });
 };
 
-// TODO deprecated, the SurveyStack browser client doesn't use it anymore. Can we remove it, or there are other clients still using it?
+// DEPRECATED: The SurveyStack browser client doesn't use it anymore. Soilstack is still using code copied from an older SurveyStack client that depends on this.```
 const resetPassword = async (req, res) => {
   const { email, token, newPassword } = req.body;
   const existingUser = await db.collection(col).findOne({ email });
