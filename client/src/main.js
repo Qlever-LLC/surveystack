@@ -49,6 +49,30 @@ Sentry.init({
   attachStacktrace: true,
 });
 
+// TODO minimize recomputes
+store.watch(
+  (_, getters) => {
+    const user = getters['auth/user'];
+    const groups = store.getters['memberships/groups'];
+    const activeGroupId = store.getters['memberships/activeGroup'];
+    const group = groups.find((item) => item._id === activeGroupId);
+    return [user, group];
+  },
+  ([user, group]) => {
+    console.log({ group, user });
+    Sentry.setUser({
+      id: user._id,
+      email: user.email,
+      username: user.name,
+    });
+    Sentry.setContext('group', {
+      id: group._id,
+      name: group.name,
+    });
+  },
+  { immediate: true }
+);
+
 Vue.component('app-control-label', appControlLabel);
 Vue.component('app-control-hint', appControlHint);
 Vue.component('app-control-more-info', appControlMoreInfo);
