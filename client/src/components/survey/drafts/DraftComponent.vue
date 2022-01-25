@@ -1,14 +1,16 @@
 <template>
-  <div class="draft-component-wrapper draft wrapper" :class="{ builder: builder }" v-if="control" ref="wrapper">
-    <!-- confirm submission modal -->
-    <app-confirm-submission-dialog
-      v-if="showConfirmSubmission"
-      v-model="showConfirmSubmission"
-      :groupId="submission.meta.group.id"
-      @submit="() => submitConfirmed(submission)"
-      @set-group="setSubmissionGroup"
-      :dateSubmitted="submission.meta.dateSubmitted"
-    />
+  <div class="outer-wrapper">
+    <div class="gutter"></div>
+    <div class="draft-component-wrapper draft wrapper" :class="{ builder: builder }" v-if="control" ref="wrapper">
+      <!-- confirm submission modal -->
+      <app-confirm-submission-dialog
+        v-if="showConfirmSubmission"
+        v-model="showConfirmSubmission"
+        :groupId="submission.meta.group.id"
+        @submit="() => submitConfirmed(submission)"
+        @set-group="setSubmissionGroup"
+        :dateSubmitted="submission.meta.dateSubmitted"
+      />
 
     <!-- Toolbar with question number and overview button -->
     <app-draft-toolbar
@@ -24,101 +26,102 @@
       <slot v-for="(_, name) in $slots" :name="name" :slot="name" />
     </app-draft-toolbar>
 
-    <!-- Overview -->
-    <div v-if="showOverview" class="draft-overview">
-      <app-draft-overview
-        v-if="showOverview"
-        :survey="survey"
-        :submission="submission"
-        :groupPath="groupPath"
-        :overviews="$store.getters['draft/overviews']"
-        @goto="goto"
-        class="maxw-60 mx-auto"
+      <!-- Overview -->
+      <div v-if="showOverview" class="draft-overview">
+        <app-draft-overview
+          v-if="showOverview"
+          :survey="survey"
+          :submission="submission"
+          :groupPath="groupPath"
+          :overviews="$store.getters['draft/overviews']"
+          @goto="goto"
+          class="maxw-60 mx-auto"
+        />
+      </div>
+
+      <!-- Content with questions -->
+      <div class="draft-content" v-else>
+        <v-fab-transition>
+          <v-btn
+            v-show="overflowing"
+            color="primary"
+            fab
+            dark
+            small
+            fixed
+            style="bottom: 76px; right: 12px; z-index: 150"
+            @click="
+              scrollY(500);
+              overflowing = false;
+            "
+          >
+            <v-icon>mdi-arrow-down</v-icon>
+          </v-btn>
+        </v-fab-transition>
+        <app-control
+          class="my-auto maxw-60 mx-auto"
+          :path="path"
+          :control="control"
+          :forceMobile="forceMobile"
+          :isInBuilder="builder"
+        />
+      </div>
+
+      <!-- Footer with next/prev buttons -->
+      <app-draft-footer
+        class="draft-footer px-0 grey lighten-4"
+        :class="{ 'show-submit': showOverview }"
+        :style="{
+          left: moveFooter ? '256px' : '0px',
+          width: moveFooter ? 'calc(100% - 256px)' : '100%',
+        }"
+        :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
+        :enableNext="!$store.getters['draft/hasRequiredUnanswered']"
+        :enableSubmit="!$store.getters['draft/errors']"
+        :showSubmit="showOverview"
+        :showNav="true"
+        @next="next"
+        @prev="prev"
+        @submit="submit"
       />
     </div>
-
-    <!-- Content with questions -->
-    <div class="draft-content" v-else>
-      <v-fab-transition>
-        <v-btn
-          v-show="overflowing"
-          color="primary"
-          fab
-          dark
-          small
-          fixed
-          style="bottom: 76px; right: 12px; z-index: 150"
-          @click="
-            scrollY(500);
-            overflowing = false;
-          "
-        >
-          <v-icon>mdi-arrow-down</v-icon>
-        </v-btn>
-      </v-fab-transition>
-      <app-control
-        class="my-auto maxw-60 mx-auto"
-        :path="path"
-        :control="control"
-        :forceMobile="forceMobile"
-        :isInBuilder="builder"
-      />
+    <div v-else-if="builder" class="d-flex flex-column justify-space-around" style="height: 100%">
+      <v-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded
+        ><div class="text-body-1 my-4 text-center">
+          Click on the
+          <v-btn fab dark x-small color="blue darken-2" style="pointer-events:none">
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+          to add questions to your survey
+        </div>
+        <div class="text-body-1 my-4 text-center">
+          <v-btn dark small color="primary" class="my-1 mr-1" style="pointer-events:none">
+            <v-icon class="mr-1">mdi-content-save</v-icon>
+            Save
+          </v-btn>
+          to create a draft
+        </div>
+        <div class="text-body-1 my-4 text-center">
+          <v-btn dark small class="my-1 mr-1" color="green" style="pointer-events:none">
+            <v-icon class="mr-1">mdi-cloud-upload</v-icon>
+            Publish
+          </v-btn>
+          to allow users to submit to your survey
+        </div></v-sheet
+      >
     </div>
-
-    <!-- Footer with next/prev buttons -->
-    <app-draft-footer
-      class="draft-footer px-0 grey lighten-4"
-      :class="{ 'show-submit': showOverview }"
-      :style="{
-        left: moveFooter ? '256px' : '0px',
-        width: moveFooter ? 'calc(100% - 256px)' : '100%',
-      }"
-      :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
-      :enableNext="!$store.getters['draft/hasRequiredUnanswered']"
-      :enableSubmit="!$store.getters['draft/errors']"
-      :showSubmit="showOverview"
-      :showNav="true"
-      @next="next"
-      @prev="prev"
-      @submit="submit"
-    />
+    <v-alert v-else border="left" prominent text type="error">
+      <v-row align="center">
+        <v-col class="grow">
+          This survey has no visible questions. Please check the "Relevance Expression" and "Hidden" settings in the
+          editor.
+        </v-col>
+        <v-col class="shrink">
+          <v-btn :to="`/surveys/${survey._id}`">back</v-btn>
+        </v-col>
+      </v-row>
+    </v-alert>
   </div>
-  <div v-else-if="builder" class="d-flex flex-column justify-space-around" style="height: 100%">
-    <v-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded
-      ><div class="text-body-1 my-4 text-center">
-        Click on the
-        <v-btn fab dark x-small color="blue darken-2" style="pointer-events:none">
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
-        to add questions to your survey
-      </div>
-      <div class="text-body-1 my-4 text-center">
-        <v-btn dark small color="primary" class="my-1 mr-1" style="pointer-events:none">
-          <v-icon class="mr-1">mdi-content-save</v-icon>
-          Save
-        </v-btn>
-        to create a draft
-      </div>
-      <div class="text-body-1 my-4 text-center">
-        <v-btn dark small class="my-1 mr-1" color="green" style="pointer-events:none">
-          <v-icon class="mr-1">mdi-cloud-upload</v-icon>
-          Publish
-        </v-btn>
-        to allow users to submit to your survey
-      </div></v-sheet
-    >
-  </div>
-  <v-alert v-else border="left" prominent text type="error">
-    <v-row align="center">
-      <v-col class="grow">
-        This survey has no visible questions. Please check the "Relevance Expression" and "Hidden" settings in the
-        editor.
-      </v-col>
-      <v-col class="shrink">
-        <v-btn :to="`/surveys/${survey._id}`">back</v-btn>
-      </v-col>
-    </v-row>
-  </v-alert>
 </template>
 
 <script>
@@ -271,6 +274,22 @@ export default {
 </script>
 
 <style scoped>
+.outer-wrapper {
+  height: 100%;
+}
+
+@media screen and (min-width: 768px) {
+  .outer-wrapper {
+    display: flex;
+    flex-direction: row-reverse;
+  }
+
+  .draft-component-wrapper {
+    min-width: 768px;
+    width: 768px;
+  }
+}
+
 .draft-component-wrapper.builder >>> .draft-footer.show-submit .full {
   position: relative;
 }
