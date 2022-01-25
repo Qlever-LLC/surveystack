@@ -1,5 +1,5 @@
 <template>
-  <v-card id="container">
+  <v-card>
     <v-data-table
       :headers="headers"
       :items="items"
@@ -47,12 +47,12 @@
               :key="header.text"
               @click.stop="showFullText(item[header.value], header, item)"
             >
-              <div :class="truncate(item[header.value]) ? 'truncate' : ''">
+              <div :class="shouldTruncate(item[header.value]) ? 'truncate' : ''">
                 {{ item[header.value] }}
               </div>
 
-              <div class="modal" v-if="isModalOpen(header.value, item._id)">
-                <div class="overlay" @click.stop="closeModal()"></div>
+              <div class="modal" v-if="isModalOpen(header.value, item._id)" role="dialog">
+                <div class="overlay" @click.stop="closeModal()" data-testid="overlay"></div>
                 <div class="modal-content">
                   <span class="black--text">{{ item[header.value] }}</span>
                 </div>
@@ -76,7 +76,7 @@ export function transformHeaders(headers) {
   return Array.isArray(headers) ? [...new Set(headers.map(replaceGeoJsonPath))] : headers;
 }
 
-export function clickedRecord(headerValue, itemId) {
+export function getCellKey(headerValue, itemId) {
   return `${headerValue}_${itemId}`;
 }
 
@@ -113,12 +113,8 @@ export default {
   },
   data() {
     return {
-      clickedTableCell: [],
       activeTableCell: null,
-      iconColor: 'grey lighten-1',
-      checkedNames: [],
       textTruncateLength: 36,
-      selecteds: [],
       csv: null,
       parsed: null,
       search: '',
@@ -164,16 +160,12 @@ export default {
       }
     },
     isModalOpen(headerValue, itemId) {
-      return this.activeTableCell === clickedRecord(headerValue, itemId);
+      return this.activeTableCell === getCellKey(headerValue, itemId);
     },
     closeModal() {
       this.activeTableCell = null;
     },
-    handleClick(data) {
-      this.selecteds.push([...this.selecteds, data.item]);
-      this.$emit('update:selected', this.selecteds);
-    },
-    truncate(value) {
+    shouldTruncate(value) {
       return value.length > this.textTruncateLength;
     },
     createCustomFilter(field) {
@@ -249,10 +241,6 @@ export default {
   margin-top: -0.3rem;
 }
 
-.v-data-table__wrapper {
-  overflow-x: hidden;
-  overflow-y: hidden;
-}
 .modal {
   height: 0;
   width: 0;
@@ -275,6 +263,5 @@ export default {
   left: 0;
   bottom: 0;
   right: 0;
-  width: 100;
 }
 </style>
