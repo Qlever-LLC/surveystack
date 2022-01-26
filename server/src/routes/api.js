@@ -297,23 +297,25 @@ router.delete(
 router.post('/call-for-submissions/send', [assertAuthenticated], catchErrors(cfsController.send));
 
 // resources
-router.get('/resources/:id', catchErrors(resourceController.getResource));
-router.post('/resources/download-url', catchErrors(resourceController.getDownloadURL));
-router.post(
-  '/resources/upload-url',
-  [assertAuthenticated],
-  catchErrors(resourceController.getUploadURL)
-);
-router.put(
-  '/resources/commit/:id',
-  [assertAuthenticated],
-  catchErrors(resourceController.commitResource)
-);
-router.delete(
-  '/resources/:id',
-  [assertAuthenticated],
-  catchErrors(resourceController.deleteResource)
-);
+if (process.env.FEATURE_RESOURCES === 'true') {
+  router.get('/resources/:id', catchErrors(resourceController.getResource));
+  router.post('/resources/download-url', catchErrors(resourceController.getDownloadURL));
+  router.post(
+    '/resources/upload-url',
+    [assertAuthenticated],
+    catchErrors(resourceController.getUploadURL)
+  );
+  router.put(
+    '/resources/commit/:id',
+    [assertAuthenticated],
+    catchErrors(resourceController.commitResource)
+  );
+  router.delete(
+    '/resources/:id',
+    [assertAuthenticated],
+    catchErrors(resourceController.deleteResource)
+  );
+}
 
 // info
 router.get('/info/ip', catchErrors(infoController.getIP));

@@ -26,7 +26,7 @@ function mockRes() {
   };
 }
 
-describe.skip('resourceController', () => {
+let tests = () => {
   //TODO mock db or cleanup test entries after tests
   beforeAll(async () => {
     await connectDatabase();
@@ -103,4 +103,7 @@ describe.skip('resourceController', () => {
       expect(res.s).toBe(404);
     });
   });
-});
+};
+
+if (process.env.FEATURE_RESOURCES === 'true') describe('resourceController', tests);
+else describe.skip('resourceController', tests);
