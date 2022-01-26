@@ -70,19 +70,19 @@ describe.skip('resourceController', () => {
   describe('getResource', () => {
     it('sends an empty array for a random resourceId', async () => {
       let req = {
-        query: { id: new ObjectId() },
+        params: { id: new ObjectId() },
       };
       let res = mockRes();
       await getResource(req, res);
-      expect(res.data).toStrictEqual([]);
+      expect(res.data).toBeNull();
     });
     it('return one resource for the given resourceId', async () => {
       let req = {
-        query: { id: resourceId },
+        params: { id: resourceId },
       };
       let res = mockRes();
       await getResource(req, res);
-      expect(res.data).toHaveLength(1);
+      expect(res.data._id).toStrictEqual(resourceId);
     });
   });
   describe('deleteResource', () => {
