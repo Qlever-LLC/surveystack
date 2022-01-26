@@ -5,6 +5,7 @@ import assert from 'assert';
 import slugify from '../helpers/slugify';
 
 const col = 'resources';
+const LOCATION_S3 = 's3';
 
 const getResource = async (req, res) => {
   const { id } = req.params;
@@ -29,6 +30,7 @@ const getUploadURL = async (req, res) => {
   // add resource entry to our db
   await addResource(
     resourceId,
+    LOCATION_S3,
     key,
     resourceName,
     contentLength,
@@ -38,13 +40,22 @@ const getUploadURL = async (req, res) => {
   return res.send({ signedUrl, resourceId });
 };
 
-const addResource = async (resourceId, key, resourceName, contentLength, contentType, userId) => {
+const addResource = async (
+  resourceId,
+  location,
+  key,
+  resourceName,
+  contentLength,
+  contentType,
+  userId
+) => {
   //insert resource entry with state=pending
   let resource = {
     _id: resourceId,
     name: slugify(resourceName),
     label: resourceName,
     state: 'pending',
+    location: location,
     key: key,
     contentLength: contentLength,
     contentType: contentType,
