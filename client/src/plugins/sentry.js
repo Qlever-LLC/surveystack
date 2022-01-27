@@ -7,6 +7,7 @@ console.log('process.env.VUE_APP_COMMIT_SHORT_SHA', process.env.VUE_APP_COMMIT_S
 console.log('process.env.VUE_APP_API_URL', process.env.VUE_APP_API_URL);
 console.log('process.env.VUE_APP_SENTRY_DSN', process.env.VUE_APP_SENTRY_DSN);
 console.log('process.env.VUE_APP_ENVIRONMENT', process.env.VUE_APP_ENVIRONMENT);
+console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 
 export const startSentry = (Vue, store, router) => {
   Sentry.init({
