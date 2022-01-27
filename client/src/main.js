@@ -6,11 +6,10 @@ import router from './router';
 import store from './store';
 import vuetify from './plugins/vuetify';
 import { startToggle } from './plugins/toggle';
+import { startSentry } from './plugins/sentry';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '@mdi/font/css/materialdesignicons.css';
 import './css/transitions.css';
-import * as Sentry from '@sentry/vue';
-import { Integrations } from '@sentry/tracing';
 
 import api from './services/api.service';
 
@@ -46,6 +45,7 @@ store.watch(
   },
   { immediate: true }
 );
+startSentry(Vue, store, router);
 
 Vue.component('app-control-label', appControlLabel);
 Vue.component('app-control-hint', appControlHint);
