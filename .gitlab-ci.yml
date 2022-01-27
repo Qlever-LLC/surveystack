@@ -253,11 +253,11 @@ build client:
       - client/dist/
   stage: build
   script: 
+    - echo VUE_APP_SENTRY_DSN="$VUE_APP_SENTRY_DSN"
     - yarn client:build
   variables: 
     VUE_APP_COMMIT_SHORT_SHA: $CI_COMMIT_SHORT_SHA
     VUE_APP_ENVIRONMENT: $CI_ENVIRONMENT_NAME
-    VUE_APP_SENTRY_DSN: $VUE_APP_SENTRY_DSN
   needs: 
     - lerna bootstrap
 
