@@ -112,6 +112,11 @@ if (process.env.NODE_ENV === 'development') {
   app.use('/debug', debugRoutes);
 }
 
+// a.listen(3000, () =>
+//     // eslint-disable-next-line no-console
+//     console.log(`Unleash Proxy listening on http://localhost:${3000}/proxy`),
+// );
+
 // Serve Vue.js from dist folder
 // https://github.com/bripkens/connect-history-api-fallback/tree/master/examples/static-files-and-index-rewrite
 app.use(frontend); // will catch majority of static file requests
