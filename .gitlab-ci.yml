@@ -255,7 +255,7 @@ build client:
   script:
     - yarn client:build
   variables: 
-    VUE_APP_COMMIT_SHORT_SHA: $CI_COMMIT_SHORT_SHA
+    VUE_APP_COMMIT_SHA: $CI_COMMIT_SHA
   needs: 
     - lerna bootstrap
 

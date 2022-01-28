@@ -3,7 +3,7 @@ import { Integrations } from '@sentry/tracing';
 
 // TODO delete me!
 console.log('process.env.VUE_APP_VERSION', process.env.VUE_APP_VERSION);
-console.log('process.env.VUE_APP_COMMIT_SHORT_SHA', process.env.VUE_APP_COMMIT_SHORT_SHA);
+console.log('process.env.VUE_APP_COMMIT_SHA', process.env.VUE_APP_COMMIT_SHA);
 console.log('process.env.VUE_APP_API_URL', process.env.VUE_APP_API_URL);
 console.log('process.env.VUE_APP_SENTRY_DSN', process.env.VUE_APP_SENTRY_DSN);
 console.log('process.env.VUE_APP_ENVIRONMENT', process.env.VUE_APP_ENVIRONMENT);
@@ -14,7 +14,7 @@ export const startSentry = (Vue, store, router) => {
   Sentry.init({
     Vue,
     environment: process.env.NODE_ENV,
-    release: `survey-stack-client@${process.env.VUE_APP_VERSION}/${process.env.VUE_APP_COMMIT_SHORT_SHA || 'unknown'}`,
+    release: process.env.VUE_APP_COMMIT_SHA || 'unknown',
     dsn: process.env.VUE_APP_SENTRY_DSN,
     integrations: [
       new Integrations.BrowserTracing({
