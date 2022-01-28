@@ -8,11 +8,12 @@ console.log('process.env.VUE_APP_API_URL', process.env.VUE_APP_API_URL);
 console.log('process.env.VUE_APP_SENTRY_DSN', process.env.VUE_APP_SENTRY_DSN);
 console.log('process.env.VUE_APP_ENVIRONMENT', process.env.VUE_APP_ENVIRONMENT);
 console.log('process.env.NODE_ENV', process.env.NODE_ENV);
+console.log('process.env.VUE_APP_SENTRY_TRACES_SAMPLE_RATE', process.env.VUE_APP_SENTRY_TRACES_SAMPLE_RATE);
 
 export const startSentry = (Vue, store, router) => {
   Sentry.init({
     Vue,
-    environment: process.env.VUE_APP_ENVIRONMENT,
+    environment: process.env.NODE_ENV,
     release: `survey-stack-client@${process.env.VUE_APP_VERSION}/${process.env.VUE_APP_COMMIT_SHORT_SHA || 'unknown'}`,
     dsn: process.env.VUE_APP_SENTRY_DSN,
     integrations: [
@@ -27,7 +28,7 @@ export const startSentry = (Vue, store, router) => {
       trackComponents: true,
     },
     // Vue specific
-    logErrors: process.env.VUE_APP_ENVIRONMENT === 'production' ? false : true,
+    logErrors: process.env.NODE_ENV === 'production' ? false : true,
     attachProps: true,
     attachStacktrace: true,
   });
