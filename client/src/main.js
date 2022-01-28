@@ -5,6 +5,7 @@ import './registerServiceWorker';
 import router from './router';
 import store from './store';
 import vuetify from './plugins/vuetify';
+import { startToggle } from './plugins/toggle';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '@mdi/font/css/materialdesignicons.css';
 import './css/transitions.css';
@@ -18,57 +19,7 @@ import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlError from '@/components/survey/drafts/ControlError.vue';
 
-
-startSentry(Vue, store, router);
-
-import { UnleashClient } from 'unleash-proxy-client';
-
-const unleash = new UnleashClient({
-  // TODO remove and regenerate these keys on GitLab
-  url: `${location.origin}/api/toggles/proxy`,
-  clientKey: 'proxy-secret',
-  appName: process.env.VUE_APP_ENVIRONMENT || 'staging',
-});
-
-unleash.updateContext({ userId: '1233' });
-
-unleash.on('ready', () => {
-  console.log('ready/unleash/sentry', unleash.isEnabled('sentry'));
-  console.log('ready/unleash/test', unleash.isEnabled('test'));
-  console.log('ready/unleash/test-user-list', unleash.isEnabled('test-user-list'));
-});
-
-unleash.on('initialized', () => {
-  console.log('initialized/unleash/sentry', unleash.isEnabled('sentry'));
-  console.log('initialized/unleash/test', unleash.isEnabled('test'));
-  console.log('initialized/unleash/test-user-list', unleash.isEnabled('test-user-list'));
-});
-
-unleash.start();
-
-// TODO minimize recomputes
-store.watch(
-  (_, getters) => {
-    const user = getters['auth/user'];
-    const groups = store.getters['memberships/groups'];
-    const activeGroupId = store.getters['memberships/activeGroup'];
-    const group = groups.find((item) => item._id === activeGroupId);
-    return [user, group];
-  },
-  ([user, group]) => {
-    console.log({ group, user });
-    Sentry.setUser({
-      id: user._id,
-      email: user.email,
-      username: user.name,
-    });
-    Sentry.setContext('group', {
-      id: group._id,
-      name: group.name,
-    });
-  },
-  { immediate: true }
-);
+startToggle(store);
 
 Vue.component('app-control-label', appControlLabel);
 Vue.component('app-control-hint', appControlHint);
