@@ -20,7 +20,6 @@ process.env.VUE_APP_VERSION = version;
 module.exports = {
   chainWebpack: (config) => {
     config.plugins.delete('pwa');
-    // config.devtool(process.env.NODE_ENV === 'development' ? 'eval-source-map' : 'hidden-source-map')
   },
   configureWebpack: {
     resolve: {
