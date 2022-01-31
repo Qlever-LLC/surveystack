@@ -17,6 +17,7 @@ import debugRoutes from './routes/debug';
 
 import resources from './controllers/resources';
 import { cookieOptions } from './constants';
+import { toggleMiddleware } from './services/featureToggle.service';
 
 const subdomainRedirect = {
   rfc: 'bionutrient',
@@ -101,6 +102,9 @@ app.use(async (req, res, next) => {
 
   next();
 });
+
+// feature toggles (res.locals.auth.isToggleOn(toggleName))
+app.use(toggleMiddleware);
 
 // routes
 app.use(`${PATH_PREFIX}/api`, apiRoutes);
