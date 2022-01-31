@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import { decode as b64Decode } from 'js-base64';
 import Home from '@/pages/Home.vue';
 import Test from '@/pages/Test.vue';
 import Unauthorized from '@/pages/Unauthorized.vue';
@@ -13,7 +14,6 @@ import Login from '@/pages/auth/Login.vue';
 import Register from '@/pages/auth/Register.vue';
 import Profile from '@/pages/auth/Profile.vue';
 import ForgotPassword from '@/pages/auth/ForgotPassword.vue';
-import ResetPassword from '@/pages/auth/ResetPassword.vue';
 
 import Experiment from '@/pages/experiment/Experiments.vue';
 import SandboxAR from '@/pages/experiment/sandbox/SandboxAR.vue';
@@ -161,9 +161,21 @@ const routes = [
     component: ForgotPassword,
   },
   {
-    path: '/auth/reset-password',
-    name: 'auth-reset-password',
-    component: ResetPassword,
+    path: '/auth/accept-magic-link',
+    name: 'accept-magic-link',
+    redirect: async (to) => {
+      let { user, landingPath = '/' } = to.query;
+      try {
+        user = JSON.parse(b64Decode(user));
+      } catch (e) {
+        store.dispatch('feedback/add', 'Failed to validate the login data');
+        return '/auth/login?magicLinkExpired';
+      }
+      landingPath = decodeURIComponent(landingPath);
+      await store.dispatch('auth/loginWithUserObject', user);
+
+      window.location.replace(`${location.origin}${landingPath}`);
+    },
   },
   // experiment
   {
