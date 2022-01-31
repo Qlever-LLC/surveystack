@@ -8,14 +8,9 @@ export const startToggle = (store) => {
     appName: process.env.VUE_APP_ENVIRONMENT || 'staging',
   });
 
-  unleash.on('initialized', (...args) => {
-    console.log('INITIALIZED', args, unleash.getAllToggles());
-    store.commit('toggle/updateToggles', unleash.getAllToggles());
-  });
-  unleash.on('update', (...args) => {
-    console.log('UPDATE', args, unleash.getAllToggles());
-    store.commit('toggle/updateToggles', unleash.getAllToggles());
-  });
+  const updateStore = () => store.commit('toggle/updateToggles', unleash.getAllToggles());
+  unleash.on('initialized', updateStore);
+  unleash.on('update', updateStore);
 
   store.registerModule('toggle', {
     namespaced: true,
@@ -46,16 +41,3 @@ export const startToggle = (store) => {
 
   unleash.start();
 };
-
-// unleash.on('ready', () => {
-//   console.log('ready/unleash/sentry', unleash.isEnabled('sentry'));
-//   console.log('ready/unleash/test', unleash.isEnabled('test'));
-//   console.log('ready/unleash/test-user-list', unleash.isEnabled('test-user-list'));
-// });
-
-// unleash.on('initialized', () => {
-//   console.log('initialized/unleash/sentry', unleash.isEnabled('sentry'));
-//   console.log('initialized/unleash/test', unleash.isEnabled('test'));
-//   console.log('initialized/unleash/test-user-list', unleash.isEnabled('test-user-list'));
-//   console.log('all toggles', unleash.getAllToggles());
-// });
