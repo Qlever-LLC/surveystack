@@ -15,6 +15,7 @@ import resourceController from '../controllers/resourceController';
 
 import groupIntegrationController from '../controllers/groupIntegrationController';
 import membershipIntegrationController from '../controllers/membershipIntegrationController';
+import { unleashProxyApp } from '../services/featureToggle.service';
 
 import cfsController from '../controllers/cfsController';
 
@@ -306,21 +307,6 @@ router.get('/resources', catchErrors(resourceController.getResources));
 router.get('/info/ip', catchErrors(infoController.getIP));
 router.get('/info/public-ip', catchErrors(infoController.getPublicIP));
 router.get('/info/public-hostname', catchErrors(infoController.getPublicHostname));
-
-const { createApp } = require('@unleash/proxy');
-const unleashProxyApp = createApp(
-  {
-    unleashUrl: 'https://gitlab.com/api/v4/feature_flags/unleash/28776001',
-    unleashApiToken: '_',
-    unleashInstanceId: '1TA4jjg4dxs35BdXMYRs',
-    clientKeys: ['proxy-secret', 'another-proxy-secret', 's1'],
-    refreshInterval: 1000,
-    // logLevel: 'info',
-    // projectName: 'order-team',
-    environment: 'development',
-  },
-  undefined
-);
 
 router.use('/toggles', unleashProxyApp);
 
