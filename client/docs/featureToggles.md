@@ -1,4 +1,4 @@
-# Feture Toggles
+# Feature Toggles
 
 SurveyStack uses [Unleash](https://github.com/Unleash/unleash) and its [GitLab integration](https://docs.gitlab.com/ee/operations/feature_flags.html) to manage feature toggles.
 
