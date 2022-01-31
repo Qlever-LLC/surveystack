@@ -23,6 +23,9 @@ export const startToggle = (store) => {
       // object map {[toggleName: string]: isEnabled: boolean}
       isOn: {},
     },
+    getters: {
+      isOn: (state) => state.isOn,
+    },
     mutations: {
       updateToggles(state, allToggles) {
         // convert toggle array to object map
