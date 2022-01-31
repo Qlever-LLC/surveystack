@@ -2,10 +2,12 @@ import { createApp } from '@unleash/proxy';
 import Client from '@unleash/proxy/dist/client';
 import { createProxyConfig } from '@unleash/proxy/dist/config';
 
+// TODO handle when env variables not set
+
 const config = {
-  unleashUrl: 'https://gitlab.com/api/v4/feature_flags/unleash/28776001',
+  unleashUrl: process.env.UNLEASH_URL,
   unleashApiToken: '_',
-  unleashInstanceId: '1TA4jjg4dxs35BdXMYRs',
+  unleashInstanceId: process.env.UNLEASH_INSTANCE_ID,
   clientKeys: ['proxy-secret', 'another-proxy-secret', 's1'],
   refreshInterval: 1000,
   // logLevel: 'info',

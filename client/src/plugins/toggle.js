@@ -2,7 +2,6 @@ import { UnleashClient } from 'unleash-proxy-client';
 
 export const startToggle = (store) => {
   const unleash = new UnleashClient({
-    // TODO remove and regenerate these keys on GitLab
     url: `${location.origin}/api/toggles/proxy`,
     clientKey: 'proxy-secret',
     appName: process.env.VUE_APP_ENVIRONMENT || 'staging',
