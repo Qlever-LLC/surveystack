@@ -26,9 +26,23 @@ export const unleashProxyApp = createApp(config, client);
 /**
  * Makes sure that the toggles are loaded and reads the state of the requested feature
  * @param {string} toggleName
+ * @param {string} userId Optonal. Only needed for toggles with per-user enable strategies
  * @returns {Promise<boolean>} state of a feature toggle
  */
-export const isToggleOn = async (toggleName) => {
+export const isToggleOn = async (toggleName, userId) => {
   await waitReadyPromise;
-  return client.getEnabledToggles().some((toggle) => toggle.name === toggleName && toggle.enabled);
+  const context = { userId };
+  return client
+    .getEnabledToggles(context)
+    .some((toggle) => toggle.name === toggleName && toggle.enabled);
+};
+
+/**
+ * Add res.locals.isToggleOn(toggleName): Promise<boolean>
+ * Same as isToggleOn(toggleName, userId) but the userId will be filled from res.locals.auth.user._id
+ */
+export const toggleMiddleware = (req, res, next) => {
+  const userId = res.locals.auth.user?._id.toString();
+  res.locals.isToggleOn = (featureName) => isToggleOn(featureName, userId);
+  next();
 };
