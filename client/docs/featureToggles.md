@@ -8,7 +8,8 @@ SurveyStack uses [Unleash](https://github.com/Unleash/unleash) and its [GitLab i
  - Set a unique name (this name will be used in the source code to query the state of the toggle)
  - Click `Create feature flag`  
 
-*TODO: Add notes for rollout strategies*
+You'll find details about the different rollout strategies in the [GitLab docs](https://docs.gitlab.com/ee/operations/feature_flags.html#feature-flag-strategies)
+Note: we use `email` as `userId` which is important when setting up per-user or user-list based strategies.
 
 ## Reading a toggle in NodeJS
 Use `res.locals.isToggleOn(featureName)` to check if a toggle is enabled.
@@ -49,9 +50,10 @@ After a toggle has been enabled for a while and the feature seems to be stable w
     - This connects to the Unleash server provided by GitLab
  - The client connects to the proxy and keeps toggle states up to date in the `toggle` Vuex store
  - The backend can read toggle states directly from the proxy with the `isToggleOn` helper
+ - We send `email` as `userId` which makes it easier to maintain `User List`s on GitLab
 
 
 ## Further development
 The free hosted Unleash server is convenient, but its feature set is limited. If we need more features in the future, we could
  - Run our own unleash server. Unleash is open-source with a free core, so we can host our instance, even as part of the main NodeJS process. (It requires a Postgress DB)
- - Implement our solution. All requests goes through the Unleash Proxy in our NodeJS backend. We could replace this with something that reads toggle states from our DB. 
+ - Implement our solution. All requests go through the Unleash Proxy in our NodeJS backend. We could replace this with something that reads toggle states from our DB. 
