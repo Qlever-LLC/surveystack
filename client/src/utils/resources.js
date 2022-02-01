@@ -97,22 +97,8 @@ export async function openResourceInTab(resourceId) {
     resource = await store.dispatch('resources/fetchRemoteResource', resourceId);
   }
 
-  //let blob = new Blob([resource.fileData], { type: resource.contentType });
   let url = window.URL.createObjectURL(resource.fileData);
-
   window.open(url);
-
-  /*
-  let fileReader = new FileReader();
-  fileReader.readAsBinaryString(new Blob([resource.fileData]));
-  fileReader.onloadend = function () {
-    console.log(fileReader);
-    const url = window.URL.createObjectURL(
-      new File([fileReader.result], resource.name, { type: resource.contentType })
-    );
-    window.open(url, '_blank');
-  };
-   */
 }
 
 export async function uploadFile(file) {
