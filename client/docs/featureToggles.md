@@ -43,6 +43,8 @@ After a toggle has been enabled for a while and the feature seems to be stable w
     - You can use sentry.io to check how many of the users are updated to the new version.
     - Probably a good practice to mark the date of removal on the GitLab dashboard, in the feature flag description. 
 
+## Local development
+To connect to the service, we have to set the `UNLEASH_URL` and `UNLEASH_INSTANCE_ID` in `server/.env`. Both values can be found at [GitLab/Feature Flags/Configure](https://gitlab.com/our-sci/software/surveystack/-/feature_flags). See the example in `server/.env.defaults`.
 
 ## Implementation details
  - GitLab can host an [unleash server](https://github.com/Unleash/unleash) for every project
