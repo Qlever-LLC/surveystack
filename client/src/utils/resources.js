@@ -1,5 +1,8 @@
 import ObjectId from 'bson-objectid';
 import slugify from '@/utils/slugify';
+import api from '@/services/api.service';
+import axios from 'axios';
+import store from '../store';
 
 export const resourceTypes = {
   ONTOLOGY_LIST: 'ONTOLOGY_LIST',
@@ -17,10 +20,6 @@ export function filterResourcesByTypes(resources, types = []) {
     return resources;
   }
   return resources.filter((resource) => types.some((type) => type === resource.type));
-}
-
-export function getResource(resources, id) {
-  return resources.find((r) => r.id === id);
 }
 
 export function removeResource(resources, id) {
@@ -70,4 +69,64 @@ export function nameHasValidCharacters(val) {
 export function nameHasValidLength(val) {
   const namePattern = /^.{4,}$/; // one character should be ok, especially within groups
   return namePattern.test(val) ? true : 'Data name must be at least 4 character in length';
+}
+
+export async function getResource(resourceId) {
+  let response = await api.get(`/resources/${resourceId}`);
+  return response.data;
+}
+
+export async function getDownloadUrl(resourceId) {
+  // fetch resource
+  let resource = await getResource(resourceId);
+  // get download url
+  let response = await api.post(`/resources/download-url`, { key: resource.key });
+  return response.data;
+}
+
+export async function downloadResourceData(resourceId) {
+  const url = await getDownloadUrl(resourceId);
+  const response = await axios.get(url, { responseType: 'arraybuffer', validateStatus: false });
+  return response.data;
+}
+
+export async function openResourceInTab(resourceId) {
+  let resource = store.getters['resources/getResource'](resourceId);
+  if (!resource) {
+    // eslint-disable-next-line require-atomic-updates
+    resource = await store.dispatch('resources/fetchRemoteResource', resourceId);
+  }
+
+  //let blob = new Blob([resource.fileData], { type: resource.contentType });
+  let url = window.URL.createObjectURL(resource.fileData);
+
+  window.open(url);
+
+  /*
+  let fileReader = new FileReader();
+  fileReader.readAsBinaryString(new Blob([resource.fileData]));
+  fileReader.onloadend = function () {
+    console.log(fileReader);
+    const url = window.URL.createObjectURL(
+      new File([fileReader.result], resource.name, { type: resource.contentType })
+    );
+    window.open(url, '_blank');
+  };
+   */
+}
+
+export async function uploadFile(file) {
+  // TODO exception handling and rollback
+  // TODO use this from survey resources feature too
+  const body = {
+    resourceName: file.name,
+    contentLength: file.size,
+    contentType: file.type,
+  };
+  let { data: uploadData } = await api.post('/resources/upload-url', body);
+  // upload file to url
+  let putResponse = await axios.create().put(uploadData.signedUrl, file);
+  //set resource to committed
+  let commitResponse = await api.put(`/resources/commit/${uploadData.resourceId}`, { dummy: '' });
+  return uploadData.resourceId;
 }

@@ -4,9 +4,9 @@ import draft from './draft.store.js';
 import feedback from './feedback.store.js';
 import invitation from './invitation.store.js';
 import memberships from './memberships.store.js';
-import readyToSubmit from './readyToSubmit.store.js';
 import submissions from './submissions.store.js';
 import surveys from './surveys.store.js';
+import resources from './resources.store.js';
 import whitelabel from './whitelabel.store.js';
 
 export default {
@@ -16,8 +16,8 @@ export default {
   feedback,
   invitation,
   memberships,
-  readyToSubmit,
   submissions,
   surveys,
+  resources,
   whitelabel,
 };
