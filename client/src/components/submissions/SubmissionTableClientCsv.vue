@@ -36,6 +36,21 @@
         </v-toolbar>
       </template>
 
+      <template v-for="header in headers" v-slot:[`header.${header.value}`]>
+        <span :key="header.value" @click.stop="showFullHeaderText(header.value)">
+          <div :class="shouldTruncate(header.value) ? 'truncate-header' : 'non-truncated-header'">
+            {{ header.value }}
+          </div>
+          <span v-if="shouldHeaderModalOpen(header.value)">
+            <div class="overlay" @click.stop="closeHeaderModal()"></div>
+            <div class="header-modal-content">
+              <!-- <span class="black--text">{{ header.value }}</span> -->
+              <span>{{ header.value }}</span>
+            </div>
+          </span>
+        </span>
+      </template>
+
       <template v-slot:body="props">
         <tbody>
           <tr v-for="item in props.items" :key="item._id">
@@ -46,6 +61,7 @@
               v-for="header in headers"
               :key="header.text"
               @click.stop="showFullText(item[header.value], header, item)"
+              :class="{ active: isModalOpen(header.value, item._id) }"
             >
               <div :class="shouldTruncate(item[header.value]) ? 'truncate' : ''">
                 {{ item[header.value] }}
@@ -54,7 +70,10 @@
               <div class="modal" v-if="isModalOpen(header.value, item._id)" role="dialog">
                 <div class="overlay" @click.stop="closeModal()" data-testid="overlay"></div>
                 <div class="modal-content">
-                  <span class="black--text">{{ item[header.value] }}</span>
+                  <span :ref="getCellKey(header.value, item._id)" class="black--text">
+                    {{ item[header.value] }}
+                  </span>
+                  <copy-to-clipboard :value="item[header.value]">copy</copy-to-clipboard>
                 </div>
               </div>
             </td>
@@ -69,6 +88,8 @@
 <script>
 import papa from 'papaparse';
 import csvService from '@/services/csv.service';
+import Modal from '../Modal.vue';
+import CopyToClipboard from './CopyToClipboard.vue';
 
 export function transformHeaders(headers) {
   const replaceGeoJsonPath = (str) => str.replace(/(value\.features\.\d).*/, '$1');
@@ -81,6 +102,9 @@ export function getCellKey(headerValue, itemId) {
 }
 
 export default {
+  components: {
+    CopyToClipboard,
+  },
   props: {
     submissions: {
       type: Object,
@@ -115,6 +139,9 @@ export default {
     return {
       activeTableCell: null,
       textTruncateLength: 36,
+      fullHeaderText: null,
+      isopen: false,
+      isActive: false,
       csv: null,
       parsed: null,
       search: '',
@@ -154,6 +181,14 @@ export default {
     },
   },
   methods: {
+    getCellKey,
+    copy(headerValue, itemId) {
+      this.$refs[this.getCellKey(headerValue, itemId)][0].select();
+      document.execCommand('copy');
+    },
+    shouldTruncate(value) {
+      return value.length > this.textTruncateLength;
+    },
     showFullText(value, header, item) {
       if (value.length > this.textTruncateLength) {
         this.activeTableCell = `${header.value}_${item._id}`;
@@ -164,10 +199,23 @@ export default {
     },
     closeModal() {
       this.activeTableCell = null;
+      this.isopen = false;
     },
-    shouldTruncate(value) {
-      return value.length > this.textTruncateLength;
+
+    showFullHeaderText(value) {
+      this.fullHeaderText = value;
+      this.isopen = !this.isopen;
     },
+
+    shouldHeaderModalOpen(value) {
+      return this.fullHeaderText === value && this.fullHeaderText.length > this.textTruncateLength && this.isopen;
+    },
+
+    closeHeaderModal() {
+      this.fullHeaderText === null;
+      this.isopen = false;
+    },
+
     createCustomFilter(field) {
       return (value, search, item) => {
         if (!this.searchFields[field]) {
@@ -189,7 +237,6 @@ export default {
             text: header,
             value: header,
             filter: this.createCustomFilter(header),
-            class: 'custom-header-class',
           });
         });
       }
@@ -225,20 +272,22 @@ export default {
 .archived {
   color: #777 !important;
 }
-.v-data-table >>> .custom-header-class span {
-  display: inline-block;
-  max-width: 250px;
+
+.custom-checkbox {
+  margin-top: -0.3rem;
 }
 
 .truncate {
   cursor: pointer;
   max-width: 250px;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.custom-checkbox {
-  margin-top: -0.3rem;
+.non-truncated-header {
+  transform: translateY(5px);
+  display: inline-block;
 }
 
 .modal {
@@ -252,16 +301,53 @@ export default {
   padding: 0.5rem;
   white-space: initial;
   position: absolute;
-  z-index: 1;
+  transform: translate(-15px, -140%);
   height: 100px;
-  width: 500px;
+  width: 400px;
   overflow: scroll;
 }
+/* header modal styles */
+.truncate-header {
+  display: inline-block;
+  cursor: pointer;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transform: translateY(5px);
+}
+
+.header-modal-content {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  background-color: white;
+  width: 100%;
+  padding: 0.5rem;
+  white-space: initial;
+  position: absolute;
+  transform: translateY(-70px);
+  min-height: 40px;
+  width: 400px;
+  overflow: scroll;
+}
+
 .overlay {
   position: absolute;
   top: 0;
   left: 0;
   bottom: 0;
   right: 0;
+}
+.active {
+  background-color: #d8d5d5;
+}
+.custom-input {
+  width: 100%;
+  height: 100%;
+  /* white-space: initial; */
+  /* display: inline; */
+  resize: none;
+  border: none;
+  outline: none;
+  padding: 0;
 }
 </style>
