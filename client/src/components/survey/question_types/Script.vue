@@ -187,6 +187,7 @@ export default {
       const contextJSON = JSON.stringify(this.meta.context || {});
       const controlJSON = JSON.stringify(this.control);
       const paramsJSON = JSON.stringify((this.control.options && this.control.options.params) || {});
+      const surveyJSON = JSON.stringify(this.survey);
 
       const html = buildScriptQuestionIframeContents({
         scriptSource: this.source.content,
@@ -196,6 +197,7 @@ export default {
         contextJSON,
         controlJSON,
         paramsJSON,
+        surveyJSON,
       });
       iframe.src = `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
 
