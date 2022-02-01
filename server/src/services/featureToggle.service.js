@@ -44,7 +44,7 @@ export const isToggleOn = async (toggleName, userId) => {
  * Same as isToggleOn(toggleName, userId) but the userId will be filled from res.locals.auth.user._id
  */
 export const toggleMiddleware = (req, res, next) => {
-  const userId = res.locals.auth.user?._id.toString();
-  res.locals.isToggleOn = (featureName) => isToggleOn(featureName, userId);
+  const email = String(res.locals.auth.user?.email).toLowerCase();
+  res.locals.isToggleOn = (featureName) => isToggleOn(featureName, email);
   next();
 };

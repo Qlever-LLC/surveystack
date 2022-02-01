@@ -30,7 +30,7 @@ export const startToggle = (store) => {
 
   // Keep the user ID in sync with the store
   store.watch(
-    (_, getters) => getters['auth/user']._id,
+    (_, getters) => String(getters['auth/user'].email).toLowerCase(),
     (userId) => {
       // set the user ID in the context so randomly enabled features can be consistent per user
       unleash.updateContext({ userId });
