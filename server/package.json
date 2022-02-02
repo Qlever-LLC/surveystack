@@ -39,6 +39,7 @@
     "@babel/runtime": "^7.14.6",
     "@elastic/elasticsearch": "^7.16.0",
     "@hapi/boom": "^8.0.1",
+    "@unleash/proxy": "^0.5.0",
     "assert": "^2.0.0",
     "axios": "^0.19.2",
     "bcrypt": "^5.0.1",
