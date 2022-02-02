@@ -88,6 +88,8 @@ deploy to prod:
     - echo "ELASTIC_CLOUD_ID=$ELASTIC_CLOUD_ID" >> .env
     - echo "ELASTIC_AUTH_USERNAME=$ELASTIC_AUTH_USERNAME" >> .env
     - echo "ELASTIC_AUTH_PASSWORD=$ELASTIC_AUTH_PASSWORD" >> .env
+    - echo "UNLEASH_URL=$UNLEASH_URL" >> .env
+    - echo "UNLEASH_INSTANCE_ID=$UNLEASH_INSTANCE_ID" >> .env
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" up -d
@@ -208,6 +210,8 @@ deploy to review 1:
     - echo "ELASTIC_CLOUD_ID=$ELASTIC_CLOUD_ID" >> .env
     - echo "ELASTIC_AUTH_USERNAME=$ELASTIC_AUTH_USERNAME" >> .env
     - echo "ELASTIC_AUTH_PASSWORD=$ELASTIC_AUTH_PASSWORD" >> .env
+    - echo "UNLEASH_URL=$UNLEASH_URL" >> .env
+    - echo "UNLEASH_INSTANCE_ID=$UNLEASH_INSTANCE_ID" >> .env
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" up -d
