@@ -15,7 +15,7 @@ import resourceController from '../controllers/resourceController';
 
 import groupIntegrationController from '../controllers/groupIntegrationController';
 import membershipIntegrationController from '../controllers/membershipIntegrationController';
-import { unleashProxyApp } from '../services/featureToggle.service';
+import { isToggleOn, unleashProxyApp } from '../services/featureToggle.service';
 
 import cfsController from '../controllers/cfsController';
 
@@ -31,6 +31,7 @@ import {
   assertEntitiesRights,
   assertHasIds,
   validateBulkReassignRequestBody,
+  checkFeatureToggledOn,
 } from '../handlers/assertions';
 
 import { catchErrors } from '../handlers/errorHandlers';
@@ -297,26 +298,31 @@ router.delete(
 // Call for submissions (CFS)
 router.post('/call-for-submissions/send', [assertAuthenticated], catchErrors(cfsController.send));
 
-// resources
-if (process.env.FEATURE_RESOURCES === 'true') {
-  router.get('/resources/:id', catchErrors(resourceController.getResource));
-  router.post('/resources/download-url', catchErrors(resourceController.getDownloadURL));
-  router.post(
-    '/resources/upload-url',
-    [assertAuthenticated],
-    catchErrors(resourceController.getUploadURL)
-  );
-  router.put(
-    '/resources/commit/:id',
-    [assertAuthenticated],
-    catchErrors(resourceController.commitResource)
-  );
-  router.delete(
-    '/resources/:id',
-    [assertAuthenticated],
-    catchErrors(resourceController.deleteResource)
-  );
-}
+router.get(
+  '/resources/:id',
+  [checkFeatureToggledOn('feature_resource')],
+  catchErrors(resourceController.getResource)
+);
+router.post(
+  '/resources/download-url',
+  [checkFeatureToggledOn('feature_resource')],
+  catchErrors(resourceController.getDownloadURL)
+);
+router.post(
+  '/resources/upload-url',
+  [checkFeatureToggledOn('feature_resource'), assertAuthenticated],
+  catchErrors(resourceController.getUploadURL)
+);
+router.put(
+  '/resources/commit/:id',
+  [checkFeatureToggledOn('feature_resource'), assertAuthenticated],
+  catchErrors(resourceController.commitResource)
+);
+router.delete(
+  '/resources/:id',
+  [checkFeatureToggledOn('feature_resource'), assertAuthenticated],
+  catchErrors(resourceController.deleteResource)
+);
 
 // info
 router.get('/info/ip', catchErrors(infoController.getIP));
