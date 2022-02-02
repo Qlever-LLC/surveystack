@@ -16,6 +16,9 @@ module.exports = {
     'no-continue': 0,
     'no-param-reassign': 1,
     'brace-style': 1,
+    'prefer-const': 1,
+    curly: 1,
+    'prefer-template': 1,
   },
   globals: {},
   parserOptions: {
