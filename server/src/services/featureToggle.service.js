@@ -13,7 +13,7 @@ const config = {
   unleashUrl: process.env.UNLEASH_URL,
   unleashApiToken: '_',
   unleashInstanceId: process.env.UNLEASH_INSTANCE_ID,
-  clientKeys: ['proxy-secret'],
+  clientKeys: ['proxy'],
   refreshInterval: 1000,
   unleashAppName: process.env.UNLEASH_APP_NAME,
 };
