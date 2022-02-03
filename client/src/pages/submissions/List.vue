@@ -48,17 +48,19 @@
     </app-dialog>
 
     <v-container>
-      <div class="d-flex justify-end">
-        <v-btn v-if="survey" outlined color="secondary" :to="`/surveys/${survey}`">
-          <v-icon left>mdi-note-text-outline</v-icon>
-          View Survey
-        </v-btn>
-        <v-btn outlined color="secondary" class="ml-2" @click="startDraft(survey)">
-          <v-icon left>mdi-plus</v-icon>
-          New submission
-        </v-btn>
+      <div class="d-flex justify-space-between align-center mb-5 mt-5">
+        <h1 v-if="surveyEntity">{{ surveyEntity.name }}</h1>
+        <div class="d-flex justify-end">
+          <v-btn v-if="survey" outlined color="secondary" :to="`/surveys/${survey}`">
+            <v-icon left>mdi-note-text-outline</v-icon>
+            View Survey
+          </v-btn>
+          <v-btn outlined color="secondary" class="ml-2" @click="startDraft(survey)">
+            <v-icon left>mdi-plus</v-icon>
+            New submission
+          </v-btn>
+        </div>
       </div>
-      <h1 v-if="surveyEntity">{{ surveyEntity.name }}</h1>
 
       <app-submissions-filter-basic
         v-if="!showAdvancedFilters && queryList"
