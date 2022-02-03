@@ -2,7 +2,6 @@
   <v-btn @click.stop="copyText" icon class="button">
     <v-icon>mdi-content-copy</v-icon>
   </v-btn>
-  <!-- <v-btn @click.stop="copyText" class="button">copy</v-btn> -->
 </template>
 
 <script>

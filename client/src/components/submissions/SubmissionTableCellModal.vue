@@ -1,13 +1,36 @@
 <template>
-  <div class="modal" v-if="isModalOpen(header.value, item._id)" role="dialog">
+  <span class="modal" role="dialog">
     <div class="overlay" @click.stop="closeModal()" data-testid="overlay"></div>
     <div class="modal-content">
-      <span class="black--text">{{ item[header.value] }}</span>
+      <span :ref="id" class="font-weight-regular">
+        {{ value }}
+      </span>
+      <copy-to-clipboard v-if="copy" :value="value">copy</copy-to-clipboard>
     </div>
-  </div>
+  </span>
 </template>
 <script>
-export default {};
+import CopyToClipboard from './CopyToClipboard.vue';
+export default {
+  components: {
+    CopyToClipboard,
+  },
+  props: {
+    value: {
+      type: String,
+    },
+    closeModal: {
+      required: true,
+    },
+    id: {
+      required: false,
+    },
+    copy: {
+      type: Boolean,
+      default: false,
+    },
+  },
+};
 </script>
 <style scoped>
 .modal {
@@ -21,7 +44,7 @@ export default {};
   padding: 0.5rem;
   white-space: initial;
   position: absolute;
-  z-index: 1;
+  transform: translate(-15px, -140%);
   min-height: 40px;
   max-height: 100px;
   width: 400px;
