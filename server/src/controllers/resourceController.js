@@ -25,19 +25,25 @@ const getUploadURL = async (req, res) => {
   // define s3 file key containing unique uuid to prevent filename collision, allowed characters see https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
   let resourceId = new ObjectId();
   let key = 'resources/' + resourceId + '/' + resourceName;
-  // get signed upload url for a fixed contenttype and contentlength
-  let signedUrl = await bucketService.getUploadUrl(key, contentType, contentLength);
-  // add resource entry to our db
-  await addResource(
-    resourceId,
-    LOCATION_S3,
-    key,
-    resourceName,
-    contentLength,
-    contentType,
-    res.locals.auth.user._id
-  );
-  return res.send({ signedUrl, resourceId });
+
+  try {
+    // get signed upload url for a fixed contenttype and contentlength
+    let signedUrl = await bucketService.getUploadUrl(key, contentType, contentLength);
+    // add resource entry to our db
+    let r = await addResource(
+      resourceId,
+      LOCATION_S3,
+      key,
+      resourceName,
+      contentLength,
+      contentType,
+      res.locals.auth.user._id
+    );
+    assert.equal(1, r.insertedCount);
+    return res.send({ signedUrl, resourceId });
+  } catch (error) {
+    return res.status(500).send({ message: 'Ouch :/' });
+  }
 };
 
 const addResource = async (
@@ -65,29 +71,36 @@ const addResource = async (
       dateModified: null,
     },
   };
-  // TODO find a good pattern in use for error handling
-  await db.collection(col).insertOne(resource);
+  return await db.collection(col).insertOne(resource);
 };
 
 const commitResource = async (req, res) => {
   const { id } = req.params;
+
+  // load resource
   const resource = await db.collection(col).findOne({ _id: new ObjectId(id) });
   if (!resource) {
     return res.status(404).send({
       message: `No entity with _id exists: ${id}`,
     });
   }
-  // TODO find a good pattern in use for error handling
-  await db.collection(col).updateOne(
-    { _id: new ObjectId(id) },
-    {
-      $set: {
-        state: 'committed',
-        'meta.dateModified': new Date(),
-      },
-    }
-  );
-  res.send({ message: 'OK' });
+
+  try {
+    // set resource to committed state
+    let r = await db.collection(col).updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          state: 'committed',
+          'meta.dateModified': new Date(),
+        },
+      }
+    );
+    assert.equal(1, r.modifiedCount);
+    return res.send({ message: 'OK' });
+  } catch (error) {
+    return res.status(500).send({ message: 'Ouch :/' });
+  }
 };
 
 const deleteResource = async (req, res) => {
@@ -96,16 +109,17 @@ const deleteResource = async (req, res) => {
   // load resource
   const resource = await db.collection(col).findOne({ _id: new ObjectId(id) });
   if (!resource) {
-    return res.status(404).send({ message: 'Not found' });
+    return res.status(404).send({
+      message: `No entity with _id exists: ${id}`,
+    });
   }
 
-  //delete resource in aws
-  const deleteResult = await bucketService.deleteObject(resource.key);
-  //TODO handle s3 delete errors
-  console.log(deleteResult);
-
-  //delete resource
   try {
+    //delete resource in aws
+    const deleteResult = await bucketService.deleteObject(resource.key);
+    assert.equal(204, deleteResult.$metadata.httpStatusCode);
+
+    //delete resource in surveystack
     let r = await db.collection(col).deleteOne({ _id: new ObjectId(resource._id) });
     assert.equal(1, r.deletedCount);
     return res.send({ message: 'OK' });
