@@ -4,5 +4,5 @@ module.exports = {
 	resetModules: true,
 	resetMocks: true,
 	moduleFileExtensions: ['js'],
-	setupFilesAfterEnv: ['./tests/setupTests.js'],
+	setupFilesAfterEnv: ['./tests/setupTests.js', './tests/setupInMemoryMongo.js'],
 };

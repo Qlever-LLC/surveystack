@@ -16,11 +16,14 @@
 
         <v-text-field v-if="entity.user" class="mt-3" v-model="entity.user" label="User" disabled />
 
+        <v-text-field class="mt-3" v-model="entity.meta.invitationEmail" label="Invitation Email" disabled />
+
         <v-text-field
+          v-if="entity.meta.status === 'pending'"
           class="mt-3"
-          v-model="entity.meta.invitationEmail"
-          label="Invitation Email"
-          :disabled="entity.meta.status === 'active'"
+          v-model="entity.meta.invitationName"
+          label="Invitee Name"
+          hint="Default name for newly registered users"
         />
 
         <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role"></v-select>

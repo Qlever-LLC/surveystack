@@ -1,6 +1,7 @@
 import api from '@/services/api.service';
-
+import { autoSelectActiveGroup } from '@/utils/memberships';
 import { MembershipService, GroupService } from '@/services/storage.service';
+import { get } from 'lodash';
 
 const createInitialState = () => ({
   status: MembershipService.getStatus(),
@@ -56,6 +57,28 @@ const actions = {
     } catch (err) {
       console.log(err);
       GroupService.clear();
+    }
+  },
+  async tryAutoJoinAndSelectGroup(store) {
+    if (store.rootGetters['auth/isLoggedIn']) {
+      try {
+        const options = {
+          getters: store.rootGetters,
+          dispatch: (path, payload) => store.dispatch(path, payload, { root: true }),
+        };
+        // try to auto join group if this is a whitelabel
+        if (store.rootGetters['whitelabel/isWhitelabel']) {
+          const partnerId = store.rootGetters['whitelabel/partner'].id;
+          await api.post(`/memberships/join-group?id=${partnerId}`);
+          await autoSelectActiveGroup(options, partnerId);
+        } else {
+          // auto select the first group of the user
+          await autoSelectActiveGroup(options, null, true);
+        }
+      } catch (error) {
+        store.dispatch('feedback/add', get(error, 'response.data.message') || error, { root: true });
+        console.error(error);
+      }
     }
   },
 };
