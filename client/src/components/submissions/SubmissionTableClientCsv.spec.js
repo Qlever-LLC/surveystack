@@ -152,9 +152,6 @@ const mockSubmissions = () => {
   };
 };
 
-const store = {};
-const noRoutes = [];
-
 function mockHeaders() {
   return [
     '_id',
