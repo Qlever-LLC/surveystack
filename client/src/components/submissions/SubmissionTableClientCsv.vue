@@ -59,7 +59,7 @@
 <script>
 import papa from 'papaparse';
 import csvService from '@/services/csv.service';
-import { downloadResource } from '@/utils/resources';
+import { openResourceInTab } from '@/utils/resources';
 
 export function transformHeaders(headers) {
   const replaceGeoJsonPath = (str) => str.replace(/(value\.features\.\d).*/, '$1');
@@ -179,7 +179,7 @@ export default {
     },
     async openResource(value) {
       let resourceId = value.replace('ResourceId:', '');
-      await downloadResource(resourceId);
+      await openResourceInTab(resourceId);
     },
   },
   async created() {

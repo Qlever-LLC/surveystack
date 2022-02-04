@@ -23,7 +23,7 @@ const actions = {
     await db.persistResource(resource);
     commit('ADD_RESOURCE', resource);
   },
-  async fetchLocalResources({ commit }) {
+  async initFromIndexedDB({ commit }) {
     // TODO reject if timeout here
     const response = await new Promise((resolve) => {
       db.openDb(() => {

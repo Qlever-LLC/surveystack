@@ -35,6 +35,7 @@ export default {
   },
   mounted() {
     this.$store.dispatch('surveys/fetchPinned');
+    this.$store.dispatch('resources/initFromIndexedDB');
 
     if (this.$store.getters['auth/isLoggedIn']) {
       api.get('farmos/fields');

@@ -1,5 +1,8 @@
 import ObjectId from 'bson-objectid';
 import slugify from '@/utils/slugify';
+import api from '@/services/api.service';
+import axios from 'axios';
+import store from '../store';
 
 export const resourceTypes = {
   ONTOLOGY_LIST: 'ONTOLOGY_LIST',
@@ -17,10 +20,6 @@ export function filterResourcesByTypes(resources, types = []) {
     return resources;
   }
   return resources.filter((resource) => types.some((type) => type === resource.type));
-}
-
-export function getResource(resources, id) {
-  return resources.find((r) => r.id === id);
 }
 
 export function removeResource(resources, id) {
@@ -72,7 +71,6 @@ export function nameHasValidLength(val) {
   return namePattern.test(val) ? true : 'Data name must be at least 4 character in length';
 }
 
-//TODO from frontend_survey
 export async function getResource(resourceId) {
   let response = await api.get(`/resources/${resourceId}`);
   return response.data;
@@ -105,7 +103,6 @@ export async function openResourceInTab(resourceId) {
 
 export async function uploadFile(file) {
   // TODO exception handling and rollback
-  // TODO use this from survey resources feature too
   const body = {
     resourceName: file.name,
     contentLength: file.size,
@@ -118,8 +115,6 @@ export async function uploadFile(file) {
   let commitResponse = await api.put(`/resources/commit/${uploadData.resourceId}`, { dummy: '' });
   return uploadData.resourceId;
 }
-
-//TODO from frontend_submission
 
 export async function uploadFileResources(submission) {
   let submissionClone = submission; //cloneDeep(submission);
@@ -145,29 +140,4 @@ export async function uploadFileResources(submission) {
   );*/
 
   return submissionClone;
-}
-
-async function uploadFile(file) {
-  // TODO exception handling and rollback
-  // TODO use this from survey resources feature too
-  const body = {
-    resourceName: file.name,
-    contentLength: file.size,
-    contentType: file.type,
-  };
-  let { data: uploadData } = await api.post('/resources/upload-url', body);
-  // upload file to url
-  let putResponse = await axios.create().put(uploadData.signedUrl, file);
-  //set resource to committed
-  let commitResponse = await api.put(`/resources/commit/${uploadData.resourceId}`, { dummy: '' });
-  return uploadData.resourceId;
-}
-
-export async function downloadResource(resourceId) {
-  // fetch resource
-  let response = await api.get(`/resources/${resourceId}`);
-  // get download url
-  response = await api.post(`/resources/download-url`, { key: response.data.key });
-  // open url in new tab
-  window.open(response.data, '_blank');
 }

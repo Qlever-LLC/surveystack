@@ -190,7 +190,6 @@ export default {
     await Promise.all([
       this.$store.dispatch('submissions/fetchLocalSubmissions'),
       this.$store.dispatch('surveys/fetchSurveys'),
-      this.$store.dispatch('resources/fetchLocalResources'),
     ]);
   },
   beforeDestroy() {
