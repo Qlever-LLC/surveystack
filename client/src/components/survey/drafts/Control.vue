@@ -1,12 +1,12 @@
 <template>
-  <div class="mx-0 px-0" style="width: 100%">
-    <div v-if="control.type === 'page' && !insidePage">
+  <div class="mx-0 px-0 full-width">
+    <template v-if="control.type === 'page' && !insidePage">
       <div v-for="(child, i) in control.children" :key="i">
         <app-control :path="`${path}.${child.name}`" :control="child" :autoFocus="i === 0" insidePage />
       </div>
-    </div>
+    </template>
 
-    <div v-else-if="control.type === 'group' && insidePage">
+    <template v-else-if="control.type === 'group' && insidePage">
       <div
         class="group"
         :class="{
@@ -23,11 +23,11 @@
 
         <app-control-more-info :value="control.moreInfo" />
       </div>
-    </div>
+    </template>
 
-    <div v-else>
+    <template v-else>
       <div
-        class="control"
+        class="control full-height"
         :class="{
           irrelevant: !$store.getters['draft/relevance'](path),
           hidden: !$store.getters['draft/relevance'](path) && insidePage,
@@ -56,7 +56,7 @@
           :survey="survey"
         />
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -141,7 +141,7 @@ export default {
 .control {
   margin: 8px 0px;
   padding: 1rem;
-  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  /* box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2); */
   border-left: 4px solid #fff;
   transition: 0.3s;
   background-color: #ffffff;
@@ -178,9 +178,5 @@ export default {
 .irrelevant:hover {
   border-left: 4px solid #aaa;
   box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
-}
-
-.title {
-  font-family: 'Google Sans', Roboto, Arial, sans-serif;
 }
 </style>

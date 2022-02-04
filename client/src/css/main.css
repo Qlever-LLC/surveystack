@@ -4,8 +4,6 @@ html {
 
 body {
   height: 100%;
-  /*overflow-y: scroll;*/
-  /*overflow-y: auto;*/
   -webkit-overflow-scrolling: touch;
 }
 
@@ -51,6 +49,10 @@ body {
 
 .full-width {
   width: 100%;
+}
+
+.full-height {
+  height: 100%;
 }
 
 .p-relative {
