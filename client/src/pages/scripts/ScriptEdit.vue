@@ -68,7 +68,7 @@ export default {
  * @param {state} state
  */
 export async function process(props, state) {
-  const { submission, parent, control, params } = props;
+  const { submission, parent, control, params, survey } = props;
   const { value, context } = state;
 
   // do stuff
@@ -91,7 +91,7 @@ export async function process(props, state) {
  * @param {setState} setState
  */
 export function render(props, state, setState) {
-  const { submission, parent, control, params } = props;
+  const { submission, parent, control, params, survey } = props;
   const { value, context } = state;
   const ui = createUI();
 
