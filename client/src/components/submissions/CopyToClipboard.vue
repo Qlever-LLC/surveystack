@@ -27,7 +27,6 @@ export default {
 <style scoped>
 .button {
   display: inline-block;
-  line-height: 0;
   margin: -5px 0;
 }
 </style>

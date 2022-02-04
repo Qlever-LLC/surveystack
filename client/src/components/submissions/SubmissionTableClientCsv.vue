@@ -40,15 +40,15 @@
         <span
           :key="header.value"
           @click.stop="showFullHeaderText(header.value)"
-          :class="{ activeHeader: shouldHeaderModalOpen(header.value) }"
+          :class="{ activeHeader: isHeaderModalOpen(header.value) }"
         >
           <div :class="shouldTruncate(header.value) ? 'truncate-header' : 'non-truncated-header'">
             {{ header.value }}
           </div>
           <submission-table-cell-modal
-            v-if="shouldHeaderModalOpen(header.value)"
+            v-if="isHeaderModalOpen(header.value)"
             :value="header.value"
-            :closeModal="closeHeaderModal"
+            @close="closeHeaderModal"
           />
         </span>
       </template>
@@ -70,18 +70,16 @@
               </div>
               <submission-table-cell-modal
                 v-if="isModalOpen(header.value, item._id)"
-                :closeModal="closeModal"
-                :id="getCellKey(header.value, item._id)"
+                @close="closeModal"
                 :value="item[header.value]"
-                :copy="true"
+                :showCopyButton="true"
               />
             </td>
+            <!-- :closeModal="closeModal" -->
           </tr>
         </tbody>
       </template>
     </v-data-table>
-
-    <!--   -->
   </v-card>
 </template>
 <script>
@@ -138,7 +136,6 @@ export default {
       activeTableCell: null,
       textTruncateLength: 36,
       fullHeaderText: null,
-      isopen: false,
       csv: null,
       parsed: null,
       search: '',
@@ -178,7 +175,6 @@ export default {
     },
   },
   methods: {
-    getCellKey,
     shouldTruncate(value) {
       return value.length > this.textTruncateLength;
     },
@@ -193,21 +189,18 @@ export default {
 
     showFullHeaderText(value) {
       this.fullHeaderText = value;
-      this.isopen = !this.isopen;
     },
 
-    shouldHeaderModalOpen(value) {
-      return this.fullHeaderText === value && this.fullHeaderText.length > this.textTruncateLength && this.isopen;
+    isHeaderModalOpen(value) {
+      return this.fullHeaderText === value && this.fullHeaderText.length > this.textTruncateLength;
     },
 
     closeHeaderModal() {
       this.fullHeaderText = null;
-      this.isopen = false;
     },
 
     closeModal() {
       this.activeTableCell = null;
-      this.isopen = false;
     },
 
     createCustomFilter(field) {
@@ -263,6 +256,9 @@ export default {
   font-family: monospace;
   white-space: nowrap;
 }
+.v-data-table >>> th {
+  white-space: nowrap;
+}
 .archived {
   color: #777 !important;
 }
@@ -280,7 +276,7 @@ export default {
 }
 
 .non-truncated-header {
-  transform: translateY(5px);
+  margin-top: 5px;
   display: inline-block;
 }
 
@@ -292,7 +288,7 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transform: translateY(5px);
+  margin-top: 5px;
 }
 
 .active,
@@ -300,6 +296,6 @@ export default {
   background-color: #d8d5d5;
 }
 .activeHeader {
-  padding: 0.9rem;
+  padding: 0.9rem 0;
 }
 </style>

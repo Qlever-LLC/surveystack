@@ -1,11 +1,11 @@
 <template>
   <span class="modal" role="dialog">
-    <div class="overlay" @click.stop="closeModal()" data-testid="overlay"></div>
+    <div class="overlay" @click.stop="$emit('close', $event.target.value)" data-testid="overlay"></div>
     <div class="modal-content">
-      <span :ref="id" class="font-weight-regular">
+      <span class="font-weight-regular">
         {{ value }}
       </span>
-      <copy-to-clipboard v-if="copy" :value="value">copy</copy-to-clipboard>
+      <copy-to-clipboard v-if="showCopyButton" :value="value" />
     </div>
   </span>
 </template>
@@ -19,13 +19,7 @@ export default {
     value: {
       type: String,
     },
-    closeModal: {
-      required: true,
-    },
-    id: {
-      required: false,
-    },
-    copy: {
+    showCopyButton: {
       type: Boolean,
       default: false,
     },
@@ -48,7 +42,7 @@ export default {
   min-height: 40px;
   max-height: 100px;
   width: 400px;
-  overflow: scroll;
+  overflow-y: auto;
 }
 .overlay {
   position: absolute;
