@@ -19,7 +19,7 @@
           </v-btn>
         </template>
         <v-list>
-          <v-list-item class="d-flex align-center">
+          <v-list-item v-if="$store.getters['toggle/isOn']['feature_resource']" class="d-flex align-center">
             <v-list-item-title>
               <v-btn text @click="importResource">
                 <v-icon color="grey">mdi-plus</v-icon>
@@ -29,7 +29,7 @@
               </v-btn>
             </v-list-item-title>
           </v-list-item>
-          <v-list-item class="d-flex align-center">
+          <v-list-item v-if="$store.getters['toggle/isOn']['feature_resource']" class="d-flex align-center">
             <v-list-item-title>
               <v-input hide-details>
                 <label for="upload-resource" class="cursor-pointer">
