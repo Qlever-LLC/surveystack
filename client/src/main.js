@@ -5,6 +5,7 @@ import './registerServiceWorker';
 import router from './router';
 import store from './store';
 import vuetify from './plugins/vuetify';
+import { startToggle } from './plugins/toggle';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '@mdi/font/css/materialdesignicons.css';
 import './css/transitions.css';
@@ -17,6 +18,8 @@ import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlError from '@/components/survey/drafts/ControlError.vue';
+
+startToggle(store);
 
 Vue.component('app-control-label', appControlLabel);
 Vue.component('app-control-hint', appControlHint);

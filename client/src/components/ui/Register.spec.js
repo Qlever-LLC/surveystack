@@ -105,7 +105,6 @@ describe('Register component', () => {
             'whitelabel/partner': () => ({
               id: 1,
             }),
-            'invitation/hasInvitation': () => false,
           },
           actions: {
             'auth/login': jest.fn(() => Promise.resolve()),
@@ -156,7 +155,6 @@ describe('Register component', () => {
             'whitelabel/partner': () => ({
               id: 1,
             }),
-            'invitation/hasInvitation': () => false,
           },
           actions: {
             'auth/login': jest.fn(() => Promise.resolve()),
@@ -199,7 +197,6 @@ describe('Register component', () => {
         store: {
           getters: {
             'whitelabel/isWhitelabel': () => false,
-            'invitation/hasInvitation': () => false,
           },
           actions: {
             'auth/login': jest.fn(() => Promise.resolve()),
@@ -232,53 +229,12 @@ describe('Register component', () => {
       expect(push).toHaveBeenCalledWith(true);
     });
 
-    it("submit and get the redirection 'name: 'invitations' & code' ", async () => {
-      const push = jest.fn();
-      const { getByLabelText, getByText } = renderWithVuetify(Register, {
-        store: {
-          getters: {
-            'whitelabel/isWhitelabel': () => false,
-            'invitation/hasInvitation': () => true,
-            'invitation/code': () => '123aeb456',
-          },
-          actions: {
-            'auth/login': jest.fn(() => Promise.resolve()),
-            'surveys/fetchPinned': jest.fn(),
-          },
-        },
-        mocks: {
-          $route: {
-            params: { redirect: false },
-            query: {},
-          },
-          $router: {
-            push,
-          },
-        },
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
-        },
-      });
-      const emailInput = getByLabelText('E-Mail');
-      fireEvent.update(emailInput, 'email@mail.com');
-      const passwordInput = getByLabelText('Password');
-      fireEvent.update(passwordInput, 'samePassword');
-
-      const button = getByText('Sign up');
-      await fireEvent.click(button);
-      // wait for Promise for pending result
-      await new Promise((resolve) => setTimeout(resolve, 0));
-      expect(push).toHaveBeenCalledWith({ name: 'invitations', query: { code: '123aeb456' } });
-    });
-
     it("submit and get the redirection '/' ", async () => {
       const push = jest.fn();
       const { getByLabelText, getByText } = renderWithVuetify(Register, {
         store: {
           getters: {
             'whitelabel/isWhitelabel': () => false,
-            'invitation/hasInvitation': () => false,
           },
           actions: {
             'auth/login': jest.fn(() => Promise.resolve()),

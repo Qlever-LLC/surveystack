@@ -141,7 +141,10 @@
     >
       <template v-slot:entity="{ entity }">
         <v-list-item-content v-if="entity.meta && entity.meta.status === 'pending'">
-          <v-list-item-title class="text--secondary">[Pending] {{ entity.meta.invitationEmail }}</v-list-item-title>
+          <v-list-item-title class="text--secondary"
+            >[Pending] {{ entity.meta.invitationEmail
+            }}{{ entity.meta.invitationName ? ` - ${entity.meta.invitationName}` : '' }}</v-list-item-title
+          >
           <v-list-item-subtitle>{{
             entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'
           }}</v-list-item-subtitle>
