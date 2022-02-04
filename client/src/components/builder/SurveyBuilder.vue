@@ -166,16 +166,15 @@
           ></code-editor>
         </div>
       </pane>
-      <pane class="pane pane-draft" :style="{ width: isPreviewMobile ? '375px' : '800px' }">
-        <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
-        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px); overflow: auto;">
+      <pane class="pane pane-draft" :style="{ width: isPreviewMobile ? '375px' : '900px' }">
+        <div class="full-height">
           <app-draft-component
             @submit="(payload) => $emit('submit', payload)"
             v-if="survey && instance"
             :submission="instance"
             :survey="survey"
             :persist="false"
-            class="builder-draft"
+            class="builder-draft full-height"
             builder
             :forceMobile="isPreviewMobile"
           >
@@ -878,20 +877,14 @@ export default {
     this.createInstance();
     this.checkForLibraryUpdates(this.survey);
   },
-
-  // TODO: get route guard to work here, or move dirty flag up to Builder.vue
-  // beforeRouteLeave(to, from, next) {
-  //   console.log('hello');
-  //   if (true) {
-  //     this.$refs.confirmLeaveDialog.open(next);
-  //     return;
-  //   }
-  //   next(true);
-  // },
 };
 </script>
 
 <style scoped>
+.builder-draft {
+  overflow: auto;
+}
+
 .screen-root {
   width: 100%;
   height: 100%;
@@ -1010,22 +1003,6 @@ export default {
 .editor-hidden {
   transform: translateX(100%);
 }
-
-/* .pane::-webkit-scrollbar {
-  width: 12px;
-  background-color: #f5f5f5;
-} */
-
-/* .pane::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
-  background-image: linear-gradient(120deg, #f44336 0%, #d67a74 100%);
-} */
-/* .pane::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
-  background-color: #f5f5f5;
-  border-radius: 10px;
-} */
 
 .pane-fixed-wrapper {
   height: 100%;

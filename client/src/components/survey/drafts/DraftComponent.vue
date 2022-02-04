@@ -1,7 +1,7 @@
 <template>
-  <div class="outer-wrapper">
+  <div class="outer-wrapper" :class="{ builder: builder }">
     <div class="gutter"></div>
-    <div class="draft-component-wrapper draft wrapper" :class="{ builder: builder }" v-if="control" ref="wrapper">
+    <div class="draft-component-wrapper draft wrapper d-flex flex-column" v-if="control" ref="wrapper">
       <!-- confirm submission modal -->
       <app-confirm-submission-dialog
         v-if="showConfirmSubmission"
@@ -40,7 +40,7 @@
       </div>
 
       <!-- Content with questions -->
-      <div class="draft-content" v-else>
+      <div class="draft-content flex-grow-1 justify-space-between" v-else>
         <v-fab-transition>
           <v-btn
             v-show="overflowing"
@@ -59,7 +59,7 @@
           </v-btn>
         </v-fab-transition>
         <app-control
-          class="my-auto maxw-60 mx-auto"
+          class="maxw-60 mx-auto"
           :path="path"
           :control="control"
           :forceMobile="forceMobile"
@@ -68,13 +68,13 @@
       </div>
 
       <!-- Footer with next/prev buttons -->
+      <!-- :style="{
+            left: moveFooter ? '256px' : '0px',
+            width: moveFooter ? 'calc(100% - 256px)' : '100%',
+          }" -->
       <app-draft-footer
-        class="draft-footer px-0 grey lighten-4"
+        class="draft-footer px-0 white"
         :class="{ 'show-submit': showOverview }"
-        :style="{
-          left: moveFooter ? '256px' : '0px',
-          width: moveFooter ? 'calc(100% - 256px)' : '100%',
-        }"
         :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
         :enableNext="!$store.getters['draft/hasRequiredUnanswered']"
         :enableSubmit="!$store.getters['draft/errors']"
@@ -276,6 +276,7 @@ export default {
 <style scoped>
 .outer-wrapper {
   height: 100%;
+  background-color: #ccc;
 }
 
 @media screen and (min-width: 768px) {
@@ -284,17 +285,36 @@ export default {
     flex-direction: row-reverse;
   }
 
+  .gutter {
+    flex-grow: 1;
+    height: 100%;
+  }
+
   .draft-component-wrapper {
     min-width: 768px;
-    width: 768px;
+    /* width: 768px; */
+    flex-grow: 2;
+    max-width: 1200px;
+  }
+
+  .builder .gutter {
+  }
+
+  .builder .draft-component-wrapper {
+    /* min-width: 384px; why is this the magic number? 399px +/- 15px for scrollbar */
+    /* min-width: 399px; /* not sure how to tell which is appropriate in pure ccss */
+    min-width: 384px;
+    width: 100%;
+    /* TODO: make builder desktop preview bigger so you can see images and change to 768px */
+    max-width: 700px;
   }
 }
 
-.draft-component-wrapper.builder >>> .draft-footer.show-submit .full {
+.builder .draft-component-wrapper >>> .draft-footer.show-submit .full {
   position: relative;
 }
 
-.draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary::after {
+.builder .draft-component-wrapper >>> .draft-footer.show-submit button.primary::after {
   background-color: gray;
   position: absolute;
   content: "Builder submissions not visible in 'Results'.  Check 'archived' to view.";
@@ -311,7 +331,7 @@ export default {
   font-size: 14px;
   opacity: 0;
 }
-.draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary::before {
+.builder .draft-component-wrapper >>> .draft-footer.show-submit button.primary::before {
   position: absolute;
   content: '';
   text-transform: none;
@@ -325,13 +345,13 @@ export default {
   border-top: 10px solid gray;
 }
 
-.draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary::after,
-.draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary::before {
+.builder .draft-component-wrapper >>> .draft-footer.show-submit button.primary::after,
+.builder .draft-component-wrapper >>> .draft-footer.show-submit button.primary::before {
   transition: opacity 0.25s;
 }
 
-.draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary:hover::after,
-.draft-component-wrapper.builder >>> .draft-footer.show-submit button.primary:hover::before {
+.builder .draft-component-wrapper >>> .draft-footer.show-submit button.primary:hover::after,
+.builder .draft-component-wrapper >>> .draft-footer.show-submit button.primary:hover::before {
   opacity: 1;
 }
 
@@ -347,7 +367,7 @@ export default {
   width: 100% !important;
   display: flex;
   flex-direction: column;
-  margin-bottom: 68px;
+  /* margin-bottom: 68px; */
   background-color: var(--v-background-base);
 }
 
@@ -358,16 +378,17 @@ export default {
   margin: 0rem auto;
   display: flex;
   flex-direction: column;
-  margin-bottom: 68px;
-  background-color: var(--v-background-base);
+  /* margin-bottom: 68px; */
+  /* background-color: var(--v-background-base); */
+  background-color: white;
 }
 
 .draft-footer {
-  z-index: 3;
+  /* z-index: 3; */
   height: 68px;
   width: 100%;
-  position: fixed;
+  /* position: fixed;
   bottom: 0px;
-  left: 0px;
+  left: 0px; */
 }
 </style>
