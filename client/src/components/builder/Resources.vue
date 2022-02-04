@@ -19,7 +19,7 @@
           </v-btn>
         </template>
         <v-list>
-          <v-list-item class="d-flex align-center">
+          <v-list-item v-if="$store.getters['toggle/isOn']['feature_resource']" class="d-flex align-center">
             <v-list-item-title>
               <v-btn text @click="importResource">
                 <v-icon color="grey">mdi-plus</v-icon>
@@ -29,7 +29,7 @@
               </v-btn>
             </v-list-item-title>
           </v-list-item>
-          <v-list-item class="d-flex align-center">
+          <v-list-item v-if="$store.getters['toggle/isOn']['feature_resource']" class="d-flex align-center">
             <v-list-item-title>
               <v-input hide-details>
                 <label for="upload-resource" class="cursor-pointer">
@@ -95,6 +95,7 @@ import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import api from '@/services/api.service';
 import axios from 'axios';
 import slugify from '@/utils/slugify';
+import { getResource, openResourceInTab, resourceLocations, uploadFile } from '@/utils/resources';
 
 export default {
   components: {
@@ -138,53 +139,29 @@ export default {
         files: [file],
       },
     }) {
-      // request upload url from server
-      const body = {
-        resourceName: file.name,
-        contentLength: file.size,
-        contentType: file.type,
-      };
-      let { data: uploadData } = await api.post('/resources/upload-url', body);
-      // upload file to url and set resource to committed if upload is successful
-      await axios
-        .create()
-        .put(uploadData.signedUrl, file)
-        .then(async (response) => {
-          // resource to committed
-          await api.put(`/resources/commit/${uploadData.resourceId}`, { dummy: '' });
-          // add survey resource
-          this.$emit('set-survey-resources', [
-            ...this.resources,
-            {
-              label: file.name,
-              name: slugify(file.name),
-              id: new ObjectId(uploadData.resourceId),
-              type: file.type,
-              location: 'REMOTE',
-              //content: [],
-            },
-          ]);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      let resourceId = await uploadFile(file);
+      await this.$store.dispatch('resources/fetchRemoteResource', resourceId, file);
+      // add survey resource
+      this.$emit('set-survey-resources', [
+        ...this.resources,
+        {
+          label: file.name,
+          name: slugify(file.name),
+          id: resourceId,
+          type: file.type,
+          location: resourceLocations.REMOTE,
+        },
+      ]);
       this.$refs['upload-resource'].value = null;
     },
     openResource(resource) {
       if (resource.type === 'ONTOLOGY_LIST') {
         this.openOntologyEditor(resource.id);
       } else {
-        this.openResourceInTab(resource);
+        openResourceInTab(resource.id);
       }
     },
-    async openResourceInTab(surveyResource) {
-      // fetch resource
-      let response = await api.get(`/resources/${surveyResource.id}`);
-      // get download url
-      response = await api.post(`/resources/download-url`, { key: response.data.key });
-      // open url in new tab
-      window.open(response.data, '_blank');
-    },
+
     importResource() {
       // TODO show dialog with resource list / search
     },

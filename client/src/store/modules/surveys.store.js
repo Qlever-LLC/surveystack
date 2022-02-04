@@ -13,11 +13,13 @@ const initialState = createInitialState();
 const getters = {
   getSurvey: (state) => (id) => state.surveys.find((survey) => survey._id === id),
   pinned: (state) => state.pinned,
-  getPinned: (state) => (prefix = '', excludePath = '') => {
-    const prefixed = state.pinned.filter((s) => s.meta.group.path && s.meta.group.path.startsWith(prefix));
-    const excluded = prefixed.filter((s) => s.meta.group.path !== excludePath);
-    return excluded;
-  },
+  getPinned:
+    (state) =>
+    (prefix = '', excludePath = '') => {
+      const prefixed = state.pinned.filter((s) => s.meta.group.path && s.meta.group.path.startsWith(prefix));
+      const excluded = prefixed.filter((s) => s.meta.group.path !== excludePath);
+      return excluded;
+    },
 };
 
 const fetchPinnedLegacy = async (commit, filteredMemberships) => {
@@ -75,10 +77,11 @@ const fetchPinned = async (commit) => {
         const cached = fetched.find((f) => f._id == sid);
         if (!cached) {
           try {
-            const r = await actions.fetchSurvey({ commit }, sid);
-            fetched.push(r);
-            item.name = r.name;
-            item.meta = r.meta;
+            let s = await actions.fetchSurvey({ commit }, sid);
+            await this.$store.dispatch('resources/fetchRemoteResources', s.resources);
+            fetched.push(s);
+            item.name = s.name;
+            item.meta = s.meta;
           } catch (error) {
             continue;
           }
