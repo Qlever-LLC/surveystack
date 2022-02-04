@@ -32,7 +32,7 @@
           <a v-else text @click.stop="$emit('updateActive', 'login')" class="font-weight-medium" role="button">
             Already have an account?
           </a>
-          <v-btn type="submit" @click.prevent="submit" color="primary" class="signUpCSS text-capitalize px-8">
+          <v-btn type="submit" @click.prevent="submit" color="primary" class="signUpCSS px-8">
             Sign up
           </v-btn>
         </div>
@@ -41,17 +41,12 @@
         >Your code is eligible to join <strong>{{ membership.group.name }}</strong></v-alert
       >
 
-      <transition name="fade">
-        <app-feedback :elevation="0" color="red lighten-1" v-if="status" class="mt-5" @closed="status = ''">{{
-          status
-        }}</app-feedback>
-      </transition>
+      <v-alert v-if="status" class="mt-4" mode="fade" text type="error">{{ status }}</v-alert>
     </v-card>
   </v-container>
 </template>
 
 <script>
-import appFeedback from '@/components/ui/Feedback.vue';
 import api from '@/services/api.service';
 
 import { autoSelectActiveGroup } from '@/utils/memberships';
@@ -63,15 +58,11 @@ const DEFAULT_ENTITY = {
 };
 
 export default {
-  components: {
-    appFeedback,
-  },
   data() {
     return {
       status: '',
       showPasswords: false,
       entity: { ...DEFAULT_ENTITY },
-      invitation: '',
       membership: null,
     };
   },
@@ -99,9 +90,6 @@ export default {
         link.params.redirect = this.$route.params.redirect;
       }
 
-      if (this.invitation) {
-        link.query = { invitation: this.invitation };
-      }
       return link;
     },
     isWhitelabel() {
@@ -109,9 +97,6 @@ export default {
     },
     whitelabelPartner() {
       return this.$store.getters['whitelabel/partner'];
-    },
-    hasInvitation() {
-      return this.$store.getters['invitation/hasInvitation'];
     },
   },
   methods: {
@@ -146,11 +131,6 @@ export default {
 
         if (this.$route.params.redirect) {
           this.$router.push(this.$route.params.redirect);
-        } else if (this.hasInvitation) {
-          this.$router.push({
-            name: 'invitations',
-            query: { code: this.$store.getters['invitation/code'] },
-          });
         } else {
           this.$store.dispatch('surveys/fetchPinned');
           this.$router.push('/');
@@ -175,16 +155,6 @@ export default {
   async created() {
     if (this.initialEmail) {
       this.entity.email = this.initialEmail;
-    }
-
-    const { invitation } = this.$route.query;
-    this.invitation = invitation;
-    if (invitation) {
-      this.$store.dispatch('invitation/set', invitation);
-      const {
-        data: [membership],
-      } = await api.get(`/memberships?invitationCode=${invitation}&populate=true`);
-      this.membership = membership;
     }
   },
 };

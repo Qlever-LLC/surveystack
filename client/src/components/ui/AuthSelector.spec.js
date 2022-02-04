@@ -1,13 +1,13 @@
-import { fireEvent } from '@testing-library/vue';
+import { fireEvent, screen } from '@testing-library/vue';
 import AuthSelector from '@/components/ui/AuthSelector.vue';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 
 const store = {};
 const noRoutes = [];
 
-const loginViewTitle = 'Login';
+const loginViewTitle = 'Welcome Back!';
 const registerViewTitle = 'Sign up';
-const forgotPasswordViewTitle = 'Forgot Password';
+const forgotPasswordViewTitle = 'Forgot Password?';
 
 describe('AuthSelector', () => {
   describe('AuthSelector renders expected views', () => {
@@ -63,6 +63,7 @@ describe('AuthSelector', () => {
         store,
         routes: noRoutes,
       });
+      await fireEvent.click(screen.getByTestId('toggle-method'));
       getByText(loginViewTitle);
       const button = getByText('Forgot password?');
       await fireEvent.click(button);
@@ -86,7 +87,7 @@ describe('AuthSelector', () => {
         routes: noRoutes,
       });
       getByText(forgotPasswordViewTitle);
-      const button = getByText('Back to Sign in');
+      const button = getByText('Back to login');
       await fireEvent.click(button);
       getByText(loginViewTitle);
     });

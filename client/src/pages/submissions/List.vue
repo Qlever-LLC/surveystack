@@ -452,6 +452,7 @@ export default {
         { key: 'showArchived', value: this.filter.showArchived, include: this.filter.showArchived },
         { key: 'showCsvDataMeta', value: this.filter.showCsvDataMeta, include: this.filter.showCsvDataMeta },
         { key: 'showCsvMeta', value: this.filter.showCsvMeta, include: this.filter.showCsvMeta },
+        { key: 'expandAllMatrices', value: true, include: this.apiDownloadFormat === 'csv' },
         {
           key: 'roles',
           value: this.filter.roles,
