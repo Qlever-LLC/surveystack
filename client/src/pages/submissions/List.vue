@@ -61,29 +61,35 @@
           </v-btn>
         </div>
       </div>
-
-      <app-submissions-filter-basic
-        v-if="!showAdvancedFilters && queryList"
-        :queryList="queryList"
-        @show-advanced="(ev) => (showAdvancedFilters = ev)"
-        :basicFilters="basicFilters"
-        @apply-basic-filters="applyBasicFilters"
-        @reset="reset"
-      />
-
-      <app-submissions-filter-advanced
-        v-if="showAdvancedFilters"
-        v-model="filter"
-        @show-advanced="(ev) => (showAdvancedFilters = ev)"
-        @apply-advanced-filters="fetchData"
-        @reset="reset"
-      />
-
-      <div class="d-flex justify-end">
+      <v-expansion-panels class="mb-6">
+        <v-expansion-panel>
+          <v-expansion-panel-header expand-icon="mdi-menu-down">
+            Basic Filters
+          </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <app-submissions-filter-basic
+              v-if="!showAdvancedFilters && queryList"
+              :queryList="queryList"
+              @show-advanced="(ev) => (showAdvancedFilters = ev)"
+              :basicFilters="basicFilters"
+              @apply-basic-filters="applyBasicFilters"
+              @reset="reset"
+            />
+            <app-submissions-filter-advanced
+              v-if="showAdvancedFilters"
+              v-model="filter"
+              @show-advanced="(ev) => (showAdvancedFilters = ev)"
+              @apply-advanced-filters="fetchData"
+              @reset="reset"
+            />
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
+      <div class="d-flex justify-space-between align-center">
+        <h4>API</h4>
         <v-checkbox label="View archived only" v-model="filter.showArchived" dense hide-details />
       </div>
 
-      <h4>API</h4>
       <a class="body-2" :href="apiDownloadUrl" target="_blank">{{ apiDownloadUrl }}</a>
 
       <div class="d-flex align-center justify-start mt-4">
@@ -165,7 +171,7 @@
     </v-container>
 
     <v-container>
-      <v-row class="mt-2">
+      <v-row class="mt-2" v-if="apiDownloadRange === 'page'">
         <v-col cols="1">
           <v-select
             style="max-width: 5rem; display: inline-block"
