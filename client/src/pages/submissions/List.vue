@@ -64,7 +64,7 @@
       <v-expansion-panels class="mb-6">
         <v-expansion-panel>
           <v-expansion-panel-header expand-icon="mdi-menu-down">
-            Basic Filters
+            <h4>Filters</h4>
           </v-expansion-panel-header>
           <v-expansion-panel-content>
             <app-submissions-filter-basic
