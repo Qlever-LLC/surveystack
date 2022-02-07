@@ -40,7 +40,7 @@
             small
             dark
             color="indigo"
-            v-for="el in rest"
+            v-for="el in filteredComponents"
             :key="el.type"
             @click="addControl(el)"
             class="ma-1 d-inline-block shadow"
@@ -61,12 +61,10 @@
 import { createControlInstance, availableControls } from '@/utils/surveyConfig';
 
 const group = availableControls.find((c) => c.type === 'group');
-const rest = availableControls.filter((c) => c.type !== 'group' && c.type !== 'library');
 
 export default {
   data() {
     return {
-      rest,
       group,
       sequence: 0,
       fabIsOpen: false,
@@ -90,6 +88,16 @@ export default {
     },
     openLibrary() {
       this.$emit('openLibrary');
+    },
+  },
+  computed: {
+    filteredComponents() {
+      return availableControls.filter(
+        (c) =>
+          c.type !== 'group' &&
+          c.type !== 'library' &&
+          (this.$store.getters['toggle/isOn']['feature_resource'] || c.type !== 'file')
+      );
     },
   },
 };
