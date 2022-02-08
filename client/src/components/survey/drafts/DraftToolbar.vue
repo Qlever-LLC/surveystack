@@ -31,10 +31,8 @@ export default {
 <style scoped>
 .number-chip {
   display: inline-flex;
-  /* border: 2px solid #ff5722; */
   border: 2px solid currentColor;
   background-color: white;
-  /* color: #ff5722; */
   border-radius: 2rem;
   line-height: 2rem;
   font-weight: bold;
