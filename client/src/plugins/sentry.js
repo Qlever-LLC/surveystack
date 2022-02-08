@@ -7,6 +7,26 @@ import { Integrations } from '@sentry/tracing';
 
 // Start error tracking and performance monitoring with Sentry.io
 export const startSentry = (Vue, store, router) => {
+  // TODO remove feature flag after we verified it's stable
+  // Wait until toggle states are loaded
+  if (!store.getters['toggle/isLoaded']) {
+    const stopWatch = store.watch(
+      (_, getters) => getters['toggle/isLoaded'],
+      (togglesLoaded) => {
+        if (togglesLoaded) {
+          stopWatch();
+          startSentry(Vue, store, router);
+        }
+      },
+      { immediate: true }
+    );
+    return;
+  }
+  // Bail if the feature toggle is not enabled
+  if (!store.getters['toggle/isOn']['feature_sentry_tracing']) {
+    return;
+  }
+
   // Parameters
 
   // User for filtering traces
