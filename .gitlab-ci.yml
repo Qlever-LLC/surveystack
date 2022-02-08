@@ -252,8 +252,10 @@ build client:
     paths:
       - client/dist/
   stage: build
-  script: 
+  script:
     - yarn client:build
+  variables: 
+    VUE_APP_COMMIT_SHA: $CI_COMMIT_SHA
   needs: 
     - lerna bootstrap
 
