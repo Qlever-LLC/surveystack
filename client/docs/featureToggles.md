@@ -34,6 +34,8 @@ Example:
 <div v-else>Toggle OFF</div>
 ```
 
+Note: You can check if the toggle states are loaded with `getters['toggle/isLoaded']`. This can be useful when you want to check a toggle state only when the app initializes.
+
 ## Removing a toggle 
 After a toggle has been enabled for a while and the feature seems to be stable we have to remove the toggle from the app.
 
