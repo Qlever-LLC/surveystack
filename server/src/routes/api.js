@@ -15,6 +15,7 @@ import resourceController from '../controllers/resourceController';
 
 import groupIntegrationController from '../controllers/groupIntegrationController';
 import membershipIntegrationController from '../controllers/membershipIntegrationController';
+import { unleashProxyApp } from '../services/featureToggle.service';
 
 import cfsController from '../controllers/cfsController';
 
@@ -306,6 +307,8 @@ router.get('/resources', catchErrors(resourceController.getResources));
 router.get('/info/ip', catchErrors(infoController.getIP));
 router.get('/info/public-ip', catchErrors(infoController.getPublicIP));
 router.get('/info/public-hostname', catchErrors(infoController.getPublicHostname));
+
+router.use('/toggles', unleashProxyApp);
 
 // default api
 router.get('/', (req, res) => {
