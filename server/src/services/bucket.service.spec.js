@@ -8,13 +8,11 @@ const fileContent = 'test data content 2';
 function getMockFile() {
   let content = fileContent;
   let contentType = 'text/plain';
-  // let fileLength = Buffer.from(content).length;
   let fileName = 'resources/surveys/' + uuidv4() + 'test_file.txt';
 
   let blob = new Blob([content], { type: contentType });
   blob['lastModifiedDate'] = '';
   blob['name'] = fileName;
-  //blob["size"] = fileLength;
   return blob;
 }
 

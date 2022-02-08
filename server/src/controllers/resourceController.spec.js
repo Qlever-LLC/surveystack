@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import resourceController from './resourceController';
-import { connectDatabase, db } from '../db';
+import { db } from '../db';
 import { createReq } from '../testUtils';
 jest.mock('../services/featureToggle.service');
 
