@@ -11,7 +11,6 @@ export const startSentry = (Vue, store, router) => {
 
   // User for filtering traces
   const environment = process.env.VUE_APP_SENTRY_ENV || process.env.NODE_ENV || 'development';
-  console.log({ environment }, process.env.VUE_APP_SENTRY_ENV, process.env.NODE_ENV);
   // Enables differentiating between different versions of the app
   // The env variable is set on GitLab CI (see gitlab-ci.yaml)
   const release = process.env.VUE_APP_COMMIT_SHA || 'unknown';
