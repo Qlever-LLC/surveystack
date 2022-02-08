@@ -48,9 +48,9 @@
     </app-dialog>
 
     <v-container>
-      <div class="d-flex justify-space-between align-center mb-5 mt-5">
+      <div class="d-flex justify-space-between align-center my-5">
         <h1 v-if="surveyEntity">{{ surveyEntity.name }}</h1>
-        <div class="d-flex justify-end">
+        <div>
           <v-btn v-if="survey" outlined color="secondary" :to="`/surveys/${survey}`">
             <v-icon left>mdi-note-text-outline</v-icon>
             View Survey
@@ -85,34 +85,65 @@
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
-      <div class="d-flex justify-space-between align-center">
-        <h4>API</h4>
-        <v-checkbox label="View archived only" v-model="filter.showArchived" dense hide-details />
-      </div>
+      <v-card class="py-5 my-5">
+        <v-card-text>
+          <div class="d-flex justify-space-between align-center">
+            <h4>API</h4>
+            <v-checkbox label="View archived only" v-model="filter.showArchived" dense hide-details />
+          </div>
 
-      <a class="body-2" :href="apiDownloadUrl" target="_blank">{{ apiDownloadUrl }}</a>
+          <a class="body-2" :href="apiDownloadUrl" target="_blank">{{ apiDownloadUrl }}</a>
 
-      <div class="d-flex align-center justify-start mt-4">
-        <v-select
-          style="max-width: 5rem; display: inline-block"
-          label="Format"
-          class="mr-3"
-          dense
-          :items="apiDownloadFormats"
-          hide-details
-          v-model="apiDownloadFormat"
-        ></v-select>
-        <v-select
-          style="max-width: 7rem; display: inline-block"
-          label="Range"
-          class="mr-3"
-          dense
-          :items="apiDownloadRanges"
-          hide-details
-          v-model="apiDownloadRange"
-        ></v-select>
-        <v-btn @click="startDownload" color="primary"> <v-icon left>mdi-download</v-icon>Download </v-btn>
-      </div>
+          <div class="d-flex align-center justify-start mt-4">
+            <v-select
+              style="max-width: 5rem; display: inline-block"
+              label="Format"
+              class="mr-3"
+              dense
+              :items="apiDownloadFormats"
+              hide-details
+              v-model="apiDownloadFormat"
+            ></v-select>
+            <v-select
+              style="max-width: 7rem; display: inline-block"
+              label="Range"
+              class="mr-3"
+              dense
+              :items="apiDownloadRanges"
+              hide-details
+              v-model="apiDownloadRange"
+            ></v-select>
+            <v-btn @click="startDownload" color="primary"> <v-icon left>mdi-download</v-icon>Download </v-btn>
+          </div>
+
+          <v-row class="mt-5" v-if="apiDownloadRange === 'page'">
+            <v-col cols="1">
+              <v-select
+                style="max-width: 5rem; display: inline-block"
+                label="Page Size"
+                dense
+                :items="pageSizes"
+                hide-details
+                v-model="pageSize"
+                @change="changedPaginationSize"
+              ></v-select>
+            </v-col>
+            <v-col cols="10">
+              <v-pagination
+                class="ml-0"
+                v-model="page"
+                :length="paginationTotalPages"
+                @input="changedPaginationPage"
+              ></v-pagination>
+            </v-col>
+            <v-col cols="1">
+              <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
+                {{ submissions.pagination.total }} total
+              </div>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
 
       <v-card v-if="selected.length > 0" class="mt-4">
         <v-card-text>
@@ -171,33 +202,6 @@
     </v-container>
 
     <v-container>
-      <v-row class="mt-2" v-if="apiDownloadRange === 'page'">
-        <v-col cols="1">
-          <v-select
-            style="max-width: 5rem; display: inline-block"
-            label="Page Size"
-            dense
-            :items="pageSizes"
-            hide-details
-            v-model="pageSize"
-            @change="changedPaginationSize"
-          ></v-select>
-        </v-col>
-        <v-col cols="10">
-          <v-pagination
-            class="ml-0"
-            v-model="page"
-            :length="paginationTotalPages"
-            @input="changedPaginationPage"
-          ></v-pagination>
-        </v-col>
-        <v-col cols="1">
-          <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
-            {{ submissions.pagination.total }} total
-          </div>
-        </v-col>
-      </v-row>
-
       <v-tabs v-model="tab">
         <v-tab v-for="view in views" :key="view.tab">
           {{ view.tab }}
