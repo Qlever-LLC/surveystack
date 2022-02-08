@@ -86,12 +86,11 @@
         </v-expansion-panel>
       </v-expansion-panels>
       <v-card class="py-5 my-5">
+        <v-card-title class="d-flex justify-space-between align-center">
+          <div>API</div>
+          <v-checkbox label="View archived only" v-model="filter.showArchived" dense hide-details />
+        </v-card-title>
         <v-card-text>
-          <div class="d-flex justify-space-between align-center">
-            <h4>API</h4>
-            <v-checkbox label="View archived only" v-model="filter.showArchived" dense hide-details />
-          </div>
-
           <a class="body-2" :href="apiDownloadUrl" target="_blank">{{ apiDownloadUrl }}</a>
 
           <div class="d-flex align-center justify-start mt-4">
