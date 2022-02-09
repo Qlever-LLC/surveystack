@@ -90,6 +90,7 @@ deploy to prod:
     - echo "ELASTIC_AUTH_PASSWORD=$ELASTIC_AUTH_PASSWORD" >> .env
     - echo "UNLEASH_URL=$UNLEASH_URL" >> .env
     - echo "UNLEASH_INSTANCE_ID=$UNLEASH_INSTANCE_ID" >> .env
+    - echo "UNLEASH_APP_NAME=$CI_ENVIRONMENT_NAME" >> .env
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" up -d
@@ -152,6 +153,7 @@ deploy to stage:
     - echo "ELASTIC_AUTH_PASSWORD=$ELASTIC_AUTH_PASSWORD" >> .env
     - echo "UNLEASH_URL=$UNLEASH_URL" >> .env
     - echo "UNLEASH_INSTANCE_ID=$UNLEASH_INSTANCE_ID" >> .env
+    - echo "UNLEASH_APP_NAME=$CI_ENVIRONMENT_NAME" >> .env
     - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" up -d
@@ -212,6 +214,7 @@ deploy to review 1:
     - echo "ELASTIC_AUTH_PASSWORD=$ELASTIC_AUTH_PASSWORD" >> .env
     - echo "UNLEASH_URL=$UNLEASH_URL" >> .env
     - echo "UNLEASH_INSTANCE_ID=$UNLEASH_INSTANCE_ID" >> .env
+    - echo "UNLEASH_APP_NAME=$CI_ENVIRONMENT_NAME" >> .env
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" up -d
@@ -249,8 +252,10 @@ build client:
     paths:
       - client/dist/
   stage: build
-  script: 
+  script:
     - yarn client:build
+  variables: 
+    VUE_APP_COMMIT_SHA: $CI_COMMIT_SHA
   needs: 
     - lerna bootstrap
 
