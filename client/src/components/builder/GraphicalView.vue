@@ -25,6 +25,7 @@
       :key="el.id || el._id"
       @mousedown.stop.left="$emit('control-selected', el)"
       :data-testid="`control-card-${el.id}`"
+      :data-control-type="el.type"
     >
       <div
         class="d-flex justify-space-between align-center"
@@ -112,6 +113,7 @@
         @open-library="$emit('open-library', $event)"
         @update-library-questions="$emit('update-library-questions', $event)"
         :index="createIndex(index, idx + 1)"
+        :data-control-type="el.type"
       />
 
       <nested-draggable
@@ -128,6 +130,8 @@
         @open-library="$emit('open-library', $event)"
         @update-library-questions="$emit('update-library-questions', $event)"
         :index="createIndex(index, idx + 1)"
+        :group="draggablePageGroup"
+        :data-control-type="el.type"
       />
 
       <v-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
@@ -195,6 +199,21 @@ export default {
       updateControl: null,
       scaleStyles: {},
       hoveredControl: null,
+      draggablePageGroup: {
+        name: 'g1',
+        // put ::: String | String[] | (to, from, el, event) => Boolean
+        // to: the sortablejs instance which will be `put` into
+        // from: the sortablejs instance which will be `put` from
+        // el: the active element which is being `put` from `from` into `to`
+        // ev: the sortablejs event
+        // returns: Boolean value indicating whether `el` should be allowed to be `put` from `from` into `to`
+        put(to, _, el) {
+          if (el.dataset.controlType === 'page' && to.el.dataset.controlType === 'page') {
+            return false;
+          }
+          return true;
+        },
+      },
     };
   },
   props: {
