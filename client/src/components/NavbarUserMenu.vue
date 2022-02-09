@@ -3,7 +3,6 @@
     <v-menu left attach="#app-menu" offset-y v-if="$store.getters['auth/isLoggedIn']" :close-on-content-click="false">
       <template v-slot:activator="{ on }">
         <v-btn text v-on="on">
-          <span class="d-none d-md-inline mr-1">{{ $store.getters['auth/user'].email }}</span>
           <v-icon>mdi-account</v-icon>
         </v-btn>
       </template>

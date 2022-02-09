@@ -12,12 +12,13 @@
 
     <!-- Toolbar with question number and overview button -->
     <app-draft-toolbar
-      :group="groupPath"
+      :groupPath="groupPath"
       :required="control && control.options && control.options.required"
       :anon="control && control.options && control.options.redacted"
       :showOverviewIcon="true"
       :questionNumber="$store.getters['draft/questionNumber']"
       @showOverviewClicked="showOverview = !showOverview"
+      v-if="builder"
     >
       <!-- forward all the slots -->
       <slot v-for="(_, name) in $slots" :name="name" :slot="name" />
