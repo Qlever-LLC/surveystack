@@ -68,17 +68,17 @@ describe.skip('resourceController', () => {
       await getResource(req, res);
       expect(res.data.state).toBe('committed');
     });
-  });
-
-  describe('getResource', () => {
-    it('returns not found error for a random resourceId', async () => {
+    it('returns not found error for a random resourceid', async () => {
       const req = createReq({
         params: { id: new ObjectId() },
       });
       let res = mockRes();
-      await getResource(req, res);
+      await commitResource(req, res);
       expect(res.s).toBe(404);
     });
+  });
+
+  describe('getResource', () => {
     it('return one resource for the given resourceId', async () => {
       const req = createReq({
         params: { id: resourceId },
@@ -87,6 +87,14 @@ describe.skip('resourceController', () => {
       await commitResource(req, res);
       await getResource(req, res);
       expect(res.data._id).toStrictEqual(resourceId);
+    });
+    it('returns not found error for a random resourceId', async () => {
+      const req = createReq({
+        params: { id: new ObjectId() },
+      });
+      let res = mockRes();
+      await getResource(req, res);
+      expect(res.s).toBe(404);
     });
   });
   describe('deleteResource', () => {
@@ -97,6 +105,8 @@ describe.skip('resourceController', () => {
       let res = mockRes();
       await deleteResource(req, res);
       expect(res.data.message).toBe('OK');
+      await getResource(req, res);
+      expect(res.s).toBe(404);
     });
     it('throws error if id is not existing', async () => {
       const req = createReq({
