@@ -1,29 +1,36 @@
 <template>
   <nav class="app-navbar">
+    <navbar-drawer v-model="drawerIsVisible" />
     <v-app-bar app clipped-left color="appbar" absolute>
       <v-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
-      <v-toolbar-title class="flex-column">
-        <div id="app-bar-title" class="title py-0 my-0">
-          <router-link to="/" id="home-link" v-html="appTitle" />
-        </div>
-        <div class="app-bar-subtitle subtitle py-0 my-0" v-html="appSubtitle" />
+      <v-toolbar-title class="flex-column flex-grow-1">
+        <draft-toolbar
+          :groupPath="groupPath"
+          :required="control && control.options && control.options.required"
+          :anon="control && control.options && control.options.redacted"
+          :showOverviewIcon="true"
+          :questionNumber="$store.getters['draft/questionNumber']"
+          @showOverviewClicked="showOverview = !showOverview"
+        />
       </v-toolbar-title>
 
-      <v-spacer></v-spacer>
       <navbar-user-menu />
     </v-app-bar>
-    <navbar-drawer v-model="drawerIsVisible" />
   </nav>
 </template>
 
 <script>
-import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
+import DraftToolbar from '@/components/survey/drafts/DraftToolbar.vue';
 import NavbarDrawer from '@/components/NavbarDrawer.vue';
+import NavbarUserMenu from '@/components/NavbarUserMenu.vue';
+
+import { queueAction } from '@/utils/surveyStack';
 
 export default {
   components: {
-    NavbarUserMenu,
+    DraftToolbar,
     NavbarDrawer,
+    NavbarUserMenu,
   },
   computed: {
     drawerIsVisible: {
@@ -32,6 +39,21 @@ export default {
       },
       set(value) {
         this.$store.dispatch('appui/setMenu', value);
+      },
+    },
+    control() {
+      return this.$store.getters['draft/control'];
+    },
+    groupPath() {
+      return this.$store.getters['draft/groupPath'];
+    },
+    showOverview: {
+      get() {
+        return this.$store.getters['draft/showOverview'];
+      },
+      set(v) {
+        // this.$store.dispatch('draft/showOverview', v);
+        queueAction(this.$store, 'draft/showOverview', v);
       },
     },
   },

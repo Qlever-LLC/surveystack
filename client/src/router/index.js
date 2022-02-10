@@ -5,7 +5,7 @@ import Home from '@/pages/Home.vue';
 import Test from '@/pages/Test.vue';
 import Unauthorized from '@/pages/Unauthorized.vue';
 
-const MySubmissions = () => import('@/pages/surveys/MySubmissions.vue');
+import MySubmissions from '@/pages/surveys/MySubmissions.vue';
 import SurveysBrowse from '@/pages/surveys/Browse.vue';
 import SurveysDetail from '@/pages/surveys/Detail.vue';
 import DraftSubmission from '@/pages/submissions/drafts/Draft.vue';
@@ -15,20 +15,13 @@ import Register from '@/pages/auth/Register.vue';
 import Profile from '@/pages/auth/Profile.vue';
 import ForgotPassword from '@/pages/auth/ForgotPassword.vue';
 
-const Experiment = () => import('@/pages/experiment/Experiments.vue');
-
-import SandboxAR from '@/pages/experiment/sandbox/SandboxAR.vue';
-import SandboxMDC from '@/pages/experiment/sandbox/SandboxMDC.vue';
-import SandboxWG from '@/pages/experiment/sandbox/SandboxWG.vue';
-
 import UserList from '@/pages/users/UserList.vue';
 import User from '@/pages/users/User.vue';
 import UserEdit from '@/pages/users/UserEdit.vue';
 
 import GroupList from '@/pages/groups/GroupList.vue';
 import Group from '@/pages/groups/Group.vue';
-const GroupEdit = () => import('@/pages/groups/GroupEdit.vue');
-
+import GroupEdit from '@/pages/groups/GroupEdit.vue';
 
 import SubmissionList from '@/pages/submissions/List.vue';
 
@@ -45,14 +38,17 @@ import ResourceList from '@/pages/resources/ResourceList.vue';
 
 import AppInfo from '@/pages/app/AppInfo.vue';
 
-const FarmHubOnboarding = () => import('@/pages/farmhub-onboarding/FarmHubOnboarding.vue');
+import FarmHubOnboarding from '@/pages/farmhub-onboarding/FarmHubOnboarding.vue';
 
 // integrations
-const MembershipIntegrationEdit = () => import('@/pages/integrations/MembershipIntegrationEdit.vue');
-const GroupIntegrationEdit = () => import('@/pages/integrations/GroupIntegrationEdit.vue');
+import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
+import GroupIntegrationEdit from '@/pages/integrations/GroupIntegrationEdit.vue';
+
+import Navbar from '@/components/Navbar.vue';
+import SubmissionDraftNavbar from '@/components/SubmissionDraftNavbar.vue';
 
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
-const Kit = () => import('@/pages/Kit.vue');
+import Kit from '@/pages/Kit.vue';
 import store from '@/store';
 
 const Builder = () => import('@/pages/builder/Builder.vue');
@@ -77,11 +73,22 @@ const superGuard = async (to, from, next) => {
   }
 };
 
+const commonComponents = {
+  navbar: Navbar,
+};
+
+function getComponents(component, defaultComponents = commonComponents) {
+  return {
+    default: component,
+    ...defaultComponents,
+  };
+}
+
 const routes = [
   {
     path: '/',
     name: 'home',
-    component: Home,
+    components: getComponents(Home),
   },
   {
     path: '/about',
@@ -89,32 +96,27 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '@/pages/About.vue'),
-  },
-  {
-    path: '/test',
-    name: 'test',
-    component: Test,
+    components: getComponents(() => import(/* webpackChunkName: "about" */ '@/pages/About.vue')),
   },
   {
     path: '/submissions',
     name: 'submissions',
-    component: SubmissionList,
+    components: getComponents(SubmissionList),
   },
   {
     path: '/surveys/my-submissions',
     name: 'my-submissions',
-    component: MySubmissions,
+    components: getComponents(MySubmissions),
   },
   {
     path: '/surveys/browse',
     name: 'surveys-browse',
-    component: SurveysBrowse,
+    components: getComponents(SurveysBrowse),
   },
   {
     path: '/surveys/new',
     name: 'surveys-new',
-    component: Builder,
+    components: getComponents(Builder),
     props: {
       isNew: true,
     },
@@ -123,7 +125,7 @@ const routes = [
   {
     path: '/surveys/:id/edit',
     name: 'surveys-edit',
-    component: Builder,
+    components: getComponents(Builder),
     props: {
       isNew: false,
     },
@@ -132,35 +134,35 @@ const routes = [
   {
     path: '/surveys/:id',
     name: 'surveys-detail',
-    component: SurveysDetail,
+    components: getComponents(SurveysDetail),
   },
 
   {
     path: '/submissions/drafts/:id',
     name: 'submissions-drafts-detail',
-    component: DraftSubmission,
+    components: getComponents(DraftSubmission, { navbar: SubmissionDraftNavbar }),
   },
   {
     path: '/auth/login',
     name: 'auth-login',
-    component: Login,
+    components: getComponents(Login),
     props: true,
   },
   {
     path: '/auth/register',
     name: 'auth-register',
-    component: Register,
+    components: getComponents(Register),
     props: true,
   },
   {
     path: '/auth/profile',
     name: 'auth-profile',
-    component: Profile,
+    components: getComponents(Profile),
   },
   {
     path: '/auth/forgot-password',
     name: 'auth-forgot-password',
-    component: ForgotPassword,
+    components: getComponents(ForgotPassword),
   },
   {
     path: '/auth/accept-magic-link',
@@ -179,171 +181,152 @@ const routes = [
       window.location.replace(`${location.origin}${landingPath}`);
     },
   },
-  // experiment
-  {
-    path: '/experiment',
-    name: 'experiment',
-    component: Experiment,
-  },
-  {
-    path: '/experiment/ar',
-    name: 'experiment-ar',
-    component: SandboxAR,
-  },
-  {
-    path: '/experiment/mdc',
-    name: 'experiment-mdc',
-    component: SandboxMDC,
-  },
-  {
-    path: '/experiment/wg',
-    name: 'experiment-wg',
-    component: SandboxWG,
-  },
   // users
   {
     path: '/users',
     name: 'users-list',
-    component: UserList,
+    components: getComponents(UserList),
     beforeEnter: superGuard,
   },
   {
     path: '/users/new',
     name: 'users-new',
-    component: UserEdit,
+    components: getComponents(UserEdit),
   },
   {
     path: '/users/:id/edit',
     name: 'users-edit',
-    component: UserEdit,
+    components: getComponents(UserEdit),
   },
   {
     path: '/users/:id',
     name: 'users-detail',
-    component: User,
+    components: getComponents(User),
   },
   // groups
   {
     path: '/groups',
     name: 'groups-list',
-    component: GroupList,
+    components: getComponents(GroupList),
   },
   {
     path: '/groups/new',
     name: 'groups-new',
-    component: GroupEdit,
+    components: getComponents(GroupEdit),
   },
   {
     path: '/groups/edit/:id',
     name: 'groups-edit',
-    component: GroupEdit,
+    components: getComponents(GroupEdit),
   },
   {
     path: '/g/*',
     name: 'groups-by-path',
-    component: Group,
+    components: getComponents(Group),
   },
   // scripts
   {
     path: '/scripts',
     name: 'scripts-list',
-    component: ScriptList,
+    components: getComponents(ScriptList),
   },
   {
     path: '/scripts/new',
     name: 'scripts-new',
-    component: ScriptEdit,
+    components: getComponents(ScriptEdit),
   },
   {
     path: '/scripts/:id/edit',
     name: 'scripts-edit',
-    component: ScriptEdit,
+    components: getComponents(ScriptEdit),
   },
   {
     path: '/scripts/:id',
     name: 'scripts-detail',
-    component: Script,
+    components: getComponents(Script),
   },
   // integrations
   {
     path: '/group-integrations/new',
     name: 'group-integrations-new',
-    component: GroupIntegrationEdit,
+    components: getComponents(GroupIntegrationEdit),
   },
   {
     path: '/farm-hub-onboarding/:id',
     name: 'farm-hub-onboarding',
-    component: FarmHubOnboarding,
+    components: getComponents(FarmHubOnboarding),
   },
   {
     path: '/group-integrations/:id/edit',
     name: 'group-integrations-edit',
-    component: GroupIntegrationEdit,
+    components: getComponents(GroupIntegrationEdit),
   },
   {
     path: '/membership-integrations/new',
     name: 'membership-integrations-new',
-    component: MembershipIntegrationEdit,
+    components: getComponents(MembershipIntegrationEdit),
   },
   {
     path: '/membership-integrations/:id/edit',
     name: 'membership-integrations-edit',
-    component: MembershipIntegrationEdit,
+    components: getComponents(MembershipIntegrationEdit),
   },
   // memberships
   {
     path: '/memberships/new',
     name: 'memberships-new',
-    component: MembershipNew,
+    components: getComponents(MembershipNew),
   },
   {
     path: '/memberships/:id/edit',
     name: 'memberships-edit',
-    component: MembershipEdit,
+    components: getComponents(MembershipEdit),
   },
   // Invitation
   {
     path: '/invitations',
     name: 'invitations',
-    component: Invitation,
+    components: getComponents(Invitation),
   },
   // Request submissions
   {
     path: '/call-for-submissions',
     name: 'call-for-submissions',
-    component: CallForSubmissions,
+    components: getComponents(CallForSubmissions),
   },
   // Resources
   {
     path: '/resources',
     name: 'resources-list',
-    component: ResourceList,
+    components: getComponents(ResourceList),
   },
   // Unauthorized
   {
     path: '/unauthorized',
     name: 'unauthorized',
-    component: Unauthorized,
+    components: getComponents(Unauthorized),
     props: true,
   },
   // App-Info
   {
     path: '/app/info',
     name: 'app-info',
-    component: AppInfo,
+    components: getComponents(AppInfo),
   },
   // tabula rasa
-  // TODO: remove this from production
-  {
-    path: '/tabularasa',
-    name: 'tabula-rasa',
-    component: TabulaRasa,
-  },
-
+  ...(process.env.NODE_ENV === 'production'
+    ? [{}]
+    : [
+        {
+          path: '/tabularasa',
+          name: 'tabula-rasa',
+          component: TabulaRasa,
+        },
+      ]),
   {
     path: '/kit/*',
     name: 'kit',
-    component: Kit,
+    components: getComponents(Kit),
   },
 ];
 

@@ -34,6 +34,8 @@ Example:
 <div v-else>Toggle OFF</div>
 ```
 
+Note: You can check if the toggle states are loaded with `getters['toggle/isLoaded']`. This can be useful when you want to check a toggle state only when the app initializes.
+
 ## Removing a toggle 
 After a toggle has been enabled for a while and the feature seems to be stable we have to remove the toggle from the app.
 
@@ -44,7 +46,11 @@ After a toggle has been enabled for a while and the feature seems to be stable w
     - Probably a good practice to mark the date of removal on the GitLab dashboard, in the feature flag description. 
 
 ## Local development
-To connect to the service, we have to set the `UNLEASH_URL` and `UNLEASH_INSTANCE_ID` in `server/.env`. Both values can be found at [GitLab/Feature Flags/Configure](https://gitlab.com/our-sci/software/surveystack/-/feature_flags). See the example in `server/.env.defaults`.
+ - To **connect to the service**, we have to set the `UNLEASH_URL` and `UNLEASH_INSTANCE_ID` in `server/.env`. Both values can be found at [GitLab/Feature Flags/Configure](https://gitlab.com/our-sci/software/surveystack/-/feature_flags). See the example in `server/.env.defaults`.
+ - You can **simulate being on a GitLab environment** by setting `UNLEASH_APP_NAME` to one of the GitLab environment names
+ - When **testing NodeJS** functions, use `jest.mock('../path/to/featureToggle.service')`. This enables all feature toggles, and skips calling the external service.
+
+
 
 ## Implementation details
  - GitLab can host an [unleash server](https://github.com/Unleash/unleash) for every project

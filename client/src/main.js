@@ -6,6 +6,7 @@ import router from './router';
 import store from './store';
 import vuetify from './plugins/vuetify';
 import { startToggle } from './plugins/toggle';
+import { startSentry } from './plugins/sentry';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '@mdi/font/css/materialdesignicons.css';
 import './css/transitions.css';
@@ -20,6 +21,8 @@ import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlError from '@/components/survey/drafts/ControlError.vue';
 
 startToggle(store);
+
+startSentry(Vue, store, router);
 
 Vue.component('app-control-label', appControlLabel);
 Vue.component('app-control-hint', appControlHint);
