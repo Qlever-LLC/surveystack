@@ -1,7 +1,7 @@
 <template>
   <span class="modal" role="dialog">
     <div class="overlay" @click.stop="$emit('close', $event.target.value)" data-testid="overlay"></div>
-    <div class="modal-content">
+    <div class="modal-content" :style="{ left: `${left}px` }">
       <span class="font-weight-regular">
         {{ value }}
       </span>
@@ -22,6 +22,9 @@ export default {
     showCopyButton: {
       type: Boolean,
       default: false,
+    },
+    left: {
+      type: Number,
     },
   },
 };

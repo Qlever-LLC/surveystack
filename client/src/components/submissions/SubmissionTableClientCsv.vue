@@ -18,6 +18,7 @@
       :sort-by="dataTableProps.sortBy"
       :sort-desc="dataTableProps.sortDesc"
       :loading="loading"
+      ref="table"
     >
       <template v-slot:top>
         <v-toolbar flat>
@@ -39,7 +40,7 @@
       <template v-for="header in headers" v-slot:[`header.${header.value}`]>
         <span
           :key="header.value"
-          @click.stop="showFullHeaderText(header.value)"
+          @click.stop="showFullHeaderText(header.value, $event)"
           :class="{ activeHeader: isHeaderModalOpen(header.value) }"
         >
           <div :class="shouldTruncate(header.value) ? 'truncate-header' : 'non-truncated-header'">
@@ -49,6 +50,7 @@
             v-if="isHeaderModalOpen(header.value)"
             :value="header.value"
             @close="closeHeaderModal"
+            :left="modalLeftPosition"
           />
         </span>
       </template>
@@ -62,7 +64,7 @@
             <td
               v-for="header in headers"
               :key="header.text"
-              @click.stop="showFullText(item[header.value], header, item)"
+              @click.stop="showFullText(item[header.value], header, item, $event)"
               :class="{ active: isModalOpen(header.value, item._id) }"
             >
               <div :class="shouldTruncate(item[header.value]) ? 'truncate' : ''">
@@ -73,9 +75,9 @@
                 @close="closeModal"
                 :value="item[header.value]"
                 :showCopyButton="true"
+                :left="modalLeftPosition"
               />
             </td>
-            <!-- :closeModal="closeModal" -->
           </tr>
         </tbody>
       </template>
@@ -143,6 +145,7 @@ export default {
         survey: '',
       },
       headers: [],
+      modalLeftPosition: null,
     };
   },
   computed: {
@@ -168,27 +171,26 @@ export default {
     submissions() {
       this.fetchData();
     },
-    selected(newVal) {
-      // see 'sync' modifier
-      // https://vuejs.org/v2/guide/components-custom-events.html
-      // this.$emit('update:selected', this.selected);
-    },
   },
   methods: {
     shouldTruncate(value) {
       return value.length > this.textTruncateLength;
     },
-    showFullText(value, header, item) {
+    showFullText(value, header, item, ev) {
       if (value.length > this.textTruncateLength) {
         this.activeTableCell = `${header.value}_${item._id}`;
+        this.modalLeftPosition =
+          ev.target.getBoundingClientRect().left - this.$refs.table.$el.getBoundingClientRect().left;
       }
     },
     isModalOpen(headerValue, itemId) {
       return this.activeTableCell === getCellKey(headerValue, itemId);
     },
 
-    showFullHeaderText(value) {
+    showFullHeaderText(value, ev) {
       this.fullHeaderText = value;
+      this.modalLeftPosition =
+        ev.target.getBoundingClientRect().left - this.$refs.table.$el.getBoundingClientRect().left;
     },
 
     isHeaderModalOpen(value) {
@@ -197,10 +199,12 @@ export default {
 
     closeHeaderModal() {
       this.fullHeaderText = null;
+      this.modalLeftPosition = null;
     },
 
     closeModal() {
       this.activeTableCell = null;
+      this.modalLeftPosition = null;
     },
 
     createCustomFilter(field) {
