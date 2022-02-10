@@ -8,17 +8,17 @@ const fileContent = 'test data content 2';
 function getMockFile() {
   let content = fileContent;
   let contentType = 'text/plain';
-  // let fileLength = Buffer.from(content).length;
-  let fileName = 'resources/surveys/' + uuidv4() + 'test_file.txt';
+  let fileName = 'resources/unit-tests/' + uuidv4() + 'test_file.txt';
 
   let blob = new Blob([content], { type: contentType });
   blob['lastModifiedDate'] = '';
   blob['name'] = fileName;
-  //blob["size"] = fileLength;
   return blob;
 }
 
 describe.skip('Bucket service', () => {
+  let fileNameToDelete = undefined;
+
   describe('getUploadUrl', () => {
     const file = getMockFile();
     let signedUploadUrl;
@@ -30,8 +30,7 @@ describe.skip('Bucket service', () => {
     it('allow to upload a file with the requested and signed size', async () => {
       const response = await axios.put(signedUploadUrl, fileContent, { validateStatus: false });
       expect(response.status).toBe(200);
-      let responseDelete = await bucketService.deleteObject(file.name);
-      expect(responseDelete.$metadata.httpStatusCode).toBe(204);
+      fileNameToDelete = file.name;
     });
     it('prevents to upload a file with a size bigger than the requested and signed size', async () => {
       const response = await axios.put(signedUploadUrl, fileContent + 'additional_data', {
@@ -61,22 +60,27 @@ describe.skip('Bucket service', () => {
       let url = await bucketService.getDownloadUrl(file.name);
       const response = await axios.get(url, { validateStatus: false });
       expect(response.status).toBe(200);
-      let responseDelete = await bucketService.deleteObject(file.name);
-      expect(responseDelete.$metadata.httpStatusCode).toBe(204);
+      fileNameToDelete = file.name;
     });
   });
 
   describe('deleteObject', () => {
     const file = getMockFile();
-    it('deletes an existing object, and thats not avilable anymore afterwards', async () => {
+    it('deletes an existing object, and its not available anymore afterwards', async () => {
       let signedUrl = await bucketService.getUploadUrl(file.name, file.type, file.size);
       const responseUpload = await axios.put(signedUrl, fileContent, { validateStatus: false });
       expect(responseUpload.status).toBe(200);
-      let responseDelete = await bucketService.deleteObject(file.name);
+      fileNameToDelete = file.name;
+    });
+  });
+
+  afterEach(async () => {
+    if (fileNameToDelete) {
+      let responseDelete = await bucketService.deleteObject(fileNameToDelete);
       expect(responseDelete.$metadata.httpStatusCode).toBe(204);
-      let url = await bucketService.getDownloadUrl(file.name);
+      let url = await bucketService.getDownloadUrl(fileNameToDelete);
       const response = await axios.get(url, { validateStatus: false });
       expect(response.status).toBe(404);
-    });
+    }
   });
 });

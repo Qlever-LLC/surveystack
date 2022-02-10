@@ -13,9 +13,9 @@ const config = {
   unleashUrl: process.env.UNLEASH_URL,
   unleashApiToken: '_',
   unleashInstanceId: process.env.UNLEASH_INSTANCE_ID,
-  clientKeys: ['proxy'],
+  clientKeys: ['proxy-secret'],
   refreshInterval: 1000,
-  unleashAppName: process.env.UNLEASH_APP_NAME,
+  environment: 'development',
 };
 
 const client = ENABLED ? new Client(createProxyConfig(config)) : null;

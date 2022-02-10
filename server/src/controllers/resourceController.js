@@ -11,12 +11,22 @@ const getResource = async (req, res) => {
   const { id } = req.params;
   // load committed resource
   const resource = await db.collection(col).findOne({ _id: new ObjectId(id), state: 'committed' });
+  if (!resource) {
+    return res.status(404).send({
+      message: `No entity with _id exists: ${id}`,
+    });
+  }
   return res.send(resource);
 };
 
 const getDownloadURL = async (req, res) => {
   const { key } = req.body;
   let downloadURL = await bucketService.getDownloadUrl(key);
+  if (!downloadURL) {
+    return res.status(500).send({
+      message: `no url returned by bucket service`,
+    });
+  }
   return res.send(downloadURL);
 };
 

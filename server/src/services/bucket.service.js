@@ -19,10 +19,7 @@ const s3Client = getS3Client();
 
 function getS3Client() {
   if (AWS_S3_ENDPOINT_OVERRIDE) {
-    /*console.log(AWS_S3_ENDPOINT_OVERRIDE);
-    console.log(AWS_S3_ACCESS_KEY_ID);
-    console.log(AWS_S3_SECRET_ACCESS_KEY);
-    console.log(AWS_S3_REGION);*/
+    // S3-compatible service like min.io or localstack
     return new S3Client({
       credentials: {
         accessKeyId: AWS_S3_ACCESS_KEY_ID,
@@ -34,6 +31,7 @@ function getS3Client() {
       forcePathStyle: true,
     });
   } else {
+    // access the official AWS S3 instance, located by S3Client library
     return new S3Client({
       credentials: {
         accessKeyId: AWS_S3_ACCESS_KEY_ID,
