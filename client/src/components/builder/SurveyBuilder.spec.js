@@ -60,6 +60,9 @@ const optionsWithControls = (controls = []) => {
   });
   const props = { survey };
   const store = createStoreObject();
+  store.getters = {
+    'toggle/isOn': () => ({ feature_resource: true }),
+  };
   return {
     props,
     router,
