@@ -40,16 +40,16 @@
       <template v-for="header in headers" v-slot:[`header.${header.value}`]>
         <span
           :key="header.value"
-          @click.stop="showFullHeaderText(header.value, $event)"
-          :class="{ activeHeader: isHeaderModalOpen(header.value) }"
+          @click.stop="showFull(header.value, header.value, $event)"
+          :class="{ activeHeader: isModalOpen(header.value) }"
         >
           <div :class="shouldTruncate(header.value) ? 'truncate-header' : 'non-truncated-header'">
             {{ header.value }}
           </div>
           <submission-table-cell-modal
-            v-if="isHeaderModalOpen(header.value)"
+            v-if="isModalOpen(header.value)"
             :value="header.value"
-            @close="closeHeaderModal"
+            @close="closeModal"
             :left="modalLeftPosition"
           />
         </span>
@@ -64,14 +64,14 @@
             <td
               v-for="header in headers"
               :key="header.text"
-              @click.stop="showFullText(item[header.value], header, item, $event)"
-              :class="{ active: isModalOpen(header.value, item._id) }"
+              @click.stop="showFullCell(item, header, $event)"
+              :class="{ active: isModalOpen(getCellKey(header.value, item._id)) }"
             >
-              <div :class="shouldTruncate(item[header.value]) ? 'truncate' : ''">
+              <div :class="{ truncate: shouldTruncate(item[header.value]) }">
                 {{ item[header.value] }}
               </div>
               <submission-table-cell-modal
-                v-if="isModalOpen(header.value, item._id)"
+                v-if="isModalOpen(getCellKey(header.value, item._id))"
                 @close="closeModal"
                 :value="item[header.value]"
                 :showCopyButton="true"
@@ -137,7 +137,6 @@ export default {
     return {
       activeTableCell: null,
       textTruncateLength: 36,
-      fullHeaderText: null,
       csv: null,
       parsed: null,
       search: '',
@@ -173,40 +172,30 @@ export default {
     },
   },
   methods: {
+    getCellKey,
     shouldTruncate(value) {
       return value.length > this.textTruncateLength;
     },
-    showFullText(value, header, item, ev) {
+    showFull(value, id, ev) {
       if (value.length > this.textTruncateLength) {
-        this.activeTableCell = `${header.value}_${item._id}`;
+        this.activeTableCell = id;
         this.modalLeftPosition =
           ev.target.getBoundingClientRect().left - this.$refs.table.$el.getBoundingClientRect().left;
       }
     },
-    isModalOpen(headerValue, itemId) {
-      return this.activeTableCell === getCellKey(headerValue, itemId);
+    showFullCell(item, header, ev) {
+      this.showFull(item[header.value], this.getCellKey(header.value, item._id), ev);
     },
-
-    showFullHeaderText(value, ev) {
-      this.fullHeaderText = value;
-      this.modalLeftPosition =
-        ev.target.getBoundingClientRect().left - this.$refs.table.$el.getBoundingClientRect().left;
+    isModalOpen(id) {
+      return this.activeTableCell === id;
     },
-
-    isHeaderModalOpen(value) {
-      return this.fullHeaderText === value && this.fullHeaderText.length > this.textTruncateLength;
+    isCellModalOpen(header, item) {
+      return this.isModalOpen(getCellKey(header.value, item._id));
     },
-
-    closeHeaderModal() {
-      this.fullHeaderText = null;
-      this.modalLeftPosition = null;
-    },
-
     closeModal() {
       this.activeTableCell = null;
       this.modalLeftPosition = null;
     },
-
     createCustomFilter(field) {
       return (value, search, item) => {
         if (!this.searchFields[field]) {
