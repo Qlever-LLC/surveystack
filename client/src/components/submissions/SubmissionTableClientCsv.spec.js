@@ -3,6 +3,7 @@ import { fireEvent } from '@testing-library/vue';
 import { within } from '@testing-library/dom';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 import SubmissionTableClientCsv from './SubmissionTableClientCsv.vue';
+import router from "@/router";
 
 const mockSubmissions = () => {
   return {
@@ -241,6 +242,12 @@ describe('SubmissionTableClientCsv', () => {
     it('should check that the modal text content is the same with the clicked table cell', async () => {
       const { getByText, getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
         propsData: { submissions: mockSubmissions(), selected: [] },
+        store: {
+          getters: {
+            'toggle/isOn': () => ({ feature_resource: true }),
+          },
+        },
+        router: router,
       });
       const td = getByText(
         'You can use the overflow property when you want to have better control of the layout. The overflow'
@@ -255,6 +262,12 @@ describe('SubmissionTableClientCsv', () => {
     it('set modal to hidden when overlay is clicked', async () => {
       const { getByTestId, getByText, queryByRole } = renderWithVuetify(SubmissionTableClientCsv, {
         propsData: { submissions: mockSubmissions(), selected: [] },
+        store: {
+          getters: {
+            'toggle/isOn': () => ({ feature_resource: true }),
+          },
+        },
+        router: router,
       });
       const td = getByText(
         'You can use the overflow property when you want to have better control of the layout. The overflow'
@@ -270,6 +283,12 @@ describe('SubmissionTableClientCsv', () => {
   it('should check that the modal text content is the same with the clicked table cell', async () => {
     const { getByText, getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
       propsData: { submissions: mockSubmissions(), selected: [] },
+      store: {
+        getters: {
+          'toggle/isOn': () => ({ feature_resource: true }),
+        },
+      },
+      router: router,
     });
     const td = getByText(
       'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout'
