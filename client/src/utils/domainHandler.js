@@ -68,5 +68,7 @@ export default {
     document.head.appendChild(iconElement);
     document.head.appendChild(appleTouch);
     document.head.appendChild(appBarThemeColor);
+
+    vue.$store.dispatch('memberships/tryAutoJoinAndSelectGroup');
   },
 };

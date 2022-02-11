@@ -16,6 +16,7 @@ module.exports = {
     'no-continue': 0,
     'no-param-reassign': 1,
     'brace-style': 1,
+    'vue/no-unused-components': 'warn',
   },
   globals: {},
   parserOptions: {

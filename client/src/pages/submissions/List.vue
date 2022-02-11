@@ -143,61 +143,6 @@
           </v-row>
         </v-card-text>
       </v-card>
-
-      <v-card v-if="selected.length > 0" class="mt-4">
-        <v-card-text>
-          <div class="d-flex align-center">
-            <div>
-              <span class="subtitle-2">ACTIONS</span><br />{{ selected.length }}
-              {{ selected.length === 1 ? 'submission' : 'submissions' }} selected
-            </div>
-            <div class="ml-auto d-flex flex-column flex-sm-row">
-              <v-btn
-                v-if="selected[0]['meta.archived'] === 'true'"
-                :disabled="surveyEntity.meta.isLibrary"
-                color="error"
-                text
-                @click="showDeleteModal = true"
-              >
-                DELETE
-              </v-btn>
-              <v-btn
-                v-if="selected[0]['meta.archived'] === 'true'"
-                :disabled="surveyEntity.meta.isLibrary"
-                text
-                @click="archiveSubmissions(selected, '', false)"
-              >
-                RESTORE
-              </v-btn>
-              <v-btn
-                v-if="selected[0]['meta.archived'] !== 'true'"
-                :disabled="surveyEntity.meta.isLibrary"
-                color="error"
-                text
-                @click="showArchiveModal = true"
-              >
-                ARCHIVE
-              </v-btn>
-              <v-btn
-                @click="reassignment.showModal = true"
-                :disabled="surveyEntity.meta.isLibrary"
-                text
-                color="secondary"
-                >REASSIGN</v-btn
-              >
-              <v-btn
-                v-if="selected[0]['meta.archived'] !== 'true' && selected.length === 1"
-                :disabled="surveyEntity.meta.isLibrary"
-                text
-                color="primary"
-                @click="resubmit(selected[0])"
-              >
-                RESUBMIT
-              </v-btn>
-            </div>
-          </div>
-        </v-card-text>
-      </v-card>
     </v-container>
 
     <v-container>
@@ -218,6 +163,12 @@
               :excludeMeta="!filter.showCsvMeta"
               :loading="loading"
               style="margin: 3px 2px"
+              :surveyEntity="surveyEntity.meta.isLibrary"
+              @showDeleteModal="showDeleteModal = true"
+              @archiveSubmissions="archiveSubmissions(selected, '', false)"
+              @showArchiveModal="showArchiveModal = true"
+              @reassignment="reassignment.showModal = true"
+              @resubmit="resubmit(selected[0])"
             />
           </v-tab-item>
           <v-tab-item>
@@ -463,6 +414,7 @@ export default {
         { key: 'showArchived', value: this.filter.showArchived, include: this.filter.showArchived },
         { key: 'showCsvDataMeta', value: this.filter.showCsvDataMeta, include: this.filter.showCsvDataMeta },
         { key: 'showCsvMeta', value: this.filter.showCsvMeta, include: this.filter.showCsvMeta },
+        { key: 'expandAllMatrices', value: true, include: this.apiDownloadFormat === 'csv' },
         {
           key: 'roles',
           value: this.filter.roles,
@@ -632,5 +584,9 @@ ul {
   padding-left: 1em;
   line-height: 1.5em;
   list-style-type: dot;
+}
+
+>>> .v-window {
+  overflow: unset;
 }
 </style>

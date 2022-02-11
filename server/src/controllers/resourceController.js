@@ -6,7 +6,7 @@ import { ObjectId } from 'mongodb';
 import { db } from '../db';
 
 import { queryParam } from '../helpers';
-import mailService from '../services/mail.service';
+import mailService from '../services/mail/mail.service';
 import membershipService from '../services/membership.service';
 import rolesService from '../services/roles.service';
 

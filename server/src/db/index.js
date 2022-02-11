@@ -10,6 +10,8 @@ let db = null;
  */
 let mongoClient = null;
 
+export const COLL_ACCESS_CODES = 'users.accesscodes';
+
 /**
  * https://stackoverflow.com/a/33780894
  * https://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html#mongoclient-connection-pooling
@@ -28,6 +30,12 @@ const connectDatabase = async () => {
   await db.collection('submissions').createIndex({ 'meta.survey.id': 1 });
   await db.collection('submissions').createIndex({ 'meta.survey.version': 1 });
   await db.collection('submissions').createIndex({ 'meta.creator': 1 });
+
+  // delete expired access codes from the DB automatically
+  await db.collection(COLL_ACCESS_CODES).createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+  // make sure that tokens are unique
+  await db.collection(COLL_ACCESS_CODES).createIndex({ code: 1 }, { unique: true });
+
   // const farmOsWebhookRequestsCollectionExists = await db.listCollections().toArray().some(({ name }) => name === 'farmos.webhookrequests')
   const farmOsWebhookRequestsCollectionName = 'farmos.webhookrequests';
   const farmOsWebhookRequestsCollectionExists = await db
@@ -238,4 +246,7 @@ const migrateResourceLibraryIds = async () => {
     console.log('Migrated resource.library to objectId of this many surveys', modifiedCount);
   }
 };
+
+export const getDb = () => db;
+
 export { db, connectDatabase, mongoClient };

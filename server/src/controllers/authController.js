@@ -2,21 +2,20 @@ import assert from 'assert';
 import bcrypt from 'bcrypt';
 import uuidv4 from 'uuid/v4';
 import isEmail from 'isemail';
+import { encodeURI as b64EncodeURI } from 'js-base64';
 
 import boom from '@hapi/boom';
 
-import mailService from '../services/mail.service';
-import rolesService from '../services/roles.service';
-import { db } from '../db';
+import mailService from '../services/mail/mail.service';
+import {
+  createUserDoc,
+  createUserIfNotExist,
+  createLoginPayload,
+  createMagicLink,
+} from '../services/auth.service';
+import { db, COLL_ACCESS_CODES } from '../db';
 
 const col = 'users';
-
-const createPayload = async (user) => {
-  delete user.password;
-  const roles = await rolesService.getRoles(user._id);
-  user.roles = roles;
-  return user;
-};
 
 const register = async (req, res) => {
   // TODO: sanity check
@@ -28,20 +27,17 @@ const register = async (req, res) => {
 
   const hash = bcrypt.hashSync(password, parseInt(process.env.BCRYPT_ROUNDS));
   const token = uuidv4();
-  const user = {
+  const user = createUserDoc({
     email,
     name,
     token,
     password: hash,
-    permissions: [],
-    authProviders: [],
-    memberships: [],
-  };
+  });
 
   try {
     let r = await db.collection(col).insertOne(user);
     assert.equal(1, r.insertedCount);
-    const payload = await createPayload(r.ops[0]);
+    const payload = await createLoginPayload(r.ops[0]);
     return res.send(payload);
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
@@ -60,14 +56,15 @@ const login = async (req, res) => {
     if (!existingUser) {
       throw boom.notFound(`No user found with matching email and token: [${email}, ${token}]`);
     }
-    const payload = await createPayload(existingUser);
+    const payload = await createLoginPayload(existingUser);
     return res.send(payload);
   }
 
   if (email.trim() === '' || password.trim() === '') {
     throw boom.badRequest('Email and password must not be empty');
   }
-
+  // TODO the client shows the same error message weather the email or the pw doesn't match (since https://gitlab.com/our-sci/software/surveystack/-/merge_requests/19)
+  //  We should also send the same error from the server to get less vulnerable against dictionary attacks
   const existingUser = await db.collection(col).findOne({ email });
   if (!existingUser) {
     throw boom.notFound(`No user with email exists: ${email}`);
@@ -79,33 +76,33 @@ const login = async (req, res) => {
     throw boom.unauthorized(`Incorrect password for user: ${email}`);
   }
 
-  const payload = await createPayload(existingUser);
+  const payload = await createLoginPayload(existingUser);
   return res.send(payload);
 };
 
 const sendPasswordResetMail = async (req, res) => {
   const { email } = req.body;
-  const { origin } = req.headers;
   const existingUser = await db.collection(col).findOne({ email });
-  if (!existingUser) {
-    throw boom.notFound(`No user with email exists: ${email}`);
+
+  // Fail silently when the email is not in the DB
+  if (existingUser) {
+    const { origin } = req.headers;
+    const landingPath = `/users/${existingUser._id}/edit`;
+    const magicLink = await createMagicLink({ origin, email, expiresAfterDays: 3, landingPath });
+
+    await mailService.sendLink({
+      to: email,
+      subject: `Link to reset your password`,
+      link: magicLink,
+      actionDescriptionHtml: 'Continue to reset your password at <b>SurveyStack</b>:',
+      actionDescriptionText: 'Use the following link to set a new password:',
+      btnText: 'Reset password',
+    });
   }
-  await mailService.send({
-    to: email,
-    subject: 'Link to reset your password',
-    text: `Hello,
-
-Use the following link to set a new password:
-
-${origin}/auth/reset-password?token=${existingUser.token}&email=${existingUser.email}
-
-If you did not request this email, you can safely ignore it.
-
-Best Regards`,
-  });
-  return res.send('OK');
+  return res.send({ ok: true });
 };
 
+// DEPRECATED: The SurveyStack browser client doesn't use it anymore. Soilstack is still using code copied from an older SurveyStack client that depends on this.```
 const resetPassword = async (req, res) => {
   const { email, token, newPassword } = req.body;
   const existingUser = await db.collection(col).findOne({ email });
@@ -137,9 +134,61 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const requestMagicLink = async (req, res) => {
+  const { email, expiresAfterDays = 1, landingPath = null } = req.body;
+
+  if (!isEmail.validate(email)) {
+    throw boom.badRequest(`Invalid email address: ${email}`);
+  }
+
+  const { origin } = req.headers;
+  const magicLink = await createMagicLink({ origin, email, expiresAfterDays, landingPath });
+
+  await mailService.sendLink({
+    to: email,
+    subject: `SurveyStack sign in`,
+    link: magicLink,
+    actionDescriptionHtml: 'Continue to <b>SurveyStack</b>:',
+    actionDescriptionText: 'Continue to log into SurveyStack with this link:',
+    btnText: 'Sign in',
+  });
+
+  res.send({ ok: true });
+};
+
+const enterWithMagicLink = async (req, res) => {
+  const { code, landingPath } = req.query;
+  const { value: accessCode } = await db.collection(COLL_ACCESS_CODES).findOneAndDelete({ code });
+
+  const withLandingPath = (url) => {
+    if (landingPath) {
+      return url + `&landingPath=${encodeURIComponent(landingPath)}`;
+    }
+    return url;
+  };
+
+  if (!accessCode) {
+    res.redirect(withLandingPath('/auth/login?magicLinkExpired'));
+    return;
+  }
+
+  const { email } = accessCode;
+
+  let userObject = await createUserIfNotExist(email);
+
+  let loginPayload = await createLoginPayload(userObject);
+  loginPayload = JSON.stringify(loginPayload);
+  loginPayload = b64EncodeURI(loginPayload);
+  let loginUrl = withLandingPath(`/auth/accept-magic-link?user=${loginPayload}`);
+
+  res.redirect(loginUrl);
+};
+
 export default {
   register,
   login,
   resetPassword,
   sendPasswordResetMail,
+  requestMagicLink,
+  enterWithMagicLink,
 };
