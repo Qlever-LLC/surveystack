@@ -2,7 +2,9 @@ import { ObjectId } from 'mongodb';
 import resourceController from './resourceController';
 import { db } from '../db';
 import { createReq } from '../testUtils';
+import bucketService from '../services/bucket.service';
 jest.mock('../services/featureToggle.service');
+jest.mock('../services/bucket.service');
 
 const { getResource, getUploadURL, commitResource, deleteResource, col } = resourceController;
 
@@ -28,10 +30,17 @@ function mockRes() {
   };
 }
 
-describe.skip('resourceController', () => {
+describe('resourceController', () => {
   let signedUrl, resourceId;
 
   beforeEach(async () => {
+    bucketService.getUploadUrl.mockReturnValue('https://mockedurl');
+    bucketService.deleteObject.mockReturnValue({
+      $metadata: {
+        httpStatusCode: 204,
+      },
+    });
+
     const req = createReq({
       body: {
         resourceName: 'testimage.png',
