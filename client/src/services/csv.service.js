@@ -1,7 +1,7 @@
 /* eslint no-restricted-syntax: 0 */
 /* eslint no-param-reassign: 0 */
 import papa from 'papaparse';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, omitBy, isObject, isEmpty } from 'lodash';
 import { flatten } from 'flat';
 
 function removeKeys(obj, keys) {
@@ -127,7 +127,7 @@ export function fileTransformer(o) {
   };
 }
 
-function createCsv(submissions, headers) {
+export function createCsv(submissions, headers) {
   const items = [];
   submissions.forEach((s) => {
     const submission = cloneDeep(s);
@@ -157,17 +157,20 @@ function createCsv(submissions, headers) {
 
     // transform GeoJSON question type result table output to only flatten
     // down to the level of each Feature in the FeatureCollection
+
     const transformedSubmissionData = transformSubmissionQuestionTypes(submission.data, {
       geoJSON: geojsonTransformer,
       file: fileTransformer,
     });
 
-    items.push(
-      flatten({
-        ...submission,
-        data: transformedSubmissionData,
-      })
-    );
+    const flattenSubmissionData = flatten({
+      ...submission,
+      data: transformedSubmissionData,
+    });
+
+    const finalSubmissionData = omitBy(flattenSubmissionData, (value) => isObject(value) && isEmpty(value));
+
+    items.push(finalSubmissionData);
   });
 
   let csv = '';
@@ -178,7 +181,6 @@ function createCsv(submissions, headers) {
   } catch (error) {
     console.log(error);
   }
-
   return csv;
 }
 

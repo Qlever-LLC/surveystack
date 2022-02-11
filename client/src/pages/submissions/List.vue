@@ -189,7 +189,6 @@
           </div>
         </v-col>
       </v-row>
-
       <v-tabs v-model="tab">
         <v-tab v-for="view in views" :key="view.tab">
           {{ view.tab }}
@@ -622,5 +621,9 @@ ul {
   padding-left: 1em;
   line-height: 1.5em;
   list-style-type: dot;
+}
+
+>>> .v-window {
+  overflow: unset;
 }
 </style>
