@@ -315,7 +315,7 @@ const routes = [
   },
   // tabula rasa
   ...(process.env.NODE_ENV === 'production'
-    ? [{}]
+    ? []
     : [
         {
           path: '/tabularasa',
