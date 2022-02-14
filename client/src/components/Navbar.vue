@@ -2,6 +2,7 @@
   <nav class="app-navbar">
     <v-app-bar app clipped-left color="appbar" absolute>
       <v-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
+      <navbar-user-menu />
       <v-toolbar-title class="flex-column">
         <div id="app-bar-title" class="title py-0 my-0">
           <router-link to="/" id="home-link" v-html="appTitle" />
@@ -10,7 +11,6 @@
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
-      <navbar-user-menu />
     </v-app-bar>
     <navbar-drawer v-model="drawerIsVisible" />
   </nav>
@@ -33,6 +33,12 @@ export default {
       set(value) {
         this.$store.dispatch('appui/setMenu', value);
       },
+    },
+    appTitle() {
+      return this.$store.getters['appui/title'];
+    },
+    appSubtitle() {
+      return this.$store.getters['appui/subtitle'];
     },
   },
 };

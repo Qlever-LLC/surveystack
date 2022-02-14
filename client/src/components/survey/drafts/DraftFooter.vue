@@ -46,8 +46,4 @@ export default {
 .button {
   text-transform: none;
 }
-
-/* .overview-footer {
-  background: #d9d9d9;
-} */
 </style>
