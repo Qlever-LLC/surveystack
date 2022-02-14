@@ -12,19 +12,22 @@
         :dateSubmitted="submission.meta.dateSubmitted"
       />
 
-    <!-- Toolbar with question number and overview button -->
-    <app-draft-toolbar
-      :groupPath="groupPath"
-      :required="control && control.options && control.options.required"
-      :anon="control && control.options && control.options.redacted"
-      :showOverviewIcon="true"
-      :questionNumber="$store.getters['draft/questionNumber']"
-      @showOverviewClicked="showOverview = !showOverview"
-      v-if="builder"
-    >
-      <!-- forward all the slots -->
-      <slot v-for="(_, name) in $slots" :name="name" :slot="name" />
-    </app-draft-toolbar>
+      <!-- Toolbar with question number and overview button -->
+      <app-draft-toolbar
+        :groupPath="groupPath"
+        :required="control && control.options && control.options.required"
+        :anon="control && control.options && control.options.redacted"
+        :showOverviewIcon="true"
+        :questionNumber="$store.getters['draft/questionNumber']"
+        @showOverviewClicked="showOverview = !showOverview"
+        :overviewIsVisible="showOverview"
+        v-if="builder"
+        class="flex-grow-0"
+        :class="{ 'pr-3': builder }"
+      >
+        <!-- forward all the slots -->
+        <slot v-for="(_, name) in $slots" :name="name" :slot="name" />
+      </app-draft-toolbar>
 
       <!-- Overview -->
       <div v-if="showOverview" class="draft-overview">
@@ -74,7 +77,7 @@
           }" -->
       <app-draft-footer
         class="draft-footer px-0 white"
-        :class="{ 'show-submit': showOverview }"
+        :class="{ 'show-submit': showOverview, 'draft-footer-builder': builder }"
         :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
         :enableNext="!$store.getters['draft/hasRequiredUnanswered']"
         :enableSubmit="!$store.getters['draft/errors']"
@@ -276,18 +279,19 @@ export default {
 <style scoped>
 .outer-wrapper {
   height: 100%;
-  background-color: #ccc;
 }
 
 @media screen and (min-width: 768px) {
   .outer-wrapper {
     display: flex;
     flex-direction: row-reverse;
+    background-color: #bbb;
   }
 
   .gutter {
     flex-grow: 1;
     height: 100%;
+    background-color: #bbb;
   }
 
   .draft-component-wrapper {
@@ -312,6 +316,10 @@ export default {
 
 .builder .draft-component-wrapper >>> .draft-footer.show-submit .full {
   position: relative;
+}
+
+.draft-footer-builder {
+  min-height: 68px;
 }
 
 .builder .draft-component-wrapper >>> .draft-footer.show-submit button.primary::after {
