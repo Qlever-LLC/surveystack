@@ -236,18 +236,18 @@ describe('computed.diffInfoTree', () => {
       const diff = shuffle(diffSurveyVersions(oldControls, newControls));
       const diffTree = SurveyDiff.computed.diffInfoTree.call(componentThis(diff));
       expect(diffTree).toMatchObject([
-        { name: control1.name, changeType: UNCHANGED },
-        { name: control2.name, changeType: REMOVED },
-        { name: control2_new.name, changeType: ADDED },
-        { name: control3.name, changeType: UNCHANGED },
+        { name: control1.name, changeType: UNCHANGED, children: [] },
+        { name: control2.name, changeType: REMOVED, children: [] },
+        { name: control2_new.name, changeType: ADDED, children: [] },
+        { name: control3.name, changeType: UNCHANGED, children: [] },
         {
           name: page.name,
           changeType: UNCHANGED,
           children: [
-            { name: control4.name, changeType: REMOVED },
-            { name: control5.name, changeType: UNCHANGED },
-            { name: control56.name, changeType: ADDED },
-            { name: control6.name, changeType: UNCHANGED },
+            { name: control4.name, changeType: REMOVED, children: [] },
+            { name: control5.name, changeType: UNCHANGED, children: [] },
+            { name: control56.name, changeType: ADDED, children: [] },
+            { name: control6.name, changeType: UNCHANGED, children: [] },
           ],
         },
       ]);

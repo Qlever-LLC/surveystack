@@ -24,7 +24,6 @@
         old-version-name="Your version"
         :new-version-name="`Version ${toLibraryRevision.version}`"
         :default-open="false"
-        use-control-path-as-id
       ></survey-diff>
       <v-card-actions class="mr-3">
         <v-btn

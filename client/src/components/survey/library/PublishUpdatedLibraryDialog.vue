@@ -16,7 +16,6 @@
         :default-open="false"
         :old-version-name="`Version ${localLibrarySurvey.latestVersion}`"
         :new-version-name="`Version ${localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].version}`"
-        :use-control-path-as-id="false"
       ></survey-diff>
       <v-card-actions class="mr-3">
         <v-spacer />

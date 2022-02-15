@@ -1,5 +1,5 @@
-import { normalizedSurveyControls, diffControls, changeType, diffSurveyVersions } from './surveyDiff';
-import { cloneDeep, find, uniqueId, set } from 'lodash';
+import { flatSurveyControls, diffControls, changeType, diffSurveyVersions } from './surveyDiff';
+import { cloneDeep, find, uniqueId, set, map } from 'lodash';
 import { createControlInstance } from './surveyConfig';
 
 const createControl = ({ type, ...overrides }) => ({
@@ -17,25 +17,25 @@ const changeAllControlIds = (controls) =>
   });
 
 describe('surveyDiff', () => {
-  describe('normalizedSurveyControls', () => {
+  describe('flatSurveyControls', () => {
     function sameItems(arr1, arr2) {
       return expect(new Set(arr1)).toEqual(new Set(arr2));
     }
 
-    it('can normalize pages', () => {
+    it('can flatten pages', () => {
       const num = createControl({ type: 'number', name: 'number_1' });
       const str = createControl({ type: 'string', name: 'string_1' });
       const page = createControl({ type: 'page', name: 'page_1', children: [num, str] });
-      const normalized = normalizedSurveyControls([page]);
-      sameItems(Object.keys(normalized), [num.id, str.id, page.id]);
+      const normalized = flatSurveyControls([page]);
+      sameItems(map(normalized, 'control'), [num, str, page]);
     });
 
-    it('can normalize groups', () => {
+    it('can flatten groups', () => {
       const num = createControl({ type: 'number', name: 'number_1' });
       const str = createControl({ type: 'string', name: 'string_1' });
       const group = createControl({ type: 'group', name: 'group_1', children: [num, str] });
-      const normalized = normalizedSurveyControls([group]);
-      sameItems(Object.keys(normalized), [num.id, str.id, group.id]);
+      const normalized = flatSurveyControls([group]);
+      sameItems(map(normalized, 'control'), [num, str, group]);
     });
 
     const createTestControls = () => [
@@ -62,38 +62,38 @@ describe('surveyDiff', () => {
 
     it('sets parentId', () => {
       const controls = createTestControls();
-      const normalized = normalizedSurveyControls(controls);
-      expect(normalized['num_1'].parentId).toBeNull();
-      expect(normalized['pag_1'].parentId).toBeNull();
-      expect(normalized['str_1'].parentId).toBe('pag_1');
-      expect(normalized['grp_1'].parentId).toBe('pag_1');
-      expect(normalized['num_2'].parentId).toBe('grp_1');
-      expect(normalized['str_2'].parentId).toBe('grp_1');
-      expect(normalized['num_3'].parentId).toBeNull();
+      const flatControls = flatSurveyControls(controls);
+      expect(find(flatControls, ['control.id', 'num_1']).parentId).toBeNull();
+      expect(find(flatControls, ['control.id', 'pag_1']).parentId).toBeNull();
+      expect(find(flatControls, ['control.id', 'str_1']).parentId).toBe('pag_1');
+      expect(find(flatControls, ['control.id', 'grp_1']).parentId).toBe('pag_1');
+      expect(find(flatControls, ['control.id', 'num_2']).parentId).toBe('grp_1');
+      expect(find(flatControls, ['control.id', 'str_2']).parentId).toBe('grp_1');
+      expect(find(flatControls, ['control.id', 'num_3']).parentId).toBeNull();
     });
 
     it('sets childIndex', () => {
       const controls = createTestControls();
-      const normalized = normalizedSurveyControls(controls);
-      expect(normalized['num_1'].childIndex).toBe(0);
-      expect(normalized['pag_1'].childIndex).toBe(1);
-      expect(normalized['str_1'].childIndex).toBe(0);
-      expect(normalized['grp_1'].childIndex).toBe(1);
-      expect(normalized['num_2'].childIndex).toBe(0);
-      expect(normalized['str_2'].childIndex).toBe(1);
-      expect(normalized['num_3'].childIndex).toBe(2);
+      const flatControls = flatSurveyControls(controls);
+      expect(find(flatControls, ['control.id', 'num_1']).childIndex).toBe(0);
+      expect(find(flatControls, ['control.id', 'pag_1']).childIndex).toBe(1);
+      expect(find(flatControls, ['control.id', 'str_1']).childIndex).toBe(0);
+      expect(find(flatControls, ['control.id', 'grp_1']).childIndex).toBe(1);
+      expect(find(flatControls, ['control.id', 'num_2']).childIndex).toBe(0);
+      expect(find(flatControls, ['control.id', 'str_2']).childIndex).toBe(1);
+      expect(find(flatControls, ['control.id', 'num_3']).childIndex).toBe(2);
     });
 
     it('sets control', () => {
       const controls = createTestControls();
-      const normalized = normalizedSurveyControls(controls);
-      expect(normalized['num_1'].control).toBe(controls[0]);
-      expect(normalized['pag_1'].control).toBe(controls[1]);
-      expect(normalized['str_1'].control).toBe(controls[1].children[0]);
-      expect(normalized['grp_1'].control).toBe(controls[1].children[1]);
-      expect(normalized['num_2'].control).toBe(controls[1].children[1].children[0]);
-      expect(normalized['str_2'].control).toBe(controls[1].children[1].children[1]);
-      expect(normalized['num_3'].control).toBe(controls[2]);
+      const flatControls = flatSurveyControls(controls);
+      expect(find(flatControls, ['control.id', 'num_1']).control).toBe(controls[0]);
+      expect(find(flatControls, ['control.id', 'pag_1']).control).toBe(controls[1]);
+      expect(find(flatControls, ['control.id', 'str_1']).control).toBe(controls[1].children[0]);
+      expect(find(flatControls, ['control.id', 'grp_1']).control).toBe(controls[1].children[1]);
+      expect(find(flatControls, ['control.id', 'num_2']).control).toBe(controls[1].children[1].children[0]);
+      expect(find(flatControls, ['control.id', 'str_2']).control).toBe(controls[1].children[1].children[1]);
+      expect(find(flatControls, ['control.id', 'num_3']).control).toBe(controls[2]);
     });
   });
 
@@ -332,7 +332,7 @@ describe('surveyDiff', () => {
         },
       ]);
     });
-    describe('works with path ids', () => {
+    describe('matches by pathId when it can not find mach by control ID', () => {
       const createDiff = () => {
         const num1 = createControlInstance({ type: 'number', name: 'number_1', label: 'foo' });
         const num2 = createControlInstance({ type: 'number', name: 'number_2', label: 'foo' });
@@ -343,7 +343,7 @@ describe('surveyDiff', () => {
 
         newControls[0] = createControlInstance({ type: 'string', name: num1.name });
         newControls[1].children[0].label = 'baz';
-        const diff = diffSurveyVersions(oldControls, newControls, { useControlPathAsId: true });
+        const diff = diffSurveyVersions(oldControls, newControls);
         return { diff, oldControls, newControls };
       };
 
@@ -364,11 +364,11 @@ describe('surveyDiff', () => {
         const { diff, oldControls, newControls } = createDiff();
         const num1OldDiff = find(diff, { oldPath: 'number_1' });
         expect(num1OldDiff).toHaveProperty('changeType', changeType.REMOVED);
-        expect(num1OldDiff).toHaveProperty('matchId', 'number_1-removed');
+        expect(num1OldDiff).toHaveProperty('matchId', `${num1OldDiff.oldControl.id}-removed`);
         expect(num1OldDiff).toHaveProperty('oldControl.type', oldControls[0].type);
         const num1NewDiff = find(diff, { newPath: 'number_1' });
         expect(num1NewDiff).toHaveProperty('changeType', changeType.ADDED);
-        expect(num1NewDiff).toHaveProperty('matchId', 'number_1-added');
+        expect(num1NewDiff).toHaveProperty('matchId', `${num1NewDiff.newControl.id}-added`);
         expect(num1NewDiff).toHaveProperty('newControl.type', newControls[0].type);
       });
     });
