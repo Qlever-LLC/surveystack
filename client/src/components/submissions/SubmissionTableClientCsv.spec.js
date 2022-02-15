@@ -1,6 +1,6 @@
 import { transformHeaders, getCellKey } from './SubmissionTableClientCsv.vue';
 import { fireEvent } from '@testing-library/vue';
-import { within } from '@testing-library/dom';
+import { within, screen } from '@testing-library/dom';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 import SubmissionTableClientCsv from './SubmissionTableClientCsv.vue';
 
@@ -279,5 +279,17 @@ describe('SubmissionTableClientCsv', () => {
     within(modal).getByText(
       'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout'
     );
+  });
+
+  it('should show actions if a submission is selected', async () => {
+    const { getAllByRole, getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
+      propsData: { submissions: mockSubmissions(), selected: [] },
+    });
+    const checkbox = getAllByRole('checkbox');
+    expect(checkbox[0].checked).toEqual(false);
+    await fireEvent.click(checkbox[0]);
+    expect(checkbox[0].checked).toEqual(true);
+    //  const actions = getByRole('actions');
+    //  expect(actions).toBeInTheDocument();
   });
 });

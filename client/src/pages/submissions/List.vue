@@ -85,7 +85,7 @@
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
-      <v-card class="py-5 my-5">
+      <v-card class="my-5">
         <v-card-title class="d-flex justify-space-between align-center">
           <div>API</div>
           <v-checkbox label="View archived only" v-model="filter.showArchived" dense hide-details />
@@ -95,45 +95,38 @@
 
           <div class="d-flex align-center justify-start mt-4">
             <v-select
-              style="max-width: 5rem; display: inline-block"
               label="Format"
-              class="mr-3"
+              class="mr-3 custom-select"
               dense
               :items="apiDownloadFormats"
               hide-details
               v-model="apiDownloadFormat"
-            ></v-select>
+            />
             <v-select
-              style="max-width: 7rem; display: inline-block"
               label="Range"
-              class="mr-3"
+              class="mr-3 custom-select"
               dense
               :items="apiDownloadRanges"
               hide-details
               v-model="apiDownloadRange"
-            ></v-select>
+            />
             <v-btn @click="startDownload" color="primary"> <v-icon left>mdi-download</v-icon>Download </v-btn>
           </div>
 
           <v-row class="mt-5" v-if="apiDownloadRange === 'page'">
             <v-col cols="1">
               <v-select
-                style="max-width: 5rem; display: inline-block"
+                class="custom-select"
                 label="Page Size"
                 dense
                 :items="pageSizes"
                 hide-details
                 v-model="pageSize"
                 @change="changedPaginationSize"
-              ></v-select>
+              />
             </v-col>
             <v-col cols="10">
-              <v-pagination
-                class="ml-0"
-                v-model="page"
-                :length="paginationTotalPages"
-                @input="changedPaginationPage"
-              ></v-pagination>
+              <v-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
             </v-col>
             <v-col cols="1">
               <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
@@ -163,7 +156,7 @@
               :excludeMeta="!filter.showCsvMeta"
               :loading="loading"
               style="margin: 3px 2px"
-              :surveyEntity="surveyEntity.meta.isLibrary"
+              :actionsAreDisabled="surveyEntity.meta.isLibrary"
               @showDeleteModal="showDeleteModal = true"
               @archiveSubmissions="archiveSubmissions(selected, '', false)"
               @showArchiveModal="showArchiveModal = true"
@@ -190,15 +183,10 @@
             hide-details
             v-model="pageSize"
             @change="changedPaginationSize"
-          ></v-select>
+          />
         </v-col>
         <v-col cols="10">
-          <v-pagination
-            class="ml-0"
-            v-model="page"
-            :length="paginationTotalPages"
-            @input="changedPaginationPage"
-          ></v-pagination>
+          <v-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
         </v-col>
         <v-col cols="1">
           <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
@@ -588,5 +576,9 @@ ul {
 
 >>> .v-window {
   overflow: unset;
+}
+.custom-select {
+  max-width: 5rem;
+  display: inline-block;
 }
 </style>

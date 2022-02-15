@@ -34,7 +34,7 @@
                   ></v-switch>
                 </div>
 
-                <div class="d-flex align-center" v-if="selected.length > 0">
+                <div class="d-flex align-center" v-if="selected.length > 0" role="actions">
                   <div>
                     <span class="subtitle-2">ACTIONS</span><br />{{ selected.length }}
                     {{ selected.length === 1 ? 'submission' : 'submissions' }} selected
@@ -42,43 +42,39 @@
                   <div class="ml-auto d-flex flex-column flex-sm-row">
                     <v-btn
                       v-if="selected[0]['meta.archived'] === 'true'"
-                      :disabled="surveyEntity"
+                      :disabled="actionsAreDisabled"
                       color="error"
                       text
-                      @click="$emit('showDeleteModal', $event.target.value)"
+                      @click="$emit('showDeleteModal', $event)"
                     >
                       DELETE
                     </v-btn>
                     <v-btn
                       v-if="selected[0]['meta.archived'] === 'true'"
-                      :disabled="surveyEntity"
+                      :disabled="actionsAreDisabled"
                       text
-                      @click="$emit('archiveSubmissions', $event.target.value)"
+                      @click="$emit('archiveSubmissions', $event)"
                     >
                       RESTORE
                     </v-btn>
                     <v-btn
                       v-if="selected[0]['meta.archived'] !== 'true'"
-                      :disabled="surveyEntity"
+                      :disabled="actionsAreDisabled"
                       color="error"
                       text
-                      @click="$emit('showArchiveModal', $event.target.value)"
+                      @click="$emit('showArchiveModal', $event)"
                     >
                       ARCHIVE
                     </v-btn>
-                    <v-btn
-                      @click="$emit('reassignment', $event.target.value)"
-                      :disabled="surveyEntity"
-                      text
-                      color="secondary"
+                    <v-btn @click="$emit('reassignment', $event)" :disabled="actionsAreDisabled" text color="secondary"
                       >REASSIGN</v-btn
                     >
                     <v-btn
                       v-if="selected[0]['meta.archived'] !== 'true' && selected.length === 1"
-                      :disabled="surveyEntity"
+                      :disabled="actionsAreDisabled"
                       text
                       color="primary"
-                      @click="$emit('resubmit', $event.target.value)"
+                      @click="$emit('resubmit', $event)"
                     >
                       RESUBMIT
                     </v-btn>
@@ -112,7 +108,14 @@
         <tbody>
           <tr v-for="item in props.items" :key="item._id">
             <td>
-              <v-checkbox v-model="tableSelected" :value="item" color="#777" class="custom-checkbox" hide-details />
+              <v-checkbox
+                v-model="tableSelected"
+                :value="item"
+                color="#777"
+                class="custom-checkbox"
+                hide-details
+                role="checkbox"
+              />
             </td>
             <td
               v-for="header in headers"
@@ -157,8 +160,8 @@ export default {
     SubmissionTableCellModal,
   },
   props: {
-    surveyEntity: {
-      type: Object,
+    actionsAreDisabled: {
+      type: Boolean,
     },
     submissions: {
       type: Object,
