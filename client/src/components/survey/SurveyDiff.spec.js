@@ -45,7 +45,7 @@ describe('render diff cards', () => {
 
     render(SurveyDiff, createOptions({ oldControls: [oldControl], newControls: [newControl] }));
 
-    const card = screen.getByTestId(`diff-card-1`);
+    const card = screen.getByTestId(`diff-card-1-changed`);
     expect(within(card).getByText('changed')).toBeInTheDocument();
     expect(within(card).getByText(newControl.label)).toBeInTheDocument();
     expect(within(card).getByText(newControl.name, { exact: false })).toBeInTheDocument();
@@ -56,7 +56,7 @@ describe('render diff cards', () => {
   it('shows addition', () => {
     const newControl = createControl({ type: 'number', name: 'number_1', label: 'number label' });
     render(SurveyDiff, createOptions({ oldControls: [], newControls: [newControl] }));
-    const card = screen.getByTestId(`diff-card-1`);
+    const card = screen.getByTestId(`diff-card-1-added`);
     expect(within(card).getByText('added')).toBeInTheDocument();
     expect(within(card).getByText(newControl.label)).toBeInTheDocument();
     expect(within(card).getByText(newControl.name, { exact: false })).toBeInTheDocument();
@@ -65,7 +65,7 @@ describe('render diff cards', () => {
   it('shows removal', () => {
     const oldControl = createControl({ type: 'number', name: 'number_1', label: 'number label' });
     render(SurveyDiff, createOptions({ oldControls: [oldControl], newControls: [] }));
-    const card = screen.getByTestId(`diff-card-1`);
+    const card = screen.getByTestId(`diff-card-1-removed`);
     expect(within(card).getByText('removed')).toBeInTheDocument();
     expect(within(card).getByText(oldControl.label)).toBeInTheDocument();
     expect(within(card).getByText(oldControl.name, { exact: false })).toBeInTheDocument();
@@ -78,12 +78,12 @@ describe('render diff cards', () => {
     newControls[0].children = [number];
 
     render(SurveyDiff, createOptions({ oldControls, newControls }));
-    const pageCard = screen.getByTestId(`diff-card-1`);
+    const pageCard = screen.getByTestId(`diff-card-1-unchanged`);
     expect(within(pageCard).getByText('unchanged')).toBeInTheDocument();
     expect(within(pageCard).getByText(page.label)).toBeInTheDocument();
     expect(within(pageCard).getByText(page.name, { exact: false })).toBeInTheDocument();
 
-    const numberCard = within(pageCard).getByTestId(`diff-card-1.1`);
+    const numberCard = within(pageCard).getByTestId(`diff-card-1.1-added`);
     expect(within(numberCard).getByText('added')).toBeInTheDocument();
     expect(within(numberCard).getByText(number.label)).toBeInTheDocument();
     expect(within(numberCard).getByText(number.name, { exact: false })).toBeInTheDocument();
@@ -95,7 +95,7 @@ describe('render diff cards', () => {
       SurveyDiff,
       createOptions({ oldControls: [unchanged], newControls: [unchanged, added], defaultShowUnchanged: true })
     );
-    const card = screen.getByTestId(`diff-card-1`);
+    const card = screen.getByTestId(`diff-card-1-unchanged`);
     expect(within(card).getByText('unchanged')).toBeInTheDocument();
     expect(within(card).getByText(unchanged.label)).toBeInTheDocument();
     expect(within(card).getByText(unchanged.name, { exact: false })).toBeInTheDocument();
@@ -110,7 +110,7 @@ describe('render diff cards', () => {
     newMatrix.options.source.content[1].label = 'changed';
 
     render(SurveyDiff, createOptions({ oldControls: [oldMatrix], newControls: [newMatrix] }));
-    const card = screen.getByTestId(`diff-card-1`);
+    const card = screen.getByTestId(`diff-card-1-changed`);
     await fireEvent.click(card.firstElementChild);
     hasDiffRow(card, 'name', oldMatrix.name, newMatrix.name);
     hasDiffRow(
@@ -146,7 +146,6 @@ describe('computed.diffInfoTree', () => {
     expect(diffTree).toMatchObject([
       {
         ...pick(newControl, 'name', 'label', 'controlType'),
-        id: diff[0].matchId,
         color: colors[CHANGED],
         changeType: CHANGED,
         changeList: [
@@ -202,7 +201,6 @@ describe('computed.diffInfoTree', () => {
     expect(diffTree).toMatchObject([
       {
         ...pick(oldControl, 'name', 'label', 'controlType'),
-        id: 0,
         color: colors[REMOVED],
         changeType: REMOVED,
         changeList: [],

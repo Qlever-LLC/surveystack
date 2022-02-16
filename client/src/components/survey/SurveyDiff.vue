@@ -114,13 +114,12 @@ export default {
           const idx = controlDiff.newControl ? controlDiff.newChildIndex : controlDiff.oldChildIndex;
           const idxPath = [...parentIdxPath, idx + 1];
           return {
-            id: controlDiff.matchId,
             name: control.name,
             label: control.label,
             controlType: control.type,
             color: this.colors[controlDiff.changeType],
             changeType: controlDiff.changeType,
-            changeList: this.getControlChangeList(controlDiff.matchId),
+            changeList: this.getControlChangeList(controlDiff),
             indexPath: idxPath.join('.'),
             children: convert(childrenOf(controlDiff), idxPath),
           };
@@ -179,8 +178,7 @@ export default {
     },
   },
   methods: {
-    getControlChangeList(matchId) {
-      const controlDiff = this.diff && this.diff.find((d) => d.matchId === matchId);
+    getControlChangeList(controlDiff) {
       if (!controlDiff || !controlDiff.diff) {
         return [];
       }

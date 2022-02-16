@@ -247,7 +247,6 @@ describe('surveyDiff', () => {
           oldChildIndex: 0,
           oldPath: oldNum.name,
           oldParentId: null,
-          matchId: 0,
           diff: {
             name: {
               changeType: changeType.CHANGED,
@@ -273,7 +272,6 @@ describe('surveyDiff', () => {
           newChildIndex: 0,
           newPath: num.name,
           newParentId: null,
-          matchId: 0,
         },
       ]);
     });
@@ -289,7 +287,6 @@ describe('surveyDiff', () => {
           oldChildIndex: 0,
           oldPath: num.name,
           oldParentId: null,
-          matchId: 0,
         },
       ]);
     });

@@ -159,17 +159,13 @@ export const diffSurveyVersions = (oldControls, newControls) => {
     const changed = Object.values(diff).some(({ changeType }) => changeType !== UNCHANGED);
     const changeType = changed ? CHANGED : UNCHANGED;
 
-    return {
-      ...result,
-      diff,
-      changeType,
-    };
+    return { ...result, diff, changeType };
   });
 
   removeds = removeds.map((control) => ({ changeType: REMOVED, ...getOldProps(control) }));
   addeds = addeds.map((control) => ({ changeType: ADDED, ...getNewProps(control) }));
 
-  return [...matcheds, ...addeds, ...removeds].map((controlDiff, matchId) => ({ ...controlDiff, matchId }));
+  return [...matcheds, ...addeds, ...removeds];
 };
 
 export function controlListsHaveChanges(oldControls, newControls) {
