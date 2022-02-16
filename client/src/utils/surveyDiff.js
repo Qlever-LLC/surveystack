@@ -113,6 +113,7 @@ export const diffSurveyVersions = (oldControls, newControls) => {
   let addeds = flatSurveyControls(newControls);
   let matcheds = [];
 
+  // Moves found matches from the `addeds`, `removeds` arrays into `matcheds`
   const extractMatchesBy = (predictate) => {
     for (const a of [...addeds]) {
       const predictateA = predictate(a);
@@ -126,6 +127,9 @@ export const diffSurveyVersions = (oldControls, newControls) => {
       }
     }
   };
+  // Try to find matches by control.id first and then by control-path
+  //  Matching by control-path is useful because in QSL's the control.id
+  //  always changes when we update a library
   extractMatchesBy((c) => c.control.id);
   extractMatchesBy((c) => c.path);
 
