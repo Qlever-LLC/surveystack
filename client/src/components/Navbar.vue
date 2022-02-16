@@ -3,7 +3,7 @@
     <v-app-bar app clipped-left color="appbar" absolute>
       <v-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
       <navbar-user-menu />
-      <v-toolbar-title class="flex-column">
+      <v-toolbar-title class="flex-column ml-4">
         <div id="app-bar-title" class="title py-0 my-0">
           <router-link to="/" id="home-link" v-html="appTitle" />
         </div>

@@ -281,24 +281,28 @@ export default {
   height: 100%;
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width: 1200px) {
   .outer-wrapper {
     display: flex;
     flex-direction: row-reverse;
     background-color: #bbb;
+    /* display: grid;
+    grid-template-columns: 1fr 500px;
+    grid-template-rows: 100%; */
   }
 
   .gutter {
     flex-grow: 1;
     height: 100%;
     background-color: #bbb;
+    width: 500px;
   }
 
   .draft-component-wrapper {
-    min-width: 768px;
-    /* width: 768px; */
+    /* min-width: 960px; */
+    width: 700px;
     flex-grow: 2;
-    max-width: 1200px;
+    /* max-width: 960px; */
   }
 
   .builder .gutter {
