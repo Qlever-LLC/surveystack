@@ -247,7 +247,7 @@ describe('surveyDiff', () => {
           oldChildIndex: 0,
           oldPath: oldNum.name,
           oldParentId: null,
-          matchId: newNum.id,
+          matchId: 0,
           diff: {
             name: {
               changeType: changeType.CHANGED,
@@ -273,7 +273,7 @@ describe('surveyDiff', () => {
           newChildIndex: 0,
           newPath: num.name,
           newParentId: null,
-          matchId: `${num.id}-added`,
+          matchId: 0,
         },
       ]);
     });
@@ -289,7 +289,7 @@ describe('surveyDiff', () => {
           oldChildIndex: 0,
           oldPath: num.name,
           oldParentId: null,
-          matchId: `${num.id}-removed`,
+          matchId: 0,
         },
       ]);
     });
@@ -313,7 +313,6 @@ describe('surveyDiff', () => {
           oldChildIndex: 0,
           oldPath: oldMat.name,
           oldParentId: null,
-          matchId: newMat.id,
           diff: {
             'options.source.config.addRowLabel': {
               changeType: changeType.CHANGED,
@@ -353,7 +352,6 @@ describe('surveyDiff', () => {
         const num2Diff = find(diff, { newPath: path });
         expect(num2Diff).toHaveProperty('changeType', changeType.CHANGED);
         expect(num2Diff).toHaveProperty('oldPath', path);
-        expect(num2Diff).toHaveProperty('matchId', path);
         expect(num2Diff).toHaveProperty('diff.label.changeType', changeType.CHANGED);
         expect(num2Diff).toHaveProperty('diff.label.oldValue', oldControls[1].children[0].label);
         expect(num2Diff).toHaveProperty('diff.label.newValue', newControls[1].children[0].label);
@@ -364,11 +362,9 @@ describe('surveyDiff', () => {
         const { diff, oldControls, newControls } = createDiff();
         const num1OldDiff = find(diff, { oldPath: 'number_1' });
         expect(num1OldDiff).toHaveProperty('changeType', changeType.REMOVED);
-        expect(num1OldDiff).toHaveProperty('matchId', `${num1OldDiff.oldControl.id}-removed`);
         expect(num1OldDiff).toHaveProperty('oldControl.type', oldControls[0].type);
         const num1NewDiff = find(diff, { newPath: 'number_1' });
         expect(num1NewDiff).toHaveProperty('changeType', changeType.ADDED);
-        expect(num1NewDiff).toHaveProperty('matchId', `${num1NewDiff.newControl.id}-added`);
         expect(num1NewDiff).toHaveProperty('newControl.type', newControls[0].type);
       });
     });

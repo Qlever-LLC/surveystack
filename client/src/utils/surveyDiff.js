@@ -120,7 +120,7 @@ export const diffSurveyVersions = (oldControls, newControls) => {
         if (a.control.type === b.control.type && predictateA === predictate(b)) {
           pull(addeds, a);
           pull(removeds, b);
-          matcheds.push([b, a, predictateA]);
+          matcheds.push([b, a]);
           break;
         }
       }
@@ -149,11 +149,10 @@ export const diffSurveyVersions = (oldControls, newControls) => {
     };
   };
 
-  matcheds = matcheds.map(([oldControl, newControl, matchId]) => {
+  matcheds = matcheds.map(([oldControl, newControl]) => {
     const result = {
       ...getOldProps(oldControl),
       ...getNewProps(newControl),
-      matchId,
     };
 
     const diff = diffControls(result.oldControl, result.newControl);
@@ -167,21 +166,10 @@ export const diffSurveyVersions = (oldControls, newControls) => {
     };
   });
 
-  // NOTE - to avoid comparing controls with different types,
-  //  when control.type changes, we generate an ADDED and a REMOVED type diff instead of one CHANGED
-  //  This would result in two diffs with the same matchId, so we add '-added' '-removed' postfixes to the matchId
-  removeds = removeds.map((control) => ({
-    changeType: REMOVED,
-    matchId: `${control.control.id}-removed`,
-    ...getOldProps(control),
-  }));
-  addeds = addeds.map((control) => ({
-    changeType: ADDED,
-    matchId: `${control.control.id}-added`,
-    ...getNewProps(control),
-  }));
+  removeds = removeds.map((control) => ({ changeType: REMOVED, ...getOldProps(control) }));
+  addeds = addeds.map((control) => ({ changeType: ADDED, ...getNewProps(control) }));
 
-  return [...matcheds, ...addeds, ...removeds]; //.map((controlDiff, matchId) => ({ ...controlDiff, matchId }));
+  return [...matcheds, ...addeds, ...removeds].map((controlDiff, matchId) => ({ ...controlDiff, matchId }));
 };
 
 export function controlListsHaveChanges(oldControls, newControls) {
