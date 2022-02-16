@@ -5,7 +5,7 @@
       <v-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
       <navbar-user-menu />
 
-      <div class="d-flex flex-column" v-if="$vuetify.breakpoint.smAndUp">
+      <div class="d-flex flex-column ml-4" v-if="$vuetify.breakpoint.mdAndUp">
         <div id="app-bar-title" class="title py-0 my-0">
           <router-link to="/" id="home-link" v-html="appTitle" />
           <div class="app-bar-subtitle subtitle py-0 my-0" v-html="appSubtitle" />

@@ -2,7 +2,7 @@
   <div>
     <v-menu right attach="#app-menu" offset-y v-if="$store.getters['auth/isLoggedIn']" :close-on-content-click="false">
       <template v-slot:activator="{ on }">
-        <v-btn text v-on="on">
+        <v-btn icon v-on="on">
           <v-icon>mdi-account</v-icon>
         </v-btn>
       </template>
