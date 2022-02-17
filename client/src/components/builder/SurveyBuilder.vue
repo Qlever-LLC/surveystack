@@ -166,7 +166,7 @@
           ></code-editor>
         </div>
       </pane>
-      <pane class="pane pane-draft" :style="{ width: isPreviewMobile ? '375px' : '900px' }">
+      <pane class="pane pane-draft" :style="{ width: isPreviewMobile ? '375px' : '1200px' }">
         <div class="full-height">
           <app-draft-component
             @submit="(payload) => $emit('submit', payload)"

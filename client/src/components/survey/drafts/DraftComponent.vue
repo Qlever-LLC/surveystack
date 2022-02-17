@@ -38,7 +38,7 @@
           :groupPath="groupPath"
           :overviews="$store.getters['draft/overviews']"
           @goto="goto"
-          class="maxw-60 mx-auto"
+          class="maxw-60 mr-auto"
         />
       </div>
 
@@ -62,7 +62,7 @@
           </v-btn>
         </v-fab-transition>
         <app-control
-          class="maxw-60 mx-auto"
+          class="maxw-60 mr-auto"
           :path="path"
           :control="control"
           :forceMobile="forceMobile"
@@ -281,28 +281,36 @@ export default {
   height: 100%;
 }
 
+.gutter {
+}
+
+.show-mobile-image.outer-wrapper {
+  display: grid;
+  grid-template: 300px 1fr / 1fr;
+}
+
+.show-mobile-image .gutter {
+  width: 100%;
+  height: 100%;
+  background-color: #ccc;
+}
+
 @media screen and (min-width: 1200px) {
   .outer-wrapper {
-    display: flex;
-    flex-direction: row-reverse;
     background-color: #bbb;
-    /* display: grid;
-    grid-template-columns: 1fr 500px;
-    grid-template-rows: 100%; */
+    display: grid;
+    grid-template: 1fr / 1fr 500px;
+    width: 100%;
   }
 
   .gutter {
-    flex-grow: 1;
     height: 100%;
     background-color: #bbb;
     width: 500px;
+    order: 2;
   }
 
   .draft-component-wrapper {
-    /* min-width: 960px; */
-    width: 700px;
-    flex-grow: 2;
-    /* max-width: 960px; */
   }
 
   .builder .gutter {
@@ -310,11 +318,16 @@ export default {
 
   .builder .draft-component-wrapper {
     /* min-width: 384px; why is this the magic number? 399px +/- 15px for scrollbar */
-    /* min-width: 399px; /* not sure how to tell which is appropriate in pure ccss */
     min-width: 384px;
     width: 100%;
-    /* TODO: make builder desktop preview bigger so you can see images and change to 768px */
-    max-width: 700px;
+    max-width: 1200px;
+  }
+
+  .builder-draft.builder {
+    /* hack to avoid horizontal scrolling for builder mobile view, since media queries are for whole viewport and draft is embedded */
+    overflow-x: hidden;
+    /* always show vertical scrollbar so that builder preview is constant width */
+    overflow-y: scroll;
   }
 }
 
