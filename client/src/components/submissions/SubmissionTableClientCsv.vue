@@ -34,7 +34,7 @@
                   ></v-switch>
                 </div>
 
-                <div class="d-flex align-center" v-if="selected.length > 0" role="actions">
+                <div class="d-flex align-center" v-if="selected.length > 0">
                   <div>
                     <span class="subtitle-2">ACTIONS</span><br />{{ selected.length }}
                     {{ selected.length === 1 ? 'submission' : 'submissions' }} selected

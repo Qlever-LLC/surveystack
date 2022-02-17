@@ -281,15 +281,37 @@ describe('SubmissionTableClientCsv', () => {
     );
   });
 
-  it('should show actions if a submission is selected', async () => {
-    const { getAllByRole, getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: { submissions: mockSubmissions(), selected: [] },
-    });
+  it('selected is updated when checkbox is clicked', async () => {
+    const { getAllByRole, getByRole, findByText, getByText, debug, emitted } = renderWithVuetify(
+      SubmissionTableClientCsv,
+      {
+        propsData: { submissions: mockSubmissions(), selected: [] },
+      }
+    );
+
     const checkbox = getAllByRole('checkbox');
-    expect(checkbox[0].checked).toEqual(false);
     await fireEvent.click(checkbox[0]);
-    expect(checkbox[0].checked).toEqual(true);
-    //  const actions = getByRole('actions');
-    //  expect(actions).toBeInTheDocument();
+    expect(emitted()['update:selected']).toBeTruthy();
+  });
+
+  it('selected is updated when checkbox is clicked', async () => {
+    const { getAllByRole, getByRole, findByText, getByText, debug, emitted } = renderWithVuetify(
+      SubmissionTableClientCsv,
+      {
+        propsData: {
+          submissions: mockSubmissions(),
+          selected: [
+            {
+              _id: '61bd8891ff21c10001c986aa',
+              'data.text_1.value': 'Test',
+            },
+          ],
+        },
+      }
+    );
+    getByText(/1 submission selected/i);
+    getByRole('button', { name: /archive/i });
+    getByRole('button', { name: /reassign/i });
+    getByRole('button', { name: /resubmit/i });
   });
 });
