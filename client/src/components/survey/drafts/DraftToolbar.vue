@@ -39,11 +39,6 @@ export default {
       type: Boolean,
     },
   },
-  // watch: {
-  //   overviewIsVisible(o, n) {
-  //     console.log('old', o, 'new', n)
-  //   }
-  // },
 };
 </script>
 
