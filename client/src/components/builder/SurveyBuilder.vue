@@ -903,8 +903,8 @@ export default {
   padding: 12px;
   width: 2800px;
   min-width: 100vw;
-  /* full height minus navbar */
-  height: calc(100vh - 68px);
+  /* full height minus navbar minux horizontal scrollbar */
+  height: calc(100vh - 68px - 15px);
 }
 
 .pane-root > .pane ~ .pane {
@@ -958,9 +958,7 @@ export default {
 }
 
 .pane-draft {
-  width: 100vw;
   align-self: center;
-  overflow: auto;
 }
 
 .hide-pane {

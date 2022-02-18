@@ -1,7 +1,12 @@
 <template>
   <div class="outer-wrapper" :class="{ builder: builder }">
     <div class="gutter"></div>
-    <div class="draft-component-wrapper draft wrapper d-flex flex-column" v-if="control" ref="wrapper">
+    <div
+      class="draft-component-wrapper draft wrapper d-flex flex-column"
+      v-if="control"
+      ref="wrapper"
+      :class="{ 'force-mobile': forceMobile }"
+    >
       <!-- confirm submission modal -->
       <app-confirm-submission-dialog
         v-if="showConfirmSubmission"
@@ -70,14 +75,12 @@
         />
       </div>
 
-      <!-- Footer with next/prev buttons -->
-      <!-- :style="{
-            left: moveFooter ? '256px' : '0px',
-            width: moveFooter ? 'calc(100% - 256px)' : '100%',
-          }" -->
       <app-draft-footer
-        class="draft-footer px-0 white"
-        :class="{ 'show-submit': showOverview, 'draft-footer-builder': builder }"
+        class="draft-footer px-6 py-2"
+        :class="{
+          'show-submit': showOverview,
+          'draft-footer-builder': builder,
+        }"
         :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
         :enableNext="!$store.getters['draft/hasRequiredUnanswered']"
         :enableSubmit="!$store.getters['draft/errors']"
@@ -295,42 +298,6 @@ export default {
   background-color: #ccc;
 }
 
-@media screen and (min-width: 1200px) {
-  .outer-wrapper {
-    background-color: #bbb;
-    display: grid;
-    grid-template: 1fr / 1fr 500px;
-    width: 100%;
-  }
-
-  .gutter {
-    height: 100%;
-    background-color: #bbb;
-    width: 500px;
-    order: 2;
-  }
-
-  .draft-component-wrapper {
-  }
-
-  .builder .gutter {
-  }
-
-  .builder .draft-component-wrapper {
-    /* min-width: 384px; why is this the magic number? 399px +/- 15px for scrollbar */
-    min-width: 384px;
-    width: 100%;
-    max-width: 1200px;
-  }
-
-  .builder-draft.builder {
-    /* hack to avoid horizontal scrolling for builder mobile view, since media queries are for whole viewport and draft is embedded */
-    overflow-x: hidden;
-    /* always show vertical scrollbar so that builder preview is constant width */
-    overflow-y: scroll;
-  }
-}
-
 .builder .draft-component-wrapper >>> .draft-footer.show-submit .full {
   position: relative;
 }
@@ -381,7 +348,8 @@ export default {
 }
 
 .draft-component-wrapper {
-  height: 100%;
+  height: calc(100vh - 68px - 48px);
+  overflow: auto;
   display: flex;
   flex-direction: column;
   padding: 0px !important;
@@ -392,7 +360,6 @@ export default {
   width: 100% !important;
   display: flex;
   flex-direction: column;
-  /* margin-bottom: 68px; */
   background-color: var(--v-background-base);
 }
 
@@ -403,17 +370,72 @@ export default {
   margin: 0rem auto;
   display: flex;
   flex-direction: column;
-  /* margin-bottom: 68px; */
   /* background-color: var(--v-background-base); */
   background-color: white;
 }
 
 .draft-footer {
-  /* z-index: 3; */
-  height: 68px;
+  z-index: 3;
+  height: 52px;
   width: 100%;
-  /* position: fixed;
+  position: fixed;
   bottom: 0px;
-  left: 0px; */
+  left: 0px;
+  background-color: var(--v-appbar-base);
+  box-shadow: 0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%);
+}
+
+@media screen and (min-width: 1200px) {
+  .outer-wrapper {
+    background-color: #bbb;
+    display: grid;
+    grid-template: 1fr / 1fr 500px;
+    width: 100%;
+  }
+
+  .gutter {
+    height: 100%;
+    background-color: #bbb;
+    width: 500px;
+    order: 2;
+  }
+
+  .draft-footer {
+    width: calc(100% - 500px);
+  }
+
+  .draft-component-wrapper {
+  }
+
+  .builder .gutter {
+  }
+
+  .builder .draft-component-wrapper {
+    /* min-width: 384px; 399px +/- 15px for scrollbar */
+    /* min-width: 384px; */
+    min-width: 400px;
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  .builder-draft.builder {
+    /* hack to avoid horizontal scrolling for builder mobile view, since media queries are for whole viewport and draft is embedded */
+    overflow-x: hidden;
+  }
+}
+
+.force-mobile > .draft-footer {
+  width: 100%;
+}
+
+.force-mobile .gutter {
+  /* width: 0; */
+  display: none;
+}
+
+.draft-component-wrapper.force-mobile {
+  height: calc(667px - 48px);
+  /* always show vertical scrollbar so that builder preview is constant width */
+  /* overflow-y: scroll; */
 }
 </style>
