@@ -79,7 +79,6 @@
         class="draft-footer px-6 py-2"
         :class="{
           'show-submit': showOverview,
-          'draft-footer-builder': builder,
         }"
         :showPrev="!$store.getters['draft/atStart'] && !$store.getters['draft/showOverview']"
         :enableNext="!$store.getters['draft/hasRequiredUnanswered']"
@@ -273,9 +272,6 @@ export default {
     const { survey, submission, persist } = this;
     this.$store.dispatch('draft/init', { survey, submission, persist });
   },
-  mounted() {
-    // console.log('wrapper', this.$refs.wrapper.clientHeight, this.$refs.wrapper.scrollHeight);
-  },
 };
 </script>
 
@@ -300,10 +296,6 @@ export default {
 
 .builder .draft-component-wrapper >>> .draft-footer.show-submit .full {
   position: relative;
-}
-
-.draft-footer-builder {
-  min-height: 68px;
 }
 
 .builder .draft-component-wrapper >>> .draft-footer.show-submit button.primary::after {
@@ -370,7 +362,6 @@ export default {
   margin: 0rem auto;
   display: flex;
   flex-direction: column;
-  /* background-color: var(--v-background-base); */
   background-color: white;
 }
 
@@ -411,8 +402,6 @@ export default {
   }
 
   .builder .draft-component-wrapper {
-    /* min-width: 384px; 399px +/- 15px for scrollbar */
-    /* min-width: 384px; */
     min-width: 400px;
     width: 100%;
     max-width: 1200px;
@@ -428,14 +417,7 @@ export default {
   width: 100%;
 }
 
-.force-mobile .gutter {
-  /* width: 0; */
-  display: none;
-}
-
 .draft-component-wrapper.force-mobile {
   height: calc(667px - 48px);
-  /* always show vertical scrollbar so that builder preview is constant width */
-  /* overflow-y: scroll; */
 }
 </style>

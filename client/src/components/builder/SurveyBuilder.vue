@@ -907,10 +907,6 @@ export default {
   height: calc(100vh - 68px - 15px);
 }
 
-.pane-root > .pane ~ .pane {
-  /* border-left: 1px solid #eee; */
-}
-
 .horizontal-line {
   border-bottom: 1px solid #eee;
 }
