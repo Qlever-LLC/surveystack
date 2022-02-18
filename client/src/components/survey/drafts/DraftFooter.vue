@@ -1,6 +1,6 @@
 <template>
   <footer v-if="showNav" class="d-flex align-center" color="white">
-    <div class="full-width maxw-60 mx-auto">
+    <div class="full-width maxw-60 mr-auto">
       <div v-if="showSubmit" class="d-flex full-width overview-footer">
         <div class="px-1">
           <v-btn
