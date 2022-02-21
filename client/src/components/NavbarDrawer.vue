@@ -166,12 +166,6 @@ export default {
     readyToSubmitCount() {
       return this.$store.getters['submissions/readyToSubmit'].length;
     },
-    appTitle() {
-      return this.$store.getters['appui/title'];
-    },
-    appSubtitle() {
-      return this.$store.getters['appui/subtitle'];
-    },
     items() {
       const items = [];
       const divider = { type: 'divider' };
