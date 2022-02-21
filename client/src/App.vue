@@ -1,8 +1,7 @@
 <template>
   <v-app id="app" :class="{ 'minimal-ui': $route.query.minimal_ui }">
-    <app-navbar />
+    <router-view name="navbar" />
     <div id="app-menu"></div>
-
     <v-main>
       <app-global-feedback />
       <router-view />
@@ -12,9 +11,6 @@
 </template>
 
 <script>
-/* eslint-disable no-restricted-syntax */
-
-import appNavbar from '@/components/Navbar.vue';
 import appGlobalFeedback from '@/components/GlobalFeedback.vue';
 import domainHandler from '@/utils/domainHandler';
 import api from '@/services/api.service';
@@ -24,7 +20,6 @@ import InstallBanner from '@/components/ui/InstallBanner.vue';
 export default {
   name: 'App',
   components: {
-    appNavbar,
     appGlobalFeedback,
     InstallBanner,
   },
@@ -41,15 +36,6 @@ export default {
       api.get('farmos/fields');
       api.get('farmos/assets');
     }
-    // this.$store.dispatch('surveys/fetchPinned', ),
-    // fetch pinned surveys
-    // for survey, prefetch
-
-    // TODO prefetch iframemessaging
-    // fetch('/iframeMessaging.js');
-    // fetch('/iframeUtils.js');
-    // fetch('/iframeUI.js');
-    // fetch('/iframeStyles.css');
   },
 };
 </script>

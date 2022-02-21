@@ -17,6 +17,7 @@ import resourceController from '../controllers/resourceController';
 
 import groupIntegrationController from '../controllers/groupIntegrationController';
 import membershipIntegrationController from '../controllers/membershipIntegrationController';
+import { unleashProxyApp } from '../services/featureToggle.service';
 
 import cfsController from '../controllers/cfsController';
 
@@ -56,6 +57,8 @@ router.post('/auth/register', catchErrors(authController.register));
 router.post('/auth/login', catchErrors(authController.login));
 router.post('/auth/send-password-reset-mail', catchErrors(authController.sendPasswordResetMail));
 router.post('/auth/reset-password', catchErrors(authController.resetPassword));
+router.post('/auth/request-magic-link', catchErrors(authController.requestMagicLink));
+router.get('/auth/enter-with-magic-link', catchErrors(authController.enterWithMagicLink));
 
 /** Group */
 router.get('/groups', catchErrors(groupController.getGroups));
@@ -73,7 +76,11 @@ router.put(
   catchErrors(groupController.updateGroup)
 );
 router.post('/groups/add-doc-link', assertAuthenticated, catchErrors(groupController.addDocLink));
-router.post('/groups/remove-doc-link', assertAuthenticated, catchErrors(groupController.removeDocLink));
+router.post(
+  '/groups/remove-doc-link',
+  assertAuthenticated,
+  catchErrors(groupController.removeDocLink)
+);
 // router.delete('/groups/:id', assertAuthenticated, catchErrors(groupController.deleteGroup));
 
 /** Submissions */
@@ -102,7 +109,7 @@ router.post(
     assertEntitiesExist({ collection: 'submissions' }),
     assertEntitiesRights,
   ],
-  catchErrors(submissionController.bulkReassignSubmissions),
+  catchErrors(submissionController.bulkReassignSubmissions)
 );
 router.get(
   '/submissions/:id',
@@ -178,7 +185,11 @@ router.put(
   [assertAuthenticated, assertIdsMatch, assertEntityExists({ collection: 'users' })],
   catchErrors(userController.updateUser)
 );
-router.delete('/users/:id', [assertAuthenticated, assertIsSuperAdmin], catchErrors(userController.deleteUser));
+router.delete(
+  '/users/:id',
+  [assertAuthenticated, assertIsSuperAdmin],
+  catchErrors(userController.deleteUser)
+);
 
 /** Scripts */
 router.get('/scripts', catchErrors(scriptController.getScripts));
@@ -300,6 +311,8 @@ router.get('/resources', catchErrors(resourceController.getResources));
 router.get('/info/ip', catchErrors(infoController.getIP));
 router.get('/info/public-ip', catchErrors(infoController.getPublicIP));
 router.get('/info/public-hostname', catchErrors(infoController.getPublicHostname));
+
+router.use('/toggles', unleashProxyApp);
 
 // default api
 router.get('/', (req, res) => {

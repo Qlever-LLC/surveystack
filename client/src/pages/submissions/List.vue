@@ -189,7 +189,6 @@
           </div>
         </v-col>
       </v-row>
-
       <v-tabs v-model="tab">
         <v-tab v-for="view in views" :key="view.tab">
           {{ view.tab }}
@@ -203,6 +202,8 @@
               :archived="filter.showArchived"
               :dataTableProps="dateTableProps"
               @onDataTablePropsChanged="onDataTablePropsChanged"
+              @excludeMetaChange="filter.showCsvMeta = !$event"
+              :excludeMeta="!filter.showCsvMeta"
               :loading="loading"
               style="margin: 3px 2px"
             />
@@ -278,6 +279,7 @@ const createDefaultFilter = () => ({
   showArchived: false,
   showIrrelevant: false,
   showCsvDataMeta: false,
+  showCsvMeta: false,
   roles: '',
 });
 
@@ -448,6 +450,8 @@ export default {
         { key: 'showIrrelevant', value: this.filter.showIrrelevant, include: this.filter.showIrrelevant },
         { key: 'showArchived', value: this.filter.showArchived, include: this.filter.showArchived },
         { key: 'showCsvDataMeta', value: this.filter.showCsvDataMeta, include: this.filter.showCsvDataMeta },
+        { key: 'showCsvMeta', value: this.filter.showCsvMeta, include: this.filter.showCsvMeta },
+        { key: 'expandAllMatrices', value: true, include: this.apiDownloadFormat === 'csv' },
         {
           key: 'roles',
           value: this.filter.roles,
@@ -617,5 +621,9 @@ ul {
   padding-left: 1em;
   line-height: 1.5em;
   list-style-type: dot;
+}
+
+>>> .v-window {
+  overflow: unset;
 }
 </style>

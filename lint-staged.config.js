@@ -4,6 +4,7 @@ module.exports = {
     () => "yarn lerna --scope surveystack-client run test",
   ],
   "server/{tests,src}/**/*.js": [
+    "yarn lerna --scope surveystack-server run lint-fix -- --",
     () => "yarn lerna --scope surveystack-server run test",
   ],
 };

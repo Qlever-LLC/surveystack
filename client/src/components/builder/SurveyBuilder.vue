@@ -39,6 +39,7 @@
             @set-survey-resources="setSurveyResources"
             @addToLibrary="addToLibrary"
             class="mb-4"
+            data-testid="survey-details"
           />
           <graphical-view
             v-if="!viewCode"
@@ -165,9 +166,9 @@
           ></code-editor>
         </div>
       </pane>
-      <pane class="pane pane-draft">
+      <pane class="pane pane-draft" :style="{ width: isPreviewMobile ? '375px' : '800px' }">
         <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
-        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px);">
+        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px); overflow: auto;">
           <app-draft-component
             @submit="(payload) => $emit('submit', payload)"
             v-if="survey && instance"
@@ -176,8 +177,30 @@
             :persist="false"
             class="builder-draft"
             builder
-          ></app-draft-component>
+            :forceMobile="isPreviewMobile"
+          >
+            <template v-slot:toolbar-actions>
+              <v-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
+                <v-btn :value="false" dense>
+                  <span class="hidden-sm-and-down">desktop</span>
+
+                  <v-icon right>
+                    mdi-monitor
+                  </v-icon>
+                </v-btn>
+
+                <v-btn :value="true">
+                  <span class="hidden-sm-and-down">mobile</span>
+
+                  <v-icon right>
+                    mdi-cellphone
+                  </v-icon>
+                </v-btn>
+              </v-btn-toggle>
+            </template>
+          </app-draft-component>
         </div>
+
         <v-overlay :value="enableSaveDraft">
           <v-card>
             <v-card-text>
@@ -185,32 +208,8 @@
             </v-card-text>
           </v-card>
         </v-overlay>
-
-        <!-- <v-snackbar
-          v-model="infoSnack"
-        >
-          hello
-
-          <template v-slot:action="{ attrs }">
-            <v-btn
-              color="red"
-              text
-              v-bind="attrs"
-              @click="infoSnack = false"
-            >
-              Close
-            </v-btn>
-          </template>
-        </v-snackbar> -->
       </pane>
     </splitpanes>
-
-    <!-- <confirm-leave-dialog
-      ref="confirmLeaveDialog"
-      title="Confirm Leave Survey"
-    >
-      Are you sure you want to leave this survey?
-    </confirm-leave-dialog> -->
   </div>
 </template>
 
@@ -320,6 +319,7 @@ export default {
       surveyUnchanged: true,
       showExamples: false,
       availableLibraryUpdates: {},
+      isPreviewMobile: false,
     };
   },
   methods: {
@@ -962,12 +962,6 @@ export default {
   width: 100vw;
   align-self: center;
   overflow: auto;
-}
-
-.pane-draft,
-.draft {
-  max-width: 500px;
-  /*max-height: 1000px;*/
 }
 
 .hide-pane {

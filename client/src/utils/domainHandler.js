@@ -30,9 +30,10 @@ export default {
     manifestElement.setAttribute('rel', 'manifest');
     const parts = window.location.host.split('.');
     manifestElement.setAttribute('href', '/manifest.json');
+    const partnerSubdomainOverride = localStorage.getItem('partner_subdomain_override');
 
-    if (parts.length > 0) {
-      const subdomain = parts[0];
+    if (partnerSubdomainOverride || parts.length > 0) {
+      const subdomain = partnerSubdomainOverride || parts[0];
       const activePartner = partners.find((p) => p.domain === subdomain);
 
       if (activePartner) {
@@ -67,5 +68,7 @@ export default {
     document.head.appendChild(iconElement);
     document.head.appendChild(appleTouch);
     document.head.appendChild(appBarThemeColor);
+
+    vue.$store.dispatch('memberships/tryAutoJoinAndSelectGroup');
   },
 };
