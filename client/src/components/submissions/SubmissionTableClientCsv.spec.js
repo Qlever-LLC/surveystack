@@ -282,12 +282,9 @@ describe('SubmissionTableClientCsv', () => {
   });
 
   it('selected is updated when checkbox is clicked', async () => {
-    const { getAllByRole, getByRole, findByText, getByText, debug, emitted } = renderWithVuetify(
-      SubmissionTableClientCsv,
-      {
-        propsData: { submissions: mockSubmissions(), selected: [] },
-      }
-    );
+    const { getAllByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
+      propsData: { submissions: mockSubmissions(), selected: [] },
+    });
 
     const checkbox = getAllByRole('checkbox');
     await fireEvent.click(checkbox[0]);
@@ -295,23 +292,126 @@ describe('SubmissionTableClientCsv', () => {
   });
 
   it('selected is updated when checkbox is clicked', async () => {
-    const { getAllByRole, getByRole, findByText, getByText, debug, emitted } = renderWithVuetify(
-      SubmissionTableClientCsv,
-      {
-        propsData: {
-          submissions: mockSubmissions(),
-          selected: [
-            {
-              _id: '61bd8891ff21c10001c986aa',
-              'data.text_1.value': 'Test',
-            },
-          ],
-        },
-      }
-    );
+    const { getByRole, getByText } = renderWithVuetify(SubmissionTableClientCsv, {
+      propsData: {
+        submissions: mockSubmissions(),
+        selected: [
+          {
+            _id: '61bd8891ff21c10001c986aa',
+            'data.text_1.value': 'Test',
+          },
+        ],
+      },
+    });
     getByText(/1 submission selected/i);
     getByRole('button', { name: /archive/i });
     getByRole('button', { name: /reassign/i });
     getByRole('button', { name: /resubmit/i });
+  });
+
+  it('should emit showArchiveModal event when archive button is clicked', async () => {
+    const { getByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
+      propsData: {
+        submissions: mockSubmissions(),
+        selected: [
+          {
+            _id: '61bd8891ff21c10001c986aa',
+            'data.text_1.value': 'Test',
+          },
+        ],
+      },
+    });
+
+    const archiveButton = getByRole('button', { name: /archive/i });
+    await fireEvent.click(archiveButton);
+    expect(emitted()['showArchiveModal']).toBeTruthy();
+  });
+
+  it('should emit resubmit event when resubmit button is clicked', async () => {
+    const { getByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
+      propsData: {
+        submissions: mockSubmissions(),
+        selected: [
+          {
+            _id: '61bd8891ff21c10001c986aa',
+            'data.text_1.value': 'Test',
+          },
+        ],
+      },
+    });
+
+    const resubmitButton = getByRole('button', { name: /resubmit/i });
+    await fireEvent.click(resubmitButton);
+    expect(emitted()['resubmit']).toBeTruthy();
+  });
+
+  it('should emit reassignment event when reassign button is clicked', async () => {
+    const { getByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
+      propsData: {
+        submissions: mockSubmissions(),
+        selected: [
+          {
+            _id: '61bd8891ff21c10001c986aa',
+            'data.text_1.value': 'Test',
+          },
+        ],
+      },
+    });
+
+    const reassignButton = getByRole('button', { name: /reassign/i });
+    await fireEvent.click(reassignButton);
+    expect(emitted()['reassignment']).toBeTruthy();
+  });
+
+  it('should disable reassign Button if actionsAreDisabled prop is set to true', async () => {
+    const { getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
+      propsData: {
+        submissions: mockSubmissions(),
+        actionsAreDisabled: true,
+        selected: [
+          {
+            _id: '61bd8891ff21c10001c986aa',
+            'data.text_1.value': 'Test',
+          },
+        ],
+      },
+    });
+
+    const reassignButton = getByRole('button', { name: /reassign/i });
+    expect(reassignButton).toBeDisabled();
+  });
+  it('should disable resubmit Button if actionsAreDisabled prop is set to true', async () => {
+    const { getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
+      propsData: {
+        submissions: mockSubmissions(),
+        actionsAreDisabled: true,
+        selected: [
+          {
+            _id: '61bd8891ff21c10001c986aa',
+            'data.text_1.value': 'Test',
+          },
+        ],
+      },
+    });
+
+    const resubmitButton = getByRole('button', { name: /resubmit/i });
+    expect(resubmitButton).toBeDisabled();
+  });
+  it('should disable archive Button if actionsAreDisabled prop is set to true', async () => {
+    const { getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
+      propsData: {
+        submissions: mockSubmissions(),
+        actionsAreDisabled: true,
+        selected: [
+          {
+            _id: '61bd8891ff21c10001c986aa',
+            'data.text_1.value': 'Test',
+          },
+        ],
+      },
+    });
+
+    const archiveButton = getByRole('button', { name: /archive/i });
+    expect(archiveButton).toBeDisabled();
   });
 });
