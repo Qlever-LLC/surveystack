@@ -8,8 +8,8 @@ import { ping } from '../services/farmos-2/area';
 
 const areaPing = () => {
   ping();
-}
+};
 
 export default {
-  areaPing
+  areaPing,
 };
