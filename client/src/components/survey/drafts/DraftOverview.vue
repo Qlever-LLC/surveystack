@@ -1,5 +1,5 @@
 <template>
-  <v-container class="wrapper">
+  <v-container class="wrapper ml-0">
     <v-banner class="my-2" v-if="$store.getters['draft/errors']" color="red" dark rounded>
       <h3>Api Compose Errors</h3>
       <li v-for="(error, i) in $store.getters['draft/errors']" :key="i">

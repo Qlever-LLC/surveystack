@@ -1,5 +1,5 @@
 <template>
-  <div class="screen-root" style="padding: 0px 12px 0px 0px !important">
+  <div class="screen-root pr-3">
     <v-dialog v-model="viewCode">
       <app-code-view v-model="survey" />
     </v-dialog>
@@ -12,9 +12,9 @@
       This survey uses an outdated question library set. Consider reviewing the new version and updating it.
     </v-alert>
 
-    <splitpanes style="padding: 0px !important" class="pane-root" vertical>
-      <pane class="pane pane-survey" style="position: relative; overflow: hidden">
-        <div class="pane-fixed-wrapper pr-2" style="position: relative;">
+    <splitpanes class="pane-root pa-0" vertical>
+      <pane class="pane pane-survey full-height pa-2">
+        <div class="pane-fixed-wrapper pr-2">
           <control-adder @controlAdded="controlAdded" @openLibrary="openLibrary" />
           <survey-details
             :version="version"
@@ -70,7 +70,6 @@
       <pane class="pane pane-controls" v-if="control">
         <v-card class="pb-3 mb-3">
           <div class="px-4">
-            <!-- <v-card-title class="pl-0">Details</v-card-title> -->
             <control-properties
               v-if="control"
               :control="control"
@@ -166,22 +165,28 @@
           ></code-editor>
         </div>
       </pane>
-      <pane class="pane pane-draft" :style="{ width: isPreviewMobile ? '375px' : '800px' }">
-        <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
-        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px); overflow: auto;">
+      <pane
+        class="pane pane-draft pa-0 ma-0"
+        :class="{ 'v-card': isPreviewMobile, 'v-sheet': isPreviewMobile }"
+        :style="{
+          width: isPreviewMobile ? '375px' : '1200px',
+          height: isPreviewMobile ? '667px' : '100%',
+        }"
+      >
+        <div class="full-height">
           <app-draft-component
             @submit="(payload) => $emit('submit', payload)"
             v-if="survey && instance"
             :submission="instance"
             :survey="survey"
             :persist="false"
-            class="builder-draft"
+            class="builder-draft full-height"
             builder
             :forceMobile="isPreviewMobile"
           >
             <template v-slot:toolbar-actions>
-              <v-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
-                <v-btn :value="false" dense>
+              <v-btn-toggle v-model="isPreviewMobile" dense class="my-auto">
+                <v-btn text :value="false" dense>
                   <span class="hidden-sm-and-down">desktop</span>
 
                   <v-icon right>
@@ -189,7 +194,7 @@
                   </v-icon>
                 </v-btn>
 
-                <v-btn :value="true">
+                <v-btn text :value="true">
                   <span class="hidden-sm-and-down">mobile</span>
 
                   <v-icon right>
@@ -878,20 +883,14 @@ export default {
     this.createInstance();
     this.checkForLibraryUpdates(this.survey);
   },
-
-  // TODO: get route guard to work here, or move dirty flag up to Builder.vue
-  // beforeRouteLeave(to, from, next) {
-  //   console.log('hello');
-  //   if (true) {
-  //     this.$refs.confirmLeaveDialog.open(next);
-  //     return;
-  //   }
-  //   next(true);
-  // },
 };
 </script>
 
 <style scoped>
+.builder-draft {
+  overflow: auto;
+}
+
 .screen-root {
   width: 100%;
   height: 100%;
@@ -904,10 +903,8 @@ export default {
   padding: 12px;
   width: 2800px;
   min-width: 100vw;
-}
-
-.pane-root > .pane ~ .pane {
-  border-left: 1px solid #eee;
+  /* full height minus navbar minux horizontal scrollbar */
+  height: calc(100vh - 68px - 15px);
 }
 
 .horizontal-line {
@@ -917,14 +914,11 @@ export default {
 .pane {
   will-change: transform;
   transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  height: calc(100vh - 64px - 30px - 24px);
   min-width: 400px;
-  max-height: 100%;
-  margin-top: 15px;
-  margin-left: 15px;
   margin-right: 15px;
   margin-bottom: 0px;
   overflow: hidden;
+  height: 100%;
 }
 
 .pane-survey,
@@ -956,12 +950,11 @@ export default {
 
 .pane-survey {
   overflow: auto;
+  height: 100%;
 }
 
 .pane-draft {
-  width: 100vw;
   align-self: center;
-  overflow: auto;
 }
 
 .hide-pane {
@@ -1010,22 +1003,6 @@ export default {
 .editor-hidden {
   transform: translateX(100%);
 }
-
-/* .pane::-webkit-scrollbar {
-  width: 12px;
-  background-color: #f5f5f5;
-} */
-
-/* .pane::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
-  background-image: linear-gradient(120deg, #f44336 0%, #d67a74 100%);
-} */
-/* .pane::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
-  background-color: #f5f5f5;
-  border-radius: 10px;
-} */
 
 .pane-fixed-wrapper {
   height: 100%;

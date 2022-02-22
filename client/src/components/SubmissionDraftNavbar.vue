@@ -3,18 +3,25 @@
     <navbar-drawer v-model="drawerIsVisible" />
     <v-app-bar app clipped-left color="appbar" absolute>
       <v-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
-      <v-toolbar-title class="flex-column flex-grow-1">
-        <draft-toolbar
-          :groupPath="groupPath"
-          :required="control && control.options && control.options.required"
-          :anon="control && control.options && control.options.redacted"
-          :showOverviewIcon="true"
-          :questionNumber="$store.getters['draft/questionNumber']"
-          @showOverviewClicked="showOverview = !showOverview"
-        />
-      </v-toolbar-title>
-
       <navbar-user-menu />
+
+      <div class="d-flex flex-column ml-4" v-if="$vuetify.breakpoint.mdAndUp">
+        <div id="app-bar-title" class="title py-0 my-0">
+          <router-link to="/" id="home-link" v-html="appTitle" />
+          <div class="app-bar-subtitle subtitle py-0 my-0" v-html="appSubtitle" />
+        </div>
+      </div>
+      <v-spacer />
+      <draft-toolbar
+        :groupPath="groupPath"
+        :required="control && control.options && control.options.required"
+        :anon="control && control.options && control.options.redacted"
+        :showOverviewIcon="true"
+        :questionNumber="$store.getters['draft/questionNumber']"
+        @showOverviewClicked="showOverview = !showOverview"
+        class="flex-grow-1"
+        :overviewIsVisible="showOverview"
+      />
     </v-app-bar>
   </nav>
 </template>
@@ -55,6 +62,12 @@ export default {
         // this.$store.dispatch('draft/showOverview', v);
         queueAction(this.$store, 'draft/showOverview', v);
       },
+    },
+    appTitle() {
+      return this.$store.getters['appui/title'];
+    },
+    appSubtitle() {
+      return this.$store.getters['appui/subtitle'];
     },
   },
 };

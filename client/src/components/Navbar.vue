@@ -2,7 +2,8 @@
   <nav class="app-navbar">
     <v-app-bar app clipped-left color="appbar" absolute>
       <v-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
-      <v-toolbar-title class="flex-column">
+      <navbar-user-menu />
+      <v-toolbar-title class="flex-column ml-4">
         <div id="app-bar-title" class="title py-0 my-0">
           <router-link to="/" id="home-link" v-html="appTitle" />
         </div>
@@ -10,7 +11,6 @@
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
-      <navbar-user-menu />
     </v-app-bar>
     <navbar-drawer v-model="drawerIsVisible" />
   </nav>

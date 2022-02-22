@@ -1,44 +1,49 @@
 <template>
-  <div>
-    <v-toolbar color="grey lighten-4" flat tile>
-      <div class="flex-grow-1 d-flex flex-row justify-space-between maxw-60 mx-auto">
-        <v-toolbar-title id="draft-toolbar">
-          <div class="infos grey--text text--darken-2">
-            <div class="d-flex">
-              <span class="number-chip mr-2">{{ questionNumber }}</span>
-            </div>
-          </div>
-        </v-toolbar-title>
+  <v-toolbar color="grey lighten-4" flat tile class="pr-0 draft-toolbar">
+    <div class="flex-grow-1 d-flex flex-row justify-space-between align-center mx-auto">
+      <v-toolbar-title id="draft-toolbar">
+        {{ questionNumber }}
+      </v-toolbar-title>
 
-        <v-spacer />
+      <v-spacer />
 
-        <slot name="toolbar-actions"></slot>
+      <slot name="toolbar-actions"></slot>
 
-        <v-btn icon v-if="showOverviewIcon" @click="$emit('showOverviewClicked')">
-          <v-icon>mdi-format-list-numbered</v-icon>
-        </v-btn>
-      </div>
-    </v-toolbar>
-  </div>
+      <v-btn icon v-if="showOverviewIcon" @click="$emit('showOverviewClicked')" class="mr-n3">
+        <v-icon v-if="!overviewIsVisible">mdi-text-box-check-outline</v-icon>
+        <v-icon v-else>mdi-close</v-icon>
+      </v-btn>
+    </div>
+  </v-toolbar>
 </template>
 
 <script>
 export default {
-  props: ['showOverviewIcon', 'questionNumber', 'required', 'anon', 'groupPath'],
+  props: {
+    showOverviewIcon: {
+      type: Boolean,
+    },
+    questionNumber: {
+      type: String,
+    },
+    required: {
+      type: Boolean,
+    },
+    anon: {
+      type: Boolean,
+    },
+    groupPath: {
+      type: String,
+    },
+    overviewIsVisible: {
+      type: Boolean,
+    },
+  },
 };
 </script>
 
 <style scoped>
-.number-chip {
-  display: inline-flex;
-  border: 2px solid currentColor;
-  background-color: white;
-  border-radius: 2rem;
-  line-height: 2rem;
-  font-weight: bold;
-  font-size: 2rem;
-  padding: 0.4rem;
-  padding-left: 0.8rem;
-  padding-right: 0.9rem;
+.draft-toolbar >>> .v-toolbar__content {
+  padding-right: 0;
 }
 </style>
