@@ -5,7 +5,7 @@
     <v-row>
       <div class="col-12">
         <v-file-input
-          v-model="currFiles"
+          v-model="newFiles"
           :accept="
             control.options.source.types && control.options.source.types.length > 0
               ? control.options.source.types.join()
@@ -23,12 +23,13 @@
         >
           <template v-slot:selection="{ text, index, file }">
             <v-chip
-              v-for="f in allFiles"
+              v-for="(f, idx) in allFiles"
               :key="f.name"
               text-color="white"
               color="grey"
               close
-              @click:close="clear(index)"
+              @click:close="remove(idx)"
+              :data-test-id="'file_' + idx"
             >
               {{ f.name }}
             </v-chip>
@@ -43,27 +44,47 @@
 
 <script>
 import baseQuestionComponent from './BaseQuestionComponent';
+import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
+import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
+import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 
 export default {
   mixins: [baseQuestionComponent],
+  components: {
+    appControlLabel,
+    appControlMoreInfo,
+    appControlHint,
+  },
   props: {},
   data() {
     return {
-      currFiles: [],
-      allFiles: [],
+      newFiles: new File([''], 'dummyfile'), //workaround to make sure v-slot:selection is shown even if newFiles is empty because file chooser has not been used yet
+      allFiles: this.value || [],
     };
   },
   computed: {},
   watch: {},
   methods: {
     async filesChanged(e) {
-      this.allFiles.push(...this.currFiles);
+      this.allFiles.push(...this.newFiles);
       this.changed(this.allFiles.length ? this.allFiles : null);
     },
-    async clear(e) {
-      this.currFiles = [];
+    clear() {
       this.allFiles = [];
+      this.changed(null);
     },
+    remove(index) {
+      this.allFiles.splice(index, 1);
+      this.changed(this.allFiles);
+    },
+    submit() {
+      console.log('file value' + this.allFiles);
+      this.changed(this.allFiles);
+      this.$emit('next');
+    },
+  },
+  mounted() {
+    console.log(this.value);
   },
 };
 </script>
