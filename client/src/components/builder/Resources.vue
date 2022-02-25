@@ -93,7 +93,7 @@
 import ObjectId from 'bson-objectid';
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import slugify from '@/utils/slugify';
-import { openResourceInTab, resourceLocations, uploadFile } from '@/utils/resources';
+import { openResourceInTab, resourceLocations } from '@/utils/resources';
 
 export default {
   components: {
@@ -137,8 +137,7 @@ export default {
         files: [file],
       },
     }) {
-      let resourceId = await uploadFile(file);
-      await this.$store.dispatch('resources/fetchRemoteResource', resourceId, file);
+      let resourceId = await this.$store.dispatch('resources/addResource', file);
       // add survey resource
       this.$emit('set-survey-resources', [
         ...this.resources,

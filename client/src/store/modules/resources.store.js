@@ -1,5 +1,7 @@
 import * as db from '@/store/db';
-import { downloadResourceData, getResource, resourceLocations } from '@/utils/resources';
+import { resourceLocations, uploadFile } from '@/utils/resources';
+import api from '@/services/api.service';
+import axios from 'axios';
 
 const createInitialState = () => ({
   resources: [],
@@ -17,11 +19,11 @@ const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  async addLocalResource({ commit }, resourceId, file) {
-    let resource = await getResource(resourceId);
-    resource.fileData = file;
-    await db.persistResource(resource);
-    commit('ADD_RESOURCE', resource);
+  // eslint-disable-next-line no-unused-vars
+  async addResource({ commit, dispatch }, file) {
+    let resourceId = await uploadFile(file);
+    await dispatch('fetchResource', resourceId, file);
+    return resourceId;
   },
   async initFromIndexedDB({ commit }) {
     // TODO reject if timeout here
@@ -33,24 +35,32 @@ const actions = {
     commit('SET_RESOURCES', response);
     return response;
   },
-  async fetchRemoteResource({ commit }, resourceId) {
-    let resource = await getResource(resourceId);
-    /*TODO store data in the resource object could lead to the data being stored in OUR db if a caller persists this resource object
+  async fetchResource({ commit, getters }, resourceId) {
+    let resource = getters['getResource'](resourceId);
+    console.log('1' + resource);
+    if (!resource) {
+      /*TODO store data in the resource object could lead to the data being stored in OUR db if a caller persists this resource object
       maybe store the data in a separate array?
      */
-    let binaryResult = await downloadResourceData(resourceId);
-    resource.fileData = new Blob([binaryResult], { type: resource.contentType });
-    //resource.fileData = btoa(unescape(encodeURIComponent(binaryResult)));
-    await db.persistResource(resource);
-    commit('ADD_RESOURCE', resource);
+      // fetch resource
+      ({ data: resource } = await api.get(`/resources/${resourceId}`));
+      console.log('2' + resource);
+      // get download url
+      const { data: url } = await api.post(`/resources/download-url`, { key: resource.key });
+      // download data
+      const { data: binaryResult } = await axios.get(url, { responseType: 'arraybuffer', validateStatus: false });
+      resource.fileData = new Blob([binaryResult], { type: resource.contentType });
+      await db.persistResource(resource);
+      commit('ADD_RESOURCE', resource);
+    }
     return resource;
   },
-  async fetchRemoteResources({ commit }, resources) {
+  async fetchResources({ commit }, resources) {
     //TODO test if this is executed in parallel
     let promises = [];
     for (const r of resources) {
       if (r.location === resourceLocations.REMOTE) {
-        promises.push(this.$store.dispatch('resources/fetchRemoteResource', r._id));
+        promises.push(this.$store.dispatch('resources/fetchResource', r._id));
       }
     }
     await Promise.all(promises);

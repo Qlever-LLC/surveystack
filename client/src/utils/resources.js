@@ -71,32 +71,8 @@ export function nameHasValidLength(val) {
   return namePattern.test(val) ? true : 'Data name must be at least 4 character in length';
 }
 
-export async function getResource(resourceId) {
-  let response = await api.get(`/resources/${resourceId}`);
-  return response.data;
-}
-
-export async function getDownloadUrl(resourceId) {
-  // fetch resource
-  let resource = await getResource(resourceId);
-  // get download url
-  let response = await api.post(`/resources/download-url`, { key: resource.key });
-  return response.data;
-}
-
-export async function downloadResourceData(resourceId) {
-  const url = await getDownloadUrl(resourceId);
-  const response = await axios.get(url, { responseType: 'arraybuffer', validateStatus: false });
-  return response.data;
-}
-
 export async function openResourceInTab(resourceId) {
-  let resource = store.getters['resources/getResource'](resourceId);
-  if (!resource) {
-    // eslint-disable-next-line require-atomic-updates
-    resource = await store.dispatch('resources/fetchRemoteResource', resourceId);
-  }
-
+  let resource = await store.dispatch('resources/fetchResource', resourceId);
   let url = window.URL.createObjectURL(resource.fileData);
   window.open(url);
 }
@@ -117,6 +93,7 @@ export async function uploadFile(file) {
 }
 
 export async function uploadFileResources(submission) {
+  //this does not cache to store, and that makes sense when submitting
   let submissionClone = submission; //cloneDeep(submission);
 
   let controls = Object.values(submissionClone.data);
