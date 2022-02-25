@@ -92,10 +92,8 @@
 <script>
 import ObjectId from 'bson-objectid';
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
-import api from '@/services/api.service';
-import axios from 'axios';
 import slugify from '@/utils/slugify';
-import { getResource, openResourceInTab, resourceLocations, uploadFile } from '@/utils/resources';
+import { openResourceInTab, resourceLocations, uploadFile } from '@/utils/resources';
 
 export default {
   components: {
