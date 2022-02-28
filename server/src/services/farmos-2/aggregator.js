@@ -22,12 +22,45 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
       httpsAgent: agent,
     });
 
+    console.log('fetching', r);
+
     return r;
   };
 
-  const asset = async () => {};
+  const getAssets = async (farmurl, bundle) => {
+    const r = await axios.get(
+      `${apiBase}/farms/relay/api/asset/${bundle}?farm_url=${encodeURIComponent(farmurl)}`,
+      {
+        headers: {
+          accept: 'application/json',
+          'api-key': aggregatorKey,
+        },
+        httpsAgent: agent,
+      }
+    );
+
+    return r;
+  };
+
+  const createLog = async (farmurl, bundle, log) => {
+    const r = await axios.post(
+      `${apiBase}/farms/relay/api/log/${bundle}?farm_url=${encodeURIComponent(farmurl)}`,
+      log,
+      {
+        headers: {
+          accept: 'application/json',
+          'api-key': aggregatorKey,
+        },
+        httpsAgent: agent,
+      }
+    );
+
+    return r;
+  };
 
   return {
     farminfo,
+    getAssets,
+    createLog,
   };
 };
