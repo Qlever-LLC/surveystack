@@ -78,13 +78,9 @@ export default {
       this.changed(this.allFiles);
     },
     submit() {
-      console.log('file value' + this.allFiles);
       this.changed(this.allFiles);
       this.$emit('next');
     },
-  },
-  mounted() {
-    console.log(this.value);
   },
 };
 </script>
