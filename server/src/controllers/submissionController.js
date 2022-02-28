@@ -397,7 +397,7 @@ const getSubmissionsPage = async (req, res) => {
 
   pipeline.push(...paginationStages);
 
-  const [entities] = await db.collection(col).aggregate(pipeline).toArray();
+  const [entities] = await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).toArray();
 
   if (!entities) {
     return res.send({
