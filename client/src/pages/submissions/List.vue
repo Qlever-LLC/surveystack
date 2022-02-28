@@ -12,9 +12,7 @@
 
     <app-dialog v-model="showDeleteModal" @cancel="showDeleteModal = false" @confirm="deleteSubmissions(selected)">
       <template v-slot:title>Confirm deletion</template>
-      <template>
-        Are you sure you want to delete this submission? This can not be undone.
-      </template>
+      <template> Are you sure you want to delete this submission? This can not be undone. </template>
     </app-dialog>
 
     <app-dialog
@@ -189,7 +187,6 @@
           </div>
         </v-col>
       </v-row>
-
       <v-tabs v-model="tab">
         <v-tab v-for="view in views" :key="view.tab">
           {{ view.tab }}
@@ -452,6 +449,7 @@ export default {
         { key: 'showArchived', value: this.filter.showArchived, include: this.filter.showArchived },
         { key: 'showCsvDataMeta', value: this.filter.showCsvDataMeta, include: this.filter.showCsvDataMeta },
         { key: 'showCsvMeta', value: this.filter.showCsvMeta, include: this.filter.showCsvMeta },
+        { key: 'expandAllMatrices', value: true, include: this.apiDownloadFormat === 'csv' },
         {
           key: 'roles',
           value: this.filter.roles,
@@ -581,12 +579,12 @@ export default {
   },
   watch: {
     // eslint-disable-next-line func-names
-    'filter.showArchived': function() {
+    'filter.showArchived': function () {
       this.selected = [];
       this.fetchData();
     },
     // eslint-disable-next-line func-names
-    'reassignment.group': function(val) {
+    'reassignment.group': function (val) {
       this.reassignment.user = null;
 
       if (!val) {
@@ -621,5 +619,9 @@ ul {
   padding-left: 1em;
   line-height: 1.5em;
   list-style-type: dot;
+}
+
+>>> .v-window {
+  overflow: unset;
 }
 </style>

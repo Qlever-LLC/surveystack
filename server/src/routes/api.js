@@ -15,6 +15,7 @@ import resourceController from '../controllers/resourceController';
 
 import groupIntegrationController from '../controllers/groupIntegrationController';
 import membershipIntegrationController from '../controllers/membershipIntegrationController';
+import { isToggleOn, unleashProxyApp } from '../services/featureToggle.service';
 
 import cfsController from '../controllers/cfsController';
 
@@ -25,12 +26,12 @@ import {
   assertIdsMatch,
   assertNameNotEmpty,
   assertEntityRights,
-  assertHasSurveyParam,
   assertSubmissionRights,
   assertEntitiesExist,
   assertEntitiesRights,
   assertHasIds,
   validateBulkReassignRequestBody,
+  checkFeatureToggledOn,
 } from '../handlers/assertions';
 
 import { catchErrors } from '../handlers/errorHandlers';
@@ -54,6 +55,8 @@ router.post('/auth/register', catchErrors(authController.register));
 router.post('/auth/login', catchErrors(authController.login));
 router.post('/auth/send-password-reset-mail', catchErrors(authController.sendPasswordResetMail));
 router.post('/auth/reset-password', catchErrors(authController.resetPassword));
+router.post('/auth/request-magic-link', catchErrors(authController.requestMagicLink));
+router.get('/auth/enter-with-magic-link', catchErrors(authController.enterWithMagicLink));
 
 /** Group */
 router.get('/groups', catchErrors(groupController.getGroups));
@@ -298,13 +301,38 @@ router.delete(
 // Call for submissions (CFS)
 router.post('/call-for-submissions/send', [assertAuthenticated], catchErrors(cfsController.send));
 
-// resources (/api/resources) - not to be confused with /resources
-router.get('/resources', catchErrors(resourceController.getResources));
+router.get(
+  '/resources/:id',
+  [checkFeatureToggledOn('feature_resource')],
+  catchErrors(resourceController.getResource)
+);
+router.post(
+  '/resources/download-url',
+  [checkFeatureToggledOn('feature_resource')],
+  catchErrors(resourceController.getDownloadURL)
+);
+router.post(
+  '/resources/upload-url',
+  [checkFeatureToggledOn('feature_resource'), assertAuthenticated],
+  catchErrors(resourceController.getUploadURL)
+);
+router.put(
+  '/resources/commit/:id',
+  [checkFeatureToggledOn('feature_resource'), assertAuthenticated],
+  catchErrors(resourceController.commitResource)
+);
+router.delete(
+  '/resources/:id',
+  [checkFeatureToggledOn('feature_resource'), assertAuthenticated],
+  catchErrors(resourceController.deleteResource)
+);
 
 // info
 router.get('/info/ip', catchErrors(infoController.getIP));
 router.get('/info/public-ip', catchErrors(infoController.getPublicIP));
 router.get('/info/public-hostname', catchErrors(infoController.getPublicHostname));
+
+router.use('/toggles', unleashProxyApp);
 
 // default api
 router.get('/', (req, res) => {

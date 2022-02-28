@@ -4,7 +4,7 @@
       class="control-item mb-2"
       v-for="diffInfo in diffInfoTree"
       :diffInfo="diffInfo"
-      :key="diffInfo.id"
+      :key="`${diffInfo.indexPath}-${diffInfo.changeType}`"
       v-bind="{ oldVersionName, newVersionName }"
     >
       <survey-diff-card-tree :diffInfoTree="diffInfo.children" v-bind="{ oldVersionName, newVersionName }" />

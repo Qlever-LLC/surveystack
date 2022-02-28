@@ -21,6 +21,7 @@ export default function buildScriptQuestionIframeContents({
   contextJSON,
   controlJSON,
   paramsJSON,
+  surveyJSON,
 }) {
   let baseURL;
   switch (process.env.NODE_ENV) {
@@ -82,6 +83,7 @@ export default function buildScriptQuestionIframeContents({
           parent: ${parentJSON},
           control: ${controlJSON},
           params: ${paramsJSON},
+          survey: ${surveyJSON},
         };
 
         ${scriptSource}

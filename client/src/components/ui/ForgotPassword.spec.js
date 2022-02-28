@@ -19,7 +19,7 @@ describe('ForgotPassword component', () => {
           RouterLink: RouterLinkStub,
         },
       });
-      getByRole('link', { name: 'Back to Sign in' });
+      getByRole('link', { name: 'Back to login' });
     });
     it('Renders button to ForgotPassword when useLink is false', async () => {
       const { getByRole } = renderWithVuetify(ForgotPassword, {
@@ -34,7 +34,7 @@ describe('ForgotPassword component', () => {
           RouterLink: RouterLinkStub,
         },
       });
-      getByRole('button', { name: 'Back to Sign in' });
+      getByRole('button', { name: 'Back to login' });
     });
   });
 
@@ -89,32 +89,11 @@ describe('ForgotPassword component', () => {
       expect(emailInput.value).toBe(emailData);
       const button = getByText('Submit');
       await fireEvent.click(button);
-      getByText(`Check your inbox on ${emailData}`);
+      getByText(
+        'If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes.'
+      );
     });
-    it('displays error message status 404 when submit is called with a "wrong" email', async () => {
-      let error404 = { response: { status: 404 } };
-      mockAxios.post.mockImplementation(() => Promise.reject(error404));
-      const { getByLabelText, getByText } = renderWithVuetify(ForgotPassword, {
-        propsData: {},
-        store: {},
-        mocks: {
-          $route: {
-            query: {},
-          },
-        },
-        stubs: {
-          RouterLink: RouterLinkStub,
-          transition: TransitionStub,
-        },
-      });
-      const emailInput = getByLabelText('Email');
-      fireEvent.update(emailInput, 'such_a_email_that_returns_status_404');
-      expect(emailInput.value).toBe('such_a_email_that_returns_status_404');
-      const button = getByText('Submit');
-      await fireEvent.click(button);
-      getByText(`invalid email`);
-    });
-    it('displays error message status default when submit is called with a "wrong" email', async () => {
+    it('displays error message when submit returns with an error', async () => {
       let error500 = { response: { status: 500 } };
       mockAxios.post.mockImplementation(() => Promise.reject(error500));
       const { getByLabelText, getByText } = renderWithVuetify(ForgotPassword, {
@@ -135,7 +114,7 @@ describe('ForgotPassword component', () => {
       expect(emailInput.value).toBe('such_a_email_that_returns_status_default');
       const button = getByText('Submit');
       await fireEvent.click(button);
-      getByText(`Unknown error :/`);
+      getByText('An error occurred, please try again later.');
     });
   });
 });
