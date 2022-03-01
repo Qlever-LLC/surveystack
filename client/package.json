@@ -12,7 +12,7 @@
     "scaffold-partner": "node src/scripts/scaffoldPartner.js",
     "storybook": "start-storybook -p 6006 --no-manager-cache",
     "build-storybook": "build-storybook",
-    "chromatic": "npx chromatic --exit-once-uploaded"
+    "chromatic": "npx chromatic --exit-once-uploaded --project-token=297a39f5b7c2"
   },
   "license": "GPL-3.0-only",
   "dependencies": {
