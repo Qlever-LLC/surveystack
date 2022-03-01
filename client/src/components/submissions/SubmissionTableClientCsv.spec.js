@@ -281,7 +281,7 @@ describe('SubmissionTableClientCsv', () => {
     );
   });
 
-  it('selected is updated when checkbox is clicked', async () => {
+  it('emits update:selected event when submission checkbox is clicked', async () => {
     const { getAllByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
       propsData: { submissions: mockSubmissions(), selected: [] },
     });
@@ -291,7 +291,7 @@ describe('SubmissionTableClientCsv', () => {
     expect(emitted()['update:selected']).toBeTruthy();
   });
 
-  it('selected is updated when checkbox is clicked', async () => {
+  it('displays selected text and submission action buttons when the selected prop contains a submission from the submissions prop', async () => {
     const { getByRole, getByText } = renderWithVuetify(SubmissionTableClientCsv, {
       propsData: {
         submissions: mockSubmissions(),
@@ -309,7 +309,7 @@ describe('SubmissionTableClientCsv', () => {
     getByRole('button', { name: /resubmit/i });
   });
 
-  it('should emit showArchiveModal event when archive button is clicked', async () => {
+  it('emits showArchiveModal event when archive button is clicked', async () => {
     const { getByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
       propsData: {
         submissions: mockSubmissions(),
@@ -324,7 +324,7 @@ describe('SubmissionTableClientCsv', () => {
 
     const archiveButton = getByRole('button', { name: /archive/i });
     await fireEvent.click(archiveButton);
-    expect(emitted()['showArchiveModal']).toBeTruthy();
+    expect(emitted().showArchiveModal).toBeTruthy();
   });
 
   it('should emit resubmit event when resubmit button is clicked', async () => {
@@ -342,7 +342,7 @@ describe('SubmissionTableClientCsv', () => {
 
     const resubmitButton = getByRole('button', { name: /resubmit/i });
     await fireEvent.click(resubmitButton);
-    expect(emitted()['resubmit']).toBeTruthy();
+    expect(emitted().resubmit).toBeTruthy();
   });
 
   it('should emit reassignment event when reassign button is clicked', async () => {
@@ -360,7 +360,7 @@ describe('SubmissionTableClientCsv', () => {
 
     const reassignButton = getByRole('button', { name: /reassign/i });
     await fireEvent.click(reassignButton);
-    expect(emitted()['reassignment']).toBeTruthy();
+    expect(emitted().reassignment).toBeTruthy();
   });
 
   it('should disable reassign Button if actionsAreDisabled prop is set to true', async () => {

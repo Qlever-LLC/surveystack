@@ -156,7 +156,7 @@
               :excludeMeta="!filter.showCsvMeta"
               :loading="loading"
               style="margin: 3px 2px"
-              :actionsAreDisabled="surveyEntity.meta.isLibrary"
+              :actionsAreDisabled="surveyEntity && surveyEntity.meta.isLibrary"
               @showDeleteModal="showDeleteModal = true"
               @archiveSubmissions="archiveSubmissions(selected, '', false)"
               @showArchiveModal="showArchiveModal = true"
