@@ -107,7 +107,10 @@ const getters = {
 
     return null;
   },
-  relevance: (state) => (path, fallback = true) => surveyStackUtils.getRelevance(state.submission, path, fallback),
+  relevance:
+    (state) =>
+    (path, fallback = true) =>
+      surveyStackUtils.getRelevance(state.submission, path, fallback),
   hasRequiredUnanswered: (state) => {
     if (state.node.hasChildren()) {
       const requiredAndUnansweredPaths = [];

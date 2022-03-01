@@ -34,6 +34,12 @@ export default {
         this.$store.dispatch('appui/setMenu', value);
       },
     },
+    appTitle() {
+      return this.$store.getters['appui/title'];
+    },
+    appSubtitle() {
+      return this.$store.getters['appui/subtitle'];
+    },
   },
 };
 </script>

@@ -45,7 +45,7 @@ describe('render diff cards', () => {
 
     render(SurveyDiff, createOptions({ oldControls: [oldControl], newControls: [newControl] }));
 
-    const card = screen.getByTestId(`diff-card-${newControl.id}`);
+    const card = screen.getByTestId(`diff-card-1-changed`);
     expect(within(card).getByText('changed')).toBeInTheDocument();
     expect(within(card).getByText(newControl.label)).toBeInTheDocument();
     expect(within(card).getByText(newControl.name, { exact: false })).toBeInTheDocument();
@@ -56,7 +56,7 @@ describe('render diff cards', () => {
   it('shows addition', () => {
     const newControl = createControl({ type: 'number', name: 'number_1', label: 'number label' });
     render(SurveyDiff, createOptions({ oldControls: [], newControls: [newControl] }));
-    const card = screen.getByTestId(`diff-card-${newControl.id}`);
+    const card = screen.getByTestId(`diff-card-1-added`);
     expect(within(card).getByText('added')).toBeInTheDocument();
     expect(within(card).getByText(newControl.label)).toBeInTheDocument();
     expect(within(card).getByText(newControl.name, { exact: false })).toBeInTheDocument();
@@ -65,7 +65,7 @@ describe('render diff cards', () => {
   it('shows removal', () => {
     const oldControl = createControl({ type: 'number', name: 'number_1', label: 'number label' });
     render(SurveyDiff, createOptions({ oldControls: [oldControl], newControls: [] }));
-    const card = screen.getByTestId(`diff-card-${oldControl.id}`);
+    const card = screen.getByTestId(`diff-card-1-removed`);
     expect(within(card).getByText('removed')).toBeInTheDocument();
     expect(within(card).getByText(oldControl.label)).toBeInTheDocument();
     expect(within(card).getByText(oldControl.name, { exact: false })).toBeInTheDocument();
@@ -78,12 +78,12 @@ describe('render diff cards', () => {
     newControls[0].children = [number];
 
     render(SurveyDiff, createOptions({ oldControls, newControls }));
-    const pageCard = screen.getByTestId(`diff-card-${page.id}`);
+    const pageCard = screen.getByTestId(`diff-card-1-unchanged`);
     expect(within(pageCard).getByText('unchanged')).toBeInTheDocument();
     expect(within(pageCard).getByText(page.label)).toBeInTheDocument();
     expect(within(pageCard).getByText(page.name, { exact: false })).toBeInTheDocument();
 
-    const numberCard = within(pageCard).getByTestId(`diff-card-${number.id}`);
+    const numberCard = within(pageCard).getByTestId(`diff-card-1.1-added`);
     expect(within(numberCard).getByText('added')).toBeInTheDocument();
     expect(within(numberCard).getByText(number.label)).toBeInTheDocument();
     expect(within(numberCard).getByText(number.name, { exact: false })).toBeInTheDocument();
@@ -95,7 +95,7 @@ describe('render diff cards', () => {
       SurveyDiff,
       createOptions({ oldControls: [unchanged], newControls: [unchanged, added], defaultShowUnchanged: true })
     );
-    const card = screen.getByTestId(`diff-card-${unchanged.id}`);
+    const card = screen.getByTestId(`diff-card-1-unchanged`);
     expect(within(card).getByText('unchanged')).toBeInTheDocument();
     expect(within(card).getByText(unchanged.label)).toBeInTheDocument();
     expect(within(card).getByText(unchanged.name, { exact: false })).toBeInTheDocument();
@@ -110,7 +110,7 @@ describe('render diff cards', () => {
     newMatrix.options.source.content[1].label = 'changed';
 
     render(SurveyDiff, createOptions({ oldControls: [oldMatrix], newControls: [newMatrix] }));
-    const card = screen.getByTestId(`diff-card-${newMatrix.id}`);
+    const card = screen.getByTestId(`diff-card-1-changed`);
     await fireEvent.click(card.firstElementChild);
     hasDiffRow(card, 'name', oldMatrix.name, newMatrix.name);
     hasDiffRow(
@@ -145,7 +145,7 @@ describe('computed.diffInfoTree', () => {
     const diffTree = SurveyDiff.computed.diffInfoTree.call(componentThis(diff));
     expect(diffTree).toMatchObject([
       {
-        ...pick(newControl, 'id', 'name', 'label', 'controlType'),
+        ...pick(newControl, 'name', 'label', 'controlType'),
         color: colors[CHANGED],
         changeType: CHANGED,
         changeList: [
@@ -200,7 +200,7 @@ describe('computed.diffInfoTree', () => {
     const diffTree = SurveyDiff.computed.diffInfoTree.call(componentThis(diff));
     expect(diffTree).toMatchObject([
       {
-        ...pick(oldControl, 'id', 'name', 'label', 'controlType'),
+        ...pick(oldControl, 'name', 'label', 'controlType'),
         color: colors[REMOVED],
         changeType: REMOVED,
         changeList: [],
@@ -235,18 +235,18 @@ describe('computed.diffInfoTree', () => {
       const diff = shuffle(diffSurveyVersions(oldControls, newControls));
       const diffTree = SurveyDiff.computed.diffInfoTree.call(componentThis(diff));
       expect(diffTree).toMatchObject([
-        { name: control1.name, changeType: UNCHANGED },
-        { name: control2.name, changeType: REMOVED },
-        { name: control2_new.name, changeType: ADDED },
-        { name: control3.name, changeType: UNCHANGED },
+        { name: control1.name, changeType: UNCHANGED, children: [] },
+        { name: control2.name, changeType: REMOVED, children: [] },
+        { name: control2_new.name, changeType: ADDED, children: [] },
+        { name: control3.name, changeType: UNCHANGED, children: [] },
         {
           name: page.name,
           changeType: UNCHANGED,
           children: [
-            { name: control4.name, changeType: REMOVED },
-            { name: control5.name, changeType: UNCHANGED },
-            { name: control56.name, changeType: ADDED },
-            { name: control6.name, changeType: UNCHANGED },
+            { name: control4.name, changeType: REMOVED, children: [] },
+            { name: control5.name, changeType: UNCHANGED, children: [] },
+            { name: control56.name, changeType: ADDED, children: [] },
+            { name: control6.name, changeType: UNCHANGED, children: [] },
           ],
         },
       ]);

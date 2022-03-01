@@ -40,7 +40,7 @@
 
 <script>
 import { diffSurveyVersions, changeType } from '@/utils/surveyDiff';
-import { isNumber, sortBy } from 'lodash';
+import { isNumber, sortBy, get, remove } from 'lodash';
 import SurveyDiffCardTree from './SurveyDiffCardTree';
 
 export default {
@@ -51,12 +51,11 @@ export default {
   props: {
     oldControls: Array,
     newControls: Array,
-    defaultOpen: Boolean,
-    defaultShowUnchanged: {
+    defaultOpen: {
       type: Boolean,
       default: false,
     },
-    useControlPathAsId: {
+    defaultShowUnchanged: {
       type: Boolean,
       default: false,
     },
@@ -84,7 +83,7 @@ export default {
   computed: {
     diff() {
       if (this.oldControls && this.newControls) {
-        return diffSurveyVersions(this.oldControls, this.newControls, { useControlPathAsId: this.useControlPathAsId });
+        return diffSurveyVersions(this.oldControls, this.newControls);
       }
       return [];
     },
@@ -95,8 +94,18 @@ export default {
       if (!this.diff) {
         return [];
       }
-
-      const childrenOf = (parent) => this.diff.filter((d) => (d.newParentId || d.oldParentId || null) === parent);
+      // consume this array to protect agains circular dependencies
+      const unsortedDiffs = [...this.diff];
+      // returns the direct old/new children of a diff object
+      const childrenOf = (parent) =>
+        remove(unsortedDiffs, (d) => {
+          return parent === null
+            ? // get root controls
+              !d.oldParentId && !d.newParentId
+            : // get direct children
+              (d.oldParentId && d.oldParentId === get(parent, 'oldControl.id')) ||
+                (d.newParentId && d.newParentId === get(parent, 'newControl.id'));
+        });
       const getSortKey = (diff) => (isNumber(diff.newChildIndex) ? diff.newChildIndex : diff.oldChildIndex - 0.5);
       const convert = (diffs, parentIdxPath = []) => {
         // sort to make the order similart to the original
@@ -105,15 +114,14 @@ export default {
           const idx = controlDiff.newControl ? controlDiff.newChildIndex : controlDiff.oldChildIndex;
           const idxPath = [...parentIdxPath, idx + 1];
           return {
-            id: controlDiff.matchId || control.id,
             name: control.name,
             label: control.label,
             controlType: control.type,
             color: this.colors[controlDiff.changeType],
             changeType: controlDiff.changeType,
-            changeList: this.getControlChangeList(controlDiff.matchId),
+            changeList: this.getControlChangeList(controlDiff),
             indexPath: idxPath.join('.'),
-            children: convert(childrenOf(control.id), idxPath),
+            children: convert(childrenOf(controlDiff), idxPath),
           };
         });
       };
@@ -170,8 +178,7 @@ export default {
     },
   },
   methods: {
-    getControlChangeList(matchId) {
-      const controlDiff = this.diff && this.diff.find((d) => d.matchId === matchId);
+    getControlChangeList(controlDiff) {
       if (!controlDiff || !controlDiff.diff) {
         return [];
       }
