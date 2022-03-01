@@ -320,12 +320,3 @@ test server:
     - yarn server:test
   needs:
     - lerna bootstrap
-
-chromatic_publish:
-  extends: .pull-cache-only
-  stage: build
-  script:
-    - yarn client:chromatic
-  needs:
-    - lerna bootstrap
-
