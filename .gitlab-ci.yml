@@ -325,4 +325,5 @@ chromatic_publish:
   stage: test
   script:
     - yarn client:chromatic
-
+  needs:
+    - lerna bootstrap
