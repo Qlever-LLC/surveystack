@@ -322,7 +322,8 @@ test server:
     - lerna bootstrap
 
 chromatic_publish:
-  stage: test
+  extends: .pull-cache-only
+  stage: build
   script:
     - yarn client:chromatic
   needs:
