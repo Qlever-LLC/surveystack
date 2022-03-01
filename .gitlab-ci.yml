@@ -320,3 +320,9 @@ test server:
     - yarn server:test
   needs:
     - lerna bootstrap
+
+chromatic_publish:
+  stage: test
+  script:
+    - yarn client:chromatic
+
