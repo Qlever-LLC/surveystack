@@ -36,9 +36,7 @@
         <v-expansion-panels class="pa-0 ma-0 no-background" flat accordion :value="docs.length > 2 ? undefined : 0">
           <v-expansion-panel>
             <v-expansion-panel-header class="pa-0 ma-0">
-              <v-subheader>
-                DOCUMENTATION
-              </v-subheader>
+              <v-subheader> DOCUMENTATION </v-subheader>
             </v-expansion-panel-header>
             <v-expansion-panel-content class="pa-0 ma-0 no-padding">
               <v-list class="pa-0 ma-0">

@@ -75,9 +75,7 @@
         </div>
         <div class="d-flex justify-center pr-sm-5 pl-sm-10 py-6 d-flex flex-column align-center flex-wrap">
           <p class="white-space-nowrap">Don't have an account?</p>
-          <v-btn v-if="useLink" :to="registerLink" color="primary" class="px-8" role="link">
-            Register now
-          </v-btn>
+          <v-btn v-if="useLink" :to="registerLink" color="primary" class="px-8" role="link"> Register now </v-btn>
           <v-btn v-else @click.stop="$emit('updateActive', 'register')" color="primary" class="px-8" role="button">
             Register now
           </v-btn>
@@ -102,9 +100,7 @@
       Follow the link we sent you at <span class="font-weight-medium">{{ entity.email }}</span> to finish logging in!
     </p>
     <div class="text-right text-muted mt-5">
-      <v-btn text small @click="signInLinkSent = false">
-        Back to login
-      </v-btn>
+      <v-btn text small @click="signInLinkSent = false"> Back to login </v-btn>
     </div>
   </v-alert>
 </template>
