@@ -13,45 +13,13 @@ const initialState = createInitialState();
 const getters = {
   getSurvey: (state) => (id) => state.surveys.find((survey) => survey._id === id),
   pinned: (state) => state.pinned,
-  getPinned: (state) => (prefix = '', excludePath = '') => {
-    const prefixed = state.pinned.filter((s) => s.meta.group.path && s.meta.group.path.startsWith(prefix));
-    const excluded = prefixed.filter((s) => s.meta.group.path !== excludePath);
-    return excluded;
-  },
-};
-
-const fetchPinnedLegacy = async (commit, filteredMemberships) => {
-  const pinned = [];
-  for (const membership of filteredMemberships) {
-    try {
-      const { data } = await api.get(`/groups/${membership.group._id}?populate=1`);
-      if (data && data.surveys && data.surveys.pinned && Array.isArray(data.surveys.pinned)) {
-        for (const s of data.surveys.pinned) {
-          let skipFetch = false;
-          if (pinned.find((p) => p.id == s._id)) {
-            skipFetch = true;
-          }
-
-          pinned.push({
-            id: s._id,
-            name: s.name,
-            group: data.name,
-            meta: s.meta,
-          });
-
-          if (skipFetch) {
-            continue;
-          }
-
-          actions.fetchSurvey({ commit }, s._id);
-        }
-      }
-    } catch (err) {
-      console.log('Error fetching surveys:', err);
-    }
-  }
-
-  return pinned;
+  getPinned:
+    (state) =>
+    (prefix = '', excludePath = '') => {
+      const prefixed = state.pinned.filter((s) => s.meta.group.path && s.meta.group.path.startsWith(prefix));
+      const excluded = prefixed.filter((s) => s.meta.group.path !== excludePath);
+      return excluded;
+    },
 };
 
 const fetchPinned = async (commit) => {
@@ -137,9 +105,7 @@ const actions = {
 
     const useLegacyPinnedImpl = false; // toggle switch for legacy implementation
 
-    const pinnedItems = !useLegacyPinnedImpl
-      ? await fetchPinned(commit, filteredMemberships)
-      : await fetchPinnedLegacy(commit, filteredMemberships);
+    const pinnedItems = await fetchPinned(commit, filteredMemberships);
     pinned.push(...pinnedItems);
 
     commit('SET_PINNED', pinned);

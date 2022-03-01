@@ -12,9 +12,7 @@
 
     <app-dialog v-model="showDeleteModal" @cancel="showDeleteModal = false" @confirm="deleteSubmissions(selected)">
       <template v-slot:title>Confirm deletion</template>
-      <template>
-        Are you sure you want to delete this submission? This can not be undone.
-      </template>
+      <template> Are you sure you want to delete this submission? This can not be undone. </template>
     </app-dialog>
 
     <app-dialog
@@ -581,12 +579,12 @@ export default {
   },
   watch: {
     // eslint-disable-next-line func-names
-    'filter.showArchived': function() {
+    'filter.showArchived': function () {
       this.selected = [];
       this.fetchData();
     },
     // eslint-disable-next-line func-names
-    'reassignment.group': function(val) {
+    'reassignment.group': function (val) {
       this.reassignment.user = null;
 
       if (!val) {

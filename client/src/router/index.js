@@ -5,7 +5,7 @@ import Home from '@/pages/Home.vue';
 import Test from '@/pages/Test.vue';
 import Unauthorized from '@/pages/Unauthorized.vue';
 
-import MySubmissions from '@/pages/surveys/MySubmissions.vue';
+const MySubmissions = () => import('@/pages/surveys/MySubmissions.vue');
 import SurveysBrowse from '@/pages/surveys/Browse.vue';
 import SurveysDetail from '@/pages/surveys/Detail.vue';
 import DraftSubmission from '@/pages/submissions/drafts/Draft.vue';
@@ -21,7 +21,7 @@ import UserEdit from '@/pages/users/UserEdit.vue';
 
 import GroupList from '@/pages/groups/GroupList.vue';
 import Group from '@/pages/groups/Group.vue';
-import GroupEdit from '@/pages/groups/GroupEdit.vue';
+const GroupEdit = () => import('@/pages/groups/GroupEdit.vue');
 
 import SubmissionList from '@/pages/submissions/List.vue';
 
@@ -38,17 +38,17 @@ import ResourceList from '@/pages/resources/ResourceList.vue';
 
 import AppInfo from '@/pages/app/AppInfo.vue';
 
-import FarmHubOnboarding from '@/pages/farmhub-onboarding/FarmHubOnboarding.vue';
+const FarmHubOnboarding = () => import('@/pages/farmhub-onboarding/FarmHubOnboarding.vue');
 
 // integrations
-import MembershipIntegrationEdit from '@/pages/integrations/MembershipIntegrationEdit.vue';
-import GroupIntegrationEdit from '@/pages/integrations/GroupIntegrationEdit.vue';
+const MembershipIntegrationEdit = () => import('@/pages/integrations/MembershipIntegrationEdit.vue');
+const GroupIntegrationEdit = () => import('@/pages/integrations/GroupIntegrationEdit.vue');
 
 import Navbar from '@/components/Navbar.vue';
 import SubmissionDraftNavbar from '@/components/SubmissionDraftNavbar.vue';
 
 import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
-import Kit from '@/pages/Kit.vue';
+const Kit = () => import('@/pages/Kit.vue');
 import store from '@/store';
 
 const Builder = () => import('@/pages/builder/Builder.vue');
