@@ -11,7 +11,8 @@
     "test-watch": "vue-cli-service test:unit --watchAll",
     "scaffold-partner": "node src/scripts/scaffoldPartner.js",
     "storybook": "start-storybook -p 6006 --no-manager-cache",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "chromatic": "npx chromatic --exit-once-uploaded"
   },
   "license": "GPL-3.0-only",
   "dependencies": {
@@ -83,6 +84,7 @@
     "@vue/test-utils": "1.2.2",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.2.3",
+    "chromatic": "^6.5.1",
     "compression-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "6",
     "eslint": "^6.7.2",
