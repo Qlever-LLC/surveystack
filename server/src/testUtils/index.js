@@ -99,6 +99,7 @@ export const createReq = ({ body = {}, params = {}, query = {}, headers = {} } =
 export const createRes = async ({ user = null } = {}) => ({
   send: jest.fn(),
   redirect: jest.fn(),
+  status: jest.fn().mockReturnThis(),
   locals: {
     auth: {
       isAuthenticated: !!user,

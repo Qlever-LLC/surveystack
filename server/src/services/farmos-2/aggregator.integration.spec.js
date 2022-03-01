@@ -32,11 +32,14 @@ describe('fetching farminfo', () => {
 
     const id = uuid.v4();
     const log = {
-      id,
-      type: 'log--activity',
-      attributes: {
-        name: 'Node Test',
-        timestamp: '2021-04-26T09:18:33Z',
+      data: {
+        id,
+        type: 'log--activity',
+        attributes: {
+          name: 'Test activity log via API',
+          timestamp: 1645801459,
+          status: 'done',
+        },
       },
     };
 
