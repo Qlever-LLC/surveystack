@@ -1,0 +1,42 @@
+.button--base {
+  text-transform: unset !important;
+}
+
+.button--primaryGreen {
+  background-color: rgb(28, 156, 124);
+  border-color: black !important;
+}
+
+.button--secondaryGreen {
+  color: rgb(28, 156, 124) !important;
+}
+
+.button--skinny {
+  min-width: 0px !important;
+  padding: 0px 8px !important;
+}
+
+.button--little {
+  font-size: x-small !important;
+  min-width: 0px !important;
+  padding: 0px 4px !important;
+}
+
+.button--noBorder {
+  border-color: transparent !important;
+}
+
+.button--colorBlue {
+  color: rgb(100, 100, 253) !important;
+}
+.button--colorWhite {
+  color: white !important;
+}
+.button--colorRed {
+  color: rgb(253, 100, 100) !important;
+}
+
+.button--bigFont {
+  font-size: large !important;
+  font-weight: bold !important;
+}
