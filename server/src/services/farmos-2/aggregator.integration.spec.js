@@ -20,14 +20,16 @@ describe('fetching farminfo', () => {
     const r = await farminfo();
     console.log('result', r.data);
   });
-  it('assets', async () => {
+
+  it('get assets', async () => {
+    jest.setTimeout(10000);
     const { farminfo, getAssets, createLog } = config();
 
-    const assets = await getAssets('apricotlanefarms.farmos.dev', 'land');
-    console.log('assets', assets.data);
+    const assets = await getAssets('buddingmoonfarm.farmos.dev', 'plant');
+    console.log('assets', JSON.stringify(assets.data, null, 2));
   });
 
-  it('createlog', async () => {
+  it('create log', async () => {
     const { farminfo, getAssets, createLog } = config();
 
     const id = uuid.v4();
@@ -44,8 +46,77 @@ describe('fetching farminfo', () => {
     };
 
     console.log('log', log);
-    const logres = await createLog('apricotlanefarms.farmos.dev', 'activity', log);
+    try {
+      const logres = await createLog('buddingmoonfarm.farmos.dev', 'activity', log);
+      console.log('log result', logres.data);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+  it('subrequest', async () => {
+    const { subrequest } = config();
+    const req = {
+      data: [
+        {
+          requestId: 'req1',
+          action: 'view',
+          uri: '/api',
+        },
+      ],
+    };
 
-    console.log('log result', logres.data);
+    try {
+      const r = await subrequest('buddingmoonfarm.farmos.dev', req);
+      console.log(r);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+  it('create asset', async () => {
+    const { createAsset, getTaxonomy } = config();
+
+    const { data: plants } = await getTaxonomy('buddingmoonfarm.farmos.dev', 'plant_type');
+
+    const plantTypes = plants.data.map((p) => {
+      return {
+        id: p.id,
+        name: p.attributes.name,
+      };
+    });
+    console.log('plant types', plantTypes);
+
+    const chioggia = plantTypes.find((p) => p.name == 'Chioggia');
+
+    const id = uuid.v4();
+
+    const asset = {
+      data: {
+        id,
+        type: 'asset--plant',
+        attributes: {
+          name: 'Test plant Asset',
+          status: 'active',
+          geometry: '',
+        },
+        relationships: {
+          plant_type: {
+            data: [
+              {
+                type: 'taxonomy_term--plant_type',
+                id: chioggia.id,
+              },
+            ],
+          },
+        },
+      },
+    };
+
+    console.log('asset', asset);
+    try {
+      const logres = await createAsset('buddingmoonfarm.farmos.dev', 'plant', asset);
+      console.log('log result', logres.data);
+    } catch (error) {
+      console.log(error);
+    }
   });
 });
