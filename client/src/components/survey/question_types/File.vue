@@ -5,14 +5,19 @@
     <v-row>
       <div class="col-12">
         <v-file-input
-          v-model="newFiles"
+          id="fileChooser"
+          name="fileChooser"
+          outlined
+          show-size
+          :counter="control.options.source.allowMultiple"
+          :clearable="control.options.source.allowMultiple"
+          :multiple="control.options.source.allowMultiple"
+          v-model="files"
           :accept="
             control.options.source.types && control.options.source.types.length > 0
               ? control.options.source.types.join()
               : ''
           "
-          outlined
-          :multiple="control.options.source.allowMultiple"
           :chips="control.options.source.allowMultiple"
           :label="control.hint"
           @keyup.enter.prevent="submit"
@@ -21,17 +26,16 @@
           color="focus"
           data-test-id="input"
         >
-          <template v-slot:selection="{ text, index, file }">
+          <template v-slot:selection="{ text, index }">
             <v-chip
-              v-for="(f, idx) in allFiles"
-              :key="f.name"
+              label
               text-color="white"
               color="grey"
               close
-              @click:close="remove(idx)"
-              :data-test-id="'file_' + idx"
+              @click:close="remove(index)"
+              :data-test-id="'file_' + index"
             >
-              {{ f.name }}
+              {{ text }}
             </v-chip>
           </template>
         </v-file-input>
@@ -58,27 +62,46 @@ export default {
   props: {},
   data() {
     return {
-      newFiles: new File([''], 'dummyfile'), //workaround to make sure v-slot:selection is shown even if newFiles is empty because file chooser has not been used yet
-      allFiles: this.value || [],
+      files: this.value || [],
+      previousFiles: this.value || [],
     };
   },
   computed: {},
   watch: {},
   methods: {
     async filesChanged(e) {
-      this.allFiles.push(...this.newFiles);
-      this.changed(this.allFiles.length ? this.allFiles : null);
+      if (this.control.options.source.allowMultiple) {
+        // file chooser REPLACES already chosen files by the newly chosen files.
+        // To prevent this, use additional array previousFiles as a backup and restore previously selected files
+        const newFiles = this.$el.querySelector('#fileChooser').files;
+        newFiles.forEach((file) => {
+          if (this.previousFiles.length === 0) {
+            this.previousFiles.push(file);
+          } else {
+            const index = this.previousFiles.findIndex((x) => x.name === file.name);
+            if (index >= 0) {
+              this.previousFiles.splice(index, 1);
+            }
+            this.previousFiles.push(file);
+          }
+        });
+        this.files = this.previousFiles;
+      }
+
+      this.changed(this.files.length ? this.files : null);
     },
     clear() {
-      this.allFiles = [];
+      this.previousFiles = [];
+      this.files = [];
       this.changed(null);
     },
     remove(index) {
-      this.allFiles.splice(index, 1);
-      this.changed(this.allFiles);
+      this.previousFiles.splice(index, 1);
+      this.files = this.previousFiles;
+      this.changed(this.files);
     },
     submit() {
-      this.changed(this.allFiles);
+      this.changed(this.files);
       this.$emit('next');
     },
   },
