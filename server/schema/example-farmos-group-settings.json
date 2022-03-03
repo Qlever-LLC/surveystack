@@ -1,0 +1,69 @@
+{
+    "groupHasFarmOSAccess": true,
+    "groupHasCoffeeShopAccess": true,
+    "allowSubgroupsToJoinCoffeeShop": true,
+    "allowSubgroupAdminsToCreateFarmOSInstances": true,
+    "name": "Bionutrient > Labs",
+    "seats": {
+        "current": 7,
+        "max": 20
+    },
+    "members": [
+        {
+            "name": "Dan TerAvest",
+            "email": "teravestdan@gmail.com",
+            "admin": true,
+            "connectedFarms": [
+                {
+                    "url": "dan_teravest_farm.farmos.net",
+                    "owner": true,
+                    "memberships": [
+                        "Bionutrient > Labs"
+                    ]
+                },
+                {
+                    "url": "lees_farm.farmos.net",
+                    "owner": true,
+                    "memberships": [
+                        "Bionutrient > Labs",
+                        "Bionutrient > Labs > Michigan"
+                    ]
+                },
+                {
+                    "url": "ourscinet.farmos.net",
+                    "owner": false,
+                    "memberships": [
+                        "Bionutrient > Labs",
+                        "Bionutrient > Labs > Michigan",
+                        "Bionutrient > Labs > Europe",
+                        "Bionutrient > Labs > Community",
+                        "Bionutrient > Labs > Community > Lab"
+                    ]
+                },
+                {
+                    "url": "coffeeshop.farmos.net",
+                    "owner": false
+                }
+            ]
+        },
+        {
+            "name": "Dave Jole",
+            "email": "djole2352@gmail.com",
+            "admin": false,
+            "connectedFarms": []
+        },
+        {
+            "name": "Jenny Jennerson",
+            "email": "bigjenny@bj.net",
+            "connectedFarms": [
+                {
+                    "url": "jennybigfarmstand.farmos.net",
+                    "owner": true,
+                    "memberships": [
+                        "Bionutrient > Lab > Michigan"
+                    ]
+                }
+            ]
+        }
+    ]
+}
