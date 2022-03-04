@@ -1,6 +1,7 @@
 import { expectationFailed } from '@hapi/boom';
 import { get } from 'lodash';
 import { getHeaders } from './header.service';
+import * as csvService from './csv.service';
 import { ObjectId } from 'mongodb';
 const { getDb } = jest.requireActual('../db');
 
@@ -549,55 +550,47 @@ describe('getHeaders', () => {
     expect(new Set(expectedHeaders)).toEqual(new Set(actualHeaders));
   });
 
-  it('splitValueFieldFromQuestions option removes value field from questions', async () => {
-    // const expectedHeaders = [
-    //   '_id',
-    //   'meta.dateCreated',
-    //   'meta.dateModified',
-    //   'meta.dateSubmitted',
-    //   'meta.survey.id',
-    //   'meta.survey.version',
-    //   'meta.revision',
-    //   'meta.permissions',
-    //   'meta.status.0.type',
-    //   'meta.status.0.value.at',
-    //   'meta.group.id',
-    //   'meta.group.path',
-    //   'meta.specVersion',
-    //   'meta.creator',
-    //   'data.matrix_1.meta.dateModified',
-    //   'data.matrix_1.meta.type',
-    //   'data.matrix_1.value.0.description.value',
-    //   'data.matrix_1.value.0.sample.value',
-    //   'data.matrix_1.value.1.description.value',
-    //   'data.matrix_1.value.1.sample.value',
-    //   'data.text_3.meta.dateModified',
-    //   'data.text_3.meta.type',
-    //   'data.text_3.value',
-    //   'data.group_4.number_5.meta.dateModified',
-    //   'data.group_4.number_5.meta.type',
-    //   'data.group_4.number_5.value',
-    //   'data.map_2.meta.dateModified',
-    //   'data.map_2.meta.type',
-    //   'data.map_2.value.features.0.geometry.coordinates.0',
-    //   'data.map_2.value.features.0.geometry.coordinates.1',
-    //   'data.map_2.value.features.0.geometry.type',
-    //   'data.map_2.value.features.0.id',
-    //   'data.map_2.value.features.0.properties',
-    //   'data.map_2.value.features.0.type',
-    //   'data.map_2.value.type',
-    //   'data.group_4.meta.type',
-    // ];
+  it("questionsHaveNoValueField option handles when questions don't have the intermediary `value` field", async () => {
+    const expectedHeaders = [
+      '_id',
+      'meta.dateCreated',
+      'meta.dateModified',
+      'meta.dateSubmitted',
+      'meta.survey.id',
+      'meta.survey.version',
+      'meta.revision',
+      'meta.permissions',
+      'meta.status.0.type',
+      'meta.status.0.value.at',
+      'meta.group.id',
+      'meta.group.path',
+      'meta.specVersion',
+      'meta.creator',
+      'data.matrix_1',
+      'data.text_3',
+      'data.group_4.number_5',
+      'data.map_2.features.0',
+      'data.map_2.type',
+    ];
+    const transformer = (entity) => {
+      let data = csvService.transformSubmissionQuestionTypes(
+        entity.data,
+        {
+          geoJSON: csvService.geojsonTransformer,
+          matrix: csvService.matrixTransformer,
+        },
+        {}
+      );
+
+      data = csvService.removeMetaFromQuestions(data);
+
+      return { ...entity, data };
+    };
+    let transformedSubmissions = mockSubmissions().map(transformer);
     const survey = mockSurveyComplex();
-    const opts = { splitValueFieldFromQuestions: true };
+    const opts = { questionsHaveNoValueField: true };
     await getDb().collection('surveys').insertOne(survey);
-    const actualHeaders = await getHeaders(survey._id, mockSubmissions(), opts);
-    // console.log('---actual with split\n', actualHeaders.sort());
-    const actualHeadersWithoutSplit = await getHeaders(survey._id, mockSubmissions(), {
-      splitValueFieldFromQuestions: false,
-    });
-    // console.log('==-actual without split\n', actualHeadersWithoutSplit.sort());
-    // expect(new Set(expectedHeaders)).toEqual(new Set(actualHeaders));
-    expect(new Set(actualHeadersWithoutSplit)).toEqual(new Set(actualHeaders));
+    const actualHeaders = await getHeaders(survey._id, transformedSubmissions, opts);
+    expect(new Set(actualHeaders)).toEqual(new Set(expectedHeaders));
   });
 });
