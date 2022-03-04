@@ -49,6 +49,57 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
       {
         headers: {
           accept: 'application/json',
+          'Content-Type': 'application/json',
+          'api-key': aggregatorKey,
+        },
+        httpsAgent: agent,
+      }
+    );
+
+    return r;
+  };
+
+  const createAsset = async (farmurl, bundle, asset) => {
+    const r = await axios.post(
+      `${apiBase}/farms/relay/api/asset/${bundle}?farm_url=${encodeURIComponent(farmurl)}`,
+      asset,
+      {
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'application/json',
+          'api-key': aggregatorKey,
+        },
+        httpsAgent: agent,
+      }
+    );
+
+    return r;
+  };
+
+  const subrequest = async (farmurl, req) => {
+    const r = await axios.post(
+      `${apiBase}/farms/relay/subrequests?farm_url=${encodeURIComponent(farmurl)}`,
+      req,
+      {
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'application/json',
+          'api-key': aggregatorKey,
+        },
+        httpsAgent: agent,
+      }
+    );
+
+    return r;
+  };
+
+  const getTaxonomy = async (farmurl, bundle) => {
+    const r = await axios.get(
+      `${apiBase}/farms/relay/api/taxonomy_term/${bundle}?farm_url=${encodeURIComponent(farmurl)}`,
+      {
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'application/json',
           'api-key': aggregatorKey,
         },
         httpsAgent: agent,
@@ -60,7 +111,10 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
 
   return {
     farminfo,
+    getTaxonomy,
     getAssets,
     createLog,
+    createAsset,
+    subrequest,
   };
 };

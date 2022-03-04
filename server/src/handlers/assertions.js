@@ -238,3 +238,11 @@ export const validateBulkReassignRequestBody = (req, res, next) => {
 
   next();
 };
+
+export const checkFeatureToggledOn = (toggleName) => async (req, res, next) => {
+  if (await res.locals.isToggleOn(toggleName)) {
+    next();
+  } else {
+    next(boom.notImplemented('this feature is turned off'));
+  }
+};

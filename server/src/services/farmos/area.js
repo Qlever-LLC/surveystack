@@ -48,7 +48,7 @@ async function area(apiCompose, info, terms, user, credentials, submission) {
 
   const infoResponse = await getInfo(farmUrl, cred);
   const vid = infoResponse['info']['resources']['taxonomy_term']['farm_areas'].vid;
-  console.log("using vid", vid);
+  console.log('using vid', vid);
 
   const body = {
     vocabulary: vid + '',

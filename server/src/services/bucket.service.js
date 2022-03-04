@@ -1,37 +1,74 @@
-import AWS from 'aws-sdk';
 import dotenv from 'dotenv-defaults';
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+
 dotenv.config();
 
-// https://coolaj86.com/articles/upload-to-s3-with-node-the-right-way/
-const AWS_BUCKET_NAME = process.env.AWS_BUCKET_NAME;
-var AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID;
-var AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
+const AWS_S3_REGION = process.env.AWS_S3_REGION;
+const AWS_S3_BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
+const AWS_S3_ACCESS_KEY_ID = process.env.AWS_S3_ACCESS_KEY_ID;
+const AWS_S3_SECRET_ACCESS_KEY = process.env.AWS_S3_SECRET_ACCESS_KEY;
+const AWS_S3_ENDPOINT_OVERRIDE = process.env.AWS_S3_ENDPOINT_OVERRIDE;
 
-var s3 = new AWS.S3({
-  accessKeyId: AWS_ACCESS_KEY_ID,
-  secretAccessKey: AWS_SECRET_ACCESS_KEY,
-});
+const s3Client = getS3Client();
 
-var fs = require('fs');
-var path = require('path');
+function getS3Client() {
+  if (AWS_S3_ENDPOINT_OVERRIDE) {
+    // S3-compatible service like min.io or localstack
+    return new S3Client({
+      credentials: {
+        accessKeyId: AWS_S3_ACCESS_KEY_ID,
+        secretAccessKey: AWS_S3_SECRET_ACCESS_KEY,
+      },
+      region: AWS_S3_REGION,
+      endpoint: AWS_S3_ENDPOINT_OVERRIDE,
+      sslEnabled: false,
+      forcePathStyle: true,
+    });
+  } else {
+    // access the official AWS S3 instance, located by S3Client library
+    return new S3Client({
+      credentials: {
+        accessKeyId: AWS_S3_ACCESS_KEY_ID,
+        secretAccessKey: AWS_S3_SECRET_ACCESS_KEY,
+      },
+      region: AWS_S3_REGION,
+    });
+  }
+}
 
-export function uploadToS3(keyPrefix, filePath) {
-  // ex: /path/to/my-picture.png becomes my-picture.png
-  var fileName = path.basename(filePath);
-  var fileStream = fs.createReadStream(filePath);
-
-  // If you want to save to "my-bucket/{prefix}/{filename}"
-  //                    ex: "my-bucket/my-pictures-folder/my-picture.png"
-  var keyName = path.join(keyPrefix, fileName);
-
-  return new Promise(function (resolve, reject) {
-    fileStream.once('error', reject);
-    s3.upload({
-      Bucket: AWS_BUCKET_NAME,
-      Key: keyName,
-      Body: fileStream,
-    })
-      .promise()
-      .then(resolve, reject);
+export async function getUploadUrl(key, contentType, contentLength) {
+  const command = new PutObjectCommand({
+    Bucket: AWS_S3_BUCKET_NAME,
+    Key: key,
+    ContentType: contentType,
+    ContentLength: contentLength,
+  });
+  return await getSignedUrl(s3Client, command, {
+    expiresIn: 3600, //in seconds, eq 1 hour
   });
 }
+
+export async function getDownloadUrl(key) {
+  const command = new GetObjectCommand({ Bucket: AWS_S3_BUCKET_NAME, Key: key });
+  return await getSignedUrl(s3Client, command, {
+    expiresIn: 3600, //in seconds, eq 1 hour
+  });
+}
+
+export async function deleteObject(key) {
+  return await s3Client.send(new DeleteObjectCommand({ Bucket: AWS_S3_BUCKET_NAME, Key: key }));
+}
+
+export default {
+  AWS_S3_ENDPOINT_OVERRIDE,
+  AWS_S3_BUCKET_NAME,
+  getUploadUrl,
+  getDownloadUrl,
+  deleteObject,
+};
