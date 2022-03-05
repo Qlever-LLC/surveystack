@@ -23,6 +23,28 @@ export const mapFarmOSInstanceToUser = async (userId, farmOSInstanceName, owner)
 };
 
 /**
+ * The admin receives access to the farmos instance
+ */
+export const mapFarmOSInstanceToGroupAdmin = async (adminUserId, groupId, farmOSInstanceName) => {
+  const _id = new ObjectId();
+  await db.collection('farmos-instances').insertOne({
+    _id,
+    userId: adminUserId,
+    farmOSInstanceName,
+    owner: false,
+    groupId,
+  });
+
+  return {
+    _id,
+    userId: adminUserId,
+    farmOSInstanceName,
+    owner: false,
+    groupId,
+  };
+};
+
+/**
  * FarmOS instance takes a seat in the groups roster
  */
 export const mapFarmOSInstanceToUserOfGroup = async (userId, farmOSInstanceName, groupId) => {
@@ -51,7 +73,9 @@ export const createFarmOSInstanceForUserAndGroup = async () => {};
 /**
  * A farmos instance is removed from the group's plan
  */
-export const removeFarmOSInstanceFromGroup = async () => {};
+export const removeFarmOSInstanceFromGroup = async () => {
+  // all groups where the user is admin of
+};
 
 /**
  * a list of farmos instances the user currently has access to
@@ -59,8 +83,13 @@ export const removeFarmOSInstanceFromGroup = async () => {};
 export const listFarmOSInstancesForUser = async (userId) => {
   // instances owned by user
   const usersInstances = await db.collection('farmos-instances').find({ userId }).toArray();
+  return usersInstances;
+};
 
-  // all groups where the user is admin of
+/**
+ * a list of farmos instances a group and its subgroups are currently managing
+ */
+export const listFarmOSInstancesForGroup = async (userId, groupId) => {
   const adminOfGroups = (
     await db
       .collection('memberships')
@@ -80,18 +109,11 @@ export const listFarmOSInstancesForUser = async (userId) => {
     })
     .toArray();
 
-  return uniqBy([...usersInstances, ...adminInstances], (item) => item.farmOSInstanceName).map(
-    (item) => ({
-      farmOSInstanceName: item.farmOSInstanceName,
-      owner: item.owner === true,
-    })
-  );
+  return uniqBy([...adminInstances], (item) => item.farmOSInstanceName).map((item) => ({
+    farmOSInstanceName: item.farmOSInstanceName,
+    owner: item.owner === true,
+  }));
 };
-
-/**
- * a list of farmos instances a group and its subgroups are currently managing
- */
-export const listFarmOSInstancesForGroup = async () => {};
 
 /**
  * a list of surveystack users that currently can access the farmos instance of a user
