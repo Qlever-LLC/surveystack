@@ -29,7 +29,9 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
 
   const getAssets = async (farmurl, bundle) => {
     const r = await axios.get(
-      `${apiBase}/farms/relay/api/asset/${bundle}?farm_url=${encodeURIComponent(farmurl)}`,
+      `${apiBase}/farms/relay/api/asset/${bundle}?farm_url=${encodeURIComponent(
+        farmurl
+      )}&fields[asset--${bundle}]=id,name`,
       {
         headers: {
           accept: 'application/json',

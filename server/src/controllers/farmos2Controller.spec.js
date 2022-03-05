@@ -6,6 +6,12 @@ import {
   mapFarmOSInstanceToGroupAdmin,
 } from '../services/farmos-2/manage';
 
+import { assetResponse } from '../services/farmos-2/__mock__/farmos.asset.response';
+
+import mockAxios from 'axios';
+
+require('dotenv').config();
+
 function mockRes(userId) {
   return {
     data: null,
@@ -31,14 +37,14 @@ function mockRes(userId) {
 describe('farmos2controller', () => {
   it('get-farmos-instances', async () => {
     const user = await createUser();
-    await mapFarmOSInstanceToUser(user._id, 'farm1.farmos.dev', true);
+    await mapFarmOSInstanceToUser(user._id, 'user.farmos.dev', true);
 
     const res = mockRes(user._id);
     await getFarmOSInstances({}, res);
 
     expect(res.data.length).toEqual(1);
     expect(res.data[0].userId).toEqual(user._id);
-    expect(res.data[0].farmOSInstanceName).toEqual('farm1.farmos.dev');
+    expect(res.data[0].farmOSInstanceName).toEqual('user.farmos.dev');
   });
 
   it('get-farmos-instances-not-logged-in', async () => {
@@ -74,5 +80,36 @@ describe('farmos2controller', () => {
       expect.arrayContaining(['admin-farm.farmos.dev', 'user-farm.farmos.dev'])
     );
   });
-  
+
+  it('get-assets', async () => {
+    jest.setTimeout(10000);
+
+    mockAxios.get.mockImplementation(() => Promise.resolve({ data: assetResponse }));
+
+    const user = await createUser();
+    await mapFarmOSInstanceToUser(user._id, 'buddingmoonfarm.farmos.dev', true);
+
+    const res = mockRes(user._id);
+    await getAssets(
+      {
+        body: {
+          bundle: 'plant',
+        },
+      },
+      res
+    );
+
+    expect(res.data.assets).toEqual(
+      expect.arrayContaining([
+        {
+          name: 'Block B bed 12 Kale',
+          id: 'a89f2dfe-35f6-4bfb-b079-be7c034a7f24',
+        },
+        {
+          name: 'spinach 8/26/20 ',
+          id: '626dec74-7f46-4c85-bc0e-76f69bcb7b41',
+        },
+      ])
+    );
+  });
 });

@@ -58,7 +58,7 @@ export const getAssets = async (req, res) => {
 
   const { bundle } = req.body;
 
-  if (!bundle || isString(bundle)) {
+  if (!bundle || !isString(bundle)) {
     throw boom.badData("argument 'bundle' not valid");
   }
 
@@ -66,21 +66,21 @@ export const getAssets = async (req, res) => {
     throw boom.badData(`unknown bundle: ${bundle}`);
   }
 
-  const instances = listFarmOSInstancesForUser(userId);
+  const instances = await listFarmOSInstancesForUser(userId);
   const cfg = config();
 
   const assets = [];
   const errors = [];
   for (const instance of instances) {
     try {
-      const r = await cfg.getAssets(instance.farmOSInstanceName, bundle);
-      r.map((a) => {
+      const axiosResponse = await cfg.getAssets(instance.farmOSInstanceName, bundle);
+      const assetList = axiosResponse.data.data.map((a) => {
         return {
-          name: a.data.attributes.name,
-          id: a.data.id,
+          name: a.attributes.name,
+          id: a.id,
         };
       });
-      assets.push(...r);
+      assets.push(...assetList);
     } catch (error) {
       errors.push(error);
     }
