@@ -1,6 +1,6 @@
 import { transformHeaders, getCellKey } from './SubmissionTableClientCsv.vue';
 import { fireEvent } from '@testing-library/vue';
-import { within, screen } from '@testing-library/dom';
+import { within } from '@testing-library/dom';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 import SubmissionTableClientCsv from './SubmissionTableClientCsv.vue';
 
