@@ -408,7 +408,30 @@ const getSubmissionsPage = async (req, res) => {
   }
 
   try {
-    const headers = await headerService.getHeaders(req.query.survey, entities.content, {
+    const transformer = (entity) => {
+      let data = csvService.transformSubmissionQuestionTypes(
+        entity.data,
+        {
+          geoJSON: csvService.geojsonTransformer,
+          matrix: csvService.matrixTransformer,
+        },
+        { expandAllMatrices: false, expandMatrix: [] }
+      );
+
+      data = csvService.removeMetaFromQuestions(data);
+
+      const result = {
+        _id: entity._id,
+        data,
+      };
+
+      return result;
+    };
+    let transformedEntities = entities.content.map(transformer);
+    entities.content = transformedEntities;
+    console.log(JSON.stringify(transformedEntities));
+    // const headers = await headerService.getHeaders(req.query.survey, entities.content, {
+    const headers = await headerService.getHeaders(req.query.survey, transformedEntities, {
       excludeDataMeta: !queryParam(req.query.showCsvDataMeta),
     });
     entities.headers = headers;
