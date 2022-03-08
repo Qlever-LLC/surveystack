@@ -1,50 +1,48 @@
 <template>
   <div>
+    <v-snackbar v-model="showTypeNotAllowedAlert" color="orange" :timeout="5000" fixed centered>
+      Drop not allowed for this file type. Allowed types: {{ control.options.source.types.join(', ') }}
+    </v-snackbar>
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
-    <v-row>
-      <div class="col-12" @drop.prevent="onDrop" @dragover.prevent="onDragOver">
-        <v-file-input
-          id="fileChooser"
-          name="fileChooser"
-          :placeholder="
-            $vuetify.breakpoint.mobile || forceMobile ? 'tap here to upload' : 'click or drop here to upload'
-          "
-          outlined
-          show-size
-          :counter="control.options.source.allowMultiple"
-          :clearable="control.options.source.allowMultiple"
-          :multiple="control.options.source.allowMultiple"
-          v-model="files"
-          :accept="
-            control.options.source.types && control.options.source.types.length > 0
-              ? control.options.source.types.join()
-              : ''
-          "
-          :chips="control.options.source.allowMultiple"
-          :label="control.hint"
-          @keyup.enter.prevent="submit"
-          @click:clear="clear"
-          @change="filesChanged"
-          color="focus"
-          data-test-id="input"
-        >
-          <template v-slot:selection="{ text, index }">
-            <v-chip
-              label
-              text-color="white"
-              color="grey"
-              close
-              @click:close="remove(index)"
-              :data-test-id="'file_' + index"
-            >
-              {{ text }}
-            </v-chip>
-          </template>
-        </v-file-input>
-      </div>
-    </v-row>
-
+    <div @drop.prevent="onDrop" @dragover.prevent="onDragOver">
+      <v-file-input
+        id="fileChooser"
+        name="fileChooser"
+        :placeholder="$vuetify.breakpoint.mobile || forceMobile ? 'tap here to upload' : 'click or drop here to upload'"
+        outlined
+        show-size
+        hide-details="auto"
+        :clearable="control.options.source.allowMultiple"
+        :multiple="control.options.source.allowMultiple"
+        v-model="files"
+        :accept="
+          control.options.source.types && control.options.source.types.length > 0
+            ? control.options.source.types.join()
+            : ''
+        "
+        :chips="control.options.source.allowMultiple"
+        :label="control.hint"
+        @keyup.enter.prevent="submit"
+        @click:clear="clear"
+        @change="filesChanged"
+        color="focus"
+        data-test-id="input"
+      >
+        <template v-slot:selection="{ text, index }">
+          <v-chip
+            label
+            text-color="white"
+            color="grey"
+            close
+            @click:close="remove(index)"
+            :data-test-id="'file_' + index"
+          >
+            {{ text }}
+          </v-chip>
+        </template>
+      </v-file-input>
+    </div>
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
@@ -67,6 +65,7 @@ export default {
     return {
       files: this.value || [],
       previousFiles: this.value || [],
+      showTypeNotAllowedAlert: false,
     };
   },
   computed: {},
@@ -98,6 +97,7 @@ export default {
       }
     },
     onDrop(event) {
+      this.showTypeNotAllowedAlert = false;
       let newFiles = [];
       if (event.dataTransfer.items) {
         // Use DataTransferItemList interface to access the file(s)
@@ -105,7 +105,7 @@ export default {
           if (item.kind === 'file' && this.isMimeTypeAllowed(this.control.options.source.types, item.type)) {
             newFiles.push(item.getAsFile());
           } else {
-            alert('drop not allowed, only file a type of ' + this.control.options.source.types);
+            this.showTypeNotAllowedAlert = true;
           }
         });
       } else {
@@ -129,7 +129,7 @@ export default {
       event.dataTransfer.dropEffect = 'copy';
     },
     isMimeTypeAllowed(allowedTypes, type) {
-      if (!allowedTypes || allowedTypes === 0) {
+      if (!allowedTypes || allowedTypes.length === 0) {
         //no type restrictions
         return true;
       } else {
