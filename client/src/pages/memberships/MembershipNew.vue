@@ -47,20 +47,14 @@
 
     <v-dialog v-model="dialogCreateUser" max-width="500">
       <v-card class="">
-        <v-card-title>
-          User does not exist yet
-        </v-card-title>
+        <v-card-title> User does not exist yet </v-card-title>
         <v-card-text class="mt-4">
           Do you want to proceed to create a new user with email {{ this.entity.meta.invitationEmail }}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click.stop="dialogCreateUser = false">
-            Cancel
-          </v-btn>
-          <v-btn text color="red" @click.stop="proceedToUserCreation">
-            Proceed
-          </v-btn>
+          <v-btn text @click.stop="dialogCreateUser = false"> Cancel </v-btn>
+          <v-btn text color="red" @click.stop="proceedToUserCreation"> Proceed </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

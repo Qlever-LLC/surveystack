@@ -14,9 +14,7 @@
       </p>
       <ul class="my-3">
         <li>Allow any user to join your group from your custom url.</li>
-        <li>
-          See all your group and pinned surveys without being logged in to your app.
-        </li>
+        <li>See all your group and pinned surveys without being logged in to your app.</li>
         <li>
           Automatically associate data submitted to your custom url to your group so that you have proper administrative
           controls over data privacy.
@@ -173,8 +171,9 @@ import appPinnedSurveys from '@/components/groups/PinnedSurveys.vue';
 import appDocLinks from '@/components/groups/DocLinks.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
 import appDialog from '@/components/ui/Dialog.vue';
-import appFarmHubOnboarding from '@/components/integrations/FarmHubOnboarding.vue';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
+
+const appFarmHubOnboarding = () => import('@/components/integrations/FarmHubOnboarding.vue');
 
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';

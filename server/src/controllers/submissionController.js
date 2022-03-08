@@ -397,7 +397,7 @@ const getSubmissionsPage = async (req, res) => {
 
   pipeline.push(...paginationStages);
 
-  const [entities] = await db.collection(col).aggregate(pipeline).toArray();
+  const [entities] = await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).toArray();
 
   if (!entities) {
     return res.send({
@@ -452,7 +452,7 @@ const getSubmissions = async (req, res) => {
     }
   }
 
-  const entities = await db.collection(col).aggregate(pipeline).toArray();
+  const entities = await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).toArray();
 
   return res.send(entities);
 };
@@ -501,7 +501,7 @@ const getSubmissionsCsv = async (req, res) => {
       : [],
   };
 
-  const entities = await db.collection(col).aggregate(pipeline).toArray();
+  const entities = await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).toArray();
   const transformer = (entity) => {
     let data = csvService.transformSubmissionQuestionTypes(
       entity.data,

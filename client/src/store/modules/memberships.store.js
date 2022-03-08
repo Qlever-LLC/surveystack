@@ -15,11 +15,15 @@ const getters = {
   status: (state) => state.status,
   activeGroup: (state) => state.activeGroup,
   memberships: (state) => state.memberships,
-  getPrefixedMemberships: (state) => (prefix = '/') =>
-    state.memberships.filter((m) => m.group.path && m.group.path.startsWith(prefix)),
+  getPrefixedMemberships:
+    (state) =>
+    (prefix = '/') =>
+      state.memberships.filter((m) => m.group.path && m.group.path.startsWith(prefix)),
   groups: (state) => state.memberships.map((m) => m.group),
-  getPrefixedGroups: (state) => (prefix = '/') =>
-    state.memberships.filter((m) => m.group.path && m.group.path.startsWith(prefix)).map((m) => m.group),
+  getPrefixedGroups:
+    (state) =>
+    (prefix = '/') =>
+      state.memberships.filter((m) => m.group.path && m.group.path.startsWith(prefix)).map((m) => m.group),
 };
 
 const actions = {
