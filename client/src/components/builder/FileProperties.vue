@@ -1,24 +1,29 @@
 <template>
   <div>
-    <div class="text--primary">
-      Map Options
-    </div>
+    <v-card-title class="px-0 d-flex justify-space-between">
+      <span> File upload options </span>
+    </v-card-title>
+
+    <div class="text--primary">Restrict uploaded file types (.csv, .pdf, etc.)</div>
+    <v-select
+      multiple
+      chips
+      clearable
+      deletable-chips
+      solo
+      v-model="value.types"
+      label="allow all files types"
+      :items="types"
+    />
 
     <v-checkbox
       class="my-1"
       outlined
       v-model="value.allowMultiple"
-      label="Allow multiple files"
+      label="Allow user to upload multiple files"
       color="grey darken-1"
       hide-details
     />
-    <v-combobox v-model="value.types" :items="types" chips clearable label="Restrict file types" multiple solo>
-      <template v-slot:selection="{ attrs, item, select, selected }">
-        <v-chip v-bind="attrs" :input-value="selected" close @click="select" @click:close="removeType(item)">
-          <strong>{{ item }}</strong>
-        </v-chip>
-      </template>
-    </v-combobox>
   </div>
 </template>
 
@@ -27,7 +32,11 @@ export default {
   name: 'file-properties',
   data() {
     return {
-      types: ['image/*', 'application/pdf', 'text/csv'],
+      types: [
+        { text: 'PDF (.pdf)', value: 'application/pdf' },
+        { text: 'Spreadsheets (.csv)', value: 'text/csv' },
+        { text: 'Image (.gif, .png, .jpg, .jpeg)', value: 'image/*' },
+      ],
     };
   },
   props: {
