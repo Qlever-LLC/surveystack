@@ -107,9 +107,7 @@
         <template slot="label">
           <div>
             <div class="text--primary">Private</div>
-            <div class="body-2">
-              Only admins and original submitters can see this field
-            </div>
+            <div class="body-2">Only admins and original submitters can see this field</div>
           </div>
         </template>
       </v-checkbox>
@@ -125,9 +123,7 @@
         <template slot="label">
           <div>
             <div class="text--primary">Allow hide</div>
-            <div class="body-2">
-              Allow users of this question set to hide this question
-            </div>
+            <div class="body-2">Allow users of this question set to hide this question</div>
           </div>
         </template>
       </v-checkbox>
@@ -182,9 +178,9 @@
         v-model="control.options.hasMultipleSelections"
         v-if="
           control.type === 'ontology' ||
-            control.type === 'farmOsPlanting' ||
-            control.type === 'farmOsFarm' ||
-            control.type === 'farmOsField'
+          control.type === 'farmOsPlanting' ||
+          control.type === 'farmOsFarm' ||
+          control.type === 'farmOsField'
         "
         label="Allow Multiple Selections"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
@@ -204,7 +200,7 @@
       </div>
       <div v-if="showAdvanced" class="mt-2">
         <div class="d-flex justify-space-between">
-          <v-card-title class="d-flex">Advanced Options</v-card-title>
+          <v-card-title class="px-0 d-flex">Advanced Options</v-card-title>
           <v-icon @click.stop="showAdvanced = false">mdi-close</v-icon>
         </div>
 
