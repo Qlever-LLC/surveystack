@@ -3,6 +3,7 @@ import resourceController from './resourceController';
 import { db } from '../db';
 import { createReq } from '../testUtils';
 import bucketService from '../services/bucket.service';
+import slugify from '../helpers/slugify';
 jest.mock('../services/featureToggle.service');
 jest.mock('../services/bucket.service');
 
@@ -31,7 +32,8 @@ function mockRes() {
 }
 
 describe('resourceController', () => {
-  let signedUrl, resourceId;
+  let signedUrl;
+  const resourceId = new ObjectId();
 
   beforeEach(async () => {
     bucketService.getUploadUrl.mockReturnValue('https://mockedurl');
@@ -41,9 +43,15 @@ describe('resourceController', () => {
       },
     });
 
+    const fileName = 'testimage.png';
+
     const req = createReq({
       body: {
-        resourceName: 'testimage.png',
+        _id: resourceId,
+        state: 'local',
+        label: fileName,
+        name: slugify(fileName),
+        key: 'resources/' + resourceId + '/' + fileName, // define s3 file key containing unique uuid to prevent filename collision, allowed characters see https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
         contentLength: 1234,
         contentType: 'image/png',
       },
@@ -52,7 +60,6 @@ describe('resourceController', () => {
     let res = mockRes();
     await getUploadURL(req, res);
     signedUrl = res.data.signedUrl;
-    resourceId = res.data.resourceId;
   });
 
   describe('getUploadURL', () => {
