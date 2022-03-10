@@ -25,15 +25,20 @@
           <v-row>
             <v-col>
               <div class="d-flex justify-space-between align-center">
-                <div>
+                <div class="d-flex justify-space-between align-center mt-5">
                   <v-switch
-                    :input-value="excludeMeta"
+                    :input-value="!excludeMeta"
                     @change="$emit('excludeMetaChange', $event)"
-                    label="Hide meta"
+                    :label="excludeMeta ? 'Show Metadata' : 'Hide Metadata'"
                     class="mt-2"
                   ></v-switch>
+                  <v-switch
+                    :input-value="archived"
+                    @change="$emit('showArchived', $event)"
+                    :label="!archived ? 'View archived only' : 'Hide Archived only'"
+                    class="mt-2 ml-5"
+                  ></v-switch>
                 </div>
-
                 <div class="d-flex align-center" v-if="selected.length > 0">
                   <div>
                     <span class="subtitle-2">ACTIONS</span><br />{{ selected.length }}
@@ -194,6 +199,7 @@ export default {
   },
   data() {
     return {
+      newData: this.archived,
       activeTableCell: null,
       textTruncateLength: 36,
       csv: null,
@@ -304,6 +310,9 @@ export default {
 </script>
 
 <style scoped>
+>>> .v-toolbar__content {
+  background: #f5f5f5 !important;
+}
 .v-data-table >>> td {
   font-family: monospace;
   white-space: nowrap;

@@ -61,9 +61,7 @@
       </div>
       <v-expansion-panels class="mb-6">
         <v-expansion-panel>
-          <v-expansion-panel-header expand-icon="mdi-menu-down">
-            <h4>Filters</h4>
-          </v-expansion-panel-header>
+          <v-expansion-panel-header expand-icon="mdi-menu-down"> Filters </v-expansion-panel-header>
           <v-expansion-panel-content>
             <app-submissions-filter-basic
               v-if="!showAdvancedFilters && queryList"
@@ -83,10 +81,9 @@
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
-      <v-card class="my-5">
+      <v-card class="my-5 px-2">
         <v-card-title class="d-flex justify-space-between align-center">
-          <div>API</div>
-          <v-checkbox label="View archived only" v-model="filter.showArchived" dense hide-details />
+          <div class="text-body-1">API</div>
         </v-card-title>
         <v-card-text>
           <a class="body-2" :href="apiDownloadUrl" target="_blank">{{ apiDownloadUrl }}</a>
@@ -150,7 +147,7 @@
               :archived="filter.showArchived"
               :dataTableProps="dateTableProps"
               @onDataTablePropsChanged="onDataTablePropsChanged"
-              @excludeMetaChange="filter.showCsvMeta = !$event"
+              @excludeMetaChange="filter.showCsvMeta = $event"
               :excludeMeta="!filter.showCsvMeta"
               :loading="loading"
               style="margin: 3px 2px"
@@ -160,6 +157,7 @@
               @showArchiveModal="showArchiveModal = true"
               @reassignment="reassignment.showModal = true"
               @resubmit="resubmit(selected[0])"
+              @showArchived="filter.showArchived = $event"
             />
           </v-tab-item>
           <v-tab-item>
