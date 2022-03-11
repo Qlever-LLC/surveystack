@@ -1,5 +1,6 @@
 import { create } from 'lodash';
 import uuid from 'uuid';
+import { getAssets } from '../../controllers/farmos2Controller';
 import { aggregator } from './aggregator';
 
 require('dotenv').config();
@@ -73,9 +74,12 @@ describe('fetching farminfo', () => {
     }
   });
   it('create asset', async () => {
-    const { createAsset, getTaxonomy } = config();
+    const { createAsset, getTaxonomy, getAssets } = config();
+
 
     const { data: plants } = await getTaxonomy('buddingmoonfarm.farmos.dev', 'plant_type');
+    const { data: fields } = await getAssets('buddingmoonfarm.farmos.dev', 'land');
+    const fieldId = fields.data[0].id;
 
     const plantTypes = plants.data.map((p) => {
       return {
@@ -107,6 +111,14 @@ describe('fetching farminfo', () => {
               },
             ],
           },
+          asset: {
+            data: [
+              {
+                type: 'asset--land',
+                id: fieldId,
+              },
+            ]
+          }
         },
       },
     };
