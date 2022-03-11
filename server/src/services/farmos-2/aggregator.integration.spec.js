@@ -1,9 +1,12 @@
-import { create } from 'lodash';
+/* istanbul ignore file */
+
 import uuid from 'uuid';
-import { getAssets } from '../../controllers/farmos2Controller';
 import { aggregator } from './aggregator';
 
+const TEST_FARM = 'buddingmoonfarm.farmos.dev';
+
 require('dotenv').config();
+jest.unmock('axios');
 
 const config = () => {
   if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
@@ -14,7 +17,10 @@ const config = () => {
   return aggregator(process.env.FARMOS_AGGREGATOR_URL, process.env.FARMOS_AGGREGATOR_APIKEY);
 };
 
-describe('fetching farminfo', () => {
+jest.setTimeout(15000);
+
+
+describe('test-aggregator-integration', () => {
   it('farminfo', async () => {
     const { farminfo, getAssets, createLog } = config();
 
@@ -22,15 +28,15 @@ describe('fetching farminfo', () => {
     console.log('result', r.data);
   });
 
-  it('get assets', async () => {
+  it('get-assets', async () => {
     jest.setTimeout(10000);
     const { farminfo, getAssets, createLog } = config();
 
-    const assets = await getAssets('buddingmoonfarm.farmos.dev', 'plant');
+    const assets = await getAssets(TEST_FARM, 'plant');
     console.log('assets', JSON.stringify(assets.data, null, 2));
   });
 
-  it('create log', async () => {
+  it('create-log', async () => {
     const { farminfo, getAssets, createLog } = config();
 
     const id = uuid.v4();
@@ -47,12 +53,7 @@ describe('fetching farminfo', () => {
     };
 
     console.log('log', log);
-    try {
-      const logres = await createLog('buddingmoonfarm.farmos.dev', 'activity', log);
-      console.log('log result', logres.data);
-    } catch (error) {
-      console.log(error);
-    }
+    await createLog(TEST_FARM, 'activity', log);
   });
   it('subrequest', async () => {
     const { subrequest } = config();
@@ -67,18 +68,21 @@ describe('fetching farminfo', () => {
     };
 
     try {
-      const r = await subrequest('buddingmoonfarm.farmos.dev', req);
+      const r = await subrequest(TEST_FARM, req);
       console.log(r);
     } catch (error) {
       console.log(error);
     }
   });
-  it('create asset', async () => {
-    const { createAsset, getTaxonomy, getAssets } = config();
+  it('create-planting-in-field', async () => {
+    // create planting in a field and a log referencing it
+    jest.setTimeout(10000);
+
+    const { createAsset, getTaxonomy, getAssets, createLog } = config();
 
 
-    const { data: plants } = await getTaxonomy('buddingmoonfarm.farmos.dev', 'plant_type');
-    const { data: fields } = await getAssets('buddingmoonfarm.farmos.dev', 'land');
+    const { data: plants } = await getTaxonomy(TEST_FARM, 'plant_type');
+    const { data: fields } = await getAssets(TEST_FARM, 'land');
     const fieldId = fields.data[0].id;
 
     const plantTypes = plants.data.map((p) => {
@@ -87,7 +91,6 @@ describe('fetching farminfo', () => {
         name: p.attributes.name,
       };
     });
-    console.log('plant types', plantTypes);
 
     const chioggia = plantTypes.find((p) => p.name == 'Chioggia');
 
@@ -123,12 +126,66 @@ describe('fetching farminfo', () => {
       },
     };
 
-    console.log('asset', asset);
-    try {
-      const logres = await createAsset('buddingmoonfarm.farmos.dev', 'plant', asset);
-      console.log('log result', logres.data);
-    } catch (error) {
-      console.log(error);
-    }
+    const assetRes = await createAsset(TEST_FARM, 'plant', asset);
+    expect(assetRes.status).toBe(201);
+
+    const log = {
+      data: {
+        type: 'log--activity',
+        attributes: {
+          name: 'Test activity log via API',
+          timestamp: 1645801459,
+          status: 'done',
+        },
+        relationships: {
+          asset: {
+            id,
+          }
+        }
+      },
+    };
+
+
+    const logres = await createLog(TEST_FARM, 'activity', log);
+    expect(logres.status).toBe(201);
+    console.log('id', logres.data.data.id);
+  });
+
+  it.only('create-and-delete-log', async () => {
+
+    const { farminfo, getAssets, createLog, getLogs, deleteAllWithData } = config();
+
+    const id = uuid.v4();
+    const data = uuid.v4();
+    const log = {
+      data: {
+        id,
+        type: 'log--activity',
+        attributes: {
+          name: 'Test activity log via API',
+          timestamp: 1645801459,
+          status: 'done',
+          data,
+        },
+      },
+    };
+
+    console.time("test")
+
+    await createLog(TEST_FARM, 'activity', log);
+    console.timeLog("test")
+    const { data: logs } = await getLogs(TEST_FARM, 'activity');
+    let ids = logs.data.map(l => l.id);
+
+    expect(ids.includes(id)).toBe(true);
+
+    console.time("delete")
+    await deleteAllWithData(TEST_FARM, data);
+    console.timeEnd("delete")
+
+    const { data: logsAfterDeletion } = await getLogs(TEST_FARM, 'activity');
+    ids = logsAfterDeletion.data.map(l => l.id);
+    expect(ids.includes(id)).toBe(false);
+    console.timeEnd("test")
   });
 });
