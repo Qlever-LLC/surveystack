@@ -109,13 +109,13 @@
         </span>
       </template>
 
-      <template v-slot:body="props">
+      <template v-slot:body="{ items, isSelected, select }">
         <tbody>
-          <tr v-for="item in props.items" :key="item._id">
+          <tr v-for="item in items" :key="item._id">
             <td>
               <v-checkbox
-                v-model="tableSelected"
-                :value="item"
+                :value="isSelected(item)"
+                @click="select(item, !isSelected(item))"
                 color="#777"
                 class="custom-checkbox"
                 hide-details
