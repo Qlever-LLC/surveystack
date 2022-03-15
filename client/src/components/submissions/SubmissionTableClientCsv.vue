@@ -29,13 +29,13 @@
                   <v-switch
                     :input-value="!excludeMeta"
                     @change="$emit('excludeMetaChange', $event)"
-                    :label="excludeMeta ? 'Show Metadata' : 'Hide Metadata'"
+                    label="Show metadata"
                     class="mt-2"
                   ></v-switch>
                   <v-switch
                     :input-value="archived"
                     @change="$emit('showArchived', $event)"
-                    :label="!archived ? 'View archived only' : 'Hide Archived only'"
+                    label="View archived only"
                     class="mt-2 ml-5"
                   ></v-switch>
                 </div>

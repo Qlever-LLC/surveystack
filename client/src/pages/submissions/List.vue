@@ -61,7 +61,9 @@
       </div>
       <v-expansion-panels class="mb-6">
         <v-expansion-panel>
-          <v-expansion-panel-header expand-icon="mdi-menu-down"> Filters </v-expansion-panel-header>
+          <v-expansion-panel-header expand-icon="mdi-menu-down"
+            ><span class="text-body-1">Filters</span>
+          </v-expansion-panel-header>
           <v-expansion-panel-content>
             <app-submissions-filter-basic
               v-if="!showAdvancedFilters && queryList"
