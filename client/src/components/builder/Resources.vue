@@ -23,9 +23,7 @@
             <v-list-item-title>
               <v-btn text @click="importResource">
                 <v-icon color="grey">mdi-plus</v-icon>
-                <div class="ml-1">
-                  Use Existing Resource
-                </div>
+                <div class="ml-1">Use Existing Resource</div>
               </v-btn>
             </v-list-item-title>
           </v-list-item>
@@ -35,9 +33,7 @@
                 <label for="upload-resource" class="cursor-pointer">
                   <v-btn class="pointer-events-none" text>
                     <v-icon color="grey">mdi-upload</v-icon>
-                    <div class="ml-1">
-                      Create File Resource
-                    </div>
+                    <div class="ml-1">Create File Resource</div>
                   </v-btn>
                 </label>
                 <input
@@ -54,9 +50,7 @@
             <v-list-item-title>
               <v-btn text @click="createOntology">
                 <v-icon color="grey">mdi-plus</v-icon>
-                <div class="ml-1">
-                  Create Ontology
-                </div>
+                <div class="ml-1">Create Ontology</div>
               </v-btn>
             </v-list-item-title>
           </v-list-item>
@@ -137,7 +131,8 @@ export default {
         files: [file],
       },
     }) {
-      let resourceId = await this.$store.dispatch('resources/addResource', file);
+      let resourceId = await this.$store.dispatch('resources/addRemoteResource', file);
+      //TODO get back the resource, not just id, and add that below instead of creating a new resource object
       // add survey resource
       this.$emit('set-survey-resources', [
         ...this.resources,

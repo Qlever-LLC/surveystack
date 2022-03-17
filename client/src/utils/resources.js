@@ -77,31 +77,33 @@ export async function openResourceInTab(resourceId) {
   window.open(url);
 }
 
-export async function uploadFile(file) {
+export async function uploadFileResource(resourceKey) {
+  // TODO handle case of resource being already committed (e.g. resubmit)
   // TODO exception handling and rollback
-  const body = {
-    resourceName: file.name,
-    contentLength: file.size,
-    contentType: file.type,
-  };
-  let { data: uploadData } = await api.post('/resources/upload-url', body);
+  // load resource from local store
+  const resource = store.getters['resources/getResourceByKey'](resourceKey);
+  // create clone of resource object, without file data
+  let resourceClone = Object.assign({}, resource);
+  delete resourceClone.fileData;
+  // send resource to server, get upload-url
+  let { data: uploadData } = await api.post('/resources/upload-url', resourceClone);
   // upload file to url
-  let putResponse = await axios.create().put(uploadData.signedUrl, file);
+  let putResponse = await axios.create().put(uploadData.signedUrl, resource.fileData);
   //set resource to committed
   let commitResponse = await api.put(`/resources/commit/${uploadData.resourceId}`, { dummy: '' });
   return uploadData.resourceId;
 }
 
 export async function uploadFileResources(submission) {
-  //this does not cache to store, and that makes sense when submitting
   let submissionClone = submission; //cloneDeep(submission);
 
   let controls = Object.values(submissionClone.data);
 
   for (let control of controls) {
     if (control.meta.type === 'file') {
-      const unresolvedPromises = control.value.map((file) => uploadFile(file));
-      control.value = await Promise.all(unresolvedPromises);
+      //TODO control.value does not have to be mapped, a loop would be sufficient
+      const unresolvedPromises = control.value.map((resourceKey) => uploadFileResource(resourceKey));
+      await Promise.all(unresolvedPromises);
     }
   }
 

@@ -67,8 +67,10 @@
               @click.stop="showFullCell(item, header, $event)"
               :class="{ active: isModalOpen(getCellKey(header.value, item._id)) }"
             >
-              <div v-if="item[header.value].includes('ResourceId:')">
-                <a @click="openResource(item[header.value])"> {{ item[header.value] }}</a>
+              <div v-if="item[header.value].includes('resources/')">
+                <a @click.stop="openResource(item[header.value])">
+                  {{ item[header.value].substring(item[header.value].lastIndexOf('/') + 1) }}</a
+                >
               </div>
               <div v-else :class="{ truncate: shouldTruncate(item[header.value]) }">
                 {{ item[header.value] }}
@@ -91,7 +93,7 @@
 import papa from 'papaparse';
 import csvService from '@/services/csv.service';
 import SubmissionTableCellModal from './SubmissionTableCellModal.vue';
-import { openResourceInTab } from "@/utils/resources";
+import { openResourceInTab } from '@/utils/resources';
 
 export function transformHeaders(headers) {
   const replaceGeoJsonPath = (str) => str.replace(/(value\.features\.\d).*/, '$1');
@@ -242,7 +244,7 @@ export default {
       this.createHeaders();
     },
     async openResource(value) {
-      let resourceId = value.replace('ResourceId:', '');
+      let resourceId = value.substring(value.indexOf('/') + 1, value.lastIndexOf('/'));
       await openResourceInTab(resourceId);
     },
   },
