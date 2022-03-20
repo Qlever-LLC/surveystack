@@ -5,19 +5,19 @@ import { uniqBy } from 'lodash';
 /**
  * The user receives ownership over the farmos instance
  */
-export const mapFarmOSInstanceToUser = async (userId, farmOSInstanceName, owner) => {
+export const mapFarmOSInstanceToUser = async (userId, instanceName, owner) => {
   const _id = new ObjectId();
   await db.collection('farmos-instances').insertOne({
     _id,
     userId,
-    farmOSInstanceName,
+    instanceName,
     owner,
   });
 
   return {
     _id,
     userId,
-    farmOSInstanceName,
+    instanceName,
     owner,
   };
 };
@@ -25,12 +25,12 @@ export const mapFarmOSInstanceToUser = async (userId, farmOSInstanceName, owner)
 /**
  * The admin receives access to the farmos instance
  */
-export const mapFarmOSInstanceToGroupAdmin = async (adminUserId, groupId, farmOSInstanceName) => {
+export const mapFarmOSInstanceToGroupAdmin = async (adminUserId, groupId, instanceName) => {
   const _id = new ObjectId();
   await db.collection('farmos-instances').insertOne({
     _id,
     userId: adminUserId,
-    farmOSInstanceName,
+    instanceName,
     owner: false,
     groupId,
   });
@@ -38,7 +38,7 @@ export const mapFarmOSInstanceToGroupAdmin = async (adminUserId, groupId, farmOS
   return {
     _id,
     userId: adminUserId,
-    farmOSInstanceName,
+    instanceName,
     owner: false,
     groupId,
   };
@@ -47,34 +47,37 @@ export const mapFarmOSInstanceToGroupAdmin = async (adminUserId, groupId, farmOS
 /**
  * FarmOS instance takes a seat in the groups roster
  */
-export const mapFarmOSInstanceToUserOfGroup = async (userId, farmOSInstanceName, groupId) => {
-  const _id = new ObjectId();
-  await db.collection('farmos-group-mapping').insertOne({
-    _id,
-    userId,
-    groupId,
-    farmOSInstanceName,
-  });
+export const unmapFarmOSInstance = async (id) => {
+  await db.collection('farmos-instances').deleteOne(
+    {
+      _id: ObjectId(id),
+    });
+};
 
-  return {
-    _id,
-    userId,
-    groupId,
-    farmOSInstanceName,
-  };
+/**
+ * A farmos instance is removed from the group's plan
+ */
+export const removeFarmOSInstanceFromGroup = async (id) => {
+  await db.collection('farmos-group-mapping').deleteOne(
+    {
+      _id: ObjectId(id),
+    });
 };
 
 /**
  * A group Admin creates a new farmos instance for a user
  * The instance is added to the groups plan
  */
-export const createFarmOSInstanceForUserAndGroup = async () => {};
+export const createFarmOSInstanceForUserAndGroup = async (userId, groupId, instanceName) => {
 
-/**
- * A farmos instance is removed from the group's plan
- */
-export const removeFarmOSInstanceFromGroup = async () => {
-  // all groups where the user is admin of
+  const _id = new ObjectId();
+  await db.collection('farmos-group-mapping').insertOne({
+    _id,
+    instanceName,
+    groupId,
+  });
+
+  return await mapFarmOSInstanceToUser(userId, instanceName, true);
 };
 
 /**
@@ -109,13 +112,8 @@ export const listFarmOSInstancesForGroup = async (userId, groupId) => {
     })
     .toArray();
 
-  return uniqBy([...adminInstances], (item) => item.farmOSInstanceName).map((item) => ({
-    farmOSInstanceName: item.farmOSInstanceName,
+  return uniqBy([...adminInstances], (item) => item.instanceName).map((item) => ({
+    instanceName: item.instanceName,
     owner: item.owner === true,
   }));
 };
-
-/**
- * a list of surveystack users that currently can access the farmos instance of a user
- */
-export const listUsersAndGroupsWithAccessToFarmOSInstance = async () => {};

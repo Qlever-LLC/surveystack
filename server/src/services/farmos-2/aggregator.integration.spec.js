@@ -17,7 +17,7 @@ const config = () => {
   return aggregator(process.env.FARMOS_AGGREGATOR_URL, process.env.FARMOS_AGGREGATOR_APIKEY);
 };
 
-jest.setTimeout(15000);
+jest.setTimeout(60000);
 
 
 describe('test-aggregator-integration', () => {
@@ -76,7 +76,6 @@ describe('test-aggregator-integration', () => {
   });
   it('create-planting-in-field', async () => {
     // create planting in a field and a log referencing it
-    jest.setTimeout(10000);
 
     const { createAsset, getTaxonomy, getAssets, createLog } = config();
 
@@ -151,7 +150,7 @@ describe('test-aggregator-integration', () => {
     console.log('id', logres.data.data.id);
   });
 
-  it.only('create-and-delete-log', async () => {
+  it('create-and-delete-log', async () => {
 
     const { farminfo, getAssets, createLog, getLogs, deleteAllWithData } = config();
 
@@ -170,22 +169,24 @@ describe('test-aggregator-integration', () => {
       },
     };
 
-    console.time("test")
 
     await createLog(TEST_FARM, 'activity', log);
-    console.timeLog("test")
     const { data: logs } = await getLogs(TEST_FARM, 'activity');
     let ids = logs.data.map(l => l.id);
 
     expect(ids.includes(id)).toBe(true);
 
-    console.time("delete")
     await deleteAllWithData(TEST_FARM, data);
-    console.timeEnd("delete")
 
     const { data: logsAfterDeletion } = await getLogs(TEST_FARM, 'activity');
     ids = logsAfterDeletion.data.map(l => l.id);
     expect(ids.includes(id)).toBe(false);
-    console.timeEnd("test")
+
   });
+  it.only('log-response', async () => {
+    const { farminfo, getAssets, createLog, getLogs, deleteAllWithData } = config();
+
+    const { data: logs } = await getLogs(TEST_FARM, 'activity');
+    console.log('data', JSON.stringify(logs, null, 2));
+  })
 });

@@ -12,14 +12,17 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
   };
 
   const agent = new https.Agent(agentOptions);
+  const opts = {
+    headers: {
+      accept: 'application/json',
+      'api-key': aggregatorKey,
+    },
+    httpsAgent: agent,
+  }
 
   const farminfo = async () => {
     const r = await axios.get(`${apiBase}/farms/`, {
-      headers: {
-        accept: 'application/json',
-        'api-key': aggregatorKey,
-      },
-      httpsAgent: agent,
+      ...opts
     });
     return r;
   };
@@ -27,13 +30,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
   const getAssets = async (farmurl, bundle) => {
     const r = await axios.get(
       `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/api/asset/${bundle}?&fields[asset--${bundle}]=id,name`,
-      {
-        headers: {
-          accept: 'application/json',
-          'api-key': aggregatorKey,
-        },
-        httpsAgent: agent,
-      }
+      ...opts
     );
 
     return r;
@@ -42,13 +39,9 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
 
   const getLogs = async (farmurl, bundle) => {
     const r = await axios.get(
-      `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/api/log/${bundle}?&fields[asset--${bundle}]=id,name`,
+      `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/api/log/${bundle}?&fields[log--${bundle}]=id,name`,
       {
-        headers: {
-          accept: 'application/json',
-          'api-key': aggregatorKey,
-        },
-        httpsAgent: agent,
+        ...opts
       }
     );
 
@@ -60,12 +53,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
       `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/api/log/${bundle}?`,
       log,
       {
-        headers: {
-          accept: 'application/json',
-          'Content-Type': 'application/json',
-          'api-key': aggregatorKey,
-        },
-        httpsAgent: agent,
+        ...opts
       }
     );
 
@@ -77,12 +65,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
       `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/api/asset/${bundle}?`,
       asset,
       {
-        headers: {
-          accept: 'application/json',
-          'Content-Type': 'application/json',
-          'api-key': aggregatorKey,
-        },
-        httpsAgent: agent,
+        ...opts
       }
     );
 
@@ -94,12 +77,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
       `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/subrequests?`,
       req,
       {
-        headers: {
-          accept: 'application/json',
-          'Content-Type': 'application/json',
-          'api-key': aggregatorKey,
-        },
-        httpsAgent: agent,
+        ...opts
       }
     );
 
@@ -110,17 +88,18 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     const r = await axios.get(
       `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/api/taxonomy_term/${bundle}?`,
       {
-        headers: {
-          accept: 'application/json',
-          'Content-Type': 'application/json',
-          'api-key': aggregatorKey,
-        },
-        httpsAgent: agent,
+        ...opts
       }
     );
 
     return r;
   };
+
+  const getAllTaxonomy = async (farmurl) => {
+    const bundles = [
+      
+    ]
+  }
 
   const deleteAllWithData = async (farmurl, data) => {
     const assetBundles = [
@@ -153,12 +132,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
 
     const r = await axios.post(
       `${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`, body, {
-      headers: {
-        accept: 'application/json',
-        'Content-Type': 'application/json',
-        'api-key': aggregatorKey,
-      },
-      httpsAgent: agent,
+      ...opts
     })
 
     // console.log('data', r.data);
@@ -190,12 +164,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
 
     await axios.post(
       `${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`, deleteBody, {
-      headers: {
-        accept: 'application/json',
-        'Content-Type': 'application/json',
-        'api-key': aggregatorKey,
-      },
-      httpsAgent: agent,
+      ...opts
     })
   }
 

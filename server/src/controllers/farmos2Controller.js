@@ -5,9 +5,10 @@ import _, { isString } from 'lodash';
 import axios from 'axios';
 import boom from '@hapi/boom';
 import https from 'https';
-import { getRoles } from '../services/roles.service';
+import { getRoles, hasAdminRole } from '../services/roles.service';
 import { listFarmOSInstancesForUser } from '../services/farmos-2/manage';
 import { aggregator } from '../services/farmos-2/aggregator';
+
 
 const config = () => {
   if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
@@ -17,6 +18,32 @@ const config = () => {
 
   return aggregator(process.env.FARMOS_AGGREGATOR_URL, process.env.FARMOS_AGGREGATOR_APIKEY);
 };
+
+const requireUserId = (res) => {
+  const userId = res.locals.auth.user._id;
+
+  if (!userId) {
+    throw boom.unauthorized();
+  }
+}
+
+const requireGroupdAdmin = (req, res) => {
+
+  const { group } = req.body;
+  const userId = res.locals.auth.user._id;
+
+  if (!userId) {
+    throw boom.unauthorized();
+  }
+
+  if (!group) {
+    throw boom.unauthorized();
+  }
+
+  if (!hasAdminRole(userId, group)) {
+    throw boom.unauthorized();
+  }
+}
 
 /**
  *
@@ -28,10 +55,7 @@ export const getFarmOSInstances = async (req, res) => {
    * A flat list of instances the user has access to for the farm question type
    */
 
-  const userId = res.locals.auth.user._id;
-  if (!userId) {
-    throw boom.unauthorized();
-  }
+  const userId = requireUserId(res);
 
   const r = await listFarmOSInstancesForUser(userId);
 
@@ -44,6 +68,10 @@ export const getFarmOSInstances = async (req, res) => {
  * get a list of assets (fields, plantings, etc.)
  */
 export const getAssets = async (req, res) => {
+
+
+  const userId = requireUserId(res);
+
   /**
    * A list of assets the user has access to for the farm question type
    * include instance url for each asset
@@ -51,10 +79,6 @@ export const getAssets = async (req, res) => {
 
   const allowedBundles = ['plant', 'location', 'equipment'];
 
-  const userId = res.locals.auth.user._id;
-  if (!userId) {
-    throw boom.forbidden('not signed in');
-  }
 
   const { bundle } = req.body;
 
@@ -78,6 +102,7 @@ export const getAssets = async (req, res) => {
         return {
           name: a.attributes.name,
           id: a.id,
+          instance: instance.farmOSInstanceName,
         };
       });
       assets.push(...assetList);
@@ -100,13 +125,53 @@ export const getLogs = async (req, res) => {
    * A list of logs the user has access to
    * include instance url for each log
    */
-  return res.send([]);
+
+  const userId = res.locals.auth.user._id;
+  if (!userId) {
+    throw boom.forbidden('not signed in');
+  }
+
+  const { bundle } = req.body;
+
+  if (!bundle || !isString(bundle)) {
+    throw boom.badData("argument 'bundle' not valid");
+  }
+
+  const instances = await listFarmOSInstancesForUser(userId);
+  const cfg = config();
+
+  const assets = [];
+  const errors = [];
+  for (const instance of instances) {
+    try {
+      const axiosResponse = await cfg.getLogs(instance.instanceName, bundle);
+      const assetList = axiosResponse.data.data.map((a) => {
+        return {
+          name: a.attributes.name,
+          id: a.id,
+          instance: instance.instanceName,
+        };
+      });
+      assets.push(...assetList);
+    } catch (error) {
+      errors.push(error);
+    }
+  }
+
+  return res.send({
+    assets,
+    errors,
+  });
 };
 
 /**
  * Return all instances for group with mappings
  */
 export const getInstancesForGroup = async (req, res) => {
+
+  const userId = requireUserId(res);
+  const groupId = requireGroupdAdmin(req, res);
+
   return res.send([]);
 };
 

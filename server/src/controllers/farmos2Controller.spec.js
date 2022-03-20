@@ -1,12 +1,12 @@
 import boom from '@hapi/boom';
-import { getFarmOSInstances, getAssets } from './farmos2Controller';
+import { getFarmOSInstances, getAssets, getLogs } from './farmos2Controller';
 import { createGroup, createReq, createRes, createUser } from '../testUtils';
 import {
   mapFarmOSInstanceToUser,
   mapFarmOSInstanceToGroupAdmin,
 } from '../services/farmos-2/manage';
 
-import { assetResponse } from '../services/farmos-2/__mock__/farmos.asset.response';
+import { assetResponse, logResponse } from '../services/farmos-2/__mock__/farmos.asset.response';
 
 import mockAxios from 'axios';
 
@@ -104,10 +104,46 @@ describe('farmos2controller', () => {
         {
           name: 'Block B bed 12 Kale',
           id: 'a89f2dfe-35f6-4bfb-b079-be7c034a7f24',
+          instance: 'buddingmoonfarm.farmos.dev',
         },
         {
           name: 'spinach 8/26/20 ',
           id: '626dec74-7f46-4c85-bc0e-76f69bcb7b41',
+          instance: 'buddingmoonfarm.farmos.dev',
+        },
+      ])
+    );
+  });
+
+  it.only('get-logs', async () => {
+    jest.setTimeout(10000);
+
+    mockAxios.get.mockImplementation(() => Promise.resolve({ data: logResponse }));
+
+    const user = await createUser();
+    await mapFarmOSInstanceToUser(user._id, 'buddingmoonfarm.farmos.dev', true);
+
+    const res = mockRes(user._id);
+    await getLogs(
+      {
+        body: {
+          bundle: 'activity',
+        },
+      },
+      res
+    );
+
+    expect(res.data.assets).toEqual(
+      expect.arrayContaining([
+        {
+          id: '190e2daf-4efd-4db6-a472-179a29de2ad0',
+          name: 'Test activity log via API',
+          instance: 'buddingmoonfarm.farmos.dev',
+        },
+        {
+          id: 'd4640163-bab7-4b9f-b35c-6dcc3099aa69',
+          name: 'Test activity log via API',
+          instance: 'buddingmoonfarm.farmos.dev',
         },
       ])
     );
