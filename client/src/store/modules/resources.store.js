@@ -1,5 +1,5 @@
 import * as db from '@/store/db';
-import { resourceLocations, uploadFile, uploadFileResource } from '@/utils/resources';
+import { getPublicDownloadUrl, resourceLocations, uploadFileResource } from '@/utils/resources';
 import api from '@/services/api.service';
 import axios from 'axios';
 import ObjectId from 'bson-objectid';
@@ -41,7 +41,7 @@ const actions = {
   async addRemoteResource({ commit, dispatch }, file) {
     let resource = await dispatch('addLocalResource', file);
     let resourceId = await uploadFileResource(resource.key);
-    await dispatch('fetchResource', resourceId, file);
+    await dispatch('fetchResource', resourceId);
     return resourceId;
   },
   async addLocalResource({ commit }, file) {
@@ -78,13 +78,10 @@ const actions = {
   async fetchResource({ commit, getters }, resourceId) {
     let resource = getters['getResource'](resourceId);
     if (!resource) {
-      /*TODO store data in the resource object could lead to the data being stored in OUR db if a caller persists this resource object
-      maybe store the data in a separate array?
-     */
       // fetch resource
       ({ data: resource } = await api.get(`/resources/${resourceId}`));
       // get download url
-      const { data: url } = await api.post(`/resources/download-url`, { key: resource.key });
+      const url = await getPublicDownloadUrl(resource.key);
       // download data
       const { data: binaryResult } = await axios.get(url, {
         responseType: 'arraybuffer',

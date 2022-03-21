@@ -3,6 +3,7 @@
 import papa from 'papaparse';
 import { cloneDeep, omitBy, isObject, isEmpty } from 'lodash';
 import { flatten } from 'flat';
+import { getPublicDownloadUrl } from '@/utils/resources';
 
 function removeKeys(obj, keys) {
   if (!obj) {
@@ -112,6 +113,16 @@ export function geojsonTransformer(o) {
   };
 }
 
+export function fileTransformer(o) {
+  if (!o.value) {
+    return o;
+  }
+  let changedValues = o.value.map((r) => getPublicDownloadUrl(r));
+  return {
+    value: changedValues,
+  };
+}
+
 export function createCsv(submissions, headers) {
   const items = [];
   submissions.forEach((s) => {
@@ -145,6 +156,7 @@ export function createCsv(submissions, headers) {
 
     const transformedSubmissionData = transformSubmissionQuestionTypes(submission.data, {
       geoJSON: geojsonTransformer,
+      file: fileTransformer,
     });
 
     const flattenSubmissionData = flatten({

@@ -77,6 +77,19 @@ export async function openResourceInTab(resourceId) {
   window.open(url);
 }
 
+export async function getSignedDownloadUrl(resourceKey) {
+  const { data: url } = await api.post(`/resources/download-url`, { key: resourceKey });
+  return url;
+}
+
+export function getPublicDownloadUrl(resourceKey) {
+  const s3BaseUrl =
+    process.env.NODE_ENV === 'production'
+      ? 'https://surveystack.s3.amazonaws.com/'
+      : 'https://surveystack-test.s3.amazonaws.com/';
+  return s3BaseUrl + resourceKey;
+}
+
 export async function uploadFileResource(resourceKey) {
   // TODO handle case of resource being already committed (e.g. resubmit)
   // TODO exception handling and rollback
@@ -100,7 +113,7 @@ export async function uploadFileResources(submission) {
   let controls = Object.values(submissionClone.data);
 
   for (let control of controls) {
-    if (control.meta.type === 'file') {
+    if (control.meta.type === 'file' && control.value) {
       //TODO control.value does not have to be mapped, a loop would be sufficient
       const unresolvedPromises = control.value.map((resourceKey) => uploadFileResource(resourceKey));
       await Promise.all(unresolvedPromises);

@@ -87,6 +87,14 @@
         </tbody>
       </template>
     </v-data-table>
+    <v-dialog :value="downloadingResource" hide-overlay persistent width="300">
+      <v-card>
+        <v-card-text class="pa-4">
+          <span>Downloading file resource</span>
+          <v-progress-linear indeterminate class="mb-0" />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 <script>
@@ -151,6 +159,7 @@ export default {
       },
       headers: [],
       modalLeftPosition: null,
+      downloadingResource: false,
     };
   },
   computed: {
@@ -244,8 +253,11 @@ export default {
       this.createHeaders();
     },
     async openResource(value) {
-      let resourceId = value.substring(value.indexOf('/') + 1, value.lastIndexOf('/'));
+      this.downloadingResource = true;
+      let resourceKeyParts = value.split('/');
+      let resourceId = resourceKeyParts[resourceKeyParts.length - 2]; //resourceId is second last part of key
       await openResourceInTab(resourceId);
+      this.downloadingResource = false;
     },
   },
   async created() {
