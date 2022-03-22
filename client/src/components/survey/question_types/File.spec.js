@@ -34,14 +34,16 @@ describe('File question', () => {
   describe('rendering', () => {
     const rendersValue = (value) => {
       const wrapper = mount(FileComp, getMountOpts({ value }));
-      value.forEach((file, index) => {
+      value.forEach((key, index) => {
         const input = wrapper.find('[data-test-id="file_' + index + '"]');
-        expect(input.vnode.children[0].children[0].text).toContain(file.name);
+        expect(input.vnode.children[0].children[0].children[0].text).toContain(
+          key.substring(key.lastIndexOf('/') + 1, key.length)
+        );
       });
     };
 
-    test('displays single file name', () => rendersValue([new File(['data1'], 'file1.png')]));
+    test('displays single file name', () => rendersValue(['resources/62398a1e977e7a0001718ef6/test.jpg']));
     test('displays multiple file names', () =>
-      rendersValue([new File(['data1'], 'file1.png'), new File(['data2'], 'file2.png')]));
+      rendersValue(['resources/62398a1e977e7a0001718ee6/test2.jpg', 'resources/62398a1e977e7a0001718fe6/test3.jpg']));
   });
 });
