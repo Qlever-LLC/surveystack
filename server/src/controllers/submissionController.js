@@ -239,28 +239,6 @@ const buildPipeline = async (req, res) => {
     });
   }
 
-  // sort stage
-  if (req.query.sort) {
-    try {
-      const s = JSON.parse(req.query.sort);
-      if (!_.isEmpty(s)) {
-        sort = s;
-      }
-    } catch (error) {
-      throw boom.badRequest(`Bad query paramter sort: ${sort}`);
-    }
-
-    _.forOwn(sort, (v) => {
-      if (v !== -1 && v !== 1) {
-        throw boom.badRequest(`Bad query paramter sort, value must be either 1 or -1`);
-      }
-    });
-  }
-
-  pipeline.push({
-    $sort: sort,
-  });
-
   // Authenticated either Authorization header or Cookie
   if (res.locals.auth.isAuthenticated) {
     // Authorization header
@@ -385,11 +363,31 @@ const getSubmissionsPage = async (req, res) => {
     }
   }
 
+  // sort stage
+  let sort;
+  if (req.query.sort) {
+    try {
+      const s = JSON.parse(req.query.sort);
+      if (!_.isEmpty(s)) {
+        sort = s;
+      }
+    } catch (error) {
+      throw boom.badRequest(`Bad query paramter sort: ${sort}`);
+    }
+
+    _.forOwn(sort, (v) => {
+      if (v !== -1 && v !== 1) {
+        throw boom.badRequest(`Bad query paramter sort, value must be either 1 or -1`);
+      }
+    });
+  }
+
   // pagination stage
   const paginationStages = [
     {
       $facet: {
-        content: [{ $skip: skip }, { $limit: limit }],
+        // Optimize $sort by running it right before $limit https://docs.mongodb.com/manual/reference/operator/aggregation/sort/#-sort----limit-memory-optimization
+        content: [{ $sort: sort }, { $limit: limit + skip }, { $skip: skip }],
         pagination: [{ $count: 'total' }, { $addFields: { skip, limit } }],
       },
     },
