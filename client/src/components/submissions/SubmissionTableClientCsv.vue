@@ -87,7 +87,7 @@
         </tbody>
       </template>
     </v-data-table>
-    <v-dialog :value="downloadingResource" hide-overlay persistent width="300">
+    <v-dialog :value="downloadingResource" hide-overlay persistent width="300" role="downloadingResourceProgressDialog">
       <v-card>
         <v-card-text class="pa-4">
           <span>Downloading file resource</span>
