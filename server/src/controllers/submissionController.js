@@ -239,6 +239,28 @@ const buildPipeline = async (req, res) => {
     });
   }
 
+  // sort stage
+  if (req.query.sort) {
+    try {
+      const s = JSON.parse(req.query.sort);
+      if (!_.isEmpty(s)) {
+        sort = s;
+      }
+    } catch (error) {
+      throw boom.badRequest(`Bad query paramter sort: ${sort}`);
+    }
+
+    _.forOwn(sort, (v) => {
+      if (v !== -1 && v !== 1) {
+        throw boom.badRequest(`Bad query paramter sort, value must be either 1 or -1`);
+      }
+    });
+  }
+
+  pipeline.push({
+    $sort: sort,
+  });
+
   // Authenticated either Authorization header or Cookie
   if (res.locals.auth.isAuthenticated) {
     // Authorization header
@@ -330,27 +352,6 @@ const buildPipeline = async (req, res) => {
     }
   }
 
-  // sort stage
-  if (req.query.sort) {
-    try {
-      const s = JSON.parse(req.query.sort);
-      if (!_.isEmpty(s)) {
-        sort = s;
-      }
-    } catch (error) {
-      throw boom.badRequest(`Bad query paramter sort: ${sort}`);
-    }
-
-    _.forOwn(sort, (v) => {
-      if (v !== -1 && v !== 1) {
-        throw boom.badRequest(`Bad query paramter sort, value must be either 1 or -1`);
-      }
-    });
-  }
-
-  pipeline.push({
-    $sort: sort,
-  });
   return pipeline;
 };
 
