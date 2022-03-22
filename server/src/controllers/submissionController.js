@@ -348,9 +348,13 @@ const buildPipeline = async (req, res) => {
     });
   }
 
-  pipeline.push({
-    $sort: sort,
-  });
+  pipeline.push(
+    { $project: JSON.parse(req.query.sort) },
+    {
+      $sort: sort,
+    },
+    { $project: { _id: 1 } },
+  );
   return pipeline;
 };
 
