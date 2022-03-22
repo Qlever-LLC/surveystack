@@ -10,6 +10,22 @@
         @close-dialog="ontologyEditorDialog = false"
       />
     </v-dialog>
+    <v-dialog :value="uploadingResource" hide-overlay persistent width="300">
+      <v-card>
+        <v-card-text class="pa-4">
+          <span>Uploading file resource</span>
+          <v-progress-linear indeterminate class="mb-0" />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <v-dialog :value="downloadingResource" hide-overlay persistent width="300">
+      <v-card>
+        <v-card-text class="pa-4">
+          <span>Downloading file resource</span>
+          <v-progress-linear indeterminate class="mb-0" />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
     <div class="d-flex justify-end">
       <v-menu offset-y left>
         <template v-slot:activator="{ on }">
@@ -110,6 +126,8 @@ export default {
       ],
       ontologyEditorDialog: false,
       selectedId: null,
+      uploadingResource: false,
+      downloadingResource: false,
     };
   },
   methods: {
@@ -131,7 +149,9 @@ export default {
         files: [file],
       },
     }) {
+      this.uploadingResource = true;
       let resourceId = await this.$store.dispatch('resources/addRemoteResource', file);
+      this.uploadingResource = false;
       //TODO get back the resource, not just id, and add that below instead of creating a new resource object
       // add survey resource
       this.$emit('set-survey-resources', [
@@ -146,11 +166,13 @@ export default {
       ]);
       this.$refs['upload-resource'].value = null;
     },
-    openResource(resource) {
+    async openResource(resource) {
       if (resource.type === 'ONTOLOGY_LIST') {
         this.openOntologyEditor(resource.id);
       } else {
-        openResourceInTab(resource.id);
+        this.downloadingResource = true;
+        await openResourceInTab(resource.id);
+        this.downloadingResource = false;
       }
     },
 
