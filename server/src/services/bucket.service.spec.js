@@ -40,16 +40,16 @@ describe.skip('Bucket service', () => {
     });
   });
 
-  describe('getDownloadURL', () => {
+  describe('getSignedDownloadUrl', () => {
     const file = getMockFile();
     let signedDownloadUrl;
     it('returns an URL to the testing endpoint', async () => {
-      signedDownloadUrl = await bucketService.getDownloadUrl(file.name);
+      signedDownloadUrl = await bucketService.getSignedDownloadUrl(file.name);
       expect(signedDownloadUrl).toContain(bucketService.AWS_S3_BUCKET_NAME);
       expect(signedDownloadUrl).toContain(file.name);
     });
     it('responds with Not Found if object is not available', async () => {
-      let url = await bucketService.getDownloadUrl('non-existing-file.txt');
+      let url = await bucketService.getSignedDownloadUrl('non-existing-file.txt');
       const response = await axios.get(url, { validateStatus: false });
       expect(response.statusText).toBe('Not Found');
     });
@@ -57,7 +57,7 @@ describe.skip('Bucket service', () => {
       let signedUrl = await bucketService.getUploadUrl(file.name, file.type, file.size);
       const responseUpload = await axios.put(signedUrl, fileContent, { validateStatus: false });
       expect(responseUpload.status).toBe(200);
-      let url = await bucketService.getDownloadUrl(file.name);
+      let url = await bucketService.getSignedDownloadUrl(file.name);
       const response = await axios.get(url, { validateStatus: false });
       expect(response.status).toBe(200);
       fileNameToDelete = file.name;
@@ -78,7 +78,7 @@ describe.skip('Bucket service', () => {
     if (fileNameToDelete) {
       let responseDelete = await bucketService.deleteObject(fileNameToDelete);
       expect(responseDelete.$metadata.httpStatusCode).toBe(204);
-      let url = await bucketService.getDownloadUrl(fileNameToDelete);
+      let url = await bucketService.getSignedDownloadUrl(fileNameToDelete);
       const response = await axios.get(url, { validateStatus: false });
       expect(response.status).toBe(404);
     }

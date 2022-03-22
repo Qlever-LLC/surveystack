@@ -3,6 +3,7 @@
 import papa from 'papaparse';
 import _ from 'lodash';
 import { flatten } from 'flat';
+import { getPublicDownloadUrl } from './bucket.service';
 
 // Marker class to flag cells to be expanded into new rows in post processing
 // NOTE: It stores data as JSON string. I didn't find a less hacky way
@@ -76,6 +77,21 @@ function geojsonTransformer(o) {
       ...o.value,
       features: o.value.features.map(JSON.stringify),
     },
+  };
+}
+
+/**
+ *
+ * @param {*} o submission question object e.g. { meta: { type: 'file', ...}, value: {...}}
+ * @returns updated submission question object
+ */
+export function fileTransformer(o) {
+  if (!o.value) {
+    return o;
+  }
+  let changedValues = o.value.map((r) => getPublicDownloadUrl(r));
+  return {
+    value: changedValues,
   };
 }
 

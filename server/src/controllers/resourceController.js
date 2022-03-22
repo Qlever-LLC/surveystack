@@ -21,7 +21,7 @@ const getResource = async (req, res) => {
 
 const getDownloadURL = async (req, res) => {
   const { key } = req.body;
-  let downloadURL = await bucketService.getDownloadUrl(key);
+  let downloadURL = await bucketService.getSignedDownloadUrl(key);
   if (!downloadURL) {
     return res.status(500).send({
       message: `no url returned by bucket service`,

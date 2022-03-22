@@ -54,11 +54,19 @@ export async function getUploadUrl(key, contentType, contentLength) {
   });
 }
 
-export async function getDownloadUrl(key) {
+export async function getSignedDownloadUrl(key) {
   const command = new GetObjectCommand({ Bucket: AWS_S3_BUCKET_NAME, Key: key });
   return await getSignedUrl(s3Client, command, {
     expiresIn: 3600, //in seconds, eq 1 hour
   });
+}
+
+export function getPublicDownloadUrl(resourceKey) {
+  const s3BaseUrl =
+    process.env.NODE_ENV === 'production'
+      ? 'https://surveystack.s3.amazonaws.com/'
+      : 'https://surveystack-test.s3.amazonaws.com/';
+  return s3BaseUrl + resourceKey;
 }
 
 export async function deleteObject(key) {
@@ -69,6 +77,7 @@ export default {
   AWS_S3_ENDPOINT_OVERRIDE,
   AWS_S3_BUCKET_NAME,
   getUploadUrl,
-  getDownloadUrl,
+  getSignedDownloadUrl,
+  getPublicDownloadUrl,
   deleteObject,
 };

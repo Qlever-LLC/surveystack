@@ -507,6 +507,7 @@ const getSubmissionsCsv = async (req, res) => {
       entity.data,
       {
         geoJSON: csvService.geojsonTransformer,
+        file: csvService.fileTransformer,
         matrix: csvService.matrixTransformer,
       },
       formatOptions
