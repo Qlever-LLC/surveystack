@@ -397,6 +397,11 @@ const getSubmissionsPage = async (req, res) => {
 
   pipeline.push(...paginationStages);
 
+  // TODO remove, only added for debugging performance
+  if (req.query.explain) {
+    return res.send(await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).explain());
+  }
+
   const [entities] = await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).toArray();
 
   if (!entities) {
