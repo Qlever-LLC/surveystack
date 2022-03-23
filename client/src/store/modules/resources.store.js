@@ -61,6 +61,18 @@ const actions = {
     commit('ADD_RESOURCE', resource);
     return resource;
   },
+  async updateResourceLabel({ commit, getters }, { resourceKey, labelNew }) {
+    let resource = getters['getResourceByKey'](resourceKey);
+    if (resource) {
+      resource.key = resource.key.substring(0, resource.key.lastIndexOf('/') + 1) + labelNew;
+      resource.label = labelNew;
+      resource.name = slugify(labelNew);
+      await db.persistResource(resource);
+      commit('REMOVE_RESOURCE', resource.id);
+      commit('ADD_RESOURCE', resource);
+    }
+    return resource;
+  },
   async removeLocalResource({ commit, getters }, resourceKey) {
     let resource = getters['getResourceByKey'](resourceKey);
     if (resource) {

@@ -6,7 +6,7 @@
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
 
-    <div @drop.prevent="onDrop" @dragover.prevent="onDragOver">
+    <div @drop.prevent="onDrop" @dragover.prevent="onDragOver" @dragleave="onDragLeave">
       <input
         name="fileInput"
         id="fileInput"
@@ -28,14 +28,19 @@
         ref="captureImage"
         style="display: none"
         type="file"
-        :multiple="control.options.source.allowMultiple"
         @change="filesChanged"
         capture="environment"
-        data-test-id="captureFile"
+        accept="image/*"
+        data-test-id="captureImage"
       />
-      <div class="dropzone row mx-0 text-center" for="fileInput" @click.stop="showFileChooser">
-        <div class="col-12 pt-4">
-          {{ $vuetify.breakpoint.mobile || forceMobile ? 'tap here to upload' : 'click or drop here to upload' }}
+      <div
+        class="dropzone row mx-0 text-center"
+        :class="isDragging ? 'dragging' : ''"
+        for="fileInput"
+        @click.stop="showFileChooser"
+      >
+        <div class="col-12 pt-4 font-weight-bold">
+          {{ $vuetify.breakpoint.mobile || forceMobile ? 'Tap here to upload' : 'Click or drop here to upload' }}
         </div>
         <div
           class="col-12 pt-0"
@@ -58,23 +63,58 @@
             </v-btn>
           </div>
         </div>
-        <div v-if="fileResourceKeys && fileResourceKeys.length > 0" class="ma-3">
-          <v-chip
-            v-for="(fileResourceKey, index) in fileResourceKeys"
-            :key="fileResourceKey"
-            label
-            text-color="white"
-            color="grey"
-            class="ma-1 expanding-chip"
-            close
-            @click:close="remove(index)"
-            :data-test-id="'file_' + index"
-            ><span class="text-wrap"> {{ fileResourceKey.substring(fileResourceKey.lastIndexOf('/') + 1) }}</span>
-          </v-chip>
-        </div>
       </div>
     </div>
 
+    <v-expand-transition>
+      <v-list v-if="fileResourceKeys && fileResourceKeys.length > 0" class="pb-0">
+        <v-list-item
+          v-for="(fileResourceKey, index) in fileResourceKeys"
+          :key="fileResourceKey"
+          :data-test-id="'file_' + index"
+          class="file-list-item my-2"
+        >
+          <v-list-item-avatar>
+            <v-icon v-if="isResourceTypeOf(fileResourceKey, 'image')" large>mdi-image</v-icon>
+            <v-icon v-else-if="isResourceTypeOf(fileResourceKey, 'text')" large>mdi-file-document-outline</v-icon>
+            <v-icon v-else-if="isResourceTypeOf(fileResourceKey, 'pdf')" large>mdi-file-document-outline</v-icon>
+            <v-icon v-else large>mdi-file-outline</v-icon>
+            <!--v-img
+            alt="uploaded image thumbnail"
+            :src="chat.avatar"
+          ></v-img-->
+          </v-list-item-avatar>
+          <v-list-item-content>
+            <v-list-item-title
+              v-if="editIndex !== index"
+              class="text-wrap font-bold"
+              v-text="fileResourceKey.substring(fileResourceKey.lastIndexOf('/') + 1)"
+            ></v-list-item-title>
+            <v-list-item-title v-if="editIndex === index" class="text-wrap font-bold">
+              <v-text-field v-model="editFileName" />
+            </v-list-item-title>
+            <v-list-item-subtitle v-if="showUploadProgressIndex === index"
+              ><v-progress-linear indeterminate class="mb-0"
+            /></v-list-item-subtitle>
+          </v-list-item-content>
+          <v-list-item-action v-if="isNameEditable(fileResourceKey) && editIndex !== index">
+            <v-btn icon @click="editResourceName(fileResourceKey, index)">
+              <v-icon color="grey lighten-1">mdi-pencil</v-icon>
+            </v-btn>
+          </v-list-item-action>
+          <v-list-item-action v-if="editIndex === index">
+            <v-btn icon @click="commitResourceName(fileResourceKey, index)">
+              <v-icon color="success">mdi-check</v-icon>
+            </v-btn>
+          </v-list-item-action>
+          <v-list-item-action>
+            <v-btn icon @click="remove(index)">
+              <v-icon color="grey lighten-1">mdi-close-circle</v-icon>
+            </v-btn>
+          </v-list-item-action>
+        </v-list-item>
+      </v-list>
+    </v-expand-transition>
     <app-control-more-info :value="control.moreInfo" />
   </div>
 </template>
@@ -84,6 +124,7 @@ import baseQuestionComponent from './BaseQuestionComponent';
 import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
+import store from '@/store';
 
 const MAX_FILE_SIZE = 20971520; //20 MB
 const MAX_FILE_SIZE_IMAGES = 512000; //500 KB
@@ -99,8 +140,12 @@ export default {
   data() {
     return {
       fileResourceKeys: this.value || [],
+      isDragging: false,
       alertMessageVisible: false,
       alertMessage: null,
+      showUploadProgressIndex: undefined,
+      editIndex: undefined,
+      editFileName: undefined,
     };
   },
   computed: {},
@@ -157,15 +202,20 @@ export default {
         }
       }
       this.changed(this.fileResourceKeys.length ? this.fileResourceKeys : null);
+      this.isDragging = false;
     },
     onDragOver(event) {
       event.dataTransfer.dropEffect = 'copy';
+      this.isDragging = true;
+    },
+    onDragLeave(event) {
+      this.isDragging = false;
     },
     async addFile(file, destArray, allowMultiple, allowedTypes) {
       if (!this.isMimeTypeAllowed(allowedTypes, file.type)) {
         throw 'Drop not allowed for this file type. Allowed types: ' + allowedTypes.join(', ');
       }
-      if (!this.isImage(file.type) && file.size > MAX_FILE_SIZE) {
+      if (!this.isImageFile(file.type) && file.size > MAX_FILE_SIZE) {
         throw (
           'File size limit exceeded. Limit ' +
           MAX_FILE_SIZE / 1024 / 1024 +
@@ -174,7 +224,7 @@ export default {
           ' MB'
         );
       }
-      if (this.isImage(file.type) && file.size > MAX_FILE_SIZE_IMAGES) {
+      if (this.isImageFile(file.type) && file.size > MAX_FILE_SIZE_IMAGES) {
         throw (
           'Image exceeds size limit of: ' +
           MAX_FILE_SIZE_IMAGES / 1024 +
@@ -199,7 +249,11 @@ export default {
         destArray.pop();
       }
 
-      destArray.push(resource.key);
+      const newLength = destArray.push(resource.key);
+      this.showUploadProgressIndex = newLength - 1;
+      setTimeout(() => {
+        this.showUploadProgressIndex = undefined;
+      }, 1100);
     },
     isMimeTypeAllowed(allowedTypes, type) {
       if (!allowedTypes || allowedTypes.length === 0) {
@@ -209,8 +263,38 @@ export default {
         return !!allowedTypes.find((allowedType) => type.match(allowedType));
       }
     },
-    isImage(type) {
+    isImageFile(type) {
       return type.match('image');
+    },
+    isResourceTypeOf(resourceKey, type) {
+      const resource = store.getters['resources/getResourceByKey'](resourceKey);
+      if (resource && resource.fileData && resource.fileData.type.match(type)) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    isNameEditable(resourceKey) {
+      const resource = store.getters['resources/getResourceByKey'](resourceKey);
+      if (resource && resource.state === 'local') {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    editResourceName(fileResourceKey, index) {
+      this.editIndex = index;
+      this.editFileName = fileResourceKey.substring(fileResourceKey.lastIndexOf('/') + 1);
+    },
+    async commitResourceName(fileResourceKey, index) {
+      const resource = await this.$store.dispatch('resources/updateResourceLabel', {
+        resourceKey: fileResourceKey,
+        labelNew: this.editFileName,
+      });
+      this.fileResourceKeys[index] = resource.key;
+      this.editIndex = undefined;
+      this.editFileName = undefined;
+      this.changed(this.fileResourceKeys);
     },
     showAlertMessage(error) {
       this.alertMessage = error;
@@ -238,14 +322,31 @@ export default {
   border-radius: 4px;
   border-collapse: collapse;
   border-color: rgba(0, 0, 0, 0.38);
-  border-style: solid;
-  border-width: 1px;
+  border-style: dashed;
+  border-width: 2px;
   min-height: 56px;
   cursor: pointer;
 }
+
 .dropzone:hover {
-  border-color: black;
+  border-color: var(--v-primary-base);
+  background-color: #e3f2fd;
 }
+
+.dragging {
+  border-color: var(--v-primary-base);
+  background-color: #e3f2fd;
+}
+
+.file-list-item {
+  border-radius: 4px;
+  border-collapse: collapse;
+  border-color: rgba(221, 221, 221);
+  border-style: solid;
+  border-width: 1px;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
 .expanding-chip {
   min-height: 32px;
   height: auto;

@@ -91,10 +91,13 @@ export function getPublicDownloadUrl(resourceKey) {
 }
 
 export async function uploadFileResource(resourceKey) {
-  // TODO handle case of resource being already committed (e.g. resubmit)
   // TODO exception handling and rollback
   // load resource from local store
   const resource = store.getters['resources/getResourceByKey'](resourceKey);
+  if (!resource || resource.state === 'committed') {
+    // case of resource being already committed (e.g. resubmit)
+    return;
+  }
   // create clone of resource object, without file data
   let resourceClone = Object.assign({}, resource);
   delete resourceClone.fileData;
@@ -114,22 +117,10 @@ export async function uploadFileResources(submission) {
 
   for (let control of controls) {
     if (control.meta.type === 'file' && control.value) {
-      //TODO control.value does not have to be mapped, a loop would be sufficient
       const unresolvedPromises = control.value.map((resourceKey) => uploadFileResource(resourceKey));
       await Promise.all(unresolvedPromises);
     }
   }
-
-  // TODO parallelize all uploads using promises, then await Promise.all - NOT WORKING, NOT WAITING
-  /*await Promise.all(
-    Object.values(submissionClone.data).map(async (control) => {
-      if (control.meta.type === 'file') {
-        return await control.value.map(async (file) => {
-          return await uploadFile(file);
-        });
-      }
-    })
-  );*/
 
   return submissionClone;
 }
