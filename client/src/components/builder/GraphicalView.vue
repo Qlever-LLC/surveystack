@@ -7,11 +7,11 @@
     :disabled="readOnly"
     tag="div"
     :list="controls"
-    :group="{ name: 'g1' }"
     :invertSwap="true"
     @start="drag = true"
     @end="drag = false"
     draggable=".draggable-item"
+    :group="draggableGroup"
   >
     <v-card
       v-for="(el, idx) in controls"
@@ -153,8 +153,27 @@
         @hide-control="$emit('hide-control', $event)"
         @unhide-control="$emit('unhide-control', $event)"
         :index="createIndex(index, idx + 1)"
-        :group="draggablePageGroup"
         :data-control-type="el.type"
+      />
+
+      <v-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
+        <v-card class="">
+          <v-card-title> Delete Question </v-card-title>
+          <v-card-text class="mt-4"> Are you sure you want to remove this question? </v-card-text>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
+            <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <update-library-dialog
+        v-if="updateLibraryDialogIsVisible"
+        v-model="updateLibraryDialogIsVisible"
+        :from-library-control="updateControl"
+        :to-survey="updateToLibrary"
+        @ok="updateLibraryConfirmed"
+        @cancel="updateLibraryCancelled"
       />
     </v-card>
 
@@ -203,7 +222,7 @@ export default {
       deleteQuestionIndex: null,
       scaleStyles: {},
       hoveredControl: null,
-      draggablePageGroup: {
+      draggableGroup: {
         name: 'g1',
         // put ::: String | String[] | (to, from, el, event) => Boolean
         // to: the sortablejs instance which will be `put` into
