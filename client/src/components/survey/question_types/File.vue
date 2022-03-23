@@ -71,7 +71,6 @@
         <v-list-item
           v-for="(fileResourceKey, index) in fileResourceKeys"
           :key="fileResourceKey"
-          :data-test-id="'file_' + index"
           class="file-list-item my-2"
         >
           <v-list-item-avatar>
@@ -87,6 +86,7 @@
           <v-list-item-content>
             <v-list-item-title
               v-if="editIndex !== index"
+              :data-test-id="'file_' + index"
               class="text-wrap font-bold"
               v-text="fileResourceKey.substring(fileResourceKey.lastIndexOf('/') + 1)"
             ></v-list-item-title>
@@ -127,7 +127,7 @@ import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import store from '@/store';
 
 const MAX_FILE_SIZE = 20971520; //20 MB
-const MAX_FILE_SIZE_IMAGES = 512000; //500 KB
+const MAX_FILE_SIZE_IMAGES = 20971520; //20 MB TODO compress down to 512000; //500 KB
 
 export default {
   mixins: [baseQuestionComponent],
