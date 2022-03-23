@@ -110,7 +110,6 @@
             <v-btn @click="startDownload" color="primary"> <v-icon left>mdi-download</v-icon>Download </v-btn>
           </div>
 
-          <!-- work around here start-->
           <v-row class="mt-5" v-if="apiDownloadRange === 'page'">
             <v-col cols="1">
               <v-select
@@ -132,7 +131,6 @@
               </div>
             </v-col>
           </v-row>
-          <!-- work around here end-->
         </v-card-text>
       </v-card>
     </v-container>
@@ -175,7 +173,6 @@
 
       <v-row class="my-2">
         <v-col cols="1">
-          <!-- work around here start-->
           <v-select
             style="max-width: 5rem; display: inline-block"
             label="Page Size"
@@ -185,7 +182,6 @@
             v-model="pageSize"
             @change="changedPaginationSize"
           />
-          <!-- work around here end-->
         </v-col>
         <v-col cols="10">
           <v-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
