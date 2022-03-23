@@ -36,6 +36,7 @@ export default {
         { text: 'PDF (.pdf)', value: 'application/pdf' },
         { text: 'Spreadsheets (.csv)', value: 'text/csv' },
         { text: 'Image (.gif, .png, .jpg, .jpeg)', value: 'image/*' },
+        { text: 'Plan text (.txt)', value: 'text/plain' },
       ],
     };
   },
