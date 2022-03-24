@@ -84,6 +84,7 @@ router.post(
 /** Submissions */
 router.get('/submissions', catchErrors(submissionController.getSubmissions));
 router.get('/submissions/page', catchErrors(submissionController.getSubmissionsPage));
+router.get('/submissions/echoUserInfo', catchErrors(submissionController.echoUserInfo));
 router.get('/submissions/csv', catchErrors(submissionController.getSubmissionsCsv));
 router.post(
   '/submissions/:id/archive',

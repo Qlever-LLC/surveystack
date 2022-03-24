@@ -294,7 +294,6 @@ const buildPipeline = async (req, res) => {
       console.log(error);
     }
   }
-
   const redactStage = createRedactStage(user, roles);
   pipeline.push(redactStage);
 
@@ -535,6 +534,105 @@ const getSubmissionsCsv = async (req, res) => {
   const csv = csvService.createCsv(transformedEntities, headers);
   res.set('Content-Type', 'text/plain');
   return res.send(csv);
+};
+
+const echoUserInfo = async (req, res) => {
+  const pipeline = [];
+
+  let match = {};
+  let project = {};
+  let sort = DEFAULT_SORT;
+  let user = null;
+  let roles = [];
+
+  // initial match stage to filter surveys
+  if (req.query.survey) {
+    pipeline.push({
+      $match: { 'meta.survey.id': new ObjectId(req.query.survey) },
+    });
+  }
+
+  // archived
+  const archivedMatch = { 'meta.archived': { $ne: true } };
+  if (queryParam(req.query.showArchived)) {
+    archivedMatch['meta.archived'] = true;
+  }
+  pipeline.push({ $match: archivedMatch });
+
+  if (req.query.creator) {
+    pipeline.push({
+      $match: {
+        'meta.creator': new ObjectId(req.query.creator),
+      },
+    });
+  }
+
+  if (req.query.group) {
+    pipeline.push({
+      $match: {
+        'meta.group.id': new ObjectId(req.query.group),
+      },
+    });
+  }
+
+  // Authenticated either Authorization header or Cookie
+  if (res.locals.auth.isAuthenticated) {
+    // Authorization header
+    user = res.locals.auth.user._id.toString();
+    roles.push(...res.locals.auth.roles);
+  } else if (req.cookies.user && req.cookies.token) {
+    // Cookie
+    user = req.cookies.user;
+    const userRoles = await rolesService.getRoles(user);
+    roles.push(...userRoles);
+  }
+
+  // Add creator details if request has admin rights on survey.
+  // However, don't add creator details if pure=1 is set (e.g. for re-submissions)
+  if (user && req.query.survey && !queryParam(req.query.pure)) {
+    const survey = await db.collection('surveys').findOne({ _id: new ObjectId(req.query.survey) });
+    const groupId = survey.meta.group.id;
+    const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
+
+    if (hasAdminRights) {
+      pipeline.push({
+        $lookup: {
+          from: 'users',
+          let: { creatorId: '$meta.creator' },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$_id', '$$creatorId'] } } },
+            { $project: { name: 1, email: 1, _id: 0 } },
+          ],
+          as: 'meta.creatorDetail',
+        },
+      });
+      pipeline.push({
+        $unwind: { path: '$meta.creatorDetail', preserveNullAndEmptyArrays: true },
+      });
+    }
+  }
+
+  // Hide fields with meta.relevant = false (and below) by default
+  // However, don't hide if query showIrrelevant=1 or pure=1
+  if (!queryParam(req.query.showIrrelevant) && !queryParam(req.query.pure)) {
+    const relevanceStage = createRelevanceStage();
+    pipeline.push(relevanceStage);
+  }
+
+  // For development purposes
+  if (process.env.NODE_ENV === 'development' && req.query.roles) {
+    try {
+      const splits = req.query.roles.split(',');
+      splits.forEach((role) => {
+        roles.push(role.trim());
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  res.send({user, roles})
+  
+  
 };
 
 const getSubmission = async (req, res) => {
@@ -1062,4 +1160,5 @@ export default {
   archiveSubmissions,
   deleteSubmissions,
   prepareSubmissionsToQSLs,
+  echoUserInfo,
 };
