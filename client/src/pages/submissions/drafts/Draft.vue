@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 100%; max-height: 100%;">
+  <div style="height: 100%; max-height: 100%">
     <app-draft-component
       v-if="!loading && !hasError"
       :survey="survey"
@@ -10,9 +10,7 @@
     <div v-else-if="loading && !hasError" class="d-flex align-center justify-center" style="height: 100%">
       <v-progress-circular :size="50" color="primary" indeterminate />
     </div>
-    <div v-else-if="hasError" class="text-center mt-8">
-      Error Loading Draft Submission or Survey
-    </div>
+    <div v-else-if="hasError" class="text-center mt-8">Error Loading Draft Submission or Survey</div>
 
     <confirm-leave-dialog ref="confirmLeaveDialog" title="Confirm Exit Draft" v-if="submission && survey">
       Are you sure you want to exit this draft?
@@ -125,7 +123,7 @@ export default {
 
       let message;
       try {
-        const payloadTransformed = await uploadFileResources(payload);
+        const payloadTransformed = await uploadFileResources(payload, true);
         const response = payloadTransformed.meta.dateSubmitted
           ? await api.put(`/submissions/${payloadTransformed._id}`, payloadTransformed)
           : await api.post('/submissions', payloadTransformed);

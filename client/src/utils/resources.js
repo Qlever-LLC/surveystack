@@ -90,8 +90,7 @@ export function getPublicDownloadUrl(resourceKey) {
   return s3BaseUrl + resourceKey;
 }
 
-export async function uploadFileResource(resourceKey) {
-  // TODO exception handling and rollback
+export async function uploadFileResource(resourceKey, clearCacheAfterUpload) {
   // load resource from local store
   const resource = store.getters['resources/getResourceByKey'](resourceKey);
   if (!resource || resource.state === 'committed') {
@@ -102,22 +101,32 @@ export async function uploadFileResource(resourceKey) {
   let resourceClone = Object.assign({}, resource);
   delete resourceClone.fileData;
   // send resource to server, get upload-url
-  let { data: uploadData } = await api.post('/resources/upload-url', resourceClone);
+  let uploadResponse = await api.post('/resources/upload-url', resourceClone);
   // upload file to url
-  let putResponse = await axios.create().put(uploadData.signedUrl, resource.fileData);
+  await axios.create().put(uploadResponse.data.signedUrl, resource.fileData);
   //set resource to committed
-  let commitResponse = await api.put(`/resources/commit/${uploadData.resourceId}`, { dummy: '' });
-  return uploadData.resourceId;
+  await api.put(`/resources/commit/${resource._id}`, { dummy: '' });
+
+  if (clearCacheAfterUpload) {
+    await store.dispatch('resources/removeLocalResource', resource.key);
+  } else {
+    await store.dispatch('resources/updateResourceState', {
+      resourceKey: resource.key,
+      stateNew: 'committed',
+    });
+  }
 }
 
-export async function uploadFileResources(submission) {
+export async function uploadFileResources(submission, clearCacheAfterUpload) {
   let submissionClone = submission; //cloneDeep(submission);
 
   let controls = Object.values(submissionClone.data);
 
   for (let control of controls) {
     if (control.value && (control.meta.type === 'file' || control.meta.type === 'image')) {
-      const unresolvedPromises = control.value.map((resourceKey) => uploadFileResource(resourceKey));
+      const unresolvedPromises = control.value.map((resourceKey) =>
+        uploadFileResource(resourceKey, clearCacheAfterUpload)
+      );
       await Promise.all(unresolvedPromises);
     }
   }

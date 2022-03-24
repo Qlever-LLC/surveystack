@@ -34,15 +34,12 @@ const actions = {
     commit('SET_RESOURCES', response);
     return response;
   },
-  /*
-   TODO used by Resource.vue, refactor so it uses addLocalResource and then uploadFile
-   */
   // eslint-disable-next-line no-unused-vars
   async addRemoteResource({ commit, dispatch }, file) {
     let resource = await dispatch('addLocalResource', file);
-    let resourceId = await uploadFileResource(resource.key);
-    await dispatch('fetchResource', resourceId);
-    return resourceId;
+    await uploadFileResource(resource.key, false);
+    await dispatch('fetchResource', resource._id);
+    return resource._id;
   },
   async addLocalResource({ commit }, file) {
     //only add resource locally, do not upload resource or file data yet
@@ -68,7 +65,17 @@ const actions = {
       resource.label = labelNew;
       resource.name = slugify(labelNew);
       await db.persistResource(resource);
-      commit('REMOVE_RESOURCE', resource.id);
+      commit('REMOVE_RESOURCE', resource._id);
+      commit('ADD_RESOURCE', resource);
+    }
+    return resource;
+  },
+  async updateResourceState({ commit, getters }, { resourceKey, stateNew }) {
+    let resource = getters['getResourceByKey'](resourceKey);
+    if (resource) {
+      resource.state = stateNew;
+      await db.persistResource(resource);
+      commit('REMOVE_RESOURCE', resource._id);
       commit('ADD_RESOURCE', resource);
     }
     return resource;
@@ -86,7 +93,6 @@ const actions = {
       console.error('resource not found, key: ' + resourceKey);
     }
   },
-
   async fetchResource({ commit, getters }, resourceId) {
     let resource = getters['getResource'](resourceId);
     if (!resource) {

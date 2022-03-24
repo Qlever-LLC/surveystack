@@ -64,8 +64,8 @@
   </div>
   <div
     v-else
-    class="d-flex justify-center align-center overlay-bg "
-    style="background: rgba(0, 0, 0, 0.45); height: 100%;"
+    class="d-flex justify-center align-center overlay-bg"
+    style="background: rgba(0, 0, 0, 0.45); height: 100%"
   >
     <v-card max-width="500">
       <v-card-title>
@@ -171,7 +171,7 @@ export default {
     async submitSubmission({ payload }) {
       this.submitting = true;
       try {
-        const transformedPayload = await uploadFileResources(payload);
+        const transformedPayload = await uploadFileResources(payload, false);
         const submission = {
           ...transformedPayload,
           meta: {
