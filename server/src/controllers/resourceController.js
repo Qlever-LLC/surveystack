@@ -2,7 +2,6 @@ import bucketService from '../services/bucket.service';
 import { db } from '../db';
 import { ObjectId } from 'mongodb';
 import assert from 'assert';
-import slugify from '../helpers/slugify';
 
 const col = 'resources';
 const LOCATION_S3 = 's3';
@@ -33,7 +32,15 @@ const getDownloadURL = async (req, res) => {
 const getUploadURL = async (req, res) => {
   const resource = req.body;
 
-  // TODO validate resource object param
+  // validate resource object param
+  if (!resource._id || !resource.key || !resource.contentType || !resource.contentLength) {
+    return res.status(500).send({ message: 'Incomplete message body supplied' });
+  }
+  if (resource.state === 'committed' || resource.state === 'pending') {
+    return res
+      .status(500)
+      .send({ message: 'Illegal resource state, must not be committed or pending' });
+  }
 
   try {
     // get signed upload url for a fixed contenttype and contentlength
@@ -45,7 +52,7 @@ const getUploadURL = async (req, res) => {
     // add resource entry to our db
     let r = await addResource(resource, res.locals.auth.user._id, LOCATION_S3);
     assert.equal(1, r.insertedCount);
-    return res.send({ signedUrl, resourceId: resource._id });
+    return res.send({ signedUrl });
   } catch (error) {
     return res.status(500).send({ message: 'Ouch :/' });
   }
