@@ -630,9 +630,7 @@ const echoUserInfo = async (req, res) => {
       console.log(error);
     }
   }
-  res.send({user, roles})
-  
-  
+  res.send({ user, roles });
 };
 
 const getSubmission = async (req, res) => {
