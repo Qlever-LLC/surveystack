@@ -4,17 +4,19 @@
       <span> File upload options </span>
     </v-card-title>
 
-    <div class="text--primary">Restrict uploaded file types (.csv, .pdf, etc.)</div>
-    <v-select
-      multiple
-      chips
-      clearable
-      deletable-chips
-      solo
-      v-model="value.types"
-      label="allow all files types"
-      :items="types"
-    />
+    <div v-if="!value.typesImmutable">
+      <div class="text--primary">Restrict uploaded file types (.csv, .pdf, etc.)</div>
+      <v-select
+        multiple
+        chips
+        clearable
+        deletable-chips
+        solo
+        v-model="value.types"
+        label="allow all files types"
+        :items="types"
+      />
+    </div>
 
     <v-checkbox
       class="my-1"

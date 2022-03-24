@@ -403,7 +403,7 @@ export default {
       return this.control.type === 'group';
     },
     isFile() {
-      return this.control.type === 'file';
+      return this.control.type === 'file' || this.control.type === 'image';
     },
     isDate() {
       return this.control.type === 'date';

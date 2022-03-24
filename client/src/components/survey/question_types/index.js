@@ -2,6 +2,7 @@ import Vue from 'vue';
 
 import _File from './File.vue';
 Vue.component('AppControlFile', _File);
+Vue.component('AppControlImage', _File);
 
 import _Date from './Date.vue';
 Vue.component('AppControlDate', _Date);
@@ -16,7 +17,7 @@ import FarmOsPlanting from './FarmOsPlanting.vue';
 Vue.component('AppControlFarmOsPlanting', FarmOsPlanting);
 
 // import GeoJSON from './GeoJSON.vue';
-const GeoJSON = () => import('./GeoJSON.vue')
+const GeoJSON = () => import('./GeoJSON.vue');
 Vue.component('AppControlGeoJSON', GeoJSON);
 
 import Group from './Group.vue';
@@ -26,11 +27,11 @@ import Instructions from './Instructions.vue';
 Vue.component('AppControlInstructions', Instructions);
 
 // import InstructionsImageSplit from './InstructionsImageSplit.vue';
-const InstructionsImageSplit = () => import('./InstructionsImageSplit.vue')
+const InstructionsImageSplit = () => import('./InstructionsImageSplit.vue');
 Vue.component('AppControlInstructionsImageSplit', InstructionsImageSplit);
 
 // import Location from './Location.vue';
-const Location = () => import('./Location.vue')
+const Location = () => import('./Location.vue');
 Vue.component('AppControlLocation', Location);
 
 import MatrixLegacy from './Matrix.legacy.vue';

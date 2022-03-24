@@ -116,7 +116,7 @@ export async function uploadFileResources(submission) {
   let controls = Object.values(submissionClone.data);
 
   for (let control of controls) {
-    if (control.meta.type === 'file' && control.value) {
+    if (control.value && (control.meta.type === 'file' || control.meta.type === 'image')) {
       const unresolvedPromises = control.value.map((resourceKey) => uploadFileResource(resourceKey));
       await Promise.all(unresolvedPromises);
     }
