@@ -35,14 +35,6 @@
           </v-btn>
         </template>
         <v-list>
-          <v-list-item v-if="false && $store.getters['toggle/isOn']['feature_resource']" class="d-flex align-center">
-            <v-list-item-title>
-              <v-btn text @click="importResource">
-                <v-icon color="grey">mdi-plus</v-icon>
-                <div class="ml-1">Use Existing Resource</div>
-              </v-btn>
-            </v-list-item-title>
-          </v-list-item>
           <v-list-item class="d-flex align-center">
             <v-list-item-title>
               <v-btn text @click="createOntology">
@@ -81,7 +73,7 @@
           <v-list-item-content style="user-select: text">
             <v-list-item-title>{{ resource.label }}</v-list-item-title>
             <v-list-item-subtitle v-if="resource.type === 'FILE'"
-              >{{ resource.key }} : {{ resource.contentType }}</v-list-item-subtitle
+              >{{ 'resources/' + resource.id + '/' + resource.label }} : {{ resource.type }}</v-list-item-subtitle
             >
             <v-list-item-subtitle v-if="resource.type === 'ONTOLOGY_LIST'"
               >{{ resource.name }} : {{ resource.type }}</v-list-item-subtitle
@@ -107,7 +99,7 @@
 <script>
 import ObjectId from 'bson-objectid';
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
-import { openResourceInTab } from '@/utils/resources';
+import { openResourceInTab, resourceLocations } from '@/utils/resources';
 import store from '@/store';
 
 export default {
@@ -155,14 +147,17 @@ export default {
       let resourceId = await this.$store.dispatch('resources/addRemoteResource', file);
       let newResource = store.getters['resources/getResource'](resourceId);
 
-      //transform resulting resource to a survey.resource structure
-      newResource.id = newResource._id;
-      delete newResource._id;
-      newResource.location = 'REMOTE';
-      newResource.type = 'FILE';
-
       // add survey resource
-      this.$emit('set-survey-resources', [...this.resources, newResource]);
+      this.$emit('set-survey-resources', [
+        ...this.resources,
+        {
+          label: newResource.label,
+          name: newResource.name,
+          id: newResource._id,
+          type: 'FILE',
+          location: resourceLocations.REMOTE,
+        },
+      ]);
       this.$refs['upload-resource'].value = null;
       this.uploadingResource = false;
     },
@@ -174,9 +169,6 @@ export default {
         await openResourceInTab(resource.id);
         this.downloadingResource = false;
       }
-    },
-    importResource() {
-      // TODO show dialog with resource list / search
     },
     removeRemoteResource(resource) {
       // delete the resource reference
