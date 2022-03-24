@@ -96,7 +96,7 @@ export default {
         (c) =>
           c.type !== 'group' &&
           c.type !== 'library' &&
-          (this.$store.getters['toggle/isOn']['feature_resource'] || c.type !== 'file')
+          (this.$store.getters['toggle/isOn']['feature_resource'] || c.type !== 'file' || c.type !== 'image')
       );
     },
   },
