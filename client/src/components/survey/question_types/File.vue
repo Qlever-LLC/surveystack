@@ -39,7 +39,10 @@
         for="fileInput"
         @click.stop="showFileChooser"
       >
-        <div class="col-12 pt-4 font-weight-bold">
+        <div class="col-12 pb-0">
+          <v-icon color="primary" x-large>mdi-cloud-upload-outline</v-icon>
+        </div>
+        <div class="col-12 font-weight-bold">
           {{ $vuetify.breakpoint.mobile || forceMobile ? 'Tap here to upload' : 'Click or drop here to upload' }}
         </div>
         <div
