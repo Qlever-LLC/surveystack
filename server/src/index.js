@@ -16,7 +16,7 @@ import apiRoutes from './routes/api';
 import debugRoutes from './routes/debug';
 
 import resources from './controllers/resources';
-import { cookieOptions } from './constants';
+import { createCookieOptions } from './constants';
 import { toggleMiddleware } from './services/featureToggle.service';
 
 const subdomainRedirect = {
@@ -84,8 +84,8 @@ app.use(async (req, res, next) => {
     if (user) {
       isAuthenticated = true;
       isSuperAdmin = user.permissions.includes('super-admin');
-      res.cookie('user', user._id.toString(), cookieOptions);
-      res.cookie('token', user.token, cookieOptions);
+      res.cookie('user', user._id.toString(), createCookieOptions());
+      res.cookie('token', user.token, createCookieOptions());
     }
 
     if (user) {

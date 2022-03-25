@@ -6,7 +6,7 @@ import uuidv4 from 'uuid/v4';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
-import { cookieOptions } from '../constants';
+import { createCookieOptions } from '../constants';
 import _ from 'lodash';
 
 const col = 'users';
@@ -112,7 +112,7 @@ const updateUser = async (req, res) => {
       console.warn(e);
     }
     // udpate the token in the cookie header for backward compatibility: https://gitlab.com/our-sci/software/surveystack/-/merge_requests/33#note_700125477
-    res.cookie('token', updatedUser.token, cookieOptions);
+    res.cookie('token', updatedUser.token, createCookieOptions());
   }
 
   try {
