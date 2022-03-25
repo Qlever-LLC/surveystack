@@ -9,7 +9,7 @@ import userController from '../controllers/userController';
 import scriptController from '../controllers/scriptController';
 import rolesController from '../controllers/rolesController';
 import farmosController from '../controllers/farmosController';
-import farmos2Controller from '../controllers/farmos2Controller';
+import * as farmos2Controller from '../controllers/farmos2Controller';
 
 import membershipController from '../controllers/membershipController';
 import infoController from '../controllers/infoController';
@@ -250,6 +250,14 @@ router.post('/farmos/create-instance', catchErrors(farmosController.createFarmOs
 router.post('/farmos/callback', catchErrors(farmosController.webhookCallback));
 router.get('/farmos/areas/:aggregator/:farmurl', catchErrors(farmosController.getAreas));
 router.post('/farmos/areas/:aggregator/:farmurl', catchErrors(farmosController.createField));
+
+/** farmos 2 */
+
+router.get(
+  '/farmos2/all',
+  [assertAuthenticated, assertIsSuperAdmin],
+  catchErrors(farmos2Controller)
+);
 
 /** Integrations - Group */
 router.get('/group-integrations', catchErrors(groupIntegrationController.getIntegrations));

@@ -87,27 +87,29 @@ export const createMembership = async (_overrides = {}) => {
 };
 
 export const deleteMemberships = async (groupId, userId) => {
-  return await getDb().collection('memberships').deleteMany({
-    group: asMongoId(groupId),
-    user: asMongoId(userId),
-  });
+  return await getDb()
+    .collection('memberships')
+    .deleteMany({
+      group: asMongoId(groupId),
+      user: asMongoId(userId),
+    });
 };
 
 /**
  * membershipId must be ObjectId
- * @param {ObjectId} membershipId 
- * @param {*} role 
- * @returns 
+ * @param {ObjectId} membershipId
+ * @param {*} role
+ * @returns
  */
 export const setRole = async (membershipId, role) => {
   return await getDb().collection('memberships').findOneAndUpdate(
     { _id: membershipId },
-    { $set: { role, } },
+    { $set: { role } },
     {
       returnOriginal: false,
     }
   );
-}
+};
 
 export const createReq = ({ body = {}, params = {}, query = {}, headers = {} } = {}) => ({
   body,

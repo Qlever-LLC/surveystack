@@ -6,9 +6,8 @@ import axios from 'axios';
 import boom from '@hapi/boom';
 import https from 'https';
 import { getRoles, hasAdminRole } from '../services/roles.service';
-import { listFarmOSInstancesForUser } from '../services/farmos-2/manage';
+import { listFarmOSInstancesForUser, getSuperAllFarmosMappings } from '../services/farmos-2/manage';
 import { aggregator } from '../services/farmos-2/aggregator';
-
 
 const config = () => {
   if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
@@ -25,10 +24,9 @@ const requireUserId = (res) => {
   if (!userId) {
     throw boom.unauthorized();
   }
-}
+};
 
 const requireGroupdAdmin = (req, res) => {
-
   const { group } = req.body;
   const userId = res.locals.auth.user._id;
 
@@ -43,7 +41,7 @@ const requireGroupdAdmin = (req, res) => {
   if (!hasAdminRole(userId, group)) {
     throw boom.unauthorized();
   }
-}
+};
 
 /**
  *
@@ -68,8 +66,6 @@ export const getFarmOSInstances = async (req, res) => {
  * get a list of assets (fields, plantings, etc.)
  */
 export const getAssets = async (req, res) => {
-
-
   const userId = requireUserId(res);
 
   /**
@@ -78,7 +74,6 @@ export const getAssets = async (req, res) => {
    */
 
   const allowedBundles = ['plant', 'location', 'equipment'];
-
 
   const { bundle } = req.body;
 
@@ -164,11 +159,15 @@ export const getLogs = async (req, res) => {
   });
 };
 
+export const superAdminGetAllInstances = async (req, res) => {
+  const r = await getSuperAllFarmosMappings();
+  return res.send(r);
+};
+
 /**
  * Return all instances for group with mappings
  */
 export const getInstancesForGroup = async (req, res) => {
-
   const userId = requireUserId(res);
   const groupId = requireGroupdAdmin(req, res);
 

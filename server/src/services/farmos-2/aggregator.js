@@ -1,3 +1,4 @@
+import { triggerAsyncId } from 'async_hooks';
 import axios from 'axios';
 import https from 'https';
 
@@ -18,30 +19,33 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
       'api-key': aggregatorKey,
     },
     httpsAgent: agent,
-  }
+  };
 
   const farminfo = async () => {
     const r = await axios.get(`${apiBase}/farms/`, {
-      ...opts
+      ...opts,
     });
     return r;
   };
 
   const getAssets = async (farmurl, bundle) => {
     const r = await axios.get(
-      `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/api/asset/${bundle}?&fields[asset--${bundle}]=id,name`,
+      `${apiBase}/farms/relay/${encodeURIComponent(
+        farmurl
+      )}/api/asset/${bundle}?&fields[asset--${bundle}]=id,name`,
       ...opts
     );
 
     return r;
   };
 
-
   const getLogs = async (farmurl, bundle) => {
     const r = await axios.get(
-      `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/api/log/${bundle}?&fields[log--${bundle}]=id,name`,
+      `${apiBase}/farms/relay/${encodeURIComponent(
+        farmurl
+      )}/api/log/${bundle}?&fields[log--${bundle}]=id,name`,
       {
-        ...opts
+        ...opts,
       }
     );
 
@@ -53,7 +57,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
       `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/api/log/${bundle}?`,
       log,
       {
-        ...opts
+        ...opts,
       }
     );
 
@@ -65,7 +69,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
       `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/api/asset/${bundle}?`,
       asset,
       {
-        ...opts
+        ...opts,
       }
     );
 
@@ -77,7 +81,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
       `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/subrequests?`,
       req,
       {
-        ...opts
+        ...opts,
       }
     );
 
@@ -88,7 +92,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     const r = await axios.get(
       `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/api/taxonomy_term/${bundle}?`,
       {
-        ...opts
+        ...opts,
       }
     );
 
@@ -96,44 +100,35 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
   };
 
   const getAllTaxonomy = async (farmurl) => {
-    const bundles = [
-      
-    ]
-  }
+    const bundles = [];
+  };
 
   const deleteAllWithData = async (farmurl, data) => {
-    const assetBundles = [
-      'plant',
-      'land',
-      'structure'
-    ];
+    const assetBundles = ['plant', 'land', 'structure'];
 
-    const logBundles = [
-      'activity',
-      'input',
-      'observation',
-      'seeding',
-      'transplanting'
-    ];
+    const logBundles = ['activity', 'input', 'observation', 'seeding', 'transplanting'];
 
-    const assetSubRequestUrls = assetBundles.map(bundle => `api/asset/${bundle}?fields[asset--${bundle}]=id&filter[data][value]=${data}`)
-    const logSubRequestUrls = logBundles.map(bundle => `api/log/${bundle}?fields[log--${bundle}]=id&filter[data][value]=${data}`)
+    const assetSubRequestUrls = assetBundles.map(
+      (bundle) => `api/asset/${bundle}?fields[asset--${bundle}]=id&filter[data][value]=${data}`
+    );
+    const logSubRequestUrls = logBundles.map(
+      (bundle) => `api/log/${bundle}?fields[log--${bundle}]=id&filter[data][value]=${data}`
+    );
 
     const subrequests = [...assetSubRequestUrls, ...logSubRequestUrls];
 
-    const body = subrequests.map(s => ({
+    const body = subrequests.map((s) => ({
       uri: s,
-      action: "view",
+      action: 'view',
       headers: {
-        "Accept": "application/vnd.api+json",
-        "Content-Type": "application/vnd.api+json"
-      }
-    }))
+        Accept: 'application/vnd.api+json',
+        'Content-Type': 'application/vnd.api+json',
+      },
+    }));
 
-    const r = await axios.post(
-      `${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`, body, {
-      ...opts
-    })
+    const r = await axios.post(`${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`, body, {
+      ...opts,
+    });
 
     // console.log('data', r.data);
     const items = [];
@@ -143,30 +138,45 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
       items.push(...res.data);
     }
 
-
-    const deleteUrls = items.map(item => {
+    const deleteUrls = items.map((item) => {
       const [ep, bundle] = item.type.split('--');
-      return `api/${ep}/${bundle}/${item.id}`
-    })
+      return `api/${ep}/${bundle}/${item.id}`;
+    });
 
     // console.log("deleteUrls", deleteUrls);
 
-
-    const deleteBody = deleteUrls.map(s => ({
+    const deleteBody = deleteUrls.map((s) => ({
       uri: s,
-      action: "delete",
+      action: 'delete',
       headers: {
-        "Accept": "application/vnd.api+json",
-        "Content-Type": "application/vnd.api+json"
-      }
-    }))
+        Accept: 'application/vnd.api+json',
+        'Content-Type': 'application/vnd.api+json',
+      },
+    }));
 
+    await axios.post(`${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`, deleteBody, {
+      ...opts,
+    });
+  };
 
-    await axios.post(
-      `${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`, deleteBody, {
-      ...opts
-    })
-  }
+  const getFarmsWithTag = async (tag) => {
+    const r = await axios.get(`${apiBase}/farms`, { ...opts });
+    if (!r.data) {
+      return [];
+    }
+    return r.data.filter((farm) => farm.tags.includes(tag)).map((farm) => farm.url);
+  };
+
+  const getAllFarmsWithTags = async () => {
+    const r = await axios.get(`${apiBase}/farms`, { ...opts });
+    if (!r.data) {
+      return [];
+    }
+    return r.data.map((farm) => ({
+      url: farm.url,
+      tags: farm.tags,
+    }));
+  };
 
   return {
     farminfo,
@@ -176,6 +186,8 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     createLog,
     createAsset,
     subrequest,
-    deleteAllWithData
+    deleteAllWithData,
+    getFarmsWithTag,
+    getAllFarmsWithTags,
   };
 };

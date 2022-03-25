@@ -19,7 +19,6 @@ const config = () => {
 
 jest.setTimeout(60000);
 
-
 describe('test-aggregator-integration', () => {
   it('farminfo', async () => {
     const { farminfo, getAssets, createLog } = config();
@@ -79,7 +78,6 @@ describe('test-aggregator-integration', () => {
 
     const { createAsset, getTaxonomy, getAssets, createLog } = config();
 
-
     const { data: plants } = await getTaxonomy(TEST_FARM, 'plant_type');
     const { data: fields } = await getAssets(TEST_FARM, 'land');
     const fieldId = fields.data[0].id;
@@ -119,8 +117,8 @@ describe('test-aggregator-integration', () => {
                 type: 'asset--land',
                 id: fieldId,
               },
-            ]
-          }
+            ],
+          },
         },
       },
     };
@@ -139,11 +137,10 @@ describe('test-aggregator-integration', () => {
         relationships: {
           asset: {
             id,
-          }
-        }
+          },
+        },
       },
     };
-
 
     const logres = await createLog(TEST_FARM, 'activity', log);
     expect(logres.status).toBe(201);
@@ -151,7 +148,6 @@ describe('test-aggregator-integration', () => {
   });
 
   it('create-and-delete-log', async () => {
-
     const { farminfo, getAssets, createLog, getLogs, deleteAllWithData } = config();
 
     const id = uuid.v4();
@@ -169,24 +165,28 @@ describe('test-aggregator-integration', () => {
       },
     };
 
-
     await createLog(TEST_FARM, 'activity', log);
     const { data: logs } = await getLogs(TEST_FARM, 'activity');
-    let ids = logs.data.map(l => l.id);
+    let ids = logs.data.map((l) => l.id);
 
     expect(ids.includes(id)).toBe(true);
 
     await deleteAllWithData(TEST_FARM, data);
 
     const { data: logsAfterDeletion } = await getLogs(TEST_FARM, 'activity');
-    ids = logsAfterDeletion.data.map(l => l.id);
+    ids = logsAfterDeletion.data.map((l) => l.id);
     expect(ids.includes(id)).toBe(false);
-
   });
-  it.only('log-response', async () => {
+  it('log-response', async () => {
     const { farminfo, getAssets, createLog, getLogs, deleteAllWithData } = config();
 
     const { data: logs } = await getLogs(TEST_FARM, 'activity');
     console.log('data', JSON.stringify(logs, null, 2));
-  })
+  });
+  it.only('farms-by-tag', async () => {
+    const { getFarmsWithTag, getAllFarmsWithTags } = config();
+
+    // console.log(await getFarmsWithTag('/bionutrient/partners/main/'));
+    console.log(await getAllFarmsWithTags());
+  });
 });
