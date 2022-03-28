@@ -123,10 +123,10 @@ export default {
 
       let message;
       try {
-        const payloadTransformed = await uploadFileResources(payload, true);
-        const response = payloadTransformed.meta.dateSubmitted
-          ? await api.put(`/submissions/${payloadTransformed._id}`, payloadTransformed)
-          : await api.post('/submissions', payloadTransformed);
+        await uploadFileResources(payload, true);
+        const response = payload.meta.dateSubmitted
+          ? await api.put(`/submissions/${payload._id}`, payload)
+          : await api.post('/submissions', payload);
         this.result({ response });
         this.isSubmitted = true;
         await this.$store.dispatch('submissions/remove', this.submission._id);

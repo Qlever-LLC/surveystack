@@ -171,11 +171,11 @@ export default {
     async submitSubmission({ payload }) {
       this.submitting = true;
       try {
-        const transformedPayload = await uploadFileResources(payload, false);
+        await uploadFileResources(payload, false);
         const submission = {
-          ...transformedPayload,
+          ...payload,
           meta: {
-            ...transformedPayload.meta,
+            ...payload.meta,
             archived: true,
             archivedReason: 'SUBMISSION_FROM_BUILDER',
           },

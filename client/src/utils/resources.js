@@ -118,9 +118,7 @@ export async function uploadFileResource(resourceKey, clearCacheAfterUpload) {
 }
 
 export async function uploadFileResources(submission, clearCacheAfterUpload) {
-  let submissionClone = submission; //cloneDeep(submission);
-
-  let controls = Object.values(submissionClone.data);
+  let controls = Object.values(submission.data);
 
   for (let control of controls) {
     if (control.value && (control.meta.type === 'file' || control.meta.type === 'image')) {
@@ -130,6 +128,4 @@ export async function uploadFileResources(submission, clearCacheAfterUpload) {
       await Promise.all(unresolvedPromises);
     }
   }
-
-  return submissionClone;
 }
