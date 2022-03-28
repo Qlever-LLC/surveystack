@@ -52,4 +52,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+>>> .v-chip .v-chip__close.v-icon.v-icon--right {
+  margin-right: 0;
+}
+</style>
