@@ -200,7 +200,7 @@ const createDataMetaStage = () => {
   };
 };
 
-const buildPipeline = async (req, res) => {
+export const buildPipeline = async (req, res) => {
   const pipeline = [];
 
   let match = {};
