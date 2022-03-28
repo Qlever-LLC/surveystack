@@ -135,7 +135,6 @@ export default {
     appControlMoreInfo,
     appControlHint,
   },
-  props: {},
   data() {
     return {
       fileResourceKeys: this.value || [],
@@ -147,8 +146,6 @@ export default {
       editFileName: undefined,
     };
   },
-  computed: {},
-  watch: {},
   methods: {
     showFileChooser() {
       this.$refs.fileInput.click();
