@@ -72,9 +72,9 @@
         <v-list-item v-for="resource in filteredResources" :key="resource.id" two-line @click="openResource(resource)">
           <v-list-item-content style="user-select: text">
             <v-list-item-title>{{ resource.label }}</v-list-item-title>
-            <v-list-item-subtitle v-if="resource.type === 'FILE'"
-              >{{ `resources/${resource.id}/${resource.label} : ${resource.type}` }}</v-list-item-subtitle
-            >
+            <v-list-item-subtitle v-if="resource.type === 'FILE'">{{
+              `resources/${resource.id}/${resource.label} : ${resource.type}`
+            }}</v-list-item-subtitle>
             <v-list-item-subtitle v-if="resource.type === 'ONTOLOGY_LIST'"
               >{{ resource.name }} : {{ resource.type }}</v-list-item-subtitle
             >
@@ -172,8 +172,7 @@ export default {
     },
     removeRemoteResource(resource) {
       // delete the resource reference
-      const index = this.resources.findIndex((r) => r.id === resource.id);
-      const newResources = [...this.resources.slice(0, index), ...this.resources.slice(index + 1)];
+      const newResources = this.resources.filter((r) => r.id !== resource.id);
       this.$emit('set-survey-resources', newResources);
       // TODO delete the resource eventually
     },
