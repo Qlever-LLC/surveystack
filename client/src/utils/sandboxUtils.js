@@ -21,9 +21,11 @@ function match(answers, thisValue) {
  * 'answer' is optional, if not provided it just checks for relevance
  *
  * @param {object} question you're asking about
- * @param {answer} answer(s) (strings or numbers) to check against
+ * @param {answers} answer(s) (strings or numbers) to check against
  */
 export function checkIfAny(question, ...answers) {
+  // if the reference in the survey is missing or false, then return false
+  if (!question?.value) return false; 
   // answers is always passed as an array!
   let values = question.value;
   // return false if question is not relevant
@@ -82,9 +84,11 @@ export function checkIfAny(question, ...answers) {
  * if question isn't answered (=== null), will also return false
  *
  * @param {object} question you're asking about
- * @param {answer} answer(s) (strings or numbers) to check against
+ * @param {answers} answer(s) (strings or numbers) to check against
  */
 export function checkIfNone(question, ...answers) {
+  // if the reference in the survey is missing or false, then return false
+  if (!question?.value) return false; 
   let values = question.value;
   // return false if question is not relevant
   if (
@@ -193,5 +197,74 @@ export function getClean(chooseOne) {
     thisAnswer = chooseOne.value; // if it's a single string/number, return that
     console.log(`clean "${chooseOne.value}" to "${thisAnswer}"`);
     return thisAnswer;
+  }
+}
+
+// /////////////// SUBMISSION NAVIGATION //////////////////////////
+
+
+/*
+ * Find a nested item inside a JSON object.
+ * Pass the object and the string referencing the location.
+ * Returns the object in that location.
+ *
+ * ### Example
+* let submission = { this: { that: { theOther: 55} } }
+* dig(submission, 'this.that.theOther'); // returns 55
+* dig(submission, 'this.that[theOther]'); // returns 55 (this notation also works!)
+* now imagine we are passed the full reference and want to use dig.  Let's use getRoot and removeRoot also -->
+* refText = submission.this.that.theother;
+* dig(getRoot(refText), removeRoot(refText)); // returns 55
+* @param {object} the JSON object your looking in - this is usually 'submission' or 'parent'
+* @param {string} the location in the object.
+ * robust, can accept null, undefined and will always pass back null
+ */
+export function dig(object, path, defaultValue = null) {
+  const chunks = path
+    .split(/\.|\[|\]/)
+    .filter(d => d.length !== 0)
+    ;
+  try {
+    const value = chunks.reduce((current, chunk) => current[chunk], object);
+    if (value !== undefined) {
+      return value;
+    } else {
+      return defaultValue;
+    }
+  } catch (e) {
+    return defaultValue;
+  }
+};
+
+/*
+ * identify object root as referencing parent or the submission
+ * return parent or submission objects
+ * robust, can accept null, undefined and will always pass back null
+ * @param {string} the location in the object.
+ */
+export function getRoot(path, defaultValue = null) {
+  if (typeof path !== 'string') {
+    return defaultValue;
+  } else if ((/^parent+/g).test(path)) {
+    return parent;
+  } else if ((/^submission+/g).test(path)) {
+    return submission;
+  } else { // if neither, assume parent.  add error checking here also
+    return parent;
+  }
+}
+
+/*
+ * remove the survey root and return the text
+ * useful when using dig() function
+ * robust, can accept null, undefined and will always pass back null
+ * @param {string} the string you want the root removed from.
+ */
+export function removeRoot(path, defaultValue = null) {
+  try {
+    path = path.replace(/(^submission\.|^submission|^parent\.|^parent)+/g, '');
+    return path;
+  } catch (e) {
+    return defaultValue;
   }
 }
