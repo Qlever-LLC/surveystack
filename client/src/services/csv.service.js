@@ -157,6 +157,7 @@ export function createCsv(submissions, headers) {
     const transformedSubmissionData = transformSubmissionQuestionTypes(submission.data, {
       geoJSON: geojsonTransformer,
       file: fileTransformer,
+      image: fileTransformer,
     });
 
     const flattenSubmissionData = flatten({
