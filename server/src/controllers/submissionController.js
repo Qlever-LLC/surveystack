@@ -348,9 +348,11 @@ const buildPipeline = async (req, res) => {
     });
   }
 
-  pipeline.push({
-    $sort: sort,
-  });
+  if (!queryParam(req.query.unsorted)) {
+    pipeline.push({
+      $sort: sort,
+    });
+  }
   return pipeline;
 };
 
