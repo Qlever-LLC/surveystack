@@ -65,8 +65,8 @@
         </v-list>
       </v-menu>
     </div>
-    <!--v-select :items="availableFilters" v-model="filter" label="Filter" />
-    <v-text-field v-model="search" label="Search" autocomplete="off" /-->
+    <v-select :items="availableFilters" v-model="filter" label="Filter" />
+    <v-text-field v-model="search" label="Search" autocomplete="off" />
     <v-list>
       <template v-if="filteredResources.length > 0">
         <v-list-item v-for="resource in filteredResources" :key="resource.id" two-line @click="openResource(resource)">
@@ -119,7 +119,7 @@ export default {
         { text: 'All', value: false },
         { text: 'Ontology List', value: 'ONTOLOGY_LIST' },
         { text: 'Matrix', value: 'MATRIX' },
-        { text: 'Remote', value: 'REMOTE' },
+        { text: 'File', value: 'FILE' },
       ],
       ontologyEditorDialog: false,
       selectedId: null,
