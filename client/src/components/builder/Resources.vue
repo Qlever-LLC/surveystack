@@ -73,7 +73,7 @@
           <v-list-item-content style="user-select: text">
             <v-list-item-title>{{ resource.label }}</v-list-item-title>
             <v-list-item-subtitle v-if="resource.type === 'FILE'"
-              >{{ 'resources/' + resource.id + '/' + resource.label }} : {{ resource.type }}</v-list-item-subtitle
+              >{{ `resources/${resource.id}/${resource.label} : ${resource.type}` }}</v-list-item-subtitle
             >
             <v-list-item-subtitle v-if="resource.type === 'ONTOLOGY_LIST'"
               >{{ resource.name }} : {{ resource.type }}</v-list-item-subtitle
