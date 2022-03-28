@@ -81,10 +81,6 @@
             <v-icon v-else-if="isResourceTypeOf(fileResourceKey, 'text')" large>mdi-file-document-outline</v-icon>
             <v-icon v-else-if="isResourceTypeOf(fileResourceKey, 'pdf')" large>mdi-file-document-outline</v-icon>
             <v-icon v-else large>mdi-file-outline</v-icon>
-            <!--v-img
-            alt="uploaded image thumbnail"
-            :src="chat.avatar"
-          ></v-img-->
           </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title
@@ -348,10 +344,5 @@ export default {
   border-style: solid;
   border-width: 1px;
   background-color: rgba(0, 0, 0, 0.05);
-}
-
-.expanding-chip {
-  min-height: 32px;
-  height: auto;
 }
 </style>
