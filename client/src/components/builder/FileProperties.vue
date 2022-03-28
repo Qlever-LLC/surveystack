@@ -48,12 +48,7 @@ export default {
       required: true,
     },
   },
-  methods: {
-    removeType(type) {
-      this.value.types.splice(this.value.types.indexOf(type), 1);
-      this.value.types = [...this.value.types];
-    },
-  },
+  methods: {},
 };
 </script>
 
