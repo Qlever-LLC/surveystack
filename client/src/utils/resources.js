@@ -84,7 +84,7 @@ export async function getSignedDownloadUrl(resourceKey) {
 
 export function getPublicDownloadUrl(resourceKey) {
   const s3BaseUrl =
-    process.env.NODE_ENV === 'production'
+    window.location.origin.indexOf('app.surveystack.io') > -1
       ? 'https://surveystack.s3.amazonaws.com/'
       : 'https://surveystack-test.s3.amazonaws.com/';
   return s3BaseUrl + resourceKey;
