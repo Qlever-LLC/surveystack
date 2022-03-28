@@ -209,24 +209,24 @@ export default {
     },
     async addFile(file, destArray, allowMultiple, allowedTypes) {
       if (!this.isMimeTypeAllowed(allowedTypes, file.type)) {
-        throw 'Drop not allowed for this file type. Allowed types: ' + allowedTypes.join(', ');
+        throw Error(`Drop not allowed for this file type. Allowed types: ${allowedTypes.join(', ')}`);
       }
       if (!this.isImageFile(file.type) && file.size > MAX_FILE_SIZE) {
-        throw (
+        throw Error(
           'File size limit exceeded. Limit ' +
-          MAX_FILE_SIZE / 1024 / 1024 +
-          ' MB / Your file: ' +
-          Math.round(file.size / 1024 / 1024) +
-          ' MB'
+            MAX_FILE_SIZE / 1024 / 1024 +
+            ' MB / Your file: ' +
+            Math.round(file.size / 1024 / 1024) +
+            ' MB'
         );
       }
       if (this.isImageFile(file.type) && file.size > MAX_FILE_SIZE_IMAGES) {
-        throw (
+        throw Error(
           'Image exceeds size limit of: ' +
-          MAX_FILE_SIZE_IMAGES / 1024 +
-          ' KB / Your file: ' +
-          Math.round(file.size / 1024) +
-          ' KB'
+            MAX_FILE_SIZE_IMAGES / 1024 +
+            ' KB / Your file: ' +
+            Math.round(file.size / 1024) +
+            ' KB'
         );
       }
       let resource = await this.$store.dispatch('resources/addLocalResource', file);
@@ -293,7 +293,7 @@ export default {
       this.changed(this.fileResourceKeys);
     },
     showAlertMessage(error) {
-      this.alertMessage = error;
+      this.alertMessage = error.message;
       this.alertMessageVisible = true;
     },
     supportsImageCapture() {
