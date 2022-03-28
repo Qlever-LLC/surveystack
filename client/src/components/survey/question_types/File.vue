@@ -256,7 +256,7 @@ export default {
         //no type restrictions
         return true;
       } else {
-        return !!allowedTypes.find((allowedType) => type.match(allowedType));
+        return allowedTypes.some((allowedType) => type.match(allowedType));
       }
     },
     isImageFile(type) {
