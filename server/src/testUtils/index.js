@@ -88,10 +88,17 @@ export const createMembership = async (_overrides = {}) => {
   return result.ops[0];
 };
 
-export const createReq = ({ body = {}, params = {}, query = {}, headers = {} } = {}) => ({
+export const createReq = ({
+  body = {},
+  params = {},
+  query = {},
+  headers = {},
+  cookies = {},
+} = {}) => ({
   body,
   params,
   query,
+  cookies,
   headers: {
     origin: 'https://surveystack.io',
     ...headers,
