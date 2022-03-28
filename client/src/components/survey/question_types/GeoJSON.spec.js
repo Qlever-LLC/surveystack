@@ -176,11 +176,6 @@ describe('GeoJSON Question', () => {
           value: null,
           index: 'data.geojson_1',
         },
-        store: {
-          getters: {
-            'toggle/isOn': () => ({ feature_resource: true }),
-          },
-        },
         router: router,
       };
 
@@ -240,11 +235,6 @@ describe('GeoJSON Question', () => {
           value: null,
           index: 'data.geojson_1',
         },
-        store: {
-          getters: {
-            'toggle/isOn': () => ({ feature_resource: true }),
-          },
-        },
         router: router,
       };
 
@@ -266,11 +256,6 @@ describe('GeoJSON Question', () => {
           control: getControlProps(),
           value: mockFeatureCollection(),
           index: 'data.geojson_1',
-        },
-        store: {
-          getters: {
-            'toggle/isOn': () => ({ feature_resource: true }),
-          },
         },
         router: router,
       };
@@ -347,11 +332,6 @@ describe('GeoJSON Question', () => {
           index: 'data.geojson_1',
           survey: mockSurvey(),
         },
-        store: {
-          getters: {
-            'toggle/isOn': () => ({ feature_resource: true }),
-          },
-        },
         router: router,
       };
       const { getByText } = renderWithVuetify(ControlProperties, renderOptions);
@@ -370,11 +350,6 @@ describe('GeoJSON Question', () => {
           value: null,
           index: 'data.geojson_1',
           survey: mockSurvey(),
-        },
-        store: {
-          getters: {
-            'toggle/isOn': () => ({ feature_resource: true }),
-          },
         },
         router: router,
       };
