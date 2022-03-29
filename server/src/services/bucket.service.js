@@ -62,11 +62,7 @@ export async function getSignedDownloadUrl(key) {
 }
 
 export function getPublicDownloadUrl(resourceKey) {
-  const s3BaseUrl =
-    process.env.NODE_ENV === 'production'
-      ? 'https://surveystack.s3.amazonaws.com/'
-      : 'https://surveystack-test.s3.amazonaws.com/';
-  return s3BaseUrl + resourceKey;
+  return 'https://' + AWS_S3_BUCKET_NAME + '.s3.amazonaws.com/' + resourceKey;
 }
 
 export async function deleteObject(key) {
