@@ -297,9 +297,8 @@ export default {
       this.alertMessageVisible = true;
     },
     supportsImageCapture() {
-      let i = document.createElement('input');
-      i.setAttribute('capture', true);
-      return !!i['capture'];
+      let el = document.createElement('input');
+      return el.capture !== undefined;
     },
     async remove(index) {
       await this.$store.dispatch('resources/removeLocalResource', this.fileResourceKeys[index]);
