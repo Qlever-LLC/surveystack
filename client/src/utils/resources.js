@@ -71,6 +71,10 @@ export function nameHasValidLength(val) {
   return namePattern.test(val) ? true : 'Data name must be at least 4 character in length';
 }
 
+export function replaceLabelInKey(resourceKey, labelNew) {
+  return resourceKey.substring(0, resourceKey.lastIndexOf('/') + 1) + labelNew;
+}
+
 export async function openResourceInTab(resourceId) {
   let resource = await store.dispatch('resources/fetchResource', resourceId);
   let url = window.URL.createObjectURL(resource.fileData);

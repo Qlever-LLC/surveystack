@@ -1,5 +1,5 @@
 import * as db from '@/store/db';
-import { getPublicDownloadUrl, resourceLocations, uploadFileResource } from '@/utils/resources';
+import { getPublicDownloadUrl, replaceLabelInKey, resourceLocations, uploadFileResource } from '@/utils/resources';
 import api from '@/services/api.service';
 import axios from 'axios';
 import ObjectId from 'bson-objectid';
@@ -61,7 +61,7 @@ const actions = {
   async updateResourceLabel({ commit, getters }, { resourceKey, labelNew }) {
     let resource = getters['getResourceByKey'](resourceKey);
     if (resource) {
-      resource.key = resource.key.substring(0, resource.key.lastIndexOf('/') + 1) + labelNew;
+      resource.key = replaceLabelInKey(resource.key, labelNew);
       resource.label = labelNew;
       resource.name = slugify(labelNew);
       await db.persistResource(resource);
@@ -99,7 +99,7 @@ const actions = {
       // fetch resource
       ({ data: resource } = await api.get(`/resources/${resourceId}`));
       // get download url
-      const url = await getPublicDownloadUrl(resource.key);
+      const url = getPublicDownloadUrl(resource.key);
       // download data
       const { data: binaryResult } = await axios.get(url, {
         responseType: 'arraybuffer',
