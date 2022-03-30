@@ -66,7 +66,7 @@
             <v-card-text v-if="false" class="my-0 py-0">
               <span
                 class="font-weight-light grey--text text--darken-2 mt-n1"
-                style="font-size: 0.9rem; position: relative;"
+                style="font-size: 0.9rem; position: relative"
                 >{{ display.path }}</span
               >
             </v-card-text>
@@ -90,9 +90,7 @@
               </div>
             </v-card-text>
 
-            <v-card-text v-else>
-              No answer
-            </v-card-text>
+            <v-card-text v-else> No answer </v-card-text>
 
             <!-- date modified -->
             <v-card-text class="pt-1 pb-0" v-if="display.modified">
@@ -116,6 +114,7 @@
 
 <script>
 import moment from 'moment';
+import { getLabelFromKey } from '@/utils/resources';
 
 const states = {
   done: ['mdi-check-bold', 'green'],
@@ -220,10 +219,9 @@ export default {
           .slice(1)
           .join('.');
         let value = this.$store.getters['draft/property'](`${overview.path}.value`);
-        //in case of a file array, display the names
-        if (Array.isArray(value) && value.length > 0 && value[0] instanceof File) {
-          value = value.map((file) => file.name);
-          value = JSON.stringify(value);
+        //in case of a resource array, display the names
+        if (Array.isArray(value) && (control.type === 'file' || control.type === 'image')) {
+          value = value.map((resourceKey) => getLabelFromKey(resourceKey));
         }
         const icon = iconify(value, overview.control, relevant);
 
