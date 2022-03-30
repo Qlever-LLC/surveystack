@@ -21,16 +21,70 @@
       ref="table"
     >
       <template v-slot:top>
-        <v-toolbar flat>
+        <v-toolbar flat class="my-5">
           <v-row>
             <v-col>
-              <div class="d-flex justify-end">
-                <v-switch
-                  :input-value="excludeMeta"
-                  @change="$emit('excludeMetaChange', $event)"
-                  label="Hide meta"
-                  class="mt-2"
-                ></v-switch>
+              <div class="d-flex justify-space-between align-center">
+                <div class="d-flex justify-space-between align-center mt-5">
+                  <v-switch
+                    :input-value="!excludeMeta"
+                    @change="$emit('excludeMetaChange', $event)"
+                    label="Show metadata"
+                    class="mt-2"
+                  ></v-switch>
+                  <v-switch
+                    :input-value="archived"
+                    @change="$emit('showArchived', $event)"
+                    label="View archived only"
+                    class="mt-2 ml-5"
+                  ></v-switch>
+                </div>
+                <div class="d-flex align-center" v-if="selected.length > 0">
+                  <div>
+                    <span class="subtitle-2">ACTIONS</span><br />{{ selected.length }}
+                    {{ selected.length === 1 ? 'submission' : 'submissions' }} selected
+                  </div>
+                  <div class="ml-auto d-flex flex-column flex-sm-row">
+                    <v-btn
+                      v-if="selected[0]['meta.archived'] === 'true'"
+                      :disabled="actionsAreDisabled"
+                      color="error"
+                      text
+                      @click="$emit('showDeleteModal', $event)"
+                    >
+                      DELETE
+                    </v-btn>
+                    <v-btn
+                      v-if="selected[0]['meta.archived'] === 'true'"
+                      :disabled="actionsAreDisabled"
+                      text
+                      @click="$emit('archiveSubmissions', $event)"
+                    >
+                      RESTORE
+                    </v-btn>
+                    <v-btn
+                      v-if="selected[0]['meta.archived'] !== 'true'"
+                      :disabled="actionsAreDisabled"
+                      color="error"
+                      text
+                      @click="$emit('showArchiveModal', $event)"
+                    >
+                      ARCHIVE
+                    </v-btn>
+                    <v-btn @click="$emit('reassignment', $event)" :disabled="actionsAreDisabled" text color="secondary"
+                      >REASSIGN</v-btn
+                    >
+                    <v-btn
+                      v-if="selected[0]['meta.archived'] !== 'true' && selected.length === 1"
+                      :disabled="actionsAreDisabled"
+                      text
+                      color="primary"
+                      @click="$emit('resubmit', $event)"
+                    >
+                      RESUBMIT
+                    </v-btn>
+                  </div>
+                </div>
               </div>
             </v-col>
           </v-row>
@@ -55,11 +109,18 @@
         </span>
       </template>
 
-      <template v-slot:body="props">
+      <template v-slot:body="{ items, isSelected, select }">
         <tbody>
-          <tr v-for="item in props.items" :key="item._id">
+          <tr v-for="item in items" :key="item._id">
             <td>
-              <v-checkbox v-model="tableSelected" :value="item" color="#777" class="custom-checkbox" hide-details />
+              <v-checkbox
+                :value="isSelected(item)"
+                @click="select(item, !isSelected(item))"
+                color="#777"
+                class="custom-checkbox"
+                hide-details
+                role="checkbox"
+              />
             </td>
             <td
               v-for="header in headers"
@@ -104,6 +165,9 @@ export default {
     SubmissionTableCellModal,
   },
   props: {
+    actionsAreDisabled: {
+      type: Boolean,
+    },
     submissions: {
       type: Object,
     },
@@ -135,6 +199,7 @@ export default {
   },
   data() {
     return {
+      newData: this.archived,
       activeTableCell: null,
       textTruncateLength: 36,
       csv: null,
@@ -245,6 +310,9 @@ export default {
 </script>
 
 <style scoped>
+>>> .v-toolbar__content {
+  background: #f5f5f5 !important;
+}
 .v-data-table >>> td {
   font-family: monospace;
   white-space: nowrap;
