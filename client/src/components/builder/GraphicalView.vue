@@ -14,7 +14,6 @@
     :invertSwap="true"
     @start="startHandler"
     @end="endHandler"
-    @update="updateHandler"
     draggable=".draggable-item"
     :group="draggableGroup"
   >
@@ -158,12 +157,6 @@
         @cancel="updateLibraryCancelled"
       />
     </v-card>
-    <v-alert v-model="pageInPageHintIsVisible" color="info lighten-1" bottom :timeout="-1">
-      <div class="d-flex align-center">
-        <v-icon class="mr-1">mdi-information</v-icon>
-        Pages cannot be nested inside other Pages
-      </div>
-    </v-alert>
   </draggable>
   <div v-else>
     <v-card class="text--secondary">
@@ -411,6 +404,32 @@ export default {
   min-width: 108px;
   text-align: right;
 }
+
+.sortable-drag[data-control-type='page']::after {
+  position: absolute;
+  content: 'Tip: Pages cannot be nested inside Pages';
+  width: 100%;
+  left: 0;
+  top: 100%;
+  margin-top: 13px;
+  background-color: var(--v-info-base);
+  padding: 0.75rem 1.5rem;
+  border-radius: 3px;
+}
+
+.control-item.sortable-drag[data-control-type='page']:hover::before,
+.control-item-selected.sortable-drag[data-control-type='page']::before {
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 7px solid var(--v-info-base);
+  top: 100%;
+  margin-top: 3px;
+  left: 50%;
+  content: '';
+  transform: translate(-50%, 50%);
+}
 </style>
 
 <style>
@@ -424,5 +443,9 @@ export default {
 
 .sortable-ghost {
   opacity: 0.2;
+}
+
+.sortable-drag[data-control-type='page'] {
+  position: relative;
 }
 </style>
