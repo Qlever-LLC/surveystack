@@ -32,7 +32,6 @@ const actions = {
       });
     });
     commit('SET_RESOURCES', response);
-    return response;
   },
   // eslint-disable-next-line no-unused-vars
   async addRemoteResource({ commit, dispatch }, file) {
