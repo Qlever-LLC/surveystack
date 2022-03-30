@@ -25,7 +25,6 @@ const actions = {
     commit('RESET');
   },
   async initFromIndexedDB({ commit }) {
-    // TODO reject if timeout here
     const response = await new Promise((resolve) => {
       db.openDb(() => {
         db.getAllResources((results) => resolve(results));

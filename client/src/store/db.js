@@ -152,6 +152,10 @@ function getResults(storeName, success) {
       success(results);
     }
   };
+
+  objectStore.openCursor().onerror = (event) => {
+    console.log(`Error: ${event}`);
+  };
 }
 
 // Read All data in ObjectStore
