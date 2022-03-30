@@ -77,7 +77,6 @@ const actions = {
       commit('REMOVE_RESOURCE', resource._id);
       commit('ADD_RESOURCE', resource);
     }
-    return resource;
   },
   async removeLocalResource({ commit, getters }, resourceKey) {
     let resource = getters['getResourceByKey'](resourceKey);
