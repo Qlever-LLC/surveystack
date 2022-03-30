@@ -14,8 +14,6 @@
     draggable=".draggable-item"
     :group="draggableGroup"
   >
-    <!-- :data-control-type="controlType"
-      :group="group || { name: 'g1' }" -->
     <v-card
       v-for="(el, idx) in controls"
       class="control-item mb-2"
@@ -135,8 +133,6 @@
         :index="createIndex(index, idx + 1)"
         :data-control-type="el.type"
       />
-      <!-- :group="draggableGroup"
-          :controlType="el.type" -->
 
       <v-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
         <v-card class="">
@@ -158,11 +154,13 @@
         @cancel="updateLibraryCancelled"
       />
     </v-card>
-    <div v-if="pageInPageHintIsVisible" color="red" bottom :timeout="-1" style="bottom: 100px">no nesting pages!</div>
+    <v-alert v-model="pageInPageHintIsVisible" color="info lighten-1" bottom :timeout="-1">
+      <div class="d-flex align-center">
+        <v-icon class="mr-1">mdi-information</v-icon>
+        Pages cannot be nested inside other Pages
+      </div>
+    </v-alert>
   </draggable>
-  <!-- <v-alert v-model="pageInPageHintIsVisible" bottom color="red" :timeout="-1">
-      Pages cannot be nested in pages
-    </v-alert> -->
   <div v-else>
     <v-card class="text--secondary">
       <v-card-title>Empty survey</v-card-title>
@@ -172,6 +170,7 @@
     </v-card>
   </div>
 </template>
+
 <script>
 import draggable from 'vuedraggable';
 import { cloneDeep } from 'lodash';
@@ -181,6 +180,16 @@ import * as utils from '@/utils/surveys';
 import api from '@/services/api.service';
 import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
 import ControlCardHeader from './ControlCardHeader';
+
+function debounce(func, timeout = 300) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, timeout);
+  };
+}
 
 export default {
   name: 'nested-draggable',
@@ -216,10 +225,15 @@ export default {
             // this.pageInPageHintIsVisible = true;
             // console.log('show');
             console.log({ to });
-            setTimeout(function () {
-              // this.pageInPageHintIsVisible = false;
-              // console.log('hide');
-            }, 2000);
+            to.el.style.borderColor = 'red';
+            // setTimeout(function () {
+            //   // this.pageInPageHintIsVisible = false;
+            //   // console.log('hide');
+            //   to.el.style = null;
+            // }, 500);
+            debounce(() => {
+              to.el.style.borderColor = null;
+            });
             return false;
           }
           return true;
