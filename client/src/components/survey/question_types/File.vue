@@ -233,7 +233,7 @@ export default {
 
       if (allowMultiple) {
         //remove duplicates
-        const index = destArray.findIndex((x) => x === resource.key);
+        const index = destArray.findIndex((x) => x.endsWith(resource.label));
         if (index >= 0) {
           await this.$store.dispatch('resources/removeLocalResource', destArray[index]);
           destArray.splice(index, 1);
