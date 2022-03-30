@@ -87,7 +87,7 @@
               v-if="editIndex !== index"
               :data-test-id="'file_' + index"
               class="text-wrap font-bold"
-              v-text="fileResourceKey.substring(fileResourceKey.lastIndexOf('/') + 1)"
+              v-text="getLabelFromKey(fileResourceKey)"
             ></v-list-item-title>
             <v-list-item-title v-if="editIndex === index" class="text-wrap font-bold">
               <v-text-field v-model="editFileName" />
@@ -148,6 +148,7 @@ export default {
     };
   },
   methods: {
+    getLabelFromKey,
     showFileChooser() {
       this.$refs.fileInput.click();
     },
