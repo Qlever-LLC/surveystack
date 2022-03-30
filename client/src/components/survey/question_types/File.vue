@@ -124,6 +124,7 @@ import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
 import appControlHint from '@/components/survey/drafts/ControlHint.vue';
 import store from '@/store';
+import { getLabelFromKey } from '@/utils/resources';
 
 const MAX_FILE_SIZE = 20971520; //20 MB
 const MAX_FILE_SIZE_IMAGES = 20971520; //20 MB TODO compress down to 512000; //500 KB
@@ -280,7 +281,7 @@ export default {
     },
     editResourceName(fileResourceKey, index) {
       this.editIndex = index;
-      this.editFileName = fileResourceKey.substring(fileResourceKey.lastIndexOf('/') + 1);
+      this.editFileName = getLabelFromKey(fileResourceKey);
     },
     async commitResourceName(fileResourceKey, index) {
       const resource = await this.$store.dispatch('resources/updateResourceLabel', {
