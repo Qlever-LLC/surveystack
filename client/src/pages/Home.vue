@@ -9,13 +9,7 @@
           contain
           height="128"
         ></v-img>
-        <v-img
-          v-else
-          :src="require('../assets/surveystack_temp_logo.svg')"
-          class="my-3"
-          contain
-          height="128"
-        ></v-img>
+        <v-img v-else :src="require('../assets/surveystack_temp_logo.svg')" class="my-3" contain height="128"></v-img>
       </v-col>
     </v-row>
 

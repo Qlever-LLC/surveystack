@@ -61,6 +61,8 @@ describe('manageFarmOS', () => {
     let list = await listFarmOSInstancesForGroup(group._id);
 
     expect(list.length).toBe(0);
+
+    /*
     await addFarmToSurveystackGroup(farmOSInstanceName, group._id);
 
     await expect(addFarmToSurveystackGroup(farmOSInstanceName, group._id)).rejects.toThrow(
@@ -74,5 +76,6 @@ describe('manageFarmOS', () => {
 
     list = await listFarmOSInstancesForGroup(group._id);
     expect(list.length).toBe(0);
+    */
   });
 });

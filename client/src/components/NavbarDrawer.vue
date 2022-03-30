@@ -20,7 +20,8 @@
                 v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
                 color="accent"
                 small
-              >{{ readyToSubmitCount }}</v-chip>
+                >{{ readyToSubmitCount }}</v-chip
+              >
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -29,24 +30,14 @@
       <v-divider dark class="my-1" />
 
       <v-list-item class="pa-0">
-        <v-expansion-panels
-          class="pa-0 ma-0 no-background"
-          flat
-          accordion
-          :value="docs.length > 2 ? undefined : 0"
-        >
+        <v-expansion-panels class="pa-0 ma-0 no-background" flat accordion :value="docs.length > 2 ? undefined : 0">
           <v-expansion-panel>
             <v-expansion-panel-header class="pa-0 ma-0">
               <v-subheader>DOCUMENTATION</v-subheader>
             </v-expansion-panel-header>
             <v-expansion-panel-content class="pa-0 ma-0 no-padding">
               <v-list class="pa-0 ma-0">
-                <v-list-item
-                  v-for="(doc, index) in docs"
-                  :key="doc.link + index"
-                  :href="doc.link"
-                  target="_blank"
-                >
+                <v-list-item v-for="(doc, index) in docs" :key="doc.link + index" :href="doc.link" target="_blank">
                   <v-list-item-icon>
                     <v-icon>mdi-notebook</v-icon>
                   </v-list-item-icon>
@@ -55,10 +46,7 @@
                   </v-list-item-content>
                 </v-list-item>
 
-                <v-list-item
-                  href="https://our-sci.gitlab.io/software/surveystack_tutorials/"
-                  target="_blank"
-                >
+                <v-list-item href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
                   <v-list-item-icon>
                     <v-icon>mdi-notebook-multiple</v-icon>
                   </v-list-item-icon>
