@@ -141,13 +141,15 @@ export const listFarmOSInstancesForGroup = async (groupId) => {
 };
 
 export const getSuperAllFarmosMappings = async () => {
-  const { getFarmsWithTags } = config();
-  const aggregatorFarms = await getFarmsWithTags();
+  const { getAllFarmsWithTags } = config();
+  const aggregatorFarms = await getAllFarmsWithTags();
   const surveystackFarms = await db.collection('farmos-group-mapping').find().toArray();
+  const surveystackUserFarms = await db.collection('farmos-instances').find().toArray();
 
   return {
     aggregatorFarms,
     surveystackFarms,
+    surveystackUserFarms,
   };
 };
 
@@ -161,7 +163,21 @@ export const addFarmToSurveystackGroup = async (instanceName, groupId) => {
     .toArray();
 
   if (res.length > 0) {
-    throw boom.badRequest('mapping already exists');
+    throw boom.badData('mapping already exists');
+  }
+
+  const group = await db.collection('groups').findOne({
+    _id: asMongoId(groupId),
+  });
+
+  if (!group) {
+    throw boom.badData('group not found');
+  }
+
+  const { getAllFarmsWithTags } = config();
+  const aggregatorFarms = await getAllFarmsWithTags();
+  if (!aggregatorFarms.find((f) => f.url === instanceName)) {
+    throw boom.badData('instance not found in aggregator');
   }
 
   const _id = new ObjectId();
@@ -176,4 +192,64 @@ export const removeFarmFromSurveystackGroup = async (instanceName, groupId) => {
   await db
     .collection('farmos-group-mapping')
     .deleteMany({ instanceName, groupId: asMongoId(groupId) });
+};
+
+export const addFarmToUser = async (instanceName, userId, groupId, owner) => {
+  const res = await db
+    .collection('farmos-instances')
+    .find({
+      instanceName,
+      userId: asMongoId(userId),
+    })
+    .toArray();
+
+  if (res.length > 0) {
+    throw boom.badData('mapping already exists');
+  }
+
+  const user = await db.collection('users').findOne({
+    _id: asMongoId(userId),
+  });
+
+  if (!user) {
+    throw boom.badData('user not found');
+  }
+
+  if (groupId) {
+    const group = await db.collection('groups').findOne({
+      _id: asMongoId(groupId),
+    });
+
+    if (!group) {
+      throw boom.badData('group not found');
+    }
+  }
+
+  const { getAllFarmsWithTags } = config();
+  const aggregatorFarms = await getAllFarmsWithTags();
+  if (!aggregatorFarms.find((f) => f.url === instanceName)) {
+    throw boom.badData('instance not found in aggregator');
+  }
+
+  const _id = new ObjectId();
+  const doc = {
+    _id,
+    instanceName,
+    userId: asMongoId(userId),
+    owner: !!owner,
+  };
+
+  if (groupId) {
+    doc.groupId = groupId;
+  }
+  await db.collection('farmos-instances').insertOne(doc);
+};
+
+export const removeFarmFromUser = async (instanceName, userId, groupId) => {
+  const filter = { instanceName, userId: asMongoId(userId) };
+  if (groupId) {
+    filter.groupId = groupId;
+  }
+
+  await db.collection('farmos-instances').deleteMany(filter);
 };

@@ -6,7 +6,14 @@ import axios from 'axios';
 import boom from '@hapi/boom';
 import https from 'https';
 import { getRoles, hasAdminRole } from '../services/roles.service';
-import { listFarmOSInstancesForUser, getSuperAllFarmosMappings } from '../services/farmos-2/manage';
+import {
+  listFarmOSInstancesForUser,
+  getSuperAllFarmosMappings,
+  addFarmToSurveystackGroup,
+  removeFarmFromSurveystackGroup,
+  addFarmToUser,
+  removeFarmFromUser,
+} from '../services/farmos-2/manage';
 import { aggregator } from '../services/farmos-2/aggregator';
 
 const config = () => {
@@ -24,6 +31,7 @@ const requireUserId = (res) => {
   if (!userId) {
     throw boom.unauthorized();
   }
+  return userId;
 };
 
 const requireGroupdAdmin = (req, res) => {
@@ -41,6 +49,7 @@ const requireGroupdAdmin = (req, res) => {
   if (!hasAdminRole(userId, group)) {
     throw boom.unauthorized();
   }
+  return userId;
 };
 
 /**
@@ -54,12 +63,12 @@ export const getFarmOSInstances = async (req, res) => {
    */
 
   const userId = requireUserId(res);
+  console.log('userid', userId);
 
   const r = await listFarmOSInstancesForUser(userId);
 
   return res.send(r);
 };
-
 /**
  *
  *
@@ -73,9 +82,9 @@ export const getAssets = async (req, res) => {
    * include instance url for each asset
    */
 
-  const allowedBundles = ['plant', 'location', 'equipment'];
+  const allowedBundles = ['plant', 'location', 'equipment', 'land'];
 
-  const { bundle } = req.body;
+  const { bundle } = req.query;
 
   if (!bundle || !isString(bundle)) {
     throw boom.badData("argument 'bundle' not valid");
@@ -86,22 +95,28 @@ export const getAssets = async (req, res) => {
   }
 
   const instances = await listFarmOSInstancesForUser(userId);
+
   const cfg = config();
 
   const assets = [];
   const errors = [];
   for (const instance of instances) {
     try {
-      const axiosResponse = await cfg.getAssets(instance.farmOSInstanceName, bundle);
+      const axiosResponse = await cfg.getAssets(instance.instanceName, bundle);
+
+      console.log('axiosresponse', axiosResponse.data);
       const assetList = axiosResponse.data.data.map((a) => {
         return {
           name: a.attributes.name,
           id: a.id,
-          instance: instance.farmOSInstanceName,
+          instanceName: instance.instanceName,
+          archived: a.attributes.archived,
+          location: a.relationships.location.data,
         };
       });
       assets.push(...assetList);
     } catch (error) {
+      console.log(error);
       errors.push(error);
     }
   }
@@ -162,6 +177,75 @@ export const getLogs = async (req, res) => {
 export const superAdminGetAllInstances = async (req, res) => {
   const r = await getSuperAllFarmosMappings();
   return res.send(r);
+};
+
+export const superAdminMapFarmosInstance = async (req, res) => {
+  const { group } = req.body;
+  if (!group) {
+    throw boom.badData('group missing');
+  }
+
+  const { instanceName } = req.body;
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
+
+  await addFarmToSurveystackGroup(instanceName, group);
+  return res.send({
+    status: 'success',
+  });
+};
+
+export const superAdminUnMapFarmosInstance = async (req, res) => {
+  const { group, instanceName } = req.body;
+  if (!group) {
+    throw boom.badData('group missing');
+  }
+
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
+
+  await removeFarmFromSurveystackGroup(instanceName, group);
+  return res.send({
+    status: 'success',
+  });
+};
+
+export const superAdminMapFarmosInstanceToUser = async (req, res) => {
+  const { user, group, owner, instanceName } = req.body;
+  if (!user) {
+    throw boom.badData('user missing');
+  }
+
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
+
+  if (typeof owner == undefined) {
+    throw boom.badData('owner attribute missing');
+  }
+
+  await addFarmToUser(instanceName, user, group, !!owner);
+  return res.send({
+    status: 'success',
+  });
+};
+
+export const superAdminUnMapFarmosInstanceFromUser = async (req, res) => {
+  const { user, group, instanceName } = req.body;
+  if (!user) {
+    throw boom.badData('user missing');
+  }
+
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
+
+  await removeFarmFromUser(instanceName, user, group);
+  return res.send({
+    status: 'success',
+  });
 };
 
 /**

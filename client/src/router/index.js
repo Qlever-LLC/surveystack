@@ -19,6 +19,8 @@ import UserList from '@/pages/users/UserList.vue';
 import User from '@/pages/users/User.vue';
 import UserEdit from '@/pages/users/UserEdit.vue';
 
+const FarmosManage = () => import('@/pages/farmos-manage/FarmosManage.vue');
+
 import GroupList from '@/pages/groups/GroupList.vue';
 import Group from '@/pages/groups/Group.vue';
 const GroupEdit = () => import('@/pages/groups/GroupEdit.vue');
@@ -186,6 +188,12 @@ const routes = [
     path: '/users',
     name: 'users-list',
     components: getComponents(UserList),
+    beforeEnter: superGuard,
+  },
+  {
+    path: '/farmos-manage',
+    name: 'farmos-manage',
+    components: getComponents(FarmosManage),
     beforeEnter: superGuard,
   },
   {

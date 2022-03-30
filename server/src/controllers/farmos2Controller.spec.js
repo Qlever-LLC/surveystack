@@ -95,6 +95,9 @@ describe('farmos2controller', () => {
         body: {
           bundle: 'plant',
         },
+        query: {
+          bundle: 'plant',
+        },
       },
       res
     );

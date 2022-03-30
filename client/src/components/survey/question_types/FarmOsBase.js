@@ -38,11 +38,10 @@ const base = (type) => ({
       this.loading = true;
       try {
         const response = await api.get('farmos/farms');
-        this.farms = response.data.map(({ name, url }) => ({
-          label: name,
+        this.farms = response.data.map(({ name, instanceName }) => ({
+          label: instanceName,
           value: {
-            farmName: name,
-            url,
+            url: instanceName,
           },
         }));
       } catch (err) {
@@ -53,21 +52,17 @@ const base = (type) => ({
     async fetchAreas() {
       this.loading = true;
       try {
-        const response = await api.get('farmos/fields');
-        this.farms = response.data.flatMap((f) => {
-          // '9' => { actualResponse of FarmosInstance}
-          const firstKey = Object.keys(f.data)[0];
-          const data = f.data[firstKey];
-          return data.map((farmField) => ({
-            label: `<span class="blue-chip mr-4">${f.farm}</span> ${farmField.name} `,
-            value: {
-              farmName: f.farm.trim(),
-              url: f.url,
-              name: farmField.name.trim(),
-              fieldId: farmField.tid,
-            },
-          }));
-        });
+        const response = await api.get('farmos/fields?bundle=land');
+
+        this.farms = response.data.assets.map((f) => ({
+          label: `<span class="blue-chip mr-4">${f.instanceName}</span> ${f.name} `,
+          value: {
+            farmName: f.instanceName,
+            url: f.instanceName,
+            name: f.name.trim(),
+            fieldId: f.id,
+          },
+        }));
       } catch (e) {
         console.log('something went wrong:', e);
         // TODO show error
@@ -77,27 +72,26 @@ const base = (type) => ({
     async fetchAssets() {
       this.loading = true;
       try {
-        const response = await api.get('farmos/assets');
-        console.log('assets', response);
-        this.assets = response.data.flatMap((f) => {
-          // '9' => { actualResponse of FarmosInstance}
-          const firstKey = Object.keys(f.data)[0];
-          const data = f.data[firstKey];
-          return data
-            .filter((asset) => asset.type === 'planting' && asset.archived === '0')
-            .map((planting) => ({
-              label: `<span class="blue-chip mr-4">${f.farm}</span> ${planting.name} `,
-              value: {
-                farmName: f.farm.trim(),
-                url: f.url,
-                name: planting.name.trim(),
-                assetId: planting.id,
-                location: planting.location,
-                farmId: firstKey,
-                archived: planting.archived !== '0',
-              },
-            }));
-        });
+        const { data: location } = await api.get('farmos/fields?bundle=land');
+
+        const response = await api.get('farmos/fields?bundle=plant');
+
+        console.log('res', response.data);
+        this.assets = response.data.assets.map((f) => ({
+          label: `<span class="blue-chip mr-4">${f.instanceName}</span> ${f.name} `,
+          value: {
+            farmId: f.instanceName,
+            farmName: f.instanceName,
+            url: f.instanceName,
+            name: f.name.trim(),
+            assetId: f.id,
+            archived: f.archived !== null,
+            location: f.location.map((loc) => ({
+              id: loc.id,
+              name: location.assets.find((l) => l.id === loc.id).name,
+            })),
+          },
+        }));
       } catch (e) {
         console.log('something went wrong:', e);
         // TODO show error
