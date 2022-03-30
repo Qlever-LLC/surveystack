@@ -1,4 +1,8 @@
 <template>
+  <!-- 
+    WARNING: this component renders recursively, be careful! 
+    vuedraggable props are not exposed via this component's props so recursively rendered children (via <nested-draggable />) can't set these props 
+  -->
   <draggable
     v-if="controls.length !== 0 || index.length !== 0"
     class="draggable"
@@ -182,16 +186,6 @@ import { availableControls } from '@/utils/surveyConfig';
 import * as utils from '@/utils/surveys';
 import ControlCardHeader from './ControlCardHeader';
 
-function debounce(func, timeout = 300) {
-  let timer;
-  return (...args) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      func.apply(this, args);
-    }, timeout);
-  };
-}
-
 export default {
   name: 'nested-draggable',
   components: {
@@ -215,22 +209,7 @@ export default {
         // ev: the sortablejs event
         // returns: Boolean value indicating whether `el` should be allowed to be `put` from `from` into `to`
         put(to, _, el) {
-          // console.log(`to: ${to.el.dataset.controlType}, from: ${from.el.dataset.controlType}, el: ${el.dataset.controlType}`)
-          // console.log({ to, from , el, ev });
-          // return false;
           if (el.dataset.controlType === 'page' && to.el.dataset.controlType === 'page') {
-            // this.pageInPageHintIsVisible = true;
-            // console.log('show');
-            console.log({ to });
-            to.el.style.borderColor = 'red';
-            // setTimeout(function () {
-            //   // this.pageInPageHintIsVisible = false;
-            //   // console.log('hide');
-            //   to.el.style = null;
-            // }, 500);
-            debounce(() => {
-              to.el.style.borderColor = null;
-            });
             return false;
           }
           return true;
@@ -265,12 +244,6 @@ export default {
       type: Number,
       default: 1.0,
     },
-    // group: {
-    //   type: Object,
-    // },
-    // controlType: {
-    //   type: String,
-    // },
   },
   filters: {
     displayIndex(value) {
@@ -278,12 +251,7 @@ export default {
     },
   },
   methods: {
-    updateHandler(ev) {
-      // console.log('update', {from: ev.from, to: ev.to, item: ev.item});
-      console.log('update', ev);
-    },
     startHandler(ev) {
-      // console.log(ev.item.dataset.controlType);
       if (ev.item.dataset.controlType === 'page') {
         this.pageInPageHintIsVisible = true;
       }
