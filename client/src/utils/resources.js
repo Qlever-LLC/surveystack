@@ -137,3 +137,7 @@ export async function uploadFileResources(submission, clearCacheAfterUpload) {
     }
   }
 }
+
+export async function deleteFileResource(resourceId) {
+  await api.delete(`/resources/${resourceId}`);
+}

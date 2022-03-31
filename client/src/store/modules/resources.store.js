@@ -1,5 +1,11 @@
 import * as db from '@/store/db';
-import { getPublicDownloadUrl, replaceLabelInKey, resourceLocations, uploadFileResource } from '@/utils/resources';
+import {
+  deleteFileResource,
+  getPublicDownloadUrl,
+  replaceLabelInKey,
+  resourceLocations,
+  uploadFileResource,
+} from '@/utils/resources';
 import api from '@/services/api.service';
 import axios from 'axios';
 import ObjectId from 'bson-objectid';
@@ -84,17 +90,36 @@ const actions = {
       commit('ADD_RESOURCE', resource);
     }
   },
-  async removeLocalResource({ commit, getters }, resourceKey) {
+  async removeLocalResource({ commit, getters, dispatch }, resourceKey) {
     let resource = getters['getResourceByKey'](resourceKey);
     if (resource) {
       try {
         await db.removeFromIndexedDB(db.stores.RESOURCES, resource._id);
-      } catch (err) {
-        console.warn('unable to remove resource from IDB');
+      } catch (error) {
+        dispatch('feedback/add', error, { root: true });
+        throw error;
       }
       commit('REMOVE_RESOURCE', resource._id);
     } else {
-      console.error('resource not found, key: ' + resourceKey);
+      const errorMessage = 'resource not found, key: ' + resourceKey;
+      dispatch('feedback/add', errorMessage, { root: true });
+      throw Error(errorMessage);
+    }
+  },
+  async removeRemoteResource({ commit, getters, dispatch }, resourceKey) {
+    let resource = getters['getResourceByKey'](resourceKey);
+    if (resource) {
+      try {
+        await dispatch('removeLocalResource', resourceKey);
+        await deleteFileResource(resource._id);
+      } catch (error) {
+        dispatch('feedback/add', error, { root: true });
+        throw error;
+      }
+    } else {
+      const errorMessage = 'resource not found, key: ' + resourceKey;
+      dispatch('feedback/add', errorMessage, { root: true });
+      throw Error(errorMessage);
     }
   },
   async fetchResource({ commit, getters }, resourceId) {
