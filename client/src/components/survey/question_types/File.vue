@@ -285,14 +285,19 @@ export default {
       this.editFileName = getLabelFromKey(fileResourceKey);
     },
     async commitResourceName(fileResourceKey, index) {
-      const resource = await this.$store.dispatch('resources/updateResourceLabel', {
-        resourceKey: fileResourceKey,
-        labelNew: this.editFileName,
-      });
-      this.fileResourceKeys[index] = resource.key;
-      this.editIndex = undefined;
-      this.editFileName = undefined;
-      this.changed(this.fileResourceKeys);
+      try {
+        const resource = await this.$store.dispatch('resources/updateResourceLabel', {
+          resourceKey: fileResourceKey,
+          labelNew: this.editFileName,
+        });
+        this.fileResourceKeys[index] = resource.key;
+        this.editIndex = undefined;
+        this.editFileName = undefined;
+        this.changed(this.fileResourceKeys);
+      } catch (error) {
+        this.editIndex = undefined;
+        this.editFileName = undefined;
+      }
     },
     showAlertMessage(error) {
       this.alertMessage = error.message;

@@ -52,27 +52,34 @@ const actions = {
       contentType: file.type,
       fileData: file,
     };
-    await db.persistResource(resource);
+    db.persistResource(resource);
     commit('ADD_RESOURCE', resource);
     return resource;
   },
-  async updateResourceLabel({ commit, getters }, { resourceKey, labelNew }) {
-    let resource = getters['getResourceByKey'](resourceKey);
-    if (resource) {
-      resource.key = replaceLabelInKey(resource.key, labelNew);
-      resource.label = labelNew;
-      resource.name = slugify(labelNew);
-      await db.persistResource(resource);
-      commit('REMOVE_RESOURCE', resource._id);
-      commit('ADD_RESOURCE', resource);
+  async updateResourceLabel({ commit, getters, dispatch }, { resourceKey, labelNew }) {
+    try {
+      let resource = getters['getResourceByKey'](resourceKey);
+      if (resource) {
+        resource.key = replaceLabelInKey(resource.key, labelNew);
+        resource.label = labelNew;
+        resource.name = slugify(labelNew);
+        db.persistResource(resource);
+        commit('REMOVE_RESOURCE', resource._id);
+        commit('ADD_RESOURCE', resource);
+      } else {
+        throw Error(`Resource with key ${resourceKey}not found`);
+      }
+      return resource;
+    } catch (error) {
+      dispatch('feedback/add', error, { root: true });
+      throw error;
     }
-    return resource;
   },
   async updateResourceState({ commit, getters }, { resourceKey, stateNew }) {
     let resource = getters['getResourceByKey'](resourceKey);
     if (resource) {
       resource.state = stateNew;
-      await db.persistResource(resource);
+      db.persistResource(resource);
       commit('REMOVE_RESOURCE', resource._id);
       commit('ADD_RESOURCE', resource);
     }
@@ -103,17 +110,16 @@ const actions = {
         validateStatus: false,
       });
       resource.fileData = new Blob([binaryResult], { type: resource.contentType });
-      await db.persistResource(resource);
+      db.persistResource(resource);
       commit('ADD_RESOURCE', resource);
     }
     return resource;
   },
-  async fetchResources({ commit }, resources) {
-    //TODO test if this is executed in parallel
+  async fetchResources({ commit, dispatch }, resources) {
     let promises = [];
     for (const r of resources) {
       if (r.location === resourceLocations.REMOTE) {
-        promises.push(this.$store.dispatch('resources/fetchResource', r._id));
+        promises.push(dispatch('resources/fetchResource', r._id));
       }
     }
     await Promise.all(promises);
