@@ -82,7 +82,13 @@ export function getLabelFromKey(resourcKey) {
 export async function openResourceInTab(resourceId) {
   let resource = await store.dispatch('resources/fetchResource', resourceId);
   let url = window.URL.createObjectURL(resource.fileData);
-  window.open(url);
+  const element = document.createElement('a');
+  element.setAttribute('href', url);
+  element.setAttribute('download', `${resource.label}`);
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
 }
 
 export async function getSignedDownloadUrl(resourceKey) {
