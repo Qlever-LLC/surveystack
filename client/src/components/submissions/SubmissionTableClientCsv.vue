@@ -130,7 +130,7 @@
             >
               <div
                 v-if="item[header.value].includes('resources/')"
-                :class="{ truncate: shouldTruncate(item[header.value]) }"
+                :class="{ truncate: shouldTruncate(getLabelFromKey(item[header.value])) }"
               >
                 <a @click.stop="openResource(item[header.value])"> {{ getLabelFromKey(item[header.value]) }}</a>
               </div>
