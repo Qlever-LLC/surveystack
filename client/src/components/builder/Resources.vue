@@ -26,6 +26,9 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <v-alert v-if="openResourceError" type="warning" dismissible>
+      {{ openResourceError }}
+    </v-alert>
     <div class="d-flex justify-end">
       <v-menu offset-y left>
         <template v-slot:activator="{ on }">
@@ -125,6 +128,7 @@ export default {
       selectedId: null,
       uploadingResource: false,
       downloadingResource: false,
+      openResourceError: false,
     };
   },
   methods: {
@@ -166,8 +170,13 @@ export default {
         this.openOntologyEditor(resource.id);
       } else {
         this.downloadingResource = true;
-        await openResourceInTab(resource.id);
-        this.downloadingResource = false;
+        try {
+          await openResourceInTab(resource.id);
+        } catch (error) {
+          this.openResourceError = 'File could not be opened';
+        } finally {
+          this.downloadingResource = false;
+        }
       }
     },
     async removeRemoteResource(resource) {

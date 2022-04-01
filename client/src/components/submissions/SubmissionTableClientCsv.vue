@@ -154,6 +154,9 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <v-alert v-if="openResourceError" type="warning" dismissible>
+      {{ openResourceError }}
+    </v-alert>
   </v-card>
 </template>
 <script>
@@ -223,6 +226,7 @@ export default {
       headers: [],
       modalLeftPosition: null,
       downloadingResource: false,
+      openResourceError: false,
     };
   },
   computed: {
@@ -320,8 +324,13 @@ export default {
       this.downloadingResource = true;
       let resourceKeyParts = value.split('/');
       let resourceId = resourceKeyParts[resourceKeyParts.length - 2]; //resourceId is second last part of key
-      await openResourceInTab(resourceId);
-      this.downloadingResource = false;
+      try {
+        await openResourceInTab(resourceId);
+      } catch (error) {
+        this.openResourceError = 'File could not be opened';
+      } finally {
+        this.downloadingResource = false;
+      }
     },
   },
   async created() {
