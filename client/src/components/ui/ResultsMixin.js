@@ -31,11 +31,20 @@ export default {
           console.log('parsing error', farmos);
 
           if (farmos.status === 'error') {
-            this.resultItems.push({
-              title: 'Error submitting to FarmOS',
-              body: `${farmos.error.message}: ${farmos.error.config.data}`,
-              error: true,
-            });
+            if (farmos.error.isBoom === true) {
+              this.resultItems.push({
+                title: 'Error submitting to FarmOS',
+                body: `${farmos.error.output.payload.error}: ${farmos.error.output.payload.message}`,
+                error: true,
+              });
+            } else {
+              this.resultItems.push({
+                title: 'Error submitting to FarmOS',
+                body: `${farmos.error.message}: ${farmos.error.config.data}`,
+                error: true,
+              });
+            }
+
             hasErrors = true;
           } else {
             this.resultItems.push({

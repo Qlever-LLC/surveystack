@@ -166,6 +166,7 @@ describe('test-aggregator-integration', () => {
     };
 
     await createLog(TEST_FARM, 'activity', log);
+
     const { data: logs } = await getLogs(TEST_FARM, 'activity');
     let ids = logs.data.map((l) => l.id);
 

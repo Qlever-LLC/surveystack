@@ -18,46 +18,79 @@ const config = () => {
   return aggregator(process.env.FARMOS_AGGREGATOR_URL, process.env.FARMOS_AGGREGATOR_APIKEY);
 };
 
-function allowed(farmUrl, user) {
-  return hasPermission(user, farmUrl);
+function allowed(instanceName, user) {
+  const url = instanceName;
+  if (typeof url != 'string') {
+    throw boom.badData(`url is not a string: ${url}`);
+  }
+
+  return hasPermission(user, url);
 }
 
 async function flushlogs(instanceName, user, id) {
   /**
    * TODO Group Admins should have access
    */
+
+  const url = instanceName;
+  if (typeof url != 'string') {
+    throw boom.badData(`url is not a string: ${url}`);
+  }
+
   if (!allowed(instanceName, user)) {
     throw boom.unauthorized('No Access to farm');
   }
 
   const { deleteAllWithData } = config();
 
+  console.log('deleting data', instanceName, id);
   const res = await deleteAllWithData(instanceName, id);
-  return res;
+  console.log('done');
+  return [res];
 }
 
-async function fetchTerms(farmUrl, credentials, user) {
-  if (!allowed(farmUrl, user)) {
+async function fetchTerms(instanceName, credentials, user) {
+  const url = instanceName;
+  if (typeof url != 'string') {
+    throw boom.badData(`url is not a string: ${url}`);
+  }
+
+  if (!allowed(instanceName, user)) {
     throw boom.unauthorized('No Access to farm');
   }
 
   // TODO fetch terms
 }
 
-async function execute(apiCompose, info, terms, user, submission) {
+async function execute(aggregator, apiCompose, info, terms, user, submission) {
   console.log('executing apiCompose', apiCompose);
 
   const url = apiCompose.url;
-  const type = apiCompose.farmosType;
+  if (typeof url != 'string') {
+    throw boom.badData(`url is not a string: ${url}`);
+  }
 
   if (!allowed(url, user)) {
     throw boom.unauthorized(`User has no access to farm: ${url}`);
   }
 
+  if (!apiCompose.entity || !apiCompose.entity.type) {
+    throw boom.badData('apiCompose: missing entity or entity.type');
+  }
+
+  const [endpoint, bundle] = apiCompose.entity.type.split('--');
+
+  if (!endpoint || !bundle) {
+    throw boom.badData('apiCompose.entity.type should be in the form endpoint--bundle');
+  }
+
   // TODO
   // create log / assets / profile ....
 
-  return [];
+  const payload = { data: apiCompose.entity };
+  payload.data.attributes.data = submission._id;
+
+  return await aggregator.create(url, endpoint, bundle, payload);
 }
 
 export const handle = async ({ submission, survey, user }) => {
@@ -83,7 +116,6 @@ export const handle = async ({ submission, survey, user }) => {
       return;
     }
 
-    console.log('apiCompose', field.meta);
     if (!field.meta.apiCompose) {
       return;
     }
@@ -114,9 +146,11 @@ export const handle = async ({ submission, survey, user }) => {
 
   // TODO adapt to farmos 2.0
 
+  const aggregator = config();
+
   const runSingle = async (apiCompose, info, terms) => {
     try {
-      const r = await execute(apiCompose, info, terms, user, submission);
+      const r = await execute(aggregator, apiCompose, info, terms, user, submission);
 
       if (Array.isArray(r)) {
         results.push(...r);
@@ -128,7 +162,7 @@ export const handle = async ({ submission, survey, user }) => {
         return [r];
       }
     } catch (error) {
-      console.log('error in run single', error.message);
+      console.log('error in run single', error);
       results.push({
         status: 'error',
         error,
@@ -137,14 +171,13 @@ export const handle = async ({ submission, survey, user }) => {
     }
   };
 
-  // distinct aggregator map
-
-  const aggregators = new Map();
-
   // TODO find for each instance relevant farm information
 
   const farmUrlMap = {};
   farmOsCompose.forEach((c) => {
+    if (typeof c.url !== 'string') {
+      throw boom.badData(`url is not a string: ${c.url}`);
+    }
     const items = farmUrlMap[c.url];
     farmUrlMap[c.url] = items === undefined ? 1 : items + 1;
   });

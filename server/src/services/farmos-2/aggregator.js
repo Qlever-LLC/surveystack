@@ -17,6 +17,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     headers: {
       accept: 'application/json',
       'api-key': aggregatorKey,
+      'Content-Type': 'application/json',
     },
     httpsAgent: agent,
   };
@@ -78,6 +79,18 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     return r;
   };
 
+  const create = async (farmurl, endpoint, bundle, entity) => {
+    const r = await axios.post(
+      `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/api/${endpoint}/${bundle}`,
+      entity,
+      {
+        ...opts,
+      }
+    );
+
+    return r;
+  };
+
   const subrequest = async (farmurl, req) => {
     const r = await axios.post(
       `${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/subrequests?`,
@@ -108,7 +121,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
   const deleteAllWithData = async (farmurl, data) => {
     const assetBundles = ['plant', 'land', 'structure'];
 
-    const logBundles = ['activity', 'input', 'observation', 'seeding', 'transplanting'];
+    const logBundles = ['activity', 'input', 'observation', 'seeding'];
 
     const assetSubRequestUrls = assetBundles.map(
       (bundle) => `api/asset/${bundle}?fields[asset--${bundle}]=id&filter[data][value]=${data}`
@@ -134,6 +147,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
 
     // console.log('data', r.data);
     const items = [];
+    console.log('response', r.data);
     for (const k of Object.keys(r.data)) {
       const res = JSON.parse(r.data[k].body);
       // console.log('parsed', res);
@@ -155,6 +169,10 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
         'Content-Type': 'application/vnd.api+json',
       },
     }));
+
+    if (deleteBody.length == 0) {
+      return {};
+    }
 
     await axios.post(`${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`, deleteBody, {
       ...opts,
@@ -187,6 +205,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     getLogs,
     createLog,
     createAsset,
+    create,
     subrequest,
     deleteAllWithData,
     getFarmsWithTag,
