@@ -4,134 +4,36 @@ import axios from 'axios';
 import https from 'https';
 
 import * as utils from '../helpers/surveys';
-import { asset } from './farmos/planting';
-import { log } from './farmos/log';
-import { area } from './farmos/area';
-import { aggregatorRequest } from './farmos/request';
-import { farminfo } from './farmos/farminfo';
 
+import { hasPermission } from './farmos-2/apiCompose';
+import { aggregator } from './farmos-2/aggregator';
 import { db } from '../db';
 
-/*
-const credentials = [
-  {
-    name: 'farmOS Test',
-    url: 'test.farmos.net',
-    aggregatorURL: 'oursci.farmos.group',
-    aggregatorApiKey: process.env.FARMOS_AGGREGATOR_APIKEY,
-  },
-  {
-    name: 'Our Sci Test	',
-    url: 'ourscitest.farmos.net',
-    aggregatorURL: 'oursci.farmos.group',
-    aggregatorApiKey: process.env.FARMOS_AGGREGATOR_APIKEY,
-  },
-];
-*/
-
-export const getCredentials = async (user) => {
-  if (!user) {
-    throw boom.unauthorized(`You are not logged in.`);
+const config = () => {
+  if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
+    console.log('env not set');
+    return;
   }
 
-  const filter = { type: 'farmos-farm' };
-
-  const memberships = await db
-    .collection('memberships')
-    .find({ user: user._id })
-    .project({ _id: 1 })
-    .toArray();
-
-  filter.membership = { $in: memberships.map((m) => m._id) };
-
-  const entities = await db
-    .collection('integrations.memberships')
-    .aggregate([
-      { $match: filter },
-      {
-        $lookup: {
-          from: 'integrations.groups',
-          localField: 'data.aggregator',
-          foreignField: '_id',
-          as: 'aggregatorDetails',
-        },
-      },
-      {
-        $unwind: '$aggregatorDetails',
-      },
-      {
-        $project: {
-          name: '$name',
-          url: '$data.url',
-          aggregatorURL: '$aggregatorDetails.data.url',
-          aggregatorApiKey: '$aggregatorDetails.data.apiKey',
-          farmId: '$data.farm',
-        },
-      },
-    ])
-    .toArray();
-  return entities;
+  return aggregator(process.env.FARMOS_AGGREGATOR_URL, process.env.FARMOS_AGGREGATOR_APIKEY);
 };
 
 function allowed(farmUrl, user) {
-  // TODO: has user access to farm URL in one of the Aggregators?
-  // TODO: also figure out aggregator
-  return true;
+  return hasPermission(user, farmUrl);
 }
 
-async function flushlogs(farmUrl, credentials, user, id) {
-  if (!allowed(farmUrl, user)) {
+async function flushlogs(instanceName, user, id) {
+  /**
+   * TODO Group Admins should have access
+   */
+  if (!allowed(instanceName, user)) {
     throw boom.unauthorized('No Access to farm');
   }
 
-  const cred = credentials.find((c) => c.url === farmUrl);
-  if (!cred) {
-    return [];
-  }
+  const { deleteAllWithData } = config();
 
-  const results = [];
-  const logs = await aggregatorRequest(
-    cred.aggregatorURL,
-    cred.aggregatorApiKey,
-    farmUrl,
-    'logs',
-    'get',
-    undefined,
-    id
-  );
-
-  console.log('res from logs operation', logs);
-
-  if (logs.length === 0) {
-    return results;
-  }
-
-  console.log('logs response', logs);
-
-  const query = logs.map((l) => `id=${l.id}`).join('&');
-
-  console.log('query string: ' + query);
-
-  const r = await aggregatorRequest(
-    cred.aggregatorURL,
-    cred.aggregatorApiKey,
-    farmUrl,
-    'logs',
-    'delete',
-    undefined,
-    undefined,
-    undefined,
-    query
-  );
-
-  console.log('res[0] from delete operation', JSON.stringify(r));
-
-  // response format
-  // [{"1406":[]}]
-
-  // TODO how to catch errors here?
-  // results.push(r);
-  return results;
+  const res = await deleteAllWithData(instanceName, id);
+  return res;
 }
 
 async function fetchTerms(farmUrl, credentials, user) {
@@ -139,21 +41,10 @@ async function fetchTerms(farmUrl, credentials, user) {
     throw boom.unauthorized('No Access to farm');
   }
 
-  const cred = credentials.find((c) => c.url === farmUrl);
-  if (!cred) {
-    return;
-  }
-
-  return await aggregatorRequest(
-    cred.aggregatorURL,
-    cred.aggregatorApiKey,
-    farmUrl,
-    'terms',
-    'get'
-  );
+  // TODO fetch terms
 }
 
-async function execute(apiCompose, info, terms, user, submission, currentAssetId, currentAreaId) {
+async function execute(apiCompose, info, terms, user, submission) {
   const url = apiCompose.url;
   const type = apiCompose.farmosType;
 
@@ -161,30 +52,10 @@ async function execute(apiCompose, info, terms, user, submission, currentAssetId
     throw boom.unauthorized(`User has no access to farm: ${url}`);
   }
 
-  const credentials = await getCredentials(user);
+  // TODO
+  // create log / assets / profile ....
 
-  if (type === 'asset') {
-    console.log('running farmos asset');
-    return await asset(apiCompose, info, terms, user, credentials, submission, currentAreaId);
-  } else if (type === 'area') {
-    console.log('running farmos area');
-    return await area(apiCompose, info, terms, user, credentials, submission);
-  } else if (type === 'log') {
-    console.log('running farmos log');
-    return await log(
-      apiCompose,
-      info,
-      terms,
-      user,
-      credentials,
-      submission,
-      currentAssetId,
-      currentAreaId
-    );
-    // TODO create log
-    // TODO check all terms, create if not existing
-    // TODO replace terms in body
-  }
+  return [];
 }
 
 export const handle = async ({ submission, survey, user }) => {
@@ -230,24 +101,17 @@ export const handle = async ({ submission, survey, user }) => {
     farmOsCompose.push(...compose);
   });
 
-  console.log('farmOsCompose', farmOsCompose);
   if (farmOsCompose.length === 0) {
     return [];
   }
 
   const results = [];
 
-  const runSingle = async (apiCompose, info, terms, currentAssetId, currentAreaId) => {
+  // TODO adapt to farmos 2.0
+
+  const runSingle = async (apiCompose, info, terms) => {
     try {
-      const r = await execute(
-        apiCompose,
-        info,
-        terms,
-        user,
-        submission,
-        currentAssetId,
-        currentAreaId
-      );
+      const r = await execute(apiCompose, info, terms, user, submission);
 
       if (Array.isArray(r)) {
         results.push(...r);
@@ -269,70 +133,28 @@ export const handle = async ({ submission, survey, user }) => {
   };
 
   // distinct aggregator map
+
   const aggregators = new Map();
-  const credentials = await getCredentials(user);
 
-  credentials.forEach((credential) => {
-    aggregators.set(credential.aggregatorURL, credential.aggregatorApiKey);
-  });
-
-  let info = [];
-  try {
-    // FML: note that one can not use forEach with await
-    for (const [url, apiKey] of aggregators.entries()) {
-      const { data } = await farminfo(url, apiKey);
-      info.push(...data);
-    }
-  } catch (error) {
-    console.log('error fetching farm info from aggregator');
-    throw error;
-  }
-
-  console.log('compose', farmOsCompose);
+  // TODO find for each instance relevant farm information
 
   const farmUrlMap = {};
   farmOsCompose.forEach((c) => {
     const items = farmUrlMap[c.url];
     farmUrlMap[c.url] = items === undefined ? 1 : items + 1;
   });
+
   for (const farmUrl of Object.keys(farmUrlMap)) {
-    const res = await flushlogs(farmUrl, credentials, user, submission._id);
+    const res = await flushlogs(farmUrl, user, submission._id);
     if (res.length > 0) {
       results.push(res);
     }
   }
-
-  // TODO, for all farms flush logs with data == submissionId
-  // flushlogs()
-
-  let currentAssetId = null;
-  let currentAreaId = null;
   for (const compose of farmOsCompose) {
-    const r = await runSingle(
-      compose,
-      info.find((farm) => farm.url === compose.url),
-      {},
-      currentAssetId,
-      currentAreaId
-    );
+    const info = {};
+    const terms = {};
 
-    if (r) {
-      r.forEach((item) => {
-        if (!item) {
-          return;
-        }
-
-        if (item.resource === 'farm_asset') {
-          console.log('using asset id', item.id);
-          currentAssetId = item.id;
-        }
-
-        if (compose.farmosType === 'area') {
-          console.log('using area id', item.id);
-          currentAreaId = item.id;
-        }
-      });
-    }
+    const r = await runSingle(compose, info, terms);
   }
 
   console.log('results', results);
@@ -349,7 +171,7 @@ const testAggregatorConnection = async (url, apiKey) => {
 
   const agent = new https.Agent(agentOptions);
 
-  const r = await axios.get(`https://${url}/api/v1/farms/`, {
+  const r = await axios.get(`https://${url}/api/v2/farms/`, {
     headers: {
       accept: 'application/json',
       'api-key': apiKey,
@@ -402,4 +224,4 @@ const isFarmosUrlAvailable = async (url, apiKey) => {
   }
 };
 
-export default { isFarmosUrlAvailable, handle, getCredentials, testAggregatorConnection };
+export default { isFarmosUrlAvailable, handle, testAggregatorConnection };

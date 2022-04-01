@@ -52,7 +52,7 @@ const base = (type) => ({
     async fetchAreas() {
       this.loading = true;
       try {
-        const response = await api.get('farmos/fields?bundle=land');
+        const response = await api.get('farmos/assets?bundle=land');
 
         this.farms = response.data.assets.map((f) => ({
           label: `<span class="blue-chip mr-4">${f.instanceName}</span> ${f.name} `,
@@ -72,9 +72,9 @@ const base = (type) => ({
     async fetchAssets() {
       this.loading = true;
       try {
-        const { data: location } = await api.get('farmos/fields?bundle=land');
+        const { data: location } = await api.get('farmos/assets?bundle=land');
 
-        const response = await api.get('farmos/fields?bundle=plant');
+        const response = await api.get('farmos/assets?bundle=plant');
 
         console.log('res', response.data);
         this.assets = response.data.assets.map((f) => ({

@@ -231,8 +231,7 @@ router.get('/roles', catchErrors(rolesController.getRoles));
 
 /** farmos */
 router.get('/farmos/farms', catchErrors(farmos2Controller.getFarmOSInstances));
-router.get('/farmos/fields', catchErrors(farmos2Controller.getAssets));
-router.get('/farmos/assets', catchErrors(farmosController.getAssets));
+router.get('/farmos/assets', catchErrors(farmos2Controller.getAssets));
 router.get(
   '/farmos/integrations/:id/farms',
   [assertAuthenticated],

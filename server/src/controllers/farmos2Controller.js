@@ -87,6 +87,7 @@ export const getAssets = async (req, res) => {
   const { bundle } = req.query;
 
   if (!bundle || !isString(bundle)) {
+    console.log('bundle', bundle);
     throw boom.badData("argument 'bundle' not valid");
   }
 
