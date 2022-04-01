@@ -171,7 +171,7 @@ export default {
     async submitSubmission({ payload }) {
       this.submitting = true;
       try {
-        await uploadFileResources(payload, false);
+        await uploadFileResources(this.$store, payload, false);
         const submission = {
           ...payload,
           meta: {

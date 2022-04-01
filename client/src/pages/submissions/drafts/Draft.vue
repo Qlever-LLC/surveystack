@@ -123,7 +123,7 @@ export default {
 
       let message;
       try {
-        await uploadFileResources(payload, true);
+        await uploadFileResources(this.$store, payload, true);
         const response = payload.meta.dateSubmitted
           ? await api.put(`/submissions/${payload._id}`, payload)
           : await api.post('/submissions', payload);

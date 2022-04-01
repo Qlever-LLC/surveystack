@@ -325,7 +325,7 @@ export default {
       let resourceKeyParts = value.split('/');
       let resourceId = resourceKeyParts[resourceKeyParts.length - 2]; //resourceId is second last part of key
       try {
-        await openResourceInTab(resourceId);
+        await openResourceInTab(this.$store, resourceId);
       } catch (error) {
         this.openResourceError = 'File could not be opened';
       } finally {

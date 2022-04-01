@@ -2,7 +2,6 @@ import ObjectId from 'bson-objectid';
 import slugify from '@/utils/slugify';
 import api from '@/services/api.service';
 import axios from 'axios';
-import store from '../store';
 
 export const resourceTypes = {
   ONTOLOGY_LIST: 'ONTOLOGY_LIST',
@@ -79,7 +78,7 @@ export function getLabelFromKey(resourcKey) {
   return resourcKey.substring(resourcKey.lastIndexOf('/') + 1);
 }
 
-export async function openResourceInTab(resourceId) {
+export async function openResourceInTab(store, resourceId) {
   let resource = await store.dispatch('resources/fetchResource', resourceId);
   let url = window.URL.createObjectURL(resource.fileData);
   const element = document.createElement('a');
@@ -104,7 +103,7 @@ export function getPublicDownloadUrl(resourceKey) {
   return s3BaseUrl + resourceKey;
 }
 
-export async function uploadFileResource(resourceKey, clearCacheAfterUpload) {
+export async function uploadFileResource(store, resourceKey, clearCacheAfterUpload) {
   // load resource from local store
   const resource = store.getters['resources/getResourceByKey'](resourceKey);
   if (!resource || resource.state === 'committed') {
@@ -137,13 +136,13 @@ export async function uploadFileResource(resourceKey, clearCacheAfterUpload) {
   }
 }
 
-export async function uploadFileResources(submission, clearCacheAfterUpload) {
+export async function uploadFileResources(store, submission, clearCacheAfterUpload) {
   try {
     let controls = Object.values(submission.data);
     for (let control of controls) {
       if (control.value && (control.meta.type === 'file' || control.meta.type === 'image')) {
         const unresolvedPromises = control.value.map((resourceKey) =>
-          uploadFileResource(resourceKey, clearCacheAfterUpload)
+          uploadFileResource(store, resourceKey, clearCacheAfterUpload)
         );
         await Promise.all(unresolvedPromises);
       }

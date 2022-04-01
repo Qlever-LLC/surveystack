@@ -171,7 +171,7 @@ export default {
       } else {
         this.downloadingResource = true;
         try {
-          await openResourceInTab(resource.id);
+          await openResourceInTab(this.$store, resource.id);
         } catch (error) {
           this.openResourceError = 'File could not be opened';
         } finally {

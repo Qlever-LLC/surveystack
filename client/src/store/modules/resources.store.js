@@ -42,7 +42,7 @@ const actions = {
   async addRemoteResource({ commit, dispatch }, file) {
     try {
       let resource = await dispatch('addLocalResource', file);
-      await uploadFileResource(resource.key, false);
+      await uploadFileResource(this, resource.key, false);
       await dispatch('fetchResource', resource._id);
       return resource._id;
     } catch (error) {

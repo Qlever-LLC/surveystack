@@ -1,19 +1,19 @@
-//import resourcesStore from './resources.store';
+import resourcesStore from './resources.store';
 //import resourcesStore from '@/store/modules/resources.store';
 //import draftStore from './draft.store';
 
-//const { actions } = resourcesStore;
+const { actions } = resourcesStore;
 
 describe('resources store', () => {
   describe('actions', () => {
     describe('initFromIndexedDB', () => {
-      it('does not throw', () => {
-        /*const call = jest.fn();
+      it.todo('does not throw');
+      /*it('does not throw', () => {
+        const call = jest.fn();
         const dispatch = call.bind(null, 'dispatch');
         const commit = call.bind(null, 'commit');
-        expect(actions.initFromIndexedDB({ dispatch, commit })).toThrowError();*/
-        expect(true).toBeTruthy();
-      });
+        expect(actions.initFromIndexedDB({ dispatch, commit })).toThrowError();
+      });*/
       it.todo('loads the content from idb to the state');
     });
     describe('addRemoteResource', () => {
