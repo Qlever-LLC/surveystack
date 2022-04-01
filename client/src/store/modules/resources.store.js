@@ -40,27 +40,37 @@ const actions = {
   },
   // eslint-disable-next-line no-unused-vars
   async addRemoteResource({ commit, dispatch }, file) {
-    let resource = await dispatch('addLocalResource', file);
-    await uploadFileResource(resource.key, false);
-    await dispatch('fetchResource', resource._id);
-    return resource._id;
+    try {
+      let resource = await dispatch('addLocalResource', file);
+      await uploadFileResource(resource.key, false);
+      await dispatch('fetchResource', resource._id);
+      return resource._id;
+    } catch (error) {
+      dispatch('feedback/add', error, { root: true });
+      throw error;
+    }
   },
-  async addLocalResource({ commit }, file) {
-    //only add resource locally, do not upload resource or file data yet
-    const resourceId = new ObjectId().toString();
-    const resource = {
-      _id: resourceId,
-      state: 'local',
-      label: file.name,
-      name: slugify(file.name),
-      key: 'resources/' + resourceId + '/' + file.name, // define s3 file key containing unique uuid to prevent filename collision, allowed characters see https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
-      contentLength: file.size,
-      contentType: file.type,
-      fileData: file,
-    };
-    db.persistResource(resource);
-    commit('ADD_RESOURCE', resource);
-    return resource;
+  async addLocalResource({ commit, dispatch }, file) {
+    try {
+      //only add resource locally, do not upload resource or file data yet
+      const resourceId = new ObjectId().toString();
+      const resource = {
+        _id: resourceId,
+        state: 'local',
+        label: file.name,
+        name: slugify(file.name),
+        key: 'resources/' + resourceId + '/' + file.name, // define s3 file key containing unique uuid to prevent filename collision, allowed characters see https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
+        contentLength: file.size,
+        contentType: file.type,
+        fileData: file,
+      };
+      db.persistResource(resource);
+      commit('ADD_RESOURCE', resource);
+      return resource;
+    } catch (error) {
+      dispatch('feedback/add', error, { root: true });
+      throw error;
+    }
   },
   async updateResourceLabel({ commit, getters, dispatch }, { resourceKey, labelNew }) {
     try {

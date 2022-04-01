@@ -116,31 +116,41 @@ export async function uploadFileResource(resourceKey, clearCacheAfterUpload) {
   delete resourceClone.fileData;
   // send resource to server, get upload-url
   let uploadResponse = await api.post('/resources/upload-url', resourceClone);
-  // upload file to url
-  await axios.create().put(uploadResponse.data.signedUrl, resource.fileData);
-  //set resource to committed
-  await api.put(`/resources/commit/${resource._id}`, { dummy: '' });
 
-  if (clearCacheAfterUpload) {
-    await store.dispatch('resources/removeLocalResource', resource.key);
-  } else {
-    await store.dispatch('resources/updateResourceState', {
-      resourceKey: resource.key,
-      stateNew: 'committed',
-    });
+  try {
+    // upload file to url
+    await axios.create().put(uploadResponse.data.signedUrl, resource.fileData);
+    //set resource to committed
+    await api.put(`/resources/commit/${resource._id}`, { dummy: '' });
+    if (clearCacheAfterUpload) {
+      await store.dispatch('resources/removeLocalResource', resource.key);
+    } else {
+      await store.dispatch('resources/updateResourceState', {
+        resourceKey: resource.key,
+        stateNew: 'committed',
+      });
+    }
+  } catch (error) {
+    //delete file resource
+    await deleteFileResource(resource._id);
+    throw error;
   }
 }
 
 export async function uploadFileResources(submission, clearCacheAfterUpload) {
-  let controls = Object.values(submission.data);
-
-  for (let control of controls) {
-    if (control.value && (control.meta.type === 'file' || control.meta.type === 'image')) {
-      const unresolvedPromises = control.value.map((resourceKey) =>
-        uploadFileResource(resourceKey, clearCacheAfterUpload)
-      );
-      await Promise.all(unresolvedPromises);
+  try {
+    let controls = Object.values(submission.data);
+    for (let control of controls) {
+      if (control.value && (control.meta.type === 'file' || control.meta.type === 'image')) {
+        const unresolvedPromises = control.value.map((resourceKey) =>
+          uploadFileResource(resourceKey, clearCacheAfterUpload)
+        );
+        await Promise.all(unresolvedPromises);
+      }
     }
+  } catch (error) {
+    await store.dispatch('feedback/add', error, { root: true });
+    throw error;
   }
 }
 
