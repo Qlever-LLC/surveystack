@@ -411,7 +411,7 @@ export function compileSandboxSingleLine(src) {
   const wrappedSource = `with (sandbox) { return ${src}}`;
   const code = new Function('sandbox', wrappedSource);
 
-  return function(sandbox) {
+  return function (sandbox) {
     const sandboxProxy = new Proxy(sandbox, { _has, _get });
     return code(sandboxProxy);
   };
@@ -419,11 +419,12 @@ export function compileSandboxSingleLine(src) {
 
 export function compileSandbox(src, fname) {
   const wrappedSource = `with (sandbox) { ${src}\nreturn ${fname}(arg1, arg2, arg3); }`;
-  const code = new Function('sandbox', wrappedSource);
+  let AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+  const code = new AsyncFunction('sandbox', wrappedSource);
 
-  return function(sandbox) {
+  return async function (sandbox) {
     const sandboxProxy = new Proxy(sandbox, { _has, _get });
-    return code(sandboxProxy);
+    return await code(sandboxProxy);
   };
 }
 
@@ -445,17 +446,19 @@ export const simplify = (submissionItem) => {
   return ret;
 };
 
-export function executeUnsafe({ code, fname, submission, survey, parent, log }) {
+export async function executeUnsafe({ code, fname, submission, survey, parent, log }) {
   console.log('execute unsafe called');
   const sandbox = compileSandbox(code, fname);
 
-  const res = sandbox({
+  const res = await sandbox({
     arg1: submission,
     arg2: survey,
     arg3: parent,
     log,
     ...supplySandbox,
   });
+
+  console.log('result of sandbox', res);
 
   return res;
 }

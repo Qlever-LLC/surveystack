@@ -45,6 +45,8 @@ async function fetchTerms(farmUrl, credentials, user) {
 }
 
 async function execute(apiCompose, info, terms, user, submission) {
+  console.log('executing apiCompose', apiCompose);
+
   const url = apiCompose.url;
   const type = apiCompose.farmosType;
 
@@ -60,6 +62,8 @@ async function execute(apiCompose, info, terms, user, submission) {
 
 export const handle = async ({ submission, survey, user }) => {
   const surveyVersion = submission.meta.survey.version;
+
+  console.log('submission', JSON.stringify(submission, null, 2));
 
   const { controls } = survey.revisions.find((revision) => revision.version === surveyVersion);
   const positions = utils.getControlPositions(controls);
@@ -79,6 +83,7 @@ export const handle = async ({ submission, survey, user }) => {
       return;
     }
 
+    console.log('apiCompose', field.meta);
     if (!field.meta.apiCompose) {
       return;
     }
