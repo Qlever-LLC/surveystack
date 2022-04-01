@@ -127,35 +127,44 @@ const actions = {
       throw Error(errorMessage);
     }
   },
-  async fetchResource({ commit, getters }, resourceId) {
-    let resource = getters['getResource'](resourceId);
-    if (!resource) {
-      // fetch resource
-      ({ data: resource } = await api.get(`/resources/${resourceId}`));
-      // get download url
-      const url = getPublicDownloadUrl(resource.key);
-      // download data
-      const { data: binaryResult } = await axios.get(url, {
-        responseType: 'arraybuffer',
-        validateStatus: false,
-      });
-      resource.fileData = new Blob([binaryResult], { type: resource.contentType });
-      db.persistResource(resource);
-      commit('ADD_RESOURCE', resource);
+  async fetchResource({ commit, getters, dispatch }, resourceId) {
+    try {
+      let resource = getters['getResource'](resourceId);
+      if (!resource) {
+        // fetch resource
+        ({ data: resource } = await api.get(`/resources/${resourceId}`));
+        // get download url
+        const url = getPublicDownloadUrl(resource.key);
+        // download data
+        const { data: binaryResult } = await axios.get(url, {
+          responseType: 'arraybuffer',
+          validateStatus: false,
+        });
+        resource.fileData = new Blob([binaryResult], { type: resource.contentType });
+        db.persistResource(resource);
+        commit('ADD_RESOURCE', resource);
+      }
+      return resource;
+    } catch (error) {
+      dispatch('feedback/add', error, { root: true });
+      throw error;
     }
-    return resource;
   },
   async fetchResources({ commit, dispatch }, resources) {
-    let promises = [];
-    for (const r of resources) {
-      if (r.location === resourceLocations.REMOTE) {
-        promises.push(dispatch('resources/fetchResource', r._id));
+    try {
+      let promises = [];
+      for (const r of resources) {
+        if (r.location === resourceLocations.REMOTE) {
+          promises.push(dispatch('resources/fetchResource', r._id));
+        }
       }
+      await Promise.all(promises);
+    } catch (error) {
+      dispatch('feedback/add', error, { root: true });
+      throw error;
     }
-    await Promise.all(promises);
   },
 };
-
 const mutations = {
   RESET(state) {
     Object.assign(state, createInitialState());
