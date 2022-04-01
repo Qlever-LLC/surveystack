@@ -81,13 +81,18 @@ const actions = {
       throw error;
     }
   },
-  async updateResourceState({ commit, getters }, { resourceKey, stateNew }) {
-    let resource = getters['getResourceByKey'](resourceKey);
-    if (resource) {
-      resource.state = stateNew;
-      db.persistResource(resource);
-      commit('REMOVE_RESOURCE', resource._id);
-      commit('ADD_RESOURCE', resource);
+  async updateResourceState({ commit, getters, dispatch }, { resourceKey, stateNew }) {
+    try {
+      let resource = getters['getResourceByKey'](resourceKey);
+      if (resource) {
+        resource.state = stateNew;
+        db.persistResource(resource);
+        commit('REMOVE_RESOURCE', resource._id);
+        commit('ADD_RESOURCE', resource);
+      }
+    } catch (error) {
+      dispatch('feedback/add', error, { root: true });
+      throw error;
     }
   },
   async removeLocalResource({ commit, getters, dispatch }, resourceKey) {
