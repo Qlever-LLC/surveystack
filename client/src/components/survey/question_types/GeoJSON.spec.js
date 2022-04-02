@@ -6,6 +6,7 @@ import GeoJSON, { addBaseLayer, getNextValue, addDrawingLayer } from './GeoJSON.
 
 import ControlProperties from '../../builder/ControlProperties.vue';
 import { createControlInstance } from '../../../utils/surveyConfig';
+import router from '@/router';
 
 const cssFile = fs.readFileSync(path.resolve(__dirname, './GeoJSON.css'), 'utf8');
 
@@ -175,6 +176,7 @@ describe('GeoJSON Question', () => {
           value: null,
           index: 'data.geojson_1',
         },
+        router: router,
       };
 
       ({ getByTitle, getByText, getByRole, container, updateProps } = renderWithVuetify(GeoJSON, renderOptions));
@@ -233,6 +235,7 @@ describe('GeoJSON Question', () => {
           value: null,
           index: 'data.geojson_1',
         },
+        router: router,
       };
 
       const { getByTitle, getByText, getByRole, getByPlaceholderText, container, updateProps } = renderWithVuetify(
@@ -254,6 +257,7 @@ describe('GeoJSON Question', () => {
           value: mockFeatureCollection(),
           index: 'data.geojson_1',
         },
+        router: router,
       };
 
       const { getByTitle, getByText, getByRole, getByPlaceholderText, container, updateProps } = renderWithVuetify(
@@ -328,6 +332,7 @@ describe('GeoJSON Question', () => {
           index: 'data.geojson_1',
           survey: mockSurvey(),
         },
+        router: router,
       };
       const { getByText } = renderWithVuetify(ControlProperties, renderOptions);
       getByText('Show polygon control');
@@ -346,6 +351,7 @@ describe('GeoJSON Question', () => {
           index: 'data.geojson_1',
           survey: mockSurvey(),
         },
+        router: router,
       };
       const { getByText } = renderWithVuetify(ControlProperties, renderOptions);
       const polygonControl = getByText('Show polygon control');

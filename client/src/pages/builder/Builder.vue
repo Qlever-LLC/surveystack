@@ -64,8 +64,8 @@
   </div>
   <div
     v-else
-    class="d-flex justify-center align-center overlay-bg "
-    style="background: rgba(0, 0, 0, 0.45); height: 100%;"
+    class="d-flex justify-center align-center overlay-bg"
+    style="background: rgba(0, 0, 0, 0.45); height: 100%"
   >
     <v-card max-width="500">
       <v-card-title>
@@ -93,6 +93,7 @@ import resultMixin from '@/components/ui/ResultsMixin';
 
 import { createSurvey, updateControls } from '@/utils/surveys';
 import { isIos, isSafari } from '@/utils/compatibility';
+import { uploadFileResources } from '@/utils/resources';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
@@ -169,18 +170,17 @@ export default {
     },
     async submitSubmission({ payload }) {
       this.submitting = true;
-      const submission = {
-        ...payload,
-        meta: {
-          ...payload.meta,
-          archived: true,
-          archivedReason: 'SUBMISSION_FROM_BUILDER',
-        },
-      };
       try {
-        console.log('submitting', submission);
+        await uploadFileResources(this.$store, payload, false);
+        const submission = {
+          ...payload,
+          meta: {
+            ...payload.meta,
+            archived: true,
+            archivedReason: 'SUBMISSION_FROM_BUILDER',
+          },
+        };
         const response = await api.post('/submissions', submission);
-        // this.$router.push(`/surveys/${this.survey._id}`);
         try {
           this.result({ response });
         } catch (error) {

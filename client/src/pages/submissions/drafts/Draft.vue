@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 100%; max-height: 100%;">
+  <div style="height: 100%; max-height: 100%">
     <app-draft-component
       v-if="!loading && !hasError"
       :survey="survey"
@@ -10,9 +10,7 @@
     <div v-else-if="loading && !hasError" class="d-flex align-center justify-center" style="height: 100%">
       <v-progress-circular :size="50" color="primary" indeterminate />
     </div>
-    <div v-else-if="hasError" class="text-center mt-8">
-      Error Loading Draft Submission or Survey
-    </div>
+    <div v-else-if="hasError" class="text-center mt-8">Error Loading Draft Submission or Survey</div>
 
     <confirm-leave-dialog ref="confirmLeaveDialog" title="Confirm Exit Draft" v-if="submission && survey">
       Are you sure you want to exit this draft?
@@ -64,6 +62,7 @@ import resultDialog from '@/components/ui/ResultDialog.vue';
 import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
 import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
+import { uploadFileResources } from '@/utils/resources';
 
 export default {
   mixins: [appMixin, resultMixin],
@@ -124,6 +123,7 @@ export default {
 
       let message;
       try {
+        await uploadFileResources(this.$store, payload, true);
         const response = payload.meta.dateSubmitted
           ? await api.put(`/submissions/${payload._id}`, payload)
           : await api.post('/submissions', payload);

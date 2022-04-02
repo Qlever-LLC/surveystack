@@ -2,7 +2,6 @@ import bucketService from '../services/bucket.service';
 import { db } from '../db';
 import { ObjectId } from 'mongodb';
 import assert from 'assert';
-import slugify from '../helpers/slugify';
 
 const col = 'resources';
 const LOCATION_S3 = 's3';
@@ -21,7 +20,7 @@ const getResource = async (req, res) => {
 
 const getDownloadURL = async (req, res) => {
   const { key } = req.body;
-  let downloadURL = await bucketService.getDownloadUrl(key);
+  let downloadURL = await bucketService.getSignedDownloadUrl(key);
   if (!downloadURL) {
     return res.status(500).send({
       message: `no url returned by bucket service`,
@@ -31,55 +30,42 @@ const getDownloadURL = async (req, res) => {
 };
 
 const getUploadURL = async (req, res) => {
-  const { resourceName, contentLength, contentType } = req.body;
-  // define s3 file key containing unique uuid to prevent filename collision, allowed characters see https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
-  let resourceId = new ObjectId();
-  let key = 'resources/' + resourceId + '/' + resourceName;
+  const resource = req.body;
+
+  // validate resource object param
+  if (!resource._id || !resource.key || !resource.contentType || !resource.contentLength) {
+    return res.status(500).send({ message: 'Incomplete message body supplied' });
+  }
+  if (resource.state === 'committed' || resource.state === 'pending') {
+    return res
+      .status(500)
+      .send({ message: 'Illegal resource state, must not be committed or pending' });
+  }
 
   try {
     // get signed upload url for a fixed contenttype and contentlength
-    let signedUrl = await bucketService.getUploadUrl(key, contentType, contentLength);
-    // add resource entry to our db
-    let r = await addResource(
-      resourceId,
-      LOCATION_S3,
-      key,
-      resourceName,
-      contentLength,
-      contentType,
-      res.locals.auth.user._id
+    let signedUrl = await bucketService.getUploadUrl(
+      resource.key,
+      resource.contentType,
+      resource.contentLength
     );
+    // add resource entry to our db
+    let r = await addResource(resource, res.locals.auth.user._id, LOCATION_S3);
     assert.equal(1, r.insertedCount);
-    return res.send({ signedUrl, resourceId });
+    return res.send({ signedUrl });
   } catch (error) {
     return res.status(500).send({ message: 'Ouch :/' });
   }
 };
 
-const addResource = async (
-  resourceId,
-  location,
-  key,
-  resourceName,
-  contentLength,
-  contentType,
-  userId
-) => {
-  //insert resource entry with state=pending
-  let resource = {
-    _id: resourceId,
-    name: slugify(resourceName),
-    label: resourceName,
-    state: 'pending',
-    location: location,
-    key: key,
-    contentLength: contentLength,
-    contentType: contentType,
-    meta: {
-      creator: new ObjectId(userId),
-      dateCreated: new Date(),
-      dateModified: null,
-    },
+const addResource = async (resource, userId, location) => {
+  resource._id = new ObjectId(resource._id);
+  resource.state = 'pending';
+  resource.location = location;
+  resource.meta = {
+    creator: new ObjectId(userId),
+    dateCreated: new Date(),
+    dateModified: null,
   };
   return await db.collection(col).insertOne(resource);
 };

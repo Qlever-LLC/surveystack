@@ -43,10 +43,11 @@ const fetchPinned = async (commit) => {
         const cached = fetched.find((f) => f._id == sid);
         if (!cached) {
           try {
-            const r = await actions.fetchSurvey({ commit }, sid);
-            fetched.push(r);
-            item.name = r.name;
-            item.meta = r.meta;
+            let s = await actions.fetchSurvey({ commit }, sid);
+            await this.$store.dispatch('resources/fetchResources', s.resources);
+            fetched.push(s);
+            item.name = s.name;
+            item.meta = s.meta;
           } catch (error) {
             continue;
           }

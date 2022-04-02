@@ -128,7 +128,13 @@
               @click.stop="showFullCell(item, header, $event)"
               :class="{ active: isModalOpen(getCellKey(header.value, item._id)) }"
             >
-              <div :class="{ truncate: shouldTruncate(item[header.value]) }">
+              <div
+                v-if="item[header.value].includes('resources/')"
+                :class="{ truncate: shouldTruncate(getLabelFromKey(item[header.value])) }"
+              >
+                <a @click.stop="openResource(item[header.value])"> {{ getLabelFromKey(item[header.value]) }}</a>
+              </div>
+              <div v-else :class="{ truncate: shouldTruncate(item[header.value]) }">
                 {{ item[header.value] }}
               </div>
               <submission-table-cell-modal
@@ -143,12 +149,24 @@
         </tbody>
       </template>
     </v-data-table>
+    <v-dialog :value="downloadingResource" hide-overlay persistent width="300" role="downloadingResourceProgressDialog">
+      <v-card>
+        <v-card-text class="pa-4">
+          <span>Downloading file resource</span>
+          <v-progress-linear indeterminate class="mb-0" />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <v-alert v-if="openResourceError" type="warning" dismissible>
+      {{ openResourceError }}
+    </v-alert>
   </v-card>
 </template>
 <script>
 import papa from 'papaparse';
 import csvService from '@/services/csv.service';
 import SubmissionTableCellModal from './SubmissionTableCellModal.vue';
+import { getLabelFromKey, openResourceInTab } from '@/utils/resources';
 
 export function transformHeaders(headers) {
   const replaceGeoJsonPath = (str) => str.replace(/(value\.features\.\d).*/, '$1');
@@ -210,6 +228,8 @@ export default {
       },
       headers: [],
       modalLeftPosition: null,
+      downloadingResource: false,
+      openResourceError: false,
     };
   },
   computed: {
@@ -237,6 +257,7 @@ export default {
     },
   },
   methods: {
+    getLabelFromKey,
     getCellKey,
     shouldTruncate(value) {
       return value.length > this.textTruncateLength;
@@ -301,6 +322,18 @@ export default {
       this.csv = csvService.createCsv(this.submissions.content, headers);
       this.parsed = papa.parse(this.csv, { header: true });
       this.createHeaders();
+    },
+    async openResource(value) {
+      this.downloadingResource = true;
+      let resourceKeyParts = value.split('/');
+      let resourceId = resourceKeyParts[resourceKeyParts.length - 2]; //resourceId is second last part of key
+      try {
+        await openResourceInTab(this.$store, resourceId);
+      } catch (error) {
+        this.openResourceError = 'File could not be opened';
+      } finally {
+        this.downloadingResource = false;
+      }
     },
   },
   async created() {

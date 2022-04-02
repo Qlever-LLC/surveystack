@@ -54,11 +54,15 @@ export async function getUploadUrl(key, contentType, contentLength) {
   });
 }
 
-export async function getDownloadUrl(key) {
+export async function getSignedDownloadUrl(key) {
   const command = new GetObjectCommand({ Bucket: AWS_S3_BUCKET_NAME, Key: key });
   return await getSignedUrl(s3Client, command, {
     expiresIn: 3600, //in seconds, eq 1 hour
   });
+}
+
+export function getPublicDownloadUrl(resourceKey) {
+  return 'https://' + AWS_S3_BUCKET_NAME + '.s3.amazonaws.com/' + resourceKey;
 }
 
 export async function deleteObject(key) {
@@ -69,6 +73,7 @@ export default {
   AWS_S3_ENDPOINT_OVERRIDE,
   AWS_S3_BUCKET_NAME,
   getUploadUrl,
-  getDownloadUrl,
+  getSignedDownloadUrl,
+  getPublicDownloadUrl,
   deleteObject,
 };
