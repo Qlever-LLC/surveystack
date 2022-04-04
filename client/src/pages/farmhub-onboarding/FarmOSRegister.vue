@@ -1,6 +1,17 @@
 <template>
-  <v-row>
+  <v-container>
     <v-form v-model="valid" ref="form" class="mt-8" @keydown.enter.prevent="submit">
+      <v-autocomplete
+        outlined
+        primary
+        label="Select Group"
+        v-model="selectedGroup"
+        v-if="!loading && !!groups"
+        item-text="name"
+        item-value="_id"
+        :items="groups"
+      ></v-autocomplete>
+
       <v-text-field
         v-model="instance.url"
         label="Instance URL"
@@ -12,9 +23,12 @@
         :rules="urlRules"
       >
         <template v-slot:append-outer>
-          <v-icon style="margin-top: -8px" v-if="!!urlState" :color="urlState === 'free' ? 'green' : 'red'" large>
-            {{ urlState === 'free' ? 'mdi-check' : 'mdi-alert-octagon' }}</v-icon
-          >
+          <v-icon
+            style="margin-top: -8px"
+            v-if="!!urlState"
+            :color="urlState === 'free' ? 'green' : 'red'"
+            large
+          >{{ urlState === 'free' ? 'mdi-check' : 'mdi-alert-octagon' }}</v-icon>
         </template>
       </v-text-field>
 
@@ -56,13 +70,6 @@
         <v-radio label="US" value="us"></v-radio>
       </v-radio-group>
 
-      <v-text-field
-        v-model="instance.aggregator.data.planName"
-        readonly
-        label="Name of Partner Plan to associate the instance with"
-        placeholder="Partner Plan"
-        disabled
-      />
       <v-autocomplete
         label="Members with Access to Farm"
         v-model="activeUsers"
@@ -82,7 +89,10 @@
             {{ item.name }}
             <v-chip color="grey--darken-2" dark>{{ item.email }}</v-chip>
           </div>
-          <div v-else><v-icon left>mdi-account-clock</v-icon> {{ item.email }}</div>
+          <div v-else>
+            <v-icon left>mdi-account-clock</v-icon>
+            {{ item.email }}
+          </div>
         </template>
         <template v-slot:prepend-item>
           <v-btn
@@ -106,7 +116,7 @@
 
       <v-divider class="my-4"></v-divider>
 
-      <app-field-list v-if="fields.length > 0" v-model="fields"> </app-field-list>
+      <app-field-list v-if="fields.length > 0" v-model="fields"></app-field-list>
 
       <v-btn class="mx-2" @click="importFields = true" v-if="!importFields">Add / Import Field</v-btn>
 
@@ -128,16 +138,14 @@
         @cancel="invite = false"
         @confirm="loadMembers"
         width="400"
-      >
-        To show new members in the dropdown, please press refresh.
-      </app-dialog>
+      >To show new members in the dropdown, please press refresh.</app-dialog>
 
       <v-checkbox
         :rules="agreeRules"
         v-model="instance.agree"
         label="Agree to Terms of Service and Privacy Policy of Farmos"
       >
-        <template v-slot:label> </template>
+        <template v-slot:label></template>
       </v-checkbox>
       <div class="text-left mb-4">
         Visit
@@ -156,10 +164,8 @@
       @cancel="successDialog = false"
       @confirm="successDialog = false"
       width="400"
-    >
-      {{ successMessage }}
-    </app-dialog>
-  </v-row>
+    >{{ successMessage }}</app-dialog>
+  </v-container>
 </template>
 
 <script>
@@ -168,30 +174,8 @@ import appDialog from '@/components/ui/Dialog.vue';
 import appFieldCreator from './FieldCreator.vue';
 import appFieldList from './FieldList.vue';
 
-const nameRule = (s) => !/[!"#$%()*+,\-./:;<=>?@[\\\]^_{|}~]/gi.test(`${s}`);
-const punctFree = (s) => !/[!"#$%&'()*+,\-./:;<=>?@[\\\]^_‘{|}~]/gi.test(`${s}`);
-const xesc = (input) => `${input}`.replace(/[!"#$%&'()*+,\-./:;<=>?@[\\\]^_‘{|}~]/gi, '');
-
-const remapGroupMembership = (m) => {
-  let username = m.meta.invitationEmail;
-  let userExists = false;
-  const email = m.meta.invitationEmail;
-  if (m.user && m.user.name) {
-    username = m.user.name;
-    userExists = true;
-    // eslint-disable-next-line prefer-destructuring
-    // email = m.user.email;
-  }
-  return {
-    id: m._id,
-    name: username,
-    userExists,
-    email,
-  };
-};
-
 export default {
-  props: ['instance', 'group'],
+  props: ['groups', 'loading'],
   components: {
     appDialog,
     appFieldCreator,
@@ -199,6 +183,17 @@ export default {
   },
   data() {
     return {
+      instance: {
+        url: '',
+        email: '',
+        registrant: '',
+        site_name: '',
+        location: '',
+        units: '',
+        timezone: '',
+        agree: false,
+      },
+      selectedGroup: null,
       fields: [],
       field: {
         wkt: '',
@@ -212,7 +207,6 @@ export default {
       members: [],
       urlState: null,
       checkingUrl: false,
-      loading: false,
       invite: false,
       urlRules: [() => this.urlState === 'free' || 'URL must be available'],
       emailRules: [
@@ -244,7 +238,6 @@ export default {
       };
 
       this.$refs['field-creator'].clear();
-      this.loading = false;
     },
     onInvite() {
       this.invite = true;
@@ -260,7 +253,6 @@ export default {
         units,
       } = this.instance;
 
-      const { group } = this;
       const aggregator = this.instance.aggregator._id;
       const apiKey = this.instance.aggregator.data.planKey;
       const plan = this.instance.aggregator.data.planName;
@@ -278,7 +270,7 @@ export default {
           agree: true,
           apiKey,
           aggregator,
-          group,
+          selectedGroup: this.selectedGroup,
           fields,
         });
 
@@ -303,8 +295,6 @@ export default {
       try {
         this.checkingUrl = true;
         const r = await api.post('/farmos/checkurl', {
-          plan: this.instance.aggregator.data.planName,
-          apiKey: this.instance.aggregator.data.planKey,
           url: this.instance.url,
         });
 
@@ -329,34 +319,23 @@ export default {
     },
     async loadMembers() {
       this.invite = false;
-      this.loading = true;
       this.activeUsers = [];
 
       try {
         console.log('farmos instance', this.instance);
-        const { data } = await api.get(`/groups/${this.group}?populate=true`);
+        const { data } = await api.get(`/groups/${this.selectedGroup}?populate=true`);
         this.entity = { ...this.entity, ...data };
 
-        const { data: members } = await api.get(`/memberships?group=${this.group}&populate=true`);
-        this.members = members.map(remapGroupMembership);
+        const { data: members } = await api.get(`/memberships?group=${this.selectedGroup}&populate=true`);
+        this.members = members.map(m => m.email);
       } catch (e) {
         console.log('error', e);
         this.$emit('dialog', 'Error', e.message);
       }
-      this.loading = false;
     },
 
     async persistMemberships() {
-      const memberships = this.activeUsers.map((a) => a.id);
-      const data = await api.post('/farmos/set-memberships', {
-        group: this.group,
-        memberships,
-        farmUrl: `${this.instance.url}.farmos.net`,
-        farmId: -1,
-        aggregator: this.instance.aggregator._id,
-      });
-
-      console.log('updated farm', data);
+      // updatge access
     },
   },
   computed: {

@@ -1,6 +1,13 @@
 <template>
   <v-container>
-    <v-alert v-if="success" class="mt-4" mode="fade" text type="success" @click="success = null">{{ success }}</v-alert>
+    <v-alert
+      v-if="success"
+      class="mt-4"
+      mode="fade"
+      text
+      type="success"
+      @click="success = null"
+    >{{ success }}</v-alert>
 
     <v-tabs v-model="tab" background-color="transparent" color="basil" grow>
       <v-tab v-for="item in items" :key="item.name">{{ item.name }}</v-tab>
@@ -31,6 +38,7 @@ import api from '@/services/api.service';
 import Aggregator from './Aggregator.vue';
 import Groups from './Groups.vue';
 import Users from './Users.vue';
+import FarmOSRegisterVue from '../farmhub-onboarding/FarmOSRegister.vue';
 
 export default {
   data() {
@@ -42,6 +50,7 @@ export default {
       success: null,
       error: null,
       loading: false,
+
       items: [
         {
           name: 'Aggregator',
@@ -55,6 +64,13 @@ export default {
           name: 'Users',
           component: Users,
         },
+
+        /*
+        {
+          name: 'Register',
+          component: FarmOSRegisterVue
+        }
+        */
       ],
     };
   },
