@@ -26,7 +26,6 @@ workflow:
     # # pull and use the cache, but do not update it
     policy: pull
 
-
 stages:
   - install
   - lint
@@ -38,7 +37,7 @@ stages:
 build container:
   extends: .pull-cache-only
   stage: dockerize
-  script: 
+  script:
     - ls server/dist
     - docker login -u $BUILD_TOKEN_USER -p $BUILD_TOKEN registry.gitlab.com
     - docker build -t "registry.gitlab.com/our-sci/software/surveystack:$IMAGE_APP_TAG" .
@@ -95,6 +94,8 @@ deploy to prod:
     - echo "AWS_S3_SECRET_ACCESS_KEY=$PROD_AWS_S3_SECRET_ACCESS_KEY" >> .env
     - echo "AWS_S3_BUCKET_NAME=$PROD_AWS_S3_BUCKET_NAME" >> .env
     - echo "AWS_S3_REGION=$PROD_AWS_S3_REGION" >> .env
+    - echo "FARMOS_AGGREGATOR_APIKEY" >> .env
+    - echo "FARMOS_AGGREGATOR_URL" >> .env
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" up -d
@@ -119,13 +120,12 @@ deploy to prod:
     # /certs/client so we only need to share this directory with the
     # volume mount in `config.toml`.
     DOCKER_TLS_CERTDIR: "/certs"
-  needs: 
+  needs:
     - build container
     - lint client
     - lint server
     - test client
     - test server
-
 
 deploy to stage:
   stage: deploy
@@ -162,6 +162,8 @@ deploy to stage:
     - echo "AWS_S3_SECRET_ACCESS_KEY=$STAGE_AWS_S3_SECRET_ACCESS_KEY" >> .env
     - echo "AWS_S3_BUCKET_NAME=$STAGE_AWS_S3_BUCKET_NAME" >> .env
     - echo "AWS_S3_REGION=$STAGE_AWS_S3_REGION" >> .env
+    - echo "FARMOS_AGGREGATOR_APIKEY" >> .env
+    - echo "FARMOS_AGGREGATOR_URL" >> .env
     - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" up -d
@@ -185,7 +187,7 @@ deploy to stage:
     # /certs/client so we only need to share this directory with the
     # volume mount in `config.toml`.
     DOCKER_TLS_CERTDIR: "/certs"
-  needs: 
+  needs:
     - build container
     - lint client
     - lint server
@@ -227,6 +229,8 @@ deploy to review 1:
     - echo "AWS_S3_SECRET_ACCESS_KEY=$REVIEW_AWS_S3_SECRET_ACCESS_KEY" >> .env
     - echo "AWS_S3_BUCKET_NAME=$REVIEW_AWS_S3_BUCKET_NAME" >> .env
     - echo "AWS_S3_REGION=$REVIEW_AWS_S3_REGION" >> .env
+    - echo "FARMOS_AGGREGATOR_APIKEY" >> .env
+    - echo "FARMOS_AGGREGATOR_URL" >> .env
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" up -d
@@ -249,14 +253,12 @@ deploy to review 1:
     # /certs/client so we only need to share this directory with the
     # volume mount in `config.toml`.
     DOCKER_TLS_CERTDIR: "/certs"
-  needs: 
+  needs:
     - build container
     - lint client
     - lint server
     - test client
     - test server
-
-
 
 build client:
   extends: .pull-cache-only
@@ -266,9 +268,9 @@ build client:
   stage: build
   script:
     - yarn client:build
-  variables: 
+  variables:
     VUE_APP_COMMIT_SHA: $CI_COMMIT_SHA
-  needs: 
+  needs:
     - lerna bootstrap
 
 build server:
@@ -277,10 +279,10 @@ build server:
     paths:
       - server/dist/
   stage: build
-  script: 
+  script:
     - yarn server:build
-  needs: 
-    - lerna bootstrap 
+  needs:
+    - lerna bootstrap
 
 lerna bootstrap:
   extends: .cache-policy
@@ -288,7 +290,7 @@ lerna bootstrap:
   script:
     - yarn
     - yarn lerna bootstrap
-  
+
 lint client:
   extends: .pull-cache-only
   stage: lint
