@@ -80,7 +80,6 @@ deploy to prod:
     - echo "SMTP_USER=$PROD_SMTP_USER" >> .env
     - echo "SMTP_PASS=$PROD_SMTP_PASS" >> .env
     - echo "SMTP_DEFAULT_SENDER=$PROD_SMTP_DEFAULT_SENDER" >> .env
-    - echo "FARMOS_AGGREGATOR_APIKEY=$PROD_FARMOS_AGGREGATOR_APIKEY" >> .env
     - echo "FARMOS_CALLBACK_KEY=$PROD_FARMOS_CALLBACK_KEY" >> .env
     - echo "ELASTIC_ENABLE_LOGGING=$PROD_ELASTIC_ENABLE_LOGGING" >> .env
     - echo "ELASTIC_INDEX_NAME=$PROD_ELASTIC_INDEX_NAME" >> .env
@@ -94,8 +93,8 @@ deploy to prod:
     - echo "AWS_S3_SECRET_ACCESS_KEY=$PROD_AWS_S3_SECRET_ACCESS_KEY" >> .env
     - echo "AWS_S3_BUCKET_NAME=$PROD_AWS_S3_BUCKET_NAME" >> .env
     - echo "AWS_S3_REGION=$PROD_AWS_S3_REGION" >> .env
-    - echo "FARMOS_AGGREGATOR_APIKEY" >> .env
-    - echo "FARMOS_AGGREGATOR_URL" >> .env
+    - echo "FARMOS_AGGREGATOR_APIKEY=$PROD_FARMOS_AGGREGATOR_APIKEY" >> .env
+    - echo "FARMOS_AGGREGATOR_URL=$PROD_FARMOS_AGGREGATOR_URL" >> .env
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$PROD_SERVER_IP" up -d
@@ -148,7 +147,6 @@ deploy to stage:
     - echo "SMTP_USER=$STAGE_SMTP_USER" >> .env
     - echo "SMTP_PASS=$STAGE_SMTP_PASS" >> .env
     - echo "SMTP_DEFAULT_SENDER=$STAGE_SMTP_DEFAULT_SENDER" >> .env
-    - echo "FARMOS_AGGREGATOR_APIKEY=$STAGE_FARMOS_AGGREGATOR_APIKEY" >> .env
     - echo "FARMOS_CALLBACK_KEY=$STAGE_FARMOS_CALLBACK_KEY" >> .env
     - echo "ELASTIC_ENABLE_LOGGING=$STAGE_ELASTIC_ENABLE_LOGGING" >> .env
     - echo "ELASTIC_INDEX_NAME=$STAGE_ELASTIC_INDEX_NAME" >> .env
@@ -162,8 +160,8 @@ deploy to stage:
     - echo "AWS_S3_SECRET_ACCESS_KEY=$STAGE_AWS_S3_SECRET_ACCESS_KEY" >> .env
     - echo "AWS_S3_BUCKET_NAME=$STAGE_AWS_S3_BUCKET_NAME" >> .env
     - echo "AWS_S3_REGION=$STAGE_AWS_S3_REGION" >> .env
-    - echo "FARMOS_AGGREGATOR_APIKEY" >> .env
-    - echo "FARMOS_AGGREGATOR_URL" >> .env
+    - echo "FARMOS_AGGREGATOR_APIKEY=$PROD_FARMOS_AGGREGATOR_APIKEY" >> .env
+    - echo "FARMOS_AGGREGATOR_URL=$PROD_FARMOS_AGGREGATOR_URL" >> .env
     - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$STAGE_SERVER_IP" up -d
@@ -215,7 +213,6 @@ deploy to review 1:
     - echo "SMTP_USER=$REVIEW_SMTP_USER" >> .env
     - echo "SMTP_PASS=$REVIEW_SMTP_PASS" >> .env
     - echo "SMTP_DEFAULT_SENDER=$REVIEW_SMTP_DEFAULT_SENDER" >> .env
-    - echo "FARMOS_AGGREGATOR_APIKEY=$REVIEW_FARMOS_AGGREGATOR_APIKEY" >> .env
     - echo "FARMOS_CALLBACK_KEY=$REVIEW_FARMOS_CALLBACK_KEY" >> .env
     - echo "ELASTIC_ENABLE_LOGGING=$REVIEW_ELASTIC_ENABLE_LOGGING" >> .env
     - echo "ELASTIC_INDEX_NAME=$REVIEW_ELASTIC_INDEX_NAME" >> .env
@@ -229,8 +226,8 @@ deploy to review 1:
     - echo "AWS_S3_SECRET_ACCESS_KEY=$REVIEW_AWS_S3_SECRET_ACCESS_KEY" >> .env
     - echo "AWS_S3_BUCKET_NAME=$REVIEW_AWS_S3_BUCKET_NAME" >> .env
     - echo "AWS_S3_REGION=$REVIEW_AWS_S3_REGION" >> .env
-    - echo "FARMOS_AGGREGATOR_APIKEY" >> .env
-    - echo "FARMOS_AGGREGATOR_URL" >> .env
+    - echo "FARMOS_AGGREGATOR_APIKEY=$PROD_FARMOS_AGGREGATOR_APIKEY" >> .env
+    - echo "FARMOS_AGGREGATOR_URL=$PROD_FARMOS_AGGREGATOR_URL" >> .env
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" up -d
