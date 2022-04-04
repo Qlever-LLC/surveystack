@@ -228,6 +228,7 @@ deploy to review 1:
     - echo "AWS_S3_REGION=$REVIEW_AWS_S3_REGION" >> .env
     - echo "FARMOS_AGGREGATOR_APIKEY=$PROD_FARMOS_AGGREGATOR_APIKEY" >> .env
     - echo "FARMOS_AGGREGATOR_URL=$PROD_FARMOS_AGGREGATOR_URL" >> .env
+    - echo "FARMOS_CREATE_KEY=$PROD_FARMOS_CREATE_KEY" >> .env
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" pull
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" up -d

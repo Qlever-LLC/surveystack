@@ -147,7 +147,7 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
 
     // console.log('data', r.data);
     const items = [];
-    console.log('response', r.data);
+
     for (const k of Object.keys(r.data)) {
       const res = JSON.parse(r.data[k].body);
       // console.log('parsed', res);
@@ -174,9 +174,13 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
       return {};
     }
 
-    await axios.post(`${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`, deleteBody, {
-      ...opts,
-    });
+    return await axios.post(
+      `${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`,
+      deleteBody,
+      {
+        ...opts,
+      }
+    );
   };
 
   const getFarmsWithTag = async (tag) => {

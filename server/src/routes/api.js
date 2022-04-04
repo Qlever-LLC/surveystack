@@ -239,18 +239,18 @@ router.get(
 );
 router.post('/farmos/test', [assertAuthenticated], catchErrors(farmosController.testConnection));
 
-router.get('/farmos/v2', [assertAuthenticated], catchErrors(farmosController.testConnection));
-
 router.get('/farmos/members-by-farm', catchErrors(farmosController.getMembersByFarmAndGroup));
 
 router.post('/farmos/set-memberships', catchErrors(farmosController.setFarmMemberships));
-router.post('/farmos/checkurl', catchErrors(farmosController.checkUrl));
-router.post('/farmos/create-instance', catchErrors(farmosController.createFarmOsInstance));
+
 router.post('/farmos/callback', catchErrors(farmosController.webhookCallback));
 router.get('/farmos/areas/:aggregator/:farmurl', catchErrors(farmosController.getAreas));
 router.post('/farmos/areas/:aggregator/:farmurl', catchErrors(farmosController.createField));
 
 /** farmos 2 */
+
+router.post('/farmos/checkurl', catchErrors(farmosController.checkUrl));
+router.post('/farmos/create-instance', catchErrors(farmosController.createFarmOsInstance));
 
 router.get(
   '/farmos/all',

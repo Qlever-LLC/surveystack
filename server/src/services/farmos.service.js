@@ -43,10 +43,13 @@ async function flushlogs(instanceName, user, id) {
 
   const { deleteAllWithData } = config();
 
-  console.log('deleting data', instanceName, id);
+  // console.log('deleting data', instanceName, id);
   const res = await deleteAllWithData(instanceName, id);
-  console.log('done');
-  return [res];
+  // console.log('done', res);
+  if (!res.data) {
+    return [];
+  }
+  return [res.data];
 }
 
 async function fetchTerms(instanceName, credentials, user) {
@@ -63,7 +66,7 @@ async function fetchTerms(instanceName, credentials, user) {
 }
 
 async function execute(aggregator, apiCompose, info, terms, user, submission) {
-  console.log('executing apiCompose', apiCompose);
+  // console.log('executing apiCompose', apiCompose);
 
   const url = apiCompose.url;
   if (typeof url != 'string') {
@@ -90,13 +93,13 @@ async function execute(aggregator, apiCompose, info, terms, user, submission) {
   const payload = { data: apiCompose.entity };
   payload.data.attributes.data = submission._id;
 
-  return await aggregator.create(url, endpoint, bundle, payload);
+  return (await aggregator.create(url, endpoint, bundle, payload)).data;
 }
 
 export const handle = async ({ submission, survey, user }) => {
   const surveyVersion = submission.meta.survey.version;
 
-  console.log('submission', JSON.stringify(submission, null, 2));
+  // console.log('submission', JSON.stringify(submission, null, 2));
 
   const { controls } = survey.revisions.find((revision) => revision.version === surveyVersion);
   const positions = utils.getControlPositions(controls);
@@ -144,8 +147,6 @@ export const handle = async ({ submission, survey, user }) => {
 
   const results = [];
 
-  // TODO adapt to farmos 2.0
-
   const aggregator = config();
 
   const runSingle = async (apiCompose, info, terms) => {
@@ -154,11 +155,9 @@ export const handle = async ({ submission, survey, user }) => {
 
       if (Array.isArray(r)) {
         results.push(...r);
-        console.log('results interim after array spread', results);
         return r;
       } else {
         results.push(r);
-        console.log('results interim after single add', results);
         return [r];
       }
     } catch (error) {
@@ -185,17 +184,34 @@ export const handle = async ({ submission, survey, user }) => {
   for (const farmUrl of Object.keys(farmUrlMap)) {
     const res = await flushlogs(farmUrl, user, submission._id);
     if (res.length > 0) {
-      results.push(res);
+      results.push(...res);
     }
   }
+
   for (const compose of farmOsCompose) {
     const info = {};
     const terms = {};
 
     const r = await runSingle(compose, info, terms);
+    results.push(...r);
   }
 
-  console.log('results', results);
+  /** strip away compose from submission*/
+
+  positions.forEach((position) => {
+    const control = utils.getControl(controls, position);
+    if (!control.options.apiCompose || !control.options.apiCompose.enabled) {
+      return;
+    }
+
+    const field = utils.getSubmissionField(submission, survey, position);
+
+    if (field.meta.relevant === false || !field.meta.apiCompose) {
+      return;
+    }
+    delete field.meta.apiCompose;
+  });
+
   return results;
 };
 
