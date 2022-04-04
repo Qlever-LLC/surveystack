@@ -184,10 +184,11 @@ describe('test-aggregator-integration', () => {
     const { data: logs } = await getLogs(TEST_FARM, 'activity');
     console.log('data', JSON.stringify(logs, null, 2));
   });
-  it.only('farms-by-tag', async () => {
+  it('farms-by-tag', async () => {
     const { getFarmsWithTag, getAllFarmsWithTags } = config();
 
-    // console.log(await getFarmsWithTag('/bionutrient/partners/main/'));
-    // console.log(await getAllFarmsWithTags());
+    console.log(await getFarmsWithTag('/bionutrient/partners/main/'));
+    console.log(await getAllFarmsWithTags());
   });
+  it.only('integration-test-skipping', async () => {});
 });

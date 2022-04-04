@@ -118,7 +118,7 @@ describe('farmos2controller', () => {
     );
   });
 
-  it.only('get-logs', async () => {
+  it('get-logs', async () => {
     jest.setTimeout(10000);
 
     mockAxios.get.mockImplementation(() => Promise.resolve({ data: logResponse }));
@@ -151,4 +151,5 @@ describe('farmos2controller', () => {
       ])
     );
   });
+  it.only('requires-env-secrets-skipping', async () => {});
 });
