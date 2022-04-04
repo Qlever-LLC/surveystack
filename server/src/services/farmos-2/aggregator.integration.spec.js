@@ -188,6 +188,6 @@ describe('test-aggregator-integration', () => {
     const { getFarmsWithTag, getAllFarmsWithTags } = config();
 
     // console.log(await getFarmsWithTag('/bionutrient/partners/main/'));
-    console.log(await getAllFarmsWithTags());
+    // console.log(await getAllFarmsWithTags());
   });
 });
