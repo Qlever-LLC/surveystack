@@ -107,9 +107,7 @@
         <template slot="label">
           <div>
             <div class="text--primary">Private</div>
-            <div class="body-2">
-              Only admins and original submitters can see this field
-            </div>
+            <div class="body-2">Only admins and original submitters can see this field</div>
           </div>
         </template>
       </v-checkbox>
@@ -125,9 +123,7 @@
         <template slot="label">
           <div>
             <div class="text--primary">Allow hide</div>
-            <div class="body-2">
-              Allow users of this question set to hide this question
-            </div>
+            <div class="body-2">Allow users of this question set to hide this question</div>
           </div>
         </template>
       </v-checkbox>
@@ -182,9 +178,9 @@
         v-model="control.options.hasMultipleSelections"
         v-if="
           control.type === 'ontology' ||
-            control.type === 'farmOsPlanting' ||
-            control.type === 'farmOsFarm' ||
-            control.type === 'farmOsField'
+          control.type === 'farmOsPlanting' ||
+          control.type === 'farmOsFarm' ||
+          control.type === 'farmOsField'
         "
         label="Allow Multiple Selections"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
@@ -204,7 +200,7 @@
       </div>
       <div v-if="showAdvanced" class="mt-2">
         <div class="d-flex justify-space-between">
-          <v-card-title class="d-flex">Advanced Options</v-card-title>
+          <v-card-title class="px-0 d-flex">Advanced Options</v-card-title>
           <v-icon @click.stop="showAdvanced = false">mdi-close</v-icon>
         </div>
 
@@ -268,6 +264,12 @@
           </v-icon>
         </div>
       </div>
+      <app-file-properties
+        v-if="isFile"
+        v-model="control.options.source"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        class="mt-5"
+      />
       <select-items-editor
         v-if="isSelect"
         v-model="control.options.source"
@@ -316,6 +318,7 @@
 <script>
 import { getAdvancedCodeTemplate, findParentByChildId } from '@/utils/surveys';
 import api from '@/services/api.service';
+import AppFileProperties from '@/components/builder/FileProperties.vue';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
 import appMatrixProperties from '@/components/builder/MatrixProperties.vue';
 import appOntologyProperties from '@/components/builder/OntologyProperties.vue';
@@ -327,6 +330,7 @@ import { convertToKey } from '@/utils/builder';
 
 export default {
   components: {
+    AppFileProperties,
     SelectItemsEditor,
     InstructionsEditor,
     appOntologyProperties,
@@ -397,6 +401,9 @@ export default {
     },
     isGroup() {
       return this.control.type === 'group';
+    },
+    isFile() {
+      return this.control.type === 'file' || this.control.type === 'image';
     },
     isDate() {
       return this.control.type === 'date';

@@ -114,6 +114,10 @@ export function isAnswered(node, submission) {
     return answered;
   }
 
+  if (type === 'file' || type === 'image') {
+    return value != null && Array.isArray(value) && value.length > 0;
+  }
+
   if (type === 'page' || type === 'instructions' || type === 'instructionsImageSplit') {
     // we may want to have a "instructions read" checkbox or similar at one point
     // for now, just assume this is answered so users can progress further
