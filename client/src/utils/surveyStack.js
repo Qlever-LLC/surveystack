@@ -21,10 +21,7 @@ export function getNested(obj, path, fallback = undefined) {
 }
 
 export function setNested(obj, path, value) {
-  const parentPath = path
-    .replace('[', SEPARATOR)
-    .replace(']', '')
-    .split(SEPARATOR);
+  const parentPath = path.replace('[', SEPARATOR).replace(']', '').split(SEPARATOR);
   const subKey = parentPath.pop();
   const parent = getNested(obj, parentPath.join(SEPARATOR), SEPARATOR);
   // parent[subKey] = value; // not reactive if setting properties which do not exist yet
