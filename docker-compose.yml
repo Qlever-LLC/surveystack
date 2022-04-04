@@ -1,10 +1,10 @@
-version: '3.7'
+version: "3.7"
 
 services:
   app:
     image: ${IMAGE_APP}
     environment:
-      - PATH_PREFIX= 
+      - PATH_PREFIX=
       - BCRYPT_ROUNDS=12
       - ADMIN_USERNAME=root
       - ADMIN_EMAIL=admin@our-sci.net
@@ -32,5 +32,7 @@ services:
       - AWS_S3_SECRET_ACCESS_KEY=${AWS_S3_SECRET_ACCESS_KEY}
       - AWS_S3_BUCKET_NAME=${AWS_S3_BUCKET_NAME}
       - AWS_S3_REGION=${AWS_S3_REGION}
+      - FARMOS_AGGREGATOR_URL=${FARMOS_AGGREGATOR_URL}
+      - FARMOS_AGGREGATOR_APIKEY=${FARMOS_AGGREGATOR_APIKEY}
     network_mode: host
     restart: always
