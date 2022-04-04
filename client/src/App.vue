@@ -34,8 +34,8 @@ export default {
     this.$store.dispatch('resources/initFromIndexedDB');
 
     if (this.$store.getters['auth/isLoggedIn']) {
-      api.get('farmos/fields');
-      api.get('farmos/assets');
+      api.get('farmos/assets?bundle=land');
+      api.get('farmos/assets?bundle=plant');
     }
   },
 };

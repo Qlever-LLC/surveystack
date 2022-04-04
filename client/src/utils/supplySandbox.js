@@ -1,5 +1,6 @@
 import moment from 'moment';
 import * as utils from '@/utils/sandboxUtils';
+import * as farmos from 'farmos';
 
 export default {
   Date,
@@ -7,4 +8,5 @@ export default {
   Number,
   moment,
   utils,
+  farmos,
 };

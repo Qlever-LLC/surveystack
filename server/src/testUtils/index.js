@@ -1,5 +1,3 @@
-/* global jest */
-
 const { deburr, kebabCase, uniqueId } = jest.requireActual('lodash');
 const { ObjectId } = jest.requireActual('mongodb');
 const { getDb } = jest.requireActual('../db');
@@ -86,6 +84,31 @@ export const createMembership = async (_overrides = {}) => {
   const result = await getDb().collection('memberships').insertOne(doc);
 
   return result.ops[0];
+};
+
+export const deleteMemberships = async (groupId, userId) => {
+  return await getDb()
+    .collection('memberships')
+    .deleteMany({
+      group: asMongoId(groupId),
+      user: asMongoId(userId),
+    });
+};
+
+/**
+ * membershipId must be ObjectId
+ * @param {ObjectId} membershipId
+ * @param {*} role
+ * @returns
+ */
+export const setRole = async (membershipId, role) => {
+  return await getDb().collection('memberships').findOneAndUpdate(
+    { _id: membershipId },
+    { $set: { role } },
+    {
+      returnOriginal: false,
+    }
+  );
 };
 
 export const createReq = ({ body = {}, params = {}, query = {}, headers = {} } = {}) => ({

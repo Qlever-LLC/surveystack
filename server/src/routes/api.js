@@ -9,6 +9,8 @@ import userController from '../controllers/userController';
 import scriptController from '../controllers/scriptController';
 import rolesController from '../controllers/rolesController';
 import farmosController from '../controllers/farmosController';
+import * as farmos2Controller from '../controllers/farmos2Controller';
+
 import membershipController from '../controllers/membershipController';
 import infoController from '../controllers/infoController';
 import resourceController from '../controllers/resourceController';
@@ -228,15 +230,16 @@ router.post(
 router.get('/roles', catchErrors(rolesController.getRoles));
 
 /** farmos */
-router.get('/farmos/farms', catchErrors(farmosController.getFarms));
-router.get('/farmos/fields', catchErrors(farmosController.getFields));
-router.get('/farmos/assets', catchErrors(farmosController.getAssets));
+router.get('/farmos/farms', catchErrors(farmos2Controller.getFarmOSInstances));
+router.get('/farmos/assets', catchErrors(farmos2Controller.getAssets));
 router.get(
   '/farmos/integrations/:id/farms',
   [assertAuthenticated],
   catchErrors(farmosController.getIntegrationFarms)
 );
 router.post('/farmos/test', [assertAuthenticated], catchErrors(farmosController.testConnection));
+
+router.get('/farmos/v2', [assertAuthenticated], catchErrors(farmosController.testConnection));
 
 router.get('/farmos/members-by-farm', catchErrors(farmosController.getMembersByFarmAndGroup));
 
@@ -246,6 +249,37 @@ router.post('/farmos/create-instance', catchErrors(farmosController.createFarmOs
 router.post('/farmos/callback', catchErrors(farmosController.webhookCallback));
 router.get('/farmos/areas/:aggregator/:farmurl', catchErrors(farmosController.getAreas));
 router.post('/farmos/areas/:aggregator/:farmurl', catchErrors(farmosController.createField));
+
+/** farmos 2 */
+
+router.get(
+  '/farmos/all',
+  [assertIsSuperAdmin],
+  catchErrors(farmos2Controller.superAdminGetAllInstances)
+);
+router.post(
+  '/farmos/group-map-instance',
+  [assertIsSuperAdmin],
+  catchErrors(farmos2Controller.superAdminMapFarmosInstance)
+);
+
+router.post(
+  '/farmos/group-unmap-instance',
+  [assertIsSuperAdmin],
+  catchErrors(farmos2Controller.superAdminUnMapFarmosInstance)
+);
+
+router.post(
+  '/farmos/user-map-instance',
+  [assertIsSuperAdmin],
+  catchErrors(farmos2Controller.superAdminMapFarmosInstanceToUser)
+);
+
+router.post(
+  '/farmos/user-unmap-instance',
+  [assertIsSuperAdmin],
+  catchErrors(farmos2Controller.superAdminUnMapFarmosInstanceFromUser)
+);
 
 /** Integrations - Group */
 router.get('/group-integrations', catchErrors(groupIntegrationController.getIntegrations));

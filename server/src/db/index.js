@@ -36,6 +36,9 @@ const connectDatabase = async () => {
   // make sure that tokens are unique
   await db.collection(COLL_ACCESS_CODES).createIndex({ code: 1 }, { unique: true });
 
+  await db.collection('farmos-instances').createIndex({ userId: 1 });
+  await db.collection('farmos-instances').createIndex({ farmOSInstanceName: 1 });
+
   // const farmOsWebhookRequestsCollectionExists = await db.listCollections().toArray().some(({ name }) => name === 'farmos.webhookrequests')
   const farmOsWebhookRequestsCollectionName = 'farmos.webhookrequests';
   const farmOsWebhookRequestsCollectionExists = await db
