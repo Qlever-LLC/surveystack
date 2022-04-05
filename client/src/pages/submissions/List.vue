@@ -381,11 +381,11 @@ export default {
         return false;
       }
 
-      const isAdminOfSurveyGroup = this.userMemberships.find(membership =>
-        membership.group._id === this.surveyEntity.meta.group.id &&
-        membership.role === 'admin');
+      const isAdminOfSurveyGroup = this.userMemberships.find(
+        (membership) => membership.group._id === this.surveyEntity.meta.group.id && membership.role === 'admin'
+      );
 
-      const isCreatorOfSelected = this.selected.every(selection => selection.meta.creator === u?._id);
+      const isCreatorOfSelected = this.selected.every((selection) => selection['meta.creator'] === this.user._id);
 
       return isAdminOfSurveyGroup || isCreatorOfSelected;
     },
