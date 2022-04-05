@@ -55,7 +55,7 @@
             v-show="overflowing"
             color="primary"
             fab
-            
+            outlined
             small
             fixed
             @click="
@@ -277,6 +277,7 @@ export default {
   left: 50%;
   transform: translateX(-50%);
   z-index: 2;
+  background-color: white;
 }
 
 .outer-wrapper {

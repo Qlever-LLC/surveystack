@@ -56,7 +56,13 @@
       </div>
     </div>
     <div class="mt-fix-bottom py-2" :style="{ pointerEvents: 'none' }">
-      <v-btn @click="$emit('addRow')" color="primary" :style="{ pointerEvents: 'auto' }">
+      <v-btn
+        @click="$emit('addRow')"
+        color="primary"
+        outlined
+        class="add-row-button"
+        :style="{ pointerEvents: 'auto' }"
+      >
         <v-icon left>mdi-plus</v-icon>{{ addRowLabel }}
       </v-btn>
     </div>
@@ -274,6 +280,11 @@ export default {
 </script>
 
 <style scoped>
+.add-row-button {
+  background-color: white;
+  text-transform: none;
+}
+
 .mt-wrap {
   position: relative;
 }
