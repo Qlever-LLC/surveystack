@@ -51,15 +51,15 @@
       <div class="draft-content flex-grow-1 justify-space-between" v-else>
         <v-fab-transition>
           <v-btn
+            class="y-overflow-button"
             v-show="overflowing"
             color="primary"
             fab
-            dark
+            
             small
             fixed
-            style="bottom: 76px; right: 12px; z-index: 150"
             @click="
-              scrollY(500);
+              scrollY();
               overflowing = false;
             "
           >
@@ -94,20 +94,20 @@
       <v-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded
         ><div class="text-body-1 my-4 text-center">
           Click on the
-          <v-btn fab dark x-small color="blue darken-2" style="pointer-events:none">
+          <v-btn fab dark x-small color="blue darken-2" style="pointer-events: none">
             <v-icon>mdi-plus</v-icon>
           </v-btn>
           to add questions to your survey
         </div>
         <div class="text-body-1 my-4 text-center">
-          <v-btn dark small color="primary" class="my-1 mr-1" style="pointer-events:none">
+          <v-btn dark small color="primary" class="my-1 mr-1" style="pointer-events: none">
             <v-icon class="mr-1">mdi-content-save</v-icon>
             Save
           </v-btn>
           to create a draft
         </div>
         <div class="text-body-1 my-4 text-center">
-          <v-btn dark small class="my-1 mr-1" color="green" style="pointer-events:none">
+          <v-btn dark small class="my-1 mr-1" color="green" style="pointer-events: none">
             <v-icon class="mr-1">mdi-cloud-upload</v-icon>
             Publish
           </v-btn>
@@ -200,12 +200,8 @@ export default {
       const vm = this;
       vm.overflowing = false;
       setTimeout(() => {
-        const body = document.getElementsByTagName('body')[0];
-        const { clientHeight, scrollHeight } = body;
-        if (scrollHeight - 100 > clientHeight) {
+        if (vm.$refs.wrapper.scrollHeight > vm.$refs.wrapper.clientHeight) {
           vm.overflowing = true;
-        } else {
-          vm.overflowing = false;
         }
       }, 500);
     },
@@ -264,8 +260,8 @@ export default {
     isOverflown({ clientWidth, clientHeight, scrollWidth, scrollHeight }) {
       return scrollHeight > clientHeight || scrollWidth > clientWidth;
     },
-    scrollY(val) {
-      window.scrollBy({ top: val, left: 0, behavior: 'smooth' });
+    scrollY() {
+      this.$refs.wrapper.scrollBy({ top: this.$refs.wrapper.scrollHeight, left: 0, behavior: 'smooth' });
     },
   },
   created() {
@@ -276,6 +272,13 @@ export default {
 </script>
 
 <style scoped>
+.y-overflow-button {
+  bottom: 66px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
 .outer-wrapper {
   height: 100%;
 }
@@ -345,6 +348,7 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 0px !important;
+  background-color: white;
 }
 
 .draft-overview {
@@ -362,7 +366,6 @@ export default {
   margin: 0rem auto;
   display: flex;
   flex-direction: column;
-  background-color: white;
 }
 
 .draft-footer {
@@ -411,6 +414,11 @@ export default {
     /* hack to avoid horizontal scrolling for builder mobile view, since media queries are for whole viewport and draft is embedded */
     overflow-x: hidden;
   }
+
+  .y-overflow-button {
+    bottom: 58px;
+    left: calc(calc(100% - 500px) / 2);
+  }
 }
 
 .force-mobile > .draft-footer {
@@ -419,5 +427,10 @@ export default {
 
 .draft-component-wrapper.force-mobile {
   height: calc(667px - 48px);
+}
+
+.draft-component-wrapper.force-mobile .y-overflow-button {
+  left: 50%;
+  bottom: 70px;
 }
 </style>

@@ -55,7 +55,7 @@
         </div>
       </div>
     </div>
-    <div class="mt-fix-bottom py-4 mb-8" :style="{ pointerEvents: 'none' }">
+    <div class="mt-fix-bottom py-2" :style="{ pointerEvents: 'none' }">
       <v-btn @click="$emit('addRow')" color="primary" :style="{ pointerEvents: 'auto' }">
         <v-icon left>mdi-plus</v-icon>{{ addRowLabel }}
       </v-btn>
@@ -112,7 +112,7 @@ export default {
     // how much sooner the bottom has to start floating to avoid being coverd by the footer
     floatingFooterSize: {
       type: Number,
-      default: 68,
+      default: 0,
     },
     // (experimental optimization) skip rendering the cells that aren't visible on the screen
     // TODO test this on a device that has visible performance issues with large matrices
@@ -207,7 +207,7 @@ export default {
       );
     },
     // create a 2d boolean matrix where true marks the cells visible on the scren (experimenal)
-    updateCellVisibilityMask: debounce(function() {
+    updateCellVisibilityMask: debounce(function () {
       if (!this.dontRenderOffScreenCells) {
         return;
       }
@@ -355,6 +355,7 @@ export default {
 .mt-fix-bottom {
   position: sticky;
   bottom: var(--mt-floating-footer-size);
+  margin-left: calc(100% - 125px);
   /* should be above all input cells */
   z-index: 2;
 }
