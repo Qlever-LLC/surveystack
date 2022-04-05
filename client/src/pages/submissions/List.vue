@@ -377,15 +377,13 @@ export default {
     },
     editable() {
       // allow submissions editing to survey's group admins and all selected submissions creator
-      const g = this.userMemberships.find((m) => m.group._id === this.surveyEntity.meta.group.id);
-      const u = this.user;
-      if (g && g.role === 'admin') {
-        return true;
-      } else if (u && this.selected.every((s) => s['meta.creator'] === u._id)) {
-        return true;
-      } else {
-        return false;
-      }
+const isAdminOfSurveyGroup = this.userMemberships.find(membership =>
+  membership.group._id === this.surveyEntity.meta.group.id &&
+  membership.role === 'admin');
+    
+const isCreatorOfSelected = this.selected.every(selection => selection.meta.creator === u?._id);
+
+return isAdminOfSurveyGroup || isCreatorOfSelected;
     },
   },
   methods: {
