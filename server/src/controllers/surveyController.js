@@ -166,7 +166,9 @@ const buildPipelineForGetSurveyPage = ({
           'meta.isLibrary': true,
         },
       },
-      {
+      /*
+      TODO Resolve #48, then uncommet this
+       {
         $lookup: {
           from: 'surveys',
           localField: '_id',
@@ -180,7 +182,7 @@ const buildPipelineForGetSurveyPage = ({
             $size: '$meta.libraryUsageCountSurveys',
           },
         },
-      },
+      },*/
       {
         $lookup: {
           from: 'submissions',
@@ -203,7 +205,9 @@ const buildPipelineForGetSurveyPage = ({
       },
       {
         $sort: {
-          'meta.libraryUsageCountSurveys': -1,
+          //         TODO Resolve #48, then uncommet this and remove the other line
+          //          'meta.libraryUsageCountSurveys': -1,
+          'meta.libraryUsageCountSubmissions': -1,
         },
       },
     ];

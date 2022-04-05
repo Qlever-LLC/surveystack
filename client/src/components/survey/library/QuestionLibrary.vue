@@ -67,7 +67,8 @@
                 >
                   add to survey
                 </v-btn>
-                <div>
+                <!--TODO Resolve #48, then uncommet this
+                div>
                   <v-tooltip bottom>
                     <template v-slot:activator="{ on, attrs }">
                       <div v-bind="attrs" v-on="on">
@@ -77,7 +78,7 @@
                     </template>
                     <span>Number of surveys using this</span>
                   </v-tooltip>
-                </div>
+                </div-->
                 <div>
                   <v-tooltip bottom>
                     <template v-slot:activator="{ on, attrs }">
