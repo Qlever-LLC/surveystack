@@ -153,7 +153,7 @@
               :excludeMeta="!filter.showCsvMeta"
               :loading="loading"
               style="margin: 3px 2px"
-              :actionsAreDisabled="surveyEntity && surveyEntity.meta.isLibrary"
+              :actionsAreDisabled="(surveyEntity && surveyEntity.meta.isLibrary) || !editable"
               @showDeleteModal="showDeleteModal = true"
               @archiveSubmissions="archiveSubmissions(selected, '', false)"
               @showArchiveModal="showArchiveModal = true"
@@ -377,13 +377,17 @@ export default {
     },
     editable() {
       // allow submissions editing to survey's group admins and all selected submissions creator
-const isAdminOfSurveyGroup = this.userMemberships.find(membership =>
-  membership.group._id === this.surveyEntity.meta.group.id &&
-  membership.role === 'admin');
-    
-const isCreatorOfSelected = this.selected.every(selection => selection.meta.creator === u?._id);
+      if (!this.surveyEntity) {
+        return false;
+      }
 
-return isAdminOfSurveyGroup || isCreatorOfSelected;
+      const isAdminOfSurveyGroup = this.userMemberships.find(membership =>
+        membership.group._id === this.surveyEntity.meta.group.id &&
+        membership.role === 'admin');
+
+      const isCreatorOfSelected = this.selected.every(selection => selection.meta.creator === u?._id);
+
+      return isAdminOfSurveyGroup || isCreatorOfSelected;
     },
   },
   methods: {
