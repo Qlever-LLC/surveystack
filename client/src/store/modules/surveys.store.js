@@ -13,11 +13,57 @@ const initialState = createInitialState();
 const getters = {
   getSurvey: (state) => (id) => state.surveys.find((survey) => survey._id === id),
   pinned: (state) => state.pinned,
-  getPinned: (state) => (prefix = '', excludePath = '') => {
-    const prefixed = state.pinned.filter((s) => s.meta.group.path && s.meta.group.path.startsWith(prefix));
-    const excluded = prefixed.filter((s) => s.meta.group.path !== excludePath);
-    return excluded;
-  },
+  getPinned:
+    (state) =>
+    (prefix = '', excludePath = '') => {
+      const prefixed = state.pinned.filter((s) => s.meta.group.path && s.meta.group.path.startsWith(prefix));
+      const excluded = prefixed.filter((s) => s.meta.group.path !== excludePath);
+      return excluded;
+    },
+};
+
+const fetchPinned = async (commit) => {
+  const pinned = [];
+  const { data } = await api.get(`/surveys/pinned`);
+  const { status } = data;
+  console.log('pinned', data);
+
+  const fetched = [];
+
+  if (status == 'success') {
+    for (const group of data.pinned) {
+      for (const sid of group.pinned) {
+        const item = {
+          id: sid,
+          name: '',
+          group: group.group_name,
+          meta: {},
+        };
+
+        const cached = fetched.find((f) => f._id == sid);
+        if (!cached) {
+          try {
+            let s = await actions.fetchSurvey({ commit }, sid);
+            await this.$store.dispatch('resources/fetchResources', s.resources);
+            fetched.push(s);
+            item.name = s.name;
+            item.meta = s.meta;
+          } catch (error) {
+            continue;
+          }
+        } else {
+          item.name = cached.name;
+          item.meta = cached.meta;
+        }
+
+        pinned.push(item);
+      }
+    }
+  }
+
+  // console.log('fetched', fetched);
+  // console.log('pinned', pinned);
+  return pinned;
 };
 
 const actions = {
@@ -57,27 +103,12 @@ const actions = {
       filteredMemberships = excluded;
     }
 
-    for (const membership of filteredMemberships) {
-      try {
-        const { data } = await api.get(`/groups/${membership.group._id}?populate=1`);
-        if (data && data.surveys && data.surveys.pinned && Array.isArray(data.surveys.pinned)) {
-          for (const s of data.surveys.pinned) {
-            pinned.push({
-              id: s._id,
-              name: s.name,
-              group: data.name,
-              meta: s.meta,
-            });
-            actions.fetchSurvey({ commit }, s._id);
-          }
-        }
-      } catch (err) {
-        console.log('Error fetching surveys:', err);
-      }
-    }
+    const useLegacyPinnedImpl = false; // toggle switch for legacy implementation
+
+    const pinnedItems = await fetchPinned(commit, filteredMemberships);
+    pinned.push(...pinnedItems);
 
     commit('SET_PINNED', pinned);
-
     return pinned;
   },
   removeSurvey({ commit }, id) {

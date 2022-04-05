@@ -1,3 +1,4 @@
+/* eslint-disable */
 // migrate memberships
 
 // meta.sentTo => meta.inviationEmail

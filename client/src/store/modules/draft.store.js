@@ -87,6 +87,9 @@ const getters = {
   showOverview: (state) => state.showOverview,
   showConfirmSubmission: (state) => state.showConfirmSubmission,
   questionNumber: (state) => {
+    if (!state.node) {
+      return;
+    }
     const n = state.node
       .getPath()
       .map((node) => node.getIndex() + 1)
@@ -95,16 +98,19 @@ const getters = {
     return n;
   },
   groupPath: (state) => {
-    if (state.submission.meta && state.submission.meta.group && state.submission.meta.group.path) {
+    if (state.submission && state.submission.meta && state.submission.meta.group && state.submission.meta.group.path) {
       return state.submission.meta.group.path;
     }
-    if (state.survey.meta && state.survey.meta.group && state.survey.meta.group.path) {
+    if (state.survey && state.survey.meta && state.survey.meta.group && state.survey.meta.group.path) {
       return state.survey.meta.group.path;
     }
 
     return null;
   },
-  relevance: (state) => (path, fallback = true) => surveyStackUtils.getRelevance(state.submission, path, fallback),
+  relevance:
+    (state) =>
+    (path, fallback = true) =>
+      surveyStackUtils.getRelevance(state.submission, path, fallback),
   hasRequiredUnanswered: (state) => {
     if (state.node.hasChildren()) {
       const requiredAndUnansweredPaths = [];

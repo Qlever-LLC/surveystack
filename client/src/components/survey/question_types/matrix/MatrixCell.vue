@@ -208,7 +208,7 @@
           outlined
           autocomplete="off"
           :disabled="disabled"
-          :style="{pointerEvents: disabled ? 'none' : 'auto'}"
+          :style="{ pointerEvents: disabled ? 'none' : 'auto' }"
           readonly
         ></v-text-field>
       </template>

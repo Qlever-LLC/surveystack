@@ -8,6 +8,17 @@
 
         <v-text-field class="mt-3" v-model="entity.meta.invitationEmail" label="Email" outlined />
 
+        <v-text-field
+          class="mt-3"
+          v-model="entity.meta.invitationName"
+          outlined
+          hint="Default name for newly registered users"
+        >
+          <template v-slot:label>
+            <div>Name <small>(optional)</small></div>
+          </template>
+        </v-text-field>
+
         <v-radio-group v-model="sendEmail" name="sendEmail">
           <v-radio label="Send an invitation email" value="SEND_NOW">
             <template v-slot:label>
@@ -36,20 +47,14 @@
 
     <v-dialog v-model="dialogCreateUser" max-width="500">
       <v-card class="">
-        <v-card-title>
-          User does not exist yet
-        </v-card-title>
+        <v-card-title> User does not exist yet </v-card-title>
         <v-card-text class="mt-4">
           Do you want to proceed to create a new user with email {{ this.entity.meta.invitationEmail }}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click.stop="dialogCreateUser = false">
-            Cancel
-          </v-btn>
-          <v-btn text color="red" @click.stop="proceedToUserCreation">
-            Proceed
-          </v-btn>
+          <v-btn text @click.stop="dialogCreateUser = false"> Cancel </v-btn>
+          <v-btn text color="red" @click.stop="proceedToUserCreation"> Proceed </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -90,6 +95,7 @@ export default {
           dateActivated: null,
           notes: '',
           invitationEmail: null,
+          invitationName: null,
           invitationCode: uuid(),
         },
       },

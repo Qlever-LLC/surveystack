@@ -12,14 +12,14 @@ const filesChalkColor = chalk.hex('#DCE5E7');
 
 function printFolderContents(dir) {
   //passsing directoryPath and callback function
-  fs.readdir(dir, function(err, files) {
+  fs.readdir(dir, function (err, files) {
     //handling error
     if (err) {
       console.log(filesChalkColor(`Unable to scan directory:  ${err}`));
       return;
     }
     //listing all files using forEach
-    files.forEach(function(file) {
+    files.forEach(function (file) {
       // print file
       console.log(filesChalkColor(`client/public/partners/${process.argv[2]}/${file}`));
     });

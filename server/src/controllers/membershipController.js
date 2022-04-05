@@ -6,9 +6,12 @@ import { ObjectId } from 'mongodb';
 import { db } from '../db';
 
 import { queryParam } from '../helpers';
-import mailService from '../services/mail.service';
+import mailService from '../services/mail/mail.service';
 import membershipService from '../services/membership.service';
 import rolesService from '../services/roles.service';
+import { createLoginPayload, createUserIfNotExist } from '../services/auth.service';
+import { pick } from 'lodash';
+import flatten from 'flat';
 
 const col = 'memberships';
 
@@ -151,10 +154,7 @@ const getMemberships = async (req, res) => {
         continue;
       }
 
-      if (
-        member.user &&
-        admins.find((m) => m.user && `${m.user._id}` === `${member.user._id}`)
-      ) {
+      if (member.user && admins.find((m) => m.user && `${m.user._id}` === `${member.user._id}`)) {
         continue;
       }
 
@@ -174,7 +174,7 @@ const getMemberships = async (req, res) => {
 
       if (
         member.user &&
-          otherMembers.find((m) => m.user && `${m.user._id}` === `${member.user._id}`)
+        otherMembers.find((m) => m.user && `${m.user._id}` === `${member.user._id}`)
       ) {
         continue;
       }
@@ -317,21 +317,21 @@ const joinGroup = async (req, res) => {
     throw boom.badRequest('Group not found');
   }
 
-  if (group.meta.invitationOnly) {
-    throw boom.badRequest('Group is set to invitation only');
-  }
-
   const { user } = res.locals.auth;
 
-  let r = await db.collection(col).findOne({
+  let existingMembership = await db.collection(col).findOne({
     group: group._id,
     user: user._id,
   });
-  console.log("user in group findone result: ", r)
-  if(r) {
+
+  if (existingMembership) {
     return res.send({
-      status: "ok"
-    })
+      status: 'ok',
+    });
+  }
+
+  if (group.meta.invitationOnly) {
+    throw boom.badRequest('Group is set to invitation only');
   }
 
   const membership = {
@@ -369,17 +369,13 @@ const sendMembershipInvitation = async ({ membership, origin }) => {
     throw boom.badRequest(`Group does not exist: ${membership.group}`);
   }
 
-  await mailService.send({
+  await mailService.sendLink({
     to: membership.meta.invitationEmail,
-    subject: `Surveystack invitation to group ${group.name}`,
-    text: `Hello
-
-You have been invited to join group '${group.name}'!
-
-Please use the following link to activate your invitation:
-${origin}/invitations?code=${membership.meta.invitationCode}
-
-Best Regards`,
+    subject: `SurveyStack invitation to group ${group.name}`,
+    link: `${origin}/invitations?code=${membership.meta.invitationCode}`,
+    actionDescriptionHtml: `You have been invited to join group '${group.name}'!`,
+    actionDescriptionText: `You have been invited to join group '${group.name}'!\nFollow this link to activate your invitation:`,
+    btnText: 'Join',
   });
 };
 
@@ -402,19 +398,21 @@ const resendInvitation = async (req, res) => {
 
 const updateMembership = async (req, res) => {
   const { id } = req.params;
-  const entity = req.body;
+  const { group } = req.body;
 
-  sanitize(entity);
-
-  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
+  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, group);
   if (!adminAccess) {
     throw boom.unauthorized(`Only group admins can update memberships`);
   }
 
+  // select the fields that are updateable by the user
+  // TODO validate role (user/admin?)
+  const update = flatten(pick(req.body, ['role', 'meta.invitationName']));
+
   try {
     let updated = await db
       .collection(col)
-      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: entity }, { returnOriginal: false });
+      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: update }, { returnOriginal: false });
     return res.send(updated);
   } catch (err) {
     console.log(err);
@@ -451,11 +449,31 @@ const deleteMembership = async (req, res) => {
 
 const activateMembership = async (req, res) => {
   const { code } = req.body;
-  const user = res.locals.auth.user._id;
+  let user;
+  let loginPayload = null;
 
+  const membership = await db.collection(col).findOne({ 'meta.invitationCode': code });
+  // is authenticated with the user that owns the invitation
+  if (
+    res.locals.auth.isAuthenticated &&
+    res.locals.auth.user.email === membership.meta.invitationEmail
+  ) {
+    user = res.locals.auth.user._id;
+  } else {
+    const userObject = await createUserIfNotExist(
+      membership.meta.invitationEmail,
+      membership.meta.invitationName
+    );
+    loginPayload = await createLoginPayload(userObject);
+    user = userObject._id;
+  }
   await membershipService.activateMembership({ code, user });
 
-  return res.send('OK');
+  if (loginPayload) {
+    res.send(loginPayload);
+  } else {
+    res.send({ message: 'ok' });
+  }
 };
 
 export default {

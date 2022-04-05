@@ -9,7 +9,6 @@
       :mobile-breakpoint="0"
       hide-default-footer
       v-model="tableSelected"
-      @item-selected="onRowSelected"
       disable-pagination
       :class="{ archived }"
       :server-items-length="submissions.pagination.total"
@@ -19,25 +18,155 @@
       :sort-by="dataTableProps.sortBy"
       :sort-desc="dataTableProps.sortDesc"
       :loading="loading"
+      ref="table"
     >
       <template v-slot:top>
-        <v-toolbar flat>
+        <v-toolbar flat class="my-5">
           <v-row>
             <v-col>
-              <div class="d-flex justify-end">
-                <v-switch v-model="excludeMeta" label="Hide meta" class="mt-2"></v-switch>
+              <div class="d-flex justify-space-between align-center">
+                <div class="d-flex justify-space-between align-center mt-5">
+                  <v-switch
+                    :input-value="!excludeMeta"
+                    @change="$emit('excludeMetaChange', $event)"
+                    label="Show metadata"
+                    class="mt-2"
+                  ></v-switch>
+                  <v-switch
+                    :input-value="archived"
+                    @change="$emit('showArchived', $event)"
+                    label="View archived only"
+                    class="mt-2 ml-5"
+                  ></v-switch>
+                </div>
+                <div class="d-flex align-center" v-if="selected.length > 0">
+                  <div>
+                    <span class="subtitle-2">ACTIONS</span><br />{{ selected.length }}
+                    {{ selected.length === 1 ? 'submission' : 'submissions' }} selected
+                  </div>
+                  <div class="ml-auto d-flex flex-column flex-sm-row">
+                    <v-btn
+                      v-if="selected[0]['meta.archived'] === 'true'"
+                      :disabled="actionsAreDisabled"
+                      color="error"
+                      text
+                      @click="$emit('showDeleteModal', $event)"
+                    >
+                      DELETE
+                    </v-btn>
+                    <v-btn
+                      v-if="selected[0]['meta.archived'] === 'true'"
+                      :disabled="actionsAreDisabled"
+                      text
+                      @click="$emit('archiveSubmissions', $event)"
+                    >
+                      RESTORE
+                    </v-btn>
+                    <v-btn
+                      v-if="selected[0]['meta.archived'] !== 'true'"
+                      :disabled="actionsAreDisabled"
+                      color="error"
+                      text
+                      @click="$emit('showArchiveModal', $event)"
+                    >
+                      ARCHIVE
+                    </v-btn>
+                    <v-btn @click="$emit('reassignment', $event)" :disabled="actionsAreDisabled" text color="secondary"
+                      >REASSIGN</v-btn
+                    >
+                    <v-btn
+                      v-if="selected[0]['meta.archived'] !== 'true' && selected.length === 1"
+                      :disabled="actionsAreDisabled"
+                      text
+                      color="primary"
+                      @click="$emit('resubmit', $event)"
+                    >
+                      RESUBMIT
+                    </v-btn>
+                  </div>
+                </div>
               </div>
             </v-col>
           </v-row>
         </v-toolbar>
       </template>
+
+      <template v-for="header in headers" v-slot:[`header.${header.value}`]>
+        <span
+          :key="header.value"
+          @click.stop="showFull(header.value, header.value, $event)"
+          :class="{ activeHeader: isModalOpen(header.value) }"
+        >
+          <div :class="shouldTruncate(header.value) ? 'truncate-header' : 'non-truncated-header'">
+            {{ header.value }}
+          </div>
+          <submission-table-cell-modal
+            v-if="isModalOpen(header.value)"
+            :value="header.value"
+            @close="closeModal"
+            :left="modalLeftPosition"
+          />
+        </span>
+      </template>
+
+      <template v-slot:body="{ items, isSelected, select }">
+        <tbody>
+          <tr v-for="item in items" :key="item._id">
+            <td>
+              <v-checkbox
+                :value="isSelected(item)"
+                @click="select(item, !isSelected(item))"
+                color="#777"
+                class="custom-checkbox"
+                hide-details
+                role="checkbox"
+              />
+            </td>
+            <td
+              v-for="header in headers"
+              :key="header.text"
+              @click.stop="showFullCell(item, header, $event)"
+              :class="{ active: isModalOpen(getCellKey(header.value, item._id)) }"
+            >
+              <div
+                v-if="item[header.value].includes('resources/')"
+                :class="{ truncate: shouldTruncate(getLabelFromKey(item[header.value])) }"
+              >
+                <a @click.stop="openResource(item[header.value])"> {{ getLabelFromKey(item[header.value]) }}</a>
+              </div>
+              <div v-else :class="{ truncate: shouldTruncate(item[header.value]) }">
+                {{ item[header.value] }}
+              </div>
+              <submission-table-cell-modal
+                v-if="isModalOpen(getCellKey(header.value, item._id))"
+                @close="closeModal"
+                :value="item[header.value]"
+                :showCopyButton="true"
+                :left="modalLeftPosition"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </template>
     </v-data-table>
+    <v-dialog :value="downloadingResource" hide-overlay persistent width="300" role="downloadingResourceProgressDialog">
+      <v-card>
+        <v-card-text class="pa-4">
+          <span>Downloading file resource</span>
+          <v-progress-linear indeterminate class="mb-0" />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <v-alert v-if="openResourceError" type="warning" dismissible>
+      {{ openResourceError }}
+    </v-alert>
   </v-card>
 </template>
-
 <script>
 import papa from 'papaparse';
 import csvService from '@/services/csv.service';
+import SubmissionTableCellModal from './SubmissionTableCellModal.vue';
+import { getLabelFromKey, openResourceInTab } from '@/utils/resources';
 
 export function transformHeaders(headers) {
   const replaceGeoJsonPath = (str) => str.replace(/(value\.features\.\d).*/, '$1');
@@ -45,8 +174,18 @@ export function transformHeaders(headers) {
   return Array.isArray(headers) ? [...new Set(headers.map(replaceGeoJsonPath))] : headers;
 }
 
+export function getCellKey(headerValue, itemId) {
+  return `${headerValue}_${itemId}`;
+}
+
 export default {
+  components: {
+    SubmissionTableCellModal,
+  },
   props: {
+    actionsAreDisabled: {
+      type: Boolean,
+    },
     submissions: {
       type: Object,
     },
@@ -71,10 +210,16 @@ export default {
       type: Boolean,
       default: false,
     },
+    excludeMeta: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
-      excludeMeta: true,
+      newData: this.archived,
+      activeTableCell: null,
+      textTruncateLength: 36,
       csv: null,
       parsed: null,
       search: '',
@@ -82,6 +227,9 @@ export default {
         survey: '',
       },
       headers: [],
+      modalLeftPosition: null,
+      downloadingResource: false,
+      openResourceError: false,
     };
   },
   computed: {
@@ -107,20 +255,38 @@ export default {
     submissions() {
       this.fetchData();
     },
-    selected(newVal) {
-      // see 'sync' modifier
-      // https://vuejs.org/v2/guide/components-custom-events.html
-      // this.$emit('update:selected', this.selected);
-    },
   },
   methods: {
-    onRowSelected({ value, item }) {},
+    getLabelFromKey,
+    getCellKey,
+    shouldTruncate(value) {
+      return value.length > this.textTruncateLength;
+    },
+    showFull(value, id, ev) {
+      if (value.length > this.textTruncateLength) {
+        this.activeTableCell = id;
+        this.modalLeftPosition =
+          ev.target.getBoundingClientRect().left - this.$refs.table.$el.getBoundingClientRect().left;
+      }
+    },
+    showFullCell(item, header, ev) {
+      this.showFull(item[header.value], this.getCellKey(header.value, item._id), ev);
+    },
+    isModalOpen(id) {
+      return this.activeTableCell === id;
+    },
+    isCellModalOpen(header, item) {
+      return this.isModalOpen(getCellKey(header.value, item._id));
+    },
+    closeModal() {
+      this.activeTableCell = null;
+      this.modalLeftPosition = null;
+    },
     createCustomFilter(field) {
       return (value, search, item) => {
         if (!this.searchFields[field]) {
           return true;
         }
-
         return value.toLowerCase().startsWith(this.searchFields[field].toLowerCase());
       };
     },
@@ -132,7 +298,12 @@ export default {
             return;
           }
           this.$set(this.searchFields, header, ''); // v-data-table search/filter is not used at this moment
-          headers.push({ text: header, value: header, filter: this.createCustomFilter(header) });
+
+          headers.push({
+            text: header,
+            value: header,
+            filter: this.createCustomFilter(header),
+          });
         });
       }
       this.headers = headers;
@@ -152,6 +323,18 @@ export default {
       this.parsed = papa.parse(this.csv, { header: true });
       this.createHeaders();
     },
+    async openResource(value) {
+      this.downloadingResource = true;
+      let resourceKeyParts = value.split('/');
+      let resourceId = resourceKeyParts[resourceKeyParts.length - 2]; //resourceId is second last part of key
+      try {
+        await openResourceInTab(this.$store, resourceId);
+      } catch (error) {
+        this.openResourceError = 'File could not be opened';
+      } finally {
+        this.downloadingResource = false;
+      }
+    },
   },
   async created() {
     this.fetchData();
@@ -160,41 +343,53 @@ export default {
 </script>
 
 <style scoped>
-/* https://vue-loader.vuejs.org/guide/scoped-css.html#child-component-root-elements */
+>>> .v-toolbar__content {
+  background: #f5f5f5 !important;
+}
 .v-data-table >>> td {
   font-family: monospace;
+  white-space: nowrap;
 }
-
-/*
-.v-data-table >>> .v-label {
-  font-size: 12px;
+.v-data-table >>> th {
+  white-space: nowrap;
 }
-*/
-</style>
-
-<style scoped>
 .archived {
   color: #777 !important;
 }
 
-.v-data-table >>> td {
-  white-space: nowrap;
-  /* max-width: 1px;
-  overflow: hidden;
-  text-overflow: ellipsis; */
+.custom-checkbox {
+  margin-top: -0.3rem;
 }
 
-.v-data-table-truncated >>> td {
-  white-space: nowrap;
+.truncate {
+  cursor: pointer;
   max-width: 250px;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-td.untruncated {
-  white-space: normal;
+.non-truncated-header {
+  margin-top: 5px;
+  display: inline-block;
+}
+
+/* header modal styles */
+.truncate-header {
+  display: inline-block;
+  cursor: pointer;
   max-width: 250px;
-  overflow: visible;
-  text-overflow: unset;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 5px;
+}
+
+.active,
+.activeHeader {
+  background-color: #d8d5d5;
+}
+.activeHeader {
+  padding: 0.9rem 0;
 }
 </style>

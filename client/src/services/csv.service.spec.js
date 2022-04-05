@@ -1,4 +1,4 @@
-import { transformSubmissionQuestionTypes, geojsonTransformer } from './csv.service';
+import { transformSubmissionQuestionTypes, geojsonTransformer, createCsv, fileTransformer } from './csv.service';
 
 function mockSubmissions() {
   return [
@@ -59,6 +59,23 @@ function mockSubmissions() {
           meta: {
             type: 'geoJSON',
             dateModified: '2021-05-31T14:01:51.153-04:00',
+          },
+        },
+        file_1: {
+          value: [
+            'resources/6244104b52b9eb000195e938/text1.txt',
+            'resources/6244104c52b9eb000195e939/TDS00020010597026789_sized_800_0-500x500.jpg',
+          ],
+          meta: {
+            type: 'file',
+            dateModified: '2022-03-30T10:09:48.352+02:00',
+          },
+        },
+        image_1: {
+          value: ['resources/6244104052b9eb000195e936/TDS00020010597026789_sized_800_0-500x500.jpg'],
+          meta: {
+            type: 'image',
+            dateModified: '2022-03-30T10:09:36.669+02:00',
           },
         },
       },
@@ -295,65 +312,80 @@ function mockSubmissionsNested() {
 
 describe('CSV Service', () => {
   describe('transformQuestionTypes', () => {
-    it('applies geojsonTransformer function to submissions object', () => {
-      const submissions = mockSubmissions();
-      const actual = transformSubmissionQuestionTypes(submissions[0].data, { geoJSON: geojsonTransformer });
-      expect(actual.map_1.value.features.length).toBe(1);
-      expect(actual.map_1.value.features[0]).toBe(JSON.stringify(submissions[0].data.map_1.value.features[0]));
-    });
+    describe('with geojsonTransformer', () => {
+      it('applies geojsonTransformer function to submissions object', () => {
+        const submissions = mockSubmissions();
+        const actual = transformSubmissionQuestionTypes(submissions[0].data, { geoJSON: geojsonTransformer });
+        expect(actual.map_1.value.features.length).toBe(1);
+        expect(actual.map_1.value.features[0]).toBe(JSON.stringify(submissions[0].data.map_1.value.features[0]));
+      });
 
-    it('geojsonTransformer does not throw for null values', () => {
-      const submissions = mockNullValueSubmissions();
-      expect(() =>
-        transformSubmissionQuestionTypes(submissions[0].data, { geoJSON: geojsonTransformer })
-      ).not.toThrow();
-    });
+      it('geojsonTransformer does not throw for null values', () => {
+        const submissions = mockNullValueSubmissions();
+        expect(() =>
+          transformSubmissionQuestionTypes(submissions[0].data, { geoJSON: geojsonTransformer })
+        ).not.toThrow();
+      });
 
-    it('applies geojsonTransformer function correctly to nested submissions object', () => {
-      const submissions = mockSubmissionsNested();
-      const actual = transformSubmissionQuestionTypes(submissions[0].data, { geoJSON: geojsonTransformer });
-      expect(actual.group_1.map_2.value.features[0]).toBe(
-        JSON.stringify(submissions[0].data.group_1.map_2.value.features[0])
-      );
-      expect(actual.group_1.map_2.value.features[1]).toBe(
-        JSON.stringify(submissions[0].data.group_1.map_2.value.features[1])
-      );
-    });
+      it('applies geojsonTransformer function correctly to nested submissions object', () => {
+        const submissions = mockSubmissionsNested();
+        const actual = transformSubmissionQuestionTypes(submissions[0].data, { geoJSON: geojsonTransformer });
+        expect(actual.group_1.map_2.value.features[0]).toBe(
+          JSON.stringify(submissions[0].data.group_1.map_2.value.features[0])
+        );
+        expect(actual.group_1.map_2.value.features[1]).toBe(
+          JSON.stringify(submissions[0].data.group_1.map_2.value.features[1])
+        );
+      });
 
-    it('does not modify structure incorrectly', () => {
-      const submissions = mockSubmissionsNested();
-      const actual = transformSubmissionQuestionTypes(submissions[0].data, { geoJSON: geojsonTransformer });
+      it('does not modify structure incorrectly', () => {
+        const submissions = mockSubmissionsNested();
+        const actual = transformSubmissionQuestionTypes(submissions[0].data, { geoJSON: geojsonTransformer });
 
-      expect(actual).toMatchObject({
-        group_1: {
-          meta: {
-            type: 'group',
-          },
-          map_2: {
-            value: {
-              type: 'FeatureCollection',
-              // features: expect.arrayContaining(expect.any(String)),
-            },
+        expect(actual).toMatchObject({
+          group_1: {
             meta: {
-              type: 'geoJSON',
-              dateModified: expect.any(String),
+              type: 'group',
+            },
+            map_2: {
+              value: {
+                type: 'FeatureCollection',
+                // features: expect.arrayContaining(expect.any(String)),
+              },
+              meta: {
+                type: 'geoJSON',
+                dateModified: expect.any(String),
+              },
+            },
+            text_1: {
+              value: 'ss',
+              meta: {
+                type: 'string',
+                dateModified: '2021-06-14T21:12:33.839-04:00',
+              },
             },
           },
-          text_1: {
-            value: 'ss',
+          text_3: {
+            value: 'mvmvmv',
             meta: {
               type: 'string',
-              dateModified: '2021-06-14T21:12:33.839-04:00',
+              dateModified: '2021-06-14T21:12:36.811-04:00',
             },
           },
-        },
-        text_3: {
-          value: 'mvmvmv',
-          meta: {
-            type: 'string',
-            dateModified: '2021-06-14T21:12:36.811-04:00',
-          },
-        },
+        });
+      });
+    });
+    describe('with fileTransformer', () => {
+      it('applies fileTransformer function to files in submissions object', () => {
+        const submissions = mockSubmissions();
+        const actual = transformSubmissionQuestionTypes(submissions[0].data, { file: fileTransformer });
+        expect(actual.file_1.value[0].startsWith('https://surveystack-test.s3.amazonaws.com/')).toBeTruthy();
+        expect(actual.file_1.value[1].startsWith('https://surveystack-test.s3.amazonaws.com/')).toBeTruthy();
+      });
+      it('applies fileTransformer function to images in submissions object', () => {
+        const submissions = mockSubmissions();
+        const actual = transformSubmissionQuestionTypes(submissions[0].data, { image: fileTransformer });
+        expect(actual.image_1.value[0].startsWith('https://surveystack-test.s3.amazonaws.com/')).toBeTruthy();
       });
     });
   });

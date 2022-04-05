@@ -12,10 +12,7 @@ const sanitizeIntegration = (entity) => {
 
 const getIntegrations = async (req, res) => {
   let entities;
-  entities = await db
-    .collection(col)
-    .find({})
-    .toArray();
+  entities = await db.collection(col).find({}).toArray();
   return res.send(entities);
 };
 

@@ -12,12 +12,13 @@
 
     <!-- Toolbar with question number and overview button -->
     <app-draft-toolbar
-      :group="groupPath"
+      :groupPath="groupPath"
       :required="control && control.options && control.options.required"
       :anon="control && control.options && control.options.redacted"
       :showOverviewIcon="true"
       :questionNumber="$store.getters['draft/questionNumber']"
       @showOverviewClicked="showOverview = !showOverview"
+      v-if="builder"
     >
       <!-- forward all the slots -->
       <slot v-for="(_, name) in $slots" :name="name" :slot="name" />
@@ -55,7 +56,13 @@
           <v-icon>mdi-arrow-down</v-icon>
         </v-btn>
       </v-fab-transition>
-      <app-control class="my-auto maxw-60 mx-auto" :path="path" :control="control" />
+      <app-control
+        class="my-auto maxw-60 mx-auto"
+        :path="path"
+        :control="control"
+        :forceMobile="forceMobile"
+        :isInBuilder="builder"
+      />
     </div>
 
     <!-- Footer with next/prev buttons -->
@@ -80,20 +87,20 @@
     <v-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded
       ><div class="text-body-1 my-4 text-center">
         Click on the
-        <v-btn fab dark x-small color="blue darken-2" style="pointer-events:none">
+        <v-btn fab dark x-small color="blue darken-2" style="pointer-events: none">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
         to add questions to your survey
       </div>
       <div class="text-body-1 my-4 text-center">
-        <v-btn dark small color="primary" class="my-1 mr-1" style="pointer-events:none">
+        <v-btn dark small color="primary" class="my-1 mr-1" style="pointer-events: none">
           <v-icon class="mr-1">mdi-content-save</v-icon>
           Save
         </v-btn>
         to create a draft
       </div>
       <div class="text-body-1 my-4 text-center">
-        <v-btn dark small class="my-1 mr-1" color="green" style="pointer-events:none">
+        <v-btn dark small class="my-1 mr-1" color="green" style="pointer-events: none">
           <v-icon class="mr-1">mdi-cloud-upload</v-icon>
           Publish
         </v-btn>
@@ -136,6 +143,7 @@ export default {
     submission: { type: Object },
     persist: { type: Boolean },
     builder: { type: Boolean },
+    forceMobile: { type: Boolean, default: false },
   },
   data() {
     return {

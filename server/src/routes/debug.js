@@ -7,7 +7,7 @@ import boom from '@hapi/boom';
 import { db } from '../db';
 
 import { uploadToS3 } from '../services/bucket.service';
-import mailService from '../services/mail.service';
+import mailService from '../services/mail/mail.service';
 import farmosService from '../services/farmos.service';
 import rolesService from '../services/roles.service';
 
@@ -34,7 +34,7 @@ router.get('/s3upload', async (req, res) => {
 function removeKeys(obj, keys) {
   for (var prop in obj) {
     console.log(prop);
-    if (obj.hasOwnProperty(prop)) {
+    if (Object.prototype.hasOwnProperty.call(obj, prop)) {
       switch (typeof obj[prop]) {
         case 'object':
           if (keys.indexOf(prop) > -1) {
@@ -144,47 +144,6 @@ router.get('/node_env', async (req, res) => {
   console.log(process.env.NODE_ENV);
   return res.send(process.env.NODE_ENV);
 });
-
-const getCredentials = async (req, res) => {
-  const { user } = req.query;
-
-  const u = await db.collection('users').findOne({ _id: new ObjectId(user) });
-
-  if (!u) {
-    throw boom.notFound(`User not found: ${user}`);
-  }
-
-  const credentials = await farmosService.getCredentials(u);
-  return res.send(credentials);
-};
-
-router.get('/farmos/credentials', catchErrors(getCredentials));
-
-const getAggregators = async (req, res) => {
-  const { user } = req.query;
-
-  const u = await db.collection('users').findOne({ _id: new ObjectId(user) });
-
-  if (!u) {
-    throw boom.notFound(`User not found: ${user}`);
-  }
-
-  const credentials = await farmosService.getCredentials(u);
-
-  const map = new Map();
-  credentials.forEach((credential) => {
-    map.set(credential.aggregatorURL, credential.aggregatorApiKey);
-  });
-
-  const aggregators = [];
-  map.forEach((apiKey, url) => {
-    aggregators.push({ url, apiKey });
-  });
-
-  return res.send(aggregators);
-};
-
-router.get('/farmos/aggregators', catchErrors(getAggregators));
 
 router.get('/roles/check', async (req, res) => {
   const { user, group, role } = req.query;

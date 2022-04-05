@@ -51,6 +51,9 @@
           @next="!$store.getters['draft/hasRequiredUnanswered'] && $store.dispatch('draft/next')"
           :redacted="control.options && control.options.redacted"
           :required="$store.getters['draft/relevance'](path) && control.options && control.options.required"
+          :forceMobile="forceMobile"
+          :isInBuilder="isInBuilder"
+          :survey="survey"
         />
       </div>
     </div>
@@ -82,6 +85,14 @@ export default {
     autoFocus: {
       type: Boolean,
       default: true,
+    },
+    forceMobile: {
+      type: Boolean,
+      default: false,
+    },
+    isInBuilder: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {

@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
+import _ from 'lodash';
 
 import { checkSurvey, changeRecursive } from '../helpers/surveys';
 import rolesService from '../services/roles.service';
@@ -17,11 +18,11 @@ const sanitize = async (entity) => {
     version.dateCreated = new Date(entity.dateCreated);
 
     version.controls.forEach((control) => {
-      changeRecursive(control, (control)=> {
+      changeRecursive(control, (control) => {
         if (control.libraryId) {
           control.libraryId = new ObjectId(control.libraryId);
         }
-      })
+      });
     });
   });
 
@@ -81,15 +82,15 @@ const getSurveys = async (req, res) => {
 };
 
 const buildPipelineForGetSurveyPage = ({
-                                         q,
-                                         groups,
-                                         projections,
-                                         creator,
-                                         skip,
-                                         limit,
-                                         prefix,
-                                         isLibrary,
-                                       }) => {
+  q,
+  groups,
+  projections,
+  creator,
+  skip,
+  limit,
+  prefix,
+  isLibrary,
+}) => {
   const match = {};
   const project = {};
   let parsedSkip = 0;
@@ -119,7 +120,7 @@ const buildPipelineForGetSurveyPage = ({
   }
 
   if (isLibrary) {
-    match['meta.isLibrary'] = (isLibrary === "true");
+    match['meta.isLibrary'] = isLibrary === 'true';
   }
 
   const pipeline = [
@@ -155,51 +156,60 @@ const buildPipelineForGetSurveyPage = ({
     ]
   );
 
-  if (isLibrary === "true") {
+  if (isLibrary === 'true') {
     // add to pipeline the aggregation for number of referencing survey and for number of submissions of referencing surveys
     // TODO further reduce meta.libraryUsageCountSurveys by revisions.controls.isLibraryRoot=true and revisions.version=latestVersion
     // TODO also count revisions.controls.children.libraryId
     const aggregateCounts = [
       {
-        '$match': {
-          'meta.isLibrary': true
-        }
-      }, {
-        '$lookup': {
-          'from': 'surveys',
-          'localField': '_id',
-          'foreignField': 'revisions.controls.libraryId',
-          'as': 'meta.libraryUsageCountSurveys'
-        }
-      }, {
-        '$addFields': {
-          'meta.libraryUsageCountSurveys': {
-            '$size': '$meta.libraryUsageCountSurveys'
-          }
-        }
-      }, {
-        '$lookup': {
-          'from': 'submissions',
-          'let': {
-            'surveyId': '$_id',
-          },
-          'pipeline': [
-            { '$match': { '$expr': { '$eq': ['$meta.survey.id', '$$surveyId'] } } },
-            { '$count': 'count' },
-          ],
-          'as': "meta.libraryUsageCountSubmissions",
+        $match: {
+          'meta.isLibrary': true,
         },
-      }, {
-        '$addFields': {
+      },
+      /*
+      TODO Resolve #48, then uncommet this
+       {
+        $lookup: {
+          from: 'surveys',
+          localField: '_id',
+          foreignField: 'revisions.controls.libraryId',
+          as: 'meta.libraryUsageCountSurveys',
+        },
+      },
+      {
+        $addFields: {
+          'meta.libraryUsageCountSurveys': {
+            $size: '$meta.libraryUsageCountSurveys',
+          },
+        },
+      },*/
+      {
+        $lookup: {
+          from: 'submissions',
+          let: {
+            surveyId: '$_id',
+          },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$meta.survey.id', '$$surveyId'] } } },
+            { $count: 'count' },
+          ],
+          as: 'meta.libraryUsageCountSubmissions',
+        },
+      },
+      {
+        $addFields: {
           'meta.libraryUsageCountSubmissions': {
-            '$arrayElemAt': ['$meta.libraryUsageCountSubmissions.count', 0]
-          }
-        }
-      }, {
-        '$sort': {
-          'meta.libraryUsageCountSurveys': -1
-        }
-      }
+            $arrayElemAt: ['$meta.libraryUsageCountSubmissions.count', 0],
+          },
+        },
+      },
+      {
+        $sort: {
+          //         TODO Resolve #48, then uncommet this and remove the other line
+          //          'meta.libraryUsageCountSurveys': -1,
+          'meta.libraryUsageCountSubmissions': -1,
+        },
+      },
     ];
     pipeline.push(...aggregateCounts);
   }
@@ -387,11 +397,31 @@ const getSurveyLibraryConsumers = async (req, res) => {
   // TODO naive and limited (to 3 child levels) implementation for deeply nested question sets - try to find elegant query which is still performing well
   const filter = {
     $or: [
-      { $and: [{ "revisions.controls.libraryId": new ObjectId(id) }, { "revisions.controls.isLibraryRoot": true }] },
-      { $and: [{ "revisions.controls.children.libraryId": new ObjectId(id) }, { "revisions.controls.children.isLibraryRoot": true }] },
-      { $and: [{ "revisions.controls.children.children.libraryId": new ObjectId(id) }, { "revisions.controls.children.children.isLibraryRoot": true }] },
-      { $and: [{ "revisions.controls.children.children.children.libraryId": new ObjectId(id) }, { "revisions.controls.children.children.children.isLibraryRoot": true }] },
-    ]
+      {
+        $and: [
+          { 'revisions.controls.libraryId': new ObjectId(id) },
+          { 'revisions.controls.isLibraryRoot': true },
+        ],
+      },
+      {
+        $and: [
+          { 'revisions.controls.children.libraryId': new ObjectId(id) },
+          { 'revisions.controls.children.isLibraryRoot': true },
+        ],
+      },
+      {
+        $and: [
+          { 'revisions.controls.children.children.libraryId': new ObjectId(id) },
+          { 'revisions.controls.children.children.isLibraryRoot': true },
+        ],
+      },
+      {
+        $and: [
+          { 'revisions.controls.children.children.children.libraryId': new ObjectId(id) },
+          { 'revisions.controls.children.children.children.isLibraryRoot': true },
+        ],
+      },
+    ],
   };
   const entities = await db.collection(col).find(filter).toArray();
   return res.send(entities);
@@ -499,26 +529,82 @@ const checkForLibraryUpdates = async (req, res) => {
   //for each question set library used in the given survey
   let updatableSurveys = {};
 
-  await Promise.all(latestRevision.controls.map(async (control) => {
-    if(control.isLibraryRoot && !control.libraryIsInherited) {
-      //check if used library survey version is old
-      const librarySurvey = await db.collection(col).findOne({ _id: new ObjectId(control.libraryId) });
-      if(!librarySurvey) {
-        //library can not be found, also return this information
-        updatableSurveys[control.libraryId] = null;
-      } else if(control.libraryVersion<librarySurvey.latestVersion) {
-        //library is updatable, add to result set
-        updatableSurveys[control.libraryId] = librarySurvey.latestVersion;
+  await Promise.all(
+    latestRevision.controls.map(async (control) => {
+      if (control.isLibraryRoot && !control.libraryIsInherited) {
+        //check if used library survey version is old
+        const librarySurvey = await db
+          .collection(col)
+          .findOne({ _id: new ObjectId(control.libraryId) });
+        if (!librarySurvey) {
+          //library can not be found, also return this information
+          updatableSurveys[control.libraryId] = null;
+        } else if (control.libraryVersion < librarySurvey.latestVersion) {
+          //library is updatable, add to result set
+          updatableSurveys[control.libraryId] = librarySurvey.latestVersion;
+        }
       }
-    }
-  }));
+    })
+  );
 
   return res.send(updatableSurveys);
+};
+
+const getPinned = async (req, res) => {
+  const pinned = [];
+
+  if (!res.locals.auth || !res.locals.auth.user || !res.locals.auth.user._id) {
+    // user not signed in, send empty array
+    return res.send({
+      status: 'success',
+      pinned,
+    });
+  }
+
+  const userId = res.locals.auth.user._id;
+
+  // Pipeline
+  // 1. find all memberships
+  // 2. for all memberships find all groups
+  // 3. for all groups find all pinned surveys
+
+  const memberships = await db
+    .collection('memberships')
+    .find({ user: new ObjectId(userId) })
+    .project({ group: 1 })
+    .toArray();
+
+  // console.log('memberships', memberships);
+
+  const groupIds = _.uniq(memberships.map((m) => m.group)).map((g) => new ObjectId(g));
+  const groupsPinned = await db
+    .collection('groups')
+    .find({ _id: { $in: groupIds } })
+    .project({ name: 1, 'surveys.pinned': 1 })
+    .toArray();
+
+  const r = groupsPinned.map((g) => {
+    if (!g.surveys || !g.surveys.pinned) {
+      return [];
+    }
+
+    return { group_id: g._id, group_name: g.name, pinned: g.surveys.pinned };
+  });
+
+  pinned.push(...r);
+
+  // console.log('pinned', pinned);
+
+  return res.send({
+    status: 'success',
+    pinned,
+  });
 };
 
 export default {
   getSurveys,
   getSurveyPage,
+  getPinned,
   getSurveyListPage,
   getSurvey,
   getSurveyLibraryConsumers,

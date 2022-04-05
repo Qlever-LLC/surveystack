@@ -16,7 +16,7 @@ function* processPositions(data, position = []) {
   }
 }
 
-export const getControlPositions = controls => {
+export const getControlPositions = (controls) => {
   const it = processPositions(controls);
   let res = it.next();
   const positions = [];
@@ -32,7 +32,7 @@ export const getControl = (controls, position) => {
   let control;
   let currentControls = controls;
   // let { controls } = survey;
-  position.forEach(i => {
+  position.forEach((i) => {
     control = currentControls[i];
     currentControls = control.children;
   });
@@ -50,7 +50,7 @@ export const getFlatName = (controls, position) => {
   let flatName = '';
   let control;
   let currentControls = controls;
-  position.forEach(i => {
+  position.forEach((i) => {
     control = currentControls[i];
     currentControls = control.children;
     flatName += `.${control.name}`;
@@ -60,10 +60,10 @@ export const getFlatName = (controls, position) => {
 };
 
 export const getFlatNames = (survey, version = 1) => {
-  const { controls } = survey.revisions.find(revision => revision.version === version);
+  const { controls } = survey.revisions.find((revision) => revision.version === version);
   const positions = getControlPositions(controls);
   const items = [];
-  positions.forEach(position => {
+  positions.forEach((position) => {
     const flatName = getFlatName(controls, position);
     items.push(flatName);
   });
@@ -81,9 +81,9 @@ export const getDuplicateControls = (survey, version = 1) => {
 export const checkSurvey = (survey, version = 1) => {
   const controlNameExp = new RegExp('^[a-z0-9]+(_[a-z0-9]+)*$');
 
-  const { controls } = survey.revisions.find(revision => revision.version === version);
+  const { controls } = survey.revisions.find((revision) => revision.version === version);
   const positions = getControlPositions(controls);
-  positions.forEach(position => {
+  positions.forEach((position) => {
     const control = getControl(controls, position);
     if (!controlNameExp.test(control.name)) {
       const flatName = getFlatName(controls, position);
@@ -101,7 +101,6 @@ export const checkSurvey = (survey, version = 1) => {
   }
 };
 
-
 /**
  * Returns the object from submission's data corresponding to the current position in a survey
  * @param {Object} submission A submission entity
@@ -112,7 +111,9 @@ export const checkSurvey = (survey, version = 1) => {
  */
 export const getSubmissionField = (submission, survey, position) => {
   // TODO: handle version not found
-  const { controls } = survey.revisions.find(revision => revision.version === submission.meta.survey.version);
+  const { controls } = survey.revisions.find(
+    (revision) => revision.version === submission.meta.survey.version
+  );
 
   const flatName = getFlatName(controls, position);
   const splits = flatName.split('.');
@@ -134,10 +135,9 @@ export const getSubmissionField = (submission, survey, position) => {
 export const changeRecursive = (control, changeFn) => {
   changeFn(control);
 
-  if(control.children) {
+  if (control.children) {
     control.children.forEach((childControl) => {
       changeRecursive(childControl, changeFn);
     });
   }
 };
-

@@ -29,7 +29,7 @@ const create = async (req, res) => {
     }
   }
 
-  return res.send(files.map(file => file.name));
+  return res.send(files.map((file) => file.name));
 };
 
 export default {

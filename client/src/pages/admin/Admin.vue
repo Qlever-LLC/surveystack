@@ -1,5 +1,5 @@
 <template>
   <v-container>
-    <h1>Will's Playground</h1>
+    <h1>Super Admin Interface</h1>
   </v-container>
 </template>

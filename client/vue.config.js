@@ -58,7 +58,11 @@ module.exports = {
     //     // changeOrigin: true,
     //   },
     // },
-    proxy: `http://localhost:${process.env.VUE_APP_DEV_API_SERVER_PORT || 3000}`,
+    proxy: {
+      '/api': {
+        target: `http://localhost:${process.env.VUE_APP_DEV_API_SERVER_PORT || 3000}`,
+      },
+    },
   },
   pwa: {
     name: 'Surveystack',

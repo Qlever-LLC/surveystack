@@ -179,6 +179,21 @@ export default {
       console.log('set render queue', queue);
       this.$emit('setRenderQueue', queue);
     },
+    handleRequestResource({ resourceKey }) {
+      console.log('script requested resource with key ', resourceKey);
+      const resource = this.$store.getters['resources/getResourceByKey'](resourceKey);
+      const file = resource.fileData;
+
+      this.$refs.iframe.contentWindow.postMessage(
+        {
+          type: 'RETURN_RESOURCE',
+          payload: {
+            file,
+          },
+        },
+        '*'
+      );
+    },
     initializeIframe() {
       const { iframe } = this.$refs;
       const submissionJSON = JSON.stringify(this.submission);
@@ -187,6 +202,7 @@ export default {
       const contextJSON = JSON.stringify(this.meta.context || {});
       const controlJSON = JSON.stringify(this.control);
       const paramsJSON = JSON.stringify((this.control.options && this.control.options.params) || {});
+      const surveyJSON = JSON.stringify(this.survey);
 
       const html = buildScriptQuestionIframeContents({
         scriptSource: this.source.content,
@@ -196,6 +212,7 @@ export default {
         contextJSON,
         controlJSON,
         paramsJSON,
+        surveyJSON,
       });
       iframe.src = `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
 
@@ -208,7 +225,8 @@ export default {
         onMessage('REQUEST_RUN_SURVEY_STACK_KIT', this.requestRunSurveyStackKit),
         onMessage('REQUEST_SET_QUESTION_CONTEXT', this.handleRequestSetContext),
         onMessage('REQUEST_SET_QUESTION_RENDER_QUEUE', this.handleRequestSetRenderQueue),
-        onMessage('REQUEST_SET_QUESTION_RENDER_QUEUE', this.handleRequestSetRenderQueue)
+        onMessage('REQUEST_SET_QUESTION_RENDER_QUEUE', this.handleRequestSetRenderQueue),
+        onMessage('REQUEST_RESOURCE', this.handleRequestResource)
       );
     },
     async fetchScriptSource() {

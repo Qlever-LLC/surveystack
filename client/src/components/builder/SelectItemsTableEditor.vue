@@ -2,9 +2,7 @@
   <v-card min-height="70vh" class="d-flex flex-column">
     <v-card-title class="d-block">
       <div class="d-flex justify-space-between align-center">
-        <div class="grey--text text--darken-2">
-          Dropdown List Editor
-        </div>
+        <div class="grey--text text--darken-2">Dropdown List Editor</div>
         <div class="d-flex align-center">
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
@@ -28,7 +26,7 @@
           label="List Label"
           persistent-hint
           class="display-1 flex-shrink-1"
-          style="max-width: 12em;"
+          style="max-width: 12em"
         />
         <!-- TODO: validate unique data name -->
         <v-text-field
@@ -37,7 +35,7 @@
           label="List Data Name"
           persistent-hint
           class="flex-shrink-1 ml-4"
-          style="max-width: 12em;"
+          style="max-width: 12em"
           :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
         />
         <v-spacer />
@@ -117,8 +115,7 @@
 </template>
 
 <script>
-import { uniqWith, isEqual } from 'lodash';
-import slugify from '@/utils/slugify';
+import { isEqual, uniqWith } from 'lodash';
 
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
 
