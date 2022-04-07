@@ -1,9 +1,7 @@
 <template>
   <div>
     <v-card-title class="px-0 d-flex justify-space-between">
-      <div>
-        Dropdown List
-      </div>
+      <div>Dropdown List</div>
     </v-card-title>
     <div class="text-center d-flex">
       <!-- :resourceTypes="['ONTOLOGY_LIST']" -->
@@ -107,7 +105,7 @@ export default {
       return this.resources.find((resource) => resource.id === this.value);
     },
     filteredResources() {
-      return this.resources.filter((resource) => resource.type === 'ONTOLOGY_LIST');
+      return this.resources.filter((resource) => resource.type === resourceTypes.ONTOLOGY_LIST);
     },
   },
 };
