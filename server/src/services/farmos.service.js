@@ -151,6 +151,7 @@ export const handle = async ({ submission, survey, user }) => {
 
   const runSingle = async (apiCompose, info, terms) => {
     try {
+      console.log('running', apiCompose);
       const r = await execute(aggregator, apiCompose, info, terms, user, submission);
 
       if (Array.isArray(r)) {
@@ -166,7 +167,7 @@ export const handle = async ({ submission, survey, user }) => {
         status: 'error',
         error,
       });
-      return null;
+      return [];
     }
   };
 

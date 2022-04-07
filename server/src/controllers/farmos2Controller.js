@@ -105,7 +105,6 @@ export const getAssets = async (req, res) => {
     try {
       const axiosResponse = await cfg.getAssets(instance.instanceName, bundle);
 
-      console.log('axiosresponse', axiosResponse.data);
       const assetList = axiosResponse.data.data.map((a) => {
         return {
           name: a.attributes.name,
