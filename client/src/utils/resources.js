@@ -7,6 +7,7 @@ export const resourceTypes = {
   ONTOLOGY_LIST: 'ONTOLOGY_LIST',
   IMAGE: 'IMAGE',
   SURVEY_REFERENCE: 'SURVEY_REFERENCE',
+  FILE: 'FILE',
 };
 
 export const resourceLocations = {
@@ -74,8 +75,8 @@ export function replaceLabelInKey(resourceKey, labelNew) {
   return resourceKey.substring(0, resourceKey.lastIndexOf('/') + 1) + labelNew;
 }
 
-export function getLabelFromKey(resourcKey) {
-  return resourcKey.substring(resourcKey.lastIndexOf('/') + 1);
+export function getLabelFromKey(resourceKey) {
+  return resourceKey.substring(resourceKey.lastIndexOf('/') + 1);
 }
 
 export async function openResourceInTab(store, resourceId) {
