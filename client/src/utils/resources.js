@@ -15,13 +15,6 @@ export const resourceLocations = {
   EMBEDDED: 'EMBEDDED',
 };
 
-export function filterResourcesByTypes(resources, types = []) {
-  if (types.length === 0) {
-    return resources;
-  }
-  return resources.filter((resource) => types.some((type) => type === resource.type));
-}
-
 export function removeResource(resources, id) {
   const index = resources.findIndex((r) => r.id === id);
   return [...resources.slice(0, index), ...resources.slice(index + 1)];
