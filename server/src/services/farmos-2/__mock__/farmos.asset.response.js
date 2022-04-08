@@ -1048,3 +1048,175 @@ export const logResponse = {
     },
   },
 };
+
+export const createFieldResponse = {
+  jsonapi: {
+    version: '1.0',
+    meta: {
+      links: {
+        self: {
+          href: 'http://jsonapi.org/format/1.0/',
+        },
+      },
+    },
+  },
+  data: {
+    type: 'asset--land',
+    id: '28317098-0a4f-49e8-b006-8f55713a63a5',
+    links: {
+      self: {
+        href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5',
+      },
+    },
+    attributes: {
+      drupal_internal__id: 317,
+      drupal_internal__revision_id: 394,
+      langcode: 'en',
+      revision_created: '2022-04-08T11:02:24+00:00',
+      revision_log_message: null,
+      name: 'Unit Test Field',
+      status: 'active',
+      created: '2022-04-08T11:02:24+00:00',
+      changed: '2022-04-08T11:02:24+00:00',
+      archived: null,
+      default_langcode: true,
+      revision_translation_affected: true,
+      data: null,
+      notes: null,
+      flag: [],
+      id_tag: [],
+      geometry: {
+        value:
+          'POLYGON ((-84.34150323269021 42.77962447110511, -84.34129044408108 42.77962315868189, -84.34125289315487 42.77938035618669, -84.34148535132407 42.77938298110345, -84.34150323269021 42.77962447110511))',
+        geo_type: 'Polygon',
+        lat: 42.779500969948614,
+        lon: -84.34138269027936,
+        left: -84.34150323269021,
+        top: 42.77962447110511,
+        right: -84.34125289315487,
+        bottom: 42.77938035618669,
+        geohash: 'dps52g',
+        latlon: '42.779500969949,-84.341382690279',
+      },
+      intrinsic_geometry: {
+        value:
+          'POLYGON ((-84.34150323269021 42.77962447110511, -84.34129044408108 42.77962315868189, -84.34125289315487 42.77938035618669, -84.34148535132407 42.77938298110345, -84.34150323269021 42.77962447110511))',
+        geo_type: 'Polygon',
+        lat: 42.779500969948614,
+        lon: -84.34138269027936,
+        left: -84.34150323269021,
+        top: 42.77962447110511,
+        right: -84.34125289315487,
+        bottom: 42.77938035618669,
+        geohash: 'dps52g',
+        latlon: '42.779500969949,-84.341382690279',
+      },
+      is_location: true,
+      is_fixed: true,
+      surveystack_id: null,
+      land_type: 'field',
+    },
+    relationships: {
+      asset_type: {
+        data: {
+          type: 'asset_type--asset_type',
+          id: '277edcd0-5af9-430b-8e3b-19ceaf97bfec',
+          meta: {
+            drupal_internal__target_id: 'land',
+          },
+        },
+        links: {
+          related: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/asset_type',
+          },
+          self: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/relationships/asset_type',
+          },
+        },
+      },
+      revision_user: {
+        data: {
+          type: 'user--user',
+          id: '88197dd1-ce89-4624-9524-a4d2327f9bd5',
+          meta: {
+            drupal_internal__target_id: 10,
+          },
+        },
+        links: {
+          related: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/revision_user',
+          },
+          self: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/relationships/revision_user',
+          },
+        },
+      },
+      uid: {
+        data: {
+          type: 'user--user',
+          id: '88197dd1-ce89-4624-9524-a4d2327f9bd5',
+          meta: {
+            drupal_internal__target_id: 10,
+          },
+        },
+        links: {
+          related: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/uid',
+          },
+          self: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/relationships/uid',
+          },
+        },
+      },
+      file: {
+        data: [],
+        links: {
+          related: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/file',
+          },
+          self: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/relationships/file',
+          },
+        },
+      },
+      image: {
+        data: [],
+        links: {
+          related: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/image',
+          },
+          self: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/relationships/image',
+          },
+        },
+      },
+      parent: {
+        data: [],
+        links: {
+          related: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/parent',
+          },
+          self: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/relationships/parent',
+          },
+        },
+      },
+      location: {
+        data: [],
+        links: {
+          related: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/location',
+          },
+          self: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/relationships/location',
+          },
+        },
+      },
+    },
+  },
+  links: {
+    self: {
+      href: 'https://oursci.farmos.dev/api/asset/land',
+    },
+  },
+};

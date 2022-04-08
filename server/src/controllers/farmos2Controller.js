@@ -308,3 +308,213 @@ export const changeOwnershipForInstace = async (req, res) => {
 export const assignFarmOSInstanceToUser = async (req, res) => {
   return res.send([]);
 };
+
+const runPendingFarmOSOperations = async (url, plan) => {
+  try {
+    const pendingOp = await db.collection('farmos.fields').findOne({ url: url });
+
+    if (!pendingOp) {
+      return; // success, no pending ops
+    }
+
+    const { fields } = pendingOp;
+
+    for (const field of fields) {
+      try {
+        const { create } = config();
+
+        const payload = {
+          data: {
+            type: 'asset--land',
+            attributes: {
+              name: field.name,
+              status: 'active',
+              intrinsic_geometry: {
+                value: field.wkt,
+              },
+              land_type: 'field',
+            },
+          },
+        };
+        const response = await create(url, 'asset', 'land', payload);
+        db.collection('farmos.webhookrequests').insertOne({
+          url,
+          plan,
+          created: new Date(),
+          state: 'success',
+          message: `created field ${field.name} with id ${response.data.id} for ${url}`,
+        });
+      } catch (error) {
+        db.collection('farmos.webhookrequests').insertOne({
+          url,
+          plan,
+          created: new Date(),
+          state: 'failed-field',
+          message: error.message,
+        });
+      }
+    }
+  } catch (error) {
+    console.log('error');
+    db.collection('farmos.webhookrequests').insertOne({
+      url,
+      plan,
+      created: new Date(),
+      state: 'failed',
+      message: error.message,
+    });
+  }
+
+  // finally delete all entries with url
+  await db.collection('farmos.fields').deleteMany({ url });
+};
+
+export const webhookCallback = async (req, res, next) => {
+  try {
+    const { key } = req.query;
+
+    //console.log("req", req)
+    if (!key) {
+      throw boom.unauthorized('key missing');
+    }
+
+    if (!process.env.FARMOS_CALLBACK_KEY) {
+      throw boom.badRequest('server does not support farmos webhooks');
+    }
+
+    if (key !== process.env.FARMOS_CALLBACK_KEY) {
+      throw boom.unauthorized('unauthorized');
+    }
+
+    const { url, plan, status } = req.body;
+
+    if (status !== 'ready') {
+      throw boom.badRequest('expecting status ready');
+    }
+
+    if (!url) {
+      throw boom.badRequest('url is missing');
+    }
+
+    if (!plan) {
+      throw boom.badRequest('plan is missing');
+    }
+
+    db.collection('farmos.webhookrequests').insertOne({
+      url,
+      plan,
+      created: new Date(),
+    });
+
+    await runPendingFarmOSOperations(url, plan);
+
+    return res.send({
+      status: 'success',
+    });
+  } catch (error) {
+    console.log('error', error);
+    if (boom.isBoom(error)) {
+      return next(error);
+    } else {
+      return res.send({
+        status: 'error',
+      });
+    }
+  }
+};
+
+export const createFarmOsInstance = async (req, res) => {
+  console.log('creating farmos instance', req.body);
+
+  const nameRule = (s) => !/[!"#$%()*+,\-./:;<=>?@[\\\]^_{|}~]/gi.test(`${s}`);
+  const validEmail = (e) =>
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+      e + ''
+    );
+
+  const {
+    url,
+    email,
+    site_name,
+    registrant,
+    location,
+    units,
+    plan,
+    apiKey,
+    group,
+    fields,
+    timezone,
+  } = req.body;
+
+  if (!nameRule(site_name)) {
+    throw boom.badData('site_name contains invalid characters');
+  }
+
+  if (!nameRule(registrant)) {
+    throw boom.badData('registrant contains invalid characters');
+  }
+
+  if (!validEmail(email)) {
+    throw boom.badData('invalid email address');
+  }
+
+  const access = await hasAdminRole(res.locals.auth.user._id, group);
+  if (!access) {
+    throw boom.unauthorized('permission denied: not group admin');
+  }
+
+  const groupId = typeof group === 'string' ? new ObjectId(group) : group;
+  const groupEntity = await db.collection('groups').findOne({ _id: groupId });
+  const { path: groupPath } = groupEntity;
+
+  console.log('groupPath', groupEntity, groupPath);
+
+  const agentOptions = {
+    host: 'account.farmos.net',
+    port: '443',
+    path: '/',
+    rejectUnauthorized: false,
+  };
+
+  const agent = new https.Agent(agentOptions);
+  const body = {
+    url: `${url}.farmos.net`,
+    email,
+    site_name,
+    registrant,
+    location,
+    units,
+    plan,
+    tags: [groupPath],
+    agree: true,
+    tz: timezone,
+  };
+
+  console.log('body for request', body);
+
+  try {
+    const r = await axios.post(`https://account.farmos.net/api/v1/farms`, body, {
+      headers: {
+        accept: 'application/json',
+        apikey: apiKey,
+      },
+      httpsAgent: agent,
+    });
+
+    db.collection('farmos.fields').insertOne({
+      url: `${url}.farmos.net`,
+      created: new Date(),
+      fields,
+    });
+
+    res.send({
+      status: 'success',
+      response: r.data,
+    });
+  } catch (error) {
+    return res.send({
+      status: 'error',
+      message: error.message,
+    });
+  }
+};

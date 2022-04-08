@@ -232,25 +232,12 @@ router.get('/roles', catchErrors(rolesController.getRoles));
 /** farmos */
 router.get('/farmos/farms', catchErrors(farmos2Controller.getFarmOSInstances));
 router.get('/farmos/assets', catchErrors(farmos2Controller.getAssets));
-router.get(
-  '/farmos/integrations/:id/farms',
-  [assertAuthenticated],
-  catchErrors(farmosController.getIntegrationFarms)
-);
 router.post('/farmos/test', [assertAuthenticated], catchErrors(farmosController.testConnection));
-
-router.get('/farmos/members-by-farm', catchErrors(farmosController.getMembersByFarmAndGroup));
-
-router.post('/farmos/set-memberships', catchErrors(farmosController.setFarmMemberships));
-
-router.post('/farmos/callback', catchErrors(farmosController.webhookCallback));
-router.get('/farmos/areas/:aggregator/:farmurl', catchErrors(farmosController.getAreas));
-router.post('/farmos/areas/:aggregator/:farmurl', catchErrors(farmosController.createField));
+router.post('/farmos/callback', catchErrors(farmos2Controller.webhookCallback));
 
 /** farmos 2 */
-
 router.post('/farmos/checkurl', catchErrors(farmosController.checkUrl));
-router.post('/farmos/create-instance', catchErrors(farmosController.createFarmOsInstance));
+router.post('/farmos/create-instance', catchErrors(farmos2Controller.createFarmOsInstance));
 
 router.get(
   '/farmos/all',

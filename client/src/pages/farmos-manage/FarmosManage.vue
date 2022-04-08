@@ -38,7 +38,7 @@ import api from '@/services/api.service';
 import Aggregator from './Aggregator.vue';
 import Groups from './Groups.vue';
 import Users from './Users.vue';
-import FarmOSRegisterVue from '../farmhub-onboarding/FarmOSRegister.vue';
+import FarmOSRegisterVue from './FarmOSRegister.vue';
 
 export default {
   data() {

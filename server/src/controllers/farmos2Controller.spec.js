@@ -1,12 +1,19 @@
 import boom from '@hapi/boom';
-import { getFarmOSInstances, getAssets, getLogs } from './farmos2Controller';
+
+const { getDb } = require('../db');
+
+import { getFarmOSInstances, getAssets, getLogs, webhookCallback } from './farmos2Controller';
 import { createGroup, createReq, createRes, createUser } from '../testUtils';
 import {
   mapFarmOSInstanceToUser,
   mapFarmOSInstanceToGroupAdmin,
 } from '../services/farmos-2/manage';
 
-import { assetResponse, logResponse } from '../services/farmos-2/__mock__/farmos.asset.response';
+import {
+  assetResponse,
+  logResponse,
+  createFieldResponse,
+} from '../services/farmos-2/__mock__/farmos.asset.response';
 
 import mockAxios from 'axios';
 
@@ -150,6 +157,52 @@ describe('farmos2controller', () => {
         },
       ])
     );
+  });
+  it.only('webhook-create-fields', async () => {
+    mockAxios.post.mockImplementation(() => Promise.resolve({ data: createFieldResponse }));
+    jest.resetModules();
+
+    const db = getDb();
+    await db.collection('farmos.fields').insertOne({
+      url: 'oursci.farmos.dev',
+      fields: [
+        {
+          name: 'Unit Test Field',
+          wkt: 'POLYGON ((-84.34150323269021 42.77962447110511, -84.34129044408108 42.77962315868189, -84.34125289315487 42.77938035618669, -84.34148535132407 42.77938298110345, -84.34150323269021 42.77962447110511))',
+        },
+      ],
+    });
+
+    process.env = {
+      FARMOS_CALLBACK_KEY: 'x',
+      FARMOS_AGGREGATOR_URL: 'x',
+      FARMOS_AGGREGATOR_APIKEY: 'x',
+    };
+
+    const send = jest.fn();
+
+    await webhookCallback(
+      {
+        query: {
+          key: 'x',
+        },
+        body: {
+          url: 'oursci.farmos.dev',
+          plan: 'oursci',
+          status: 'ready',
+        },
+      },
+      {
+        send,
+      },
+      () => {}
+    );
+    expect(send).toHaveBeenCalledWith({ status: 'success' });
+
+    const dbstate = await db.collection('farmos.webhookrequests').find().toArray();
+    expect(dbstate.length).toBe(2);
+    expect(dbstate[1].state).toBe('success');
+    expect(dbstate[1].url).toBe('oursci.farmos.dev');
   });
   it.only('requires-env-secrets-skipping', async () => {});
 });
