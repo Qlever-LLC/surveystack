@@ -15,7 +15,7 @@ const Template = (args, { argTypes }) => ({
   props: Object.keys(argTypes),
   components: { FarmosRegister },
   template: '<farmos-register v-bind="$props" />',
-  methods: { checkUrl: action('checkUrl'), create: action('create') },
+  //  methods: { checkUrl: action('checkUrl'), create: action('create') },
 });
 
 export const FarmosRegisterPage = Template.bind({});

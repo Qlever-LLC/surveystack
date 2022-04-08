@@ -6,7 +6,7 @@
         primary
         label="Select Group"
         v-model="selectedGroup"
-        v-if="!loading && !!localViewModel.groups"
+        v-if="!localViewModel.loading && !!localViewModel.groups"
         item-text="name"
         item-value="_id"
         :items="localViewModel.groups"
@@ -19,7 +19,7 @@
             label="Instance URL"
             placeholder="Enter Subdomain"
             suffix=".farmos.net"
-            :loading="checkingUrl"
+            :loading="localViewModel.loading"
             outlined
             :rules="urlRules"
           >
@@ -91,7 +91,7 @@
         chips
         multiple
         return-object
-        :loading="loading"
+        :loading="localViewModel.loading"
         ref="members"
       >
         <template v-slot:item="{ item }">
@@ -132,7 +132,7 @@
 
       <app-field-creator
         v-show="importFields"
-        :loading="loading"
+        :loading="localViewModel.loading"
         ref="field-creator"
         v-model="field"
         @done="fieldImported"
@@ -207,7 +207,6 @@ export default {
       successMessage: '',
       valid: false,
       urlState: null,
-      checkingUrl: false,
       invite: false,
       urlRules: [() => this.urlState === 'free' || 'URL must be available'],
       emailRules: [
@@ -301,7 +300,6 @@ export default {
     },
     async isUrlAvailable() {
       try {
-        this.checkingUrl = true;
         const r = await api.post('/farmos/checkurl', {
           url: this.localViewModel.form.instanceName,
         });
