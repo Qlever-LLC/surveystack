@@ -454,7 +454,8 @@ const getSubmissions = async (req, res) => {
     }
   }
 
-  const entities = await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).toArray();
+  const query = db.collection(col).aggregate(pipeline, { allowDiskUse: true });
+  const entities = await (queryParam(req.query.explain) ? query.explain() : query.toArray());
 
   return res.send(entities);
 };
