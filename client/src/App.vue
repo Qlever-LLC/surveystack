@@ -40,9 +40,9 @@ export default {
     },
     fetchFarmOsAssets() {
       if (this.$store.getters['auth/isLoggedIn']) {
+        api.get('farmos/farms');
         api.get('farmos/assets?bundle=land');
         api.get('farmos/assets?bundle=plant');
-        api.get('farmos/farms');
       }
     },
   },
