@@ -4,6 +4,7 @@ import {
   getPublicDownloadUrl,
   replaceLabelInKey,
   resourceLocations,
+  resourceTypes,
   uploadFileResource,
 } from '@/utils/resources';
 import api from '@/services/api.service';
@@ -31,6 +32,7 @@ const actions = {
     commit('RESET');
   },
   async initFromIndexedDB({ commit }) {
+    //TODO maybe better initFromIndexedDB by the store itself on first access
     const response = await new Promise((resolve) => {
       db.openDb(() => {
         db.getAllResources((results) => resolve(results));
@@ -160,12 +162,13 @@ const actions = {
       throw error;
     }
   },
-  async fetchResources({ commit, dispatch }, resources) {
+  async fetchResources({ commit, dispatch }, surveyResource) {
     try {
       let promises = [];
-      for (const r of resources) {
-        if (r.location === resourceLocations.REMOTE) {
-          promises.push(dispatch('resources/fetchResource', r._id));
+      for (const r of surveyResource) {
+        if (r.location === resourceLocations.REMOTE && r.type === resourceTypes.FILE) {
+          //Hint: survey resources's primary key is called id, not _id
+          promises.push(dispatch('fetchResource', r.id));
         }
       }
       await Promise.all(promises);

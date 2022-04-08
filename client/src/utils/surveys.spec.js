@@ -8,6 +8,7 @@ import {
   getPreparedLibraryControls,
   prepareToAddFromLibrary,
 } from './surveys';
+import { resourceTypes } from '@/utils/resources';
 
 function mockControls() {
   return [
@@ -93,7 +94,7 @@ function mockLibrarySurvey() {
         label: 'Dropdown Items 1',
         name: 'dropdown_items_1',
         id: '61813b1d33922800016e2b5c',
-        type: 'ONTOLOGY_LIST',
+        type: resourceTypes.ONTOLOGY_LIST,
         location: 'EMBEDDED',
         content: [
           {
@@ -120,7 +121,7 @@ function mockLibrarySurvey() {
         label: 'Dropdown Items 1',
         name: 'dropdown_items_1',
         id: '618260e5ec075200015b8b7f',
-        type: 'ONTOLOGY_LIST',
+        type: resourceTypes.ONTOLOGY_LIST,
         location: 'EMBEDDED',
         content: [
           {
@@ -149,7 +150,7 @@ function mockLibrarySurvey() {
         label: 'Dropdown Items 1',
         name: 'dropdown_items_1',
         id: '618260e5ec075200015b8b80',
-        type: 'ONTOLOGY_LIST',
+        type: resourceTypes.ONTOLOGY_LIST,
         location: 'EMBEDDED',
         content: [
           {

@@ -13,9 +13,7 @@
     <v-card class="d-flex flex-column">
       <v-card-title class="d-block">
         <div class="d-flex justify-space-between align-center">
-          <div class="grey--text text--darken-2">
-            Matrix Column Editor
-          </div>
+          <div class="grey--text text--darken-2">Matrix Column Editor</div>
           <div class="d-flex align-center ml-auto mr-2">
             <v-btn color="primary" @click="addColumn"> <v-icon left>mdi-plus</v-icon>Add Column </v-btn>
           </div>
@@ -183,6 +181,7 @@ import ObjectId from 'bson-objectid';
 import draggable from 'vuedraggable';
 
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
+import { resourceLocations, resourceTypes } from '@/utils/resources';
 
 const MATRIX_COLUMN_TYPES = [
   { text: 'Ontology - Dropdown', value: 'dropdown' },
@@ -226,7 +225,7 @@ export default {
   computed: {
     resourceSelectItems() {
       return this.resources
-        .filter((resource) => resource.type === 'ONTOLOGY_LIST')
+        .filter((resource) => resource.type === resourceTypes.ONTOLOGY_LIST)
         .map((resource) => ({ text: resource.label, value: resource.id }));
     },
     ontology() {
@@ -272,8 +271,8 @@ export default {
           label: `Ontology List ${this.resources.length + 1}`,
           name: `ontology_list_${this.resources.length + 1}`,
           id,
-          type: 'ONTOLOGY_LIST',
-          location: 'EMBEDDED',
+          type: resourceTypes.ONTOLOGY_LIST,
+          location: resourceLocations.EMBEDDED,
           content: [],
         },
       ]);

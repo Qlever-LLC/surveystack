@@ -72,18 +72,22 @@
     <v-text-field v-model="search" label="Search" autocomplete="off" />
     <v-list>
       <template v-if="filteredResources.length > 0">
-        <v-list-item v-for="resource in filteredResources" :key="resource.id" two-line @click="openResource(resource)">
+        <v-list-item
+          v-for="resource in filteredResources"
+          :key="resource.id"
+          two-line
+          @click="openResource(resource)"
+          :inactive="resource.type !== resourceTypes.FILE && resource.type !== resourceTypes.ONTOLOGY_LIST"
+        >
           <v-list-item-content style="user-select: text">
             <v-list-item-title>{{ resource.label }}</v-list-item-title>
-            <v-list-item-subtitle v-if="resource.type === 'FILE'"
-              >{{ `resources/${resource.id}/${resource.label} : ${resource.type}` }}
+            <v-list-item-subtitle v-if="resource.type === resourceTypes.FILE">
+              {{ `resources/${resource.id}/${resource.label} : ${resource.type}` }}
             </v-list-item-subtitle>
-            <v-list-item-subtitle v-if="resource.type === 'ONTOLOGY_LIST'"
-              >{{ resource.name }} : {{ resource.type }}
-            </v-list-item-subtitle>
+            <v-list-item-subtitle v-else>{{ resource.name }} : {{ resource.type }} </v-list-item-subtitle>
           </v-list-item-content>
           <v-icon v-if="resource.libraryId" color="grey lighten-1">mdi-library</v-icon>
-          <v-list-item-action v-if="resource.location === 'REMOTE'">
+          <v-list-item-action v-if="resource.type === resourceTypes.FILE">
             <v-btn icon>
               <v-icon color="grey lighten-1" @click.stop="removeRemoteResource(resource)"> mdi-delete </v-icon>
             </v-btn>
@@ -102,7 +106,7 @@
 <script>
 import ObjectId from 'bson-objectid';
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
-import { openResourceInTab, resourceLocations } from '@/utils/resources';
+import { openResourceInTab, resourceLocations, resourceTypes } from '@/utils/resources';
 import store from '@/store';
 
 export default {
@@ -116,13 +120,16 @@ export default {
   },
   data() {
     return {
+      resourceLocations,
+      resourceTypes,
       search: '',
       filter: false,
       availableFilters: [
         { text: 'All', value: false },
-        { text: 'Ontology List', value: 'ONTOLOGY_LIST' },
-        { text: 'Matrix', value: 'MATRIX' },
-        { text: 'File', value: 'FILE' },
+        { text: 'Ontology List', value: resourceTypes.ONTOLOGY_LIST },
+        { text: 'Image URL', value: resourceTypes.IMAGE },
+        { text: 'File', value: resourceTypes.FILE },
+        { text: 'Survey reference', value: resourceTypes.SURVEY_REFERENCE },
       ],
       ontologyEditorDialog: false,
       selectedId: null,
@@ -158,7 +165,7 @@ export default {
           label: newResource.label,
           name: newResource.name,
           id: newResource._id,
-          type: 'FILE',
+          type: resourceTypes.FILE,
           location: resourceLocations.REMOTE,
         },
       ]);
@@ -166,17 +173,12 @@ export default {
       this.uploadingResource = false;
     },
     async openResource(resource) {
-      if (resource.type === 'ONTOLOGY_LIST') {
+      if (resource.type === resourceTypes.ONTOLOGY_LIST) {
         this.openOntologyEditor(resource.id);
+      } else if (resource.type === resourceTypes.FILE) {
+        await this.openFileResource(resource.id);
       } else {
-        this.downloadingResource = true;
-        try {
-          await openResourceInTab(this.$store, resource.id);
-        } catch (error) {
-          this.openResourceError = 'File could not be opened';
-        } finally {
-          this.downloadingResource = false;
-        }
+        //  resourceTypes IMAGE and SURVEY_REFERENCE can not be opened here
       }
     },
     async removeRemoteResource(resource) {
@@ -193,8 +195,8 @@ export default {
           label: `Ontology List ${this.resources.length + 1}`,
           name: `ontology_list_${this.resources.length + 1}`,
           id,
-          type: 'ONTOLOGY_LIST',
-          location: 'EMBEDDED',
+          type: resourceTypes.ONTOLOGY_LIST,
+          location: resourceLocations.EMBEDDED,
           content: [],
         },
       ]);
@@ -203,6 +205,16 @@ export default {
     openOntologyEditor(id) {
       this.selectedId = id;
       this.ontologyEditorDialog = true;
+    },
+    async openFileResource(id) {
+      this.downloadingResource = true;
+      try {
+        await openResourceInTab(this.$store, id);
+      } catch (error) {
+        this.openResourceError = 'File could not be opened';
+      } finally {
+        this.downloadingResource = false;
+      }
     },
   },
   computed: {
