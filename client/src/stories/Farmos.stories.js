@@ -6,9 +6,9 @@ import FarmosRegister from '../pages/farmos-manage/FarmOSRegister.vue';
 import { action } from '@storybook/addon-actions';
 
 export default {
-  title: 'FarmOS',
+  title: 'FarmOS Register Page',
   component: FarmosRegister,
-  argTypes: {},
+  argTypes: { checkUrl: { action: 'checkUrl' } },
 };
 
 const Template = (args, { argTypes }) => ({
@@ -28,8 +28,10 @@ FarmosRegisterPage.args = {
       farmName: '',
       farmAddress: '',
       units: '',
-      timeZone: '',
+      timezone: '',
       agree: false,
+      owner: null,
+      admins: [],
     },
     groups: [
       {

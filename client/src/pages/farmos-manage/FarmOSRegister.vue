@@ -24,21 +24,15 @@
             :rules="urlRules"
           >
             <template v-slot:append-outer>
-              <v-icon
-                style="margin-top: -8px"
-                v-if="!!urlState"
-                :color="urlState === 'free' ? 'green' : 'red'"
-                large
-              >{{ urlState === 'free' ? 'mdi-check' : 'mdi-alert-octagon' }}</v-icon>
+              <v-icon style="margin-top: -8px" v-if="!!urlState" :color="urlState === 'free' ? 'green' : 'red'" large>{{
+                urlState === 'free' ? 'mdi-check' : 'mdi-alert-octagon'
+              }}</v-icon>
             </template>
           </v-text-field>
         </v-col>
 
         <v-col>
-          <v-btn
-            @click="$emit('checkUrl', localViewModel.form.instanceName)"
-            color="primary"
-          >Check URL</v-btn>
+          <v-btn @click="$emit('checkUrl', localViewModel.form.instanceName)" color="primary">Check URL</v-btn>
         </v-col>
       </v-row>
 
@@ -74,6 +68,15 @@
         :rules="addressRules"
       />
 
+      <v-autocomplete
+        label="Timezone"
+        outlined
+        :items="timezones"
+        item-text="name"
+        v-model="localViewModel.form.timezone"
+        return-object
+      />
+
       <div class="text-left text--secondary">Unit System to use</div>
       <v-radio-group v-model="localViewModel.form.units" col>
         <v-radio label="Metric" value="metric"></v-radio>
@@ -81,11 +84,21 @@
       </v-radio-group>
 
       <v-autocomplete
-        label="Members with Access to Farm"
-        v-model="activeUsers"
-        :items="members"
+        label="Owner of the FarmOS Instance"
+        outlined
+        :items="localViewModel.users"
         item-value="id"
-        item-text="name"
+        :item-text="(item) => `${item.name} (${item.email})`"
+        v-model="localViewModel.form.owner"
+        return-object
+      />
+
+      <v-autocomplete
+        label="Admins with Access to Farm"
+        v-model="localViewModel.form.admins"
+        :items="localViewModel.users"
+        item-value="id"
+        :item-text="(item) => `${item.name} (${item.email})`"
         outlined
         deletable-chips
         chips
@@ -109,7 +122,7 @@
             color="primary"
             class="ma-4"
             outlined
-            :to="`/memberships/new?group=${group}&role=user`"
+            :to="`/memberships/new?group=${selectedGroup}&role=user`"
             @click="onInvite"
             target="_blank"
           >
@@ -148,7 +161,8 @@
         @cancel="invite = false"
         @confirm="loadMembers"
         width="400"
-      >To show new members in the dropdown, please press refresh.</app-dialog>
+        >To show new members in the dropdown, please press refresh.</app-dialog
+      >
 
       <v-checkbox
         :rules="agreeRules"
@@ -174,7 +188,8 @@
       @cancel="successDialog = false"
       @confirm="successDialog = false"
       width="400"
-    >{{ successMessage }}</app-dialog>
+      >{{ successMessage }}</app-dialog
+    >
   </v-container>
 </template>
 
@@ -185,6 +200,8 @@ import api from '@/services/api.service';
 import appDialog from '@/components/ui/Dialog.vue';
 import appFieldCreator from './FieldCreator.vue';
 import appFieldList from './FieldList.vue';
+
+import { timezones } from './timezones';
 
 export default {
   props: ['viewModel'],
@@ -219,18 +236,10 @@ export default {
       nameRules: [(v) => !!v || 'Name Required'],
       addressRules: [(v) => !!v || 'Address Required'],
       agreeRules: [(v) => !!v || 'Must agree to ToS'],
+      timezones: [],
     };
   },
-  watch: {
-    viewModel: {
-      deep: true,
-      immediate: true,
-      handler(vm) {
-        console.log("changes")
-        this.localViewModel = _.cloneDeep(vm)
-      },
-    }
-  },
+
   methods: {
     cancelFieldImport() {
       this.field = {
@@ -273,10 +282,7 @@ export default {
           registrant,
           location,
           units,
-          plan,
           agree: true,
-          apiKey,
-          aggregator,
           selectedGroup: this.selectedGroup,
           fields,
         });
@@ -333,7 +339,7 @@ export default {
         this.entity = { ...this.entity, ...data };
 
         const { data: members } = await api.get(`/memberships?group=${this.selectedGroup}&populate=true`);
-        this.members = members.map(m => m.email);
+        this.members = members.map((m) => m.email);
       } catch (e) {
         console.log('error', e);
         this.$emit('dialog', 'Error', e.message);
@@ -360,6 +366,24 @@ export default {
   watch: {},
   async mounted() {
     this.loadMembers();
+    /*
+    this.timezones = _.keys(timezones.countries).flatMap((key) => {
+      const country = timezones.countries[key];
+      return country.zones.map((z) => ({
+        name: `${country.name} ${z}`,
+        value: z,
+      }));
+    });*/
+
+    this.timezones = _.keys(timezones.zones);
+  },
+  viewModel: {
+    deep: true,
+    immediate: true,
+    handler(vm) {
+      console.log('changes');
+      this.localViewModel = _.cloneDeep(vm);
+    },
   },
 };
 </script>
