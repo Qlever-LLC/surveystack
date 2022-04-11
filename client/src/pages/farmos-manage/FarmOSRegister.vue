@@ -131,7 +131,7 @@
           <v-divider />
         </template>
         <template v-slot:append-outer>
-          <v-btn fab color="primary" style="margin-top: -16px" @click="loadMembers">
+          <v-btn fab color="primary" style="margin-top: -16px">
             <v-icon>mdi-refresh</v-icon>
           </v-btn>
         </template>
@@ -329,7 +329,7 @@ export default {
       this.checkingUrl = false;
       this.$refs.form.validate();
     },
-    async loadMembers() {
+    async loadMekuzrztmbers() {
       this.invite = false;
       this.activeUsers = [];
 
@@ -363,9 +363,18 @@ export default {
       return true;
     },
   },
-  watch: {},
+  watch: {
+    viewModel: {
+      deep: true,
+      immediate: true,
+      handler(vm) {
+        console.log('changes');
+        this.localViewModel = _.cloneDeep(vm);
+      },
+    },
+  },
   async mounted() {
-    this.loadMembers();
+    // this.loadMembers();
     /*
     this.timezones = _.keys(timezones.countries).flatMap((key) => {
       const country = timezones.countries[key];
@@ -376,14 +385,6 @@ export default {
     });*/
 
     this.timezones = _.keys(timezones.zones);
-  },
-  viewModel: {
-    deep: true,
-    immediate: true,
-    handler(vm) {
-      console.log('changes');
-      this.localViewModel = _.cloneDeep(vm);
-    },
   },
 };
 </script>

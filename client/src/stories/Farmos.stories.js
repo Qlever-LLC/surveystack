@@ -23,6 +23,7 @@ FarmosRegisterPage.args = {
   viewModel: {
     form: {
       instanceName: 'oursci.surveystack.dev',
+      instanceNameValid: true,
       email: '',
       fullName: '',
       farmName: '',
