@@ -78,6 +78,7 @@ SuperAdminInterface.args = {
 
 const methods = {
   async isUrlAvailable() {
+    /*
     try {
       const r = await api.post('/farmos/checkurl', {
         url: this.localViewModel.form.instanceName,
@@ -101,8 +102,10 @@ const methods = {
     }
     this.checkingUrl = false;
     this.$refs.form.validate();
+    */
   },
   async loadMembers() {
+    /*
     this.invite = false;
     this.activeUsers = [];
 
@@ -117,5 +120,6 @@ const methods = {
       console.log('error', e);
       this.$emit('dialog', 'Error', e.message);
     }
+    */
   },
 };
