@@ -30,13 +30,21 @@ export default {
     db.openDb(() => {});
   },
   mounted() {
-    this.$store.dispatch('surveys/fetchPinned');
-    this.$store.dispatch('resources/initFromIndexedDB');
-
-    if (this.$store.getters['auth/isLoggedIn']) {
-      api.get('farmos/assets?bundle=land');
-      api.get('farmos/assets?bundle=plant');
-    }
+    this.fetchPinnedSurveys();
+    this.fetchFarmOsAssets();
+  },
+  methods: {
+    async fetchPinnedSurveys() {
+      await this.$store.dispatch('resources/initFromIndexedDB');
+      await this.$store.dispatch('surveys/fetchPinned');
+    },
+    fetchFarmOsAssets() {
+      if (this.$store.getters['auth/isLoggedIn']) {
+        api.get('farmos/farms');
+        api.get('farmos/assets?bundle=land');
+        api.get('farmos/assets?bundle=plant');
+      }
+    },
   },
 };
 </script>

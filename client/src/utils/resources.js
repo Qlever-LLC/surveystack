@@ -7,19 +7,13 @@ export const resourceTypes = {
   ONTOLOGY_LIST: 'ONTOLOGY_LIST',
   IMAGE: 'IMAGE',
   SURVEY_REFERENCE: 'SURVEY_REFERENCE',
+  FILE: 'FILE',
 };
 
 export const resourceLocations = {
   REMOTE: 'REMOTE',
   EMBEDDED: 'EMBEDDED',
 };
-
-export function filterResourcesByTypes(resources, types = []) {
-  if (types.length === 0) {
-    return resources;
-  }
-  return resources.filter((resource) => types.some((type) => type === resource.type));
-}
 
 export function removeResource(resources, id) {
   const index = resources.findIndex((r) => r.id === id);
@@ -74,8 +68,8 @@ export function replaceLabelInKey(resourceKey, labelNew) {
   return resourceKey.substring(0, resourceKey.lastIndexOf('/') + 1) + labelNew;
 }
 
-export function getLabelFromKey(resourcKey) {
-  return resourcKey.substring(resourcKey.lastIndexOf('/') + 1);
+export function getLabelFromKey(resourceKey) {
+  return resourceKey.substring(resourceKey.lastIndexOf('/') + 1);
 }
 
 export async function openResourceInTab(store, resourceId) {

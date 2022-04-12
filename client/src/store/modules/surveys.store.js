@@ -22,7 +22,7 @@ const getters = {
     },
 };
 
-const fetchPinned = async (commit) => {
+const fetchPinned = async (commit, dispatch) => {
   const pinned = [];
   const { data } = await api.get(`/surveys/pinned`);
   const { status } = data;
@@ -44,11 +44,12 @@ const fetchPinned = async (commit) => {
         if (!cached) {
           try {
             let s = await actions.fetchSurvey({ commit }, sid);
-            await this.$store.dispatch('resources/fetchResources', s.resources);
+            await dispatch('resources/fetchResources', s.resources, { root: true });
             fetched.push(s);
             item.name = s.name;
             item.meta = s.meta;
           } catch (error) {
+            console.log('error:' + error);
             continue;
           }
         } else {
@@ -105,7 +106,7 @@ const actions = {
 
     const useLegacyPinnedImpl = false; // toggle switch for legacy implementation
 
-    const pinnedItems = await fetchPinned(commit, filteredMemberships);
+    const pinnedItems = await fetchPinned(commit, dispatch, filteredMemberships);
     pinned.push(...pinnedItems);
 
     commit('SET_PINNED', pinned);
