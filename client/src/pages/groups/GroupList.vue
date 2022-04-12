@@ -37,15 +37,19 @@ export default {
   },
   methods: {
     async fetchEntities() {
-      if (this.isWhitelabel) {
-        const { path } = this.whitelabelPartner;
-        const { data: entities } = await api.get(`/groups?showArchived=${this.showArchived}&prefix=${path}`);
-        this.entities = entities;
-        return;
-      }
+      try {
+        if (this.isWhitelabel) {
+          const { path } = this.whitelabelPartner;
+          const { data: entities } = await api.get(`/groups?showArchived=${this.showArchived}&prefix=${path}`);
+          this.entities = entities;
+          return;
+        }
 
-      const { data: entities } = await api.get(`/groups?showArchived=${this.showArchived}`);
-      this.entities = entities;
+        const { data: entities } = await api.get(`/groups?showArchived=${this.showArchived}`);
+        this.entities = entities;
+      } catch {
+        this.$store.dispatch('feedback/add', 'There was an error, please refresh the page');
+      }
     },
   },
   computed: {
