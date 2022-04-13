@@ -48,6 +48,13 @@
       "
       @close="onCloseResultDialog"
     />
+
+    <result-dialog
+      v-model="showApiComposeErrors"
+      :items="apiComposeErrors"
+      title="ApiCompose Errors"
+      @close="showApiComposeErrors = false"
+    />
   </div>
 </template>
 
@@ -63,6 +70,7 @@ import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
 import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
+import { getApiComposeErros } from '@/utils/draft';
 
 export default {
   mixins: [appMixin, resultMixin],
@@ -82,6 +90,8 @@ export default {
       isSubmitted: false,
       hasError: false,
       showResubmissionDialog: false,
+      apiComposeErrors: [],
+      showApiComposeErrors: false,
     };
   },
   methods: {
@@ -118,6 +128,12 @@ export default {
       window.parent.postMessage(message, '*');
     },
     async submit({ payload }) {
+      this.apiComposeErrors = getApiComposeErros(this.survey, payload);
+      if (this.apiComposeErrors.length > 0) {
+        this.showApiComposeErrors = true;
+        return;
+      }
+
       this.submitting = true;
       this.submission.meta.status = this.addReadyToSubmit(this.submission.meta.status || []);
 

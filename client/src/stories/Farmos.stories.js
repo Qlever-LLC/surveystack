@@ -17,8 +17,9 @@ const Template = (args, { argTypes }) => ({
   template: '<farmos-register :viewModel="viewModel" @check-url="checkUrl" @create-instance="createInstance"/>',
 });
 
-export const FarmosRegisterPage = Template.bind({});
-FarmosRegisterPage.args = {
+export const SuperAdminInterface = Template.bind({});
+
+SuperAdminInterface.args = {
   viewModel: {
     form: {
       instanceName: 'oursci.surveystack.dev',

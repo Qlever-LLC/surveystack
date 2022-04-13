@@ -60,7 +60,7 @@
       />
 
       <v-text-field
-        v-model="localViewModel.form.registrant"
+        v-model="localViewModel.form.fullName"
         label="Full Name of the Farmer"
         placeholder="Farmer's Name"
         outlined
@@ -68,7 +68,7 @@
       />
 
       <v-text-field
-        v-model="localViewModel.form.site_name"
+        v-model="localViewModel.form.farmName"
         label="Name of the Farm"
         placeholder="Farm Name"
         outlined
@@ -76,7 +76,7 @@
       />
 
       <v-text-field
-        v-model="localViewModel.form.location"
+        v-model="localViewModel.form.farmAddress"
         label="Farm Address / Location"
         placeholder="123 Fake Street, Exampletown, NY"
         outlined
@@ -175,7 +175,6 @@
         class="primary--text mx-4"
         v-model="invite"
         @cancel="invite = false"
-        @confirm="loadMembers"
         width="400"
         >To show new members in the dropdown, please press refresh.</app-dialog
       >
@@ -280,48 +279,6 @@ export default {
     async save() {
       this.$emit('create-instance', this.localViewModel.form, this.localViewModel.fields);
     },
-    async isUrlAvailable() {
-      try {
-        const r = await api.post('/farmos/checkurl', {
-          url: this.localViewModel.form.instanceName,
-        });
-
-        if (r.data && r.data.status) {
-          console.log('data', r.data);
-          if (r.data.status === 'free') {
-            this.urlState = 'free';
-          } else if (r.data.status === 'taken') {
-            this.urlState = 'taken';
-          } else {
-            this.urlState = null;
-            console.log('error', r.data); // TODO show error dialog
-          }
-        } else {
-          throw new Error('Invalid Response Format');
-        }
-      } catch (error) {
-        console.log('error', error);
-      }
-      this.checkingUrl = false;
-      this.$refs.form.validate();
-    },
-    async loadMembers() {
-      this.invite = false;
-      this.activeUsers = [];
-
-      try {
-        console.log('farmos instance', this.localViewModel.form);
-        const { data } = await api.get(`/groups/${this.selectedGroup}?populate=true`);
-        this.entity = { ...this.entity, ...data };
-
-        const { data: members } = await api.get(`/memberships?group=${this.selectedGroup}&populate=true`);
-        this.members = members.map((m) => m.email);
-      } catch (e) {
-        console.log('error', e);
-        this.$emit('dialog', 'Error', e.message);
-      }
-    },
-
     async persistMemberships() {
       // updatge access
     },

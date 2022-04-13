@@ -10,7 +10,7 @@
         :resources="filteredResources"
         :value="(value && value.images && value.images[0]) || null"
         :disabled="disabled"
-        :newResourceTypes="['IMAGE']"
+        :newResourceTypes="[resourceTypes.IMAGE]"
         @on-new="createResourceHandler"
         @on-select="selectResourceHandler"
       />
@@ -68,6 +68,7 @@ import {
 export default {
   data() {
     return {
+      resourceTypes,
       imageDialogIsVisible: false,
     };
   },
@@ -95,7 +96,7 @@ export default {
   },
   computed: {
     filteredResources() {
-      return this.resources.filter((resource) => resource.type === 'IMAGE');
+      return this.resources.filter((resource) => resource.type === resourceTypes.IMAGE);
     },
     resource() {
       return this.resources.find((resource) => resource.id === this.value.images[0]);
