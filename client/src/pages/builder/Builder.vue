@@ -180,6 +180,7 @@ export default {
     },
     async submitSubmission({ payload }) {
       this.apiComposeErrors = getApiComposeErros(this.survey, payload);
+      console.log('apicompose errors', this.apiComposeErrors);
       if (this.apiComposeErrors.length > 0) {
         this.showApiComposeErrors = true;
         return;

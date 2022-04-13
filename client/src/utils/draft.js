@@ -1,8 +1,9 @@
-import { linearControls } from '@/utils/submissions';
+import { linearControlsWithGroups } from '@/utils/submissions';
 
 export const getApiComposeErros = (survey, submission) => {
   const errors = [];
-  linearControls(survey, submission).forEach((control) => {
+  linearControlsWithGroups(survey, submission).forEach((control) => {
+    console.log('walking through', control);
     if (control.meta && control.meta.apiCompose) {
       if (Array.isArray(control.meta.apiCompose)) {
         for (const apc of control.meta.apiCompose) {
