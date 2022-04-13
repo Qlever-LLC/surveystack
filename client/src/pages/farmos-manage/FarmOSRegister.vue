@@ -5,14 +5,25 @@
         outlined
         primary
         label="Select Group"
-        v-model="selectedGroup"
+        v-model="localViewModel.form.selectedGroup"
         v-if="!localViewModel.loading && !!localViewModel.groups"
         item-text="name"
         item-value="_id"
         :items="localViewModel.groups"
+        :rules="[(v) => !!v || `select group`]"
       ></v-autocomplete>
 
-      <v-row>
+      <v-autocomplete
+        outlined
+        primary
+        label="Select Plan"
+        v-model="localViewModel.form.selectedPlan"
+        v-if="!localViewModel.loading"
+        :items="localViewModel.plans"
+        :rules="[(v) => !!v || `select plan`]"
+      ></v-autocomplete>
+
+      <v-row class="align-baseline">
         <v-col>
           <v-text-field
             v-model="localViewModel.form.instanceName"
@@ -21,18 +32,22 @@
             suffix=".farmos.net"
             :loading="localViewModel.loading"
             outlined
-            :rules="urlRules"
+            :rules="[(v) => viewModel.form.instanceNameValid === true || 'Instance Name not valid']"
           >
             <template v-slot:append-outer>
-              <v-icon style="margin-top: -8px" v-if="!!urlState" :color="urlState === 'free' ? 'green' : 'red'" large>{{
-                urlState === 'free' ? 'mdi-check' : 'mdi-alert-octagon'
-              }}</v-icon>
+              <v-icon
+                style="margin-top: -8px"
+                v-if="viewModel.form.instanceNameValid === true || viewModel.form.instanceNameValid === false"
+                :color="viewModel.form.instanceNameValid === true ? 'green' : 'red'"
+                large
+                >{{ viewModel.form.instanceNameValid === true ? 'mdi-check' : 'mdi-alert-octagon' }}</v-icon
+              >
             </template>
           </v-text-field>
         </v-col>
 
         <v-col>
-          <v-btn @click="$emit('checkUrl', localViewModel.form.instanceName)" color="primary">Check URL</v-btn>
+          <v-btn @click="$emit('check-url', localViewModel.form.instanceName)" color="primary">Check URL</v-btn>
         </v-col>
       </v-row>
 
@@ -72,8 +87,8 @@
         label="Timezone"
         outlined
         :items="timezones"
-        item-text="name"
         v-model="localViewModel.form.timezone"
+        :rules="[(v) => !!v || `select time zone`]"
         return-object
       />
 
@@ -90,10 +105,11 @@
         item-value="id"
         :item-text="(item) => `${item.name} (${item.email})`"
         v-model="localViewModel.form.owner"
+        :rules="[(v) => !!v || `select at least one owner`]"
         return-object
       />
 
-      <v-autocomplete
+      <!-- <v-autocomplete
         label="Admins with Access to Farm"
         v-model="localViewModel.form.admins"
         :items="localViewModel.users"
@@ -135,11 +151,11 @@
             <v-icon>mdi-refresh</v-icon>
           </v-btn>
         </template>
-      </v-autocomplete>
+      </v-autocomplete> -->
 
       <v-divider class="my-4"></v-divider>
 
-      <app-field-list v-if="fields.length > 0" v-model="fields"></app-field-list>
+      <app-field-list v-if="localViewModel.fields.length > 0" v-model="localViewModel.fields"></app-field-list>
 
       <v-btn class="mx-2" @click="importFields = true" v-if="!importFields">Add / Import Field</v-btn>
 
@@ -167,7 +183,7 @@
       <v-checkbox
         :rules="agreeRules"
         v-model="localViewModel.form.agree"
-        label="Agree to Terms of Service and Privacy Policy of Farmos"
+        label="Agree to Terms of Serviceand  Privacy Policy of Farmos"
       >
         <template v-slot:label></template>
       </v-checkbox>
@@ -236,7 +252,7 @@ export default {
       nameRules: [(v) => !!v || 'Name Required'],
       addressRules: [(v) => !!v || 'Address Required'],
       agreeRules: [(v) => !!v || 'Must agree to ToS'],
-      timezones: [],
+      timezones: timezones,
     };
   },
 
@@ -262,47 +278,7 @@ export default {
       this.invite = true;
     },
     async save() {
-      const {
-        url,
-        email,
-        // eslint-disable-next-line camelcase
-        site_name,
-        registrant,
-        location,
-        units,
-      } = this.localViewModel.form;
-
-      const { fields } = this.localViewModel;
-
-      try {
-        const r = await api.post('/farmos/create-instance', {
-          url,
-          email,
-          site_name,
-          registrant,
-          location,
-          units,
-          agree: true,
-          selectedGroup: this.selectedGroup,
-          fields,
-        });
-
-        if (r.data && r.data.status === 'success') {
-          this.$emit(
-            'dialog',
-            'Success',
-            `Sucessfully created ${this.localViewModel.form.instanceName}. FarmOS Instance is now being created.`
-          );
-          this.persistMemberships();
-        } else {
-          throw new Error('Error creating instance');
-        }
-      } catch (e) {
-        this.$emit('dialog', 'Error', e.message);
-      }
-    },
-    testConnection() {
-      this.$emit('testConnection', this.localViewModel.form);
+      this.$emit('create-instance', this.localViewModel.form, this.localViewModel.fields);
     },
     async isUrlAvailable() {
       try {
@@ -329,7 +305,7 @@ export default {
       this.checkingUrl = false;
       this.$refs.form.validate();
     },
-    async loadMekuzrztmbers() {
+    async loadMembers() {
       this.invite = false;
       this.activeUsers = [];
 
@@ -375,16 +351,6 @@ export default {
   },
   async mounted() {
     // this.loadMembers();
-    /*
-    this.timezones = _.keys(timezones.countries).flatMap((key) => {
-      const country = timezones.countries[key];
-      return country.zones.map((z) => ({
-        name: `${country.name} ${z}`,
-        value: z,
-      }));
-    });*/
-
-    this.timezones = _.keys(timezones.zones);
   },
 };
 </script>

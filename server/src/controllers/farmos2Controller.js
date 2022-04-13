@@ -432,19 +432,10 @@ export const createFarmOsInstance = async (req, res) => {
       e + ''
     );
 
-  const {
-    url,
-    email,
-    site_name,
-    registrant,
-    location,
-    units,
-    plan,
-    apiKey,
-    group,
-    fields,
-    timezone,
-  } = req.body;
+  const apiKey = process.env.FARMOS_CREATE_KEY;
+
+  const { url, email, site_name, registrant, location, units, group, fields, timezone, planName } =
+    req.body;
 
   if (!nameRule(site_name)) {
     throw boom.badData('site_name contains invalid characters');
@@ -456,6 +447,10 @@ export const createFarmOsInstance = async (req, res) => {
 
   if (!validEmail(email)) {
     throw boom.badData('invalid email address');
+  }
+
+  if (!planName) {
+    throw boom.badData('plan name missing');
   }
 
   const access = await hasAdminRole(res.locals.auth.user._id, group);
@@ -484,13 +479,15 @@ export const createFarmOsInstance = async (req, res) => {
     registrant,
     location,
     units,
-    plan,
+    plan: planName,
     tags: [groupPath],
     agree: true,
-    tz: timezone,
+    timezone: timezone,
   };
 
   console.log('body for request', body);
+
+  // also add instances to users
 
   try {
     const r = await axios.post(`https://account.farmos.net/api/v1/farms`, body, {

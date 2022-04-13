@@ -12,7 +12,7 @@ export const uuidv4 = () => {
     return ((r & 0x3) | 0x8).toString(16);
   });
   return `${u}.${new Date().getTime().toString(16)}`;
-}
+};
 
 /**
  * ApiCompose
@@ -20,14 +20,10 @@ export const uuidv4 = () => {
  * @param {submission} submission
  */
 function apiCompose(submission) {
-  const request = populatePlanting(
-    submission.data.crop,
-    submission.data.field,
-  );
+  const request = populatePlanting(submission.data.crop, submission.data.field);
 
   return request;
 }
-
 
 /**
  * Helper function to populate the request
@@ -43,7 +39,6 @@ function populatePlanting(cropAnswer, field) {
     throw 'Please select field';
   }
 
-
   const crop = cropAnswer.value;
   const farmUrl = field.value.url;
 
@@ -52,17 +47,15 @@ function populatePlanting(cropAnswer, field) {
    * the server creates the appropriate taxonomy first.
    */
   const terms = {
-    'Chioggia': {
+    Chioggia: {
       type: 'taxonomy_term--plant_type',
       name: 'Chioggia',
       id: uuidv4(),
     },
   };
 
-
   return {
-    type: 'farmos-v2',
-    farmosType: 'asset',
+    type: 'farmos',
     url: farmUrl,
     terms,
     body: {
@@ -76,7 +69,7 @@ function populatePlanting(cropAnswer, field) {
       relationships: {
         plant_type: {
           data: [
-            terms['Chioggia'] // server will go and check if exists
+            terms['Chioggia'], // server will go and check if exists
           ],
         },
       },

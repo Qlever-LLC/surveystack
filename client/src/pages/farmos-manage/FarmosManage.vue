@@ -1,13 +1,6 @@
 <template>
   <v-container>
-    <v-alert
-      v-if="success"
-      class="mt-4"
-      mode="fade"
-      text
-      type="success"
-      @click="success = null"
-    >{{ success }}</v-alert>
+    <v-alert v-if="success" class="mt-4" mode="fade" text type="success" @click="success = null">{{ success }}</v-alert>
 
     <v-tabs v-model="tab" background-color="transparent" color="basil" grow>
       <v-tab v-for="item in items" :key="item.name">{{ item.name }}</v-tab>
@@ -175,6 +168,44 @@ export default {
         } else {
           this.error = error.message;
         }
+      }
+    },
+    async createInstance(form, fields) {
+      const {
+        url,
+        email,
+        // eslint-disable-next-line camelcase
+        site_name,
+        registrant,
+        location,
+        units,
+      } = form;
+
+      try {
+        const r = await api.post('/farmos/create-instance', {
+          url,
+          email,
+          site_name,
+          registrant,
+          location,
+          units,
+          agree: true,
+          selectedGroup: this.selectedGroup,
+          fields,
+        });
+
+        if (r.data && r.data.status === 'success') {
+          this.$emit(
+            'dialog',
+            'Success',
+            `Sucessfully created ${this.localViewModel.form.instanceName}. FarmOS Instance is now being created.`
+          );
+          this.persistMemberships();
+        } else {
+          throw new Error('Error creating instance');
+        }
+      } catch (e) {
+        this.$emit('dialog', 'Error', e.message);
       }
     },
   },

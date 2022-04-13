@@ -153,7 +153,7 @@ export const getSuperAllFarmosMappings = async () => {
   };
 };
 
-export const addFarmToSurveystackGroup = async (instanceName, groupId) => {
+export const addFarmToSurveystackGroup = async (instanceName, groupId, planName) => {
   const res = await db
     .collection('farmos-group-mapping')
     .find({
@@ -185,6 +185,7 @@ export const addFarmToSurveystackGroup = async (instanceName, groupId) => {
     _id,
     instanceName,
     groupId: asMongoId(groupId),
+    planName,
   });
 };
 
@@ -252,4 +253,28 @@ export const removeFarmFromUser = async (instanceName, userId, groupId) => {
   }
 
   await db.collection('farmos-instances').deleteMany(filter);
+};
+
+export const createPlan = async (planName) => {
+  const _id = new ObjectId();
+
+  return await db.collection('farmos-plans').insertOne({
+    _id,
+    planName,
+  });
+};
+
+export const getPlans = async () => {
+  return await db.collection('farmos-plans').find().toArray();
+};
+
+export const deletePlan = async (planId) => {
+  const filter = { _id: asMongoId(planId) };
+  await db.collection('farmos-plans').deleteMany(filter);
+};
+
+export const setPlanNameForGroup = async (groupId, planName) => {
+  await db
+    .collection('groups')
+    .update({ _id: asMongoId(groupId) }, { $set: { farmOsPlanName: planName } });
 };
