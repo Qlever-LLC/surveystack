@@ -6,6 +6,11 @@ import {
   listFarmOSInstancesForGroup,
   addFarmToSurveystackGroup,
   removeFarmFromSurveystackGroup,
+  createPlan,
+  getPlans,
+  getPlanForGroup,
+  deletePlan,
+  setPlanNameForGroup,
 } from './manage';
 
 const init = async () => {
@@ -77,5 +82,25 @@ describe('manageFarmOS', () => {
     list = await listFarmOSInstancesForGroup(group._id);
     expect(list.length).toBe(0);
     */
+  });
+
+  it('test-plans', async () => {
+    const { group, admin1, user1 } = await init();
+    await setPlanNameForGroup(group._id, 'test-plan');
+    const res = await getPlanForGroup(group._id);
+    expect(res).toBe('test-plan');
+
+    await createPlan('test-plan-all');
+    const plans = await getPlans();
+    expect(plans.length).toBe(1);
+    expect(plans[0].planName).toBe('test-plan-all');
+
+    await deletePlan(plans[0]._id);
+    const deleted = await getPlans();
+    expect(deleted.length).toBe(0);
+
+    await setPlanNameForGroup(group._id, null);
+    const nullPlan = await getPlanForGroup(group._id);
+    expect(nullPlan).toBe(null);
   });
 });

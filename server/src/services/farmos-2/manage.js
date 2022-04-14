@@ -174,12 +174,6 @@ export const addFarmToSurveystackGroup = async (instanceName, groupId, planName)
     throw boom.badData('group not found');
   }
 
-  const { getAllFarmsWithTags } = config();
-  const aggregatorFarms = await getAllFarmsWithTags();
-  if (!aggregatorFarms.find((f) => f.url === instanceName)) {
-    throw boom.badData('instance not found in aggregator');
-  }
-
   const _id = new ObjectId();
   await db.collection('farmos-group-mapping').insertOne({
     _id,
@@ -224,12 +218,6 @@ export const addFarmToUser = async (instanceName, userId, groupId, owner) => {
     if (!group) {
       throw boom.badData('group not found');
     }
-  }
-
-  const { getAllFarmsWithTags } = config();
-  const aggregatorFarms = await getAllFarmsWithTags();
-  if (!aggregatorFarms.find((f) => f.url === instanceName)) {
-    throw boom.badData('instance not found in aggregator');
   }
 
   const _id = new ObjectId();
@@ -277,4 +265,17 @@ export const setPlanNameForGroup = async (groupId, planName) => {
   await db
     .collection('groups')
     .update({ _id: asMongoId(groupId) }, { $set: { farmOsPlanName: planName } });
+};
+
+export const getPlanForGroup = async (groupId) => {
+  const arr = await db
+    .collection('groups')
+    .find({ _id: asMongoId(groupId) }, { projection: { farmOsPlanName: 1 } })
+    .toArray();
+
+  if (arr.length > 0) {
+    return arr[0].farmOsPlanName || null;
+  } else {
+    return null;
+  }
 };

@@ -1,12 +1,21 @@
 import boom from '@hapi/boom';
 
+import { ObjectId } from 'mongodb';
 const { getDb } = require('../db');
 
-import { getFarmOSInstances, getAssets, getLogs, webhookCallback } from './farmos2Controller';
+import {
+  getFarmOSInstances,
+  getAssets,
+  getLogs,
+  webhookCallback,
+  checkUrl,
+  superAdminCreateFarmOsInstance,
+} from './farmos2Controller';
 import { createGroup, createReq, createRes, createUser } from '../testUtils';
 import {
   mapFarmOSInstanceToUser,
   mapFarmOSInstanceToGroupAdmin,
+  setPlanNameForGroup,
 } from '../services/farmos-2/manage';
 
 import {
@@ -16,8 +25,19 @@ import {
 } from '../services/farmos-2/__mock__/farmos.asset.response';
 
 import mockAxios from 'axios';
-
 require('dotenv').config();
+
+const init = async () => {
+  const group = await createGroup();
+  const user1 = await group.createUserMember();
+  const admin1 = await group.createAdminMember();
+
+  return {
+    group,
+    user1,
+    admin1,
+  };
+};
 
 function mockRes(userId) {
   return {
@@ -204,5 +224,104 @@ describe('farmos2controller', () => {
     expect(dbstate[1].state).toBe('success');
     expect(dbstate[1].url).toBe('oursci.farmos.dev');
   });
-  it.only('requires-env-secrets-skipping', async () => {});
+  it('test-farmos-check-url', async () => {
+    mockAxios.post.mockImplementation(() => Promise.resolve({ status: 200 }));
+
+    process.env = {
+      FARMOS_CALLBACK_KEY: 'x',
+      FARMOS_AGGREGATOR_URL: 'x',
+      FARMOS_AGGREGATOR_APIKEY: 'x',
+      FARMOS_CREATE_KEY: 'x',
+    };
+
+    const send = jest.fn();
+
+    await checkUrl(
+      {
+        body: {
+          url: 'oursci-unit-test',
+        },
+      },
+      { send }
+    );
+
+    expect(send).toHaveBeenCalledWith({ status: 'free' });
+
+    mockAxios.post.mockImplementation(() => Promise.resolve({ status: 400 }));
+
+    await checkUrl(
+      {
+        body: {
+          url: 'oursci-unit-test',
+        },
+      },
+      { send }
+    );
+
+    expect(send).toHaveBeenCalledWith({ status: 'taken' });
+  });
+
+  it.only('create-farmos-instance', async () => {
+    process.env = {
+      FARMOS_CALLBACK_KEY: 'x',
+      FARMOS_AGGREGATOR_URL: 'x',
+      FARMOS_AGGREGATOR_APIKEY: 'x',
+      FARMOS_CREATE_KEY: 'x',
+    };
+
+    const { group, admin1, user1 } = await init();
+    setPlanNameForGroup(group._id, 'unit-test-plan');
+
+    let body = {
+      groupId: group._id + '',
+      url: 'oursci-farm',
+      agree: true,
+    };
+
+    const send = jest.fn();
+
+    mockAxios.post.mockImplementation(() => Promise.resolve({ status: 202, data: '' }));
+    await superAdminCreateFarmOsInstance(
+      {
+        body,
+      },
+      {
+        send,
+      }
+    );
+
+    expect(send).toHaveBeenCalledWith({ errors: ['email: "email" is required'] });
+
+    body = {
+      groupId: group._id + '',
+      url: 'oursci-farm',
+      email: 'test@our-sci.net',
+      farmName: 'unit test farm',
+      fullName: 'Unit tester',
+      farmAddress: 'Unit Farm Address',
+      units: 'metric',
+      timezone: 'US/Eastern',
+      planName: 'unit-plan',
+      owner: user1._id + '',
+      agree: true,
+      fields: [
+        {
+          name: 'Field 1',
+          wkt: 'POLYGON()',
+        },
+      ],
+    };
+
+    await superAdminCreateFarmOsInstance(
+      {
+        body,
+      },
+      {
+        send,
+      }
+    );
+    expect(send).toHaveBeenCalledWith({ status: 'success', response: '' });
+  });
+
+  it('requires-env-secrets-skipping', async () => {});
 });

@@ -47,10 +47,7 @@
           item-value="_id"
           :items="groups"
         ></v-autocomplete>
-        <v-btn
-          :disabled="!selectedGroup"
-          color="primary"
-          @click="$emit('map-group', this.selectedGroup, this.selectedInstance)"
+        <v-btn :disabled="!selectedGroup" color="primary" @click="$emit('map-group', selectedGroup, selectedInstance)"
           >Map Selected Aggregator Instance to Group in Surveystack</v-btn
         >
       </div>
@@ -76,15 +73,13 @@
         </template>
       </v-simple-table>
       <v-alert v-else class="mt-4" mode="fade" text type="warning"
-        >No Mappings exist for {{ this.selectedInstance }}</v-alert
+        >No Mappings exist for {{ selectedInstance }}</v-alert
       >
     </template>
   </v-container>
 </template>
 
 <script>
-import api from '@/services/api.service';
-
 export default {
   props: {
     groups: Array,

@@ -13,11 +13,15 @@
           @unmap-group="unmapGroup"
           @map-user="mapUser"
           @unmap-user="unmapUser"
+          :plans="plans"
           :is="item.component"
           :groups="groups"
           :mappings="mappings"
           :users="users"
           :loading="loading"
+          :viewModel="item.viewModel || {}"
+          @check-url="checkUrl"
+          @create-instance="createInstance"
         ></v-component>
       </v-tab-item>
     </v-tabs-items>
@@ -43,7 +47,9 @@ export default {
       success: null,
       error: null,
       loading: false,
-
+      plans: [],
+      selectedGroup: null,
+      selectedInstance: null,
       items: [
         {
           name: 'Aggregator',
@@ -57,13 +63,31 @@ export default {
           name: 'Users',
           component: Users,
         },
-
-        /*
         {
           name: 'Register',
-          component: FarmOSRegisterVue
-        }
-        */
+          component: FarmOSRegisterVue,
+          viewModel: {
+            form: {
+              groupId: null,
+              instanceName: '',
+              instanceNameValid: null,
+              email: '',
+              fullName: '',
+              farmName: '',
+              farmAddress: '',
+              units: '',
+              timezone: '',
+              agree: false,
+              owner: null,
+              fields: [],
+              planName: '',
+            },
+            groups: [],
+            plans: [],
+            users: [],
+            count: 1,
+          },
+        },
       ],
     };
   },
@@ -76,10 +100,18 @@ export default {
       const { data: mappings } = await api.get('/farmos/all');
       const { data: groups } = await api.get('/groups?populate=0');
       const { data: users } = await api.get('/users');
+      const { data: plans } = await api.get('/farmos/plans');
+
       this.loading = false;
       this.mappings = mappings;
       this.groups = groups;
       this.users = users;
+      this.plans = plans;
+
+      const viewModel = this.getRegisterViewModel();
+      viewModel.groups = groups;
+      viewModel.plans = plans;
+      viewModel.users = users;
 
       console.dir(users);
     },
@@ -170,43 +202,60 @@ export default {
         }
       }
     },
-    async createInstance(form, fields) {
-      const {
-        url,
-        email,
-        // eslint-disable-next-line camelcase
-        site_name,
-        registrant,
-        location,
-        units,
-      } = form;
+    getRegisterViewModel() {
+      return this.items.find((item) => item.name === 'Register').viewModel;
+    },
+    async checkUrl(viewModel) {
+      this.getRegisterViewModel().form = viewModel.form;
 
+      this.getRegisterViewModel().loading = true;
       try {
-        const r = await api.post('/farmos/create-instance', {
-          url,
-          email,
-          site_name,
-          registrant,
-          location,
-          units,
-          agree: true,
-          selectedGroup: this.selectedGroup,
-          fields,
+        const r = await api.post('/farmos/check-url', {
+          url: viewModel.form.instanceName,
         });
 
-        if (r.data && r.data.status === 'success') {
-          this.$emit(
-            'dialog',
-            'Success',
-            `Sucessfully created ${this.localViewModel.form.instanceName}. FarmOS Instance is now being created.`
-          );
-          this.persistMemberships();
+        if (r.data.status === 'free') {
+          this.getRegisterViewModel().form.instanceNameValid = true;
+          console.log('instance name free');
         } else {
-          throw new Error('Error creating instance');
+          this.getRegisterViewModel().form.instanceNameValid = false;
+          console.log('instance name taken');
+        }
+      } catch (error) {
+        this.getRegisterViewModel().form.instanceNameValid = false;
+      }
+
+      this.getRegisterViewModel().loading = false;
+      this.getRegisterViewModel().count += 1; // invalidate cache
+    },
+    async createInstance(form, fields) {
+      this.getRegisterViewModel().form = form;
+      this.getRegisterViewModel().loading = true;
+
+      const formated = {
+        ...form,
+      };
+
+      formated.url = `${form.instanceName}.farmos.net`;
+      delete formated.instanceName;
+      delete formated.instanceNameValid;
+      formated.owner = formated.owner._id;
+
+      try {
+        const r = await api.post('/farmos/create-instance', formated);
+
+        if (r.data && r.data.status === 'success') {
+          this.success = 'Successfully created Instance';
+          window.scrollTo(0, 0);
+        } else {
+          this.error = 'error creating instance: ' + r.data.errors;
         }
       } catch (e) {
-        this.$emit('dialog', 'Error', e.message);
+        this.error = 'error creating instance: ' + e.message;
       }
+
+      this.getRegisterViewModel().loading = false;
+      this.getRegisterViewModel().count += 1; // invalidate cache
     },
   },
 };

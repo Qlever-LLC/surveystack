@@ -234,10 +234,13 @@ router.get('/farmos/farms', catchErrors(farmos2Controller.getFarmOSInstances));
 router.get('/farmos/assets', catchErrors(farmos2Controller.getAssets));
 router.post('/farmos/test', [assertAuthenticated], catchErrors(farmosController.testConnection));
 router.post('/farmos/callback', catchErrors(farmos2Controller.webhookCallback));
-
-/** farmos 2 */
-router.post('/farmos/checkurl', catchErrors(farmosController.checkUrl));
-router.post('/farmos/create-instance', catchErrors(farmos2Controller.createFarmOsInstance));
+router.post('/farmos/check-url', catchErrors(farmos2Controller.checkUrl));
+router.post(
+  '/farmos/create-instance',
+  [assertIsSuperAdmin],
+  catchErrors(farmos2Controller.superAdminCreateFarmOsInstance)
+);
+router.get('/farmos/plans', [assertIsSuperAdmin], catchErrors(farmos2Controller.getPlans));
 
 router.get(
   '/farmos/all',

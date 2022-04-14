@@ -24,6 +24,22 @@
       :items="groups"
     ></v-autocomplete>
 
+    <!-- <v-row class="align-baseline">
+      <v-col>
+        <v-autocomplete
+          outlined
+          primary
+          label="Select Group Plan"
+          v-model="selectedPlan"
+          v-if="!loading && !!groups"
+          :items="plans"
+        ></v-autocomplete>
+      </v-col>
+      <v-col>
+        <v-btn color="primary" @click="$emit('save-plan', selectedPlan)">Save Plan</v-btn>
+      </v-col>
+    </v-row> -->
+
     <v-divider class="my-4"></v-divider>
 
     <v-simple-table v-if="!loading">
@@ -70,6 +86,7 @@
 export default {
   props: {
     groups: Array,
+    plans: Array,
     mappings: Object,
     loading: Boolean,
   },
@@ -77,9 +94,15 @@ export default {
     return {
       selectedGroup: null,
       selectedInstance: null,
+      selectedPlan: null,
       error: null,
       success: null,
     };
+  },
+  watch: {
+    selectedGroup() {
+      console.log('group updated', this.selectedGroup);
+    },
   },
   computed: {
     mappedInstances() {

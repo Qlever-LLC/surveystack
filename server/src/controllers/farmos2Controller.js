@@ -1,11 +1,15 @@
 import { db } from '../db';
 import { ObjectId } from 'mongodb';
+import Joi from 'joi';
+import joiObjectId from 'joi-objectid';
+Joi.objectId = joiObjectId(Joi);
 
 import _, { isString } from 'lodash';
 import axios from 'axios';
 import boom from '@hapi/boom';
 import https from 'https';
 import { getRoles, hasAdminRole } from '../services/roles.service';
+import { isFarmosUrlAvailable, createInstance } from '../services/farmos.service';
 import {
   listFarmOSInstancesForUser,
   getSuperAllFarmosMappings,
@@ -13,8 +17,14 @@ import {
   removeFarmFromSurveystackGroup,
   addFarmToUser,
   removeFarmFromUser,
+  getPlans as manageGetPlans,
+  getPlanForGroup as manageGetPlanForGroup,
+  mapFarmOSInstanceToUser,
 } from '../services/farmos-2/manage';
 import { aggregator } from '../services/farmos-2/aggregator';
+
+export const asMongoId = (source) =>
+  source instanceof ObjectId ? source : ObjectId(typeof source === 'string' ? source : source._id);
 
 const config = () => {
   if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
@@ -423,82 +433,111 @@ export const webhookCallback = async (req, res, next) => {
   }
 };
 
-export const createFarmOsInstance = async (req, res) => {
-  console.log('creating farmos instance', req.body);
+export const getPlans = async (req, res) => {
+  return res.send(await manageGetPlans());
+};
 
-  const nameRule = (s) => !/[!"#$%()*+,\-./:;<=>?@[\\\]^_{|}~]/gi.test(`${s}`);
-  const validEmail = (e) =>
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-      e + ''
-    );
+export const getPlanForGroup = async (req, res) => {
+  return res.send(await manageGetPlanForGroup());
+};
 
+export const checkUrl = async (req, res) => {
+  console.log('checking url');
   const apiKey = process.env.FARMOS_CREATE_KEY;
-
-  const { url, email, site_name, registrant, location, units, group, fields, timezone, planName } =
-    req.body;
-
-  if (!nameRule(site_name)) {
-    throw boom.badData('site_name contains invalid characters');
+  if (!apiKey) {
+    throw boom.badImplementation('farmos not configured');
   }
 
-  if (!nameRule(registrant)) {
-    throw boom.badData('registrant contains invalid characters');
+  const { url } = req.body;
+  if (!url) {
+    throw boom.badRequest('missing url');
   }
-
-  if (!validEmail(email)) {
-    throw boom.badData('invalid email address');
-  }
-
-  if (!planName) {
-    throw boom.badData('plan name missing');
-  }
-
-  const access = await hasAdminRole(res.locals.auth.user._id, group);
-  if (!access) {
-    throw boom.unauthorized('permission denied: not group admin');
-  }
-
-  const groupId = typeof group === 'string' ? new ObjectId(group) : group;
-  const groupEntity = await db.collection('groups').findOne({ _id: groupId });
-  const { path: groupPath } = groupEntity;
-
-  console.log('groupPath', groupEntity, groupPath);
-
-  const agentOptions = {
-    host: 'account.farmos.net',
-    port: '443',
-    path: '/',
-    rejectUnauthorized: false,
-  };
-
-  const agent = new https.Agent(agentOptions);
-  const body = {
-    url: `${url}.farmos.net`,
-    email,
-    site_name,
-    registrant,
-    location,
-    units,
-    plan: planName,
-    tags: [groupPath],
-    agree: true,
-    timezone: timezone,
-  };
-
-  console.log('body for request', body);
-
-  // also add instances to users
 
   try {
-    const r = await axios.post(`https://account.farmos.net/api/v1/farms`, body, {
-      headers: {
-        accept: 'application/json',
-        apikey: apiKey,
-      },
-      httpsAgent: agent,
+    return res.send({
+      status: (await isFarmosUrlAvailable(url, apiKey)) ? 'free' : 'taken',
     });
+  } catch (error) {
+    return res.send({
+      status: 'error',
+      message: error.message,
+    });
+  }
+};
+export const superAdminCreateFarmOsInstance = async (req, res) => {
+  const schema = Joi.object({
+    groupId: Joi.string().required(),
+    url: Joi.string().max(100).required(),
+    email: Joi.string().email().required(),
+    farmName: Joi.string().required(),
+    fullName: Joi.string().required(),
+    farmAddress: Joi.string().required(),
+    units: Joi.string().required(),
+    timezone: Joi.string().required(),
+    planName: Joi.string().required(),
+    owner: Joi.string().required(),
+    agree: Joi.boolean().valid(true),
+    fields: Joi.array()
+      .items(Joi.object({ name: Joi.string().required(), wkt: Joi.string().required() }))
+      .required(),
+  }).required();
 
-    db.collection('farmos.fields').insertOne({
+  // todo, also map user to instance
+  // todo, create mapping to group
+
+  const validres = schema.validate(req.body);
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    return res.send({
+      errors,
+    });
+  }
+
+  const {
+    groupId: group,
+    url,
+    email,
+    farmName: site_name,
+    fullName: registrant,
+    farmAddress: location,
+    units,
+    timezone,
+    planName,
+    fields,
+    owner,
+  } = req.body;
+  const groupId = asMongoId(group);
+  const groupEntity = await db.collection('groups').findOne({ _id: groupId });
+  if (!groupEntity || !groupEntity.path) {
+    throw boom.badData('unable to find group');
+  }
+
+  const userId = asMongoId(owner);
+  const user = await db.collection('users').findOne({ _id: userId });
+  if (!user) {
+    throw boom.badData('owner not found');
+  }
+
+  const { path: groupPath } = groupEntity;
+  // also add instances to users
+  try {
+    const r = await createInstance(
+      url,
+      email,
+      site_name,
+      registrant,
+      location,
+      units,
+      [groupPath],
+      timezone,
+      planName
+    );
+
+    mapFarmOSInstanceToUser(owner, url, true);
+
+    addFarmToSurveystackGroup(url, groupId, planName);
+
+    await db.collection('farmos.fields').insertOne({
       url: `${url}.farmos.net`,
       created: new Date(),
       fields,

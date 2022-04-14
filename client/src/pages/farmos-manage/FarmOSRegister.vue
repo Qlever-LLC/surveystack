@@ -1,27 +1,26 @@
 <template>
   <v-container>
-    <v-form v-model="valid" ref="form" class="mt-8" @keydown.enter.prevent="submit">
+    <v-form v-model="valid" ref="form" class="mt-8" @keydown.enter.prevent="submit" :disabled="localViewModel.loading">
       <v-autocomplete
         outlined
         primary
         label="Select Group"
-        v-model="localViewModel.form.selectedGroup"
-        v-if="!localViewModel.loading && !!localViewModel.groups"
+        v-model="localViewModel.form.groupId"
+        v-if="!!localViewModel.groups"
         item-text="name"
         item-value="_id"
         :items="localViewModel.groups"
         :rules="[(v) => !!v || `select group`]"
       ></v-autocomplete>
 
-      <v-autocomplete
+      <v-combobox
         outlined
         primary
         label="Select Plan"
-        v-model="localViewModel.form.selectedPlan"
-        v-if="!localViewModel.loading"
+        v-model="localViewModel.form.planName"
         :items="localViewModel.plans"
         :rules="[(v) => !!v || `select plan`]"
-      ></v-autocomplete>
+      ></v-combobox>
 
       <v-row class="align-baseline">
         <v-col>
@@ -32,7 +31,6 @@
             suffix=".farmos.net"
             :loading="localViewModel.loading"
             outlined
-            :rules="[(v) => viewModel.form.instanceNameValid === true || 'Instance Name not valid']"
           >
             <template v-slot:append-outer>
               <v-icon
@@ -47,7 +45,7 @@
         </v-col>
 
         <v-col>
-          <v-btn @click="$emit('check-url', localViewModel.form.instanceName)" color="primary">Check URL</v-btn>
+          <v-btn @click="$emit('check-url', localViewModel)" color="primary">Check URL</v-btn>
         </v-col>
       </v-row>
 
@@ -155,7 +153,10 @@
 
       <v-divider class="my-4"></v-divider>
 
-      <app-field-list v-if="localViewModel.fields.length > 0" v-model="localViewModel.fields"></app-field-list>
+      <app-field-list
+        v-if="localViewModel.form.fields.length > 0"
+        v-model="localViewModel.form.fields"
+      ></app-field-list>
 
       <v-btn class="mx-2" @click="importFields = true" v-if="!importFields">Add / Import Field</v-btn>
 
@@ -228,8 +229,6 @@ export default {
   data() {
     return {
       localViewModel: _.cloneDeep(this.viewModel),
-      selectedGroup: null,
-      fields: [],
       field: {
         wkt: '',
         name: '',
@@ -265,7 +264,7 @@ export default {
       this.$refs['field-creator'].clear();
     },
     async fieldImported() {
-      this.fields.push(this.field);
+      this.localViewModel.form.fields.push(this.field);
       this.field = {
         wkt: '',
         name: '',
@@ -277,7 +276,7 @@ export default {
       this.invite = true;
     },
     async save() {
-      this.$emit('create-instance', this.localViewModel.form, this.localViewModel.fields);
+      this.$emit('create-instance', this.localViewModel.form, this.localViewModel.form.fields);
     },
     async persistMemberships() {
       // updatge access
@@ -301,13 +300,11 @@ export default {
       deep: true,
       immediate: true,
       handler(vm) {
-        console.log('changes');
+        console.log('change propagated');
         this.localViewModel = _.cloneDeep(vm);
       },
     },
   },
-  async mounted() {
-    // this.loadMembers();
-  },
+  async mounted() {},
 };
 </script>

@@ -241,9 +241,9 @@ const testAggregatorConnection = async (url, apiKey) => {
   }
 };
 
-const isFarmosUrlAvailable = async (url, apiKey) => {
+export const isFarmosUrlAvailable = async (url, apiKey) => {
   const agentOptions = {
-    host: 'account.farmos.net',
+    host: 'account.farmier.net',
     port: '443',
     path: '/',
     rejectUnauthorized: false,
@@ -253,7 +253,7 @@ const isFarmosUrlAvailable = async (url, apiKey) => {
 
   try {
     const r = await axios.post(
-      `https://account.farmos.net/api/v1/utils/validate-farm-url`,
+      `https://account.farmier.net/api/v1/utils/validate-farm-url`,
       {
         url: `${url}.farmos.net`,
       },
@@ -268,6 +268,8 @@ const isFarmosUrlAvailable = async (url, apiKey) => {
 
     if (r.status === 200) {
       return true;
+    } else if (r.status === 400) {
+      return false;
     } else {
       throw Error('unable to connect to aggregator');
     }
@@ -277,6 +279,54 @@ const isFarmosUrlAvailable = async (url, apiKey) => {
     }
     throw error;
   }
+};
+
+export const createInstance = async (
+  url,
+  email,
+  site_name,
+  registrant,
+  location,
+  units,
+  tags,
+  timezone,
+  planName
+) => {
+  const apiKey = process.env.FARMOS_CREATE_KEY;
+  if (!apiKey) {
+    throw boom.badImplementation('farmos not configured');
+  }
+
+  const agentOptions = {
+    host: 'account.farmier.net',
+    port: '443',
+    path: '/',
+    rejectUnauthorized: false,
+  };
+
+  const agent = new https.Agent(agentOptions);
+  const body = {
+    url,
+    email,
+    site_name,
+    registrant,
+    location,
+    units,
+    plan: planName,
+    tags,
+    agree: true,
+    timezone: timezone,
+  };
+
+  const r = await axios.post(`https://account.farmier.net/api/v1/farms`, body, {
+    headers: {
+      accept: 'application/json',
+      apikey: apiKey,
+      'Content-Type': 'application/json',
+    },
+    httpsAgent: agent,
+  });
+  return r;
 };
 
 export default { isFarmosUrlAvailable, handle, testAggregatorConnection };
