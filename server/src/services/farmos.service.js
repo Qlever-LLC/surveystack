@@ -5,8 +5,8 @@ import https from 'https';
 
 import * as utils from '../helpers/surveys';
 
-import { hasPermission } from './farmos-2/apiCompose';
-import { aggregator } from './farmos-2/aggregator';
+import { hasPermission } from './farmos/apiCompose';
+import { aggregator } from './farmos/aggregator';
 import { db } from '../db';
 
 const config = () => {

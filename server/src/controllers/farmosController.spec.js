@@ -16,13 +16,13 @@ import {
   mapFarmOSInstanceToUser,
   mapFarmOSInstanceToGroupAdmin,
   setPlanNameForGroup,
-} from '../services/farmos-2/manage';
+} from '../services/farmos/manage';
 
 import {
   assetResponse,
   logResponse,
   createFieldResponse,
-} from '../services/farmos-2/__mock__/farmos.asset.response';
+} from '../services/farmos/__mock__/farmos.asset.response';
 
 import mockAxios from 'axios';
 require('dotenv').config();

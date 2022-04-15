@@ -22,8 +22,8 @@ import {
   createPlan as manageCreatePlan,
   deletePlan as manageDeletePlan,
   mapFarmOSInstanceToUser,
-} from '../services/farmos-2/manage';
-import { aggregator } from '../services/farmos-2/aggregator';
+} from '../services/farmos/manage';
+import { aggregator } from '../services/farmos/aggregator';
 
 export const asMongoId = (source) =>
   source instanceof ObjectId ? source : ObjectId(typeof source === 'string' ? source : source._id);
