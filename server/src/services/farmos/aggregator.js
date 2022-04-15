@@ -1,3 +1,4 @@
+import boom from '@hapi/boom';
 import { triggerAsyncId } from 'async_hooks';
 import axios from 'axios';
 import https from 'https';
@@ -137,8 +138,8 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     for (const k of Object.keys(r.data)) {
       const res = JSON.parse(r.data[k].body);
       responses.push(res.data);
-      if (!res.data) {
-        console.log('data missing', res);
+      if (res.errors && res.errors.length > 0) {
+        throw boom.badData(res.errors.map((e) => e.detail).join(', '));
       }
     }
 
