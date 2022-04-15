@@ -1,7 +1,6 @@
 import { aggregator } from './aggregator';
 import mockAxios from 'axios';
-
-require('dotenv').config();
+import * as mockResponses from './__mock__/farmos.asset.response';
 
 describe('fetching farminfo', () => {
   it('farminfo', async () => {
@@ -71,10 +70,11 @@ describe('fetching farminfo', () => {
     let res = { data: mockresponse };
     mockAxios.get.mockImplementation(() => Promise.resolve(res));
 
-    if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
-      console.log('env not set');
-      return;
-    }
+    process.env = {
+      FARMOS_CALLBACK_KEY: 'x',
+      FARMOS_AGGREGATOR_URL: 'x',
+      FARMOS_AGGREGATOR_APIKEY: 'x',
+    };
 
     const { farminfo } = aggregator(
       process.env.FARMOS_AGGREGATOR_URL,
@@ -84,5 +84,52 @@ describe('fetching farminfo', () => {
     const r = await farminfo();
 
     expect(r.data.length).toBe(4);
+  });
+
+  it.only('get-all-terms', async () => {
+    let count = 0;
+    mockAxios.post.mockImplementation((req) => {
+      console.log('request is', req);
+      if (count == 0) {
+        count++;
+        return Promise.resolve({ data: mockResponses.rawSpinachSubrequestsResponse });
+      } else {
+        count++;
+        return Promise.resolve({ data: mockResponses.createSpinachResponse });
+      }
+    });
+
+    const { getAllTerms } = aggregator(
+      process.env.FARMOS_AGGREGATOR_URL,
+      process.env.FARMOS_AGGREGATOR_APIKEY
+    );
+
+    const arg = {
+      'oursci.farmos.dev': [
+        {
+          endpoint: 'taxonomy_term',
+          bundle: 'plant_type',
+          name: 'Spinach',
+        },
+      ],
+    };
+
+    for (const url of Object.keys(arg)) {
+      const res = await getAllTerms(url, arg[url]);
+      expect(res).toStrictEqual([
+        {
+          endpoint: 'taxonomy_term',
+          bundle: 'plant_type',
+          name: 'spinach',
+          id: '0548b26f-effa-43b4-be41-fb5f443cd119',
+        },
+        {
+          endpoint: 'taxonomy_term',
+          bundle: 'plant_type',
+          name: 'Test Plant Type',
+          id: 'cca926ae-c889-4143-8d24-aeb596e7653f',
+        },
+      ]);
+    }
   });
 });

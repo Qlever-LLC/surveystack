@@ -114,8 +114,95 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     return r;
   };
 
-  const getAllTaxonomy = async (farmurl) => {
-    const bundles = [];
+  const getAllTerms = async (farmurl, items) => {
+    const body = items.map((item) => {
+      const { endpoint, bundle, name } = item;
+
+      return {
+        uri: `api/${endpoint}/${bundle}/?fields[${endpoint}--${bundle}]=name,id&filter[name][value]=${name}`,
+        action: 'view',
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      };
+    });
+
+    const r = await axios.post(`${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`, body, {
+      ...opts,
+    });
+
+    const responses = [];
+
+    for (const k of Object.keys(r.data)) {
+      const res = JSON.parse(r.data[k].body);
+      responses.push(res.data);
+      if (!res.data) {
+        console.log('data missing', res);
+      }
+    }
+
+    const res = [];
+
+    const missingTerms = [];
+    let count = 0;
+    for (const response of responses) {
+      if (response.length > 0) {
+        const [endpoint, bundle] = response[0].type.split('--');
+        res.push({
+          endpoint,
+          bundle,
+          id: response[0].id,
+          name: response[0].attributes.name,
+        });
+      } else {
+        missingTerms.push(items[count]);
+      }
+      count++;
+    }
+
+    const createBody = missingTerms.map((item) => {
+      const { endpoint, bundle, name } = item;
+
+      return {
+        uri: `api/${endpoint}/${bundle}`,
+        action: 'create',
+        body: `{"data":{"type":"${endpoint}--${bundle}","attributes":{"name":"${name}"}}}`,
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      };
+    });
+
+    const createdTypes = await axios.post(
+      `${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`,
+      createBody,
+      {
+        ...opts,
+      }
+    );
+
+    const createResponses = [];
+
+    for (const k of Object.keys(createdTypes.data)) {
+      const createResponseBody = JSON.parse(createdTypes.data[k].body);
+      createResponses.push(createResponseBody.data);
+    }
+
+    console.log('responses of create', createResponses);
+
+    for (const response of createResponses) {
+      const [endpoint, bundle] = response.type.split('--');
+      res.push({
+        endpoint,
+        bundle,
+        id: response.id,
+        name: response.attributes.name,
+      });
+    }
+
+    return res;
   };
 
   const deleteAllWithData = async (farmurl, data) => {
@@ -124,10 +211,12 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     const logBundles = ['activity', 'input', 'observation', 'seeding'];
 
     const assetSubRequestUrls = assetBundles.map(
-      (bundle) => `api/asset/${bundle}?fields[asset--${bundle}]=id&filter[data][value]=${data}`
+      (bundle) =>
+        `api/asset/${bundle}?fields[asset--${bundle}]=id&filter[surveystack_id][value]=${data}`
     );
     const logSubRequestUrls = logBundles.map(
-      (bundle) => `api/log/${bundle}?fields[log--${bundle}]=id&filter[data][value]=${data}`
+      (bundle) =>
+        `api/log/${bundle}?fields[log--${bundle}]=id&filter[surveystack_id][value]=${data}`
     );
 
     const subrequests = [...assetSubRequestUrls, ...logSubRequestUrls];
@@ -214,5 +303,6 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     deleteAllWithData,
     getFarmsWithTag,
     getAllFarmsWithTags,
+    getAllTerms,
   };
 };

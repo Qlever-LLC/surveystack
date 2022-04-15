@@ -190,5 +190,29 @@ describe('test-aggregator-integration', () => {
     console.log(await getFarmsWithTag('/bionutrient/partners/main/'));
     console.log(await getAllFarmsWithTags());
   });
+  it('get-all-terms', async () => {
+    const { getAllTerms } = config();
+    const arg = {
+      'oursci.farmos.dev': [
+        {
+          endpoint: 'taxonomy_term',
+          bundle: 'plant_type',
+          name: 'Spinach',
+        },
+      ],
+    };
+
+    for (const url of Object.keys(arg)) {
+      const res = await getAllTerms(url, arg[url]);
+      expect(res).toStrictEqual([
+        {
+          endpoint: 'taxonomy_term',
+          bundle: 'plant_type',
+          name: 'spinach',
+          id: '0548b26f-effa-43b4-be41-fb5f443cd119',
+        },
+      ]);
+    }
+  });
   it.only('integration-test-skipping', async () => {});
 });

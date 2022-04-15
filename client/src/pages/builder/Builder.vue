@@ -205,6 +205,9 @@ export default {
       } catch (error) {
         console.log('error', error);
         const { message } = error.response.data;
+        console.log('message', message);
+        this.apiComposeErrors = [{ body: message, error: true }];
+        this.showApiComposeErrors = true;
         this.snack(message);
         console.log(error);
       }

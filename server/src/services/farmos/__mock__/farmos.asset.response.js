@@ -1220,3 +1220,109 @@ export const createFieldResponse = {
     },
   },
 };
+
+export const plantTypesResponseSpinach = {
+  jsonapi: {
+    version: '1.0',
+    meta: {
+      links: {
+        self: {
+          href: 'http://jsonapi.org/format/1.0/',
+        },
+      },
+    },
+  },
+  data: [
+    {
+      type: 'taxonomy_term--plant_type',
+      id: '0548b26f-effa-43b4-be41-fb5f443cd119',
+      links: {
+        self: {
+          href: 'https://oursci.farmos.dev/api/taxonomy_term/plant_type/0548b26f-effa-43b4-be41-fb5f443cd119',
+        },
+      },
+      attributes: {
+        name: 'spinach',
+      },
+    },
+    {
+      type: 'taxonomy_term--plant_type',
+      id: 'c463664b-5f26-440e-9845-a41a29545517',
+      links: {
+        self: {
+          href: 'https://oursci.farmos.dev/api/taxonomy_term/plant_type/c463664b-5f26-440e-9845-a41a29545517',
+        },
+      },
+      attributes: {
+        name: 'Spinach',
+      },
+    },
+  ],
+  links: {
+    self: {
+      href: 'https://oursci.farmos.dev/api/taxonomy_term/plant_type?fields%5Btaxonomy_term--plant_type%5D=name%2Cid&filter%5Bname%5D%5Bvalue%5D=Spinach',
+    },
+  },
+};
+
+export const plantTypeResponseNonExistant = {
+  jsonapi: {
+    version: '1.0',
+    meta: {
+      links: {
+        self: {
+          href: 'http://jsonapi.org/format/1.0/',
+        },
+      },
+    },
+  },
+  data: [],
+  links: {
+    self: {
+      href: 'https://oursci.farmos.dev/api/taxonomy_term/plant_type?fields%5Btaxonomy_term--plant_type%5D=name%2Cid&filter%5Bname%5D%5Bvalue%5D=Somethingthatdoesnotexist',
+    },
+  },
+};
+
+export const rawSpinachSubrequestsResponse = {
+  'cba90664-c48b-4be9-874b-0a36c7e0267b': {
+    headers: {
+      'cache-control': [Array],
+      date: [Array],
+      'content-type': [Array],
+      'x-ua-compatible': [Array],
+      'content-language': [Array],
+      'x-content-type-options': [Array],
+      'x-frame-options': [Array],
+      'permissions-policy': [Array],
+      expires: [Array],
+      'x-generator': [Array],
+      'content-id': [Array],
+      status: [Array],
+    },
+    body: '{"jsonapi":{"version":"1.0","meta":{"links":{"self":{"href":"http:\\/\\/jsonapi.org\\/format\\/1.0\\/"}}}},"data":[{"type":"taxonomy_term--plant_type","id":"0548b26f-effa-43b4-be41-fb5f443cd119","links":{"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/0548b26f-effa-43b4-be41-fb5f443cd119"}},"attributes":{"name":"spinach"}},{"type":"taxonomy_term--plant_type","id":"c463664b-5f26-440e-9845-a41a29545517","links":{"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/c463664b-5f26-440e-9845-a41a29545517"}},"attributes":{"name":"Spinach"}}],"links":{"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/?fields%5Btaxonomy_term--plant_type%5D=name%2Cid\\u0026filter%5Bname%5D%5Bvalue%5D=Spinach"}}}',
+  },
+};
+
+export const createSpinachResponse = {
+  'a84e521c-50bf-4c8e-a412-5458c4fe8ddf': {
+    headers: {
+      'cache-control': ['must-revalidate, no-cache, private'],
+      date: ['Fri, 15 Apr 2022 16:47:06 GMT'],
+      location: [
+        'http://oursci.farmos.dev/api/taxonomy_term/plant_type/cca926ae-c889-4143-8d24-aeb596e7653f',
+      ],
+      'content-type': ['application/vnd.api+json'],
+      'x-ua-compatible': ['IE=edge'],
+      'content-language': ['en'],
+      'x-content-type-options': ['nosniff'],
+      'x-frame-options': ['SAMEORIGIN'],
+      'permissions-policy': ['interest-cohort=()'],
+      expires: ['Sun, 19 Nov 1978 05:00:00 GMT'],
+      'x-generator': ['Drupal 9 (https://www.drupal.org)'],
+      'content-id': ['<a84e521c-50bf-4c8e-a412-5458c4fe8ddf>'],
+      status: [201],
+    },
+    body: '{"jsonapi":{"version":"1.0","meta":{"links":{"self":{"href":"http:\\/\\/jsonapi.org\\/format\\/1.0\\/"}}}},"data":{"type":"taxonomy_term--plant_type","id":"cca926ae-c889-4143-8d24-aeb596e7653f","links":{"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f"}},"attributes":{"drupal_internal__tid":441,"drupal_internal__revision_id":726,"langcode":"en","revision_created":"2022-04-15T16:47:06+00:00","revision_log_message":null,"status":true,"name":"Test Plant Type","description":null,"weight":0,"changed":"2022-04-15T16:47:06+00:00","default_langcode":true,"revision_translation_affected":true,"maturity_days":null,"transplant_days":null},"relationships":{"vid":{"data":{"type":"taxonomy_vocabulary--taxonomy_vocabulary","id":"4b483bff-e1f7-4fdc-8d02-18d6bdad1354","meta":{"drupal_internal__target_id":"plant_type"}},"links":{"related":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/vid"},"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/relationships\\/vid"}}},"revision_user":{"data":null,"links":{"related":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/revision_user"},"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/relationships\\/revision_user"}}},"parent":{"data":[{"type":"taxonomy_term--plant_type","id":"virtual","meta":{"links":{"help":{"href":"https:\\/\\/www.drupal.org\\/docs\\/8\\/modules\\/json-api\\/core-concepts#virtual","meta":{"about":"Usage and meaning of the \\u0027virtual\\u0027 resource identifier."}}}}}],"links":{"related":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/parent"},"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/relationships\\/parent"}}},"companions":{"data":[],"links":{"related":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/companions"},"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/relationships\\/companions"}}},"crop_family":{"data":null,"links":{"related":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/crop_family"},"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/relationships\\/crop_family"}}},"image":{"data":[],"links":{"related":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/image"},"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/relationships\\/image"}}}}},"links":{"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type"}}}',
+  },
+};

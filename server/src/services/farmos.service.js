@@ -52,18 +52,30 @@ async function flushlogs(instanceName, user, id) {
   return [res.data];
 }
 
-async function fetchTerms(instanceName, credentials, user) {
-  const url = instanceName;
-  if (typeof url != 'string') {
-    throw boom.badData(`url is not a string: ${url}`);
-  }
+export const substitue = (entity, terms) => {
+  if (entity && entity.relationships) {
+    for (const bundle of Object.keys(entity.relationships)) {
+      const innerDataArray = entity.relationships[bundle].data;
+      for (const data of innerDataArray) {
+        if (!data.id && data.type && data.name) {
+          // candidate for replacement
+          const [endpoint, bundle] = data.type.split('--');
+          const replacement = terms.find(
+            (term) =>
+              term.endpoint === endpoint &&
+              term.bundle == bundle &&
+              term.name.toLowerCase() === data.name.toLowerCase()
+          );
 
-  if (!allowed(instanceName, user)) {
-    throw boom.unauthorized('No Access to farm');
+          if (replacement) {
+            data.id = replacement.id;
+            delete data.name;
+          }
+        }
+      }
+    }
   }
-
-  // TODO fetch terms
-}
+};
 
 async function execute(aggregator, apiCompose, info, terms, user, submission) {
   // console.log('executing apiCompose', apiCompose);
@@ -87,14 +99,69 @@ async function execute(aggregator, apiCompose, info, terms, user, submission) {
     throw boom.badData('apiCompose.entity.type should be in the form endpoint--bundle');
   }
 
-  // TODO
-  // create log / assets / profile ....
+  // substitute terms
+  substitue(apiCompose.entity, terms);
 
   const payload = { data: apiCompose.entity };
   payload.data.attributes.data = submission._id;
 
   return (await aggregator.create(url, endpoint, bundle, payload)).data;
 }
+
+export const getTerms = (apiCompose) => {
+  const composeByUrl = {};
+  const res = {};
+
+  apiCompose.forEach((c) => {
+    if (typeof c.url !== 'string') {
+      throw boom.badData(`url is not a string: ${c.url}`);
+    }
+
+    if (!composeByUrl[c.url]) {
+      composeByUrl[c.url] = [c];
+      res[c.url] = [];
+    } else {
+      composeByUrl[c.url].push(c);
+    }
+  });
+
+  for (const url of Object.keys(composeByUrl)) {
+    const composeItems = composeByUrl[url];
+    for (const compose of composeItems) {
+      if (compose.entity && compose.entity.relationships) {
+        for (const bundle of Object.keys(compose.entity.relationships)) {
+          const innerDataArray = compose.entity.relationships[bundle].data;
+          for (const data of innerDataArray) {
+            if (!data.id && data.type && data.name) {
+              const [endpoint, b] = data.type.split('--');
+
+              let skip = false;
+              for (const r of res[url]) {
+                if (r.bundle === b && r.endpoint === endpoint && r.name === data.name) {
+                  skip = true;
+                  break;
+                }
+              }
+
+              if (skip) {
+                // already in there
+                continue;
+              }
+
+              res[url].push({
+                bundle: b,
+                endpoint,
+                name: data.name,
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return res;
+};
 
 export const handle = async ({ submission, survey, user }) => {
   const surveyVersion = submission.meta.survey.version;
@@ -188,12 +255,18 @@ export const handle = async ({ submission, survey, user }) => {
       results.push(...res);
     }
   }
+  const termStructures = getTerms(farmOsCompose);
+  const instanceTerms = {};
+
+  for (const url of Object.keys(termStructures)) {
+    const terms = await aggregator.getAllTerms(url, termStructures[url]);
+    instanceTerms[url] = terms;
+  }
 
   for (const compose of farmOsCompose) {
     const info = {};
-    const terms = {};
 
-    const r = await runSingle(compose, info, terms);
+    const r = await runSingle(compose, info, instanceTerms[compose.url]);
     results.push(...r);
   }
 
