@@ -561,6 +561,8 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
 
   const { path: groupPath } = groupEntity;
   // also add instances to users
+  console.log('groupPath', groupPath);
+
   try {
     const r = await createInstance(
       url,
@@ -589,6 +591,7 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
       response: r.data,
     });
   } catch (error) {
+    console.log(error);
     return res.send({
       status: 'error',
       message: error.message,

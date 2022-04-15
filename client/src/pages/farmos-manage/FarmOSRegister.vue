@@ -18,9 +18,7 @@
         primary
         label="Select Plan"
         v-model="localViewModel.form.planName"
-        :items="localViewModel.plans"
-        item-text="planName"
-        item-value="planName"
+        :items="localViewModel.plans.map((p) => p.planName)"
         :rules="[(v) => !!v || `select plan`]"
       ></v-combobox>
 
@@ -302,7 +300,7 @@ export default {
       deep: true,
       immediate: true,
       handler(vm) {
-        console.log('change propagated');
+        console.log('change propagated', vm);
         this.localViewModel = _.cloneDeep(vm);
       },
     },

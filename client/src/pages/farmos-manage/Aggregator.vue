@@ -66,7 +66,7 @@
             <tr v-for="(group, idx) in mappedGroups" :key="`grp-${idx}`">
               <td>{{ group.name }}</td>
               <td>
-                <v-btn color="red" @click="$emit('unmap-group', group._id)" dark>Unmap</v-btn>
+                <v-btn color="red" @click="$emit('unmap-group', group._id, selectedInstance)" dark>Unmap</v-btn>
               </td>
             </tr>
           </tbody>
@@ -108,9 +108,6 @@ export default {
       if (!this.selectedInstance) {
         return [];
       }
-
-      console.dir(this.mappings.surveystackFarms);
-      console.dir(this.groups);
       return this.mappings.surveystackFarms
         .filter((farm) => farm.instanceName === this.selectedInstance)
         .map((farm) => {

@@ -1,6 +1,8 @@
 <template>
   <v-container>
-    <v-alert v-if="success" class="mt-4" mode="fade" text type="success" @click="success = null">{{ success }}</v-alert>
+    <v-alert v-if="successMessage" class="mt-4" mode="fade" text type="success" @click="successMessage = null">{{
+      successMessage
+    }}</v-alert>
 
     <v-tabs v-model="tab" background-color="transparent" color="basil" grow>
       <v-tab v-for="item in items" :key="item.name">{{ item.name }}</v-tab>
@@ -28,7 +30,7 @@
       </v-tab-item>
     </v-tabs-items>
 
-    <v-alert v-if="error" class="mt-4" mode="fade" text type="error">{{ error }}</v-alert>
+    <v-alert v-if="errorMessage" class="mt-4" mode="fade" text type="error">{{ errorMessage }}</v-alert>
   </v-container>
 </template>
 
@@ -47,8 +49,8 @@ export default {
       groups: null,
       users: null,
       tab: null,
-      success: null,
-      error: null,
+      successMessage: null,
+      errorMessage: null,
       loading: false,
       plans: [],
       selectedGroup: null,
@@ -135,7 +137,7 @@ export default {
       console.dir(users);
     },
     async mapGroup(group, instanceName) {
-      this.error = null;
+      this.error(null);
       try {
         this.loading = true;
 
@@ -147,20 +149,21 @@ export default {
           instanceName,
         });
         await this.reload();
-        this.success = 'Sucessfully mapped instance';
+        this.success('Sucessfully mapped instance');
       } catch (error) {
         console.dir(error);
         if (error.response && error.response.data && error.response.data.message) {
-          this.error = error.response.data.message;
+          this.error(error.response.data.message);
         } else {
-          this.error = error.message;
+          this.error(error.message);
         }
 
         this.loading = false;
       }
     },
     async unmapGroup(group, instanceName) {
-      this.error = null;
+      console.log('unmap group instanceName', instanceName);
+      this.error(null);
       try {
         this.loading = true;
 
@@ -169,18 +172,18 @@ export default {
           instanceName,
         });
         await this.reload();
-        this.success = 'Sucessfully un-mapped instance';
+        this.success('Sucessfully un-mapped instance');
       } catch (error) {
         console.dir(error);
         if (error.response && error.response.data) {
-          this.error = error.response.data;
+          this.error(error.response.data);
         } else {
-          this.error = error.message;
+          this.error(error.message);
         }
       }
     },
     async mapUser(user, instanceName, owner) {
-      this.error = null;
+      this.error(null);
       try {
         console.log('owner', owner);
         this.loading = true;
@@ -190,19 +193,19 @@ export default {
           owner,
         });
         await this.reload();
-        this.success = 'Sucessfully mapped instance';
+        this.success('Sucessfully mapped instance');
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
-          this.error = error.response.data.message;
+          this.error(error.response.data.message);
         } else {
-          this.error = error.message;
+          this.error(error.message);
         }
 
         this.loading = false;
       }
     },
     async unmapUser(user, instanceName) {
-      this.error = null;
+      this.error(null);
       try {
         this.loading = true;
 
@@ -211,13 +214,13 @@ export default {
           instanceName,
         });
         await this.reload();
-        this.success = 'Sucessfully un-mapped instance';
+        this.success('Sucessfully un-mapped instance');
       } catch (error) {
         console.dir(error);
         if (error.response && error.response.data) {
-          this.error = error.response.data;
+          this.error(error.response.data);
         } else {
-          this.error = error.message;
+          this.error(error.message);
         }
       }
     },
@@ -248,7 +251,7 @@ export default {
       vm.loading = false;
       vm.count += 1; // invalidate cache
     },
-    async createInstance(form, fields) {
+    async createInstance(form) {
       const vm = this.vmOf('create-instance');
       vm.form = form;
       vm.loading = true;
@@ -266,13 +269,16 @@ export default {
         const r = await api.post('/farmos/create-instance', formated);
 
         if (r.data && r.data.status === 'success') {
-          this.success = 'Successfully created Instance';
-          window.scrollTo(0, 0);
+          this.success('Successfully created Instance');
         } else {
-          this.error = 'error creating instance: ' + r.data.errors;
+          if (r.data.errors) {
+            this.error('error creating instance: ' + r.data.errors);
+          } else if (r.data.message) {
+            this.error('error creating instance: ' + r.data.message);
+          }
         }
       } catch (e) {
-        this.error = 'error creating instance: ' + e.message;
+        this.error('error creating instance: ' + e.message);
       }
 
       vm.loading = false;
@@ -291,12 +297,12 @@ export default {
         this.plans = plans;
 
         if (r.data.status === 'success') {
-          this.success = 'Sucessfully created new plan';
+          this.success('Sucessfully created new plan');
         } else {
-          this.error = 'Error creating plan';
+          this.error('Error creating plan');
         }
       } catch (error) {
-        this.error = error.message;
+        this.error(error.message);
       }
 
       vm.loading = false;
@@ -316,16 +322,25 @@ export default {
         this.plans = plans;
 
         if (r.data.status === 'success') {
-          this.success = 'Sucessfully deleted';
+          this.success('Sucessfully deleted');
         } else {
-          this.error = 'Error deleting plan';
+          this.error('Error deleting plan');
         }
       } catch (error) {
-        this.error = error.message;
+        this.error(error.message);
       }
 
       vm.loading = false;
       vm.count += 1;
+    },
+    success(msg) {
+      this.successMessage = msg;
+      this.errorMessage = null;
+      window.scrollTo(0, 0);
+    },
+    error(msg) {
+      this.errorMessage = msg;
+      this.successMessage = null;
     },
   },
 };

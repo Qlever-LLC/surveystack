@@ -21,9 +21,10 @@ export const asMongoId = (source) =>
  */
 export const mapFarmOSInstanceToUser = async (userId, instanceName, owner) => {
   const _id = new ObjectId();
+
   await db.collection('farmos-instances').insertOne({
     _id,
-    userId,
+    userId: asMongoId(userId),
     instanceName,
     owner,
   });
@@ -43,10 +44,10 @@ export const mapFarmOSInstanceToGroupAdmin = async (adminUserId, groupId, instan
   const _id = new ObjectId();
   await db.collection('farmos-instances').insertOne({
     _id,
-    userId: adminUserId,
+    userId: asMongoId(adminUserId),
     instanceName,
     owner: false,
-    groupId,
+    groupId: asMongoId(groupId),
   });
 
   return {
@@ -96,7 +97,10 @@ export const createFarmOSInstanceForUserAndGroup = async (userId, groupId, insta
  */
 export const listFarmOSInstancesForUser = async (userId) => {
   // instances owned by user
-  const usersInstances = await db.collection('farmos-instances').find({ userId }).toArray();
+  const usersInstances = await db
+    .collection('farmos-instances')
+    .find({ userId: asMongoId(userId) })
+    .toArray();
   return usersInstances;
 };
 
@@ -229,7 +233,7 @@ export const addFarmToUser = async (instanceName, userId, groupId, owner) => {
   };
 
   if (groupId) {
-    doc.groupId = groupId;
+    doc.groupId = asMongoId(groupId);
   }
   await db.collection('farmos-instances').insertOne(doc);
 };
@@ -237,8 +241,10 @@ export const addFarmToUser = async (instanceName, userId, groupId, owner) => {
 export const removeFarmFromUser = async (instanceName, userId, groupId) => {
   const filter = { instanceName, userId: asMongoId(userId) };
   if (groupId) {
-    filter.groupId = groupId;
+    filter.groupId = asMongoId(groupId);
   }
+
+  console.log('filter', filter);
 
   await db.collection('farmos-instances').deleteMany(filter);
 };
