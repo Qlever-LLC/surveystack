@@ -63,46 +63,44 @@ function mockRes(userId) {
 
 describe('farmos2controller', () => {
   it('get-farmos-instances', async () => {
-    const user = await createUser();
-    await mapFarmOSInstanceToUser(user._id, 'user.farmos.dev', true);
+    const { group, admin1, user1 } = await init();
 
-    const res = mockRes(user._id);
+    await mapFarmOSInstanceToUser(user1.user._id, 'user.farmos.dev', true);
+
+    const res = mockRes(user1.user._id);
     await getFarmOSInstances({}, res);
 
     expect(res.data.length).toEqual(1);
-    expect(res.data[0].userId).toEqual(user._id);
-    expect(res.data[0].farmOSInstanceName).toEqual('user.farmos.dev');
+    expect(res.data[0].userId).toEqual(user1.user._id);
+    expect(res.data[0].instanceName).toEqual('user.farmos.dev');
   });
 
   it('get-farmos-instances-not-logged-in', async () => {
-    const user = await createUser();
-    await mapFarmOSInstanceToUser(user._id, 'farm1.farmos.dev', true);
+    const { group, admin1, user1 } = await init();
+
+    await mapFarmOSInstanceToUser(user1.user._id, 'farm1.farmos.dev', true);
 
     const res = mockRes('');
     await expect(getFarmOSInstances({}, res)).rejects.toThrow(boom.unauthorized());
   });
 
   it('get-instances-for-admin', async () => {
-    const groupRes = await createGroup();
-    const { createUserMember, createAdminMember } = groupRes;
+    const { group, admin1, user1 } = await init();
 
-    const { user } = await createUserMember();
-    await mapFarmOSInstanceToUser(user._id, 'user-farm.farmos.dev', true);
+    await mapFarmOSInstanceToUser(user1.user._id, 'user-farm.farmos.dev', true);
 
-    const { user: admin } = await createAdminMember();
+    await mapFarmOSInstanceToGroupAdmin(admin1.user._id, group._id, 'user-farm.farmos.dev');
+    await mapFarmOSInstanceToUser(admin1.user._id, 'admin-farm.farmos.dev', true);
 
-    await mapFarmOSInstanceToGroupAdmin(admin._id, groupRes._id, 'user-farm.farmos.dev');
-    await mapFarmOSInstanceToUser(admin._id, 'admin-farm.farmos.dev', true);
-
-    const userRes = mockRes(user._id);
+    const userRes = mockRes(user1.user._id);
     await getFarmOSInstances({}, userRes);
 
-    const adminRes = mockRes(admin._id);
+    const adminRes = mockRes(admin1.user._id);
 
     await getFarmOSInstances({}, adminRes);
 
     expect(userRes.data.length).toEqual(1);
-    const farms = adminRes.data.map((a) => a.farmOSInstanceName);
+    const farms = adminRes.data.map((a) => a.instanceName);
     expect(farms).toEqual(
       expect.arrayContaining(['admin-farm.farmos.dev', 'user-farm.farmos.dev'])
     );
@@ -117,6 +115,8 @@ describe('farmos2controller', () => {
     await mapFarmOSInstanceToUser(user._id, 'buddingmoonfarm.farmos.dev', true);
 
     const res = mockRes(user._id);
+    const send = jest.fn();
+    res.send = send;
     await getAssets(
       {
         body: {
@@ -129,19 +129,21 @@ describe('farmos2controller', () => {
       res
     );
 
-    expect(res.data.assets).toEqual(
-      expect.arrayContaining([
-        {
-          name: 'Block B bed 12 Kale',
-          id: 'a89f2dfe-35f6-4bfb-b079-be7c034a7f24',
-          instance: 'buddingmoonfarm.farmos.dev',
-        },
-        {
-          name: 'spinach 8/26/20 ',
-          id: '626dec74-7f46-4c85-bc0e-76f69bcb7b41',
-          instance: 'buddingmoonfarm.farmos.dev',
-        },
-      ])
+    expect(send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        assets: expect.arrayContaining([
+          expect.objectContaining({
+            name: 'Block B bed 12 Kale',
+            id: 'a89f2dfe-35f6-4bfb-b079-be7c034a7f24',
+            instanceName: 'buddingmoonfarm.farmos.dev',
+          }),
+          expect.objectContaining({
+            name: 'spinach 8/26/20 ',
+            id: '626dec74-7f46-4c85-bc0e-76f69bcb7b41',
+            instanceName: 'buddingmoonfarm.farmos.dev',
+          }),
+        ]),
+      })
     );
   });
 

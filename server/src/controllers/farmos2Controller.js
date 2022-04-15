@@ -113,6 +113,7 @@ export const getAssets = async (req, res) => {
 
   const assets = [];
   const errors = [];
+
   for (const instance of instances) {
     try {
       const axiosResponse = await cfg.getAssets(instance.instanceName, bundle);
@@ -123,7 +124,10 @@ export const getAssets = async (req, res) => {
           id: a.id,
           instanceName: instance.instanceName,
           archived: a.attributes.archived,
-          location: a.relationships.location.data,
+          location:
+            a.relationships && a.relationships.locations
+              ? a.relationships.location.data
+              : undefined,
         };
       });
       assets.push(...assetList);
@@ -480,7 +484,6 @@ export const deletePlan = async (req, res) => {
 };
 
 export const checkUrl = async (req, res) => {
-  console.log('checking url');
   const apiKey = process.env.FARMOS_CREATE_KEY;
   if (!apiKey) {
     throw boom.badImplementation('farmos not configured');
