@@ -178,7 +178,7 @@ describe('farmos2controller', () => {
       ])
     );
   });
-  it.only('webhook-create-fields', async () => {
+  it('webhook-create-fields', async () => {
     mockAxios.post.mockImplementation(() => Promise.resolve({ data: createFieldResponse }));
     jest.resetModules();
 
@@ -261,7 +261,7 @@ describe('farmos2controller', () => {
     expect(send).toHaveBeenCalledWith({ status: 'taken' });
   });
 
-  it.only('create-farmos-instance', async () => {
+  it('create-farmos-instance', async () => {
     process.env = {
       FARMOS_CALLBACK_KEY: 'x',
       FARMOS_AGGREGATOR_URL: 'x',
