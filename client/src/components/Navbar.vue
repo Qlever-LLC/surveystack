@@ -1,6 +1,6 @@
 <template>
   <nav class="app-navbar">
-    <v-app-bar app clipped-left color="appbar" absolute>
+    <v-app-bar app clipped-left flat color="appbar" absolute>
       <v-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
       <navbar-user-menu />
       <v-toolbar-title class="flex-column ml-4">

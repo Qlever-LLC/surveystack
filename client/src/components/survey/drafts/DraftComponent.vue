@@ -72,7 +72,9 @@
           :control="control"
           :forceMobile="forceMobile"
           :isInBuilder="builder"
+          @mounted="handleMounted"
         />
+        <div class="draft-content-bottom" ref="draftContentBottom" />
       </div>
 
       <app-draft-footer
@@ -207,6 +209,9 @@ export default {
     },
   },
   methods: {
+    handleMounted() {
+      console.log('mounted outside');
+    },
     next() {
       // this.$store.dispatch('draft/next')
       queueAction(this.$store, 'draft/next');
@@ -267,6 +272,24 @@ export default {
   created() {
     const { survey, submission, persist } = this;
     this.$store.dispatch('draft/init', { survey, submission, persist });
+  },
+  mounted() {
+    const vm = this;
+    const onIntersection = () => {
+      vm.overflowing = false;
+      console.log('onintersection');
+    };
+    const options = {
+      root: this.$refs.wrapper,
+      rootMargin: '0px',
+      threshold: 1.0,
+    };
+    // const observer = new IntersectionObserver(onIntersection, options);
+    // console.log(this.$refs.draftContentBottom);
+    // // TODO: find a better way to do this? maybe emit a 'mounted' event from the child control?
+    // setTimeout(() => {
+    //   observer.observe(vm.$refs.draftContentBottom);
+    // }, 500)
   },
 };
 </script>
@@ -352,6 +375,20 @@ export default {
   background-color: white;
 }
 
+.draft-component-wrapper::-webkit-scrollbar {
+  background-color: transparent;
+  width: 10px;
+}
+.draft-component-wrapper::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  opacity: 0;
+  /* transition: opacity 0.25s; */
+}
+.draft-component-wrapper:hover::-webkit-scrollbar-thumb {
+  opacity: 1;
+}
+
 .draft-overview {
   flex: 1;
   width: 100% !important;
@@ -378,6 +415,12 @@ export default {
   left: 0px;
   background-color: var(--v-appbar-base);
   box-shadow: 0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%);
+}
+
+@media screen and (min-width: 960px) {
+  .y-overflow-button {
+    left: calc(960px / 2);
+  }
 }
 
 @media screen and (min-width: 1200px) {
@@ -420,6 +463,16 @@ export default {
     bottom: 58px;
     left: calc(calc(100% - 500px) / 2);
   }
+
+  .builder .y-overflow-button {
+    left: calc(calc(100% - 500px) / 2);
+  }
+}
+
+@media (min-width: 1500px) {
+  .y-overflow-button {
+    left: calc(960px / 2);
+  }
 }
 
 .force-mobile > .draft-footer {
@@ -433,5 +486,11 @@ export default {
 .draft-component-wrapper.force-mobile .y-overflow-button {
   left: 50%;
   bottom: 70px;
+}
+
+.draft-content-bottom {
+  width: 1px;
+  height: 1px;
+  background-color: transparent;
 }
 </style>

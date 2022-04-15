@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer :value="value" app>
+  <v-navigation-drawer :value="value" @input="$emit('input', $event)" disable-resize-watcher app>
     <div class="d-flex justify-end mt-3 mr-3">
       <v-btn large icon @click="$emit('input', !value)">
         <v-icon>mdi-close</v-icon>
@@ -36,9 +36,7 @@
         <v-expansion-panels class="pa-0 ma-0 no-background" flat accordion :value="docs.length > 2 ? undefined : 0">
           <v-expansion-panel>
             <v-expansion-panel-header class="pa-0 ma-0">
-              <v-subheader>
-                DOCUMENTATION
-              </v-subheader>
+              <v-subheader> DOCUMENTATION </v-subheader>
             </v-expansion-panel-header>
             <v-expansion-panel-content class="pa-0 ma-0 no-padding">
               <v-list class="pa-0 ma-0">

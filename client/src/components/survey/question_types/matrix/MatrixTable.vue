@@ -113,7 +113,7 @@ export default {
     },
     addRowLabel: {
       type: String,
-      default: 'Add row',
+      default: 'Add Row',
     },
     // how much sooner the bottom has to start floating to avoid being coverd by the footer
     floatingFooterSize: {
@@ -282,7 +282,7 @@ export default {
 <style scoped>
 .add-row-button {
   background-color: white;
-  text-transform: none;
+  text-transform: capitalize;
 }
 
 .mt-wrap {

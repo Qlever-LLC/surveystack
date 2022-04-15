@@ -1,7 +1,7 @@
 <template>
   <nav class="app-navbar">
     <navbar-drawer v-model="drawerIsVisible" />
-    <v-app-bar app clipped-left color="appbar" absolute>
+    <v-app-bar app clipped-left flat color="appbar" absolute>
       <v-app-bar-nav-icon @click="drawerIsVisible = !drawerIsVisible" />
       <navbar-user-menu />
 

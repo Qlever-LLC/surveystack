@@ -134,6 +134,10 @@ export default {
       return `app-control-${control.type}`;
     },
   },
+  mounted() {
+    console.log('mounted inside');
+    this.$emit('mounted');
+  },
 };
 </script>
 
