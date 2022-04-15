@@ -302,7 +302,7 @@ describe('farmos2controller', () => {
       units: 'metric',
       timezone: 'US/Eastern',
       planName: 'unit-plan',
-      owner: user1._id + '',
+      owner: user1.user._id + '',
       agree: true,
       fields: [
         {
