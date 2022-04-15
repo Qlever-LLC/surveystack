@@ -1,279 +1,606 @@
 import { db } from '../db';
 import { ObjectId } from 'mongodb';
+import Joi from 'joi';
+import joiObjectId from 'joi-objectid';
+Joi.objectId = joiObjectId(Joi);
 
+import _, { isString } from 'lodash';
 import axios from 'axios';
 import boom from '@hapi/boom';
 import https from 'https';
-import farmosService from '../services/farmos.service';
-import rolesService from '../services/roles.service';
+import { getRoles, hasAdminRole } from '../services/roles.service';
+import { isFarmosUrlAvailable, createInstance } from '../services/farmos.service';
+import {
+  listFarmOSInstancesForUser,
+  getSuperAllFarmosMappings,
+  addFarmToSurveystackGroup,
+  removeFarmFromSurveystackGroup,
+  addFarmToUser,
+  removeFarmFromUser,
+  getPlans as manageGetPlans,
+  getPlanForGroup as manageGetPlanForGroup,
+  createPlan as manageCreatePlan,
+  deletePlan as manageDeletePlan,
+  mapFarmOSInstanceToUser,
+} from '../services/farmos-2/manage';
+import { aggregator } from '../services/farmos-2/aggregator';
 
-const getFarms = async (req, res) => {
-  let farms;
-  try {
-    farms = await farmosService.getCredentials(res.locals.auth.user);
-  } catch (exception) {
-    console.error(exception);
-    throw boom.badData();
+export const asMongoId = (source) =>
+  source instanceof ObjectId ? source : ObjectId(typeof source === 'string' ? source : source._id);
+
+const config = () => {
+  if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
+    console.log('env not set');
+    return;
   }
 
-  return res.send(farms.map((f) => ({ name: f.name, url: f.url })));
+  return aggregator(process.env.FARMOS_AGGREGATOR_URL, process.env.FARMOS_AGGREGATOR_APIKEY);
 };
 
-const common = async (endpoint, req, res) => {
-  const farms = await farmosService.getCredentials(res.locals.auth.user);
-  const uniqueFarmsByURL = [];
-  farms.forEach((f) => {
-    if (!uniqueFarmsByURL.find((u) => u.url === f.url)) {
-      uniqueFarmsByURL.push(f);
+const requireUserId = (res) => {
+  const userId = res.locals.auth.user._id;
+
+  if (!userId) {
+    throw boom.unauthorized();
+  }
+  return userId;
+};
+
+const requireGroupdAdmin = (req, res) => {
+  const { group } = req.body;
+  const userId = res.locals.auth.user._id;
+
+  if (!userId) {
+    throw boom.unauthorized();
+  }
+
+  if (!group) {
+    throw boom.unauthorized();
+  }
+
+  if (!hasAdminRole(userId, group)) {
+    throw boom.unauthorized();
+  }
+  return userId;
+};
+
+/**
+ *
+ * Return a list of farmos instances associated with user
+ *
+ */
+export const getFarmOSInstances = async (req, res) => {
+  /**
+   * A flat list of instances the user has access to for the farm question type
+   */
+
+  const userId = requireUserId(res);
+  console.log('userid', userId);
+
+  const r = await listFarmOSInstancesForUser(userId);
+
+  return res.send(r);
+};
+/**
+ *
+ *
+ * get a list of assets (fields, plantings, etc.)
+ */
+export const getAssets = async (req, res) => {
+  const userId = requireUserId(res);
+
+  /**
+   * A list of assets the user has access to for the farm question type
+   * include instance url for each asset
+   */
+
+  const allowedBundles = ['plant', 'location', 'equipment', 'land'];
+
+  const { bundle } = req.query;
+
+  if (!bundle || !isString(bundle)) {
+    console.log('bundle', bundle);
+    throw boom.badData("argument 'bundle' not valid");
+  }
+
+  if (!allowedBundles.includes(bundle)) {
+    throw boom.badData(`unknown bundle: ${bundle}`);
+  }
+
+  const instances = await listFarmOSInstancesForUser(userId);
+
+  const cfg = config();
+
+  const assets = [];
+  const errors = [];
+
+  for (const instance of instances) {
+    try {
+      const axiosResponse = await cfg.getAssets(instance.instanceName, bundle);
+
+      const assetList = axiosResponse.data.data.map((a) => {
+        return {
+          name: a.attributes.name,
+          id: a.id,
+          instanceName: instance.instanceName,
+          archived: a.attributes.archived,
+          location:
+            a.relationships && a.relationships.locations
+              ? a.relationships.location.data
+              : undefined,
+        };
+      });
+      assets.push(...assetList);
+    } catch (error) {
+      console.log(error);
+      errors.push(error);
     }
+  }
+
+  return res.send({
+    assets,
+    errors,
   });
+};
 
-  //console.log('farms distinct by URL', uniqueFarmsByURL);
+/**
+ * get list of logs
+ */
+export const getLogs = async (req, res) => {
+  /**
+   * A list of logs the user has access to
+   * include instance url for each log
+   */
 
-  const farmosFields = [];
+  const userId = res.locals.auth.user._id;
+  if (!userId) {
+    throw boom.forbidden('not signed in');
+  }
 
+  const { bundle } = req.body;
+
+  if (!bundle || !isString(bundle)) {
+    throw boom.badData("argument 'bundle' not valid");
+  }
+
+  const instances = await listFarmOSInstancesForUser(userId);
+  const cfg = config();
+
+  const assets = [];
+  const errors = [];
+  for (const instance of instances) {
+    try {
+      const axiosResponse = await cfg.getLogs(instance.instanceName, bundle);
+      const assetList = axiosResponse.data.data.map((a) => {
+        return {
+          name: a.attributes.name,
+          id: a.id,
+          instance: instance.instanceName,
+        };
+      });
+      assets.push(...assetList);
+    } catch (error) {
+      errors.push(error);
+    }
+  }
+
+  return res.send({
+    assets,
+    errors,
+  });
+};
+
+export const superAdminGetAllInstances = async (req, res) => {
+  const r = await getSuperAllFarmosMappings();
+  return res.send(r);
+};
+
+export const superAdminMapFarmosInstance = async (req, res) => {
+  const { group } = req.body;
+  if (!group) {
+    throw boom.badData('group missing');
+  }
+
+  const { instanceName } = req.body;
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
+
+  await addFarmToSurveystackGroup(instanceName, group);
+  return res.send({
+    status: 'success',
+  });
+};
+
+export const superAdminUnMapFarmosInstance = async (req, res) => {
+  const { group, instanceName } = req.body;
+  if (!group) {
+    throw boom.badData('group missing');
+  }
+
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
+
+  await removeFarmFromSurveystackGroup(instanceName, group);
+  return res.send({
+    status: 'success',
+  });
+};
+
+export const superAdminMapFarmosInstanceToUser = async (req, res) => {
+  const { user, group, owner, instanceName } = req.body;
+  if (!user) {
+    throw boom.badData('user missing');
+  }
+
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
+
+  if (typeof owner == undefined) {
+    throw boom.badData('owner attribute missing');
+  }
+
+  await addFarmToUser(instanceName, user, group, !!owner);
+  return res.send({
+    status: 'success',
+  });
+};
+
+export const superAdminUnMapFarmosInstanceFromUser = async (req, res) => {
+  const { user, group, instanceName } = req.body;
+  if (!user) {
+    throw boom.badData('user missing');
+  }
+
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
+
+  await removeFarmFromUser(instanceName, user, group);
+  return res.send({
+    status: 'success',
+  });
+};
+
+/**
+ * Return all instances for group with mappings
+ */
+export const getInstancesForGroup = async (req, res) => {
+  const userId = requireUserId(res);
+  const groupId = requireGroupdAdmin(req, res);
+
+  return res.send([]);
+};
+
+/**
+ * get list of farms that are connectable to users of group
+ */
+export const getConnectableFarmsForGroup = async (req, res) => {
+  /**
+   * 1. only admins can do this, they pass a user from a group or subgroup
+   * 2. get tagged farms from aggregator for this group and its subgroups
+   */
+};
+
+/**
+ * update mapped instances for group
+ */
+export const updateInstancesForGroup = async (req, res) => {
+  return res.send([]);
+};
+
+/**
+ * get list of instances for user, including who has access to them
+ */
+export const getInstancesForUser = async (req, res) => {
+  /**
+   * 1. For this user list all instances that the user has access to
+   * 2. indicate if owner or not
+   * 3. list groups with access to the farm if owner
+   * 4. list other users with access to the farm
+   */
+  return res.send([]);
+};
+
+/**
+ * add / remove instance from user
+ */
+export const updateInstancesForUser = async (req, res) => {
+  return res.send([]);
+};
+
+/**
+ * change ownership of an instance
+ */
+export const changeOwnershipForInstace = async (req, res) => {
+  return res.send([]);
+};
+
+/**
+ * Super Admin can map instance to any user
+ */
+export const assignFarmOSInstanceToUser = async (req, res) => {
+  return res.send([]);
+};
+
+const runPendingFarmOSOperations = async (url, plan) => {
   try {
-    for (const farm of uniqueFarmsByURL) {
-      //console.log('farm', farm);
-      const agentOptions = {
-        host: farm.aggregatorURL,
-        port: '443',
-        path: '/',
-        rejectUnauthorized: false,
-      };
+    const pendingOp = await db.collection('farmos.fields').findOne({ url: url });
 
-      const agent = new https.Agent(agentOptions);
+    if (!pendingOp) {
+      return; // success, no pending ops
+    }
 
-      console.log('fetching fields', farm.aggregatorURL, endpoint, farm.url);
+    const { fields } = pendingOp;
 
-      const r = await axios.get(
-        `https://${farm.aggregatorURL}/api/v1/farms/${endpoint}/?farm_url=${encodeURIComponent(
-          farm.url
-        )}`,
-        {
-          headers: {
-            accept: 'application/json',
-            'api-key': farm.aggregatorApiKey,
+    for (const field of fields) {
+      try {
+        const { create } = config();
+
+        const payload = {
+          data: {
+            type: 'asset--land',
+            attributes: {
+              name: field.name,
+              status: 'active',
+              intrinsic_geometry: {
+                value: field.wkt,
+              },
+              land_type: 'field',
+            },
           },
-          httpsAgent: agent,
-        }
-      );
-      farmosFields.push({ farm: farm.name, url: farm.url, data: r.data });
-    }
-  } catch (exception) {
-    console.error(exception);
-    throw boom.badData();
-  }
-
-  return res.send(farmosFields);
-};
-
-const getFields = async (req, res) => {
-  return common('areas', req, res);
-};
-
-const getAssets = async (req, res) => {
-  return common('assets', req, res);
-};
-
-const getAreas = async (req, res) => {
-  const { aggregator, farmurl } = req.params;
-
-  const ag = await db
-    .collection('integrations.groups')
-    .findOne({ _id: new ObjectId(aggregator), type: 'farmos-aggregator' });
-
-  if (!ag) {
-    throw boom.notFound();
-  }
-
-  const hasAdminRole = await rolesService.hasAdminRole(res.locals.auth.user._id, ag.group);
-  if (!hasAdminRole) {
-    throw boom.unauthorized();
-  }
-
-  const apiKey = ag.data.apiKey;
-  if (!apiKey) {
-    throw boom.internal('api key missing for aggregator ' + ag._id);
-  }
-
-  try {
-    const agentOptions = {
-      host: ag.data.url,
-      port: '443',
-      path: '/',
-      rejectUnauthorized: false,
-    };
-
-    const agent = new https.Agent(agentOptions);
-
-    const r = await axios.get(
-      `https://${ag.data.url}/api/v1/farms/areas/?farm_url=${encodeURIComponent(farmurl)}`,
-      {
-        headers: {
-          accept: 'application/json',
-          'api-key': apiKey,
-        },
-        httpsAgent: agent,
+        };
+        const response = await create(url, 'asset', 'land', payload);
+        db.collection('farmos.webhookrequests').insertOne({
+          url,
+          plan,
+          created: new Date(),
+          state: 'success',
+          message: `created field ${field.name} with id ${response.data.id} for ${url}`,
+        });
+      } catch (error) {
+        db.collection('farmos.webhookrequests').insertOne({
+          url,
+          plan,
+          created: new Date(),
+          state: 'failed-field',
+          message: error.message,
+        });
       }
-    );
-    return res.send({
-      status: 'success',
-      areas: r.data,
+    }
+  } catch (error) {
+    console.log('error');
+    db.collection('farmos.webhookrequests').insertOne({
+      url,
+      plan,
+      created: new Date(),
+      state: 'failed',
+      message: error.message,
     });
-  } catch (exception) {
-    console.error(exception);
-    throw boom.badData();
   }
+
+  // finally delete all entries with url
+  await db.collection('farmos.fields').deleteMany({ url });
 };
 
-const createFieldRequest = async (ag, apiKey, farmurl, name, wkt) => {
-  const agentOptions = {
-    host: ag.data.url,
-    port: '443',
-    path: '/',
-    rejectUnauthorized: false,
-  };
-
-  const agent = new https.Agent(agentOptions);
-
-  const vr = await axios.get(
-    `https://${ag.data.url}/api/v1/farms/info/?use_cached=false&farm_url=${encodeURIComponent(
-      farmurl
-    )}`,
-    {
-      headers: {
-        accept: 'application/json',
-        'api-key': apiKey,
-      },
-      httpsAgent: agent,
-    }
-  );
-
-  console.log('ag', ag);
-  console.log('url', farmurl);
-  console.log('info response', vr.data);
-
-  const fid = Object.keys(vr.data)[0];
-  const vid = vr.data[fid]['info']['resources']['taxonomy_term']['farm_areas'].vid;
-
-  const r = await axios.post(
-    `https://${ag.data.url}/api/v1/farms/areas/?farm_url=${encodeURIComponent(farmurl)}`,
-    {
-      vocabulary: vid + '',
-      name: name,
-      description: '',
-      area_type: 'field',
-      geofield: [
-        {
-          geom: wkt,
-        },
-      ],
-    },
-    {
-      headers: {
-        accept: 'application/json',
-        'api-key': apiKey,
-      },
-      httpsAgent: agent,
-    }
-  );
-
-  return r;
-};
-
-const createField = async (req, res) => {
-  const { aggregator, farmurl } = req.params;
-  const { name, wkt } = req.body;
-
-  const ag = await db
-    .collection('integrations.groups')
-    .findOne({ _id: new ObjectId(aggregator), type: 'farmos-aggregator' });
-
-  if (!ag) {
-    throw boom.notFound();
-  }
-
-  const hasAdminRole = await rolesService.hasAdminRole(res.locals.auth.user._id, ag.group);
-  if (!hasAdminRole) {
-    throw boom.unauthorized();
-  }
-
-  const apiKey = ag.data.apiKey;
-  if (!apiKey) {
-    throw boom.internal('api key missing for aggregator ' + ag._id);
-  }
-
-  if (!name) {
-    boom.badData('missing name');
-  }
-
-  if (!wkt) {
-    boom.badData('missing wkt');
-  }
-
+export const webhookCallback = async (req, res, next) => {
   try {
-    const r = await createFieldRequest(ag, apiKey, farmurl, name, wkt);
+    const { key } = req.query;
+
+    //console.log("req", req)
+    if (!key) {
+      throw boom.unauthorized('key missing');
+    }
+
+    if (!process.env.FARMOS_CALLBACK_KEY) {
+      throw boom.badRequest('server does not support farmos webhooks');
+    }
+
+    if (key !== process.env.FARMOS_CALLBACK_KEY) {
+      throw boom.unauthorized('unauthorized');
+    }
+
+    const { url, plan, status } = req.body;
+
+    if (status !== 'ready') {
+      throw boom.badRequest('expecting status ready');
+    }
+
+    if (!url) {
+      throw boom.badRequest('url is missing');
+    }
+
+    if (!plan) {
+      throw boom.badRequest('plan is missing');
+    }
+
+    db.collection('farmos.webhookrequests').insertOne({
+      url,
+      plan,
+      created: new Date(),
+    });
+
+    await runPendingFarmOSOperations(url, plan);
+
     return res.send({
       status: 'success',
-      areas: r.data,
     });
-  } catch (exception) {
-    console.error(exception);
-    throw boom.badData(exception.message);
+  } catch (error) {
+    console.log('error', error);
+    if (boom.isBoom(error)) {
+      return next(error);
+    } else {
+      return res.send({
+        status: 'error',
+      });
+    }
   }
 };
 
-const getIntegrationFarms = async (req, res) => {
-  const { id } = req.params;
+export const getPlans = async (req, res) => {
+  return res.send(await manageGetPlans());
+};
 
-  const aggregator = await db
-    .collection('integrations.groups')
-    .findOne({ _id: new ObjectId(id), type: 'farmos-aggregator' });
+export const getPlanForGroup = async (req, res) => {
+  return res.send(await manageGetPlanForGroup());
+};
 
-  if (!aggregator) {
-    throw boom.notFound();
+export const createPlan = async (req, res) => {
+  const schema = Joi.object({
+    planName: Joi.string().required(),
+  }).required();
+
+  const validres = schema.validate(req.body);
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
   }
 
-  const hasAdminRole = await rolesService.hasAdminRole(res.locals.auth.user._id, aggregator.group);
-  if (!hasAdminRole) {
-    throw boom.unauthorized();
-  }
+  await manageCreatePlan(req.body.planName);
 
-  const { data: farms } = await axios.get(`https://${aggregator.data.url}/api/v1/farms/`, {
-    headers: {
-      accept: 'application/json',
-      'api-key': aggregator.data.apiKey,
-    },
+  return res.send({
+    status: 'success',
   });
-
-  const tags = aggregator.data.parameters;
-  if (!tags) {
-    return res.send(farms);
-  }
-
-  // console.log("filtering for tags", tags);
-  const arr = tags.split(',');
-  return res.send(
-    farms.filter((f) => {
-      //console.log('farm tags', f.tags)
-      if (!f.tags) {
-        return false;
-      }
-
-      const farr = f.tags.toLowerCase().split(' ');
-      for (const t of arr) {
-        if (farr.includes(t)) {
-          return true;
-        }
-      }
-
-      return false;
-    })
-  );
 };
 
-const testConnection = async (req, res) => {
+export const deletePlan = async (req, res) => {
+  const schema = Joi.object({
+    planId: Joi.objectId().required(),
+  }).required();
+
+  const validres = schema.validate(req.body);
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
+  await manageDeletePlan(req.body.planId);
+
+  return res.send({
+    status: 'success',
+  });
+};
+
+export const checkUrl = async (req, res) => {
+  const apiKey = process.env.FARMOS_CREATE_KEY;
+  if (!apiKey) {
+    throw boom.badImplementation('farmos not configured');
+  }
+
+  const { url } = req.body;
+  if (!url) {
+    throw boom.badRequest('missing url');
+  }
+
+  try {
+    return res.send({
+      status: (await isFarmosUrlAvailable(url, apiKey)) ? 'free' : 'taken',
+    });
+  } catch (error) {
+    return res.send({
+      status: 'error',
+      message: error.message,
+    });
+  }
+};
+export const superAdminCreateFarmOsInstance = async (req, res) => {
+  const schema = Joi.object({
+    groupId: Joi.string().required(),
+    url: Joi.string().max(100).required(),
+    email: Joi.string().email().required(),
+    farmName: Joi.string().required(),
+    fullName: Joi.string().required(),
+    farmAddress: Joi.string().required(),
+    units: Joi.string().required(),
+    timezone: Joi.string().required(),
+    planName: Joi.string().required(),
+    owner: Joi.string().required(),
+    agree: Joi.boolean().valid(true),
+    fields: Joi.array()
+      .items(Joi.object({ name: Joi.string().required(), wkt: Joi.string().required() }))
+      .required(),
+  }).required();
+
+  // todo, also map user to instance
+  // todo, create mapping to group
+
+  const validres = schema.validate(req.body);
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    return res.send({
+      errors,
+    });
+  }
+
+  const {
+    groupId: group,
+    url,
+    email,
+    farmName: site_name,
+    fullName: registrant,
+    farmAddress: location,
+    units,
+    timezone,
+    planName,
+    fields,
+    owner,
+  } = req.body;
+  const groupId = asMongoId(group);
+  const groupEntity = await db.collection('groups').findOne({ _id: groupId });
+  if (!groupEntity || !groupEntity.path) {
+    throw boom.badData('unable to find group');
+  }
+
+  const userId = asMongoId(owner);
+  const user = await db.collection('users').findOne({ _id: userId });
+  if (!user) {
+    throw boom.badData('owner not found');
+  }
+
+  const { path: groupPath } = groupEntity;
+  // also add instances to users
+  try {
+    const r = await createInstance(
+      url,
+      email,
+      site_name,
+      registrant,
+      location,
+      units,
+      [groupPath],
+      timezone,
+      planName
+    );
+
+    mapFarmOSInstanceToUser(owner, url, true);
+
+    addFarmToSurveystackGroup(url, groupId, planName);
+
+    await db.collection('farmos.fields').insertOne({
+      url: `${url}.farmos.net`,
+      created: new Date(),
+      fields,
+    });
+
+    res.send({
+      status: 'success',
+      response: r.data,
+    });
+  } catch (error) {
+    return res.send({
+      status: 'error',
+      message: error.message,
+    });
+  }
+};
+
+export const testConnection = async (req, res) => {
+  /**
+   * TODO migrate Testconnection
+   */
+  /* 
   const aggregator = req.body.data;
 
   if (!aggregator.url) {
@@ -310,156 +637,5 @@ const testConnection = async (req, res) => {
       status: 'error',
       message: error.message,
     });
-  }
-};
-
-const buildMembersByFarmAndGroupPipeline = (farmUrl, aggregator, group) => {
-  return [
-    {
-      $match: {
-        'data.url': farmUrl,
-        type: 'farmos-farm',
-        'data.aggregator': new ObjectId(aggregator),
-      },
-    },
-    {
-      $lookup: {
-        from: 'memberships',
-        localField: 'membership',
-        foreignField: '_id',
-        as: 'm',
-      },
-    },
-    {
-      $project: {
-        membership: {
-          $arrayElemAt: ['$m', 0],
-        },
-      },
-    },
-    {
-      $match: {
-        'membership.group': new ObjectId(group),
-      },
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'membership.user',
-        foreignField: '_id',
-        as: 'user',
-      },
-    },
-  ];
-};
-
-const getMembersByFarmAndGroup = async (req, res) => {
-  const { farmUrl, group, aggregator } = req.query;
-  if (!farmUrl || !group || !aggregator) {
-    throw boom.badRequest('missing farmUrl, group or aggregator');
-  }
-
-  const access = await rolesService.hasAdminRole(res.locals.auth.user._id, group);
-  if (!access) {
-    throw boom.unauthorized('permission denied: not group admin');
-  }
-
-  const pipeline = buildMembersByFarmAndGroupPipeline(farmUrl, aggregator, group);
-
-  const entities = await db.collection('integrations.memberships').aggregate(pipeline).toArray();
-
-  return res.send(entities);
-};
-
-const setFarmMemberships = async (req, res) => {
-  const { memberships, group, farmUrl, farmId, aggregator } = req.body;
-
-  if (!group) {
-    throw boom.badRequest('missing group');
-  }
-
-  const access = await rolesService.hasAdminRole(res.locals.auth.user._id, group);
-  if (!access) {
-    throw boom.unauthorized('permission denied: not group admin');
-  }
-
-  if (!farmUrl || !farmId || !aggregator) {
-    throw boom.badRequest('parameter missing (farmUrl || farmId || aggregator)');
-  }
-
-  if (!memberships || !Array.isArray(memberships)) {
-    throw boom.badRequest('memberships must be an array of strings');
-  }
-
-  const r = /^[a-f\d]{24}$/;
-  if (!memberships.every((m) => typeof m === 'string') || !memberships.every((m) => r.test(m))) {
-    throw boom.badRequest('memberships must be an array of ObjectId');
-  }
-
-  // clear all membership integrations of farm,aggregator in group
-  const pipeline = buildMembersByFarmAndGroupPipeline(farmUrl, aggregator, group);
-
-  const entities = await db.collection('integrations.memberships').aggregate(pipeline).toArray();
-
-  const toDelete = entities.map((e) => new ObjectId(e._id));
-  console.log('deleting', toDelete);
-
-  const delRes = await db.collection('integrations.memberships').deleteMany({
-    _id: {
-      $in: toDelete,
-    },
-  });
-
-  if (!delRes.ok === 1) {
-    throw boom.internal('error updating memberships, delete entries failed');
-  }
-
-  const toInsert = memberships.map((m) => ({
-    name: farmUrl,
-    membership: new ObjectId(m),
-    type: 'farmos-farm',
-    data: {
-      name: farmUrl,
-      url: farmUrl,
-      aggregator: new ObjectId(aggregator),
-      farm: farmId,
-    },
-  }));
-  // add all new integrations for farm,aggregator in group for membership
-  const created = await db.collection('integrations.memberships').insertMany(toInsert);
-  res.send(created);
-};
-
-const checkUrl = async (req, res) => {
-  console.log('checking url');
-
-  const { url, apiKey } = req.body;
-
-  if (!url || !apiKey) {
-    throw boom.badRequest('missing url or apikey');
-  }
-
-  try {
-    return res.send({
-      status: (await farmosService.isFarmosUrlAvailable(url, apiKey)) ? 'free' : 'taken',
-    });
-  } catch (error) {
-    return res.send({
-      status: 'error',
-      message: error.message,
-    });
-  }
-};
-
-export default {
-  getFields,
-  getAreas,
-  getAssets,
-  getIntegrationFarms,
-  testConnection,
-  getMembersByFarmAndGroup,
-  setFarmMemberships,
-  checkUrl,
-  createField,
-  getFarms,
+  } */
 };

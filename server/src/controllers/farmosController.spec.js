@@ -10,7 +10,7 @@ import {
   webhookCallback,
   checkUrl,
   superAdminCreateFarmOsInstance,
-} from './farmos2Controller';
+} from './farmosController';
 import { createGroup, createReq, createRes, createUser } from '../testUtils';
 import {
   mapFarmOSInstanceToUser,
@@ -61,7 +61,7 @@ function mockRes(userId) {
   };
 }
 
-describe('farmos2controller', () => {
+describe('farmos-controller', () => {
   it('get-farmos-instances', async () => {
     const { group, admin1, user1 } = await init();
 
