@@ -19,6 +19,8 @@ import {
   removeFarmFromUser,
   getPlans as manageGetPlans,
   getPlanForGroup as manageGetPlanForGroup,
+  createPlan as manageCreatePlan,
+  deletePlan as manageDeletePlan,
   mapFarmOSInstanceToUser,
 } from '../services/farmos-2/manage';
 import { aggregator } from '../services/farmos-2/aggregator';
@@ -439,6 +441,42 @@ export const getPlans = async (req, res) => {
 
 export const getPlanForGroup = async (req, res) => {
   return res.send(await manageGetPlanForGroup());
+};
+
+export const createPlan = async (req, res) => {
+  const schema = Joi.object({
+    planName: Joi.string().required(),
+  }).required();
+
+  const validres = schema.validate(req.body);
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
+  await manageCreatePlan(req.body.planName);
+
+  return res.send({
+    status: 'success',
+  });
+};
+
+export const deletePlan = async (req, res) => {
+  const schema = Joi.object({
+    planId: Joi.objectId().required(),
+  }).required();
+
+  const validres = schema.validate(req.body);
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
+  await manageDeletePlan(req.body.planId);
+
+  return res.send({
+    status: 'success',
+  });
 };
 
 export const checkUrl = async (req, res) => {

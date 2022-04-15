@@ -241,6 +241,17 @@ router.post(
   catchErrors(farmos2Controller.superAdminCreateFarmOsInstance)
 );
 router.get('/farmos/plans', [assertIsSuperAdmin], catchErrors(farmos2Controller.getPlans));
+router.post(
+  '/farmos/plans/create',
+  [assertIsSuperAdmin],
+  catchErrors(farmos2Controller.createPlan)
+);
+
+router.post(
+  '/farmos/plans/delete',
+  [assertIsSuperAdmin],
+  catchErrors(farmos2Controller.deletePlan)
+);
 
 router.get(
   '/farmos/all',

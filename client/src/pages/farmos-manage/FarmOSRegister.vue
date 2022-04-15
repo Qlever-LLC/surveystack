@@ -19,6 +19,8 @@
         label="Select Plan"
         v-model="localViewModel.form.planName"
         :items="localViewModel.plans"
+        item-text="planName"
+        item-value="planName"
         :rules="[(v) => !!v || `select plan`]"
       ></v-combobox>
 

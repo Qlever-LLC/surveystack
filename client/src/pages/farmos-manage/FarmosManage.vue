@@ -22,6 +22,8 @@
           :viewModel="item.viewModel || {}"
           @check-url="checkUrl"
           @create-instance="createInstance"
+          @create-plan="createPlan"
+          @delete-plan="deletePlan"
         ></v-component>
       </v-tab-item>
     </v-tabs-items>
@@ -36,6 +38,7 @@ import Aggregator from './Aggregator.vue';
 import Groups from './Groups.vue';
 import Users from './Users.vue';
 import FarmOSRegisterVue from './FarmOSRegister.vue';
+import Plans from './Plans.vue';
 
 export default {
   data() {
@@ -53,18 +56,22 @@ export default {
       items: [
         {
           name: 'Aggregator',
+          id: 'aggregator',
           component: Aggregator,
         },
         {
           name: 'Groups',
+          id: 'groups',
           component: Groups,
         },
         {
           name: 'Users',
+          id: 'users',
           component: Users,
         },
         {
-          name: 'Register',
+          name: 'Create Instance',
+          id: 'create-instance',
           component: FarmOSRegisterVue,
           viewModel: {
             form: {
@@ -88,6 +95,15 @@ export default {
             count: 1,
           },
         },
+        {
+          name: 'Plans',
+          id: 'plans',
+          component: Plans,
+          viewModel: {
+            plans: [],
+            count: 1,
+          },
+        },
       ],
     };
   },
@@ -108,10 +124,13 @@ export default {
       this.users = users;
       this.plans = plans;
 
-      const viewModel = this.getRegisterViewModel();
-      viewModel.groups = groups;
-      viewModel.plans = plans;
-      viewModel.users = users;
+      const registerVm = this.vmOf('create-instance');
+      registerVm.groups = groups;
+      registerVm.plans = plans;
+      registerVm.users = users;
+
+      const plansVm = this.vmOf('plans');
+      plansVm.plans = plans;
 
       console.dir(users);
     },
@@ -202,35 +221,37 @@ export default {
         }
       }
     },
-    getRegisterViewModel() {
-      return this.items.find((item) => item.name === 'Register').viewModel;
+    vmOf(componentId) {
+      return this.items.find((item) => item.id === componentId).viewModel;
     },
     async checkUrl(viewModel) {
-      this.getRegisterViewModel().form = viewModel.form;
+      const vm = this.vmOf('create-instance');
+      vm.form = viewModel.form;
 
-      this.getRegisterViewModel().loading = true;
+      vm.loading = true;
       try {
         const r = await api.post('/farmos/check-url', {
           url: viewModel.form.instanceName,
         });
 
         if (r.data.status === 'free') {
-          this.getRegisterViewModel().form.instanceNameValid = true;
+          vm.form.instanceNameValid = true;
           console.log('instance name free');
         } else {
-          this.getRegisterViewModel().form.instanceNameValid = false;
+          vm.form.instanceNameValid = false;
           console.log('instance name taken');
         }
       } catch (error) {
-        this.getRegisterViewModel().form.instanceNameValid = false;
+        vm.form.instanceNameValid = false;
       }
 
-      this.getRegisterViewModel().loading = false;
-      this.getRegisterViewModel().count += 1; // invalidate cache
+      vm.loading = false;
+      vm.count += 1; // invalidate cache
     },
     async createInstance(form, fields) {
-      this.getRegisterViewModel().form = form;
-      this.getRegisterViewModel().loading = true;
+      const vm = this.vmOf('create-instance');
+      vm.form = form;
+      vm.loading = true;
 
       const formated = {
         ...form,
@@ -254,8 +275,57 @@ export default {
         this.error = 'error creating instance: ' + e.message;
       }
 
-      this.getRegisterViewModel().loading = false;
-      this.getRegisterViewModel().count += 1; // invalidate cache
+      vm.loading = false;
+      vm.count += 1; // invalidate cache
+    },
+    async createPlan(planName) {
+      const vm = this.vmOf('plans');
+      vm.loading = true;
+      try {
+        const r = await api.post('/farmos/plans/create', {
+          planName,
+        });
+
+        const { data: plans } = await api.get('/farmos/plans');
+        vm.plans = plans;
+        this.plans = plans;
+
+        if (r.data.status === 'success') {
+          this.success = 'Sucessfully created new plan';
+        } else {
+          this.error = 'Error creating plan';
+        }
+      } catch (error) {
+        this.error = error.message;
+      }
+
+      vm.loading = false;
+      vm.count += 1;
+    },
+    async deletePlan(planId) {
+      const vm = this.vmOf('plans');
+      vm.loading = true;
+
+      try {
+        const r = await api.post('/farmos/plans/delete', {
+          planId,
+        });
+
+        const { data: plans } = await api.get('/farmos/plans');
+        vm.plans = plans;
+        this.plans = plans;
+
+        if (r.data.status === 'success') {
+          this.success = 'Sucessfully deleted';
+        } else {
+          this.error = 'Error deleting plan';
+        }
+      } catch (error) {
+        this.error = error.message;
+      }
+
+      vm.loading = false;
+      vm.count += 1;
     },
   },
 };
