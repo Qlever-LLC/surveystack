@@ -25,7 +25,6 @@ import {
 } from '../services/farmos/__mock__/farmos.asset.response';
 
 import mockAxios from 'axios';
-require('dotenv').config();
 
 const init = async () => {
   const group = await createGroup();
@@ -37,6 +36,12 @@ const init = async () => {
     user1,
     admin1,
   };
+};
+
+process.env = {
+  FARMOS_CALLBACK_KEY: 'x',
+  FARMOS_AGGREGATOR_URL: 'x',
+  FARMOS_AGGREGATOR_APIKEY: 'x',
 };
 
 function mockRes(userId) {
@@ -194,12 +199,6 @@ describe('farmos-controller', () => {
         },
       ],
     });
-
-    process.env = {
-      FARMOS_CALLBACK_KEY: 'x',
-      FARMOS_AGGREGATOR_URL: 'x',
-      FARMOS_AGGREGATOR_APIKEY: 'x',
-    };
 
     const send = jest.fn();
 
