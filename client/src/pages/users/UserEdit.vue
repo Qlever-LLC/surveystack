@@ -7,9 +7,10 @@
     </div>
     <v-card class="pa-4 mb-4 mt-2">
       <v-form>
-        <v-text-field v-model="entity.email" label="E-Mail" />
-        <v-text-field v-model="entity.name" label="Name" />
+        <v-text-field tabindex="1" v-model="entity.email" label="E-Mail" />
+        <v-text-field tabindex="2" v-model="entity.name" label="Name" />
         <v-text-field
+          tabindex="3"
           v-model="entity.password"
           :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
           @click:append="showPasswords = !showPasswords"
@@ -20,6 +21,7 @@
         />
 
         <v-text-field
+          tabindex="4"
           v-model="passwordConfirmation"
           :append-icon="showPasswords ? 'mdi-eye-off' : 'mdi-eye'"
           @click:append="showPasswords = !showPasswords"
@@ -33,12 +35,15 @@
 
         <div class="d-flex mt-2 justify-end">
           <v-btn text @click="cancel">Cancel</v-btn>
-          <v-btn color="primary" @click="submit">Submit</v-btn>
+          <v-btn color="primary" @click="submit" :loading="isSubmitting">Submit</v-btn>
         </div>
       </v-form>
     </v-card>
+    <!-- <v-alert v-if="status.type" class="mt-4 mb-0" mode="fade" text :type="status.type">{{ status.message }}</v-alert> -->
     <transition name="fade">
-      <app-feedback v-if="status" class="mt-5" @closed="status = ''">{{ status }}</app-feedback>
+      <app-feedback v-if="status" class="mt-5" @closed="status = null" :type="status.type">{{
+        status.message
+      }}</app-feedback>
     </transition>
   </v-container>
 </template>
@@ -57,7 +62,7 @@ export default {
       editMode: true,
       passwordConfirmation: '',
       showPasswords: false,
-      status: '',
+      status: null,
       entity: {
         _id: '',
         email: '',
@@ -66,6 +71,7 @@ export default {
       },
       groupEntity: null,
       sendMail: false,
+      isSubmitting: false,
     };
   },
   methods: {
@@ -77,11 +83,13 @@ export default {
       const url = this.editMode ? `/users/${this.entity._id}` : '/users';
 
       if (this.entity.password !== this.passwordConfirmation) {
-        this.status = 'Passwords do not match';
+        this.status = { type: 'error', message: 'Passwords do not match' };
         return;
       }
 
       try {
+        this.isSubmitting = true;
+
         const { _id, email, name, password } = this.entity;
         const { data: newUser } = await api.customRequest({
           method,
@@ -98,10 +106,15 @@ export default {
         if (this.editMode) {
           this.$store.dispatch('auth/updateToken', newUser.value);
         }
-        this.$router.back();
+        this.status = {
+          type: 'success',
+          message: this.editMode ? 'Your account details have been saved.' : 'A new user has been created.',
+        };
       } catch (err) {
         console.log(err);
-        this.status = err.response.data.message;
+        this.status = { type: 'error', message: err.response.data.message };
+      } finally {
+        this.isSubmitting = false;
       }
     },
   },
