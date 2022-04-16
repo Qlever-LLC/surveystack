@@ -129,6 +129,10 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
       };
     });
 
+    if (body.length == 0) {
+      return {};
+    }
+
     const r = await axios.post(`${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`, body, {
       ...opts,
     });
@@ -176,31 +180,33 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
       };
     });
 
-    const createdTypes = await axios.post(
-      `${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`,
-      createBody,
-      {
-        ...opts,
+    if (createBody.length > 0) {
+      const createdTypes = await axios.post(
+        `${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`,
+        createBody,
+        {
+          ...opts,
+        }
+      );
+
+      const createResponses = [];
+
+      for (const k of Object.keys(createdTypes.data)) {
+        const createResponseBody = JSON.parse(createdTypes.data[k].body);
+        createResponses.push(createResponseBody.data);
       }
-    );
 
-    const createResponses = [];
+      console.log('responses of create', createResponses);
 
-    for (const k of Object.keys(createdTypes.data)) {
-      const createResponseBody = JSON.parse(createdTypes.data[k].body);
-      createResponses.push(createResponseBody.data);
-    }
-
-    console.log('responses of create', createResponses);
-
-    for (const response of createResponses) {
-      const [endpoint, bundle] = response.type.split('--');
-      res.push({
-        endpoint,
-        bundle,
-        id: response.id,
-        name: response.attributes.name,
-      });
+      for (const response of createResponses) {
+        const [endpoint, bundle] = response.type.split('--');
+        res.push({
+          endpoint,
+          bundle,
+          id: response.id,
+          name: response.attributes.name,
+        });
+      }
     }
 
     return res;
