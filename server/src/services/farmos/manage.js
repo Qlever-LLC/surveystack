@@ -249,12 +249,13 @@ export const removeFarmFromUser = async (instanceName, userId, groupId) => {
   await db.collection('farmos-instances').deleteMany(filter);
 };
 
-export const createPlan = async (planName) => {
+export const createPlan = async (planName, planUrl) => {
   const _id = new ObjectId();
 
   return await db.collection('farmos-plans').insertOne({
     _id,
     planName,
+    planUrl,
   });
 };
 

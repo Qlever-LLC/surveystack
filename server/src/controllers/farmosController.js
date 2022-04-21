@@ -450,6 +450,7 @@ export const getPlanForGroup = async (req, res) => {
 export const createPlan = async (req, res) => {
   const schema = Joi.object({
     planName: Joi.string().required(),
+    planUrl: Joi.string().required(),
   }).required();
 
   const validres = schema.validate(req.body);
@@ -458,7 +459,7 @@ export const createPlan = async (req, res) => {
     throw boom.badData(`error: ${errors.join(',')}`);
   }
 
-  await manageCreatePlan(req.body.planName);
+  await manageCreatePlan(req.body.planName, req.body.planUrl);
 
   return res.send({
     status: 'success',
@@ -522,9 +523,6 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
       .items(Joi.object({ name: Joi.string().required(), wkt: Joi.string().required() }))
       .required(),
   }).required();
-
-  // todo, also map user to instance
-  // todo, create mapping to group
 
   const validres = schema.validate(req.body);
   if (validres.error) {

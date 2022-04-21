@@ -13,10 +13,13 @@
 
     <v-row class="align-baseline">
       <v-col>
-        <v-text-field outlined primary label="New Plan Name" v-model="planName"></v-text-field>
+        <v-text-field outlined primary label="New Plan Name" v-model.trim="planName"></v-text-field>
       </v-col>
       <v-col>
-        <v-btn color="primary" @click="$emit('create-plan', planName)">Create Plan</v-btn>
+        <v-text-field outlined primary label="New Plan URL" hint="farmos.net" v-model.trim="planUrl"></v-text-field>
+      </v-col>
+      <v-col>
+        <v-btn color="primary" @click="$emit('create-plan', planName, planUrl)">Create Plan</v-btn>
       </v-col>
     </v-row>
 
@@ -27,12 +30,14 @@
         <thead>
           <tr>
             <th class="text-left">Plan Name</th>
+            <th class="text-left">Plan Base URL</th>
             <th class="text-left">Action</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(plan, idx) in viewModel.plans" :key="`plan--${idx}`">
             <td>{{ plan.planName }}</td>
+            <td>{{ plan.planUrl }}</td>
             <td>
               <v-btn color="red" @click="$emit('delete-plan', plan._id)" dark>Delete</v-btn>
             </td>
@@ -49,6 +54,7 @@ export default {
   data() {
     return {
       planName: '',
+      planUrl: '',
     };
   },
 };

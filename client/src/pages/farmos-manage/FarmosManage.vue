@@ -89,7 +89,7 @@ export default {
               agree: false,
               owner: null,
               fields: [],
-              planName: '',
+              plan: null,
             },
             groups: [],
             plans: [],
@@ -232,9 +232,28 @@ export default {
       vm.form = viewModel.form;
 
       vm.loading = true;
+
+      const { planName, planUrl } = this.plans.find((p) => p._id === vm.form.plan);
+      if (!planUrl) {
+        vm.loading = false;
+        vm.count += 1; // invalidate cache
+
+        this.error('unable to find plan url for ' + vm.form.plan);
+        return;
+      }
+
+      if (!planName) {
+        vm.loading = false;
+        vm.count += 1; // invalidate cache
+        this.error('unable to find plan name for ' + vm.form.plan);
+        return;
+      }
+
+      const url = `${viewModel.form.instanceName}.${planUrl}`;
+
       try {
         const r = await api.post('/farmos/check-url', {
-          url: viewModel.form.instanceName,
+          url,
         });
 
         if (r.data.status === 'free') {
@@ -246,6 +265,7 @@ export default {
         }
       } catch (error) {
         vm.form.instanceNameValid = false;
+        console.log(error);
       }
 
       vm.loading = false;
@@ -260,7 +280,22 @@ export default {
         ...form,
       };
 
-      formated.url = `${form.instanceName}.farmos.net`;
+      const { planName, planUrl } = this.plans.find((p) => p._id === formated.plan);
+      if (!planUrl) {
+        vm.loading = false;
+        this.error('unable to find plan url for ' + formated.plan);
+        return;
+      }
+
+      if (!planName) {
+        vm.loading = false;
+        this.error('unable to find plan name for ' + formated.plan);
+        return;
+      }
+
+      formated.url = `${form.instanceName}.${planUrl}`;
+      formated.planName = planName;
+      delete formated.plan;
       delete formated.instanceName;
       delete formated.instanceNameValid;
       formated.owner = formated.owner._id;
@@ -284,12 +319,13 @@ export default {
       vm.loading = false;
       vm.count += 1; // invalidate cache
     },
-    async createPlan(planName) {
+    async createPlan(planName, planUrl) {
       const vm = this.vmOf('plans');
       vm.loading = true;
       try {
         const r = await api.post('/farmos/plans/create', {
-          planName,
+          planName: planName,
+          planUrl: planUrl,
         });
 
         const { data: plans } = await api.get('/farmos/plans');

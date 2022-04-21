@@ -328,7 +328,7 @@ export const isFarmosUrlAvailable = async (url, apiKey) => {
     const r = await axios.post(
       `https://account.farmier.net/api/v1/utils/validate-farm-url`,
       {
-        url: `${url}.farmos.net`,
+        url,
       },
       {
         headers: {

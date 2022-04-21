@@ -13,22 +13,25 @@
         :rules="[(v) => !!v || `select group`]"
       ></v-autocomplete>
 
-      <v-combobox
+      <v-autocomplete
         outlined
         primary
         label="Select Plan"
-        v-model="localViewModel.form.planName"
-        :items="localViewModel.plans.map((p) => p.planName)"
+        v-model="localViewModel.form.plan"
+        :items="localViewModel.plans"
+        item-text="planName"
+        item-value="_id"
         :rules="[(v) => !!v || `select plan`]"
-      ></v-combobox>
+      ></v-autocomplete>
 
       <v-row class="align-baseline">
         <v-col>
           <v-text-field
-            v-model="localViewModel.form.instanceName"
+            :disabled="!localViewModel.form.plan"
+            v-model.trim="localViewModel.form.instanceName"
             label="Instance URL"
             placeholder="Enter Subdomain"
-            suffix=".farmos.net"
+            :suffix="'.' + planUrl"
             :loading="localViewModel.loading"
             outlined
           >
@@ -45,7 +48,9 @@
         </v-col>
 
         <v-col>
-          <v-btn @click="$emit('check-url', localViewModel)" color="primary">Check URL</v-btn>
+          <v-btn @click="$emit('check-url', localViewModel)" color="primary" :disabled="!localViewModel.form.plan"
+            >Check URL</v-btn
+          >
         </v-col>
       </v-row>
 
@@ -293,6 +298,19 @@ export default {
       }
 
       return true;
+    },
+    planUrl() {
+      const selectedPlanId = this.localViewModel.form.plan;
+
+      if (selectedPlanId) {
+        const plan = this.viewModel.plans.find((p) => p._id == selectedPlanId);
+        if (!plan) {
+          return 'Plan not found';
+        }
+
+        return plan.planUrl;
+      }
+      return 'Select plan first';
     },
   },
   watch: {
