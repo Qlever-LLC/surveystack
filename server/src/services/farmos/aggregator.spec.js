@@ -123,12 +123,6 @@ describe('fetching farminfo', () => {
           name: 'spinach',
           id: '0548b26f-effa-43b4-be41-fb5f443cd119',
         },
-        {
-          endpoint: 'taxonomy_term',
-          bundle: 'plant_type',
-          name: 'Test Plant Type',
-          id: 'cca926ae-c889-4143-8d24-aeb596e7653f',
-        },
       ]);
     }
   });

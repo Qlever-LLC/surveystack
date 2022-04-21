@@ -196,8 +196,6 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
         createResponses.push(createResponseBody.data);
       }
 
-      console.log('responses of create', createResponses);
-
       for (const response of createResponses) {
         const [endpoint, bundle] = response.type.split('--');
         res.push({
