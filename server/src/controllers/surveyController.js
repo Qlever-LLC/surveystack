@@ -515,20 +515,17 @@ const deleteSurvey = async (req, res) => {
 
 const checkForLibraryUpdates = async (req, res) => {
   const { id } = req.params;
+  let updatableSurveys = {};
   let survey = await db.collection(col).findOne({ _id: new ObjectId(id) });
 
   if (!survey) {
-    return res.status(404).send({
-      message: `No entity with _id exists: ${id}`,
-    });
+    return res.send(updatableSurveys);
   }
 
   // get latest revision of survey controls, even if draft
   const latestRevision = survey.revisions[survey.revisions.length - 1];
 
   //for each question set library used in the given survey
-  let updatableSurveys = {};
-
   await Promise.all(
     latestRevision.controls.map(async (control) => {
       if (control.isLibraryRoot && !control.libraryIsInherited) {
