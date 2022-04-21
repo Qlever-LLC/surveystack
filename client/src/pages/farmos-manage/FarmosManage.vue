@@ -214,7 +214,7 @@ export default {
           instanceName,
         });
         await this.reload();
-        this.success('Sucessfully un-mapped instance');
+        this.success('Sucessfully un-mapped user');
       } catch (error) {
         console.dir(error);
         if (error.response && error.response.data) {

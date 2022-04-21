@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <div class="d-flex justify-space-between align-center ma-4">
-      <h1>Manage FarmOS Aggregator Instances</h1>
+      <h1>Manage FarmOS Instances</h1>
 
       <v-progress-circular
         v-if="loading"
@@ -33,7 +33,7 @@
     <template v-if="!!selectedInstance">
       <v-divider class="my-4"></v-divider>
       <h2>
-        Surveystack Mappings for
+        Group Mappings for
         <v-chip>{{ selectedInstance }}</v-chip>
       </h2>
 
@@ -52,7 +52,7 @@
         >
       </div>
 
-      <v-label class="vy-4">Current Mappings</v-label>
+      <v-label class="vy-4">Current Group Mappings</v-label>
 
       <v-simple-table v-if="mappedGroups.length > 0">
         <template v-slot:default>
@@ -73,8 +73,58 @@
         </template>
       </v-simple-table>
       <v-alert v-else class="mt-4" mode="fade" text type="warning"
-        >No Mappings exist for {{ selectedInstance }}</v-alert
+        >No Group Mappings exist for {{ selectedInstance }}</v-alert
       >
+
+      <v-divider class="my-8"></v-divider>
+
+      <h2>
+        User Mappings for
+        <v-chip>{{ selectedInstance }}</v-chip>
+      </h2>
+      <v-simple-table v-if="!loading">
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th class="text-left">Instance Name</th>
+              <th class="text-left">Owner</th>
+              <th class="text-left">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(mapping, idx) in mappedUsers" :key="`user-${idx}`">
+              <td>{{ `${mapping.user.name} (${mapping.user.email})` }}</td>
+              <td>{{ mapping.owner }}</td>
+              <td>
+                <v-btn color="red" @click="$emit('unmap-user', mapping.userId, mapping.instanceName)" dark>Unmap</v-btn>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <v-autocomplete
+                  class="mt-4"
+                  outlined
+                  primary
+                  hint="Select User"
+                  label="Map User to Instace"
+                  v-model="selectedUser"
+                  v-if="!loading && !!groups"
+                  :item-text="(item) => `${item.name} (${item.email})`"
+                  item-value="_id"
+                  :items="users"
+                ></v-autocomplete>
+              </td>
+              <td>
+                <v-checkbox v-model="owner" label="owner"></v-checkbox>
+              </td>
+              <td>
+                <v-btn color="primary" @click="$emit('map-user', selectedUser, selectedInstance, owner)">Map</v-btn>
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
     </template>
   </v-container>
 </template>
@@ -85,11 +135,14 @@ export default {
     groups: Array,
     mappings: Object,
     loading: Boolean,
+    users: Array,
   },
   data() {
     return {
       selectedInstance: null,
       selectedGroup: null,
+      selectedUser: null,
+      owner: false,
       error: null,
       success: null,
     };
@@ -113,6 +166,17 @@ export default {
         .map((farm) => {
           return this.groups.find((g) => g._id === farm.groupId);
         });
+    },
+    mappedUsers() {
+      console.log('mappings', this.mappings);
+      return this.mappings.surveystackUserFarms
+        .filter((farm) => farm.instanceName === this.selectedInstance)
+        .map((farm) => ({
+          instanceName: farm.instanceName,
+          owner: farm.owner,
+          userId: farm.userId,
+          user: this.users.find((u) => u._id === farm.userId),
+        }));
     },
   },
 };
