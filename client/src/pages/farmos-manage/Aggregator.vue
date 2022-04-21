@@ -43,7 +43,7 @@
           primary
           label="Select Group"
           v-model="selectedGroup"
-          item-text="name"
+          :item-text="(g) => `${g.name} (${g.path})`"
           item-value="_id"
           :items="groups"
         ></v-autocomplete>

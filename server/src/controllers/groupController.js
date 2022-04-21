@@ -149,6 +149,7 @@ const getGroups = async (req, res) => {
   }
 
   entities = await db.collection(col).find(findQuery).sort({ path: 1 }).toArray();
+
   return res.send(entities);
 };
 

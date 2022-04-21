@@ -7,7 +7,7 @@
         label="Select Group"
         v-model="localViewModel.form.groupId"
         v-if="!!localViewModel.groups"
-        item-text="name"
+        :item-text="(g) => `${g.name} (${g.path})`"
         item-value="_id"
         :items="localViewModel.groups"
         :rules="[(v) => !!v || `select group`]"

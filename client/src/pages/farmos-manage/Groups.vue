@@ -19,7 +19,7 @@
       label="Select Group"
       v-model="selectedGroup"
       v-if="!loading && !!groups"
-      item-text="name"
+      :item-text="(g) => `${g.name} (${g.path})`"
       item-value="_id"
       :items="groups"
     ></v-autocomplete>

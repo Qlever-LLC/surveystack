@@ -116,7 +116,7 @@ export default {
     async reload() {
       this.loading = true;
       const { data: mappings } = await api.get('/farmos/all');
-      const { data: groups } = await api.get('/groups?populate=0');
+      const { data: groups } = await api.get('/groups?populate=0&prefix=/');
       const { data: users } = await api.get('/users');
       const { data: plans } = await api.get('/farmos/plans');
 
