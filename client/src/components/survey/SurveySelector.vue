@@ -18,7 +18,8 @@
             <v-list-item-content>
               <v-list-item-title>{{ searchResult.name }}</v-list-item-title>
               <v-list-item-subtitle
-                >last modified {{ renderDateFromNow(searchResult.meta.dateModified) }}</v-list-item-subtitle
+                >last modified
+                {{ seachResult.meta ? renderDateFromNow(searchResult.meta.dateModified) : '' }}</v-list-item-subtitle
               >
             </v-list-item-content>
           </v-list-item>
