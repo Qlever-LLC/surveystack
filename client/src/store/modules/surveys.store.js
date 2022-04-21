@@ -44,12 +44,14 @@ const fetchPinned = async (commit, dispatch) => {
         if (!cached) {
           try {
             let s = await actions.fetchSurvey({ commit }, sid);
-            await dispatch('resources/fetchResources', s.resources, { root: true });
+            if (s.resources) {
+              await dispatch('resources/fetchResources', s.resources, { root: true });
+            }
             fetched.push(s);
             item.name = s.name;
             item.meta = s.meta;
           } catch (error) {
-            console.log('error:' + error);
+            console.error('error:' + error);
             continue;
           }
         } else {
