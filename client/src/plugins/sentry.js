@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/vue';
-import { Integrations } from '@sentry/tracing';
+import { BrowserTracing } from '@sentry/tracing';
+import { CaptureConsole } from '@sentry/integrations';
 
 // NOTE: you can send traces from your localhost by adding these variables to client/.env.local
 //  VUE_APP_SENTRY_DSN="Copy the DNS from https://sentry.io/settings/our-sci/projects/survey-stack/keys/"
@@ -53,9 +54,12 @@ export const startSentry = (Vue, store, router) => {
     release,
     dsn,
     integrations: [
-      new Integrations.BrowserTracing({
+      new BrowserTracing({
         routingInstrumentation: Sentry.vueRouterInstrumentation(router),
         tracingOrigins: [process.env.VUE_APP_API_URL, /^\//],
+      }),
+      new CaptureConsole({
+        levels: ['error', 'debug'],
       }),
     ],
     debug: false,
