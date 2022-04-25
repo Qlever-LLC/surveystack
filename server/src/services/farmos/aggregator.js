@@ -2,6 +2,7 @@ import boom from '@hapi/boom';
 import { triggerAsyncId } from 'async_hooks';
 import axios from 'axios';
 import https from 'https';
+import _ from 'lodash';
 
 export const aggregator = (aggregatorURL, aggregatorKey) => {
   const apiBase = `https://${aggregatorURL}/api/v2`;
@@ -210,24 +211,36 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     return res;
   };
 
-  const deleteAllWithData = async (farmurl, data) => {
-    const assetBundles = ['plant', 'land', 'structure'];
+  const getEndpointsAndBundles = async (farmurl) => {
+    const { data: apiResponse } = await axios.get(`${apiBase}/farms/relay/${farmurl}/api`, {
+      ...opts,
+    });
 
-    const logBundles = ['activity', 'input', 'observation', 'seeding'];
+    return _.uniq(_.keys(apiResponse.links).filter((k) => k.includes('--')));
+  };
 
-    const assetSubRequestUrls = assetBundles.map(
-      (bundle) =>
-        `api/asset/${bundle}?fields[asset--${bundle}]=id&filter[surveystack_id][value]=${data}`
-    );
-    const logSubRequestUrls = logBundles.map(
-      (bundle) =>
-        `api/log/${bundle}?fields[log--${bundle}]=id&filter[surveystack_id][value]=${data}`
-    );
+  const createBodiesForSurveystackGetId = (endpoints, endpointsAndBundles, surveystackId) => {
+    const endpointAndBundles = endpointsAndBundles
+      .map((entry) => {
+        const [endpoint, bundle] = entry.split('--');
+        return {
+          endpoint,
+          bundle,
+        };
+      })
+      .filter((e) => {
+        let include = false;
+        for (const ep of endpoints) {
+          if (e.endpoint === ep) {
+            include = true;
+            break;
+          }
+        }
+        return include;
+      });
 
-    const subrequests = [...assetSubRequestUrls, ...logSubRequestUrls];
-
-    const body = subrequests.map((s) => ({
-      uri: s,
+    const bodies = endpointAndBundles.map((entry) => ({
+      uri: `api/${entry.endpoint}/${entry.bundle}?fields[${entry.endpoint}--${entry.bundle}]=id&filter[surveystack_id][value]=${surveystackId}`,
       action: 'view',
       headers: {
         Accept: 'application/vnd.api+json',
@@ -235,9 +248,24 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
       },
     }));
 
-    const r = await axios.post(`${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`, body, {
-      ...opts,
-    });
+    return bodies;
+  };
+
+  const deleteAllWithSurveystackId = async (farmurl, surveystackId) => {
+    // fetch all bundles of endpoints
+
+    const endpoints = ['asset', 'log', 'profile'];
+
+    const endpointsAndBundles = await getEndpointsAndBundles(farmurl);
+    const bodies = createBodiesForSurveystackGetId(endpoints, endpointsAndBundles, surveystackId);
+
+    const r = await axios.post(
+      `${apiBase}/farms/relay/${farmurl}/subrequests?_format=json`,
+      bodies,
+      {
+        ...opts,
+      }
+    );
 
     // console.log('data', r.data);
     const items = [];
@@ -245,6 +273,10 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     for (const k of Object.keys(r.data)) {
       const res = JSON.parse(r.data[k].body);
       // console.log('parsed', res);
+      if (!res.data || !Array.isArray(res.data)) {
+        // probably no item with surveystack_id, skip
+        continue;
+      }
       items.push(...res.data);
     }
 
@@ -305,9 +337,11 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     createAsset,
     create,
     subrequest,
-    deleteAllWithData,
+    deleteAllWithSurveystackId,
     getFarmsWithTag,
     getAllFarmsWithTags,
     getAllTerms,
+    getEndpointsAndBundles,
+    createBodiesForSurveystackGetId,
   };
 };

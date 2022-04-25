@@ -1326,3 +1326,90 @@ export const createSpinachResponse = {
     body: '{"jsonapi":{"version":"1.0","meta":{"links":{"self":{"href":"http:\\/\\/jsonapi.org\\/format\\/1.0\\/"}}}},"data":{"type":"taxonomy_term--plant_type","id":"cca926ae-c889-4143-8d24-aeb596e7653f","links":{"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f"}},"attributes":{"drupal_internal__tid":441,"drupal_internal__revision_id":726,"langcode":"en","revision_created":"2022-04-15T16:47:06+00:00","revision_log_message":null,"status":true,"name":"Test Plant Type","description":null,"weight":0,"changed":"2022-04-15T16:47:06+00:00","default_langcode":true,"revision_translation_affected":true,"maturity_days":null,"transplant_days":null},"relationships":{"vid":{"data":{"type":"taxonomy_vocabulary--taxonomy_vocabulary","id":"4b483bff-e1f7-4fdc-8d02-18d6bdad1354","meta":{"drupal_internal__target_id":"plant_type"}},"links":{"related":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/vid"},"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/relationships\\/vid"}}},"revision_user":{"data":null,"links":{"related":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/revision_user"},"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/relationships\\/revision_user"}}},"parent":{"data":[{"type":"taxonomy_term--plant_type","id":"virtual","meta":{"links":{"help":{"href":"https:\\/\\/www.drupal.org\\/docs\\/8\\/modules\\/json-api\\/core-concepts#virtual","meta":{"about":"Usage and meaning of the \\u0027virtual\\u0027 resource identifier."}}}}}],"links":{"related":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/parent"},"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/relationships\\/parent"}}},"companions":{"data":[],"links":{"related":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/companions"},"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/relationships\\/companions"}}},"crop_family":{"data":null,"links":{"related":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/crop_family"},"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/relationships\\/crop_family"}}},"image":{"data":[],"links":{"related":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/image"},"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/relationships\\/image"}}}}},"links":{"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type"}}}',
   },
 };
+
+export const apiResponse = {
+  jsonapi: { version: '1.0', meta: { links: [Object] } },
+  data: [],
+  meta: {
+    links: { me: [Object] },
+    farm: {
+      name: 'Coffeeshop Sandbox',
+      url: 'https://coffeeshop.farmos.dev',
+      version: '2.0.0-beta3',
+      system_of_measurement: 'metric',
+    },
+  },
+  links: {
+    'asset--animal': { href: 'https://coffeeshop.farmos.dev/api/asset/animal' },
+    'asset--equipment': { href: 'https://coffeeshop.farmos.dev/api/asset/equipment' },
+    'asset--land': { href: 'https://coffeeshop.farmos.dev/api/asset/land' },
+    'asset--material': { href: 'https://coffeeshop.farmos.dev/api/asset/material' },
+    'asset--plant': { href: 'https://coffeeshop.farmos.dev/api/asset/plant' },
+    'asset--structure': { href: 'https://coffeeshop.farmos.dev/api/asset/structure' },
+    'asset--water': { href: 'https://coffeeshop.farmos.dev/api/asset/water' },
+    'asset_type--asset_type': { href: 'https://coffeeshop.farmos.dev/api/asset_type/asset_type' },
+    'entity_browser--entity_browser': {
+      href: 'https://coffeeshop.farmos.dev/api/entity_browser/entity_browser',
+    },
+    'file--file': { href: 'https://coffeeshop.farmos.dev/api/file/file' },
+    'flag--flag': { href: 'https://coffeeshop.farmos.dev/api/flag/flag' },
+    'lab_test_type--lab_test_type': {
+      href: 'https://coffeeshop.farmos.dev/api/lab_test_type/lab_test_type',
+    },
+    'land_type--land_type': { href: 'https://coffeeshop.farmos.dev/api/land_type/land_type' },
+    'layer_style--layer_style': {
+      href: 'https://coffeeshop.farmos.dev/api/layer_style/layer_style',
+    },
+    'log--activity': { href: 'https://coffeeshop.farmos.dev/api/log/activity' },
+    'log--harvest': { href: 'https://coffeeshop.farmos.dev/api/log/harvest' },
+    'log--input': { href: 'https://coffeeshop.farmos.dev/api/log/input' },
+    'log--lab_test': { href: 'https://coffeeshop.farmos.dev/api/log/lab_test' },
+    'log--maintenance': { href: 'https://coffeeshop.farmos.dev/api/log/maintenance' },
+    'log--observation': { href: 'https://coffeeshop.farmos.dev/api/log/observation' },
+    'log--seeding': { href: 'https://coffeeshop.farmos.dev/api/log/seeding' },
+    'log--transplanting': { href: 'https://coffeeshop.farmos.dev/api/log/transplanting' },
+    'log_type--log_type': { href: 'https://coffeeshop.farmos.dev/api/log_type/log_type' },
+    'map_behavior--map_behavior': {
+      href: 'https://coffeeshop.farmos.dev/api/map_behavior/map_behavior',
+    },
+    'map_type--map_type': { href: 'https://coffeeshop.farmos.dev/api/map_type/map_type' },
+    'profile--common': { href: 'https://coffeeshop.farmos.dev/api/profile/common' },
+    'profile--hylo': { href: 'https://coffeeshop.farmos.dev/api/profile/hylo' },
+    'profile--regen_digital': { href: 'https://coffeeshop.farmos.dev/api/profile/regen_digital' },
+    'profile_type--profile_type': {
+      href: 'https://coffeeshop.farmos.dev/api/profile_type/profile_type',
+    },
+    'quantity--material': { href: 'https://coffeeshop.farmos.dev/api/quantity/material' },
+    'quantity--standard': { href: 'https://coffeeshop.farmos.dev/api/quantity/standard' },
+    'quantity_type--quantity_type': {
+      href: 'https://coffeeshop.farmos.dev/api/quantity_type/quantity_type',
+    },
+    self: { href: 'https://coffeeshop.farmos.dev/api' },
+    'structure_type--structure_type': {
+      href: 'https://coffeeshop.farmos.dev/api/structure_type/structure_type',
+    },
+    'tag_type--tag_type': { href: 'https://coffeeshop.farmos.dev/api/tag_type/tag_type' },
+    'taxonomy_term--animal_type': {
+      href: 'https://coffeeshop.farmos.dev/api/taxonomy_term/animal_type',
+    },
+    'taxonomy_term--crop_family': {
+      href: 'https://coffeeshop.farmos.dev/api/taxonomy_term/crop_family',
+    },
+    'taxonomy_term--log_category': {
+      href: 'https://coffeeshop.farmos.dev/api/taxonomy_term/log_category',
+    },
+    'taxonomy_term--material_type': {
+      href: 'https://coffeeshop.farmos.dev/api/taxonomy_term/material_type',
+    },
+    'taxonomy_term--plant_type': {
+      href: 'https://coffeeshop.farmos.dev/api/taxonomy_term/plant_type',
+    },
+    'taxonomy_term--season': { href: 'https://coffeeshop.farmos.dev/api/taxonomy_term/season' },
+    'taxonomy_term--unit': { href: 'https://coffeeshop.farmos.dev/api/taxonomy_term/unit' },
+    'taxonomy_vocabulary--taxonomy_vocabulary': {
+      href: 'https://coffeeshop.farmos.dev/api/taxonomy_vocabulary/taxonomy_vocabulary',
+    },
+    'user--user': { href: 'https://coffeeshop.farmos.dev/api/user/user' },
+    'user_role--user_role': { href: 'https://coffeeshop.farmos.dev/api/user_role/user_role' },
+  },
+};

@@ -1,6 +1,7 @@
 import { aggregator } from './aggregator';
 import mockAxios from 'axios';
 import * as mockResponses from './__mock__/farmos.asset.response';
+import { subrequetsResponse } from './__mock__/farmos.surveystackid.response';
 
 describe('fetching farminfo', () => {
   it('farminfo', async () => {
@@ -86,7 +87,7 @@ describe('fetching farminfo', () => {
     expect(r.data.length).toBe(4);
   });
 
-  it.only('get-all-terms', async () => {
+  it('get-all-terms', async () => {
     let count = 0;
     mockAxios.post.mockImplementation((req) => {
       console.log('request is', req);
@@ -125,5 +126,218 @@ describe('fetching farminfo', () => {
         },
       ]);
     }
+  });
+
+  it('get-endpoints-and-bundles', async () => {
+    mockAxios.get.mockImplementation((req) => {
+      return Promise.resolve({ data: mockResponses.apiResponse });
+    });
+
+    mockAxios.post.mockImplementation((req) => {
+      return Promise.resolve({ data: subrequetsResponse });
+    });
+
+    const { getEndpointsAndBundles, createBodiesForSurveystackGetId } = aggregator(
+      process.env.FARMOS_AGGREGATOR_URL,
+      process.env.FARMOS_AGGREGATOR_APIKEY
+    );
+
+    const endpointsAndBundles = await getEndpointsAndBundles('coffeeshop.farmos.dev');
+
+    expect(endpointsAndBundles).toStrictEqual([
+      'asset--animal',
+      'asset--equipment',
+      'asset--land',
+      'asset--material',
+      'asset--plant',
+      'asset--structure',
+      'asset--water',
+      'asset_type--asset_type', // must be skipped
+      'entity_browser--entity_browser',
+      'file--file',
+      'flag--flag',
+      'lab_test_type--lab_test_type',
+      'land_type--land_type',
+      'layer_style--layer_style',
+      'log--activity',
+      'log--harvest',
+      'log--input',
+      'log--lab_test',
+      'log--maintenance',
+      'log--observation',
+      'log--seeding',
+      'log--transplanting',
+      'log_type--log_type', // must be skipped
+      'map_behavior--map_behavior',
+      'map_type--map_type',
+      'profile--common',
+      'profile--hylo',
+      'profile--regen_digital',
+      'profile_type--profile_type', // must be skipped
+      'quantity--material',
+      'quantity--standard',
+      'quantity_type--quantity_type',
+      'structure_type--structure_type',
+      'tag_type--tag_type',
+      'taxonomy_term--animal_type',
+      'taxonomy_term--crop_family',
+      'taxonomy_term--log_category',
+      'taxonomy_term--material_type',
+      'taxonomy_term--plant_type',
+      'taxonomy_term--season',
+      'taxonomy_term--unit',
+      'taxonomy_vocabulary--taxonomy_vocabulary',
+      'user--user',
+      'user_role--user_role',
+    ]);
+
+    const endpoints = ['asset', 'log', 'profile'];
+    const bodies = createBodiesForSurveystackGetId(endpoints, endpointsAndBundles, 123);
+
+    expect(bodies).toStrictEqual([
+      {
+        uri: 'api/asset/animal?fields[asset--animal]=id&filter[surveystack_id][value]=123',
+        action: 'view',
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      },
+      {
+        uri: 'api/asset/equipment?fields[asset--equipment]=id&filter[surveystack_id][value]=123',
+        action: 'view',
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      },
+      {
+        uri: 'api/asset/land?fields[asset--land]=id&filter[surveystack_id][value]=123',
+        action: 'view',
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      },
+      {
+        uri: 'api/asset/material?fields[asset--material]=id&filter[surveystack_id][value]=123',
+        action: 'view',
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      },
+      {
+        uri: 'api/asset/plant?fields[asset--plant]=id&filter[surveystack_id][value]=123',
+        action: 'view',
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      },
+      {
+        uri: 'api/asset/structure?fields[asset--structure]=id&filter[surveystack_id][value]=123',
+        action: 'view',
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      },
+      {
+        uri: 'api/asset/water?fields[asset--water]=id&filter[surveystack_id][value]=123',
+        action: 'view',
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      },
+      {
+        // must be skipped
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      },
+      {
+        uri: 'api/log/harvest?fields[log--harvest]=id&filter[surveystack_id][value]=123',
+        action: 'view',
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      },
+      {
+        uri: 'api/log/input?fields[log--input]=id&filter[surveystack_id][value]=123',
+        action: 'view',
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      },
+      {
+        uri: 'api/log/lab_test?fields[log--lab_test]=id&filter[surveystack_id][value]=123',
+        action: 'view',
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      },
+      {
+        uri: 'api/log/maintenance?fields[log--maintenance]=id&filter[surveystack_id][value]=123',
+        action: 'view',
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      },
+      {
+        uri: 'api/log/observation?fields[log--observation]=id&filter[surveystack_id][value]=123',
+        action: 'view',
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      },
+      {
+        uri: 'api/log/seeding?fields[log--seeding]=id&filter[surveystack_id][value]=123',
+        action: 'view',
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      },
+      {
+        uri: 'api/log/transplanting?fields[log--transplanting]=id&filter[surveystack_id][value]=123',
+        action: 'view',
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      },
+      {
+        uri: 'api/profile/common?fields[profile--common]=id&filter[surveystack_id][value]=123',
+        action: 'view',
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      },
+      {
+        uri: 'api/profile/hylo?fields[profile--hylo]=id&filter[surveystack_id][value]=123',
+        action: 'view',
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      },
+      {
+        uri: 'api/profile/regen_digital?fields[profile--regen_digital]=id&filter[surveystack_id][value]=123',
+        action: 'view',
+        headers: {
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      },
+    ]);
   });
 });

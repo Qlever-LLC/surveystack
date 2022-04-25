@@ -41,10 +41,10 @@ async function flushlogs(instanceName, user, id) {
     throw boom.unauthorized('No Access to farm');
   }
 
-  const { deleteAllWithData } = config();
+  const { deleteAllWithSurveystackId } = config();
 
   // console.log('deleting data', instanceName, id);
-  const res = await deleteAllWithData(instanceName, id);
+  const res = await deleteAllWithSurveystackId(instanceName, id);
   // console.log('done', res);
   if (!res.data) {
     return [];
@@ -103,6 +103,7 @@ async function execute(aggregator, apiCompose, info, terms, user, submission) {
   substitue(apiCompose.entity, terms);
 
   const payload = { data: apiCompose.entity };
+  console.log('adding id to payload', submission._id);
   payload.data.attributes.surveystack_id = submission._id;
 
   return (await aggregator.create(url, endpoint, bundle, payload)).data;
@@ -218,7 +219,7 @@ export const handle = async ({ submission, survey, user }) => {
 
   const runSingle = async (apiCompose, info, terms) => {
     try {
-      console.log('running', apiCompose);
+      // console.log('running', apiCompose);
       const r = await execute(aggregator, apiCompose, info, terms, user, submission);
 
       if (Array.isArray(r)) {
