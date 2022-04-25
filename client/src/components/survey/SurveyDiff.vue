@@ -1,11 +1,11 @@
 <template>
-  <v-card-text v-if="!haveChanges" class="d-flex">
+  <v-card-text v-if="!haveChanges && showNoChangesText" class="d-flex">
     <v-icon color="success" class="mr-1">mdi-check-bold</v-icon>
     <h3 class="flex-grow-0 mr-6">No changes detected</h3>
   </v-card-text>
   <v-expansion-panels v-else flat multiple v-model="mainPanelState">
     <v-expansion-panel>
-      <v-expansion-panel-header class="pt-0">
+      <v-expansion-panel-header v-if="showHeader" class="pt-0">
         <h3 class="flex-grow-0 mr-6">Update details</h3>
 
         <v-tooltip bottom v-for="{ icon, color, count, tooltip } in changeSummaryList" :key="icon">
@@ -58,6 +58,14 @@ export default {
     defaultShowUnchanged: {
       type: Boolean,
       default: false,
+    },
+    showHeader: {
+      type: Boolean,
+      default: true,
+    },
+    showNoChangesText: {
+      type: Boolean,
+      default: true,
     },
     oldVersionName: {
       type: String,

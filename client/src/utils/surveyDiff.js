@@ -56,30 +56,30 @@ export const diffControls = (oldControl, newControl) => {
 
   // Collect all the object paths that we should compare
   let diffFields = [];
-  let addFileds = (fields) => (diffFields = uniq([...diffFields, ...fields]));
-  let removeFileds = (fields) => pull(diffFields, ...fields);
+  let addFields = (fields) => (diffFields = uniq([...diffFields, ...fields]));
+  let removeFields = (fields) => pull(diffFields, ...fields);
 
   // get all the object paths from the controls
   // once we have schemas for the control object, we shoul use that instead
-  addFileds(getComparableFields(oldControl, newControl));
+  addFields(getComparableFields(oldControl, newControl));
   // remove fields we don't need in the diff
-  removeFileds(['id', 'hint', 'children', 'libraryId', 'libraryIsInherited', 'libraryVersion']);
+  removeFields(['id', 'hint', 'children', 'libraryId', 'libraryIsInherited', 'libraryVersion']);
 
   if ('matrix' === controlType) {
     const colCount = Math.max(oldControl.options.source.content.length, newControl.options.source.content.length);
-    removeFileds(['options.source.content']);
+    removeFields(['options.source.content']);
     for (let i = 0; i < colCount; ++i) {
       const path = `options.source.content[${i}]`;
       const fields = getComparableFields(get(oldControl, path, {}), get(newControl, path, {}));
-      addFileds(fields.map((f) => `${path}.${f}`));
+      addFields(fields.map((f) => `${path}.${f}`));
     }
   } else if (['selectSingle', 'selectMultiple'].includes(controlType)) {
     const optionCount = Math.max(oldControl.options.source.length, newControl.options.source.length);
-    removeFileds(['options.source']);
+    removeFields(['options.source']);
     for (let i = 0; i < optionCount; ++i) {
       const path = `options.source[${i}]`;
       const fields = getComparableFields(get(oldControl, path, {}), get(newControl, path, {}));
-      addFileds(fields.map((f) => `${path}.${f}`));
+      addFields(fields.map((f) => `${path}.${f}`));
     }
   }
   return diffObject(oldControl, newControl, diffFields);
@@ -174,4 +174,7 @@ export const diffSurveyVersions = (oldControls, newControls) => {
 
 export function controlListsHaveChanges(oldControls, newControls) {
   return diffSurveyVersions(oldControls, newControls).some((diff) => diff.changeType !== changeType.UNCHANGED);
+}
+export function getChangesOnly(oldControls, newControls) {
+  return diffSurveyVersions(oldControls, newControls).filter((diff) => diff.changeType === changeType.CHANGED);
 }
