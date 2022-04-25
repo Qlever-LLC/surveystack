@@ -59,7 +59,7 @@ export const startSentry = (Vue, store, router) => {
         tracingOrigins: [process.env.VUE_APP_API_URL, /^\//],
       }),
       new CaptureConsole({
-        levels: ['error', 'debug'],
+        levels: ['error'],
       }),
     ],
     debug: false,
