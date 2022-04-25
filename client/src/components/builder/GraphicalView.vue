@@ -91,7 +91,13 @@
                 >mdi-delete
               </v-icon>
             </v-btn>
-            <v-btn text x-small v-if="el.options.hidden" @click.stop="el.options.hidden = false" color="grey lighten-1">
+            <v-btn
+              text
+              x-small
+              v-if="el.options.hidden"
+              @click.stop="el.options.hidden = undefined"
+              color="grey lighten-1"
+            >
               unhide
             </v-btn>
           </div>
@@ -132,27 +138,19 @@
 
       <v-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
         <v-card class="">
-          <v-card-title>
-            Delete Question
-          </v-card-title>
-          <v-card-text class="mt-4">
-            Are you sure you want to remove this question?
-          </v-card-text>
+          <v-card-title> Delete Question </v-card-title>
+          <v-card-text class="mt-4"> Are you sure you want to remove this question? </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <v-btn text @click.stop="deleteQuestionModalIsVisible = false">
-              Cancel
-            </v-btn>
-            <v-btn text color="red" @click.stop="handleConfirmDelete">
-              Remove
-            </v-btn>
+            <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
+            <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
       <update-library-dialog
         v-if="updateLibraryDialogIsVisible"
         v-model="updateLibraryDialogIsVisible"
-        :from-library-control="updateControl"
+        :from-survey="updateControl"
         :to-survey="updateToLibrary"
         @ok="updateLibraryConfirmed"
         @cancel="updateLibraryCancelled"
