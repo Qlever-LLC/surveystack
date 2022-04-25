@@ -103,7 +103,7 @@ async function execute(aggregator, apiCompose, info, terms, user, submission) {
   substitue(apiCompose.entity, terms);
 
   const payload = { data: apiCompose.entity };
-  payload.data.attributes.data = submission._id;
+  payload.data.attributes.surveystack_id = submission._id;
 
   return (await aggregator.create(url, endpoint, bundle, payload)).data;
 }
