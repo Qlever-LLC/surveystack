@@ -72,7 +72,6 @@
           :control="control"
           :forceMobile="forceMobile"
           :isInBuilder="builder"
-          @mounted="handleMounted"
         />
         <div class="draft-content-bottom" ref="draftContentBottom" />
       </div>
@@ -158,6 +157,7 @@ export default {
   data() {
     return {
       overflowing: false,
+      bottomIntersectionObserver: null,
     };
   },
   computed: {
@@ -209,8 +209,24 @@ export default {
     },
   },
   methods: {
-    handleMounted() {
-      console.log('mounted outside');
+    initializeIntersectionObserver() {
+      const vm = this;
+      const onIntersection = () => {
+        vm.overflowing = false;
+      };
+      const options = {
+        root: this.$refs.wrapper,
+        rootMargin: '0px',
+        threshold: 1.0,
+      };
+      this.bottomIntersectionObserver = new IntersectionObserver(onIntersection, options);
+    },
+    updateIntersectionObserver() {
+      // unobserve previous control
+      // this.bottomIntersectionObserver.disconnect();
+      // TODO: seems that we don't need to unobserve/disconnect, and in fact that breaks functionality
+      // observe current control
+      this.bottomIntersectionObserver.observe(this.$refs.draftContentBottom);
     },
     next() {
       // this.$store.dispatch('draft/next')
@@ -273,23 +289,23 @@ export default {
     const { survey, submission, persist } = this;
     this.$store.dispatch('draft/init', { survey, submission, persist });
   },
-  mounted() {
-    const vm = this;
-    const onIntersection = () => {
-      vm.overflowing = false;
-      console.log('onintersection');
-    };
-    const options = {
-      root: this.$refs.wrapper,
-      rootMargin: '0px',
-      threshold: 1.0,
-    };
-    // const observer = new IntersectionObserver(onIntersection, options);
-    // console.log(this.$refs.draftContentBottom);
-    // // TODO: find a better way to do this? maybe emit a 'mounted' event from the child control?
-    // setTimeout(() => {
-    //   observer.observe(vm.$refs.draftContentBottom);
-    // }, 500)
+  updated() {
+    if (!this.bottomIntersectionObserver && this.$refs.wrapper) {
+      this.initializeIntersectionObserver();
+    }
+    if (this.$refs.draftContentBottom && this.bottomIntersectionObserver) {
+      this.updateIntersectionObserver();
+    }
+  },
+  unmounted() {
+    if (
+      this.bottomIntersectionObserver &&
+      this.bottomIntersectionObserver.disconnect &&
+      typeof this.bottomIntersectionObserver.disconnect === 'function'
+    ) {
+      this.bottomIntersectionObserver.disconnect();
+      console.log('disconnected');
+    }
   },
 };
 </script>
@@ -377,13 +393,12 @@ export default {
 
 .draft-component-wrapper::-webkit-scrollbar {
   background-color: transparent;
-  width: 10px;
+  width: 8px;
 }
 .draft-component-wrapper::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.4);
   border-radius: 4px;
   opacity: 0;
-  /* transition: opacity 0.25s; */
 }
 .draft-component-wrapper:hover::-webkit-scrollbar-thumb {
   opacity: 1;

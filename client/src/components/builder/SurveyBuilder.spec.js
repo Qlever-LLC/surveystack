@@ -94,6 +94,18 @@ const createApiGetMock = (reqResMap) => {
 // setup the default api mocks for all tests
 beforeEach(() => api.get.mockImplementation(createApiGetMock()));
 
+beforeAll(() => {
+  window.IntersectionObserver = jest.fn(() => ({
+    observe: jest.fn(),
+    unobserve: jest.fn(),
+    disconnect: jest.fn(),
+    takeRecords: jest.fn(),
+    root: null,
+    rootMargin: null,
+    thresholds: [],
+  }));
+});
+
 describe('add control', () => {
   describe('for each control type', () => {
     availableControls.forEach((info) => {

@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer :value="value" @input="$emit('input', $event)" disable-resize-watcher app>
+  <v-navigation-drawer :value="value" @input="$emit('input', $event)" disable-resize-watcher app temporary>
     <div class="d-flex justify-end mt-3 mr-3">
       <v-btn large icon @click="$emit('input', !value)">
         <v-icon>mdi-close</v-icon>
