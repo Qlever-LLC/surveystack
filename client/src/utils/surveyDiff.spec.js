@@ -128,7 +128,7 @@ describe('surveyDiff', () => {
       });
     });
     it('does not compare blacklisted fileds', () => {
-      const blacklisteds = ['id', 'hint', 'children', 'libraryId', 'libraryIsInherited', 'libraryVersion'];
+      const blacklisteds = ['id', 'children', 'libraryId', 'libraryIsInherited', 'libraryVersion'];
       const control = createControl({
         type: 'group',
         hint: 'this is a hint',
@@ -151,8 +151,8 @@ describe('surveyDiff', () => {
 
       expect(diff.name).toMatchObject({
         changeType: changeType.CHANGED,
-        oldValue: oldNum.name,
-        newValue: newNum.name,
+        valueA: oldNum.name,
+        valueB: newNum.name,
       });
     });
     it('reports no-change', () => {
@@ -174,8 +174,8 @@ describe('surveyDiff', () => {
 
       expect(diff.label).toMatchObject({
         changeType: changeType.REMOVED,
-        oldValue: oldNum.label,
-        newValue: undefined,
+        valueA: oldNum.label,
+        valueB: undefined,
       });
     });
     it('reports addition', () => {
@@ -187,8 +187,8 @@ describe('surveyDiff', () => {
 
       expect(diff.label).toMatchObject({
         changeType: changeType.ADDED,
-        oldValue: undefined,
-        newValue: newNum.label,
+        valueA: undefined,
+        valueB: newNum.label,
       });
     });
     describe('controls with array type source', () => {
@@ -211,18 +211,18 @@ describe('surveyDiff', () => {
           });
           expect(diff[`options.${srcPath}[1].bar`]).toMatchObject({
             changeType: changeType.CHANGED,
-            oldValue: 2,
-            newValue: 5,
+            valueA: 2,
+            valueB: 5,
           });
           expect(diff[`options.${srcPath}[2].baz`]).toMatchObject({
             changeType: changeType.REMOVED,
-            oldValue: 3,
-            newValue: null,
+            valueA: 3,
+            valueB: null,
           });
           expect(diff[`options.${srcPath}[2].bux`]).toMatchObject({
             changeType: changeType.ADDED,
-            oldValue: undefined,
-            newValue: 6,
+            valueA: undefined,
+            valueB: 6,
           });
         });
       });
@@ -239,19 +239,19 @@ describe('surveyDiff', () => {
       expect(diff).toMatchObject([
         {
           changeType: changeType.CHANGED,
-          newControl: newNum,
-          newChildIndex: 0,
-          newPath: newNum.name,
-          newParentId: null,
-          oldControl: oldNum,
-          oldChildIndex: 0,
-          oldPath: oldNum.name,
-          oldParentId: null,
+          controlRevisionB: newNum,
+          childIndexRevisionB: 0,
+          pathRevisionB: newNum.name,
+          parentIdRevisionB: null,
+          controlRevisionA: oldNum,
+          childIndexRevisionA: 0,
+          pathRevisionA: oldNum.name,
+          parentIdRevisionA: null,
           diff: {
             name: {
               changeType: changeType.CHANGED,
-              oldValue: oldNum.name,
-              newValue: newNum.name,
+              valueA: oldNum.name,
+              valueB: newNum.name,
             },
             label: {
               changeType: changeType.UNCHANGED,
@@ -268,10 +268,10 @@ describe('surveyDiff', () => {
       expect(diff).toMatchObject([
         {
           changeType: changeType.ADDED,
-          newControl: num,
-          newChildIndex: 0,
-          newPath: num.name,
-          newParentId: null,
+          controlRevisionB: num,
+          childIndexRevisionB: 0,
+          pathRevisionB: num.name,
+          parentIdRevisionB: null,
         },
       ]);
     });
@@ -283,10 +283,10 @@ describe('surveyDiff', () => {
       expect(diff).toMatchObject([
         {
           changeType: changeType.REMOVED,
-          oldControl: num,
-          oldChildIndex: 0,
-          oldPath: num.name,
-          oldParentId: null,
+          controlRevisionA: num,
+          childIndexRevisionA: 0,
+          pathRevisionA: num.name,
+          parentIdRevisionA: null,
         },
       ]);
     });
@@ -302,27 +302,28 @@ describe('surveyDiff', () => {
       expect(diff).toMatchObject([
         {
           changeType: changeType.CHANGED,
-          newControl: newMat,
-          newChildIndex: 0,
-          newPath: newMat.name,
-          newParentId: null,
-          oldControl: oldMat,
-          oldChildIndex: 0,
-          oldPath: oldMat.name,
-          oldParentId: null,
+
+          controlRevisionB: newMat,
+          childIndexRevisionB: 0,
+          pathRevisionB: newMat.name,
+          parentIdRevisionB: null,
+          controlRevisionA: oldMat,
+          childIndexRevisionA: 0,
+          pathRevisionA: oldMat.name,
+          parentIdRevisionA: null,
           diff: {
             'options.source.config.addRowLabel': {
               changeType: changeType.CHANGED,
-              oldValue: oldMat.options.source.config.addRowLabel,
-              newValue: newMat.options.source.config.addRowLabel,
+              valueA: oldMat.options.source.config.addRowLabel,
+              valueB: newMat.options.source.config.addRowLabel,
             },
             name: {
               changeType: changeType.UNCHANGED,
             },
             'options.source.content[0].label': {
               changeType: changeType.CHANGED,
-              oldValue: oldMat.options.source.content[0].label,
-              newValue: newMat.options.source.content[0].label,
+              valueA: oldMat.options.source.content[0].label,
+              valueB: newMat.options.source.content[0].label,
             },
           },
         },
@@ -346,24 +347,29 @@ describe('surveyDiff', () => {
       it('matches controls with the same path', () => {
         const { diff, oldControls, newControls } = createDiff();
         const path = 'group_1.number_2';
-        const num2Diff = find(diff, { newPath: path });
+        const num2Diff = find(diff, { pathRevisionB: path });
         expect(num2Diff).toHaveProperty('changeType', changeType.CHANGED);
-        expect(num2Diff).toHaveProperty('oldPath', path);
+        expect(num2Diff).toHaveProperty('pathRevisionA', path);
         expect(num2Diff).toHaveProperty('diff.label.changeType', changeType.CHANGED);
-        expect(num2Diff).toHaveProperty('diff.label.oldValue', oldControls[1].children[0].label);
-        expect(num2Diff).toHaveProperty('diff.label.newValue', newControls[1].children[0].label);
+        expect(num2Diff).toHaveProperty('diff.label.valueA', oldControls[1].children[0].label);
+        expect(num2Diff).toHaveProperty('diff.label.valueB', newControls[1].children[0].label);
         expect(num2Diff).toHaveProperty('diff.name.changeType', changeType.UNCHANGED);
       });
 
       it('treats type change as "remove" and "add', () => {
         const { diff, oldControls, newControls } = createDiff();
-        const num1OldDiff = find(diff, { oldPath: 'number_1' });
+        const num1OldDiff = find(diff, { pathRevisionA: 'number_1' });
         expect(num1OldDiff).toHaveProperty('changeType', changeType.REMOVED);
-        expect(num1OldDiff).toHaveProperty('oldControl.type', oldControls[0].type);
-        const num1NewDiff = find(diff, { newPath: 'number_1' });
+        expect(num1OldDiff).toHaveProperty('controlRevisionA.type', oldControls[0].type);
+        const num1NewDiff = find(diff, { pathRevisionB: 'number_1' });
         expect(num1NewDiff).toHaveProperty('changeType', changeType.ADDED);
-        expect(num1NewDiff).toHaveProperty('newControl.type', newControls[0].type);
+        expect(num1NewDiff).toHaveProperty('controlRevisionB.type', newControls[0].type);
       });
     });
+  });
+  describe('diffSurveyVersionsConflictingChanges', () => {
+    it.todo('returns conflicting changes');
+    it.todo('contains the property values for revisions A,B and C of a diff');
+    it.todo('does not return non-conflicting changes');
   });
 });

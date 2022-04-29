@@ -31,7 +31,7 @@
       <v-expansion-panel-content>
         <survey-diff-card-tree
           :diffInfoTree="showChangesOnly ? diffInfoTreeWithoutUnchangeds : diffInfoTree"
-          v-bind="{ oldVersionName, newVersionName }"
+          v-bind="{ versionNameRevisionA, versionNameRevisionB, versionNameRevisionC }"
         />
       </v-expansion-panel-content>
     </v-expansion-panel>
@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { diffSurveyVersions, changeType } from '@/utils/surveyDiff';
+import { diffSurveyVersions, changeType, diffSurveyVersionsConflictingChanges } from '@/utils/surveyDiff';
 import { isNumber, sortBy, get, remove } from 'lodash';
 import SurveyDiffCardTree from './SurveyDiffCardTree';
 
@@ -49,8 +49,25 @@ export default {
     SurveyDiffCardTree,
   },
   props: {
-    oldControls: Array,
-    newControls: Array,
+    controlsRevisionA: Array,
+    controlsRevisionB: Array,
+    controlsRevisionC: Array,
+    versionNameRevisionA: {
+      type: String,
+      required: true,
+    },
+    versionNameRevisionB: {
+      type: String,
+      required: true,
+    },
+    versionNameRevisionC: {
+      type: String,
+      required: false,
+    },
+    conflictingChangesOnly: {
+      type: Boolean,
+      default: false,
+    },
     defaultOpen: {
       type: Boolean,
       default: false,
@@ -67,14 +84,6 @@ export default {
       type: Boolean,
       default: true,
     },
-    oldVersionName: {
-      type: String,
-      required: true,
-    },
-    newVersionName: {
-      type: String,
-      required: true,
-    },
   },
   data() {
     return {
@@ -90,9 +99,18 @@ export default {
 
   computed: {
     diff() {
-      if (this.oldControls && this.newControls) {
-        return diffSurveyVersions(this.oldControls, this.newControls);
+      if (this.controlsRevisionA && this.controlsRevisionB) {
+        if (this.controlsRevisionC && this.conflictingChangesOnly) {
+          return diffSurveyVersionsConflictingChanges(
+            this.controlsRevisionA,
+            this.controlsRevisionB,
+            this.controlsRevisionC
+          );
+        } else {
+          return diffSurveyVersions(this.controlsRevisionA, this.controlsRevisionB);
+        }
       }
+
       return [];
     },
     haveChanges() {
@@ -102,24 +120,25 @@ export default {
       if (!this.diff) {
         return [];
       }
-      // consume this array to protect agains circular dependencies
+      // consume this array to protect against circular dependencies
       const unsortedDiffs = [...this.diff];
-      // returns the direct old/new children of a diff object
+      // returns the direct A/B revision children of a diff object
       const childrenOf = (parent) =>
         remove(unsortedDiffs, (d) => {
           return parent === null
             ? // get root controls
-              !d.oldParentId && !d.newParentId
+              !d.parentIdRevisionA && !d.parentIdRevisionB
             : // get direct children
-              (d.oldParentId && d.oldParentId === get(parent, 'oldControl.id')) ||
-                (d.newParentId && d.newParentId === get(parent, 'newControl.id'));
+              (d.parentIdRevisionA && d.parentIdRevisionA === get(parent, 'controlRevisionA.id')) ||
+                (d.parentIdRevisionB && d.parentIdRevisionB === get(parent, 'controlRevisionB.id'));
         });
-      const getSortKey = (diff) => (isNumber(diff.newChildIndex) ? diff.newChildIndex : diff.oldChildIndex - 0.5);
+      const getSortKey = (diff) =>
+        isNumber(diff.childIndexRevisionB) ? diff.childIndexRevisionB : diff.childIndexRevisionA - 0.5;
       const convert = (diffs, parentIdxPath = []) => {
         // sort to make the order similart to the original
         return sortBy(diffs, getSortKey).map((controlDiff) => {
-          const control = controlDiff.newControl || controlDiff.oldControl;
-          const idx = controlDiff.newControl ? controlDiff.newChildIndex : controlDiff.oldChildIndex;
+          const control = controlDiff.controlRevisionB || controlDiff.controlRevisionA;
+          const idx = controlDiff.controlRevisionB ? controlDiff.childIndexRevisionB : controlDiff.childIndexRevisionA;
           const idxPath = [...parentIdxPath, idx + 1];
           return {
             name: control.name,
@@ -195,8 +214,9 @@ export default {
           if (change.changeType !== changeType.UNCHANGED) {
             return {
               key,
-              oldValue: JSON.stringify(change.oldValue),
-              newValue: JSON.stringify(change.newValue),
+              valueA: JSON.stringify(change.valueA),
+              valueB: JSON.stringify(change.valueB),
+              valueC: change.valueC ? JSON.stringify(change.valueC) : undefined,
             };
           }
           return null;

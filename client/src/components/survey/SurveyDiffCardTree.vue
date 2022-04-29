@@ -5,9 +5,12 @@
       v-for="diffInfo in diffInfoTree"
       :diffInfo="diffInfo"
       :key="`${diffInfo.indexPath}-${diffInfo.changeType}`"
-      v-bind="{ oldVersionName, newVersionName }"
+      v-bind="{ versionNameRevisionA, versionNameRevisionB, versionNameRevisionC }"
     >
-      <survey-diff-card-tree :diffInfoTree="diffInfo.children" v-bind="{ oldVersionName, newVersionName }" />
+      <survey-diff-card-tree
+        :diffInfoTree="diffInfo.children"
+        v-bind="{ versionNameRevisionA, versionNameRevisionB, versionNameRevisionC }"
+      />
     </survey-diff-card>
   </div>
 </template>
@@ -25,13 +28,17 @@ export default {
       type: Array,
       required: true,
     },
-    oldVersionName: {
+    versionNameRevisionA: {
       type: String,
       required: true,
     },
-    newVersionName: {
+    versionNameRevisionB: {
       type: String,
       required: true,
+    },
+    versionNameRevisionC: {
+      type: String,
+      required: false,
     },
   },
 };

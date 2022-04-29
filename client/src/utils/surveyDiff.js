@@ -9,35 +9,35 @@ export const changeType = {
 };
 const { CHANGED, REMOVED, ADDED, UNCHANGED } = changeType;
 
-const diffObject = (oldObj, newObj, fields) => {
+const diffObject = (objectA, objectB, fields) => {
   return fields.reduce((diff, field) => {
-    const oldValue = get(oldObj, field);
-    const newValue = get(newObj, field);
+    const valueA = get(objectA, field);
+    const valueB = get(objectB, field);
 
     const path = toPath(field);
     for (let i = 0; i < path.length - 1; ++i) {
       const subPath = path.slice(0, i);
-      const oldExist = isObjectLike(get(oldValue, subPath));
-      const newExist = isObjectLike(get(newValue, subPath));
-      if (oldExist && !newExist) {
+      const aExists = isObjectLike(get(valueA, subPath));
+      const bExists = isObjectLike(get(valueB, subPath));
+      if (aExists && !bExists) {
         diff[subPath.join('.')] = { changeType: REMOVED };
-      } else if (!oldExist && newExist) {
+      } else if (!aExists && bExists) {
         diff[subPath.join('.')] = { changeType: ADDED };
       }
     }
 
-    if (!isEqual(oldValue, newValue)) {
-      const oldExist = !isNil(oldValue);
-      const newExist = !isNil(newValue);
+    if (!isEqual(valueA, valueB)) {
+      const aExists = !isNil(valueA);
+      const bExists = !isNil(valueB);
       let changeType = CHANGED;
-      if (oldExist && !newExist) {
+      if (aExists && !bExists) {
         changeType = REMOVED;
-      } else if (!oldExist && newExist) {
+      } else if (!aExists && bExists) {
         changeType = ADDED;
       }
-      diff[field] = { oldValue, newValue, changeType };
+      diff[field] = { valueA, valueB, changeType };
     } else {
-      diff[field] = { value: newValue, changeType: UNCHANGED };
+      diff[field] = { value: valueA, changeType: UNCHANGED };
     }
     return diff;
   }, {});
@@ -48,11 +48,11 @@ const getComparableFields = (a, b) => {
   return Object.keys({ ...flatA, ...flatB });
 };
 
-export const diffControls = (oldControl, newControl) => {
-  if (oldControl.type !== newControl.type) {
+export const diffControls = (controlRevisionA, controlRevisionB) => {
+  if (controlRevisionA.type !== controlRevisionB.type) {
     throw new Error("Control types don't match");
   }
-  const controlType = oldControl.type;
+  const controlType = controlRevisionA.type;
 
   // Collect all the object paths that we should compare
   let diffFields = [];
@@ -61,28 +61,31 @@ export const diffControls = (oldControl, newControl) => {
 
   // get all the object paths from the controls
   // once we have schemas for the control object, we shoul use that instead
-  addFields(getComparableFields(oldControl, newControl));
+  addFields(getComparableFields(controlRevisionA, controlRevisionB));
   // remove fields we don't need in the diff
-  removeFields(['id', 'hint', 'children', 'libraryId', 'libraryIsInherited', 'libraryVersion']);
+  removeFields(['id', 'children', 'libraryId', 'libraryIsInherited', 'libraryVersion']);
 
   if ('matrix' === controlType) {
-    const colCount = Math.max(oldControl.options.source.content.length, newControl.options.source.content.length);
+    const colCount = Math.max(
+      controlRevisionA.options.source.content.length,
+      controlRevisionB.options.source.content.length
+    );
     removeFields(['options.source.content']);
     for (let i = 0; i < colCount; ++i) {
       const path = `options.source.content[${i}]`;
-      const fields = getComparableFields(get(oldControl, path, {}), get(newControl, path, {}));
+      const fields = getComparableFields(get(controlRevisionA, path, {}), get(controlRevisionB, path, {}));
       addFields(fields.map((f) => `${path}.${f}`));
     }
   } else if (['selectSingle', 'selectMultiple'].includes(controlType)) {
-    const optionCount = Math.max(oldControl.options.source.length, newControl.options.source.length);
+    const optionCount = Math.max(controlRevisionA.options.source.length, controlRevisionB.options.source.length);
     removeFields(['options.source']);
     for (let i = 0; i < optionCount; ++i) {
       const path = `options.source[${i}]`;
-      const fields = getComparableFields(get(oldControl, path, {}), get(newControl, path, {}));
+      const fields = getComparableFields(get(controlRevisionA, path, {}), get(controlRevisionB, path, {}));
       addFields(fields.map((f) => `${path}.${f}`));
     }
   }
-  return diffObject(oldControl, newControl, diffFields);
+  return diffObject(controlRevisionA, controlRevisionB, diffFields);
 };
 
 /**
@@ -108,9 +111,9 @@ export const flatSurveyControls = (controls) => {
   return normalize(controls);
 };
 
-export const diffSurveyVersions = (oldControls, newControls) => {
-  let removeds = flatSurveyControls(oldControls);
-  let addeds = flatSurveyControls(newControls);
+export const diffSurveyVersions = (controlsRevisionA, controlsRevisionB) => {
+  let removeds = flatSurveyControls(controlsRevisionA);
+  let addeds = flatSurveyControls(controlsRevisionB);
   let matcheds = [];
 
   // Moves found matches from the `addeds`, `removeds` arrays into `matcheds`
@@ -133,48 +136,134 @@ export const diffSurveyVersions = (oldControls, newControls) => {
   extractMatchesBy((c) => c.control.id);
   extractMatchesBy((c) => c.path);
 
-  const getOldProps = (control) => {
-    const { control: oldControl, parentId: oldParentId, childIndex: oldChildIndex, path: oldPath } = control;
+  const getPropsRevisionA = (control) => {
+    const {
+      control: controlRevisionA,
+      parentId: parentIdRevisionA,
+      childIndex: childIndexRevisionA,
+      path: pathRevisionA,
+    } = control;
     return {
-      oldControl,
-      oldParentId,
-      oldChildIndex,
-      oldPath,
+      controlRevisionA,
+      parentIdRevisionA,
+      childIndexRevisionA,
+      pathRevisionA,
     };
   };
 
-  const getNewProps = (control) => {
-    const { control: newControl, parentId: newParentId, childIndex: newChildIndex, path: newPath } = control;
+  const getPropsRevisionB = (control) => {
+    const {
+      control: controlRevisionB,
+      parentId: parentIdRevisionB,
+      childIndex: childIndexRevisionB,
+      path: pathRevisionB,
+    } = control;
     return {
-      newControl,
-      newParentId,
-      newChildIndex,
-      newPath,
+      controlRevisionB,
+      parentIdRevisionB,
+      childIndexRevisionB,
+      pathRevisionB,
     };
   };
 
-  matcheds = matcheds.map(([oldControl, newControl]) => {
+  matcheds = matcheds.map(([controlRevisionA, controlRevisionB]) => {
     const result = {
-      ...getOldProps(oldControl),
-      ...getNewProps(newControl),
+      ...getPropsRevisionA(controlRevisionA),
+      ...getPropsRevisionB(controlRevisionB),
     };
 
-    const diff = diffControls(result.oldControl, result.newControl);
+    const diff = diffControls(result.controlRevisionA, result.controlRevisionB);
     const changed = Object.values(diff).some(({ changeType }) => changeType !== UNCHANGED);
     const changeType = changed ? CHANGED : UNCHANGED;
 
     return { ...result, diff, changeType };
   });
 
-  removeds = removeds.map((control) => ({ changeType: REMOVED, ...getOldProps(control) }));
-  addeds = addeds.map((control) => ({ changeType: ADDED, ...getNewProps(control) }));
+  removeds = removeds.map((control) => ({ changeType: REMOVED, ...getPropsRevisionA(control) }));
+  addeds = addeds.map((control) => ({ changeType: ADDED, ...getPropsRevisionB(control) }));
 
   return [...matcheds, ...addeds, ...removeds];
 };
 
-export function controlListsHaveChanges(oldControls, newControls) {
-  return diffSurveyVersions(oldControls, newControls).some((diff) => diff.changeType !== changeType.UNCHANGED);
+export function controlListsHaveChanges(controlsRevisionA, controlsRevisionB) {
+  return diffSurveyVersions(controlsRevisionA, controlsRevisionB).some((diff) => diff.changeType !== UNCHANGED);
 }
-export function getChangesOnly(oldControls, newControls) {
-  return diffSurveyVersions(oldControls, newControls).filter((diff) => diff.changeType === changeType.CHANGED);
+export function diffSurveyVersionsConflictingChanges(controlsRevisionA, controlsRevisionB, controlsRevisionC) {
+  const changesAB = diffSurveyVersions(controlsRevisionA, controlsRevisionB).filter(
+    (diff) => diff.changeType === CHANGED
+  );
+  const changesBC = diffSurveyVersions(controlsRevisionB, controlsRevisionC).filter(
+    (diff) => diff.changeType === CHANGED
+  );
+  //get changes both in changesAB and changesBC
+  //TODO extract line 117 to 134, coll that to find the matches
+  let conflictingChanges = [];
+  for (const changeAB of changesAB) {
+    for (const changeBC of changesBC) {
+      if (
+        changeAB.controlRevisionA.id === changeBC.controlRevisionA.id ||
+        changeAB.pathRevisionA === changeBC.pathRevisionA
+      ) {
+        /*TODO conflict cases:
+      - allow hide question turned off, but question is hidden: auto unhide, show to user
+      - allow modifications turned off, but modifications done: revert modifications, show to user
+      - other cases: merge modifications, or show to user so he can make it by hand
+      add mode to UI which allows to find conflicts*/
+        const conflictingChange = {
+          changeType: changeType.CHANGED,
+
+          controlRevisionA: changeAB.controlRevisionA,
+          parentIdRevisionA: changeAB.parentIdRevisionA,
+          childIndexRevisionA: changeAB.childIndexRevisionA,
+          pathRevisionA: changeAB.pathRevisionA,
+
+          controlRevisionB: changeAB.controlRevisionB,
+          parentIdRevisionB: changeAB.parentIdRevisionB,
+          childIndexRevisionB: changeAB.childIndexRevisionB,
+          pathRevisionB: changeAB.pathRevisionB,
+
+          controlRevisionC: changeBC.controlRevisionC,
+          parentIdRevisionC: changeBC.parentIdRevisionC,
+          childIndexRevisionC: changeBC.childIndexRevisionC,
+          pathRevisionC: changeBC.pathRevisionC,
+
+          diff: changeAB.diff,
+        };
+
+        //add all diffs of revision C
+        for (const diffProperty in conflictingChange.diff) {
+          if (
+            Object.prototype.hasOwnProperty.call(changeBC.diff, diffProperty) &&
+            changeBC.diff[diffProperty].changeType !== UNCHANGED
+          ) {
+            if (conflictingChange.diff[diffProperty].changeType !== UNCHANGED) {
+              //update properties ALREADY differing between A and B
+              conflictingChange.diff[diffProperty].valueC = changeBC.diff[diffProperty].valueB;
+            } else {
+              conflictingChange.diff[diffProperty].valueA = conflictingChange.diff[diffProperty].value;
+              conflictingChange.diff[diffProperty].valueB = conflictingChange.diff[diffProperty].value;
+              conflictingChange.diff[diffProperty].valueC = changeBC.diff[diffProperty].valueB;
+              conflictingChange.diff[diffProperty].changeType = changeBC.diff[diffProperty].changeType;
+            }
+          }
+        }
+        //add all diffs of revision C for properties NOT YET differing between A and B
+        /*
+        for (const diffProperty in changeBC.diff) {
+          if (
+            !Object.prototype.hasOwnProperty.call(conflictingChange.diff, diffProperty) &&
+            diffProperty.changeType !== UNCHANGED
+          ) {
+            conflictingChange.diff[diffProperty].valueC = changeBC.diff[diffProperty].valueB;
+            conflictingChange.diff[diffProperty].valueA = conflictingChange.diff[diffProperty].value;
+            conflictingChange.diff[diffProperty].valueB = conflictingChange.diff[diffProperty].value;
+            conflictingChange.diff[diffProperty].changeType = changeBC.diff[diffProperty].changeType;
+          }
+        }*/
+
+        conflictingChanges.push(conflictingChange);
+      }
+    }
+  }
+  return conflictingChanges;
 }

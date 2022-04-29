@@ -11,31 +11,36 @@
         <library-change-type-selector v-model="toSurvey.meta.libraryLastChangeType" :disabled="true" />
       </v-card-text>
       <survey-diff
-        :old-controls="remoteOldRevisionControls"
-        :new-controls="remoteNewRevisionControls"
-        :old-version-name="`Version ${fromSurvey.libraryVersion}`"
-        :new-version-name="`Version ${toSurvey.latestVersion}`"
+        :controls-revision-a="remoteOldRevisionControls"
+        :controls-revision-b="remoteNewRevisionControls"
+        :version-name-revision-a="`Version ${fromSurvey.libraryVersion}`"
+        :version-name-revision-b="`Version ${toSurvey.latestVersion}`"
         :default-open="true"
         :showHeader="true"
         :showNoChangesText="true"
       ></survey-diff>
-      <v-card-text v-if="localRevisionHasChanges" class="mt-3" style="margin-bottom: -20px">
-        <h3>
-          <v-icon color="warning">mdi-alert</v-icon>&nbsp;<b
-            >You have modified this question set compared to Version {{ fromSurvey.libraryVersion }}. To following
-            changes will be reset:</b
-          >
-        </h3>
-      </v-card-text>
-      <survey-diff
-        :old-controls="localRevisionControls"
-        :new-controls="remoteOldRevisionControls"
-        old-version-name="Your modifications"
-        :new-version-name="`Version ${fromSurvey.libraryVersion}`"
-        :default-open="true"
-        :showHeader="false"
-        :showNoChangesText="false"
-      ></survey-diff>
+      <div v-if="localRevisionHasChanges">
+        <v-card-text class="mt-3" style="margin-bottom: -20px">
+          <h3>
+            <v-icon color="warning">mdi-alert</v-icon>&nbsp;<b
+              >You have modified this question set compared to Version {{ fromSurvey.libraryVersion }}. To following
+              changes will be reset:</b
+            >
+          </h3>
+        </v-card-text>
+        <survey-diff
+          :controls-revision-a="localRevisionControls"
+          :controls-revision-b="remoteOldRevisionControls"
+          :controls-revision-c="remoteNewRevisionControls"
+          :conflicting-changes-only="true"
+          version-name-revision-a="Your modifications"
+          :version-name-revision-b="`Version ${fromSurvey.libraryVersion}`"
+          :version-name-revision-c="`Version ${toSurvey.latestVersion}`"
+          :default-open="true"
+          :showHeader="false"
+          :showNoChangesText="false"
+        ></survey-diff>
+      </div>
       <v-card-actions class="mr-3">
         <v-btn
           small

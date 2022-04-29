@@ -14,7 +14,7 @@
 
     <splitpanes style="padding: 0px !important" class="pane-root" vertical>
       <pane class="pane pane-survey" style="position: relative; overflow: hidden">
-        <div class="pane-fixed-wrapper pr-2" style="position: relative;">
+        <div class="pane-fixed-wrapper pr-2" style="position: relative">
           <control-adder @controlAdded="controlAdded" @openLibrary="openLibrary" />
           <survey-details
             :version="version"
@@ -112,21 +112,13 @@
           <pane size="80">
             <div style="height: 100%">
               <v-tabs v-if="control.options" v-model="selectedTab" background-color="blue-grey darken-4" dark>
-                <v-tab :disabled="!control.options.relevance.enabled">
-                  Relevance
-                </v-tab>
-                <v-tab :disabled="!control.options.calculate.enabled">
-                  Calculate
-                </v-tab>
-                <v-tab :disabled="!control.options.constraint.enabled">
-                  Constraint
-                </v-tab>
+                <v-tab :disabled="!control.options.relevance.enabled"> Relevance </v-tab>
+                <v-tab :disabled="!control.options.calculate.enabled"> Calculate </v-tab>
+                <v-tab :disabled="!control.options.constraint.enabled"> Constraint </v-tab>
                 <v-tab v-if="control.options.apiCompose" :disabled="!control.options.apiCompose.enabled">
                   API Compose
                 </v-tab>
-                <v-tab v-if="control.type === 'script'">
-                  Script
-                </v-tab>
+                <v-tab v-if="control.type === 'script'"> Script </v-tab>
               </v-tabs>
 
               <code-editor
@@ -168,7 +160,7 @@
       </pane>
       <pane class="pane pane-draft" :style="{ width: isPreviewMobile ? '375px' : '800px' }">
         <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
-        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px); overflow: auto;">
+        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px); overflow: auto">
           <app-draft-component
             @submit="(payload) => $emit('submit', payload)"
             v-if="survey && instance"
@@ -183,18 +175,12 @@
               <v-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
                 <v-btn :value="false" dense>
                   <span class="hidden-sm-and-down">desktop</span>
-
-                  <v-icon right>
-                    mdi-monitor
-                  </v-icon>
+                  <v-icon right> mdi-monitor </v-icon>
                 </v-btn>
 
                 <v-btn :value="true">
                   <span class="hidden-sm-and-down">mobile</span>
-
-                  <v-icon right>
-                    mdi-cellphone
-                  </v-icon>
+                  <v-icon right> mdi-cellphone </v-icon>
                 </v-btn>
               </v-btn-toggle>
             </template>
@@ -203,9 +189,7 @@
 
         <v-overlay :value="enableSaveDraft">
           <v-card>
-            <v-card-text>
-              Please Save Draft to update Survey Preview.
-            </v-card-text>
+            <v-card-text> Please Save Draft to update Survey Preview. </v-card-text>
           </v-card>
         </v-overlay>
       </pane>
@@ -250,6 +234,7 @@ import {
   getSurveyPositions,
   insertControl,
 } from '@/utils/surveys';
+import { changeType, diffSurveyVersions } from '@/utils/surveyDiff';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -410,10 +395,32 @@ export default {
 
       this.showLibrary = false;
     },
-    updateLibraryQuestions(control) {
-      //clear selected control and re-add questions from library
-      control.children = [];
-      this.addQuestionsFromLibrary(control.libraryId, control);
+    updateLibraryQuestions(libraryRootGroup) {
+      //merge changes in labrary into the local revision
+      /*
+        1. load remote qsl survey
+        2. collect changes in remote survey
+        3. collect changes between local and remote survey
+        4. run all remote changes on local question
+        5. in case of conflict (local and remote change), sustain local change except they got broken (allowHide/allowModify turned off remotely)
+       */
+      let changes = diffSurveyVersions(this.oldControls, this.controlsRevisionB);
+      for (const change of changes) {
+        switch (change.changeType) {
+          case changeType.CHANGED:
+            //TODO replace the control
+            break;
+          case changeType.REMOVED:
+            //TODO remove the control
+            break;
+          case changeType.ADDED:
+            //TODO add the control
+            break;
+        }
+      }
+
+      libraryRootGroup.children = [];
+      this.addQuestionsFromLibrary(libraryRootGroup.libraryId, libraryRootGroup);
     },
     closeLibrary() {
       this.showLibrary = false;

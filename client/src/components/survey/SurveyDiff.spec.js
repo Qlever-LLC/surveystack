@@ -9,10 +9,12 @@ const { CHANGED, UNCHANGED, REMOVED, ADDED } = changeType;
 
 const createOptions = (props = {}) => {
   props = {
-    oldControls: [],
-    newControls: [],
-    oldVersionName: 'old',
-    newVersionName: 'new',
+    controlsRevisionA: [],
+    controlsRevisionB: [],
+    controlsRevisionC: null,
+    versionNameRevisionA: 'old',
+    versionNameRevisionB: 'new',
+    versionNameRevisionC: null,
     defaultOpen: true,
     ...props,
   };
@@ -43,7 +45,7 @@ describe('render diff cards', () => {
     const oldControl = createControl({ type: 'number', name: 'number_1', label: 'old label', id: 'num_1' });
     const newControl = { ...cloneDeep(oldControl), label: 'new label' };
 
-    render(SurveyDiff, createOptions({ oldControls: [oldControl], newControls: [newControl] }));
+    render(SurveyDiff, createOptions({ controlsRevisionA: [oldControl], controlsRevisionB: [newControl] }));
 
     const card = screen.getByTestId(`diff-card-1-changed`);
     expect(within(card).getByText('changed')).toBeInTheDocument();
@@ -55,7 +57,7 @@ describe('render diff cards', () => {
 
   it('shows addition', () => {
     const newControl = createControl({ type: 'number', name: 'number_1', label: 'number label' });
-    render(SurveyDiff, createOptions({ oldControls: [], newControls: [newControl] }));
+    render(SurveyDiff, createOptions({ controlsRevisionA: [], controlsRevisionB: [newControl] }));
     const card = screen.getByTestId(`diff-card-1-added`);
     expect(within(card).getByText('added')).toBeInTheDocument();
     expect(within(card).getByText(newControl.label)).toBeInTheDocument();
@@ -64,7 +66,7 @@ describe('render diff cards', () => {
 
   it('shows removal', () => {
     const oldControl = createControl({ type: 'number', name: 'number_1', label: 'number label' });
-    render(SurveyDiff, createOptions({ oldControls: [oldControl], newControls: [] }));
+    render(SurveyDiff, createOptions({ controlsRevisionA: [oldControl], controlsRevisionB: [] }));
     const card = screen.getByTestId(`diff-card-1-removed`);
     expect(within(card).getByText('removed')).toBeInTheDocument();
     expect(within(card).getByText(oldControl.label)).toBeInTheDocument();
@@ -77,7 +79,7 @@ describe('render diff cards', () => {
     const newControls = cloneDeep(oldControls);
     newControls[0].children = [number];
 
-    render(SurveyDiff, createOptions({ oldControls, newControls }));
+    render(SurveyDiff, createOptions({ controlsRevisionA: oldControls, controlsRevisionB: newControls }));
     const pageCard = screen.getByTestId(`diff-card-1-unchanged`);
     expect(within(pageCard).getByText('unchanged')).toBeInTheDocument();
     expect(within(pageCard).getByText(page.label)).toBeInTheDocument();
@@ -93,7 +95,11 @@ describe('render diff cards', () => {
     const added = createControl({ type: 'number', name: 'number_2', label: 'number added' });
     render(
       SurveyDiff,
-      createOptions({ oldControls: [unchanged], newControls: [unchanged, added], defaultShowUnchanged: true })
+      createOptions({
+        controlsRevisionA: [unchanged],
+        controlsRevisionB: [unchanged, added],
+        defaultShowUnchanged: true,
+      })
     );
     const card = screen.getByTestId(`diff-card-1-unchanged`);
     expect(within(card).getByText('unchanged')).toBeInTheDocument();
@@ -109,7 +115,7 @@ describe('render diff cards', () => {
     newMatrix.options.source.content[0].type = 'text';
     newMatrix.options.source.content[1].label = 'changed';
 
-    render(SurveyDiff, createOptions({ oldControls: [oldMatrix], newControls: [newMatrix] }));
+    render(SurveyDiff, createOptions({ controlsRevisionA: [oldMatrix], controlsRevisionB: [newMatrix] }));
     const card = screen.getByTestId(`diff-card-1-changed`);
     await fireEvent.click(card.firstElementChild);
     hasDiffRow(card, 'name', oldMatrix.name, newMatrix.name);
@@ -151,8 +157,8 @@ describe('computed.diffInfoTree', () => {
         changeList: [
           {
             key: 'label',
-            oldValue: JSON.stringify(oldControl.label),
-            newValue: JSON.stringify(newControl.label),
+            valueA: JSON.stringify(oldControl.label),
+            valueB: JSON.stringify(newControl.label),
           },
         ],
         indexPath: '1',

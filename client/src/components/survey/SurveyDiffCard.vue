@@ -26,15 +26,17 @@
         <thead>
           <tr>
             <th class="text-left"></th>
-            <th class="text-left">{{ oldVersionName }}</th>
-            <th class="text-left">{{ newVersionName }}</th>
+            <th class="text-left">{{ versionNameRevisionA }}</th>
+            <th class="text-left">{{ versionNameRevisionB }}</th>
+            <th v-if="versionNameRevisionC" class="text-left">{{ versionNameRevisionC }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="diffInfo in diffInfo.changeList" :key="diffInfo.key">
             <td>{{ diffInfo.key }}</td>
-            <td>{{ diffInfo.oldValue }}</td>
-            <td>{{ diffInfo.newValue }}</td>
+            <td>{{ diffInfo.valueA }}</td>
+            <td>{{ diffInfo.valueB }}</td>
+            <td v-if="versionNameRevisionC">{{ diffInfo.valueC }}</td>
           </tr>
         </tbody>
       </template>
@@ -62,13 +64,17 @@ export default {
       type: Object,
       required: true,
     },
-    oldVersionName: {
+    versionNameRevisionA: {
       type: String,
       required: true,
     },
-    newVersionName: {
+    versionNameRevisionB: {
       type: String,
       required: true,
+    },
+    versionNameRevisionC: {
+      type: String,
+      required: false,
     },
   },
   computed: {
