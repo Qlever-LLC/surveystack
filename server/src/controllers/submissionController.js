@@ -9,6 +9,7 @@ import { withTransaction, withSession } from '../db/helpers';
 import * as csvService from '../services/csv.service';
 import headerService from '../services/header.service';
 import * as farmOsService from '../services/farmos.service';
+import * as hyloService from '../services/hylo.service';
 import rolesService from '../services/roles.service';
 import { queryParam } from '../helpers';
 const col = 'submissions';
