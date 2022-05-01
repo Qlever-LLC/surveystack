@@ -148,7 +148,7 @@ describe('test-aggregator-integration', () => {
   });
 
   it('create-and-delete-log', async () => {
-    const { farminfo, getAssets, createLog, getLogs, deleteAllWithData } = config();
+    const { farminfo, getAssets, createLog, getLogs, deleteAllWithSurveystackId } = config();
 
     const id = uuid.v4();
     const data = uuid.v4();
@@ -172,14 +172,14 @@ describe('test-aggregator-integration', () => {
 
     expect(ids.includes(id)).toBe(true);
 
-    await deleteAllWithData(TEST_FARM, data);
+    await deleteAllWithSurveystackId(TEST_FARM, data);
 
     const { data: logsAfterDeletion } = await getLogs(TEST_FARM, 'activity');
     ids = logsAfterDeletion.data.map((l) => l.id);
     expect(ids.includes(id)).toBe(false);
   });
   it('log-response', async () => {
-    const { farminfo, getAssets, createLog, getLogs, deleteAllWithData } = config();
+    const { farminfo, getAssets, createLog, getLogs, deleteAllWithSurveystackId } = config();
 
     const { data: logs } = await getLogs(TEST_FARM, 'activity');
     console.log('data', JSON.stringify(logs, null, 2));
@@ -189,6 +189,39 @@ describe('test-aggregator-integration', () => {
 
     console.log(await getFarmsWithTag('/bionutrient/partners/main/'));
     console.log(await getAllFarmsWithTags());
+  });
+  it('get-all-terms', async () => {
+    const { getAllTerms } = config();
+    const arg = {
+      'oursci.farmos.dev': [
+        {
+          endpoint: 'taxonomy_term',
+          bundle: 'plant_type',
+          name: 'Spinach',
+        },
+      ],
+    };
+
+    for (const url of Object.keys(arg)) {
+      const res = await getAllTerms(url, arg[url]);
+      expect(res).toStrictEqual([
+        {
+          endpoint: 'taxonomy_term',
+          bundle: 'plant_type',
+          name: 'spinach',
+          id: '0548b26f-effa-43b4-be41-fb5f443cd119',
+        },
+      ]);
+    }
+  });
+  it('delete-all-with-id', async () => {
+    const { deleteAllWithSurveystackId } = config();
+
+    try {
+      console.log(await deleteAllWithSurveystackId('coffeeshop.farmos.dev', '123'));
+    } catch (error) {
+      console.error(error);
+    }
   });
   it.only('integration-test-skipping', async () => {});
 });

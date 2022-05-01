@@ -5,9 +5,7 @@
       Question Library
       <v-spacer></v-spacer>
       <v-btn icon key="library" @click="$emit('cancel')" class="mt-n5 mr-n6" :depressed="true" small tile elevation="0">
-        <v-icon>
-          mdi-close
-        </v-icon>
+        <v-icon> mdi-close </v-icon>
       </v-btn>
     </v-card-title>
 
@@ -27,7 +25,7 @@
             class="control-item mb-2"
             elevation="7"
           >
-            <v-row style="min-height:96px;">
+            <v-row style="min-height: 96px">
               <v-col :style="{ minWidth: '0px' }">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">

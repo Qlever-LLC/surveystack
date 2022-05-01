@@ -15,9 +15,7 @@
         <div v-if="additionalMessage" v-html="additionalMessage" />
         <v-card-actions>
           <v-spacer />
-          <v-btn text color="primary" @click="onClose">
-            Ok
-          </v-btn>
+          <v-btn text color="primary" @click="onClose"> Ok </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -62,8 +60,10 @@ export default {
     onClose() {
       this.show = null;
       this.$emit('close');
-      const nextRoute = this.persistent ? this.to : null;
-      this.$router.push(nextRoute);
+      if (!this.persistent) {
+        return;
+      }
+      this.$router.push(this.to);
     },
   },
 };

@@ -1,6 +1,8 @@
 /**
  * ApiCompose
  *
+ * WARNING: This is for FARMOS 1.0 and won't work anymore
+ *
  * @param {submission} submission
  */
 function apiCompose(submission) {

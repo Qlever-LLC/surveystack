@@ -40,8 +40,6 @@ import ResourceList from '@/pages/resources/ResourceList.vue';
 
 import AppInfo from '@/pages/app/AppInfo.vue';
 
-const FarmHubOnboarding = () => import('@/pages/farmhub-onboarding/FarmHubOnboarding.vue');
-
 // integrations
 const MembershipIntegrationEdit = () => import('@/pages/integrations/MembershipIntegrationEdit.vue');
 const GroupIntegrationEdit = () => import('@/pages/integrations/GroupIntegrationEdit.vue');
@@ -258,11 +256,6 @@ const routes = [
     path: '/group-integrations/new',
     name: 'group-integrations-new',
     components: getComponents(GroupIntegrationEdit),
-  },
-  {
-    path: '/farm-hub-onboarding/:id',
-    name: 'farm-hub-onboarding',
-    components: getComponents(FarmHubOnboarding),
   },
   {
     path: '/group-integrations/:id/edit',

@@ -1048,3 +1048,368 @@ export const logResponse = {
     },
   },
 };
+
+export const createFieldResponse = {
+  jsonapi: {
+    version: '1.0',
+    meta: {
+      links: {
+        self: {
+          href: 'http://jsonapi.org/format/1.0/',
+        },
+      },
+    },
+  },
+  data: {
+    type: 'asset--land',
+    id: '28317098-0a4f-49e8-b006-8f55713a63a5',
+    links: {
+      self: {
+        href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5',
+      },
+    },
+    attributes: {
+      drupal_internal__id: 317,
+      drupal_internal__revision_id: 394,
+      langcode: 'en',
+      revision_created: '2022-04-08T11:02:24+00:00',
+      revision_log_message: null,
+      name: 'Unit Test Field',
+      status: 'active',
+      created: '2022-04-08T11:02:24+00:00',
+      changed: '2022-04-08T11:02:24+00:00',
+      archived: null,
+      default_langcode: true,
+      revision_translation_affected: true,
+      data: null,
+      notes: null,
+      flag: [],
+      id_tag: [],
+      geometry: {
+        value:
+          'POLYGON ((-84.34150323269021 42.77962447110511, -84.34129044408108 42.77962315868189, -84.34125289315487 42.77938035618669, -84.34148535132407 42.77938298110345, -84.34150323269021 42.77962447110511))',
+        geo_type: 'Polygon',
+        lat: 42.779500969948614,
+        lon: -84.34138269027936,
+        left: -84.34150323269021,
+        top: 42.77962447110511,
+        right: -84.34125289315487,
+        bottom: 42.77938035618669,
+        geohash: 'dps52g',
+        latlon: '42.779500969949,-84.341382690279',
+      },
+      intrinsic_geometry: {
+        value:
+          'POLYGON ((-84.34150323269021 42.77962447110511, -84.34129044408108 42.77962315868189, -84.34125289315487 42.77938035618669, -84.34148535132407 42.77938298110345, -84.34150323269021 42.77962447110511))',
+        geo_type: 'Polygon',
+        lat: 42.779500969948614,
+        lon: -84.34138269027936,
+        left: -84.34150323269021,
+        top: 42.77962447110511,
+        right: -84.34125289315487,
+        bottom: 42.77938035618669,
+        geohash: 'dps52g',
+        latlon: '42.779500969949,-84.341382690279',
+      },
+      is_location: true,
+      is_fixed: true,
+      surveystack_id: null,
+      land_type: 'field',
+    },
+    relationships: {
+      asset_type: {
+        data: {
+          type: 'asset_type--asset_type',
+          id: '277edcd0-5af9-430b-8e3b-19ceaf97bfec',
+          meta: {
+            drupal_internal__target_id: 'land',
+          },
+        },
+        links: {
+          related: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/asset_type',
+          },
+          self: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/relationships/asset_type',
+          },
+        },
+      },
+      revision_user: {
+        data: {
+          type: 'user--user',
+          id: '88197dd1-ce89-4624-9524-a4d2327f9bd5',
+          meta: {
+            drupal_internal__target_id: 10,
+          },
+        },
+        links: {
+          related: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/revision_user',
+          },
+          self: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/relationships/revision_user',
+          },
+        },
+      },
+      uid: {
+        data: {
+          type: 'user--user',
+          id: '88197dd1-ce89-4624-9524-a4d2327f9bd5',
+          meta: {
+            drupal_internal__target_id: 10,
+          },
+        },
+        links: {
+          related: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/uid',
+          },
+          self: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/relationships/uid',
+          },
+        },
+      },
+      file: {
+        data: [],
+        links: {
+          related: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/file',
+          },
+          self: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/relationships/file',
+          },
+        },
+      },
+      image: {
+        data: [],
+        links: {
+          related: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/image',
+          },
+          self: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/relationships/image',
+          },
+        },
+      },
+      parent: {
+        data: [],
+        links: {
+          related: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/parent',
+          },
+          self: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/relationships/parent',
+          },
+        },
+      },
+      location: {
+        data: [],
+        links: {
+          related: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/location',
+          },
+          self: {
+            href: 'https://oursci.farmos.dev/api/asset/land/28317098-0a4f-49e8-b006-8f55713a63a5/relationships/location',
+          },
+        },
+      },
+    },
+  },
+  links: {
+    self: {
+      href: 'https://oursci.farmos.dev/api/asset/land',
+    },
+  },
+};
+
+export const plantTypesResponseSpinach = {
+  jsonapi: {
+    version: '1.0',
+    meta: {
+      links: {
+        self: {
+          href: 'http://jsonapi.org/format/1.0/',
+        },
+      },
+    },
+  },
+  data: [
+    {
+      type: 'taxonomy_term--plant_type',
+      id: '0548b26f-effa-43b4-be41-fb5f443cd119',
+      links: {
+        self: {
+          href: 'https://oursci.farmos.dev/api/taxonomy_term/plant_type/0548b26f-effa-43b4-be41-fb5f443cd119',
+        },
+      },
+      attributes: {
+        name: 'spinach',
+      },
+    },
+    {
+      type: 'taxonomy_term--plant_type',
+      id: 'c463664b-5f26-440e-9845-a41a29545517',
+      links: {
+        self: {
+          href: 'https://oursci.farmos.dev/api/taxonomy_term/plant_type/c463664b-5f26-440e-9845-a41a29545517',
+        },
+      },
+      attributes: {
+        name: 'Spinach',
+      },
+    },
+  ],
+  links: {
+    self: {
+      href: 'https://oursci.farmos.dev/api/taxonomy_term/plant_type?fields%5Btaxonomy_term--plant_type%5D=name%2Cid&filter%5Bname%5D%5Bvalue%5D=Spinach',
+    },
+  },
+};
+
+export const plantTypeResponseNonExistant = {
+  jsonapi: {
+    version: '1.0',
+    meta: {
+      links: {
+        self: {
+          href: 'http://jsonapi.org/format/1.0/',
+        },
+      },
+    },
+  },
+  data: [],
+  links: {
+    self: {
+      href: 'https://oursci.farmos.dev/api/taxonomy_term/plant_type?fields%5Btaxonomy_term--plant_type%5D=name%2Cid&filter%5Bname%5D%5Bvalue%5D=Somethingthatdoesnotexist',
+    },
+  },
+};
+
+export const rawSpinachSubrequestsResponse = {
+  'cba90664-c48b-4be9-874b-0a36c7e0267b': {
+    headers: {
+      'cache-control': [Array],
+      date: [Array],
+      'content-type': [Array],
+      'x-ua-compatible': [Array],
+      'content-language': [Array],
+      'x-content-type-options': [Array],
+      'x-frame-options': [Array],
+      'permissions-policy': [Array],
+      expires: [Array],
+      'x-generator': [Array],
+      'content-id': [Array],
+      status: [Array],
+    },
+    body: '{"jsonapi":{"version":"1.0","meta":{"links":{"self":{"href":"http:\\/\\/jsonapi.org\\/format\\/1.0\\/"}}}},"data":[{"type":"taxonomy_term--plant_type","id":"0548b26f-effa-43b4-be41-fb5f443cd119","links":{"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/0548b26f-effa-43b4-be41-fb5f443cd119"}},"attributes":{"name":"spinach"}},{"type":"taxonomy_term--plant_type","id":"c463664b-5f26-440e-9845-a41a29545517","links":{"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/c463664b-5f26-440e-9845-a41a29545517"}},"attributes":{"name":"Spinach"}}],"links":{"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/?fields%5Btaxonomy_term--plant_type%5D=name%2Cid\\u0026filter%5Bname%5D%5Bvalue%5D=Spinach"}}}',
+  },
+};
+
+export const createSpinachResponse = {
+  'a84e521c-50bf-4c8e-a412-5458c4fe8ddf': {
+    headers: {
+      'cache-control': ['must-revalidate, no-cache, private'],
+      date: ['Fri, 15 Apr 2022 16:47:06 GMT'],
+      location: [
+        'http://oursci.farmos.dev/api/taxonomy_term/plant_type/cca926ae-c889-4143-8d24-aeb596e7653f',
+      ],
+      'content-type': ['application/vnd.api+json'],
+      'x-ua-compatible': ['IE=edge'],
+      'content-language': ['en'],
+      'x-content-type-options': ['nosniff'],
+      'x-frame-options': ['SAMEORIGIN'],
+      'permissions-policy': ['interest-cohort=()'],
+      expires: ['Sun, 19 Nov 1978 05:00:00 GMT'],
+      'x-generator': ['Drupal 9 (https://www.drupal.org)'],
+      'content-id': ['<a84e521c-50bf-4c8e-a412-5458c4fe8ddf>'],
+      status: [201],
+    },
+    body: '{"jsonapi":{"version":"1.0","meta":{"links":{"self":{"href":"http:\\/\\/jsonapi.org\\/format\\/1.0\\/"}}}},"data":{"type":"taxonomy_term--plant_type","id":"cca926ae-c889-4143-8d24-aeb596e7653f","links":{"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f"}},"attributes":{"drupal_internal__tid":441,"drupal_internal__revision_id":726,"langcode":"en","revision_created":"2022-04-15T16:47:06+00:00","revision_log_message":null,"status":true,"name":"Test Plant Type","description":null,"weight":0,"changed":"2022-04-15T16:47:06+00:00","default_langcode":true,"revision_translation_affected":true,"maturity_days":null,"transplant_days":null},"relationships":{"vid":{"data":{"type":"taxonomy_vocabulary--taxonomy_vocabulary","id":"4b483bff-e1f7-4fdc-8d02-18d6bdad1354","meta":{"drupal_internal__target_id":"plant_type"}},"links":{"related":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/vid"},"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/relationships\\/vid"}}},"revision_user":{"data":null,"links":{"related":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/revision_user"},"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/relationships\\/revision_user"}}},"parent":{"data":[{"type":"taxonomy_term--plant_type","id":"virtual","meta":{"links":{"help":{"href":"https:\\/\\/www.drupal.org\\/docs\\/8\\/modules\\/json-api\\/core-concepts#virtual","meta":{"about":"Usage and meaning of the \\u0027virtual\\u0027 resource identifier."}}}}}],"links":{"related":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/parent"},"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/relationships\\/parent"}}},"companions":{"data":[],"links":{"related":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/companions"},"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/relationships\\/companions"}}},"crop_family":{"data":null,"links":{"related":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/crop_family"},"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/relationships\\/crop_family"}}},"image":{"data":[],"links":{"related":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/image"},"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type\\/cca926ae-c889-4143-8d24-aeb596e7653f\\/relationships\\/image"}}}}},"links":{"self":{"href":"http:\\/\\/oursci.farmos.dev\\/api\\/taxonomy_term\\/plant_type"}}}',
+  },
+};
+
+export const apiResponse = {
+  jsonapi: { version: '1.0', meta: { links: [Object] } },
+  data: [],
+  meta: {
+    links: { me: [Object] },
+    farm: {
+      name: 'Coffeeshop Sandbox',
+      url: 'https://coffeeshop.farmos.dev',
+      version: '2.0.0-beta3',
+      system_of_measurement: 'metric',
+    },
+  },
+  links: {
+    'asset--animal': { href: 'https://coffeeshop.farmos.dev/api/asset/animal' },
+    'asset--equipment': { href: 'https://coffeeshop.farmos.dev/api/asset/equipment' },
+    'asset--land': { href: 'https://coffeeshop.farmos.dev/api/asset/land' },
+    'asset--material': { href: 'https://coffeeshop.farmos.dev/api/asset/material' },
+    'asset--plant': { href: 'https://coffeeshop.farmos.dev/api/asset/plant' },
+    'asset--structure': { href: 'https://coffeeshop.farmos.dev/api/asset/structure' },
+    'asset--water': { href: 'https://coffeeshop.farmos.dev/api/asset/water' },
+    'asset_type--asset_type': { href: 'https://coffeeshop.farmos.dev/api/asset_type/asset_type' },
+    'entity_browser--entity_browser': {
+      href: 'https://coffeeshop.farmos.dev/api/entity_browser/entity_browser',
+    },
+    'file--file': { href: 'https://coffeeshop.farmos.dev/api/file/file' },
+    'flag--flag': { href: 'https://coffeeshop.farmos.dev/api/flag/flag' },
+    'lab_test_type--lab_test_type': {
+      href: 'https://coffeeshop.farmos.dev/api/lab_test_type/lab_test_type',
+    },
+    'land_type--land_type': { href: 'https://coffeeshop.farmos.dev/api/land_type/land_type' },
+    'layer_style--layer_style': {
+      href: 'https://coffeeshop.farmos.dev/api/layer_style/layer_style',
+    },
+    'log--activity': { href: 'https://coffeeshop.farmos.dev/api/log/activity' },
+    'log--harvest': { href: 'https://coffeeshop.farmos.dev/api/log/harvest' },
+    'log--input': { href: 'https://coffeeshop.farmos.dev/api/log/input' },
+    'log--lab_test': { href: 'https://coffeeshop.farmos.dev/api/log/lab_test' },
+    'log--maintenance': { href: 'https://coffeeshop.farmos.dev/api/log/maintenance' },
+    'log--observation': { href: 'https://coffeeshop.farmos.dev/api/log/observation' },
+    'log--seeding': { href: 'https://coffeeshop.farmos.dev/api/log/seeding' },
+    'log--transplanting': { href: 'https://coffeeshop.farmos.dev/api/log/transplanting' },
+    'log_type--log_type': { href: 'https://coffeeshop.farmos.dev/api/log_type/log_type' },
+    'map_behavior--map_behavior': {
+      href: 'https://coffeeshop.farmos.dev/api/map_behavior/map_behavior',
+    },
+    'map_type--map_type': { href: 'https://coffeeshop.farmos.dev/api/map_type/map_type' },
+    'profile--common': { href: 'https://coffeeshop.farmos.dev/api/profile/common' },
+    'profile--hylo': { href: 'https://coffeeshop.farmos.dev/api/profile/hylo' },
+    'profile--regen_digital': { href: 'https://coffeeshop.farmos.dev/api/profile/regen_digital' },
+    'profile_type--profile_type': {
+      href: 'https://coffeeshop.farmos.dev/api/profile_type/profile_type',
+    },
+    'quantity--material': { href: 'https://coffeeshop.farmos.dev/api/quantity/material' },
+    'quantity--standard': { href: 'https://coffeeshop.farmos.dev/api/quantity/standard' },
+    'quantity_type--quantity_type': {
+      href: 'https://coffeeshop.farmos.dev/api/quantity_type/quantity_type',
+    },
+    self: { href: 'https://coffeeshop.farmos.dev/api' },
+    'structure_type--structure_type': {
+      href: 'https://coffeeshop.farmos.dev/api/structure_type/structure_type',
+    },
+    'tag_type--tag_type': { href: 'https://coffeeshop.farmos.dev/api/tag_type/tag_type' },
+    'taxonomy_term--animal_type': {
+      href: 'https://coffeeshop.farmos.dev/api/taxonomy_term/animal_type',
+    },
+    'taxonomy_term--crop_family': {
+      href: 'https://coffeeshop.farmos.dev/api/taxonomy_term/crop_family',
+    },
+    'taxonomy_term--log_category': {
+      href: 'https://coffeeshop.farmos.dev/api/taxonomy_term/log_category',
+    },
+    'taxonomy_term--material_type': {
+      href: 'https://coffeeshop.farmos.dev/api/taxonomy_term/material_type',
+    },
+    'taxonomy_term--plant_type': {
+      href: 'https://coffeeshop.farmos.dev/api/taxonomy_term/plant_type',
+    },
+    'taxonomy_term--season': { href: 'https://coffeeshop.farmos.dev/api/taxonomy_term/season' },
+    'taxonomy_term--unit': { href: 'https://coffeeshop.farmos.dev/api/taxonomy_term/unit' },
+    'taxonomy_vocabulary--taxonomy_vocabulary': {
+      href: 'https://coffeeshop.farmos.dev/api/taxonomy_vocabulary/taxonomy_vocabulary',
+    },
+    'user--user': { href: 'https://coffeeshop.farmos.dev/api/user/user' },
+    'user_role--user_role': { href: 'https://coffeeshop.farmos.dev/api/user_role/user_role' },
+  },
+};

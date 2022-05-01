@@ -19,7 +19,7 @@
       label="Select User"
       v-model="selectedUser"
       v-if="!loading && !!groups"
-      item-text="name"
+      :item-text="(item) => `${item.name} (${item.email})`"
       item-value="_id"
       :items="users"
     ></v-autocomplete>
