@@ -579,7 +579,7 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
     addFarmToSurveystackGroup(url, groupId, planName);
 
     await db.collection('farmos.fields').insertOne({
-      url: `${url}.farmos.net`,
+      url,
       created: new Date(),
       fields,
     });
