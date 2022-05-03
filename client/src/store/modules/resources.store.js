@@ -158,7 +158,10 @@ const actions = {
       }
       return resource;
     } catch (error) {
-      dispatch('feedback/add', error, { root: true });
+      dispatch('feedback/add', `Could not fetch resource ${resourceId}. This problem is reported automatically.`, {
+        root: true,
+      });
+      console.error(error);
       throw error;
     }
   },
@@ -173,7 +176,10 @@ const actions = {
       }
       await Promise.all(promises);
     } catch (error) {
-      dispatch('feedback/add', error, { root: true });
+      dispatch('feedback/add', `Fetching of some resources failed. This problem is reported automatically.`, {
+        root: true,
+      });
+      console.error(error);
       throw error;
     }
   },
