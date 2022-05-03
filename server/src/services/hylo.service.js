@@ -12,7 +12,7 @@ import { db } from '../db';
 
 const getToken = async () => {
   const r = await axios.post(
-    `https://staging.hylo.com/noo/oauth/token`,
+    `${process.env.HYLO_API_URL}/noo/oauth/token`,
     querystring.stringify({
       client_secret: process.env.HYLO_CLIENT_SECRET,
       scope: 'api:write',
@@ -31,7 +31,7 @@ const getToken = async () => {
   return r.data;
 };
 
-const gqlHeaders = async () => {
+const gqlPostConfig = async () => {
   return {
     headers: {
       Authorization: `Bearer ${(await getToken()).access_token}`,
@@ -40,23 +40,25 @@ const gqlHeaders = async () => {
   };
 };
 
+const gqlRequest = async (query, variables) => {};
+
 const createHyloUser = async ({ email, name, groupId }) => {
   const r = await axios.post(
-    `https://staging.hylo.com/noo/user`,
+    `${process.env.HYLO_API_URL}/noo/user`,
     querystring.stringify({ email, name, groupId }),
     {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: (await gqlPostConfig()).headers.Authorization,
       },
     }
   );
-
   return r.data;
 };
 
 const queryHyloUser = async (email) => {
   const r = await axios.post(
-    `https://staging.hylo.com/noo/graphql`,
+    `${process.env.HYLO_API_URL}/noo/graphql`,
     JSON.stringify({
       query:
         'query ($id: ID, $email: String) { person(id: $id, email: $email) { id name hasRegistered } }',
@@ -66,7 +68,7 @@ const queryHyloUser = async (email) => {
         // "id": PERSON_ID
       },
     }),
-    await gqlHeaders()
+    await gqlPostConfig()
   );
 
   return r.data;
@@ -74,27 +76,108 @@ const queryHyloUser = async (email) => {
 
 const queryHyloGroup = async (slug) => {
   const r = await axios.post(
-    `https://staging.hylo.com/noo/graphql`,
+    `${process.env.HYLO_API_URL}/noo/graphql`,
     JSON.stringify({
       query:
-        'query ($id: ID, $slug: String) { group(id: $id, slug: $slug) { id name slug members { id name hasRegistered } } }',
+        'query ($id: ID, $slug: String) { group(id: $id, slug: $slug) { id name slug members { items { id name hasRegistered } } } }',
       variables: {
         // It uses the slug OR the id (slug if both set)
-        slug: 'GROUP_SLUG',
+        slug,
         // "id": GROUP_ID
       },
     }),
-    await gqlHeaders()
+    await gqlPostConfig()
   );
 
   return r.data;
 };
 
-const upsertHyloUser = async (email) => {};
-// getToken().then(t => console.log("Token", t))
-// createHyloUser({name: "azazdeaz test 1", email: "user2@azazdeaz.test"}).then(t => console.log("NEW USER", t))
-// queryHyloUser().then(t => console.log("USER", t))
-// queryHyloGroup().then(t => console.log("GROUP", t))
+const createHyloGroup = async (slug, hyloUserId) => {
+  const r = await axios.post(
+    `${process.env.HYLO_API_URL}/noo/graphql`,
+    JSON.stringify({
+      query:
+        'mutation ($data: GroupInput, $asUserId: ID) { createGroup(data: $data, asUserId: $asUserId) { id name slug } }',
+      variables: {
+        data: {
+          accessibility: 1,
+          name: 'Test Group',
+          slug,
+          parentIds: [],
+          visibility: 1,
+          groupExtensions: [
+            {
+              type: 'farm-onboarding',
+              data: {
+                farm_email: 'test@farm.org',
+              },
+            },
+          ],
+        },
+        asUserId: hyloUserId,
+      },
+    }),
+    await gqlPostConfig()
+  );
+
+  return r.data;
+};
+
+const updateHyloGroup = async (hyloGroupId, hyloUserId) => {
+  const r = await axios.post(
+    `${process.env.HYLO_API_URL}/noo/graphql`,
+    JSON.stringify({
+      query:
+        'mutation ($id: ID, $changes: GroupInput, $asUserId: ID) { updateGroup(id: $id, changes: $changes, asUserId: $asUserId) { id name slug } }',
+      variables: {
+        id: hyloGroupId,
+        changes: {
+          name: 'New Name2',
+        },
+        asUserId: hyloUserId,
+      },
+    }),
+    await gqlPostConfig()
+  );
+
+  return r.data;
+};
+
+const addUserToHylo = async (email) => {
+  const user = await db.collection('users').findOne({ email });
+  if (!user) {
+    throw new Error('TODO');
+  }
+  let hyloUser = await createHyloUser(user.email);
+
+  // if user already exists
+  if (!hyloUser?.id) {
+    const { data, errors } = queryHyloUser(user.email);
+    if (errors?.length > 0) {
+      throw new Error(`Error on querying hylo user ${errors.map((e) => e.message).join('\n')}`);
+    }
+    hyloUser = data.person;
+  }
+
+  if (!hyloUser?.id) {
+    throw new Error('Failed to create the ');
+  }
+};
+
+// getToken().then((t) => console.log('Token', t));
+// createHyloUser({ name: 'azazdeaz test 5', email: 'user5@azazdeaz.test' }).then((t) =>
+//   console.log('NEW USER', t)
+// );
+// queryHyloUser('user3f@azazdeaz.test').then((t) => console.log('USER', t));
+// const group = createHyloGroup('azazdeaz-test-group-1', '36341').then((t) => {
+//   console.log('NEW GROUP', JSON.stringify(t, null, 2));
+//   return t;
+// });
+// queryHyloGroup('azazdeaz-test-group-1').then((t) => console.log('GROUP', t));
+// updateHyloGroup('34844', '36341').then((t) => {
+//   console.log('NEW GROUP', JSON.stringify(t, null, 2));
+//   return t;
+// });
 
 const config = () => {
   if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {

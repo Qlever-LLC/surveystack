@@ -11,6 +11,7 @@ let db = null;
 let mongoClient = null;
 
 export const COLL_ACCESS_CODES = 'users.accesscodes';
+export const COLL_USERS = 'users';
 
 /**
  * https://stackoverflow.com/a/33780894
