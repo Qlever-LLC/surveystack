@@ -651,6 +651,27 @@ const createSubmission = async (req, res) => {
     });
   }
 
+  let hyloResults;
+  try {
+    hyloResults = await Promise.all(
+      submissionEntities.map(({ entity, survey }) =>
+        hyloService.handle({
+          submission: entity,
+          survey,
+          user: res.locals.auth.user,
+        })
+      )
+    );
+  } catch (error) {
+    // TODO what should we do if something internal fails?
+    // need to let the user somehow know
+    console.log('error handling hylo', error);
+    return res.status(503).send({
+      message: `error submitting to hylo ${error}`,
+      hylo: error.messages,
+    });
+  }
+
   const mapSubmissionToQSL = ({ entity, survey }) => {
     const controls = survey.revisions[entity.meta.survey.version - 1].controls;
     return prepareSubmissionsToQSLs(controls, entity);
@@ -686,6 +707,7 @@ const createSubmission = async (req, res) => {
   res.send({
     ...results,
     farmos: farmOsResults.flat(),
+    hylo: hyloResults.flat(),
   });
 };
 
