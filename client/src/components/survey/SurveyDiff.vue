@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { diffSurveyVersions, changeType, diffSurveyVersionsConflictingChanges } from '@/utils/surveyDiff';
+import { diffSurveyVersions, changeType, diffThreeSurveyVersions } from '@/utils/surveyDiff';
 import { isNumber, sortBy, get, remove } from 'lodash';
 import SurveyDiffCardTree from './SurveyDiffCardTree';
 
@@ -64,10 +64,6 @@ export default {
       type: String,
       required: false,
     },
-    conflictingChangesOnly: {
-      type: Boolean,
-      default: false,
-    },
     defaultOpen: {
       type: Boolean,
       default: false,
@@ -90,6 +86,7 @@ export default {
       isOpen: this.defaultOpen,
       showChangesOnly: !this.defaultShowUnchanged,
       colors: {
+        conflict: 'red lighten-1',
         changed: 'amber lighten-1',
         added: 'green lighten-1',
         removed: 'red lighten-1',
@@ -100,12 +97,8 @@ export default {
   computed: {
     diff() {
       if (this.controlsRevisionA && this.controlsRevisionB) {
-        if (this.controlsRevisionC && this.conflictingChangesOnly) {
-          return diffSurveyVersionsConflictingChanges(
-            this.controlsRevisionA,
-            this.controlsRevisionB,
-            this.controlsRevisionC
-          );
+        if (this.controlsRevisionC) {
+          return diffThreeSurveyVersions(this.controlsRevisionA, this.controlsRevisionB, this.controlsRevisionC);
         } else {
           return diffSurveyVersions(this.controlsRevisionA, this.controlsRevisionB);
         }

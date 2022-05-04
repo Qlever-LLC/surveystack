@@ -79,7 +79,7 @@ export default {
   },
   computed: {
     haveChangeDetails() {
-      return this.diffInfo.changeType === changeType.CHANGED;
+      return this.diffInfo.changeType === changeType.CHANGED || this.diffInfo.changeType === changeType.CONFLICT;
     },
   },
 };

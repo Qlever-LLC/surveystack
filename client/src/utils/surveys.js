@@ -119,6 +119,26 @@ export const changeRecursive = (control, changeFn) => {
     });
   }
 };
+/**
+ * Replaces a control by its path
+ * @param controls control list to be changed
+ * @param parentPath parent path of the controls passed
+ * @param replacePath path of the control to be replaced
+ * @param replacementControl new control which replaces the control at the replacePath
+ */
+export const replaceControl = (controls, parentPath, replacePath, replacementControl) => {
+  return controls.map((control) => {
+    let currentPath = parentPath ? [parentPath, control.name].join('.') : control.name;
+    if (currentPath === replacePath) {
+      return replacementControl;
+    } else if (control.children) {
+      control.children = replaceControl(control.children, currentPath, replacePath, replacementControl);
+      return control;
+    } else {
+      return control;
+    }
+  });
+};
 
 /**
  * Prepares the passed library control or resource to be consumed in another survey

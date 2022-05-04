@@ -403,6 +403,7 @@ describe('surveys', () => {
     expect(group.name).toBe('group_1_x');
     expect(group.children[1].children[1].name).toBe('group_5_x');
   });
+  test.todo('replaceControl works');
   test('prepareToAddFromLibrary sets libraryId to librarySurvey.id for resources/controls not inherited from nested question sets and does not set libraryIsInherited', () => {
     let librarySurvey = mockLibrarySurvey();
     prepareToAddFromLibrary(librarySurvey.resources[0], librarySurvey._id, librarySurvey.latestVersion);

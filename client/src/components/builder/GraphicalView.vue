@@ -138,7 +138,7 @@
 
       <v-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
         <v-card class="">
-          <v-card-title> Delete Question </v-card-title>
+          <v-card-title> Delete Question</v-card-title>
           <v-card-text class="mt-4"> Are you sure you want to remove this question? </v-card-text>
           <v-card-actions>
             <v-spacer />
@@ -151,7 +151,7 @@
         v-if="updateLibraryDialogIsVisible"
         :library-root-group="updateLibraryRootGroup"
         :to-survey="updateToLibrary"
-        @update="updateLibraryConfirmed(idx, $event)"
+        @update="updateLibraryConfirmed(idx - 1, $event)"
         @cancel="updateLibraryCancelled"
       />
     </v-card>

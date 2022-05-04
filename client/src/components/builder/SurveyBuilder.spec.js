@@ -578,31 +578,32 @@ describe('question set library', () => {
   describe('methods.updateLibraryQuestions', () => {
     const { updateLibraryQuestions } = SurveyBuilder.methods;
 
-    describe('resources', () => {
-      const runTest = async (surveyResources, updatedResources, expectedResources) => {
-        const component = { ...optionsWithControls().props, controlAdded: jest.fn() };
-        component.survey.resources = surveyResources;
-        qsl.resources = updatedResources;
-        await updateLibraryQuestions.call(component, {
-          controlIndex: 0,
-          updatedLibraryRootGroup: { libraryId: qsl._id },
-          updatedResources,
-        });
-
-        expect(component.survey.resources).toMatchObject(expectedResources);
-        return component.survey.resources;
-      };
-
-      it('updates resources from the same QSL', async () => {
-        const resourceCurrent = { foo: 1, libraryId: qsl._id };
-        const resourceFromQsl = { bar: 2, libraryId: qsl._id };
-        await runTest([resourceCurrent], [resourceFromQsl], [resourceFromQsl]);
+    const runTest = async (surveyResources, updatedResources, expectedResources) => {
+      const component = { ...optionsWithControls().props, controlAdded: jest.fn() };
+      component.survey.resources = surveyResources;
+      qsl.resources = updatedResources;
+      await updateLibraryQuestions.call(component, {
+        controlIndex: 0,
+        updatedLibraryRootGroup: { libraryId: qsl._id },
+        updatedResources,
       });
-      it('removes old resources of the same QSL', async () => {
-        const resourceSameLib = { libraryId: qsl._id };
-        const resourceOther = { libraryId: 'not_related_to_this_qsl' };
-        await runTest([resourceSameLib, resourceOther], [], [resourceOther]);
-      });
+
+      expect(component.survey.resources).toMatchObject(expectedResources);
+      return component.survey.resources;
+    };
+
+    it('updates resources from the same QSL', async () => {
+      const resourceCurrent = { foo: 1, libraryId: qsl._id };
+      const resourceFromQsl = { bar: 2, libraryId: qsl._id };
+      await runTest([resourceCurrent], [resourceFromQsl], [resourceFromQsl]);
     });
+    it('removes old resources of the same QSL', async () => {
+      const resourceSameLib = { libraryId: qsl._id };
+      const resourceOther = { libraryId: 'not_related_to_this_qsl' };
+      await runTest([resourceSameLib, resourceOther], [], [resourceOther]);
+    });
+
+    it.todo('updates the library root group');
+    it.todo('sets the currently selected control to the updated library root group');
   });
 });

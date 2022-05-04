@@ -11,35 +11,25 @@
         <library-change-type-selector v-model="toSurvey.meta.libraryLastChangeType" :disabled="true" />
       </v-card-text>
       <survey-diff
-        :controls-revision-a="remoteOldRevisionControls"
-        :controls-revision-b="remoteNewRevisionControls"
-        :version-name-revision-a="`Version ${libraryRootGroup.libraryVersion}`"
-        :version-name-revision-b="`Version ${toSurvey.latestVersion}`"
+        :controls-revision-a="localRevisionControls"
+        :controls-revision-b="remoteOldRevisionControls"
+        :controls-revision-c="remoteNewRevisionControls"
+        version-name-revision-a="Your Version"
+        :version-name-revision-b="`Version ${libraryRootGroup.libraryVersion}`"
+        :version-name-revision-c="`Version ${toSurvey.latestVersion}`"
         :default-open="true"
         :showHeader="true"
         :showNoChangesText="true"
       ></survey-diff>
-      <div v-if="localRevisionHasChanges">
+      <div v-if="hasConflicts">
         <v-card-text class="ml-2 my-3" style="margin-bottom: -20px">
           <h3>
             <v-icon color="warning">mdi-alert</v-icon>&nbsp;<b
-              >You have modified this question set compared to Version {{ libraryRootGroup.libraryVersion }}. The
-              following changes will be reset due to conflicting changes:</b
+              >You have modified this question set compared to Version {{ libraryRootGroup.libraryVersion }}. Your
+              changes marked as CONFLICT will be reset to the latest library version.</b
             >
           </h3>
         </v-card-text>
-        <survey-diff
-          :controls-revision-a="localRevisionControls"
-          :controls-revision-b="remoteOldRevisionControls"
-          :controls-revision-c="remoteNewRevisionControls"
-          :conflicting-changes-only="true"
-          version-name-revision-a="Your modifications"
-          :version-name-revision-b="`Version ${libraryRootGroup.libraryVersion}`"
-          :version-name-revision-c="`Version ${toSurvey.latestVersion}`"
-          :default-open="true"
-          :showHeader="false"
-          :showNoChangesText="false"
-        ></survey-diff>
       </div>
       <v-card-actions class="mr-3">
         <v-btn
@@ -68,7 +58,7 @@
 import TipTapEditor from '@/components/builder/TipTapEditor';
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
 import SurveyDiff from '@/components/survey/SurveyDiff';
-import { controlListsHaveChanges, merge } from '@/utils/surveyDiff';
+import { diffHasConflicts, merge } from '@/utils/surveyDiff';
 import { reactive, toRefs } from '@vue/composition-api';
 import { getPreparedLibraryControls, getPreparedLibraryResources } from '@/utils/surveys';
 
@@ -90,7 +80,7 @@ export default {
       localRevisionControls: props.libraryRootGroup.children,
       remoteOldRevisionControls: null,
       remoteNewRevisionControls: null,
-      localRevisionHasChanges: false,
+      hasConflicts: false,
     });
 
     state.remoteOldRevisionControls = props.toSurvey.revisions.find(
@@ -100,9 +90,10 @@ export default {
       (revision) => revision.version === props.toSurvey.latestVersion
     ).controls;
 
-    state.localRevisionHasChanges = controlListsHaveChanges(
+    state.hasConflicts = diffHasConflicts(
       state.localRevisionControls,
-      state.remoteOldRevisionControls
+      state.remoteOldRevisionControls,
+      state.remoteNewRevisionControls
     );
 
     function update() {

@@ -367,7 +367,7 @@ describe('surveyDiff', () => {
       });
     });
   });
-  describe('diffSurveyVersionsConflictingChanges', () => {
+  describe('diffThreeSurveyVersions', () => {
     it.todo('returns conflicting changes');
     it.todo('contains the property values for revisions A,B and C of a diff');
     it.todo('does not return non-conflicting changes');

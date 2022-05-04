@@ -1,13 +1,15 @@
-import { get, isObjectLike, isEqual, isNil, toPath, uniq, pull, isArray, intersection, without } from 'lodash';
+import { get, isArray, isEqual, isNil, isObjectLike, pull, toPath, uniq } from 'lodash';
 import flatten from 'flat';
+import { replaceControl } from '@/utils/surveys';
 
 export const changeType = {
   CHANGED: 'changed',
+  CONFLICT: 'conflict',
   REMOVED: 'removed',
   ADDED: 'added',
   UNCHANGED: 'unchanged',
 };
-const { CHANGED, REMOVED, ADDED, UNCHANGED } = changeType;
+const { CHANGED, CONFLICT, REMOVED, ADDED, UNCHANGED } = changeType;
 
 const diffObject = (objectA, objectB, fields) => {
   return fields.reduce((diff, field) => {
@@ -185,90 +187,113 @@ export const diffSurveyVersions = (controlsRevisionA, controlsRevisionB) => {
   return [...matcheds, ...addeds, ...removeds];
 };
 
-export function controlListsHaveChanges(controlsRevisionA, controlsRevisionB) {
-  return diffSurveyVersions(controlsRevisionA, controlsRevisionB).some((diff) => diff.changeType !== UNCHANGED);
+export function diffHasConflicts(controlsLocalRevision, controlsRemoteRevisionA, controlsRemoteRevisionB) {
+  return diffThreeSurveyVersions(controlsLocalRevision, controlsRemoteRevisionA, controlsRemoteRevisionB).some(
+    (diff) => diff.changeType === CONFLICT
+  );
 }
-export function diffSurveyVersionsConflictingChanges(controlsRevisionA, controlsRevisionB, controlsRevisionC) {
-  const changesAB = diffSurveyVersions(controlsRevisionA, controlsRevisionB).filter(
-    (diff) => diff.changeType === CHANGED
-  );
-  const changesBC = diffSurveyVersions(controlsRevisionB, controlsRevisionC).filter(
-    (diff) => diff.changeType === CHANGED
-  );
+
+export function diffThreeSurveyVersions(controlsLocalRevision, controlsRemoteRevisionA, controlsRemoteRevisionB) {
+  //collect diff results for all controls
+  const changesLocal = diffSurveyVersions(controlsLocalRevision, controlsRemoteRevisionA);
+  const changesRemote = diffSurveyVersions(controlsRemoteRevisionA, controlsRemoteRevisionB);
   //get changes both in changesAB and changesBC
-  let conflictingChanges = [];
-  for (const changeAB of changesAB) {
-    for (const changeBC of changesBC) {
-      if (
-        (changeAB.controlRevisionA.id === changeBC.controlRevisionA.id ||
-          changeAB.pathRevisionA === changeBC.pathRevisionA) &&
-        hasBreakingChange(changeBC.diff)
-      ) {
-        const conflictingChange = {
-          changeType: changeType.CHANGED,
-
-          controlRevisionA: changeAB.controlRevisionA,
-          parentIdRevisionA: changeAB.parentIdRevisionA,
-          childIndexRevisionA: changeAB.childIndexRevisionA,
-          pathRevisionA: changeAB.pathRevisionA,
-
-          controlRevisionB: changeAB.controlRevisionB,
-          parentIdRevisionB: changeAB.parentIdRevisionB,
-          childIndexRevisionB: changeAB.childIndexRevisionB,
-          pathRevisionB: changeAB.pathRevisionB,
-
-          controlRevisionC: changeBC.controlRevisionB,
-          parentIdRevisionC: changeBC.parentIdRevisionB,
-          childIndexRevisionC: changeBC.childIndexRevisionB,
-          pathRevisionC: changeBC.pathRevisionB,
-
-          diff: changeAB.diff,
-        };
-
-        //add all diffs of revision C
-        for (const diffProperty in conflictingChange.diff) {
-          if (
-            Object.prototype.hasOwnProperty.call(changeBC.diff, diffProperty) &&
-            changeBC.diff[diffProperty].changeType !== UNCHANGED
-          ) {
-            if (conflictingChange.diff[diffProperty].changeType !== UNCHANGED) {
-              //update properties ALREADY differing between A and B
-              conflictingChange.diff[diffProperty].valueC = changeBC.diff[diffProperty].valueB;
-            } else {
-              conflictingChange.diff[diffProperty].valueA = conflictingChange.diff[diffProperty].value;
-              conflictingChange.diff[diffProperty].valueB = conflictingChange.diff[diffProperty].value;
-              conflictingChange.diff[diffProperty].valueC = changeBC.diff[diffProperty].valueB;
-              conflictingChange.diff[diffProperty].changeType = changeBC.diff[diffProperty].changeType;
-            }
-          }
+  let changes = [];
+  for (const changeRemote of changesRemote) {
+    if (changeRemote.changeType === CHANGED) {
+      for (const changeLocal of changesLocal) {
+        if (
+          changeRemote.controlRevisionA.id === changeLocal.controlRevisionA.id ||
+          changeRemote.pathRevisionA === changeLocal.pathRevisionA
+          //&& hasBreakingChange(changeRemote.diff)
+        ) {
+          changes.push(createThreePointChange(changeLocal, changeRemote));
+          break;
         }
-
-        conflictingChanges.push(conflictingChange);
       }
+    } else if (changeRemote.changeType === ADDED) {
+      changes.push(changeRemote);
+    } else if (changeRemote.changeType === REMOVED) {
+      changes.push(changeRemote);
+    } else {
+      changes.push(changeRemote);
     }
   }
-  return conflictingChanges;
+  return changes;
 }
+
+function createThreePointChange(changeLocal, changeRemote) {
+  let threePointChange = {
+    changeType: changeRemote.changeType,
+    diff: changeRemote.diff,
+
+    controlRevisionA: changeLocal.controlRevisionA,
+    parentIdRevisionA: changeLocal.parentIdRevisionA,
+    childIndexRevisionA: changeLocal.childIndexRevisionA,
+    pathRevisionA: changeLocal.pathRevisionA,
+
+    controlRevisionB: changeRemote.controlRevisionA,
+    parentIdRevisionB: changeRemote.parentIdRevisionA,
+    childIndexRevisionB: changeRemote.childIndexRevisionA,
+    pathRevisionB: changeRemote.pathRevisionA,
+
+    controlRevisionC: changeRemote.controlRevisionB,
+    parentIdRevisionC: changeRemote.parentIdRevisionB,
+    childIndexRevisionC: changeRemote.childIndexRevisionB,
+    pathRevisionC: changeRemote.pathRevisionB,
+  };
+
+  //add all diffs of local revision
+  for (const diffProperty in threePointChange.diff) {
+    const remoteChangeProp = threePointChange.diff[diffProperty];
+    const localChangeProp = Object.prototype.hasOwnProperty.call(changeLocal.diff, diffProperty)
+      ? changeLocal.diff[diffProperty]
+      : undefined;
+    remoteChangeProp.valueC = remoteChangeProp.valueB || remoteChangeProp.value;
+    remoteChangeProp.valueB = remoteChangeProp.valueA || remoteChangeProp.value;
+    remoteChangeProp.valueA = localChangeProp ? localChangeProp.valueA || localChangeProp.value : undefined;
+    if (remoteChangeProp.changeType === UNCHANGED && localChangeProp.changeType === CHANGED) {
+      remoteChangeProp.changeType = CHANGED;
+    }
+  }
+
+  if (hasBreakingChange(threePointChange.diff)) {
+    threePointChange.changeType = CONFLICT;
+  }
+
+  return threePointChange;
+}
+
 /*
   returns merged changes from the given revisions
+
+  merge algorithm:
+  - apply all adds and removes in remote revisions to the local revision
+  - apply changes in remote revisions to unchanged local revision
+  - apply changes in remote revision to changed local revision if remote change is breaking change
+  - do not apply changes in remote revision to changed local revision if remote change is NOT breaking change
  */
 export function merge(controlsLocalRevision, controlsRemoteRevisionA, controlsRemoteRevisionB) {
   let mergedControls = [...controlsLocalRevision];
+  //TODO let mergedControls = flatSurveyControls(controlsLocalRevision);
 
   //collect changes
-  let localChanges = diffSurveyVersions(controlsLocalRevision, controlsRemoteRevisionA);
-  let remoteChanges = diffSurveyVersions(controlsRemoteRevisionA, controlsRemoteRevisionB);
+  let changes = diffThreeSurveyVersions(controlsLocalRevision, controlsRemoteRevisionA, controlsRemoteRevisionB);
   //applicate remote changes on local survey
-  for (const change of remoteChanges) {
+  for (const change of changes) {
     switch (change.changeType) {
+      case changeType.CONFLICT:
+        mergedControls = replaceControl(mergedControls, null, change.pathRevisionC, change.controlRevisionC);
+        break;
       case changeType.CHANGED:
-        mergedControls = replaceControlIfBreakingChange(mergedControls, change);
+        //mergedControls = replaceControlIfBreakingChange(mergedControls, change);
+        //DO NOT REPLACE LOCAL VERSION AS IT'S NOT CONFLICTING
         break;
       case changeType.REMOVED:
-        mergedControls = removeControl(mergedControls, change.childIndexRevisionA);
+        mergedControls = removeControl(mergedControls, change.childIndexRevisionB);
         break;
       case changeType.ADDED:
-        mergedControls = insertControl(mergedControls, change.controlRevisionB, change.childIndexRevisionB);
+        mergedControls = insertControl(mergedControls, change.controlRevisionC, change.childIndexRevisionC);
         break;
     }
   }
@@ -276,26 +301,13 @@ export function merge(controlsLocalRevision, controlsRemoteRevisionA, controlsRe
   return mergedControls;
 }
 
-/*
-    replaces controls if one of the following requirements are met:
-    - control has no local change, but remote changes
-    - control has local change and remote breaking changes
- */
-function replaceControlIfBreakingChange(destControls, change) {
-  // sustain local change except allowHide is turned off remotely and hidden is true locally, or allowModify turned off remotely)
-  //TODO also update local revision if noLocalChange was done
-  if (hasBreakingChange(change.diff)) {
-    return destControls.map((c, idx) => (idx === change.childIndexRevisionB ? change.controlRevisionB : c));
-  } else {
-    return destControls;
-  }
-}
-
 function removeControl(destControls, index) {
+  //TODO does not find childs in groups
   return destControls.filter((c, idx) => index !== idx);
 }
 
 function insertControl(destControls, control, index) {
+  //TODO does not find childs in groups
   return destControls.map((c, idx) => (idx === index ? control : c));
 }
 
@@ -307,7 +319,7 @@ function propertyTurnedOff(diff, propertyName) {
   const property = Object.prototype.hasOwnProperty.call(diff, propertyName);
   if (property) {
     return (
-      diff[propertyName].changeType === 'changed' && diff[propertyName].valueA === true && !diff[propertyName].valueB
+      diff[propertyName].changeType === CHANGED && diff[propertyName].valueB === true && !diff[propertyName].valueC
     );
   } else {
     return false;
