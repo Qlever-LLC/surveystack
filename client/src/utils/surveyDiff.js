@@ -196,19 +196,14 @@ export function diffSurveyVersionsConflictingChanges(controlsRevisionA, controls
     (diff) => diff.changeType === CHANGED
   );
   //get changes both in changesAB and changesBC
-  //TODO extract line 117 to 134, coll that to find the matches
   let conflictingChanges = [];
   for (const changeAB of changesAB) {
     for (const changeBC of changesBC) {
       if (
-        changeAB.controlRevisionA.id === changeBC.controlRevisionA.id ||
-        changeAB.pathRevisionA === changeBC.pathRevisionA
+        (changeAB.controlRevisionA.id === changeBC.controlRevisionA.id ||
+          changeAB.pathRevisionA === changeBC.pathRevisionA) &&
+        hasBreakingChange(changeBC.diff)
       ) {
-        /*TODO conflict cases:
-      - allow hide question turned off, but question is hidden: auto unhide, show to user
-      - allow modifications turned off, but modifications done: revert modifications, show to user
-      - other cases: merge modifications, or show to user so he can make it by hand
-      add mode to UI which allows to find conflicts*/
         const conflictingChange = {
           changeType: changeType.CHANGED,
 
@@ -222,10 +217,10 @@ export function diffSurveyVersionsConflictingChanges(controlsRevisionA, controls
           childIndexRevisionB: changeAB.childIndexRevisionB,
           pathRevisionB: changeAB.pathRevisionB,
 
-          controlRevisionC: changeBC.controlRevisionC,
-          parentIdRevisionC: changeBC.parentIdRevisionC,
-          childIndexRevisionC: changeBC.childIndexRevisionC,
-          pathRevisionC: changeBC.pathRevisionC,
+          controlRevisionC: changeBC.controlRevisionB,
+          parentIdRevisionC: changeBC.parentIdRevisionB,
+          childIndexRevisionC: changeBC.childIndexRevisionB,
+          pathRevisionC: changeBC.pathRevisionB,
 
           diff: changeAB.diff,
         };
@@ -247,23 +242,74 @@ export function diffSurveyVersionsConflictingChanges(controlsRevisionA, controls
             }
           }
         }
-        //add all diffs of revision C for properties NOT YET differing between A and B
-        /*
-        for (const diffProperty in changeBC.diff) {
-          if (
-            !Object.prototype.hasOwnProperty.call(conflictingChange.diff, diffProperty) &&
-            diffProperty.changeType !== UNCHANGED
-          ) {
-            conflictingChange.diff[diffProperty].valueC = changeBC.diff[diffProperty].valueB;
-            conflictingChange.diff[diffProperty].valueA = conflictingChange.diff[diffProperty].value;
-            conflictingChange.diff[diffProperty].valueB = conflictingChange.diff[diffProperty].value;
-            conflictingChange.diff[diffProperty].changeType = changeBC.diff[diffProperty].changeType;
-          }
-        }*/
 
         conflictingChanges.push(conflictingChange);
       }
     }
   }
   return conflictingChanges;
+}
+/*
+  returns merged changes from the given revisions
+ */
+export function merge(controlsLocalRevision, controlsRemoteRevisionA, controlsRemoteRevisionB) {
+  let mergedControls = [...controlsLocalRevision];
+
+  //collect changes
+  let localChanges = diffSurveyVersions(controlsLocalRevision, controlsRemoteRevisionA);
+  let remoteChanges = diffSurveyVersions(controlsRemoteRevisionA, controlsRemoteRevisionB);
+  //applicate remote changes on local survey
+  for (const change of remoteChanges) {
+    switch (change.changeType) {
+      case changeType.CHANGED:
+        mergedControls = replaceControlIfBreakingChange(mergedControls, change);
+        break;
+      case changeType.REMOVED:
+        mergedControls = removeControl(mergedControls, change.childIndexRevisionA);
+        break;
+      case changeType.ADDED:
+        mergedControls = insertControl(mergedControls, change.controlRevisionB, change.childIndexRevisionB);
+        break;
+    }
+  }
+
+  return mergedControls;
+}
+
+/*
+    replaces controls if one of the following requirements are met:
+    - control has no local change, but remote changes
+    - control has local change and remote breaking changes
+ */
+function replaceControlIfBreakingChange(destControls, change) {
+  // sustain local change except allowHide is turned off remotely and hidden is true locally, or allowModify turned off remotely)
+  //TODO also update local revision if noLocalChange was done
+  if (hasBreakingChange(change.diff)) {
+    return destControls.map((c, idx) => (idx === change.childIndexRevisionB ? change.controlRevisionB : c));
+  } else {
+    return destControls;
+  }
+}
+
+function removeControl(destControls, index) {
+  return destControls.filter((c, idx) => index !== idx);
+}
+
+function insertControl(destControls, control, index) {
+  return destControls.map((c, idx) => (idx === index ? control : c));
+}
+
+function hasBreakingChange(diff) {
+  return propertyTurnedOff(diff, 'options.allowHide') || propertyTurnedOff(diff, 'options.allowModify');
+}
+
+function propertyTurnedOff(diff, propertyName) {
+  const property = Object.prototype.hasOwnProperty.call(diff, propertyName);
+  if (property) {
+    return (
+      diff[propertyName].changeType === 'changed' && diff[propertyName].valueA === true && !diff[propertyName].valueB
+    );
+  } else {
+    return false;
+  }
 }

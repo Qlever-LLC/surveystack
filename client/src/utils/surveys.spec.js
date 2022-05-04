@@ -428,7 +428,12 @@ describe('surveys', () => {
   });
   test('getPreparedLibraryControls works', () => {
     let librarySurvey = mockLibrarySurvey();
-    let result = getPreparedLibraryControls(librarySurvey);
+    let result = getPreparedLibraryControls(
+      librarySurvey._id,
+      librarySurvey.latestVersion,
+      librarySurvey.revisions[librarySurvey.latestVersion - 1].controls,
+      librarySurvey.resources
+    );
     expect(result.length).toBe(librarySurvey.revisions[librarySurvey.latestVersion - 1].controls.length);
   });
 });

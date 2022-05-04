@@ -112,13 +112,13 @@
           <pane size="80">
             <div style="height: 100%">
               <v-tabs v-if="control.options" v-model="selectedTab" background-color="blue-grey darken-4" dark>
-                <v-tab :disabled="!control.options.relevance.enabled"> Relevance </v-tab>
-                <v-tab :disabled="!control.options.calculate.enabled"> Calculate </v-tab>
-                <v-tab :disabled="!control.options.constraint.enabled"> Constraint </v-tab>
+                <v-tab :disabled="!control.options.relevance.enabled"> Relevance</v-tab>
+                <v-tab :disabled="!control.options.calculate.enabled"> Calculate</v-tab>
+                <v-tab :disabled="!control.options.constraint.enabled"> Constraint</v-tab>
                 <v-tab v-if="control.options.apiCompose" :disabled="!control.options.apiCompose.enabled">
                   API Compose
                 </v-tab>
-                <v-tab v-if="control.type === 'script'"> Script </v-tab>
+                <v-tab v-if="control.type === 'script'"> Script</v-tab>
               </v-tabs>
 
               <code-editor
@@ -175,12 +175,12 @@
               <v-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
                 <v-btn :value="false" dense>
                   <span class="hidden-sm-and-down">desktop</span>
-                  <v-icon right> mdi-monitor </v-icon>
+                  <v-icon right> mdi-monitor</v-icon>
                 </v-btn>
 
                 <v-btn :value="true">
                   <span class="hidden-sm-and-down">mobile</span>
-                  <v-icon right> mdi-cellphone </v-icon>
+                  <v-icon right> mdi-cellphone</v-icon>
                 </v-btn>
               </v-btn-toggle>
             </template>
@@ -189,7 +189,7 @@
 
         <v-overlay :value="enableSaveDraft">
           <v-card>
-            <v-card-text> Please Save Draft to update Survey Preview. </v-card-text>
+            <v-card-text> Please Save Draft to update Survey Preview.</v-card-text>
           </v-card>
         </v-overlay>
       </pane>
@@ -198,8 +198,8 @@
 </template>
 
 <script>
-import { cloneDeep, isEqualWith, isEqual, uniqBy } from 'lodash';
-import { Splitpanes, Pane } from 'splitpanes';
+import { cloneDeep, isEqual, isEqualWith, uniqBy } from 'lodash';
+import { Pane, Splitpanes } from 'splitpanes';
 
 import moment from 'moment';
 
@@ -234,7 +234,6 @@ import {
   getSurveyPositions,
   insertControl,
 } from '@/utils/surveys';
-import { changeType, diffSurveyVersions } from '@/utils/surveyDiff';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -366,61 +365,43 @@ export default {
       this.survey.meta.isLibrary = true;
       this.saveDraft();
     },
-    async addQuestionsFromLibrary(librarySurveyId, rootGroup) {
+    async addQuestionsFromLibrary(librarySurveyId) {
       // load library survey
-      const { data } = await api.get(`/surveys/${librarySurveyId}`);
+      const { data: librarySurvey } = await api.get(`/surveys/${librarySurveyId}`);
 
       // remove old resources copied from the library survey
       this.survey.resources = this.survey.resources.filter((resource) => resource.libraryId !== librarySurveyId);
-
       // add resources from library survey
-      this.survey.resources = this.survey.resources.concat(getPreparedLibraryResources(data));
+      this.survey.resources = this.survey.resources.concat(getPreparedLibraryResources(librarySurvey));
 
       // prepare root group for the library questions to be inserted into
-      if (rootGroup) {
-        rootGroup.libraryVersion = data.latestVersion;
-      } else {
-        // create question group
-        rootGroup = createControlInstance(availableControls.find((c) => c.type === 'group'));
-        rootGroup.name = slugify(data.name);
-        rootGroup.label = data.name;
-        rootGroup.isLibraryRoot = true;
-        rootGroup.libraryId = data._id;
-        rootGroup.libraryVersion = data.latestVersion;
-        this.controlAdded(rootGroup);
-      }
+      let rootGroup = createControlInstance(availableControls.find((c) => c.type === 'group'));
+      rootGroup.name = slugify(librarySurvey.name);
+      rootGroup.label = librarySurvey.name;
+      rootGroup.isLibraryRoot = true;
+      rootGroup.libraryId = librarySurvey._id;
+      rootGroup.libraryVersion = librarySurvey.latestVersion;
+      this.controlAdded(rootGroup);
 
       // add questions from library survey to question group
-      rootGroup.children = getPreparedLibraryControls(data, this.survey.resources);
+      rootGroup.children = getPreparedLibraryControls(
+        librarySurvey._id,
+        librarySurvey.latestVersion,
+        librarySurvey.revisions[librarySurvey.latestVersion - 1].controls,
+        this.survey.resources
+      );
 
       this.showLibrary = false;
     },
-    updateLibraryQuestions(libraryRootGroup) {
-      //merge changes in labrary into the local revision
-      /*
-        1. load remote qsl survey
-        2. collect changes in remote survey
-        3. collect changes between local and remote survey
-        4. run all remote changes on local question
-        5. in case of conflict (local and remote change), sustain local change except they got broken (allowHide/allowModify turned off remotely)
-       */
-      let changes = diffSurveyVersions(this.oldControls, this.controlsRevisionB);
-      for (const change of changes) {
-        switch (change.changeType) {
-          case changeType.CHANGED:
-            //TODO replace the control
-            break;
-          case changeType.REMOVED:
-            //TODO remove the control
-            break;
-          case changeType.ADDED:
-            //TODO add the control
-            break;
-        }
-      }
-
-      libraryRootGroup.children = [];
-      this.addQuestionsFromLibrary(libraryRootGroup.libraryId, libraryRootGroup);
+    async updateLibraryQuestions({ controlIndex, updatedLibraryRootGroup, updatedResources }) {
+      // replace the library's old resources by the new ones
+      this.survey.resources = this.survey.resources.filter(
+        (resource) => resource.libraryId !== updatedLibraryRootGroup.libraryId
+      );
+      this.survey.resources = this.survey.resources.concat(updatedResources);
+      // replace the updatedLibraryRootGroup
+      this.survey.revisions[this.survey.revisions.length - 1].controls.splice(controlIndex, 1, updatedLibraryRootGroup);
+      this.control = updatedLibraryRootGroup;
     },
     closeLibrary() {
       this.showLibrary = false;

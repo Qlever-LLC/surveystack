@@ -130,7 +130,12 @@ describe('add control', () => {
       { inputLabel: 'Data name', type: 'number', value: 'control_name', propPath: 'name' },
       { inputLabel: 'Label', type: 'string', value: 'Foo Bar', propPath: 'label' },
       { inputLabel: 'Hint', type: 'page', value: 'Heads up!', propPath: 'hint' },
-      { inputLabel: 'More info', type: 'instructionsImageSplit', value: 'Info', propPath: 'moreInfo' },
+      {
+        inputLabel: 'More info',
+        type: 'instructionsImageSplit',
+        value: 'Info',
+        propPath: 'moreInfo',
+      },
       { inputLabel: 'QR Code', type: 'string', value: true, propPath: 'options.enableQr' },
       { inputLabel: 'Required', type: 'matrix', value: true, propPath: 'options.required' },
       { inputLabel: 'Private', type: 'matrix', value: true, propPath: 'options.redacted' },
@@ -172,20 +177,57 @@ describe('add control', () => {
         value: true,
         propPath: 'options.hasMultipleSelections',
       },
-      { inputLabel: 'Run Button Label', type: 'script', value: 'Go', propPath: 'options.buttonLabel' },
+      {
+        inputLabel: 'Run Button Label',
+        type: 'script',
+        value: 'Go',
+        propPath: 'options.buttonLabel',
+      },
       {
         inputLabel: 'Allow Multiple Selections',
         type: 'ontology',
         value: true,
         propPath: 'options.hasMultipleSelections',
       },
-      { inputLabel: 'Show Polygon Control', type: 'geoJSON', value: false, propPath: 'options.geoJSON.showPolygon' },
-      { inputLabel: 'Show Line Control', type: 'geoJSON', value: false, propPath: 'options.geoJSON.showLine' },
-      { inputLabel: 'Show Point Control', type: 'geoJSON', value: false, propPath: 'options.geoJSON.showPoint' },
-      { inputLabel: 'Show Circle Control', type: 'geoJSON', value: false, propPath: 'options.geoJSON.showCircle' },
+      {
+        inputLabel: 'Show Polygon Control',
+        type: 'geoJSON',
+        value: false,
+        propPath: 'options.geoJSON.showPolygon',
+      },
+      {
+        inputLabel: 'Show Line Control',
+        type: 'geoJSON',
+        value: false,
+        propPath: 'options.geoJSON.showLine',
+      },
+      {
+        inputLabel: 'Show Point Control',
+        type: 'geoJSON',
+        value: false,
+        propPath: 'options.geoJSON.showPoint',
+      },
+      {
+        inputLabel: 'Show Circle Control',
+        type: 'geoJSON',
+        value: false,
+        propPath: 'options.geoJSON.showCircle',
+      },
       { inputLabel: 'Type', type: 'date', value: 'date-year', propPath: 'options.subtype' },
-      { inputLabel: 'Allow hide', type: 'number', value: true, propPath: 'options.allowHide', isLibrary: true },
-      { inputLabel: 'Allow modify', type: 'date', value: true, propPath: 'options.allowModify', isLibrary: true },
+      {
+        inputLabel: 'Allow hide',
+        type: 'number',
+        value: true,
+        propPath: 'options.allowHide',
+        isLibrary: true,
+      },
+      {
+        inputLabel: 'Allow modify',
+        type: 'date',
+        value: true,
+        propPath: 'options.allowModify',
+        isLibrary: true,
+      },
       // TODO test changing options.hidden
     ].forEach(({ type, inputLabel, value, propPath, propValue = null, openAdvanced = false, isLibrary = false }) => {
       if (propValue === null) {
@@ -244,7 +286,12 @@ describe('add control', () => {
         controls: [
           makeControl({
             type: 'group',
-            children: [makeControl({ type: 'group', children: [makeControl({ type: 'group', id: SELECTED })] })],
+            children: [
+              makeControl({
+                type: 'group',
+                children: [makeControl({ type: 'group', id: SELECTED })],
+              }),
+            ],
           }),
         ],
         expectedPosition: [1],
@@ -391,14 +438,14 @@ describe('question set library', () => {
     const { addQuestionsFromLibrary } = SurveyBuilder.methods;
 
     describe('resources', () => {
-      const runTest = async (surveyResources, qslResources, mergedResources) => {
+      const runTest = async (surveyResources, qslResources, expectedResources) => {
         const component = { ...optionsWithControls().props, controlAdded: jest.fn() };
         component.survey.resources = surveyResources;
         qsl.resources = qslResources;
 
         await addQuestionsFromLibrary.call(component, qsl._id);
 
-        expect(component.survey.resources).toMatchObject(mergedResources);
+        expect(component.survey.resources).toMatchObject(expectedResources);
         return component.survey.resources;
       };
 
@@ -419,7 +466,11 @@ describe('question set library', () => {
       });
       it('sets qsl id/version on the resource', async () => {
         const resourceQsl = { foo: 2 };
-        const resourceCopy = { ...resourceQsl, libraryId: qsl._id, libraryVersion: qsl.latestVersion };
+        const resourceCopy = {
+          ...resourceQsl,
+          libraryId: qsl._id,
+          libraryVersion: qsl.latestVersion,
+        };
         const mergedResources = await runTest([], [resourceQsl], [resourceCopy]);
         expect(mergedResources.libraryIsInherited).toBeFalsy();
       });
@@ -447,82 +498,110 @@ describe('question set library', () => {
         );
       });
 
-      it('updates the root control when it is provided', async () => {
-        const component = { ...optionsWithControls().props, controlAdded: jest.fn() };
-        const rootControl = { libraryVersion: 0 };
-        await addQuestionsFromLibrary.call(component, qsl._id, rootControl);
-        expect(rootControl.libraryVersion).toBe(qsl.latestVersion);
-        expect(component.controlAdded).not.toHaveBeenCalled();
-      });
+      describe('adds the QSL info to the copied controls', () => {
+        it('works with newly added QSL', async () => {
+          const component = { ...optionsWithControls().props, controlAdded: jest.fn() };
+          const num = createControlInstance({ type: 'number', name: 'number_1' });
+          const childSrt = createControlInstance({ type: 'string', name: 'string_1' });
+          const group = createControlInstance({
+            type: 'group',
+            name: 'group_1',
+            children: [childSrt],
+          });
+          qsl.revisions[1].controls = cloneDeep([num, group]);
 
-      // run the same test twice: as adding a new QSL and as a QSL update
-      const newOrUpdate = (name, runTest) => {
-        describe(name, () => {
-          it('works with newly added QSL', async () => {
-            await runTest(async (component, id) => {
-              await addQuestionsFromLibrary.call(component, id);
-              return component.controlAdded.mock.calls[0][0];
-            });
-          });
-          it('updates already added QSL', async () => {
-            await runTest(async (component, id, rootControl = {}) => {
-              await addQuestionsFromLibrary.call(component, id, rootControl);
-              return rootControl;
-            });
-          });
+          await addQuestionsFromLibrary.call(component, qsl._id);
+          const addedGroup = component.controlAdded.mock.calls[0][0];
+
+          const libInfo = { libraryId: qsl._id, libraryVersion: qsl.latestVersion };
+          expect(addedGroup.children).toMatchObject([
+            { ...num, ...libInfo, id: expect.not.stringMatching(num.id) },
+            {
+              ...group,
+              ...libInfo,
+              id: expect.not.stringMatching(group.id),
+              children: [{ ...childSrt, ...libInfo, id: expect.not.stringMatching(childSrt.id) }],
+            },
+          ]);
+          expect(addedGroup.children[0].libraryIsInherited).toBeFalsy();
+          expect(addedGroup.children[1].libraryIsInherited).toBeFalsy();
+          expect(addedGroup.children[1].children[0].libraryIsInherited).toBeFalsy();
         });
+
+        it('sets the inherited flag if the QSL control comes from another QSL', async () => {
+          const otherLibInfo = { libraryId: 'other_qsl', libraryVersion: 3 };
+          const component = { ...optionsWithControls().props, controlAdded: jest.fn() };
+          const num = createControlInstance({ type: 'number', name: 'number_1' });
+          const childSrt = createControlInstance({
+            type: 'string',
+            name: 'string_1',
+            ...otherLibInfo,
+          });
+          const group = createControlInstance({
+            type: 'group',
+            name: 'group_1',
+            children: [childSrt],
+            ...otherLibInfo,
+            isLibraryRoot: true,
+          });
+          qsl.revisions[1].controls = cloneDeep([num, group]);
+
+          await addQuestionsFromLibrary.call(component, qsl._id);
+          const addedGroup = component.controlAdded.mock.calls[0][0];
+
+          expect(addedGroup.children).toMatchObject([
+            {
+              ...num,
+              libraryId: qsl._id,
+              libraryVersion: qsl.latestVersion,
+              id: expect.not.stringMatching(num.id),
+            },
+            {
+              ...group,
+              libraryIsInherited: true,
+              id: expect.not.stringMatching(group.id),
+              children: [
+                {
+                  ...childSrt,
+                  id: expect.not.stringMatching(childSrt.id),
+                  libraryIsInherited: true,
+                },
+              ],
+            },
+          ]);
+          expect(addedGroup.children[0].libraryIsInherited).toBeFalsy();
+        });
+      });
+    });
+  });
+
+  describe('methods.updateLibraryQuestions', () => {
+    const { updateLibraryQuestions } = SurveyBuilder.methods;
+
+    describe('resources', () => {
+      const runTest = async (surveyResources, updatedResources, expectedResources) => {
+        const component = { ...optionsWithControls().props, controlAdded: jest.fn() };
+        component.survey.resources = surveyResources;
+        qsl.resources = updatedResources;
+        await updateLibraryQuestions.call(component, {
+          controlIndex: 0,
+          updatedLibraryRootGroup: { libraryId: qsl._id },
+          updatedResources,
+        });
+
+        expect(component.survey.resources).toMatchObject(expectedResources);
+        return component.survey.resources;
       };
 
-      newOrUpdate('adds the QSL info to the copied controls', async (runMethod) => {
-        const component = { ...optionsWithControls().props, controlAdded: jest.fn() };
-        const num = createControlInstance({ type: 'number', name: 'number_1' });
-        const childSrt = createControlInstance({ type: 'string', name: 'string_1' });
-        const group = createControlInstance({ type: 'group', name: 'group_1', children: [childSrt] });
-        qsl.revisions[1].controls = cloneDeep([num, group]);
-
-        const addedGroup = await runMethod(component, qsl._id);
-
-        const libInfo = { libraryId: qsl._id, libraryVersion: qsl.latestVersion };
-        expect(addedGroup.children).toMatchObject([
-          { ...num, ...libInfo, id: expect.not.stringMatching(num.id) },
-          {
-            ...group,
-            ...libInfo,
-            id: expect.not.stringMatching(group.id),
-            children: [{ ...childSrt, ...libInfo, id: expect.not.stringMatching(childSrt.id) }],
-          },
-        ]);
-        expect(addedGroup.children[0].libraryIsInherited).toBeFalsy();
-        expect(addedGroup.children[1].libraryIsInherited).toBeFalsy();
-        expect(addedGroup.children[1].children[0].libraryIsInherited).toBeFalsy();
+      it('updates resources from the same QSL', async () => {
+        const resourceCurrent = { foo: 1, libraryId: qsl._id };
+        const resourceFromQsl = { bar: 2, libraryId: qsl._id };
+        await runTest([resourceCurrent], [resourceFromQsl], [resourceFromQsl]);
       });
-
-      newOrUpdate('sets the inherited flag if the QSL control comes from another QSL', async (runMethod) => {
-        const otherLibInfo = { libraryId: 'other_qsl', libraryVersion: 3 };
-        const component = { ...optionsWithControls().props, controlAdded: jest.fn() };
-        const num = createControlInstance({ type: 'number', name: 'number_1' });
-        const childSrt = createControlInstance({ type: 'string', name: 'string_1', ...otherLibInfo });
-        const group = createControlInstance({
-          type: 'group',
-          name: 'group_1',
-          children: [childSrt],
-          ...otherLibInfo,
-          isLibraryRoot: true,
-        });
-        qsl.revisions[1].controls = cloneDeep([num, group]);
-
-        const addedGroup = await runMethod(component, qsl._id);
-
-        expect(addedGroup.children).toMatchObject([
-          { ...num, libraryId: qsl._id, libraryVersion: qsl.latestVersion, id: expect.not.stringMatching(num.id) },
-          {
-            ...group,
-            libraryIsInherited: true,
-            id: expect.not.stringMatching(group.id),
-            children: [{ ...childSrt, id: expect.not.stringMatching(childSrt.id), libraryIsInherited: true }],
-          },
-        ]);
-        expect(addedGroup.children[0].libraryIsInherited).toBeFalsy();
+      it('removes old resources of the same QSL', async () => {
+        const resourceSameLib = { libraryId: qsl._id };
+        const resourceOther = { libraryId: 'not_related_to_this_qsl' };
+        await runTest([resourceSameLib, resourceOther], [], [resourceOther]);
       });
     });
   });

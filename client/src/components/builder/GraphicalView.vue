@@ -149,10 +149,9 @@
       </v-dialog>
       <update-library-dialog
         v-if="updateLibraryDialogIsVisible"
-        v-model="updateLibraryDialogIsVisible"
-        :from-survey="updateControl"
+        :library-root-group="updateLibraryRootGroup"
         :to-survey="updateToLibrary"
-        @ok="updateLibraryConfirmed"
+        @update="updateLibraryConfirmed(idx, $event)"
         @cancel="updateLibraryCancelled"
       />
     </v-card>
@@ -190,7 +189,7 @@ export default {
       deleteQuestionIndex: null,
       updateLibraryDialogIsVisible: false,
       updateToLibrary: null,
-      updateControl: null,
+      updateLibraryRootGroup: null,
       scaleStyles: {},
       hoveredControl: null,
     };
@@ -273,22 +272,26 @@ export default {
     openLibrary(libraryId) {
       this.$emit('open-library', libraryId);
     },
-    async updateLibrary(control) {
-      this.updateControl = control;
-      const { data } = await api.get(`/surveys/${control.libraryId}`);
+    async updateLibrary(updateLibraryRootGroup) {
+      this.updateLibraryRootGroup = updateLibraryRootGroup;
+      const { data } = await api.get(`/surveys/${updateLibraryRootGroup.libraryId}`);
       this.updateToLibrary = data;
       this.updateLibraryDialogIsVisible = true;
     },
-    updateLibraryConfirmed() {
-      this.updateToLibrary = null;
+    updateLibraryConfirmed(idx, { updatedLibraryRootGroup, updatedResources }) {
       this.updateLibraryDialogIsVisible = false;
-      this.$emit('update-library-questions', this.updateControl);
-      this.updateControl = null;
+      this.$emit('update-library-questions', {
+        controlIndex: idx,
+        updatedLibraryRootGroup: updatedLibraryRootGroup,
+        updatedResources: updatedResources,
+      });
+      this.updateToLibrary = null;
+      this.updateLibraryRootGroup = null;
     },
     updateLibraryCancelled() {
       this.updateToLibrary = null;
       this.updateLibraryDialogIsVisible = false;
-      this.updateControl = null;
+      this.updateLibraryRootGroup = null;
     },
     handleCardHoverChange({ control, isHovering }) {
       if (isHovering) {

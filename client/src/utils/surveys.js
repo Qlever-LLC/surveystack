@@ -153,14 +153,21 @@ export const getPreparedLibraryResources = (librarySurvey) => {
 
 /**
  * Returns new controls copied from library survey
- * @param librarySurvey
+ * @param librarySurveyId
+ * @param librarySurveyLatestVersion
+ * @param controlsToAdd
  * @param newResources an array of resources containing updated id's, with the old id stored in the origin property
  * @returns [controls]
  */
-export const getPreparedLibraryControls = (librarySurvey, newResources) => {
-  return librarySurvey.revisions[librarySurvey.latestVersion - 1].controls.map((controlToAdd) => {
+export const getPreparedLibraryControls = (
+  librarySurveyId,
+  librarySurveyLatestVersion,
+  controlsToAdd,
+  newResources
+) => {
+  return controlsToAdd.map((controlToAdd) => {
     changeRecursive(controlToAdd, (control) => {
-      prepareToAddFromLibrary(control, librarySurvey._id, librarySurvey.latestVersion);
+      prepareToAddFromLibrary(control, librarySurveyId, librarySurveyLatestVersion);
       replaceResourceReferenceId(control, newResources);
     });
     return controlToAdd;

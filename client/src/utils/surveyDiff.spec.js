@@ -1,4 +1,4 @@
-import { flatSurveyControls, diffControls, changeType, diffSurveyVersions } from './surveyDiff';
+import { flatSurveyControls, diffControls, changeType, diffSurveyVersions, merge } from './surveyDiff';
 import { cloneDeep, find, uniqueId, set, map } from 'lodash';
 import { createControlInstance } from './surveyConfig';
 
@@ -371,5 +371,14 @@ describe('surveyDiff', () => {
     it.todo('returns conflicting changes');
     it.todo('contains the property values for revisions A,B and C of a diff');
     it.todo('does not return non-conflicting changes');
+  });
+  describe('merge', () => {
+    it.todo('adds new controls');
+    it.todo('removes deleted controls');
+    it.todo('replaces changed controls if no local change');
+    it.todo('not replaces changed controls if local change');
+    it.todo(
+      'replaces changed controls if local change but allowhide or allowmodify is turned off in new remote revision'
+    );
   });
 });
