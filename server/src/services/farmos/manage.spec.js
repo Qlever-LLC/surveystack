@@ -10,7 +10,7 @@ import {
   getPlans,
   getPlanForGroup,
   deletePlan,
-  setPlanNameForGroup,
+  setPlanForGroup,
 } from './manage';
 
 const init = async () => {
@@ -86,7 +86,10 @@ describe('manageFarmOS', () => {
 
   it('test-plans', async () => {
     const { group, admin1, user1 } = await init();
-    await setPlanNameForGroup(group._id, 'test-plan');
+
+    // TODO create plan
+
+    await setPlanForGroup(group._id, 'test-plan');
     const res = await getPlanForGroup(group._id);
     expect(res).toBe('test-plan');
 
@@ -99,7 +102,7 @@ describe('manageFarmOS', () => {
     const deleted = await getPlans();
     expect(deleted.length).toBe(0);
 
-    await setPlanNameForGroup(group._id, null);
+    await setPlanForGroup(group._id, null);
     const nullPlan = await getPlanForGroup(group._id);
     expect(nullPlan).toBe(null);
   });

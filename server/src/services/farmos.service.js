@@ -378,15 +378,15 @@ export const createInstance = async (
     rejectUnauthorized: false,
   };
 
-  console.log('creat instance param: url', url);
-  console.log('creat instance param: email', email);
-  console.log('creat instance param: site_name', site_name);
-  console.log('creat instance param: registrant', registrant);
-  console.log('creat instance param: location', location);
-  console.log('creat instance param: units', units);
-  console.log('creat instance param: tags', tags);
-  console.log('creat instance param: timezone', timezone);
-  console.log('creat instance param: planName', planName);
+  // console.log('creat instance param: url', url);
+  // console.log('creat instance param: email', email);
+  // console.log('creat instance param: site_name', site_name);
+  // console.log('creat instance param: registrant', registrant);
+  // console.log('creat instance param: location', location);
+  // console.log('creat instance param: units', units);
+  // console.log('creat instance param: tags', tags);
+  // console.log('creat instance param: timezone', timezone);
+  // console.log('creat instance param: planName', planName);
 
   const agent = new https.Agent(agentOptions);
   const body = {
@@ -412,5 +412,3 @@ export const createInstance = async (
   });
   return r;
 };
-
-export default { isFarmosUrlAvailable, handle, testAggregatorConnection };

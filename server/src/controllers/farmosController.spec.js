@@ -15,7 +15,7 @@ import { createGroup, createReq, createRes, createUser } from '../testUtils';
 import {
   mapFarmOSInstanceToUser,
   mapFarmOSInstanceToGroupAdmin,
-  setPlanNameForGroup,
+  setPlanForGroup,
 } from '../services/farmos/manage';
 
 import {
@@ -271,7 +271,9 @@ describe('farmos-controller', () => {
     };
 
     const { group, admin1, user1 } = await init();
-    setPlanNameForGroup(group._id, 'unit-test-plan');
+
+    // TODO create Plan (id, name, url)
+    setPlanForGroup(group._id, 'unit-test-plan');
 
     let body = {
       groupId: group._id + '',

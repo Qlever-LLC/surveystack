@@ -80,6 +80,7 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
         parent: parentData,
         log: (msg) => console.log(msg),
       });
+
       item.result = result;
     } catch (error) {
       item.error = error;
