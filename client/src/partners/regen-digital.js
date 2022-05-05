@@ -1,5 +1,5 @@
 export default {
-  name: 'Regen Farmers Mutual',
+  name: 'Regen Digital',
   domain: 'regen-digital',
   id: '6171ca059d62e10001356510',
   slug: 'regen-farmers-mutual',
