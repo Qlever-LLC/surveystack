@@ -661,7 +661,10 @@ const handleApiCompose = async (submissionEntities, user) => {
     console.log('error handling hylo', error);
     throw {
       message: `error submitting to hylo ${error}`,
-      hylo: error.messages,
+      // TODO remove debug
+      hyloApi: process.env.HYLO_CLIENT_SECRET || 'no env var',
+      hyloS: process.env.HYLO_CLIENT_SECRET?.length || 'no env var',
+      hylo: error,
     };
   }
 
