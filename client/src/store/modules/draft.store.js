@@ -335,7 +335,8 @@ const actions = {
   goto({ commit }, path) {
     commit('GOTO', path);
   },
-  showOverview({ commit }, show) {
+  showOverview({ commit, dispatch }, show) {
+    dispatch('calculateApiCompose');
     commit('SHOW_OVERVIEW', show);
   },
   showConfirmSubmission({ commit }, show) {

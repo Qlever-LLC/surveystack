@@ -47,4 +47,23 @@ describe('sendPasswordResetMail', () => {
     await sendPasswordResetMail(createReq({ body: { email: user.email } }), res);
     expect(res.send).toHaveBeenCalledWith({ ok: true });
   });
+
+  it('handles `useLegacy` query param', async () => {
+    const user = await createUser();
+    const origin = `https://foo.bar`;
+    const req = createReq({
+      body: { email: user.email },
+      query: { useLegacy: 'true' },
+      headers: { origin },
+    });
+    await sendPasswordResetMail(req, await createRes());
+    expect(mailService.send).toHaveBeenCalledTimes(1);
+    expect(mailService.send).toHaveBeenCalledWith({
+      to: user.email,
+      subject: 'Link to reset your password',
+      text: expect.stringContaining(
+        `${origin}/auth/reset-password?token=${user.token}&email=${user.email}`
+      ),
+    });
+  });
 });

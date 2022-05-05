@@ -3,17 +3,15 @@
 /**
  * ApiCompose
  *
+ * WARNING: This is for FARMOS 1.0 and won't work anymore
+ *
  * @param {submission} submission
  */
 function apiCompose(submission) {
-  const request = populatePlanting(
-    submission.data.crop,
-    submission.data.field,
-  );
+  const request = populatePlanting(submission.data.crop, submission.data.field);
 
   return request;
 }
-
 
 /**
  * Helper function to populate the request
@@ -29,10 +27,8 @@ function populatePlanting(cropAnswer, field) {
     throw 'Please select field';
   }
 
-
   const crop = cropAnswer.value;
   const farmUrl = field.value.url;
-
 
   return {
     type: 'farmos',
@@ -45,8 +41,6 @@ function populatePlanting(cropAnswer, field) {
     },
   };
 }
-
-
 
 /*
 Simple example to demonstrate how to create a planting on farmos.

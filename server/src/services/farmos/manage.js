@@ -21,9 +21,10 @@ export const asMongoId = (source) =>
  */
 export const mapFarmOSInstanceToUser = async (userId, instanceName, owner) => {
   const _id = new ObjectId();
+
   await db.collection('farmos-instances').insertOne({
     _id,
-    userId,
+    userId: asMongoId(userId),
     instanceName,
     owner,
   });
@@ -43,10 +44,10 @@ export const mapFarmOSInstanceToGroupAdmin = async (adminUserId, groupId, instan
   const _id = new ObjectId();
   await db.collection('farmos-instances').insertOne({
     _id,
-    userId: adminUserId,
+    userId: asMongoId(adminUserId),
     instanceName,
     owner: false,
-    groupId,
+    groupId: asMongoId(groupId),
   });
 
   return {
@@ -96,7 +97,10 @@ export const createFarmOSInstanceForUserAndGroup = async (userId, groupId, insta
  */
 export const listFarmOSInstancesForUser = async (userId) => {
   // instances owned by user
-  const usersInstances = await db.collection('farmos-instances').find({ userId }).toArray();
+  const usersInstances = await db
+    .collection('farmos-instances')
+    .find({ userId: asMongoId(userId) })
+    .toArray();
   return usersInstances;
 };
 
@@ -153,7 +157,7 @@ export const getSuperAllFarmosMappings = async () => {
   };
 };
 
-export const addFarmToSurveystackGroup = async (instanceName, groupId) => {
+export const addFarmToSurveystackGroup = async (instanceName, groupId, planName) => {
   const res = await db
     .collection('farmos-group-mapping')
     .find({
@@ -174,17 +178,12 @@ export const addFarmToSurveystackGroup = async (instanceName, groupId) => {
     throw boom.badData('group not found');
   }
 
-  const { getAllFarmsWithTags } = config();
-  const aggregatorFarms = await getAllFarmsWithTags();
-  if (!aggregatorFarms.find((f) => f.url === instanceName)) {
-    throw boom.badData('instance not found in aggregator');
-  }
-
   const _id = new ObjectId();
   await db.collection('farmos-group-mapping').insertOne({
     _id,
     instanceName,
     groupId: asMongoId(groupId),
+    planName,
   });
 };
 
@@ -225,12 +224,6 @@ export const addFarmToUser = async (instanceName, userId, groupId, owner) => {
     }
   }
 
-  const { getAllFarmsWithTags } = config();
-  const aggregatorFarms = await getAllFarmsWithTags();
-  if (!aggregatorFarms.find((f) => f.url === instanceName)) {
-    throw boom.badData('instance not found in aggregator');
-  }
-
   const _id = new ObjectId();
   const doc = {
     _id,
@@ -240,7 +233,7 @@ export const addFarmToUser = async (instanceName, userId, groupId, owner) => {
   };
 
   if (groupId) {
-    doc.groupId = groupId;
+    doc.groupId = asMongoId(groupId);
   }
   await db.collection('farmos-instances').insertOne(doc);
 };
@@ -248,8 +241,48 @@ export const addFarmToUser = async (instanceName, userId, groupId, owner) => {
 export const removeFarmFromUser = async (instanceName, userId, groupId) => {
   const filter = { instanceName, userId: asMongoId(userId) };
   if (groupId) {
-    filter.groupId = groupId;
+    filter.groupId = asMongoId(groupId);
   }
 
+  console.log('filter', filter);
+
   await db.collection('farmos-instances').deleteMany(filter);
+};
+
+export const createPlan = async (planName, planUrl) => {
+  const _id = new ObjectId();
+
+  return await db.collection('farmos-plans').insertOne({
+    _id,
+    planName,
+    planUrl,
+  });
+};
+
+export const getPlans = async () => {
+  return await db.collection('farmos-plans').find().toArray();
+};
+
+export const deletePlan = async (planId) => {
+  const filter = { _id: asMongoId(planId) };
+  await db.collection('farmos-plans').deleteMany(filter);
+};
+
+export const setPlanNameForGroup = async (groupId, planName) => {
+  await db
+    .collection('groups')
+    .update({ _id: asMongoId(groupId) }, { $set: { farmOsPlanName: planName } });
+};
+
+export const getPlanForGroup = async (groupId) => {
+  const arr = await db
+    .collection('groups')
+    .find({ _id: asMongoId(groupId) }, { projection: { farmOsPlanName: 1 } })
+    .toArray();
+
+  if (arr.length > 0) {
+    return arr[0].farmOsPlanName || null;
+  } else {
+    return null;
+  }
 };

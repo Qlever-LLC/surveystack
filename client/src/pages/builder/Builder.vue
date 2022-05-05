@@ -57,6 +57,13 @@
       additionalMessage="<span class='caption'>Note: submissions from Builder are automatically archived. Please browse archived submissions to view this result.</span>"
     />
 
+    <result-dialog
+      v-model="showApiComposeErrors"
+      :items="apiComposeErrors"
+      title="ApiCompose Errors"
+      @close="showApiComposeErrors = false"
+    />
+
     <v-snackbar v-model="showSnackbar" :timeout="4000">
       {{ snackbarMessage | capitalize }}
       <v-btn color="grey" text @click="showSnackbar = false">Close</v-btn>
@@ -94,6 +101,7 @@ import resultMixin from '@/components/ui/ResultsMixin';
 import { createSurvey, updateControls } from '@/utils/surveys';
 import { isIos, isSafari } from '@/utils/compatibility';
 import { uploadFileResources } from '@/utils/resources';
+import { getApiComposeErros } from '@/utils/draft';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
@@ -124,6 +132,8 @@ export default {
       submitting: false,
       showInvalidPlatformModal: false,
       isIos: () => isIos(),
+      apiComposeErrors: [],
+      showApiComposeErrors: false,
     };
   },
   mounted() {
@@ -169,6 +179,12 @@ export default {
       }
     },
     async submitSubmission({ payload }) {
+      this.apiComposeErrors = getApiComposeErros(this.survey, payload);
+      if (this.apiComposeErrors.length > 0) {
+        this.showApiComposeErrors = true;
+        return;
+      }
+
       this.submitting = true;
       try {
         await uploadFileResources(this.$store, payload, false);
@@ -189,6 +205,9 @@ export default {
       } catch (error) {
         console.log('error', error);
         const { message } = error.response.data;
+        console.log('message', message);
+        this.apiComposeErrors = [{ body: message, error: true }];
+        this.showApiComposeErrors = true;
         this.snack(message);
         console.log(error);
       }

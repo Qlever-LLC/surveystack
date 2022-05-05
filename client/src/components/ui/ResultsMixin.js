@@ -46,11 +46,6 @@ export default {
             }
 
             hasErrors = true;
-          } else {
-            this.resultItems.push({
-              title: 'FarmOS success:',
-              body: farmos.uri || farmos.message,
-            });
           }
         });
       }
