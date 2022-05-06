@@ -119,6 +119,7 @@ export const changeRecursive = (control, changeFn) => {
     });
   }
 };
+
 /**
  * Replaces a control by its path
  * @param controls control list to be changed
@@ -136,6 +137,30 @@ export const replaceControl = (controls, parentPath, replacePath, replacementCon
       return control;
     } else {
       return control;
+    }
+  });
+};
+
+/**
+ * Replaces a control by its path
+ * @param controls control list to be changed
+ * @param parentPath parent path of the controls passed
+ * @param removePath  path of the control to be replaced
+ */
+export const removeControl = (controls, parentPath, removePath) => {
+  return controls.filter((control) => {
+    let currentPath = parentPath ? [parentPath, control.name].join('.') : control.name;
+    if (currentPath === removePath) {
+      return false;
+    } else if (control.children) {
+      control.children = removeControl(control.children, currentPath, removePath);
+      if (control.children.length > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return true;
     }
   });
 };

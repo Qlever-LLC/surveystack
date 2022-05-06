@@ -1,6 +1,6 @@
 import { get, isArray, isEqual, isNil, isObjectLike, pull, toPath, uniq } from 'lodash';
 import flatten from 'flat';
-import { replaceControl } from '@/utils/surveys';
+import { getPosition, insertControl, removeControl, replaceControl } from '@/utils/surveys';
 
 export const changeType = {
   CHANGED: 'changed',
@@ -282,6 +282,7 @@ export function merge(controlsLocalRevision, controlsRemoteRevisionA, controlsRe
   //applicate remote changes on local survey
   for (const change of changes) {
     switch (change.changeType) {
+      //TODO move is not detected as a change, thus moves are lost on the target
       case changeType.CONFLICT:
         mergedControls = replaceControl(mergedControls, null, change.pathRevisionC, change.controlRevisionC);
         break;
@@ -290,25 +291,23 @@ export function merge(controlsLocalRevision, controlsRemoteRevisionA, controlsRe
         //DO NOT REPLACE LOCAL VERSION AS IT'S NOT CONFLICTING
         break;
       case changeType.REMOVED:
-        mergedControls = removeControl(mergedControls, change.childIndexRevisionB);
+        mergedControls = removeControl(mergedControls, null, change.pathRevisionA);
         break;
-      case changeType.ADDED:
-        mergedControls = insertControl(mergedControls, change.controlRevisionC, change.childIndexRevisionC);
+      case changeType.ADDED: {
+        const position = getPosition(change.controlRevisionB, controlsRemoteRevisionB);
+        // change position to the control before/above, cause that's expected by insertControl
+        if (position[position.length - 1] === 0) {
+          position.pop(); //move up
+        } else {
+          position[position.length - 1]--; //move back
+        }
+        insertControl(change.controlRevisionB, mergedControls, position, false);
         break;
+      }
     }
   }
 
   return mergedControls;
-}
-
-function removeControl(destControls, index) {
-  //TODO does not find childs in groups
-  return destControls.filter((c, idx) => index !== idx);
-}
-
-function insertControl(destControls, control, index) {
-  //TODO does not find childs in groups
-  return destControls.map((c, idx) => (idx === index ? control : c));
 }
 
 function hasBreakingChange(diff) {

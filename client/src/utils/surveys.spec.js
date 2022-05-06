@@ -7,6 +7,7 @@ import {
   getPreparedLibraryResources,
   getPreparedLibraryControls,
   prepareToAddFromLibrary,
+  removeControl,
 } from './surveys';
 import { resourceTypes } from '@/utils/resources';
 
@@ -404,6 +405,7 @@ describe('surveys', () => {
     expect(group.children[1].children[1].name).toBe('group_5_x');
   });
   test.todo('replaceControl works');
+  test.todo('removeControl works');
   test('prepareToAddFromLibrary sets libraryId to librarySurvey.id for resources/controls not inherited from nested question sets and does not set libraryIsInherited', () => {
     let librarySurvey = mockLibrarySurvey();
     prepareToAddFromLibrary(librarySurvey.resources[0], librarySurvey._id, librarySurvey.latestVersion);
