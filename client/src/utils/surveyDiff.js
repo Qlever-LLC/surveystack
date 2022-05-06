@@ -205,7 +205,6 @@ export function diffThreeSurveyVersions(controlsLocalRevision, controlsRemoteRev
         if (
           changeRemote.controlRevisionA.id === changeLocal.controlRevisionA.id ||
           changeRemote.pathRevisionA === changeLocal.pathRevisionA
-          //&& hasBreakingChange(changeRemote.diff)
         ) {
           changes.push(createThreePointChange(changeLocal, changeRemote));
           break;
@@ -225,6 +224,7 @@ export function diffThreeSurveyVersions(controlsLocalRevision, controlsRemoteRev
 function createThreePointChange(changeLocal, changeRemote) {
   let threePointChange = {
     changeType: changeRemote.changeType,
+    hasLocalChange: false,
     diff: changeRemote.diff,
 
     controlRevisionA: changeLocal.controlRevisionA,
@@ -255,6 +255,10 @@ function createThreePointChange(changeLocal, changeRemote) {
     if (remoteChangeProp.changeType === UNCHANGED && localChangeProp.changeType === CHANGED) {
       remoteChangeProp.changeType = CHANGED;
     }
+    if (localChangeProp.changeType === CHANGED) {
+      //add flog for easier detection by merge function
+      threePointChange.hasLocalChange = true;
+    }
   }
 
   if (hasBreakingChange(threePointChange.diff)) {
@@ -282,13 +286,14 @@ export function merge(controlsLocalRevision, controlsRemoteRevisionA, controlsRe
   //applicate remote changes on local survey
   for (const change of changes) {
     switch (change.changeType) {
-      //TODO move is not detected as a change, thus moves are lost on the target
       case changeType.CONFLICT:
         mergedControls = replaceControl(mergedControls, null, change.pathRevisionC, change.controlRevisionC);
         break;
       case changeType.CHANGED:
-        //mergedControls = replaceControlIfBreakingChange(mergedControls, change);
-        //DO NOT REPLACE LOCAL VERSION AS IT'S NOT CONFLICTING
+        //only merge remote changes into local revision if local revision was not changed
+        if (!change.hasLocalChange) {
+          mergedControls = replaceControl(mergedControls, null, change.pathRevisionC, change.controlRevisionC);
+        }
         break;
       case changeType.REMOVED:
         mergedControls = removeControl(mergedControls, null, change.pathRevisionA);
