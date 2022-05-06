@@ -24,10 +24,11 @@
       <div v-if="hasConflicts">
         <v-card-text class="ml-2 my-3" style="margin-bottom: -20px">
           <h3>
-            <v-icon color="warning">mdi-alert</v-icon>&nbsp;<b
+            <v-icon color="warning">mdi-alert</v-icon>&nbsp;
+            <b
               >You have modified this question set compared to Version {{ libraryRootGroup.libraryVersion }}. Your
-              changes marked as CONFLICT will be reset to the latest library version.</b
-            >
+              changes marked as CONFLICT will be reset to the latest library version.
+            </b>
           </h3>
         </v-card-text>
       </div>
@@ -51,6 +52,23 @@
         <v-btn @click="$emit('cancel')" color="primary" text> Cancel</v-btn>
       </v-card-actions>
     </v-card>
+    <v-dialog v-if="conflictConfirmModalIsVisible" v-model="conflictConfirmModalIsVisible" max-width="290">
+      <v-card class="">
+        <v-card-title> Confirm Update</v-card-title>
+        <v-card-text class="mt-4">
+          <v-icon color="warning">mdi-alert</v-icon>&nbsp;
+          <b
+            >You have modified this question set compared to Version {{ libraryRootGroup.libraryVersion }}. Your changes
+            marked as CONFLICT will be reset to the latest library version.
+          </b>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn text @click.stop="conflictConfirmModalIsVisible = false"> Cancel</v-btn>
+          <v-btn text color="red" @click.stop="updateConfirmed"> Update</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-dialog>
 </template>
 
@@ -81,6 +99,7 @@ export default {
       remoteOldRevisionControls: null,
       remoteNewRevisionControls: null,
       hasConflicts: false,
+      conflictConfirmModalIsVisible: false,
     });
 
     state.remoteOldRevisionControls = props.toSurvey.revisions.find(
@@ -97,6 +116,14 @@ export default {
     );
 
     function update() {
+      if (state.hasConflicts) {
+        state.conflictConfirmModalIsVisible = true;
+      } else {
+        updateConfirmed();
+      }
+    }
+
+    function updateConfirmed() {
       //update updatedLibraryRootGroup
       let updatedLibraryRootGroup = { ...props.libraryRootGroup };
       updatedLibraryRootGroup.libraryVersion = props.toSurvey.latestVersion;
@@ -118,9 +145,11 @@ export default {
       //emit containing updated controls and resources
       emit('update', { updatedLibraryRootGroup, updatedResources });
     }
+
     return {
       ...toRefs(state),
       update,
+      updateConfirmed,
     };
   },
 };
