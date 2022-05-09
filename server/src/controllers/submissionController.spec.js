@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
-import submissionController from './submissionController';
+import submissionController, { buildPipeline } from './submissionController';
+import { createReq, createRes } from '../testUtils';
 
 const { getSubmissionsCsv, prepareSubmissionsToQSLs } = submissionController;
 
@@ -628,5 +629,36 @@ describe('submissionController', () => {
       expect(QSLSubmissions[1].data.text_1.meta.permissions).toStrictEqual(['admin']);
       expect(QSLSubmissions[2].data.text_1.meta.permissions).toStrictEqual(['admin']);
     });
+  });
+});
+
+describe('buildPipeline', () => {
+  // TODO add tests for the rest of the operations ( $match, $redact, $project)
+
+  it('adds default $sort operation to pipeline', async () => {
+    const pipeline = await buildPipeline(createReq({ query: {} }), await createRes());
+    expect(pipeline).toContainEqual({ $sort: { _id: -1 } });
+  });
+
+  it('adds $sort opetaion from query parameter', async () => {
+    const pipeline = await buildPipeline(
+      createReq({ query: { sort: JSON.stringify({ 'meta.dateCreated': -1 }) } }),
+      await createRes()
+    );
+    expect(pipeline).toContainEqual({ $sort: { 'meta.dateCreated': -1 } });
+  });
+  it('skips sort operation when `?unsorted=true`', async () => {
+    const pipeline = await buildPipeline(
+      createReq({ query: { unsorted: 'true' } }),
+      await createRes()
+    );
+    expect(pipeline).not.toContainEqual(expect.objectContaining({ $sort: expect.anything() }));
+  });
+  it('skips sort operation when `query.sort` is set but `query.unsorted="true"`', async () => {
+    const pipeline = await buildPipeline(
+      createReq({ query: { unsorted: 'true', sort: JSON.stringify({ _id: 1 }) } }),
+      await createRes()
+    );
+    expect(pipeline).not.toContainEqual(expect.objectContaining({ $sort: expect.anything() }));
   });
 });
