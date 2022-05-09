@@ -10,7 +10,7 @@ const groupSettingDefaults = {
   groupHasCoffeeShopAccess: false,
   allowSubgroupsToJoinCoffeeShop: false,
   maxSeats: 20,
-  planId: null,
+  planIds: [],
 };
 
 const config = () => {
@@ -296,6 +296,10 @@ export const getPlanForGroup = async (groupId) => {
   }
 };
 
+
+// TODO group-settings etc.
+
+
 export const setGroupSettings = async (groupId, settings) => {};
 
 export const getGroupSettings = async (groupId) => {
@@ -343,7 +347,9 @@ export const disableFarmosForGroup = async (groupId) => {
 };
 
 export const getGroupInformation = async (groupId) => {
-  const group = await db.collection('group').findOne({ _id: asMongoId(groupId) });
+
+  console.log("group ID ist", groupId);
+  const group = await db.collection('groups').findOne({ _id: asMongoId(groupId) });
   if (!group) {
     throw boom.notFound();
   }

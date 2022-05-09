@@ -11,6 +11,7 @@ import {
   getPlanForGroup,
   deletePlan,
   setPlanForGroup,
+  getGroupInformation,
 } from './manage';
 
 const init = async () => {
@@ -106,4 +107,25 @@ describe('manageFarmOS', () => {
     const nullPlan = await getPlanForGroup(group._id);
     expect(nullPlan).toBe(null);
   });
+  it.only('test-group-settings', async () => {
+    // TODO test farmos
+    const { group, admin1, user1 } = await init();
+    const farmOSInstanceName = 'test.surveystack.io';
+    const someAdminFarmOSInstanceName = 'admin.surveystack.io';
+    await mapFarmOSInstanceToUser(user1.user._id, farmOSInstanceName, true);
+    await mapFarmOSInstanceToUser(admin1.user._id, someAdminFarmOSInstanceName, true);
+    await mapFarmOSInstanceToGroupAdmin(admin1.user._id, group._id, farmOSInstanceName);
+
+    // setup admins
+    // setup users
+    // setup group-settings
+    // test return value of getGroupInformation
+
+    const groupInformation = await getGroupInformation(group._id);
+    console.log(groupInformation);
+
+    // expect statements
+    // expect(groupInformation.groupHasFarmOSAccess).toBe(true);
+
+  })
 });
