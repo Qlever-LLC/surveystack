@@ -218,6 +218,29 @@ export const linearControls = (survey, submission) => {
   return res;
 };
 
+export const linearControlsWithGroups = (survey, submission) => {
+  const res = [];
+  const { controls } = survey.revisions.find((revision) => revision.version === submission.meta.survey.version);
+  const positions = getControlPositions(controls);
+  positions.forEach((p) => {
+    const control = cloneDeep(getControl(controls, p));
+    const breadcrumbs = getBreadcrumbsForSubmission(controls, p);
+    const submissionField = getSubmissionField(submission, survey, p);
+
+    const key = breadcrumbs.join('.');
+    const r = Object.assign(control, {
+      breadcrumbs,
+      key,
+      number: p.map((value) => value + 1),
+      position: p,
+      value: submissionField.value,
+      meta: submissionField.meta,
+    });
+    res.push(r);
+  });
+  return res;
+};
+
 export default {
   createSubmissionFromSurvey,
   getSubmissionField,

@@ -102,15 +102,6 @@
       </v-col>
       <v-col cols="12" lg="6">
         <v-card v-if="editMode" class="mb-4">
-          <app-farm-hub-onboarding
-            :newRoute="{
-              name: 'farm-hub-onboarding',
-              query: { group: entity._id },
-            }"
-          />
-        </v-card>
-
-        <v-card v-if="editMode" class="mb-4">
           <app-integration-list
             title="Group Integrations"
             :entities="integrations"

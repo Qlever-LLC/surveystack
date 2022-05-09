@@ -5,8 +5,8 @@ import https from 'https';
 
 import * as utils from '../helpers/surveys';
 
-import { hasPermission } from './farmos-2/apiCompose';
-import { aggregator } from './farmos-2/aggregator';
+import { hasPermission } from './farmos/apiCompose';
+import { aggregator } from './farmos/aggregator';
 import { db } from '../db';
 
 const config = () => {
@@ -41,29 +41,44 @@ async function flushlogs(instanceName, user, id) {
     throw boom.unauthorized('No Access to farm');
   }
 
-  const { deleteAllWithData } = config();
+  const { deleteAllWithSurveystackId } = config();
 
-  console.log('deleting data', instanceName, id);
-  const res = await deleteAllWithData(instanceName, id);
-  console.log('done');
-  return [res];
+  // console.log('deleting data', instanceName, id);
+  const res = await deleteAllWithSurveystackId(instanceName, id);
+  // console.log('done', res);
+  if (!res.data) {
+    return [];
+  }
+  return [res.data];
 }
 
-async function fetchTerms(instanceName, credentials, user) {
-  const url = instanceName;
-  if (typeof url != 'string') {
-    throw boom.badData(`url is not a string: ${url}`);
-  }
+export const substitue = (entity, terms) => {
+  if (entity && entity.relationships) {
+    for (const bundle of Object.keys(entity.relationships)) {
+      const innerDataArray = entity.relationships[bundle].data;
+      for (const data of innerDataArray) {
+        if (!data.id && data.type && data.name) {
+          // candidate for replacement
+          const [endpoint, bundle] = data.type.split('--');
+          const replacement = terms.find(
+            (term) =>
+              term.endpoint === endpoint &&
+              term.bundle == bundle &&
+              term.name.toLowerCase() === data.name.toLowerCase()
+          );
 
-  if (!allowed(instanceName, user)) {
-    throw boom.unauthorized('No Access to farm');
+          if (replacement) {
+            data.id = replacement.id;
+            delete data.name;
+          }
+        }
+      }
+    }
   }
-
-  // TODO fetch terms
-}
+};
 
 async function execute(aggregator, apiCompose, info, terms, user, submission) {
-  console.log('executing apiCompose', apiCompose);
+  // console.log('executing apiCompose', apiCompose);
 
   const url = apiCompose.url;
   if (typeof url != 'string') {
@@ -84,19 +99,75 @@ async function execute(aggregator, apiCompose, info, terms, user, submission) {
     throw boom.badData('apiCompose.entity.type should be in the form endpoint--bundle');
   }
 
-  // TODO
-  // create log / assets / profile ....
+  // substitute terms
+  substitue(apiCompose.entity, terms);
 
   const payload = { data: apiCompose.entity };
-  payload.data.attributes.data = submission._id;
+  console.log('adding id to payload', submission._id);
+  payload.data.attributes.surveystack_id = submission._id;
 
-  return await aggregator.create(url, endpoint, bundle, payload);
+  return (await aggregator.create(url, endpoint, bundle, payload)).data;
 }
+
+export const getTerms = (apiCompose) => {
+  const composeByUrl = {};
+  const res = {};
+
+  apiCompose.forEach((c) => {
+    if (typeof c.url !== 'string') {
+      throw boom.badData(`url is not a string: ${c.url}`);
+    }
+
+    if (!composeByUrl[c.url]) {
+      composeByUrl[c.url] = [c];
+      res[c.url] = [];
+    } else {
+      composeByUrl[c.url].push(c);
+    }
+  });
+
+  for (const url of Object.keys(composeByUrl)) {
+    const composeItems = composeByUrl[url];
+    for (const compose of composeItems) {
+      if (compose.entity && compose.entity.relationships) {
+        for (const bundle of Object.keys(compose.entity.relationships)) {
+          const innerDataArray = compose.entity.relationships[bundle].data;
+          for (const data of innerDataArray) {
+            if (!data.id && data.type && data.name) {
+              const [endpoint, b] = data.type.split('--');
+
+              let skip = false;
+              for (const r of res[url]) {
+                if (r.bundle === b && r.endpoint === endpoint && r.name === data.name) {
+                  skip = true;
+                  break;
+                }
+              }
+
+              if (skip) {
+                // already in there
+                continue;
+              }
+
+              res[url].push({
+                bundle: b,
+                endpoint,
+                name: data.name,
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return res;
+};
 
 export const handle = async ({ submission, survey, user }) => {
   const surveyVersion = submission.meta.survey.version;
 
-  console.log('submission', JSON.stringify(submission, null, 2));
+  // console.log('submission', JSON.stringify(submission, null, 2));
 
   const { controls } = survey.revisions.find((revision) => revision.version === surveyVersion);
   const positions = utils.getControlPositions(controls);
@@ -144,21 +215,18 @@ export const handle = async ({ submission, survey, user }) => {
 
   const results = [];
 
-  // TODO adapt to farmos 2.0
-
   const aggregator = config();
 
   const runSingle = async (apiCompose, info, terms) => {
     try {
+      // console.log('running', apiCompose);
       const r = await execute(aggregator, apiCompose, info, terms, user, submission);
 
       if (Array.isArray(r)) {
         results.push(...r);
-        console.log('results interim after array spread', results);
         return r;
       } else {
         results.push(r);
-        console.log('results interim after single add', results);
         return [r];
       }
     } catch (error) {
@@ -167,7 +235,7 @@ export const handle = async ({ submission, survey, user }) => {
         status: 'error',
         error,
       });
-      return null;
+      return [];
     }
   };
 
@@ -185,17 +253,40 @@ export const handle = async ({ submission, survey, user }) => {
   for (const farmUrl of Object.keys(farmUrlMap)) {
     const res = await flushlogs(farmUrl, user, submission._id);
     if (res.length > 0) {
-      results.push(res);
+      results.push(...res);
     }
   }
-  for (const compose of farmOsCompose) {
-    const info = {};
-    const terms = {};
+  const termStructures = getTerms(farmOsCompose);
+  const instanceTerms = {};
 
-    const r = await runSingle(compose, info, terms);
+  for (const url of Object.keys(termStructures)) {
+    const terms = await aggregator.getAllTerms(url, termStructures[url]);
+    instanceTerms[url] = terms;
   }
 
-  console.log('results', results);
+  for (const compose of farmOsCompose) {
+    const info = {};
+
+    const r = await runSingle(compose, info, instanceTerms[compose.url]);
+    results.push(...r);
+  }
+
+  /** strip away compose from submission*/
+
+  positions.forEach((position) => {
+    const control = utils.getControl(controls, position);
+    if (!control.options.apiCompose || !control.options.apiCompose.enabled) {
+      return;
+    }
+
+    const field = utils.getSubmissionField(submission, survey, position);
+
+    if (field.meta.relevant === false || !field.meta.apiCompose) {
+      return;
+    }
+    delete field.meta.apiCompose;
+  });
+
   return results;
 };
 
@@ -224,9 +315,9 @@ const testAggregatorConnection = async (url, apiKey) => {
   }
 };
 
-const isFarmosUrlAvailable = async (url, apiKey) => {
+export const isFarmosUrlAvailable = async (url, apiKey) => {
   const agentOptions = {
-    host: 'account.farmos.net',
+    host: 'account.farmier.net',
     port: '443',
     path: '/',
     rejectUnauthorized: false,
@@ -236,9 +327,9 @@ const isFarmosUrlAvailable = async (url, apiKey) => {
 
   try {
     const r = await axios.post(
-      `https://account.farmos.net/api/v1/utils/validate-farm-url`,
+      `https://account.farmier.net/api/v1/utils/validate-farm-url`,
       {
-        url: `${url}.farmos.net`,
+        url,
       },
       {
         headers: {
@@ -251,6 +342,8 @@ const isFarmosUrlAvailable = async (url, apiKey) => {
 
     if (r.status === 200) {
       return true;
+    } else if (r.status === 400) {
+      return false;
     } else {
       throw Error('unable to connect to aggregator');
     }
@@ -260,6 +353,64 @@ const isFarmosUrlAvailable = async (url, apiKey) => {
     }
     throw error;
   }
+};
+
+export const createInstance = async (
+  url,
+  email,
+  site_name,
+  registrant,
+  location,
+  units,
+  tags,
+  timezone,
+  planName
+) => {
+  const apiKey = process.env.FARMOS_CREATE_KEY;
+  if (!apiKey) {
+    throw boom.badImplementation('farmos not configured');
+  }
+
+  const agentOptions = {
+    host: 'account.farmier.net',
+    port: '443',
+    path: '/',
+    rejectUnauthorized: false,
+  };
+
+  console.log('creat instance param: url', url);
+  console.log('creat instance param: email', email);
+  console.log('creat instance param: site_name', site_name);
+  console.log('creat instance param: registrant', registrant);
+  console.log('creat instance param: location', location);
+  console.log('creat instance param: units', units);
+  console.log('creat instance param: tags', tags);
+  console.log('creat instance param: timezone', timezone);
+  console.log('creat instance param: planName', planName);
+
+  const agent = new https.Agent(agentOptions);
+  const body = {
+    url,
+    email,
+    site_name,
+    registrant,
+    location,
+    units,
+    plan: planName,
+    tags,
+    agree: true,
+    timezone: timezone,
+  };
+
+  const r = await axios.post(`https://account.farmier.net/api/v1/farms`, body, {
+    headers: {
+      accept: 'application/json',
+      apikey: apiKey,
+      'Content-Type': 'application/json',
+    },
+    httpsAgent: agent,
+  });
+  return r;
 };
 
 export default { isFarmosUrlAvailable, handle, testAggregatorConnection };
