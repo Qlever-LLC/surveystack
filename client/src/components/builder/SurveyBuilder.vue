@@ -49,7 +49,7 @@
             @control-selected="controlSelected"
             @duplicate-control="duplicateControl"
             @open-library="openLibrary"
-            @update-library-questions="updateLibraryQuestions"
+            @update-library-resources="updateLibraryResources"
             data-testid="graphical-view"
           />
         </div>
@@ -393,15 +393,11 @@ export default {
 
       this.showLibrary = false;
     },
-    async updateLibraryQuestions({ controlIndex, updatedLibraryRootGroup, updatedResources }) {
+    async updateLibraryResources({ libraryId, updatedResources }) {
       // replace the library's old resources by the new ones
-      this.survey.resources = this.survey.resources.filter(
-        (resource) => resource.libraryId !== updatedLibraryRootGroup.libraryId
-      );
+      this.survey.resources = this.survey.resources.filter((resource) => resource.libraryId !== libraryId);
       this.survey.resources = this.survey.resources.concat(updatedResources);
-      // replace the updatedLibraryRootGroup
-      this.survey.revisions[this.survey.revisions.length - 1].controls.splice(controlIndex, 1, updatedLibraryRootGroup);
-      this.control = updatedLibraryRootGroup;
+      this.control = null;
     },
     closeLibrary() {
       this.showLibrary = false;

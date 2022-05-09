@@ -75,7 +75,7 @@
             >
               <v-icon
                 v-if="availableLibraryUpdates[el.libraryId] > el.libraryVersion"
-                @click.stop="updateLibrary(el)"
+                @click.stop="updateLibrary(idx)"
                 left
               >
                 mdi-refresh
@@ -149,9 +149,9 @@
       </v-dialog>
       <update-library-dialog
         v-if="updateLibraryDialogIsVisible"
-        :library-root-group="updateLibraryRootGroup"
+        :library-root-group="controls[updateLibraryRootGroupIndex]"
         :to-survey="updateToLibrary"
-        @update="updateLibraryConfirmed(idx - 1, $event)"
+        @update="updateLibraryConfirmed"
         @cancel="updateLibraryCancelled"
       />
     </v-card>
@@ -189,7 +189,7 @@ export default {
       deleteQuestionIndex: null,
       updateLibraryDialogIsVisible: false,
       updateToLibrary: null,
-      updateLibraryRootGroup: null,
+      updateLibraryRootGroupIndex: null,
       scaleStyles: {},
       hoveredControl: null,
     };
@@ -272,26 +272,28 @@ export default {
     openLibrary(libraryId) {
       this.$emit('open-library', libraryId);
     },
-    async updateLibrary(updateLibraryRootGroup) {
-      this.updateLibraryRootGroup = updateLibraryRootGroup;
-      const { data } = await api.get(`/surveys/${updateLibraryRootGroup.libraryId}`);
+    async updateLibrary(updateLibraryRootGroupIndex) {
+      this.updateLibraryRootGroupIndex = updateLibraryRootGroupIndex;
+      const { data } = await api.get(`/surveys/${this.controls[updateLibraryRootGroupIndex].libraryId}`);
       this.updateToLibrary = data;
       this.updateLibraryDialogIsVisible = true;
     },
-    updateLibraryConfirmed(idx, { updatedLibraryRootGroup, updatedResources }) {
+    updateLibraryConfirmed({ updatedLibraryRootGroup, updatedResources }) {
       this.updateLibraryDialogIsVisible = false;
-      this.$emit('update-library-questions', {
-        controlIndex: idx,
-        updatedLibraryRootGroup: updatedLibraryRootGroup,
+      // replace the updatedLibraryRootGroup
+      this.controls.splice(this.updateLibraryRootGroupIndex, 1, updatedLibraryRootGroup);
+      // let surveybuilder update the survey resources
+      this.$emit('update-library-resources', {
+        libraryId: updatedLibraryRootGroup.libraryId,
         updatedResources: updatedResources,
       });
       this.updateToLibrary = null;
-      this.updateLibraryRootGroup = null;
+      this.updateLibraryRootGroupIndex = null;
     },
     updateLibraryCancelled() {
       this.updateToLibrary = null;
       this.updateLibraryDialogIsVisible = false;
-      this.updateLibraryRootGroup = null;
+      this.updateLibraryRootGroupIndex = null;
     },
     handleCardHoverChange({ control, isHovering }) {
       if (isHovering) {
