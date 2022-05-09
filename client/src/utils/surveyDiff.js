@@ -255,7 +255,12 @@ function createThreePointChange(changeLocal, changeRemote) {
     if (remoteChangeProp.changeType === UNCHANGED && localChangeProp.changeType === CHANGED) {
       remoteChangeProp.changeType = CHANGED;
     }
-    if (localChangeProp.changeType === CHANGED) {
+    if (
+      localChangeProp.changeType === CHANGED &&
+      //ignore resource id changes, cause these changes always happen when inherting a qsl
+      !isOntologyResourceChange(threePointChange.controlRevisionA, diffProperty) &&
+      !isMatrixResourceChange(threePointChange.controlRevisionA, diffProperty)
+    ) {
       //add flog for easier detection by merge function
       threePointChange.hasLocalChange = true;
     }
@@ -317,6 +322,14 @@ export function merge(controlsLocalRevision, controlsRemoteRevisionA, controlsRe
 
 function hasBreakingChange(diff) {
   return propertyTurnedOff(diff, 'options.allowHide') || propertyTurnedOff(diff, 'options.allowModify');
+}
+
+function isOntologyResourceChange(control, diffProperty) {
+  return control.type === 'ontology' && diffProperty === 'options.source';
+}
+
+function isMatrixResourceChange(control, diffProperty) {
+  return control.type === 'matrix' && diffProperty.startsWith('options.source') && diffProperty.endsWith('.resource');
 }
 
 function propertyTurnedOff(diff, propertyName) {
