@@ -14,6 +14,7 @@ import {
   createMagicLink,
 } from '../services/auth.service';
 import { db, COLL_ACCESS_CODES } from '../db';
+import { queryParam } from '../helpers';
 
 const col = 'users';
 
@@ -90,14 +91,32 @@ const sendPasswordResetMail = async (req, res) => {
     const landingPath = `/users/${existingUser._id}/edit`;
     const magicLink = await createMagicLink({ origin, email, expiresAfterDays: 3, landingPath });
 
-    await mailService.sendLink({
-      to: email,
-      subject: `Link to reset your password`,
-      link: magicLink,
-      actionDescriptionHtml: 'Continue to reset your password at <b>SurveyStack</b>:',
-      actionDescriptionText: 'Use the following link to set a new password:',
-      btnText: 'Reset password',
-    });
+    // Legacy PW reset format used by SoilStack
+    // TODO remove this after we update SoilStack
+    if (queryParam(req.query.useLegacy)) {
+      await mailService.send({
+        to: email,
+        subject: 'Link to reset your password',
+        text: `Hello,
+
+Use the following link to set a new password:
+
+${origin}/auth/reset-password?token=${existingUser.token}&email=${existingUser.email}
+
+If you did not request this email, you can safely ignore it.
+
+Best Regards`,
+      });
+    } else {
+      await mailService.sendLink({
+        to: email,
+        subject: `Link to reset your password`,
+        link: magicLink,
+        actionDescriptionHtml: 'Continue to reset your password at <b>SurveyStack</b>:',
+        actionDescriptionText: 'Use the following link to set a new password:',
+        btnText: 'Reset password',
+      });
+    }
   }
   return res.send({ ok: true });
 };

@@ -252,7 +252,8 @@ describe('fetching farminfo', () => {
         },
       },
       {
-        // must be skipped
+        uri: 'api/log/activity?fields[log--activity]=id&filter[surveystack_id][value]=123',
+        action: 'view',
         headers: {
           Accept: 'application/vnd.api+json',
           'Content-Type': 'application/vnd.api+json',

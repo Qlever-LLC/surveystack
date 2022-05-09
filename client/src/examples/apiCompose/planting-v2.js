@@ -1,5 +1,5 @@
 /* eslint-disable */
-export const uuidv4 = () => {
+const uuidv4 = () => {
   const rnd = new Uint8Array(32);
   crypto.getRandomValues(rnd);
   let count = 0;
@@ -30,36 +30,11 @@ function apiCompose(submission) {
  * @param {*} cropAnswer answer for the planting crop question
  */
 
-function populatePlanting(cropAnswer, field) {
-  if (!cropAnswer.value) {
-    throw 'Please select crop';
-  }
-
-  if (!field.value) {
-    throw 'Please select field';
-  }
-
-  const crop = cropAnswer.value;
-  const farmUrl = field.value.url;
-
-  /**
-   * The server checks if the name already exists. If not,
-   * the server creates the appropriate taxonomy first.
-   */
-  const terms = {
-    Chioggia: {
-      type: 'taxonomy_term--plant_type',
-      name: 'Chioggia',
-      id: uuidv4(),
-    },
-  };
-
+function populatePlanting() {
   return {
     type: 'farmos',
-    url: farmUrl,
-    terms,
-    body: {
-      id,
+    url: 'oursci.farmos.dev',
+    entity: {
       type: 'asset--plant',
       attributes: {
         name: 'Test plant Asset',
@@ -69,7 +44,10 @@ function populatePlanting(cropAnswer, field) {
       relationships: {
         plant_type: {
           data: [
-            terms['Chioggia'], // server will go and check if exists
+            {
+              type: 'taxonomy_term--plant_type',
+              name: 'Spinach',
+            },
           ],
         },
       },

@@ -214,7 +214,7 @@ describe('test-aggregator-integration', () => {
       ]);
     }
   });
-  it.only('delete-all-with-id', async () => {
+  it('delete-all-with-id', async () => {
     const { deleteAllWithSurveystackId } = config();
 
     try {

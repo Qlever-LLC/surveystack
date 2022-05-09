@@ -19,7 +19,7 @@
         label="Select Plan"
         v-model="localViewModel.form.plan"
         :items="localViewModel.plans"
-        item-text="planName"
+        :item-text="(p) => `${p.planName}, ${p.planUrl}`"
         item-value="_id"
         :rules="[(v) => !!v || `select plan`]"
       ></v-autocomplete>
