@@ -43,6 +43,11 @@
       </div>
     </div>
   </v-container>
+  <v-container fill-height v-else>
+    <v-layout column justify-center align-center>
+      <v-progress-circular :size="50" color="primary" indeterminate></v-progress-circular
+    ></v-layout>
+  </v-container>
 </template>
 
 <script>
