@@ -53,7 +53,6 @@
           :required="$store.getters['draft/relevance'](path) && control.options && control.options.required"
           :forceMobile="forceMobile"
           :isInBuilder="isInBuilder"
-          :survey="survey"
         />
       </div>
     </div>
