@@ -534,25 +534,12 @@ const checkForLibraryUpdates = async (req, res) => {
         const librarySurvey = await db
           .collection(col)
           .findOne({ _id: new ObjectId(control.libraryId) });
-        console.log(
-          control.label +
-            ' ' +
-            control.isLibraryRoot +
-            ' ' +
-            control.libraryId +
-            ' ' +
-            control.libraryVersion +
-            ' ' +
-            librarySurvey.latestVersion
-        );
         if (!librarySurvey) {
           //library can not be found, also return this information
           updatableSurveys[control.libraryId] = null;
-          console.log('added');
         } else if (control.libraryVersion < librarySurvey.latestVersion) {
           //library is updatable, add to result set
           updatableSurveys[control.libraryId] = librarySurvey.latestVersion;
-          console.log('added');
         }
       }
     });
