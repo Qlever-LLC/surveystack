@@ -5,7 +5,7 @@ import boom from '@hapi/boom';
 import { db } from '../db';
 import _ from 'lodash';
 
-import { checkSurvey, changeRecursive } from '../helpers/surveys';
+import { checkSurvey, changeRecursive, changeRecursiveAsync } from '../helpers/surveys';
 import rolesService from '../services/roles.service';
 
 const col = 'surveys';
@@ -526,23 +526,38 @@ const checkForLibraryUpdates = async (req, res) => {
   const latestRevision = survey.revisions[survey.revisions.length - 1];
 
   //for each question set library used in the given survey
-  await Promise.all(
-    latestRevision.controls.map(async (control) => {
+  let promises = [];
+  latestRevision.controls.map((rootControl) => {
+    changeRecursiveAsync(promises, rootControl, async (control) => {
       if (control.isLibraryRoot && !control.libraryIsInherited) {
         //check if used library survey version is old
         const librarySurvey = await db
           .collection(col)
           .findOne({ _id: new ObjectId(control.libraryId) });
+        console.log(
+          control.label +
+            ' ' +
+            control.isLibraryRoot +
+            ' ' +
+            control.libraryId +
+            ' ' +
+            control.libraryVersion +
+            ' ' +
+            librarySurvey.latestVersion
+        );
         if (!librarySurvey) {
           //library can not be found, also return this information
           updatableSurveys[control.libraryId] = null;
+          console.log('added');
         } else if (control.libraryVersion < librarySurvey.latestVersion) {
           //library is updatable, add to result set
           updatableSurveys[control.libraryId] = librarySurvey.latestVersion;
+          console.log('added');
         }
       }
-    })
-  );
+    });
+  });
+  await Promise.all(promises);
 
   return res.send(updatableSurveys);
 };
