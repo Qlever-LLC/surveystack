@@ -233,6 +233,7 @@ import {
   getPreparedLibraryResources,
   getSurveyPositions,
   insertControl,
+  isResourceReferenced,
 } from '@/utils/surveys';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
@@ -394,8 +395,10 @@ export default {
       this.showLibrary = false;
     },
     async updateLibraryResources({ libraryId, updatedResources }) {
-      // replace the library's old resources by the new ones
-      this.survey.resources = this.survey.resources.filter((resource) => resource.libraryId !== libraryId);
+      // remove resources with resource.libraryId!=null which are not used in a control
+      this.survey.resources = this.survey.resources.filter(
+        (resource) => resource.libraryId === null || isResourceReferenced(this.currentControls, resource.id)
+      );
       this.survey.resources = this.survey.resources.concat(updatedResources);
       this.control = null;
     },
