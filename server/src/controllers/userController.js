@@ -90,7 +90,6 @@ const updateUser = async (req, res) => {
   const { _id: id, password } = req.body;
 
   const updatedUser = {
-    email: req.body.email,
     name: req.body.name,
   };
 
