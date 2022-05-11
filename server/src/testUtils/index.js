@@ -131,6 +131,7 @@ export const createReq = ({
 export const createRes = async ({ user = null } = {}) => ({
   send: jest.fn(),
   redirect: jest.fn(),
+  cookie: jest.fn(),
   status: jest.fn().mockReturnThis(),
   locals: {
     auth: {
