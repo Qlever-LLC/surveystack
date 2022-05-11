@@ -97,7 +97,7 @@ const updateUser = async (req, res) => {
     throw boom.unauthorized(`Not allowed to put user: ${id}`);
   }
 
-  if (password !== '') {
+  if (typeof password === 'string' && password !== '') {
     updatedUser.password = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS));
 
     // create a new user token when password changes
