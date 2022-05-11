@@ -7,7 +7,7 @@
     </div>
     <v-card class="pa-4 mb-4 mt-2">
       <v-form>
-        <v-text-field tabindex="1" v-model="entity.email" label="E-Mail" />
+        <v-text-field tabindex="1" v-model="entity.email" label="E-Mail" :readonly="editMode" />
         <v-text-field tabindex="2" v-model="entity.name" label="Name" />
         <v-text-field
           tabindex="3"
