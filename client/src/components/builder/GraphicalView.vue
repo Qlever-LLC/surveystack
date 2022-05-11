@@ -283,10 +283,7 @@ export default {
       // replace the updatedLibraryRootGroup
       this.controls.splice(this.updateLibraryRootGroupIndex, 1, updatedLibraryRootGroup);
       // let surveybuilder update the survey resources
-      this.$emit('update-library-resources', {
-        libraryId: updatedLibraryRootGroup.libraryId,
-        updatedResources: updatedResources,
-      });
+      this.$emit('update-library-resources', updatedResources);
       this.updateToLibrary = null;
       this.updateLibraryRootGroupIndex = null;
     },

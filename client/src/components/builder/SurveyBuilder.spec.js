@@ -576,33 +576,29 @@ describe('question set library', () => {
   });
 
   describe('methods.updateLibraryQuestions', () => {
-    const { updateLibraryQuestions } = SurveyBuilder.methods;
+    const { addQuestionsFromLibrary, updateLibraryResources } = SurveyBuilder.methods;
 
     const runTest = async (surveyResources, updatedResources, expectedResources) => {
       const component = { ...optionsWithControls().props, controlAdded: jest.fn() };
       component.survey.resources = surveyResources;
       qsl.resources = updatedResources;
-      await updateLibraryQuestions.call(component, {
-        controlIndex: 0,
-        updatedLibraryRootGroup: { libraryId: qsl._id },
-        updatedResources,
-      });
-
+      await addQuestionsFromLibrary.call(component, qsl._id);
+      await updateLibraryResources.call(component, updatedResources);
       expect(component.survey.resources).toMatchObject(expectedResources);
       return component.survey.resources;
     };
 
     it('updates resources from the same QSL', async () => {
-      const resourceCurrent = { foo: 1, libraryId: qsl._id };
-      const resourceFromQsl = { bar: 2, libraryId: qsl._id };
+      const resourceCurrent = { id: 1, foo: 1, libraryId: qsl._id };
+      const resourceFromQsl = { id: 2, bar: 2, libraryId: qsl._id };
       await runTest([resourceCurrent], [resourceFromQsl], [resourceFromQsl]);
     });
-    it('removes old resources of the same QSL', async () => {
-      const resourceSameLib = { libraryId: qsl._id };
-      const resourceOther = { libraryId: 'not_related_to_this_qsl' };
-      await runTest([resourceSameLib, resourceOther], [], [resourceOther]);
+    it('removes unreferenced resources', async () => {
+      const unusedResourceSameLib = { libraryId: qsl._id };
+      const unusedResourceOtherLib = { libraryId: 'not_related_to_this_qsl' };
+      await runTest([unusedResourceSameLib, unusedResourceOtherLib], [], []);
     });
-
+    it.todo('keeps referenced resources');
     it.todo('updates the library root group');
     it.todo('sets the currently selected control to the updated library root group');
   });

@@ -394,11 +394,13 @@ export default {
 
       this.showLibrary = false;
     },
-    async updateLibraryResources({ libraryId, updatedResources }) {
-      // remove resources with resource.libraryId!=null which are not used in a control
+    async updateLibraryResources(updatedResources) {
+      // remove library resources which are not used anymore
+      const controls = this.survey.revisions[this.survey.revisions.length - 1].controls;
       this.survey.resources = this.survey.resources.filter(
-        (resource) => resource.libraryId === null || isResourceReferenced(this.currentControls, resource.id)
+        (resource) => resource.libraryId === null || isResourceReferenced(controls, resource.id)
       );
+      // add updated resources
       this.survey.resources = this.survey.resources.concat(updatedResources);
       this.control = null;
     },
