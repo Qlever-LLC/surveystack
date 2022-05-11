@@ -1,4 +1,4 @@
-import { get, isArray, isEqual, isNil, isObjectLike, pull, toPath, uniq } from 'lodash';
+import { cloneDeep, get, isArray, isEqual, isNil, isObjectLike, pull, toPath, uniq } from 'lodash';
 import flatten from 'flat';
 import { getPosition, insertControl, removeControl, replaceControl } from '@/utils/surveys';
 
@@ -288,6 +288,7 @@ export function merge(controlsLocalRevision, controlsRemoteRevisionA, controlsRe
 
   //collect changes
   let changes = diffThreeSurveyVersions(controlsLocalRevision, controlsRemoteRevisionA, controlsRemoteRevisionB);
+  let addedGroups = [];
   //applicate remote changes on local survey
   for (const change of changes) {
     switch (change.changeType) {
@@ -301,9 +302,17 @@ export function merge(controlsLocalRevision, controlsRemoteRevisionA, controlsRe
         }
         break;
       case changeType.REMOVED:
+        //TODO check if removing a group also leads to trying to remove its childs afterwards (which would fail cause removing the group already removes the children)
         mergedControls = removeControl(mergedControls, null, change.pathRevisionA);
         break;
       case changeType.ADDED: {
+        if (change.controlRevisionB.type === 'group' || change.controlRevisionB.type === 'page') {
+          addedGroups.push(change.controlRevisionB.id);
+        }
+        if (addedGroups.indexOf(change.parentIdRevisionB) > -1) {
+          //it's a child of an added group, do not add it cause it's added together with the group
+          continue;
+        }
         const position = getPosition(change.controlRevisionB, controlsRemoteRevisionB);
         // change position to the control before/above, cause that's expected by insertControl
         if (position[position.length - 1] === 0) {
