@@ -31,7 +31,7 @@ export const createGroup = async (_overrides = {}) => {
     name,
     slug: kebabCase(deburr(name)),
     dir: '/',
-    path: `/${name}/`,
+    path: `/${kebabCase(deburr(name))}/`,
     surveys: {
       pinned: [],
       ...overrides.surveys,
@@ -58,7 +58,16 @@ export const createGroup = async (_overrides = {}) => {
     });
   };
 
-  return { ...result.ops[0], createUserMember, createAdminMember };
+  const createSubGroup = async (nameObj) => {
+    const { name } = nameObj;
+    return await createGroup({
+      name: name,
+      dir: doc.path,
+      path: doc.path + kebabCase(deburr(name)) + '/',
+    });
+  };
+
+  return { ...result.ops[0], createUserMember, createAdminMember, createSubGroup };
 };
 
 export const asMongoId = (source) =>

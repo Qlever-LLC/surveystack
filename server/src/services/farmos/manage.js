@@ -26,6 +26,64 @@ export const asMongoId = (source) =>
   source instanceof ObjectId ? source : ObjectId(typeof source === 'string' ? source : source._id);
 
 /**
+ * list of users who belong to the group
+ */
+export const listUsersWithRoleForGroup = async (groupId) => {
+  const listMemberships = await db
+    .collection('memberships')
+    .find({ group: asMongoId(groupId) })
+    .toArray();
+  const listUser = [];
+  for (const membership of listMemberships) {
+    const userId = membership.user;
+    const user = await getUserFromUserId(userId);
+    let isAdmin;
+    membership.role == 'admin' ? (isAdmin = { admin: true }) : (isAdmin = { admin: false });
+    const userWithRole = { ...user, ...isAdmin };
+    listUser.push(userWithRole);
+  }
+  return listUser;
+};
+export const getUserFromUserId = async (userId) => {
+  return await db
+    .collection('users')
+    .findOne({ _id: asMongoId(userId) }, { projection: { _id: 1, email: 1, name: 1 } });
+};
+
+/**
+ * list of subgroups that contain the url (instanceName) of the farmos instance
+ */
+export const listSubGroupsContainFarmosInstance = async (subgroups, instanceName) => {
+  const listGroup = [];
+  for (const subgroup of subgroups) {
+    // find a couple: group && instanceName
+    const findACouple = await db
+      .collection('farmos-group-mapping')
+      .findOne(
+        { groupId: asMongoId(subgroup._id), instanceName: instanceName },
+        { projection: { _id: 1 } }
+      );
+    if (findACouple) {
+      const subgroupCustom = { _id: subgroup._id };
+      subgroupCustom.path = await getRewrittenPathFromGroup(subgroup);
+      listGroup.push({ ...subgroupCustom });
+    }
+  }
+  return listGroup;
+};
+// transform "/a/b/c/" to "a > b > c"
+export const getRewrittenPathFromGroup = async (subgroup) => {
+  let path = subgroup.name;
+  while (subgroup.dir != '/') {
+    subgroup = await db
+      .collection('groups')
+      .findOne({ path: subgroup.dir }, { projection: { name: 1, dir: 1 } });
+    path = subgroup.name + ' > ' + path;
+  }
+  return path;
+};
+
+/**
  * The user receives ownership over the farmos instance
  */
 export const mapFarmOSInstanceToUser = async (userId, instanceName, owner) => {
@@ -78,6 +136,24 @@ export const unmapFarmOSInstance = async (id) => {
 };
 
 /**
+ * A farmos instance is added to the group's plan
+ */
+export const mapFarmOSInstanceToGroup = async (groupId, instanceName) => {
+  const _id = new ObjectId();
+
+  await db.collection('farmos-group-mapping').insertOne({
+    _id,
+    groupId: asMongoId(groupId),
+    instanceName,
+  });
+
+  return {
+    _id,
+    groupId,
+    instanceName,
+  };
+};
+/**
  * A farmos instance is removed from the group's plan
  */
 export const removeFarmOSInstanceFromGroup = async (id) => {
@@ -90,7 +166,12 @@ export const removeFarmOSInstanceFromGroup = async (id) => {
  * A group Admin creates a new farmos instance for a user
  * The instance is added to the groups plan
  */
-export const createFarmOSInstanceForUserAndGroup = async (userId, groupId, instanceName) => {
+export const createFarmOSInstanceForUserAndGroup = async (
+  userId,
+  groupId,
+  instanceName,
+  userIsOwner
+) => {
   const _id = new ObjectId();
   await db.collection('farmos-group-mapping').insertOne({
     _id,
@@ -98,7 +179,7 @@ export const createFarmOSInstanceForUserAndGroup = async (userId, groupId, insta
     groupId: asMongoId(groupId),
   });
 
-  return await mapFarmOSInstanceToUser(userId, instanceName, true);
+  return await mapFarmOSInstanceToUser(userId, instanceName, userIsOwner);
 };
 
 /**
@@ -296,9 +377,7 @@ export const getPlanForGroup = async (groupId) => {
   }
 };
 
-
-// TODO group-settings etc.
-
+// TODO create farmos-group-settings etc.
 
 export const setGroupSettings = async (groupId, settings) => {};
 
@@ -347,13 +426,34 @@ export const disableFarmosForGroup = async (groupId) => {
 };
 
 export const getGroupInformation = async (groupId) => {
-
-  console.log("group ID ist", groupId);
-  const group = await db.collection('groups').findOne({ _id: asMongoId(groupId) });
-  if (!group) {
+  const group_justPath = await db
+    .collection('groups')
+    .findOne({ _id: asMongoId(groupId) }, { projection: { path: 1 } });
+  if (!group_justPath) {
     throw boom.notFound();
   }
-
+  const groupInformation = { members: [] };
+  const subgroups = await getDescendantGroups(group_justPath, {
+    _id: 1,
+    name: 1,
+    dir: 1,
+    path: 1,
+  }); // TODO UNIT TEST
+  const listUsersWithRole = await listUsersWithRoleForGroup(groupId); // TODO UNIT TEST
+  for (const user of listUsersWithRole) {
+    const listInstances = await listFarmOSInstancesForUser(user._id); // TODO UNIT TEST
+    for (let instance in listInstances) {
+      const memberships = await listSubGroupsContainFarmosInstance(
+        subgroups,
+        listInstances[instance].instanceName
+      ); // TODO UNIT TEST
+      listInstances[instance] = { ...listInstances[instance], memberships: [...memberships] };
+    }
+    const userWithConnectedFarms = { ...user, connectedFarms: [...listInstances] };
+    groupInformation.members.push(userWithConnectedFarms);
+  }
+  return groupInformation;
+  /*
   const groupSettings = await db
     .collection('farmos-group-settings')
     .findOne({ groupId: asMongoId(groupId) });
@@ -431,82 +531,10 @@ export const getGroupInformation = async (groupId) => {
           {
             url: 'jennybigfarmstand.farmos.net',
             owner: true,
-            memberships: ['Bionutrient > Lab > Michigan'],
-          },
-        ],
-      },
-      {
-        name: 'Jenny AA',
-        email: 'bigAAjenny@bj.net',
-        connectedFarms: [
-          {
-            url: 'jennybigfarmstand.farmosA.net',
-            owner: true,
-            memberships: ['Bionutrient > Lab > Michigan'],
-          },
-        ],
-      },
-      {
-        name: 'Jenny AB',
-        email: 'bigABjenny@bj.net',
-        connectedFarms: [
-          {
-            url: 'jennybigfarmstand.farmosB.net',
-            owner: true,
-            memberships: [
-              'Bionutrient > Labs',
-              'Bionutrient > Labs > Michigan',
-              'Bionutrient > Labs > Europe',
-              'Bionutrient > Labs > Community',
-              'Bionutrient > Labs > Community > Lab',
-            ],
-          },
-        ],
-      },
-      {
-        name: 'Jenny CD',
-        email: 'bigCDjenny@bj.net',
-        connectedFarms: [
-          {
-            url: 'jennybigfarmstand.farmosC.net',
-            owner: true,
-            memberships: ['Bionutrient > Lab > Michigan'],
-          },
-        ],
-      },
-      {
-        name: 'Jenny DD',
-        email: 'bigDDjenny@bj.net',
-        connectedFarms: [
-          {
-            url: 'jennybigfarmstand.farmosD.net',
-            owner: true,
-            memberships: ['Bionutrient > Lab > Michigan'],
-          },
-        ],
-      },
-      {
-        name: 'Jenny AE',
-        email: 'bigAEjenny@bj.net',
-        connectedFarms: [
-          {
-            url: 'jennybigfarmstand.farmosE.net',
-            owner: true,
-            memberships: ['Bionutrient > Lab > Michigan'],
-          },
-        ],
-      },
-      {
-        name: 'Jenny AF',
-        email: 'bigFAjenny@bj.net',
-        connectedFarms: [
-          {
-            url: 'jennybigfarmstand.farmosF.net',
-            owner: true,
-            memberships: ['Bionutrient > Lab > Michigan'],
+            memberships: ['Bionutrient > Labs > Michigan'],
           },
         ],
       },
     ],
-  };
+  };*/
 };

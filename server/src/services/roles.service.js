@@ -37,10 +37,10 @@ const getParentGroups = async (groupId) => {
   return descendants.filter((d) => isParent(d.path, group.path));
 };
 
-const getDescendantGroups = async (group) => {
+export const getDescendantGroups = async (group, projection = {}) => {
   const descendants = await db
     .collection('groups')
-    .find({ path: { $regex: `^${group.path}` } })
+    .find({ path: { $regex: `^${group.path}` } }, { projection: projection })
     .toArray();
   return descendants;
 };

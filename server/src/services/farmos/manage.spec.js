@@ -12,6 +12,9 @@ import {
   deletePlan,
   setPlanForGroup,
   getGroupInformation,
+  listUsersForGroup,
+  createFarmOSInstanceForUserAndGroup,
+  mapFarmOSInstanceToGroup,
 } from './manage';
 
 const init = async () => {
@@ -109,23 +112,80 @@ describe('manageFarmOS', () => {
   });
   it.only('test-group-settings', async () => {
     // TODO test farmos
-    const { group, admin1, user1 } = await init();
-    const farmOSInstanceName = 'test.surveystack.io';
-    const someAdminFarmOSInstanceName = 'admin.surveystack.io';
-    await mapFarmOSInstanceToUser(user1.user._id, farmOSInstanceName, true);
-    await mapFarmOSInstanceToUser(admin1.user._id, someAdminFarmOSInstanceName, true);
-    await mapFarmOSInstanceToGroupAdmin(admin1.user._id, group._id, farmOSInstanceName);
+    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
+    const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
+    const groupEurope = await groupLabs.createSubGroup({ name: 'Europe' });
+    const groupCommunity = await groupLabs.createSubGroup({ name: 'Community' });
+    const groupCommunityLab = await groupCommunity.createSubGroup({ name: 'Lab' });
+
+    const admin1_data = { userOverrides: { name: 'Dan TerAvest', email: 'teravestdan@gmail.com' } };
+    const admin1 = await groupLabs.createAdminMember(admin1_data);
+    const user1_data = { userOverrides: { name: 'Dave Jole', email: 'djole2352@gmail.com' } };
+    const user1 = await groupLabs.createUserMember(user1_data);
+    const user2_data = { userOverrides: { name: 'Jenny Jennerson', email: 'bigjenny@bj.net' } };
+    const user2 = await groupLabs.createUserMember(user2_data);
+
+    const admin1_farmOSInstance1 = 'dan_teravest_farm.farmos.net';
+    await createFarmOSInstanceForUserAndGroup(
+      admin1.user._id,
+      groupLabs._id,
+      admin1_farmOSInstance1,
+      true
+    );
+    const admin1_farmOSInstance2 = 'lees_farm.farmos.net';
+    await createFarmOSInstanceForUserAndGroup(
+      admin1.user._id,
+      groupLabs._id,
+      admin1_farmOSInstance2,
+      true
+    );
+    await mapFarmOSInstanceToGroup(groupMichigan._id, admin1_farmOSInstance2);
+    const admin1_farmOSInstance3 = 'ourscinet.farmos.net';
+    await createFarmOSInstanceForUserAndGroup(
+      admin1.user._id,
+      groupLabs._id,
+      admin1_farmOSInstance3,
+      false
+    );
+    await mapFarmOSInstanceToGroup(groupMichigan._id, admin1_farmOSInstance3);
+    await mapFarmOSInstanceToGroup(groupEurope._id, admin1_farmOSInstance3);
+    await mapFarmOSInstanceToGroup(groupCommunity._id, admin1_farmOSInstance3);
+    await mapFarmOSInstanceToGroup(groupCommunityLab._id, admin1_farmOSInstance3);
+    const admin1_farmOSInstance4 = 'coffeeshop.farmos.net';
+    await createFarmOSInstanceForUserAndGroup(
+      admin1.user._id,
+      groupMichigan._id,
+      admin1_farmOSInstance4,
+      false
+    );
+
+    const user2_farmOSInstance1 = 'jennybigfarmstand.farmos.net';
+    await createFarmOSInstanceForUserAndGroup(
+      user2.user._id,
+      groupLabs._id,
+      user2_farmOSInstance1,
+      true
+    );
+    await mapFarmOSInstanceToGroup(groupMichigan._id, user2_farmOSInstance1);
+
+    console.log(groupLabs._id);
+    console.log(admin1.user._id);
+    console.log(user1.user._id);
+    console.log(user2.user._id);
+
+    const infos = await getGroupInformation(groupLabs._id);
+    console.log(JSON.stringify(infos, null, 2));
 
     // setup admins
     // setup users
     // setup group-settings
     // test return value of getGroupInformation
 
-    const groupInformation = await getGroupInformation(group._id);
-    console.log(groupInformation);
+    //const groupInformation = await getGroupInformation(group._id);
+    //console.log(JSON.stringify(groupInformation, null, 2));
 
     // expect statements
     // expect(groupInformation.groupHasFarmOSAccess).toBe(true);
-
-  })
+  });
 });
