@@ -20,22 +20,30 @@ export const asMongoId = (source) =>
 /**
  * list of users who belong to the group
  */
-export const listUsersWithRoleForGroup = async (groupId) => {
-  const listMemberships = await db
-    .collection('memberships')
-    .find({ group: asMongoId(groupId) })
-    .toArray();
-  const listUser = [];
-  if (listMemberships) {
-    for (const membership of listMemberships) {
-      const user = await getUserFromUserId(membership.user);
-      let isAdmin;
-      membership.role == 'admin' ? (isAdmin = { admin: true }) : (isAdmin = { admin: false });
-      const userWithRole = { ...user, ...isAdmin };
-      listUser.push(userWithRole);
+export const listUsersWithRoleForGroup = async (groups) => {
+  if (groups) {
+    const subgrps = [];
+    for (const subg of groups) {
+      subgrps.push(subg._id);
     }
+
+    const listMemberships = await db
+      .collection('memberships')
+      .find({ group: { $in: subgrps } })
+      .toArray();
+    const listUser = [];
+    if (listMemberships) {
+      for (const membership of listMemberships) {
+        const user = await getUserFromUserId(membership.user);
+        let isAdmin;
+        membership.role == 'admin' ? (isAdmin = { admin: true }) : (isAdmin = { admin: false });
+        const userWithRole = { ...user, ...isAdmin };
+        listUser.push(userWithRole);
+      }
+    }
+    return listUser;
   }
-  return listUser;
+  return undefined;
 };
 export const getUserFromUserId = async (userId) => {
   const user = await db
@@ -52,18 +60,20 @@ export const getUserFromUserId = async (userId) => {
  */
 export const listSubGroupsContainFarmosInstance = async (subgroups, instanceName) => {
   const listGroup = [];
-  for (const subgroup of subgroups) {
-    // find a couple: group && instanceName
-    const findACouple = await db
-      .collection('farmos-group-mapping')
-      .findOne(
-        { groupId: asMongoId(subgroup._id), instanceName: instanceName },
-        { projection: { _id: 1 } }
-      );
-    if (findACouple) {
-      const subgroupCustom = { _id: subgroup._id };
-      subgroupCustom.path = await getRewrittenPathFromGroup(subgroup);
-      listGroup.push({ ...subgroupCustom });
+  if (subgroups) {
+    for (const subgroup of subgroups) {
+      // find a couple: group && instanceName
+      const findACouple = await db
+        .collection('farmos-group-mapping')
+        .findOne(
+          { groupId: asMongoId(subgroup._id), instanceName: instanceName },
+          { projection: { _id: 1 } }
+        );
+      if (findACouple) {
+        const subgroupCustom = { _id: subgroup._id };
+        subgroupCustom.path = await getRewrittenPathFromGroup(subgroup);
+        listGroup.push({ ...subgroupCustom });
+      }
     }
   }
   return listGroup;
@@ -412,7 +422,21 @@ export const getGroupSettings = async (groupId, projection = {}) => {
     .collection('farmos-group-settings')
     .findOne({ groupId: asMongoId(groupId) }, { projection: projection });
 };
-//TODO faire methodes has & enable & disable aussi pour
+
+export const getCurrentSeatsFromGroup = async (groups) => {
+  if (groups) {
+    const subgrps = [];
+    for (const subg of groups) {
+      subgrps.push(subg._id);
+    }
+    const mapping = await db
+      .collection('farmos-group-mapping')
+      .distinct('instanceName', { groupId: { $in: subgrps } });
+    return mapping.length;
+  }
+  return 0;
+};
+//TODO write methodes has & enable & disable also for
 // -> groupHasCoffeeShopAccess
 // -> allowSubgroupsToJoinCoffeeShop
 // -> allowSubgroupAdminsToCreateFarmOSInstances
@@ -446,20 +470,19 @@ export const disableFarmOSAccessForGroup = async (groupId) => {
 };
 
 export const getGroupInformation = async (groupId) => {
-  const group_justPath = await db
-    .collection('groups')
-    .findOne({ _id: asMongoId(groupId) }, { projection: { path: 1 } });
-  if (!group_justPath) {
+  const group = await db.collection('groups').findOne({ _id: asMongoId(groupId) });
+  if (!group) {
     throw boom.notFound();
   }
-  const groupInformation = { members: [] };
-  const subgroups = await getDescendantGroups(group_justPath, {
+  const groupName = await getRewrittenPathFromGroup(group);
+  let groupInformation = { name: groupName, members: [] };
+  const subgroups = await getDescendantGroups(group, {
     _id: 1,
     name: 1,
     dir: 1,
     path: 1,
   }); // TODO UNIT TEST
-  const listUsersWithRole = await listUsersWithRoleForGroup(groupId); // TODO UNIT TEST
+  const listUsersWithRole = await listUsersWithRoleForGroup(subgroups); // TODO UNIT TEST
   if (listUsersWithRole) {
     for (const user of listUsersWithRole) {
       const userWithConnectedFarms = { ...user, connectedFarms: [] };
@@ -480,9 +503,13 @@ export const getGroupInformation = async (groupId) => {
       groupInformation.members.push(userWithConnectedFarms);
     }
   }
-
+  //TODO integrate groupSettings in groupInformation
   const groupSettings = await getGroupSettings(groupId);
-  console.log('groupSettings -> ', groupSettings);
+  const currentSeats = await getCurrentSeatsFromGroup(subgroups);
+  const seats_obj = { seats: { current: currentSeats, max: groupSettings.maxSeats } };
+  delete groupSettings.planIds;
+  delete groupSettings.maxSeats;
+  groupInformation = { ...groupSettings, ...seats_obj, ...groupInformation };
 
   return groupInformation;
   /*
