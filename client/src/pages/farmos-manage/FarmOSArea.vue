@@ -42,8 +42,7 @@ export default {
       // Adding an XYZ layer.
       const xyzOpts = {
         title: 'mapbox', // defaults to 'xyz'
-        url:
-          'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA', // REQUIRED!
+        url: 'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA', // REQUIRED!
         visible: true, // defaults to true
         base: true, // defaults to false
       };

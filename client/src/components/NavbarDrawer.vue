@@ -64,8 +64,8 @@
     <template v-slot:append>
       <div dark class="grey--text">
         <p class="pt-4 pl-4">
-          App-Version:
-          <router-link to="/app/info" class="decoration-none">{{ version }}</router-link>
+          Version:
+          <router-link to="/app/info" class="decoration-none">{{ lcl.shortHash }}</router-link>
         </p>
       </div>
     </template>
@@ -88,7 +88,7 @@ export default {
 
     return {
       drawerIsVisible: false,
-      version: process.env.VUE_APP_VERSION,
+      lcl: JSON.parse(process.env.VUE_APP_LCL),
       sidenav: {
         collect: [
           {
