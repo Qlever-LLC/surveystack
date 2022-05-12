@@ -5,14 +5,6 @@ import { uniqBy } from 'lodash';
 import boom from '@hapi/boom';
 import { getDescendantGroups } from '../roles.service';
 
-const groupSettingDefaults = {
-  groupHasFarmOSAccess: true,
-  groupHasCoffeeShopAccess: false,
-  allowSubgroupsToJoinCoffeeShop: false,
-  maxSeats: 20,
-  planIds: [],
-};
-
 const config = () => {
   if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
     console.log('env not set');
@@ -378,40 +370,62 @@ export const getPlanForGroup = async (groupId) => {
 };
 
 // TODO create farmos-group-settings etc.
-
-export const setGroupSettings = async (groupId, settings) => {};
-
-export const getGroupSettings = async (groupId) => {
-  return await db.collection('farmos-group-settings').findOne({ groupId: asMongoId(groupId) });
+export const createFarmosGroupSettings = async (groupId, specification) => {
+  /*
+  const groupSettingDefaults = {
+  groupHasFarmOSAccess: true,
+  groupHasCoffeeShopAccess: false,
+  allowSubgroupsToJoinCoffeeShop: false,
+  maxSeats: 20,
+  planIds: [],
+  };
+*/
+  return await db.collection('farmos-group-settings').insertOne({
+    _id: new ObjectId(),
+    groupId: asMongoId(groupId),
+    planIds: [],
+    groupHasFarmOSAccess: true,
+    groupHasCoffeeShopAccess: false,
+    allowSubgroupsToJoinCoffeeShop: false,
+    allowSubgroupAdminsToCreateFarmOSInstances: true,
+    maxSeats: 20,
+    ...specification,
+  });
 };
 
-export const hasGroupFarmosAccess = async (groupId) => {
-  const s = await getGroupSettings();
-  if (s) {
-    return s.hasGroupFarmosAccess;
-  }
+export const setGroupSettings = async (groupId, settings) => {
+  return await db
+    .collection('farmos-group-settings')
+    .update({ groupId: asMongoId(groupId) }, { $set: settings });
+};
 
+export const getGroupSettings = async (groupId, projection = {}) => {
+  return await db
+    .collection('farmos-group-settings')
+    .findOne({ groupId: asMongoId(groupId) }, { projection: projection });
+};
+//TODO faire methodes has & enable & disable aussi pour
+// -> groupHasCoffeeShopAccess
+// -> allowSubgroupsToJoinCoffeeShop
+// -> allowSubgroupAdminsToCreateFarmOSInstances
+export const hasGroupFarmOSAccess = async (groupId) => {
+  const s = await getGroupSettings(groupId, { groupHasFarmOSAccess: 1 });
+  if (s) {
+    return s;
+  }
   return false;
 };
 
-export const enableFarmosForGroup = async (groupId) => {
-  const groupSettings = await db
-    .collection('farmos-group-settings')
-    .findOne({ groupId: asMongoId(groupId) });
+export const enableFarmOSAccessForGroup = async (groupId) => {
+  const groupSettings = await getGroupSettings(groupId);
   if (!groupSettings) {
-    return await db.collection('farmos-group-settings').insertOne({
-      _id: new ObjectId(),
-      groupId: asMongoId(groupId),
-      ...groupSettingDefaults,
-    });
+    return createFarmosGroupSettings(groupId, { groupHasFarmOSAccess: true });
   } else {
-    return await db
-      .collection('farmos-group-settings')
-      .update({ groupId: asMongoId(groupId) }, { $set: { groupHasFarmOSAccess: true } });
+    return await setGroupSettings(groupId, { groupHasFarmOSAccess: true });
   }
 };
 
-export const disableFarmosForGroup = async (groupId) => {
+export const disableFarmOSAccessForGroup = async (groupId) => {
   const groupSettings = await db
     .collection('farmos-group-settings')
     .findOne({ groupId: asMongoId(groupId) });
@@ -420,9 +434,7 @@ export const disableFarmosForGroup = async (groupId) => {
     throw boom.notFound();
   }
 
-  return await db
-    .collection('farmos-group-settings')
-    .update({ groupId: asMongoId(groupId) }, { $set: { groupHasFarmOSAccess: false } });
+  return await setGroupSettings(groupId, { groupHasFarmOSAccess: false });
 };
 
 export const getGroupInformation = async (groupId) => {
@@ -452,6 +464,11 @@ export const getGroupInformation = async (groupId) => {
     const userWithConnectedFarms = { ...user, connectedFarms: [...listInstances] };
     groupInformation.members.push(userWithConnectedFarms);
   }
+
+  const groupSettings = await hasGroupFarmOSAccess(groupId);
+  //const groupSettings = await getGroupSettings(groupId);
+  console.log('groupSettings -> ', groupSettings);
+
   return groupInformation;
   /*
   const groupSettings = await db
