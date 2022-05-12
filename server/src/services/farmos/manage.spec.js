@@ -15,7 +15,7 @@ import {
   listUsersForGroup,
   createFarmOSInstanceForUserAndGroup,
   mapFarmOSInstanceToGroup,
-  enableFarmOSAccessForGroup,
+  createFarmosGroupSettings,
 } from './manage';
 
 const init = async () => {
@@ -170,7 +170,7 @@ describe('manageFarmOS', () => {
     );
     await mapFarmOSInstanceToGroup(groupMichigan._id, user2_farmOSInstance1);
 
-    //await enableFarmOSAccessForGroup(groupLabs._id);
+    await createFarmosGroupSettings(groupLabs._id);
     console.log(groupLabs._id);
     console.log(admin1.user._id);
     console.log(user1.user._id);

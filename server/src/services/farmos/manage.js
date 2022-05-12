@@ -26,20 +26,25 @@ export const listUsersWithRoleForGroup = async (groupId) => {
     .find({ group: asMongoId(groupId) })
     .toArray();
   const listUser = [];
-  for (const membership of listMemberships) {
-    const userId = membership.user;
-    const user = await getUserFromUserId(userId);
-    let isAdmin;
-    membership.role == 'admin' ? (isAdmin = { admin: true }) : (isAdmin = { admin: false });
-    const userWithRole = { ...user, ...isAdmin };
-    listUser.push(userWithRole);
+  if (listMemberships) {
+    for (const membership of listMemberships) {
+      const user = await getUserFromUserId(membership.user);
+      let isAdmin;
+      membership.role == 'admin' ? (isAdmin = { admin: true }) : (isAdmin = { admin: false });
+      const userWithRole = { ...user, ...isAdmin };
+      listUser.push(userWithRole);
+    }
   }
   return listUser;
 };
 export const getUserFromUserId = async (userId) => {
-  return await db
+  const user = await db
     .collection('users')
-    .findOne({ _id: asMongoId(userId) }, { projection: { _id: 1, email: 1, name: 1 } });
+    .findOne({ _id: asMongoId(userId) }, { projection: { email: 1, name: 1 } });
+  if (!user) {
+    throw boom.notFound();
+  }
+  return user;
 };
 
 /**
@@ -70,6 +75,9 @@ export const getRewrittenPathFromGroup = async (subgroup) => {
     subgroup = await db
       .collection('groups')
       .findOne({ path: subgroup.dir }, { projection: { name: 1, dir: 1 } });
+    if (!subgroup) {
+      throw boom.badData('parent from subgroup not found');
+    }
     path = subgroup.name + ' > ' + path;
   }
   return path;
@@ -452,21 +460,28 @@ export const getGroupInformation = async (groupId) => {
     path: 1,
   }); // TODO UNIT TEST
   const listUsersWithRole = await listUsersWithRoleForGroup(groupId); // TODO UNIT TEST
-  for (const user of listUsersWithRole) {
-    const listInstances = await listFarmOSInstancesForUser(user._id); // TODO UNIT TEST
-    for (let instance in listInstances) {
-      const memberships = await listSubGroupsContainFarmosInstance(
-        subgroups,
-        listInstances[instance].instanceName
-      ); // TODO UNIT TEST
-      listInstances[instance] = { ...listInstances[instance], memberships: [...memberships] };
+  if (listUsersWithRole) {
+    for (const user of listUsersWithRole) {
+      const userWithConnectedFarms = { ...user, connectedFarms: [] };
+      let listInstances = await listFarmOSInstancesForUser(user._id); // TODO UNIT TEST
+      if (listInstances) {
+        for (let instance in listInstances) {
+          const memberships = await listSubGroupsContainFarmosInstance(
+            subgroups,
+            listInstances[instance].instanceName
+          ); // TODO UNIT TEST
+          listInstances[instance] = { ...listInstances[instance], memberships: [] };
+          if (memberships) {
+            listInstances[instance].memberships = [...memberships];
+          }
+        }
+        userWithConnectedFarms.connectedFarms = [...listInstances];
+      }
+      groupInformation.members.push(userWithConnectedFarms);
     }
-    const userWithConnectedFarms = { ...user, connectedFarms: [...listInstances] };
-    groupInformation.members.push(userWithConnectedFarms);
   }
 
-  const groupSettings = await hasGroupFarmOSAccess(groupId);
-  //const groupSettings = await getGroupSettings(groupId);
+  const groupSettings = await getGroupSettings(groupId);
   console.log('groupSettings -> ', groupSettings);
 
   return groupInformation;
