@@ -40,6 +40,7 @@ describe('userController', () => {
       const updatedUser = await db.collection('users').findOne(user._id);
       expect(updatedUser).toMatchObject({
         ...user,
+        // bcrypt hashes should start with `$2`
         password: expect.stringMatching(/^\$2/),
         token: expect.any(String),
       });
