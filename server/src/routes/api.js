@@ -9,6 +9,7 @@ import userController from '../controllers/userController';
 import scriptController from '../controllers/scriptController';
 import rolesController from '../controllers/rolesController';
 import * as farmosController from '../controllers/farmosController';
+import * as hyloController from '../controllers/hyloController';
 
 import membershipController from '../controllers/membershipController';
 import infoController from '../controllers/infoController';
@@ -273,6 +274,25 @@ router.post(
   '/farmos/user-unmap-instance',
   [assertIsSuperAdmin],
   catchErrors(farmosController.superAdminUnMapFarmosInstanceFromUser)
+);
+
+/** Hylo */
+router.post(
+  '/hylo/createIntegratedGroup',
+  [],
+  catchErrors(hyloController.createIntegratedHyloGroup)
+);
+
+router.post(
+  '/hylo/getIntegratedGroup',
+  [],
+  catchErrors(hyloController.getIntegratedHyloGroup)
+);
+
+router.get(
+  '/hylo/isGroupExist',
+  [],
+  catchErrors(hyloController.isGroupExist)
 );
 
 /** Integrations - Group */

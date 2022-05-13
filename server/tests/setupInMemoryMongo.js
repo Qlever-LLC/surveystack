@@ -10,7 +10,9 @@ beforeAll(async () => {
   mongod = await MongoMemoryServer.create();
   // Prepare the env for connectDatabase
   process.env.DATABASE_URL = mongod.getUri();
+  console.log("____CONNECTING", process.env.DATABASE_URL)
   await connectDatabase();
+  console.log("____CONNECTED")
 }, CREATE_DB_TIMEOUT);
 
 // eslint-disable-next-line no-undef
