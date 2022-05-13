@@ -9,7 +9,7 @@ import * as utils from '../helpers/surveys';
 import { db } from '../db';
 import { request, gql } from 'graphql-request';
 
-const getToken = async () => {
+export const getToken = async () => {
   const r = await axios.post(
     `${process.env.HYLO_API_URL}/noo/oauth/token`,
     querystring.stringify({
@@ -45,7 +45,7 @@ const getGqlAuthHeaders = async () => {
   };
 };
 
-const gqlRequest = async (query, variables) => {
+export const gqlRequest = async (query, variables) => {
   return request(
     `${process.env.HYLO_API_URL}/noo/graphql`,
     query,
