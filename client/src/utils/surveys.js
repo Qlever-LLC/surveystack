@@ -249,15 +249,11 @@ export const replaceResourceReferenceId = (control, newResources) => {
 export const isResourceReferenced = (controls, resourceId) => {
   return flatSurveyControls(controls).some(({ control }) => {
     if (control.type === 'matrix') {
-      let result = control.options.source.content.some(
+      return control.options.source.content.some(
         (contentEl) => contentEl.resource && contentEl.resource === resourceId
       );
-      if (result) console.log(control.name + ' uses resource id ' + resourceId);
-      return result;
     } else {
-      let result = control.options.source === resourceId;
-      if (result) console.log(control.name + ' uses resource id ' + resourceId);
-      return result;
+      return control.options.source === resourceId;
     }
   });
 };

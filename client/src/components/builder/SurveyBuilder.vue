@@ -49,6 +49,7 @@
             @control-selected="controlSelected"
             @duplicate-control="duplicateControl"
             @open-library="openLibrary"
+            @cleanup-library-resources="cleanupLibraryResources"
             @update-library-resources="updateLibraryResources"
             data-testid="graphical-view"
           />
@@ -369,9 +370,6 @@ export default {
     async addQuestionsFromLibrary(librarySurveyId) {
       // load library survey
       const { data: librarySurvey } = await api.get(`/surveys/${librarySurveyId}`);
-
-      // remove old resources copied from the library survey
-      this.survey.resources = this.survey.resources.filter((resource) => resource.libraryId !== librarySurveyId);
       // add resources from library survey
       this.survey.resources = this.survey.resources.concat(getPreparedLibraryResources(librarySurvey));
 
@@ -392,17 +390,24 @@ export default {
         this.survey.resources
       );
 
+      // cleanup unused library resources (e.g. this could happen if resources with same origin are added when consuming the same library multiple times)
+      this.cleanupLibraryResources();
+
       this.showLibrary = false;
     },
-    async updateLibraryResources(updatedResources) {
+    updateLibraryResources(newLibraryResources) {
       // remove library resources which are not used anymore
+      this.cleanupLibraryResources();
+      // add updated resources
+      if (newLibraryResources) {
+        this.survey.resources = this.survey.resources.concat(newLibraryResources);
+      }
+    },
+    cleanupLibraryResources() {
       const controls = this.survey.revisions[this.survey.revisions.length - 1].controls;
       this.survey.resources = this.survey.resources.filter(
         (resource) => resource.libraryId === null || isResourceReferenced(controls, resource.id)
       );
-      // add updated resources
-      this.survey.resources = this.survey.resources.concat(updatedResources);
-      this.control = null;
     },
     closeLibrary() {
       this.showLibrary = false;

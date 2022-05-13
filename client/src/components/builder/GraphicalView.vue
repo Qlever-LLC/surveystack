@@ -139,11 +139,11 @@
       <v-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
         <v-card class="">
           <v-card-title> Delete Question</v-card-title>
-          <v-card-text class="mt-4"> Are you sure you want to remove this question? </v-card-text>
+          <v-card-text class="mt-4"> Are you sure you want to remove this question?</v-card-text>
           <v-card-actions>
             <v-spacer />
-            <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
-            <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
+            <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel</v-btn>
+            <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -160,7 +160,10 @@
     <v-card class="text--secondary">
       <v-card-title>Empty survey</v-card-title>
       <v-card-text v-if="!readOnly">
-        <div class="text--primary">You can add questions by clicking the <strong>plus icon</strong> below.</div>
+        <div class="text--primary">
+          You can add questions by clicking the <strong>plus icon</strong>
+          below.
+        </div>
       </v-card-text>
     </v-card>
   </div>
@@ -248,6 +251,7 @@ export default {
     },
     removeAt(idx) {
       this.controls.splice(idx, 1);
+      this.$emit('cleanup-library-resources');
       this.$emit('control-selected', null);
     },
     createIndex(current, idx) {
@@ -284,6 +288,8 @@ export default {
       this.controls.splice(this.updateLibraryRootGroupIndex, 1, updatedLibraryRootGroup);
       // let surveybuilder update the survey resources
       this.$emit('update-library-resources', updatedResources);
+      // let surveybuilder unselect the replaced control
+      this.$emit('control-selected', null);
       this.updateToLibrary = null;
       this.updateLibraryRootGroupIndex = null;
     },
