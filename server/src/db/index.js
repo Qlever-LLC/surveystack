@@ -12,6 +12,7 @@ let mongoClient = null;
 
 export const COLL_ACCESS_CODES = 'users.accesscodes';
 export const COLL_USERS = 'users';
+export const COLL_HYLO_GROUP_MAPPING = 'hylo-group-mapping';
 
 /**
  * https://stackoverflow.com/a/33780894
@@ -39,6 +40,9 @@ const connectDatabase = async () => {
 
   await db.collection('farmos-instances').createIndex({ userId: 1 });
   await db.collection('farmos-instances').createIndex({ instanceName: 1 });
+
+  await db.collection(COLL_HYLO_GROUP_MAPPING).createIndex({ groupId: 1 }, { unique: true });
+  await db.collection(COLL_HYLO_GROUP_MAPPING).createIndex({ hyloGroupId: 1 }, { unique: true });
 
   // const farmOsWebhookRequestsCollectionExists = await db.listCollections().toArray().some(({ name }) => name === 'farmos.webhookrequests')
   const farmOsWebhookRequestsCollectionName = 'farmos.webhookrequests';

@@ -22,7 +22,7 @@ const validateOrThrow = (schema, _value) => {
 
 const GROUP_QUERY = gql`
   query Group($id: String!) {
-    group(slug: $id) {
+    group(id: $id) {
       id
       name
       slug
@@ -52,7 +52,13 @@ const getIntegratedHyloGroupSchema = Joi.object({
 });
 export const getIntegratedHyloGroup = async (req, res) => {
   const { surveyStackGroupId } = validateOrThrow(getIntegratedHyloGroupSchema, req.query);
-  const data = await gqlRequest(GROUP_QUERY, { id: surveyStackGroupId });
+  const mapping = await db
+    .collection(COLL_HYLO_GROUP_MAPPING)
+    .findOne({ groupId: new ObjectId(surveyStackGroupId) });
+  if (!mapping) {
+    return null;
+  }
+  const data = await gqlRequest(GROUP_QUERY, { id: mapping.hyloGroupId});
   res.json(data);
 };
 
