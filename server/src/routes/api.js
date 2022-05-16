@@ -283,6 +283,12 @@ router.get(
   catchErrors(hyloController.createIntegratedHyloGroup)
 );
 
+router.post(
+  '/hylo/setIntegratedGroup',
+  [],
+  catchErrors(hyloController.setIntegratedHyloGroup)
+);
+
 router.get(
   '/hylo/getIntegratedGroup',
   [],

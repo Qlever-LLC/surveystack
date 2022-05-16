@@ -12,7 +12,7 @@ let mongoClient = null;
 
 export const COLL_ACCESS_CODES = 'users.accesscodes';
 export const COLL_USERS = 'users';
-export const COLL_HYLO_GROUP_MAPPING = 'hylo-group-mapping';
+export const COLL_GROUPS_HYLO_MAPPINGS = 'groups.hylo-mappings'; // TODO rename to prural?
 
 /**
  * https://stackoverflow.com/a/33780894
@@ -41,8 +41,8 @@ const connectDatabase = async () => {
   await db.collection('farmos-instances').createIndex({ userId: 1 });
   await db.collection('farmos-instances').createIndex({ instanceName: 1 });
 
-  await db.collection(COLL_HYLO_GROUP_MAPPING).createIndex({ groupId: 1 }, { unique: true });
-  await db.collection(COLL_HYLO_GROUP_MAPPING).createIndex({ hyloGroupId: 1 }, { unique: true });
+  await db.collection(COLL_GROUPS_HYLO_MAPPINGS).createIndex({ groupId: 1 }, { unique: true });
+  await db.collection(COLL_GROUPS_HYLO_MAPPINGS).createIndex({ hyloGroupId: 1 }, { unique: true });
 
   // const farmOsWebhookRequestsCollectionExists = await db.listCollections().toArray().some(({ name }) => name === 'farmos.webhookrequests')
   const farmOsWebhookRequestsCollectionName = 'farmos.webhookrequests';
