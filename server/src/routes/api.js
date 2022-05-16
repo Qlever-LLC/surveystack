@@ -277,13 +277,13 @@ router.post(
 );
 
 /** Hylo */
-router.post(
+router.get(
   '/hylo/createIntegratedGroup',
   [],
   catchErrors(hyloController.createIntegratedHyloGroup)
 );
 
-router.post(
+router.get(
   '/hylo/getIntegratedGroup',
   [],
   catchErrors(hyloController.getIntegratedHyloGroup)

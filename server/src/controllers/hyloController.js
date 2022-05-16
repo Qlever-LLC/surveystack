@@ -11,14 +11,6 @@ import boom from '@hapi/boom';
 import { getToken, gqlRequest } from '../services/hylo.service';
 import { gql } from 'graphql-request';
 
-export const getIntegratedHyloGroup = (req, res) => {
-  res.send('ok');
-};
-
-export const createIntegratedHyloGroup = (req, res) => {
-  res.send('ok');
-};
-
 const validateOrThrow = (schema, _value) => {
   const { value, error } = schema.validate(_value);
   if (error) {
@@ -28,11 +20,46 @@ const validateOrThrow = (schema, _value) => {
   return value;
 };
 
-const isGroupExistSchema = Joi.object({
-  slug: Joi.string()
+const GROUP_QUERY = gql`
+  query Group($id: String!) {
+    group(slug: $id) {
+      id
+      name
+      slug
+      # invitePath
+      type
+      avatarUrl
+      bannerUrl
+      members {
+        items {
+          id
+          avatarUrl
+          bannerUrl
+          hasRegistered
+          tagline
+          url
+          contactEmail
+        }
+      }
+    }
+  }
+`;
+
+const getIntegratedHyloGroupSchema = Joi.object({
+  surveyStackGroupId: Joi.string()
     .required()
-    .messages({ 'any.required': 'The slug query parameter is required' }),
+    .messages({ 'any.required': 'The surveyStackGroupId query parameter is required' }),
 });
+export const getIntegratedHyloGroup = async (req, res) => {
+  const { surveyStackGroupId } = validateOrThrow(getIntegratedHyloGroupSchema, req.query);
+  const data = await gqlRequest(GROUP_QUERY, { id: surveyStackGroupId });
+  res.json(data);
+};
+
+export const createIntegratedHyloGroup = async (req, res) => {
+  res.send('ok');
+};
+
 const IS_GROUP_EXIST_QUERY = gql`
   query IsGroupExist($slug: String!) {
     group(slug: $slug) {
@@ -40,6 +67,11 @@ const IS_GROUP_EXIST_QUERY = gql`
     }
   }
 `;
+const isGroupExistSchema = Joi.object({
+  slug: Joi.string()
+    .required()
+    .messages({ 'any.required': 'The slug query parameter is required' }),
+});
 export const isGroupExist = async (req, res) => {
   const { slug } = validateOrThrow(isGroupExistSchema, req.query);
   const data = await gqlRequest(IS_GROUP_EXIST_QUERY, { slug });
