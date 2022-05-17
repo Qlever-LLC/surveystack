@@ -5,7 +5,7 @@ import boom from '@hapi/boom';
 import { db } from '../db';
 import _ from 'lodash';
 
-import { checkSurvey, changeRecursive } from '../helpers/surveys';
+import { checkSurvey, changeRecursive, changeRecursiveAsync } from '../helpers/surveys';
 import rolesService from '../services/roles.service';
 
 const col = 'surveys';
@@ -525,9 +525,10 @@ const checkForLibraryUpdates = async (req, res) => {
   // get latest revision of survey controls, even if draft
   const latestRevision = survey.revisions[survey.revisions.length - 1];
 
-  //for each question set library used in the given survey
-  await Promise.all(
-    latestRevision.controls.map(async (control) => {
+  //for each question set library used in the given survey, collect id and version if updates available
+  let promises = [];
+  latestRevision.controls.map((rootControl) => {
+    changeRecursiveAsync(promises, rootControl, async (control) => {
       if (control.isLibraryRoot && !control.libraryIsInherited) {
         //check if used library survey version is old
         const librarySurvey = await db
@@ -541,8 +542,9 @@ const checkForLibraryUpdates = async (req, res) => {
           updatableSurveys[control.libraryId] = librarySurvey.latestVersion;
         }
       }
-    })
-  );
+    });
+  });
+  await Promise.all(promises);
 
   return res.send(updatableSurveys);
 };
