@@ -525,7 +525,7 @@ const checkForLibraryUpdates = async (req, res) => {
   // get latest revision of survey controls, even if draft
   const latestRevision = survey.revisions[survey.revisions.length - 1];
 
-  //for each question set library used in the given survey
+  //for each question set library used in the given survey, collect id and version if updates available
   let promises = [];
   latestRevision.controls.map((rootControl) => {
     changeRecursiveAsync(promises, rootControl, async (control) => {
