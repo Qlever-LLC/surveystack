@@ -9,7 +9,7 @@
           contain
           height="128"
         ></v-img>
-        <v-img v-else :src="require('../assets/surveystack_temp_logo.svg')" class="my-3" contain height="128"></v-img>
+        <v-img v-else :src="require('../assets/logo-green-stacked.svg')" class="my-3" contain height="128"></v-img>
       </v-col>
     </v-row>
 
@@ -128,12 +128,6 @@
         <v-btn color="primary" x-large href="surveystack://measurement">Run Measurement</v-btn>
       </v-col>
     </v-row>
-
-    <v-row>
-      <v-col align="center">
-        <v-btn text style="font-family: monospace" to="/app/info">v{{ version }}</v-btn>
-      </v-col>
-    </v-row>
   </v-container>
 </template>
 
@@ -149,7 +143,6 @@ export default {
   name: 'home',
   data() {
     return {
-      version: process.env.VUE_APP_VERSION,
       loginIsVisible: this.$store.getters['auth/isLoggedIn'] || true,
     };
   },

@@ -21,7 +21,6 @@ export default function buildScriptQuestionIframeContents({
   contextJSON,
   controlJSON,
   paramsJSON,
-  surveyJSON,
 }) {
   let baseURL = window.location.origin;
 
@@ -72,7 +71,6 @@ export default function buildScriptQuestionIframeContents({
           parent: ${parentJSON},
           control: ${controlJSON},
           params: ${paramsJSON},
-          survey: ${surveyJSON},
         };
 
         ${scriptSource}
