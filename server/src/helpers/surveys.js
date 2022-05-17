@@ -153,7 +153,7 @@ export const changeRecursiveAsync = async (promises, control, changeFn) => {
 
   if (control.children) {
     control.children.forEach((childControl) => {
-      promises.push(changeRecursiveAsync(promises, childControl, changeFn));
+      changeRecursiveAsync(promises, childControl, changeFn);
     });
   }
 };
