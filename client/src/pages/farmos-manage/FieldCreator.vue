@@ -29,9 +29,7 @@
       </v-col>
     </template>
 
-    <app-dialog labelConfirm="OK" class="primary--text mx-4" v-model="dialog" width="400">
-      Dialog Text
-    </app-dialog>
+    <app-dialog labelConfirm="OK" class="primary--text mx-4" v-model="dialog" width="400"> Dialog Text </app-dialog>
   </v-row>
 </template>
 <script>
