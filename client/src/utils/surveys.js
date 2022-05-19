@@ -121,6 +121,11 @@ export const changeRecursive = (control, changeFn) => {
   }
 };
 
+export const getControlPath = (controls, control) => {
+  const position = getPosition(control, controls);
+  return getFlatName(this.currentControls, position);
+};
+
 /**
  * Replaces a control by its path
  * @param controls control list to be changed
@@ -203,46 +208,80 @@ export const getPreparedLibraryResources = (librarySurvey) => {
  * @param librarySurveyLatestVersion
  * @param controlsToAdd
  * @param newResources an array of resources containing updated id's, with the old id stored in the origin property
+ * @param oldResources an array of resources containing updated id's, with the old id stored in the origin property
  * @returns [controls]
  */
 export const getPreparedLibraryControls = (
   librarySurveyId,
   librarySurveyLatestVersion,
   controlsToAdd,
-  newResources
+  newResources,
+  oldResources
 ) => {
   return controlsToAdd.map((controlToAdd) => {
     changeRecursive(controlToAdd, (control) => {
       prepareToAddFromLibrary(control, librarySurveyId, librarySurveyLatestVersion);
-      replaceResourceReferenceId(control, newResources);
+      replaceResourceReferenceId(control, newResources, oldResources);
     });
     return controlToAdd;
   });
 };
 
 /**
- * Updates a control's references to resources
+ * Updates a control's references to new resources
  * @param control the control to update
  * @param newResources an array of resources containing updated id's, with the old id stored in the origin property
+ * @param oldResources optional, an array of resources containing updated id's, with the old id stored in the origin property
  * @returns [controls]
  */
-export const replaceResourceReferenceId = (control, newResources) => {
+export const replaceResourceReferenceId = (control, newResources, oldResources) => {
   if (newResources && control && control.options && control.options.source) {
+    // replace the control's reference(s) by the new ids of the resources
     if (control.type === 'matrix') {
       control.options.source.content.forEach((col) => {
         if (col.resource) {
-          let matchingResource = newResources.find((r) => r.origin === col.resource);
-          if (matchingResource) {
-            col.resource = matchingResource.id; // replace the control's reference by the new id of the resource
-          }
+          col.resource = getUpdatedResourceId(col.resource, oldResources, newResources);
         }
       });
     } else {
-      let matchingResource = newResources.find((r) => r.origin === control.options.source);
-      if (matchingResource) {
-        control.options.source = matchingResource.id; // replace the control's reference by the new id of the resource
-      }
+      control.options.source = getUpdatedResourceId(control.options.source, oldResources, newResources);
     }
+  }
+};
+
+/*
+
+
+ */
+/**
+ * Returns the updated resourceId.
+ * If oldResources are passed, we try to find matches via newResource.origin===oldResource.origin and oldResource.id===oldId
+ * If oldResources are NOT passed, we try to find matches via newResource.origin===oldId
+ *
+ * @param oldId old resource id
+ * @param oldResources (optional) old resources containing id's and origin's
+ * @param newResources old resources containing id's and origin's
+ * @returns {*} the new resource id if found, otherwise returns oldId
+ */
+const getUpdatedResourceId = (oldId, oldResources, newResources) => {
+  let matchingResource;
+
+  if (oldResources) {
+    matchingResource = newResources.find((newRes) => {
+      const matchingOldRes = oldResources.find((oldRes) => oldRes.origin === newRes.origin);
+      if (matchingOldRes) {
+        return matchingOldRes.id === oldId;
+      } else {
+        return false;
+      }
+    });
+  } else {
+    matchingResource = newResources.find((r) => r.origin === oldId);
+  }
+  if (matchingResource) {
+    return matchingResource.id;
+  } else {
+    return oldId;
   }
 };
 

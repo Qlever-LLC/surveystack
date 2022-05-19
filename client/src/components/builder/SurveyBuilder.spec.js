@@ -435,11 +435,15 @@ describe('question set library', () => {
   });
 
   describe('methods.addQuestionsFromLibrary', () => {
-    const { addQuestionsFromLibrary } = SurveyBuilder.methods;
+    const { addQuestionsFromLibrary, cleanupLibraryResources } = SurveyBuilder.methods;
 
     describe('resources', () => {
       const runTest = async (surveyResources, qslResources, expectedResources) => {
-        const component = { ...optionsWithControls().props, controlAdded: jest.fn() };
+        const component = {
+          ...optionsWithControls().props,
+          controlAdded: jest.fn(),
+          cleanupLibraryResources: cleanupLibraryResources,
+        };
         component.survey.resources = surveyResources;
         qsl.resources = qslResources;
 
@@ -483,7 +487,7 @@ describe('question set library', () => {
 
     describe('copying controls', () => {
       it("adds a new group control if the QLS if it's newly imported", async () => {
-        const component = { ...optionsWithControls().props, controlAdded: jest.fn() };
+        const component = { ...optionsWithControls().props, controlAdded: jest.fn(), cleanupLibraryResources };
 
         await addQuestionsFromLibrary.call(component, qsl._id);
         expect(component.controlAdded).toHaveBeenCalledWith(
@@ -500,7 +504,7 @@ describe('question set library', () => {
 
       describe('adds the QSL info to the copied controls', () => {
         it('works with newly added QSL', async () => {
-          const component = { ...optionsWithControls().props, controlAdded: jest.fn() };
+          const component = { ...optionsWithControls().props, controlAdded: jest.fn(), cleanupLibraryResources };
           const num = createControlInstance({ type: 'number', name: 'number_1' });
           const childSrt = createControlInstance({ type: 'string', name: 'string_1' });
           const group = createControlInstance({
@@ -530,7 +534,7 @@ describe('question set library', () => {
 
         it('sets the inherited flag if the QSL control comes from another QSL', async () => {
           const otherLibInfo = { libraryId: 'other_qsl', libraryVersion: 3 };
-          const component = { ...optionsWithControls().props, controlAdded: jest.fn() };
+          const component = { ...optionsWithControls().props, controlAdded: jest.fn(), cleanupLibraryResources };
           const num = createControlInstance({ type: 'number', name: 'number_1' });
           const childSrt = createControlInstance({
             type: 'string',
@@ -576,10 +580,14 @@ describe('question set library', () => {
   });
 
   describe('methods.updateLibraryQuestions', () => {
-    const { addQuestionsFromLibrary, updateLibraryResources } = SurveyBuilder.methods;
+    const { addQuestionsFromLibrary, updateLibraryResources, cleanupLibraryResources } = SurveyBuilder.methods;
 
     const runTest = async (surveyResources, updatedResources, expectedResources) => {
-      const component = { ...optionsWithControls().props, controlAdded: jest.fn() };
+      const component = {
+        ...optionsWithControls().props,
+        controlAdded: jest.fn(),
+        cleanupLibraryResources: cleanupLibraryResources,
+      };
       component.survey.resources = surveyResources;
       qsl.resources = updatedResources;
       await addQuestionsFromLibrary.call(component, qsl._id);

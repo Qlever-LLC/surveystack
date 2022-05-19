@@ -78,7 +78,6 @@ import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChange
 import SurveyDiff from '@/components/survey/SurveyDiff';
 import { diffHasConflicts, merge } from '@/utils/surveyDiff';
 import { reactive, toRefs } from '@vue/composition-api';
-import { getPreparedLibraryControls, getPreparedLibraryResources } from '@/utils/surveys';
 
 export default {
   components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor },
@@ -124,26 +123,14 @@ export default {
     }
 
     function updateConfirmed() {
-      //update updatedLibraryRootGroup
-      let updatedLibraryRootGroup = { ...props.libraryRootGroup };
-      updatedLibraryRootGroup.libraryVersion = props.toSurvey.latestVersion;
-      //update resources
-      const updatedResources = getPreparedLibraryResources(props.toSurvey);
       //update controls
-      let updatedControls = merge(
+      let updatedLibraryControls = merge(
         state.localRevisionControls,
         state.remoteOldRevisionControls,
         state.remoteNewRevisionControls
       );
-      // add questions from library survey to question group
-      updatedLibraryRootGroup.children = getPreparedLibraryControls(
-        props.toSurvey._id,
-        props.toSurvey.latestVersion,
-        updatedControls,
-        updatedResources
-      );
       //emit containing updated controls and resources
-      emit('update', { updatedLibraryRootGroup, updatedResources });
+      emit('update', updatedLibraryControls);
     }
 
     return {

@@ -75,7 +75,7 @@
             >
               <v-icon
                 v-if="availableLibraryUpdates[el.libraryId] > el.libraryVersion"
-                @click.stop="updateLibrary(idx)"
+                @click.stop="$emit('update-library-control', el)"
                 left
               >
                 mdi-refresh
@@ -115,9 +115,10 @@
         :availableLibraryUpdates="availableLibraryUpdates"
         :readOnly="readOnly"
         @control-selected="$emit('control-selected', $event)"
+        @control-removed="$emit('control-removed', $event)"
         @duplicate-control="$emit('duplicate-control', $event)"
         @open-library="$emit('open-library', $event)"
-        @update-library-questions="$emit('update-library-questions', $event)"
+        @update-library-control="$emit('update-library-control', $event)"
         :index="createIndex(index, idx + 1)"
       />
 
@@ -132,9 +133,10 @@
         :availableLibraryUpdates="availableLibraryUpdates"
         :readOnly="readOnly"
         @control-selected="$emit('control-selected', $event)"
+        @control-removed="$emit('control-removed', $event)"
         @duplicate-control="$emit('duplicate-control', $event)"
         @open-library="$emit('open-library', $event)"
-        @update-library-questions="$emit('update-library-questions', $event)"
+        @update-library-control="$emit('update-library-control', $event)"
         :index="createIndex(index, idx + 1)"
       />
 
@@ -149,13 +151,6 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <update-library-dialog
-        v-if="updateLibraryDialogIsVisible"
-        :library-root-group="controls[updateLibraryRootGroupIndex]"
-        :to-survey="updateToLibrary"
-        @update="updateLibraryConfirmed"
-        @cancel="updateLibraryCancelled"
-      />
     </v-card>
   </draggable>
   <div v-else>
@@ -177,13 +172,11 @@ import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
 import * as utils from '@/utils/surveys';
 import api from '@/services/api.service';
-import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
 import ControlCardHeader from './ControlCardHeader';
 
 export default {
   name: 'nested-draggable',
   components: {
-    UpdateLibraryDialog,
     draggable,
     ControlCardHeader,
   },
@@ -192,9 +185,6 @@ export default {
       drag: false,
       deleteQuestionModalIsVisible: false,
       deleteQuestionIndex: null,
-      updateLibraryDialogIsVisible: false,
-      updateToLibrary: null,
-      updateLibraryRootGroupIndex: null,
       scaleStyles: {},
       hoveredControl: null,
     };
@@ -253,8 +243,7 @@ export default {
     },
     removeAt(idx) {
       this.controls.splice(idx, 1);
-      this.$emit('cleanup-library-resources');
-      this.$emit('control-selected', null);
+      this.$emit('control-removed');
     },
     createIndex(current, idx) {
       const newIndex = [...current];
@@ -277,28 +266,6 @@ export default {
     },
     openLibrary(libraryId) {
       this.$emit('open-library', libraryId);
-    },
-    async updateLibrary(updateLibraryRootGroupIndex) {
-      this.updateLibraryRootGroupIndex = updateLibraryRootGroupIndex;
-      const { data } = await api.get(`/surveys/${this.controls[updateLibraryRootGroupIndex].libraryId}`);
-      this.updateToLibrary = data;
-      this.updateLibraryDialogIsVisible = true;
-    },
-    updateLibraryConfirmed({ updatedLibraryRootGroup, updatedResources }) {
-      this.updateLibraryDialogIsVisible = false;
-      // replace the updatedLibraryRootGroup
-      this.controls.splice(this.updateLibraryRootGroupIndex, 1, updatedLibraryRootGroup);
-      // let surveybuilder update the survey resources
-      this.$emit('update-library-resources', updatedResources);
-      // let surveybuilder unselect the replaced control
-      this.$emit('control-selected', null);
-      this.updateToLibrary = null;
-      this.updateLibraryRootGroupIndex = null;
-    },
-    updateLibraryCancelled() {
-      this.updateToLibrary = null;
-      this.updateLibraryDialogIsVisible = false;
-      this.updateLibraryRootGroupIndex = null;
     },
     handleCardHoverChange({ control, isHovering }) {
       if (isHovering) {

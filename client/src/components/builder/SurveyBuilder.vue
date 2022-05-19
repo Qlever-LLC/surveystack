@@ -8,6 +8,14 @@
       <app-examples-view @close="showExamples = false" :category="tabMap[selectedTab]" />
     </v-dialog>
 
+    <update-library-dialog
+      v-if="updateLibraryDialogIsVisible"
+      :library-root-group="updateLibraryRootGroup"
+      :to-survey="updateToLibrary"
+      @update="updateLibraryConfirmed"
+      @cancel="updateLibraryCancelled"
+    />
+
     <v-alert v-if="Object.keys(availableLibraryUpdates).length > 0" type="warning" dismissible>
       This survey uses an outdated question library set. Consider reviewing the new version and updating it.
     </v-alert>
@@ -49,8 +57,11 @@
             @control-selected="controlSelected"
             @duplicate-control="duplicateControl"
             @open-library="openLibrary"
-            @cleanup-library-resources="cleanupLibraryResources"
-            @update-library-resources="updateLibraryResources"
+            @control-removed="
+              cleanupLibraryResources();
+              controlSelected(null);
+            "
+            @update-library-control="updateLibrary"
             data-testid="graphical-view"
           />
         </div>
@@ -227,6 +238,7 @@ import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 import * as surveyStackUtils from '@/utils/surveyStack';
 import {
   executeUnsafe,
+  getControlPath,
   getFlatName,
   getGroups,
   getPosition,
@@ -235,7 +247,11 @@ import {
   getSurveyPositions,
   insertControl,
   isResourceReferenced,
+  replaceControl,
+  replaceResourceReferenceId,
 } from '@/utils/surveys';
+import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
+import { merge } from '@/utils/surveyDiff';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -257,6 +273,7 @@ const tabMap = ['relevance', 'calculate', 'constraint', 'apiCompose'];
 export default {
   mixins: [appMixin],
   components: {
+    UpdateLibraryDialog,
     Splitpanes,
     Pane,
     codeEditor,
@@ -304,8 +321,12 @@ export default {
       initialSurvey: cloneDeep(this.survey),
       surveyUnchanged: true,
       showExamples: false,
-      availableLibraryUpdates: {},
       isPreviewMobile: false,
+      //question sets
+      availableLibraryUpdates: {},
+      updateLibraryDialogIsVisible: false,
+      updateLibraryRootGroup: null,
+      updateToLibrary: null,
     };
   },
   methods: {
@@ -392,16 +413,51 @@ export default {
 
       // cleanup unused library resources (e.g. this could happen if resources with same origin are added when consuming the same library multiple times)
       this.cleanupLibraryResources();
-
+      // hide the library view
       this.showLibrary = false;
     },
+    async updateLibrary(updateLibraryRootGroup) {
+      this.updateLibraryRootGroup = updateLibraryRootGroup;
+      const { data } = await api.get(`/surveys/${updateLibraryRootGroup.libraryId}`);
+      this.updateToLibrary = data;
+      this.updateLibraryDialogIsVisible = true;
+    },
+    updateLibraryConfirmed(updatedLibraryControls) {
+      this.updateLibraryRootGroup.libraryVersion = this.updateToLibrary.latestVersion;
+      //update resources
+      const updatedResources = getPreparedLibraryResources(this.updateToLibrary);
+      // add updated controls, prepared by creating new id's, setting origin and update resources references
+      this.updateLibraryRootGroup.children = getPreparedLibraryControls(
+        this.updateToLibrary,
+        this.updateToLibrary.latestVersion,
+        updatedLibraryControls,
+        updatedResources,
+        this.survey.resources
+      );
+
+      // replace the updatedLibraryRootGroup
+      //const libraryRootGroupPath = getControlPath(this.currentControls, updatedLibraryRootGroup);
+      //replaceControl(this.currentControls, null, libraryRootGroupPath, updatedLibraryRootGroup);
+
+      // update the survey resources
+      this.updateLibraryResources(updatedResources);
+      // let surveybuilder select the replaced control
+      //this.controlSelected(this.updateLibraryRootGroup);
+      //clear update vars
+      this.updateToLibrary = null;
+      this.updateLibraryRootGroup = null;
+      this.updateLibraryDialogIsVisible = false;
+    },
+    updateLibraryCancelled() {
+      this.updateToLibrary = null;
+      this.updateLibraryDialogIsVisible = false;
+      this.updateLibraryRootGroup = null;
+    },
     updateLibraryResources(newLibraryResources) {
+      // add updated resources
+      this.survey.resources = this.survey.resources.concat(newLibraryResources);
       // remove library resources which are not used anymore
       this.cleanupLibraryResources();
-      // add updated resources
-      if (newLibraryResources) {
-        this.survey.resources = this.survey.resources.concat(newLibraryResources);
-      }
     },
     cleanupLibraryResources() {
       const controls = this.survey.revisions[this.survey.revisions.length - 1].controls;
