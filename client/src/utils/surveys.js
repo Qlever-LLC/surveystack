@@ -254,7 +254,7 @@ export const replaceResourceReferenceId = (control, newResources, oldResources) 
 
  */
 /**
- * Returns the updated resourceId.
+ * Returns an updated resource id referencing the new resource id
  * If oldResources are passed, we try to find matches via newResource.origin===oldResource.origin and oldResource.id===oldId
  * If oldResources are NOT passed, we try to find matches via newResource.origin===oldId
  *
@@ -275,7 +275,9 @@ const getUpdatedResourceId = (oldId, oldResources, newResources) => {
         return false;
       }
     });
-  } else {
+  }
+
+  if (!matchingResource) {
     matchingResource = newResources.find((r) => r.origin === oldId);
   }
   if (matchingResource) {
