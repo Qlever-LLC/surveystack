@@ -278,27 +278,27 @@ router.post(
 
 /** Hylo */
 router.get(
-  '/hylo/createIntegratedGroup',
+  '/hylo/create-integrated-group',
   [],
   catchErrors(hyloController.createIntegratedHyloGroup)
 );
 
 router.post(
-  '/hylo/setIntegratedGroup',
+  '/hylo/set-integrated-group',
   [],
   catchErrors(hyloController.setIntegratedHyloGroup)
 );
 
 router.get(
-  '/hylo/getIntegratedGroup',
+  '/hylo/integrated-group/:groupId',
   [],
   catchErrors(hyloController.getIntegratedHyloGroup)
 );
 
 router.get(
-  '/hylo/isGroupExist',
+  '/hylo/group',
   [],
-  catchErrors(hyloController.isGroupExist)
+  catchErrors(hyloController.getGroupBySlug)
 );
 
 /** Integrations - Group */

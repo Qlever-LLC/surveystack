@@ -1,0 +1,152 @@
+<template>
+  <div>
+    <v-card>
+      <v-card-title>
+        Hylo Integraton
+        <v-spacer />
+      </v-card-title>
+      <v-card-text v-if="isLoading"> loading </v-card-text>
+      <v-card-text v-else-if="!!integratedHyloGroup">
+        <div>
+          Your group is integrated with
+          <a :href="`https://wwww.hylo.com/groups/${integratedHyloGroup.slug}`" target="_blank">{{
+            integratedHyloGroup.name
+          }}</a> on Hylo
+        </div>
+        <v-btn color="primary" dark> Remove integration TODO </v-btn>
+      </v-card-text>
+
+      <template v-else>
+        <v-card-subtitle>This group is not integrated with Hylo yet</v-card-subtitle>
+
+        <v-card-text>
+          <v-dialog v-model="integrateDialog" width="500">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn color="primary" dark v-bind="attrs" v-on="on"> Integrate with Hylo </v-btn>
+            </template>
+
+            <v-card>
+              <v-card-title>Integrate group with Hylo</v-card-title>
+
+              <v-card-text>
+                <v-text-field
+                  v-model="hyloGroupInput"
+                  label="Hylo group"
+                  placeholder="Link to your Hylo group"
+                  :loading="!!isLoadingHyloGroup"
+                  :error="hyloGroupInput && !groupFound"
+                  :error-messages="findError"
+                ></v-text-field>
+                <v-btn
+                  color="primary"
+                  :disabled="!groupFound"
+                  :loading="isSetIntegratedInProgress"
+                  @click="setIntegratedGroup"
+                >
+                  {{ groupFound ? `Integrate with ${groupFound.name} on Hylo` : 'Integrate with Hylo' }}
+                </v-btn>
+              </v-card-text>
+
+              <v-divider></v-divider>
+
+              <v-card-text>
+                <v-btn color="primary"> Create new group </v-btn>
+              </v-card-text>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn text @click="dialog = false"> close </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </v-card-text>
+      </template>
+    </v-card>
+  </div>
+</template>
+
+<script>
+import api from '@/services/api.service';
+
+export default {
+  props: {
+    groupId: String,
+  },
+  data() {
+    return {
+      integratedHyloGroup: null,
+      isLoading: true,
+      isLoadingHyloGroup: null,
+      isSetIntegratedInProgress: false,
+      hyloGroupInput: null,
+      integrateDialog: false,
+      groupFound: null,
+      findError: null,
+    };
+  },
+  computed: {
+    extractedSlug() {
+      console.log('this.hyloGroupInput', this.hyloGroupInput);
+      if (!this.hyloGroupInput) {
+        return null;
+      }
+      const match = this.hyloGroupInput.match(/\/groups\/([^/]+)/);
+      console.log({ match });
+      const slug = match ? match[1] : this.hyloGroupInput;
+      return slug;
+    },
+  },
+  watch: {
+    extractedSlug(slug) {
+      this.throttledFindHyloGroup(slug);
+    },
+  },
+  methods: {
+    async setIntegratedGroup() {
+      this.isSetIntegratedInProgress = true;
+      try {
+        this.integratedHyloGroup = (
+          await api.post(`/hylo/set-integrated-group`, {
+            hyloGroupId: this.groupFound.id,
+            surveyStackGroupId: this.groupId,
+          })
+        ).data;
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.isSetIntegratedInProgress = false;
+      }
+    },
+    async throttledFindHyloGroup(slug) {
+      console.log('throttledFindHyloGroup', slug, this.isLoadingHyloGroup);
+      if (this.isLoadingHyloGroup) {
+        this._nextSlugToCheck = slug;
+        console.log('already loading');
+        return;
+      }
+      console.log('check with', slug);
+      if (slug) {
+        try {
+          this.isLoadingHyloGroup = api.get(`/hylo/group?slug=${slug}`);
+          this.groupFound = (await this.isLoadingHyloGroup).data;
+          this.findError = this.groupFound ? null : `Can't find Hylo group with slug "${slug}"`;
+        } catch (e) {
+          console.warn(e);
+        }
+
+        this.isLoadingHyloGroup = null;
+        // console.log("this._nextSlugToCheck", this._nextSlugToCheck)
+        // if (this._nextSlugToCheck) {
+        //   this._nextSlugToCheck = null;
+        //   this.throttledFindHyloGroup(this._nextSlugToCheck);
+        // }
+      }
+    },
+  },
+  async created() {
+    this.integratedHyloGroup = (await api.get(`/hylo/integrated-group/${this.groupId}`)).data;
+    // TODO handle error
+    this.isLoading = false;
+  },
+};
+</script>

@@ -5,7 +5,6 @@ import joiObjectId from 'joi-objectid';
 Joi.objectId = joiObjectId(Joi);
 
 import _, { isString, min } from 'lodash';
-import axios from 'axios';
 import boom from '@hapi/boom';
 
 import { getToken, gqlRequest } from '../services/hylo.service';
@@ -20,43 +19,53 @@ const validateOrThrow = (schema, _value) => {
   return value;
 };
 
-const GROUP_QUERY = gql`
-  query Group($id: String!) {
-    group(id: $id) {
-      id
-      name
-      slug
-      # invitePath
-      type
-      avatarUrl
-      bannerUrl
-      members {
-        items {
-          id
-          avatarUrl
-          bannerUrl
-          hasRegistered
-          tagline
-          url
-          contactEmail
-        }
+export const GROUP_FIELDS = gql`
+  fragment GroupFields on Group {
+    id
+    name
+    slug
+    # invitePath
+    type
+    avatarUrl
+    bannerUrl
+    members {
+      items {
+        id
+        avatarUrl
+        bannerUrl
+        hasRegistered
+        tagline
+        url
+        contactEmail
       }
     }
   }
 `;
 
+const GROUP_QUERY = gql`
+  ${GROUP_FIELDS}
+  query Group($id: ID!) {
+    group(id: $id) {
+      ...GroupFields
+    }
+  }
+`;
+
 const getIntegratedHyloGroupSchema = Joi.object({
-  surveyStackGroupId: Joi.string()
+  groupId: Joi.string()
     .required()
-    .messages({ 'any.required': 'The surveyStackGroupId query parameter is required' }),
+    .messages({ 'any.required': 'The groupId query parameter is required' }),
 });
 export const getIntegratedHyloGroup = async (req, res) => {
-  const { surveyStackGroupId } = validateOrThrow(getIntegratedHyloGroupSchema, req.query);
+  console.log('getIntegratedHyloGroup');
+  const { groupId } = validateOrThrow(getIntegratedHyloGroupSchema, req.params);
+  console.log('groupId', groupId);
   const mapping = await db
     .collection(COLL_GROUPS_HYLO_MAPPINGS)
-    .findOne({ groupId: new ObjectId(surveyStackGroupId) });
+    .findOne({ groupId: new ObjectId(groupId) });
+  console.log({ mapping });
   if (!mapping) {
-    return null;
+    return res.json(null);
   }
   const data = await gqlRequest(GROUP_QUERY, { id: mapping.hyloGroupId });
   res.json(data);
@@ -68,52 +77,52 @@ export const createIntegratedHyloGroup = async (req, res) => {
 
 export const setIntegratedHyloGroup = async (req, res) => {
   const QUERY = gql`
-    query GroupId($slug: String!) {
-      group(slug: $slug) {
-        id
+    ${GROUP_FIELDS}
+    query GroupId($id: ID!) {
+      group(id: $id) {
+        ...GroupFields
       }
     }
   `;
 
   const schema = Joi.object({
-    hyloGroupSlug: Joi.string().required(),
+    hyloGroupId: Joi.string().required(),
     surveyStackGroupId: Joi.string().required(),
   });
 
-  const { hyloGroupSlug, surveyStackGroupId } = validateOrThrow(schema, req.body);
+  const { hyloGroupId, surveyStackGroupId } = validateOrThrow(schema, req.body);
 
-  const hyloGroupId = (await gqlRequest(QUERY, { slug: hyloGroupSlug }))?.group?.id;
-  if (!hyloGroupId) {
-    throw boom.notFound(`Can't find Hylo group with the slug "${hyloGroupSlug}`);
+  const hyloGroup = (await gqlRequest(QUERY, { id: hyloGroupId }))?.group;
+  if (!hyloGroup) {
+    throw boom.notFound(`Can't find Hylo group with the ID "${hyloGroupId}`);
   }
 
   const groupId = (await db.collection('groups').findOne({ _id: new ObjectId(surveyStackGroupId) }))
     ?._id;
   if (!groupId) {
-    throw boom.notFound(`Can't find SurveyStack group with the id "${surveyStackGroupId}`);
+    throw boom.notFound(`Can't find SurveyStack group with the ID "${surveyStackGroupId}`);
   }
 
   await db
     .collection(COLL_GROUPS_HYLO_MAPPINGS)
     .updateOne({ groupId }, { $set: { hyloGroupId } }, { upsert: true });
 
-  res.send({ ok: true });
+  res.send(hyloGroup);
 };
 
-const IS_GROUP_EXIST_QUERY = gql`
-  query IsGroupExist($slug: String!) {
-    group(slug: $slug) {
-      id
+export const getGroupBySlug = async (req, res) => {
+  const QUERY = gql`
+    ${GROUP_FIELDS}
+    query Group($slug: String!) {
+      group(slug: $slug) {
+        ...GroupFields
+      }
     }
-  }
-`;
-const isGroupExistSchema = Joi.object({
-  slug: Joi.string()
-    .required()
-    .messages({ 'any.required': 'The slug query parameter is required' }),
-});
-export const isGroupExist = async (req, res) => {
-  const { slug } = validateOrThrow(isGroupExistSchema, req.query);
-  const data = await gqlRequest(IS_GROUP_EXIST_QUERY, { slug });
-  res.json({ exist: !!data?.group });
+  `;
+  const schema = Joi.object({
+    slug: Joi.string().required(),
+  });
+  const { slug } = validateOrThrow(schema, req.query);
+  const data = await gqlRequest(QUERY, { slug });
+  res.json(data?.group );
 };
