@@ -238,11 +238,13 @@ export default {
 
         this.snack(isDraft ? 'Saved Draft' : 'Published Survey');
       } catch (error) {
-        if (error.response.status === 409) {
+        if (error && error.response && error.response.status === 409) {
           this.showConflictModal = true;
-        } else {
+        } else if (error && error.response && error.response.data) {
           const { message } = error.response.data;
           this.snack(message);
+        } else {
+          console.error(error);
         }
         return;
       }
