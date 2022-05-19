@@ -422,7 +422,7 @@ export default {
       const updatedResources = getPreparedLibraryResources(this.updateToLibrary);
       // add updated controls, prepared by creating new id's, setting origin and update resources references
       this.updateLibraryRootGroup.children = getPreparedLibraryControls(
-        this.updateToLibrary,
+        this.updateToLibrary._id,
         this.updateToLibrary.latestVersion,
         updatedLibraryControls,
         updatedResources,
