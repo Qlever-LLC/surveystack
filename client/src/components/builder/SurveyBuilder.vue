@@ -57,10 +57,7 @@
             @control-selected="controlSelected"
             @duplicate-control="duplicateControl"
             @open-library="openLibrary"
-            @control-removed="
-              cleanupLibraryResources();
-              controlSelected(null);
-            "
+            @control-removed="controlRemoved"
             @update-library-control="updateLibrary"
             data-testid="graphical-view"
           />
@@ -238,7 +235,6 @@ import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 import * as surveyStackUtils from '@/utils/surveyStack';
 import {
   executeUnsafe,
-  getControlPath,
   getFlatName,
   getGroups,
   getPosition,
@@ -247,11 +243,8 @@ import {
   getSurveyPositions,
   insertControl,
   isResourceReferenced,
-  replaceControl,
-  replaceResourceReferenceId,
 } from '@/utils/surveys';
 import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
-import { merge } from '@/utils/surveyDiff';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -408,7 +401,8 @@ export default {
         librarySurvey._id,
         librarySurvey.latestVersion,
         librarySurvey.revisions[librarySurvey.latestVersion - 1].controls,
-        this.survey.resources
+        this.survey.resources,
+        null
       );
 
       // cleanup unused library resources (e.g. this could happen if resources with same origin are added when consuming the same library multiple times)
@@ -591,6 +585,10 @@ export default {
       } else {
         this.scriptCode = null;
       }
+    },
+    async controlRemoved() {
+      await this.controlSelected(null);
+      this.cleanupLibraryResources();
     },
     async fetchScript(id) {
       const { data } = await api.get(`/scripts/${id}`);
