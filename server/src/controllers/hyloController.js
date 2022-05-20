@@ -69,7 +69,7 @@ export const getIntegratedHyloGroup = async (req, res) => {
     return res.json(null);
   }
   const data = await gqlRequest(QUERY, { id: mapping.hyloGroupId });
-  res.json(data);
+  res.json(data?.group);
 };
 
 export const createNewIntegratedHyloGroup = async (req, res) => {

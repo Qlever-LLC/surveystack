@@ -5,15 +5,34 @@
         Hylo Integraton
         <v-spacer />
       </v-card-title>
-      <v-card-text v-if="isLoading"> loading </v-card-text>
+      <v-card-text v-if="isLoading">
+        <v-skeleton-loader type="list-item-avatar, card-heading"></v-skeleton-loader>
+      </v-card-text>
       <v-card-text v-else-if="!!integratedHyloGroup">
-        <div>
+        <v-row align="center" class="spacer mb-4" no-gutters>
+          <!-- <v-col cols="4" sm="2" md="1"> -->
+            <v-avatar size="36px" class="mr-4">
+              <img alt="Avatar" :src="integratedHyloGroup.avatarUrl" />
+            </v-avatar>
+          <!-- </v-col> -->
+
+          <!-- <v-col class="hidden-xs-only" sm="5" md="3"> -->
+            <span class="grey--text">
+              &nbsp;Your group is integrated with
+              <a :href="`https://wwww.hylo.com/groups/${integratedHyloGroup.slug}`" target="_blank">{{
+                integratedHyloGroup.name
+              }}</a>
+              on Hylo
+            </span>
+          <!-- </v-col> -->
+        </v-row>
+        <!-- <div>
           Your group is integrated with
           <a :href="`https://wwww.hylo.com/groups/${integratedHyloGroup.slug}`" target="_blank">{{
             integratedHyloGroup.name
           }}</a>
           on Hylo
-        </div>
+        </div> -->
         <v-btn color="primary" @click="removeGroupIntegration" :loading="isRemoveGroupIntegrationInProgress">
           Remove integration TODO
         </v-btn>
@@ -38,6 +57,7 @@
                   placeholder="Link to your Hylo group"
                   :loading="!!isLoadingHyloGroup"
                   :error-messages="findError"
+                  class="mb-2"
                 ></v-text-field>
                 <v-btn
                   color="primary"
@@ -49,15 +69,9 @@
                 </v-btn>
               </v-card-text>
 
-              <v-divider></v-divider>
-
-              <v-card-text>
-                <v-btn color="primary"> Create new group </v-btn>
-              </v-card-text>
-
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn text @click="dialog = false"> close </v-btn>
+                <v-btn text @click="integrateDialog = false"> close </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -109,6 +123,7 @@ export default {
         this.isLoading = true;
         console.log('this.groupId', groupId);
         this.integratedHyloGroup = (await api.get(`/hylo/integrated-group/${groupId}`)).data;
+        console.log(JSON.stringify(this.integratedHyloGroup, null, 2));
         // TODO handle error
         this.isLoading = false;
       },
@@ -147,7 +162,7 @@ export default {
       console.log('throttledFindHyloGroup', slug, this.isLoadingHyloGroup);
       if (this.isLoadingHyloGroup) {
         this._nextSlugToCheck = slug;
-        console.log('already loading, next is ',slug);
+        console.log('already loading, next is ', slug);
         return;
       }
       console.log('check with', slug);
@@ -163,7 +178,7 @@ export default {
         }
 
         this.isLoadingHyloGroup = null;
-        console.log("this._nextSlugToCheck", this._nextSlugToCheck)
+        console.log('this._nextSlugToCheck', this._nextSlugToCheck);
         if (this._nextSlugToCheck) {
           this.throttledFindHyloGroup(this._nextSlugToCheck);
           this._nextSlugToCheck = null;
