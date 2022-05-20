@@ -42,23 +42,24 @@ export const GROUP_FIELDS = gql`
   }
 `;
 
-const GROUP_QUERY = gql`
-  ${GROUP_FIELDS}
-  query Group($id: ID!) {
-    group(id: $id) {
-      ...GroupFields
-    }
-  }
-`;
-
-const getIntegratedHyloGroupSchema = Joi.object({
-  groupId: Joi.string()
-    .required()
-    .messages({ 'any.required': 'The groupId query parameter is required' }),
-});
 export const getIntegratedHyloGroup = async (req, res) => {
+  const QUERY = gql`
+    ${GROUP_FIELDS}
+    query Group($id: ID!) {
+      group(id: $id) {
+        ...GroupFields,
+      }
+    }
+  `;
+
+  const schema = Joi.object({
+    groupId: Joi.string()
+      .required()
+      .messages({ 'any.required': 'The groupId query parameter is required' }),
+  });
+
   console.log('getIntegratedHyloGroup');
-  const { groupId } = validateOrThrow(getIntegratedHyloGroupSchema, req.params);
+  const { groupId } = validateOrThrow(schema, req.params);
   console.log('groupId', groupId);
   const mapping = await db
     .collection(COLL_GROUPS_HYLO_MAPPINGS)
@@ -67,7 +68,7 @@ export const getIntegratedHyloGroup = async (req, res) => {
   if (!mapping) {
     return res.json(null);
   }
-  const data = await gqlRequest(GROUP_QUERY, { id: mapping.hyloGroupId });
+  const data = await gqlRequest(QUERY, { id: mapping.hyloGroupId });
   res.json(data);
 };
 
@@ -109,6 +110,20 @@ export const setIntegratedHyloGroup = async (req, res) => {
 
   res.send(hyloGroup);
 };
+export const removeHyloGroupIntegration = async (req, res) => {
+  // TODO check for access rights
+  const schema = Joi.object({
+    groupId: Joi.string().required(),
+  });
+
+  const { groupId } = validateOrThrow(schema, req.body);
+
+  await db
+    .collection(COLL_GROUPS_HYLO_MAPPINGS)
+    .deleteOne({ groupId });
+
+  res.send({ok: true});
+};
 
 export const getGroupBySlug = async (req, res) => {
   const QUERY = gql`
@@ -124,5 +139,5 @@ export const getGroupBySlug = async (req, res) => {
   });
   const { slug } = validateOrThrow(schema, req.query);
   const data = await gqlRequest(QUERY, { slug });
-  res.json(data?.group );
+  res.json(data?.group);
 };

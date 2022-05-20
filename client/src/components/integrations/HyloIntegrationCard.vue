@@ -14,7 +14,9 @@
           }}</a>
           on Hylo
         </div>
-        <v-btn color="primary" dark> Remove integration TODO </v-btn>
+        <v-btn color="primary" @click="removeGroupIntegration" :loading="isRemoveGroupIntegrationInProgress">
+          Remove integration TODO
+        </v-btn>
       </v-card-text>
 
       <template v-else>
@@ -127,6 +129,19 @@ export default {
         console.error(e);
       } finally {
         this.isSetIntegratedInProgress = false;
+      }
+    },
+    async removeGroupIntegration() {
+      this.isRemoveGroupIntegrationInProgress = true;
+      try {
+        await api.post(`/hylo/remove-group-integration`, {
+          groupId: this.groupId,
+        });
+        this.integratedHyloGroup = null;
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.isRemoveGroupIntegrationInProgress = false;
       }
     },
     async throttledFindHyloGroup(slug) {

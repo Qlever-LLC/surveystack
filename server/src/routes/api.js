@@ -279,14 +279,20 @@ router.post(
 /** Hylo */
 router.get(
   '/hylo/create-integrated-group',
-  [],
+  [],// TODO check for access rights
   catchErrors(hyloController.createIntegratedHyloGroup)
 );
 
 router.post(
   '/hylo/set-integrated-group',
-  [],
+  [],// TODO check for access rights
   catchErrors(hyloController.setIntegratedHyloGroup)
+);
+
+router.post(
+  '/hylo/remove-group-integration',
+  [],// TODO check for access rights
+  catchErrors(hyloController.removeHyloGroupIntegration)
 );
 
 router.get(
