@@ -47,7 +47,7 @@ export const getIntegratedHyloGroup = async (req, res) => {
     ${GROUP_FIELDS}
     query Group($id: ID!) {
       group(id: $id) {
-        ...GroupFields,
+        ...GroupFields
       }
     }
   `;
@@ -55,7 +55,7 @@ export const getIntegratedHyloGroup = async (req, res) => {
   const schema = Joi.object({
     groupId: Joi.string()
       .required()
-      .messages({ 'any.required': 'The groupId query parameter is required' }),
+      .messages({ 'any.req  uired': 'The groupId query parameter is required' }),
   });
 
   console.log('getIntegratedHyloGroup');
@@ -72,8 +72,55 @@ export const getIntegratedHyloGroup = async (req, res) => {
   res.json(data);
 };
 
-export const createIntegratedHyloGroup = async (req, res) => {
-  res.send('ok');
+export const createNewIntegratedHyloGroup = async (req, res) => {
+  const MUTATION = gql`
+    mutation ($data: GroupInput, $asUserId: ID) {
+      group: createGroup(data: $data, asUserId: $asUserId) {
+        ...GroupDetails
+      }
+    }
+    ${FRAGMENT_GROUP_DETAILS}
+  `;
+  const schema = Joi.object({
+    groupId: Joi.string().required(),
+  });
+
+  const { groupId } = validateOrThrow(schema, req.body);
+
+  const group = await db.collection('groups').findOne({ _id: new ObjectId(groupId) });
+  if (!group) {
+    throw boom.notFound(`Can't find SurveyStack group with the ID "${groupId}`);
+  }
+
+  let hyloGroup = null;
+  for (let postfix = 0; postfix <= 12; postfix++) {
+    const slug = postfix === 0 ? group.slug : `${group.slug}-${postfix}`;
+    try {
+      const variables = {
+        data: {
+          accessibility: 1,
+          name: group.name,
+          slug,
+          parentIds: [],
+          visibility: 1,
+        },
+        asUserId: hyloUserId,
+      };
+      // TODO create/find Hylo user for admin
+      // hyloGroup = (await createHyloGroup({ name, slug, farm_url, hyloUserId })).group;
+    } catch (e) {
+      if (
+        !e.response?.errors?.some((e) => e.message === 'A group with that URL slug already exists')
+      ) {
+        throw e;
+      }
+    }
+  }
+  if (!hyloGroup) {
+    throw boom.conflict(`The slug "${group.slug} is already taken on Hylo`);
+  }
+
+  // TODO save in DB and return group
 };
 
 export const setIntegratedHyloGroup = async (req, res) => {
@@ -118,11 +165,9 @@ export const removeHyloGroupIntegration = async (req, res) => {
 
   const { groupId } = validateOrThrow(schema, req.body);
 
-  await db
-    .collection(COLL_GROUPS_HYLO_MAPPINGS)
-    .deleteOne({ groupId });
+  await db.collection(COLL_GROUPS_HYLO_MAPPINGS).deleteOne({ groupId });
 
-  res.send({ok: true});
+  res.send({ ok: true });
 };
 
 export const getGroupBySlug = async (req, res) => {

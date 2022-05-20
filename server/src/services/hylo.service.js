@@ -210,7 +210,7 @@ const syncGroupWithHylo = async ({ name, slug, farm_url, hyloUserId }) => {
   if (!group?.id) {
     group = (await queryHyloGroup(slug)).group;
     if (!group?.id) {
-      throw new Error(`Failed to create of read the Hylo group with slug "${slug}`);
+      throw new Error(`Failed to create a Hylo group with slug "${slug}`);
     }
     group = await updateHyloGroup({ name, farm_url, hyloUserId, hyloGroupId: group.id });
   }
