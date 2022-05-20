@@ -37,7 +37,6 @@
                   label="Hylo group"
                   placeholder="Link to your Hylo group"
                   :loading="!!isLoadingHyloGroup"
-                  :error="hyloGroupInput && !groupFound"
                   :error-messages="findError"
                 ></v-text-field>
                 <v-btn
@@ -148,12 +147,14 @@ export default {
       console.log('throttledFindHyloGroup', slug, this.isLoadingHyloGroup);
       if (this.isLoadingHyloGroup) {
         this._nextSlugToCheck = slug;
-        console.log('already loading');
+        console.log('already loading, next is ',slug);
         return;
       }
       console.log('check with', slug);
       if (slug) {
         try {
+          this.findError = null;
+          this.groupFound = null;
           this.isLoadingHyloGroup = api.get(`/hylo/group?slug=${slug}`);
           this.groupFound = (await this.isLoadingHyloGroup).data;
           this.findError = this.groupFound ? null : `Can't find Hylo group with slug "${slug}"`;
@@ -162,11 +163,11 @@ export default {
         }
 
         this.isLoadingHyloGroup = null;
-        // console.log("this._nextSlugToCheck", this._nextSlugToCheck)
-        // if (this._nextSlugToCheck) {
-        //   this._nextSlugToCheck = null;
-        //   this.throttledFindHyloGroup(this._nextSlugToCheck);
-        // }
+        console.log("this._nextSlugToCheck", this._nextSlugToCheck)
+        if (this._nextSlugToCheck) {
+          this.throttledFindHyloGroup(this._nextSlugToCheck);
+          this._nextSlugToCheck = null;
+        }
       }
     },
   },
