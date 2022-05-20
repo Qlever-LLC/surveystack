@@ -11,7 +11,8 @@
           Your group is integrated with
           <a :href="`https://wwww.hylo.com/groups/${integratedHyloGroup.slug}`" target="_blank">{{
             integratedHyloGroup.name
-          }}</a> on Hylo
+          }}</a>
+          on Hylo
         </div>
         <v-btn color="primary" dark> Remove integration TODO </v-btn>
       </v-card-text>
@@ -100,6 +101,17 @@ export default {
     extractedSlug(slug) {
       this.throttledFindHyloGroup(slug);
     },
+    groupId: {
+      immediate: true,
+      // TODO find out how this should be done in Vue
+      async handler(groupId) {
+        this.isLoading = true;
+        console.log('this.groupId', groupId);
+        this.integratedHyloGroup = (await api.get(`/hylo/integrated-group/${groupId}`)).data;
+        // TODO handle error
+        this.isLoading = false;
+      },
+    },
   },
   methods: {
     async setIntegratedGroup() {
@@ -142,11 +154,6 @@ export default {
         // }
       }
     },
-  },
-  async created() {
-    this.integratedHyloGroup = (await api.get(`/hylo/integrated-group/${this.groupId}`)).data;
-    // TODO handle error
-    this.isLoading = false;
   },
 };
 </script>
