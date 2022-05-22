@@ -76,10 +76,10 @@ export const createNewIntegratedHyloGroup = async (req, res) => {
   const MUTATION = gql`
     mutation ($data: GroupInput, $asUserId: ID) {
       group: createGroup(data: $data, asUserId: $asUserId) {
-        ...GroupDetails
+        ...GroupFields
       }
     }
-    ${FRAGMENT_GROUP_DETAILS}
+    ${GROUP_FIELDS}
   `;
   const schema = Joi.object({
     groupId: Joi.string().required(),
@@ -104,7 +104,7 @@ export const createNewIntegratedHyloGroup = async (req, res) => {
           parentIds: [],
           visibility: 1,
         },
-        asUserId: hyloUserId,
+        asUserId: 'TODO hyloUserId',
       };
       // TODO create/find Hylo user for admin
       // hyloGroup = (await createHyloGroup({ name, slug, farm_url, hyloUserId })).group;

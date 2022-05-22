@@ -279,19 +279,19 @@ router.post(
 /** Hylo */
 router.get(
   '/hylo/create-integrated-group',
-  [],// TODO check for access rights
+  [], // TODO check for access rights
   catchErrors(hyloController.createIntegratedHyloGroup)
 );
 
 router.post(
   '/hylo/set-integrated-group',
-  [],// TODO check for access rights
+  [], // TODO check for access rights
   catchErrors(hyloController.setIntegratedHyloGroup)
 );
 
 router.post(
   '/hylo/remove-group-integration',
-  [],// TODO check for access rights
+  [], // TODO check for access rights
   catchErrors(hyloController.removeHyloGroupIntegration)
 );
 
@@ -301,11 +301,7 @@ router.get(
   catchErrors(hyloController.getIntegratedHyloGroup)
 );
 
-router.get(
-  '/hylo/group',
-  [],
-  catchErrors(hyloController.getGroupBySlug)
-);
+router.get('/hylo/group', [], catchErrors(hyloController.getGroupBySlug));
 
 /** Integrations - Group */
 router.get('/group-integrations', catchErrors(groupIntegrationController.getIntegrations));
