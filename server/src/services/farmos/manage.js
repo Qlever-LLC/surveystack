@@ -18,7 +18,7 @@ export const asMongoId = (source) =>
   source instanceof ObjectId ? source : ObjectId(typeof source === 'string' ? source : source._id);
 
 /**
- * @param {*} group who contains attribut path
+ * @param { Object } group who contains attribut path
  * @returns RootGroup or null;
  * is RootGroup if group has an entry in farmos-group-settigns
  */
@@ -32,7 +32,7 @@ export const getFarmOSRootGroup = async (group) => {
 };
 
 /**
- * @param {*} groupId
+ * @param { ObjectId } groupId
  * @returns true or false;
  * true means no RootGroup in direct way to MainGroup AND no RootGroup in all Subgroups
  */
@@ -54,7 +54,7 @@ export const canBecomeFarmOSRootGroup = async (groupId) => {
 
 /**
  *
- * @param {*} path
+ * @param { String } path
  * @returns array of paths contained in given path;
  * first element is path from it-self and after all direct parents with last who is BaseGroup '/xxx/'
  */
@@ -75,7 +75,7 @@ const getArrayPathsConainedInPath = (path) => {
 };
 
 /**
- * @param {*} paths is array of path(s)
+ * @param { Array } paths is array of path(s)
  * @returns null or groupId if entry in farmos-group-settings
  */
 const getGroupIdFromGroupInFarmosGroupSettingsFromPaths = async (paths) => {
@@ -115,8 +115,8 @@ const getGroupIdFromGroupInFarmosGroupSettingsFromPaths = async (paths) => {
 
 /**
  *
- * @param {*} userId
- * @param {*} projection
+ * @param { ObjectId } userId
+ * @param { Object } projection
  * @returns the user that matches the userId
  */
 export const getUserFromUserId = async (userId, projection = {}) => {
@@ -130,8 +130,8 @@ export const getUserFromUserId = async (userId, projection = {}) => {
 };
 /**
  *
- * @param {*} groupId
- * @param {*} projection can be explicitly undefined
+ * @param { ObjectId } groupId
+ * @param { Object } projection can be explicitly undefined
  * @returns the group that matches the groupId
  */
 export const getGroupFromGroupId = async (groupId, projection = {}) => {
@@ -145,7 +145,7 @@ export const getGroupFromGroupId = async (groupId, projection = {}) => {
 };
 
 /**
- * @param {*} path
+ * @param { String } path
  * @returns 'mainGroupName > SubGroupName > SubSubGroupName';
  * transform '/a/b/c/' to 'a > b > c'
  */
@@ -495,7 +495,7 @@ export const getGroupSettings = async (groupId, projection = {}) => {
 };
 
 /**
- * @param {*} groups
+ * @param { Array } groups
  * @returns amount of unique entry of instanceName in farmos-group-mapping inside the Domain;
  * groups is the entire domain
  */
@@ -613,7 +613,7 @@ export const disableSubgroupAdminsToCreateFarmOSInstances = async (groupId) => {
 };*/
 
 /**
- * @param {*} descendants
+ * @param { Array } descendants
  * @returns all info (raw data) from members from the tested domain
  */
 const getMembersCreatedinDescendantsGroups = async (descendants) => {
@@ -723,7 +723,7 @@ const getMembersCreatedinDescendantsGroups = async (descendants) => {
 };
 
 /**
- * @param {*} membersRawData
+ * @param { Array } membersRawData
  * @returns members part from JSON answer
  */
 const structureMembersPart = async (membersRawData) => {
@@ -766,8 +766,8 @@ const structureMembersPart = async (membersRawData) => {
 
 //TODO implement getGroupInformation
 /**
- * @param {*} groupId
- * @param {*} isSuperAdmin
+ * @param { ObjectId } groupId
+ * @param { Boolean } isSuperAdmin
  * @returns JSON answer
  */
 export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
