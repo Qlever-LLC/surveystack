@@ -114,7 +114,7 @@ describe('manageFarmOS', () => {
   it.only('test-group-settings', async () => {
     // TODO test farmos
     const groupBionutrient = await createGroup({ name: 'Bionutrient' });
-    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'ALabs' });
     const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
     const groupEurope = await groupLabs.createSubGroup({ name: 'Europe' });
     const groupCommunity = await groupLabs.createSubGroup({ name: 'Community' });
@@ -125,7 +125,7 @@ describe('manageFarmOS', () => {
     const user1_data = { userOverrides: { name: 'Dave Jole', email: 'djole2352@gmail.com' } };
     const user1 = await groupLabs.createUserMember(user1_data);
     const user2_data = { userOverrides: { name: 'Jenny Jennerson', email: 'bigjenny@bj.net' } };
-    const user2 = await groupLabs.createUserMember(user2_data);
+    const user2 = await groupMichigan.createUserMember(user2_data);
 
     const admin1_farmOSInstance1 = 'dan_teravest_farm.farmos.net';
     await createFarmOSInstanceForUserAndGroup(
@@ -164,15 +164,15 @@ describe('manageFarmOS', () => {
     const user2_farmOSInstance1 = 'jennybigfarmstand.farmos.net';
     await createFarmOSInstanceForUserAndGroup(
       user2.user._id,
-      groupLabs._id,
+      groupMichigan._id,
       user2_farmOSInstance1,
       true
     );
-    await mapFarmOSInstanceToGroup(groupMichigan._id, user2_farmOSInstance1);
+    //await mapFarmOSInstanceToGroup(groupLabs._id, user2_farmOSInstance1);
 
     // create subgroup "Bio > Ext"
     const groupExt = await groupBionutrient.createSubGroup({ name: 'Ext' });
-    /*const userext_data = { userOverrides: { name: 'Ext ernal', email: 'external@bj.net' } };
+    const userext_data = { userOverrides: { name: 'Ext ernal', email: 'external@bj.net' } };
     const userext = await groupExt.createUserMember(userext_data);
     const userext_farmOSInstance1 = 'external.farmos.net';
     await createFarmOSInstanceForUserAndGroup(
@@ -182,13 +182,17 @@ describe('manageFarmOS', () => {
       true
     );
     await mapFarmOSInstanceToGroup(groupMichigan._id, userext_farmOSInstance1);
-*/
+
+    //FederalMills
+    const groupFederalMills = await createGroup({ name: 'FederalMills' });
+    const groupX = await groupFederalMills.createSubGroup({ name: 'FMX' });
+
     await createFarmosGroupSettings(groupLabs._id);
     //await createFarmosGroupSettings(groupBionutrient._id);
     //await createFarmosGroupSettings(groupCommunityLab._id);
 
-    const infos = await getGroupInformation(groupLabs._id);
-    //console.log(JSON.stringify(infos, null, 2));
+    const infos = await getGroupInformation(groupLabs._id, true);
+    console.log('INFORMATIONS', JSON.stringify(infos, null, 2));
 
     // setup admins
     // setup users
