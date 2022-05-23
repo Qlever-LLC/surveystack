@@ -118,10 +118,13 @@ describe('manageFarmOS', () => {
     const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
     await createFarmosGroupSettings(groupLabs._id);
     const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
+
     const root = await getFarmOSRootGroup(groupMichigan);
     expect(root.name).toBe('Labs');
+
     const root2 = await getFarmOSRootGroup(groupLabs);
     expect(root2.name).toBe('Labs');
+
     const root3 = await getFarmOSRootGroup(groupBionutrient);
     expect(root3).toBeNull();
   });
@@ -131,10 +134,18 @@ describe('manageFarmOS', () => {
     const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
     await createFarmosGroupSettings(groupLabs._id);
     const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
+
     const canBeRoot = await canBecomeFarmOSRootGroup(groupMichigan._id);
     expect(canBeRoot).toBeFalsy();
-    const canBeRoot2 = await canBecomeFarmOSRootGroup(groupExt._id);
-    expect(canBeRoot2).toBeTruthy();
+
+    const canBeRoot2 = await canBecomeFarmOSRootGroup(groupLabs._id);
+    expect(canBeRoot2).toBeFalsy();
+
+    const canBeRoot3 = await canBecomeFarmOSRootGroup(groupExt._id);
+    expect(canBeRoot3).toBeTruthy();
+
+    const canBeRoot4 = await canBecomeFarmOSRootGroup(groupBionutrient._id);
+    expect(canBeRoot4).toBeFalsy();
   });
   it('test-group-settings', async () => {
     // TODO test farmos
