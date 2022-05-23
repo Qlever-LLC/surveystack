@@ -635,6 +635,25 @@ const getMembersCreatedinDescendantsGroups = async (descendants) => {
         role: 1,
       },
     },
+    { $addFields: { m_id: '$_id' } },
+    {
+      $project: {
+        _id: 0,
+      },
+    },
+    {
+      $set: {
+        role: {
+          $cond: {
+            if: {
+              $eq: ['$role', 'admin'],
+            },
+            then: 'true',
+            else: 'false',
+          },
+        },
+      },
+    },
     {
       $lookup: {
         from: 'groups',
@@ -649,6 +668,12 @@ const getMembersCreatedinDescendantsGroups = async (descendants) => {
           },
         ],
         as: 'membersLocation',
+      },
+    },
+    { $addFields: { location: { $arrayElemAt: ['$membersLocation.path', 0] } } },
+    {
+      $project: {
+        membersLocation: 0,
       },
     },
     {
@@ -668,6 +693,13 @@ const getMembersCreatedinDescendantsGroups = async (descendants) => {
         as: 'members',
       },
     },
+    { $addFields: { email: { $arrayElemAt: ['$members.email', 0] } } },
+    { $addFields: { name: { $arrayElemAt: ['$members.name', 0] } } },
+    {
+      $project: {
+        members: 0,
+      },
+    },
     {
       $lookup: {
         from: 'farmos-instances',
@@ -679,21 +711,24 @@ const getMembersCreatedinDescendantsGroups = async (descendants) => {
               userId: 0,
             },
           },
+          {
+            $set: { i_id: '$_id' },
+          },
         ],
-        as: 'connectedFarms',
+        as: 'instances',
       },
     },
     {
       $lookup: {
         from: 'farmos-group-mapping',
-        localField: 'connectedFarms.instanceName',
+        localField: 'instances.instanceName',
         foreignField: 'instanceName',
         pipeline: [
           {
             $group: {
               _id: '$instanceName',
-              groupsId: { $push: '$groupId' },
-              fgm: { $push: '$_id' },
+              memberships: { $push: { groupId: '$groupId', fgm_id: '$_id' } },
+              fgm: { $push: '$_id' }, // used for nonMembers part
             },
           },
         ],
@@ -701,9 +736,46 @@ const getMembersCreatedinDescendantsGroups = async (descendants) => {
       },
     },
     {
+      $addFields: {
+        connectedFarms: {
+          $map: {
+            input: '$instances',
+            in: {
+              $mergeObjects: [
+                '$$this',
+                {
+                  $arrayElemAt: [
+                    '$memberships',
+                    {
+                      $indexOfArray: ['$memberships._id', '$$this.instanceName'],
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        'connectedFarms._id': 0,
+      },
+    },
+    {
+      $project: {
+        instances: 0,
+      },
+    },
+    {
+      $project: {
+        memberships: 0,
+      },
+    },
+    {
       $lookup: {
         from: 'groups',
-        localField: 'memberships.groupsId',
+        localField: 'connectedFarms.memberships.groupId',
         foreignField: '_id',
         pipeline: [
           {
@@ -727,41 +799,23 @@ const getMembersCreatedinDescendantsGroups = async (descendants) => {
  * @returns members part from JSON answer
  */
 const structureMembersPart = async (membersRawData) => {
-  const members = [];
   for (const memberRD of membersRawData) {
-    let tempMb = {};
-    tempMb.name = memberRD.members[0].name;
-    tempMb.email = memberRD.members[0].email;
-    tempMb.location = await getRewrittenPathFromGroupPath(memberRD.membersLocation[0].path);
-    tempMb.userId = memberRD.user;
-    memberRD.role == 'admin' ? (tempMb.admin = true) : (tempMb.admin = false);
+    memberRD.location = await getRewrittenPathFromGroupPath(memberRD.location);
+    memberRD.userId = memberRD.user;
+    delete memberRD.user;
     //connectedFarms
-    tempMb.connectedFarms = [];
     for (const cf of memberRD.connectedFarms) {
-      let tempCF = {};
-      tempCF.farmId = cf._id;
-      tempCF.instanceName = cf.instanceName;
-      tempCF.owner = cf.owner;
-      let mbships = memberRD.memberships.find((data) => {
-        return data._id === cf.instanceName;
-      });
-      const grps = [];
-      for (const ms of mbships.groupsId) {
-        const gp = memberRD.mgroups.find((data) => {
-          return ms + '' === data._id + '';
+      delete cf.fgm;
+      for (const mbships of cf.memberships) {
+        const grp = memberRD.mgroups.find((data) => {
+          return data._id + '' === mbships.groupId + '';
         });
-        if (gp) {
-          const p = await getRewrittenPathFromGroupPath(gp.path);
-          grps.push(p);
-        }
+        mbships.path = await getRewrittenPathFromGroupPath(grp.path);
       }
-      tempCF.memberships = grps;
-      tempMb.connectedFarms.push(tempCF);
     }
-    //obj created
-    members.push(tempMb);
+    delete memberRD.mgroups;
   }
-  return members;
+  return membersRawData;
 };
 
 /**
@@ -772,8 +826,8 @@ const structureMembersPart = async (membersRawData) => {
 const getIdsFromFarmOSGroupMapped = async (rawData) => {
   const ids = [];
   for (const obj of rawData) {
-    for (const mbships of obj.memberships) {
-      ids.push(...mbships.fgm);
+    for (const cf of obj.connectedFarms) {
+      ids.push(...cf.fgm);
     }
   }
   return ids;
@@ -893,9 +947,9 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
   let groupInformation = { name: groupName };
   //get members part from JSON response
   const membersRawData = await getMembersCreatedinDescendantsGroups(descendants);
-  console.log('RESULT membersRawData', JSON.stringify(membersRawData, null, 2));
+  //console.log('RESULT membersRawData', JSON.stringify(membersRawData, null, 2));
   const farmOSGroupsMappedId = await getIdsFromFarmOSGroupMapped(membersRawData);
-  console.log('farmOSGroupsMappedId', farmOSGroupsMappedId);
+  //console.log('farmOSGroupsMappedId', farmOSGroupsMappedId);
   const membersPart = await structureMembersPart(membersRawData);
   //console.log('RESULT membersPart', JSON.stringify(membersPart, null, 2));
   const nonMembersPart = await getNonMembersWhoHaveFarmsLinkedinDescendantsGroups(
