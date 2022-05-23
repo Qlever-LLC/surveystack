@@ -764,6 +764,71 @@ const structureMembersPart = async (membersRawData) => {
   return members;
 };
 
+/**
+ * @param { Object } rawData
+ * @returns all ids from collection farmos-group-mapping who are in RawData;
+ * => Farms from NonMerbers inside the domain
+ */
+const getIdsFromFarmOSGroupMapped = async (rawData) => {
+  const ids = [];
+  for (const obj of rawData) {
+    for (const mbships of obj.memberships) {
+      ids.push(...mbships.fgm);
+    }
+  }
+  return ids;
+};
+
+/**
+ * @param { Array } descendants
+ * @param { Array } farmOSGroupsMappedId
+ * @returns array of nonMembers with only instanceName and path;
+ * nonMembers are users who are not members from a Domain but who have a farmos mapped into it
+ */
+const getNonMembersWhoHaveFarmsLinkedinDescendantsGroups = async (
+  descendants,
+  farmOSGroupsMappedId
+) => {
+  const descendantsId = [];
+  for (const descendant of descendants) {
+    descendantsId.push(descendant._id);
+  }
+  const getNonMembersWhoHaveFarmsLinkedinTestedDescendantsGroups = [
+    {
+      $match: {
+        groupId: { $in: descendantsId },
+        _id: { $not: { $in: farmOSGroupsMappedId } },
+      },
+    },
+    {
+      $lookup: {
+        from: 'groups',
+        localField: 'groupId',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $project: {
+              _id: 0,
+              path: 1,
+            },
+          },
+        ],
+        as: 'mgroups',
+      },
+    },
+    { $addFields: { path: { $arrayElemAt: ['$mgroups.path', 0] } } },
+    {
+      $project: {
+        mgroups: 0,
+      },
+    },
+  ];
+  return await db
+    .collection('farmos-group-mapping')
+    .aggregate(getNonMembersWhoHaveFarmsLinkedinTestedDescendantsGroups)
+    .toArray();
+};
+
 //TODO implement getGroupInformation
 /**
  * @param { ObjectId } groupId
@@ -828,13 +893,24 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
   let groupInformation = { name: groupName };
   //get members part from JSON response
   const membersRawData = await getMembersCreatedinDescendantsGroups(descendants);
-  //console.log('RESULT membersRawData', JSON.stringify(membersRawData, null, 2));
-  //TODO array from all fgm id => Farms from NonMerbers inside the domain
+  console.log('RESULT membersRawData', JSON.stringify(membersRawData, null, 2));
+  const farmOSGroupsMappedId = await getIdsFromFarmOSGroupMapped(membersRawData);
+  console.log('farmOSGroupsMappedId', farmOSGroupsMappedId);
   const membersPart = await structureMembersPart(membersRawData);
   //console.log('RESULT membersPart', JSON.stringify(membersPart, null, 2));
-  groupInformation.members = membersPart;
-  //TODO insert array nonMembers with only instanceName and path
+  const nonMembersPart = await getNonMembersWhoHaveFarmsLinkedinDescendantsGroups(
+    descendants,
+    farmOSGroupsMappedId
+  );
+  await Promise.all(
+    nonMembersPart.map(async (el) => {
+      el.path = await getRewrittenPathFromGroupPath(el.path);
+    })
+  );
+  //console.log('RESULT nonMembersRawData', JSON.stringify(nonMembersPart, null, 2));
 
+  groupInformation.members = membersPart;
+  groupInformation.nonMembers = nonMembersPart;
   groupInformation = { ...groupSettings, ...groupInformation };
 
   return groupInformation;

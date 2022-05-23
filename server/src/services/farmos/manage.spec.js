@@ -182,6 +182,16 @@ describe('manageFarmOS', () => {
       true
     );
     await mapFarmOSInstanceToGroup(groupMichigan._id, userext_farmOSInstance1);
+    const userext_data2 = { userOverrides: { name: 'Ext ernal2', email: 'external2@bj.net' } };
+    const userext2 = await groupExt.createUserMember(userext_data2);
+    const userext_farmOSInstance2 = 'external2.farmos.net';
+    await createFarmOSInstanceForUserAndGroup(
+      userext2.user._id,
+      groupExt._id,
+      userext_farmOSInstance2,
+      true
+    );
+    await mapFarmOSInstanceToGroup(groupMichigan._id, userext_farmOSInstance2);
 
     //FederalMills
     const groupFederalMills = await createGroup({ name: 'FederalMills' });
