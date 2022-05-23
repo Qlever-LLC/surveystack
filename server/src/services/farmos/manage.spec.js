@@ -16,6 +16,7 @@ import {
   createFarmOSInstanceForUserAndGroup,
   mapFarmOSInstanceToGroup,
   createFarmosGroupSettings,
+  getFarmOSRootGroup,
 } from './manage';
 
 const init = async () => {
@@ -110,6 +111,14 @@ describe('manageFarmOS', () => {
     await setPlanForGroup(group._id, null);
     const nullPlan = await getPlanForGroup(group._id);
     expect(nullPlan).toBe(null);
+  });
+  it('getFarmOSRootGroup', async () => {
+    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
+    await createFarmosGroupSettings(groupLabs._id);
+    const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
+    const root = await getFarmOSRootGroup(groupMichigan);
+    expect(root.name).toBe('Labs');
   });
   it('test-group-settings', async () => {
     // TODO test farmos

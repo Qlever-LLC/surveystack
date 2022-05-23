@@ -901,7 +901,6 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
   let testedGroupIsRoot = false;
   const getRootGroup = await getFarmOSRootGroup(group);
   const canBecomeRootGroup = await canBecomeFarmOSRootGroup(groupId); //TODO to be deleted but kept for testing
-  console.log('getFarmOSRootGroup', getRootGroup);
   console.log('canBecomeFarmOSRootGroup', canBecomeRootGroup); //TODO to be deleted but kept for testing
 
   //this case should not be encountered because the access is protected in the Frontend
@@ -910,7 +909,6 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
   }
   if (groupId.equals(getRootGroup._id)) {
     testedGroupIsRoot = true;
-    console.log('testedGroupIsRoot');
   }
 
   const descendants = await getDescendantGroups(group, {
@@ -970,64 +968,4 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
   groupInformation = { ...groupSettings, ...groupInformation };
 
   return groupInformation;
-  /*
-  return {
-    ...groupSettings,
-    name: group.name,
-    seats: {
-      current: 7,
-      max: groupSettings.maxSeats,
-    },
-    members: [
-      {
-        name: 'Dan TerAvest',
-        email: 'teravestdan@gmail.com',
-        admin: true,
-        connectedFarms: [
-          {
-            url: 'dan_teravest_farm.farmos.net',
-            owner: true,
-            memberships: ['Bionutrient > Labs'],
-          },
-          {
-            url: 'lees_farm.farmos.net',
-            owner: true,
-            memberships: ['Bionutrient > Labs', 'Bionutrient > Labs > Michigan'],
-          },
-          {
-            url: 'ourscinet.farmos.net',
-            owner: false,
-            memberships: [
-              'Bionutrient > Labs',
-              'Bionutrient > Labs > Michigan',
-              'Bionutrient > Labs > Europe',
-              'Bionutrient > Labs > Community',
-              'Bionutrient > Labs > Community > Lab',
-            ],
-          },
-          {
-            url: 'coffeeshop.farmos.net',
-            owner: false,
-          },
-        ],
-      },
-      {
-        name: 'Dave Jole',
-        email: 'djole2352@gmail.com',
-        admin: false,
-        connectedFarms: [],
-      },
-      {
-        name: 'Jenny Jennerson',
-        email: 'bigjenny@bj.net',
-        connectedFarms: [
-          {
-            url: 'jennybigfarmstand.farmos.net',
-            owner: true,
-            memberships: ['Bionutrient > Labs > Michigan'],
-          },
-        ],
-      },
-    ],
-  };*/
 };
