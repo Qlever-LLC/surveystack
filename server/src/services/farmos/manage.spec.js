@@ -111,7 +111,7 @@ describe('manageFarmOS', () => {
     const nullPlan = await getPlanForGroup(group._id);
     expect(nullPlan).toBe(null);
   });
-  it.only('test-group-settings', async () => {
+  it('test-group-settings', async () => {
     // TODO test farmos
     const groupBionutrient = await createGroup({ name: 'Bionutrient' });
     const groupLabs = await groupBionutrient.createSubGroup({ name: 'ALabs' });
