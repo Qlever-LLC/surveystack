@@ -900,9 +900,6 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
   //know if groupId is a RootGroup or not (=> define setting in JSON response)
   let testedGroupIsRoot = false;
   const getRootGroup = await getFarmOSRootGroup(group);
-  const canBecomeRootGroup = await canBecomeFarmOSRootGroup(groupId); //TODO to be deleted but kept for testing
-  console.log('canBecomeFarmOSRootGroup', canBecomeRootGroup); //TODO to be deleted but kept for testing
-
   //this case should not be encountered because the access is protected in the Frontend
   if (getRootGroup === null) {
     return boom.badData();

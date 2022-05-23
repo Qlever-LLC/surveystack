@@ -17,6 +17,7 @@ import {
   mapFarmOSInstanceToGroup,
   createFarmosGroupSettings,
   getFarmOSRootGroup,
+  canBecomeFarmOSRootGroup,
 } from './manage';
 
 const init = async () => {
@@ -119,6 +120,21 @@ describe('manageFarmOS', () => {
     const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
     const root = await getFarmOSRootGroup(groupMichigan);
     expect(root.name).toBe('Labs');
+    const root2 = await getFarmOSRootGroup(groupLabs);
+    expect(root2.name).toBe('Labs');
+    const root3 = await getFarmOSRootGroup(groupBionutrient);
+    expect(root3).toBeNull();
+  });
+  it('canBecomeFarmOSRootGroup', async () => {
+    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
+    const groupExt = await groupBionutrient.createSubGroup({ name: 'Ext' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
+    await createFarmosGroupSettings(groupLabs._id);
+    const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
+    const canBeRoot = await canBecomeFarmOSRootGroup(groupMichigan._id);
+    expect(canBeRoot).toBeFalsy();
+    const canBeRoot2 = await canBecomeFarmOSRootGroup(groupExt._id);
+    expect(canBeRoot2).toBeTruthy();
   });
   it('test-group-settings', async () => {
     // TODO test farmos
