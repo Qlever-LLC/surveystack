@@ -871,9 +871,11 @@ const getNonMembersWhoHaveFarmsLinkedinDescendantsGroups = async (
       },
     },
     { $addFields: { path: { $arrayElemAt: ['$mgroups.path', 0] } } },
+    { $addFields: { fgm_id: '$_id' } },
     {
       $project: {
         mgroups: 0,
+        _id: 0,
       },
     },
   ];
