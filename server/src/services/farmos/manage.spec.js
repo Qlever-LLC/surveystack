@@ -21,6 +21,7 @@ import {
   getArrayPathsConainedInPath,
   getUserFromUserId,
   getGroupFromGroupId,
+  getRewrittenPathFromGroupPath,
 } from './manage';
 
 const init = async () => {
@@ -181,6 +182,14 @@ describe('manageFarmOS', () => {
     expect(groupFound.path).toBe(group.path);
     expect(groupFound.surveys).toStrictEqual(group.surveys);
     expect(groupFound._id).toStrictEqual(group._id);
+  });
+  it('getRewrittenPathFromGroupPath', async () => {
+    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
+    const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
+
+    const prettyPath = await getRewrittenPathFromGroupPath(groupMichigan.path);
+    expect(prettyPath).toBe('Bionutrient > Labs > Michigan');
   });
   it('test-group-settings', async () => {
     // TODO test farmos
