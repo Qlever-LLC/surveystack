@@ -534,7 +534,7 @@ export const enableFarmOSAccessForGroup = async (groupId) => {
 };
 /**
  * @param { ObjectId } groupId
- * @returns groupHasFarmOSAccess on false for group;
+ * @returns groupHasFarmOSAccess and allowSubgroupAdminsToCreateFarmOSInstances on false for group;
  * can only happen in RootGroup
  */
 export const disableFarmOSAccessForGroup = async (groupId) => {
@@ -547,31 +547,58 @@ export const disableFarmOSAccessForGroup = async (groupId) => {
     allowSubgroupAdminsToCreateFarmOSInstances: false,
   });
 };
-/*
-WARNING WRONG IMPLEMENTATION !!!
+
+/**
+ * @param { ObjectId } groupId
+ * @returns groupHasCoffeeShopAccess setting from root
+ */
 export const hasGroupCoffeeShopAccess = async (groupId) => {
+  const group = await getGroupFromGroupId(groupId);
+  if (!group) {
+    throw boom.notFound();
+  }
+  const rootGroup = await getFarmOSRootGroup(group);
+  if (!rootGroup) {
+    return false;
+  }
   const s = await getGroupSettings(groupId, { groupHasCoffeeShopAccess: 1 });
   if (s) {
     return s.groupHasCoffeeShopAccess;
   }
   return false;
 };
+/**
+ * @param { ObjectId } groupId
+ * @returns groupHasCoffeeShopAccess on true for group;
+ * can only happen in RootGroup
+ */
 export const enableCoffeeShopAccessForGroup = async (groupId) => {
   const groupSettings = await getGroupSettings(groupId, { _id: 1 });
-  if (!groupSettings) {
-    return createFarmosGroupSettings(groupId, { groupHasCoffeeShopAccess: true });
-  } else {
+  if (groupSettings) {
     return await setGroupSettings(groupId, { groupHasCoffeeShopAccess: true });
   }
+  if (await canBecomeFarmOSRootGroup(groupId)) {
+    return createFarmosGroupSettings(groupId, { groupHasCoffeeShopAccess: true });
+  }
+  return null;
 };
+/**
+ * @param { ObjectId } groupId
+ * @returns groupHasCoffeeShopAccess and allowSubgroupsToJoinCoffeeShop on false for group;
+ * can only happen in RootGroup
+ */
 export const disableCoffeeShopAccessForGroup = async (groupId) => {
   const groupSettings = await getGroupSettings(groupId, { _id: 1 });
   if (!groupSettings) {
     throw boom.notFound();
   }
-  return await setGroupSettings(groupId, { groupHasCoffeeShopAccess: false });
+  return await setGroupSettings(groupId, {
+    groupHasCoffeeShopAccess: false,
+    allowSubgroupsToJoinCoffeeShop: false,
+  });
 };
-
+/*
+WARNING WRONG IMPLEMENTATION !!!
 export const isAllowedSubgroupsToJoinCoffeeShop = async (groupId) => {
   const s = await getGroupSettings(groupId, { allowSubgroupsToJoinCoffeeShop: 1 });
   if (s) {
