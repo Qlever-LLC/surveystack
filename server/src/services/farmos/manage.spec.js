@@ -30,6 +30,9 @@ import {
   hasGroupCoffeeShopAccess,
   enableCoffeeShopAccessForGroup,
   disableCoffeeShopAccessForGroup,
+  isAllowedSubgroupsToJoinCoffeeShop,
+  enableSubgroupsToJoinCoffeeShop,
+  disableSubgroupsToJoinCoffeeShop,
 } from './manage';
 
 const init = async () => {
@@ -418,5 +421,36 @@ describe('manageFarmOS', () => {
     expect(await hasGroupCoffeeShopAccess(groupBionutrient._id)).toBeFalsy();
     expect(await hasGroupCoffeeShopAccess(groupLabs._id)).toBeFalsy();
     expect(await hasGroupCoffeeShopAccess(groupMichigan._id)).toBeFalsy();
+  });
+  it('allowSubgroupsToJoinCoffeeShop', async () => {
+    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
+    const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
+
+    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupBionutrient._id)).toBeFalsy();
+    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupLabs._id)).toBeFalsy();
+    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupMichigan._id)).toBeFalsy();
+
+    await enableSubgroupsToJoinCoffeeShop(groupLabs._id);
+    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupBionutrient._id)).toBeFalsy();
+    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupLabs._id)).toBeFalsy();
+    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupMichigan._id)).toBeFalsy();
+
+    await enableCoffeeShopAccessForGroup(groupLabs._id);
+    await enableSubgroupsToJoinCoffeeShop(groupLabs._id);
+    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupBionutrient._id)).toBeFalsy();
+    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupLabs._id)).toBeTruthy();
+    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupMichigan._id)).toBeTruthy();
+
+    await disableSubgroupsToJoinCoffeeShop(groupLabs._id);
+    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupBionutrient._id)).toBeFalsy();
+    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupLabs._id)).toBeFalsy();
+    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupMichigan._id)).toBeFalsy();
+
+    await enableSubgroupsToJoinCoffeeShop(groupLabs._id);
+    await disableCoffeeShopAccessForGroup(groupLabs._id);
+    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupBionutrient._id)).toBeFalsy();
+    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupLabs._id)).toBeFalsy();
+    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupMichigan._id)).toBeFalsy();
   });
 });

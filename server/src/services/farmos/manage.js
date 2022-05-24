@@ -627,7 +627,7 @@ export const enableSubgroupsToJoinCoffeeShop = async (groupId) => {
   if (!groupSettings) {
     return null;
   }
-  if (await hasGroupFarmOSAccess(groupId)) {
+  if (await hasGroupCoffeeShopAccess(groupId)) {
     return await setGroupSettings(groupId, { allowSubgroupsToJoinCoffeeShop: true });
   }
   return null;
