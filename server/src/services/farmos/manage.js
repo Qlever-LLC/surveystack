@@ -597,23 +597,46 @@ export const disableCoffeeShopAccessForGroup = async (groupId) => {
     allowSubgroupsToJoinCoffeeShop: false,
   });
 };
-/*
-WARNING WRONG IMPLEMENTATION !!!
+
+/**
+ * @param { ObjectId } groupId
+ * @returns allowSubgroupsToJoinCoffeeShop setting from root
+ */
 export const isAllowedSubgroupsToJoinCoffeeShop = async (groupId) => {
-  const s = await getGroupSettings(groupId, { allowSubgroupsToJoinCoffeeShop: 1 });
+  const group = await getGroupFromGroupId(groupId);
+  if (!group) {
+    throw boom.notFound();
+  }
+  const rootGroup = await getFarmOSRootGroup(group);
+  if (!rootGroup) {
+    return false;
+  }
+  const s = await getGroupSettings(rootGroup._id, { allowSubgroupsToJoinCoffeeShop: 1 });
   if (s) {
     return s.allowSubgroupsToJoinCoffeeShop;
   }
   return false;
 };
+/**
+ * @param { ObjectId } groupId
+ * @returns allowSubgroupsToJoinCoffeeShop on true for group;
+ * can only happen in RootGroup
+ */
 export const enableSubgroupsToJoinCoffeeShop = async (groupId) => {
   const groupSettings = await getGroupSettings(groupId, { _id: 1 });
   if (!groupSettings) {
-    return createFarmosGroupSettings(groupId, { allowSubgroupsToJoinCoffeeShop: true });
-  } else {
+    return null;
+  }
+  if (await hasGroupFarmOSAccess(groupId)) {
     return await setGroupSettings(groupId, { allowSubgroupsToJoinCoffeeShop: true });
   }
+  return null;
 };
+/**
+ * @param { ObjectId } groupId
+ * @returns allowSubgroupsToJoinCoffeeShop on false for group;
+ * can only happen in RootGroup
+ */
 export const disableSubgroupsToJoinCoffeeShop = async (groupId) => {
   const groupSettings = await getGroupSettings(groupId, { _id: 1 });
   if (!groupSettings) {
@@ -621,7 +644,8 @@ export const disableSubgroupsToJoinCoffeeShop = async (groupId) => {
   }
   return await setGroupSettings(groupId, { allowSubgroupsToJoinCoffeeShop: false });
 };
-
+/*
+WARNING WRONG IMPLEMENTATION !!!
 export const isAllowedSubgroupAdminsToCreateFarmOSInstances = async (groupId) => {
   const s = await getGroupSettings(groupId, { allowSubgroupAdminsToCreateFarmOSInstances: 1 });
   if (s) {
