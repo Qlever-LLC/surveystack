@@ -58,7 +58,7 @@ export const canBecomeFarmOSRootGroup = async (groupId) => {
  * @returns array of paths contained in given path;
  * first element is path from it-self and after all direct parents with last who is BaseGroup '/xxx/'
  */
-const getArrayPathsConainedInPath = (path) => {
+export const getArrayPathsConainedInPath = (path) => {
   const groupsPath = [];
   const hierarchie = path.split('/');
   hierarchie.shift();

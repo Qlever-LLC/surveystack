@@ -18,6 +18,7 @@ import {
   createFarmosGroupSettings,
   getFarmOSRootGroup,
   canBecomeFarmOSRootGroup,
+  getArrayPathsConainedInPath,
 } from './manage';
 
 const init = async () => {
@@ -147,6 +148,18 @@ describe('manageFarmOS', () => {
     const canBeRoot4 = await canBecomeFarmOSRootGroup(groupBionutrient._id);
     expect(canBeRoot4).toBeFalsy();
   });
+  it('getArrayPathsConainedInPath', async () => {
+    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
+    const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
+
+    const paths = await getArrayPathsConainedInPath(groupMichigan.path);
+    expect(paths).toStrictEqual([
+      '/bionutrient/labs/michigan/',
+      '/bionutrient/labs/',
+      '/bionutrient/',
+    ]);
+  });
   it('test-group-settings', async () => {
     // TODO test farmos
     const groupBionutrient = await createGroup({ name: 'Bionutrient' });
@@ -238,7 +251,7 @@ describe('manageFarmOS', () => {
     //await createFarmosGroupSettings(groupCommunityLab._id);
 
     const infos = await getGroupInformation(groupLabs._id, true);
-    console.log('INFORMATIONS', JSON.stringify(infos, null, 2));
+    //console.log('INFORMATIONS', JSON.stringify(infos, null, 2));
 
     // setup admins
     // setup users
