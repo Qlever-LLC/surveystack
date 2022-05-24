@@ -27,6 +27,9 @@ import {
   hasGroupFarmOSAccess,
   enableFarmOSAccessForGroup,
   disableFarmOSAccessForGroup,
+  hasGroupCoffeeShopAccess,
+  enableCoffeeShopAccessForGroup,
+  disableCoffeeShopAccessForGroup,
 } from './manage';
 
 const init = async () => {
@@ -396,5 +399,24 @@ describe('manageFarmOS', () => {
     expect(await hasGroupFarmOSAccess(groupBionutrient._id)).toBeFalsy();
     expect(await hasGroupFarmOSAccess(groupLabs._id)).toBeFalsy();
     expect(await hasGroupFarmOSAccess(groupMichigan._id)).toBeFalsy();
+  });
+  it('groupHasCoffeeShopAccess', async () => {
+    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
+    const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
+
+    expect(await hasGroupCoffeeShopAccess(groupBionutrient._id)).toBeFalsy();
+    expect(await hasGroupCoffeeShopAccess(groupLabs._id)).toBeFalsy();
+    expect(await hasGroupCoffeeShopAccess(groupMichigan._id)).toBeFalsy();
+
+    await enableCoffeeShopAccessForGroup(groupLabs._id);
+    expect(await hasGroupCoffeeShopAccess(groupBionutrient._id)).toBeFalsy();
+    expect(await hasGroupCoffeeShopAccess(groupLabs._id)).toBeTruthy();
+    expect(await hasGroupCoffeeShopAccess(groupMichigan._id)).toBeTruthy();
+
+    await disableCoffeeShopAccessForGroup(groupLabs._id);
+    expect(await hasGroupCoffeeShopAccess(groupBionutrient._id)).toBeFalsy();
+    expect(await hasGroupCoffeeShopAccess(groupLabs._id)).toBeFalsy();
+    expect(await hasGroupCoffeeShopAccess(groupMichigan._id)).toBeFalsy();
   });
 });

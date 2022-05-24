@@ -561,7 +561,7 @@ export const hasGroupCoffeeShopAccess = async (groupId) => {
   if (!rootGroup) {
     return false;
   }
-  const s = await getGroupSettings(groupId, { groupHasCoffeeShopAccess: 1 });
+  const s = await getGroupSettings(rootGroup._id, { groupHasCoffeeShopAccess: 1 });
   if (s) {
     return s.groupHasCoffeeShopAccess;
   }
