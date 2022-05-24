@@ -644,30 +644,55 @@ export const disableSubgroupsToJoinCoffeeShop = async (groupId) => {
   }
   return await setGroupSettings(groupId, { allowSubgroupsToJoinCoffeeShop: false });
 };
-/*
-WARNING WRONG IMPLEMENTATION !!!
+
+/**
+ * @param { ObjectId } groupId
+ * @returns allowSubgroupAdminsToCreateFarmOSInstances setting from root
+ */
 export const isAllowedSubgroupAdminsToCreateFarmOSInstances = async (groupId) => {
-  const s = await getGroupSettings(groupId, { allowSubgroupAdminsToCreateFarmOSInstances: 1 });
+  const group = await getGroupFromGroupId(groupId);
+  if (!group) {
+    throw boom.notFound();
+  }
+  const rootGroup = await getFarmOSRootGroup(group);
+  if (!rootGroup) {
+    return false;
+  }
+  const s = await getGroupSettings(rootGroup._id, {
+    allowSubgroupAdminsToCreateFarmOSInstances: 1,
+  });
   if (s) {
     return s.allowSubgroupAdminsToCreateFarmOSInstances;
   }
   return false;
 };
+/**
+ * @param { ObjectId } groupId
+ * @returns allowSubgroupAdminsToCreateFarmOSInstances on true for group;
+ * can only happen in RootGroup
+ */
 export const enableSubgroupAdminsToCreateFarmOSInstances = async (groupId) => {
   const groupSettings = await getGroupSettings(groupId, { _id: 1 });
   if (!groupSettings) {
-    return createFarmosGroupSettings(groupId, { allowSubgroupAdminsToCreateFarmOSInstances: true });
-  } else {
-    return await setGroupSettings(groupId, { allowSubgroupAdminsToCreateFarmOSInstances: true });
+    return null;
   }
+  if (await hasGroupFarmOSAccess(groupId)) {
+    return setGroupSettings(groupId, { allowSubgroupAdminsToCreateFarmOSInstances: true });
+  }
+  return null;
 };
+/**
+ * @param { ObjectId } groupId
+ * @returns allowSubgroupAdminsToCreateFarmOSInstances on false for group;
+ * can only happen in RootGroup
+ */
 export const disableSubgroupAdminsToCreateFarmOSInstances = async (groupId) => {
   const groupSettings = await getGroupSettings(groupId, { _id: 1 });
   if (!groupSettings) {
     throw boom.notFound();
   }
   return await setGroupSettings(groupId, { allowSubgroupAdminsToCreateFarmOSInstances: false });
-};*/
+};
 
 /**
  * @param { Array } groups
