@@ -20,6 +20,7 @@ import {
   canBecomeFarmOSRootGroup,
   getArrayPathsConainedInPath,
   getUserFromUserId,
+  getGroupFromGroupId,
 } from './manage';
 
 const init = async () => {
@@ -168,6 +169,18 @@ describe('manageFarmOS', () => {
 
     const userFound = await getUserFromUserId(admin.user._id);
     expect(userFound).toStrictEqual(admin.user);
+  });
+  it('getGroupFromGroupId', async () => {
+    const group = await createGroup({ name: 'Bionutrient' });
+
+    const groupFound = await getGroupFromGroupId(group._id);
+    expect(groupFound.meta).toStrictEqual(group.meta);
+    expect(groupFound.name).toBe(group.name);
+    expect(groupFound.slug).toBe(group.slug);
+    expect(groupFound.dir).toBe(group.dir);
+    expect(groupFound.path).toBe(group.path);
+    expect(groupFound.surveys).toStrictEqual(group.surveys);
+    expect(groupFound._id).toStrictEqual(group._id);
   });
   it('test-group-settings', async () => {
     // TODO test farmos
