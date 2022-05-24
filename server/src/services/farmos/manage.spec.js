@@ -292,7 +292,6 @@ describe('manageFarmOS', () => {
     await createFarmosGroupSettings(groupLabs._id);
 
     const groupLabsInfos = await getGroupInformation(groupLabs._id, true);
-    //console.log('INFORMATIONS', JSON.stringify(groupLabsInfos, null, 2));
 
     expect(groupLabsInfos.groupHasFarmOSAccess).toBeTruthy();
     expect(groupLabsInfos.groupHasCoffeeShopAccess).toBeFalsy();
@@ -457,9 +456,6 @@ describe('manageFarmOS', () => {
     expect(await isAllowedSubgroupsToJoinCoffeeShop(groupMichigan._id)).toBeFalsy();
   });
   it('allowSubgroupAdminsToCreateFarmOSInstances', async () => {
-    /*isAllowedSubgroupAdminsToCreateFarmOSInstances,
-  enableSubgroupAdminsToCreateFarmOSInstances,
-  disableSubgroupAdminsToCreateFarmOSInstances,*/
     const groupBionutrient = await createGroup({ name: 'Bionutrient' });
     const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
     const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });

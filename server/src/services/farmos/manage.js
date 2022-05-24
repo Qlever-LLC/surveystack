@@ -1045,11 +1045,8 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
   let groupInformation = { name: groupName };
   //get members part from JSON response
   const membersRawData = await getMembersCreatedinDescendantsGroups(descendants);
-  //console.log('RESULT membersRawData', JSON.stringify(membersRawData, null, 2));
   const farmOSGroupsMappedId = await getIdsFromFarmOSGroupMapped(membersRawData);
-  //console.log('farmOSGroupsMappedId', farmOSGroupsMappedId);
   const membersPart = await structureMembersPart(membersRawData);
-  //console.log('RESULT membersPart', JSON.stringify(membersPart, null, 2));
   const nonMembersPart = await getNonMembersWhoHaveFarmsLinkedinDescendantsGroups(
     descendants,
     farmOSGroupsMappedId
@@ -1059,7 +1056,6 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
       el.path = await getRewrittenPathFromGroupPath(el.path);
     })
   );
-  //console.log('RESULT nonMembersRawData', JSON.stringify(nonMembersPart, null, 2));
 
   groupInformation.members = membersPart;
   groupInformation.nonMembers = nonMembersPart;
