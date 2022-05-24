@@ -24,6 +24,9 @@ import {
   getRewrittenPathFromGroupPath,
   getGroupSettings,
   setGroupSettings,
+  hasGroupFarmOSAccess,
+  enableFarmOSAccessForGroup,
+  disableFarmOSAccessForGroup,
 } from './manage';
 
 const init = async () => {
@@ -374,5 +377,24 @@ describe('manageFarmOS', () => {
     expect(groupFound.groupHasCoffeeShopAccess).toBeTruthy();
     expect(groupFound.allowSubgroupsToJoinCoffeeShop).toBeFalsy();
     expect(groupFound.allowSubgroupAdminsToCreateFarmOSInstances).toBeFalsy();
+  });
+  it('groupHasGroupFarmOSAccess', async () => {
+    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
+    const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
+
+    expect(await hasGroupFarmOSAccess(groupBionutrient._id)).toBeFalsy();
+    expect(await hasGroupFarmOSAccess(groupLabs._id)).toBeFalsy();
+    expect(await hasGroupFarmOSAccess(groupMichigan._id)).toBeFalsy();
+
+    await enableFarmOSAccessForGroup(groupLabs._id);
+    expect(await hasGroupFarmOSAccess(groupBionutrient._id)).toBeFalsy();
+    expect(await hasGroupFarmOSAccess(groupLabs._id)).toBeTruthy();
+    expect(await hasGroupFarmOSAccess(groupMichigan._id)).toBeTruthy();
+
+    await disableFarmOSAccessForGroup(groupLabs._id);
+    expect(await hasGroupFarmOSAccess(groupBionutrient._id)).toBeFalsy();
+    expect(await hasGroupFarmOSAccess(groupLabs._id)).toBeFalsy();
+    expect(await hasGroupFarmOSAccess(groupMichigan._id)).toBeFalsy();
   });
 });

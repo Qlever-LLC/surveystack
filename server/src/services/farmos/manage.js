@@ -495,33 +495,57 @@ export const getGroupSettings = async (groupId, projection = {}) => {
 };
 
 //TODO write settings methodes has & enable & disable also for
-// -> groupHasGroupFarmOSAccess
 // -> groupHasCoffeeShopAccess
 // -> allowSubgroupsToJoinCoffeeShop
 // -> allowSubgroupAdminsToCreateFarmOSInstances
-// for has get value from root
-// enable and disable can only happen in RootGroup
+/**
+ * @param { ObjectId } groupId
+ * @returns groupHasFarmOSAccess setting from root
+ */
 export const hasGroupFarmOSAccess = async (groupId) => {
-  const s = await getGroupSettings(groupId, { groupHasFarmOSAccess: 1 });
+  const group = await getGroupFromGroupId(groupId);
+  if (!group) {
+    throw boom.notFound();
+  }
+  const rootGroup = await getFarmOSRootGroup(group);
+  if (!rootGroup) {
+    return false;
+  }
+  const s = await getGroupSettings(rootGroup._id, { groupHasFarmOSAccess: 1 });
   if (s) {
     return s.groupHasFarmOSAccess;
   }
   return false;
 };
+/**
+ * @param { ObjectId } groupId
+ * @returns groupHasFarmOSAccess on true for group;
+ * can only happen in RootGroup
+ */
 export const enableFarmOSAccessForGroup = async (groupId) => {
   const groupSettings = await getGroupSettings(groupId, { _id: 1 });
-  if (!groupSettings) {
-    return createFarmosGroupSettings(groupId, { groupHasFarmOSAccess: true });
-  } else {
+  if (groupSettings) {
     return await setGroupSettings(groupId, { groupHasFarmOSAccess: true });
   }
+  if (await canBecomeFarmOSRootGroup(groupId)) {
+    return createFarmosGroupSettings(groupId, { groupHasFarmOSAccess: true });
+  }
+  return null;
 };
+/**
+ * @param { ObjectId } groupId
+ * @returns groupHasFarmOSAccess on false for group;
+ * can only happen in RootGroup
+ */
 export const disableFarmOSAccessForGroup = async (groupId) => {
   const groupSettings = await getGroupSettings(groupId, { _id: 1 });
   if (!groupSettings) {
     throw boom.notFound();
   }
-  return await setGroupSettings(groupId, { groupHasFarmOSAccess: false });
+  return await setGroupSettings(groupId, {
+    groupHasFarmOSAccess: false,
+    allowSubgroupAdminsToCreateFarmOSInstances: false,
+  });
 };
 /*
 WARNING WRONG IMPLEMENTATION !!!
