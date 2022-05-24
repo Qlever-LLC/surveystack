@@ -19,6 +19,7 @@ import {
   getFarmOSRootGroup,
   canBecomeFarmOSRootGroup,
   getArrayPathsConainedInPath,
+  getUserFromUserId,
 } from './manage';
 
 const init = async () => {
@@ -159,6 +160,14 @@ describe('manageFarmOS', () => {
       '/bionutrient/labs/',
       '/bionutrient/',
     ]);
+  });
+  it('getUserFromUserId', async () => {
+    const group = await createGroup({ name: 'Bionutrient' });
+    const admin_data = { userOverrides: { name: 'Dan TerAvest', email: 'teravestdan@gmail.com' } };
+    const admin = await group.createAdminMember(admin_data);
+
+    const userFound = await getUserFromUserId(admin.user._id);
+    expect(userFound).toStrictEqual(admin.user);
   });
   it('test-group-settings', async () => {
     // TODO test farmos
