@@ -445,7 +445,7 @@ export const deletePlan = async (planId) => {
 export const setPlanForGroup = async (groupId, planId) => {
   await db
     .collection('farmos-group-settings')
-    .update({ groupId: asMongoId(groupId) }, { $set: { planId: planId } });
+    .updateOne({ groupId: asMongoId(groupId) }, { $set: { planId: planId } });
 };
 
 export const getPlanForGroup = async (groupId) => {
@@ -479,7 +479,7 @@ export const createFarmosGroupSettings = async (groupId, specification) => {
 export const setGroupSettings = async (groupId, settings) => {
   return await db
     .collection('farmos-group-settings')
-    .update({ groupId: asMongoId(groupId) }, { $set: settings });
+    .updateOne({ groupId: asMongoId(groupId) }, { $set: settings });
 };
 
 /**
