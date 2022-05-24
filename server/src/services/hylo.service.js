@@ -1,4 +1,3 @@
-/* eslint-disable no-unreachable */
 import boom from '@hapi/boom';
 import axios from 'axios';
 import { ObjectId } from 'mongodb';
@@ -7,52 +6,8 @@ import querystring from 'querystring';
 import * as utils from '../helpers/surveys';
 
 import { db } from '../db';
-import { request, gql } from 'graphql-request';
-
-export const getToken = async () => {
-  const r = await axios.post(
-    `${process.env.HYLO_API_URL}/noo/oauth/token`,
-    querystring.stringify({
-      client_secret: process.env.HYLO_CLIENT_SECRET,
-      scope: 'api:write',
-      resource: 'https://hylo.com ',
-      audience: 'https://hylo.com',
-      grant_type: 'client_credentials',
-      client_id: 'openteam',
-    }),
-    {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    }
-  );
-
-  return r.data;
-};
-
-const gqlPostConfig = async () => {
-  return {
-    headers: {
-      Authorization: `Bearer ${(await getToken()).access_token}`,
-      'Content-Type': 'application/json',
-    },
-  };
-};
-
-const getGqlAuthHeaders = async () => {
-  return {
-    Authorization: `Bearer ${(await getToken()).access_token}`,
-  };
-};
-
-export const gqlRequest = async (query, variables) => {
-  return request(
-    `${process.env.HYLO_API_URL}/noo/graphql`,
-    query,
-    variables,
-    await getGqlAuthHeaders()
-  );
-};
+import { gql } from 'graphql-request';
+import { gqlRequest } from './hylo/utils';
 
 const createHyloUser = async ({ email, name, groupId }) => {
   const r = await axios.post(
@@ -232,7 +187,7 @@ const syncGroupWithHylo = async ({ name, slug, farm_url, hyloUserId }) => {
 //   return t;
 // });
 
-export const handle = async ({ submission, survey, user }) => {
+const getHyloApiComposeOutputs = ({ submission, survey }) => {
   const surveyVersion = submission.meta.survey.version;
 
   console.log('submission-hylo', JSON.stringify(submission, null, 2));
@@ -277,34 +232,42 @@ export const handle = async ({ submission, survey, user }) => {
       return compose;
     })
     .flat();
+};
+
+export const handleSyncGroupOutput = ({ output, user }) => {
+  const { url, entity } = output;
+  const { name, slug, extraModerators } = entity;
+
+  const hyloUser = await syncUserWithHylo(user._id);
+  console.log({ hyloUser });
+
+  const hyloGroup = await syncGroupWithHylo({
+    name,
+    slug,
+    farm_email,
+    hyloUserId: hyloUser.id,
+  });
+  results.push({ hyloUser, hyloGroup });
+
+  for ({email, name} of extraModerators) {
+    try {
+      await createHyloUser({email: email.value, name, name.value, groupId})
+    }
+    catch (e) {
+      // TODO if already exist
+      //  - query hylo user info (for saving in the submission)
+      //  - make sure user is added to group
+    }
+  }
+};
+
+export const handle = async ({ submission, survey, user }) => {
+  const hyloCopose = getHyloApiComposeOutputs({ submission, survey });
 
   const results = [];
-  for (const { hyloType, body } of hyloCompose) {
-    if (hyloType === 'sync-group') {
-      const { name, slug, farm_email } = body;
-      if (typeof name !== 'string') {
-        throw boom.badData(`name is not a string: ${name}`);
-      }
-      if (typeof slug !== 'string') {
-        throw boom.badData(`slug is not a string: ${slug}`);
-      }
-      if (typeof farm_email !== 'string') {
-        throw boom.badData(`farm_email is not a string: ${farm_email}`);
-      }
-
-      console.log('do the thing with', { name, slug, farm_email });
-      console.log('as user', JSON.stringify(user, null, 2));
-
-      const hyloUser = await syncUserWithHylo(user._id);
-      console.log({ hyloUser });
-
-      const hyloGroup = await syncGroupWithHylo({
-        name,
-        slug,
-        farm_email,
-        hyloUserId: hyloUser.id,
-      });
-      results.push({ hyloUser, hyloGroup });
+  for (const output of hyloCompose) {
+    if (output.hyloType === 'sync-group') {
+      results.push(await handleSyncGroupOutput({ output, user }));
     }
   }
   console.log('RESULTS', JSON.stringify(results, null, 2));

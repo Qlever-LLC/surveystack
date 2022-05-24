@@ -7,7 +7,7 @@ Joi.objectId = joiObjectId(Joi);
 import _, { isString, min } from 'lodash';
 import boom from '@hapi/boom';
 
-import { getToken, gqlRequest } from '../services/hylo.service';
+import { gqlRequest } from '../services/hylo/utils';
 import { gql } from 'graphql-request';
 
 const validateOrThrow = (schema, _value) => {
