@@ -494,24 +494,6 @@ export const getGroupSettings = async (groupId, projection = {}) => {
     .findOne({ groupId: asMongoId(groupId) }, { projection: projection });
 };
 
-/**
- * @param { Array } groups
- * @returns amount of unique entry of instanceName in farmos-group-mapping inside the Domain;
- * groups is the entire domain
- */
-export const getCurrentSeatsFromDomain = async (groups) => {
-  if (groups) {
-    const subgrps = [];
-    for (const subg of groups) {
-      subgrps.push(subg._id);
-    }
-    const mapping = await db
-      .collection('farmos-group-mapping')
-      .distinct('instanceName', { groupId: { $in: subgrps } });
-    return mapping.length;
-  }
-  return 0;
-};
 //TODO write settings methodes has & enable & disable also for
 // -> groupHasGroupFarmOSAccess
 // -> groupHasCoffeeShopAccess
@@ -611,6 +593,25 @@ export const disableSubgroupAdminsToCreateFarmOSInstances = async (groupId) => {
   }
   return await setGroupSettings(groupId, { allowSubgroupAdminsToCreateFarmOSInstances: false });
 };*/
+
+/**
+ * @param { Array } groups
+ * @returns amount of unique entry of instanceName in farmos-group-mapping inside the Domain;
+ * groups is the entire domain
+ */
+export const getCurrentSeatsFromDomain = async (groups) => {
+  if (groups) {
+    const subgrps = [];
+    for (const subg of groups) {
+      subgrps.push(subg._id);
+    }
+    const mapping = await db
+      .collection('farmos-group-mapping')
+      .distinct('instanceName', { groupId: { $in: subgrps } });
+    return mapping.length;
+  }
+  return 0;
+};
 
 /**
  * @param { Array } descendants

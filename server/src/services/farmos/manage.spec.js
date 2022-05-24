@@ -22,10 +22,8 @@ import {
   getUserFromUserId,
   getGroupFromGroupId,
   getRewrittenPathFromGroupPath,
-  getMembersCreatedinDescendantsGroups,
-  getIdsFromFarmOSGroupMapped,
-  structureMembersPart,
-  getNonMembersWhoHaveFarmsLinkedinDescendantsGroups,
+  getGroupSettings,
+  setGroupSettings,
 } from './manage';
 
 const init = async () => {
@@ -360,4 +358,21 @@ describe('manageFarmOS', () => {
   });
 
   //TODO unit test 'test-group-settings'
+  it('createFarmosGroupSettings, getGroupSettings and setGroupSettings', async () => {
+    const group = await createGroup({ name: 'Bionutrient' });
+
+    await createFarmosGroupSettings(group._id);
+    let groupFound = await getGroupSettings(group._id);
+    expect(groupFound.groupHasFarmOSAccess).toBeTruthy();
+    expect(groupFound.groupHasCoffeeShopAccess).toBeFalsy();
+    expect(groupFound.allowSubgroupsToJoinCoffeeShop).toBeFalsy();
+    expect(groupFound.allowSubgroupAdminsToCreateFarmOSInstances).toBeFalsy();
+
+    await setGroupSettings(group._id, { groupHasCoffeeShopAccess: true });
+    groupFound = await getGroupSettings(group._id);
+    expect(groupFound.groupHasFarmOSAccess).toBeTruthy();
+    expect(groupFound.groupHasCoffeeShopAccess).toBeTruthy();
+    expect(groupFound.allowSubgroupsToJoinCoffeeShop).toBeFalsy();
+    expect(groupFound.allowSubgroupAdminsToCreateFarmOSInstances).toBeFalsy();
+  });
 });
