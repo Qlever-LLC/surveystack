@@ -461,7 +461,7 @@ export const getPlanForGroup = async (groupId) => {
   }
 };
 
-// TODO create farmos-group-settings etc.
+// TODO unit test for settings part
 export const createFarmosGroupSettings = async (groupId, specification) => {
   return await db.collection('farmos-group-settings').insertOne({
     _id: new ObjectId(),
@@ -616,7 +616,7 @@ export const disableSubgroupAdminsToCreateFarmOSInstances = async (groupId) => {
  * @param { Array } descendants
  * @returns all info (raw data) from members from the tested domain
  */
-const getMembersCreatedinDescendantsGroups = async (descendants) => {
+export const getMembersCreatedinDescendantsGroups = async (descendants) => {
   const descendantsId = [];
   for (const descendant of descendants) {
     descendantsId.push(descendant._id);
@@ -798,7 +798,7 @@ const getMembersCreatedinDescendantsGroups = async (descendants) => {
  * @param { Array } membersRawData
  * @returns members part from JSON answer
  */
-const structureMembersPart = async (membersRawData) => {
+export const structureMembersPart = async (membersRawData) => {
   for (const memberRD of membersRawData) {
     memberRD.location = await getRewrittenPathFromGroupPath(memberRD.location);
     memberRD.userId = memberRD.user;
@@ -823,7 +823,7 @@ const structureMembersPart = async (membersRawData) => {
  * @returns all ids from collection farmos-group-mapping who are in RawData;
  * => Farms from NonMerbers inside the domain
  */
-const getIdsFromFarmOSGroupMapped = async (rawData) => {
+export const getIdsFromFarmOSGroupMapped = async (rawData) => {
   const ids = [];
   for (const obj of rawData) {
     for (const cf of obj.connectedFarms) {
@@ -839,7 +839,7 @@ const getIdsFromFarmOSGroupMapped = async (rawData) => {
  * @returns array of nonMembers with only instanceName and path;
  * nonMembers are users who are not members from a Domain but who have a farmos mapped into it
  */
-const getNonMembersWhoHaveFarmsLinkedinDescendantsGroups = async (
+export const getNonMembersWhoHaveFarmsLinkedinDescendantsGroups = async (
   descendants,
   farmOSGroupsMappedId
 ) => {

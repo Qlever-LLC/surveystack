@@ -22,6 +22,10 @@ import {
   getUserFromUserId,
   getGroupFromGroupId,
   getRewrittenPathFromGroupPath,
+  getMembersCreatedinDescendantsGroups,
+  getIdsFromFarmOSGroupMapped,
+  structureMembersPart,
+  getNonMembersWhoHaveFarmsLinkedinDescendantsGroups,
 } from './manage';
 
 const init = async () => {
@@ -191,10 +195,9 @@ describe('manageFarmOS', () => {
     const prettyPath = await getRewrittenPathFromGroupPath(groupMichigan.path);
     expect(prettyPath).toBe('Bionutrient > Labs > Michigan');
   });
-  it('test-group-settings', async () => {
-    // TODO test farmos
+  it('getGroupInformation', async () => {
     const groupBionutrient = await createGroup({ name: 'Bionutrient' });
-    const groupLabs = await groupBionutrient.createSubGroup({ name: 'ALabs' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
     const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
     const groupEurope = await groupLabs.createSubGroup({ name: 'Europe' });
     const groupCommunity = await groupLabs.createSubGroup({ name: 'Community' });
@@ -248,7 +251,6 @@ describe('manageFarmOS', () => {
       user2_farmOSInstance1,
       true
     );
-    //await mapFarmOSInstanceToGroup(groupLabs._id, user2_farmOSInstance1);
 
     // create subgroup "Bio > Ext"
     const groupExt = await groupBionutrient.createSubGroup({ name: 'Ext' });
@@ -278,18 +280,84 @@ describe('manageFarmOS', () => {
     const groupX = await groupFederalMills.createSubGroup({ name: 'FMX' });
 
     await createFarmosGroupSettings(groupLabs._id);
-    //await createFarmosGroupSettings(groupBionutrient._id);
-    //await createFarmosGroupSettings(groupCommunityLab._id);
 
-    const infos = await getGroupInformation(groupLabs._id, true);
-    //console.log('INFORMATIONS', JSON.stringify(infos, null, 2));
+    const groupLabsInfos = await getGroupInformation(groupLabs._id, true);
+    //console.log('INFORMATIONS', JSON.stringify(groupLabsInfos, null, 2));
 
-    // setup admins
-    // setup users
-    // setup group-settings
-    // test return value of getGroupInformation
+    expect(groupLabsInfos.groupHasFarmOSAccess).toBeTruthy();
+    expect(groupLabsInfos.groupHasCoffeeShopAccess).toBeFalsy();
+    expect(groupLabsInfos.allowSubgroupsToJoinCoffeeShop).toBeFalsy();
+    expect(groupLabsInfos.allowSubgroupAdminsToCreateFarmOSInstances).toBeFalsy();
+    expect(groupLabsInfos.seats.current).toBe(7);
+    expect(groupLabsInfos.seats.max).toBe(20);
+    expect(groupLabsInfos.name).toBe('Bionutrient > Labs');
 
-    // expect statements
-    // expect(groupInformation.groupHasFarmOSAccess).toBe(true);
+    expect(groupLabsInfos.members).toHaveLength(3);
+    expect(groupLabsInfos.members[0].role).toBeTruthy();
+    expect(groupLabsInfos.members[0].location).toBe('Bionutrient > Labs');
+    expect(groupLabsInfos.members[0].email).toBe('teravestdan@gmail.com');
+    expect(groupLabsInfos.members[0].connectedFarms).toHaveLength(4);
+    expect(groupLabsInfos.members[0].connectedFarms[0].instanceName).toBe(
+      'dan_teravest_farm.farmos.net'
+    );
+    expect(groupLabsInfos.members[0].connectedFarms[0].memberships).toHaveLength(1);
+    expect(groupLabsInfos.members[0].connectedFarms[0].memberships[0].path).toBe(
+      'Bionutrient > Labs'
+    );
+    expect(groupLabsInfos.members[0].connectedFarms[1].instanceName).toBe('lees_farm.farmos.net');
+    expect(groupLabsInfos.members[0].connectedFarms[1].memberships).toHaveLength(2);
+    expect(groupLabsInfos.members[0].connectedFarms[1].memberships[0].path).toBe(
+      'Bionutrient > Labs'
+    );
+    expect(groupLabsInfos.members[0].connectedFarms[1].memberships[1].path).toBe(
+      'Bionutrient > Labs > Michigan'
+    );
+    expect(groupLabsInfos.members[0].connectedFarms[2].instanceName).toBe('ourscinet.farmos.net');
+    expect(groupLabsInfos.members[0].connectedFarms[2].memberships).toHaveLength(5);
+    expect(groupLabsInfos.members[0].connectedFarms[2].memberships[0].path).toBe(
+      'Bionutrient > Labs'
+    );
+    expect(groupLabsInfos.members[0].connectedFarms[2].memberships[1].path).toBe(
+      'Bionutrient > Labs > Michigan'
+    );
+    expect(groupLabsInfos.members[0].connectedFarms[2].memberships[2].path).toBe(
+      'Bionutrient > Labs > Europe'
+    );
+    expect(groupLabsInfos.members[0].connectedFarms[2].memberships[3].path).toBe(
+      'Bionutrient > Labs > Community'
+    );
+    expect(groupLabsInfos.members[0].connectedFarms[2].memberships[4].path).toBe(
+      'Bionutrient > Labs > Community > Lab'
+    );
+    expect(groupLabsInfos.members[0].connectedFarms[3].instanceName).toBe('coffeeshop.farmos.net');
+    expect(groupLabsInfos.members[0].connectedFarms[3].memberships).toHaveLength(1);
+    expect(groupLabsInfos.members[0].connectedFarms[3].memberships[0].path).toBe(
+      'Bionutrient > Labs > Michigan'
+    );
+
+    expect(groupLabsInfos.members[1].role).toBe('false');
+    expect(groupLabsInfos.members[1].location).toBe('Bionutrient > Labs');
+    expect(groupLabsInfos.members[1].email).toBe('djole2352@gmail.com');
+    expect(groupLabsInfos.members[1].connectedFarms).toHaveLength(0);
+
+    expect(groupLabsInfos.members[2].role).toBe('false');
+    expect(groupLabsInfos.members[2].location).toBe('Bionutrient > Labs > Michigan');
+    expect(groupLabsInfos.members[2].email).toBe('bigjenny@bj.net');
+    expect(groupLabsInfos.members[2].connectedFarms).toHaveLength(1);
+    expect(groupLabsInfos.members[2].connectedFarms[0].instanceName).toBe(
+      'jennybigfarmstand.farmos.net'
+    );
+    expect(groupLabsInfos.members[2].connectedFarms[0].memberships).toHaveLength(1);
+    expect(groupLabsInfos.members[2].connectedFarms[0].memberships[0].path).toBe(
+      'Bionutrient > Labs > Michigan'
+    );
+
+    expect(groupLabsInfos.nonMembers).toHaveLength(2);
+    expect(groupLabsInfos.nonMembers[0].instanceName).toBe('external.farmos.net');
+    expect(groupLabsInfos.nonMembers[0].path).toBe('Bionutrient > Labs > Michigan');
+    expect(groupLabsInfos.nonMembers[1].instanceName).toBe('external2.farmos.net');
+    expect(groupLabsInfos.nonMembers[1].path).toBe('Bionutrient > Labs > Michigan');
   });
+
+  //TODO unit test 'test-group-settings'
 });
