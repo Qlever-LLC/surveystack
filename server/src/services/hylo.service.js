@@ -8,6 +8,18 @@ import * as utils from '../helpers/surveys';
 import { db } from '../db';
 import { gql } from 'graphql-request';
 import { gqlRequest } from './hylo/utils';
+import Joi from 'joi';
+
+const outputSchema = Joi.object({
+  entity: Joi.object({
+    name: Joi.string().required(),
+    slug: Joi.string().required(),
+    extraModerators: Joi.array().items(Joi.object({
+      name: Joi.object({value: Joi.string().required()}).required(),
+      email: Joi.object({value: Joi.string().required()}).required(),
+    }))
+  }).required(),
+}).required();
 
 const createHyloUser = async ({ email, name, groupId }) => {
   const r = await axios.post(
@@ -234,12 +246,17 @@ const getHyloApiComposeOutputs = ({ submission, survey }) => {
     .flat();
 };
 
-export const handleSyncGroupOutput = ({ output, user }) => {
+export const handleSyncGroupOutput = ({ _output, user }) => {
+  const {value: output, error } = outputSchema.validate(_output)
+  if (error) {
+    const errors = error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(', ')}`);
+  }
+
   const { url, entity } = output;
   const { name, slug, extraModerators } = entity;
 
   const hyloUser = await syncUserWithHylo(user._id);
-  console.log({ hyloUser });
 
   const hyloGroup = await syncGroupWithHylo({
     name,
@@ -251,7 +268,7 @@ export const handleSyncGroupOutput = ({ output, user }) => {
 
   for ({email, name} of extraModerators) {
     try {
-      await createHyloUser({email: email.value, name, name.value, groupId})
+      await createHyloUser({email: email.value, name: name.value, groupId})
     }
     catch (e) {
       // TODO if already exist
