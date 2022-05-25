@@ -1,12 +1,7 @@
-import boom from '@hapi/boom';
 import axios from 'axios';
-import { ObjectId } from 'mongodb';
 import querystring from 'querystring';
 
-import * as utils from '../helpers/surveys';
-
-import { db } from '../db';
-import { request, gql } from 'graphql-request';
+import { request } from 'graphql-request';
 
 export const getToken = async () => {
   const r = await axios.post(
@@ -29,7 +24,7 @@ export const getToken = async () => {
   return r.data;
 };
 
-const gqlPostConfig = async () => {
+export const gqlPostConfig = async () => {
   return {
     headers: {
       Authorization: `Bearer ${(await getToken()).access_token}`,
@@ -50,5 +45,9 @@ export const gqlRequest = async (query, variables) => {
     query,
     variables,
     await getGqlAuthHeaders()
-  );
+  ).catch(async (e) => {
+    console.log(e.response.errors[0])
+    console.log("H", JSON.stringify(await getGqlAuthHeaders()))
+    throw new Error(e.response.errors.map((e) => e.message).join('\n') + ' in ' + query + JSON.stringify(variables, null, 2));
+  });
 };
