@@ -34,7 +34,7 @@
           on Hylo
         </div> -->
         <v-btn color="primary" @click="removeGroupIntegration" :loading="isRemoveGroupIntegrationInProgress">
-          Remove integration TODO
+          Remove integration
         </v-btn>
       </v-card-text>
 
