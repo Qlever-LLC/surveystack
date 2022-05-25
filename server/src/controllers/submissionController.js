@@ -650,13 +650,16 @@ const handleApiCompose = async (submissionEntities, user) => {
   let hyloResults;
   try {
     hyloResults = await Promise.all(
-      submissionEntities.map(({ entity, survey }) =>
-        hyloService.handle({
+      submissionEntities.map(async ({ entity, survey }) => {
+        const results = hyloService.handle({
           submission: entity,
           survey,
           user,
-        })
-      )
+        });
+        // Save the results of the Hylo handler in the submission
+        entity.hyloApiComposeResults = results;
+        return results;
+      })
     );
   } catch (error) {
     // TODO this error handling copied from the farmos handle. Find out what is does
@@ -671,21 +674,26 @@ const handleApiCompose = async (submissionEntities, user) => {
   }
 
   return {
-    farmos: farmOsResults.flat(),
-    hylo: hyloResults.flat(),
+    results: {
+      farmos: farmOsResults.flat(),
+      hylo: hyloResults.flat(),
+    },
+    entities: submissionEntities,
   };
 };
 
 const createSubmission = async (req, res) => {
   const submissions = Array.isArray(req.body) ? req.body : [req.body];
 
-  const submissionEntities = await Promise.all(
+  let submissionEntities = await Promise.all(
     submissions.map((submission) => prepareCreateSubmissionEntity(submission, res))
   );
 
   let apiComposeResutls = {};
   try {
-    apiComposeResutls = await handleApiCompose(submissionEntities, res.locals.auth.user);
+    const composeResults = await handleApiCompose(submissionEntities, res.locals.auth.user);
+    apiComposeResutls = composeResults.results;
+    submissionEntities = composeResults.entities;
   } catch (errorObject) {
     return res.status(503).send(errorObject);
   }

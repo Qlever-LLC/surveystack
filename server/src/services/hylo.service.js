@@ -5,7 +5,7 @@ import querystring from 'querystring';
 
 import * as utils from '../helpers/surveys';
 
-import { db } from '../db';
+import { COLL_GROUPS_HYLO_MAPPINGS, db } from '../db';
 import { gql } from 'graphql-request';
 import { gqlRequest, gqlPostConfig } from './hylo/utils';
 import Joi from 'joi';
@@ -188,7 +188,7 @@ const getHyloApiComposeOutputs = ({ submission, survey }) => {
   const { controls } = survey.revisions.find((revision) => revision.version === surveyVersion);
   const positions = utils.getControlPositions(controls);
 
-  const hyloCompose = positions
+  return positions
     .map((position) => {
       const control = utils.getControl(controls, position);
       if (!control.options.apiCompose || !control.options.apiCompose.enabled) {
@@ -227,7 +227,7 @@ const getHyloApiComposeOutputs = ({ submission, survey }) => {
     .flat();
 };
 
-export const handleSyncGroupOutput = async ({ output: _output, user }) => {
+export const handleSyncGroupOutput = async ({ output: _output, user, group }) => {
   const { value: output, error } = outputSchema.validate(_output);
   if (error) {
     const errors = error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
@@ -246,6 +246,17 @@ export const handleSyncGroupOutput = async ({ output: _output, user }) => {
   entity.groupExtensions = entity.groupExtensions.map(e => ({...e, data: JSON.stringify(e.data)}))
   // TODO Hylo throws Invalid GeoJSON
   delete entity.geoShape
+
+
+  const groupMapping = await db
+    .collection(COLL_GROUPS_HYLO_MAPPINGS)
+    .findOne({ groupId: new ObjectId(group.id) });
+  if (!groupMapping) {
+    throw new Error(`The group ${group.path || group.id} is not integrated with Hylo. Go to the group admin page to connect this group to Hylo.`)
+  }
+  console.log("groupMapping", groupMapping)
+  entity.parentIds = [groupMapping.hyloGroupId]
+
 
   const hyloUser = await syncUserWithHylo(user._id);
   console.log('hyloUser', hyloUser);
@@ -276,11 +287,11 @@ export const handleSyncGroupOutput = async ({ output: _output, user }) => {
 
 export const handle = async ({ submission, survey, user }) => {
   const hyloCompose = getHyloApiComposeOutputs({ submission, survey });
-
+  console.log("hyloCompose", hyloCompose)
   const results = [];
   for (const output of hyloCompose) {
     if (output.hyloType === 'sync-group') {
-      results.push(await handleSyncGroupOutput({ output, user }));
+      results.push(await handleSyncGroupOutput({ output, user, group: survey.meta.group }));
     }
   }
   console.log('RESULTS', JSON.stringify(results, null, 2));
@@ -472,10 +483,10 @@ const op = testOutput({
   slug: 'test-group-2',
 });
 
-new Promise((r) => setTimeout(r, 3000))
-  .then(() => db.collection('users').findOne({ email: 'azazdeaz@gmail.com' }))
-  .then((user) => handleSyncGroupOutput({ output: op, user }))
-  .then((t) => {
-    console.log('Handled', JSON.stringify(t, null, 2));
-    return t;
-  });
+// new Promise((r) => setTimeout(r, 3000))
+//   .then(() => db.collection('users').findOne({ email: 'azazdeaz@gmail.com' }))
+//   .then((user) => handleSyncGroupOutput({ output: op, user }))
+//   .then((t) => {
+//     console.log('Handled', JSON.stringify(t, null, 2));
+//     return t;
+//   });
