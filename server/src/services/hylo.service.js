@@ -26,7 +26,7 @@ const outputSchema = Joi.object({
   .options({ allowUnknown: true });
 
 const createHyloUser = async ({ email, name, groupId }) => {
-  console.log("create hyloUser", { email, name, groupId })
+  console.log('create hyloUser', { email, name, groupId });
   const r = await axios.post(
     `${process.env.HYLO_API_URL}/noo/user`,
     querystring.stringify({ email, name, groupId }),
@@ -41,7 +41,7 @@ const createHyloUser = async ({ email, name, groupId }) => {
 };
 
 const queryHyloUser = async (email) => {
-  console.log('queryHyloUser', email)
+  console.log('queryHyloUser', email);
   return gqlRequest(
     gql`
       query ($id: ID, $email: String) {
@@ -243,20 +243,25 @@ export const handleSyncGroupOutput = async ({ output: _output, user, group }) =>
 
   // Convert some fields to JSON to match the Hylo API
   entity.geoShape = JSON.stringify(entity.geoShape);
-  entity.groupExtensions = entity.groupExtensions.map(e => ({...e, data: JSON.stringify(e.data)}))
+  entity.groupExtensions = entity.groupExtensions.map((e) => ({
+    ...e,
+    data: JSON.stringify(e.data),
+  }));
   // TODO Hylo throws Invalid GeoJSON
-  delete entity.geoShape
-
+  delete entity.geoShape;
 
   const groupMapping = await db
     .collection(COLL_GROUPS_HYLO_MAPPINGS)
     .findOne({ groupId: new ObjectId(group.id) });
   if (!groupMapping) {
-    throw new Error(`The group ${group.path || group.id} is not integrated with Hylo. Go to the group admin page to connect this group to Hylo.`)
+    throw new Error(
+      `The group ${
+        group.path || group.id
+      } is not integrated with Hylo. Go to the group admin page to connect this group to Hylo.`
+    );
   }
-  console.log("groupMapping", groupMapping)
-  entity.parentIds = [groupMapping.hyloGroupId]
-
+  console.log('groupMapping', groupMapping);
+  entity.parentIds = [groupMapping.hyloGroupId];
 
   const hyloUser = await syncUserWithHylo(user._id);
   console.log('hyloUser', hyloUser);
@@ -273,7 +278,7 @@ export const handleSyncGroupOutput = async ({ output: _output, user, group }) =>
         await createHyloUser({ email: email.value, name: name.value, groupId: hyloGroup.id })
       );
     } catch (e) {
-      console.log("Error on creating extra moderator", e)
+      console.log('Error on creating extra moderator', e);
       extraModeratorUsers.push(await queryHyloUser(email.value));
       // TODO if already exist
       //  - query hylo user info (for saving in the submission)
@@ -287,7 +292,7 @@ export const handleSyncGroupOutput = async ({ output: _output, user, group }) =>
 
 export const handle = async ({ submission, survey, user }) => {
   const hyloCompose = getHyloApiComposeOutputs({ submission, survey });
-  console.log("hyloCompose", hyloCompose)
+  console.log('hyloCompose', hyloCompose);
   const results = [];
   for (const output of hyloCompose) {
     if (output.hyloType === 'sync-group') {
