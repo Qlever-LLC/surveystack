@@ -312,7 +312,7 @@ export const handle = async ({ submission, survey, user }) => {
   const results = [];
   for (const output of hyloCompose) {
     if (output.hyloType === 'sync-group') {
-      results.push(await handleSyncGroupOutput({ output, user, group: survey.meta.group }));
+      results.push(await handleSyncGroupOutput({ output, user, group: submission.meta.group }));
     }
   }
   console.log('RESULTS', JSON.stringify(results, null, 2));
