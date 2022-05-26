@@ -206,7 +206,7 @@ const actions = {
 
       const [relevance] = await codeEvaluator.calculateRelevance([nextNode], state.submission, state.survey); // eslint-disable-line
       const { result, path, skip } = relevance;
-      if (!skip && !!path) {
+      if (!skip) {
         commit('SET_PROPERTY', { path: `${path}.meta.relevant`, value: result });
         if (!result) {
           continue;
@@ -280,7 +280,7 @@ const actions = {
 
       const [relevance] = await codeEvaluator.calculateRelevance([prevNode], state.submission, state.survey); // eslint-disable-line
       const { result, path, skip } = relevance;
-      if (!skip && !!path) {
+      if (!skip) {
         commit('SET_PROPERTY', { path: `${path}.meta.relevant`, value: result });
         if (!result) {
           continue;
@@ -380,7 +380,7 @@ const actions = {
     const calculations = await codeEvaluator.calculateRelevance(nodes, state.submission, state.survey);
     calculations.forEach((calculation) => {
       const { result, path, skip } = calculation;
-      if (!skip && !!path) {
+      if (!skip) {
         commit('SET_PROPERTY', { path: `${path}.meta.relevant`, value: result });
         // commit('SET_PROPERTY', { path: `${path}.meta.computedRelevance`, value: result }); // TODO: set computedRelevance as well?
       }
@@ -396,11 +396,11 @@ const actions = {
       if (error) {
         errors.push({ path, error });
       }
-      if (!skip && !!path) {
+      if (!skip) {
         commit('SET_PROPERTY', { path: `${path}.meta.apiCompose`, value: result });
       }
 
-      if (clear && !!path) {
+      if (clear) {
         commit('SET_PROPERTY', { path: `${path}.meta.apiCompose`, value: null });
       }
     });
