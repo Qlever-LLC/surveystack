@@ -46,18 +46,20 @@ const createHyloUser = async (options) => {
 const queryHyloUser = async (options) => {
   const { email, gqlRequest } = { ...deps, ...options };
   console.log('queryHyloUser', email);
-  return (await gqlRequest(
-    gql`
-      query ($id: ID, $email: String) {
-        person(id: $id, email: $email) {
-          id
-          name
-          hasRegistered
+  return (
+    await gqlRequest(
+      gql`
+        query ($id: ID, $email: String) {
+          person(id: $id, email: $email) {
+            id
+            name
+            hasRegistered
+          }
         }
-      }
-    `,
-    { email }
-  )).person;
+      `,
+      { email }
+    )
+  ).person;
 };
 
 const FRAGMENT_GROUP_DETAILS = gql`
@@ -266,15 +268,10 @@ export const handleSyncGroupOutput = async ({ output: _output, user, group }) =>
   const groupMapping = await db
     .collection(COLL_GROUPS_HYLO_MAPPINGS)
     .findOne({ groupId: new ObjectId(group.id) });
-  if (!groupMapping) {
-    throw new Error(
-      `The group ${
-        group.path || group.id
-      } is not integrated with Hylo. Go to the group admin page to connect this group to Hylo.`
-    );
+  if (groupMapping) {
+    entity.parentIds = [groupMapping.hyloGroupId];
   }
   console.log('groupMapping', groupMapping);
-  entity.parentIds = [groupMapping.hyloGroupId];
 
   const hyloUser = await syncUserWithHylo({ userId: user._id, gqlRequest, gqlPostConfig });
   console.log('hyloUser', hyloUser);

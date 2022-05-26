@@ -165,7 +165,7 @@ export const removeHyloGroupIntegration = async (req, res) => {
 
   const { groupId } = validateOrThrow(schema, req.body);
 
-  await db.collection(COLL_GROUPS_HYLO_MAPPINGS).deleteOne({ groupId });
+  await db.collection(COLL_GROUPS_HYLO_MAPPINGS).deleteOne({ groupId: new ObjectId(groupId) });
 
   res.send({ ok: true });
 };
