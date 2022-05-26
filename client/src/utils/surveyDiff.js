@@ -1,6 +1,6 @@
-import { cloneDeep, get, isArray, isEqual, isNil, isObjectLike, pull, toPath, uniq } from 'lodash';
+import { get, isArray, isEqual, isNil, isObjectLike, pull, toPath, uniq } from 'lodash';
 import flatten from 'flat';
-import { getPosition, insertControl, removeControl, replaceControl } from '@/utils/surveys';
+import { getPosition, insertControl, replaceControl } from '@/utils/surveys';
 
 export const changeType = {
   CHANGED: 'changed',
@@ -193,32 +193,44 @@ export function diffHasConflicts(controlsLocalRevision, controlsRemoteRevisionA,
   );
 }
 
-export function diffThreeSurveyVersions(controlsLocalRevision, controlsRemoteRevisionA, controlsRemoteRevisionB) {
+export function diffThreeSurveyVersions(
+  controlsLocalRevision,
+  controlsRemoteRevisionA,
+  controlsRemoteRevisionB,
+  reportChangeTypeBasedOnLocalRevision = false
+) {
+  let changesResult = [];
   //collect diff results for all controls
-  const changesLocal = diffSurveyVersions(controlsLocalRevision, controlsRemoteRevisionA);
+  const changesLocal = diffSurveyVersions(controlsRemoteRevisionA, controlsLocalRevision);
   const changesRemote = diffSurveyVersions(controlsRemoteRevisionA, controlsRemoteRevisionB);
   //get changes both in changesAB and changesBC
-  let changes = [];
-  for (const changeRemote of changesRemote) {
-    if (changeRemote.changeType === CHANGED) {
-      for (const changeLocal of changesLocal) {
+  let changesPrimary = reportChangeTypeBasedOnLocalRevision ? changesLocal : changesRemote;
+  let changesSecondary = reportChangeTypeBasedOnLocalRevision ? changesRemote : changesLocal;
+  for (const changePrimary of changesPrimary) {
+    if (changePrimary.changeType === CHANGED) {
+      for (const changeSecondary of changesSecondary) {
         if (
-          changeRemote.controlRevisionA.id === changeLocal.controlRevisionA.id ||
-          changeRemote.pathRevisionA === changeLocal.pathRevisionA
+          changePrimary.controlRevisionA.id === changeSecondary.controlRevisionA.id ||
+          changePrimary.pathRevisionA === changeSecondary.pathRevisionA
         ) {
-          changes.push(createThreePointChange(changeLocal, changeRemote));
+          if (reportChangeTypeBasedOnLocalRevision) {
+            changesResult.push(createThreePointChange(changePrimary, changeSecondary));
+          } else {
+            changesResult.push(createThreePointChange(changeSecondary, changePrimary));
+          }
+
           break;
         }
       }
-    } else if (changeRemote.changeType === ADDED) {
-      changes.push(changeRemote);
-    } else if (changeRemote.changeType === REMOVED) {
-      changes.push(changeRemote);
+    } else if (changePrimary.changeType === ADDED) {
+      changesResult.push(changePrimary);
+    } else if (changePrimary.changeType === REMOVED) {
+      changesResult.push(changePrimary);
     } else {
-      changes.push(changeRemote);
+      changesResult.push(changePrimary);
     }
   }
-  return changes;
+  return changesResult;
 }
 
 function createThreePointChange(changeLocal, changeRemote) {
@@ -227,10 +239,10 @@ function createThreePointChange(changeLocal, changeRemote) {
     hasLocalChange: false,
     diff: changeRemote.diff,
 
-    controlRevisionA: changeLocal.controlRevisionA,
-    parentIdRevisionA: changeLocal.parentIdRevisionA,
-    childIndexRevisionA: changeLocal.childIndexRevisionA,
-    pathRevisionA: changeLocal.pathRevisionA,
+    controlRevisionA: changeLocal.controlRevisionB,
+    parentIdRevisionA: changeLocal.parentIdRevisionB,
+    childIndexRevisionA: changeLocal.childIndexRevisionB,
+    pathRevisionA: changeLocal.pathRevisionB,
 
     controlRevisionB: changeRemote.controlRevisionA,
     parentIdRevisionB: changeRemote.parentIdRevisionA,
@@ -245,13 +257,13 @@ function createThreePointChange(changeLocal, changeRemote) {
 
   //add all diffs of local revision
   for (const diffProperty in threePointChange.diff) {
-    const remoteChangeProp = threePointChange.diff[diffProperty];
+    let remoteChangeProp = threePointChange.diff[diffProperty];
     const localChangeProp = Object.prototype.hasOwnProperty.call(changeLocal.diff, diffProperty)
       ? changeLocal.diff[diffProperty]
       : undefined;
     remoteChangeProp.valueC = remoteChangeProp.valueB || remoteChangeProp.value;
     remoteChangeProp.valueB = remoteChangeProp.valueA || remoteChangeProp.value;
-    remoteChangeProp.valueA = localChangeProp ? localChangeProp.valueA || localChangeProp.value : undefined;
+    remoteChangeProp.valueA = localChangeProp ? localChangeProp.valueB || localChangeProp.value : undefined;
     if (remoteChangeProp.changeType === UNCHANGED && localChangeProp.changeType === CHANGED) {
       remoteChangeProp.changeType = CHANGED;
     }
@@ -266,6 +278,22 @@ function createThreePointChange(changeLocal, changeRemote) {
       threePointChange.hasLocalChange = true;
     }
   }
+  //add all diff properties of local revision missing in remote revision
+  for (const localDiffProperty in changeLocal.diff) {
+    const localDiffPropertyIsMissing = !Object.prototype.hasOwnProperty.call(threePointChange.diff, localDiffProperty);
+    if (localDiffPropertyIsMissing) {
+      //add it
+      const localChangeProp = changeLocal.diff[localDiffProperty];
+      threePointChange.diff[localDiffProperty] = {
+        valueA: localChangeProp.valueB,
+        valueB: localChangeProp.valueA,
+        valueC: undefined,
+        changeType: CHANGED,
+      };
+      threePointChange.hasLocalChange = true;
+      threePointChange.changeType = CHANGED;
+    }
+  }
 
   if (hasBreakingChange(threePointChange.diff)) {
     threePointChange.changeType = CONFLICT;
@@ -278,33 +306,32 @@ function createThreePointChange(changeLocal, changeRemote) {
   returns merged changes from the given revisions
 
   merge algorithm:
-  - apply all adds and removes in remote revisions to the local revision
-  - apply changes in remote revisions to unchanged local revision
-  - apply changes in remote revision to changed local revision if remote change is breaking change
-  - do not apply changes in remote revision to changed local revision if remote change is NOT breaking change
+  - take remoteRevisionB as the base for the resulting revision
+  - apply changes in local revision to the resulting revision if the remote change is not a breaking change
+  - apply adds of "foreign" controls to the resulting revision keeping the same position
  */
 export function merge(controlsLocalRevision, controlsRemoteRevisionA, controlsRemoteRevisionB) {
-  let mergedControls = [...controlsLocalRevision];
-  //TODO let mergedControls = flatSurveyControls(controlsLocalRevision);
+  let mergedControls = [...controlsRemoteRevisionB];
 
   //collect changes
-  let changes = diffThreeSurveyVersions(controlsLocalRevision, controlsRemoteRevisionA, controlsRemoteRevisionB);
+  let changes = diffThreeSurveyVersions(controlsLocalRevision, controlsRemoteRevisionA, controlsRemoteRevisionB, true);
   let addedGroups = [];
-  //applicate remote changes on local survey
+  //applicate local changes
   for (const change of changes) {
     switch (change.changeType) {
       case changeType.CONFLICT:
-        mergedControls = replaceControl(mergedControls, null, change.pathRevisionC, change.controlRevisionC);
+        //a breaking change occurred on remote revision, discard local change
         break;
       case changeType.CHANGED:
-        //only merge remote changes into local revision if local revision was not changed
-        if (!change.hasLocalChange) {
-          mergedControls = replaceControl(mergedControls, null, change.pathRevisionC, change.controlRevisionC);
+        //merge local change into resulting controls
+        if (change.hasLocalChange) {
+          //TODO if the path is not available in the remote revision, add it to parent path if existing. Try until root is reached.
+          mergedControls = replaceControl(mergedControls, null, change.pathRevisionC, change.controlRevisionA);
         }
         break;
       case changeType.REMOVED:
-        //TODO check if removing a group also leads to trying to remove its childs afterwards (which would fail cause removing the group already removes the children)
-        mergedControls = removeControl(mergedControls, null, change.pathRevisionA);
+        //ignore, controls can not be removed locally
+        console.error('local removal of question set control detected. Ignoring this change.');
         break;
       case changeType.ADDED: {
         if (change.controlRevisionB.type === 'group' || change.controlRevisionB.type === 'page') {
@@ -314,13 +341,16 @@ export function merge(controlsLocalRevision, controlsRemoteRevisionA, controlsRe
           //it's a child of an added group, do not add it cause it's added together with the group
           continue;
         }
-        const position = getPosition(change.controlRevisionB, controlsRemoteRevisionB);
+        const position = getPosition(change.controlRevisionB, controlsLocalRevision);
         // change position to the control before/above, cause that's expected by insertControl
         if (position[position.length - 1] === 0) {
           position.pop(); //move up
         } else {
           position[position.length - 1]--; //move back
         }
+        //flag the control as consumer-added non-library-control
+        change.controlRevisionB.isNonLibraryControl = true;
+        //insert control
         insertControl(change.controlRevisionB, mergedControls, position, false);
         break;
       }

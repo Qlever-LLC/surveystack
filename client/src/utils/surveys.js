@@ -182,6 +182,9 @@ export const prepareToAddFromLibrary = (controlOrResource, libraryId, libraryVer
   if (controlOrResource.libraryId) {
     // do not overwrite the libraryId cause it references another library the inherited library consists of
     controlOrResource.libraryIsInherited = true;
+  } else if (controlOrResource.isNonLibraryControl) {
+    // this flag is set by surveyDiff.js:merge to indicate that this is a consumer-added, non-library control
+    delete controlOrResource.isNonLibraryControl;
   } else {
     // set library data
     controlOrResource.libraryId = libraryId;
