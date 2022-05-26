@@ -276,6 +276,7 @@ function createThreePointChange(changeLocal, changeRemote) {
     ) {
       //add flog for easier detection by merge function
       threePointChange.hasLocalChange = true;
+      threePointChange.changeType = CHANGED;
     }
   }
   //add all diff properties of local revision missing in remote revision
