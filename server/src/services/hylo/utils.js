@@ -3,9 +3,9 @@ import querystring from 'querystring';
 
 import { request } from 'graphql-request';
 
-export const getToken = async () => {
+export const getToken = async (apiUrl = process.env.HYLO_API_URL) => {
   const r = await axios.post(
-    `${process.env.HYLO_API_URL}/noo/oauth/token`,
+    `${apiUrl}/noo/oauth/token`,
     querystring.stringify({
       client_secret: process.env.HYLO_CLIENT_SECRET,
       scope: 'api:write',
@@ -24,30 +24,42 @@ export const getToken = async () => {
   return r.data;
 };
 
-export const gqlPostConfig = async () => {
+export const gqlPostConfig = async (apiUrl = process.env.HYLO_API_URL) => {
   return {
     headers: {
-      Authorization: `Bearer ${(await getToken()).access_token}`,
+      Authorization: `Bearer ${(await getToken(apiUrl)).access_token}`,
       'Content-Type': 'application/json',
     },
   };
 };
 
-const getGqlAuthHeaders = async () => {
+const getGqlAuthHeaders = async (apiUrl = process.env.HYLO_API_URL) => {
   return {
-    Authorization: `Bearer ${(await getToken()).access_token}`,
+    Authorization: `Bearer ${(await getToken(apiUrl)).access_token}`,
   };
 };
 
-export const gqlRequest = async (query, variables) => {
-  return request(
-    `${process.env.HYLO_API_URL}/noo/graphql`,
-    query,
-    variables,
-    await getGqlAuthHeaders()
-  ).catch(async (e) => {
-    console.log(e.response.errors[0])
-    console.log("H", JSON.stringify(await getGqlAuthHeaders()))
-    throw new Error(e.response.errors.map((e) => e.message).join('\n') + ' in ' + query + JSON.stringify(variables, null, 2));
-  });
+export const gqlRequest = async (query, variables, apiUrl = process.env.HYLO_API_URL) => {
+  return request(apiUrl + '/noo/graphql', query, variables, await getGqlAuthHeaders(apiUrl)).catch(
+    async (e) => {
+      if (e?.response?.errors) {
+        console.log(e.response.errors[0]);
+        console.log('H', JSON.stringify(await getGqlAuthHeaders(apiUrl)));
+        throw new Error(
+          e.response.errors.map((e) => e.message).join('\n') +
+            ' in ' +
+            query +
+            JSON.stringify(variables, null, 2)
+        );
+      }
+      throw e;
+    }
+  );
+};
+
+export const gqlRequestWithUrl = (apiUrl) => {
+  if (!apiUrl.endsWith('.hylo.com')) {
+    throw new Error('Hylo API URL has to end in .hylo.com');
+  }
+  return (query, variables) => gqlRequest(query, variables, apiUrl);
 };

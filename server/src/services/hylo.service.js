@@ -7,8 +7,10 @@ import * as utils from '../helpers/surveys';
 
 import { COLL_GROUPS_HYLO_MAPPINGS, db } from '../db';
 import { gql } from 'graphql-request';
-import { gqlRequest, gqlPostConfig } from './hylo/utils';
+import * as hyloUtils from './hylo/utils';
 import Joi from 'joi';
+
+const deps = { gqlRequest: hyloUtils.gqlRequest, gqlPostConfig: hyloUtils.gqlPostConfig };
 
 const outputSchema = Joi.object({
   entity: Joi.object({
@@ -25,7 +27,8 @@ const outputSchema = Joi.object({
   .required()
   .options({ allowUnknown: true });
 
-const createHyloUser = async ({ email, name, groupId }) => {
+const createHyloUser = async (options) => {
+  const { email, name, groupId, gqlPostConfig } = { ...deps, ...options };
   console.log('create hyloUser', { email, name, groupId });
   const r = await axios.post(
     `${process.env.HYLO_API_URL}/noo/user`,
@@ -40,9 +43,10 @@ const createHyloUser = async ({ email, name, groupId }) => {
   return r.data;
 };
 
-const queryHyloUser = async (email) => {
+const queryHyloUser = async (options) => {
+  const { email, gqlRequest } = { ...deps, ...options };
   console.log('queryHyloUser', email);
-  return gqlRequest(
+  return (await gqlRequest(
     gql`
       query ($id: ID, $email: String) {
         person(id: $id, email: $email) {
@@ -53,7 +57,7 @@ const queryHyloUser = async (email) => {
       }
     `,
     { email }
-  );
+  )).person;
 };
 
 const FRAGMENT_GROUP_DETAILS = gql`
@@ -71,7 +75,8 @@ const FRAGMENT_GROUP_DETAILS = gql`
   }
 `;
 
-const queryHyloGroup = async (slug) => {
+const queryHyloGroup = async (options) => {
+  const { slug, gqlRequest } = { ...deps, ...options };
   return gqlRequest(
     gql`
       query ($id: ID, $slug: String) {
@@ -85,7 +90,8 @@ const queryHyloGroup = async (slug) => {
   );
 };
 
-const createHyloGroup = async ({ data, hyloUserId }) => {
+const createHyloGroup = async (options) => {
+  const { data, hyloUserId, gqlRequest } = { ...deps, ...options };
   return gqlRequest(
     gql`
       mutation ($data: GroupInput, $asUserId: ID) {
@@ -102,7 +108,8 @@ const createHyloGroup = async ({ data, hyloUserId }) => {
   );
 };
 
-const updateHyloGroup = async ({ data, hyloUserId, hyloGroupId }) => {
+const updateHyloGroup = async (options) => {
+  const { data, hyloUserId, hyloGroupId, gqlRequest } = { ...deps, ...options };
   return gqlRequest(
     gql`
       mutation ($id: ID, $changes: GroupInput, $asUserId: ID) {
@@ -120,20 +127,21 @@ const updateHyloGroup = async ({ data, hyloUserId, hyloGroupId }) => {
   );
 };
 
-const syncUserWithHylo = async (id) => {
-  const user = await db.collection('users').findOne({ _id: new ObjectId(id) });
+const syncUserWithHylo = async (options) => {
+  const { userId, gqlRequest, gqlPostConfig } = { ...deps, ...options };
+  const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
   if (!user) {
     throw new Error('TODO');
   }
   let hyloUser = await createHyloUser({
     email: user.email,
     name: user.name,
+    gqlPostConfig,
   });
 
   // if user already exists
   if (!hyloUser?.id) {
-    const { person } = await queryHyloUser(user.email);
-    hyloUser = person;
+    hyloUser = await queryHyloUser({ email: user.email, gqlRequest });
   }
 
   if (!hyloUser?.id) {
@@ -143,24 +151,27 @@ const syncUserWithHylo = async (id) => {
   return hyloUser;
 };
 
-const syncGroupWithHylo = async ({ data, hyloUserId }) => {
+const syncGroupWithHylo = async (options) => {
+  const { data, hyloUserId, gqlRequest } = { ...deps, ...options };
   let group = null;
   try {
-    group = (await createHyloGroup({ data, hyloUserId })).group;
+    group = (await createHyloGroup({ data, hyloUserId, gqlRequest })).group;
   } catch (e) {
     if (
       !e.response?.errors?.some((e) => e.message === 'A group with that URL slug already exists')
     ) {
       console.error(e);
+    } else {
+      console.log(`Group with slug ${data.slug} already exist. Try to update it...`);
     }
   }
   console.log('group after create', { group });
   if (!group?.id) {
-    group = (await queryHyloGroup(data.slug)).group;
+    group = (await queryHyloGroup({ gqlRequest, slug: data.slug })).group;
     if (!group?.id) {
       throw new Error(`Failed to create a Hylo group with slug "${data.slug}"`);
     }
-    group = await updateHyloGroup({ data, hyloUserId, hyloGroupId: group.id });
+    group = (await updateHyloGroup({ data, hyloUserId, hyloGroupId: group.id, gqlRequest })).group;
   }
   return group;
 };
@@ -182,8 +193,6 @@ const syncGroupWithHylo = async ({ data, hyloUserId }) => {
 
 const getHyloApiComposeOutputs = ({ submission, survey }) => {
   const surveyVersion = submission.meta.survey.version;
-
-  console.log('submission-hylo', JSON.stringify(submission, null, 2));
 
   const { controls } = survey.revisions.find((revision) => revision.version === surveyVersion);
   const positions = utils.getControlPositions(controls);
@@ -241,6 +250,10 @@ export const handleSyncGroupOutput = async ({ output: _output, user, group }) =>
   } = output;
   const { name, slug } = entity;
 
+  const href = url ? 'https://' + url : null;
+  const gqlRequest = href ? hyloUtils.gqlRequestWithUrl(href) : hyloUtils.gqlRequest;
+  const gqlPostConfig = href ? () => hyloUtils.gqlPostConfig(href) : hyloUtils.gqlPostConfig;
+
   // Convert some fields to JSON to match the Hylo API
   entity.geoShape = JSON.stringify(entity.geoShape);
   entity.groupExtensions = entity.groupExtensions.map((e) => ({
@@ -263,28 +276,31 @@ export const handleSyncGroupOutput = async ({ output: _output, user, group }) =>
   console.log('groupMapping', groupMapping);
   entity.parentIds = [groupMapping.hyloGroupId];
 
-  const hyloUser = await syncUserWithHylo(user._id);
+  const hyloUser = await syncUserWithHylo({ userId: user._id, gqlRequest, gqlPostConfig });
   console.log('hyloUser', hyloUser);
   const hyloGroup = await syncGroupWithHylo({
     data: entity,
     hyloUserId: hyloUser.id,
-  }).group;
+    gqlRequest,
+  });
   console.log('hyloGroup', hyloGroup);
 
   const extraModeratorUsers = [];
   for (const { email, name } of extraModerators) {
-    try {
-      extraModeratorUsers.push(
-        await createHyloUser({ email: email.value, name: name.value, groupId: hyloGroup.id })
-      );
-    } catch (e) {
-      console.log('Error on creating extra moderator', e);
-      extraModeratorUsers.push(await queryHyloUser(email.value));
-      // TODO if already exist
-      //  - query hylo user info (for saving in the submission)
-      //  - make sure user is added to group
+    let hyloUser = await createHyloUser({
+      email: email.value,
+      name: name.value,
+      groupId: hyloGroup.id,
+      gqlPostConfig,
+    });
+    // if user already exists
+    if (!hyloUser?.id) {
+      hyloUser = await queryHyloUser({ email: email.value, gqlRequest });
+      // TODO make sure user is added to the group
     }
+    extraModeratorUsers.push(hyloUser);
   }
+
   console.log('extraModeratorUsers', extraModeratorUsers);
 
   return { hyloUser, hyloGroup, extraModeratorUsers };
