@@ -21,20 +21,17 @@
 
                     <v-card-text>
                       <v-expansion-panels accordion>
-                        <v-expansion-panel v-for="(item, i) in item.logs" :key="i" :disabled="!item.data">
+                        <v-expansion-panel v-for="(item, i) in item.logs" :key="i" :readonly="!item.data">
                           <v-expansion-panel-header>
-                            <v-row
-                              ><!-- <template v-slot:actions> -->
-                              <div>
-                                <v-icon v-if="item.type === 'error'" color="error"> mdi-alert-circle </v-icon>
-                                <v-icon v-else-if="item.type === 'success'" color="teal"> mdi-check </v-icon>
-                                <v-icon v-else-if="item.type === 'info'" color="light-blue"> mdi-information </v-icon>
-                                <v-icon v-else-if="item.type === 'warning'" color="orange"> mdi-alert </v-icon>
-                                <v-icon v-else color="primary"> $expand </v-icon>
-                                <!-- </template> -->
-                              </div>
-                              <div>{{ item.message }}</div></v-row
-                            >
+                            <template v-slot:actions v-if="!item.data"><v-spacer></v-spacer> </template>
+                            <div class="mr-4 flex-grow-0">
+                              <v-icon v-if="item.type === 'error'" color="error"> mdi-alert-circle </v-icon>
+                              <v-icon v-else-if="item.type === 'success'" color="teal"> mdi-check </v-icon>
+                              <v-icon v-else-if="item.type === 'info'" color="light-blue"> mdi-information </v-icon>
+                              <v-icon v-else-if="item.type === 'warning'" color="orange"> mdi-alert </v-icon>
+                              <v-icon v-else color="primary"> $expand </v-icon>
+                            </div>
+                            {{ item.message }}
                           </v-expansion-panel-header>
                           <v-expansion-panel-content>
                             <pre>{{ JSON.stringify(item.data, null, 2) }}</pre>

@@ -35,12 +35,15 @@ const outputSchema = Joi.object({
   entity: Joi.object({
     name: Joi.string().required(),
     slug: Joi.string().required(),
-    extraModerators: Joi.array().items(
-      Joi.object({
-        name: Joi.object({ value: Joi.string().required() }).required(),
-        email: Joi.object({ value: Joi.string().required() }).required(),
-      }).required()
-    ),
+    // type: Joi.string().valid("farm").required(), //TODO
+    extraModerators: Joi.array()
+      .min(0)
+      .items(
+        Joi.object({
+          name: Joi.object({ value: Joi.string().required() }).required(),
+          email: Joi.object({ value: Joi.string().required() }).required(),
+        }).optional()
+      ),
   }).required(),
 })
   .required()
@@ -182,6 +185,8 @@ const syncUserWithHylo = async (options) => {
   return await upsertHyloUser({ email: user.email, ...options });
 };
 
+const hasGqlError = (e, message) => (e.response?.errors || []).some((e) => e.message === message);
+
 const syncGroupWithHylo = async (options) => {
   const { data, hyloUserId, gqlRequest, logger } = { ...deps, ...options };
   let group = null;
@@ -192,12 +197,13 @@ const syncGroupWithHylo = async (options) => {
     });
     group = (await createHyloGroup({ data, hyloUserId, gqlRequest })).group;
   } catch (e) {
-    if (
-      !e.response?.errors?.some((e) => e.message === 'A group with that URL slug already exists')
-    ) {
-      logger.info(`Group with slug ${data.slug} already exist. Try to update it...`);
+    if (hasGqlError(e, 'A group with that URL slug already exists')) {
+      logger.info(
+        `Group with slug ${data.slug} already exist. Try to update it...`,
+        e.response?.errors
+      );
     } else {
-      logger.error('Failed to create group', e.response?.errors);
+      logger.error('Failed to create group', e.response?.errors || { error: String(e) });
       throw e;
     }
   }
@@ -397,6 +403,7 @@ export const testOutput = (settings = {}) => {
       description: 'Long long string of very important characters',
       name,
       slug,
+      type: 'farm',
       extraModerators,
       visibility: 2,
       location: '560 Little lake dr, washtenaw',
