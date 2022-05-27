@@ -8,7 +8,26 @@ import * as utils from '../helpers/surveys';
 import { COLL_GROUPS_HYLO_MAPPINGS, db } from '../db';
 import { gql } from 'graphql-request';
 import * as hyloUtils from './hylo/utils';
-import Joi from 'joi';
+import Joi, { date } from 'joi';
+
+const createLogger = () => {
+  const logs = [];
+  const log = (type, message, data) => {
+    console.log(type, message, data);
+    logs.push({ type, message, data, time: Date.now() });
+  };
+  return {
+    log,
+    success: (message, data) => log('success', message, data),
+    error: (message, data) => {
+      log('error', message, data);
+      return new Error(message + JSON.stringify(data, null, 2));
+    },
+    warning: (message, data) => log('warning', message, data),
+    info: (message, data) => log('info', message, data),
+    getLogs: () => [...logs],
+  };
+};
 
 const deps = { gqlRequest: hyloUtils.gqlRequest, gqlPostConfig: hyloUtils.gqlPostConfig };
 
@@ -129,52 +148,70 @@ const updateHyloGroup = async (options) => {
   );
 };
 
-const syncUserWithHylo = async (options) => {
-  const { userId, gqlRequest, gqlPostConfig } = { ...deps, ...options };
-  const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
-  if (!user) {
-    throw new Error('TODO');
-  }
-  let hyloUser = await createHyloUser({
-    email: user.email,
-    name: user.name,
-    gqlPostConfig,
-  });
+const upsertHyloUser = async (options) => {
+  const { email, name, groupId, logger } = { ...deps, ...options };
+  logger.info(`Query Hylo user - email="${email}"`);
+  let hyloUser = await queryHyloUser({ email, ...options });
+  // TODO make sure the user is added to the group (if set)
 
   // if user already exists
   if (!hyloUser?.id) {
-    hyloUser = await queryHyloUser({ email: user.email, gqlRequest });
+    logger.info(`Create Hylo user - email="${email}"`);
+    hyloUser = await createHyloUser({
+      email,
+      name,
+      groupId,
+      ...options,
+    });
   }
 
   if (!hyloUser?.id) {
-    throw new Error("Hylo didn't return an ID for the user");
+    throw logger.error("Hylo didn't return an ID for the user", { hyloUser });
   }
 
+  logger.success('Got Hylo user', hyloUser);
   return hyloUser;
 };
 
+const syncUserWithHylo = async (options) => {
+  const { userId, logger } = { ...deps, ...options };
+  const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
+  if (!user) {
+    throw logger.error(`Can't find SurveyStack user with id "${userId}"`);
+  }
+  return await upsertHyloUser({ email: user.email, ...options });
+};
+
 const syncGroupWithHylo = async (options) => {
-  const { data, hyloUserId, gqlRequest } = { ...deps, ...options };
+  const { data, hyloUserId, gqlRequest, logger } = { ...deps, ...options };
   let group = null;
   try {
+    logger.info(`Create Hylo group slug=${data.slug} hyloUserId=${hyloUserId}`, {
+      data,
+      hyloUserId,
+    });
     group = (await createHyloGroup({ data, hyloUserId, gqlRequest })).group;
   } catch (e) {
     if (
       !e.response?.errors?.some((e) => e.message === 'A group with that URL slug already exists')
     ) {
-      console.log(`Group with slug ${data.slug} already exist. Try to update it...`);
+      logger.info(`Group with slug ${data.slug} already exist. Try to update it...`);
     } else {
-      throw e
+      logger.error('Failed to create group', e.response?.errors);
+      throw e;
     }
   }
-  console.log('group after create', { group });
   if (!group?.id) {
+    logger.info(`Query Hylo group slug=${data.slug}`);
     group = (await queryHyloGroup({ gqlRequest, slug: data.slug })).group;
     if (!group?.id) {
-      throw new Error(`Failed to create or find a Hylo group with slug "${data.slug}"`);
+      throw logger.error(`Failed to create or find a Hylo group with slug "${data.slug}"`);
     }
+
+    logger.info(`Update Hylo group slug=${data.slug}`, { data, hyloUserId, hyloGroupId: group.id });
     group = (await updateHyloGroup({ data, hyloUserId, hyloGroupId: group.id, gqlRequest })).group;
   }
+  logger.info('Got Hylo group', group);
   return group;
 };
 
@@ -238,13 +275,14 @@ const getHyloApiComposeOutputs = ({ submission, survey }) => {
     .flat();
 };
 
-export const handleSyncGroupOutput = async ({ output: _output, user, group }) => {
+export const handleSyncGroupOutput = async ({ output: _output, user, group, logger }) => {
   const { value: output, error } = outputSchema.validate(_output);
   if (error) {
     const errors = error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
     console.log(error.details, _output);
     throw boom.badData(`error: ${errors.join(', ')}`);
   }
+  logger.success('Output is valid', output);
 
   const {
     url,
@@ -255,6 +293,7 @@ export const handleSyncGroupOutput = async ({ output: _output, user, group }) =>
   const href = url ? 'https://' + url : null;
   const gqlRequest = href ? hyloUtils.gqlRequestWithUrl(href) : hyloUtils.gqlRequest;
   const gqlPostConfig = href ? () => hyloUtils.gqlPostConfig(href) : hyloUtils.gqlPostConfig;
+  const options = { gqlRequest, gqlPostConfig, logger };
 
   // Convert some fields to JSON to match the Hylo API
   entity.geoShape = JSON.stringify(entity.geoShape);
@@ -264,41 +303,41 @@ export const handleSyncGroupOutput = async ({ output: _output, user, group }) =>
   }));
   // TODO Hylo throws Invalid GeoJSON
   delete entity.geoShape;
+  logger.warning('Remove data.geoShape - TODO Hylo throws Invalid GeoJSON');
 
   const groupMapping = await db
     .collection(COLL_GROUPS_HYLO_MAPPINGS)
     .findOne({ groupId: new ObjectId(group.id) });
   if (groupMapping) {
     entity.parentIds = [groupMapping.hyloGroupId];
+    logger.success('Found Hylo group integration', groupMapping);
+  } else {
+    logger.warn("Didn't find Hylo group integration", groupMapping);
   }
-  console.log('groupMapping', groupMapping);
 
-  const hyloUser = await syncUserWithHylo({ userId: user._id, gqlRequest, gqlPostConfig });
-  console.log('hyloUser', hyloUser);
+  const hyloUser = await syncUserWithHylo({ userId: user._id, ...options });
+  logger.info('Hylo user', hyloUser);
   const hyloGroup = await syncGroupWithHylo({
     data: entity,
     hyloUserId: hyloUser.id,
-    gqlRequest,
+    ...options,
   });
-  console.log('hyloGroup', hyloGroup);
+  logger.info('Hylo group', hyloGroup);
 
   const extraModeratorUsers = [];
   for (const { email, name } of extraModerators) {
-    let hyloUser = await createHyloUser({
-      email: email.value,
-      name: name.value,
-      groupId: hyloGroup.id,
-      gqlPostConfig,
-    });
-    // if user already exists
-    if (!hyloUser?.id) {
-      hyloUser = await queryHyloUser({ email: email.value, gqlRequest });
-      // TODO make sure user is added to the group
-    }
-    extraModeratorUsers.push(hyloUser);
+    logger.info(`Add extra moderator email=${email} name=${name}`);
+    extraModeratorUsers.push(
+      await upsertHyloUser({
+        email: email.value,
+        name: name.value,
+        groupId: hyloGroup.id,
+        ...options,
+      })
+    );
   }
 
-  console.log('extraModeratorUsers', extraModeratorUsers);
+  logger.info('extraModeratorUsers', extraModeratorUsers);
 
   return { hyloUser, hyloGroup, extraModeratorUsers };
 };
@@ -306,10 +345,23 @@ export const handleSyncGroupOutput = async ({ output: _output, user, group }) =>
 export const handle = async ({ submission, survey, user }) => {
   const hyloCompose = getHyloApiComposeOutputs({ submission, survey });
   console.log('hyloCompose', hyloCompose);
-  const results = []; 
+  const results = [];
+  const logger = createLogger();
   for (const output of hyloCompose) {
     if (output.hyloType === 'sync-group') {
-      results.push(await handleSyncGroupOutput({ output, user, group: submission.meta.group }));
+      try {
+        const result = await handleSyncGroupOutput({
+          output,
+          user,
+          group: submission.meta.group,
+          logger,
+        });
+        result.logs = logger.getLogs();
+        results.push(result);
+      } catch (e) {
+        e.logs = logger.getLogs();
+        throw e;
+      }
     }
   }
   console.log('RESULTS', JSON.stringify(results, null, 2));
