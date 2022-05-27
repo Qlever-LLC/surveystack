@@ -162,16 +162,16 @@ const syncGroupWithHylo = async (options) => {
     if (
       !e.response?.errors?.some((e) => e.message === 'A group with that URL slug already exists')
     ) {
-      console.error(e);
-    } else {
       console.log(`Group with slug ${data.slug} already exist. Try to update it...`);
+    } else {
+      throw e
     }
   }
   console.log('group after create', { group });
   if (!group?.id) {
     group = (await queryHyloGroup({ gqlRequest, slug: data.slug })).group;
     if (!group?.id) {
-      throw new Error(`Failed to create a Hylo group with slug "${data.slug}"`);
+      throw new Error(`Failed to create or find a Hylo group with slug "${data.slug}"`);
     }
     group = (await updateHyloGroup({ data, hyloUserId, hyloGroupId: group.id, gqlRequest })).group;
   }
@@ -306,7 +306,7 @@ export const handleSyncGroupOutput = async ({ output: _output, user, group }) =>
 export const handle = async ({ submission, survey, user }) => {
   const hyloCompose = getHyloApiComposeOutputs({ submission, survey });
   console.log('hyloCompose', hyloCompose);
-  const results = [];
+  const results = []; 
   for (const output of hyloCompose) {
     if (output.hyloType === 'sync-group') {
       results.push(await handleSyncGroupOutput({ output, user, group: submission.meta.group }));
