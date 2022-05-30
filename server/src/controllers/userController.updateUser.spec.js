@@ -17,15 +17,28 @@ describe('userController', () => {
     });
   });
 
-  it('can not update user.email', async () => {
+  it('updates user.email', async () => {
     const user = await createUser();
-    const email = `changed-${user.name}`;
+    const email = `changed-${user.email}`;
     await updateUser(
       createReq({ body: { _id: user._id, name: user.name, email } }),
       await createRes({ user })
     );
     const updatedUser = await db.collection('users').findOne(user._id);
-    expect(updatedUser).toMatchObject(user);
+    expect(updatedUser).toMatchObject({ ...user, email });
+  });
+
+  it('Throws for invalid email', async () => {
+    const user = await createUser();
+    const email = `wrong(a)here.com`;
+    await expect(
+      updateUser(
+        createReq({ body: { _id: user._id, name: user.name, email } }),
+        await createRes({ user })
+      )
+    ).rejects.toThrow('Invalid email address');
+    const updatedUser = await db.collection('users').findOne(user._id);
+    expect(updatedUser).toMatchObject({ ...user });
   });
 
   describe('change password', () => {
