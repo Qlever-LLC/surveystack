@@ -6,7 +6,13 @@
       <v-form class="mt-3" @keydown.enter.prevent="submit">
         <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined></v-select>
 
-        <v-text-field class="mt-3" v-model="entity.meta.invitationEmail" label="Email" outlined />
+        <v-text-field
+          class="mt-3"
+          v-model="entity.meta.invitationEmail"
+          label="Email"
+          outlined
+          hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work."
+        />
 
         <v-text-field
           class="mt-3"
