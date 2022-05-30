@@ -597,6 +597,19 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
   }
 };
 
+export const getGroupInformation = async (req, res) => {
+  const group = await db.collection('groups').findOne({ _id: new ObjectId(req.params.groupId) });
+  if (!group) {
+    // group not found, boom!
+    throw boom.notFound(`No group found: ${req.params.groupId}`);
+  }
+  const r = await getGroupInformation(req.params.groupId, res.locals.auth.isSuperAdmin);
+  res.send({
+    status: 'success',
+    response: r,
+  });
+};
+
 export const testConnection = async (req, res) => {
   /**
    * TODO migrate Testconnection

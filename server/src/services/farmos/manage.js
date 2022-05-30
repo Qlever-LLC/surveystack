@@ -986,7 +986,6 @@ export const getNonMembersWhoHaveFarmsLinkedinDescendantsGroups = async (
     .toArray();
 };
 
-//TODO implement getGroupInformation
 /**
  * @param { ObjectId } groupId
  * @param { Boolean } isSuperAdmin

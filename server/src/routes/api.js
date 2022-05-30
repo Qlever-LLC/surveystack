@@ -23,6 +23,7 @@ import cfsController from '../controllers/cfsController';
 import {
   assertAuthenticated,
   assertIsSuperAdmin,
+  assertHasGroupAdminAccess,
   assertEntityExists,
   assertIdsMatch,
   assertNameNotEmpty,
@@ -273,6 +274,12 @@ router.post(
   '/farmos/user-unmap-instance',
   [assertIsSuperAdmin],
   catchErrors(farmosController.superAdminUnMapFarmosInstanceFromUser)
+);
+
+router.get(
+  'farmos/group-manage/:groupId',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.getGroupInformation)
 );
 
 /** Integrations - Group */

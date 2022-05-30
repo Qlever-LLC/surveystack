@@ -1,5 +1,6 @@
 import boom from '@hapi/boom';
-import { assertIsSuperAdmin, assertHasIds } from './assertions.js';
+import { assertIsSuperAdmin, assertHasIds, assertHasGroupAdminAccess } from './assertions.js';
+import { createGroup } from '../testUtils';
 
 describe('assertIsSuperAdmin', () => {
   it('throws unauthorized error if user is not a super admin', () => {
@@ -48,6 +49,94 @@ describe('assertHasIds', () => {
     const res = {};
 
     assertHasIds(req, res, nextSpy);
+
+    expect(nextSpy).toHaveBeenCalled();
+  });
+});
+
+const init = async () => {
+  const group = await createGroup();
+  const user1 = await group.createUserMember();
+  const admin1 = await group.createAdminMember();
+
+  return {
+    group,
+    user1,
+    admin1,
+  };
+};
+
+describe('assertHasGroupAdminAccess', () => {
+  it('with admin from the group', async () => {
+    const { group, admin1 } = await init();
+    const nextSpy = jest.fn();
+    const req = { params: { groupId: group._id } };
+    const res = { locals: { auth: { user: { _id: admin1.user._id } } } };
+
+    await assertHasGroupAdminAccess(req, res, nextSpy);
+
+    expect(nextSpy).toHaveBeenCalled();
+  });
+  it('with non-admin (a user) inside the group', async () => {
+    const { group, user1 } = await init();
+    const nextSpy = jest.fn();
+    const req = { params: { groupId: group._id } };
+    const res = { locals: { auth: { user: { _id: user1.user._id } } } };
+
+    await expect(assertHasGroupAdminAccess(req, res, nextSpy)).rejects.toThrow(boom.unauthorized());
+    expect(nextSpy).not.toHaveBeenCalled();
+  });
+  it('with non-admin (a user) outside the group', async () => {
+    const workingGroup = await createGroup();
+    const { user1 } = await init();
+    const nextSpy = jest.fn();
+    const req = { params: { groupId: workingGroup._id } };
+    const res = { locals: { auth: { user: { _id: user1.user._id } } } };
+
+    await expect(assertHasGroupAdminAccess(req, res, nextSpy)).rejects.toThrow(boom.unauthorized());
+    expect(nextSpy).not.toHaveBeenCalled();
+  });
+  it('with admin from other group', async () => {
+    const group1 = await createGroup();
+    const { admin1: admin2 } = await init();
+    const nextSpy = jest.fn();
+    const req = { params: { groupId: group1._id } };
+    const res = { locals: { auth: { user: { _id: admin2.user._id } } } };
+
+    await expect(assertHasGroupAdminAccess(req, res, nextSpy)).rejects.toThrow(boom.unauthorized());
+    expect(nextSpy).not.toHaveBeenCalled();
+  });
+  it('with admin from upper group in same domain', async () => {
+    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
+    const adminBio = await groupBionutrient.createAdminMember();
+    const nextSpy = jest.fn();
+    const req = { params: { groupId: groupLabs._id } };
+    const res = { locals: { auth: { user: { _id: adminBio.user._id } } } };
+
+    await assertHasGroupAdminAccess(req, res, nextSpy);
+
+    expect(nextSpy).toHaveBeenCalled();
+  });
+  it('with admin from lower group in same domain', async () => {
+    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
+    const adminLabs = await groupLabs.createAdminMember();
+    const nextSpy = jest.fn();
+    const req = { params: { groupId: groupBionutrient._id } };
+    const res = { locals: { auth: { user: { _id: adminLabs.user._id } } } };
+
+    await expect(assertHasGroupAdminAccess(req, res, nextSpy)).rejects.toThrow(boom.unauthorized());
+    expect(nextSpy).not.toHaveBeenCalled();
+  });
+  it('with superAdmin', async () => {
+    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
+    const nextSpy = jest.fn();
+    const req = { params: { groupId: groupLabs._id } };
+    const res = { locals: { auth: { isSuperAdmin: true } } };
+
+    await assertHasGroupAdminAccess(req, res, nextSpy);
 
     expect(nextSpy).toHaveBeenCalled();
   });
