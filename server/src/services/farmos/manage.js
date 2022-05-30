@@ -1050,11 +1050,10 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
     descendants,
     farmOSGroupsMappedId
   );
-  await Promise.all(
-    nonMembersPart.map(async (el) => {
-      el.path = await getRewrittenPathFromGroupPath(el.path);
-    })
-  );
+
+  for (const nonMember of nonMembersPart) {
+    nonMember.path = await getRewrittenPathFromGroupPath(nonMember.path);
+  }
 
   groupInformation.members = membersPart;
   groupInformation.nonMembers = nonMembersPart;
