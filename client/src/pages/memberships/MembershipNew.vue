@@ -13,6 +13,7 @@
           outlined
           :rules="emailRules"
           validate-on-blur
+          hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work."
         />
 
         <v-text-field
