@@ -33,11 +33,7 @@
         </v-card-text>
       </div>
       <v-card-actions class="mr-3">
-        <v-btn
-          small
-          href="https://our-sci.gitlab.io/software/surveystack_tutorials/question_types/"
-          target="_blank"
-          text
+        <v-btn small href="https://our-sci.gitlab.io/software/surveystack_tutorials/QSL/" target="_blank" text
           >Learn more...
         </v-btn>
         <v-spacer />
