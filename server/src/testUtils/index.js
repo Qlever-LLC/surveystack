@@ -141,4 +141,5 @@ export const createRes = async ({ user = null } = {}) => ({
       roles: user ? await getRoles(user._id) : [],
     },
   },
+  _headers: {},
 });
