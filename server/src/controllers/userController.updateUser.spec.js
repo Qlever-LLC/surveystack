@@ -28,6 +28,21 @@ describe('userController', () => {
     expect(updatedUser).toMatchObject({ ...user, email });
   });
 
+  it('fails if email is already in use', async () => {
+    const user = await createUser();
+    const user2 = await createUser({ email: 'already@taken.com' });
+    const res = await createRes({ user });
+    await updateUser(
+      createReq({ body: { _id: user._id, name: user.name, email: user2.email } }),
+      res
+    );
+    const updatedUser = await db.collection('users').findOne(user._id);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.send).toHaveBeenCalledWith({ message: 'Failed to update user.' });
+    expect(updatedUser).toMatchObject({ ...user });
+  });
+
   it('Throws for invalid email', async () => {
     const user = await createUser();
     const email = `wrong(a)here.com`;

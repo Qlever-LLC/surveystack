@@ -135,7 +135,7 @@ const updateUser = async (req, res) => {
     return res.send(updated);
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ message: 'Ouch :/' });
+    return res.status(500).send({ message: 'Failed to update user.' });
   }
 };
 
@@ -160,6 +160,6 @@ export default {
   getUsers,
   getUser,
   createUser,
-  updateUser, //x
+  updateUser,
   deleteUser,
 };
