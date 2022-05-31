@@ -45,7 +45,6 @@ process.env.FARMOS_CALLBACK_KEY = 'x';
 process.env.FARMOS_AGGREGATOR_URL = 'x';
 process.env.FARMOS_AGGREGATOR_APIKEY = 'x';
 
-
 function mockRes(userId) {
   return {
     data: null,
