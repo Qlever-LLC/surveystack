@@ -18,6 +18,7 @@ afterEach(async () => {
   // clean up the DB after each test
   await getDb().dropDatabase();
   // recreate indices
+  process.env.DATABASE_URL = mongod.getUri();
   await connectDatabase();
 });
 
