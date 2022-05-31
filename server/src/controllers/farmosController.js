@@ -22,6 +22,7 @@ import {
   createPlan as manageCreatePlan,
   deletePlan as manageDeletePlan,
   mapFarmOSInstanceToUser,
+  getGroupInformation,
 } from '../services/farmos/manage';
 import { aggregator } from '../services/farmos/aggregator';
 
@@ -597,17 +598,24 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
   }
 };
 
-export const getGroupInformation = async (req, res) => {
+export const fCgetGroupInformation = async (req, res) => {
   const group = await db.collection('groups').findOne({ _id: new ObjectId(req.params.groupId) });
   if (!group) {
     // group not found, boom!
     throw boom.notFound(`No group found: ${req.params.groupId}`);
   }
-  const r = await getGroupInformation(req.params.groupId, res.locals.auth.isSuperAdmin);
-  res.send({
-    status: 'success',
-    response: r,
-  });
+  try {
+    const r = await getGroupInformation(req.params.groupId, res.locals.auth.isSuperAdmin);
+    res.send({
+      status: 'success',
+      response: r,
+    });
+  } catch (error) {
+    return res.send({
+      status: 'error',
+      message: error.message,
+    });
+  }
 };
 
 export const testConnection = async (req, res) => {

@@ -10,14 +10,17 @@ import {
   webhookCallback,
   checkUrl,
   superAdminCreateFarmOsInstance,
+  fCgetGroupInformation,
 } from './farmosController';
 import { createGroup, createReq, createRes, createUser } from '../testUtils';
 import {
   mapFarmOSInstanceToUser,
   mapFarmOSInstanceToGroupAdmin,
   setPlanForGroup,
+  getGroupInformation,
+  createFarmosGroupSettings,
 } from '../services/farmos/manage';
-
+import * as farmosManageModule from '../services/farmos/manage';
 import {
   assetResponse,
   logResponse,
@@ -327,4 +330,92 @@ describe('farmos-controller', () => {
   });
 
   it('requires-env-secrets-skipping', async () => {});
+
+  function mockResSuperAdmin(booleanValue) {
+    return {
+      data: null,
+      s: null,
+      status: function (s) {
+        this.s = s;
+        return this;
+      },
+      send: function (r) {
+        this.data = r;
+        return this;
+      },
+      locals: {
+        auth: {
+          isSuperAdmin: booleanValue,
+        },
+      },
+    };
+  }
+  it('farmos-fCgetGroupInformation works fine', async () => {
+    const group = await createGroup({ name: 'Bionutrient' });
+    const admin1_data = { userOverrides: { name: 'Dan TerAvest', email: 'teravestdan@gmail.com' } };
+    const admin1 = await group.createAdminMember(admin1_data);
+    const user1_data = { userOverrides: { name: 'Dave Jole', email: 'djole2352@gmail.com' } };
+    const user1 = await group.createUserMember(user1_data);
+    await createFarmosGroupSettings(group._id);
+    const req = { params: { groupId: group._id } };
+    const res = mockResSuperAdmin(true);
+    await fCgetGroupInformation(req, res);
+    console.log('RES-1', res);
+
+    expect(res.data.status).toStrictEqual('success');
+    expect(res.data.response.groupId).toStrictEqual(group._id);
+    expect(res.data.response.members.length).toBe(2);
+  });
+  it('farmos-fCgetGroupInformation error with passed groupId', async () => {
+    const group = await createGroup({ name: 'Bionutrient' });
+    await createFarmosGroupSettings(group._id);
+    let grpId = new ObjectId();
+    while (group._id === grpId) {
+      grpId = new ObjectId();
+    }
+    const req = { params: { groupId: grpId } };
+    const res = mockResSuperAdmin(true);
+
+    await expect(fCgetGroupInformation(req, res)).rejects.toThrow(
+      boom.notFound(`No group found: ${grpId}`)
+    );
+    console.log('RES-2', res);
+  });
+  it('farmos-fCgetGroupInformation error by executing the service', async () => {
+    const group = await createGroup({ name: 'Bionutrient' });
+    await createFarmosGroupSettings(group._id);
+    const groupExt = await createGroup({ name: 'exterior' });
+    const req = { params: { groupId: groupExt._id } };
+    const res = mockResSuperAdmin(true);
+
+    const spy = jest.spyOn(farmosManageModule, 'getGroupInformation');
+    spy.mockImplementation(() => Promise.reject({ message: 'custom error detected' }));
+
+    await fCgetGroupInformation(req, res);
+    console.log('RES-3', res);
+
+    expect(res.data.status).toStrictEqual('error');
+    expect(res.data.message).toStrictEqual('custom error detected');
+  });
+
+  /*it('get-assets', async () => {
+    mockAxios.get.mockImplementation(() => Promise.resolve({ data: assetResponse }));
+
+    const user = await createUser();
+    await mapFarmOSInstanceToUser(user._id, 'buddingmoonfarm.farmos.dev', true);
+
+    const res = mockRes(user._id);
+    const send = jest.fn();
+    res.send = send;
+    await getAssets(
+      {
+        body: {
+          bundle: 'plant',
+        },
+        query: {
+          bundle: 'plant',
+        },
+      },
+      res
+    );*/
 });

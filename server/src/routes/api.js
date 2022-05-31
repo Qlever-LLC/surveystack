@@ -279,7 +279,7 @@ router.post(
 router.get(
   'farmos/group-manage/:groupId',
   [assertHasGroupAdminAccess],
-  catchErrors(farmosController.getGroupInformation)
+  catchErrors(farmosController.fCgetGroupInformation)
 );
 
 /** Integrations - Group */
