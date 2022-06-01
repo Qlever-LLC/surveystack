@@ -95,7 +95,6 @@
 import ObjectId from 'bson-objectid';
 import moment from 'moment';
 import api from '@/services/api.service';
-import VBtnGroup from '@/components/ui/VBtnGroup.vue';
 
 import { uuid } from '@/utils/memberships';
 
@@ -111,9 +110,6 @@ const availableRoles = [
 ];
 
 export default {
-  components: {
-    VBtnGroup,
-  },
   data() {
     return {
       availableRoles,
