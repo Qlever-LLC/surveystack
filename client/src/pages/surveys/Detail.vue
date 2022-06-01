@@ -55,13 +55,6 @@ import api from '@/services/api.service';
 import { autoSelectActiveGroup } from '@/utils/memberships';
 
 export default {
-  props: {
-    start: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
   data() {
     return {
       entity: null,
@@ -179,11 +172,6 @@ export default {
     this.$store.dispatch('memberships/getUserMemberships', user._id);
 
     const { submissions, isLibrary } = this.entity.meta;
-
-    if (this.start && this.isAllowedToSubmit) {
-      this.startDraft(this.entity);
-      //TODO what about the lines below? should they be executed first?
-    }
 
     if (!submissions || submissions === 'public' || isLibrary) {
       this.show = true;
