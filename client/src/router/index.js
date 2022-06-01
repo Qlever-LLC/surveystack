@@ -136,7 +136,14 @@ const routes = [
     name: 'surveys-detail',
     components: getComponents(SurveysDetail),
   },
-
+  {
+    path: '/surveys/:id/start',
+    name: 'surveys-detail',
+    components: getComponents(SurveysDetail),
+    props: {
+      startDraft: true,
+    },
+  },
   {
     path: '/submissions/drafts/:id',
     name: 'submissions-drafts-detail',
