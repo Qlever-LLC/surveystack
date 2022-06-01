@@ -40,7 +40,37 @@
 
         <div class="d-flex mt-2 justify-end">
           <v-btn text @click="cancel">Cancel</v-btn>
-          <v-btn color="primary" @click="submit" :disabled="!submittable">Submit</v-btn>
+
+          <v-btn-toggle :max="0" multiple :value="[]" dense>
+            <v-btn color="primary" @click="submit" elevation="0" :disabled="!submittable">{{invitationMethod=="invite" ? "Send Invitation" : "Confirm User"}}</v-btn>
+            <v-menu top left>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn outlined primary v-bind="attrs" v-on="on" color="primary" elevation="0" min-width="0">
+                  <v-icon > mdi-chevron-down </v-icon></v-btn
+                >
+              </template>
+               <v-list>
+              <v-list-item-group v-model="invitationMethod">
+                <v-list-item two-line value="invite">
+                  <v-list-item-content>
+                    <v-list-item-title>Invite</v-list-item-title>
+                    <v-list-item-subtitle>Secondary text</v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+
+                <v-list-item three-line value="confirm">
+                  <v-list-item-content>
+                    <v-list-item-title>Auto Confirm</v-list-item-title>
+                    <v-list-item-subtitle> Secondary line text Lorem ipsum dolor sit amet, </v-list-item-subtitle>
+                    <v-list-item-subtitle> consectetur adipiscing elit. </v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list-item-group>
+              </v-list>
+            </v-menu>
+
+            
+          </v-btn-toggle>
         </div>
       </v-form>
     </v-card>
@@ -65,6 +95,7 @@
 import ObjectId from 'bson-objectid';
 import moment from 'moment';
 import api from '@/services/api.service';
+import VBtnGroup from '@/components/ui/VBtnGroup.vue';
 
 import { uuid } from '@/utils/memberships';
 
@@ -80,6 +111,9 @@ const availableRoles = [
 ];
 
 export default {
+  components: {
+    VBtnGroup,
+  },
   data() {
     return {
       availableRoles,
@@ -102,9 +136,13 @@ export default {
       groupDetail: { name: '', path: '' },
       dialogCreateUser: false,
       sendEmail: 'SEND_NOW',
+      invitationMethod: 'invite'
     };
   },
   methods: {
+    log(...args) {
+      console.log('...', ...args);
+    },
     cancel() {
       this.$router.back();
     },
