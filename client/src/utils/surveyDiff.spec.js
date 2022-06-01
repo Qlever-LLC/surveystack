@@ -1,4 +1,11 @@
-import { flatSurveyControls, diffControls, changeType, diffSurveyVersions, merge } from './surveyDiff';
+import {
+  flatSurveyControls,
+  diffControls,
+  changeType,
+  diffSurveyVersions,
+  merge,
+  diffThreeSurveyVersions,
+} from './surveyDiff';
 import { cloneDeep, find, uniqueId, set, map } from 'lodash';
 import { createControlInstance } from './surveyConfig';
 
@@ -368,12 +375,102 @@ describe('surveyDiff', () => {
     });
   });
   describe('diffThreeSurveyVersions', () => {
-    it.todo('returns conflicting changes');
-    it.todo('contains the property values for revisions A,B and C of a diff');
-    it.todo('does not return non-conflicting changes');
+    it('contains the property values for revisions A,B and C of a diff', () => {
+      const controlLocalVersion = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo_one',
+      });
+      const controlRemoteVersionA = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo_two',
+      });
+      const controlRemoteVersionB = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo_three',
+      });
+
+      const diff = diffThreeSurveyVersions([controlLocalVersion], [controlRemoteVersionA], [controlRemoteVersionB]);
+      expect(diff[0].changeType).toBe(changeType.CHANGED);
+      expect(diff[0].diff.name).toBeDefined();
+      expect(diff[0].diff.name.valueB).toBe(controlRemoteVersionA.name);
+      expect(diff[0].diff.name.valueC).toBe(controlRemoteVersionB.name);
+      expect(diff[0].diff.name.valueA).toBe(controlLocalVersion.name);
+    });
+    it('returns conflicting changes', () => {
+      const controlLocalVersion = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowHide: true, hidden: true },
+      });
+      const controlRemoteVersionA = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowHide: true },
+      });
+      const controlRemoteVersionB = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowHide: false },
+      });
+
+      const diff = diffThreeSurveyVersions([controlLocalVersion], [controlRemoteVersionA], [controlRemoteVersionB]);
+
+      expect(diff).toMatchObject([
+        {
+          changeType: changeType.CONFLICT,
+          hasLocalChange: true,
+          controlRevisionA: controlLocalVersion,
+          childIndexRevisionA: 0,
+          pathRevisionA: controlLocalVersion.name,
+          parentIdRevisionA: null,
+          controlRevisionB: controlRemoteVersionA,
+          childIndexRevisionB: 0,
+          pathRevisionB: controlRemoteVersionA.name,
+          parentIdRevisionB: null,
+          controlRevisionC: controlRemoteVersionB,
+          childIndexRevisionC: 0,
+          pathRevisionC: controlRemoteVersionB.name,
+          parentIdRevisionC: null,
+
+          diff: {
+            'options.allowHide': {
+              changeType: changeType.CHANGED,
+              valueA: controlLocalVersion.options.allowHide,
+              valueB: controlRemoteVersionA.options.allowHide,
+              valueC: undefined, //yes, it's not false, cause some sanitation in place sets false to undefined
+            },
+            'options.hidden': {
+              changeType: changeType.CHANGED,
+              valueA: controlLocalVersion.options.hidden,
+              valueB: controlRemoteVersionA.options.hidden,
+              valueC: controlRemoteVersionB.options.hidden,
+            },
+          },
+        },
+      ]);
+    });
   });
   describe('merge', () => {
-    it.todo('adds new controls');
+    it('adds new controls', () => {
+      const numberControl = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+      });
+      const textControl = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar',
+      });
+      const mergeResult = merge([numberControl], [numberControl], [numberControl, textControl]);
+      expect(mergeResult.length).toBe(2);
+    });
     it.todo('removes deleted controls');
     it.todo('replaces changed controls if no local change');
     it.todo('not replaces changed controls if local change');

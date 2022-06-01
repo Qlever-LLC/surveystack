@@ -55,7 +55,7 @@ export const createControlInstance = (control) => {
   const clone = cloneDeep(control);
 
   const cloneWithDefaultOptions = Object.assign(clone, {
-    options: cloneDeep(defaultControlOptions),
+    options: control.options || cloneDeep(defaultControlOptions),
     id: new ObjectId().toString(),
   });
 
