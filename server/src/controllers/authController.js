@@ -211,7 +211,7 @@ const enterWithMagicLink = async (req, res) => {
 const invalidateMagicLink = async (req, res) => {
   const { invalidateCode } = req.query;
   await db.collection(COLL_ACCESS_CODES).deleteOne({ invalidateCode });
-  res.redirect({ ok: true });
+  res.send({ ok: true });
 };
 
 export default {
