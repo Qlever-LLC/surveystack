@@ -11,6 +11,7 @@ import headerService from '../services/header.service';
 import * as farmOsService from '../services/farmos.service';
 import rolesService from '../services/roles.service';
 import { queryParam } from '../helpers';
+import { appendDatabaseOperationDurationToLoggingMessage } from '../middleware/logging';
 const col = 'submissions';
 const DEFAULT_LIMIT = 100000;
 const DEFAULT_SORT = { _id: -1 }; // reverse insert order
@@ -454,7 +455,12 @@ const getSubmissions = async (req, res) => {
     }
   }
 
+  const databaseOperationStartTime = new Date();
   const entities = await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).toArray();
+  appendDatabaseOperationDurationToLoggingMessage(
+    res,
+    Date.now() - databaseOperationStartTime.valueOf()
+  );
 
   return res.send(entities);
 };
