@@ -210,10 +210,7 @@ const enterWithMagicLink = async (req, res) => {
 
 const invalidateMagicLink = async (req, res) => {
   const { invalidateCode } = req.query;
-  const { _id: accessCodeId, value: accessCode } = await db
-    .collection(COLL_ACCESS_CODES)
-    .findOneAndDelete({ invalidateCode });
-
+  await db.collection(COLL_ACCESS_CODES).deleteOne({ invalidateCode });
   res.redirect({ ok: true });
 };
 
