@@ -68,7 +68,7 @@ describe('enterWithMagicLink', () => {
     expect(user.landingPath).toBeFalsy();
   });
 
-  withNewOrExistingUser('adds `invalidateMagicLink` to loginPayload', async (email) => {
+  withNewOrExistingUser('adds `invalidateMagicLink` to the accept URL', async (email) => {
     const res = await createRes();
     const origin = 'https://foo.magic';
     const req = await createMagicReq({ origin, email });
@@ -84,11 +84,10 @@ describe('enterWithMagicLink', () => {
       accessCodeId: accessCode._id,
     });
     const redirect = url.parse(res.redirect.mock.calls[0][0], true);
-    const user = JSON.parse(decode(redirect.query.user));
-    expect(user.invalidateMagicLink).toBe(invalidateMagicLink);
+    expect(redirect.query.invalidateMagicLink).toBe(invalidateMagicLink);
   });
 
-  withNewOrExistingUser('adds returnPath to the accept route URL', async (email) => {
+  withNewOrExistingUser('adds returnPath to the accept URL', async (email) => {
     const res = await createRes();
     const landingPath = '/some/where';
     const req = await createMagicReq({ origin: 'https://foo.bar', email, landingPath });
