@@ -132,7 +132,7 @@ describe('createMagicLink', () => {
 describe('createInvalidateMagicLink', () => {
   const origin = 'http://foo.bar';
   let accessCodeId;
-  
+
   beforeEach(async () => {
     const accessCode = (
       await db.collection(COLL_ACCESS_CODES).insertOne({ code: uniqueId().toString() })
