@@ -187,6 +187,15 @@ const enterWithMagicLink = async (req, res) => {
     return url;
   };
 
+  const withInvalidateLink = async (url) => {
+    const origin = req.protocol + '://' + req.get('host');
+    const invalidateLink = await createInvalidateMagicLink({
+      origin,
+      accessCodeId: accessCode._id,
+    });
+    return url + `&invalidateMagicLink=${encodeURIComponent(invalidateLink)}`;
+  };
+
   if (!accessCode) {
     res.redirect(withLandingPath('/auth/login?magicLinkExpired'));
     return;
@@ -196,14 +205,11 @@ const enterWithMagicLink = async (req, res) => {
 
   let userObject = await createUserIfNotExist(email);
   let loginPayload = await createLoginPayload(userObject);
-  const origin = req.protocol + '://' + req.get('host');
-  loginPayload.invalidateMagicLink = await createInvalidateMagicLink({
-    origin,
-    accessCodeId: accessCode._id,
-  });
   loginPayload = JSON.stringify(loginPayload);
   loginPayload = b64EncodeURI(loginPayload);
-  let loginUrl = withLandingPath(`/auth/accept-magic-link?user=${loginPayload}`);
+  let loginUrl = await withInvalidateLink(
+    withLandingPath(`/auth/accept-magic-link?user=${loginPayload}`)
+  );
 
   res.redirect(loginUrl);
 };
