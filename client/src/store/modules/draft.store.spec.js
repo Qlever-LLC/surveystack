@@ -3,31 +3,9 @@ import draftStore from './draft.store';
 const { actions, mutations } = draftStore;
 
 import { createSurvey } from '@/utils/surveys';
-import { createControlInstance } from '@/utils/surveyConfig';
 import submissionUtils from '@/utils/submissions';
 const { createSubmissionFromSurvey } = submissionUtils;
-import { uniqueId } from 'lodash';
-
-const addRevisionToSurvey = (survey, controls) => {
-  const revision = {
-    version: survey.revisions.length + 1,
-    controls,
-  };
-  survey.revisions.push(revision);
-  survey.latestVersion = revision.version;
-  return revision;
-};
-
-const createControl = ({ type, ...overrides }) => {
-  const control = {
-    ...createControlInstance({ type }),
-    name: `${type}_${uniqueId()}`,
-    children: ['page', 'group'].includes(type) ? [] : undefined,
-    ...overrides,
-  };
-  control.options = { ...control.options, ...(overrides.options || {}) };
-  return control;
-};
+import { addRevisionToSurvey, createControl } from '@/../tests/surveyTestingUtils';
 
 describe('draft store', () => {
   describe('actions', () => {
