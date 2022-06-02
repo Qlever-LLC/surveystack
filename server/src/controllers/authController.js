@@ -12,6 +12,7 @@ import {
   createUserIfNotExist,
   createLoginPayload,
   createMagicLink,
+  createInvalidateMagicLink,
 } from '../services/auth.service';
 import { db, COLL_ACCESS_CODES } from '../db';
 import { queryParam } from '../helpers';
@@ -177,7 +178,7 @@ const requestMagicLink = async (req, res) => {
 
 const enterWithMagicLink = async (req, res) => {
   const { code, landingPath } = req.query;
-  const { value: accessCode } = await db.collection(COLL_ACCESS_CODES).findOneAndDelete({ code });
+  const accessCode = await db.collection(COLL_ACCESS_CODES).findOne({ code });
 
   const withLandingPath = (url) => {
     if (landingPath) {
@@ -194,13 +195,26 @@ const enterWithMagicLink = async (req, res) => {
   const { email } = accessCode;
 
   let userObject = await createUserIfNotExist(email);
-
   let loginPayload = await createLoginPayload(userObject);
+  const origin = req.protocol + '://' + req.get('host');
+  loginPayload.invalidateMagicLink = await createInvalidateMagicLink({
+    origin,
+    accessCodeId: accessCode._id,
+  });
   loginPayload = JSON.stringify(loginPayload);
   loginPayload = b64EncodeURI(loginPayload);
   let loginUrl = withLandingPath(`/auth/accept-magic-link?user=${loginPayload}`);
 
   res.redirect(loginUrl);
+};
+
+const invalidateMagicLink = async (req, res) => {
+  const { invalidateCode } = req.query;
+  const { _id: accessCodeId, value: accessCode } = await db
+    .collection(COLL_ACCESS_CODES)
+    .findOneAndDelete({ invalidateCode });
+
+  res.redirect({ ok: true });
 };
 
 export default {
@@ -210,4 +224,5 @@ export default {
   sendPasswordResetMail,
   requestMagicLink,
   enterWithMagicLink,
+  invalidateMagicLink,
 };

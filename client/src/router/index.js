@@ -168,16 +168,24 @@ const routes = [
     path: '/auth/accept-magic-link',
     name: 'accept-magic-link',
     redirect: async (to) => {
-      let { user, landingPath = '/' } = to.query;
+      let { user: payload, landingPath = '/' } = to.query;
       try {
-        user = JSON.parse(b64Decode(user));
+        payload = JSON.parse(b64Decode(payload));
       } catch (e) {
         store.dispatch('feedback/add', 'Failed to validate the login data');
         return '/auth/login?magicLinkExpired';
       }
-      landingPath = decodeURIComponent(landingPath);
+      const { invalidateMagicLink, ...user } = payload;
+      try {
+        if (invalidateMagicLink) {
+          await fetch(invalidateMagicLink);
+        }
+      } catch (e) {
+        console.error('Failed to invalidate magic link');
+      }
       await store.dispatch('auth/loginWithUserObject', user);
 
+      landingPath = decodeURIComponent(landingPath);
       window.location.replace(`${location.origin}${landingPath}`);
     },
   },

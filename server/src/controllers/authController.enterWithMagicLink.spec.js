@@ -1,12 +1,16 @@
 import url from 'url';
 import authController from './authController';
 const { enterWithMagicLink } = authController;
-import { db } from '../db';
+import { db, COLL_ACCESS_CODES } from '../db';
 import { createReq, createRes, createUser } from '../testUtils';
-import { createMagicLink } from '../services/auth.service';
 import { decode } from 'js-base64';
 import { uniqueId } from 'lodash';
 jest.mock('../services/mail/mail.service');
+const { createMagicLink } = jest.requireActual('../services/auth.service');
+jest.mock('../services/auth.service');
+// import { createInvalidateMagicLink } from '../services/auth.service';
+
+// const { createMagicLink } = jest.requireActual('../services/auth.service')
 
 describe('enterWithMagicLink', () => {
   it('redirects to the expired page when code is invalid', async () => {
@@ -41,12 +45,17 @@ describe('enterWithMagicLink', () => {
     });
   };
 
+  const createMagicReq = async (options) => {
+    const magicLink = await createMagicLink(options);
+    const { protocol, host, query } = url.parse(magicLink, true);
+    return createReq({ query, protocol, headers: { host, origin: undefined } });
+  };
+
   withNewOrExistingUser('redirects to the accept route in the app', async (email) => {
     const res = await createRes();
-    const magicLink = await createMagicLink({ origin: 'https://foo.bar', email });
-    const { query } = url.parse(magicLink, true);
+    const req = await createMagicReq({ origin: 'https://foo.bar', email });
 
-    await enterWithMagicLink(createReq({ query }), res);
+    await enterWithMagicLink(req, res);
 
     expect(res.redirect).toHaveBeenCalledTimes(1);
     const redirect = url.parse(res.redirect.mock.calls[0][0], true);
@@ -56,13 +65,29 @@ describe('enterWithMagicLink', () => {
     expect(user.landingPath).toBeFalsy();
   });
 
+  withNewOrExistingUser('adds `invalidateMagicLink` to loginPayload', async (email) => {
+    const res = await createRes();
+    const origin = 'https://foo.magic';
+    const req = await createMagicReq({ origin, email });
+    const accessCode = await db.collection(COLL_ACCESS_CODES).findOne({ code: req.query.code });
+    const invalidateMagicLink = 'http://foo.invalid';
+    console.log(createInvalidateMagicLink.mock)
+    createInvalidateMagicLink.mockReturnValue(invalidateMagicLink);
+
+    await enterWithMagicLink(req, res);
+    
+    expect(createInvalidateMagicLink).toHaveBeenCalledTimes(1);
+    expect(createInvalidateMagicLink).toHaveBeenCalledWith({ origin, accessCodeId: accessCode.id });
+    const user = JSON.parse(decode(redirect.query.user));
+    expect(user.invalidateMagicLink).toBe(invalidateMagicLink);
+  });
+
   withNewOrExistingUser('adds returnPath to the accept route URL', async (email) => {
     const res = await createRes();
     const landingPath = '/some/where';
-    const magicLink = await createMagicLink({ origin: 'https://foo.bar', email, landingPath });
-    const { query } = url.parse(magicLink, true);
+    const req = await createMagicReq({ origin: 'https://foo.bar', email, landingPath });
 
-    await enterWithMagicLink(createReq({ query }), res);
+    await enterWithMagicLink(req, res);
 
     expect(res.redirect).toHaveBeenCalledTimes(1);
     const redirect = url.parse(res.redirect.mock.calls[0][0], true);
