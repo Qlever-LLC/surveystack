@@ -1,3 +1,8 @@
+jest.mock('../services/mail/mail.service');
+import * as authService from '../services/auth.service';
+jest.spyOn(authService, 'createInvalidateMagicLink');
+const { createMagicLink, createInvalidateMagicLink } = authService;
+
 import url from 'url';
 import authController from './authController';
 const { enterWithMagicLink } = authController;
@@ -5,12 +10,6 @@ import { db, COLL_ACCESS_CODES } from '../db';
 import { createReq, createRes, createUser } from '../testUtils';
 import { decode } from 'js-base64';
 import { uniqueId } from 'lodash';
-jest.mock('../services/mail/mail.service');
-const { createMagicLink } = jest.requireActual('../services/auth.service');
-jest.mock('../services/auth.service');
-// import { createInvalidateMagicLink } from '../services/auth.service';
-
-// const { createMagicLink } = jest.requireActual('../services/auth.service')
 
 describe('enterWithMagicLink', () => {
   it('redirects to the expired page when code is invalid', async () => {
@@ -48,7 +47,7 @@ describe('enterWithMagicLink', () => {
   const createMagicReq = async (options) => {
     const magicLink = await createMagicLink(options);
     const { protocol, host, query } = url.parse(magicLink, true);
-    return createReq({ query, protocol, headers: { host, origin: undefined } });
+    return createReq({ query, protocol: protocol.slice(0, -1), headers: { host, origin: undefined } });
   };
 
   withNewOrExistingUser('redirects to the accept route in the app', async (email) => {
@@ -71,13 +70,13 @@ describe('enterWithMagicLink', () => {
     const req = await createMagicReq({ origin, email });
     const accessCode = await db.collection(COLL_ACCESS_CODES).findOne({ code: req.query.code });
     const invalidateMagicLink = 'http://foo.invalid';
-    console.log(createInvalidateMagicLink.mock)
     createInvalidateMagicLink.mockReturnValue(invalidateMagicLink);
 
     await enterWithMagicLink(req, res);
-    
+
     expect(createInvalidateMagicLink).toHaveBeenCalledTimes(1);
-    expect(createInvalidateMagicLink).toHaveBeenCalledWith({ origin, accessCodeId: accessCode.id });
+    expect(createInvalidateMagicLink).toHaveBeenCalledWith({ origin, accessCodeId: accessCode._id });
+    const redirect = url.parse(res.redirect.mock.calls[0][0], true);
     const user = JSON.parse(decode(redirect.query.user));
     expect(user.invalidateMagicLink).toBe(invalidateMagicLink);
   });
