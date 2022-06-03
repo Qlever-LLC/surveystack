@@ -1,5 +1,7 @@
 # Authentication
 
+Auth flow visualization: https://miro.com/app/board/o9J_l5J_iMs=/?moveToWidget=3458764515413760664&cot=14
+
 ## Request authorization
 
 The current authentication method is to send an `Authorization` header with each request of the following form:
