@@ -471,11 +471,108 @@ describe('surveyDiff', () => {
       const mergeResult = merge([numberControl], [numberControl], [numberControl, textControl]);
       expect(mergeResult.length).toBe(2);
     });
-    it.todo('removes deleted controls');
-    it.todo('replaces changed controls if no local change');
-    it.todo('not replaces changed controls if local change');
-    it.todo(
-      'replaces changed controls if local change but allowhide or allowmodify is turned off in new remote revision'
-    );
+    it('removes deleted controls', () => {
+      const numberControl = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+      });
+      const textControl = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar',
+      });
+      const mergeResult = merge([numberControl, textControl], [numberControl, textControl], [numberControl]);
+      expect(mergeResult.length).toBe(1);
+    });
+    it('replaces changed controls if no local change', () => {
+      const numberControl = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+      });
+      const textControl = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar',
+      });
+      const textControlChanged = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar_changed',
+      });
+      const mergeResult = merge(
+        [numberControl, textControl],
+        [numberControl, textControl],
+        [numberControl, textControlChanged]
+      );
+      expect(mergeResult[1].label).toBe('bar_changed');
+    });
+    it('not replaces changed controls if local change', () => {
+      const numberControlChanged = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo_changed',
+      });
+      const numberControl = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+      });
+      const textControl = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar',
+      });
+      const mergeResult = merge(
+        [numberControlChanged, textControl],
+        [numberControl, textControl],
+        [numberControl, textControl]
+      );
+      expect(mergeResult[0].label).toBe('foo_changed');
+    });
+    it('replaces changed controls if local change but allowModify is turned off in new remote revision', () => {
+      const numberControlLocal = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo_changed',
+      });
+      const numberControlRemoteA = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowModify: true },
+      });
+      const numberControlRemoteB = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowModify: false },
+      });
+      const mergeResult = merge([numberControlLocal], [numberControlRemoteA], [numberControlRemoteB]);
+      expect(mergeResult[0].label).toBe('foo');
+    });
+    it('replaces changed controls if local change but allowHide is turned off in new remote revision', () => {
+      const numberControlLocal = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { hidden: true },
+      });
+      const numberControlRemoteA = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowHide: true },
+      });
+      const numberControlRemoteB = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowHide: false },
+      });
+      const mergeResult = merge([numberControlLocal], [numberControlRemoteA], [numberControlRemoteB]);
+      expect(mergeResult[0].options.hidden).toBeFalsy();
+    });
   });
 });
