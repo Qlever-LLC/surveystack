@@ -143,10 +143,10 @@ export const replaceControl = (controls, parentPath, replacePath, replacementCon
 };
 
 /**
- * Replaces a control by its path
+ * Removes a control by its path
  * @param controls control list to be changed
  * @param parentPath parent path of the controls passed
- * @param removePath  path of the control to be replaced
+ * @param removePath  path of the control to be removed
  */
 export const removeControl = (controls, parentPath, removePath) => {
   return controls.filter((control) => {
@@ -155,11 +155,7 @@ export const removeControl = (controls, parentPath, removePath) => {
       return false;
     } else if (control.children) {
       control.children = removeControl(control.children, currentPath, removePath);
-      if (control.children.length > 0) {
-        return true;
-      } else {
-        return false;
-      }
+      return true;
     } else {
       return true;
     }

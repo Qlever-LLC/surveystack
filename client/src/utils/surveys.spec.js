@@ -1,13 +1,14 @@
 import {
+  changeRecursive,
   findControlById,
   findParentByChildId,
   getPosition,
-  insertControl,
-  changeRecursive,
-  getPreparedLibraryResources,
   getPreparedLibraryControls,
+  getPreparedLibraryResources,
+  insertControl,
   prepareToAddFromLibrary,
   removeControl,
+  replaceControl,
 } from './surveys';
 import { resourceTypes } from '@/utils/resources';
 
@@ -404,8 +405,26 @@ describe('surveys', () => {
     expect(group.name).toBe('group_1_x');
     expect(group.children[1].children[1].name).toBe('group_5_x');
   });
-  test.todo('replaceControl works');
-  test.todo('removeControl works');
+  //TODO
+  test('replaceControl works', () => {
+    let controls = mockControls();
+    const replacePath = 'group_1.group_3.group_5.instructions_6';
+    const replacementControl = {
+      name: 'instructions_new',
+      label: 'Instructions new',
+      type: 'instructions',
+      _id: '5e8508f7ba06570001c46b20',
+      value: null,
+    };
+    const newControls = replaceControl(controls, null, replacePath, replacementControl);
+    expect(newControls[0].children[1].children[1].children[0].name).toBe(replacementControl.name);
+  });
+  test('removeControl works', () => {
+    let controls = mockControls();
+    const removePath = 'group_1.group_3.group_5.instructions_6';
+    const newControls = removeControl(controls, null, removePath);
+    expect(newControls[0].children[1].children[1].children.length).toBe(0);
+  });
   test('prepareToAddFromLibrary sets libraryId to librarySurvey.id for resources/controls not inherited from nested question sets and does not set libraryIsInherited', () => {
     let librarySurvey = mockLibrarySurvey();
     prepareToAddFromLibrary(librarySurvey.resources[0], librarySurvey._id, librarySurvey.latestVersion);
