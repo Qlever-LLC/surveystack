@@ -428,15 +428,8 @@ export default {
         updatedResources,
         this.survey.resources
       );
-
-      // replace the updatedLibraryRootGroup
-      //const libraryRootGroupPath = getControlPath(this.currentControls, updatedLibraryRootGroup);
-      //replaceControl(this.currentControls, null, libraryRootGroupPath, updatedLibraryRootGroup);
-
       // update the survey resources
       this.updateLibraryResources(updatedResources);
-      // let surveybuilder select the replaced control
-      //this.controlSelected(this.updateLibraryRootGroup);
       //clear update vars
       this.updateToLibrary = null;
       this.updateLibraryRootGroup = null;

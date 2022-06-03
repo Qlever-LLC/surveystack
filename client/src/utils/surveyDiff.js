@@ -326,7 +326,6 @@ export function merge(controlsLocalRevision, controlsRemoteRevisionA, controlsRe
       case changeType.CHANGED:
         //merge local change into resulting controls
         if (change.hasLocalChange) {
-          //TODO if the path is not available in the remote revision, add it to parent path if existing. Try until root is reached.
           mergedControls = replaceControl(mergedControls, null, change.pathRevisionC, change.controlRevisionA);
         }
         break;

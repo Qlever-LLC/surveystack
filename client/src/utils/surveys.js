@@ -121,11 +121,6 @@ export const changeRecursive = (control, changeFn) => {
   }
 };
 
-export const getControlPath = (controls, control) => {
-  const position = getPosition(control, controls);
-  return getFlatName(this.currentControls, position);
-};
-
 /**
  * Replaces a control by its path
  * @param controls control list to be changed
