@@ -508,7 +508,48 @@ describe('surveyDiff', () => {
       );
       expect(mergeResult[1].label).toBe('bar_changed');
     });
-    it('not replaces changed controls if local change', () => {
+    it('preserves locally added control', () => {
+      const numberControl = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+      });
+      const textControl = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar',
+      });
+      const mergeResult = merge([numberControl, textControl], [numberControl], [numberControl]);
+      expect(mergeResult.length).toBe(2);
+      expect(mergeResult[1].name).toBe('text_1');
+    });
+    it('preserves locally added control if parent group is deleted in remote revision', () => {
+      const numberControl = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+      });
+      const textControl = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar',
+      });
+      const textControl2 = createControlInstance({
+        type: 'text',
+        name: 'text_2',
+        label: 'baz',
+      });
+      const groupLocal = createControlInstance({
+        type: 'group',
+        name: 'group_1',
+        children: [numberControl, textControl],
+      });
+      const groupRemote = createControlInstance({ type: 'group', name: 'group_1', children: [numberControl] });
+      const mergeResult = merge([groupLocal, textControl2], [groupRemote, textControl2], [textControl2]);
+      expect(mergeResult.length).toBe(2);
+      expect(mergeResult[1]).toMatchObject(textControl);
+    });
+    it('preserves local control change when remote also changed', () => {
       const numberControlChanged = createControlInstance({
         type: 'number',
         name: 'number_1',
@@ -531,7 +572,7 @@ describe('surveyDiff', () => {
       );
       expect(mergeResult[0].label).toBe('foo_changed');
     });
-    it('replaces changed controls if local change but allowModify is turned off in new remote revision', () => {
+    it('replaces local control change if allowModify is turned off in remote control', () => {
       const numberControlLocal = createControlInstance({
         type: 'number',
         name: 'number_1',
@@ -552,7 +593,7 @@ describe('surveyDiff', () => {
       const mergeResult = merge([numberControlLocal], [numberControlRemoteA], [numberControlRemoteB]);
       expect(mergeResult[0].label).toBe('foo');
     });
-    it('replaces changed controls if local change but allowHide is turned off in new remote revision', () => {
+    it('replaces local control change if allowHide is turned off in remote control', () => {
       const numberControlLocal = createControlInstance({
         type: 'number',
         name: 'number_1',
