@@ -10,6 +10,7 @@
 
     <update-library-dialog
       v-if="updateLibraryDialogIsVisible"
+      :value="updateLibraryDialogIsVisible"
       :library-root-group="updateLibraryRootGroup"
       :to-survey="updateToLibrary"
       @update="updateLibraryConfirmed"

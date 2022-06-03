@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="true" @input="(v) => $emit('input', v)" width="700" max-width="75%">
+  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%" persistent>
     <v-card>
       <v-card-title>
         Update question set from Version {{ libraryRootGroup.libraryVersion }} to Version
@@ -78,6 +78,10 @@ import { reactive, toRefs } from '@vue/composition-api';
 export default {
   components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor },
   props: {
+    value: {
+      required: true,
+      type: Boolean,
+    },
     libraryRootGroup: {
       type: Object,
       required: true,
