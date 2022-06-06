@@ -60,6 +60,8 @@
             @open-library="openLibrary"
             @control-removed="controlRemoved"
             @update-library-control="updateLibrary"
+            @hide-control="hideControl"
+            @unhide-control="unhideControl"
             data-testid="graphical-view"
           />
         </div>
@@ -623,6 +625,14 @@ export default {
         insertControl(control, this.currentControls, 0, false);
       }
       this.control = control;
+    },
+    hideControl(control) {
+      this.controlSelected(control);
+      this.$set(this.control.options, 'hidden', true);
+    },
+    unhideControl(control) {
+      this.controlSelected(control);
+      this.$set(this.control.options, 'hidden', undefined);
     },
     controlAdded(control) {
       if (!this.control) {

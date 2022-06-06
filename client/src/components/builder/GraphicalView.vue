@@ -84,7 +84,7 @@
             </v-chip>
             <v-btn
               icon
-              v-if="areActionsVisible(el) && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
+              v-if="!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited)"
               @click.stop="() => showDeleteModal(idx)"
             >
               <v-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey lighten-1'"
@@ -95,10 +95,21 @@
               text
               x-small
               v-if="el.options.hidden"
-              @click.stop="el.options.hidden = undefined"
+              @click.stop="$emit('unhide-control', el)"
               color="grey lighten-1"
+              style="margin-bottom: -8px"
             >
               unhide
+            </v-btn>
+            <v-btn
+              text
+              x-small
+              v-if="areActionsVisible(el) && el.options.allowHide && !el.options.hidden"
+              @click.stop="$emit('hide-control', el)"
+              color="grey lighten-1"
+              class="mb-4"
+            >
+              hide
             </v-btn>
           </div>
         </div>
@@ -119,6 +130,8 @@
         @duplicate-control="$emit('duplicate-control', $event)"
         @open-library="$emit('open-library', $event)"
         @update-library-control="$emit('update-library-control', $event)"
+        @hide-control="$emit('hide-control', $event)"
+        @unhide-control="$emit('unhide-control', $event)"
         :index="createIndex(index, idx + 1)"
       />
 
@@ -137,6 +150,8 @@
         @duplicate-control="$emit('duplicate-control', $event)"
         @open-library="$emit('open-library', $event)"
         @update-library-control="$emit('update-library-control', $event)"
+        @hide-control="$emit('hide-control', $event)"
+        @unhide-control="$emit('unhide-control', $event)"
         :index="createIndex(index, idx + 1)"
       />
 
@@ -171,7 +186,6 @@ import { cloneDeep } from 'lodash';
 import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
 import * as utils from '@/utils/surveys';
-import api from '@/services/api.service';
 import ControlCardHeader from './ControlCardHeader';
 
 export default {
