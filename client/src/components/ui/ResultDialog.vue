@@ -34,7 +34,7 @@
                             {{ item.message }}
                           </v-expansion-panel-header>
                           <v-expansion-panel-content>
-                            <pre>{{ JSON.stringify(item.data, null, 2) }}</pre>
+                            <pre>{{ JSON.stringify(item.data, (k, v) => (v === undefined ? null : v), 2) }}</pre>
                           </v-expansion-panel-content>
                         </v-expansion-panel>
                       </v-expansion-panels>

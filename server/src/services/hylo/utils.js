@@ -43,14 +43,11 @@ export const gqlRequest = async (query, variables, apiUrl = process.env.HYLO_API
   return request(apiUrl + '/noo/graphql', query, variables, await getGqlAuthHeaders(apiUrl)).catch(
     async (e) => {
       if (e?.response?.errors) {
-        console.log(e.response.errors[0]);
-        console.log('H', JSON.stringify(await getGqlAuthHeaders(apiUrl)));
-        throw new Error(
+        e.message =
           e.response.errors.map((e) => e.message).join('\n') +
-            ' in ' +
-            query +
-            JSON.stringify(variables, null, 2)
-        );
+          ' in ' +
+          query +
+          JSON.stringify(variables, null, 2);
       }
       throw e;
     }

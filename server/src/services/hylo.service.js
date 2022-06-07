@@ -8,11 +8,15 @@ import * as utils from '../helpers/surveys';
 import { COLL_GROUPS_HYLO_MAPPINGS, db } from '../db';
 import { gql } from 'graphql-request';
 import * as hyloUtils from './hylo/utils';
-import Joi, { date } from 'joi';
+import Joi from 'joi';
+import { isString } from 'lodash';
 
 const createLogger = () => {
   const logs = [];
   const log = (type, message, data) => {
+    if (!message || !isString(message)) {
+      throw `Message has to be a string`;
+    }
     console.log(type, message, data);
     logs.push({ type, message, data, time: Date.now() });
   };
@@ -50,39 +54,66 @@ const outputSchema = Joi.object({
   .options({ allowUnknown: true });
 
 const createHyloUser = async (options) => {
-  const { email, name, groupId, gqlPostConfig } = { ...deps, ...options };
-  console.log('create hyloUser', { email, name, groupId });
-  const r = await axios.post(
-    `${process.env.HYLO_API_URL}/noo/user`,
-    querystring.stringify({ email, name, groupId, isModerator: true }),
-    {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: (await gqlPostConfig()).headers.Authorization,
-      },
-    }
-  );
-  return r.data;
+  const { email, name, hyloGroupId, gqlPostConfig, logger } = { ...deps, ...options };
+  logger.info(`create Hylo user email=${email} name=${name} hyloGroupId=${hyloGroupId}...`, {
+    email,
+    name,
+    hyloGroupId,
+  });
+  try {
+    const r = await axios.post(
+      `${process.env.HYLO_API_URL}/noo/user`,
+      querystring.stringify({ email, name, groupId: hyloGroupId, isModerator: true }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: (await gqlPostConfig()).headers.Authorization,
+        },
+      }
+    );
+    logger.info('create user result:', r.data);
+    return r.data;
+  } catch (e) {
+    logger.error(`Failed to create user: "${e.response?.data?.error}"`, e);
+    throw e;
+  }
 };
 
 const queryHyloUser = async (options) => {
-  const { email, gqlRequest } = { ...deps, ...options };
-  console.log('queryHyloUser', email);
-  return (
+  const { email, gqlRequest, logger } = { ...deps, ...options };
+  logger.info(`Query Hylo user - email="${email}"`);
+  const result = (
     await gqlRequest(
       gql`
         query ($id: ID, $email: String) {
           person(id: $id, email: $email) {
-            id
-            name
-            hasRegistered
+            ...PersonDetails
           }
         }
+        ${FRAGMENT_PERSON_DETAILS}
       `,
       { email }
     )
   ).person;
+  logger.info('Query Hylo user result:', { person: result });
+  return result;
 };
+
+const FRAGMENT_PERSON_DETAILS = gql`
+  fragment PersonDetails on Person {
+    id
+    name
+    hasRegistered
+    memberships {
+      id
+      group {
+        id
+        slug
+      }
+      hasModeratorRole
+    }
+  }
+`;
 
 const FRAGMENT_GROUP_DETAILS = gql`
   fragment GroupDetails on Group {
@@ -91,12 +122,11 @@ const FRAGMENT_GROUP_DETAILS = gql`
     slug
     members {
       items {
-        id
-        name
-        hasRegistered
+        ...PersonDetails
       }
     }
   }
+  ${FRAGMENT_PERSON_DETAILS}
 `;
 
 const queryHyloGroup = async (options) => {
@@ -115,8 +145,12 @@ const queryHyloGroup = async (options) => {
 };
 
 const createHyloGroup = async (options) => {
-  const { data, hyloUserId, gqlRequest } = { ...deps, ...options };
-  return gqlRequest(
+  const { data, hyloUserId, gqlRequest, logger } = { ...deps, ...options };
+  logger.info(`Create Hylo group slug=${data.slug} hyloUserId=${hyloUserId}`, {
+    data,
+    hyloUserId,
+  });
+  const result = gqlRequest(
     gql`
       mutation ($data: GroupInput, $asUserId: ID) {
         group: createGroup(data: $data, asUserId: $asUserId) {
@@ -130,11 +164,14 @@ const createHyloGroup = async (options) => {
       asUserId: hyloUserId,
     }
   );
+  logger.info('Create Hylo group result:', result);
+  return result;
 };
 
 const updateHyloGroup = async (options) => {
-  const { data, hyloUserId, hyloGroupId, gqlRequest } = { ...deps, ...options };
-  return gqlRequest(
+  const { data, hyloUserId, hyloGroupId, gqlRequest, logger } = { ...deps, ...options };
+  logger.info(`Update hylo group  slug=${data.slug}`, { data, hyloUserId, hyloGroupId });
+  const result = gqlRequest(
     gql`
       mutation ($id: ID, $changes: GroupInput, $asUserId: ID) {
         group: updateGroup(id: $id, changes: $changes, asUserId: $asUserId) {
@@ -149,23 +186,51 @@ const updateHyloGroup = async (options) => {
       asUserId: hyloUserId,
     }
   );
+  logger.info('Update Hylo group result:', result);
+  return result;
+};
+
+const addMember = async (options) => {
+  const { hyloUserId, hyloGroupId, gqlRequest, logger } = { ...deps, ...options };
+  logger.info(`Add member (${hyloUserId}) to group (${hyloGroupId})...`);
+  const result = await gqlRequest(
+    gql`
+      mutation ($hyloUserId: ID, $hyloGroupId: ID) {
+        member: addMember(userId: $hyloUserId, groupId: $hyloGroupId, role: 1) {
+          success
+          error
+        }
+      }
+    `,
+    {
+      hyloGroupId,
+      hyloUserId,
+    }
+  );
+  logger.log(result.member?.success ? 'success' : 'error', 'Add member results:', {
+    hyloUserId,
+    hyloGroupId,
+    result,
+  });
 };
 
 const upsertHyloUser = async (options) => {
-  const { email, name, groupId, logger } = { ...deps, ...options };
-  logger.info(`Query Hylo user - email="${email}"`);
+  const { email, name, hyloGroupId, logger } = { ...deps, ...options };
+  logger.info('Upsert Hylo user', { email, name, hyloGroupId });
   let hyloUser = await queryHyloUser({ email, ...options });
   // TODO make sure the user is added to the group (if set)
 
-  // if user already exists
+  // if user does not exists
   if (!hyloUser?.id) {
-    logger.info(`Create Hylo user - email="${email}"`);
     hyloUser = await createHyloUser({
       email,
       name,
-      groupId,
+      hyloGroupId,
       ...options,
     });
+  } else if (hyloGroupId) {
+    logger.info('Add existing member to group...');
+    await addMember({ hyloUserId: hyloUser.id, hyloGroupId, ...options });
   }
 
   if (!hyloUser?.id) {
@@ -182,7 +247,7 @@ const syncUserWithHylo = async (options) => {
   if (!user) {
     throw logger.error(`Can't find SurveyStack user with id "${userId}"`);
   }
-  return await upsertHyloUser({ email: user.email, ...options });
+  return await upsertHyloUser({ email: user.email, name: user.name, ...options });
 };
 
 const hasGqlError = (e, message) => (e.response?.errors || []).some((e) => e.message === message);
@@ -191,12 +256,10 @@ const syncGroupWithHylo = async (options) => {
   const { data, hyloUserId, gqlRequest, logger } = { ...deps, ...options };
   let group = null;
   try {
-    logger.info(`Create Hylo group slug=${data.slug} hyloUserId=${hyloUserId}`, {
-      data,
-      hyloUserId,
-    });
-    group = (await createHyloGroup({ data, hyloUserId, gqlRequest })).group;
+    group = (await createHyloGroup({ data, hyloUserId, ...options })).group;
   } catch (e) {
+    console.log("ERROR", JSON.stringify(e))
+    console.log("ERROR.response", e.response)
     if (hasGqlError(e, 'A group with that URL slug already exists')) {
       logger.info(
         `Group with slug ${data.slug} already exist. Try to update it...`,
@@ -214,8 +277,7 @@ const syncGroupWithHylo = async (options) => {
       throw logger.error(`Failed to create or find a Hylo group with slug "${data.slug}"`);
     }
 
-    logger.info(`Update Hylo group slug=${data.slug}`, { data, hyloUserId, hyloGroupId: group.id });
-    group = (await updateHyloGroup({ data, hyloUserId, hyloGroupId: group.id, gqlRequest })).group;
+    group = (await updateHyloGroup({ data, hyloUserId, hyloGroupId: group.id, ...options })).group;
   }
   logger.info('Got Hylo group', group);
   return group;
@@ -322,22 +384,22 @@ export const handleSyncGroupOutput = async ({ output: _output, user, group, logg
   }
 
   const hyloUser = await syncUserWithHylo({ userId: user._id, ...options });
-  logger.info('Hylo user', hyloUser);
   const hyloGroup = await syncGroupWithHylo({
     data: entity,
     hyloUserId: hyloUser.id,
     ...options,
   });
-  logger.info('Hylo group', hyloGroup);
+  logger.info('Add current user to the group (to be sure they are added)...');
+  await addMember({ hyloGroupId: hyloGroup.id, hyloUserId: hyloUser.id, ...options });
 
   const extraModeratorUsers = [];
   for (const { email, name } of extraModerators) {
-    logger.info(`Add extra moderator email=${email} name=${name}`);
+    logger.info(`Add extra moderator email=${email?.value} name=${name?.value}`);
     extraModeratorUsers.push(
       await upsertHyloUser({
         email: email.value,
         name: name.value,
-        groupId: hyloGroup.id,
+        hyloGroupId: hyloGroup.id,
         ...options,
       })
     );
