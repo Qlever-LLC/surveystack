@@ -367,6 +367,10 @@ router.get('/', (req, res) => {
   return res.send('This is API version 1');
 });
 
+router.get('/status', (_, res) => {
+  return res.status(200).send('OK');
+});
+
 // 404 fallback
 router.use((req, res) => {
   return res.status(404).send({
