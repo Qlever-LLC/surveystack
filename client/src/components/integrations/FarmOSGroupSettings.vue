@@ -41,25 +41,28 @@
       </template>
 
       <template v-slot:item="{ item, index }">
-        <tr v-for="(group, id) in item.connectedFarms" :key="group.url + '-' + id">
+        <tr v-for="(group, id) in item.connectedFarms" :key="group.instanceName + '-' + id">
           <td class="box">
             <div v-if="id == 0" class="d-flex align-center justify-space-between">
               <span class="d-flex align-center">
                 <span v-if="item.admin" class="mdi mdi-crown pr-1"></span>
-                <span>{{ item.name }} ({{ item.email }})</span>
+                <span v-if="item.name"
+                  >{{ item.name }} ({{ item.email }}) <br />
+                  {{ item.location }}</span
+                >
               </span>
-              <span>
+              <span v-if="item.name">
                 <my-button little noBorder colorBlue label="+ connect" />
               </span>
             </div>
           </td>
           <td class="box">
-            <div v-if="item.connectedFarms[id].url" class="d-flex align-center justify-space-between">
+            <div v-if="item.connectedFarms[id].instanceName" class="d-flex align-center justify-space-between">
               <span class="d-flex align-center">
                 <span v-if="item.connectedFarms[id].owner" class="mdi mdi-crown pr-1"></span>
-                <span>{{ item.connectedFarms[id].url }}</span>
+                <span>{{ item.connectedFarms[id].instanceName }}</span>
               </span>
-              <span class="d-flex" style="flex-wrap: nowrap">
+              <span v-if="item.name" class="d-flex" style="flex-wrap: nowrap">
                 <my-button little noBorder colorBlue label="access" />
                 <my-button little noBorder colorRed label="remove" />
               </span>
@@ -70,7 +73,7 @@
             <div v-if="item.connectedFarms[id].memberships">
               <span v-for="(ms, idd) in item.connectedFarms[id].memberships" :key="idd">
                 <span v-if="idd === 0 || idd === 1 || developMbships[index].value">
-                  {{ ms }}
+                  {{ ms.path }}
                   <br />
                 </span>
                 <span
@@ -160,13 +163,13 @@ export default {
     });
 
     function filterGMembers(item) {
-      return item.name.toLowerCase().includes(arrHeaderSearch.value[0].toLowerCase());
+      return item.name?.toLowerCase().includes(arrHeaderSearch.value[0].toLowerCase());
     }
     function filterCoFarms(item) {
       let result = false;
-      if (item.connectedFarms[0].url) {
+      if (item.connectedFarms[0].instanceName) {
         item.connectedFarms.forEach((cF) => {
-          result = result || cF.url.toLowerCase().includes(arrHeaderSearch.value[1].toLowerCase());
+          result = result || cF.instanceName.toLowerCase().includes(arrHeaderSearch.value[1].toLowerCase());
         });
       }
       return result;
@@ -177,7 +180,7 @@ export default {
         item.connectedFarms.forEach((cF) => {
           if (cF.memberships) {
             cF.memberships.forEach((m) => {
-              result = result || m.toLowerCase().includes(arrHeaderSearch.value[2].toLowerCase());
+              result = result || m.path.toLowerCase().includes(arrHeaderSearch.value[2].toLowerCase());
             });
           }
         });
