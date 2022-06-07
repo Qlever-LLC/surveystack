@@ -971,12 +971,29 @@ export const getNonMembersWhoHaveFarmsLinkedinDescendantsGroups = async (
         as: 'mgroups',
       },
     },
-    { $addFields: { path: { $arrayElemAt: ['$mgroups.path', 0] } } },
+    {
+      $lookup: {
+        from: 'farmos-instances',
+        localField: 'instanceName',
+        foreignField: 'instanceName',
+        pipeline: [
+          {
+            $project: {
+              _id: 1,
+            },
+          },
+        ],
+        as: 'instances',
+      },
+    },
     { $addFields: { fgm_id: '$_id' } },
+    { $addFields: { path: { $arrayElemAt: ['$mgroups.path', 0] } } },
+    { $addFields: { i_id: { $arrayElemAt: ['$instances._id', 0] } } },
     {
       $project: {
         mgroups: 0,
         _id: 0,
+        instances: 0,
       },
     },
   ];

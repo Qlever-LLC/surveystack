@@ -267,7 +267,7 @@ describe('manageFarmOS', () => {
     const userext_data = { userOverrides: { name: 'Ext ernal', email: 'external@bj.net' } };
     const userext = await groupExt.createUserMember(userext_data);
     const userext_farmOSInstance1 = 'external.farmos.net';
-    await createFarmOSInstanceForUserAndGroup(
+    const external_farmos_net_data = await createFarmOSInstanceForUserAndGroup(
       userext.user._id,
       groupExt._id,
       userext_farmOSInstance1,
@@ -277,7 +277,7 @@ describe('manageFarmOS', () => {
     const userext_data2 = { userOverrides: { name: 'Ext ernal2', email: 'external2@bj.net' } };
     const userext2 = await groupExt.createUserMember(userext_data2);
     const userext_farmOSInstance2 = 'external2.farmos.net';
-    await createFarmOSInstanceForUserAndGroup(
+    const external2_farmos_net_data = await createFarmOSInstanceForUserAndGroup(
       userext2.user._id,
       groupExt._id,
       userext_farmOSInstance2,
@@ -292,6 +292,7 @@ describe('manageFarmOS', () => {
     await createFarmosGroupSettings(groupLabs._id);
 
     const groupLabsInfos = await getGroupInformation(groupLabs._id, true);
+    //console.log('INFORMATION', groupLabsInfos);
 
     expect(groupLabsInfos.groupHasFarmOSAccess).toBeTruthy();
     expect(groupLabsInfos.groupHasCoffeeShopAccess).toBeFalsy();
@@ -364,8 +365,10 @@ describe('manageFarmOS', () => {
     expect(groupLabsInfos.nonMembers).toHaveLength(2);
     expect(groupLabsInfos.nonMembers[0].instanceName).toBe('external.farmos.net');
     expect(groupLabsInfos.nonMembers[0].path).toBe('Bionutrient > Labs > Michigan');
+    expect(groupLabsInfos.nonMembers[0].i_id).toStrictEqual(external_farmos_net_data._id);
     expect(groupLabsInfos.nonMembers[1].instanceName).toBe('external2.farmos.net');
     expect(groupLabsInfos.nonMembers[1].path).toBe('Bionutrient > Labs > Michigan');
+    expect(groupLabsInfos.nonMembers[1].i_id).toStrictEqual(external2_farmos_net_data._id);
   });
 
   it('createFarmosGroupSettings, getGroupSettings and setGroupSettings', async () => {
