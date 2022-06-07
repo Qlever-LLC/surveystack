@@ -194,12 +194,14 @@ FarmOSManage.args = {
       instanceName: 'external.farmos.net',
       path: 'Bionutrient > Labs > Michigan',
       fgm_id: '628bd0a08d7c284adc0542e1',
+      i_id: '629f51bc52b2600e34e26fec',
     },
     {
       groupId: '628bd0a08d7c284adc0542c3',
       instanceName: 'external2.farmos.net',
       path: 'Bionutrient > Labs > Michigan',
       fgm_id: '628bd0a08d7c284adc0542e6',
+      i_id: '629f51bc52b2600e34e26ff1',
     },
   ],
   unifomMembers() {

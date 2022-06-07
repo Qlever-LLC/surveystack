@@ -62,7 +62,7 @@
                 <span v-if="item.connectedFarms[id].owner" class="mdi mdi-crown pr-1"></span>
                 <span>{{ item.connectedFarms[id].instanceName }}</span>
               </span>
-              <span v-if="item.name" class="d-flex" style="flex-wrap: nowrap">
+              <span class="d-flex" style="flex-wrap: nowrap">
                 <my-button little noBorder colorBlue label="access" />
                 <my-button little noBorder colorRed label="remove" />
               </span>
