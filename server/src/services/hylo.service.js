@@ -39,7 +39,7 @@ const outputSchema = Joi.object({
   entity: Joi.object({
     name: Joi.string().required(),
     slug: Joi.string().required(),
-    // type: Joi.string().valid("farm").required(), //TODO
+    type: Joi.string().valid("farm").required(),
     extraModerators: Joi.array()
       .min(0)
       .items(
@@ -258,8 +258,6 @@ const syncGroupWithHylo = async (options) => {
   try {
     group = (await createHyloGroup({ data, hyloUserId, ...options })).group;
   } catch (e) {
-    console.log("ERROR", JSON.stringify(e))
-    console.log("ERROR.response", e.response)
     if (hasGqlError(e, 'A group with that URL slug already exists')) {
       logger.info(
         `Group with slug ${data.slug} already exist. Try to update it...`,
