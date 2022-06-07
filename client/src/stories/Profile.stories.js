@@ -24,7 +24,7 @@ const Template = (args, { argTypes }) => ({
 const TemplateGroup = (args, { argTypes }) => ({
   props: Object.keys(argTypes),
   components: { TableGroup },
-  template: '<table-group v-bind="$props" :members="unifomMembers()" />',
+  template: '<table-group v-bind="$props" :groupInfos="unifomMembers()" />',
   methods: {},
 });
 
@@ -58,168 +58,170 @@ ProfilePage.args = {
 
 export const FarmOSManage = TemplateGroup.bind({});
 FarmOSManage.args = {
-  _id: '628bd0a08d7c284adc0542e9',
-  groupId: '628bd0a08d7c284adc0542c2',
-  groupHasFarmOSAccess: true,
-  groupHasCoffeeShopAccess: false,
-  allowSubgroupsToJoinCoffeeShop: false,
-  allowSubgroupAdminsToCreateFarmOSInstances: false,
-  seats: {
-    current: 7,
-    max: 20,
+  returnedData: {
+    _id: '628bd0a08d7c284adc0542e9',
+    groupId: '628bd0a08d7c284adc0542c2',
+    groupHasFarmOSAccess: true,
+    groupHasCoffeeShopAccess: true,
+    allowSubgroupsToJoinCoffeeShop: false,
+    allowSubgroupAdminsToCreateFarmOSInstances: false,
+    seats: {
+      current: 7,
+      max: 20,
+    },
+    name: 'Bionutrient > Labs',
+    members: [
+      {
+        group: '628bd0a08d7c284adc0542c2',
+        role: 'true',
+        m_id: '628bd0a08d7c284adc0542c8',
+        location: 'Bionutrient > Labs',
+        email: 'teravestdan@gmail.com',
+        name: 'Dan TerAvest',
+        connectedFarms: [
+          {
+            instanceName: 'dan_teravest_farm.farmos.net',
+            owner: true,
+            i_id: '628bd0a08d7c284adc0542ce',
+            memberships: [
+              {
+                groupId: '628bd0a08d7c284adc0542c2',
+                fgm_id: '628bd0a08d7c284adc0542cd',
+                path: 'Bionutrient > Labs',
+              },
+            ],
+          },
+          {
+            instanceName: 'lees_farm.farmos.net',
+            owner: true,
+            i_id: '628bd0a08d7c284adc0542d0',
+            memberships: [
+              {
+                groupId: '628bd0a08d7c284adc0542c2',
+                fgm_id: '628bd0a08d7c284adc0542cf',
+                path: 'Bionutrient > Labs',
+              },
+              {
+                groupId: '628bd0a08d7c284adc0542c3',
+                fgm_id: '628bd0a08d7c284adc0542d1',
+                path: 'Bionutrient > Labs > Michigan',
+              },
+            ],
+          },
+          {
+            instanceName: 'ourscinet.farmos.net',
+            owner: false,
+            i_id: '628bd0a08d7c284adc0542d3',
+            memberships: [
+              {
+                groupId: '628bd0a08d7c284adc0542c2',
+                fgm_id: '628bd0a08d7c284adc0542d2',
+                path: 'Bionutrient > Labs',
+              },
+              {
+                groupId: '628bd0a08d7c284adc0542c3',
+                fgm_id: '628bd0a08d7c284adc0542d4',
+                path: 'Bionutrient > Labs > Michigan',
+              },
+              {
+                groupId: '628bd0a08d7c284adc0542c4',
+                fgm_id: '628bd0a08d7c284adc0542d5',
+                path: 'Bionutrient > Labs > Europe',
+              },
+              {
+                groupId: '628bd0a08d7c284adc0542c5',
+                fgm_id: '628bd0a08d7c284adc0542d6',
+                path: 'Bionutrient > Labs > Community',
+              },
+              {
+                groupId: '628bd0a08d7c284adc0542c6',
+                fgm_id: '628bd0a08d7c284adc0542d7',
+                path: 'Bionutrient > Labs > Community > Lab',
+              },
+            ],
+          },
+          {
+            instanceName: 'coffeeshop.farmos.net',
+            owner: false,
+            i_id: '628bd0a08d7c284adc0542d9',
+            memberships: [
+              {
+                groupId: '628bd0a08d7c284adc0542c3',
+                fgm_id: '628bd0a08d7c284adc0542d8',
+                path: 'Bionutrient > Labs > Michigan',
+              },
+            ],
+          },
+        ],
+        userId: '628bd0a08d7c284adc0542c7',
+      },
+      {
+        group: '628bd0a08d7c284adc0542c2',
+        role: 'false',
+        m_id: '628bd0a08d7c284adc0542ca',
+        location: 'Bionutrient > Labs',
+        email: 'djole2352@gmail.com',
+        name: 'Dave Jole',
+        connectedFarms: [],
+        userId: '628bd0a08d7c284adc0542c9',
+      },
+      {
+        group: '628bd0a08d7c284adc0542c3',
+        role: 'false',
+        m_id: '628bd0a08d7c284adc0542cc',
+        location: 'Bionutrient > Labs > Michigan',
+        email: 'bigjenny@bj.net',
+        name: 'Jenny Jennerson',
+        connectedFarms: [
+          {
+            instanceName: 'jennybigfarmstand.farmos.net',
+            owner: true,
+            i_id: '628bd0a08d7c284adc0542db',
+            memberships: [
+              {
+                groupId: '628bd0a08d7c284adc0542c3',
+                fgm_id: '628bd0a08d7c284adc0542da',
+                path: 'Bionutrient > Labs > Michigan',
+              },
+            ],
+          },
+        ],
+        userId: '628bd0a08d7c284adc0542cb',
+      },
+    ],
+    nonMembers: [
+      {
+        groupId: '628bd0a08d7c284adc0542c3',
+        instanceName: 'external.farmos.net',
+        path: 'Bionutrient > Labs > Michigan',
+        fgm_id: '628bd0a08d7c284adc0542e1',
+        i_id: '629f51bc52b2600e34e26fec',
+      },
+      {
+        groupId: '628bd0a08d7c284adc0542c3',
+        instanceName: 'external2.farmos.net',
+        path: 'Bionutrient > Labs > Michigan',
+        fgm_id: '628bd0a08d7c284adc0542e6',
+        i_id: '629f51bc52b2600e34e26ff1',
+      },
+    ],
   },
-  name: 'Bionutrient > Labs',
-  members: [
-    {
-      group: '628bd0a08d7c284adc0542c2',
-      role: 'true',
-      m_id: '628bd0a08d7c284adc0542c8',
-      location: 'Bionutrient > Labs',
-      email: 'teravestdan@gmail.com',
-      name: 'Dan TerAvest',
-      connectedFarms: [
-        {
-          instanceName: 'dan_teravest_farm.farmos.net',
-          owner: true,
-          i_id: '628bd0a08d7c284adc0542ce',
-          memberships: [
-            {
-              groupId: '628bd0a08d7c284adc0542c2',
-              fgm_id: '628bd0a08d7c284adc0542cd',
-              path: 'Bionutrient > Labs',
-            },
-          ],
-        },
-        {
-          instanceName: 'lees_farm.farmos.net',
-          owner: true,
-          i_id: '628bd0a08d7c284adc0542d0',
-          memberships: [
-            {
-              groupId: '628bd0a08d7c284adc0542c2',
-              fgm_id: '628bd0a08d7c284adc0542cf',
-              path: 'Bionutrient > Labs',
-            },
-            {
-              groupId: '628bd0a08d7c284adc0542c3',
-              fgm_id: '628bd0a08d7c284adc0542d1',
-              path: 'Bionutrient > Labs > Michigan',
-            },
-          ],
-        },
-        {
-          instanceName: 'ourscinet.farmos.net',
-          owner: false,
-          i_id: '628bd0a08d7c284adc0542d3',
-          memberships: [
-            {
-              groupId: '628bd0a08d7c284adc0542c2',
-              fgm_id: '628bd0a08d7c284adc0542d2',
-              path: 'Bionutrient > Labs',
-            },
-            {
-              groupId: '628bd0a08d7c284adc0542c3',
-              fgm_id: '628bd0a08d7c284adc0542d4',
-              path: 'Bionutrient > Labs > Michigan',
-            },
-            {
-              groupId: '628bd0a08d7c284adc0542c4',
-              fgm_id: '628bd0a08d7c284adc0542d5',
-              path: 'Bionutrient > Labs > Europe',
-            },
-            {
-              groupId: '628bd0a08d7c284adc0542c5',
-              fgm_id: '628bd0a08d7c284adc0542d6',
-              path: 'Bionutrient > Labs > Community',
-            },
-            {
-              groupId: '628bd0a08d7c284adc0542c6',
-              fgm_id: '628bd0a08d7c284adc0542d7',
-              path: 'Bionutrient > Labs > Community > Lab',
-            },
-          ],
-        },
-        {
-          instanceName: 'coffeeshop.farmos.net',
-          owner: false,
-          i_id: '628bd0a08d7c284adc0542d9',
-          memberships: [
-            {
-              groupId: '628bd0a08d7c284adc0542c3',
-              fgm_id: '628bd0a08d7c284adc0542d8',
-              path: 'Bionutrient > Labs > Michigan',
-            },
-          ],
-        },
-      ],
-      userId: '628bd0a08d7c284adc0542c7',
-    },
-    {
-      group: '628bd0a08d7c284adc0542c2',
-      role: 'false',
-      m_id: '628bd0a08d7c284adc0542ca',
-      location: 'Bionutrient > Labs',
-      email: 'djole2352@gmail.com',
-      name: 'Dave Jole',
-      connectedFarms: [],
-      userId: '628bd0a08d7c284adc0542c9',
-    },
-    {
-      group: '628bd0a08d7c284adc0542c3',
-      role: 'false',
-      m_id: '628bd0a08d7c284adc0542cc',
-      location: 'Bionutrient > Labs > Michigan',
-      email: 'bigjenny@bj.net',
-      name: 'Jenny Jennerson',
-      connectedFarms: [
-        {
-          instanceName: 'jennybigfarmstand.farmos.net',
-          owner: true,
-          i_id: '628bd0a08d7c284adc0542db',
-          memberships: [
-            {
-              groupId: '628bd0a08d7c284adc0542c3',
-              fgm_id: '628bd0a08d7c284adc0542da',
-              path: 'Bionutrient > Labs > Michigan',
-            },
-          ],
-        },
-      ],
-      userId: '628bd0a08d7c284adc0542cb',
-    },
-  ],
-  nonMembers: [
-    {
-      groupId: '628bd0a08d7c284adc0542c3',
-      instanceName: 'external.farmos.net',
-      path: 'Bionutrient > Labs > Michigan',
-      fgm_id: '628bd0a08d7c284adc0542e1',
-      i_id: '629f51bc52b2600e34e26fec',
-    },
-    {
-      groupId: '628bd0a08d7c284adc0542c3',
-      instanceName: 'external2.farmos.net',
-      path: 'Bionutrient > Labs > Michigan',
-      fgm_id: '628bd0a08d7c284adc0542e6',
-      i_id: '629f51bc52b2600e34e26ff1',
-    },
-  ],
   unifomMembers() {
-    this.members.forEach((el) => {
+    this.returnedData.members.forEach((el) => {
       if (el.connectedFarms[0] == undefined) {
         el.connectedFarms.push({});
       }
     });
-    this.nonMembers.forEach((el) => {
+    this.returnedData.nonMembers.forEach((el) => {
       // without this if-check, we have an infinite loop
       if (!el.connectedFarms) {
         el.connectedFarms = [];
         let memberships = [];
         memberships.push({ groupId: el.groupId, fgm_id: el.fgm_id, path: el.path });
         el.connectedFarms.push({ instanceName: el.instanceName, memberships: memberships });
-        this.members.push(el);
+        this.returnedData.members.push(el);
       }
     });
-    return this.members;
+    return this.returnedData;
   },
 };

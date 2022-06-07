@@ -1,5 +1,26 @@
 <template>
   <div>
+    <h1>Connected Members & Farms</h1>
+    <ul>
+      <h3>Settings</h3>
+      <v-checkbox
+        hide-details
+        v-model="groupInfos.groupHasCoffeeShopAccess"
+        @input="$emit('addGrpCoffeeShop', $event.target.value)"
+        label="Add this group to the Coffee Shop"
+      ></v-checkbox>
+      <v-checkbox
+        hide-details
+        v-model="groupInfos.allowSubgroupsToJoinCoffeeShop"
+        @input="$emit('allowSbGrpsJoinCoffeeShop', $event.target.value)"
+        label="Allow subgroups to join the Coffee Shop"
+      ></v-checkbox>
+      <v-checkbox
+        v-model="groupInfos.allowSubgroupAdminsToCreateFarmOSInstances"
+        @input="$emit('allowSbGrpsAdminsCreateFarmOSFarmsInSS', $event.target.value)"
+        label="Allow subgroups admins to create FarmOS Farms through Survey Stack"
+      ></v-checkbox>
+    </ul>
     <v-data-table
       :headers="headers"
       :items="filteredMembers"
@@ -109,11 +130,12 @@ import MyButton from './common/Button.vue';
 export default {
   components: { MyButton },
   props: {
-    members: {
-      type: Array,
+    groupInfos: {
+      type: Object,
       required: true,
     },
   },
+  emits: ['addGrpCoffeeShop', 'allowSbGrpsJoinCoffeeShop', 'allowSbGrpsAdminsCreateFarmOSFarmsInSS'],
   setup(props) {
     // part Search input field
     const arrHeaderSearch = ref(['', '', '']);
@@ -152,14 +174,14 @@ export default {
       }
 
       if (conditions.length > 0) {
-        return props.members.filter((m) => {
+        return props.groupInfos.members.filter((m) => {
           return conditions.every((condition) => {
             return condition(m);
           });
         });
       }
 
-      return props.members;
+      return props.groupInfos.members;
     });
 
     function filterGMembers(item) {
@@ -191,7 +213,7 @@ export default {
     // part develop + n others
 
     const developMbships = ref([]);
-    for (let i = 0; i < props.members.length; i++) {
+    for (let i = 0; i < props.groupInfos.members.length; i++) {
       developMbships.value.push(ref(false));
     }
     function toggleDevelopMbships(index) {
