@@ -3,7 +3,7 @@ import VueCompositionApi from '@vue/composition-api';
 Vue.use(VueCompositionApi);
 
 import TableComponent from '../components/integrations/FarmOSProfile.vue';
-import TableGroup from '../components/integrations/FarmOSManage.vue';
+import TableGroup from '../components/integrations/FarmOSGroupSettings.vue';
 
 import { action } from '@storybook/addon-actions';
 

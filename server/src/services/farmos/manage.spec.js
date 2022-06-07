@@ -368,7 +368,6 @@ describe('manageFarmOS', () => {
     expect(groupLabsInfos.nonMembers[1].path).toBe('Bionutrient > Labs > Michigan');
   });
 
-  //TODO unit test 'test-group-settings'
   it('createFarmosGroupSettings, getGroupSettings and setGroupSettings', async () => {
     const group = await createGroup({ name: 'Bionutrient' });
 
