@@ -54,7 +54,7 @@ const createHyloUser = async (options) => {
   console.log('create hyloUser', { email, name, groupId });
   const r = await axios.post(
     `${process.env.HYLO_API_URL}/noo/user`,
-    querystring.stringify({ email, name, groupId }),
+    querystring.stringify({ email, name, groupId, isModerator: true }),
     {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
