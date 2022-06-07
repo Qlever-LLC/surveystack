@@ -39,7 +39,7 @@ const outputSchema = Joi.object({
   entity: Joi.object({
     name: Joi.string().required(),
     slug: Joi.string().required(),
-    type: Joi.string().valid("farm").required(),
+    type: Joi.string().valid('farm').required(),
     extraModerators: Joi.array()
       .min(0)
       .items(
