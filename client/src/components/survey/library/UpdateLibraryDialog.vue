@@ -19,7 +19,7 @@
         :version-name-revision-c="`Version ${toSurvey.latestVersion}`"
         :default-open="true"
         :showHeader="true"
-        :showNoChangesText="true"
+        :showNoChangesText="false"
       ></survey-diff>
       <div v-if="hasConflicts">
         <v-card-text class="ml-2 my-3" style="margin-bottom: -20px">
