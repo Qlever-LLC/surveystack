@@ -651,13 +651,17 @@ const handleApiCompose = async (submissionEntities, user) => {
   try {
     hyloResults = await Promise.all(
       submissionEntities.map(async ({ entity, survey }) => {
-        const results = hyloService.handle({
+        const results = await hyloService.handle({
           submission: entity,
           survey,
           user,
         });
         // Save the results of the Hylo handler in the submission
-        entity.hyloApiComposeResults = results;
+        const permanentResults = results.map((r) => r.permanent).filter(Boolean);
+        entity.meta.permanentResults = [
+          ...(Array.isArray(entity.meta.permanentResults) ? entity.meta.permanentResults : []),
+          ...permanentResults,
+        ];
         return results;
       })
     );
@@ -695,48 +699,6 @@ const createSubmission = async (req, res) => {
   } catch (errorObject) {
     return res.status(503).send(errorObject);
   }
-
-  // let farmOsResults;
-  // try {
-  //   farmOsResults = await Promise.all(
-  //     submissionEntities.map(({ entity, survey }) =>
-  //       farmOsService.handle({
-  //         submission: entity,
-  //         survey,
-  //         user: res.locals.auth.user,
-  //       })
-  //     )
-  //   );
-  // } catch (error) {
-  //   // TODO what should we do if something internal fails?
-  //   // need to let the user somehow know
-  //   console.log('error handling farmos', error);
-  //   return res.status(503).send({
-  //     message: `error submitting to farmos ${error}`,
-  //     farmos: error.messages,
-  //   });
-  // }
-
-  // let hyloResults;
-  // try {
-  //   hyloResults = await Promise.all(
-  //     submissionEntities.map(({ entity, survey }) =>
-  //       hyloService.handle({
-  //         submission: entity,
-  //         survey,
-  //         user: res.locals.auth.user,
-  //       })
-  //     )
-  //   );
-  // } catch (error) {
-  //   // TODO what should we do if something internal fails?
-  //   // need to let the user somehow know
-  //   console.log('error handling hylo', error);
-  //   return res.status(503).send({
-  //     message: `error submitting to hylo ${error}`,
-  //     hylo: error.messages,
-  //   });
-  // }
 
   const mapSubmissionToQSL = ({ entity, survey }) => {
     const controls = survey.revisions[entity.meta.survey.version - 1].controls;

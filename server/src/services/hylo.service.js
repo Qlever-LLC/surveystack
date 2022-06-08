@@ -9,7 +9,10 @@ import { COLL_GROUPS_HYLO_MAPPINGS, db } from '../db';
 import { gql } from 'graphql-request';
 import * as hyloUtils from './hylo/utils';
 import Joi from 'joi';
-import { isString } from 'lodash';
+import { isString, pick } from 'lodash';
+
+const API_COMPOSE_TYPE_HYLO = 'hylo';
+const HYLO_TYPE_SYNC_GROUP = 'sync-group';
 
 const createLogger = () => {
   const logs = [];
@@ -17,7 +20,6 @@ const createLogger = () => {
     if (!message || !isString(message)) {
       throw `Message has to be a string`;
     }
-    console.log(type, message, data);
     logs.push({ type, message, data, time: Date.now() });
   };
   return {
@@ -103,15 +105,16 @@ const FRAGMENT_PERSON_DETAILS = gql`
   fragment PersonDetails on Person {
     id
     name
+    email: contactEmail
     hasRegistered
-    memberships {
-      id
-      group {
-        id
-        slug
-      }
-      hasModeratorRole
-    }
+    # memberships {
+    #   id
+    #   group {
+    #     id
+    #     slug
+    #   }
+    #   hasModeratorRole
+    # }
   }
 `;
 
@@ -331,7 +334,7 @@ const getHyloApiComposeOutputs = ({ submission, survey }) => {
         return [];
       }
 
-      const relevantApiCompose = compose.filter((c) => c.type === 'hylo');
+      const relevantApiCompose = compose.filter((c) => c.type === API_COMPOSE_TYPE_HYLO);
       if (relevantApiCompose.length === 0) {
         return [];
       }
@@ -405,16 +408,23 @@ export const handleSyncGroupOutput = async ({ output: _output, user, group, logg
 
   logger.info('extraModeratorUsers', extraModeratorUsers);
 
-  return { hyloUser, hyloGroup, extraModeratorUsers };
+  const permanent = {
+    type: API_COMPOSE_TYPE_HYLO,
+    hyloType: HYLO_TYPE_SYNC_GROUP,
+    createdHyloGroup: pick(hyloGroup, 'id', 'slug', 'name'),
+    submittingHyloUser: pick(hyloUser, 'id', 'email', 'name'),
+    extraModeratorUsers: extraModeratorUsers.map((u) => pick(u, 'id', 'email', 'name')),
+  };
+
+  return { hyloUser, hyloGroup, extraModeratorUsers, permanent };
 };
 
 export const handle = async ({ submission, survey, user }) => {
   const hyloCompose = getHyloApiComposeOutputs({ submission, survey });
-  console.log('hyloCompose', hyloCompose);
   const results = [];
   const logger = createLogger();
   for (const output of hyloCompose) {
-    if (output.hyloType === 'sync-group') {
+    if (output.hyloType === HYLO_TYPE_SYNC_GROUP) {
       try {
         const result = await handleSyncGroupOutput({
           output,
@@ -430,9 +440,8 @@ export const handle = async ({ submission, survey, user }) => {
       }
     }
   }
-  console.log('RESULTS', JSON.stringify(results, null, 2));
 
-  // TODO does results have an expected format?
+  // TODO do results have an expected format?
   return results;
 };
 
