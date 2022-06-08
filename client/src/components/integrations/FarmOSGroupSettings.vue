@@ -1,26 +1,55 @@
 <template>
   <div>
-    <h1>Connected Members & Farms</h1>
-    <ul>
-      <h3>Settings</h3>
-      <v-checkbox
-        hide-details
-        v-model="groupInfos.groupHasCoffeeShopAccess"
-        @input="$emit('addGrpCoffeeShop', $event.target.value)"
-        label="Add this group to the Coffee Shop"
-      ></v-checkbox>
-      <v-checkbox
-        hide-details
-        v-model="groupInfos.allowSubgroupsToJoinCoffeeShop"
-        @input="$emit('allowSbGrpsJoinCoffeeShop', $event.target.value)"
-        label="Allow subgroups to join the Coffee Shop"
-      ></v-checkbox>
-      <v-checkbox
-        v-model="groupInfos.allowSubgroupAdminsToCreateFarmOSInstances"
-        @input="$emit('allowSbGrpsAdminsCreateFarmOSFarmsInSS', $event.target.value)"
-        label="Allow subgroups admins to create FarmOS Farms through Survey Stack"
-      ></v-checkbox>
-    </ul>
+    <div class="d-flex justify-space-between">
+      <div>
+        <h2>Connected Members & Farms</h2>
+        <div class="pa-3">
+          <p class="font-weight-bold">Settings</p>
+          <v-container class="pa-0" fluid>
+            <v-checkbox
+              class="ma-0 pa-0"
+              hide-details
+              :ripple="false"
+              v-model="groupInfos.groupHasCoffeeShopAccess"
+              @input="$emit('addGrpCoffeeShop', $event.target.value)"
+              label="Add this group to the Coffee Shop"
+            ></v-checkbox>
+            <v-checkbox
+              class="ma-0 pa-0"
+              hide-details
+              :ripple="false"
+              v-model="groupInfos.allowSubgroupsToJoinCoffeeShop"
+              @input="$emit('allowSbGrpsJoinCoffeeShop', $event.target.value)"
+              :label="`Allow subgroups to join the Coffee Shop`"
+            ></v-checkbox>
+            <v-checkbox
+              class="ma-0 pa-0"
+              :ripple="false"
+              v-model="groupInfos.allowSubgroupAdminsToCreateFarmOSInstances"
+              @input="$emit('allowSbGrpsAdminsCreateFarmOSFarmsInSS', $event.target.value)"
+              label="Allow subgroups admins to create FarmOS Farms through Survey Stack"
+            >
+            </v-checkbox>
+          </v-container>
+        </div>
+      </div>
+      <div class="d-flex flex-column">
+        <div class="d-flex justify-end" v-if="groupInfos.seats">
+          {{ groupInfos.name }} has {{ groupInfos.seats.current }} / {{ groupInfos.seats.max }} accounts
+        </div>
+        <div class="d-flex justify-end" v-else>
+          {{ groupInfos.name }}
+        </div>
+        <div class="d-flex justify-end align-center">
+          <my-button color="secondary" noBorder label="Upgrade" /> or
+          <my-button color="secondary" noBorder label="Learn More" />
+        </div>
+        <div class="d-flex justify-end">
+          <my-button class="mr-2" color="primary" label="advanced" />
+          <my-button color="primary" label="Tutorial" />
+        </div>
+      </div>
+    </div>
     <v-data-table
       :headers="headers"
       :items="filteredMembers"
