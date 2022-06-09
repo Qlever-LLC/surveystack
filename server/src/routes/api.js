@@ -282,6 +282,12 @@ router.get(
   catchErrors(farmosController.groupAdminMinimumGetGroupInformation)
 );
 
+router.post(
+  '/farmos/farmos-access',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.superAdminUpdateFarmOSAccess)
+);
+
 /** Integrations - Group */
 router.get('/group-integrations', catchErrors(groupIntegrationController.getIntegrations));
 

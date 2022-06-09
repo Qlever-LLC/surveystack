@@ -23,6 +23,8 @@ import {
   deletePlan as manageDeletePlan,
   mapFarmOSInstanceToUser,
   getGroupInformation,
+  enableFarmOSAccessForGroup,
+  disableFarmOSAccessForGroup,
 } from '../services/farmos/manage';
 import { aggregator } from '../services/farmos/aggregator';
 
@@ -616,6 +618,24 @@ export const groupAdminMinimumGetGroupInformation = async (req, res) => {
       message: error.message,
     });
   }
+};
+
+export const superAdminUpdateFarmOSAccess = async (req, res) => {
+  const { groupId, updateTo } = req.body;
+  if (!groupId) {
+    throw boom.badData('groupId missing');
+  }
+  if (!updateTo) {
+    throw boom.badData('updated value missing');
+  }
+  if (updateTo) {
+    await enableFarmOSAccessForGroup(groupId);
+  } else {
+    await disableFarmOSAccessForGroup(groupId);
+  }
+  return res.send({
+    status: 'success',
+  });
 };
 
 export const testConnection = async (req, res) => {
