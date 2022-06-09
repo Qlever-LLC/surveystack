@@ -8,7 +8,10 @@
             <v-card flat dark outlined class="mb-2" :color="item.error ? 'red darken-4' : 'green'">
               <v-card-text class="white--text">
                 <span style="font-weight: bold">{{ item.title }}</span> {{ item.body }}
-                <v-dialog v-if="item.logs && item.logs.length" width="500">
+              </v-card-text>
+              <template v-if="item.logs && item.logs.length">
+                <v-divider class="mx-4"></v-divider>
+                <v-dialog width="500">
                   <template v-slot:activator="{ on, attrs }">
                     <v-card-actions>
                       <v-spacer />
@@ -41,8 +44,7 @@
                     </v-card-text>
                   </v-card>
                 </v-dialog>
-              </v-card-text>
-
+              </template>
               <!-- <pre v-if="item.logs">{{ JSON.stringify(item.logs, null, 2) }}</pre> -->
             </v-card>
           </div>
