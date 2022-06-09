@@ -193,8 +193,8 @@ const createHyloGroup = async (options) => {
 
 const updateHyloGroup = async (options) => {
   const { data, hyloUserId, hyloGroupId, gqlRequest, logger } = { ...deps, ...options };
-  logger.info(`Update hylo group  slug=${data.slug}`, { data, hyloUserId, hyloGroupId });
-  const result = gqlRequest(
+  logger.info(`Update hylo group  ID=${hyloGroupId}`, { data, hyloUserId, hyloGroupId });
+  const result = await gqlRequest(
     gql`
       mutation ($id: ID, $changes: GroupInput, $asUserId: ID) {
         group: updateGroup(id: $id, changes: $changes, asUserId: $asUserId) {
@@ -279,7 +279,7 @@ const syncGroupWithHylo = async (options) => {
   const { data, hyloGroupId, hyloUserId, logger } = { ...deps, ...options };
   let group;
   if (hyloGroupId) {
-    logger.info(`Updated the Hylo group with ID "${hyloGroupId}"`);
+    logger.info(`Update the Hylo group with ID "${hyloGroupId}"`);
     group = (await updateHyloGroup({ data, hyloUserId, hyloGroupId, ...options })).group;
   } else {
     logger.info(`Create a new Hylo group with slug "${data.slug}-#"`);
@@ -393,7 +393,7 @@ export const handleSyncGroupOutput = async ({
     entity.parentIds = [groupMapping.hyloGroupId];
     logger.success('Found Hylo group integration', groupMapping);
   } else {
-    logger.warn("Didn't find Hylo group integration", groupMapping);
+    logger.warning("Didn't find Hylo group integration", groupMapping);
   }
 
   const hyloUser = await syncUserWithHylo({ userId: user._id, ...options });

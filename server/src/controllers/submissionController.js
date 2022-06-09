@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _, { cloneDeep, isError } from 'lodash';
 
 import { ObjectId } from 'mongodb';
 
@@ -626,6 +626,7 @@ const prepareCreateSubmissionEntity = async (submission, res) => {
 };
 
 const handleApiCompose = async (submissionEntities, user) => {
+  submissionEntities = cloneDeep(submissionEntities);
   let farmOsResults;
   try {
     farmOsResults = await Promise.all(
@@ -692,10 +693,10 @@ const createSubmission = async (req, res) => {
     submissions.map((submission) => prepareCreateSubmissionEntity(submission, res))
   );
 
-  let apiComposeResutls = {};
+  let apiComposeResults = {};
   try {
     const composeResults = await handleApiCompose(submissionEntities, res.locals.auth.user);
-    apiComposeResutls = composeResults.results;
+    apiComposeResults = composeResults.results;
     submissionEntities = composeResults.entities;
   } catch (errorObject) {
     return res.status(503).send(errorObject);
@@ -735,7 +736,7 @@ const createSubmission = async (req, res) => {
 
   res.send({
     ...results,
-    ...apiComposeResutls,
+    ...apiComposeResults,
   });
 };
 
@@ -809,7 +810,7 @@ const findVal = (obj, keyToFind) => {
 
 const updateSubmission = async (req, res) => {
   const { id } = req.params;
-  const newSubmission = await sanitize(req.body);
+  let newSubmission = await sanitize(req.body);
 
   // re-insert old submission version with a new _id
   const oldSubmission = res.locals.existing;
@@ -828,10 +829,15 @@ const updateSubmission = async (req, res) => {
     throw boom.notFound(`No survey found with id: ${newSubmission.meta.survey.id}`);
   }
 
-  let apiComposeResutls = {};
+  let apiComposeResults = {};
   const creator = await db.collection('users').findOne({ _id: newSubmission.meta.creator });
   try {
-    apiComposeResutls = await handleApiCompose([{ entity: newSubmission, prevEntity: oldSubmission, survey }], creator);
+    const composeResults = await handleApiCompose(
+      [{ entity: newSubmission, prevEntity: oldSubmission, survey }],
+      creator
+    );
+    apiComposeResults = composeResults.results;
+    newSubmission = composeResults.entities[0].entity;
   } catch (errorObject) {
     return res.status(503).send(errorObject);
   }
@@ -867,7 +873,7 @@ const updateSubmission = async (req, res) => {
 
   await updateSubmissionToLibrarySurveys(survey, newSubmission);
 
-  return res.send({ ...updated.value, ...apiComposeResutls });
+  return res.send({ ...updated.value, ...apiComposeResults });
 };
 
 const updateSubmissionToLibrarySurveys = async (survey, submission) => {
@@ -897,7 +903,7 @@ const updateSubmissionToLibrarySurveys = async (survey, submission) => {
 
 const bulkReassignSubmissions = async (req, res) => {
   const { group, creator, ids } = req.body;
-  const submissions = res.locals.existing;
+  let submissions = res.locals.existing;
 
   const surveyIds = [
     ...new Set(submissions.map((submission) => submission.meta.survey.id.toString())),
@@ -912,15 +918,20 @@ const bulkReassignSubmissions = async (req, res) => {
     throw boom.notFound(`Survey referenced by submission not found.`);
   }
 
-  let apiComposeResutls = {};
+  let apiComposeResults = {};
   try {
     const submissionsWithSurveys = submissions.map((submission) => ({
       entity: submission,
       prevEntity: submission,
       survey: surveys.find(({ _id }) => submission.meta.survey.id.toString() === _id.toString()),
     }));
-    apiComposeResutls = await handleApiCompose(submissionsWithSurveys, res.locals.auth.user);
+    const composeResults = await handleApiCompose(submissionsWithSurveys, res.locals.auth.user);
+    apiComposeResults = composeResults.results;
+    submissions = composeResults.entities.map((s) => s.entity);
   } catch (errorObject) {
+    if (isError(errorObject)) {
+      throw errorObject;
+    }
     return res.status(503).send(errorObject);
   }
 
@@ -1000,7 +1011,7 @@ const bulkReassignSubmissions = async (req, res) => {
 
   res.send({
     result: results.result,
-    ...apiComposeResutls,
+    ...apiComposeResults,
   });
 };
 
@@ -1008,7 +1019,7 @@ const reassignSubmission = async (req, res) => {
   const { id } = req.params;
   const { body } = req;
 
-  const existing = res.locals.existing;
+  let existing = res.locals.existing;
   const updatedRevision = existing.meta.revision + 1;
 
   const survey = await db.collection('surveys').findOne({ _id: existing.meta.survey.id });
@@ -1023,12 +1034,14 @@ const reassignSubmission = async (req, res) => {
   existing.meta.archivedReason = 'REASSIGN';
   await db.collection(col).insertOne(existing);
 
-  let apiComposeResutls = {};
+  let apiComposeResults = {};
   try {
-    apiComposeResutls = await handleApiCompose(
+    const composeResults = await handleApiCompose(
       [{ entity: existing, prevEntity: existing, survey }],
       res.locals.auth.user
     );
+    apiComposeResults = composeResults.results;
+    existing = composeResults.entities[0].entity;
   } catch (errorObject) {
     return res.status(503).send(errorObject);
   }
@@ -1073,7 +1086,7 @@ const reassignSubmission = async (req, res) => {
       { $set: updateOperation },
       { returnOriginal: false }
     );
-  return res.send({ ...updated.value, ...apiComposeResutls });
+  return res.send({ ...updated.value, ...apiComposeResults });
 };
 
 const archiveSubmissions = async (req, res) => {
