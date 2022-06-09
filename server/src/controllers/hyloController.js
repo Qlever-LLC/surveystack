@@ -55,7 +55,7 @@ export const getIntegratedHyloGroup = async (req, res) => {
   const schema = Joi.object({
     groupId: Joi.string()
       .required()
-      .messages({ 'any.req  uired': 'The groupId query parameter is required' }),
+      .messages({ 'any.required': 'The groupId query parameter is required' }),
   });
 
   console.log('getIntegratedHyloGroup');

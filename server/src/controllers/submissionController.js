@@ -650,9 +650,10 @@ const handleApiCompose = async (submissionEntities, user) => {
   let hyloResults;
   try {
     hyloResults = await Promise.all(
-      submissionEntities.map(async ({ entity, survey }) => {
+      submissionEntities.map(async ({ entity, prevEntity, survey }) => {
         const results = await hyloService.handle({
           submission: entity,
+          prevSubmission: prevEntity,
           survey,
           user,
         });
@@ -830,7 +831,7 @@ const updateSubmission = async (req, res) => {
   let apiComposeResutls = {};
   const creator = await db.collection('users').findOne({ _id: newSubmission.meta.creator });
   try {
-    apiComposeResutls = await handleApiCompose([{ entity: newSubmission, survey }], creator);
+    apiComposeResutls = await handleApiCompose([{ entity: newSubmission, prevEntity: oldSubmission, survey }], creator);
   } catch (errorObject) {
     return res.status(503).send(errorObject);
   }
@@ -915,6 +916,7 @@ const bulkReassignSubmissions = async (req, res) => {
   try {
     const submissionsWithSurveys = submissions.map((submission) => ({
       entity: submission,
+      prevEntity: submission,
       survey: surveys.find(({ _id }) => submission.meta.survey.id.toString() === _id.toString()),
     }));
     apiComposeResutls = await handleApiCompose(submissionsWithSurveys, res.locals.auth.user);
@@ -1024,7 +1026,7 @@ const reassignSubmission = async (req, res) => {
   let apiComposeResutls = {};
   try {
     apiComposeResutls = await handleApiCompose(
-      [{ entity: existing, survey }],
+      [{ entity: existing, prevEntity: existing, survey }],
       res.locals.auth.user
     );
   } catch (errorObject) {

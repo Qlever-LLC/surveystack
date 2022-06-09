@@ -9,7 +9,7 @@ import { COLL_GROUPS_HYLO_MAPPINGS, db } from '../db';
 import { gql } from 'graphql-request';
 import * as hyloUtils from './hylo/utils';
 import Joi from 'joi';
-import { isString, pick } from 'lodash';
+import { isString, pick, find } from 'lodash';
 
 const API_COMPOSE_TYPE_HYLO = 'hylo';
 const HYLO_TYPE_SYNC_GROUP = 'sync-group';
@@ -149,26 +149,46 @@ const queryHyloGroup = async (options) => {
 
 const createHyloGroup = async (options) => {
   const { data, hyloUserId, gqlRequest, logger } = { ...deps, ...options };
-  logger.info(`Create Hylo group slug=${data.slug} hyloUserId=${hyloUserId}`, {
-    data,
-    hyloUserId,
-  });
-  const result = gqlRequest(
-    gql`
-      mutation ($data: GroupInput, $asUserId: ID) {
-        group: createGroup(data: $data, asUserId: $asUserId) {
-          ...GroupDetails
+
+  for (let postfix = 0; postfix <= 12; postfix++) {
+    const dataWithSlug = {
+      ...data,
+      slug: postfix === 0 ? data.slug : `${data.slug}-${postfix}`,
+    };
+    try {
+      logger.info(`Create Hylo group slug=${dataWithSlug.slug} hyloUserId=${hyloUserId}`, {
+        data: dataWithSlug,
+        hyloUserId,
+      });
+      const result = await gqlRequest(
+        gql`
+          mutation ($data: GroupInput, $asUserId: ID) {
+            group: createGroup(data: $data, asUserId: $asUserId) {
+              ...GroupDetails
+            }
+          }
+          ${FRAGMENT_GROUP_DETAILS}
+        `,
+        {
+          data: dataWithSlug,
+          asUserId: hyloUserId,
         }
+      );
+      logger.info('Create Hylo group result:', result);
+      return result;
+    } catch (e) {
+      if (hasGqlError(e, 'A group with that URL slug already exists')) {
+        logger.info(
+          `Group with slug ${dataWithSlug.slug} already exist. Trying andother postfix...`,
+          e.response?.errors
+        );
+      } else {
+        throw logger.error('Failed to create group', e.response?.errors || { error: String(e) });
       }
-      ${FRAGMENT_GROUP_DETAILS}
-    `,
-    {
-      data,
-      asUserId: hyloUserId,
     }
-  );
-  logger.info('Create Hylo group result:', result);
-  return result;
+  }
+
+  throw logger.error(`The group slug "${data.slug}-#" is already taken.`);
 };
 
 const updateHyloGroup = async (options) => {
@@ -256,30 +276,16 @@ const syncUserWithHylo = async (options) => {
 const hasGqlError = (e, message) => (e.response?.errors || []).some((e) => e.message === message);
 
 const syncGroupWithHylo = async (options) => {
-  const { data, hyloUserId, gqlRequest, logger } = { ...deps, ...options };
-  let group = null;
-  try {
+  const { data, hyloGroupId, hyloUserId, logger } = { ...deps, ...options };
+  let group;
+  if (hyloGroupId) {
+    logger.info(`Updated the Hylo group with ID "${hyloGroupId}"`);
+    group = (await updateHyloGroup({ data, hyloUserId, hyloGroupId, ...options })).group;
+  } else {
+    logger.info(`Create a new Hylo group with slug "${data.slug}-#"`);
     group = (await createHyloGroup({ data, hyloUserId, ...options })).group;
-  } catch (e) {
-    if (hasGqlError(e, 'A group with that URL slug already exists')) {
-      logger.info(
-        `Group with slug ${data.slug} already exist. Try to update it...`,
-        e.response?.errors
-      );
-    } else {
-      logger.error('Failed to create group', e.response?.errors || { error: String(e) });
-      throw e;
-    }
   }
-  if (!group?.id) {
-    logger.info(`Query Hylo group slug=${data.slug}`);
-    group = (await queryHyloGroup({ gqlRequest, slug: data.slug })).group;
-    if (!group?.id) {
-      throw logger.error(`Failed to create or find a Hylo group with slug "${data.slug}"`);
-    }
 
-    group = (await updateHyloGroup({ data, hyloUserId, hyloGroupId: group.id, ...options })).group;
-  }
   logger.info('Got Hylo group', group);
   return group;
 };
@@ -344,7 +350,13 @@ const getHyloApiComposeOutputs = ({ submission, survey }) => {
     .flat();
 };
 
-export const handleSyncGroupOutput = async ({ output: _output, user, group, logger }) => {
+export const handleSyncGroupOutput = async ({
+  output: _output,
+  user,
+  group,
+  logger,
+  hyloGroupId,
+}) => {
   const { value: output, error } = outputSchema.validate(_output);
   if (error) {
     const errors = error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
@@ -388,6 +400,7 @@ export const handleSyncGroupOutput = async ({ output: _output, user, group, logg
   const hyloGroup = await syncGroupWithHylo({
     data: entity,
     hyloUserId: hyloUser.id,
+    hyloGroupId,
     ...options,
   });
   logger.info('Add current user to the group (to be sure they are added)...');
@@ -411,6 +424,7 @@ export const handleSyncGroupOutput = async ({ output: _output, user, group, logg
   const permanent = {
     type: API_COMPOSE_TYPE_HYLO,
     hyloType: HYLO_TYPE_SYNC_GROUP,
+    // TODO we probably won't need email and name
     createdHyloGroup: pick(hyloGroup, 'id', 'slug', 'name'),
     submittingHyloUser: pick(hyloUser, 'id', 'email', 'name'),
     extraModeratorUsers: extraModeratorUsers.map((u) => pick(u, 'id', 'email', 'name')),
@@ -419,25 +433,31 @@ export const handleSyncGroupOutput = async ({ output: _output, user, group, logg
   return { hyloUser, hyloGroup, extraModeratorUsers, permanent };
 };
 
-export const handle = async ({ submission, survey, user }) => {
-  const hyloCompose = getHyloApiComposeOutputs({ submission, survey });
+export const handle = async ({ submission, prevSubmission, survey, user }) => {
+  const outputs = getHyloApiComposeOutputs({ submission, survey });
   const results = [];
   const logger = createLogger();
-  for (const output of hyloCompose) {
-    if (output.hyloType === HYLO_TYPE_SYNC_GROUP) {
-      try {
-        const result = await handleSyncGroupOutput({
-          output,
-          user,
-          group: submission.meta.group,
-          logger,
-        });
-        result.logs = logger.getLogs();
-        results.push(result);
-      } catch (e) {
-        e.logs = logger.getLogs();
-        throw e;
-      }
+  const syncGroupOutputs = outputs.filter((o) => o.hyloType === HYLO_TYPE_SYNC_GROUP);
+  if (syncGroupOutputs.length > 1) {
+    throw new Error(`The submission can't have more that one hyloType='sync-group' outputs`);
+  }
+  for (const output of syncGroupOutputs) {
+    try {
+      const result = await handleSyncGroupOutput({
+        output,
+        user,
+        group: submission.meta.group,
+        hyloGroupId: find(prevSubmission?.meta?.permanentResults || [], {
+          type: API_COMPOSE_TYPE_HYLO,
+          hyloType: HYLO_TYPE_SYNC_GROUP,
+        })?.createdHyloGroup.id,
+        logger,
+      });
+      result.logs = logger.getLogs();
+      results.push(result);
+    } catch (e) {
+      e.logs = logger.getLogs();
+      throw e;
     }
   }
 
