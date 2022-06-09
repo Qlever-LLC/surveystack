@@ -6,14 +6,14 @@ import rolesService from './roles.service';
 import { pick } from 'lodash';
 
 describe('createUserIfNotExist', () => {
-  it('creates a new user if it does not exeist', async () => {
+  it('creates a new user if it does not exist', async () => {
     const email = 'fuz@baz.bar';
     const user = await createUserIfNotExist(email);
     expect(user).toMatchObject({ email, token: expect.any(String), name: 'Fuz' });
   });
   describe('giving name to new user', () => {
     it('creates a name from the email, if name option is not set', async () => {
-      const email = 'DiegoJose.Francisco.dePaula-Juan__nepomucenoMaria@baz.bar';
+      const email = 'diego-jose.francisco.de.paula-juan__nepomuceno-maria@baz.bar';
       const user = await createUserIfNotExist(email);
       expect(user).toMatchObject({
         email,
@@ -31,6 +31,15 @@ describe('createUserIfNotExist', () => {
     const existingUser = await createUser();
     const user = await createUserIfNotExist(existingUser.email, 'Ignored Name');
     expect(existingUser).toMatchObject(user);
+  });
+  it('converts email to lowercase', async () => {
+    const email = 'SomeLetters@UPPERCASE.com';
+    const user = await createUserIfNotExist(email);
+    expect(user).toMatchObject({
+      email: email.toLowerCase(),
+      token: expect.any(String),
+      name: 'Someletters',
+    });
   });
 });
 
