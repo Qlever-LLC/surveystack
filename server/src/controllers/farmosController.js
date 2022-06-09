@@ -25,6 +25,8 @@ import {
   getGroupInformation,
   enableFarmOSAccessForGroup,
   disableFarmOSAccessForGroup,
+  enableCoffeeShopAccessForGroup,
+  disableCoffeeShopAccessForGroup,
 } from '../services/farmos/manage';
 import { aggregator } from '../services/farmos/aggregator';
 
@@ -632,6 +634,24 @@ export const superAdminUpdateFarmOSAccess = async (req, res) => {
     await enableFarmOSAccessForGroup(groupId);
   } else {
     await disableFarmOSAccessForGroup(groupId);
+  }
+  return res.send({
+    status: 'success',
+  });
+};
+
+export const groupAdminMinimumUpdateCoffeeShopAccess = async (req, res) => {
+  const { groupId, updateTo } = req.body;
+  if (!groupId) {
+    throw boom.badData('groupId missing');
+  }
+  if (!updateTo) {
+    throw boom.badData('updated value missing');
+  }
+  if (updateTo) {
+    await enableCoffeeShopAccessForGroup(groupId);
+  } else {
+    await disableCoffeeShopAccessForGroup(groupId);
   }
   return res.send({
     status: 'success',

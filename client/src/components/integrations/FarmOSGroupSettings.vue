@@ -11,7 +11,7 @@
               hide-details
               :ripple="false"
               v-model="groupInfos.groupHasCoffeeShopAccess"
-              @input="$emit('addGrpCoffeeShop', $event.target.value)"
+              @input="$emit('addGrpCoffeeShop', $event.target.value, groupInfos.groupId)"
               label="Add this group to the Coffee Shop"
             ></v-checkbox>
             <v-checkbox

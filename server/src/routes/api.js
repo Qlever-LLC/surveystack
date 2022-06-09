@@ -288,6 +288,12 @@ router.post(
   catchErrors(farmosController.superAdminUpdateFarmOSAccess)
 );
 
+router.post(
+  '/farmos/coffee-shop-access',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupAdminMinimumUpdateCoffeeShopAccess)
+);
+
 /** Integrations - Group */
 router.get('/group-integrations', catchErrors(groupIntegrationController.getIntegrations));
 

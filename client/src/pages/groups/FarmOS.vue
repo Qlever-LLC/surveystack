@@ -24,8 +24,9 @@ export default {
     const groupInfos = ref([]);
 
     //TODO create route in API
-    const addGroupCoffeeShop = async (booleanValue) => {
+    const addGroupCoffeeShop = async (booleanValue, groupId) => {
       // update via api
+      const resp = await api.post('/farmos/coffee-shop-access', { groupId: groupId, updateTo: booleanValue });
     };
     //TODO create route in API
     const allowSubGroupsJoinCoffeeShop = async (booleanValue) => {
