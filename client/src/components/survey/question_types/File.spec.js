@@ -65,7 +65,6 @@ describe('File question', () => {
       const fileToAdd = getMockFile('test_file.txt');
       await wrapper.vm.addFile(fileToAdd, fileResourceKeys, false, ['text/plain']);
       expect(fileResourceKeys[0]).toContain('test_file.txt');
-      //expect(wrapper.vm.$options.propsData.value).toContain(resource);
     });
     test('a file with an excluded type results in error message', async () => {
       const fileResourceKeys = [];
@@ -100,7 +99,21 @@ describe('File question', () => {
     });
   });
   describe('removing', () => {
-    test.todo('a file results in a value without that file');
+    test('a file results in a value without that file', async () => {
+      const fileResourceKeys = [];
+      const wrapper = mount(FileComp, getMountOpts({ value: fileResourceKeys }));
+      const file1 = getMockFile('file1.txt');
+      const file2 = getMockFile('file2.txt');
+      const file3 = getMockFile('file3.txt');
+      await wrapper.vm.addFile(file1, fileResourceKeys, true, ['text/plain']);
+      await wrapper.vm.addFile(file2, fileResourceKeys, true, ['text/plain']);
+      await wrapper.vm.addFile(file3, fileResourceKeys, true, ['text/plain']);
+      expect(wrapper.vm.$options.propsData.value).toHaveLength(3);
+      await wrapper.vm.remove(0);
+      expect(wrapper.vm.$options.propsData.value).toHaveLength(2);
+      await wrapper.vm.remove(1);
+      expect(wrapper.vm.$options.propsData.value[0]).toContain('file2.txt');
+    });
   });
   describe('editing file name', () => {
     test.todo('results in a changed name, label and key');
