@@ -63,18 +63,41 @@ describe('File question', () => {
       const fileResourceKeys = [];
       const wrapper = mount(FileComp, getMountOpts({ value: [] }));
       const fileToAdd = getMockFile('test_file.txt');
-      await wrapper.vm.addFile(fileToAdd, fileResourceKeys, false, [
-        { text: 'PDF (.pdf)', value: 'application/pdf' },
-        { text: 'Spreadsheets (.csv)', value: 'text/csv' },
-        { text: 'Image (.gif, .png, .jpg, .jpeg)', value: 'image/*' },
-        { text: 'Plain text (.txt)', value: 'text/plain' },
-      ]);
+      await wrapper.vm.addFile(fileToAdd, fileResourceKeys, false, ['text/plain']);
       expect(fileResourceKeys[0]).toContain('test_file.txt');
       //expect(wrapper.vm.$options.propsData.value).toContain(resource);
     });
-    test.todo('two files results in two files if multiple files is allowed');
-    test.todo('two files results in one file if multiple files is not allowed ');
-    test.todo('a file with an excluded type results in error message');
+    test('a file with an excluded type results in error message', async () => {
+      const fileResourceKeys = [];
+      const wrapper = mount(FileComp, getMountOpts({ value: [] }));
+      const fileToAdd = getMockFile('file1.txt');
+      await expect(wrapper.vm.addFile(fileToAdd, fileResourceKeys, false, ['application/pdf'])).rejects.toThrow(
+        'not allowed'
+      );
+    });
+    test('two files result in two files if multiple files is allowed', async () => {
+      //suppress console.warn regarding indexeddb missing: jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const fileResourceKeys = [];
+      const wrapper = mount(FileComp, getMountOpts({ value: [] }));
+      const file1 = getMockFile('file1.txt');
+      const file2 = getMockFile('file2.txt');
+      await wrapper.vm.addFile(file1, fileResourceKeys, true, ['text/plain']);
+      await wrapper.vm.addFile(file2, fileResourceKeys, true, ['text/plain']);
+      expect(fileResourceKeys).toHaveLength(2);
+      expect(fileResourceKeys[0]).toContain('file1.txt');
+      expect(fileResourceKeys[1]).toContain('file2.txt');
+    });
+    test('two files result in one file (the newest) if multiple files is not allowed', async () => {
+      //suppress console.warn regarding indexeddb missing: jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const fileResourceKeys = [];
+      const wrapper = mount(FileComp, getMountOpts({ value: [] }));
+      const file1 = getMockFile('file1.txt');
+      const file2 = getMockFile('file2.txt');
+      await wrapper.vm.addFile(file1, fileResourceKeys, false, ['text/plain']);
+      await wrapper.vm.addFile(file2, fileResourceKeys, false, ['text/plain']);
+      expect(fileResourceKeys).toHaveLength(1);
+      expect(fileResourceKeys[0]).toContain('file2.txt');
+    });
   });
   describe('removing', () => {
     test.todo('a file results in a value without that file');
