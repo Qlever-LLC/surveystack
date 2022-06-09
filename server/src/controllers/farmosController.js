@@ -598,7 +598,7 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
   }
 };
 
-export const fCgetGroupInformation = async (req, res) => {
+export const groupAdminMinimumGetGroupInformation = async (req, res) => {
   const group = await db.collection('groups').findOne({ _id: new ObjectId(req.params.groupId) });
   if (!group) {
     // group not found, boom!

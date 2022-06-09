@@ -10,7 +10,7 @@ import {
   webhookCallback,
   checkUrl,
   superAdminCreateFarmOsInstance,
-  fCgetGroupInformation,
+  groupAdminMinimumGetGroupInformation,
 } from './farmosController';
 import { createGroup, createReq, createRes, createUser } from '../testUtils';
 import {
@@ -350,7 +350,7 @@ describe('farmos-controller', () => {
       },
     };
   }
-  it('farmos-fCgetGroupInformation works fine', async () => {
+  it('farmos-groupAdminMinimumGetGroupInformation works fine', async () => {
     const group = await createGroup({ name: 'Bionutrient' });
     const admin1_data = { userOverrides: { name: 'Dan TerAvest', email: 'teravestdan@gmail.com' } };
     const admin1 = await group.createAdminMember(admin1_data);
@@ -359,14 +359,14 @@ describe('farmos-controller', () => {
     await createFarmosGroupSettings(group._id);
     const req = { params: { groupId: group._id } };
     const res = mockResSuperAdmin(true);
-    await fCgetGroupInformation(req, res);
+    await groupAdminMinimumGetGroupInformation(req, res);
     console.log('RES-1', res);
 
     expect(res.data.status).toStrictEqual('success');
     expect(res.data.response.groupId).toStrictEqual(group._id);
     expect(res.data.response.members.length).toBe(2);
   });
-  it('farmos-fCgetGroupInformation error with passed groupId', async () => {
+  it('farmos-groupAdminMinimumGetGroupInformation error with passed groupId', async () => {
     const group = await createGroup({ name: 'Bionutrient' });
     await createFarmosGroupSettings(group._id);
     let grpId = new ObjectId();
@@ -376,12 +376,12 @@ describe('farmos-controller', () => {
     const req = { params: { groupId: grpId } };
     const res = mockResSuperAdmin(true);
 
-    await expect(fCgetGroupInformation(req, res)).rejects.toThrow(
+    await expect(groupAdminMinimumGetGroupInformation(req, res)).rejects.toThrow(
       boom.notFound(`No group found: ${grpId}`)
     );
     console.log('RES-2', res);
   });
-  it('farmos-fCgetGroupInformation error by executing the service', async () => {
+  it('farmos-groupAdminMinimumGetGroupInformation error by executing the service', async () => {
     const group = await createGroup({ name: 'Bionutrient' });
     await createFarmosGroupSettings(group._id);
     const groupExt = await createGroup({ name: 'exterior' });
@@ -391,7 +391,7 @@ describe('farmos-controller', () => {
     const spy = jest.spyOn(farmosManageModule, 'getGroupInformation');
     spy.mockImplementation(() => Promise.reject({ message: 'custom error detected' }));
 
-    await fCgetGroupInformation(req, res);
+    await groupAdminMinimumGetGroupInformation(req, res);
     console.log('RES-3', res);
 
     expect(res.data.status).toStrictEqual('error');
