@@ -116,8 +116,16 @@ describe('File question', () => {
     });
   });
   describe('editing file name', () => {
-    test.todo('results in a changed name, label and key');
-    test.todo('prevents special characters like /, *, #, <> etc');
+    test('results in a changed resource key', async () => {
+      const fileResourceKeys = [];
+      const wrapper = mount(FileComp, getMountOpts({ value: fileResourceKeys }));
+      const file1 = getMockFile('file1.txt');
+      await wrapper.vm.addFile(file1, fileResourceKeys, true, ['text/plain']);
+      await wrapper.vm.editResourceName(fileResourceKeys[0], 0);
+      wrapper.vm.editFileName = 'new-file-name.txt';
+      await wrapper.vm.commitResourceName(fileResourceKeys[0], 0);
+      expect(wrapper.vm.$options.propsData.value[0]).toContain('new-file-name.txt');
+    });
   });
   describe('submitting', () => {
     test.todo('a submission with a file resource leads to a submission with a value containing a download url');
