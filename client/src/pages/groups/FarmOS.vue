@@ -31,6 +31,7 @@ export default {
     //TODO create route in API
     const allowSubGroupsJoinCoffeeShop = async (booleanValue) => {
       // update via api
+      const resp = await api.post('/farmos/subgrp-join-coffee-shop', { groupId: groupId, updateTo: booleanValue });
     };
     //TODO create route in API
     const allowSubGroupsAdminsCreateFarmOSFarmsInSS = async (booleanValue) => {

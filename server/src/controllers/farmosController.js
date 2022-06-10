@@ -27,6 +27,8 @@ import {
   disableFarmOSAccessForGroup,
   enableCoffeeShopAccessForGroup,
   disableCoffeeShopAccessForGroup,
+  enableSubgroupsToJoinCoffeeShop,
+  disableSubgroupsToJoinCoffeeShop,
 } from '../services/farmos/manage';
 import { aggregator } from '../services/farmos/aggregator';
 
@@ -652,6 +654,24 @@ export const groupAdminMinimumUpdateCoffeeShopAccess = async (req, res) => {
     await enableCoffeeShopAccessForGroup(groupId);
   } else {
     await disableCoffeeShopAccessForGroup(groupId);
+  }
+  return res.send({
+    status: 'success',
+  });
+};
+
+export const groupAdminMinimumUpdateJoinCoffeeShop = async (req, res) => {
+  const { groupId, updateTo } = req.body;
+  if (!groupId) {
+    throw boom.badData('groupId missing');
+  }
+  if (!updateTo) {
+    throw boom.badData('updated value missing');
+  }
+  if (updateTo) {
+    await enableSubgroupsToJoinCoffeeShop(groupId);
+  } else {
+    await disableSubgroupsToJoinCoffeeShop(groupId);
   }
   return res.send({
     status: 'success',

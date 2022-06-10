@@ -294,6 +294,12 @@ router.post(
   catchErrors(farmosController.groupAdminMinimumUpdateCoffeeShopAccess)
 );
 
+router.post(
+  '/farmos/subgrp-join-coffee-shop',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupAdminMinimumUpdateJoinCoffeeShop)
+);
+
 /** Integrations - Group */
 router.get('/group-integrations', catchErrors(groupIntegrationController.getIntegrations));
 
