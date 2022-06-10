@@ -127,8 +127,4 @@ describe('File question', () => {
       expect(wrapper.vm.$options.propsData.value[0]).toContain('new-file-name.txt');
     });
   });
-  describe('submitting', () => {
-    test.todo('a submission with a file resource leads to a submission with a value containing a download url');
-    test.todo('a submission with a file resource with missing file data prevents a submission to be submitted');
-  });
 });
