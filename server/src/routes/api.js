@@ -300,6 +300,12 @@ router.post(
   catchErrors(farmosController.groupAdminMinimumUpdateJoinCoffeeShop)
 );
 
+router.post(
+  '/farmos/subgrp-admins-create-farmos-instances',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupAdminMinimumUpdateCreateFarmOSInstances)
+);
+
 /** Integrations - Group */
 router.get('/group-integrations', catchErrors(groupIntegrationController.getIntegrations));
 

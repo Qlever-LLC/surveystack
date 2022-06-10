@@ -36,6 +36,10 @@ export default {
     //TODO create route in API
     const allowSubGroupsAdminsCreateFarmOSFarmsInSS = async (booleanValue) => {
       // update via api
+      const rest = await api.post('/farmos/subgrp-admins-create-farmos-instances', {
+        groupId: groupId,
+        updateTo: booleanValue,
+      });
     };
 
     function fetchData() {
