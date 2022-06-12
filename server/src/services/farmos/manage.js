@@ -3,7 +3,9 @@ import { db } from '../../db';
 import { aggregator } from './aggregator';
 import { uniqBy } from 'lodash';
 import boom from '@hapi/boom';
-import { getDescendantGroups } from '../roles.service';
+import _ from "lodash";
+import { getDescendantGroups, getAscendantGroups } from '../roles.service';
+
 
 const config = () => {
   if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
@@ -713,186 +715,151 @@ export const getCurrentSeatsFromDomain = async (groups) => {
   return 0;
 };
 
-/**
- * @param { Array } descendants
- * @returns all info (raw data) from members from the tested domain
- */
-export const getMembersCreatedinDescendantsGroups = async (descendants) => {
-  const descendantsId = [];
-  for (const descendant of descendants) {
-    descendantsId.push(descendant._id);
-  }
-  const getMembersCreatedinTestedDescendantsGroups = [
-    {
-      $match: {
-        group: { $in: descendantsId },
+export const getMembersCreatedinDescendantsGroupsCompat = async (descendants) => {
+  const descendantsIds = descendants.map(d => d._id);
+
+
+  const aggregation = [{
+    $match: {
+      group: {
+        $in: descendantsIds
+      }
+    }
+  }, {
+    $project: {
+      m_id: '$_id',
+      user: 1,
+      group: 1,
+      admin: {
+        $eq: [
+          '$role',
+          'admin'
+        ]
+      }
+    }
+  }, {
+    $lookup: {
+      from: 'groups',
+      localField: 'group',
+      foreignField: '_id',
+      as: 'group'
+    }
+  }, {
+    $project: {
+      m_id: 1,
+      admin: 1,
+      user: 1,
+      path: {
+        $arrayElemAt: [
+          '$group.path',
+          0
+        ]
       },
-    },
-    {
-      $project: {
-        _id: 1,
-        user: 1,
-        group: 1,
-        role: 1,
+      group_id: {
+        $arrayElemAt: [
+          '$group._id',
+          0
+        ]
+      }
+    }
+  }, {
+    $lookup: {
+      from: 'users',
+      localField: 'user',
+      foreignField: '_id',
+      as: 'user'
+    }
+  }, {
+    $project: {
+      m_id: 1,
+      admin: 1,
+      user: 1,
+      path: 1,
+      group_id: 1,
+      email: {
+        $arrayElemAt: [
+          '$user.email',
+          0
+        ]
       },
-    },
-    { $addFields: { m_id: '$_id' } },
-    {
-      $project: {
-        _id: 0,
-      },
-    },
-    {
-      $set: {
-        role: {
-          $cond: {
-            if: {
-              $eq: ['$role', 'admin'],
-            },
-            then: 'true',
-            else: 'false',
-          },
-        },
-      },
-    },
-    {
-      $lookup: {
-        from: 'groups',
-        localField: 'group',
-        foreignField: '_id',
-        pipeline: [
-          {
-            $project: {
-              _id: 0,
-              path: 1,
-            },
-          },
-        ],
-        as: 'membersLocation',
-      },
-    },
-    { $addFields: { location: { $arrayElemAt: ['$membersLocation.path', 0] } } },
-    {
-      $project: {
-        membersLocation: 0,
-      },
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'user',
-        foreignField: '_id',
-        pipeline: [
-          {
-            $project: {
-              _id: 0,
-              email: 1,
-              name: 1,
-            },
-          },
-        ],
-        as: 'members',
-      },
-    },
-    { $addFields: { email: { $arrayElemAt: ['$members.email', 0] } } },
-    { $addFields: { name: { $arrayElemAt: ['$members.name', 0] } } },
-    {
-      $project: {
-        members: 0,
-      },
-    },
-    {
-      $lookup: {
-        from: 'farmos-instances',
-        localField: 'user',
-        foreignField: 'userId',
-        pipeline: [
-          {
-            $project: {
-              userId: 0,
-            },
-          },
-          {
-            $set: { i_id: '$_id' },
-          },
-        ],
-        as: 'instances',
-      },
-    },
-    {
-      $lookup: {
-        from: 'farmos-group-mapping',
-        localField: 'instances.instanceName',
-        foreignField: 'instanceName',
-        pipeline: [
-          {
-            $group: {
-              _id: '$instanceName',
-              memberships: { $push: { groupId: '$groupId', fgm_id: '$_id' } },
-              fgm: { $push: '$_id' }, // used for nonMembers part
-            },
-          },
-        ],
-        as: 'memberships',
-      },
-    },
-    {
-      $addFields: {
-        connectedFarms: {
-          $map: {
-            input: '$instances',
-            in: {
-              $mergeObjects: [
-                '$$this',
-                {
-                  $arrayElemAt: [
-                    '$memberships',
-                    {
-                      $indexOfArray: ['$memberships._id', '$$this.instanceName'],
-                    },
-                  ],
-                },
-              ],
-            },
-          },
-        },
-      },
-    },
-    {
-      $project: {
-        'connectedFarms._id': 0,
-      },
-    },
-    {
-      $project: {
-        instances: 0,
-      },
-    },
-    {
-      $project: {
-        memberships: 0,
-      },
-    },
-    {
-      $lookup: {
-        from: 'groups',
-        localField: 'connectedFarms.memberships.groupId',
-        foreignField: '_id',
-        pipeline: [
-          {
-            $project: {
-              path: 1,
-            },
-          },
-        ],
-        as: 'mgroups',
-      },
-    },
-  ];
-  return await db
+      user_id: {
+        $arrayElemAt: [
+          '$user._id',
+          0
+        ]
+      }
+    }
+  }, {
+    $lookup: {
+      from: 'farmos-instances',
+      localField: 'user_id',
+      foreignField: 'userId',
+      as: 'farmos_instances'
+    }
+  }, {
+    $lookup: {
+      from: 'farmos-group-mapping',
+      localField: 'farmos_instances.instanceName',
+      foreignField: 'instanceName',
+      as: 'group_mappings'
+    }
+  }];
+
+
+
+  const res = await db
     .collection('memberships')
-    .aggregate(getMembersCreatedinTestedDescendantsGroups)
+    .aggregate(aggregation)
     .toArray();
+
+
+  // console.log(JSON.stringify(res, null, 2));
+
+  const groupIds = _.uniq(res.flatMap(item => item["group_mappings"].map(gm => gm.groupId)));
+  // console.log("groupIds", groupIds);
+
+  const groups = await db.collection('groups').find({
+    _id: { $in: groupIds.map(id => new ObjectId(id)) }
+  }).toArray();
+
+  const prj = res.map(item => {
+    return {
+      user: item.user_id,
+      group: item.group_id,
+      admin: item.admin,
+      path: item.path,
+      email: item.email,
+      name: item.user[0].name,
+      connectedFarms: item.farmos_instances.map(ins => ({
+        instanceName: ins.instanceName,
+        owner: ins.owner,
+        _id: ins._id,
+        groups: item.group_mappings.filter(g => g.instanceName == ins.instanceName).map(g => ({
+          groupId: g.groupId,
+          name: groups.find(group => group._id.equals(g.groupId))?.name,
+          path: groups.find(group => group._id.equals(g.groupId))?.path
+        })),
+      }))
+    }
+  });
+
+  const mappedInstances = _.uniq(prj.flatMap(item => item.connectedFarms.map(f => f.instanceName)));
+  const farmosInstancesMappedToAllGroups = await db.collection('farmos-group-mapping').find({
+    groupId: { $in: descendantsIds }
+  }).toArray();
+
+  // console.log("mappedInstances", mappedInstances);
+  // console.log("farmosInstancesMappedToAllGroups", farmosInstancesMappedToAllGroups);
+  const unassignedInstances = farmosInstancesMappedToAllGroups.filter(instance => !mappedInstances.some(m => m == instance.instanceName));
+  // console.log("unassignedInstances", unassignedInstances);
+
+  return {
+    members: prj,
+    unassignedInstances: unassignedInstances.map(u => ({
+      ...u,
+      path: groups.find(g => g._id.equals(u.groupId))?.path
+    }))
+  };
 };
 
 /**
@@ -934,74 +901,6 @@ export const getIdsFromFarmOSGroupMapped = async (rawData) => {
   return ids;
 };
 
-/**
- * @param { Array } descendants
- * @param { Array } farmOSGroupsMappedId
- * @returns array of nonMembers with only instanceName and path;
- * nonMembers are users who are not members from a Domain but who have a farmos mapped into it
- */
-export const getNonMembersWhoHaveFarmsLinkedinDescendantsGroups = async (
-  descendants,
-  farmOSGroupsMappedId
-) => {
-  const descendantsId = [];
-  for (const descendant of descendants) {
-    descendantsId.push(descendant._id);
-  }
-  const getNonMembersWhoHaveFarmsLinkedinTestedDescendantsGroups = [
-    {
-      $match: {
-        groupId: { $in: descendantsId },
-        _id: { $not: { $in: farmOSGroupsMappedId } },
-      },
-    },
-    {
-      $lookup: {
-        from: 'groups',
-        localField: 'groupId',
-        foreignField: '_id',
-        pipeline: [
-          {
-            $project: {
-              _id: 0,
-              path: 1,
-            },
-          },
-        ],
-        as: 'mgroups',
-      },
-    },
-    {
-      $lookup: {
-        from: 'farmos-instances',
-        localField: 'instanceName',
-        foreignField: 'instanceName',
-        pipeline: [
-          {
-            $project: {
-              _id: 1,
-            },
-          },
-        ],
-        as: 'instances',
-      },
-    },
-    { $addFields: { fgm_id: '$_id' } },
-    { $addFields: { path: { $arrayElemAt: ['$mgroups.path', 0] } } },
-    { $addFields: { i_id: { $arrayElemAt: ['$instances._id', 0] } } },
-    {
-      $project: {
-        mgroups: 0,
-        _id: 0,
-        instances: 0,
-      },
-    },
-  ];
-  return await db
-    .collection('farmos-group-mapping')
-    .aggregate(getNonMembersWhoHaveFarmsLinkedinTestedDescendantsGroups)
-    .toArray();
-};
 
 /**
  * @param { ObjectId } groupId
@@ -1019,11 +918,20 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
   const getRootGroup = await getFarmOSRootGroup(group);
   //this case should not be encountered because the access is protected in the Frontend
   if (getRootGroup === null) {
-    return boom.badData();
+    throw boom.notFound();
   }
+
   if (groupId.equals(getRootGroup._id)) {
     testedGroupIsRoot = true;
   }
+
+
+  const ascendants = await getAscendantGroups(group, {
+    _id: 1,
+    name: 1,
+    dir: 1,
+    path: 1,
+  });
 
   const descendants = await getDescendantGroups(group, {
     _id: 1,
@@ -1042,6 +950,7 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
         allowSubgroupsToJoinCoffeeShop: 1,
         allowSubgroupAdminsToCreateFarmOSInstances: 1,
         maxSeats: 1,
+        name: group.name
       });
     } else {
       groupSettings = await getGroupSettings(groupId, {
@@ -1060,21 +969,58 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
   const groupName = await getRewrittenPathFromGroupPath(group.path);
   let groupInformation = { name: groupName };
   //get members part from JSON response
-  const membersRawData = await getMembersCreatedinDescendantsGroups(descendants);
-  const farmOSGroupsMappedId = await getIdsFromFarmOSGroupMapped(membersRawData);
-  const membersPart = await structureMembersPart(membersRawData);
-  const nonMembersPart = await getNonMembersWhoHaveFarmsLinkedinDescendantsGroups(
-    descendants,
-    farmOSGroupsMappedId
-  );
+  const membersRawData = await getMembersCreatedinDescendantsGroupsCompat(descendants);
+  console.log("membersRawData", JSON.stringify(membersRawData, null, 2));
 
-  for (const nonMember of nonMembersPart) {
-    nonMember.path = await getRewrittenPathFromGroupPath(nonMember.path);
+
+  const allGroups = [...ascendants, ...descendants];
+
+  const resolveName = (path) => {
+    const parts = path.trim().split("/");
+    // console.log("parts", parts);
+
+    let current = ""
+    let breadcrumb = ""
+    for (const p of parts) {
+      if (!p) {
+        continue;
+      }
+
+      current += `/${p}`;
+      const grpname = allGroups.find(g => g.path === `${current}/`)?.name
+      // console.log(p, current, grpname);
+      if (!breadcrumb) {
+        breadcrumb = grpname
+      } else {
+        breadcrumb = `${breadcrumb} > ${grpname}`
+      }
+    }
+
+    return breadcrumb;
   }
 
-  groupInformation.members = membersPart;
-  groupInformation.nonMembers = nonMembersPart;
-  groupInformation = { ...groupSettings, ...groupInformation };
+  const groupPaths = {}
 
+  for (const g of allGroups) {
+    groupPaths[g.path] = resolveName(g.path)
+  }
+
+  groupSettings.name = groupPaths[group.path]
+
+  for (const member of membersRawData.members) {
+    member.breadcrumb = groupPaths[member.path]
+    for (const farm of member.connectedFarms) {
+      for (const g of farm.groups) {
+        g.breadcrumb = groupPaths[g.path];
+      }
+    }
+  }
+
+  for (const inst of membersRawData.unassignedInstances) {
+    inst.breadcrumb = groupPaths[inst.path];
+  }
+
+
+  groupInformation = { ...groupSettings, ...membersRawData };
   return groupInformation;
 };

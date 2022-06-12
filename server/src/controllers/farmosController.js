@@ -607,37 +607,33 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
 };
 
 export const groupAdminMinimumGetGroupInformation = async (req, res) => {
-  const group = await db.collection('groups').findOne({ _id: new ObjectId(req.params.groupId) });
+  const groupId = asMongoId(req.params.groupId);
+  const group = await db.collection('groups').findOne({ _id: groupId });
   if (!group) {
     // group not found, boom!
-    throw boom.notFound(`No group found: ${req.params.groupId}`);
+    throw boom.notFound(`No group found: ${groupId}`);
   }
-  try {
-    const r = await getGroupInformation(req.params.groupId, res.locals.auth.isSuperAdmin);
-    res.send({
-      status: 'success',
-      response: r,
-    });
-  } catch (error) {
-    return res.send({
-      status: 'error',
-      message: error.message,
-    });
-  }
+
+  const r = await getGroupInformation(groupId, res.locals.auth.isSuperAdmin);
+  return res.send({
+    status: 'success',
+    response: r,
+  });
+
 };
 
 export const superAdminUpdateFarmOSAccess = async (req, res) => {
-  const { groupId, updateTo } = req.body;
+  const { groupId, enable } = req.body;
   if (!groupId) {
     throw boom.badData('groupId missing');
   }
-  if (!updateTo) {
+  if (enable == undefined) {
     throw boom.badData('updated value missing');
   }
-  if (updateTo) {
-    await enableFarmOSAccessForGroup(groupId);
+  if (enable) {
+    await enableFarmOSAccessForGroup(asMongoId(groupId));
   } else {
-    await disableFarmOSAccessForGroup(groupId);
+    await disableFarmOSAccessForGroup(asMongoId(groupId));
   }
   return res.send({
     status: 'success',

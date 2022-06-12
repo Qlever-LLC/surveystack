@@ -1,11 +1,7 @@
 <template>
   <v-container>
-    <app-dialog
-      v-model="learnMoreDialog"
-      title="Premium Features"
-      @confirm="learnMoreDialog = false"
-      @cancel="learnMoreDialog = false"
-    >
+    <app-dialog v-model="learnMoreDialog" title="Premium Features" @confirm="learnMoreDialog = false"
+      @cancel="learnMoreDialog = false">
       <p>
         With a paid subscription you can upgrade to
         <strong>your own white-labelled app</strong> with a <strong>custom url</strong>, and your
@@ -21,9 +17,9 @@
         </li>
       </ul>
       <p>
-        To learn more about paid subscriptions please contact Dan TerAvest (<a href="mailto:dan@our-sci.net"
-          >dan@our-sci.net</a
-        >) or Greg Austic (<a href="mailto:greg@our-sci.net">greg@our-sci.net</a>)
+        To learn more about paid subscriptions please contact Dan TerAvest (<a
+          href="mailto:dan@our-sci.net">dan@our-sci.net</a>) or Greg Austic (<a
+          href="mailto:greg@our-sci.net">greg@our-sci.net</a>)
       </p>
     </app-dialog>
 
@@ -44,41 +40,19 @@
     </div>
     <v-card class="pa-4 mb-4">
       <form @submit.prevent="onSubmit" autocomplete="off">
-        <v-text-field
-          label="Name"
-          placeholder="Enter group name"
-          id="group-name"
-          autocomplete="off"
-          v-model="entity.name"
-        />
-        <v-text-field
-          label="Slug"
-          placeholder="Enter group slug or use suggested"
-          id="group-slug"
-          v-model="entity.slug"
-          :readonly="!editSlug"
-          :append-icon="editSlug ? 'mdi-pencil-off-outline' : 'mdi-pencil-outline'"
-          autocomplete="off"
-          @click:append="editSlug = !editSlug"
-          hint="URL friendly version of name"
-          persistent-hint
-          :disabled="isWhitelabel && entity.path === whitelabelPartner.path"
-        />
+        <v-text-field label="Name" placeholder="Enter group name" id="group-name" autocomplete="off"
+          v-model="entity.name" />
+        <v-text-field label="Slug" placeholder="Enter group slug or use suggested" id="group-slug" v-model="entity.slug"
+          :readonly="!editSlug" :append-icon="editSlug ? 'mdi-pencil-off-outline' : 'mdi-pencil-outline'"
+          autocomplete="off" @click:append="editSlug = !editSlug" hint="URL friendly version of name" persistent-hint
+          :disabled="isWhitelabel && entity.path === whitelabelPartner.path" />
         <div class="d-flex align-center mt-6">
-          <v-checkbox
-            label="Invitation Only"
-            v-model="entity.meta.invitationOnly"
-            :hint="
-              entity.meta.invitationOnly ? 'Users can only join through an invitation' : 'Everybody may join this group'
-            "
-            persistent-hint
-            :disabled="!isPremium"
-            class="d-inline mt-0"
-          />
+          <v-checkbox label="Invitation Only" v-model="entity.meta.invitationOnly" :hint="
+            entity.meta.invitationOnly ? 'Users can only join through an invitation' : 'Everybody may join this group'
+          " persistent-hint :disabled="!isPremium" class="d-inline mt-0" />
           <div class="ml-auto ml-sm-6">
-            <v-btn small v-if="!isPremium" @click="learnMoreDialog = true" outlined color="primary"
-              >Learn more...</v-btn
-            >
+            <v-btn small v-if="!isPremium" @click="learnMoreDialog = true" outlined color="primary">Learn more...
+            </v-btn>
           </div>
         </div>
         <v-checkbox label="Archived" v-model="entity.meta.archived" />
@@ -90,52 +64,34 @@
     </v-card>
 
     <v-row>
-      <v-col cols="12" lg="6">
-        <app-pinned-surveys
-          class="mb-4"
-          v-if="editMode"
-          :entities="entity.surveys.pinned"
-          :searchResults="searchResults"
-          @search="searchSurveys"
-        >
+      <v-col cols="12" lg="12">
+        <app-pinned-surveys class="mb-4" v-if="editMode" :entities="entity.surveys.pinned"
+          :searchResults="searchResults" @search="searchSurveys">
         </app-pinned-surveys>
-      </v-col>
-      <v-col cols="12" lg="6">
-        <v-card v-if="editMode" class="mb-4">
-          <app-integration-list
-            title="Group Integrations"
-            :entities="integrations"
-            integrationType="group"
-            :newRoute="{
-              name: 'group-integrations-new',
-              query: { group: entity._id },
-            }"
-          />
-        </v-card>
       </v-col>
     </v-row>
 
-    <app-basic-list
-      editable
-      class="mb-4"
-      v-if="editMode"
-      :entities="members"
-      title="Members"
-      :link="(member) => `/memberships/${member._id}/edit`"
-      :linkNew="{
+    <app-basic-list class="mb-4" v-if="editMode" :entities="integrations" title="Integrations"
+      :link="(integration) => `/group-manage/${integration.slug}/${entity._id}`">
+      <template v-slot:entity="{ entity }">
+        <v-list-item-content>
+          <v-list-item-title>{{ entity.name }}</v-list-item-title>
+          <v-list-item-subtitle>{{ entity.description }} </v-list-item-subtitle>
+        </v-list-item-content>
+      </template>
+    </app-basic-list>
+
+    <app-basic-list editable class="mb-4" v-if="editMode" :entities="members" title="Members"
+      :link="(member) => `/memberships/${member._id}/edit`" :linkNew="{
         name: 'memberships-new',
         query: { group: entity._id, role: 'user' },
-      }"
-      :filter="filterMembers"
-    >
+      }" :filter="filterMembers">
       <template v-slot:entity="{ entity }">
         <v-list-item-content v-if="entity.meta && entity.meta.status === 'pending'">
-          <v-list-item-title class="text--secondary"
-            >[Pending] {{ entity.meta.invitationEmail
-            }}{{ entity.meta.invitationName ? ` - ${entity.meta.invitationName}` : '' }}</v-list-item-title
-          >
+          <v-list-item-title class="text--secondary">[Pending] {{ entity.meta.invitationEmail
+          }}{{ entity.meta.invitationName ? ` - ${entity.meta.invitationName}` : '' }}</v-list-item-title>
           <v-list-item-subtitle>{{
-            entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'
+              entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'
           }}</v-list-item-subtitle>
         </v-list-item-content>
 
@@ -169,6 +125,14 @@ const appFarmHubOnboarding = () => import('@/components/integrations/FarmHubOnbo
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
 
+const integrations = [
+  {
+    name: "FarmOS",
+    description: "Manage FarmOS integration",
+    slug: `farmos`, // used for the link /group-manage/farmos/$GROUP_ID
+  }
+];
+
 export default {
   components: {
     appIntegrationList,
@@ -198,10 +162,10 @@ export default {
           pinned: [],
         },
       },
-      integrations: [],
       searchResults: [],
       members: [],
       learnMoreDialog: false,
+      integrations,
     };
   },
   methods: {
@@ -322,8 +286,8 @@ export default {
         const { data: members } = await api.get(`/memberships?group=${this.entity._id}&populate=true`);
         this.members = members;
 
-        const { data: integrations } = await api.get(`/group-integrations?group=${id}&populate=true`);
-        this.integrations = integrations;
+        // const { data: integrations } = await api.get(`/group-integrations?group=${id}&populate=true`);
+        // this.integrations = integrations;
       } catch (e) {
         console.log('something went wrong:', e);
       }

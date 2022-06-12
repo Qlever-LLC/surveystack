@@ -98,7 +98,7 @@
                 <span v-if="item.admin" class="mdi mdi-crown pr-1"></span>
                 <span v-if="item.name"
                   >{{ item.name }} ({{ item.email }}) <br />
-                  {{ item.location }}</span
+                  {{ item.path }}</span
                 >
               </span>
               <span v-if="item.name">
@@ -214,7 +214,10 @@ export default {
     });
 
     function filterGMembers(item) {
-      return item.name?.toLowerCase().includes(arrHeaderSearch.value[0].toLowerCase());
+      if(!item.name) {
+        return null;
+      }
+      return item.name.toLowerCase().includes(arrHeaderSearch.value[0].toLowerCase());
     }
     function filterCoFarms(item) {
       let result = false;

@@ -277,13 +277,13 @@ router.post(
 );
 
 router.get(
-  'farmos/group-manage/:groupId',
+  '/farmos/group-manage/:groupId',
   [assertHasGroupAdminAccess],
   catchErrors(farmosController.groupAdminMinimumGetGroupInformation)
 );
 
 router.post(
-  '/farmos/farmos-access',
+  '/farmos/group-manage/enable',
   [assertIsSuperAdmin],
   catchErrors(farmosController.superAdminUpdateFarmOSAccess)
 );

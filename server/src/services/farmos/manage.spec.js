@@ -292,7 +292,7 @@ describe('manageFarmOS', () => {
     await createFarmosGroupSettings(groupLabs._id);
 
     const groupLabsInfos = await getGroupInformation(groupLabs._id, true);
-    //console.log('INFORMATION', groupLabsInfos);
+    // console.log('INFORMATION', groupLabsInfos);
 
     expect(groupLabsInfos.groupHasFarmOSAccess).toBeTruthy();
     expect(groupLabsInfos.groupHasCoffeeShopAccess).toBeFalsy();
@@ -301,74 +301,73 @@ describe('manageFarmOS', () => {
     expect(groupLabsInfos.seats.current).toBe(7);
     expect(groupLabsInfos.seats.max).toBe(20);
     expect(groupLabsInfos.name).toBe('Bionutrient > Labs');
-
     expect(groupLabsInfos.members).toHaveLength(3);
-    expect(groupLabsInfos.members[0].role).toBeTruthy();
-    expect(groupLabsInfos.members[0].location).toBe('Bionutrient > Labs');
+    expect(groupLabsInfos.members[0].admin).toBeTruthy();
+    expect(groupLabsInfos.members[0].breadcrumb).toBe('Bionutrient > Labs');
     expect(groupLabsInfos.members[0].email).toBe('teravestdan@gmail.com');
     expect(groupLabsInfos.members[0].connectedFarms).toHaveLength(4);
     expect(groupLabsInfos.members[0].connectedFarms[0].instanceName).toBe(
       'dan_teravest_farm.farmos.net'
     );
-    expect(groupLabsInfos.members[0].connectedFarms[0].memberships).toHaveLength(1);
-    expect(groupLabsInfos.members[0].connectedFarms[0].memberships[0].path).toBe(
+    expect(groupLabsInfos.members[0].connectedFarms[0].groups).toHaveLength(1);
+    expect(groupLabsInfos.members[0].connectedFarms[0].groups[0].breadcrumb).toBe(
       'Bionutrient > Labs'
     );
     expect(groupLabsInfos.members[0].connectedFarms[1].instanceName).toBe('lees_farm.farmos.net');
-    expect(groupLabsInfos.members[0].connectedFarms[1].memberships).toHaveLength(2);
-    expect(groupLabsInfos.members[0].connectedFarms[1].memberships[0].path).toBe(
+    expect(groupLabsInfos.members[0].connectedFarms[1].groups).toHaveLength(2);
+    expect(groupLabsInfos.members[0].connectedFarms[1].groups[0].breadcrumb).toBe(
       'Bionutrient > Labs'
     );
-    expect(groupLabsInfos.members[0].connectedFarms[1].memberships[1].path).toBe(
+    expect(groupLabsInfos.members[0].connectedFarms[1].groups[1].breadcrumb).toBe(
       'Bionutrient > Labs > Michigan'
     );
     expect(groupLabsInfos.members[0].connectedFarms[2].instanceName).toBe('ourscinet.farmos.net');
-    expect(groupLabsInfos.members[0].connectedFarms[2].memberships).toHaveLength(5);
-    expect(groupLabsInfos.members[0].connectedFarms[2].memberships[0].path).toBe(
+    expect(groupLabsInfos.members[0].connectedFarms[2].groups).toHaveLength(5);
+    expect(groupLabsInfos.members[0].connectedFarms[2].groups[0].breadcrumb).toBe(
       'Bionutrient > Labs'
     );
-    expect(groupLabsInfos.members[0].connectedFarms[2].memberships[1].path).toBe(
+    expect(groupLabsInfos.members[0].connectedFarms[2].groups[1].breadcrumb).toBe(
       'Bionutrient > Labs > Michigan'
     );
-    expect(groupLabsInfos.members[0].connectedFarms[2].memberships[2].path).toBe(
+    expect(groupLabsInfos.members[0].connectedFarms[2].groups[2].breadcrumb).toBe(
       'Bionutrient > Labs > Europe'
     );
-    expect(groupLabsInfos.members[0].connectedFarms[2].memberships[3].path).toBe(
+    expect(groupLabsInfos.members[0].connectedFarms[2].groups[3].breadcrumb).toBe(
       'Bionutrient > Labs > Community'
     );
-    expect(groupLabsInfos.members[0].connectedFarms[2].memberships[4].path).toBe(
+    expect(groupLabsInfos.members[0].connectedFarms[2].groups[4].breadcrumb).toBe(
       'Bionutrient > Labs > Community > Lab'
     );
     expect(groupLabsInfos.members[0].connectedFarms[3].instanceName).toBe('coffeeshop.farmos.net');
-    expect(groupLabsInfos.members[0].connectedFarms[3].memberships).toHaveLength(1);
-    expect(groupLabsInfos.members[0].connectedFarms[3].memberships[0].path).toBe(
+    expect(groupLabsInfos.members[0].connectedFarms[3].groups).toHaveLength(1);
+    expect(groupLabsInfos.members[0].connectedFarms[3].groups[0].breadcrumb).toBe(
       'Bionutrient > Labs > Michigan'
     );
 
-    expect(groupLabsInfos.members[1].role).toBe('false');
-    expect(groupLabsInfos.members[1].location).toBe('Bionutrient > Labs');
+    expect(groupLabsInfos.members[1].admin).toBe(false);
+    expect(groupLabsInfos.members[1].breadcrumb).toBe('Bionutrient > Labs');
     expect(groupLabsInfos.members[1].email).toBe('djole2352@gmail.com');
     expect(groupLabsInfos.members[1].connectedFarms).toHaveLength(0);
 
-    expect(groupLabsInfos.members[2].role).toBe('false');
-    expect(groupLabsInfos.members[2].location).toBe('Bionutrient > Labs > Michigan');
+    expect(groupLabsInfos.members[2].admin).toBe(false);
+    expect(groupLabsInfos.members[2].breadcrumb).toBe('Bionutrient > Labs > Michigan');
     expect(groupLabsInfos.members[2].email).toBe('bigjenny@bj.net');
     expect(groupLabsInfos.members[2].connectedFarms).toHaveLength(1);
     expect(groupLabsInfos.members[2].connectedFarms[0].instanceName).toBe(
       'jennybigfarmstand.farmos.net'
     );
-    expect(groupLabsInfos.members[2].connectedFarms[0].memberships).toHaveLength(1);
-    expect(groupLabsInfos.members[2].connectedFarms[0].memberships[0].path).toBe(
+    expect(groupLabsInfos.members[2].connectedFarms[0].groups).toHaveLength(1);
+    expect(groupLabsInfos.members[2].connectedFarms[0].groups[0].breadcrumb).toBe(
       'Bionutrient > Labs > Michigan'
     );
 
-    expect(groupLabsInfos.nonMembers).toHaveLength(2);
-    expect(groupLabsInfos.nonMembers[0].instanceName).toBe('external.farmos.net');
-    expect(groupLabsInfos.nonMembers[0].path).toBe('Bionutrient > Labs > Michigan');
-    expect(groupLabsInfos.nonMembers[0].i_id).toStrictEqual(external_farmos_net_data._id);
-    expect(groupLabsInfos.nonMembers[1].instanceName).toBe('external2.farmos.net');
-    expect(groupLabsInfos.nonMembers[1].path).toBe('Bionutrient > Labs > Michigan');
-    expect(groupLabsInfos.nonMembers[1].i_id).toStrictEqual(external2_farmos_net_data._id);
+    expect(groupLabsInfos.unassignedInstances).toHaveLength(2);
+    expect(groupLabsInfos.unassignedInstances[0].instanceName).toBe('external.farmos.net');
+    expect(groupLabsInfos.unassignedInstances[0].breadcrumb).toBe('Bionutrient > Labs > Michigan');
+    expect(groupLabsInfos.unassignedInstances[0]._id).toStrictEqual(external_farmos_net_data._id);
+    expect(groupLabsInfos.unassignedInstances[1].instanceName).toBe('external2.farmos.net');
+    expect(groupLabsInfos.unassignedInstances[1].breadcrumb).toBe('Bionutrient > Labs > Michigan');
+    expect(groupLabsInfos.unassignedInstances[1]._id).toStrictEqual(external2_farmos_net_data._id);
   });
 
   it('createFarmosGroupSettings, getGroupSettings and setGroupSettings', async () => {

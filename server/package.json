@@ -60,7 +60,7 @@
     "js-base64": "^3.7.2",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
-    "mongodb": "^3.3.3",
+    "mongodb": "^3.7.3",
     "nodemailer": "^6.4.3",
     "papaparse": "^5.1.1",
     "sanitize-html": "^2.6.1",

@@ -54,6 +54,8 @@ import store from '@/store';
 const Builder = () => import('@/pages/builder/Builder.vue');
 const Script = () => import('@/pages/scripts/Script.vue');
 const ScriptEdit = () => import('@/pages/scripts/ScriptEdit.vue');
+const FarmOSGroupManage = () => import('@/pages/groups/FarmOS.vue');
+
 
 Vue.use(VueRouter);
 
@@ -195,6 +197,12 @@ const routes = [
     beforeEnter: superGuard,
   },
   {
+    path: '/group-manage/farmos/:id',
+    name: 'farmos-group-manage',
+    props: true,
+    components: getComponents(FarmOSGroupManage),
+  },
+  {
     path: '/users/new',
     name: 'users-new',
     components: getComponents(UserEdit),
@@ -318,12 +326,12 @@ const routes = [
   ...(process.env.NODE_ENV === 'production'
     ? []
     : [
-        {
-          path: '/tabularasa',
-          name: 'tabula-rasa',
-          component: TabulaRasa,
-        },
-      ]),
+      {
+        path: '/tabularasa',
+        name: 'tabula-rasa',
+        component: TabulaRasa,
+      },
+    ]),
   {
     path: '/kit/*',
     name: 'kit',

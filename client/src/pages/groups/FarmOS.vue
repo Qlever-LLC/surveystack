@@ -1,37 +1,67 @@
 <template>
-  <FarmOSGroupSettings
-    @addGrpCoffeeShop="addGroupCoffeeShop"
+  <FarmOSGroupSettings v-if="groupInfos" class="ma-16" @addGrpCoffeeShop="addGroupCoffeeShop"
     @allowSbGrpsJoinCoffeeShop="allowSubGroupsJoinCoffeeShop"
-    @allowSbGrpsAdminsCreateFarmOSFarmsInSS="allowSubGroupsAdminsCreateFarmOSFarmsInSS"
-    :groupInfos="unifomMembersInGroupInfos"
-  ></FarmOSGroupSettings>
+    @allowSbGrpsAdminsCreateFarmOSFarmsInSS="allowSubGroupsAdminsCreateFarmOSFarmsInSS" :groupInfos="groupInfos">
+  </FarmOSGroupSettings>
+  <v-container v-else>
+    <v-row>
+      <v-col lg="4">
+        <v-card class="pa-8" v-if="superAdmin">
+          <p>FarmOS Integrations are disabled for this group.</p>
+          <v-btn color="primary" type="submit" @click="enable">Enable</v-btn>
+        </v-card>
+        <v-card class="pa-8" v-else>
+          <p>Please contact Surveystack to enable FarmOS integration for your Group</p>
+          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank"> Our-Sci</v-btn>
+        </v-card>
+      </v-col>
+    </v-row>
+
+  </v-container>
+
 </template>
 
 <script>
 import api from '@/services/api.service';
-import { ref, computed } from '@vue/composition-api';
-import { FarmOSGroupSettings } from './../../components/integrations/FarmOSGroupSettings.vue';
+import FarmOSGroupSettings from './../../components/integrations/FarmOSGroupSettings.vue';
+
+
 export default {
   props: {
-    groupId: String,
+    id: String,
   },
   components: {
     FarmOSGroupSettings,
   },
-  async setup(props) {
+  computed: {
+    superAdmin() {
+      return this.$store.getters['auth/isSuperAdmin'];
+    }
+  },
+  data() {
+    return {
+      groupInfos: null,
+      groupId: null,
+    }
+  },
+  async created() {
     // setup function
     // fetch group settings
-    const groupInfos = ref([]);
+    const { id: groupId } = this.$route.params;
+    this.groupId = groupId;
+    console.log("groupId", groupId);
 
+
+    console.log("groupId", groupId);
     //TODO create route in API
     const addGroupCoffeeShop = async (booleanValue, groupId) => {
       // update via api
-      const resp = await api.post('/farmos/coffee-shop-access', { groupId: groupId, updateTo: booleanValue });
+      const res = await api.post('/farmos/coffee-shop-access', { groupId: groupId, updateTo: booleanValue });
     };
     //TODO create route in API
     const allowSubGroupsJoinCoffeeShop = async (booleanValue) => {
       // update via api
-      const resp = await api.post('/farmos/subgrp-join-coffee-shop', { groupId: groupId, updateTo: booleanValue });
+      const res = await api.post('/farmos/subgrp-join-coffee-shop', { groupId: groupId, updateTo: booleanValue });
     };
     //TODO create route in API
     const allowSubGroupsAdminsCreateFarmOSFarmsInSS = async (booleanValue) => {
@@ -42,39 +72,49 @@ export default {
       });
     };
 
-    function fetchData() {
-      const resp = await api.get('farmos/group-manage/' + groupId);
-      groupInfos.value = resp.data;
+    try {
+      const res = await api.get('/farmos/group-manage/' + groupId);
+      this.groupInfos.value = res.data;
+    } catch (error) {
+      console.log("error", error);
     }
 
-    onMounted(() => {
-      fetchData();
+    /*
+    this.groupInfos.value.members.forEach((el) => {
+      if (el.connectedFarms[0] == undefined) {
+        el.connectedFarms.push({});
+      }
     });
-
-    function unifomMembersInGroupInfos() {
-      groupInfos.value.members.forEach((el) => {
-        if (el.connectedFarms[0] == undefined) {
-          el.connectedFarms.push({});
-        }
-      });
-      groupInfos.value.nonMembers.forEach((el) => {
-        // without this if-check, we have an infinite loop
-        if (!el.connectedFarms) {
-          el.connectedFarms = [];
-          let memberships = [];
-          memberships.push({ groupId: el.groupId, fgm_id: el.fgm_id, path: el.path });
-          el.connectedFarms.push({ instanceName: el.instanceName, memberships: memberships });
-          groupInfos.value.members.push(el);
-        }
-      });
-      return groupInfos.value;
-    }
-
-    return {
-      groupInfos,
-      updateGroupConfig,
-      unifomMembersInGroupInfos,
-    };
+    this.groupInfos.value.nonMembers.forEach((el) => {
+      // without this if-check, we have an infinite loop
+      if (!el.connectedFarms) {
+        el.connectedFarms = [];
+        let memberships = [];
+        memberships.push({ groupId: el.groupId, fgm_id: el.fgm_id, path: el.path });
+        el.connectedFarms.push({ instanceName: el.instanceName, memberships: memberships });
+        this.groupInfos.value.members.push(el);
+      }
+    });
+    */
   },
+  methods: {
+    updateGroupConfig() { },
+    unifomMembersInGroupInfos() { },
+    addGroupCoffeeShop() { },
+    allowSubGroupsJoinCoffeeShop() { },
+    allowSubGroupsAdminsCreateFarmOSFarmsInSS() { },
+    async enable() {
+      const res = await api.post('/farmos/group-manage/enable', { groupId: this.groupId, enable: true });
+      console.log("res", res.data);
+
+
+      try {
+        const res = await api.get('/farmos/group-manage/' + this.groupId);
+        this.groupInfos.value = res.data;
+      } catch (error) {
+        console.log("error", error);
+      }
+    }
+  }
 };
 </script>
