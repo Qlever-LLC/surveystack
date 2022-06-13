@@ -1,6 +1,7 @@
 import uuidv4 from 'uuid/v4';
 import { startCase, pick } from 'lodash';
 import { db, COLL_ACCESS_CODES } from '../db';
+import { ObjectId } from 'mongodb';
 import rolesService from '../services/roles.service';
 import crypto from 'crypto';
 
@@ -18,6 +19,7 @@ export const createUserDoc = (overrides) => ({
 });
 
 export const createUserIfNotExist = async (email, name = null) => {
+  email = email.toLowerCase();
   if (!name) {
     // use the first part of the email as the default name
     name = startCase(email.split('@')[0]);
@@ -65,6 +67,22 @@ export const createMagicLink = async ({
   }
 
   return link;
+};
+
+export const createInvalidateMagicLink = async ({ origin, accessCodeId }) => {
+  if (!origin) {
+    throw new Error('createInvalidateMagicLink: "origin" parameter is required');
+  }
+  if (!(accessCodeId instanceof ObjectId)) {
+    throw new Error('createInvalidateMagicLink: "accessCodeId" parameter has to be an ObjectID');
+  }
+  const invalidateCode = crypto.randomBytes(32).toString('hex');
+
+  await db
+    .collection(COLL_ACCESS_CODES)
+    .updateOne({ _id: accessCodeId }, { $set: { invalidateCode } });
+
+  return `${origin}/api/auth/invalidate-magic-link?invalidateCode=${invalidateCode}`;
 };
 
 export const createLoginPayload = async (userObject) => {
