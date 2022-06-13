@@ -405,7 +405,6 @@ describe('surveys', () => {
     expect(group.name).toBe('group_1_x');
     expect(group.children[1].children[1].name).toBe('group_5_x');
   });
-  //TODO
   test('replaceControl works', () => {
     let controls = mockControls();
     const replacePath = 'group_1.group_3.group_5.instructions_6';
