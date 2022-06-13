@@ -3,9 +3,8 @@ import { db } from '../../db';
 import { aggregator } from './aggregator';
 import { uniqBy } from 'lodash';
 import boom from '@hapi/boom';
-import _ from "lodash";
+import _ from 'lodash';
 import { getDescendantGroups, getAscendantGroups } from '../roles.service';
-
 
 const config = () => {
   if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
@@ -21,37 +20,246 @@ export const asMongoId = (source) =>
 
 /**
  * @param { Object } group who contains attribut path
- * @returns RootGroup or null;
+ * @returns root group ID or null;
  * is RootGroup if group has an entry in farmos-group-settigns
  */
-export const getFarmOSRootGroup = async (group) => {
-  const groupsPath = getArrayPathsConainedInPath(group.path);
-  const id = await getGroupIdFromGroupInFarmosGroupSettingsFromPaths(groupsPath);
-  if (id) {
-    return await getGroupFromGroupId(id, undefined);
+export const getFarmOSRootGroup = async (ascendantGroups, descendantGroups) => {
+  const union = [...ascendantGroups, ...descendantGroups];
+
+  const ids = union.map((g) => g._id);
+
+  const res = await db
+    .collection('farmos-group-settings')
+    .find({
+      groupId: {
+        $in: ids,
+      },
+    })
+    .toArray();
+
+  if (res.length == 0) {
+    return null;
   }
-  return null;
+
+  return union.find((g) => g._id.equals(res[0].groupId));
 };
 
-/**
- * @param { ObjectId } groupId
- * @returns true or false;
- * true means no RootGroup in direct way to MainGroup AND no RootGroup in all Subgroups
- */
-export const canBecomeFarmOSRootGroup = async (groupId) => {
-  const group = await getGroupFromGroupId(groupId, { path: 1 });
-  const groupsPath = getArrayPathsConainedInPath(group.path);
-  const subgroups = await getDescendantGroups(group, {
-    _id: 0,
-    path: 1,
-  });
-  for (const subgroup of subgroups) {
-    groupsPath.push(subgroup.path);
+export const getTree = async (group) => {
+  const descendants = await getDescendantGroups(group);
+  const ascendants = await getAscendantGroups(group);
+  let domainRoot = await getFarmOSRootGroup(ascendants, descendants);
+
+  const allGroups = [...ascendants, ...descendants];
+
+  const isDomainRooInDescendants = () => {
+    return descendants
+      .filter((d) => !d._id.equals(group._id) /* exclude self*/)
+      .some((d) => d._id.equals(domainRoot._id));
+  };
+
+  const resolveName = (path) => {
+    const parts = path.trim().split('/');
+    // console.log("parts", parts);
+
+    let current = '';
+    let breadcrumb = '';
+    for (const p of parts) {
+      if (!p) {
+        continue;
+      }
+
+      current += `/${p}`;
+      const grpname = allGroups.find((g) => g.path === `${current}/`)?.name;
+      // console.log(p, current, grpname);
+      if (!breadcrumb) {
+        breadcrumb = grpname;
+      } else {
+        breadcrumb = `${breadcrumb} > ${grpname}`;
+      }
+    }
+
+    return breadcrumb;
+  };
+
+  const breadcrumbsByPath = {};
+
+  for (const g of allGroups) {
+    breadcrumbsByPath[g.path] = resolveName(g.path);
   }
-  if (await getGroupIdFromGroupInFarmosGroupSettingsFromPaths(groupsPath)) {
-    return false;
-  }
-  return true;
+
+  const Attributes = {
+    EnableFarmOS: 'groupHasFarmOSAccess',
+    EnableCoffeShop: 'groupHasCoffeeShopAccess',
+    AllowSubgroupsJoinCoffeeShop: 'allowSubgroupsToJoinCoffeeShop',
+    AllowSubgroupAdminsToCreateInstances: 'allowSubgroupAdminsToCreateFarmOSInstances',
+  };
+
+  const domainInformation = async (projection) => {
+    if (!domainRoot) {
+      return null;
+    }
+
+    if (isDomainRooInDescendants()) {
+      return null;
+    }
+
+    const groupSettings = await db
+      .collection('farmos-group-settings')
+      .findOne({ groupId: domainRoot._id }, { projection: projection });
+
+    const seats = (
+      await db
+        .collection('farmos-group-mapping')
+        .distinct('instanceName', { groupId: { $in: descendants.map((d) => d._id) } })
+    ).length;
+
+    return {
+      ...groupSettings,
+      name: breadcrumbsByPath[group.path],
+      seats,
+    };
+  };
+
+  const enableFarmOS = async () => {
+    const groupSettings = await db
+      .collection('farmos-group-settings')
+      .findOne({ groupId: group._id });
+
+    if (groupSettings) {
+      return await db
+        .collection('farmos-group-settings')
+        .updateOne({ groupId: group._id }, { $set: { groupHasFarmOSAccess: true } });
+    }
+
+    if (domainRoot == null) {
+      // may become root
+      domainRoot = group;
+      return createFarmosGroupSettings(group._id, { groupHasFarmOSAccess: true });
+    }
+
+    return null;
+  };
+
+  const disableFarmOS = async () => {
+    const groupSettings = await db
+      .collection('farmos-group-settings')
+      .findOne({ groupId: group._id });
+
+    if (groupSettings) {
+      domainRoot = null;
+      return await db
+        .collection('farmos-group-settings')
+        .updateOne({ groupId: group._id }, { $set: { groupHasFarmOSAccess: false } });
+    }
+
+    return null;
+  };
+
+  const isEnabled = async (attr) => {
+    // console.log("isEnabled", group.name, attr);
+
+    if (!domainRoot) {
+      return false;
+    }
+
+    const q = {};
+    q[attr] = 1;
+    const dom = await domainInformation({ ...q });
+    // console.log("dom", dom, group.name, attr);
+    if (!dom) {
+      return false;
+    }
+
+    return dom[attr] == undefined ? false : dom[attr];
+  };
+
+  const updateAttr = async (attr, val) => {
+    const q = {};
+    q[attr] = val;
+
+    const groupSettings = await db
+      .collection('farmos-group-settings')
+      .findOne({ groupId: group._id });
+
+    if (groupSettings) {
+      return await db
+        .collection('farmos-group-settings')
+        .updateOne({ groupId: group._id }, { $set: { ...q } });
+    }
+
+    return null;
+  };
+
+  const enableAttr = async (attr) => {
+    return await updateAttr(attr, true);
+  };
+
+  const disableAttr = async (attr) => {
+    return await updateAttr(attr, false);
+  };
+
+  const isFarmOSEnabled = async () => {
+    return await isEnabled(Attributes.EnableFarmOS);
+  };
+
+  const hasCoffeeShopAccess = async () => {
+    return isEnabled(Attributes.EnableCoffeShop);
+  };
+  const enableCoffeeShop = async () => {
+    return enableAttr(Attributes.EnableCoffeShop);
+  };
+  const disableCoffeeShop = async () => {
+    return disableAttr(Attributes.EnableCoffeShop);
+  };
+  const hasAllowSubgroupsToJoinCoffeeShop = async () => {
+    return (
+      (await isEnabled(Attributes.EnableCoffeShop)) &&
+      (await isEnabled(Attributes.AllowSubgroupsJoinCoffeeShop))
+    );
+  };
+  const enableAllowSubgroupsToJoinCoffeeShop = async () => {
+    return enableAttr(Attributes.AllowSubgroupsJoinCoffeeShop);
+  };
+  const disableAllowSubgroupsToJoinCoffeeShop = async () => {
+    return disableAttr(Attributes.AllowSubgroupsJoinCoffeeShop);
+  };
+  const hasAllowSubgroupAdminsToCreateFarmOSInstances = async () => {
+    return (
+      (await isEnabled(Attributes.EnableFarmOS)) &&
+      (await isEnabled(Attributes.AllowSubgroupAdminsToCreateInstances))
+    );
+  };
+  const enableAllowSubgroupAdminsToCreateFarmOSInstances = async () => {
+    return enableAttr(Attributes.AllowSubgroupAdminsToCreateInstances);
+  };
+  const disableAllowSubgroupAdminsToCreateFarmOSInstances = async () => {
+    return disableAttr(Attributes.AllowSubgroupAdminsToCreateInstances);
+  };
+
+  return {
+    group,
+    descendants,
+    ascendants,
+    domainRoot,
+    isDomainRooInDescendants,
+    breadcrumbsByPath,
+    canBecomeRoot() {
+      return domainRoot == null;
+    },
+    domainInformation,
+    isFarmOSEnabled,
+    enableFarmOS,
+    disableFarmOS,
+    hasCoffeeShopAccess,
+    enableCoffeeShop,
+    disableCoffeeShop,
+    hasAllowSubgroupsToJoinCoffeeShop,
+    enableAllowSubgroupsToJoinCoffeeShop,
+    disableAllowSubgroupsToJoinCoffeeShop,
+    hasAllowSubgroupAdminsToCreateFarmOSInstances,
+    enableAllowSubgroupAdminsToCreateFarmOSInstances,
+    disableAllowSubgroupAdminsToCreateFarmOSInstances,
+  };
 };
 
 /**
@@ -74,105 +282,6 @@ export const getArrayPathsConainedInPath = (path) => {
     hierarchie.pop();
   }
   return groupsPath;
-};
-
-/**
- * @param { Array } paths is array of path(s)
- * @returns null or groupId if entry in farmos-group-settings
- */
-const getGroupIdFromGroupInFarmosGroupSettingsFromPaths = async (paths) => {
-  const agg = [
-    {
-      $match: {
-        path: { $in: paths },
-      },
-    },
-    {
-      $project: {
-        _id: 1,
-      },
-    },
-    {
-      $lookup: {
-        from: 'farmos-group-settings',
-        localField: '_id',
-        foreignField: 'groupId',
-        as: 'groupMapped',
-      },
-    },
-    { $unwind: '$groupMapped' }, //return the only result if exists
-    {
-      $project: {
-        _id: 0,
-        'groupMapped.groupId': 1,
-      },
-    },
-  ];
-  const groupIdEntryExists = await db.collection('groups').aggregate(agg).toArray();
-  if (groupIdEntryExists[0]) {
-    return groupIdEntryExists[0].groupMapped.groupId;
-  }
-  return null;
-};
-
-/**
- *
- * @param { ObjectId } userId
- * @param { Object } projection
- * @returns the user that matches the userId
- */
-export const getUserFromUserId = async (userId, projection = {}) => {
-  const user = await db
-    .collection('users')
-    .findOne({ _id: asMongoId(userId) }, { projection: projection });
-  if (!user) {
-    throw boom.notFound();
-  }
-  return user;
-};
-/**
- *
- * @param { ObjectId } groupId
- * @param { Object } projection can be explicitly undefined
- * @returns the group that matches the groupId
- */
-export const getGroupFromGroupId = async (groupId, projection = {}) => {
-  const group = await db
-    .collection('groups')
-    .findOne({ _id: asMongoId(groupId) }, { projection: projection });
-  if (!group) {
-    throw boom.notFound();
-  }
-  return group;
-};
-
-/**
- * @param { String } path
- * @returns 'mainGroupName > SubGroupName > SubSubGroupName';
- * transform '/a/b/c/' to 'a > b > c'
- */
-export const getRewrittenPathFromGroupPath = async (path) => {
-  const paths = getArrayPathsConainedInPath(path);
-  const agg = [
-    {
-      $match: {
-        path: { $in: paths },
-      },
-    },
-    {
-      $project: {
-        name: 1,
-        dir: 1,
-      },
-    },
-    { $sort: { dir: 1 } },
-  ];
-  const groups = await db.collection('groups').aggregate(agg).toArray();
-  let prettyPath = groups.shift().name;
-  for (const grp of groups) {
-    prettyPath = prettyPath + ' > ' + grp.name;
-  }
-  return prettyPath;
 };
 
 /**
@@ -496,333 +605,104 @@ export const getGroupSettings = async (groupId, projection = {}) => {
     .findOne({ groupId: asMongoId(groupId) }, { projection: projection });
 };
 
-//TODO write settings methodes has & enable & disable also for
-// -> groupHasCoffeeShopAccess
-// -> allowSubgroupsToJoinCoffeeShop
-// -> allowSubgroupAdminsToCreateFarmOSInstances
-/**
- * @param { ObjectId } groupId
- * @returns groupHasFarmOSAccess setting from root
- */
-export const hasGroupFarmOSAccess = async (groupId) => {
-  const group = await getGroupFromGroupId(groupId);
-  if (!group) {
-    throw boom.notFound();
-  }
-  const rootGroup = await getFarmOSRootGroup(group);
-  if (!rootGroup) {
-    return false;
-  }
-  const s = await getGroupSettings(rootGroup._id, { groupHasFarmOSAccess: 1 });
-  if (s) {
-    return s.groupHasFarmOSAccess;
-  }
-  return false;
-};
-/**
- * @param { ObjectId } groupId
- * @returns groupHasFarmOSAccess on true for group;
- * can only happen in RootGroup
- */
-export const enableFarmOSAccessForGroup = async (groupId) => {
-  const groupSettings = await getGroupSettings(groupId, { _id: 1 });
-  if (groupSettings) {
-    return await setGroupSettings(groupId, { groupHasFarmOSAccess: true });
-  }
-  if (await canBecomeFarmOSRootGroup(groupId)) {
-    return createFarmosGroupSettings(groupId, { groupHasFarmOSAccess: true });
-  }
-  return null;
-};
-/**
- * @param { ObjectId } groupId
- * @returns groupHasFarmOSAccess and allowSubgroupAdminsToCreateFarmOSInstances on false for group;
- * can only happen in RootGroup
- */
-export const disableFarmOSAccessForGroup = async (groupId) => {
-  const groupSettings = await getGroupSettings(groupId, { _id: 1 });
-  if (!groupSettings) {
-    throw boom.notFound();
-  }
-  return await setGroupSettings(groupId, {
-    groupHasFarmOSAccess: false,
-    allowSubgroupAdminsToCreateFarmOSInstances: false,
-  });
-};
+export const getMemberInformationForDomain = async (descendants) => {
+  const descendantsIds = descendants.map((d) => d._id);
 
-/**
- * @param { ObjectId } groupId
- * @returns groupHasCoffeeShopAccess setting from root
- */
-export const hasGroupCoffeeShopAccess = async (groupId) => {
-  const group = await getGroupFromGroupId(groupId);
-  if (!group) {
-    throw boom.notFound();
-  }
-  const rootGroup = await getFarmOSRootGroup(group);
-  if (!rootGroup) {
-    return false;
-  }
-  const s = await getGroupSettings(rootGroup._id, { groupHasCoffeeShopAccess: 1 });
-  if (s) {
-    return s.groupHasCoffeeShopAccess;
-  }
-  return false;
-};
-/**
- * @param { ObjectId } groupId
- * @returns groupHasCoffeeShopAccess on true for group;
- * can only happen in RootGroup
- */
-export const enableCoffeeShopAccessForGroup = async (groupId) => {
-  const groupSettings = await getGroupSettings(groupId, { _id: 1 });
-  if (groupSettings) {
-    return await setGroupSettings(groupId, { groupHasCoffeeShopAccess: true });
-  }
-  if (await canBecomeFarmOSRootGroup(groupId)) {
-    return createFarmosGroupSettings(groupId, { groupHasCoffeeShopAccess: true });
-  }
-  return null;
-};
-/**
- * @param { ObjectId } groupId
- * @returns groupHasCoffeeShopAccess and allowSubgroupsToJoinCoffeeShop on false for group;
- * can only happen in RootGroup
- */
-export const disableCoffeeShopAccessForGroup = async (groupId) => {
-  const groupSettings = await getGroupSettings(groupId, { _id: 1 });
-  if (!groupSettings) {
-    throw boom.notFound();
-  }
-  return await setGroupSettings(groupId, {
-    groupHasCoffeeShopAccess: false,
-    allowSubgroupsToJoinCoffeeShop: false,
-  });
-};
-
-/**
- * @param { ObjectId } groupId
- * @returns allowSubgroupsToJoinCoffeeShop setting from root
- */
-export const isAllowedSubgroupsToJoinCoffeeShop = async (groupId) => {
-  const group = await getGroupFromGroupId(groupId);
-  if (!group) {
-    throw boom.notFound();
-  }
-  const rootGroup = await getFarmOSRootGroup(group);
-  if (!rootGroup) {
-    return false;
-  }
-  const s = await getGroupSettings(rootGroup._id, { allowSubgroupsToJoinCoffeeShop: 1 });
-  if (s) {
-    return s.allowSubgroupsToJoinCoffeeShop;
-  }
-  return false;
-};
-/**
- * @param { ObjectId } groupId
- * @returns allowSubgroupsToJoinCoffeeShop on true for group;
- * can only happen in RootGroup
- */
-export const enableSubgroupsToJoinCoffeeShop = async (groupId) => {
-  const groupSettings = await getGroupSettings(groupId, { _id: 1 });
-  if (!groupSettings) {
-    return null;
-  }
-  if (await hasGroupCoffeeShopAccess(groupId)) {
-    return await setGroupSettings(groupId, { allowSubgroupsToJoinCoffeeShop: true });
-  }
-  return null;
-};
-/**
- * @param { ObjectId } groupId
- * @returns allowSubgroupsToJoinCoffeeShop on false for group;
- * can only happen in RootGroup
- */
-export const disableSubgroupsToJoinCoffeeShop = async (groupId) => {
-  const groupSettings = await getGroupSettings(groupId, { _id: 1 });
-  if (!groupSettings) {
-    throw boom.notFound();
-  }
-  return await setGroupSettings(groupId, { allowSubgroupsToJoinCoffeeShop: false });
-};
-
-/**
- * @param { ObjectId } groupId
- * @returns allowSubgroupAdminsToCreateFarmOSInstances setting from root
- */
-export const isAllowedSubgroupAdminsToCreateFarmOSInstances = async (groupId) => {
-  const group = await getGroupFromGroupId(groupId);
-  if (!group) {
-    throw boom.notFound();
-  }
-  const rootGroup = await getFarmOSRootGroup(group);
-  if (!rootGroup) {
-    return false;
-  }
-  const s = await getGroupSettings(rootGroup._id, {
-    allowSubgroupAdminsToCreateFarmOSInstances: 1,
-  });
-  if (s) {
-    return s.allowSubgroupAdminsToCreateFarmOSInstances;
-  }
-  return false;
-};
-/**
- * @param { ObjectId } groupId
- * @returns allowSubgroupAdminsToCreateFarmOSInstances on true for group;
- * can only happen in RootGroup
- */
-export const enableSubgroupAdminsToCreateFarmOSInstances = async (groupId) => {
-  const groupSettings = await getGroupSettings(groupId, { _id: 1 });
-  if (!groupSettings) {
-    return null;
-  }
-  if (await hasGroupFarmOSAccess(groupId)) {
-    return setGroupSettings(groupId, { allowSubgroupAdminsToCreateFarmOSInstances: true });
-  }
-  return null;
-};
-/**
- * @param { ObjectId } groupId
- * @returns allowSubgroupAdminsToCreateFarmOSInstances on false for group;
- * can only happen in RootGroup
- */
-export const disableSubgroupAdminsToCreateFarmOSInstances = async (groupId) => {
-  const groupSettings = await getGroupSettings(groupId, { _id: 1 });
-  if (!groupSettings) {
-    throw boom.notFound();
-  }
-  return await setGroupSettings(groupId, { allowSubgroupAdminsToCreateFarmOSInstances: false });
-};
-
-/**
- * @param { Array } groups
- * @returns amount of unique entry of instanceName in farmos-group-mapping inside the Domain;
- * groups is the entire domain
- */
-export const getCurrentSeatsFromDomain = async (groups) => {
-  if (groups) {
-    const subgrps = [];
-    for (const subg of groups) {
-      subgrps.push(subg._id);
-    }
-    const mapping = await db
-      .collection('farmos-group-mapping')
-      .distinct('instanceName', { groupId: { $in: subgrps } });
-    return mapping.length;
-  }
-  return 0;
-};
-
-export const getMembersCreatedinDescendantsGroupsCompat = async (descendants) => {
-  const descendantsIds = descendants.map(d => d._id);
-
-
-  const aggregation = [{
-    $match: {
-      group: {
-        $in: descendantsIds
-      }
-    }
-  }, {
-    $project: {
-      m_id: '$_id',
-      user: 1,
-      group: 1,
-      admin: {
-        $eq: [
-          '$role',
-          'admin'
-        ]
-      }
-    }
-  }, {
-    $lookup: {
-      from: 'groups',
-      localField: 'group',
-      foreignField: '_id',
-      as: 'group'
-    }
-  }, {
-    $project: {
-      m_id: 1,
-      admin: 1,
-      user: 1,
-      path: {
-        $arrayElemAt: [
-          '$group.path',
-          0
-        ]
+  const aggregation = [
+    {
+      $match: {
+        group: {
+          $in: descendantsIds,
+        },
       },
-      group_id: {
-        $arrayElemAt: [
-          '$group._id',
-          0
-        ]
-      }
-    }
-  }, {
-    $lookup: {
-      from: 'users',
-      localField: 'user',
-      foreignField: '_id',
-      as: 'user'
-    }
-  }, {
-    $project: {
-      m_id: 1,
-      admin: 1,
-      user: 1,
-      path: 1,
-      group_id: 1,
-      email: {
-        $arrayElemAt: [
-          '$user.email',
-          0
-        ]
+    },
+    {
+      $project: {
+        m_id: '$_id',
+        user: 1,
+        group: 1,
+        admin: {
+          $eq: ['$role', 'admin'],
+        },
       },
-      user_id: {
-        $arrayElemAt: [
-          '$user._id',
-          0
-        ]
-      }
-    }
-  }, {
-    $lookup: {
-      from: 'farmos-instances',
-      localField: 'user_id',
-      foreignField: 'userId',
-      as: 'farmos_instances'
-    }
-  }, {
-    $lookup: {
-      from: 'farmos-group-mapping',
-      localField: 'farmos_instances.instanceName',
-      foreignField: 'instanceName',
-      as: 'group_mappings'
-    }
-  }];
+    },
+    {
+      $lookup: {
+        from: 'groups',
+        localField: 'group',
+        foreignField: '_id',
+        as: 'group',
+      },
+    },
+    {
+      $project: {
+        m_id: 1,
+        admin: 1,
+        user: 1,
+        path: {
+          $arrayElemAt: ['$group.path', 0],
+        },
+        group_id: {
+          $arrayElemAt: ['$group._id', 0],
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $project: {
+        m_id: 1,
+        admin: 1,
+        user: 1,
+        path: 1,
+        group_id: 1,
+        email: {
+          $arrayElemAt: ['$user.email', 0],
+        },
+        user_id: {
+          $arrayElemAt: ['$user._id', 0],
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: 'farmos-instances',
+        localField: 'user_id',
+        foreignField: 'userId',
+        as: 'farmos_instances',
+      },
+    },
+    {
+      $lookup: {
+        from: 'farmos-group-mapping',
+        localField: 'farmos_instances.instanceName',
+        foreignField: 'instanceName',
+        as: 'group_mappings',
+      },
+    },
+  ];
 
-
-
-  const res = await db
-    .collection('memberships')
-    .aggregate(aggregation)
-    .toArray();
-
+  const res = await db.collection('memberships').aggregate(aggregation).toArray();
 
   // console.log(JSON.stringify(res, null, 2));
 
-  const groupIds = _.uniq(res.flatMap(item => item["group_mappings"].map(gm => gm.groupId)));
+  const groupIds = _.uniq(res.flatMap((item) => item['group_mappings'].map((gm) => gm.groupId)));
   // console.log("groupIds", groupIds);
 
-  const groups = await db.collection('groups').find({
-    _id: { $in: groupIds.map(id => new ObjectId(id)) }
-  }).toArray();
+  const groups = await db
+    .collection('groups')
+    .find({
+      _id: { $in: groupIds.map((id) => new ObjectId(id)) },
+    })
+    .toArray();
 
-  const prj = res.map(item => {
+  const prj = res.map((item) => {
     return {
       user: item.user_id,
       group: item.group_id,
@@ -830,77 +710,46 @@ export const getMembersCreatedinDescendantsGroupsCompat = async (descendants) =>
       path: item.path,
       email: item.email,
       name: item.user[0].name,
-      connectedFarms: item.farmos_instances.map(ins => ({
+      connectedFarms: item.farmos_instances.map((ins) => ({
         instanceName: ins.instanceName,
         owner: ins.owner,
         _id: ins._id,
-        groups: item.group_mappings.filter(g => g.instanceName == ins.instanceName).map(g => ({
-          groupId: g.groupId,
-          name: groups.find(group => group._id.equals(g.groupId))?.name,
-          path: groups.find(group => group._id.equals(g.groupId))?.path
-        })),
-      }))
-    }
+        groups: item.group_mappings
+          .filter((g) => g.instanceName == ins.instanceName)
+          .map((g) => ({
+            groupId: g.groupId,
+            name: groups.find((group) => group._id.equals(g.groupId))?.name,
+            path: groups.find((group) => group._id.equals(g.groupId))?.path,
+          })),
+      })),
+    };
   });
 
-  const mappedInstances = _.uniq(prj.flatMap(item => item.connectedFarms.map(f => f.instanceName)));
-  const farmosInstancesMappedToAllGroups = await db.collection('farmos-group-mapping').find({
-    groupId: { $in: descendantsIds }
-  }).toArray();
+  const mappedInstances = _.uniq(
+    prj.flatMap((item) => item.connectedFarms.map((f) => f.instanceName))
+  );
+  const farmosInstancesMappedToAllGroups = await db
+    .collection('farmos-group-mapping')
+    .find({
+      groupId: { $in: descendantsIds },
+    })
+    .toArray();
 
   // console.log("mappedInstances", mappedInstances);
   // console.log("farmosInstancesMappedToAllGroups", farmosInstancesMappedToAllGroups);
-  const unassignedInstances = farmosInstancesMappedToAllGroups.filter(instance => !mappedInstances.some(m => m == instance.instanceName));
+  const unassignedInstances = farmosInstancesMappedToAllGroups.filter(
+    (instance) => !mappedInstances.some((m) => m == instance.instanceName)
+  );
   // console.log("unassignedInstances", unassignedInstances);
 
   return {
     members: prj,
-    unassignedInstances: unassignedInstances.map(u => ({
+    unassignedInstances: unassignedInstances.map((u) => ({
       ...u,
-      path: groups.find(g => g._id.equals(u.groupId))?.path
-    }))
+      path: groups.find((g) => g._id.equals(u.groupId))?.path,
+    })),
   };
 };
-
-/**
- * @param { Array } membersRawData
- * @returns members part from JSON answer
- */
-export const structureMembersPart = async (membersRawData) => {
-  for (const memberRD of membersRawData) {
-    memberRD.location = await getRewrittenPathFromGroupPath(memberRD.location);
-    memberRD.userId = memberRD.user;
-    delete memberRD.user;
-    //connectedFarms
-    for (const cf of memberRD.connectedFarms) {
-      delete cf.fgm;
-      for (const mbships of cf.memberships) {
-        const grp = memberRD.mgroups.find((data) => {
-          return data._id + '' === mbships.groupId + '';
-        });
-        mbships.path = await getRewrittenPathFromGroupPath(grp.path);
-      }
-    }
-    delete memberRD.mgroups;
-  }
-  return membersRawData;
-};
-
-/**
- * @param { Object } rawData
- * @returns all ids from collection farmos-group-mapping who are in RawData;
- * => Farms from NonMerbers inside the domain
- */
-export const getIdsFromFarmOSGroupMapped = async (rawData) => {
-  const ids = [];
-  for (const obj of rawData) {
-    for (const cf of obj.connectedFarms) {
-      ids.push(...cf.fgm);
-    }
-  }
-  return ids;
-};
-
 
 /**
  * @param { ObjectId } groupId
@@ -908,118 +757,70 @@ export const getIdsFromFarmOSGroupMapped = async (rawData) => {
  * @returns JSON answer
  */
 export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
-  const group = await getGroupFromGroupId(groupId);
+  const group = await db.collection('groups').findOne({ _id: asMongoId(groupId) });
+
   if (!group) {
     throw boom.notFound();
   }
 
   //know if groupId is a RootGroup or not (=> define setting in JSON response)
   let testedGroupIsRoot = false;
-  const getRootGroup = await getFarmOSRootGroup(group);
-  //this case should not be encountered because the access is protected in the Frontend
-  if (getRootGroup === null) {
+
+  const tree = await getTree(group);
+
+  // do root in domain
+  if (!tree.domainRoot) {
     throw boom.notFound();
   }
 
-  if (groupId.equals(getRootGroup._id)) {
+  if (groupId.equals(tree.domainRoot._id)) {
     testedGroupIsRoot = true;
   }
 
-
-  const ascendants = await getAscendantGroups(group, {
-    _id: 1,
-    name: 1,
-    dir: 1,
-    path: 1,
-  });
-
-  const descendants = await getDescendantGroups(group, {
-    _id: 1,
-    name: 1,
-    dir: 1,
-    path: 1,
-  });
   let groupSettings = {};
   //setting part only if it's a RootGroup
   if (testedGroupIsRoot) {
     if (isSuperAdmin) {
-      groupSettings = await getGroupSettings(groupId, {
+      groupSettings = await tree.domainInformation({
         groupId: 1,
         groupHasFarmOSAccess: 1,
         groupHasCoffeeShopAccess: 1,
         allowSubgroupsToJoinCoffeeShop: 1,
         allowSubgroupAdminsToCreateFarmOSInstances: 1,
         maxSeats: 1,
-        name: group.name
+        name: group.name,
       });
     } else {
-      groupSettings = await getGroupSettings(groupId, {
+      groupSettings = await tree.domainInformation({
         groupId: 1,
         allowSubgroupsToJoinCoffeeShop: 1,
         allowSubgroupAdminsToCreateFarmOSInstances: 1,
         maxSeats: 1,
       });
     }
-    const currentSeats = await getCurrentSeatsFromDomain(descendants);
-    const seats_obj = { seats: { current: currentSeats, max: groupSettings.maxSeats } };
+    const seats = { current: groupSettings.seats, max: groupSettings.maxSeats };
     delete groupSettings.maxSeats;
-    groupSettings = { ...groupSettings, ...seats_obj };
+    groupSettings = { ...groupSettings, seats };
   }
 
-  const groupName = await getRewrittenPathFromGroupPath(group.path);
+  const groupName = tree.breadcrumbsByPath[group.path];
   let groupInformation = { name: groupName };
   //get members part from JSON response
-  const membersRawData = await getMembersCreatedinDescendantsGroupsCompat(descendants);
-  console.log("membersRawData", JSON.stringify(membersRawData, null, 2));
-
-
-  const allGroups = [...ascendants, ...descendants];
-
-  const resolveName = (path) => {
-    const parts = path.trim().split("/");
-    // console.log("parts", parts);
-
-    let current = ""
-    let breadcrumb = ""
-    for (const p of parts) {
-      if (!p) {
-        continue;
-      }
-
-      current += `/${p}`;
-      const grpname = allGroups.find(g => g.path === `${current}/`)?.name
-      // console.log(p, current, grpname);
-      if (!breadcrumb) {
-        breadcrumb = grpname
-      } else {
-        breadcrumb = `${breadcrumb} > ${grpname}`
-      }
-    }
-
-    return breadcrumb;
-  }
-
-  const groupPaths = {}
-
-  for (const g of allGroups) {
-    groupPaths[g.path] = resolveName(g.path)
-  }
-
-  groupSettings.name = groupPaths[group.path]
+  const membersRawData = await getMemberInformationForDomain(tree.descendants);
+  //console.log("membersRawData", JSON.stringify(membersRawData, null, 2));
 
   for (const member of membersRawData.members) {
-    member.breadcrumb = groupPaths[member.path]
+    member.breadcrumb = tree.breadcrumbsByPath[member.path];
     for (const farm of member.connectedFarms) {
       for (const g of farm.groups) {
-        g.breadcrumb = groupPaths[g.path];
+        g.breadcrumb = tree.breadcrumbsByPath[g.path];
       }
     }
   }
 
   for (const inst of membersRawData.unassignedInstances) {
-    inst.breadcrumb = groupPaths[inst.path];
+    inst.breadcrumb = tree.breadcrumbsByPath[inst.path];
   }
-
 
   groupInformation = { ...groupSettings, ...membersRawData };
   return groupInformation;

@@ -1,41 +1,22 @@
 import { createGroup, createReq, createRes, createUser } from '../../testUtils';
+import { getAscendantGroups, getDescendantGroups } from '../roles.service';
 import {
   mapFarmOSInstanceToUser,
   listFarmOSInstancesForUser,
   mapFarmOSInstanceToGroupAdmin,
   listFarmOSInstancesForGroup,
-  addFarmToSurveystackGroup,
-  removeFarmFromSurveystackGroup,
   createPlan,
   getPlans,
   getPlanForGroup,
   deletePlan,
   setPlanForGroup,
   getGroupInformation,
-  listUsersForGroup,
   createFarmOSInstanceForUserAndGroup,
   mapFarmOSInstanceToGroup,
   createFarmosGroupSettings,
-  getFarmOSRootGroup,
-  canBecomeFarmOSRootGroup,
-  getArrayPathsConainedInPath,
-  getUserFromUserId,
-  getGroupFromGroupId,
-  getRewrittenPathFromGroupPath,
   getGroupSettings,
   setGroupSettings,
-  hasGroupFarmOSAccess,
-  enableFarmOSAccessForGroup,
-  disableFarmOSAccessForGroup,
-  hasGroupCoffeeShopAccess,
-  enableCoffeeShopAccessForGroup,
-  disableCoffeeShopAccessForGroup,
-  isAllowedSubgroupsToJoinCoffeeShop,
-  enableSubgroupsToJoinCoffeeShop,
-  disableSubgroupsToJoinCoffeeShop,
-  isAllowedSubgroupAdminsToCreateFarmOSInstances,
-  enableSubgroupAdminsToCreateFarmOSInstances,
-  disableSubgroupAdminsToCreateFarmOSInstances,
+  getTree,
 } from './manage';
 
 const init = async () => {
@@ -139,14 +120,15 @@ describe('manageFarmOS', () => {
     await createFarmosGroupSettings(groupLabs._id);
     const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
 
-    const root = await getFarmOSRootGroup(groupMichigan);
-    expect(root.name).toBe('Labs');
+    const michiganTree = await getTree(groupMichigan);
+    expect(michiganTree.domainRoot.name).toBe('Labs');
 
-    const root2 = await getFarmOSRootGroup(groupLabs);
-    expect(root2.name).toBe('Labs');
+    const labsTree = await getTree(groupLabs);
+    expect(labsTree.domainRoot.name).toBe('Labs');
 
-    const root3 = await getFarmOSRootGroup(groupBionutrient);
-    expect(root3).toBeNull();
+    const bionutrientTree = await getTree(groupBionutrient);
+    expect(bionutrientTree.domainRoot.name).toBe('Labs');
+    expect(bionutrientTree.isDomainRooInDescendants()).toBeTruthy();
   });
   it('canBecomeFarmOSRootGroup', async () => {
     const groupBionutrient = await createGroup({ name: 'Bionutrient' });
@@ -155,57 +137,22 @@ describe('manageFarmOS', () => {
     await createFarmosGroupSettings(groupLabs._id);
     const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
 
-    const canBeRoot = await canBecomeFarmOSRootGroup(groupMichigan._id);
+    const michiganTree = await getTree(groupMichigan);
+
+    const canBeRoot = michiganTree.canBecomeRoot();
     expect(canBeRoot).toBeFalsy();
 
-    const canBeRoot2 = await canBecomeFarmOSRootGroup(groupLabs._id);
+    const labsTree = await getTree(groupLabs);
+    const canBeRoot2 = labsTree.canBecomeRoot();
     expect(canBeRoot2).toBeFalsy();
 
-    const canBeRoot3 = await canBecomeFarmOSRootGroup(groupExt._id);
+    const extTree = await getTree(groupExt);
+    const canBeRoot3 = extTree.canBecomeRoot();
     expect(canBeRoot3).toBeTruthy();
 
-    const canBeRoot4 = await canBecomeFarmOSRootGroup(groupBionutrient._id);
+    const bionutrientTree = await getTree(groupBionutrient);
+    const canBeRoot4 = bionutrientTree.canBecomeRoot();
     expect(canBeRoot4).toBeFalsy();
-  });
-  it('getArrayPathsConainedInPath', async () => {
-    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
-    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
-    const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
-
-    const paths = await getArrayPathsConainedInPath(groupMichigan.path);
-    expect(paths).toStrictEqual([
-      '/bionutrient/labs/michigan/',
-      '/bionutrient/labs/',
-      '/bionutrient/',
-    ]);
-  });
-  it('getUserFromUserId', async () => {
-    const group = await createGroup({ name: 'Bionutrient' });
-    const admin_data = { userOverrides: { name: 'Dan TerAvest', email: 'teravestdan@gmail.com' } };
-    const admin = await group.createAdminMember(admin_data);
-
-    const userFound = await getUserFromUserId(admin.user._id);
-    expect(userFound).toStrictEqual(admin.user);
-  });
-  it('getGroupFromGroupId', async () => {
-    const group = await createGroup({ name: 'Bionutrient' });
-
-    const groupFound = await getGroupFromGroupId(group._id);
-    expect(groupFound.meta).toStrictEqual(group.meta);
-    expect(groupFound.name).toBe(group.name);
-    expect(groupFound.slug).toBe(group.slug);
-    expect(groupFound.dir).toBe(group.dir);
-    expect(groupFound.path).toBe(group.path);
-    expect(groupFound.surveys).toStrictEqual(group.surveys);
-    expect(groupFound._id).toStrictEqual(group._id);
-  });
-  it('getRewrittenPathFromGroupPath', async () => {
-    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
-    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
-    const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
-
-    const prettyPath = await getRewrittenPathFromGroupPath(groupMichigan.path);
-    expect(prettyPath).toBe('Bionutrient > Labs > Michigan');
   });
   it('getGroupInformation', async () => {
     const groupBionutrient = await createGroup({ name: 'Bionutrient' });
@@ -266,7 +213,6 @@ describe('manageFarmOS', () => {
       true
     );
 
-
     const user2_farmOSInstance2 = 'foreigninstance.farmos.net';
     await createFarmOSInstanceForUserAndGroup(
       user2.user._id,
@@ -286,7 +232,10 @@ describe('manageFarmOS', () => {
       userext_farmOSInstance1,
       true
     );
-    const { _id: idExternal1 } = await mapFarmOSInstanceToGroup(groupMichigan._id, userext_farmOSInstance1);
+    const { _id: idExternal1 } = await mapFarmOSInstanceToGroup(
+      groupMichigan._id,
+      userext_farmOSInstance1
+    );
     const userext_data2 = { userOverrides: { name: 'Ext ernal2', email: 'external2@bj.net' } };
     const userext2 = await groupExt.createUserMember(userext_data2);
     const userext_farmOSInstance2 = 'external2.farmos.net';
@@ -296,7 +245,10 @@ describe('manageFarmOS', () => {
       userext_farmOSInstance2,
       true
     );
-    const { _id: idExternal2 } =await mapFarmOSInstanceToGroup(groupMichigan._id, userext_farmOSInstance2);
+    const { _id: idExternal2 } = await mapFarmOSInstanceToGroup(
+      groupMichigan._id,
+      userext_farmOSInstance2
+    );
 
     //FederalMills
     const groupFederalMills = await createGroup({ name: 'FederalMills' });
@@ -405,99 +357,178 @@ describe('manageFarmOS', () => {
     const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
     const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
 
-    expect(await hasGroupFarmOSAccess(groupBionutrient._id)).toBeFalsy();
-    expect(await hasGroupFarmOSAccess(groupLabs._id)).toBeFalsy();
-    expect(await hasGroupFarmOSAccess(groupMichigan._id)).toBeFalsy();
+    let bionutrientTree = await getTree(groupBionutrient);
+    let labsTree = await getTree(groupLabs);
+    let michiganTree = await getTree(groupMichigan);
 
-    await enableFarmOSAccessForGroup(groupLabs._id);
-    expect(await hasGroupFarmOSAccess(groupBionutrient._id)).toBeFalsy();
-    expect(await hasGroupFarmOSAccess(groupLabs._id)).toBeTruthy();
-    expect(await hasGroupFarmOSAccess(groupMichigan._id)).toBeTruthy();
+    expect(await bionutrientTree.isFarmOSEnabled()).toBeFalsy();
+    expect(await labsTree.isFarmOSEnabled()).toBeFalsy();
+    expect(await michiganTree.isFarmOSEnabled()).toBeFalsy();
 
-    await disableFarmOSAccessForGroup(groupLabs._id);
-    expect(await hasGroupFarmOSAccess(groupBionutrient._id)).toBeFalsy();
-    expect(await hasGroupFarmOSAccess(groupLabs._id)).toBeFalsy();
-    expect(await hasGroupFarmOSAccess(groupMichigan._id)).toBeFalsy();
+    await labsTree.enableFarmOS();
+    michiganTree = await getTree(groupMichigan);
+    bionutrientTree = await getTree(groupBionutrient);
+
+    expect(await bionutrientTree.isFarmOSEnabled()).toBeFalsy();
+    expect(await labsTree.isFarmOSEnabled()).toBeTruthy();
+    expect(await michiganTree.isFarmOSEnabled()).toBeTruthy();
+
+    await labsTree.disableFarmOS();
+    michiganTree = await getTree(groupMichigan);
+    bionutrientTree = await getTree(groupBionutrient);
+
+    expect(await bionutrientTree.isFarmOSEnabled()).toBeFalsy();
+    expect(await labsTree.isFarmOSEnabled()).toBeFalsy();
+    expect(await michiganTree.isFarmOSEnabled()).toBeFalsy();
   });
   it('groupHasCoffeeShopAccess', async () => {
     const groupBionutrient = await createGroup({ name: 'Bionutrient' });
     const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
     const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
 
-    expect(await hasGroupCoffeeShopAccess(groupBionutrient._id)).toBeFalsy();
-    expect(await hasGroupCoffeeShopAccess(groupLabs._id)).toBeFalsy();
-    expect(await hasGroupCoffeeShopAccess(groupMichigan._id)).toBeFalsy();
+    let treeMichigan, treeLabs, treeBionutrient;
 
-    await enableCoffeeShopAccessForGroup(groupLabs._id);
-    expect(await hasGroupCoffeeShopAccess(groupBionutrient._id)).toBeFalsy();
-    expect(await hasGroupCoffeeShopAccess(groupLabs._id)).toBeTruthy();
-    expect(await hasGroupCoffeeShopAccess(groupMichigan._id)).toBeTruthy();
+    treeMichigan = await getTree(groupMichigan);
+    treeLabs = await getTree(groupLabs);
+    treeBionutrient = await getTree(groupBionutrient);
 
-    await disableCoffeeShopAccessForGroup(groupLabs._id);
-    expect(await hasGroupCoffeeShopAccess(groupBionutrient._id)).toBeFalsy();
-    expect(await hasGroupCoffeeShopAccess(groupLabs._id)).toBeFalsy();
-    expect(await hasGroupCoffeeShopAccess(groupMichigan._id)).toBeFalsy();
+    expect(await treeBionutrient.hasCoffeeShopAccess()).toBeFalsy();
+    expect(await treeLabs.hasCoffeeShopAccess()).toBeFalsy();
+    expect(await treeMichigan.hasCoffeeShopAccess()).toBeFalsy();
+
+    await treeLabs.enableFarmOS();
+    await treeLabs.enableCoffeeShop();
+
+    treeMichigan = await getTree(groupMichigan);
+    treeLabs = await getTree(groupLabs);
+    treeBionutrient = await getTree(groupBionutrient);
+
+    expect(await treeBionutrient.hasCoffeeShopAccess()).toBeFalsy();
+    expect(await treeLabs.hasCoffeeShopAccess()).toBeTruthy();
+    expect(await treeMichigan.hasCoffeeShopAccess()).toBeTruthy();
+
+    await treeLabs.disableCoffeeShop();
+    treeMichigan = await getTree(groupMichigan);
+    treeLabs = await getTree(groupLabs);
+    treeBionutrient = await getTree(groupBionutrient);
+
+    expect(await treeBionutrient.hasCoffeeShopAccess()).toBeFalsy();
+    expect(await treeLabs.hasCoffeeShopAccess()).toBeFalsy();
+    expect(await treeMichigan.hasCoffeeShopAccess()).toBeFalsy();
   });
   it('allowSubgroupsToJoinCoffeeShop', async () => {
     const groupBionutrient = await createGroup({ name: 'Bionutrient' });
     const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
     const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
 
-    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupBionutrient._id)).toBeFalsy();
-    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupLabs._id)).toBeFalsy();
-    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupMichigan._id)).toBeFalsy();
+    let treeBionutrient, treeMichigan, treeLabs;
 
-    await enableSubgroupsToJoinCoffeeShop(groupLabs._id);
-    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupBionutrient._id)).toBeFalsy();
-    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupLabs._id)).toBeFalsy();
-    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupMichigan._id)).toBeFalsy();
+    treeMichigan = await getTree(groupMichigan);
+    treeLabs = await getTree(groupLabs);
+    treeBionutrient = await getTree(groupBionutrient);
 
-    await enableCoffeeShopAccessForGroup(groupLabs._id);
-    await enableSubgroupsToJoinCoffeeShop(groupLabs._id);
-    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupBionutrient._id)).toBeFalsy();
-    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupLabs._id)).toBeTruthy();
-    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupMichigan._id)).toBeTruthy();
+    expect(await treeBionutrient.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
+    expect(await treeLabs.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
+    expect(await treeMichigan.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
 
-    await disableSubgroupsToJoinCoffeeShop(groupLabs._id);
-    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupBionutrient._id)).toBeFalsy();
-    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupLabs._id)).toBeFalsy();
-    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupMichigan._id)).toBeFalsy();
+    await treeLabs.enableFarmOS();
+    await treeLabs.enableAllowSubgroupsToJoinCoffeeShop();
 
-    await enableSubgroupsToJoinCoffeeShop(groupLabs._id);
-    await disableCoffeeShopAccessForGroup(groupLabs._id);
-    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupBionutrient._id)).toBeFalsy();
-    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupLabs._id)).toBeFalsy();
-    expect(await isAllowedSubgroupsToJoinCoffeeShop(groupMichigan._id)).toBeFalsy();
+    treeMichigan = await getTree(groupMichigan);
+    treeLabs = await getTree(groupLabs);
+    treeBionutrient = await getTree(groupBionutrient);
+
+    expect(await treeBionutrient.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
+    expect(await treeLabs.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
+    expect(await treeMichigan.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
+
+    await treeLabs.enableCoffeeShop();
+    await treeLabs.enableAllowSubgroupsToJoinCoffeeShop();
+
+    treeMichigan = await getTree(groupMichigan);
+    treeLabs = await getTree(groupLabs);
+    treeBionutrient = await getTree(groupBionutrient);
+
+    expect(await treeBionutrient.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
+    expect(await treeLabs.hasAllowSubgroupsToJoinCoffeeShop()).toBeTruthy();
+    expect(await treeMichigan.hasAllowSubgroupsToJoinCoffeeShop()).toBeTruthy();
+
+    await treeLabs.disableAllowSubgroupsToJoinCoffeeShop();
+
+    treeMichigan = await getTree(groupMichigan);
+    treeLabs = await getTree(groupLabs);
+    treeBionutrient = await getTree(groupBionutrient);
+
+    expect(await treeBionutrient.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
+    expect(await treeLabs.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
+    expect(await treeMichigan.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
+
+    await treeLabs.enableAllowSubgroupsToJoinCoffeeShop();
+    await treeLabs.disableCoffeeShop();
+
+    treeMichigan = await getTree(groupMichigan);
+    treeLabs = await getTree(groupLabs);
+    treeBionutrient = await getTree(groupBionutrient);
+
+    expect(await treeBionutrient.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
+    expect(await treeLabs.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
+    expect(await treeMichigan.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
   });
   it('allowSubgroupAdminsToCreateFarmOSInstances', async () => {
     const groupBionutrient = await createGroup({ name: 'Bionutrient' });
     const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
     const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
 
-    expect(await isAllowedSubgroupAdminsToCreateFarmOSInstances(groupBionutrient._id)).toBeFalsy();
-    expect(await isAllowedSubgroupAdminsToCreateFarmOSInstances(groupLabs._id)).toBeFalsy();
-    expect(await isAllowedSubgroupAdminsToCreateFarmOSInstances(groupMichigan._id)).toBeFalsy();
+    let treeBionutrient, treeMichigan, treeLabs;
 
-    await enableSubgroupAdminsToCreateFarmOSInstances(groupLabs._id);
-    expect(await isAllowedSubgroupAdminsToCreateFarmOSInstances(groupBionutrient._id)).toBeFalsy();
-    expect(await isAllowedSubgroupAdminsToCreateFarmOSInstances(groupLabs._id)).toBeFalsy();
-    expect(await isAllowedSubgroupAdminsToCreateFarmOSInstances(groupMichigan._id)).toBeFalsy();
+    treeMichigan = await getTree(groupMichigan);
+    treeLabs = await getTree(groupLabs);
+    treeBionutrient = await getTree(groupBionutrient);
 
-    await enableFarmOSAccessForGroup(groupLabs._id);
-    await enableSubgroupAdminsToCreateFarmOSInstances(groupLabs._id);
-    expect(await isAllowedSubgroupAdminsToCreateFarmOSInstances(groupBionutrient._id)).toBeFalsy();
-    expect(await isAllowedSubgroupAdminsToCreateFarmOSInstances(groupLabs._id)).toBeTruthy();
-    expect(await isAllowedSubgroupAdminsToCreateFarmOSInstances(groupMichigan._id)).toBeTruthy();
+    expect(await treeBionutrient.hasAllowSubgroupAdminsToCreateFarmOSInstances()).toBeFalsy();
+    expect(await treeLabs.hasAllowSubgroupAdminsToCreateFarmOSInstances()).toBeFalsy();
+    expect(await treeMichigan.hasAllowSubgroupAdminsToCreateFarmOSInstances()).toBeFalsy();
 
-    await disableSubgroupAdminsToCreateFarmOSInstances(groupLabs._id);
-    expect(await isAllowedSubgroupAdminsToCreateFarmOSInstances(groupBionutrient._id)).toBeFalsy();
-    expect(await isAllowedSubgroupAdminsToCreateFarmOSInstances(groupLabs._id)).toBeFalsy();
-    expect(await isAllowedSubgroupAdminsToCreateFarmOSInstances(groupMichigan._id)).toBeFalsy();
+    await treeLabs.enableAllowSubgroupAdminsToCreateFarmOSInstances();
 
-    await enableSubgroupAdminsToCreateFarmOSInstances(groupLabs._id);
-    await disableFarmOSAccessForGroup(groupLabs._id);
-    expect(await isAllowedSubgroupAdminsToCreateFarmOSInstances(groupBionutrient._id)).toBeFalsy();
-    expect(await isAllowedSubgroupAdminsToCreateFarmOSInstances(groupLabs._id)).toBeFalsy();
-    expect(await isAllowedSubgroupAdminsToCreateFarmOSInstances(groupMichigan._id)).toBeFalsy();
+    treeMichigan = await getTree(groupMichigan);
+    treeLabs = await getTree(groupLabs);
+    treeBionutrient = await getTree(groupBionutrient);
+
+    expect(await treeBionutrient.hasAllowSubgroupAdminsToCreateFarmOSInstances()).toBeFalsy();
+    expect(await treeLabs.hasAllowSubgroupAdminsToCreateFarmOSInstances()).toBeFalsy();
+    expect(await treeMichigan.hasAllowSubgroupAdminsToCreateFarmOSInstances()).toBeFalsy();
+
+    await treeLabs.enableFarmOS();
+    await treeLabs.enableAllowSubgroupAdminsToCreateFarmOSInstances();
+
+    treeMichigan = await getTree(groupMichigan);
+    treeLabs = await getTree(groupLabs);
+    treeBionutrient = await getTree(groupBionutrient);
+
+    expect(await treeBionutrient.hasAllowSubgroupAdminsToCreateFarmOSInstances()).toBeFalsy();
+    expect(await treeLabs.hasAllowSubgroupAdminsToCreateFarmOSInstances()).toBeTruthy();
+    expect(await treeMichigan.hasAllowSubgroupAdminsToCreateFarmOSInstances()).toBeTruthy();
+
+    await treeLabs.disableAllowSubgroupAdminsToCreateFarmOSInstances();
+
+    treeMichigan = await getTree(groupMichigan);
+    treeLabs = await getTree(groupLabs);
+    treeBionutrient = await getTree(groupBionutrient);
+
+    expect(await treeBionutrient.hasAllowSubgroupAdminsToCreateFarmOSInstances()).toBeFalsy();
+    expect(await treeLabs.hasAllowSubgroupAdminsToCreateFarmOSInstances()).toBeFalsy();
+    expect(await treeMichigan.hasAllowSubgroupAdminsToCreateFarmOSInstances()).toBeFalsy();
+
+    await treeLabs.enableAllowSubgroupAdminsToCreateFarmOSInstances();
+    await treeLabs.disableFarmOS();
+
+    treeMichigan = await getTree(groupMichigan);
+    treeLabs = await getTree(groupLabs);
+    treeBionutrient = await getTree(groupBionutrient);
+
+    expect(await treeBionutrient.hasAllowSubgroupAdminsToCreateFarmOSInstances()).toBeFalsy();
+    expect(await treeLabs.hasAllowSubgroupAdminsToCreateFarmOSInstances()).toBeFalsy();
+    expect(await treeMichigan.hasAllowSubgroupAdminsToCreateFarmOSInstances()).toBeFalsy();
   });
 });

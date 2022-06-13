@@ -46,31 +46,34 @@ export const getDescendantGroups = async (group, projection = {}) => {
 };
 
 export const getAscendantGroups = async (group, projection = {}) => {
-  const parts = group.path.split("/");
-  const relevant = parts.filter(p => !!p);
+  const parts = group.path.split('/');
+  const relevant = parts.filter((p) => !!p);
 
-  const groupPaths = []
-  let last = ""
+  const groupPaths = [];
+  let last = '';
   for (const part of relevant) {
-    let current = "";
+    let current = '';
     if (groupPaths.length == 0) {
-      current = `/${part}/`
+      current = `/${part}/`;
     } else {
-      current = `${last}${part}/`
+      current = `${last}${part}/`;
     }
 
     groupPaths.push(current);
     last = current;
-
   }
-  const ascendants = await db.collection('groups').find({
-    path: { $in: groupPaths },
-  }, { projection }).toArray();
-
+  const ascendants = await db
+    .collection('groups')
+    .find(
+      {
+        path: { $in: groupPaths },
+      },
+      { projection }
+    )
+    .toArray();
 
   return ascendants;
-
-}
+};
 
 export const hasRole = async (userId, groupId, role) => {
   if (!userId || !groupId || !role) {

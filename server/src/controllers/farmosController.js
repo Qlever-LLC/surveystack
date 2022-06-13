@@ -619,7 +619,6 @@ export const groupAdminMinimumGetGroupInformation = async (req, res) => {
     status: 'success',
     response: r,
   });
-
 };
 
 export const superAdminUpdateFarmOSAccess = async (req, res) => {
