@@ -33,6 +33,12 @@ function initLogging(req, res, next) {
   next();
 }
 
+function appendDatabaseOperationDurationToLoggingMessage(res, duration) {
+  if (process.env.ELASTIC_ENABLE_LOGGING === 'true') {
+    res.locals.loggingMessage.databaseOperationDuration = duration;
+  }
+}
+
 // Logging response bodies can use significant amounts of storage.
 // Consider log volume, index lifecycle policy (duration to keep logs), and available storage before using this middleware.
 const appendResponseBodyToLoggingMessage = mung.json(
@@ -44,4 +50,8 @@ const appendResponseBodyToLoggingMessage = mung.json(
   { mungError: true }
 );
 
-export { initLogging, appendResponseBodyToLoggingMessage };
+export {
+  initLogging,
+  appendResponseBodyToLoggingMessage,
+  appendDatabaseOperationDurationToLoggingMessage,
+};

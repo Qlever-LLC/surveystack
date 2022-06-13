@@ -202,7 +202,7 @@ export const linearControls = (survey, submission) => {
     const control = cloneDeep(getControl(controls, p));
     const breadcrumbs = getBreadcrumbsForSubmission(controls, p);
     const submissionField = getSubmissionField(submission, survey, p);
-    if (control.type !== 'group') {
+    if (control.type !== 'group' && !!submissionField) {
       const key = breadcrumbs.join('.');
       const r = Object.assign(control, {
         breadcrumbs,
@@ -226,6 +226,9 @@ export const linearControlsWithGroups = (survey, submission) => {
     const control = cloneDeep(getControl(controls, p));
     const breadcrumbs = getBreadcrumbsForSubmission(controls, p);
     const submissionField = getSubmissionField(submission, survey, p);
+    if (!submissionField) {
+      return;
+    }
 
     const key = breadcrumbs.join('.');
     const r = Object.assign(control, {

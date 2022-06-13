@@ -40,6 +40,7 @@ const sendLink = async ({
 }) => {
   // remove all html tags
   const s = (text) => sanitizeHtml(text, { allowedTags: [] });
+  const btnColor = "#225034";
 
   await transport.sendMail({
     from: process.env.SMTP_DEFAULT_SENDER,
@@ -61,7 +62,7 @@ const sendLink = async ({
                   <h2>${s(actionDescriptionHtml)}</h2>
                   <a href="${s(
                     link
-                  )}" style="color: white; font-weight: bold; text-decoration: none; word-break: break-word; font-size: 17px; line-height: 24px; background-color: #ff5555; border-color: #ff2a2a; letter-spacing: 1px; min-width: 80px; text-align: center; border-radius: 4px; padding: 10px 22px; font-family: 'Roboto', sans-serif;" target="_blank">
+                  )}" style="color: white; font-weight: bold; text-decoration: none; word-break: break-word; font-size: 17px; line-height: 24px; background-color: ${btnColor}; letter-spacing: 1px; min-width: 80px; text-align: center; border-radius: 4px; padding: 10px 22px; font-family: 'Roboto', sans-serif;" target="_blank">
                   ${s(btnText)}
                   </a>
                 </td></tr>
