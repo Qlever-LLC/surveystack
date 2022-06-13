@@ -117,6 +117,7 @@ export const createReq = ({
   query = {},
   headers = {},
   cookies = {},
+  protocol,
 } = {}) => ({
   body,
   params,
@@ -126,6 +127,10 @@ export const createReq = ({
     origin: 'https://surveystack.io',
     ...headers,
   },
+  get(key) {
+    return this.headers[key];
+  },
+  protocol,
 });
 
 export const createRes = async ({ user = null } = {}) => ({

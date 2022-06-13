@@ -1,9 +1,14 @@
-import { createUserIfNotExist, createMagicLink, createLoginPayload } from './auth.service';
+import {
+  createUserIfNotExist,
+  createMagicLink,
+  createLoginPayload,
+  createInvalidateMagicLink,
+} from './auth.service';
 import { createGroup, createUser } from '../testUtils';
 import { db, COLL_ACCESS_CODES } from '../db';
 import url from 'url';
 import rolesService from './roles.service';
-import { pick } from 'lodash';
+import { pick, uniqueId } from 'lodash';
 
 describe('createUserIfNotExist', () => {
   it('creates a new user if it does not exist', async () => {
@@ -130,5 +135,47 @@ describe('createMagicLink', () => {
       const payload = await createLoginPayload(user);
       expect(payload).toMatchObject(pick(user, '_id', 'email', 'name', 'token', 'permissions'));
     });
+  });
+});
+
+describe('createInvalidateMagicLink', () => {
+  const origin = 'http://foo.bar';
+  let accessCodeId;
+
+  beforeEach(async () => {
+    const accessCode = (
+      await db.collection(COLL_ACCESS_CODES).insertOne({ code: uniqueId().toString() })
+    ).ops[0];
+    accessCodeId = accessCode._id;
+  });
+
+  it('throws if origin is not set', async () => {
+    await expect(createInvalidateMagicLink({ accessCodeId })).rejects.toThrow(
+      'createInvalidateMagicLink: "origin" parameter is required'
+    );
+  });
+  it('throws if accessCodeId is not set', async () => {
+    await expect(createInvalidateMagicLink({ origin })).rejects.toThrow(
+      'createInvalidateMagicLink: "accessCodeId" parameter has to be an ObjectID'
+    );
+  });
+  it('throws if accessCodeId is not an ObjectID', async () => {
+    await expect(
+      createInvalidateMagicLink({ origin, accessCodeId: String(accessCodeId) })
+    ).rejects.toThrow('createInvalidateMagicLink: "accessCodeId" parameter has to be an ObjectID');
+  });
+
+  it('adds `invalidateCode` to the accessCode doc', async () => {
+    await createInvalidateMagicLink({ origin, accessCodeId });
+    const accessCode = await db.collection(COLL_ACCESS_CODES).findOne({ _id: accessCodeId });
+    expect(accessCode.invalidateCode).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  it('returns the link in the correct format', async () => {
+    const link = new URL(await createInvalidateMagicLink({ origin, accessCodeId }));
+    const accessCode = await db.collection(COLL_ACCESS_CODES).findOne({ _id: accessCodeId });
+    expect(link.origin).toBe(origin);
+    expect(link.pathname).toBe('/api/auth/invalidate-magic-link');
+    expect(link.searchParams.get('invalidateCode')).toBe(accessCode.invalidateCode);
   });
 });
