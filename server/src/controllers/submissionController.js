@@ -645,6 +645,7 @@ const handleApiCompose = async (submissionEntities, user) => {
     throw {
       message: `error submitting to farmos ${error}`,
       farmos: error.messages,
+      logs: error.logs || [],
     };
   }
 
@@ -668,7 +669,6 @@ const handleApiCompose = async (submissionEntities, user) => {
       })
     );
   } catch (error) {
-    // TODO this error handling copied from the farmos handle. Find out what is does
     console.log('error handling hylo', error);
     throw {
       message: `error submitting to hylo ${error}`,

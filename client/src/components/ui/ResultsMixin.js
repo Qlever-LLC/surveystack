@@ -53,14 +53,16 @@ export default {
         });
       }
 
+      const getLogsOf = key => get(response, `data.${key}`, [])
+      .map((h) => h.logs)
+      .flat()
+
       if (!hasErrors) {
         this.resultItems.push({
           title: 'Success',
           body: 'Successful submission',
           response,
-          logs: get(response, 'data.hylo', [])
-            .map((h) => h.logs)
-            .flat(),
+          logs: [...getLogsOf('farmos'), ...getLogsOf('hylo')],
         });
       }
     },
