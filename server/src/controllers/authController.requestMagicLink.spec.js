@@ -29,6 +29,20 @@ describe('requestMagicLink', () => {
       });
     });
 
+    it('converts email to lowercase', async () => {
+      const email = 'SomeLetters@UPPERCASE.com';
+      const origin = 'http://foo.com';
+      const req = createReq({ body: { email }, headers: { origin } });
+      await requestMagicLink(req, await createRes());
+      expect(createMagicLink).toHaveBeenCalledTimes(1);
+      expect(createMagicLink).toHaveBeenCalledWith({
+        origin,
+        email: email.toLowerCase(),
+        expiresAfterDays: 1,
+        landingPath: null,
+      });
+    });
+
     it('with all options', async () => {
       const email = 'foo@bar.com';
       const origin = 'http://foo.com';

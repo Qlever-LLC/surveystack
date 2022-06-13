@@ -20,7 +20,8 @@ const col = 'users';
 
 const register = async (req, res) => {
   // TODO: sanity check
-  const { email, name, password } = req.body;
+  const { name, password } = req.body;
+  const email = req.body.email.toLowerCase();
 
   if (!isEmail.validate(email)) {
     throw boom.badRequest(`Invalid email address: ${email}`);
@@ -154,7 +155,8 @@ const resetPassword = async (req, res) => {
 };
 
 const requestMagicLink = async (req, res) => {
-  const { email, expiresAfterDays = 1, landingPath = null } = req.body;
+  const { expiresAfterDays = 1, landingPath = null } = req.body;
+  const email = req.body.email.toLowerCase();
 
   if (!isEmail.validate(email)) {
     throw boom.badRequest(`Invalid email address: ${email}`);

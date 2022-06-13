@@ -18,6 +18,7 @@ export const createUserDoc = (overrides) => ({
 });
 
 export const createUserIfNotExist = async (email, name = null) => {
+  email = email.toLowerCase();
   if (!name) {
     // use the first part of the email as the default name
     name = startCase(email.split('@')[0]);
