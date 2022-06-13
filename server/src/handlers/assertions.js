@@ -23,10 +23,15 @@ export const assertIsSuperAdmin = (req, res, next) => {
   next();
 };
 
-export const assertHasGroupAdminAccess = async (req, res, next) => {
+export const assertHasGroupAdminAccess = catchErrors(async (req, res, next) => {
   if (res.locals.auth.isSuperAdmin) {
     return next();
   }
+
+  if (!res.locals || !res.locals.auth || !res.locals.auth.user || !res.locals.auth.user._id) {
+    throw boom.unauthorized();
+  }
+
   const userId = res.locals.auth.user._id;
   const groupId = req.params.groupId;
 
@@ -36,7 +41,7 @@ export const assertHasGroupAdminAccess = async (req, res, next) => {
   }
 
   next();
-};
+});
 
 const getEntity = async (id, collection) => {
   return await db.collection(collection).findOne({ _id: new ObjectId(id) });
