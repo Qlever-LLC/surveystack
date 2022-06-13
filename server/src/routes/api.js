@@ -9,6 +9,7 @@ import userController from '../controllers/userController';
 import scriptController from '../controllers/scriptController';
 import rolesController from '../controllers/rolesController';
 import * as farmosController from '../controllers/farmosController';
+import * as hyloController from '../controllers/hyloController';
 
 import membershipController from '../controllers/membershipController';
 import infoController from '../controllers/infoController';
@@ -305,6 +306,33 @@ router.post(
   [assertHasGroupAdminAccess],
   catchErrors(farmosController.groupAdminMinimumUpdateCreateFarmOSInstances)
 );
+
+/** Hylo */
+router.get(
+  '/hylo/create-integrated-group',
+  [], // TODO check for access rights
+  catchErrors(hyloController.createIntegratedHyloGroup)
+);
+
+router.post(
+  '/hylo/set-integrated-group',
+  [], // TODO check for access rights
+  catchErrors(hyloController.setIntegratedHyloGroup)
+);
+
+router.post(
+  '/hylo/remove-group-integration',
+  [], // TODO check for access rights
+  catchErrors(hyloController.removeHyloGroupIntegration)
+);
+
+router.get(
+  '/hylo/integrated-group/:groupId',
+  [],
+  catchErrors(hyloController.getIntegratedHyloGroup)
+);
+
+router.get('/hylo/group', [], catchErrors(hyloController.getGroupBySlug));
 
 /** Integrations - Group */
 router.get('/group-integrations', catchErrors(groupIntegrationController.getIntegrations));

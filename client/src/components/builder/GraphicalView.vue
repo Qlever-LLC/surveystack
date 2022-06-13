@@ -106,6 +106,7 @@
         ]"
         :selected="selected"
         :controls="el.children"
+        :availableLibraryUpdates="availableLibraryUpdates"
         :readOnly="readOnly"
         @control-selected="$emit('control-selected', $event)"
         @duplicate-control="$emit('duplicate-control', $event)"
@@ -122,6 +123,7 @@
         ]"
         :selected="selected"
         :controls="el.children"
+        :availableLibraryUpdates="availableLibraryUpdates"
         :readOnly="readOnly"
         @control-selected="$emit('control-selected', $event)"
         @duplicate-control="$emit('duplicate-control', $event)"
@@ -132,20 +134,12 @@
 
       <v-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
         <v-card class="">
-          <v-card-title>
-            Delete Question
-          </v-card-title>
-          <v-card-text class="mt-4">
-            Are you sure you want to remove this question?
-          </v-card-text>
+          <v-card-title> Delete Question </v-card-title>
+          <v-card-text class="mt-4"> Are you sure you want to remove this question? </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <v-btn text @click.stop="deleteQuestionModalIsVisible = false">
-              Cancel
-            </v-btn>
-            <v-btn text color="red" @click.stop="handleConfirmDelete">
-              Remove
-            </v-btn>
+            <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
+            <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

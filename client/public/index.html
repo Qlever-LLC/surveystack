@@ -2,9 +2,9 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0" />
   <title>SurveyStack</title>
   <!-- <link href="/img/splashscreens/iphone5_splash.png"
     media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
@@ -27,6 +27,11 @@
   <link href="/img/splashscreens/ipadpro2_splash.png"
     media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)"
     rel="apple-touch-startup-image" /> -->
+  <link rel="stylesheet" href="/loading_screen/please-wait.min.css" />
+  <link rel="stylesheet" href="/loading_screen/spinner.css" />
+  <link rel="preload" href="/loading_screen/please-wait.min.js" as="script"/>
+  <link rel="preload" href="/img/icons/android-chrome-256x256.png" as="image"/>
+  
 </head>
 
 <body>
@@ -34,6 +39,15 @@
     <strong>We're sorry but SurveyStack doesn't work properly without JavaScript enabled. Please enable it to
       continue.</strong>
   </noscript>
+  <script src="/loading_screen/please-wait.min.js"></script>
+  <script type="text/javascript">
+    window.loading_screen = window.pleaseWait({
+      logo: '/img/icons/android-chrome-256x256.png',
+      backgroundColor: '#F5F5F5',
+      loadingHtml:
+        '<div class="spinner"><div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div></div>',
+    });
+  </script>
   <div id="app"></div>
   <!-- built files will be auto injected -->
 </body>

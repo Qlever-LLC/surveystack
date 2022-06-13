@@ -1,1 +1,1 @@
-Use https://realfavicongenerator.net/ to generate icons for all major platforms
+use favicons.js to generate favicon and pwa assets

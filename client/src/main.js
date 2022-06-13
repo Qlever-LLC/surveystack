@@ -51,3 +51,10 @@ new Vue({
   vuetify,
   render: (h) => h(App),
 }).$mount('#app');
+
+// remove initial loading screen (added in the index.html)
+try {
+  window.loading_screen.finish();
+} catch (e) {
+  console.error('Failed to remove loading screen', e);
+}

@@ -1,9 +1,9 @@
 export default {
   name: 'Regen Digital',
   domain: 'regen-digital',
-  id: '6171ca059d62e10001356510',
-  slug: 'regen-farmers-mutual',
-  path: '/regen-farmers-mutual/',
+  id: '62700ee569741e0001eabbf3',
+  slug: 'regen-digital',
+  path: '/regen-digital/',
   logo: '/partners/regen-digital/img/logo.png',
   themes: {
     light: {

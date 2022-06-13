@@ -12,7 +12,6 @@ export default {
     resources: {
       default: () => [],
     },
-    survey: { type: Object },
   },
   methods: {
     submit() {

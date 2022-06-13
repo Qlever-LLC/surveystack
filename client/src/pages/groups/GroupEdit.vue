@@ -71,40 +71,53 @@
       </v-col>
     </v-row>
 
-    <app-basic-list class="mb-4" v-if="editMode" :entities="integrations" title="Integrations"
-      :link="(integration) => `/group-manage/${integration.slug}/${entity._id}`">
-      <template v-slot:entity="{ entity }">
-        <v-list-item-content>
-          <v-list-item-title>{{ entity.name }}</v-list-item-title>
-          <v-list-item-subtitle>{{ entity.description }} </v-list-item-subtitle>
-        </v-list-item-content>
-      </template>
-    </app-basic-list>
+    <v-row>
+      <v-col cols="12" lg="12">
+        <app-basic-list class="mb-4" v-if="editMode" :entities="integrations" title="Integrations"
+          :link="(integration) => `/group-manage/${integration.slug}/${entity._id}`">
+          <template v-slot:entity="{ entity }">
+            <v-list-item-content>
+              <v-list-item-title>{{ entity.name }}</v-list-item-title>
+              <v-list-item-subtitle>{{ entity.description }} </v-list-item-subtitle>
+            </v-list-item-content>
+          </template>
+        </app-basic-list>
 
-    <app-basic-list editable class="mb-4" v-if="editMode" :entities="members" title="Members"
-      :link="(member) => `/memberships/${member._id}/edit`" :linkNew="{
-        name: 'memberships-new',
-        query: { group: entity._id, role: 'user' },
-      }" :filter="filterMembers">
-      <template v-slot:entity="{ entity }">
-        <v-list-item-content v-if="entity.meta && entity.meta.status === 'pending'">
-          <v-list-item-title class="text--secondary">[Pending] {{ entity.meta.invitationEmail
-          }}{{ entity.meta.invitationName ? ` - ${entity.meta.invitationName}` : '' }}</v-list-item-title>
-          <v-list-item-subtitle>{{
-              entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'
-          }}</v-list-item-subtitle>
-        </v-list-item-content>
+      </v-col>
+    </v-row>
 
-        <v-list-item-content v-else>
-          <v-list-item-title>{{ entity.user.name }}</v-list-item-title>
-          <v-list-item-subtitle>{{ entity.user.email }}</v-list-item-subtitle>
-        </v-list-item-content>
 
-        <v-list-item-action>
-          <v-icon v-if="entity.role === 'admin'">mdi-crown-outline</v-icon>
-        </v-list-item-action>
-      </template>
-    </app-basic-list>
+    <v-row>
+      <v-col cols="12" lg="6">
+        <app-basic-list editable class="mb-4" v-if="editMode" :entities="members" title="Members"
+          :link="(member) => `/memberships/${member._id}/edit`" :linkNew="{
+            name: 'memberships-new',
+            query: { group: entity._id, role: 'user' },
+          }" :filter="filterMembers">
+          <template v-slot:entity="{ entity }">
+            <v-list-item-content v-if="entity.meta && entity.meta.status === 'pending'">
+              <v-list-item-title class="text--secondary">[Pending] {{ entity.meta.invitationEmail
+              }}{{ entity.meta.invitationName ? ` - ${entity.meta.invitationName}` : '' }}</v-list-item-title>
+              <v-list-item-subtitle>{{
+                  entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'
+              }}</v-list-item-subtitle>
+            </v-list-item-content>
+            <v-list-item-content v-else>
+              <v-list-item-title>{{ entity.user.name }}</v-list-item-title>
+              <v-list-item-subtitle>{{ entity.user.email }}</v-list-item-subtitle>
+            </v-list-item-content>
+            <v-list-item-action>
+              <v-icon v-if="entity.role === 'admin'">mdi-crown-outline</v-icon>
+            </v-list-item-action>
+          </template>
+        </app-basic-list>
+      </v-col>
+      <v-col cols="12" lg="6">
+        <v-card v-if="editMode && entity._id" class="mb-4">
+          <app-hylo-integration-card :groupId="entity._id" />
+        </v-card>
+      </v-col>
+    </v-row>
 
     <app-doc-links class="mb-4" v-if="editMode" :group="entity"> </app-doc-links>
   </v-container>
@@ -114,6 +127,7 @@
 import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import appIntegrationList from '@/components/integrations/IntegrationList.vue';
+import appHyloIntegrationCard from '@/components/integrations/HyloIntegrationCard.vue';
 import appPinnedSurveys from '@/components/groups/PinnedSurveys.vue';
 import appDocLinks from '@/components/groups/DocLinks.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
@@ -136,6 +150,7 @@ const integrations = [
 export default {
   components: {
     appIntegrationList,
+    appHyloIntegrationCard,
     appPinnedSurveys,
     appDocLinks,
     appBasicList,

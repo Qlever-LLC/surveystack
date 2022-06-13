@@ -141,3 +141,19 @@ export const changeRecursive = (control, changeFn) => {
     });
   }
 };
+
+/**
+ * Calls changeFn for the passed control and recursively on its descendants controls. changeFn can mutate control
+ * @param promises Array to be filled so caller can wait for them
+ * @param control to call changeFn on
+ * @param changeFn(control) function to be called on control and its descendants
+ */
+export const changeRecursiveAsync = async (promises, control, changeFn) => {
+  promises.push(changeFn(control));
+
+  if (control.children) {
+    control.children.forEach((childControl) => {
+      changeRecursiveAsync(promises, childControl, changeFn);
+    });
+  }
+};

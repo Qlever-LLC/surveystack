@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _, { cloneDeep, isError } from 'lodash';
 
 import { ObjectId } from 'mongodb';
 
@@ -9,6 +9,7 @@ import { withTransaction, withSession } from '../db/helpers';
 import * as csvService from '../services/csv.service';
 import headerService from '../services/header.service';
 import * as farmOsService from '../services/farmos.service';
+import * as hyloService from '../services/hylo.service';
 import rolesService from '../services/roles.service';
 import { queryParam } from '../helpers';
 const col = 'submissions';
@@ -200,7 +201,7 @@ const createDataMetaStage = () => {
   };
 };
 
-const buildPipeline = async (req, res) => {
+export const buildPipeline = async (req, res) => {
   const pipeline = [];
 
   let match = {};
@@ -348,9 +349,11 @@ const buildPipeline = async (req, res) => {
     });
   }
 
-  pipeline.push({
-    $sort: sort,
-  });
+  if (!queryParam(req.query.unsorted)) {
+    pipeline.push({
+      $sort: sort,
+    });
+  }
   return pipeline;
 };
 
@@ -622,13 +625,8 @@ const prepareCreateSubmissionEntity = async (submission, res) => {
   return { entity, survey };
 };
 
-const createSubmission = async (req, res) => {
-  const submissions = Array.isArray(req.body) ? req.body : [req.body];
-
-  const submissionEntities = await Promise.all(
-    submissions.map((submission) => prepareCreateSubmissionEntity(submission, res))
-  );
-
+const handleApiCompose = async (submissionEntities, user) => {
+  submissionEntities = cloneDeep(submissionEntities);
   let farmOsResults;
   try {
     farmOsResults = await Promise.all(
@@ -636,7 +634,7 @@ const createSubmission = async (req, res) => {
         farmOsService.handle({
           submission: entity,
           survey,
-          user: res.locals.auth.user,
+          user,
         })
       )
     );
@@ -644,10 +642,64 @@ const createSubmission = async (req, res) => {
     // TODO what should we do if something internal fails?
     // need to let the user somehow know
     console.log('error handling farmos', error);
-    return res.status(503).send({
+    throw {
       message: `error submitting to farmos ${error}`,
       farmos: error.messages,
-    });
+      logs: error.logs || [],
+    };
+  }
+
+  let hyloResults;
+  try {
+    hyloResults = await Promise.all(
+      submissionEntities.map(async ({ entity, prevEntity, survey }) => {
+        const results = await hyloService.handle({
+          submission: entity,
+          prevSubmission: prevEntity,
+          survey,
+          user,
+        });
+        // Save the results of the Hylo handler in the submission
+        const permanentResults = results.map((r) => r.permanent).filter(Boolean);
+        entity.meta.permanentResults = [
+          ...(Array.isArray(entity.meta.permanentResults) ? entity.meta.permanentResults : []),
+          ...permanentResults,
+        ];
+        return results;
+      })
+    );
+  } catch (error) {
+    console.log('error handling hylo', error);
+    throw {
+      message: `error submitting to hylo ${error}`,
+      hylo: error,
+      logs: error.logs || [],
+    };
+  }
+
+  return {
+    results: {
+      farmos: farmOsResults.flat(),
+      hylo: hyloResults.flat(),
+    },
+    entities: submissionEntities,
+  };
+};
+
+const createSubmission = async (req, res) => {
+  const submissions = Array.isArray(req.body) ? req.body : [req.body];
+
+  let submissionEntities = await Promise.all(
+    submissions.map((submission) => prepareCreateSubmissionEntity(submission, res))
+  );
+
+  let apiComposeResults = {};
+  try {
+    const composeResults = await handleApiCompose(submissionEntities, res.locals.auth.user);
+    apiComposeResults = composeResults.results;
+    submissionEntities = composeResults.entities;
+  } catch (errorObject) {
+    return res.status(503).send(errorObject);
   }
 
   const mapSubmissionToQSL = ({ entity, survey }) => {
@@ -684,7 +736,7 @@ const createSubmission = async (req, res) => {
 
   res.send({
     ...results,
-    farmos: farmOsResults.flat(),
+    ...apiComposeResults,
   });
 };
 
@@ -758,7 +810,7 @@ const findVal = (obj, keyToFind) => {
 
 const updateSubmission = async (req, res) => {
   const { id } = req.params;
-  const newSubmission = await sanitize(req.body);
+  let newSubmission = await sanitize(req.body);
 
   // re-insert old submission version with a new _id
   const oldSubmission = res.locals.existing;
@@ -777,26 +829,39 @@ const updateSubmission = async (req, res) => {
     throw boom.notFound(`No survey found with id: ${newSubmission.meta.survey.id}`);
   }
 
-  const farmosResults = [];
+  let apiComposeResults = {};
+  const creator = await db.collection('users').findOne({ _id: newSubmission.meta.creator });
   try {
-    // re-run with original creator user
-    const creator = await db.collection('users').findOne({ _id: newSubmission.meta.creator });
-    const results = await farmOsService.handle({
-      submission: newSubmission,
-      survey,
-      user: creator,
-    });
-    farmosResults.push(...results);
-    // could contain errors, need to pass these on to the user
-  } catch (error) {
-    // TODO what should we do if something internal fails?
-    // need to let the user somehow know
-    console.log('error handling farmos', error);
-    return res.status(503).send({
-      message: `error submitting to farmos ${error}`,
-      farmos: error.messages,
-    });
+    const composeResults = await handleApiCompose(
+      [{ entity: newSubmission, prevEntity: oldSubmission, survey }],
+      creator
+    );
+    apiComposeResults = composeResults.results;
+    newSubmission = composeResults.entities[0].entity;
+  } catch (errorObject) {
+    return res.status(503).send(errorObject);
   }
+
+  // const farmosResults = [];
+  // try {
+  //   // re-run with original creator user
+  //   const creator = await db.collection('users').findOne({ _id: newSubmission.meta.creator });
+  //   const results = await farmOsService.handle({
+  //     submission: newSubmission,
+  //     survey,
+  //     user: creator,
+  //   });
+  //   farmosResults.push(...results);
+  //   // could contain errors, need to pass these on to the user
+  // } catch (error) {
+  //   // TODO what should we do if something internal fails?
+  //   // need to let the user somehow know
+  //   console.log('error handling farmos', error);
+  //   return res.status(503).send({
+  //     message: `error submitting to farmos ${error}`,
+  //     farmos: error.messages,
+  //   });
+  // }
 
   const updated = await db.collection(col).findOneAndUpdate(
     { _id: new ObjectId(id) },
@@ -805,11 +870,10 @@ const updateSubmission = async (req, res) => {
       returnOriginal: false,
     }
   );
-  updated.value.farmos = farmosResults;
 
   await updateSubmissionToLibrarySurveys(survey, newSubmission);
 
-  return res.send(updated.value);
+  return res.send({ ...updated.value, ...apiComposeResults });
 };
 
 const updateSubmissionToLibrarySurveys = async (survey, submission) => {
@@ -839,7 +903,7 @@ const updateSubmissionToLibrarySurveys = async (survey, submission) => {
 
 const bulkReassignSubmissions = async (req, res) => {
   const { group, creator, ids } = req.body;
-  const submissions = res.locals.existing;
+  let submissions = res.locals.existing;
 
   const surveyIds = [
     ...new Set(submissions.map((submission) => submission.meta.survey.id.toString())),
@@ -854,27 +918,44 @@ const bulkReassignSubmissions = async (req, res) => {
     throw boom.notFound(`Survey referenced by submission not found.`);
   }
 
-  let farmOsResults;
+  let apiComposeResults = {};
   try {
-    const farmOsResponses = await Promise.all(
-      submissions.map((submission) =>
-        farmOsService.handle({
-          submission,
-          survey: surveys.find(
-            ({ _id }) => submission.meta.survey.id.toString() === _id.toString()
-          ),
-          user: res.locals.auth.user,
-        })
-      )
-    );
-    farmOsResults = farmOsResponses.flat();
-  } catch (error) {
-    console.log('error handling farmos', error);
-    return res.status(503).send({
-      message: `Error submitting to farmos ${error}`,
-      farmos: error.messages,
-    });
+    const submissionsWithSurveys = submissions.map((submission) => ({
+      entity: submission,
+      prevEntity: submission,
+      survey: surveys.find(({ _id }) => submission.meta.survey.id.toString() === _id.toString()),
+    }));
+    const composeResults = await handleApiCompose(submissionsWithSurveys, res.locals.auth.user);
+    apiComposeResults = composeResults.results;
+    submissions = composeResults.entities.map((s) => s.entity);
+  } catch (errorObject) {
+    if (isError(errorObject)) {
+      throw errorObject;
+    }
+    return res.status(503).send(errorObject);
   }
+
+  // let farmOsResults;
+  // try {
+  //   const farmOsResponses = await Promise.all(
+  //     submissions.map((submission) =>
+  //       farmOsService.handle({
+  //         submission,
+  // survey: surveys.find(
+  //   ({ _id }) => submission.meta.survey.id.toString() === _id.toString()
+  // ),
+  //         user: res.locals.auth.user,
+  //       })
+  //     )
+  //   );
+  //   farmOsResults = farmOsResponses.flat();
+  // } catch (error) {
+  //   console.log('error handling farmos', error);
+  //   return res.status(503).send({
+  //     message: `Error submitting to farmos ${error}`,
+  //     farmos: error.messages,
+  //   });
+  // }
 
   const results = await withSession(mongoClient, async (session) => {
     try {
@@ -930,7 +1011,7 @@ const bulkReassignSubmissions = async (req, res) => {
 
   res.send({
     result: results.result,
-    farmos: farmOsResults.flat(),
+    ...apiComposeResults,
   });
 };
 
@@ -938,7 +1019,7 @@ const reassignSubmission = async (req, res) => {
   const { id } = req.params;
   const { body } = req;
 
-  const existing = res.locals.existing;
+  let existing = res.locals.existing;
   const updatedRevision = existing.meta.revision + 1;
 
   const survey = await db.collection('surveys').findOne({ _id: existing.meta.survey.id });
@@ -953,26 +1034,38 @@ const reassignSubmission = async (req, res) => {
   existing.meta.archivedReason = 'REASSIGN';
   await db.collection(col).insertOne(existing);
 
-  const farmosResults = [];
+  let apiComposeResults = {};
   try {
-    // TODO: should we use the currently logged in user or the submission's user?
-    // probably the submission's user (for instance if submission is re-assigned with a different user)
-    const results = await farmOsService.handle({
-      submission: existing,
-      survey,
-      user: res.locals.auth.user,
-    });
-    farmosResults.push(...results);
-    // could contain errors, need to pass these on to the user
-  } catch (error) {
-    // TODO what should we do if something internal fails?
-    // need to let the user somehow know
-    console.log('error handling farmos', error);
-    return res.status(503).send({
-      message: `error submitting to farmos ${error}`,
-      farmos: error.messages,
-    });
+    const composeResults = await handleApiCompose(
+      [{ entity: existing, prevEntity: existing, survey }],
+      res.locals.auth.user
+    );
+    apiComposeResults = composeResults.results;
+    existing = composeResults.entities[0].entity;
+  } catch (errorObject) {
+    return res.status(503).send(errorObject);
   }
+
+  // const farmosResults = [];
+  // try {
+  //   // TODO: should we use the currently logged in user or the submission's user?
+  //   // probably the submission's user (for instance if submission is re-assigned with a different user)
+  //   const results = await farmOsService.handle({
+  //     submission: existing,
+  //     survey,
+  //     user: res.locals.auth.user,
+  //   });
+  //   farmosResults.push(...results);
+  //   // could contain errors, need to pass these on to the user
+  // } catch (error) {
+  //   // TODO what should we do if something internal fails?
+  //   // need to let the user somehow know
+  //   console.log('error handling farmos', error);
+  //   return res.status(503).send({
+  //     message: `error submitting to farmos ${error}`,
+  //     farmos: error.messages,
+  //   });
+  // }
 
   const updateOperation = { 'meta.revision': updatedRevision };
   if (body.group) {
@@ -993,8 +1086,7 @@ const reassignSubmission = async (req, res) => {
       { $set: updateOperation },
       { returnOriginal: false }
     );
-  updated.value.farmos = farmosResults;
-  return res.send(updated.value);
+  return res.send({ ...updated.value, ...apiComposeResults });
 };
 
 const archiveSubmissions = async (req, res) => {

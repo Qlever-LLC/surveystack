@@ -120,10 +120,17 @@ export const setRole = async (membershipId, role) => {
   );
 };
 
-export const createReq = ({ body = {}, params = {}, query = {}, headers = {} } = {}) => ({
+export const createReq = ({
+  body = {},
+  params = {},
+  query = {},
+  headers = {},
+  cookies = {},
+} = {}) => ({
   body,
   params,
   query,
+  cookies,
   headers: {
     origin: 'https://surveystack.io',
     ...headers,
