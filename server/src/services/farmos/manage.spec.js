@@ -114,6 +114,8 @@ describe('manageFarmOS', () => {
 
     // TODO create plan
 
+    await createFarmosGroupSettings(group._id);
+
     await setPlanForGroup(group._id, 'test-plan');
     const res = await getPlanForGroup(group._id);
     expect(res).toBe('test-plan');
@@ -213,6 +215,8 @@ describe('manageFarmOS', () => {
     const groupCommunity = await groupLabs.createSubGroup({ name: 'Community' });
     const groupCommunityLab = await groupCommunity.createSubGroup({ name: 'Lab' });
 
+    const froeignGroup = await createGroup({ name: 'Foreign' });
+
     const admin1_data = { userOverrides: { name: 'Dan TerAvest', email: 'teravestdan@gmail.com' } };
     const admin1 = await groupLabs.createAdminMember(admin1_data);
     const user1_data = { userOverrides: { name: 'Dave Jole', email: 'djole2352@gmail.com' } };
@@ -262,6 +266,15 @@ describe('manageFarmOS', () => {
       true
     );
 
+
+    const user2_farmOSInstance2 = 'foreigninstance.farmos.net';
+    await createFarmOSInstanceForUserAndGroup(
+      user2.user._id,
+      froeignGroup._id,
+      user2_farmOSInstance2,
+      true
+    );
+
     // create subgroup "Bio > Ext"
     const groupExt = await groupBionutrient.createSubGroup({ name: 'Ext' });
     const userext_data = { userOverrides: { name: 'Ext ernal', email: 'external@bj.net' } };
@@ -273,7 +286,7 @@ describe('manageFarmOS', () => {
       userext_farmOSInstance1,
       true
     );
-    await mapFarmOSInstanceToGroup(groupMichigan._id, userext_farmOSInstance1);
+    const { _id: idExternal1 } = await mapFarmOSInstanceToGroup(groupMichigan._id, userext_farmOSInstance1);
     const userext_data2 = { userOverrides: { name: 'Ext ernal2', email: 'external2@bj.net' } };
     const userext2 = await groupExt.createUserMember(userext_data2);
     const userext_farmOSInstance2 = 'external2.farmos.net';
@@ -283,7 +296,7 @@ describe('manageFarmOS', () => {
       userext_farmOSInstance2,
       true
     );
-    await mapFarmOSInstanceToGroup(groupMichigan._id, userext_farmOSInstance2);
+    const { _id: idExternal2 } =await mapFarmOSInstanceToGroup(groupMichigan._id, userext_farmOSInstance2);
 
     //FederalMills
     const groupFederalMills = await createGroup({ name: 'FederalMills' });
@@ -352,7 +365,7 @@ describe('manageFarmOS', () => {
     expect(groupLabsInfos.members[2].admin).toBe(false);
     expect(groupLabsInfos.members[2].breadcrumb).toBe('Bionutrient > Labs > Michigan');
     expect(groupLabsInfos.members[2].email).toBe('bigjenny@bj.net');
-    expect(groupLabsInfos.members[2].connectedFarms).toHaveLength(1);
+    expect(groupLabsInfos.members[2].connectedFarms).toHaveLength(2);
     expect(groupLabsInfos.members[2].connectedFarms[0].instanceName).toBe(
       'jennybigfarmstand.farmos.net'
     );
@@ -364,10 +377,10 @@ describe('manageFarmOS', () => {
     expect(groupLabsInfos.unassignedInstances).toHaveLength(2);
     expect(groupLabsInfos.unassignedInstances[0].instanceName).toBe('external.farmos.net');
     expect(groupLabsInfos.unassignedInstances[0].breadcrumb).toBe('Bionutrient > Labs > Michigan');
-    expect(groupLabsInfos.unassignedInstances[0]._id).toStrictEqual(external_farmos_net_data._id);
+    expect(groupLabsInfos.unassignedInstances[0]._id).toStrictEqual(idExternal1);
     expect(groupLabsInfos.unassignedInstances[1].instanceName).toBe('external2.farmos.net');
     expect(groupLabsInfos.unassignedInstances[1].breadcrumb).toBe('Bionutrient > Labs > Michigan');
-    expect(groupLabsInfos.unassignedInstances[1]._id).toStrictEqual(external2_farmos_net_data._id);
+    expect(groupLabsInfos.unassignedInstances[1]._id).toStrictEqual(idExternal2);
   });
 
   it('createFarmosGroupSettings, getGroupSettings and setGroupSettings', async () => {
