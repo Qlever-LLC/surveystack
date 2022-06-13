@@ -31,6 +31,8 @@ import {
   disableSubgroupsToJoinCoffeeShop,
   enableSubgroupAdminsToCreateFarmOSInstances,
   disableSubgroupAdminsToCreateFarmOSInstances,
+  getTree,
+  getTreeFromGroupId,
 } from '../services/farmos/manage';
 import { aggregator } from '../services/farmos/aggregator';
 
@@ -606,6 +608,26 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
   }
 };
 
+
+export const getDomain = async (req, res) => {
+  const schema = Joi.objectId().required();
+  const { groupId } = req.params;
+  const validres = schema.validate(groupId);
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
+
+  const tree = await getTreeFromGroupId(groupId);
+
+  return res.send({
+    domain: tree.domainRoot,
+    canBecomeRoot: tree.canBecomeRoot(),
+    isDomainRootInDescendants: tree.isDomainRooInDescendants()
+  });
+}
+
 export const groupAdminMinimumGetGroupInformation = async (req, res) => {
   const groupId = asMongoId(req.params.groupId);
   const group = await db.collection('groups').findOne({ _id: groupId });
@@ -622,18 +644,30 @@ export const groupAdminMinimumGetGroupInformation = async (req, res) => {
 };
 
 export const superAdminUpdateFarmOSAccess = async (req, res) => {
+  const schema = Joi.object({
+    groupId: Joi.objectId().required(),
+    enable: Joi.boolean().required()
+  });
+
+
+  const validres = schema.validate(req.body);
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
   const { groupId, enable } = req.body;
-  if (!groupId) {
-    throw boom.badData('groupId missing');
-  }
-  if (enable == undefined) {
-    throw boom.badData('updated value missing');
-  }
+
+  const tree = await getTreeFromGroupId(groupId);
+
   if (enable) {
-    await enableFarmOSAccessForGroup(asMongoId(groupId));
+    if (tree.canBecomeRoot()) {
+      await tree.enableFarmOS();
+    }
   } else {
-    await disableFarmOSAccessForGroup(asMongoId(groupId));
+    await tree.disableFarmOS();
   }
+
   return res.send({
     status: 'success',
   });

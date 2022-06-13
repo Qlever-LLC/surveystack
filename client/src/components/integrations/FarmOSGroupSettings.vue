@@ -2,6 +2,7 @@
   <div>
     <div class="d-flex justify-space-between">
       <div>
+        <h1>{{ groupInfos.name }}</h1>
         <h2>Connected Members & Farms</h2>
         <div class="pa-3">
           <p class="font-weight-bold">Settings</p>
@@ -91,9 +92,9 @@
       </template>
 
       <template v-slot:item="{ item, index }">
-        <tr v-for="(group, id) in item.connectedFarms" :key="group.instanceName + '-' + id">
+        <tr v-for="(group, idx) in item.connectedFarms" :key="group.instanceName + '-' + idx">
           <td class="box">
-            <div v-if="id == 0" class="d-flex align-center justify-space-between">
+            <div v-if="idx == 0" class="d-flex align-center justify-space-between">
               <span class="d-flex align-center">
                 <span v-if="item.admin" class="mdi mdi-crown pr-1"></span>
                 <span v-if="item.name"
@@ -120,24 +121,24 @@
             <div v-else>no farmos connected</div>
           </td>
           <td class="box">
-            <div v-if="item.connectedFarms[id].memberships">
-              <span v-for="(ms, idd) in item.connectedFarms[id].memberships" :key="idd">
-                <span v-if="idd === 0 || idd === 1 || developMbships[index].value">
-                  {{ ms.path }}
+            <div v-if="item.connectedFarms[id].groups">
+              <span v-for="(ms, iidx) in item.connectedFarms[id].groups" :key="`connected-${idx}-${iidx}`">
+                <span v-if="iidx === 0 || iidx === 1 || developMbships[index].value">
+                  {{ ms.breadcrumb }}
                   <br />
                 </span>
                 <span
-                  v-if="idd === 2 && !developMbships[index].value"
+                  v-if="iidx === 2 && !developMbships[index].value"
                   @click="toggleDevelopMbships(index)"
                   class="nOthers"
                 >
-                  (+{{ item.connectedFarms[id].memberships.length - 2 }} others)
+                  (+{{ item.connectedFarms[id].groups.length - 2 }} others)
                 </span>
                 <span
                   v-if="
                     developMbships[index].value &&
-                    idd === item.connectedFarms[id].memberships.length - 1 &&
-                    item.connectedFarms[id].memberships.length - 1 > 2
+                    idd === item.connectedFarms[id].groups.length - 1 &&
+                    item.connectedFarms[id].groups.length - 1 > 2
                   "
                   @click="toggleDevelopMbships(index)"
                   class="nOthers"
@@ -274,7 +275,7 @@ export default {
   position: sticky;
   font-size: 16px !important;
   border-bottom: none;
-  z-index: 10;
+  /* z-index: 10; */
 }
 .header2CSS {
   top: 48px;
@@ -282,7 +283,7 @@ export default {
   position: sticky;
   font-size: 16px;
   border-bottom: none;
-  z-index: 10;
+  /* z-index: 10; */
 }
 .v-data-table /deep/ .v-data-table__wrapper {
   overflow: unset;

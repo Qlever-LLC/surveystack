@@ -11,7 +11,7 @@ describe('rolesService', () => {
     const groupCommunityLab = await groupCommunity.createSubGroup({ name: 'Lab' });
 
     const a = await getDescendantGroups(groupBionutrient);
-    console.log(a);
+    // console.log(a);
     expect(a._id).not.toBeNaN();
     expect.objectContaining(a[0].meta);
     expect(a[0].name).toBe('Bionutrient');
@@ -22,7 +22,7 @@ describe('rolesService', () => {
     expect(a).toHaveLength(6);
 
     const b = await getDescendantGroups(groupBionutrient, {});
-    console.log(b);
+    // console.log(b);
     expect(b._id).not.toBeNaN();
     expect.objectContaining(b[0].meta);
     expect(b[0].name).toBe('Bionutrient');
@@ -33,7 +33,7 @@ describe('rolesService', () => {
     expect(b).toHaveLength(6);
 
     const c = await getDescendantGroups(groupBionutrient, { name: 1, dir: 1 });
-    console.log(c);
+    // console.log(c);
     expect(c._id).not.toBeNaN();
     expect(c[0].meta).toBeUndefined();
     expect(c[0].name).toBe('Bionutrient');

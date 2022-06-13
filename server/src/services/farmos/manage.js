@@ -52,6 +52,10 @@ export const getTree = async (group) => {
   const allGroups = [...ascendants, ...descendants];
 
   const isDomainRooInDescendants = () => {
+    if(domainRoot == null) {
+      return false;
+    }
+    
     return descendants.filter(d => !d._id.equals(group._id) /* exclude self*/)
       .some(d => d._id.equals(domainRoot._id));
   }
@@ -695,14 +699,15 @@ export const getMemberInformationForDomain = async (descendants) => {
     _id: { $in: groupIds.map(id => new ObjectId(id)) }
   }).toArray();
 
-  const prj = res.map(item => {
+  console.log("res", res);
+  const prj = res.filter(r => r.user !== null && r.user.length != 0).map(item => {
     return {
       user: item.user_id,
       group: item.group_id,
       admin: item.admin,
       path: item.path,
       email: item.email,
-      name: item.user[0].name,
+      name: item.user.length > 0 ? item.user[0].name : "",
       connectedFarms: item.farmos_instances.map(ins => ({
         instanceName: ins.instanceName,
         owner: ins.owner,
@@ -812,3 +817,13 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
   groupInformation = { ...groupSettings, ...membersRawData };
   return groupInformation;
 };
+
+
+export const getTreeFromGroupId = async (groupId) => {
+  const res = await db.collection("groups").findOne({ _id: asMongoId(groupId) });
+  if (!res) {
+    throw boom.notFound();
+  }
+
+  return await getTree(res);
+}
