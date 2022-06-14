@@ -342,6 +342,6 @@ tr {
 }
 
 td {
-  border: none;
+  border: none !important;
 }
 </style>
