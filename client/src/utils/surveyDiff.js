@@ -296,7 +296,7 @@ function createThreePointChange(changeLocal, changeRemote) {
     }
   }
 
-  if (hasBreakingChange(threePointChange.diff)) {
+  if (threePointChange.hasLocalChange && hasBreakingChange(threePointChange.diff)) {
     threePointChange.changeType = CONFLICT;
   }
 

@@ -399,7 +399,7 @@ describe('surveyDiff', () => {
       expect(diff[0].diff.name.valueC).toBe(controlRemoteVersionB.name);
       expect(diff[0].diff.name.valueA).toBe(controlLocalVersion.name);
     });
-    it('returns conflicting changes', () => {
+    it('returns conflicting changes in case of local change', () => {
       const controlLocalVersion = createControlInstance({
         type: 'number',
         name: 'number_1',
@@ -450,6 +450,56 @@ describe('surveyDiff', () => {
               valueA: controlLocalVersion.options.hidden,
               valueB: controlRemoteVersionA.options.hidden,
               valueC: controlRemoteVersionB.options.hidden,
+            },
+          },
+        },
+      ]);
+    });
+    it('does not return conflicting changes in case of no local change', () => {
+      const controlLocalVersion = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowHide: true },
+      });
+      const controlRemoteVersionA = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowHide: true },
+      });
+      const controlRemoteVersionB = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowHide: false },
+      });
+
+      const diff = diffThreeSurveyVersions([controlLocalVersion], [controlRemoteVersionA], [controlRemoteVersionB]);
+
+      expect(diff).toMatchObject([
+        {
+          changeType: changeType.CHANGED,
+          hasLocalChange: false,
+          controlRevisionA: controlLocalVersion,
+          childIndexRevisionA: 0,
+          pathRevisionA: controlLocalVersion.name,
+          parentIdRevisionA: null,
+          controlRevisionB: controlRemoteVersionA,
+          childIndexRevisionB: 0,
+          pathRevisionB: controlRemoteVersionA.name,
+          parentIdRevisionB: null,
+          controlRevisionC: controlRemoteVersionB,
+          childIndexRevisionC: 0,
+          pathRevisionC: controlRemoteVersionB.name,
+          parentIdRevisionC: null,
+
+          diff: {
+            'options.allowHide': {
+              changeType: changeType.CHANGED,
+              valueA: controlLocalVersion.options.allowHide,
+              valueB: controlRemoteVersionA.options.allowHide,
+              valueC: undefined, //yes, it's not false, cause some sanitation in place sets false to undefined
             },
           },
         },
