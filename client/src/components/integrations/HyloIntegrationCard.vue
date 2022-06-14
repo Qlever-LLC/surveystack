@@ -11,19 +11,19 @@
       <v-card-text v-else-if="!!integratedHyloGroup">
         <v-row align="center" class="spacer mb-4" no-gutters>
           <!-- <v-col cols="4" sm="2" md="1"> -->
-            <v-avatar size="36px" class="mr-4">
-              <img alt="Avatar" :src="integratedHyloGroup.avatarUrl" />
-            </v-avatar>
+          <v-avatar size="36px" class="mr-4">
+            <img alt="Avatar" :src="integratedHyloGroup.avatarUrl" />
+          </v-avatar>
           <!-- </v-col> -->
 
           <!-- <v-col class="hidden-xs-only" sm="5" md="3"> -->
-            <span class="grey--text">
-              &nbsp;Your group is integrated with
-              <a :href="`https://wwww.hylo.com/groups/${integratedHyloGroup.slug}`" target="_blank">{{
-                integratedHyloGroup.name
-              }}</a>
-              on Hylo
-            </span>
+          <span class="grey--text">
+            &nbsp;Your group is integrated with
+            <a :href="`https://wwww.hylo.com/groups/${integratedHyloGroup.slug}`" target="_blank">{{
+              integratedHyloGroup.name
+            }}</a>
+            on Hylo
+          </span>
           <!-- </v-col> -->
         </v-row>
         <!-- <div>

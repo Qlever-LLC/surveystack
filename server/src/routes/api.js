@@ -278,8 +278,6 @@ router.post(
   catchErrors(farmosController.superAdminUnMapFarmosInstanceFromUser)
 );
 
-
-
 router.post(
   '/farmos/group-manage/enable',
   [assertIsSuperAdmin],
@@ -291,7 +289,6 @@ router.get(
   [assertHasGroupAdminAccess],
   catchErrors(farmosController.getDomain)
 );
-
 
 router.get(
   '/farmos/group-manage/:groupId',
@@ -444,6 +441,5 @@ router.use((req, res) => {
     status: 404,
   });
 });
-
 
 export default router;

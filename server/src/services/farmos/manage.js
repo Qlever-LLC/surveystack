@@ -701,7 +701,7 @@ export const getMemberInformationForDomain = async (descendants) => {
 
   // console.log("present groups", JSON.stringify(groups, null, 2));
 
-  console.log("res", res);
+  // console.log("res", res);
   const prj = res.filter(r => r.user !== null && r.user.length != 0).map(item => {
     return {
       user: item.user_id,
@@ -833,7 +833,8 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
     const connectedFarms = [];
     const currentUser = {
       ...memberships[0],
-      connectedFarms
+      connectedFarms,
+      groups: [],
     };
 
     for (const m of memberships) {
@@ -841,6 +842,14 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
         if (!connectedFarms.find(cf => cf.instanceName == connectedFarm.instanceName)) {
           connectedFarms.push(connectedFarm);
         }
+      }
+
+      if (!currentUser.groups.find(g => g.id.equals(m.group))) {
+        currentUser.groups.push({
+          id: m.group,
+          breadcrumb: m.breadcrumb,
+          path: m.path
+        })
       }
     }
 

@@ -10,26 +10,28 @@
       </div>
     </div>
 
-    <div style="color: red;" v-if="entity.meta.archived">
+    <div style="color: red" v-if="entity.meta.archived">
       <strong>Please note:</strong> this group is currently archived
     </div>
     <h1>
       <span>{{ entity.name }}</span>
-      <v-chip v-if="isPremium" class="ml-2" color="success">
-        <v-icon small left> mdi-octagram </v-icon>Premium
-      </v-chip>
+      <v-chip v-if="isPremium" class="ml-2" color="success"> <v-icon small left> mdi-octagram </v-icon>Premium </v-chip>
     </h1>
     <h3 class="text--secondary">{{ entity.path }}</h3>
     <div class="text--secondary body-2">{{ entity._id }}</div>
-
 
     <v-row>
       <v-col>
         <div class="d-flex justify-end">
           <v-checkbox class="mt-0" v-model="showArchivedSubgroups" label="View archived" dense hide-details />
         </div>
-        <app-basic-list :editable="editable" :entities="subgroups" title="Subgroups" :link="(e) => `/g${e.path}`"
-          :linkNew="{ name: 'groups-new', query: { dir: entity.path } }">
+        <app-basic-list
+          :editable="editable"
+          :entities="subgroups"
+          title="Subgroups"
+          :link="(e) => `/g${e.path}`"
+          :linkNew="{ name: 'groups-new', query: { dir: entity.path } }"
+        >
           <template v-slot:entity="{ entity }">
             <v-list-item-content>
               <v-list-item-title>{{ entity.name }}</v-list-item-title>
@@ -41,9 +43,13 @@
     </v-row>
     <v-row>
       <v-col>
-        <app-basic-list :editable="editable"
-          :entities="entity.surveys && entity.surveys.pinned ? entity.surveys.pinned : []" title="Pinned Surveys"
-          :link="(e) => `/surveys/${e._id}`" :linkNew="`/groups/edit/${entity._id}`">
+        <app-basic-list
+          :editable="editable"
+          :entities="entity.surveys && entity.surveys.pinned ? entity.surveys.pinned : []"
+          title="Pinned Surveys"
+          :link="(e) => `/surveys/${e._id}`"
+          :linkNew="`/groups/edit/${entity._id}`"
+        >
           <template v-slot:entity="{ entity }">
             <v-list-item-content>
               <v-list-item-title>{{ entity.name }}</v-list-item-title>
@@ -171,7 +177,7 @@ export default {
   margin-bottom: 3rem;
 }
 
-.placeholder>div {
+.placeholder > div {
   display: flex;
   flex: 1;
   justify-content: center;

@@ -1,7 +1,12 @@
 <template>
-  <FarmOSGroupSettings v-if="farmosEnabled" class="ma-16" @addGrpCoffeeShop="addGroupCoffeeShop"
+  <FarmOSGroupSettings
+    v-if="farmosEnabled"
+    class="ma-16"
+    @addGrpCoffeeShop="addGroupCoffeeShop"
     @allowSbGrpsJoinCoffeeShop="allowSubGroupsJoinCoffeeShop"
-    @allowSbGrpsAdminsCreateFarmOSFarmsInSS="allowSubGroupsAdminsCreateFarmOSFarmsInSS" :groupInfos="groupInfos">
+    @allowSbGrpsAdminsCreateFarmOSFarmsInSS="allowSubGroupsAdminsCreateFarmOSFarmsInSS"
+    :groupInfos="groupInfos"
+  >
   </FarmOSGroupSettings>
   <v-container v-else>
     <v-row v-if="loading">
@@ -21,9 +26,7 @@
         </v-card>
       </v-col>
     </v-row>
-
   </v-container>
-
 </template>
 
 <script>
@@ -41,7 +44,7 @@ export default {
   computed: {
     superAdmin() {
       return this.$store.getters['auth/isSuperAdmin'];
-    }
+    },
   },
   data() {
     return {
@@ -49,8 +52,8 @@ export default {
       groupId: null,
       farmosEnabled: false,
       loading: true,
-      message: "",
-    }
+      message: '',
+    };
   },
   async created() {
     // setup function
@@ -79,19 +82,19 @@ export default {
 
     try {
       const { data: res } = await api.get(`/farmos/group-manage/${groupId}/domain`);
-      console.log("res", res.data);
+      console.log('res', res.data);
       if (res.domain) {
         if (res.isDomainRootInDescendants) {
-          this.message = `At least one subgroup has the FarmOS integration enabled: ${res.domain.name}`
+          this.message = `At least one subgroup has the FarmOS integration enabled: ${res.domain.name}`;
         } else {
           const { data: groupInfos } = await api.get(`/farmos/group-manage/${groupId}`);
-          console.log("group settings", groupInfos);
-          groupInfos.response.members = _.sortBy(groupInfos.response.members, (m) => - m.connectedFarms.length) ;
+          console.log('group settings', groupInfos);
+          groupInfos.response.members = _.sortBy(groupInfos.response.members, (m) => -m.connectedFarms.length);
           this.groupInfos = groupInfos.response;
           this.farmosEnabled = true;
         }
       } else {
-        this.message = "Please contact Surveystack to enable FarmOS integration for your Group";
+        this.message = 'Please contact Surveystack to enable FarmOS integration for your Group';
       }
       this.loading = false;
     } catch (error) {
@@ -118,23 +121,22 @@ export default {
     */
   },
   methods: {
-    updateGroupConfig() { },
-    unifomMembersInGroupInfos() { },
-    addGroupCoffeeShop() { },
-    allowSubGroupsJoinCoffeeShop() { },
-    allowSubGroupsAdminsCreateFarmOSFarmsInSS() { },
+    updateGroupConfig() {},
+    unifomMembersInGroupInfos() {},
+    addGroupCoffeeShop() {},
+    allowSubGroupsJoinCoffeeShop() {},
+    allowSubGroupsAdminsCreateFarmOSFarmsInSS() {},
     async enable() {
       const res = await api.post('/farmos/group-manage/enable', { groupId: this.groupId, enable: true });
-      console.log("res", res.data);
-
+      console.log('res', res.data);
 
       try {
         const res = await api.get('/farmos/group-manage/' + this.groupId);
         this.groupInfos.value = res.data;
       } catch (error) {
-        console.log("error", error.status);
+        console.log('error', error.status);
       }
-    }
-  }
+    },
+  },
 };
 </script>

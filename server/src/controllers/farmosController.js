@@ -86,7 +86,7 @@ export const getFarmOSInstances = async (req, res) => {
    */
 
   const userId = requireUserId(res);
-  console.log('userid', userId);
+  // console.log('userid', userId);
 
   const r = await listFarmOSInstancesForUser(userId);
 
@@ -608,7 +608,6 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
   }
 };
 
-
 export const getDomain = async (req, res) => {
   const schema = Joi.objectId().required();
   const { groupId } = req.params;
@@ -618,15 +617,14 @@ export const getDomain = async (req, res) => {
     throw boom.badData(`error: ${errors.join(',')}`);
   }
 
-
   const tree = await getTreeFromGroupId(groupId);
 
   return res.send({
     domain: tree.domainRoot,
     canBecomeRoot: tree.canBecomeRoot(),
-    isDomainRootInDescendants: tree.isDomainRooInDescendants()
+    isDomainRootInDescendants: tree.isDomainRooInDescendants(),
   });
-}
+};
 
 export const groupAdminMinimumGetGroupInformation = async (req, res) => {
   const groupId = asMongoId(req.params.groupId);
@@ -646,9 +644,8 @@ export const groupAdminMinimumGetGroupInformation = async (req, res) => {
 export const superAdminUpdateFarmOSAccess = async (req, res) => {
   const schema = Joi.object({
     groupId: Joi.objectId().required(),
-    enable: Joi.boolean().required()
+    enable: Joi.boolean().required(),
   });
-
 
   const validres = schema.validate(req.body);
   if (validres.error) {
