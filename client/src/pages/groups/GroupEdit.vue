@@ -112,11 +112,6 @@
           </template>
         </app-basic-list>
       </v-col>
-      <v-col cols="12" lg="6">
-        <v-card v-if="editMode && entity._id" class="mb-4">
-          <app-hylo-integration-card :groupId="entity._id" />
-        </v-card>
-      </v-col>
     </v-row>
 
     <app-doc-links class="mb-4" v-if="editMode" :group="entity"> </app-doc-links>
@@ -127,7 +122,6 @@
 import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import appIntegrationList from '@/components/integrations/IntegrationList.vue';
-import appHyloIntegrationCard from '@/components/integrations/HyloIntegrationCard.vue';
 import appPinnedSurveys from '@/components/groups/PinnedSurveys.vue';
 import appDocLinks from '@/components/groups/DocLinks.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
@@ -144,13 +138,17 @@ const integrations = [
     name: "FarmOS",
     description: "Manage FarmOS integration",
     slug: `farmos`, // used for the link /group-manage/farmos/$GROUP_ID
-  }
+  },
+  {
+    name: "Hylo",
+    description: "Manage Hylo integration",
+    slug: `hylo`, // used for the link /group-manage/farmos/$GROUP_ID
+  },
 ];
 
 export default {
   components: {
     appIntegrationList,
-    appHyloIntegrationCard,
     appPinnedSurveys,
     appDocLinks,
     appBasicList,

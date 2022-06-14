@@ -55,6 +55,8 @@ const Builder = () => import('@/pages/builder/Builder.vue');
 const Script = () => import('@/pages/scripts/Script.vue');
 const ScriptEdit = () => import('@/pages/scripts/ScriptEdit.vue');
 const FarmOSGroupManage = () => import('@/pages/groups/FarmOS.vue');
+const HyloGroupManage = () => import('@/pages/groups/Hylo.vue');
+
 
 
 Vue.use(VueRouter);
@@ -209,6 +211,12 @@ const routes = [
     name: 'farmos-group-manage',
     props: true,
     components: getComponents(FarmOSGroupManage),
+  },
+    {
+    path: '/group-manage/hylo/:id',
+    name: 'hylo-group-manage',
+    props: true,
+    components: getComponents(HyloGroupManage),
   },
   {
     path: '/users/new',
