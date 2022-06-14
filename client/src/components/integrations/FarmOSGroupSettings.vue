@@ -92,14 +92,14 @@
       </template>
 
       <template v-slot:item="{ item, index }">
-        <tr v-for="(group, idx) in item.connectedFarms" :key="group.instanceName + '-' + idx">
+        <tr v-for="(connectedFarm, idx) in item.connectedFarms" :key="`${item.user}-instance-${idx}`">
           <td class="box">
             <div v-if="idx == 0" class="d-flex align-center justify-space-between">
               <span class="d-flex align-center">
                 <span v-if="item.admin" class="mdi mdi-crown pr-1"></span>
                 <span v-if="item.name"
                   >{{ item.name }} ({{ item.email }}) <br />
-                  {{ item.path }}</span
+                  {{ item.breadcrumb }}</span
                 >
               </span>
               <span v-if="item.name">
@@ -108,10 +108,10 @@
             </div>
           </td>
           <td class="box">
-            <div v-if="item.connectedFarms[id].instanceName" class="d-flex align-center justify-space-between">
+            <div v-if="connectedFarm.instanceName" class="d-flex align-center justify-space-between">
               <span class="d-flex align-center">
-                <span v-if="item.connectedFarms[id].owner" class="mdi mdi-crown pr-1"></span>
-                <span>{{ item.connectedFarms[id].instanceName }}</span>
+                <span v-if="connectedFarm.owner" class="mdi mdi-crown pr-1"></span>
+                <span>{{ connectedFarm.instanceName }}</span>
               </span>
               <span class="d-flex" style="flex-wrap: nowrap">
                 <my-button little noBorder colorBlue label="access" />
@@ -121,10 +121,10 @@
             <div v-else>no farmos connected</div>
           </td>
           <td class="box">
-            <div v-if="item.connectedFarms[id].groups">
-              <span v-for="(ms, iidx) in item.connectedFarms[id].groups" :key="`connected-${idx}-${iidx}`">
+            <div v-if="connectedFarm.groups">
+              <span v-for="(grp, iidx) in connectedFarm.groups" :key="`connected-${idx}-${iidx}`">
                 <span v-if="iidx === 0 || iidx === 1 || developMbships[index].value">
-                  {{ ms.breadcrumb }}
+                  {{ grp.breadcrumb || grp.name }}
                   <br />
                 </span>
                 <span
@@ -132,13 +132,13 @@
                   @click="toggleDevelopMbships(index)"
                   class="nOthers"
                 >
-                  (+{{ item.connectedFarms[id].groups.length - 2 }} others)
+                  (+{{ connectedFarm.groups.length - 2 }} others)
                 </span>
                 <span
                   v-if="
                     developMbships[index].value &&
-                    idd === item.connectedFarms[id].groups.length - 1 &&
-                    item.connectedFarms[id].groups.length - 1 > 2
+                    iidx === connectedFarm.groups.length - 1 &&
+                    connectedFarm.groups.length - 1 > 2
                   "
                   @click="toggleDevelopMbships(index)"
                   class="nOthers"

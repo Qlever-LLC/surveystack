@@ -52,10 +52,10 @@ export const getTree = async (group) => {
   const allGroups = [...ascendants, ...descendants];
 
   const isDomainRooInDescendants = () => {
-    if(domainRoot == null) {
+    if (domainRoot == null) {
       return false;
     }
-    
+
     return descendants.filter(d => !d._id.equals(group._id) /* exclude self*/)
       .some(d => d._id.equals(domainRoot._id));
   }
@@ -699,6 +699,8 @@ export const getMemberInformationForDomain = async (descendants) => {
     _id: { $in: groupIds.map(id => new ObjectId(id)) }
   }).toArray();
 
+  // console.log("present groups", JSON.stringify(groups, null, 2));
+
   console.log("res", res);
   const prj = res.filter(r => r.user !== null && r.user.length != 0).map(item => {
     return {
@@ -809,12 +811,47 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
     }
   }
 
+
+
   for (const inst of membersRawData.unassignedInstances) {
     inst.breadcrumb = tree.breadcrumbsByPath[inst.path];
   }
 
+  // console.log(JSON.stringify(membersRawData.members, null, 2));
 
-  groupInformation = { ...groupSettings, ...membersRawData };
+  // by users
+
+  const userIds = _.uniq(membersRawData.members.map(m => m.user + ""));
+  const members = [];
+
+  // console.log("userids", userIds);
+
+  for (const userId of userIds) {
+    const memberships = membersRawData.members.filter(m => m.user.equals(userId));
+    // console.log("memberships", memberships);
+
+    const connectedFarms = [];
+    const currentUser = {
+      ...memberships[0],
+      connectedFarms
+    };
+
+    for (const m of memberships) {
+      for (const connectedFarm of m.connectedFarms) {
+        if (!connectedFarms.find(cf => cf.instanceName == connectedFarm.instanceName)) {
+          connectedFarms.push(connectedFarm);
+        }
+      }
+    }
+
+    members.push({
+      ...currentUser
+    });
+
+  }
+
+
+  groupInformation = { ...groupSettings, members, unassignedInstances: membersRawData.unassignedInstances };
   return groupInformation;
 };
 
