@@ -7,29 +7,17 @@
         <div class="pa-3">
           <p class="font-weight-bold">Settings</p>
           <v-container class="pa-0" fluid>
-            <v-checkbox
-              class="ma-0 pa-0"
-              hide-details
-              :ripple="false"
-              v-model="groupInfos.groupHasCoffeeShopAccess"
+            <v-checkbox disabled class="ma-0 pa-0" hide-details :ripple="false" v-model="groupInfos.groupHasCoffeeShopAccess"
               @input="$emit('addGrpCoffeeShop', $event.target.value, groupInfos.groupId)"
-              label="Add this group to the Coffee Shop"
-            ></v-checkbox>
-            <v-checkbox
-              class="ma-0 pa-0"
-              hide-details
-              :ripple="false"
+              label="Add this group to the Coffee Shop"></v-checkbox>
+            <v-checkbox disabled  class="ma-0 pa-0" hide-details :ripple="false"
               v-model="groupInfos.allowSubgroupsToJoinCoffeeShop"
               @input="$emit('allowSbGrpsJoinCoffeeShop', $event.target.value)"
-              :label="`Allow subgroups to join the Coffee Shop`"
-            ></v-checkbox>
-            <v-checkbox
-              class="ma-0 pa-0"
-              :ripple="false"
+              :label="`Allow subgroups to join the Coffee Shop`"></v-checkbox>
+            <v-checkbox disabled  class="ma-0 pa-0" :ripple="false"
               v-model="groupInfos.allowSubgroupAdminsToCreateFarmOSInstances"
               @input="$emit('allowSbGrpsAdminsCreateFarmOSFarmsInSS', $event.target.value)"
-              label="Allow subgroups admins to create FarmOS Farms through Survey Stack"
-            >
+              label="Allow subgroups admins to create FarmOS Farms through Survey Stack">
             </v-checkbox>
           </v-container>
         </div>
@@ -51,15 +39,8 @@
         </div>
       </div>
     </div>
-    <v-data-table
-      :headers="headers"
-      :items="filteredMembers"
-      item-key="name"
-      class="elevation-1"
-      hide-default-footer
-      hide-default-header
-      disable-pagination
-    >
+    <v-data-table :headers="headers" :items="filteredMembers" item-key="name" class="elevation-1" hide-default-footer
+      hide-default-header disable-pagination>
       <template v-slot:header="{ props: { headers } }">
         <thead>
           <tr>
@@ -68,24 +49,10 @@
             </th>
           </tr>
           <tr>
-            <th
-              v-for="(aHS, i) in arrHeaderSearch"
-              :key="i"
-              class="header2CSS"
-              style="font-size: 16px; border-bottom: none"
-            >
-              <v-text-field
-                v-model="arrHeaderSearch[i]"
-                label="Search"
-                placeholder="Search"
-                filled
-                rounded
-                dense
-                single-line
-                append-icon="mdi-magnify"
-                class="shrink"
-                hide-details
-              ></v-text-field>
+            <th v-for="(aHS, i) in arrHeaderSearch" :key="i" class="header2CSS"
+              style="font-size: 16px; border-bottom: none">
+              <v-text-field v-model="arrHeaderSearch[i]" label="Search" placeholder="Search" filled rounded dense
+                single-line append-icon="mdi-magnify" class="shrink" hide-details></v-text-field>
             </th>
           </tr>
         </thead>
@@ -97,10 +64,8 @@
             <div v-if="idx == 0" class="d-flex align-center justify-space-between">
               <span class="d-flex align-center">
                 <span v-if="item.admin" class="mdi mdi-crown pr-1"></span>
-                <span v-if="item.name"
-                  >{{ item.name }} ({{ item.email }}) <br />
-                  {{ item.breadcrumb }}</span
-                >
+                <span v-if="item.name">{{ item.name }} ({{ item.email }}) <br />
+                  {{ item.breadcrumb }}</span>
               </span>
               <span v-if="item.name">
                 <my-button little noBorder colorBlue label="+ connect" />
@@ -127,23 +92,29 @@
                   {{ grp.breadcrumb || grp.name }}
                   <br />
                 </span>
-                <span
-                  v-if="iidx === 2 && !developMbships[index].value"
-                  @click="toggleDevelopMbships(index)"
-                  class="nOthers"
-                >
+                <span v-if="iidx === 2 && !developMbships[index].value" @click="toggleDevelopMbships(index)"
+                  class="nOthers">
                   (+{{ connectedFarm.groups.length - 2 }} others)
                 </span>
-                <span
-                  v-if="
-                    developMbships[index].value &&
-                    iidx === connectedFarm.groups.length - 1 &&
-                    connectedFarm.groups.length - 1 > 2
-                  "
-                  @click="toggleDevelopMbships(index)"
-                  class="nOthers"
-                  >reduce</span
-                >
+                <span v-if="
+                  developMbships[index].value &&
+                  iidx === connectedFarm.groups.length - 1 &&
+                  connectedFarm.groups.length - 1 > 2
+                " @click="toggleDevelopMbships(index)" class="nOthers">reduce</span>
+              </span>
+            </div>
+          </td>
+        </tr>
+        <tr v-if="item.connectedFarms.length == 0">
+          <td class="box">
+            <div class="d-flex align-center justify-space-between">
+              <span class="d-flex align-center">
+                <span v-if="item.admin" class="mdi mdi-crown pr-1"></span>
+                <span v-if="item.name">{{ item.name }} ({{ item.email }}) <br />
+                  {{ item.breadcrumb }}</span>
+              </span>
+              <span v-if="item.name">
+                <my-button little noBorder colorBlue label="+ connect" />
               </span>
             </div>
           </td>
@@ -215,14 +186,14 @@ export default {
     });
 
     function filterGMembers(item) {
-      if(!item.name) {
+      if (!item.name) {
         return null;
       }
       return item.name.toLowerCase().includes(arrHeaderSearch.value[0].toLowerCase());
     }
     function filterCoFarms(item) {
       let result = false;
-      if (item.connectedFarms[0].instanceName) {
+      if (item.connectedFarms && item.connectedFarms.length > 0 && item.connectedFarms[0].instanceName) {
         item.connectedFarms.forEach((cF) => {
           result = result || cF.instanceName.toLowerCase().includes(arrHeaderSearch.value[1].toLowerCase());
         });
@@ -231,10 +202,10 @@ export default {
     }
     function filterMbShips(item) {
       let result = false;
-      if (item.connectedFarms[0].memberships) {
+      if (item.connectedFarms && item.connectedFarms.length > 0 && item.connectedFarms[0].groups) {
         item.connectedFarms.forEach((cF) => {
-          if (cF.memberships) {
-            cF.memberships.forEach((m) => {
+          if (cF.groups) {
+            cF.groups.forEach((m) => {
               result = result || m.path.toLowerCase().includes(arrHeaderSearch.value[2].toLowerCase());
             });
           }
@@ -277,6 +248,7 @@ export default {
   border-bottom: none;
   /* z-index: 10; */
 }
+
 .header2CSS {
   top: 48px;
   background-color: white;
@@ -285,23 +257,26 @@ export default {
   border-bottom: none;
   /* z-index: 10; */
 }
+
 .v-data-table /deep/ .v-data-table__wrapper {
   overflow: unset;
 }
 
-.v-data-table__wrapper > table > tbody > tr:hover {
+.v-data-table__wrapper>table>tbody>tr:hover {
   background: inherit !important;
 }
 
-.v-data-table >>> div > table {
+.v-data-table>>>div>table {
   width: 100%;
   border-spacing: 4px !important;
 }
+
 .box {
   align-items: center;
   padding: 16px 4px;
   background-color: rgb(222, 222, 222);
 }
+
 .nOthers {
   color: grey;
   cursor: pointer;

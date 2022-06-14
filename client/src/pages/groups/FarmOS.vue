@@ -29,7 +29,7 @@
 <script>
 import api from '@/services/api.service';
 import FarmOSGroupSettings from './../../components/integrations/FarmOSGroupSettings.vue';
-
+import _ from 'lodash';
 
 export default {
   props: {
@@ -86,6 +86,7 @@ export default {
         } else {
           const { data: groupInfos } = await api.get(`/farmos/group-manage/${groupId}`);
           console.log("group settings", groupInfos);
+          groupInfos.response.members = _.sortBy(groupInfos.response.members, (m) => - m.connectedFarms.length) ;
           this.groupInfos = groupInfos.response;
           this.farmosEnabled = true;
         }
