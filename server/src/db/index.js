@@ -42,7 +42,7 @@ const connectDatabase = async () => {
   await db.collection('farmos-instances').createIndex({ instanceName: 1 });
 
   await db.collection(COLL_GROUPS_HYLO_MAPPINGS).createIndex({ groupId: 1 }, { unique: true });
-  await db.collection(COLL_GROUPS_HYLO_MAPPINGS).dropIndex({ hyloGroupId: 1 });
+  // await db.collection(COLL_GROUPS_HYLO_MAPPINGS).dropIndex({ hyloGroupId: 1 });
 
   // const farmOsWebhookRequestsCollectionExists = await db.listCollections().toArray().some(({ name }) => name === 'farmos.webhookrequests')
   const farmOsWebhookRequestsCollectionName = 'farmos.webhookrequests';
