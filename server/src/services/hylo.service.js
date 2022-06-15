@@ -35,7 +35,11 @@ const createLogger = () => {
   };
 };
 
-const deps = { gqlRequest: hyloUtils.gqlRequest, gqlPostConfig: hyloUtils.gqlPostConfig };
+const deps = {
+  gqlRequest: hyloUtils.gqlRequest,
+  gqlPostConfig: hyloUtils.gqlPostConfig,
+  logger: createLogger(),
+};
 
 const outputSchema = Joi.object({
   entity: Joi.object({
@@ -147,13 +151,21 @@ const queryHyloGroup = async (options) => {
   );
 };
 
-const createHyloGroup = async (options) => {
+export const createHyloGroup = async (options) => {
   const { data, hyloUserId, gqlRequest, logger } = { ...deps, ...options };
 
-  for (let postfix = 0; postfix <= 12; postfix++) {
+  const randomPostfix = () => {
+    var minm = 100000;
+    var maxm = 999999;
+    return Math.floor(Math.random() * (maxm - minm + 1)) + minm;
+  };
+
+  const maxTrials = 16;
+
+  for (let trial = 0; trial <= maxTrials; trial++) {
     const dataWithSlug = {
       ...data,
-      slug: postfix === 0 ? data.slug : `${data.slug}-${postfix}`,
+      slug: trial === 0 ? data.slug : `${data.slug}-${randomPostfix()}`,
     };
     try {
       logger.info(`Create Hylo group slug=${dataWithSlug.slug} hyloUserId=${hyloUserId}`, {
@@ -188,7 +200,7 @@ const createHyloGroup = async (options) => {
     }
   }
 
-  throw logger.error(`The group slug "${data.slug}-#" is already taken.`);
+  throw logger.error(`Failed to find a free slug after ${maxTrials} trials`);
 };
 
 const updateHyloGroup = async (options) => {
@@ -237,7 +249,7 @@ const addMember = async (options) => {
   });
 };
 
-const upsertHyloUser = async (options) => {
+export const upsertHyloUser = async (options) => {
   const { email, name, hyloGroupId, logger } = { ...deps, ...options };
   logger.info('Upsert Hylo user', { email, name, hyloGroupId });
   let hyloUser = await queryHyloUser({ email, ...options });

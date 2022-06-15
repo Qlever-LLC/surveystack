@@ -4,11 +4,12 @@ import Joi from 'joi';
 import joiObjectId from 'joi-objectid';
 Joi.objectId = joiObjectId(Joi);
 
-import _, { isString, min } from 'lodash';
+import _ from 'lodash';
 import boom from '@hapi/boom';
 
 import { gqlRequest } from '../services/hylo/utils';
 import { gql } from 'graphql-request';
+import { createHyloGroup, upsertHyloUser } from '../services/hylo.service';
 
 const validateOrThrow = (schema, _value) => {
   const { value, error } = schema.validate(_value);
@@ -28,6 +29,7 @@ export const GROUP_FIELDS = gql`
     type
     avatarUrl
     bannerUrl
+    location
     members {
       items {
         id
@@ -42,7 +44,7 @@ export const GROUP_FIELDS = gql`
   }
 `;
 
-export const getIntegratedHyloGroup = async (req, res) => {
+const loadHyloGroup = async (id) => {
   const QUERY = gql`
     ${GROUP_FIELDS}
     query Group($id: ID!) {
@@ -51,16 +53,18 @@ export const getIntegratedHyloGroup = async (req, res) => {
       }
     }
   `;
+  const data = await gqlRequest(QUERY, { id });
+  return data?.group;
+};
 
+export const getIntegratedHyloGroup = async (req, res) => {
   const schema = Joi.object({
     groupId: Joi.string()
       .required()
       .messages({ 'any.required': 'The groupId query parameter is required' }),
   });
 
-  console.log('getIntegratedHyloGroup');
   const { groupId } = validateOrThrow(schema, req.params);
-  console.log('groupId', groupId);
   const mapping = await db
     .collection(COLL_GROUPS_HYLO_MAPPINGS)
     .findOne({ groupId: new ObjectId(groupId) });
@@ -68,19 +72,11 @@ export const getIntegratedHyloGroup = async (req, res) => {
   if (!mapping) {
     return res.json(null);
   }
-  const data = await gqlRequest(QUERY, { id: mapping.hyloGroupId });
-  res.json(data?.group);
+  const hyloGroup = await loadHyloGroup(mapping.hyloGroupId);
+  res.json(hyloGroup);
 };
 
 export const createNewIntegratedHyloGroup = async (req, res) => {
-  const MUTATION = gql`
-    mutation ($data: GroupInput, $asUserId: ID) {
-      group: createGroup(data: $data, asUserId: $asUserId) {
-        ...GroupFields
-      }
-    }
-    ${GROUP_FIELDS}
-  `;
   const schema = Joi.object({
     groupId: Joi.string().required(),
   });
@@ -92,70 +88,53 @@ export const createNewIntegratedHyloGroup = async (req, res) => {
     throw boom.notFound(`Can't find SurveyStack group with the ID "${groupId}`);
   }
 
-  let hyloGroup = null;
-  for (let postfix = 0; postfix <= 12; postfix++) {
-    const slug = postfix === 0 ? group.slug : `${group.slug}-${postfix}`;
-    try {
-      const variables = {
-        data: {
-          accessibility: 1,
-          name: group.name,
-          slug,
-          parentIds: [],
-          visibility: 1,
-        },
-        asUserId: 'TODO hyloUserId',
-      };
-      // TODO create/find Hylo user for admin
-      // hyloGroup = (await createHyloGroup({ name, slug, farm_url, hyloUserId })).group;
-    } catch (e) {
-      if (
-        !e.response?.errors?.some((e) => e.message === 'A group with that URL slug already exists')
-      ) {
-        throw e;
-      }
-    }
-  }
-  if (!hyloGroup) {
-    throw boom.conflict(`The slug "${group.slug} is already taken on Hylo`);
-  }
+  const user = res.locals.auth.user;
+  const hyloUser = await upsertHyloUser({ name: user.name, email: user.email });
+  const { group: hyloGroup } = await createHyloGroup({
+    data: {
+      accessibility: 1,
+      name: group.name,
+      slug: group.slug,
+      parentIds: [],
+      visibility: 1,
+    },
+    hyloUserId: hyloUser.id,
+  });
 
-  // TODO save in DB and return group
+  await db
+    .collection(COLL_GROUPS_HYLO_MAPPINGS)
+    .updateOne(
+      { groupId: new ObjectId(groupId) },
+      { $set: { hyloGroupId: hyloGroup.id } },
+      { upsert: true }
+    );
+  const detailedHyloGroup = await loadHyloGroup(hyloGroup.id);
+  res.json(detailedHyloGroup);
 };
 
 export const setIntegratedHyloGroup = async (req, res) => {
-  const QUERY = gql`
-    ${GROUP_FIELDS}
-    query GroupId($id: ID!) {
-      group(id: $id) {
-        ...GroupFields
-      }
-    }
-  `;
-
   const schema = Joi.object({
     hyloGroupId: Joi.string().required(),
-    surveyStackGroupId: Joi.string().required(),
+    groupId: Joi.string().required(),
   });
 
-  const { hyloGroupId, surveyStackGroupId } = validateOrThrow(schema, req.body);
+  const { hyloGroupId, groupId } = validateOrThrow(schema, req.body);
 
-  const hyloGroup = (await gqlRequest(QUERY, { id: hyloGroupId }))?.group;
+  const hyloGroup = await loadHyloGroup(hyloGroupId);
   if (!hyloGroup) {
     throw boom.notFound(`Can't find Hylo group with the ID "${hyloGroupId}`);
   }
 
-  const groupId = (await db.collection('groups').findOne({ _id: new ObjectId(surveyStackGroupId) }))
-    ?._id;
-  if (!groupId) {
-    throw boom.notFound(`Can't find SurveyStack group with the ID "${surveyStackGroupId}`);
+  const group = await db.collection('groups').findOne({ _id: new ObjectId(groupId) });
+  if (!group) {
+    throw boom.notFound(`Can't find SurveyStack group with the ID "${groupId}"`);
   }
 
   await db
     .collection(COLL_GROUPS_HYLO_MAPPINGS)
-    .updateOne({ groupId }, { $set: { hyloGroupId } }, { upsert: true });
+    .updateOne({ groupId: ObjectId(groupId) }, { $set: { hyloGroupId } }, { upsert: true });
 
-  res.send(hyloGroup);
+  res.json(hyloGroup);
 };
 export const removeHyloGroupIntegration = async (req, res) => {
   // TODO check for access rights
