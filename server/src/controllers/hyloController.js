@@ -115,20 +115,19 @@ export const setIntegratedHyloGroup = async (req, res) => {
 
   const schema = Joi.object({
     hyloGroupId: Joi.string().required(),
-    surveyStackGroupId: Joi.string().required(),
+    groupId: Joi.string().required(),
   });
 
-  const { hyloGroupId, surveyStackGroupId } = validateOrThrow(schema, req.body);
+  const { hyloGroupId, groupId } = validateOrThrow(schema, req.body);
 
   const hyloGroup = (await gqlRequest(QUERY, { id: hyloGroupId }))?.group;
   if (!hyloGroup) {
     throw boom.notFound(`Can't find Hylo group with the ID "${hyloGroupId}`);
   }
 
-  const groupId = (await db.collection('groups').findOne({ _id: new ObjectId(surveyStackGroupId) }))
-    ?._id;
-  if (!groupId) {
-    throw boom.notFound(`Can't find SurveyStack group with the ID "${surveyStackGroupId}`);
+  const group = await db.collection('groups').findOne({ _id: new ObjectId(groupId) });
+  if (!group) {
+    throw boom.notFound(`Can't find SurveyStack group with the ID "${groupId}`);
   }
 
   await db

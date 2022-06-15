@@ -136,7 +136,7 @@ export default {
         this.integratedHyloGroup = (
           await api.post(`/hylo/set-integrated-group`, {
             hyloGroupId: this.groupFound.id,
-            surveyStackGroupId: this.groupId,
+            groupId: this.groupId,
           })
         ).data;
       } catch (e) {

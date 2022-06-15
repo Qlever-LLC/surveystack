@@ -33,7 +33,7 @@ export const assertHasGroupAdminAccess = catchErrors(async (req, res, next) => {
   }
 
   const userId = res.locals.auth.user._id;
-  const groupId = req.params.groupId;
+  const groupId = req.params.groupId || req.body.groupId;
 
   const hasAdminRole = await rolesService.hasAdminRole(userId, groupId);
   if (!hasAdminRole) {

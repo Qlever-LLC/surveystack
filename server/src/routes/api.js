@@ -315,21 +315,21 @@ router.post(
 );
 
 /** Hylo */
-router.get(
+router.post(
   '/hylo/create-new-integrated-group',
-  [], // TODO check for access rights 
+  [assertHasGroupAdminAccess],
   catchErrors(hyloController.createNewIntegratedHyloGroup)
 );
 
 router.post(
   '/hylo/set-integrated-group',
-  [], // TODO check for access rights
+  [assertHasGroupAdminAccess],
   catchErrors(hyloController.setIntegratedHyloGroup)
 );
 
 router.post(
   '/hylo/remove-group-integration',
-  [], // TODO check for access rights
+  [assertHasGroupAdminAccess],
   catchErrors(hyloController.removeHyloGroupIntegration)
 );
 
