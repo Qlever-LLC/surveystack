@@ -210,8 +210,9 @@ export function diffThreeSurveyVersions(
     if (changePrimary.changeType === CHANGED) {
       for (const changeSecondary of changesSecondary) {
         if (
-          changePrimary.controlRevisionA.id === changeSecondary.controlRevisionA.id ||
-          changePrimary.pathRevisionA === changeSecondary.pathRevisionA
+          (changeSecondary.changeType === CHANGED || changeSecondary.changeType === REMOVED) &&
+          (changePrimary.controlRevisionA.id === changeSecondary.controlRevisionA.id ||
+            changePrimary.pathRevisionA === changeSecondary.pathRevisionA)
         ) {
           if (reportChangeTypeBasedOnLocalRevision) {
             changesResult.push(createThreePointChange(changePrimary, changeSecondary));
@@ -237,7 +238,7 @@ function createThreePointChange(changeLocal, changeRemote) {
   let threePointChange = {
     changeType: changeRemote.changeType,
     hasLocalChange: false,
-    diff: changeRemote.diff,
+    diff: changeRemote.diff || {},
 
     controlRevisionA: changeLocal.controlRevisionB,
     parentIdRevisionA: changeLocal.parentIdRevisionB,

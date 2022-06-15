@@ -505,6 +505,39 @@ describe('surveyDiff', () => {
         },
       ]);
     });
+    it('handles when control was replaced in the remote and changed in the local', () => {
+      const numberControl = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+      });
+      const textControl = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar',
+      });
+      // same control with different label/name
+      const textControlReplaced = createControlInstance({
+        type: 'text',
+        name: 'bazz_1',
+        label: 'bazzz',
+      });
+      const textControlChanged = { ...textControl, label: textControl.label + '-change' };
+      const diffBasedOnRemote = diffThreeSurveyVersions(
+        [numberControl, textControlChanged],
+        [numberControl, textControl],
+        [numberControl, textControlReplaced],
+        false
+      );
+      expect(diffBasedOnRemote.length).toBe(3);
+      const diffBasedOnLocal = diffThreeSurveyVersions(
+        [numberControl, textControlChanged],
+        [numberControl, textControl],
+        [numberControl, textControlReplaced],
+        true
+      );
+      expect(diffBasedOnLocal.length).toBe(2);
+    });
   });
   describe('merge', () => {
     it('adds new controls', () => {
