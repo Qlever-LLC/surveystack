@@ -4,12 +4,11 @@ import { getPosition, insertControl, replaceControl } from '@/utils/surveys';
 
 export const changeType = {
   CHANGED: 'changed',
-  CONFLICT: 'conflict',
   REMOVED: 'removed',
   ADDED: 'added',
   UNCHANGED: 'unchanged',
 };
-const { CHANGED, CONFLICT, REMOVED, ADDED, UNCHANGED } = changeType;
+const { CHANGED, REMOVED, ADDED, UNCHANGED } = changeType;
 
 const diffObject = (objectA, objectB, fields) => {
   return fields.reduce((diff, field) => {
@@ -187,9 +186,9 @@ export const diffSurveyVersions = (controlsRevisionA, controlsRevisionB) => {
   return [...matcheds, ...addeds, ...removeds];
 };
 
-export function diffHasConflicts(controlsLocalRevision, controlsRemoteRevisionA, controlsRemoteRevisionB) {
+export function diffHasBreakingChanges(controlsLocalRevision, controlsRemoteRevisionA, controlsRemoteRevisionB) {
   return diffThreeSurveyVersions(controlsLocalRevision, controlsRemoteRevisionA, controlsRemoteRevisionB).some(
-    (diff) => diff.changeType === CONFLICT
+    (diff) => diff.hasBreakingChange
   );
 }
 
@@ -210,7 +209,9 @@ export function diffThreeSurveyVersions(
     if (changePrimary.changeType === CHANGED) {
       for (const changeSecondary of changesSecondary) {
         if (
-          (changeSecondary.changeType === CHANGED || changeSecondary.changeType === REMOVED) &&
+          (changeSecondary.changeType === UNCHANGED ||
+            changeSecondary.changeType === CHANGED ||
+            changeSecondary.changeType === REMOVED) &&
           (changePrimary.controlRevisionA.id === changeSecondary.controlRevisionA.id ||
             changePrimary.pathRevisionA === changeSecondary.pathRevisionA)
         ) {
@@ -298,7 +299,7 @@ function createThreePointChange(changeLocal, changeRemote) {
   }
 
   if (threePointChange.hasLocalChange && hasBreakingChange(threePointChange.diff)) {
-    threePointChange.changeType = CONFLICT;
+    threePointChange.hasBreakingChange = true;
   }
 
   return threePointChange;
@@ -321,12 +322,9 @@ export function merge(controlsLocalRevision, controlsRemoteRevisionA, controlsRe
   //applicate local changes
   for (const change of changes) {
     switch (change.changeType) {
-      case changeType.CONFLICT:
-        //a breaking change occurred on remote revision, discard local change
-        break;
       case changeType.CHANGED:
-        //merge local change into resulting controls
-        if (change.hasLocalChange) {
+        //merge local change into resulting controls except if it's a breaking change, then discard the local change
+        if (change.hasLocalChange && !change.hasBreakingChange) {
           mergedControls = replaceControl(mergedControls, null, change.pathRevisionC, change.controlRevisionA);
         }
         break;

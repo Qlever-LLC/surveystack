@@ -86,7 +86,6 @@ export default {
       isOpen: this.defaultOpen,
       showChangesOnly: !this.defaultShowUnchanged,
       colors: {
-        conflict: 'red lighten-1',
         changed: 'amber lighten-1',
         added: 'green lighten-1',
         removed: 'red lighten-1',
@@ -138,6 +137,7 @@ export default {
             label: control.label,
             controlType: control.type,
             color: this.colors[controlDiff.changeType],
+            hasBreakingChange: controlDiff.hasBreakingChange,
             changeType: controlDiff.changeType,
             changeList: this.getControlChangeList(controlDiff),
             indexPath: idxPath.join('.'),

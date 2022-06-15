@@ -399,7 +399,7 @@ describe('surveyDiff', () => {
       expect(diff[0].diff.name.valueC).toBe(controlRemoteVersionB.name);
       expect(diff[0].diff.name.valueA).toBe(controlLocalVersion.name);
     });
-    it('returns conflicting changes in case of local change', () => {
+    it('returns remote control instead of changed local control in case of breaking remote change', () => {
       const controlLocalVersion = createControlInstance({
         type: 'number',
         name: 'number_1',
@@ -423,7 +423,8 @@ describe('surveyDiff', () => {
 
       expect(diff).toMatchObject([
         {
-          changeType: changeType.CONFLICT,
+          changeType: changeType.CHANGED,
+          hasBreakingChange: true,
           hasLocalChange: true,
           controlRevisionA: controlLocalVersion,
           childIndexRevisionA: 0,
@@ -475,7 +476,12 @@ describe('surveyDiff', () => {
         options: { allowHide: false },
       });
 
-      const diff = diffThreeSurveyVersions([controlLocalVersion], [controlRemoteVersionA], [controlRemoteVersionB]);
+      const diff = diffThreeSurveyVersions(
+        [controlLocalVersion],
+        [controlRemoteVersionA],
+        [controlRemoteVersionB],
+        false
+      );
 
       expect(diff).toMatchObject([
         {
@@ -697,6 +703,21 @@ describe('surveyDiff', () => {
       });
       const mergeResult = merge([numberControlLocal], [numberControlRemoteA], [numberControlRemoteB]);
       expect(mergeResult[0].options.hidden).toBeFalsy();
+    });
+    it('removes deleted controls when they were changed locally', () => {
+      const numberControl = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+      });
+      const textControl = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar',
+      });
+      const textControlChanged = { ...textControl, label: textControl.label + '-change' };
+      const mergeResult = merge([numberControl, textControlChanged], [numberControl, textControl], [numberControl]);
+      expect(mergeResult.length).toBe(1);
     });
   });
 });

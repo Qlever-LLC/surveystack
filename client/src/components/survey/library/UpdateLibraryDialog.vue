@@ -21,14 +21,11 @@
         :showHeader="true"
         :showNoChangesText="false"
       ></survey-diff>
-      <div v-if="hasConflicts">
+      <div v-if="hasBreakingChanges">
         <v-card-text class="ml-2 my-3" style="margin-bottom: -20px">
           <h3>
             <v-icon color="warning">mdi-alert</v-icon>&nbsp;
-            <b
-              >You have modified this question set compared to Version {{ libraryRootGroup.libraryVersion }}. Your
-              changes marked as CONFLICT will be reset to the latest library version.
-            </b>
+            <b v-html="breakingChangeText" />
           </h3>
         </v-card-text>
       </div>
@@ -53,10 +50,7 @@
         <v-card-title> Confirm Update</v-card-title>
         <v-card-text class="mt-4">
           <v-icon color="warning">mdi-alert</v-icon>&nbsp;
-          <b
-            >You have modified this question set compared to Version {{ libraryRootGroup.libraryVersion }}. Your changes
-            marked as CONFLICT will be reset to the latest library version.
-          </b>
+          <b v-html="breakingChangeText" />
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -72,7 +66,7 @@
 import TipTapEditor from '@/components/builder/TipTapEditor';
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
 import SurveyDiff from '@/components/survey/SurveyDiff';
-import { diffHasConflicts, merge } from '@/utils/surveyDiff';
+import { diffHasBreakingChanges, merge } from '@/utils/surveyDiff';
 import { reactive, toRefs } from '@vue/composition-api';
 
 export default {
@@ -97,8 +91,12 @@ export default {
       localRevisionControls: props.libraryRootGroup.children,
       remoteOldRevisionControls: null,
       remoteNewRevisionControls: null,
-      hasConflicts: false,
+      hasBreakingChanges: false,
       conflictConfirmModalIsVisible: false,
+      breakingChangeText:
+        'You have modified this question set compared to Version ' +
+        props.libraryRootGroup.libraryVersion +
+        ". Your changes marked as 'breaking change' will be reset to the latest library version.",
     });
 
     state.remoteOldRevisionControls = props.toSurvey.revisions.find(
@@ -108,14 +106,14 @@ export default {
       (revision) => revision.version === props.toSurvey.latestVersion
     ).controls;
 
-    state.hasConflicts = diffHasConflicts(
+    state.hasBreakingChanges = diffHasBreakingChanges(
       state.localRevisionControls,
       state.remoteOldRevisionControls,
       state.remoteNewRevisionControls
     );
 
     function update() {
-      if (state.hasConflicts) {
+      if (state.hasBreakingChanges) {
         state.conflictConfirmModalIsVisible = true;
       } else {
         updateConfirmed();

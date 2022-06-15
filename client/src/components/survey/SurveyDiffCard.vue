@@ -15,6 +15,9 @@
         />
 
         <v-chip class="ma-3 align-self-start" outlined small :color="diffInfo.color">{{ diffInfo.changeType }}</v-chip>
+        <v-chip v-if="diffInfo.hasBreakingChange" class="ma-3 align-self-start" outlined small color="red lighten-1"
+          >breaking change</v-chip
+        >
         <v-spacer />
         <v-icon v-if="haveChangeDetails" class="mr-5 align-self-center" :class="{ 'mdi-rotate-180': !isOpen }"
           >mdi-chevron-down</v-icon
@@ -79,7 +82,7 @@ export default {
   },
   computed: {
     haveChangeDetails() {
-      return this.diffInfo.changeType === changeType.CHANGED || this.diffInfo.changeType === changeType.CONFLICT;
+      return this.diffInfo.changeType === changeType.CHANGED || this.diffInfo.hasBreakingChange;
     },
   },
 };
