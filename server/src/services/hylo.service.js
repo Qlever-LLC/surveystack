@@ -85,22 +85,18 @@ const createHyloUser = async (options) => {
   }
 };
 
-const queryHyloUser = async (options) => {
+export const QUERY_PERSON_BY_EMAIL = gql`
+  query ($email: String) {
+    person(email: $email) {
+      ...PersonDetails
+    }
+  }
+  ${FRAGMENT_PERSON_DETAILS}
+`;
+export const queryHyloUser = async (options) => {
   const { email, gqlRequest, logger } = { ...deps, ...options };
   logger.info(`Query Hylo user - email="${email}"`);
-  const result = (
-    await gqlRequest(
-      gql`
-        query ($id: ID, $email: String) {
-          person(id: $id, email: $email) {
-            ...PersonDetails
-          }
-        }
-        ${FRAGMENT_PERSON_DETAILS}
-      `,
-      { email }
-    )
-  ).person;
+  const result = (await gqlRequest(QUERY_PERSON_BY_EMAIL, { email })).person;
   logger.info('Query Hylo user result:', { person: result });
   return result;
 };
@@ -473,7 +469,6 @@ export const handle = async ({ submission, prevSubmission, survey, user }) => {
     }
   }
 
-  // TODO do results have an expected format?
   return results;
 };
 
