@@ -4,12 +4,12 @@ import Joi from 'joi';
 import joiObjectId from 'joi-objectid';
 Joi.objectId = joiObjectId(Joi);
 
-import _, { isString, min } from 'lodash';
+import _ from 'lodash';
 import boom from '@hapi/boom';
 
 import { gqlRequest } from '../services/hylo/utils';
 import { gql } from 'graphql-request';
-import { createHyloGroup } from '../services/hylo.service';
+import { createHyloGroup, upsertHyloUser } from '../services/hylo.service';
 
 const validateOrThrow = (schema, _value) => {
   const { value, error } = schema.validate(_value);
@@ -29,6 +29,7 @@ export const GROUP_FIELDS = gql`
     type
     avatarUrl
     bannerUrl
+    location
     members {
       items {
         id
@@ -43,7 +44,7 @@ export const GROUP_FIELDS = gql`
   }
 `;
 
-export const getIntegratedHyloGroup = async (req, res) => {
+const loadHyloGroup = async (id) => {
   const QUERY = gql`
     ${GROUP_FIELDS}
     query Group($id: ID!) {
@@ -52,16 +53,18 @@ export const getIntegratedHyloGroup = async (req, res) => {
       }
     }
   `;
+  const data = await gqlRequest(QUERY, { id });
+  return data?.group;
+};
 
+export const getIntegratedHyloGroup = async (req, res) => {
   const schema = Joi.object({
     groupId: Joi.string()
       .required()
       .messages({ 'any.required': 'The groupId query parameter is required' }),
   });
 
-  console.log('getIntegratedHyloGroup');
   const { groupId } = validateOrThrow(schema, req.params);
-  console.log('groupId', groupId);
   const mapping = await db
     .collection(COLL_GROUPS_HYLO_MAPPINGS)
     .findOne({ groupId: new ObjectId(groupId) });
@@ -69,8 +72,8 @@ export const getIntegratedHyloGroup = async (req, res) => {
   if (!mapping) {
     return res.json(null);
   }
-  const data = await gqlRequest(QUERY, { id: mapping.hyloGroupId });
-  res.json(data?.group);
+  const hyloGroup = await loadHyloGroup(mapping.hyloGroupId);
+  res.json(hyloGroup);
 };
 
 export const createNewIntegratedHyloGroup = async (req, res) => {
@@ -87,11 +90,11 @@ export const createNewIntegratedHyloGroup = async (req, res) => {
 
   const user = res.locals.auth.user;
   const hyloUser = await upsertHyloUser({ name: user.name, email: user.email });
-  const hyloGroup = await createHyloGroup({
+  const { group: hyloGroup } = await createHyloGroup({
     data: {
       accessibility: 1,
       name: group.name,
-      slug,
+      slug: group.slug,
       parentIds: [],
       visibility: 1,
     },
@@ -100,19 +103,16 @@ export const createNewIntegratedHyloGroup = async (req, res) => {
 
   await db
     .collection(COLL_GROUPS_HYLO_MAPPINGS)
-    .updateOne({ groupId: group.id }, { $set: { hyloGroupId: hyloGroup.id } }, { upsert: true });
+    .updateOne(
+      { groupId: new ObjectId(groupId) },
+      { $set: { hyloGroupId: hyloGroup.id } },
+      { upsert: true }
+    );
+  const detailedHyloGroup = await loadHyloGroup(hyloGroup.id);
+  res.json(detailedHyloGroup);
 };
 
 export const setIntegratedHyloGroup = async (req, res) => {
-  const QUERY = gql`
-    ${GROUP_FIELDS}
-    query GroupId($id: ID!) {
-      group(id: $id) {
-        ...GroupFields
-      }
-    }
-  `;
-
   const schema = Joi.object({
     hyloGroupId: Joi.string().required(),
     groupId: Joi.string().required(),
@@ -120,21 +120,21 @@ export const setIntegratedHyloGroup = async (req, res) => {
 
   const { hyloGroupId, groupId } = validateOrThrow(schema, req.body);
 
-  const hyloGroup = (await gqlRequest(QUERY, { id: hyloGroupId }))?.group;
+  const hyloGroup = await loadHyloGroup(hyloGroupId);
   if (!hyloGroup) {
     throw boom.notFound(`Can't find Hylo group with the ID "${hyloGroupId}`);
   }
 
   const group = await db.collection('groups').findOne({ _id: new ObjectId(groupId) });
   if (!group) {
-    throw boom.notFound(`Can't find SurveyStack group with the ID "${groupId}`);
+    throw boom.notFound(`Can't find SurveyStack group with the ID "${groupId}"`);
   }
 
   await db
     .collection(COLL_GROUPS_HYLO_MAPPINGS)
-    .updateOne({ groupId }, { $set: { hyloGroupId } }, { upsert: true });
+    .updateOne({ groupId: ObjectId(groupId) }, { $set: { hyloGroupId } }, { upsert: true });
 
-  res.send(hyloGroup);
+  res.json(hyloGroup);
 };
 export const removeHyloGroupIntegration = async (req, res) => {
   // TODO check for access rights
