@@ -8,7 +8,7 @@
       <v-card-text v-if="isLoading">
         <v-skeleton-loader type="list-item-avatar, card-heading"></v-skeleton-loader>
       </v-card-text>
-      <v-card-text v-else-if="!!integratedHyloGroup">
+      <v-card-text v-else-if="integratedHyloGroup">
         <v-row align="center" class="spacer mb-4" no-gutters>
           <!-- <v-col cols="4" sm="2" md="1"> -->
           <v-avatar size="36px" class="mr-4">
@@ -26,13 +26,6 @@
           </span>
           <!-- </v-col> -->
         </v-row>
-        <!-- <div>
-          Your group is integrated with
-          <a :href="`https://wwww.hylo.com/groups/${integratedHyloGroup.slug}`" target="_blank">{{
-            integratedHyloGroup.name
-          }}</a>
-          on Hylo
-        </div> -->
         <v-btn color="primary" @click="removeGroupIntegration" :loading="isRemoveGroupIntegrationInProgress">
           Remove integration
         </v-btn>
@@ -94,6 +87,7 @@ export default {
       isLoading: true,
       isLoadingHyloGroup: null,
       isSetIntegratedInProgress: false,
+      isRemoveGroupIntegrationInProgress: false,
       hyloGroupInput: null,
       integrateDialog: false,
       groupFound: null,
@@ -139,6 +133,7 @@ export default {
             groupId: this.groupId,
           })
         ).data;
+        this.integrateDialog = false;
       } catch (e) {
         console.error(e);
       } finally {
