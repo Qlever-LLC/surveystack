@@ -147,7 +147,7 @@ const queryHyloGroup = async (options) => {
   );
 };
 
-const createHyloGroup = async (options) => {
+export const createHyloGroup = async (options) => {
   const { data, hyloUserId, gqlRequest, logger } = { ...deps, ...options };
 
   for (let postfix = 0; postfix <= 12; postfix++) {

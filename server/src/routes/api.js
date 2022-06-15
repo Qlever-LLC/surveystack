@@ -316,9 +316,9 @@ router.post(
 
 /** Hylo */
 router.get(
-  '/hylo/create-integrated-group',
-  [], // TODO check for access rights
-  catchErrors(hyloController.createIntegratedHyloGroup)
+  '/hylo/create-new-integrated-group',
+  [], // TODO check for access rights 
+  catchErrors(hyloController.createNewIntegratedHyloGroup)
 );
 
 router.post(

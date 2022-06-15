@@ -9,6 +9,7 @@ import boom from '@hapi/boom';
 
 import { gqlRequest } from '../services/hylo/utils';
 import { gql } from 'graphql-request';
+import { createHyloGroup } from '../services/hylo.service';
 
 const validateOrThrow = (schema, _value) => {
   const { value, error } = schema.validate(_value);
@@ -73,14 +74,6 @@ export const getIntegratedHyloGroup = async (req, res) => {
 };
 
 export const createNewIntegratedHyloGroup = async (req, res) => {
-  const MUTATION = gql`
-    mutation ($data: GroupInput, $asUserId: ID) {
-      group: createGroup(data: $data, asUserId: $asUserId) {
-        ...GroupFields
-      }
-    }
-    ${GROUP_FIELDS}
-  `;
   const schema = Joi.object({
     groupId: Joi.string().required(),
   });
@@ -92,35 +85,22 @@ export const createNewIntegratedHyloGroup = async (req, res) => {
     throw boom.notFound(`Can't find SurveyStack group with the ID "${groupId}`);
   }
 
-  let hyloGroup = null;
-  for (let postfix = 0; postfix <= 12; postfix++) {
-    const slug = postfix === 0 ? group.slug : `${group.slug}-${postfix}`;
-    try {
-      const variables = {
-        data: {
-          accessibility: 1,
-          name: group.name,
-          slug,
-          parentIds: [],
-          visibility: 1,
-        },
-        asUserId: 'TODO hyloUserId',
-      };
-      // TODO create/find Hylo user for admin
-      // hyloGroup = (await createHyloGroup({ name, slug, farm_url, hyloUserId })).group;
-    } catch (e) {
-      if (
-        !e.response?.errors?.some((e) => e.message === 'A group with that URL slug already exists')
-      ) {
-        throw e;
-      }
-    }
-  }
-  if (!hyloGroup) {
-    throw boom.conflict(`The slug "${group.slug} is already taken on Hylo`);
-  }
+  const user = res.locals.auth.user;
+  const hyloUser = await upsertHyloUser({ name: user.name, email: user.email });
+  const hyloGroup = await createHyloGroup({
+    data: {
+      accessibility: 1,
+      name: group.name,
+      slug,
+      parentIds: [],
+      visibility: 1,
+    },
+    hyloUserId: hyloUser.id,
+  });
 
-  // TODO save in DB and return group
+  await db
+    .collection(COLL_GROUPS_HYLO_MAPPINGS)
+    .updateOne({ groupId: group.id }, { $set: { hyloGroupId: hyloGroup.id } }, { upsert: true });
 };
 
 export const setIntegratedHyloGroup = async (req, res) => {
