@@ -9,12 +9,11 @@ const { CHANGED, UNCHANGED, REMOVED, ADDED } = changeType;
 
 const createOptions = (props = {}) => {
   props = {
-    controlsRevisionA: [],
-    controlsRevisionB: [],
-    controlsRevisionC: null,
-    versionNameRevisionA: 'old',
-    versionNameRevisionB: 'new',
-    versionNameRevisionC: null,
+    controlsLocalRevision: null,
+    controlsRemoteRevisionOld: [],
+    controlsRemoteRevisionNew: [],
+    versionNameRemoteRevisionOld: 'old',
+    versionNameRemoteRevisionNew: 'new',
     defaultOpen: true,
     ...props,
   };
@@ -45,7 +44,10 @@ describe('render diff cards', () => {
     const oldControl = createControl({ type: 'number', name: 'number_1', label: 'old label', id: 'num_1' });
     const newControl = { ...cloneDeep(oldControl), label: 'new label' };
 
-    render(SurveyDiff, createOptions({ controlsRevisionA: [oldControl], controlsRevisionB: [newControl] }));
+    render(
+      SurveyDiff,
+      createOptions({ controlsRemoteRevisionOld: [oldControl], controlsRemoteRevisionNew: [newControl] })
+    );
 
     const card = screen.getByTestId(`diff-card-1-changed`);
     expect(within(card).getByText('changed')).toBeInTheDocument();
@@ -57,7 +59,7 @@ describe('render diff cards', () => {
 
   it('shows addition', () => {
     const newControl = createControl({ type: 'number', name: 'number_1', label: 'number label' });
-    render(SurveyDiff, createOptions({ controlsRevisionA: [], controlsRevisionB: [newControl] }));
+    render(SurveyDiff, createOptions({ controlsRemoteRevisionOld: [], controlsRemoteRevisionNew: [newControl] }));
     const card = screen.getByTestId(`diff-card-1-added`);
     expect(within(card).getByText('added')).toBeInTheDocument();
     expect(within(card).getByText(newControl.label)).toBeInTheDocument();
@@ -66,7 +68,7 @@ describe('render diff cards', () => {
 
   it('shows removal', () => {
     const oldControl = createControl({ type: 'number', name: 'number_1', label: 'number label' });
-    render(SurveyDiff, createOptions({ controlsRevisionA: [oldControl], controlsRevisionB: [] }));
+    render(SurveyDiff, createOptions({ controlsRemoteRevisionOld: [oldControl], controlsRemoteRevisionNew: [] }));
     const card = screen.getByTestId(`diff-card-1-removed`);
     expect(within(card).getByText('removed')).toBeInTheDocument();
     expect(within(card).getByText(oldControl.label)).toBeInTheDocument();
@@ -79,7 +81,10 @@ describe('render diff cards', () => {
     const newControls = cloneDeep(oldControls);
     newControls[0].children = [number];
 
-    render(SurveyDiff, createOptions({ controlsRevisionA: oldControls, controlsRevisionB: newControls }));
+    render(
+      SurveyDiff,
+      createOptions({ controlsRemoteRevisionOld: oldControls, controlsRemoteRevisionNew: newControls })
+    );
     const pageCard = screen.getByTestId(`diff-card-1-unchanged`);
     expect(within(pageCard).getByText('unchanged')).toBeInTheDocument();
     expect(within(pageCard).getByText(page.label)).toBeInTheDocument();
@@ -96,8 +101,8 @@ describe('render diff cards', () => {
     render(
       SurveyDiff,
       createOptions({
-        controlsRevisionA: [unchanged],
-        controlsRevisionB: [unchanged, added],
+        controlsRemoteRevisionOld: [unchanged],
+        controlsRemoteRevisionNew: [unchanged, added],
         defaultShowUnchanged: true,
       })
     );
@@ -115,7 +120,10 @@ describe('render diff cards', () => {
     newMatrix.options.source.content[0].type = 'text';
     newMatrix.options.source.content[1].label = 'changed';
 
-    render(SurveyDiff, createOptions({ controlsRevisionA: [oldMatrix], controlsRevisionB: [newMatrix] }));
+    render(
+      SurveyDiff,
+      createOptions({ controlsRemoteRevisionOld: [oldMatrix], controlsRemoteRevisionNew: [newMatrix] })
+    );
     const card = screen.getByTestId(`diff-card-1-changed`);
     await fireEvent.click(card.firstElementChild);
     hasDiffRow(card, 'name', oldMatrix.name, newMatrix.name);
@@ -157,8 +165,8 @@ describe('computed.diffInfoTree', () => {
         changeList: [
           {
             key: 'label',
-            valueA: JSON.stringify(oldControl.label),
-            valueB: JSON.stringify(newControl.label),
+            oldValue: JSON.stringify(oldControl.label),
+            newValue: JSON.stringify(newControl.label),
           },
         ],
         indexPath: '1',

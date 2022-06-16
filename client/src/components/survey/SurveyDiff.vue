@@ -31,7 +31,9 @@
       <v-expansion-panel-content>
         <survey-diff-card-tree
           :diffInfoTree="showChangesOnly ? diffInfoTreeWithoutUnchangeds : diffInfoTree"
-          v-bind="{ versionNameRevisionA, versionNameRevisionB, versionNameRevisionC }"
+          :version-name-local-revision="controlsLocalRevision ? 'Your Version' : null"
+          :version-name-remote-revision-old="versionNameRemoteRevisionOld"
+          :version-name-remote-revision-new="versionNameRemoteRevisionNew"
         />
       </v-expansion-panel-content>
     </v-expansion-panel>
@@ -49,18 +51,14 @@ export default {
     SurveyDiffCardTree,
   },
   props: {
-    controlsRevisionA: Array,
-    controlsRevisionB: Array,
-    controlsRevisionC: Array,
-    versionNameRevisionA: {
+    controlsLocalRevision: Array,
+    controlsRemoteRevisionOld: Array,
+    controlsRemoteRevisionNew: Array,
+    versionNameRemoteRevisionOld: {
       type: String,
       required: true,
     },
-    versionNameRevisionB: {
-      type: String,
-      required: true,
-    },
-    versionNameRevisionC: {
+    versionNameRemoteRevisionNew: {
       type: String,
       required: false,
     },
@@ -95,11 +93,15 @@ export default {
 
   computed: {
     diff() {
-      if (this.controlsRevisionA && this.controlsRevisionB) {
-        if (this.controlsRevisionC) {
-          return diffThreeSurveyVersions(this.controlsRevisionA, this.controlsRevisionB, this.controlsRevisionC);
+      if (this.controlsRemoteRevisionNew && this.controlsRemoteRevisionOld) {
+        if (this.controlsLocalRevision) {
+          return diffThreeSurveyVersions(
+            this.controlsLocalRevision,
+            this.controlsRemoteRevisionOld,
+            this.controlsRemoteRevisionNew
+          );
         } else {
-          return diffSurveyVersions(this.controlsRevisionA, this.controlsRevisionB);
+          return diffSurveyVersions(this.controlsRemoteRevisionOld, this.controlsRemoteRevisionNew);
         }
       }
 
@@ -119,18 +121,20 @@ export default {
         remove(unsortedDiffs, (d) => {
           return parent === null
             ? // get root controls
-              !d.parentIdRevisionA && !d.parentIdRevisionB
+              !d.parentIdRevisionOld && !d.parentIdRevisionNew
             : // get direct children
-              (d.parentIdRevisionA && d.parentIdRevisionA === get(parent, 'controlRevisionA.id')) ||
-                (d.parentIdRevisionB && d.parentIdRevisionB === get(parent, 'controlRevisionB.id'));
+              (d.parentIdRevisionOld && d.parentIdRevisionOld === get(parent, 'controlRevisionOld.id')) ||
+                (d.parentIdRevisionNew && d.parentIdRevisionNew === get(parent, 'controlRevisionNew.id'));
         });
       const getSortKey = (diff) =>
-        isNumber(diff.childIndexRevisionB) ? diff.childIndexRevisionB : diff.childIndexRevisionA - 0.5;
+        isNumber(diff.childIndexRevisionNew) ? diff.childIndexRevisionNew : diff.childIndexRevisionOld - 0.5;
       const convert = (diffs, parentIdxPath = []) => {
         // sort to make the order similart to the original
         return sortBy(diffs, getSortKey).map((controlDiff) => {
-          const control = controlDiff.controlRevisionB || controlDiff.controlRevisionA;
-          const idx = controlDiff.controlRevisionB ? controlDiff.childIndexRevisionB : controlDiff.childIndexRevisionA;
+          const control = controlDiff.controlRevisionNew || controlDiff.controlRevisionOld;
+          const idx = controlDiff.controlRevisionNew
+            ? controlDiff.childIndexRevisionNew
+            : controlDiff.childIndexRevisionOld;
           const idxPath = [...parentIdxPath, idx + 1];
           return {
             name: control.name,
@@ -207,9 +211,9 @@ export default {
           if (change.changeType !== changeType.UNCHANGED) {
             return {
               key,
-              valueA: JSON.stringify(change.valueA),
-              valueB: JSON.stringify(change.valueB),
-              valueC: change.valueC ? JSON.stringify(change.valueC) : undefined,
+              localValue: change.localValue ? JSON.stringify(change.localValue) : undefined,
+              oldValue: JSON.stringify(change.oldValue),
+              newValue: JSON.stringify(change.newValue),
             };
           }
           return null;

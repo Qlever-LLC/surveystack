@@ -8,14 +8,14 @@
         <library-change-type-selector v-model="localLibrarySurvey.meta.libraryLastChangeType" :disabled="false" />
       </v-card-text>
       <survey-diff
-        :controls-revision-a="
+        :controls-remote-revision-old="
           localLibrarySurvey.revisions.find((revision) => revision.version === localLibrarySurvey.latestVersion)
             .controls
         "
-        :controls-revision-b="localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].controls"
+        :controls-remote-revision-new="localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].controls"
         :default-open="false"
-        :version-name-revision-a="`Version ${localLibrarySurvey.latestVersion}`"
-        :version-name-revision-b="`Version ${
+        :version-name-remote-revision-old="`Version ${localLibrarySurvey.latestVersion}`"
+        :version-name-remote-revision-new="`Version ${
           localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].version
         }`"
       ></survey-diff>

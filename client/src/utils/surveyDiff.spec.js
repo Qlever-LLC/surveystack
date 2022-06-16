@@ -158,8 +158,8 @@ describe('surveyDiff', () => {
 
       expect(diff.name).toMatchObject({
         changeType: changeType.CHANGED,
-        valueA: oldNum.name,
-        valueB: newNum.name,
+        oldValue: oldNum.name,
+        newValue: newNum.name,
       });
     });
     it('reports no-change', () => {
@@ -181,8 +181,8 @@ describe('surveyDiff', () => {
 
       expect(diff.label).toMatchObject({
         changeType: changeType.REMOVED,
-        valueA: oldNum.label,
-        valueB: undefined,
+        oldValue: oldNum.label,
+        newValue: undefined,
       });
     });
     it('reports addition', () => {
@@ -194,8 +194,8 @@ describe('surveyDiff', () => {
 
       expect(diff.label).toMatchObject({
         changeType: changeType.ADDED,
-        valueA: undefined,
-        valueB: newNum.label,
+        oldValue: undefined,
+        newValue: newNum.label,
       });
     });
     describe('controls with array type source', () => {
@@ -218,18 +218,18 @@ describe('surveyDiff', () => {
           });
           expect(diff[`options.${srcPath}[1].bar`]).toMatchObject({
             changeType: changeType.CHANGED,
-            valueA: 2,
-            valueB: 5,
+            oldValue: 2,
+            newValue: 5,
           });
           expect(diff[`options.${srcPath}[2].baz`]).toMatchObject({
             changeType: changeType.REMOVED,
-            valueA: 3,
-            valueB: null,
+            oldValue: 3,
+            newValue: null,
           });
           expect(diff[`options.${srcPath}[2].bux`]).toMatchObject({
             changeType: changeType.ADDED,
-            valueA: undefined,
-            valueB: 6,
+            oldValue: undefined,
+            newValue: 6,
           });
         });
       });
@@ -246,19 +246,19 @@ describe('surveyDiff', () => {
       expect(diff).toMatchObject([
         {
           changeType: changeType.CHANGED,
-          controlRevisionB: newNum,
-          childIndexRevisionB: 0,
-          pathRevisionB: newNum.name,
-          parentIdRevisionB: null,
-          controlRevisionA: oldNum,
-          childIndexRevisionA: 0,
-          pathRevisionA: oldNum.name,
-          parentIdRevisionA: null,
+          controlRevisionNew: newNum,
+          childIndexRevisionNew: 0,
+          pathRevisionNew: newNum.name,
+          parentIdRevisionNew: null,
+          controlRevisionOld: oldNum,
+          childIndexRevisionOld: 0,
+          pathRevisionOld: oldNum.name,
+          parentIdRevisionOld: null,
           diff: {
             name: {
               changeType: changeType.CHANGED,
-              valueA: oldNum.name,
-              valueB: newNum.name,
+              oldValue: oldNum.name,
+              newValue: newNum.name,
             },
             label: {
               changeType: changeType.UNCHANGED,
@@ -275,10 +275,10 @@ describe('surveyDiff', () => {
       expect(diff).toMatchObject([
         {
           changeType: changeType.ADDED,
-          controlRevisionB: num,
-          childIndexRevisionB: 0,
-          pathRevisionB: num.name,
-          parentIdRevisionB: null,
+          controlRevisionNew: num,
+          childIndexRevisionNew: 0,
+          pathRevisionNew: num.name,
+          parentIdRevisionNew: null,
         },
       ]);
     });
@@ -290,10 +290,10 @@ describe('surveyDiff', () => {
       expect(diff).toMatchObject([
         {
           changeType: changeType.REMOVED,
-          controlRevisionA: num,
-          childIndexRevisionA: 0,
-          pathRevisionA: num.name,
-          parentIdRevisionA: null,
+          controlRevisionOld: num,
+          childIndexRevisionOld: 0,
+          pathRevisionOld: num.name,
+          parentIdRevisionOld: null,
         },
       ]);
     });
@@ -310,27 +310,27 @@ describe('surveyDiff', () => {
         {
           changeType: changeType.CHANGED,
 
-          controlRevisionB: newMat,
-          childIndexRevisionB: 0,
-          pathRevisionB: newMat.name,
-          parentIdRevisionB: null,
-          controlRevisionA: oldMat,
-          childIndexRevisionA: 0,
-          pathRevisionA: oldMat.name,
-          parentIdRevisionA: null,
+          controlRevisionNew: newMat,
+          childIndexRevisionNew: 0,
+          pathRevisionNew: newMat.name,
+          parentIdRevisionNew: null,
+          controlRevisionOld: oldMat,
+          childIndexRevisionOld: 0,
+          pathRevisionOld: oldMat.name,
+          parentIdRevisionOld: null,
           diff: {
             'options.source.config.addRowLabel': {
               changeType: changeType.CHANGED,
-              valueA: oldMat.options.source.config.addRowLabel,
-              valueB: newMat.options.source.config.addRowLabel,
+              oldValue: oldMat.options.source.config.addRowLabel,
+              newValue: newMat.options.source.config.addRowLabel,
             },
             name: {
               changeType: changeType.UNCHANGED,
             },
             'options.source.content[0].label': {
               changeType: changeType.CHANGED,
-              valueA: oldMat.options.source.content[0].label,
-              valueB: newMat.options.source.content[0].label,
+              oldValue: oldMat.options.source.content[0].label,
+              newValue: newMat.options.source.content[0].label,
             },
           },
         },
@@ -354,23 +354,23 @@ describe('surveyDiff', () => {
       it('matches controls with the same path', () => {
         const { diff, oldControls, newControls } = createDiff();
         const path = 'group_1.number_2';
-        const num2Diff = find(diff, { pathRevisionB: path });
+        const num2Diff = find(diff, { pathRevisionNew: path });
         expect(num2Diff).toHaveProperty('changeType', changeType.CHANGED);
-        expect(num2Diff).toHaveProperty('pathRevisionA', path);
+        expect(num2Diff).toHaveProperty('pathRevisionNew', path);
         expect(num2Diff).toHaveProperty('diff.label.changeType', changeType.CHANGED);
-        expect(num2Diff).toHaveProperty('diff.label.valueA', oldControls[1].children[0].label);
-        expect(num2Diff).toHaveProperty('diff.label.valueB', newControls[1].children[0].label);
+        expect(num2Diff).toHaveProperty('diff.label.oldValue', oldControls[1].children[0].label);
+        expect(num2Diff).toHaveProperty('diff.label.newValue', newControls[1].children[0].label);
         expect(num2Diff).toHaveProperty('diff.name.changeType', changeType.UNCHANGED);
       });
 
       it('treats type change as "remove" and "add', () => {
         const { diff, oldControls, newControls } = createDiff();
-        const num1OldDiff = find(diff, { pathRevisionA: 'number_1' });
+        const num1OldDiff = find(diff, { pathRevisionOld: 'number_1' });
         expect(num1OldDiff).toHaveProperty('changeType', changeType.REMOVED);
-        expect(num1OldDiff).toHaveProperty('controlRevisionA.type', oldControls[0].type);
-        const num1NewDiff = find(diff, { pathRevisionB: 'number_1' });
+        expect(num1OldDiff).toHaveProperty('controlRevisionOld.type', oldControls[0].type);
+        const num1NewDiff = find(diff, { pathRevisionNew: 'number_1' });
         expect(num1NewDiff).toHaveProperty('changeType', changeType.ADDED);
-        expect(num1NewDiff).toHaveProperty('controlRevisionB.type', newControls[0].type);
+        expect(num1NewDiff).toHaveProperty('controlRevisionNew.type', newControls[0].type);
       });
     });
   });
@@ -381,23 +381,23 @@ describe('surveyDiff', () => {
         name: 'number_1',
         label: 'foo_one',
       });
-      const controlRemoteVersionA = createControlInstance({
+      const controlRemoteVersionOld = createControlInstance({
         type: 'number',
         name: 'number_1',
         label: 'foo_two',
       });
-      const controlRemoteVersionB = createControlInstance({
+      const controlRemoteVersionNew = createControlInstance({
         type: 'number',
         name: 'number_1',
         label: 'foo_three',
       });
 
-      const diff = diffThreeSurveyVersions([controlLocalVersion], [controlRemoteVersionA], [controlRemoteVersionB]);
+      const diff = diffThreeSurveyVersions([controlLocalVersion], [controlRemoteVersionOld], [controlRemoteVersionNew]);
       expect(diff[0].changeType).toBe(changeType.CHANGED);
       expect(diff[0].diff.name).toBeDefined();
-      expect(diff[0].diff.name.valueB).toBe(controlRemoteVersionA.name);
-      expect(diff[0].diff.name.valueC).toBe(controlRemoteVersionB.name);
-      expect(diff[0].diff.name.valueA).toBe(controlLocalVersion.name);
+      expect(diff[0].diff.name.oldValue).toBe(controlRemoteVersionOld.name);
+      expect(diff[0].diff.name.newValue).toBe(controlRemoteVersionNew.name);
+      expect(diff[0].diff.name.localValue).toBe(controlLocalVersion.name);
     });
     it('returns remote control instead of changed local control in case of breaking remote change', () => {
       const controlLocalVersion = createControlInstance({
@@ -406,51 +406,51 @@ describe('surveyDiff', () => {
         label: 'foo',
         options: { allowHide: true, hidden: true },
       });
-      const controlRemoteVersionA = createControlInstance({
+      const controlRemoteVersionOld = createControlInstance({
         type: 'number',
         name: 'number_1',
         label: 'foo',
         options: { allowHide: true },
       });
-      const controlRemoteVersionB = createControlInstance({
+      const controlRemoteVersionNew = createControlInstance({
         type: 'number',
         name: 'number_1',
         label: 'foo',
         options: { allowHide: false },
       });
 
-      const diff = diffThreeSurveyVersions([controlLocalVersion], [controlRemoteVersionA], [controlRemoteVersionB]);
+      const diff = diffThreeSurveyVersions([controlLocalVersion], [controlRemoteVersionOld], [controlRemoteVersionNew]);
 
       expect(diff).toMatchObject([
         {
           changeType: changeType.CHANGED,
           hasBreakingChange: true,
           hasLocalChange: true,
-          controlRevisionA: controlLocalVersion,
-          childIndexRevisionA: 0,
-          pathRevisionA: controlLocalVersion.name,
-          parentIdRevisionA: null,
-          controlRevisionB: controlRemoteVersionA,
-          childIndexRevisionB: 0,
-          pathRevisionB: controlRemoteVersionA.name,
-          parentIdRevisionB: null,
-          controlRevisionC: controlRemoteVersionB,
-          childIndexRevisionC: 0,
-          pathRevisionC: controlRemoteVersionB.name,
-          parentIdRevisionC: null,
+          controlLocalRevision: controlLocalVersion,
+          childIndexLocalRevision: 0,
+          pathLocalRevision: controlLocalVersion.name,
+          parentIdLocalRevision: null,
+          controlRevisionOld: controlRemoteVersionOld,
+          childIndexRevisionOld: 0,
+          pathRevisionOld: controlRemoteVersionOld.name,
+          parentIdRevisionOld: null,
+          controlRevisionNew: controlRemoteVersionNew,
+          childIndexRevisionNew: 0,
+          pathRevisionNew: controlRemoteVersionNew.name,
+          parentIdRevisionNew: null,
 
           diff: {
             'options.allowHide': {
               changeType: changeType.CHANGED,
-              valueA: controlLocalVersion.options.allowHide,
-              valueB: controlRemoteVersionA.options.allowHide,
-              valueC: undefined, //yes, it's not false, cause some sanitation in place sets false to undefined
+              localValue: controlLocalVersion.options.allowHide,
+              oldValue: controlRemoteVersionOld.options.allowHide,
+              newValue: undefined, //yes, it's not false, cause some sanitation in place sets false to undefined
             },
             'options.hidden': {
               changeType: changeType.CHANGED,
-              valueA: controlLocalVersion.options.hidden,
-              valueB: controlRemoteVersionA.options.hidden,
-              valueC: controlRemoteVersionB.options.hidden,
+              localValue: controlLocalVersion.options.hidden,
+              oldValue: controlRemoteVersionOld.options.hidden,
+              newValue: controlRemoteVersionNew.options.hidden,
             },
           },
         },
@@ -463,13 +463,13 @@ describe('surveyDiff', () => {
         label: 'foo',
         options: { allowHide: true },
       });
-      const controlRemoteVersionA = createControlInstance({
+      const controlRemoteVersionOld = createControlInstance({
         type: 'number',
         name: 'number_1',
         label: 'foo',
         options: { allowHide: true },
       });
-      const controlRemoteVersionB = createControlInstance({
+      const controlRemoteVersionNew = createControlInstance({
         type: 'number',
         name: 'number_1',
         label: 'foo',
@@ -478,8 +478,8 @@ describe('surveyDiff', () => {
 
       const diff = diffThreeSurveyVersions(
         [controlLocalVersion],
-        [controlRemoteVersionA],
-        [controlRemoteVersionB],
+        [controlRemoteVersionOld],
+        [controlRemoteVersionNew],
         false
       );
 
@@ -487,25 +487,25 @@ describe('surveyDiff', () => {
         {
           changeType: changeType.CHANGED,
           hasLocalChange: false,
-          controlRevisionA: controlLocalVersion,
-          childIndexRevisionA: 0,
-          pathRevisionA: controlLocalVersion.name,
-          parentIdRevisionA: null,
-          controlRevisionB: controlRemoteVersionA,
-          childIndexRevisionB: 0,
-          pathRevisionB: controlRemoteVersionA.name,
-          parentIdRevisionB: null,
-          controlRevisionC: controlRemoteVersionB,
-          childIndexRevisionC: 0,
-          pathRevisionC: controlRemoteVersionB.name,
-          parentIdRevisionC: null,
+          controlLocalRevision: controlLocalVersion,
+          childIndexLocalRevision: 0,
+          pathLocalRevision: controlLocalVersion.name,
+          parentIdLocalRevision: null,
+          controlRevisionOld: controlRemoteVersionOld,
+          childIndexRevisionOld: 0,
+          pathRevisionOld: controlLocalVersion.name,
+          parentIdRevisionOld: null,
+          controlRevisionNew: controlRemoteVersionNew,
+          childIndexRevisionNew: 0,
+          pathRevisionNew: controlRemoteVersionNew.name,
+          parentIdRevisionNew: null,
 
           diff: {
             'options.allowHide': {
               changeType: changeType.CHANGED,
-              valueA: controlLocalVersion.options.allowHide,
-              valueB: controlRemoteVersionA.options.allowHide,
-              valueC: undefined, //yes, it's not false, cause some sanitation in place sets false to undefined
+              localValue: controlLocalVersion.options.allowHide,
+              oldValue: controlRemoteVersionOld.options.allowHide,
+              newValue: undefined, //yes, it's not false, cause some sanitation in place sets false to undefined
             },
           },
         },

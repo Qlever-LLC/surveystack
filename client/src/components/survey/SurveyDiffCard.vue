@@ -29,17 +29,17 @@
         <thead>
           <tr>
             <th class="text-left"></th>
-            <th class="text-left">{{ versionNameRevisionA }}</th>
-            <th class="text-left">{{ versionNameRevisionB }}</th>
-            <th v-if="versionNameRevisionC" class="text-left">{{ versionNameRevisionC }}</th>
+            <th v-if="versionNameLocalRevision" class="text-left">{{ versionNameLocalRevision }}</th>
+            <th class="text-left">{{ versionNameRemoteRevisionOld }}</th>
+            <th class="text-left">{{ versionNameRemoteRevisionNew }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="diffInfo in diffInfo.changeList" :key="diffInfo.key">
             <td>{{ diffInfo.key }}</td>
-            <td>{{ diffInfo.valueA }}</td>
-            <td>{{ diffInfo.valueB }}</td>
-            <td v-if="versionNameRevisionC">{{ diffInfo.valueC }}</td>
+            <td v-if="versionNameLocalRevision">{{ diffInfo.localValue }}</td>
+            <td>{{ diffInfo.oldValue }}</td>
+            <td>{{ diffInfo.newValue }}</td>
           </tr>
         </tbody>
       </template>
@@ -67,15 +67,15 @@ export default {
       type: Object,
       required: true,
     },
-    versionNameRevisionA: {
+    versionNameLocalRevision: {
+      type: String,
+      required: false,
+    },
+    versionNameRemoteRevisionOld: {
       type: String,
       required: true,
     },
-    versionNameRevisionB: {
-      type: String,
-      required: true,
-    },
-    versionNameRevisionC: {
+    versionNameRemoteRevisionNew: {
       type: String,
       required: false,
     },

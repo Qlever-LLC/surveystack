@@ -11,12 +11,11 @@
         <library-change-type-selector v-model="toSurvey.meta.libraryLastChangeType" :disabled="true" />
       </v-card-text>
       <survey-diff
-        :controls-revision-a="localRevisionControls"
-        :controls-revision-b="remoteOldRevisionControls"
-        :controls-revision-c="remoteNewRevisionControls"
-        version-name-revision-a="Your Version"
-        :version-name-revision-b="`Version ${libraryRootGroup.libraryVersion}`"
-        :version-name-revision-c="`Version ${toSurvey.latestVersion}`"
+        :controls-local-revision="localRevisionControls"
+        :controls-remote-revision-old="remoteOldRevisionControls"
+        :controls-remote-revision-new="remoteNewRevisionControls"
+        :version-name-remote-revision-old="`Version ${libraryRootGroup.libraryVersion}`"
+        :version-name-remote-revision-new="`Version ${toSurvey.latestVersion}`"
         :default-open="true"
         :showHeader="true"
         :showNoChangesText="false"
