@@ -44,16 +44,17 @@ export const GROUP_FIELDS = gql`
   }
 `;
 
-const loadHyloGroup = async (id) => {
-  const QUERY = gql`
-    ${GROUP_FIELDS}
-    query Group($id: ID!) {
-      group(id: $id) {
-        ...GroupFields
-      }
+export const QUERY_GROUP = gql`
+  ${GROUP_FIELDS}
+  query Group($id: ID!) {
+    group(id: $id) {
+      ...GroupFields
     }
-  `;
-  const data = await gqlRequest(QUERY, { id });
+  }
+`;
+
+const loadHyloGroup = async (id) => {
+  const data = await gqlRequest(QUERY_GROUP, { id });
   return data?.group;
 };
 
@@ -68,7 +69,6 @@ export const getIntegratedHyloGroup = async (req, res) => {
   const mapping = await db
     .collection(COLL_GROUPS_HYLO_MAPPINGS)
     .findOne({ groupId: new ObjectId(groupId) });
-  console.log({ mapping });
   if (!mapping) {
     return res.json(null);
   }

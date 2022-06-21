@@ -144,6 +144,7 @@ export const createReq = ({
 
 export const createRes = async ({ user = null } = {}) => ({
   send: jest.fn(),
+  json: jest.fn(),
   redirect: jest.fn(),
   status: jest.fn().mockReturnThis(),
   locals: {
