@@ -137,7 +137,6 @@ export const setIntegratedHyloGroup = async (req, res) => {
   res.json(hyloGroup);
 };
 export const removeHyloGroupIntegration = async (req, res) => {
-  // TODO check for access rights
   const schema = Joi.object({
     groupId: Joi.string().required(),
   });
@@ -149,19 +148,19 @@ export const removeHyloGroupIntegration = async (req, res) => {
   res.send({ ok: true });
 };
 
-export const getGroupBySlug = async (req, res) => {
-  const QUERY = gql`
-    ${GROUP_FIELDS}
-    query Group($slug: String!) {
-      group(slug: $slug) {
-        ...GroupFields
-      }
+export const QUERY_GROUP_BY_SLUG = gql`
+  ${GROUP_FIELDS}
+  query GroupBySlug($slug: String!) {
+    group(slug: $slug) {
+      ...GroupFields
     }
-  `;
+  }
+`;
+export const getGroupBySlug = async (req, res) => {
   const schema = Joi.object({
     slug: Joi.string().required(),
   });
   const { slug } = validateOrThrow(schema, req.query);
-  const data = await gqlRequest(QUERY, { slug });
+  const data = await gqlRequest(QUERY_GROUP_BY_SLUG, { slug });
   res.json(data?.group);
 };
