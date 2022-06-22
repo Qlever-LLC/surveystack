@@ -60,15 +60,6 @@ const outputSchema = Joi.object({
   .required()
   .options({ allowUnknown: true });
 
-export const QUERY_PERSON_BY_EMAIL = gql`
-  query ($email: String) {
-    person(email: $email) {
-      ...PersonDetails
-    }
-  }
-  ${FRAGMENT_PERSON_DETAILS}
-`;
-
 export const FRAGMENT_PERSON_DETAILS = gql`
   fragment PersonDetails on Person {
     id
@@ -87,6 +78,15 @@ export const FRAGMENT_GROUP_DETAILS = gql`
       items {
         ...PersonDetails
       }
+    }
+  }
+  ${FRAGMENT_PERSON_DETAILS}
+`;
+
+export const QUERY_PERSON_BY_EMAIL = gql`
+  query ($email: String) {
+    person(email: $email) {
+      ...PersonDetails
     }
   }
   ${FRAGMENT_PERSON_DETAILS}
@@ -378,7 +378,6 @@ export const handleSyncGroupOutput = async (options) => {
     url,
     entity: { extraModerators, ...entity },
   } = output;
-  const { name, slug } = entity;
 
   const href = url ? 'https://' + url : null;
   const gqlRequest = href ? _gqlRequestWithUrl(href) : _gqlRequest;
