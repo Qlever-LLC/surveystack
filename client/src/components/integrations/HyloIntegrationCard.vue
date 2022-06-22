@@ -42,7 +42,7 @@
           <!-- <v-col class="hidden-xs-only" sm="5" md="3"> -->
           <v-card-text class="white--text">
             &nbsp;Your group is integrated with
-            <a :href="`https://wwww.hylo.com/groups/${integratedHyloGroup.slug}`" target="_blank">{{
+            <a :href="`https://www.hylo.com/groups/${integratedHyloGroup.slug}`" target="_blank">{{
               integratedHyloGroup.name
             }}</a>
             on Hylo
@@ -91,23 +91,18 @@
                 ></v-row>
 
                 <div class="font-italic text-body-2 mb-4">Create a new group on Hylo with the same name</div>
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-col align="center">
-                      <v-btn
-                        color="primary"
-                        :loading="isCreateIntegratedHyloGroupInProgress"
-                        :disabled="isSetIntegratedInProgress"
-                        @click="createIntegratedHyloGroup"
-                        v-bind="attrs"
-                        v-on="on"
-                      >
-                        Integrate with a new Hylo group
-                      </v-btn></v-col
-                    >
-                  </template>
-                  <span>Create a new group on Hylo with the same name and connect it to this group</span>
-                </v-tooltip>
+                <v-col align="center">
+                  <v-btn
+                    color="primary"
+                    :loading="isCreateIntegratedHyloGroupInProgress"
+                    :disabled="isSetIntegratedInProgress"
+                    @click="createIntegratedHyloGroup"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    Integrate with a new Hylo group
+                  </v-btn></v-col
+                >
               </v-card-text>
 
               <v-card-actions>
