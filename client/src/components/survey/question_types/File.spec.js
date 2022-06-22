@@ -34,7 +34,7 @@ function getMountOpts(opts = {}) {
   };
 }
 
-function getMockFile(fileName) {
+export function getMockFile(fileName) {
   let content = 'test-data';
   let contentType = 'text/plain';
 

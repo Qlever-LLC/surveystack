@@ -1,5 +1,8 @@
-import resourcesStore from './resources.store';
+import { getMockFile } from '@/components/survey/question_types/File.spec';
 import { uploadFileResource } from '@/utils/resources';
+import resourcesStore from './resources.store';
+
+jest.mock('@/utils/resources');
 
 const { actions, mutations } = resourcesStore;
 
@@ -14,8 +17,20 @@ describe('resources store', () => {
       });
     });
     describe('addRemoteResource', () => {
-      it.todo('calls addLocalResource');
-      it.todo('calls uploadFileResource');
+      const mockFile = getMockFile('test-file-name.txt');
+
+      it('calls addLocalResource', async () => {
+        const dispatch = jest.fn().mockReturnValue({ _id: 'mocked-id', key: 'mocked-key' });
+        const commit = jest.fn();
+        await actions.addRemoteResource({ dispatch, commit }, mockFile);
+        expect(dispatch).toHaveBeenCalledWith('addLocalResource', mockFile);
+      });
+      it('calls uploadFileResource', async () => {
+        const dispatch = jest.fn().mockReturnValue({ _id: 'mocked-id', key: 'mocked-key' });
+        const commit = jest.fn();
+        await actions.addRemoteResource({ dispatch, commit }, mockFile);
+        expect(uploadFileResource).toHaveBeenCalled();
+      });
       it.todo('loads the newly created remote resource into cache');
     });
     describe('addLocalResource', () => {
