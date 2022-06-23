@@ -53,7 +53,13 @@
             <v-icon left>mdi-note-text-outline</v-icon>
             View Survey
           </v-btn>
-          <v-btn outlined color="secondary" class="ml-2" @click="startDraft(survey)">
+          <v-btn
+            outlined
+            color="secondary"
+            class="ml-2"
+            :disabled="surveyEntity.meta.isLibrary"
+            @click="startDraft(survey)"
+          >
             <v-icon left>mdi-plus</v-icon>
             New submission
           </v-btn>
