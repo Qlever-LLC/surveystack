@@ -1,10 +1,20 @@
-import { getMockFile } from '@/components/survey/question_types/File.spec';
 import { uploadFileResource } from '@/utils/resources';
 import resourcesStore from './resources.store';
+import { Blob } from 'buffer';
 
 jest.mock('@/utils/resources');
 
 const { actions, mutations } = resourcesStore;
+
+export function getMockFile(fileName) {
+  let content = 'test-data';
+  let contentType = 'text/plain';
+
+  let blob = new Blob([content], { type: contentType });
+  blob['lastModifiedDate'] = '';
+  blob['name'] = fileName;
+  return blob;
+}
 
 describe('resources store', () => {
   describe('actions', () => {
