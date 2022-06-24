@@ -366,8 +366,7 @@ export default {
       return list;
     },
     paginationTotalPages() {
-      const r = Math.floor(this.submissions.pagination.total / this.submissions.pagination.limit) + 1;
-      return r;
+      return Math.ceil(this.submissions.pagination.total / this.submissions.pagination.limit);
     },
     user() {
       return this.$store.getters['auth/user'];
