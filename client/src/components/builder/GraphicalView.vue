@@ -104,7 +104,7 @@
             <v-btn
               text
               x-small
-              v-if="areActionsVisible(el) && el.options.allowHide && !el.options.hidden"
+              v-if="areActionsVisible(el) && el.libraryId && el.options.allowHide && !el.options.hidden"
               @click.stop="$emit('hide-control', el)"
               color="grey lighten-1"
               class="mb-4"
