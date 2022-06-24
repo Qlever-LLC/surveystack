@@ -396,6 +396,10 @@ export default {
       try {
         const { data: submissions } = await api.get(this.apiFetchRequest);
         this.submissions = submissions;
+        // turn back to the first page if it skipped all the submissions (can happen on filter update)
+        if (this.page !== 1 && this.submissions.pagination.total <= this.submissions.pagination.skip) {
+          this.changedPaginationPage(1);
+        }
       } catch (e) {
         console.log('something went wrong:', e);
       } finally {
