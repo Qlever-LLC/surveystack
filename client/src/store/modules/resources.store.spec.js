@@ -41,7 +41,12 @@ describe('resources store', () => {
         await actions.addRemoteResource({ dispatch, commit }, mockFile);
         expect(uploadFileResource).toHaveBeenCalled();
       });
-      it.todo('loads the newly created remote resource into cache');
+      it('loads the newly created remote resource into cache', async () => {
+        const dispatch = jest.fn().mockReturnValue({ _id: 'mocked-id', key: 'mocked-key' });
+        const commit = jest.fn();
+        await actions.addRemoteResource({ dispatch, commit }, mockFile);
+        expect(dispatch).toHaveBeenCalledWith('fetchResource', 'mocked-id');
+      });
     });
     describe('addLocalResource', () => {
       it.todo('stores the resource to the store state');
