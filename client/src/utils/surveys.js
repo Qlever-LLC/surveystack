@@ -427,7 +427,7 @@ export const insertControl = (controlToInsert, controls, position, selectedContr
   let exit = false;
 
   for (let i = 0; i < position.length; i++) {
-    currentControl = currentControls[position[i]];
+    currentControl = getControlByPosition(currentControls, position[i]);
     index = position[i];
     if (currentControl.type === 'group' || currentControl.type === 'page') {
       if (exit || controlToInsert.type === 'page') {
@@ -442,6 +442,16 @@ export const insertControl = (controlToInsert, controls, position, selectedContr
   }
 
   currentControls.splice(index + 1, 0, controlToInsert);
+};
+
+/**
+ * Returns the control at the given position in controls. Falls back to highest position if the passed position is out of range
+ * @param controls
+ * @param position
+ * @returns {*}
+ */
+export const getControlByPosition = (controls, position) => {
+  return controls[position] || controls[controls.length - 1];
 };
 
 export const getBreadcrumbs = (survey, position) => {

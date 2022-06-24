@@ -638,6 +638,30 @@ describe('surveyDiff', () => {
       expect(mergeResult.length).toBe(2);
       expect(mergeResult[1]).toMatchObject(textControl);
     });
+    it('preserves locally added control if control before is deleted in remote revision', () => {
+      const controlLocal = createControlInstance({
+        type: 'text',
+        name: 'text_local',
+        label: 'loc',
+      });
+      const numberControl = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+      });
+      const textControl = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar',
+      });
+      const mergeResult = merge(
+        [numberControl, textControl, controlLocal],
+        [numberControl, textControl],
+        [textControl]
+      );
+      expect(mergeResult.length).toBe(2);
+      expect(mergeResult[1]).toMatchObject(controlLocal);
+    });
     it('preserves local control change when remote also changed', () => {
       const numberControlChanged = createControlInstance({
         type: 'number',
