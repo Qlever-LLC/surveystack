@@ -388,7 +388,7 @@ export default {
       // load library survey
       const { data: librarySurvey } = await api.get(`/surveys/${librarySurveyId}`);
       // add resources from library survey
-      this.survey.resources = this.survey.resources.concat(getPreparedLibraryResources(librarySurvey));
+      const newResources = getPreparedLibraryResources(librarySurvey);
 
       // prepare root group for the library questions to be inserted into
       let rootGroup = createControlInstance(availableControls.find((c) => c.type === 'group'));
@@ -404,12 +404,11 @@ export default {
         librarySurvey._id,
         librarySurvey.latestVersion,
         librarySurvey.revisions[librarySurvey.latestVersion - 1].controls,
-        this.survey.resources,
+        newResources,
         null
       );
-
-      // cleanup unused library resources (e.g. this could happen if resources with same origin are added when consuming the same library multiple times)
-      this.cleanupLibraryResources();
+      // update the survey resources
+      this.updateLibraryResources(newResources);
       // hide the library view
       this.showLibrary = false;
     },
@@ -446,7 +445,7 @@ export default {
     updateLibraryResources(newLibraryResources) {
       // add updated resources
       this.survey.resources = this.survey.resources.concat(newLibraryResources);
-      // remove library resources which are not used anymore
+      // remove library resources which are not used anymore (e.g. this could happen if resources with same origin are added when consuming the same library multiple times)
       this.cleanupLibraryResources();
     },
     cleanupLibraryResources() {

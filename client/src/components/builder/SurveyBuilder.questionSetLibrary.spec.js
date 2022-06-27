@@ -128,13 +128,14 @@ describe('question set library', () => {
   });
 
   describe('methods.addQuestionsFromLibrary', () => {
-    const { addQuestionsFromLibrary, cleanupLibraryResources } = SurveyBuilder.methods;
+    const { addQuestionsFromLibrary, updateLibraryResources, cleanupLibraryResources } = SurveyBuilder.methods;
 
     describe('resources', () => {
       const runTest = async (surveyResources, qslResources, expectedResources, doCleanup) => {
         const component = {
           ...optionsWithControls().props,
           controlAdded: jest.fn(),
+          updateLibraryResources: updateLibraryResources,
           cleanupLibraryResources: doCleanup ? cleanupLibraryResources : jest.fn(),
         };
         component.survey.resources = surveyResources;
@@ -179,6 +180,7 @@ describe('question set library', () => {
         const component = {
           ...optionsWithControls().props,
           controlAdded: jest.fn(),
+          updateLibraryResources,
           cleanupLibraryResources,
         };
 
@@ -200,6 +202,7 @@ describe('question set library', () => {
           const component = {
             ...optionsWithControls().props,
             controlAdded: jest.fn(),
+            updateLibraryResources,
             cleanupLibraryResources,
           };
           const num = createControlInstance({ type: 'number', name: 'number_1' });
@@ -234,6 +237,7 @@ describe('question set library', () => {
           const component = {
             ...optionsWithControls().props,
             controlAdded: jest.fn(),
+            updateLibraryResources,
             cleanupLibraryResources,
           };
           const num = createControlInstance({ type: 'number', name: 'number_1' });
