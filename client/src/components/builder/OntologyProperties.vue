@@ -22,7 +22,7 @@
         v-if="tableDialogIsVisible && resource && resource.type === resourceTypes.ONTOLOGY_LIST"
         :resources="resources"
         :resource="resource"
-        :disabled="disableOntologyEditor && !!resource.libraryId"
+        :disabled="!!resource.libraryId"
         @change="setResource"
         @delete="removeResource"
         @close-dialog="closeTableDialog"
@@ -122,9 +122,6 @@ export default {
       default: () => [],
     },
     disableSelection: {
-      required: false,
-    },
-    disableOntologyEditor: {
       required: false,
     },
   },

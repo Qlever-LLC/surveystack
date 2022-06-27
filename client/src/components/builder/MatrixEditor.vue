@@ -4,6 +4,7 @@
       <app-ontology-list-editor
         :resources="resources"
         :resource="ontology"
+        :disabled="ontology && !!ontology.libraryId"
         @change="setResource"
         @delete="removeResource"
         @close-dialog="editorDialog = false"

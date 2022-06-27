@@ -281,7 +281,6 @@
         :value="control.options.source"
         :resources="survey.resources"
         :disable-selection="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-        :disable-ontology-editor="!!control.libraryId && !control.isLibraryRoot"
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         class="mt-5"
