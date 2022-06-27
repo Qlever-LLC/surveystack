@@ -451,7 +451,7 @@ export default {
     cleanupLibraryResources() {
       const controls = this.survey.revisions[this.survey.revisions.length - 1].controls;
       this.survey.resources = this.survey.resources.filter(
-        (resource) => resource.libraryId === null || isResourceReferenced(controls, resource.id)
+        (resource) => !resource.libraryId || isResourceReferenced(controls, resource.id)
       );
     },
     closeLibrary() {
