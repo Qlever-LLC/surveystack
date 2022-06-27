@@ -337,6 +337,7 @@ describe('question set library', () => {
       const component = await prepareBuilderComponent(newQslVersion);
       const unusedResource = createQSL().resources[0];
       unusedResource.id = 'unreferenced resource id';
+      unusedResource.libraryId = 'foo';
       component.survey.resources.push(unusedResource);
       const updatedLibraryControls = newQslVersion.revisions[0].controls;
       await updateLibraryConfirmed.call(component, updatedLibraryControls);
