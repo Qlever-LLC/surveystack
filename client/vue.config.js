@@ -41,7 +41,7 @@ module.exports = {
   transpileDependencies: ['vuetify'],
   devServer: {
     port: process.env.VUE_APP_DEV_SERVER_PORT || 8080,
-    disableHostCheck: true,
+    allowedHosts: "all",
     compress: true,
     headers: {
       'Access-Control-Allow-Origin': '*',
