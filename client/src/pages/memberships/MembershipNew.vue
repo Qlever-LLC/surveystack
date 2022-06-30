@@ -42,34 +42,43 @@
           <v-btn text @click="cancel">Cancel</v-btn>
 
           <v-btn-toggle :max="0" multiple :value="[]" dense>
-            <v-btn color="primary" @click="submit" elevation="0" :disabled="!submittable">{{invitationMethod=="invite" ? "Send Invitation" : "Confirm User"}}</v-btn>
+            <v-btn color="primary" @click="submit" elevation="0" :disabled="!submittable">{{
+              invitationMethod === 'invite' ? 'Invite Member' : 'Add Member'
+            }}</v-btn>
             <v-menu top left>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn outlined primary v-bind="attrs" v-on="on" color="primary" elevation="0" min-width="0">
-                  <v-icon > mdi-chevron-down </v-icon></v-btn
+                  <v-icon> mdi-chevron-down </v-icon></v-btn
                 >
               </template>
-               <v-list>
-              <v-list-item-group v-model="invitationMethod">
-                <v-list-item two-line value="invite">
-                  <v-list-item-content>
-                    <v-list-item-title>Invite</v-list-item-title>
-                    <v-list-item-subtitle>Secondary text</v-list-item-subtitle>
-                  </v-list-item-content>
-                </v-list-item>
+              <v-list>
+                <v-list-item-group v-model="invitationMethod">
+                  <v-list-item two-line value="invite">
+                    <v-list-item-content>
+                      <v-list-item-title>Invite Member</v-list-item-title>
+                      <v-list-item-subtitle
+                        >Send an invitation to the user for joining your group.</v-list-item-subtitle
+                      >
+                    </v-list-item-content>
+                  </v-list-item>
 
-                <v-list-item three-line value="confirm">
-                  <v-list-item-content>
-                    <v-list-item-title>Auto Confirm</v-list-item-title>
-                    <v-list-item-subtitle> Secondary line text Lorem ipsum dolor sit amet, </v-list-item-subtitle>
-                    <v-list-item-subtitle> consectetur adipiscing elit. </v-list-item-subtitle>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list-item-group>
+                  <v-list-item three-line value="confirm">
+                    <v-list-item-content>
+                      <v-list-item-title>Add Member</v-list-item-title>
+                      <v-list-item-subtitle>
+                        Add member to this group without requiring interation from their side.<br />
+                        This is useful if you want to send out "Call for Submissions" without waiting for the user to
+                        joint your group.
+                      </v-list-item-subtitle>
+                      <!-- <v-list-item-subtitle>
+                        This is useful if you want to send out "Call for Submissions" without waiting to the user to
+                        joint your group.
+                      </v-list-item-subtitle> -->
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list-item-group>
               </v-list>
             </v-menu>
-
-            
           </v-btn-toggle>
         </div>
       </v-form>
@@ -132,7 +141,7 @@ export default {
       groupDetail: { name: '', path: '' },
       dialogCreateUser: false,
       sendEmail: 'SEND_NOW',
-      invitationMethod: 'invite'
+      invitationMethod: 'invite',
     };
   },
   methods: {
@@ -147,7 +156,8 @@ export default {
     },
     async submit() {
       const data = this.entity;
-      const url = `/memberships?sendEmail=${this.sendEmail}`;
+      const url =
+        this.invitationMethod === 'invite' ? `/memberships?sendEmail=${this.sendEmail}` : `/memberships/confirmed`;
 
       try {
         await api.post(url, data);

@@ -215,6 +215,7 @@ router.post(
   catchErrors(membershipController.resendInvitation)
 );
 router.post('/memberships/activate', catchErrors(membershipController.activateMembership));
+router.post('/memberships/confirmed', catchErrors(membershipController.createConfirmedMembership));
 router.post('/memberships', catchErrors(membershipController.createMembership));
 router.put(
   '/memberships/:id',

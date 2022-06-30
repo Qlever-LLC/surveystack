@@ -33,7 +33,7 @@ export const activateMembership = async ({ code, user }) => {
   const existing = await db.collection(col).find({ user, group: membership.group }).toArray();
   if (existing.length > 0) {
     console.log(
-      `User ${user.email} already has ${existing.length} memberships for group ${membership.group}`
+      `User ${user} already has ${existing.length} memberships for group ${membership.group}`
     );
     console.log('deleting existing membership now...');
     await db.collection(col).deleteMany({ _id: { $in: existing.map((e) => e._id) } });
