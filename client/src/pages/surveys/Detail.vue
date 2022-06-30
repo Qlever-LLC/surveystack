@@ -180,26 +180,20 @@ export default {
 
     const { submissions, isLibrary } = this.entity.meta;
 
-    if (this.start && this.isAllowedToSubmit) {
-      this.startDraft(this.entity);
-      //TODO what about the lines below? should they be executed first?
-    }
-
     if (!submissions || submissions === 'public' || isLibrary) {
       this.show = true;
-      return;
-    }
-
-    if (this.$store.getters['auth/isLoggedIn']) {
+    } else if (this.$store.getters['auth/isLoggedIn']) {
       // let ui handle issues if user is already logged in
       this.show = true;
-      return;
+    } else {
+      this.$router.push({
+        name: 'auth-login',
+        params: { redirect: this.$route.path, autoJoin: true },
+      });
     }
-
-    this.$router.push({
-      name: 'auth-login',
-      params: { redirect: this.$route.path, autoJoin: true },
-    });
+    if (this.show && this.start && this.isAllowedToSubmit) {
+      this.startDraft(this.entity._id);
+    }
   },
 };
 </script>

@@ -132,17 +132,19 @@ const routes = [
     beforeEnter: guard,
   },
   {
+    path: '/surveys/:id/start',
+    name: 'surveys-start',
+    components: getComponents(SurveysDetail),
+    props: {
+      default: {
+        start: true,
+      }
+    },
+  },
+  {
     path: '/surveys/:id',
     name: 'surveys-detail',
     components: getComponents(SurveysDetail),
-  },
-  {
-    path: '/surveys/:id/start',
-    name: 'surveys-detail',
-    components: getComponents(SurveysDetail),
-    props: {
-      startDraft: true,
-    },
   },
   {
     path: '/submissions/drafts/:id',
