@@ -23,6 +23,26 @@ export const assertIsSuperAdmin = (req, res, next) => {
   next();
 };
 
+export const assertHasGroupAdminAccess = catchErrors(async (req, res, next) => {
+  if (res.locals.auth.isSuperAdmin) {
+    return next();
+  }
+
+  if (!res.locals || !res.locals.auth || !res.locals.auth.user || !res.locals.auth.user._id) {
+    throw boom.unauthorized();
+  }
+
+  const userId = res.locals.auth.user._id;
+  const groupId = req.params.groupId || req.body.groupId;
+
+  const hasAdminRole = await rolesService.hasAdminRole(userId, groupId);
+  if (!hasAdminRole) {
+    throw boom.unauthorized();
+  }
+
+  next();
+});
+
 const getEntity = async (id, collection) => {
   return await db.collection(collection).findOne({ _id: new ObjectId(id) });
 };

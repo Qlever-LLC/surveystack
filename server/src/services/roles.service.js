@@ -37,12 +37,42 @@ const getParentGroups = async (groupId) => {
   return descendants.filter((d) => isParent(d.path, group.path));
 };
 
-const getDescendantGroups = async (group) => {
+export const getDescendantGroups = async (group, projection = {}) => {
   const descendants = await db
     .collection('groups')
-    .find({ path: { $regex: `^${group.path}` } })
+    .find({ path: { $regex: `^${group.path}` } }, { projection: projection })
     .toArray();
   return descendants;
+};
+
+export const getAscendantGroups = async (group, projection = {}) => {
+  const parts = group.path.split('/');
+  const relevant = parts.filter((p) => !!p);
+
+  const groupPaths = [];
+  let last = '';
+  for (const part of relevant) {
+    let current = '';
+    if (groupPaths.length == 0) {
+      current = `/${part}/`;
+    } else {
+      current = `${last}${part}/`;
+    }
+
+    groupPaths.push(current);
+    last = current;
+  }
+  const ascendants = await db
+    .collection('groups')
+    .find(
+      {
+        path: { $in: groupPaths },
+      },
+      { projection }
+    )
+    .toArray();
+
+  return ascendants;
 };
 
 export const hasRole = async (userId, groupId, role) => {

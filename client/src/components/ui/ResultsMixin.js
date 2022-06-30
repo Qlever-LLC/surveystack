@@ -1,3 +1,5 @@
+import { get } from 'lodash';
+
 export default {
   data() {
     return {
@@ -17,6 +19,7 @@ export default {
         this.resultItems.push({
           title: 'Error',
           body: (error.response && error.response.data && error.response.data.message) || error,
+          logs: error.response && error.response.data && error.response.data.logs,
           error: true,
         });
         return;
@@ -50,10 +53,16 @@ export default {
         });
       }
 
+      const getLogsOf = key => get(response, `data.${key}`, [])
+      .map((h) => h.logs)
+      .flat()
+
       if (!hasErrors) {
         this.resultItems.push({
           title: 'Success',
           body: 'Successful submission',
+          response,
+          logs: [...getLogsOf('farmos'), ...getLogsOf('hylo')],
         });
       }
     },

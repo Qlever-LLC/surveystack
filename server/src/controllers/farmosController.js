@@ -22,6 +22,17 @@ import {
   createPlan as manageCreatePlan,
   deletePlan as manageDeletePlan,
   mapFarmOSInstanceToUser,
+  getGroupInformation,
+  enableFarmOSAccessForGroup,
+  disableFarmOSAccessForGroup,
+  enableCoffeeShopAccessForGroup,
+  disableCoffeeShopAccessForGroup,
+  enableSubgroupsToJoinCoffeeShop,
+  disableSubgroupsToJoinCoffeeShop,
+  enableSubgroupAdminsToCreateFarmOSInstances,
+  disableSubgroupAdminsToCreateFarmOSInstances,
+  getTree,
+  getTreeFromGroupId,
 } from '../services/farmos/manage';
 import { aggregator } from '../services/farmos/aggregator';
 
@@ -75,7 +86,7 @@ export const getFarmOSInstances = async (req, res) => {
    */
 
   const userId = requireUserId(res);
-  console.log('userid', userId);
+  // console.log('userid', userId);
 
   const r = await listFarmOSInstancesForUser(userId);
 
@@ -595,6 +606,122 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
       message: error.message,
     });
   }
+};
+
+export const getDomain = async (req, res) => {
+  const schema = Joi.objectId().required();
+  const { groupId } = req.params;
+  const validres = schema.validate(groupId);
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
+  const tree = await getTreeFromGroupId(groupId);
+
+  return res.send({
+    domain: tree.domainRoot,
+    canBecomeRoot: tree.canBecomeRoot(),
+    isDomainRootInDescendants: tree.isDomainRooInDescendants(),
+  });
+};
+
+export const groupAdminMinimumGetGroupInformation = async (req, res) => {
+  const groupId = asMongoId(req.params.groupId);
+  const group = await db.collection('groups').findOne({ _id: groupId });
+  if (!group) {
+    // group not found, boom!
+    throw boom.notFound(`No group found: ${groupId}`);
+  }
+
+  const r = await getGroupInformation(groupId, res.locals.auth.isSuperAdmin);
+  return res.send({
+    status: 'success',
+    response: r,
+  });
+};
+
+export const superAdminUpdateFarmOSAccess = async (req, res) => {
+  const schema = Joi.object({
+    groupId: Joi.objectId().required(),
+    enable: Joi.boolean().required(),
+  });
+
+  const validres = schema.validate(req.body);
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
+  const { groupId, enable } = req.body;
+
+  const tree = await getTreeFromGroupId(groupId);
+
+  if (enable) {
+    if (tree.canBecomeRoot()) {
+      await tree.enableFarmOS();
+    }
+  } else {
+    await tree.disableFarmOS();
+  }
+
+  return res.send({
+    status: 'success',
+  });
+};
+
+export const groupAdminMinimumUpdateCoffeeShopAccess = async (req, res) => {
+  const { groupId, updateTo } = req.body;
+  if (!groupId) {
+    throw boom.badData('groupId missing');
+  }
+  if (!updateTo) {
+    throw boom.badData('updated value missing');
+  }
+  if (updateTo) {
+    await enableCoffeeShopAccessForGroup(groupId);
+  } else {
+    await disableCoffeeShopAccessForGroup(groupId);
+  }
+  return res.send({
+    status: 'success',
+  });
+};
+
+export const groupAdminMinimumUpdateJoinCoffeeShop = async (req, res) => {
+  const { groupId, updateTo } = req.body;
+  if (!groupId) {
+    throw boom.badData('groupId missing');
+  }
+  if (!updateTo) {
+    throw boom.badData('updated value missing');
+  }
+  if (updateTo) {
+    await enableSubgroupsToJoinCoffeeShop(groupId);
+  } else {
+    await disableSubgroupsToJoinCoffeeShop(groupId);
+  }
+  return res.send({
+    status: 'success',
+  });
+};
+
+export const groupAdminMinimumUpdateCreateFarmOSInstances = async (req, res) => {
+  const { groupId, updateTo } = req.body;
+  if (!groupId) {
+    throw boom.badData('groupId missing');
+  }
+  if (!updateTo) {
+    throw boom.badData('updated value missing');
+  }
+  if (updateTo) {
+    await enableSubgroupAdminsToCreateFarmOSInstances(groupId);
+  } else {
+    await disableSubgroupAdminsToCreateFarmOSInstances(groupId);
+  }
+  return res.send({
+    status: 'success',
+  });
 };
 
 export const testConnection = async (req, res) => {

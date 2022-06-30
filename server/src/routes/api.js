@@ -9,6 +9,7 @@ import userController from '../controllers/userController';
 import scriptController from '../controllers/scriptController';
 import rolesController from '../controllers/rolesController';
 import * as farmosController from '../controllers/farmosController';
+import * as hyloController from '../controllers/hyloController';
 
 import membershipController from '../controllers/membershipController';
 import infoController from '../controllers/infoController';
@@ -23,6 +24,7 @@ import cfsController from '../controllers/cfsController';
 import {
   assertAuthenticated,
   assertIsSuperAdmin,
+  assertHasGroupAdminAccess,
   assertEntityExists,
   assertIdsMatch,
   assertNameNotEmpty,
@@ -275,6 +277,69 @@ router.post(
   [assertIsSuperAdmin],
   catchErrors(farmosController.superAdminUnMapFarmosInstanceFromUser)
 );
+
+router.post(
+  '/farmos/group-manage/enable',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.superAdminUpdateFarmOSAccess)
+);
+
+router.get(
+  '/farmos/group-manage/:groupId/domain',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.getDomain)
+);
+
+router.get(
+  '/farmos/group-manage/:groupId',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupAdminMinimumGetGroupInformation)
+);
+
+router.post(
+  '/farmos/coffee-shop-access',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupAdminMinimumUpdateCoffeeShopAccess)
+);
+
+router.post(
+  '/farmos/subgrp-join-coffee-shop',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupAdminMinimumUpdateJoinCoffeeShop)
+);
+
+router.post(
+  '/farmos/subgrp-admins-create-farmos-instances',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupAdminMinimumUpdateCreateFarmOSInstances)
+);
+
+/** Hylo */
+router.post(
+  '/hylo/create-new-integrated-group',
+  [assertHasGroupAdminAccess],
+  catchErrors(hyloController.createNewIntegratedHyloGroup)
+);
+
+router.post(
+  '/hylo/set-integrated-group',
+  [assertHasGroupAdminAccess],
+  catchErrors(hyloController.setIntegratedHyloGroup)
+);
+
+router.post(
+  '/hylo/remove-group-integration',
+  [assertHasGroupAdminAccess],
+  catchErrors(hyloController.removeHyloGroupIntegration)
+);
+
+router.get(
+  '/hylo/integrated-group/:groupId',
+  [],
+  catchErrors(hyloController.getIntegratedHyloGroup)
+);
+
+router.get('/hylo/group', [], catchErrors(hyloController.getGroupBySlug));
 
 /** Integrations - Group */
 router.get('/group-integrations', catchErrors(groupIntegrationController.getIntegrations));
