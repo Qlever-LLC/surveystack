@@ -231,13 +231,13 @@ describe('hyloController', () => {
 
     it('calls gqlRequest', async () => {
       await getGroupBySlug(req, res);
-      expect(gqlRequest).toHaveBeenCalledWith(QUERY_GROUP_BY_SLUG, {slug: hyloGroup.slug})
+      expect(gqlRequest).toHaveBeenCalledWith(QUERY_GROUP_BY_SLUG, { slug: hyloGroup.slug });
     });
 
     it('returns the group', async () => {
       await getGroupBySlug(req, res);
-      gqlRequest.mockResolvedValue({group: hyloGroup})
-      expect(res.json).toHaveBeenCalledWith(hyloGroup)
+      gqlRequest.mockResolvedValue({ group: hyloGroup });
+      expect(res.json).toHaveBeenCalledWith(hyloGroup);
     });
   });
 });
