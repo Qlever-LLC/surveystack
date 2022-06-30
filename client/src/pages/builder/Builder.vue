@@ -185,8 +185,6 @@ export default {
         return;
       }
 
-      console.log('submission', payload);
-
       this.submitting = true;
       try {
         await uploadFileResources(this.$store, payload, false);
