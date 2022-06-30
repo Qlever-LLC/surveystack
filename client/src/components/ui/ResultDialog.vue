@@ -3,15 +3,15 @@
     <v-dialog v-model="show" max-width="350" :persistent="persistent">
       <v-card class="pa-4">
         <v-card-title class="headline" v-if="title">{{ title }}</v-card-title>
-        <template v-for="(item, idx) in items">
-          <div :key="'item_' + idx">
+        <div v-for="(item, idx) in items" :key="'item_' + idx">
+          <div>
             <v-card flat dark outlined class="mb-2" :color="item.error ? 'red darken-4' : 'green'">
               <v-card-text class="white--text">
                 <span style="font-weight: bold">{{ item.title }}</span> {{ item.body }}
               </v-card-text>
             </v-card>
           </div>
-        </template>
+        </div>
         <div v-if="additionalMessage" v-html="additionalMessage" />
         <v-card-actions>
           <v-spacer />
