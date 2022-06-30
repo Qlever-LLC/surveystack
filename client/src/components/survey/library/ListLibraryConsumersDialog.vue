@@ -31,7 +31,7 @@
   </v-dialog>
 </template>
 <script>
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs } from 'vue';
 import api from '@/services/api.service';
 
 export default {

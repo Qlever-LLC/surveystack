@@ -326,7 +326,7 @@
 </template>
 
 <script>
-import { Editor, EditorContent, EditorMenuBar, EditorMenuBubble } from 'tiptap';
+import { Editor, EditorContent, EditorMenuBar } from 'tiptap';
 import {
   Blockquote,
   CodeBlock,
