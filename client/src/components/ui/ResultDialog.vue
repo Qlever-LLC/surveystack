@@ -5,7 +5,7 @@
         <v-card-title class="headline" v-if="title">{{ title }}</v-card-title>
         <div v-for="(item, idx) in items" :key="'item_' + idx">
           <div>
-            <v-card flat dark outlined class="mb-2" :color="item.error ? 'red darken-4' : 'green'">
+            <v-card flat outlined class="mb-2" :color="item.error ? 'red darken-4' : 'green'">
               <v-card-text class="white--text">
                 <span style="font-weight: bold">{{ item.title }}</span> {{ item.body }}
               </v-card-text>

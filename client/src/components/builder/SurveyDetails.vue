@@ -156,7 +156,7 @@
           {{ value._id }}
         </div>
         <div class="text-left ">
-          <v-chip dark small outlined color="grey"> Version {{ version }} </v-chip>
+          <v-chip small outlined color="grey"> Version {{ version }} </v-chip>
         </div>
       </div>
     </v-card-title>
@@ -180,6 +180,7 @@
           <v-tooltip bottom v-if="!isNew">
             <template v-slot:activator="{ on }">
               <div v-on="on">
+                <!--TODO replace dark attr by changing the color as dark is not supported anymore by vuetify 3-->
                 <v-btn
                   v-if="!isNew"
                   :dark="enableUpdate"
@@ -214,6 +215,7 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
+                <!--TODO replace dark attr by changing the color as dark is not supported anymore by vuetify 3-->
                 <v-btn
                   :dark="enablePublish"
                   class="my-1 mr-1"
@@ -233,6 +235,7 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
+                <!--TODO replace dark attr by changing the color as dark is not supported anymore by vuetify 3-->
                 <v-btn
                   :dark="enableSaveDraft"
                   @click="$emit('saveDraft')"

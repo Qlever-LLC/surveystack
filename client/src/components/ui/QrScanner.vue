@@ -5,7 +5,6 @@
       aria-label="Open QR Scanner"
       :x-large="!small"
       :small="!!small"
-      dark
       color="primary"
       @click="isScannerOpen = true"
     >
@@ -14,8 +13,8 @@
 
     <v-dialog v-model="isScannerOpen" fullscreen>
       <v-card>
-        <v-toolbar dark color="primary">
-          <v-btn aria-label="Close QR Scanner" icon dark @click="isScannerOpen = false">
+        <v-toolbar color="primary">
+          <v-btn aria-label="Close QR Scanner" icon @click="isScannerOpen = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
           <v-toolbar-title>QR Code Scanner</v-toolbar-title>

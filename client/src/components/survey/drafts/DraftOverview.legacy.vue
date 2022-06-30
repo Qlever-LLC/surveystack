@@ -25,6 +25,7 @@
           :color="display.color"
           :hide-dot="display.hidden"
         >
+          <!--TODO replace dark attr by changing the color as dark is not supported anymore by vuetify 3-->
           <v-card
             v-if="display.relevant || !display.hidden"
             @click="$emit('navigate', display.position)"
@@ -38,13 +39,13 @@
                 <v-card-title class="d-block">
                   <div class="ma-0 pa-0 d-flex align-stretch">
                     <!-- color="#FF5722" -->
-                    <v-chip dark small class="mr-0 mr-1"
+                    <v-chip small class="mr-0 mr-1"
                       ><span v-for="(crumb, ci) in display.breadcrumbs" :key="`bread_${ci}`"
                         >{{ crumb }} <span class="mr-1" v-if="ci < display.breadcrumbs.length - 1">&gt;</span></span
                       ></v-chip
                     >
                     <v-spacer></v-spacer>
-                    <v-chip small dark v-if="display.collate > 0" color="grey-darken-5">Irrelevant</v-chip>
+                    <v-chip small v-if="display.collate > 0" color="grey-darken-5">Irrelevant</v-chip>
                   </div>
                   <span class="number-chip mr-2">{{ display.number }}</span>
                   {{ display.label }}

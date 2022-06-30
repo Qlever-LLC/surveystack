@@ -8,7 +8,7 @@
     <v-list class="mt-0 pt-0">
       <template>
         <div v-for="(item, i) in items" :key="i">
-          <v-divider v-if="item.type === 'divider'" dark class="my-1"/>
+          <v-divider v-if="item.type === 'divider'" class="my-1"/>
           <v-subheader v-else-if="item.type === 'subheader'">{{ item.label }}</v-subheader>
           <v-list-item v-else :to="item.to">
             <v-list-item-icon v-if="item.icon" :class="item.class">
@@ -68,7 +68,7 @@
     </v-list>
 
     <template v-slot:append>
-      <div dark class="grey--text">
+      <div class="grey--text">
         <p class="pt-4 pl-4">
           Version:
           <router-link to="/app/info" class="decoration-none">{{ lcl.shortHash }}</router-link>

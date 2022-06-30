@@ -101,7 +101,7 @@
       </template>
     </v-combobox>
     <v-banner v-else-if="isLoading"> <v-icon class="mr-2 mdi-spin">mdi-loading</v-icon>Loading </v-banner>
-    <v-banner v-else color="red lighten-2" dark>
+    <v-banner v-else color="red lighten-2">
       <v-icon class="mr-2">mdi-alert</v-icon>Invalid select options, please update Survey Definition
     </v-banner>
     <app-control-more-info :value="control.moreInfo" />

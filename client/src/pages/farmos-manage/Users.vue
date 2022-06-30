@@ -40,7 +40,7 @@
             <td>{{ instance.instanceName }}</td>
             <td>{{ instance.owner }}</td>
             <td>
-              <v-btn color="red" @click="$emit('unmap-user', selectedUser, instance.instanceName)" dark>Unmap</v-btn>
+              <v-btn color="red" @click="$emit('unmap-user', selectedUser, instance.instanceName)">Unmap</v-btn>
             </td>
           </tr>
 

@@ -66,7 +66,7 @@
             <tr v-for="(group, idx) in mappedGroups" :key="`grp-${idx}`">
               <td>{{ group.name }}</td>
               <td>
-                <v-btn color="red" @click="$emit('unmap-group', group._id, selectedInstance)" dark>Unmap</v-btn>
+                <v-btn color="red" @click="$emit('unmap-group', group._id, selectedInstance)">Unmap</v-btn>
               </td>
             </tr>
           </tbody>

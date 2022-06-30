@@ -163,7 +163,7 @@
             </div>
 
             <v-btn slot="footer" @click="addColumn" class="align-self-center mx-4 my-6" fab dark small color="primary">
-              <v-icon dark>mdi-plus</v-icon>
+              <v-icon>mdi-plus</v-icon>
             </v-btn>
           </draggable>
         </div>

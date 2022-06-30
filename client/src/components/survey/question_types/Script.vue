@@ -60,9 +60,9 @@
         {{ control.options.buttonLabel ? control.options.buttonLabel : 'Run Script' }}
       </v-btn>
       <p class="status" v-if="meta.status || meta.statusMessage">
-        <v-chip dark> {{ meta && meta.status }}</v-chip>
+        <v-chip> {{ meta && meta.status }}</v-chip>
         <br />
-        <v-chip dark class="mt-1">
+        <v-chip class="mt-1">
           <v-icon small left>mdi-message-bulleted</v-icon>
           {{ meta && meta.statusMessage }}</v-chip
         >

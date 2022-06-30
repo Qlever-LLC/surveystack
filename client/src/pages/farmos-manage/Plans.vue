@@ -39,7 +39,7 @@
             <td>{{ plan.planName }}</td>
             <td>{{ plan.planUrl }}</td>
             <td>
-              <v-btn color="red" @click="$emit('delete-plan', plan._id)" dark>Delete</v-btn>
+              <v-btn color="red" @click="$emit('delete-plan', plan._id)">Delete</v-btn>
             </td>
           </tr>
         </tbody>

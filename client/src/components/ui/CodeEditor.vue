@@ -1,6 +1,6 @@
 <template>
   <div class="full">
-    <v-card dark color="dark-blue--lighten-2" class="card-height" slot="paneL">
+    <v-card color="dark-blue--lighten-2" class="card-height" slot="paneL">
       <v-card-title
         >{{ title || '' }}
 
