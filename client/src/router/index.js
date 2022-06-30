@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import VueRouter from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router'
 import { decode as b64Decode } from 'js-base64';
 import Home from '@/pages/Home.vue';
 import Test from '@/pages/Test.vue';
@@ -54,8 +54,6 @@ import store from '@/store';
 const Builder = () => import('@/pages/builder/Builder.vue');
 const Script = () => import('@/pages/scripts/Script.vue');
 const ScriptEdit = () => import('@/pages/scripts/ScriptEdit.vue');
-
-Vue.use(VueRouter);
 
 const guard = async (to, from, next) => {
   if (!store.getters['auth/isLoggedIn']) {
@@ -234,7 +232,7 @@ const routes = [
     components: getComponents(GroupEdit),
   },
   {
-    path: '/g/*',
+    path: '/g/*', //TODO * not supported anymore, https://router.vuejs.org/guide/migration/#removed-star-or-catch-all-routes
     name: 'groups-by-path',
     components: getComponents(Group),
   },
@@ -333,15 +331,13 @@ const routes = [
         },
       ]),
   {
-    path: '/kit/*',
+    path: '/kit/*',  //TODO * not supported anymore, https://router.vuejs.org/guide/migration/#removed-star-or-catch-all-routes
     name: 'kit',
     components: getComponents(Kit),
   },
 ];
-
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
   routes,
   scrollBehavior(to, from, savedPosition) {
     return {
@@ -349,6 +345,6 @@ const router = new VueRouter({
       y: 0,
     };
   },
-});
+})
 
 export default router;
