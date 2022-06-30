@@ -113,7 +113,6 @@
     "vue-cli-plugin-vuetify": "^2.5.1",
     "vue-eslint-parser": "^9.0.3",
     "vue-loader": "^17.0.0",
-    "vue-template-compiler": "^2.7.0-beta.8",
     "webpack": "^5.73.0",
     "webpack-plugin-vuetify": "^2.0.0-alpha.11",
     "worker-loader": "^3.0.8"
