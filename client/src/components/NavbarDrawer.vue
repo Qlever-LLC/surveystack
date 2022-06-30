@@ -1,36 +1,31 @@
 <template>
   <v-navigation-drawer :value="value" app>
     <div class="d-flex justify-end mt-3 mr-3">
-      <v-btn large icon @click="$emit('input', !value)">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
+      <v-btn large icon="mdi-close" @click="$emit('input', !value)"/>
     </div>
-    <v-list class="mt-0 pt-0">
-      <template>
-        <div v-for="(item, i) in items" :key="i">
-          <v-divider v-if="item.type === 'divider'" class="my-1"/>
-          <v-subheader v-else-if="item.type === 'subheader'">{{ item.label }}</v-subheader>
-          <v-list-item v-else :to="item.to">
-            <v-list-item-icon v-if="item.icon" :class="item.class">
-              <v-icon>{{ item.icon }}</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>
-                {{ item.label }}
-                <v-chip
-                  v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
-                  color="accent"
-                  small
-                >{{ readyToSubmitCount }}
-                </v-chip
-                >
-              </v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </div>
-      </template>
 
-      <v-divider dark class="my-1"/>
+    <v-list class="mt-0 pt-0">
+      <div v-for="(item, i) in items" :key="i">
+        <v-divider v-if="item.type === 'divider'" class="my-1"/>
+        <v-subheader v-else-if="item.type === 'subheader'">{{ item.label }}</v-subheader>
+        <v-list-item v-else :to="item.to">
+          <v-list-item-icon v-if="item.icon" :icon="item.icon" :class="item.class"/>
+          <v-list-item-content>
+            <v-list-item-title>
+              {{ item.label }}
+              <v-chip
+                v-if="item.to && item.to.name && item.to.name === 'my-submissions' && readyToSubmitCount"
+                color="accent"
+                small
+              >{{ readyToSubmitCount }}
+              </v-chip
+              >
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </div>
+
+      <v-divider class="my-1"/>
 
       <v-list-item class="pa-0">
         <v-expansion-panels class="pa-0 ma-0 no-background" flat accordion
@@ -43,9 +38,7 @@
               <v-list class="pa-0 ma-0">
                 <v-list-item v-for="(doc, index) in docs" :key="doc.link + index" :href="doc.link"
                              target="_blank">
-                  <v-list-item-icon>
-                    <v-icon>mdi-notebook</v-icon>
-                  </v-list-item-icon>
+                  <v-list-item-icon icon="mdi-notebook"/>
                   <v-list-item-content>
                     <v-list-item-title>{{ doc.label }}</v-list-item-title>
                   </v-list-item-content>
@@ -53,9 +46,7 @@
 
                 <v-list-item href="https://our-sci.gitlab.io/software/surveystack_tutorials/"
                              target="_blank">
-                  <v-list-item-icon>
-                    <v-icon>mdi-notebook-multiple</v-icon>
-                  </v-list-item-icon>
+                  <v-list-item-icon icon="mdi-notebook-multiple"/>
                   <v-list-item-content>
                     <v-list-item-title>SurveyStack Docs</v-list-item-title>
                   </v-list-item-content>
@@ -66,7 +57,6 @@
         </v-expansion-panels>
       </v-list-item>
     </v-list>
-
     <template v-slot:append>
       <div class="grey--text">
         <p class="pt-4 pl-4">
