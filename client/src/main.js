@@ -1,5 +1,4 @@
-import Vue from 'vue';
-import CompositionApi from '@vue/composition-api';
+import Vue, { createApp } from 'vue';
 import App from './App.vue';
 import './registerServiceWorker';
 import router from './router';
@@ -44,13 +43,12 @@ Vue.filter('showNull', (value) => {
 });
 
 Vue.config.productionTip = false;
-Vue.use(CompositionApi);
-new Vue({
-  router,
-  store,
-  vuetify,
-  render: (h) => h(App),
-}).$mount('#app');
+
+createApp(App)
+  .use(router)
+  .use(store)
+  .use(vuetify)
+  .mount("#app");
 
 // remove initial loading screen (added in the index.html)
 try {
