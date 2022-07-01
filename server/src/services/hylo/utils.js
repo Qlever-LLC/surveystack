@@ -55,8 +55,8 @@ export const gqlRequest = async (query, variables, apiUrl = process.env.HYLO_API
 };
 
 export const gqlRequestWithUrl = (apiUrl) => {
-  if (!apiUrl.endsWith('.hylo.com')) {
-    throw new Error('Hylo API URL has to end in .hylo.com');
+  if (!apiUrl.match(/(^|\.|\/)hylo.com$/)) {
+    throw new Error('Hylo API URL has to be under hylo.com');
   }
   return (query, variables) => gqlRequest(query, variables, apiUrl);
 };
