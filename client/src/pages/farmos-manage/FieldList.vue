@@ -5,7 +5,7 @@
 
       <v-list-item v-for="(field, idx) in value" :key="`field_${idx}`">
         <v-list-item-avatar>
-          <v-icon class="primary lighten-1" dark> mdi-map </v-icon>
+          <v-icon class="primary lighten-1"> mdi-map </v-icon>
         </v-list-item-avatar>
 
         <v-list-item-content>

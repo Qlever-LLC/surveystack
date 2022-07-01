@@ -34,6 +34,7 @@
           :color="display.color"
           :hide-dot="display.hidden"
         >
+          <!--TODO replace dark attr by changing the color as dark is not supported anymore by vuetify 3-->
           <v-card
             v-if="display.relevant || !display.hidden"
             @click="$emit('goto', display.path)"
@@ -103,7 +104,7 @@
             </v-card-text>
           </v-card>
 
-          <v-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1"
+          <v-chip v-else @click="expand(display.collateGroup)" small color="grey" class="mr-0 mr-1"
             >{{ display.collate }} Irrelevant Questions
           </v-chip>
         </v-timeline-item>

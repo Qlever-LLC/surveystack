@@ -53,7 +53,7 @@ import TipTapEditor from '@/components/builder/TipTapEditor';
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
 import SurveyDiff from '@/components/survey/SurveyDiff';
 import { controlListsHaveChanges } from '@/utils/surveyDiff';
-import { computed } from '@vue/composition-api';
+import { computed } from 'vue';
 export default {
   components: { SurveyDiff, LibraryChangeTypeSelector, TipTapEditor },
   props: {

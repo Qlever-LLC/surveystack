@@ -18,6 +18,7 @@
         <img v-if="!value" id="map-marker" src="@/assets/marker.svg" alt="marker" />
         <div class="selection-controls d-flex justify-center">
           <div v-if="!location">
+            <!--TODO replace dark attr by changing the color as dark is not supported anymore by vuetify 3-->
             <v-btn
               large
               :disabled="disablePick"
@@ -48,7 +49,7 @@
     </div>
 
     <v-overlay class="text-center" :value="!gps && !mapError && !geolocationError" light absolute>
-      <v-card light>
+      <v-card>
         <v-card-text>
           <div class="subtitle-1 text-center">
             Getting GPS Coordinates

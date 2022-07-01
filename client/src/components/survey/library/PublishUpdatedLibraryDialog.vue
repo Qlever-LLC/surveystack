@@ -30,7 +30,7 @@
 <script>
 import LibraryChangeTypeSelector from '@/components/survey/library/LibraryChangeTypeSelector';
 import TipTapEditor from '@/components/builder/TipTapEditor.vue';
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs } from 'vue';
 import SurveyDiff from '@/components/survey/SurveyDiff';
 
 export default {

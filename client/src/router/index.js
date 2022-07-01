@@ -1,11 +1,7 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import { decode as b64Decode } from 'js-base64';
 import Home from '@/pages/Home.vue';
-import Test from '@/pages/Test.vue';
 import Unauthorized from '@/pages/Unauthorized.vue';
-
-const MySubmissions = () => import('@/pages/surveys/MySubmissions.vue');
 import SurveysBrowse from '@/pages/surveys/Browse.vue';
 import SurveysDetail from '@/pages/surveys/Detail.vue';
 import DraftSubmission from '@/pages/submissions/drafts/Draft.vue';
@@ -18,13 +14,8 @@ import ForgotPassword from '@/pages/auth/ForgotPassword.vue';
 import UserList from '@/pages/users/UserList.vue';
 import User from '@/pages/users/User.vue';
 import UserEdit from '@/pages/users/UserEdit.vue';
-
-const FarmosManage = () => import('@/pages/farmos-manage/FarmosManage.vue');
-
 import GroupList from '@/pages/groups/GroupList.vue';
 import Group from '@/pages/groups/Group.vue';
-const GroupEdit = () => import('@/pages/groups/GroupEdit.vue');
-
 import SubmissionList from '@/pages/submissions/List.vue';
 
 import ScriptList from '@/pages/scripts/ScriptList.vue';
@@ -39,17 +30,23 @@ import CallForSubmissions from '@/pages/call-for-submissions/CallForSubmissions.
 import ResourceList from '@/pages/resources/ResourceList.vue';
 
 import AppInfo from '@/pages/app/AppInfo.vue';
+import Navbar from '@/components/Navbar.vue';
+import SubmissionDraftNavbar from '@/components/SubmissionDraftNavbar.vue';
+
+import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
+import store from '@/store';
+
+const MySubmissions = () => import('@/pages/surveys/MySubmissions.vue');
+
+const FarmosManage = () => import('@/pages/farmos-manage/FarmosManage.vue');
+
+const GroupEdit = () => import('@/pages/groups/GroupEdit.vue');
 
 // integrations
 const MembershipIntegrationEdit = () => import('@/pages/integrations/MembershipIntegrationEdit.vue');
 const GroupIntegrationEdit = () => import('@/pages/integrations/GroupIntegrationEdit.vue');
 
-import Navbar from '@/components/Navbar.vue';
-import SubmissionDraftNavbar from '@/components/SubmissionDraftNavbar.vue';
-
-import TabulaRasa from '@/pages/debug/TabulaRasa.vue';
 const Kit = () => import('@/pages/Kit.vue');
-import store from '@/store';
 
 const Builder = () => import('@/pages/builder/Builder.vue');
 const Script = () => import('@/pages/scripts/Script.vue');
@@ -58,8 +55,6 @@ const FarmOSGroupManage = () => import('@/pages/groups/FarmOS.vue');
 const HyloGroupManage = () => import('@/pages/groups/Hylo.vue');
 
 
-
-Vue.use(VueRouter);
 
 const guard = async (to, from, next) => {
   if (!store.getters['auth/isLoggedIn']) {
@@ -250,7 +245,7 @@ const routes = [
     components: getComponents(GroupEdit),
   },
   {
-    path: '/g/*',
+    path: '/g/*', //TODO * not supported anymore, https://router.vuejs.org/guide/migration/#removed-star-or-catch-all-routes
     name: 'groups-by-path',
     components: getComponents(Group),
   },
@@ -349,20 +344,18 @@ const routes = [
       },
     ]),
   {
-    path: '/kit/*',
+    path: '/kit/*', //TODO * not supported anymore, https://router.vuejs.org/guide/migration/#removed-star-or-catch-all-routes
     name: 'kit',
     components: getComponents(Kit),
   },
 ];
-
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
   routes,
   scrollBehavior(to, from, savedPosition) {
     return {
-      x: 0,
-      y: 0,
+      left: 0,
+      top: 0,
     };
   },
 });

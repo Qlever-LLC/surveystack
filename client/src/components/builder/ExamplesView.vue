@@ -1,12 +1,11 @@
 <template>
   <v-card style="height: 90vh" color="grey darken-3">
     <v-container>
-      <v-row dark>
+      <v-row>
         <v-spacer></v-spacer>
         <v-autocomplete
           style="max-width: 800px"
           rounded
-          dark
           solo
           label="Select example and copy"
           v-model="selected"

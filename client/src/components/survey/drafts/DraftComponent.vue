@@ -44,7 +44,6 @@
           v-show="overflowing"
           color="primary"
           fab
-          dark
           small
           fixed
           style="bottom: 76px; right: 12px; z-index: 150"
@@ -87,13 +86,13 @@
     <v-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded
       ><div class="text-body-1 my-4 text-center">
         Click on the
-        <v-btn fab dark x-small color="blue darken-2" style="pointer-events: none">
+        <v-btn fab x-small color="blue darken-2" style="pointer-events: none">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
         to add questions to your survey
       </div>
       <div class="text-body-1 my-4 text-center">
-        <v-btn dark small color="primary" class="my-1 mr-1" style="pointer-events: none">
+        <v-btn small color="primary" class="my-1 mr-1" style="pointer-events: none">
           <v-icon class="mr-1">mdi-content-save</v-icon>
           Save
         </v-btn>

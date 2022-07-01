@@ -10,7 +10,6 @@
       <template v-slot:default>
         <div class="button-grid">
           <v-btn
-            dark
             color="white"
             key="library"
             @click="openLibrary()"
@@ -22,7 +21,6 @@
             search question library
           </v-btn>
           <v-btn
-            dark
             color="white"
             key="group"
             @click="addControl(group)"
@@ -38,7 +36,6 @@
           </v-btn>
           <v-btn
             small
-            dark
             color="indigo"
             v-for="el in filteredComponents"
             :key="el.type"
@@ -46,7 +43,7 @@
             class="ma-1 d-inline-block shadow"
             :data-testid="'add-control-' + el.type"
           >
-            <v-icon dark left v-if="el.icon">
+            <v-icon left v-if="el.icon">
               {{ el.icon }}
             </v-icon>
             {{ el.name.replace('_', ' ') }}

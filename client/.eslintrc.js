@@ -16,7 +16,12 @@ module.exports = {
     'no-continue': 0,
     'no-param-reassign': 1,
     'brace-style': 1,
-    'vue/no-unused-components': 'warn'
+    'vue/no-unused-components': 'warn',
+    'vue/multi-word-component-names': 'warn', //TODO fix them and set to error again
+    'vue/no-v-text-v-html-on-component': 'warn', //TODO fix them and set to error again
+    'vue/no-mutating-props': 'warn', //TODO fix them and set to error again
+    'vue/no-unused-vars': 'warn',  //TODO fix them and set to error again
+    'vue/valid-v-slot': 'warn',  //TODO fix them and set to error again
   },
   globals: {},
   parserOptions: {
