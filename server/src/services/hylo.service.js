@@ -364,7 +364,8 @@ export const handleSyncGroupOutput = async (options) => {
     entity: { extraModerators, ...entity },
   } = output;
 
-  const href = url ? 'https://' + url : null;
+  const href = url ? 'https://' + url : process.env.HYLO_API_URL;
+  logger.info(`Hylo API URL: "${href}"`);
   const gqlRequest = href ? _gqlRequestWithUrl(href) : _gqlRequest;
   const gqlPostConfig = href ? () => _gqlPostConfig(href) : _gqlPostConfig();
   const baseDeps = { gqlRequest, gqlPostConfig, logger };
