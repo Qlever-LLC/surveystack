@@ -371,7 +371,10 @@ export const handleSyncGroupOutput = async (options) => {
     return url;
   }
   const href = url ? addHttps(url) : process.env.HYLO_API_URL;
-  logger.info(`Hylo API URL: "${href}"`, { urlFromApiCompose: url });
+  logger.info(`Hylo API URL: "${href}"`, {
+    urlFromApiCompose: String(url),
+    defaultHyloApiUrl: process.env.HYLO_API_URL,
+  });
   const gqlRequest = href ? _gqlRequestWithUrl(href) : _gqlRequest;
   const gqlPostConfig = href ? () => _gqlPostConfig(href) : _gqlPostConfig();
   const baseDeps = { gqlRequest, gqlPostConfig, logger };
