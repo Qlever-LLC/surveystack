@@ -60,6 +60,7 @@
     "joi": "^17.6.0",
     "joi-objectid": "^4.0.2",
     "js-base64": "^3.7.2",
+    "json-stringify-safe": "^5.0.1",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "mongodb": "^3.7.3",

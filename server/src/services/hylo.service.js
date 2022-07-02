@@ -2,6 +2,7 @@ import boom from '@hapi/boom';
 import axios from 'axios';
 import { ObjectId } from 'mongodb';
 import querystring from 'querystring';
+import jsonSafeStringify from 'json-stringify-safe'
 
 import * as utils from '../helpers/surveys';
 
@@ -25,9 +26,8 @@ const createLogger = () => {
   return {
     log,
     success: (message, data) => log('success', message, data),
-    error: (message, data) => {
-      log('error', message, data);
-      return new Error(message + JSON.stringify(data, null, 2));
+    error: (message, data) => { 
+      return new Error(message + jsonSafeStringify(data, null, 2));
     },
     warning: (message, data) => log('warning', message, data),
     info: (message, data) => log('info', message, data),
@@ -293,21 +293,6 @@ export const syncGroupWithHylo = async (options) => {
   return group;
 };
 
-// getToken().then((t) => console.log('Token', t));
-// createHyloUser({ name: 'azazdeaz test 6', email: 'user6@azazdeaz.test' }).then((t) =>
-//   console.log('NEW USER', t)
-// );
-// queryHyloUser('user3@azazdeaz.test').then((t) => console.log('USER', t));
-// const group = createHyloGroup('azazdeaz-test-group-5', '36341').then((t) => {
-//   console.log('NEW GROUP', JSON.stringify(t, null, 2));
-//   return t;
-// });
-// queryHyloGroup('azazdeaz-test-group-2').then((t) => console.log('GROUP', t));
-// updateHyloGroup('34844', '36341').then((t) => {
-//   console.log('UPDAATED GROUP', JSON.stringify(t, null, 2));
-//   return t;
-// });
-
 export const getHyloApiComposeOutputs = ({ submission, survey }) => {
   const surveyVersion = submission.meta.survey.version;
 
@@ -385,10 +370,10 @@ export const handleSyncGroupOutput = async (options) => {
   const baseDeps = { gqlRequest, gqlPostConfig, logger };
 
   // Convert some fields to JSON to match the Hylo API
-  entity.geoShape = JSON.stringify(entity.geoShape);
+  entity.geoShape = jsonSafeStringify(entity.geoShape);
   entity.groupExtensions = entity.groupExtensions.map((e) => ({
     ...e,
-    data: JSON.stringify(e.data),
+    data: jsonSafeStringify(e.data),
   }));
   // TODO Hylo throws Invalid GeoJSON
   delete entity.geoShape;
