@@ -235,7 +235,7 @@ deploy to review 1:
     - echo "FARMOS_AGGREGATOR_URL=$PROD_FARMOS_AGGREGATOR_URL" >> .env
     - echo "FARMOS_CALLBACK_KEY=$PROD_FARMOS_CALLBACK_KEY" >> .env
     - echo "FARMOS_CREATE_KEY=$PROD_FARMOS_CREATE_KEY" >> .env
-    - echo "HYLO_API_URL=$REWIEW_HYLO_API_URL" >> .env
+    - echo "HYLO_API_URL=$REVIEW_HYLO_API_URL" >> .env
     - echo "HYLO_CLIENT_SECRET=$REVIEW_HYLO_CLIENT_SECRET" >> .env
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" down --remove-orphans
     - docker-compose -H "ssh://$SERVER_USER@$REVIEW_SERVER_IP" pull
