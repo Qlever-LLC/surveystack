@@ -2,7 +2,7 @@ import boom from '@hapi/boom';
 import axios from 'axios';
 import { ObjectId } from 'mongodb';
 import querystring from 'querystring';
-import jsonSafeStringify from 'json-stringify-safe'
+import jsonSafeStringify from 'json-stringify-safe';
 
 import * as utils from '../helpers/surveys';
 
@@ -26,7 +26,7 @@ const createLogger = () => {
   return {
     log,
     success: (message, data) => log('success', message, data),
-    error: (message, data) => { 
+    error: (message, data) => {
       return new Error(message + jsonSafeStringify(data, null, 2));
     },
     warning: (message, data) => log('warning', message, data),
@@ -364,8 +364,14 @@ export const handleSyncGroupOutput = async (options) => {
     entity: { extraModerators, ...entity },
   } = output;
 
-  const href = url ? 'https://' + url : process.env.HYLO_API_URL;
-  logger.info(`Hylo API URL: "${href}"`);
+  function addHttps(url) {
+    if (!/^https?:\/\//i.test(url)) {
+      url = 'https://' + url;
+    }
+    return url;
+  }
+  const href = url ? addHttps(url) : process.env.HYLO_API_URL;
+  logger.info(`Hylo API URL: "${href}"`, { urlFromApiCompose: url });
   const gqlRequest = href ? _gqlRequestWithUrl(href) : _gqlRequest;
   const gqlPostConfig = href ? () => _gqlPostConfig(href) : _gqlPostConfig();
   const baseDeps = { gqlRequest, gqlPostConfig, logger };
