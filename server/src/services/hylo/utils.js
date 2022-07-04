@@ -24,13 +24,13 @@ export const getToken = async (apiUrl = process.env.HYLO_API_URL) => {
   return r.data;
 };
 
-export const gqlPostConfig = async (apiUrl = process.env.HYLO_API_URL) => {
-  return {
+export const postHyloUser = async (body, apiUrl = process.env.HYLO_API_URL) => {
+  return await axios.post(`${apiUrl}/noo/user`, body, {
     headers: {
-      Authorization: `Bearer ${(await getToken(apiUrl)).access_token}`,
-      'Content-Type': 'application/json',
+      ...(await getGqlAuthHeaders(apiUrl)),
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
-  };
+  });
 };
 
 const getGqlAuthHeaders = async (apiUrl = process.env.HYLO_API_URL) => {

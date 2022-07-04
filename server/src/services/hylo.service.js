@@ -38,7 +38,7 @@ const createLogger = () => {
 const deps = {
   gqlRequest: hyloUtils.gqlRequest,
   gqlRequestWithUrl: hyloUtils.gqlRequestWithUrl,
-  gqlPostConfig: hyloUtils.gqlPostConfig,
+  postHyloUser: hyloUtils.postHyloUser,
   logger: createLogger(),
 };
 
@@ -120,22 +120,15 @@ export const MUTATION_ADD_MEMBER = gql`
 `;
 
 const createHyloUser = async (options) => {
-  const { email, name, hyloGroupId, gqlPostConfig, logger } = { ...deps, ...options };
+  const { email, name, hyloGroupId, postHyloUser, logger } = { ...deps, ...options };
   logger.info(`create Hylo user email=${email} name=${name} hyloGroupId=${hyloGroupId}...`, {
     email,
     name,
     hyloGroupId,
   });
   try {
-    const r = await axios.post(
-      `${process.env.HYLO_API_URL}/noo/user`,
-      querystring.stringify({ email, name, groupId: hyloGroupId, isModerator: true }),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: (await gqlPostConfig()).headers.Authorization,
-        },
-      }
+    const r = await postHyloUser(
+      querystring.stringify({ email, name, groupId: hyloGroupId, isModerator: true })
     );
     logger.info('create user result:', r.data);
     return r.data;
@@ -350,7 +343,7 @@ export const handleSyncGroupOutput = async (options) => {
     upsertHyloUser: _upsertHyloUser,
     gqlRequest: _gqlRequest,
     gqlRequestWithUrl: _gqlRequestWithUrl,
-    gqlPostConfig: _gqlPostConfig,
+    postHyloUser: _postHyloUser,
   } = { ...deps, syncUserWithHylo, syncGroupWithHylo, addMember, upsertHyloUser, ...options };
   const { value: output, error } = outputSchema.validate(_output);
   if (error) {
@@ -370,14 +363,14 @@ export const handleSyncGroupOutput = async (options) => {
     }
     return url;
   }
-  const href = url ? addHttps(url) : process.env.HYLO_API_URL;
-  logger.info(`Hylo API URL: "${href}"`, {
+  const apiUrl = url ? addHttps(url) : process.env.HYLO_API_URL;
+  logger.info(`Hylo API URL: "${apiUrl}"`, {
     urlFromApiCompose: String(url),
     defaultHyloApiUrl: process.env.HYLO_API_URL,
   });
-  const gqlRequest = href ? _gqlRequestWithUrl(href) : _gqlRequest;
-  const gqlPostConfig = href ? () => _gqlPostConfig(href) : _gqlPostConfig();
-  const baseDeps = { gqlRequest, gqlPostConfig, logger };
+  const gqlRequest = _gqlRequestWithUrl(apiUrl);
+  const postHyloUser = (body) => _postHyloUser(body, apiUrl);
+  const baseDeps = { gqlRequest, postHyloUser, logger };
 
   // Convert some fields to JSON to match the Hylo API
   entity.geoShape = jsonSafeStringify(entity.geoShape);
