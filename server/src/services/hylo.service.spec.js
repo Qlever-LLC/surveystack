@@ -338,7 +338,7 @@ describe('hylo.service', () => {
         upsertHyloUser: jest.fn(),
         gqlRequest: jest.fn(),
         gqlRequestWithUrl: jest.fn(),
-        gqlPostConfig: jest.fn(),
+        postHyloUser: jest.fn(),
       };
       await db
         .collection(COLL_GROUPS_HYLO_MAPPINGS)
