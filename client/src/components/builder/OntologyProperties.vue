@@ -1,20 +1,18 @@
 <template>
   <div>
     <v-card-title class="px-0 d-flex justify-space-between">
-      <div>
-        Dropdown List
-      </div>
+      <div>Dropdown List</div>
     </v-card-title>
     <div class="text-center d-flex">
       <resource-selector
         :resources="filteredResources"
         :value="value"
-        :disabled="disabled"
+        :disabled="disableSelection"
         @on-new="createResourceHandler"
         @on-select="selectResourceHandler"
         :newResourceTypes="[resourceTypes.ONTOLOGY_LIST, resourceTypes.SURVEY_REFERENCE]"
       />
-      <v-btn icon :disabled="disabled" @click.stop="editResourceHandler" :class="{ 'd-none': !value }">
+      <v-btn icon @click.stop="editResourceHandler" :class="{ 'd-none': !value }">
         <!-- Edit entries -->
         <v-icon class="ml-2 mt-3">mdi-pencil</v-icon>
       </v-btn>
@@ -24,7 +22,7 @@
         v-if="tableDialogIsVisible && resource && resource.type === resourceTypes.ONTOLOGY_LIST"
         :resources="resources"
         :resource="resource"
-        :disabled="disabled"
+        :disabled="!!resource.libraryId"
         @change="setResource"
         @delete="removeResource"
         @close-dialog="closeTableDialog"
@@ -123,7 +121,7 @@ export default {
       type: Array,
       default: () => [],
     },
-    disabled: {
+    disableSelection: {
       required: false,
     },
   },

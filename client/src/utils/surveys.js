@@ -9,6 +9,7 @@ import submissionUtils from './submissions';
 import { SPEC_VERSION_SURVEY } from '@/constants';
 import supplySandbox from './supplySandbox';
 import ObjectID from 'bson-objectid';
+import { flatSurveyControls } from '@/utils/surveyDiff';
 
 function* processSurveyNames(data) {
   if (!data) {
@@ -121,6 +122,47 @@ export const changeRecursive = (control, changeFn) => {
 };
 
 /**
+ * Replaces a control by its path
+ * @param controls control list to be changed
+ * @param parentPath parent path of the controls passed
+ * @param replacePath path of the control to be replaced
+ * @param replacementControl new control which replaces the control at the replacePath
+ */
+export const replaceControl = (controls, parentPath, replacePath, replacementControl) => {
+  return controls.map((control) => {
+    let currentPath = parentPath ? [parentPath, control.name].join('.') : control.name;
+    if (currentPath === replacePath) {
+      return replacementControl;
+    } else if (control.children) {
+      control.children = replaceControl(control.children, currentPath, replacePath, replacementControl);
+      return control;
+    } else {
+      return control;
+    }
+  });
+};
+
+/**
+ * Removes a control by its path
+ * @param controls control list to be changed
+ * @param parentPath parent path of the controls passed
+ * @param removePath  path of the control to be removed
+ */
+export const removeControl = (controls, parentPath, removePath) => {
+  return controls.filter((control) => {
+    let currentPath = parentPath ? [parentPath, control.name].join('.') : control.name;
+    if (currentPath === removePath) {
+      return false;
+    } else if (control.children) {
+      control.children = removeControl(control.children, currentPath, removePath);
+      return true;
+    } else {
+      return true;
+    }
+  });
+};
+
+/**
  * Prepares the passed library control or resource to be consumed in another survey
  * @param controlOrResource control to be prepared, mutating
  * @param libraryId the library id the control/resource originated from
@@ -131,6 +173,9 @@ export const prepareToAddFromLibrary = (controlOrResource, libraryId, libraryVer
   if (controlOrResource.libraryId) {
     // do not overwrite the libraryId cause it references another library the inherited library consists of
     controlOrResource.libraryIsInherited = true;
+  } else if (controlOrResource.isNonLibraryControl) {
+    // this flag is set by surveyDiff.js:merge to indicate that this is a consumer-added, non-library control
+    delete controlOrResource.isNonLibraryControl;
   } else {
     // set library data
     controlOrResource.libraryId = libraryId;
@@ -153,44 +198,99 @@ export const getPreparedLibraryResources = (librarySurvey) => {
 
 /**
  * Returns new controls copied from library survey
- * @param librarySurvey
+ * @param librarySurveyId
+ * @param librarySurveyLatestVersion
+ * @param controlsToAdd
  * @param newResources an array of resources containing updated id's, with the old id stored in the origin property
+ * @param oldResources an array of resources containing updated id's, with the old id stored in the origin property
  * @returns [controls]
  */
-export const getPreparedLibraryControls = (librarySurvey, newResources) => {
-  return librarySurvey.revisions[librarySurvey.latestVersion - 1].controls.map((controlToAdd) => {
+export const getPreparedLibraryControls = (
+  librarySurveyId,
+  librarySurveyLatestVersion,
+  controlsToAdd,
+  newResources,
+  oldResources
+) => {
+  return controlsToAdd.map((controlToAdd) => {
     changeRecursive(controlToAdd, (control) => {
-      prepareToAddFromLibrary(control, librarySurvey._id, librarySurvey.latestVersion);
-      replaceResourceReferenceId(control, newResources);
+      prepareToAddFromLibrary(control, librarySurveyId, librarySurveyLatestVersion);
+      replaceResourceReferenceId(control, newResources, oldResources);
     });
     return controlToAdd;
   });
 };
 
 /**
- * Updates a control's references to resources
+ * Updates a control's references to new resources
  * @param control the control to update
  * @param newResources an array of resources containing updated id's, with the old id stored in the origin property
+ * @param oldResources optional, an array of resources containing updated id's, with the old id stored in the origin property
  * @returns [controls]
  */
-export const replaceResourceReferenceId = (control, newResources) => {
+export const replaceResourceReferenceId = (control, newResources, oldResources) => {
   if (newResources && control && control.options && control.options.source) {
+    // replace the control's reference(s) by the new ids of the resources
     if (control.type === 'matrix') {
       control.options.source.content.forEach((col) => {
         if (col.resource) {
-          let matchingResource = newResources.find((r) => r.origin === col.resource);
-          if (matchingResource) {
-            col.resource = matchingResource.id; // replace the control's reference by the new id of the resource
-          }
+          col.resource = getUpdatedResourceId(col.resource, oldResources, newResources);
         }
       });
     } else {
-      let matchingResource = newResources.find((r) => r.origin === control.options.source);
-      if (matchingResource) {
-        control.options.source = matchingResource.id; // replace the control's reference by the new id of the resource
-      }
+      control.options.source = getUpdatedResourceId(control.options.source, oldResources, newResources);
     }
   }
+};
+
+/*
+
+
+ */
+/**
+ * Returns an updated resource id referencing the new resource id
+ * If oldResources are passed, we try to find matches via newResource.origin===oldResource.origin and oldResource.id===oldId
+ * If oldResources are NOT passed, we try to find matches via newResource.origin===oldId
+ *
+ * @param oldId old resource id
+ * @param oldResources (optional) old resources containing id's and origin's
+ * @param newResources old resources containing id's and origin's
+ * @returns {*} the new resource id if found, otherwise returns oldId
+ */
+const getUpdatedResourceId = (oldId, oldResources, newResources) => {
+  let matchingResource;
+
+  if (oldResources) {
+    matchingResource = newResources.find((newRes) => {
+      const matchingOldRes = oldResources.find((oldRes) => oldRes.origin === newRes.origin);
+      if (matchingOldRes) {
+        return matchingOldRes.id === oldId;
+      } else {
+        return false;
+      }
+    });
+  }
+
+  if (!matchingResource) {
+    matchingResource = newResources.find((r) => r.origin === oldId);
+  }
+  if (matchingResource) {
+    return matchingResource.id;
+  } else {
+    return oldId;
+  }
+};
+
+export const isResourceReferenced = (controls, resourceId) => {
+  return flatSurveyControls(controls).some(({ control }) => {
+    if (control.type === 'matrix') {
+      return control.options.source.content.some(
+        (contentEl) => contentEl.resource && contentEl.resource === resourceId
+      );
+    } else {
+      return control.options.source === resourceId;
+    }
+  });
 };
 
 /**
@@ -327,7 +427,7 @@ export const insertControl = (controlToInsert, controls, position, selectedContr
   let exit = false;
 
   for (let i = 0; i < position.length; i++) {
-    currentControl = currentControls[position[i]];
+    currentControl = getControlByPosition(currentControls, position[i]);
     index = position[i];
     if (currentControl.type === 'group' || currentControl.type === 'page') {
       if (exit || controlToInsert.type === 'page') {
@@ -342,6 +442,16 @@ export const insertControl = (controlToInsert, controls, position, selectedContr
   }
 
   currentControls.splice(index + 1, 0, controlToInsert);
+};
+
+/**
+ * Returns the control at the given position in controls. Falls back to highest position if the passed position is out of range
+ * @param controls
+ * @param position
+ * @returns {*}
+ */
+export const getControlByPosition = (controls, position) => {
+  return controls[position] || controls[controls.length - 1];
 };
 
 export const getBreadcrumbs = (survey, position) => {

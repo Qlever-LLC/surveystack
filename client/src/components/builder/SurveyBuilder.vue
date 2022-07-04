@@ -8,13 +8,22 @@
       <app-examples-view @close="showExamples = false" :category="tabMap[selectedTab]" />
     </v-dialog>
 
+    <update-library-dialog
+      v-if="updateLibraryDialogIsVisible"
+      :value="updateLibraryDialogIsVisible"
+      :library-root-group="updateLibraryRootGroup"
+      :to-survey="updateToLibrary"
+      @update="updateLibraryConfirmed"
+      @cancel="updateLibraryCancelled"
+    />
+
     <v-alert v-if="Object.keys(availableLibraryUpdates).length > 0" type="warning" dismissible>
       This survey uses an outdated question library set. Consider reviewing the new version and updating it.
     </v-alert>
 
     <splitpanes style="padding: 0px !important" class="pane-root" vertical>
       <pane class="pane pane-survey" style="position: relative; overflow: hidden">
-        <div class="pane-fixed-wrapper pr-2" style="position: relative;">
+        <div class="pane-fixed-wrapper pr-2" style="position: relative">
           <control-adder @controlAdded="controlAdded" @openLibrary="openLibrary" />
           <survey-details
             :version="version"
@@ -49,7 +58,10 @@
             @control-selected="controlSelected"
             @duplicate-control="duplicateControl"
             @open-library="openLibrary"
-            @update-library-questions="updateLibraryQuestions"
+            @control-removed="controlRemoved"
+            @update-library-control="updateLibrary"
+            @hide-control="hideControl"
+            @unhide-control="unhideControl"
             data-testid="graphical-view"
           />
         </div>
@@ -112,21 +124,13 @@
           <pane size="80">
             <div style="height: 100%">
               <v-tabs v-if="control.options" v-model="selectedTab" background-color="blue-grey darken-4" dark>
-                <v-tab :disabled="!control.options.relevance.enabled">
-                  Relevance
-                </v-tab>
-                <v-tab :disabled="!control.options.calculate.enabled">
-                  Calculate
-                </v-tab>
-                <v-tab :disabled="!control.options.constraint.enabled">
-                  Constraint
-                </v-tab>
+                <v-tab :disabled="!control.options.relevance.enabled"> Relevance</v-tab>
+                <v-tab :disabled="!control.options.calculate.enabled"> Calculate</v-tab>
+                <v-tab :disabled="!control.options.constraint.enabled"> Constraint</v-tab>
                 <v-tab v-if="control.options.apiCompose" :disabled="!control.options.apiCompose.enabled">
                   API Compose
                 </v-tab>
-                <v-tab v-if="control.type === 'script'">
-                  Script
-                </v-tab>
+                <v-tab v-if="control.type === 'script'"> Script</v-tab>
               </v-tabs>
 
               <code-editor
@@ -168,7 +172,7 @@
       </pane>
       <pane class="pane pane-draft" :style="{ width: isPreviewMobile ? '375px' : '800px' }">
         <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
-        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px); overflow: auto;">
+        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px); overflow: auto">
           <app-draft-component
             @submit="(payload) => $emit('submit', payload)"
             v-if="survey && instance"
@@ -183,18 +187,12 @@
               <v-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
                 <v-btn :value="false" dense>
                   <span class="hidden-sm-and-down">desktop</span>
-
-                  <v-icon right>
-                    mdi-monitor
-                  </v-icon>
+                  <v-icon right> mdi-monitor</v-icon>
                 </v-btn>
 
                 <v-btn :value="true">
                   <span class="hidden-sm-and-down">mobile</span>
-
-                  <v-icon right>
-                    mdi-cellphone
-                  </v-icon>
+                  <v-icon right> mdi-cellphone</v-icon>
                 </v-btn>
               </v-btn-toggle>
             </template>
@@ -203,9 +201,7 @@
 
         <v-overlay :value="enableSaveDraft">
           <v-card>
-            <v-card-text>
-              Please Save Draft to update Survey Preview.
-            </v-card-text>
+            <v-card-text> Please Save Draft to update Survey Preview.</v-card-text>
           </v-card>
         </v-overlay>
       </pane>
@@ -214,8 +210,8 @@
 </template>
 
 <script>
-import { cloneDeep, isEqualWith, isEqual, uniqBy } from 'lodash';
-import { Splitpanes, Pane } from 'splitpanes';
+import { cloneDeep, isEqual, isEqualWith, uniqBy } from 'lodash';
+import { Pane, Splitpanes } from 'splitpanes';
 
 import moment from 'moment';
 
@@ -249,7 +245,9 @@ import {
   getPreparedLibraryResources,
   getSurveyPositions,
   insertControl,
+  isResourceReferenced,
 } from '@/utils/surveys';
+import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -271,6 +269,7 @@ const tabMap = ['relevance', 'calculate', 'constraint', 'apiCompose'];
 export default {
   mixins: [appMixin],
   components: {
+    UpdateLibraryDialog,
     Splitpanes,
     Pane,
     codeEditor,
@@ -318,8 +317,12 @@ export default {
       initialSurvey: cloneDeep(this.survey),
       surveyUnchanged: true,
       showExamples: false,
-      availableLibraryUpdates: {},
       isPreviewMobile: false,
+      //question sets
+      availableLibraryUpdates: {},
+      updateLibraryDialogIsVisible: false,
+      updateLibraryRootGroup: null,
+      updateToLibrary: null,
     };
   },
   methods: {
@@ -381,39 +384,75 @@ export default {
       this.survey.meta.isLibrary = true;
       this.saveDraft();
     },
-    async addQuestionsFromLibrary(librarySurveyId, rootGroup) {
+    async addQuestionsFromLibrary(librarySurveyId) {
       // load library survey
-      const { data } = await api.get(`/surveys/${librarySurveyId}`);
-
-      // remove old resources copied from the library survey
-      this.survey.resources = this.survey.resources.filter((resource) => resource.libraryId !== librarySurveyId);
-
+      const { data: librarySurvey } = await api.get(`/surveys/${librarySurveyId}`);
       // add resources from library survey
-      this.survey.resources = this.survey.resources.concat(getPreparedLibraryResources(data));
+      const newResources = getPreparedLibraryResources(librarySurvey);
 
       // prepare root group for the library questions to be inserted into
-      if (rootGroup) {
-        rootGroup.libraryVersion = data.latestVersion;
-      } else {
-        // create question group
-        rootGroup = createControlInstance(availableControls.find((c) => c.type === 'group'));
-        rootGroup.name = slugify(data.name);
-        rootGroup.label = data.name;
-        rootGroup.isLibraryRoot = true;
-        rootGroup.libraryId = data._id;
-        rootGroup.libraryVersion = data.latestVersion;
-        this.controlAdded(rootGroup);
-      }
+      let rootGroup = createControlInstance(availableControls.find((c) => c.type === 'group'));
+      rootGroup.name = slugify(librarySurvey.name);
+      rootGroup.label = librarySurvey.name;
+      rootGroup.isLibraryRoot = true;
+      rootGroup.libraryId = librarySurvey._id;
+      rootGroup.libraryVersion = librarySurvey.latestVersion;
+      this.controlAdded(rootGroup);
 
       // add questions from library survey to question group
-      rootGroup.children = getPreparedLibraryControls(data, this.survey.resources);
-
+      rootGroup.children = getPreparedLibraryControls(
+        librarySurvey._id,
+        librarySurvey.latestVersion,
+        librarySurvey.revisions[librarySurvey.latestVersion - 1].controls,
+        newResources,
+        null
+      );
+      // update the survey resources
+      this.updateLibraryResources(newResources);
+      // hide the library view
       this.showLibrary = false;
     },
-    updateLibraryQuestions(control) {
-      //clear selected control and re-add questions from library
-      control.children = [];
-      this.addQuestionsFromLibrary(control.libraryId, control);
+    async updateLibrary(updateLibraryRootGroup) {
+      this.updateLibraryRootGroup = updateLibraryRootGroup;
+      const { data } = await api.get(`/surveys/${updateLibraryRootGroup.libraryId}`);
+      this.updateToLibrary = data;
+      this.updateLibraryDialogIsVisible = true;
+    },
+    updateLibraryConfirmed(updatedLibraryControls) {
+      this.updateLibraryRootGroup.libraryVersion = this.updateToLibrary.latestVersion;
+      //update resources
+      const updatedResources = getPreparedLibraryResources(this.updateToLibrary);
+      // add updated controls, prepared by creating new id's, setting origin and update resources references
+      this.updateLibraryRootGroup.children = getPreparedLibraryControls(
+        this.updateToLibrary._id,
+        this.updateToLibrary.latestVersion,
+        updatedLibraryControls,
+        updatedResources,
+        this.survey.resources
+      );
+      // update the survey resources
+      this.updateLibraryResources(updatedResources);
+      //clear update vars
+      this.updateToLibrary = null;
+      this.updateLibraryRootGroup = null;
+      this.updateLibraryDialogIsVisible = false;
+    },
+    updateLibraryCancelled() {
+      this.updateToLibrary = null;
+      this.updateLibraryDialogIsVisible = false;
+      this.updateLibraryRootGroup = null;
+    },
+    updateLibraryResources(newLibraryResources) {
+      // add updated resources
+      this.survey.resources = this.survey.resources.concat(newLibraryResources);
+      // remove library resources which are not used anymore (e.g. this could happen if resources with same origin are added when consuming the same library multiple times)
+      this.cleanupLibraryResources();
+    },
+    cleanupLibraryResources() {
+      const controls = this.survey.revisions[this.survey.revisions.length - 1].controls;
+      this.survey.resources = this.survey.resources.filter(
+        (resource) => !resource.libraryId || isResourceReferenced(controls, resource.id)
+      );
     },
     closeLibrary() {
       this.showLibrary = false;
@@ -542,6 +581,10 @@ export default {
         this.scriptCode = null;
       }
     },
+    async controlRemoved() {
+      await this.controlSelected(null);
+      this.cleanupLibraryResources();
+    },
     async fetchScript(id) {
       const { data } = await api.get(`/scripts/${id}`);
       return data;
@@ -581,6 +624,14 @@ export default {
         insertControl(control, this.currentControls, 0, false);
       }
       this.control = control;
+    },
+    hideControl(control) {
+      this.controlSelected(control);
+      this.$set(this.control.options, 'hidden', true);
+    },
+    unhideControl(control) {
+      this.controlSelected(control);
+      this.$set(this.control.options, 'hidden', undefined);
     },
     controlAdded(control) {
       if (!this.control) {

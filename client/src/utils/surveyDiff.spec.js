@@ -1,4 +1,11 @@
-import { flatSurveyControls, diffControls, changeType, diffSurveyVersions } from './surveyDiff';
+import {
+  flatSurveyControls,
+  diffControls,
+  changeType,
+  diffSurveyVersions,
+  merge,
+  diffThreeSurveyVersions,
+} from './surveyDiff';
 import { cloneDeep, find, uniqueId, set, map } from 'lodash';
 import { createControlInstance } from './surveyConfig';
 
@@ -128,7 +135,7 @@ describe('surveyDiff', () => {
       });
     });
     it('does not compare blacklisted fileds', () => {
-      const blacklisteds = ['id', 'hint', 'children', 'libraryId', 'libraryIsInherited', 'libraryVersion'];
+      const blacklisteds = ['id', 'children', 'libraryId', 'libraryIsInherited', 'libraryVersion'];
       const control = createControl({
         type: 'group',
         hint: 'this is a hint',
@@ -239,14 +246,14 @@ describe('surveyDiff', () => {
       expect(diff).toMatchObject([
         {
           changeType: changeType.CHANGED,
-          newControl: newNum,
-          newChildIndex: 0,
-          newPath: newNum.name,
-          newParentId: null,
-          oldControl: oldNum,
-          oldChildIndex: 0,
-          oldPath: oldNum.name,
-          oldParentId: null,
+          controlRevisionNew: newNum,
+          childIndexRevisionNew: 0,
+          pathRevisionNew: newNum.name,
+          parentIdRevisionNew: null,
+          controlRevisionOld: oldNum,
+          childIndexRevisionOld: 0,
+          pathRevisionOld: oldNum.name,
+          parentIdRevisionOld: null,
           diff: {
             name: {
               changeType: changeType.CHANGED,
@@ -268,10 +275,10 @@ describe('surveyDiff', () => {
       expect(diff).toMatchObject([
         {
           changeType: changeType.ADDED,
-          newControl: num,
-          newChildIndex: 0,
-          newPath: num.name,
-          newParentId: null,
+          controlRevisionNew: num,
+          childIndexRevisionNew: 0,
+          pathRevisionNew: num.name,
+          parentIdRevisionNew: null,
         },
       ]);
     });
@@ -283,10 +290,10 @@ describe('surveyDiff', () => {
       expect(diff).toMatchObject([
         {
           changeType: changeType.REMOVED,
-          oldControl: num,
-          oldChildIndex: 0,
-          oldPath: num.name,
-          oldParentId: null,
+          controlRevisionOld: num,
+          childIndexRevisionOld: 0,
+          pathRevisionOld: num.name,
+          parentIdRevisionOld: null,
         },
       ]);
     });
@@ -302,14 +309,15 @@ describe('surveyDiff', () => {
       expect(diff).toMatchObject([
         {
           changeType: changeType.CHANGED,
-          newControl: newMat,
-          newChildIndex: 0,
-          newPath: newMat.name,
-          newParentId: null,
-          oldControl: oldMat,
-          oldChildIndex: 0,
-          oldPath: oldMat.name,
-          oldParentId: null,
+
+          controlRevisionNew: newMat,
+          childIndexRevisionNew: 0,
+          pathRevisionNew: newMat.name,
+          parentIdRevisionNew: null,
+          controlRevisionOld: oldMat,
+          childIndexRevisionOld: 0,
+          pathRevisionOld: oldMat.name,
+          parentIdRevisionOld: null,
           diff: {
             'options.source.config.addRowLabel': {
               changeType: changeType.CHANGED,
@@ -346,9 +354,9 @@ describe('surveyDiff', () => {
       it('matches controls with the same path', () => {
         const { diff, oldControls, newControls } = createDiff();
         const path = 'group_1.number_2';
-        const num2Diff = find(diff, { newPath: path });
+        const num2Diff = find(diff, { pathRevisionNew: path });
         expect(num2Diff).toHaveProperty('changeType', changeType.CHANGED);
-        expect(num2Diff).toHaveProperty('oldPath', path);
+        expect(num2Diff).toHaveProperty('pathRevisionNew', path);
         expect(num2Diff).toHaveProperty('diff.label.changeType', changeType.CHANGED);
         expect(num2Diff).toHaveProperty('diff.label.oldValue', oldControls[1].children[0].label);
         expect(num2Diff).toHaveProperty('diff.label.newValue', newControls[1].children[0].label);
@@ -357,13 +365,383 @@ describe('surveyDiff', () => {
 
       it('treats type change as "remove" and "add', () => {
         const { diff, oldControls, newControls } = createDiff();
-        const num1OldDiff = find(diff, { oldPath: 'number_1' });
+        const num1OldDiff = find(diff, { pathRevisionOld: 'number_1' });
         expect(num1OldDiff).toHaveProperty('changeType', changeType.REMOVED);
-        expect(num1OldDiff).toHaveProperty('oldControl.type', oldControls[0].type);
-        const num1NewDiff = find(diff, { newPath: 'number_1' });
+        expect(num1OldDiff).toHaveProperty('controlRevisionOld.type', oldControls[0].type);
+        const num1NewDiff = find(diff, { pathRevisionNew: 'number_1' });
         expect(num1NewDiff).toHaveProperty('changeType', changeType.ADDED);
-        expect(num1NewDiff).toHaveProperty('newControl.type', newControls[0].type);
+        expect(num1NewDiff).toHaveProperty('controlRevisionNew.type', newControls[0].type);
       });
+    });
+  });
+  describe('diffThreeSurveyVersions', () => {
+    it('contains the property values for revisions A,B and C of a diff', () => {
+      const controlLocalVersion = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo_one',
+      });
+      const controlRemoteVersionOld = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo_two',
+      });
+      const controlRemoteVersionNew = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo_three',
+      });
+
+      const diff = diffThreeSurveyVersions([controlLocalVersion], [controlRemoteVersionOld], [controlRemoteVersionNew]);
+      expect(diff[0].changeType).toBe(changeType.CHANGED);
+      expect(diff[0].diff.name).toBeDefined();
+      expect(diff[0].diff.name.oldValue).toBe(controlRemoteVersionOld.name);
+      expect(diff[0].diff.name.newValue).toBe(controlRemoteVersionNew.name);
+      expect(diff[0].diff.name.localValue).toBe(controlLocalVersion.name);
+    });
+    it('returns remote control instead of changed local control in case of breaking remote change', () => {
+      const controlLocalVersion = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowHide: true, hidden: true },
+      });
+      const controlRemoteVersionOld = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowHide: true },
+      });
+      const controlRemoteVersionNew = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowHide: false },
+      });
+
+      const diff = diffThreeSurveyVersions([controlLocalVersion], [controlRemoteVersionOld], [controlRemoteVersionNew]);
+
+      expect(diff).toMatchObject([
+        {
+          changeType: changeType.CHANGED,
+          hasBreakingChange: true,
+          hasLocalChange: true,
+          controlLocalRevision: controlLocalVersion,
+          childIndexLocalRevision: 0,
+          pathLocalRevision: controlLocalVersion.name,
+          parentIdLocalRevision: null,
+          controlRevisionOld: controlRemoteVersionOld,
+          childIndexRevisionOld: 0,
+          pathRevisionOld: controlRemoteVersionOld.name,
+          parentIdRevisionOld: null,
+          controlRevisionNew: controlRemoteVersionNew,
+          childIndexRevisionNew: 0,
+          pathRevisionNew: controlRemoteVersionNew.name,
+          parentIdRevisionNew: null,
+
+          diff: {
+            'options.allowHide': {
+              changeType: changeType.CHANGED,
+              localValue: controlLocalVersion.options.allowHide,
+              oldValue: controlRemoteVersionOld.options.allowHide,
+              newValue: undefined, //yes, it's not false, cause some sanitation in place sets false to undefined
+            },
+            'options.hidden': {
+              changeType: changeType.CHANGED,
+              localValue: controlLocalVersion.options.hidden,
+              oldValue: controlRemoteVersionOld.options.hidden,
+              newValue: controlRemoteVersionNew.options.hidden,
+            },
+          },
+        },
+      ]);
+    });
+    it('does not return conflicting changes in case of no local change', () => {
+      const controlLocalVersion = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowHide: true },
+      });
+      const controlRemoteVersionOld = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowHide: true },
+      });
+      const controlRemoteVersionNew = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowHide: false },
+      });
+
+      const diff = diffThreeSurveyVersions(
+        [controlLocalVersion],
+        [controlRemoteVersionOld],
+        [controlRemoteVersionNew],
+        false
+      );
+
+      expect(diff).toMatchObject([
+        {
+          changeType: changeType.CHANGED,
+          hasLocalChange: false,
+          controlLocalRevision: controlLocalVersion,
+          childIndexLocalRevision: 0,
+          pathLocalRevision: controlLocalVersion.name,
+          parentIdLocalRevision: null,
+          controlRevisionOld: controlRemoteVersionOld,
+          childIndexRevisionOld: 0,
+          pathRevisionOld: controlLocalVersion.name,
+          parentIdRevisionOld: null,
+          controlRevisionNew: controlRemoteVersionNew,
+          childIndexRevisionNew: 0,
+          pathRevisionNew: controlRemoteVersionNew.name,
+          parentIdRevisionNew: null,
+
+          diff: {
+            'options.allowHide': {
+              changeType: changeType.CHANGED,
+              localValue: controlLocalVersion.options.allowHide,
+              oldValue: controlRemoteVersionOld.options.allowHide,
+              newValue: undefined, //yes, it's not false, cause some sanitation in place sets false to undefined
+            },
+          },
+        },
+      ]);
+    });
+    it('handles when control was replaced in the remote and changed in the local', () => {
+      const numberControl = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+      });
+      const textControl = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar',
+      });
+      // same control with different label/name
+      const textControlReplaced = createControlInstance({
+        type: 'text',
+        name: 'bazz_1',
+        label: 'bazzz',
+      });
+      const textControlChanged = { ...textControl, label: textControl.label + '-change' };
+      const diffBasedOnRemote = diffThreeSurveyVersions(
+        [numberControl, textControlChanged],
+        [numberControl, textControl],
+        [numberControl, textControlReplaced],
+        false
+      );
+      expect(diffBasedOnRemote.length).toBe(3);
+      const diffBasedOnLocal = diffThreeSurveyVersions(
+        [numberControl, textControlChanged],
+        [numberControl, textControl],
+        [numberControl, textControlReplaced],
+        true
+      );
+      expect(diffBasedOnLocal.length).toBe(2);
+    });
+  });
+  describe('merge', () => {
+    it('adds new controls', () => {
+      const numberControl = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+      });
+      const textControl = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar',
+      });
+      const mergeResult = merge([numberControl], [numberControl], [numberControl, textControl]);
+      expect(mergeResult.length).toBe(2);
+    });
+    it('removes deleted controls', () => {
+      const numberControl = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+      });
+      const textControl = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar',
+      });
+      const mergeResult = merge([numberControl, textControl], [numberControl, textControl], [numberControl]);
+      expect(mergeResult.length).toBe(1);
+    });
+    it('replaces changed controls if no local change', () => {
+      const numberControl = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+      });
+      const textControl = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar',
+      });
+      const textControlChanged = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar_changed',
+      });
+      const mergeResult = merge(
+        [numberControl, textControl],
+        [numberControl, textControl],
+        [numberControl, textControlChanged]
+      );
+      expect(mergeResult[1].label).toBe('bar_changed');
+    });
+    it('preserves locally added control', () => {
+      const numberControl = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+      });
+      const textControl = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar',
+      });
+      const mergeResult = merge([numberControl, textControl], [numberControl], [numberControl]);
+      expect(mergeResult.length).toBe(2);
+      expect(mergeResult[1].name).toBe('text_1');
+    });
+    it('preserves locally added control if parent group is deleted in remote revision', () => {
+      const numberControl = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+      });
+      const textControl = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar',
+      });
+      const textControl2 = createControlInstance({
+        type: 'text',
+        name: 'text_2',
+        label: 'baz',
+      });
+      const groupLocal = createControlInstance({
+        type: 'group',
+        name: 'group_1',
+        children: [numberControl, textControl],
+      });
+      const groupRemote = createControlInstance({ type: 'group', name: 'group_1', children: [numberControl] });
+      const mergeResult = merge([groupLocal, textControl2], [groupRemote, textControl2], [textControl2]);
+      expect(mergeResult.length).toBe(2);
+      expect(mergeResult[1]).toMatchObject(textControl);
+    });
+    it('preserves locally added control if control before is deleted in remote revision', () => {
+      const controlLocal = createControlInstance({
+        type: 'text',
+        name: 'text_local',
+        label: 'loc',
+      });
+      const numberControl = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+      });
+      const textControl = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar',
+      });
+      const mergeResult = merge(
+        [numberControl, textControl, controlLocal],
+        [numberControl, textControl],
+        [textControl]
+      );
+      expect(mergeResult.length).toBe(2);
+      expect(mergeResult[1]).toMatchObject(controlLocal);
+    });
+    it('preserves local control change when remote also changed', () => {
+      const numberControlChanged = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo_changed',
+      });
+      const numberControl = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+      });
+      const textControl = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar',
+      });
+      const mergeResult = merge(
+        [numberControlChanged, textControl],
+        [numberControl, textControl],
+        [numberControl, textControl]
+      );
+      expect(mergeResult[0].label).toBe('foo_changed');
+    });
+    it('replaces local control change if allowModify is turned off in remote control', () => {
+      const numberControlLocal = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo_changed',
+      });
+      const numberControlRemoteA = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowModify: true },
+      });
+      const numberControlRemoteB = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowModify: false },
+      });
+      const mergeResult = merge([numberControlLocal], [numberControlRemoteA], [numberControlRemoteB]);
+      expect(mergeResult[0].label).toBe('foo');
+    });
+    it('replaces local control change if allowHide is turned off in remote control', () => {
+      const numberControlLocal = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { hidden: true },
+      });
+      const numberControlRemoteA = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowHide: true },
+      });
+      const numberControlRemoteB = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+        options: { allowHide: false },
+      });
+      const mergeResult = merge([numberControlLocal], [numberControlRemoteA], [numberControlRemoteB]);
+      expect(mergeResult[0].options.hidden).toBeFalsy();
+    });
+    it('removes deleted controls when they were changed locally', () => {
+      const numberControl = createControlInstance({
+        type: 'number',
+        name: 'number_1',
+        label: 'foo',
+      });
+      const textControl = createControlInstance({
+        type: 'text',
+        name: 'text_1',
+        label: 'bar',
+      });
+      const textControlChanged = { ...textControl, label: textControl.label + '-change' };
+      const mergeResult = merge([numberControl, textControlChanged], [numberControl, textControl], [numberControl]);
+      expect(mergeResult.length).toBe(1);
     });
   });
 });

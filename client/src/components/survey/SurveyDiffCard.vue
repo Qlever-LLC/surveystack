@@ -15,6 +15,9 @@
         />
 
         <v-chip class="ma-3 align-self-start" outlined small :color="diffInfo.color">{{ diffInfo.changeType }}</v-chip>
+        <v-chip v-if="diffInfo.hasBreakingChange" class="ma-3 align-self-start" outlined small color="red lighten-1"
+          >breaking change</v-chip
+        >
         <v-spacer />
         <v-icon v-if="haveChangeDetails" class="mr-5 align-self-center" :class="{ 'mdi-rotate-180': !isOpen }"
           >mdi-chevron-down</v-icon
@@ -26,13 +29,15 @@
         <thead>
           <tr>
             <th class="text-left"></th>
-            <th class="text-left">{{ oldVersionName }}</th>
-            <th class="text-left">{{ newVersionName }}</th>
+            <th v-if="versionNameLocalRevision" class="text-left">{{ versionNameLocalRevision }}</th>
+            <th class="text-left">{{ versionNameRemoteRevisionOld }}</th>
+            <th class="text-left">{{ versionNameRemoteRevisionNew }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="diffInfo in diffInfo.changeList" :key="diffInfo.key">
             <td>{{ diffInfo.key }}</td>
+            <td v-if="versionNameLocalRevision">{{ diffInfo.localValue }}</td>
             <td>{{ diffInfo.oldValue }}</td>
             <td>{{ diffInfo.newValue }}</td>
           </tr>
@@ -62,18 +67,22 @@ export default {
       type: Object,
       required: true,
     },
-    oldVersionName: {
+    versionNameLocalRevision: {
+      type: String,
+      required: false,
+    },
+    versionNameRemoteRevisionOld: {
       type: String,
       required: true,
     },
-    newVersionName: {
+    versionNameRemoteRevisionNew: {
       type: String,
-      required: true,
+      required: false,
     },
   },
   computed: {
     haveChangeDetails() {
-      return this.diffInfo.changeType === changeType.CHANGED;
+      return this.diffInfo.changeType === changeType.CHANGED || this.diffInfo.hasBreakingChange;
     },
   },
 };

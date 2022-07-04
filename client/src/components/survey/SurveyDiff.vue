@@ -1,11 +1,11 @@
 <template>
-  <v-card-text v-if="!haveChanges" class="d-flex">
+  <v-card-text v-if="!haveChanges && showNoChangesText" class="d-flex">
     <v-icon color="success" class="mr-1">mdi-check-bold</v-icon>
     <h3 class="flex-grow-0 mr-6">No changes detected</h3>
   </v-card-text>
   <v-expansion-panels v-else flat multiple v-model="mainPanelState">
     <v-expansion-panel>
-      <v-expansion-panel-header class="pt-0">
+      <v-expansion-panel-header v-if="showHeader" class="pt-0">
         <h3 class="flex-grow-0 mr-6">Update details</h3>
 
         <v-tooltip bottom v-for="{ icon, color, count, tooltip } in changeSummaryList" :key="icon">
@@ -31,7 +31,9 @@
       <v-expansion-panel-content>
         <survey-diff-card-tree
           :diffInfoTree="showChangesOnly ? diffInfoTreeWithoutUnchangeds : diffInfoTree"
-          v-bind="{ oldVersionName, newVersionName }"
+          :version-name-local-revision="controlsLocalRevision ? 'Your Version' : null"
+          :version-name-remote-revision-old="versionNameRemoteRevisionOld"
+          :version-name-remote-revision-new="versionNameRemoteRevisionNew"
         />
       </v-expansion-panel-content>
     </v-expansion-panel>
@@ -39,7 +41,7 @@
 </template>
 
 <script>
-import { diffSurveyVersions, changeType } from '@/utils/surveyDiff';
+import { diffSurveyVersions, changeType, diffThreeSurveyVersions } from '@/utils/surveyDiff';
 import { isNumber, sortBy, get, remove } from 'lodash';
 import SurveyDiffCardTree from './SurveyDiffCardTree';
 
@@ -49,8 +51,17 @@ export default {
     SurveyDiffCardTree,
   },
   props: {
-    oldControls: Array,
-    newControls: Array,
+    controlsLocalRevision: Array,
+    controlsRemoteRevisionOld: Array,
+    controlsRemoteRevisionNew: Array,
+    versionNameRemoteRevisionOld: {
+      type: String,
+      required: true,
+    },
+    versionNameRemoteRevisionNew: {
+      type: String,
+      required: false,
+    },
     defaultOpen: {
       type: Boolean,
       default: false,
@@ -59,13 +70,13 @@ export default {
       type: Boolean,
       default: false,
     },
-    oldVersionName: {
-      type: String,
-      required: true,
+    showHeader: {
+      type: Boolean,
+      default: true,
     },
-    newVersionName: {
-      type: String,
-      required: true,
+    showNoChangesText: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -82,9 +93,18 @@ export default {
 
   computed: {
     diff() {
-      if (this.oldControls && this.newControls) {
-        return diffSurveyVersions(this.oldControls, this.newControls);
+      if (this.controlsRemoteRevisionNew && this.controlsRemoteRevisionOld) {
+        if (this.controlsLocalRevision) {
+          return diffThreeSurveyVersions(
+            this.controlsLocalRevision,
+            this.controlsRemoteRevisionOld,
+            this.controlsRemoteRevisionNew
+          );
+        } else {
+          return diffSurveyVersions(this.controlsRemoteRevisionOld, this.controlsRemoteRevisionNew);
+        }
       }
+
       return [];
     },
     haveChanges() {
@@ -94,30 +114,34 @@ export default {
       if (!this.diff) {
         return [];
       }
-      // consume this array to protect agains circular dependencies
+      // consume this array to protect against circular dependencies
       const unsortedDiffs = [...this.diff];
-      // returns the direct old/new children of a diff object
+      // returns the direct A/B revision children of a diff object
       const childrenOf = (parent) =>
         remove(unsortedDiffs, (d) => {
           return parent === null
             ? // get root controls
-              !d.oldParentId && !d.newParentId
+              !d.parentIdRevisionOld && !d.parentIdRevisionNew
             : // get direct children
-              (d.oldParentId && d.oldParentId === get(parent, 'oldControl.id')) ||
-                (d.newParentId && d.newParentId === get(parent, 'newControl.id'));
+              (d.parentIdRevisionOld && d.parentIdRevisionOld === get(parent, 'controlRevisionOld.id')) ||
+                (d.parentIdRevisionNew && d.parentIdRevisionNew === get(parent, 'controlRevisionNew.id'));
         });
-      const getSortKey = (diff) => (isNumber(diff.newChildIndex) ? diff.newChildIndex : diff.oldChildIndex - 0.5);
+      const getSortKey = (diff) =>
+        isNumber(diff.childIndexRevisionNew) ? diff.childIndexRevisionNew : diff.childIndexRevisionOld - 0.5;
       const convert = (diffs, parentIdxPath = []) => {
         // sort to make the order similart to the original
         return sortBy(diffs, getSortKey).map((controlDiff) => {
-          const control = controlDiff.newControl || controlDiff.oldControl;
-          const idx = controlDiff.newControl ? controlDiff.newChildIndex : controlDiff.oldChildIndex;
+          const control = controlDiff.controlRevisionNew || controlDiff.controlRevisionOld;
+          const idx = controlDiff.controlRevisionNew
+            ? controlDiff.childIndexRevisionNew
+            : controlDiff.childIndexRevisionOld;
           const idxPath = [...parentIdxPath, idx + 1];
           return {
             name: control.name,
             label: control.label,
             controlType: control.type,
             color: this.colors[controlDiff.changeType],
+            hasBreakingChange: controlDiff.hasBreakingChange,
             changeType: controlDiff.changeType,
             changeList: this.getControlChangeList(controlDiff),
             indexPath: idxPath.join('.'),
@@ -187,6 +211,7 @@ export default {
           if (change.changeType !== changeType.UNCHANGED) {
             return {
               key,
+              localValue: change.localValue ? JSON.stringify(change.localValue) : undefined,
               oldValue: JSON.stringify(change.oldValue),
               newValue: JSON.stringify(change.newValue),
             };

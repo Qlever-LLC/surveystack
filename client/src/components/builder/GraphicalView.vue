@@ -75,7 +75,7 @@
             >
               <v-icon
                 v-if="availableLibraryUpdates[el.libraryId] > el.libraryVersion"
-                @click.stop="updateLibrary(el)"
+                @click.stop="$emit('update-library-control', el)"
                 left
               >
                 mdi-refresh
@@ -84,15 +84,32 @@
             </v-chip>
             <v-btn
               icon
-              v-if="areActionsVisible(el) && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
+              v-if="!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited)"
               @click.stop="() => showDeleteModal(idx)"
             >
               <v-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey lighten-1'"
                 >mdi-delete
               </v-icon>
             </v-btn>
-            <v-btn text x-small v-if="el.options.hidden" @click.stop="el.options.hidden = false" color="grey lighten-1">
+            <v-btn
+              text
+              x-small
+              v-if="el.options.hidden"
+              @click.stop="$emit('unhide-control', el)"
+              color="grey lighten-1"
+              style="margin-bottom: -8px"
+            >
               unhide
+            </v-btn>
+            <v-btn
+              text
+              x-small
+              v-if="areActionsVisible(el) && el.libraryId && el.options.allowHide && !el.options.hidden"
+              @click.stop="$emit('hide-control', el)"
+              color="grey lighten-1"
+              class="mb-4"
+            >
+              hide
             </v-btn>
           </div>
         </div>
@@ -109,9 +126,12 @@
         :availableLibraryUpdates="availableLibraryUpdates"
         :readOnly="readOnly"
         @control-selected="$emit('control-selected', $event)"
+        @control-removed="$emit('control-removed', $event)"
         @duplicate-control="$emit('duplicate-control', $event)"
         @open-library="$emit('open-library', $event)"
-        @update-library-questions="$emit('update-library-questions', $event)"
+        @update-library-control="$emit('update-library-control', $event)"
+        @hide-control="$emit('hide-control', $event)"
+        @unhide-control="$emit('unhide-control', $event)"
         :index="createIndex(index, idx + 1)"
       />
 
@@ -126,9 +146,12 @@
         :availableLibraryUpdates="availableLibraryUpdates"
         :readOnly="readOnly"
         @control-selected="$emit('control-selected', $event)"
+        @control-removed="$emit('control-removed', $event)"
         @duplicate-control="$emit('duplicate-control', $event)"
         @open-library="$emit('open-library', $event)"
-        @update-library-questions="$emit('update-library-questions', $event)"
+        @update-library-control="$emit('update-library-control', $event)"
+        @hide-control="$emit('hide-control', $event)"
+        @unhide-control="$emit('unhide-control', $event)"
         :index="createIndex(index, idx + 1)"
       />
 
@@ -143,21 +166,16 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <update-library-dialog
-        v-if="updateLibraryDialogIsVisible"
-        v-model="updateLibraryDialogIsVisible"
-        :from-library-control="updateControl"
-        :to-survey="updateToLibrary"
-        @ok="updateLibraryConfirmed"
-        @cancel="updateLibraryCancelled"
-      />
     </v-card>
   </draggable>
   <div v-else>
     <v-card class="text--secondary">
       <v-card-title>Empty survey</v-card-title>
       <v-card-text v-if="!readOnly">
-        <div class="text--primary">You can add questions by clicking the <strong>plus icon</strong> below.</div>
+        <div class="text--primary">
+          You can add questions by clicking the <strong>plus icon</strong>
+          below.
+        </div>
       </v-card-text>
     </v-card>
   </div>
@@ -168,14 +186,11 @@ import { cloneDeep } from 'lodash';
 import ObjectID from 'bson-objectid';
 import { availableControls } from '@/utils/surveyConfig';
 import * as utils from '@/utils/surveys';
-import api from '@/services/api.service';
-import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
 import ControlCardHeader from './ControlCardHeader';
 
 export default {
   name: 'nested-draggable',
   components: {
-    UpdateLibraryDialog,
     draggable,
     ControlCardHeader,
   },
@@ -184,9 +199,6 @@ export default {
       drag: false,
       deleteQuestionModalIsVisible: false,
       deleteQuestionIndex: null,
-      updateLibraryDialogIsVisible: false,
-      updateToLibrary: null,
-      updateControl: null,
       scaleStyles: {},
       hoveredControl: null,
     };
@@ -245,7 +257,7 @@ export default {
     },
     removeAt(idx) {
       this.controls.splice(idx, 1);
-      this.$emit('control-selected', null);
+      this.$emit('control-removed');
     },
     createIndex(current, idx) {
       const newIndex = [...current];
@@ -268,23 +280,6 @@ export default {
     },
     openLibrary(libraryId) {
       this.$emit('open-library', libraryId);
-    },
-    async updateLibrary(control) {
-      this.updateControl = control;
-      const { data } = await api.get(`/surveys/${control.libraryId}`);
-      this.updateToLibrary = data;
-      this.updateLibraryDialogIsVisible = true;
-    },
-    updateLibraryConfirmed() {
-      this.updateToLibrary = null;
-      this.updateLibraryDialogIsVisible = false;
-      this.$emit('update-library-questions', this.updateControl);
-      this.updateControl = null;
-    },
-    updateLibraryCancelled() {
-      this.updateToLibrary = null;
-      this.updateLibraryDialogIsVisible = false;
-      this.updateControl = null;
     },
     handleCardHoverChange({ control, isHovering }) {
       if (isHovering) {
