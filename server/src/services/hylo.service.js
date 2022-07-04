@@ -369,7 +369,7 @@ export const handleSyncGroupOutput = async (options) => {
     defaultHyloApiUrl: process.env.HYLO_API_URL,
   });
   const gqlRequest = _gqlRequestWithUrl(apiUrl);
-  const postHyloUser = body => _postHyloUser(body, apiUrl);
+  const postHyloUser = (body) => _postHyloUser(body, apiUrl);
   const baseDeps = { gqlRequest, postHyloUser, logger };
 
   // Convert some fields to JSON to match the Hylo API
