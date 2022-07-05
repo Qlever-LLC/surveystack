@@ -11,7 +11,6 @@ import membershipService from '../services/membership.service';
 import rolesService from '../services/roles.service';
 import {
   createLoginPayload,
-  createMagicLink,
   createUserIfNotExist,
 } from '../services/auth.service';
 import { pick } from 'lodash';
@@ -480,52 +479,41 @@ const activateMembership = async (req, res) => {
   }
 };
 
+const activateMembershipByAdmin = async (req, res) => {
+  const { code } = req.body;
+  const { origin } = req.headers;
+
+  const membership = await db.collection(col).findOne({ 'meta.invitationCode': code });
+  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
+  if (!adminAccess) {
+    throw boom.unauthorized(`Only group admins can create memberships`);
+  }
+
+  await membershipService.activateMembershipByAdmin({ membershipId: membership._id, origin });
+
+  res.send({ message: 'ok' });
+};
+
 // Creates a confirmed (activated) group member
 const createConfirmedMembership = async (req, res) => {
   const entity = req.body;
   delete entity._id;
   sanitize(entity);
+  const { origin } = req.headers;
+
+  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
+  if (!adminAccess) {
+    throw boom.unauthorized(`Only group admins can create memberships`);
+  }
 
   if (!entity.meta.invitationEmail) {
     throw boom.badRequest('Need to supply an email address');
   }
 
-  // TODO use the assertion function from "other" MR
-  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
-  if (!adminAccess) {
-    throw boom.unauthorized(`Only group admins can create memberships`);
-  }
-  let group = await db.collection('groups').findOne({ _id: entity.group });
-  if (!group) {
-    throw boom.badRequest(`Can't find a group with the ID: ${entity.group}`);
-  }
   let membership = (await db.collection(col).insertOne(entity)).ops[0];
-  let userObject = await createUserIfNotExist(
-    membership.meta.invitationEmail,
-    membership.meta.invitationName
-  );
-  await membershipService.activateMembership({
-    code: membership.meta.invitationCode,
-    user: userObject._id,
-  });
+  await membershipService.activateMembershipByAdmin({ membershipId: membership._id, origin });
 
-  const { origin } = req.headers;
-  const magicLink = await createMagicLink({
-    origin,
-    email: userObject.email,
-    expiresAfterDays: 7,
-    landingPath: `/g/${group.slug}/`,
-  });
-
-  await mailService.sendLink({
-    to: userObject.email,
-    subject: `SurveyStack sign in`,
-    link: magicLink,
-    // TODO add the rest of the copy
-    actionDescriptionHtml: `You've been added to "${group.name}" in SurveyStack!`,
-    actionDescriptionText: `You've been added to "${group.name}" in SurveyStack!`,
-    btnText: 'Sign in',
-  });
+  res.send({ message: 'ok' });
 };
 
 export default {
@@ -536,6 +524,7 @@ export default {
   updateMembership,
   deleteMembership,
   activateMembership,
+  activateMembershipByAdmin,
   getTree,
   resendInvitation,
   joinGroup,

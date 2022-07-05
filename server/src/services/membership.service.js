@@ -1,6 +1,8 @@
 import boom from '@hapi/boom';
 
 import { db } from '../db';
+import { createMagicLink, createUserIfNotExist } from './auth.service';
+import mailService from './mail/mail.service';
 
 const col = 'memberships';
 
@@ -51,7 +53,42 @@ export const activateMembership = async ({ code, user }) => {
   );
 };
 
+// activates the membership and notifies the user in email
+export const activateMembershipByAdmin = async ({ membershipId, origin }) => {
+  const membership = await db.collection(col).findOne({ _id: membershipId });
+  let group = await db.collection('groups').findOne({ _id: membership.group });
+  if (!group) {
+    throw boom.badRequest(`Can't find a group with the ID: ${membership.group}`);
+  }
+  let userObject = await createUserIfNotExist(
+    membership.meta.invitationEmail,
+    membership.meta.invitationName
+  );
+  await activateMembership({
+    code: membership.meta.invitationCode,
+    user: userObject._id,
+  });
+
+  const magicLink = await createMagicLink({
+    origin,
+    email: userObject.email,
+    expiresAfterDays: 7,
+    landingPath: `/g/${group.slug}/`,
+  });
+
+  await mailService.sendLink({
+    to: userObject.email,
+    subject: `SurveyStack sign in`,
+    link: magicLink,
+    // TODO add the rest of the copy
+    actionDescriptionHtml: `You've been added to "${group.name}" in SurveyStack!`,
+    actionDescriptionText: `You've been added to "${group.name}" in SurveyStack!`,
+    btnText: 'Sign in',
+  });
+};
+
 export default {
   addMembership,
   activateMembership,
+  activateMembershipByAdmin,
 };
