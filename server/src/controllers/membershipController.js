@@ -9,10 +9,7 @@ import { queryParam } from '../helpers';
 import mailService from '../services/mail/mail.service';
 import membershipService from '../services/membership.service';
 import rolesService from '../services/roles.service';
-import {
-  createLoginPayload,
-  createUserIfNotExist,
-} from '../services/auth.service';
+import { createLoginPayload, createUserIfNotExist } from '../services/auth.service';
 import { pick } from 'lodash';
 import flatten from 'flat';
 
@@ -480,11 +477,16 @@ const activateMembership = async (req, res) => {
 };
 
 const activateMembershipByAdmin = async (req, res) => {
-  const { code } = req.body;
+  const { membershipId } = req.body;
   const { origin } = req.headers;
 
-  const membership = await db.collection(col).findOne({ 'meta.invitationCode': code });
-  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
+  if (!membershipId) {
+    console.log('BODY', req.body, req.params);
+    throw boom.badRequest('"membershipId" is missing from the request body');
+  }
+
+  const membership = await db.collection(col).findOne({ _id: ObjectId(membershipId) });
+  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, membership.group);
   if (!adminAccess) {
     throw boom.unauthorized(`Only group admins can create memberships`);
   }

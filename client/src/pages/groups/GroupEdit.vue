@@ -1,7 +1,11 @@
 <template>
   <v-container>
-    <app-dialog v-model="learnMoreDialog" title="Premium Features" @confirm="learnMoreDialog = false"
-      @cancel="learnMoreDialog = false">
+    <app-dialog
+      v-model="learnMoreDialog"
+      title="Premium Features"
+      @confirm="learnMoreDialog = false"
+      @cancel="learnMoreDialog = false"
+    >
       <p>
         With a paid subscription you can upgrade to
         <strong>your own white-labelled app</strong> with a <strong>custom url</strong>, and your
@@ -17,9 +21,9 @@
         </li>
       </ul>
       <p>
-        To learn more about paid subscriptions please contact Dan TerAvest (<a
-          href="mailto:dan@our-sci.net">dan@our-sci.net</a>) or Greg Austic (<a
-          href="mailto:greg@our-sci.net">greg@our-sci.net</a>)
+        To learn more about paid subscriptions please contact Dan TerAvest (<a href="mailto:dan@our-sci.net"
+          >dan@our-sci.net</a
+        >) or Greg Austic (<a href="mailto:greg@our-sci.net">greg@our-sci.net</a>)
       </p>
     </app-dialog>
 
@@ -40,18 +44,40 @@
     </div>
     <v-card class="pa-4 mb-4">
       <form @submit.prevent="onSubmit" autocomplete="off">
-        <v-text-field label="Name" placeholder="Enter group name" id="group-name" autocomplete="off"
-          v-model="entity.name" />
-        <v-text-field label="Slug" placeholder="Enter group slug or use suggested" id="group-slug" v-model="entity.slug"
-          :readonly="!editSlug" :append-icon="editSlug ? 'mdi-pencil-off-outline' : 'mdi-pencil-outline'"
-          autocomplete="off" @click:append="editSlug = !editSlug" hint="URL friendly version of name" persistent-hint
-          :disabled="isWhitelabel && entity.path === whitelabelPartner.path" />
+        <v-text-field
+          label="Name"
+          placeholder="Enter group name"
+          id="group-name"
+          autocomplete="off"
+          v-model="entity.name"
+        />
+        <v-text-field
+          label="Slug"
+          placeholder="Enter group slug or use suggested"
+          id="group-slug"
+          v-model="entity.slug"
+          :readonly="!editSlug"
+          :append-icon="editSlug ? 'mdi-pencil-off-outline' : 'mdi-pencil-outline'"
+          autocomplete="off"
+          @click:append="editSlug = !editSlug"
+          hint="URL friendly version of name"
+          persistent-hint
+          :disabled="isWhitelabel && entity.path === whitelabelPartner.path"
+        />
         <div class="d-flex align-center mt-6">
-          <v-checkbox label="Invitation Only" v-model="entity.meta.invitationOnly" :hint="
-            entity.meta.invitationOnly ? 'Users can only join through an invitation' : 'Everybody may join this group'
-          " persistent-hint :disabled="!isPremium" class="d-inline mt-0" />
+          <v-checkbox
+            label="Invitation Only"
+            v-model="entity.meta.invitationOnly"
+            :hint="
+              entity.meta.invitationOnly ? 'Users can only join through an invitation' : 'Everybody may join this group'
+            "
+            persistent-hint
+            :disabled="!isPremium"
+            class="d-inline mt-0"
+          />
           <div class="ml-auto ml-sm-6">
-            <v-btn small v-if="!isPremium" @click="learnMoreDialog = true" outlined color="primary">Learn more...
+            <v-btn small v-if="!isPremium" @click="learnMoreDialog = true" outlined color="primary"
+              >Learn more...
             </v-btn>
           </div>
         </div>
@@ -65,16 +91,26 @@
 
     <v-row>
       <v-col cols="12" lg="12">
-        <app-pinned-surveys class="mb-4" v-if="editMode" :entities="entity.surveys.pinned"
-          :searchResults="searchResults" @search="searchSurveys">
+        <app-pinned-surveys
+          class="mb-4"
+          v-if="editMode"
+          :entities="entity.surveys.pinned"
+          :searchResults="searchResults"
+          @search="searchSurveys"
+        >
         </app-pinned-surveys>
       </v-col>
     </v-row>
 
     <v-row>
       <v-col cols="12" lg="12">
-        <app-basic-list class="mb-4" v-if="editMode" :entities="integrations" title="Integrations"
-          :link="(integration) => `/group-manage/${integration.slug}/${entity._id}`">
+        <app-basic-list
+          class="mb-4"
+          v-if="editMode"
+          :entities="integrations"
+          title="Integrations"
+          :link="(integration) => `/group-manage/${integration.slug}/${entity._id}`"
+        >
           <template v-slot:entity="{ entity }">
             <v-list-item-content>
               <v-list-item-title>{{ entity.name }}</v-list-item-title>
@@ -82,32 +118,48 @@
             </v-list-item-content>
           </template>
         </app-basic-list>
-
       </v-col>
     </v-row>
 
-
     <v-row>
       <v-col cols="12" lg="6">
-        <app-basic-list editable class="mb-4" v-if="editMode" :entities="members" title="Members"
-          :link="(member) => `/memberships/${member._id}/edit`" :linkNew="{
+        <app-basic-list
+          editable
+          class="mb-4"
+          v-if="editMode"
+          :entities="members"
+          title="Members"
+          :link="(member) => `/memberships/${member._id}/edit`"
+          :linkNew="{
             name: 'memberships-new',
             query: { group: entity._id, role: 'user' },
-          }" :filter="filterMembers">
+          }"
+          :filter="filterMembers"
+        >
           <template v-slot:entity="{ entity }">
             <v-list-item-content v-if="entity.meta && entity.meta.status === 'pending'">
-              <v-list-item-title class="text--secondary">[Pending] {{ entity.meta.invitationEmail
-              }}{{ entity.meta.invitationName ? ` - ${entity.meta.invitationName}` : '' }}</v-list-item-title>
+              <v-list-item-title class="text--secondary"
+                >[Pending] {{ entity.meta.invitationEmail
+                }}{{ entity.meta.invitationName ? ` - ${entity.meta.invitationName}` : '' }}</v-list-item-title
+              >
               <v-list-item-subtitle>{{
-                  entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'
+                entity.meta.dateSent ? `sent ${entity.meta.dateSent}` : 'Invitation not sent yet'
               }}</v-list-item-subtitle>
             </v-list-item-content>
             <v-list-item-content v-else>
               <v-list-item-title>{{ entity.user.name }}</v-list-item-title>
               <v-list-item-subtitle>{{ entity.user.email }}</v-list-item-subtitle>
             </v-list-item-content>
-            <v-list-item-action>
-              <v-icon v-if="entity.role === 'admin'">mdi-crown-outline</v-icon>
+            <v-list-item-action @mousedown.stop @touchstart.stop @click.prevent>
+              <v-row style="gap: 12px">
+                <app-confirm-membership-button
+                  v-if="entity.meta && entity.meta.status === 'pending'"
+                  :membershipId="entity._id"
+                  :email="entity.meta.invitationEmail"
+                  @confirmed="loadMembers"
+                />
+                <v-icon v-if="entity.role === 'admin'">mdi-crown-outline</v-icon>
+              </v-row>
             </v-list-item-action>
           </template>
         </app-basic-list>
@@ -127,6 +179,7 @@ import appDocLinks from '@/components/groups/DocLinks.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
+import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipButton.vue';
 
 const appFarmHubOnboarding = () => import('@/components/integrations/FarmHubOnboarding.vue');
 
@@ -135,13 +188,13 @@ import { SPEC_VERSION_GROUP } from '@/constants';
 
 const integrations = [
   {
-    name: "FarmOS",
-    description: "Manage FarmOS integration",
+    name: 'FarmOS',
+    description: 'Manage FarmOS integration',
     slug: `farmos`, // used for the link /group-manage/farmos/$GROUP_ID
   },
   {
-    name: "Hylo",
-    description: "Manage Hylo integration",
+    name: 'Hylo',
+    description: 'Manage Hylo integration',
     slug: `hylo`, // used for the link /group-manage/farmos/$GROUP_ID
   },
 ];
@@ -155,6 +208,7 @@ export default {
     appDialog,
     appFarmHubOnboarding,
     appGroupBreadcrumbs,
+    appConfirmMembershipButton,
   },
   data() {
     return {
@@ -182,6 +236,11 @@ export default {
     };
   },
   methods: {
+    async loadMembers() {
+      console.log('load members..');
+      const { data: members } = await api.get(`/memberships?group=${this.entity._id}&populate=true`);
+      this.members = members;
+    },
     async onSubmit() {
       if (this.entity.name.trim() === '') {
         console.log('name must not be empty');
@@ -296,8 +355,7 @@ export default {
         const { data } = await api.get(`/groups/${id}?populate=true`);
         this.entity = { ...this.entity, ...data };
 
-        const { data: members } = await api.get(`/memberships?group=${this.entity._id}&populate=true`);
-        this.members = members;
+        await this.loadMembers();
 
         // const { data: integrations } = await api.get(`/group-integrations?group=${id}&populate=true`);
         // this.integrations = integrations;
