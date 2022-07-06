@@ -12,7 +12,9 @@ import rolesService from '../services/roles.service';
 const col = 'groups';
 
 const sanitizeGroup = (entity) => {
-  entity._id = new ObjectId(entity._id);
+  if (entity._id) {
+    entity._id = new ObjectId(entity._id);
+  }
 
   if (!entity.slug) {
     throw boom.badRequest(`Group slug not set`);
@@ -178,6 +180,7 @@ const getGroupByPath = async (req, res) => {
 };
 
 const getGroupById = async (req, res) => {
+  await new Promise((r) => setTimeout(r, 8000));
   const { id } = req.params;
   const pipeline = [{ $match: { _id: new ObjectId(id) } }];
 
