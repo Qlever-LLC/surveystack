@@ -42,7 +42,17 @@
           hide-default-footer
           show-select
           item-key="_id"
-        />
+          loading="isLoadingMembers"
+        >
+          <template v-slot:item.actions="{ item }">
+            <app-confirm-membership-button
+              v-if="item.meta.status === 'pending'"
+              :membershipId="item._id"
+              :email="item.meta.invitationEmail"
+              @confirmed="loadMembers"
+            />
+          </template>
+        </v-data-table>
       </v-card-text>
     </v-card>
 
@@ -67,7 +77,7 @@
 
 <script>
 import appSurveySelector from '@/components/survey/SurveySelector.vue';
-
+import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipButton.vue';
 import api from '@/services/api.service';
 
 const defaultSubject = 'Request to submit a survey';
@@ -83,6 +93,7 @@ All the best
 export default {
   components: {
     appSurveySelector,
+    appConfirmMembershipButton,
   },
   data() {
     return {
@@ -97,13 +108,25 @@ export default {
       copy: false,
       headers: [
         { text: 'id', value: '_id' },
-        { text: 'name', value: 'user.name' },
-        { text: 'email', value: 'user.email' },
+        { text: 'name', value: 'name' },
+        { text: 'email', value: 'email' },
+        { text: 'actions', value: 'actions' },
       ],
       showConfirmDialog: false,
+      isLoadingMembers: false,
     };
   },
   methods: {
+    async loadMembers() {
+      this.isLoadingMembers = true;
+      try {
+        const { data: members } = await api.get(`/memberships?group=${this.group}&populate=true`);
+        this.members = members;
+        //TODO handle errors
+      } finally {
+        this.isLoadingMembers = false;
+      }
+    },
     async searchSurveys(q) {
       console.log('calling searchSurveys', q);
       const { data: searchResults } = await api.get(
@@ -146,7 +169,12 @@ export default {
   },
   computed: {
     activeMembers() {
-      return this.members.filter((member) => member.meta.status === 'active');
+      return this.members.map((m) => ({
+        ...m,
+        name: (m.user && m.user.name) || (m.meta && m.meta.invitationName),
+        email: (m.user && m.user.email) || (m.meta && m.meta.invitationEmail),
+        isSelectable: m.meta.status === 'active',
+      }));
     },
     submittable() {
       return this.selectedSurvey !== null && this.selectedMembers.length !== 0;
@@ -159,8 +187,7 @@ export default {
     const { group } = this.$route.query;
     if (group) {
       this.group = group;
-      const { data: members } = await api.get(`/memberships?group=${this.group}&populate=true`);
-      this.members = members;
+      await this.loadMembers();
     }
   },
 };
