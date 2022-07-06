@@ -43,7 +43,7 @@
 
           <v-btn-toggle :max="0" multiple :value="[]" dense>
             <v-btn color="primary" @click="submit" elevation="0" :disabled="!submittable">{{
-              invitationMethod === 'invite' ? 'Invite Member' : 'Add Member'
+              invitationMethod === INVITATION_METHODS.INVITE ? 'Invite Member' : 'Add Member'
             }}</v-btn>
             <v-menu top left>
               <template v-slot:activator="{ on, attrs }">
@@ -53,7 +53,7 @@
               </template>
               <v-list>
                 <v-list-item-group v-model="invitationMethod">
-                  <v-list-item two-line value="invite">
+                  <v-list-item two-line :value="INVITATION_METHODS.INVITE">
                     <v-list-item-content>
                       <v-list-item-title>Invite Member</v-list-item-title>
                       <v-list-item-subtitle
@@ -62,7 +62,7 @@
                     </v-list-item-content>
                   </v-list-item>
 
-                  <v-list-item three-line value="confirm">
+                  <v-list-item three-line :value="INVITATION_METHODS.ADD">
                     <v-list-item-content>
                       <v-list-item-title>Add Member</v-list-item-title>
                       <v-list-item-subtitle>
@@ -107,6 +107,9 @@ import api from '@/services/api.service';
 
 import { uuid } from '@/utils/memberships';
 
+// LocalStorage key for saving the preferred login method
+const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
+
 const availableRoles = [
   {
     value: 'user',
@@ -120,6 +123,10 @@ const availableRoles = [
 
 export default {
   data() {
+    const INVITATION_METHODS = {
+      INVITE: 'invite',
+      ADD: 'add',
+    };
     return {
       availableRoles,
       entity: {
@@ -141,7 +148,10 @@ export default {
       groupDetail: { name: '', path: '' },
       dialogCreateUser: false,
       sendEmail: 'SEND_NOW',
-      invitationMethod: 'invite',
+      INVITATION_METHODS,
+      invitationMethod: Object.values(INVITATION_METHODS).includes(localStorage[LS_MEMBER_INVITATION_METHOD])
+        ? localStorage[LS_MEMBER_INVITATION_METHOD]
+        : INVITATION_METHODS.INVITE,
     };
   },
   methods: {
@@ -157,7 +167,9 @@ export default {
     async submit() {
       const data = this.entity;
       const url =
-        this.invitationMethod === 'invite' ? `/memberships?sendEmail=${this.sendEmail}` : `/memberships/confirmed`;
+        this.invitationMethod === this.INVITATION_METHODS.INVITE
+          ? `/memberships?sendEmail=${this.sendEmail}`
+          : `/memberships/confirmed`;
 
       try {
         await api.post(url, data);
@@ -184,6 +196,11 @@ export default {
   computed: {
     submittable() {
       return true;
+    },
+  },
+  watch: {
+    invitationMethod(newValue) {
+      localStorage[LS_MEMBER_INVITATION_METHOD] = newValue;
     },
   },
   async created() {
