@@ -124,6 +124,7 @@
     <v-row>
       <v-col cols="12" lg="6">
         <app-basic-list
+          :loading="isLoadingMembers"
           editable
           class="mb-4"
           v-if="editMode"
@@ -233,13 +234,19 @@ export default {
       members: [],
       learnMoreDialog: false,
       integrations,
+      isLoadingMembers: false,
     };
   },
   methods: {
     async loadMembers() {
-      console.log('load members..');
-      const { data: members } = await api.get(`/memberships?group=${this.entity._id}&populate=true`);
-      this.members = members;
+      this.isLoadingMembers = true;
+      try {
+        const { data: members } = await api.get(`/memberships?group=${this.entity._id}&populate=true`);
+        this.members = members;
+        //TODO handle error
+      } finally {
+        this.isLoadingMembers = false;
+      }
     },
     async onSubmit() {
       if (this.entity.name.trim() === '') {
