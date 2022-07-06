@@ -38,55 +38,65 @@
           <v-icon small left> mdi-octagram </v-icon>Premium
         </v-chip>
       </h1>
-      <v-btn v-if="editMode" class="ma-2" :to="`/call-for-submissions?group=${entity._id}`" color="secondary">
+      <v-btn
+        v-if="editMode"
+        :disabled="!entity._id"
+        class="ma-2"
+        :to="`/call-for-submissions?group=${entity._id}`"
+        color="secondary"
+      >
         <v-icon left>mdi-email-multiple-outline</v-icon>Call for submissions...
       </v-btn>
     </div>
-    <v-card class="pa-4 mb-4">
-      <form @submit.prevent="onSubmit" autocomplete="off">
-        <v-text-field
-          label="Name"
-          placeholder="Enter group name"
-          id="group-name"
-          autocomplete="off"
-          v-model="entity.name"
-        />
-        <v-text-field
-          label="Slug"
-          placeholder="Enter group slug or use suggested"
-          id="group-slug"
-          v-model="entity.slug"
-          :readonly="!editSlug"
-          :append-icon="editSlug ? 'mdi-pencil-off-outline' : 'mdi-pencil-outline'"
-          autocomplete="off"
-          @click:append="editSlug = !editSlug"
-          hint="URL friendly version of name"
-          persistent-hint
-          :disabled="isWhitelabel && entity.path === whitelabelPartner.path"
-        />
-        <div class="d-flex align-center mt-6">
-          <v-checkbox
-            label="Invitation Only"
-            v-model="entity.meta.invitationOnly"
-            :hint="
-              entity.meta.invitationOnly ? 'Users can only join through an invitation' : 'Everybody may join this group'
-            "
-            persistent-hint
-            :disabled="!isPremium"
-            class="d-inline mt-0"
+    <v-card :loading="isLoadingGroup" class="mb-4">
+      <v-card-text>
+        <form @submit.prevent="onSubmit" autocomplete="off">
+          <v-text-field
+            label="Name"
+            placeholder="Enter group name"
+            id="group-name"
+            autocomplete="off"
+            v-model="entity.name"
           />
-          <div class="ml-auto ml-sm-6">
-            <v-btn small v-if="!isPremium" @click="learnMoreDialog = true" outlined color="primary"
-              >Learn more...
-            </v-btn>
+          <v-text-field
+            label="Slug"
+            placeholder="Enter group slug or use suggested"
+            id="group-slug"
+            v-model="entity.slug"
+            :readonly="!editSlug"
+            :append-icon="editSlug ? 'mdi-pencil-off-outline' : 'mdi-pencil-outline'"
+            autocomplete="off"
+            @click:append="editSlug = !editSlug"
+            hint="URL friendly version of name"
+            persistent-hint
+            :disabled="isWhitelabel && entity.path === whitelabelPartner.path"
+          />
+          <div class="d-flex align-center mt-6">
+            <v-checkbox
+              label="Invitation Only"
+              v-model="entity.meta.invitationOnly"
+              :hint="
+                entity.meta.invitationOnly
+                  ? 'Users can only join through an invitation'
+                  : 'Everybody may join this group'
+              "
+              persistent-hint
+              :disabled="!isPremium"
+              class="d-inline mt-0"
+            />
+            <div class="ml-auto ml-sm-6">
+              <v-btn small v-if="!isPremium" @click="learnMoreDialog = true" outlined color="primary"
+                >Learn more...
+              </v-btn>
+            </div>
           </div>
-        </div>
-        <v-checkbox label="Archived" v-model="entity.meta.archived" />
-        <div class="d-flex justify-end pa-2">
-          <v-btn text @click="cancel">Cancel</v-btn>
-          <v-btn color="primary" type="submit">{{ editMode ? 'Save' : 'Create' }}</v-btn>
-        </div>
-      </form>
+          <v-checkbox label="Archived" v-model="entity.meta.archived" />
+          <div class="d-flex justify-end pa-2">
+            <v-btn text @click="cancel">Cancel</v-btn>
+            <v-btn color="primary" type="submit">{{ editMode ? 'Save' : 'Create' }}</v-btn>
+          </div>
+        </form>
+      </v-card-text>
     </v-card>
 
     <v-row>
@@ -235,6 +245,7 @@ export default {
       learnMoreDialog: false,
       integrations,
       isLoadingMembers: false,
+      isLoadingGroup: false,
     };
   },
   methods: {
@@ -354,9 +365,11 @@ export default {
       }
     }
 
-    this.entity._id = new ObjectId().toString();
+    // TODO is it okay to remove this?
+    // this.entity._id = new ObjectId().toString();
 
     if (this.editMode) {
+      this.isLoadingGroup = true;
       try {
         const { id } = this.$route.params;
         const { data } = await api.get(`/groups/${id}?populate=true`);
@@ -368,6 +381,8 @@ export default {
         // this.integrations = integrations;
       } catch (e) {
         console.log('something went wrong:', e);
+      } finally {
+        this.isLoadingGroup = false;
       }
     }
   },
