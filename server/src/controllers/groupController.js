@@ -180,7 +180,6 @@ const getGroupByPath = async (req, res) => {
 };
 
 const getGroupById = async (req, res) => {
-  await new Promise((r) => setTimeout(r, 8000));
   const { id } = req.params;
   const pipeline = [{ $match: { _id: new ObjectId(id) } }];
 
