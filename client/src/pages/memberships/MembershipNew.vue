@@ -42,7 +42,7 @@
           <v-btn text @click="cancel">Cancel</v-btn>
 
           <v-btn-toggle :max="0" multiple :value="[]" dense>
-            <v-btn color="primary" @click="submit" elevation="0" :disabled="!submittable">{{
+            <v-btn :loading="isSubmitting" color="primary" @click="submit" elevation="0" :disabled="!submittable">{{
               invitationMethod === INVITATION_METHODS.INVITE ? 'Invite Member' : 'Add Member'
             }}</v-btn>
             <v-menu top left>
@@ -152,6 +152,7 @@ export default {
       invitationMethod: Object.values(INVITATION_METHODS).includes(localStorage[LS_MEMBER_INVITATION_METHOD])
         ? localStorage[LS_MEMBER_INVITATION_METHOD]
         : INVITATION_METHODS.INVITE,
+      isSubmitting: false,
     };
   },
   methods: {
@@ -172,6 +173,7 @@ export default {
           : `/memberships/confirmed`;
 
       try {
+        this.isSubmitting = true;
         await api.post(url, data);
         this.$router.back();
       } catch (err) {
@@ -180,6 +182,8 @@ export default {
           this.dialogCreateUser = true;
         }
         this.$store.dispatch('feedback/add', err.response.data.message);
+      } finally {
+        this.isSubmitting = false;
       }
     },
     proceedToUserCreation() {
