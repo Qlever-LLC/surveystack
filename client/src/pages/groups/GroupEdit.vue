@@ -226,7 +226,6 @@ export default {
       editSlug: false,
       editMode: true,
       entity: {
-        _id: '',
         meta: {
           archived: false,
           specVersion: SPEC_VERSION_GROUP,
