@@ -41,7 +41,7 @@ const sendLink = async ({
 }) => {
   // remove all html tags
   const s = (text) => sanitizeHtml(text, { allowedTags: [] });
-  const btnColor = "#225034";
+  const btnColor = '#225034';
 
   await transport.sendMail({
     from: process.env.SMTP_DEFAULT_SENDER,
@@ -72,12 +72,14 @@ const sendLink = async ({
                     link
                   )}</small>
                 </td></tr>
-                ${afterHtml ? `
+                ${
+                  afterHtml
+                    ? `
                 <tr><td align="center" style="padding-top: 32px">
-                  <p style="padding-top:18px">${
-                    afterHtml
-                  }</p>
-                </td></tr>` : ''}
+                  <p style="padding-top:18px">${afterHtml}</p>
+                </td></tr>`
+                    : ''
+                }
                 </tbody></table>
               </td>
           </tr>
