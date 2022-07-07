@@ -65,15 +65,11 @@
                   <v-list-item three-line :value="INVITATION_METHODS.ADD">
                     <v-list-item-content>
                       <v-list-item-title>Add Member</v-list-item-title>
-                      <v-list-item-subtitle>
+                      <v-list-item-subtitle style="-webkit-line-clamp:4">
                         Add member to this group without requiring interation from their side.<br />
                         This is useful if you want to send out "Call for Submissions" without waiting for the user to
                         joint your group.
                       </v-list-item-subtitle>
-                      <!-- <v-list-item-subtitle>
-                        This is useful if you want to send out "Call for Submissions" without waiting to the user to
-                        joint your group.
-                      </v-list-item-subtitle> -->
                     </v-list-item-content>
                   </v-list-item>
                 </v-list-item-group>
