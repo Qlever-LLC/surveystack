@@ -75,15 +75,32 @@ export const activateMembershipByAdmin = async ({ membershipId, origin }) => {
     expiresAfterDays: 7,
     landingPath: `/g/${group.slug}/`,
   });
+  const magicLinkProfile = await createMagicLink({
+    origin,
+    email: userObject.email,
+    expiresAfterDays: 7,
+    landingPath: `/auth/profile`,
+  });
+  const magicLinkUser = await createMagicLink({
+    origin,
+    email: userObject.email,
+    expiresAfterDays: 7,
+    landingPath: `/users/${userObject._id}/edit`,
+  });
 
   await mailService.sendLink({
     to: userObject.email,
-    subject: `SurveyStack sign in`,
+    subject: `You've been added to "${group.name}" in SurveyStack!`,
     link: magicLink,
     // TODO add the rest of the copy
     actionDescriptionHtml: `You've been added to "${group.name}" in SurveyStack!`,
     actionDescriptionText: `You've been added to "${group.name}" in SurveyStack!`,
     btnText: 'Sign in',
+    afterHtml: `<b>Unsure why you're receiving this email?</b> 
+"${group.name}" added you to a SurveyStack group and may have initiated an account on your behalf. 
+You have control over your acctount. 
+<a href="${magicLinkProfile}">Click here</a> to view and change groups. 
+You can <a href="${magicLinkUser}">click here</a> to manage or change your account.`,
   });
 };
 

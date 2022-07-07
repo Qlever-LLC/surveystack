@@ -37,6 +37,7 @@ const sendLink = async ({
   actionDescriptionText,
   btnText,
   greeting = 'Hi there,',
+  afterHtml,
 }) => {
   // remove all html tags
   const s = (text) => sanitizeHtml(text, { allowedTags: [] });
@@ -48,7 +49,7 @@ const sendLink = async ({
     subject,
     // Note: Basic html email. We should probably use some templating engine if we decide to create more complicated emails
     html: `
-      <table style="max-width: 600px; margin: 0 auto;"width="100%; font-size: 17px;" border="0" cellspacing="0" cellpadding="0">
+      <table style="max-width: 600px; margin: 0 auto; font-size: 17px; font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;"width="100%;" border="0" cellspacing="0" cellpadding="0">
           <tr>
               <td align="center">
                 <img style="width:80px;" src="cid:logo"/>
@@ -62,7 +63,7 @@ const sendLink = async ({
                   <h2>${s(actionDescriptionHtml)}</h2>
                   <a href="${s(
                     link
-                  )}" style="color: white; font-weight: bold; text-decoration: none; word-break: break-word; font-size: 17px; line-height: 24px; background-color: ${btnColor}; letter-spacing: 1px; min-width: 80px; text-align: center; border-radius: 4px; padding: 10px 22px; font-family: 'Roboto', sans-serif;" target="_blank">
+                  )}" style="color: white; font-weight: bold; text-decoration: none; word-break: break-word; font-size: 17px; line-height: 24px; background-color: ${btnColor}; letter-spacing: 1px; min-width: 80px; text-align: center; border-radius: 4px; padding: 10px 22px;" target="_blank">
                   ${s(btnText)}
                   </a>
                 </td></tr>
@@ -71,6 +72,12 @@ const sendLink = async ({
                     link
                   )}</small>
                 </td></tr>
+                ${afterHtml ? `
+                <tr><td align="center" style="padding-top: 32px">
+                  <p style="padding-top:18px">${
+                    afterHtml
+                  }</p>
+                </td></tr>` : ''}
                 </tbody></table>
               </td>
           </tr>

@@ -228,7 +228,7 @@ const createGroup = async (req, res) => {
     assert.equal(1, r.insertedCount);
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
-      throw boom.conflict(`Conflict _id or path: ${entity._id}, ${entity.path}`);
+      throw boom.conflict(`Conflict _id or path: "${String(entity._id)}", "${entity.path}"`);
     }
     throw boom.internal(`createGroup: unknown internal error`);
   }
