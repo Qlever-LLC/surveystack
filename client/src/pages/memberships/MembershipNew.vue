@@ -3,10 +3,17 @@
     <span class="text--secondary overline">{{ entity._id }}</span>
     <h2>Invite people to '{{ groupDetail.name }}'</h2>
     <v-card class="pa-4 mb-4">
-      <v-form class="mt-3" @keydown.enter.prevent="submit">
+      <v-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
         <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined></v-select>
 
-        <v-text-field class="mt-3" v-model="entity.meta.invitationEmail" label="Email" outlined />
+        <v-text-field
+          class="mt-3"
+          v-model="entity.meta.invitationEmail"
+          label="Email"
+          outlined
+          :rules="emailRules"
+          validate-on-blur
+        />
 
         <v-text-field
           class="mt-3"
@@ -65,7 +72,7 @@
                   <v-list-item three-line :value="INVITATION_METHODS.ADD">
                     <v-list-item-content>
                       <v-list-item-title>Add Member</v-list-item-title>
-                      <v-list-item-subtitle style="-webkit-line-clamp:4">
+                      <v-list-item-subtitle style="-webkit-line-clamp: 4">
                         Add member to this group without requiring interation from their side.<br />
                         This is useful if you want to send out "Call for Submissions" without waiting for the user to
                         joint your group.
@@ -100,6 +107,7 @@
 import ObjectId from 'bson-objectid';
 import moment from 'moment';
 import api from '@/services/api.service';
+import EmailValidator from 'email-validator';
 
 import { uuid } from '@/utils/memberships';
 
@@ -149,6 +157,7 @@ export default {
         ? localStorage[LS_MEMBER_INVITATION_METHOD]
         : INVITATION_METHODS.INVITE,
       isSubmitting: false,
+      emailRules: [(v) => !!v || 'E-mail is required', (v) => EmailValidator.validate(v) || 'E-mail must be valid'],
     };
   },
   methods: {
@@ -162,6 +171,9 @@ export default {
       this.entity.content = code;
     },
     async submit() {
+      if (!this.$refs.form.validate()) {
+        return;
+      }
       const data = this.entity;
       const url =
         this.invitationMethod === this.INVITATION_METHODS.INVITE
