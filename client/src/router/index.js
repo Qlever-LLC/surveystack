@@ -138,7 +138,7 @@ const routes = [
     props: {
       default: {
         start: true,
-      }
+      },
     },
   },
   {
