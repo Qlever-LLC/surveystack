@@ -196,6 +196,7 @@ const appFarmHubOnboarding = () => import('@/components/integrations/FarmHubOnbo
 
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
+import { get } from 'lodash';
 
 const integrations = [
   {
@@ -253,7 +254,9 @@ export default {
       try {
         const { data: members } = await api.get(`/memberships?group=${this.entity._id}&populate=true`);
         this.members = members;
-        //TODO handle error
+      } catch (e) {
+        console.error(e);
+        this.$store.dispatch('feedback/add', get(e, 'response.data.message', String(e)));
       } finally {
         this.isLoadingMembers = false;
       }

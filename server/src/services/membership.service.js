@@ -92,7 +92,6 @@ export const activateMembershipByAdmin = async ({ membershipId, origin }) => {
     to: userObject.email,
     subject: `You've been added to "${group.name}" in SurveyStack!`,
     link: magicLink,
-    // TODO add the rest of the copy
     actionDescriptionHtml: `You've been added to "${group.name}" in SurveyStack!`,
     actionDescriptionText: `You've been added to "${group.name}" in SurveyStack!`,
     btnText: 'Sign in',

@@ -79,6 +79,7 @@
 import appSurveySelector from '@/components/survey/SurveySelector.vue';
 import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipButton.vue';
 import api from '@/services/api.service';
+import { get } from 'lodash';
 
 const defaultSubject = 'Request to submit a survey';
 
@@ -122,7 +123,9 @@ export default {
       try {
         const { data: members } = await api.get(`/memberships?group=${this.group}&populate=true`);
         this.members = members;
-        //TODO handle errors
+      } catch (e) {
+        console.error(e);
+        this.$store.dispatch('feedback/add', get(e, 'response.data.message', String(e)));
       } finally {
         this.isLoadingMembers = false;
       }
@@ -155,8 +158,9 @@ export default {
           group: this.group,
           copy: this.copy,
         });
-      } catch (err) {
-        this.$store.dispatch('feedback/add', err.response.data.message);
+      } catch (e) {
+        console.error(e);
+        this.$store.dispatch('feedback/add', get(e, 'response.data.message', String(e)));
       }
     },
   },

@@ -21,6 +21,7 @@
 
 <script>
 import api from '@/services/api.service';
+import { get } from 'lodash';
 
 export default {
   data() {
@@ -49,7 +50,7 @@ export default {
         this.$emit('confirmed');
       } catch (e) {
         console.error(e);
-        this.$store.dispatch('feedback/add', e.response.data.message);
+        this.$store.dispatch('feedback/add', get(e, 'response.data.message', String(e)));
       } finally {
         this.isVisible = false;
         this.isInProgress = false;
