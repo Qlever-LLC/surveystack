@@ -426,6 +426,7 @@ describe('surveyDiff', () => {
           changeType: changeType.CHANGED,
           hasBreakingChange: true,
           hasLocalChange: true,
+          discardLocalChange: true,
           controlLocalRevision: controlLocalVersion,
           childIndexLocalRevision: 0,
           pathLocalRevision: controlLocalVersion.name,
@@ -487,6 +488,7 @@ describe('surveyDiff', () => {
         {
           changeType: changeType.CHANGED,
           hasLocalChange: false,
+          discardLocalChange: false,
           controlLocalRevision: controlLocalVersion,
           childIndexLocalRevision: 0,
           pathLocalRevision: controlLocalVersion.name,

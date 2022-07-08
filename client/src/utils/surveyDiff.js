@@ -236,6 +236,7 @@ function createThreePointChange(changeLocal, changeRemote) {
   let threePointChange = {
     changeType: changeRemote.changeType,
     hasLocalChange: false,
+    discardLocalChange: false,
     diff: changeRemote.diff || {},
 
     controlLocalRevision: changeLocal.controlRevisionNew,
@@ -300,6 +301,7 @@ function createThreePointChange(changeLocal, changeRemote) {
 
   if (threePointChange.hasLocalChange && hasBreakingChange(threePointChange.diff)) {
     threePointChange.hasBreakingChange = true;
+    threePointChange.discardLocalChange = true;
   }
 
   return threePointChange;
@@ -329,7 +331,7 @@ export function merge(controlsLocalRevision, controlsRemoteRevisionOld, controls
     switch (change.changeType) {
       case changeType.CHANGED:
         //merge local change into resulting controls except if it's a breaking change, then discard the local change
-        if (change.hasLocalChange && !change.hasBreakingChange) {
+        if (change.hasLocalChange && !change.discardLocalChange) {
           mergedControls = replaceControl(mergedControls, null, change.pathRevisionNew, change.controlLocalRevision);
         }
         break;

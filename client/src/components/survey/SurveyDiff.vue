@@ -142,6 +142,8 @@ export default {
             controlType: control.type,
             color: this.colors[controlDiff.changeType],
             hasBreakingChange: controlDiff.hasBreakingChange,
+            hasLocalChange: controlDiff.hasLocalChange,
+            discardLocalChange: controlDiff.discardLocalChange,
             changeType: controlDiff.changeType,
             changeList: this.getControlChangeList(controlDiff),
             indexPath: idxPath.join('.'),

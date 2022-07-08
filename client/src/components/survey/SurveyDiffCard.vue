@@ -29,17 +29,33 @@
         <thead>
           <tr>
             <th class="text-left"></th>
-            <th v-if="versionNameLocalRevision" class="text-left">{{ versionNameLocalRevision }}</th>
+            <th v-if="versionNameLocalRevision" class="text-left">
+              <v-row class="ma-0 pa-0">
+                {{ versionNameLocalRevision }}
+                <v-checkbox
+                  v-if="diffInfo.hasLocalChange"
+                  v-model="diffInfo.discardLocalChange"
+                  :disabled="diffInfo.hasBreakingChange"
+                  dense
+                  hide-details
+                  class="pa-0"
+                  style="margin-left: 5px; margin-right: -6px; margin-top: -3px"
+                ></v-checkbox>
+                <span v-if="diffInfo.hasLocalChange" class="primary--text">discard</span>
+              </v-row>
+            </th>
             <th class="text-left">{{ versionNameRemoteRevisionOld }}</th>
             <th class="text-left">{{ versionNameRemoteRevisionNew }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="diffInfo in diffInfo.changeList" :key="diffInfo.key">
-            <td>{{ diffInfo.key }}</td>
-            <td v-if="versionNameLocalRevision">{{ diffInfo.localValue }}</td>
-            <td>{{ diffInfo.oldValue }}</td>
-            <td>{{ diffInfo.newValue }}</td>
+          <tr v-for="change in diffInfo.changeList" :key="change.key">
+            <td>{{ change.key }}</td>
+            <td v-if="versionNameLocalRevision" :class="diffInfo.discardLocalChange ? 'change-discarded' : ''">
+              {{ change.localValue }} {{ diffInfo.discardLocalChange }}
+            </td>
+            <td>{{ change.oldValue }}</td>
+            <td>{{ change.newValue }}</td>
           </tr>
         </tbody>
       </template>
@@ -94,5 +110,9 @@ export default {
   margin-bottom: -1px;
   border-left-width: 2px;
   position: relative;
+}
+.change-discarded {
+  text-decoration: line-through;
+  text-decoration-color: var(--v-primary-base);
 }
 </style>
