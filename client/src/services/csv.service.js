@@ -181,6 +181,21 @@ export function createCsv(submissions, headers) {
   return csv;
 }
 
+export function createResourceCsv(items) {
+  const headers = ['label', 'value', 'tags'];
+
+  let csv = '';
+  try {
+    csv = papa.unparse(items, {
+      columns: headers,
+      skipEmptyLines: true,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+  return csv;
+}
+
 export default {
   createCsv,
   createCsvLegacy,
