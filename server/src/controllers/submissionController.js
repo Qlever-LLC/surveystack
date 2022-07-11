@@ -817,18 +817,30 @@ const findVal = (obj, keyToFind) => {
 const updateSubmission = async (req, res) => {
   const { id } = req.params;
   let newSubmission = await sanitize(req.body);
+  const oldSubmission = res.locals.existing;
+
+  // update with upped revision and resubmitter
+  newSubmission.meta.revision = oldSubmission.meta.revision + 1;
+  newSubmission.meta.resubmitter = new ObjectId(res.locals.auth.user._id);
+
+  const updateOperation = {
+    data: newSubmission.data,
+    'meta.group': newSubmission.meta.group,
+    'meta.revision': newSubmission.meta.revision,
+    'meta.resubmitter': newSubmission.meta.resubmitter,
+    'meta.dateModified': newSubmission.meta.dateModified,
+    'meta.dateSubmitted': newSubmission.meta.dateSubmitted,
+    'meta.specVersion': newSubmission.meta.specVersion,
+    // TODO: does meta.status need to be stored in the database?
+    'meta.status': newSubmission.meta.status,
+  };
 
   // re-insert old submission version with a new _id
-  const oldSubmission = res.locals.existing;
   oldSubmission._id = new ObjectId();
   oldSubmission.meta.original = new ObjectId(id);
   oldSubmission.meta.archived = true;
   oldSubmission.meta.archivedReason = newSubmission.meta.archivedReason || 'RESUBMIT';
   await db.collection(col).insertOne(oldSubmission);
-
-  // update with upped revision and resubmitter
-  newSubmission.meta.revision = oldSubmission.meta.revision + 1;
-  newSubmission.meta.resubmitter = new ObjectId(res.locals.auth.user._id);
 
   const survey = await db.collection('surveys').findOne({ _id: newSubmission.meta.survey.id });
   if (!survey) {
@@ -871,7 +883,7 @@ const updateSubmission = async (req, res) => {
 
   const updated = await db.collection(col).findOneAndUpdate(
     { _id: new ObjectId(id) },
-    { $set: newSubmission },
+    { $set: updateOperation },
     {
       returnOriginal: false,
     }
