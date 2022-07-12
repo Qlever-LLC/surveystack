@@ -147,6 +147,7 @@ export const createRes = async ({ user = null } = {}) => ({
   json: jest.fn(),
   redirect: jest.fn(),
   status: jest.fn().mockReturnThis(),
+  set: jest.fn(),
   locals: {
     auth: {
       isAuthenticated: !!user,
