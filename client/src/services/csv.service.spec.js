@@ -1,4 +1,9 @@
-import { transformSubmissionQuestionTypes, geojsonTransformer, createCsv, fileTransformer } from './csv.service';
+import {
+  createResourceCsv,
+  fileTransformer,
+  geojsonTransformer,
+  transformSubmissionQuestionTypes,
+} from './csv.service';
 
 function mockSubmissions() {
   return [
@@ -387,6 +392,37 @@ describe('CSV Service', () => {
         const actual = transformSubmissionQuestionTypes(submissions[0].data, { image: fileTransformer });
         expect(actual.image_1.value[0].startsWith('https://surveystack-test.s3.amazonaws.com/')).toBeTruthy();
       });
+    });
+  });
+  describe('createResourceCsv', () => {
+    it('returns a valid csv', () => {
+      const resourceContentJson = [
+        {
+          label: 'foo_l',
+          value: 'foo_v',
+          tags: 'foo_t',
+          id: '62cbfbd046713300010a7101',
+        },
+        {
+          label: 'bar_l',
+          value: 'bar_v',
+          tags: 'bar_t',
+          id: '62cbfbd046713300010a7102',
+        },
+        {
+          label: 'baz_l.,_#<>/\\',
+          value: 'baz_v.,_#<>/\\',
+          tags: 'baz_t.,_#<>/\\',
+          id: '62cbfbd046713300010a7103',
+        },
+      ];
+      const resultCSV = createResourceCsv(resourceContentJson);
+      expect(resultCSV).toBe(
+        'label,value,tags\r\n' +
+          'foo_l,foo_v,foo_t\r\n' +
+          'bar_l,bar_v,bar_t\r\n' +
+          '"baz_l.,_#<>/\\","baz_v.,_#<>/\\","baz_t.,_#<>/\\"'
+      );
     });
   });
 });
