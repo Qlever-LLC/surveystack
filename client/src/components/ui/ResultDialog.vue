@@ -24,7 +24,11 @@
 
                     <v-card-text>
                       <v-expansion-panels accordion>
-                        <v-expansion-panel v-for="(item, i) in item.logs" :key="i" :readonly="!item.data">
+                        <v-expansion-panel
+                          v-for="(item, i) in item.logs.filter(Boolean)"
+                          :key="i"
+                          :readonly="!item.data"
+                        >
                           <v-expansion-panel-header>
                             <template v-slot:actions v-if="!item.data"><v-spacer></v-spacer> </template>
                             <div class="mr-4 flex-grow-0">
