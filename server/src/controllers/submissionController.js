@@ -633,28 +633,9 @@ const prepareCreateSubmissionEntity = async (submission, res) => {
 
 const handleApiCompose = async (submissionEntities, user) => {
   submissionEntities = cloneDeep(submissionEntities);
-  let farmOsResults;
-  try {
-    farmOsResults = await Promise.all(
-      submissionEntities.map(({ entity, survey }) =>
-        farmOsService.handle({
-          submission: entity,
-          survey,
-          user,
-        })
-      )
-    );
-  } catch (error) {
-    // TODO what should we do if something internal fails?
-    // need to let the user somehow know
-    console.log('error handling farmos', error);
-    throw {
-      message: `error submitting to farmos ${error}`,
-      farmos: error.messages,
-      logs: error.logs || [],
-    };
-  }
 
+  // HOTFIX: do hylo first because farmos handler remove all apiCompose outputs from the submission
+  // TODO: solve this in a cleaner way. Create utiliti functions for apiCompose handlers
   let hyloResults;
   try {
     hyloResults = await Promise.all(
@@ -679,6 +660,28 @@ const handleApiCompose = async (submissionEntities, user) => {
     throw {
       message: `error submitting to hylo ${error}`,
       hylo: error,
+      logs: error.logs || [],
+    };
+  }
+
+  let farmOsResults;
+  try {
+    farmOsResults = await Promise.all(
+      submissionEntities.map(({ entity, survey }) =>
+        farmOsService.handle({
+          submission: entity,
+          survey,
+          user,
+        })
+      )
+    );
+  } catch (error) {
+    // TODO what should we do if something internal fails?
+    // need to let the user somehow know
+    console.log('error handling farmos', error);
+    throw {
+      message: `error submitting to farmos ${error}`,
+      farmos: error.messages,
       logs: error.logs || [],
     };
   }
