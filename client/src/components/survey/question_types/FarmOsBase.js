@@ -77,21 +77,29 @@ const base = (type) => ({
         const response = await api.get('farmos/assets?bundle=plant');
 
         console.log('res', response.data);
-        this.assets = response.data.assets.map((f) => ({
-          label: `<span class="blue-chip mr-4">${f.instanceName}</span> ${f.name} `,
-          value: {
-            farmId: f.instanceName,
-            farmName: f.instanceName,
-            url: f.instanceName,
-            name: f.name.trim(),
-            assetId: f.id,
-            archived: f.archived !== null,
-            location: f.location.map((loc) => ({
+        this.assets = response.data.assets.map((f) => {
+          let location = [];
+
+          if (f.location) {
+            location = f.location.map((loc) => ({
               id: loc.id,
               name: location.assets.find((l) => l.id === loc.id).name,
-            })),
-          },
-        }));
+            }));
+          }
+
+          return {
+            label: `<span class="blue-chip mr-4">${f.instanceName}</span> ${f.name} `,
+            value: {
+              farmId: f.instanceName,
+              farmName: f.instanceName,
+              url: f.instanceName,
+              name: f.name.trim(),
+              assetId: f.id,
+              archived: f.archived !== null,
+              location,
+            },
+          };
+        });
       } catch (e) {
         console.log('something went wrong:', e);
         // TODO show error
