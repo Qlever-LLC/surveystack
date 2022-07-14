@@ -1,13 +1,13 @@
 <template>
-  <FarmOSGroupSettings
-    v-if="farmosEnabled"
-    class="ma-16"
-    @addGrpCoffeeShop="addGroupCoffeeShop"
-    @allowSbGrpsJoinCoffeeShop="allowSubGroupsJoinCoffeeShop"
-    @allowSbGrpsAdminsCreateFarmOSFarmsInSS="allowSubGroupsAdminsCreateFarmOSFarmsInSS"
-    :groupInfos="groupInfos"
-  >
-  </FarmOSGroupSettings>
+  <div v-if="farmosEnabled">
+    <FarmOSConnectDialog v-model="showConnectDialog" :farmInstances="farmInstances" :allowCreate="false" />
+    <FarmOSGroupSettings class="ma-16" @addGrpCoffeeShop="addGroupCoffeeShop"
+      @allowSbGrpsJoinCoffeeShop="allowSubGroupsJoinCoffeeShop"
+      @allowSbGrpsAdminsCreateFarmOSFarmsInSS="allowSubGroupsAdminsCreateFarmOSFarmsInSS" @connect="connect"
+      :groupInfos="groupInfos">
+    </FarmOSGroupSettings>
+  </div>
+
   <v-container v-else>
     <v-row v-if="loading">
       <v-col>
@@ -32,6 +32,7 @@
 <script>
 import api from '@/services/api.service';
 import FarmOSGroupSettings from './../../components/integrations/FarmOSGroupSettings.vue';
+import FarmOSConnectDialog from './../../components/integrations/FarmOSConnectDialog.vue'
 import _ from 'lodash';
 
 export default {
@@ -40,11 +41,12 @@ export default {
   },
   components: {
     FarmOSGroupSettings,
+    FarmOSConnectDialog
   },
   computed: {
     superAdmin() {
       return this.$store.getters['auth/isSuperAdmin'];
-    },
+    }
   },
   data() {
     return {
@@ -53,6 +55,9 @@ export default {
       farmosEnabled: false,
       loading: true,
       message: '',
+      showConnectDialog: false,
+      selectedUser: null,
+      farmInstances: [],
     };
   },
   async created() {
@@ -121,11 +126,21 @@ export default {
     */
   },
   methods: {
-    updateGroupConfig() {},
-    unifomMembersInGroupInfos() {},
-    addGroupCoffeeShop() {},
-    allowSubGroupsJoinCoffeeShop() {},
-    allowSubGroupsAdminsCreateFarmOSFarmsInSS() {},
+    updateGroupConfig() { },
+    unifomMembersInGroupInfos() { },
+    addGroupCoffeeShop() { },
+    allowSubGroupsJoinCoffeeShop() { },
+    allowSubGroupsAdminsCreateFarmOSFarmsInSS() { },
+    connect(user) {
+      this.selectedUser = user
+      this.showConnectDialog = true
+
+      this.farmInstances = _.uniq([...this.groupInfos.members.flatMap(m => {
+        return m.connectedFarms.filter(f => f.owner == true).flatMap(f => f.instanceName)
+      }), ... this.groupInfos.unassignedInstances.flatMap(f => f.instanceName)]).filter(f => !user.connectedFarms.some(c => c.instanceName == f));
+
+      console.log("user", user)
+    },
     async enable() {
       const res = await api.post('/farmos/group-manage/enable', { groupId: this.groupId, enable: true });
       console.log('res', res.data);

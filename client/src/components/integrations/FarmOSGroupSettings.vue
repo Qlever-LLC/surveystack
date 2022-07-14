@@ -1,5 +1,6 @@
 <template>
   <div>
+
     <div class="d-flex justify-space-between">
       <div>
         <h1>{{ groupInfos.name }}</h1>
@@ -7,32 +8,18 @@
         <div class="pa-3">
           <p class="font-weight-bold">Settings</p>
           <v-container class="pa-0" fluid>
-            <v-checkbox
-              disabled
-              class="ma-0 pa-0"
-              hide-details
-              :ripple="false"
+            <v-checkbox disabled class="ma-0 pa-0" hide-details :ripple="false"
               v-model="groupInfos.groupHasCoffeeShopAccess"
               @input="$emit('addGrpCoffeeShop', $event.target.value, groupInfos.groupId)"
-              label="Add this group to the Coffee Shop"
-            ></v-checkbox>
-            <v-checkbox
-              disabled
-              class="ma-0 pa-0"
-              hide-details
-              :ripple="false"
+              label="Add this group to the Coffee Shop"></v-checkbox>
+            <v-checkbox disabled class="ma-0 pa-0" hide-details :ripple="false"
               v-model="groupInfos.allowSubgroupsToJoinCoffeeShop"
               @input="$emit('allowSbGrpsJoinCoffeeShop', $event.target.value)"
-              :label="`Allow subgroups to join the Coffee Shop`"
-            ></v-checkbox>
-            <v-checkbox
-              disabled
-              class="ma-0 pa-0"
-              :ripple="false"
+              :label="`Allow subgroups to join the Coffee Shop`"></v-checkbox>
+            <v-checkbox disabled class="ma-0 pa-0" :ripple="false"
               v-model="groupInfos.allowSubgroupAdminsToCreateFarmOSInstances"
               @input="$emit('allowSbGrpsAdminsCreateFarmOSFarmsInSS', $event.target.value)"
-              label="Allow subgroups admins to create FarmOS Farms through Survey Stack"
-            >
+              label="Allow subgroups admins to create FarmOS Farms through Survey Stack">
             </v-checkbox>
           </v-container>
         </div>
@@ -54,15 +41,8 @@
         </div>
       </div>
     </div>
-    <v-data-table
-      :headers="headers"
-      :items="filteredMembers"
-      item-key="name"
-      class="elevation-1"
-      hide-default-footer
-      hide-default-header
-      disable-pagination
-    >
+    <v-data-table :headers="headers" :items="filteredMembers" item-key="name" class="elevation-1" hide-default-footer
+      hide-default-header disable-pagination>
       <template v-slot:header="{ props: { headers } }">
         <thead>
           <tr>
@@ -72,17 +52,8 @@
           </tr>
           <tr>
             <th v-for="(aHS, i) in arrHeaderSearch" :key="i">
-              <v-text-field
-                v-model="arrHeaderSearch[i]"
-                label="Search"
-                placeholder="Search"
-                solo
-                dense
-                single-line
-                append-icon="mdi-magnify"
-                hide-details
-                class="mb-2"
-              ></v-text-field>
+              <v-text-field v-model="arrHeaderSearch[i]" label="Search" placeholder="Search" solo dense single-line
+                append-icon="mdi-magnify" hide-details class="mb-2"></v-text-field>
             </th>
           </tr>
         </thead>
@@ -95,15 +66,14 @@
               <span class="d-flex align-center">
                 <div class="d-flex flex-column">
                   <span v-if="item.name">
-                    <span v-if="item.admin" class="mdi mdi-crown pr-1"></span> {{ item.name }} ({{ item.email }})</span
-                  >
+                    <span v-if="item.admin" class="mdi mdi-crown pr-1"></span> {{ item.name }} ({{ item.email }})</span>
                   <div class="d-flex flex-column font-weight-light">
                     <div v-for="(g, gidx) in item.groups" :key="`${item.user}-grp-${gidx}`">{{ g.breadcrumb }}</div>
                   </div>
                 </div>
               </span>
               <span v-if="item.name">
-                <v-btn text color="green" x-small>+ connect</v-btn>
+                <v-btn text color="green" x-small @click="$emit('connect', item)">+ connect</v-btn>
               </span>
             </div>
           </td>
@@ -127,23 +97,15 @@
                   {{ grp.breadcrumb || grp.name }}
                   <br />
                 </span>
-                <span
-                  v-if="iidx === 2 && !developMbships[index].value"
-                  @click="toggleDevelopMbships(index)"
-                  class="nOthers"
-                >
+                <span v-if="iidx === 2 && !developMbships[index].value" @click="toggleDevelopMbships(index)"
+                  class="nOthers">
                   (+{{ connectedFarm.groups.length - 2 }} others)
                 </span>
-                <span
-                  v-if="
-                    developMbships[index].value &&
-                    iidx === connectedFarm.groups.length - 1 &&
-                    connectedFarm.groups.length - 1 > 2
-                  "
-                  @click="toggleDevelopMbships(index)"
-                  class="nOthers"
-                  >reduce</span
-                >
+                <span v-if="
+                  developMbships[index].value &&
+                  iidx === connectedFarm.groups.length - 1 &&
+                  connectedFarm.groups.length - 1 > 2
+                " @click="toggleDevelopMbships(index)" class="nOthers">reduce</span>
               </span>
             </div>
           </td>
@@ -154,15 +116,14 @@
               <span class="d-flex align-center">
                 <div class="d-flex flex-column">
                   <span v-if="item.name">
-                    <span v-if="item.admin" class="mdi mdi-crown pr-1"></span> {{ item.name }} ({{ item.email }})</span
-                  >
+                    <span v-if="item.admin" class="mdi mdi-crown pr-1"></span> {{ item.name }} ({{ item.email }})</span>
                   <div class="d-flex flex-column font-weight-light">
                     <div v-for="(g, gidx) in item.groups" :key="`${item.user}-grp-${gidx}`">{{ g.breadcrumb }}</div>
                   </div>
                 </div>
               </span>
               <span v-if="item.name">
-                <v-btn text color="green" x-small>+ connect</v-btn>
+                <v-btn text color="green" x-small @click="$emit('connect', item)">+ connect</v-btn>
               </span>
             </div>
           </td>
@@ -184,11 +145,10 @@ export default {
       required: true,
     },
   },
-  emits: ['addGrpCoffeeShop', 'allowSbGrpsJoinCoffeeShop', 'allowSbGrpsAdminsCreateFarmOSFarmsInSS'],
+  emits: ['addGrpCoffeeShop', 'allowSbGrpsJoinCoffeeShop', 'allowSbGrpsAdminsCreateFarmOSFarmsInSS', 'connect'],
   setup(props) {
     // part Search input field
     const arrHeaderSearch = ref(['', '', '']);
-
     let headers = computed(() => {
       return [
         {
@@ -310,11 +270,11 @@ export default {
   overflow: unset;
 }
 
-.v-data-table__wrapper > table > tbody > tr:hover {
+.v-data-table__wrapper>table>tbody>tr:hover {
   background: inherit !important;
 }
 
-.v-data-table >>> div > table {
+.v-data-table>>>div>table {
   width: 100%;
   border-spacing: 4px !important;
 }
