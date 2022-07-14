@@ -78,10 +78,10 @@ const base = (type) => ({
 
         console.log('res', response.data);
         this.assets = response.data.assets.map((f) => {
-          let location = [];
+          let loc = [];
 
           if (f.location) {
-            location = f.location.map((loc) => ({
+            loc = f.location.map((loc) => ({
               id: loc.id,
               name: location.assets.find((l) => l.id === loc.id).name,
             }));
@@ -96,7 +96,7 @@ const base = (type) => ({
               name: f.name.trim(),
               assetId: f.id,
               archived: f.archived !== null,
-              location,
+              location: loc,
             },
           };
         });
