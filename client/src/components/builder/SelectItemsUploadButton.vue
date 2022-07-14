@@ -51,9 +51,6 @@ export default {
         files: [file],
       },
     }) {
-      console.log('handle file change');
-      console.log(file);
-      console.log(this.columns);
       try {
         const data = parse(await file.text(), {
           header: true,
