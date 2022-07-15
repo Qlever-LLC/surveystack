@@ -34,6 +34,7 @@
           :version-name-local-revision="controlsLocalRevision ? 'Your Version' : null"
           :version-name-remote-revision-old="versionNameRemoteRevisionOld"
           :version-name-remote-revision-new="versionNameRemoteRevisionNew"
+          @diff-info-changed="diffInfoChanged"
         />
       </v-expansion-panel-content>
     </v-expansion-panel>
@@ -221,6 +222,16 @@ export default {
           return null;
         })
         .filter((c) => c !== null);
+    },
+    diffInfoChanged(diffInfoTree) {
+      const iterateAll = (diffInfoTree) => {
+        return diffInfoTree.map((changeItem) => {
+          const children = iterateAll(changeItem.children);
+          console.log(changeItem.discardLocalChange ? changeItem.name + ' discarded' : changeItem.name + ' keep');
+          return null;
+        });
+      };
+      iterateAll(diffInfoTree);
     },
   },
 };

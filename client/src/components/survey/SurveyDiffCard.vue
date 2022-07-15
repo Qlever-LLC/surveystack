@@ -35,12 +35,13 @@
                 <v-checkbox
                   v-if="diffInfo.hasLocalChange"
                   v-model="diffInfo.discardLocalChange"
+                  @change="$emit('diff-info-changed', diffInfo)"
                   :disabled="diffInfo.hasBreakingChange"
                   dense
                   hide-details
                   class="pa-0"
                   style="margin-left: 5px; margin-right: -6px; margin-top: -3px"
-                ></v-checkbox>
+                />
                 <span v-if="diffInfo.hasLocalChange" class="primary--text">discard</span>
               </v-row>
             </th>
@@ -96,6 +97,7 @@ export default {
       required: false,
     },
   },
+  emits: ['diff-info-changed'],
   computed: {
     haveChangeDetails() {
       return this.diffInfo.changeType === changeType.CHANGED || this.diffInfo.hasBreakingChange;
