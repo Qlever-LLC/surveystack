@@ -2,13 +2,11 @@
   <v-card min-height="70vh" class="d-flex flex-column">
     <v-card-title class="d-block">
       <div class="d-flex justify-space-between align-center">
-        <div class="grey--text text--darken-2">
-          Ontology List Editor
-        </div>
+        <div class="grey--text text--darken-2">Ontology List Editor</div>
         <div class="d-flex align-center ml-auto mr-2">
           <v-btn
             color="primary"
-            style="margin-top: 2px;"
+            style="margin-top: 2px"
             @click="
               editedItem = createEmptyItem();
               editItemDialogIsVisible = true;
@@ -22,11 +20,12 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
-                <select-items-upload-button @change="handleFileChange" class="mt-4 mb-n2" :disabled="disabled" />
+                <select-items-upload-button @change="uploadCSV" class="mt-4 mr-2 mb-n2" :disabled="disabled" />
               </div>
             </template>
             CSV must have column headers 'label', 'value', and optionally 'tags'
           </v-tooltip>
+          <select-items-download-button :resourceName="resource.name" :items="resource.content" class="mt-1" />
           <v-dialog v-model="deleteDialogIsVisible" max-width="290">
             <template v-slot:activator="{ on }">
               <v-btn icon v-on="on" class="ml-2" :disabled="disabled">
@@ -139,6 +138,7 @@
 import { uniqWith, isEqual } from 'lodash';
 import ObjectId from 'bson-objectid';
 import SelectItemsUploadButton from '@/components/builder/SelectItemsUploadButton.vue';
+import SelectItemsDownloadButton from '@/components/builder/SelectItemsDownloadButton';
 
 export default {
   props: {
@@ -159,6 +159,7 @@ export default {
     },
   },
   components: {
+    SelectItemsDownloadButton,
     SelectItemsUploadButton,
   },
   data() {
@@ -322,7 +323,7 @@ export default {
         name,
       });
     },
-    handleFileChange(data) {
+    uploadCSV(data) {
       this.appendItems(data);
     },
     deleteItem(item) {

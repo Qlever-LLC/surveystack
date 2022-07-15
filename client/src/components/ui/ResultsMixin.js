@@ -53,9 +53,10 @@ export default {
         });
       }
 
-      const getLogsOf = key => get(response, `data.${key}`, [])
-      .map((h) => h.logs)
-      .flat()
+      const getLogsOf = (key) =>
+        get(response, `data.${key}`, [])
+          .map((h) => h.logs || [])
+          .flat();
 
       if (!hasErrors) {
         this.resultItems.push({
