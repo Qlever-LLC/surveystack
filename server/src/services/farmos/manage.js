@@ -690,7 +690,7 @@ export const getMemberInformationForDomain = async (descendants) => {
     .toArray();
 
 
-  // console.log(JSON.stringify(res, null, 2));
+  console.log(JSON.stringify(res, null, 2));
 
   const groupIds = _.uniq(res.flatMap(item => item["group_mappings"].map(gm => gm.groupId)));
   // console.log("groupIds", groupIds);
@@ -700,7 +700,7 @@ export const getMemberInformationForDomain = async (descendants) => {
   }).toArray();
 
   // console.log("present groups", JSON.stringify(groups, null, 2));
-
+  console.log("descendants", descendantsIds);
   // console.log("res", res);
   const prj = res.filter(r => r.user !== null && r.user.length != 0).map(item => {
     return {
@@ -710,7 +710,16 @@ export const getMemberInformationForDomain = async (descendants) => {
       path: item.path,
       email: item.email,
       name: item.user.length > 0 ? item.user[0].name : "",
-      connectedFarms: item.farmos_instances.map(ins => ({
+      connectedFarms: item.farmos_instances.filter(ins => {
+        const groupIds = item.group_mappings.filter(g => g.instanceName == ins.instanceName).map(g => g.groupId);
+
+        console.log("groupIds", groupIds);
+
+        if (groupIds.some(id => descendantsIds.map(iid => iid + "").includes(id + ""))) {
+          return true
+        }
+        return false;
+      }).map(ins => ({
         instanceName: ins.instanceName,
         owner: ins.owner,
         _id: ins._id,
