@@ -874,7 +874,76 @@ export const mapUser = async (req, res) => {
 };
 
 export const unmapUser = async (req, res) => {
+  let schema = Joi.objectId().required();
+  const { groupId } = req.params;
+  const { userId, instanceName } = req.body;
 
+  console.log("req body", req.body);
+
+  let validres = schema.validate(groupId);
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
+
+  schema = Joi.object({
+    userId: Joi.objectId().required(),
+    instanceName: Joi.string().required()
+  })
+
+  validres = schema.validate({
+    userId,
+    instanceName
+  });
+
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
+  const userRes = await db.collection("users").findOne({ _id: new ObjectId(userId) });
+  if (!userRes) {
+    throw boom.notFound(`user with id: ${userId} not found`);
+  }
+
+
+  const memberships = await db.collection("memberships").find({
+    group: new ObjectId(groupId),
+    user: userRes._id,
+  }).toArray();
+
+  if (memberships.length <= 0) {
+    throw boom.badData(`user not member of group: user, group: ${userId}, ${groupId}`)
+  }
+
+
+  const admins = await db.collection("memberships").find({
+    group: new ObjectId(groupId),
+    role: "admin"
+  }).toArray();
+
+
+  // instance mapped to group?
+
+  const mappedInstance = await db.collection("farmos-group-mapping").find({
+    instanceName,
+    groupId: new ObjectId(groupId),
+  }).toArray();
+
+  if (mappedInstance.length == 0) {
+    throw boom.badData(`instance not mapped to group ${instanceName}, ${groupId}`);
+  }
+
+  await db.collection("farmos-group-mapping").deleteMany({
+    _id: {
+      $in: mappedInstance.map(mi => mi._id),
+    }
+  });
+
+  return res.send({
+    status: "ok",
+  })
 };
 
 export const testConnection = async (req, res) => {

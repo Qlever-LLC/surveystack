@@ -5,7 +5,7 @@
     <FarmOSGroupSettings class="ma-16" @addGrpCoffeeShop="addGroupCoffeeShop"
       @allowSbGrpsJoinCoffeeShop="allowSubGroupsJoinCoffeeShop"
       @allowSbGrpsAdminsCreateFarmOSFarmsInSS="allowSubGroupsAdminsCreateFarmOSFarmsInSS" @connect="connect"
-      :groupInfos="groupInfos">
+      @disconnect="disconnectFarm" :groupInfos="groupInfos">
     </FarmOSGroupSettings>
   </div>
 
@@ -185,6 +185,23 @@ export default {
         } catch (error) {
           console.log('error', error);
         }
+      }
+
+      await this.init();
+    },
+    async disconnectFarm(userId, instanceName) {
+      console.log("disconnecting", userId, instanceName);
+
+      this.loading = true;
+
+      try {
+        const res = await api.post(`/farmos/group-manage/${this.groupId}/unmapUser`, {
+          userId,
+          instanceName,
+        });
+        console.log("res", res);
+      } catch (error) {
+        console.log('error', error);
       }
 
       await this.init();
