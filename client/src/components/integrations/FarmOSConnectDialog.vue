@@ -18,7 +18,7 @@
                 <v-card-text>
                     Add a new farm to the member's profile.
                     <br />
-                    <v-btn block class="mt-4" color="primary">Create Farm</v-btn>
+                    <v-btn disabled block class="mt-4" color="primary">Create Farm</v-btn>
                 </v-card-text>
             </template>
 
