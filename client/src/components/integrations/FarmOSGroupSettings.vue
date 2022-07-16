@@ -60,7 +60,8 @@
       </template>
 
       <template v-slot:item="{ item, index }">
-        <tr v-for="(connectedFarm, idx) in item.connectedFarms" :key="`${item.user}-instance-${idx}`">
+        <tr v-for="(connectedFarm, idx) in item.connectedFarms.filter(f => !f.skip)"
+          :key="`${item.user}-instance-${idx}`">
           <td class="pa-4" :class="{ box: idx == 0 }">
             <div v-if="idx == 0" class="d-flex align-center justify-space-between">
               <span class="d-flex align-center">

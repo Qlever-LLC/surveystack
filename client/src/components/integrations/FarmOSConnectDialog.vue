@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="show" max-width="400" max-height="1000">
+    <v-dialog v-model="show" max-width="400" max-height="1000" @input="v => v || (selectedFarms = [])">
         <v-card class="pa-4">
             <v-card-title class="headline"> Connect Existing Farm </v-card-title>
             <v-card-text>

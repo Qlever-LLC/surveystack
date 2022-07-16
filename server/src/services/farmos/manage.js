@@ -710,25 +710,26 @@ export const getMemberInformationForDomain = async (descendants) => {
       path: item.path,
       email: item.email,
       name: item.user.length > 0 ? item.user[0].name : "",
-      connectedFarms: item.farmos_instances.filter(ins => {
+      connectedFarms: item.farmos_instances.map(ins => {
         const groupIds = item.group_mappings.filter(g => g.instanceName == ins.instanceName).map(g => g.groupId);
-
-        console.log("groupIds", groupIds);
+        let skip = true;
 
         if (groupIds.some(id => descendantsIds.map(iid => iid + "").includes(id + ""))) {
-          return true
+          skip = false;
         }
-        return false;
-      }).map(ins => ({
-        instanceName: ins.instanceName,
-        owner: ins.owner,
-        _id: ins._id,
-        groups: item.group_mappings.filter(g => g.instanceName == ins.instanceName).map(g => ({
-          groupId: g.groupId,
-          name: groups.find(group => group._id.equals(g.groupId))?.name,
-          path: groups.find(group => group._id.equals(g.groupId))?.path
-        })),
-      }))
+
+        return {
+          instanceName: ins.instanceName,
+          owner: ins.owner,
+          _id: ins._id,
+          skip,
+          groups: item.group_mappings.filter(g => g.instanceName == ins.instanceName).map(g => ({
+            groupId: g.groupId,
+            name: groups.find(group => group._id.equals(g.groupId))?.name,
+            path: groups.find(group => group._id.equals(g.groupId))?.path
+          })),
+        }
+      })
     }
   });
 

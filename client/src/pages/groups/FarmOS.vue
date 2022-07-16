@@ -142,9 +142,14 @@ export default {
       this.selectedUser = user
       this.showConnectDialog = true
 
-      this.farmInstances = _.uniq([...this.groupInfos.members.flatMap(m => {
-        return m.connectedFarms.filter(f => f.owner == true).flatMap(f => f.instanceName)
-      }), ... this.groupInfos.unassignedInstances.flatMap(f => f.instanceName)]).filter(f => !user.connectedFarms.some(c => c.instanceName == f));
+      if (user.admin) {
+        this.farmInstances = _.uniq([...this.groupInfos.members.flatMap(m => {
+          return m.connectedFarms.filter(f => f.owner == true).flatMap(f => f.instanceName)
+        }), ... this.groupInfos.unassignedInstances.flatMap(f => f.instanceName)]).filter(f => !user.connectedFarms.some(c => c.instanceName == f && !c.skip));
+      } else {
+        this.farmInstances = _.uniq([...user.connectedFarms.filter(f => f.owner == true).flatMap(f => f.instanceName), ... this.groupInfos.unassignedInstances.flatMap(f => f.instanceName)]).filter(f => !user.connectedFarms.some(c => c.instanceName == f && !c.skip));
+      }
+
 
       console.log("user", user)
     },
