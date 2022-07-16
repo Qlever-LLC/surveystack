@@ -304,6 +304,12 @@ router.post(
 );
 
 router.post(
+  '/farmos/group-manage/:groupId/unmapUser',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.unmapUser)
+);
+
+router.post(
   '/farmos/coffee-shop-access',
   [assertHasGroupAdminAccess],
   catchErrors(farmosController.groupAdminMinimumUpdateCoffeeShopAccess)

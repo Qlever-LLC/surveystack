@@ -111,7 +111,7 @@
             </div>
           </td>
         </tr>
-        <tr v-if="item.connectedFarms.length == 0">
+        <tr v-if="item.connectedFarms.filter(f => !f.skip).length == 0">
           <td class="box pa-4">
             <div class="d-flex align-center justify-space-between">
               <span class="d-flex align-center">

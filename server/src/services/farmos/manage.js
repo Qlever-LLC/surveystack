@@ -690,7 +690,7 @@ export const getMemberInformationForDomain = async (descendants) => {
     .toArray();
 
 
-  console.log(JSON.stringify(res, null, 2));
+  // console.log(JSON.stringify(res, null, 2));
 
   const groupIds = _.uniq(res.flatMap(item => item["group_mappings"].map(gm => gm.groupId)));
   // console.log("groupIds", groupIds);
@@ -700,7 +700,7 @@ export const getMemberInformationForDomain = async (descendants) => {
   }).toArray();
 
   // console.log("present groups", JSON.stringify(groups, null, 2));
-  console.log("descendants", descendantsIds);
+  // console.log("descendants", descendantsIds);
   // console.log("res", res);
   const prj = res.filter(r => r.user !== null && r.user.length != 0).map(item => {
     return {

@@ -70,49 +70,7 @@ export default {
   async created() {
     // setup function
     // fetch group settings
-    const { id: groupId } = this.$route.params;
-    this.groupId = groupId;
-
-    //TODO create route in API
-    const addGroupCoffeeShop = async (booleanValue, groupId) => {
-      // update via api
-      const res = await api.post('/farmos/coffee-shop-access', { groupId: groupId, updateTo: booleanValue });
-    };
-    //TODO create route in API
-    const allowSubGroupsJoinCoffeeShop = async (booleanValue) => {
-      // update via api
-      const res = await api.post('/farmos/subgrp-join-coffee-shop', { groupId: groupId, updateTo: booleanValue });
-    };
-    //TODO create route in API
-    const allowSubGroupsAdminsCreateFarmOSFarmsInSS = async (booleanValue) => {
-      // update via api
-      const rest = await api.post('/farmos/subgrp-admins-create-farmos-instances', {
-        groupId: groupId,
-        updateTo: booleanValue,
-      });
-    };
-
-    try {
-      const { data: res } = await api.get(`/farmos/group-manage/${groupId}/domain`);
-      console.log('res', res.data);
-      if (res.domain) {
-        if (res.isDomainRootInDescendants) {
-          this.message = `At least one subgroup has the FarmOS integration enabled: ${res.domain.name}`;
-        } else {
-          const { data: groupInfos } = await api.get(`/farmos/group-manage/${groupId}`);
-          console.log('group settings', groupInfos);
-          groupInfos.response.members = _.sortBy(groupInfos.response.members, (m) => -m.connectedFarms.length);
-          this.groupInfos = groupInfos.response;
-          this.farmosEnabled = true;
-        }
-      } else {
-        this.message = 'Please contact Surveystack to enable FarmOS integration for your Group';
-      }
-      this.loading = false;
-    } catch (error) {
-      this.message = error.message;
-      this.loading = false;
-    }
+    await this.init();
 
     /*
     this.groupInfos.value.members.forEach((el) => {
@@ -138,6 +96,51 @@ export default {
     addGroupCoffeeShop() { },
     allowSubGroupsJoinCoffeeShop() { },
     allowSubGroupsAdminsCreateFarmOSFarmsInSS() { },
+    async init() {
+      const { id: groupId } = this.$route.params;
+      this.groupId = groupId;
+
+      //TODO create route in API
+      const addGroupCoffeeShop = async (booleanValue, groupId) => {
+        // update via api
+        const res = await api.post('/farmos/coffee-shop-access', { groupId: groupId, updateTo: booleanValue });
+      };
+      //TODO create route in API
+      const allowSubGroupsJoinCoffeeShop = async (booleanValue) => {
+        // update via api
+        const res = await api.post('/farmos/subgrp-join-coffee-shop', { groupId: groupId, updateTo: booleanValue });
+      };
+      //TODO create route in API
+      const allowSubGroupsAdminsCreateFarmOSFarmsInSS = async (booleanValue) => {
+        // update via api
+        const rest = await api.post('/farmos/subgrp-admins-create-farmos-instances', {
+          groupId: groupId,
+          updateTo: booleanValue,
+        });
+      };
+
+      try {
+        const { data: res } = await api.get(`/farmos/group-manage/${groupId}/domain`);
+        console.log('res', res);
+        if (res.domain) {
+          if (res.isDomainRootInDescendants) {
+            this.message = `At least one subgroup has the FarmOS integration enabled: ${res.domain.name}`;
+          } else {
+            const { data: groupInfos } = await api.get(`/farmos/group-manage/${groupId}`);
+            console.log('group settings', groupInfos);
+            groupInfos.response.members = _.sortBy(groupInfos.response.members, (m) => -m.connectedFarms.length);
+            this.groupInfos = groupInfos.response;
+            this.farmosEnabled = true;
+          }
+        } else {
+          this.message = 'Please contact Surveystack to enable FarmOS integration for your Group';
+        }
+        this.loading = false;
+      } catch (error) {
+        this.message = error.message;
+        this.loading = false;
+      }
+    },
     connect(user) {
       this.selectedUser = user
       this.showConnectDialog = true
@@ -166,6 +169,25 @@ export default {
     },
     async connectFarms(farms) {
       console.log("connecting farms", farms, this.selectedUser);
+
+      this.loading = true;
+      this.showConnectDialog = false;
+
+
+      for (const farm of farms) {
+        console.log("farm", farm, farms);
+        try {
+          const res = await api.post(`/farmos/group-manage/${this.groupId}/mapUser`, {
+            userId: this.selectedUser.user,
+            instanceName: farm,
+          });
+          console.log("res", res);
+        } catch (error) {
+          console.log('error', error);
+        }
+      }
+
+      await this.init();
     }
   },
 };

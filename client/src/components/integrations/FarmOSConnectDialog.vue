@@ -8,8 +8,8 @@
                 <br />
                 <v-autocomplete label="Select Farms" multiple chips deletable-chips :items="farmInstances" class="mt-4"
                     v-model="selectedFarms" />
-                <v-btn block @click="$emit('connect', selectedFarms)" :disabled="selectedFarms.length <= 0"
-                    color="primary">Connect selected Farms</v-btn>
+                <v-btn block @click="connect" :disabled="selectedFarms.length <= 0" color="primary">Connect selected
+                    Farms</v-btn>
             </v-card-text>
 
             <template v-if="allowCreate">
@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { ref, computed } from '@vue/composition-api';
+import { ref, computed, emits } from '@vue/composition-api';
 
 export default {
     emits: ['connect', 'addExisting', 'create'],
@@ -45,13 +45,18 @@ export default {
             required: true,
         },
     },
-    setup(props) {
+    setup(props, { emit }) {
         const selectedFarms = ref([]);
+
+        const connect = () => {
+            emit('connect', selectedFarms.value)
+        }
 
         console.log(props.farmInstances);
 
         return {
             selectedFarms,
+            connect
         };
     },
     computed: {
