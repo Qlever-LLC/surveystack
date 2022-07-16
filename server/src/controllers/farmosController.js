@@ -724,6 +724,94 @@ export const groupAdminMinimumUpdateCreateFarmOSInstances = async (req, res) => 
   });
 };
 
+
+export const mapUser = async (req, res) => {
+  let schema = Joi.objectId().required();
+  const { groupId } = req.params;
+  const { userId, instanceName } = req.body;
+
+  let validres = schema.validate(groupId);
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
+
+  schema = Joi.object({
+    userId: Joi.objectId().required(),
+    instanceName: Joi.string().required()
+  })
+
+  validres = schema.validate({
+    userId,
+    instanceName
+  });
+
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
+  const userRes = await db.collection("users").findOne({ _id: new ObjectId(userId) });
+  if (!userRes) {
+    throw boom.notFound(`user with id: ${userId} not found`);
+  }
+
+  const memberships = await db.collection("memberships").find({
+    group: new ObjectId(groupId),
+    user: userRes._id,
+  }).toArray();
+
+  if (memberships.length <= 0) {
+    throw boom.badData(`user not member of group: user, group: ${userId}, ${groupId}`)
+  }
+
+  const allUsersOfGroup = await db.collection("memberships").find({
+    group: new ObjectId(groupId),
+  }).toArray();
+
+  const userIds = allUsersOfGroup.map(u => u.user);
+
+  const instances = (await db.collection("farmos-instances").find({
+    userId: {
+      $in: userIds
+    },
+    owner: true,
+  }).toArray()).map(i => i.instanceName);
+
+
+  const groupInstances = (await db.collection("farmos-group-mapping").find({
+    instanceName,
+    groupId: new ObjectId(groupId)
+  }).toArray()).map(i => instanceName);
+
+
+  if (![...groupInstances, ...instances].includes(instanceName)) {
+    throw boom.badData(`instance cannot be mapped for group: ${groupId}, ${instanceName}`);
+  }
+
+  const instanceMapped = await db.collection("farmos-instances").find({
+    user: new ObjectId(userId),
+    instanceName
+  }).toArray();
+
+  if (instanceMapped.length > 0) {
+    throw boom.badData("instance already mapped to user");
+  }
+
+
+  await db.collection("farmos-instances").insert({
+    _id: new ObjectId(),
+    instanceName,
+    user: new ObjectId(userId),
+    owner: false,
+  });
+
+  return res.send({
+    status: "ok"
+  });
+};
+
 export const testConnection = async (req, res) => {
   /**
    * TODO migrate Testconnection

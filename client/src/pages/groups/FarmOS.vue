@@ -1,6 +1,7 @@
 <template>
   <div v-if="farmosEnabled">
-    <FarmOSConnectDialog v-model="showConnectDialog" :farmInstances="farmInstances" :allowCreate="false" />
+    <FarmOSConnectDialog v-model="showConnectDialog" :farmInstances="farmInstances" :allowCreate="allowCreate"
+      @connect="connectFarms" />
     <FarmOSGroupSettings class="ma-16" @addGrpCoffeeShop="addGroupCoffeeShop"
       @allowSbGrpsJoinCoffeeShop="allowSubGroupsJoinCoffeeShop"
       @allowSbGrpsAdminsCreateFarmOSFarmsInSS="allowSubGroupsAdminsCreateFarmOSFarmsInSS" @connect="connect"
@@ -46,6 +47,12 @@ export default {
   computed: {
     superAdmin() {
       return this.$store.getters['auth/isSuperAdmin'];
+    },
+    allowCreate() {
+      if (!this.groupInfos) {
+        return false;
+      }
+      return this.groupInfos.isDomainRoot || this.groupInfos.allowSubgroupAdminsToCreateFarmOSInstances
     }
   },
   data() {
@@ -152,6 +159,9 @@ export default {
         console.log('error', error.status);
       }
     },
+    async connectFarms(farms) {
+      console.log("connecting farms", farms, this.selectedUser);
+    }
   },
 };
 </script>

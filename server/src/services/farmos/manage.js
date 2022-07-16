@@ -771,30 +771,21 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
   }
 
   let groupSettings = {};
-  //setting part only if it's a RootGroup
-  if (testedGroupIsRoot) {
-    if (isSuperAdmin) {
-      groupSettings = await tree.domainInformation({
-        groupId: 1,
-        groupHasFarmOSAccess: 1,
-        groupHasCoffeeShopAccess: 1,
-        allowSubgroupsToJoinCoffeeShop: 1,
-        allowSubgroupAdminsToCreateFarmOSInstances: 1,
-        maxSeats: 1,
-        name: group.name
-      });
-    } else {
-      groupSettings = await tree.domainInformation({
-        groupId: 1,
-        allowSubgroupsToJoinCoffeeShop: 1,
-        allowSubgroupAdminsToCreateFarmOSInstances: 1,
-        maxSeats: 1,
-      });
-    }
-    const seats = { current: groupSettings.seats, max: groupSettings.maxSeats };
-    delete groupSettings.maxSeats;
-    groupSettings = { ...groupSettings, seats };
-  }
+
+  groupSettings = await tree.domainInformation({
+    groupId: 1,
+    groupHasFarmOSAccess: 1,
+    groupHasCoffeeShopAccess: 1,
+    allowSubgroupsToJoinCoffeeShop: 1,
+    allowSubgroupAdminsToCreateFarmOSInstances: 1,
+    maxSeats: 1,
+    name: group.name
+  });
+
+  const seats = { current: groupSettings.seats, max: groupSettings.maxSeats };
+  delete groupSettings.maxSeats;
+  groupSettings = { ...groupSettings, seats };
+
 
   const groupName = tree.breadcrumbsByPath[group.path];
   let groupInformation = { name: groupName };
@@ -859,8 +850,7 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
 
   }
 
-
-  groupInformation = { ...groupSettings, members, unassignedInstances: membersRawData.unassignedInstances };
+  groupInformation = { ...groupSettings, isDomainRoot: testedGroupIsRoot, members, unassignedInstances: membersRawData.unassignedInstances };
   return groupInformation;
 };
 

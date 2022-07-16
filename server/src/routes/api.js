@@ -296,6 +296,13 @@ router.get(
   catchErrors(farmosController.groupAdminMinimumGetGroupInformation)
 );
 
+
+router.post(
+  '/farmos/group-manage/:groupId/mapUser',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.mapUser)
+);
+
 router.post(
   '/farmos/coffee-shop-access',
   [assertHasGroupAdminAccess],
