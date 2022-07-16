@@ -85,7 +85,7 @@
                 <span>{{ connectedFarm.instanceName }}</span>
               </span>
               <span class="d-flex" style="flex-wrap: nowrap">
-                <v-btn text color="blue" x-small>access</v-btn>
+                <v-btn text color="blue" disabled x-small>access</v-btn>
                 <v-btn @click="$emit('disconnect', item.user, connectedFarm.instanceName)" text color="red" x-small>
                   remove</v-btn>
               </span>

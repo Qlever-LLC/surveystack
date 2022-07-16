@@ -886,7 +886,6 @@ export const unmapUser = async (req, res) => {
     throw boom.badData(`error: ${errors.join(',')}`);
   }
 
-
   schema = Joi.object({
     userId: Joi.objectId().required(),
     instanceName: Joi.string().required()
@@ -917,13 +916,6 @@ export const unmapUser = async (req, res) => {
     throw boom.badData(`user not member of group: user, group: ${userId}, ${groupId}`)
   }
 
-
-  const admins = await db.collection("memberships").find({
-    group: new ObjectId(groupId),
-    role: "admin"
-  }).toArray();
-
-
   // instance mapped to group?
 
   const mappedInstance = await db.collection("farmos-group-mapping").find({
@@ -941,9 +933,29 @@ export const unmapUser = async (req, res) => {
     }
   });
 
+
+  // if the target user is not owner of the farm, then also unlink
+
+  const usersUnownedFarms = await db.collection("farmos-instances").find({
+    userId: new ObjectId("userId"),
+    instanceName,
+    owner: false,
+  }).toArray();
+
+  if (usersUnownedFarms.length > 0) {
+    await db.collection("farmos-instances").deleteMany({
+      _id: {
+        $in: usersUnownedFarms.map(uo => uo._id)
+      }
+    });
+  }
+
+
+  // todo, what if there are multiple admins in the group that added the instance?
+
   return res.send({
     status: "ok",
-  })
+  });
 };
 
 export const testConnection = async (req, res) => {
