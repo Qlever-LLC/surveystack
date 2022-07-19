@@ -9,7 +9,7 @@ import boom from '@hapi/boom';
 
 import { gqlRequest } from '../services/hylo/utils';
 import { gql } from 'graphql-request';
-import { createHyloGroup, upsertHyloUser } from '../services/hylo.service';
+import { addMember, createHyloGroup, upsertHyloUser } from '../services/hylo.service';
 
 const validateOrThrow = (schema, _value) => {
   const { value, error } = schema.validate(_value);
@@ -33,6 +33,7 @@ export const GROUP_FIELDS = gql`
     members {
       items {
         id
+        name
         avatarUrl
         bannerUrl
         hasRegistered
@@ -72,7 +73,43 @@ export const getIntegratedHyloGroup = async (req, res) => {
   if (!mapping) {
     return res.json(null);
   }
+
+  const ssMemberships = await db
+    .collection('memberships')
+    .aggregate([
+      {
+        $match: { group: new ObjectId(groupId) },
+      },
+      { $lookup: { from: 'users', localField: 'user', foreignField: '_id', as: 'user' } },
+      { $unwind: '$user' },
+      { $project: { _id: 1, 'user.email': 1, 'user._id': 1 } },
+    ])
+    .toArray();
+
+  console.log('ssMemberships', JSON.stringify(ssMemberships, null, 2));
+  const queryHyloMembers = gql`
+    query SurveyStackMembers {
+      ${ssMemberships
+        .map(
+          ({ user }, i) => `member${i}: person(email:"${user?.email}") {
+        id
+      }`
+        )
+        .join('\n')}
+    }
+  `;
+  console.log({ queryHyloMembers });
+  const hyloMembers = await gqlRequest(queryHyloMembers);
+  console.log({ hyloMembers });
   const hyloGroup = await loadHyloGroup(mapping.hyloGroupId);
+  ssMemberships.forEach((ssMembership, i) => {
+    const hyloMember = hyloMembers[`member${i}`];
+    const hyloMemberInGroup =
+      hyloMember && (hyloGroup?.members?.items || []).find((m) => m.id === hyloMember.id);
+    if (hyloMemberInGroup) {
+      hyloMemberInGroup.surveyStackMembership = ssMembership;
+    }
+  });
   res.json(hyloGroup);
 };
 
@@ -110,6 +147,27 @@ export const createNewIntegratedHyloGroup = async (req, res) => {
     );
   const detailedHyloGroup = await loadHyloGroup(hyloGroup.id);
   res.json(detailedHyloGroup);
+};
+
+export const inviteMemberToHyloGroup = async (req, res) => {
+  const schema = Joi.object({
+    membershipId: Joi.string().required(),
+  });
+
+  const { membershipId } = validateOrThrow(schema, req.body);
+
+  const membership = await db
+    .collection('memberships')
+    .findOne({ _id: new ObjectId(membershipId) });
+  if (!membership) {
+    throw boom.notFound(`Can't find membership with the ID "${membershipId}`);
+  }
+
+  // TODO asser group admin
+
+  // TODO await upsertHyloUser({ name: user.name, email: user.email });
+
+  // TODO addMember
 };
 
 export const setIntegratedHyloGroup = async (req, res) => {
@@ -156,6 +214,7 @@ export const QUERY_GROUP_BY_SLUG = gql`
     }
   }
 `;
+
 export const getGroupBySlug = async (req, res) => {
   const schema = Joi.object({
     slug: Joi.string().required(),

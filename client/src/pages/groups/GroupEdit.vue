@@ -134,7 +134,7 @@
     <v-row>
       <v-col cols="12" lg="6">
         <app-basic-list
-          :loading="isLoadingMembers"
+          :loading="isLoadingMembers || isLoadingHyloGroup"
           editable
           class="mb-4"
           v-if="editMode"
@@ -169,6 +169,11 @@
                   :email="entity.meta.invitationEmail"
                   @confirmed="loadMembers"
                 />
+                <app-member-hylo-status
+                  v-if="integratedHyloGroup"
+                  :membershipId="entity._id"
+                  :hyloGroup="integratedHyloGroup"
+                />
                 <v-icon v-if="entity.role === 'admin'">mdi-crown-outline</v-icon>
               </v-row>
             </v-list-item-action>
@@ -191,6 +196,7 @@ import appBasicList from '@/components/ui/BasicList.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipButton.vue';
+import appMemberHyloStatus from './MemberHyloStatus.vue';
 
 const appFarmHubOnboarding = () => import('@/components/integrations/FarmHubOnboarding.vue');
 
@@ -221,6 +227,7 @@ export default {
     appFarmHubOnboarding,
     appGroupBreadcrumbs,
     appConfirmMembershipButton,
+    appMemberHyloStatus,
   },
   data() {
     return {
@@ -242,10 +249,12 @@ export default {
       },
       searchResults: [],
       members: [],
+      integratedHyloGroup: null,
       learnMoreDialog: false,
       integrations,
       isLoadingMembers: false,
       isLoadingGroup: false,
+      isLoadingHyloGroup: false,
     };
   },
   methods: {
@@ -259,6 +268,16 @@ export default {
         this.$store.dispatch('feedback/add', get(e, 'response.data.message', String(e)));
       } finally {
         this.isLoadingMembers = false;
+      }
+    },
+    async loadHyloGroup() {
+      this.isLoadingHyloGroup = true;
+      try {
+        this.integratedHyloGroup = (await api.get(`/hylo/integrated-group/${this.entity._id}`)).data;
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.isLoadingHyloGroup = false;
       }
     },
     async onSubmit() {
@@ -377,7 +396,7 @@ export default {
         const { data } = await api.get(`/groups/${id}?populate=true`);
         this.entity = { ...this.entity, ...data };
 
-        await this.loadMembers();
+        await Promise.all([this.loadMembers(), this.loadHyloGroup()]);
 
         // const { data: integrations } = await api.get(`/group-integrations?group=${id}&populate=true`);
         // this.integrations = integrations;

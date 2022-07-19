@@ -72,7 +72,7 @@
                   v-model="hyloGroupInput"
                   label="Hylo group"
                   placeholder="Link to your Hylo group"
-                  :loading="!!isLoadingHyloGroup"
+                  :loading="isLoadingHyloGroup"
                   :error-messages="findError"
                   class="mb-2"
                 ></v-text-field>
@@ -129,7 +129,7 @@ export default {
     return {
       integratedHyloGroup: null,
       isLoading: true,
-      isLoadingHyloGroup: null,
+      isLoadingHyloGroup: false,
       isSetIntegratedInProgress: false,
       isRemoveGroupIntegrationInProgress: false,
       isCreateIntegratedHyloGroupInProgress: false,
@@ -141,12 +141,10 @@ export default {
   },
   computed: {
     extractedSlug() {
-      console.log('this.hyloGroupInput', this.hyloGroupInput);
       if (!this.hyloGroupInput) {
         return null;
       }
       const match = this.hyloGroupInput.match(/\/groups\/([^/]+)/);
-      console.log({ match });
       const slug = match ? match[1] : this.hyloGroupInput;
       return slug;
     },
@@ -160,11 +158,13 @@ export default {
       // TODO find out how this should be done in Vue
       async handler(groupId) {
         this.isLoading = true;
-        console.log('this.groupId', groupId);
-        this.integratedHyloGroup = (await api.get(`/hylo/integrated-group/${groupId}`)).data;
-        console.log(JSON.stringify(this.integratedHyloGroup, null, 2));
-        // TODO handle error
-        this.isLoading = false;
+        try {
+          this.integratedHyloGroup = (await api.get(`/hylo/integrated-group/${groupId}`)).data;
+        } catch (e) {
+          console.error(e);
+        } finally {
+          this.isLoading = false;
+        }
       },
     },
   },
@@ -217,29 +217,27 @@ export default {
       }
     },
     async throttledFindHyloGroup(slug) {
-      console.log('throttledFindHyloGroup', slug, this.isLoadingHyloGroup);
       if (this.isLoadingHyloGroup) {
         this._nextSlugToCheck = slug;
-        console.log('already loading, next is ', slug);
         return;
       }
-      console.log('check with', slug);
+
       if (slug) {
         try {
           this.findError = null;
           this.groupFound = null;
-          this.isLoadingHyloGroup = api.get(`/hylo/group?slug=${slug}`);
-          this.groupFound = (await this.isLoadingHyloGroup).data;
+          this.isLoadingHyloGroup = true;
+          this.groupFound = (await this.api.get(`/hylo/group?slug=${slug}`)).data;
           this.findError = this.groupFound ? null : `Can't find Hylo group with slug "${slug}"`;
         } catch (e) {
           console.warn(e);
         }
 
         this.isLoadingHyloGroup = null;
-        console.log('this._nextSlugToCheck', this._nextSlugToCheck);
         if (this._nextSlugToCheck) {
-          this.throttledFindHyloGroup(this._nextSlugToCheck);
+          const nextSlug = this._nextSlugToCheck;
           this._nextSlugToCheck = null;
+          this.throttledFindHyloGroup(nextSlug);
         }
       }
     },
