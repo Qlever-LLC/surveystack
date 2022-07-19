@@ -1,6 +1,6 @@
 <template>
-  <v-chip v-if="member" :color="`green lighten-4`" class="ml-0 mr-2 black--text" label small>Hylo</v-chip>
-  <v-btn v-else-if="hyloGroup" k="addToHylo" :loading="isAddingMember">add to Hylo</v-btn>
+  <v-btn v-if="member" @click="addToHylo" :loading="isAddingMember" small color="#00AD87">See on Hylo</v-btn>
+  <v-btn v-else-if="hyloGroup" @click="addToHylo" :loading="isAddingMember" small>Invite to Hylo</v-btn>
 </template>
 
 <script>

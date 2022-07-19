@@ -170,7 +170,7 @@
                   @confirmed="loadMembers"
                 />
                 <app-member-hylo-status
-                  v-if="integratedHyloGroup"
+                  v-if="entity.meta && entity.meta.status === 'active' && integratedHyloGroup"
                   :membershipId="entity._id"
                   :hyloGroup="integratedHyloGroup"
                 />
