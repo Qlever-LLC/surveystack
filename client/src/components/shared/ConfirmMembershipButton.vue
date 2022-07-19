@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="isVisible" width="300">
     <template v-slot:activator="{ on, attrs }">
-      <v-btn v-bind="attrs" v-on:click.prevent="on.click"> Confirm </v-btn>
+      <v-btn v-bind="attrs" v-on:click.prevent="on.click" small> Confirm </v-btn>
     </template>
 
     <v-card>
