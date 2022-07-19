@@ -171,8 +171,10 @@
                 />
                 <app-member-hylo-status
                   v-if="entity.meta && entity.meta.status === 'active' && integratedHyloGroup"
+                  :loading="isLoadingHyloGroup"
                   :membershipId="entity._id"
                   :hyloGroup="integratedHyloGroup"
+                  @updated="loadHyloGroup"
                 />
                 <v-icon v-if="entity.role === 'admin'">mdi-crown-outline</v-icon>
               </v-row>

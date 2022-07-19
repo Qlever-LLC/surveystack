@@ -108,6 +108,7 @@ export const getIntegratedHyloGroup = async (req, res) => {
       hyloMember && (hyloGroup?.members?.items || []).find((m) => m.id === hyloMember.id);
     if (hyloMemberInGroup) {
       hyloMemberInGroup.surveyStackMembership = ssMembership;
+      hyloMemberInGroup.hyloUrl = `${process.env.HYLO_API_URL}/groups/${hyloGroup?.slug}/members/${hyloMember.id}`;
     }
   });
   res.json(hyloGroup);
@@ -150,6 +151,8 @@ export const createNewIntegratedHyloGroup = async (req, res) => {
 };
 
 export const inviteMemberToHyloGroup = async (req, res) => {
+  await new Promise((r) => setTimeout(r, 2000));
+  return res.json({ ok: true });
   const schema = Joi.object({
     membershipId: Joi.string().required(),
   });
