@@ -14,7 +14,7 @@
     <v-autocomplete
       outlined
       primary
-      label="Select Instace from Aggregator"
+      label="Select Instance from Aggregator"
       v-model="selectedInstance"
       v-if="!loading && !!mappings"
       item-text="url"
@@ -107,7 +107,7 @@
                   outlined
                   primary
                   hint="Select User"
-                  label="Map User to Instace"
+                  label="Map User to Instance"
                   v-model="selectedUser"
                   v-if="!loading && !!groups"
                   :item-text="(item) => `${item.name} (${item.email})`"

@@ -325,7 +325,7 @@ export const updateInstancesForUser = async (req, res) => {
 /**
  * change ownership of an instance
  */
-export const changeOwnershipForInstace = async (req, res) => {
+export const changeOwnershipForInstance = async (req, res) => {
   return res.send([]);
 };
 
