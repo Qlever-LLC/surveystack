@@ -174,6 +174,7 @@
                   :loading="isLoadingHyloGroup"
                   :membershipId="entity._id"
                   :hyloGroup="integratedHyloGroup"
+                  :userName="entity.user.name"
                   @updated="loadHyloGroup"
                 />
                 <v-icon v-if="entity.role === 'admin'">mdi-crown-outline</v-icon>
@@ -189,7 +190,6 @@
 </template>
 
 <script>
-import ObjectId from 'bson-objectid';
 import api from '@/services/api.service';
 import appIntegrationList from '@/components/integrations/IntegrationList.vue';
 import appPinnedSurveys from '@/components/groups/PinnedSurveys.vue';

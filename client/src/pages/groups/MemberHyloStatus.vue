@@ -16,7 +16,7 @@
     </template>
     <v-card>
       <v-card-title> Confirm Invitation </v-card-title>
-      <v-card-text> Do you want to invite this user to the connected Hylo group? </v-card-text>
+      <v-card-text> Do you want to invite "{{userName}}" to the group "{{hyloGroup.name}}" on Hylo? </v-card-text>
       <v-card-actions>
         <v-spacer />
         <v-btn text @click="isConfirming = false"> Cancel </v-btn>
@@ -49,6 +49,10 @@ export default {
     loading: {
       default: false,
       type: Boolean,
+    },
+    userName: {
+      required: true,
+      type: String,
     },
   },
   computed: {
