@@ -157,10 +157,9 @@ export const getAssets = async (req, res) => {
         };
       });
       assets.push(...assetList);
-      console.log('assetList', assetList);
     } catch (error) {
       if (error.data) {
-        console.log(error.data);
+        // console.log(error.data);
         errors.push(error.data);
       } else if (error.message) {
         const msg = `${instance.instanceName}: ${error.message}`;
