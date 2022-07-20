@@ -1,11 +1,23 @@
 <template>
   <div v-if="farmosEnabled">
-    <FarmOSConnectDialog v-model="showConnectDialog" :farmInstances="farmInstances" :allowCreate="allowCreate"
-      @connect="connectFarms" />
-    <FarmOSGroupSettings class="ma-16" @addGrpCoffeeShop="addGroupCoffeeShop"
+    <FarmOSConnectDialog
+      v-model="showConnectDialog"
+      :farmInstances="farmInstances"
+      :allowCreate="allowCreate"
+      @connect="connectFarms"
+    />
+    <FarmOSGroupSettings
+      class="ma-16"
+      @addGrpCoffeeShop="addGroupCoffeeShop"
       @allowSbGrpsJoinCoffeeShop="allowSubGroupsJoinCoffeeShop"
-      @allowSbGrpsAdminsCreateFarmOSFarmsInSS="allowSubGroupsAdminsCreateFarmOSFarmsInSS" @connect="connect"
-      @disconnect="disconnectFarm" :groupInfos="groupInfos">
+      @allowSbGrpsAdminsCreateFarmOSFarmsInSS="allowSubGroupsAdminsCreateFarmOSFarmsInSS"
+      @connect="connect"
+      @disconnect="disconnectFarm"
+      @plansChanged="plansChanged"
+      :plans="plans"
+      :groupInfos="groupInfos"
+      :superAdmin="superAdmin"
+    >
     </FarmOSGroupSettings>
   </div>
 
@@ -33,7 +45,7 @@
 <script>
 import api from '@/services/api.service';
 import FarmOSGroupSettings from './../../components/integrations/FarmOSGroupSettings.vue';
-import FarmOSConnectDialog from './../../components/integrations/FarmOSConnectDialog.vue'
+import FarmOSConnectDialog from './../../components/integrations/FarmOSConnectDialog.vue';
 import _ from 'lodash';
 
 export default {
@@ -42,7 +54,7 @@ export default {
   },
   components: {
     FarmOSGroupSettings,
-    FarmOSConnectDialog
+    FarmOSConnectDialog,
   },
   computed: {
     superAdmin() {
@@ -52,8 +64,8 @@ export default {
       if (!this.groupInfos) {
         return false;
       }
-      return this.groupInfos.isDomainRoot || this.groupInfos.allowSubgroupAdminsToCreateFarmOSInstances
-    }
+      return this.groupInfos.isDomainRoot || this.groupInfos.allowSubgroupAdminsToCreateFarmOSInstances;
+    },
   },
   data() {
     return {
@@ -65,6 +77,7 @@ export default {
       showConnectDialog: false,
       selectedUser: null,
       farmInstances: [],
+      plans: [],
     };
   },
   async created() {
@@ -91,11 +104,11 @@ export default {
     */
   },
   methods: {
-    updateGroupConfig() { },
-    unifomMembersInGroupInfos() { },
-    addGroupCoffeeShop() { },
-    allowSubGroupsJoinCoffeeShop() { },
-    allowSubGroupsAdminsCreateFarmOSFarmsInSS() { },
+    updateGroupConfig() {},
+    unifomMembersInGroupInfos() {},
+    addGroupCoffeeShop() {},
+    allowSubGroupsJoinCoffeeShop() {},
+    allowSubGroupsAdminsCreateFarmOSFarmsInSS() {},
     async init() {
       const { id: groupId } = this.$route.params;
       this.groupId = groupId;
@@ -127,6 +140,10 @@ export default {
             this.message = `At least one subgroup has the FarmOS integration enabled: ${res.domain.name}`;
           } else {
             const { data: groupInfos } = await api.get(`/farmos/group-manage/${groupId}`);
+            if (this.superAdmin) {
+              const { data: plans } = await api.get(`/farmos/plans`);
+              this.plans = plans;
+            }
             console.log('group settings', groupInfos);
             groupInfos.response.members = _.sortBy(groupInfos.response.members, (m) => -m.connectedFarms.length);
             this.groupInfos = groupInfos.response;
@@ -142,19 +159,24 @@ export default {
       }
     },
     connect(user) {
-      this.selectedUser = user
-      this.showConnectDialog = true
+      this.selectedUser = user;
+      this.showConnectDialog = true;
 
       if (user.admin) {
-        this.farmInstances = _.uniq([...this.groupInfos.members.flatMap(m => {
-          return m.connectedFarms.filter(f => f.owner == true).flatMap(f => f.instanceName)
-        }), ... this.groupInfos.unassignedInstances.flatMap(f => f.instanceName)]).filter(f => !user.connectedFarms.some(c => c.instanceName == f && !c.skip));
+        this.farmInstances = _.uniq([
+          ...this.groupInfos.members.flatMap((m) => {
+            return m.connectedFarms.filter((f) => f.owner == true).flatMap((f) => f.instanceName);
+          }),
+          ...this.groupInfos.unassignedInstances.flatMap((f) => f.instanceName),
+        ]).filter((f) => !user.connectedFarms.some((c) => c.instanceName == f && !c.skip));
       } else {
-        this.farmInstances = _.uniq([...user.connectedFarms.filter(f => f.owner == true).flatMap(f => f.instanceName), ... this.groupInfos.unassignedInstances.flatMap(f => f.instanceName)]).filter(f => !user.connectedFarms.some(c => c.instanceName == f && !c.skip));
+        this.farmInstances = _.uniq([
+          ...user.connectedFarms.filter((f) => f.owner == true).flatMap((f) => f.instanceName),
+          ...this.groupInfos.unassignedInstances.flatMap((f) => f.instanceName),
+        ]).filter((f) => !user.connectedFarms.some((c) => c.instanceName == f && !c.skip));
       }
 
-
-      console.log("user", user)
+      console.log('user', user);
     },
     async enable() {
       const res = await api.post('/farmos/group-manage/enable', { groupId: this.groupId, enable: true });
@@ -168,20 +190,19 @@ export default {
       }
     },
     async connectFarms(farms) {
-      console.log("connecting farms", farms, this.selectedUser);
+      console.log('connecting farms', farms, this.selectedUser);
 
       this.loading = true;
       this.showConnectDialog = false;
 
-
       for (const farm of farms) {
-        console.log("farm", farm, farms);
+        console.log('farm', farm, farms);
         try {
           const res = await api.post(`/farmos/group-manage/${this.groupId}/mapUser`, {
             userId: this.selectedUser.user,
             instanceName: farm,
           });
-          console.log("res", res);
+          console.log('res', res);
         } catch (error) {
           console.log('error', error);
         }
@@ -190,7 +211,7 @@ export default {
       await this.init();
     },
     async disconnectFarm(userId, instanceName) {
-      console.log("disconnecting", userId, instanceName);
+      console.log('disconnecting', userId, instanceName);
 
       this.loading = true;
 
@@ -199,13 +220,18 @@ export default {
           userId,
           instanceName,
         });
-        console.log("res", res);
+        console.log('res', res);
       } catch (error) {
         console.log('error', error);
       }
 
       await this.init();
-    }
+    },
+    async plansChanged(plans) {
+      this.loading = true;
+      const res = await api.post(`/farmos/group-manage/${this.groupId}/updatePlans`, plans);
+      await this.init();
+    },
   },
 };
 </script>

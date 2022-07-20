@@ -284,6 +284,12 @@ router.post(
   catchErrors(farmosController.superAdminUpdateFarmOSAccess)
 );
 
+router.post(
+  '/farmos/group-manage/:groupId/updatePlans',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.updatePlansForGroup)
+);
+
 router.get(
   '/farmos/group-manage/:groupId/domain',
   [assertHasGroupAdminAccess],

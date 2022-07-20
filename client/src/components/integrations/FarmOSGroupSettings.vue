@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <div class="d-flex justify-space-between">
       <div>
         <h1>{{ groupInfos.name }}</h1>
@@ -8,23 +7,52 @@
         <div class="pa-3">
           <p class="font-weight-bold">Settings</p>
           <v-container class="pa-0" fluid>
-            <v-checkbox disabled class="ma-0 pa-0" hide-details :ripple="false"
+            <v-checkbox
+              disabled
+              class="ma-0 pa-0"
+              hide-details
+              :ripple="false"
               v-model="groupInfos.groupHasCoffeeShopAccess"
               @input="$emit('addGrpCoffeeShop', $event.target.value, groupInfos.groupId)"
-              label="Add this group to the Coffee Shop"></v-checkbox>
-            <v-checkbox disabled class="ma-0 pa-0" hide-details :ripple="false"
+              label="Add this group to the Coffee Shop"
+            ></v-checkbox>
+            <v-checkbox
+              disabled
+              class="ma-0 pa-0"
+              hide-details
+              :ripple="false"
               v-model="groupInfos.allowSubgroupsToJoinCoffeeShop"
               @input="$emit('allowSbGrpsJoinCoffeeShop', $event.target.value)"
-              :label="`Allow subgroups to join the Coffee Shop`"></v-checkbox>
-            <v-checkbox disabled class="ma-0 pa-0" :ripple="false"
+              :label="`Allow subgroups to join the Coffee Shop`"
+            ></v-checkbox>
+            <v-checkbox
+              disabled
+              class="ma-0 pa-0"
+              :ripple="false"
               v-model="groupInfos.allowSubgroupAdminsToCreateFarmOSInstances"
               @input="$emit('allowSbGrpsAdminsCreateFarmOSFarmsInSS', $event.target.value)"
-              label="Allow subgroups admins to create FarmOS Farms through Survey Stack">
+              label="Allow subgroups admins to create FarmOS Farms through Survey Stack"
+            >
             </v-checkbox>
           </v-container>
         </div>
       </div>
       <div class="d-flex flex-column">
+        <div v-if="superAdmin">
+          <v-autocomplete
+            outlined
+            label="Select Plans for Group"
+            multiple
+            deletable-chips
+            @change="$emit('plansChanged', selectedPlans)"
+            v-model="selectedPlans"
+            :items="plans"
+            :item-value="(p) => p._id"
+            small-chips
+            :item-text="(p) => `${p.planName} (${p.planUrl})`"
+          >
+          </v-autocomplete>
+        </div>
         <div class="d-flex justify-end" v-if="groupInfos.seats">
           {{ groupInfos.name }} has {{ groupInfos.seats.current }} / {{ groupInfos.seats.max }} accounts
         </div>
@@ -41,8 +69,15 @@
         </div>
       </div>
     </div>
-    <v-data-table :headers="headers" :items="filteredMembers" item-key="name" class="elevation-1" hide-default-footer
-      hide-default-header disable-pagination>
+    <v-data-table
+      :headers="headers"
+      :items="filteredMembers"
+      item-key="name"
+      class="elevation-1"
+      hide-default-footer
+      hide-default-header
+      disable-pagination
+    >
       <template v-slot:header="{ props: { headers } }">
         <thead>
           <tr>
@@ -52,22 +87,34 @@
           </tr>
           <tr>
             <th v-for="(aHS, i) in arrHeaderSearch" :key="i">
-              <v-text-field v-model="arrHeaderSearch[i]" label="Search" placeholder="Search" solo dense single-line
-                append-icon="mdi-magnify" hide-details class="mb-2"></v-text-field>
+              <v-text-field
+                v-model="arrHeaderSearch[i]"
+                label="Search"
+                placeholder="Search"
+                solo
+                dense
+                single-line
+                append-icon="mdi-magnify"
+                hide-details
+                class="mb-2"
+              ></v-text-field>
             </th>
           </tr>
         </thead>
       </template>
 
       <template v-slot:item="{ item, index }">
-        <tr v-for="(connectedFarm, idx) in item.connectedFarms.filter(f => !f.skip)"
-          :key="`${item.user}-instance-${idx}`">
+        <tr
+          v-for="(connectedFarm, idx) in item.connectedFarms.filter((f) => !f.skip)"
+          :key="`${item.user}-instance-${idx}`"
+        >
           <td class="pa-4" :class="{ box: idx == 0 }">
             <div v-if="idx == 0" class="d-flex align-center justify-space-between">
               <span class="d-flex align-center">
                 <div class="d-flex flex-column">
                   <span v-if="item.name">
-                    <span v-if="item.admin" class="mdi mdi-crown pr-1"></span> {{ item.name }} ({{ item.email }})</span>
+                    <span v-if="item.admin" class="mdi mdi-crown pr-1"></span> {{ item.name }} ({{ item.email }})</span
+                  >
                   <div class="d-flex flex-column font-weight-light">
                     <div v-for="(g, gidx) in item.groups" :key="`${item.user}-grp-${gidx}`">{{ g.breadcrumb }}</div>
                   </div>
@@ -87,7 +134,8 @@
               <span class="d-flex" style="flex-wrap: nowrap">
                 <v-btn text color="blue" disabled x-small>access</v-btn>
                 <v-btn @click="$emit('disconnect', item.user, connectedFarm.instanceName)" text color="red" x-small>
-                  remove</v-btn>
+                  remove</v-btn
+                >
               </span>
             </div>
             <div v-else>no farmos connected</div>
@@ -99,26 +147,35 @@
                   {{ grp.breadcrumb || grp.name }}
                   <br />
                 </span>
-                <span v-if="iidx === 2 && !developMbships[index].value" @click="toggleDevelopMbships(index)"
-                  class="nOthers">
+                <span
+                  v-if="iidx === 2 && !developMbships[index].value"
+                  @click="toggleDevelopMbships(index)"
+                  class="nOthers"
+                >
                   (+{{ connectedFarm.groups.length - 2 }} others)
                 </span>
-                <span v-if="
-                  developMbships[index].value &&
-                  iidx === connectedFarm.groups.length - 1 &&
-                  connectedFarm.groups.length - 1 > 2
-                " @click="toggleDevelopMbships(index)" class="nOthers">reduce</span>
+                <span
+                  v-if="
+                    developMbships[index].value &&
+                    iidx === connectedFarm.groups.length - 1 &&
+                    connectedFarm.groups.length - 1 > 2
+                  "
+                  @click="toggleDevelopMbships(index)"
+                  class="nOthers"
+                  >reduce</span
+                >
               </span>
             </div>
           </td>
         </tr>
-        <tr v-if="item.connectedFarms.filter(f => !f.skip).length == 0">
+        <tr v-if="item.connectedFarms.filter((f) => !f.skip).length == 0">
           <td class="box pa-4">
             <div class="d-flex align-center justify-space-between">
               <span class="d-flex align-center">
                 <div class="d-flex flex-column">
                   <span v-if="item.name">
-                    <span v-if="item.admin" class="mdi mdi-crown pr-1"></span> {{ item.name }} ({{ item.email }})</span>
+                    <span v-if="item.admin" class="mdi mdi-crown pr-1"></span> {{ item.name }} ({{ item.email }})</span
+                  >
                   <div class="d-flex flex-column font-weight-light">
                     <div v-for="(g, gidx) in item.groups" :key="`${item.user}-grp-${gidx}`">{{ g.breadcrumb }}</div>
                   </div>
@@ -146,8 +203,22 @@ export default {
       type: Object,
       required: true,
     },
+    superAdmin: {
+      type: Boolean,
+      required: true,
+    },
+    plans: {
+      type: Array,
+      required: true,
+    },
   },
-  emits: ['addGrpCoffeeShop', 'allowSbGrpsJoinCoffeeShop', 'allowSbGrpsAdminsCreateFarmOSFarmsInSS', 'connect'],
+  emits: [
+    'addGrpCoffeeShop',
+    'plansChanged',
+    'allowSbGrpsJoinCoffeeShop',
+    'allowSbGrpsAdminsCreateFarmOSFarmsInSS',
+    'connect',
+  ],
   setup(props) {
     // part Search input field
     const arrHeaderSearch = ref(['', '', '']);
@@ -234,6 +305,8 @@ export default {
       developMbships.value[index].value = !developMbships.value[index].value;
     }
 
+    const selectedPlans = ref(props.groupInfos.planIds);
+
     return {
       arrHeaderSearch,
       headers,
@@ -244,6 +317,7 @@ export default {
       filterMbShips,
       developMbships,
       toggleDevelopMbships,
+      selectedPlans,
     };
   },
 };
@@ -272,11 +346,11 @@ export default {
   overflow: unset;
 }
 
-.v-data-table__wrapper>table>tbody>tr:hover {
+.v-data-table__wrapper > table > tbody > tr:hover {
   background: inherit !important;
 }
 
-.v-data-table>>>div>table {
+.v-data-table >>> div > table {
   width: 100%;
   border-spacing: 4px !important;
 }

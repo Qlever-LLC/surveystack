@@ -519,6 +519,60 @@ export const deletePlan = async (req, res) => {
   });
 };
 
+export const updatePlansForGroup = async (req, res) => {
+  let schema = Joi.objectId().required();
+  const { groupId } = req.params;
+  const plans = req.body;
+
+  let validres = schema.validate(groupId);
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
+  schema = Joi.array().items(Joi.objectId());
+
+  validres = schema.validate(plans);
+
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
+  const groupSetting = await db.collection('farmos-group-settings').findOne({
+    groupId: new ObjectId(groupId),
+  });
+
+  if (!groupSetting) {
+    throw boom.badData('no farmos Settings for group found');
+  }
+
+  const availablePlans = await db.collection('farmos-plans').find().toArray();
+  const planIds = availablePlans.map((a) => a._id + '');
+
+  if (!plans.every((p) => planIds.includes(p))) {
+    throw boom.badData(`some plan ids are not available, ${planIds}, ${plans}`);
+  }
+
+  const updatedPlanIds = plans.map((p) => new ObjectId(p));
+
+  const r = await db.collection('farmos-group-settings').updateOne(
+    {
+      _id: groupSetting._id,
+    },
+    {
+      $set: {
+        planIds: updatedPlanIds,
+      },
+    }
+  );
+
+  return res.send({
+    status: 'ok',
+    res: r,
+  });
+};
+
 export const checkUrl = async (req, res) => {
   const apiKey = process.env.FARMOS_CREATE_KEY;
   if (!apiKey) {
