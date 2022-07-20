@@ -1,6 +1,12 @@
 <template>
   <div v-if="farmosEnabled">
-    <FarmOSCreateDialog v-model="showCreateDialog" :groupId="groupId" :plans="[]" />
+    <FarmOSCreateDialog
+      v-model="showCreateDialog"
+      v-if="showCreateDialog"
+      @check-url="checkUrl"
+      @create-instance="createInstance"
+      :viewModel="createViewModel"
+    />
 
     <FarmOSConnectDialog
       v-model="showConnectDialog"
@@ -47,12 +53,11 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import api from '@/services/api.service';
 import FarmOSGroupSettings from './../../components/integrations/FarmOSGroupSettings.vue';
 import FarmOSConnectDialog from './../../components/integrations/FarmOSConnectDialog.vue';
 import FarmOSCreateDialog from './../../components/integrations/FarmOSCreateDialog.vue';
-
-import _ from 'lodash';
 
 export default {
   props: {
@@ -86,6 +91,7 @@ export default {
       selectedUser: null,
       farmInstances: [],
       plans: [],
+      createViewModel: {},
     };
   },
   async created() {
@@ -241,8 +247,137 @@ export default {
       await this.init();
     },
     async createFarm() {
+      const { data: plans } = await api.get(`/farmos/group-manage/${this.groupId}/plans`);
+
+      const users = this.groupInfos.members.map((m) => {
+        return {
+          id: m.user,
+          email: m.email,
+          name: m.name,
+        };
+      });
+
+      let selectedPlan = '';
+      if (plans && plans.length > 0) {
+        selectedPlan = plans[0]._id;
+      }
+
+      this.createViewModel = {
+        form: {
+          groupId: this.groupId,
+          instanceName: '',
+          instanceNameValid: null,
+          email: this.selectedUser.email,
+          fullName: this.selectedUser.name,
+          farmName: '',
+          farmAddress: '',
+          unitscreateViewModel: '',
+          timezone: '',
+          agree: false,
+          owner: null,
+          fields: [],
+          plan: selectedPlan,
+        },
+        groups: null,
+        plans: plans,
+        users: users,
+        count: 1,
+      };
+
       this.showCreateDialog = true;
       this.showConnectDialog = false;
+    },
+    async checkUrl(viewModel) {
+      const vm = this.createViewModel;
+      vm.form = viewModel.form;
+
+      vm.loading = true;
+
+      const { planName, planUrl } = this.plans.find((p) => p._id === vm.form.plan);
+      if (!planUrl) {
+        vm.loading = false;
+        vm.count += 1; // invalidate cache
+
+        this.error('unable to find plan url for ' + vm.form.plan);
+        return;
+      }
+
+      if (!planName) {
+        vm.loading = false;
+        vm.count += 1; // invalidate cache
+        this.error('unable to find plan name for ' + vm.form.plan);
+        return;
+      }
+
+      const url = `${viewModel.form.instanceName}.${planUrl}`;
+
+      try {
+        const r = await api.post('/farmos/check-url', {
+          url,
+        });
+
+        if (r.data.status === 'free') {
+          vm.form.instanceNameValid = true;
+          console.log('instance name free');
+        } else {
+          vm.form.instanceNameValid = false;
+          console.log('instance name taken');
+        }
+      } catch (error) {
+        vm.form.instanceNameValid = false;
+        console.log(error);
+      }
+
+      vm.loading = false;
+      vm.count += 1; // invalidate cache
+    },
+    async createInstance(form) {
+      const vm = this.createViewModel;
+      vm.form = form;
+      vm.loading = true;
+
+      const formated = {
+        ...form,
+      };
+
+      const { planName, planUrl } = this.plans.find((p) => p._id === formated.plan);
+      if (!planUrl) {
+        vm.loading = false;
+        this.error('unable to find plan url for ' + formated.plan);
+        return;
+      }
+
+      if (!planName) {
+        vm.loading = false;
+        this.error('unable to find plan name for ' + formated.plan);
+        return;
+      }
+
+      formated.url = `${form.instanceName}.${planUrl}`;
+      formated.planName = planName;
+      delete formated.plan;
+      delete formated.instanceName;
+      delete formated.instanceNameValid;
+      formated.owner = formated.owner._id;
+
+      try {
+        const r = await api.post('/farmos/create-instance', formated);
+
+        if (r.data && r.data.status === 'success') {
+          this.success('Successfully created Instance');
+        } else {
+          if (r.data.errors) {
+            this.error('error creating instance: ' + r.data.errors);
+          } else if (r.data.message) {
+            this.error('error creating instance: ' + r.data.message);
+          }
+        }
+      } catch (e) {
+        this.error('error creating instance: ' + e.message);
+      }
+
+      vm.loading = false;
+      vm.count += 1; // invalidate cache
     },
   },
 };

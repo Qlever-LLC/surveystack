@@ -566,14 +566,23 @@ export const setPlanForGroup = async (groupId, planId) => {
 export const getPlanForGroup = async (groupId) => {
   const arr = await db
     .collection('farmos-group-settings')
-    .find({ groupId: asMongoId(groupId) }, { projection: { planId: 1 } })
+    .find({ groupId: asMongoId(groupId) }, { projection: { planIds: 1 } })
     .toArray();
 
-  if (arr.length > 0) {
-    return arr[0].planId || null;
-  } else {
-    return null;
+  if (arr.length == 0) {
+    return [];
   }
+
+  const plans = await db
+    .collection('farmos-plans')
+    .find({
+      _id: {
+        $in: arr[0].planIds,
+      },
+    })
+    .toArray();
+
+  return plans;
 };
 
 // TODO unit test for settings part

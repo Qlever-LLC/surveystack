@@ -1,56 +1,39 @@
 <template>
-  <v-dialog v-model="show" max-width="800" max-height="1000" @input="(v) => v || (testValue = [])">
+  <v-dialog v-model="show" max-width="800" max-height="1000" @input="(v) => v || clearViewModel()">
     <v-card class="pa-4">
-      <FarmOSRegister :viewModel="viewModel"></FarmOSRegister>
+      <FarmOSRegister
+        :viewModel="localViewModel"
+        @check-url="(f) => $emit('checkUrl', f)"
+        @create-instance="(f) => $emit('createInstance', f)"
+      ></FarmOSRegister>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
+import _ from 'lodash';
 import { ref } from '@vue/composition-api';
 import FarmOSRegister from '@/pages/farmos-manage/FarmOSRegister.vue';
 
 export default {
-  emits: ['create'],
+  emits: ['create', 'createInstance', 'checkUrl'],
   props: {
     value: Boolean,
-    groupId: {
-      type: String,
-      required: true,
-    },
-    plans: {
-      type: Array,
+    viewModel: {
+      type: Object,
       required: true,
     },
   },
   setup(props, { emit }) {
-    console.log('dialog created');
-    const viewModel = ref({
-      form: {
-        groupId: null,
-        instanceName: '',
-        instanceNameValid: null,
-        email: '',
-        fullName: '',
-        farmName: '',
-        farmAddress: '',
-        units: '',
-        timezone: '',
-        agree: false,
-        owner: null,
-        fields: [],
-        plan: null,
-      },
-      groups: [],
-      plans: props.plans,
-      users: [],
-      count: 1,
-    });
+    const localViewModel = ref(_.cloneDeep(props.viewModel));
 
-    const testValue = ref([]);
+    const clearViewModel = () => {
+      localViewModel.value = _.cloneDeep(props.viewModel);
+    };
+
     return {
-      testValue,
-      viewModel,
+      localViewModel,
+      clearViewModel,
     };
   },
   computed: {

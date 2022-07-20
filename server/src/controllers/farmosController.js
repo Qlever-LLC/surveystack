@@ -479,7 +479,16 @@ export const getPlans = async (req, res) => {
 };
 
 export const getPlanForGroup = async (req, res) => {
-  return res.send(await manageGetPlanForGroup());
+  let schema = Joi.objectId().required();
+  const { groupId } = req.params;
+
+  let validres = schema.validate(groupId);
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
+  return res.send(await manageGetPlanForGroup(groupId));
 };
 
 export const createPlan = async (req, res) => {

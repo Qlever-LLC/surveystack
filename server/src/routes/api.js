@@ -302,6 +302,12 @@ router.get(
   catchErrors(farmosController.groupAdminMinimumGetGroupInformation)
 );
 
+router.get(
+  '/farmos/group-manage/:groupId/plans',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.getPlanForGroup)
+);
+
 router.post(
   '/farmos/group-manage/:groupId/mapUser',
   [assertHasGroupAdminAccess],
