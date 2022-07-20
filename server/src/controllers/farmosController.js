@@ -1,6 +1,6 @@
 import { db } from '../db';
 import { ObjectId } from 'mongodb';
-import Joi from 'joi';
+import Joi, { string } from 'joi';
 import joiObjectId from 'joi-objectid';
 Joi.objectId = joiObjectId(Joi);
 
@@ -38,6 +38,23 @@ import { aggregator } from '../services/farmos/aggregator';
 
 export const asMongoId = (source) =>
   source instanceof ObjectId ? source : ObjectId(typeof source === 'string' ? source : source._id);
+
+const getCircularReplacer = () => {
+  const seen = new WeakSet();
+  return (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) {
+        return;
+      }
+      seen.add(value);
+    }
+    return value;
+  };
+};
+
+const stringify = (json) => {
+  return JSON.stringify(json, getCircularReplacer());
+};
 
 const config = () => {
   if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
@@ -136,15 +153,23 @@ export const getAssets = async (req, res) => {
           instanceName: instance.instanceName,
           archived: a.attributes.archived,
           location:
-            a.relationships && a.relationships.locations
-              ? a.relationships.location.data
-              : undefined,
+            a.relationships && a.relationships.location ? a.relationships.location.data : undefined,
         };
       });
       assets.push(...assetList);
+      console.log('assetList', assetList);
     } catch (error) {
-      console.log(error);
-      errors.push(error);
+      if (error.data) {
+        console.log(error.data);
+        errors.push(error.data);
+      } else if (error.message) {
+        const msg = `${instance.instanceName}: ${error.message}`;
+        console.log(msg);
+        errors.push(msg);
+      } else {
+        console.log(stringify(error));
+        errors.push(stringify(error));
+      }
     }
   }
 
