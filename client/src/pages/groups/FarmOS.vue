@@ -1,11 +1,15 @@
 <template>
   <div v-if="farmosEnabled">
+    <FarmOSCreateDialog v-model="showCreateDialog" :groupId="groupId" :plans="[]" />
+
     <FarmOSConnectDialog
       v-model="showConnectDialog"
       :farmInstances="farmInstances"
       :allowCreate="allowCreate"
       @connect="connectFarms"
+      @create="createFarm"
     />
+
     <FarmOSGroupSettings
       class="ma-16"
       @addGrpCoffeeShop="addGroupCoffeeShop"
@@ -46,6 +50,8 @@
 import api from '@/services/api.service';
 import FarmOSGroupSettings from './../../components/integrations/FarmOSGroupSettings.vue';
 import FarmOSConnectDialog from './../../components/integrations/FarmOSConnectDialog.vue';
+import FarmOSCreateDialog from './../../components/integrations/FarmOSCreateDialog.vue';
+
 import _ from 'lodash';
 
 export default {
@@ -55,6 +61,7 @@ export default {
   components: {
     FarmOSGroupSettings,
     FarmOSConnectDialog,
+    FarmOSCreateDialog,
   },
   computed: {
     superAdmin() {
@@ -75,6 +82,7 @@ export default {
       loading: true,
       message: '',
       showConnectDialog: false,
+      showCreateDialog: false,
       selectedUser: null,
       farmInstances: [],
       plans: [],
@@ -231,6 +239,10 @@ export default {
       this.loading = true;
       const res = await api.post(`/farmos/group-manage/${this.groupId}/updatePlans`, plans);
       await this.init();
+    },
+    async createFarm() {
+      this.showCreateDialog = true;
+      this.showConnectDialog = false;
     },
   },
 };
