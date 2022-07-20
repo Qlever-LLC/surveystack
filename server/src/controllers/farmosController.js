@@ -1,6 +1,6 @@
 import { db } from '../db';
 import { ObjectId } from 'mongodb';
-import Joi, { string } from 'joi';
+import Joi from 'joi';
 import joiObjectId from 'joi-objectid';
 Joi.objectId = joiObjectId(Joi);
 
