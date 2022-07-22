@@ -182,21 +182,10 @@ export default {
       this.selectedUser = user;
       this.showConnectDialog = true;
 
-      if (user.admin) {
-        this.farmInstances = _.uniq([
-          ...this.groupInfos.members.flatMap((m) => {
-            return m.connectedFarms.filter((f) => f.owner == true).flatMap((f) => f.instanceName);
-          }),
-          ...this.groupInfos.unassignedInstances.flatMap((f) => f.instanceName),
-        ]).filter((f) => !user.connectedFarms.some((c) => c.instanceName == f && !c.skip));
-      } else {
-        this.farmInstances = _.uniq([
-          ...user.connectedFarms.filter((f) => f.owner == true).flatMap((f) => f.instanceName),
-          ...this.groupInfos.unassignedInstances.flatMap((f) => f.instanceName),
-        ]).filter((f) => !user.connectedFarms.some((c) => c.instanceName == f && !c.skip));
-      }
-
-      console.log('user', user);
+      this.farmInstances = _.uniq([
+        ...user.connectedFarms.filter((f) => f.owner == true).flatMap((f) => f.instanceName),
+        ...this.groupInfos.unassignedInstances.flatMap((f) => f.instanceName),
+      ]).filter((f) => !user.connectedFarms.some((c) => c.instanceName == f && !c.skip));
     },
     async enable() {
       const res = await api.post('/farmos/group-manage/enable', { groupId: this.groupId, enable: true });
@@ -206,7 +195,7 @@ export default {
         const res = await api.get('/farmos/group-manage/' + this.groupId);
         this.groupInfos.value = res.data;
       } catch (error) {
-        console.log('error', error.status);
+        this.error(error.status);
       }
     },
     async connectFarms(farms) {
@@ -222,9 +211,8 @@ export default {
             userId: this.selectedUser.user,
             instanceName: farm,
           });
-          console.log('res', res);
         } catch (error) {
-          console.log('error', error);
+          this.error(error + '');
         }
       }
 
@@ -242,14 +230,14 @@ export default {
         });
         console.log('res', res);
       } catch (error) {
-        console.log('error', error);
+        this.error(error + '');
       }
 
       await this.init();
     },
     async plansChanged(plans) {
       this.loading = true;
-      const res = await api.post(`/farmos/group-manage/${this.groupId}/updatePlans`, plans);
+      const res = await api.post(`/farmos/group-manage/${this.groupId}/updatePlans`, { plans });
       await this.init();
     },
     async createFarm() {
@@ -335,7 +323,7 @@ export default {
         }
       } catch (error) {
         vm.form.instanceNameValid = false;
-        console.log(error);
+        this.error(error + '');
       }
 
       vm.loading = false;

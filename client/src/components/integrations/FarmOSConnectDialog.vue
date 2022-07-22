@@ -57,7 +57,8 @@ export default {
     const selectedFarms = ref([]);
 
     const connect = () => {
-      emit('connect', selectedFarms.value);
+      emit('connect', [...selectedFarms.value]);
+      selectedFarms.value = [];
     };
 
     console.log(props.farmInstances);

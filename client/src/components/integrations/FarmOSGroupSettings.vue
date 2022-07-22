@@ -3,7 +3,7 @@
     <div v-if="superAdmin" class="d-flex justify-space-between">
       <v-autocomplete
         outlined
-        label="Select Plans for Group"
+        label="Super Admin: Select Plans for Group"
         multiple
         deletable-chips
         @change="$emit('plansChanged', selectedPlans)"
@@ -63,10 +63,6 @@
         <div class="d-flex justify-end align-center">
           <my-button color="secondary" noBorder label="Upgrade" /> or
           <my-button color="secondary" noBorder label="Learn More" />
-        </div>
-        <div class="d-flex justify-end">
-          <my-button class="mr-2" color="primary" label="advanced" />
-          <my-button color="primary" label="Tutorial" />
         </div>
       </div>
     </div>

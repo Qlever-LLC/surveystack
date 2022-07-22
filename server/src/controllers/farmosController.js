@@ -925,32 +925,12 @@ export const groupAdminMinimumUpdateCreateFarmOSInstances = async (req, res) => 
 };
 
 export const mapUser = async (req, res) => {
-  let schema = Joi.objectId().required();
-  const { groupId } = req.params;
-  const { userId, instanceName } = req.body;
-
-  console.log('req body', req.body);
-
-  let validres = schema.validate(groupId);
-  if (validres.error) {
-    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
-    throw boom.badData(`error: ${errors.join(',')}`);
-  }
-
-  schema = Joi.object({
+  const { groupId, userId, instanceName } = await requireFarmOSManageAdmin(req, {
     userId: Joi.objectId().required(),
     instanceName: Joi.string().required(),
   });
 
-  validres = schema.validate({
-    userId,
-    instanceName,
-  });
-
-  if (validres.error) {
-    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
-    throw boom.badData(`error: ${errors.join(',')}`);
-  }
+  console.log('mapping', instanceName, userId, groupId);
 
   const userRes = await db.collection('users').findOne({ _id: new ObjectId(userId) });
   if (!userRes) {
@@ -969,120 +949,50 @@ export const mapUser = async (req, res) => {
     throw boom.badData(`user not member of group: user, group: ${userId}, ${groupId}`);
   }
 
-  const admins = await db
-    .collection('memberships')
+  // if instance not mapped to group, map to group
+  // if instance not mapped to user, map to user
+
+  const groupInstances = await db
+    .collection('farmos-group-mapping')
     .find({
-      group: new ObjectId(groupId),
-      role: 'admin',
+      groupId: new ObjectId(groupId),
     })
     .toArray();
 
-  if (admins.map((a) => a.user + '').includes(userId)) {
-    // if the target user is an admin
+  let mapToGroup = true;
+  if (groupInstances.map((g) => g.instanceName).includes(instanceName)) {
+    mapToGroup = false;
+  }
 
-    // error if none of the members is owner of the instance
-    // error if the admin is already mapped to instance
-    // add instance to group if not already mapped to group
-    // add instance to admin
+  let mapToUser = false;
 
-    const allUsersOfGroup = await db
-      .collection('memberships')
-      .find({
-        group: new ObjectId(groupId),
-      })
-      .toArray();
-
-    const userIds = allUsersOfGroup.map((u) => u.user);
-
-    const membersInstances = (
-      await db
-        .collection('farmos-instances')
-        .find({
-          userId: {
-            $in: userIds,
-          },
-          owner: true,
-        })
-        .toArray()
-    ).map((i) => i.instanceName);
-
-    if (!membersInstances.includes(instanceName)) {
-      throw boom.badData(`no member of group is owner of instance ${instanceName}, ${groupId}`);
-    }
-
-    const adminInstances = await db
-      .collection('farmos-instances')
-      .find({
-        userId: new ObjectId(userId),
-        instanceName,
-      })
-      .toArray();
-
-    if (adminInstances.length > 0) {
-      throw boom.badData(`user has already mapped instance ${instanceName}, ${userId}`);
-    }
-
-    const groupInstances = await db
-      .collection('farmos-group-mapping')
-      .find({
-        groupId: new ObjectId(groupId),
-        instanceName,
-      })
-      .toArray();
-
-    if (groupInstances.length == 0) {
-      await db.collection('farmos-group-mapping').insertOne({
-        _id: new ObjectId(),
-        instanceName,
-        groupId: new ObjectId(groupId),
-        planName: null,
-      });
-    }
-
-    await db.collection('farmos-instances').insertOne({
-      _id: new ObjectId(),
-      instanceName,
+  const userMappings = await db
+    .collection('farmos-instances')
+    .find({
       userId: new ObjectId(userId),
-      owner: false,
-    });
-  } else {
-    // the target user is not an admin
+      instanceName,
+      owner: true,
+    })
+    .toArray();
 
-    // fail if instance is already in group
-    // fail if user is not owner of instance
-    // otherwise add instance to group
+  if (userMappings.length == 0) {
+    mapToUser = true;
+  }
 
-    const groupInstances = await db
-      .collection('farmos-group-mapping')
-      .find({
-        groupId: new ObjectId(groupId),
-      })
-      .toArray();
-
-    if (groupInstances.map((g) => g.instanceName).includes(instanceName)) {
-      throw boom.badData(`instance already mapped to group: ${instanceName}, ${groupId}`);
-    }
-
-    const userMappings = await db
-      .collection('farmos-instances')
-      .find({
-        userId: new ObjectId(userId),
-        instanceName,
-        owner: true,
-      })
-      .toArray();
-
-    if (userMappings.length == 0) {
-      throw boom.badData(
-        `instance not mapped to user or user not owner ${instanceName}, ${userId}`
-      );
-    }
-
+  if (mapToGroup) {
     await db.collection('farmos-group-mapping').insertOne({
       _id: new ObjectId(),
       groupId: new ObjectId(groupId),
       instanceName,
-      planName: null,
+    });
+  }
+
+  if (mapToUser) {
+    await db.collection('farmos-instances').insertOne({
+      _id: new ObjectId(),
+      userId: new ObjectId(userId),
+      instanceName,
+      owner: true,
     });
   }
 
@@ -1092,32 +1002,10 @@ export const mapUser = async (req, res) => {
 };
 
 export const unmapUser = async (req, res) => {
-  let schema = Joi.objectId().required();
-  const { groupId } = req.params;
-  const { userId, instanceName } = req.body;
-
-  console.log('req body', req.body);
-
-  let validres = schema.validate(groupId);
-  if (validres.error) {
-    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
-    throw boom.badData(`error: ${errors.join(',')}`);
-  }
-
-  schema = Joi.object({
+  const { groupId, userId, instanceName } = await requireFarmOSManageAdmin(req, {
     userId: Joi.objectId().required(),
     instanceName: Joi.string().required(),
   });
-
-  validres = schema.validate({
-    userId,
-    instanceName,
-  });
-
-  if (validres.error) {
-    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
-    throw boom.badData(`error: ${errors.join(',')}`);
-  }
 
   const userRes = await db.collection('users').findOne({ _id: new ObjectId(userId) });
   if (!userRes) {
@@ -1161,7 +1049,7 @@ export const unmapUser = async (req, res) => {
   const usersUnownedFarms = await db
     .collection('farmos-instances')
     .find({
-      userId: new ObjectId('userId'),
+      userId: new ObjectId(userId),
       instanceName,
       owner: false,
     })
