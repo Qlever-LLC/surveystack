@@ -97,14 +97,14 @@ describe('manageFarmOS', () => {
 
     await createFarmosGroupSettings(group._id);
 
-    await setPlanForGroup(group._id, 'test-plan');
-    const res = await getPlanForGroup(group._id);
-    expect(res).toBe('test-plan');
-
     await createPlan('test-plan-all');
     const plans = await getPlans();
     expect(plans.length).toBe(1);
     expect(plans[0].planName).toBe('test-plan-all');
+
+    await setPlanForGroup(group._id, plans.find((it) => it.planName == 'test-plan-all')._id);
+    const res = await getPlanForGroup(group._id);
+    expect(res[0].planName).toBe('test-plan-all');
 
     await deletePlan(plans[0]._id);
     const deleted = await getPlans();
@@ -112,7 +112,7 @@ describe('manageFarmOS', () => {
 
     await setPlanForGroup(group._id, null);
     const nullPlan = await getPlanForGroup(group._id);
-    expect(nullPlan).toBe(null);
+    expect(nullPlan).toStrictEqual([]);
   });
   it('getFarmOSRootGroup', async () => {
     const groupBionutrient = await createGroup({ name: 'Bionutrient' });

@@ -560,16 +560,15 @@ export const deletePlan = async (planId) => {
 export const setPlanForGroup = async (groupId, planId) => {
   await db
     .collection('farmos-group-settings')
-    .updateOne({ groupId: asMongoId(groupId) }, { $set: { planId: planId } });
+    .updateOne({ groupId: asMongoId(groupId) }, { $set: { planIds: [planId] } });
 };
 
 export const getPlanForGroup = async (groupId) => {
-  const arr = await db
+  const settings = await db
     .collection('farmos-group-settings')
-    .find({ groupId: asMongoId(groupId) }, { projection: { planIds: 1 } })
-    .toArray();
+    .findOne({ groupId: asMongoId(groupId) }, { projection: { planIds: 1 } });
 
-  if (arr.length == 0) {
+  if (!settings) {
     return [];
   }
 
@@ -577,7 +576,7 @@ export const getPlanForGroup = async (groupId) => {
     .collection('farmos-plans')
     .find({
       _id: {
-        $in: arr[0].planIds,
+        $in: settings.planIds,
       },
     })
     .toArray();
