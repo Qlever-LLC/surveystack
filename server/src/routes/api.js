@@ -321,6 +321,18 @@ router.post(
 );
 
 router.post(
+  '/farmos/group-manage/:groupId/check-url',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupManageCheckUrl)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/create-instance',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupManageCreateFarmOsInstance)
+);
+
+router.post(
   '/farmos/coffee-shop-access',
   [assertHasGroupAdminAccess],
   catchErrors(farmosController.groupAdminMinimumUpdateCoffeeShopAccess)

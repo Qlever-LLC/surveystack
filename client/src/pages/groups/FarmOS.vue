@@ -1,5 +1,9 @@
 <template>
   <div v-if="farmosEnabled">
+    <v-alert v-if="successMessage" class="mt-4" mode="fade" text type="success" @click="successMessage = null">{{
+      successMessage
+    }}</v-alert>
+
     <FarmOSCreateDialog
       v-model="showCreateDialog"
       v-if="showCreateDialog"
@@ -92,6 +96,8 @@ export default {
       farmInstances: [],
       plans: [],
       createViewModel: {},
+      successMessage: null,
+      errorMessage: null,
     };
   },
   async created() {
@@ -271,10 +277,10 @@ export default {
           fullName: this.selectedUser.name,
           farmName: '',
           farmAddress: '',
-          unitscreateViewModel: '',
+          units: '',
           timezone: '',
           agree: false,
-          owner: null,
+          owner: this.selectedUser.user,
           fields: [],
           plan: selectedPlan,
         },
@@ -288,12 +294,13 @@ export default {
       this.showConnectDialog = false;
     },
     async checkUrl(viewModel) {
+      console.log('calling checkurl in FarmOS.vue');
       const vm = this.createViewModel;
       vm.form = viewModel.form;
-
       vm.loading = true;
 
-      const { planName, planUrl } = this.plans.find((p) => p._id === vm.form.plan);
+      const plan = this.plans.find((p) => p._id === vm.form.plan);
+      const { planName, planUrl } = plan;
       if (!planUrl) {
         vm.loading = false;
         vm.count += 1; // invalidate cache
@@ -309,10 +316,13 @@ export default {
         return;
       }
 
-      const url = `${viewModel.form.instanceName}.${planUrl}`;
+      const instanceName = viewModel.form.instanceName;
+      const url = `${instanceName}.${planUrl}`;
 
       try {
-        const r = await api.post('/farmos/check-url', {
+        const r = await api.post(`/farmos/group-manage/${this.groupId}/check-url`, {
+          instanceName,
+          planId: plan._id,
           url,
         });
 
@@ -336,6 +346,8 @@ export default {
       vm.form = form;
       vm.loading = true;
 
+      console.log(vm);
+
       const formated = {
         ...form,
       };
@@ -355,13 +367,13 @@ export default {
 
       formated.url = `${form.instanceName}.${planUrl}`;
       formated.planName = planName;
+      formated.planId = form.plan;
       delete formated.plan;
       delete formated.instanceName;
       delete formated.instanceNameValid;
-      formated.owner = formated.owner._id;
 
       try {
-        const r = await api.post('/farmos/create-instance', formated);
+        const r = await api.post(`/farmos/group-manage/${this.groupId}/create-instance`, formated);
 
         if (r.data && r.data.status === 'success') {
           this.success('Successfully created Instance');
@@ -378,6 +390,18 @@ export default {
 
       vm.loading = false;
       vm.count += 1; // invalidate cache
+
+      this.showCreateDialog = false;
+      await this.init();
+    },
+    success(msg) {
+      this.successMessage = msg;
+      this.errorMessage = null;
+      window.scrollTo(0, 0);
+    },
+    error(msg) {
+      this.errorMessage = msg;
+      this.successMessage = null;
     },
   },
 };

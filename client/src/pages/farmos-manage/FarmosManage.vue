@@ -4,6 +4,10 @@
       successMessage
     }}</v-alert>
 
+    <v-alert v-if="errorMessage" class="mt-4" mode="fade" text type="error" @click="errorMessage = null">{{
+      errorMessage
+    }}</v-alert>
+
     <v-tabs v-model="tab" background-color="transparent" color="basil" grow>
       <v-tab v-for="item in items" :key="item.name">{{ item.name }}</v-tab>
     </v-tabs>

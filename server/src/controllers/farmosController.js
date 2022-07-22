@@ -93,6 +93,73 @@ const requireGroupdAdmin = (req, res) => {
 };
 
 /**
+ * Validate that the groupId has groupSettings with enabled
+ * farmos
+ *
+ * @param {*} req
+ * @param {*} res
+ */
+const requireFarmOSManageAdmin = async (req, optJoi = {}) => {
+  const apiKey = process.env.FARMOS_CREATE_KEY;
+  if (!apiKey) {
+    throw boom.badImplementation('farmos not configured');
+  }
+
+  let schema = Joi.objectId().required();
+  const { groupId } = req.params;
+
+  schema = Joi.object({
+    groupId: Joi.objectId().required(),
+    ...optJoi,
+  });
+
+  const validres = schema.validate(
+    {
+      ...req.body,
+      groupId,
+    },
+    { allowUnknown: true }
+  );
+
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
+  const groupSetting = await db.collection('farmos-group-settings').findOne({
+    groupId: new ObjectId(groupId),
+  });
+
+  // TODO could be part of domain
+
+  if (!groupSetting) {
+    throw boom.badData('no farmos Settings for group found');
+  }
+
+  const keys = Object.keys(req.body)
+    .map((a) => {
+      if (Object.keys(optJoi).includes(a)) {
+        return a;
+      } else {
+        return null;
+      }
+    })
+    .filter((k) => k != null);
+
+  const r = {};
+  for (const key of keys) {
+    r[key] = req.body[key];
+  }
+
+  return {
+    ...r,
+    apiKey,
+    groupId,
+    groupSetting,
+  };
+};
+
+/**
  *
  * Return a list of farmos instances associated with user
  *
@@ -529,32 +596,9 @@ export const deletePlan = async (req, res) => {
 };
 
 export const updatePlansForGroup = async (req, res) => {
-  let schema = Joi.objectId().required();
-  const { groupId } = req.params;
-  const plans = req.body;
-
-  let validres = schema.validate(groupId);
-  if (validres.error) {
-    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
-    throw boom.badData(`error: ${errors.join(',')}`);
-  }
-
-  schema = Joi.array().items(Joi.objectId());
-
-  validres = schema.validate(plans);
-
-  if (validres.error) {
-    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
-    throw boom.badData(`error: ${errors.join(',')}`);
-  }
-
-  const groupSetting = await db.collection('farmos-group-settings').findOne({
-    groupId: new ObjectId(groupId),
+  const { groupSetting, plans } = await requireFarmOSManageAdmin(req, {
+    plans: Joi.array().items(Joi.objectId()),
   });
-
-  if (!groupSetting) {
-    throw boom.badData('no farmos Settings for group found');
-  }
 
   const availablePlans = await db.collection('farmos-plans').find().toArray();
   const planIds = availablePlans.map((a) => a._id + '');
@@ -578,7 +622,7 @@ export const updatePlansForGroup = async (req, res) => {
 
   return res.send({
     status: 'ok',
-    res: r,
+    // res: r,
   });
 };
 
@@ -604,6 +648,43 @@ export const checkUrl = async (req, res) => {
     });
   }
 };
+
+export const groupManageCheckUrl = async (req, res) => {
+  const { groupSetting, planId, instanceName, url, apiKey } = await requireFarmOSManageAdmin(req, {
+    planId: Joi.objectId().required(),
+    instanceName: Joi.string().required(),
+    url: Joi.string().required(),
+  });
+
+  const planIds = groupSetting.planIds.map((p) => p + '');
+  if (!planIds.includes(planId)) {
+    throw boom.badData('planId not mapped to group');
+  }
+
+  const plan = await db.collection('farmos-plans').findOne({ _id: new ObjectId(planId) });
+
+  if (!plan) {
+    throw boom.badData('plan not found');
+  }
+
+  const { planUrl } = plan;
+
+  if (url !== `${instanceName}.${planUrl}`) {
+    throw boom.badData(`url does not match ${url}, ${instanceName}.${planUrl}`);
+  }
+
+  try {
+    return res.send({
+      status: (await isFarmosUrlAvailable(url, apiKey)) ? 'free' : 'taken',
+    });
+  } catch (error) {
+    return res.send({
+      status: 'error',
+      message: error.message,
+    });
+  }
+};
+
 export const superAdminCreateFarmOsInstance = async (req, res) => {
   const schema = Joi.object({
     groupId: Joi.string().required(),
@@ -695,6 +776,36 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
   }
 };
 
+export const groupManageCreateFarmOsInstance = async (req, res) => {
+  const { groupSetting, url, planId, groupId } = await requireFarmOSManageAdmin(req, {
+    url: Joi.string().max(100).required(),
+    planId: Joi.objectId().required(),
+  });
+
+  if (!groupSetting.planIds.map((p) => p + '').includes(planId)) {
+    throw boom.badData(`plan not included in group: ${planId}`);
+  }
+
+  const plan = await db.collection('farmos-plans').findOne({ _id: new ObjectId(planId) });
+  if (!plan) {
+    throw boom.badData(`unable to find plan: ${planId}`);
+  }
+
+  if (!url.endsWith(plan.planUrl)) {
+    throw boom.badData(`url needs to end with ${plan.planUrl}: ${url}`);
+  }
+
+  const { groupId: bodyGroupId } = req.body;
+
+  if (groupId !== bodyGroupId) {
+    throw boom.badData(`groupIds do not match: ${groupId}, ${bodyGroupId}`);
+  }
+
+  delete req.body.planId;
+
+  return await superAdminCreateFarmOsInstance(req, res);
+};
+
 export const getDomain = async (req, res) => {
   const schema = Joi.objectId().required();
   const { groupId } = req.params;
@@ -756,6 +867,8 @@ export const superAdminUpdateFarmOSAccess = async (req, res) => {
     status: 'success',
   });
 };
+
+export const groupManageCreateInstance = async () => {};
 
 export const groupAdminMinimumUpdateCoffeeShopAccess = async (req, res) => {
   const { groupId, updateTo } = req.body;

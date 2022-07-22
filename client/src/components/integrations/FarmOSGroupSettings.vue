@@ -1,9 +1,25 @@
 <template>
   <div>
+    <div v-if="superAdmin" class="d-flex justify-space-between">
+      <v-autocomplete
+        outlined
+        label="Select Plans for Group"
+        multiple
+        deletable-chips
+        @change="$emit('plansChanged', selectedPlans)"
+        v-model="selectedPlans"
+        :items="plans"
+        :item-value="(p) => p._id"
+        small-chips
+        :item-text="(p) => `${p.planName} (${p.planUrl})`"
+      >
+      </v-autocomplete>
+    </div>
     <div class="d-flex justify-space-between">
       <div>
         <h1>{{ groupInfos.name }}</h1>
         <h2>Connected Members & Farms</h2>
+
         <div class="pa-3">
           <p class="font-weight-bold">Settings</p>
           <v-container class="pa-0" fluid>
@@ -38,21 +54,6 @@
         </div>
       </div>
       <div class="d-flex flex-column">
-        <div v-if="superAdmin">
-          <v-autocomplete
-            outlined
-            label="Select Plans for Group"
-            multiple
-            deletable-chips
-            @change="$emit('plansChanged', selectedPlans)"
-            v-model="selectedPlans"
-            :items="plans"
-            :item-value="(p) => p._id"
-            small-chips
-            :item-text="(p) => `${p.planName} (${p.planUrl})`"
-          >
-          </v-autocomplete>
-        </div>
         <div class="d-flex justify-end" v-if="groupInfos.seats">
           {{ groupInfos.name }} has {{ groupInfos.seats.current }} / {{ groupInfos.seats.max }} accounts
         </div>

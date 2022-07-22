@@ -1,10 +1,10 @@
 <template>
-  <v-dialog v-model="show" max-width="800" max-height="1000" @input="(v) => v || clearViewModel()">
+  <v-dialog v-model="show" max-width="800" max-height="1000" @input="(v) => v">
     <v-card class="pa-4">
       <FarmOSRegister
-        :viewModel="localViewModel"
-        @check-url="(f) => $emit('checkUrl', f)"
-        @create-instance="(f) => $emit('createInstance', f)"
+        :viewModel="viewModel"
+        @check-url="(f) => $emit('check-url', f)"
+        @create-instance="(f) => $emit('create-instance', f)"
       ></FarmOSRegister>
     </v-card>
   </v-dialog>
@@ -25,16 +25,7 @@ export default {
     },
   },
   setup(props, { emit }) {
-    const localViewModel = ref(_.cloneDeep(props.viewModel));
-
-    const clearViewModel = () => {
-      localViewModel.value = _.cloneDeep(props.viewModel);
-    };
-
-    return {
-      localViewModel,
-      clearViewModel,
-    };
+    return {};
   },
   computed: {
     show: {
