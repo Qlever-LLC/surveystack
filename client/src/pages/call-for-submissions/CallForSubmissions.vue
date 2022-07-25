@@ -68,16 +68,23 @@
         </v-card-text>
         <v-card-actions class="d-flex justify-end">
           <v-btn @click="showConfirmDialog = false" text>Cancel</v-btn>
-          <v-btn color="primary" @click="submit">SEND NOW</v-btn>
+          <v-btn color="primary" :loading="isSubmitting" @click="submit">SEND NOW</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <result-dialog
+      v-model="showSubmitResult"
+      :items="submitResults"
+      title="Call for Submissions"
+      @close="showSubmitResult = false"
+    />
   </v-container>
 </template>
 
 <script>
 import appSurveySelector from '@/components/survey/SurveySelector.vue';
 import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipButton.vue';
+import resultDialog from '@/components/ui/ResultDialog.vue';
 import api from '@/services/api.service';
 import { get } from 'lodash';
 
@@ -93,6 +100,7 @@ All the best
 
 export default {
   components: {
+    resultDialog,
     appSurveySelector,
     appConfirmMembershipButton,
   },
@@ -115,6 +123,9 @@ export default {
       ],
       showConfirmDialog: false,
       isLoadingMembers: false,
+      isSubmitting: false,
+      showSubmitResult: false,
+      submitResults: [],
     };
   },
   methods: {
@@ -146,7 +157,7 @@ export default {
       this.$router.back();
     },
     async submit() {
-      this.showConfirmDialog = false;
+      this.isSubmitting = true;
       try {
         const members = this.selectedMembers.map((member) => member._id);
         const survey = this.selectedSurvey._id;
@@ -158,9 +169,26 @@ export default {
           group: this.group,
           copy: this.copy,
         });
+        this.submitResults = [
+          {
+            title: 'Success:',
+            body: 'Emails are sent out!',
+          },
+        ];
+        this.showSubmitResult = true;
       } catch (e) {
         console.error(e);
-        this.$store.dispatch('feedback/add', get(e, 'response.data.message', String(e)));
+        this.submitResults = [
+          {
+            title: 'Error:',
+            body: get(e, 'response.data.message', String(e)),
+            error: true,
+          },
+        ];
+        this.showSubmitResult = true;
+      } finally {
+        this.isSubmitting = false;
+        this.showConfirmDialog = false;
       }
     },
   },
