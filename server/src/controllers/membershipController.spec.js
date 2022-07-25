@@ -1,7 +1,10 @@
 import membershipController from './membershipController';
-const { updateMembership } = membershipController;
+const { updateMembership, activateMembershipByAdmin } = membershipController;
 import { db } from '../db';
 import { createGroup, createReq, createRes, asMongoId } from '../testUtils';
+
+jest.mock('../services/membership.service');
+import membershipService from '../services/membership.service';
 
 describe('updateMembership', () => {
   it('can update editable fields', async () => {
@@ -50,3 +53,46 @@ describe('updateMembership', () => {
     );
   });
 });
+
+describe('activateMembershipByAdmin', () => {
+  let group, admin, pendingUser, req, res;
+  beforeEach(async () => {
+    group = await createGroup();
+    admin = await group.createAdminMember();
+    pendingUser = await group.createUserMember({ meta: { status: 'pending' } });
+    req = createReq({ body: { membershipId: pendingUser.membership._id.toString() } });
+    res = await createRes({ user: admin.user });
+  });
+
+  it('throws when createConfirmedMembership is not set', async () => {
+    req = createReq();
+    await expect(activateMembershipByAdmin(req, res)).rejects.toThrow(
+      '"membershipId" is missing from the request body'
+    );
+  });
+  
+  it('throws when user has no group-admin acces', async () => {
+    const user = await group.createUserMember();
+    res = await createRes({ user: user.user });
+    await expect(activateMembershipByAdmin(req, res)).rejects.toThrow(
+      'Only group admins can create memberships'
+    );
+  });
+
+  it('calls membershipService.activateMembershipByAdmin', async () => {
+    await activateMembershipByAdmin(req, res);
+    expect(membershipService.activateMembershipByAdmin).toHaveBeenCalledWith({
+      membershipId: pendingUser.membership._id,
+      origin: req.headers.origin,
+    });
+  });
+
+  it('returns ok', async () => {
+    await activateMembershipByAdmin(req, res);
+    expect(res.send).toHaveBeenCalledWith({ ok: true });
+  });
+});
+
+// describe('createConfirmedMembership', () => {
+
+// })

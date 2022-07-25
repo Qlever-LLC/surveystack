@@ -12,6 +12,7 @@ import rolesService from '../services/roles.service';
 const col = 'groups';
 
 const sanitizeGroup = (entity) => {
+  // entity doesn't have an _id before inserting a new group
   if (entity._id) {
     entity._id = new ObjectId(entity._id);
   }

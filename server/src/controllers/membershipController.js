@@ -472,7 +472,7 @@ const activateMembership = async (req, res) => {
   if (loginPayload) {
     res.send(loginPayload);
   } else {
-    res.send({ message: 'ok' });
+    res.send({ ok: true });
   }
 };
 
@@ -481,7 +481,6 @@ const activateMembershipByAdmin = async (req, res) => {
   const { origin } = req.headers;
 
   if (!membershipId) {
-    console.log('BODY', req.body, req.params);
     throw boom.badRequest('"membershipId" is missing from the request body');
   }
 
@@ -493,7 +492,7 @@ const activateMembershipByAdmin = async (req, res) => {
 
   await membershipService.activateMembershipByAdmin({ membershipId: membership._id, origin });
 
-  res.send({ message: 'ok' });
+  res.send({ ok: true });
 };
 
 // Creates a confirmed (activated) group member
@@ -515,7 +514,7 @@ const createConfirmedMembership = async (req, res) => {
   let membership = (await db.collection(col).insertOne(entity)).ops[0];
   await membershipService.activateMembershipByAdmin({ membershipId: membership._id, origin });
 
-  res.send({ message: 'ok' });
+  res.send({ ok: true });
 };
 
 export default {

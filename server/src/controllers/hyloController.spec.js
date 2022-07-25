@@ -209,7 +209,7 @@ describe('hyloController', () => {
     });
     it('returns ok', async () => {
       await removeHyloGroupIntegration(req, res);
-      await expect(res.send).toHaveBeenCalledWith({ ok: true });
+      expect(res.send).toHaveBeenCalledWith({ ok: true });
     });
   });
 
