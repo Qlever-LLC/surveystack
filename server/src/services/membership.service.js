@@ -54,7 +54,12 @@ export const activateMembership = async ({ code, user }) => {
 };
 
 // activates the membership and notifies the user in email
-export const activateMembershipByAdmin = async ({ membershipId, origin }) => {
+export const activateMembershipByAdmin = async (options) => {
+  const {
+    membershipId,
+    origin,
+    activateMembership: _activateMembership,
+  } = { activateMembership, ...options };
   const membership = await db.collection(col).findOne({ _id: membershipId });
   let group = await db.collection('groups').findOne({ _id: membership.group });
   if (!group) {
@@ -64,7 +69,7 @@ export const activateMembershipByAdmin = async ({ membershipId, origin }) => {
     membership.meta.invitationEmail,
     membership.meta.invitationName
   );
-  await activateMembership({
+  await _activateMembership({
     code: membership.meta.invitationCode,
     user: userObject._id,
   });

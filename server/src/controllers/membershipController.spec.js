@@ -60,7 +60,9 @@ describe('activateMembershipByAdmin', () => {
   beforeEach(async () => {
     group = await createGroup();
     admin = await group.createAdminMember();
-    pendingUser = await group.createUserMember({ meta: { status: 'pending' } });
+    pendingUser = await group.createUserMember({
+      membershipOverrides: { meta: { status: 'pending' } },
+    });
     req = createReq({ body: { membershipId: pendingUser.membership._id.toString() } });
     res = await createRes({ user: admin.user });
   });

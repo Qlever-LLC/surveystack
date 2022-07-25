@@ -1,3 +1,4 @@
+const crypto = jest.requireActual('crypto');
 const { deburr, kebabCase, uniqueId } = jest.requireActual('lodash');
 const { ObjectId } = jest.requireActual('mongodb');
 const { getDb } = jest.requireActual('../db');
@@ -76,7 +77,7 @@ export const asMongoId = (source) =>
 export const createMembership = async (_overrides = {}) => {
   const { user, group, ...overrides } = _overrides;
   const doc = {
-    user: asMongoId(user),
+    user: overrides.meta?.status === 'pending' ? null : asMongoId(user),
     group: asMongoId(group),
     role: 'user',
     meta: {
@@ -85,7 +86,7 @@ export const createMembership = async (_overrides = {}) => {
       dateSent: null,
       dateActivated: new Date(),
       invitationEmail: null,
-      invitationCode: null,
+      invitationCode: crypto.randomBytes(32).toString('hex'),
       ...overrides.meta,
     },
     ...overrides,
