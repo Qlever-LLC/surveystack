@@ -507,7 +507,7 @@ const createConfirmedMembership = async (req, res) => {
     throw boom.unauthorized(`Only group admins can create memberships`);
   }
 
-  if (!entity.meta.invitationEmail) {
+  if (!entity.meta?.invitationEmail) {
     throw boom.badRequest('Need to supply an email address');
   }
 
