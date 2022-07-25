@@ -162,9 +162,6 @@ export default {
     };
   },
   methods: {
-    log(...args) {
-      console.log('...', ...args);
-    },
     cancel() {
       this.$router.back();
     },
