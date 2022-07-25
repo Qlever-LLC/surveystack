@@ -97,7 +97,7 @@ export const activateMembershipByAdmin = async ({ membershipId, origin }) => {
     btnText: 'Sign in',
     afterHtml: `<b>Unsure why you're receiving this email?</b> 
 "${group.name}" added you to a SurveyStack group and may have initiated an account on your behalf. 
-You have control over your acctount. 
+You have control over your account. 
 <a href="${magicLinkProfile}">Click here</a> to view and change groups. 
 You can <a href="${magicLinkUser}">click here</a> to manage or change your account.`,
   });

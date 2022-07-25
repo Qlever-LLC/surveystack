@@ -64,7 +64,8 @@
                     <v-list-item-content>
                       <v-list-item-title>Invite Member</v-list-item-title>
                       <v-list-item-subtitle
-                        >Send an invitation to the user for joining your group.</v-list-item-subtitle
+                        >Send them an email to agree to join your group. They only join once they click the "Join" link
+                        in the email.</v-list-item-subtitle
                       >
                     </v-list-item-content>
                   </v-list-item>
@@ -73,9 +74,9 @@
                     <v-list-item-content>
                       <v-list-item-title>Add Member</v-list-item-title>
                       <v-list-item-subtitle style="-webkit-line-clamp: 4">
-                        Add member to this group without requiring interation from their side.<br />
-                        This is useful if you want to send out "Call for Submissions" without waiting for the user to
-                        joint your group.
+                        The member joins immediately. An email is still sent informing them they are joined. This is
+                        useful when using "Call for Submissions" to send this member survey requests without waiting for
+                        them to check their email.
                       </v-list-item-subtitle>
                     </v-list-item-content>
                   </v-list-item>
