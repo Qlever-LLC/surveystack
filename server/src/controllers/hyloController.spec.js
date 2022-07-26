@@ -7,12 +7,14 @@ import {
   QUERY_GROUP_BY_SLUG,
   removeHyloGroupIntegration,
   setIntegratedHyloGroup,
+  inviteMemberToHyloGroup,
 } from './hyloController';
 import { createGroup, createReq, createRes } from '../testUtils';
 import { gqlRequest } from '../services/hylo/utils';
 import { COLL_GROUPS_HYLO_MAPPINGS, db } from '../db';
-import { createHyloGroup, upsertHyloUser } from '../services/hylo.service';
+import { addMember, createHyloGroup, upsertHyloUser } from '../services/hylo.service';
 import { without } from 'lodash';
+import boom from '@hapi/boom';
 
 jest.mock('../services/hylo.service');
 jest.mock('../services/hylo/utils');
@@ -161,6 +163,79 @@ describe('hyloController', () => {
       expect(res.json).toHaveBeenCalledWith(hyloGroup);
     });
   });
+
+  describe('inviteMemberToHyloGroup', () => {
+    let group, user, admin, hyloGroup, hyloUser, res, req;
+    beforeEach(async () => {
+      group = await createGroup();
+      user = await group.createUserMember();
+      admin = await group.createAdminMember();
+      hyloGroup = {
+        id: 'hylo-group-id-foo',
+      };
+      hyloUser = {
+        id: 'hylo-user-id-foo',
+      };
+      await db
+        .collection(COLL_GROUPS_HYLO_MAPPINGS)
+        .insertOne({ groupId: group._id, hyloGroupId: hyloGroup.id });
+      upsertHyloUser.mockResolvedValue(hyloUser);
+      req = createReq({ body: { membershipId: user.membership._id.toString() } });
+      res = await createRes({ user: admin.user });
+    });
+
+    it('throws if membershipId is not set', async () => {
+      await expect(inviteMemberToHyloGroup(createReq(), res)).rejects.toThrow(
+        '"membershipId" is required'
+      );
+    });
+
+    it("throws if membership doesn't exsist in DB", async () => {
+      await db.collection('memberships').deleteOne({ _id: user.membership._id });
+      await expect(inviteMemberToHyloGroup(req, res)).rejects.toThrow(
+        `Can't find membership with the ID "${user.membership._id}"`
+      );
+    });
+
+    it('throws if executing user is not group admin', async () => {
+      const userMember = await group.createUserMember();
+      res = await createRes({ user: userMember.user });
+      await expect(inviteMemberToHyloGroup(req, res)).rejects.toThrow(boom.unauthorized());
+    });
+
+    it("throws if user doesn't exsist in DB", async () => {
+      await db.collection('users').deleteOne({ _id: user.membership.user });
+      await expect(inviteMemberToHyloGroup(req, res)).rejects.toThrow(
+        `Membership "${user.membership._id}" has no user`
+      );
+    });
+
+    it('throws when group has no integrated Hylo group', async () => {
+      await db.collection(COLL_GROUPS_HYLO_MAPPINGS).deleteOne({ groupId: group._id });
+      await expect(inviteMemberToHyloGroup(req, res)).rejects.toThrow(
+        `Can't find Hylo integration for group "${group._id}"`
+      );
+    });
+
+    it('calls upsertHyloUser', async () => {
+      await inviteMemberToHyloGroup(req, res);
+      expect(upsertHyloUser).toHaveBeenCalledWith({ name: user.user.name, email: user.user.email });
+    });
+
+    it('calls addMember', async () => {
+      await inviteMemberToHyloGroup(req, res);
+      expect(addMember).toHaveBeenCalledWith({
+        hyloUserId: hyloUser.id,
+        hyloGroupId: hyloGroup.id,
+      });
+    });
+
+    it('returns ok', async () => {
+      await inviteMemberToHyloGroup(req, res);
+      expect(res.json).toHaveBeenCalledWith({ ok: true });
+    });
+  });
+
   describe('setIntegratedHyloGroup', () => {
     let group, user, hyloGroup, res, req;
     beforeEach(async () => {
@@ -210,6 +285,7 @@ describe('hyloController', () => {
       expect(res.json).toHaveBeenCalledWith(hyloGroup);
     });
   });
+
   describe('removeHyloGroupIntegration', () => {
     let group, user, hyloGroup, res, req;
     beforeEach(async () => {
