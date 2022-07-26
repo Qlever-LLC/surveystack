@@ -19,34 +19,72 @@ jest.mock('../services/hylo/utils');
 
 describe('hyloController', () => {
   describe('getIntegratedHyloGroup', () => {
-    let group, user, hyloGroup, res, req;
+    const SAVE_ENV = process.env;
+    let group, user1, hyloUser1, hyloGroup, res, req;
     beforeEach(async () => {
+      process.env = { ...SAVE_ENV, HYLO_API_URL: 'https://hylo.api.url' };
       group = await createGroup();
-      user = (await group.createUserMember()).user;
+      user1 = await group.createUserMember();
+      hyloUser1 = {
+        id: '1',
+        hasRegistered: true,
+        name: user1.user.name,
+      };
       hyloGroup = {
         id: 'hylo-group-id-foo',
+        slug: 'hylo-slug-foo',
+        members: {
+          items: [hyloUser1],
+        },
       };
       await db
         .collection(COLL_GROUPS_HYLO_MAPPINGS)
         .insertOne({ groupId: group._id, hyloGroupId: hyloGroup.id });
 
-      gqlRequest.mockResolvedValue({ group: hyloGroup });
+      gqlRequest.mockResolvedValueOnce({ member0: hyloUser1 });
+      gqlRequest.mockResolvedValueOnce({ group: hyloGroup });
       req = createReq({ params: { groupId: group._id.toString() } });
-      res = await createRes({ user });
+      res = await createRes({ user: user1.user });
     });
+
+    afterAll(() => (process.env = SAVE_ENV));
 
     it('throws if groupId is not set', async () => {
       await expect(getIntegratedHyloGroup(await createReq(), res)).rejects.toThrow(
         'The groupId query parameter is required'
       );
     });
-    it('calls Hylo API', async () => {
+    it('reads group from Hylo API', async () => {
       await getIntegratedHyloGroup(req, res);
       expect(gqlRequest).toHaveBeenCalledWith(QUERY_GROUP, { id: hyloGroup.id });
+    });
+    it('reads members from Hylo API', async () => {
+      await getIntegratedHyloGroup(req, res);
+      expect(gqlRequest.mock.calls[0][0]).toContain(`person(email:"${user1.user.email}")`);
     });
     it('returns the integrated hylo group', async () => {
       await getIntegratedHyloGroup(req, res);
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining(hyloGroup));
+    });
+    it('extends hylo member objects with surveyStackMembership', async () => {
+      await getIntegratedHyloGroup(req, res);
+      expect(res.json.mock.calls[0][0].members.items).toContainEqual({
+        ...hyloUser1,
+        surveyStackMembership: {
+          _id: user1.membership._id,
+          user: {
+            _id: user1.user._id,
+            email: user1.user.email,
+          },
+        },
+      });
+    });
+    it('adds hyloUrl to surveyStackMembership', async () => {
+      await getIntegratedHyloGroup(req, res);
+      expect(res.json.mock.calls[0][0].members.items).toContainEqual({
+        ...hyloUser1,
+        hyloUrl: `${process.env.HYLO_API_URL}/groups/${hyloGroup?.slug}/members/${hyloUser1.id}`,
+      });
     });
     it('returns null if group is not connected to Hylo', async () => {
       await db.collection(COLL_GROUPS_HYLO_MAPPINGS).deleteOne({ groupId: group._id });

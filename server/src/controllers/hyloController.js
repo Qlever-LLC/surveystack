@@ -90,7 +90,7 @@ export const getIntegratedHyloGroup = async (req, res) => {
     ])
     .toArray();
 
-  // Find members on by email
+  // Find Hylo members on by email
   const queryHyloMembers = gql`
     query SurveyStackMembers {
       ${ssMemberships
@@ -103,13 +103,14 @@ export const getIntegratedHyloGroup = async (req, res) => {
         .join('\n')}
     }
   `;
-  const hyloMembers = await gqlRequest(queryHyloMembers);
-  console.log(hyloMembers);
+  const hyloMemberMap = await gqlRequest(queryHyloMembers);
+
+  // Find the Hylo group
+  const hyloGroup = await loadHyloGroup(mapping.hyloGroupId);
 
   // Add the SurveyStack user IDs to the Hylo member objects
-  const hyloGroup = await loadHyloGroup(mapping.hyloGroupId);
   ssMemberships.forEach((ssMembership, i) => {
-    const hyloMember = hyloMembers[`member${i}`];
+    const hyloMember = hyloMemberMap[`member${i}`];
     // Only add the user if they are also a member of the Hylo group
     let hyloMemberInGroup =
       hyloMember && (hyloGroup?.members?.items || []).find((m) => m.id === hyloMember.id);
