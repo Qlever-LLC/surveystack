@@ -20,7 +20,11 @@
                   </template>
 
                   <v-card>
-                    <v-card-title> Handler logs </v-card-title>
+                    <v-card-title>
+                      Handler logs
+                      <v-spacer></v-spacer>
+                      <copy-to-clipboard :value="JSON.stringify(item.logs, null, 2)" />
+                    </v-card-title>
 
                     <v-card-text>
                       <v-expansion-panels accordion>
@@ -60,7 +64,11 @@
 </template>
 
 <script>
+import CopyToClipboard from '../submissions/CopyToClipboard.vue';
 export default {
+  components: {
+    CopyToClipboard,
+  },
   props: {
     value: {
       required: true,
