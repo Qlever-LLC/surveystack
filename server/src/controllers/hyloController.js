@@ -150,7 +150,7 @@ export const createNewIntegratedHyloGroup = async (req, res) => {
       name: group.name,
       slug: group.slug,
       parentIds: [],
-      visibility: 1,
+      visibility: 2,
     },
     hyloUserId: hyloUser.id,
   });

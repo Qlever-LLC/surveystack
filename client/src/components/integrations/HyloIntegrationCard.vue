@@ -91,6 +91,7 @@
                 ></v-row>
 
                 <div class="font-italic text-body-2 mb-4">Create a new group on Hylo with the same name</div>
+
                 <v-col align="center">
                   <v-btn
                     color="primary"
@@ -103,6 +104,10 @@
                     Integrate with a new Hylo group
                   </v-btn></v-col
                 >
+                <div class="font-italic text-body-2 mb-4">
+                  Default group settings are: anyone can find and see this group but people must apply to join this
+                  group and must be approved. You can change the settings in this Group Settings page in Hylo.
+                </div>
               </v-card-text>
 
               <v-card-actions>
