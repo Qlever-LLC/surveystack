@@ -472,17 +472,60 @@ const activateMembership = async (req, res) => {
   if (loginPayload) {
     res.send(loginPayload);
   } else {
-    res.send({ message: 'ok' });
+    res.send({ ok: true });
   }
+};
+
+const activateMembershipByAdmin = async (req, res) => {
+  const { membershipId } = req.body;
+  const { origin } = req.headers;
+
+  if (!membershipId) {
+    throw boom.badRequest('"membershipId" is missing from the request body');
+  }
+
+  const membership = await db.collection(col).findOne({ _id: ObjectId(membershipId) });
+  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, membership.group);
+  if (!adminAccess) {
+    throw boom.unauthorized(`Only group admins can create memberships`);
+  }
+
+  await membershipService.activateMembershipByAdmin({ membershipId: membership._id, origin });
+
+  res.send({ ok: true });
+};
+
+// Creates a confirmed (activated) group member
+const createConfirmedMembership = async (req, res) => {
+  const entity = req.body;
+  delete entity._id;
+  sanitize(entity);
+  const { origin } = req.headers;
+
+  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
+  if (!adminAccess) {
+    throw boom.unauthorized(`Only group admins can create memberships`);
+  }
+
+  if (!entity.meta?.invitationEmail) {
+    throw boom.badRequest('Need to supply an email address');
+  }
+
+  let membership = (await db.collection(col).insertOne(entity)).ops[0];
+  await membershipService.activateMembershipByAdmin({ membershipId: membership._id, origin });
+
+  res.send({ ok: true });
 };
 
 export default {
   getMemberships,
   getMembership,
   createMembership,
+  createConfirmedMembership,
   updateMembership,
   deleteMembership,
   activateMembership,
+  activateMembershipByAdmin,
   getTree,
   resendInvitation,
   joinGroup,
