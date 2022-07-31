@@ -16,10 +16,25 @@
             <v-toolbar-title class="text-h6 white--text pl-0"> Hylo Integration </v-toolbar-title>
 
             <v-spacer></v-spacer>
-
-            <v-btn text color="white" @click="removeGroupIntegration" :loading="isRemoveGroupIntegrationInProgress">
-              Remove integration
-            </v-btn>
+            <v-dialog v-model="isRemoveConfirmDialogOpen" persistent max-width="490">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn text v-bind="attrs" v-on="on" color="white"> Remove integration </v-btn>
+              </template>
+              <v-card>
+                <v-card-title class="text-h5"> Are you sure? </v-card-title>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    color="green darken-1"
+                    text
+                    @click="removeGroupIntegration"
+                    :loading="isRemoveGroupIntegrationInProgress"
+                  >
+                    Yes, remove Hylo integration
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
           </v-app-bar>
           <v-spacer />
           <!-- <v-col cols="4" sm="2" md="1"> -->
@@ -42,9 +57,7 @@
           <!-- <v-col class="hidden-xs-only" sm="5" md="3"> -->
           <v-card-text class="white--text">
             &nbsp;Your group is integrated with
-            <a :href="integratedHyloGroup.hyloUrl" target="_blank">{{
-              integratedHyloGroup.name
-            }}</a>
+            <a :href="integratedHyloGroup.hyloUrl" target="_blank">{{ integratedHyloGroup.name }}</a>
             on Hylo
           </v-card-text>
 
@@ -98,8 +111,6 @@
                     :loading="isCreateIntegratedHyloGroupInProgress"
                     :disabled="isSetIntegratedInProgress"
                     @click="createIntegratedHyloGroup"
-                    v-bind="attrs"
-                    v-on="on"
                   >
                     Integrate with a new Hylo group
                   </v-btn></v-col
@@ -137,6 +148,7 @@ export default {
       isLoadingHyloGroup: false,
       isSetIntegratedInProgress: false,
       isRemoveGroupIntegrationInProgress: false,
+      isRemoveConfirmDialogOpen: false,
       isCreateIntegratedHyloGroupInProgress: false,
       hyloGroupInput: null,
       integrateDialog: false,
@@ -219,6 +231,7 @@ export default {
         this.$store.dispatch('feedback/add', get(e, 'response.data.message', String(e)));
       } finally {
         this.isRemoveGroupIntegrationInProgress = false;
+        this.isRemoveConfirmDialogOpen = false;
       }
     },
     async throttledFindHyloGroup(slug) {
@@ -232,7 +245,7 @@ export default {
           this.findError = null;
           this.groupFound = null;
           this.isLoadingHyloGroup = true;
-          this.groupFound = (await this.api.get(`/hylo/group?slug=${slug}`)).data;
+          this.groupFound = (await api.get(`/hylo/group?slug=${slug}`)).data;
           this.findError = this.groupFound ? null : `Can't find Hylo group with slug "${slug}"`;
         } catch (e) {
           console.warn(e);
