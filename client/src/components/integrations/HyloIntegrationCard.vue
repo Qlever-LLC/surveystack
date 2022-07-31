@@ -16,7 +16,7 @@
             <v-toolbar-title class="text-h6 white--text pl-0"> Hylo Integration </v-toolbar-title>
 
             <v-spacer></v-spacer>
-            <v-dialog v-model="isRemoveConfirmDialogOpen" persistent max-width="490">
+            <v-dialog v-model="isRemoveConfirmDialogOpen" max-width="490">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn text v-bind="attrs" v-on="on" color="white"> Remove integration </v-btn>
               </template>
