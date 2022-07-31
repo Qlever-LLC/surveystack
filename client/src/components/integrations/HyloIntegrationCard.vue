@@ -42,7 +42,7 @@
           <!-- <v-col class="hidden-xs-only" sm="5" md="3"> -->
           <v-card-text class="white--text">
             &nbsp;Your group is integrated with
-            <a :href="`https://www.hylo.com/groups/${integratedHyloGroup.slug}`" target="_blank">{{
+            <a :href="integratedHyloGroup.hyloUrl" target="_blank">{{
               integratedHyloGroup.name
             }}</a>
             on Hylo

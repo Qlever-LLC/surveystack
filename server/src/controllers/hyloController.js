@@ -107,6 +107,7 @@ export const getIntegratedHyloGroup = async (req, res) => {
 
   // Find the Hylo group
   const hyloGroup = await loadHyloGroup(mapping.hyloGroupId);
+  hyloGroup.hyloUrl = `${process.env.HYLO_API_URL}/groups/${hyloGroup.slug}`
 
   // Add the SurveyStack user IDs to the Hylo member objects
   ssMemberships.forEach((ssMembership, i) => {
