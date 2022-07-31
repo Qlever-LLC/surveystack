@@ -338,6 +338,11 @@ router.post(
   catchErrors(hyloController.removeHyloGroupIntegration)
 );
 
+router.post(
+  '/hylo/invite-member-to-hylo-group',
+  catchErrors(hyloController.inviteMemberToHyloGroup)
+);
+
 router.get(
   '/hylo/integrated-group/:groupId',
   [],

@@ -16,10 +16,25 @@
             <v-toolbar-title class="text-h6 white--text pl-0"> Hylo Integration </v-toolbar-title>
 
             <v-spacer></v-spacer>
-
-            <v-btn text color="white" @click="removeGroupIntegration" :loading="isRemoveGroupIntegrationInProgress">
-              Remove integration
-            </v-btn>
+            <v-dialog v-model="isRemoveConfirmDialogOpen" persistent max-width="490">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn text v-bind="attrs" v-on="on" color="white"> Remove integration </v-btn>
+              </template>
+              <v-card>
+                <v-card-title class="text-h5"> Are you sure? </v-card-title>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    color="green darken-1"
+                    text
+                    @click="removeGroupIntegration"
+                    :loading="isRemoveGroupIntegrationInProgress"
+                  >
+                    Yes, remove Hylo integration
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
           </v-app-bar>
           <v-spacer />
           <!-- <v-col cols="4" sm="2" md="1"> -->
@@ -42,9 +57,7 @@
           <!-- <v-col class="hidden-xs-only" sm="5" md="3"> -->
           <v-card-text class="white--text">
             &nbsp;Your group is integrated with
-            <a :href="`https://www.hylo.com/groups/${integratedHyloGroup.slug}`" target="_blank">{{
-              integratedHyloGroup.name
-            }}</a>
+            <a :href="integratedHyloGroup.hyloUrl" target="_blank">{{ integratedHyloGroup.name }}</a>
             on Hylo
           </v-card-text>
 
@@ -72,7 +85,7 @@
                   v-model="hyloGroupInput"
                   label="Hylo group"
                   placeholder="Link to your Hylo group"
-                  :loading="!!isLoadingHyloGroup"
+                  :loading="isLoadingHyloGroup"
                   :error-messages="findError"
                   class="mb-2"
                 ></v-text-field>
@@ -91,18 +104,21 @@
                 ></v-row>
 
                 <div class="font-italic text-body-2 mb-4">Create a new group on Hylo with the same name</div>
+
                 <v-col align="center">
                   <v-btn
                     color="primary"
                     :loading="isCreateIntegratedHyloGroupInProgress"
                     :disabled="isSetIntegratedInProgress"
                     @click="createIntegratedHyloGroup"
-                    v-bind="attrs"
-                    v-on="on"
                   >
                     Integrate with a new Hylo group
                   </v-btn></v-col
                 >
+                <div class="font-italic text-body-2 mb-4">
+                  Default group settings are: anyone can find and see this group but people must apply to join this
+                  group and must be approved. You can change the settings in this Group Settings page in Hylo.
+                </div>
               </v-card-text>
 
               <v-card-actions>
@@ -129,9 +145,10 @@ export default {
     return {
       integratedHyloGroup: null,
       isLoading: true,
-      isLoadingHyloGroup: null,
+      isLoadingHyloGroup: false,
       isSetIntegratedInProgress: false,
       isRemoveGroupIntegrationInProgress: false,
+      isRemoveConfirmDialogOpen: false,
       isCreateIntegratedHyloGroupInProgress: false,
       hyloGroupInput: null,
       integrateDialog: false,
@@ -141,12 +158,10 @@ export default {
   },
   computed: {
     extractedSlug() {
-      console.log('this.hyloGroupInput', this.hyloGroupInput);
       if (!this.hyloGroupInput) {
         return null;
       }
       const match = this.hyloGroupInput.match(/\/groups\/([^/]+)/);
-      console.log({ match });
       const slug = match ? match[1] : this.hyloGroupInput;
       return slug;
     },
@@ -160,11 +175,13 @@ export default {
       // TODO find out how this should be done in Vue
       async handler(groupId) {
         this.isLoading = true;
-        console.log('this.groupId', groupId);
-        this.integratedHyloGroup = (await api.get(`/hylo/integrated-group/${groupId}`)).data;
-        console.log(JSON.stringify(this.integratedHyloGroup, null, 2));
-        // TODO handle error
-        this.isLoading = false;
+        try {
+          this.integratedHyloGroup = (await api.get(`/hylo/integrated-group/${groupId}`)).data;
+        } catch (e) {
+          console.error(e);
+        } finally {
+          this.isLoading = false;
+        }
       },
     },
   },
@@ -214,32 +231,31 @@ export default {
         this.$store.dispatch('feedback/add', get(e, 'response.data.message', String(e)));
       } finally {
         this.isRemoveGroupIntegrationInProgress = false;
+        this.isRemoveConfirmDialogOpen = false;
       }
     },
     async throttledFindHyloGroup(slug) {
-      console.log('throttledFindHyloGroup', slug, this.isLoadingHyloGroup);
       if (this.isLoadingHyloGroup) {
         this._nextSlugToCheck = slug;
-        console.log('already loading, next is ', slug);
         return;
       }
-      console.log('check with', slug);
+
       if (slug) {
         try {
           this.findError = null;
           this.groupFound = null;
-          this.isLoadingHyloGroup = api.get(`/hylo/group?slug=${slug}`);
-          this.groupFound = (await this.isLoadingHyloGroup).data;
+          this.isLoadingHyloGroup = true;
+          this.groupFound = (await api.get(`/hylo/group?slug=${slug}`)).data;
           this.findError = this.groupFound ? null : `Can't find Hylo group with slug "${slug}"`;
         } catch (e) {
           console.warn(e);
         }
 
         this.isLoadingHyloGroup = null;
-        console.log('this._nextSlugToCheck', this._nextSlugToCheck);
         if (this._nextSlugToCheck) {
-          this.throttledFindHyloGroup(this._nextSlugToCheck);
+          const nextSlug = this._nextSlugToCheck;
           this._nextSlugToCheck = null;
+          this.throttledFindHyloGroup(nextSlug);
         }
       }
     },
