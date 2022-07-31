@@ -57,7 +57,11 @@ export const QUERY_GROUP = gql`
 
 const loadHyloGroup = async (id) => {
   const data = await gqlRequest(QUERY_GROUP, { id });
-  return data?.group;
+  const hyloGroup = data?.group;
+  if (hyloGroup) {
+    hyloGroup.hyloUrl = `${process.env.HYLO_API_URL}/groups/${hyloGroup.slug}`;
+  }
+  return hyloGroup;
 };
 
 export const getIntegratedHyloGroup = async (req, res) => {
@@ -107,7 +111,6 @@ export const getIntegratedHyloGroup = async (req, res) => {
 
   // Find the Hylo group
   const hyloGroup = await loadHyloGroup(mapping.hyloGroupId);
-  hyloGroup.hyloUrl = `${process.env.HYLO_API_URL}/groups/${hyloGroup.slug}`;
 
   // Add the SurveyStack user IDs to the Hylo member objects
   ssMemberships.forEach((ssMembership, i) => {
