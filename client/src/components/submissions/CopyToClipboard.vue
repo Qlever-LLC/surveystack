@@ -14,12 +14,13 @@ export default {
   },
   methods: {
     copyText() {
-      const tempInput = document.createElement('input');
-      tempInput.value = this.value;
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      document.execCommand('copy');
-      document.body.removeChild(tempInput);
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(this.value).catch((err) => {
+          console.error('Async: Could not copy text: ', err);
+        });
+      } else {
+        console.warn("Can't copy to clipboard:", this.value);
+      }
     },
   },
 };
