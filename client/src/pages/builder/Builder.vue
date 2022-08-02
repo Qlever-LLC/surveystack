@@ -187,7 +187,7 @@ export default {
 
       this.submitting = true;
       try {
-        await uploadFileResources(this.$store, payload, false);
+        await uploadFileResources(this.$store, this.survey, payload, false);
         const submission = {
           ...payload,
           meta: {
