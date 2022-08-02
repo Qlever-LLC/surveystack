@@ -57,7 +57,7 @@
             outlined
             color="secondary"
             class="ml-2"
-            :disabled="surveyEntity.meta.isLibrary"
+            :disabled="surveyEntity && surveyEntity.meta.isLibrary"
             @click="startDraft(survey)"
           >
             <v-icon left>mdi-plus</v-icon>
