@@ -212,7 +212,6 @@
  ... it's ok for now but working with the real JSON object would make more sense
 */
 import api from '@/services/api.service';
-import { flattenSubmission } from '@/utils/submissions';
 import appSubmissionsFilterBasic from '@/components/submissions/SubmissionFilterBasic.vue';
 import appSubmissionsFilterAdvanced from '@/components/submissions/SubmissionFilterAdvanced.vue';
 import appSubmissionsTableClientCsv from '@/components/submissions/SubmissionTableClientCsv.vue';

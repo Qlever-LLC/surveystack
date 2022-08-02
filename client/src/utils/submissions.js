@@ -73,23 +73,6 @@ export const getBreadcrumbsForSubmission = (controls, position) => {
   return breadcrumbs;
 };
 
-export const flattenSubmission = (submission, delimiter = '.') => {
-  const res = {};
-  const positions = getControlPositions(submission.data);
-  positions.forEach((p) => {
-    const control = getControl(submission.data, p);
-    const breadcrumbs = getBreadcrumbsForSubmission(submission.data, p);
-    if (control.type !== 'group') {
-      const key = breadcrumbs.join(delimiter);
-      res[key] = {
-        value: control.value,
-        type: control.type,
-      };
-    }
-  });
-  return res;
-};
-
 /**
  * Creates and returns a new submission based off a specific survey version
  * @param {Object} survey
