@@ -54,6 +54,14 @@
                     <v-list-item-title>SurveyStack Docs</v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
+                <v-list-item href="https://www.surveystack.io" target="_blank">
+                  <v-list-item-icon>
+                    <v-icon>mdi-information-outline</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title>About</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
               </v-list>
             </v-expansion-panel-content>
           </v-expansion-panel>
