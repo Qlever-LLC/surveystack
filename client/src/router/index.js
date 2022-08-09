@@ -12,12 +12,12 @@ import DraftSubmission from '@/pages/submissions/drafts/Draft.vue';
 
 import Login from '@/pages/auth/Login.vue';
 import Register from '@/pages/auth/Register.vue';
-import Profile from '@/pages/auth/Profile.vue';
 import ForgotPassword from '@/pages/auth/ForgotPassword.vue';
 
 import UserList from '@/pages/users/UserList.vue';
 import User from '@/pages/users/User.vue';
 import UserEdit from '@/pages/users/UserEdit.vue';
+import Profile from '@/pages/users/Profile.vue';
 
 const FarmosManage = () => import('@/pages/farmos-manage/FarmosManage.vue');
 
