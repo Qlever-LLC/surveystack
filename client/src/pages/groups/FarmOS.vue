@@ -190,10 +190,10 @@ export default {
     async enable() {
       const res = await api.post('/farmos/group-manage/enable', { groupId: this.groupId, enable: true });
       console.log('res', res.data);
-
       try {
         const res = await api.get('/farmos/group-manage/' + this.groupId);
-        this.groupInfos.value = res.data;
+        this.groupInfos = res.data;
+        await this.init();
       } catch (error) {
         this.error(error.status);
       }
