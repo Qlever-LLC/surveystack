@@ -134,8 +134,13 @@ export default {
           const membership = { user: newUser._id, group, role };
           await api.post('/memberships', membership);
         }
+
         if (this.editMode) {
-          this.$store.dispatch('auth/updateToken', newUser.value);
+          const current_user = this.$store.getters['auth/user'];
+          // update the token when we're logged in with the updated user (not superadmin editing a user)
+          if (current_user._id.toString() === newUser.value._id.toString()) {
+            this.$store.dispatch('auth/updateToken', newUser.value);
+          }
         }
         this.status = {
           type: 'success',
