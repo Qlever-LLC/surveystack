@@ -73,12 +73,6 @@ describe('membership.service', () => {
         expiresAfterDays: 7,
         landingPath: `/auth/profile`,
       });
-      expect(createMagicLink).toHaveBeenCalledWith({
-        origin,
-        email: pendingUser.email,
-        expiresAfterDays: 7,
-        landingPath: `/users/${pendingUser._id}/edit`,
-      });
     });
 
     it('calls mailService.sendLink', async () => {
