@@ -227,7 +227,7 @@ export default {
       const iterateAll = (diffInfoTree) => {
         return diffInfoTree.map((changeItem) => {
           const children = iterateAll(changeItem.children);
-          console.log(changeItem.discardLocalChange ? changeItem.name + ' discarded' : changeItem.name + ' keep');
+          // console.log(changeItem.discardLocalChange ? changeItem.name + ' discarded' : changeItem.name + ' keep');
           return null;
         });
       };
