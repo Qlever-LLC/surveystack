@@ -211,7 +211,7 @@ export default {
     },
     async addFile(file, destArray, allowMultiple, allowedTypes) {
       if (!this.isMimeTypeAllowed(allowedTypes, file.type)) {
-        throw Error(`Drop not allowed for this file type. Allowed types: ${allowedTypes.join(', ')}`);
+        throw Error(`This file type is not allowed. Allowed types: ${allowedTypes.join(', ')}`);
       }
       if (!this.isImageFile(file.type) && file.size > MAX_FILE_SIZE) {
         throw Error(

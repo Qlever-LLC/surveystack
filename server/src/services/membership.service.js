@@ -1,6 +1,8 @@
 import boom from '@hapi/boom';
 
 import { db } from '../db';
+import { createMagicLink, createUserIfNotExist } from './auth.service';
+import mailService from './mail/mail.service';
 
 const col = 'memberships';
 
@@ -33,7 +35,7 @@ export const activateMembership = async ({ code, user }) => {
   const existing = await db.collection(col).find({ user, group: membership.group }).toArray();
   if (existing.length > 0) {
     console.log(
-      `User ${user.email} already has ${existing.length} memberships for group ${membership.group}`
+      `User ${user} already has ${existing.length} memberships for group ${membership.group}`
     );
     console.log('deleting existing membership now...');
     await db.collection(col).deleteMany({ _id: { $in: existing.map((e) => e._id) } });
@@ -51,7 +53,63 @@ export const activateMembership = async ({ code, user }) => {
   );
 };
 
+// activates the membership and notifies the user in email
+export const activateMembershipByAdmin = async (options) => {
+  const {
+    membershipId,
+    origin,
+    activateMembership: _activateMembership,
+  } = { activateMembership, ...options };
+  const membership = await db.collection(col).findOne({ _id: membershipId });
+  let group = await db.collection('groups').findOne({ _id: membership.group });
+  if (!group) {
+    throw boom.badRequest(`Can't find a group with the ID: ${membership.group}`);
+  }
+  let userObject = await createUserIfNotExist(
+    membership.meta.invitationEmail,
+    membership.meta.invitationName
+  );
+  await _activateMembership({
+    code: membership.meta.invitationCode,
+    user: userObject._id,
+  });
+
+  const magicLink = await createMagicLink({
+    origin,
+    email: userObject.email,
+    expiresAfterDays: 7,
+    landingPath: `/g/${group.slug}/`,
+  });
+  const magicLinkProfile = await createMagicLink({
+    origin,
+    email: userObject.email,
+    expiresAfterDays: 7,
+    landingPath: `/auth/profile`,
+  });
+  const magicLinkUser = await createMagicLink({
+    origin,
+    email: userObject.email,
+    expiresAfterDays: 7,
+    landingPath: `/users/${userObject._id}/edit`,
+  });
+
+  await mailService.sendLink({
+    to: userObject.email,
+    subject: `You've been added to "${group.name}" in SurveyStack!`,
+    link: magicLink,
+    actionDescriptionHtml: `You've been added to "${group.name}" in SurveyStack!`,
+    actionDescriptionText: `You've been added to "${group.name}" in SurveyStack!`,
+    btnText: 'Sign in',
+    afterHtml: `<b>Unsure why you're receiving this email?</b> 
+"${group.name}" added you to a SurveyStack group and may have initiated an account on your behalf. 
+You have control over your account. 
+<a href="${magicLinkProfile}">Click here</a> to view and change groups. 
+You can <a href="${magicLinkUser}">click here</a> to manage or change your account.`,
+  });
+};
+
 export default {
   addMembership,
   activateMembership,
+  activateMembershipByAdmin,
 };

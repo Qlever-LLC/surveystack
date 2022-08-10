@@ -12,7 +12,10 @@ import rolesService from '../services/roles.service';
 const col = 'groups';
 
 const sanitizeGroup = (entity) => {
-  entity._id = new ObjectId(entity._id);
+  // entity doesn't have an _id before inserting a new group
+  if (entity._id) {
+    entity._id = new ObjectId(entity._id);
+  }
 
   if (!entity.slug) {
     throw boom.badRequest(`Group slug not set`);
@@ -226,7 +229,7 @@ const createGroup = async (req, res) => {
     assert.equal(1, r.insertedCount);
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
-      throw boom.conflict(`Conflict _id or path: ${entity._id}, ${entity.path}`);
+      throw boom.conflict(`Conflict _id or path: "${String(entity._id)}", "${entity.path}"`);
     }
     throw boom.internal(`createGroup: unknown internal error`);
   }

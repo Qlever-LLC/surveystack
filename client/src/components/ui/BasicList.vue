@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card :loading="loading">
     <v-card-title class="heading--text">
       <slot name="title">
         {{ title }}
@@ -32,6 +32,10 @@
 <script>
 export default {
   props: {
+    loading: {
+      type: Boolean,
+      default: false,
+    },
     editable: {
       type: Boolean,
     },
