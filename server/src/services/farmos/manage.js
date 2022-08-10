@@ -267,28 +267,6 @@ export const getTree = async (group) => {
 };
 
 /**
- *
- * @param { String } path
- * @returns array of paths contained in given path;
- * first element is path from it-self and after all direct parents with last who is BaseGroup '/xxx/'
- */
-export const getArrayPathsConainedInPath = (path) => {
-  const groupsPath = [];
-  const hierarchie = path.split('/');
-  hierarchie.shift();
-  hierarchie.pop();
-  while (hierarchie.length > 0) {
-    let path = '/';
-    hierarchie.forEach((part) => {
-      path = path + part + '/';
-    });
-    groupsPath.push(path);
-    hierarchie.pop();
-  }
-  return groupsPath;
-};
-
-/**
  * The user receives ownership over the farmos instance
  */
 export const mapFarmOSInstanceToUser = async (userId, instanceName, owner) => {
@@ -357,14 +335,6 @@ export const mapFarmOSInstanceToGroup = async (groupId, instanceName) => {
     groupId,
     instanceName,
   };
-};
-/**
- * A farmos instance is removed from the group's plan
- */
-export const removeFarmOSInstanceFromGroup = async (id) => {
-  await db.collection('farmos-group-mapping').deleteOne({
-    _id: ObjectId(id),
-  });
 };
 
 /**
