@@ -2,6 +2,7 @@ import ObjectId from 'bson-objectid';
 import slugify from '@/utils/slugify';
 import api from '@/services/api.service';
 import axios from 'axios';
+import { linearControls } from '@/utils/submissions';
 
 export const resourceTypes = {
   ONTOLOGY_LIST: 'ONTOLOGY_LIST',
@@ -130,9 +131,9 @@ export async function uploadFileResource(store, resourceKey, clearCacheAfterUplo
   }
 }
 
-export async function uploadFileResources(store, submission, clearCacheAfterUpload) {
+export async function uploadFileResources(store, survey, submission, clearCacheAfterUpload) {
   try {
-    let controls = Object.values(submission.data);
+    let controls = linearControls(survey, submission);
     for (let control of controls) {
       if (control.value && (control.meta.type === 'file' || control.meta.type === 'image')) {
         const unresolvedPromises = control.value.map((resourceKey) =>

@@ -3,10 +3,17 @@
     <span class="text--secondary overline">{{ entity._id }}</span>
     <h2>Invite people to '{{ groupDetail.name }}'</h2>
     <v-card class="pa-4 mb-4">
-      <v-form class="mt-3" @keydown.enter.prevent="submit">
+      <v-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
         <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined></v-select>
 
-        <v-text-field class="mt-3" v-model="entity.meta.invitationEmail" label="Email" outlined />
+        <v-text-field
+          class="mt-3"
+          v-model="entity.meta.invitationEmail"
+          label="Email"
+          outlined
+          :rules="emailRules"
+          validate-on-blur
+        />
 
         <v-text-field
           class="mt-3"
@@ -40,7 +47,43 @@
 
         <div class="d-flex mt-2 justify-end">
           <v-btn text @click="cancel">Cancel</v-btn>
-          <v-btn color="primary" @click="submit" :disabled="!submittable">Submit</v-btn>
+
+          <v-btn-toggle :max="0" multiple :value="[]" dense>
+            <v-btn :loading="isSubmitting" color="primary" @click="submit" elevation="0" :disabled="!submittable">{{
+              invitationMethod === INVITATION_METHODS.INVITE ? 'Invite Member' : 'Add Member'
+            }}</v-btn>
+            <v-menu top left>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn outlined primary v-bind="attrs" v-on="on" color="primary" elevation="0" min-width="0">
+                  <v-icon> mdi-chevron-down </v-icon></v-btn
+                >
+              </template>
+              <v-list>
+                <v-list-item-group v-model="invitationMethod">
+                  <v-list-item two-line :value="INVITATION_METHODS.INVITE">
+                    <v-list-item-content>
+                      <v-list-item-title>Invite Member</v-list-item-title>
+                      <v-list-item-subtitle
+                        >Send them an email to agree to join your group. They only join once they click the "Join" link
+                        in the email.</v-list-item-subtitle
+                      >
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item three-line :value="INVITATION_METHODS.ADD">
+                    <v-list-item-content>
+                      <v-list-item-title>Add Member</v-list-item-title>
+                      <v-list-item-subtitle style="-webkit-line-clamp: 4">
+                        The member joins immediately. An email is still sent informing them they are joined. This is
+                        useful when using "Call for Submissions" to send this member survey requests without waiting for
+                        them to check their email.
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list-item-group>
+              </v-list>
+            </v-menu>
+          </v-btn-toggle>
         </div>
       </v-form>
     </v-card>
@@ -65,8 +108,12 @@
 import ObjectId from 'bson-objectid';
 import moment from 'moment';
 import api from '@/services/api.service';
+import EmailValidator from 'email-validator';
 
 import { uuid } from '@/utils/memberships';
+
+// LocalStorage key for saving the preferred login method
+const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
 
 const availableRoles = [
   {
@@ -81,6 +128,10 @@ const availableRoles = [
 
 export default {
   data() {
+    const INVITATION_METHODS = {
+      INVITE: 'invite',
+      ADD: 'add',
+    };
     return {
       availableRoles,
       entity: {
@@ -102,6 +153,12 @@ export default {
       groupDetail: { name: '', path: '' },
       dialogCreateUser: false,
       sendEmail: 'SEND_NOW',
+      INVITATION_METHODS,
+      invitationMethod: Object.values(INVITATION_METHODS).includes(localStorage[LS_MEMBER_INVITATION_METHOD])
+        ? localStorage[LS_MEMBER_INVITATION_METHOD]
+        : INVITATION_METHODS.INVITE,
+      isSubmitting: false,
+      emailRules: [(v) => !!v || 'E-mail is required', (v) => EmailValidator.validate(v) || 'E-mail must be valid'],
     };
   },
   methods: {
@@ -112,10 +169,17 @@ export default {
       this.entity.content = code;
     },
     async submit() {
+      if (!this.$refs.form.validate()) {
+        return;
+      }
       const data = this.entity;
-      const url = `/memberships?sendEmail=${this.sendEmail}`;
+      const url =
+        this.invitationMethod === this.INVITATION_METHODS.INVITE
+          ? `/memberships?sendEmail=${this.sendEmail}`
+          : `/memberships/confirmed`;
 
       try {
+        this.isSubmitting = true;
         await api.post(url, data);
         this.$router.back();
       } catch (err) {
@@ -124,6 +188,8 @@ export default {
           this.dialogCreateUser = true;
         }
         this.$store.dispatch('feedback/add', err.response.data.message);
+      } finally {
+        this.isSubmitting = false;
       }
     },
     proceedToUserCreation() {
@@ -140,6 +206,11 @@ export default {
   computed: {
     submittable() {
       return true;
+    },
+  },
+  watch: {
+    invitationMethod(newValue) {
+      localStorage[LS_MEMBER_INVITATION_METHOD] = newValue;
     },
   },
   async created() {
