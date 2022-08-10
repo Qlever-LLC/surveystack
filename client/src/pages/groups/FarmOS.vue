@@ -42,12 +42,12 @@
       </v-col>
     </v-row>
     <v-row v-else>
-      <v-col lg="4">
-        <v-card class="pa-8" v-if="superAdmin">
+      <v-col lg="4" class="mx-auto">
+        <v-card class="pa-8 text-center" v-if="superAdmin">
           <p>FarmOS Integrations are disabled for this group.</p>
           <v-btn color="primary" type="submit" @click="enable">Enable</v-btn>
         </v-card>
-        <v-card class="pa-8" v-else>
+        <v-card class="pa-8 text-center" v-else>
           <p>{{ message }}</p>
           <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank">Contact Our-Sci</v-btn>
         </v-card>
@@ -174,7 +174,7 @@ export default {
         }
         this.loading = false;
       } catch (error) {
-        this.message = error.message;
+        this.message = error.message + '.';
         this.loading = false;
       }
     },
