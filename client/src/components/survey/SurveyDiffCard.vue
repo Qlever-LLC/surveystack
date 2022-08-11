@@ -53,7 +53,7 @@
           <tr v-for="change in diffInfo.changeList" :key="change.key">
             <td>{{ change.key }}</td>
             <td v-if="versionNameLocalRevision" :class="diffInfo.discardLocalChange ? 'change-discarded' : ''">
-              {{ change.localValue }} {{ diffInfo.discardLocalChange }}
+              {{ change.localValue }}
             </td>
             <td>{{ change.oldValue }}</td>
             <td>{{ change.newValue }}</td>

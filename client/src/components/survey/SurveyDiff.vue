@@ -149,6 +149,7 @@ export default {
             changeList: this.getControlChangeList(controlDiff),
             indexPath: idxPath.join('.'),
             children: convert(childrenOf(controlDiff), idxPath),
+            pathLocalRevision: controlDiff.pathLocalRevision,
           };
         });
       };
@@ -224,14 +225,18 @@ export default {
         .filter((c) => c !== null);
     },
     diffInfoChanged(diffInfoTree) {
+      let localChangesToDiscard = [];
       const iterateAll = (diffInfoTree) => {
-        return diffInfoTree.map((changeItem) => {
-          const children = iterateAll(changeItem.children);
-          console.log(changeItem.discardLocalChange ? changeItem.name + ' discarded' : changeItem.name + ' keep');
-          return null;
+        diffInfoTree.map((changeItem) => {
+          if (Array.isArray(changeItem)) {
+            iterateAll(changeItem);
+          } else if (changeItem.discardLocalChange) {
+            localChangesToDiscard.push(changeItem.pathLocalRevision);
+          }
         });
       };
       iterateAll(diffInfoTree);
+      this.$emit('discard-local-changes-changed', localChangesToDiscard);
     },
   },
 };

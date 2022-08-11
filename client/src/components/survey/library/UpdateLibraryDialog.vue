@@ -19,6 +19,7 @@
         :default-open="true"
         :showHeader="true"
         :showNoChangesText="false"
+        @discard-local-changes-changed="discardLocalChangesChanged"
       ></survey-diff>
       <div v-if="hasBreakingChanges">
         <v-card-text class="ml-2 my-3" style="margin-bottom: -20px">
@@ -88,6 +89,7 @@ export default {
   setup(props, { emit }) {
     const state = reactive({
       localRevisionControls: props.libraryRootGroup.children,
+      discardLocalChanges: [],
       remoteOldRevisionControls: null,
       remoteNewRevisionControls: null,
       hasBreakingChanges: false,
@@ -124,16 +126,22 @@ export default {
       let updatedLibraryControls = merge(
         state.localRevisionControls,
         state.remoteOldRevisionControls,
-        state.remoteNewRevisionControls
+        state.remoteNewRevisionControls,
+        state.discardLocalChanges
       );
       //emit containing updated controls and resources
       emit('update', updatedLibraryControls);
+    }
+
+    function discardLocalChangesChanged(discardLocalChanges) {
+      state.discardLocalChanges = discardLocalChanges;
     }
 
     return {
       ...toRefs(state),
       update,
       updateConfirmed,
+      discardLocalChangesChanged,
     };
   },
 };

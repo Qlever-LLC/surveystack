@@ -315,7 +315,12 @@ function createThreePointChange(changeLocal, changeRemote) {
   - apply changes in local revision to the resulting revision if the remote change is not a breaking change
   - apply adds of "foreign" controls to the resulting revision keeping the same position
  */
-export function merge(controlsLocalRevision, controlsRemoteRevisionOld, controlsRemoteRevisionNew) {
+export function merge(
+  controlsLocalRevision,
+  controlsRemoteRevisionOld,
+  controlsRemoteRevisionNew,
+  discardLocalChanges
+) {
   let mergedControls = [...controlsRemoteRevisionNew];
 
   //collect changes
@@ -330,8 +335,12 @@ export function merge(controlsLocalRevision, controlsRemoteRevisionOld, controls
   for (const change of changes) {
     switch (change.changeType) {
       case changeType.CHANGED:
-        //merge local change into resulting controls except if it's a breaking change, then discard the local change
-        if (change.hasLocalChange && !change.discardLocalChange) {
+        //merge local change into resulting controls except if the local change is discarded by the user or by a breaking change
+        if (
+          change.hasLocalChange &&
+          !change.discardLocalChange &&
+          discardLocalChanges.indexOf(change.pathLocalRevision) === -1
+        ) {
           mergedControls = replaceControl(mergedControls, null, change.pathRevisionNew, change.controlLocalRevision);
         }
         break;
