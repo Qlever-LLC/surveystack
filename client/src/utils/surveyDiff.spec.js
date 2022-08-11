@@ -559,7 +559,7 @@ describe('surveyDiff', () => {
         name: 'text_1',
         label: 'bar',
       });
-      const mergeResult = merge([numberControl], [numberControl], [numberControl, textControl]);
+      const mergeResult = merge([numberControl], [numberControl], [numberControl, textControl], []);
       expect(mergeResult.length).toBe(2);
     });
     it('removes deleted controls', () => {
@@ -573,7 +573,7 @@ describe('surveyDiff', () => {
         name: 'text_1',
         label: 'bar',
       });
-      const mergeResult = merge([numberControl, textControl], [numberControl, textControl], [numberControl]);
+      const mergeResult = merge([numberControl, textControl], [numberControl, textControl], [numberControl], []);
       expect(mergeResult.length).toBe(1);
     });
     it('replaces changed controls if no local change', () => {
@@ -595,7 +595,8 @@ describe('surveyDiff', () => {
       const mergeResult = merge(
         [numberControl, textControl],
         [numberControl, textControl],
-        [numberControl, textControlChanged]
+        [numberControl, textControlChanged],
+        []
       );
       expect(mergeResult[1].label).toBe('bar_changed');
     });
@@ -610,7 +611,7 @@ describe('surveyDiff', () => {
         name: 'text_1',
         label: 'bar',
       });
-      const mergeResult = merge([numberControl, textControl], [numberControl], [numberControl]);
+      const mergeResult = merge([numberControl, textControl], [numberControl], [numberControl], []);
       expect(mergeResult.length).toBe(2);
       expect(mergeResult[1].name).toBe('text_1');
     });
@@ -636,7 +637,7 @@ describe('surveyDiff', () => {
         children: [numberControl, textControl],
       });
       const groupRemote = createControlInstance({ type: 'group', name: 'group_1', children: [numberControl] });
-      const mergeResult = merge([groupLocal, textControl2], [groupRemote, textControl2], [textControl2]);
+      const mergeResult = merge([groupLocal, textControl2], [groupRemote, textControl2], [textControl2], []);
       expect(mergeResult.length).toBe(2);
       expect(mergeResult[1]).toMatchObject(textControl);
     });
@@ -659,7 +660,8 @@ describe('surveyDiff', () => {
       const mergeResult = merge(
         [numberControl, textControl, controlLocal],
         [numberControl, textControl],
-        [textControl]
+        [textControl],
+        []
       );
       expect(mergeResult.length).toBe(2);
       expect(mergeResult[1]).toMatchObject(controlLocal);
@@ -683,7 +685,8 @@ describe('surveyDiff', () => {
       const mergeResult = merge(
         [numberControlChanged, textControl],
         [numberControl, textControl],
-        [numberControl, textControl]
+        [numberControl, textControl],
+        []
       );
       expect(mergeResult[0].label).toBe('foo_changed');
     });
@@ -705,7 +708,7 @@ describe('surveyDiff', () => {
         label: 'foo',
         options: { allowModify: false },
       });
-      const mergeResult = merge([numberControlLocal], [numberControlRemoteA], [numberControlRemoteB]);
+      const mergeResult = merge([numberControlLocal], [numberControlRemoteA], [numberControlRemoteB], []);
       expect(mergeResult[0].label).toBe('foo');
     });
     it('replaces local control change if allowHide is turned off in remote control', () => {
@@ -727,7 +730,7 @@ describe('surveyDiff', () => {
         label: 'foo',
         options: { allowHide: false },
       });
-      const mergeResult = merge([numberControlLocal], [numberControlRemoteA], [numberControlRemoteB]);
+      const mergeResult = merge([numberControlLocal], [numberControlRemoteA], [numberControlRemoteB], []);
       expect(mergeResult[0].options.hidden).toBeFalsy();
     });
     it('removes deleted controls when they were changed locally', () => {
@@ -742,7 +745,7 @@ describe('surveyDiff', () => {
         label: 'bar',
       });
       const textControlChanged = { ...textControl, label: textControl.label + '-change' };
-      const mergeResult = merge([numberControl, textControlChanged], [numberControl, textControl], [numberControl]);
+      const mergeResult = merge([numberControl, textControlChanged], [numberControl, textControl], [numberControl], []);
       expect(mergeResult.length).toBe(1);
     });
   });
