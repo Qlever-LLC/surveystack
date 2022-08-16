@@ -426,7 +426,6 @@ describe('surveyDiff', () => {
           changeType: changeType.CHANGED,
           hasBreakingChange: true,
           hasLocalChange: true,
-          discardLocalChange: true,
           controlLocalRevision: controlLocalVersion,
           childIndexLocalRevision: 0,
           pathLocalRevision: controlLocalVersion.name,
@@ -488,7 +487,6 @@ describe('surveyDiff', () => {
         {
           changeType: changeType.CHANGED,
           hasLocalChange: false,
-          discardLocalChange: false,
           controlLocalRevision: controlLocalVersion,
           childIndexLocalRevision: 0,
           pathLocalRevision: controlLocalVersion.name,
@@ -708,7 +706,12 @@ describe('surveyDiff', () => {
         label: 'foo',
         options: { allowModify: false },
       });
-      const mergeResult = merge([numberControlLocal], [numberControlRemoteA], [numberControlRemoteB], []);
+      const mergeResult = merge(
+        [numberControlLocal],
+        [numberControlRemoteA],
+        [numberControlRemoteB],
+        [numberControlRemoteB.name]
+      );
       expect(mergeResult[0].label).toBe('foo');
     });
     it('replaces local control change if allowHide is turned off in remote control', () => {
@@ -730,7 +733,12 @@ describe('surveyDiff', () => {
         label: 'foo',
         options: { allowHide: false },
       });
-      const mergeResult = merge([numberControlLocal], [numberControlRemoteA], [numberControlRemoteB], []);
+      const mergeResult = merge(
+        [numberControlLocal],
+        [numberControlRemoteA],
+        [numberControlRemoteB],
+        [numberControlRemoteB.name]
+      );
       expect(mergeResult[0].options.hidden).toBeFalsy();
     });
     it('removes deleted controls when they were changed locally', () => {
