@@ -17,6 +17,9 @@ import {
   getGroupSettings,
   setGroupSettings,
   getTree,
+  addFarmToUser,
+  removeFarmFromUser,
+  addFarmToSurveystackGroup,
 } from './manage';
 
 const init = async () => {
@@ -32,6 +35,40 @@ const init = async () => {
 };
 
 describe('manageFarmOS', () => {
+  it('addFarmToUser && removeFarmFromUser in same group', async () => {
+    const { group, admin1, user1 } = await init();
+    const farmOSInstanceName = 'test.surveystack.io';
+    await addFarmToUser(farmOSInstanceName, user1.user._id, group._id, true);
+    let results = await listFarmOSInstancesForUser(user1.user._id);
+    expect(results[0].instanceName).toBe(farmOSInstanceName);
+    await removeFarmFromUser(farmOSInstanceName, user1.user._id, group._id);
+    results = await listFarmOSInstancesForUser(user1.user._id);
+    expect(results.length).toBe(0);
+
+    const farmOSInstanceNameBis = 'test2.surveystack.io';
+    await addFarmToUser(farmOSInstanceName, user1.user._id, group._id, true);
+    await addFarmToUser(farmOSInstanceNameBis, user1.user._id, group._id, true);
+    results = await listFarmOSInstancesForUser(user1.user._id);
+    expect(results.length).toBe(2);
+    await removeFarmFromUser(farmOSInstanceName, user1.user._id, group._id);
+    results = await listFarmOSInstancesForUser(user1.user._id);
+    expect(results.length).toBe(1);
+    expect(results[0].instanceName).toBe(farmOSInstanceNameBis);
+  });
+  it('addFarmToUser && removeFarmFromUser in differents groups', async () => {
+    const { group, admin1, user1 } = await init();
+    const init2 = await init();
+    const farmOSInstanceName = 'test.surveystack.io';
+    const farmOSInstanceNameBis = 'test2.surveystack.io';
+    await addFarmToUser(farmOSInstanceName, user1.user._id, group._id, true);
+    await addFarmToUser(farmOSInstanceNameBis, user1.user._id, init2.group._id, true);
+    let results = await listFarmOSInstancesForUser(user1.user._id);
+    expect(results.length).toBe(2);
+    await removeFarmFromUser(farmOSInstanceName, user1.user._id, group._id);
+    results = await listFarmOSInstancesForUser(user1.user._id);
+    expect(results.length).toBe(1);
+    expect(results[0].instanceName).toBe(farmOSInstanceNameBis);
+  });
   it('mapFarmOSInstanceToUser', async () => {
     const { group, admin1, user1 } = await init();
     const farmOSInstanceName = 'test.surveystack.io';
