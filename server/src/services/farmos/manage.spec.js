@@ -1,3 +1,4 @@
+import boom from '@hapi/boom';
 import { createGroup, createReq, createRes, createUser } from '../../testUtils';
 import { getAscendantGroups, getDescendantGroups } from '../roles.service';
 import {
@@ -20,6 +21,7 @@ import {
   addFarmToUser,
   removeFarmFromUser,
   addFarmToSurveystackGroup,
+  removeFarmFromSurveystackGroup,
 } from './manage';
 
 const init = async () => {
@@ -47,6 +49,10 @@ describe('manageFarmOS', () => {
 
     const farmOSInstanceNameBis = 'test2.surveystack.io';
     await addFarmToUser(farmOSInstanceName, user1.user._id, group._id, true);
+    await expect(
+      addFarmToUser(farmOSInstanceName, user1.user._id, group._id, true)
+    ).rejects.toThrow(/mapping already exists/);
+
     await addFarmToUser(farmOSInstanceNameBis, user1.user._id, group._id, true);
     results = await listFarmOSInstancesForUser(user1.user._id);
     expect(results.length).toBe(2);
@@ -61,6 +67,10 @@ describe('manageFarmOS', () => {
     const farmOSInstanceName = 'test.surveystack.io';
     const farmOSInstanceNameBis = 'test2.surveystack.io';
     await addFarmToUser(farmOSInstanceName, user1.user._id, group._id, true);
+    await expect(
+      addFarmToUser(farmOSInstanceName, user1.user._id, init2.group._id, true)
+    ).rejects.toThrow(/mapping already exists/);
+
     await addFarmToUser(farmOSInstanceNameBis, user1.user._id, init2.group._id, true);
     let results = await listFarmOSInstancesForUser(user1.user._id);
     expect(results.length).toBe(2);
@@ -101,6 +111,24 @@ describe('manageFarmOS', () => {
     expect(results.length).toBe(1);
     expect(results[0].instanceName).toBe(farmOSInstanceName);
     expect(results[0].owner).toBe(true);
+  });
+  it('addFarmToSurveystackGroup && removeFarmFromSurveystackGroup', async () => {
+    const { group, admin1, user1 } = await init();
+    const farmOSInstanceName = 'test.surveystack.io';
+    const planName = 'the_plan_name';
+    const planName2 = 'the_plan_name2';
+
+    await addFarmToSurveystackGroup(farmOSInstanceName, group._id, planName);
+    let results = await listFarmOSInstancesForGroup(group._id);
+    expect(results[0].instanceName).toBe(farmOSInstanceName);
+
+    await expect(
+      addFarmToSurveystackGroup(farmOSInstanceName, group._id, planName2)
+    ).rejects.toThrow(/mapping already exists/);
+
+    await removeFarmFromSurveystackGroup(farmOSInstanceName, group._id);
+    results = await listFarmOSInstancesForGroup(group._id);
+    expect(results.length).toBe(0);
   });
   it('map-and-unmap-instance-to-group', async () => {
     const { group, admin1, user1 } = await init();
