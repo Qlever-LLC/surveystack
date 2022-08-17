@@ -1,5 +1,4 @@
 const { MongoMemoryServer } = require('mongodb-memory-server');
-const MongoClient = require('mongodb/lib/mongo_client');
 const { connectDatabase, getDb, disconnect } = require('../src/db');
 
 let mongod;
