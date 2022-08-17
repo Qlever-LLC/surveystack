@@ -44,8 +44,11 @@
     <v-row v-else>
       <v-col lg="4" class="mx-auto">
         <v-card class="pa-8 text-center" v-if="superAdmin">
-          <p>FarmOS Integrations are disabled for this group.</p>
-          <v-btn color="primary" type="submit" @click="enable">Enable</v-btn>
+          <p>{{ message }}</p>
+          <v-btn color="primary" type="submit" @click="enable" v-if="btnEnable">Enable</v-btn>
+          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-else
+            >Contact Our-Sci</v-btn
+          >
         </v-card>
         <v-card class="pa-8 text-center" v-else>
           <p>{{ message }}</p>
@@ -90,6 +93,7 @@ export default {
       farmosEnabled: false,
       loading: true,
       message: '',
+      btnEnable: false,
       showConnectDialog: false,
       showCreateDialog: false,
       selectedUser: null,
@@ -170,11 +174,22 @@ export default {
             this.farmosEnabled = true;
           }
         } else {
-          this.message = 'Please contact Surveystack to enable FarmOS integration for your Group';
+          if (this.superAdmin) {
+            this.message = 'FarmOS Integrations are disabled for this group.';
+            this.btnEnable = true;
+          } else {
+            this.message = 'Please contact Surveystack to enable FarmOS integration for your Group';
+            this.btnEnable = false;
+          }
         }
         this.loading = false;
       } catch (error) {
-        this.message = error.message + '.';
+        if (error.response.status === 401) {
+          this.message =
+            'FarmOS is not enabled for your group. Please contact support if you are interested in FarmOS integration.';
+        } else {
+          this.message = error.message + '.';
+        }
         this.loading = false;
       }
     },
