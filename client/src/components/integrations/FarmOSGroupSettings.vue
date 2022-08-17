@@ -61,8 +61,8 @@
           {{ groupInfos.name }}
         </div>
         <div class="d-flex justify-end align-center">
-          <my-button color="secondary" noBorder label="Upgrade" /> or
-          <my-button color="secondary" noBorder label="Learn More" />
+          <v-btn color="secondary" text class="mx-2">Upgrade</v-btn> or
+          <v-btn color="secondary" text class="mx-2">Learn More</v-btn>
         </div>
       </div>
     </div>
