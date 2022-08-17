@@ -34,13 +34,13 @@
                 {{ versionNameLocalRevision }}
                 <v-checkbox
                   v-if="diffInfo.hasLocalChange"
-                  v-model="diffInfo.discardLocalChange"
-                  @change="$emit('diff-info-changed', diffInfo)"
+                  v-model="discardLocalChange"
+                  @change="discardChanged"
                   :disabled="diffInfo.hasBreakingChange"
                   dense
                   hide-details
                   class="pa-0"
-                  style="margin-left: 5px; margin-right: -6px; margin-top: -3px"
+                  style="margin-left: 5px; margin-right: -6px; margin-top: -3px; margin-bottom: -10px"
                 />
                 <span v-if="diffInfo.hasLocalChange" class="primary--text">discard</span>
               </v-row>
@@ -52,7 +52,7 @@
         <tbody>
           <tr v-for="change in diffInfo.changeList" :key="change.key">
             <td>{{ change.key }}</td>
-            <td v-if="versionNameLocalRevision" :class="diffInfo.discardLocalChange ? 'change-discarded' : ''">
+            <td v-if="versionNameLocalRevision" :class="discardLocalChange ? 'change-discarded' : ''">
               {{ change.localValue }}
             </td>
             <td>{{ change.oldValue }}</td>
@@ -77,6 +77,7 @@ export default {
   data() {
     return {
       isOpen: false,
+      discardLocalChange: false,
     };
   },
   props: {
@@ -97,11 +98,25 @@ export default {
       required: false,
     },
   },
-  emits: ['diff-info-changed'],
+  emits: ['discard-changed'],
   computed: {
     haveChangeDetails() {
       return this.diffInfo.changeType === changeType.CHANGED || this.diffInfo.hasBreakingChange;
     },
+  },
+  methods: {
+    discardChanged() {
+      this.$emit('discard-changed', {
+        discardLocalChange: this.discardLocalChange,
+        pathLocalRevision: this.diffInfo.pathLocalRevision,
+      });
+    },
+  },
+  mounted() {
+    if (this.diffInfo.hasBreakingChange) {
+      this.discardLocalChange = true;
+      this.discardChanged();
+    }
   },
 };
 </script>

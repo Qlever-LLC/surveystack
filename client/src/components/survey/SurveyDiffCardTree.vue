@@ -2,7 +2,7 @@
   <div>
     <survey-diff-card
       class="control-item mb-2"
-      v-for="(diffInfo, idx) in diffInfoTree"
+      v-for="diffInfo in diffInfoTree"
       :diffInfo="diffInfo"
       :key="`${diffInfo.indexPath}-${diffInfo.changeType}`"
       v-bind="{
@@ -10,7 +10,7 @@
         versionNameRemoteRevisionOld,
         versionNameRemoteRevisionNew,
       }"
-      @diff-info-changed="diffInfoChanged($event, idx)"
+      @discard-changed="discardChanged($event)"
     >
       <survey-diff-card-tree
         :diffInfoTree="diffInfo.children"
@@ -19,7 +19,7 @@
           versionNameRemoteRevisionOld,
           versionNameRemoteRevisionNew,
         }"
-        @diff-info-changed="diffInfoChanged($event, idx)"
+        @discard-changed="discardChanged($event)"
       />
     </survey-diff-card>
   </div>
@@ -52,16 +52,10 @@ export default {
       required: false,
     },
   },
-  emits: ['diff-info-changed'],
-  computed: {
-    discardLocalChange() {
-      return this.diffInfo.changeType === changeType.CHANGED || this.diffInfo.hasBreakingChange;
-    },
-  },
+  emits: ['discard-changed'],
   methods: {
-    diffInfoChanged(newDiffInfo, idx) {
-      this.diffInfoTree[idx] = newDiffInfo;
-      this.$emit('diff-info-changed', this.diffInfoTree);
+    discardChanged({ discardLocalChange, pathLocalRevision }) {
+      this.$emit('discard-changed', { discardLocalChange, pathLocalRevision });
     },
   },
 };

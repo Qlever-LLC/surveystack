@@ -34,7 +34,7 @@
           :version-name-local-revision="controlsLocalRevision ? 'Your Version' : null"
           :version-name-remote-revision-old="versionNameRemoteRevisionOld"
           :version-name-remote-revision-new="versionNameRemoteRevisionNew"
-          @diff-info-changed="diffInfoChanged"
+          @discard-changed="discardChanged"
         />
       </v-expansion-panel-content>
     </v-expansion-panel>
@@ -89,6 +89,7 @@ export default {
         added: 'green lighten-1',
         removed: 'red lighten-1',
       },
+      localChangesToDiscard: [],
     };
   },
 
@@ -144,7 +145,6 @@ export default {
             color: this.colors[controlDiff.changeType],
             hasBreakingChange: controlDiff.hasBreakingChange,
             hasLocalChange: controlDiff.hasLocalChange,
-            discardLocalChange: controlDiff.discardLocalChange,
             changeType: controlDiff.changeType,
             changeList: this.getControlChangeList(controlDiff),
             indexPath: idxPath.join('.'),
@@ -224,19 +224,14 @@ export default {
         })
         .filter((c) => c !== null);
     },
-    diffInfoChanged(diffInfoTree) {
-      let localChangesToDiscard = [];
-      const iterateAll = (diffInfoTree) => {
-        diffInfoTree.map((changeItem) => {
-          if (Array.isArray(changeItem)) {
-            iterateAll(changeItem);
-          } else if (changeItem.discardLocalChange) {
-            localChangesToDiscard.push(changeItem.pathLocalRevision);
-          }
-        });
-      };
-      iterateAll(diffInfoTree);
-      this.$emit('discard-local-changes-changed', localChangesToDiscard);
+    discardChanged({ discardLocalChange, pathLocalRevision }) {
+      if (discardLocalChange) {
+        this.localChangesToDiscard.push(pathLocalRevision);
+      } else {
+        //remote the change from the discard list
+        this.localChangesToDiscard = this.localChangesToDiscard.filter((e) => e !== pathLocalRevision);
+      }
+      this.$emit('discard-local-changes-changed', this.localChangesToDiscard);
     },
   },
 };

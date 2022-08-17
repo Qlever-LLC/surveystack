@@ -183,12 +183,6 @@ export const diffSurveyVersions = (controlsRevisionOld, controlsRevisionNew) => 
   return [...matcheds, ...addeds, ...removeds];
 };
 
-export function diffHasBreakingChanges(controlsLocalRevision, controlsRemoteRevisionOld, controlsRemoteRevisionNew) {
-  return diffThreeSurveyVersions(controlsLocalRevision, controlsRemoteRevisionOld, controlsRemoteRevisionNew).some(
-    (diff) => diff.hasBreakingChange
-  );
-}
-
 export function diffThreeSurveyVersions(
   controlsLocalRevision,
   controlsRemoteRevisionOld,
@@ -236,7 +230,6 @@ function createThreePointChange(changeLocal, changeRemote) {
   let threePointChange = {
     changeType: changeRemote.changeType,
     hasLocalChange: false,
-    discardLocalChange: false,
     diff: changeRemote.diff || {},
 
     controlLocalRevision: changeLocal.controlRevisionNew,
@@ -301,7 +294,6 @@ function createThreePointChange(changeLocal, changeRemote) {
 
   if (threePointChange.hasLocalChange && hasBreakingChange(threePointChange.diff)) {
     threePointChange.hasBreakingChange = true;
-    threePointChange.discardLocalChange = true;
   }
 
   return threePointChange;
@@ -336,11 +328,7 @@ export function merge(
     switch (change.changeType) {
       case changeType.CHANGED:
         //merge local change into resulting controls except if the local change is discarded by the user or by a breaking change
-        if (
-          change.hasLocalChange &&
-          !change.discardLocalChange &&
-          discardLocalChanges.indexOf(change.pathLocalRevision) === -1
-        ) {
+        if (change.hasLocalChange && discardLocalChanges.indexOf(change.pathLocalRevision) === -1) {
           mergedControls = replaceControl(mergedControls, null, change.pathRevisionNew, change.controlLocalRevision);
         }
         break;
