@@ -55,6 +55,13 @@ import api from '@/services/api.service';
 import { autoSelectActiveGroup } from '@/utils/memberships';
 
 export default {
+  props: {
+    start: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
   data() {
     return {
       entity: null,
@@ -173,21 +180,32 @@ export default {
 
     const { submissions, isLibrary } = this.entity.meta;
 
-    if (!submissions || submissions === 'public' || isLibrary) {
-      this.show = true;
-      return;
-    }
-
-    if (this.$store.getters['auth/isLoggedIn']) {
+    if (
+      !submissions ||
+      submissions === 'public' ||
+      isLibrary ||
       // let ui handle issues if user is already logged in
+      this.$store.getters['auth/isLoggedIn']
+    ) {
       this.show = true;
-      return;
-    }
 
-    this.$router.push({
-      name: 'auth-login',
-      params: { redirect: this.$route.path, autoJoin: true },
-    });
+      if (this.start && this.isAllowedToSubmit) {
+        // Make sure navigating back will lead to the survey detail page
+        // Without this, pressing "back" will go to the auto start page, which pushes us back to the draft
+        // This feels hacky, but i couldn't find a better way
+        this.$router.replace({
+          name: 'surveys-detail',
+          params: this.$route.params,
+          query: this.$route.query,
+        });
+        this.startDraft(this.entity._id);
+      }
+    } else {
+      this.$router.push({
+        name: 'auth-login',
+        params: { redirect: this.$route.path, autoJoin: true },
+      });
+    }
   },
 };
 </script>
