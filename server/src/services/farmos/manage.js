@@ -5,6 +5,7 @@ import { uniqBy } from 'lodash';
 import boom from '@hapi/boom';
 import _ from 'lodash';
 import { getDescendantGroups, getAscendantGroups } from '../roles.service';
+import { addGroupToCoffeeShop, isCoffeeShopEnabled, removeGroupFromCoffeeShop } from './coffeeshop';
 
 const config = () => {
   if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
@@ -93,7 +94,6 @@ export const getTree = async (group) => {
 
   const Attributes = {
     EnableFarmOS: 'groupHasFarmOSAccess',
-    EnableCoffeShop: 'groupHasCoffeeShopAccess',
     AllowSubgroupsJoinCoffeeShop: 'allowSubgroupsToJoinCoffeeShop',
     AllowSubgroupAdminsToCreateInstances: 'allowSubgroupAdminsToCreateFarmOSInstances',
   };
@@ -207,17 +207,17 @@ export const getTree = async (group) => {
   };
 
   const hasCoffeeShopAccess = async () => {
-    return isEnabled(Attributes.EnableCoffeShop);
+    return await isCoffeeShopEnabled(group._id);
   };
   const enableCoffeeShop = async () => {
-    return enableAttr(Attributes.EnableCoffeShop);
+    await addGroupToCoffeeShop(group._id);
   };
   const disableCoffeeShop = async () => {
-    return disableAttr(Attributes.EnableCoffeShop);
+    await removeGroupFromCoffeeShop(group._id);
   };
   const hasAllowSubgroupsToJoinCoffeeShop = async () => {
     return (
-      (await isEnabled(Attributes.EnableCoffeShop)) &&
+      (await isCoffeeShopEnabled(group._id)) &&
       (await isEnabled(Attributes.AllowSubgroupsJoinCoffeeShop))
     );
   };
@@ -561,7 +561,6 @@ export const createFarmosGroupSettings = async (groupId, specification) => {
     groupId: asMongoId(groupId),
     planIds: [],
     groupHasFarmOSAccess: true,
-    groupHasCoffeeShopAccess: false,
     allowSubgroupsToJoinCoffeeShop: false,
     allowSubgroupAdminsToCreateFarmOSInstances: false,
     maxSeats: 20,
@@ -579,7 +578,7 @@ export const setGroupSettings = async (groupId, settings) => {
  * @param {*} groupId
  * @param {*} projection
  * @returns without projection, dimension farmos-group-settings is like:
- * _id, groupId, planIds, groupHasFarmOSAccess, groupHasCoffeeShopAccess, allowSubgroupsToJoinCoffeeShop, allowSubgroupAdminsToCreateFarmOSInstances, maxSeats
+ * _id, groupId, planIds, groupHasFarmOSAccess, allowSubgroupsToJoinCoffeeShop, allowSubgroupAdminsToCreateFarmOSInstances, maxSeats
  */
 export const getGroupSettings = async (groupId, projection = {}) => {
   return await db
@@ -782,12 +781,13 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
     groupId: 1,
     planIds: 1,
     groupHasFarmOSAccess: 1,
-    groupHasCoffeeShopAccess: 1,
     allowSubgroupsToJoinCoffeeShop: 1,
     allowSubgroupAdminsToCreateFarmOSInstances: 1,
     maxSeats: 1,
     name: group.name,
   });
+
+  groupSettings.groupHasCoffeeShopAccess = await isCoffeeShopEnabled(group._id);
 
   const seats = { current: groupSettings.seats, max: groupSettings.maxSeats };
   delete groupSettings.maxSeats;
