@@ -51,3 +51,9 @@ export const removeGroupFromCoffeeShop = async (groupId) => {
     _id: setting._id,
   });
 };
+
+export const isCoffeeShopEnabled = async (groupId) => {
+  const group = await validateGroup(groupId);
+
+  return (await db.collection('farmos-coffeeshop').findOne({ group: group._id })) !== null;
+};

@@ -1,4 +1,9 @@
-import { addGroupToCoffeeShop, removeGroupFromCoffeeShop, validateGroup } from './coffeeshop';
+import {
+  addGroupToCoffeeShop,
+  isCoffeeShopEnabled,
+  removeGroupFromCoffeeShop,
+  validateGroup,
+} from './coffeeshop';
 import { createGroup, createReq, createRes, createUser } from '../../testUtils';
 
 const init = async () => {
@@ -50,5 +55,17 @@ describe('coffeeShop', () => {
 
     const rem = await removeGroupFromCoffeeShop(group._id + '');
     expect(rem.result.ok).toEqual(1);
+  });
+
+  it('validateIsEnabled', async () => {
+    const { group } = await init();
+
+    const en = await isCoffeeShopEnabled(group._id);
+    expect(en).toEqual(false);
+
+    await addGroupToCoffeeShop(group._id + '');
+
+    const res = await isCoffeeShopEnabled(group._id);
+    expect(res).toEqual(true);
   });
 });
