@@ -1,5 +1,6 @@
 const { MongoMemoryServer } = require('mongodb-memory-server');
-const { connectDatabase, getDb } = require('../src/db');
+const MongoClient = require('mongodb/lib/mongo_client');
+const { connectDatabase, getDb, disconnect } = require('../src/db');
 
 let mongod;
 
@@ -21,5 +22,6 @@ afterEach(async () => {
 
 // eslint-disable-next-line no-undef
 afterAll(async () => {
+  await disconnect();
   await mongod.stop();
 });
