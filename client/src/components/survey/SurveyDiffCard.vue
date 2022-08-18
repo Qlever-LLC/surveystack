@@ -14,14 +14,16 @@
           class="ml-3 align-self-center"
         />
 
-        <v-chip class="ma-3 align-self-start" outlined small :color="diffInfo.color">{{ diffInfo.changeType }}</v-chip>
-        <v-chip v-if="diffInfo.hasBreakingChange" class="ma-3 align-self-start" outlined small color="red lighten-1"
-          >breaking change</v-chip
-        >
+        <v-chip v-if="diffInfo.hasBreakingChange" class="ma-3 align-self-start" outlined small :color="diffInfo.color">
+          required change
+        </v-chip>
+        <v-chip v-else class="ma-3 align-self-start" outlined small :color="diffInfo.color">
+          {{ diffInfo.changeType }}
+        </v-chip>
         <v-spacer />
         <v-icon v-if="haveChangeDetails" class="mr-5 align-self-center" :class="{ 'mdi-rotate-180': !isOpen }"
-          >mdi-chevron-down</v-icon
-        >
+          >mdi-chevron-down
+        </v-icon>
       </v-row>
     </button>
     <v-simple-table v-if="isOpen" fixed-header dense class="mb-4">
@@ -73,6 +75,13 @@
       </template>
     </v-simple-table>
     <slot></slot>
+    <v-snackbar v-model="showErrorSnackbar" color="orange" :timeout="6000" fixed centered>
+      Selecting your Version of this question is not possible because the new
+      {{ versionNameRemoteRevisionNew }} contains a required change.
+      <template v-slot:action="{ attrs }">
+        <v-btn color="white" text v-bind="attrs" @click="showErrorSnackbar = false"> Ok </v-btn>
+      </template>
+    </v-snackbar>
   </v-card>
 </template>
 
@@ -89,6 +98,7 @@ export default {
     return {
       isOpen: false,
       discardLocalChange: false,
+      showErrorSnackbar: false,
     };
   },
   props: {
@@ -118,7 +128,7 @@ export default {
       return this.diffInfo.hasLocalChange && !this.discardLocalChange;
     },
     isLocalVersionSelectable() {
-      return this.diffInfo.hasLocalChange && this.discardLocalChange && !this.diffInfo.hasBreakingChange;
+      return this.diffInfo.hasLocalChange && this.discardLocalChange;
     },
     isNewRemoteVersionSelected() {
       return !this.diffInfo.hasLocalChange || this.discardLocalChange;
@@ -129,6 +139,10 @@ export default {
   },
   methods: {
     changeDiscarded(discarded) {
+      if (this.diffInfo.hasBreakingChange && !discarded) {
+        this.showErrorSnackbar = true;
+        return;
+      }
       this.discardLocalChange = discarded;
       this.$emit('discard-changed', {
         discardLocalChange: this.discardLocalChange,
@@ -152,9 +166,11 @@ export default {
   border-left-width: 2px;
   position: relative;
 }
+
 tr:hover {
   background-color: transparent !important;
 }
+
 .header-selectable {
   background-color: transparent !important;
   border: 2px solid #ffca28;
@@ -163,6 +179,7 @@ tr:hover {
   //text-decoration: line-through;
   //text-decoration-color: grey;
 }
+
 .cell-selectable {
   background-color: transparent !important;
   border: 2px solid #ffca28;
@@ -172,6 +189,7 @@ tr:hover {
   //text-decoration: line-through;
   //text-decoration-color: grey;
 }
+
 tr:last-child .cell-selectable {
   background-color: transparent !important;
   border: 2px solid #ffca28;
@@ -180,18 +198,21 @@ tr:last-child .cell-selectable {
   //text-decoration: line-through;
   //text-decoration-color: grey;
 }
+
 .header-selected {
   background-color: #ffecb3 !important;
   border: 2px solid #ffca28;
   border-bottom: none;
   box-shadow: 0 0 1em maroon;
 }
+
 .cell-selected {
   background-color: #ffecb3 !important;
   border: 2px solid #ffca28;
   border-top: none;
   border-bottom: none;
 }
+
 tr:last-child .cell-selected {
   background-color: #ffecb3 !important;
   border: 2px solid #ffca28;
