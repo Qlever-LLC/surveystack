@@ -131,14 +131,18 @@ export default {
       return this.diffInfo.hasLocalChange && this.discardLocalChange;
     },
     isNewRemoteVersionSelected() {
-      return !this.diffInfo.hasLocalChange || this.discardLocalChange;
+      return this.versionNameLocalRevision && (!this.diffInfo.hasLocalChange || this.discardLocalChange);
     },
     isNewRemoteVersionSelectable() {
-      return !this.isNewRemoteVersionSelected;
+      return this.versionNameLocalRevision && !this.isNewRemoteVersionSelected;
     },
   },
   methods: {
     changeDiscarded(discarded) {
+      if (!this.versionNameLocalRevision) {
+        //no local version displayed, so discarding makes no sense
+        return;
+      }
       if (this.diffInfo.hasBreakingChange && !discarded) {
         this.showErrorSnackbar = true;
         return;
