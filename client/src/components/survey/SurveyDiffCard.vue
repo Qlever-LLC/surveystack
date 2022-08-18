@@ -24,39 +24,50 @@
         >
       </v-row>
     </button>
-    <v-simple-table v-if="isOpen" fixed-header class="mb-4">
+    <v-simple-table v-if="isOpen" fixed-header dense class="mb-4">
       <template v-slot:default>
         <thead>
           <tr>
             <th class="text-left"></th>
-            <th v-if="versionNameLocalRevision" class="text-left">
-              <v-row class="ma-0 pa-0">
-                {{ versionNameLocalRevision }}
-                <v-checkbox
-                  v-if="diffInfo.hasLocalChange"
-                  v-model="discardLocalChange"
-                  @change="discardChanged"
-                  :disabled="diffInfo.hasBreakingChange"
-                  dense
-                  hide-details
-                  class="pa-0"
-                  style="margin-left: 5px; margin-right: -6px; margin-top: -3px; margin-bottom: -10px"
-                />
-                <span v-if="diffInfo.hasLocalChange" class="primary--text">discard</span>
-              </v-row>
+            <th
+              v-if="versionNameLocalRevision"
+              class="text-left"
+              :class="isLocalVersionSelected ? 'header-selected' : isLocalVersionSelectable ? 'header-selectable' : ''"
+              @click="isLocalVersionSelectable && changeDiscarded(false)"
+            >
+              {{ versionNameLocalRevision }}
             </th>
             <th class="text-left">{{ versionNameRemoteRevisionOld }}</th>
-            <th class="text-left">{{ versionNameRemoteRevisionNew }}</th>
+            <th
+              class="text-left"
+              :class="
+                isNewRemoteVersionSelected ? 'header-selected' : isNewRemoteVersionSelectable ? 'header-selectable' : ''
+              "
+              @click="isNewRemoteVersionSelectable && changeDiscarded(true)"
+            >
+              {{ versionNameRemoteRevisionNew }}
+            </th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="change in diffInfo.changeList" :key="change.key">
             <td>{{ change.key }}</td>
-            <td v-if="versionNameLocalRevision" :class="discardLocalChange ? 'change-discarded' : ''">
+            <td
+              v-if="versionNameLocalRevision"
+              :class="isLocalVersionSelected ? 'cell-selected' : isLocalVersionSelectable ? 'cell-selectable' : ''"
+              @click="isLocalVersionSelectable && changeDiscarded(false)"
+            >
               {{ change.localValue }}
             </td>
             <td>{{ change.oldValue }}</td>
-            <td>{{ change.newValue }}</td>
+            <td
+              :class="
+                isNewRemoteVersionSelected ? 'cell-selected' : isNewRemoteVersionSelectable ? 'cell-selectable' : ''
+              "
+              @click="isNewRemoteVersionSelectable && changeDiscarded(true)"
+            >
+              {{ change.newValue }}
+            </td>
           </tr>
         </tbody>
       </template>
@@ -103,9 +114,22 @@ export default {
     haveChangeDetails() {
       return this.diffInfo.changeType === changeType.CHANGED || this.diffInfo.hasBreakingChange;
     },
+    isLocalVersionSelected() {
+      return this.diffInfo.hasLocalChange && !this.discardLocalChange;
+    },
+    isLocalVersionSelectable() {
+      return this.diffInfo.hasLocalChange && this.discardLocalChange && !this.diffInfo.hasBreakingChange;
+    },
+    isNewRemoteVersionSelected() {
+      return !this.diffInfo.hasLocalChange || this.discardLocalChange;
+    },
+    isNewRemoteVersionSelectable() {
+      return !this.isNewRemoteVersionSelected;
+    },
   },
   methods: {
-    discardChanged() {
+    changeDiscarded(discarded) {
+      this.discardLocalChange = discarded;
       this.$emit('discard-changed', {
         discardLocalChange: this.discardLocalChange,
         pathLocalRevision: this.diffInfo.pathLocalRevision,
@@ -114,13 +138,13 @@ export default {
   },
   mounted() {
     if (this.diffInfo.hasBreakingChange) {
-      this.discardLocalChange = true;
-      this.discardChanged();
+      this.changeDiscarded(true);
     }
   },
 };
 </script>
-<style scoped>
+
+<style scoped lang="scss">
 .control-item {
   padding: 0.25rem 1.25rem;
   border: 1px solid rgba(0, 0, 0, 0.125);
@@ -128,8 +152,49 @@ export default {
   border-left-width: 2px;
   position: relative;
 }
-.change-discarded {
-  text-decoration: line-through;
-  text-decoration-color: var(--v-primary-base);
+tr:hover {
+  background-color: transparent !important;
+}
+.header-selectable {
+  background-color: transparent !important;
+  border: 2px solid #ffca28;
+  border-bottom: none;
+  cursor: pointer;
+  //text-decoration: line-through;
+  //text-decoration-color: grey;
+}
+.cell-selectable {
+  background-color: transparent !important;
+  border: 2px solid #ffca28;
+  border-top: none;
+  border-bottom: none;
+  cursor: pointer;
+  //text-decoration: line-through;
+  //text-decoration-color: grey;
+}
+tr:last-child .cell-selectable {
+  background-color: transparent !important;
+  border: 2px solid #ffca28;
+  border-top: none;
+  cursor: pointer;
+  //text-decoration: line-through;
+  //text-decoration-color: grey;
+}
+.header-selected {
+  background-color: #ffecb3 !important;
+  border: 2px solid #ffca28;
+  border-bottom: none;
+  box-shadow: 0 0 1em maroon;
+}
+.cell-selected {
+  background-color: #ffecb3 !important;
+  border: 2px solid #ffca28;
+  border-top: none;
+  border-bottom: none;
+}
+tr:last-child .cell-selected {
+  background-color: #ffecb3 !important;
+  border: 2px solid #ffca28;
+  border-top: none;
 }
 </style>
