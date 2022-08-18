@@ -1,4 +1,4 @@
-import boom from '@hapi/boom';
+import mockAxios from 'axios';
 import { createGroup, createReq, createRes, createUser } from '../../testUtils';
 import { getAscendantGroups, getDescendantGroups } from '../roles.service';
 import {
@@ -22,6 +22,7 @@ import {
   removeFarmFromUser,
   addFarmToSurveystackGroup,
   removeFarmFromSurveystackGroup,
+  getSuperAllFarmosMappings,
 } from './manage';
 
 const init = async () => {
@@ -129,6 +130,52 @@ describe('manageFarmOS', () => {
     await removeFarmFromSurveystackGroup(farmOSInstanceName, group._id);
     results = await listFarmOSInstancesForGroup(group._id);
     expect(results.length).toBe(0);
+  });
+  it('getSuperAllFarmosMappings', async () => {
+    //aggregatorFarms part
+    const farmosAggregatorResponse = [
+      {
+        url: 'test1.farmos.net',
+        tags: `/test-group/`,
+      },
+      {
+        url: 'test2.farmos.net',
+        tags: `/test-group/child`,
+      },
+    ];
+
+    let res = { data: farmosAggregatorResponse };
+    mockAxios.get.mockImplementation(() => Promise.resolve(res));
+
+    process.env = {
+      FARMOS_AGGREGATOR_URL: 'x',
+      FARMOS_AGGREGATOR_APIKEY: 'x',
+    };
+
+    const init1 = await init();
+    const init2 = await init();
+    //surveystackFarms part
+    await addFarmToSurveystackGroup('farmOSInstanceNameA', init1.group._id, 'planName');
+    await addFarmToSurveystackGroup('farmOSInstanceNameA', init2.group._id, 'planName');
+    await expect(
+      addFarmToSurveystackGroup('farmOSInstanceNameA', init1.group._id, 'planName')
+    ).rejects.toThrow(/mapping already exists/);
+
+    //surveystackUserFarms part
+    await addFarmToUser('farmOSInstanceNameB', init1.user1.user._id, init1.group._id, true);
+    await expect(
+      addFarmToUser('farmOSInstanceNameB', init1.user1.user._id, init2.group._id, true)
+    ).rejects.toThrow(/mapping already exists/);
+
+    await addFarmToUser('farmOSInstanceNameB', init2.user1.user._id, init1.group._id, true);
+    await expect(
+      addFarmToUser('farmOSInstanceNameB', init2.user1.user._id, init2.group._id, true)
+    ).rejects.toThrow(/mapping already exists/);
+
+    const r = await getSuperAllFarmosMappings();
+    expect(r.aggregatorFarms.length).toBe(2);
+    expect(r.surveystackFarms.length).toBe(2);
+    expect(r.surveystackUserFarms.length).toBe(2);
   });
   it('map-and-unmap-instance-to-group', async () => {
     const { group, admin1, user1 } = await init();
