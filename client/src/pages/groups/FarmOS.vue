@@ -46,13 +46,15 @@
         <v-card class="pa-8 text-center" v-if="superAdmin">
           <p>{{ message }}</p>
           <v-btn color="primary" type="submit" @click="enable" v-if="btnEnable">Enable</v-btn>
-          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-else
+          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-else-if="btnContact"
             >Contact Our-Sci</v-btn
           >
         </v-card>
         <v-card class="pa-8 text-center" v-else>
           <p>{{ message }}</p>
-          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank">Contact Our-Sci</v-btn>
+          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-if="btnContact"
+            >Contact Our-Sci</v-btn
+          >
         </v-card>
       </v-col>
     </v-row>
@@ -94,6 +96,7 @@ export default {
       loading: true,
       message: '',
       btnEnable: false,
+      btnContact: true,
       showConnectDialog: false,
       showCreateDialog: false,
       selectedUser: null,
@@ -162,6 +165,7 @@ export default {
         if (res.domain) {
           if (res.isDomainRootInDescendants) {
             this.message = `At least one subgroup has the FarmOS integration enabled: ${res.domain.name}`;
+            this.btnContact = false;
           } else {
             const { data: groupInfos } = await api.get(`/farmos/group-manage/${groupId}`);
             if (this.superAdmin) {
