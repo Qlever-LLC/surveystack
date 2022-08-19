@@ -21,6 +21,7 @@ import {
   addFarmToSurveystackGroup,
   removeFarmFromSurveystackGroup,
   getSuperAllFarmosMappings,
+  unmapFarmOSInstance,
 } from './manage';
 
 const init = async () => {
@@ -78,14 +79,24 @@ describe('manageFarmOS', () => {
     expect(results.length).toBe(1);
     expect(results[0].instanceName).toBe(farmOSInstanceNameBis);
   });
-  it('mapFarmOSInstanceToUser', async () => {
+  it('mapFarmOSInstanceToUser and unmapFarmOSInstance', async () => {
     const { group, admin1, user1 } = await init();
     const farmOSInstanceName = 'test.surveystack.io';
-    await mapFarmOSInstanceToUser(user1.user._id, farmOSInstanceName, true);
+    const farmOSInstanceName2 = 'test2.surveystack.io';
+    const res = await mapFarmOSInstanceToUser(user1.user._id, farmOSInstanceName, true);
+    const idFirstMap = res._id;
     const results = await listFarmOSInstancesForUser(user1.user._id);
 
     expect(results[0].instanceName).toBe(farmOSInstanceName);
     expect(results[0].owner).toBe(true);
+
+    await mapFarmOSInstanceToUser(user1.user._id, farmOSInstanceName2, true);
+    const res1 = await listFarmOSInstancesForUser(user1.user._id);
+    expect(res1.length).toBe(2);
+
+    await unmapFarmOSInstance(idFirstMap);
+    const res2 = await listFarmOSInstancesForUser(user1.user._id);
+    expect(res2.length).toBe(1);
   });
 
   it('create instance admin access', async () => {
