@@ -173,30 +173,6 @@ describe('manageFarmOS', () => {
     expect(r.surveystackFarms.length).toBe(2);
     expect(r.surveystackUserFarms.length).toBe(2);
   });
-  it('map-and-unmap-instance-to-group', async () => {
-    const { group, admin1, user1 } = await init();
-    const farmOSInstanceName = 'test.surveystack.io';
-
-    let list = await listFarmOSInstancesForGroup(group._id);
-
-    expect(list.length).toBe(0);
-
-    /*
-    await addFarmToSurveystackGroup(farmOSInstanceName, group._id);
-
-    await expect(addFarmToSurveystackGroup(farmOSInstanceName, group._id)).rejects.toThrow(
-      /mapping already exists/
-    );
-
-    list = await listFarmOSInstancesForGroup(group._id);
-    expect(list[0].instanceName).toBe('test.surveystack.io');
-
-    await removeFarmFromSurveystackGroup(farmOSInstanceName, group._id);
-
-    list = await listFarmOSInstancesForGroup(group._id);
-    expect(list.length).toBe(0);
-    */
-  });
 
   it('test-plans', async () => {
     const { group, admin1, user1 } = await init();
