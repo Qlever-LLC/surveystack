@@ -38,6 +38,9 @@
               @click="isLocalVersionSelectable && changeDiscarded(false)"
             >
               {{ versionNameLocalRevision }}
+              <v-icon v-if="isLocalVersionSelected" style="margin-top: -3px" small title="this version is selected"
+                >mdi-checkbox-marked-circle-outline</v-icon
+              >
             </th>
             <th class="text-left">{{ versionNameRemoteRevisionOld }}</th>
             <th
@@ -48,6 +51,9 @@
               @click="isNewRemoteVersionSelectable && changeDiscarded(true)"
             >
               {{ versionNameRemoteRevisionNew }}
+              <v-icon v-if="isNewRemoteVersionSelected" style="margin-top: -3px" small title="this version is selected"
+                >mdi-checkbox-marked-circle-outline</v-icon
+              >
             </th>
           </tr>
         </thead>
@@ -207,7 +213,6 @@ tr:last-child .cell-selectable {
   background-color: #ffecb3 !important;
   border: 2px solid #ffca28;
   border-bottom: none;
-  box-shadow: 0 0 1em maroon;
 }
 
 .cell-selected {
