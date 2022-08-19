@@ -156,15 +156,21 @@ const resetPassword = async (req, res) => {
 };
 
 const requestMagicLink = async (req, res) => {
-  const { expiresAfterDays = 1, landingPath = null } = req.body;
+  const { expiresAfterDays = 1, landingPath = null, callbackUrl = null } = req.body;
   const email = req.body.email.toLowerCase();
 
   if (!isEmail.validate(email)) {
-    throw boom.badRequest(`Invalid email address: ${email}`);
+    throw boom.badRequest(`Invalid email address: "${email}"`);
   }
 
-  const { origin } = req.headers;
-  const magicLink = await createMagicLink({ origin, email, expiresAfterDays, landingPath });
+  const origin = req.protocol + '://' + req.get('host');
+  const magicLink = await createMagicLink({
+    origin,
+    email,
+    expiresAfterDays,
+    landingPath,
+    callbackUrl,
+  });
 
   await mailService.sendLink({
     to: email,
@@ -179,39 +185,44 @@ const requestMagicLink = async (req, res) => {
 };
 
 const enterWithMagicLink = async (req, res) => {
-  const { code, landingPath } = req.query;
+  const { code, landingPath, callbackUrl } = req.query;
   const accessCode = await db.collection(COLL_ACCESS_CODES).findOne({ code });
+  const origin = req.protocol + '://' + req.get('host');
 
-  const withLandingPath = (url) => {
+  const withForwardedParams = (url) => {
     if (landingPath) {
-      return url + `&landingPath=${encodeURIComponent(landingPath)}`;
+      url.searchParams.set('landingPath', encodeURIComponent(landingPath));
+    }
+    if (callbackUrl) {
+      url.searchParams.set('callbackUrl', encodeURIComponent(callbackUrl));
     }
     return url;
   };
 
-  const withInvalidateLink = async (url) => {
-    const origin = req.protocol + '://' + req.get('host');
-    const invalidateLink = await createInvalidateMagicLink({
-      origin,
-      accessCodeId: accessCode._id,
-    });
-    return url + `&invalidateMagicLink=${encodeURIComponent(invalidateLink)}`;
-  };
-
+  // Redirect user to the "link expired" page if the magiclink is invalid
   if (!accessCode) {
-    res.redirect(withLandingPath('/auth/login?magicLinkExpired'));
+    res.redirect(withForwardedParams(new URL('/auth/login?magicLinkExpired')));
     return;
   }
 
-  const { email } = accessCode;
+  // If custom callback URL is not set, use the default SurveyStack accept root
+  const loginUrl = withForwardedParams(
+    callbackUrl ? new URL(callbackUrl) : new URL(`/auth/accept-magic-link`, origin)
+  );
 
-  let userObject = await createUserIfNotExist(email);
+  // Add login payload to the search params
+  const userObject = await createUserIfNotExist(accessCode.email);
   let loginPayload = await createLoginPayload(userObject);
   loginPayload = JSON.stringify(loginPayload);
   loginPayload = b64EncodeURI(loginPayload);
-  let loginUrl = await withInvalidateLink(
-    withLandingPath(`/auth/accept-magic-link?user=${loginPayload}`)
-  );
+  loginUrl.searchParams.set('user', loginPayload);
+
+  // Add invalidate link to the search params.
+  const invalidateLink = await createInvalidateMagicLink({
+    origin,
+    accessCodeId: accessCode._id,
+  });
+  loginUrl.searchParams.set('invalidateMagicLink', encodeURIComponent(invalidateLink));
 
   res.redirect(loginUrl);
 };
