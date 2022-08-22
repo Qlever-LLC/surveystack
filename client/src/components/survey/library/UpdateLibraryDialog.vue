@@ -98,7 +98,6 @@ export default {
         'You have modified this question set compared to Version ' +
         props.libraryRootGroup.libraryVersion +
         ". Your changes marked as 'breaking change' will be reset to the latest library version.",
-      maintainer: null,
     });
 
     state.remoteOldRevisionControls = props.toSurvey.revisions.find(
