@@ -53,19 +53,9 @@ export default {
     return {
       content: this.value,
       availableLibraryChangeTypes: [
-        {
-          value: 'major',
-          text: 'Major change',
-          tooltip:
-            "May make data from old versions incomparable to this new version. Changes existing data, how it's collected or interpreted. QS users should review this thoroughly before updating",
-        },
-        {
-          value: 'minor',
-          text: 'Minor change',
-          tooltip:
-            "A survey improvement. This doesn't change the meaning or comparability of the existing questions, it only adds/improves.",
-        },
-        { value: 'patch', text: 'Small fix', tooltip: 'Fixes a problem or error. Everyone should update.' },
+        { value: 'major', text: 'Major change' },
+        { value: 'minor', text: 'Minor change' },
+        { value: 'patch', text: 'Small fix' },
       ],
     };
   },
