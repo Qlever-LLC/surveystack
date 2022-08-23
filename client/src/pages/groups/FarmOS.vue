@@ -192,7 +192,6 @@ export default {
 
       try {
         const { data: res } = await api.get(`/farmos/group-manage/${groupId}/domain`);
-        console.log('res', res);
         if (res.domain) {
           if (res.isDomainRootInDescendants) {
             this.message = `At least one subgroup has the FarmOS integration enabled: ${res.domain.name}`;
@@ -201,6 +200,9 @@ export default {
             const { data: groupInfos } = await api.get(`/farmos/group-manage/${groupId}`);
             if (this.superAdmin) {
               const { data: plans } = await api.get(`/farmos/plans`);
+              this.plans = plans;
+            } else {
+              const { data: plans } = await api.get(`/farmos/group-manage/${groupId}/plans`);
               this.plans = plans;
             }
             console.log('group settings', groupInfos);
@@ -278,7 +280,6 @@ export default {
           userId,
           instanceName,
         });
-        console.log('res', res);
       } catch (error) {
         this.error(error + '');
       }
@@ -337,6 +338,7 @@ export default {
       vm.form = viewModel.form;
       vm.loading = true;
 
+      console.log('plans', this.plans);
       const plan = this.plans.find((p) => p._id === vm.form.plan);
       const { planName, planUrl } = plan;
       if (!planUrl) {

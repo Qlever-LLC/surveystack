@@ -61,8 +61,6 @@ export default {
       selectedFarms.value = [];
     };
 
-    console.log(props.farmInstances);
-
     return {
       selectedFarms,
       connect,

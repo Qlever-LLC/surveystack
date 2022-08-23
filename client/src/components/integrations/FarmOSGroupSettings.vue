@@ -16,7 +16,7 @@
           <v-autocomplete
             outlined
             class="flex-grow-1 flex-shrink-0"
-            label="Select Plans for Group"
+            label="Select FarmOS Plans for Group"
             multiple
             deletable-chips
             @change="$emit('plansChanged', selectedPlans)"
@@ -68,16 +68,11 @@
           </v-container>
         </div>
       </div>
-      <div class="d-flex flex-column">
-        <div class="d-flex justify-end" v-if="groupInfos.seats">
-          {{ groupInfos.name }} has {{ groupInfos.seats.current }} / {{ groupInfos.seats.max }} accounts
-        </div>
-        <div class="d-flex justify-end" v-else>
-          {{ groupInfos.name }}
-        </div>
-        <div class="d-flex justify-end align-center">
-          <v-btn color="secondary" text class="mx-2">Upgrade</v-btn> or
-          <v-btn color="secondary" text class="mx-2">Learn More</v-btn>
+      <div class="d-flex flex-column" v-if="groupInfos.seats && groupInfos.isDomainRoot">
+        <div class="d-flex justify-end">{{ groupInfos.seats.current }} / {{ groupInfos.seats.max }} accounts</div>
+        <div class="d-flex justify-end align-center my-4">
+          <v-btn outlined class="mx-2">Upgrade</v-btn>
+          <v-btn outlined>Learn More</v-btn>
         </div>
       </div>
     </div>

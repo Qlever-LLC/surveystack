@@ -30,6 +30,7 @@ import {
   enableSubgroupsAllowCreateInstances,
   disableSubgroupsAllowCreateInstances,
   getTreeFromGroupId,
+  getTree,
 } from '../services/farmos/manage';
 import { aggregator } from '../services/farmos/aggregator';
 
@@ -182,6 +183,23 @@ const requireGroup = async (req, optJoi = {}) => {
     const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
     throw boom.badData(`error: ${errors.join(',')}`);
   }
+  const group = await db.collection('groups').findOne({ _id: asMongoId(groupId) });
+
+  if (!group) {
+    throw boom.notFound();
+  }
+
+  const tree = await getTree(group);
+
+  const groupSetting = await db.collection('farmos-group-settings').findOne({
+    groupId: tree.domainRoot._id,
+  });
+
+  // TODO could be part of domain
+
+  if (!groupSetting) {
+    throw boom.badData('no farmos Settings for group found');
+  }
 
   const keys = Object.keys(req.body)
     .map((a) => {
@@ -202,6 +220,7 @@ const requireGroup = async (req, optJoi = {}) => {
     ...r,
     apiKey,
     groupId,
+    groupSetting,
   };
 };
 
@@ -718,7 +737,7 @@ export const checkUrl = async (req, res) => {
 };
 
 export const groupManageCheckUrl = async (req, res) => {
-  const { groupSetting, planId, instanceName, url, apiKey } = await requireFarmOSManageAdmin(req, {
+  const { groupSetting, planId, instanceName, url, apiKey } = await requireGroup(req, {
     planId: Joi.objectId().required(),
     instanceName: Joi.string().required(),
     url: Joi.string().required(),
@@ -845,7 +864,7 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
 };
 
 export const groupManageCreateFarmOsInstance = async (req, res) => {
-  const { groupSetting, url, planId, groupId } = await requireFarmOSManageAdmin(req, {
+  const { groupSetting, url, planId, groupId } = await requireGroup(req, {
     url: Joi.string().max(100).required(),
     planId: Joi.objectId().required(),
   });
