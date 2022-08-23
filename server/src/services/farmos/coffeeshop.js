@@ -1,5 +1,4 @@
 import boom from '@hapi/boom';
-import joi from 'joi';
 import { ObjectId } from 'mongodb';
 import { db } from '../../db';
 
