@@ -37,7 +37,7 @@ describe('enterWithMagicLink', () => {
         expect(redirectUrl.host).toBe(host);
         expect(redirectUrl.searchParams.has('magicLinkExpired')).toBe(true);
         for (const [key, value] of Object.entries(queryParamsToForward)) {
-          expect(redirectUrl.searchParams.get(key)).toBe(encodeURIComponent(value));
+          expect(redirectUrl.searchParams.get(key)).toBe(value);
         }
       });
     });
@@ -100,9 +100,7 @@ describe('enterWithMagicLink', () => {
       accessCodeId: accessCode._id,
     });
     const redirect = new URL(res.redirect.mock.calls[0][0]);
-    expect(redirect.searchParams.get('invalidateMagicLink')).toBe(
-      encodeURIComponent(invalidateMagicLink)
-    );
+    expect(redirect.searchParams.get('invalidateMagicLink')).toBe(invalidateMagicLink);
   });
 
   describe('forwarding params', () => {
@@ -129,7 +127,7 @@ describe('enterWithMagicLink', () => {
         expect(user.email).toBe(email);
 
         for (const [key, value] of Object.entries(queryParamsToForward)) {
-          expect(redirect.searchParams.get(key)).toBe(encodeURIComponent(value));
+          expect(redirect.searchParams.get(key)).toBe(value);
         }
       });
     });

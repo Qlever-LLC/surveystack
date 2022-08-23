@@ -191,10 +191,10 @@ const enterWithMagicLink = async (req, res) => {
 
   const withForwardedParams = (url) => {
     if (landingPath) {
-      url.searchParams.set('landingPath', encodeURIComponent(landingPath));
+      url.searchParams.set('landingPath', landingPath);
     }
     if (callbackUrl) {
-      url.searchParams.set('callbackUrl', encodeURIComponent(callbackUrl));
+      url.searchParams.set('callbackUrl', callbackUrl);
     }
     return url;
   };
@@ -222,7 +222,7 @@ const enterWithMagicLink = async (req, res) => {
     origin,
     accessCodeId: accessCode._id,
   });
-  loginUrl.searchParams.set('invalidateMagicLink', encodeURIComponent(invalidateLink));
+  loginUrl.searchParams.set('invalidateMagicLink', invalidateLink);
 
   res.redirect(loginUrl);
 };
