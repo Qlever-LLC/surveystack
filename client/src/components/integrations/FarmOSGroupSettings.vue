@@ -24,29 +24,29 @@
           <p class="font-weight-bold">Settings</p>
           <v-container class="pa-0" fluid>
             <v-checkbox
-              disabled
+              v-if="groupInfos.allowSubgroupsToJoinCoffeeShop || groupInfos.isDomainRoot"
               class="ma-0 pa-0"
               hide-details
               :ripple="false"
               v-model="groupInfos.groupHasCoffeeShopAccess"
-              @input="$emit('addGrpCoffeeShop', $event.target.value, groupInfos.groupId)"
+              @change="$emit('addGrpCoffeeShop', $event)"
               label="Add this group to the Coffee Shop"
             ></v-checkbox>
             <v-checkbox
-              disabled
+              v-if="groupInfos.isDomainRoot"
               class="ma-0 pa-0"
               hide-details
               :ripple="false"
               v-model="groupInfos.allowSubgroupsToJoinCoffeeShop"
-              @input="$emit('allowSbGrpsJoinCoffeeShop', $event.target.value)"
+              @change="$emit('allowSbGrpsJoinCoffeeShop', $event)"
               :label="`Allow subgroups to join the Coffee Shop`"
             ></v-checkbox>
             <v-checkbox
-              disabled
+              v-if="groupInfos.isDomainRoot"
               class="ma-0 pa-0"
               :ripple="false"
               v-model="groupInfos.allowSubgroupAdminsToCreateFarmOSInstances"
-              @input="$emit('allowSbGrpsAdminsCreateFarmOSFarmsInSS', $event.target.value)"
+              @change="$emit('allowSbGrpsAdminsCreateFarmOSFarms', $event)"
               label="Allow subgroups admins to create FarmOS Farms through Survey Stack"
             >
             </v-checkbox>

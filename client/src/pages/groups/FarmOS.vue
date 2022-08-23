@@ -3,6 +3,7 @@
     <v-alert v-if="successMessage" class="mt-4" mode="fade" text type="success" @click="successMessage = null">{{
       successMessage
     }}</v-alert>
+    <v-alert v-if="errorMessage" class="mt-4" mode="fade" text type="error">{{ errorMessage }}</v-alert>
 
     <FarmOSCreateDialog
       v-model="showCreateDialog"
@@ -22,9 +23,9 @@
 
     <FarmOSGroupSettings
       class="ma-16"
-      @addGrpCoffeeShop="addGroupCoffeeShop"
+      @addGrpCoffeeShop="enableCoffeeshop"
       @allowSbGrpsJoinCoffeeShop="allowSubGroupsJoinCoffeeShop"
-      @allowSbGrpsAdminsCreateFarmOSFarmsInSS="allowSubGroupsAdminsCreateFarmOSFarmsInSS"
+      @allowSbGrpsAdminsCreateFarmOSFarms="allowSubGroupsAdminsCreateFarmOSFarms"
       @connect="connect"
       @disconnect="disconnectFarm"
       @plansChanged="plansChanged"
@@ -133,31 +134,43 @@ export default {
   methods: {
     updateGroupConfig() {},
     unifomMembersInGroupInfos() {},
-    addGroupCoffeeShop() {},
-    allowSubGroupsJoinCoffeeShop() {},
-    allowSubGroupsAdminsCreateFarmOSFarmsInSS() {},
+    async allowSubGroupsJoinCoffeeShop(booleanValue) {
+      try {
+        await api.post(`/farmos/group-manage/${this.groupId}/subgroup-join-coffee-shop`, { updateTo: booleanValue });
+        this.success('updated');
+      } catch (error) {
+        this.error(error.response.data.message + '');
+      }
+
+      this.init();
+    },
+    async allowSubGroupsAdminsCreateFarmOSFarms(booleanValue) {
+      try {
+        await api.post(`/farmos/group-manage/${this.groupId}/subgroup-create-farmos-instances`, {
+          updateTo: booleanValue,
+        });
+        this.success('updated');
+      } catch (error) {
+        this.error(error.response.data.message + '');
+      }
+
+      this.init();
+    },
+    async enableCoffeeshop(booleanValue) {
+      try {
+        await api.post(`/farmos/group-manage/${this.groupId}/enable-coffeeshop`, {
+          updateTo: booleanValue,
+        });
+        this.success('updated');
+      } catch (error) {
+        this.error(error.response.data.message + '');
+      }
+
+      this.init();
+    },
     async init() {
       const { id: groupId } = this.$route.params;
       this.groupId = groupId;
-
-      //TODO create route in API
-      const addGroupCoffeeShop = async (booleanValue, groupId) => {
-        // update via api
-        const res = await api.post('/farmos/coffee-shop-access', { groupId: groupId, updateTo: booleanValue });
-      };
-      //TODO create route in API
-      const allowSubGroupsJoinCoffeeShop = async (booleanValue) => {
-        // update via api
-        const res = await api.post('/farmos/subgrp-join-coffee-shop', { groupId: groupId, updateTo: booleanValue });
-      };
-      //TODO create route in API
-      const allowSubGroupsAdminsCreateFarmOSFarmsInSS = async (booleanValue) => {
-        // update via api
-        const rest = await api.post('/farmos/subgrp-admins-create-farmos-instances', {
-          groupId: groupId,
-          updateTo: booleanValue,
-        });
-      };
 
       try {
         const { data: res } = await api.get(`/farmos/group-manage/${groupId}/domain`);

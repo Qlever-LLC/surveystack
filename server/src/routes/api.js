@@ -338,21 +338,21 @@ router.post(
 );
 
 router.post(
-  '/farmos/coffee-shop-access',
+  '/farmos/group-manage/:groupId/subgroup-join-coffee-shop',
   [assertHasGroupAdminAccess],
-  catchErrors(farmosController.groupAdminMinimumUpdateCoffeeShopAccess)
+  catchErrors(farmosController.groupAdminAllowGroupsToJoinCoffeeshop)
 );
 
 router.post(
-  '/farmos/subgrp-join-coffee-shop',
-  [assertHasGroupAdminAccess],
-  catchErrors(farmosController.groupAdminMinimumUpdateJoinCoffeeShop)
-);
-
-router.post(
-  '/farmos/subgrp-admins-create-farmos-instances',
+  '/farmos/group-manage/:groupId/subgroup-create-farmos-instances',
   [assertHasGroupAdminAccess],
   catchErrors(farmosController.groupAdminMinimumUpdateCreateFarmOSInstances)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/enable-coffeeshop',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupAdminJoinCoffeeShop)
 );
 
 /** Hylo */

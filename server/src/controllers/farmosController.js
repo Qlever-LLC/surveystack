@@ -23,15 +23,12 @@ import {
   deletePlan as manageDeletePlan,
   mapFarmOSInstanceToUser,
   getGroupInformation,
-  enableFarmOSAccessForGroup,
-  disableFarmOSAccessForGroup,
-  enableCoffeeShopAccessForGroup,
-  disableCoffeeShopAccessForGroup,
+  enableCoffeeshop,
+  disableCoffeeshop,
   enableSubgroupsToJoinCoffeeShop,
   disableSubgroupsToJoinCoffeeShop,
-  enableSubgroupAdminsToCreateFarmOSInstances,
-  disableSubgroupAdminsToCreateFarmOSInstances,
-  getTree,
+  enableSubgroupsAllowCreateInstances,
+  disableSubgroupsAllowCreateInstances,
   getTreeFromGroupId,
 } from '../services/farmos/manage';
 import { aggregator } from '../services/farmos/aggregator';
@@ -156,6 +153,55 @@ const requireFarmOSManageAdmin = async (req, optJoi = {}) => {
     apiKey,
     groupId,
     groupSetting,
+  };
+};
+
+const requireGroup = async (req, optJoi = {}) => {
+  const apiKey = process.env.FARMOS_CREATE_KEY;
+  if (!apiKey) {
+    throw boom.badImplementation('farmos not configured');
+  }
+
+  let schema = Joi.objectId().required();
+  const { groupId } = req.params;
+
+  schema = Joi.object({
+    groupId: Joi.objectId().required(),
+    ...optJoi,
+  });
+
+  const validres = schema.validate(
+    {
+      ...req.body,
+      groupId,
+    },
+    { allowUnknown: true }
+  );
+
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
+  const keys = Object.keys(req.body)
+    .map((a) => {
+      if (Object.keys(optJoi).includes(a)) {
+        return a;
+      } else {
+        return null;
+      }
+    })
+    .filter((k) => k != null);
+
+  const r = {};
+  for (const key of keys) {
+    r[key] = req.body[key];
+  }
+
+  return {
+    ...r,
+    apiKey,
+    groupId,
   };
 };
 
@@ -870,32 +916,11 @@ export const superAdminUpdateFarmOSAccess = async (req, res) => {
 
 export const groupManageCreateInstance = async () => {};
 
-export const groupAdminMinimumUpdateCoffeeShopAccess = async (req, res) => {
-  const { groupId, updateTo } = req.body;
-  if (!groupId) {
-    throw boom.badData('groupId missing');
-  }
-  if (!updateTo) {
-    throw boom.badData('updated value missing');
-  }
-  if (updateTo) {
-    await enableCoffeeShopAccessForGroup(groupId);
-  } else {
-    await disableCoffeeShopAccessForGroup(groupId);
-  }
-  return res.send({
-    status: 'success',
+export const groupAdminAllowGroupsToJoinCoffeeshop = async (req, res) => {
+  const { groupId, updateTo } = await requireFarmOSManageAdmin(req, {
+    updateTo: Joi.boolean().required(),
   });
-};
 
-export const groupAdminMinimumUpdateJoinCoffeeShop = async (req, res) => {
-  const { groupId, updateTo } = req.body;
-  if (!groupId) {
-    throw boom.badData('groupId missing');
-  }
-  if (!updateTo) {
-    throw boom.badData('updated value missing');
-  }
   if (updateTo) {
     await enableSubgroupsToJoinCoffeeShop(groupId);
   } else {
@@ -906,18 +931,30 @@ export const groupAdminMinimumUpdateJoinCoffeeShop = async (req, res) => {
   });
 };
 
-export const groupAdminMinimumUpdateCreateFarmOSInstances = async (req, res) => {
-  const { groupId, updateTo } = req.body;
-  if (!groupId) {
-    throw boom.badData('groupId missing');
-  }
-  if (!updateTo) {
-    throw boom.badData('updated value missing');
-  }
+export const groupAdminJoinCoffeeShop = async (req, res) => {
+  const { groupId, updateTo } = await requireGroup(req, {
+    updateTo: Joi.boolean().required(),
+  });
+
   if (updateTo) {
-    await enableSubgroupAdminsToCreateFarmOSInstances(groupId);
+    await enableCoffeeshop(groupId);
   } else {
-    await disableSubgroupAdminsToCreateFarmOSInstances(groupId);
+    await disableCoffeeshop(groupId);
+  }
+  return res.send({
+    status: 'success',
+  });
+};
+
+export const groupAdminMinimumUpdateCreateFarmOSInstances = async (req, res) => {
+  const { groupId, updateTo } = await requireFarmOSManageAdmin(req, {
+    updateTo: Joi.boolean().required(),
+  });
+
+  if (updateTo) {
+    await enableSubgroupsAllowCreateInstances(groupId);
+  } else {
+    await disableSubgroupsAllowCreateInstances(groupId);
   }
   return res.send({
     status: 'success',
@@ -925,12 +962,10 @@ export const groupAdminMinimumUpdateCreateFarmOSInstances = async (req, res) => 
 };
 
 export const mapUser = async (req, res) => {
-  const { groupId, userId, instanceName } = await requireFarmOSManageAdmin(req, {
+  const { groupId, userId, instanceName } = await requireGroup(req, {
     userId: Joi.objectId().required(),
     instanceName: Joi.string().required(),
   });
-
-  console.log('mapping', instanceName, userId, groupId);
 
   const userRes = await db.collection('users').findOne({ _id: new ObjectId(userId) });
   if (!userRes) {
@@ -1002,7 +1037,7 @@ export const mapUser = async (req, res) => {
 };
 
 export const unmapUser = async (req, res) => {
-  const { groupId, userId, instanceName } = await requireFarmOSManageAdmin(req, {
+  const { groupId, userId, instanceName } = await requireGroup(req, {
     userId: Joi.objectId().required(),
     instanceName: Joi.string().required(),
   });

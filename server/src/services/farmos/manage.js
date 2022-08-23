@@ -216,10 +216,7 @@ export const getTree = async (group) => {
     await removeGroupFromCoffeeShop(group._id);
   };
   const hasAllowSubgroupsToJoinCoffeeShop = async () => {
-    return (
-      (await isCoffeeShopEnabled(group._id)) &&
-      (await isEnabled(Attributes.AllowSubgroupsJoinCoffeeShop))
-    );
+    return await isEnabled(Attributes.AllowSubgroupsJoinCoffeeShop);
   };
   const enableAllowSubgroupsToJoinCoffeeShop = async () => {
     return enableAttr(Attributes.AllowSubgroupsJoinCoffeeShop);
@@ -869,4 +866,80 @@ export const getTreeFromGroupId = async (groupId) => {
   }
 
   return await getTree(res);
+};
+
+const updateSubgroupsToJoinCoffeeShop = async (groupId, enable) => {
+  const res = await db.collection('groups').findOne({ _id: asMongoId(groupId) });
+  if (!res) {
+    throw boom.notFound();
+  }
+
+  const tree = await getTree(res);
+
+  if (!asMongoId(groupId).equals(tree.domainRoot._id)) {
+    throw boom.badData('Group is not a farmos domain root group');
+  }
+
+  return enable
+    ? await tree.enableAllowSubgroupsToJoinCoffeeShop()
+    : await tree.disableAllowSubgroupsToJoinCoffeeShop();
+};
+
+export const enableSubgroupsToJoinCoffeeShop = async (groupId) => {
+  return await updateSubgroupsToJoinCoffeeShop(groupId, true);
+};
+
+export const disableSubgroupsToJoinCoffeeShop = async (groupId) => {
+  return await updateSubgroupsToJoinCoffeeShop(groupId, false);
+};
+
+const updateSubgroupsAllowCreateInstances = async (groupId, enable) => {
+  const res = await db.collection('groups').findOne({ _id: asMongoId(groupId) });
+  if (!res) {
+    throw boom.notFound();
+  }
+
+  const tree = await getTree(res);
+
+  if (!asMongoId(groupId).equals(tree.domainRoot._id)) {
+    throw boom.badData('Group is not a farmos domain root group');
+  }
+
+  return enable
+    ? await tree.enableAllowSubgroupAdminsToCreateFarmOSInstances()
+    : await tree.disableAllowSubgroupAdminsToCreateFarmOSInstances();
+};
+
+export const enableSubgroupsAllowCreateInstances = async (groupId) => {
+  return await updateSubgroupsAllowCreateInstances(groupId, true);
+};
+
+export const disableSubgroupsAllowCreateInstances = async (groupId) => {
+  return await updateSubgroupsAllowCreateInstances(groupId, false);
+};
+
+const updateEnableCoffeShop = async (groupId, enable) => {
+  const res = await db.collection('groups').findOne({ _id: asMongoId(groupId) });
+  if (!res) {
+    throw boom.notFound();
+  }
+
+  const tree = await getTree(res);
+
+  if (!asMongoId(groupId).equals(tree.domainRoot._id)) {
+    // check if subgroup can enable coffeeshop
+    if (!(await tree.hasAllowSubgroupsToJoinCoffeeShop())) {
+      throw boom.badData('Subgroups are not allowed to enable coffeeshop');
+    }
+  }
+
+  return enable ? await tree.enableCoffeeShop() : await tree.disableCoffeeShop();
+};
+
+export const enableCoffeeshop = async (groupId) => {
+  return await updateEnableCoffeShop(groupId, true);
+};
+
+export const disableCoffeeshop = async (groupId) => {
+  return await updateEnableCoffeShop(groupId, false);
 };

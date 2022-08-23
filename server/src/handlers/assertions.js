@@ -28,7 +28,6 @@ export const assertHasGroupAdminAccess = catchErrors(async (req, res, next) => {
     return next();
   }
 
-  console.log('locals', res.locals);
   if (!res.locals || !res.locals.auth || !res.locals.auth.user || !res.locals.auth.user._id) {
     throw boom.unauthorized();
   }
