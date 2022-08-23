@@ -42,14 +42,19 @@
       </v-col>
     </v-row>
     <v-row v-else>
-      <v-col lg="4">
-        <v-card class="pa-8" v-if="superAdmin">
-          <p>FarmOS Integrations are disabled for this group.</p>
-          <v-btn color="primary" type="submit" @click="enable">Enable</v-btn>
-        </v-card>
-        <v-card class="pa-8" v-else>
+      <v-col lg="4" class="mx-auto">
+        <v-card class="pa-8 text-center" v-if="superAdmin">
           <p>{{ message }}</p>
-          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank">Contact Our-Sci</v-btn>
+          <v-btn color="primary" type="submit" @click="enable" v-if="btnEnable">Enable</v-btn>
+          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-else-if="btnContact"
+            >Contact Our-Sci</v-btn
+          >
+        </v-card>
+        <v-card class="pa-8 text-center" v-else>
+          <p>{{ message }}</p>
+          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-if="btnContact"
+            >Contact Our-Sci</v-btn
+          >
         </v-card>
       </v-col>
     </v-row>
@@ -90,6 +95,8 @@ export default {
       farmosEnabled: false,
       loading: true,
       message: '',
+      btnEnable: false,
+      btnContact: true,
       showConnectDialog: false,
       showCreateDialog: false,
       selectedUser: null,
@@ -158,6 +165,7 @@ export default {
         if (res.domain) {
           if (res.isDomainRootInDescendants) {
             this.message = `At least one subgroup has the FarmOS integration enabled: ${res.domain.name}`;
+            this.btnContact = false;
           } else {
             const { data: groupInfos } = await api.get(`/farmos/group-manage/${groupId}`);
             if (this.superAdmin) {
@@ -170,11 +178,22 @@ export default {
             this.farmosEnabled = true;
           }
         } else {
-          this.message = 'Please contact Surveystack to enable FarmOS integration for your Group';
+          if (this.superAdmin) {
+            this.message = 'FarmOS Integrations are disabled for this group.';
+            this.btnEnable = true;
+          } else {
+            this.message = 'Please contact Surveystack to enable FarmOS integration for your Group';
+            this.btnEnable = false;
+          }
         }
         this.loading = false;
       } catch (error) {
-        this.message = error.message;
+        if (error.response.status === 401) {
+          this.message =
+            'FarmOS is not enabled for your group. Please contact support if you are interested in FarmOS integration.';
+        } else {
+          this.message = error.message + '.';
+        }
         this.loading = false;
       }
     },
@@ -190,10 +209,10 @@ export default {
     async enable() {
       const res = await api.post('/farmos/group-manage/enable', { groupId: this.groupId, enable: true });
       console.log('res', res.data);
-
       try {
         const res = await api.get('/farmos/group-manage/' + this.groupId);
-        this.groupInfos.value = res.data;
+        this.groupInfos = res.data;
+        await this.init();
       } catch (error) {
         this.error(error.status);
       }
