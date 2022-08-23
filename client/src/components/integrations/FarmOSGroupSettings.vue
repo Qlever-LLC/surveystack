@@ -106,7 +106,7 @@
           :key="`${item.user}-instance-${idx}`"
         >
           <td class="pa-4" :class="{ box: idx == 0 }">
-            <div v-if="idx == 0" class="d-flex align-center justify-space-between">
+            <div v-if="idx == 0" class="d-flex align-start justify-space-between">
               <span class="d-flex align-center">
                 <div class="d-flex flex-column">
                   <span v-if="item.name">
@@ -167,7 +167,7 @@
         </tr>
         <tr v-if="item.connectedFarms.filter((f) => !f.skip).length == 0">
           <td class="box pa-4">
-            <div class="d-flex align-center justify-space-between">
+            <div class="d-flex align-start justify-space-between">
               <span class="d-flex align-center">
                 <div class="d-flex flex-column">
                   <span v-if="item.name">
