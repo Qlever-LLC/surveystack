@@ -643,7 +643,7 @@ export const deletePlan = async (req, res) => {
 
 export const updatePlansForGroup = async (req, res) => {
   const { groupSetting, plans } = await requireFarmOSManageAdmin(req, {
-    plans: Joi.array().items(Joi.objectId()),
+    plans: Joi.array().items(Joi.objectId()).required,
   });
 
   const availablePlans = await db.collection('farmos-plans').find().toArray();
@@ -662,6 +662,28 @@ export const updatePlansForGroup = async (req, res) => {
     {
       $set: {
         planIds: updatedPlanIds,
+      },
+    }
+  );
+
+  return res.send({
+    status: 'ok',
+    // res: r,
+  });
+};
+
+export const updateSeats = async (req, res) => {
+  const { groupSetting, seats } = await requireFarmOSManageAdmin(req, {
+    seats: Joi.number().integer().min(0).max(10000).required(),
+  });
+
+  const r = await db.collection('farmos-group-settings').updateOne(
+    {
+      _id: groupSetting._id,
+    },
+    {
+      $set: {
+        maxSeats: seats,
       },
     }
   );

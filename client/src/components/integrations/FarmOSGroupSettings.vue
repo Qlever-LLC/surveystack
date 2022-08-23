@@ -1,20 +1,35 @@
 <template>
   <div>
-    <div v-if="superAdmin" class="d-flex justify-space-between">
-      <v-autocomplete
-        outlined
-        label="Super Admin: Select Plans for Group"
-        multiple
-        deletable-chips
-        @change="$emit('plansChanged', selectedPlans)"
-        v-model="selectedPlans"
-        :items="plans"
-        :item-value="(p) => p._id"
-        small-chips
-        :item-text="(p) => `${p.planName} (${p.planUrl})`"
-      >
-      </v-autocomplete>
-    </div>
+    <v-card v-if="superAdmin" class="px-4 mb-4">
+      <v-card-title>Super Admin</v-card-title>
+      <v-card-text
+        ><div class="d-flex flex-grow-1">
+          <v-text-field
+            class="mr-4 flex-shrink-1 flex-grow-0"
+            outlined
+            v-model="seats"
+            label="Max Seats"
+            type="number"
+            @change="$emit('seatsChanged', seats)"
+          />
+
+          <v-autocomplete
+            outlined
+            class="flex-grow-1 flex-shrink-0"
+            label="Select Plans for Group"
+            multiple
+            deletable-chips
+            @change="$emit('plansChanged', selectedPlans)"
+            v-model="selectedPlans"
+            :items="plans"
+            :item-value="(p) => p._id"
+            small-chips
+            :item-text="(p) => `${p.planName} (${p.planUrl})`"
+          >
+          </v-autocomplete>
+        </div>
+      </v-card-text>
+    </v-card>
     <div class="d-flex justify-space-between">
       <div>
         <h1>{{ groupInfos.name }}</h1>
@@ -214,6 +229,7 @@ export default {
     'allowSbGrpsJoinCoffeeShop',
     'allowSbGrpsAdminsCreateFarmOSFarmsInSS',
     'connect',
+    'seatsChanged',
   ],
   setup(props) {
     // part Search input field
@@ -303,6 +319,8 @@ export default {
 
     const selectedPlans = ref(props.groupInfos.planIds);
 
+    const seats = ref(props.groupInfos.seats.max);
+
     return {
       arrHeaderSearch,
       headers,
@@ -314,6 +332,7 @@ export default {
       developMbships,
       toggleDevelopMbships,
       selectedPlans,
+      seats,
     };
   },
 };

@@ -531,9 +531,17 @@ export const setPlanForGroup = async (groupId, planId) => {
 };
 
 export const getPlanForGroup = async (groupId) => {
+  const group = await db.collection('groups').findOne({ _id: asMongoId(groupId) });
+
+  if (!group) {
+    throw boom.notFound();
+  }
+
+  const tree = await getTree(group);
+
   const settings = await db
     .collection('farmos-group-settings')
-    .findOne({ groupId: asMongoId(groupId) }, { projection: { planIds: 1 } });
+    .findOne({ groupId: tree.domainRoot._id }, { projection: { planIds: 1 } });
 
   if (!settings) {
     return [];

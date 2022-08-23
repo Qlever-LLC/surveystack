@@ -1,9 +1,18 @@
 <template>
   <div v-if="farmosEnabled">
-    <v-alert v-if="successMessage" class="mt-4" mode="fade" text type="success" @click="successMessage = null">{{
-      successMessage
+    <v-alert
+      v-if="successMessage"
+      class="mt-4"
+      style="cursor: pointer"
+      mode="fade"
+      text
+      type="success"
+      @click="successMessage = null"
+      >{{ successMessage }}</v-alert
+    >
+    <v-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
+      errorMessage
     }}</v-alert>
-    <v-alert v-if="errorMessage" class="mt-4" mode="fade" text type="error">{{ errorMessage }}</v-alert>
 
     <FarmOSCreateDialog
       v-model="showCreateDialog"
@@ -29,6 +38,7 @@
       @connect="connect"
       @disconnect="disconnectFarm"
       @plansChanged="plansChanged"
+      @seatsChanged="seatsChanged"
       :plans="plans"
       :groupInfos="groupInfos"
       :superAdmin="superAdmin"
@@ -134,10 +144,18 @@ export default {
   methods: {
     updateGroupConfig() {},
     unifomMembersInGroupInfos() {},
+    async seatsChanged(seats) {
+      try {
+        await api.post(`/farmos/group-manage/${this.groupId}/seats`, { seats: seats });
+        this.success('seats updated');
+      } catch (error) {
+        this.error(error.response.data.message + '');
+      }
+      this.init();
+    },
     async allowSubGroupsJoinCoffeeShop(booleanValue) {
       try {
         await api.post(`/farmos/group-manage/${this.groupId}/subgroup-join-coffee-shop`, { updateTo: booleanValue });
-        this.success('updated');
       } catch (error) {
         this.error(error.response.data.message + '');
       }
