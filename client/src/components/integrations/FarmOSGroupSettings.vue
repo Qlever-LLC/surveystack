@@ -1,5 +1,14 @@
 <template>
   <div>
+    <v-dialog v-model="upgradeDialog" width="400">
+      <v-card>
+        <v-card-title> Upgrade </v-card-title>
+        <v-card-text>
+          In order to change your current plan, please contact
+          <a href="mailto:info@surveystack.io">info@surveystack.io</a>.
+        </v-card-text>
+      </v-card>
+    </v-dialog>
     <v-card v-if="superAdmin" class="px-4 mb-4">
       <v-card-title>Super Admin</v-card-title>
       <v-card-text
@@ -71,8 +80,8 @@
       <div class="d-flex flex-column" v-if="groupInfos.seats && groupInfos.isDomainRoot">
         <div class="d-flex justify-end">{{ groupInfos.seats.current }} / {{ groupInfos.seats.max }} accounts</div>
         <div class="d-flex justify-end align-center my-4">
-          <v-btn outlined class="mx-2">Upgrade</v-btn>
-          <v-btn outlined>Learn More</v-btn>
+          <v-btn outlined @click="upgradeDialog = true">Upgrade</v-btn>
+          <!-- <v-btn outlined class="ml-2">Learn More</v-btn> -->
         </div>
       </div>
     </div>
@@ -316,6 +325,7 @@ export default {
 
     const seats = ref(props.groupInfos.seats.max);
 
+    const upgradeDialog = ref(false);
     return {
       arrHeaderSearch,
       headers,
@@ -328,6 +338,7 @@ export default {
       toggleDevelopMbships,
       selectedPlans,
       seats,
+      upgradeDialog,
     };
   },
 };
