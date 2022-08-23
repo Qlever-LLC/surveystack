@@ -9,22 +9,38 @@ const { enterWithMagicLink } = authController;
 import { db, COLL_ACCESS_CODES } from '../db';
 import { createReq, createRes, createUser } from '../testUtils';
 import { decode } from 'js-base64';
-import { uniqueId } from 'lodash';
+import { uniqueId, mapValues } from 'lodash';
+
+const PARAM_VARIATIONS = [
+  ['without params', {}],
+  ['forwards landingPath', { landingPath: '/some/where' }],
+  ['forwards callbackUrl', { callbackUrl: 'https://foo.bar.com/quz' }],
+  [
+    'forwards landingPath + callbackUrl',
+    { landingPath: '/some/where', callbackUrl: 'http://foo.bar.com/quz' },
+  ],
+];
 
 describe('enterWithMagicLink', () => {
-  it('redirects to the expired page when code is invalid', async () => {
-    const res = await createRes();
-    await enterWithMagicLink(createReq({ query: { code: 'invalid' } }), res);
-    expect(res.redirect).toHaveBeenCalledWith('/auth/login?magicLinkExpired');
-  });
-
-  it('adds returnPath to the expired page URL', async () => {
-    const res = await createRes();
-    const landingPath = '/some/where';
-    await enterWithMagicLink(createReq({ query: { code: 'invalid', landingPath } }), res);
-    expect(res.redirect).toHaveBeenCalledWith(
-      `/auth/login?magicLinkExpired&landingPath=${encodeURIComponent(landingPath)}`
-    );
+  describe('redirects to the expired page when code is invalid', () => {
+    PARAM_VARIATIONS.forEach(([description, queryParamsToForward]) => {
+      it(description, async () => {
+        let host = 'bar.foo.com';
+        const req = createReq({
+          query: { code: 'invalid', ...queryParamsToForward },
+          headers: { host },
+        });
+        const res = await createRes();
+        await enterWithMagicLink(req, res);
+        expect(res.redirect).toHaveBeenCalled();
+        const redirectUrl = new URL(res.redirect.mock.calls[0][0]);
+        expect(redirectUrl.host).toBe(host);
+        expect(redirectUrl.searchParams.has('magicLinkExpired')).toBe(true);
+        for (const [key, value] of Object.entries(queryParamsToForward)) {
+          expect(redirectUrl.searchParams.get(key)).toBe(encodeURIComponent(value));
+        }
+      });
+    });
   });
 
   const withNewOrExistingUser = (description, test) => {
@@ -46,9 +62,9 @@ describe('enterWithMagicLink', () => {
 
   const createMagicReq = async (options) => {
     const magicLink = await createMagicLink(options);
-    const { protocol, host, query } = url.parse(magicLink, true);
+    const { protocol, host, searchParams } = new URL(magicLink);
     return createReq({
-      query,
+      query: Object.fromEntries(searchParams),
       protocol: protocol.slice(0, -1),
       headers: { host, origin: undefined },
     });
@@ -61,9 +77,9 @@ describe('enterWithMagicLink', () => {
     await enterWithMagicLink(req, res);
 
     expect(res.redirect).toHaveBeenCalledTimes(1);
-    const redirect = url.parse(res.redirect.mock.calls[0][0], true);
+    const redirect = new URL(res.redirect.mock.calls[0][0]);
     expect(redirect.pathname).toBe('/auth/accept-magic-link');
-    const user = JSON.parse(decode(redirect.query.user));
+    const user = JSON.parse(decode(redirect.searchParams.get('user')));
     expect(user.email).toBe(email);
     expect(user.landingPath).toBeFalsy();
   });
@@ -83,22 +99,39 @@ describe('enterWithMagicLink', () => {
       origin,
       accessCodeId: accessCode._id,
     });
-    const redirect = url.parse(res.redirect.mock.calls[0][0], true);
-    expect(redirect.query.invalidateMagicLink).toBe(invalidateMagicLink);
+    const redirect = new URL(res.redirect.mock.calls[0][0]);
+    expect(redirect.searchParams.get('invalidateMagicLink')).toBe(
+      encodeURIComponent(invalidateMagicLink)
+    );
   });
 
-  withNewOrExistingUser('adds returnPath to the accept URL', async (email) => {
-    const res = await createRes();
-    const landingPath = '/some/where';
-    const req = await createMagicReq({ origin: 'https://foo.bar', email, landingPath });
+  describe('forwarding params', () => {
+    PARAM_VARIATIONS.forEach(([description, queryParamsToForward]) => {
+      withNewOrExistingUser(description, async (email) => {
+        const res = await createRes();
+        const req = await createMagicReq({
+          origin: 'https://foo.bar',
+          email,
+          ...queryParamsToForward,
+        });
 
-    await enterWithMagicLink(req, res);
+        await enterWithMagicLink(req, res);
 
-    expect(res.redirect).toHaveBeenCalledTimes(1);
-    const redirect = url.parse(res.redirect.mock.calls[0][0], true);
-    expect(redirect.pathname).toBe('/auth/accept-magic-link');
-    const user = JSON.parse(decode(redirect.query.user));
-    expect(user.email).toBe(email);
-    expect(redirect.query.landingPath).toBe(landingPath);
+        expect(res.redirect).toHaveBeenCalledTimes(1);
+        const callbackUrl =
+          queryParamsToForward.callbackUrl && new URL(queryParamsToForward.callbackUrl);
+        const redirect = new URL(res.redirect.mock.calls[0][0]);
+        expect(redirect.pathname).toBe(
+          callbackUrl ? callbackUrl.pathname : '/auth/accept-magic-link'
+        );
+        expect(redirect.host).toBe(callbackUrl ? callbackUrl.host : req.get('host'));
+        const user = JSON.parse(decode(redirect.searchParams.get('user')));
+        expect(user.email).toBe(email);
+
+        for (const [key, value] of Object.entries(queryParamsToForward)) {
+          expect(redirect.searchParams.get(key)).toBe(encodeURIComponent(value));
+        }
+      });
+    });
   });
 });

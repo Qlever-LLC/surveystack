@@ -201,7 +201,7 @@ const enterWithMagicLink = async (req, res) => {
 
   // Redirect user to the "link expired" page if the magiclink is invalid
   if (!accessCode) {
-    res.redirect(withForwardedParams(new URL('/auth/login?magicLinkExpired')));
+    res.redirect(withForwardedParams(new URL('/auth/login?magicLinkExpired', origin)));
     return;
   }
 
