@@ -125,7 +125,6 @@
           <td class="box pa-4">
             <div v-if="connectedFarm.instanceName" class="d-flex align-center justify-space-between">
               <span class="d-flex align-center">
-                <span v-if="connectedFarm.owner" class="mdi mdi-crown pr-1"></span>
                 <span>{{ connectedFarm.instanceName }}</span>
               </span>
               <span class="d-flex" style="flex-wrap: nowrap">
