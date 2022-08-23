@@ -61,7 +61,7 @@ export default {
       selectedInstance: null,
       items: [
         {
-          name: 'Aggregator',
+          name: 'farmOS instance',
           id: 'aggregator',
           component: Aggregator,
         },
