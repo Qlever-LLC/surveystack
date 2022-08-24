@@ -258,7 +258,7 @@ function createThreePointChange(changeLocal, changeRemote) {
       remoteChangeProp.oldValue = remoteChangeProp.oldValue || remoteChangeProp.value;
       remoteChangeProp.newValue = remoteChangeProp.newValue || remoteChangeProp.value;
       remoteChangeProp.localValue = localChangeProp ? localChangeProp.newValue || localChangeProp.value : undefined;
-      if (remoteChangeProp.changeType === UNCHANGED && localChangeProp.changeType === CHANGED) {
+      if (remoteChangeProp.changeType === UNCHANGED && localChangeProp && localChangeProp.changeType === CHANGED) {
         remoteChangeProp.changeType = CHANGED;
       }
       if (
