@@ -263,5 +263,6 @@ const migrateResourceLibraryIds = async () => {
 };
 
 export const getDb = () => db;
+export const disconnect = async () => await mongoClient.close();
 
 export { db, connectDatabase, mongoClient };

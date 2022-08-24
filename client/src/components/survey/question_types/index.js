@@ -34,9 +34,6 @@ Vue.component('AppControlInstructionsImageSplit', InstructionsImageSplit);
 const Location = () => import('./Location.vue');
 Vue.component('AppControlLocation', Location);
 
-import MatrixLegacy from './Matrix.legacy.vue';
-Vue.component('AppControlMatrix.legacy', MatrixLegacy);
-
 import Matrix from './matrix/Matrix.vue';
 Vue.component('AppControlMatrix', Matrix);
 

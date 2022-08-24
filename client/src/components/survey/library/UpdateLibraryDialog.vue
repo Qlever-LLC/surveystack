@@ -2,12 +2,14 @@
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%" persistent>
     <v-card>
       <v-card-title>
-        Update question set from Version {{ libraryRootGroup.libraryVersion }} to Version
-        {{ toSurvey.latestVersion }}
+        Update question set from Version
+        <v-chip dark small color="green" class="mx-2"> Version {{ libraryRootGroup.libraryVersion }} </v-chip>
+        to
+        <v-chip dark small color="green" class="mx-2"> Version {{ toSurvey.latestVersion }} </v-chip>
       </v-card-title>
-      <v-card-text class="pb-0">
-        <h3 class="mt-5 mb-2">Update notes from maintainer of question set "{{ toSurvey.name }}":</h3>
-        <tip-tap-editor disabled v-model="toSurvey.meta.libraryHistory" class="mb-4" />
+      <v-card-text class="mt-5">
+        <h3 class="mb-2" style="color: rgba(0, 0, 0, 0.87); font-size: 17.55px">Update Notes</h3>
+        <tip-tap-editor disabled v-model="toSurvey.meta.libraryHistory" class="mb-2" />
         <library-change-type-selector v-model="toSurvey.meta.libraryLastChangeType" :disabled="true" />
       </v-card-text>
       <survey-diff
