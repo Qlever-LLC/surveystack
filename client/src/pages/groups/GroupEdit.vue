@@ -101,38 +101,6 @@
 
     <v-row>
       <v-col cols="12" lg="12">
-        <app-pinned-surveys
-          class="mb-4"
-          v-if="editMode"
-          :entities="entity.surveys.pinned"
-          :searchResults="searchResults"
-          @search="searchSurveys"
-        >
-        </app-pinned-surveys>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col cols="12" lg="12">
-        <app-basic-list
-          class="mb-4"
-          v-if="editMode"
-          :entities="integrations"
-          title="Integrations"
-          :link="(integration) => `/group-manage/${integration.slug}/${entity._id}`"
-        >
-          <template v-slot:entity="{ entity }">
-            <v-list-item-content>
-              <v-list-item-title>{{ entity.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ entity.description }} </v-list-item-subtitle>
-            </v-list-item-content>
-          </template>
-        </app-basic-list>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col cols="12" lg="6">
         <app-basic-list
           :loading="isLoadingMembers || isLoadingHyloGroup"
           editable
@@ -169,6 +137,7 @@
                   :email="entity.meta.invitationEmail"
                   @confirmed="loadMembers"
                 />
+                <v-btn @click="startSubmission(entity.user)">Start submission</v-btn>
                 <app-member-hylo-status
                   v-if="entity.meta && entity.meta.status === 'active' && integratedHyloGroup"
                   :loading="isLoadingHyloGroup"
@@ -180,6 +149,38 @@
                 <v-icon v-if="entity.role === 'admin'">mdi-crown-outline</v-icon>
               </v-row>
             </v-list-item-action>
+          </template>
+        </app-basic-list>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col cols="12" lg="12">
+        <app-pinned-surveys
+          class="mb-4"
+          v-if="editMode"
+          :entities="entity.surveys.pinned"
+          :searchResults="searchResults"
+          @search="searchSurveys"
+        >
+        </app-pinned-surveys>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col cols="12" lg="12">
+        <app-basic-list
+          class="mb-4"
+          v-if="editMode"
+          :entities="integrations"
+          title="Integrations"
+          :link="(integration) => `/group-manage/${integration.slug}/${entity._id}`"
+        >
+          <template v-slot:entity="{ entity }">
+            <v-list-item-content>
+              <v-list-item-title>{{ entity.name }}</v-list-item-title>
+              <v-list-item-subtitle>{{ entity.description }} </v-list-item-subtitle>
+            </v-list-item-content>
           </template>
         </app-basic-list>
       </v-col>
@@ -199,12 +200,11 @@ import appDialog from '@/components/ui/Dialog.vue';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 import appConfirmMembershipButton from '@/components/shared/ConfirmMembershipButton.vue';
 import appMemberHyloStatus from './MemberHyloStatus.vue';
-
-const appFarmHubOnboarding = () => import('@/components/integrations/FarmHubOnboarding.vue');
-
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
 import { get } from 'lodash';
+
+const appFarmHubOnboarding = () => import('@/components/integrations/FarmHubOnboarding.vue');
 
 const integrations = [
   {
@@ -260,6 +260,12 @@ export default {
     };
   },
   methods: {
+    async startSubmission(user) {
+      //TODO
+      const survey = '62c6a504d87a77000175e753';
+      //('5f047cf498d96300010121d4');
+      await this.$store.dispatch('submissions/startDraft', { survey, submitAsUserId: user._id });
+    },
     async loadMembers() {
       this.isLoadingMembers = true;
       try {

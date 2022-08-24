@@ -619,7 +619,12 @@ const prepareCreateSubmissionEntity = async (submission, res) => {
   }
 
   if (res.locals.auth.isAuthenticated) {
-    entity.meta.creator = res.locals.auth.user._id;
+    if (entity.meta.submitAsUserId) {
+      entity.meta.creator = entity.meta.submitAsUserId;
+      entity.meta.delegate = res.locals.auth.user._id;
+    } else {
+      entity.meta.creator = res.locals.auth.user._id;
+    }
   } else {
     entity.meta.creator = null;
     // set submission group to survey's group for now
