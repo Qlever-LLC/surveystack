@@ -1,10 +1,16 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%">
     <v-card>
-      <v-card-title> Publish Update To Library </v-card-title>
-      <v-card-text class="pb-0">
-        <h3>Version history</h3>
-        <tip-tap-editor v-model="localLibrarySurvey.meta.libraryHistory" class="mb-4" />
+      <v-card-title>
+        Publish
+        <v-chip dark small color="green" class="mx-2">
+          Version {{ localLibrarySurvey.revisions[localLibrarySurvey.revisions.length - 1].version }}
+        </v-chip>
+        to Library
+      </v-card-title>
+      <v-card-text class="mt-5">
+        <h3 class="mb-2" style="color: rgba(0, 0, 0, 0.87); font-size: 17.55px">Update Notes</h3>
+        <tip-tap-editor v-model="localLibrarySurvey.meta.libraryHistory" class="mb-2" />
         <library-change-type-selector v-model="localLibrarySurvey.meta.libraryLastChangeType" :disabled="false" />
       </v-card-text>
       <survey-diff
@@ -53,6 +59,17 @@ export default {
     const state = reactive({
       localLibrarySurvey: props.librarySurvey,
     });
+
+    const versionHistoryText =
+      '<p>Version ' +
+      state.localLibrarySurvey.revisions[state.localLibrarySurvey.revisions.length - 1].version +
+      '</p>';
+    const ul = '<ul><li></li></ul>';
+
+    if (state.localLibrarySurvey.meta.libraryHistory.indexOf(versionHistoryText) === -1) {
+      state.localLibrarySurvey.meta.libraryHistory =
+        versionHistoryText + ul + state.localLibrarySurvey.meta.libraryHistory;
+    }
 
     return {
       ...toRefs(state),
