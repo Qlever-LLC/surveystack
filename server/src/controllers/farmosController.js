@@ -858,7 +858,7 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
     console.log(error);
     return res.send({
       status: 'error',
-      message: error.message,
+      message: error.response.data,
     });
   }
 };
