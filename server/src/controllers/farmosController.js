@@ -662,7 +662,7 @@ export const deletePlan = async (req, res) => {
 
 export const updatePlansForGroup = async (req, res) => {
   const { groupSetting, plans } = await requireFarmOSManageAdmin(req, {
-    plans: Joi.array().items(Joi.objectId()).required,
+    plans: Joi.array().items(Joi.objectId()).required(),
   });
 
   const availablePlans = await db.collection('farmos-plans').find().toArray();
