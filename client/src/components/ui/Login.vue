@@ -224,9 +224,10 @@ export default {
       // email sign-in link
       if (!this.usePassword) {
         const landingPath = this.$route.params.redirect || this.$route.query.landingPath;
+        const callbackUrl = this.$route.query.callbackUrl;
 
         try {
-          await this.$store.dispatch('auth/sendMagicLink', { email: this.entity.email, landingPath });
+          await this.$store.dispatch('auth/sendMagicLink', { email: this.entity.email, landingPath, callbackUrl });
           this.signInLinkSent = true;
           this.status = '';
         } catch (e) {

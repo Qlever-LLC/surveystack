@@ -74,8 +74,8 @@ const actions = {
       throw err;
     }
   },
-  async sendMagicLink(_, { email, landingPath = null }) {
-    await api.post('/auth/request-magic-link', { email, landingPath });
+  async sendMagicLink(_, { email, landingPath = null, callbackUrl = null }) {
+    await api.post('/auth/request-magic-link', { email, landingPath, callbackUrl });
   },
   logout({ commit, dispatch }) {
     return new Promise((resolve) => {
