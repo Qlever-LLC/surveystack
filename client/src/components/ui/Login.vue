@@ -181,6 +181,8 @@ export default {
 
     if ('magicLinkExpired' in this.$route.query) {
       this.status = 'Your magic link is expired. Please request a new one.';
+      // Select the magic link login variation of the dialog
+      this.usePassword = false;
     }
 
     if (this.isWhitelabel) {
