@@ -109,7 +109,7 @@ describe('createMagicLink', () => {
 
   describe('returns the link in the correct format', () => {
     PARAM_VARIATIONS.forEach(([description, paramsToForward]) => {
-      it(description, async() => {
+      it(description, async () => {
         const link = new URL(await createMagicLink({ email, origin, ...paramsToForward }));
         expect(link.origin).toBe(origin);
         expect(link.pathname).toBe('/api/auth/enter-with-magic-link');
@@ -117,9 +117,8 @@ describe('createMagicLink', () => {
         for (const [key, value] of Object.entries(paramsToForward)) {
           expect(link.searchParams.get(key)).toBe(value);
         }
-      })
-    })
-   
+      });
+    });
   });
 
   describe('createLoginPayload', () => {
