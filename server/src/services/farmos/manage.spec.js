@@ -249,6 +249,39 @@ describe('manageFarmOS', () => {
     const canBeRoot4 = bionutrientTree.canBecomeRoot();
     expect(canBeRoot4).toBeFalsy();
   });
+  it('getTree group-descendants-ascendants', async () => {
+    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
+    const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
+
+    let bionutrientTree = await getTree(groupBionutrient);
+    let labsTree = await getTree(groupLabs);
+    let michiganTree = await getTree(groupMichigan);
+
+    expect(bionutrientTree.group).toBe(groupBionutrient);
+    expect(labsTree.group).toBe(groupLabs);
+    expect(michiganTree.group).toBe(groupMichigan);
+
+    //descendants
+    expect(bionutrientTree.descendants[0].name).toBe(groupBionutrient.name);
+    expect(bionutrientTree.descendants[1].name).toBe(groupLabs.name);
+    expect(bionutrientTree.descendants[2].name).toBe(groupMichigan.name);
+
+    expect(labsTree.descendants[0].name).toBe(groupLabs.name);
+    expect(labsTree.descendants[1].name).toBe(groupMichigan.name);
+
+    expect(michiganTree.descendants[0].name).toBe(groupMichigan.name);
+
+    //ascendants
+    expect(bionutrientTree.ascendants[0].name).toBe(groupBionutrient.name);
+
+    expect(labsTree.ascendants[0].name).toBe(groupBionutrient.name);
+    expect(labsTree.ascendants[1].name).toBe(groupLabs.name);
+
+    expect(michiganTree.ascendants[0].name).toBe(groupBionutrient.name);
+    expect(michiganTree.ascendants[1].name).toBe(groupLabs.name);
+    expect(michiganTree.ascendants[2].name).toBe(groupMichigan.name);
+  });
   it('getGroupInformation', async () => {
     const groupBionutrient = await createGroup({ name: 'Bionutrient' });
     const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
