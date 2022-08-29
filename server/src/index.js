@@ -18,6 +18,7 @@ import debugRoutes from './routes/debug';
 import resources from './controllers/resources';
 import { createCookieOptions } from './constants';
 import { toggleMiddleware } from './services/featureToggle.service';
+import { ObjectId } from 'mongodb';
 
 const subdomainRedirect = {
   rfc: 'bionutrient',
@@ -93,11 +94,19 @@ app.use(async (req, res, next) => {
     }
   }
 
+  //read out an optional userid to delegate the request to
+
+  let delegateToUserId = req.headers['x-delegate-to'];
+  if (isAuthenticated && delegateToUserId) {
+    delegateToUserId = new ObjectId(delegateToUserId);
+  }
+
   res.locals.auth = {
     isAuthenticated,
     isSuperAdmin,
     user,
     roles,
+    delegateToUserId,
   };
 
   next();

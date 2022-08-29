@@ -619,11 +619,9 @@ const prepareCreateSubmissionEntity = async (submission, res) => {
   }
 
   if (res.locals.auth.isAuthenticated) {
-    if (entity.meta.submitAsUserId) {
-      entity.meta.creator = entity.meta.submitAsUserId;
-      entity.meta.delegate = res.locals.auth.user._id;
-    } else {
-      entity.meta.creator = res.locals.auth.user._id;
+    entity.meta.creator = res.locals.auth.user._id;
+    if (res.locals.auth.delegatorUserId) {
+      entity.meta.delegatorUserId = res.locals.auth.delegatorUserId;
     }
   } else {
     entity.meta.creator = null;
@@ -676,7 +674,7 @@ const handleApiCompose = async (submissionEntities, user) => {
         farmOsService.handle({
           submission: entity,
           survey,
-          user,
+          user, //todo
         })
       )
     );

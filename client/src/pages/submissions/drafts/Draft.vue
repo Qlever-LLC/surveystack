@@ -204,12 +204,20 @@ export default {
       this.hasError = true;
     }
 
+    if (this.submission.meta.submitAsUserId) {
+      api.setHeader('x-delegate-to', this.submission.meta.submitAsUserId);
+    }
+
     this.loading = false;
   },
   beforeRouteLeave(to, from, next) {
     if (this.submission && this.survey && !this.isSubmitted) {
       this.$refs.confirmLeaveDialog.open(next);
       return;
+    }
+
+    if (this.submission.meta.submitAsUserId) {
+      api.removeHeader('x-delegate-to');
     }
     next(true);
   },
