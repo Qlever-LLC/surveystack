@@ -3,13 +3,12 @@ import * as authService from '../services/auth.service';
 jest.spyOn(authService, 'createInvalidateMagicLink');
 const { createMagicLink, createInvalidateMagicLink } = authService;
 
-import url from 'url';
 import authController from './authController';
 const { enterWithMagicLink } = authController;
 import { db, COLL_ACCESS_CODES } from '../db';
 import { createReq, createRes, createUser } from '../testUtils';
 import { decode } from 'js-base64';
-import { uniqueId, mapValues } from 'lodash';
+import { uniqueId } from 'lodash';
 
 const PARAM_VARIATIONS = [
   ['without params', {}],
@@ -126,9 +125,11 @@ describe('enterWithMagicLink', () => {
         const user = JSON.parse(decode(redirect.searchParams.get('user')));
         expect(user.email).toBe(email);
 
-        for (const [key, value] of Object.entries(queryParamsToForward)) {
-          expect(redirect.searchParams.get(key)).toBe(value);
-        }
+        expect(redirect.searchParams.get('landingPath')).toBe(
+          queryParamsToForward.landingPath || null
+        );
+        // should not add callbackUrl to the query params
+        expect(redirect.searchParams.has('callbackUrl')).toBe(false);
       });
     });
   });

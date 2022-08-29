@@ -189,26 +189,24 @@ const enterWithMagicLink = async (req, res) => {
   const accessCode = await db.collection(COLL_ACCESS_CODES).findOne({ code });
   const origin = req.protocol + '://' + req.get('host');
 
-  const withForwardedParams = (url) => {
+  // Redirect user to the "link expired" page if the magiclink is invalid
+  if (!accessCode) {
+    const url = new URL('/auth/login?magicLinkExpired', origin);
     if (landingPath) {
       url.searchParams.set('landingPath', landingPath);
     }
     if (callbackUrl) {
       url.searchParams.set('callbackUrl', callbackUrl);
     }
-    return url;
-  };
-
-  // Redirect user to the "link expired" page if the magiclink is invalid
-  if (!accessCode) {
-    res.redirect(withForwardedParams(new URL('/auth/login?magicLinkExpired', origin)));
+    res.redirect(url);
     return;
   }
 
   // If custom callback URL is not set, use the default SurveyStack accept root
-  const loginUrl = withForwardedParams(
-    callbackUrl ? new URL(callbackUrl) : new URL(`/auth/accept-magic-link`, origin)
-  );
+  const loginUrl = callbackUrl ? new URL(callbackUrl) : new URL(`/auth/accept-magic-link`, origin);
+  if (landingPath) {
+    loginUrl.searchParams.set('landingPath', landingPath);
+  }
 
   // Add login payload to the search params
   const userObject = await createUserIfNotExist(accessCode.email);
