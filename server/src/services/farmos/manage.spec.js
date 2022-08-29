@@ -282,6 +282,24 @@ describe('manageFarmOS', () => {
     expect(michiganTree.ascendants[1].name).toBe(groupLabs.name);
     expect(michiganTree.ascendants[2].name).toBe(groupMichigan.name);
   });
+  it('getTree breadcrumbsByPath', async () => {
+    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
+    const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
+
+    let bionutrientTree = await getTree(groupBionutrient);
+    let labsTree = await getTree(groupLabs);
+    let michiganTree = await getTree(groupMichigan);
+    const expectedResult = {
+      '/bionutrient/': 'Bionutrient',
+      '/bionutrient/labs/': 'Bionutrient > Labs',
+      '/bionutrient/labs/michigan/': 'Bionutrient > Labs > Michigan',
+    };
+
+    expect(bionutrientTree.breadcrumbsByPath).toStrictEqual(expectedResult);
+    expect(labsTree.breadcrumbsByPath).toStrictEqual(expectedResult);
+    expect(michiganTree.breadcrumbsByPath).toStrictEqual(expectedResult);
+  });
   it('getGroupInformation', async () => {
     const groupBionutrient = await createGroup({ name: 'Bionutrient' });
     const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
