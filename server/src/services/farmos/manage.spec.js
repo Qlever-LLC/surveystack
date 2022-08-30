@@ -300,6 +300,33 @@ describe('manageFarmOS', () => {
     expect(labsTree.breadcrumbsByPath).toStrictEqual(expectedResult);
     expect(michiganTree.breadcrumbsByPath).toStrictEqual(expectedResult);
   });
+  it('getTree domainInformation', async () => {
+    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
+    const groupLabs2 = await groupBionutrient.createSubGroup({ name: 'Labs2' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
+    const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
+
+    await createFarmosGroupSettings(groupLabs._id);
+
+    let bionutrientTree = await getTree(groupBionutrient);
+    let labs2Tree = await getTree(groupLabs2);
+    let labsTree = await getTree(groupLabs);
+    let michiganTree = await getTree(groupMichigan);
+
+    const bioResult = await bionutrientTree.domainInformation();
+    const labs2Result = await labs2Tree.domainInformation();
+    const labsResult = await labsTree.domainInformation();
+    const michResult = await michiganTree.domainInformation();
+
+    expect(bioResult).toBe(null);
+    expect(labs2Result).toBe(null);
+    expect(labsResult.maxSeats).toBe(20);
+    expect(labsResult.name).toBe('Bionutrient > Labs');
+    expect(labsResult.seats).toBe(0);
+    expect(michResult.maxSeats).toBe(20);
+    expect(michResult.name).toBe('Bionutrient > Labs > Michigan');
+    expect(michResult.seats).toBe(0);
+  });
   it('getGroupInformation', async () => {
     const groupBionutrient = await createGroup({ name: 'Bionutrient' });
     const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
