@@ -41,6 +41,19 @@
           {{ submissionRightsHint }}
         </div>
       </div>
+      <div v-if="isAdminOfSurveyGroup && isAllowedToSubmit" class="text-center ml-3">
+        <v-btn x-large color="" @click="showSelectMember = true" class="start-button">
+          <v-icon>mdi-file-document-box-plus-outline</v-icon>
+          <span class="ml-2">Start Survey As a Member</span>
+          <app-member-selector
+            :show="showSelectMember"
+            :searchResults="searchResults"
+            @hide="showSelectMember = false"
+            @search="searchMembers"
+            @selected="startDraftAs(entity._id, $event)"
+          />
+        </v-btn>
+      </div>
     </div>
   </v-container>
   <v-container fill-height v-else>
@@ -52,6 +65,7 @@
 
 <script>
 import api from '@/services/api.service';
+import appMemberSelector from '@/components/shared/MemberSelector.vue';
 import { autoSelectActiveGroup } from '@/utils/memberships';
 
 export default {
@@ -62,16 +76,30 @@ export default {
       default: false,
     },
   },
+  components: {
+    appMemberSelector,
+  },
   data() {
     return {
       entity: null,
       surveyInfo: null,
       show: false,
+      searchResults: [],
+      showSelectMember: false,
     };
   },
   methods: {
     startDraft(survey) {
       this.$store.dispatch('submissions/startDraft', { survey });
+    },
+    startDraftAs(survey, selectedMember) {
+      this.showSelectMember = false;
+      this.$store.dispatch('submissions/startDraft', { survey, submitAsUserId: selectedMember.user._id });
+    },
+    async searchMembers() {
+      //TODO load members of MY groups instead of Survey group?
+      const { data: searchResults } = await api.get(`/memberships?group=${this.entity.meta.group.id}&populate=true`);
+      this.searchResults = searchResults;
     },
   },
   computed: {
@@ -80,6 +108,9 @@ export default {
     },
     memberships() {
       return this.$store.getters['memberships/memberships'];
+    },
+    isAdminOfSurveyGroup() {
+      return !!this.memberships.find((m) => m.group._id === this.entity.meta.group.id && m.role === 'admin');
     },
     editable() {
       if (!this.$store.getters['auth/isLoggedIn']) {
@@ -95,11 +126,12 @@ export default {
         return false;
       }
 
-      const g = this.memberships.find((m) => m.group._id === this.entity.meta.group.id);
+      return this.isAdminOfSurveyGroup;
+      /*const g = this.memberships.find((m) => m.group._id === this.entity.meta.group.id);
       if (g && g.role === 'admin') {
         return true;
       }
-      return false;
+      return false;*/
     },
     isAllowedToSubmit() {
       const { submissions, isLibrary } = this.entity.meta;

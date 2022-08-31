@@ -137,7 +137,6 @@
                   :email="entity.meta.invitationEmail"
                   @confirmed="loadMembers"
                 />
-                <v-btn @click="startSubmission(entity.user)">Start submission</v-btn>
                 <app-member-hylo-status
                   v-if="entity.meta && entity.meta.status === 'active' && integratedHyloGroup"
                   :loading="isLoadingHyloGroup"
@@ -260,12 +259,6 @@ export default {
     };
   },
   methods: {
-    async startSubmission(user) {
-      //TODO
-      const survey = '62c6a504d87a77000175e753';
-      //('5f047cf498d96300010121d4');
-      await this.$store.dispatch('submissions/startDraft', { survey, submitAsUserId: user._id });
-    },
     async loadMembers() {
       this.isLoadingMembers = true;
       try {
