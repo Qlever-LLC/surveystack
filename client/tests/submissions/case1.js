@@ -115,7 +115,7 @@ export const survey = {
             },
             apiCompose: {
               enabled: true,
-              code: '\n/* eslint-disable */\n\n/**\n * ApiCompose\n *\n * @param {submission} submission\n * @param {survey} survey\n * @param {parent} parent\n */\nfunction apiCompose(submission, survey, parent) {\n  order(1);\n  return {\n    number: 1,\n  };\n}\n\n\n',
+              code: '\n/* eslint-disable */\n\n/**\n * ApiCompose\n *\n * @param {submission} submission\n * @param {survey} survey\n * @param {parent} parent\n */\nfunction apiCompose(submission, survey, parent) {\n  console.warn(1);\n  return {\n    number: 1,\n  };\n}\n\n\n',
             },
           },
           id: '630f32497f5f6e0001c86427',
@@ -149,7 +149,7 @@ export const survey = {
                 },
                 apiCompose: {
                   enabled: true,
-                  code: 'function apiCompose(submission, survey, parent) {\n  order(2);\n  return {\n    number: 3,\n  };\n}',
+                  code: 'function apiCompose(submission, survey, parent) {\n  console.warn(2);\n  return {\n    number: 3,\n  };\n}',
                 },
               },
               id: '630f324d7f5f6e0001c8642b',
@@ -183,7 +183,7 @@ export const survey = {
                     },
                     apiCompose: {
                       enabled: true,
-                      code: 'function apiCompose(submission, survey, parent) {\n  order(3);\n  return {\n    number: 3,\n  };\n}',
+                      code: 'function apiCompose(submission, survey, parent) {\n  console.warn(3);\n  return {\n    number: 3,\n  };\n}',
                     },
                   },
                   id: '630f324b7f5f6e0001c86429',
@@ -209,7 +209,7 @@ export const survey = {
                 },
                 apiCompose: {
                   enabled: true,
-                  code: 'function apiCompose(submission, survey, parent) {\n  order(4);\n  return {\n    number: 4,\n  };\n}',
+                  code: 'function apiCompose(submission, survey, parent) {\n  console.warn(4);\n  return {\n    number: 4,\n  };\n}',
                 },
               },
               id: '630f33cf7f5f6e0001c86454',
@@ -234,7 +234,7 @@ export const survey = {
             },
             apiCompose: {
               enabled: true,
-              code: 'function apiCompose(submission, survey, parent) {\n  order(5);\n  return {\n    number: 5,\n  };\n}',
+              code: 'function apiCompose(submission, survey, parent) {\n  console.warn(5);\n  return {\n    number: 5,\n  };\n}',
             },
           },
           id: '630f33c87f5f6e0001c86451',
