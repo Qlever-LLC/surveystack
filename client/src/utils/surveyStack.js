@@ -31,13 +31,13 @@ export function setNested(obj, path, value) {
   Vue.set(parent, subKey, value);
 }
 
-function walkThroughAllAndReorganized(nodes, childrens) {
-  for (const children of childrens) {
-    if (children.children.length > 0) {
-      // group and page can have childrens
-      walkThroughAllAndReorganized(nodes, children.children);
+function walkThroughAllAndReorganized(nodes, children) {
+  for (const child of children) {
+    if (child.children.length > 0) {
+      // group and page can have children
+      walkThroughAllAndReorganized(nodes, child.children);
     }
-    nodes.push(children);
+    nodes.push(child);
   }
   return nodes;
 }
