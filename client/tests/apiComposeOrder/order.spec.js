@@ -23,7 +23,7 @@ describe('order apiCompose', () => {
     expect(consoleWarnMock.mock.calls.toString()).toBe('1,2,3');
   });
 
-  it('linear text - text in group - text in group', async () => {
+  it('linear text - (text & text in group) in group', async () => {
     const { submission, survey } = case1;
 
     const consoleWarnMock = jest.spyOn(console, 'warn').mockImplementation();
@@ -55,5 +55,27 @@ describe('order apiCompose', () => {
     const apiCompositions = await codeEvaluator.calculateApiCompose(nodes, submission, survey);
 
     expect(consoleWarnMock.mock.calls.toString()).toBe('1,2,3,4,5,6,7,8,9,10,11');
+  });
+});
+
+describe('order apiCompose control structure recursion error', () => {
+  it.only('linear text - (text & text in group) in group', async () => {
+    const { submission, survey } = case1;
+
+    const consoleWarnMock = jest.spyOn(console, 'warn').mockImplementation();
+
+    const { controls } = survey.revisions.find((revision) => revision.version === submission.meta.survey.version);
+
+    const tree = new TreeModel();
+    const root = tree.parse({ name: 'data', children: controls });
+
+    const firstStage = root.children[1];
+    root.children[1].children.push(firstStage);
+
+    const nodes = surveyStackUtils.getAllNodes(root);
+
+    const apiCompositions = await codeEvaluator.calculateApiCompose(nodes, submission, survey);
+
+    expect(consoleWarnMock.mock.calls.toString()).toBe('1,2,3,4,5');
   });
 });
