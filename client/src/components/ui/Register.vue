@@ -11,6 +11,7 @@
           :value="entity.email.toLowerCase()"
           @input="entity.email = $event.toLowerCase()"
           color="focus"
+          hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work."
         />
 
         <v-text-field label="Name" type="text" class="form-control" v-model="entity.name" color="focus" />
