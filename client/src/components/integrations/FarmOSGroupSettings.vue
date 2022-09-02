@@ -1,56 +1,87 @@
 <template>
   <div>
+    <v-dialog v-model="upgradeDialog" width="400">
+      <v-card>
+        <v-card-title> Upgrade </v-card-title>
+        <v-card-text>
+          In order to change your current plan, please contact
+          <a href="mailto:info@surveystack.io">info@surveystack.io</a>.
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <v-card v-if="superAdmin" class="px-4 mb-4">
+      <v-card-title>Super Admin</v-card-title>
+      <v-card-text
+        ><div class="d-flex flex-grow-1">
+          <v-text-field
+            class="mr-4 flex-shrink-1 flex-grow-0"
+            outlined
+            v-model="seats"
+            label="Max Seats"
+            type="number"
+            @change="$emit('seatsChanged', seats)"
+          />
+
+          <v-autocomplete
+            outlined
+            class="flex-grow-1 flex-shrink-0"
+            label="Select FarmOS Plans for Group"
+            multiple
+            deletable-chips
+            @change="$emit('plansChanged', selectedPlans)"
+            v-model="selectedPlans"
+            :items="plans"
+            :item-value="(p) => p._id"
+            small-chips
+            :item-text="(p) => `${p.planName} (${p.planUrl})`"
+          >
+          </v-autocomplete>
+        </div>
+      </v-card-text>
+    </v-card>
     <div class="d-flex justify-space-between">
       <div>
         <h1>{{ groupInfos.name }}</h1>
         <h2>Connected Members & Farms</h2>
+
         <div class="pa-3">
           <p class="font-weight-bold">Settings</p>
           <v-container class="pa-0" fluid>
             <v-checkbox
-              disabled
+              v-if="groupInfos.allowSubgroupsToJoinCoffeeShop || groupInfos.isDomainRoot"
               class="ma-0 pa-0"
               hide-details
               :ripple="false"
               v-model="groupInfos.groupHasCoffeeShopAccess"
-              @input="$emit('addGrpCoffeeShop', $event.target.value, groupInfos.groupId)"
+              @change="$emit('addGrpCoffeeShop', $event)"
               label="Add this group to the Coffee Shop"
             ></v-checkbox>
             <v-checkbox
-              disabled
+              v-if="groupInfos.isDomainRoot"
               class="ma-0 pa-0"
               hide-details
               :ripple="false"
               v-model="groupInfos.allowSubgroupsToJoinCoffeeShop"
-              @input="$emit('allowSbGrpsJoinCoffeeShop', $event.target.value)"
+              @change="$emit('allowSbGrpsJoinCoffeeShop', $event)"
               :label="`Allow subgroups to join the Coffee Shop`"
             ></v-checkbox>
             <v-checkbox
-              disabled
+              v-if="groupInfos.isDomainRoot"
               class="ma-0 pa-0"
               :ripple="false"
               v-model="groupInfos.allowSubgroupAdminsToCreateFarmOSInstances"
-              @input="$emit('allowSbGrpsAdminsCreateFarmOSFarmsInSS', $event.target.value)"
+              @change="$emit('allowSbGrpsAdminsCreateFarmOSFarms', $event)"
               label="Allow subgroups admins to create FarmOS Farms through Survey Stack"
             >
             </v-checkbox>
           </v-container>
         </div>
       </div>
-      <div class="d-flex flex-column">
-        <div class="d-flex justify-end" v-if="groupInfos.seats">
-          {{ groupInfos.name }} has {{ groupInfos.seats.current }} / {{ groupInfos.seats.max }} accounts
-        </div>
-        <div class="d-flex justify-end" v-else>
-          {{ groupInfos.name }}
-        </div>
-        <div class="d-flex justify-end align-center">
-          <my-button color="secondary" noBorder label="Upgrade" /> or
-          <my-button color="secondary" noBorder label="Learn More" />
-        </div>
-        <div class="d-flex justify-end">
-          <my-button class="mr-2" color="primary" label="advanced" />
-          <my-button color="primary" label="Tutorial" />
+      <div class="d-flex flex-column" v-if="groupInfos.seats && groupInfos.isDomainRoot">
+        <div class="d-flex justify-end">{{ groupInfos.seats.current }} / {{ groupInfos.seats.max }} accounts</div>
+        <div class="d-flex justify-end align-center my-4">
+          <v-btn outlined @click="upgradeDialog = true">Upgrade</v-btn>
+          <!-- <v-btn outlined class="ml-2">Learn More</v-btn> -->
         </div>
       </div>
     </div>
@@ -89,9 +120,12 @@
       </template>
 
       <template v-slot:item="{ item, index }">
-        <tr v-for="(connectedFarm, idx) in item.connectedFarms" :key="`${item.user}-instance-${idx}`">
+        <tr
+          v-for="(connectedFarm, idx) in item.connectedFarms.filter((f) => !f.skip)"
+          :key="`${item.user}-instance-${idx}`"
+        >
           <td class="pa-4" :class="{ box: idx == 0 }">
-            <div v-if="idx == 0" class="d-flex align-center justify-space-between">
+            <div v-if="idx == 0" class="d-flex align-start justify-space-between">
               <span class="d-flex align-center">
                 <div class="d-flex flex-column">
                   <span v-if="item.name">
@@ -103,19 +137,20 @@
                 </div>
               </span>
               <span v-if="item.name">
-                <v-btn text color="green" x-small>+ connect</v-btn>
+                <v-btn text color="green" x-small @click="$emit('connect', item)">+ connect</v-btn>
               </span>
             </div>
           </td>
           <td class="box pa-4">
             <div v-if="connectedFarm.instanceName" class="d-flex align-center justify-space-between">
               <span class="d-flex align-center">
-                <span v-if="connectedFarm.owner" class="mdi mdi-crown pr-1"></span>
                 <span>{{ connectedFarm.instanceName }}</span>
               </span>
               <span class="d-flex" style="flex-wrap: nowrap">
-                <v-btn text color="blue" x-small>access</v-btn>
-                <v-btn text color="red" x-small>remove</v-btn>
+                <v-btn text color="blue" disabled x-small>access</v-btn>
+                <v-btn @click="$emit('disconnect', item.user, connectedFarm.instanceName)" text color="red" x-small>
+                  remove</v-btn
+                >
               </span>
             </div>
             <div v-else>no farmos connected</div>
@@ -148,9 +183,9 @@
             </div>
           </td>
         </tr>
-        <tr v-if="item.connectedFarms.length == 0">
+        <tr v-if="item.connectedFarms.filter((f) => !f.skip).length == 0">
           <td class="box pa-4">
-            <div class="d-flex align-center justify-space-between">
+            <div class="d-flex align-start justify-space-between">
               <span class="d-flex align-center">
                 <div class="d-flex flex-column">
                   <span v-if="item.name">
@@ -162,7 +197,7 @@
                 </div>
               </span>
               <span v-if="item.name">
-                <v-btn text color="green" x-small>+ connect</v-btn>
+                <v-btn text color="green" x-small @click="$emit('connect', item)">+ connect</v-btn>
               </span>
             </div>
           </td>
@@ -183,12 +218,26 @@ export default {
       type: Object,
       required: true,
     },
+    superAdmin: {
+      type: Boolean,
+      required: true,
+    },
+    plans: {
+      type: Array,
+      required: true,
+    },
   },
-  emits: ['addGrpCoffeeShop', 'allowSbGrpsJoinCoffeeShop', 'allowSbGrpsAdminsCreateFarmOSFarmsInSS'],
+  emits: [
+    'addGrpCoffeeShop',
+    'plansChanged',
+    'allowSbGrpsJoinCoffeeShop',
+    'allowSbGrpsAdminsCreateFarmOSFarmsInSS',
+    'connect',
+    'seatsChanged',
+  ],
   setup(props) {
     // part Search input field
     const arrHeaderSearch = ref(['', '', '']);
-
     let headers = computed(() => {
       return [
         {
@@ -272,6 +321,11 @@ export default {
       developMbships.value[index].value = !developMbships.value[index].value;
     }
 
+    const selectedPlans = ref(props.groupInfos.planIds);
+
+    const seats = ref(props.groupInfos.seats.max);
+
+    const upgradeDialog = ref(false);
     return {
       arrHeaderSearch,
       headers,
@@ -282,6 +336,9 @@ export default {
       filterMbShips,
       developMbships,
       toggleDevelopMbships,
+      selectedPlans,
+      seats,
+      upgradeDialog,
     };
   },
 };
