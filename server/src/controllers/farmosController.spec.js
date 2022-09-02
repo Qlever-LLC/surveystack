@@ -16,7 +16,6 @@ import {
 import { createGroup, createReq, createRes, createUser } from '../testUtils';
 import {
   mapFarmOSInstanceToUser,
-  mapFarmOSInstanceToGroupAdmin,
   setPlanForGroup,
   getGroupInformation,
   createFarmosGroupSettings,
@@ -97,7 +96,7 @@ describe('farmos-controller', () => {
 
     await mapFarmOSInstanceToUser(user1.user._id, 'user-farm.farmos.dev', true);
 
-    await mapFarmOSInstanceToGroupAdmin(admin1.user._id, group._id, 'user-farm.farmos.dev');
+    await mapFarmOSInstanceToUser(admin1.user._id, 'user-farm.farmos.dev', false);
     await mapFarmOSInstanceToUser(admin1.user._id, 'admin-farm.farmos.dev', true);
 
     const userRes = mockRes(user1.user._id);

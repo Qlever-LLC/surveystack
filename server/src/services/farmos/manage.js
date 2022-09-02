@@ -285,53 +285,12 @@ export const mapFarmOSInstanceToUser = async (userId, instanceName, owner) => {
 };
 
 /**
- * The admin receives access to the farmos instance
- */
-export const mapFarmOSInstanceToGroupAdmin = async (adminUserId, groupId, instanceName) => {
-  const _id = new ObjectId();
-  await db.collection('farmos-instances').insertOne({
-    _id,
-    userId: asMongoId(adminUserId),
-    instanceName,
-    owner: false,
-    groupId: asMongoId(groupId),
-  });
-
-  return {
-    _id,
-    userId: adminUserId,
-    instanceName,
-    owner: false,
-    groupId,
-  };
-};
-
-/**
  * FarmOS instance takes a seat in the groups roster
  */
 export const unmapFarmOSInstance = async (id) => {
   await db.collection('farmos-instances').deleteOne({
     _id: ObjectId(id),
   });
-};
-
-/**
- * A farmos instance is added to the group's plan
- */
-export const mapFarmOSInstanceToGroup = async (groupId, instanceName) => {
-  const _id = new ObjectId();
-
-  await db.collection('farmos-group-mapping').insertOne({
-    _id,
-    groupId: asMongoId(groupId),
-    instanceName,
-  });
-
-  return {
-    _id,
-    groupId,
-    instanceName,
-  };
 };
 
 /**
@@ -344,7 +303,7 @@ export const createFarmOSInstanceForUserAndGroup = async (
   instanceName,
   userIsOwner
 ) => {
-  await mapFarmOSInstanceToGroup(groupId, instanceName);
+  await addFarmToSurveystackGroup(instanceName, groupId);
   return await mapFarmOSInstanceToUser(userId, instanceName, userIsOwner);
 };
 
@@ -358,35 +317,6 @@ export const listFarmOSInstancesForUser = async (userId) => {
     .find({ userId: asMongoId(userId) })
     .toArray();
   return usersInstances;
-};
-
-/**
- * a list of farmos instances a group and its subgroups are currently managing
- */
-export const listFarmOSInstancesForGroupAdmin = async (userId, groupId) => {
-  const adminOfGroups = (
-    await db
-      .collection('memberships')
-      .find({
-        user: userId,
-        role: 'admin',
-      })
-      .toArray()
-  ).map((a) => new ObjectId(a.group));
-
-  const adminInstances = await db
-    .collection('farmos-group-mapping')
-    .find({
-      groupId: {
-        $in: adminOfGroups,
-      },
-    })
-    .toArray();
-
-  return uniqBy([...adminInstances], (item) => item.instanceName).map((item) => ({
-    instanceName: item.instanceName,
-    owner: item.owner === true,
-  }));
 };
 
 export const listFarmOSInstancesForGroup = async (groupId) => {
@@ -413,7 +343,7 @@ export const getSuperAllFarmosMappings = async () => {
   };
 };
 
-export const addFarmToSurveystackGroup = async (instanceName, groupId, planName) => {
+export const addFarmToSurveystackGroup = async (instanceName, groupId) => {
   const res = await db
     .collection('farmos-group-mapping')
     .find({
@@ -439,8 +369,9 @@ export const addFarmToSurveystackGroup = async (instanceName, groupId, planName)
     _id,
     instanceName,
     groupId: asMongoId(groupId),
-    planName,
   });
+
+  return { _id };
 };
 
 export const removeFarmFromSurveystackGroup = async (instanceName, groupId) => {
