@@ -18,8 +18,8 @@
         <div class="half px-1">
           <v-btn :disabled="!enableSubmit" @click="$emit('submit')" depressed large color="primary" class="full">
             Submit
-            <span v-if="$store.getters['draft/submission'].meta.submitAsUserId"
-              >as {{ $store.getters['draft/submission'].meta.submitAsUserId }} <br
+            <span v-if="$store.getters['draft/submission'].meta.submitAsUser"
+              >as {{ $store.getters['draft/submission'].meta.submitAsUser.name }} <br
             /></span>
           </v-btn>
         </div>

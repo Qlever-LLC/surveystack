@@ -94,7 +94,9 @@ export default {
     },
     startDraftAs(survey, selectedMember) {
       this.showSelectMember = false;
-      this.$store.dispatch('submissions/startDraft', { survey, submitAsUserId: selectedMember.user._id });
+      if (selectedMember.user) {
+        this.$store.dispatch('submissions/startDraft', { survey, submitAsUser: selectedMember.user });
+      }
     },
     async searchMembers() {
       //TODO load members of MY groups instead of Survey group?

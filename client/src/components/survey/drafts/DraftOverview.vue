@@ -19,8 +19,8 @@
       <v-card-text>
         Submitting to: {{ groupPath || '--' }}
         <br />
-        <span v-if="submission.meta.submitAsUserId" style="color: orange"
-          >As user: {{ submission.meta.submitAsUserId }} <br
+        <span v-if="submission.meta.submitAsUser"
+          >As user: {{ submission.meta.submitAsUser.name }} ({{ submission.meta.submitAsUser.email }})<br
         /></span>
         Created: {{ created }}
         <br />

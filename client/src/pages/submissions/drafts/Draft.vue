@@ -139,6 +139,9 @@ export default {
       this.submitting = true;
       this.submission.meta.status = this.addReadyToSubmit(this.submission.meta.status || []);
 
+      // clear submitAsUser as this transient local information
+      delete this.submission.meta.submitAsUser;
+
       let message;
       try {
         await uploadFileResources(this.$store, this.survey, payload, true);
@@ -204,8 +207,8 @@ export default {
       this.hasError = true;
     }
 
-    if (this.submission.meta.submitAsUserId) {
-      api.setHeader('x-delegate-to', this.submission.meta.submitAsUserId);
+    if (this.submission.meta.submitAsUser) {
+      api.setHeader('x-delegate-to', this.submission.meta.submitAsUser._id);
     }
 
     this.loading = false;
@@ -216,7 +219,7 @@ export default {
       return;
     }
 
-    if (this.submission.meta.submitAsUserId) {
+    if (this.submission.meta.submitAsUser) {
       api.removeHeader('x-delegate-to');
     }
     next(true);

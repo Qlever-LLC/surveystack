@@ -8,11 +8,10 @@
           <v-list-item
             v-for="searchResult in filteredSearchResults"
             :key="searchResult._id"
+            :disabled="searchResult.meta.status === 'pending'"
             @click="
-              () => {
-                $emit('selected', searchResult);
-                dialog = false;
-              }
+              $emit('selected', searchResult);
+              dialog = false;
             "
           >
             <v-list-item-content v-if="searchResult.meta && searchResult.meta.status === 'pending'">
