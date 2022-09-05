@@ -98,8 +98,3 @@ export default {
   },
 };
 </script>
-<!--style scoped lang="scss">
-::v-deep .v-dialog {
-  max-height: 50%;
-}
-</style-->
