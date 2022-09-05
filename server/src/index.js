@@ -95,7 +95,6 @@ app.use(async (req, res, next) => {
   }
 
   //read out an optional userid to delegate the request to
-
   let delegateToUserId = req.headers['x-delegate-to'];
   if (isAuthenticated && delegateToUserId) {
     delegateToUserId = new ObjectId(delegateToUserId);
