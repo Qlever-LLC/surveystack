@@ -78,7 +78,8 @@ export const activateMembershipByAdmin = async (options) => {
     origin,
     email: userObject.email,
     expiresAfterDays: 7,
-    landingPath: `/g/${group.slug}/`,
+    // make sure the path is separated by single '/'s
+    landingPath: `/g/${group.path.split('/').filter(Boolean).join('/')}/`,
   });
   const magicLinkProfile = await createMagicLink({
     origin,
