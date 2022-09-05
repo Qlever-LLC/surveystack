@@ -37,7 +37,8 @@ import {
   checkFeatureToggledOn,
 } from '../handlers/assertions';
 
-import { catchErrors, handleDelegates } from '../handlers/errorHandlers';
+import { catchErrors } from '../handlers/errorHandlers';
+import { handleDelegates } from '../handlers/headerHandlers';
 
 const router = Router();
 
