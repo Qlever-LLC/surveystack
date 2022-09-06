@@ -41,11 +41,9 @@ const init = async () => {
   };
 };
 
-process.env = {
-  FARMOS_CALLBACK_KEY: 'x',
-  FARMOS_AGGREGATOR_URL: 'x',
-  FARMOS_AGGREGATOR_APIKEY: 'x',
-};
+process.env.FARMOS_CALLBACK_KEY = 'x';
+process.env.FARMOS_AGGREGATOR_URL = 'x';
+process.env.FARMOS_AGGREGATOR_APIKEY = 'x';
 
 function mockRes(userId) {
   return {
@@ -231,12 +229,10 @@ describe('farmos-controller', () => {
   it('test-farmos-check-url', async () => {
     mockAxios.post.mockImplementation(() => Promise.resolve({ status: 200 }));
 
-    process.env = {
-      FARMOS_CALLBACK_KEY: 'x',
-      FARMOS_AGGREGATOR_URL: 'x',
-      FARMOS_AGGREGATOR_APIKEY: 'x',
-      FARMOS_CREATE_KEY: 'x',
-    };
+    process.env.FARMOS_CALLBACK_KEY = 'x';
+    process.env.FARMOS_AGGREGATOR_URL = 'x';
+    process.env.FARMOS_AGGREGATOR_APIKEY = 'x';
+    process.env.FARMOS_CREATE_KEY = 'x';
 
     const send = jest.fn();
 
@@ -266,12 +262,10 @@ describe('farmos-controller', () => {
   });
 
   it('create-farmos-instance', async () => {
-    process.env = {
-      FARMOS_CALLBACK_KEY: 'x',
-      FARMOS_AGGREGATOR_URL: 'x',
-      FARMOS_AGGREGATOR_APIKEY: 'x',
-      FARMOS_CREATE_KEY: 'x',
-    };
+    process.env.FARMOS_CALLBACK_KEY = 'x';
+    process.env.FARMOS_AGGREGATOR_URL = 'x';
+    process.env.FARMOS_AGGREGATOR_APIKEY = 'x';
+    process.env.FARMOS_CREATE_KEY = 'x';
 
     const { group, admin1, user1 } = await init();
 

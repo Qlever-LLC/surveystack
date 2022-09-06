@@ -147,6 +147,7 @@ export const createRes = async ({ user = null } = {}) => ({
   send: jest.fn(),
   json: jest.fn(),
   redirect: jest.fn(),
+  cookie: jest.fn(),
   status: jest.fn().mockReturnThis(),
   set: jest.fn(),
   locals: {
@@ -157,4 +158,5 @@ export const createRes = async ({ user = null } = {}) => ({
       roles: user ? await getRoles(user._id) : [],
     },
   },
+  _headers: {},
 });

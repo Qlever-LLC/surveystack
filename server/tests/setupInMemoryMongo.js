@@ -1,5 +1,5 @@
 const { MongoMemoryServer } = require('mongodb-memory-server');
-const { connectDatabase, getDb } = require('../src/db');
+const { connectDatabase, getDb, disconnect } = require('../src/db');
 
 let mongod;
 
@@ -17,9 +17,13 @@ beforeAll(async () => {
 afterEach(async () => {
   // clean up the DB after each test
   await getDb().dropDatabase();
+  // recreate indices
+  process.env.DATABASE_URL = mongod.getUri();
+  await connectDatabase();
 });
 
 // eslint-disable-next-line no-undef
 afterAll(async () => {
+  await disconnect();
   await mongod.stop();
 });

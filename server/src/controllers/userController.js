@@ -7,7 +7,8 @@ import boom from '@hapi/boom';
 
 import { db } from '../db';
 import { createCookieOptions } from '../constants';
-import _ from 'lodash';
+import _, { isEmpty, isString } from 'lodash';
+import IsEmail from 'isemail';
 
 const col = 'users';
 
@@ -87,18 +88,26 @@ const createUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const { _id: id, password } = req.body;
+  const { _id: id, password, name, email } = req.body;
 
-  const updatedUser = {
-    email: req.body.email,
-    name: req.body.name,
-  };
+  const updatedUser = {};
+
+  if (isString(name) && !isEmpty(name)) {
+    updatedUser.name = name;
+  }
+
+  if (isString(email) && !isEmpty(email)) {
+    if (!IsEmail.validate(email)) {
+      throw boom.badRequest('Invalid email address');
+    }
+    updatedUser.email = email;
+  }
 
   if (!res.locals.auth.isSuperAdmin && res.locals.auth.user._id != id) {
     throw boom.unauthorized(`Not allowed to put user: ${id}`);
   }
 
-  if (password !== '') {
+  if (isString(password) && !isEmpty(password)) {
     updatedUser.password = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS));
 
     // create a new user token when password changes
@@ -126,7 +135,7 @@ const updateUser = async (req, res) => {
     return res.send(updated);
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ message: 'Ouch :/' });
+    return res.status(500).send({ message: 'Failed to update user.' });
   }
 };
 

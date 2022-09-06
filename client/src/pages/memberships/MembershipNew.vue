@@ -13,6 +13,7 @@
           outlined
           :rules="emailRules"
           validate-on-blur
+          hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work."
         />
 
         <v-text-field
@@ -26,7 +27,7 @@
           </template>
         </v-text-field>
 
-        <v-radio-group v-model="sendEmail" name="sendEmail">
+        <v-radio-group v-model="sendEmail" name="sendEmail" :disabled="invitationMethod === INVITATION_METHODS.ADD">
           <v-radio label="Send an invitation email" value="SEND_NOW">
             <template v-slot:label>
               <div>
