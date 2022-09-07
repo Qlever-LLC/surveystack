@@ -26,33 +26,39 @@
     </div>
 
     <div class="pt-8 pb-4 d-flex justify-center start-button-container">
-      <div class="text-center">
-        <v-btn
+      <div>
+        <btn-dropdown
+          :disabled="!isAllowedToSubmit"
           x-large
+          top
+          left
           color="primary"
           @click="startDraft(entity._id)"
-          :disabled="!isAllowedToSubmit"
-          class="start-button"
+          :show-drop-down="isAdminOfSurveyGroup && isAllowedToSubmit"
         >
-          <v-icon>mdi-file-document-box-plus-outline</v-icon>
-          <span class="ml-2">Start Survey</span>
-        </v-btn>
+          <v-list class="ma-0 pa-0">
+            <div>
+              <v-btn block x-large color="" @click="startDraft(entity._id)" style="border-radius: 0">
+                Start survey
+              </v-btn>
+            </div>
+            <div v-if="isAdminOfSurveyGroup && isAllowedToSubmit">
+              <v-btn block x-large elevation="0" color="" @click="showSelectMember = true" style="border-radius: 0">
+                Start survey as a member
+              </v-btn>
+            </div>
+          </v-list>
+        </btn-dropdown>
         <div class="mt-2 text--secondary text-center submission-rights-hint" v-if="!isAllowedToSubmit">
           {{ submissionRightsHint }}
         </div>
-      </div>
-      <div v-if="isAdminOfSurveyGroup && isAllowedToSubmit" class="text-center ml-3">
-        <v-btn x-large color="" @click="showSelectMember = true" class="start-button">
-          <v-icon>mdi-file-document-box-plus-outline</v-icon>
-          <span class="ml-2">Start Survey As a Member</span>
-          <app-member-selector
-            :show="showSelectMember"
-            :searchResults="searchResults"
-            @hide="showSelectMember = false"
-            @search="searchMembers"
-            @selected="startDraftAs(entity._id, $event)"
-          />
-        </v-btn>
+        <app-member-selector
+          :show="showSelectMember"
+          :searchResults="searchResults"
+          @hide="showSelectMember = false"
+          @search="searchMembers"
+          @selected="startDraftAs(entity._id, $event)"
+        />
       </div>
     </div>
   </v-container>
@@ -67,6 +73,7 @@
 import api from '@/services/api.service';
 import appMemberSelector from '@/components/shared/MemberSelector.vue';
 import { autoSelectActiveGroup } from '@/utils/memberships';
+import BtnDropdown from '@/components/ui/BtnDropdown';
 
 export default {
   props: {
@@ -77,6 +84,7 @@ export default {
     },
   },
   components: {
+    BtnDropdown,
     appMemberSelector,
   },
   data() {
@@ -251,7 +259,7 @@ export default {
 }
 
 .start-button-container {
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.85) 50%);
+  background: linear-gradient(to bottom, rgba(80, 44, 155, 0) 0%, rgba(255, 255, 255, 0.85) 50%);
 
   position: fixed;
   bottom: 0;
