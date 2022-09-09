@@ -193,20 +193,6 @@ export default {
     } else {
       this.registrationEnabled = true;
     }
-
-    // DEPRECATED: remove a few weeks after https://gitlab.com/our-sci/software/surveystack/-/merge_requests/67  was deployed
-    //  reason: we use magic links for CFS now
-    const { cfs, email, token, group } = this.$route.query;
-    if (cfs) {
-      await this.$store.dispatch('auth/login', {
-        url: '/auth/login',
-        user: { email: email.replace(/ /g, '+'), token }, // TODO: find a better solution for + signs
-      });
-
-      this.$store.dispatch('surveys/fetchPinned');
-      await autoSelectActiveGroup(this.$store, group);
-      this.$router.replace({ name: 'surveys-detail', params: { id: cfs } });
-    }
   },
   methods: {
     async handleSubmitClick() {
