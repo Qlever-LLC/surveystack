@@ -134,7 +134,9 @@ export default {
           const membership = { user: newUser._id, group, role };
           await api.post('/memberships', membership);
         }
-        if (this.editMode) {
+        
+        // update the token when we're logged in with the updated user (not superadmin editing a user)
+        if (this.editMode && this.user._id.toString() === newUser.value._id.toString()) {
           this.$store.dispatch('auth/updateToken', newUser.value);
         }
         this.status = {
@@ -171,6 +173,9 @@ export default {
     hasMembership() {
       const { group, role, email } = this.$route.query;
       return group && role && email;
+    },
+    user() {
+      return this.$store.getters['auth/user'];
     },
   },
   async created() {

@@ -95,31 +95,35 @@
         </v-card-title>
         <v-card-text>
           <a class="body-2" :href="apiDownloadUrl" target="_blank">{{ apiDownloadUrl }}</a>
-
-          <div class="d-flex align-center justify-start mt-4">
-            <v-select
-              label="Format"
-              class="mr-3 custom-select"
-              dense
-              :items="apiDownloadFormats"
-              hide-details
-              v-model="apiDownloadFormat"
-            />
-            <v-select
-              label="Range"
-              class="mr-3 custom-select"
-              dense
-              :items="apiDownloadRanges"
-              hide-details
-              v-model="apiDownloadRange"
-            />
-            <v-btn @click="startDownload" color="primary"> <v-icon left>mdi-download</v-icon>Download </v-btn>
-          </div>
+        </v-card-text>
+        <v-card-text>
+          <v-row>
+            <v-col md="2" sm="6">
+              <v-select
+                label="Format"
+                dense
+                :items="apiDownloadFormats"
+                hide-details
+                v-model="apiDownloadFormat"
+              /> </v-col
+            ><v-col md="2" sm="6">
+              <v-select label="Range" dense :items="apiDownloadRanges" hide-details v-model="apiDownloadRange" /></v-col
+            ><v-col v-if="apiDownloadFormat === 'csv'" md="5" sm="6">
+              <v-select
+                label="Matrix answers"
+                dense
+                :items="apiDownloadExpandAllMatricesOptions"
+                hide-details
+                v-model="apiDownloadExpandAllMatrices"
+              /> </v-col
+            ><v-col md="2" sm="6">
+              <v-btn @click="startDownload" color="primary"> <v-icon left>mdi-download</v-icon>Download </v-btn>
+            </v-col></v-row
+          >
 
           <v-row class="mt-5" v-if="apiDownloadRange === 'page'">
-            <v-col cols="1">
+            <v-col sm="2">
               <v-select
-                class="custom-select"
                 label="Page Size"
                 dense
                 :items="pageSizes"
@@ -245,6 +249,10 @@ const apiDownloadRanges = [
   { text: 'All data', value: 'all' },
   { text: 'Page only', value: 'page' },
 ];
+const apiDownloadExpandAllMatricesOptions = [
+  { text: 'Add a row for each matrix answers', value: true },
+  { text: 'Keep matrix answers in a single cell', value: false },
+];
 
 export default {
   components: {
@@ -262,6 +270,8 @@ export default {
       apiDownloadFormats,
       apiDownloadRanges,
       apiDownloadRange: apiDownloadRanges[0].value,
+      apiDownloadExpandAllMatrices: true,
+      apiDownloadExpandAllMatricesOptions,
       showAdvancedFilters: false,
       tab: null,
       views: [
@@ -428,7 +438,11 @@ export default {
         { key: 'showArchived', value: this.filter.showArchived, include: this.filter.showArchived },
         { key: 'showCsvDataMeta', value: this.filter.showCsvDataMeta, include: this.filter.showCsvDataMeta },
         { key: 'showCsvMeta', value: this.filter.showCsvMeta, include: this.filter.showCsvMeta },
-        { key: 'expandAllMatrices', value: true, include: this.apiDownloadFormat === 'csv' },
+        {
+          key: 'expandAllMatrices',
+          value: this.apiDownloadExpandAllMatrices,
+          include: this.apiDownloadFormat === 'csv',
+        },
         {
           key: 'roles',
           value: this.filter.roles,
@@ -602,9 +616,5 @@ ul {
 
 >>> .v-window {
   overflow: unset;
-}
-.custom-select {
-  max-width: 5rem;
-  display: inline-block;
 }
 </style>

@@ -90,7 +90,7 @@ const sendPasswordResetMail = async (req, res) => {
   // Fail silently when the email is not in the DB
   if (existingUser) {
     const { origin } = req.headers;
-    const landingPath = `/users/${existingUser._id}/edit`;
+    const landingPath = '/auth/profile';
     const magicLink = await createMagicLink({ origin, email, expiresAfterDays: 3, landingPath });
 
     // Legacy PW reset format used by SoilStack
