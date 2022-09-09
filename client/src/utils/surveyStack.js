@@ -31,20 +31,25 @@ export function setNested(obj, path, value) {
   Vue.set(parent, subKey, value);
 }
 
-function walkThroughAllAndReorganized(nodes, children) {
+function walkThroughAllAndReorganized(nodes, children, visitedNodes) {
   for (const child of children) {
-    if (child.children.length > 0) {
-      // group and page can have children
-      walkThroughAllAndReorganized(nodes, child.children);
+    // the root node doesn't have id => he isn't in visitedNodes
+    if (!child.isRoot() && visitedNodes.find((el) => el === child.model.id) === undefined) {
+      visitedNodes.push(child.model.id);
+      if (child.children.length > 0) {
+        // group and page can have children
+        walkThroughAllAndReorganized(nodes, child.children, visitedNodes);
+      }
+      nodes.push(child);
     }
-    nodes.push(child);
   }
   return nodes;
 }
 
 export const getAllNodes = (root) => {
   const nodes = [];
-  return walkThroughAllAndReorganized(nodes, root.children);
+  const visitedNodes = [];
+  return walkThroughAllAndReorganized(nodes, root.children, visitedNodes);
 };
 
 export function getParentPath(path) {
