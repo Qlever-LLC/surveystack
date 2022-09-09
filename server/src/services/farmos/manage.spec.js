@@ -1,9 +1,9 @@
+import mockAxios from 'axios';
 import { createGroup, createReq, createRes, createUser } from '../../testUtils';
 import { getAscendantGroups, getDescendantGroups } from '../roles.service';
 import {
   mapFarmOSInstanceToUser,
   listFarmOSInstancesForUser,
-  mapFarmOSInstanceToGroupAdmin,
   listFarmOSInstancesForGroup,
   createPlan,
   getPlans,
@@ -12,11 +12,16 @@ import {
   setPlanForGroup,
   getGroupInformation,
   createFarmOSInstanceForUserAndGroup,
-  mapFarmOSInstanceToGroup,
   createFarmosGroupSettings,
   getGroupSettings,
   setGroupSettings,
   getTree,
+  addFarmToUser,
+  removeFarmFromUser,
+  addFarmToSurveystackGroup,
+  removeFarmFromSurveystackGroup,
+  getSuperAllFarmosMappings,
+  unmapFarmOSInstance,
 } from './manage';
 
 const init = async () => {
@@ -32,14 +37,66 @@ const init = async () => {
 };
 
 describe('manageFarmOS', () => {
-  it('mapFarmOSInstanceToUser', async () => {
+  it('addFarmToUser && removeFarmFromUser in same group', async () => {
     const { group, admin1, user1 } = await init();
     const farmOSInstanceName = 'test.surveystack.io';
-    await mapFarmOSInstanceToUser(user1.user._id, farmOSInstanceName, true);
+    await addFarmToUser(farmOSInstanceName, user1.user._id, group._id, true);
+    let results = await listFarmOSInstancesForUser(user1.user._id);
+    expect(results[0].instanceName).toBe(farmOSInstanceName);
+    await removeFarmFromUser(farmOSInstanceName, user1.user._id, group._id);
+    results = await listFarmOSInstancesForUser(user1.user._id);
+    expect(results.length).toBe(0);
+
+    const farmOSInstanceNameBis = 'test2.surveystack.io';
+    await addFarmToUser(farmOSInstanceName, user1.user._id, group._id, true);
+    await expect(
+      addFarmToUser(farmOSInstanceName, user1.user._id, group._id, true)
+    ).rejects.toThrow(/mapping already exists/);
+
+    await addFarmToUser(farmOSInstanceNameBis, user1.user._id, group._id, true);
+    results = await listFarmOSInstancesForUser(user1.user._id);
+    expect(results.length).toBe(2);
+    await removeFarmFromUser(farmOSInstanceName, user1.user._id, group._id);
+    results = await listFarmOSInstancesForUser(user1.user._id);
+    expect(results.length).toBe(1);
+    expect(results[0].instanceName).toBe(farmOSInstanceNameBis);
+  });
+  it('addFarmToUser && removeFarmFromUser in differents groups', async () => {
+    const { group, admin1, user1 } = await init();
+    const init2 = await init();
+    const farmOSInstanceName = 'test.surveystack.io';
+    const farmOSInstanceNameBis = 'test2.surveystack.io';
+    await addFarmToUser(farmOSInstanceName, user1.user._id, group._id, true);
+    await expect(
+      addFarmToUser(farmOSInstanceName, user1.user._id, init2.group._id, true)
+    ).rejects.toThrow(/mapping already exists/);
+
+    await addFarmToUser(farmOSInstanceNameBis, user1.user._id, init2.group._id, true);
+    let results = await listFarmOSInstancesForUser(user1.user._id);
+    expect(results.length).toBe(2);
+    await removeFarmFromUser(farmOSInstanceName, user1.user._id, group._id);
+    results = await listFarmOSInstancesForUser(user1.user._id);
+    expect(results.length).toBe(1);
+    expect(results[0].instanceName).toBe(farmOSInstanceNameBis);
+  });
+  it('mapFarmOSInstanceToUser and unmapFarmOSInstance', async () => {
+    const { group, admin1, user1 } = await init();
+    const farmOSInstanceName = 'test.surveystack.io';
+    const farmOSInstanceName2 = 'test2.surveystack.io';
+    const res = await mapFarmOSInstanceToUser(user1.user._id, farmOSInstanceName, true);
+    const idFirstMap = res._id;
     const results = await listFarmOSInstancesForUser(user1.user._id);
 
     expect(results[0].instanceName).toBe(farmOSInstanceName);
     expect(results[0].owner).toBe(true);
+
+    await mapFarmOSInstanceToUser(user1.user._id, farmOSInstanceName2, true);
+    const res1 = await listFarmOSInstancesForUser(user1.user._id);
+    expect(res1.length).toBe(2);
+
+    await unmapFarmOSInstance(idFirstMap);
+    const res2 = await listFarmOSInstancesForUser(user1.user._id);
+    expect(res2.length).toBe(1);
   });
 
   it('create instance admin access', async () => {
@@ -48,7 +105,7 @@ describe('manageFarmOS', () => {
     const someAdminFarmOSInstanceName = 'admin.surveystack.io';
     await mapFarmOSInstanceToUser(user1.user._id, farmOSInstanceName, true);
     await mapFarmOSInstanceToUser(admin1.user._id, someAdminFarmOSInstanceName, true);
-    await mapFarmOSInstanceToGroupAdmin(admin1.user._id, group._id, farmOSInstanceName);
+    await mapFarmOSInstanceToUser(admin1.user._id, farmOSInstanceName, false);
 
     const farms = await listFarmOSInstancesForUser(admin1.user._id);
 
@@ -65,29 +122,67 @@ describe('manageFarmOS', () => {
     expect(results[0].instanceName).toBe(farmOSInstanceName);
     expect(results[0].owner).toBe(true);
   });
-  it('map-and-unmap-instance-to-group', async () => {
+  it('addFarmToSurveystackGroup && removeFarmFromSurveystackGroup', async () => {
     const { group, admin1, user1 } = await init();
     const farmOSInstanceName = 'test.surveystack.io';
 
-    let list = await listFarmOSInstancesForGroup(group._id);
-
-    expect(list.length).toBe(0);
-
-    /*
     await addFarmToSurveystackGroup(farmOSInstanceName, group._id);
+    let results = await listFarmOSInstancesForGroup(group._id);
+    expect(results[0].instanceName).toBe(farmOSInstanceName);
 
     await expect(addFarmToSurveystackGroup(farmOSInstanceName, group._id)).rejects.toThrow(
       /mapping already exists/
     );
 
-    list = await listFarmOSInstancesForGroup(group._id);
-    expect(list[0].instanceName).toBe('test.surveystack.io');
-
     await removeFarmFromSurveystackGroup(farmOSInstanceName, group._id);
+    results = await listFarmOSInstancesForGroup(group._id);
+    expect(results.length).toBe(0);
+  });
+  it('getSuperAllFarmosMappings', async () => {
+    //aggregatorFarms part
+    const farmosAggregatorResponse = [
+      {
+        url: 'test1.farmos.net',
+        tags: `/test-group/`,
+      },
+      {
+        url: 'test2.farmos.net',
+        tags: `/test-group/child`,
+      },
+    ];
 
-    list = await listFarmOSInstancesForGroup(group._id);
-    expect(list.length).toBe(0);
-    */
+    let res = { data: farmosAggregatorResponse };
+    mockAxios.get.mockImplementation(() => Promise.resolve(res));
+
+    process.env = {
+      FARMOS_AGGREGATOR_URL: 'x',
+      FARMOS_AGGREGATOR_APIKEY: 'x',
+    };
+
+    const init1 = await init();
+    const init2 = await init();
+    //surveystackFarms part
+    await addFarmToSurveystackGroup('farmOSInstanceNameA', init1.group._id);
+    await addFarmToSurveystackGroup('farmOSInstanceNameA', init2.group._id);
+    await expect(addFarmToSurveystackGroup('farmOSInstanceNameA', init1.group._id)).rejects.toThrow(
+      /mapping already exists/
+    );
+
+    //surveystackUserFarms part
+    await addFarmToUser('farmOSInstanceNameB', init1.user1.user._id, init1.group._id, true);
+    await expect(
+      addFarmToUser('farmOSInstanceNameB', init1.user1.user._id, init2.group._id, true)
+    ).rejects.toThrow(/mapping already exists/);
+
+    await addFarmToUser('farmOSInstanceNameB', init2.user1.user._id, init1.group._id, true);
+    await expect(
+      addFarmToUser('farmOSInstanceNameB', init2.user1.user._id, init2.group._id, true)
+    ).rejects.toThrow(/mapping already exists/);
+
+    const r = await getSuperAllFarmosMappings();
+    expect(r.aggregatorFarms.length).toBe(2);
+    expect(r.surveystackFarms.length).toBe(2);
+    expect(r.surveystackUserFarms.length).toBe(2);
   });
 
   it('test-plans', async () => {
@@ -97,14 +192,14 @@ describe('manageFarmOS', () => {
 
     await createFarmosGroupSettings(group._id);
 
-    await setPlanForGroup(group._id, 'test-plan');
-    const res = await getPlanForGroup(group._id);
-    expect(res).toBe('test-plan');
-
     await createPlan('test-plan-all');
     const plans = await getPlans();
     expect(plans.length).toBe(1);
     expect(plans[0].planName).toBe('test-plan-all');
+
+    await setPlanForGroup(group._id, plans.find((it) => it.planName == 'test-plan-all')._id);
+    const res = await getPlanForGroup(group._id);
+    expect(res[0].planName).toBe('test-plan-all');
 
     await deletePlan(plans[0]._id);
     const deleted = await getPlans();
@@ -112,7 +207,7 @@ describe('manageFarmOS', () => {
 
     await setPlanForGroup(group._id, null);
     const nullPlan = await getPlanForGroup(group._id);
-    expect(nullPlan).toBe(null);
+    expect(nullPlan).toStrictEqual([]);
   });
   it('getFarmOSRootGroup', async () => {
     const groupBionutrient = await createGroup({ name: 'Bionutrient' });
@@ -154,6 +249,84 @@ describe('manageFarmOS', () => {
     const canBeRoot4 = bionutrientTree.canBecomeRoot();
     expect(canBeRoot4).toBeFalsy();
   });
+  it('getTree group-descendants-ascendants', async () => {
+    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
+    const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
+
+    let bionutrientTree = await getTree(groupBionutrient);
+    let labsTree = await getTree(groupLabs);
+    let michiganTree = await getTree(groupMichigan);
+
+    expect(bionutrientTree.group).toBe(groupBionutrient);
+    expect(labsTree.group).toBe(groupLabs);
+    expect(michiganTree.group).toBe(groupMichigan);
+
+    //descendants
+    expect(bionutrientTree.descendants[0].name).toBe(groupBionutrient.name);
+    expect(bionutrientTree.descendants[1].name).toBe(groupLabs.name);
+    expect(bionutrientTree.descendants[2].name).toBe(groupMichigan.name);
+
+    expect(labsTree.descendants[0].name).toBe(groupLabs.name);
+    expect(labsTree.descendants[1].name).toBe(groupMichigan.name);
+
+    expect(michiganTree.descendants[0].name).toBe(groupMichigan.name);
+
+    //ascendants
+    expect(bionutrientTree.ascendants[0].name).toBe(groupBionutrient.name);
+
+    expect(labsTree.ascendants[0].name).toBe(groupBionutrient.name);
+    expect(labsTree.ascendants[1].name).toBe(groupLabs.name);
+
+    expect(michiganTree.ascendants[0].name).toBe(groupBionutrient.name);
+    expect(michiganTree.ascendants[1].name).toBe(groupLabs.name);
+    expect(michiganTree.ascendants[2].name).toBe(groupMichigan.name);
+  });
+  it('getTree breadcrumbsByPath', async () => {
+    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
+    const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
+
+    let bionutrientTree = await getTree(groupBionutrient);
+    let labsTree = await getTree(groupLabs);
+    let michiganTree = await getTree(groupMichigan);
+    const expectedResult = {
+      '/bionutrient/': 'Bionutrient',
+      '/bionutrient/labs/': 'Bionutrient > Labs',
+      '/bionutrient/labs/michigan/': 'Bionutrient > Labs > Michigan',
+    };
+
+    expect(bionutrientTree.breadcrumbsByPath).toStrictEqual(expectedResult);
+    expect(labsTree.breadcrumbsByPath).toStrictEqual(expectedResult);
+    expect(michiganTree.breadcrumbsByPath).toStrictEqual(expectedResult);
+  });
+  it('getTree domainInformation', async () => {
+    const groupBionutrient = await createGroup({ name: 'Bionutrient' });
+    const groupLabs2 = await groupBionutrient.createSubGroup({ name: 'Labs2' });
+    const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
+    const groupMichigan = await groupLabs.createSubGroup({ name: 'Michigan' });
+
+    await createFarmosGroupSettings(groupLabs._id);
+
+    let bionutrientTree = await getTree(groupBionutrient);
+    let labs2Tree = await getTree(groupLabs2);
+    let labsTree = await getTree(groupLabs);
+    let michiganTree = await getTree(groupMichigan);
+
+    const bioResult = await bionutrientTree.domainInformation();
+    const labs2Result = await labs2Tree.domainInformation();
+    const labsResult = await labsTree.domainInformation();
+    const michResult = await michiganTree.domainInformation();
+
+    expect(bioResult).toBe(null);
+    expect(labs2Result).toBe(null);
+    expect(labsResult.maxSeats).toBe(20);
+    expect(labsResult.name).toBe('Bionutrient > Labs');
+    expect(labsResult.seats).toBe(0);
+    expect(michResult.maxSeats).toBe(20);
+    expect(michResult.name).toBe('Bionutrient > Labs > Michigan');
+    expect(michResult.seats).toBe(0);
+  });
   it('getGroupInformation', async () => {
     const groupBionutrient = await createGroup({ name: 'Bionutrient' });
     const groupLabs = await groupBionutrient.createSubGroup({ name: 'Labs' });
@@ -185,7 +358,7 @@ describe('manageFarmOS', () => {
       admin1_farmOSInstance2,
       true
     );
-    await mapFarmOSInstanceToGroup(groupMichigan._id, admin1_farmOSInstance2);
+    await addFarmToSurveystackGroup(admin1_farmOSInstance2, groupMichigan._id);
     const admin1_farmOSInstance3 = 'ourscinet.farmos.net';
     await createFarmOSInstanceForUserAndGroup(
       admin1.user._id,
@@ -193,10 +366,10 @@ describe('manageFarmOS', () => {
       admin1_farmOSInstance3,
       false
     );
-    await mapFarmOSInstanceToGroup(groupMichigan._id, admin1_farmOSInstance3);
-    await mapFarmOSInstanceToGroup(groupEurope._id, admin1_farmOSInstance3);
-    await mapFarmOSInstanceToGroup(groupCommunity._id, admin1_farmOSInstance3);
-    await mapFarmOSInstanceToGroup(groupCommunityLab._id, admin1_farmOSInstance3);
+    await addFarmToSurveystackGroup(admin1_farmOSInstance3, groupMichigan._id);
+    await addFarmToSurveystackGroup(admin1_farmOSInstance3, groupEurope._id);
+    await addFarmToSurveystackGroup(admin1_farmOSInstance3, groupCommunity._id);
+    await addFarmToSurveystackGroup(admin1_farmOSInstance3, groupCommunityLab._id);
     const admin1_farmOSInstance4 = 'coffeeshop.farmos.net';
     await createFarmOSInstanceForUserAndGroup(
       admin1.user._id,
@@ -232,9 +405,9 @@ describe('manageFarmOS', () => {
       userext_farmOSInstance1,
       true
     );
-    const { _id: idExternal1 } = await mapFarmOSInstanceToGroup(
-      groupMichigan._id,
-      userext_farmOSInstance1
+    const { _id: idExternal1 } = await addFarmToSurveystackGroup(
+      userext_farmOSInstance1,
+      groupMichigan._id
     );
     const userext_data2 = { userOverrides: { name: 'Ext ernal2', email: 'external2@bj.net' } };
     const userext2 = await groupExt.createUserMember(userext_data2);
@@ -245,9 +418,9 @@ describe('manageFarmOS', () => {
       userext_farmOSInstance2,
       true
     );
-    const { _id: idExternal2 } = await mapFarmOSInstanceToGroup(
-      groupMichigan._id,
-      userext_farmOSInstance2
+    const { _id: idExternal2 } = await addFarmToSurveystackGroup(
+      userext_farmOSInstance2,
+      groupMichigan._id
     );
 
     //FederalMills
@@ -405,7 +578,7 @@ describe('manageFarmOS', () => {
 
     expect(await treeBionutrient.hasCoffeeShopAccess()).toBeFalsy();
     expect(await treeLabs.hasCoffeeShopAccess()).toBeTruthy();
-    expect(await treeMichigan.hasCoffeeShopAccess()).toBeTruthy();
+    expect(await treeMichigan.hasCoffeeShopAccess()).toBeFalsy();
 
     await treeLabs.disableCoffeeShop();
     treeMichigan = await getTree(groupMichigan);
@@ -451,7 +624,7 @@ describe('manageFarmOS', () => {
 
     expect(await treeBionutrient.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
     expect(await treeLabs.hasAllowSubgroupsToJoinCoffeeShop()).toBeTruthy();
-    expect(await treeMichigan.hasAllowSubgroupsToJoinCoffeeShop()).toBeTruthy();
+    expect(await treeMichigan.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
 
     await treeLabs.disableAllowSubgroupsToJoinCoffeeShop();
 

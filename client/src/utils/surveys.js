@@ -507,6 +507,21 @@ export const uuid = () => {
   return `${u}.${new Date().getTime().toString(16)}`;
 };
 
+export const uuidv4 = () => {
+  const rnd = new Uint8Array(32);
+  crypto.getRandomValues(rnd);
+  let count = 0;
+  const u = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = rnd[count++] % 16;
+
+    if (c === 'x') {
+      return r.toString(16);
+    }
+    return ((r & 0x3) | 0x8).toString(16);
+  });
+  return u;
+};
+
 // eslint-disable-next-line no-unused-vars
 function _has(target, key) {
   return true;

@@ -65,7 +65,7 @@ describe('membership.service', () => {
         origin,
         email: pendingUser.email,
         expiresAfterDays: 7,
-        landingPath: `/g/${group.slug}/`,
+        landingPath: `/g${group.path}`,
       });
       expect(createMagicLink).toHaveBeenCalledWith({
         origin,
@@ -73,11 +73,24 @@ describe('membership.service', () => {
         expiresAfterDays: 7,
         landingPath: `/auth/profile`,
       });
+    });
+
+    it('calls createMagicLink with nested group', async () => {
+      const path = '/group/subgroup/';
+      await db.collection('groups').updateOne({ _id: group._id }, { $set: { path } });
+      await activateMembershipByAdmin(args);
+
       expect(createMagicLink).toHaveBeenCalledWith({
         origin,
         email: pendingUser.email,
         expiresAfterDays: 7,
-        landingPath: `/users/${pendingUser._id}/edit`,
+        landingPath: `/g${path}`,
+      });
+      expect(createMagicLink).toHaveBeenCalledWith({
+        origin,
+        email: pendingUser.email,
+        expiresAfterDays: 7,
+        landingPath: `/auth/profile`,
       });
     });
 

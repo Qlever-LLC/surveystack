@@ -27,7 +27,7 @@
           </template>
         </v-text-field>
 
-        <v-radio-group v-model="sendEmail" name="sendEmail">
+        <v-radio-group v-model="sendEmail" name="sendEmail" :disabled="invitationMethod === INVITATION_METHODS.ADD">
           <v-radio label="Send an invitation email" value="SEND_NOW">
             <template v-slot:label>
               <div>

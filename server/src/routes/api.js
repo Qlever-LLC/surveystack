@@ -289,6 +289,18 @@ router.post(
   catchErrors(farmosController.superAdminUpdateFarmOSAccess)
 );
 
+router.post(
+  '/farmos/group-manage/:groupId/updatePlans',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.updatePlansForGroup)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/seats',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.updateSeats)
+);
+
 router.get(
   '/farmos/group-manage/:groupId/domain',
   [assertHasGroupAdminAccess],
@@ -301,22 +313,52 @@ router.get(
   catchErrors(farmosController.groupAdminMinimumGetGroupInformation)
 );
 
-router.post(
-  '/farmos/coffee-shop-access',
+router.get(
+  '/farmos/group-manage/:groupId/plans',
   [assertHasGroupAdminAccess],
-  catchErrors(farmosController.groupAdminMinimumUpdateCoffeeShopAccess)
+  catchErrors(farmosController.getPlanForGroup)
 );
 
 router.post(
-  '/farmos/subgrp-join-coffee-shop',
+  '/farmos/group-manage/:groupId/mapUser',
   [assertHasGroupAdminAccess],
-  catchErrors(farmosController.groupAdminMinimumUpdateJoinCoffeeShop)
+  catchErrors(farmosController.mapUser)
 );
 
 router.post(
-  '/farmos/subgrp-admins-create-farmos-instances',
+  '/farmos/group-manage/:groupId/unmapUser',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.unmapUser)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/check-url',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupManageCheckUrl)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/create-instance',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupManageCreateFarmOsInstance)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/subgroup-join-coffee-shop',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupAdminAllowGroupsToJoinCoffeeshop)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/subgroup-create-farmos-instances',
   [assertHasGroupAdminAccess],
   catchErrors(farmosController.groupAdminMinimumUpdateCreateFarmOSInstances)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/enable-coffeeshop',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupAdminJoinCoffeeShop)
 );
 
 /** Hylo */
