@@ -13,12 +13,6 @@
           </v-list-item-icon>
           <v-list-item-title> Profile </v-list-item-title>
         </v-list-item>
-        <v-list-item link :to="{ name: 'users-edit', params: { id: this.$store.state.auth.user._id } }">
-          <v-list-item-icon>
-            <v-icon>mdi-account-edit</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title> Edit Account </v-list-item-title>
-        </v-list-item>
         <v-divider />
         <v-subheader>Active Group</v-subheader>
         <active-group-selector-list v-model="activeGroup" />
