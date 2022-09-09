@@ -54,12 +54,6 @@ import * as db from '@/store/db';
 
 */
 
-Object.defineProperty(global.self, 'crypto', {
-  value: {
-    getRandomValues: (arr) => {},
-  },
-});
-
 const createInitialState = () => ({
   survey: null, // current survey
   submission: null, // current submission
