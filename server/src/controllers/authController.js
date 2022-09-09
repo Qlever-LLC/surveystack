@@ -163,6 +163,7 @@ const requestMagicLink = async (req, res) => {
     throw boom.badRequest(`Invalid email address: "${email}"`);
   }
 
+  // Get the origin of this server
   const origin = req.protocol + '://' + req.get('host');
   const magicLink = await createMagicLink({
     origin,
@@ -187,6 +188,7 @@ const requestMagicLink = async (req, res) => {
 const enterWithMagicLink = async (req, res) => {
   const { code, landingPath, callbackUrl } = req.query;
   const accessCode = await db.collection(COLL_ACCESS_CODES).findOne({ code });
+  // Get the origin of this server
   const origin = req.protocol + '://' + req.get('host');
 
   // Redirect user to the "link expired" page if the magiclink is invalid
