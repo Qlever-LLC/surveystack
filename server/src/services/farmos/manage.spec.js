@@ -612,8 +612,8 @@ describe('manageFarmOS', () => {
     treeBionutrient = await getTree(groupBionutrient);
 
     expect(await treeBionutrient.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
-    expect(await treeLabs.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
-    expect(await treeMichigan.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
+    expect(await treeLabs.hasAllowSubgroupsToJoinCoffeeShop()).toBeTruthy();
+    expect(await treeMichigan.hasAllowSubgroupsToJoinCoffeeShop()).toBeTruthy();
 
     await treeLabs.enableCoffeeShop();
     await treeLabs.enableAllowSubgroupsToJoinCoffeeShop();
@@ -624,7 +624,7 @@ describe('manageFarmOS', () => {
 
     expect(await treeBionutrient.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
     expect(await treeLabs.hasAllowSubgroupsToJoinCoffeeShop()).toBeTruthy();
-    expect(await treeMichigan.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
+    expect(await treeMichigan.hasAllowSubgroupsToJoinCoffeeShop()).toBeTruthy();
 
     await treeLabs.disableAllowSubgroupsToJoinCoffeeShop();
 
@@ -644,8 +644,8 @@ describe('manageFarmOS', () => {
     treeBionutrient = await getTree(groupBionutrient);
 
     expect(await treeBionutrient.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
-    expect(await treeLabs.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
-    expect(await treeMichigan.hasAllowSubgroupsToJoinCoffeeShop()).toBeFalsy();
+    expect(await treeLabs.hasAllowSubgroupsToJoinCoffeeShop()).toBeTruthy();
+    expect(await treeMichigan.hasAllowSubgroupsToJoinCoffeeShop()).toBeTruthy();
   });
   it('allowSubgroupAdminsToCreateFarmOSInstances', async () => {
     const groupBionutrient = await createGroup({ name: 'Bionutrient' });
