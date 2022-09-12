@@ -49,6 +49,16 @@ describe('createUserIfNotExist', () => {
 });
 
 describe('createMagicLink', () => {
+  const PARAM_VARIATIONS = [
+    ['without params', {}],
+    ['forwards landingPath', { landingPath: '/some/where' }],
+    ['forwards callbackUrl', { callbackUrl: 'https://foo.bar.com/quz' }],
+    [
+      'forwards landingPath + callbackUrl',
+      { landingPath: '/some/where', callbackUrl: 'http://foo.bar.com/quz' },
+    ],
+  ];
+
   const email = 'foo@bar.com';
   const origin = 'http://foo.bar';
   it('throws if origin is not set', async () => {
@@ -98,20 +108,16 @@ describe('createMagicLink', () => {
   });
 
   describe('returns the link in the correct format', () => {
-    it('without landingPath', async () => {
-      const link = new URL(await createMagicLink({ email, origin }));
-      expect(link.origin).toBe(origin);
-      expect(link.pathname).toBe('/api/auth/enter-with-magic-link');
-      expect(link.searchParams.get('code')).toEqual(expect.any(String));
-      expect(link.searchParams.get('landingPath')).toBeNull();
-    });
-    it('with landingPath', async () => {
-      const landingPath = '/in/app/path';
-      const link = new URL(await createMagicLink({ email, origin, landingPath }));
-      expect(link.origin).toBe(origin);
-      expect(link.pathname).toBe('/api/auth/enter-with-magic-link');
-      expect(link.searchParams.get('code')).toEqual(expect.any(String));
-      expect(link.searchParams.get('landingPath')).toBe(landingPath);
+    PARAM_VARIATIONS.forEach(([description, paramsToForward]) => {
+      it(description, async () => {
+        const link = new URL(await createMagicLink({ email, origin, ...paramsToForward }));
+        expect(link.origin).toBe(origin);
+        expect(link.pathname).toBe('/api/auth/enter-with-magic-link');
+        expect(link.searchParams.get('code')).toEqual(expect.any(String));
+        for (const [key, value] of Object.entries(paramsToForward)) {
+          expect(link.searchParams.get(key)).toBe(value);
+        }
+      });
     });
   });
 

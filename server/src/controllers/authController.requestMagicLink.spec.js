@@ -17,48 +17,52 @@ describe('requestMagicLink', () => {
   describe('calls createMagicLink correctly', () => {
     it('with minimal options', async () => {
       const email = 'foo@bar.com';
-      const origin = 'http://foo.com';
-      const req = createReq({ body: { email }, headers: { origin } });
+      const host = 'foo.com';
+      const req = createReq({ body: { email }, headers: { host } });
       await requestMagicLink(req, await createRes());
       expect(createMagicLink).toHaveBeenCalledTimes(1);
       expect(createMagicLink).toHaveBeenCalledWith({
-        origin,
+        origin: `${req.protocol}://${host}`,
         email,
         expiresAfterDays: 1,
         landingPath: null,
+        callbackUrl: null,
       });
     });
 
     it('converts email to lowercase', async () => {
       const email = 'SomeLetters@UPPERCASE.com';
-      const origin = 'http://foo.com';
-      const req = createReq({ body: { email }, headers: { origin } });
+      const host = 'foo.com';
+      const req = createReq({ body: { email }, headers: { host } });
       await requestMagicLink(req, await createRes());
       expect(createMagicLink).toHaveBeenCalledTimes(1);
       expect(createMagicLink).toHaveBeenCalledWith({
-        origin,
+        origin: `${req.protocol}://${host}`,
         email: email.toLowerCase(),
         expiresAfterDays: 1,
         landingPath: null,
+        callbackUrl: null,
       });
     });
 
     it('with all options', async () => {
       const email = 'foo@bar.com';
-      const origin = 'http://foo.com';
+      const host = 'foo.com';
       const landingPath = '/foo/bar';
+      const callbackUrl = 'https://buz.quz/enter?here';
       const expiresAfterDays = '8';
       const req = createReq({
-        body: { email, landingPath, expiresAfterDays },
-        headers: { origin },
+        body: { email, landingPath, callbackUrl, expiresAfterDays },
+        headers: { host },
       });
       await requestMagicLink(req, await createRes());
       expect(createMagicLink).toHaveBeenCalledTimes(1);
       expect(createMagicLink).toHaveBeenCalledWith({
-        origin,
+        origin: `${req.protocol}://${host}`,
         email,
         expiresAfterDays,
         landingPath,
+        callbackUrl,
       });
     });
   });
