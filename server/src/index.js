@@ -30,6 +30,9 @@ const frontend = expressStaticGzip('../client/dist', { index: false });
 
 app.use(initLogging);
 
+// http://expressjs.com/en/guide/behind-proxies.html (needed to get valid req.protocol)
+app.set('trust proxy');
+
 /**
  * Hard-Redirect certain subdomains after migration.
  * To test this locally, build the client and serve it using the server.
