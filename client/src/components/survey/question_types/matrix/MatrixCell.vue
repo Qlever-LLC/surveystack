@@ -17,7 +17,7 @@
     <div style="flex: 1">
       <v-text-field
         ref="text-qrcode"
-        :value="value"
+        :value="value ? value.value : ''"
         @input="
           (v) => {
             value = getValueOrNull(v);
@@ -30,7 +30,7 @@
         :disabled="disabled"
       />
     </div>
-    <div style="flex: 0; display: flex; align-items: center;">
+    <div style="flex: 0; display: flex; align-items: center">
       <app-qr-scanner
         class="mx-2 py-2"
         ref="scan-button"
@@ -45,6 +45,27 @@
       />
     </div>
   </div>
+
+  <v-text-field
+    v-else-if="header.type === 'farmos_uuid'"
+    :value="localValue"
+    @input="
+      (v) => {
+        if (!this.value || this.value.value !== v) {
+          const text = getValueOrNull(v);
+          value = {
+            value: text,
+            uuid: uuidv4(),
+          };
+        }
+        onInput();
+      }
+    "
+    outlined
+    hide-details
+    autocomplete="off"
+    :disabled="disabled"
+  />
 
   <v-text-field
     v-else-if="header.type === 'number'"
@@ -160,6 +181,7 @@
       <div v-html="item.label"></div>
     </template>
   </v-autocomplete>
+
   <v-autocomplete
     v-else-if="header.type === 'farmos_planting'"
     :value="value"
@@ -232,6 +254,7 @@
 <script>
 import { getValueOrNull } from '@/utils/surveyStack';
 import appQrScanner from '@/components/ui/QrScanner.vue';
+import { uuidv4 } from '@/utils/surveys';
 import MatrixCellSelectionLabel from './MatrixCellSelectionLabel.vue';
 
 export default {
@@ -280,12 +303,20 @@ export default {
         this.item[this.header.value].value = value;
       },
     },
+    localValue() {
+      if (this.value == null) {
+        return '';
+      } else {
+        return this.value && this.value.value ? this.value.value : '';
+      }
+    },
     items() {
       return this.getDropdownItems(this.header.value, Array.isArray(this.value) ? this.value : [this.value]);
     },
   },
   methods: {
     getValueOrNull,
+    uuidv4,
     onInput() {
       this.$emit('changed');
     },

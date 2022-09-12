@@ -79,7 +79,13 @@
                   <v-card-text>
                     <v-text-field v-model="item.label" label="Label" style="font-size: 1.3rem" dense />
                     <v-text-field v-model="item.value" label="Value" dense />
-                    <v-select dense v-model="item.type" :items="$options.MATRIX_COLUMN_TYPES" label="Type" />
+                    <v-select
+                      dense
+                      v-bind:value="item.type"
+                      v-on:input="(t) => onTypeChanged(item, t)"
+                      :items="$options.MATRIX_COLUMN_TYPES"
+                      label="Type"
+                    />
                     <div v-if="item.type === 'dropdown' || item.type === 'autocomplete'" class="d-flex flex-column">
                       <div class="d-flex flex-row flex-wrap">
                         <v-select
@@ -112,6 +118,18 @@
                         hide-details
                         dense
                       />
+                    </div>
+
+                    <div v-if="item.type == 'farmos_uuid'" class="d-flex flex-column">
+                      <v-select
+                        dense
+                        v-model="item.options.farmOsType"
+                        :items="item.options.farmOsTypes"
+                        label="FarmOS Type"
+                        hide-details
+                        style="max-width: 10rem"
+                      >
+                      </v-select>
                     </div>
 
                     <v-checkbox
@@ -193,6 +211,7 @@ const MATRIX_COLUMN_TYPES = [
   { text: 'Date', value: 'date' },
   { text: 'Farmos Field', value: 'farmos_field' },
   { text: 'Farmos Planting', value: 'farmos_planting' },
+  { text: 'Farmos UUID', value: 'farmos_uuid' },
 ];
 
 export default {
@@ -300,19 +319,28 @@ export default {
       [columns[idx1], columns[idx2]] = [columns[idx2], columns[idx1]];
       this.columns = columns;
     },
+    createOptions(src) {
+      if (src.type === 'farmos_uuid') {
+        // sync with surveyConfig.js
+        src.options.farmOsType = 'field';
+        src.options.farmOsTypes = ['field', 'planting'];
+      }
+      return src;
+    },
     createEmptyColumn() {
-      return {
+      return this.createOptions({
         label: '',
         value: '',
         tags: '',
         type: '',
+        options: {},
         resource: '',
         multiple: false,
         custom: false,
         required: false,
         redacted: false,
         scaleWidth: 100,
-      };
+      });
     },
     deleteColumn(index) {
       const columns = [...this.columns];
@@ -321,6 +349,10 @@ export default {
     },
     addColumn() {
       this.value.content = [...this.value.content, this.createEmptyColumn()];
+    },
+    onTypeChanged(item, type) {
+      item.type = type;
+      item = this.createOptions(item);
     },
   },
   MATRIX_COLUMN_TYPES,

@@ -31,6 +31,7 @@ const createDefaultMatrixSource = () => ({
       value: 'sample',
       tags: '',
       type: 'number',
+      options: {},
       resource: '',
       multiple: false,
       required: false,
@@ -42,6 +43,7 @@ const createDefaultMatrixSource = () => ({
       value: 'description',
       tags: '',
       type: 'text',
+      options: {},
       resource: '',
       multiple: false,
       required: false,
@@ -91,6 +93,9 @@ export const createControlInstance = (control) => {
       typesImmutable: true,
       allowMultiple: false,
     };
+  } else if (control.type === 'farmOsUuid') {
+    cloneWithDefaultOptions.options.farmOsTypes = ['field', 'planting'];
+    cloneWithDefaultOptions.options.farmOsType = 'field';
   }
 
   delete cloneWithDefaultOptions.icon;
@@ -192,6 +197,12 @@ export const availableControls = [
     icon: 'mdi-code-braces',
   },
   {
+    name: 'map',
+    label: 'Map',
+    type: 'geoJSON',
+    icon: 'mdi-map',
+  },
+  {
     name: 'farmos_field',
     label: 'Farmos Field',
     type: 'farmOsField',
@@ -210,9 +221,9 @@ export const availableControls = [
     icon: 'mdi-leaf',
   },
   {
-    name: 'map',
-    label: 'Map',
-    type: 'geoJSON',
-    icon: 'mdi-map',
+    name: 'farmos_uuid',
+    label: 'FarmOS UUID',
+    type: 'farmOsUuid',
+    icon: 'mdi-leaf',
   },
 ];
