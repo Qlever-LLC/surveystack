@@ -1,6 +1,7 @@
 import api from '@/services/api.service';
-
 import { getValueOrNull } from '@/utils/surveyStack';
+import { linearControls } from '@/utils/submissions';
+import { NODE_STREAM_INPUT } from 'papaparse';
 
 const base = (type) => ({
   data() {
@@ -67,6 +68,63 @@ const base = (type) => ({
         console.log('something went wrong:', e);
         // TODO show error
       }
+
+      const submission = this.$store.getters['draft/submission'];
+      const survey = this.$store.getters['draft/survey'];
+      const nodes = linearControls(survey, submission);
+      const farmOsType = 'field';
+
+      const localAreas = [];
+      for (const node of nodes) {
+        if (node.type === 'farmOsUuid' && node.options.farmOsType === farmOsType) {
+          if (!node.value) {
+            continue;
+          }
+          localAreas.push({
+            label: `<span class="green-chip mr-4">New Field</span> ${node.value.name}`,
+            value: {
+              farmName: '',
+              url: '',
+              name: node.value.name,
+              fieldId: node.value.uuid,
+            },
+          });
+        }
+
+        if (node.type === 'matrix') {
+          if (!node.options || !node.options.source || !node.options.source.content) {
+            continue;
+          }
+
+          const farmosUuidElemets = node.options.source.content.filter((c) => c.type == 'farmos_uuid');
+
+          for (const config of farmosUuidElemets) {
+            console.log('config', config);
+            const type = config.options.farmOsType;
+            const colName = config.value;
+            if (type === farmOsType && node.value) {
+              console.log('type matches');
+              for (const v of node.value) {
+                const targetValue = v[colName].value;
+                if (targetValue && targetValue.name) {
+                  localAreas.push({
+                    label: `<span class="green-chip mr-4">New Field</span> ${targetValue.name}`,
+                    value: {
+                      farmName: '',
+                      url: '',
+                      name: targetValue.name,
+                      fieldId: targetValue.uuid,
+                    },
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+
+      this.farms = [...localAreas, ...this.farms];
+
       this.loading = false;
     },
     async fetchAssets() {
@@ -76,15 +134,19 @@ const base = (type) => ({
 
         const response = await api.get('farmos/assets?bundle=plant');
 
-        console.log('res', response.data);
+        // console.log('res', response.data);
         this.assets = response.data.assets.map((f) => {
           let loc = [];
 
           if (f.location) {
-            loc = f.location.map((loc) => ({
-              id: loc.id,
-              name: location.assets.find((l) => l.id === loc.id).name,
-            }));
+            loc = f.location.map((loc) => {
+              const name = location.assets.find((l) => l.id === loc.id);
+
+              return {
+                id: loc.id,
+                name: name ? name : '',
+              };
+            });
           }
 
           return {
@@ -104,6 +166,71 @@ const base = (type) => ({
         console.log('something went wrong:', e);
         // TODO show error
       }
+
+      // submission assets
+
+      const submission = this.$store.getters['draft/submission'];
+      const survey = this.$store.getters['draft/survey'];
+      const nodes = linearControls(survey, submission);
+
+      console.log('nodes', nodes);
+
+      const farmOsType = 'planting';
+
+      const localPlantings = [];
+      for (const node of nodes) {
+        if (node.type === 'farmOsUuid' && node.options.farmOsType === farmOsType) {
+          if (!node.value) {
+            continue;
+          }
+          localPlantings.push({
+            label: `<span class="green-chip mr-4">New Planting</span> ${node.value.name}`,
+            value: {
+              farmId: '',
+              farmName: '',
+              url: '',
+              name: node.value.name,
+              assetId: node.value.uuid,
+              archived: false,
+              location: [],
+            },
+          });
+        }
+
+        if (node.type === 'matrix') {
+          if (!node.options || !node.options.source || !node.options.source.content) {
+            continue;
+          }
+
+          const farmosUuidElemets = node.options.source.content.filter((c) => c.type == 'farmos_uuid');
+
+          for (const config of farmosUuidElemets) {
+            const type = config.options.farmOsType;
+            const colName = config.value;
+            if (type === farmOsType && node.value) {
+              for (const v of node.value) {
+                const targetValue = v[colName].value;
+                if (targetValue && targetValue.name) {
+                  localPlantings.push({
+                    label: `<span class="green-chip mr-4">New Planting</span> ${targetValue.name}`,
+                    value: {
+                      farmId: '',
+                      farmName: '',
+                      url: '',
+                      name: targetValue.name,
+                      assetId: targetValue.uuid,
+                      archived: false,
+                      location: [],
+                    },
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+
+      this.assets = [...localPlantings, ...this.assets];
       this.loading = false;
     },
   },

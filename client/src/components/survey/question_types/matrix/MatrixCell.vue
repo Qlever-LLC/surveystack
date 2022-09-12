@@ -51,10 +51,10 @@
     :value="localValue"
     @input="
       (v) => {
-        if (!this.value || this.value.value !== v) {
+        if (!this.value || this.value.name !== v) {
           const text = getValueOrNull(v);
           value = {
-            value: text,
+            name: text,
             uuid: uuidv4(),
           };
         }
@@ -307,7 +307,7 @@ export default {
       if (this.value == null) {
         return '';
       } else {
-        return this.value && this.value.value ? this.value.value : '';
+        return this.value && this.value.name ? this.value.name : '';
       }
     },
     items() {

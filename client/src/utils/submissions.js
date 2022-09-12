@@ -133,7 +133,7 @@ const createSubmissionFromSurvey = ({ survey, version = 1, instance }) => {
       }
     }
     const dateModified = flattenedInstance ? flattenedInstance[`${flatName}.meta.dateModified`] : null;
-    const meta = { type: control.type, dateModified, uuid: uuidv4() };
+    const meta = { type: control.type, dateModified /* uuid: uuidv4() */ };
     if (control.options.redacted) {
       meta.permissions = ['admin'];
     }

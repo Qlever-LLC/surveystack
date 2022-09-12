@@ -34,14 +34,14 @@ export default {
   methods: {
     getValueOrNull,
     submit() {
-      this.onInput(this.value);
+      this.onInput(this.localValue);
       this.$emit('next');
     },
     onInput(v) {
       if (!this.value || this.value.value !== v) {
-        const text = getValueOrNull(v);
+        const val = getValueOrNull(v);
         this.changed({
-          value: text,
+          name: val,
           uuid: uuidv4(),
         });
       }
@@ -65,11 +65,10 @@ export default {
   },
   computed: {
     localValue() {
-      console.log('value', this.value);
       if (this.value == null) {
         return '';
       } else {
-        return this.value && this.value.value ? this.value.value : '';
+        return this.value && this.value.name ? this.value.name : '';
       }
     },
   },
