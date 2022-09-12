@@ -54,9 +54,7 @@
         </div>
         <app-member-selector
           :show="showSelectMember"
-          :searchResults="searchResults"
           @hide="showSelectMember = false"
-          @search="searchMembers"
           @selected="startDraftAs(entity._id, $event)"
         />
       </div>
@@ -92,7 +90,6 @@ export default {
       entity: null,
       surveyInfo: null,
       show: false,
-      searchResults: [],
       showSelectMember: false,
     };
   },
@@ -105,11 +102,6 @@ export default {
       if (selectedMember.user) {
         this.$store.dispatch('submissions/startDraft', { survey, submitAsUser: selectedMember.user });
       }
-    },
-    async searchMembers() {
-      //TODO load members of MY groups instead of Survey group?
-      const { data: searchResults } = await api.get(`/memberships?group=${this.entity.meta.group.id}&populate=true`);
-      this.searchResults = searchResults;
     },
   },
   computed: {

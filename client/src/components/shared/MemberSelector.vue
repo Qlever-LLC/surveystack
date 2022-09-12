@@ -3,31 +3,30 @@
     <v-card>
       <v-card-title>Search members</v-card-title>
       <v-card-text>
-        <v-text-field v-model="q" append-icon="mdi-magnify" />
+        <active-group-selector v-if="!fixedGroupId" label="Group" :value="selectedGroupId" @input="setGroup" />
+        <v-text-field v-model="q" append-icon="mdi-magnify" label="Search members" />
         <v-list>
           <v-list-item
-            v-for="searchResult in filteredSearchResults"
-            :key="searchResult._id"
-            :disabled="searchResult.meta.status === 'pending'"
+            v-for="member in filteredMembers"
+            :key="member._id"
+            :disabled="member.meta.status === 'pending'"
             @click="
-              $emit('selected', searchResult);
+              $emit('selected', member);
               dialog = false;
             "
           >
-            <v-list-item-content v-if="searchResult.meta && searchResult.meta.status === 'pending'">
+            <v-list-item-content v-if="member.meta && member.meta.status === 'pending'">
               <v-list-item-title class="text--secondary"
-                >[Pending] {{ searchResult.meta.invitationEmail
-                }}{{
-                  searchResult.meta.invitationName ? ` - ${searchResult.meta.invitationName}` : ''
-                }}</v-list-item-title
+                >[Pending] {{ member.meta.invitationEmail
+                }}{{ member.meta.invitationName ? ` - ${member.meta.invitationName}` : '' }}</v-list-item-title
               >
               <v-list-item-subtitle>{{
-                searchResult.meta.dateSent ? `sent ${searchResult.meta.dateSent}` : 'Invitation not sent yet'
+                member.meta.dateSent ? `sent ${member.meta.dateSent}` : 'Invitation not sent yet'
               }}</v-list-item-subtitle>
             </v-list-item-content>
             <v-list-item-content v-else>
-              <v-list-item-title>{{ searchResult.user.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ searchResult.user.email }}</v-list-item-subtitle>
+              <v-list-item-title>{{ member.user.name }}</v-list-item-title>
+              <v-list-item-subtitle>{{ member.user.email }}</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -37,11 +36,15 @@
 </template>
 
 <script>
+import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector';
+import api from '@/services/api.service';
 export default {
+  components: { ActiveGroupSelector },
   props: {
-    searchResults: {
-      type: Array,
-      required: true,
+    //if a fixedGroupId is passed, group chooser will be hidden
+    fixedGroupId: {
+      type: String,
+      required: false,
     },
     show: {
       type: Boolean,
@@ -50,6 +53,8 @@ export default {
   },
   data() {
     return {
+      selectedGroupId: this.fixedGroupId || this.$store.getters['memberships/activeGroup'],
+      members: [],
       q: '',
     };
   },
@@ -64,13 +69,13 @@ export default {
         }
       },
     },
-    filteredSearchResults() {
+    filteredMembers() {
       if (!this.q) {
-        return this.searchResults;
+        return this.members;
       }
       const ql = this.q.toLowerCase();
 
-      return this.searchResults.filter((entity) => {
+      return this.members.filter((entity) => {
         if (entity.user) {
           if (entity.user.name.toLowerCase().indexOf(ql) > -1) {
             return true;
@@ -89,11 +94,21 @@ export default {
       });
     },
   },
+  methods: {
+    async fetchMembers(groupId) {
+      const { data: members } = await api.get(`/memberships?group=${groupId}&populate=true`);
+      this.members = members;
+    },
+    setGroup(groupId) {
+      this.selectedGroupId = groupId;
+      this.fetchMembers(this.selectedGroupId);
+    },
+  },
   mounted() {
     this.value = true;
+    this.fetchMembers(this.selectedGroupId);
   },
   async created() {
-    this.$emit('search', this.q);
     this.value = true;
   },
 };
