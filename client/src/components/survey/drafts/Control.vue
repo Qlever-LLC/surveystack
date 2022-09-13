@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-0 px-0" style="width: 100%">
+  <div :class="className" style="width: 100%">
     <div v-if="control.type === 'page' && !insidePage">
       <div v-for="(child, i) in control.children" :key="i">
         <app-control :path="`${path}.${child.name}`" :control="child" :autoFocus="i === 0" insidePage />
@@ -95,6 +95,9 @@ export default {
     },
   },
   computed: {
+    className() {
+      return `mx-0 px-0 ${this.control.type === 'page' && this.control.options.compact ? 'compact-page' : ''}`;
+    },
     submission() {
       return this.$store.getters['draft/submission'];
     },
@@ -135,6 +138,20 @@ export default {
   },
 };
 </script>
+
+<style>
+.compact-page .control {
+  padding: 0.5rem !important;
+}
+
+.compact-page .control .control-label-wrapper {
+  margin-bottom: 4px !important;
+}
+
+.compact-page .control .control-more-info {
+  margin-top: 4px;
+}
+</style>
 
 <style scoped>
 .control {
