@@ -97,7 +97,6 @@ export const createLoginPayload = async (userObject) => {
 
 // Returns an origin URL that points at this server process
 export const getServerSelfOrigin = (req) => {
-  console.log(">>> process.env.NODE_ENV", process.env.NODE_ENV)
   // In production, req.protocol is not reliable if there is a proxy before the Node process
   //  to fix this, here, https in enforced in production, but there could be a better solution to this
   // NOTE app.set('trust proxy') didn't seem to solve the issue
