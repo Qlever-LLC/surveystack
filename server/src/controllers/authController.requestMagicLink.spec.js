@@ -2,11 +2,18 @@ import authController from './authController';
 const { requestMagicLink } = authController;
 import { createReq, createRes } from '../testUtils';
 import mailService from '../services/mail/mail.service';
-import { createMagicLink } from '../services/auth.service';
+import { createMagicLink, getServerSelfOrigin } from '../services/auth.service';
 jest.mock('../services/mail/mail.service');
 jest.mock('../services/auth.service');
 
 describe('requestMagicLink', () => {
+  let origin;
+
+  beforeEach(() => {
+    origin = 'https://foo.com';
+    getServerSelfOrigin.mockReturnValue(origin);
+  });
+
   it('throws for invalid email address', async () => {
     const req = createReq({ body: { email: '#invalid email' } });
     await expect(requestMagicLink(req, await createRes())).rejects.toThrow('Invalid email address');
@@ -17,12 +24,11 @@ describe('requestMagicLink', () => {
   describe('calls createMagicLink correctly', () => {
     it('with minimal options', async () => {
       const email = 'foo@bar.com';
-      const host = 'foo.com';
-      const req = createReq({ body: { email }, headers: { host } });
+      const req = createReq({ body: { email } });
       await requestMagicLink(req, await createRes());
       expect(createMagicLink).toHaveBeenCalledTimes(1);
       expect(createMagicLink).toHaveBeenCalledWith({
-        origin: `${req.protocol}://${host}`,
+        origin,
         email,
         expiresAfterDays: 1,
         landingPath: null,
@@ -32,12 +38,11 @@ describe('requestMagicLink', () => {
 
     it('converts email to lowercase', async () => {
       const email = 'SomeLetters@UPPERCASE.com';
-      const host = 'foo.com';
-      const req = createReq({ body: { email }, headers: { host } });
+      const req = createReq({ body: { email } });
       await requestMagicLink(req, await createRes());
       expect(createMagicLink).toHaveBeenCalledTimes(1);
       expect(createMagicLink).toHaveBeenCalledWith({
-        origin: `${req.protocol}://${host}`,
+        origin,
         email: email.toLowerCase(),
         expiresAfterDays: 1,
         landingPath: null,
@@ -47,18 +52,16 @@ describe('requestMagicLink', () => {
 
     it('with all options', async () => {
       const email = 'foo@bar.com';
-      const host = 'foo.com';
       const landingPath = '/foo/bar';
       const callbackUrl = 'https://buz.quz/enter?here';
       const expiresAfterDays = '8';
       const req = createReq({
         body: { email, landingPath, callbackUrl, expiresAfterDays },
-        headers: { host },
       });
       await requestMagicLink(req, await createRes());
       expect(createMagicLink).toHaveBeenCalledTimes(1);
       expect(createMagicLink).toHaveBeenCalledWith({
-        origin: `${req.protocol}://${host}`,
+        origin,
         email,
         expiresAfterDays,
         landingPath,

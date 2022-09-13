@@ -3,8 +3,9 @@ import {
   createMagicLink,
   createLoginPayload,
   createInvalidateMagicLink,
+  getServerSelfOrigin,
 } from './auth.service';
-import { createGroup, createUser } from '../testUtils';
+import { createGroup, createReq, createUser } from '../testUtils';
 import { db, COLL_ACCESS_CODES } from '../db';
 import url from 'url';
 import rolesService from './roles.service';
@@ -183,5 +184,35 @@ describe('createInvalidateMagicLink', () => {
     expect(link.origin).toBe(origin);
     expect(link.pathname).toBe('/api/auth/invalidate-magic-link');
     expect(link.searchParams.get('invalidateCode')).toBe(accessCode.invalidateCode);
+  });
+});
+
+describe('getServerSelfOrigin', () => {
+  describe('builds origin from req.protocol and req.headers.host', () => {
+    ['http', 'https'].forEach((protocol) => {
+      it(protocol, () => {
+        const host = 'foo.com';
+        const req = createReq({ protocol, headers: { host } });
+        const origin = getServerSelfOrigin(req);
+        expect(origin).toBe(`${protocol}://${host}`);
+      });
+    });
+  });
+  describe('enforcing https in production', () => {
+    const SAVE_ENV = process.env;
+    beforeEach(() => {
+      process.env = { ...SAVE_ENV, NODE_ENV: 'production' };
+    });
+    ['http', 'https'].forEach((protocol) => {
+      it(protocol, () => {
+        const host = 'foo.com';
+        const req = createReq({ protocol, headers: { host } });
+        const origin = getServerSelfOrigin(req);
+        expect(origin).toBe(`https://${host}`);
+      });
+    });
+    afterAll(() => {
+      process.env = SAVE_ENV;
+    });
   });
 });

@@ -13,6 +13,7 @@ import {
   createLoginPayload,
   createMagicLink,
   createInvalidateMagicLink,
+  getServerSelfOrigin,
 } from '../services/auth.service';
 import { db, COLL_ACCESS_CODES } from '../db';
 import { queryParam } from '../helpers';
@@ -89,7 +90,7 @@ const sendPasswordResetMail = async (req, res) => {
 
   // Fail silently when the email is not in the DB
   if (existingUser) {
-    const { origin } = req.headers;
+    const origin = getServerSelfOrigin(req);
     const landingPath = '/auth/profile';
     const magicLink = await createMagicLink({ origin, email, expiresAfterDays: 3, landingPath });
 
@@ -153,16 +154,6 @@ const resetPassword = async (req, res) => {
     console.log(err);
     throw boom.internal(`Ouch`);
   }
-};
-
-// Returns an origin URL that points at this server process
-const getServerSelfOrigin = (req) => {
-  // In production, req.protocol is not reliable if there is a proxy before the Node process
-  //  to fix this, here, https in enforced in production, but there could be a better solution to this
-  // NOTE app.set('trust proxy') didn't seem to solve the issue
-  const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
-  // NOTE req.headers.origin can't be used because it's set by the client and points at the client
-  return protocol + '://' + req.get('host');
 };
 
 const requestMagicLink = async (req, res) => {
