@@ -13,6 +13,7 @@ import {
   createLoginPayload,
   createMagicLink,
   createInvalidateMagicLink,
+  getServerSelfOrigin,
 } from '../services/auth.service';
 import { db, COLL_ACCESS_CODES } from '../db';
 import { queryParam } from '../helpers';
@@ -89,7 +90,7 @@ const sendPasswordResetMail = async (req, res) => {
 
   // Fail silently when the email is not in the DB
   if (existingUser) {
-    const { origin } = req.headers;
+    const origin = getServerSelfOrigin(req);
     const landingPath = '/auth/profile';
     const magicLink = await createMagicLink({ origin, email, expiresAfterDays: 3, landingPath });
 
@@ -164,7 +165,7 @@ const requestMagicLink = async (req, res) => {
   }
 
   // Get the origin of this server
-  const origin = req.protocol + '://' + req.get('host');
+  const origin = getServerSelfOrigin(req);
   const magicLink = await createMagicLink({
     origin,
     email,
@@ -189,7 +190,7 @@ const enterWithMagicLink = async (req, res) => {
   const { code, landingPath, callbackUrl } = req.query;
   const accessCode = await db.collection(COLL_ACCESS_CODES).findOne({ code });
   // Get the origin of this server
-  const origin = req.protocol + '://' + req.get('host');
+  const origin = getServerSelfOrigin(req);
 
   // Redirect user to the "link expired" page if the magiclink is invalid
   if (!accessCode) {

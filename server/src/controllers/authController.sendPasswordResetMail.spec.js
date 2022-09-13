@@ -2,11 +2,18 @@ import authController from './authController';
 const { sendPasswordResetMail } = authController;
 import { createReq, createRes, createUser } from '../testUtils';
 import mailService from '../services/mail/mail.service';
-import { createMagicLink } from '../services/auth.service';
+import { createMagicLink, getServerSelfOrigin } from '../services/auth.service';
 jest.mock('../services/mail/mail.service');
 jest.mock('../services/auth.service');
 
 describe('sendPasswordResetMail', () => {
+  let origin;
+
+  beforeEach(() => {
+    origin = 'https://foo.com';
+    getServerSelfOrigin.mockReturnValue(origin);
+  });
+
   it('fails silently when the email does not match any user', async () => {
     const res = await createRes();
     await sendPasswordResetMail(createReq({ body: { email: 'unknown@user.com' } }), res);
@@ -17,9 +24,9 @@ describe('sendPasswordResetMail', () => {
 
   it('calls createMagicLink correctly', async () => {
     const user = await createUser();
-    const origin = 'http://foo.com';
-    const req = createReq({ body: { email: user.email }, headers: { origin } });
+    const req = createReq({ body: { email: user.email } });
     await sendPasswordResetMail(req, await createRes());
+    expect(getServerSelfOrigin).toHaveBeenCalledWith(req);
     expect(createMagicLink).toHaveBeenCalledTimes(1);
     expect(createMagicLink).toHaveBeenCalledWith({
       origin,
@@ -50,11 +57,9 @@ describe('sendPasswordResetMail', () => {
 
   it('handles `useLegacy` query param', async () => {
     const user = await createUser();
-    const origin = `https://foo.bar`;
     const req = createReq({
       body: { email: user.email },
       query: { useLegacy: 'true' },
-      headers: { origin },
     });
     await sendPasswordResetMail(req, await createRes());
     expect(mailService.send).toHaveBeenCalledTimes(1);
