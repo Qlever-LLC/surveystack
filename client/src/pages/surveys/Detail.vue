@@ -28,21 +28,22 @@
     <div class="pt-8 pb-4 d-flex justify-center start-button-container">
       <div>
         <btn-dropdown
+          :label="'Start Survey'"
+          :show-drop-down="isAdminOfAnyGroup && isAllowedToSubmit"
           :disabled="!isAllowedToSubmit"
+          @click="startDraft(entity._id)"
           x-large
+          color="primary"
           top
           left
-          color="primary"
-          @click="startDraft(entity._id)"
-          :show-drop-down="isAdminOfAnyGroup && isAllowedToSubmit"
         >
           <v-list class="pa-0 mx-auto" max-width="260">
             <v-list-item @click="startDraft(entity._id)">
               <v-list-item-content>
                 <v-list-item-title>Start survey</v-list-item-title>
-                <v-list-item-content class="multiline-subtitle"
-                  >Start a survey as the user you are signed in with</v-list-item-content
-                >
+                <v-list-item-content class="multiline-subtitle">
+                  Start a survey as the user you are signed in with
+                </v-list-item-content>
               </v-list-item-content>
             </v-list-item>
             <v-list-item @click="showSelectMember = true">
