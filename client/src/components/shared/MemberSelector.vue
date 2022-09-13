@@ -3,7 +3,13 @@
     <v-card>
       <v-card-title>Search members</v-card-title>
       <v-card-text>
-        <active-group-selector v-if="!fixedGroupId" label="Group" :value="selectedGroupId" @input="setGroup" />
+        <active-group-selector
+          v-if="!fixedGroupId"
+          :value="selectedGroupId"
+          :admin-groups-only="true"
+          label="Group"
+          @input="setGroup"
+        />
         <v-text-field v-model="q" append-icon="mdi-magnify" label="Search members" />
         <v-list>
           <v-list-item

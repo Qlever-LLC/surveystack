@@ -34,7 +34,7 @@
           left
           color="primary"
           @click="startDraft(entity._id)"
-          :show-drop-down="isAdminOfSurveyGroup && isAllowedToSubmit"
+          :show-drop-down="isAdminOfAnyGroup && isAllowedToSubmit"
         >
           <v-list class="pa-0 mx-auto" max-width="260">
             <v-list-item @click="startDraft(entity._id)">
@@ -45,7 +45,7 @@
                 >
               </v-list-item-content>
             </v-list-item>
-            <v-list-item v-if="isAdminOfSurveyGroup && isAllowedToSubmit" @click="showSelectMember = true">
+            <v-list-item @click="showSelectMember = true">
               <v-list-item-content>
                 <v-list-item-title>Start survey as a member</v-list-item-title>
                 <v-list-item-content class="multiline-subtitle">
@@ -119,6 +119,9 @@ export default {
     },
     isAdminOfSurveyGroup() {
       return !!this.memberships.find((m) => m.group._id === this.entity.meta.group.id && m.role === 'admin');
+    },
+    isAdminOfAnyGroup() {
+      return !!this.memberships.find((m) => m.role === 'admin');
     },
     editable() {
       if (!this.$store.getters['auth/isLoggedIn']) {

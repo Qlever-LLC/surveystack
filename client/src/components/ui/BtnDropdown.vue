@@ -21,7 +21,6 @@ export default {
     },
   },
   emit: ['click'],
-  setup(props) {},
 };
 </script>
 
