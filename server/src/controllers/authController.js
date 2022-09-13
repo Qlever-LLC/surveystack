@@ -155,6 +155,16 @@ const resetPassword = async (req, res) => {
   }
 };
 
+// Returns an origin URL that points at this server process
+const getServerSelfOrigin = (req) => {
+  // In production, req.protocol is not reliable if there is a proxy before the Node process
+  //  to fix this, here, https in enforced in production, but there could be a better solution to this
+  // NOTE app.set('trust proxy') didn't seem to solve the issue
+  const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
+  // NOTE req.headers.origin can't be used because it's set by the client and points at the client
+  return protocol + '://' + req.get('host');
+};
+
 const requestMagicLink = async (req, res) => {
   const { expiresAfterDays = 1, landingPath = null, callbackUrl = null } = req.body;
   const email = req.body.email.toLowerCase();
@@ -164,7 +174,7 @@ const requestMagicLink = async (req, res) => {
   }
 
   // Get the origin of this server
-  const origin = req.protocol + '://' + req.get('host');
+  const origin = getServerSelfOrigin(req);
   const magicLink = await createMagicLink({
     origin,
     email,
@@ -189,7 +199,7 @@ const enterWithMagicLink = async (req, res) => {
   const { code, landingPath, callbackUrl } = req.query;
   const accessCode = await db.collection(COLL_ACCESS_CODES).findOne({ code });
   // Get the origin of this server
-  const origin = req.protocol + '://' + req.get('host');
+  const origin = getServerSelfOrigin(req);
 
   // Redirect user to the "link expired" page if the magiclink is invalid
   if (!accessCode) {
