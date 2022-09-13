@@ -36,17 +36,23 @@
           @click="startDraft(entity._id)"
           :show-drop-down="isAdminOfSurveyGroup && isAllowedToSubmit"
         >
-          <v-list class="ma-0 pa-0">
-            <div>
-              <v-btn block x-large color="" @click="startDraft(entity._id)" style="border-radius: 0">
-                Start survey
-              </v-btn>
-            </div>
-            <div v-if="isAdminOfSurveyGroup && isAllowedToSubmit">
-              <v-btn block x-large elevation="0" color="" @click="showSelectMember = true" style="border-radius: 0">
-                Start survey as a member
-              </v-btn>
-            </div>
+          <v-list class="pa-0 mx-auto" max-width="260">
+            <v-list-item @click="startDraft(entity._id)">
+              <v-list-item-content>
+                <v-list-item-title>Start survey</v-list-item-title>
+                <v-list-item-content class="multiline-subtitle"
+                  >Start a survey as the user you are signed in with</v-list-item-content
+                >
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item v-if="isAdminOfSurveyGroup && isAllowedToSubmit" @click="showSelectMember = true">
+              <v-list-item-content>
+                <v-list-item-title>Start survey as a member</v-list-item-title>
+                <v-list-item-content class="multiline-subtitle">
+                  Select the member for whom you want to start the survey
+                </v-list-item-content>
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
         </btn-dropdown>
         <div class="mt-2 text--secondary text-center submission-rights-hint" v-if="!isAllowedToSubmit">
@@ -270,5 +276,12 @@ export default {
 
 .submission-rights-hint {
   max-width: 500px;
+}
+
+.multiline-subtitle {
+  font-size: 0.875rem;
+  color: rgba(0, 0, 0, 0.6);
+  padding: 0;
+  line-height: 1.3;
 }
 </style>
