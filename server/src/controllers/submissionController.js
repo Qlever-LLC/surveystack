@@ -261,20 +261,7 @@ export const buildPipeline = async (req, res) => {
     const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
 
     if (hasAdminRights) {
-      pipeline.push({
-        $lookup: {
-          from: 'users',
-          let: { creatorId: '$meta.creator' },
-          pipeline: [
-            { $match: { $expr: { $eq: ['$_id', '$$creatorId'] } } },
-            { $project: { name: 1, email: 1, _id: 0 } },
-          ],
-          as: 'meta.creatorDetail',
-        },
-      });
-      pipeline.push({
-        $unwind: { path: '$meta.creatorDetail', preserveNullAndEmptyArrays: true },
-      });
+      addeUserDetailsStage(pipeline);
     }
   }
 
@@ -356,6 +343,38 @@ export const buildPipeline = async (req, res) => {
     });
   }
   return pipeline;
+};
+
+const addeUserDetailsStage = (pipeline) => {
+  pipeline.push({
+    $lookup: {
+      from: 'users',
+      let: { creatorId: '$meta.creator' },
+      pipeline: [
+        { $match: { $expr: { $eq: ['$_id', '$$creatorId'] } } },
+        { $project: { name: 1, email: 1, _id: 0 } },
+      ],
+      as: 'meta.creatorDetail',
+    },
+  });
+  pipeline.push({
+    $unwind: { path: '$meta.creatorDetail', preserveNullAndEmptyArrays: true },
+  });
+
+  pipeline.push({
+    $lookup: {
+      from: 'users',
+      let: { proxyUserId: '$meta.proxyUserId' },
+      pipeline: [
+        { $match: { $expr: { $eq: ['$_id', '$$proxyUserId'] } } },
+        { $project: { name: 1, email: 1, _id: 0 } },
+      ],
+      as: 'meta.proxyUserDetail',
+    },
+  });
+  pipeline.push({
+    $unwind: { path: '$meta.proxyUserDetail', preserveNullAndEmptyArrays: true },
+  });
 };
 
 const getSubmissionsPage = async (req, res) => {
@@ -574,20 +593,7 @@ const getSubmission = async (req, res) => {
     const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
 
     if (hasAdminRights) {
-      pipeline.push({
-        $lookup: {
-          from: 'users',
-          let: { creatorId: '$meta.creator' },
-          pipeline: [
-            { $match: { $expr: { $eq: ['$_id', '$$creatorId'] } } },
-            { $project: { name: 1, email: 1, _id: 0 } },
-          ],
-          as: 'meta.creatorDetail',
-        },
-      });
-      pipeline.push({
-        $unwind: { path: '$meta.creatorDetail', preserveNullAndEmptyArrays: true },
-      });
+      addeUserDetailsStage(pipeline);
     }
   }
 
@@ -601,7 +607,6 @@ const getSubmission = async (req, res) => {
   pipeline.push({ $match: { _id: new ObjectId(id) } });
   const redactStage = createRedactStage(user, roles);
   pipeline.push(redactStage);
-
   const [entity] = await db.collection(col).aggregate(pipeline).toArray();
   if (!entity) {
     throw boom.notFound(`No entity found for id: ${id}`);
@@ -620,8 +625,8 @@ const prepareCreateSubmissionEntity = async (submission, res) => {
 
   if (res.locals.auth.isAuthenticated) {
     entity.meta.creator = res.locals.auth.user._id;
-    if (res.locals.auth.delegatorUserId) {
-      entity.meta.delegatorUserId = res.locals.auth.delegatorUserId;
+    if (res.locals.auth.proxyUserId) {
+      entity.meta.proxyUserId = res.locals.auth.proxyUserId;
     }
   } else {
     entity.meta.creator = null;

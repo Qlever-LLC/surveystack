@@ -11,9 +11,9 @@ describe('handleDelegates', () => {
     await expect(await handleDelegates(t)).rejects.toThrow(Error);
   });
 
-  it('calls fn with res.locals.auth.user._id set to res.locals.auth.delegateToUserId and res.locals.auth.delegateByUserId set to res.locals.auth.user._id', async () => {
+  it('calls fn with res.locals.auth.user._id set to res.locals.auth.delegateToUserId and res.locals.auth.proxyUserId set to res.locals.auth.user._id', async () => {
     const group = await createGroup();
-    const callingUser = (await group.createAdminMember()).user;
+    const proxyUser = (await group.createAdminMember()).user;
     const delegateToUser = (await group.createUserMember()).user;
 
     const t = async (req, res, next) => {
@@ -21,9 +21,9 @@ describe('handleDelegates', () => {
       expect(res.locals.auth.delegateToUserId.toString()).toStrictEqual(
         delegateToUser._id.toString()
       );
-      expect(res.locals.auth.delegateByUserId.toString()).toStrictEqual(callingUser._id.toString());
+      expect(res.locals.auth.proxyUserId.toString()).toStrictEqual(proxyUser._id.toString());
     };
-    let res = await createRes({ user: cloneDeep(callingUser) });
+    let res = await createRes({ user: cloneDeep(proxyUser) });
     res.locals.auth.delegateToUserId = delegateToUser._id.toString();
     await handleDelegates(t)(createReq(), res);
   });
