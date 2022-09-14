@@ -139,17 +139,33 @@ export default {
 };
 </script>
 
-<style>
-.compact-page .control {
-  padding: 0.5rem !important;
-}
+<style lang="scss">
+.compact-page {
+  .control {
+    margin: 0px !important;
+    padding: 0.25rem 0.5rem 1rem !important;
+    box-shadow: none !important;
 
-.compact-page .control .control-label-wrapper {
-  margin-bottom: 4px !important;
-}
+    .control-label-wrapper {
+      margin-bottom: 4px !important;
+    }
 
-.compact-page .control .control-more-info {
-  margin-top: 4px;
+    .control-more-info {
+      margin-top: 4px !important;
+    }
+  }
+
+  & > div {
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+
+    & > :first-child .control {
+      margin-top: 8px !important;
+    }
+
+    & > :last-child .control {
+      margin-bottom: 8px !important;
+    }
+  }
 }
 </style>
 

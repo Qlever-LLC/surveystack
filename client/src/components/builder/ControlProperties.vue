@@ -88,7 +88,6 @@
         v-model="control.options.required"
         label="Required"
         color="grey darken-1"
-        hide-details
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       >
         <template slot="label">
@@ -99,11 +98,11 @@
         </template>
       </v-checkbox>
 
-      <v-checkbox v-if="isPage" class="my-1" color="grey darken-1" v-model="control.options.compact">
+      <v-checkbox v-if="isPage" class="my-1" color="grey darken-1" v-model="control.options.compact" label="Compact">
         <template slot="label">
           <div>
             <div class="text--primary">Compact</div>
-            <div class="body-2">Reduce the spaces</div>
+            <div class="body-2">Reduce the spaces and combine fields into one card</div>
           </div>
         </template>
       </v-checkbox>
@@ -128,7 +127,6 @@
         color="grey darken-1"
         v-if="survey.meta.isLibrary && !control.libraryIsInherited && !control.libraryId"
         v-model="control.options.allowHide"
-        hide-details
         label="Allow hide"
       >
         <template slot="label">
@@ -144,7 +142,6 @@
         color="grey darken-1"
         v-if="survey.meta.isLibrary && !control.libraryIsInherited && !control.libraryId"
         v-model="control.options.allowModify"
-        hide-details
         label="Allow modify"
       >
         <template slot="label">
@@ -160,7 +157,6 @@
         color="grey darken-1"
         v-if="control.libraryId && control.options.allowHide"
         v-model="control.options.hidden"
-        hide-details
         label="Hidden"
       >
         <template slot="label">
