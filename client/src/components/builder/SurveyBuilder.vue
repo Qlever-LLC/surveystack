@@ -206,7 +206,7 @@
         </v-overlay>
       </pane>
 
-      <!-- Padding pane - DO NOTE DELETE -->
+      <!-- Padding pane - DO NOT DELETE -->
       <pane />
     </splitpanes>
   </div>
