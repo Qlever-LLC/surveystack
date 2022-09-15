@@ -28,7 +28,22 @@ describe('handleDelegates', () => {
     await handleDelegates(t)(createReq(), res);
   });
 
-  it.todo(
-    'throws error if delegateToUserId is passed but calling user is not authorized to delegate to this user'
-  );
+  it('throws error if delegateToUserId is passed but calling user is not authorized to delegate to this user', async () => {
+    const proxyUserGroup = await createGroup();
+    const proxyUser = (await proxyUserGroup.createAdminMember()).user;
+    const delegateUserGroup = await createGroup();
+    const delegateToUser = (await delegateUserGroup.createUserMember()).user;
+
+    let res = await createRes({ user: cloneDeep(proxyUser) });
+    res.locals.auth.delegateToUserId = delegateToUser._id.toString();
+
+    const t = async (req, res, next) => {
+      console.log('t called');
+    };
+
+    await handleDelegates(t)(createReq(), res).catch((error) => {
+      expect(error).toBeInstanceOf(Error);
+      expect(error.message).toContain('not allowed');
+    });
+  });
 });
