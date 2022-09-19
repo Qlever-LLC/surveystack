@@ -375,6 +375,21 @@ const addeUserDetailsStage = (pipeline) => {
   pipeline.push({
     $unwind: { path: '$meta.proxyUserDetail', preserveNullAndEmptyArrays: true },
   });
+
+  pipeline.push({
+    $lookup: {
+      from: 'users',
+      let: { resubmitterUserId: '$meta.resubmitter' },
+      pipeline: [
+        { $match: { $expr: { $eq: ['$_id', '$$resubmitterUserId'] } } },
+        { $project: { name: 1, email: 1, _id: 0 } },
+      ],
+      as: 'meta.resubmitterUserDetail',
+    },
+  });
+  pipeline.push({
+    $unwind: { path: '$meta.resubmitterUserDetail', preserveNullAndEmptyArrays: true },
+  });
 };
 
 const getSubmissionsPage = async (req, res) => {
