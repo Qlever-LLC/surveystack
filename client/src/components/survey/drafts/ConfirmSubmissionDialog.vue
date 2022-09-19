@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="300">
+  <v-dialog :value="value" @input="(v) => $emit('input', v)" width="400">
     <v-card>
       <v-card-title> Confirm Submission </v-card-title>
       <v-card-text v-if="!groupChangeAllowed"> Submit Survey </v-card-text>
@@ -16,6 +16,9 @@
         <v-btn icon @click="handleEditGroup" v-if="groupChangeAllowed && !groupEditorIsVisible">
           <v-icon small>mdi-pencil</v-icon>
         </v-btn>
+        <div v-if="submitAsUser">
+          As user: <strong>{{ submitAsUser.name }}</strong> ({{ submitAsUser.email }})
+        </div>
         <div v-if="dateSubmitted">
           This submission was previously submitted on
           {{ new Date(dateSubmitted).toLocaleString() }}. Resubmission will archive the previous submission.
@@ -47,12 +50,16 @@ export default {
   },
   props: {
     value: {
-      required: true,
       type: Boolean,
+      required: true,
     },
     groupId: {
-      required: false,
       type: String,
+      required: false,
+    },
+    submitAsUser: {
+      type: Object,
+      required: false,
     },
     'survey-name': {
       type: String,

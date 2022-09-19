@@ -80,7 +80,7 @@ export const getBreadcrumbsForSubmission = (controls, position) => {
  *
  * @returns {Object} A submission for a specific survey version.
  */
-const createSubmissionFromSurvey = ({ survey, version = 1, instance }) => {
+const createSubmissionFromSurvey = ({ survey, version = 1, instance, submitAsUser = undefined }) => {
   const submission = {};
   const dateNow = moment().toISOString(true);
 
@@ -98,6 +98,7 @@ const createSubmissionFromSurvey = ({ survey, version = 1, instance }) => {
       path: survey.meta.group.path,
     },
     specVersion: constants.SPEC_VERSION_SUBMISSION,
+    submitAsUser: submitAsUser,
   };
 
   // TODO: handle version not found

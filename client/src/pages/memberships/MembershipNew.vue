@@ -49,42 +49,42 @@
         <div class="d-flex mt-2 justify-end">
           <v-btn text @click="cancel">Cancel</v-btn>
 
-          <v-btn-toggle :max="0" multiple :value="[]" dense>
-            <v-btn :loading="isSubmitting" color="primary" @click="submit" elevation="0" :disabled="!submittable">{{
-              invitationMethod === INVITATION_METHODS.INVITE ? 'Invite Member' : 'Add Member'
-            }}</v-btn>
-            <v-menu top left>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn outlined primary v-bind="attrs" v-on="on" color="primary" elevation="0" min-width="0">
-                  <v-icon> mdi-chevron-down </v-icon></v-btn
-                >
-              </template>
-              <v-list>
-                <v-list-item-group v-model="invitationMethod">
-                  <v-list-item two-line :value="INVITATION_METHODS.INVITE">
-                    <v-list-item-content>
-                      <v-list-item-title>Invite Member</v-list-item-title>
-                      <v-list-item-subtitle
-                        >Send them an email to agree to join your group. They only join once they click the "Join" link
-                        in the email.</v-list-item-subtitle
-                      >
+          <btn-dropdown
+            :label="invitationMethod === INVITATION_METHODS.INVITE ? 'Invite Member' : 'Add Member'"
+            :show-drop-down="true"
+            :disabled="!submittable"
+            :loading="isSubmitting"
+            @click="submit"
+            color="primary"
+            elevation="0"
+            top
+            left
+          >
+            <v-list class="pa-0 mx-auto" max-width="280">
+              <v-list-item-group v-model="invitationMethod">
+                <v-list-item two-line :value="INVITATION_METHODS.INVITE">
+                  <v-list-item-content>
+                    <v-list-item-title>Invite Member</v-list-item-title>
+                    <v-list-item-content class="multiline-subtitle">
+                      Send them an email to agree to join your group. They only join once they click the "Join" link in
+                      the email.
                     </v-list-item-content>
-                  </v-list-item>
+                  </v-list-item-content>
+                </v-list-item>
 
-                  <v-list-item three-line :value="INVITATION_METHODS.ADD">
-                    <v-list-item-content>
-                      <v-list-item-title>Add Member</v-list-item-title>
-                      <v-list-item-subtitle style="-webkit-line-clamp: 4">
-                        The member joins immediately. An email is still sent informing them they are joined. This is
-                        useful when using "Call for Submissions" to send this member survey requests without waiting for
-                        them to check their email.
-                      </v-list-item-subtitle>
+                <v-list-item three-line :value="INVITATION_METHODS.ADD">
+                  <v-list-item-content>
+                    <v-list-item-title>Add Member</v-list-item-title>
+                    <v-list-item-content class="multiline-subtitle">
+                      The member joins immediately. An email is still sent informing them they are joined. This is
+                      useful when using "Call for Submissions" to send this member survey requests without waiting for
+                      them to check their email.
                     </v-list-item-content>
-                  </v-list-item>
-                </v-list-item-group>
-              </v-list>
-            </v-menu>
-          </v-btn-toggle>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list-item-group>
+            </v-list>
+          </btn-dropdown>
         </div>
       </v-form>
     </v-card>
@@ -112,6 +112,7 @@ import api from '@/services/api.service';
 import EmailValidator from 'email-validator';
 
 import { uuid } from '@/utils/memberships';
+import BtnDropdown from '@/components/ui/BtnDropdown';
 
 // LocalStorage key for saving the preferred login method
 const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
@@ -128,6 +129,7 @@ const availableRoles = [
 ];
 
 export default {
+  components: { BtnDropdown },
   data() {
     const INVITATION_METHODS = {
       INVITE: 'invite',
@@ -233,3 +235,12 @@ export default {
   },
 };
 </script>
+
+<style scoped lang="scss">
+.multiline-subtitle {
+  font-size: 0.875rem;
+  color: rgba(0, 0, 0, 0.6);
+  padding: 0;
+  line-height: 1.3;
+}
+</style>
