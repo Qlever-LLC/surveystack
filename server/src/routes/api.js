@@ -38,6 +38,7 @@ import {
 } from '../handlers/assertions';
 
 import { catchErrors } from '../handlers/errorHandlers';
+import { handleDelegates } from '../handlers/headerHandlers';
 
 const router = Router();
 
@@ -121,7 +122,7 @@ router.get(
 router.post(
   '/submissions',
   [assertSubmissionRights],
-  catchErrors(submissionController.createSubmission)
+  catchErrors(handleDelegates(submissionController.createSubmission))
 );
 router.put(
   '/submissions/:id',
@@ -238,7 +239,7 @@ router.get('/roles', catchErrors(rolesController.getRoles));
 
 /** farmos */
 router.get('/farmos/farms', catchErrors(farmosController.getFarmOSInstances));
-router.get('/farmos/assets', catchErrors(farmosController.getAssets));
+router.get('/farmos/assets', catchErrors(handleDelegates(farmosController.getAssets)));
 
 // TODO update test connection
 // router.post('/farmos/test', [assertAuthenticated], catchErrors(farmosController.testConnection));

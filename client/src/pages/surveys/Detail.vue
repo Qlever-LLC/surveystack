@@ -26,20 +26,44 @@
     </div>
 
     <div class="pt-8 pb-4 d-flex justify-center start-button-container">
-      <div class="text-center">
-        <v-btn
+      <div>
+        <btn-dropdown
+          :label="'Start Survey'"
+          :show-drop-down="isAdminOfAnyGroup && isAllowedToSubmit"
+          :disabled="!isAllowedToSubmit"
+          @click="startDraft(entity._id)"
           x-large
           color="primary"
-          @click="startDraft(entity._id)"
-          :disabled="!isAllowedToSubmit"
-          class="start-button"
+          top
+          left
         >
-          <v-icon>mdi-file-document-box-plus-outline</v-icon>
-          <span class="ml-2">Start Survey</span>
-        </v-btn>
+          <v-list class="pa-0 mx-auto" max-width="260">
+            <v-list-item @click="startDraft(entity._id)">
+              <v-list-item-content>
+                <v-list-item-title>Start survey</v-list-item-title>
+                <v-list-item-content class="multiline-subtitle">
+                  Start a survey as the user you are signed in with
+                </v-list-item-content>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item @click="showSelectMember = true">
+              <v-list-item-content>
+                <v-list-item-title>Start survey as a member</v-list-item-title>
+                <v-list-item-content class="multiline-subtitle">
+                  Select the member for whom you want to start the survey
+                </v-list-item-content>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </btn-dropdown>
         <div class="mt-2 text--secondary text-center submission-rights-hint" v-if="!isAllowedToSubmit">
           {{ submissionRightsHint }}
         </div>
+        <app-member-selector
+          :show="showSelectMember"
+          @hide="showSelectMember = false"
+          @selected="startDraftAs(entity._id, $event)"
+        />
       </div>
     </div>
   </v-container>
@@ -52,7 +76,9 @@
 
 <script>
 import api from '@/services/api.service';
+import appMemberSelector from '@/components/shared/MemberSelector.vue';
 import { autoSelectActiveGroup } from '@/utils/memberships';
+import BtnDropdown from '@/components/ui/BtnDropdown';
 
 export default {
   props: {
@@ -62,16 +88,27 @@ export default {
       default: false,
     },
   },
+  components: {
+    BtnDropdown,
+    appMemberSelector,
+  },
   data() {
     return {
       entity: null,
       surveyInfo: null,
       show: false,
+      showSelectMember: false,
     };
   },
   methods: {
     startDraft(survey) {
       this.$store.dispatch('submissions/startDraft', { survey });
+    },
+    startDraftAs(survey, selectedMember) {
+      this.showSelectMember = false;
+      if (selectedMember.user) {
+        this.$store.dispatch('submissions/startDraft', { survey, submitAsUser: selectedMember.user });
+      }
     },
   },
   computed: {
@@ -80,6 +117,12 @@ export default {
     },
     memberships() {
       return this.$store.getters['memberships/memberships'];
+    },
+    isAdminOfSurveyGroup() {
+      return !!this.memberships.find((m) => m.group._id === this.entity.meta.group.id && m.role === 'admin');
+    },
+    isAdminOfAnyGroup() {
+      return !!this.memberships.find((m) => m.role === 'admin');
     },
     editable() {
       if (!this.$store.getters['auth/isLoggedIn']) {
@@ -95,11 +138,12 @@ export default {
         return false;
       }
 
-      const g = this.memberships.find((m) => m.group._id === this.entity.meta.group.id);
+      return this.isAdminOfSurveyGroup;
+      /*const g = this.memberships.find((m) => m.group._id === this.entity.meta.group.id);
       if (g && g.role === 'admin') {
         return true;
       }
-      return false;
+      return false;*/
     },
     isAllowedToSubmit() {
       const { submissions, isLibrary } = this.entity.meta;
@@ -217,7 +261,7 @@ export default {
 }
 
 .start-button-container {
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.85) 50%);
+  background: linear-gradient(to bottom, rgba(80, 44, 155, 0) 0%, rgba(255, 255, 255, 0.85) 50%);
 
   position: fixed;
   bottom: 0;
@@ -236,5 +280,12 @@ export default {
 
 .submission-rights-hint {
   max-width: 500px;
+}
+
+.multiline-subtitle {
+  font-size: 0.875rem;
+  color: rgba(0, 0, 0, 0.6);
+  padding: 0;
+  line-height: 1.3;
 }
 </style>
