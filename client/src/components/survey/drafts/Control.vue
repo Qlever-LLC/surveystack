@@ -159,6 +159,7 @@ export default {
     box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
 
     & > :first-child .control {
+      padding-top: 1rem !important;
       margin-top: 8px !important;
     }
 
