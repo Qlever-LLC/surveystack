@@ -11,15 +11,10 @@
           :icon-color="diffInfo.color"
           :type="diffInfo.controlType"
           :dataName="diffInfo.name"
+          :chip-label="diffInfo.hasBreakingChange ? 'required change' : diffInfo.changeType"
+          :chip-color="diffInfo.color"
           class="ml-3 align-self-center"
         />
-
-        <v-chip v-if="diffInfo.hasBreakingChange" class="ma-3 align-self-start" outlined small :color="diffInfo.color">
-          required change
-        </v-chip>
-        <v-chip v-else class="ma-3 align-self-start" outlined small :color="diffInfo.color">
-          {{ diffInfo.changeType }}
-        </v-chip>
         <v-spacer />
         <v-icon v-if="haveChangeDetails" class="mr-5 align-self-center" :class="{ 'mdi-rotate-180': !isOpen }"
           >mdi-chevron-down
