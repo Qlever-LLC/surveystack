@@ -24,6 +24,8 @@ const getters = {
     (state) =>
     (prefix = '/') =>
       state.memberships.filter((m) => m.group.path && m.group.path.startsWith(prefix)).map((m) => m.group),
+  getGroupById: (state) => (groupId) => state.memberships.map((m) => m.group).find((group) => group._id === groupId),
+  getMembershipByGroupId: (state) => (groupId) => state.memberships.find((m) => m.group._id === groupId),
 };
 
 const actions = {

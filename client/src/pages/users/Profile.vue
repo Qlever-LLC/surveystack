@@ -19,7 +19,27 @@
         >.
       </p>
 
-      <active-group-selector class="my-4" v-model="activeGroup" outlined />
+      <div class="my-4 d-flex align-center">
+        <active-group-selector class="flex-grow-1" v-model="activeGroup" outlined />
+        <v-btn class="ml-2" color="error" :disabled="!activeMemebership" @click="isLeaveDialogOpen = true">Leave</v-btn>
+      </div>
+
+      <v-dialog v-model="isLeaveDialogOpen" max-width="290">
+        <v-card>
+          <v-card-title> Leave Group </v-card-title>
+          <v-card-text class="mt-4">
+            Are you sure you want to leave the
+            <strong>{{ activeGroupName }}</strong
+            >?
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn text @click.stop="isLeaveDialogOpen = false"> Cancel </v-btn>
+            <v-btn text color="red" @click.stop="leaveGroup"> Leave </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
       <v-card outlined>
         <v-card-text> <div>User Details</div></v-card-text>
         <v-card-text>
@@ -111,6 +131,7 @@ export default {
       isSubmittingData: false,
       isSubmittingEmail: false,
       isEmailDialogOpen: false,
+      isLeaveDialogOpen: false,
     };
   },
   computed: {
@@ -130,6 +151,16 @@ export default {
       set(val) {
         this.$store.dispatch('memberships/setActiveGroup', val);
       },
+    },
+    activeGroupName() {
+      const group = this.$store.getters['memberships/getGroupById'](this.activeGroup);
+      if (group) {
+        return group.name;
+      }
+      return 'current active group';
+    },
+    activeMemebership() {
+      return this.$store.getters['memberships/getMembershipByGroupId'](this.activeGroup);
     },
   },
   methods: {
@@ -174,6 +205,15 @@ export default {
         this.status = { type: 'error', message: err.response.data.message };
       } finally {
         this.isSubmitting = false;
+      }
+    },
+    async leaveGroup() {
+      this.isLeaveDialogOpen = false;
+      try {
+        await api.delete(`/memberships/${this.activeMemebership._id}`);
+        this.$store.dispatch('memberships/tryAutoJoinAndSelectGroup');
+      } catch (err) {
+        this.$store.dispatch('feedback/add', err.response.data.message);
       }
     },
     async readUser() {
