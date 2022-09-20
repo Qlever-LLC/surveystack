@@ -135,7 +135,6 @@ export async function uploadFileResources(store, survey, submission, clearCacheA
   try {
     let controls = linearControls(survey, submission);
     for (let control of controls) {
-      console.log(control.value + 'test');
       if (control.value && (control.meta.type === 'file' || control.meta.type === 'image')) {
         const unresolvedPromises = control.value.map((resourceKey) =>
           uploadFileResource(store, resourceKey, clearCacheAfterUpload)
