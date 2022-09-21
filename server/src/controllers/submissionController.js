@@ -261,7 +261,7 @@ export const buildPipeline = async (req, res) => {
     const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
 
     if (hasAdminRights) {
-      addeUserDetailsStage(pipeline);
+      addUserDetailsStage(pipeline);
     }
   }
 
@@ -345,7 +345,7 @@ export const buildPipeline = async (req, res) => {
   return pipeline;
 };
 
-const addeUserDetailsStage = (pipeline) => {
+const addUserDetailsStage = (pipeline) => {
   pipeline.push({
     $lookup: {
       from: 'users',
@@ -361,6 +361,7 @@ const addeUserDetailsStage = (pipeline) => {
     $unwind: { path: '$meta.creatorDetail', preserveNullAndEmptyArrays: true },
   });
 
+  /* TEMPORARY DISABLED DUE TO PERFRMANCE ISSUES IN SOILSTACK, see https://gitlab.com/our-sci/software/surveystack/-/issues/144
   pipeline.push({
     $lookup: {
       from: 'users',
@@ -389,7 +390,7 @@ const addeUserDetailsStage = (pipeline) => {
   });
   pipeline.push({
     $unwind: { path: '$meta.resubmitterUserDetail', preserveNullAndEmptyArrays: true },
-  });
+  });*/
 };
 
 const getSubmissionsPage = async (req, res) => {
@@ -608,7 +609,7 @@ const getSubmission = async (req, res) => {
     const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
 
     if (hasAdminRights) {
-      addeUserDetailsStage(pipeline);
+      addUserDetailsStage(pipeline);
     }
   }
 
