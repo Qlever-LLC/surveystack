@@ -90,13 +90,10 @@ const sendPasswordResetMail = async (req, res) => {
 
   // Fail silently when the email is not in the DB
   if (existingUser) {
-    const origin = getServerSelfOrigin(req);
-    const landingPath = '/auth/profile';
-    const magicLink = await createMagicLink({ origin, email, expiresAfterDays: 3, landingPath });
-
     // Legacy PW reset format used by SoilStack
     // TODO remove this after we update SoilStack
     if (queryParam(req.query.useLegacy)) {
+      const { origin } = req.headers;
       await mailService.send({
         to: email,
         subject: 'Link to reset your password',
@@ -111,6 +108,10 @@ If you did not request this email, you can safely ignore it.
 Best Regards`,
       });
     } else {
+      const origin = getServerSelfOrigin(req);
+      const landingPath = '/auth/profile';
+      const magicLink = await createMagicLink({ origin, email, expiresAfterDays: 3, landingPath });
+
       await mailService.sendLink({
         to: email,
         subject: `Link to reset your password`,
