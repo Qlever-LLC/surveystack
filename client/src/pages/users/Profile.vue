@@ -29,7 +29,7 @@
           <v-card-title> Leave Group </v-card-title>
           <v-card-text class="mt-4">
             Are you sure you want to leave the
-            <strong>{{ activeGroupName }}</strong
+            <strong>{{ activeMemebership ? activeMemebership.group.name : 'current active group' }}</strong
             >?
           </v-card-text>
           <v-card-actions>
@@ -151,13 +151,6 @@ export default {
       set(val) {
         this.$store.dispatch('memberships/setActiveGroup', val);
       },
-    },
-    activeGroupName() {
-      const group = this.$store.getters['memberships/getGroupById'](this.activeGroup);
-      if (group) {
-        return group.name;
-      }
-      return 'current active group';
     },
     activeMemebership() {
       return this.$store.getters['memberships/getMembershipByGroupId'](this.activeGroup);
