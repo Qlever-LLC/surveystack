@@ -261,7 +261,7 @@ export const buildPipeline = async (req, res) => {
     const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
 
     if (hasAdminRights) {
-      addeUserDetailsStage(pipeline);
+      addUserDetailsStage(pipeline);
     }
   }
 
@@ -345,7 +345,7 @@ export const buildPipeline = async (req, res) => {
   return pipeline;
 };
 
-const addeUserDetailsStage = (pipeline) => {
+const addUserDetailsStage = (pipeline) => {
   pipeline.push({
     $lookup: {
       from: 'users',
@@ -608,7 +608,7 @@ const getSubmission = async (req, res) => {
     const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
 
     if (hasAdminRights) {
-      addeUserDetailsStage(pipeline);
+      addUserDetailsStage(pipeline);
     }
   }
 
