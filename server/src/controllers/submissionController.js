@@ -361,7 +361,6 @@ const addUserDetailsStage = (pipeline) => {
     $unwind: { path: '$meta.creatorDetail', preserveNullAndEmptyArrays: true },
   });
 
-  /* TEMPORARY DISABLED DUE TO PERFRMANCE ISSUES IN SOILSTACK, see https://gitlab.com/our-sci/software/surveystack/-/issues/144
   pipeline.push({
     $lookup: {
       from: 'users',
@@ -390,7 +389,7 @@ const addUserDetailsStage = (pipeline) => {
   });
   pipeline.push({
     $unwind: { path: '$meta.resubmitterUserDetail', preserveNullAndEmptyArrays: true },
-  });*/
+  });
 };
 
 const getSubmissionsPage = async (req, res) => {
