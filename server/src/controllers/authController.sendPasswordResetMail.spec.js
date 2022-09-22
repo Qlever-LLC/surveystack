@@ -55,11 +55,12 @@ describe('sendPasswordResetMail', () => {
     expect(res.send).toHaveBeenCalledWith({ ok: true });
   });
 
-  it('handles `useLegacy` query param', async () => {
+  it("when `useLegacy` query param is true, it sends an email with a link containing the request's origin header", async () => {
     const user = await createUser();
     const req = createReq({
       body: { email: user.email },
       query: { useLegacy: 'true' },
+      headers: { origin: 'https://app.soilstack.io' },
     });
     await sendPasswordResetMail(req, await createRes());
     expect(mailService.send).toHaveBeenCalledTimes(1);
@@ -67,7 +68,7 @@ describe('sendPasswordResetMail', () => {
       to: user.email,
       subject: 'Link to reset your password',
       text: expect.stringContaining(
-        `${origin}/auth/reset-password?token=${user.token}&email=${user.email}`
+        `${req.headers.origin}/auth/reset-password?token=${user.token}&email=${user.email}`
       ),
     });
   });
