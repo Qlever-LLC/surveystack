@@ -101,17 +101,17 @@ export default {
         collect: [
           {
             type: 'subheader',
-            label: 'COLLECT',
+            label: this.$t('navigation.collect'),
           },
           {
             type: 'link',
-            label: 'My Submissions',
+            label: this.$t('navigation.mySubmissions'),
             to: { name: 'my-submissions' },
             icon: 'mdi-clipboard',
           },
           {
             type: 'link',
-            label: 'Browse',
+            label: this.$t('navigation.browse'),
             to: { name: 'surveys-browse' },
             icon: 'mdi-magnify',
           },
