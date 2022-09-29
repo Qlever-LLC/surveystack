@@ -173,11 +173,13 @@ router.put(
   ],
   catchErrors(surveyController.updateSurvey)
 );
-router.delete(
-  '/surveys/:id',
+router.post(
+  '/surveys/cleanup/:id',
   [assertAuthenticated, assertEntityExists({ collection: 'surveys' })],
-  catchErrors(surveyController.deleteSurvey)
+  catchErrors(surveyController.cleanupSurvey)
 );
+
+router.delete('/surveys/:id?');
 
 /** Users */
 router.get('/users', assertIsSuperAdmin, catchErrors(userController.getUsers));

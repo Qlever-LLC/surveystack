@@ -4,6 +4,8 @@ import boom from '@hapi/boom';
 
 import { db } from '../db';
 import _ from 'lodash';
+import countBy from 'lodash/countBy';
+import get from 'lodash/get';
 
 import { checkSurvey, changeRecursive, changeRecursiveAsync } from '../helpers/surveys';
 import rolesService from '../services/roles.service';
@@ -600,6 +602,75 @@ const getPinned = async (req, res) => {
   });
 };
 
+const cleanupSurvey = async (req, res) => {
+  const { id } = req.params;
+  const { versions, resourceIds, auto } = req.query;
+  const survey = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  if (!survey) {
+    throw boom.notFound(`No entity with _id exists: ${id}`);
+  }
+
+  const isAllowed = await isUserAllowedToModifySurvey(survey, res.locals.auth.user._id);
+  if (!isAllowed) {
+    throw boom.unauthorized(`You are not authorized to update survey: ${id}`);
+  }
+
+  const SUBMISSIONS_COLLECTION = 'submissions';
+  // TODO: should this just use `buildPipeline` from submissionsController? seems excessive
+  const pipeline = [
+    {
+      $match: { 'meta.survey.id': new ObjectId(id) },
+    },
+    {
+      $match: { 'meta.archived': { $ne: true } },
+    },
+    {
+      $project: { 'meta.survey.version': 1 },
+    },
+  ];
+  const surveyVersions = survey.revisions.map(({ version }) => String(version));
+
+  const submissions = await db
+    .collection(SUBMISSIONS_COLLECTION)
+    .aggregate(pipeline, { allowDiskUse: true })
+    .toArray();
+
+  const getSurveyVersion = (submission) => submission.meta.survey.version;
+  const submissionsVersionCounts = _.countBy(submissions.map(getSurveyVersion));
+
+  const versionsToKeep = Array.from(
+    new Set([...Object.keys(submissionsVersionCounts), String(survey.latestVersion)])
+  );
+
+  // const versionsToDelete = _.difference(
+  //   surveyVersions,
+  //   Object.keys(submissionsVersionCounts)
+  // ).filter(({ version }) => version !== survey.latestVersion);
+
+  const versionsToDelete = _.difference(surveyVersions, versionsToKeep);
+  // const versionsToDelete = surveyVersions.filter((version) => !versionsToKeep.includes(version));
+
+  console.log(submissionsVersionCounts, versionsToDelete);
+
+  const shouldKeepVersion = ({ version }) => versionsToKeep.includes(String(version));
+
+  const filteredSurvey = {
+    ...survey,
+    revisions: survey.revisions.filter(shouldKeepVersion),
+  };
+
+  console.log(JSON.stringify(filteredSurvey));
+  res.send({ deletedVersions: versionsToDelete, keptVersions: versionsToKeep });
+  // TODO:
+  // Get all submissions for different versions of survey to determine what can be deleted
+  // associate submissions to survey versions, count them
+  //
+
+  if (auto) {
+    console.log('stripping unnecessary versions');
+  }
+};
+
 export default {
   getSurveys,
   getSurveyPage,
@@ -612,4 +683,5 @@ export default {
   updateSurvey,
   deleteSurvey,
   checkForLibraryUpdates,
+  cleanupSurvey,
 };

@@ -11,9 +11,7 @@
             </v-btn>
           </template>
           <v-card>
-            <v-card-title>
-              Edit Survey Details
-            </v-card-title>
+            <v-card-title> Edit Survey Details </v-card-title>
             <v-card-text>
               <active-group-selector class="my-4" label="Group" v-model="value.meta.group" outlined returnObject />
               <v-select
@@ -26,9 +24,7 @@
             </v-card-text>
             <v-card-actions class="mr-3">
               <v-spacer />
-              <v-btn @click="editDetailsDialogIsVisible = false" color="primary" text>
-                Close
-              </v-btn>
+              <v-btn @click="editDetailsDialogIsVisible = false" color="primary" text> Close </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -39,9 +35,7 @@
             </v-btn>
           </template>
           <v-card>
-            <v-card-title>
-              Survey Resources
-            </v-card-title>
+            <v-card-title> Survey Resources </v-card-title>
             <v-card-text>
               <app-resources
                 :resources="survey.resources"
@@ -50,9 +44,7 @@
             </v-card-text>
             <v-card-actions class="mr-3">
               <v-spacer />
-              <v-btn @click="resourcesDialogIsVisible = false" color="primary" text>
-                Close
-              </v-btn>
+              <v-btn @click="resourcesDialogIsVisible = false" color="primary" text> Close </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -76,9 +68,7 @@
                   <label for="select-items-file-input-surveydetails" class="cursor-pointer">
                     <v-btn class="pointer-events-none" text>
                       <v-icon color="grey">mdi-file-upload</v-icon>
-                      <div class="ml-1">
-                        Import
-                      </div>
+                      <div class="ml-1">Import</div>
                     </v-btn>
                   </label>
                   <input
@@ -96,22 +86,21 @@
               <v-list-item-title>
                 <v-btn @click="$emit('export-survey')" text>
                   <v-icon color="grey">mdi-file-download</v-icon>
-                  <div class="ml-1">
-                    Export
-                  </div>
+                  <div class="ml-1">Export</div>
                 </v-btn>
+              </v-list-item-title>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title>
+                <v-btn @click="versionsDialogIsVisible = true" text> Survey Versions </v-btn>
               </v-list-item-title>
             </v-list-item>
             <v-list-item>
               <v-list-item-title>
                 <v-btn @click="editLibraryDialogIsVisible = true" text>
                   <v-icon color="grey">mdi-library</v-icon>
-                  <div class="ml-1" v-if="!value.meta.isLibrary">
-                    add to library
-                  </div>
-                  <div class="ml-1" v-if="value.meta.isLibrary">
-                    edit library data
-                  </div>
+                  <div class="ml-1" v-if="!value.meta.isLibrary">add to library</div>
+                  <div class="ml-1" v-if="value.meta.isLibrary">edit library data</div>
                 </v-btn>
               </v-list-item-title>
             </v-list-item>
@@ -119,9 +108,7 @@
               <v-list-item-title>
                 <v-btn @click="libraryConsumersDialogIsVisible = true" text>
                   <v-icon color="grey">mdi-layers-search</v-icon>
-                  <div class="ml-1">
-                    list library consumers
-                  </div>
+                  <div class="ml-1">list library consumers</div>
                 </v-btn>
               </v-list-item-title>
             </v-list-item>
@@ -129,9 +116,7 @@
               <v-list-item-title>
                 <v-btn text @click="$emit('delete')">
                   <v-icon color="grey">mdi-delete</v-icon>
-                  <div class="ml-1">
-                    Delete
-                  </div>
+                  <div class="ml-1">Delete</div>
                 </v-btn>
               </v-list-item-title>
             </v-list-item>
@@ -150,12 +135,18 @@
           :library-survey="value"
           @cancel="libraryConsumersDialogIsVisible = false"
         />
+        <versions-dialog
+          v-if="versionsDialogIsVisible"
+          v-model="versionsDialogIsVisible"
+          @cancel="versionsDialogIsVisible = false"
+          :survey="survey"
+        />
       </div>
       <div class="d-flex justify-space-between align-center mt-n1">
         <div class="body-2 grey--text caption">
           {{ value._id }}
         </div>
-        <div class="text-left ">
+        <div class="text-left">
           <v-chip dark small outlined color="grey"> Version {{ version }} </v-chip>
         </div>
       </div>
@@ -172,11 +163,6 @@
           class="mb-2 survey-group-name-input"
         />
         <div class="d-flex flex-wrap justify-end align-center">
-          <!-- <v-btn
-            class="my-1 mr-1"
-            @click="$emit('cancel')"
-            text
-          >Cancel</v-btn> -->
           <v-tooltip bottom v-if="!isNew">
             <template v-slot:activator="{ on }">
               <div v-on="on">
@@ -199,18 +185,6 @@
               Updating is only possible <em>only</em> when changing Labels of a Question.</span
             >
           </v-tooltip>
-
-          <!-- <v-btn
-            :dark="enableDismissDraft"
-            :disabled="!enableDismissDraft"
-            @click="$emit('dismissDraft')"
-            color="error"
-            text
-            class="my-1 mr-1"
-          >
-            <div>Dismiss Draft</div>
-          </v-btn> -->
-
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <div v-on="on">
@@ -247,28 +221,11 @@
             </template>
             <span>Save a new draft <strong>version</strong> of the Survey</span>
           </v-tooltip>
-          <!-- <v-tooltip bottom v-if="validationErrors.length > 0">
-            <template v-slot:activator="{ on }">
-              <div v-on="on">
-                <v-icon small color="error">mdi-close-circle-outline</v-icon>
-              </div>
-            </template>
-            <span
-              v-for="error in validationErrors"
-              :key="error"
-            >
-              {{error}}
-            </span>
-          </v-tooltip> -->
         </div>
       </div>
 
       <v-tooltip bottom v-if="validationErrors.length > 0">
         <template v-slot:activator="{ on }">
-          <!-- <div v-on="on" class="text-center mt-4 error--text" >
-            <v-icon color="error">mdi-exclamation</v-icon>
-            Survey contains errors
-          </div> -->
           <v-alert type="error" colored-border border="left" class="mt-2" elevation="2" v-on="on">
             Survey contains errors
           </v-alert>
@@ -290,6 +247,7 @@ import { getGroupNameById } from '@/utils/groups';
 import EditLibraryDialog from '@/components/survey/library/EditLibraryDialog';
 import PublishUpdatedLibraryDialog from '@/components/survey/library/PublishUpdatedLibraryDialog';
 import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryConsumersDialog';
+import VersionsDialog from './VersionsDialog.vue';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -303,6 +261,7 @@ export default {
       resourcesDialogIsVisible: false,
       editDetailsDialogIsVisible: false,
       editLibraryDialogIsVisible: false,
+      versionsDialogIsVisible: false,
       updateLibraryDialogIsVisible: false,
       libraryConsumersDialogIsVisible: false,
       surveyGroupName: 'Group Not Found',
@@ -328,27 +287,9 @@ export default {
     'version',
     'validationErrors',
   ],
-  computed: {
-    // surveyGroupName() {
-    //   const { id } = this.value.group;
-    //   const groups = this.$store.getters['memberships/groups'];
-    //   const { name } = groups.find(({ _id }) => id === _id);
-    //   if (!name) {
-    //   }
-    //   return name;
-    // },
-  },
   watch: {
     value: {
       async handler(value, oldValue) {
-        // console.log(value.group.id, this.value.group.id);
-        // if (
-        //   value.group && oldValue.group && value.group.id && oldValue.group.id
-        //   && value.group.id === oldValue.group.id
-        // ) {
-        //   console.log('groups are same');
-        //   return;
-        // }
         if (value.meta.group && value.meta.group.id) {
           this.surveyGroupName = await this.getGroupNameById(value.meta.group.id);
         }
@@ -363,6 +304,7 @@ export default {
     SurveyNameEditor,
     ActiveGroupSelector,
     appResources,
+    VersionsDialog,
   },
   methods: {
     async getGroupNameById(id) {
