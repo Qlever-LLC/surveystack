@@ -42,7 +42,7 @@ export default {
         const val = getValueOrNull(v);
         this.changed({
           name: val,
-          uuid: uuidv4(),
+          id: uuidv4(),
         });
       }
     },
