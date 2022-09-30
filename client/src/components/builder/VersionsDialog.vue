@@ -3,25 +3,44 @@
     <v-card>
       <v-card-title>Survey Versions</v-card-title>
       <v-card-text>
-        <v-list>
-          <v-list-item v-for="revision in survey.revisions" :key="revision.version">
-            <span class="mr-1">{{ revision.version }}:&nbsp;</span>
-            <span v-if="submissionsDataIsLoading"> Loading submissions </span>
-            <span v-else-if="submissionsDataHasLoaded && !submissionsDataHasError">
-              {{ getCount(revision.version) }} submission{{
-                getCount(revision.version) > 1 || getCount(revision.version) === 0 ? 's' : ''
-              }}
-              <span v-if="getCount(revision.version) === 0"><v-icon small>mdi-alert</v-icon></span>
+        <v-skeleton-loader type="list-item@3" v-if="cleanupInfoIsLoading" />
+        <p v-else-if="cleanupInfoHasError">An error occurred loading survey cleanup data</p>
+        <div v-else-if="cleanupInfoHasLoaded && !cleanupInfoHasError">
+          <v-checkbox
+            v-model="selectedVersionsToDelete"
+            :label="getVersionLabel(revision.version)"
+            :value="String(revision.version)"
+            :disabled="deleteVersionIsDisabled(revision.version)"
+            :append-icon="shouldDeleteVersion(revision.version) ? 'mdi-alert' : null"
+            v-for="revision in survey.revisions"
+            :key="revision.version"
+            class="mt-0"
+          />
+          <p>
+            Versions to be deleted:&nbsp;
+            <span v-if="selectedVersionsToDelete.length > 0">
+              {{ selectedVersionsToDelete.join(', ') }}
             </span>
-            <span v-else-if="submissionsDataHasError"> Error loading submissions data </span>
-          </v-list-item>
-          <p>Versions to be deleted: {{ versionsToDelete.join(', ') }}</p>
-        </v-list>
-        <v-btn @click="() => fetchSubmissionsData()">fetch data</v-btn>
+            <span v-else> none </span>
+          </p>
+        </div>
+        <!-- <v-btn @click="() => fetchCleanupInfo()">fetch data</v-btn> -->
+        <v-btn
+          @click="deleteVersions"
+          :disabled="deleteVersionsIsLoading || selectedVersionsToDelete.length === 0"
+          :loading="deleteVersionsIsLoading"
+        >
+          Delete selected versions
+        </v-btn>
+        <v-alert v-if="deleteVersionsHasError" type="error"> An error occurred deleting survey versions. </v-alert>
+        <v-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success">
+          Successfully deleted survey versions {{ deleteVersionsResponse.deletedVersions.join(', ') }}
+        </v-alert>
       </v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer />
+
         <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
       </v-card-actions>
     </v-card>
@@ -31,12 +50,7 @@
 <script>
 import { ref, computed } from '@vue/composition-api';
 import api from '@/services/api.service';
-import { fetchSubmissions } from '../survey/question_types/Ontology.vue';
-import countBy from 'lodash/countBy';
 import get from 'lodash/get';
-import difference from 'lodash/difference';
-
-const getSurveyVersion = (submission) => submission.meta.survey.version;
 
 export default {
   props: {
@@ -49,17 +63,49 @@ export default {
       required: true,
     },
   },
-  setup(props) {
-    const submissionsDataIsLoading = ref(false);
-    const submissionsDataHasLoaded = ref(false);
-    const submissionsDataHasError = ref(false);
-    const submissionsData = ref([]);
-    const submissionsVersionCounts = ref({});
-    const submissionsVersionCountsWithZeros = ref({});
-    // const versionsToDelete = computed(() => Object.entries(submissionsVersionCountsWithZeros.value).filter(([_, v]) => v === 0).map(([k, _]) => k)
-    // );
-    const surveyVersions = props.survey.revisions.map(({ version }) => String(version));
-    const versionsToDelete = computed(() => difference(surveyVersions, submissionsVersionCounts));
+  setup(props, { emit }) {
+    const initialCleanupInfo = {
+      versionsToKeep: [],
+      versionsToDelete: [],
+      surveyVersions: props.survey.revisions.map(({ version }) => String(version)),
+      surveySubmissionsVersionCounts: {},
+    };
+
+    const initialDeleteVersions = {
+      deletedVersions: [],
+      keptVersions: [],
+    };
+
+    const cleanupInfoIsLoading = ref(false);
+    const cleanupInfoHasLoaded = ref(false);
+    const cleanupInfoHasError = ref(false);
+    const cleanupInfoResponse = ref({ ...initialCleanupInfo });
+
+    const deleteVersionsIsLoading = ref(false);
+    const deleteVersionsHasLoaded = ref(false);
+    const deleteVersionsHasError = ref(false);
+    const deleteVersionsResponse = ref({ ...initialDeleteVersions });
+
+    const selectedVersionsToDelete = ref([]);
+
+    async function fetchCleanupInfo() {
+      cleanupInfoIsLoading.value = true;
+      cleanupInfoHasError.value = false;
+      cleanupInfoHasLoaded.value = false;
+      cleanupInfoResponse.value = { ...initialCleanupInfo };
+      try {
+        const { data } = await api.get(`/surveys/cleanup/${props.survey._id}`);
+        cleanupInfoResponse.value = data;
+        selectedVersionsToDelete.value = [...cleanupInfoResponse.value.versionsToDelete];
+      } catch {
+        cleanupInfoHasError.value = true;
+      } finally {
+        cleanupInfoHasLoaded.value = true;
+        cleanupInfoIsLoading.value = false;
+      }
+    }
+
+    fetchCleanupInfo();
 
     async function fetchLibraryConsumers() {
       const { data } = await api.get(`/surveys/list-library-consumers?id=${props.survey._id}`);
@@ -71,54 +117,57 @@ export default {
       fetchLibraryConsumers();
     }
 
-    async function fetchSubmissionsData() {
-      // TODO: Fix bug where empty submissions to be deleted shows wrong value
-
-      submissionsDataIsLoading.value = true;
-      submissionsDataHasError.value = false;
-      submissionsDataHasLoaded.value = false;
-      submissionsVersionCounts.value = {};
-      // submissionsVersionCountsWithZeros.value = {};
-      const queryParams = new URLSearchParams();
-      queryParams.append('project', '{"meta.survey.version":1}');
-      queryParams.append('survey', props.survey._id);
+    async function deleteVersions() {
       try {
-        const { data } = await api.get(`/submissions?${queryParams}`);
-        submissionsData.value = data;
-        submissionsVersionCounts.value = countBy(data.map(getSurveyVersion));
-        // submissionsVersionCountsWithZeros.value = surveyVersions.reduce((counts, version) => {
-        //   // console.log(version, get(submissionsVersionCounts.value, version, 0));
-        //   // console.log(counts);
-        //   return {
-        //     ...counts,
-        //     [version]: get(submissionsVersionCounts.value, version, 0),
-        //   };
-        // }, {});
+        deleteVersionsIsLoading.value = true;
+        deleteVersionsHasError.value = false;
+        deleteVersionsHasLoaded.value = false;
+        deleteVersionsResponse.value = { ...initialDeleteVersions };
+
+        const queryParams = new URLSearchParams();
+        selectedVersionsToDelete.value.forEach((v) => queryParams.append('versions[]', v));
+        // queryParams.append('dryRun', true);
+        const { data } = await api.post(`/surveys/cleanup/${props.survey._id}?${queryParams}`);
+        deleteVersionsResponse.value = data;
       } catch {
-        submissionsDataHasError.value = true;
+        deleteVersionsHasError.value = true;
       } finally {
-        submissionsDataHasLoaded.value = true;
-        submissionsDataIsLoading.value = false;
+        deleteVersionsHasLoaded.value = true;
+        deleteVersionsIsLoading.value = false;
       }
+      fetchCleanupInfo();
+      emit('reloadSurvey');
     }
 
-    async function deleteVersions() {}
+    function getCount(version) {
+      return get(cleanupInfoResponse.value.surveySubmissionsVersionCounts, version, 0);
+    }
 
-    fetchSubmissionsData();
+    const isPlural = (x) => x === 0 || x > 1;
 
     return {
-      submissionsDataIsLoading,
-      submissionsDataHasLoaded,
-      submissionsDataHasError,
-      submissionsData,
-      fetchSubmissionsData,
-      submissionsVersionCounts,
-      submissionsVersionCountsWithZeros,
-      getCount(version) {
-        return get(submissionsVersionCounts.value, version, 0);
-        // return submissionsVersionCountsWithZeros.value[version];
+      cleanupInfoIsLoading,
+      cleanupInfoHasLoaded,
+      cleanupInfoHasError,
+      cleanupInfoResponse,
+      fetchCleanupInfo,
+      getCount,
+      getVersionLabel(version) {
+        const count = getCount(version);
+        return `${version}: ${count} submission${isPlural(count) ? 's' : ''}`;
       },
-      versionsToDelete,
+      deleteVersionIsDisabled(version) {
+        return cleanupInfoResponse.value.versionsToKeep.includes(String(version));
+      },
+      shouldDeleteVersion(version) {
+        return cleanupInfoResponse.value.versionsToDelete.includes(String(version));
+      },
+      selectedVersionsToDelete,
+      deleteVersionsIsLoading,
+      deleteVersionsHasLoaded,
+      deleteVersionsHasError,
+      deleteVersionsResponse,
+      deleteVersions,
     };
   },
 };

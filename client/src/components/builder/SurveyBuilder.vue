@@ -49,6 +49,7 @@
             @addToLibrary="addToLibrary"
             class="mb-4"
             data-testid="survey-details"
+            @reloadSurvey="() => $emit('reloadSurvey')"
           />
           <graphical-view
             v-if="!viewCode"

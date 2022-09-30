@@ -12,6 +12,7 @@
       @onDelete="onDelete"
       @import-survey="importSurvey"
       @export-survey="exportSurvey"
+      @reloadSurvey="onReloadSurvey"
     />
     <div v-else class="d-flex align-center justify-center" style="height: 100%">
       <v-progress-circular :size="50" color="primary" indeterminate />
@@ -252,7 +253,6 @@ export default {
       this.sessionId = new ObjectId().toString();
       this.survey = { ...tmp };
     },
-
     async importSurvey({
       target: {
         files: [file],
@@ -340,6 +340,10 @@ export default {
       }
       this.sessionId = new ObjectId().toString();
       this.loading = false;
+    },
+    onReloadSurvey() {
+      this.loading = true;
+      this.fetchData();
     },
   },
   async created() {

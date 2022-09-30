@@ -140,6 +140,7 @@
           v-model="versionsDialogIsVisible"
           @cancel="versionsDialogIsVisible = false"
           :survey="survey"
+          @reloadSurvey="() => $emit('reload')"
         />
       </div>
       <div class="d-flex justify-space-between align-center mt-n1">

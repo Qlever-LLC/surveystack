@@ -9,6 +9,7 @@ import get from 'lodash/get';
 
 import { checkSurvey, changeRecursive, changeRecursiveAsync } from '../helpers/surveys';
 import rolesService from '../services/roles.service';
+import { versions } from 'process';
 
 const col = 'surveys';
 const DEFAULT_LIMIT = 20;
@@ -602,23 +603,18 @@ const getPinned = async (req, res) => {
   });
 };
 
-// const getCleanupSurveyInfo = async (req, res) => {};
-
-const cleanupSurvey = async (req, res) => {
-  const { id } = req.params;
-  const { versions, resourceIds, auto } = req.query;
+const getSurveyAndCleanupInfo = async (id, userId) => {
   const survey = await db.collection(col).findOne({ _id: new ObjectId(id) });
   if (!survey) {
     throw boom.notFound(`No entity with _id exists: ${id}`);
   }
 
-  const isAllowed = await isUserAllowedToModifySurvey(survey, res.locals.auth.user._id);
+  const isAllowed = await isUserAllowedToModifySurvey(survey, userId);
   if (!isAllowed) {
     throw boom.unauthorized(`You are not authorized to update survey: ${id}`);
   }
 
   const SUBMISSIONS_COLLECTION = 'submissions';
-  // TODO: should this just use `buildPipeline` from submissionsController? seems excessive
   const pipeline = [
     {
       $match: { 'meta.survey.id': new ObjectId(id) },
@@ -630,8 +626,6 @@ const cleanupSurvey = async (req, res) => {
       $project: { 'meta.survey.version': 1 },
     },
   ];
-  const surveyVersions = survey.revisions.map(({ version }) => String(version));
-
   const submissions = await db
     .collection(SUBMISSIONS_COLLECTION)
     .aggregate(pipeline, { allowDiskUse: true })
@@ -639,35 +633,67 @@ const cleanupSurvey = async (req, res) => {
 
   const getSurveyVersion = (submission) => submission.meta.survey.version;
   const submissionsVersionCounts = _.countBy(submissions.map(getSurveyVersion));
-
   const versionsToKeep = Array.from(
     new Set([...Object.keys(submissionsVersionCounts), String(survey.latestVersion)])
   );
-
+  const surveyVersions = survey.revisions.map(({ version }) => String(version));
   const versionsToDelete = _.difference(surveyVersions, versionsToKeep);
-  // const versionsToDelete = surveyVersions.filter((version) => !versionsToKeep.includes(version));
+  return {
+    survey,
+    surveyVersions,
+    versionsToKeep,
+    versionsToDelete,
+    submissionsVersionCounts,
+  };
+};
 
-  console.log(submissionsVersionCounts, versionsToDelete);
+const getCleanupSurveyInfo = async (req, res) => {
+  const { id } = req.params;
+  const { versionsToKeep, versionsToDelete, surveyVersions, submissionsVersionCounts } =
+    await getSurveyAndCleanupInfo(id, res.locals.auth.user._id);
+  res.send({
+    versionsToKeep,
+    versionsToDelete,
+    surveyVersions,
+    surveySubmissionsVersionCounts: submissionsVersionCounts,
+  });
+};
 
-  const shouldKeepVersion = ({ version }) => versionsToKeep.includes(String(version));
+const cleanupSurvey = async (req, res) => {
+  const { id } = req.params;
+  const { versions: requestedVersionsToDelete, resourceIds, auto, dryRun } = req.query;
+  const { survey, versionsToKeep, versionsToDelete } = await getSurveyAndCleanupInfo(
+    id,
+    res.locals.auth.user._id
+  );
+  console.log(requestedVersionsToDelete);
+  // Don't allow deletion of survey versions that have associated submissions
+  if (requestedVersionsToDelete.some((v) => !versionsToDelete.includes(v))) {
+    return res.status(404).send({ message: 'Invalid version cleanup requested' });
+  }
 
+  const versionsToFilter = auto ? versionsToDelete : requestedVersionsToDelete;
+  const shouldKeepVersion = ({ version }) => !versionsToFilter.includes(String(version));
   const filteredSurveyRevisions = survey.revisions.filter(shouldKeepVersion);
 
-  if (auto) {
+  if (versionsToDelete.length > 0) {
     try {
-      let updated = await db.collection(col).findOneAndUpdate(
-        { _id: new ObjectId(id) },
-        {
-          $set: {
-            revisions: filteredSurveyRevisions,
+      let updated = {};
+      if (!dryRun) {
+        updated = await db.collection(col).findOneAndUpdate(
+          { _id: new ObjectId(id) },
+          {
+            $set: {
+              revisions: filteredSurveyRevisions,
+            },
           },
-        },
-        { returnOriginal: false }
-      );
+          { returnOriginal: false }
+        );
+      }
       return res.send({ updated, deletedVersions: versionsToDelete, keptVersions: versionsToKeep });
     } catch (err) {
       console.log(err);
-      return res.status(500).send({ message: 'Ouch :/' });
+      return res.status(500).send({ message: 'Could not clean up survey' });
     }
   }
 
@@ -687,4 +713,5 @@ export default {
   deleteSurvey,
   checkForLibraryUpdates,
   cleanupSurvey,
+  getCleanupSurveyInfo,
 };
