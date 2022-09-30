@@ -86,7 +86,7 @@ const base = (type) => ({
               farmName: '',
               url: '',
               name: node.value.name,
-              fieldId: node.value.uuid,
+              fieldId: node.value.id,
             },
           });
         }
@@ -113,7 +113,7 @@ const base = (type) => ({
                       farmName: '',
                       url: '',
                       name: targetValue.name,
-                      fieldId: targetValue.uuid,
+                      fieldId: targetValue.id,
                     },
                   });
                 }
@@ -190,7 +190,7 @@ const base = (type) => ({
               farmName: '',
               url: '',
               name: node.value.name,
-              assetId: node.value.uuid,
+              assetId: node.value.id,
               archived: false,
               location: [],
             },
@@ -218,7 +218,7 @@ const base = (type) => ({
                       farmName: '',
                       url: '',
                       name: targetValue.name,
-                      assetId: targetValue.uuid,
+                      assetId: targetValue.id,
                       archived: false,
                       location: [],
                     },

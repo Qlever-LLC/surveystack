@@ -55,7 +55,7 @@
           const text = getValueOrNull(v);
           value = {
             name: text,
-            uuid: uuidv4(),
+            id: uuidv4(),
           };
         }
         onInput();
