@@ -1,5 +1,5 @@
 <template>
-  <div class="screen-root" style="padding: 0px 12px 0px 0px !important">
+  <div class="screen-root">
     <v-dialog v-model="viewCode">
       <app-code-view v-model="survey" />
     </v-dialog>
@@ -21,8 +21,8 @@
       This survey uses an outdated question library set. Consider reviewing the new version and updating it.
     </v-alert>
 
-    <splitpanes style="padding: 0px !important" class="pane-root" vertical>
-      <pane class="pane pane-survey" style="position: relative; overflow: hidden">
+    <splitpanes class="pane-root" vertical>
+      <pane class="pane pane-survey">
         <div class="pane-fixed-wrapper pr-2" style="position: relative">
           <control-adder @controlAdded="controlAdded" @openLibrary="openLibrary" />
           <survey-details
@@ -80,29 +80,27 @@
       </pane>
 
       <pane class="pane pane-controls" v-if="control">
-        <v-card class="pb-3 mb-3">
-          <div class="px-4">
-            <!-- <v-card-title class="pl-0">Details</v-card-title> -->
-            <control-properties
-              v-if="control"
-              :control="control"
-              :survey="survey"
-              :calculate="optionsCalculate"
-              :relevance="optionsRelevance"
-              :constraint="optionsConstraint"
-              :api-compose="optionsApiCompose"
-              :controls="currentControls"
-              @code-calculate="highlight('calculate')"
-              @code-relevance="highlight('relevance')"
-              @code-constraint="highlight('constraint')"
-              @code-api-compose="highlight('apiCompose')"
-              @set-control-source="setControlSource"
-              @set-survey-resources="setSurveyResources"
-              @set-control-params="setControlParams"
-              @set-script-editor-is-visible="setScriptIsVisible"
-              data-testid="control-properties"
-            />
-          </div>
+        <v-card class="px-4 pb-3 mb-3">
+          <!-- <v-card-title class="pl-0">Details</v-card-title> -->
+          <control-properties
+            v-if="control"
+            :control="control"
+            :survey="survey"
+            :calculate="optionsCalculate"
+            :relevance="optionsRelevance"
+            :constraint="optionsConstraint"
+            :api-compose="optionsApiCompose"
+            :controls="currentControls"
+            @code-calculate="highlight('calculate')"
+            @code-relevance="highlight('relevance')"
+            @code-constraint="highlight('constraint')"
+            @code-api-compose="highlight('apiCompose')"
+            @set-control-source="setControlSource"
+            @set-survey-resources="setSurveyResources"
+            @set-control-params="setControlParams"
+            @set-script-editor-is-visible="setScriptIsVisible"
+            data-testid="control-properties"
+          />
         </v-card>
       </pane>
       <pane class="pane pane-script" v-if="hasScript && scriptEditorIsVisible && scriptCode !== null">
@@ -156,6 +154,7 @@
           </pane>
         </splitpanes>
       </pane>
+
       <pane
         class="pane pane-submission-code pane-shared-code"
         v-if="(hasCode && !hideCode) || (hasScript && scriptEditorIsVisible)"
@@ -170,6 +169,7 @@
           ></code-editor>
         </div>
       </pane>
+
       <pane class="pane pane-draft" :style="{ width: isPreviewMobile ? '375px' : '800px' }">
         <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
         <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px); overflow: auto">
@@ -205,6 +205,9 @@
           </v-card>
         </v-overlay>
       </pane>
+
+      <!-- Padding pane - DO NOT DELETE -->
+      <pane />
     </splitpanes>
   </div>
 </template>
@@ -942,6 +945,12 @@ export default {
 };
 </script>
 
+<style>
+.pane-root .splitpanes__splitter {
+  background-color: #eee;
+}
+</style>
+
 <style scoped>
 .screen-root {
   width: 100%;
@@ -951,18 +960,9 @@ export default {
 }
 
 .pane-root {
+  min-width: 100%;
   height: 100%;
-  padding: 12px;
-  width: 2800px;
-  min-width: 100vw;
-}
-
-.pane-root > .pane ~ .pane {
-  border-left: 1px solid #eee;
-}
-
-.horizontal-line {
-  border-bottom: 1px solid #eee;
+  padding: 0;
 }
 
 .pane {
@@ -971,11 +971,10 @@ export default {
   height: calc(100vh - 64px - 30px - 24px);
   min-width: 400px;
   max-height: 100%;
-  margin-top: 15px;
-  margin-left: 15px;
-  margin-right: 15px;
+  margin: 15px;
   margin-bottom: 0px;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .pane-survey,
@@ -1005,14 +1004,10 @@ export default {
   min-width: 700px;
 }
 
-.pane-survey {
-  overflow: auto;
-}
-
 .pane-draft {
   width: 100vw;
   align-self: center;
-  overflow: auto;
+  margin: 15px 60px;
 }
 
 .hide-pane {

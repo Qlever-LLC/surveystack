@@ -1,14 +1,9 @@
 <template>
-  <v-container fluid class="instructions">
-    <v-row>
-      <v-col cols="12">
-        <app-control-label :value="control.label" :redacted="redacted" :required="required" />
-        <div v-if="control.options.source" v-html="control.options.source" class="instructions" />
-
-        <app-control-more-info :value="control.moreInfo" />
-      </v-col>
-    </v-row>
-  </v-container>
+  <div class="instructions">
+    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <div v-if="control.options.source" v-html="control.options.source" class="instructions" />
+    <app-control-more-info :value="control.moreInfo" />
+  </div>
 </template>
 
 <script>
