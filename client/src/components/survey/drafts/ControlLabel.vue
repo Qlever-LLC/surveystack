@@ -1,5 +1,5 @@
 <template>
-  <div v-if="value || required || redacted" class="d-flex align-center control-label-wrapper">
+  <div class="d-flex align-center control-label-wrapper" :class="className">
     <div class="control-label" v-if="value">{{ value }}</div>
     <v-spacer />
     <app-redacted v-if="redacted" bottom />
@@ -17,14 +17,25 @@ export default {
     appRequired,
     appRedacted,
   },
+  computed: {
+    className() {
+      return {
+        'margin-top-3': this.value,
+        'mb-3': this.value || this.required || this.redacted,
+        'mb-0': !this.value && !this.required && !this.redacted,
+      };
+    },
+  },
 };
 </script>
 
-<style scoped>
-.control-label-wrapper {
-  margin-bottom: 12px;
+<style>
+.compact-page .control-label-wrapper.margin-top-3 {
+  margin-top: 12px;
 }
+</style>
 
+<style scoped>
 .control-label {
   font-size: 1.25rem;
   line-height: 2rem;

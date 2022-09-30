@@ -96,7 +96,10 @@ export default {
   },
   computed: {
     className() {
-      return `mx-0 px-0 ${this.control.type === 'page' && this.control.options.compact ? 'compact-page' : ''}`;
+      return {
+        'mx-0 px-0': true,
+        'compact-page': this.control.type === 'page' && this.control.options.compact,
+      };
     },
     submission() {
       return this.$store.getters['draft/submission'];
@@ -143,11 +146,12 @@ export default {
 .compact-page {
   .control {
     margin: 0px !important;
-    padding: 0.25rem 0.5rem 1rem !important;
+    padding: 0.5rem !important;
     box-shadow: none !important;
 
     .control-label-wrapper {
       margin-bottom: 4px !important;
+      min-height: 16px;
     }
 
     .control-more-info {
@@ -156,6 +160,7 @@ export default {
   }
 
   & > div {
+    margin-bottom: 0.5rem;
     box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
 
     & > :first-child .control {
@@ -164,7 +169,7 @@ export default {
     }
 
     & > :last-child .control {
-      margin-bottom: 8px !important;
+      padding-bottom: 24px !important;
     }
   }
 }
