@@ -33,6 +33,12 @@
                     class="mt-2"
                   ></v-switch>
                   <v-switch
+                    :input-value="showExploded"
+                    @change="showExploded = $event"
+                    label="Show exploded"
+                    class="mt-2 ml-5"
+                  ></v-switch>
+                  <v-switch
                     :input-value="archived"
                     @change="$emit('showArchived', $event)"
                     label="View archived only"
@@ -94,18 +100,12 @@
       <template v-for="header in headers" v-slot:[`header.${header.value}`]>
         <span
           :key="header.value"
-          @click.stop="showFull(header.value, header.value, $event)"
-          :class="{ activeHeader: isModalOpen(header.value) }"
+          @click.stop="openModal($event, header.text)"
+          :class="{ activeHeader: isModalOpen(header.text) }"
         >
           <div :class="shouldTruncate(header.value) ? 'truncate-header' : 'non-truncated-header'">
-            {{ header.value }}
+            {{ header.text }}
           </div>
-          <submission-table-cell-modal
-            v-if="isModalOpen(header.value)"
-            :value="header.value"
-            @close="closeModal"
-            :left="modalLeftPosition"
-          />
         </span>
       </template>
 
@@ -125,11 +125,20 @@
             <td
               v-for="header in headers"
               :key="header.text"
-              @click.stop="showFullCell(item, header, $event)"
-              :class="{ active: isModalOpen(getCellKey(header.value, item._id)) }"
+              @click.stop="openModal($event, getCellValue(item, header.value), true)"
+              :class="{ active: isModalOpen(getCellValue(item, header.value)) }"
             >
+              <table v-if="Array.isArray(item[header.value])">
+                <tr v-for="(child, index) in item[header.value]" :key="index">
+                  <td :class="{ 'matrix-cell': index < item.count - 1 }" @click.stop="openModal($event, child, true)">
+                    <div :class="{ truncate: shouldTruncate(child) }">
+                      {{ child }}
+                    </div>
+                  </td>
+                </tr>
+              </table>
               <div
-                v-if="item[header.value].includes('resources/')"
+                v-else-if="item[header.value].includes('resources/')"
                 :class="{ truncate: shouldTruncate(getLabelFromKey(item[header.value])) }"
               >
                 <a @click.stop="openResource(item[header.value])"> {{ getLabelFromKey(item[header.value]) }}</a>
@@ -137,18 +146,21 @@
               <div v-else :class="{ truncate: shouldTruncate(item[header.value]) }">
                 {{ item[header.value] }}
               </div>
-              <submission-table-cell-modal
-                v-if="isModalOpen(getCellKey(header.value, item._id))"
-                @close="closeModal"
-                :value="item[header.value]"
-                :showCopyButton="true"
-                :left="modalLeftPosition"
-              />
             </td>
           </tr>
         </tbody>
       </template>
     </v-data-table>
+
+    <submission-table-cell-modal
+      v-if="!!activeTableCell"
+      :value="activeTableCell"
+      :left="modalLeftPosition"
+      :top="modalTopPosition"
+      :showCopyButton="modalShowCopyButton"
+      @close="closeModal"
+    />
+
     <v-dialog :value="downloadingResource" hide-overlay persistent width="300" role="downloadingResourceProgressDialog">
       <v-card>
         <v-card-text class="pa-4">
@@ -168,14 +180,73 @@ import csvService from '@/services/csv.service';
 import SubmissionTableCellModal from './SubmissionTableCellModal.vue';
 import { getLabelFromKey, openResourceInTab } from '@/utils/resources';
 
-export function transformHeaders(headers) {
-  const replaceGeoJsonPath = (str) => str.replace(/(value\.features\.\d).*/, '$1');
-  // Remove GeoJSON question type paths from headers
-  return Array.isArray(headers) ? [...new Set(headers.map(replaceGeoJsonPath))] : headers;
+function getPropertiesFromMatrix(headers, matrix) {
+  if (!Array.isArray(headers) || typeof matrix !== 'string') {
+    return [];
+  }
+  const key = `${matrix}.0.`;
+  const matches = headers.filter((header) => header.startsWith(key));
+  const properties = matches.map((header) => header.substring(key.length));
+  return properties;
 }
 
-export function getCellKey(headerValue, itemId) {
-  return `${headerValue}_${itemId}`;
+function transformItem(item, rawHeaders, headers, exploded) {
+  const row = {};
+  let count = 1;
+  const columns = headers.map((header) => header.value);
+  columns.forEach((header) => {
+    if (header in item) {
+      row[header] = item[header];
+    } else {
+      const [matrix, property] = header.split('-');
+      const children = rawHeaders.filter((r) => r.startsWith(matrix) && r.endsWith(property)).map((key) => item[key]);
+      row[header] = exploded ? children : JSON.stringify(children);
+      if (exploded && children.length > count) {
+        count = children.length;
+      }
+    }
+  });
+  row.count = count;
+  return row;
+}
+
+function transformHeaders(headers) {
+  if (!Array.isArray(headers)) {
+    return headers;
+  }
+
+  // Remove GeoJSON question type paths from headers
+  const replaceGeoJsonPath = (str) => str.replace(/(value\.features\.\d).*/, '$1');
+  return [...new Set(headers.map(replaceGeoJsonPath))];
+}
+
+function transformMatrixHeaders(headers) {
+  // Group matrix questions type paths
+  const result = [];
+  const matrixHeaders = [
+    ...new Set(
+      headers
+        .map((header) => {
+          const matched = header.match(/\.\d+\./g);
+          if (matched) {
+            const [key] = header.split(matched[0]);
+            return key;
+          }
+          return false;
+        })
+        .filter((header) => !!header)
+    ),
+  ];
+  headers.forEach((header) => {
+    const matched = matrixHeaders.find((h) => header.startsWith(h));
+    if (matched) {
+      result.push(matched);
+    } else {
+      result.push(header);
+    }
+  });
+
+  return [...new Set(result)];
 }
 
 export default {
@@ -228,16 +299,21 @@ export default {
       },
       headers: [],
       modalLeftPosition: null,
+      modalTopPosition: null,
+      modalShowCopyButton: false,
       downloadingResource: false,
       openResourceError: false,
+      showExploded: true,
     };
   },
   computed: {
     items() {
-      if (this.parsed) {
-        return this.parsed.data;
+      if (!this.parsed) {
+        return [];
       }
-      return [];
+      return this.parsed.data.map((item) =>
+        transformItem(item, this.parsed.meta.fields, this.headers, this.showExploded)
+      );
     },
     tableSelected: {
       get() {
@@ -258,29 +334,30 @@ export default {
   },
   methods: {
     getLabelFromKey,
-    getCellKey,
+    getCellValue(item, header) {
+      return typeof item[header] === 'string' ? item[header] : '';
+    },
     shouldTruncate(value) {
       return value.length > this.textTruncateLength;
     },
-    showFull(value, id, ev) {
+    isModalOpen(value) {
+      return this.activeTableCell === value;
+    },
+    openModal(ev, value, showCopyButton = false) {
       if (value.length > this.textTruncateLength) {
-        this.activeTableCell = id;
+        this.activeTableCell = value;
         this.modalLeftPosition =
           ev.target.getBoundingClientRect().left - this.$refs.table.$el.getBoundingClientRect().left;
+        this.modalTopPosition =
+          ev.target.getBoundingClientRect().top - this.$refs.table.$el.getBoundingClientRect().top;
+        this.modalShowCopyButton = showCopyButton;
       }
-    },
-    showFullCell(item, header, ev) {
-      this.showFull(item[header.value], this.getCellKey(header.value, item._id), ev);
-    },
-    isModalOpen(id) {
-      return this.activeTableCell === id;
-    },
-    isCellModalOpen(header, item) {
-      return this.isModalOpen(getCellKey(header.value, item._id));
     },
     closeModal() {
       this.activeTableCell = null;
       this.modalLeftPosition = null;
+      this.modalTopPosition = null;
+      this.modalShowCopyButton = false;
     },
     createCustomFilter(field) {
       return (value, search, item) => {
@@ -293,17 +370,30 @@ export default {
     createHeaders() {
       const headers = [];
       if (this.parsed) {
-        this.parsed.meta.fields.forEach((header) => {
+        const rawHeaders = this.parsed.meta.fields;
+        const matrixHeaders = transformMatrixHeaders(rawHeaders);
+        matrixHeaders.forEach((header) => {
           if (this.excludeMeta && (header.startsWith('meta') || header.includes('meta'))) {
             return;
           }
           this.$set(this.searchFields, header, ''); // v-data-table search/filter is not used at this moment
 
-          headers.push({
-            text: header,
-            value: header,
-            filter: this.createCustomFilter(header),
-          });
+          if (rawHeaders.includes(header) || !this.showExploded) {
+            headers.push({
+              text: header,
+              value: header,
+              filter: this.createCustomFilter(header),
+            });
+          } else {
+            const properties = getPropertiesFromMatrix(rawHeaders, header);
+            headers.push(
+              ...properties.map((h) => ({
+                text: `${header}.${h}`,
+                value: `${header}-${h}`,
+                filter: this.createCustomFilter(`${header}-${h}`),
+              }))
+            );
+          }
         });
       }
       this.headers = headers;
@@ -391,5 +481,17 @@ export default {
 }
 .activeHeader {
   padding: 0.9rem 0;
+}
+
+.matrix-cell {
+  position: relative;
+}
+.matrix-cell div::after {
+  content: '';
+  position: absolute;
+  left: -18px;
+  right: -18px;
+  bottom: 0;
+  border-bottom: thin solid rgba(0, 0, 0, 0.12);
 }
 </style>

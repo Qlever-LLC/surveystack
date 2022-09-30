@@ -1,7 +1,7 @@
 <template>
   <span class="modal" role="dialog">
     <div class="overlay" @click.stop="$emit('close', $event.target.value)" data-testid="overlay"></div>
-    <div class="modal-content" :style="{ left: `${left}px` }">
+    <div class="modal-content" :style="{ left: `${left}px`, top: `${top}px` }">
       <span class="font-weight-regular">
         {{ value }}
       </span>
@@ -26,6 +26,9 @@ export default {
     left: {
       type: Number,
     },
+    top: {
+      type: Number,
+    },
   },
 };
 </script>
@@ -41,9 +44,9 @@ export default {
   padding: 0.5rem;
   white-space: initial;
   position: absolute;
-  transform: translate(-15px, -140%);
+  transform: translate(-15px, calc(-100% - 4px));
   min-height: 40px;
-  max-height: 100px;
+  max-height: 150px;
   width: 400px;
   overflow-y: auto;
 }
