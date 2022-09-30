@@ -8,7 +8,9 @@
             <span class="mr-1">{{ revision.version }}:&nbsp;</span>
             <span v-if="submissionsDataIsLoading"> Loading submissions </span>
             <span v-else-if="submissionsDataHasLoaded && !submissionsDataHasError">
-              {{ getCount(revision.version) }} submissions
+              {{ getCount(revision.version) }} submission{{
+                getCount(revision.version) > 1 || getCount(revision.version) === 0 ? 's' : ''
+              }}
               <span v-if="getCount(revision.version) === 0"><v-icon small>mdi-alert</v-icon></span>
             </span>
             <span v-else-if="submissionsDataHasError"> Error loading submissions data </span>
@@ -70,11 +72,13 @@ export default {
     }
 
     async function fetchSubmissionsData() {
+      // TODO: Fix bug where empty submissions to be deleted shows wrong value
+
       submissionsDataIsLoading.value = true;
       submissionsDataHasError.value = false;
       submissionsDataHasLoaded.value = false;
       submissionsVersionCounts.value = {};
-      submissionsVersionCountsWithZeros.value = {};
+      // submissionsVersionCountsWithZeros.value = {};
       const queryParams = new URLSearchParams();
       queryParams.append('project', '{"meta.survey.version":1}');
       queryParams.append('survey', props.survey._id);
@@ -82,14 +86,14 @@ export default {
         const { data } = await api.get(`/submissions?${queryParams}`);
         submissionsData.value = data;
         submissionsVersionCounts.value = countBy(data.map(getSurveyVersion));
-        submissionsVersionCountsWithZeros.value = surveyVersions.reduce((counts, version) => {
-          // console.log(version, get(submissionsVersionCounts.value, version, 0));
-          // console.log(counts);
-          return {
-            ...counts,
-            [version]: get(submissionsVersionCounts.value, version, 0),
-          };
-        }, {});
+        // submissionsVersionCountsWithZeros.value = surveyVersions.reduce((counts, version) => {
+        //   // console.log(version, get(submissionsVersionCounts.value, version, 0));
+        //   // console.log(counts);
+        //   return {
+        //     ...counts,
+        //     [version]: get(submissionsVersionCounts.value, version, 0),
+        //   };
+        // }, {});
       } catch {
         submissionsDataHasError.value = true;
       } finally {
@@ -111,8 +115,8 @@ export default {
       submissionsVersionCounts,
       submissionsVersionCountsWithZeros,
       getCount(version) {
-        // return get(submissionsVersionCounts.value, version, 0);
-        return submissionsVersionCountsWithZeros.value[version];
+        return get(submissionsVersionCounts.value, version, 0);
+        // return submissionsVersionCountsWithZeros.value[version];
       },
       versionsToDelete,
     };

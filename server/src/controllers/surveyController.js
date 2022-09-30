@@ -602,6 +602,8 @@ const getPinned = async (req, res) => {
   });
 };
 
+// const getCleanupSurveyInfo = async (req, res) => {};
+
 const cleanupSurvey = async (req, res) => {
   const { id } = req.params;
   const { versions, resourceIds, auto } = req.query;
@@ -642,11 +644,6 @@ const cleanupSurvey = async (req, res) => {
     new Set([...Object.keys(submissionsVersionCounts), String(survey.latestVersion)])
   );
 
-  // const versionsToDelete = _.difference(
-  //   surveyVersions,
-  //   Object.keys(submissionsVersionCounts)
-  // ).filter(({ version }) => version !== survey.latestVersion);
-
   const versionsToDelete = _.difference(surveyVersions, versionsToKeep);
   // const versionsToDelete = surveyVersions.filter((version) => !versionsToKeep.includes(version));
 
@@ -654,21 +651,27 @@ const cleanupSurvey = async (req, res) => {
 
   const shouldKeepVersion = ({ version }) => versionsToKeep.includes(String(version));
 
-  const filteredSurvey = {
-    ...survey,
-    revisions: survey.revisions.filter(shouldKeepVersion),
-  };
-
-  console.log(JSON.stringify(filteredSurvey));
-  res.send({ deletedVersions: versionsToDelete, keptVersions: versionsToKeep });
-  // TODO:
-  // Get all submissions for different versions of survey to determine what can be deleted
-  // associate submissions to survey versions, count them
-  //
+  const filteredSurveyRevisions = survey.revisions.filter(shouldKeepVersion);
 
   if (auto) {
-    console.log('stripping unnecessary versions');
+    try {
+      let updated = await db.collection(col).findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        {
+          $set: {
+            revisions: filteredSurveyRevisions,
+          },
+        },
+        { returnOriginal: false }
+      );
+      return res.send({ updated, deletedVersions: versionsToDelete, keptVersions: versionsToKeep });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).send({ message: 'Ouch :/' });
+    }
   }
+
+  res.send({ deletedVersions: versionsToDelete, keptVersions: versionsToKeep });
 };
 
 export default {
