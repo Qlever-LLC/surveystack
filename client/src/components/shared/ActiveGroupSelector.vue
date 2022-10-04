@@ -11,11 +11,29 @@
       hide-details
       color="focus"
     >
+      <template v-slot:item="{ item }">
+        <span :style="item.style">{{ item.text }}</span>
+      </template>
     </v-select>
   </div>
 </template>
 
 <script>
+function getGroupLevel(group) {
+  return group.dir.match(/\//g).length;
+}
+
+function makeTree(groups, lvl = 1) {
+  const treeList = [];
+  const lvlGroups = groups.filter((group) => getGroupLevel(group) === lvl);
+  lvlGroups.forEach((group) => {
+    const childGroups = groups.filter((g) => g.path.startsWith(group.path));
+    treeList.push(group);
+    treeList.push(...makeTree(childGroups, lvl + 1));
+  });
+  return treeList;
+}
+
 export default {
   props: {
     value: {
@@ -39,6 +57,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    treeView: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     groups() {
@@ -51,20 +73,12 @@ export default {
       return this.$store.getters['memberships/groups'];
     },
     groupItems() {
-      return this.groups.map(({ name, _id, path }) => {
-        if (this.returnObject) {
-          return {
-            text: name,
-            value: {
-              id: _id,
-              path,
-            },
-          };
-        }
-
+      const calculatedGroups = this.treeView ? makeTree(this.groups) : this.groups;
+      return calculatedGroups.map((group) => {
         return {
-          text: name,
-          value: _id,
+          text: group.name,
+          value: this.returnObject ? { id: group._id, path: group.path } : group._id,
+          style: this.getMargin(getGroupLevel(group)),
         };
       });
     },
@@ -78,10 +92,13 @@ export default {
       return this.$store.getters['whitelabel/partner'];
     },
   },
-
   methods: {
     handleInput(val) {
       this.$emit('input', val);
+    },
+    getMargin(lvl) {
+      const pixels = Math.max(0, lvl - 1) * 16;
+      return this.treeView ? { 'margin-left': `${pixels}px` } : {};
     },
   },
   created() {

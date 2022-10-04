@@ -20,22 +20,27 @@
       </p>
 
       <div class="my-4 d-flex align-center">
-        <active-group-selector class="flex-grow-1" v-model="activeGroup" outlined />
+        <active-group-selector class="flex-grow-1" v-model="activeGroup" outlined tree-view />
         <v-btn class="ml-2" color="error" :disabled="!activeMemebership" @click="isLeaveDialogOpen = true">Leave</v-btn>
       </div>
 
       <v-dialog v-model="isLeaveDialogOpen" max-width="290">
         <v-card>
           <v-card-title> Leave Group </v-card-title>
-          <v-card-text class="mt-4">
-            Are you sure you want to leave the
-            <strong>{{ activeMemebership ? activeMemebership.group.name : 'current active group' }}</strong
+          <v-card-text v-if="parentAdminGroup" class="mt-4">
+            You are admin of <strong>{{ parentAdminGroup.name }}</strong
+            >. To leave this group, you must leave that group or change your status from <strong>Admin</strong> to
+            <strong>Member</strong>`
+          </v-card-text>
+          <v-card-text v-else>
+            Are you sure you want to leave
+            <strong>{{ activeMemebership ? activeMemebership.group.name : 'the current active group' }}</strong
             >?
           </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <v-btn text @click.stop="isLeaveDialogOpen = false"> Cancel </v-btn>
-            <v-btn text color="red" @click.stop="leaveGroup"> Leave </v-btn>
+            <v-btn text @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </v-btn>
+            <v-btn v-if="!parentAdminGroup" text color="red" @click.stop="leaveGroup"> Leave </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -114,6 +119,16 @@ import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import api from '@/services/api.service';
 import { pick } from 'lodash';
 
+function findParentAdminGroup(memberships, activeMembership) {
+  if (activeMembership.role === 'admin') {
+    const parent = memberships.find((membership) => membership.group.path === activeMembership.group.dir);
+    if (parent && parent.role === 'admin') {
+      return findParentAdminGroup(memberships, parent);
+    }
+  }
+  return activeMembership.group;
+}
+
 export default {
   components: {
     appFeedback,
@@ -154,6 +169,16 @@ export default {
     },
     activeMemebership() {
       return this.$store.getters['memberships/getMembershipByGroupId'](this.activeGroup);
+    },
+    parentAdminGroup() {
+      const memberships = this.$store.getters['memberships/memberships'];
+      if (this.activeMemebership) {
+        const parentAdminGroup = findParentAdminGroup(memberships, this.activeMemebership);
+        if (parentAdminGroup._id !== this.activeMemebership.group._id) {
+          return parentAdminGroup;
+        }
+      }
+      return null;
     },
   },
   methods: {
