@@ -58,7 +58,7 @@
         </v-btn>
       </v-fab-transition>
       <app-control
-        class="my-auto maxw-60 mx-auto"
+        class="pb-1"
         :path="path"
         :control="control"
         :forceMobile="forceMobile"
