@@ -44,7 +44,7 @@ export default {
   padding: 0.5rem;
   white-space: initial;
   position: absolute;
-  transform: translate(-15px, calc(-100% - 4px));
+  transform: translate(-70px, calc(-100% - 4px));
   min-height: 40px;
   max-height: 150px;
   width: 400px;

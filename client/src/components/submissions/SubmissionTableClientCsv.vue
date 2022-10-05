@@ -1,24 +1,25 @@
 <template>
   <v-card>
     <v-data-table
+      ref="table"
+      v-model="tableSelected"
+      :class="{ archived }"
+      :mobile-breakpoint="0"
       :headers="headers"
       :items="items"
-      show-select
       item-key="_id"
+      :loading="loading"
       :search="search"
-      :mobile-breakpoint="0"
-      hide-default-footer
-      v-model="tableSelected"
-      disable-pagination
-      :class="{ archived }"
       :server-items-length="submissions.pagination.total"
-      @update:sort-by="onUpdateSortBy"
-      @update:sort-desc="onUpdateSortDesc"
-      multi-sort
       :sort-by="dataTableProps.sortBy"
       :sort-desc="dataTableProps.sortDesc"
-      :loading="loading"
-      ref="table"
+      @update:sort-by="onUpdateSortBy"
+      @update:sort-desc="onUpdateSortDesc"
+      show-select
+      multi-sort
+      disable-pagination
+      :hide-default-header="headers.length === 0"
+      hide-default-footer
     >
       <template v-slot:top>
         <v-toolbar flat class="my-5">
@@ -33,22 +34,21 @@
                     class="mt-2"
                   ></v-switch>
                   <v-switch
-                    :input-value="showExploded"
-                    @change="showExploded = $event"
-                    label="Show exploded"
-                    class="mt-2 ml-5"
-                  ></v-switch>
-                  <v-switch
                     :input-value="archived"
                     @change="$emit('showArchived', $event)"
                     label="View archived only"
                     class="mt-2 ml-5"
                   ></v-switch>
+                  <v-switch
+                    :input-value="isExpandMatrix"
+                    @change="isExpandMatrix = $event"
+                    label="Expand matrix questions"
+                    class="mt-2 ml-5"
+                  ></v-switch>
                 </div>
                 <div class="d-flex align-center" v-if="selected.length > 0">
                   <div>
-                    <span class="subtitle-2">ACTIONS</span><br />{{ selected.length }}
-                    {{ selected.length === 1 ? 'submission' : 'submissions' }} selected
+                    {{ `${selected.length} ${selected.length === 1 ? 'submission' : 'submissions'} selected` }}
                   </div>
                   <div class="ml-auto d-flex flex-column flex-sm-row">
                     <v-btn
@@ -100,8 +100,8 @@
       <template v-for="header in headers" v-slot:[`header.${header.value}`]>
         <span
           :key="header.value"
-          @click.stop="openModal($event, header.text)"
-          :class="{ activeHeader: isModalOpen(header.text) }"
+          @click.stop="openModal($event, [header.text, -1, header.value])"
+          :class="{ activeHeader: isModalOpen([header.text, -1, header.value]) }"
         >
           <div :class="shouldTruncate(header.value) ? 'truncate-header' : 'non-truncated-header'">
             {{ header.text }}
@@ -109,52 +109,56 @@
         </span>
       </template>
 
-      <template v-slot:body="{ items, isSelected, select }">
-        <tbody>
-          <tr v-for="item in items" :key="item._id">
-            <td>
-              <v-checkbox
-                :value="isSelected(item)"
-                @click="select(item, !isSelected(item))"
-                color="#777"
-                class="custom-checkbox"
-                hide-details
-                role="checkbox"
-              />
-            </td>
-            <td
-              v-for="header in headers"
-              :key="header.text"
-              @click.stop="openModal($event, getCellValue(item, header.value), true)"
-              :class="{ active: isModalOpen(getCellValue(item, header.value)) }"
+      <template v-slot:item="{ item, index, isSelected, select }">
+        <tr :key="item._id">
+          <td>
+            <v-checkbox
+              :value="isSelected"
+              @click="select(!isSelected)"
+              color="#777"
+              class="custom-checkbox"
+              hide-details
+              role="checkbox"
+            />
+          </td>
+          <td
+            v-for="header in headers"
+            :key="header.text"
+            @click.stop="openModal($event, [getCellValue(item, header.value), index, header.value], true)"
+            :class="{ active: isModalOpen([getCellValue(item, header.value), index, header.value]) }"
+          >
+            <table v-if="Array.isArray(item[header.value])">
+              <tr v-for="(child, i) in item[header.value]" :key="i">
+                <td
+                  :class="{
+                    active: isModalOpen([child, index, header.value, i]),
+                    'matrix-cell': index < item.count - 1,
+                  }"
+                  @click.stop="openModal($event, [getCellValue(child), index, header.value, i], true)"
+                >
+                  <div :class="{ truncate: shouldTruncate(child) }">
+                    {{ getCellValue(child) }}
+                  </div>
+                </td>
+              </tr>
+            </table>
+            <div
+              v-else-if="item[header.value].includes('resources/')"
+              :class="{ truncate: shouldTruncate(getLabelFromKey(item[header.value])) }"
             >
-              <table v-if="Array.isArray(item[header.value])">
-                <tr v-for="(child, index) in item[header.value]" :key="index">
-                  <td :class="{ 'matrix-cell': index < item.count - 1 }" @click.stop="openModal($event, child, true)">
-                    <div :class="{ truncate: shouldTruncate(child) }">
-                      {{ child }}
-                    </div>
-                  </td>
-                </tr>
-              </table>
-              <div
-                v-else-if="item[header.value].includes('resources/')"
-                :class="{ truncate: shouldTruncate(getLabelFromKey(item[header.value])) }"
-              >
-                <a @click.stop="openResource(item[header.value])"> {{ getLabelFromKey(item[header.value]) }}</a>
-              </div>
-              <div v-else :class="{ truncate: shouldTruncate(item[header.value]) }">
-                {{ item[header.value] }}
-              </div>
-            </td>
-          </tr>
-        </tbody>
+              <a @click.stop="openResource(item[header.value])"> {{ getLabelFromKey(item[header.value]) }}</a>
+            </div>
+            <div v-else :class="{ truncate: shouldTruncate(item[header.value]) }">
+              {{ getCellValue(item, header.value) }}
+            </div>
+          </td>
+        </tr>
       </template>
     </v-data-table>
 
     <submission-table-cell-modal
-      v-if="!!activeTableCell"
-      :value="activeTableCell"
+      v-if="cellText"
+      :value="cellText"
       :left="modalLeftPosition"
       :top="modalTopPosition"
       :showCopyButton="modalShowCopyButton"
@@ -169,6 +173,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+
     <v-alert v-if="openResourceError" type="warning" dismissible>
       {{ openResourceError }}
     </v-alert>
@@ -179,6 +184,7 @@ import papa from 'papaparse';
 import csvService from '@/services/csv.service';
 import SubmissionTableCellModal from './SubmissionTableCellModal.vue';
 import { getLabelFromKey, openResourceInTab } from '@/utils/resources';
+import moment from 'moment';
 
 function getPropertiesFromMatrix(headers, matrix) {
   if (!Array.isArray(headers) || typeof matrix !== 'string') {
@@ -190,7 +196,7 @@ function getPropertiesFromMatrix(headers, matrix) {
   return properties;
 }
 
-function transformItem(item, rawHeaders, headers, exploded) {
+function transformItem(item, rawHeaders, headers, isExpandMatrix) {
   const row = {};
   let count = 1;
   const columns = headers.map((header) => header.value);
@@ -200,8 +206,8 @@ function transformItem(item, rawHeaders, headers, exploded) {
     } else {
       const [matrix, property] = header.split('-');
       const children = rawHeaders.filter((r) => r.startsWith(matrix) && r.endsWith(property)).map((key) => item[key]);
-      row[header] = exploded ? children : JSON.stringify(children);
-      if (exploded && children.length > count) {
+      row[header] = isExpandMatrix ? children : JSON.stringify(children);
+      if (isExpandMatrix && children.length > count) {
         count = children.length;
       }
     }
@@ -221,7 +227,8 @@ function transformHeaders(headers) {
 }
 
 function transformMatrixHeaders(headers) {
-  // Group matrix questions type paths
+  // Group matrix questions type headers by paths
+  // ex; [data.input.0.name, data.input.1.name] => 'data.input'
   const result = [];
   const matrixHeaders = [
     ...new Set(
@@ -248,6 +255,8 @@ function transformMatrixHeaders(headers) {
 
   return [...new Set(result)];
 }
+
+const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted'];
 
 export default {
   components: {
@@ -289,7 +298,7 @@ export default {
   data() {
     return {
       newData: this.archived,
-      activeTableCell: null,
+      activeTableCell: [],
       textTruncateLength: 36,
       csv: null,
       parsed: null,
@@ -303,7 +312,7 @@ export default {
       modalShowCopyButton: false,
       downloadingResource: false,
       openResourceError: false,
-      showExploded: true,
+      isExpandMatrix: true,
     };
   },
   computed: {
@@ -312,7 +321,7 @@ export default {
         return [];
       }
       return this.parsed.data.map((item) =>
-        transformItem(item, this.parsed.meta.fields, this.headers, this.showExploded)
+        transformItem(item, this.parsed.meta.fields, this.headers, this.isExpandMatrix)
       );
     },
     tableSelected: {
@@ -322,6 +331,10 @@ export default {
       set(newValue) {
         this.$emit('update:selected', newValue);
       },
+    },
+    cellText() {
+      const [value] = this.activeTableCell;
+      return value || '';
     },
   },
   watch: {
@@ -335,17 +348,35 @@ export default {
   methods: {
     getLabelFromKey,
     getCellValue(item, header) {
-      return typeof item[header] === 'string' ? item[header] : '';
+      if (typeof item === 'string') {
+        return item;
+      }
+
+      const value = item[header];
+      if (typeof value !== 'string') {
+        return '';
+      }
+
+      const dateValue = moment(value);
+      if (dateValue.isValid()) {
+        return dateValue.format('MMM D, YYYY h:mm A');
+      }
+      return value;
     },
     shouldTruncate(value) {
       return value.length > this.textTruncateLength;
     },
     isModalOpen(value) {
-      return this.activeTableCell === value;
+      return JSON.stringify(this.activeTableCell) === JSON.stringify(value);
     },
-    openModal(ev, value, showCopyButton = false) {
+    /*
+     ** ev - event
+     ** value - Array [text, row index, col name, cell array index]
+     */
+    openModal(ev, cell, showCopyButton = false) {
+      const [value] = cell;
       if (value.length > this.textTruncateLength) {
-        this.activeTableCell = value;
+        this.activeTableCell = cell;
         this.modalLeftPosition =
           ev.target.getBoundingClientRect().left - this.$refs.table.$el.getBoundingClientRect().left;
         this.modalTopPosition =
@@ -354,7 +385,7 @@ export default {
       }
     },
     closeModal() {
-      this.activeTableCell = null;
+      this.activeTableCell = [];
       this.modalLeftPosition = null;
       this.modalTopPosition = null;
       this.modalShowCopyButton = false;
@@ -372,13 +403,25 @@ export default {
       if (this.parsed) {
         const rawHeaders = this.parsed.meta.fields;
         const matrixHeaders = transformMatrixHeaders(rawHeaders);
+        PREFERRED_HEADERS.forEach((header) => {
+          if (matrixHeaders.includes(header)) {
+            headers.push({
+              text: header,
+              value: header,
+              filter: this.createCustomFilter(header),
+            });
+          }
+        });
         matrixHeaders.forEach((header) => {
-          if (this.excludeMeta && (header.startsWith('meta') || header.includes('meta'))) {
+          if (
+            PREFERRED_HEADERS.includes(header) ||
+            (this.excludeMeta && (header.startsWith('meta') || header.includes('meta')))
+          ) {
             return;
           }
           this.$set(this.searchFields, header, ''); // v-data-table search/filter is not used at this moment
 
-          if (rawHeaders.includes(header) || !this.showExploded) {
+          if (rawHeaders.includes(header)) {
             headers.push({
               text: header,
               value: header,

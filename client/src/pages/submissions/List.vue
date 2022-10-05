@@ -237,7 +237,7 @@ const createDefaultFilter = () => ({
   showArchived: false,
   showIrrelevant: false,
   showCsvDataMeta: false,
-  showCsvMeta: true,
+  showCsvMeta: false,
   roles: '',
 });
 
