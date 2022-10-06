@@ -1,4 +1,8 @@
-import { transformHeaders, getCellKey } from './SubmissionTableClientCsv.vue';
+import {
+  getPropertiesFromMatrix,
+  transformGeoJsonHeaders,
+  transformMatrixHeaders,
+} from './SubmissionTableClientCsv.vue';
 import { fireEvent } from '@testing-library/vue';
 import { within } from '@testing-library/dom';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
@@ -197,12 +201,16 @@ function mockHeaders() {
     'data.group_1.map_2.value.features.1.type',
     'data.group_1.map_2.value.type',
     'data.group_1.text_1.value',
+    'data.group_1.input_1.0.name.value',
+    'data.group_1.input_1.0.description.value',
+    'data.group_1.input_1.1.name.value',
+    'data.group_1.input_1.1.description.value',
     'data.text_3.value',
   ];
 }
 
 describe('SubmissionTableClientCsv', () => {
-  describe('transformHeaders', () => {
+  describe('transformGeoJsonHeaders', () => {
     it('collapses geojson features', () => {
       const expected = [
         '_id',
@@ -225,16 +233,48 @@ describe('SubmissionTableClientCsv', () => {
         'data.group_1.map_2.value.features.1',
         'data.group_1.map_2.value.type',
         'data.group_1.text_1.value',
+        'data.group_1.input_1.0.name.value',
+        'data.group_1.input_1.0.description.value',
+        'data.group_1.input_1.1.name.value',
+        'data.group_1.input_1.1.description.value',
         'data.text_3.value',
       ];
-      expect(transformHeaders(mockHeaders())).toEqual(expected);
+      expect(transformGeoJsonHeaders(mockHeaders())).toEqual(expected);
     });
   });
 
-  describe('getCellKey', () => {
-    it('should return the correct header value and item Id that was clicked', () => {
-      const expected = getCellKey('header value', 'item id');
-      expect(expected).toEqual('header value_item id');
+  describe('transformMatrixHeaders', () => {
+    it('collapses matrix question type', () => {
+      const expected = [
+        '_id',
+        'meta.dateCreated',
+        'meta.dateModified',
+        'meta.dateSubmitted',
+        'meta.survey.id',
+        'meta.survey.version',
+        'meta.revision',
+        'meta.permissions',
+        'meta.status',
+        'meta.group.id',
+        'meta.group.path',
+        'meta.specVersion',
+        'meta.creator',
+        'meta.creatorDetail.email',
+        'meta.creatorDetail.name',
+        'data.group_1.map_2.value.features',
+        'data.group_1.map_2.value.type',
+        'data.group_1.text_1.value',
+        'data.group_1.input_1',
+        'data.text_3.value',
+      ];
+      expect(transformMatrixHeaders(mockHeaders())).toEqual(expected);
+    });
+  });
+
+  describe('getPropertiesFromMatrix', () => {
+    it('generate properties from the headers for the given matrix header', () => {
+      const expected = ['name.value', 'description.value'];
+      expect(getPropertiesFromMatrix(mockHeaders(), 'data.group_1.input_1')).toEqual(expected);
     });
   });
 
@@ -390,6 +430,7 @@ describe('SubmissionTableClientCsv', () => {
     const reassignButton = getByRole('button', { name: /reassign/i });
     expect(reassignButton).toBeDisabled();
   });
+
   it('should disable resubmit Button if actionsAreDisabled prop is set to true', async () => {
     const { getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
       propsData: {
@@ -408,6 +449,7 @@ describe('SubmissionTableClientCsv', () => {
     const resubmitButton = getByRole('button', { name: /resubmit/i });
     expect(resubmitButton).toBeDisabled();
   });
+
   it('should disable archive Button if actionsAreDisabled prop is set to true', async () => {
     const { getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
       propsData: {

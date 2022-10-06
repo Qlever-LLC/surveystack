@@ -186,7 +186,7 @@ import SubmissionTableCellModal from './SubmissionTableCellModal.vue';
 import { getLabelFromKey, openResourceInTab } from '@/utils/resources';
 import moment from 'moment';
 
-function getPropertiesFromMatrix(headers, matrix) {
+export function getPropertiesFromMatrix(headers, matrix) {
   if (!Array.isArray(headers) || typeof matrix !== 'string') {
     return [];
   }
@@ -196,27 +196,7 @@ function getPropertiesFromMatrix(headers, matrix) {
   return properties;
 }
 
-function transformItem(item, rawHeaders, headers, isExpandMatrix) {
-  const row = {};
-  let count = 1;
-  const columns = headers.map((header) => header.value);
-  columns.forEach((header) => {
-    if (header in item) {
-      row[header] = item[header];
-    } else {
-      const [matrix, property] = header.split('-');
-      const children = rawHeaders.filter((r) => r.startsWith(matrix) && r.endsWith(property)).map((key) => item[key]);
-      row[header] = isExpandMatrix ? children : JSON.stringify(children);
-      if (isExpandMatrix && children.length > count) {
-        count = children.length;
-      }
-    }
-  });
-  row.count = count;
-  return row;
-}
-
-function transformHeaders(headers) {
+export function transformGeoJsonHeaders(headers) {
   if (!Array.isArray(headers)) {
     return headers;
   }
@@ -226,7 +206,7 @@ function transformHeaders(headers) {
   return [...new Set(headers.map(replaceGeoJsonPath))];
 }
 
-function transformMatrixHeaders(headers) {
+export function transformMatrixHeaders(headers) {
   // Group matrix questions type headers by paths
   // ex; [data.input.0.name, data.input.1.name] => 'data.input'
   const result = [];
@@ -320,9 +300,27 @@ export default {
       if (!this.parsed) {
         return [];
       }
-      return this.parsed.data.map((item) =>
-        transformItem(item, this.parsed.meta.fields, this.headers, this.isExpandMatrix)
-      );
+      return this.parsed.data.map((item) => {
+        const row = {};
+        let count = 1;
+        const columns = this.headers.map((header) => header.value);
+        columns.forEach((header) => {
+          if (header in item) {
+            row[header] = item[header];
+          } else {
+            const [matrix, property] = header.split('-');
+            const children = this.parsed.meta.fields
+              .filter((r) => r.startsWith(matrix) && r.endsWith(property))
+              .map((key) => item[key]);
+            row[header] = this.isExpandMatrix ? children : JSON.stringify(children);
+            if (this.isExpandMatrix && children.length > count) {
+              count = children.length;
+            }
+          }
+        });
+        row.count = count;
+        return row;
+      });
     },
     tableSelected: {
       get() {
@@ -357,8 +355,8 @@ export default {
         return '';
       }
 
-      const dateValue = moment(value);
-      if (dateValue.isValid()) {
+      if (!isNaN(Date.parse(value))) {
+        const dateValue = moment(value);
         return dateValue.format('MMM D, YYYY h:mm A');
       }
       return value;
@@ -451,7 +449,7 @@ export default {
       if (!this.submissions) {
         return;
       }
-      const headers = transformHeaders(this.submissions.headers);
+      const headers = transformGeoJsonHeaders(this.submissions.headers);
       this.csv = csvService.createCsv(this.submissions.content, headers);
       this.parsed = papa.parse(this.csv, { header: true });
       this.createHeaders();
