@@ -44,6 +44,7 @@ export const createMagicLink = async ({
   email,
   expiresAfterDays = 7,
   landingPath = null,
+  callbackUrl = null,
 }) => {
   if (!origin) {
     throw new Error('createMagicLink: "origin" parameter is required');
@@ -64,6 +65,9 @@ export const createMagicLink = async ({
   let link = `${origin}/api/auth/enter-with-magic-link?code=${code}`;
   if (landingPath) {
     link += `&landingPath=${encodeURIComponent(landingPath)}`;
+  }
+  if (callbackUrl) {
+    link += `&callbackUrl=${encodeURIComponent(callbackUrl)}`;
   }
 
   return link;
@@ -89,4 +93,14 @@ export const createLoginPayload = async (userObject) => {
   const payload = pick(userObject, 'email', 'name', 'token', '_id', 'permissions');
   const roles = await rolesService.getRoles(userObject._id);
   return { ...payload, roles };
+};
+
+// Returns an origin URL that points at this server process
+export const getServerSelfOrigin = (req) => {
+  // In production, req.protocol is not reliable if there is a proxy before the Node process
+  //  to fix this, here, https in enforced in production, but there could be a better solution to this
+  // NOTE app.set('trust proxy') didn't seem to solve the issue
+  const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
+  // NOTE req.headers.origin can't be used because it's set by the client and points at the client
+  return protocol + '://' + req.get('host');
 };

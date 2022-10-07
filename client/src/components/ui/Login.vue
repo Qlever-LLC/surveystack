@@ -181,6 +181,8 @@ export default {
 
     if ('magicLinkExpired' in this.$route.query) {
       this.status = 'Your magic link is expired. Please request a new one.';
+      // Select the magic link login variation of the dialog
+      this.usePassword = false;
     }
 
     if (this.isWhitelabel) {
@@ -190,20 +192,6 @@ export default {
       }
     } else {
       this.registrationEnabled = true;
-    }
-
-    // DEPRECATED: remove a few weeks after https://gitlab.com/our-sci/software/surveystack/-/merge_requests/67  was deployed
-    //  reason: we use magic links for CFS now
-    const { cfs, email, token, group } = this.$route.query;
-    if (cfs) {
-      await this.$store.dispatch('auth/login', {
-        url: '/auth/login',
-        user: { email: email.replace(/ /g, '+'), token }, // TODO: find a better solution for + signs
-      });
-
-      this.$store.dispatch('surveys/fetchPinned');
-      await autoSelectActiveGroup(this.$store, group);
-      this.$router.replace({ name: 'surveys-detail', params: { id: cfs } });
     }
   },
   methods: {
@@ -224,9 +212,10 @@ export default {
       // email sign-in link
       if (!this.usePassword) {
         const landingPath = this.$route.params.redirect || this.$route.query.landingPath;
+        const callbackUrl = this.$route.query.callbackUrl;
 
         try {
-          await this.$store.dispatch('auth/sendMagicLink', { email: this.entity.email, landingPath });
+          await this.$store.dispatch('auth/sendMagicLink', { email: this.entity.email, landingPath, callbackUrl });
           this.signInLinkSent = true;
           this.status = '';
         } catch (e) {

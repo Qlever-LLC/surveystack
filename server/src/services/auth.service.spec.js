@@ -3,8 +3,9 @@ import {
   createMagicLink,
   createLoginPayload,
   createInvalidateMagicLink,
+  getServerSelfOrigin,
 } from './auth.service';
-import { createGroup, createUser } from '../testUtils';
+import { createGroup, createReq, createUser } from '../testUtils';
 import { db, COLL_ACCESS_CODES } from '../db';
 import url from 'url';
 import rolesService from './roles.service';
@@ -49,6 +50,16 @@ describe('createUserIfNotExist', () => {
 });
 
 describe('createMagicLink', () => {
+  const PARAM_VARIATIONS = [
+    ['without params', {}],
+    ['forwards landingPath', { landingPath: '/some/where' }],
+    ['forwards callbackUrl', { callbackUrl: 'https://foo.bar.com/quz' }],
+    [
+      'forwards landingPath + callbackUrl',
+      { landingPath: '/some/where', callbackUrl: 'http://foo.bar.com/quz' },
+    ],
+  ];
+
   const email = 'foo@bar.com';
   const origin = 'http://foo.bar';
   it('throws if origin is not set', async () => {
@@ -98,20 +109,16 @@ describe('createMagicLink', () => {
   });
 
   describe('returns the link in the correct format', () => {
-    it('without landingPath', async () => {
-      const link = new URL(await createMagicLink({ email, origin }));
-      expect(link.origin).toBe(origin);
-      expect(link.pathname).toBe('/api/auth/enter-with-magic-link');
-      expect(link.searchParams.get('code')).toEqual(expect.any(String));
-      expect(link.searchParams.get('landingPath')).toBeNull();
-    });
-    it('with landingPath', async () => {
-      const landingPath = '/in/app/path';
-      const link = new URL(await createMagicLink({ email, origin, landingPath }));
-      expect(link.origin).toBe(origin);
-      expect(link.pathname).toBe('/api/auth/enter-with-magic-link');
-      expect(link.searchParams.get('code')).toEqual(expect.any(String));
-      expect(link.searchParams.get('landingPath')).toBe(landingPath);
+    PARAM_VARIATIONS.forEach(([description, paramsToForward]) => {
+      it(description, async () => {
+        const link = new URL(await createMagicLink({ email, origin, ...paramsToForward }));
+        expect(link.origin).toBe(origin);
+        expect(link.pathname).toBe('/api/auth/enter-with-magic-link');
+        expect(link.searchParams.get('code')).toEqual(expect.any(String));
+        for (const [key, value] of Object.entries(paramsToForward)) {
+          expect(link.searchParams.get(key)).toBe(value);
+        }
+      });
     });
   });
 
@@ -177,5 +184,35 @@ describe('createInvalidateMagicLink', () => {
     expect(link.origin).toBe(origin);
     expect(link.pathname).toBe('/api/auth/invalidate-magic-link');
     expect(link.searchParams.get('invalidateCode')).toBe(accessCode.invalidateCode);
+  });
+});
+
+describe('getServerSelfOrigin', () => {
+  describe('builds origin from req.protocol and req.headers.host', () => {
+    ['http', 'https'].forEach((protocol) => {
+      it(protocol, () => {
+        const host = 'foo.com';
+        const req = createReq({ protocol, headers: { host } });
+        const origin = getServerSelfOrigin(req);
+        expect(origin).toBe(`${protocol}://${host}`);
+      });
+    });
+  });
+  describe('enforcing https in production', () => {
+    const SAVE_ENV = process.env;
+    beforeEach(() => {
+      process.env = { ...SAVE_ENV, NODE_ENV: 'production' };
+    });
+    ['http', 'https'].forEach((protocol) => {
+      it(protocol, () => {
+        const host = 'foo.com';
+        const req = createReq({ protocol, headers: { host } });
+        const origin = getServerSelfOrigin(req);
+        expect(origin).toBe(`https://${host}`);
+      });
+    });
+    afterAll(() => {
+      process.env = SAVE_ENV;
+    });
   });
 });

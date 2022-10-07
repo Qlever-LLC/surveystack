@@ -5,6 +5,7 @@
       v-if="showConfirmSubmission"
       v-model="showConfirmSubmission"
       :groupId="submission.meta.group.id"
+      :submitAsUser="submission.meta.submitAsUser"
       @submit="() => submitConfirmed(submission)"
       @set-group="setSubmissionGroup"
       :dateSubmitted="submission.meta.dateSubmitted"
@@ -57,7 +58,7 @@
         </v-btn>
       </v-fab-transition>
       <app-control
-        class="my-auto maxw-60 mx-auto"
+        class="pb-1"
         :path="path"
         :control="control"
         :forceMobile="forceMobile"

@@ -122,6 +122,7 @@
         @set-group="(val) => setSubmissionGroup(activeSubmissionId, val)"
         :groupId="activeSubmission.meta.group.id"
         :id="activeSubmissionId"
+        :submitAsUser="activeSubmission.meta.submitAsUser"
         :dateSubmitted="activeSubmission.meta.dateSubmitted"
         v-model="confirmSubmissionIsVisible"
         @close="handleConfirmSubmissionDialogClose"

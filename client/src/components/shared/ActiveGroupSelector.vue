@@ -27,6 +27,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    adminGroupsOnly: {
+      type: Boolean,
+      default: false,
+    },
     label: {
       type: String,
       default: 'Active Group',
@@ -40,6 +44,9 @@ export default {
     groups() {
       if (this.isWhitelabel) {
         return this.$store.getters['memberships/getPrefixedGroups'](this.whitelabelPartner.path);
+      }
+      if (this.adminGroupsOnly) {
+        return this.$store.getters['memberships/memberships'].filter((m) => m.role === 'admin').map((m) => m.group);
       }
       return this.$store.getters['memberships/groups'];
     },
