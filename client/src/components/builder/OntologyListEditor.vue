@@ -104,16 +104,16 @@
             <v-icon @click="moveItemUp(item)" tabindex="-1" :disabled="disabled">mdi-arrow-up</v-icon>
             <v-icon class="ml-2" @click="moveItemDown(item)" tabindex="-1" :disabled="disabled">mdi-arrow-down</v-icon>
             <v-icon class="ml-2" @click="copyItem(item)" tabindex="-1" :disabled="disabled">mdi-content-copy</v-icon>
-            <v-icon class="ml-2" @click="deleteItem(item)" tabindex="-1" :disabled="disabled"
-              >mdi-trash-can-outline</v-icon
-            >
+            <v-icon class="ml-2" @click="deleteItem(item)" tabindex="-1" :disabled="disabled">
+              mdi-trash-can-outline
+            </v-icon>
           </div>
         </template>
       </v-data-table>
     </v-card-text>
     <v-spacer />
     <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
-      <v-btn text class="ml-4" @click="() => $emit('close-dialog')">Close</v-btn>
+      <v-btn text class="ml-4" @click="close">Close</v-btn>
     </v-card-actions>
 
     <v-dialog v-model="editItemDialogIsVisible" max-width="350">
@@ -305,6 +305,14 @@ export default {
     },
     closeDeleteDialog() {
       this.deleteDialogIsVisible = false;
+    },
+    matchValidItem(item) {
+      return item.label.trim() && item.value.trim();
+    },
+    close() {
+      const content = this.resource.content.filter(this.matchValidItem);
+      this.$emit('change', { ...this.resource, content });
+      this.$emit('close-dialog');
     },
     deleteResult() {
       this.closeDeleteDialog();
