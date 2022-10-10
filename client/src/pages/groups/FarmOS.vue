@@ -57,8 +57,8 @@
         <v-card class="pa-8 text-center" v-if="superAdmin">
           <p>{{ message }}</p>
           <v-btn color="primary" type="submit" @click="enable" v-if="btnEnable">Enable</v-btn>
-          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-else-if="btnContact"
-            >Contact Our-Sci</v-btn
+          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-else-if="btnContact">
+            Contact Our-Sci</v-btn
           >
         </v-card>
         <v-card class="pa-8 text-center" v-else>
@@ -206,7 +206,10 @@ export default {
               this.plans = plans;
             }
             console.log('group settings', groupInfos);
-            groupInfos.response.members = _.sortBy(groupInfos.response.members, (m) => -m.connectedFarms.length);
+            groupInfos.response.members = _.sortBy(groupInfos.response.members, [
+              (m) => !m.admin,
+              (m) => m.name.toLowerCase(),
+            ]);
             this.groupInfos = groupInfos.response;
             this.farmosEnabled = true;
           }
