@@ -1,50 +1,24 @@
 <template>
-  <div v-if="farmosEnabled">
-    <v-alert
-      v-if="successMessage"
-      class="mt-4"
-      style="cursor: pointer"
-      mode="fade"
-      text
-      type="success"
-      @click="successMessage = null"
-      >{{ successMessage }}</v-alert
-    >
+  <v-container v-if="farmosEnabled">
+    <v-alert v-if="successMessage" class="mt-4" style="cursor: pointer" mode="fade" text type="success"
+      @click="successMessage = null">{{ successMessage }}</v-alert>
     <v-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
-      errorMessage
+    errorMessage
     }}</v-alert>
 
-    <FarmOSCreateDialog
-      v-model="showCreateDialog"
-      v-if="showCreateDialog"
-      @check-url="checkUrl"
-      @create-instance="createInstance"
-      :viewModel="createViewModel"
-    />
+    <FarmOSCreateDialog v-model="showCreateDialog" v-if="showCreateDialog" @check-url="checkUrl"
+      @create-instance="createInstance" :viewModel="createViewModel" />
 
-    <FarmOSConnectDialog
-      v-model="showConnectDialog"
-      :farmInstances="farmInstances"
-      :allowCreate="allowCreate"
-      @connect="connectFarms"
-      @create="createFarm"
-    />
+    <FarmOSConnectDialog v-model="showConnectDialog" :farmInstances="farmInstances" :allowCreate="allowCreate"
+      @connect="connectFarms" @create="createFarm" />
 
-    <FarmOSGroupSettings
-      class="ma-16"
-      @addGrpCoffeeShop="enableCoffeeshop"
+    <FarmOSGroupSettings class="ma-16" @addGrpCoffeeShop="enableCoffeeshop"
       @allowSbGrpsJoinCoffeeShop="allowSubGroupsJoinCoffeeShop"
-      @allowSbGrpsAdminsCreateFarmOSFarms="allowSubGroupsAdminsCreateFarmOSFarms"
-      @connect="connect"
-      @disconnect="disconnectFarm"
-      @plansChanged="plansChanged"
-      @seatsChanged="seatsChanged"
-      :plans="plans"
-      :groupInfos="groupInfos"
-      :superAdmin="superAdmin"
-    >
+      @allowSbGrpsAdminsCreateFarmOSFarms="allowSubGroupsAdminsCreateFarmOSFarms" @connect="connect"
+      @disconnect="disconnectFarm" @plansChanged="plansChanged" @seatsChanged="seatsChanged" :plans="plans"
+      :groupInfos="groupInfos" :superAdmin="superAdmin">
     </FarmOSGroupSettings>
-  </div>
+  </v-container>
 
   <v-container v-else>
     <v-row v-if="loading">
@@ -58,14 +32,12 @@
           <p>{{ message }}</p>
           <v-btn color="primary" type="submit" @click="enable" v-if="btnEnable">Enable</v-btn>
           <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-else-if="btnContact">
-            Contact Our-Sci</v-btn
-          >
+            Contact Our-Sci</v-btn>
         </v-card>
         <v-card class="pa-8 text-center" v-else>
           <p>{{ message }}</p>
-          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-if="btnContact"
-            >Contact Our-Sci</v-btn
-          >
+          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-if="btnContact">Contact
+            Our-Sci</v-btn>
         </v-card>
       </v-col>
     </v-row>
@@ -142,8 +114,8 @@ export default {
     */
   },
   methods: {
-    updateGroupConfig() {},
-    unifomMembersInGroupInfos() {},
+    updateGroupConfig() { },
+    unifomMembersInGroupInfos() { },
     async seatsChanged(seats) {
       try {
         await api.post(`/farmos/group-manage/${this.groupId}/seats`, { seats: seats });
