@@ -84,7 +84,6 @@ import buildScriptQuestionIframeContents, { onMessage } from '@/utils/userScript
 import api from '@/services/api.service';
 import BaseQuestionComponent from './BaseQuestionComponent';
 import * as surveyStackUtils from '@/utils/surveyStack';
-import submissionUtils from '@/utils/submissions';
 import appDialog from '@/components/ui/Dialog.vue';
 
 export default {
