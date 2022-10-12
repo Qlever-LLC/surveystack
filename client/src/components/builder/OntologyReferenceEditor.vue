@@ -36,7 +36,7 @@
     <v-card-actions>
       <v-spacer />
       <v-btn text @click="closeHandler"> Close </v-btn>
-      <v-btn text color="green" @click="previewDialogIsVisible = true"> Preview </v-btn>
+      <v-btn text color="green" @click="previewDialogIsVisible = true" :disabled="!path"> Preview </v-btn>
       <v-btn text color="error" @click="deleteResource"> Delete </v-btn>
       <v-btn text color="primary" @click="updateAndClose"> Save </v-btn>
     </v-card-actions>
@@ -152,6 +152,11 @@ export default {
       });
 
       this.paths = paths;
+    },
+  },
+  watch: {
+    surveyId() {
+      this.path = '';
     },
   },
   async mounted() {
