@@ -13,12 +13,28 @@
       <v-card-title>Super Admin</v-card-title>
       <v-card-text>
         <div class="d-flex flex-grow-1">
-          <v-text-field class="mr-4 flex-shrink-1 flex-grow-0" outlined v-model="seats" label="Max Seats" type="number"
-            @change="$emit('seatsChanged', seats)" />
+          <v-text-field
+            class="mr-4 flex-shrink-1 flex-grow-0"
+            outlined
+            v-model="seats"
+            label="Max Seats"
+            type="number"
+            @change="$emit('seatsChanged', seats)"
+          />
 
-          <v-autocomplete outlined class="flex-grow-1 flex-shrink-0" label="Select FarmOS Plans for Group" multiple
-            deletable-chips @change="$emit('plansChanged', selectedPlans)" v-model="selectedPlans" :items="plans"
-            :item-value="(p) => p._id" small-chips :item-text="(p) => `${p.planName} (${p.planUrl})`">
+          <v-autocomplete
+            outlined
+            class="flex-grow-1 flex-shrink-0"
+            label="Select FarmOS Plans for Group"
+            multiple
+            deletable-chips
+            @change="$emit('plansChanged', selectedPlans)"
+            v-model="selectedPlans"
+            :items="plans"
+            :item-value="(p) => p._id"
+            small-chips
+            :item-text="(p) => `${p.planName} (${p.planUrl})`"
+          >
           </v-autocomplete>
         </div>
       </v-card-text>
@@ -31,16 +47,32 @@
         <div class="pa-3">
           <p class="font-weight-bold">Settings</p>
           <v-container class="pa-0" fluid>
-            <v-checkbox v-if="groupInfos.allowSubgroupsToJoinCoffeeShop || groupInfos.isDomainRoot" class="ma-0 pa-0"
-              hide-details :ripple="false" v-model="groupInfos.groupHasCoffeeShopAccess"
-              @change="$emit('addGrpCoffeeShop', $event)" label="Add this group to the Coffee Shop"></v-checkbox>
-            <v-checkbox v-if="groupInfos.isDomainRoot" class="ma-0 pa-0" hide-details :ripple="false"
-              v-model="groupInfos.allowSubgroupsToJoinCoffeeShop" @change="$emit('allowSbGrpsJoinCoffeeShop', $event)"
-              :label="`Allow subgroups to join the Coffee Shop`"></v-checkbox>
-            <v-checkbox v-if="groupInfos.isDomainRoot" class="ma-0 pa-0" :ripple="false"
+            <v-checkbox
+              v-if="groupInfos.allowSubgroupsToJoinCoffeeShop || groupInfos.isDomainRoot"
+              class="ma-0 pa-0"
+              hide-details
+              :ripple="false"
+              v-model="groupInfos.groupHasCoffeeShopAccess"
+              @change="$emit('addGrpCoffeeShop', $event)"
+              label="Add this group to the Coffee Shop"
+            ></v-checkbox>
+            <v-checkbox
+              v-if="groupInfos.isDomainRoot"
+              class="ma-0 pa-0"
+              hide-details
+              :ripple="false"
+              v-model="groupInfos.allowSubgroupsToJoinCoffeeShop"
+              @change="$emit('allowSbGrpsJoinCoffeeShop', $event)"
+              :label="`Allow subgroups to join the Coffee Shop`"
+            ></v-checkbox>
+            <v-checkbox
+              v-if="groupInfos.isDomainRoot"
+              class="ma-0 pa-0"
+              :ripple="false"
               v-model="groupInfos.allowSubgroupAdminsToCreateFarmOSInstances"
               @change="$emit('allowSbGrpsAdminsCreateFarmOSFarms', $event)"
-              label="Allow subgroups admins to create FarmOS Farms through Survey Stack">
+              label="Allow subgroups admins to create FarmOS Farms through Survey Stack"
+            >
             </v-checkbox>
           </v-container>
         </div>
@@ -53,105 +85,23 @@
         </div>
       </div>
     </div>
-    <v-data-table :headers="headers" :items="filteredMembers" item-key="name" class="elevation-1" hide-default-footer
-      hide-default-header disable-pagination>
-      <template v-slot:header="{ props: { headers } }">
-        <thead>
-          <tr>
-            <th v-for="(h, i) in headers" :key="'h1' + i">
-              {{ h.text }}
-            </th>
-          </tr>
-          <tr>
-            <th v-for="(aHS, i) in arrHeaderSearch" :key="i">
-              <v-text-field v-model="arrHeaderSearch[i]" label="Search" placeholder="Search" solo dense single-line
-                append-icon="mdi-magnify" hide-details class="mb-2"></v-text-field>
-            </th>
-          </tr>
-        </thead>
-      </template>
 
-      <template v-slot:item="{ item, index }">
-        <tr v-for="(connectedFarm, idx) in item.connectedFarms.filter((f) => !f.skip)"
-          :key="`${item.user}-instance-${idx}`">
-          <td class="pa-4" :class="{ box: idx == 0 }">
-            <div v-if="idx == 0" class="d-flex align-start justify-space-between">
-              <span class="d-flex align-center">
-                <div class="d-flex flex-column">
-                  <span v-if="item.name">
-                    <span v-if="item.admin" class="mdi mdi-crown pr-1"></span> {{ item.name }} ({{ item.email }})</span>
-                  <div class="d-flex flex-column font-weight-light">
-                    <div v-for="(g, gidx) in item.groups" :key="`${item.user}-grp-${gidx}`">{{ g.breadcrumb }}</div>
-                  </div>
-                </div>
-              </span>
-              <span v-if="item.name">
-                <v-btn text color="green" x-small @click="$emit('connect', item)">+ connect</v-btn>
-              </span>
-            </div>
-          </td>
-          <td class="box pa-4">
-            <div v-if="connectedFarm.instanceName" class="d-flex align-center justify-space-between">
-              <span class="d-flex align-center">
-                <span>{{ connectedFarm.instanceName }}</span>
-              </span>
-              <span class="d-flex" style="flex-wrap: nowrap">
-                <v-btn text color="blue" disabled x-small>access</v-btn>
-                <v-btn @click="$emit('disconnect', item.user, connectedFarm.instanceName)" text color="red" x-small>
-                  remove</v-btn>
-              </span>
-            </div>
-            <div v-else>no farmos connected</div>
-          </td>
-          <td class="box pa-4">
-            <div v-if="connectedFarm.groups">
-              <span v-for="(grp, iidx) in connectedFarm.groups" :key="`connected-${idx}-${iidx}`">
-                <span v-if="iidx === 0 || iidx === 1 || developMbships[index].value">
-                  {{ grp.breadcrumb || grp.name }}
-                  <br />
-                </span>
-                <span v-if="iidx === 2 && !developMbships[index].value" @click="toggleDevelopMbships(index)"
-                  class="nOthers">
-                  (+{{ connectedFarm.groups.length - 2 }} others)
-                </span>
-                <span v-if="
-                  developMbships[index].value &&
-                  iidx === connectedFarm.groups.length - 1 &&
-                  connectedFarm.groups.length - 1 > 2
-                " @click="toggleDevelopMbships(index)" class="nOthers">reduce</span>
-              </span>
-            </div>
-          </td>
-        </tr>
-        <tr v-if="item.connectedFarms.filter((f) => !f.skip).length == 0">
-          <td class="box pa-4">
-            <div class="d-flex align-start justify-space-between">
-              <span class="d-flex align-center">
-                <div class="d-flex flex-column">
-                  <span v-if="item.name">
-                    <span v-if="item.admin" class="mdi mdi-crown pr-1"></span> {{ item.name }} ({{ item.email }})</span>
-                  <div class="d-flex flex-column font-weight-light">
-                    <div v-for="(g, gidx) in item.groups" :key="`${item.user}-grp-${gidx}`">{{ g.breadcrumb }}</div>
-                  </div>
-                </div>
-              </span>
-              <span v-if="item.name">
-                <v-btn text color="green" x-small @click="$emit('connect', item)">+ connect</v-btn>
-              </span>
-            </div>
-          </td>
-        </tr>
-      </template>
-    </v-data-table>
+    <FarmOSGroupTable
+      :members="groupInfos.members"
+      @connect="(item) => $emit('connect', item)"
+      @disconnect="(item) => $emit('disconnect', item)"
+    />
   </div>
 </template>
 
 <script>
 import { ref, computed } from '@vue/composition-api';
-import MyButton from './common/Button.vue';
+import FarmOSGroupTable from './FarmOSGroupTable.vue';
 
 export default {
-  components: { MyButton },
+  components: {
+    FarmOSGroupTable,
+  },
   props: {
     groupInfos: {
       type: Object,
@@ -306,11 +256,11 @@ export default {
   overflow: unset;
 }
 
-.v-data-table__wrapper>table>tbody>tr:hover {
+.v-data-table__wrapper > table > tbody > tr:hover {
   background: inherit !important;
 }
 
-.v-data-table>>>div>table {
+.v-data-table >>> div > table {
   width: 100%;
   border-spacing: 4px !important;
 }

@@ -16,8 +16,8 @@
           v-model="selectedFarms"
         />
         <v-btn block @click="connect" :disabled="selectedFarms.length <= 0" color="primary"
-          >Connect selected Farms</v-btn
-        >
+          >Connect selected Farms
+        </v-btn>
       </v-card-text>
 
       <template v-if="allowCreate">
@@ -30,8 +30,8 @@
         </v-card-text>
       </template>
 
-      <v-card-text class="text-center primary--text" @click="$emit('addExisting')" style="cursor: pointer">
-        or add existing farmOS instance
+      <v-card-text class="text-center grey--text" @click="$emit('addExisting')" disabled>
+        or add existing farmOS instance (currently in development)
       </v-card-text>
     </v-card>
   </v-dialog>

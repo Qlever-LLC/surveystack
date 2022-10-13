@@ -221,6 +221,7 @@ const requireGroup = async (req, optJoi = {}) => {
     apiKey,
     groupId,
     groupSetting,
+    tree,
   };
 };
 
@@ -1078,9 +1079,10 @@ export const mapUser = async (req, res) => {
 };
 
 export const unmapUser = async (req, res) => {
-  const { groupId, userId, instanceName } = await requireGroup(req, {
+  const { groupId, userId, instanceName, groupIds, tree } = await requireGroup(req, {
     userId: Joi.objectId().required(),
     instanceName: Joi.string().required(),
+    groupIds: Joi.array().items(Joi.objectId()).required(),
   });
 
   const userRes = await db.collection('users').findOne({ _id: new ObjectId(userId) });
@@ -1100,23 +1102,46 @@ export const unmapUser = async (req, res) => {
     throw boom.badData(`user not member of group: user, group: ${userId}, ${groupId}`);
   }
 
+  // do we have permission to manage unmapping these groups?
+  // are we top-level admin and are these groups in the farmos domain?
+
+  console.log('descendants', tree.descendants);
+  const unauthorized = groupIds.filter(
+    (gid) => !tree.descendants.map((d) => d._id).some((id) => id + '' === gid)
+  );
+  if (unauthorized.length > 0) {
+    const groups = (
+      await db
+        .collection('groups')
+        .find({
+          _id: {
+            $in: unauthorized.map((gid) => new ObjectId(gid)),
+          },
+        })
+        .toArray()
+    ).map((g) => g.name);
+    throw boom.unauthorized(`unauthorized to manage groups: ${groups.join(',')}`);
+  }
+
   // instance mapped to group?
 
-  const mappedInstance = await db
+  const mappedInstances = await db
     .collection('farmos-group-mapping')
     .find({
       instanceName,
-      groupId: new ObjectId(groupId),
+      groupId: {
+        $in: groupIds.map((g) => new ObjectId(g)),
+      },
     })
     .toArray();
 
-  if (mappedInstance.length == 0) {
+  if (mappedInstances.length == 0) {
     throw boom.badData(`instance not mapped to group ${instanceName}, ${groupId}`);
   }
 
   await db.collection('farmos-group-mapping').deleteMany({
     _id: {
-      $in: mappedInstance.map((mi) => mi._id),
+      $in: mappedInstances.map((mi) => mi._id),
     },
   });
 

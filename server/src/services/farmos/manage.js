@@ -676,6 +676,14 @@ export const getMemberInformationForDomain = async (descendants) => {
   );
   // console.log("unassignedInstances", unassignedInstances);
 
+  // strip out all unrelated groups from members.connectedFarms.groups
+
+  prj.forEach((m) => {
+    m.connectedFarms.forEach((f) => {
+      f.groups = f.groups.filter((g) => descendants.some((d) => d._id + '' == g.groupId + ''));
+    });
+  });
+
   return {
     members: prj,
     unassignedInstances: unassignedInstances.map((u) => ({

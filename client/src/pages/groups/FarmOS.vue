@@ -1,22 +1,57 @@
 <template>
   <v-container v-if="farmosEnabled">
-    <v-alert v-if="successMessage" class="mt-4" style="cursor: pointer" mode="fade" text type="success"
-      @click="successMessage = null">{{ successMessage }}</v-alert>
+    <v-alert
+      v-if="successMessage"
+      class="mt-4"
+      style="cursor: pointer"
+      mode="fade"
+      text
+      type="success"
+      @click="successMessage = null"
+      >{{ successMessage }}</v-alert
+    >
     <v-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
-    errorMessage
+      errorMessage
     }}</v-alert>
 
-    <FarmOSCreateDialog v-model="showCreateDialog" v-if="showCreateDialog" @check-url="checkUrl"
-      @create-instance="createInstance" :viewModel="createViewModel" />
+    <FarmOSCreateDialog
+      v-model="showCreateDialog"
+      v-if="showCreateDialog"
+      @check-url="checkUrl"
+      @create-instance="createInstance"
+      :viewModel="createViewModel"
+    />
 
-    <FarmOSConnectDialog v-model="showConnectDialog" :farmInstances="farmInstances" :allowCreate="allowCreate"
-      @connect="connectFarms" @create="createFarm" />
+    <FarmOSConnectDialog
+      v-model="showConnectDialog"
+      :farmInstances="farmInstances"
+      :allowCreate="allowCreate"
+      @connect="connectFarms"
+      @create="createFarm"
+    />
 
-    <FarmOSGroupSettings class="ma-16" @addGrpCoffeeShop="enableCoffeeshop"
+    <FarmOSDisconnectDialog
+      v-model="showDisonnectDialog"
+      :disconnectFarmInstanceName="disconnectFarmInstanceName"
+      :groupsOfInstance="groupsOfInstance"
+      :disconnectGroupId="disconnectGroupId"
+      @disconnect="disconnectGroups"
+    />
+
+    <FarmOSGroupSettings
+      class="ma-16"
+      @addGrpCoffeeShop="enableCoffeeshop"
       @allowSbGrpsJoinCoffeeShop="allowSubGroupsJoinCoffeeShop"
-      @allowSbGrpsAdminsCreateFarmOSFarms="allowSubGroupsAdminsCreateFarmOSFarms" @connect="connect"
-      @disconnect="disconnectFarm" @plansChanged="plansChanged" @seatsChanged="seatsChanged" :plans="plans"
-      :groupInfos="groupInfos" :superAdmin="superAdmin">
+      @allowSbGrpsAdminsCreateFarmOSFarms="allowSubGroupsAdminsCreateFarmOSFarms"
+      @connect="connect"
+      @disconnect="showDisconnectGroupsDialog"
+      @open="openFarm"
+      @plansChanged="plansChanged"
+      @seatsChanged="seatsChanged"
+      :plans="plans"
+      :groupInfos="groupInfos"
+      :superAdmin="superAdmin"
+    >
     </FarmOSGroupSettings>
   </v-container>
 
@@ -32,12 +67,14 @@
           <p>{{ message }}</p>
           <v-btn color="primary" type="submit" @click="enable" v-if="btnEnable">Enable</v-btn>
           <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-else-if="btnContact">
-            Contact Our-Sci</v-btn>
+            Contact Our-Sci</v-btn
+          >
         </v-card>
         <v-card class="pa-8 text-center" v-else>
           <p>{{ message }}</p>
-          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-if="btnContact">Contact
-            Our-Sci</v-btn>
+          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-if="btnContact"
+            >Contact Our-Sci</v-btn
+          >
         </v-card>
       </v-col>
     </v-row>
@@ -49,6 +86,7 @@ import _ from 'lodash';
 import api from '@/services/api.service';
 import FarmOSGroupSettings from './../../components/integrations/FarmOSGroupSettings.vue';
 import FarmOSConnectDialog from './../../components/integrations/FarmOSConnectDialog.vue';
+import FarmOSDisconnectDialog from './../../components/integrations/FarmOSDisconnectDialog.vue';
 import FarmOSCreateDialog from './../../components/integrations/FarmOSCreateDialog.vue';
 
 export default {
@@ -59,6 +97,7 @@ export default {
     FarmOSGroupSettings,
     FarmOSConnectDialog,
     FarmOSCreateDialog,
+    FarmOSDisconnectDialog,
   },
   computed: {
     superAdmin() {
@@ -82,8 +121,15 @@ export default {
       btnContact: true,
       showConnectDialog: false,
       showCreateDialog: false,
+      showDisonnectDialog: false,
       selectedUser: null,
       farmInstances: [],
+
+      // disconnect farm instance
+      disconnectFarmInstanceName: [],
+      groupsOfInstance: [],
+      disconnectGroupId: '',
+      disconnectUserId: '',
       plans: [],
       createViewModel: {},
       successMessage: null,
@@ -114,8 +160,9 @@ export default {
     */
   },
   methods: {
-    updateGroupConfig() { },
-    unifomMembersInGroupInfos() { },
+    openFarm() {},
+    updateGroupConfig() {},
+    unifomMembersInGroupInfos() {},
     async seatsChanged(seats) {
       try {
         await api.post(`/farmos/group-manage/${this.groupId}/seats`, { seats: seats });
@@ -205,8 +252,10 @@ export default {
         this.loading = false;
       }
     },
-    connect(user) {
+    connect(userId) {
+      const user = this.groupInfos.members.find((m) => m.user === userId);
       this.selectedUser = user;
+      console.log('connecting user', this.selectedUser);
       this.showConnectDialog = true;
 
       this.farmInstances = _.uniq([
@@ -245,20 +294,52 @@ export default {
 
       await this.init();
     },
-    async disconnectFarm(userId, instanceName) {
+    async showDisconnectGroupsDialog(item) {
+      const { userId, instanceName, groupId } = item;
+
+      const membership = this.groupInfos.members.find((m) => m.user === userId);
+      if (!membership) {
+        return;
+      }
+
+      const connectedFarm = membership.connectedFarms.find((f) => f.instanceName === instanceName);
+      if (!connectedFarm) {
+        return;
+      }
+
+      this.disconnectUserId = userId;
+      this.disconnectGroupId = groupId;
+      this.groupsOfInstance = connectedFarm.groups;
+      this.disconnectFarmInstanceName = instanceName;
+
+      this.showDisonnectDialog = true;
+    },
+    async disconnectGroups(args) {
+      const [instanceName, groupIds] = args;
+      const userId = this.disconnectUserId;
       console.log('disconnecting', userId, instanceName);
+      const groupId = this.groupId;
+
+      console.log('args', args);
 
       this.loading = true;
 
       try {
-        const res = await api.post(`/farmos/group-manage/${this.groupId}/unmapUser`, {
+        await api.post(`/farmos/group-manage/${groupId}/unmapUser`, {
           userId,
           instanceName,
+          groupIds,
         });
+        this.success('Succefully umapped groups');
       } catch (error) {
-        this.error(error + '');
+        if (error.response && error.response.data && error.response.data.message) {
+          this.error(error.response.data.message);
+        } else {
+          this.error(error.message);
+        }
       }
 
+      this.showDisonnectDialog = false;
       await this.init();
     },
     async plansChanged(plans) {
@@ -350,7 +431,11 @@ export default {
         }
       } catch (error) {
         vm.form.instanceNameValid = false;
-        this.error(error + '');
+        if (error.response && error.response.data && error.response.data.message) {
+          this.error(error.response.data.message);
+        } else {
+          this.error(error.message);
+        }
       }
 
       vm.loading = false;
@@ -399,8 +484,12 @@ export default {
             this.error('error creating instance: ' + r.data.message);
           }
         }
-      } catch (e) {
-        this.error('error creating instance: ' + e.message);
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+          this.error(error.response.data.message);
+        } else {
+          this.error(error.message);
+        }
       }
 
       vm.loading = false;
@@ -417,6 +506,7 @@ export default {
     error(msg) {
       this.errorMessage = msg;
       this.successMessage = null;
+      window.scrollTo(0, 0);
     },
   },
 };
