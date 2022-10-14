@@ -76,7 +76,7 @@ export default {
     surveyId: '',
     surveyVersion: '',
     path: '',
-    loading: false,
+    loading: true,
     surveys: [],
     paths: [],
     previewDialogIsVisible: false,
@@ -156,7 +156,9 @@ export default {
   },
   watch: {
     surveyId() {
-      this.path = '';
+      if (!this.loading) {
+        this.path = '';
+      }
     },
   },
   async mounted() {
@@ -170,7 +172,6 @@ export default {
       }
     }
 
-    this.loading = true;
     const { data } = await api.get('/surveys/list-page?limit=1000');
     this.surveys = data.content;
     this.loading = false;
