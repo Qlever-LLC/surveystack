@@ -132,6 +132,8 @@ const base = (type) => ({
       try {
         const { data: location } = await api.get('farmos/assets?bundle=land');
 
+        console.log('locations', location);
+
         const response = await api.get('farmos/assets?bundle=plant');
 
         // console.log('res', response.data);
@@ -140,11 +142,11 @@ const base = (type) => ({
 
           if (f.location) {
             loc = f.location.map((loc) => {
-              const name = location.assets.find((l) => l.id === loc.id);
+              const asset = location.assets.find((l) => l.id === loc.id);
 
               return {
                 id: loc.id,
-                name: name ? name : '',
+                name: asset ? asset.name : '(No Area Associated)',
               };
             });
           }
@@ -180,11 +182,11 @@ const base = (type) => ({
       const localPlantings = [];
       for (const node of nodes) {
         if (node.type === 'farmOsUuid' && node.options.farmOsType === farmOsType) {
-          if (!node.value) {
+          if (!node.value || !node.value.name) {
             continue;
           }
           localPlantings.push({
-            label: `<span class="green-chip mr-4">New Planting</span> ${node.value.name}`,
+            label: `${node.value.name}`,
             value: {
               farmId: '',
               farmName: '',
