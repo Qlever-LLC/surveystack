@@ -682,6 +682,8 @@ export const getMemberInformationForDomain = async (descendants) => {
     m.connectedFarms.forEach((f) => {
       f.groups = f.groups.filter((g) => descendants.some((d) => d._id + '' == g.groupId + ''));
     });
+
+    m.connectedFarms = m.connectedFarms.filter((f) => f.groups.length > 0);
   });
 
   return {
