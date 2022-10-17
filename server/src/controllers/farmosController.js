@@ -1105,7 +1105,7 @@ export const unmapUser = async (req, res) => {
   // do we have permission to manage unmapping these groups?
   // are we top-level admin and are these groups in the farmos domain?
 
-  console.log('descendants', tree.descendants);
+  // console.log('descendants', tree.descendants);
   const unauthorized = groupIds.filter(
     (gid) => !tree.descendants.map((d) => d._id).some((id) => id + '' === gid)
   );
