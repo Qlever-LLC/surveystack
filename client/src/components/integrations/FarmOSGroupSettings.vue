@@ -13,28 +13,12 @@
       <v-card-title>Super Admin</v-card-title>
       <v-card-text>
         <div class="d-flex flex-grow-1">
-          <v-text-field
-            class="mr-4 flex-shrink-1 flex-grow-0"
-            outlined
-            v-model="seats"
-            label="Max Seats"
-            type="number"
-            @change="$emit('seatsChanged', seats)"
-          />
+          <v-text-field class="mr-4 flex-shrink-1 flex-grow-0" outlined v-model="seats" label="Max Seats" type="number"
+            @change="$emit('seatsChanged', seats)" />
 
-          <v-autocomplete
-            outlined
-            class="flex-grow-1 flex-shrink-0"
-            label="Select FarmOS Plans for Group"
-            multiple
-            deletable-chips
-            @change="$emit('plansChanged', selectedPlans)"
-            v-model="selectedPlans"
-            :items="plans"
-            :item-value="(p) => p._id"
-            small-chips
-            :item-text="(p) => `${p.planName} (${p.planUrl})`"
-          >
+          <v-autocomplete outlined class="flex-grow-1 flex-shrink-0" label="Select FarmOS Plans for Group" multiple
+            deletable-chips @change="$emit('plansChanged', selectedPlans)" v-model="selectedPlans" :items="plans"
+            :item-value="(p) => p._id" small-chips :item-text="(p) => `${p.planName} (${p.planUrl})`">
           </v-autocomplete>
         </div>
       </v-card-text>
@@ -47,32 +31,16 @@
         <div class="pa-3">
           <p class="font-weight-bold">Settings</p>
           <v-container class="pa-0" fluid>
-            <v-checkbox
-              v-if="groupInfos.allowSubgroupsToJoinCoffeeShop || groupInfos.isDomainRoot"
-              class="ma-0 pa-0"
-              hide-details
-              :ripple="false"
-              v-model="groupInfos.groupHasCoffeeShopAccess"
-              @change="$emit('addGrpCoffeeShop', $event)"
-              label="Add this group to the Coffee Shop"
-            ></v-checkbox>
-            <v-checkbox
-              v-if="groupInfos.isDomainRoot"
-              class="ma-0 pa-0"
-              hide-details
-              :ripple="false"
-              v-model="groupInfos.allowSubgroupsToJoinCoffeeShop"
-              @change="$emit('allowSbGrpsJoinCoffeeShop', $event)"
-              :label="`Allow subgroups to join the Coffee Shop`"
-            ></v-checkbox>
-            <v-checkbox
-              v-if="groupInfos.isDomainRoot"
-              class="ma-0 pa-0"
-              :ripple="false"
+            <v-checkbox v-if="groupInfos.allowSubgroupsToJoinCoffeeShop || groupInfos.isDomainRoot" class="ma-0 pa-0"
+              hide-details :ripple="false" v-model="groupInfos.groupHasCoffeeShopAccess"
+              @change="$emit('addGrpCoffeeShop', $event)" label="Add this group to the Coffee Shop"></v-checkbox>
+            <v-checkbox v-if="groupInfos.isDomainRoot" class="ma-0 pa-0" hide-details :ripple="false"
+              v-model="groupInfos.allowSubgroupsToJoinCoffeeShop" @change="$emit('allowSbGrpsJoinCoffeeShop', $event)"
+              :label="`Allow subgroups to join the Coffee Shop`"></v-checkbox>
+            <v-checkbox v-if="groupInfos.isDomainRoot" class="ma-0 pa-0" :ripple="false"
               v-model="groupInfos.allowSubgroupAdminsToCreateFarmOSInstances"
               @change="$emit('allowSbGrpsAdminsCreateFarmOSFarms', $event)"
-              label="Allow subgroups admins to create FarmOS Farms through Survey Stack"
-            >
+              label="Allow subgroups admins to create FarmOS Farms through Survey Stack">
             </v-checkbox>
           </v-container>
         </div>
@@ -86,11 +54,11 @@
       </div>
     </div>
 
-    <FarmOSGroupTable
-      :members="groupInfos.members"
-      @connect="(item) => $emit('connect', item)"
-      @disconnect="(item) => $emit('disconnect', item)"
-    />
+    <div class="search">
+      <v-text-field solo placeholder="Search" prepend-icon="mdi-magnify" clear-icon v-model="search"></v-text-field>
+    </div>
+    <FarmOSGroupTable :members="filteredMembers" @connect="(item) => $emit('connect', item)"
+      @disconnect="(item) => $emit('disconnect', item)" />
   </div>
 </template>
 
@@ -126,7 +94,7 @@ export default {
   ],
   setup(props) {
     // part Search input field
-    const arrHeaderSearch = ref(['', '', '']);
+    const search = ref('');
     let headers = computed(() => {
       return [
         {
@@ -141,64 +109,79 @@ export default {
       ];
     });
 
-    function filterOnlyCapsText(value, search, item) {
-      return Object.values(item).some((v) => v && v.toString().toLowerCase().includes(search.toLowerCase()));
-    }
+
 
     const filteredMembers = computed(() => {
-      let conditions = [];
-
-      if (arrHeaderSearch.value[0] != '') {
-        conditions.push(filterGMembers);
+      const s = search.value.toLowerCase().trim();
+      if (!s) {
+        return props.groupInfos.members;
       }
 
-      if (arrHeaderSearch.value[1] != '') {
-        conditions.push(filterCoFarms);
+      const strHas = (attr) => {
+        if (attr && attr.toLowerCase().trim().includes(s)) {
+          return true;
+        }
+        return false
       }
 
-      if (arrHeaderSearch.value[2] != '') {
-        conditions.push(filterMbShips);
-      }
+      return props.groupInfos.members.filter(m => {
+        if (strHas(m.name)) {
+          return true;
+        }
 
-      if (conditions.length > 0) {
-        return props.groupInfos.members.filter((m) => {
-          return conditions.every((condition) => {
-            return condition(m);
+        if (strHas(m.email)) {
+          return true;
+        }
+
+        if (m.connectedFarms.some(f => {
+          return strHas(f.instanceName);
+        })) {
+          return true;
+        }
+
+
+        if (m.connectedFarms.some(f => {
+          return f.groups.some(g => {
+            return strHas(g.path);
           });
-        });
-      }
+        })) {
+          return true;
+        }
 
-      return props.groupInfos.members;
+
+        return false;
+
+      })
     });
 
-    function filterGMembers(item) {
-      if (!item.name) {
-        return null;
-      }
-      return item.name.toLowerCase().includes(arrHeaderSearch.value[0].toLowerCase());
-    }
-    function filterCoFarms(item) {
-      let result = false;
-      if (item.connectedFarms && item.connectedFarms.length > 0 && item.connectedFarms[0].instanceName) {
-        item.connectedFarms.forEach((cF) => {
-          result = result || cF.instanceName.toLowerCase().includes(arrHeaderSearch.value[1].toLowerCase());
-        });
-      }
-      return result;
-    }
-    function filterMbShips(item) {
-      let result = false;
-      if (item.connectedFarms && item.connectedFarms.length > 0 && item.connectedFarms[0].groups) {
-        item.connectedFarms.forEach((cF) => {
-          if (cF.groups) {
-            cF.groups.forEach((m) => {
-              result = result || m.path.toLowerCase().includes(arrHeaderSearch.value[2].toLowerCase());
-            });
-          }
-        });
-        return result;
-      }
-    }
+    // function filterGMembers(item) {
+    //   if (!item.name) {
+    //     return null;
+    //   }
+    //   return item.name.toLowerCase().includes(arrHeaderSearch.value[0].toLowerCase());
+    // }
+    // function filterCoFarms(item) {
+    //   let result = false;
+    //   if (item.connectedFarms && item.connectedFarms.length > 0 && item.connectedFarms[0].instanceName) {
+    //     item.connectedFarms.forEach((cF) => {
+    //       result = result || cF.instanceName.toLowerCase().includes(arrHeaderSearch.value[1].toLowerCase());
+    //     });
+    //   }
+    //   return result;
+    // }
+    // function filterMbShips(item) {
+    //   let result = false;
+    //   if (item.connectedFarms && item.connectedFarms.length > 0 && item.connectedFarms[0].groups) {
+    //     item.connectedFarms.forEach((cF) => {
+    //       if (cF.groups) {
+    //         cF.groups.forEach((m) => {
+    //           result = result || m.path.toLowerCase().includes(arrHeaderSearch.value[2].toLowerCase());
+    //         });
+    //       }
+    //     });
+    //     return result;
+    //   }
+    // }
 
     // part develop + n others
 
@@ -216,13 +199,9 @@ export default {
 
     const upgradeDialog = ref(false);
     return {
-      arrHeaderSearch,
+      search,
       headers,
-      filterOnlyCapsText,
       filteredMembers,
-      filterGMembers,
-      filterCoFarms,
-      filterMbShips,
       developMbships,
       toggleDevelopMbships,
       selectedPlans,
@@ -256,11 +235,11 @@ export default {
   overflow: unset;
 }
 
-.v-data-table__wrapper > table > tbody > tr:hover {
+.v-data-table__wrapper>table>tbody>tr:hover {
   background: inherit !important;
 }
 
-.v-data-table >>> div > table {
+.v-data-table>>>div>table {
   width: 100%;
   border-spacing: 4px !important;
 }
