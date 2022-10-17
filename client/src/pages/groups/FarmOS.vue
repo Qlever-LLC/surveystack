@@ -13,7 +13,7 @@
       @connect="connectFarms" @create="createFarm" />
 
     <FarmOSDisconnectDialog v-model="showDisonnectDialog" :disconnectFarmInstanceName="disconnectFarmInstanceName"
-      :groupsOfInstance="groupsOfInstance" :disconnectGroupId="disconnectGroupId" @disconnect="disconnectGroups" />
+      :groupsOfInstance="groupsOfInstance" :allGroupIds="allGroupIds" @updateGroups="updateGroups" />
 
     <FarmOSGroupSettings class="ma-16" @addGrpCoffeeShop="enableCoffeeshop"
       @allowSbGrpsJoinCoffeeShop="allowSubGroupsJoinCoffeeShop"
@@ -94,7 +94,7 @@ export default {
       // disconnect farm instance
       disconnectFarmInstanceName: [],
       groupsOfInstance: [],
-      disconnectGroupId: '',
+      allGroupIds: [],
       disconnectUserId: '',
       plans: [],
       createViewModel: {},
@@ -261,7 +261,7 @@ export default {
       await this.init();
     },
     async showDisconnectGroupsDialog(item) {
-      const { userId, instanceName, groupId } = item;
+      const { userId, instanceName } = item;
 
       const membership = this.groupInfos.members.find((m) => m.user === userId);
       if (!membership) {
@@ -274,19 +274,18 @@ export default {
       }
 
       this.disconnectUserId = userId;
-      this.disconnectGroupId = groupId;
+      this.allGroupIds = connectedFarm.groups.map(g => g.groupId);
       this.groupsOfInstance = connectedFarm.groups;
       this.disconnectFarmInstanceName = instanceName;
 
       this.showDisonnectDialog = true;
     },
-    async disconnectGroups(args) {
+    async updateGroups(args) {
       const [instanceName, groupIds] = args;
       const userId = this.disconnectUserId;
-      console.log('disconnecting', userId, instanceName);
       const groupId = this.groupId;
 
-      console.log('args', args);
+      const disconnectGroups = this.groupsOfInstance.filter(g => !groupIds.includes(g.groupId)).map(g => g.groupId);
 
       this.loading = true;
 
@@ -294,7 +293,7 @@ export default {
         await api.post(`/farmos/group-manage/${groupId}/unmapUser`, {
           userId,
           instanceName,
-          groupIds,
+          groupIds: disconnectGroups,
         });
         this.success('Succefully umapped groups');
       } catch (error) {

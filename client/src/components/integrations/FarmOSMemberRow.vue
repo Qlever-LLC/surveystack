@@ -13,32 +13,24 @@
         {{ instance.name }}
       </div>
       <div class="instance-groups">
-        <div
-          class="instance-group"
-          v-for="(group, idx) in instance.groups"
-          :key="`user-${user.id}-instance-${instance.name}-group-${group.name}`"
-        >
-          <div class="group-chip mx-1" v-if="idx < 4 || more.includes(`${user.id}-${instance.name}`)">
+        <div class="instance-group" v-for="(group, idx) in instance.groups"
+          :key="`user-${user.id}-instance-${instance.name}-group-${group.name}`">
+          <div class="group-chip mx-1" v-if="idx < 3 || more.includes(`${user.id}-${instance.name}`)">
             <v-tooltip top>
               <template v-slot:activator="{ on }">
-                <v-chip
-                  close
-                  small
-                  v-on="on"
-                  @click:close="
-                    $emit('disconnect', { groupId: group.id, userId: user.id, instanceName: instance.name })
-                  "
-                >
-                  {{ group.name }}</v-chip
-                >
+                <v-chip small v-on="on">
+                  {{ group.name }}</v-chip>
               </template>
               <span>{{ group.path }}</span>
             </v-tooltip>
           </div>
         </div>
         <div v-if="instance.groups.length >= 4 && !more.includes(`${user.id}-${instance.name}`)">
-          <v-btn text x-small @click="showMore(user, instance)">+ {{ `${instance.groups.length - 4}` }} more</v-btn>
+          <v-btn text x-small @click="showMore(user, instance)">+ {{ `${instance.groups.length - 3}` }} more</v-btn>
         </div>
+        <v-btn text small dense
+          @click=" $emit('disconnect', { groupId: null, userId: user.id, instanceName: instance.name })">
+          manage </v-btn>
       </div>
     </div>
 

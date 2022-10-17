@@ -1,24 +1,13 @@
 <template>
   <v-dialog v-model="show" max-width="500" max-height="1000" @input="(v) => v || (selectedGroups = [])">
     <v-card class="pa-4">
-      <v-card-title class="headline"> Disconnect Farm from Groups </v-card-title>
+      <v-card-title class="headline"> Manage Groups </v-card-title>
       <v-card-text>
-        Select Groups to disconnect this farm from.
+        Update Groups with Access to Farm Instance
         <br />
-        <v-autocomplete
-          label="Select Groups"
-          multiple
-          chips
-          deletable-chips
-          :items="groupsOfInstance"
-          :item-text="(g) => `${g.name}`"
-          :item-value="(g) => `${g.groupId}`"
-          class="mt-4"
-          v-model="selectedGroups"
-        />
-        <v-btn block @click="disconnect" :disabled="selectedGroups.length <= 0" color="primary"
-          >Disconnect Selected Groups
-        </v-btn>
+        <v-autocomplete label="Select Groups" multiple deletable-chips chips :items="groupsOfInstance"
+          :item-text="(g) => `${g.name}`" :item-value="(g) => `${g.groupId}`" class="mt-4" v-model="selectedGroups" />
+        <v-btn block @click="updateGroups" :disabled="selectedGroups.length <= 0" color="primary">Update Groups</v-btn>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -26,25 +15,25 @@
 
 <script>
 export default {
-  emits: ['disconnect'],
-  props: ['disconnectFarmInstanceName', 'groupsOfInstance', 'disconnectGroupId', 'value'],
+  emits: ['updateGroups'],
+  props: ['disconnectFarmInstanceName', 'groupsOfInstance', 'allGroupIds', 'value'],
   data() {
     return {
       selectedGroups: [],
     };
   },
   methods: {
-    disconnect() {
-      this.$emit('disconnect', [this.disconnectFarmInstanceName, this.selectedGroups]);
+    updateGroups() {
+      this.$emit('updateGroups', [this.disconnectFarmInstanceName, this.selectedGroups]);
       this.selectedGroups = [];
     },
   },
   watch: {
     groupsOfInstance() {
-      this.selectedGroups = [this.disconnectGroupId];
+      this.selectedGroups = [this.allGroupIds];
     },
-    disconnectGroupId() {
-      this.selectedGroups = [this.disconnectGroupId];
+    allGroupIds() {
+      this.selectedGroups = this.allGroupIds;
     },
   },
   computed: {
