@@ -1,3 +1,5 @@
+import getControlGenerator from './surveyControls';
+
 const crypto = jest.requireActual('crypto');
 const { deburr, kebabCase, uniqueId } = jest.requireActual('lodash');
 const { ObjectId } = jest.requireActual('mongodb');
@@ -119,6 +121,125 @@ export const setRole = async (membershipId, role) => {
       returnOriginal: false,
     }
   );
+};
+
+/**
+ *
+ * @param {
+    'page' |
+    'group' |
+    'instructions' |
+    'instructionsImageSplit' |
+    'text' |
+    'number' |
+    'date' |
+    'location' |
+    'selectSingle' |
+    'selectMultiple' |
+    'ontology' |
+    'matrix' |
+    'image' |
+    'file' |
+    'script' |
+    'farmOsField' |
+    'farmOsPlanting' |
+    'farmOsFarm' |
+    'geoJSON'
+  } controls
+*/
+export const createSurvey = async (overrides = {}, control = '') => {
+  const surveyDoc = {
+    _id: uniqueId(),
+    name: 'Mock Survey Name',
+    latestVersion: 1,
+    meta: {
+      dateCreated: new Date('2022-10-11T02:30:35.000Z'),
+      dateModified: new Date('2022-10-11T02:30:35.000Z'),
+      submissions: 'public',
+      creator: uniqueId(),
+      group: {
+        id: uniqueId(),
+        path: '/mock-group-path/',
+      },
+      specVersion: 4,
+    },
+    resources: [
+      {
+        id: uniqueId(),
+        label: 'Mock.csv',
+        name: 'mockcsv',
+        type: 'FILE',
+        location: 'REMOTE',
+      },
+      {
+        id: uniqueId(),
+        label: 'Mock Dropdown Items',
+        name: 'mock_dropdown_items',
+        type: 'ONTOLOGY_LIST',
+        location: 'EMBEDDED',
+        content: [
+          {
+            id: uniqueId(),
+            label: 'Item 1',
+            value: 'item_1',
+            tags: 'item1',
+          },
+          {
+            id: uniqueId(),
+            label: 'Item 2',
+            value: 'item_2',
+            tags: 'item2',
+          },
+        ],
+      },
+      {
+        id: uniqueId(),
+        label: 'Mock Resource Name',
+        name: 'survey_reference_1',
+        type: 'SURVEY_REFERENCE',
+        location: 'REMOTE',
+        content: {
+          id: uniqueId(),
+          version: 1,
+          path: 'data.node_1.property_2',
+        },
+      },
+    ],
+    revisions: [
+      {
+        dateCreated: new Date('2022-10-11T02:30:35.000Z'),
+        version: 1,
+        controls: [],
+      },
+    ],
+    ...overrides,
+  };
+
+  const controlGenerator = getControlGenerator(control);
+
+  if (typeof controlGenerator === 'function') {
+    surveyDoc.revisions.push({
+      dateCreated: surveyDoc.meta.dateModified,
+      version: 2,
+      controls: [
+        {
+          id: uniqueId(),
+          ...controlGenerator({}, 1, surveyDoc.resources[1].id),
+        },
+      ],
+    });
+    surveyDoc.latestVersion = 2;
+  }
+
+  const survey = await getDb().collection('survey').insertOne(surveyDoc);
+
+  const createSubmission = async (_overrides = {}) => {
+    const submissionDoc = { ..._overrides };
+    const submission = await getDb().collection('submissions').insertOne(submissionDoc);
+    return submission;
+  };
+
+  return { ...survey, createSubmission };
 };
 
 export const createReq = ({
