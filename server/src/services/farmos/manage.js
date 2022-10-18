@@ -606,6 +606,27 @@ export const getMemberInformationForDomain = async (descendants) => {
   ];
 
   const res = await db.collection('memberships').aggregate(aggregation).toArray();
+  const domainGroups = await db
+    .collection('groups')
+    .find(
+      {
+        _id: {
+          $in: descendantsIds,
+        },
+      },
+      {
+        projection: {
+          _id: 1,
+          name: 1,
+          path: 1,
+          slug: 1,
+          dir: 1,
+        },
+      }
+    )
+    .toArray();
+
+  console.log('descendant groups', domainGroups);
 
   // console.log(JSON.stringify(res, null, 2));
 
@@ -683,7 +704,7 @@ export const getMemberInformationForDomain = async (descendants) => {
       f.groups = f.groups.filter((g) => descendants.some((d) => d._id + '' == g.groupId + ''));
     });
 
-    m.connectedFarms = m.connectedFarms.filter((f) => f.groups.length > 0);
+    // m.connectedFarms = m.connectedFarms.filter((f) => f.groups.length > 0);
   });
 
   return {
@@ -692,6 +713,7 @@ export const getMemberInformationForDomain = async (descendants) => {
       ...u,
       path: groups.find((g) => g._id.equals(u.groupId))?.path,
     })),
+    domainGroups,
   };
 };
 
@@ -804,6 +826,7 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
     isDomainRoot: testedGroupIsRoot,
     members,
     unassignedInstances: membersRawData.unassignedInstances,
+    domainGroups: membersRawData.domainGroups,
   };
   return groupInformation;
 };

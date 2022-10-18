@@ -5,9 +5,10 @@
       <v-card-text>
         Update Groups with Access to Farm Instance
         <br />
-        <v-autocomplete label="Select Groups" multiple deletable-chips chips :items="groupsOfInstance"
-          :item-text="(g) => `${g.name}`" :item-value="(g) => `${g.groupId}`" class="mt-4" v-model="selectedGroups" />
-        <v-btn block @click="updateGroups" :disabled="selectedGroups.length <= 0" color="primary">Update Groups</v-btn>
+        <v-autocomplete label="Select Groups" multiple chips :items="allGroups"
+          :item-text="(g) => `${g.name} (${g.path})`" :item-value="(g) => `${g._id}`" class="mt-4"
+          v-model="selectedGroups" dense open-on-clear />
+        <v-btn block @click="updateGroups" color="primary">Update Groups</v-btn>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -16,7 +17,7 @@
 <script>
 export default {
   emits: ['updateGroups'],
-  props: ['disconnectFarmInstanceName', 'groupsOfInstance', 'allGroupIds', 'value'],
+  props: ['updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],
   data() {
     return {
       selectedGroups: [],
@@ -24,16 +25,16 @@ export default {
   },
   methods: {
     updateGroups() {
-      this.$emit('updateGroups', [this.disconnectFarmInstanceName, this.selectedGroups]);
+      this.$emit('updateGroups', [this.updateFarmInstanceName, this.selectedGroups]);
       this.selectedGroups = [];
     },
   },
   watch: {
-    groupsOfInstance() {
-      this.selectedGroups = [this.allGroupIds];
+    allGroups() {
+      this.selectedGroups = [this.selectedGroupIds];
     },
-    allGroupIds() {
-      this.selectedGroups = this.allGroupIds;
+    selectedGroupIds() {
+      this.selectedGroups = this.selectedGroupIds;
     },
   },
   computed: {

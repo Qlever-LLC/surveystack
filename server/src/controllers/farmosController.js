@@ -1078,7 +1078,7 @@ export const mapUser = async (req, res) => {
   });
 };
 
-export const unmapUser = async (req, res) => {
+export const updateGroupsForUser = async (req, res) => {
   const { groupId, userId, instanceName, groupIds, tree } = await requireGroup(req, {
     userId: Joi.objectId().required(),
     instanceName: Joi.string().required(),
@@ -1123,48 +1123,26 @@ export const unmapUser = async (req, res) => {
     throw boom.unauthorized(`unauthorized to manage groups: ${groups.join(',')}`);
   }
 
-  // instance mapped to group?
-
-  const mappedInstances = await db
-    .collection('farmos-group-mapping')
-    .find({
-      instanceName,
-      groupId: {
-        $in: groupIds.map((g) => new ObjectId(g)),
-      },
-    })
-    .toArray();
-
-  if (mappedInstances.length == 0) {
-    throw boom.badData(`instance not mapped to group ${instanceName}, ${groupId}`);
-  }
+  // clear all mappings of groups in descendants
 
   await db.collection('farmos-group-mapping').deleteMany({
-    _id: {
-      $in: mappedInstances.map((mi) => mi._id),
+    groupId: {
+      $in: tree.descendants.map((d) => d._id),
     },
+    instanceName,
   });
 
-  // if the target user is not owner of the farm, then also unlink
+  // add all
 
-  const usersUnownedFarms = await db
-    .collection('farmos-instances')
-    .find({
-      userId: new ObjectId(userId),
-      instanceName,
-      owner: false,
-    })
-    .toArray();
-
-  if (usersUnownedFarms.length > 0) {
-    await db.collection('farmos-instances').deleteMany({
-      _id: {
-        $in: usersUnownedFarms.map((uo) => uo._id),
-      },
-    });
+  if (groupIds.length > 0) {
+    await db.collection('farmos-group-mapping').insertMany(
+      groupIds.map((gid) => ({
+        _id: new ObjectId(),
+        groupId: new ObjectId(gid),
+        instanceName,
+      }))
+    );
   }
-
-  // todo, what if there are multiple admins in the group that added the instance?
 
   return res.send({
     status: 'ok',

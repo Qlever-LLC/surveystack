@@ -12,8 +12,8 @@
     <FarmOSConnectDialog v-model="showConnectDialog" :farmInstances="farmInstances" :allowCreate="allowCreate"
       @connect="connectFarms" @create="createFarm" />
 
-    <FarmOSDisconnectDialog v-model="showDisonnectDialog" :disconnectFarmInstanceName="disconnectFarmInstanceName"
-      :groupsOfInstance="groupsOfInstance" :allGroupIds="allGroupIds" @updateGroups="updateGroups" />
+    <FarmOSDisconnectDialog v-model="showDisonnectDialog" :updateFarmInstanceName="updateFarmInstanceName"
+      :allGroups="allGroups" :selectedGroupIds="selectedGroupIds" @updateGroups="updateGroups" />
 
     <FarmOSGroupSettings class="ma-16" @addGrpCoffeeShop="enableCoffeeshop"
       @allowSbGrpsJoinCoffeeShop="allowSubGroupsJoinCoffeeShop"
@@ -92,9 +92,9 @@ export default {
       farmInstances: [],
 
       // disconnect farm instance
-      disconnectFarmInstanceName: [],
-      groupsOfInstance: [],
-      allGroupIds: [],
+      updateFarmInstanceName: [],
+      allGroups: [],
+      selectedGroupIds: [],
       disconnectUserId: '',
       plans: [],
       createViewModel: {},
@@ -273,10 +273,12 @@ export default {
         return;
       }
 
+
+      console.log("groupInfos", this.groupInfos.domainGroups);
       this.disconnectUserId = userId;
-      this.allGroupIds = connectedFarm.groups.map(g => g.groupId);
-      this.groupsOfInstance = connectedFarm.groups;
-      this.disconnectFarmInstanceName = instanceName;
+      this.selectedGroupIds = connectedFarm.groups.map(g => g.groupId);
+      this.allGroups = this.groupInfos.domainGroups;
+      this.updateFarmInstanceName = instanceName;
 
       this.showDisonnectDialog = true;
     },
@@ -285,15 +287,13 @@ export default {
       const userId = this.disconnectUserId;
       const groupId = this.groupId;
 
-      const disconnectGroups = this.groupsOfInstance.filter(g => !groupIds.includes(g.groupId)).map(g => g.groupId);
-
       this.loading = true;
 
       try {
-        await api.post(`/farmos/group-manage/${groupId}/unmapUser`, {
+        await api.post(`/farmos/group-manage/${groupId}/updateGroupsForUser`, {
           userId,
           instanceName,
-          groupIds: disconnectGroups,
+          groupIds,
         });
         this.success('Succefully umapped groups');
       } catch (error) {

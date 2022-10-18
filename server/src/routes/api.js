@@ -327,9 +327,9 @@ router.post(
 );
 
 router.post(
-  '/farmos/group-manage/:groupId/unmapUser',
+  '/farmos/group-manage/:groupId/updateGroupsForUser',
   [assertHasGroupAdminAccess],
-  catchErrors(farmosController.unmapUser)
+  catchErrors(farmosController.updateGroupsForUser)
 );
 
 router.post(
