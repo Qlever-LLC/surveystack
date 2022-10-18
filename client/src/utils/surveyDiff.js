@@ -264,7 +264,7 @@ function createThreePointChange(changeLocal, changeRemote) {
       if (
         localChangeProp &&
         localChangeProp.changeType === CHANGED &&
-        //ignore resource id changes, cause these changes always happen when inherting a qsl
+        //ignore resource id changes, cause these changes always happen when consuming a qsl
         !isOntologyResourceChange(threePointChange.controlLocalRevision, diffProperty) &&
         !isMatrixResourceChange(threePointChange.controlLocalRevision, diffProperty)
       ) {
