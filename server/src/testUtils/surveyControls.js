@@ -158,7 +158,7 @@ const selectMultipleControl = (overrides = {}, index = 1) => ({
   ...overrides,
 });
 
-const ontologyControl = (overrides = {}, source = uniqueId(), index = 1) => ({
+const ontologyControl = (overrides = {}, index = 1, source = uniqueId()) => ({
   name: `dropdown_${index}`,
   label: `Dropdown ${index}`,
   type: 'ontology',
@@ -239,7 +239,7 @@ const fileControl = (overrides = {}, index = 1) => ({
   ...overrides,
 });
 
-const scriptControl = (overrides = {}, source = uniqueId(), index = 1) => ({
+const scriptControl = (overrides = {}, index = 1, source = uniqueId()) => ({
   name: `script_${index}`,
   label: `Script ${index}`,
   type: 'script',
