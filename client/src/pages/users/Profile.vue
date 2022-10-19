@@ -92,9 +92,9 @@
         <v-card>
           <v-card-title> Leave Group </v-card-title>
           <v-card-text v-if="parentAdminGroup" class="mt-4">
-            You are admin of <strong>{{ parentAdminGroup.name }}</strong
-            >. To leave this group, you must leave that group or change your status from <strong>Admin</strong> to
-            <strong>Member</strong>`
+            To leave <strong>{{ activeGroup.name }}</strong
+            >, you must leave <strong>{{ parentAdminGroup.name }}</strong> or change status from
+            <strong>Admin</strong> to <strong>Member</strong>
           </v-card-text>
           <v-card-text v-else>
             Are you sure you want to leave
