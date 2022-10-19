@@ -12,7 +12,7 @@
       color="focus"
     >
       <template v-slot:item="{ item }">
-        <span :style="item.style">{{ item.text }}</span>
+        <span :class="item.className" :style="item.style">{{ item.text }}</span>
       </template>
     </v-select>
   </div>
@@ -73,13 +73,27 @@ export default {
       return this.$store.getters['memberships/groups'];
     },
     groupItems() {
-      const calculatedGroups = this.treeView ? makeTree(this.groups) : this.groups;
-      return calculatedGroups.map((group) => {
-        return {
+      if (!this.treeView) {
+        return this.groups.map((group) => ({
           text: group.name,
           value: this.returnObject ? { id: group._id, path: group.path } : group._id,
-          style: this.getMargin(getGroupLevel(group)),
+        }));
+      }
+
+      const groupsTree = makeTree(this.groups);
+      let seperator = true;
+      return Array.from(new Set([...groupsTree, ...this.groups])).map((group) => {
+        const isTreeGroup = groupsTree.includes(group);
+        const item = {
+          text: group.name,
+          value: this.returnObject ? { id: group._id, path: group.path } : group._id,
+          style: isTreeGroup ? this.getMargin(getGroupLevel(group)) : undefined,
+          className: !isTreeGroup && seperator ? 'no-parent-group' : '',
         };
+        if (!isTreeGroup && seperator) {
+          seperator = false;
+        }
+        return item;
       });
     },
     activeGroup() {
@@ -107,3 +121,14 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+>>> .v-list-item > .no-parent-group::after {
+  content: '';
+  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.24);
+}
+</style>

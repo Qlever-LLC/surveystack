@@ -19,32 +19,6 @@
         >.
       </p>
 
-      <div class="my-4 d-flex align-center">
-        <active-group-selector class="flex-grow-1" v-model="activeGroup" outlined tree-view />
-        <v-btn class="ml-2" color="error" :disabled="!activeMemebership" @click="isLeaveDialogOpen = true">Leave</v-btn>
-      </div>
-
-      <v-dialog v-model="isLeaveDialogOpen" max-width="290">
-        <v-card>
-          <v-card-title> Leave Group </v-card-title>
-          <v-card-text v-if="parentAdminGroup" class="mt-4">
-            You are admin of <strong>{{ parentAdminGroup.name }}</strong
-            >. To leave this group, you must leave that group or change your status from <strong>Admin</strong> to
-            <strong>Member</strong>`
-          </v-card-text>
-          <v-card-text v-else>
-            Are you sure you want to leave
-            <strong>{{ activeMemebership ? activeMemebership.group.name : 'the current active group' }}</strong
-            >?
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer />
-            <v-btn text @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </v-btn>
-            <v-btn v-if="!parentAdminGroup" text color="red" @click.stop="leaveGroup"> Leave </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
       <v-card outlined>
         <v-card-text> <div>User Details</div></v-card-text>
         <v-card-text>
@@ -102,6 +76,38 @@
           </v-form></v-card-text
         >
       </v-card>
+
+      <div class="mt-8 mb-4">
+        <h3>Group Memberships</h3>
+        <p class="mt-1 mb-5 grey--text text-body-2">These are your group memberships. You can select one to leave.</p>
+        <div class="d-flex align-center">
+          <active-group-selector class="flex-grow-1" label="Select a group" v-model="activeGroup" outlined tree-view />
+          <v-btn class="ml-2" color="error" :disabled="!activeMemebership" @click="isLeaveDialogOpen = true"
+            >Leave</v-btn
+          >
+        </div>
+      </div>
+
+      <v-dialog v-model="isLeaveDialogOpen" max-width="290">
+        <v-card>
+          <v-card-title> Leave Group </v-card-title>
+          <v-card-text v-if="parentAdminGroup" class="mt-4">
+            You are admin of <strong>{{ parentAdminGroup.name }}</strong
+            >. To leave this group, you must leave that group or change your status from <strong>Admin</strong> to
+            <strong>Member</strong>`
+          </v-card-text>
+          <v-card-text v-else>
+            Are you sure you want to leave
+            <strong>{{ activeMemebership ? activeMemebership.group.name : 'the current active group' }}</strong
+            >?
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn text @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </v-btn>
+            <v-btn v-if="!parentAdminGroup" text color="red" @click.stop="leaveGroup"> Leave </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </template>
     <template v-else>
       <h1>Profile</h1>
