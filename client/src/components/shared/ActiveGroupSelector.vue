@@ -11,11 +11,29 @@
       hide-details
       color="focus"
     >
+      <template v-slot:item="{ item }">
+        <span :class="item.className" :style="item.style">{{ item.text }}</span>
+      </template>
     </v-select>
   </div>
 </template>
 
 <script>
+function getGroupLevel(group) {
+  return group.dir.match(/\//g).length;
+}
+
+function makeTree(groups, lvl = 1) {
+  const treeList = [];
+  const lvlGroups = groups.filter((group) => getGroupLevel(group) === lvl);
+  lvlGroups.forEach((group) => {
+    const childGroups = groups.filter((g) => g.path.startsWith(group.path));
+    treeList.push(group);
+    treeList.push(...makeTree(childGroups, lvl + 1));
+  });
+  return treeList;
+}
+
 export default {
   props: {
     value: {
@@ -39,6 +57,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    treeView: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     groups() {
@@ -51,21 +73,27 @@ export default {
       return this.$store.getters['memberships/groups'];
     },
     groupItems() {
-      return this.groups.map(({ name, _id, path }) => {
-        if (this.returnObject) {
-          return {
-            text: name,
-            value: {
-              id: _id,
-              path,
-            },
-          };
-        }
+      if (!this.treeView) {
+        return this.groups.map((group) => ({
+          text: group.name,
+          value: this.returnObject ? { id: group._id, path: group.path } : group._id,
+        }));
+      }
 
-        return {
-          text: name,
-          value: _id,
+      const groupsTree = makeTree(this.groups);
+      let seperator = true;
+      return Array.from(new Set([...groupsTree, ...this.groups])).map((group) => {
+        const isTreeGroup = groupsTree.includes(group);
+        const item = {
+          text: group.name,
+          value: this.returnObject ? { id: group._id, path: group.path } : group._id,
+          style: isTreeGroup ? this.getMargin(getGroupLevel(group)) : undefined,
+          className: !isTreeGroup && seperator ? 'no-parent-group' : '',
         };
+        if (!isTreeGroup && seperator) {
+          seperator = false;
+        }
+        return item;
       });
     },
     activeGroup() {
@@ -78,10 +106,13 @@ export default {
       return this.$store.getters['whitelabel/partner'];
     },
   },
-
   methods: {
     handleInput(val) {
       this.$emit('input', val);
+    },
+    getMargin(lvl) {
+      const pixels = Math.max(0, lvl - 1) * 16;
+      return this.treeView ? { 'margin-left': `${pixels}px` } : {};
     },
   },
   created() {
@@ -90,3 +121,14 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+>>> .v-list-item > .no-parent-group::after {
+  content: '';
+  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.24);
+}
+</style>

@@ -19,7 +19,6 @@
         >.
       </p>
 
-      <active-group-selector class="my-4" v-model="activeGroup" outlined />
       <v-card outlined>
         <v-card-text> <div>User Details</div></v-card-text>
         <v-card-text>
@@ -77,6 +76,38 @@
           </v-form></v-card-text
         >
       </v-card>
+
+      <div class="mt-8 mb-4">
+        <h3>Group Memberships</h3>
+        <p class="mt-1 mb-5 grey--text text-body-2">These are your group memberships. You can select one to leave.</p>
+        <div class="d-flex align-center">
+          <active-group-selector class="flex-grow-1" label="Select a group" v-model="activeGroup" outlined tree-view />
+          <v-btn class="ml-2" color="error" :disabled="!activeMemebership" @click="isLeaveDialogOpen = true"
+            >Leave</v-btn
+          >
+        </div>
+      </div>
+
+      <v-dialog v-model="isLeaveDialogOpen" max-width="290">
+        <v-card>
+          <v-card-title> Leave Group </v-card-title>
+          <v-card-text v-if="parentAdminGroup" class="mt-4">
+            To leave <strong>{{ activeGroup.name }}</strong
+            >, you must leave <strong>{{ parentAdminGroup.name }}</strong> or change status from
+            <strong>Admin</strong> to <strong>Member</strong>
+          </v-card-text>
+          <v-card-text v-else>
+            Are you sure you want to leave
+            <strong>{{ activeMemebership ? activeMemebership.group.name : 'the current active group' }}</strong
+            >?
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn text @click.stop="isLeaveDialogOpen = false"> {{ parentAdminGroup ? 'Close' : 'Cancel' }} </v-btn>
+            <v-btn v-if="!parentAdminGroup" text color="red" @click.stop="leaveGroup"> Leave </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </template>
     <template v-else>
       <h1>Profile</h1>
@@ -93,6 +124,16 @@ import appFeedback from '@/components/ui/Feedback.vue';
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import api from '@/services/api.service';
 import { pick } from 'lodash';
+
+function findParentAdminGroup(memberships, activeMembership) {
+  if (activeMembership.role === 'admin') {
+    const parent = memberships.find((membership) => membership.group.path === activeMembership.group.dir);
+    if (parent && parent.role === 'admin') {
+      return findParentAdminGroup(memberships, parent);
+    }
+  }
+  return activeMembership.group;
+}
 
 export default {
   components: {
@@ -111,6 +152,7 @@ export default {
       isSubmittingData: false,
       isSubmittingEmail: false,
       isEmailDialogOpen: false,
+      isLeaveDialogOpen: false,
     };
   },
   computed: {
@@ -130,6 +172,19 @@ export default {
       set(val) {
         this.$store.dispatch('memberships/setActiveGroup', val);
       },
+    },
+    activeMemebership() {
+      return this.$store.getters['memberships/getMembershipByGroupId'](this.activeGroup);
+    },
+    parentAdminGroup() {
+      const memberships = this.$store.getters['memberships/memberships'];
+      if (this.activeMemebership) {
+        const parentAdminGroup = findParentAdminGroup(memberships, this.activeMemebership);
+        if (parentAdminGroup._id !== this.activeMemebership.group._id) {
+          return parentAdminGroup;
+        }
+      }
+      return null;
     },
   },
   methods: {
@@ -174,6 +229,15 @@ export default {
         this.status = { type: 'error', message: err.response.data.message };
       } finally {
         this.isSubmitting = false;
+      }
+    },
+    async leaveGroup() {
+      this.isLeaveDialogOpen = false;
+      try {
+        await api.delete(`/memberships/${this.activeMemebership._id}`);
+        this.$store.dispatch('memberships/tryAutoJoinAndSelectGroup');
+      } catch (err) {
+        this.$store.dispatch('feedback/add', err.response.data.message);
       }
     },
     async readUser() {
