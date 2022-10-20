@@ -163,6 +163,7 @@
   <v-autocomplete
     v-else-if="header.type === 'farmos_field'"
     :items="farmos.farms || []"
+    :multiple="header.multiple"
     :value="value"
     @input="
       (v) => {
@@ -184,6 +185,7 @@
 
   <v-autocomplete
     v-else-if="header.type === 'farmos_planting'"
+    :multiple="header.multiple"
     :value="value"
     @input="
       (v) => {

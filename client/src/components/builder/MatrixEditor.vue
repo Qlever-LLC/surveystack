@@ -166,6 +166,14 @@
                       hint="Submitters can not see this column. This option is intentionally allowed by the question set designer"
                       persistent-hint
                     />
+
+                    <div
+                      v-if="item.type == 'farmos_field' || item.type == 'farmos_planting'"
+                      class="d-flex flex-column"
+                    >
+                      <v-checkbox class="mt-2" v-model="item.multiple" label="Multiselect" hide-details />
+                    </div>
+
                     <h4 class="mt-6 mb-4">Display Options</h4>
                     <v-text-field
                       type="number"
