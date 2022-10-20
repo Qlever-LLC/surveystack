@@ -30,6 +30,7 @@
       @mousedown.stop.left="$emit('control-selected', el)"
       :data-testid="`control-card-${el.id}`"
       :data-control-type="el.type"
+      :data-control-contains-page="childContainsPage(el.children)"
     >
       <div
         class="d-flex justify-space-between align-center"
@@ -47,59 +48,74 @@
           {{ createIndex(index, idx + 1) | displayIndex }} &nbsp; {{ getDisplay(el) }}
         </div>
         <div class="mb-2 context-actions">
-          <div>
-            <v-btn icon v-if="areActionsVisible(el) && !el.libraryId" @click.stop="duplicateControl(el)">
-              <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
-            </v-btn>
-            <v-btn
-              icon
-              v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
-              @click.stop="openLibrary(el.libraryId)"
+          <v-btn icon v-if="areActionsVisible(el) && !el.libraryId" @click.stop="duplicateControl(el)">
+            <v-icon color="grey lighten-1">mdi-content-copy</v-icon>
+          </v-btn>
+          <v-btn
+            icon
+            v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
+            @click.stop="openLibrary(el.libraryId)"
+          >
+            <v-icon color="grey lighten-1">mdi-library</v-icon>
+          </v-btn>
+          <v-chip
+            v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
+            class="align-center text-align-center text-center"
+            dark
+            small
+            :color="
+              availableLibraryUpdates[el.libraryId] === null
+                ? 'error'
+                : availableLibraryUpdates[el.libraryId] > el.libraryVersion
+                ? 'warning'
+                : 'grey'
+            "
+            :title="
+              availableLibraryUpdates[el.libraryId] === null
+                ? 'question set has been deleted in the library'
+                : availableLibraryUpdates[el.libraryId]
+                ? 'new version ' + availableLibraryUpdates[el.libraryId] + ' available'
+                : 'newest available version'
+            "
+          >
+            <v-icon
+              v-if="availableLibraryUpdates[el.libraryId] > el.libraryVersion"
+              @click.stop="$emit('update-library-control', el)"
+              left
             >
-              <v-icon color="grey lighten-1">mdi-library</v-icon>
-            </v-btn>
-            <v-chip
-              v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
-              class="align-center text-align-center text-center"
-              dark
-              small
-              :color="
-                availableLibraryUpdates[el.libraryId] === null
-                  ? 'error'
-                  : availableLibraryUpdates[el.libraryId] > el.libraryVersion
-                  ? 'warning'
-                  : 'grey'
-              "
-              :title="
-                availableLibraryUpdates[el.libraryId] === null
-                  ? 'question set has been deleted in the library'
-                  : availableLibraryUpdates[el.libraryId]
-                  ? 'new version ' + availableLibraryUpdates[el.libraryId] + ' available'
-                  : 'newest available version'
-              "
-            >
-              <v-icon
-                v-if="availableLibraryUpdates[el.libraryId] > el.libraryVersion"
-                @click.stop="updateLibrary(el)"
-                left
-              >
-                mdi-refresh
-              </v-icon>
-              Version {{ el.libraryVersion }}
-            </v-chip>
-            <v-btn
-              icon
-              v-if="areActionsVisible(el) && (!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited))"
-              @click.stop="() => showDeleteModal(idx)"
-            >
-              <v-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey lighten-1'"
-                >mdi-delete
-              </v-icon>
-            </v-btn>
-            <v-btn text x-small v-if="el.options.hidden" @click.stop="el.options.hidden = false" color="grey lighten-1">
-              unhide
-            </v-btn>
-          </div>
+              mdi-refresh
+            </v-icon>
+            Version {{ el.libraryVersion }}
+          </v-chip>
+          <v-btn
+            icon
+            v-if="!el.libraryId || (el.isLibraryRoot && !el.libraryIsInherited)"
+            @click.stop="() => showDeleteModal(idx)"
+          >
+            <v-icon :color="availableLibraryUpdates[el.libraryId] === null ? 'error' : 'grey lighten-1'">
+              mdi-delete
+            </v-icon>
+          </v-btn>
+          <v-btn
+            text
+            x-small
+            v-if="el.options.hidden"
+            @click.stop="$emit('unhide-control', el)"
+            color="grey lighten-1"
+            style="margin-bottom: -8px"
+          >
+            unhide
+          </v-btn>
+          <v-btn
+            text
+            x-small
+            v-if="areActionsVisible(el) && el.libraryId && el.options.allowHide && !el.options.hidden"
+            @click.stop="$emit('hide-control', el)"
+            color="grey lighten-1"
+            class="mb-4"
+          >
+            hide
+          </v-btn>
         </div>
       </div>
 
@@ -111,13 +127,18 @@
         ]"
         :selected="selected"
         :controls="el.children"
+        :availableLibraryUpdates="availableLibraryUpdates"
         :readOnly="readOnly"
         @control-selected="$emit('control-selected', $event)"
+        @control-removed="$emit('control-removed', $event)"
         @duplicate-control="$emit('duplicate-control', $event)"
         @open-library="$emit('open-library', $event)"
-        @update-library-questions="$emit('update-library-questions', $event)"
+        @update-library-control="$emit('update-library-control', $event)"
+        @hide-control="$emit('hide-control', $event)"
+        @unhide-control="$emit('unhide-control', $event)"
         :index="createIndex(index, idx + 1)"
         :data-control-type="el.type"
+        :data-control-contains-page="childContainsPage(el.children)"
       />
 
       <nested-draggable
@@ -128,35 +149,32 @@
         ]"
         :selected="selected"
         :controls="el.children"
+        :availableLibraryUpdates="availableLibraryUpdates"
         :readOnly="readOnly"
         @control-selected="$emit('control-selected', $event)"
+        @control-removed="$emit('control-removed', $event)"
         @duplicate-control="$emit('duplicate-control', $event)"
         @open-library="$emit('open-library', $event)"
-        @update-library-questions="$emit('update-library-questions', $event)"
-        :index="createIndex(index, idx + 1)"
+        @update-library-control="$emit('update-library-control', $event)"
+        @hide-control="$emit('hide-control', $event)"
+        @unhide-control="$emit('unhide-control', $event)"
         :data-control-type="el.type"
-      />
-
-      <v-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
-        <v-card class="">
-          <v-card-title> Delete Question </v-card-title>
-          <v-card-text class="mt-4"> Are you sure you want to remove this question? </v-card-text>
-          <v-card-actions>
-            <v-spacer />
-            <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
-            <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <update-library-dialog
-        v-if="updateLibraryDialogIsVisible"
-        v-model="updateLibraryDialogIsVisible"
-        :from-library-control="updateControl"
-        :to-survey="updateToLibrary"
-        @ok="updateLibraryConfirmed"
-        @cancel="updateLibraryCancelled"
+        :data-control-contains-page="childContainsPage(el.children)"
+        :index="createIndex(index, idx + 1)"
       />
     </v-card>
+
+    <v-dialog v-if="deleteQuestionModalIsVisible" v-model="deleteQuestionModalIsVisible" max-width="290">
+      <v-card class="">
+        <v-card-title> Delete Question </v-card-title>
+        <v-card-text class="mt-4"> Are you sure you want to remove this question? </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
+          <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </draggable>
   <div v-else>
     <v-card class="text--secondary">
@@ -202,11 +220,19 @@ export default {
         // ev: the sortablejs event
         // returns: Boolean value indicating whether `el` should be allowed to be `put` from `from` into `to`
         put(to, _, el) {
-          if (el.dataset.controlType === 'page' && to.el.dataset.controlType === 'page') {
+          if (el.dataset.controlContainsPage === 'true' && to.el.dataset.controlType === 'page') {
             return false;
           }
           return true;
         },
+      },
+      childContainsPage(children) {
+        return (
+          !!children &&
+          children !== undefined &&
+          Array.isArray(children) &&
+          children.some((child) => child.type === 'page')
+        );
       },
     };
   },
@@ -310,7 +336,6 @@ export default {
     },
   },
   mounted() {
-    // console.log(Date.now());
     const { width, height } = this.$el.getBoundingClientRect();
     this.scaleStyles =
       this.style === 1.0
