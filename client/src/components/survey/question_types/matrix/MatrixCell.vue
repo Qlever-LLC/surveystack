@@ -175,10 +175,27 @@
     item-text="value.name"
     item-value="value"
     hide-details
+    clearable
     outlined
     :disabled="disabled || loading"
   >
-    <template v-slot:item="{ item }">
+    <template v-slot:selection="data" v-if="!!header.multiple">
+      <v-chip v-bind="data.attrs" :input-value="data.selected" @click="data.select">
+        <template v-slot:default>
+          <span v-html="data.item.label" />
+        </template>
+      </v-chip>
+    </template>
+    <template v-slot:selection="{ item }" v-else>
+      <div v-html="item.label" class="d-flex align-center autocomplete-selection"></div>
+    </template>
+
+    <template v-slot:item="data" v-if="!!header.multiple">
+      <v-list-item-content>
+        <v-list-item-title v-html="data.item.label" />
+      </v-list-item-content>
+    </template>
+    <template v-slot:item="{ item }" v-else>
       <div v-html="item.label"></div>
     </template>
   </v-autocomplete>
@@ -404,13 +421,45 @@ export default {
 };
 </script>
 
-<style>
-.v-select__selections {
+<style scoped>
+>>> .v-select__selections {
   flex-wrap: nowrap;
 }
-.v-select__selections span {
+>>> .v-select__selections span {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+}
+
+>>> .blue-chip,
+>>> .orange-chip,
+>>> .green-chip {
+  display: inline-flex;
+  border: 1px var(--v-focus-base) solid;
+  color: var(--v-focus-base);
+  border-radius: 0.6rem;
+  font-weight: bold;
+  font-size: 80%;
+  padding: 0.2rem;
+  padding-left: 0.4rem;
+  padding-right: 0.2rem;
+  vertical-align: middle;
+  margin-top: 0.4rem;
+  margin-bottom: 0.4rem;
+  margin-right: 0.2rem !important;
+}
+
+>>> .green-chip {
+  color: #46b355;
+  border: 1px #46b355 solid;
+}
+
+div >>> .orange-chip {
+  color: #f38d49;
+  border: 1px #f38d49 solid;
+}
+
+>>> .v-list-item.v-list-item--active {
+  color: var(--v-focus-base) !important;
 }
 </style>
