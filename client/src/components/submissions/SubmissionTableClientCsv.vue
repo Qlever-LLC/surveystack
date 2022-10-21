@@ -130,7 +130,7 @@
               'expand-cell': isExpandMatrix,
             }"
           >
-            <table v-if="Array.isArray(item[header.value])" class="mt-6" width="100%" cellSpacing="0">
+            <table v-if="Array.isArray(item[header.value])" width="100%" cellSpacing="0" class="mt-6">
               <tr v-for="(child, i) in item[header.value]" :key="i">
                 <td
                   class="matrix-cell"
@@ -532,6 +532,7 @@ export default {
   vertical-align: top;
   padding-top: 8px;
   padding-bottom: 8px;
+  height: 24px;
 }
 
 .v-data-table >>> td.matrix-cell {
