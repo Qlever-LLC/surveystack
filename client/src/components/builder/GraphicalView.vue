@@ -30,7 +30,7 @@
       @mousedown.stop.left="$emit('control-selected', el)"
       :data-testid="`control-card-${el.id}`"
       :data-control-type="el.type"
-      :data-control-contains-page="childContainsPage(el.children)"
+      :data-control-contains-page="descendantHasPage(el)"
     >
       <div
         class="d-flex justify-space-between align-center"
@@ -138,7 +138,7 @@
         @unhide-control="$emit('unhide-control', $event)"
         :index="createIndex(index, idx + 1)"
         :data-control-type="el.type"
-        :data-control-contains-page="childContainsPage(el.children)"
+        :data-control-contains-page="descendantHasPage(el)"
       />
 
       <nested-draggable
@@ -159,7 +159,7 @@
         @hide-control="$emit('hide-control', $event)"
         @unhide-control="$emit('unhide-control', $event)"
         :data-control-type="el.type"
-        :data-control-contains-page="childContainsPage(el.children)"
+        :data-control-contains-page="descendantHasPage(el)"
         :index="createIndex(index, idx + 1)"
       />
     </v-card>
@@ -226,14 +226,7 @@ export default {
           return true;
         },
       },
-      childContainsPage(children) {
-        return (
-          !!children &&
-          children !== undefined &&
-          Array.isArray(children) &&
-          children.some((child) => child.type === 'page')
-        );
-      },
+      descendantHasPage: utils.descendantHasPage,
     };
   },
   props: {
@@ -410,6 +403,7 @@ export default {
   text-align: right;
 }
 
+.sortable-drag[data-control-contains-page='true']::after,
 .sortable-drag[data-control-type='page']::after {
   position: absolute;
   content: 'Tip: Pages cannot be nested inside Pages';
@@ -422,6 +416,8 @@ export default {
   border-radius: 3px;
 }
 
+.control-item.sortable-drag[data-control-contains-page='true']:hover::before,
+.control-item-selected.sortable-drag[data-control-contains-page='true']::before,
 .control-item.sortable-drag[data-control-type='page']:hover::before,
 .control-item-selected.sortable-drag[data-control-type='page']::before {
   width: 0;
@@ -450,6 +446,7 @@ export default {
   opacity: 0.2;
 }
 
+.sortable-drag[data-control-contains-page='true'],
 .sortable-drag[data-control-type='page'] {
   position: relative;
 }
