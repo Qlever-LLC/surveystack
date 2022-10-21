@@ -111,7 +111,7 @@
 
       <template v-slot:item="{ item, index, isSelected, select }">
         <tr :key="item._id">
-          <td>
+          <td :class="{ 'expand-cell': isExpandMatrix }">
             <v-checkbox
               :value="isSelected"
               @click="select(!isSelected)"
@@ -125,14 +125,17 @@
             v-for="header in headers"
             :key="header.text"
             @click.stop="openModal($event, [getCellValue(item, header.value), index, header.value], true)"
-            :class="{ active: isModalOpen([getCellValue(item, header.value), index, header.value]) }"
+            :class="{
+              active: isModalOpen([getCellValue(item, header.value), index, header.value]),
+              'expand-cell': isExpandMatrix,
+            }"
           >
-            <table v-if="Array.isArray(item[header.value])">
+            <table v-if="Array.isArray(item[header.value])" class="mt-6" width="100%" cellSpacing="0">
               <tr v-for="(child, i) in item[header.value]" :key="i">
                 <td
+                  class="matrix-cell"
                   :class="{
                     active: isModalOpen([child, index, header.value, i]),
-                    'matrix-cell': index < item.count - 1,
                   }"
                   @click.stop="openModal($event, [getCellValue(child), index, header.value, i], true)"
                 >
@@ -347,12 +350,12 @@ export default {
     getLabelFromKey,
     getCellValue(item, header) {
       if (typeof item === 'string') {
-        return item;
+        return item || ' ';
       }
 
       const value = item[header];
       if (typeof value !== 'string') {
-        return '';
+        return ' ';
       }
 
       if (!isNaN(Date.parse(value))) {
@@ -484,6 +487,7 @@ export default {
 .v-data-table >>> th {
   white-space: nowrap;
 }
+
 .archived {
   color: #777 !important;
 }
@@ -524,15 +528,31 @@ export default {
   padding: 0.9rem 0;
 }
 
-.matrix-cell {
-  position: relative;
+.v-data-table >>> td.expand-cell {
+  vertical-align: top;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
-.matrix-cell div::after {
+
+.v-data-table >>> td.matrix-cell {
+  position: relative;
+  height: 24px;
+  line-height: 24px;
+}
+
+.v-data-table >>> td.matrix-cell div::after {
   content: '';
   position: absolute;
-  left: -18px;
-  right: -18px;
-  bottom: 0;
+  left: -16px;
+  right: -16px;
+  top: 0;
+  height: 100%;
+  border-top: thin solid rgba(0, 0, 0, 0.12);
+  /* border-bottom: thin solid rgba(0, 0, 0, 0.12); */
+}
+
+.v-data-table >>> td.expand-cell tr:last-child td.matrix-cell div::after {
+  height: calc(100% + 1px);
   border-bottom: thin solid rgba(0, 0, 0, 0.12);
 }
 </style>
