@@ -131,7 +131,13 @@
             }"
           >
             <table v-if="Array.isArray(item[header.value])" width="100%" cellSpacing="0" class="mt-6">
-              <tr v-for="(child, i) in item[header.value]" :key="i">
+              <tr
+                v-for="(child, i) in item[header.value]"
+                :key="i"
+                :class="{
+                  'last-row': item[header.value].length === item.count,
+                }"
+              >
                 <td
                   class="matrix-cell"
                   :class="{
@@ -209,34 +215,30 @@ export function transformGeoJsonHeaders(headers) {
   return [...new Set(headers.map(replaceGeoJsonPath))];
 }
 
-export function transformMatrixHeaders(headers) {
-  // Group matrix questions type headers by paths
-  // ex; [data.input.0.name, data.input.1.name] => 'data.input'
+function matrixHeadersFromSubmission(submission) {
+  return Object.entries(submission.data || {})
+    .filter(([key, value]) => typeof value.meta === 'object' && value.meta.type === 'matrix')
+    .map(([header]) => `data.${header}.value`);
+}
+
+export function transformMatrixHeaders(headers, submissions) {
+  // Get matrix headers from submissions raw data by filtering "meta.type" = "matrix"
+  let matrixHeaders = [];
+  submissions.forEach((submission) => {
+    matrixHeaders = [...new Set([...matrixHeaders, ...matrixHeadersFromSubmission(submission)])];
+  });
+
   const result = [];
-  const matrixHeaders = [
-    ...new Set(
-      headers
-        .map((header) => {
-          const matched = header.match(/\.\d+\./g);
-          if (matched) {
-            const [key] = header.split(matched[0]);
-            return key;
-          }
-          return false;
-        })
-        .filter((header) => !!header)
-    ),
-  ];
   headers.forEach((header) => {
     const matched = matrixHeaders.find((h) => header.startsWith(h));
-    if (matched) {
-      result.push(matched);
-    } else {
+    if (!matched) {
       result.push(header);
+    } else if (!result.includes(matched)) {
+      result.push(matched);
     }
   });
 
-  return [...new Set(result)];
+  return result;
 }
 
 const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted'];
@@ -403,7 +405,7 @@ export default {
       const headers = [];
       if (this.parsed) {
         const rawHeaders = this.parsed.meta.fields;
-        const matrixHeaders = transformMatrixHeaders(rawHeaders);
+        const matrixHeaders = transformMatrixHeaders(rawHeaders, this.submissions.content);
         PREFERRED_HEADERS.forEach((header) => {
           if (matrixHeaders.includes(header)) {
             headers.push({
@@ -541,7 +543,7 @@ export default {
   line-height: 24px;
 }
 
-.v-data-table >>> td.matrix-cell div::after {
+.v-data-table >>> td.expand-cell tr td.matrix-cell div::after {
   content: '';
   position: absolute;
   left: -16px;
@@ -549,10 +551,9 @@ export default {
   top: 0;
   height: 100%;
   border-top: thin solid rgba(0, 0, 0, 0.12);
-  /* border-bottom: thin solid rgba(0, 0, 0, 0.12); */
 }
 
-.v-data-table >>> td.expand-cell tr:last-child td.matrix-cell div::after {
+.v-data-table >>> td.expand-cell tr:not(.last-row):last-child td.matrix-cell div::after {
   height: calc(100% + 1px);
   border-bottom: thin solid rgba(0, 0, 0, 0.12);
 }
