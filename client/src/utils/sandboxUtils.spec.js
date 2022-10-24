@@ -8,9 +8,9 @@ const createMockPostMessage = (resourceKey, type, payload) => ({
 describe('Sandbox Utils', () => {
   describe('getResource', () => {
     it('should return the correct resource on RETURN_RESOURCE message and should remove listener', async () => {
-      const postMessageSpy = spyOn(window.parent, 'postMessage');
-      const addEventListenerSpy = spyOn(window, 'addEventListener');
-      const removeEventListenerSpy = spyOn(window, 'removeEventListener');
+      const postMessageSpy = jest.spyOn(window.parent, 'postMessage');
+      const addEventListenerSpy = jest.spyOn(window, 'addEventListener');
+      const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
 
       getResource('resource1').then((file) => {
         expect(removeEventListenerSpy).toBeCalled();
