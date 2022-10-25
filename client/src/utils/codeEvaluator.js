@@ -14,7 +14,7 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
     const control = node.model;
     const field = surveyStackUtils.getNested(submission, path);
 
-    // if control is hidden set relevance to false and skip further calculatiosn
+    // if control is hidden set relevance to false
     if (fname === 'relevance' && control.options.hidden) {
       return {
         path,
@@ -92,6 +92,7 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
 }
 
 export const calculateRelevance = async (nodes, submission, survey) => {
+  //to check
   const calculations = await calculateField({
     nodes,
     submission,
