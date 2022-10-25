@@ -1182,7 +1182,6 @@ const assertFarmMappedToUser = async (instanceName, userId) => {
   const res = await db.collection('farmos-instances').findOne({
     userId: new ObjectId(userId),
     instanceName,
-    owner: true,
   });
 
   if (!res) {
