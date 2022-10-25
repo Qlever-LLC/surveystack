@@ -170,7 +170,6 @@ const actions = {
   init({ commit, dispatch }, { survey, submission, persist }) {
     commit('INIT', { survey, submission, persist });
     dispatch('next');
-    dispatch('calculateRelevance');
   },
   setProperty({ commit, dispatch, state }, { path, value, calculate = true }) {
     commit('SET_PROPERTY', { path, value });
@@ -196,6 +195,7 @@ const actions = {
 
     // when state.node is not set, this is the initial step
     // setting the index to 0 will let the next loop to select the first relevant node
+    // TODO CHECK THIS
     let index = state.node ? traversal.indexOf(state.node) : 0;
     if (index < 0) {
       return;
