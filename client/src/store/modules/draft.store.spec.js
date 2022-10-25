@@ -28,8 +28,6 @@ describe('draft store', () => {
         expect(call.mock.calls[0][2].persist).toBe(payload.persist);
       });
       it('dispatches next', () => expect(run().call).toHaveBeenNthCalledWith(2, 'dispatch', 'next'));
-      it('dispatches calculateRelevance', () =>
-        expect(run().call).toHaveBeenNthCalledWith(3, 'dispatch', 'calculateRelevance'));
     });
     describe('next', () => {
       // marker control ID's to setup the initial state
