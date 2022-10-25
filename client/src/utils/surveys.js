@@ -237,6 +237,10 @@ export const replaceResourceReferenceId = (control, newResources, oldResources) 
           col.resource = getUpdatedResourceId(col.resource, oldResources, newResources);
         }
       });
+    } else if (control.type === 'instructionsImageSplit') {
+      control.options.source.images.forEach((image, index, images) => {
+        images[index] = getUpdatedResourceId(image, oldResources, newResources);
+      });
     } else {
       control.options.source = getUpdatedResourceId(control.options.source, oldResources, newResources);
     }
@@ -287,6 +291,8 @@ export const isResourceReferenced = (controls, resourceId) => {
       return control.options.source.content.some(
         (contentEl) => contentEl.resource && contentEl.resource === resourceId
       );
+    } else if (control.type === 'instructionsImageSplit') {
+      return control.options.source.images.some((image) => image === resourceId);
     } else {
       return control.options.source === resourceId;
     }
