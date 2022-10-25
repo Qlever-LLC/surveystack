@@ -1,25 +1,81 @@
 <template>
   <v-container v-if="farmosEnabled" class="max-800">
-    <v-alert v-if="successMessage" class="mt-4" style="cursor: pointer" mode="fade" text type="success"
-      @click="successMessage = null">{{ successMessage }}</v-alert>
+    <v-alert
+      v-if="successMessage"
+      class="mt-4"
+      style="cursor: pointer"
+      mode="fade"
+      text
+      type="success"
+      @click="successMessage = null"
+      >{{ successMessage }}</v-alert
+    >
     <v-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
-    errorMessage
+      errorMessage
     }}</v-alert>
 
-    <FarmOSCreateDialog v-model="showCreateDialog" v-if="showCreateDialog" @check-url="checkUrl"
-      @create-instance="createInstance" :viewModel="createViewModel" />
+    <app-dialog
+      modal
+      :maxWidth="600"
+      labelConfirm="Close"
+      :hideCancel="true"
+      v-model="showLinkDialog"
+      @cancel="showLinkDialog = false"
+      @confirm="showLinkDialog = false"
+      title="Access FarmOS Instance"
+    >
+      <div class="d-flex justify-center my-8">
+        <v-btn
+          :loading="!linkReady"
+          :disabled="!linkReady"
+          :href="adminLink"
+          @click="invalidateLink"
+          color="primary"
+          target="_blank"
+        >
+          {{ linkReady ? 'Access' : 'Loading' }}</v-btn
+        >
+      </div>
+    </app-dialog>
 
-    <FarmOSConnectDialog v-model="showConnectDialog" :farmInstances="farmInstances" :allowCreate="allowCreate"
-      @connect="connectFarms" @create="createFarm" />
+    <FarmOSCreateDialog
+      v-model="showCreateDialog"
+      v-if="showCreateDialog"
+      @check-url="checkUrl"
+      @create-instance="createInstance"
+      :viewModel="createViewModel"
+    />
 
-    <FarmOSDisconnectDialog v-model="showDisonnectDialog" :updateFarmInstanceName="updateFarmInstanceName"
-      :allGroups="allGroups" :selectedGroupIds="selectedGroupIds" @updateGroups="updateGroups" />
+    <FarmOSConnectDialog
+      v-model="showConnectDialog"
+      :farmInstances="farmInstances"
+      :allowCreate="allowCreate"
+      @connect="connectFarms"
+      @create="createFarm"
+    />
 
-    <FarmOSGroupSettings class="ma-16" @addGrpCoffeeShop="enableCoffeeshop"
+    <FarmOSDisconnectDialog
+      v-model="showDisonnectDialog"
+      :updateFarmInstanceName="updateFarmInstanceName"
+      :allGroups="allGroups"
+      :selectedGroupIds="selectedGroupIds"
+      @updateGroups="updateGroups"
+    />
+
+    <FarmOSGroupSettings
+      class="ma-16"
+      @addGrpCoffeeShop="enableCoffeeshop"
       @allowSbGrpsJoinCoffeeShop="allowSubGroupsJoinCoffeeShop"
-      @allowSbGrpsAdminsCreateFarmOSFarms="allowSubGroupsAdminsCreateFarmOSFarms" @connect="connect"
-      @disconnect="showDisconnectGroupsDialog" @open="openFarm" @plansChanged="plansChanged"
-      @seatsChanged="seatsChanged" :plans="plans" :groupInfos="groupInfos" :superAdmin="superAdmin">
+      @allowSbGrpsAdminsCreateFarmOSFarms="allowSubGroupsAdminsCreateFarmOSFarms"
+      @connect="connect"
+      @disconnect="showDisconnectGroupsDialog"
+      @open="openFarm"
+      @plansChanged="plansChanged"
+      @seatsChanged="seatsChanged"
+      :plans="plans"
+      :groupInfos="groupInfos"
+      :superAdmin="superAdmin"
+    >
     </FarmOSGroupSettings>
   </v-container>
 
@@ -35,12 +91,14 @@
           <p>{{ message }}</p>
           <v-btn color="primary" type="submit" @click="enable" v-if="btnEnable">Enable</v-btn>
           <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-else-if="btnContact">
-            Contact Our-Sci</v-btn>
+            Contact Our-Sci</v-btn
+          >
         </v-card>
         <v-card class="pa-8 text-center" v-else>
           <p>{{ message }}</p>
-          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-if="btnContact">Contact
-            Our-Sci</v-btn>
+          <v-btn color="primary" type="submit" href="mailto:info@our-sci.net" target="_blank" v-if="btnContact"
+            >Contact Our-Sci</v-btn
+          >
         </v-card>
       </v-col>
     </v-row>
@@ -54,6 +112,7 @@ import FarmOSGroupSettings from './../../components/integrations/FarmOSGroupSett
 import FarmOSConnectDialog from './../../components/integrations/FarmOSConnectDialog.vue';
 import FarmOSDisconnectDialog from './../../components/integrations/FarmOSDisconnectDialog.vue';
 import FarmOSCreateDialog from './../../components/integrations/FarmOSCreateDialog.vue';
+import appDialog from '@/components/ui/Dialog.vue';
 
 export default {
   props: {
@@ -64,6 +123,7 @@ export default {
     FarmOSConnectDialog,
     FarmOSCreateDialog,
     FarmOSDisconnectDialog,
+    appDialog,
   },
   computed: {
     superAdmin() {
@@ -100,6 +160,10 @@ export default {
       createViewModel: {},
       successMessage: null,
       errorMessage: null,
+
+      showLinkDialog: false,
+      adminLink: '',
+      linkReady: false,
     };
   },
   async created() {
@@ -126,9 +190,8 @@ export default {
     */
   },
   methods: {
-    openFarm() { },
-    updateGroupConfig() { },
-    unifomMembersInGroupInfos() { },
+    updateGroupConfig() {},
+    unifomMembersInGroupInfos() {},
     async seatsChanged(seats) {
       try {
         await api.post(`/farmos/group-manage/${this.groupId}/seats`, { seats: seats });
@@ -273,10 +336,9 @@ export default {
         return;
       }
 
-
-      console.log("groupInfos", this.groupInfos.domainGroups);
+      console.log('groupInfos', this.groupInfos.domainGroups);
       this.disconnectUserId = userId;
-      this.selectedGroupIds = connectedFarm.groups.map(g => g.groupId);
+      this.selectedGroupIds = connectedFarm.groups.map((g) => g.groupId);
       this.allGroups = this.groupInfos.domainGroups;
       this.updateFarmInstanceName = instanceName;
 
@@ -290,7 +352,7 @@ export default {
       this.loading = true;
 
       try {
-        await api.post(`/farmos/group-manage/${groupId}/updateGroupsForUser`, {
+        await api.post(`/farmos/group-manage/${groupId}/update-groups-for-user`, {
           userId,
           instanceName,
           groupIds,
@@ -306,6 +368,32 @@ export default {
 
       this.showDisonnectDialog = false;
       await this.init();
+    },
+    async openFarm(item) {
+      const { instanceName, userId } = item;
+      try {
+        this.showLinkDialog = true;
+        const { data: link } = await api.post(`/farmos/group-manage/${this.groupId}/get-admin-link`, {
+          instanceName,
+          userId,
+        });
+        this.adminLink = link;
+        this.linkReady = true;
+      } catch (error) {
+        this.showLinkDialog = false;
+        if (error.response && error.response.data && error.response.data.message) {
+          this.error(error.response.data.message);
+        } else {
+          this.error(error.message);
+        }
+
+        this.invalidateLink();
+      }
+    },
+    invalidateLink() {
+      this.linkReady = false;
+      this.showLinkDialog = false;
+      this.adminLink = '';
     },
     async plansChanged(plans) {
       this.loading = true;
@@ -476,7 +564,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .max-800 {

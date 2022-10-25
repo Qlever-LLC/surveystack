@@ -327,9 +327,15 @@ router.post(
 );
 
 router.post(
-  '/farmos/group-manage/:groupId/updateGroupsForUser',
+  '/farmos/group-manage/:groupId/update-groups-for-user',
   [assertHasGroupAdminAccess],
   catchErrors(farmosController.updateGroupsForUser)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/get-admin-link',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.getAdminLink)
 );
 
 router.post(

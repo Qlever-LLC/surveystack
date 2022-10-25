@@ -626,7 +626,7 @@ export const getMemberInformationForDomain = async (descendants) => {
     )
     .toArray();
 
-  console.log('descendant groups', domainGroups);
+  // console.log('descendant groups', domainGroups);
 
   // console.log(JSON.stringify(res, null, 2));
 

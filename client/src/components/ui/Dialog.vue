@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="show" :width="width" :max-width="maxWidth">
+  <v-dialog v-model="show" :width="width" :max-width="maxWidth" :modal="modal">
     <v-card>
       <v-card-title class="headline">
         <slot name="title">{{ title }}</slot>
@@ -19,6 +19,10 @@
 <script>
 export default {
   props: {
+    modal: {
+      type: Boolean,
+      default: false,
+    },
     value: Boolean,
     labelConfirm: String,
     width: [String, Number],

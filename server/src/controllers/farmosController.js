@@ -539,7 +539,7 @@ const runPendingFarmOSOperations = async (url, plan) => {
       }
     }
   } catch (error) {
-    console.log('error');
+    console.log('error', error);
     db.collection('farmos.webhookrequests').insertOne({
       url,
       plan,
@@ -826,7 +826,7 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
 
   const { path: groupPath } = groupEntity;
   // also add instances to users
-  console.log('groupPath', groupPath);
+  // console.log('groupPath', groupPath);
 
   try {
     const r = await createInstance(
@@ -1078,13 +1078,7 @@ export const mapUser = async (req, res) => {
   });
 };
 
-export const updateGroupsForUser = async (req, res) => {
-  const { groupId, userId, instanceName, groupIds, tree } = await requireGroup(req, {
-    userId: Joi.objectId().required(),
-    instanceName: Joi.string().required(),
-    groupIds: Joi.array().items(Joi.objectId()).required(),
-  });
-
+const assertUserInGroup = async (userId, groupId) => {
   const userRes = await db.collection('users').findOne({ _id: new ObjectId(userId) });
   if (!userRes) {
     throw boom.notFound(`user with id: ${userId} not found`);
@@ -1101,7 +1095,30 @@ export const updateGroupsForUser = async (req, res) => {
   if (memberships.length <= 0) {
     throw boom.badData(`user not member of group: user, group: ${userId}, ${groupId}`);
   }
+};
 
+const assertUserInSubGroup = async (userId, tree) => {
+  const userRes = await db.collection('users').findOne({ _id: new ObjectId(userId) });
+  if (!userRes) {
+    throw boom.notFound(`user with id: ${userId} not found`);
+  }
+
+  const memberships = await db
+    .collection('memberships')
+    .find({
+      group: {
+        $in: tree.descendants.map((d) => new ObjectId(d._id)),
+      },
+      user: userRes._id,
+    })
+    .toArray();
+
+  if (memberships.length <= 0) {
+    throw boom.badData(`user not member of farmos domain`);
+  }
+};
+
+const assertGroupsInTree = async (groupIds, tree) => {
   // do we have permission to manage unmapping these groups?
   // are we top-level admin and are these groups in the farmos domain?
 
@@ -1109,6 +1126,7 @@ export const updateGroupsForUser = async (req, res) => {
   const unauthorized = groupIds.filter(
     (gid) => !tree.descendants.map((d) => d._id).some((id) => id + '' === gid)
   );
+
   if (unauthorized.length > 0) {
     const groups = (
       await db
@@ -1122,6 +1140,17 @@ export const updateGroupsForUser = async (req, res) => {
     ).map((g) => g.name);
     throw boom.unauthorized(`unauthorized to manage groups: ${groups.join(',')}`);
   }
+};
+
+export const updateGroupsForUser = async (req, res) => {
+  const { userId, instanceName, groupIds, tree } = await requireGroup(req, {
+    userId: Joi.objectId().required(),
+    instanceName: Joi.string().required(),
+    groupIds: Joi.array().items(Joi.objectId()).required(),
+  });
+
+  await assertUserInSubGroup(userId, tree);
+  await assertGroupsInTree(groupIds, tree);
 
   // clear all mappings of groups in descendants
 
@@ -1147,6 +1176,47 @@ export const updateGroupsForUser = async (req, res) => {
   return res.send({
     status: 'ok',
   });
+};
+
+const assertFarmMappedToUser = async (instanceName, userId) => {
+  const res = await db.collection('farmos-instances').findOne({
+    userId: new ObjectId(userId),
+    instanceName,
+    owner: true,
+  });
+
+  if (!res) {
+    throw boom.unauthorized(`user has no mapping to farm ${instanceName}`);
+  }
+};
+
+const assertFarmInSubGroup = async (instanceName, tree) => {
+  const res = await db.collection('farmos-group-mapping').findOne({
+    instanceName,
+    groupId: {
+      $in: tree.descendants.map((d) => new ObjectId(d._id)),
+    },
+  });
+
+  if (!res) {
+    throw boom.unauthorized(`farm not mapped to group`);
+  }
+};
+
+export const getAdminLink = async (req, res) => {
+  const { userId, instanceName, tree } = await requireGroup(req, {
+    userId: Joi.objectId().required(),
+    instanceName: Joi.string().required(),
+  });
+
+  await assertUserInSubGroup(userId, tree);
+  await assertFarmInSubGroup(instanceName, tree);
+  await assertFarmMappedToUser(instanceName, userId);
+
+  const { getAdminLink } = config();
+  const link = await getAdminLink(instanceName);
+
+  return res.send(link);
 };
 
 export const testConnection = async (req, res) => {
