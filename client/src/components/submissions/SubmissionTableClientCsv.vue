@@ -194,6 +194,8 @@ import csvService from '@/services/csv.service';
 import SubmissionTableCellModal from './SubmissionTableCellModal.vue';
 import { getLabelFromKey, openResourceInTab } from '@/utils/resources';
 import moment from 'moment';
+import cloneDeep from 'lodash/cloneDeep';
+import omit from 'lodash/omit';
 
 export function getPropertiesFromMatrix(headers, matrix) {
   if (!Array.isArray(headers) || typeof matrix !== 'string') {
@@ -215,10 +217,18 @@ export function transformGeoJsonHeaders(headers) {
   return [...new Set(headers.map(replaceGeoJsonPath))];
 }
 
-function matrixHeadersFromSubmission(submission) {
-  return Object.entries(submission.data || {})
-    .filter(([key, value]) => typeof value.meta === 'object' && value.meta.type === 'matrix')
-    .map(([header]) => `data.${header}.value`);
+function matrixHeadersFromSubmission(submission, parentKey = '') {
+  const headers = [];
+  Object.entries(submission.data || {}).forEach(([key, value]) => {
+    const type = typeof value.meta === 'object' ? value.meta.type : '';
+    if (type === 'page' || type === 'group') {
+      const data = cloneDeep(omit(value, 'meta'));
+      headers.push(...matrixHeadersFromSubmission({ data }, key));
+    } else if (type === 'matrix') {
+      headers.push(`data${parentKey ? `.${parentKey}` : ''}.${key}.value`);
+    }
+  });
+  return headers;
 }
 
 export function transformMatrixHeaders(headers, submissions) {
