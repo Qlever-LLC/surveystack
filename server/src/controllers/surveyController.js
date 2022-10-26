@@ -15,7 +15,7 @@ const sanitize = async (entity) => {
   entity._id = new ObjectId(entity._id);
 
   entity.revisions.forEach((version) => {
-    version.dateCreated = new Date(entity.dateCreated);
+    version.dateCreated = new Date(version.dateCreated);
 
     version.controls.forEach((control) => {
       changeRecursive(control, (control) => {

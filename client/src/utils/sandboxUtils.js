@@ -214,11 +214,18 @@ export async function getResource(resourceKey) {
   );
 
   return await new Promise(function (resolve, reject) {
-    window.addEventListener('message', (event) => {
-      if (event.data && event.data.type === 'RETURN_RESOURCE') {
+    const handler = function (event) {
+      if (
+        event.data &&
+        event.data.type === 'RETURN_RESOURCE' &&
+        event.data.payload &&
+        event.data.payload.resourceKey === resourceKey
+      ) {
         resolve(event.data.payload.file);
+        window.removeEventListener('message', handler);
       }
-    });
+    };
+    window.addEventListener('message', handler);
   });
 }
 
