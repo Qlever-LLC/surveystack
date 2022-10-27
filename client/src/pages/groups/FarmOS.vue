@@ -447,6 +447,9 @@ export default {
       vm.form = viewModel.form;
       vm.loading = true;
 
+      console.log('this.createViewModel', this.createViewModel);
+      console.log('viewModel', viewModel);
+
       // console.log('plans', this.plans);
       const plan = this.plans.find((p) => p._id === vm.form.plan);
       const { planName, planUrl } = plan;
@@ -498,7 +501,6 @@ export default {
       const vm = this.createViewModel;
       vm.form = form;
       vm.loading = true;
-
       // console.log(vm);
 
       const formated = {
