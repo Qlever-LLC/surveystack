@@ -325,9 +325,6 @@ export default {
       handler(vm) {
         console.log('change propagated', vm);
         this.localViewModel = _.cloneDeep(vm);
-        if (this.localViewModel.owner && this.localViewModel.owner.id) {
-          this.localViewModel.owner = this.localViewModel.owner.id;
-        }
       },
     },
   },

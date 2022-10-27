@@ -523,6 +523,9 @@ export default {
       formated.url = `${form.instanceName}.${planUrl}`;
       formated.planName = planName;
       formated.planId = form.plan;
+      if (formated.owner && formated.owner.id) {
+        formated.owner = formated.owner.id;
+      }
       delete formated.plan;
       delete formated.instanceName;
       delete formated.instanceNameValid;
