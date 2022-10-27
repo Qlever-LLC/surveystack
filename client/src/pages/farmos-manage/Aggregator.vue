@@ -128,7 +128,7 @@
     </template>
 
     <div v-if="farmsNotInAggregator.length > 0 && !loading">
-      <h2>Farms in Surveystack which are not present in the Aggregator</h2>
+      <h2>Farms in Surveystack which are not present on FarmOS Aggregator</h2>
       <p class="grey--text text--darken-2">These instances have likely been removed from the aggregator.</p>
       <v-simple-table v-if="!loading">
         <template v-slot:default>
