@@ -31,7 +31,7 @@ const base = (type) => ({
       return (item && item.label) || value;
     },
     getLabelForItemValue2(value) {
-      console.log(value);
+      // console.log(value);
       const item = this.farms.find((x) => x.value === value);
       return (item && item.label) || value;
     },
@@ -99,11 +99,11 @@ const base = (type) => ({
           const farmosUuidElemets = node.options.source.content.filter((c) => c.type == 'farmos_uuid');
 
           for (const config of farmosUuidElemets) {
-            console.log('config', config);
+            // console.log('config', config);
             const type = config.options.farmOsType;
             const colName = config.value;
             if (type === farmOsType && node.value) {
-              console.log('type matches');
+              // console.log('type matches');
               for (const v of node.value) {
                 const targetValue = v[colName].value;
                 if (targetValue && targetValue.name) {
@@ -132,7 +132,7 @@ const base = (type) => ({
       try {
         const { data: location } = await api.get('farmos/assets?bundle=land');
 
-        console.log('locations', location);
+        // console.log('locations', location);
 
         const response = await api.get('farmos/assets?bundle=plant');
 
@@ -175,7 +175,7 @@ const base = (type) => ({
       const survey = this.$store.getters['draft/survey'];
       const nodes = linearControls(survey, submission);
 
-      console.log('nodes', nodes);
+      // console.log('nodes', nodes);
 
       const farmOsType = 'planting';
 
