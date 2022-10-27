@@ -222,6 +222,15 @@ const MATRIX_COLUMN_TYPES = [
   { text: 'Farmos UUID', value: 'farmos_uuid' },
 ];
 
+const createOptions = (src) => {
+  if (src.type === 'farmos_uuid') {
+    // sync with surveyConfig.js
+    src.options.farmOsType = 'field';
+    src.options.farmOsTypes = ['field', 'planting'];
+  }
+  return src;
+};
+
 export default {
   props: {
     value: {
@@ -327,16 +336,9 @@ export default {
       [columns[idx1], columns[idx2]] = [columns[idx2], columns[idx1]];
       this.columns = columns;
     },
-    createOptions(src) {
-      if (src.type === 'farmos_uuid') {
-        // sync with surveyConfig.js
-        src.options.farmOsType = 'field';
-        src.options.farmOsTypes = ['field', 'planting'];
-      }
-      return src;
-    },
+
     createEmptyColumn() {
-      return this.createOptions({
+      return createOptions({
         label: '',
         value: '',
         tags: '',
@@ -360,7 +362,7 @@ export default {
     },
     onTypeChanged(item, type) {
       item.type = type;
-      item = this.createOptions(item);
+      item = createOptions(item);
     },
   },
   MATRIX_COLUMN_TYPES,
