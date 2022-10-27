@@ -253,7 +253,7 @@ export default {
               const { data: plans } = await api.get(`/farmos/group-manage/${groupId}/plans`);
               this.plans = plans;
             }
-            console.log('group settings', groupInfos);
+            console.log('response', groupInfos);
             groupInfos.response.members = _.sortBy(groupInfos.response.members, [
               (m) => !m.admin,
               (m) => m.name.toLowerCase(),
@@ -284,7 +284,7 @@ export default {
     connect(userId) {
       const user = this.groupInfos.members.find((m) => m.user === userId);
       this.selectedUser = user;
-      console.log('connecting user', this.selectedUser);
+      // console.log('connecting user', this.selectedUser);
       this.showConnectDialog = true;
 
       this.farmInstances = _.uniq([
@@ -294,7 +294,7 @@ export default {
     },
     async enable() {
       const res = await api.post('/farmos/group-manage/enable', { groupId: this.groupId, enable: true });
-      console.log('res', res.data);
+      // console.log('res', res.data);
       try {
         const res = await api.get('/farmos/group-manage/' + this.groupId);
         this.groupInfos = res.data;
@@ -304,13 +304,13 @@ export default {
       }
     },
     async connectFarms(farms) {
-      console.log('connecting farms', farms, this.selectedUser);
+      // console.log('connecting farms', farms, this.selectedUser);
 
       this.loading = true;
       this.showConnectDialog = false;
 
       for (const farm of farms) {
-        console.log('farm', farm, farms);
+        // console.log('farm', farm, farms);
         try {
           const res = await api.post(`/farmos/group-manage/${this.groupId}/mapUser`, {
             userId: this.selectedUser.user,
@@ -336,7 +336,7 @@ export default {
         return;
       }
 
-      console.log('groupInfos', this.groupInfos.domainGroups);
+      // console.log('groupInfos', this.groupInfos.domainGroups);
       this.disconnectUserId = userId;
       this.selectedGroupIds = connectedFarm.groups.map((g) => g.groupId);
       this.allGroups = this.groupInfos.domainGroups;
@@ -442,12 +442,12 @@ export default {
       this.showConnectDialog = false;
     },
     async checkUrl(viewModel) {
-      console.log('calling checkurl in FarmOS.vue');
+      // console.log('calling checkurl in FarmOS.vue');
       const vm = this.createViewModel;
       vm.form = viewModel.form;
       vm.loading = true;
 
-      console.log('plans', this.plans);
+      // console.log('plans', this.plans);
       const plan = this.plans.find((p) => p._id === vm.form.plan);
       const { planName, planUrl } = plan;
       if (!planUrl) {
@@ -477,10 +477,10 @@ export default {
 
         if (r.data.status === 'free') {
           vm.form.instanceNameValid = true;
-          console.log('instance name free');
+          // console.log('instance name free');
         } else {
           vm.form.instanceNameValid = false;
-          console.log('instance name taken');
+          // console.log('instance name taken');
         }
       } catch (error) {
         vm.form.instanceNameValid = false;
@@ -499,7 +499,7 @@ export default {
       vm.form = form;
       vm.loading = true;
 
-      console.log(vm);
+      // console.log(vm);
 
       const formated = {
         ...form,
