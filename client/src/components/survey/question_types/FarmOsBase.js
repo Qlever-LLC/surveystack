@@ -232,7 +232,7 @@ const base = (type) => ({
         }
       }
 
-      console.log('localplantings', localPlantings);
+      // console.log('localplantings', localPlantings);
       this.assets = [...localPlantings, ...this.assets];
       this.loading = false;
     },
