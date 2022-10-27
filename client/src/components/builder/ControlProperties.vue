@@ -339,7 +339,6 @@ import api from '@/services/api.service';
 import AppFileProperties from '@/components/builder/FileProperties.vue';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
 import appMatrixProperties from '@/components/builder/MatrixProperties.vue';
-import appFarmosUuidProperties from '@/components/builder/FarmosUuidProperties.vue';
 import appOntologyProperties from '@/components/builder/OntologyProperties.vue';
 import InstructionsEditor from '@/components/builder/TipTapEditor.vue';
 import InstructionsImageSplitEditor from '@/components/builder/InstructionsImageSplitEditor.vue';
@@ -355,7 +354,6 @@ export default {
     appOntologyProperties,
     appMatrixProperties,
     InstructionsImageSplitEditor,
-    appFarmosUuidProperties,
     'geojson-properties': GeoJSONProperties,
   },
   props: {
