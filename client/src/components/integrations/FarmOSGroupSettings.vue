@@ -188,37 +188,6 @@ export default {
       });
     });
 
-    // function filterGMembers(item) {
-    //   if (!item.name) {
-    //     return null;
-    //   }
-    //   return item.name.toLowerCase().includes(arrHeaderSearch.value[0].toLowerCase());
-    // }
-    // function filterCoFarms(item) {
-    //   let result = false;
-    //   if (item.connectedFarms && item.connectedFarms.length > 0 && item.connectedFarms[0].instanceName) {
-    //     item.connectedFarms.forEach((cF) => {
-    //       result = result || cF.instanceName.toLowerCase().includes(arrHeaderSearch.value[1].toLowerCase());
-    //     });
-    //   }
-    //   return result;
-    // }
-    // function filterMbShips(item) {
-    //   let result = false;
-    //   if (item.connectedFarms && item.connectedFarms.length > 0 && item.connectedFarms[0].groups) {
-    //     item.connectedFarms.forEach((cF) => {
-    //       if (cF.groups) {
-    //         cF.groups.forEach((m) => {
-    //           result = result || m.path.toLowerCase().includes(arrHeaderSearch.value[2].toLowerCase());
-    //         });
-    //       }
-    //     });
-    //     return result;
-    //   }
-    // }
-
-    // part develop + n others
-
     const developMbships = ref([]);
     for (let i = 0; i < props.groupInfos.members.length; i++) {
       developMbships.value.push(ref(false));
