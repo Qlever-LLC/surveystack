@@ -284,7 +284,7 @@ export default {
     connect(userId) {
       const user = this.groupInfos.members.find((m) => m.user === userId);
       this.selectedUser = user;
-      // console.log('connecting user', this.selectedUser);
+      console.log('connecting user', this.selectedUser);
       this.showConnectDialog = true;
 
       this.farmInstances = _.uniq([
