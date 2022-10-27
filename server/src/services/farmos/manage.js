@@ -431,7 +431,7 @@ export const removeFarmFromUser = async (instanceName, userId, groupId) => {
     filter.groupId = asMongoId(groupId);
   }
 
-  console.log('filter', filter);
+  // console.log('filter', filter);
 
   await db.collection('farmos-instances').deleteMany(filter);
 };
