@@ -285,6 +285,12 @@ router.post(
 );
 
 router.post(
+  '/farmos/unmap-instance',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.superAdminUnMapFarmosInstanceFromAll)
+);
+
+router.post(
   '/farmos/group-manage/enable',
   [assertIsSuperAdmin],
   catchErrors(farmosController.superAdminUpdateFarmOSAccess)

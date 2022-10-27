@@ -432,6 +432,26 @@ export const superAdminUnMapFarmosInstanceFromUser = async (req, res) => {
   });
 };
 
+export const superAdminUnMapFarmosInstanceFromAll = async (req, res) => {
+  const { instanceName } = req.body;
+
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
+
+  await db.collection('farmos-instances').deleteMany({
+    instanceName,
+  });
+
+  await db.collection('farmos-group-mapping').deleteMany({
+    instanceName,
+  });
+
+  return res.send({
+    status: 'success',
+  });
+};
+
 /**
  * Return all instances for group with mappings
  */
