@@ -172,6 +172,7 @@ const actions = {
     await dispatch('calculateRelevance');
     await dispatch('next');
   },
+  //TODO check - could this be removed? does not seem to be referenced
   setProperty({ commit, dispatch, state }, { path, value, calculate = true }) {
     commit('SET_PROPERTY', { path, value });
     if (state.persist) {
