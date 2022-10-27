@@ -167,10 +167,10 @@ const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  init({ commit, dispatch }, { survey, submission, persist }) {
-    commit('INIT', { survey, submission, persist });
-    dispatch('next');
-    dispatch('calculateRelevance');
+  async init({ commit, dispatch }, { survey, submission, persist }) {
+    await commit('INIT', { survey, submission, persist });
+    await dispatch('calculateRelevance');
+    await dispatch('next');
   },
   setProperty({ commit, dispatch, state }, { path, value, calculate = true }) {
     commit('SET_PROPERTY', { path, value });
