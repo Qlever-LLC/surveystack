@@ -30,7 +30,7 @@
         :disabled="disabled"
       />
     </div>
-    <div style="flex: 0; display: flex; align-items: center;">
+    <div style="flex: 0; display: flex; align-items: center">
       <app-qr-scanner
         class="mx-2 py-2"
         ref="scan-button"
@@ -45,6 +45,27 @@
       />
     </div>
   </div>
+
+  <v-text-field
+    v-else-if="header.type === 'farmos_uuid'"
+    :value="localValue"
+    @input="
+      (v) => {
+        if (!this.value || this.value.name !== v) {
+          const text = getValueOrNull(v);
+          value = {
+            name: text,
+            id: uuidv4(),
+          };
+        }
+        onInput();
+      }
+    "
+    outlined
+    hide-details
+    autocomplete="off"
+    :disabled="disabled"
+  />
 
   <v-text-field
     v-else-if="header.type === 'number'"
@@ -142,6 +163,7 @@
   <v-autocomplete
     v-else-if="header.type === 'farmos_field'"
     :items="farmos.farms || []"
+    :multiple="header.multiple"
     :value="value"
     @input="
       (v) => {
@@ -153,15 +175,34 @@
     item-text="value.name"
     item-value="value"
     hide-details
+    clearable
     outlined
     :disabled="disabled || loading"
   >
-    <template v-slot:item="{ item }">
+    <template v-slot:selection="data" v-if="!!header.multiple">
+      <v-chip v-bind="data.attrs" :input-value="data.selected" @click="data.select">
+        <template v-slot:default>
+          <span v-html="data.item.label" />
+        </template>
+      </v-chip>
+    </template>
+    <template v-slot:selection="{ item }" v-else>
+      <div v-html="item.label" class="d-flex align-center autocomplete-selection"></div>
+    </template>
+
+    <template v-slot:item="data" v-if="!!header.multiple">
+      <v-list-item-content>
+        <v-list-item-title v-html="data.item.label" />
+      </v-list-item-content>
+    </template>
+    <template v-slot:item="{ item }" v-else>
       <div v-html="item.label"></div>
     </template>
   </v-autocomplete>
+
   <v-autocomplete
     v-else-if="header.type === 'farmos_planting'"
+    :multiple="header.multiple"
     :value="value"
     @input="
       (v) => {
@@ -232,6 +273,7 @@
 <script>
 import { getValueOrNull } from '@/utils/surveyStack';
 import appQrScanner from '@/components/ui/QrScanner.vue';
+import { uuidv4 } from '@/utils/surveys';
 import MatrixCellSelectionLabel from './MatrixCellSelectionLabel.vue';
 
 export default {
@@ -280,12 +322,20 @@ export default {
         this.item[this.header.value].value = value;
       },
     },
+    localValue() {
+      if (this.value == null) {
+        return '';
+      } else {
+        return this.value && this.value.name ? this.value.name : '';
+      }
+    },
     items() {
       return this.getDropdownItems(this.header.value, Array.isArray(this.value) ? this.value : [this.value]);
     },
   },
   methods: {
     getValueOrNull,
+    uuidv4,
     onInput() {
       this.$emit('changed');
     },
@@ -371,13 +421,45 @@ export default {
 };
 </script>
 
-<style>
-.v-select__selections {
+<style scoped>
+>>> .v-select__selections {
   flex-wrap: nowrap;
 }
-.v-select__selections span {
+>>> .v-select__selections span {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+}
+
+>>> .blue-chip,
+>>> .orange-chip,
+>>> .green-chip {
+  display: inline-flex;
+  border: 1px var(--v-focus-base) solid;
+  color: var(--v-focus-base);
+  border-radius: 0.6rem;
+  font-weight: bold;
+  font-size: 80%;
+  padding: 0.2rem;
+  padding-left: 0.4rem;
+  padding-right: 0.2rem;
+  vertical-align: middle;
+  margin-top: 0.4rem;
+  margin-bottom: 0.4rem;
+  margin-right: 0.2rem !important;
+}
+
+>>> .green-chip {
+  color: #46b355;
+  border: 1px #46b355 solid;
+}
+
+div >>> .orange-chip {
+  color: #f38d49;
+  border: 1px #f38d49 solid;
+}
+
+>>> .v-list-item.v-list-item--active {
+  color: var(--v-focus-base) !important;
 }
 </style>

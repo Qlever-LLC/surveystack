@@ -1,7 +1,11 @@
 <template>
   <div class="screen-root">
     <v-dialog v-model="viewCode">
-      <app-code-view v-model="survey" />
+      <app-code-view v-model="survey" style="height: 80vh" />
+    </v-dialog>
+
+    <v-dialog v-model="viewSubmission">
+      <app-code-view v-model="instance" style="height: 80vh" />
     </v-dialog>
 
     <v-dialog v-model="showExamples">
@@ -195,6 +199,16 @@
                   <v-icon right> mdi-cellphone</v-icon>
                 </v-btn>
               </v-btn-toggle>
+
+              <v-btn @click="viewCode = true" class="ma-2" depressed outlined text>
+                <span class="hidden-sm-and-down">survey</span>
+                <v-icon right>mdi-code-tags</v-icon>
+              </v-btn>
+
+              <v-btn @click="viewSubmission = true" class="ma-2" depressed outlined text>
+                <span class="hidden-sm-and-down">submission</span>
+                <v-icon right>mdi-code-tags</v-icon>
+              </v-btn>
             </template>
           </app-draft-component>
         </div>
@@ -298,6 +312,7 @@ export default {
       version: 1,
       // ui
       viewCode: false,
+      viewSubmission: false,
       // currently selected control
       control: null,
       showLibrary: false,

@@ -193,6 +193,15 @@
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
 
+      <v-combobox
+        v-if="control.type === 'farmOsUuid'"
+        outlined
+        label="FarmOS Type"
+        v-model="control.options.farmOsType"
+        :items="control.options.farmOsTypes"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+      />
+
       <v-select
         v-if="isDate"
         :items="dateTypes"

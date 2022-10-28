@@ -48,7 +48,10 @@
         </v-col>
 
         <v-col>
-          <v-btn @click="$emit('check-url', localViewModel)" color="primary" :disabled="!localViewModel.form.plan"
+          <v-btn
+            @click="$emit('check-url', localViewModel)"
+            color="primary"
+            :disabled="!localViewModel.form.plan || localViewModel.loading"
             >Check URL</v-btn
           >
         </v-col>
@@ -199,7 +202,9 @@
         <a href="https://farmier.com/privacy" target="blank">Privacy Policy</a>.
       </div>
 
-      <v-btn class="mx-2" color="primary" :disabled="!valid" @click="save">Register FarmOS Instance</v-btn>
+      <v-btn class="mx-2" color="primary" :disabled="!valid || localViewModel.loading" @click="save"
+        >Register FarmOS Instance</v-btn
+      >
     </v-form>
     <app-dialog
       title="Field Import"
