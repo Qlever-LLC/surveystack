@@ -62,8 +62,8 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const email = req.body.email.split(' ').join('').toLowerCase();
-  const password = req.body.password.split(' ').join('');
+  const email = req.body.email.trim().toLowerCase();
+  const password = req.body.password.trim();
   const { token } = req.body;
 
   if (email.trim() === '' || password.trim() === '') {

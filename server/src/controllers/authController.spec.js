@@ -157,9 +157,7 @@ describe('authController specific on login function', () => {
         email: '    email@ not exists .com',
       },
     });
-    await expect(login(reqLogin, res)).rejects.toThrow(
-      /No user with email exists: email@notexists.com/
-    );
+    await expect(login(reqLogin, res)).rejects.toThrow(/No user with email exists: .*/);
   });
 
   it('Incorrect password for user', async () => {
