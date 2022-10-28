@@ -278,6 +278,114 @@ describe('SubmissionTableClientCsv', () => {
       const expected = mockHeaders('matrix');
       expect(transformMatrixHeaders(mockHeaders(), mockSubmissions().content)).toEqual(expected);
     });
+
+    it('collapses nested matrix question type under `Page` or `Group` type', () => {
+      const headers = [
+        '_id',
+        'meta.dateCreated',
+        'meta.dateModified',
+        'meta.dateSubmitted',
+        'meta.survey.id',
+        'meta.survey.version',
+        'meta.revision',
+        'meta.permissions',
+        'meta.status.0.type',
+        'meta.status.0.value.at',
+        'meta.group.id',
+        'meta.group.path',
+        'meta.specVersion',
+        'meta.creator',
+        'meta.permanentResults',
+        'data.page_1.text_2.value',
+        'data.page_1.matrix_3.value.0.description.value',
+        'data.page_1.matrix_3.value.0.sample.value',
+        'data.page_1.matrix_3.value.1.description.value',
+        'data.page_1.matrix_3.value.1.sample.value',
+        'data.page_1.matrix_3.value.2.description.value',
+        'data.page_1.matrix_3.value.2.sample.value',
+        'data.page_1.matrix_4.value.0.description.value',
+        'data.page_1.matrix_4.value.0.sample.value',
+        'data.page_1.matrix_4.value.1.description.value',
+        'data.page_1.matrix_4.value.1.sample.value',
+      ];
+      const data = [
+        {
+          _id: '6353113c1c423f00016d4e68',
+          meta: {
+            dateCreated: '2022-10-21T21:38:04.979Z',
+            dateModified: '2022-10-21T21:38:24.108Z',
+            dateSubmitted: '2022-10-21T21:38:31.806Z',
+            survey: { id: '635311081c423f00016d4e4c', version: 2 },
+            revision: 1,
+            permissions: [],
+            status: [
+              {
+                type: 'READY_TO_SUBMIT',
+                value: { at: '2022-10-21T21:38:31.763Z' },
+              },
+            ],
+            group: { id: '62f697a8cb00931dd4a31d7b', path: '/soilstack/' },
+            specVersion: 3,
+            creator: '630581e20c26b03c040b9655',
+            permanentResults: [],
+          },
+          data: {
+            page_1: {
+              meta: { type: 'page' },
+              text_2: {
+                value: 'Test',
+                meta: {
+                  type: 'string',
+                  dateModified: '2022-10-21T15:38:24.108-06:00',
+                },
+              },
+              matrix_3: {
+                value: [
+                  { sample: { value: 1 }, description: { value: 'a' } },
+                  { sample: { value: 2 }, description: { value: 'b' } },
+                  { sample: { value: 3 }, description: { value: 'c' } },
+                ],
+                meta: {
+                  type: 'matrix',
+                  dateModified: '2022-10-21T15:38:13.107-06:00',
+                },
+              },
+              matrix_4: {
+                value: [
+                  { sample: { value: 'A' }, description: { value: 'a' } },
+                  { sample: { value: 'B' }, description: { value: 'b' } },
+                ],
+                meta: {
+                  type: 'matrix',
+                  dateModified: '2022-10-21T15:38:18.666-06:00',
+                },
+              },
+            },
+          },
+        },
+      ];
+      const expected = [
+        '_id',
+        'meta.dateCreated',
+        'meta.dateModified',
+        'meta.dateSubmitted',
+        'meta.survey.id',
+        'meta.survey.version',
+        'meta.revision',
+        'meta.permissions',
+        'meta.status.0.type',
+        'meta.status.0.value.at',
+        'meta.group.id',
+        'meta.group.path',
+        'meta.specVersion',
+        'meta.creator',
+        'meta.permanentResults',
+        'data.page_1.text_2.value',
+        'data.page_1.matrix_3.value',
+        'data.page_1.matrix_4.value',
+      ];
+      expect(transformMatrixHeaders(headers, data)).toEqual(expected);
+    });
   });
 
   describe('getPropertiesFromMatrix', () => {
