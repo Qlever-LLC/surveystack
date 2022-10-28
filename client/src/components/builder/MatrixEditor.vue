@@ -128,8 +128,7 @@
                         label="FarmOS Type"
                         hide-details
                         style="max-width: 10rem"
-                      >
-                      </v-select>
+                      />
                     </div>
 
                     <v-checkbox

@@ -200,8 +200,7 @@
         v-model="control.options.farmOsType"
         :items="control.options.farmOsTypes"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-      >
-      </v-combobox>
+      />
 
       <v-select
         v-if="isDate"

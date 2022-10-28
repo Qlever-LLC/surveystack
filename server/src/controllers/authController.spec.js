@@ -41,7 +41,9 @@ describe('authController', () => {
         email: 'tEsT   e.com',
       },
     });
-    await expect(register(reqWrongEmail, res)).rejects.toThrow(/Invalid email address: teste.com/);
+    await expect(register(reqWrongEmail, res)).rejects.toThrow(
+      /Invalid email address: test {3}e.com/
+    );
   });
 
   it('strip whitespace on register and login', async () => {
@@ -55,19 +57,7 @@ describe('authController', () => {
         email: 'tEsT @  e.com',
       },
     });
-    await register(req, res);
-    const list = await db.collection('users').find().toArray();
-    expect(list.length === 1);
-
-    const token = list[0].token;
-    const reqLogin = createReq({
-      body: {
-        password: 'password',
-        email: 'test@e.com',
-        token: token,
-      },
-    });
-    await login(reqLogin, res);
+    await expect(register(req, res)).rejects.toThrow(/Invalid email address: .*$/);
   });
 
   it('not able to use email twice', async () => {
@@ -79,14 +69,14 @@ describe('authController', () => {
       body: {
         name: userName,
         password: 'passwor d',
-        email: 'tEsT @  e.com',
+        email: 'tEsT@e.com',
       },
     });
     const req2 = createReq({
       body: {
         name: userName2,
         password: 'other passwor d',
-        email: ' tEs  T @  e. com',
+        email: ' tEsT@e.com',
       },
     });
 
@@ -94,7 +84,7 @@ describe('authController', () => {
     let list = await db.collection('users').find().toArray();
     expect(list.length === 1);
 
-    await expect(register(req2, res)).rejects.toThrow(/E-Mail already in use: test@e.com/);
+    await expect(register(req2, res)).rejects.toThrow(/E-Mail already in use: .*$/);
     list = await db.collection('users').find().toArray();
     expect(list.length === 1);
   });
@@ -120,8 +110,8 @@ describe('authController specific on login function', () => {
     const req = createReq({
       body: {
         name: 'userName',
-        password: 'passwor d',
-        email: 'tEsT @  e.com',
+        password: 'password',
+        email: 'tEsT@e.com',
       },
     });
     await register(req, res);
@@ -153,8 +143,8 @@ describe('authController specific on login function', () => {
     const req = createReq({
       body: {
         name: 'userName',
-        password: 'passwor d',
-        email: 'tEsT @  e.com',
+        password: 'password',
+        email: 'tEsT@e.com',
       },
     });
     await register(req, res);
@@ -178,8 +168,8 @@ describe('authController specific on login function', () => {
     const req = createReq({
       body: {
         name: userName,
-        password: 'passwor d',
-        email: 'tEsT @  e.com',
+        password: 'password',
+        email: 'tEsT@e.com',
       },
     });
     await register(req, res);

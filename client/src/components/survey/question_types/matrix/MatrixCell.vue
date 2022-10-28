@@ -17,7 +17,7 @@
     <div style="flex: 1">
       <v-text-field
         ref="text-qrcode"
-        :value="value ? value.value : ''"
+        :value="value"
         @input="
           (v) => {
             value = getValueOrNull(v);

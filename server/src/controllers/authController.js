@@ -21,12 +21,11 @@ import { queryParam } from '../helpers';
 const col = 'users';
 
 const register = async (req, res) => {
-  // TODO: sanity check
-  const email = req.body.email.split(' ').join('').toLowerCase();
+  const email = req.body.email.trim().toLowerCase();
   const { name } = req.body;
-  const password = req.body.password.split(' ').join('');
+  const password = req.body.password.trim();
 
-  if (email.trim() === '' || password.trim() === '') {
+  if (email === '' || password === '') {
     throw boom.badRequest('Email and password must not be empty');
   }
 

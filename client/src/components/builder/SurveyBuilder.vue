@@ -967,10 +967,6 @@ export default {
 </style>
 
 <style scoped>
-.fullscreen {
-  height: 100%;
-}
-
 .screen-root {
   width: 100%;
   height: 100%;

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="show" :width="width" :max-width="maxWidth" :modal="modal">
+  <v-dialog v-model="show" :width="width" :max-width="maxWidth" :persistent="modal">
     <v-card>
       <v-card-title class="headline">
         <slot name="title">{{ title }}</slot>
