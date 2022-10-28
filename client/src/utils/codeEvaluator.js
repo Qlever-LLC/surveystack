@@ -92,7 +92,6 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
 }
 
 export const calculateRelevance = async (nodes, submission, survey) => {
-  //to check
   const calculations = await calculateField({
     nodes,
     submission,
