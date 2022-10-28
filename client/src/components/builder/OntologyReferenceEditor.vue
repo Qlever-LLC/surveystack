@@ -36,7 +36,14 @@
     <v-card-actions>
       <v-spacer />
       <v-btn text @click="closeHandler"> Close </v-btn>
-      <v-btn text color="green" @click="previewDialogIsVisible = true" :disabled="!path"> Preview </v-btn>
+      <v-tooltip top :disabled="!!path">
+        <template v-slot:activator="{ on }">
+          <div v-on="on">
+            <v-btn text color="green" @click="previewDialogIsVisible = true" :disabled="!path"> Preview </v-btn>
+          </div>
+        </template>
+        <span>No Submitted Surveys Available</span>
+      </v-tooltip>
       <v-btn text color="error" @click="deleteResource"> Delete </v-btn>
       <v-btn text color="primary" @click="updateAndClose"> Save </v-btn>
     </v-card-actions>
