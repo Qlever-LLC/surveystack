@@ -222,7 +222,7 @@ export const availableControls = [
   },
   {
     name: 'farmos_uuid',
-    label: 'FarmOS UUID',
+    label: 'FarmOS ID',
     type: 'farmOsUuid',
     icon: 'mdi-leaf',
   },

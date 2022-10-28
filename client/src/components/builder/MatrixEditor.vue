@@ -218,7 +218,7 @@ const MATRIX_COLUMN_TYPES = [
   { text: 'Date', value: 'date' },
   { text: 'Farmos Field', value: 'farmos_field' },
   { text: 'Farmos Planting', value: 'farmos_planting' },
-  { text: 'Farmos UUID', value: 'farmos_uuid' },
+  { text: 'Farmos ID', value: 'farmos_uuid' },
 ];
 
 const createOptions = (src) => {
