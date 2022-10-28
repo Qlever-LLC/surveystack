@@ -11,11 +11,11 @@ import {
   checkUrl,
   superAdminCreateFarmOsInstance,
   groupAdminMinimumGetGroupInformation,
+  mapUser,
 } from './farmosController';
 import { createGroup, createReq, createRes, createUser } from '../testUtils';
 import {
   mapFarmOSInstanceToUser,
-  mapFarmOSInstanceToGroupAdmin,
   setPlanForGroup,
   getGroupInformation,
   createFarmosGroupSettings,
@@ -28,6 +28,7 @@ import {
 } from '../services/farmos/__mock__/farmos.asset.response';
 
 import mockAxios from 'axios';
+import { assert } from 'joi';
 
 const init = async () => {
   const group = await createGroup();
@@ -95,7 +96,7 @@ describe('farmos-controller', () => {
 
     await mapFarmOSInstanceToUser(user1.user._id, 'user-farm.farmos.dev', true);
 
-    await mapFarmOSInstanceToGroupAdmin(admin1.user._id, group._id, 'user-farm.farmos.dev');
+    await mapFarmOSInstanceToUser(admin1.user._id, 'user-farm.farmos.dev', false);
     await mapFarmOSInstanceToUser(admin1.user._id, 'admin-farm.farmos.dev', true);
 
     const userRes = mockRes(user1.user._id);
@@ -392,6 +393,36 @@ describe('farmos-controller', () => {
 
     expect(res.data.status).toStrictEqual('error');
     expect(res.data.message).toStrictEqual('custom error detected');
+  });
+
+  it('map-user', async () => {
+    // check that user is in group
+    // check that user has access to instance and is owner
+    // or that instance is assigned to group
+    // check instance not already mapped
+    // const group = await createGroup({ name: 'Bionutrient' });
+    // const admin = await group.createAdminMember();
+    // const user = await group.createUserMember();
+    // await mapFarmOSInstanceToUser(user.user._id, 'userinstance.farmos.net', true);
+    // const req = {
+    //   params: { groupId: group._id + "" },
+    //   body: {
+    //     instanceName: "userinstance.farmos.net",
+    //     userId: admin.user._id + "",
+    //   }
+    // };
+    // const res = {
+    //   send: jest.fn(),
+    //   locals: {
+    //     auth: {
+    //       user: {
+    //         _id: admin,
+    //       },
+    //     },
+    //   },
+    // }
+    // await mapUser(req, res);
+    // expect(res.send).toHaveBeenCalledWith({ status: "ok" })
   });
 
   /*it('get-assets', async () => {

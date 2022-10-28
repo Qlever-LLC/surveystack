@@ -78,7 +78,7 @@
       <template v-slot:header-cell="{ header }">
         <v-tooltip top>
           <template v-slot:activator="{ on }">
-            <span class="flex-grow-1 text-truncate " v-on="on">{{ header.label }}</span>
+            <span class="flex-grow-1 text-truncate" v-on="on">{{ header.label }}</span>
           </template>
           <span>{{ header.type }}: {{ header.label }}</span>
         </v-tooltip>
@@ -101,7 +101,7 @@
         </v-form>
       </template>
       <template v-if="!isMobile" v-slot:row-actions="{ rowIdx }">
-        <div style="width: 64px; padding-left: 4px !important; padding-right: 0px;">
+        <div style="width: 64px; padding-left: 4px !important; padding-right: 0px">
           <div class="d-flex">
             <v-btn icon @click="rowToBeDeleted = rowIdx" tabindex="-1" small>
               <v-icon>mdi-trash-can-outline</v-icon>

@@ -60,3 +60,6 @@ Vue.component('AppControlSelectSingle', SelectSingle);
 
 import String from './String.vue';
 Vue.component('AppControlString', String);
+
+import FarmosUuid from './FarmOsCreateUUID.vue';
+Vue.component('AppControlFarmOsUuid', FarmosUuid);

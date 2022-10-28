@@ -328,6 +328,14 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     }));
   };
 
+  const getAdminLink = async (farmurl) => {
+    const r = await axios.get(`${apiBase}/farms/relay/${encodeURIComponent(farmurl)}/api/login?`, {
+      ...opts,
+    });
+
+    return r.data;
+  };
+
   return {
     farminfo,
     getTaxonomy,
@@ -343,5 +351,6 @@ export const aggregator = (aggregatorURL, aggregatorKey) => {
     getAllTerms,
     getEndpointsAndBundles,
     createBodiesForSurveystackGetId,
+    getAdminLink,
   };
 };
