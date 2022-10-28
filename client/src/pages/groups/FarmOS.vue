@@ -16,6 +16,7 @@
 
     <app-dialog
       modal
+      title="Deactivate FarmOS"
       :maxWidth="600"
       labelConfirm="Deactivate FarmOS for Group"
       class="primary--text mx-4"
