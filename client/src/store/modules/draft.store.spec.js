@@ -10,24 +10,26 @@ import { addRevisionToSurvey, createControl } from '@/../tests/surveyTestingUtil
 describe('draft store', () => {
   describe('actions', () => {
     describe('init', () => {
-      const run = () => {
+      const run = async () => {
         const payload = { survey: {}, submission: {}, persist: {} };
         const call = jest.fn();
         const dispatch = call.bind(null, 'dispatch');
         const commit = call.bind(null, 'commit');
-        actions.init({ dispatch, commit }, payload);
+        await actions.init({ dispatch, commit }, payload);
 
         return { payload, call };
       };
-      it('commits INIT', () => {
+      it('commits INIT', async () => {
         const { call, payload } = run();
-        expect(call).toHaveBeenNthCalledWith(1, 'commit', 'INIT', payload);
+        await expect(call).toHaveBeenNthCalledWith(1, 'commit', 'INIT', payload);
         // passes down the given payload to the mutation
         expect(call.mock.calls[0][2].survey).toBe(payload.survey);
         expect(call.mock.calls[0][2].submission).toBe(payload.submission);
         expect(call.mock.calls[0][2].persist).toBe(payload.persist);
       });
-      it('dispatches next', () => expect(run().call).toHaveBeenNthCalledWith(2, 'dispatch', 'next'));
+      //it('dispatches calculateRelevance', () => expect(run().call).toHaveBeenNthCalledWith(2, 'dispatch', 'calculateRelevance'));
+      it('dispatches next', async () =>
+        await expect(run().call).resolves.toHaveBeenNthCalledWith(2, 'dispatch', 'next'));
     });
     describe('next', () => {
       // marker control ID's to setup the initial state
