@@ -370,7 +370,7 @@ export default {
         return ' ';
       }
 
-      if (!isNaN(Date.parse(value))) {
+      if (isNaN(Number(value)) && !isNaN(Date.parse(value))) {
         const dateValue = moment(value);
         return dateValue.format('MMM D, YYYY h:mm A');
       }
