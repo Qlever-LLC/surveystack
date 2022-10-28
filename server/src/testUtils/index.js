@@ -1,3 +1,5 @@
+import getSubmissionDataGenerator from './submissionData';
+import getSubmissionHeadersGenerator from './submissionHeader';
 import getControlGenerator from './surveyControls';
 
 const crypto = jest.requireActual('crypto');
@@ -148,19 +150,16 @@ export const setRole = async (membershipId, role) => {
   } controls
 */
 export const createSurvey = async (overrides = {}, control = '') => {
+  const now = new Date();
   const surveyDoc = {
-    _id: uniqueId(),
     name: 'Mock Survey Name',
     latestVersion: 1,
     meta: {
-      dateCreated: new Date('2022-10-11T02:30:35.000Z'),
-      dateModified: new Date('2022-10-11T02:30:35.000Z'),
+      dateCreated: now,
+      dateModified: now,
       submissions: 'public',
       creator: uniqueId(),
-      group: {
-        id: uniqueId(),
-        path: '/mock-group-path/',
-      },
+      group: createGroup(),
       specVersion: 4,
     },
     resources: [
@@ -207,7 +206,7 @@ export const createSurvey = async (overrides = {}, control = '') => {
     ],
     revisions: [
       {
-        dateCreated: new Date('2022-10-11T02:30:35.000Z'),
+        dateCreated: now,
         version: 1,
         controls: [],
       },
@@ -234,8 +233,58 @@ export const createSurvey = async (overrides = {}, control = '') => {
   const survey = await getDb().collection('survey').insertOne(surveyDoc);
 
   const createSubmission = async (_overrides = {}) => {
-    const submissionDoc = { ..._overrides };
+    const headersGenerator = getSubmissionHeadersGenerator(control);
+    const dataGenerator = getSubmissionDataGenerator(control);
+
+    const submissionDoc = {
+      content: [
+        {
+          _id: uniqueId(),
+          meta: {
+            dateCreated: now,
+            dateModified: now,
+            dateSubmitted: now,
+            survey: { id: survey.insertedId, version: 2 },
+            revision: 1,
+            permissions: [],
+            status: [
+              {
+                type: 'READY_TO_SUBMIT',
+                value: { at: now },
+              },
+            ],
+            group: surveyDoc.meta.group,
+            specVersion: 4,
+            creator: uniqueId(),
+            permanentResults: [],
+          },
+          data: dataGenerator(),
+        },
+      ],
+      pagination: { total: 1, skip: 0, limit: 10 },
+      headers: [
+        '_id',
+        'meta.dateCreated',
+        'meta.dateModified',
+        'meta.dateSubmitted',
+        'meta.survey.id',
+        'meta.survey.version',
+        'meta.revision',
+        'meta.permissions',
+        'meta.status.0.type',
+        'meta.status.0.value.at',
+        'meta.group.id',
+        'meta.group.path',
+        'meta.specVersion',
+        'meta.creator',
+        'meta.permanentResults',
+        ...(typeof headersGenerator === 'function' ? headersGenerator() : []),
+      ],
+      ..._overrides,
+    };
+
     const submission = await getDb().collection('submissions').insertOne(submissionDoc);
+
     return submission;
   };
 
