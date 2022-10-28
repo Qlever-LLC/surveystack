@@ -10,9 +10,9 @@ import {
 } from '../../testUtils';
 import {
   mapFarmOSInstanceToUser,
-  mapFarmOSInstanceToGroupAdmin,
   unmapFarmOSInstance,
   listFarmOSInstancesForUser,
+  addFarmToUser,
 } from './manage';
 
 import { createAsset } from './apiCompose';
@@ -38,7 +38,7 @@ describe('farmos2-api-compose', () => {
     const { group, user1, user2, admin1 } = await init();
     const instanceName = 'test.surveystack.io';
     await mapFarmOSInstanceToUser(user1.user._id, instanceName, true);
-    await mapFarmOSInstanceToGroupAdmin(admin1.user._id, group._id, instanceName);
+    await addFarmToUser(instanceName, admin1.user._id, group._id, false);
 
     expect(await hasPermission(user1.user._id, instanceName)).toBe(true);
     expect(await hasPermission(user2.user._id, instanceName)).toBe(false);

@@ -79,7 +79,13 @@
                   <v-card-text>
                     <v-text-field v-model="item.label" label="Label" style="font-size: 1.3rem" dense />
                     <v-text-field v-model="item.value" label="Value" dense />
-                    <v-select dense v-model="item.type" :items="$options.MATRIX_COLUMN_TYPES" label="Type" />
+                    <v-select
+                      dense
+                      v-bind:value="item.type"
+                      v-on:input="(t) => onTypeChanged(item, t)"
+                      :items="$options.MATRIX_COLUMN_TYPES"
+                      label="Type"
+                    />
                     <div v-if="item.type === 'dropdown' || item.type === 'autocomplete'" class="d-flex flex-column">
                       <div class="d-flex flex-row flex-wrap">
                         <v-select
@@ -111,6 +117,17 @@
                         label="Custom inputs"
                         hide-details
                         dense
+                      />
+                    </div>
+
+                    <div v-if="item.type == 'farmos_uuid'" class="d-flex flex-column">
+                      <v-select
+                        dense
+                        v-model="item.options.farmOsType"
+                        :items="item.options.farmOsTypes"
+                        label="FarmOS Type"
+                        hide-details
+                        style="max-width: 10rem"
                       />
                     </div>
 
@@ -148,6 +165,14 @@
                       hint="Submitters can not see this column. This option is intentionally allowed by the question set designer"
                       persistent-hint
                     />
+
+                    <div
+                      v-if="item.type == 'farmos_field' || item.type == 'farmos_planting'"
+                      class="d-flex flex-column"
+                    >
+                      <v-checkbox class="mt-2" v-model="item.multiple" label="Multiselect" hide-details />
+                    </div>
+
                     <h4 class="mt-6 mb-4">Display Options</h4>
                     <v-text-field
                       type="number"
@@ -193,7 +218,17 @@ const MATRIX_COLUMN_TYPES = [
   { text: 'Date', value: 'date' },
   { text: 'Farmos Field', value: 'farmos_field' },
   { text: 'Farmos Planting', value: 'farmos_planting' },
+  { text: 'Farmos ID', value: 'farmos_uuid' },
 ];
+
+const createOptions = (src) => {
+  if (src.type === 'farmos_uuid') {
+    // sync with surveyConfig.js
+    src.options.farmOsType = 'field';
+    src.options.farmOsTypes = ['field', 'planting'];
+  }
+  return src;
+};
 
 export default {
   props: {
@@ -300,19 +335,21 @@ export default {
       [columns[idx1], columns[idx2]] = [columns[idx2], columns[idx1]];
       this.columns = columns;
     },
+
     createEmptyColumn() {
-      return {
+      return createOptions({
         label: '',
         value: '',
         tags: '',
         type: '',
+        options: {},
         resource: '',
         multiple: false,
         custom: false,
         required: false,
         redacted: false,
         scaleWidth: 100,
-      };
+      });
     },
     deleteColumn(index) {
       const columns = [...this.columns];
@@ -321,6 +358,10 @@ export default {
     },
     addColumn() {
       this.value.content = [...this.value.content, this.createEmptyColumn()];
+    },
+    onTypeChanged(item, type) {
+      item.type = type;
+      item = createOptions(item);
     },
   },
   MATRIX_COLUMN_TYPES,
