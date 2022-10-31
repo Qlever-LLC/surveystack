@@ -20,16 +20,22 @@ describe('draft store', () => {
         return { payload, call };
       };
       it('commits INIT', async () => {
-        const { call, payload } = run();
-        await expect(call).toHaveBeenNthCalledWith(1, 'commit', 'INIT', payload);
+        const { call, payload } = await run();
+        expect(call).toHaveBeenNthCalledWith(1, 'commit', 'INIT', payload);
         // passes down the given payload to the mutation
         expect(call.mock.calls[0][2].survey).toBe(payload.survey);
         expect(call.mock.calls[0][2].submission).toBe(payload.submission);
         expect(call.mock.calls[0][2].persist).toBe(payload.persist);
       });
-      //it('dispatches calculateRelevance', () => expect(run().call).toHaveBeenNthCalledWith(2, 'dispatch', 'calculateRelevance'));
-      it('dispatches next', async () =>
-        await expect(run().call).resolves.toHaveBeenNthCalledWith(2, 'dispatch', 'next'));
+      it('dispatches calculateRelevance', async () => {
+        const { call, payload } = await run();
+        expect(call).toHaveBeenNthCalledWith(2, 'dispatch', 'calculateRelevance');
+      });
+
+      it('dispatches next', async () => {
+        const { call, payload } = await run();
+        await expect(call).toHaveBeenNthCalledWith(3, 'dispatch', 'next');
+      });
     });
     describe('next', () => {
       // marker control ID's to setup the initial state
