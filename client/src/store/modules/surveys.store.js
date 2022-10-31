@@ -30,42 +30,46 @@ const fetchPinned = async (commit, dispatch) => {
 
   const fetched = [];
 
-  if (status == 'success') {
-    for (const group of data.pinned) {
-      for (const sid of group.pinned) {
-        const item = {
-          id: sid,
-          name: '',
-          group: group.group_name,
-          meta: {},
-        };
+  if (status !== 'success' || !Array.isArray(data.pinned)) {
+    return pinned;
+  }
 
-        const cached = fetched.find((f) => f._id == sid);
-        if (!cached) {
-          try {
-            let s = await actions.fetchSurvey({ commit }, sid);
-            if (s.resources) {
-              await dispatch('resources/fetchResources', s.resources, { root: true });
-            }
-            fetched.push(s);
-            item.name = s.name;
-            item.meta = s.meta;
-          } catch (error) {
-            console.error('error:' + error);
-            continue;
+  for (const group of data.pinned) {
+    if (!Array.isArray(group.pinned)) {
+      continue;
+    }
+
+    for (const sid of group.pinned) {
+      const item = {
+        id: sid,
+        name: '',
+        group: group.group_name,
+        meta: {},
+      };
+
+      const cached = fetched.find((f) => f._id == sid);
+      if (!cached) {
+        try {
+          let s = await actions.fetchSurvey({ commit }, sid);
+          if (s.resources) {
+            await dispatch('resources/fetchResources', s.resources, { root: true });
           }
-        } else {
-          item.name = cached.name;
-          item.meta = cached.meta;
+          fetched.push(s);
+          item.name = s.name;
+          item.meta = s.meta;
+        } catch (error) {
+          console.error('error:' + error);
+          continue;
         }
-
-        pinned.push(item);
+      } else {
+        item.name = cached.name;
+        item.meta = cached.meta;
       }
+
+      pinned.push(item);
     }
   }
 
-  // console.log('fetched', fetched);
-  // console.log('pinned', pinned);
   return pinned;
 };
 
