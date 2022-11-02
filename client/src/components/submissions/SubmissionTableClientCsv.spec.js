@@ -454,7 +454,7 @@ describe('SubmissionTableClientCsv', () => {
     });
 
     const checkbox = getAllByRole('checkbox');
-    await fireEvent.click(checkbox[0]);
+    await fireEvent.click(checkbox[1]); //checkbox[0] is the toggleSelectAllItems checkbox, so take the second one (index 1)
     expect(emitted()['update:selected']).toBeTruthy();
   });
 
