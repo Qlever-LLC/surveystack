@@ -60,22 +60,26 @@ export default {
 </script>
 
 <style scoped>
+>>> .v-select__selections {
+  flex-wrap: wrap !important;
+}
+
 div >>> .blue-chip,
 div >>> .orange-chip,
 div >>> .green-chip {
   display: inline-flex;
   border: 1px var(--v-focus-base) solid;
-  background: none;
   color: var(--v-focus-base);
-  border-radius: 0.4rem;
+  border-radius: 0.6rem;
   font-weight: bold;
   font-size: 80%;
   padding: 0.2rem;
   padding-left: 0.4rem;
-  padding-right: 0.4rem;
+  padding-right: 0.2rem;
   vertical-align: middle;
   margin-top: 0.4rem;
   margin-bottom: 0.4rem;
+  margin-right: 0.2rem !important;
 }
 
 div >>> .green-chip {

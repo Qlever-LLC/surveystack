@@ -8,3 +8,8 @@ window.scrollTo = () => {};
 
 // until this gets closed https://github.com/jsdom/jsdom/issues/1721
 global.URL.createObjectURL = () => {};
+Object.defineProperty(global.self, 'crypto', {
+  value: {
+    getRandomValues: () => {},
+  },
+});

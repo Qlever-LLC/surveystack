@@ -4,6 +4,10 @@
       successMessage
     }}</v-alert>
 
+    <v-alert v-if="errorMessage" class="mt-4" mode="fade" text type="error" @click="errorMessage = null">{{
+      errorMessage
+    }}</v-alert>
+
     <v-tabs v-model="tab" background-color="transparent" color="basil" grow>
       <v-tab v-for="item in items" :key="item.name">{{ item.name }}</v-tab>
     </v-tabs>
@@ -15,6 +19,7 @@
           @unmap-group="unmapGroup"
           @map-user="mapUser"
           @unmap-user="unmapUser"
+          @unmap-farm="unmapFarm"
           :plans="plans"
           :is="item.component"
           :groups="groups"
@@ -120,6 +125,8 @@ export default {
       const { data: users } = await api.get('/users');
       const { data: plans } = await api.get('/farmos/plans');
 
+      console.log('mappings', mappings);
+
       this.loading = false;
       this.mappings = mappings;
       this.groups = groups;
@@ -214,7 +221,25 @@ export default {
           instanceName,
         });
         await this.reload();
-        this.success('Sucessfully un-mapped user');
+        this.success('Sucessfully unmapped user');
+      } catch (error) {
+        console.dir(error);
+        if (error.response && error.response.data) {
+          this.error(error.response.data);
+        } else {
+          this.error(error.message);
+        }
+      }
+    },
+    async unmapFarm(instanceName) {
+      this.error(null);
+      try {
+        this.loading = true;
+        await api.post('/farmos/unmap-instance', {
+          instanceName,
+        });
+        await this.reload();
+        this.success('Sucessfully unmapped farm instance');
       } catch (error) {
         console.dir(error);
         if (error.response && error.response.data) {
