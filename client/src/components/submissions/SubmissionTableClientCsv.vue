@@ -503,13 +503,15 @@ export default {
         this.downloadingResource = false;
       }
     },
-    isSelectable(submission) {
+    isSelectable(item) {
+      //load original submission object, as item may miss meta data if excludeMeta is true
+      const submission = this.submissions.content.find((s) => s._id === item._id);
       // allow submissions editing to submission creator and submission.meta.group's admins
       const isAdminOfSubmissionGroup = this.userMemberships.find(
-        (membership) => membership.group._id === submission['meta.group.id'] && membership.role === 'admin'
+        (membership) => membership.group._id === submission.meta.group.id && membership.role === 'admin'
       );
 
-      const isCreator = submission['meta.creator'] === this.user._id;
+      const isCreator = submission.meta.creator === this.user._id;
 
       return isAdminOfSubmissionGroup || isCreator;
     },
