@@ -258,7 +258,7 @@ export const createSurvey = async (overrides = {}, control = '') => {
             creator: uniqueId(),
             permanentResults: [],
           },
-          data: dataGenerator(),
+          data: typeof dataGenerator === 'function' ? dataGenerator() : {},
         },
       ],
       pagination: { total: 1, skip: 0, limit: 10 },
@@ -285,10 +285,13 @@ export const createSurvey = async (overrides = {}, control = '') => {
 
     const submission = await getDb().collection('submissions').insertOne(submissionDoc);
 
-    return submission;
+    return submission.ops[0];
   };
 
-  return { ...survey, createSubmission };
+  return {
+    survey: survey.ops[0],
+    createSubmission,
+  };
 };
 
 export const createReq = ({

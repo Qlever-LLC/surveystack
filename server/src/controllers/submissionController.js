@@ -545,6 +545,7 @@ const getSubmissionsCsv = async (req, res) => {
   };
 
   const entities = await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).toArray();
+  console.log(1111111, entities);
   const transformer = (entity) => {
     let data = csvService.transformSubmissionQuestionTypes(
       entity.data,
