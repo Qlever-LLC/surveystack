@@ -521,11 +521,7 @@ export default {
         this.tableSelected = [];
       } else {
         //select all
-        this.items.forEach((item) => {
-          if (this.isSelectable(item)) {
-            this.tableSelected.push(item);
-          }
-        });
+        this.tableSelected = this.selectableItems;
       }
     },
   },
