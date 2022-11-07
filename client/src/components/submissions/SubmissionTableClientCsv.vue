@@ -97,6 +97,18 @@
         </v-toolbar>
       </template>
 
+      <template v-slot:header.data-table-select="{ props }">
+        <v-checkbox
+          :value="selected.length === selectableItems.length"
+          :indeterminate="selected.length > 0 && selected.length < selectableItems.length"
+          @click="toggleSelectAllItems"
+          color="#777"
+          class="custom-checkbox"
+          hide-details
+          role="checkbox"
+        />
+      </template>
+
       <template v-for="header in headers" v-slot:[`header.${header.value}`]>
         <span
           :key="header.value"
@@ -114,6 +126,7 @@
           <td :class="{ 'expand-cell': isExpandMatrix }">
             <v-checkbox
               :value="isSelected"
+              :disabled="!isSelectable(item)"
               @click="select(!isSelected)"
               color="#777"
               class="custom-checkbox"
@@ -349,6 +362,15 @@ export default {
       const [value] = this.activeTableCell;
       return value || '';
     },
+    selectableItems() {
+      return this.items.filter((item) => this.isSelectable(item));
+    },
+    user() {
+      return this.$store.getters['auth/user'];
+    },
+    userMemberships() {
+      return this.$store.getters['memberships/memberships'];
+    },
   },
   watch: {
     excludeMeta() {
@@ -479,6 +501,27 @@ export default {
         this.openResourceError = 'File could not be opened';
       } finally {
         this.downloadingResource = false;
+      }
+    },
+    isSelectable(item) {
+      //load original submission object, as item may miss meta data if excludeMeta is true
+      const submission = this.submissions.content.find((s) => s._id === item._id);
+      // allow submissions editing to submission creator and submission.meta.group's admins
+      const isAdminOfSubmissionGroup = this.userMemberships.find(
+        (membership) => membership.group._id === submission.meta.group.id && membership.role === 'admin'
+      );
+
+      const isCreator = submission.meta.creator === this.user._id;
+
+      return isAdminOfSubmissionGroup || isCreator;
+    },
+    toggleSelectAllItems() {
+      if (this.selected.length > 0) {
+        //de-select all
+        this.tableSelected = [];
+      } else {
+        //select all
+        this.tableSelected = this.selectableItems;
       }
     },
   },

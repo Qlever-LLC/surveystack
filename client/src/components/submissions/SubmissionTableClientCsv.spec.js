@@ -8,6 +8,7 @@ import { within } from '@testing-library/dom';
 import { renderWithVuetify } from '../../../tests/renderWithVuetify';
 import SubmissionTableClientCsv from './SubmissionTableClientCsv.vue';
 import router from '@/router';
+import { createStoreObject } from '@/store';
 
 const mockSubmissions = () => {
   return {
@@ -400,6 +401,7 @@ describe('SubmissionTableClientCsv', () => {
       const { getByText, getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
         propsData: { submissions: mockSubmissions(), selected: [] },
         router: router,
+        store: createStoreObject(),
       });
       const td = getByText(
         'You can use the overflow property when you want to have better control of the layout. The overflow'
@@ -415,6 +417,7 @@ describe('SubmissionTableClientCsv', () => {
       const { getByTestId, getByText, queryByRole } = renderWithVuetify(SubmissionTableClientCsv, {
         propsData: { submissions: mockSubmissions(), selected: [] },
         router: router,
+        store: createStoreObject(),
       });
       const td = getByText(
         'You can use the overflow property when you want to have better control of the layout. The overflow'
@@ -431,6 +434,7 @@ describe('SubmissionTableClientCsv', () => {
     const { getByText, getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
       propsData: { submissions: mockSubmissions(), selected: [] },
       router: router,
+      store: createStoreObject(),
     });
     const td = getByText(
       'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout'
@@ -446,10 +450,11 @@ describe('SubmissionTableClientCsv', () => {
     const { getAllByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
       propsData: { submissions: mockSubmissions(), selected: [] },
       router: router,
+      store: createStoreObject(),
     });
 
     const checkbox = getAllByRole('checkbox');
-    await fireEvent.click(checkbox[0]);
+    await fireEvent.click(checkbox[1]); //checkbox[0] is the toggleSelectAllItems checkbox, so take the second one (index 1)
     expect(emitted()['update:selected']).toBeTruthy();
   });
 
@@ -465,6 +470,7 @@ describe('SubmissionTableClientCsv', () => {
         ],
       },
       router: router,
+      store: createStoreObject(),
     });
     getByText(/1 submission selected/i);
     getByRole('button', { name: /archive/i });
@@ -484,6 +490,7 @@ describe('SubmissionTableClientCsv', () => {
         ],
       },
       router: router,
+      store: createStoreObject(),
     });
 
     const archiveButton = getByRole('button', { name: /archive/i });
@@ -503,6 +510,7 @@ describe('SubmissionTableClientCsv', () => {
         ],
       },
       router: router,
+      store: createStoreObject(),
     });
 
     const resubmitButton = getByRole('button', { name: /resubmit/i });
@@ -522,6 +530,7 @@ describe('SubmissionTableClientCsv', () => {
         ],
       },
       router: router,
+      store: createStoreObject(),
     });
 
     const reassignButton = getByRole('button', { name: /reassign/i });
@@ -542,6 +551,7 @@ describe('SubmissionTableClientCsv', () => {
         ],
       },
       router: router,
+      store: createStoreObject(),
     });
 
     const reassignButton = getByRole('button', { name: /reassign/i });
@@ -561,6 +571,7 @@ describe('SubmissionTableClientCsv', () => {
         ],
       },
       router: router,
+      store: createStoreObject(),
     });
 
     const resubmitButton = getByRole('button', { name: /resubmit/i });
@@ -580,6 +591,7 @@ describe('SubmissionTableClientCsv', () => {
         ],
       },
       router: router,
+      store: createStoreObject(),
     });
 
     const archiveButton = getByRole('button', { name: /archive/i });

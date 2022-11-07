@@ -141,15 +141,14 @@
 </template>
 
 <script>
-import moment from 'moment';
 import api from '@/services/api.service';
 // TODO: figure out why there is an import cycle from submissions.strore > router
 // eslint-disable-next-line import/no-cycle
-import { types as submissionsTypes } from '@/store/modules/submissions.store';
 import ConfirmSubmissionDialog from '@/components/survey/drafts/ConfirmSubmissionDialog.vue';
 import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import ResultMixin from '@/components/ui/ResultsMixin';
 import ResultDialog from '@/components/ui/ResultDialog.vue';
+import { uploadFileResources } from '@/utils/resources';
 
 const PAGINATION_LIMIT = 10;
 
@@ -260,6 +259,7 @@ export default {
     async uploadSubmission(submission) {
       this.isSubmitting = true;
       try {
+        await uploadFileResources(this.$store, this.surveyForSubmission(submission), submission, true);
         const response = submission.meta.dateSubmitted
           ? await api.put(`/submissions/${submission._id}`, submission)
           : await api.post('/submissions', submission);
