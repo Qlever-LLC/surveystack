@@ -1,4 +1,4 @@
-import { uniqueId } from 'lodash';
+const { ObjectId } = jest.requireActual('mongodb');
 
 const now = new Date();
 
@@ -132,7 +132,7 @@ const matrixData = (overrides = {}, index = 1) => ({
 
 const imageData = (overrides = {}, index = 1) => ({
   [`image_${index}`]: {
-    value: [`resources/${uniqueId()}/file1.jpg`],
+    value: [`resources/${new ObjectId()}/file1.jpg`],
     meta: {
       type: 'image',
       dateModified: now,
@@ -143,7 +143,7 @@ const imageData = (overrides = {}, index = 1) => ({
 
 const fileData = (overrides = {}, index = 1) => ({
   [`file_${index}`]: {
-    value: [`resources/${uniqueId()}/file1.jpg`],
+    value: [`resources/${new ObjectId()}/file1.jpg`],
     meta: {
       type: 'file',
       dateModified: now,
@@ -167,7 +167,7 @@ const farmOsFieldData = (overrides = {}, index = 1) => ({
         farmName: 'Mock farm name',
         url: 'Mock url',
         name: 'Mock name',
-        fieldId: uniqueId(),
+        fieldId: new ObjectId(),
       },
     ],
     meta: {
@@ -182,15 +182,15 @@ const farmOsPlantingData = (overrides = {}, index = 1) => ({
   [`farmos_planting_${index}`]: {
     value: [
       {
-        farmId: uniqueId(),
+        farmId: new ObjectId(),
         farmName: 'Mock farm name',
         url: 'Mock url',
         name: 'Mock name',
-        assetId: uniqueId(),
+        assetId: new ObjectId(),
         archived: true,
         location: [
           {
-            id: uniqueId(),
+            id: new ObjectId(),
             name: 'Mock location name',
           },
         ],
