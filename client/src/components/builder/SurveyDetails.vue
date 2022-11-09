@@ -92,7 +92,10 @@
             </v-list-item>
             <v-list-item>
               <v-list-item-title>
-                <v-btn @click="versionsDialogIsVisible = true" text> Survey Versions </v-btn>
+                <v-btn @click="versionsDialogIsVisible = true" text>
+                  <v-icon color="grey">mdi-sitemap</v-icon>
+                  <div class="ml-1">Manage Survey Versions</div>
+                </v-btn>
               </v-list-item-title>
             </v-list-item>
             <v-list-item>

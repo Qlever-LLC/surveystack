@@ -6,17 +6,36 @@
         <v-skeleton-loader type="list-item@3" v-if="cleanupInfoIsLoading" />
         <p v-else-if="cleanupInfoHasError">An error occurred loading survey cleanup data</p>
         <div v-else-if="cleanupInfoHasLoaded && !cleanupInfoHasError">
-          <v-checkbox
-            v-model="selectedVersionsToDelete"
-            :label="getVersionLabel(revision.version)"
-            :value="String(revision.version)"
-            :disabled="deleteVersionIsDisabled(revision.version)"
-            :append-icon="shouldDeleteVersion(revision.version) ? 'mdi-alert' : null"
-            v-for="revision in survey.revisions"
-            :key="revision.version"
-            class="mt-0"
-          />
-          <p>
+          <div v-for="revision in survey.revisions" :key="revision.version" class="row py-0">
+            <div class="col-10 mt-1 py-0">
+              <v-chip
+                dark
+                small
+                :color="deleteVersionIsDisabled(revision.version) ? 'green' : 'grey'"
+                :title="deleteVersionIsDisabled(revision.version) ? 'in use' : 'unused'"
+              >
+                {{ revision.version }}</v-chip
+              >
+              <span class="ml-2"
+                >{{ getCount(revision.version) || 'no' }} submission{{
+                  getCount(revision.version) > 1 ? 's' : ''
+                }}</span
+              >
+            </div>
+            <div class="col-2 py-0">
+              <v-checkbox
+                v-model="selectedVersionsToDelete"
+                label="delete"
+                :value="String(revision.version)"
+                :disabled="deleteVersionIsDisabled(revision.version)"
+                hide-details
+                class="mt-0"
+                color="red"
+              />
+            </div>
+          </div>
+
+          <p v-if="false">
             Versions to be deleted:&nbsp;
             <span v-if="selectedVersionsToDelete.length > 0">
               {{ selectedVersionsToDelete.join(', ') }}
@@ -25,13 +44,7 @@
           </p>
         </div>
         <!-- <v-btn @click="() => fetchCleanupInfo()">fetch data</v-btn> -->
-        <v-btn
-          @click="deleteVersions"
-          :disabled="deleteVersionsIsLoading || selectedVersionsToDelete.length === 0"
-          :loading="deleteVersionsIsLoading"
-        >
-          Delete selected versions
-        </v-btn>
+
         <v-alert v-if="deleteVersionsHasError" type="error"> An error occurred deleting survey versions. </v-alert>
         <v-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success">
           Successfully deleted survey versions {{ deleteVersionsResponse.deletedVersions.join(', ') }}
@@ -40,7 +53,15 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer />
-
+        <v-btn
+          @click="deleteVersions"
+          :disabled="deleteVersionsIsLoading || selectedVersionsToDelete.length === 0"
+          :loading="deleteVersionsIsLoading"
+          color="error"
+          outlined
+        >
+          Delete selected versions
+        </v-btn>
         <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
       </v-card-actions>
     </v-card>
@@ -143,8 +164,6 @@ export default {
       return get(cleanupInfoResponse.value.surveySubmissionsVersionCounts, version, 0);
     }
 
-    const isPlural = (x) => x === 0 || x > 1;
-
     return {
       cleanupInfoIsLoading,
       cleanupInfoHasLoaded,
@@ -152,15 +171,8 @@ export default {
       cleanupInfoResponse,
       fetchCleanupInfo,
       getCount,
-      getVersionLabel(version) {
-        const count = getCount(version);
-        return `${version}: ${count} submission${isPlural(count) ? 's' : ''}`;
-      },
       deleteVersionIsDisabled(version) {
         return cleanupInfoResponse.value.versionsToKeep.includes(String(version));
-      },
-      shouldDeleteVersion(version) {
-        return cleanupInfoResponse.value.versionsToDelete.includes(String(version));
       },
       selectedVersionsToDelete,
       deleteVersionsIsLoading,
