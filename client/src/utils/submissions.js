@@ -2,7 +2,6 @@ import ObjectID from 'bson-objectid';
 import { flatten, unflatten } from 'flat';
 import { cloneDeep } from 'lodash';
 import moment from 'moment';
-
 import * as constants from '@/constants';
 
 function* processPositions(data, position = []) {
@@ -80,7 +79,7 @@ export const getBreadcrumbsForSubmission = (controls, position) => {
  *
  * @returns {Object} A submission for a specific survey version.
  */
-const createSubmissionFromSurvey = ({ survey, version = 1, instance }) => {
+const createSubmissionFromSurvey = ({ survey, version = 1, instance, submitAsUser = undefined }) => {
   const submission = {};
   const dateNow = moment().toISOString(true);
 
@@ -98,6 +97,7 @@ const createSubmissionFromSurvey = ({ survey, version = 1, instance }) => {
       path: survey.meta.group.path,
     },
     specVersion: constants.SPEC_VERSION_SUBMISSION,
+    submitAsUser: submitAsUser,
   };
 
   // TODO: handle version not found
@@ -134,6 +134,8 @@ const createSubmissionFromSurvey = ({ survey, version = 1, instance }) => {
     }
     const dateModified = flattenedInstance ? flattenedInstance[`${flatName}.meta.dateModified`] : null;
     const meta = { type: control.type, dateModified };
+    // add uuid: uuidv4(), if uuid
+
     if (control.options.redacted) {
       meta.permissions = ['admin'];
     }

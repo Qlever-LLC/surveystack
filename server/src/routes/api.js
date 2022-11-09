@@ -38,6 +38,7 @@ import {
 } from '../handlers/assertions';
 
 import { catchErrors } from '../handlers/errorHandlers';
+import { handleDelegates } from '../handlers/headerHandlers';
 
 const router = Router();
 
@@ -121,7 +122,7 @@ router.get(
 router.post(
   '/submissions',
   [assertSubmissionRights],
-  catchErrors(submissionController.createSubmission)
+  catchErrors(handleDelegates(submissionController.createSubmission))
 );
 router.put(
   '/submissions/:id',
@@ -245,7 +246,7 @@ router.get('/roles', catchErrors(rolesController.getRoles));
 
 /** farmos */
 router.get('/farmos/farms', catchErrors(farmosController.getFarmOSInstances));
-router.get('/farmos/assets', catchErrors(farmosController.getAssets));
+router.get('/farmos/assets', catchErrors(handleDelegates(farmosController.getAssets)));
 
 // TODO update test connection
 // router.post('/farmos/test', [assertAuthenticated], catchErrors(farmosController.testConnection));
@@ -291,9 +292,27 @@ router.post(
 );
 
 router.post(
+  '/farmos/unmap-instance',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.superAdminUnMapFarmosInstanceFromAll)
+);
+
+router.post(
   '/farmos/group-manage/enable',
   [assertIsSuperAdmin],
   catchErrors(farmosController.superAdminUpdateFarmOSAccess)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/updatePlans',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.updatePlansForGroup)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/seats',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.updateSeats)
 );
 
 router.get(
@@ -308,22 +327,58 @@ router.get(
   catchErrors(farmosController.groupAdminMinimumGetGroupInformation)
 );
 
-router.post(
-  '/farmos/coffee-shop-access',
+router.get(
+  '/farmos/group-manage/:groupId/plans',
   [assertHasGroupAdminAccess],
-  catchErrors(farmosController.groupAdminMinimumUpdateCoffeeShopAccess)
+  catchErrors(farmosController.getPlanForGroup)
 );
 
 router.post(
-  '/farmos/subgrp-join-coffee-shop',
+  '/farmos/group-manage/:groupId/mapUser',
   [assertHasGroupAdminAccess],
-  catchErrors(farmosController.groupAdminMinimumUpdateJoinCoffeeShop)
+  catchErrors(farmosController.mapUser)
 );
 
 router.post(
-  '/farmos/subgrp-admins-create-farmos-instances',
+  '/farmos/group-manage/:groupId/update-groups-for-user',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.updateGroupsForUser)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/get-admin-link',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.getAdminLink)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/check-url',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupManageCheckUrl)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/create-instance',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupManageCreateFarmOsInstance)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/subgroup-join-coffee-shop',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupAdminAllowGroupsToJoinCoffeeshop)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/subgroup-create-farmos-instances',
   [assertHasGroupAdminAccess],
   catchErrors(farmosController.groupAdminMinimumUpdateCreateFarmOSInstances)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/enable-coffeeshop',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupAdminJoinCoffeeShop)
 );
 
 /** Hylo */

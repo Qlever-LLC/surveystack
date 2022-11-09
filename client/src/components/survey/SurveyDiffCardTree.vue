@@ -10,6 +10,7 @@
         versionNameRemoteRevisionOld,
         versionNameRemoteRevisionNew,
       }"
+      @discard-changed="discardChanged($event)"
     >
       <survey-diff-card-tree
         :diffInfoTree="diffInfo.children"
@@ -18,6 +19,7 @@
           versionNameRemoteRevisionOld,
           versionNameRemoteRevisionNew,
         }"
+        @discard-changed="discardChanged($event)"
       />
     </survey-diff-card>
   </div>
@@ -25,6 +27,7 @@
 
 <script>
 import SurveyDiffCard from './SurveyDiffCard.vue';
+import { changeType } from '@/utils/surveyDiff';
 
 export default {
   name: 'survey-diff-card-tree',
@@ -47,6 +50,12 @@ export default {
     versionNameRemoteRevisionNew: {
       type: String,
       required: false,
+    },
+  },
+  emits: ['discard-changed'],
+  methods: {
+    discardChanged({ discardLocalChange, pathLocalRevision }) {
+      this.$emit('discard-changed', { discardLocalChange, pathLocalRevision });
     },
   },
 };

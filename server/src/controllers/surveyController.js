@@ -18,7 +18,7 @@ const sanitize = async (entity) => {
   entity._id = new ObjectId(entity._id);
 
   entity.revisions.forEach((version) => {
-    version.dateCreated = new Date(entity.dateCreated);
+    version.dateCreated = new Date(version.dateCreated);
 
     version.controls.forEach((control) => {
       changeRecursive(control, (control) => {
@@ -106,7 +106,7 @@ const buildPipelineForGetSurveyPage = ({
     };
   }
 
-  if (groups && Array.isArray(groups) && groups.length > 0) {
+  if (Array.isArray(groups) && groups.length > 0) {
     match['meta.group.id'] = {
       $in: groups.map((item) => new ObjectId(item)),
     };
@@ -126,18 +126,10 @@ const buildPipelineForGetSurveyPage = ({
     match['meta.isLibrary'] = isLibrary === 'true';
   }
 
-  const pipeline = [
-    {
-      $match: match,
-    },
-  ];
+  const pipeline = [];
 
-  if (!q) {
-    pipeline.push({
-      $sort: {
-        dateModified: -1,
-      },
-    });
+  if (Object.keys(match).length > 0) {
+    pipeline.push({ $match: match });
   }
 
   if (projections) {
@@ -145,18 +137,16 @@ const buildPipelineForGetSurveyPage = ({
       project[projection] = 1;
     });
     pipeline.push({
-      $project: project,
+      $project: { ...project },
     });
   }
 
   // default sort by name (or date modified?)
   // needs aggregation for case insensitive sorting
   pipeline.push(
-    ...[
-      { $addFields: { name_lowercase: { $toLower: '$name' } } },
-      { $sort: { 'meta.dateCreated': -1 } },
-      { $project: { name_lowercase: 0 } },
-    ]
+    { $addFields: { lowercasedName: { $toLower: '$name' } } },
+    { $sort: { lowercasedName: 1 } },
+    { $project: { lowercasedName: 0 } }
   );
 
   if (isLibrary === 'true') {
@@ -208,8 +198,8 @@ const buildPipelineForGetSurveyPage = ({
       },
       {
         $sort: {
-          //         TODO Resolve #48, then uncommet this and remove the other line
-          //          'meta.libraryUsageCountSurveys': -1,
+          // TODO Resolve #48, then uncommet this and remove the other line
+          // 'meta.libraryUsageCountSurveys': -1,
           'meta.libraryUsageCountSubmissions': -1,
         },
       },
@@ -276,16 +266,21 @@ const buildPipelineForGetSurveyPage = ({
 };
 
 const getSurveyPage = async (req, res) => {
-  const skip = req.query.skip || 0;
-  const limit = req.query.limit || DEFAULT_LIMIT;
   const pipeline = buildPipelineForGetSurveyPage(req.query);
 
-  const entities = await db.collection(col).aggregate(pipeline).toArray();
+  const [entities] = await db.collection(col).aggregate(pipeline).toArray();
 
   // empty array when ther is no match
   // however, we still want content and pagination properties
-  if (!entities[0]) {
-    entities[0] = { content: [], pagination: { total: 0, skip, limit } };
+  if (!entities) {
+    return res.send({
+      content: [],
+      pagination: {
+        total: 0,
+        skip: req.query.skip || 0,
+        limit: req.query.limit || DEFAULT_LIMIT,
+      },
+    });
   }
 
   return res.send(entities[0]);
@@ -307,8 +302,8 @@ const getSurveyListPage = async (req, res) => {
       'meta.isLibrary',
     ],
   };
-  const pipeline = buildPipelineForGetSurveyPage(query);
 
+  const pipeline = buildPipelineForGetSurveyPage(query);
   const [entities] = await db.collection(col).aggregate(pipeline).toArray();
 
   // empty array when there is no match

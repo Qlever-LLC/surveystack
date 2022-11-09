@@ -34,6 +34,7 @@
           :version-name-local-revision="controlsLocalRevision ? 'Your Version' : null"
           :version-name-remote-revision-old="versionNameRemoteRevisionOld"
           :version-name-remote-revision-new="versionNameRemoteRevisionNew"
+          @discard-changed="discardChanged"
         />
       </v-expansion-panel-content>
     </v-expansion-panel>
@@ -88,6 +89,7 @@ export default {
         added: 'green lighten-1',
         removed: 'red lighten-1',
       },
+      localChangesToDiscard: [],
     };
   },
 
@@ -142,10 +144,12 @@ export default {
             controlType: control.type,
             color: this.colors[controlDiff.changeType],
             hasBreakingChange: controlDiff.hasBreakingChange,
+            hasLocalChange: controlDiff.hasLocalChange,
             changeType: controlDiff.changeType,
             changeList: this.getControlChangeList(controlDiff),
             indexPath: idxPath.join('.'),
             children: convert(childrenOf(controlDiff), idxPath),
+            pathLocalRevision: controlDiff.pathLocalRevision,
           };
         });
       };
@@ -219,6 +223,15 @@ export default {
           return null;
         })
         .filter((c) => c !== null);
+    },
+    discardChanged({ discardLocalChange, pathLocalRevision }) {
+      if (discardLocalChange) {
+        this.localChangesToDiscard.push(pathLocalRevision);
+      } else {
+        //remote the change from the discard list
+        this.localChangesToDiscard = this.localChangesToDiscard.filter((e) => e !== pathLocalRevision);
+      }
+      this.$emit('discard-local-changes-changed', this.localChangesToDiscard);
     },
   },
 };

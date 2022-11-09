@@ -1,6 +1,13 @@
 <template>
   <div>
-    <v-menu left attach="#app-menu" offset-y v-if="$store.getters['auth/isLoggedIn']" :close-on-content-click="false">
+    <v-menu
+      left
+      attach="#app-menu"
+      offset-y
+      v-if="$store.getters['auth/isLoggedIn']"
+      :close-on-content-click="false"
+      max-height="calc(100% - 100px)"
+    >
       <template v-slot:activator="{ on }">
         <v-btn text v-on="on">
           <v-icon>mdi-account</v-icon>

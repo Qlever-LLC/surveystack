@@ -183,12 +183,6 @@ export const diffSurveyVersions = (controlsRevisionOld, controlsRevisionNew) => 
   return [...matcheds, ...addeds, ...removeds];
 };
 
-export function diffHasBreakingChanges(controlsLocalRevision, controlsRemoteRevisionOld, controlsRemoteRevisionNew) {
-  return diffThreeSurveyVersions(controlsLocalRevision, controlsRemoteRevisionOld, controlsRemoteRevisionNew).some(
-    (diff) => diff.hasBreakingChange
-  );
-}
-
 export function diffThreeSurveyVersions(
   controlsLocalRevision,
   controlsRemoteRevisionOld,
@@ -264,13 +258,13 @@ function createThreePointChange(changeLocal, changeRemote) {
       remoteChangeProp.oldValue = remoteChangeProp.oldValue || remoteChangeProp.value;
       remoteChangeProp.newValue = remoteChangeProp.newValue || remoteChangeProp.value;
       remoteChangeProp.localValue = localChangeProp ? localChangeProp.newValue || localChangeProp.value : undefined;
-      if (remoteChangeProp.changeType === UNCHANGED && localChangeProp.changeType === CHANGED) {
+      if (remoteChangeProp.changeType === UNCHANGED && localChangeProp && localChangeProp.changeType === CHANGED) {
         remoteChangeProp.changeType = CHANGED;
       }
       if (
         localChangeProp &&
         localChangeProp.changeType === CHANGED &&
-        //ignore resource id changes, cause these changes always happen when inherting a qsl
+        //ignore resource id changes, cause these changes always happen when consuming a qsl
         !isOntologyResourceChange(threePointChange.controlLocalRevision, diffProperty) &&
         !isMatrixResourceChange(threePointChange.controlLocalRevision, diffProperty)
       ) {
@@ -313,7 +307,12 @@ function createThreePointChange(changeLocal, changeRemote) {
   - apply changes in local revision to the resulting revision if the remote change is not a breaking change
   - apply adds of "foreign" controls to the resulting revision keeping the same position
  */
-export function merge(controlsLocalRevision, controlsRemoteRevisionOld, controlsRemoteRevisionNew) {
+export function merge(
+  controlsLocalRevision,
+  controlsRemoteRevisionOld,
+  controlsRemoteRevisionNew,
+  discardLocalChanges
+) {
   let mergedControls = [...controlsRemoteRevisionNew];
 
   //collect changes
@@ -328,8 +327,8 @@ export function merge(controlsLocalRevision, controlsRemoteRevisionOld, controls
   for (const change of changes) {
     switch (change.changeType) {
       case changeType.CHANGED:
-        //merge local change into resulting controls except if it's a breaking change, then discard the local change
-        if (change.hasLocalChange && !change.hasBreakingChange) {
+        //merge local change into resulting controls except if the local change is discarded by the user or by a breaking change
+        if (change.hasLocalChange && discardLocalChanges.indexOf(change.pathLocalRevision) === -1) {
           mergedControls = replaceControl(mergedControls, null, change.pathRevisionNew, change.controlLocalRevision);
         }
         break;

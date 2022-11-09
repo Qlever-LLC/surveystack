@@ -3,8 +3,144 @@ import boom from '@hapi/boom';
 import { db } from '../db';
 import { createMagicLink, createUserIfNotExist } from './auth.service';
 import mailService from './mail/mail.service';
+import rolesService from './roles.service';
+import { ObjectId } from 'mongodb';
+import { queryParam } from '../helpers';
 
 const col = 'memberships';
+
+export const getMemberships = async (group, user, invitationCode, status, role, doPopulate) => {
+  const filter = {};
+
+  if (group) {
+    const parentGroups = await rolesService.getParentGroups(group);
+    // console.log('parentGroups', parentGroups);
+    filter.group = { $in: parentGroups.map((g) => new ObjectId(g._id)) };
+    // console.log('filter', filter);
+  }
+
+  if (user) {
+    filter.user = new ObjectId(user);
+  }
+
+  if (role) {
+    filter.role = role;
+  }
+
+  if (invitationCode) {
+    filter['meta.invitationCode'] = invitationCode;
+  }
+
+  if (status) {
+    filter['meta.status'] = status;
+  }
+
+  const pipeline = [{ $match: filter }];
+  if (queryParam(doPopulate)) {
+    pipeline.push(...createPopulationPipeline());
+  }
+
+  const entities = await db.collection(col).aggregate(pipeline).toArray();
+
+  if (user) {
+    const adminOfSubGroups = await getAdminOfSubGroups(entities);
+    entities.push(...adminOfSubGroups);
+  }
+
+  if (group) {
+    const filteredMemberships = entities.filter(
+      (e) => !(e.role != 'admin' && e.group._id != group)
+    );
+
+    const otherMembers = [];
+    const admins = [];
+
+    for (const member of filteredMemberships) {
+      if (member.role !== 'admin') {
+        continue;
+      }
+
+      if (member.user && admins.find((m) => m.user && `${m.user._id}` === `${member.user._id}`)) {
+        continue;
+      }
+
+      if (admins.find((m) => `${m._id}` === `${member._id}`)) {
+        continue;
+      }
+
+      admins.push(member);
+    }
+
+    // console.log('admins', admins);
+
+    for (const member of filteredMemberships) {
+      if (member.role !== 'user') {
+        continue;
+      }
+
+      if (
+        member.user &&
+        otherMembers.find((m) => m.user && `${m.user._id}` === `${member.user._id}`)
+      ) {
+        continue;
+      }
+
+      if (otherMembers.find((m) => `${m._id}` === `${member._id}`)) {
+        continue;
+      }
+
+      otherMembers.push(member);
+    }
+
+    return [...admins, ...otherMembers];
+  }
+
+  return entities;
+};
+
+export const createPopulationPipeline = () => {
+  const pipeline = [];
+  const userLookup = [
+    {
+      $lookup: {
+        from: 'users',
+        let: { userId: '$user' },
+        pipeline: [
+          { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
+          { $project: { name: 1, email: 1 } },
+        ],
+        as: 'user',
+      },
+    },
+    {
+      $unwind: { path: '$user', preserveNullAndEmptyArrays: true },
+    },
+    {
+      $set: {
+        user: { $ifNull: ['$user', null] }, // we want user: null explicitly
+      },
+    },
+  ];
+  pipeline.push(...userLookup);
+
+  const groupLookup = [
+    {
+      $lookup: {
+        from: 'groups',
+        let: { groupId: '$group' },
+        pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$groupId'] } } }],
+        as: 'group',
+      },
+    },
+    {
+      $unwind: '$group',
+    },
+  ];
+  pipeline.push(...groupLookup);
+  pipeline.push({ $sort: { 'group.path': 1 } });
+
+  return pipeline;
+};
 
 export const addMembership = async ({ user, group, role }) => {
   const entity = { user, group, role };
@@ -102,8 +238,43 @@ You have control over your account.
   });
 };
 
+const getAdminOfSubGroups = async (entities) => {
+  const adminOfSubGroups = [];
+  for (const e of [...entities]) {
+    if (e.role === 'admin') {
+      const subgroups = await rolesService.getDescendantGroups(e.group);
+
+      for (const subgroup of subgroups) {
+        // console.log('subgroup', subgroup._id);
+        // console.log('entities', entities);
+        // console.log('adminOfSubGroups', adminOfSubGroups);
+
+        if (adminOfSubGroups.find((m) => m.group._id == subgroup._id)) {
+          continue;
+        }
+
+        const presentEntity = entities.find((e) => `${e.group._id}` == `${subgroup._id}`);
+        // console.log('found entity', presentEntity);
+
+        if (presentEntity) {
+          continue;
+        }
+
+        const cpy = { ...e };
+        cpy.group = { ...subgroup };
+        e.projected = true;
+        adminOfSubGroups.push(cpy);
+      }
+    }
+  }
+
+  return adminOfSubGroups;
+};
+
 export default {
   addMembership,
   activateMembership,
   activateMembershipByAdmin,
+  createPopulationPipeline,
+  getMemberships,
 };

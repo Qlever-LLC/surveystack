@@ -13,6 +13,7 @@
       <v-text-field outlined v-model="control.label" label="Label" />
       <v-text-field outlined v-model="control.hint" label="Hint" />
       <v-text-field outlined v-model="control.moreInfo" label="More info" />
+
       <v-checkbox
         v-if="isText"
         outlined
@@ -37,7 +38,7 @@
           chips
           persistent-hint
         >
-          <template v-slot:selection="{ attr, on, item, selected }">
+          <template v-slot:selection="{ item }">
             <div>{{ item.name }}</div>
           </template>
         </v-autocomplete>
@@ -79,6 +80,7 @@
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         outlined
       />
+
       <v-checkbox
         class="my-1"
         outlined
@@ -86,13 +88,21 @@
         v-model="control.options.required"
         label="Required"
         color="grey darken-1"
-        hide-details
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       >
         <template slot="label">
           <div>
             <div class="text--primary">Required</div>
             <div class="body-2">Make this a required field</div>
+          </div>
+        </template>
+      </v-checkbox>
+
+      <v-checkbox v-if="isPage" class="my-1" color="grey darken-1" v-model="control.options.compact" label="Compact">
+        <template slot="label">
+          <div>
+            <div class="text--primary">Compact</div>
+            <div class="body-2">Reduce the spaces and combine fields into one card</div>
           </div>
         </template>
       </v-checkbox>
@@ -117,7 +127,6 @@
         color="grey darken-1"
         v-if="survey.meta.isLibrary && !control.libraryIsInherited && !control.libraryId"
         v-model="control.options.allowHide"
-        hide-details
         label="Allow hide"
       >
         <template slot="label">
@@ -133,7 +142,6 @@
         color="grey darken-1"
         v-if="survey.meta.isLibrary && !control.libraryIsInherited && !control.libraryId"
         v-model="control.options.allowModify"
-        hide-details
         label="Allow modify"
       >
         <template slot="label">
@@ -149,7 +157,6 @@
         color="grey darken-1"
         v-if="control.libraryId && control.options.allowHide"
         v-model="control.options.hidden"
-        hide-details
         label="Hidden"
       >
         <template slot="label">
@@ -186,6 +193,15 @@
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
 
+      <v-combobox
+        v-if="control.type === 'farmOsUuid'"
+        outlined
+        label="FarmOS Type"
+        v-model="control.options.farmOsType"
+        :items="control.options.farmOsTypes"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+      />
+
       <v-select
         v-if="isDate"
         :items="dateTypes"
@@ -198,7 +214,7 @@
       <div v-if="!showAdvanced" class="d-flex justify-end mt-4">
         <v-btn @click="showAdvanced = true" color="grey darken-1" small text>advanced</v-btn>
       </div>
-      <div v-if="showAdvanced" class="mt-2">
+      <div v-else class="mt-2">
         <div class="d-flex justify-space-between">
           <v-card-title class="px-0 d-flex">Advanced Options</v-card-title>
           <v-icon @click.stop="showAdvanced = false">mdi-close</v-icon>
@@ -264,6 +280,7 @@
           </v-icon>
         </div>
       </div>
+
       <app-file-properties
         v-if="isFile"
         v-model="control.options.source"
@@ -431,6 +448,9 @@ export default {
     },
     isInstructionsImageSplit() {
       return this.control.type === 'instructionsImageSplit';
+    },
+    isPage() {
+      return this.control.type === 'page';
     },
     showRequiredOption() {
       if (this.control.options.required) {

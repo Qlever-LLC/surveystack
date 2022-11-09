@@ -21,12 +21,21 @@ import { queryParam } from '../helpers';
 const col = 'users';
 
 const register = async (req, res) => {
-  // TODO: sanity check
-  const { name, password } = req.body;
-  const email = req.body.email.toLowerCase();
+  const email = req.body.email.trim().toLowerCase();
+  const { name } = req.body;
+  const password = req.body.password.trim();
+
+  if (email === '' || password === '') {
+    throw boom.badRequest('Email and password must not be empty');
+  }
 
   if (!isEmail.validate(email)) {
     throw boom.badRequest(`Invalid email address: ${email}`);
+  }
+
+  const emailAlreadyExists = await db.collection(col).findOne({ email });
+  if (emailAlreadyExists) {
+    throw boom.conflict(`E-Mail already in use: ${email}`, { email });
   }
 
   const hash = bcrypt.hashSync(password, parseInt(process.env.BCRYPT_ROUNDS));
@@ -53,7 +62,14 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { email, password, token } = req.body;
+  const email = req.body.email.trim().toLowerCase();
+  const password = req.body.password.trim();
+  const { token } = req.body;
+
+  if (email.trim() === '' || password.trim() === '') {
+    throw boom.badRequest('Email and password must not be empty');
+  }
+
   if (token) {
     // alternative magic link login with token
     const existingUser = await db.collection(col).findOne({ email, token });
@@ -64,9 +80,6 @@ const login = async (req, res) => {
     return res.send(payload);
   }
 
-  if (email.trim() === '' || password.trim() === '') {
-    throw boom.badRequest('Email and password must not be empty');
-  }
   // TODO the client shows the same error message weather the email or the pw doesn't match (since https://gitlab.com/our-sci/software/surveystack/-/merge_requests/19)
   //  We should also send the same error from the server to get less vulnerable against dictionary attacks
   const existingUser = await db.collection(col).findOne({ email });
@@ -90,13 +103,10 @@ const sendPasswordResetMail = async (req, res) => {
 
   // Fail silently when the email is not in the DB
   if (existingUser) {
-    const origin = getServerSelfOrigin(req);
-    const landingPath = '/auth/profile';
-    const magicLink = await createMagicLink({ origin, email, expiresAfterDays: 3, landingPath });
-
     // Legacy PW reset format used by SoilStack
     // TODO remove this after we update SoilStack
     if (queryParam(req.query.useLegacy)) {
+      const { origin } = req.headers;
       await mailService.send({
         to: email,
         subject: 'Link to reset your password',
@@ -111,6 +121,10 @@ If you did not request this email, you can safely ignore it.
 Best Regards`,
       });
     } else {
+      const origin = getServerSelfOrigin(req);
+      const landingPath = '/auth/profile';
+      const magicLink = await createMagicLink({ origin, email, expiresAfterDays: 3, landingPath });
+
       await mailService.sendLink({
         to: email,
         subject: `Link to reset your password`,

@@ -126,10 +126,65 @@
         </template>
       </v-simple-table>
     </template>
+
+    <div v-if="farmsNotInAggregator.length > 0 && !loading">
+      <h2>Farms in Surveystack which are not present on FarmOS Aggregator</h2>
+      <p class="grey--text text--darken-2">These instances have likely been removed from the aggregator.</p>
+      <v-simple-table v-if="!loading">
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th class="text-left">Instance Name</th>
+              <th class="text-left">Mappings</th>
+              <th class="text-left">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(farm, idx) in farmsNotInAggregator" :key="`farm-${idx}`">
+              <td>{{ `${farm.instanceName}` }}</td>
+              <td>
+                <div>
+                  <v-chip
+                    small
+                    class="ma-1"
+                    dark
+                    color="blue"
+                    v-for="(userMapping, uidx) in farm.userMappings"
+                    :key="`farm-${idx}-user-${uidx}`"
+                  >
+                    {{ userMapping.user }}
+                  </v-chip>
+                </div>
+
+                <div>
+                  <v-chip
+                    class="ma-1"
+                    small
+                    dark
+                    color="green"
+                    v-for="(groupMapping, gidx) in farm.groupMappings"
+                    :key="`farm-${idx}-group-${gidx}`"
+                  >
+                    {{ groupMapping.group }}
+                  </v-chip>
+                </div>
+              </td>
+              <td>
+                <v-btn x-small color="red" @click="$emit('unmap-farm', farm.instanceName)" dark
+                  >Remove all Mappings</v-btn
+                >
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+    </div>
   </v-container>
 </template>
 
 <script>
+import _ from 'lodash';
+
 export default {
   props: {
     groups: Array,
@@ -150,6 +205,42 @@ export default {
   computed: {
     selectedInstanceInfo() {
       return this.mappings.aggregatorFarms.find((e) => e.url === this.selectedInstance);
+    },
+    farmsNotInAggregator() {
+      if (!this.mappings) {
+        return [];
+      }
+      const union = [];
+      union.push(...this.mappings.surveystackUserFarms.map((f) => f.instanceName));
+      union.push(...this.mappings.surveystackFarms.map((f) => f.instanceName));
+      const farms = _.uniq(union).filter(
+        (instanceName) => !this.mappings.aggregatorFarms.some((a) => a.url === instanceName)
+      );
+      const mappings = [];
+
+      for (const farm of farms) {
+        const userMappings = this.mappings.surveystackUserFarms
+          .filter((f) => f.instanceName === farm)
+          .map((m) => ({
+            instanceName: m.instanceName,
+            user: this.users.find((u) => u._id === m.userId).email,
+          }));
+
+        const groupMappings = this.mappings.surveystackFarms
+          .filter((f) => f.instanceName === farm)
+          .map((group) => ({
+            instanceName: group.instanceName,
+            group: this.groups.find((g) => g._id === group.groupId).path,
+          }));
+
+        mappings.push({
+          instanceName: farm,
+          userMappings,
+          groupMappings,
+        });
+      }
+
+      return mappings;
     },
     tags() {
       if (this.selectedInstanceInfo.tags == '') {
