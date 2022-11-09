@@ -147,10 +147,11 @@ export const setRole = async (membershipId, role) => {
     'farmOsPlanting' |
     'farmOsFarm' |
     'geoJSON'
-  } controls
+  } | *[] controls
 */
-export const createSurvey = async (overrides = {}, control = '') => {
+export const createSurvey = async (control = '', overrides = {}) => {
   const now = new Date();
+  const group = await createGroup();
   const surveyDoc = {
     name: 'Mock Survey Name',
     latestVersion: 1,
@@ -158,33 +159,36 @@ export const createSurvey = async (overrides = {}, control = '') => {
       dateCreated: now,
       dateModified: now,
       submissions: 'public',
-      creator: uniqueId(),
-      group: createGroup(),
+      creator: new ObjectId(),
+      group: {
+        id: group._id,
+        path: group.path,
+      },
       specVersion: 4,
     },
     resources: [
       {
-        id: uniqueId(),
+        id: new ObjectId(),
         label: 'Mock.csv',
         name: 'mockcsv',
         type: 'FILE',
         location: 'REMOTE',
       },
       {
-        id: uniqueId(),
+        id: new ObjectId(),
         label: 'Mock Dropdown Items',
         name: 'mock_dropdown_items',
         type: 'ONTOLOGY_LIST',
         location: 'EMBEDDED',
         content: [
           {
-            id: uniqueId(),
+            id: new ObjectId(),
             label: 'Item 1',
             value: 'item_1',
             tags: 'item1',
           },
           {
-            id: uniqueId(),
+            id: new ObjectId(),
             label: 'Item 2',
             value: 'item_2',
             tags: 'item2',
@@ -192,13 +196,13 @@ export const createSurvey = async (overrides = {}, control = '') => {
         ],
       },
       {
-        id: uniqueId(),
+        id: new ObjectId(),
         label: 'Mock Resource Name',
         name: 'survey_reference_1',
         type: 'SURVEY_REFERENCE',
         location: 'REMOTE',
         content: {
-          id: uniqueId(),
+          id: new ObjectId(),
           version: 1,
           path: 'data.node_1.property_2',
         },
@@ -214,78 +218,97 @@ export const createSurvey = async (overrides = {}, control = '') => {
     ...overrides,
   };
 
-  const controlGenerator = getControlGenerator(control);
+  const controlDocs = [];
+  const controls = Array.isArray(control)
+    ? control
+    : typeof control === 'string' && control
+    ? [control]
+    : [];
 
-  if (typeof controlGenerator === 'function') {
+  controls.forEach((ctrl, index) => {
+    const controlGenerator = getControlGenerator(ctrl);
+
+    if (typeof controlGenerator === 'function') {
+      controlDocs.push({
+        id: new ObjectId(),
+        ...controlGenerator({}, index + 1, surveyDoc.resources[1].id),
+      });
+    }
+  });
+
+  if (controlDocs.length > 0) {
     surveyDoc.revisions.push({
       dateCreated: surveyDoc.meta.dateModified,
       version: 2,
-      controls: [
-        {
-          id: uniqueId(),
-          ...controlGenerator({}, 1, surveyDoc.resources[1].id),
-        },
-      ],
+      controls: controlDocs,
     });
     surveyDoc.latestVersion = 2;
   }
 
-  const survey = await getDb().collection('survey').insertOne(surveyDoc);
+  const survey = await getDb().collection('surveys').insertOne(surveyDoc);
 
   const createSubmission = async (_overrides = {}) => {
-    const headersGenerator = getSubmissionHeadersGenerator(control);
-    const dataGenerator = getSubmissionDataGenerator(control);
+    let data = {};
+    const headers = [
+      '_id',
+      'meta.dateCreated',
+      'meta.dateModified',
+      'meta.dateSubmitted',
+      'meta.survey.id',
+      'meta.survey.version',
+      'meta.revision',
+      'meta.permissions',
+      'meta.status.0.type',
+      'meta.status.0.value.at',
+      'meta.group.id',
+      'meta.group.path',
+      'meta.specVersion',
+      'meta.creator',
+      'meta.permanentResults',
+    ];
+
+    controls.forEach((ctrl, index) => {
+      const dataGenerator = getSubmissionDataGenerator(ctrl);
+      if (typeof dataGenerator === 'function') {
+        data = { ...data, ...dataGenerator({}, index + 1) };
+      }
+
+      const headersGenerator = getSubmissionHeadersGenerator(ctrl);
+      if (typeof headersGenerator === 'function') {
+        headers.push(...headersGenerator(index + 1));
+      }
+    });
 
     const submissionDoc = {
-      content: [
-        {
-          _id: uniqueId(),
-          meta: {
-            dateCreated: now,
-            dateModified: now,
-            dateSubmitted: now,
-            survey: { id: survey.insertedId, version: 2 },
-            revision: 1,
-            permissions: [],
-            status: [
-              {
-                type: 'READY_TO_SUBMIT',
-                value: { at: now },
-              },
-            ],
-            group: surveyDoc.meta.group,
-            specVersion: 4,
-            creator: uniqueId(),
-            permanentResults: [],
+      _id: new ObjectId(),
+      meta: {
+        dateCreated: now,
+        dateModified: now,
+        dateSubmitted: now,
+        survey: { id: survey.insertedId, version: 2 },
+        revision: 1,
+        permissions: [],
+        status: [
+          {
+            type: 'READY_TO_SUBMIT',
+            value: { at: now },
           },
-          data: typeof dataGenerator === 'function' ? dataGenerator() : {},
-        },
-      ],
-      pagination: { total: 1, skip: 0, limit: 10 },
-      headers: [
-        '_id',
-        'meta.dateCreated',
-        'meta.dateModified',
-        'meta.dateSubmitted',
-        'meta.survey.id',
-        'meta.survey.version',
-        'meta.revision',
-        'meta.permissions',
-        'meta.status.0.type',
-        'meta.status.0.value.at',
-        'meta.group.id',
-        'meta.group.path',
-        'meta.specVersion',
-        'meta.creator',
-        'meta.permanentResults',
-        ...(typeof headersGenerator === 'function' ? headersGenerator() : []),
-      ],
+        ],
+        group: surveyDoc.meta.group,
+        specVersion: 4,
+        creator: new ObjectId(),
+        permanentResults: [],
+      },
+      data,
       ..._overrides,
     };
 
     const submission = await getDb().collection('submissions').insertOne(submissionDoc);
 
-    return submission.ops[0];
+    return {
+      submission: submission.ops[0],
+      headers,
+    };
   };
 
   return {
@@ -334,3 +357,5 @@ export const createRes = async ({ user = null } = {}) => ({
   },
   _headers: {},
 });
+
+export { getSubmissionDataGenerator, getSubmissionHeadersGenerator, getControlGenerator };
