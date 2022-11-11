@@ -97,6 +97,18 @@
         </v-toolbar>
       </template>
 
+      <template v-slot:header.data-table-select="{ props }">
+        <v-checkbox
+          :value="selected.length === selectableItems.length"
+          :indeterminate="selected.length > 0 && selected.length < selectableItems.length"
+          @click="toggleSelectAllItems"
+          color="#777"
+          class="custom-checkbox"
+          hide-details
+          role="checkbox"
+        />
+      </template>
+
       <template v-for="header in headers" v-slot:[`header.${header.value}`]>
         <span
           :key="header.value"
@@ -114,6 +126,7 @@
           <td :class="{ 'expand-cell': isExpandMatrix }">
             <v-checkbox
               :value="isSelected"
+              :disabled="!isSelectable(item)"
               @click="select(!isSelected)"
               color="#777"
               class="custom-checkbox"
@@ -194,6 +207,8 @@ import csvService from '@/services/csv.service';
 import SubmissionTableCellModal from './SubmissionTableCellModal.vue';
 import { getLabelFromKey, openResourceInTab } from '@/utils/resources';
 import moment from 'moment';
+import cloneDeep from 'lodash/cloneDeep';
+import omit from 'lodash/omit';
 
 export function getPropertiesFromMatrix(headers, matrix) {
   if (!Array.isArray(headers) || typeof matrix !== 'string') {
@@ -215,10 +230,18 @@ export function transformGeoJsonHeaders(headers) {
   return [...new Set(headers.map(replaceGeoJsonPath))];
 }
 
-function matrixHeadersFromSubmission(submission) {
-  return Object.entries(submission.data || {})
-    .filter(([key, value]) => typeof value.meta === 'object' && value.meta.type === 'matrix')
-    .map(([header]) => `data.${header}.value`);
+function matrixHeadersFromSubmission(submission, parentKey = '') {
+  const headers = [];
+  Object.entries(submission.data || {}).forEach(([key, value]) => {
+    const type = typeof value.meta === 'object' ? value.meta.type : '';
+    if (type === 'page' || type === 'group') {
+      const data = cloneDeep(omit(value, 'meta'));
+      headers.push(...matrixHeadersFromSubmission({ data }, key));
+    } else if (type === 'matrix') {
+      headers.push(`data${parentKey ? `.${parentKey}` : ''}.${key}.value`);
+    }
+  });
+  return headers;
 }
 
 export function transformMatrixHeaders(headers, submissions) {
@@ -339,6 +362,15 @@ export default {
       const [value] = this.activeTableCell;
       return value || '';
     },
+    selectableItems() {
+      return this.items.filter((item) => this.isSelectable(item));
+    },
+    user() {
+      return this.$store.getters['auth/user'];
+    },
+    userMemberships() {
+      return this.$store.getters['memberships/memberships'];
+    },
   },
   watch: {
     excludeMeta() {
@@ -360,7 +392,7 @@ export default {
         return ' ';
       }
 
-      if (!isNaN(Date.parse(value))) {
+      if (isNaN(Number(value)) && !isNaN(Date.parse(value))) {
         const dateValue = moment(value);
         return dateValue.format('MMM D, YYYY h:mm A');
       }
@@ -469,6 +501,27 @@ export default {
         this.openResourceError = 'File could not be opened';
       } finally {
         this.downloadingResource = false;
+      }
+    },
+    isSelectable(item) {
+      //load original submission object, as item may miss meta data if excludeMeta is true
+      const submission = this.submissions.content.find((s) => s._id === item._id);
+      // allow submissions editing to submission creator and submission.meta.group's admins
+      const isAdminOfSubmissionGroup = this.userMemberships.find(
+        (membership) => membership.group._id === submission.meta.group.id && membership.role === 'admin'
+      );
+
+      const isCreator = submission.meta.creator === this.user._id;
+
+      return isAdminOfSubmissionGroup || isCreator;
+    },
+    toggleSelectAllItems() {
+      if (this.selected.length > 0) {
+        //de-select all
+        this.tableSelected = [];
+      } else {
+        //select all
+        this.tableSelected = this.selectableItems;
       }
     },
   },

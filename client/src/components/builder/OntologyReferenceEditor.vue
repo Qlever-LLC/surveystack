@@ -1,8 +1,6 @@
 <template>
   <v-card>
-    <v-card-title>
-      Survey Reference Editor
-    </v-card-title>
+    <v-card-title> Survey Reference Editor </v-card-title>
     <v-card-text>
       <v-autocomplete
         label="Select Survey"
@@ -15,7 +13,7 @@
         item-text="name"
       >
         <template slot="append-outer">
-          <v-chip style="margin-top: -10px;" dark color="green" v-if="surveyVersion">
+          <v-chip style="margin-top: -10px" dark color="green" v-if="surveyVersion">
             Survey Version {{ surveyVersion }}
           </v-chip>
         </template>
@@ -37,22 +35,27 @@
     <v-spacer />
     <v-card-actions>
       <v-spacer />
-      <v-btn text @click="closeHandler">
-        Close
-      </v-btn>
-      <v-btn text color="error" @click="deleteResource">
-        Delete
-      </v-btn>
-      <v-btn text color="primary" @click="updateAndClose">
-        Save
-      </v-btn>
+      <v-btn text @click="closeHandler"> Close </v-btn>
+      <v-tooltip top :disabled="!!path">
+        <template v-slot:activator="{ on }">
+          <div v-on="on">
+            <v-btn text color="green" @click="previewDialogIsVisible = true" :disabled="!path"> Preview </v-btn>
+          </div>
+        </template>
+        <span>No Submitted Surveys Available</span>
+      </v-tooltip>
+      <v-btn text color="error" @click="deleteResource"> Delete </v-btn>
+      <v-btn text color="primary" @click="updateAndClose"> Save </v-btn>
     </v-card-actions>
+
+    <ontology-reference-preview v-model="previewDialogIsVisible" :resource="resource" />
   </v-card>
 </template>
 
 <script>
 import TreeModel from 'tree-model';
 import api from '@/services/api.service';
+import OntologyReferencePreview from './OntologyReferencePreview.vue';
 
 function getSurveyById(surveys, id) {
   return surveys.find((s) => s._id === id);
@@ -63,6 +66,7 @@ function getPathByPath(paths, path) {
 }
 
 export default {
+  components: { OntologyReferencePreview },
   props: {
     resource: {
       type: Object,
@@ -79,9 +83,10 @@ export default {
     surveyId: '',
     surveyVersion: '',
     path: '',
-    loading: false,
+    loading: true,
     surveys: [],
     paths: [],
+    previewDialogIsVisible: false,
   }),
   methods: {
     deleteResource() {
@@ -156,6 +161,13 @@ export default {
       this.paths = paths;
     },
   },
+  watch: {
+    surveyId() {
+      if (!this.loading) {
+        this.path = '';
+      }
+    },
+  },
   async mounted() {
     if (this.resource.content) {
       this.surveyId = this.resource.content.id || '';
@@ -167,7 +179,6 @@ export default {
       }
     }
 
-    this.loading = true;
     const { data } = await api.get('/surveys/list-page?limit=1000');
     this.surveys = data.content;
     this.loading = false;

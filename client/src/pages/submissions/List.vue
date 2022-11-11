@@ -163,7 +163,7 @@
               :excludeMeta="!filter.showCsvMeta"
               :loading="loading"
               style="margin: 3px 2px"
-              :actionsAreDisabled="(surveyEntity && surveyEntity.meta.isLibrary) || !editable"
+              :actionsAreDisabled="surveyEntity && surveyEntity.meta.isLibrary"
               @showDeleteModal="showDeleteModal = true"
               @archiveSubmissions="archiveSubmissions(selected, '', false)"
               @showArchiveModal="showArchiveModal = true"
@@ -382,26 +382,6 @@ export default {
     },
     paginationTotalPages() {
       return Math.ceil(this.submissions.pagination.total / this.submissions.pagination.limit);
-    },
-    user() {
-      return this.$store.getters['auth/user'];
-    },
-    userMemberships() {
-      return this.$store.getters['memberships/memberships'];
-    },
-    editable() {
-      // allow submissions editing to survey's group admins and all selected submissions creator
-      if (!this.surveyEntity) {
-        return false;
-      }
-
-      const isAdminOfSurveyGroup = this.userMemberships.find(
-        (membership) => membership.group._id === this.surveyEntity.meta.group.id && membership.role === 'admin'
-      );
-
-      const isCreatorOfSelected = this.selected.every((selection) => selection['meta.creator'] === this.user._id);
-
-      return isAdminOfSurveyGroup || isCreatorOfSelected;
     },
   },
   methods: {
