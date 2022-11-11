@@ -390,38 +390,37 @@ const getSurveyInfo = async (req, res) => {
 };
 
 const getSurveyLibraryConsumers = async (req, res) => {
-  // TODO only check highest or latestVersion ?
   const { id } = req.query;
-  // TODO naive and limited (to 3 child levels) implementation for deeply nested question sets - try to find elegant query which is still performing well
-  const filter = {
-    $or: [
-      {
-        $and: [
-          { 'revisions.controls.libraryId': new ObjectId(id) },
-          { 'revisions.controls.isLibraryRoot': true },
-        ],
+  const pipeline = [
+    {
+      $project: {
+        name: 1,
+        revisions: {
+          $filter: {
+            input: '$revisions',
+            as: 'revision',
+            cond: { $eq: ['$$revision.version', '$latestVersion'] },
+          },
+        },
       },
-      {
-        $and: [
-          { 'revisions.controls.children.libraryId': new ObjectId(id) },
-          { 'revisions.controls.children.isLibraryRoot': true },
-        ],
+    },
+    {
+      $match: {
+        revisions: {
+          $elemMatch: {
+            $or: [
+              { 'controls.libraryId': new ObjectId(id) },
+              { 'controls.children.libraryId': new ObjectId(id) },
+              { 'controls.children.children.libraryId': new ObjectId(id) },
+              { 'controls.children.children.children.libraryId': new ObjectId(id) },
+              { 'controls.children.children.children.children.libraryId': new ObjectId(id) },
+            ],
+          },
+        },
       },
-      {
-        $and: [
-          { 'revisions.controls.children.children.libraryId': new ObjectId(id) },
-          { 'revisions.controls.children.children.isLibraryRoot': true },
-        ],
-      },
-      {
-        $and: [
-          { 'revisions.controls.children.children.children.libraryId': new ObjectId(id) },
-          { 'revisions.controls.children.children.children.isLibraryRoot': true },
-        ],
-      },
-    ],
-  };
-  const entities = await db.collection(col).find(filter).toArray();
+    },
+  ];
+  const entities = await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).toArray();
   return res.send(entities);
 };
 
