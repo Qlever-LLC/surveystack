@@ -11,7 +11,7 @@ export const handleDelegates = (fn) => async (req, res, next) => {
     res.locals.auth.user._id = res.locals.auth.delegateToUserId;
   }
 
-  fn(req, res, next);
+  await fn(req, res, next);
 };
 
 async function checkProxyPermission(proxyUserId, delegateToUserId) {
