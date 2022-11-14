@@ -146,7 +146,12 @@ function matrixTransformer(question, dataName, { expandAllMatrices = false, expa
 function transformSubmissionQuestionTypes(obj, typeHandlers, formatOptions) {
   return Object.fromEntries(
     Object.entries(obj).map(([key, val]) => {
-      if (typeof val === 'object' && val !== null) {
+      if (
+        typeof val === 'object' &&
+        !Array.isArray(val) &&
+        !(val instanceof Date) &&
+        val !== null
+      ) {
         const typeHandler =
           'meta' in val && val.meta.type in typeHandlers && typeHandlers[val.meta.type];
         if (typeHandler) {
