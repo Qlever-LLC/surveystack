@@ -12,7 +12,7 @@
       @onDelete="onDelete"
       @import-survey="importSurvey"
       @export-survey="exportSurvey"
-      @reloadSurvey="onReloadSurvey"
+      @reload-survey="onReloadSurvey"
     />
     <div v-else class="d-flex align-center justify-center" style="height: 100%">
       <v-progress-circular :size="50" color="primary" indeterminate />
@@ -342,7 +342,6 @@ export default {
       this.loading = false;
     },
     onReloadSurvey() {
-      this.loading = true;
       this.fetchData();
     },
   },

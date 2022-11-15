@@ -152,7 +152,7 @@ export default {
         deleteVersionsIsLoading.value = false;
       }
       await fetchCleanupInfo();
-      emit('reloadSurvey');
+      emit('reload-survey');
     }
 
     function getSubmissionCount(version) {

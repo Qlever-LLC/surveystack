@@ -143,7 +143,7 @@
           v-model="versionsDialogIsVisible"
           @cancel="versionsDialogIsVisible = false"
           :survey="survey"
-          @reloadSurvey="() => $emit('reload')"
+          @reload-survey="() => $emit('reload-survey')"
         />
       </div>
       <div class="d-flex justify-space-between align-center mt-n1">
@@ -246,7 +246,6 @@
 import SurveyNameEditor from '@/components/builder/SurveyNameEditor.vue';
 import ActiveGroupSelector from '@/components/shared/ActiveGroupSelector.vue';
 import appResources from '@/components/builder/Resources.vue';
-import api from '@/services/api.service';
 import { getGroupNameById } from '@/utils/groups';
 import EditLibraryDialog from '@/components/survey/library/EditLibraryDialog';
 import PublishUpdatedLibraryDialog from '@/components/survey/library/PublishUpdatedLibraryDialog';
