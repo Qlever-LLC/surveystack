@@ -7,27 +7,31 @@
         <p v-else-if="cleanupInfoHasError">An error occurred loading survey cleanup data</p>
         <div v-else-if="cleanupInfoHasLoaded && !cleanupInfoHasError">
           <div v-for="revision in survey.revisions" :key="revision.version" class="row py-0">
-            <div class="col-10 mt-1 py-0">
+            <div class="col-11 mt-1 py-0">
               <v-chip
                 dark
                 small
-                :color="deleteVersionIsDisabled(revision.version) ? 'green' : 'grey'"
-                :title="deleteVersionIsDisabled(revision.version) ? 'in use' : 'unused'"
+                :color="isVersionDeletable(revision.version) ? 'grey' : 'green'"
+                :title="isVersionDeletable(revision.version) ? 'unused' : 'in use'"
               >
                 {{ revision.version }}</v-chip
               >
               <span class="ml-2"
-                >{{ getCount(revision.version) || 'no' }} submission{{
-                  getCount(revision.version) > 1 ? 's' : ''
-                }}</span
-              >
+                >{{ getSubmissionCount(revision.version) || 'no' }} submission{{
+                  getSubmissionCount(revision.version) > 1 ? 's' : ''
+                }}
+              </span>
+              <span v-if="survey.meta.isLibrary" class="ml-2"
+                >{{ getQSConsumerCount(revision.version) || 'no' }} survey{{
+                  getQSConsumerCount(revision.version) > 1 ? 's' : ''
+                }}
+              </span>
             </div>
-            <div class="col-2 py-0">
+            <div class="col-1 py-0" v-if="isVersionDeletable(revision.version)">
               <v-checkbox
                 v-model="selectedVersionsToDelete"
-                label="delete"
                 :value="String(revision.version)"
-                :disabled="deleteVersionIsDisabled(revision.version)"
+                :disabled="!isVersionDeletable(revision.version)"
                 hide-details
                 class="mt-0"
                 color="red"
@@ -43,8 +47,6 @@
             <span v-else> none </span>
           </p>
         </div>
-        <!-- <v-btn @click="() => fetchCleanupInfo()">fetch data</v-btn> -->
-
         <v-alert v-if="deleteVersionsHasError" type="error"> An error occurred deleting survey versions. </v-alert>
         <v-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success">
           Successfully deleted survey versions {{ deleteVersionsResponse.deletedVersions.join(', ') }}
@@ -69,7 +71,7 @@
 </template>
 
 <script>
-import { ref, computed } from '@vue/composition-api';
+import { ref } from '@vue/composition-api';
 import api from '@/services/api.service';
 import get from 'lodash/get';
 
@@ -109,33 +111,26 @@ export default {
 
     const selectedVersionsToDelete = ref([]);
 
+    const libraryConsumers = ref({});
+
+    fetchCleanupInfo();
+
     async function fetchCleanupInfo() {
       cleanupInfoIsLoading.value = true;
       cleanupInfoHasError.value = false;
       cleanupInfoHasLoaded.value = false;
       cleanupInfoResponse.value = { ...initialCleanupInfo };
       try {
-        const { data } = await api.get(`/surveys/cleanup/${props.survey._id}`);
-        cleanupInfoResponse.value = data;
+        const { data: submissionUsageInfo } = await api.get(`/surveys/cleanup/${props.survey._id}`);
+        cleanupInfoResponse.value = submissionUsageInfo;
         selectedVersionsToDelete.value = [...cleanupInfoResponse.value.versionsToDelete];
+        libraryConsumers.value = cleanupInfoResponse.value.libraryConsumersByVersion;
       } catch {
         cleanupInfoHasError.value = true;
       } finally {
         cleanupInfoHasLoaded.value = true;
         cleanupInfoIsLoading.value = false;
       }
-    }
-
-    fetchCleanupInfo();
-
-    async function fetchLibraryConsumers() {
-      const { data } = await api.get(`/surveys/list-library-consumers?id=${props.survey._id}`);
-      console.log(data);
-      // TODO: for each consumer, for each revision, recursively traverse controls and find
-      // practically the list consumers endpoint only checks the first three levels of controls, see surveyController.js around line 420
-    }
-    if (props.survey.meta.isLibrary) {
-      fetchLibraryConsumers();
     }
 
     async function deleteVersions() {
@@ -156,12 +151,16 @@ export default {
         deleteVersionsHasLoaded.value = true;
         deleteVersionsIsLoading.value = false;
       }
-      fetchCleanupInfo();
+      await fetchCleanupInfo();
       emit('reloadSurvey');
     }
 
-    function getCount(version) {
+    function getSubmissionCount(version) {
       return get(cleanupInfoResponse.value.surveySubmissionsVersionCounts, version, 0);
+    }
+
+    function getQSConsumerCount(version) {
+      return libraryConsumers.value[version] || 0;
     }
 
     return {
@@ -169,10 +168,13 @@ export default {
       cleanupInfoHasLoaded,
       cleanupInfoHasError,
       cleanupInfoResponse,
-      fetchCleanupInfo,
-      getCount,
-      deleteVersionIsDisabled(version) {
-        return cleanupInfoResponse.value.versionsToKeep.includes(String(version));
+      libraryConsumers,
+      getSubmissionCount,
+      getQSConsumerCount,
+      isVersionDeletable(version) {
+        return (
+          cleanupInfoResponse.value.versionsToDelete.includes(String(version)) && getQSConsumerCount(version) === 0
+        );
       },
       selectedVersionsToDelete,
       deleteVersionsIsLoading,

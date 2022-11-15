@@ -389,8 +389,7 @@ const getSurveyInfo = async (req, res) => {
   return res.send(entity);
 };
 
-const getSurveyLibraryConsumers = async (req, res) => {
-  const { id } = req.query;
+const getSurveyLibraryConsumersInternal = async (id) => {
   const pipeline = [
     {
       $project: {
@@ -420,8 +419,12 @@ const getSurveyLibraryConsumers = async (req, res) => {
       },
     },
   ];
-  const entities = await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).toArray();
-  return res.send(entities);
+  return await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).toArray();
+};
+
+const getSurveyLibraryConsumers = async (req, res) => {
+  const { id } = req.query;
+  return res.send(await getSurveyLibraryConsumersInternal(id));
 };
 
 const createSurvey = async (req, res) => {
@@ -610,27 +613,47 @@ const getSurveyAndCleanupInfo = async (id, userId) => {
 
   const SUBMISSIONS_COLLECTION = 'submissions';
   const pipeline = [
-    {
-      $match: { 'meta.survey.id': new ObjectId(id) },
-    },
-    {
-      $match: { 'meta.archived': { $ne: true } },
-    },
-    {
-      $project: { 'meta.survey.version': 1 },
-    },
+    { $match: { 'meta.survey.id': new ObjectId(id) } },
+    { $match: { 'meta.archived': { $ne: true } } },
+    { $project: { 'meta.survey.version': 1 } },
   ];
   const submissions = await db
     .collection(SUBMISSIONS_COLLECTION)
     .aggregate(pipeline, { allowDiskUse: true })
     .toArray();
 
-  const getSurveyVersion = (submission) => submission.meta.survey.version;
-  const submissionsVersionCounts = _.countBy(submissions.map(getSurveyVersion));
+  const submissionsVersionCounts = _.countBy(
+    submissions.map((submission) => submission.meta.survey.version)
+  );
+
+  let libraryConsumersByVersion = {};
+  if (survey.meta.isLibrary) {
+    const libraryConsumers = await getSurveyLibraryConsumersInternal(survey._id);
+    libraryConsumers.forEach((s) => {
+      s.revisions[0].controls.forEach((c) => {
+        changeRecursive(c, (c) => {
+          if (c.isLibraryRoot) {
+            //increase count by version
+            libraryConsumersByVersion[c.libraryVersion] = libraryConsumersByVersion[
+              c.libraryVersion
+            ]
+              ? libraryConsumersByVersion[c.libraryVersion] + 1
+              : 1;
+          }
+        });
+      });
+    });
+  }
+
   const versionsToKeep = Array.from(
-    new Set([...Object.keys(submissionsVersionCounts), String(survey.latestVersion)])
+    new Set([
+      ...Object.keys(submissionsVersionCounts),
+      ...Object.keys(libraryConsumersByVersion),
+      String(survey.latestVersion),
+    ])
   );
   const surveyVersions = survey.revisions.map(({ version }) => String(version));
+  //todo take libraryConsumersByVersion into account
   const versionsToDelete = _.difference(surveyVersions, versionsToKeep);
   return {
     survey,
@@ -638,18 +661,25 @@ const getSurveyAndCleanupInfo = async (id, userId) => {
     versionsToKeep,
     versionsToDelete,
     submissionsVersionCounts,
+    libraryConsumersByVersion,
   };
 };
 
 const getCleanupSurveyInfo = async (req, res) => {
   const { id } = req.params;
-  const { versionsToKeep, versionsToDelete, surveyVersions, submissionsVersionCounts } =
-    await getSurveyAndCleanupInfo(id, res.locals.auth.user._id);
+  const {
+    versionsToKeep,
+    versionsToDelete,
+    surveyVersions,
+    submissionsVersionCounts,
+    libraryConsumersByVersion,
+  } = await getSurveyAndCleanupInfo(id, res.locals.auth.user._id);
   res.send({
     versionsToKeep,
     versionsToDelete,
     surveyVersions,
     surveySubmissionsVersionCounts: submissionsVersionCounts,
+    libraryConsumersByVersion,
   });
 };
 
@@ -660,7 +690,7 @@ const cleanupSurvey = async (req, res) => {
     id,
     res.locals.auth.user._id
   );
-  console.log(requestedVersionsToDelete);
+
   // Don't allow deletion of survey versions that have associated submissions
   if (requestedVersionsToDelete.some((v) => !versionsToDelete.includes(v))) {
     return res.status(404).send({ message: 'Invalid version cleanup requested' });

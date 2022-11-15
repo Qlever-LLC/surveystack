@@ -2,7 +2,7 @@
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="500" max-width="75%">
     <v-card>
       <v-card-title>
-        List library consumers
+        List library consumers {{ libraryConsumers !== null ? '(' + libraryConsumers.length + ')' : '' }}
       </v-card-title>
       <v-divider></v-divider>
       <v-card-text>
@@ -23,9 +23,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer />
-        <v-btn @click="$emit('cancel')" color="primary" text>
-          Close
-        </v-btn>
+        <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -66,7 +64,6 @@ export default {
 
     return {
       ...toRefs(state),
-      loadLibraryConsumers,
       goToSurvey,
     };
   },
