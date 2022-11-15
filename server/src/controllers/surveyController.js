@@ -700,7 +700,7 @@ const cleanupSurvey = async (req, res) => {
   const shouldKeepVersion = ({ version }) => !versionsToFilter.includes(String(version));
   const filteredSurveyRevisions = survey.revisions.filter(shouldKeepVersion);
 
-  if (versionsToDelete.length > 0) {
+  if (versionsToFilter.length > 0) {
     try {
       let updated = {};
       if (!dryRun) {
@@ -714,14 +714,14 @@ const cleanupSurvey = async (req, res) => {
           { returnOriginal: false }
         );
       }
-      return res.send({ updated, deletedVersions: versionsToDelete, keptVersions: versionsToKeep });
+      return res.send({ updated, deletedVersions: versionsToFilter, keptVersions: versionsToKeep });
     } catch (err) {
       console.log(err);
       return res.status(500).send({ message: 'Could not clean up survey' });
     }
   }
 
-  res.send({ deletedVersions: versionsToDelete, keptVersions: versionsToKeep });
+  res.send({ deletedVersions: versionsToFilter, keptVersions: versionsToKeep });
 };
 
 export default {

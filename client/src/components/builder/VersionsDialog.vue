@@ -49,7 +49,7 @@
         </div>
         <v-alert v-if="deleteVersionsHasError" type="error"> An error occurred deleting survey versions. </v-alert>
         <v-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success">
-          Successfully deleted survey versions {{ deleteVersionsResponse.deletedVersions.join(', ') }}
+          Successfully deleted survey version {{ deleteVersionsResponse.deletedVersions.join(', ') }}
         </v-alert>
       </v-card-text>
       <v-divider></v-divider>
