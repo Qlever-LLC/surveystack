@@ -153,13 +153,18 @@ const hashItem = (listItem) => {
 /* copied from FarmOsPlanting.vue */
 const transform = (assets) => {
   const withoutArea = [];
+  const localAssets = [];
   const areas = {};
 
   assets.forEach((asset) => {
     if (asset.value.location.length === 0) {
       const tmp = Object.assign({}, asset);
       tmp.value.hash = hashItem(asset);
-      withoutArea.push(tmp);
+      if (asset.value.url === '') {
+        localAssets.push(tmp);
+      } else {
+        withoutArea.push(tmp);
+      }
       return;
     }
 
@@ -218,7 +223,21 @@ const transform = (assets) => {
     label: '<span class="blue-chip mr-4 ml-0 chip-no-wrap">Plantings without Area</span>',
   };
 
+  const localAssetSection = {
+    value: {
+      farmId: null,
+      farmName: null,
+      location: null,
+      isField: true,
+    },
+    label: '<span class="green-chip mr-4 ml-0 chip-no-wrap">New Plantings</span>',
+  };
+
   res.push(withoutAreaSection, ...withoutArea);
+
+  if (localAssets.length > 0) {
+    res.unshift(localAssetSection, ...localAssets);
+  }
 
   return res;
 };
