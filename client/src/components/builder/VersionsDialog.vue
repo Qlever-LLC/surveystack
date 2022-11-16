@@ -7,7 +7,7 @@
         <p v-else-if="cleanupInfoHasError">An error occurred loading survey cleanup data</p>
         <div v-else-if="cleanupInfoHasLoaded && !cleanupInfoHasError">
           <div v-for="revision in survey.revisions" :key="revision.version" class="row py-0">
-            <div class="col-11 mt-1 py-0">
+            <div class="col-10 mt-1 py-0">
               <v-chip
                 dark
                 small
@@ -27,12 +27,22 @@
                 }}
               </span>
             </div>
+            <div class="col-1 py-0">
+              <v-icon
+                @click="toggleCompare(revision.version)"
+                class="mt-1"
+                title="Compare version"
+                :color="compareRevisions.includes(revision.version) ? 'primary' : ''"
+                >mdi-compare-horizontal</v-icon
+              >
+            </div>
             <div class="col-1 py-0" v-if="isVersionDeletable(revision.version)">
               <v-checkbox
                 v-model="selectedVersionsToDelete"
                 :value="String(revision.version)"
                 :disabled="!isVersionDeletable(revision.version)"
                 hide-details
+                title="Delete version"
                 class="mt-0"
                 color="red"
               />
@@ -56,17 +66,34 @@
       <v-card-actions>
         <v-spacer />
         <v-btn
+          v-if="compareRevisions.length > 0"
+          :disabled="compareRevisions.length === 1"
+          @click="surveyDiffDialogVisible = true"
+          color="primary"
+          outlined
+        >
+          Compare {{ compareRevisions[0] }}
+          {{ compareRevisions.length === 2 ? 'with ' + compareRevisions[1] : '' }}
+        </v-btn>
+        <v-btn
           @click="deleteVersions"
           :disabled="deleteVersionsIsLoading || selectedVersionsToDelete.length === 0"
           :loading="deleteVersionsIsLoading"
           color="error"
           outlined
         >
-          Delete selected versions
+          Delete {{ selectedVersionsToDelete.length }} versions
         </v-btn>
         <v-btn @click="$emit('cancel')" color="primary" text> Close </v-btn>
       </v-card-actions>
     </v-card>
+    <survey-diff-dialog
+      v-if="surveyDiffDialogVisible"
+      :value="surveyDiffDialogVisible"
+      :revision-a="survey.revisions.find((r) => r.version === compareRevisions[0])"
+      :revision-b="survey.revisions.find((r) => r.version === compareRevisions[1])"
+      @cancel="surveyDiffDialogVisible = false"
+    />
   </v-dialog>
 </template>
 
@@ -74,8 +101,10 @@
 import { ref } from '@vue/composition-api';
 import api from '@/services/api.service';
 import get from 'lodash/get';
+import SurveyDiffDialog from '@/components/survey/SurveyDiffDialog';
 
 export default {
+  components: { SurveyDiffDialog },
   props: {
     value: {
       type: Boolean,
@@ -112,6 +141,9 @@ export default {
     const selectedVersionsToDelete = ref([]);
 
     const libraryConsumers = ref({});
+
+    const compareRevisions = ref([]);
+    const surveyDiffDialogVisible = ref(false);
 
     fetchCleanupInfo();
 
@@ -150,6 +182,7 @@ export default {
       } finally {
         deleteVersionsHasLoaded.value = true;
         deleteVersionsIsLoading.value = false;
+        compareRevisions.value = []; //clear compare selections as they may contain a deleted revision
       }
       await fetchCleanupInfo();
       emit('reload-survey');
@@ -163,12 +196,25 @@ export default {
       return libraryConsumers.value[version] || 0;
     }
 
+    function toggleCompare(revision) {
+      let foundIdx = compareRevisions.value.indexOf(revision);
+      if (foundIdx > -1) {
+        compareRevisions.value.splice(foundIdx, 1);
+      } else {
+        compareRevisions.value.push(revision);
+        compareRevisions.value.sort();
+      }
+    }
+
     return {
       cleanupInfoIsLoading,
       cleanupInfoHasLoaded,
       cleanupInfoHasError,
       cleanupInfoResponse,
       libraryConsumers,
+      compareRevisions,
+      surveyDiffDialogVisible,
+      toggleCompare,
       getSubmissionCount,
       getQSConsumerCount,
       isVersionDeletable(version) {
