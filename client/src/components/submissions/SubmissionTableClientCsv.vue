@@ -392,10 +392,12 @@ export default {
         return ' ';
       }
 
-      if (isNaN(Number(value)) && !isNaN(Date.parse(value))) {
+      const parsedDate = Date.parse(value);
+      if (!isNaN(parsedDate) && new Date(parsedDate).toISOString() === value) {
         const dateValue = moment(value);
         return dateValue.format('MMM D, YYYY h:mm A');
       }
+
       return value;
     },
     shouldTruncate(value) {
