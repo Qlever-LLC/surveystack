@@ -92,7 +92,7 @@
             </v-list-item>
             <v-list-item>
               <v-list-item-title>
-                <v-btn @click="versionsDialogIsVisible = true" text>
+                <v-btn @click="$emit('show-version-dialog')" text>
                   <v-icon color="grey">mdi-sitemap</v-icon>
                   <div class="ml-1">Manage Survey Versions</div>
                 </v-btn>
@@ -137,13 +137,6 @@
           v-model="libraryConsumersDialogIsVisible"
           :library-survey="value"
           @cancel="libraryConsumersDialogIsVisible = false"
-        />
-        <versions-dialog
-          v-if="versionsDialogIsVisible"
-          v-model="versionsDialogIsVisible"
-          @cancel="versionsDialogIsVisible = false"
-          :survey="survey"
-          @reload-survey="() => $emit('reload-survey')"
         />
       </div>
       <div class="d-flex justify-space-between align-center mt-n1">
@@ -264,7 +257,6 @@ export default {
       resourcesDialogIsVisible: false,
       editDetailsDialogIsVisible: false,
       editLibraryDialogIsVisible: false,
-      versionsDialogIsVisible: false,
       updateLibraryDialogIsVisible: false,
       libraryConsumersDialogIsVisible: false,
       surveyGroupName: 'Group Not Found',
