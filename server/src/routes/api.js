@@ -238,7 +238,7 @@ router.post(
 router.get('/roles', catchErrors(rolesController.getRoles));
 
 /** farmos */
-router.get('/farmos/farms', catchErrors(farmosController.getFarmOSInstances));
+router.get('/farmos/farms', catchErrors(handleDelegates(farmosController.getFarmOSInstances)));
 router.get('/farmos/assets', catchErrors(handleDelegates(farmosController.getAssets)));
 
 // TODO update test connection
