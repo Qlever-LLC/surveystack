@@ -4,14 +4,13 @@ import boom from '@hapi/boom';
 
 import { db } from '../db';
 import _ from 'lodash';
-import countBy from 'lodash/countBy';
-import get from 'lodash/get';
 
-import { checkSurvey, changeRecursive, changeRecursiveAsync } from '../helpers/surveys';
+import { changeRecursive, changeRecursiveAsync, checkSurvey } from '../helpers/surveys';
 import rolesService from '../services/roles.service';
-import { versions } from 'process';
 
-const col = 'surveys';
+const SURVEYS_COLLECTION = 'surveys';
+const SUBMISSIONS_COLLECTION = 'submissions';
+
 const DEFAULT_LIMIT = 20;
 
 const sanitize = async (entity) => {
@@ -80,7 +79,7 @@ const getSurveys = async (req, res) => {
     });
   }
 
-  const entities = await db.collection(col).find(filter).project(project).toArray();
+  const entities = await db.collection(SURVEYS_COLLECTION).find(filter).project(project).toArray();
   return res.send(entities);
 };
 
@@ -178,7 +177,7 @@ const buildPipelineForGetSurveyPage = ({
       },*/
       {
         $lookup: {
-          from: 'submissions',
+          from: SUBMISSIONS_COLLECTION,
           let: {
             surveyId: '$_id',
           },
@@ -268,7 +267,7 @@ const buildPipelineForGetSurveyPage = ({
 const getSurveyPage = async (req, res) => {
   const pipeline = buildPipelineForGetSurveyPage(req.query);
 
-  const [entities] = await db.collection(col).aggregate(pipeline).toArray();
+  const [entities] = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
 
   // empty array when ther is no match
   // however, we still want content and pagination properties
@@ -304,7 +303,7 @@ const getSurveyListPage = async (req, res) => {
   };
 
   const pipeline = buildPipelineForGetSurveyPage(query);
-  const [entities] = await db.collection(col).aggregate(pipeline).toArray();
+  const [entities] = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
 
   // empty array when there is no match
   // however, we still want content and pagination properties
@@ -324,7 +323,7 @@ const getSurveyListPage = async (req, res) => {
 
 const getSurvey = async (req, res) => {
   const { id } = req.params;
-  const entity = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  const entity = await db.collection(SURVEYS_COLLECTION).findOne({ _id: new ObjectId(id) });
 
   if (!entity) {
     return res.status(404).send({
@@ -356,12 +355,12 @@ const getSurveyInfo = async (req, res) => {
   );
 
   const submissions = await db
-    .collection('submissions')
+    .collection(SUBMISSIONS_COLLECTION)
     .find({ 'meta.survey.id': new ObjectId(id), 'meta.archived': { $ne: true } })
     .count();
 
   const latestSubmissions = await db
-    .collection('submissions')
+    .collection(SUBMISSIONS_COLLECTION)
     .aggregate([
       { $match: { 'meta.survey.id': new ObjectId(id) } },
       {
@@ -419,7 +418,10 @@ const getSurveyLibraryConsumersInternal = async (id) => {
       },
     },
   ];
-  return await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).toArray();
+  return await db
+    .collection(SURVEYS_COLLECTION)
+    .aggregate(pipeline, { allowDiskUse: true })
+    .toArray();
 };
 
 const getSurveyLibraryConsumers = async (req, res) => {
@@ -433,7 +435,7 @@ const createSurvey = async (req, res) => {
   entity.meta.creator = res.locals.auth.user._id;
 
   try {
-    let r = await db.collection(col).insertOne(entity);
+    let r = await db.collection(SURVEYS_COLLECTION).insertOne(entity);
     assert.equal(1, r.insertedCount);
     return res.send(r);
   } catch (err) {
@@ -466,7 +468,7 @@ const updateSurvey = async (req, res) => {
   const { id } = req.params;
   const entity = await sanitize(req.body);
 
-  const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  const existing = await db.collection(SURVEYS_COLLECTION).findOne({ _id: new ObjectId(id) });
   if (!existing) {
     throw boom.notFound(`No entity with _id exists: ${id}`);
   }
@@ -477,7 +479,7 @@ const updateSurvey = async (req, res) => {
   }
 
   try {
-    let updated = await db.collection(col).findOneAndUpdate(
+    let updated = await db.collection(SURVEYS_COLLECTION).findOneAndUpdate(
       { _id: new ObjectId(id) },
       { $set: entity },
       {
@@ -494,7 +496,7 @@ const updateSurvey = async (req, res) => {
 const deleteSurvey = async (req, res) => {
   const { id } = req.params;
 
-  const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  const existing = await db.collection(SURVEYS_COLLECTION).findOne({ _id: new ObjectId(id) });
   if (!existing) {
     throw boom.notFound(`No entity with _id exists: ${id}`);
   }
@@ -505,7 +507,7 @@ const deleteSurvey = async (req, res) => {
   }
 
   try {
-    let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
+    let r = await db.collection(SURVEYS_COLLECTION).deleteOne({ _id: new ObjectId(id) });
     assert.equal(1, r.deletedCount);
     return res.send({ message: 'OK' });
   } catch (error) {
@@ -516,7 +518,7 @@ const deleteSurvey = async (req, res) => {
 const checkForLibraryUpdates = async (req, res) => {
   const { id } = req.params;
   let updatableSurveys = {};
-  let survey = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  let survey = await db.collection(SURVEYS_COLLECTION).findOne({ _id: new ObjectId(id) });
 
   if (!survey) {
     return res.send(updatableSurveys);
@@ -532,7 +534,7 @@ const checkForLibraryUpdates = async (req, res) => {
       if (control.isLibraryRoot && !control.libraryIsInherited) {
         //check if used library survey version is old
         const librarySurvey = await db
-          .collection(col)
+          .collection(SURVEYS_COLLECTION)
           .findOne({ _id: new ObjectId(control.libraryId) });
         if (!librarySurvey) {
           //library can not be found, also return this information
@@ -601,7 +603,7 @@ const getPinned = async (req, res) => {
 };
 
 const getSurveyAndCleanupInfo = async (id, userId) => {
-  const survey = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  const survey = await db.collection(SURVEYS_COLLECTION).findOne({ _id: new ObjectId(id) });
   if (!survey) {
     throw boom.notFound(`No entity with _id exists: ${id}`);
   }
@@ -611,7 +613,6 @@ const getSurveyAndCleanupInfo = async (id, userId) => {
     throw boom.unauthorized(`You are not authorized to update survey: ${id}`);
   }
 
-  const SUBMISSIONS_COLLECTION = 'submissions';
   const pipeline = [
     { $match: { 'meta.survey.id': new ObjectId(id) } },
     { $match: { 'meta.archived': { $ne: true } } },
@@ -704,7 +705,7 @@ const cleanupSurvey = async (req, res) => {
     try {
       let updated = {};
       if (!dryRun) {
-        updated = await db.collection(col).findOneAndUpdate(
+        updated = await db.collection(SURVEYS_COLLECTION).findOneAndUpdate(
           { _id: new ObjectId(id) },
           {
             $set: {
@@ -712,6 +713,10 @@ const cleanupSurvey = async (req, res) => {
             },
           },
           { returnOriginal: false }
+        );
+        await deleteArchivedTestSubmissions(
+          id,
+          versionsToFilter.map((v) => Number(v)) //versionsToFilter had been converted to String before, convert it back...
         );
       }
       return res.send({ updated, deletedVersions: versionsToFilter, keptVersions: versionsToKeep });
@@ -722,6 +727,24 @@ const cleanupSurvey = async (req, res) => {
   }
 
   res.send({ deletedVersions: versionsToFilter, keptVersions: versionsToKeep });
+};
+
+/**
+ Delete all useless submissions
+ Useless is defined as submissions archived with reasons of 'SUBMISSION_FROM_BUILDER' or 'TEST_DATA'
+ @param surveyId: string object id of the survey to delete subissions for
+ @param surveyVersions array of survey version numbers to delete submssions for
+ @return count of deleted submissions
+ **/
+const deleteArchivedTestSubmissions = async (surveyId, surveyVersions) => {
+  const filter = {
+    'meta.survey.id': new ObjectId(surveyId),
+    'meta.survey.version': { $in: surveyVersions },
+    'meta.archived': true,
+    'meta.archivedReason': { $in: ['SUBMISSION_FROM_BUILDER', 'TEST_DATA'] },
+  };
+  const result = await db.collection(SUBMISSIONS_COLLECTION).deleteMany(filter);
+  return result.deletedCount;
 };
 
 export default {

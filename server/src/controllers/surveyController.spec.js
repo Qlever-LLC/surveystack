@@ -74,4 +74,13 @@ describe('surveyController', () => {
     it.todo('deletes all unused survey versions when auto=true param is passed');
     it.todo('do not delete survey versions when dryRun param is passed');
   });
+  describe('deleteArchivedTestSubmissions', () => {
+    it.todo(
+      'deletes all archived submissions with reasons of SUBMISSION_FROM_BUILDER or TEST_DATA'
+    );
+    it.todo(
+      'does not delete archived submissions with reasons other than SUBMISSION_FROM_BUILDER or TEST_DATA'
+    );
+    it.todo('does not delete unarchived submissions');
+  });
 });
