@@ -105,7 +105,12 @@ export default {
     },
     async submitData() {
       this.isSubmittingData = true;
-      await this.submit(['name', 'password']);
+      if (!this.editMode) {
+        await this.submit(['name', 'password', 'email']);
+      } else {
+        await this.submit(['name', 'password']);
+      }
+
       this.isSubmittingData = false;
     },
     async submitEmail() {
@@ -116,6 +121,10 @@ export default {
     },
     async submit(fields) {
       const method = this.editMode ? 'put' : 'post';
+      if (!this.editMode) {
+        this.entity._id = new ObjectId();
+      }
+
       const url = this.editMode ? `/users/${this.entity._id}` : '/users';
 
       if (fields.includes('password') && this.entity.password !== this.passwordConfirmation) {
@@ -134,7 +143,7 @@ export default {
           const membership = { user: newUser._id, group, role };
           await api.post('/memberships', membership);
         }
-        
+
         // update the token when we're logged in with the updated user (not superadmin editing a user)
         if (this.editMode && this.user._id.toString() === newUser.value._id.toString()) {
           this.$store.dispatch('auth/updateToken', newUser.value);
@@ -180,8 +189,6 @@ export default {
   },
   async created() {
     this.editMode = !this.$route.matched.some(({ name }) => name === 'users-new');
-
-    this.entity._id = new ObjectId();
 
     if (this.hasMembership) {
       const { group, email } = this.$route.query;
