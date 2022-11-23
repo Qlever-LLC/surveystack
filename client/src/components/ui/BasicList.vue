@@ -11,9 +11,15 @@
     </v-card-title>
     <v-card-text>
       <v-text-field label="Search" v-model="q" append-icon="mdi-magnify" v-if="searchable" />
-      <template v-if="entities.length > 0">
-        <template v-for="(entity, idx) in filteredEntities">
-          <v-list-item :key="idx" two-line :to="link(entity)">
+      <v-list
+        v-if="entities.length > 0"
+        :style="{
+          'max-height': maxHeight || 'initial',
+          'overflow-y': 'auto',
+        }"
+      >
+        <div v-for="(entity, idx) in filteredEntities" :key="idx">
+          <v-list-item two-line :to="link(entity)">
             <slot name="entity" v-bind:entity="entity">
               <v-list-item-content>
                 <v-list-item-title>Title #{{ idx }}</v-list-item-title>
@@ -22,8 +28,9 @@
             </slot>
           </v-list-item>
           <v-divider v-if="idx < filteredEntities.length - 1" :key="`d-${idx}`" />
-        </template>
-      </template>
+        </div>
+      </v-list>
+
       <div v-else class="grey--text">No {{ title }} yet</div>
     </v-card-text>
   </v-card>
@@ -41,6 +48,10 @@ export default {
     },
     entities: {
       type: Array,
+    },
+    maxHeight: {
+      type: String,
+      default: '',
     },
     title: {
       type: String,

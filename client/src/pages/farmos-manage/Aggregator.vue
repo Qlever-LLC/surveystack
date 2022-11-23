@@ -32,7 +32,7 @@
 
     <template v-if="!!selectedInstance">
       <v-divider class="my-4"></v-divider>
-      <h2>
+      <h2 ref="map-group">
         Group Mappings for
         <v-chip>{{ selectedInstance }}</v-chip>
       </h2>
@@ -78,7 +78,7 @@
 
       <v-divider class="my-8"></v-divider>
 
-      <h2>
+      <h2 ref="map-user">
         User Mappings for
         <v-chip>{{ selectedInstance }}</v-chip>
       </h2>
@@ -179,6 +179,39 @@
         </template>
       </v-simple-table>
     </div>
+
+    <div v-if="farmsNotInSurvestack.length > 0 && !loading">
+      <h2>Farms on FarmOS Aggregator which are not mapped to Groups in Surveystack</h2>
+      <p class="grey--text text--darken-2">
+        These instances are likely self hosted or have not been added to a payment plan of a group.
+      </p>
+      <v-simple-table v-if="!loading">
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th class="text-left">Instance Name</th>
+              <th class="text-left">Tags</th>
+              <th class="text-left">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(farm, idx) in farmsNotInSurvestack" :key="`farm-${idx}`">
+              <td>{{ `${farm.instanceName}` }}</td>
+              <td>
+                <div>
+                  <v-chip small class="ma-1" dark v-for="(tag, uidx) in farm.tags" :key="`farm-${idx}-user-${uidx}`">
+                    {{ tag }}
+                  </v-chip>
+                </div>
+              </td>
+              <td>
+                <v-btn x-small color="blue" class="ma-1" @click="mapGroup(farm.instanceName)" dark>Map to Group</v-btn>
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+    </div>
   </v-container>
 </template>
 
@@ -201,6 +234,20 @@ export default {
       error: null,
       success: null,
     };
+  },
+  methods: {
+    mapUser(instanceName) {
+      this.selectedInstance = instanceName;
+      this.$nextTick(() => {
+        this.$vuetify.goTo(this.$refs['map-user']);
+      });
+    },
+    mapGroup(instanceName) {
+      this.selectedInstance = instanceName;
+      this.$nextTick(() => {
+        this.$vuetify.goTo(this.$refs['map-group']);
+      });
+    },
   },
   computed: {
     selectedInstanceInfo() {
@@ -237,6 +284,28 @@ export default {
           instanceName: farm,
           userMappings,
           groupMappings,
+        });
+      }
+
+      return mappings;
+    },
+    farmsNotInSurvestack() {
+      if (!this.mappings) {
+        return [];
+      }
+      const union = [];
+      union.push(...this.mappings.surveystackFarms.map((f) => f.instanceName));
+      const surveyStackFarms = _.uniq(union);
+
+      // farms without mapping
+      const farms = this.mappings.aggregatorFarms.filter((f) => !surveyStackFarms.some((s) => f.url === s));
+
+      const mappings = [];
+
+      for (const farm of farms) {
+        mappings.push({
+          instanceName: farm.url,
+          tags: farm.tags.split(' '),
         });
       }
 

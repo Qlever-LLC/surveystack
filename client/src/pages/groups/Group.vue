@@ -136,6 +136,9 @@ export default {
       if (g && g.role === 'admin') {
         return true;
       }
+      if (this.$store.getters['auth/isSuperAdmin']) {
+        return true;
+      }
       return false;
     },
     isWhitelabel() {

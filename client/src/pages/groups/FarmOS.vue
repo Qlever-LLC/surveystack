@@ -16,6 +16,19 @@
 
     <app-dialog
       modal
+      title="Deactivate FarmOS"
+      :maxWidth="600"
+      labelConfirm="Deactivate FarmOS for Group"
+      class="primary--text mx-4"
+      @confirm="disable"
+      v-model="showDeactivateDialog"
+      @cancel="showDeactivateDialog = false"
+      width="400"
+      >Deactivate FarmOS for Group? Mappings to users and groups will remain active.</app-dialog
+    >
+
+    <app-dialog
+      modal
       :maxWidth="600"
       labelConfirm="Close"
       :hideCancel="true"
@@ -72,6 +85,7 @@
       @open="openFarm"
       @plansChanged="plansChanged"
       @seatsChanged="seatsChanged"
+      @deactivate="showDeactivateDialog = true"
       :plans="plans"
       :groupInfos="groupInfos"
       :superAdmin="superAdmin"
@@ -164,6 +178,8 @@ export default {
       showLinkDialog: false,
       adminLink: '',
       linkReady: false,
+
+      showDeactivateDialog: false,
     };
   },
   async created() {
@@ -269,6 +285,7 @@ export default {
             this.message = 'Please contact Surveystack to enable FarmOS integration for your Group';
             this.btnEnable = false;
           }
+          this.farmosEnabled = false;
         }
         this.loading = false;
       } catch (error) {
@@ -302,6 +319,20 @@ export default {
       } catch (error) {
         this.error(error.status);
       }
+    },
+    async disable() {
+      try {
+        await api.post('/farmos/group-manage/enable', { groupId: this.groupId, enable: false });
+        await this.init();
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+          this.error(error.response.data.message);
+        } else {
+          this.error(error.message);
+        }
+      }
+
+      this.showDeactivateDialog = false;
     },
     async connectFarms(farms) {
       // console.log('connecting farms', farms, this.selectedUser);

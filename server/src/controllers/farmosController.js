@@ -1222,6 +1222,88 @@ const assertFarmInSubGroup = async (instanceName, tree) => {
   }
 };
 
+export const removeMembershipHook = async (membership) => {
+  const { user: userId, group: groupId } = membership;
+
+  // eslint-disable-next-line no-unreachable
+  const userMappings = await db
+    .collection('farmos-instances')
+    .find({
+      userId: asMongoId(userId),
+    })
+    .toArray();
+
+  if (userMappings.length <= 0) {
+    return;
+  }
+
+  // quick check if there is at all an instance that is mapped to a group
+  // and early exit if not
+  const affectedGroupMappings = await db
+    .collection('farmos-group-mapping')
+    .find({
+      instanceName: {
+        $in: userMappings.map((f) => f.instanceName),
+      },
+    })
+    .toArray();
+
+  if (affectedGroupMappings.length <= 0) {
+    // nothing affected
+    return;
+  }
+
+  const group = await db.collection('groups').findOne({ _id: asMongoId(groupId) });
+  if (!group) {
+    // this should never happen here because it's a hook and params are checked before calling
+    throw boom.notFound();
+  }
+
+  try {
+    const groupInformation = await getGroupInformation(asMongoId(groupId));
+    const othersInstances = [];
+
+    for (const member of groupInformation.members) {
+      if (member.user + '' == userId + '') {
+        // ignore self
+        continue;
+      }
+
+      // connected farms to the member that are mapped to a group within the farmos domain
+      // hence f.groups.length > 0
+      const memberFarms = member.connectedFarms
+        .filter((f) => f.groups.length > 0)
+        .map((f) => f.instanceName);
+
+      othersInstances.push(...memberFarms);
+    }
+
+    const instances = _.uniq(othersInstances);
+
+    const memberInfo = groupInformation.members.find((m) => m.user + '' == userId + '');
+    if (!memberInfo) {
+      return;
+    }
+
+    const connectedFarmsToCheck = memberInfo.connectedFarms.filter((f) => f.groups.length > 0);
+    const toDelete = connectedFarmsToCheck.filter((f) => !instances.includes(f.instanceName));
+
+    const results = [];
+    for (const connectedFarm of toDelete) {
+      const res = await db.collection('farmos-group-mapping').deleteMany({
+        instanceName: connectedFarm.instanceName,
+        groupId: {
+          $in: connectedFarm.groups.map((g) => asMongoId(g.groupId)),
+        },
+      });
+      results.push(res.result.ok);
+    }
+  } catch (error) {
+    console.log('error', error);
+    return;
+  }
+};
+
 export const getAdminLink = async (req, res) => {
   const { userId, instanceName, tree } = await requireGroup(req, {
     userId: Joi.objectId().required(),

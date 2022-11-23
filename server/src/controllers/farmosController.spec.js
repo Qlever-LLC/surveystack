@@ -1,5 +1,6 @@
 import boom from '@hapi/boom';
-
+import mockAxios from 'axios';
+import _ from 'lodash';
 import { ObjectId } from 'mongodb';
 const { getDb } = require('../db');
 
@@ -11,11 +12,14 @@ import {
   checkUrl,
   superAdminCreateFarmOsInstance,
   groupAdminMinimumGetGroupInformation,
+  removeMembershipHook,
   mapUser,
+  getDomain,
 } from './farmosController';
 import { createGroup, createReq, createRes, createUser } from '../testUtils';
 import {
   mapFarmOSInstanceToUser,
+  addFarmToSurveystackGroup,
   setPlanForGroup,
   getGroupInformation,
   createFarmosGroupSettings,
@@ -27,8 +31,7 @@ import {
   createFieldResponse,
 } from '../services/farmos/__mock__/farmos.asset.response';
 
-import mockAxios from 'axios';
-import { assert } from 'joi';
+import membershipController from './membershipController';
 
 const init = async () => {
   const group = await createGroup();
@@ -67,6 +70,57 @@ function mockRes(userId) {
     },
   };
 }
+
+function mockResSuperAdmin(booleanValue) {
+  return {
+    data: null,
+    s: null,
+    status: function (s) {
+      this.s = s;
+      return this;
+    },
+    send: function (r) {
+      this.data = r;
+      return this;
+    },
+    locals: {
+      auth: {
+        isSuperAdmin: booleanValue,
+      },
+    },
+  };
+}
+
+const createFarmOSDomain = async (gs) => {
+  const group = await createGroup();
+  await createFarmosGroupSettings(group._id);
+
+  const res = {
+    group,
+  };
+
+  const farms = [];
+
+  for (const [name, u] of Object.entries(gs)) {
+    const user = u.admin ? await group.createAdminMember() : await group.createUserMember();
+    res[name] = user;
+
+    if (!u.farms) {
+      continue;
+    }
+
+    for (const farm of u.farms) {
+      farms.push(farm);
+      await mapFarmOSInstanceToUser(user.user._id, farm, true);
+    }
+  }
+
+  for (const farm of _.uniq(farms)) {
+    await addFarmToSurveystackGroup(farm, group._id);
+  }
+
+  return res;
+};
 
 describe('farmos-controller', () => {
   it('get-farmos-instances', async () => {
@@ -326,25 +380,6 @@ describe('farmos-controller', () => {
 
   it('requires-env-secrets-skipping', async () => {});
 
-  function mockResSuperAdmin(booleanValue) {
-    return {
-      data: null,
-      s: null,
-      status: function (s) {
-        this.s = s;
-        return this;
-      },
-      send: function (r) {
-        this.data = r;
-        return this;
-      },
-      locals: {
-        auth: {
-          isSuperAdmin: booleanValue,
-        },
-      },
-    };
-  }
   it('farmos-groupAdminMinimumGetGroupInformation works fine', async () => {
     const group = await createGroup({ name: 'Bionutrient' });
     const admin1_data = { userOverrides: { name: 'Dan TerAvest', email: 'teravestdan@gmail.com' } };
@@ -393,6 +428,140 @@ describe('farmos-controller', () => {
 
     expect(res.data.status).toStrictEqual('error');
     expect(res.data.message).toStrictEqual('custom error detected');
+  });
+
+  const removeMemberWithFarm = async (domain, admin, member) => {
+    let res = mockRes(admin.user._id);
+    let req = { params: { groupId: domain.group._id } };
+
+    await groupAdminMinimumGetGroupInformation(req, res);
+    const membersBefore = res.data.response.members;
+
+    const connectedFarmsBefore = _.uniq(
+      membersBefore.flatMap((m) => m.connectedFarms.flatMap((c) => c.instanceName))
+    );
+    res = mockRes(admin.user._id);
+    req = { params: { id: member.membership._id } };
+
+    await membershipController.deleteMembership(req, res, undefined, async (membership) => {
+      await removeMembershipHook(membership);
+    });
+
+    res = mockRes(member.user._id);
+    req = {};
+
+    await getFarmOSInstances(req, res);
+    const usersInstancesAfter = res.data.map((f) => f.instanceName);
+
+    res = mockRes(admin.user._id);
+    req = { params: { groupId: domain.group._id } };
+
+    res = mockRes(admin.user._id);
+    req = { params: { groupId: domain.group._id } };
+    await groupAdminMinimumGetGroupInformation(req, res);
+    const membersAfter = res.data.response.members;
+
+    const connectedFarmsAfter = membersAfter.flatMap((m) => m.connectedFarms);
+
+    return {
+      connectedFarmsBefore,
+      connectedFarmsAfter,
+      usersInstancesAfter,
+      membersAfter,
+    };
+  };
+
+  it('remove-user-with-mapped-farm', async () => {
+    // create group structure
+    // map farms to users and group
+    // admin removes member
+    // farmos instance is still mapped to user
+    // farmos instance is not mapped to group anymore
+
+    const groupStructure = {
+      a1: {
+        admin: true,
+      },
+      u1: {
+        farms: ['test1@farmos.net', 'test2@farmos.net'],
+      },
+      u2: {
+        farms: [],
+      },
+    };
+
+    const farmosDomain = await createFarmOSDomain(groupStructure);
+
+    const { connectedFarmsBefore, connectedFarmsAfter, usersInstancesAfter, membersAfter } =
+      await removeMemberWithFarm(farmosDomain, farmosDomain.a1, farmosDomain.u1);
+
+    expect(connectedFarmsBefore).toEqual(
+      expect.arrayContaining(['test1@farmos.net', 'test2@farmos.net'])
+    );
+
+    expect(connectedFarmsAfter.length).toBe(0); // no more farm connected to group
+    expect(membersAfter.length).toBe(2); // admin and u2
+    expect(usersInstancesAfter).toEqual(
+      expect.arrayContaining(['test1@farmos.net', 'test2@farmos.net'])
+    );
+  });
+
+  it('remove-user-with-mapped-farm-other-user-has-same-farm-mapped', async () => {
+    const groupStructure = {
+      a1: {
+        admin: true,
+      },
+      u1: {
+        farms: ['test1@farmos.net', 'test2@farmos.net'],
+      },
+      u2: {
+        farms: ['test1@farmos.net'],
+      },
+    };
+
+    const farmosDomain = await createFarmOSDomain(groupStructure);
+
+    const { connectedFarmsBefore, connectedFarmsAfter, usersInstancesAfter, membersAfter } =
+      await removeMemberWithFarm(farmosDomain, farmosDomain.a1, farmosDomain.u1);
+
+    expect(connectedFarmsBefore).toEqual(
+      expect.arrayContaining(['test1@farmos.net', 'test2@farmos.net'])
+    );
+
+    expect(connectedFarmsAfter.length).toBe(1);
+    expect(membersAfter.length).toBe(2);
+    expect(usersInstancesAfter).toEqual(
+      expect.arrayContaining(['test1@farmos.net', 'test2@farmos.net'])
+    );
+  });
+
+  it('remove-user-with-mapped-farm-three-users', async () => {
+    const groupStructure = {
+      a1: {
+        admin: true,
+        farms: ['test3@farmos.net'],
+      },
+      u1: {
+        farms: ['test1@farmos.net'],
+      },
+      u2: {
+        farms: ['test1@farmos.net'],
+      },
+    };
+
+    const farmosDomain = await createFarmOSDomain(groupStructure);
+
+    const { connectedFarmsBefore, connectedFarmsAfter, usersInstancesAfter, membersAfter } =
+      await removeMemberWithFarm(farmosDomain, farmosDomain.a1, farmosDomain.u1);
+
+    expect(connectedFarmsBefore.length).toBe(2);
+    expect(connectedFarmsBefore).toEqual(
+      expect.arrayContaining(['test1@farmos.net', 'test3@farmos.net'])
+    );
+
+    expect(connectedFarmsAfter.length).toBe(2);
+    expect(membersAfter.length).toBe(2);
+    expect(usersInstancesAfter).toEqual(expect.arrayContaining(['test1@farmos.net']));
   });
 
   it('map-user', async () => {
