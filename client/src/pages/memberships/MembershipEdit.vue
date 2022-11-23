@@ -57,15 +57,6 @@
       </v-card-actions>
     </v-card>
 
-    <v-card class="my-3">
-      <app-integration-list
-        title="Membership Integrations"
-        :entities="integrations"
-        :newRoute="{ name: 'membership-integrations-new', query: { membership: entity._id } }"
-        integrationType="membership"
-      />
-    </v-card>
-
     <v-dialog v-model="dialogRemoval" max-width="290">
       <v-card class="">
         <v-card-title> Delete Membership </v-card-title>

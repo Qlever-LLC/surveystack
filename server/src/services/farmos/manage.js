@@ -151,9 +151,10 @@ export const getTree = async (group) => {
 
     if (groupSettings) {
       domainRoot = null;
-      return await db
-        .collection('farmos-group-settings')
-        .updateOne({ groupId: group._id }, { $set: { groupHasFarmOSAccess: false } });
+      await db.collection('farmos-group-settings').deleteMany({ groupId: group._id });
+      return {
+        status: 'success',
+      };
     }
 
     return null;
