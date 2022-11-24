@@ -214,7 +214,7 @@ const base = (type) => ({
                 const targetValue = v[colName].value;
                 if (targetValue && targetValue.name) {
                   localPlantings.push({
-                    label: `<span class="green-chip mr-4">New Planting</span> ${targetValue.name}`,
+                    label: `${targetValue.name}`,
                     value: {
                       farmId: '',
                       farmName: '',
