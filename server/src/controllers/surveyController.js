@@ -761,4 +761,5 @@ export default {
   checkForLibraryUpdates,
   cleanupSurvey,
   getCleanupSurveyInfo,
+  getSurveyAndCleanupInfo,
 };
