@@ -1063,3 +1063,16 @@ export function createSurvey({ creator = null, group = null, specVersion = SPEC_
     ],
   };
 }
+
+function hasPage(reduction, control) {
+  if (control && control.children && Array.isArray(control.children)) {
+    return control.children.reduce(hasPage, reduction) || control.type === 'page';
+  } else if (control && control.type === 'page') {
+    return true;
+  }
+  return false;
+}
+
+export const descendantHasPage = (control) => {
+  return hasPage(false, control);
+};

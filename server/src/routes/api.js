@@ -234,7 +234,18 @@ router.put(
   [assertIdsMatch, assertEntityExists({ collection: 'memberships' })],
   catchErrors(membershipController.updateMembership)
 );
-router.delete('/memberships/:id', catchErrors(membershipController.deleteMembership));
+router.delete(
+  '/memberships/:id',
+  catchErrors(membershipController.deleteMembership, async (membership) => {
+    try {
+      await farmosController.removeMembershipHook(membership);
+    } catch (error) {
+      // log the error, but don't escalate as it is not critical
+      console.log(error);
+    }
+  })
+);
+
 router.post(
   '/memberships/join-group',
   [assertAuthenticated],
@@ -245,7 +256,7 @@ router.post(
 router.get('/roles', catchErrors(rolesController.getRoles));
 
 /** farmos */
-router.get('/farmos/farms', catchErrors(farmosController.getFarmOSInstances));
+router.get('/farmos/farms', catchErrors(handleDelegates(farmosController.getFarmOSInstances)));
 router.get('/farmos/assets', catchErrors(handleDelegates(farmosController.getAssets)));
 
 // TODO update test connection

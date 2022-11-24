@@ -9,6 +9,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+
     <v-card v-if="superAdmin" class="px-4 mb-4">
       <v-card-title>Super Admin</v-card-title>
       <v-card-text>
@@ -37,6 +38,7 @@
           >
           </v-autocomplete>
         </div>
+        <v-btn color="red" @click="$emit('deactivate')" dark>Deactivate FarmOS for Group</v-btn>
       </v-card-text>
     </v-card>
     <div class="d-flex justify-space-between">
@@ -101,10 +103,12 @@
 <script>
 import { ref, computed } from '@vue/composition-api';
 import FarmOSGroupTable from './FarmOSGroupTable.vue';
+import appDialog from '@/components/ui/Dialog.vue';
 
 export default {
   components: {
     FarmOSGroupTable,
+    appDialog,
   },
   props: {
     groupInfos: {
@@ -127,6 +131,7 @@ export default {
     'allowSbGrpsAdminsCreateFarmOSFarmsInSS',
     'connect',
     'seatsChanged',
+    'deactivate',
   ],
   setup(props) {
     // part Search input field

@@ -210,6 +210,8 @@ import moment from 'moment';
 import cloneDeep from 'lodash/cloneDeep';
 import omit from 'lodash/omit';
 
+const MATRIX_SEPARATOR = '===>';
+
 export function getPropertiesFromMatrix(headers, matrix) {
   if (!Array.isArray(headers) || typeof matrix !== 'string') {
     return [];
@@ -336,9 +338,18 @@ export default {
           if (header in item) {
             row[header] = item[header];
           } else {
-            const [matrix, property] = header.split('-');
+            const [matrix, property] = header.split(MATRIX_SEPARATOR);
             const children = this.parsed.meta.fields
               .filter((r) => r.startsWith(matrix) && r.endsWith(property))
+              .sort((a, b) => {
+                const aIndex = Number(a.substring(matrix.length + 1, a.length - property.length - 1));
+                const bIndex = Number(b.substring(matrix.length + 1, b.length - property.length - 1));
+                if (isNaN(aIndex) || isNaN(bIndex)) {
+                  return a.localeCompare(b);
+                } else {
+                  return aIndex - bIndex;
+                }
+              })
               .map((key) => item[key]);
             row[header] = this.isExpandMatrix ? children : JSON.stringify(children);
             if (this.isExpandMatrix && children.length > count) {
@@ -469,8 +480,8 @@ export default {
             headers.push(
               ...properties.map((h) => ({
                 text: `${header}.${h}`,
-                value: `${header}-${h}`,
-                filter: this.createCustomFilter(`${header}-${h}`),
+                value: [header, h].join(MATRIX_SEPARATOR),
+                filter: this.createCustomFilter([header, h].join(MATRIX_SEPARATOR)),
               }))
             );
           }

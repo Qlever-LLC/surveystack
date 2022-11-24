@@ -1,4 +1,8 @@
 <template>
+  <!-- 
+    WARNING: this component renders recursively, be careful! 
+    vuedraggable props are not exposed via this component's props so recursively rendered children (via <nested-draggable />) can't set these props 
+  -->
   <draggable
     v-if="controls.length !== 0 || index.length !== 0"
     class="draggable"
@@ -7,11 +11,11 @@
     :disabled="readOnly"
     tag="div"
     :list="controls"
-    :group="{ name: 'g1' }"
     :invertSwap="true"
-    @start="drag = true"
-    @end="drag = false"
+    @start="startHandler"
+    @end="endHandler"
     draggable=".draggable-item"
+    :group="draggableGroup"
   >
     <v-card
       v-for="(el, idx) in controls"
@@ -25,6 +29,8 @@
       :key="el.id || el._id"
       @mousedown.stop.left="$emit('control-selected', el)"
       :data-testid="`control-card-${el.id}`"
+      :data-control-type="el.type"
+      :data-control-contains-page="descendantHasPage(el)"
     >
       <div
         class="d-flex justify-space-between align-center"
@@ -131,6 +137,8 @@
         @hide-control="$emit('hide-control', $event)"
         @unhide-control="$emit('unhide-control', $event)"
         :index="createIndex(index, idx + 1)"
+        :data-control-type="el.type"
+        :data-control-contains-page="descendantHasPage(el)"
       />
 
       <nested-draggable
@@ -150,6 +158,8 @@
         @update-library-control="$emit('update-library-control', $event)"
         @hide-control="$emit('hide-control', $event)"
         @unhide-control="$emit('unhide-control', $event)"
+        :data-control-type="el.type"
+        :data-control-contains-page="descendantHasPage(el)"
         :index="createIndex(index, idx + 1)"
       />
     </v-card>
@@ -178,6 +188,7 @@
     </v-card>
   </div>
 </template>
+
 <script>
 import draggable from 'vuedraggable';
 import { cloneDeep } from 'lodash';
@@ -199,6 +210,23 @@ export default {
       deleteQuestionIndex: null,
       scaleStyles: {},
       hoveredControl: null,
+      pageInPageHintIsVisible: false,
+      draggableGroup: {
+        name: 'g1',
+        // put ::: String | String[] | (to, from, el, event) => Boolean
+        // to: the sortablejs instance which will be `put` into
+        // from: the sortablejs instance which will be `put` from
+        // el: the active element which is being `put` from `from` into `to`
+        // ev: the sortablejs event
+        // returns: Boolean value indicating whether `el` should be allowed to be `put` from `from` into `to`
+        put(to, _, el) {
+          if (el.dataset.controlContainsPage === 'true' && to.el.dataset.controlType === 'page') {
+            return false;
+          }
+          return true;
+        },
+      },
+      descendantHasPage: utils.descendantHasPage,
     };
   },
   props: {
@@ -235,6 +263,16 @@ export default {
     },
   },
   methods: {
+    startHandler(ev) {
+      if (ev.item.dataset.controlType === 'page') {
+        this.pageInPageHintIsVisible = true;
+      }
+      this.drag = true;
+    },
+    endHandler() {
+      this.drag = false;
+      this.pageInPageHintIsVisible = false;
+    },
     getIconForType(type) {
       const control = availableControls.find((c) => c.type === type);
       return control && control.icon;
@@ -364,6 +402,35 @@ export default {
   min-width: 108px;
   text-align: right;
 }
+
+.sortable-drag[data-control-contains-page='true']::after,
+.sortable-drag[data-control-type='page']::after {
+  position: absolute;
+  content: 'Tip: Pages cannot be nested inside Pages';
+  width: 100%;
+  left: 0;
+  top: 100%;
+  margin-top: 13px;
+  background-color: var(--v-info-base);
+  padding: 0.75rem 1.5rem;
+  border-radius: 3px;
+}
+
+.control-item.sortable-drag[data-control-contains-page='true']:hover::before,
+.control-item-selected.sortable-drag[data-control-contains-page='true']::before,
+.control-item.sortable-drag[data-control-type='page']:hover::before,
+.control-item-selected.sortable-drag[data-control-type='page']::before {
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 7px solid var(--v-info-base);
+  top: 100%;
+  margin-top: 3px;
+  left: 50%;
+  content: '';
+  transform: translate(-50%, 50%);
+}
 </style>
 
 <style>
@@ -377,5 +444,10 @@ export default {
 
 .sortable-ghost {
   opacity: 0.2;
+}
+
+.sortable-drag[data-control-contains-page='true'],
+.sortable-drag[data-control-type='page'] {
+  position: relative;
 }
 </style>

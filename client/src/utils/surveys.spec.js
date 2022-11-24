@@ -9,6 +9,7 @@ import {
   prepareToAddFromLibrary,
   removeControl,
   replaceControl,
+  descendantHasPage,
 } from './surveys';
 import { resourceTypes } from '@/utils/resources';
 
@@ -458,5 +459,51 @@ describe('surveys', () => {
     expect(result.length).toBe(
       librarySurvey.revisions.find((revision) => revision.version === librarySurvey.latestVersion).controls.length
     );
+  });
+});
+
+describe('descendantHasPage', () => {
+  it('returns true when a descendant control has page type', () => {
+    const control = {
+      type: 'group',
+      children: [
+        {
+          type: 'group',
+          children: [
+            {
+              type: 'page',
+              children: [
+                {
+                  type: 'number',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    expect(descendantHasPage(control)).toBe(true);
+  });
+
+  it('returns false when no descendant controls have page type', () => {
+    const control = {
+      type: 'group',
+      children: [
+        {
+          type: 'group',
+          children: [
+            {
+              type: 'group',
+              children: [
+                {
+                  type: 'number',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    expect(descendantHasPage(control)).toBe(false);
   });
 });
