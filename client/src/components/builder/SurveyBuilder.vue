@@ -591,6 +591,7 @@ export default {
       console.log(value);
     },
     async controlSelected(control) {
+      this.closeLibrary();
       this.control = control;
       if (control && control.type === 'script' && control.options.source) {
         const data = await this.fetchScript(control.options.source);
