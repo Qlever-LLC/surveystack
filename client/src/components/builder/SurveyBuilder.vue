@@ -59,6 +59,7 @@
             :selected="control"
             :controls="currentControls"
             :availableLibraryUpdates="availableLibraryUpdates"
+            :libraryId="showLibrary ? libraryId : null"
             @control-selected="controlSelected"
             @duplicate-control="duplicateControl"
             @toggle-library="toggleLibrary"

@@ -56,7 +56,7 @@
             v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
             @mousedown.stop="toggleLibrary(el.libraryId)"
           >
-            <v-icon color="grey lighten-1">mdi-library</v-icon>
+            <v-icon :color="getLibraryIconColor(el.libraryId)">mdi-library</v-icon>
           </v-btn>
           <v-chip
             v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
@@ -256,6 +256,10 @@ export default {
       type: Number,
       default: 1.0,
     },
+    libraryId: {
+      type: String,
+      default: null,
+    },
   },
   filters: {
     displayIndex(value) {
@@ -316,6 +320,9 @@ export default {
     },
     toggleLibrary(libraryId) {
       this.$emit('toggle-library', libraryId);
+    },
+    getLibraryIconColor(libraryId) {
+      return `${this.libraryId && this.libraryId === libraryId ? 'green' : 'grey'} lighten-1`;
     },
     handleCardHoverChange({ control, isHovering }) {
       if (isHovering) {
