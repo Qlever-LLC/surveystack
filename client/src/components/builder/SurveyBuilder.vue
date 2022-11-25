@@ -61,7 +61,7 @@
             :availableLibraryUpdates="availableLibraryUpdates"
             @control-selected="controlSelected"
             @duplicate-control="duplicateControl"
-            @open-library="openLibrary"
+            @toggle-library="toggleLibrary"
             @control-removed="controlRemoved"
             @update-library-control="updateLibrary"
             @hide-control="hideControl"
@@ -675,6 +675,13 @@ export default {
         this.libraryId = libraryId;
       } else {
         this.libraryId = null;
+      }
+    },
+    toggleLibrary(libraryId) {
+      if (this.showLibrary) {
+        this.closeLibrary();
+      } else {
+        this.openLibrary(libraryId);
       }
     },
     onCancel() {

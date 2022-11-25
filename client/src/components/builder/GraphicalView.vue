@@ -1,7 +1,7 @@
 <template>
-  <!-- 
-    WARNING: this component renders recursively, be careful! 
-    vuedraggable props are not exposed via this component's props so recursively rendered children (via <nested-draggable />) can't set these props 
+  <!--
+    WARNING: this component renders recursively, be careful!
+    vuedraggable props are not exposed via this component's props so recursively rendered children (via <nested-draggable />) can't set these props
   -->
   <draggable
     v-if="controls.length !== 0 || index.length !== 0"
@@ -54,7 +54,7 @@
           <v-btn
             icon
             v-if="areActionsVisible(el) && el.isLibraryRoot && !el.libraryIsInherited"
-            @click.stop="openLibrary(el.libraryId)"
+            @mousedown.stop="toggleLibrary(el.libraryId)"
           >
             <v-icon color="grey lighten-1">mdi-library</v-icon>
           </v-btn>
@@ -314,8 +314,8 @@ export default {
 
       this.$emit('duplicate-control', copy);
     },
-    openLibrary(libraryId) {
-      this.$emit('open-library', libraryId);
+    toggleLibrary(libraryId) {
+      this.$emit('toggle-library', libraryId);
     },
     handleCardHoverChange({ control, isHovering }) {
       if (isHovering) {
