@@ -11,7 +11,7 @@
             </v-btn>
           </template>
           <v-card>
-            <v-card-title> Edit Survey Details </v-card-title>
+            <v-card-title> Edit Survey Details</v-card-title>
             <v-card-text>
               <active-group-selector class="my-4" label="Group" v-model="value.meta.group" outlined returnObject />
               <v-select
@@ -24,7 +24,7 @@
             </v-card-text>
             <v-card-actions class="mr-3">
               <v-spacer />
-              <v-btn @click="editDetailsDialogIsVisible = false" color="primary" text> Close </v-btn>
+              <v-btn @click="editDetailsDialogIsVisible = false" color="primary" text> Close</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -35,7 +35,7 @@
             </v-btn>
           </template>
           <v-card>
-            <v-card-title> Survey Resources </v-card-title>
+            <v-card-title> Survey Resources</v-card-title>
             <v-card-text>
               <app-resources
                 :resources="survey.resources"
@@ -44,7 +44,7 @@
             </v-card-text>
             <v-card-actions class="mr-3">
               <v-spacer />
-              <v-btn @click="resourcesDialogIsVisible = false" color="primary" text> Close </v-btn>
+              <v-btn @click="resourcesDialogIsVisible = false" color="primary" text> Close</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -141,10 +141,20 @@
       </div>
       <div class="d-flex justify-space-between align-center mt-n1">
         <div class="body-2 grey--text caption">
-          {{ value._id }}
+          Size: {{ surveySize }} MB
+          <v-btn
+            v-if="surveySize > 1"
+            @click="$emit('show-version-dialog')"
+            x-small
+            color="white"
+            elevation="0"
+            class="mb-1"
+          >
+            <v-icon x-small color="warning">mdi-alert</v-icon>try to clean up
+          </v-btn>
         </div>
         <div class="text-left">
-          <v-chip dark small outlined color="grey"> Version {{ version }} </v-chip>
+          <v-chip dark small outlined color="grey"> Version {{ version }}</v-chip>
         </div>
       </div>
     </v-card-title>
@@ -244,6 +254,7 @@ import EditLibraryDialog from '@/components/survey/library/EditLibraryDialog';
 import PublishUpdatedLibraryDialog from '@/components/survey/library/PublishUpdatedLibraryDialog';
 import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryConsumersDialog';
 import VersionsDialog from './VersionsDialog.vue';
+import { calcSurveySizeMB } from '@/utils/surveys';
 
 const availableSubmissions = [
   { value: 'public', text: 'Everyone' },
@@ -282,6 +293,11 @@ export default {
     'version',
     'validationErrors',
   ],
+  computed: {
+    surveySize() {
+      return calcSurveySizeMB(this.survey);
+    },
+  },
   watch: {
     value: {
       async handler(value, oldValue) {
@@ -349,12 +365,14 @@ export default {
 .survey-group-name-input >>> .v-input__slot ::before {
   border: none;
 }
+
 .survey-group-name-input
   >>> .theme--light.v-text-field.v-input--is-disabled
   > .v-input__control
   > .v-input__slot:before {
   border: none;
 }
+
 .survey-group-name-input >>> .v-input__control >>> .v-input__slot ::before {
   border: none;
 }

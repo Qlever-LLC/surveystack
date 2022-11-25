@@ -39,10 +39,6 @@
     >
       This survey uses an outdated question library set. Consider reviewing the new version and updating it.
     </v-alert>
-    <v-alert v-if="surveySize > 1" text type="warning" color="orange" elevation="2" dismissible>
-      This survey is very large ({{ surveySize + ' MB' }}), which could cause technical problems for the participants.
-      <v-btn @click="versionsDialogIsVisible = true" small color="white" class="black--text">Try to clean up</v-btn>
-    </v-alert>
 
     <splitpanes class="pane-root" vertical>
       <pane class="pane pane-survey">
@@ -875,12 +871,6 @@ export default {
       const parentPath = surveyStackUtils.getParentPath(path);
       const parentData = surveyStackUtils.getNested(this.instance, parentPath);
       return parentData;
-    },
-    surveySize() {
-      const size = new TextEncoder().encode(JSON.stringify(this.survey)).length;
-      const kiloBytes = size / 1024;
-      const megaBytes = kiloBytes / 1024;
-      return Math.round(megaBytes * 10) / 10;
     },
   },
   watch: {
