@@ -762,4 +762,5 @@ export default {
   cleanupSurvey,
   getCleanupSurveyInfo,
   getSurveyAndCleanupInfo,
+  deleteArchivedTestSubmissions,
 };

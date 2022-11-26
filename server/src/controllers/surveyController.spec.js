@@ -10,7 +10,7 @@ import _ from 'lodash';
 import { db, getDb } from '../db';
 
 const { ObjectId } = jest.requireActual('mongodb');
-const { cleanupSurvey, getSurveyAndCleanupInfo } = surveyController;
+const { cleanupSurvey, getSurveyAndCleanupInfo, deleteArchivedTestSubmissions } = surveyController;
 
 async function mockControlsAndSubmission() {
   const { survey, createSubmission } = await createSurvey(['text', 'number']);
@@ -69,7 +69,7 @@ async function mockControlsAndSubmission() {
     }
   );
 
-  return { survey, submission };
+  return { survey, submission, createSubmission };
 }
 
 describe('surveyController', () => {
@@ -157,12 +157,62 @@ describe('surveyController', () => {
     });
   });
   describe('deleteArchivedTestSubmissions', () => {
-    it.todo(
-      'deletes all archived submissions with reasons of SUBMISSION_FROM_BUILDER or TEST_DATA'
-    );
-    it.todo(
-      'does not delete archived submissions with reasons other than SUBMISSION_FROM_BUILDER or TEST_DATA'
-    );
-    it.todo('does not delete unarchived submissions');
+    it('deletes all archived submissions with reasons of SUBMISSION_FROM_BUILDER or TEST_DATA', async () => {
+      const { survey, submission, createSubmission } = await mockControlsAndSubmission();
+      const { submission: submissionToDel } = await createSubmission();
+      submissionToDel.meta.archived = true;
+      submissionToDel.meta.archivedReason = 'SUBMISSION_FROM_BUILDER';
+      await getDb().collection('submissions').findOneAndUpdate(
+        { _id: submissionToDel._id },
+        { $set: submissionToDel },
+        {
+          returnOriginal: false,
+        }
+      );
+
+      const deleteCount = await deleteArchivedTestSubmissions(
+        survey._id,
+        survey.revisions.map((r) => r.version)
+      );
+      expect(deleteCount).toBe(1);
+    });
+    it('does not delete archived submissions with reasons other than SUBMISSION_FROM_BUILDER or TEST_DATA', async () => {
+      const { survey, submission, createSubmission } = await mockControlsAndSubmission();
+      const { submission: submissionToDel } = await createSubmission();
+      submissionToDel.meta.archived = true;
+      submissionToDel.meta.archivedReason = 'ANY_REASON';
+      await getDb().collection('submissions').findOneAndUpdate(
+        { _id: submissionToDel._id },
+        { $set: submissionToDel },
+        {
+          returnOriginal: false,
+        }
+      );
+
+      const deleteCount = await deleteArchivedTestSubmissions(
+        survey._id,
+        survey.revisions.map((r) => r.version)
+      );
+      expect(deleteCount).toBe(0);
+    });
+    it('does not delete unarchived submissions', async () => {
+      const { survey, submission, createSubmission } = await mockControlsAndSubmission();
+      const { submission: submissionToDel } = await createSubmission();
+      submissionToDel.meta.archived = false;
+      submissionToDel.meta.archivedReason = 'ANY_REASON';
+      await getDb().collection('submissions').findOneAndUpdate(
+        { _id: submissionToDel._id },
+        { $set: submissionToDel },
+        {
+          returnOriginal: false,
+        }
+      );
+
+      const deleteCount = await deleteArchivedTestSubmissions(
+        survey._id,
+        survey.revisions.map((r) => r.version)
+      );
+      expect(deleteCount).toBe(0);
+    });
   });
 });
