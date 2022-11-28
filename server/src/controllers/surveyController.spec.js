@@ -12,21 +12,34 @@ import { db, getDb } from '../db';
 const { ObjectId } = jest.requireActual('mongodb');
 const { cleanupSurvey, getSurveyAndCleanupInfo, deleteArchivedTestSubmissions } = surveyController;
 
-async function mockControlsAndSubmission() {
-  const { survey, createSubmission } = await createSurvey(['text', 'number']);
+async function mockControlsAndSubmission(
+  surveyOverrides = undefined,
+  consumeLibraryId = undefined,
+  consumeLibraryVersion = undefined
+) {
+  const { survey, createSubmission } = await createSurvey(['text', 'number'], surveyOverrides);
   const { submission: _submission } = await createSubmission();
 
   const controls = survey.revisions[survey.latestVersion - 1].controls;
   const libraryId = new ObjectId();
   const libraryVersion = 3;
-  const groupOverride = {
-    children: [
-      getControlGenerator('text')({ libraryId, libraryVersion, libraryIsInherited: true }),
-    ],
-    isLibraryRoot: true,
-    libraryId,
-    libraryVersion,
-  };
+  let groupOverride;
+  if (consumeLibraryId) {
+    groupOverride = {
+      children: [
+        getControlGenerator('text')({ libraryId, libraryVersion, libraryIsInherited: true }),
+      ],
+      isLibraryRoot: true,
+      libraryId: consumeLibraryId,
+      libraryVersion: consumeLibraryVersion,
+    };
+  } else {
+    groupOverride = {
+      children: [
+        getControlGenerator('text')({ libraryId, libraryVersion, libraryIsInherited: true }),
+      ],
+    };
+  }
   controls.push(
     getControlGenerator('page')({
       children: [getControlGenerator('group')(groupOverride)],
@@ -73,81 +86,87 @@ async function mockControlsAndSubmission() {
 }
 
 describe('surveyController', () => {
+  let librarySurvey, librarySurveySubmission, consumerSurvey, consumerSubmission, createSubmission;
+  beforeEach(async () => {
+    const libraryResult = await mockControlsAndSubmission({
+      meta: { isLibrary: true },
+    });
+    createSubmission = libraryResult.createSubmission;
+    librarySurvey = libraryResult.survey;
+    librarySurveySubmission = libraryResult.submission;
+    const consumerResult = await mockControlsAndSubmission(
+      undefined,
+      librarySurvey._id,
+      librarySurvey.lastedVersion
+    );
+    consumerSurvey = consumerResult.survey;
+    consumerSubmission = consumerResult.submission;
+  });
   describe('getSurveyAndCleanupInfo', () => {
     it('returns the survey by the id passed', async () => {
-      const { survey, submission } = await mockControlsAndSubmission();
-      const result = await getSurveyAndCleanupInfo(survey._id, survey.meta.creator);
-      expect(result.survey._id).toStrictEqual(survey._id);
+      const result = await getSurveyAndCleanupInfo(librarySurvey._id, librarySurvey.meta.creator);
+      expect(result.survey._id).toStrictEqual(librarySurvey._id);
     });
-
     it('returns surveyVersions array of all available version strings', async () => {
-      const { survey, submission } = await mockControlsAndSubmission();
-      const result = await getSurveyAndCleanupInfo(survey._id, survey.meta.creator);
-      expect(result.surveyVersions.length).toBe(survey.revisions.length);
-      expect(result.surveyVersions).toStrictEqual(survey.revisions.map((r) => String(r.version)));
+      const result = await getSurveyAndCleanupInfo(librarySurvey._id, librarySurvey.meta.creator);
+      expect(result.surveyVersions.length).toBe(librarySurvey.revisions.length);
+      expect(result.surveyVersions).toStrictEqual(
+        librarySurvey.revisions.map((r) => String(r.version))
+      );
     });
     it('returns versionsToKeep array of all versions strings not allowed to delete', async () => {
-      const { survey, submission } = await mockControlsAndSubmission();
-      const result = await getSurveyAndCleanupInfo(survey._id, survey.meta.creator);
-      expect(result.versionsToKeep).toStrictEqual(['2']);
+      const result = await getSurveyAndCleanupInfo(librarySurvey._id, librarySurvey.meta.creator);
+      expect(result.versionsToKeep).toStrictEqual(['2', '3']);
     });
     it('returns versionsToDelete array of all versions strings allowed to delete', async () => {
-      const { survey, submission } = await mockControlsAndSubmission();
-      const result = await getSurveyAndCleanupInfo(survey._id, survey.meta.creator);
-      expect(result.versionsToDelete).toStrictEqual(['1', '3']);
+      const result = await getSurveyAndCleanupInfo(librarySurvey._id, librarySurvey.meta.creator);
+      expect(result.versionsToDelete).toStrictEqual(['1']);
     });
     it('returns submissionsVersionCounts object map with keys=version and value=count of submissions referencing that version', async () => {
-      const { survey, submission } = await mockControlsAndSubmission();
-      const result = await getSurveyAndCleanupInfo(survey._id, survey.meta.creator);
+      const result = await getSurveyAndCleanupInfo(librarySurvey._id, librarySurvey.meta.creator);
       expect(result.submissionsVersionCounts).toStrictEqual({ 2: 1 });
     });
     it('returns libraryConsumersByVersion object map with keys=version and value=count of question set consumer surveys referencing that version', async () => {
-      const { survey, submission } = await mockControlsAndSubmission();
-      const result = await getSurveyAndCleanupInfo(survey._id, survey.meta.creator);
-      //TODO add question set consumer survey and test for that ref
-      expect(result.libraryConsumersByVersion).toStrictEqual({});
+      const result = await getSurveyAndCleanupInfo(librarySurvey._id, librarySurvey.meta.creator);
+      expect(result.libraryConsumersByVersion).toStrictEqual({ 3: 3 });
     });
   });
   describe('cleanupSurvey', () => {
     it('deletes only requestedVersionsToDelete versions when auto=false param is passed', async () => {
-      const { survey, submission } = await mockControlsAndSubmission();
       const req = createReq({
-        params: { id: survey._id },
+        params: { id: librarySurvey._id },
         query: { versions: ['1'], auto: false },
       });
-      const res = await createRes({ user: { _id: survey.meta.creator, permissions: [] } });
+      const res = await createRes({ user: { _id: librarySurvey.meta.creator, permissions: [] } });
       await cleanupSurvey(req, res);
       expect(res.send).toHaveBeenCalledWith(
         expect.objectContaining({
           deletedVersions: ['1'],
-          keptVersions: ['2'], //Hint: not contains '3' even if '3' is not deleted too. Reason:  we didn't request to delete '3'
+          keptVersions: ['2', '3'], //Hint: not contains '3' even if '3' is not deleted too. Reason:  we didn't request to delete '3'
         })
       );
     });
     it('deletes all unused survey versions when auto=true param is passed', async () => {
-      const { survey, submission } = await mockControlsAndSubmission();
       const req = createReq({
-        params: { id: survey._id },
+        params: { id: librarySurvey._id },
         query: { versions: [], auto: true },
       });
-      //TODO add a third, unreferenced version to survey, expect that version 1 and 3 are deleted
-      const res = await createRes({ user: { _id: survey.meta.creator, permissions: [] } });
+      const res = await createRes({ user: { _id: librarySurvey.meta.creator, permissions: [] } });
       await cleanupSurvey(req, res);
       expect(res.send).toHaveBeenCalledWith(
         expect.objectContaining({
-          deletedVersions: ['1', '3'],
-          keptVersions: ['2'],
+          deletedVersions: ['1'],
+          keptVersions: ['2', '3'],
         })
       );
     });
     it('do not delete survey versions when dryRun param is passed', async () => {
-      const { survey, submission } = await mockControlsAndSubmission();
       const req = createReq({
-        params: { id: survey._id },
+        params: { id: librarySurvey._id },
         query: { versions: [], auto: true, dryRun: true },
       });
       //TODO add a third, unreferenced version to survey, expect that version 1 and 3 are deleted
-      const res = await createRes({ user: { _id: survey.meta.creator, permissions: [] } });
+      const res = await createRes({ user: { _id: librarySurvey.meta.creator, permissions: [] } });
       await cleanupSurvey(req, res);
       expect(res.send).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -158,7 +177,6 @@ describe('surveyController', () => {
   });
   describe('deleteArchivedTestSubmissions', () => {
     it('deletes all archived submissions with reasons of SUBMISSION_FROM_BUILDER or TEST_DATA', async () => {
-      const { survey, submission, createSubmission } = await mockControlsAndSubmission();
       const { submission: submissionToDel } = await createSubmission();
       submissionToDel.meta.archived = true;
       submissionToDel.meta.archivedReason = 'SUBMISSION_FROM_BUILDER';
@@ -171,13 +189,12 @@ describe('surveyController', () => {
       );
 
       const deleteCount = await deleteArchivedTestSubmissions(
-        survey._id,
-        survey.revisions.map((r) => r.version)
+        librarySurvey._id,
+        librarySurvey.revisions.map((r) => r.version)
       );
       expect(deleteCount).toBe(1);
     });
     it('does not delete archived submissions with reasons other than SUBMISSION_FROM_BUILDER or TEST_DATA', async () => {
-      const { survey, submission, createSubmission } = await mockControlsAndSubmission();
       const { submission: submissionToDel } = await createSubmission();
       submissionToDel.meta.archived = true;
       submissionToDel.meta.archivedReason = 'ANY_REASON';
@@ -190,13 +207,12 @@ describe('surveyController', () => {
       );
 
       const deleteCount = await deleteArchivedTestSubmissions(
-        survey._id,
-        survey.revisions.map((r) => r.version)
+        librarySurvey._id,
+        librarySurvey.revisions.map((r) => r.version)
       );
       expect(deleteCount).toBe(0);
     });
     it('does not delete unarchived submissions', async () => {
-      const { survey, submission, createSubmission } = await mockControlsAndSubmission();
       const { submission: submissionToDel } = await createSubmission();
       submissionToDel.meta.archived = false;
       submissionToDel.meta.archivedReason = 'ANY_REASON';
@@ -209,8 +225,8 @@ describe('surveyController', () => {
       );
 
       const deleteCount = await deleteArchivedTestSubmissions(
-        survey._id,
-        survey.revisions.map((r) => r.version)
+        librarySurvey._id,
+        librarySurvey.revisions.map((r) => r.version)
       );
       expect(deleteCount).toBe(0);
     });
