@@ -253,7 +253,6 @@ import { getGroupNameById } from '@/utils/groups';
 import EditLibraryDialog from '@/components/survey/library/EditLibraryDialog';
 import PublishUpdatedLibraryDialog from '@/components/survey/library/PublishUpdatedLibraryDialog';
 import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryConsumersDialog';
-import VersionsDialog from './VersionsDialog.vue';
 import { calcSurveySizeMB } from '@/utils/surveys';
 
 const availableSubmissions = [
@@ -315,7 +314,6 @@ export default {
     SurveyNameEditor,
     ActiveGroupSelector,
     appResources,
-    VersionsDialog,
   },
   methods: {
     async getGroupNameById(id) {

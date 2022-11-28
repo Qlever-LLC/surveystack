@@ -21,14 +21,6 @@
       @cancel="updateLibraryCancelled"
     />
 
-    <versions-dialog
-      v-if="versionsDialogIsVisible"
-      v-model="versionsDialogIsVisible"
-      @cancel="versionsDialogIsVisible = false"
-      :survey="survey"
-      @reload-survey="() => $emit('reload-survey')"
-    />
-
     <v-alert
       v-if="Object.keys(availableLibraryUpdates).length > 0"
       text
@@ -68,7 +60,7 @@
             @addToLibrary="addToLibrary"
             class="mb-4"
             data-testid="survey-details"
-            @show-version-dialog="versionsDialogIsVisible = true"
+            @show-version-dialog="$emit('show-version-dialog')"
           />
           <graphical-view
             v-if="!viewCode"
@@ -281,7 +273,6 @@ import {
   isResourceReferenced,
 } from '@/utils/surveys';
 import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
-import VersionsDialog from '@/components/builder/VersionsDialog';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -303,7 +294,6 @@ const tabMap = ['relevance', 'calculate', 'constraint', 'apiCompose'];
 export default {
   mixins: [appMixin],
   components: {
-    VersionsDialog,
     UpdateLibraryDialog,
     Splitpanes,
     Pane,
@@ -359,7 +349,6 @@ export default {
       updateLibraryDialogIsVisible: false,
       updateLibraryRootGroup: null,
       updateToLibrary: null,
-      versionsDialogIsVisible: false,
     };
   },
   methods: {

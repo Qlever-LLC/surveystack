@@ -57,8 +57,10 @@
             <span v-else> none </span>
           </p>
         </div>
-        <v-alert v-if="deleteVersionsHasError" type="error"> An error occurred deleting survey versions. </v-alert>
-        <v-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success">
+        <v-alert v-if="deleteVersionsHasError" type="error" class="mt-1" dismissible>
+          An error occurred deleting survey versions.
+        </v-alert>
+        <v-alert v-else-if="deleteVersionsHasLoaded && deleteVersionsResponse" type="success" class="mt-1" dismissible>
           Successfully deleted survey version {{ deleteVersionsResponse.deletedVersions.join(', ') }}
         </v-alert>
       </v-card-text>
