@@ -8,7 +8,11 @@ let db = null;
 /**
  * @type {MongoClient}
  */
- let mongoClient = null;
+let mongoClient = null;
+
+export const COLL_ACCESS_CODES = 'users.accesscodes';
+export const COLL_USERS = 'users';
+export const COLL_GROUPS_HYLO_MAPPINGS = 'groups.hylo-mappings'; // TODO rename to prural?
 
 /**
  * https://stackoverflow.com/a/33780894
@@ -28,11 +32,36 @@ const connectDatabase = async () => {
   await db.collection('submissions').createIndex({ 'meta.survey.id': 1 });
   await db.collection('submissions').createIndex({ 'meta.survey.version': 1 });
   await db.collection('submissions').createIndex({ 'meta.creator': 1 });
+
+  // delete expired access codes from the DB automatically
+  await db.collection(COLL_ACCESS_CODES).createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+  // make sure that tokens are unique
+  await db.collection(COLL_ACCESS_CODES).createIndex({ code: 1 }, { unique: true });
+
+  await db.collection('farmos-instances').createIndex({ userId: 1 });
+  await db.collection('farmos-instances').createIndex({ instanceName: 1 });
+
+  await db.collection(COLL_GROUPS_HYLO_MAPPINGS).createIndex({ groupId: 1 }, { unique: true });
+  // await db.collection(COLL_GROUPS_HYLO_MAPPINGS).dropIndex({ hyloGroupId: 1 });
+
   // const farmOsWebhookRequestsCollectionExists = await db.listCollections().toArray().some(({ name }) => name === 'farmos.webhookrequests')
-  const farmOsWebhookRequestsCollectionName = 'farmos.webhookrequests'
-  const farmOsWebhookRequestsCollectionExists = await db.listCollections({ name: farmOsWebhookRequestsCollectionName }).hasNext();
+  const farmOsWebhookRequestsCollectionName = 'farmos.webhookrequests';
+  const farmOsWebhookRequestsCollectionExists = await db
+    .listCollections({ name: farmOsWebhookRequestsCollectionName })
+    .hasNext();
   if (!farmOsWebhookRequestsCollectionExists) {
-    await db.createCollection(farmOsWebhookRequestsCollectionName, { capped: true, size: 10000, max: 5000 });
+    await db.createCollection(farmOsWebhookRequestsCollectionName, {
+      capped: true,
+      size: 10000,
+      max: 5000,
+    });
+  }
+  const resourcesCollectionName = 'resources';
+  const resourcesCollectionExists = await db
+    .listCollections({ name: resourcesCollectionName })
+    .hasNext();
+  if (!resourcesCollectionExists) {
+    await db.createCollection(resourcesCollectionName);
   }
 
   // migrations
@@ -146,7 +175,12 @@ const migrateGroups_VXtoV2 = async () => {
 const migrateLibraryIds = async () => {
   const surveys = await db
     .collection('surveys')
-    .find({"$and": [{ "revisions.controls.libraryId": { $exists: true }}, {"revisions.controls.libraryId" : { $not: {$type:"objectId" }}}] })
+    .find({
+      $and: [
+        { 'revisions.controls.libraryId': { $exists: true } },
+        { 'revisions.controls.libraryId': { $not: { $type: 'objectId' } } },
+      ],
+    })
     .toArray();
 
   let modifiedCount = 0;
@@ -160,9 +194,13 @@ const migrateLibraryIds = async () => {
       }
     }
 
-    await db.collection('surveys').findOneAndUpdate({ '_id': new ObjectId(survey._id) }, { $set: survey }, {
-      returnOriginal: false,
-    });
+    await db.collection('surveys').findOneAndUpdate(
+      { _id: new ObjectId(survey._id) },
+      { $set: survey },
+      {
+        returnOriginal: false,
+      }
+    );
 
     modifiedCount++;
 
@@ -184,12 +222,17 @@ const changeLibraryIdToObjectId = async (control) => {
       await changeLibraryIdToObjectId(child);
     }
   }
-}
+};
 
 const migrateResourceLibraryIds = async () => {
   const surveys = await db
     .collection('surveys')
-    .find({"$and": [{ "resources.libraryId": { $exists: true }}, {"resources.libraryId" : { $not: {$type:"objectId" }}}] })
+    .find({
+      $and: [
+        { 'resources.libraryId': { $exists: true } },
+        { 'resources.libraryId': { $not: { $type: 'objectId' } } },
+      ],
+    })
     .toArray();
 
   let modifiedCount = 0;
@@ -201,9 +244,13 @@ const migrateResourceLibraryIds = async () => {
       }
     }
 
-    await db.collection('surveys').findOneAndUpdate({ '_id': new ObjectId(survey._id) }, { $set: survey }, {
-      returnOriginal: false,
-    });
+    await db.collection('surveys').findOneAndUpdate(
+      { _id: new ObjectId(survey._id) },
+      { $set: survey },
+      {
+        returnOriginal: false,
+      }
+    );
 
     modifiedCount++;
 
@@ -214,4 +261,8 @@ const migrateResourceLibraryIds = async () => {
     console.log('Migrated resource.library to objectId of this many surveys', modifiedCount);
   }
 };
+
+export const getDb = () => db;
+export const disconnect = async () => await mongoClient.close();
+
 export { db, connectDatabase, mongoClient };

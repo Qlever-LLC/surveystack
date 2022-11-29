@@ -2,7 +2,6 @@ import ObjectID from 'bson-objectid';
 import { flatten, unflatten } from 'flat';
 import { cloneDeep } from 'lodash';
 import moment from 'moment';
-
 import * as constants from '@/constants';
 
 function* processPositions(data, position = []) {
@@ -73,23 +72,6 @@ export const getBreadcrumbsForSubmission = (controls, position) => {
   return breadcrumbs;
 };
 
-export const flattenSubmission = (submission, delimiter = '.') => {
-  const res = {};
-  const positions = getControlPositions(submission.data);
-  positions.forEach((p) => {
-    const control = getControl(submission.data, p);
-    const breadcrumbs = getBreadcrumbsForSubmission(submission.data, p);
-    if (control.type !== 'group') {
-      const key = breadcrumbs.join(delimiter);
-      res[key] = {
-        value: control.value,
-        type: control.type,
-      };
-    }
-  });
-  return res;
-};
-
 /**
  * Creates and returns a new submission based off a specific survey version
  * @param {Object} survey
@@ -97,7 +79,7 @@ export const flattenSubmission = (submission, delimiter = '.') => {
  *
  * @returns {Object} A submission for a specific survey version.
  */
-const createSubmissionFromSurvey = ({ survey, version = 1, instance }) => {
+const createSubmissionFromSurvey = ({ survey, version = 1, instance, submitAsUser = undefined }) => {
   const submission = {};
   const dateNow = moment().toISOString(true);
 
@@ -115,6 +97,7 @@ const createSubmissionFromSurvey = ({ survey, version = 1, instance }) => {
       path: survey.meta.group.path,
     },
     specVersion: constants.SPEC_VERSION_SUBMISSION,
+    submitAsUser: submitAsUser,
   };
 
   // TODO: handle version not found
@@ -151,6 +134,8 @@ const createSubmissionFromSurvey = ({ survey, version = 1, instance }) => {
     }
     const dateModified = flattenedInstance ? flattenedInstance[`${flatName}.meta.dateModified`] : null;
     const meta = { type: control.type, dateModified };
+    // add uuid: uuidv4(), if uuid
+
     if (control.options.redacted) {
       meta.permissions = ['admin'];
     }
@@ -202,7 +187,7 @@ export const linearControls = (survey, submission) => {
     const control = cloneDeep(getControl(controls, p));
     const breadcrumbs = getBreadcrumbsForSubmission(controls, p);
     const submissionField = getSubmissionField(submission, survey, p);
-    if (control.type !== 'group') {
+    if (control.type !== 'group' && !!submissionField) {
       const key = breadcrumbs.join('.');
       const r = Object.assign(control, {
         breadcrumbs,
@@ -214,6 +199,32 @@ export const linearControls = (survey, submission) => {
       });
       res.push(r);
     }
+  });
+  return res;
+};
+
+export const linearControlsWithGroups = (survey, submission) => {
+  const res = [];
+  const { controls } = survey.revisions.find((revision) => revision.version === submission.meta.survey.version);
+  const positions = getControlPositions(controls);
+  positions.forEach((p) => {
+    const control = cloneDeep(getControl(controls, p));
+    const breadcrumbs = getBreadcrumbsForSubmission(controls, p);
+    const submissionField = getSubmissionField(submission, survey, p);
+    if (!submissionField) {
+      return;
+    }
+
+    const key = breadcrumbs.join('.');
+    const r = Object.assign(control, {
+      breadcrumbs,
+      key,
+      number: p.map((value) => value + 1),
+      position: p,
+      value: submissionField.value,
+      meta: submissionField.meta,
+    });
+    res.push(r);
   });
   return res;
 };

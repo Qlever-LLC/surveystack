@@ -35,7 +35,6 @@ export default {
       location: null,
       gps: null,
       geolocationID: null,
-      mapCenter: null,
       usingGPS: true,
       marker: null,
       ctrl: null,
@@ -103,6 +102,10 @@ export default {
         marker: false, // Do not use the default marker style
       });
 
+      geocoder.on('result', () => {
+        this.usingGPS = false;
+      });
+
       // Add the geocoder above the map
       // document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
       document.getElementById(`map-question-geocoder-${this.index}`).appendChild(geocoder.onAdd(map));
@@ -115,7 +118,6 @@ export default {
 
       map.on('drag', () => {
         this.usingGPS = false;
-        this.mapCenter = map.getCenter();
       });
 
       this.ctrl.on('trackuserlocationstart', () => {
@@ -174,7 +176,7 @@ export default {
       }
 
       return {
-        location: this.usingGPS ? this.gps : this.geoJsonFromLngLat(this.mapCenter),
+        location: this.usingGPS ? this.gps : this.geoJsonFromLngLat(this.map.getCenter()),
         label: this.usingGPS ? 'Using GPS' : 'Using Map Center',
       };
     },

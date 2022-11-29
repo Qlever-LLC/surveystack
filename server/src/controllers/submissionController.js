@@ -1,6 +1,5 @@
-import _ from 'lodash';
+import _, { cloneDeep, isError } from 'lodash';
 
-import assert from 'assert';
 import { ObjectId } from 'mongodb';
 
 import boom from '@hapi/boom';
@@ -10,9 +9,10 @@ import { withTransaction, withSession } from '../db/helpers';
 import * as csvService from '../services/csv.service';
 import headerService from '../services/header.service';
 import * as farmOsService from '../services/farmos.service';
+import * as hyloService from '../services/hylo.service';
 import rolesService from '../services/roles.service';
 import { queryParam } from '../helpers';
-
+import { appendDatabaseOperationDurationToLoggingMessage } from '../middleware/logging';
 const col = 'submissions';
 const DEFAULT_LIMIT = 100000;
 const DEFAULT_SORT = { _id: -1 }; // reverse insert order
@@ -202,7 +202,7 @@ const createDataMetaStage = () => {
   };
 };
 
-const buildPipeline = async (req, res) => {
+export const buildPipeline = async (req, res) => {
   const pipeline = [];
 
   let match = {};
@@ -224,7 +224,7 @@ const buildPipeline = async (req, res) => {
     archivedMatch['meta.archived'] = true;
   }
   pipeline.push({ $match: archivedMatch });
-  
+
   if (req.query.creator) {
     pipeline.push({
       $match: {
@@ -261,20 +261,7 @@ const buildPipeline = async (req, res) => {
     const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
 
     if (hasAdminRights) {
-      pipeline.push({
-        $lookup: {
-          from: 'users',
-          let: { creatorId: '$meta.creator' },
-          pipeline: [
-            { $match: { $expr: { $eq: ['$_id', '$$creatorId'] } } },
-            { $project: { name: 1, email: 1, _id: 0 } },
-          ],
-          as: 'meta.creatorDetail',
-        },
-      });
-      pipeline.push({
-        $unwind: { path: '$meta.creatorDetail', preserveNullAndEmptyArrays: true },
-      });
+      addUserDetailsStage(pipeline);
     }
   }
 
@@ -350,10 +337,59 @@ const buildPipeline = async (req, res) => {
     });
   }
 
-  pipeline.push({
-    $sort: sort,
-  });
+  if (!queryParam(req.query.unsorted)) {
+    pipeline.push({
+      $sort: sort,
+    });
+  }
   return pipeline;
+};
+
+const addUserDetailsStage = (pipeline) => {
+  pipeline.push({
+    $lookup: {
+      from: 'users',
+      let: { creatorId: '$meta.creator' },
+      pipeline: [
+        { $match: { $expr: { $eq: ['$_id', '$$creatorId'] } } },
+        { $project: { name: 1, email: 1, _id: 0 } },
+      ],
+      as: 'meta.creatorDetail',
+    },
+  });
+  pipeline.push({
+    $unwind: { path: '$meta.creatorDetail', preserveNullAndEmptyArrays: true },
+  });
+
+  pipeline.push({
+    $lookup: {
+      from: 'users',
+      let: { proxyUserId: '$meta.proxyUserId' },
+      pipeline: [
+        { $match: { $expr: { $eq: ['$_id', '$$proxyUserId'] } } },
+        { $project: { name: 1, email: 1, _id: 0 } },
+      ],
+      as: 'meta.proxyUserDetail',
+    },
+  });
+  pipeline.push({
+    $unwind: { path: '$meta.proxyUserDetail', preserveNullAndEmptyArrays: true },
+  });
+
+  pipeline.push({
+    $lookup: {
+      from: 'users',
+      let: { resubmitterUserId: '$meta.resubmitter' },
+      pipeline: [
+        { $match: { $expr: { $eq: ['$_id', '$$resubmitterUserId'] } } },
+        { $project: { name: 1, email: 1, _id: 0 } },
+      ],
+      as: 'meta.resubmitterUserDetail',
+    },
+  });
+  pipeline.push({
+    $unwind: { path: '$meta.resubmitterUserDetail', preserveNullAndEmptyArrays: true },
+  });
 };
 
 const getSubmissionsPage = async (req, res) => {
@@ -399,7 +435,7 @@ const getSubmissionsPage = async (req, res) => {
 
   pipeline.push(...paginationStages);
 
-  const [entities] = await db.collection(col).aggregate(pipeline).toArray();
+  const [entities] = await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).toArray();
 
   if (!entities) {
     return res.send({
@@ -454,7 +490,12 @@ const getSubmissions = async (req, res) => {
     }
   }
 
-  const entities = await db.collection(col).aggregate(pipeline).toArray();
+  const databaseOperationStartTime = new Date();
+  const entities = await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).toArray();
+  appendDatabaseOperationDurationToLoggingMessage(
+    res,
+    Date.now() - databaseOperationStartTime.valueOf()
+  );
 
   return res.send(entities);
 };
@@ -494,18 +535,46 @@ const getSubmissionsCsv = async (req, res) => {
   addSkipToPipeline(pipeline, req.query.skip);
   addLimitToPipeline(pipeline, req.query.limit);
 
-  const entities = await db.collection(col).aggregate(pipeline).toArray();
-  const transformer = (entity) => ({
-    ...entity,
-    data: csvService.transformSubmissionQuestionTypes(
-      entity.data, 
-      { geoJSON: csvService.geojsonTransformer },
-    ),
-  });
-  const transformedEntities = entities.map(transformer);
+  const formatOptions = {
+    expandAllMatrices: queryParam(req.query.expandAllMatrices),
+    expandMatrix: _.isArray(req.query.expandMatrix)
+      ? req.query.expandMatrix
+      : _.isString(req.query.expandMatrix)
+      ? [req.query.expandMatrix]
+      : [],
+  };
+
+  const entities = await db.collection(col).aggregate(pipeline, { allowDiskUse: true }).toArray();
+  const transformer = (entity) => {
+    let data = csvService.transformSubmissionQuestionTypes(
+      entity.data,
+      {
+        geoJSON: csvService.geojsonTransformer,
+        file: csvService.fileTransformer,
+        image: csvService.fileTransformer,
+        matrix: csvService.matrixTransformer,
+      },
+      formatOptions
+    );
+
+    data = csvService.removeMetaFromQuestions(data);
+
+    const result = {
+      _id: entity._id,
+      data,
+    };
+
+    if (queryParam(req.query.showCsvMeta)) {
+      result.meta = entity.meta;
+    }
+
+    return result;
+  };
+  let transformedEntities = entities.map(transformer);
 
   const headers = await headerService.getHeaders(req.query.survey, transformedEntities, {
-    excludeDataMeta: !queryParam(req.query.showCsvDataMeta),
+    excludeDataMeta: false,
+    splitValueFieldFromQuestions: true,
   });
 
   const csv = csvService.createCsv(transformedEntities, headers);
@@ -539,20 +608,7 @@ const getSubmission = async (req, res) => {
     const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
 
     if (hasAdminRights) {
-      pipeline.push({
-        $lookup: {
-          from: 'users',
-          let: { creatorId: '$meta.creator' },
-          pipeline: [
-            { $match: { $expr: { $eq: ['$_id', '$$creatorId'] } } },
-            { $project: { name: 1, email: 1, _id: 0 } },
-          ],
-          as: 'meta.creatorDetail',
-        },
-      });
-      pipeline.push({
-        $unwind: { path: '$meta.creatorDetail', preserveNullAndEmptyArrays: true },
-      });
+      addUserDetailsStage(pipeline);
     }
   }
 
@@ -566,7 +622,6 @@ const getSubmission = async (req, res) => {
   pipeline.push({ $match: { _id: new ObjectId(id) } });
   const redactStage = createRedactStage(user, roles);
   pipeline.push(redactStage);
-
   const [entity] = await db.collection(col).aggregate(pipeline).toArray();
   if (!entity) {
     throw boom.notFound(`No entity found for id: ${id}`);
@@ -577,7 +632,7 @@ const getSubmission = async (req, res) => {
 
 const prepareCreateSubmissionEntity = async (submission, res) => {
   const entity = await sanitize(submission);
-  
+
   const survey = await db.collection('surveys').findOne({ _id: entity.meta.survey.id });
   if (!survey) {
     throw boom.notFound(`No survey found with id: ${entity.meta.survey.id}`);
@@ -585,6 +640,9 @@ const prepareCreateSubmissionEntity = async (submission, res) => {
 
   if (res.locals.auth.isAuthenticated) {
     entity.meta.creator = res.locals.auth.user._id;
+    if (res.locals.auth.proxyUserId) {
+      entity.meta.proxyUserId = res.locals.auth.proxyUserId;
+    }
   } else {
     entity.meta.creator = null;
     // set submission group to survey's group for now
@@ -596,12 +654,38 @@ const prepareCreateSubmissionEntity = async (submission, res) => {
   return { entity, survey };
 };
 
-const createSubmission = async(req, res) => {
-  const submissions = Array.isArray(req.body) ? req.body : [req.body];
+const handleApiCompose = async (submissionEntities, user) => {
+  submissionEntities = cloneDeep(submissionEntities);
 
-  const submissionEntities = await Promise.all(
-    submissions.map(submission => prepareCreateSubmissionEntity(submission, res))
-  );
+  // HOTFIX: do hylo first because farmos handler remove all apiCompose outputs from the submission
+  // TODO: solve this in a cleaner way. Create utiliti functions for apiCompose handlers
+  let hyloResults;
+  try {
+    hyloResults = await Promise.all(
+      submissionEntities.map(async ({ entity, prevEntity, survey }) => {
+        const results = await hyloService.handle({
+          submission: entity,
+          prevSubmission: prevEntity,
+          survey,
+          user,
+        });
+        // Save the results of the Hylo handler in the submission
+        const permanentResults = results.map((r) => r.permanent).filter(Boolean);
+        entity.meta.permanentResults = [
+          ...(Array.isArray(entity.meta.permanentResults) ? entity.meta.permanentResults : []),
+          ...permanentResults,
+        ];
+        return results;
+      })
+    );
+  } catch (error) {
+    console.log('error handling hylo', error);
+    throw {
+      message: `error submitting to hylo ${error}`,
+      hylo: error,
+      logs: error.logs || [],
+    };
+  }
 
   let farmOsResults;
   try {
@@ -610,7 +694,7 @@ const createSubmission = async(req, res) => {
         farmOsService.handle({
           submission: entity,
           survey,
-          user: res.locals.auth.user
+          user, //todo
         })
       )
     );
@@ -618,18 +702,43 @@ const createSubmission = async(req, res) => {
     // TODO what should we do if something internal fails?
     // need to let the user somehow know
     console.log('error handling farmos', error);
-    return res.status(503).send({
+    throw {
       message: `error submitting to farmos ${error}`,
       farmos: error.messages,
-    });
+      logs: error.logs || [],
+    };
   }
 
-  const submissionsToQSLs = submissionEntities
-    .map(({ entity, survey }) => {
-      const controls = survey.revisions[entity.meta.survey.version-1].controls;
-      return prepareSubmissionsToQSLs(controls, entity);
-    })
-    .flat();
+  return {
+    results: {
+      farmos: farmOsResults.flat(),
+      hylo: hyloResults.flat(),
+    },
+    entities: submissionEntities,
+  };
+};
+
+const createSubmission = async (req, res) => {
+  const submissions = Array.isArray(req.body) ? req.body : [req.body];
+
+  let submissionEntities = await Promise.all(
+    submissions.map((submission) => prepareCreateSubmissionEntity(submission, res))
+  );
+
+  let apiComposeResults = {};
+  try {
+    const composeResults = await handleApiCompose(submissionEntities, res.locals.auth.user);
+    apiComposeResults = composeResults.results;
+    submissionEntities = composeResults.entities;
+  } catch (errorObject) {
+    return res.status(503).send(errorObject);
+  }
+
+  const mapSubmissionToQSL = ({ entity, survey }) => {
+    const controls = survey.revisions[entity.meta.survey.version - 1].controls;
+    return prepareSubmissionsToQSLs(controls, entity);
+  };
+  const submissionsToQSLs = (await Promise.all(submissionEntities.map(mapSubmissionToQSL))).flat();
 
   const results = await withSession(mongoClient, async (session) => {
     try {
@@ -640,7 +749,7 @@ const createSubmission = async(req, res) => {
         ];
 
         const result = await db.collection(col).insertMany(submissionsToInsert);
-        
+
         if (submissionsToInsert.length !== result.insertedCount) {
           await session.abortTransaction();
           return;
@@ -659,81 +768,65 @@ const createSubmission = async(req, res) => {
 
   res.send({
     ...results,
-    farmos: farmOsResults.flat()
+    ...apiComposeResults,
   });
-}
+};
 
 // if submission contains question set library questions, return a submission subset for each question set library
-const prepareSubmissionsToQSLs = (controls, submission) => {
+const prepareSubmissionsToQSLs = async (controls, submission) => {
   const submissionsToQSLSurveys = [];
 
-  function createSubmissionsFromControl(control) {
+  async function createSubmissionsFromControl(control, submissionCopy) {
     // for each library root control which is not deleted
     if (control.isLibraryRoot && !control.options.redacted) {
       // create a copy of submission
-      let submissionCopy = JSON.parse(JSON.stringify(submission));
-      // remember submission id in original
-      submissionCopy.meta.original = new ObjectId(submissionCopy._id);
+      submissionCopy = JSON.parse(JSON.stringify(submissionCopy));
+      // remember submission source id in original
+      submissionCopy.meta.original = new ObjectId(submission._id);
       // set new id
       submissionCopy._id = new ObjectId();
-      // remember survey id in origin_id and set survey id to the qsl survey
-      submissionCopy.meta.survey.origin = new ObjectId(submissionCopy.meta.survey.id);
+      // remember source survey id in origin_id and set survey id to the qsl survey
+      submissionCopy.meta.survey.origin = new ObjectId(submission.meta.survey.id);
       submissionCopy.meta.survey.id = new ObjectId(control.libraryId);
       submissionCopy.meta.survey.version = control.libraryVersion; // must be version of the library survey, not the consuming survey
-      // remove all data with a name not in values array (except meta)
-      let dataNamesOfThisLibrary = [];
-      collectDataNamesOfGivenLibraryId(control, control.libraryId, dataNamesOfThisLibrary);
-      //remove libraryRoot container including meta child
+      // remove libraryRoot container including meta child
       submissionCopy.data = findVal(submissionCopy.data, control.name);
       delete submissionCopy.data['meta'];
-      //remove all data not in dataNamesOfThisLibrary
-      removePrivateData(submissionCopy.data, dataNamesOfThisLibrary);
 
       // do not return copy if no data is left
-      if(Object.keys(submissionCopy.data).length === 0) {
+      if (Object.keys(submissionCopy.data).length === 0) {
         return;
       }
 
       // TODO if qsl survey is not found, we are probably on an on-premise-system, so try to find the survey on the central surveystack system
 
+      //sanitize copy (e.g. convert string id's to object id
+      submissionCopy = await sanitize(submissionCopy);
       submissionsToQSLSurveys.push(submissionCopy);
-    } else if(control.children) {
-      // recursively go through the children
-      createSubmissionsFromControl(control.children);
+    }
+
+    // recursively go through the children
+    if (control.children) {
+      await Promise.all(
+        control.children.map(async (child) => {
+          await createSubmissionsFromControl(child, submissionCopy);
+        })
+      );
     }
   }
 
-  // for each component in survey.revisions[meta.survey.version]
-  controls.forEach(createSubmissionsFromControl);
+  // for each component in survey.revisions[meta.survey.version], create submission in parallel
+  await Promise.all(
+    controls.map(async (control) => {
+      await createSubmissionsFromControl(control, submission);
+    })
+  );
 
   return submissionsToQSLSurveys;
 };
 
-const collectDataNamesOfGivenLibraryId = (control, libraryId, collection) => {
-  if(control.libraryId && control.libraryId.toString()===libraryId.toString() && !control.isLibraryRoot) {
-    collection.push(control.name);
-  }
-  if(control.children) {
-    control.children.forEach(child => {
-      collectDataNamesOfGivenLibraryId(child, libraryId, collection);
-    })
-  }
-}
-
-const removePrivateData = (submissionData, dataNamesToInclude) => {
-  Object.keys(submissionData).forEach(key => {
-    if(key!='meta' &&  key!='value') {
-      if(dataNamesToInclude.indexOf(key)==-1) {
-        delete submissionData[key];
-      } else {
-        removePrivateData(submissionData[key], dataNamesToInclude);
-      }
-    }
-  });
-};
-
 const findVal = (obj, keyToFind) => {
-  if(!obj) {
+  if (!obj) {
     return false;
   }
   if (obj[keyToFind]) return obj[keyToFind];
@@ -745,130 +838,185 @@ const findVal = (obj, keyToFind) => {
     }
   }
   return false;
-}
+};
 
 const updateSubmission = async (req, res) => {
   const { id } = req.params;
-  const entity = await sanitize(req.body);
-
-  const existing = res.locals.existing;
-  const updatedRevision = existing.meta.revision + 1;
-
-  // re-insert existing submission with a new _id
-  existing._id = new ObjectId();
-  existing.meta.original = new ObjectId(id);
-  existing.meta.archived = true;
-  existing.meta.archivedReason = entity.meta.archivedReason || 'RESUBMIT';
-  await db.collection(col).insertOne(existing);
+  let newSubmission = await sanitize(req.body);
+  const oldSubmission = res.locals.existing;
 
   // update with upped revision and resubmitter
-  entity.meta.revision = updatedRevision;
-  entity.meta.resubmitter = new ObjectId(res.locals.auth.user._id);
+  newSubmission.meta.revision = oldSubmission.meta.revision + 1;
+  newSubmission.meta.resubmitter = new ObjectId(res.locals.auth.user._id);
 
-  const survey = await db.collection('surveys').findOne({ _id: entity.meta.survey.id });
+  const updateOperation = {
+    data: newSubmission.data,
+    'meta.group': newSubmission.meta.group,
+    'meta.revision': newSubmission.meta.revision,
+    'meta.resubmitter': newSubmission.meta.resubmitter,
+    'meta.dateModified': newSubmission.meta.dateModified,
+    'meta.dateSubmitted': newSubmission.meta.dateSubmitted,
+    'meta.specVersion': newSubmission.meta.specVersion,
+    // TODO: does meta.status need to be stored in the database?
+    'meta.status': newSubmission.meta.status,
+  };
+
+  // re-insert old submission version with a new _id
+  oldSubmission._id = new ObjectId();
+  oldSubmission.meta.original = new ObjectId(id);
+  oldSubmission.meta.archived = true;
+  oldSubmission.meta.archivedReason = newSubmission.meta.archivedReason || 'RESUBMIT';
+  await db.collection(col).insertOne(oldSubmission);
+
+  const survey = await db.collection('surveys').findOne({ _id: newSubmission.meta.survey.id });
   if (!survey) {
-    throw boom.notFound(`No survey found with id: ${entity.meta.survey.id}`);
+    throw boom.notFound(`No survey found with id: ${newSubmission.meta.survey.id}`);
   }
 
-  const farmosResults = [];
+  let apiComposeResults = {};
+  const creator = await db.collection('users').findOne({ _id: newSubmission.meta.creator });
   try {
-    // re-run with original creator user
-    const creator = await db.collection('users').findOne({ _id: entity.meta.creator });
-    const results = await farmOsService.handle({submission: entity, survey, user: creator });
-    farmosResults.push(...results);
-    // could contain errors, need to pass these on to the user
-  } catch (error) {
-    // TODO what should we do if something internal fails?
-    // need to let the user somehow know
-    console.log('error handling farmos', error);
-    return res.status(503).send({
-      message: `error submitting to farmos ${error}`,
-      farmos: error.messages,
-    });
+    const composeResults = await handleApiCompose(
+      [{ entity: newSubmission, prevEntity: oldSubmission, survey }],
+      creator
+    );
+    apiComposeResults = composeResults.results;
+    newSubmission = composeResults.entities[0].entity;
+  } catch (errorObject) {
+    return res.status(503).send(errorObject);
   }
+
+  // const farmosResults = [];
+  // try {
+  //   // re-run with original creator user
+  //   const creator = await db.collection('users').findOne({ _id: newSubmission.meta.creator });
+  //   const results = await farmOsService.handle({
+  //     submission: newSubmission,
+  //     survey,
+  //     user: creator,
+  //   });
+  //   farmosResults.push(...results);
+  //   // could contain errors, need to pass these on to the user
+  // } catch (error) {
+  //   // TODO what should we do if something internal fails?
+  //   // need to let the user somehow know
+  //   console.log('error handling farmos', error);
+  //   return res.status(503).send({
+  //     message: `error submitting to farmos ${error}`,
+  //     farmos: error.messages,
+  //   });
+  // }
 
   const updated = await db.collection(col).findOneAndUpdate(
     { _id: new ObjectId(id) },
-    { $set: entity },
+    { $set: updateOperation },
     {
       returnOriginal: false,
     }
   );
-  updated.value.farmos = farmosResults;
 
-  await updateSubmissionToLibrarySurveys(survey, entity);
+  await updateSubmissionToLibrarySurveys(survey, newSubmission);
 
-  return res.send(updated.value);
+  return res.send({ ...updated.value, ...apiComposeResults });
 };
 
 const updateSubmissionToLibrarySurveys = async (survey, submission) => {
   // find library submissions to be updated
-  //const librarySubmissions =  await db.collection('submissions').find({'meta.original':submission._id }).toArray();
-  const librarySubmissions =  await db.collection('submissions').find({'meta.survey.origin':survey._id }).toArray();
+  const librarySubmissions = await db
+    .collection('submissions')
+    .find({ 'meta.original': submission._id })
+    .toArray();
 
   // archive current library submissions
-  await librarySubmissions.forEach(function(librarySubmission) {
-    // re-insert existing submissions with a new _id
-    //librarySubmission.meta.original = new ObjectId(librarySubmission._id);
-    //librarySubmission._id = new ObjectId();
+  await librarySubmissions.forEach(function (librarySubmission) {
+    // re-insert existing submissions as archived
+    // in contrast to the general archiving function, here we don't move the old id to the new submission and we don't
+    // change the origin as this is occupied by the root submission origin, otherwise, the find above would not find
+    // this for a further resubmit
     librarySubmission.meta.archived = true;
     librarySubmission.meta.archivedReason = submission.meta.archivedReason || 'RESUBMIT';
-    db.collection(col).replaceOne({"_id":librarySubmission._id}, librarySubmission);
+    db.collection(col).replaceOne({ _id: librarySubmission._id }, librarySubmission);
   });
-  // create new library submissions
-  let controls = survey.revisions[submission.meta.survey.version-1].controls;
-  const QSLSubmissions = prepareSubmissionsToQSLs(controls, submission);
+  // create new library submissions with a new id
+  let controls = survey.revisions[submission.meta.survey.version - 1].controls;
+  const QSLSubmissions = await prepareSubmissionsToQSLs(controls, submission);
   if (QSLSubmissions.length !== 0) {
     await db.collection(col).insertMany(QSLSubmissions);
   }
-}
+};
 
 const bulkReassignSubmissions = async (req, res) => {
   const { group, creator, ids } = req.body;
-  const submissions = res.locals.existing;
+  let submissions = res.locals.existing;
 
-  const surveyIds = [ ...new Set(submissions.map(submission => submission.meta.survey.id.toString())) ];
-  const surveys = await db.collection('surveys').find({
-    _id: { $in: surveyIds.map(ObjectId) }
-  }).toArray();
+  const surveyIds = [
+    ...new Set(submissions.map((submission) => submission.meta.survey.id.toString())),
+  ];
+  const surveys = await db
+    .collection('surveys')
+    .find({
+      _id: { $in: surveyIds.map(ObjectId) },
+    })
+    .toArray();
   if (surveys.length !== surveyIds.length) {
     throw boom.notFound(`Survey referenced by submission not found.`);
   }
 
-  let farmOsResults;
+  let apiComposeResults = {};
   try {
-    const farmOsResponses = await Promise.all(submissions.map(
-      submission => farmOsService.handle({
-        submission,
-        survey: surveys.find(({ _id }) => submission.meta.survey.id.toString() === _id.toString()),
-        user: res.locals.auth.user
-      })
-    ));
-    farmOsResults = farmOsResponses.flat();
-  } catch (error) {
-    console.log('error handling farmos', error);
-    return res.status(503).send({
-      message: `Error submitting to farmos ${error}`,
-      farmos: error.messages,
-    });
+    const submissionsWithSurveys = submissions.map((submission) => ({
+      entity: submission,
+      prevEntity: submission,
+      survey: surveys.find(({ _id }) => submission.meta.survey.id.toString() === _id.toString()),
+    }));
+    const composeResults = await handleApiCompose(submissionsWithSurveys, res.locals.auth.user);
+    apiComposeResults = composeResults.results;
+    submissions = composeResults.entities.map((s) => s.entity);
+  } catch (errorObject) {
+    if (isError(errorObject)) {
+      throw errorObject;
+    }
+    return res.status(503).send(errorObject);
   }
+
+  // let farmOsResults;
+  // try {
+  //   const farmOsResponses = await Promise.all(
+  //     submissions.map((submission) =>
+  //       farmOsService.handle({
+  //         submission,
+  // survey: surveys.find(
+  //   ({ _id }) => submission.meta.survey.id.toString() === _id.toString()
+  // ),
+  //         user: res.locals.auth.user,
+  //       })
+  //     )
+  //   );
+  //   farmOsResults = farmOsResponses.flat();
+  // } catch (error) {
+  //   console.log('error handling farmos', error);
+  //   return res.status(503).send({
+  //     message: `Error submitting to farmos ${error}`,
+  //     farmos: error.messages,
+  //   });
+  // }
 
   const results = await withSession(mongoClient, async (session) => {
     try {
       return await withTransaction(session, async () => {
-        const submissionsToArchive = submissions.map(submission => ({
+        const submissionsToArchive = submissions.map((submission) => ({
           ...submission,
           _id: new ObjectId(),
           meta: {
             ...submission.meta,
-            original: new ObjectId(submission.id),
+            original: new ObjectId(submission._id),
             archived: true,
             archivedReason: 'REASSIGN',
           },
         }));
 
         const insertResult = await db.collection(col).insertMany(submissionsToArchive);
-        
+
         if (submissionsToArchive.length !== insertResult.insertedCount) {
           await session.abortTransaction();
           return;
@@ -883,10 +1031,10 @@ const bulkReassignSubmissions = async (req, res) => {
           {
             $set: {
               ...(group ? { 'meta.group.id': groupId, 'meta.group.path': groupPath } : {}),
-              ...(creator ? { 'meta.group.creator': ObjectId(creator) } : {}),
+              ...(creator ? { 'meta.creator': ObjectId(creator) } : {}),
             },
             $inc: { 'meta.revision': 1 },
-          },
+          }
         );
 
         if (submissions.length !== updateResult.modifiedCount) {
@@ -907,7 +1055,7 @@ const bulkReassignSubmissions = async (req, res) => {
 
   res.send({
     result: results.result,
-    farmos: farmOsResults.flat(),
+    ...apiComposeResults,
   });
 };
 
@@ -915,7 +1063,7 @@ const reassignSubmission = async (req, res) => {
   const { id } = req.params;
   const { body } = req;
 
-  const existing = res.locals.existing;
+  let existing = res.locals.existing;
   const updatedRevision = existing.meta.revision + 1;
 
   const survey = await db.collection('surveys').findOne({ _id: existing.meta.survey.id });
@@ -930,22 +1078,38 @@ const reassignSubmission = async (req, res) => {
   existing.meta.archivedReason = 'REASSIGN';
   await db.collection(col).insertOne(existing);
 
-  const farmosResults = [];
+  let apiComposeResults = {};
   try {
-    // TODO: should we use the currently logged in user or the submission's user?
-    // probably the submission's user (for instance if submission is re-assigned with a different user)
-    const results = await farmOsService.handle({ submission: existing, survey, user: res.locals.auth.user });
-    farmosResults.push(...results);
-    // could contain errors, need to pass these on to the user
-  } catch (error) {
-    // TODO what should we do if something internal fails?
-    // need to let the user somehow know
-    console.log('error handling farmos', error);
-    return res.status(503).send({
-      message: `error submitting to farmos ${error}`,
-      farmos: error.messages,
-    });
+    const composeResults = await handleApiCompose(
+      [{ entity: existing, prevEntity: existing, survey }],
+      res.locals.auth.user
+    );
+    apiComposeResults = composeResults.results;
+    existing = composeResults.entities[0].entity;
+  } catch (errorObject) {
+    return res.status(503).send(errorObject);
   }
+
+  // const farmosResults = [];
+  // try {
+  //   // TODO: should we use the currently logged in user or the submission's user?
+  //   // probably the submission's user (for instance if submission is re-assigned with a different user)
+  //   const results = await farmOsService.handle({
+  //     submission: existing,
+  //     survey,
+  //     user: res.locals.auth.user,
+  //   });
+  //   farmosResults.push(...results);
+  //   // could contain errors, need to pass these on to the user
+  // } catch (error) {
+  //   // TODO what should we do if something internal fails?
+  //   // need to let the user somehow know
+  //   console.log('error handling farmos', error);
+  //   return res.status(503).send({
+  //     message: `error submitting to farmos ${error}`,
+  //     farmos: error.messages,
+  //   });
+  // }
 
   const updateOperation = { 'meta.revision': updatedRevision };
   if (body.group) {
@@ -959,24 +1123,28 @@ const reassignSubmission = async (req, res) => {
     updateOperation['meta.creator'] = ObjectId(body.creator);
   }
 
-  const updated = await db.collection(col).findOneAndUpdate(
-    { _id: new ObjectId(id) },
-    { $set: updateOperation },
-    { returnOriginal: false }
-  );
-  updated.value.farmos = farmosResults;
-  return res.send(updated.value);
+  const updated = await db
+    .collection(col)
+    .findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set: updateOperation },
+      { returnOriginal: false }
+    );
+  return res.send({ ...updated.value, ...apiComposeResults });
 };
 
-const archiveSubmission = async (req, res) => {
+const archiveSubmissions = async (req, res) => {
   const { id } = req.params;
+  let { ids } = req.body;
+  if (!ids) {
+    ids = [id];
+  }
+
   const { reason } = req.query;
   let archived = true;
 
-  if (req.query.set) {
-    if (req.query.set === 'false' || req.query.set === '0') {
-      archived = false;
-    }
+  if (req.query.set === 'false' || req.query.set === '0') {
+    archived = false;
   }
 
   const update = { $set: { 'meta.archived': archived } };
@@ -986,30 +1154,38 @@ const archiveSubmission = async (req, res) => {
     update['$unset'] = { 'meta.archivedReason': '' };
   }
 
-  const updated = await db.collection(col).findOneAndUpdate({ _id: new ObjectId(id) }, update, {
-    returnOriginal: false,
-  });
+  const idSelector = { $in: ids.map(ObjectId) };
+
+  await db.collection(col).updateMany({ _id: idSelector }, update);
 
   // archive / unarchive library submissions as well
-  const updatedLibrarySubmissions = await db.collection(col).findOneAndUpdate({ 'meta.original': new ObjectId(id) }, update, {
-    returnOriginal: false,
-  });
+  await db.collection(col).updateMany({ 'meta.original': idSelector }, update);
 
-  return res.send(updated);
+  return res.send({ message: 'OK' });
 };
 
-const deleteSubmission = async (req, res) => {
+const deleteSubmissions = async (req, res) => {
   const { id } = req.params;
-
-  try {
-    let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
-    assert.equal(1, r.deletedCount);
-    // delete library submissions as well
-    let rqsl = await db.collection(col).deleteOne({ 'meta.original': new ObjectId(id) });
-    return res.send({ message: 'OK' });
-  } catch (error) {
-    throw boom.internal(`deleteSubmission: unknown error`);
+  let { ids } = req.body;
+  if (!ids) {
+    ids = [id];
   }
+
+  const idSelector = { $in: ids.map(ObjectId) };
+  const submissionQuery = { _id: idSelector };
+  // TODO use transactions instead of this pre-check
+  let result = await db.collection(col).countDocuments(submissionQuery);
+  if (ids.length !== result) {
+    throw boom.internal('abort because of ambiguous match results', result);
+  }
+
+  await db.collection(col).deleteMany(submissionQuery);
+
+  // delete library submissions as well
+
+  await db.collection(col).deleteMany({ 'meta.original': idSelector });
+
+  return res.send({ message: 'OK' });
 };
 
 export default {
@@ -1021,6 +1197,7 @@ export default {
   updateSubmission,
   reassignSubmission,
   bulkReassignSubmissions,
-  archiveSubmission,
-  deleteSubmission,
+  archiveSubmissions,
+  deleteSubmissions,
+  prepareSubmissionsToQSLs,
 };

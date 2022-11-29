@@ -5,22 +5,20 @@
       maxWidth="50rem"
       labelConfirm="Archive"
       @cancel="showArchiveModal = false"
-      @confirm="(reason) => archiveSubmission(selected[0], reason)"
+      @confirm="(reason) => archiveSubmissions(selected, reason)"
     >
       <template v-slot:title>Confirm Submission Archiving</template>
     </app-submission-archive-dialog>
 
-    <app-dialog v-model="showDeleteModal" @cancel="showDeleteModal = false" @confirm="deleteSubmission(selected[0])">
+    <app-dialog v-model="showDeleteModal" @cancel="showDeleteModal = false" @confirm="deleteSubmissions(selected)">
       <template v-slot:title>Confirm deletion</template>
-      <template>
-        Are you sure you want to delete this submission? This can not be undone.
-      </template>
+      <template> Are you sure you want to delete this submission? This can not be undone. </template>
     </app-dialog>
 
     <app-dialog
       v-model="reassignment.showModal"
       @cancel="reassignment.showModal = false"
-      @confirm="reassign(selected[0])"
+      @confirm="reassign(selected)"
       labelConfirm="Reassign"
     >
       <template v-slot:title>Reassign Submission</template>
@@ -48,148 +46,106 @@
     </app-dialog>
 
     <v-container>
-      <div class="d-flex justify-end">
-        <v-btn v-if="survey" outlined color="secondary" :to="`/surveys/${survey}`">
-          <v-icon left>mdi-note-text-outline</v-icon>
-          View Survey
-        </v-btn>
-        <v-btn outlined color="secondary" class="ml-2" @click="startDraft(survey)">
-          <v-icon left>mdi-plus</v-icon>
-          New submission
-        </v-btn>
+      <div class="d-flex justify-space-between align-center my-5">
+        <h1 v-if="surveyEntity">{{ surveyEntity.name }}</h1>
+        <div>
+          <v-btn v-if="survey" outlined color="secondary" :to="`/surveys/${survey}`">
+            <v-icon left>mdi-note-text-outline</v-icon>
+            View Survey
+          </v-btn>
+          <v-btn
+            outlined
+            color="secondary"
+            class="ml-2"
+            :disabled="surveyEntity && surveyEntity.meta.isLibrary"
+            @click="startDraft(survey)"
+          >
+            <v-icon left>mdi-plus</v-icon>
+            New submission
+          </v-btn>
+        </div>
       </div>
-      <h1 v-if="surveyEntity">{{ surveyEntity.name }}</h1>
-
-      <app-submissions-filter-basic
-        v-if="!showAdvancedFilters && queryList"
-        :queryList="queryList"
-        @show-advanced="(ev) => (showAdvancedFilters = ev)"
-        :basicFilters="basicFilters"
-        @apply-basic-filters="applyBasicFilters"
-        @reset="reset"
-      />
-
-      <app-submissions-filter-advanced
-        v-if="showAdvancedFilters"
-        v-model="filter"
-        @show-advanced="(ev) => (showAdvancedFilters = ev)"
-        @apply-advanced-filters="fetchData"
-        @reset="reset"
-      />
-
-      <div class="d-flex justify-end">
-        <v-checkbox label="View archived only" v-model="filter.showArchived" dense hide-details />
-      </div>
-
-      <h4>API</h4>
-      <a class="body-2" :href="apiDownloadUrl" target="_blank">{{ apiDownloadUrl }}</a>
-
-      <div class="d-flex align-center justify-start mt-4">
-        <v-select
-          style="max-width: 5rem; display: inline-block"
-          label="Format"
-          class="mr-3"
-          dense
-          :items="apiDownloadFormats"
-          hide-details
-          v-model="apiDownloadFormat"
-        ></v-select>
-        <v-select
-          style="max-width: 7rem; display: inline-block"
-          label="Range"
-          class="mr-3"
-          dense
-          :items="apiDownloadRanges"
-          hide-details
-          v-model="apiDownloadRange"
-        ></v-select>
-        <v-btn @click="startDownload" color="primary"> <v-icon left>mdi-download</v-icon>Download </v-btn>
-      </div>
-
-      <v-card v-if="selected.length > 0" class="mt-4">
+      <v-expansion-panels class="mb-6">
+        <v-expansion-panel>
+          <v-expansion-panel-header expand-icon="mdi-menu-down"
+            ><span class="text-body-1">Filters</span>
+          </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <app-submissions-filter-basic
+              v-if="!showAdvancedFilters && queryList"
+              :queryList="queryList"
+              @show-advanced="(ev) => (showAdvancedFilters = ev)"
+              :basicFilters="basicFilters"
+              @apply-basic-filters="applyBasicFilters"
+              @reset="reset"
+            />
+            <app-submissions-filter-advanced
+              v-if="showAdvancedFilters"
+              v-model="filter"
+              @show-advanced="(ev) => (showAdvancedFilters = ev)"
+              @apply-advanced-filters="fetchData"
+              @reset="reset"
+            />
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
+      <v-card class="my-5 px-2">
+        <v-card-title class="d-flex justify-space-between align-center">
+          <div class="text-body-1">API</div>
+        </v-card-title>
         <v-card-text>
-          <div class="d-flex align-center">
-            <div>
-              <span class="subtitle-2">ACTIONS</span><br />{{ selected.length }}
-              {{ selected.length === 1 ? 'submission' : 'submissions' }} selected
-            </div>
-            <div class="ml-auto d-flex flex-column flex-sm-row" v-if="selected.length === 1">
-              <v-btn
-                v-if="selected[0]['meta.archived'] === 'true'"
-                :disabled="surveyEntity.meta.isLibrary"
-                color="error"
-                text
-                @click="showDeleteModal = true"
-              >
-                DELETE
-              </v-btn>
-              <v-btn
-                v-if="selected[0]['meta.archived'] === 'true'"
-                :disabled="surveyEntity.meta.isLibrary"
-                text
-                @click="archiveSubmission(selected[0], '', false)"
-              >
-                RESTORE
-              </v-btn>
-              <v-btn
-                v-if="selected[0]['meta.archived'] !== 'true'"
-                :disabled="surveyEntity.meta.isLibrary"
-                color="error"
-                text
-                @click="showArchiveModal = true"
-              >
-                ARCHIVE
-              </v-btn>
-              <v-btn
-                @click="reassignment.showModal = true"
-                :disabled="surveyEntity.meta.isLibrary"
-                text
-                color="secondary"
-                >REASSIGN</v-btn
-              >
-              <v-btn
-                v-if="selected[0]['meta.archived'] !== 'true'"
-                :disabled="surveyEntity.meta.isLibrary"
-                text
-                color="primary"
-                @click="resubmit(selected[0])"
-              >
-                RESUBMIT
-              </v-btn>
-            </div>
-          </div>
+          <a class="body-2" :href="apiDownloadUrl" target="_blank">{{ apiDownloadUrl }}</a>
+        </v-card-text>
+        <v-card-text>
+          <v-row>
+            <v-col md="2" sm="6">
+              <v-select
+                label="Format"
+                dense
+                :items="apiDownloadFormats"
+                hide-details
+                v-model="apiDownloadFormat"
+              /> </v-col
+            ><v-col md="2" sm="6">
+              <v-select label="Range" dense :items="apiDownloadRanges" hide-details v-model="apiDownloadRange" /></v-col
+            ><v-col v-if="apiDownloadFormat === 'csv'" md="5" sm="6">
+              <v-select
+                label="Matrix answers"
+                dense
+                :items="apiDownloadExpandAllMatricesOptions"
+                hide-details
+                v-model="apiDownloadExpandAllMatrices"
+              /> </v-col
+            ><v-col md="2" sm="6">
+              <v-btn @click="startDownload" color="primary"> <v-icon left>mdi-download</v-icon>Download </v-btn>
+            </v-col></v-row
+          >
+
+          <v-row class="mt-5" v-if="apiDownloadRange === 'page'">
+            <v-col sm="2">
+              <v-select
+                label="Page Size"
+                dense
+                :items="pageSizes"
+                hide-details
+                v-model="pageSize"
+                @change="changedPaginationSize"
+              />
+            </v-col>
+            <v-col cols="10">
+              <v-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
+            </v-col>
+            <v-col cols="1">
+              <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
+                {{ submissions.pagination.total }} total
+              </div>
+            </v-col>
+          </v-row>
         </v-card-text>
       </v-card>
     </v-container>
 
     <v-container>
-      <v-row class="mt-2">
-        <v-col cols="1">
-          <v-select
-            style="max-width: 5rem; display: inline-block"
-            label="Page Size"
-            dense
-            :items="pageSizes"
-            hide-details
-            v-model="pageSize"
-            @change="changedPaginationSize"
-          ></v-select>
-        </v-col>
-        <v-col cols="10">
-          <v-pagination
-            class="ml-0"
-            v-model="page"
-            :length="paginationTotalPages"
-            @input="changedPaginationPage"
-          ></v-pagination>
-        </v-col>
-        <v-col cols="1">
-          <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
-            {{ submissions.pagination.total }} total
-          </div>
-        </v-col>
-      </v-row>
-
       <v-tabs v-model="tab">
         <v-tab v-for="view in views" :key="view.tab">
           {{ view.tab }}
@@ -203,8 +159,17 @@
               :archived="filter.showArchived"
               :dataTableProps="dateTableProps"
               @onDataTablePropsChanged="onDataTablePropsChanged"
+              @excludeMetaChange="filter.showCsvMeta = $event"
+              :excludeMeta="!filter.showCsvMeta"
               :loading="loading"
               style="margin: 3px 2px"
+              :actionsAreDisabled="surveyEntity && surveyEntity.meta.isLibrary"
+              @showDeleteModal="showDeleteModal = true"
+              @archiveSubmissions="archiveSubmissions(selected, '', false)"
+              @showArchiveModal="showArchiveModal = true"
+              @reassignment="reassignment.showModal = true"
+              @resubmit="resubmit(selected[0])"
+              @showArchived="filter.showArchived = $event"
             />
           </v-tab-item>
           <v-tab-item>
@@ -226,15 +191,10 @@
             hide-details
             v-model="pageSize"
             @change="changedPaginationSize"
-          ></v-select>
+          />
         </v-col>
         <v-col cols="10">
-          <v-pagination
-            class="ml-0"
-            v-model="page"
-            :length="paginationTotalPages"
-            @input="changedPaginationPage"
-          ></v-pagination>
+          <v-pagination class="ml-0" v-model="page" :length="paginationTotalPages" @input="changedPaginationPage" />
         </v-col>
         <v-col cols="1">
           <div class="body-2 text--secondary mt-1 d-flex align-center justify-end" style="height: 100%">
@@ -256,7 +216,6 @@
  ... it's ok for now but working with the real JSON object would make more sense
 */
 import api from '@/services/api.service';
-import { flattenSubmission } from '@/utils/submissions';
 import appSubmissionsFilterBasic from '@/components/submissions/SubmissionFilterBasic.vue';
 import appSubmissionsFilterAdvanced from '@/components/submissions/SubmissionFilterAdvanced.vue';
 import appSubmissionsTableClientCsv from '@/components/submissions/SubmissionTableClientCsv.vue';
@@ -278,6 +237,7 @@ const createDefaultFilter = () => ({
   showArchived: false,
   showIrrelevant: false,
   showCsvDataMeta: false,
+  showCsvMeta: false,
   roles: '',
 });
 
@@ -288,6 +248,10 @@ const apiDownloadFormats = [
 const apiDownloadRanges = [
   { text: 'All data', value: 'all' },
   { text: 'Page only', value: 'page' },
+];
+const apiDownloadExpandAllMatricesOptions = [
+  { text: 'Add a row for each matrix answers', value: true },
+  { text: 'Keep matrix answers in a single cell', value: false },
 ];
 
 export default {
@@ -306,6 +270,8 @@ export default {
       apiDownloadFormats,
       apiDownloadRanges,
       apiDownloadRange: apiDownloadRanges[0].value,
+      apiDownloadExpandAllMatrices: true,
+      apiDownloadExpandAllMatricesOptions,
       showAdvancedFilters: false,
       tab: null,
       views: [
@@ -415,8 +381,7 @@ export default {
       return list;
     },
     paginationTotalPages() {
-      const r = Math.floor(this.submissions.pagination.total / this.submissions.pagination.limit) + 1;
-      return r;
+      return Math.ceil(this.submissions.pagination.total / this.submissions.pagination.limit);
     },
   },
   methods: {
@@ -425,6 +390,10 @@ export default {
       try {
         const { data: submissions } = await api.get(this.apiFetchRequest);
         this.submissions = submissions;
+        // turn back to the first page if it skipped all the submissions (can happen on filter update)
+        if (this.page !== 1 && this.submissions.pagination.total <= this.submissions.pagination.skip) {
+          this.changedPaginationPage(1);
+        }
       } catch (e) {
         console.log('something went wrong:', e);
       } finally {
@@ -448,6 +417,12 @@ export default {
         { key: 'showIrrelevant', value: this.filter.showIrrelevant, include: this.filter.showIrrelevant },
         { key: 'showArchived', value: this.filter.showArchived, include: this.filter.showArchived },
         { key: 'showCsvDataMeta', value: this.filter.showCsvDataMeta, include: this.filter.showCsvDataMeta },
+        { key: 'showCsvMeta', value: this.filter.showCsvMeta, include: this.filter.showCsvMeta },
+        {
+          key: 'expandAllMatrices',
+          value: this.apiDownloadExpandAllMatrices,
+          include: this.apiDownloadFormat === 'csv',
+        },
         {
           key: 'roles',
           value: this.filter.roles,
@@ -457,21 +432,21 @@ export default {
 
       return params;
     },
-    async deleteSubmission(submission) {
+    async deleteSubmissions(submissions) {
       this.showDeleteModal = false;
       try {
-        await api.delete(`/submissions/${submission._id}`);
+        const ids = submissions.map((s) => s._id);
+        await api.post('/submissions/bulk-delete', { ids });
         this.selected = [];
         this.fetchData();
       } catch (err) {
         this.$store.dispatch('feedback/add', err.response.data.message);
       }
     },
-    async archiveSubmission(submission, reason, value = true) {
+    async archiveSubmissions(submissions, reason, value = true) {
       try {
-        const { data: archived } = await api.post(
-          `/submissions/${submission._id}/archive?set=${value}&reason=${reason}`
-        );
+        const ids = submissions.map((s) => s._id);
+        await api.post(`/submissions/bulk-archive?set=${value}&reason=${reason}`, { ids });
         this.selected = [];
         this.fetchData();
       } catch (err) {
@@ -506,11 +481,12 @@ export default {
       await this.$store.dispatch('submissions/fetchRemoteSubmission', submission._id);
       this.$router.push(`/submissions/drafts/${submission._id}`);
     },
-    async reassign(submission) {
-      console.log(`reassigning submission id ${submission._id}`);
+    async reassign(submissions) {
       this.reassignment.showModal = false;
+      const ids = submissions.map((s) => s._id);
       try {
-        await api.post(`/submissions/${submission._id}/reassign`, {
+        await api.post(`/submissions/bulk-reassign`, {
+          ids,
           group: this.reassignment.group,
           creator: this.reassignment.user,
         });
@@ -576,12 +552,12 @@ export default {
   },
   watch: {
     // eslint-disable-next-line func-names
-    'filter.showArchived': function() {
+    'filter.showArchived': function () {
       this.selected = [];
       this.fetchData();
     },
     // eslint-disable-next-line func-names
-    'reassignment.group': function(val) {
+    'reassignment.group': function (val) {
       this.reassignment.user = null;
 
       if (!val) {
@@ -616,5 +592,9 @@ ul {
   padding-left: 1em;
   line-height: 1.5em;
   list-style-type: dot;
+}
+
+>>> .v-window {
+  overflow: unset;
 }
 </style>

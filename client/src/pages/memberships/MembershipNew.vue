@@ -3,12 +3,31 @@
     <span class="text--secondary overline">{{ entity._id }}</span>
     <h2>Invite people to '{{ groupDetail.name }}'</h2>
     <v-card class="pa-4 mb-4">
-      <v-form class="mt-3" @keydown.enter.prevent="submit">
+      <v-form ref="form" class="mt-3" @keydown.enter.prevent="submit">
         <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role" outlined></v-select>
 
-        <v-text-field class="mt-3" v-model="entity.meta.invitationEmail" label="Email" outlined />
+        <v-text-field
+          class="mt-3"
+          v-model="entity.meta.invitationEmail"
+          label="Email"
+          outlined
+          :rules="emailRules"
+          validate-on-blur
+          hint="Choose an email address you will not lose access to.  Changing an email address later may cause some integrations to not work."
+        />
 
-        <v-radio-group v-model="sendEmail" name="sendEmail">
+        <v-text-field
+          class="mt-3"
+          v-model="entity.meta.invitationName"
+          outlined
+          hint="Default name for newly registered users"
+        >
+          <template v-slot:label>
+            <div>Name <small>(optional)</small></div>
+          </template>
+        </v-text-field>
+
+        <v-radio-group v-model="sendEmail" name="sendEmail" :disabled="invitationMethod === INVITATION_METHODS.ADD">
           <v-radio label="Send an invitation email" value="SEND_NOW">
             <template v-slot:label>
               <div>
@@ -29,27 +48,57 @@
 
         <div class="d-flex mt-2 justify-end">
           <v-btn text @click="cancel">Cancel</v-btn>
-          <v-btn color="primary" @click="submit" :disabled="!submittable">Submit</v-btn>
+
+          <btn-dropdown
+            :label="invitationMethod === INVITATION_METHODS.INVITE ? 'Invite Member' : 'Add Member'"
+            :show-drop-down="true"
+            :disabled="!submittable"
+            :loading="isSubmitting"
+            @click="submit"
+            color="primary"
+            elevation="0"
+            top
+            left
+          >
+            <v-list class="pa-0 mx-auto" max-width="280">
+              <v-list-item-group v-model="invitationMethod">
+                <v-list-item two-line :value="INVITATION_METHODS.INVITE">
+                  <v-list-item-content>
+                    <v-list-item-title>Invite Member</v-list-item-title>
+                    <v-list-item-content class="multiline-subtitle">
+                      Send them an email to agree to join your group. They only join once they click the "Join" link in
+                      the email.
+                    </v-list-item-content>
+                  </v-list-item-content>
+                </v-list-item>
+
+                <v-list-item three-line :value="INVITATION_METHODS.ADD">
+                  <v-list-item-content>
+                    <v-list-item-title>Add Member</v-list-item-title>
+                    <v-list-item-content class="multiline-subtitle">
+                      The member joins immediately. An email is still sent informing them they are joined. This is
+                      useful when using "Call for Submissions" to send this member survey requests without waiting for
+                      them to check their email.
+                    </v-list-item-content>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list-item-group>
+            </v-list>
+          </btn-dropdown>
         </div>
       </v-form>
     </v-card>
 
     <v-dialog v-model="dialogCreateUser" max-width="500">
       <v-card class="">
-        <v-card-title>
-          User does not exist yet
-        </v-card-title>
+        <v-card-title> User does not exist yet </v-card-title>
         <v-card-text class="mt-4">
           Do you want to proceed to create a new user with email {{ this.entity.meta.invitationEmail }}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click.stop="dialogCreateUser = false">
-            Cancel
-          </v-btn>
-          <v-btn text color="red" @click.stop="proceedToUserCreation">
-            Proceed
-          </v-btn>
+          <v-btn text @click.stop="dialogCreateUser = false"> Cancel </v-btn>
+          <v-btn text color="red" @click.stop="proceedToUserCreation"> Proceed </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -60,8 +109,13 @@
 import ObjectId from 'bson-objectid';
 import moment from 'moment';
 import api from '@/services/api.service';
+import EmailValidator from 'email-validator';
 
 import { uuid } from '@/utils/memberships';
+import BtnDropdown from '@/components/ui/BtnDropdown';
+
+// LocalStorage key for saving the preferred login method
+const LS_MEMBER_INVITATION_METHOD = 'last-used-invitation-method-on-new-member-page';
 
 const availableRoles = [
   {
@@ -75,7 +129,12 @@ const availableRoles = [
 ];
 
 export default {
+  components: { BtnDropdown },
   data() {
+    const INVITATION_METHODS = {
+      INVITE: 'invite',
+      ADD: 'add',
+    };
     return {
       availableRoles,
       entity: {
@@ -90,12 +149,19 @@ export default {
           dateActivated: null,
           notes: '',
           invitationEmail: null,
+          invitationName: null,
           invitationCode: uuid(),
         },
       },
       groupDetail: { name: '', path: '' },
       dialogCreateUser: false,
       sendEmail: 'SEND_NOW',
+      INVITATION_METHODS,
+      invitationMethod: Object.values(INVITATION_METHODS).includes(localStorage[LS_MEMBER_INVITATION_METHOD])
+        ? localStorage[LS_MEMBER_INVITATION_METHOD]
+        : INVITATION_METHODS.INVITE,
+      isSubmitting: false,
+      emailRules: [(v) => !!v || 'E-mail is required', (v) => EmailValidator.validate(v) || 'E-mail must be valid'],
     };
   },
   methods: {
@@ -106,10 +172,17 @@ export default {
       this.entity.content = code;
     },
     async submit() {
+      if (!this.$refs.form.validate()) {
+        return;
+      }
       const data = this.entity;
-      const url = `/memberships?sendEmail=${this.sendEmail}`;
+      const url =
+        this.invitationMethod === this.INVITATION_METHODS.INVITE
+          ? `/memberships?sendEmail=${this.sendEmail}`
+          : `/memberships/confirmed`;
 
       try {
+        this.isSubmitting = true;
         await api.post(url, data);
         this.$router.back();
       } catch (err) {
@@ -118,6 +191,8 @@ export default {
           this.dialogCreateUser = true;
         }
         this.$store.dispatch('feedback/add', err.response.data.message);
+      } finally {
+        this.isSubmitting = false;
       }
     },
     proceedToUserCreation() {
@@ -134,6 +209,11 @@ export default {
   computed: {
     submittable() {
       return true;
+    },
+  },
+  watch: {
+    invitationMethod(newValue) {
+      localStorage[LS_MEMBER_INVITATION_METHOD] = newValue;
     },
   },
   async created() {
@@ -155,3 +235,12 @@ export default {
   },
 };
 </script>
+
+<style scoped lang="scss">
+.multiline-subtitle {
+  font-size: 0.875rem;
+  color: rgba(0, 0, 0, 0.6);
+  padding: 0;
+  line-height: 1.3;
+}
+</style>

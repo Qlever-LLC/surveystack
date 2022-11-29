@@ -1,5 +1,4 @@
-import dotenv from 'dotenv-defaults';
-dotenv.config();
+import dotenv from 'dotenv-defaults/config';
 
 import express from 'express';
 import expressStaticGzip from 'express-static-gzip';
@@ -11,12 +10,15 @@ import { connectDatabase, db } from './db';
 import { initAdmins } from './services/admin.service';
 import { getRoles } from './services/roles.service';
 import errorHandlers from './handlers/errorHandlers';
+import { initLogging } from './middleware/logging';
 
 import apiRoutes from './routes/api';
 import debugRoutes from './routes/debug';
 
 import resources from './controllers/resources';
-import { cookieOptions } from './constants';
+import { createCookieOptions } from './constants';
+import { toggleMiddleware } from './services/featureToggle.service';
+import { ObjectId } from 'mongodb';
 
 const subdomainRedirect = {
   rfc: 'bionutrient',
@@ -27,6 +29,8 @@ const PATH_PREFIX = process.env.PATH_PREFIX;
 const app = express();
 const frontend = expressStaticGzip('../client/dist', { index: false });
 
+app.use(initLogging);
+
 /**
  * Hard-Redirect certain subdomains after migration.
  * To test this locally, build the client and serve it using the server.
@@ -35,9 +39,9 @@ const frontend = expressStaticGzip('../client/dist', { index: false });
 app.use(async (req, res, next) => {
   const { host } = req.headers;
   const protocol = req.protocol;
-  
+
   const subdomain = req.subdomains.join('.');
-  const key = Object.keys(subdomainRedirect).find(k => k === subdomain);
+  const key = Object.keys(subdomainRedirect).find((k) => k === subdomain);
   if (key) {
     const redirect = `${protocol}://${subdomainRedirect[key]}${host.substring(subdomain.length)}`;
     res.writeHead(301, { Location: redirect });
@@ -81,8 +85,8 @@ app.use(async (req, res, next) => {
     if (user) {
       isAuthenticated = true;
       isSuperAdmin = user.permissions.includes('super-admin');
-      res.cookie('user', user._id.toString(), cookieOptions);
-      res.cookie('token', user.token, cookieOptions);
+      res.cookie('user', user._id.toString(), createCookieOptions());
+      res.cookie('token', user.token, createCookieOptions());
     }
 
     if (user) {
@@ -90,15 +94,25 @@ app.use(async (req, res, next) => {
     }
   }
 
+  //read out an optional userid to delegate the request to
+  let delegateToUserId = req.headers['x-delegate-to'];
+  if (isAuthenticated && delegateToUserId) {
+    delegateToUserId = new ObjectId(delegateToUserId);
+  }
+
   res.locals.auth = {
     isAuthenticated,
     isSuperAdmin,
     user,
     roles,
+    delegateToUserId,
   };
 
   next();
 });
+
+// feature toggles (res.locals.auth.isToggleOn(toggleName))
+app.use(toggleMiddleware);
 
 // routes
 app.use(`${PATH_PREFIX}/api`, apiRoutes);

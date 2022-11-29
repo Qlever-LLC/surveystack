@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-0 px-0" style="width: 100%">
+  <div :class="className" style="width: 100%">
     <div v-if="control.type === 'page' && !insidePage">
       <div v-for="(child, i) in control.children" :key="i">
         <app-control :path="`${path}.${child.name}`" :control="child" :autoFocus="i === 0" insidePage />
@@ -51,6 +51,8 @@
           @next="!$store.getters['draft/hasRequiredUnanswered'] && $store.dispatch('draft/next')"
           :redacted="control.options && control.options.redacted"
           :required="$store.getters['draft/relevance'](path) && control.options && control.options.required"
+          :forceMobile="forceMobile"
+          :isInBuilder="isInBuilder"
         />
       </div>
     </div>
@@ -83,8 +85,22 @@ export default {
       type: Boolean,
       default: true,
     },
+    forceMobile: {
+      type: Boolean,
+      default: false,
+    },
+    isInBuilder: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
+    className() {
+      return {
+        'mx-0 px-0': true,
+        'compact-page': this.control.type === 'page' && this.control.options.compact,
+      };
+    },
     submission() {
       return this.$store.getters['draft/submission'];
     },
@@ -125,6 +141,39 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.compact-page {
+  .control {
+    margin: 0px !important;
+    padding: 0.5rem !important;
+    box-shadow: none !important;
+
+    .control-label-wrapper {
+      margin-bottom: 4px !important;
+      min-height: 16px;
+    }
+
+    .control-more-info {
+      margin-top: 4px !important;
+    }
+  }
+
+  & > div {
+    margin-bottom: 0.5rem;
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+
+    & > :first-child .control {
+      padding-top: 1rem !important;
+      margin-top: 8px !important;
+    }
+
+    & > :last-child .control {
+      padding-bottom: 24px !important;
+    }
+  }
+}
+</style>
 
 <style scoped>
 .control {

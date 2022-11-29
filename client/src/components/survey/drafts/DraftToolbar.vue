@@ -12,6 +12,8 @@
 
         <v-spacer />
 
+        <slot name="toolbar-actions"></slot>
+
         <v-btn icon v-if="showOverviewIcon" @click="$emit('showOverviewClicked')">
           <v-icon>mdi-format-list-numbered</v-icon>
         </v-btn>
@@ -29,10 +31,8 @@ export default {
 <style scoped>
 .number-chip {
   display: inline-flex;
-  /* border: 2px solid #ff5722; */
   border: 2px solid currentColor;
   background-color: white;
-  /* color: #ff5722; */
   border-radius: 2rem;
   line-height: 2rem;
   font-weight: bold;

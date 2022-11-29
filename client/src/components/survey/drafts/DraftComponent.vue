@@ -5,6 +5,7 @@
       v-if="showConfirmSubmission"
       v-model="showConfirmSubmission"
       :groupId="submission.meta.group.id"
+      :submitAsUser="submission.meta.submitAsUser"
       @submit="() => submitConfirmed(submission)"
       @set-group="setSubmissionGroup"
       :dateSubmitted="submission.meta.dateSubmitted"
@@ -12,13 +13,17 @@
 
     <!-- Toolbar with question number and overview button -->
     <app-draft-toolbar
-      :group="groupPath"
+      :groupPath="groupPath"
       :required="control && control.options && control.options.required"
       :anon="control && control.options && control.options.redacted"
       :showOverviewIcon="true"
       :questionNumber="$store.getters['draft/questionNumber']"
       @showOverviewClicked="showOverview = !showOverview"
-    />
+      v-if="builder"
+    >
+      <!-- forward all the slots -->
+      <slot v-for="(_, name) in $slots" :name="name" :slot="name" />
+    </app-draft-toolbar>
 
     <!-- Overview -->
     <div v-if="showOverview" class="draft-overview">
@@ -52,7 +57,13 @@
           <v-icon>mdi-arrow-down</v-icon>
         </v-btn>
       </v-fab-transition>
-      <app-control class="my-auto maxw-60 mx-auto" :path="path" :control="control" />
+      <app-control
+        class="pb-1"
+        :path="path"
+        :control="control"
+        :forceMobile="forceMobile"
+        :isInBuilder="builder"
+      />
     </div>
 
     <!-- Footer with next/prev buttons -->
@@ -73,6 +84,42 @@
       @submit="submit"
     />
   </div>
+  <div v-else-if="builder" class="d-flex flex-column justify-space-around" style="height: 100%">
+    <v-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded
+      ><div class="text-body-1 my-4 text-center">
+        Click on the
+        <v-btn fab dark x-small color="blue darken-2" style="pointer-events: none">
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
+        to add questions to your survey
+      </div>
+      <div class="text-body-1 my-4 text-center">
+        <v-btn dark small color="primary" class="my-1 mr-1" style="pointer-events: none">
+          <v-icon class="mr-1">mdi-content-save</v-icon>
+          Save
+        </v-btn>
+        to create a draft
+      </div>
+      <div class="text-body-1 my-4 text-center">
+        <v-btn dark small class="my-1 mr-1" color="green" style="pointer-events: none">
+          <v-icon class="mr-1">mdi-cloud-upload</v-icon>
+          Publish
+        </v-btn>
+        to allow users to submit to your survey
+      </div></v-sheet
+    >
+  </div>
+  <v-alert v-else border="left" prominent text type="error">
+    <v-row align="center">
+      <v-col class="grow">
+        This survey has no visible questions. Please check the "Relevance Expression" and "Hidden" settings in the
+        editor.
+      </v-col>
+      <v-col class="shrink">
+        <v-btn :to="`/surveys/${survey._id}`">back</v-btn>
+      </v-col>
+    </v-row>
+  </v-alert>
 </template>
 
 <script>
@@ -97,6 +144,7 @@ export default {
     submission: { type: Object },
     persist: { type: Boolean },
     builder: { type: Boolean },
+    forceMobile: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -271,7 +319,6 @@ export default {
 
 .draft-component-wrapper {
   height: 100%;
-  overflow: auto;
   display: flex;
   flex-direction: column;
   padding: 0px !important;

@@ -132,12 +132,14 @@ export async function fetchSubmissions(apiService, surveyId, path) {
     .filter((item) => item.value !== null);
 
   const explodeItem = (item) =>
-    item.value.map((v, i) => ({
-      id: `${item.id}__${i}`,
-      // stringify and remove wrapping quote characters so that strings are rendered without quotation marks
-      label: JSON.stringify(v).replace(/^"(.+(?="$))"$/, '$1'),
-      value: v,
-    }));
+    item.value
+      .map((v, i) => ({
+        id: `${item.id}__${i}`,
+        // stringify and remove wrapping quote characters so that strings are rendered without quotation marks
+        label: JSON.stringify(v).replace(/^"(.+(?="$))"$/, '$1'),
+        value: v,
+      }))
+      .filter((v) => v.value);
 
   const explodedItems = items
     .map((it) => (Array.isArray(it.value) ? explodeItem(it) : [it]))
@@ -219,7 +221,7 @@ export default {
         color: 'focus',
       };
 
-      if (this.$vuetify.breakpoint.smAndDown) {
+      if (this.$vuetify.breakpoint.smAndDown || this.forceMobile) {
         defaultProps.maxHeight = 130;
         defaultProps.top = true;
         defaultProps.closeOnContentClick = true;

@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 100%; max-height: 100%;">
+  <div style="height: 100%; max-height: 100%">
     <app-draft-component
       v-if="!loading && !hasError"
       :survey="survey"
@@ -10,9 +10,7 @@
     <div v-else-if="loading && !hasError" class="d-flex align-center justify-center" style="height: 100%">
       <v-progress-circular :size="50" color="primary" indeterminate />
     </div>
-    <div v-else-if="hasError" class="text-center mt-8">
-      Error Loading Draft Submission or Survey
-    </div>
+    <div v-else-if="hasError" class="text-center mt-8">Error Loading Draft Submission or Survey</div>
 
     <confirm-leave-dialog ref="confirmLeaveDialog" title="Confirm Exit Draft" v-if="submission && survey">
       Are you sure you want to exit this draft?
@@ -50,6 +48,13 @@
       "
       @close="onCloseResultDialog"
     />
+
+    <result-dialog
+      v-model="showApiComposeErrors"
+      :items="apiComposeErrors"
+      title="ApiCompose Errors"
+      @close="showApiComposeErrors = false"
+    />
   </div>
 </template>
 
@@ -64,6 +69,10 @@ import resultDialog from '@/components/ui/ResultDialog.vue';
 import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
 import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
+import { uploadFileResources } from '@/utils/resources';
+import { getApiComposeErros } from '@/utils/draft';
+import submissionUtils from '@/utils/submissions';
+import { defaultsDeep } from 'lodash';
 
 export default {
   mixins: [appMixin, resultMixin],
@@ -83,6 +92,8 @@ export default {
       isSubmitted: false,
       hasError: false,
       showResubmissionDialog: false,
+      apiComposeErrors: [],
+      showApiComposeErrors: false,
     };
   },
   methods: {
@@ -119,11 +130,21 @@ export default {
       window.parent.postMessage(message, '*');
     },
     async submit({ payload }) {
+      this.apiComposeErrors = getApiComposeErros(this.survey, payload);
+      if (this.apiComposeErrors.length > 0) {
+        this.showApiComposeErrors = true;
+        return;
+      }
+
       this.submitting = true;
       this.submission.meta.status = this.addReadyToSubmit(this.submission.meta.status || []);
 
+      // clear submitAsUser as this transient local information
+      delete this.submission.meta.submitAsUser;
+
       let message;
       try {
+        await uploadFileResources(this.$store, this.survey, payload, true);
         const response = payload.meta.dateSubmitted
           ? await api.put(`/submissions/${payload._id}`, payload)
           : await api.post('/submissions', payload);
@@ -174,8 +195,20 @@ export default {
     }
 
     this.survey = await this.$store.dispatch('surveys/fetchSurvey', this.submission.meta.survey.id);
+    const cleanSubmission = submissionUtils.createSubmissionFromSurvey({
+      survey: this.survey,
+      version: this.submission.meta.survey.version,
+    });
+    // initialize data in case anything is missing from data
+    defaultsDeep(this.submission.data, cleanSubmission.data);
+
     if (!this.survey) {
       console.log('Error: survey not found');
+      this.hasError = true;
+    }
+
+    if (this.submission.meta.submitAsUser) {
+      api.setHeader('x-delegate-to', this.submission.meta.submitAsUser._id);
     }
 
     this.loading = false;
@@ -184,6 +217,10 @@ export default {
     if (this.submission && this.survey && !this.isSubmitted) {
       this.$refs.confirmLeaveDialog.open(next);
       return;
+    }
+
+    if (this.submission.meta.submitAsUser) {
+      api.removeHeader('x-delegate-to');
     }
     next(true);
   },

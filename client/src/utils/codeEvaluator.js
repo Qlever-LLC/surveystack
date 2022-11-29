@@ -14,7 +14,7 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
     const control = node.model;
     const field = surveyStackUtils.getNested(submission, path);
 
-    // if control is hidden set relevance to false and skip further calculatiosn
+    // if control is hidden set relevance to false
     if (fname === 'relevance' && control.options.hidden) {
       return {
         path,
@@ -72,7 +72,7 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
     try {
       const parentPath = surveyStackUtils.getParentPath(item.path);
       const parentData = surveyStackUtils.getNested(submission, parentPath);
-      const result = surveyUtils.executeUnsafe({
+      const result = await surveyUtils.executeUnsafe({
         code: item.code,
         fname,
         submission,
@@ -80,6 +80,7 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
         parent: parentData,
         log: (msg) => console.log(msg),
       });
+
       item.result = result;
     } catch (error) {
       item.error = error;

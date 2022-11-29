@@ -8,30 +8,37 @@ import submissionController from '../controllers/submissionController';
 import userController from '../controllers/userController';
 import scriptController from '../controllers/scriptController';
 import rolesController from '../controllers/rolesController';
-import farmosController from '../controllers/farmosController';
+import * as farmosController from '../controllers/farmosController';
+import * as hyloController from '../controllers/hyloController';
+
 import membershipController from '../controllers/membershipController';
 import infoController from '../controllers/infoController';
 import resourceController from '../controllers/resourceController';
 
 import groupIntegrationController from '../controllers/groupIntegrationController';
 import membershipIntegrationController from '../controllers/membershipIntegrationController';
+import { isToggleOn, unleashProxyApp } from '../services/featureToggle.service';
 
 import cfsController from '../controllers/cfsController';
 
 import {
   assertAuthenticated,
+  assertIsSuperAdmin,
+  assertHasGroupAdminAccess,
   assertEntityExists,
   assertIdsMatch,
   assertNameNotEmpty,
   assertEntityRights,
-  assertHasSurveyParam,
   assertSubmissionRights,
   assertEntitiesExist,
   assertEntitiesRights,
+  assertHasIds,
   validateBulkReassignRequestBody,
+  checkFeatureToggledOn,
 } from '../handlers/assertions';
 
 import { catchErrors } from '../handlers/errorHandlers';
+import { handleDelegates } from '../handlers/headerHandlers';
 
 const router = Router();
 
@@ -52,11 +59,13 @@ router.post('/auth/register', catchErrors(authController.register));
 router.post('/auth/login', catchErrors(authController.login));
 router.post('/auth/send-password-reset-mail', catchErrors(authController.sendPasswordResetMail));
 router.post('/auth/reset-password', catchErrors(authController.resetPassword));
+router.post('/auth/request-magic-link', catchErrors(authController.requestMagicLink));
+router.get('/auth/enter-with-magic-link', catchErrors(authController.enterWithMagicLink));
+router.get('/auth/invalidate-magic-link', catchErrors(authController.invalidateMagicLink));
 
 /** Group */
 router.get('/groups', catchErrors(groupController.getGroups));
 router.get('/groups/by-path*', catchErrors(groupController.getGroupByPath));
-//router.get('/groups/:id/users', catchErrors(groupController.getUsers));
 router.get('/groups/:id', catchErrors(groupController.getGroupById));
 router.post('/groups', assertAuthenticated, catchErrors(groupController.createGroup));
 router.put(
@@ -70,7 +79,11 @@ router.put(
   catchErrors(groupController.updateGroup)
 );
 router.post('/groups/add-doc-link', assertAuthenticated, catchErrors(groupController.addDocLink));
-router.post('/groups/remove-doc-link', assertAuthenticated, catchErrors(groupController.removeDocLink));
+router.post(
+  '/groups/remove-doc-link',
+  assertAuthenticated,
+  catchErrors(groupController.removeDocLink)
+);
 // router.delete('/groups/:id', assertAuthenticated, catchErrors(groupController.deleteGroup));
 
 /** Submissions */
@@ -80,7 +93,12 @@ router.get('/submissions/csv', catchErrors(submissionController.getSubmissionsCs
 router.post(
   '/submissions/:id/archive',
   [assertAuthenticated, assertEntityExists({ collection: 'submissions' }), assertEntityRights],
-  catchErrors(submissionController.archiveSubmission)
+  catchErrors(submissionController.archiveSubmissions)
+);
+router.post(
+  '/submissions/bulk-archive',
+  [assertHasIds, assertEntitiesExist({ collection: 'submissions' }), assertEntitiesRights],
+  catchErrors(submissionController.archiveSubmissions)
 );
 router.post(
   '/submissions/:id/reassign',
@@ -94,7 +112,7 @@ router.post(
     assertEntitiesExist({ collection: 'submissions' }),
     assertEntitiesRights,
   ],
-  catchErrors(submissionController.bulkReassignSubmissions),
+  catchErrors(submissionController.bulkReassignSubmissions)
 );
 router.get(
   '/submissions/:id',
@@ -104,7 +122,7 @@ router.get(
 router.post(
   '/submissions',
   [assertSubmissionRights],
-  catchErrors(submissionController.createSubmission)
+  catchErrors(handleDelegates(submissionController.createSubmission))
 );
 router.put(
   '/submissions/:id',
@@ -120,15 +138,27 @@ router.put(
 router.delete(
   '/submissions/:id',
   [assertAuthenticated, assertEntityExists({ collection: 'submissions' }), assertEntityRights],
-  catchErrors(submissionController.deleteSubmission)
+  catchErrors(submissionController.deleteSubmissions)
+);
+router.post(
+  '/submissions/bulk-delete',
+  [assertHasIds, assertEntitiesExist({ collection: 'submissions' }), assertEntitiesRights],
+  catchErrors(submissionController.deleteSubmissions)
 );
 
 /** Surveys */
 router.get('/surveys', catchErrors(surveyController.getSurveys));
 router.get('/surveys/info', catchErrors(surveyController.getSurveyInfo));
 router.get('/surveys/list-page', catchErrors(surveyController.getSurveyListPage));
+router.get(
+  '/surveys/list-library-consumers',
+  [assertAuthenticated],
+  catchErrors(surveyController.getSurveyLibraryConsumers)
+);
 router.get('/surveys/page', catchErrors(surveyController.getSurveyPage));
+router.get('/surveys/pinned', catchErrors(surveyController.getPinned));
 router.get('/surveys/:id', catchErrors(surveyController.getSurvey));
+router.get('/surveys/check-for-updates/:id', catchErrors(surveyController.checkForLibraryUpdates));
 router.post(
   '/surveys',
   [assertAuthenticated, assertNameNotEmpty],
@@ -151,7 +181,7 @@ router.delete(
 );
 
 /** Users */
-router.get('/users', catchErrors(userController.getUsers));
+router.get('/users', assertIsSuperAdmin, catchErrors(userController.getUsers));
 router.get('/users/:id', catchErrors(userController.getUser));
 router.post('/users', [assertNameNotEmpty], catchErrors(userController.createUser));
 router.put(
@@ -159,7 +189,11 @@ router.put(
   [assertAuthenticated, assertIdsMatch, assertEntityExists({ collection: 'users' })],
   catchErrors(userController.updateUser)
 );
-router.delete('/users/:id', [assertAuthenticated], catchErrors(userController.deleteUser));
+router.delete(
+  '/users/:id',
+  [assertAuthenticated, assertIsSuperAdmin],
+  catchErrors(userController.deleteUser)
+);
 
 /** Scripts */
 router.get('/scripts', catchErrors(scriptController.getScripts));
@@ -182,13 +216,29 @@ router.post(
   catchErrors(membershipController.resendInvitation)
 );
 router.post('/memberships/activate', catchErrors(membershipController.activateMembership));
+router.post(
+  '/memberships/activate-by-admin',
+  catchErrors(membershipController.activateMembershipByAdmin)
+);
+router.post('/memberships/confirmed', catchErrors(membershipController.createConfirmedMembership));
 router.post('/memberships', catchErrors(membershipController.createMembership));
 router.put(
   '/memberships/:id',
   [assertIdsMatch, assertEntityExists({ collection: 'memberships' })],
   catchErrors(membershipController.updateMembership)
 );
-router.delete('/memberships/:id', catchErrors(membershipController.deleteMembership));
+router.delete(
+  '/memberships/:id',
+  catchErrors(membershipController.deleteMembership, async (membership) => {
+    try {
+      await farmosController.removeMembershipHook(membership);
+    } catch (error) {
+      // log the error, but don't escalate as it is not critical
+      console.log(error);
+    }
+  })
+);
+
 router.post(
   '/memberships/join-group',
   [assertAuthenticated],
@@ -199,24 +249,173 @@ router.post(
 router.get('/roles', catchErrors(rolesController.getRoles));
 
 /** farmos */
-router.get('/farmos/farms', catchErrors(farmosController.getFarms));
-router.get('/farmos/fields', catchErrors(farmosController.getFields));
-router.get('/farmos/assets', catchErrors(farmosController.getAssets));
-router.get(
-  '/farmos/integrations/:id/farms',
-  [assertAuthenticated],
-  catchErrors(farmosController.getIntegrationFarms)
-);
-router.post('/farmos/test', [assertAuthenticated], catchErrors(farmosController.testConnection));
+router.get('/farmos/farms', catchErrors(handleDelegates(farmosController.getFarmOSInstances)));
+router.get('/farmos/assets', catchErrors(handleDelegates(farmosController.getAssets)));
 
-router.get('/farmos/members-by-farm', catchErrors(farmosController.getMembersByFarmAndGroup));
-
-router.post('/farmos/set-memberships', catchErrors(farmosController.setFarmMemberships));
-router.post('/farmos/checkurl', catchErrors(farmosController.checkUrl));
-router.post('/farmos/create-instance', catchErrors(farmosController.createFarmOsInstance));
+// TODO update test connection
+// router.post('/farmos/test', [assertAuthenticated], catchErrors(farmosController.testConnection));
 router.post('/farmos/callback', catchErrors(farmosController.webhookCallback));
-router.get('/farmos/areas/:aggregator/:farmurl', catchErrors(farmosController.getAreas));
-router.post('/farmos/areas/:aggregator/:farmurl', catchErrors(farmosController.createField));
+router.post('/farmos/check-url', catchErrors(farmosController.checkUrl));
+router.post(
+  '/farmos/create-instance',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.superAdminCreateFarmOsInstance)
+);
+router.get('/farmos/plans', [assertIsSuperAdmin], catchErrors(farmosController.getPlans));
+router.post('/farmos/plans/create', [assertIsSuperAdmin], catchErrors(farmosController.createPlan));
+
+router.post('/farmos/plans/delete', [assertIsSuperAdmin], catchErrors(farmosController.deletePlan));
+
+router.get(
+  '/farmos/all',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.superAdminGetAllInstances)
+);
+router.post(
+  '/farmos/group-map-instance',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.superAdminMapFarmosInstance)
+);
+
+router.post(
+  '/farmos/group-unmap-instance',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.superAdminUnMapFarmosInstance)
+);
+
+router.post(
+  '/farmos/user-map-instance',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.superAdminMapFarmosInstanceToUser)
+);
+
+router.post(
+  '/farmos/user-unmap-instance',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.superAdminUnMapFarmosInstanceFromUser)
+);
+
+router.post(
+  '/farmos/unmap-instance',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.superAdminUnMapFarmosInstanceFromAll)
+);
+
+router.post(
+  '/farmos/group-manage/enable',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.superAdminUpdateFarmOSAccess)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/updatePlans',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.updatePlansForGroup)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/seats',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.updateSeats)
+);
+
+router.get(
+  '/farmos/group-manage/:groupId/domain',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.getDomain)
+);
+
+router.get(
+  '/farmos/group-manage/:groupId',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupAdminMinimumGetGroupInformation)
+);
+
+router.get(
+  '/farmos/group-manage/:groupId/plans',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.getPlanForGroup)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/mapUser',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.mapUser)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/update-groups-for-user',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.updateGroupsForUser)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/get-admin-link',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.getAdminLink)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/check-url',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupManageCheckUrl)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/create-instance',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupManageCreateFarmOsInstance)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/subgroup-join-coffee-shop',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupAdminAllowGroupsToJoinCoffeeshop)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/subgroup-create-farmos-instances',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupAdminMinimumUpdateCreateFarmOSInstances)
+);
+
+router.post(
+  '/farmos/group-manage/:groupId/enable-coffeeshop',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.groupAdminJoinCoffeeShop)
+);
+
+/** Hylo */
+router.post(
+  '/hylo/create-new-integrated-group',
+  [assertHasGroupAdminAccess],
+  catchErrors(hyloController.createNewIntegratedHyloGroup)
+);
+
+router.post(
+  '/hylo/set-integrated-group',
+  [assertHasGroupAdminAccess],
+  catchErrors(hyloController.setIntegratedHyloGroup)
+);
+
+router.post(
+  '/hylo/remove-group-integration',
+  [assertHasGroupAdminAccess],
+  catchErrors(hyloController.removeHyloGroupIntegration)
+);
+
+router.post(
+  '/hylo/invite-member-to-hylo-group',
+  catchErrors(hyloController.inviteMemberToHyloGroup)
+);
+
+router.get(
+  '/hylo/integrated-group/:groupId',
+  [],
+  catchErrors(hyloController.getIntegratedHyloGroup)
+);
+
+router.get('/hylo/group', [], catchErrors(hyloController.getGroupBySlug));
 
 /** Integrations - Group */
 router.get('/group-integrations', catchErrors(groupIntegrationController.getIntegrations));
@@ -272,17 +471,46 @@ router.delete(
 // Call for submissions (CFS)
 router.post('/call-for-submissions/send', [assertAuthenticated], catchErrors(cfsController.send));
 
-// resources (/api/resources) - not to be confused with /resources
-router.get('/resources', catchErrors(resourceController.getResources));
+router.get(
+  '/resources/:id',
+  [checkFeatureToggledOn('feature_resource')],
+  catchErrors(resourceController.getResource)
+);
+router.post(
+  '/resources/download-url',
+  [checkFeatureToggledOn('feature_resource')],
+  catchErrors(resourceController.getDownloadURL)
+);
+router.post(
+  '/resources/upload-url',
+  [checkFeatureToggledOn('feature_resource'), assertAuthenticated],
+  catchErrors(resourceController.getUploadURL)
+);
+router.put(
+  '/resources/commit/:id',
+  [checkFeatureToggledOn('feature_resource'), assertAuthenticated],
+  catchErrors(resourceController.commitResource)
+);
+router.delete(
+  '/resources/:id',
+  [checkFeatureToggledOn('feature_resource'), assertAuthenticated],
+  catchErrors(resourceController.deleteResource)
+);
 
 // info
 router.get('/info/ip', catchErrors(infoController.getIP));
 router.get('/info/public-ip', catchErrors(infoController.getPublicIP));
 router.get('/info/public-hostname', catchErrors(infoController.getPublicHostname));
 
+router.use('/toggles', unleashProxyApp);
+
 // default api
 router.get('/', (req, res) => {
   return res.send('This is API version 1');
+});
+
+router.get('/status', (_, res) => {
+  return res.status(200).send('OK');
 });
 
 // 404 fallback

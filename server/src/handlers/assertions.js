@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import boom from '@hapi/boom';
+import { isString, isArray } from 'lodash';
 
 import { catchErrors } from '../handlers/errorHandlers';
 
@@ -14,15 +15,43 @@ export const assertAuthenticated = catchErrors(async (req, res, next) => {
   next();
 });
 
+export const assertIsSuperAdmin = (req, res, next) => {
+  if (!res.locals.auth.isSuperAdmin) {
+    throw boom.unauthorized();
+  }
+
+  next();
+};
+
+export const assertHasGroupAdminAccess = catchErrors(async (req, res, next) => {
+  if (res.locals.auth.isSuperAdmin) {
+    return next();
+  }
+
+  if (!res.locals || !res.locals.auth || !res.locals.auth.user || !res.locals.auth.user._id) {
+    throw boom.unauthorized();
+  }
+
+  const userId = res.locals.auth.user._id;
+  const groupId = req.params.groupId || req.body.groupId;
+
+  const hasAdminRole = await rolesService.hasAdminRole(userId, groupId);
+  if (!hasAdminRole) {
+    throw boom.unauthorized();
+  }
+
+  next();
+});
+
 const getEntity = async (id, collection) => {
   return await db.collection(collection).findOne({ _id: new ObjectId(id) });
-}
+};
 
 const getEntities = async (ids, collection) => {
   const query = { _id: { $in: ids.map(ObjectId) } };
   const cursor = await db.collection(collection).find(query);
   return cursor.toArray();
-}
+};
 
 export const assertEntitiesExist = ({ collection }) =>
   catchErrors(async (req, res, next) => {
@@ -73,11 +102,11 @@ const hasEntityRights = async ({ entity, auth }) => {
   if (entity.meta.creator?.equals(auth.user._id)) {
     return true;
   }
-  
+
   if (!entity.meta.group?.id && !entity.meta.creator) {
     return true;
   }
-  
+
   const hasAdminRole = await rolesService.hasAdminRole(auth.user._id, entity.meta.group?.id);
   if (hasAdminRole) {
     return true;
@@ -90,7 +119,7 @@ export const assertEntitiesRights = catchErrors(async (req, res, next) => {
   const entities = res.locals.existing;
 
   const rights = await Promise.all(
-    entities.map(entity => hasEntityRights({ entity, auth: res.locals.auth }))
+    entities.map((entity) => hasEntityRights({ entity, auth: res.locals.auth }))
   );
 
   if (rights.every(Boolean)) {
@@ -118,7 +147,7 @@ const hasSubmissionRights = async (submission, res) => {
     // survey not found, boom!
     throw boom.notFound(`No survey found: ${submission.meta.survey.id}`);
   }
-  
+
   const { submissions } = survey.meta;
   if (!submissions) {
     // no meta.submissions param set, assume everyone can submit
@@ -156,14 +185,16 @@ const hasSubmissionRights = async (submission, res) => {
   }
 
   throw boom.unauthorized(`Only group members can submit to this survey`);
-}
+};
 
 export const assertSubmissionRights = catchErrors(async (req, res, next) => {
   const submissions = Array.isArray(req.body) ? req.body : [req.body];
 
-  const hasRights = await Promise.all(submissions.map(submission => hasSubmissionRights(submission, res)));
+  const hasRights = await Promise.all(
+    submissions.map((submission) => hasSubmissionRights(submission, res))
+  );
 
-  if (hasRights.every(hasRight => hasRight === true)) {
+  if (hasRights.every((hasRight) => hasRight === true)) {
     return next();
   }
 
@@ -204,14 +235,34 @@ export const assertHasSurveyParam = catchErrors(async (req, res, next) => {
   next();
 });
 
+export const assertHasIds = (req, res, next) => {
+  if (!isArray(req.body.ids) || req.body.ids.length === 0) {
+    throw boom.badRequest('You must specify ids.');
+  }
+
+  if (!req.body.ids.every(isString)) {
+    throw boom.badRequest('Each ID must be a string');
+  }
+
+  next();
+};
+
 export const validateBulkReassignRequestBody = (req, res, next) => {
   if (!req.body.ids || req.body.ids.length === 0) {
     throw boom.badRequest('You must specify ids.');
   }
 
-  if(!(req.body.group || req.body.creator)) {
-    throw boom.badRequest('You must specify a group, a creator, or both.')
+  if (!(req.body.group || req.body.creator)) {
+    throw boom.badRequest('You must specify a group, a creator, or both.');
   }
-  
+
   next();
-}
+};
+
+export const checkFeatureToggledOn = (toggleName) => async (req, res, next) => {
+  if (await res.locals.isToggleOn(toggleName)) {
+    next();
+  } else {
+    next(boom.notImplemented('this feature is turned off'));
+  }
+};

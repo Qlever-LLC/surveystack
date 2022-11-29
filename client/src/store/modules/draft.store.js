@@ -87,6 +87,9 @@ const getters = {
   showOverview: (state) => state.showOverview,
   showConfirmSubmission: (state) => state.showConfirmSubmission,
   questionNumber: (state) => {
+    if (!state.node) {
+      return;
+    }
     const n = state.node
       .getPath()
       .map((node) => node.getIndex() + 1)
@@ -95,16 +98,19 @@ const getters = {
     return n;
   },
   groupPath: (state) => {
-    if (state.submission.meta && state.submission.meta.group && state.submission.meta.group.path) {
+    if (state.submission && state.submission.meta && state.submission.meta.group && state.submission.meta.group.path) {
       return state.submission.meta.group.path;
     }
-    if (state.survey.meta && state.survey.meta.group && state.survey.meta.group.path) {
+    if (state.survey && state.survey.meta && state.survey.meta.group && state.survey.meta.group.path) {
       return state.survey.meta.group.path;
     }
 
     return null;
   },
-  relevance: (state) => (path, fallback = true) => surveyStackUtils.getRelevance(state.submission, path, fallback),
+  relevance:
+    (state) =>
+    (path, fallback = true) =>
+      surveyStackUtils.getRelevance(state.submission, path, fallback),
   hasRequiredUnanswered: (state) => {
     if (state.node.hasChildren()) {
       const requiredAndUnansweredPaths = [];
@@ -161,11 +167,12 @@ const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  init({ commit, dispatch }, { survey, submission, persist }) {
-    console.log('draft.store:action:init');
-    commit('INIT', { survey, submission, persist });
-    dispatch('calculateRelevance');
+  async init({ commit, dispatch }, { survey, submission, persist }) {
+    await commit('INIT', { survey, submission, persist });
+    await dispatch('calculateRelevance');
+    await dispatch('next');
   },
+  //TODO check - could this be removed? does not seem to be referenced
   setProperty({ commit, dispatch, state }, { path, value, calculate = true }) {
     commit('SET_PROPERTY', { path, value });
     if (state.persist) {
@@ -188,7 +195,9 @@ const actions = {
       return true;
     });
 
-    let index = traversal.indexOf(state.node);
+    // when state.node is not set, this is the initial step
+    // setting the index to 0 will let the next loop to select the first relevant node
+    let index = state.node ? traversal.indexOf(state.node) : 0;
     if (index < 0) {
       return;
     }
@@ -198,7 +207,7 @@ const actions = {
 
       const [relevance] = await codeEvaluator.calculateRelevance([nextNode], state.submission, state.survey); // eslint-disable-line
       const { result, path, skip } = relevance;
-      if (!skip) {
+      if (!skip && !!path) {
         commit('SET_PROPERTY', { path: `${path}.meta.relevant`, value: result });
         if (!result) {
           continue;
@@ -272,7 +281,7 @@ const actions = {
 
       const [relevance] = await codeEvaluator.calculateRelevance([prevNode], state.submission, state.survey); // eslint-disable-line
       const { result, path, skip } = relevance;
-      if (!skip) {
+      if (!skip && !!path) {
         commit('SET_PROPERTY', { path: `${path}.meta.relevant`, value: result });
         if (!result) {
           continue;
@@ -327,7 +336,8 @@ const actions = {
   goto({ commit }, path) {
     commit('GOTO', path);
   },
-  showOverview({ commit }, show) {
+  showOverview({ commit, dispatch }, show) {
+    dispatch('calculateApiCompose');
     commit('SHOW_OVERVIEW', show);
   },
   showConfirmSubmission({ commit }, show) {
@@ -371,7 +381,7 @@ const actions = {
     const calculations = await codeEvaluator.calculateRelevance(nodes, state.submission, state.survey);
     calculations.forEach((calculation) => {
       const { result, path, skip } = calculation;
-      if (!skip) {
+      if (!skip && !!path) {
         commit('SET_PROPERTY', { path: `${path}.meta.relevant`, value: result });
         // commit('SET_PROPERTY', { path: `${path}.meta.computedRelevance`, value: result }); // TODO: set computedRelevance as well?
       }
@@ -387,11 +397,11 @@ const actions = {
       if (error) {
         errors.push({ path, error });
       }
-      if (!skip) {
+      if (!skip && !!path) {
         commit('SET_PROPERTY', { path: `${path}.meta.apiCompose`, value: result });
       }
 
-      if (clear) {
+      if (clear && !!path) {
         commit('SET_PROPERTY', { path: `${path}.meta.apiCompose`, value: null });
       }
     });
@@ -428,16 +438,6 @@ const mutations = {
       .forEach((node) => {
         // node.drop();
       });
-
-    // assign first node
-    root.walk((node) => {
-      if (!node.isRoot() && node.model.type !== 'group') {
-        state.node = node;
-        state.firstNode = node;
-        return false;
-      }
-      return true;
-    });
   },
   SET_PROPERTY(state, { path, value }) {
     surveyStackUtils.setNested(state.submission, path, value);
@@ -445,6 +445,10 @@ const mutations = {
   NEXT(state, node) {
     // console.log('next', node, state);
     state.node = node;
+    // if firstNode is not set, this is the initial step and the given node is the first node
+    if (!state.firstNode) {
+      state.firstNode = node;
+    }
   },
   PREV(state, node) {
     // console.log('prev', node, state);

@@ -195,3 +195,58 @@ export function getClean(chooseOne) {
     return thisAnswer;
   }
 }
+
+export async function getResourceAsText(resourceKey) {
+  return parseText(await getResource(resourceKey));
+}
+
+export async function getResourceAsArrayBuffer(resourceKey) {
+  return parseArrayBuffer(await getResource(resourceKey));
+}
+
+export async function getResource(resourceKey) {
+  window.parent.postMessage(
+    {
+      type: 'REQUEST_RESOURCE',
+      payload: { resourceKey },
+    },
+    '*'
+  );
+
+  return await new Promise(function (resolve, reject) {
+    const handler = function (event) {
+      if (
+        event.data &&
+        event.data.type === 'RETURN_RESOURCE' &&
+        event.data.payload &&
+        event.data.payload.resourceKey === resourceKey
+      ) {
+        resolve(event.data.payload.file);
+        window.removeEventListener('message', handler);
+      }
+    };
+    window.addEventListener('message', handler);
+  });
+}
+
+async function parseText(file) {
+  const reader = new FileReader();
+  reader.readAsText(file);
+  const result = await new Promise((resolve, reject) => {
+    reader.onload = function (event) {
+      resolve(reader.result);
+    };
+  });
+  return result;
+}
+
+async function parseArrayBuffer(file) {
+  const reader = new FileReader();
+  reader.readAsArrayBuffer(file);
+  const result = await new Promise((resolve, reject) => {
+    reader.onload = function (event) {
+      resolve(reader.result);
+    };
+  });
+  return result;
+}

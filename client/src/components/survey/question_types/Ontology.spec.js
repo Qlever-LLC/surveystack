@@ -1,6 +1,7 @@
 import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuetify from 'vuetify';
 import Ontology, { fetchSubmissions } from './Ontology.vue';
+import { resourceLocations, resourceTypes } from '@/utils/resources';
 
 const vuetify = new Vuetify();
 
@@ -8,9 +9,9 @@ const resources = [
   {
     id: 'resource-1',
     label: 'Dropdown Items 1',
-    location: 'EMBEDDED',
+    location: resourceLocations.EMBEDDED,
     name: 'dropdown_items_1',
-    type: 'ONTOLOGY_LIST',
+    type: resourceTypes.ONTOLOGY_LIST,
     content: [
       {
         value: 'dog',
@@ -36,8 +37,8 @@ const resources = [
     label: 'Survey Reference 2',
     name: 'survey_reference_2',
     id: 'resource-2',
-    type: 'SURVEY_REFERENCE',
-    location: 'REMOTE',
+    type: resourceTypes.SURVEY_REFERENCE,
+    location: resourceLocations.REMOTE,
     content: {
       id: '60afbd3eac16af0001203bba',
       version: 3,

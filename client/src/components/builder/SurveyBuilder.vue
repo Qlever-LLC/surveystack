@@ -1,16 +1,33 @@
 <template>
-  <div class="screen-root" style="padding: 0px 12px 0px 0px !important">
+  <div class="screen-root">
     <v-dialog v-model="viewCode">
-      <app-code-view v-model="survey" />
+      <app-code-view v-model="survey" style="height: 80vh" />
+    </v-dialog>
+
+    <v-dialog v-model="viewSubmission">
+      <app-code-view v-model="instance" style="height: 80vh" />
     </v-dialog>
 
     <v-dialog v-model="showExamples">
       <app-examples-view @close="showExamples = false" :category="tabMap[selectedTab]" />
     </v-dialog>
 
-    <splitpanes style="padding: 0px !important" class="pane-root" vertical>
-      <pane class="pane pane-survey" style="position: relative; overflow: hidden">
-        <div class="pane-fixed-wrapper pr-2" style="position: relative;">
+    <update-library-dialog
+      v-if="updateLibraryDialogIsVisible"
+      :value="updateLibraryDialogIsVisible"
+      :library-root-group="updateLibraryRootGroup"
+      :to-survey="updateToLibrary"
+      @update="updateLibraryConfirmed"
+      @cancel="updateLibraryCancelled"
+    />
+
+    <v-alert v-if="Object.keys(availableLibraryUpdates).length > 0" type="warning" dismissible>
+      This survey uses an outdated question library set. Consider reviewing the new version and updating it.
+    </v-alert>
+
+    <splitpanes class="pane-root" vertical>
+      <pane class="pane pane-survey">
+        <div class="pane-fixed-wrapper pr-2" style="position: relative">
           <control-adder @controlAdded="controlAdded" @openLibrary="openLibrary" />
           <survey-details
             :version="version"
@@ -35,53 +52,59 @@
             @set-survey-resources="setSurveyResources"
             @addToLibrary="addToLibrary"
             class="mb-4"
+            data-testid="survey-details"
           />
           <graphical-view
-            class="graphical-view"
             v-if="!viewCode"
             :selected="control"
             :controls="currentControls"
-            @controlSelected="controlSelected"
+            :availableLibraryUpdates="availableLibraryUpdates"
+            @control-selected="controlSelected"
             @duplicate-control="duplicateControl"
             @open-library="openLibrary"
+            @control-removed="controlRemoved"
+            @update-library-control="updateLibrary"
+            @hide-control="hideControl"
+            @unhide-control="unhideControl"
+            data-testid="graphical-view"
           />
         </div>
       </pane>
 
-      <pane class="pane pane-library" v-if="library">
+      <pane class="pane pane-library" v-if="showLibrary">
         <div class="px-4">
           <question-library
             :survey="survey"
             :libraryId="libraryId"
-            @addToSurvey="addQuestionsFromLibrary"
+            @add-questions-from-library="addQuestionsFromLibrary"
             @cancel="closeLibrary"
+            data-testid="question-library"
           />
         </div>
       </pane>
 
       <pane class="pane pane-controls" v-if="control">
-        <v-card class="pb-3 mb-3">
-          <div class="px-4">
-            <!-- <v-card-title class="pl-0">Details</v-card-title> -->
-            <control-properties
-              v-if="control"
-              :control="control"
-              :survey="survey"
-              :calculate="optionsCalculate"
-              :relevance="optionsRelevance"
-              :constraint="optionsConstraint"
-              :api-compose="optionsApiCompose"
-              :controls="currentControls"
-              @code-calculate="highlight('calculate')"
-              @code-relevance="highlight('relevance')"
-              @code-constraint="highlight('constraint')"
-              @code-api-compose="highlight('apiCompose')"
-              @set-control-source="setControlSource"
-              @set-survey-resources="setSurveyResources"
-              @set-control-params="setControlParams"
-              @set-script-editor-is-visible="setScriptIsVisible"
-            />
-          </div>
+        <v-card class="px-4 pb-3 mb-3">
+          <!-- <v-card-title class="pl-0">Details</v-card-title> -->
+          <control-properties
+            v-if="control"
+            :control="control"
+            :survey="survey"
+            :calculate="optionsCalculate"
+            :relevance="optionsRelevance"
+            :constraint="optionsConstraint"
+            :api-compose="optionsApiCompose"
+            :controls="currentControls"
+            @code-calculate="highlight('calculate')"
+            @code-relevance="highlight('relevance')"
+            @code-constraint="highlight('constraint')"
+            @code-api-compose="highlight('apiCompose')"
+            @set-control-source="setControlSource"
+            @set-survey-resources="setSurveyResources"
+            @set-control-params="setControlParams"
+            @set-script-editor-is-visible="setScriptIsVisible"
+            data-testid="control-properties"
+          />
         </v-card>
       </pane>
       <pane class="pane pane-script" v-if="hasScript && scriptEditorIsVisible && scriptCode !== null">
@@ -103,21 +126,13 @@
           <pane size="80">
             <div style="height: 100%">
               <v-tabs v-if="control.options" v-model="selectedTab" background-color="blue-grey darken-4" dark>
-                <v-tab :disabled="!control.options.relevance.enabled">
-                  Relevance
-                </v-tab>
-                <v-tab :disabled="!control.options.calculate.enabled">
-                  Calculate
-                </v-tab>
-                <v-tab :disabled="!control.options.constraint.enabled">
-                  Constraint
-                </v-tab>
+                <v-tab :disabled="!control.options.relevance.enabled"> Relevance</v-tab>
+                <v-tab :disabled="!control.options.calculate.enabled"> Calculate</v-tab>
+                <v-tab :disabled="!control.options.constraint.enabled"> Constraint</v-tab>
                 <v-tab v-if="control.options.apiCompose" :disabled="!control.options.apiCompose.enabled">
                   API Compose
                 </v-tab>
-                <v-tab v-if="control.type === 'script'">
-                  Script
-                </v-tab>
+                <v-tab v-if="control.type === 'script'"> Script</v-tab>
               </v-tabs>
 
               <code-editor
@@ -143,6 +158,7 @@
           </pane>
         </splitpanes>
       </pane>
+
       <pane
         class="pane pane-submission-code pane-shared-code"
         v-if="(hasCode && !hideCode) || (hasScript && scriptEditorIsVisible)"
@@ -157,9 +173,10 @@
           ></code-editor>
         </div>
       </pane>
-      <pane class="pane pane-draft">
+
+      <pane class="pane pane-draft" :style="{ width: isPreviewMobile ? '375px' : '800px' }">
         <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
-        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px);">
+        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px); overflow: auto">
           <app-draft-component
             @submit="(payload) => $emit('submit', payload)"
             v-if="survey && instance"
@@ -168,54 +185,56 @@
             :persist="false"
             class="builder-draft"
             builder
-          ></app-draft-component>
+            :forceMobile="isPreviewMobile"
+          >
+            <template v-slot:toolbar-actions>
+              <v-btn-toggle v-model="isPreviewMobile" dense style="height: 36px" class="my-auto">
+                <v-btn :value="false" dense>
+                  <span class="hidden-sm-and-down">desktop</span>
+                  <v-icon right> mdi-monitor</v-icon>
+                </v-btn>
+
+                <v-btn :value="true">
+                  <span class="hidden-sm-and-down">mobile</span>
+                  <v-icon right> mdi-cellphone</v-icon>
+                </v-btn>
+              </v-btn-toggle>
+
+              <v-btn @click="viewCode = true" class="ma-2" depressed outlined text>
+                <span class="hidden-sm-and-down">survey</span>
+                <v-icon right>mdi-code-tags</v-icon>
+              </v-btn>
+
+              <v-btn @click="viewSubmission = true" class="ma-2" depressed outlined text>
+                <span class="hidden-sm-and-down">submission</span>
+                <v-icon right>mdi-code-tags</v-icon>
+              </v-btn>
+            </template>
+          </app-draft-component>
         </div>
+
         <v-overlay :value="enableSaveDraft">
           <v-card>
-            <v-card-text>
-              Please Save Draft to update Survey Preview.
-            </v-card-text>
+            <v-card-text> Please Save Draft to update Survey Preview.</v-card-text>
           </v-card>
         </v-overlay>
-
-        <!-- <v-snackbar
-          v-model="infoSnack"
-        >
-          hello
-
-          <template v-slot:action="{ attrs }">
-            <v-btn
-              color="red"
-              text
-              v-bind="attrs"
-              @click="infoSnack = false"
-            >
-              Close
-            </v-btn>
-          </template>
-        </v-snackbar> -->
       </pane>
-    </splitpanes>
 
-    <!-- <confirm-leave-dialog
-      ref="confirmLeaveDialog"
-      title="Confirm Leave Survey"
-    >
-      Are you sure you want to leave this survey?
-    </confirm-leave-dialog> -->
+      <!-- Padding pane - DO NOT DELETE -->
+      <pane />
+    </splitpanes>
   </div>
 </template>
 
 <script>
-import { cloneDeep, isEqualWith, isEqual, uniqBy } from 'lodash';
-import { Splitpanes, Pane } from 'splitpanes';
+import { cloneDeep, isEqual, isEqualWith, uniqBy } from 'lodash';
+import { Pane, Splitpanes } from 'splitpanes';
 
 import moment from 'moment';
 
-import ObjectID from 'bson-objectid';
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
-import questionLibrary from '@/components/builder/QuestionLibrary.vue';
+import questionLibrary from '@/components/survey/library/QuestionLibrary.vue';
 import controlAdder from '@/components/builder/ControlAdder.vue';
 import surveyDetails from '@/components/builder/SurveyDetails.vue';
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
@@ -228,13 +247,24 @@ import appMixin from '@/components/mixin/appComponent.mixin';
 import api from '@/services/api.service';
 import slugify from '@/utils/slugify';
 
-import * as utils from '@/utils/surveys';
 import { defaultApiCompose } from '@/utils/apiCompose';
 
 import submissionUtils from '@/utils/submissions';
 import { SPEC_VERSION_SCRIPT } from '@/constants';
 import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 import * as surveyStackUtils from '@/utils/surveyStack';
+import {
+  executeUnsafe,
+  getFlatName,
+  getGroups,
+  getPosition,
+  getPreparedLibraryControls,
+  getPreparedLibraryResources,
+  getSurveyPositions,
+  insertControl,
+  isResourceReferenced,
+} from '@/utils/surveys';
+import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -256,6 +286,7 @@ const tabMap = ['relevance', 'calculate', 'constraint', 'apiCompose'];
 export default {
   mixins: [appMixin],
   components: {
+    UpdateLibraryDialog,
     Splitpanes,
     Pane,
     codeEditor,
@@ -281,9 +312,10 @@ export default {
       version: 1,
       // ui
       viewCode: false,
+      viewSubmission: false,
       // currently selected control
       control: null,
-      library: false,
+      showLibrary: false,
       libraryId: null,
       // code stuff
       log: '',
@@ -303,6 +335,12 @@ export default {
       initialSurvey: cloneDeep(this.survey),
       surveyUnchanged: true,
       showExamples: false,
+      isPreviewMobile: false,
+      //question sets
+      availableLibraryUpdates: {},
+      updateLibraryDialogIsVisible: false,
+      updateLibraryRootGroup: null,
+      updateToLibrary: null,
     };
   },
   methods: {
@@ -330,7 +368,6 @@ export default {
       }
     },
     setScriptIsVisible(val) {
-      console.log('hello');
       this.scriptEditorIsVisible = val;
     },
     updateScriptCode(code) {
@@ -362,63 +399,85 @@ export default {
       this.survey.meta.dateModified = date;
     },
     addToLibrary() {
-      console.log('add to library');
       this.survey.meta.isLibrary = true;
       this.saveDraft();
     },
     async addQuestionsFromLibrary(librarySurveyId) {
       // load library survey
-      const { data } = await api.get(`/surveys/${librarySurveyId}`);
+      const { data: librarySurvey } = await api.get(`/surveys/${librarySurveyId}`);
+      // add resources from library survey
+      const newResources = getPreparedLibraryResources(librarySurvey);
 
-      // remove old resources copied from the library survey
-      this.survey.resources = this.survey.resources.filter((value) => value.libraryId !== librarySurveyId);
-      // copy resources from library survey
-      data.resources.forEach((r) => {
-        r.libraryId = data._id;
-        r.libraryVersion = data.latestVersion;
-      });
-      this.survey.resources = this.survey.resources.concat(data.resources);
+      // prepare root group for the library questions to be inserted into
+      let rootGroup = createControlInstance(availableControls.find((c) => c.type === 'group'));
+      rootGroup.name = slugify(librarySurvey.name);
+      rootGroup.label = librarySurvey.name;
+      rootGroup.isLibraryRoot = true;
+      rootGroup.libraryId = librarySurvey._id;
+      rootGroup.libraryVersion = librarySurvey.latestVersion;
+      this.controlAdded(rootGroup);
 
-      // copy controls from library survey
-      const controlsFromLibrary = data.revisions[data.latestVersion - 1].controls;
-
-      // create question group
-      const group = createControlInstance(availableControls.find((c) => c.type === 'group'));
-      group.name = slugify(data.name);
-      group.label = data.name;
-      group.isLibraryRoot = true;
-      group.libraryId = data._id;
-      group.libraryVersion = data.latestVersion;
-
-      // add recursive function for children
-      const dive = (control, cb) => {
-        cb(control);
-        if (!control.children) {
-          return;
-        }
-        control.children.forEach((c) => {
-          dive(c, cb);
-        });
-      };
-
-      // copy questions from library survey to question group
-      for (let i = 0; i < controlsFromLibrary.length; i++) {
-        const controlToAdd = controlsFromLibrary[i];
-        controlToAdd.id = new ObjectID().toString();
-        controlToAdd.libraryId = data._id;
-        dive(controlToAdd, (control) => {
-          // eslint-disable-next-line no-param-reassign
-          control.id = new ObjectID().toString();
-          control.libraryId = data._id;
-          control.libraryVersion = data.latestVersion;
-        });
-        group.children.push(controlToAdd);
-      }
-      this.duplicateControl(group);
-      this.library = false;
+      // add questions from library survey to question group
+      rootGroup.children = getPreparedLibraryControls(
+        librarySurvey._id,
+        librarySurvey.latestVersion,
+        librarySurvey.revisions[librarySurvey.latestVersion - 1].controls,
+        newResources,
+        null
+      );
+      // update the survey resources
+      this.updateLibraryResources(newResources);
+      // hide the library view
+      this.showLibrary = false;
+    },
+    async updateLibrary(updateLibraryRootGroup) {
+      this.updateLibraryRootGroup = updateLibraryRootGroup;
+      const { data } = await api.get(`/surveys/${updateLibraryRootGroup.libraryId}`);
+      this.updateToLibrary = data;
+      this.updateLibraryDialogIsVisible = true;
+    },
+    updateLibraryConfirmed(updatedLibraryControls) {
+      this.updateLibraryRootGroup.libraryVersion = this.updateToLibrary.latestVersion;
+      //update resources
+      const updatedResources = getPreparedLibraryResources(this.updateToLibrary);
+      // add updated controls, prepared by creating new id's, setting origin and update resources references
+      this.updateLibraryRootGroup.children = getPreparedLibraryControls(
+        this.updateToLibrary._id,
+        this.updateToLibrary.latestVersion,
+        updatedLibraryControls,
+        updatedResources,
+        this.survey.resources
+      );
+      // update the survey resources
+      this.updateLibraryResources(updatedResources);
+      //clear update vars
+      this.updateToLibrary = null;
+      this.updateLibraryRootGroup = null;
+      this.updateLibraryDialogIsVisible = false;
+    },
+    updateLibraryCancelled() {
+      this.updateToLibrary = null;
+      this.updateLibraryDialogIsVisible = false;
+      this.updateLibraryRootGroup = null;
+    },
+    updateLibraryResources(newLibraryResources) {
+      // add updated resources
+      this.survey.resources = this.survey.resources.concat(newLibraryResources);
+      // remove library resources which are not used anymore (e.g. this could happen if resources with same origin are added when consuming the same library multiple times)
+      this.cleanupLibraryResources();
+    },
+    cleanupLibraryResources() {
+      const controls = this.survey.revisions[this.survey.revisions.length - 1].controls;
+      this.survey.resources = this.survey.resources.filter(
+        (resource) => !resource.libraryId || isResourceReferenced(controls, resource.id)
+      );
     },
     closeLibrary() {
-      this.library = false;
+      this.showLibrary = false;
+    },
+    async checkForLibraryUpdates(survey) {
+      const { data } = await api.get(`/surveys/check-for-updates/${survey._id}`);
+      this.availableLibraryUpdates = data;
     },
     initNavbarAndDirtyFlag(survey) {
       if (!survey.revisions) {
@@ -447,8 +506,7 @@ export default {
       this.version = version;
 
       const v = this.survey.revisions[this.survey.revisions.length - 1].version;
-      const amountQuestions = utils.getSurveyPositions(this.survey, v);
-      // console.log('amount: ', amountQuestions);
+      const amountQuestions = getSurveyPositions(this.survey, v);
       this.setNavbarContent({
         title: this.survey.name || 'Untitled Survey',
         subtitle: `
@@ -459,8 +517,6 @@ export default {
           <!--<span class="question-title-chip">${this.groupPath}</span>-->
         `,
       });
-
-      // console.log('version is', version);
     },
     updateSelectedCode(code) {
       this.control.options[tabMap[this.selectedTab]].code = code;
@@ -488,10 +544,8 @@ export default {
 
       this.selectedTab = tabMap.indexOf(tab);
 
-      console.log('options', this.control.options);
       if (!this.control.options[tab].code) {
         let initalCode;
-        console.log('tab is', tab);
         if (tab === 'apiCompose') {
           initalCode = defaultApiCompose;
         } else {
@@ -507,7 +561,7 @@ export default {
     async runCode() {
       const tab = tabMap[this.selectedTab];
       try {
-        const res = await utils.executeUnsafe({
+        const res = await executeUnsafe({
           code: this.activeCode,
           fname: tab,
           submission: this.instance,
@@ -536,9 +590,7 @@ export default {
       console.log(value);
     },
     async controlSelected(control) {
-      // console.log('selected control', control);
       this.control = control;
-      console.log('controlSelected', control);
       if (control && control.type === 'script' && control.options.source) {
         const data = await this.fetchScript(control.options.source);
         this.scriptEditorIsVisible = false;
@@ -546,6 +598,10 @@ export default {
       } else {
         this.scriptCode = null;
       }
+    },
+    async controlRemoved() {
+      await this.controlSelected(null);
+      this.cleanupLibraryResources();
     },
     async fetchScript(id) {
       const { data } = await api.get(`/scripts/${id}`);
@@ -575,17 +631,25 @@ export default {
     },
     duplicateControl(control) {
       if (this.control && this.currentControls.length > 0) {
-        const position = utils.getPosition(this.control, this.currentControls);
-        utils.insertControl(
+        const position = getPosition(this.control, this.currentControls);
+        insertControl(
           control,
           this.currentControls,
           position,
           this.control.type === 'group' || this.control.type === 'page'
         );
       } else {
-        utils.insertControl(control, this.currentControls, 0, false);
+        insertControl(control, this.currentControls, 0, false);
       }
       this.control = control;
+    },
+    hideControl(control) {
+      this.controlSelected(control);
+      this.$set(this.control.options, 'hidden', true);
+    },
+    unhideControl(control) {
+      this.controlSelected(control);
+      this.$set(this.control.options, 'hidden', undefined);
     },
     controlAdded(control) {
       if (!this.control) {
@@ -594,19 +658,19 @@ export default {
         return;
       }
 
-      const position = utils.getPosition(this.control, this.currentControls);
-      utils.insertControl(
+      const position = getPosition(this.control, this.currentControls);
+      insertControl(
         control,
         this.currentControls,
         position,
         this.control.type === 'group' || this.control.type === 'page'
       );
       this.control = control;
-      this.library = false;
+      this.showLibrary = false;
     },
     openLibrary(libraryId) {
       this.control = null;
-      this.library = true;
+      this.showLibrary = true;
       if (libraryId) {
         this.libraryId = libraryId;
       } else {
@@ -639,7 +703,7 @@ export default {
       const hasOnlyUniqueNames = uniqueNames.length === currentControls.length;
       const allNamesContainOnlyValidCharacters = !currentControls.some((control) => !namePattern.test(control.name));
 
-      const groupedQuestionsAreValid = utils.getGroups(currentControls).reduce((r, group) => {
+      const groupedQuestionsAreValid = getGroups(currentControls).reduce((r, group) => {
         const uniqueNamesInGroup = uniqBy(group.children, 'name');
         const groupHasOnlyUniqueNames = uniqueNamesInGroup.length === group.children.length;
         const allNamesInGroupContainOnlyValidCharacters = !group.children.some(
@@ -744,8 +808,8 @@ export default {
       return this.dirty;
     },
     controlId() {
-      const position = utils.getPosition(this.control, this.currentControls);
-      const id = utils.getFlatName(this.currentControls, position);
+      const position = getPosition(this.control, this.currentControls);
+      const id = getFlatName(this.currentControls, position);
       console.log('controlId', id);
       return id;
     },
@@ -783,9 +847,8 @@ export default {
       return `${submission};\n\n${parent};\n`;
     },
     parent() {
-      console.log('parent() called');
-      const position = utils.getPosition(this.control, this.currentControls);
-      const path = utils.getFlatName(this.currentControls, position);
+      const position = getPosition(this.control, this.currentControls);
+      const path = getFlatName(this.currentControls, position);
       const parentPath = surveyStackUtils.getParentPath(path);
       const parentData = surveyStackUtils.getNested(this.instance, parentPath);
       return parentData;
@@ -793,7 +856,6 @@ export default {
   },
   watch: {
     selectedTab(tab) {
-      console.log('selecting tab', tab);
       this.highlight(tabMap[tab]);
     },
     optionsRelevance: {
@@ -883,6 +945,7 @@ export default {
   created() {
     this.initNavbarAndDirtyFlag(this.survey);
     this.createInstance();
+    this.checkForLibraryUpdates(this.survey);
   },
 
   // TODO: get route guard to work here, or move dirty flag up to Builder.vue
@@ -897,6 +960,12 @@ export default {
 };
 </script>
 
+<style>
+.pane-root .splitpanes__splitter {
+  background-color: #eee;
+}
+</style>
+
 <style scoped>
 .screen-root {
   width: 100%;
@@ -904,19 +973,11 @@ export default {
   overflow-x: auto;
   overflow-y: hidden;
 }
+
 .pane-root {
+  min-width: 100%;
   height: 100%;
-  padding: 12px;
-  width: 2800px;
-  min-width: 100vw;
-}
-
-.pane-root > .pane ~ .pane {
-  border-left: 1px solid #eee;
-}
-
-.horizontal-line {
-  border-bottom: 1px solid #eee;
+  padding: 0;
 }
 
 .pane {
@@ -925,11 +986,10 @@ export default {
   height: calc(100vh - 64px - 30px - 24px);
   min-width: 400px;
   max-height: 100%;
-  margin-top: 15px;
-  margin-left: 15px;
-  margin-right: 15px;
+  margin: 15px;
   margin-bottom: 0px;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .pane-survey,
@@ -959,24 +1019,10 @@ export default {
   min-width: 700px;
 }
 
-.pane-survey {
-  overflow: auto;
-}
-
-.graphical-view {
-  overflow: auto;
-}
-
 .pane-draft {
   width: 100vw;
   align-self: center;
-  overflow: auto;
-}
-
-.pane-draft,
-.draft {
-  max-width: 500px;
-  /*max-height: 1000px;*/
+  margin: 15px 60px;
 }
 
 .hide-pane {
@@ -1057,24 +1103,28 @@ export default {
   width: 100%;
   height: 100%;
 }
+
 .splitpanes--vertical {
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
   -ms-flex-direction: row;
   flex-direction: row;
 }
+
 .splitpanes--horizontal {
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
 }
+
 .splitpanes--dragging * {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
 }
+
 .splitpanes__pane {
   width: 100%;
   height: 100%;
@@ -1082,31 +1132,38 @@ export default {
   -webkit-transition: width 0.2s ease-out, height 0.2s ease-out;
   transition: width 0.2s ease-out, height 0.2s ease-out;
 }
+
 .splitpanes--dragging .splitpanes__pane {
   -webkit-transition: none;
   transition: none;
 }
+
 .splitpanes__splitter {
   -ms-touch-action: none;
   touch-action: none;
 }
+
 .splitpanes--vertical > .splitpanes__splitter {
   min-width: 1px;
   cursor: col-resize;
 }
+
 .splitpanes--horizontal > .splitpanes__splitter {
   min-height: 1px;
   cursor: row-resize;
 }
+
 .splitpanes.default-theme .splitpanes__pane {
   background-color: #f2f2f2;
 }
+
 .splitpanes.default-theme .splitpanes__splitter {
   background-color: #fff;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   position: relative;
 }
+
 .splitpanes.default-theme .splitpanes__splitter:after,
 .splitpanes.default-theme .splitpanes__splitter:before {
   content: '';
@@ -1117,19 +1174,23 @@ export default {
   -webkit-transition: background-color 0.3s;
   transition: background-color 0.3s;
 }
+
 .splitpanes.default-theme .splitpanes__splitter:hover:after,
 .splitpanes.default-theme .splitpanes__splitter:hover:before {
   background-color: rgba(0, 0, 0, 0.25);
 }
+
 .default-theme.splitpanes .splitpanes .splitpanes__splitter {
   z-index: 1;
 }
+
 .default-theme.splitpanes--vertical > .splitpanes__splitter,
 .default-theme .splitpanes--vertical > .splitpanes__splitter {
   width: 9px;
   border-left: 1px solid #eee;
   margin-left: -1px;
 }
+
 .default-theme.splitpanes--vertical > .splitpanes__splitter:after,
 .default-theme .splitpanes--vertical > .splitpanes__splitter:after,
 .default-theme.splitpanes--vertical > .splitpanes__splitter:before,
@@ -1139,20 +1200,24 @@ export default {
   width: 1px;
   height: 30px;
 }
+
 .default-theme.splitpanes--vertical > .splitpanes__splitter:before,
 .default-theme .splitpanes--vertical > .splitpanes__splitter:before {
   margin-left: -2px;
 }
+
 .default-theme.splitpanes--vertical > .splitpanes__splitter:after,
 .default-theme .splitpanes--vertical > .splitpanes__splitter:after {
   margin-left: 1px;
 }
+
 .default-theme.splitpanes--horizontal > .splitpanes__splitter,
 .default-theme .splitpanes--horizontal > .splitpanes__splitter {
   height: 9px;
   border-top: 1px solid #eee;
   margin-top: -1px;
 }
+
 .default-theme.splitpanes--horizontal > .splitpanes__splitter:after,
 .default-theme .splitpanes--horizontal > .splitpanes__splitter:after,
 .default-theme.splitpanes--horizontal > .splitpanes__splitter:before,
@@ -1162,10 +1227,12 @@ export default {
   width: 30px;
   height: 1px;
 }
+
 .default-theme.splitpanes--horizontal > .splitpanes__splitter:before,
 .default-theme .splitpanes--horizontal > .splitpanes__splitter:before {
   margin-top: -2px;
 }
+
 .default-theme.splitpanes--horizontal > .splitpanes__splitter:after,
 .default-theme .splitpanes--horizontal > .splitpanes__splitter:after {
   margin-top: 1px;

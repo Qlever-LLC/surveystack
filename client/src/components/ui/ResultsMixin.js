@@ -1,3 +1,5 @@
+import { get } from 'lodash';
+
 export default {
   data() {
     return {
@@ -17,6 +19,7 @@ export default {
         this.resultItems.push({
           title: 'Error',
           body: (error.response && error.response.data && error.response.data.message) || error,
+          logs: error.response && error.response.data && error.response.data.logs,
           error: true,
         });
         return;
@@ -31,25 +34,36 @@ export default {
           console.log('parsing error', farmos);
 
           if (farmos.status === 'error') {
-            this.resultItems.push({
-              title: 'Error submitting to FarmOS',
-              body: `${farmos.error.message}: ${farmos.error.config.data}`,
-              error: true,
-            });
+            if (farmos.error.isBoom === true) {
+              this.resultItems.push({
+                title: 'Error submitting to FarmOS',
+                body: `${farmos.error.output.payload.error}: ${farmos.error.output.payload.message}`,
+                error: true,
+              });
+            } else {
+              this.resultItems.push({
+                title: 'Error submitting to FarmOS',
+                body: `${farmos.error.message}: ${farmos.error.config.data}`,
+                error: true,
+              });
+            }
+
             hasErrors = true;
-          } else {
-            this.resultItems.push({
-              title: 'FarmOS success:',
-              body: farmos.uri || farmos.message,
-            });
           }
         });
       }
+
+      const getLogsOf = (key) =>
+        get(response, `data.${key}`, [])
+          .map((h) => h.logs || [])
+          .flat();
 
       if (!hasErrors) {
         this.resultItems.push({
           title: 'Success',
           body: 'Successful submission',
+          response,
+          logs: [...getLogsOf('farmos'), ...getLogsOf('hylo')],
         });
       }
     },

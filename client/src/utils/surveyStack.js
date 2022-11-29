@@ -21,13 +21,13 @@ export function getNested(obj, path, fallback = undefined) {
 }
 
 export function setNested(obj, path, value) {
-  const parentPath = path
-    .replace('[', SEPARATOR)
-    .replace(']', '')
-    .split(SEPARATOR);
+  const parentPath = path.replace('[', SEPARATOR).replace(']', '').split(SEPARATOR);
   const subKey = parentPath.pop();
-  const parent = getNested(obj, parentPath.join(SEPARATOR), SEPARATOR);
+  const parent = getNested(obj, parentPath.join(SEPARATOR), null);
   // parent[subKey] = value; // not reactive if setting properties which do not exist yet
+  if (parent === null) {
+    throw new Error(`invalid path ${path} does not exist on obj`);
+  }
   Vue.set(parent, subKey, value);
 }
 
@@ -104,11 +104,10 @@ export function isAnswered(node, submission) {
     if (!value || (Array.isArray(value) && value.length === 0)) {
       return false;
     }
-    const requiredCols = node.model.options.source.content.filter((h) => h.required).map((h) => h.value);
+    const requiredCols = node.model.options.source.content.filter((h) => h.required && !h.hidden).map((h) => h.value);
     let answered = true;
     for (const row of value) {
       for (const requiredCol of requiredCols) {
-        console.log(`row[${requiredCol}].value`, row[requiredCol].value);
         if (row[requiredCol].value === null) {
           answered = false;
         }
@@ -116,6 +115,10 @@ export function isAnswered(node, submission) {
     }
 
     return answered;
+  }
+
+  if (type === 'file' || type === 'image') {
+    return value != null && Array.isArray(value) && value.length > 0;
   }
 
   if (type === 'page' || type === 'instructions' || type === 'instructionsImageSplit') {

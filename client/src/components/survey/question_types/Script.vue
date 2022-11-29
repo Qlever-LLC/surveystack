@@ -179,6 +179,22 @@ export default {
       console.log('set render queue', queue);
       this.$emit('setRenderQueue', queue);
     },
+    handleRequestResource({ resourceKey }) {
+      console.log('script requested resource with key ', resourceKey);
+      const resource = this.$store.getters['resources/getResourceByKey'](resourceKey);
+      const file = resource.fileData;
+
+      this.$refs.iframe.contentWindow.postMessage(
+        {
+          type: 'RETURN_RESOURCE',
+          payload: {
+            resourceKey,
+            file,
+          },
+        },
+        '*'
+      );
+    },
     initializeIframe() {
       const { iframe } = this.$refs;
       const submissionJSON = JSON.stringify(this.submission);
@@ -198,7 +214,8 @@ export default {
         paramsJSON,
       });
       iframe.src = `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
-
+    },
+    initializeEventListeners() {
       // onMessage returns the message listener function so that the listener can be removed on destroyed lifecycle method
       this.messageEventListeners.push(
         onMessage('SCRIPT_HAS_LOADED', this.handleScriptHasLoaded),
@@ -208,7 +225,8 @@ export default {
         onMessage('REQUEST_RUN_SURVEY_STACK_KIT', this.requestRunSurveyStackKit),
         onMessage('REQUEST_SET_QUESTION_CONTEXT', this.handleRequestSetContext),
         onMessage('REQUEST_SET_QUESTION_RENDER_QUEUE', this.handleRequestSetRenderQueue),
-        onMessage('REQUEST_SET_QUESTION_RENDER_QUEUE', this.handleRequestSetRenderQueue)
+        onMessage('REQUEST_SET_QUESTION_RENDER_QUEUE', this.handleRequestSetRenderQueue),
+        onMessage('REQUEST_RESOURCE', this.handleRequestResource)
       );
     },
     async fetchScriptSource() {
@@ -217,11 +235,20 @@ export default {
       this.source = data;
     },
   },
+  watch: {
+    submission: {
+      handler: function () {
+        this.initializeIframe();
+      },
+      deep: true,
+    },
+  },
   async mounted() {
     try {
       this.isLoading = true;
       await this.fetchScriptSource();
       this.initializeIframe();
+      this.initializeEventListeners();
       this.isLoading = false;
     } catch (err) {
       console.log('Could not get script source', err);
@@ -240,9 +267,6 @@ iframe {
   width: 100%;
   display: block;
   height: 40vh;
-}
-
-.status {
 }
 
 .center-button {

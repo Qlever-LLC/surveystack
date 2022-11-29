@@ -1,3 +1,6 @@
 node_modules
 lerna-debug.log
 .vs-code
+client/build-storybook.log
+client/public/static
+review-2*

@@ -13,6 +13,7 @@
       <v-text-field outlined v-model="control.label" label="Label" />
       <v-text-field outlined v-model="control.hint" label="Hint" />
       <v-text-field outlined v-model="control.moreInfo" label="More info" />
+
       <v-checkbox
         v-if="isText"
         outlined
@@ -37,7 +38,7 @@
           chips
           persistent-hint
         >
-          <template v-slot:selection="{ attr, on, item, selected }">
+          <template v-slot:selection="{ item }">
             <div>{{ item.name }}</div>
           </template>
         </v-autocomplete>
@@ -79,6 +80,7 @@
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         outlined
       />
+
       <v-checkbox
         class="my-1"
         outlined
@@ -86,13 +88,21 @@
         v-model="control.options.required"
         label="Required"
         color="grey darken-1"
-        hide-details
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       >
         <template slot="label">
           <div>
             <div class="text--primary">Required</div>
             <div class="body-2">Make this a required field</div>
+          </div>
+        </template>
+      </v-checkbox>
+
+      <v-checkbox v-if="isPage" class="my-1" color="grey darken-1" v-model="control.options.compact" label="Compact">
+        <template slot="label">
+          <div>
+            <div class="text--primary">Compact</div>
+            <div class="body-2">Reduce the spaces and combine fields into one card</div>
           </div>
         </template>
       </v-checkbox>
@@ -107,9 +117,7 @@
         <template slot="label">
           <div>
             <div class="text--primary">Private</div>
-            <div class="body-2">
-              Only admins and original submitters can see this field
-            </div>
+            <div class="body-2">Only admins and original submitters can see this field</div>
           </div>
         </template>
       </v-checkbox>
@@ -117,17 +125,14 @@
       <v-checkbox
         class="my-1"
         color="grey darken-1"
-        v-if="survey.meta.isLibrary"
+        v-if="survey.meta.isLibrary && !control.libraryIsInherited && !control.libraryId"
         v-model="control.options.allowHide"
-        hide-details
         label="Allow hide"
       >
         <template slot="label">
           <div>
             <div class="text--primary">Allow hide</div>
-            <div class="body-2">
-              Allow users of this question set to hide this question
-            </div>
+            <div class="body-2">Allow users of this question set to hide this question</div>
           </div>
         </template>
       </v-checkbox>
@@ -135,9 +140,8 @@
       <v-checkbox
         class="my-1"
         color="grey darken-1"
-        v-if="survey.meta.isLibrary"
+        v-if="survey.meta.isLibrary && !control.libraryIsInherited && !control.libraryId"
         v-model="control.options.allowModify"
-        hide-details
         label="Allow modify"
       >
         <template slot="label">
@@ -153,7 +157,6 @@
         color="grey darken-1"
         v-if="control.libraryId && control.options.allowHide"
         v-model="control.options.hidden"
-        hide-details
         label="Hidden"
       >
         <template slot="label">
@@ -182,11 +185,20 @@
         v-model="control.options.hasMultipleSelections"
         v-if="
           control.type === 'ontology' ||
-            control.type === 'farmOsPlanting' ||
-            control.type === 'farmOsFarm' ||
-            control.type === 'farmOsField'
+          control.type === 'farmOsPlanting' ||
+          control.type === 'farmOsFarm' ||
+          control.type === 'farmOsField'
         "
         label="Allow Multiple Selections"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+      />
+
+      <v-combobox
+        v-if="control.type === 'farmOsUuid'"
+        outlined
+        label="FarmOS Type"
+        v-model="control.options.farmOsType"
+        :items="control.options.farmOsTypes"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
 
@@ -202,9 +214,9 @@
       <div v-if="!showAdvanced" class="d-flex justify-end mt-4">
         <v-btn @click="showAdvanced = true" color="grey darken-1" small text>advanced</v-btn>
       </div>
-      <div v-if="showAdvanced" class="mt-2">
+      <div v-else class="mt-2">
         <div class="d-flex justify-space-between">
-          <v-card-title class="d-flex">Advanced Options</v-card-title>
+          <v-card-title class="px-0 d-flex">Advanced Options</v-card-title>
           <v-icon @click.stop="showAdvanced = false">mdi-close</v-icon>
         </div>
 
@@ -268,6 +280,13 @@
           </v-icon>
         </div>
       </div>
+
+      <app-file-properties
+        v-if="isFile"
+        v-model="control.options.source"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        class="mt-5"
+      />
       <select-items-editor
         v-if="isSelect"
         v-model="control.options.source"
@@ -278,7 +297,7 @@
         v-else-if="isOntology"
         :value="control.options.source"
         :resources="survey.resources"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        :disable-selection="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         class="mt-5"
@@ -297,7 +316,7 @@
       <instructions-editor
         v-else-if="isInstructions"
         v-model="control.options.source"
-        :disabled="control.libraryId != null"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
       <instructions-image-split-editor
         v-else-if="isInstructionsImageSplit"
@@ -316,6 +335,7 @@
 <script>
 import { getAdvancedCodeTemplate, findParentByChildId } from '@/utils/surveys';
 import api from '@/services/api.service';
+import AppFileProperties from '@/components/builder/FileProperties.vue';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
 import appMatrixProperties from '@/components/builder/MatrixProperties.vue';
 import appOntologyProperties from '@/components/builder/OntologyProperties.vue';
@@ -327,6 +347,7 @@ import { convertToKey } from '@/utils/builder';
 
 export default {
   components: {
+    AppFileProperties,
     SelectItemsEditor,
     InstructionsEditor,
     appOntologyProperties,
@@ -398,6 +419,9 @@ export default {
     isGroup() {
       return this.control.type === 'group';
     },
+    isFile() {
+      return this.control.type === 'file' || this.control.type === 'image';
+    },
     isDate() {
       return this.control.type === 'date';
     },
@@ -424,6 +448,9 @@ export default {
     },
     isInstructionsImageSplit() {
       return this.control.type === 'instructionsImageSplit';
+    },
+    isPage() {
+      return this.control.type === 'page';
     },
     showRequiredOption() {
       if (this.control.options.required) {

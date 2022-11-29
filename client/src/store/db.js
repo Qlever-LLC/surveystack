@@ -12,21 +12,19 @@ const scripts = [];
 
 const groups = [];
 
-// const readyToSubmit = [];
-
 let db = null;
 
 const stores = {
   SUBMISSIONS: 'submissions',
   SURVEYS: 'surveys',
-  READY_TO_SUBMIT: 'readyToSubmit',
+  RESOURCES: 'resources',
 };
 
 const DATABASE_NAME = 'Database';
 
 // Opening a Database
 function openDb(onSuccess) {
-  const request = indexedDB.open(DATABASE_NAME, 7);
+  const request = indexedDB.open(DATABASE_NAME, 8);
   db = this.result;
 
   request.onerror = (event) => {
@@ -54,15 +52,16 @@ function openDb(onSuccess) {
       // ignore
     }
 
-    // try {
-    //   db.createObjectStore(stores.READY_TO_SUBMIT, { keyPath: '_id' });
-    // } catch (error) {
-    //   // ignore
-    // }
-
     try {
       console.log('creating survey store');
       db.createObjectStore(stores.SURVEYS, { keyPath: '_id' });
+    } catch (error) {
+      // ignore
+    }
+
+    try {
+      console.log('creating resources store');
+      db.createObjectStore(stores.RESOURCES, { keyPath: '_id' });
     } catch (error) {
       // ignore
     }
@@ -101,9 +100,9 @@ function clearAllSurveys() {
   clearObjectStore(stores.SURVEYS);
 }
 
-// function clearAllReadyToSubmit() {
-//   clearObjectStore(stores.READY_TO_SUBMIT);
-// }
+function clearAllResources() {
+  clearObjectStore(stores.RESOURCES);
+}
 
 function persist(storeName, obj) {
   try {
@@ -131,9 +130,9 @@ function persistSurvey(survey) {
   persist(stores.SURVEYS, survey);
 }
 
-// function persistReadyToSubmit(obj) {
-//   persist(stores.READY_TO_SUBMIT, obj);
-// }
+function persistResource(resource) {
+  persist(stores.RESOURCES, resource);
+}
 
 function getResults(storeName, success) {
   // Create an array
@@ -153,11 +152,11 @@ function getResults(storeName, success) {
       success(results);
     }
   };
-}
 
-// function getAllReadyToSubmit(onSuccess) {
-//   getResults(stores.READY_TO_SUBMIT, onSuccess);
-// }
+  objectStore.openCursor().onerror = (event) => {
+    console.log(`Error: ${event}`);
+  };
+}
 
 // Read All data in ObjectStore
 function getAllSubmissions(onSuccess) {
@@ -166,6 +165,10 @@ function getAllSubmissions(onSuccess) {
 
 function getAllSurveys(onSuccess) {
   getResults(stores.SURVEYS, onSuccess);
+}
+
+function getAllResources(onSuccess) {
+  getResults(stores.RESOURCES, onSuccess);
 }
 
 /*
@@ -277,16 +280,16 @@ export {
   scripts,
   openDb,
   persistSubmission,
+  persistResource,
   persistSurvey,
   getAllSubmissions,
   clearAllSubmissions,
   getAllSurveys,
   clearAllSurveys,
+  getAllResources,
+  clearAllResources,
   loadFromIndexedDB,
   saveToIndexedDB,
   stores,
-  // getAllReadyToSubmit,
-  // persistReadyToSubmit,
-  // clearAllReadyToSubmit,
   removeFromIndexedDB,
 };

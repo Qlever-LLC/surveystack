@@ -6,9 +6,12 @@ import { ObjectId } from 'mongodb';
 import { db } from '../db';
 
 import { queryParam } from '../helpers';
-import mailService from '../services/mail.service';
+import mailService from '../services/mail/mail.service';
 import membershipService from '../services/membership.service';
 import rolesService from '../services/roles.service';
+import { createLoginPayload, createUserIfNotExist } from '../services/auth.service';
+import { pick } from 'lodash';
+import flatten from 'flat';
 
 const col = 'memberships';
 
@@ -26,170 +29,18 @@ const sanitize = (entity) => {
   }
 };
 
-const createPopulationPipeline = () => {
-  const pipeline = [];
-  const userLookup = [
-    {
-      $lookup: {
-        from: 'users',
-        let: { userId: '$user' },
-        pipeline: [
-          { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
-          { $project: { name: 1, email: 1 } },
-        ],
-        as: 'user',
-      },
-    },
-    {
-      $unwind: { path: '$user', preserveNullAndEmptyArrays: true },
-    },
-    {
-      $set: {
-        user: { $ifNull: ['$user', null] }, // we want user: null explicitly
-      },
-    },
-  ];
-  pipeline.push(...userLookup);
-
-  const groupLookup = [
-    {
-      $lookup: {
-        from: 'groups',
-        let: { groupId: '$group' },
-        pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$groupId'] } } }],
-        as: 'group',
-      },
-    },
-    {
-      $unwind: '$group',
-    },
-  ];
-  pipeline.push(...groupLookup);
-  pipeline.push({ $sort: { 'group.path': 1 } });
-
-  return pipeline;
-};
-
-const getAdminOfSubGroups = async (entities) => {
-  const adminOfSubGroups = [];
-  for (const e of [...entities]) {
-    if (e.role === 'admin') {
-      const subgroups = await rolesService.getDescendantGroups(e.group);
-
-      for (const subgroup of subgroups) {
-        // console.log('subgroup', subgroup._id);
-        // console.log('entities', entities);
-        // console.log('adminOfSubGroups', adminOfSubGroups);
-
-        if (adminOfSubGroups.find((m) => m.group._id == subgroup._id)) {
-          continue;
-        }
-
-        const presentEntity = entities.find((e) => `${e.group._id}` == `${subgroup._id}`);
-        // console.log('found entity', presentEntity);
-
-        if (presentEntity) {
-          continue;
-        }
-
-        const cpy = { ...e };
-        cpy.group = { ...subgroup };
-        e.projected = true;
-        adminOfSubGroups.push(cpy);
-      }
-    }
-  }
-
-  return adminOfSubGroups;
-};
-
 const getMemberships = async (req, res) => {
-  const filter = {};
+  const { group, user, invitationCode, status, role } = req.query;
 
-  const { group, user, invitationCode, status } = req.query;
-  if (group) {
-    const parentGroups = await rolesService.getParentGroups(group);
-    // console.log('parentGroups', parentGroups);
-    filter.group = { $in: parentGroups.map((g) => new ObjectId(g._id)) };
-    // console.log('filter', filter);
-  }
-
-  if (user) {
-    filter.user = new ObjectId(user);
-  }
-
-  if (invitationCode) {
-    filter['meta.invitationCode'] = invitationCode;
-  }
-
-  if (status) {
-    filter['meta.status'] = status;
-  }
-
-  const pipeline = [{ $match: filter }];
-  if (queryParam(req.query.populate)) {
-    pipeline.push(...createPopulationPipeline());
-  }
-
-  const entities = await db.collection(col).aggregate(pipeline).toArray();
-
-  if (user) {
-    const adminOfSubGroups = await getAdminOfSubGroups(entities);
-    entities.push(...adminOfSubGroups);
-  }
-
-  if (group) {
-    const filteredMemberships = entities.filter(
-      (e) => !(e.role != 'admin' && e.group._id != group)
-    );
-
-    const otherMembers = [];
-    const admins = [];
-
-    for (const member of filteredMemberships) {
-      if (member.role !== 'admin') {
-        continue;
-      }
-
-      if (
-        member.user &&
-        admins.find((m) => m.user && `${m.user._id}` === `${member.user._id}`)
-      ) {
-        continue;
-      }
-
-      if (admins.find((m) => `${m._id}` === `${member._id}`)) {
-        continue;
-      }
-
-      admins.push(member);
-    }
-
-    // console.log('admins', admins);
-
-    for (const member of filteredMemberships) {
-      if (member.role !== 'user') {
-        continue;
-      }
-
-      if (
-        member.user &&
-          otherMembers.find((m) => m.user && `${m.user._id}` === `${member.user._id}`)
-      ) {
-        continue;
-      }
-
-      if (otherMembers.find((m) => `${m._id}` === `${member._id}`)) {
-        continue;
-      }
-
-      otherMembers.push(member);
-    }
-
-    return res.send([...admins, ...otherMembers]);
-  }
-
-  return res.send(entities);
+  const memberships = await membershipService.getMemberships(
+    group,
+    user,
+    invitationCode,
+    status,
+    role,
+    req.query.populate
+  );
+  res.send(memberships);
 };
 
 const getTree = async (req, res) => {
@@ -206,7 +57,7 @@ const getTree = async (req, res) => {
     { $project: { role: 1, group: 1 } },
   ];
 
-  membershipPipeline.push(...createPopulationPipeline());
+  membershipPipeline.push(...membershipService.createPopulationPipeline());
   membershipPipeline.push(
     ...[
       {
@@ -261,7 +112,7 @@ const getMembership = async (req, res) => {
   const pipeline = [{ $match: filter }];
 
   if (queryParam(req.query.populate)) {
-    pipeline.push(...createPopulationPipeline());
+    pipeline.push(...membershipService.createPopulationPipeline());
   }
   const [entity] = await db.collection(col).aggregate(pipeline).toArray();
 
@@ -317,21 +168,21 @@ const joinGroup = async (req, res) => {
     throw boom.badRequest('Group not found');
   }
 
-  if (group.meta.invitationOnly) {
-    throw boom.badRequest('Group is set to invitation only');
-  }
-
   const { user } = res.locals.auth;
 
-  let r = await db.collection(col).findOne({
+  let existingMembership = await db.collection(col).findOne({
     group: group._id,
     user: user._id,
   });
-  console.log("user in group findone result: ", r)
-  if(r) {
+
+  if (existingMembership) {
     return res.send({
-      status: "ok"
-    })
+      status: 'ok',
+    });
+  }
+
+  if (group.meta.invitationOnly) {
+    throw boom.badRequest('Group is set to invitation only');
   }
 
   const membership = {
@@ -369,17 +220,13 @@ const sendMembershipInvitation = async ({ membership, origin }) => {
     throw boom.badRequest(`Group does not exist: ${membership.group}`);
   }
 
-  await mailService.send({
+  await mailService.sendLink({
     to: membership.meta.invitationEmail,
-    subject: `Surveystack invitation to group ${group.name}`,
-    text: `Hello
-
-You have been invited to join group '${group.name}'!
-
-Please use the following link to activate your invitation:
-${origin}/invitations?code=${membership.meta.invitationCode}
-
-Best Regards`,
+    subject: `SurveyStack invitation to group ${group.name}`,
+    link: `${origin}/invitations?code=${membership.meta.invitationCode}`,
+    actionDescriptionHtml: `You have been invited to join group '${group.name}'!`,
+    actionDescriptionText: `You have been invited to join group '${group.name}'!\nFollow this link to activate your invitation:`,
+    btnText: 'Join',
   });
 };
 
@@ -402,19 +249,21 @@ const resendInvitation = async (req, res) => {
 
 const updateMembership = async (req, res) => {
   const { id } = req.params;
-  const entity = req.body;
+  const { group } = req.body;
 
-  sanitize(entity);
-
-  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
+  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, group);
   if (!adminAccess) {
     throw boom.unauthorized(`Only group admins can update memberships`);
   }
 
+  // select the fields that are updateable by the user
+  // TODO validate role (user/admin?)
+  const update = flatten(pick(req.body, ['role', 'meta.invitationName']));
+
   try {
     let updated = await db
       .collection(col)
-      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: entity }, { returnOriginal: false });
+      .findOneAndUpdate({ _id: new ObjectId(id) }, { $set: update }, { returnOriginal: false });
     return res.send(updated);
   } catch (err) {
     console.log(err);
@@ -422,7 +271,7 @@ const updateMembership = async (req, res) => {
   }
 };
 
-const deleteMembership = async (req, res) => {
+const deleteMembership = async (req, res, _, hook) => {
   const { id } = req.params;
 
   const membership = await db.collection(col).findOne({ _id: new ObjectId(id) });
@@ -437,6 +286,8 @@ const deleteMembership = async (req, res) => {
   }
 
   try {
+    await hook(membership); // hook before removal
+
     let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
     assert.equal(1, r.deletedCount);
 
@@ -451,20 +302,83 @@ const deleteMembership = async (req, res) => {
 
 const activateMembership = async (req, res) => {
   const { code } = req.body;
-  const user = res.locals.auth.user._id;
+  let user;
+  let loginPayload = null;
 
+  const membership = await db.collection(col).findOne({ 'meta.invitationCode': code });
+  // is authenticated with the user that owns the invitation
+  if (
+    res.locals.auth.isAuthenticated &&
+    res.locals.auth.user.email === membership.meta.invitationEmail
+  ) {
+    user = res.locals.auth.user._id;
+  } else {
+    const userObject = await createUserIfNotExist(
+      membership.meta.invitationEmail,
+      membership.meta.invitationName
+    );
+    loginPayload = await createLoginPayload(userObject);
+    user = userObject._id;
+  }
   await membershipService.activateMembership({ code, user });
 
-  return res.send('OK');
+  if (loginPayload) {
+    res.send(loginPayload);
+  } else {
+    res.send({ ok: true });
+  }
+};
+
+const activateMembershipByAdmin = async (req, res) => {
+  const { membershipId } = req.body;
+  const { origin } = req.headers;
+
+  if (!membershipId) {
+    throw boom.badRequest('"membershipId" is missing from the request body');
+  }
+
+  const membership = await db.collection(col).findOne({ _id: ObjectId(membershipId) });
+  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, membership.group);
+  if (!adminAccess) {
+    throw boom.unauthorized(`Only group admins can create memberships`);
+  }
+
+  await membershipService.activateMembershipByAdmin({ membershipId: membership._id, origin });
+
+  res.send({ ok: true });
+};
+
+// Creates a confirmed (activated) group member
+const createConfirmedMembership = async (req, res) => {
+  const entity = req.body;
+  delete entity._id;
+  sanitize(entity);
+  const { origin } = req.headers;
+
+  const adminAccess = await rolesService.hasAdminRole(res.locals.auth.user._id, entity.group);
+  if (!adminAccess) {
+    throw boom.unauthorized(`Only group admins can create memberships`);
+  }
+
+  if (!entity.meta?.invitationEmail) {
+    throw boom.badRequest('Need to supply an email address');
+  }
+
+  let membership = (await db.collection(col).insertOne(entity)).ops[0];
+  await membershipService.activateMembershipByAdmin({ membershipId: membership._id, origin });
+
+  res.send({ ok: true });
 };
 
 export default {
   getMemberships,
   getMembership,
   createMembership,
+  createConfirmedMembership,
   updateMembership,
   deleteMembership,
   activateMembership,
+  activateMembershipByAdmin,
   getTree,
   resendInvitation,
   joinGroup,

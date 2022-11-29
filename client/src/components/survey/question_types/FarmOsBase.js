@@ -1,6 +1,7 @@
 import api from '@/services/api.service';
-
 import { getValueOrNull } from '@/utils/surveyStack';
+import { linearControls } from '@/utils/submissions';
+import { NODE_STREAM_INPUT } from 'papaparse';
 
 const base = (type) => ({
   data() {
@@ -30,7 +31,7 @@ const base = (type) => ({
       return (item && item.label) || value;
     },
     getLabelForItemValue2(value) {
-      console.log(value);
+      // console.log(value);
       const item = this.farms.find((x) => x.value === value);
       return (item && item.label) || value;
     },
@@ -38,11 +39,10 @@ const base = (type) => ({
       this.loading = true;
       try {
         const response = await api.get('farmos/farms');
-        this.farms = response.data.map(({ name, url }) => ({
-          label: name,
+        this.farms = response.data.map(({ name, instanceName }) => ({
+          label: instanceName,
           value: {
-            farmName: name,
-            url,
+            url: instanceName,
           },
         }));
       } catch (err) {
@@ -53,55 +53,187 @@ const base = (type) => ({
     async fetchAreas() {
       this.loading = true;
       try {
-        const response = await api.get('farmos/fields');
-        this.farms = response.data.flatMap((f) => {
-          // '9' => { actualResponse of FarmosInstance}
-          const firstKey = Object.keys(f.data)[0];
-          const data = f.data[firstKey];
-          return data.map((farmField) => ({
-            label: `<span class="blue-chip mr-4">${f.farm}</span> ${farmField.name} `,
-            value: {
-              farmName: f.farm.trim(),
-              url: f.url,
-              name: farmField.name.trim(),
-              fieldId: farmField.tid,
-            },
-          }));
-        });
+        const response = await api.get('farmos/assets?bundle=land');
+
+        this.farms = response.data.assets.map((f) => ({
+          label: `<span class="blue-chip mr-4">${f.instanceName}</span> ${f.name} `,
+          value: {
+            farmName: f.instanceName,
+            url: f.instanceName,
+            name: f.name.trim(),
+            fieldId: f.id,
+          },
+        }));
       } catch (e) {
         console.log('something went wrong:', e);
         // TODO show error
       }
+
+      const submission = this.$store.getters['draft/submission'];
+      const survey = this.$store.getters['draft/survey'];
+      const nodes = linearControls(survey, submission);
+      const farmOsType = 'field';
+
+      const localAreas = [];
+      for (const node of nodes) {
+        if (node.type === 'farmOsUuid' && node.options.farmOsType === farmOsType) {
+          if (!node.value) {
+            continue;
+          }
+          localAreas.push({
+            label: `<span class="green-chip mr-4">New Field</span> ${node.value.name}`,
+            value: {
+              farmName: '',
+              url: '',
+              name: node.value.name,
+              fieldId: node.value.id,
+            },
+          });
+        }
+
+        if (node.type === 'matrix') {
+          if (!node.options || !node.options.source || !node.options.source.content) {
+            continue;
+          }
+
+          const farmosUuidElemets = node.options.source.content.filter((c) => c.type == 'farmos_uuid');
+
+          for (const config of farmosUuidElemets) {
+            // console.log('config', config);
+            const type = config.options.farmOsType;
+            const colName = config.value;
+            if (type === farmOsType && node.value) {
+              // console.log('type matches');
+              for (const v of node.value) {
+                const targetValue = v[colName].value;
+                if (targetValue && targetValue.name) {
+                  localAreas.push({
+                    label: `<span class="green-chip mr-4">New Field</span> ${targetValue.name}`,
+                    value: {
+                      farmName: '',
+                      url: '',
+                      name: targetValue.name,
+                      fieldId: targetValue.id,
+                    },
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+
+      this.farms = [...localAreas, ...this.farms];
+
       this.loading = false;
     },
     async fetchAssets() {
       this.loading = true;
       try {
-        const response = await api.get('farmos/assets');
-        console.log('assets', response);
-        this.assets = response.data.flatMap((f) => {
-          // '9' => { actualResponse of FarmosInstance}
-          const firstKey = Object.keys(f.data)[0];
-          const data = f.data[firstKey];
-          return data
-            .filter((asset) => asset.type === 'planting' && asset.archived === '0')
-            .map((planting) => ({
-              label: `<span class="blue-chip mr-4">${f.farm}</span> ${planting.name} `,
-              value: {
-                farmName: f.farm.trim(),
-                url: f.url,
-                name: planting.name.trim(),
-                assetId: planting.id,
-                location: planting.location,
-                farmId: firstKey,
-                archived: planting.archived !== '0',
-              },
-            }));
+        const { data: location } = await api.get('farmos/assets?bundle=land');
+
+        // console.log('locations', location);
+
+        const response = await api.get('farmos/assets?bundle=plant');
+
+        // console.log('res', response.data);
+        this.assets = response.data.assets.map((f) => {
+          let loc = [];
+
+          if (f.location) {
+            loc = f.location.map((loc) => {
+              const asset = location.assets.find((l) => l.id === loc.id);
+
+              return {
+                id: loc.id,
+                name: asset ? asset.name : '(No Area Associated)',
+              };
+            });
+          }
+
+          return {
+            label: `<span class="blue-chip mr-4">${f.instanceName}</span> ${f.name} `,
+            value: {
+              farmId: f.instanceName,
+              farmName: f.instanceName,
+              url: f.instanceName,
+              name: f.name.trim(),
+              assetId: f.id,
+              archived: f.archived !== null,
+              location: loc,
+            },
+          };
         });
       } catch (e) {
         console.log('something went wrong:', e);
         // TODO show error
       }
+
+      // submission assets
+
+      const submission = this.$store.getters['draft/submission'];
+      const survey = this.$store.getters['draft/survey'];
+      const nodes = linearControls(survey, submission);
+
+      // console.log('nodes', nodes);
+
+      const farmOsType = 'planting';
+
+      const localPlantings = [];
+      for (const node of nodes) {
+        if (node.type === 'farmOsUuid' && node.options.farmOsType === farmOsType) {
+          if (!node.value || !node.value.name) {
+            continue;
+          }
+          localPlantings.push({
+            label: `${node.value.name}`,
+            value: {
+              farmId: '',
+              farmName: '',
+              url: '',
+              name: node.value.name,
+              assetId: node.value.id,
+              archived: false,
+              location: [],
+            },
+          });
+        }
+
+        if (node.type === 'matrix') {
+          if (!node.options || !node.options.source || !node.options.source.content) {
+            continue;
+          }
+
+          const farmosUuidElemets = node.options.source.content.filter((c) => c.type == 'farmos_uuid');
+
+          for (const config of farmosUuidElemets) {
+            const type = config.options.farmOsType;
+            const colName = config.value;
+            if (type === farmOsType && node.value) {
+              for (const v of node.value) {
+                const targetValue = v[colName].value;
+                if (targetValue && targetValue.name) {
+                  localPlantings.push({
+                    label: `${targetValue.name}`,
+                    value: {
+                      farmId: '',
+                      farmName: '',
+                      url: '',
+                      name: targetValue.name,
+                      assetId: targetValue.id,
+                      archived: false,
+                      location: [],
+                    },
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // console.log('localplantings', localPlantings);
+      this.assets = [...localPlantings, ...this.assets];
       this.loading = false;
     },
   },

@@ -16,11 +16,14 @@
 
         <v-text-field v-if="entity.user" class="mt-3" v-model="entity.user" label="User" disabled />
 
+        <v-text-field class="mt-3" v-model="entity.meta.invitationEmail" label="Invitation Email" disabled />
+
         <v-text-field
+          v-if="entity.meta.status === 'pending'"
           class="mt-3"
-          v-model="entity.meta.invitationEmail"
-          label="Invitation Email"
-          :disabled="entity.meta.status === 'active'"
+          v-model="entity.meta.invitationName"
+          label="Invitee Name"
+          hint="Default name for newly registered users"
         />
 
         <v-select class="mt-3" :items="availableRoles" v-model="entity.role" label="Role"></v-select>
@@ -54,48 +57,27 @@
       </v-card-actions>
     </v-card>
 
-    <v-card class="my-3">
-      <app-integration-list
-        title="Membership Integrations"
-        :entities="integrations"
-        :newRoute="{ name: 'membership-integrations-new', query: { membership: entity._id } }"
-        integrationType="membership"
-      />
-    </v-card>
-
     <v-dialog v-model="dialogRemoval" max-width="290">
       <v-card class="">
-        <v-card-title>
-          Delete Membership
-        </v-card-title>
-        <v-card-text class="mt-4">
-          Are you sure you want to delete this membership?
-        </v-card-text>
+        <v-card-title> Delete Membership </v-card-title>
+        <v-card-text class="mt-4"> Are you sure you want to delete this membership? </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click.stop="dialogRemoval = false">
-            Cancel
-          </v-btn>
-          <v-btn text color="red" @click.stop="remove">
-            Delete
-          </v-btn>
+          <v-btn text @click.stop="dialogRemoval = false"> Cancel </v-btn>
+          <v-btn text color="red" @click.stop="remove"> Delete </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
     <v-dialog v-model="dialogSent" max-width="400">
       <v-card class="">
-        <v-card-title>
-          Sent
-        </v-card-title>
+        <v-card-title> Sent </v-card-title>
         <v-card-text class="mt-4">
           An invitation email has been sent to<br />{{ entity.meta.invitationEmail }}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click.stop="dialogSent = false">
-            OK
-          </v-btn>
+          <v-btn text @click.stop="dialogSent = false"> OK </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -168,7 +150,7 @@ export default {
     };
   },
   watch: {
-    'entity.meta.invitationEmail': function(newVal, oldVal) {
+    'entity.meta.invitationEmail': function (newVal, oldVal) {
       if (!oldVal) {
         this.initialInvitationEmail = newVal;
       }

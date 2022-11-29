@@ -2,7 +2,7 @@
   <div class="control-adder">
     <v-speed-dial v-model="fabIsOpen" fixed bottom direction="top" transition="fade" class="fab-button" :style="{}">
       <template v-slot:activator>
-        <v-btn v-model="fabIsOpen" fab color="blue darken-2" dark>
+        <v-btn v-model="fabIsOpen" fab color="blue darken-2" dark data-testid="control-adder-open">
           <v-icon v-if="fabIsOpen">mdi-close</v-icon>
           <v-icon v-else>mdi-plus</v-icon>
         </v-btn>
@@ -17,6 +17,7 @@
             class="ma-1 d-inline-block shadow green span-button"
             outlined
             small
+            data-testid="add-control-library"
           >
             search question library
           </v-btn>
@@ -28,6 +29,7 @@
             class="ma-1 indigo--text bg-white shadow"
             outlined
             small
+            data-testid="add-control-group"
           >
             <v-icon left v-if="group.icon" color="indigo lighten-2">
               {{ group.icon }}
@@ -38,10 +40,11 @@
             small
             dark
             color="indigo"
-            v-for="el in rest"
+            v-for="el in filteredComponents"
             :key="el.type"
             @click="addControl(el)"
             class="ma-1 d-inline-block shadow"
+            :data-testid="'add-control-' + el.type"
           >
             <v-icon dark left v-if="el.icon">
               {{ el.icon }}
@@ -58,12 +61,10 @@
 import { createControlInstance, availableControls } from '@/utils/surveyConfig';
 
 const group = availableControls.find((c) => c.type === 'group');
-const rest = availableControls.filter((c) => c.type !== 'group' && c.type !== 'library');
 
 export default {
   data() {
     return {
-      rest,
       group,
       sequence: 0,
       fabIsOpen: false,
@@ -87,6 +88,16 @@ export default {
     },
     openLibrary() {
       this.$emit('openLibrary');
+    },
+  },
+  computed: {
+    filteredComponents() {
+      return availableControls.filter(
+        (c) =>
+          c.type !== 'group' &&
+          c.type !== 'library' &&
+          (this.$store.getters['toggle/isOn']['feature_resource'] || c.type !== 'file' || c.type !== 'image')
+      );
     },
   },
 };

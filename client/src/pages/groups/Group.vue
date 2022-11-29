@@ -10,7 +10,7 @@
       </div>
     </div>
 
-    <div style="color: red;" v-if="entity.meta.archived">
+    <div style="color: red" v-if="entity.meta.archived">
       <strong>Please note:</strong> this group is currently archived
     </div>
     <h1>
@@ -18,6 +18,7 @@
       <v-chip v-if="isPremium" class="ml-2" color="success"> <v-icon small left> mdi-octagram </v-icon>Premium </v-chip>
     </h1>
     <h3 class="text--secondary">{{ entity.path }}</h3>
+    <div class="text--secondary body-2">{{ entity._id }}</div>
 
     <v-row>
       <v-col>
@@ -135,6 +136,9 @@ export default {
       if (g && g.role === 'admin') {
         return true;
       }
+      if (this.$store.getters['auth/isSuperAdmin']) {
+        return true;
+      }
       return false;
     },
     isWhitelabel() {
@@ -175,6 +179,7 @@ export default {
   display: flex;
   margin-bottom: 3rem;
 }
+
 .placeholder > div {
   display: flex;
   flex: 1;

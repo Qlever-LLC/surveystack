@@ -24,13 +24,14 @@ export const defaultControlOptions = {
 };
 
 const createDefaultMatrixSource = () => ({
-  config: { addRowLabel: 'Add row' },
+  config: { addRowLabel: 'Add row', fixedColumns: 1 },
   content: [
     {
       label: 'Sample',
       value: 'sample',
       tags: '',
       type: 'number',
+      options: {},
       resource: '',
       multiple: false,
       required: false,
@@ -42,6 +43,7 @@ const createDefaultMatrixSource = () => ({
       value: 'description',
       tags: '',
       type: 'text',
+      options: {},
       resource: '',
       multiple: false,
       required: false,
@@ -55,7 +57,7 @@ export const createControlInstance = (control) => {
   const clone = cloneDeep(control);
 
   const cloneWithDefaultOptions = Object.assign(clone, {
-    options: cloneDeep(defaultControlOptions),
+    options: control.options || cloneDeep(defaultControlOptions),
     id: new ObjectId().toString(),
   });
 
@@ -79,6 +81,21 @@ export const createControlInstance = (control) => {
       body: '',
       images: [],
     };
+  } else if (control.type === 'file') {
+    cloneWithDefaultOptions.options.source = {
+      types: [],
+      typesImmutable: false,
+      allowMultiple: false,
+    };
+  } else if (control.type === 'image') {
+    cloneWithDefaultOptions.options.source = {
+      types: ['image/*'],
+      typesImmutable: true,
+      allowMultiple: false,
+    };
+  } else if (control.type === 'farmOsUuid') {
+    cloneWithDefaultOptions.options.farmOsTypes = ['field', 'planting'];
+    cloneWithDefaultOptions.options.farmOsType = 'field';
   }
 
   delete cloneWithDefaultOptions.icon;
@@ -91,14 +108,14 @@ export const availableControls = [
     label: 'My group',
     type: 'group',
     children: [],
-    icon: 'mdi-group',
+    icon: 'mdi-format-list-group',
   },
   {
     name: 'page',
     label: 'My page',
     type: 'page',
     children: [],
-    icon: 'mdi-view-list',
+    icon: 'mdi-file-outline',
   },
   {
     name: 'instructions',
@@ -153,7 +170,7 @@ export const availableControls = [
     name: 'dropdown',
     label: 'Dropdown',
     type: 'ontology',
-    icon: 'mdi-arrow-down-drop-circle',
+    icon: 'mdi-arrow-down-drop-circle-outline',
   },
   {
     name: 'matrix',
@@ -162,10 +179,28 @@ export const availableControls = [
     icon: 'mdi-matrix',
   },
   {
+    name: 'image',
+    label: 'Upload an image',
+    type: 'image',
+    icon: 'mdi-file-upload-outline',
+  },
+  {
+    name: 'file',
+    label: 'Upload a file',
+    type: 'file',
+    icon: 'mdi-file-upload-outline',
+  },
+  {
     name: 'script',
     label: 'Script',
     type: 'script',
     icon: 'mdi-code-braces',
+  },
+  {
+    name: 'map',
+    label: 'Map',
+    type: 'geoJSON',
+    icon: 'mdi-map',
   },
   {
     name: 'farmos_field',
@@ -186,9 +221,9 @@ export const availableControls = [
     icon: 'mdi-leaf',
   },
   {
-    name: 'map',
-    label: 'Map',
-    type: 'geoJSON',
-    icon: 'mdi-map',
+    name: 'farmos_uuid',
+    label: 'FarmOS ID',
+    type: 'farmOsUuid',
+    icon: 'mdi-leaf',
   },
 ];

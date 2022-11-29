@@ -1,139 +1,135 @@
-import { db } from '../db';
-import { ObjectId } from 'mongodb'
-import headerService from '../services/header.service';
-import submissionController from './submissionController';
-import { expectationFailed } from '@hapi/boom';
+import submissionController, { buildPipeline } from './submissionController';
+import {
+  createReq,
+  createRes,
+  createSurvey,
+  getControlGenerator,
+  getSubmissionDataGenerator,
+} from '../testUtils';
+const { ObjectId } = jest.requireActual('mongodb');
 
-const { getSubmissionsCsv } = submissionController;
+const { getSubmissionsCsv, prepareSubmissionsToQSLs } = submissionController;
 
-jest.mock('../db', () => ({ db: {
-  collection: () => ({
-    aggregate: () => ({ toArray: mockDBValue }),
-  }),
-} }));
-jest.mock('../services/header.service', () => ({ getHeaders: mockGetHeaders }));
+async function mockControlsAndSubmission() {
+  const { survey, createSubmission } = await createSurvey(['text', 'number']);
+  const { submission: _submission } = await createSubmission();
 
-
-function mockDBValue() {
-  return [
-    {
-      "_id": ObjectId("60b52489fe387f0001339266"),
-      "meta": {
-        "dateCreated": "2021-05-31T18:01:45.771Z",
-        "dateModified": "2021-05-31T18:01:51.153Z",
-        "dateSubmitted": "2021-05-31T18:01:54.979Z",
-        "survey": {
-          "id": "60b524715575f00001f504da",
-          "version": 2
-        },
-        "revision": 1,
-        "permissions": [],
-        "status": [
-          {
-            "type": "READY_TO_SUBMIT",
-            "value": {
-              "at": "2021-05-31T18:01:54.902Z"
-            }
-          }
-        ],
-        "group": {
-          "id": "5e6f8bbeea14550001470c28",
-          "path": "/our-sci/"
-        },
-        "specVersion": 3,
-        "creator": "5e452119c5117c000185f275"
+  const controls = survey.revisions[survey.latestVersion - 1].controls;
+  const libraryId = new ObjectId();
+  const libraryVersion = 3;
+  const groupOverride = {
+    children: [
+      getControlGenerator('text')({ libraryId, libraryVersion, libraryIsInherited: true }),
+    ],
+    isLibraryRoot: true,
+    libraryId,
+    libraryVersion,
+  };
+  controls.push(
+    getControlGenerator('page')({
+      children: [getControlGenerator('group')(groupOverride)],
+    }),
+    getControlGenerator('group')(
+      {
+        ...groupOverride,
+        options: { ...getControlGenerator('text')().options, redacted: true },
       },
-      "data": {
-        "map_1": {
-          "value": {
-            "type": "FeatureCollection",
-            "features": [
-              {
-                "type": "Feature",
-                "geometry": {
-                  "type": "Polygon",
-                  "coordinates": [
-                    [
-                      [
-                        -6.562507152557395,
-                        30.54964053646397
-                      ],
-                      [
-                        16.406257152557362,
-                        5.382682618676981
-                      ],
-                      [
-                        -18.281250000000018,
-                        5.382682618676981
-                      ],
-                      [
-                        -6.562507152557395,
-                        30.54964053646397
-                      ]
-                    ]
-                  ]
-                },
-                "properties": null,
-                "id": "measureFeature0"
-              }
-            ]
-          },
-          "meta": {
-            "type": "geoJSON",
-            "dateModified": "2021-05-31T14:01:51.153-04:00"
-          }
-        }
-      }
-    }
-  ];
-}
+      2
+    ),
+    getControlGenerator('group')(groupOverride, 3)
+  );
 
-function mockGetHeaders() {
-  return [
-    '_id',
-    'meta.dateCreated',
-    'meta.dateModified',
-    'meta.dateSubmitted',
-    'meta.survey.id',
-    'meta.survey.version',
-    'meta.revision',
-    'meta.permissions',
-    'meta.status.0.type',
-    'meta.status.0.value.at',
-    'meta.group.id',
-    'meta.group.path',
-    'meta.specVersion',
-    'meta.creator',
-    'data.map_1.value.features.0',
-    'data.map_1.value.type'
-  ];
+  const submission = {
+    ..._submission,
+    data: {
+      ..._submission.data,
+      ...getSubmissionDataGenerator('page')(
+        getSubmissionDataGenerator('group')(getSubmissionDataGenerator('text')())
+      ),
+      ...getSubmissionDataGenerator('group')(getSubmissionDataGenerator('text')(), 2),
+      ...getSubmissionDataGenerator('group')(getSubmissionDataGenerator('text')(), 3),
+    },
+  };
+
+  submission.data.group_3.text_1.meta.permissions = ['admin'];
+
+  return { controls, submission };
 }
 
 describe('submissionController', () => {
   describe('getSubmissionsCsv', () => {
     it('returns expected CSV for geojson question type', async () => {
-      
-      const mockReq = { 
-        query: {}, 
-        cookies: {}
-      };
-      const mockRes = {
-        set: jest.fn(),
-        send: jest.fn(),
-        locals: {
-          auth: {
-            isAuthenticated: false,
-            user: {
-              _id: new ObjectId(),
-            },
-            roles: [],
-          },
-        }
-      }
+      const { survey, createSubmission } = await createSurvey('geoJSON');
+      const { submission } = await createSubmission();
+      const mockReq = createReq({ query: { showCsvMeta: 'true', survey: survey._id } });
+      const mockRes = await createRes();
       await getSubmissionsCsv(mockReq, mockRes);
-      const expected = `_id,meta.dateCreated,meta.dateModified,meta.dateSubmitted,meta.survey.id,meta.survey.version,meta.revision,meta.permissions,meta.status.0.type,meta.status.0.value.at,meta.group.id,meta.group.path,meta.specVersion,meta.creator,data.map_1.value.features.0,data.map_1.value.type\r\n60b52489fe387f0001339266,2021-05-31T18:01:45.771Z,2021-05-31T18:01:51.153Z,2021-05-31T18:01:54.979Z,60b524715575f00001f504da,2,1,,READY_TO_SUBMIT,2021-05-31T18:01:54.902Z,5e6f8bbeea14550001470c28,/our-sci/,3,5e452119c5117c000185f275,"{""type"":""Feature"",""geometry"":{""type"":""Polygon"",""coordinates"":[[[-6.562507152557395,30.54964053646397],[16.406257152557362,5.382682618676981],[-18.281250000000018,5.382682618676981],[-6.562507152557395,30.54964053646397]]]},""properties"":null,""id"":""measureFeature0""}",FeatureCollection`;
+      const expected =
+        '_id,meta.dateCreated,meta.dateModified,meta.dateSubmitted,meta.survey.id,meta.survey.version,meta.revision,meta.permissions,meta.status.0.type,meta.status.0.value.at,meta.group.id,meta.group.path,meta.specVersion,meta.creator,meta.permanentResults,data.map_1.features.0,data.map_1.type\r\n' +
+        `${submission._id},` +
+        `${submission.meta.dateCreated.toISOString()},` +
+        `${submission.meta.dateModified.toISOString()},` +
+        `${submission.meta.dateSubmitted.toISOString()},` +
+        `${submission.meta.survey.id},` +
+        `2,1,,READY_TO_SUBMIT,` +
+        `${submission.meta.status[0].value.at.toISOString()},` +
+        `${submission.meta.group.id},` +
+        `${submission.meta.group.path},4,` +
+        `${submission.meta.creator},` +
+        `,"{""type"":""Feature"",""geometry"":{""type"":""Polygon"",""coordinates"":[[[-79.39869321685993,43.65614580273717],[-79.39799841596073,43.6460912513611],[-79.37263818314015,43.645085703645464],[-79.3698589795434,43.657653840263464],[-79.39869321685993,43.65614580273717]]]},""properties"":null,""id"":""measureFeature0""}",FeatureCollection`;
       expect(mockRes.send).toHaveBeenCalledWith(expected);
+    });
+  });
 
-    })
-  })
+  describe('prepareSubmissionsToQSLs', () => {
+    it('returns no submission for empty params', async () => {
+      const controls = [];
+      const submission = {};
+      const QSLSubmissions = await prepareSubmissionsToQSLs(controls, submission);
+      expect(QSLSubmissions.length).toBe(0);
+    });
+
+    it('returns one submission for each used question set library in controls', async () => {
+      const { controls, submission } = await mockControlsAndSubmission();
+      const QSLSubmissions = await prepareSubmissionsToQSLs(controls, submission);
+      expect(QSLSubmissions.length).toBe(2);
+    });
+
+    it('keeps private data marked with permissions=admin for all child submissions', async () => {
+      const { controls, submission } = await mockControlsAndSubmission();
+      const QSLSubmissions = await prepareSubmissionsToQSLs(controls, submission);
+      expect(QSLSubmissions[1].data.text_1.meta.permissions).toStrictEqual(['admin']);
+    });
+  });
+});
+
+describe('buildPipeline', () => {
+  // TODO add tests for the rest of the operations ( $match, $redact, $project)
+
+  it('adds default $sort operation to pipeline', async () => {
+    const pipeline = await buildPipeline(createReq({ query: {} }), await createRes());
+    expect(pipeline).toContainEqual({ $sort: { _id: -1 } });
+  });
+
+  it('adds $sort operation from query parameter', async () => {
+    const pipeline = await buildPipeline(
+      createReq({ query: { sort: JSON.stringify({ 'meta.dateCreated': -1 }) } }),
+      await createRes()
+    );
+    expect(pipeline).toContainEqual({ $sort: { 'meta.dateCreated': -1 } });
+  });
+  it('skips sort operation when `?unsorted=true`', async () => {
+    const pipeline = await buildPipeline(
+      createReq({ query: { unsorted: 'true' } }),
+      await createRes()
+    );
+    expect(pipeline).not.toContainEqual(expect.objectContaining({ $sort: expect.anything() }));
+  });
+  it('skips sort operation when `query.sort` is set but `query.unsorted="true"`', async () => {
+    const pipeline = await buildPipeline(
+      createReq({ query: { unsorted: 'true', sort: JSON.stringify({ _id: 1 }) } }),
+      await createRes()
+    );
+    expect(pipeline).not.toContainEqual(expect.objectContaining({ $sort: expect.anything() }));
+  });
 });

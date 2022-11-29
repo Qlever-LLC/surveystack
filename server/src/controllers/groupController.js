@@ -12,7 +12,10 @@ import rolesService from '../services/roles.service';
 const col = 'groups';
 
 const sanitizeGroup = (entity) => {
-  entity._id = new ObjectId(entity._id);
+  // entity doesn't have an _id before inserting a new group
+  if (entity._id) {
+    entity._id = new ObjectId(entity._id);
+  }
 
   if (!entity.slug) {
     throw boom.badRequest(`Group slug not set`);
@@ -149,6 +152,7 @@ const getGroups = async (req, res) => {
   }
 
   entities = await db.collection(col).find(findQuery).sort({ path: 1 }).toArray();
+
   return res.send(entities);
 };
 
@@ -225,7 +229,7 @@ const createGroup = async (req, res) => {
     assert.equal(1, r.insertedCount);
   } catch (err) {
     if (err.name === 'MongoError' && err.code === 11000) {
-      throw boom.conflict(`Conflict _id or path: ${entity._id}, ${entity.path}`);
+      throw boom.conflict(`Conflict _id or path: "${String(entity._id)}", "${entity.path}"`);
     }
     throw boom.internal(`createGroup: unknown internal error`);
   }
@@ -347,21 +351,20 @@ const addDocLink = async (req, res) => {
         groupIdsToUpdate.push(subgroup._id);
       }
     } else {
-      existing.docs ? existing.docs.push(doc) : existing.docs = [doc];
+      existing.docs ? existing.docs.push(doc) : (existing.docs = [doc]);
       groupIdsToUpdate.push(existing._id);
     }
 
-    let result = await db.collection(col).updateMany(
-      { '_id': { $in: groupIdsToUpdate } },
-      { $addToSet: { docs: doc } }
-    );
+    let result = await db
+      .collection(col)
+      .updateMany({ _id: { $in: groupIdsToUpdate } }, { $addToSet: { docs: doc } });
 
     return res.send(result);
   } catch (err) {
     console.log(err);
     return res.status(500).send({ message: 'Ouch :/' });
   }
-}
+};
 
 const removeDocLink = async (req, res) => {
   const { groupid, doc, removeFromDescendants } = req.body;
@@ -378,21 +381,20 @@ const removeDocLink = async (req, res) => {
         groupIdsToUpdate.push(subgroup._id);
       }
     } else {
-      existing.docs ? existing.docs.push(doc) : existing.docs = [doc];
+      existing.docs ? existing.docs.push(doc) : (existing.docs = [doc]);
       groupIdsToUpdate.push(existing._id);
     }
 
-    let result = await db.collection(col).updateMany(
-      { '_id': { $in: groupIdsToUpdate } },
-      { $pull: { docs: {link : doc.link } } }
-    );
+    let result = await db
+      .collection(col)
+      .updateMany({ _id: { $in: groupIdsToUpdate } }, { $pull: { docs: { link: doc.link } } });
 
     return res.send(result);
   } catch (err) {
     console.log(err);
     return res.status(500).send({ message: 'Ouch :/' });
   }
-}
+};
 
 export default {
   getGroups,
@@ -402,5 +404,5 @@ export default {
   updateGroup,
   deleteGroup,
   addDocLink,
-  removeDocLink
+  removeDocLink,
 };

@@ -6,8 +6,9 @@ import uuidv4 from 'uuid/v4';
 import boom from '@hapi/boom';
 
 import { db } from '../db';
-import { cookieOptions } from '../constants'
-import _ from 'lodash';
+import { createCookieOptions } from '../constants';
+import _, { isEmpty, isString } from 'lodash';
+import IsEmail from 'isemail';
 
 const col = 'users';
 
@@ -33,62 +34,9 @@ const getUsers = async (req, res) => {
     return res.send(entities);
   }
 
-  entities = await db
-    .collection(col)
-    .find({})
-    .project(projection)
-    .toArray();
+  entities = await db.collection(col).find({}).project(projection).toArray();
   return res.send(entities);
 };
-
-/*
-// TODO: secure this route
-const getUsersByGroup = async (req, res) => {
-  const { group } = req.params;
-
-  const entities = await db
-    .collection('users')
-    .aggregate([
-      {
-        $match: {
-          $or: [{ 'group.user': new ObjectId(group) }, { 'group.admin': new ObjectId(group) }],
-        },
-      },
-      {
-        $lookup: {
-          from: 'groups',
-          let: { usergroups: { $ifNull: ['$group.user', []] } },
-          pipeline: [
-            { $match: { $expr: { $in: ['$_id', '$$usergroups'] } } },
-            { $project: { slug: 0 } },
-          ],
-          as: 'group.user',
-        },
-      },
-      {
-        $lookup: {
-          from: 'groups',
-          let: { admingroups: { $ifNull: ['$group.admin', []] } },
-          pipeline: [
-            { $match: { $expr: { $in: ['$_id', '$$admingroups'] } } },
-            { $project: { slug: 0 } },
-          ],
-          as: 'group.admin',
-        },
-      },
-      {
-        $project: {
-          email: 1,
-          name: 1,
-          group: 1,
-        },
-      },
-    ])
-    .toArray();
-
-  return res.send(entities);
-};
-*/
 
 const getUser = async (req, res) => {
   const { id } = req.params;
@@ -97,10 +45,7 @@ const getUser = async (req, res) => {
   pipeline.push({ $match: { _id: new ObjectId(id) } });
   pipeline.push({ $project: { email: 1, name: 1 } });
 
-  const [entity] = await db
-    .collection(col)
-    .aggregate(pipeline)
-    .toArray();
+  const [entity] = await db.collection(col).aggregate(pipeline).toArray();
 
   if (!entity) {
     throw boom.notFound(`No user found for id: ${id}`);
@@ -143,21 +88,30 @@ const createUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const entity = req.body;
-  const id = entity._id;
+  const { _id: id, password, name, email } = req.body;
+
+  const updatedUser = {};
+
+  if (isString(name) && !isEmpty(name)) {
+    updatedUser.name = name;
+  }
+
+  if (isString(email) && !isEmpty(email)) {
+    if (!IsEmail.validate(email)) {
+      throw boom.badRequest('Invalid email address');
+    }
+    updatedUser.email = email;
+  }
 
   if (!res.locals.auth.isSuperAdmin && res.locals.auth.user._id != id) {
     throw boom.unauthorized(`Not allowed to put user: ${id}`);
   }
 
-  const { password } = entity;
-  if (password === '') {
-    delete entity.password;
-  } else {
-    entity.password = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS));
+  if (isString(password) && !isEmpty(password)) {
+    updatedUser.password = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS));
 
     // create a new user token when password changes
-    entity.token = uuidv4();
+    updatedUser.token = uuidv4();
 
     // remove the previously set token header
     // use a try-catch because it's accessing undocumented API and failing is non-critical
@@ -167,22 +121,21 @@ const updateUser = async (req, res) => {
       console.warn(e);
     }
     // udpate the token in the cookie header for backward compatibility: https://gitlab.com/our-sci/software/surveystack/-/merge_requests/33#note_700125477
-    res.cookie('token', entity.token, cookieOptions);
+    res.cookie('token', updatedUser.token, createCookieOptions());
   }
 
   try {
-    delete entity._id;
-    let updated = await db.collection(col).findOneAndUpdate(
-      { _id: new ObjectId(id) },
-      { $set: entity },
-      {
-        returnOriginal: false,
-      }
-    );
+    const updated = await db
+      .collection(col)
+      .findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: updatedUser },
+        { returnOriginal: false }
+      );
     return res.send(updated);
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ message: 'Ouch :/' });
+    return res.status(500).send({ message: 'Failed to update user.' });
   }
 };
 
@@ -206,7 +159,6 @@ const deleteUser = async (req, res) => {
 export default {
   getUsers,
   getUser,
-  //getUsersByGroup,
   createUser,
   updateUser,
   deleteUser,

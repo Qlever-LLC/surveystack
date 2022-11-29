@@ -8,6 +8,8 @@ import moment from 'moment';
 import submissionUtils from './submissions';
 import { SPEC_VERSION_SURVEY } from '@/constants';
 import supplySandbox from './supplySandbox';
+import ObjectID from 'bson-objectid';
+import { flatSurveyControls } from '@/utils/surveyDiff';
 
 function* processSurveyNames(data) {
   if (!data) {
@@ -103,6 +105,199 @@ function* processData(data, namespace = '') {
     }
   }
 }
+
+/**
+ * Calls changeFn for the passed control and recursively on its descendants controls. ChangeFn can mutate control
+ * @param control to call changeFn on
+ * @param changeFn(control) function to be called on control and its descendants
+ */
+export const changeRecursive = (control, changeFn) => {
+  changeFn(control);
+
+  if (control.children) {
+    control.children.forEach((childControl) => {
+      changeRecursive(childControl, changeFn);
+    });
+  }
+};
+
+/**
+ * Replaces a control by its path
+ * @param controls control list to be changed
+ * @param parentPath parent path of the controls passed
+ * @param replacePath path of the control to be replaced
+ * @param replacementControl new control which replaces the control at the replacePath
+ */
+export const replaceControl = (controls, parentPath, replacePath, replacementControl) => {
+  return controls.map((control) => {
+    let currentPath = parentPath ? [parentPath, control.name].join('.') : control.name;
+    if (currentPath === replacePath) {
+      return replacementControl;
+    } else if (control.children) {
+      control.children = replaceControl(control.children, currentPath, replacePath, replacementControl);
+      return control;
+    } else {
+      return control;
+    }
+  });
+};
+
+/**
+ * Removes a control by its path
+ * @param controls control list to be changed
+ * @param parentPath parent path of the controls passed
+ * @param removePath  path of the control to be removed
+ */
+export const removeControl = (controls, parentPath, removePath) => {
+  return controls.filter((control) => {
+    let currentPath = parentPath ? [parentPath, control.name].join('.') : control.name;
+    if (currentPath === removePath) {
+      return false;
+    } else if (control.children) {
+      control.children = removeControl(control.children, currentPath, removePath);
+      return true;
+    } else {
+      return true;
+    }
+  });
+};
+
+/**
+ * Prepares the passed library control or resource to be consumed in another survey
+ * @param controlOrResource control to be prepared, mutating
+ * @param libraryId the library id the control/resource originated from
+ * @param libraryVersion the library version the control/resource originated from
+ */
+export const prepareToAddFromLibrary = (controlOrResource, libraryId, libraryVersion) => {
+  controlOrResource.id = new ObjectID().toString();
+  if (controlOrResource.libraryId) {
+    // do not overwrite the libraryId cause it references another library the inherited library consists of
+    controlOrResource.libraryIsInherited = true;
+  } else if (controlOrResource.isNonLibraryControl) {
+    // this flag is set by surveyDiff.js:merge to indicate that this is a consumer-added, non-library control
+    delete controlOrResource.isNonLibraryControl;
+  } else {
+    // set library data
+    controlOrResource.libraryId = libraryId;
+    controlOrResource.libraryVersion = libraryVersion;
+  }
+};
+
+/**
+ * Returns new resources copied from library survey
+ * @param librarySurvey
+ * @returns [resources] with property origin set to the original id of the resource before copying
+ */
+export const getPreparedLibraryResources = (librarySurvey) => {
+  return librarySurvey.resources.map((r) => {
+    r.origin = r.id;
+    prepareToAddFromLibrary(r, librarySurvey._id, librarySurvey.latestVersion);
+    return r;
+  });
+};
+
+/**
+ * Returns new controls copied from library survey
+ * @param librarySurveyId
+ * @param librarySurveyLatestVersion
+ * @param controlsToAdd
+ * @param newResources an array of resources containing updated id's, with the old id stored in the origin property
+ * @param oldResources an array of resources containing updated id's, with the old id stored in the origin property
+ * @returns [controls]
+ */
+export const getPreparedLibraryControls = (
+  librarySurveyId,
+  librarySurveyLatestVersion,
+  controlsToAdd,
+  newResources,
+  oldResources
+) => {
+  return controlsToAdd.map((controlToAdd) => {
+    changeRecursive(controlToAdd, (control) => {
+      prepareToAddFromLibrary(control, librarySurveyId, librarySurveyLatestVersion);
+      replaceResourceReferenceId(control, newResources, oldResources);
+    });
+    return controlToAdd;
+  });
+};
+
+/**
+ * Updates a control's references to new resources
+ * @param control the control to update
+ * @param newResources an array of resources containing updated id's, with the old id stored in the origin property
+ * @param oldResources optional, an array of resources containing updated id's, with the old id stored in the origin property
+ * @returns [controls]
+ */
+export const replaceResourceReferenceId = (control, newResources, oldResources) => {
+  if (newResources && control && control.options && control.options.source) {
+    // replace the control's reference(s) by the new ids of the resources
+    if (control.type === 'matrix') {
+      control.options.source.content.forEach((col) => {
+        if (col.resource) {
+          col.resource = getUpdatedResourceId(col.resource, oldResources, newResources);
+        }
+      });
+    } else if (control.type === 'instructionsImageSplit') {
+      control.options.source.images.forEach((image, index, images) => {
+        images[index] = getUpdatedResourceId(image, oldResources, newResources);
+      });
+    } else {
+      control.options.source = getUpdatedResourceId(control.options.source, oldResources, newResources);
+    }
+  }
+};
+
+/*
+
+
+ */
+/**
+ * Returns an updated resource id referencing the new resource id
+ * If oldResources are passed, we try to find matches via newResource.origin===oldResource.origin and oldResource.id===oldId
+ * If oldResources are NOT passed, we try to find matches via newResource.origin===oldId
+ *
+ * @param oldId old resource id
+ * @param oldResources (optional) old resources containing id's and origin's
+ * @param newResources old resources containing id's and origin's
+ * @returns {*} the new resource id if found, otherwise returns oldId
+ */
+const getUpdatedResourceId = (oldId, oldResources, newResources) => {
+  let matchingResource;
+
+  if (oldResources) {
+    matchingResource = newResources.find((newRes) => {
+      const matchingOldRes = oldResources.find((oldRes) => oldRes.origin === newRes.origin);
+      if (matchingOldRes) {
+        return matchingOldRes.id === oldId;
+      } else {
+        return false;
+      }
+    });
+  }
+
+  if (!matchingResource) {
+    matchingResource = newResources.find((r) => r.origin === oldId);
+  }
+  if (matchingResource) {
+    return matchingResource.id;
+  } else {
+    return oldId;
+  }
+};
+
+export const isResourceReferenced = (controls, resourceId) => {
+  return flatSurveyControls(controls).some(({ control }) => {
+    if (control.type === 'matrix') {
+      return control.options.source.content.some(
+        (contentEl) => contentEl.resource && contentEl.resource === resourceId
+      );
+    } else if (control.type === 'instructionsImageSplit') {
+      return control.options.source.images.some((image) => image === resourceId);
+    } else {
+      return control.options.source === resourceId;
+    }
+  });
+};
 
 /**
  * Returns a data object with keys and values from the instance controls.
@@ -230,7 +425,7 @@ export const getFlatName = (controls, position) => {
   return flatName.substr(1);
 };
 
-export const insertControl = (control, controls, position, selectedControlIsGroup) => {
+export const insertControl = (controlToInsert, controls, position, selectedControlIsGroup) => {
   let currentControl;
   let currentControls = controls;
   let index = position[0];
@@ -238,10 +433,10 @@ export const insertControl = (control, controls, position, selectedControlIsGrou
   let exit = false;
 
   for (let i = 0; i < position.length; i++) {
-    currentControl = currentControls[position[i]];
+    currentControl = getControlByPosition(currentControls, position[i]);
     index = position[i];
     if (currentControl.type === 'group' || currentControl.type === 'page') {
-      if (exit || control.type === 'group' || control.type === 'page') {
+      if (exit || controlToInsert.type === 'page') {
         break;
       }
       if (i === position.length - 1 && !selectedControlIsGroup) {
@@ -252,7 +447,17 @@ export const insertControl = (control, controls, position, selectedControlIsGrou
     }
   }
 
-  currentControls.splice(index + 1, 0, control);
+  currentControls.splice(index + 1, 0, controlToInsert);
+};
+
+/**
+ * Returns the control at the given position in controls. Falls back to highest position if the passed position is out of range
+ * @param controls
+ * @param position
+ * @returns {*}
+ */
+export const getControlByPosition = (controls, position) => {
+  return controls[position] || controls[controls.length - 1];
 };
 
 export const getBreadcrumbs = (survey, position) => {
@@ -308,6 +513,21 @@ export const uuid = () => {
   return `${u}.${new Date().getTime().toString(16)}`;
 };
 
+export const uuidv4 = () => {
+  const rnd = new Uint8Array(32);
+  crypto.getRandomValues(rnd);
+  let count = 0;
+  const u = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = rnd[count++] % 16;
+
+    if (c === 'x') {
+      return r.toString(16);
+    }
+    return ((r & 0x3) | 0x8).toString(16);
+  });
+  return u;
+};
+
 // eslint-disable-next-line no-unused-vars
 function _has(target, key) {
   return true;
@@ -322,7 +542,7 @@ export function compileSandboxSingleLine(src) {
   const wrappedSource = `with (sandbox) { return ${src}}`;
   const code = new Function('sandbox', wrappedSource);
 
-  return function(sandbox) {
+  return function (sandbox) {
     const sandboxProxy = new Proxy(sandbox, { _has, _get });
     return code(sandboxProxy);
   };
@@ -330,11 +550,12 @@ export function compileSandboxSingleLine(src) {
 
 export function compileSandbox(src, fname) {
   const wrappedSource = `with (sandbox) { ${src}\nreturn ${fname}(arg1, arg2, arg3); }`;
-  const code = new Function('sandbox', wrappedSource);
+  let AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+  const code = new AsyncFunction('sandbox', wrappedSource);
 
-  return function(sandbox) {
+  return async function (sandbox) {
     const sandboxProxy = new Proxy(sandbox, { _has, _get });
-    return code(sandboxProxy);
+    return await code(sandboxProxy);
   };
 }
 
@@ -356,17 +577,19 @@ export const simplify = (submissionItem) => {
   return ret;
 };
 
-export function executeUnsafe({ code, fname, submission, survey, parent, log }) {
+export async function executeUnsafe({ code, fname, submission, survey, parent, log }) {
   console.log('execute unsafe called');
   const sandbox = compileSandbox(code, fname);
 
-  const res = sandbox({
+  const res = await sandbox({
     arg1: submission,
     arg2: survey,
     arg3: parent,
     log,
     ...supplySandbox,
   });
+
+  console.log('result of sandbox', res);
 
   return res;
 }
@@ -739,6 +962,7 @@ export function findParentByChildId(controlId, controls) {
       return r;
     };
   }
+
   const [result] = controls.reduce(fpr(controlId), []);
   return result || null;
 }
@@ -760,25 +984,6 @@ export function getGroups(controls) {
 
   return controls.reduce(reducer, []);
 }
-
-// export function modifyOptions(controls = [], options = {}) {
-//   function modify({ type, key, value }) {
-//     return (control) => {
-//       if (control.type === type && control.options[key]) {
-//         console.log(control.name, control.options[key]);
-//         // eslint-disable-next-line no-param-reassign
-//         control.options[key] = value;
-//         console.log('--->', control.options[key]);
-//       } else if (control.type === 'group' && control.children.length) {
-//         control.children.forEach(modify({ type, key, value }));
-//       }
-//     };
-//   }
-
-//   const copy = cloneDeep(controls);
-//   copy.forEach(modify(options));
-//   return copy;
-// }
 
 /**
  *
@@ -858,3 +1063,16 @@ export function createSurvey({ creator = null, group = null, specVersion = SPEC_
     ],
   };
 }
+
+function hasPage(reduction, control) {
+  if (control && control.children && Array.isArray(control.children)) {
+    return control.children.reduce(hasPage, reduction) || control.type === 'page';
+  } else if (control && control.type === 'page') {
+    return true;
+  }
+  return false;
+}
+
+export const descendantHasPage = (control) => {
+  return hasPage(false, control);
+};
