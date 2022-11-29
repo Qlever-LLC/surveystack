@@ -18,7 +18,7 @@
     </v-container>
     <v-container fluid class="pa-0" v-else>
       <v-row dense>
-        <v-col v-for="c in surveys.content" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
+        <v-col v-for="c in activeSurveys" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
           <v-card
             @click="toggleCard(c._id)"
             v-show="!selectedSurvey || selectedSurvey._id == c._id"
@@ -150,8 +150,8 @@ export default {
           skip: 0,
           limit: 100000,
         },
-        loading: false,
       },
+      loading: false,
       selectedSurvey: null,
     };
   },
@@ -159,6 +159,9 @@ export default {
     activeTabPaginationLength() {
       const { total } = this.surveys.pagination;
       return total ? Math.ceil(total / PAGINATION_LIMIT) : 0;
+    },
+    activeSurveys() {
+      return this.selectedSurvey ? [this.selectedSurvey] : this.surveys.content;
     },
   },
   methods: {
@@ -193,7 +196,7 @@ export default {
       } catch (e) {
         console.log('Error fetching surveys:', e);
       }
-      // return [];
+
       return {
         content: [],
         pagination: {
@@ -201,14 +204,15 @@ export default {
           parsedSkip: 0,
           total: 0,
         },
-        loading: false,
       };
     },
     addToSurvey(librarySurveyId) {
       this.$emit('add-questions-from-library', librarySurveyId);
     },
     async toggleCard(surveyId) {
-      if (this.selectedSurvey && this.selectedSurvey._id === surveyId) {
+      if (this.selectedSurvey && this.selectedSurvey._id === this.libraryId) {
+        return; // prevent to switch to the list if editing mode
+      } else if (this.selectedSurvey && this.selectedSurvey._id === surveyId) {
         this.selectedSurvey = null; // deselect card
       } else {
         const { data } = await api.get(`/surveys/${surveyId}`);
@@ -221,12 +225,17 @@ export default {
       this.page = 1;
       this.fetchData();
     },
+    libraryId() {
+      // Reset to list mode
+      this.selectedSurvey = null;
+    },
   },
   created() {
+    // Load list of surveys
     this.fetchData();
 
-    // set selected survey
     if (this.libraryId) {
+      // Load the selected survey if editing mode
       this.toggleCard(this.libraryId);
     }
   },
