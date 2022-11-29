@@ -20,7 +20,7 @@
       <v-row dense>
         <v-col v-for="c in surveys.content" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
           <v-card
-            @click="toggleCard(c)"
+            @click="toggleCard(c._id)"
             v-show="!selectedSurvey || selectedSurvey._id == c._id"
             class="control-item mb-2"
             elevation="7"
@@ -46,7 +46,7 @@
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
                   color="grey"
                   key="close"
-                  @click.stop="toggleCard(c)"
+                  @click.stop="toggleCard(c._id)"
                   class="mt-n5 mr-1 d-inline-block shadow white span-button"
                   outlined
                   small
@@ -185,11 +185,6 @@ export default {
           }
           // eslint-disable-next-line no-param-reassign
           s.createdAgo = moment.duration(now.diff(s.meta.dateCreated)).humanize();
-
-          // set selected survey
-          if (this.libraryId && s._id === this.libraryId) {
-            this.toggleCard(s);
-          }
         }
 
         this.surveys = data;
@@ -212,11 +207,11 @@ export default {
     addToSurvey(librarySurveyId) {
       this.$emit('add-questions-from-library', librarySurveyId);
     },
-    async toggleCard(survey) {
-      if (this.selectedSurvey && survey._id === this.selectedSurvey._id) {
+    async toggleCard(surveyId) {
+      if (this.selectedSurvey && this.selectedSurvey._id === surveyId) {
         this.selectedSurvey = null; // deselect card
       } else {
-        const { data } = await api.get(`/surveys/${survey._id}`);
+        const { data } = await api.get(`/surveys/${surveyId}`);
         this.selectedSurvey = data; // select card
       }
     },
@@ -229,6 +224,11 @@ export default {
   },
   created() {
     this.fetchData();
+
+    // set selected survey
+    if (this.libraryId) {
+      this.toggleCard(this.libraryId);
+    }
   },
 };
 </script>
