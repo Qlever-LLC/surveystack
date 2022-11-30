@@ -257,7 +257,13 @@ export default {
     },
     headers() {
       // remove all hidden headers
-      return this.source.content.filter((header) => !header.hidden);
+      return this.source.content
+        .filter((header) => !header.hidden)
+        .map((header) => ({
+          ...header,
+          // Compatible with original `autocomplete` question type (https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56)
+          type: header.type === 'autocomplete' ? 'dropdown' : header.type,
+        }));
     },
     fields() {
       return this.source.content.map((col) => col.value);

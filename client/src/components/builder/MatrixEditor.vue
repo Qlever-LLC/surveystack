@@ -86,7 +86,7 @@
                       :items="$options.MATRIX_COLUMN_TYPES"
                       label="Type"
                     />
-                    <div v-if="item.type === 'dropdown' || item.type === 'autocomplete'" class="d-flex flex-column">
+                    <div v-if="item.type === 'dropdown'" class="d-flex flex-column">
                       <div class="d-flex flex-row flex-wrap">
                         <v-select
                           dense
@@ -110,14 +110,6 @@
                         </v-btn>
                       </div>
                       <v-checkbox class="mt-2 ml-2" v-model="item.multiple" label="Multi-select" hide-details dense />
-                      <v-checkbox
-                        v-if="item.type === 'autocomplete'"
-                        class="mt-0 ml-2"
-                        v-model="item.custom"
-                        label="Custom inputs"
-                        hide-details
-                        dense
-                      />
                     </div>
 
                     <div v-if="item.type == 'farmos_uuid'" class="d-flex flex-column">
@@ -210,8 +202,7 @@ import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 
 const MATRIX_COLUMN_TYPES = [
-  { text: 'Ontology - Dropdown', value: 'dropdown' },
-  { text: 'Ontology - Auto Complete', value: 'autocomplete' },
+  { text: 'Dropdown', value: 'dropdown' },
   { text: 'Text', value: 'text' },
   { text: 'Text and QR-Code', value: 'qrcode' },
   { text: 'Number', value: 'number' },
@@ -270,7 +261,13 @@ export default {
     // get/set the position of the columns and the "lock-to-left" marker
     columns: {
       get() {
-        const columns = [...this.value.content];
+        const columns = [
+          ...this.value.content.map((item) => ({
+            ...item,
+            // Compatible with original `autocomplete` question type (https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56)
+            type: item.type === 'autocomplete' ? 'dropdown' : item.type,
+          })),
+        ];
         const fixedColumns = this.value.config.fixedColumns || 0;
         columns.splice(fixedColumns, 0, { isFixedUntilMarker: true });
         return columns;

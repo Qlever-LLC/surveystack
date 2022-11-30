@@ -102,64 +102,6 @@
       <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
     </template>
   </v-select>
-  <v-combobox
-    v-else-if="header.type === 'autocomplete' && header.custom"
-    :items="items"
-    item-text="label"
-    item-value="value"
-    :value="value"
-    @input="
-      (v) => {
-        comboboxSearch = null;
-        value = getValueOrNull(v);
-        onInput();
-      }
-    "
-    :delimiters="[',']"
-    :multiple="header.multiple"
-    :disabled="disabled"
-    :return-object="false"
-    :search-input.sync="comboboxSearch"
-    outlined
-    class="custom-ontology"
-  >
-    <template v-slot:selection="{ item, index }">
-      <matrix-cell-selection-label :label="getLabel(item)" :index="index" :value="value" />
-    </template>
-    <template v-slot:no-data>
-      <v-list-item>
-        <v-list-item-content>
-          <v-list-item-title>
-            No values matching "<strong>{{ comboboxSearch }}</strong
-            >". Press <kbd>enter</kbd> <span v-if="header.multiple">or <kbd>,</kbd></span> to create a new one
-          </v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-    </template>
-  </v-combobox>
-  <v-autocomplete
-    v-else-if="header.type === 'autocomplete' && !header.custom"
-    :items="items"
-    item-text="label"
-    item-value="value"
-    :value="value"
-    @input="
-      (v) => {
-        comboboxSearch = null;
-        value = getValueOrNull(v);
-        onInput();
-      }
-    "
-    hide-details
-    outlined
-    :multiple="header.multiple"
-    :disabled="disabled"
-    :search-input.sync="comboboxSearch"
-  >
-    <template v-slot:selection="{ item, index }">
-      <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
-    </template>
-  </v-autocomplete>
   <v-autocomplete
     v-else-if="header.type === 'farmos_field'"
     :items="farmos.farms || []"
