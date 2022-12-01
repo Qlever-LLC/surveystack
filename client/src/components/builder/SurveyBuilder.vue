@@ -422,7 +422,7 @@ export default {
       rootGroup.children = getPreparedLibraryControls(
         librarySurvey._id,
         librarySurvey.latestVersion,
-        librarySurvey.revisions[librarySurvey.latestVersion - 1].controls,
+        librarySurvey.revisions[librarySurvey.revisions.length - 1].controls,
         newResources,
         null
       );

@@ -111,7 +111,7 @@
                   :scale="0.75"
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
                   class="graphical-view"
-                  :controls="selectedSurvey.revisions[selectedSurvey.latestVersion - 1].controls"
+                  :controls="selectedSurvey.revisions[selectedSurvey.revisions.length - 1].controls"
                 />
               </v-col>
             </v-row>
