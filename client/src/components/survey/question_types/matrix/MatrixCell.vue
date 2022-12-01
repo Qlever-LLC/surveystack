@@ -45,7 +45,6 @@
       />
     </div>
   </div>
-
   <v-text-field
     v-else-if="header.type === 'farmos_uuid'"
     :value="localValue"
@@ -53,10 +52,7 @@
       (v) => {
         if (!this.value || this.value.name !== v) {
           const text = getValueOrNull(v);
-          value = {
-            name: text,
-            id: uuidv4(),
-          };
+          value = { id: uuidv4(), name: text };
         }
         onInput();
       }
@@ -66,7 +62,6 @@
     autocomplete="off"
     :disabled="disabled"
   />
-
   <v-text-field
     v-else-if="header.type === 'number'"
     :value="value"
@@ -82,7 +77,7 @@
     :disabled="disabled"
   />
   <v-select
-    v-else-if="header.type === 'dropdown'"
+    v-else-if="header.type === 'dropdown' && !header.custom && !header.autocomplete"
     :items="items"
     item-text="label"
     item-value="value"
@@ -102,6 +97,67 @@
       <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
     </template>
   </v-select>
+  <v-autocomplete
+    v-else-if="header.type === 'dropdown' && !header.custom && header.autocomplete"
+    class="matrix-autocomplete"
+    :items="items"
+    item-text="label"
+    item-value="value"
+    :value="value"
+    @input="
+      (v) => {
+        comboboxSearch = null;
+        value = getValueOrNull(v);
+        onInput();
+      }
+    "
+    hide-details
+    outlined
+    :multiple="header.multiple"
+    :disabled="disabled"
+    :search-input.sync="comboboxSearch"
+    hint="Type to search"
+  >
+    <template v-slot:selection="{ item, index }">
+      <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
+    </template>
+  </v-autocomplete>
+  <v-combobox
+    v-else-if="header.type === 'dropdown' && header.custom"
+    class="matrix-combobox"
+    :items="items"
+    item-text="label"
+    item-value="value"
+    :value="value"
+    @input="
+      (v) => {
+        comboboxSearch = null;
+        value = getValueOrNull(v);
+        onInput();
+      }
+    "
+    :delimiters="[',']"
+    :multiple="header.multiple"
+    :disabled="disabled"
+    :return-object="false"
+    :search-input.sync="comboboxSearch"
+    placeholder="Type to search"
+    outlined
+  >
+    <template v-slot:selection="{ item, index }">
+      <matrix-cell-selection-label :label="getLabel(item)" :index="index" :value="value" />
+    </template>
+    <template v-slot:no-data>
+      <v-list-item>
+        <v-list-item-content>
+          <v-list-item-title>
+            No values matching "<strong>{{ comboboxSearch }}</strong
+            >". Press <kbd>enter</kbd> <span v-if="header.multiple">or <kbd>,</kbd></span> to create a new one
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+    </template>
+  </v-combobox>
   <v-autocomplete
     v-else-if="header.type === 'farmos_field'"
     :items="farmos.farms || []"
@@ -364,6 +420,11 @@ export default {
 </script>
 
 <style scoped>
+.matrix-autocomplete.v-autocomplete.v-select.v-input--is-focused >>> .v-select__selections::before {
+  content: 'Type';
+  color: var(--v-accent-lighten4);
+}
+
 >>> .v-select__selections {
   flex-wrap: nowrap;
 }

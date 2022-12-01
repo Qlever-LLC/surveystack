@@ -81,8 +81,8 @@
                     <v-text-field v-model="item.value" label="Value" dense />
                     <v-select
                       dense
-                      v-bind:value="item.type"
-                      v-on:input="(type) => onTypeChanged({ ...item, type }, i)"
+                      :value="item.type"
+                      @input="(type) => onChanged(item, { type })"
                       :items="$options.MATRIX_COLUMN_TYPES"
                       label="Type"
                     />
@@ -113,7 +113,19 @@
                       <v-checkbox
                         class="mt-0 ml-2"
                         v-model="item.custom"
+                        :checked="item.custom"
+                        @change="
+                          (custom) => onChanged(item, { ...item, custom, autocomplete: custom || item.autocomplete })
+                        "
                         label="Allow custom answer"
+                        hide-details
+                        dense
+                      />
+                      <v-checkbox
+                        class="mt-0 ml-2"
+                        v-model="item.autocomplete"
+                        label="Autocomplete"
+                        :disabled="Boolean(item.custom)"
                         hide-details
                         dense
                       />
@@ -204,9 +216,9 @@
 <script>
 import ObjectId from 'bson-objectid';
 import draggable from 'vuedraggable';
-
 import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import { resourceLocations, resourceTypes } from '@/utils/resources';
+import { cleanupAutocompleteMatrix } from '@/utils/surveys';
 
 const MATRIX_COLUMN_TYPES = [
   { text: 'Dropdown', value: 'dropdown' },
@@ -268,11 +280,7 @@ export default {
     // get/set the position of the columns and the "lock-to-left" marker
     columns: {
       get() {
-        const columns = this.value.content.map((item) => ({
-          ...item,
-          // Compatible with original `autocomplete` question type (https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56)
-          type: item.type === 'autocomplete' ? 'dropdown' : item.type,
-        }));
+        const columns = [...this.value.content];
         const fixedColumns = this.value.config.fixedColumns || 0;
         columns.splice(fixedColumns, 0, { isFixedUntilMarker: true });
         return columns;
@@ -287,9 +295,6 @@ export default {
     },
   },
   methods: {
-    log(v) {
-      console.log(v);
-    },
     removeResource(id) {
       const index = this.resources.findIndex((r) => r.id === id);
       const newResources = [...this.resources.slice(0, index), ...this.resources.slice(index + 1)];
@@ -348,6 +353,7 @@ export default {
         resource: '',
         multiple: false,
         custom: false,
+        autocomplete: false,
         required: false,
         redacted: false,
         scaleWidth: 100,
@@ -361,11 +367,15 @@ export default {
     addColumn() {
       this.value.content = [...this.value.content, this.createEmptyColumn()];
     },
-    onTypeChanged(item, index) {
-      const columns = [...this.columns];
-      columns[index] = createOptions(item);
-      this.columns = columns;
+    onChanged(item, value) {
+      Object.assign(item, value);
+      item = createOptions(item);
     },
+  },
+  created() {
+    // Compatible with original `autocomplete` question type (https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56)
+    this.value.content = [...this.value.content].map(cleanupAutocompleteMatrix);
+    this.$emit('input', this.value);
   },
   MATRIX_COLUMN_TYPES,
 };

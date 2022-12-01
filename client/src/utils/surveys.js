@@ -1076,3 +1076,21 @@ function hasPage(reduction, control) {
 export const descendantHasPage = (control) => {
   return hasPage(false, control);
 };
+
+export function cleanupAutocompleteMatrix(content) {
+  const isAutocomplete = content.type === 'autocomplete';
+  const custom = content.custom || false;
+  const autocomplete = isAutocomplete || custom || content.autocomplete || false;
+  return {
+    ...content,
+    type: isAutocomplete ? 'dropdown' : content.type,
+    custom,
+    autocomplete,
+  };
+}
+
+export function cleanupAutocompleteDropdown(control) {
+  return {
+    ...control,
+  };
+}

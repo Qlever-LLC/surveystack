@@ -1,9 +1,7 @@
 <template>
   <div>
     <v-card-title class="px-0 d-flex justify-space-between">
-      <div>
-        Matrix
-      </div>
+      <div>Matrix</div>
     </v-card-title>
     <div class="d-flex">
       <v-btn color="primary" @click="matrixEditorDialog = true" :disabled="disabled">
