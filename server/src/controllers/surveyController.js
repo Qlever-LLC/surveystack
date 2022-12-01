@@ -323,12 +323,11 @@ const getSurvey = async (req, res) => {
   const { id } = req.params;
   const { version } = req.query;
 
-  // TODO: update so that the $slice is for the element where
-  // revision.version === latestVersion
-  // TODO: if version is not 'latest' use version query param for querying mongo
+  //TODO maybe make version param mandatory and throw exception if mssing
   let versionProjection = {};
   if (version) {
     if (version === 'latest') {
+      // caller only requests the latest survey revision, exclude all others
       versionProjection = {
         projection: {
           name: 1,
@@ -340,7 +339,10 @@ const getSurvey = async (req, res) => {
           },
         },
       };
+    } else if (version === 'all') {
+      // caller explicitly wants to get all version, thus projection is not required
     } else {
+      // caller only requests the survey revision with the passed version, exclude all others
       versionProjection = {
         projection: {
           name: 1,
