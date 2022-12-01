@@ -18,9 +18,9 @@
     </v-container>
     <v-container fluid class="pa-0" v-else>
       <v-row dense>
-        <v-col v-for="c in surveys.content" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
+        <v-col v-for="c in activeSurveys" :key="c._id" :cols="!selectedSurvey ? 4 : 12" class="py-0">
           <v-card
-            @click="toggleCard(c)"
+            @click="toggleCard(c._id)"
             v-show="!selectedSurvey || selectedSurvey._id == c._id"
             class="control-item mb-2"
             elevation="7"
@@ -46,7 +46,7 @@
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
                   color="grey"
                   key="close"
-                  @click.stop="toggleCard(c)"
+                  @click.stop="toggleCard(c._id)"
                   class="mt-n5 mr-1 d-inline-block shadow white span-button"
                   outlined
                   small
@@ -150,8 +150,8 @@ export default {
           skip: 0,
           limit: 100000,
         },
-        loading: false,
       },
+      loading: false,
       selectedSurvey: null,
     };
   },
@@ -159,6 +159,9 @@ export default {
     activeTabPaginationLength() {
       const { total } = this.surveys.pagination;
       return total ? Math.ceil(total / PAGINATION_LIMIT) : 0;
+    },
+    activeSurveys() {
+      return this.selectedSurvey ? [this.selectedSurvey] : this.surveys.content;
     },
   },
   methods: {
@@ -185,11 +188,6 @@ export default {
           }
           // eslint-disable-next-line no-param-reassign
           s.createdAgo = moment.duration(now.diff(s.meta.dateCreated)).humanize();
-
-          // set selected survey
-          if (this.libraryId && s._id === this.libraryId) {
-            this.toggleCard(s);
-          }
         }
 
         this.surveys = data;
@@ -198,7 +196,7 @@ export default {
       } catch (e) {
         console.log('Error fetching surveys:', e);
       }
-      // return [];
+
       return {
         content: [],
         pagination: {
@@ -206,17 +204,18 @@ export default {
           parsedSkip: 0,
           total: 0,
         },
-        loading: false,
       };
     },
     addToSurvey(librarySurveyId) {
       this.$emit('add-questions-from-library', librarySurveyId);
     },
-    async toggleCard(survey) {
-      if (this.selectedSurvey && survey._id === this.selectedSurvey._id) {
+    async toggleCard(surveyId) {
+      if (this.selectedSurvey && this.selectedSurvey._id === this.libraryId) {
+        return; // prevent to switch to the list if editing mode
+      } else if (this.selectedSurvey && this.selectedSurvey._id === surveyId) {
         this.selectedSurvey = null; // deselect card
       } else {
-        const { data } = await api.get(`/surveys/${survey._id}?version=latest`);
+        const { data } = await api.get(`/surveys/${surveyId}`);
         this.selectedSurvey = data; // select card
       }
     },
@@ -226,9 +225,19 @@ export default {
       this.page = 1;
       this.fetchData();
     },
+    libraryId() {
+      // Reset to list mode
+      this.selectedSurvey = null;
+    },
   },
   created() {
+    // Load list of surveys
     this.fetchData();
+
+    if (this.libraryId) {
+      // Load the selected survey if editing mode
+      this.toggleCard(this.libraryId);
+    }
   },
 };
 </script>
