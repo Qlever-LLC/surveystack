@@ -333,7 +333,7 @@ export default {
       try {
         const { id } = this.$route.params;
         this.survey._id = id;
-        const { data } = await api.get(`/surveys/${this.survey._id}`);
+        const { data } = await api.get(`/surveys/${this.survey._id}?version=latest`);
         this.survey = { ...this.survey, ...data };
       } catch (e) {
         console.log('something went wrong:', e);

@@ -194,7 +194,10 @@ export default {
       this.showResubmissionDialog = true;
     }
 
-    this.survey = await this.$store.dispatch('surveys/fetchSurvey', this.submission.meta.survey.id);
+    this.survey = await this.$store.dispatch('surveys/fetchSurvey', {
+      id: this.submission.meta.survey.id,
+      version: this.submission.meta.survey.version,
+    });
     const cleanSubmission = submissionUtils.createSubmissionFromSurvey({
       survey: this.survey,
       version: this.submission.meta.survey.version,

@@ -189,7 +189,7 @@ export default {
   async created() {
     await Promise.all([
       this.$store.dispatch('submissions/fetchLocalSubmissions'),
-      this.$store.dispatch('surveys/fetchSurveys'),
+      this.$store.dispatch('surveys/fetchSurveys'), //TODO check loads whole DB??
     ]);
   },
   beforeDestroy() {

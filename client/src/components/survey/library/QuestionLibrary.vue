@@ -216,7 +216,7 @@ export default {
       if (this.selectedSurvey && survey._id === this.selectedSurvey._id) {
         this.selectedSurvey = null; // deselect card
       } else {
-        const { data } = await api.get(`/surveys/${survey._id}`);
+        const { data } = await api.get(`/surveys/${survey._id}?version=latest`);
         this.selectedSurvey = data; // select card
       }
     },

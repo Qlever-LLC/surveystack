@@ -121,7 +121,7 @@ export default {
       this.$emit('close-dialog');
     },
     async surveyChanged(version) {
-      const { data } = await api.get(`/surveys/${this.surveyId}`);
+      const { data } = await api.get(`/surveys/${this.surveyId}?version=latest`);
       if (!version) {
         this.surveyVersion = data.latestVersion;
       }

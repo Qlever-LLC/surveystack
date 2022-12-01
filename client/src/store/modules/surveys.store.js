@@ -50,7 +50,7 @@ const fetchPinned = async (commit, dispatch) => {
       const cached = fetched.find((f) => f._id == sid);
       if (!cached) {
         try {
-          let s = await actions.fetchSurvey({ commit }, sid);
+          let s = await actions.fetchSurvey({ commit }, { id: sid });
           if (s.resources) {
             await dispatch('resources/fetchResources', s.resources, { root: true });
           }
@@ -82,8 +82,8 @@ const actions = {
     commit('SET_SURVEYS', response.data);
     return response.data;
   },
-  async fetchSurvey({ commit }, id) {
-    const response = await api.get(`/surveys/${id}`);
+  async fetchSurvey({ commit }, { id, version = 'latest' }) {
+    const response = await api.get(`/surveys/${id}?version=${version}`);
     commit('ADD_SURVEY', response.data);
     return response.data;
   },

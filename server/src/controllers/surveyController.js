@@ -326,17 +326,34 @@ const getSurvey = async (req, res) => {
   // TODO: update so that the $slice is for the element where
   // revision.version === latestVersion
   // TODO: if version is not 'latest' use version query param for querying mongo
-  const versionProjection = version ? {
-    projection: {
-      name: 1,
-      latestVersion: 1,
-      meta: 1,
-      description: 1,
-      revisions: {
-        $slice: [ '$revisions', -1]
-      }
-    },
-  } : {};
+  let versionProjection = {};
+  if (version) {
+    if (version === 'latest') {
+      versionProjection = {
+        projection: {
+          name: 1,
+          latestVersion: 1,
+          meta: 1,
+          description: 1,
+          revisions: {
+            $slice: -1,
+          },
+        },
+      };
+    } else {
+      versionProjection = {
+        projection: {
+          name: 1,
+          latestVersion: 1,
+          meta: 1,
+          description: 1,
+          revisions: {
+            $elemMatch: { version: Number(version) },
+          },
+        },
+      };
+    }
+  }
 
   const entity = await db.collection(col).findOne(
     { _id: new ObjectId(id) },
@@ -589,8 +606,6 @@ const getPinned = async (req, res) => {
     .find({ user: new ObjectId(userId) })
     .project({ group: 1 })
     .toArray();
-
-  // console.log('memberships', memberships);
 
   const groupIds = _.uniq(memberships.map((m) => m.group)).map((g) => new ObjectId(g));
   const groupsPinned = await db
