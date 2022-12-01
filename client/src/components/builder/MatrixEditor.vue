@@ -82,7 +82,7 @@
                     <v-select
                       dense
                       v-bind:value="item.type"
-                      v-on:input="(t) => onTypeChanged(item, t)"
+                      v-on:input="(type) => onTypeChanged({ ...item, type }, i)"
                       :items="$options.MATRIX_COLUMN_TYPES"
                       label="Type"
                     />
@@ -110,6 +110,13 @@
                         </v-btn>
                       </div>
                       <v-checkbox class="mt-2 ml-2" v-model="item.multiple" label="Multi-select" hide-details dense />
+                      <v-checkbox
+                        class="mt-0 ml-2"
+                        v-model="item.custom"
+                        label="Allow custom answer"
+                        hide-details
+                        dense
+                      />
                     </div>
 
                     <div v-if="item.type == 'farmos_uuid'" class="d-flex flex-column">
@@ -261,13 +268,11 @@ export default {
     // get/set the position of the columns and the "lock-to-left" marker
     columns: {
       get() {
-        const columns = [
-          ...this.value.content.map((item) => ({
-            ...item,
-            // Compatible with original `autocomplete` question type (https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56)
-            type: item.type === 'autocomplete' ? 'dropdown' : item.type,
-          })),
-        ];
+        const columns = this.value.content.map((item) => ({
+          ...item,
+          // Compatible with original `autocomplete` question type (https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56)
+          type: item.type === 'autocomplete' ? 'dropdown' : item.type,
+        }));
         const fixedColumns = this.value.config.fixedColumns || 0;
         columns.splice(fixedColumns, 0, { isFixedUntilMarker: true });
         return columns;
@@ -356,9 +361,10 @@ export default {
     addColumn() {
       this.value.content = [...this.value.content, this.createEmptyColumn()];
     },
-    onTypeChanged(item, type) {
-      item.type = type;
-      item = createOptions(item);
+    onTypeChanged(item, index) {
+      const columns = [...this.columns];
+      columns[index] = createOptions(item);
+      this.columns = columns;
     },
   },
   MATRIX_COLUMN_TYPES,
