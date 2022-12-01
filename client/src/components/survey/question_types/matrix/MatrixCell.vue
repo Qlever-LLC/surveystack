@@ -99,7 +99,6 @@
   </v-select>
   <v-autocomplete
     v-else-if="header.type === 'dropdown' && !header.custom && header.autocomplete"
-    class="matrix-autocomplete"
     :items="items"
     item-text="label"
     item-value="value"
@@ -116,7 +115,7 @@
     :multiple="header.multiple"
     :disabled="disabled"
     :search-input.sync="comboboxSearch"
-    hint="Type to search"
+    placeholder="Type to search"
   >
     <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
@@ -141,7 +140,7 @@
     :disabled="disabled"
     :return-object="false"
     :search-input.sync="comboboxSearch"
-    placeholder="Type to search"
+    placeholder="Type to search or add custom answer"
     outlined
   >
     <template v-slot:selection="{ item, index }">
@@ -420,11 +419,6 @@ export default {
 </script>
 
 <style scoped>
-.matrix-autocomplete.v-autocomplete.v-select.v-input--is-focused >>> .v-select__selections::before {
-  content: 'Type';
-  color: var(--v-accent-lighten4);
-}
-
 >>> .v-select__selections {
   flex-wrap: nowrap;
 }
