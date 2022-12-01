@@ -327,7 +327,7 @@ const getSurvey = async (req, res) => {
   const pipeline = [{ $match: { _id: new ObjectId(id) } }];
   if (version) {
     if (version === 'latest') {
-      // caller only requests the survey revision with version=latestVersion, exclude all others and also exclude drafts
+      // caller only requests the LATEST PUBLISHED survey revision with version=latestVersion, exclude all others and also exclude drafts
       pipeline.push({
         $project: {
           name: 1,
@@ -344,7 +344,7 @@ const getSurvey = async (req, res) => {
         },
       });
     } else if (version === 'latestPublishedOrDraft') {
-      // caller only requests the latest PUBLISHED survey revision, exclude all other revisions and exclude drafts
+      // caller only requests the LATEST PUBLISHED survey revision AND DRAFT versions, exclude all other revisions
       pipeline.push({
         $project: {
           name: 1,
@@ -352,7 +352,11 @@ const getSurvey = async (req, res) => {
           meta: 1,
           description: 1,
           revisions: {
-            $slice: ['$revisions', -1],
+            $filter: {
+              input: '$revisions',
+              as: 'revision',
+              cond: { $gte: ['$$revision.version', '$latestVersion'] },
+            },
           },
         },
       });
@@ -376,13 +380,13 @@ const getSurvey = async (req, res) => {
 
   const entities = await db.collection(col).aggregate(pipeline).toArray();
 
-  const entity = entities[0];
-
-  if (!entity) {
+  if (entities.length === 0) {
     return res.status(404).send({
       message: `No entity with _id exists: ${id}`,
     });
   }
+
+  const entity = entities[0];
 
   return res.send(entity);
 };
