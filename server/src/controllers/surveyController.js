@@ -324,27 +324,44 @@ const getSurvey = async (req, res) => {
   const { version } = req.query;
 
   //TODO maybe make version param mandatory and throw exception if mssing
-  let versionProjection = {};
+  const pipeline = [{ $match: { _id: new ObjectId(id) } }];
   if (version) {
     if (version === 'latest') {
-      // caller only requests the latest survey revision, exclude all others
-      versionProjection = {
-        projection: {
+      // caller only requests the survey revision with version=latestVersion, exclude all others and also exclude drafts
+      pipeline.push({
+        $project: {
           name: 1,
           latestVersion: 1,
           meta: 1,
           description: 1,
           revisions: {
-            $slice: -1,
+            $filter: {
+              input: '$revisions',
+              as: 'revision',
+              cond: { $eq: ['$$revision.version', '$latestVersion'] },
+            },
           },
         },
-      };
+      });
+    } else if (version === 'latestPublishedOrDraft') {
+      // caller only requests the latest PUBLISHED survey revision, exclude all other revisions and exclude drafts
+      pipeline.push({
+        $project: {
+          name: 1,
+          latestVersion: 1,
+          meta: 1,
+          description: 1,
+          revisions: {
+            $slice: ['$revisions', -1],
+          },
+        },
+      });
     } else if (version === 'all') {
       // caller explicitly wants to get all version, thus projection is not required
     } else {
       // caller only requests the survey revision with the passed version, exclude all others
-      versionProjection = {
-        projection: {
+      pipeline.push({
+        $project: {
           name: 1,
           latestVersion: 1,
           meta: 1,
@@ -353,16 +370,13 @@ const getSurvey = async (req, res) => {
             $elemMatch: { version: Number(version) },
           },
         },
-      };
+      });
     }
   }
 
-  const entity = await db.collection(col).findOne(
-    { _id: new ObjectId(id) },
-    {
-      ...versionProjection,
-    }
-  );
+  const entities = await db.collection(col).aggregate(pipeline).toArray();
+
+  const entity = entities[0];
 
   if (!entity) {
     return res.status(404).send({
