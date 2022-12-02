@@ -31,14 +31,14 @@
           :label="'Start Survey'"
           :show-drop-down="isAdminOfAnyGroup && isAllowedToSubmit"
           :disabled="!isAllowedToSubmit"
-          @click="startDraft(entity._id)"
+          @click="startDraft(entity)"
           x-large
           color="primary"
           top
           left
         >
           <v-list class="pa-0 mx-auto" max-width="260">
-            <v-list-item @click="startDraft(entity._id)">
+            <v-list-item @click="startDraft(entity)">
               <v-list-item-content>
                 <v-list-item-title>Start survey</v-list-item-title>
                 <v-list-item-content class="multiline-subtitle">
@@ -62,7 +62,7 @@
         <app-member-selector
           :show="showSelectMember"
           @hide="showSelectMember = false"
-          @selected="startDraftAs(entity._id, $event)"
+          @selected="startDraftAs(entity, $event)"
         />
       </div>
     </div>
@@ -242,7 +242,7 @@ export default {
           params: this.$route.params,
           query: this.$route.query,
         });
-        this.startDraft(this.entity._id);
+        this.startDraft(this.entity);
       }
     } else {
       this.$router.push({

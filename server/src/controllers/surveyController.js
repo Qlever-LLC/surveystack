@@ -371,7 +371,11 @@ const getSurvey = async (req, res) => {
           meta: 1,
           description: 1,
           revisions: {
-            $elemMatch: { version: Number(version) },
+            $filter: {
+              input: '$revisions',
+              as: 'revision',
+              cond: { $gte: ['$$revision.version', Number(version)] },
+            },
           },
         },
       });
@@ -517,6 +521,8 @@ const isUserAllowedToModifySurvey = async (survey, user) => {
 };
 
 const updateSurvey = async (req, res) => {
+  //TODO prevent survey versions from being lost because of passed survey only has the latest version(s)
+  //e.g. load full survey from db and merge in the containing revisions which are missing in the passed survey
   const { id } = req.params;
   const entity = await sanitize(req.body);
 
