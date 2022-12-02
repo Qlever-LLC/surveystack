@@ -1088,9 +1088,3 @@ export function cleanupAutocompleteMatrix(content) {
     autocomplete,
   };
 }
-
-export function cleanupAutocompleteDropdown(control) {
-  return {
-    ...control,
-  };
-}

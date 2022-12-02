@@ -1,8 +1,51 @@
 <template>
   <div class="ontology question">
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <v-select
+      v-if="sourceIsValid && !control.options.allowCustomSelection && !control.options.allowAutocomplete"
+      :value="getValue"
+      @change="
+        (v) => {
+          onChange(v);
+        }
+      "
+      :items="items"
+      item-text="label"
+      item-value="value"
+      hide-details
+      outlined
+      :chips="!!control.options.hasMultipleSelections"
+      :label="control.hint"
+      :multiple="!!control.options.hasMultipleSelections"
+      class="full-width dropdown"
+      data-test-id="dropdown"
+      color="focus"
+      placeholder="Select answer"
+    >
+      <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
+        <v-chip
+          v-bind="data.attrs"
+          :input-value="data.selected"
+          close
+          @click="data.select"
+          @click:close="remove(data.item)"
+        >
+          {{ data.item.label }}
+        </v-chip>
+      </template>
+      <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
+        <v-list-item-content>
+          <v-list-item-title>
+            {{ data.item.label }}
+            <v-chip v-if="data.item.count" small class="ma-2">
+              {{ data.item.count }}
+            </v-chip>
+          </v-list-item-title>
+        </v-list-item-content>
+      </template>
+    </v-select>
     <v-autocomplete
-      v-if="sourceIsValid && !control.options.allowCustomSelection"
+      v-else-if="sourceIsValid && !control.options.allowCustomSelection && control.options.allowAutocomplete"
       :value="getValue"
       @change="
         (v) => {
@@ -24,6 +67,7 @@
       single-line
       data-test-id="autocomplete"
       color="focus"
+      placeholder="Type to search"
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip
@@ -60,19 +104,19 @@
       :items="items"
       item-text="label"
       item-value="value"
-      outlined
       :delimiters="[',']"
       :return-object="false"
       :chips="!!control.options.hasMultipleSelections"
       :label="control.hint"
       :multiple="!!control.options.hasMultipleSelections"
-      :menu-props="autocompleteMenuProps"
       ref="input"
       class="full-width custom-ontology dropdown"
+      outlined
       hide-details
       single-line
       data-test-id="combobox"
       color="focus"
+      placeholder="Type to search or add custom answer"
     >
       <template v-slot:selection="data">
         <v-chip
@@ -89,15 +133,16 @@
           {{ getLabelForItemValue(data.item) }}
         </div>
       </template>
-      <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
-        <v-list-item-content>
-          <v-list-item-title>
-            {{ data.item.label }}
-            <v-chip v-if="data.item.count" small class="ma-2">
-              {{ data.item.count }}
-            </v-chip>
-          </v-list-item-title>
-        </v-list-item-content>
+      <template v-slot:no-data>
+        <v-list-item>
+          <v-list-item-content>
+            <v-list-item-title>
+              No values matching "<strong>{{ comboboxSearch }}</strong
+              >". Press <kbd>enter</kbd> <span v-if="!!control.options.hasMultipleSelections">or <kbd>,</kbd></span> to
+              create a new one
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </template>
     </v-combobox>
     <v-banner v-else-if="isLoading"> <v-icon class="mr-2 mdi-spin">mdi-loading</v-icon>Loading </v-banner>
@@ -109,7 +154,7 @@
 </template>
 
 <script>
-import { groupBy, map } from 'lodash';
+import { groupBy, isNil, sortBy, uniq, without } from 'lodash';
 import baseQuestionComponent from './BaseQuestionComponent';
 import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
@@ -192,7 +237,8 @@ export default {
   },
   computed: {
     getValue() {
-      return this.control.options.hasMultipleSelections ? this.value : this.value && this.value[0];
+      const aryValue = Array.isArray(this.value) ? this.value : this.value ? [this.value] : [];
+      return this.control.options.hasMultipleSelections ? aryValue : aryValue[0] || this.value;
     },
     resource() {
       return this.resources.find((r) => r.id === this.control.options.source);
@@ -201,11 +247,21 @@ export default {
       return !!this.resource && this.resource.type === resourceTypes.SURVEY_REFERENCE;
     },
     items() {
-      if (this.hasReference) {
-        return this.submissionItems;
-      }
-
-      return (this.resource && this.resource.content) || [];
+      const defaultItems = this.hasReference ? this.submissionItems : this.resource ? this.resource.content : [];
+      const usedValues = Array.isArray(this.value) ? this.value : this.value ? [this.value] : [];
+      // All the custom items the users typed in
+      const customItems = without(
+        uniq(usedValues).filter((v) => !isNil(v)), // get all the uniq non-empty values
+        ...defaultItems.map((i) => i.value) // without the default values
+      ).map((value) => ({ label: value, value }));
+      const allItems = sortBy(
+        [...defaultItems, ...customItems],
+        [
+          (a) => !customItems.includes(a.value), // move selected items first
+          'label',
+        ]
+      );
+      return allItems;
     },
     sourceIsValid() {
       return this.items && Array.isArray(this.items) && this.items.every(({ label, value }) => label && value);

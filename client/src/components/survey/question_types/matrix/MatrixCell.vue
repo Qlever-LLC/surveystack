@@ -92,6 +92,7 @@
     outlined
     :multiple="header.multiple"
     :disabled="disabled"
+    placeholder="Select answer"
   >
     <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
@@ -123,7 +124,6 @@
   </v-autocomplete>
   <v-combobox
     v-else-if="header.type === 'dropdown' && header.custom"
-    class="matrix-combobox"
     :items="items"
     item-text="label"
     item-value="value"

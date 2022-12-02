@@ -173,10 +173,24 @@
         class="ma-0"
         color="grey darken-1"
         v-model="control.options.allowCustomSelection"
+        @change="(v) => (control.options.allowAutocomplete = v)"
         v-if="isSelect || isOntology"
         outlined
-        label="Allow Custom Entry"
+        label="Allow custom answer"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+      />
+
+      <v-checkbox
+        class="ma-0"
+        color="grey darken-1"
+        v-model="control.options.allowAutocomplete"
+        v-if="isOntology"
+        outlined
+        label="Autocomplete"
+        :disabled="
+          (!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot) ||
+          control.options.allowCustomSelection
+        "
       />
 
       <v-checkbox
@@ -189,7 +203,7 @@
           control.type === 'farmOsFarm' ||
           control.type === 'farmOsField'
         "
-        label="Allow Multiple Selections"
+        label="Multiple select"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
 
@@ -555,6 +569,14 @@ export default {
   },
   created() {
     this.updateScript();
+
+    // Adjust autocomplete option value to be compatible with original `ontology` question type
+    // https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56
+    if (typeof this.control.options.allowAutocomplete !== 'boolean') {
+      console.log(this.control.options.allowCustomSelection || this.control.options.allowAutocomplete || false);
+      this.control.options.allowAutocomplete =
+        this.control.options.allowCustomSelection || this.control.options.allowAutocomplete || false;
+    }
   },
 };
 </script>
