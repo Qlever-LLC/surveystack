@@ -334,6 +334,7 @@ const getSurvey = async (req, res) => {
           latestVersion: 1,
           meta: 1,
           description: 1,
+          resources: 1,
           revisions: {
             $filter: {
               input: '$revisions',
@@ -351,6 +352,7 @@ const getSurvey = async (req, res) => {
           latestVersion: 1,
           meta: 1,
           description: 1,
+          resources: 1,
           revisions: {
             $filter: {
               input: '$revisions',
@@ -370,6 +372,7 @@ const getSurvey = async (req, res) => {
           latestVersion: 1,
           meta: 1,
           description: 1,
+          resources: 1,
           revisions: {
             $filter: {
               input: '$revisions',
