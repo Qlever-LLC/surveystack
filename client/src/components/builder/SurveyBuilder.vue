@@ -433,7 +433,7 @@ export default {
     },
     async updateLibrary(updateLibraryRootGroup) {
       this.updateLibraryRootGroup = updateLibraryRootGroup;
-      const { data } = await api.get(`/surveys/${updateLibraryRootGroup.libraryId}?version=latest`);
+      const { data } = await api.get(`/surveys/${updateLibraryRootGroup.libraryId}?version=all`);
       this.updateToLibrary = data;
       this.updateLibraryDialogIsVisible = true;
     },
