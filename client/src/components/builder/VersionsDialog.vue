@@ -176,7 +176,6 @@ export default {
 
         const queryParams = new URLSearchParams();
         selectedVersionsToDelete.value.forEach((v) => queryParams.append('versions[]', v));
-        // queryParams.append('dryRun', true);
         const { data } = await api.post(`/surveys/cleanup/${props.survey._id}?${queryParams}`);
         deleteVersionsResponse.value = data;
       } catch {
