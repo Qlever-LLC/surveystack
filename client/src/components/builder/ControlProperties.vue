@@ -595,9 +595,7 @@ export default {
     // Adjust autocomplete option value to be compatible with original `ontology` question type
     // https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56
     if (typeof this.control.options.allowAutocomplete !== 'boolean') {
-      console.log(this.control.options.allowCustomSelection || this.control.options.allowAutocomplete || false);
-      this.control.options.allowAutocomplete =
-        this.control.options.allowCustomSelection || this.control.options.allowAutocomplete || false;
+      this.control.options.allowAutocomplete = this.control.options.allowCustomSelection || false;
     }
   },
 };
