@@ -80,14 +80,14 @@ describe('Ontology question', () => {
   describe('Ontology List source', () => {
     it('sets value as an array in single selection, non-custom mode', () => {
       const wrapper = shallowMount(Ontology, getMountOpts());
-      const dropDown = wrapper.find('[data-test-id="autocomplete"]');
+      const dropDown = wrapper.find('[data-test-id="dropdown"]');
       dropDown.vm.$emit('change', 'dog');
       expect(wrapper.emitted().changed[0][0]).toEqual(['dog']);
     });
 
     it('sets autocomplete input from value in single selection, non-custom mode', () => {
       const wrapper = shallowMount(Ontology, getMountOpts({ value: ['dog'] }));
-      const dropDown = wrapper.find('[data-test-id="autocomplete"]');
+      const dropDown = wrapper.find('[data-test-id="dropdown"]');
       expect(dropDown.vm.value).toBe('dog');
     });
 
@@ -110,9 +110,9 @@ describe('Ontology question', () => {
       expect(dropDown.vm.value).toBe('custom');
     });
 
-    it('sets value as an array in mutliple selection, non-custom mode', () => {
+    it('sets value as an array in multiple selection, non-custom mode', () => {
       const wrapper = shallowMount(Ontology, getMountOpts({ hasMultipleSelections: true }));
-      const dropDown = wrapper.find('[data-test-id="autocomplete"]');
+      const dropDown = wrapper.find('[data-test-id="dropdown"]');
       dropDown.vm.$emit('change', ['cat', 'dog']);
       expect(wrapper.emitted().changed[0][0]).toEqual(['cat', 'dog']);
     });
@@ -125,7 +125,7 @@ describe('Ontology question', () => {
           value: ['cat', 'dog'],
         })
       );
-      const dropDown = wrapper.find('[data-test-id="autocomplete"]');
+      const dropDown = wrapper.find('[data-test-id="dropdown"]');
       expect(dropDown.vm.value).toEqual(['cat', 'dog']);
     });
 
@@ -140,7 +140,7 @@ describe('Ontology question', () => {
       expect(wrapper.findAll('.v-chip').wrappers.length).toBe(2);
     });
 
-    it('sets value as an array in mutliple selection, custom mode', () => {
+    it('sets value as an array in multiple selection, custom mode', () => {
       const wrapper = shallowMount(
         Ontology,
         getMountOpts({

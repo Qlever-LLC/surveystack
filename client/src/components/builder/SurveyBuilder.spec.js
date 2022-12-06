@@ -129,6 +129,7 @@ describe('add control', () => {
     [
       { inputLabel: 'Data name', type: 'number', value: 'control_name', propPath: 'name' },
       { inputLabel: 'Label', type: 'string', value: 'Foo Bar', propPath: 'label' },
+      { inputLabel: 'Default value', type: 'string', value: 'Heads up!', propPath: 'defaultValue' },
       { inputLabel: 'Hint', type: 'page', value: 'Heads up!', propPath: 'hint' },
       {
         inputLabel: 'More info',
@@ -172,7 +173,7 @@ describe('add control', () => {
         openAdvanced: true,
       },
       {
-        inputLabel: 'Allow Multiple Selections',
+        inputLabel: 'Multiple select',
         type: 'farmOsFarm',
         value: true,
         propPath: 'options.hasMultipleSelections',
@@ -184,11 +185,24 @@ describe('add control', () => {
         propPath: 'options.buttonLabel',
       },
       {
-        inputLabel: 'Allow Multiple Selections',
+        inputLabel: 'Multiple select',
         type: 'ontology',
         value: true,
         propPath: 'options.hasMultipleSelections',
       },
+      {
+        inputLabel: 'Autocomplete',
+        type: 'ontology',
+        value: true,
+        propPath: 'options.allowAutocomplete',
+      },
+      {
+        inputLabel: 'Allow custom answer',
+        type: 'ontology',
+        value: true,
+        propPath: 'options.allowCustomSelection',
+      },
+
       {
         inputLabel: 'Show Polygon Control',
         type: 'geoJSON',
