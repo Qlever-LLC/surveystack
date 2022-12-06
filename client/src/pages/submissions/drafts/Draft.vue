@@ -177,14 +177,14 @@ export default {
     try {
       this.submission = await this.$store.dispatch('submissions/fetchLocalSubmission', id);
     } catch (error) {
-      console.log('Error: submssion not found');
+      console.log('Error: submission not found');
       this.hasError = true;
       this.loading = false;
-
       return;
     }
+
     if (!this.submission) {
-      console.log('Error: submssion not found');
+      console.log('Error: submission not found');
       this.hasError = true;
       this.loading = false;
       return;

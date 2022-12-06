@@ -3,24 +3,27 @@
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <v-select
       v-if="sourceIsValid && !control.options.allowCustomSelection && !control.options.allowAutocomplete"
+      :label="control.hint"
+      :placeholder="getPlaceholder"
       :value="getValue"
       @change="
         (v) => {
           onChange(v);
         }
       "
+      @focus="handleFocus"
+      @blur="handleBlur"
       :items="items"
       item-text="label"
       item-value="value"
+      :menu-props="autocompleteMenuProps"
+      :chips="!!control.options.hasMultipleSelections"
+      :multiple="!!control.options.hasMultipleSelections"
+      color="focus"
       hide-details
       outlined
-      :chips="!!control.options.hasMultipleSelections"
-      :label="control.hint"
-      :multiple="!!control.options.hasMultipleSelections"
       class="full-width dropdown"
       data-test-id="dropdown"
-      color="focus"
-      placeholder="Select answer"
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip
@@ -46,6 +49,8 @@
     </v-select>
     <v-autocomplete
       v-else-if="sourceIsValid && !control.options.allowCustomSelection && control.options.allowAutocomplete"
+      :label="control.hint"
+      :placeholder="getPlaceholder"
       :value="getValue"
       @change="
         (v) => {
@@ -53,21 +58,20 @@
           onChange(v);
         }
       "
+      @focus="handleFocus"
+      @blur="handleBlur"
       :search-input.sync="comboboxSearch"
       :items="items"
       item-text="label"
       item-value="value"
-      outlined
-      :chips="!!control.options.hasMultipleSelections"
-      :label="control.hint"
-      :multiple="!!control.options.hasMultipleSelections"
       :menu-props="autocompleteMenuProps"
-      class="full-width dropdown"
-      hide-details
-      single-line
-      data-test-id="autocomplete"
+      :chips="!!control.options.hasMultipleSelections"
+      :multiple="!!control.options.hasMultipleSelections"
       color="focus"
-      placeholder="Type to search"
+      outlined
+      hide-details
+      class="full-width dropdown"
+      data-test-id="autocomplete"
     >
       <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip
@@ -93,6 +97,9 @@
     </v-autocomplete>
     <v-combobox
       v-else-if="sourceIsValid && control.options.allowCustomSelection"
+      ref="input"
+      :label="control.hint"
+      :placeholder="getPlaceholder"
       :value="getValue"
       @change="
         (v) => {
@@ -100,23 +107,22 @@
           onChange(v);
         }
       "
-      :search-input.sync="comboboxSearch"
+      @focus="handleFocus"
+      @blur="handleBlur"
       :items="items"
       item-text="label"
       item-value="value"
+      :menu-props="autocompleteMenuProps"
       :delimiters="[',']"
       :return-object="false"
+      :search-input.sync="comboboxSearch"
       :chips="!!control.options.hasMultipleSelections"
-      :label="control.hint"
       :multiple="!!control.options.hasMultipleSelections"
-      ref="input"
-      class="full-width custom-ontology dropdown"
+      color="focus"
       outlined
       hide-details
-      single-line
+      class="full-width custom-ontology dropdown"
       data-test-id="combobox"
-      color="focus"
-      placeholder="Type to search or add custom answer"
     >
       <template v-slot:selection="data">
         <v-chip
@@ -154,49 +160,13 @@
 </template>
 
 <script>
-import { groupBy, isNil, sortBy, uniq, without } from 'lodash';
+import { isNil, sortBy, uniq, without } from 'lodash';
 import baseQuestionComponent from './BaseQuestionComponent';
 import appControlLabel from '@/components/survey/drafts/ControlLabel.vue';
 import appControlMoreInfo from '@/components/survey/drafts/ControlMoreInfo.vue';
-import { getValueOrNull, getNested } from '@/utils/surveyStack';
+import { getValueOrNull } from '@/utils/surveyStack';
 import { resourceTypes } from '@/utils/resources';
-import api from '@/services/api.service';
-
-export async function fetchSubmissions(apiService, surveyId, path) {
-  const query = `&project={"${path}.value":1}`;
-  const { data } = await apiService.get(`/submissions?survey=${surveyId}${query}`);
-  const items = data
-    .map((item) => {
-      const value = getNested(item, `${path}.value`, null);
-      return {
-        id: item._id,
-        label: JSON.stringify(value).replace(/^"(.+(?="$))"$/, '$1'),
-        value,
-      };
-    })
-    .filter((item) => item.value !== null);
-
-  const explodeItem = (item) =>
-    item.value
-      .map((v, i) => ({
-        id: `${item.id}__${i}`,
-        // stringify and remove wrapping quote characters so that strings are rendered without quotation marks
-        label: JSON.stringify(v).replace(/^"(.+(?="$))"$/, '$1'),
-        value: v,
-      }))
-      .filter((v) => v.value);
-
-  const explodedItems = items
-    .map((it) => (Array.isArray(it.value) ? explodeItem(it) : [it]))
-    .reduce((acc, curr) => [...acc, ...curr], []);
-
-  const uniqueItems = Object.values(groupBy(explodedItems, 'label')).map((group) => ({
-    ...group[0],
-    label: group[0].label,
-    count: group.length,
-  }));
-  return uniqueItems;
-}
+import { fetchSubmissionUniqueItems } from '@/utils/submissions';
 
 export default {
   mixins: [baseQuestionComponent],
@@ -209,6 +179,7 @@ export default {
       isLoading: false,
       comboboxSearch: null,
       submissionItems: [],
+      isFocus: false,
     };
   },
   methods: {
@@ -233,12 +204,19 @@ export default {
       const item = this.items.find((x) => x.value === value);
       return (item && item.label) || value;
     },
-    fetchSubmissions,
+    handleFocus() {
+      this.isFocus = true;
+    },
+    handleBlur() {
+      this.isFocus = false;
+    },
   },
   computed: {
+    getAryValue() {
+      return Array.isArray(this.value) ? this.value : this.value ? [this.value] : [];
+    },
     getValue() {
-      const aryValue = Array.isArray(this.value) ? this.value : this.value ? [this.value] : [];
-      return this.control.options.hasMultipleSelections ? aryValue : aryValue[0] || this.value;
+      return this.control.options.hasMultipleSelections ? this.getAryValue : this.getAryValue[0] || this.value;
     },
     resource() {
       return this.resources.find((r) => r.id === this.control.options.source);
@@ -248,10 +226,9 @@ export default {
     },
     items() {
       const defaultItems = this.hasReference ? this.submissionItems : this.resource ? this.resource.content : [];
-      const usedValues = Array.isArray(this.value) ? this.value : this.value ? [this.value] : [];
       // All the custom items the users typed in
       const customItems = without(
-        uniq(usedValues).filter((v) => !isNil(v)), // get all the uniq non-empty values
+        uniq(this.getAryValue).filter((v) => !isNil(v)), // get all the uniq non-empty values
         ...defaultItems.map((i) => i.value) // without the default values
       ).map((value) => ({ label: value, value }));
       const allItems = sortBy(
@@ -267,7 +244,6 @@ export default {
       return this.items && Array.isArray(this.items) && this.items.every(({ label, value }) => label && value);
     },
     autocompleteMenuProps() {
-      // default properties copied from the vuetify-autocomplete docs
       const defaultProps = {
         closeOnClick: false,
         closeOnContentClick: false,
@@ -275,6 +251,8 @@ export default {
         openOnClick: false,
         maxHeight: 304,
         color: 'focus',
+        bottom: true,
+        offsetY: true,
       };
 
       if (this.$vuetify.breakpoint.smAndDown || this.forceMobile) {
@@ -284,13 +262,25 @@ export default {
       }
       return defaultProps;
     },
+    getPlaceholder() {
+      if (this.isFocus) {
+        if (!this.control.options.allowCustomSelection && !this.control.options.allowAutocomplete) {
+          return this.control.options.hasMultipleSelections ? 'Select answers' : 'Select answer';
+        } else if (!this.control.options.allowCustomSelection && this.control.options.allowAutocomplete) {
+          return 'Type to search';
+        } else if (this.control.options.allowCustomSelection) {
+          return 'Type to search or add custom answer';
+        }
+      }
+      return undefined;
+    },
   },
   async mounted() {
-    if (this.resource && this.hasReference) {
+    if (this.hasReference) {
       const { id, path } = this.resource.content;
       this.isLoading = true;
       try {
-        this.submissionItems = await this.fetchSubmissions(api, id, path);
+        this.submissionItems = await fetchSubmissionUniqueItems(id, path);
       } finally {
         this.isLoading = false;
       }
@@ -306,5 +296,9 @@ export default {
 
 >>> .v-list-item.v-list-item--active {
   color: var(--v-focus-base) !important;
+}
+
+.dropdown >>> .v-select__selections {
+  min-height: 56px !important;
 }
 </style>

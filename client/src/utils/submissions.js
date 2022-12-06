@@ -1,8 +1,10 @@
 import ObjectID from 'bson-objectid';
 import { flatten, unflatten } from 'flat';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, groupBy } from 'lodash';
 import moment from 'moment';
 import * as constants from '@/constants';
+import api from '@/services/api.service';
+import { getNested } from '@/utils/surveyStack';
 
 function* processPositions(data, position = []) {
   if (!data) {
@@ -140,7 +142,7 @@ const createSubmissionFromSurvey = ({ survey, version = 1, instance, submitAsUse
       meta.permissions = ['admin'];
     }
 
-    const entry = { value: v || null, meta };
+    const entry = { value: v || control.defaultValue || null, meta };
     if (control.type === 'group' || control.type === 'page') {
       delete entry.value;
       delete entry.meta.dateModified;
@@ -228,6 +230,42 @@ export const linearControlsWithGroups = (survey, submission) => {
   });
   return res;
 };
+
+export async function fetchSubmissionUniqueItems(surveyId, path) {
+  const query = `&project={"${path}.value":1}`;
+  const { data } = await api.get(`/submissions?survey=${surveyId}${query}`);
+  const items = data
+    .map((item) => {
+      const value = getNested(item, `${path}.value`, null);
+      return {
+        id: item._id,
+        label: JSON.stringify(value).replace(/^"(.+(?="$))"$/, '$1'),
+        value,
+      };
+    })
+    .filter((item) => item.value !== null);
+
+  const explodeItem = (item) =>
+    item.value
+      .map((v, i) => ({
+        id: `${item.id}__${i}`,
+        // stringify and remove wrapping quote characters so that strings are rendered without quotation marks
+        label: JSON.stringify(v).replace(/^"(.+(?="$))"$/, '$1'),
+        value: v,
+      }))
+      .filter((v) => v.value);
+
+  const explodedItems = items
+    .map((it) => (Array.isArray(it.value) ? explodeItem(it) : [it]))
+    .reduce((acc, curr) => [...acc, ...curr], []);
+
+  const uniqueItems = Object.values(groupBy(explodedItems, 'label')).map((group) => ({
+    ...group[0],
+    label: group[0].label,
+    count: group.length,
+  }));
+  return uniqueItems;
+}
 
 export default {
   createSubmissionFromSurvey,

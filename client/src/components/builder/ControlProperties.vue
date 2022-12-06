@@ -11,6 +11,9 @@
         :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
       />
       <v-text-field outlined v-model="control.label" label="Label" />
+      <v-text-field v-if="isText" outlined v-model="control.defaultValue" label="Default value" />
+      <v-text-field v-if="isNumber" type="number" outlined v-model="control.defaultValue" label="Default value" />
+      <ontology v-if="isOntology" v-model="control.defaultValue" :control="control" :resources="survey.resources" />
       <v-text-field outlined v-model="control.hint" label="Hint" />
       <v-text-field outlined v-model="control.moreInfo" label="More info" />
 
@@ -173,7 +176,12 @@
         class="ma-0"
         color="grey darken-1"
         v-model="control.options.allowCustomSelection"
-        @change="(v) => (control.options.allowAutocomplete = v)"
+        @change="
+          (v) => {
+            control.options.allowAutocomplete = v;
+            control.defaultValue = null;
+          }
+        "
         v-if="isSelect || isOntology"
         outlined
         label="Allow custom answer"
@@ -356,6 +364,7 @@ import appOntologyProperties from '@/components/builder/OntologyProperties.vue';
 import InstructionsEditor from '@/components/builder/TipTapEditor.vue';
 import InstructionsImageSplitEditor from '@/components/builder/InstructionsImageSplitEditor.vue';
 import GeoJSONProperties from '@/components/builder/GeoJSONProperties.vue';
+import Ontology from '@/components/builder/Ontology.vue';
 
 import { convertToKey } from '@/utils/builder';
 
@@ -368,6 +377,7 @@ export default {
     appMatrixProperties,
     InstructionsImageSplitEditor,
     'geojson-properties': GeoJSONProperties,
+    Ontology,
   },
   props: {
     control: {
@@ -442,6 +452,9 @@ export default {
     isText() {
       return this.control.type === 'string';
     },
+    isNumber() {
+      return this.control.type === 'number';
+    },
     isScript() {
       return this.control.type === 'script';
     },
@@ -492,7 +505,7 @@ export default {
     },
     nameHasValidCharacters(val) {
       const namePattern = /^[\w]*$/;
-      return namePattern.test(val) ? true : 'Data name must only contain valid charcters';
+      return namePattern.test(val) ? true : 'Data name must only contain valid characters';
     },
     nameHasValidLength(val) {
       const namePattern = /^.{1,}$/; // one character should be ok, especially within groups
