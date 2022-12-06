@@ -82,15 +82,17 @@
                     <v-select
                       dense
                       :value="item.type"
-                      @input="(type) => onChanged(item, { type })"
+                      @input="(type) => onChanged(item, { type, defaultValue: null })"
                       :items="$options.MATRIX_COLUMN_TYPES"
                       label="Type"
                     />
+
                     <div v-if="item.type === 'dropdown'" class="d-flex flex-column">
                       <div class="d-flex flex-row flex-wrap">
                         <v-select
                           dense
                           v-model="item.resource"
+                          @input="(resource) => onChanged(item, { resource, defaultValue: null })"
                           :items="resourceSelectItems"
                           label="Resource"
                           hide-details
@@ -114,9 +116,7 @@
                         class="mt-0 ml-2"
                         v-model="item.custom"
                         :checked="item.custom"
-                        @change="
-                          (custom) => onChanged(item, { ...item, custom, autocomplete: custom || item.autocomplete })
-                        "
+                        @change="(custom) => onChanged(item, { custom, autocomplete: custom || item.autocomplete })"
                         label="Allow custom answer"
                         hide-details
                         dense
@@ -130,6 +130,26 @@
                         dense
                       />
                     </div>
+
+                    <v-text-field v-if="item.type === 'text'" v-model="item.defaultValue" label="Default value" dense />
+                    <v-text-field
+                      v-else-if="item.type === 'number'"
+                      type="number"
+                      v-model="item.defaultValue"
+                      label="Default value"
+                      dense
+                    />
+                    <ontology
+                      v-if="item.type === 'dropdown'"
+                      v-model="item.defaultValue"
+                      :multiple="item.multiple"
+                      :customAnswer="item.custom"
+                      :autocomplete="item.autocomplete"
+                      :source="item.resource"
+                      :resources="resources"
+                      dense
+                      class="mt-5"
+                    />
 
                     <div v-if="item.type == 'farmos_uuid'" class="d-flex flex-column">
                       <v-select
@@ -215,10 +235,11 @@
 
 <script>
 import ObjectId from 'bson-objectid';
-import draggable from 'vuedraggable';
-import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
+import Draggable from 'vuedraggable';
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { cleanupAutocompleteMatrix } from '@/utils/surveys';
+import AppOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
+import Ontology from '@/components/builder/Ontology.vue';
 
 const MATRIX_COLUMN_TYPES = [
   { text: 'Dropdown', value: 'dropdown' },
@@ -241,6 +262,11 @@ const createOptions = (src) => {
 };
 
 export default {
+  components: {
+    AppOntologyListEditor,
+    Draggable,
+    Ontology,
+  },
   props: {
     value: {
       type: Object,
@@ -256,10 +282,6 @@ export default {
       type: Boolean,
       required: true,
     },
-  },
-  components: {
-    appOntologyListEditor,
-    draggable,
   },
   data() {
     return {

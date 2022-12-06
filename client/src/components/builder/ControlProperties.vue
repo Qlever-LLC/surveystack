@@ -13,7 +13,16 @@
       <v-text-field outlined v-model="control.label" label="Label" />
       <v-text-field v-if="isText" outlined v-model="control.defaultValue" label="Default value" />
       <v-text-field v-if="isNumber" type="number" outlined v-model="control.defaultValue" label="Default value" />
-      <ontology v-if="isOntology" v-model="control.defaultValue" :control="control" :resources="survey.resources" />
+      <ontology
+        v-if="isOntology"
+        v-model="control.defaultValue"
+        :multiple="control.options.hasMultipleSelections"
+        :customAnswer="control.options.allowCustomSelection"
+        :autocomplete="control.options.allowAutocomplete"
+        :source="control.options.source"
+        :resources="survey.resources"
+        outlined
+      />
       <v-text-field outlined v-model="control.hint" label="Hint" />
       <v-text-field outlined v-model="control.moreInfo" label="More info" />
 
@@ -175,6 +184,20 @@
       <v-checkbox
         class="ma-0"
         color="grey darken-1"
+        v-model="control.options.hasMultipleSelections"
+        v-if="
+          control.type === 'ontology' ||
+          control.type === 'farmOsPlanting' ||
+          control.type === 'farmOsFarm' ||
+          control.type === 'farmOsField'
+        "
+        label="Multiple select"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+      />
+
+      <v-checkbox
+        class="ma-0"
+        color="grey darken-1"
         v-model="control.options.allowCustomSelection"
         @change="
           (v) => {
@@ -199,20 +222,6 @@
           (!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot) ||
           control.options.allowCustomSelection
         "
-      />
-
-      <v-checkbox
-        class="ma-0"
-        color="grey darken-1"
-        v-model="control.options.hasMultipleSelections"
-        v-if="
-          control.type === 'ontology' ||
-          control.type === 'farmOsPlanting' ||
-          control.type === 'farmOsFarm' ||
-          control.type === 'farmOsField'
-        "
-        label="Multiple select"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
 
       <v-combobox

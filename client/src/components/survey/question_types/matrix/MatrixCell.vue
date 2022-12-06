@@ -78,9 +78,7 @@
   />
   <v-select
     v-else-if="header.type === 'dropdown' && !header.custom && !header.autocomplete"
-    :items="items"
-    item-text="label"
-    item-value="value"
+    :placeholder="header.multiple ? 'Select answers' : 'Select answer'"
     :value="value"
     @input="
       (v) => {
@@ -88,11 +86,13 @@
         onInput();
       }
     "
-    hide-details
-    outlined
+    :items="items"
+    item-text="label"
+    item-value="value"
     :multiple="header.multiple"
     :disabled="disabled"
-    placeholder="Select answer"
+    hide-details
+    outlined
   >
     <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
@@ -100,9 +100,7 @@
   </v-select>
   <v-autocomplete
     v-else-if="header.type === 'dropdown' && !header.custom && header.autocomplete"
-    :items="items"
-    item-text="label"
-    item-value="value"
+    placeholder="Type to search"
     :value="value"
     @input="
       (v) => {
@@ -111,12 +109,14 @@
         onInput();
       }
     "
-    hide-details
-    outlined
+    :items="items"
+    item-text="label"
+    item-value="value"
+    :search-input.sync="comboboxSearch"
     :multiple="header.multiple"
     :disabled="disabled"
-    :search-input.sync="comboboxSearch"
-    placeholder="Type to search"
+    hide-details
+    outlined
   >
     <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
@@ -124,9 +124,7 @@
   </v-autocomplete>
   <v-combobox
     v-else-if="header.type === 'dropdown' && header.custom"
-    :items="items"
-    item-text="label"
-    item-value="value"
+    placeholder="Type to search or add custom answer"
     :value="value"
     @input="
       (v) => {
@@ -135,12 +133,15 @@
         onInput();
       }
     "
+    :items="items"
+    item-text="label"
+    item-value="value"
     :delimiters="[',']"
+    :search-input.sync="comboboxSearch"
+    :return-object="false"
     :multiple="header.multiple"
     :disabled="disabled"
-    :return-object="false"
-    :search-input.sync="comboboxSearch"
-    placeholder="Type to search or add custom answer"
+    hide-details
     outlined
   >
     <template v-slot:selection="{ item, index }">

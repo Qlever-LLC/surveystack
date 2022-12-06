@@ -1,6 +1,6 @@
 <template>
   <v-select
-    v-if="!control.options.allowCustomSelection && !control.options.allowAutocomplete"
+    v-if="!customAnswer && !autocomplete"
     label="Default value"
     :value="getValue"
     @change="
@@ -12,22 +12,24 @@
     item-text="label"
     item-value="value"
     :menu-props="autocompleteMenuProps"
-    :chips="!!control.options.hasMultipleSelections"
-    :multiple="!!control.options.hasMultipleSelections"
+    :chips="multiple"
+    :multiple="multiple"
     :disabled="!sourceIsValid"
+    :dense="dense"
     color="focus"
-    outlined
+    :outlined="outlined"
     clearable
     class="full-width dropdown"
     data-test-id="dropdown"
   >
-    <template v-slot:selection="{ item, index }" v-if="!!control.options.hasMultipleSelections">
-      <v-chip v-if="index === 0">
+    <template v-slot:selection="{ item, index }" v-if="multiple">
+      <v-chip v-if="index === 0 && !dense" small>
         <span>{{ item.label }}</span>
       </v-chip>
-      <span v-if="index === 1" class="grey--text text-caption"> (+{{ value.length - 1 }} others) </span>
+      <span v-else-if="index === 0 && dense">{{ item.label }}</span>
+      <span v-if="index === 1" class="ml-2 grey--text text-caption"> (+{{ value.length - 1 }} others) </span>
     </template>
-    <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
+    <template v-slot:item="data" v-if="multiple">
       <v-list-item-content>
         <v-list-item-title>
           {{ data.item.label }}
@@ -39,7 +41,7 @@
     </template>
   </v-select>
   <v-autocomplete
-    v-else-if="!control.options.allowCustomSelection && control.options.allowAutocomplete"
+    v-else-if="!customAnswer && autocomplete"
     label="Default value"
     :value="getValue"
     @change="
@@ -53,22 +55,24 @@
     item-text="label"
     item-value="value"
     :menu-props="autocompleteMenuProps"
-    :chips="!!control.options.hasMultipleSelections"
-    :multiple="!!control.options.hasMultipleSelections"
+    :chips="multiple"
+    :multiple="multiple"
     :disabled="!sourceIsValid"
+    :dense="dense"
     color="focus"
-    outlined
+    :outlined="outlined"
     clearable
     class="full-width dropdown"
     data-test-id="autocomplete"
   >
-    <template v-slot:selection="{ item, index }" v-if="!!control.options.hasMultipleSelections">
-      <v-chip v-if="index === 0">
+    <template v-slot:selection="{ item, index }" v-if="multiple">
+      <v-chip v-if="index === 0 && !dense" small>
         <span>{{ item.label }}</span>
       </v-chip>
-      <span v-if="index === 1" class="grey--text text-caption"> (+{{ value.length - 1 }} others) </span>
+      <span v-else-if="index === 0 && dense">{{ item.label }}</span>
+      <span v-if="index === 1" class="ml-2 grey--text text-caption"> (+{{ value.length - 1 }} others) </span>
     </template>
-    <template v-slot:item="data" v-if="!!control.options.hasMultipleSelections">
+    <template v-slot:item="data" v-if="multiple">
       <v-list-item-content>
         <v-list-item-title>
           {{ data.item.label }}
@@ -80,7 +84,7 @@
     </template>
   </v-autocomplete>
   <v-combobox
-    v-else-if="control.options.allowCustomSelection"
+    v-else-if="customAnswer"
     ref="input"
     label="Default value"
     :value="getValue"
@@ -97,28 +101,29 @@
     :delimiters="[',']"
     :return-object="false"
     :menu-props="autocompleteMenuProps"
-    :chips="!!control.options.hasMultipleSelections"
-    :multiple="!!control.options.hasMultipleSelections"
+    :chips="multiple"
+    :multiple="multiple"
     :disabled="!sourceIsValid"
+    :dense="dense"
     color="focus"
-    outlined
+    :outlined="outlined"
     clearable
     class="full-width custom-ontology dropdown"
     data-test-id="combobox"
   >
-    <template v-slot:selection="{ item, index }" v-if="!!control.options.hasMultipleSelections">
-      <v-chip v-if="index === 0">
+    <template v-slot:selection="{ item, index }" v-if="multiple">
+      <v-chip v-if="index === 0 && !dense" small>
         <span>{{ getLabelForItemValue(item) }}</span>
       </v-chip>
-      <span v-if="index === 1" class="grey--text text-caption"> (+{{ value.length - 1 }} others) </span>
+      <span v-else-if="index === 0 && dense">{{ getLabelForItemValue(item) }}</span>
+      <span v-if="index === 1" class="ml-2 grey--text text-caption"> (+{{ value.length - 1 }} others) </span>
     </template>
     <template v-slot:no-data>
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title>
             No values matching "<strong>{{ comboboxSearch }}</strong
-            >". Press <kbd>enter</kbd> <span v-if="!!control.options.hasMultipleSelections">or <kbd>,</kbd></span> to
-            create a new one
+            >". Press <kbd>enter</kbd> <span v-if="multiple">or <kbd>,</kbd></span> to create a new one
           </v-list-item-title>
         </v-list-item-content>
       </v-list-item>
@@ -135,7 +140,12 @@ import { fetchSubmissionUniqueItems } from '@/utils/submissions';
 export default {
   props: {
     value: { required: true },
-    control: { type: Object, required: true },
+    multiple: { type: Boolean, default: false },
+    customAnswer: { type: Boolean, default: false },
+    autocomplete: { type: Boolean, default: false },
+    dense: { type: Boolean, default: false },
+    outlined: { type: Boolean, default: false },
+    source: { type: String },
     resources: { default: () => [] },
   },
   data() {
@@ -163,10 +173,10 @@ export default {
       return Array.isArray(this.value) ? this.value : this.value ? [this.value] : [];
     },
     getValue() {
-      return this.control.options.hasMultipleSelections ? this.getAryValue : this.getAryValue[0] || this.value;
+      return this.multiple ? this.getAryValue : this.getAryValue[0] || this.value;
     },
     resource() {
-      return this.resources.find((r) => r.id === this.control.options.source);
+      return this.resources.find((r) => r.id === this.source);
     },
     hasReference() {
       return !!this.resource && this.resource.type === resourceTypes.SURVEY_REFERENCE;
@@ -236,5 +246,9 @@ export default {
 
 .dropdown >>> .v-select__selections {
   min-height: 56px !important;
+}
+
+.dropdown.v-input--dense >>> .v-select__selections {
+  min-height: auto !important;
 }
 </style>

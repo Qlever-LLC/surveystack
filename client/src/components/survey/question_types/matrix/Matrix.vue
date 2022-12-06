@@ -303,17 +303,20 @@ export default {
   methods: {
     add() {
       // create empty row object from headers
-      const newRow = this.fields.reduce((accu, current) => ({ ...accu, [current]: { value: null } }), {});
-
-      // eslint-disable-next-line
+      const newRow = this.fields.reduce((prev, current) => ({ ...prev, [current]: { value: null } }), {});
       for (const key of Object.keys(newRow)) {
         const header = this.headers.find((h) => h.value === key);
-
-        if (header && header.redacted) {
+        if (!header) {
+          continue;
+        }
+        if (header.redacted) {
           newRow[key].meta = { permissions: ['admin'] };
         }
+        // Set default value if value is not set when number|text|dropdown question
+        if (['text', 'number', 'dropdown'].includes(header.type)) {
+          newRow[key].value = header.defaultValue || null;
+        }
       }
-
       if (this.rows === null) {
         this.rows = [];
       }
