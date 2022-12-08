@@ -38,7 +38,7 @@
   </v-select>
   <v-autocomplete
     v-else-if="!customAnswer && autocomplete"
-    ref="input"
+    ref="dropdownRef"
     label="Default value"
     :value="getValue"
     @change="onChange"
@@ -77,7 +77,7 @@
   </v-autocomplete>
   <v-combobox
     v-else-if="customAnswer"
-    ref="input"
+    ref="dropdownRef"
     label="Default value"
     :value="getValue"
     @change="onChange"
@@ -146,6 +146,7 @@ export default {
     onChange(value) {
       this.comboboxSearch = null;
       this.$emit('input', getValueOrNull(value));
+      this.$refs.dropdownRef.isMenuActive = false;
     },
     remove(value) {
       this.$emit('input', getValueOrNull(this.value.filter((v) => v !== value)));
@@ -209,6 +210,16 @@ export default {
       return defaultProps;
     },
   },
+  watch: {
+    comboboxSearch(newVal) {
+      const match = newVal
+        ? this.items.find((item) => item.label.toLowerCase().indexOf(newVal.toLowerCase()) >= 0)
+        : undefined;
+      if (!match) {
+        this.$refs.dropdownRef.setMenuIndex(-1);
+      }
+    },
+  },
   async mounted() {
     if (this.hasReference) {
       const { id, path } = this.resource.content;
@@ -228,7 +239,7 @@ export default {
   width: 100%;
 }
 
->>> .v-list-item.v-list-item--active {
+.dropdown >>> .v-list-item.v-list-item--active {
   color: var(--v-focus-base) !important;
 }
 

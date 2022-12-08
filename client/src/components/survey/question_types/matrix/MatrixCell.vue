@@ -2,12 +2,7 @@
   <v-text-field
     v-if="header.type === 'text'"
     :value="value"
-    @input="
-      (v) => {
-        value = getValueOrNull(v);
-        onInput();
-      }
-    "
+    @input="onInput"
     outlined
     hide-details
     autocomplete="off"
@@ -18,12 +13,7 @@
       <v-text-field
         ref="text-qrcode"
         :value="value"
-        @input="
-          (v) => {
-            value = getValueOrNull(v);
-            onInput();
-          }
-        "
+        @input="onInput"
         outlined
         hide-details
         autocomplete="off"
@@ -31,32 +21,13 @@
       />
     </div>
     <div style="flex: 0; display: flex; align-items: center">
-      <app-qr-scanner
-        class="mx-2 py-2"
-        ref="scan-button"
-        small
-        @codeDetected="
-          (v) => {
-            // console.log('value is', v);
-            value = getValueOrNull(v);
-            onInput();
-          }
-        "
-      />
+      <app-qr-scanner class="mx-2 py-2" ref="scan-button" small @codeDetected="onInput" />
     </div>
   </div>
   <v-text-field
     v-else-if="header.type === 'farmos_uuid'"
     :value="localValue"
-    @input="
-      (v) => {
-        if (!this.value || this.value.name !== v) {
-          const text = getValueOrNull(v);
-          value = { id: uuidv4(), name: text };
-        }
-        onInput();
-      }
-    "
+    @input="onInput"
     outlined
     hide-details
     autocomplete="off"
@@ -65,12 +36,7 @@
   <v-text-field
     v-else-if="header.type === 'number'"
     :value="value"
-    @input="
-      (v) => {
-        value = handleNumberInput(v);
-        onInput();
-      }
-    "
+    @input="onNumberInput"
     type="number"
     outlined
     hide-details
@@ -80,12 +46,7 @@
     v-else-if="header.type === 'dropdown' && !header.custom && !header.autocomplete"
     :placeholder="header.multiple ? 'Select answers' : 'Select answer'"
     :value="value"
-    @input="
-      (v) => {
-        value = getValueOrNull(v);
-        onInput();
-      }
-    "
+    @input="onInput"
     :items="items"
     item-text="label"
     item-value="value"
@@ -100,19 +61,16 @@
   </v-select>
   <v-autocomplete
     v-else-if="header.type === 'dropdown' && !header.custom && header.autocomplete"
+    ref="dropdownRef"
     placeholder="Type to search"
     :value="value"
-    @input="
-      (v) => {
-        comboboxSearch = null;
-        value = getValueOrNull(v);
-        onInput();
-      }
-    "
+    @input="onDropDownInput"
+    :search-input.sync="comboboxSearch"
     :items="items"
     item-text="label"
     item-value="value"
-    :search-input.sync="comboboxSearch"
+    :delimiters="[',']"
+    :return-object="false"
     :multiple="header.multiple"
     :disabled="disabled"
     hide-details
@@ -124,20 +82,15 @@
   </v-autocomplete>
   <v-combobox
     v-else-if="header.type === 'dropdown' && header.custom"
+    ref="dropdownRef"
     placeholder="Type to search or add custom answer"
     :value="value"
-    @input="
-      (v) => {
-        comboboxSearch = null;
-        value = getValueOrNull(v);
-        onInput();
-      }
-    "
+    @input="onDropDownInput"
+    :search-input.sync="comboboxSearch"
     :items="items"
     item-text="label"
     item-value="value"
     :delimiters="[',']"
-    :search-input.sync="comboboxSearch"
     :return-object="false"
     :multiple="header.multiple"
     :disabled="disabled"
@@ -163,12 +116,7 @@
     :items="farmos.farms || []"
     :multiple="header.multiple"
     :value="value"
-    @input="
-      (v) => {
-        value = getValueOrNull(v);
-        onInput();
-      }
-    "
+    @input="onInput"
     :label="value ? value.farmName : null"
     item-text="value.name"
     item-value="value"
@@ -202,12 +150,7 @@
     v-else-if="header.type === 'farmos_planting'"
     :multiple="header.multiple"
     :value="value"
-    @input="
-      (v) => {
-        value = getValueOrNull(localChange(v));
-        onInput();
-      }
-    "
+    @input="(v) => onInput(localChange(v))"
     :items="farmos.plantings || []"
     :label="value ? value.farmName : null"
     item-text="value.name"
@@ -234,12 +177,7 @@
       <template v-slot:activator="{ on, attrs }">
         <v-text-field
           :value="value"
-          @input="
-            (v) => {
-              value = v;
-              onInput();
-            }
-          "
+          @input="onInput"
           @click="setActivePickerMonth"
           hide-details
           v-bind="attrs"
@@ -255,9 +193,8 @@
         :value="value"
         @input="
           (v) => {
-            value = v;
+            onInput(v);
             menus[`${index}_${header.value}`] = false;
-            onInput();
           }
         "
         no-title
@@ -334,22 +271,25 @@ export default {
   methods: {
     getValueOrNull,
     uuidv4,
-    onInput() {
+    onInput(value) {
+      this.value = getValueOrNull(value);
       this.$emit('changed');
     },
-    handleNumberInput(v) {
-      if (v === '') {
-        return null;
+    onFarmOsInput(value) {
+      if (!this.value || this.value.name !== value) {
+        this.value = { id: uuidv4(), name: getValueOrNull(value) };
+        this.$emit('changed');
       }
-
-      const n = Number(v);
-
-      // eslint-disable-next-line
-      if (isNaN(n)) {
-        return null;
-      }
-
-      return n;
+    },
+    onNumberInput(value) {
+      const numValue = Number(value);
+      this.value = isNaN(numValue) ? null : numValue;
+      this.$emit('changed');
+    },
+    onDropDownInput(value) {
+      this.onInput(value);
+      this.comboboxSearch = null;
+      this.$refs.dropdownRef.isMenuActive = false;
     },
     getLabel(value) {
       const dropdownItems = this.items;
@@ -414,6 +354,16 @@ export default {
       }
 
       return assets;
+    },
+  },
+  watch: {
+    comboboxSearch(newVal) {
+      const match = newVal
+        ? this.items.find((item) => item.label.toLowerCase().indexOf(newVal.toLowerCase()) >= 0)
+        : undefined;
+      if (!match) {
+        this.$refs.dropdownRef.setMenuIndex(-1);
+      }
     },
   },
 };

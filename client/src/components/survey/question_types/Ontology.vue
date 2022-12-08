@@ -7,8 +7,8 @@
       :placeholder="getPlaceholder"
       :value="getValue"
       @change="onChange"
-      @focus="handleFocus"
-      @blur="handleBlur"
+      @focus="onFocus"
+      @blur="onBlur"
       :items="items"
       item-text="label"
       item-value="value"
@@ -45,17 +45,18 @@
     </v-select>
     <v-autocomplete
       v-else-if="sourceIsValid && !control.options.allowCustomSelection && control.options.allowAutocomplete"
-      ref="input"
+      ref="dropdownRef"
       :label="control.hint"
       :placeholder="getPlaceholder"
       :value="getValue"
       @change="onChange"
-      @focus="handleFocus"
-      @blur="handleBlur"
+      @focus="onFocus"
+      @blur="onBlur"
       :search-input.sync="comboboxSearch"
       :items="items"
       item-text="label"
       item-value="value"
+      :delimiters="[',']"
       :menu-props="autocompleteMenuProps"
       :chips="!!control.options.hasMultipleSelections"
       :multiple="!!control.options.hasMultipleSelections"
@@ -89,13 +90,13 @@
     </v-autocomplete>
     <v-combobox
       v-else-if="sourceIsValid && control.options.allowCustomSelection"
-      ref="input"
+      ref="dropdownRef"
       :label="control.hint"
       :placeholder="getPlaceholder"
       :value="getValue"
       @change="onChange"
-      @focus="handleFocus"
-      @blur="handleBlur"
+      @focus="onFocus"
+      @blur="onBlur"
       :items="items"
       item-text="label"
       item-value="value"
@@ -171,15 +172,15 @@ export default {
   },
   methods: {
     onChange(value) {
-      if (this.value === value) {
-        return;
-      }
       this.comboboxSearch = null;
-      if (Array.isArray(value)) {
-        this.changed(getValueOrNull(value.sort()));
-      } else {
-        const nextValue = getValueOrNull(value);
-        this.changed(nextValue ? [nextValue] : nextValue);
+      this.$refs.dropdownRef.isMenuActive = false;
+      if (this.value !== value) {
+        if (Array.isArray(value)) {
+          this.changed(getValueOrNull(value.sort()));
+        } else {
+          const nextValue = getValueOrNull(value);
+          this.changed(nextValue ? [nextValue] : nextValue);
+        }
       }
     },
     remove(item) {
@@ -192,10 +193,10 @@ export default {
       const item = this.items.find((x) => x.value === value);
       return (item && item.label) || value;
     },
-    handleFocus() {
+    onFocus() {
       this.isFocus = true;
     },
-    handleBlur() {
+    onBlur() {
       this.isFocus = false;
     },
   },
@@ -219,6 +220,7 @@ export default {
         uniq(this.getAryValue).filter((v) => !isNil(v)), // get all the uniq non-empty values
         ...defaultItems.map((i) => i.value) // without the default values
       ).map((value) => ({ label: value, value }));
+
       const allItems = sortBy(
         [...defaultItems, ...customItems],
         [
@@ -262,6 +264,16 @@ export default {
         }
       }
       return undefined;
+    },
+  },
+  watch: {
+    comboboxSearch(newVal) {
+      const match = newVal
+        ? this.items.find((item) => item.label.toLowerCase().indexOf(newVal.toLowerCase()) >= 0)
+        : undefined;
+      if (!match) {
+        this.$refs.dropdownRef.setMenuIndex(-1);
+      }
     },
   },
   async mounted() {
