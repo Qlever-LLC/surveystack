@@ -184,8 +184,11 @@ router.post(
   [assertAuthenticated, assertEntityExists({ collection: 'surveys' })],
   catchErrors(surveyController.cleanupSurvey)
 );
-
-router.delete('/surveys/:id?');
+router.delete(
+  '/surveys/:id',
+  [assertAuthenticated, assertEntityExists({ collection: 'surveys' })],
+  catchErrors(surveyController.deleteSurvey)
+);
 
 /** Users */
 router.get('/users', assertIsSuperAdmin, catchErrors(userController.getUsers));
