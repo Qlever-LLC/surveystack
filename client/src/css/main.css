@@ -160,3 +160,7 @@ body {
 .white-space-nowrap {
   white-space: nowrap;
 }
+
+::placeholder {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
