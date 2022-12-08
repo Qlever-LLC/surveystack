@@ -174,6 +174,16 @@ router.put(
   ],
   catchErrors(surveyController.updateSurvey)
 );
+router.get(
+  '/surveys/cleanup/:id',
+  [assertAuthenticated, assertEntityExists({ collection: 'surveys' })],
+  catchErrors(surveyController.getCleanupSurveyInfo)
+);
+router.post(
+  '/surveys/cleanup/:id',
+  [assertAuthenticated, assertEntityExists({ collection: 'surveys' })],
+  catchErrors(surveyController.cleanupSurvey)
+);
 router.delete(
   '/surveys/:id',
   [assertAuthenticated, assertEntityExists({ collection: 'surveys' })],

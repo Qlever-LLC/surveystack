@@ -7,8 +7,8 @@
       <span>{{ typeName }}</span>
     </v-tooltip>
     <v-col class="body-1 text-truncate">
-      <div class="font-weight-light grey--text text--darken-2 text-truncate">
-        {{ index }}: {{ dataName }}
+      <div class="font-weight-light grey--text text--darken-2">
+        <span class="text-truncate">{{ index }}: {{ dataName }}</span>
         <v-chip v-if="chipLabel" class="ml-2" style="margin-top: -2px" outlined small :color="chipColor">
           {{ chipLabel }}
         </v-chip>

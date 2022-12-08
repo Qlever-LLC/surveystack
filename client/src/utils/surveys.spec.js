@@ -453,10 +453,12 @@ describe('surveys', () => {
     let result = getPreparedLibraryControls(
       librarySurvey._id,
       librarySurvey.latestVersion,
-      librarySurvey.revisions[librarySurvey.latestVersion - 1].controls,
+      librarySurvey.revisions.find((revision) => revision.version === librarySurvey.latestVersion).controls,
       librarySurvey.resources
     );
-    expect(result.length).toBe(librarySurvey.revisions[librarySurvey.latestVersion - 1].controls.length);
+    expect(result.length).toBe(
+      librarySurvey.revisions.find((revision) => revision.version === librarySurvey.latestVersion).controls.length
+    );
   });
 });
 
