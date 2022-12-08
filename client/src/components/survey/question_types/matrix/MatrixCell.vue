@@ -289,7 +289,9 @@ export default {
     onDropDownInput(value) {
       this.onInput(value);
       this.comboboxSearch = null;
-      this.$refs.dropdownRef.isMenuActive = false;
+      if (this.$refs.dropdownRef) {
+        this.$refs.dropdownRef.isMenuActive = false;
+      }
     },
     getLabel(value) {
       const dropdownItems = this.items;

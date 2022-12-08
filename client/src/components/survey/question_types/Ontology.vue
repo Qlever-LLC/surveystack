@@ -173,7 +173,9 @@ export default {
   methods: {
     onChange(value) {
       this.comboboxSearch = null;
-      this.$refs.dropdownRef.isMenuActive = false;
+      if (this.$refs.dropdownRef) {
+        this.$refs.dropdownRef.isMenuActive = false;
+      }
       if (this.value !== value) {
         if (Array.isArray(value)) {
           this.changed(getValueOrNull(value.sort()));
@@ -295,7 +297,7 @@ export default {
   width: 100%;
 }
 
->>> .v-list-item.v-list-item--active {
+.dropdown >>> .v-list-item.v-list-item--active {
   color: var(--v-focus-base) !important;
 }
 
