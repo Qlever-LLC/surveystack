@@ -406,6 +406,7 @@ const getSurveyLibraryConsumersInternal = async (id) => {
       $match: {
         revisions: {
           $elemMatch: {
+            // TODO try to find elegant query which is not limited to 4 child levels but still performing well
             $or: [
               { 'controls.libraryId': new ObjectId(id) },
               { 'controls.children.libraryId': new ObjectId(id) },

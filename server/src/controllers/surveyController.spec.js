@@ -12,11 +12,14 @@ import { db, getDb } from '../db';
 const { ObjectId } = jest.requireActual('mongodb');
 const { cleanupSurvey, getSurveyAndCleanupInfo, deleteArchivedTestSubmissions } = surveyController;
 
-async function mockControlsAndSubmission(
-  surveyOverrides = undefined,
-  consumeLibraryId = undefined,
-  consumeLibraryVersion = undefined
-) {
+/**
+ * creates a mock survey with 3 versions, controls and a submission
+ * @param surveyOverrides pass survey props to overwrite
+ * @param consumeLibraryId optional question set library id to consume
+ * @param consumeLibraryVersion optional versoin of the question set library to be consumed
+ * @returns Object containing survey (the survey created), submission (the submission object generated), createSubmission: a fn to create further submissions for this survey
+ */
+async function mockControlsAndSubmission(surveyOverrides, consumeLibraryId, consumeLibraryVersion) {
   const { survey, createSubmission } = await createSurvey(['text', 'number'], surveyOverrides);
   const { submission: _submission } = await createSubmission();
 
@@ -165,7 +168,6 @@ describe('surveyController', () => {
         params: { id: librarySurvey._id },
         query: { versions: [], auto: true, dryRun: true },
       });
-      //TODO add a third, unreferenced version to survey, expect that version 1 and 3 are deleted
       const res = await createRes({ user: { _id: librarySurvey.meta.creator, permissions: [] } });
       await cleanupSurvey(req, res);
       expect(res.send).toHaveBeenCalledWith(
