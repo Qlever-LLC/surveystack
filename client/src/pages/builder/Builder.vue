@@ -69,7 +69,7 @@
       v-if="versionsDialogIsVisible"
       v-model="versionsDialogIsVisible"
       @cancel="versionsDialogIsVisible = false"
-      :survey="survey"
+      :survey-id="survey._id"
       @reload-survey="onReloadSurvey"
     />
 
