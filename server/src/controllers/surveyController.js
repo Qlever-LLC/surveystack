@@ -5,10 +5,12 @@ import boom from '@hapi/boom';
 import { db } from '../db';
 import _ from 'lodash';
 
-import { checkSurvey, changeRecursive, changeRecursiveAsync } from '../helpers/surveys';
+import { changeRecursive, changeRecursiveAsync, checkSurvey } from '../helpers/surveys';
 import rolesService from '../services/roles.service';
 
-const col = 'surveys';
+const SURVEYS_COLLECTION = 'surveys';
+const SUBMISSIONS_COLLECTION = 'submissions';
+
 const DEFAULT_LIMIT = 20;
 
 const sanitize = async (entity) => {
@@ -77,7 +79,7 @@ const getSurveys = async (req, res) => {
     });
   }
 
-  const entities = await db.collection(col).find(filter).project(project).toArray();
+  const entities = await db.collection(SURVEYS_COLLECTION).find(filter).project(project).toArray();
   return res.send(entities);
 };
 
@@ -175,7 +177,7 @@ const buildPipelineForGetSurveyPage = ({
       },*/
       {
         $lookup: {
-          from: 'submissions',
+          from: SUBMISSIONS_COLLECTION,
           let: {
             surveyId: '$_id',
           },
@@ -265,7 +267,7 @@ const buildPipelineForGetSurveyPage = ({
 const getSurveyPage = async (req, res) => {
   const pipeline = buildPipelineForGetSurveyPage(req.query);
 
-  const [entities] = await db.collection(col).aggregate(pipeline).toArray();
+  const [entities] = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
 
   // empty array when ther is no match
   // however, we still want content and pagination properties
@@ -301,7 +303,7 @@ const getSurveyListPage = async (req, res) => {
   };
 
   const pipeline = buildPipelineForGetSurveyPage(query);
-  const [entities] = await db.collection(col).aggregate(pipeline).toArray();
+  const [entities] = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
 
   // empty array when there is no match
   // however, we still want content and pagination properties
@@ -385,7 +387,7 @@ const getSurvey = async (req, res) => {
     }
   }
 
-  const entities = await db.collection(col).aggregate(pipeline).toArray();
+  const entities = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
 
   if (entities.length === 0) {
     return res.status(404).send({
@@ -419,12 +421,12 @@ const getSurveyInfo = async (req, res) => {
   );
 
   const submissions = await db
-    .collection('submissions')
+    .collection(SUBMISSIONS_COLLECTION)
     .find({ 'meta.survey.id': new ObjectId(id), 'meta.archived': { $ne: true } })
     .count();
 
   const latestSubmissions = await db
-    .collection('submissions')
+    .collection(SUBMISSIONS_COLLECTION)
     .aggregate([
       { $match: { 'meta.survey.id': new ObjectId(id) } },
       {
@@ -452,40 +454,46 @@ const getSurveyInfo = async (req, res) => {
   return res.send(entity);
 };
 
+const getSurveyLibraryConsumersInternal = async (id) => {
+  const pipeline = [
+    {
+      $project: {
+        name: 1,
+        revisions: {
+          $filter: {
+            input: '$revisions',
+            as: 'revision',
+            cond: { $eq: ['$$revision.version', '$latestVersion'] },
+          },
+        },
+      },
+    },
+    {
+      $match: {
+        revisions: {
+          $elemMatch: {
+            // TODO try to find elegant query which is not limited to 4 child levels but still performing well
+            $or: [
+              { 'controls.libraryId': new ObjectId(id) },
+              { 'controls.children.libraryId': new ObjectId(id) },
+              { 'controls.children.children.libraryId': new ObjectId(id) },
+              { 'controls.children.children.children.libraryId': new ObjectId(id) },
+              { 'controls.children.children.children.children.libraryId': new ObjectId(id) },
+            ],
+          },
+        },
+      },
+    },
+  ];
+  return await db
+    .collection(SURVEYS_COLLECTION)
+    .aggregate(pipeline, { allowDiskUse: true })
+    .toArray();
+};
+
 const getSurveyLibraryConsumers = async (req, res) => {
-  // TODO only check highest or latestVersion ?
   const { id } = req.query;
-  // TODO naive and limited (to 3 child levels) implementation for deeply nested question sets - try to find elegant query which is still performing well
-  const filter = {
-    $or: [
-      {
-        $and: [
-          { 'revisions.controls.libraryId': new ObjectId(id) },
-          { 'revisions.controls.isLibraryRoot': true },
-        ],
-      },
-      {
-        $and: [
-          { 'revisions.controls.children.libraryId': new ObjectId(id) },
-          { 'revisions.controls.children.isLibraryRoot': true },
-        ],
-      },
-      {
-        $and: [
-          { 'revisions.controls.children.children.libraryId': new ObjectId(id) },
-          { 'revisions.controls.children.children.isLibraryRoot': true },
-        ],
-      },
-      {
-        $and: [
-          { 'revisions.controls.children.children.children.libraryId': new ObjectId(id) },
-          { 'revisions.controls.children.children.children.isLibraryRoot': true },
-        ],
-      },
-    ],
-  };
-  const entities = await db.collection(col).find(filter).toArray();
-  return res.send(entities);
+  return res.send(await getSurveyLibraryConsumersInternal(id));
 };
 
 const createSurvey = async (req, res) => {
@@ -494,7 +502,7 @@ const createSurvey = async (req, res) => {
   entity.meta.creator = res.locals.auth.user._id;
 
   try {
-    let r = await db.collection(col).insertOne(entity);
+    let r = await db.collection(SURVEYS_COLLECTION).insertOne(entity);
     assert.equal(1, r.insertedCount);
     return res.send(r);
   } catch (err) {
@@ -529,7 +537,7 @@ const updateSurvey = async (req, res) => {
   const { id } = req.params;
   const entity = await sanitize(req.body);
 
-  const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  const existing = await db.collection(SURVEYS_COLLECTION).findOne({ _id: new ObjectId(id) });
   if (!existing) {
     throw boom.notFound(`No entity with _id exists: ${id}`);
   }
@@ -540,7 +548,7 @@ const updateSurvey = async (req, res) => {
   }
 
   try {
-    let updated = await db.collection(col).findOneAndUpdate(
+    let updated = await db.collection(SURVEYS_COLLECTION).findOneAndUpdate(
       { _id: new ObjectId(id) },
       { $set: entity },
       {
@@ -557,7 +565,7 @@ const updateSurvey = async (req, res) => {
 const deleteSurvey = async (req, res) => {
   const { id } = req.params;
 
-  const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  const existing = await db.collection(SURVEYS_COLLECTION).findOne({ _id: new ObjectId(id) });
   if (!existing) {
     throw boom.notFound(`No entity with _id exists: ${id}`);
   }
@@ -568,7 +576,7 @@ const deleteSurvey = async (req, res) => {
   }
 
   try {
-    let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
+    let r = await db.collection(SURVEYS_COLLECTION).deleteOne({ _id: new ObjectId(id) });
     assert.equal(1, r.deletedCount);
     return res.send({ message: 'OK' });
   } catch (error) {
@@ -579,7 +587,7 @@ const deleteSurvey = async (req, res) => {
 const checkForLibraryUpdates = async (req, res) => {
   const { id } = req.params;
   let updatableSurveys = {};
-  let survey = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  let survey = await db.collection(SURVEYS_COLLECTION).findOne({ _id: new ObjectId(id) });
 
   if (!survey) {
     return res.send(updatableSurveys);
@@ -595,7 +603,7 @@ const checkForLibraryUpdates = async (req, res) => {
       if (control.isLibraryRoot && !control.libraryIsInherited) {
         //check if used library survey version is old
         const librarySurvey = await db
-          .collection(col)
+          .collection(SURVEYS_COLLECTION)
           .findOne({ _id: new ObjectId(control.libraryId) });
         if (!librarySurvey) {
           //library can not be found, also return this information
@@ -661,6 +669,151 @@ const getPinned = async (req, res) => {
   });
 };
 
+const getSurveyAndCleanupInfo = async (id, userId) => {
+  const survey = await db.collection(SURVEYS_COLLECTION).findOne({ _id: new ObjectId(id) });
+  if (!survey) {
+    throw boom.notFound(`No entity with _id exists: ${id}`);
+  }
+
+  const isAllowed = await isUserAllowedToModifySurvey(survey, userId);
+  if (!isAllowed) {
+    throw boom.unauthorized(`You are not authorized to update survey: ${id}`);
+  }
+
+  const pipeline = [
+    { $match: { 'meta.survey.id': new ObjectId(id) } },
+    { $match: { 'meta.archived': { $ne: true } } },
+    { $project: { 'meta.survey.version': 1 } },
+  ];
+  const submissions = await db
+    .collection(SUBMISSIONS_COLLECTION)
+    .aggregate(pipeline, { allowDiskUse: true })
+    .toArray();
+
+  const submissionsVersionCounts = _.countBy(
+    submissions.map((submission) => submission.meta.survey.version)
+  );
+
+  let libraryConsumersByVersion = {};
+  if (survey.meta.isLibrary) {
+    const libraryConsumers = await getSurveyLibraryConsumersInternal(survey._id);
+    libraryConsumers.forEach((s) => {
+      s.revisions[0].controls.forEach((c) => {
+        changeRecursive(c, (c) => {
+          if (c.isLibraryRoot) {
+            //increase count by version
+            libraryConsumersByVersion[c.libraryVersion] = libraryConsumersByVersion[
+              c.libraryVersion
+            ]
+              ? libraryConsumersByVersion[c.libraryVersion] + 1
+              : 1;
+          }
+        });
+      });
+    });
+  }
+
+  const versionsToKeep = Array.from(
+    new Set([
+      ...Object.keys(submissionsVersionCounts),
+      ...Object.keys(libraryConsumersByVersion),
+      String(survey.latestVersion),
+    ])
+  );
+  const surveyVersions = survey.revisions.map(({ version }) => String(version));
+  //todo take libraryConsumersByVersion into account
+  const versionsToDelete = _.difference(surveyVersions, versionsToKeep);
+  return {
+    survey,
+    surveyVersions,
+    versionsToKeep,
+    versionsToDelete,
+    submissionsVersionCounts,
+    libraryConsumersByVersion,
+  };
+};
+
+const getCleanupSurveyInfo = async (req, res) => {
+  const { id } = req.params;
+  const {
+    versionsToKeep,
+    versionsToDelete,
+    surveyVersions,
+    submissionsVersionCounts,
+    libraryConsumersByVersion,
+  } = await getSurveyAndCleanupInfo(id, res.locals.auth.user._id);
+  res.send({
+    versionsToKeep,
+    versionsToDelete,
+    surveyVersions,
+    surveySubmissionsVersionCounts: submissionsVersionCounts,
+    libraryConsumersByVersion,
+  });
+};
+
+const cleanupSurvey = async (req, res) => {
+  const { id } = req.params;
+  const { versions: requestedVersionsToDelete, resourceIds, auto, dryRun } = req.query;
+  const { survey, versionsToKeep, versionsToDelete } = await getSurveyAndCleanupInfo(
+    id,
+    res.locals.auth.user._id
+  );
+
+  // Don't allow deletion of survey versions that have associated submissions
+  if (requestedVersionsToDelete.some((v) => !versionsToDelete.includes(v))) {
+    return res.status(404).send({ message: 'Invalid version cleanup requested' });
+  }
+
+  const versionsToFilter = auto ? versionsToDelete : requestedVersionsToDelete;
+  const shouldKeepVersion = ({ version }) => !versionsToFilter.includes(String(version));
+  const filteredSurveyRevisions = survey.revisions.filter(shouldKeepVersion);
+
+  if (versionsToFilter.length > 0) {
+    try {
+      let updated = {};
+      if (!dryRun) {
+        updated = await db.collection(SURVEYS_COLLECTION).findOneAndUpdate(
+          { _id: new ObjectId(id) },
+          {
+            $set: {
+              revisions: filteredSurveyRevisions,
+            },
+          },
+          { returnOriginal: false }
+        );
+        await deleteArchivedTestSubmissions(
+          id,
+          versionsToFilter.map((v) => Number(v)) //versionsToFilter had been converted to String before, convert it back...
+        );
+      }
+      return res.send({ updated, deletedVersions: versionsToFilter, keptVersions: versionsToKeep });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).send({ message: 'Could not clean up survey' });
+    }
+  }
+
+  res.send({ deletedVersions: versionsToFilter, keptVersions: versionsToKeep });
+};
+
+/**
+ Delete all useless submissions
+ Useless is defined as submissions archived with reasons of 'SUBMISSION_FROM_BUILDER' or 'TEST_DATA'
+ @param surveyId: string object id of the survey to delete subissions for
+ @param surveyVersions array of survey version numbers to delete submssions for
+ @return count of deleted submissions
+ **/
+const deleteArchivedTestSubmissions = async (surveyId, surveyVersions) => {
+  const filter = {
+    'meta.survey.id': new ObjectId(surveyId),
+    'meta.survey.version': { $in: surveyVersions },
+    'meta.archived': true,
+    'meta.archivedReason': { $in: ['SUBMISSION_FROM_BUILDER', 'TEST_DATA'] },
+  };
+  const result = await db.collection(SUBMISSIONS_COLLECTION).deleteMany(filter);
+  return result.deletedCount;
+};
+
 export default {
   getSurveys,
   getSurveyPage,
@@ -673,4 +826,8 @@ export default {
   updateSurvey,
   deleteSurvey,
   checkForLibraryUpdates,
+  cleanupSurvey,
+  getCleanupSurveyInfo,
+  getSurveyAndCleanupInfo,
+  deleteArchivedTestSubmissions,
 };

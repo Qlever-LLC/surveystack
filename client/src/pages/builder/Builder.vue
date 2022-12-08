@@ -12,6 +12,7 @@
       @onDelete="onDelete"
       @import-survey="importSurvey"
       @export-survey="exportSurvey"
+      @show-version-dialog="versionsDialogIsVisible = true"
     />
     <div v-else class="d-flex align-center justify-center" style="height: 100%">
       <v-progress-circular :size="50" color="primary" indeterminate />
@@ -64,6 +65,14 @@
       @close="showApiComposeErrors = false"
     />
 
+    <versions-dialog
+      v-if="versionsDialogIsVisible"
+      v-model="versionsDialogIsVisible"
+      @cancel="versionsDialogIsVisible = false"
+      :survey="survey"
+      @reload-survey="onReloadSurvey"
+    />
+
     <v-snackbar v-model="showSnackbar" :timeout="4000">
       {{ snackbarMessage | capitalize }}
       <v-btn color="grey" text @click="showSnackbar = false">Close</v-btn>
@@ -102,11 +111,13 @@ import { createSurvey, updateControls } from '@/utils/surveys';
 import { isIos, isSafari } from '@/utils/compatibility';
 import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErros } from '@/utils/draft';
+import VersionsDialog from '@/components/builder/VersionsDialog';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
 export default {
   components: {
+    VersionsDialog,
     SurveyBuilder,
     appDialog,
     resultDialog,
@@ -134,6 +145,7 @@ export default {
       isIos: () => isIos(),
       apiComposeErrors: [],
       showApiComposeErrors: false,
+      versionsDialogIsVisible: false,
     };
   },
   mounted() {
@@ -252,7 +264,6 @@ export default {
       this.sessionId = new ObjectId().toString();
       this.survey = { ...tmp };
     },
-
     async importSurvey({
       target: {
         files: [file],
@@ -340,6 +351,9 @@ export default {
       }
       this.sessionId = new ObjectId().toString();
       this.loading = false;
+    },
+    onReloadSurvey() {
+      this.fetchData();
     },
   },
   async created() {

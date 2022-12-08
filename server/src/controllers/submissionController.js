@@ -735,7 +735,10 @@ const createSubmission = async (req, res) => {
   }
 
   const mapSubmissionToQSL = ({ entity, survey }) => {
-    const controls = survey.revisions[entity.meta.survey.version - 1].controls;
+    const controls = survey.revisions.find(
+      (revision) => revision.version === entity.meta.survey.version
+    ).controls;
+
     return prepareSubmissionsToQSLs(controls, entity);
   };
   const submissionsToQSLs = (await Promise.all(submissionEntities.map(mapSubmissionToQSL))).flat();
@@ -938,7 +941,10 @@ const updateSubmissionToLibrarySurveys = async (survey, submission) => {
     db.collection(col).replaceOne({ _id: librarySubmission._id }, librarySubmission);
   });
   // create new library submissions with a new id
-  let controls = survey.revisions[submission.meta.survey.version - 1].controls;
+  let controls = survey.revisions.find(
+    (revision) => revision.version === submission.meta.survey.version
+  ).controls;
+
   const QSLSubmissions = await prepareSubmissionsToQSLs(controls, submission);
   if (QSLSubmissions.length !== 0) {
     await db.collection(col).insertMany(QSLSubmissions);
