@@ -3,11 +3,7 @@
     v-if="!customAnswer && !autocomplete"
     label="Default value"
     :value="getValue"
-    @change="
-      (v) => {
-        onChange(v);
-      }
-    "
+    @change="onChange"
     :items="items"
     item-text="label"
     item-value="value"
@@ -42,14 +38,10 @@
   </v-select>
   <v-autocomplete
     v-else-if="!customAnswer && autocomplete"
+    ref="input"
     label="Default value"
     :value="getValue"
-    @change="
-      (v) => {
-        comboboxSearch = null;
-        onChange(v);
-      }
-    "
+    @change="onChange"
     :search-input.sync="comboboxSearch"
     :items="items"
     item-text="label"
@@ -88,12 +80,7 @@
     ref="input"
     label="Default value"
     :value="getValue"
-    @change="
-      (v) => {
-        comboboxSearch = null;
-        onChange(v);
-      }
-    "
+    @change="onChange"
     :search-input.sync="comboboxSearch"
     :items="items"
     item-text="label"
@@ -156,8 +143,8 @@ export default {
     };
   },
   methods: {
-    getValueOrNull,
     onChange(value) {
+      this.comboboxSearch = null;
       this.$emit('input', getValueOrNull(value));
     },
     remove(value) {
@@ -204,19 +191,20 @@ export default {
       // default properties copied from the vuetify-autocomplete docs
       const defaultProps = {
         closeOnClick: false,
-        closeOnContentClick: false,
         disableKeys: true,
         openOnClick: false,
-        maxHeight: 304,
         color: 'focus',
-        bottom: true,
-        offsetY: true,
       };
 
       if (this.$vuetify.breakpoint.smAndDown || this.forceMobile) {
         defaultProps.maxHeight = 130;
         defaultProps.top = true;
         defaultProps.closeOnContentClick = true;
+      } else {
+        defaultProps.maxHeight = 304;
+        defaultProps.bottom = true;
+        defaultProps.offsetY = true;
+        defaultProps.closeOnContentClick = false;
       }
       return defaultProps;
     },

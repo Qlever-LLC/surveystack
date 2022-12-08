@@ -6,11 +6,7 @@
       :label="control.hint"
       :placeholder="getPlaceholder"
       :value="getValue"
-      @change="
-        (v) => {
-          onChange(v);
-        }
-      "
+      @change="onChange"
       @focus="handleFocus"
       @blur="handleBlur"
       :items="items"
@@ -49,15 +45,11 @@
     </v-select>
     <v-autocomplete
       v-else-if="sourceIsValid && !control.options.allowCustomSelection && control.options.allowAutocomplete"
+      ref="input"
       :label="control.hint"
       :placeholder="getPlaceholder"
       :value="getValue"
-      @change="
-        (v) => {
-          comboboxSearch = null;
-          onChange(v);
-        }
-      "
+      @change="onChange"
       @focus="handleFocus"
       @blur="handleBlur"
       :search-input.sync="comboboxSearch"
@@ -101,12 +93,7 @@
       :label="control.hint"
       :placeholder="getPlaceholder"
       :value="getValue"
-      @change="
-        (v) => {
-          comboboxSearch = null;
-          onChange(v);
-        }
-      "
+      @change="onChange"
       @focus="handleFocus"
       @blur="handleBlur"
       :items="items"
@@ -183,22 +170,23 @@ export default {
     };
   },
   methods: {
-    getValueOrNull,
-    onChange(v) {
-      if (this.value !== v) {
-        if (Array.isArray(v)) {
-          this.changed(this.getValueOrNull(v.sort()));
-        } else {
-          const nextValue = this.getValueOrNull(v);
-          this.changed(nextValue ? [nextValue] : nextValue);
-        }
+    onChange(value) {
+      if (this.value === value) {
+        return;
+      }
+      this.comboboxSearch = null;
+      if (Array.isArray(value)) {
+        this.changed(getValueOrNull(value.sort()));
+      } else {
+        const nextValue = getValueOrNull(value);
+        this.changed(nextValue ? [nextValue] : nextValue);
       }
     },
     remove(item) {
-      this.changed(this.getValueOrNull(this.value.filter((v) => v !== item.value)));
+      this.changed(getValueOrNull(this.value.filter((v) => v !== item.value)));
     },
     removeValue(value) {
-      this.changed(this.getValueOrNull(this.value.filter((v) => v !== value)));
+      this.changed(getValueOrNull(this.value.filter((v) => v !== value)));
     },
     getLabelForItemValue(value) {
       const item = this.items.find((x) => x.value === value);
@@ -246,24 +234,25 @@ export default {
     autocompleteMenuProps() {
       const defaultProps = {
         closeOnClick: false,
-        closeOnContentClick: false,
         disableKeys: true,
         openOnClick: false,
-        maxHeight: 304,
         color: 'focus',
-        bottom: true,
-        offsetY: true,
       };
 
       if (this.$vuetify.breakpoint.smAndDown || this.forceMobile) {
         defaultProps.maxHeight = 130;
         defaultProps.top = true;
         defaultProps.closeOnContentClick = true;
+      } else {
+        defaultProps.maxHeight = 304;
+        defaultProps.bottom = true;
+        defaultProps.offsetY = true;
+        defaultProps.closeOnContentClick = false;
       }
       return defaultProps;
     },
     getPlaceholder() {
-      if (this.isFocus) {
+      if ((this.control.hint && this.isFocus) || !this.control.hint) {
         if (!this.control.options.allowCustomSelection && !this.control.options.allowAutocomplete) {
           return this.control.options.hasMultipleSelections ? 'Select answers' : 'Select answer';
         } else if (!this.control.options.allowCustomSelection && this.control.options.allowAutocomplete) {
