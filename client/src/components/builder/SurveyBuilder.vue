@@ -21,7 +21,14 @@
       @cancel="updateLibraryCancelled"
     />
 
-    <v-alert v-if="Object.keys(availableLibraryUpdates).length > 0" type="warning" dismissible>
+    <v-alert
+      v-if="Object.keys(availableLibraryUpdates).length > 0"
+      text
+      type="warning"
+      color="orange"
+      elevation="2"
+      dismissible
+    >
       This survey uses an outdated question library set. Consider reviewing the new version and updating it.
     </v-alert>
 
@@ -53,6 +60,7 @@
             @addToLibrary="addToLibrary"
             class="mb-4"
             data-testid="survey-details"
+            @show-version-dialog="$emit('show-version-dialog')"
           />
           <graphical-view
             v-if="!viewCode"
@@ -422,7 +430,7 @@ export default {
       rootGroup.children = getPreparedLibraryControls(
         librarySurvey._id,
         librarySurvey.latestVersion,
-        librarySurvey.revisions[librarySurvey.latestVersion - 1].controls,
+        librarySurvey.revisions.find((revision) => revision.version === librarySurvey.latestVersion).controls,
         newResources,
         null
       );

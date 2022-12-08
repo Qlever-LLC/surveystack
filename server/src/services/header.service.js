@@ -62,7 +62,9 @@ const getHeaders = async (
     console.log(`could not determine max survey version from entities, using version ${version}`);
   }
 
-  const { controls } = survey.revisions.find((r) => r.version === version);
+  // Get controls for survey version, fallback to empty controls if survey version no longer exists.
+  // Survey version may have been removed by cleanup tool.
+  const { controls } = survey.revisions.find((r) => r.version === version) ?? { controls: [] };
 
   const tree = new TreeModel();
   const root = tree.parse({ name: 'data', children: controls });
@@ -133,8 +135,6 @@ const getHeaders = async (
     });
     return headersWithoutDataMeta;
   }
-
-  // console.log(headers, surveyHeaders, submissionHeaders);
 
   return headers;
 };

@@ -1076,3 +1076,10 @@ function hasPage(reduction, control) {
 export const descendantHasPage = (control) => {
   return hasPage(false, control);
 };
+
+export const calcSurveySizeMB = (survey) => {
+  const size = new TextEncoder().encode(JSON.stringify(survey)).length;
+  const kiloBytes = size / 1024;
+  const megaBytes = kiloBytes / 1024;
+  return Math.round(megaBytes * 10) / 10;
+};
