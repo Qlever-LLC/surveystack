@@ -88,7 +88,7 @@ const createSubmissionFromSurvey = ({ survey, version = 1, instance, submitAsUse
     dateCreated: dateNow,
     dateModified: dateNow,
     dateSubmitted: null,
-    survey: { id: survey._id, version },
+    survey: { id: survey._id, name: survey.name, version: version },
     revision: 1,
     permissions: [],
     status: [],

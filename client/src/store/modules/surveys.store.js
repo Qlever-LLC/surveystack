@@ -77,11 +77,6 @@ const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  async fetchSurveys({ commit }) {
-    const response = await api.get('/surveys');
-    commit('SET_SURVEYS', response.data);
-    return response.data;
-  },
   async fetchSurvey({ commit }, { id, version = 'latest' }) {
     const response = await api.get(`/surveys/${id}?version=${version}`);
     commit('ADD_SURVEY', response.data);
