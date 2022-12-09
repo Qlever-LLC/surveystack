@@ -554,15 +554,15 @@ export default {
       this.selectedTab = tabMap.indexOf(tab);
 
       if (!this.control.options[tab].code) {
-        let initalCode;
+        let initialCode;
         if (tab === 'apiCompose') {
-          initalCode = defaultApiCompose;
+          initialCode = defaultApiCompose;
         } else {
-          initalCode = initialRelevanceCode(tab);
+          initialCode = initialRelevanceCode(tab);
         }
 
-        this.control.options[tab].code = initalCode;
-        this.activeCode = initalCode;
+        this.control.options[tab].code = initialCode;
+        this.activeCode = initialCode;
       } else {
         this.activeCode = this.control.options[tab].code;
       }
@@ -620,7 +620,7 @@ export default {
     setScriptCode(data) {
       if (!data) {
         // default empty script...
-        // ideally we shouldnt need to instantiate inside SurveyBuilder
+        // ideally we shouldn't need to instantiate inside SurveyBuilder
         this.scriptCode = {
           _id: null,
           name: 'New Script',
