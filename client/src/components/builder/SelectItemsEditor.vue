@@ -1,56 +1,56 @@
 <template>
-  <div class="select-items-editor mb-3">
-    <!-- <h4>Items</h4> -->
-    <v-card-title class="px-0 d-flex justify-space-between">
-      <span>
+  <v-dialog v-model="open" width="500">
+    <template v-slot:activator="{ on, attrs }">
+      <v-text-field class="mt-3" label="Resource" hide-details v-on="on" v-bind="attrs" />
+    </template>
+
+    <v-card>
+      <v-card-title class="d-flex justify-space-between align-center grey--text text--darken-2">
         Selection List
-      </span>
-    </v-card-title>
-    <v-list>
-      <draggable :list="value">
-        <v-card v-for="(item, index) in value" :key="index" class="mb-2 draggable-cursor" outlined>
-          <v-list-item class="draggable-cursor px-1">
-            <v-list-item-content class="pb-1">
-              <v-row>
-                <v-col class="py-0 pl-4 pr-1">
-                  <v-text-field
-                    label="Label"
-                    :value="item.label"
-                    :disabled="disabled"
-                    @input="(value) => handleItemInput(index, 'label', value)"
-                    :rules="[rules.notEmpty]"
-                    outlined
-                    dense
-                  />
-                </v-col>
-                <v-col class="py-0 pl-1 pr-3">
-                  <v-text-field
-                    label="Value"
-                    :value="item.value"
-                    :disabled="disabled"
-                    @input="(value) => handleItemInput(index, 'value', value)"
-                    :rules="[rules.notEmpty]"
-                    outlined
-                    dense
-                  />
-                </v-col>
-              </v-row>
-            </v-list-item-content>
-            <v-list-item-action class="mt-n3">
-              <v-btn icon>
-                <v-icon color="grey" :disabled="disabled" @click="() => deleteItem(index)">mdi-delete</v-icon>
-              </v-btn>
-            </v-list-item-action>
-          </v-list-item>
-        </v-card>
-      </draggable>
-    </v-list>
-    <v-row>
-      <v-btn class="ml-auto mr-0 d-block mb-3" :disabled="disabled" @click="addItem">
-        <v-icon left>mdi-plus</v-icon>Add Item
-      </v-btn>
-    </v-row>
-  </div>
+        <v-btn color="primary" @click="addItem"> <v-icon left>mdi-plus</v-icon>Add Row </v-btn>
+      </v-card-title>
+
+      <v-card-text class="dialog-content">
+        <div class="row-cell pr-11">
+          <div class="flex-grow-1">Label</div>
+          <div class="flex-grow-1">Value</div>
+        </div>
+        <v-divider></v-divider>
+        <div v-if="items.length === 0" class="mt-8 text-center">
+          Please click <strong>Add row</strong> button to add new item.
+        </div>
+        <draggable v-else :list="items" class="draggable">
+          <div v-for="(item, index) in items" :key="index" class="row-cell draggable-cursor">
+            <v-text-field
+              class="flex-grow-1"
+              :value="item.label"
+              @input="(value) => handleItemInput(index, 'label', value)"
+              :rules="rules"
+              hide-details
+              dense
+            />
+            <v-text-field
+              class="flex-grow-1"
+              :value="item.value"
+              @input="(value) => handleItemInput(index, 'value', value)"
+              :rules="rules"
+              hide-details
+              dense
+            />
+            <v-icon color="grey" size="20" @click="() => deleteItem(index)">mdi-delete</v-icon>
+          </div>
+        </draggable>
+      </v-card-text>
+
+      <v-divider></v-divider>
+
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn text @click="close">Cancel</v-btn>
+        <v-btn color="primary" @click="save">Save</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -60,66 +60,71 @@ export default {
   components: {
     draggable,
   },
-  data() {
-    return {
-      rules: {
-        notEmpty: (val) => (val !== null && val !== '' ? true : 'Please enter a string'),
-      },
-    };
-  },
-  methods: {
-    setItems(items) {
-      console.log('set items', items);
-      this.$emit('set-control-source', items);
-    },
-    createItem({ value = '', label = '' } = {}) {
-      return {
-        value: '',
-        label: '',
-      };
-    },
-    addItem() {
-      this.$emit('set-control-source', [...this.value, this.createItem()]);
-    },
-    deleteItem(index) {
-      const newItems = this.value.filter((item, i) => index !== i);
-      console.log('delete item', index, newItems);
-      this.$emit('set-control-source', newItems);
-    },
-    handleItemInput(index, type, value) {
-      const newItem = {
-        ...this.value[index],
-        [type]: value,
-      };
-      const newItems = [...this.value.slice(0, index), newItem, ...this.value.slice(index + 1, this.value.length)];
-      this.$emit('set-control-source', newItems);
-    },
-  },
-  model: {
-    // prop: 'items',
-    event: 'set-control-source',
-    // event: 'change',
-  },
   props: {
     value: {
       type: Array,
-      required: true,
+      default: () => [],
     },
-    disabled: {
-      required: false,
+  },
+  data() {
+    return {
+      open: false,
+      items: [],
+      rules: [(val) => val || 'Please enter a string'],
+    };
+  },
+  methods: {
+    close() {
+      this.open = false;
+    },
+    save() {
+      this.$emit('set-control-source', this.items);
+      this.close();
+    },
+    handleItemInput(index, key, value) {
+      this.items[index][key] = value;
+    },
+    addItem() {
+      this.items.push([{ label: '', value: '' }]);
+    },
+    deleteItem(index) {
+      this.items.splice(index, 1);
+    },
+  },
+  watch: {
+    value(newVal) {
+      this.items = newVal;
     },
   },
 };
 </script>
 
 <style scoped>
-.draggable-cursor {
-  /* cursor: grab; */
-  cursor: all-scroll;
+>>> .dialog-content {
+  min-height: 400px;
+  max-height: calc(80% - 200px);
+  padding: 12px 16px;
 }
 
-.draggable-cursor:active {
-  /* cursor: grabbing; */
-  cursor: all-scroll;
+>>> .dialog-content > :first-child {
+  padding-right: 68px;
+}
+
+>>> .dialog-content .row-cell {
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+>>> .dialog-content .draggable {
+  display: flex;
+  flex-direction: column;
+  justify-items: start;
+  align-items: stretch;
+}
+
+>>> .dialog-content .draggable .row-cell {
+  margin-top: 8px;
 }
 </style>

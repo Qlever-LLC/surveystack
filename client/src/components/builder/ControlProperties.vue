@@ -42,7 +42,6 @@
         v-if="isSelect"
         v-model="control.options.source"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-        class="mt-5"
       />
       <ontology-properties
         v-if="isOntology"
@@ -60,14 +59,12 @@
         :allowSetAllowHide="!!survey.meta.isLibrary"
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
-        class="mt-5"
         @set-control-required="control.options.required = true"
       />
       <file-properties
         v-if="isFile"
         v-model="control.options.source"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-        class="mt-5"
       />
       <div v-if="isScript" class="d-flex align-start">
         <v-autocomplete
@@ -87,7 +84,7 @@
             <div>{{ item.name }}</div>
           </template>
         </v-autocomplete>
-        <v-btn class="mt-4" @click="(ev) => $emit('set-script-editor-is-visible', true)" icon>
+        <v-btn @click="(ev) => $emit('set-script-editor-is-visible', true)" icon>
           <v-icon>mdi-open-in-new</v-icon>
         </v-btn>
       </div>
@@ -526,16 +523,17 @@ export default {
   align-items: stretch;
 }
 
-.property-panel form > * + * {
+.property-panel form > * + *,
+.property-panel form > .advanced > * + * {
   margin-top: 12px;
+}
+
+.property-panel form > .ml-2 + .ml-2 {
+  margin-top: 8px;
 }
 
 .property-panel form > .spacer {
   height: 16px;
-}
-
-.property-panel form > .advanced > * + * {
-  margin-top: 12px;
 }
 
 .property-panel form > .advanced > div {
@@ -544,7 +542,7 @@ export default {
   align-items: center;
 }
 
-.property-panel form > .advanced > div .v-input--selection-controls {
+.property-panel form > .advanced .v-input--selection-controls {
   margin-top: 0;
 }
 
