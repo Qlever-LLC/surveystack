@@ -1,22 +1,17 @@
 <template>
-  <div>
-    <v-card-title class="px-0 d-flex justify-space-between">
-      <div>Dropdown List</div>
-    </v-card-title>
-    <div class="text-center d-flex">
-      <resource-selector
-        :resources="filteredResources"
-        :value="value"
-        :disabled="disableSelection"
-        @on-new="createResourceHandler"
-        @on-select="selectResourceHandler"
-        :newResourceTypes="[resourceTypes.ONTOLOGY_LIST, resourceTypes.SURVEY_REFERENCE]"
-      />
-      <v-btn icon @click.stop="editResourceHandler" :class="{ 'd-none': !value }">
-        <!-- Edit entries -->
-        <v-icon class="ml-2 mt-3">mdi-pencil</v-icon>
-      </v-btn>
-    </div>
+  <div class="text-center d-flex align-center">
+    <resource-selector
+      :resources="filteredResources"
+      :value="value"
+      :disabled="disableSelection"
+      @on-new="createResourceHandler"
+      @on-select="selectResourceHandler"
+      :newResourceTypes="[resourceTypes.ONTOLOGY_LIST, resourceTypes.SURVEY_REFERENCE]"
+    />
+    <v-btn icon @click.stop="editResourceHandler" class="ml-2 mt-3" :class="{ 'd-none': !value }">
+      <v-icon>mdi-pencil</v-icon>
+    </v-btn>
+
     <v-dialog v-model="tableDialogIsVisible">
       <ontology-list-editor
         v-if="tableDialogIsVisible && resource && resource.type === resourceTypes.ONTOLOGY_LIST"

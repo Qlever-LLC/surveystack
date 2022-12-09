@@ -15,6 +15,7 @@
     color="focus"
     :outlined="outlined"
     clearable
+    hide-details
     class="full-width dropdown"
     data-test-id="dropdown"
   >
@@ -54,6 +55,7 @@
     color="focus"
     :outlined="outlined"
     clearable
+    hide-details
     class="full-width dropdown"
     data-test-id="autocomplete"
   >
@@ -95,6 +97,7 @@
     color="focus"
     :outlined="outlined"
     clearable
+    hide-details
     class="full-width custom-ontology dropdown"
     data-test-id="combobox"
   >
@@ -246,10 +249,6 @@ export default {
 }
 
 .dropdown >>> .v-select__selections {
-  min-height: 56px !important;
-}
-
-.dropdown.v-input--dense >>> .v-select__selections {
   min-height: auto !important;
 }
 </style>
