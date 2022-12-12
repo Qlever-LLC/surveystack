@@ -493,12 +493,12 @@ router.post(
 );
 router.post(
   '/resources/upload-url',
-  [checkFeatureToggledOn('feature_resource'), assertAuthenticated],
+  [checkFeatureToggledOn('feature_resource')],
   catchErrors(resourceController.getUploadURL)
 );
 router.put(
   '/resources/commit/:id',
-  [checkFeatureToggledOn('feature_resource'), assertAuthenticated],
+  [checkFeatureToggledOn('feature_resource')],
   catchErrors(resourceController.commitResource)
 );
 router.delete(
