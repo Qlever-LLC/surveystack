@@ -50,7 +50,7 @@ const getUploadURL = async (req, res) => {
       resource.contentLength
     );
     // add resource entry to our db
-    let r = await addResource(resource, res.locals.auth.user._id, LOCATION_S3);
+    let r = await addResource(resource, res.locals.auth.user, LOCATION_S3);
     assert.equal(1, r.insertedCount);
     return res.send({ signedUrl });
   } catch (error) {
@@ -58,12 +58,12 @@ const getUploadURL = async (req, res) => {
   }
 };
 
-const addResource = async (resource, userId, location) => {
+const addResource = async (resource, user, location) => {
   resource._id = new ObjectId(resource._id);
   resource.state = 'pending';
   resource.location = location;
   resource.meta = {
-    creator: new ObjectId(userId),
+    creator: user ? new ObjectId(user._id) : null,
     dateCreated: new Date(),
     dateModified: null,
   };
