@@ -1,7 +1,17 @@
 <template>
-  <v-dialog v-model="open" width="500">
+  <v-dialog v-model="open" width="500" @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
-      <v-text-field class="mt-3" label="Resource" hide-details v-on="on" v-bind="attrs" />
+      <v-text-field
+        ref="anchorRef"
+        label="Resource"
+        :value="getLabel"
+        :class="$vnode.data.staticClass"
+        append-icon="mdi-menu-down"
+        hide-details
+        readonly
+        v-on="on"
+        v-bind="attrs"
+      />
     </template>
 
     <v-card>
@@ -24,7 +34,7 @@
             <v-text-field
               class="flex-grow-1"
               :value="item.label"
-              @input="(value) => handleItemInput(index, 'label', value)"
+              @input="(value) => onInput(index, 'label', value)"
               :rules="rules"
               hide-details
               dense
@@ -32,7 +42,7 @@
             <v-text-field
               class="flex-grow-1"
               :value="item.value"
-              @input="(value) => handleItemInput(index, 'value', value)"
+              @input="(value) => onInput(index, 'value', value)"
               :rules="rules"
               hide-details
               dense
@@ -66,6 +76,10 @@ export default {
       default: () => [],
     },
   },
+  model: {
+    prop: 'value',
+    event: 'set-control-source',
+  },
   data() {
     return {
       open: false,
@@ -73,28 +87,44 @@ export default {
       rules: [(val) => val || 'Please enter a string'],
     };
   },
+  computed: {
+    validItems() {
+      return this.items.filter((item) => item.label.trim() && item.value.trim());
+    },
+    getLabel() {
+      const len = this.validItems.length;
+      return len > 1 ? `${len} items` : len === 1 ? '1 item' : undefined;
+    },
+  },
   methods: {
-    close() {
-      this.open = false;
-    },
-    save() {
-      this.$emit('set-control-source', this.items);
-      this.close();
-    },
-    handleItemInput(index, key, value) {
+    onInput(index, key, value) {
       this.items[index][key] = value;
     },
     addItem() {
-      this.items.push([{ label: '', value: '' }]);
+      this.items.push({ label: '', value: '' });
     },
     deleteItem(index) {
       this.items.splice(index, 1);
     },
+    close() {
+      this.open = false;
+      this.$refs.anchorRef.blur();
+    },
+    save() {
+      this.$emit('set-control-source', this.validItems);
+      this.close();
+    },
   },
   watch: {
-    value(newVal) {
-      this.items = newVal;
+    open() {
+      this.items = [...this.value];
     },
+    value(newVal) {
+      this.items = [...newVal];
+    },
+  },
+  created() {
+    this.items = [...this.value];
   },
 };
 </script>

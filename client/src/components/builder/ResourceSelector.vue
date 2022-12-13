@@ -1,7 +1,7 @@
 <template>
   <v-select
     label="Resource"
-    placeholder="Choose a resource"
+    :placeholder="placeholder"
     :value="value"
     @input="handleSelect"
     :items="items"
@@ -36,6 +36,10 @@ export default {
     },
     disabled: {
       required: false,
+    },
+    placeholder: {
+      type: String,
+      default: () => 'Choose a resource',
     },
   },
   computed: {

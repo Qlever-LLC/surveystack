@@ -7,7 +7,7 @@
     hide-details
   >
     <template slot="append" v-if="helperText || $slots['helper-text']">
-      <v-tooltip max-width="400" right>
+      <v-tooltip max-width="400" transition="slide-x-transition" right>
         <template v-slot:activator="{ on, attrs }">
           <v-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</v-icon>
         </template>

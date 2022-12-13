@@ -20,6 +20,7 @@
       <instructions-editor
         v-if="isInstructions"
         v-model="control.options.source"
+        class="mt-6"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
       <instructions-image-split-editor
@@ -35,13 +36,16 @@
         :items="dateTypes"
         label="Type"
         v-model="control.options.subtype"
+        @input="() => (control.defaultValue = null)"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        hide-details
       />
-      <date v-if="isDate" v-model="control.defaultValue" :type="control.options.subtype" />
       <select-items-editor
         v-if="isSelect"
         v-model="control.options.source"
+        @input="() => (control.defaultValue = null)"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        class="mt-3"
       />
       <ontology-properties
         v-if="isOntology"
@@ -51,8 +55,14 @@
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
       />
+      <v-text-field
+        v-if="isMatrix"
+        v-model="control.options.source.config.addRowLabel"
+        label="Add Row label"
+        hide-details
+      />
       <matrix-properties
-        v-else-if="isMatrix"
+        v-if="isMatrix"
         v-model="control.options.source"
         :resources="survey.resources"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
@@ -60,6 +70,7 @@
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
         @set-control-required="control.options.required = true"
+        class="mt-3"
       />
       <file-properties
         v-if="isFile"
@@ -120,12 +131,18 @@
         class="ml-2"
         label="Allow custom answer"
         v-model="control.options.allowCustomSelection"
+        @input="
+          () => {
+            control.options.allowAutocomplete = true;
+            control.defaultValue = null;
+          }
+        "
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         dense
       >
         <template slot="helper-text">
-          Allows the user to input answers that do not exist within the provided items. This will also require
-          <strong>Autocomplete</strong> is on
+          Allows the user to input answers that do not exist within the provided items.
+          <span v-if="isOntology">This will also require <strong>Autocomplete</strong> is on</span>
         </template>
       </checkbox>
       <checkbox
@@ -150,6 +167,21 @@
         :source="control.options.source"
         :resources="survey.resources"
       />
+      <date
+        v-if="isDate && control.options.subtype"
+        v-model="control.defaultValue"
+        @input="() => $forceUpdate()"
+        :type="control.options.subtype"
+        class="mt-3"
+      />
+      <select-items
+        v-if="isSelect && control.options.source"
+        v-model="control.defaultValue"
+        :items="control.options.source"
+        :custom="control.options.allowCustomSelection"
+        :multiple="control.type === 'selectMultiple'"
+        class="mt-3"
+      />
 
       <!-- Control options -->
       <v-spacer></v-spacer>
@@ -171,6 +203,12 @@
         label="Compact"
         v-model="control.options.compact"
         helper-text="Reduce the spaces and combine fields into one card"
+      />
+      <checkbox
+        v-if="isText"
+        label="QR Code"
+        v-model="control.options.enableQr"
+        :disabled="!!control.libraryId && !control.isLibraryRoot"
       />
       <checkbox
         v-if="survey.meta.isLibrary && !control.libraryIsInherited && !control.libraryId"
@@ -203,7 +241,6 @@
       />
 
       <!-- Advanced properties -->
-      <v-spacer></v-spacer>
       <v-btn v-if="!showAdvanced" color="grey darken-1" class="align-self-end" @click="showAdvanced = true" small text>
         advanced
       </v-btn>
@@ -262,6 +299,7 @@
 <script>
 import { getAdvancedCodeTemplate, findParentByChildId } from '@/utils/surveys';
 import api from '@/services/api.service';
+import SelectItems from '@/components/builder/SelectItems.vue';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
 import MatrixProperties from '@/components/builder/MatrixProperties.vue';
 import FileProperties from '@/components/builder/FileProperties.vue';
@@ -277,13 +315,14 @@ import { convertToKey } from '@/utils/builder';
 
 export default {
   components: {
+    SelectItems,
     SelectItemsEditor,
     OntologyProperties,
     MatrixProperties,
     FileProperties,
     InstructionsEditor,
     InstructionsImageSplitEditor,
-    'geojson-properties': GeoJSONProperties,
+    GeoJSONProperties,
     Ontology,
     Date,
     Checkbox,
@@ -388,16 +427,10 @@ export default {
       return this.control.type === 'farmOsUuid';
     },
     showRequiredOption() {
-      if (this.control.options.required) {
-        // if current state is required, add possibility to clear required
-        return true;
-      }
-
-      if (['group', 'page', 'instructions', 'instructionsImageSplit'].includes(this.control.type)) {
-        return false;
-      }
-
-      return true;
+      return (
+        this.control.options.required ||
+        !['group', 'page', 'instructions', 'instructionsImageSplit'].includes(this.control.type)
+      );
     },
   },
   methods: {
@@ -487,22 +520,6 @@ export default {
         }
       },
     },
-    'control.options.source': {
-      handler() {
-        this.control.defaultValue = null;
-      },
-    },
-    'control.options.subtype': {
-      handler() {
-        this.control.defaultValue = null;
-      },
-    },
-    'control.options.allowCustomSelection': {
-      handler(newVal) {
-        this.control.options.allowAutocomplete = newVal;
-        this.control.defaultValue = null;
-      },
-    },
   },
   created() {
     this.updateScript();
@@ -533,7 +550,7 @@ export default {
 }
 
 .property-panel form > .spacer {
-  height: 16px;
+  height: 4px;
 }
 
 .property-panel form > .advanced > div {

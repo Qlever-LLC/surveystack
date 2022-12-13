@@ -1,16 +1,12 @@
 <template>
-  <div class="instructions-image-split-editor mt-4">
-    <!-- <image-resource-picker
-      :value="value.images"
-      @input="handleImagesChange"
-      :resources="resources"
-    /> -->
+  <div class="instructions-image-split-editor">
     <div class="text-center d-flex">
       <resource-selector
         :resources="filteredResources"
         :value="(value && value.images && value.images[0]) || null"
         :disabled="disabled"
         :newResourceTypes="[resourceTypes.IMAGE]"
+        :placeholder="null"
         @on-new="createResourceHandler"
         @on-select="selectResourceHandler"
       />
@@ -26,21 +22,14 @@
       </v-btn>
     </div>
     <v-textarea
-      :value="value.body"
-      :disabled="disabled"
-      @input="handleBodyChange"
-      outlined
+      class="mt-3"
       label="Instructions Body (Markdown)"
+      :value="value.body"
+      @input="handleBodyChange"
+      :disabled="disabled"
     />
 
     <v-dialog v-model="imageDialogIsVisible" width="500">
-      <!-- <select-items-table-editor
-        :resources="filteredResources"
-        :resource="resource"
-        @change="setResource"
-        @delete="removeResource"
-        @close-dialog="closeTableDialog"
-      /> -->
       <image-resource-editor
         :resources="filteredResources"
         :resource="resource"
@@ -73,7 +62,6 @@ export default {
     };
   },
   components: {
-    // ImageResourcePicker,
     ResourceSelector,
     ImageResourceEditor,
   },
@@ -84,7 +72,6 @@ export default {
         images: [],
         body: '',
       }),
-      // type: String,
     },
     resources: {
       type: Array,
@@ -103,21 +90,8 @@ export default {
     },
   },
   methods: {
-    handleImagesChange(images) {
-      this.$emit('input', {
-        body: this.value.body,
-        images,
-      });
-    },
     handleBodyChange(body) {
-      // this.$emit('input', {
-      //   body,
-      //   images: this.value.images,
-      // });
-      this.$emit('set-control-source', {
-        body,
-        images: this.value.images,
-      });
+      this.$emit('set-control-source', { body, images: this.value.images });
     },
     removeResource(id) {
       const newResources = removeResource(this.resources, id);

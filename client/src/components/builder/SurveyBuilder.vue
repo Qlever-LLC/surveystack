@@ -93,7 +93,7 @@
       </pane>
 
       <pane class="pane pane-controls" v-if="control">
-        <v-card class="px-4 pb-3 mb-3">
+        <v-card class="px-4 pb-3 m-2 mb-3">
           <!-- <v-card-title class="pl-0">Details</v-card-title> -->
           <control-properties
             v-if="control"

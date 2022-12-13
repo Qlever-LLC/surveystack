@@ -9,11 +9,13 @@
     hide-details
   />
   <v-menu v-else v-model="open" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
-    <template v-slot:activator="{ on }">
+    <template v-slot:activator="{ on, attrs }">
       <v-text-field
         v-on="on"
+        v-bind="attrs"
         :value="formattedDate"
         @input="onChange"
+        :class="$vnode.data.staticClass"
         label="Default value"
         readonly
         clearable
@@ -135,11 +137,6 @@ export default {
       if (!value) {
         this.$emit('input', null);
       }
-    },
-  },
-  watch: {
-    value(newVal) {
-      console.log(123123, newVal);
     },
   },
 };
