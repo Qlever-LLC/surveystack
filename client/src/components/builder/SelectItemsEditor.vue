@@ -71,10 +71,7 @@ export default {
     draggable,
   },
   props: {
-    value: {
-      type: Array,
-      default: () => [],
-    },
+    value: { type: Array, default: () => [] },
   },
   model: {
     prop: 'value',

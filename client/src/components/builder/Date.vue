@@ -5,6 +5,7 @@
     v-model="year"
     :items="years"
     :menu-props="{ offsetY: true }"
+    :dense="dense"
     clearable
     hide-details
   />
@@ -13,10 +14,11 @@
       <v-text-field
         v-on="on"
         v-bind="attrs"
+        label="Default value"
         :value="formattedDate"
         @input="onChange"
         :class="$vnode.data.staticClass"
-        label="Default value"
+        :dense="dense"
         readonly
         clearable
         hide-details
@@ -48,12 +50,9 @@ import getWeekOfMonth from 'date-fns/getWeekOfMonth';
 
 export default {
   props: {
-    value: {
-      type: String,
-    },
-    type: {
-      type: String,
-    },
+    value: { type: String },
+    type: { type: String },
+    dense: { type: Boolean, default: false },
   },
   data() {
     return {

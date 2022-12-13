@@ -57,19 +57,10 @@ function getValue(source, multiple) {
 
 export default {
   props: {
-    value: {
-      type: [String, Array],
-    },
-    items: {
-      type: Array,
-      default: () => [],
-    },
-    custom: {
-      type: Boolean,
-    },
-    multiple: {
-      type: Boolean,
-    },
+    value: { type: [String, Array] },
+    items: { type: Array, default: () => [] },
+    custom: { type: Boolean },
+    multiple: { type: Boolean },
   },
   data() {
     return {

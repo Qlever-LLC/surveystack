@@ -133,7 +133,7 @@
 
                     <v-text-field v-if="item.type === 'text'" v-model="item.defaultValue" label="Default value" dense />
                     <v-text-field
-                      v-else-if="item.type === 'number'"
+                      v-if="item.type === 'number'"
                       type="number"
                       v-model="item.defaultValue"
                       label="Default value"
@@ -150,6 +150,7 @@
                       dense
                       class="mt-5"
                     />
+                    <date v-if="item.type === 'date'" v-model="item.defaultValue" type="date" dense />
 
                     <div v-if="item.type == 'farmos_uuid'" class="d-flex flex-column">
                       <v-select
@@ -240,6 +241,7 @@ import { resourceLocations, resourceTypes } from '@/utils/resources';
 import { cleanupAutocompleteMatrix } from '@/utils/surveys';
 import AppOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import Ontology from '@/components/builder/Ontology.vue';
+import Date from '@/components/builder/Date.vue';
 
 const MATRIX_COLUMN_TYPES = [
   { text: 'Dropdown', value: 'dropdown' },
@@ -266,6 +268,7 @@ export default {
     AppOntologyListEditor,
     Draggable,
     Ontology,
+    Date,
   },
   props: {
     value: {

@@ -311,10 +311,7 @@ export default {
         if (header.redacted) {
           newRow[key].meta = { permissions: ['admin'] };
         }
-        // Set default value if value is not set when number|text|dropdown question
-        if (['text', 'number', 'dropdown'].includes(header.type)) {
-          newRow[key].value = header.defaultValue || null;
-        }
+        newRow[key].value = header.defaultValue || null;
       }
       if (this.rows === null) {
         this.rows = [];

@@ -98,7 +98,7 @@
     outlined
   >
     <template v-slot:selection="{ item, index }">
-      <matrix-cell-selection-label :label="getLabel(item)" :index="index" :value="value" />
+      <matrix-cell-selection-label :label="getDropdownLabel(item)" :index="index" :value="value" />
     </template>
     <template v-slot:no-data>
       <v-list-item>
@@ -171,13 +171,12 @@
       offset-y
       max-width="290px"
       min-width="290px"
-      ref="datepickermenu"
+      ref="datepickerRef"
       :disabled="disabled"
     >
       <template v-slot:activator="{ on, attrs }">
         <v-text-field
-          :value="value"
-          @input="onInput"
+          :value="getDateLabel"
           @click="setActivePickerMonth"
           hide-details
           v-bind="attrs"
@@ -187,18 +186,18 @@
           :disabled="disabled"
           :style="{ pointerEvents: disabled ? 'none' : 'auto' }"
           readonly
-        ></v-text-field>
+        />
       </template>
       <v-date-picker
         :value="value"
         @input="
           (v) => {
-            onInput(v);
+            onDateInput(v);
             menus[`${index}_${header.value}`] = false;
           }
         "
         no-title
-      ></v-date-picker>
+      />
     </v-menu>
   </div>
 
@@ -210,6 +209,10 @@ import { getValueOrNull } from '@/utils/surveyStack';
 import appQrScanner from '@/components/ui/QrScanner.vue';
 import { uuidv4 } from '@/utils/surveys';
 import MatrixCellSelectionLabel from './MatrixCellSelectionLabel.vue';
+import parse from 'date-fns/parse';
+import parseISO from 'date-fns/parseISO';
+import isValid from 'date-fns/isValid';
+import format from 'date-fns/format';
 
 export default {
   components: {
@@ -267,12 +270,27 @@ export default {
     items() {
       return this.getDropdownItems(this.header.value, Array.isArray(this.value) ? this.value : [this.value]);
     },
+    getDateLabel() {
+      const date = parseISO(this.value);
+      if (!isValid(date)) {
+        return '';
+      }
+      return format(date, 'yyyy-MM-dd');
+    },
   },
   methods: {
     getValueOrNull,
     uuidv4,
     onInput(value) {
       this.value = getValueOrNull(value);
+      this.$emit('changed');
+    },
+    onDateInput(value) {
+      const date = parse(value, 'yyyy-MM-dd', new Date());
+      if (!isValid(date)) {
+        return;
+      }
+      this.value = date.toISOString();
       this.$emit('changed');
     },
     onFarmOsInput(value) {
@@ -293,14 +311,14 @@ export default {
         this.$refs.dropdownRef.isMenuActive = false;
       }
     },
-    getLabel(value) {
+    getDropdownLabel(value) {
       const dropdownItems = this.items;
       const found = dropdownItems.find((i) => i.value === value);
       return found ? found.label : value;
     },
     setActivePickerMonth() {
       setTimeout(() => {
-        this.$refs.datepickermenu.$children[1].$children[0].activePicker = 'MONTH';
+        this.$refs.datepickerRef.$children[1].$children[0].activePicker = 'MONTH';
       });
     },
     // copied/adapted from FarmOsPlanting.vue
