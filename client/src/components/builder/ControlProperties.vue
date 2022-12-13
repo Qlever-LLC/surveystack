@@ -154,8 +154,7 @@
           (!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot) ||
           control.options.allowCustomSelection
         "
-        helper-text="Provides selectable suggestions as a user types into it. It allows users to quickly search through and
-              select from large collections of options"
+        helper-text="Provides selectable suggestions as a user types into it. It allows users to quickly search through and select from large collections of options"
         dense
       />
       <ontology

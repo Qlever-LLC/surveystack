@@ -80,22 +80,22 @@
                     <v-text-field v-model="item.label" label="Label" style="font-size: 1.3rem" dense />
                     <v-text-field v-model="item.value" label="Value" dense />
                     <v-select
-                      dense
+                      label="Type"
                       :value="item.type"
                       @input="(type) => onChanged(item, { type, defaultValue: null })"
                       :items="$options.MATRIX_COLUMN_TYPES"
-                      label="Type"
+                      dense
                     />
 
                     <div v-if="item.type === 'dropdown'" class="d-flex flex-column">
                       <div class="d-flex flex-row flex-wrap">
                         <v-select
-                          dense
                           v-model="item.resource"
                           @input="(resource) => onChanged(item, { resource, defaultValue: null })"
                           :items="resourceSelectItems"
                           label="Resource"
                           hide-details
+                          dense
                           style="max-width: 10rem"
                         />
                         <v-btn
@@ -111,8 +111,8 @@
                           <v-icon>mdi-pencil</v-icon>
                         </v-btn>
                       </div>
-                      <v-checkbox class="mt-2 ml-2" v-model="item.multiple" label="Multi-select" hide-details dense />
-                      <v-checkbox
+                      <checkbox class="mt-2 ml-2" v-model="item.multiple" label="Multi-select" hide-details dense />
+                      <checkbox
                         class="mt-0 ml-2"
                         v-model="item.custom"
                         :checked="item.custom"
@@ -120,24 +120,37 @@
                         label="Allow custom answer"
                         hide-details
                         dense
-                      />
-                      <v-checkbox
+                      >
+                        <template slot="helper-text">
+                          Allows the user to input answers that do not exist within the provided items. This will also
+                          require <strong>Autocomplete</strong> is on
+                        </template>
+                      </checkbox>
+                      <checkbox
                         class="mt-0 ml-2"
                         v-model="item.autocomplete"
                         label="Autocomplete"
                         :disabled="Boolean(item.custom)"
+                        helper-text="Provides selectable suggestions as a user types into it. It allows users to quickly search through and select from large collections of options"
                         hide-details
                         dense
                       />
                     </div>
 
-                    <v-text-field v-if="item.type === 'text'" v-model="item.defaultValue" label="Default value" dense />
+                    <v-text-field
+                      v-if="item.type === 'text'"
+                      v-model="item.defaultValue"
+                      label="Default value"
+                      dense
+                      hide-details
+                    />
                     <v-text-field
                       v-if="item.type === 'number'"
                       type="number"
                       v-model="item.defaultValue"
                       label="Default value"
                       dense
+                      hide-details
                     />
                     <ontology
                       v-if="item.type === 'dropdown'"
@@ -163,7 +176,7 @@
                       />
                     </div>
 
-                    <v-checkbox
+                    <checkbox
                       v-model="item.required"
                       @change="
                         (v) => {
@@ -171,39 +184,36 @@
                         }
                       "
                       label="Required"
-                      class="mt-2"
+                      helper-text="Make this a required field"
                       hide-details
+                      class="mt-4"
                     />
-                    <v-checkbox
+                    <checkbox
                       v-model="item.redacted"
                       label="Private"
+                      helper-text="Visible to submitter and admins only"
                       class="mt-2"
-                      hint="Visible to submitter and admins only"
-                      persistent-hint
                     />
-                    <v-checkbox
+                    <checkbox
                       v-if="allowSetAllowHide"
                       v-model="item.allowHide"
                       label="Allow hide"
                       class="mt-2"
-                      hint="Allow users of this question set to hide this column"
-                      persistent-hint
+                      helper-text="Allow users of this question set to hide this column"
                     />
-                    <v-checkbox
+                    <checkbox
                       v-if="!allowSetAllowHide && item.allowHide"
                       v-model="item.hidden"
                       label="Hidden"
                       class="mt-2"
-                      hint="Submitters can not see this column. This option is intentionally allowed by the question set designer"
-                      persistent-hint
+                      helper-text="Submitters can not see this column. This option is intentionally allowed by the question set designer"
                     />
-
-                    <div
+                    <checkbox
                       v-if="item.type == 'farmos_field' || item.type == 'farmos_planting'"
-                      class="d-flex flex-column"
-                    >
-                      <v-checkbox class="mt-2" v-model="item.multiple" label="Multiselect" hide-details />
-                    </div>
+                      v-model="item.multiple"
+                      label="Multi-select"
+                      class="mt-2"
+                    />
 
                     <h4 class="mt-6 mb-4">Display Options</h4>
                     <v-text-field
@@ -242,6 +252,7 @@ import { cleanupAutocompleteMatrix } from '@/utils/surveys';
 import AppOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
+import Checkbox from '@/components/builder/Checkbox.vue';
 
 const MATRIX_COLUMN_TYPES = [
   { text: 'Dropdown', value: 'dropdown' },
@@ -269,6 +280,7 @@ export default {
     Draggable,
     Ontology,
     Date,
+    Checkbox,
   },
   props: {
     value: {
@@ -393,6 +405,7 @@ export default {
       this.value.content = [...this.value.content, this.createEmptyColumn()];
     },
     onChanged(item, value) {
+      console.log(1111, value);
       Object.assign(item, value);
       item = createOptions(item);
     },
@@ -411,5 +424,9 @@ export default {
   min-height: initial;
   flex-grow: 1;
   align-self: center;
+}
+
+>>> .v-input--checkbox {
+  width: fit-content;
 }
 </style>
