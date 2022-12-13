@@ -934,7 +934,7 @@ export default {
       deep: true,
     },
     survey: {
-      handler(newVal, oldVal) {
+      handler(newVal) {
         this.initNavbarAndDirtyFlag(newVal);
         if (!this.initialSurvey || !this.survey) {
           this.surveyUnchanged = true;

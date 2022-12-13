@@ -133,21 +133,21 @@ export default {
       return this.headers.map(({ scaleWidth = 100, type }) => defaultColumnWidth(type) * (scaleWidth / 100));
     },
     cellWidthStyles() {
-      return this.colMinWidths.map((minWidth, colIdx) => ({
+      return this.colMinWidths.map((minWidth) => ({
         minWidth: `${minWidth}px`,
         flexBasis: `${minWidth}px`,
       }));
     },
     leftFixStyles() {
       return this.cellWidthStyles.map((style, colIdx) => {
-        style = { ...style };
+        const newStyle = { ...style };
         if (this.fixColMask[colIdx]) {
-          style.position = 'sticky';
-          style.left = `${sum(this.colMinWidths.slice(0, colIdx))}px`;
+          newStyle.position = 'sticky';
+          newStyle.left = `${sum(this.colMinWidths.slice(0, colIdx))}px`;
           /* should be above non-fixed input cells */
-          style.zIndex = 1;
+          newStyle.zIndex = 1;
         }
-        return style;
+        return newStyle;
       });
     },
     minRowWidth() {

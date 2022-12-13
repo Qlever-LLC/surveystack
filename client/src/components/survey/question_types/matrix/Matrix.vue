@@ -277,8 +277,7 @@ export default {
       get() {
         return this.rowToBeDeleted >= 0;
       },
-      set(v) {
-        // set from dialog close
+      set() {
         this.rowToBeDeleted = -1;
       },
     },

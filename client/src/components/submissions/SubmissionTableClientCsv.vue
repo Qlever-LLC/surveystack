@@ -439,7 +439,7 @@ export default {
       this.modalShowCopyButton = false;
     },
     createCustomFilter(field) {
-      return (value, search, item) => {
+      return (value) => {
         if (!this.searchFields[field]) {
           return true;
         }

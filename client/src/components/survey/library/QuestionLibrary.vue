@@ -225,7 +225,7 @@ export default {
     },
   },
   watch: {
-    search(value) {
+    search() {
       this.page = 1;
       this.fetchData();
     },

@@ -298,6 +298,7 @@
 </template>
 <script>
 import { getAdvancedCodeTemplate, findParentByChildId } from '@/utils/surveys';
+import { nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
 import api from '@/services/api.service';
 import SelectItems from '@/components/builder/SelectItems.vue';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
@@ -322,7 +323,7 @@ export default {
     FileProperties,
     InstructionsEditor,
     InstructionsImageSplitEditor,
-    GeoJSONProperties,
+    'geojson-properties': GeoJSONProperties,
     Ontology,
     Date,
     Checkbox,
@@ -434,7 +435,7 @@ export default {
     },
   },
   methods: {
-    nameIsUnique(val) {
+    nameIsUnique() {
       const hasSameNameAndDifferentId = (control) =>
         control.name === this.control.name && control.id !== this.control.id;
       const parent = findParentByChildId(this.control.id, this.controls);
@@ -442,16 +443,10 @@ export default {
       const controlsWithSameName = parent
         ? parent.children.filter(hasSameNameAndDifferentId)
         : this.controls.filter(hasSameNameAndDifferentId);
-      return controlsWithSameName.length > 0 ? 'Data name must be unique' : true;
+      return controlsWithSameName.length > 0 ? 'Value must be unique' : true;
     },
-    nameHasValidCharacters(val) {
-      const namePattern = /^[\w]*$/;
-      return namePattern.test(val) ? true : 'Data name must only contain valid characters';
-    },
-    nameHasValidLength(val) {
-      const namePattern = /^.{1,}$/; // one character should be ok, especially within groups
-      return namePattern.test(val) ? true : 'Data name must be at least 1 characters in length';
-    },
+    nameHasValidCharacters,
+    nameHasValidLength,
     openAdvancedEditor() {
       // TODO: can't pass params to new window
       // Use Vuex maybe?
@@ -508,7 +503,7 @@ export default {
   },
   watch: {
     'control.name': {
-      handler(newVal, oldVal) {
+      handler(newVal) {
         const key = convertToKey(newVal);
         this.control.name = key;
       },

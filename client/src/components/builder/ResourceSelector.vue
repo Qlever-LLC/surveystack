@@ -51,7 +51,7 @@ export default {
     items() {
       return [
         ...this.filteredResources,
-        ...this.newResourceTypes.map((type, i) => ({
+        ...this.newResourceTypes.map((type) => ({
           label: `+ New ${type.toLowerCase().split('_').join(' ')}`,
           id: `${NEW_RESOURCE_PREFIX}${type}`,
         })),

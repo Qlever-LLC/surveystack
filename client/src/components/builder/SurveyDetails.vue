@@ -299,7 +299,7 @@ export default {
   },
   watch: {
     value: {
-      async handler(value, oldValue) {
+      async handler(value) {
         if (value.meta.group && value.meta.group.id) {
           this.surveyGroupName = await this.getGroupNameById(value.meta.group.id);
         }
