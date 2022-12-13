@@ -508,8 +508,6 @@ const isUserAllowedToModifySurvey = async (survey, user) => {
 };
 
 const updateSurvey = async (req, res) => {
-  //TODO prevent survey versions from being lost because of passed survey only has the latest version(s)
-  //e.g. load full survey from db and merge in the containing revisions which are missing in the passed survey
   const { id } = req.params;
   const entity = await sanitize(req.body);
 
@@ -523,6 +521,11 @@ const updateSurvey = async (req, res) => {
     throw boom.unauthorized(`You are not authorized to update survey: ${id}`);
   }
 
+  // restore old revisions which may be missing in the passed survey
+  const changedRevision = entity.revisions[entity.revisions.length - 1];
+  const historicRevisions = existing.revisions.filter((r) => r.version < changedRevision.version);
+  entity.revisions = [...historicRevisions, changedRevision];
+
   try {
     let updated = await db.collection(SURVEYS_COLLECTION).findOneAndUpdate(
       { _id: new ObjectId(id) },
@@ -533,7 +536,7 @@ const updateSurvey = async (req, res) => {
     );
     return res.send(updated);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return res.status(500).send({ message: 'Ouch :/' });
   }
 };
