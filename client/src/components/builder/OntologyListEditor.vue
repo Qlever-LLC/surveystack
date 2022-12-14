@@ -91,13 +91,13 @@
         :footer-props="{ 'items-per-page-options': [10, 20, 50, 100, -1] }"
       >
         <template v-slot:item.label="{ item }">
-          <v-text-field v-model="item.label" :disabled="disabled" solo dense hide-details />
+          <v-text-field v-model="item.label" :disabled="disabled" solo dense hide-details="auto" />
         </template>
         <template v-slot:item.value="{ item }">
-          <v-text-field v-model="item.value" :disabled="disabled" solo dense hide-details />
+          <v-text-field v-model="item.value" :disabled="disabled" solo dense hide-details="auto" />
         </template>
         <template v-slot:item.tags="{ item }">
-          <v-text-field v-model="item.tags" :disabled="disabled" solo dense hide-details />
+          <v-text-field v-model="item.tags" :disabled="disabled" solo dense hide-details="auto" />
         </template>
         <template v-slot:item.actions="{ item }">
           <div class="d-flex">

@@ -7,7 +7,7 @@
     :menu-props="{ offsetY: true }"
     :dense="dense"
     clearable
-    hide-details
+    hide-details="auto"
   />
   <v-menu v-else v-model="open" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
     <template v-slot:activator="{ on, attrs }">
@@ -21,7 +21,7 @@
         :dense="dense"
         readonly
         clearable
-        hide-details
+        hide-details="auto"
       />
     </template>
     <v-date-picker

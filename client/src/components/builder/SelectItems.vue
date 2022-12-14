@@ -9,7 +9,7 @@
         :class="$vnode.data.staticClass"
         append-icon="mdi-menu-down"
         clearable
-        hide-details
+        hide-details="auto"
         readonly
         v-on="on"
         v-bind="attrs"
@@ -28,9 +28,9 @@
             :label="item.label"
             :value="item.value"
             class="mt-2"
-            hide-details
+            hide-details="auto"
           />
-          <v-checkbox v-if="custom" v-model="selected" label="Other" value="other" class="mt-2" hide-details />
+          <v-checkbox v-if="custom" v-model="selected" label="Other" value="other" class="mt-2" hide-details="auto" />
         </div>
         <v-radio-group v-else v-model="selected">
           <v-radio v-for="(item, index) in items" :key="index" :label="item.label" :value="item.value" />

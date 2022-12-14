@@ -94,7 +94,7 @@
                           @input="(resource) => onChanged(item, { resource, defaultValue: null })"
                           :items="resourceSelectItems"
                           label="Resource"
-                          hide-details
+                          hide-details="auto"
                           dense
                           style="max-width: 10rem"
                         />
@@ -111,14 +111,20 @@
                           <v-icon>mdi-pencil</v-icon>
                         </v-btn>
                       </div>
-                      <checkbox class="mt-2 ml-2" v-model="item.multiple" label="Multi-select" hide-details dense />
+                      <checkbox
+                        class="mt-2 ml-2"
+                        v-model="item.multiple"
+                        label="Multi-select"
+                        hide-details="auto"
+                        dense
+                      />
                       <checkbox
                         class="mt-0 ml-2"
                         v-model="item.custom"
                         :checked="item.custom"
                         @change="(custom) => onChanged(item, { custom, autocomplete: custom || item.autocomplete })"
                         label="Allow custom answer"
-                        hide-details
+                        hide-details="auto"
                         dense
                       >
                         <template slot="helper-text">
@@ -132,7 +138,7 @@
                         label="Autocomplete"
                         :disabled="Boolean(item.custom)"
                         helper-text="Provides selectable suggestions as a user types into it. It allows users to quickly search through and select from large collections of options"
-                        hide-details
+                        hide-details="auto"
                         dense
                       />
                     </div>
@@ -142,7 +148,7 @@
                       v-model="item.defaultValue"
                       label="Default value"
                       dense
-                      hide-details
+                      hide-details="auto"
                     />
                     <v-text-field
                       v-if="item.type === 'number'"
@@ -150,7 +156,7 @@
                       v-model="item.defaultValue"
                       label="Default value"
                       dense
-                      hide-details
+                      hide-details="auto"
                     />
                     <ontology
                       v-if="item.type === 'dropdown'"
@@ -171,7 +177,7 @@
                         v-model="item.options.farmOsType"
                         :items="item.options.farmOsTypes"
                         label="FarmOS Type"
-                        hide-details
+                        hide-details="auto"
                         style="max-width: 10rem"
                       />
                     </div>
@@ -185,7 +191,7 @@
                       "
                       label="Required"
                       helper-text="Make this a required field"
-                      hide-details
+                      hide-details="auto"
                       class="mt-4"
                     />
                     <checkbox

@@ -3,20 +3,26 @@
     <v-card-title class="pl-0">Properties</v-card-title>
     <v-form v-if="control">
       <!-- Default properties -->
-      <v-text-field v-model="control.label" label="Label" hide-details />
+      <v-text-field v-model="control.label" label="Label" hide-details="auto" />
       <v-text-field
         v-model="control.name"
         label="Value"
         :disabled="!!control.libraryId && !control.isLibraryRoot"
         :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
-        hide-details
+        hide-details="auto"
       />
-      <v-text-field v-model="control.hint" label="Hint" hide-details />
-      <v-text-field v-model="control.moreInfo" label="More info" hide-details />
+      <v-text-field v-model="control.hint" label="Hint" hide-details="auto" />
+      <v-text-field v-model="control.moreInfo" label="More info" hide-details="auto" />
 
       <!-- Control properties -->
-      <v-text-field v-if="isText" v-model="control.defaultValue" label="Default value" hide-details />
-      <v-text-field v-if="isNumber" type="number" v-model="control.defaultValue" label="Default value" hide-details />
+      <v-text-field v-if="isText" v-model="control.defaultValue" label="Default value" hide-details="auto" />
+      <v-text-field
+        v-if="isNumber"
+        type="number"
+        v-model="control.defaultValue"
+        label="Default value"
+        hide-details="auto"
+      />
       <instructions-editor
         v-if="isInstructions"
         v-model="control.options.source"
@@ -38,7 +44,7 @@
         v-model="control.options.subtype"
         @input="() => (control.defaultValue = null)"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-        hide-details
+        hide-details="auto"
       />
       <select-items-editor
         v-if="isSelect"
@@ -59,7 +65,7 @@
         v-if="isMatrix"
         v-model="control.options.source.config.addRowLabel"
         label="Add Row label"
-        hide-details
+        hide-details="auto"
       />
       <matrix-properties
         v-if="isMatrix"
@@ -72,43 +78,43 @@
         @set-control-required="control.options.required = true"
         class="mt-3"
       />
-      <file-properties
-        v-if="isFile"
-        v-model="control.options.source"
+      <v-select
+        v-if="this.control.type === 'file'"
+        label="Restrict uploaded file types (.csv, .pdf, etc.)"
+        v-model="control.options.source.types"
+        :items="fileTypes"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        multiple
+        chips
+        clearable
+        deletable-chips
+        hide-details="auto"
       />
-      <div v-if="isScript" class="d-flex align-start">
-        <v-autocomplete
-          v-model="scriptSourceId"
-          v-if="isScript"
-          :items="scriptSourceItems"
-          :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-          label="Script Source"
-          item-text="name"
-          item-value="_id"
-          @focus="handleScriptSourceFocus"
-          @change="(id) => $emit('set-control-source', id)"
-          chips
-          persistent-hint
-        >
-          <template v-slot:selection="{ item }">
-            <div>{{ item.name }}</div>
-          </template>
-        </v-autocomplete>
-        <v-btn @click="(ev) => $emit('set-script-editor-is-visible', true)" icon>
-          <v-icon>mdi-open-in-new</v-icon>
-        </v-btn>
-      </div>
-      <v-text-field v-if="isScript" v-model="control.options.buttonLabel" label="Run Button Label" />
+      <v-autocomplete
+        v-if="isScript"
+        label="Script Source"
+        v-model="scriptSourceId"
+        :items="scriptSourceItems"
+        item-text="name"
+        item-value="_id"
+        append-outer-icon="mdi-open-in-new"
+        @click:append-outer="() => $emit('set-script-editor-is-visible', true)"
+        @focus="handleScriptSourceFocus"
+        @change="(id) => $emit('set-control-source', id)"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        hide-details="auto"
+      >
+        <template v-slot:selection="{ item }">
+          <div>{{ item.name }}</div>
+        </template>
+      </v-autocomplete>
+      <v-text-field
+        v-if="isScript"
+        v-model="control.options.buttonLabel"
+        label="Run Button Label"
+        hide-details="auto"
+      />
       <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
-      <checkbox
-        v-if="control.type === 'script'"
-        class="text--primary"
-        label="Native Script"
-        v-model="control.options.isNativeScript"
-        :disabled="!!control.libraryId && !control.isLibraryRoot"
-        helper-text="Show Download Link for Surveystack Kit APK"
-      />
       <v-textarea
         v-if="isScript"
         v-model="scriptParams"
@@ -116,9 +122,9 @@
         label="Parameters"
         :rules="[validateScriptParams]"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-        outlined
+        class="pt-3"
+        hide-details="auto"
       />
-      <geojson-properties v-if="isGeoJSON" v-model="control.options.geoJSON" />
       <v-combobox
         v-if="isFarmOsUuid"
         label="FarmOS Type"
@@ -238,6 +244,27 @@
         v-model="control.options.hasMultipleSelections"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
+      <checkbox
+        v-if="isFile"
+        label="Multiple upload"
+        v-model="control.options.source.allowMultiple"
+        helper-text="Allow user to upload multiple files"
+      />
+      <checkbox
+        v-if="control.type === 'script'"
+        label="Native Script"
+        v-model="control.options.isNativeScript"
+        :disabled="!!control.libraryId && !control.isLibraryRoot"
+        helper-text="Show Download Link for Surveystack Kit APK"
+      />
+      <template v-if="isGeoJSON">
+        <checkbox
+          v-for="opt in geoJsonOptions"
+          :key="opt.key"
+          :label="opt.text"
+          v-model="control.options.geoJSON[opt.key]"
+        />
+      </template>
 
       <!-- Advanced properties -->
       <v-btn v-if="!showAdvanced" color="grey darken-1" class="align-self-end" @click="showAdvanced = true" small text>
@@ -298,18 +325,16 @@
 <script>
 import { getAdvancedCodeTemplate, findParentByChildId } from '@/utils/surveys';
 import { nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
-import api from '@/services/api.service';
 import SelectItems from '@/components/builder/SelectItems.vue';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
 import MatrixProperties from '@/components/builder/MatrixProperties.vue';
-import FileProperties from '@/components/builder/FileProperties.vue';
 import OntologyProperties from '@/components/builder/OntologyProperties.vue';
 import InstructionsEditor from '@/components/builder/TipTapEditor.vue';
 import InstructionsImageSplitEditor from '@/components/builder/InstructionsImageSplitEditor.vue';
-import GeoJSONProperties from '@/components/builder/GeoJSONProperties.vue';
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
 import Checkbox from '@/components/builder/Checkbox.vue';
+import api from '@/services/api.service';
 
 import { convertToKey } from '@/utils/builder';
 
@@ -319,10 +344,8 @@ export default {
     SelectItemsEditor,
     OntologyProperties,
     MatrixProperties,
-    FileProperties,
     InstructionsEditor,
     InstructionsImageSplitEditor,
-    'geojson-properties': GeoJSONProperties,
     Ontology,
     Date,
     Checkbox,
@@ -371,13 +394,30 @@ export default {
           value: 'date-week-month-year',
         },
       ],
-      // nameRules: {
-      //   // const pat = new RegExp(this.controlNames.join('|'));
-      //   unique(val) {
-      //     console.log(this.controlNames.some(name => name === val));
-      //     return this.controlNames.some(name => name === val) ? true : 'date name must be unique';
-      //   },
-      // },
+      fileTypes: [
+        { text: 'PDF (.pdf)', value: 'application/pdf' },
+        { text: 'Spreadsheets (.csv)', value: 'text/csv' },
+        { text: 'Image (.gif, .png, .jpg, .jpeg)', value: 'image/*' },
+        { text: 'Plain text (.txt)', value: 'text/plain' },
+      ],
+      geoJsonOptions: [
+        {
+          key: 'showPolygon',
+          text: 'Show polygon control',
+        },
+        {
+          key: 'showLine',
+          text: 'Show line control',
+        },
+        {
+          key: 'showPoint',
+          text: 'Show point control',
+        },
+        {
+          key: 'showCircle',
+          text: 'Show circle control',
+        },
+      ],
     };
   },
   computed: {

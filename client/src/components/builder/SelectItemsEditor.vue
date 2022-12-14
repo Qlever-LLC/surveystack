@@ -7,7 +7,7 @@
         :value="getLabel"
         :class="$vnode.data.staticClass"
         append-icon="mdi-menu-down"
-        hide-details
+        hide-details="auto"
         readonly
         v-on="on"
         v-bind="attrs"
@@ -36,7 +36,7 @@
               :value="item.label"
               @input="(value) => onInput(index, 'label', value)"
               :rules="rules"
-              hide-details
+              hide-details="auto"
               dense
             />
             <v-text-field
@@ -44,7 +44,7 @@
               :value="item.value"
               @input="(value) => onInput(index, 'value', value)"
               :rules="rules"
-              hide-details
+              hide-details="auto"
               dense
             />
             <v-icon color="grey" size="20" @click="() => deleteItem(index)">mdi-delete</v-icon>

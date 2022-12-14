@@ -15,7 +15,7 @@
     color="focus"
     :outlined="outlined"
     clearable
-    hide-details
+    hide-details="auto"
     class="full-width dropdown"
     data-test-id="dropdown"
   >
@@ -55,7 +55,7 @@
     color="focus"
     :outlined="outlined"
     clearable
-    hide-details
+    hide-details="auto"
     class="full-width dropdown"
     data-test-id="autocomplete"
   >
@@ -97,7 +97,7 @@
     color="focus"
     :outlined="outlined"
     clearable
-    hide-details
+    hide-details="auto"
     class="full-width custom-ontology dropdown"
     data-test-id="combobox"
   >

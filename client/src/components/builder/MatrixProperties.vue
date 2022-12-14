@@ -7,7 +7,7 @@
         :value="getLabel"
         :class="$vnode.data.staticClass"
         append-icon="mdi-menu-down"
-        hide-details
+        hide-details="auto"
         readonly
         :disabled="disabled"
         v-on="on"

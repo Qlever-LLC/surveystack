@@ -27,6 +27,7 @@
       :value="value.body"
       @input="handleBodyChange"
       :disabled="disabled"
+      hide-details="auto"
     />
 
     <v-dialog v-model="imageDialogIsVisible" width="500">

@@ -4,7 +4,7 @@
     class="align-center align-self-start"
     v-bind="$attrs"
     color="grey darken-1"
-    hide-details
+    hide-details="auto"
   >
     <template slot="append" v-if="helperText || $slots['helper-text']">
       <v-tooltip max-width="400" transition="slide-x-transition" right>
