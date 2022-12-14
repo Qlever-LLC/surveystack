@@ -95,6 +95,17 @@ async function mockControlsAndSubmission(surveyOverrides, consumeLibraryId, cons
 }
 
 describe('surveyController', () => {
+  describe('getSurvey', () => {
+    it.todo(
+      'returns the revision with version=survey.latestVersion if version param is not passed'
+    );
+    it.todo('returns the revision with version=survey.latestVersion if version=latest is passed');
+    it.todo(
+      'returns the latest revision (last array position) if version=latestPublishedOrDraft is passed'
+    );
+    it.todo('returns all revisions if version=all is passed');
+    it.todo('returns the revision requested by param version=[version number]');
+  });
   describe('update', () => {
     let surveyStored, surveyToBeUpdated;
     beforeEach(async () => {
