@@ -301,66 +301,64 @@ const getSurvey = async (req, res) => {
   const { id } = req.params;
   const { version } = req.query;
 
-  //TODO maybe make version param mandatory and throw exception if mssing
   const pipeline = [{ $match: { _id: new ObjectId(id) } }];
-  if (version) {
-    if (version === 'latest') {
-      // caller only requests the LATEST PUBLISHED survey revision with version=latestVersion, exclude all others and also exclude drafts
-      pipeline.push({
-        $project: {
-          name: 1,
-          latestVersion: 1,
-          meta: 1,
-          description: 1,
-          resources: 1,
-          revisions: {
-            $filter: {
-              input: '$revisions',
-              as: 'revision',
-              cond: { $eq: ['$$revision.version', '$latestVersion'] },
-            },
+
+  if (version === undefined || version === 'latest') {
+    // caller only requests the LATEST PUBLISHED survey revision with version=latestVersion, exclude all others and also exclude drafts
+    pipeline.push({
+      $project: {
+        name: 1,
+        latestVersion: 1,
+        meta: 1,
+        description: 1,
+        resources: 1,
+        revisions: {
+          $filter: {
+            input: '$revisions',
+            as: 'revision',
+            cond: { $eq: ['$$revision.version', '$latestVersion'] },
           },
         },
-      });
-    } else if (version === 'latestPublishedOrDraft') {
-      // caller only requests the LATEST PUBLISHED survey revision AND DRAFT versions, exclude all other revisions
-      pipeline.push({
-        $project: {
-          name: 1,
-          latestVersion: 1,
-          meta: 1,
-          description: 1,
-          resources: 1,
-          revisions: {
-            $filter: {
-              input: '$revisions',
-              as: 'revision',
-              cond: { $gte: ['$$revision.version', '$latestVersion'] },
-            },
+      },
+    });
+  } else if (version === 'latestPublishedOrDraft') {
+    // caller only requests the LATEST PUBLISHED survey revision AND DRAFT versions, exclude all other revisions
+    pipeline.push({
+      $project: {
+        name: 1,
+        latestVersion: 1,
+        meta: 1,
+        description: 1,
+        resources: 1,
+        revisions: {
+          $filter: {
+            input: '$revisions',
+            as: 'revision',
+            cond: { $gte: ['$$revision.version', '$latestVersion'] },
           },
         },
-      });
-    } else if (version === 'all') {
-      // caller explicitly wants to get all version, thus projection is not required
-    } else {
-      // caller only requests the survey revision with the passed version, exclude all others
-      pipeline.push({
-        $project: {
-          name: 1,
-          latestVersion: 1,
-          meta: 1,
-          description: 1,
-          resources: 1,
-          revisions: {
-            $filter: {
-              input: '$revisions',
-              as: 'revision',
-              cond: { $gte: ['$$revision.version', Number(version)] },
-            },
+      },
+    });
+  } else if (version === 'all') {
+    // caller explicitly wants to get all version, thus projection is not required
+  } else {
+    // caller only requests the survey revision with the passed version, exclude all others
+    pipeline.push({
+      $project: {
+        name: 1,
+        latestVersion: 1,
+        meta: 1,
+        description: 1,
+        resources: 1,
+        revisions: {
+          $filter: {
+            input: '$revisions',
+            as: 'revision',
+            cond: { $gte: ['$$revision.version', Number(version)] },
           },
         },
-      });
-    }
+      },
+    });
   }
 
   const entities = await db.collection(SURVEYS_COLLECTION).aggregate(pipeline).toArray();
