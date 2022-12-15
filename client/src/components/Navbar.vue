@@ -11,7 +11,7 @@
 
       <v-spacer></v-spacer>
       <v-btn class="help-btn" text href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
-        <v-icon>mdi-help-circle</v-icon>
+        <v-icon size="22">mdi-help-circle-outline</v-icon>
       </v-btn>
       <navbar-user-menu />
     </v-app-bar>
