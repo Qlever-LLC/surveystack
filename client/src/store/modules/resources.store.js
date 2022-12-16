@@ -117,10 +117,6 @@ const actions = {
         throw error;
       }
       commit('REMOVE_RESOURCE', resource._id);
-    } else {
-      const errorMessage = 'resource not found, key: ' + resourceKey;
-      dispatch('feedback/add', errorMessage, { root: true });
-      throw Error(errorMessage);
     }
   },
   async removeRemoteResource({ commit, getters, dispatch }, resourceKey) {
