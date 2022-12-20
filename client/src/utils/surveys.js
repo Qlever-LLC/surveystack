@@ -132,7 +132,9 @@ export const replaceControl = (controls, parentPath, replacePath, replacementCon
   return controls.map((control) => {
     let currentPath = parentPath ? [parentPath, control.name].join('.') : control.name;
     if (currentPath === replacePath) {
-      return replacementControl;
+      const replacementControlCopy = cloneDeep(replacementControl);
+      replacementControlCopy.children = control.children; //only replace the control data itself, but keep the children, otherwise, locally added custom controls would be added twice (here and below)
+      return replacementControlCopy;
     } else if (control.children) {
       control.children = replaceControl(control.children, currentPath, replacePath, replacementControl);
       return control;
