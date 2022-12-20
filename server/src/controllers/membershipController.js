@@ -30,7 +30,7 @@ const sanitize = (entity) => {
 };
 
 const getMemberships = async (req, res) => {
-  const { group, user, invitationCode, status, role } = req.query;
+  const { group, user, invitationCode, status, role, populate, groupIntegration } = req.query;
 
   const memberships = await membershipService.getMemberships(
     group,
@@ -38,7 +38,8 @@ const getMemberships = async (req, res) => {
     invitationCode,
     status,
     role,
-    req.query.populate
+    populate,
+    groupIntegration
   );
   res.send(memberships);
 };

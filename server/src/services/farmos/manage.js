@@ -890,7 +890,7 @@ export const disableSubgroupsAllowCreateInstances = async (groupId) => {
   return await updateSubgroupsAllowCreateInstances(groupId, false);
 };
 
-const updateEnableCoffeShop = async (groupId, enable) => {
+const updateEnableCoffeeShop = async (groupId, enable) => {
   const res = await db.collection('groups').findOne({ _id: asMongoId(groupId) });
   if (!res) {
     throw boom.notFound();
@@ -909,9 +909,9 @@ const updateEnableCoffeShop = async (groupId, enable) => {
 };
 
 export const enableCoffeeshop = async (groupId) => {
-  return await updateEnableCoffeShop(groupId, true);
+  return await updateEnableCoffeeShop(groupId, true);
 };
 
 export const disableCoffeeshop = async (groupId) => {
-  return await updateEnableCoffeShop(groupId, false);
+  return await updateEnableCoffeeShop(groupId, false);
 };

@@ -9,7 +9,15 @@ import { queryParam } from '../helpers';
 
 const col = 'memberships';
 
-export const getMemberships = async (group, user, invitationCode, status, role, doPopulate) => {
+export const getMemberships = async (
+  group,
+  user,
+  invitationCode,
+  status,
+  role,
+  doPopulate,
+  groupIntegration
+) => {
   const filter = {};
 
   if (group) {
@@ -38,6 +46,10 @@ export const getMemberships = async (group, user, invitationCode, status, role, 
   const pipeline = [{ $match: filter }];
   if (queryParam(doPopulate)) {
     pipeline.push(...createPopulationPipeline());
+
+    if (groupIntegration) {
+      pipeline.push(...createGroupIntegrationPopulationPipeline());
+    }
   }
 
   const entities = await db.collection(col).aggregate(pipeline).toArray();
@@ -138,6 +150,34 @@ export const createPopulationPipeline = () => {
   ];
   pipeline.push(...groupLookup);
   pipeline.push({ $sort: { 'group.path': 1 } });
+
+  return pipeline;
+};
+
+export const createGroupIntegrationPopulationPipeline = () => {
+  const pipeline = [];
+
+  // FarmOS integration settings
+  pipeline.push(
+    ...[
+      {
+        $lookup: {
+          from: 'farmos-group-settings',
+          let: { groupId: '$group._id' },
+          pipeline: [{ $match: { $expr: { $eq: ['$groupId', '$$groupId'] } } }],
+          as: 'group.integration.farmOS',
+        },
+      },
+      {
+        $unwind: { path: '$group.integration.farmOS', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $set: {
+          'group.integration.farmOS': { $ifNull: ['$group.integration.farmOS', null] },
+        },
+      },
+    ]
+  );
 
   return pipeline;
 };
