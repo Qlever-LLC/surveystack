@@ -4,11 +4,9 @@ import Joi from 'joi';
 import joiObjectId from 'joi-objectid';
 Joi.objectId = joiObjectId(Joi);
 
-import _, { isString } from 'lodash';
-import axios from 'axios';
+import isString from 'lodash/isString';
+import uniq from 'lodash/uniq';
 import boom from '@hapi/boom';
-import https from 'https';
-import { getRoles, hasAdminRole } from '../services/roles.service';
 import { isFarmosUrlAvailable, createInstance } from '../services/farmos.service';
 import {
   listFarmOSInstancesForUser,
@@ -33,6 +31,7 @@ import {
   getTree,
 } from '../services/farmos/manage';
 import { aggregator } from '../services/farmos/aggregator';
+import { hasAdminRole } from '../services/roles.service';
 
 export const asMongoId = (source) =>
   source instanceof ObjectId ? source : ObjectId(typeof source === 'string' ? source : source._id);
@@ -72,7 +71,7 @@ const requireUserId = (res) => {
   return userId;
 };
 
-const requireGroupdAdmin = (req, res) => {
+const requireGroupedAdmin = (req, res) => {
   const { group } = req.body;
   const userId = res.locals.auth.user._id;
 
@@ -457,7 +456,7 @@ export const superAdminUnMapFarmosInstanceFromAll = async (req, res) => {
  */
 export const getInstancesForGroup = async (req, res) => {
   const userId = requireUserId(res);
-  const groupId = requireGroupdAdmin(req, res);
+  const groupId = requireGroupedAdmin(req, res);
 
   return res.send([]);
 };
@@ -1278,7 +1277,7 @@ export const removeMembershipHook = async (membership) => {
       othersInstances.push(...memberFarms);
     }
 
-    const instances = _.uniq(othersInstances);
+    const instances = uniq(othersInstances);
 
     const memberInfo = groupInformation.members.find((m) => m.user + '' == userId + '');
     if (!memberInfo) {
