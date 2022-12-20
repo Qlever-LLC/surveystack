@@ -22,10 +22,16 @@ const {
  * creates a mock survey with 3 versions, controls and a submission
  * @param surveyOverrides pass survey props to overwrite
  * @param consumeLibraryId optional question set library id to consume
- * @param consumeLibraryVersion optional versoin of the question set library to be consumed
+ * @param consumeLibraryVersion optional version of the question set library to be consumed
+ * @param addDraftVersion optional adds a draft revision to the created survey
  * @returns Object containing survey (the survey created), submission (the submission object generated), createSubmission: a fn to create further submissions for this survey
  */
-async function mockControlsAndSubmission(surveyOverrides, consumeLibraryId, consumeLibraryVersion) {
+async function mockControlsAndSubmission(
+  surveyOverrides,
+  consumeLibraryId,
+  consumeLibraryVersion,
+  addDraftVersion = false
+) {
   const { survey, createSubmission } = await createSurvey(['text', 'number'], surveyOverrides);
   const { submission: _submission } = await createSubmission();
 
@@ -83,6 +89,12 @@ async function mockControlsAndSubmission(surveyOverrides, consumeLibraryId, cons
   survey.revisions.push(newRevision);
   survey.latestVersion = 3;
 
+  if (addDraftVersion) {
+    const draftRevision = _.cloneDeep(survey.revisions[survey.latestVersion - 1]);
+    draftRevision.version = 4;
+    survey.revisions.push(draftRevision);
+  }
+
   await getDb().collection('surveys').findOneAndUpdate(
     { _id: survey._id },
     { $set: survey },
@@ -96,15 +108,64 @@ async function mockControlsAndSubmission(surveyOverrides, consumeLibraryId, cons
 
 describe('surveyController', () => {
   describe('getSurvey', () => {
-    it.todo(
-      'returns the revision with version=survey.latestVersion if version param is not passed'
-    );
-    it.todo('returns the revision with version=survey.latestVersion if version=latest is passed');
-    it.todo(
-      'returns the latest revision (last array position) if version=latestPublishedOrDraft is passed'
-    );
-    it.todo('returns all revisions if version=all is passed');
-    it.todo('returns the revision requested by param version=[version number]');
+    let surveyStored;
+    beforeEach(async () => {
+      surveyStored = (await mockControlsAndSubmission(undefined, undefined, undefined, true))
+        .survey;
+    });
+
+    async function loadSurvey(version) {
+      const query = version ? { version } : undefined;
+      const req = createReq({
+        params: { id: surveyStored._id },
+        query: query,
+      });
+      const res = await createRes({
+        user: { _id: surveyStored.meta.creator, permissions: [] },
+      });
+      await getSurvey(req, res);
+      return res.send.mock.calls[0][0];
+    }
+    it('returns the revision with version=survey.latestVersion if version param is not passed', async () => {
+      const returnedSurvey = await loadSurvey(undefined);
+      expect(returnedSurvey.revisions[returnedSurvey.revisions.length - 1].version).toBe(
+        surveyStored.latestVersion
+      );
+    });
+
+    it('returns the revision with version=survey.latestVersion if version=latest is passed', async () => {
+      const returnedSurvey = await loadSurvey('latest');
+      expect(returnedSurvey.revisions[returnedSurvey.revisions.length - 1].version).toBe(
+        surveyStored.latestVersion
+      );
+    });
+
+    it('returns the latest revision (last array position) if version=latestPublishedOrDraft is passed', async () => {
+      const returnedSurvey = await loadSurvey('latestPublishedOrDraft');
+      expect(returnedSurvey.revisions.length).toBe(1);
+      expect(returnedSurvey.revisions[returnedSurvey.revisions.length - 1].version).toBe(4);
+    });
+
+    it('returns all revisions if version=all is passed', async () => {
+      const returnedSurvey = await loadSurvey('all');
+      expect(returnedSurvey.revisions.length).toBe(4);
+      expect(returnedSurvey.revisions[returnedSurvey.revisions.length - 1].version).toBe(4);
+    });
+
+    it('returns the revision requested by param version=[version number]', async () => {
+      let returnedSurvey = await loadSurvey(1);
+      expect(returnedSurvey.revisions.length).toBe(1);
+      expect(returnedSurvey.revisions[0].version).toBe(1);
+      returnedSurvey = await loadSurvey('2');
+      expect(returnedSurvey.revisions.length).toBe(1);
+      expect(returnedSurvey.revisions[0].version).toBe(2);
+      returnedSurvey = await loadSurvey('3');
+      expect(returnedSurvey.revisions.length).toBe(1);
+      expect(returnedSurvey.revisions[0].version).toBe(3);
+      returnedSurvey = await loadSurvey('4');
+      expect(returnedSurvey.revisions.length).toBe(1);
+      expect(returnedSurvey.revisions[0].version).toBe(4);
+    });
   });
   describe('update', () => {
     let surveyStored, surveyToBeUpdated;
