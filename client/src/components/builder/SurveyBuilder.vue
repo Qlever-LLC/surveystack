@@ -679,7 +679,6 @@ export default {
       this.showLibrary = false;
     },
     openLibrary(libraryId) {
-      this.control = null;
       this.showLibrary = true;
       if (libraryId) {
         this.libraryId = libraryId;
@@ -827,7 +826,6 @@ export default {
     controlId() {
       const position = getPosition(this.control, this.currentControls);
       const id = getFlatName(this.currentControls, position);
-      console.log('controlId', id);
       return id;
     },
     hasCode() {
