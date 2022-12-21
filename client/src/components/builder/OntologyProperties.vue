@@ -1,5 +1,5 @@
 <template>
-  <div class="text-center d-flex align-center">
+  <div class="text-center d-flex align-center mt-6">
     <resource-selector
       :resources="filteredResources"
       :value="value"
@@ -7,8 +7,9 @@
       @on-new="createResourceHandler"
       @on-select="selectResourceHandler"
       :newResourceTypes="[resourceTypes.ONTOLOGY_LIST, resourceTypes.SURVEY_REFERENCE]"
+      outlined
     />
-    <v-btn icon @click.stop="editResourceHandler" class="ml-2 mt-3" :class="{ 'd-none': !value }">
+    <v-btn icon @click.stop="editResourceHandler" class="ml-2" :class="{ 'd-none': !value }">
       <v-icon>mdi-pencil</v-icon>
     </v-btn>
 

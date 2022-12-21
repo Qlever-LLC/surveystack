@@ -2,15 +2,17 @@
   <v-dialog v-model="open" width="500" @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
       <v-text-field
+        v-on="on"
+        v-bind="attrs"
         ref="anchorRef"
         label="Resource"
         :value="getLabel"
+        class="mt-6"
         :class="$vnode.data.staticClass"
         append-icon="mdi-menu-down"
-        hide-details="auto"
+        hide-details
         readonly
-        v-on="on"
-        v-bind="attrs"
+        outlined
       />
     </template>
 
@@ -36,7 +38,7 @@
               :value="item.label"
               @input="(value) => onInput(index, 'label', value)"
               :rules="rules"
-              hide-details="auto"
+              :hide-details="false"
               dense
             />
             <v-text-field
@@ -44,7 +46,7 @@
               :value="item.value"
               @input="(value) => onInput(index, 'value', value)"
               :rules="rules"
-              hide-details="auto"
+              :hide-details="false"
               dense
             />
             <v-icon color="grey" size="20" @click="() => deleteItem(index)">mdi-delete</v-icon>
@@ -81,7 +83,7 @@ export default {
     return {
       open: false,
       items: [],
-      rules: [(val) => val || 'Please enter a string'],
+      rules: [(val) => !!val || 'Please enter a string'],
     };
   },
   computed: {

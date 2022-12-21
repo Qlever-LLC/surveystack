@@ -9,6 +9,7 @@
     item-value="id"
     :disabled="disabled"
     hide-details
+    :outlined="outlined"
   />
 </template>
 
@@ -40,6 +41,9 @@ export default {
     placeholder: {
       type: String,
       default: () => 'Choose a resource',
+    },
+    outlined: {
+      type: Boolean,
     },
   },
   computed: {

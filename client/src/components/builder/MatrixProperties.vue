@@ -2,16 +2,18 @@
   <v-dialog v-model="open" @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
       <v-text-field
+        v-on="on"
+        v-bind="attrs"
         ref="anchorRef"
         label="Resource"
         :value="getLabel"
+        class="mt-6"
         :class="$vnode.data.staticClass"
         append-icon="mdi-menu-down"
-        hide-details="auto"
+        hide-details
         readonly
+        outlined
         :disabled="disabled"
-        v-on="on"
-        v-bind="attrs"
       />
     </template>
 

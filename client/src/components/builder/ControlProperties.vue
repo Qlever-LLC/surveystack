@@ -3,26 +3,20 @@
     <v-card-title class="pl-0">Properties</v-card-title>
     <v-form v-if="control">
       <!-- Default properties -->
-      <v-text-field v-model="control.label" label="Label" hide-details="auto" />
+      <v-text-field v-model="control.label" label="Label" hide-details />
       <v-text-field
         v-model="control.name"
         label="Value"
         :disabled="!!control.libraryId && !control.isLibraryRoot"
         :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
-        hide-details="auto"
+        hide-details
       />
-      <v-text-field v-model="control.hint" label="Hint" hide-details="auto" />
-      <v-text-field v-model="control.moreInfo" label="More info" hide-details="auto" />
+      <v-text-field v-model="control.hint" label="Hint" hide-details />
+      <v-text-field v-model="control.moreInfo" label="More info" hide-details />
 
       <!-- Control properties -->
-      <v-text-field v-if="isText" v-model="control.defaultValue" label="Default value" hide-details="auto" />
-      <v-text-field
-        v-if="isNumber"
-        type="number"
-        v-model="control.defaultValue"
-        label="Default value"
-        hide-details="auto"
-      />
+      <v-text-field v-if="isText" v-model="control.defaultValue" label="Default value" hide-details />
+      <v-text-field v-if="isNumber" type="number" v-model="control.defaultValue" label="Default value" hide-details />
       <instructions-editor
         v-if="isInstructions"
         v-model="control.options.source"
@@ -44,7 +38,7 @@
         v-model="control.options.subtype"
         @input="() => (control.defaultValue = null)"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-        hide-details="auto"
+        hide-details
       />
       <select-items-editor
         v-if="isSelect"
@@ -65,7 +59,7 @@
         v-if="isMatrix"
         v-model="control.options.source.config.addRowLabel"
         label="Add Row label"
-        hide-details="auto"
+        hide-details
       />
       <matrix-properties
         v-if="isMatrix"
@@ -88,7 +82,7 @@
         chips
         clearable
         deletable-chips
-        hide-details="auto"
+        hide-details
       />
       <v-autocomplete
         v-if="isScript"
@@ -102,18 +96,13 @@
         @focus="handleScriptSourceFocus"
         @change="(id) => $emit('set-control-source', id)"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-        hide-details="auto"
+        hide-details
       >
         <template v-slot:selection="{ item }">
           <div>{{ item.name }}</div>
         </template>
       </v-autocomplete>
-      <v-text-field
-        v-if="isScript"
-        v-model="control.options.buttonLabel"
-        label="Run Button Label"
-        hide-details="auto"
-      />
+      <v-text-field v-if="isScript" v-model="control.options.buttonLabel" label="Run Button Label" hide-details />
       <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
       <v-textarea
         v-if="isScript"
@@ -123,7 +112,7 @@
         :rules="[validateScriptParams]"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         class="pt-3"
-        hide-details="auto"
+        hide-details
       />
       <v-combobox
         v-if="isFarmOsUuid"
@@ -576,11 +565,11 @@ export default {
 
 .property-panel form > * + *,
 .property-panel form > .advanced > * + * {
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
 .property-panel form > .ml-2 + .ml-2 {
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 .property-panel form > .spacer {
