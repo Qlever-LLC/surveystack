@@ -48,10 +48,10 @@
 
                 <v-list-item href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
                   <v-list-item-icon>
-                    <v-icon>mdi-notebook-multiple</v-icon>
+                    <v-icon>mdi-help-circle-outline</v-icon>
                   </v-list-item-icon>
                   <v-list-item-content>
-                    <v-list-item-title>SurveyStack Docs</v-list-item-title>
+                    <v-list-item-title>SurveyStack Help</v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
                 <v-list-item href="https://www.surveystack.io" target="_blank">
