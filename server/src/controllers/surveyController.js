@@ -651,11 +651,11 @@ const getSurveyAndCleanupInfo = async (id, userId) => {
     new Set([
       ...Object.keys(submissionsVersionCounts),
       ...Object.keys(libraryConsumersByVersion),
-      String(survey.latestVersion),
+      String(survey.latestVersion), //always keep published version
+      String(survey.revisions[survey.revisions.length - 1].version), //always keep draft version (if existing)
     ])
   );
   const surveyVersions = survey.revisions.map(({ version }) => String(version));
-  //todo take libraryConsumersByVersion into account
   const versionsToDelete = _.difference(surveyVersions, versionsToKeep);
   return {
     survey,
