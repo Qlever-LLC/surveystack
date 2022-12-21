@@ -116,7 +116,6 @@
                       .controls
                   "
                 />
-                />
               </v-col>
             </v-row>
           </v-card>
