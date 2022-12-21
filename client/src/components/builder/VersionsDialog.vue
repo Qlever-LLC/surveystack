@@ -14,7 +14,15 @@
                 :color="isVersionDeletable(revision.version) ? 'grey' : 'green'"
                 :title="isVersionDeletable(revision.version) ? 'unused' : 'in use'"
               >
-                Version {{ revision.version + (revision.version > survey.latestVersion ? ' (draft)' : '') }}</v-chip
+                Version
+                {{
+                  revision.version +
+                  (revision.version > survey.latestVersion
+                    ? ' (draft)'
+                    : revision.version === survey.latestVersion
+                    ? ' (published) '
+                    : '')
+                }}</v-chip
               >
               <span class="ml-2"
                 >{{ getSubmissionCount(revision.version) || 'no' }} submission{{
@@ -40,7 +48,6 @@
               <v-checkbox
                 v-model="selectedVersionsToDelete"
                 :value="String(revision.version)"
-                :disabled="!isVersionDeletable(revision.version)"
                 hide-details
                 title="Delete version"
                 class="mt-0"
