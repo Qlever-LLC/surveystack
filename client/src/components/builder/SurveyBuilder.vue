@@ -430,7 +430,7 @@ export default {
       rootGroup.children = getPreparedLibraryControls(
         librarySurvey._id,
         librarySurvey.latestVersion,
-        librarySurvey.revisions[librarySurvey.latestVersion - 1].controls,
+        librarySurvey.revisions.find((revision) => revision.version === librarySurvey.latestVersion).controls,
         newResources,
         null
       );
