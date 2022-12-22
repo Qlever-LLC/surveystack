@@ -10,6 +10,9 @@
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
+      <v-btn class="help-btn" text href="https://our-sci.gitlab.io/software/surveystack_tutorials/" target="_blank">
+        <v-icon size="22">mdi-help-circle-outline</v-icon>
+      </v-btn>
       <navbar-user-menu />
     </v-app-bar>
     <navbar-drawer v-model="drawerIsVisible" />
@@ -59,7 +62,13 @@ export default {
   font-size: 0.8rem;
   line-height: 0.8rem;
 }
+
+.help-btn.v-btn:not(.v-btn--round).v-size--default {
+  min-width: 0px;
+  padding: 0px 8px;
+}
 </style>
+
 <style>
 .app-bar-subtitle span {
   vertical-align: middle;
