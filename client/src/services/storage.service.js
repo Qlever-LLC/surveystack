@@ -71,7 +71,11 @@ const MembershipService = {
     localStorage.setItem(USER_MEMBERSHIP_STATUS_KEY, status);
   },
   getUserMemberships() {
-    return JSON.parse(localStorage.getItem(USER_MEMBERSHIP_KEY)) || [];
+    try {
+      return JSON.parse(localStorage.getItem(USER_MEMBERSHIP_KEY));
+    } catch {
+      return [];
+    }
   },
   saveMemberships(memberships = []) {
     localStorage.setItem(USER_MEMBERSHIP_KEY, JSON.stringify(memberships));
@@ -87,7 +91,11 @@ const GroupService = {
     localStorage.setItem(USER_ACTIVE_GROUP_KEY, JSON.stringify(group));
   },
   getActiveGroup() {
-    return JSON.parse(localStorage.getItem(USER_ACTIVE_GROUP_KEY)) || null;
+    try {
+      return JSON.parse(localStorage.getItem(USER_ACTIVE_GROUP_KEY));
+    } catch {
+      return null;
+    }
   },
   clear() {
     localStorage.removeItem(USER_ACTIVE_GROUP_KEY);

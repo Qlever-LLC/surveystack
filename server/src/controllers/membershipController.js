@@ -30,17 +30,7 @@ const sanitize = (entity) => {
 };
 
 const getMemberships = async (req, res) => {
-  const { group, user, invitationCode, status, role, populate, groupIntegration } = req.query;
-
-  const memberships = await membershipService.getMemberships(
-    group,
-    user,
-    invitationCode,
-    status,
-    role,
-    populate,
-    groupIntegration
-  );
+  const memberships = await membershipService.getMemberships(req.query);
   res.send(memberships);
 };
 
@@ -91,12 +81,6 @@ const getTree = async (req, res) => {
   );
 
   const memberships = await db.collection(col).aggregate(membershipPipeline).toArray();
-
-  const m = await db
-    .collection(col)
-    .aggregate([{ $match: { user: userId } }])
-    .toArray();
-
   return res.send(memberships);
 };
 
@@ -257,7 +241,7 @@ const updateMembership = async (req, res) => {
     throw boom.unauthorized(`Only group admins can update memberships`);
   }
 
-  // select the fields that are updateable by the user
+  // select the fields that are updatable by the user
   // TODO validate role (user/admin?)
   const update = flatten(pick(req.body, ['role', 'meta.invitationName']));
 
@@ -292,7 +276,7 @@ const deleteMembership = async (req, res, _, hook) => {
     let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
     assert.equal(1, r.deletedCount);
 
-    // delete associated intgegrations
+    // delete associated integrations
     await db.collection('integrations.memberships').deleteMany({ membership: new ObjectId(id) });
 
     return res.send({ message: 'OK' });

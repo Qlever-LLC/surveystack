@@ -9,15 +9,15 @@ import { queryParam } from '../helpers';
 
 const col = 'memberships';
 
-export const getMemberships = async (
+export const getMemberships = async ({
   group,
   user,
   invitationCode,
   status,
   role,
-  doPopulate,
-  groupIntegration
-) => {
+  populate,
+  coffeeShop,
+}) => {
   const filter = {};
 
   if (group) {
@@ -44,12 +44,10 @@ export const getMemberships = async (
   }
 
   const pipeline = [{ $match: filter }];
-  if (queryParam(doPopulate)) {
+  if (queryParam(populate)) {
     pipeline.push(...createPopulationPipeline());
-
-    if (groupIntegration) {
-      pipeline.push(...createGroupIntegrationPopulationPipeline());
-    }
+  } else if (queryParam(coffeeShop)) {
+    pipeline.push(...createPopulationPipeline(), ...createGroupCoffeeShopPipeline());
   }
 
   const entities = await db.collection(col).aggregate(pipeline).toArray();
@@ -154,7 +152,7 @@ export const createPopulationPipeline = () => {
   return pipeline;
 };
 
-export const createGroupIntegrationPopulationPipeline = () => {
+export const createGroupCoffeeShopPipeline = () => {
   const pipeline = [];
 
   // FarmOS integration settings
@@ -165,17 +163,28 @@ export const createGroupIntegrationPopulationPipeline = () => {
           from: 'farmos-group-settings',
           let: { groupId: '$group._id' },
           pipeline: [{ $match: { $expr: { $eq: ['$groupId', '$$groupId'] } } }],
-          as: 'group.integration.farmOS',
+          as: 'd1',
         },
       },
       {
-        $unwind: { path: '$group.integration.farmOS', preserveNullAndEmptyArrays: true },
-      },
-      {
-        $set: {
-          'group.integration.farmOS': { $ifNull: ['$group.integration.farmOS', null] },
+        $lookup: {
+          from: 'farmos-coffeeshop',
+          let: { groupId: '$group._id' },
+          pipeline: [{ $match: { $expr: { $eq: ['$group', '$$groupId'] } } }],
+          as: 'd2',
         },
       },
+      {
+        $addFields: {
+          'group.coffeeShopSettings.allowSubgroupsToJoinCoffeeShop': {
+            $cond: [{ $gt: [{ $size: '$d1' }, 0] }, true, false],
+          },
+          'group.coffeeShopSettings.groupHasCoffeeshopAccess': {
+            $cond: [{ $gt: [{ $size: '$d2' }, 0] }, true, false],
+          },
+        },
+      },
+      { $project: { d1: 0, d2: 0 } },
     ]
   );
 
