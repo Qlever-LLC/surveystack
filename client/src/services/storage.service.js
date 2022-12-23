@@ -72,7 +72,7 @@ const MembershipService = {
   },
   getUserMemberships() {
     try {
-      return JSON.parse(localStorage.getItem(USER_MEMBERSHIP_KEY));
+      return JSON.parse(localStorage.getItem(USER_MEMBERSHIP_KEY)) || [];
     } catch {
       return [];
     }
@@ -92,7 +92,7 @@ const GroupService = {
   },
   getActiveGroup() {
     try {
-      return JSON.parse(localStorage.getItem(USER_ACTIVE_GROUP_KEY));
+      return JSON.parse(localStorage.getItem(USER_ACTIVE_GROUP_KEY)) || null;
     } catch {
       return null;
     }

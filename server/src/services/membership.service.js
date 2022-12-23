@@ -44,10 +44,11 @@ export const getMemberships = async ({
   }
 
   const pipeline = [{ $match: filter }];
-  if (queryParam(populate)) {
+  if (queryParam(populate) || queryParam(coffeeShop)) {
     pipeline.push(...createPopulationPipeline());
-  } else if (queryParam(coffeeShop)) {
-    pipeline.push(...createPopulationPipeline(), ...createGroupCoffeeShopPipeline());
+  }
+  if (queryParam(coffeeShop)) {
+    pipeline.push(...createGroupCoffeeShopPipeline());
   }
 
   const entities = await db.collection(col).aggregate(pipeline).toArray();
