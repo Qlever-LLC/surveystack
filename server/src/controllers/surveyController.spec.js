@@ -125,6 +125,20 @@ describe('surveyController', () => {
       const result = await getSurveyAndCleanupInfo(librarySurvey._id, librarySurvey.meta.creator);
       expect(result.versionsToDelete).toStrictEqual(['1']);
     });
+    it('returns versionsToDelete array of all versions excluding drafts', async () => {
+      const draftRevision = _.cloneDeep(librarySurvey.revisions[librarySurvey.latestVersion - 1]);
+      draftRevision.version = 4;
+      librarySurvey.revisions.push(draftRevision);
+      await getDb().collection('surveys').findOneAndUpdate(
+        { _id: librarySurvey._id },
+        { $set: librarySurvey },
+        {
+          returnOriginal: false,
+        }
+      );
+      const result = await getSurveyAndCleanupInfo(librarySurvey._id, librarySurvey.meta.creator);
+      expect(result.versionsToDelete).toStrictEqual(['1']);
+    });
     it('returns submissionsVersionCounts object map with keys=version and value=count of submissions referencing that version', async () => {
       const result = await getSurveyAndCleanupInfo(librarySurvey._id, librarySurvey.meta.creator);
       expect(result.submissionsVersionCounts).toStrictEqual({ 2: 1 });
