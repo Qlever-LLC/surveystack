@@ -161,28 +161,30 @@ export const createGroupCoffeeShopPipeline = () => {
     ...[
       {
         $lookup: {
-          from: 'farmos-group-settings',
+          from: 'farmos-coffeeshop',
           let: { groupId: '$group._id' },
-          pipeline: [{ $match: { $expr: { $eq: ['$groupId', '$$groupId'] } } }],
+          pipeline: [{ $match: { $expr: { $eq: ['$group', '$$groupId'] } } }],
           as: 'd1',
         },
       },
       {
         $lookup: {
-          from: 'farmos-coffeeshop',
+          from: 'farmos-group-settings',
           let: { groupId: '$group._id' },
-          pipeline: [{ $match: { $expr: { $eq: ['$group', '$$groupId'] } } }],
+          pipeline: [{ $match: { $expr: { $eq: ['$groupId', '$$groupId'] } } }],
           as: 'd2',
         },
       },
       {
+        $unwind: '$d2',
+      },
+      {
         $addFields: {
-          'group.coffeeShopSettings.allowSubgroupsToJoinCoffeeShop': {
+          'group.coffeeShopSettings.groupHasCoffeeshopAccess': {
             $cond: [{ $gt: [{ $size: '$d1' }, 0] }, true, false],
           },
-          'group.coffeeShopSettings.groupHasCoffeeshopAccess': {
-            $cond: [{ $gt: [{ $size: '$d2' }, 0] }, true, false],
-          },
+          'group.coffeeShopSettings.allowSubgroupsToJoinCoffeeShop':
+            '$d2.allowSubgroupsToJoinCoffeeShop',
         },
       },
       { $project: { d1: 0, d2: 0 } },
