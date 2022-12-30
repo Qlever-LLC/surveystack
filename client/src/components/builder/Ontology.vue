@@ -8,7 +8,6 @@
     item-text="label"
     item-value="value"
     :menu-props="autocompleteMenuProps"
-    :chips="multiple"
     :multiple="multiple"
     :disabled="!sourceIsValid"
     :dense="dense"
@@ -19,13 +18,6 @@
     class="full-width dropdown"
     data-test-id="dropdown"
   >
-    <template v-slot:selection="{ item, index }" v-if="multiple">
-      <v-chip v-if="index === 0 && !dense" small>
-        <span>{{ item.label }}</span>
-      </v-chip>
-      <span v-else-if="index === 0 && dense">{{ item.label }}</span>
-      <span v-if="index === 1" class="ml-2 grey--text text-caption"> (+{{ value.length - 1 }} others) </span>
-    </template>
     <template v-slot:item="data" v-if="multiple">
       <v-list-item-content>
         <v-list-item-title>
@@ -48,7 +40,6 @@
     item-text="label"
     item-value="value"
     :menu-props="autocompleteMenuProps"
-    :chips="multiple"
     :multiple="multiple"
     :disabled="!sourceIsValid"
     :dense="dense"
@@ -59,13 +50,6 @@
     class="full-width dropdown"
     data-test-id="autocomplete"
   >
-    <template v-slot:selection="{ item, index }" v-if="multiple">
-      <v-chip v-if="index === 0 && !dense" small>
-        <span>{{ item.label }}</span>
-      </v-chip>
-      <span v-else-if="index === 0 && dense">{{ item.label }}</span>
-      <span v-if="index === 1" class="ml-2 grey--text text-caption"> (+{{ value.length - 1 }} others) </span>
-    </template>
     <template v-slot:item="data" v-if="multiple">
       <v-list-item-content>
         <v-list-item-title>
@@ -90,7 +74,6 @@
     :delimiters="[',']"
     :return-object="false"
     :menu-props="autocompleteMenuProps"
-    :chips="multiple"
     :multiple="multiple"
     :disabled="!sourceIsValid"
     :dense="dense"
@@ -101,13 +84,6 @@
     class="full-width custom-ontology dropdown"
     data-test-id="combobox"
   >
-    <template v-slot:selection="{ item, index }" v-if="multiple">
-      <v-chip v-if="index === 0 && !dense" small>
-        <span>{{ getLabelForItemValue(item) }}</span>
-      </v-chip>
-      <span v-else-if="index === 0 && dense">{{ getLabelForItemValue(item) }}</span>
-      <span v-if="index === 1" class="ml-2 grey--text text-caption"> (+{{ value.length - 1 }} others) </span>
-    </template>
     <template v-slot:no-data>
       <v-list-item>
         <v-list-item-content>
