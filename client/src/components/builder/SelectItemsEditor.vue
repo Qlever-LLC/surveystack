@@ -10,7 +10,6 @@
         :value="getLabel"
         class="mt-6"
         :class="$vnode.data.staticClass"
-        append-icon="mdi-menu-down"
         hide-details
         readonly
         outlined

@@ -43,7 +43,7 @@
       <select-items-editor
         v-if="isSelect"
         v-model="control.options.source"
-        @input="() => (control.defaultValue = null)"
+        @set-control-source="() => (control.defaultValue = null)"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         class="mt-3"
       />

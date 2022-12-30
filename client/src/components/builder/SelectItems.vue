@@ -7,10 +7,10 @@
         :value="getLabel"
         @input="onChange"
         :class="$vnode.data.staticClass"
-        append-icon="mdi-menu-down"
         clearable
         hide-details
         readonly
+        :disabled="getDisabled"
         v-on="on"
         v-bind="attrs"
       />
@@ -85,6 +85,9 @@ export default {
         return match.label;
       }
       return this.value || undefined;
+    },
+    getDisabled() {
+      return !this.custom && this.items.length === 0;
     },
   },
   methods: {
