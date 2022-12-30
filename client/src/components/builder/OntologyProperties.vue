@@ -3,6 +3,7 @@
     <resource-selector
       :resources="filteredResources"
       :value="value"
+      placeholder="Add Options"
       :disabled="disableSelection"
       @on-new="createResourceHandler"
       @on-select="selectResourceHandler"

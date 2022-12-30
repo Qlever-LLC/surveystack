@@ -7,6 +7,7 @@
         ref="anchorRef"
         label="Resource"
         :value="getLabel"
+        placeholder="Add Columns"
         class="mt-6"
         :class="$vnode.data.staticClass"
         append-icon="mdi-menu-down"

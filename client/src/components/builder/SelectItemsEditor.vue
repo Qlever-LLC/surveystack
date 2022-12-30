@@ -6,6 +6,7 @@
         v-bind="attrs"
         ref="anchorRef"
         label="Resource"
+        placeholder="Add Options"
         :value="getLabel"
         class="mt-6"
         :class="$vnode.data.staticClass"
