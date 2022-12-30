@@ -655,8 +655,9 @@ const getSurveyAndCleanupInfo = async (id, userId) => {
     ])
   );
   const surveyVersions = survey.revisions.map(({ version }) => String(version));
-  //todo take libraryConsumersByVersion into account
-  const versionsToDelete = _.difference(surveyVersions, versionsToKeep);
+  const versionsToDelete = _.difference(surveyVersions, versionsToKeep, [
+    String(survey.revisions[survey.revisions.length - 1].version), //also do not propose to delete draft version, while still allowing to delete them by will
+  ]);
   return {
     survey,
     surveyVersions,
@@ -694,7 +695,7 @@ const cleanupSurvey = async (req, res) => {
   );
 
   // Don't allow deletion of survey versions that have associated submissions
-  if (requestedVersionsToDelete.some((v) => !versionsToDelete.includes(v))) {
+  if (requestedVersionsToDelete.some((v) => versionsToKeep.includes(v))) {
     return res.status(404).send({ message: 'Invalid version cleanup requested' });
   }
 
