@@ -116,7 +116,7 @@
                         class="mt-0 ml-2"
                         v-model="item.custom"
                         :checked="item.custom"
-                        @change="(custom) => onChanged(item, { custom, autocomplete: custom || item.autocomplete })"
+                        @input="(custom) => onChanged(item, { custom, autocomplete: custom || item.autocomplete })"
                         label="Allow custom answer"
                         hide-details
                         dense
