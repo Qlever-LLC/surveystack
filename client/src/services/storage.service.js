@@ -71,11 +71,7 @@ const MembershipService = {
     localStorage.setItem(USER_MEMBERSHIP_STATUS_KEY, status);
   },
   getUserMemberships() {
-    try {
-      return JSON.parse(localStorage.getItem(USER_MEMBERSHIP_KEY)) || [];
-    } catch {
-      return [];
-    }
+    return JSON.parse(localStorage.getItem(USER_MEMBERSHIP_KEY)) || [];
   },
   saveMemberships(memberships = []) {
     localStorage.setItem(USER_MEMBERSHIP_KEY, JSON.stringify(memberships));
@@ -91,11 +87,7 @@ const GroupService = {
     localStorage.setItem(USER_ACTIVE_GROUP_KEY, JSON.stringify(group));
   },
   getActiveGroup() {
-    try {
-      return JSON.parse(localStorage.getItem(USER_ACTIVE_GROUP_KEY)) || null;
-    } catch {
-      return null;
-    }
+    return JSON.parse(localStorage.getItem(USER_ACTIVE_GROUP_KEY)) || null;
   },
   clear() {
     localStorage.removeItem(USER_ACTIVE_GROUP_KEY);
