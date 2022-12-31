@@ -15,8 +15,8 @@ export const handleDelegates = (fn) => async (req, res, next) => {
 };
 
 async function checkProxyPermission(proxyUserId, delegateToUserId) {
-  const proxyUserMemberships = await getMemberships(null, proxyUserId, null, null, 'admin');
-  const delegateUserMemberships = await getMemberships(null, delegateToUserId, null, null);
+  const proxyUserMemberships = await getMemberships({ user: proxyUserId, role: 'admin' });
+  const delegateUserMemberships = await getMemberships({ user: delegateToUserId });
   const delegateUserIsPartOfACallerGroup = delegateUserMemberships.some((a) =>
     proxyUserMemberships.some((b) => a.group.equals(b.group.toString()))
   );
