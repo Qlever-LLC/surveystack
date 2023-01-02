@@ -167,6 +167,7 @@ export default {
     requestRunSurveyStackKit({ script }) {
       console.log('running script', script);
       this.scriptId = script;
+      //TODO check this with MDC
       this.$refs.scriptLink.href = `surveystack://kit/${script}`;
       this.$refs.scriptLink.click();
     },
@@ -230,6 +231,7 @@ export default {
       );
     },
     async fetchScriptSource() {
+      //TODO fetch from cache/indexeddb/store if offline
       const sourceId = this.control && this.control.options && this.control.options.source;
       const { data } = await api.get(`/scripts/${sourceId}`);
       this.source = data;
