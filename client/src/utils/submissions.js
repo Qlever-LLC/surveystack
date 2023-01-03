@@ -142,6 +142,7 @@ const createSubmissionFromSurvey = ({ survey, version = 1, instance, submitAsUse
       meta.permissions = ['admin'];
     }
 
+    // Set control value by order of 1. original value (if set), 2. default value (if set), 3. null
     const entry = { value: v || control.defaultValue || null, meta };
     if (control.type === 'group' || control.type === 'page') {
       delete entry.value;

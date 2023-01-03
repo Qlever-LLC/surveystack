@@ -40,7 +40,6 @@ export default {
     },
     placeholder: {
       type: String,
-      default: () => 'Choose a resource',
     },
     outlined: {
       type: Boolean,

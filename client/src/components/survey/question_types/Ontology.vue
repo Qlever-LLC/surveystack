@@ -203,11 +203,11 @@ export default {
     },
   },
   computed: {
-    getAryValue() {
+    getArrayValue() {
       return Array.isArray(this.value) ? this.value : this.value ? [this.value] : [];
     },
     getValue() {
-      return this.control.options.hasMultipleSelections ? this.getAryValue : this.getAryValue[0] || this.value;
+      return this.control.options.hasMultipleSelections ? this.getArrayValue : this.getArrayValue[0] || this.value;
     },
     resource() {
       return this.resources.find((r) => r.id === this.control.options.source);
@@ -219,7 +219,7 @@ export default {
       const defaultItems = this.hasReference ? this.submissionItems : this.resource ? this.resource.content : [];
       // All the custom items the users typed in
       const customItems = without(
-        uniq(this.getAryValue).filter((v) => !isNil(v)), // get all the uniq non-empty values
+        uniq(this.getArrayValue).filter((v) => !isNil(v)), // get all the uniq non-empty values
         ...defaultItems.map((i) => i.value) // without the default values
       ).map((value) => ({ label: value, value }));
 
