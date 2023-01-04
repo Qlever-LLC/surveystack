@@ -112,20 +112,16 @@
       class="full-width custom-ontology dropdown"
       data-test-id="combobox"
     >
-      <template v-slot:selection="data">
+      <template v-slot:selection="data" v-if="!!control.options.hasMultipleSelections">
         <v-chip
           v-bind="data.attrs"
           :input-value="data.selected"
           close
           @click="data.select"
           @click:close="removeValue(data.item)"
-          v-if="!!control.options.hasMultipleSelections"
         >
           {{ getLabelForItemValue(data.item) }}
         </v-chip>
-        <div v-else>
-          {{ getLabelForItemValue(data.item) }}
-        </div>
       </template>
       <template v-slot:no-data>
         <v-list-item>
