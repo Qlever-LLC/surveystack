@@ -1,4 +1,4 @@
-import moment from 'moment';
+import dateFns from 'date-fns';
 import * as utils from '@/utils/sandboxUtils';
 import * as farmos from 'farmos';
 
@@ -6,7 +6,7 @@ export default {
   Date,
   JSON,
   Number,
-  moment,
+  dateFns,
   utils,
   farmos,
 };

@@ -60,7 +60,6 @@
 </template>
 
 <script>
-import moment from 'moment';
 import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
 
@@ -117,7 +116,7 @@ export default {
       this.$store.dispatch('draft/setProperty', { path, value });
 
       // adjust modified date
-      const modified = moment().toISOString(true);
+      const modified = new Date().toISOString();
       this.$store.dispatch('draft/setProperty', {
         path: `${this.path}.meta.dateModified`,
         value: modified,

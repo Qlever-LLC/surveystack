@@ -38,7 +38,6 @@
     "mapbox-gl": "^1.6.1",
     "markdown-it": "^11.0.0",
     "markdown-it-container": "^3.0.0",
-    "moment": "^2.29.4",
     "monaco-editor": "^0.19.3",
     "monaco-editor-webpack-plugin": "^1.8.2",
     "ol": "^6.4.3",

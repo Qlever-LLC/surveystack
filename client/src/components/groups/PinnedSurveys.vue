@@ -24,9 +24,9 @@
               <br />
               <span class="title">{{ el.name }}</span>
               <br />
-              <span class="font-weight-light grey--text text--darken-2" v-if="el.meta"
-                >last modified {{ renderDateFromNow(el.meta.dateModified) }}</span
-              >
+              <span class="font-weight-light grey--text text--darken-2" v-if="el.meta">
+                last modified {{ renderDateFromNow(el.meta.dateModified) }}
+              </span>
             </div>
             <div class="d-flex">
               <v-btn icon @click.stop="() => showDeleteModal(idx)">
@@ -47,20 +47,14 @@
     </v-card>
     <v-dialog v-model="deleteQuestionModalIsVisible" max-width="290">
       <v-card>
-        <v-card-title>
-          Remove Pinned Survey
-        </v-card-title>
+        <v-card-title> Remove Pinned Survey </v-card-title>
         <v-card-text class="mt-4">
           Are you sure you want to remove this pinned survey? The survey itself will not be removed.
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click.stop="deleteQuestionModalIsVisible = false">
-            Cancel
-          </v-btn>
-          <v-btn text color="red" @click.stop="handleConfirmDelete">
-            Remove
-          </v-btn>
+          <v-btn text @click.stop="deleteQuestionModalIsVisible = false"> Cancel </v-btn>
+          <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -74,9 +68,9 @@
             <v-list-item v-for="searchResult in searchResults" :key="searchResult._id" @click="pinSurvey(searchResult)">
               <v-list-item-content>
                 <v-list-item-title>{{ searchResult.name }}</v-list-item-title>
-                <v-list-item-subtitle v-if="searchResult.meta"
-                  >last modified {{ renderDateFromNow(searchResult.meta.dateModified) }}</v-list-item-subtitle
-                >
+                <v-list-item-subtitle v-if="searchResult.meta">
+                  last modified {{ renderDateFromNow(searchResult.meta.dateModified) }}
+                </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -91,7 +85,9 @@
 
 <script>
 import draggable from 'vuedraggable';
-import moment from 'moment';
+import isValid from 'date-fns/isValid';
+import parseISO from 'date-fns/parseISO';
+import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 
 export default {
   name: 'nested-draggable',
@@ -132,7 +128,8 @@ export default {
       this.entities.splice(idx, 1);
     },
     renderDateFromNow(date) {
-      return moment(date).fromNow();
+      const parsedDate = parseISO(date);
+      return isValid(parsedDate) ? formatDistanceToNow(parseISO(date), { addSuffix: true }) : '';
     },
     openSearchDialog() {
       this.$emit('search', '');

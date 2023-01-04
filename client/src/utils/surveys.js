@@ -4,7 +4,6 @@
 
 import { unflatten } from 'flat';
 import { clone, cloneDeep, set } from 'lodash';
-import moment from 'moment';
 import submissionUtils from './submissions';
 import { SPEC_VERSION_SURVEY } from '@/constants';
 import supplySandbox from './supplySandbox';
@@ -561,11 +560,6 @@ export function compileSandbox(src, fname) {
   };
 }
 
-export const handleize = (str) => {
-  const handle = str && str.toLowerCase().replace(/\s/gi, '-');
-  return handle;
-};
-
 export const simplify = (submissionItem) => {
   if (submissionItem.meta !== undefined && submissionItem.meta.type !== 'group') {
     return submissionItem.value || null;
@@ -1042,7 +1036,7 @@ export function updateControls(
  * @param {number} options.specVersion specification version for survey definition
  */
 export function createSurvey({ creator = null, group = null, specVersion = SPEC_VERSION_SURVEY }) {
-  const currentDate = moment().toISOString(true);
+  const currentDate = new Date().toISOString();
   return {
     _id: '',
     name: '',

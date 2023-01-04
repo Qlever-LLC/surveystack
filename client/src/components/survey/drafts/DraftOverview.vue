@@ -11,17 +11,17 @@
       <v-card-subtitle class="grey--text mt-n5">
         {{ submission._id }}
         <br />
-
-        <strong v-if="submission.meta.dateSubmitted"
-          ><kbd>{{ submitted }}</kbd> submitted</strong
-        >
+        <strong v-if="submission.meta.dateSubmitted">
+          <kbd>{{ submitted }}</kbd> submitted
+        </strong>
       </v-card-subtitle>
       <v-card-text>
         Submitting to: {{ groupPath || '--' }}
         <br />
-        <span v-if="submission.meta.submitAsUser"
-          >As user: {{ submission.meta.submitAsUser.name }} ({{ submission.meta.submitAsUser.email }})<br
-        /></span>
+        <span v-if="submission.meta.submitAsUser">
+          As user: {{ submission.meta.submitAsUser.name }} ({{ submission.meta.submitAsUser.email }})
+          <br />
+        </span>
         Created: {{ created }}
         <br />
         Last modified: {{ modified }}
@@ -70,8 +70,9 @@
               <span
                 class="font-weight-light grey--text text--darken-2 mt-n1"
                 style="font-size: 0.9rem; position: relative"
-                >{{ display.path }}</span
               >
+                {{ display.path }}
+              </span>
             </v-card-text>
 
             <!-- value -->
@@ -98,16 +99,14 @@
             <!-- date modified -->
             <v-card-text class="pt-1 pb-0" v-if="display.modified">
               <div class="d-flex justify-space-between text--secondary" style="font-size: 0.8rem">
-                <div>
-                  {{ display.modified.format('YYYY-MM-DD HH:mm') }}
-                </div>
-                <div>{{ display.modifiedHumanized }} ago</div>
+                <div v-if="display.modified">{{ display.modified }}</div>
+                <div v-if="display.modifiedHumanized">{{ display.modifiedHumanized }} ago</div>
               </div>
             </v-card-text>
           </v-card>
 
-          <v-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1"
-            >{{ display.collate }} Irrelevant Questions
+          <v-chip v-else @click="expand(display.collateGroup)" dark small color="grey" class="mr-0 mr-1">
+            {{ display.collate }} Irrelevant Questions
           </v-chip>
         </v-timeline-item>
       </template>
@@ -116,7 +115,10 @@
 </template>
 
 <script>
-import moment from 'moment';
+import isValid from 'date-fns/isValid';
+import parseISO from 'date-fns/parseISO';
+import format from 'date-fns/format';
+import formatDistance from 'date-fns/formatDistance';
 import { getLabelFromKey } from '@/utils/resources';
 
 const states = {
@@ -176,11 +178,19 @@ export default {
       return relevant;
     },
     refresh() {
-      this.created = moment(this.submission.meta.dateCreated).format('YYYY-MM-DD HH:mm');
-      this.modified = moment(this.submission.meta.dateModified).format('YYYY-MM-DD HH:mm');
-      this.submitted = moment(this.submission.meta.dateSubmitted).format('YYYY-MM-DD HH:mm');
+      const [dateCreated, dateModified, dateSubmitted] = [
+        this.submission.meta.dateCreated,
+        this.submission.meta.dateModified,
+        this.submission.meta.dateSubmitted,
+      ].map((date) => {
+        const parsedDate = parseISO(date);
+        return isValid(parsedDate) ? parsedDate : new Date();
+      });
+      this.created = format(dateCreated, 'yyyy-MM-dd hh:mm');
+      this.modified = format(dateModified, 'yyyy-MM-dd hh:mm');
+      this.submitted = format(dateSubmitted, 'yyyy-MM-dd hh:mm');
 
-      const now = moment();
+      const now = new Date();
 
       let collate = 0;
       let collateGroup = 0;
@@ -212,7 +222,7 @@ export default {
         }
 
         const dateModified = this.$store.getters['draft/property'](`${path}.meta.dateModified`, null);
-        const modified = dateModified ? moment(dateModified) : null;
+        const modified = parseISO(dateModified);
 
         const active = this.$store.getters['draft/path'] === overview.path;
         const background = 'white';
@@ -243,8 +253,8 @@ export default {
           collateGroup,
           lastOfCollation,
           active,
-          modified,
-          modifiedHumanized: moment.duration(now.diff(modified)).humanize(),
+          modified: isValid(modified) ? format(modified, 'yyyy-MM-dd hh:mm') : '',
+          modifiedHumanized: isValid(modified) ? formatDistance(modified, now) : '',
           redacted: overview.control.options && overview.control.options.redacted,
           required: overview.control.options && overview.control.options.required,
           ellipsis: true,

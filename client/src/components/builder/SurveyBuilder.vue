@@ -239,8 +239,6 @@
 import { cloneDeep, isEqual, isEqualWith, uniqBy } from 'lodash';
 import { Pane, Splitpanes } from 'splitpanes';
 
-import moment from 'moment';
-
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
 import questionLibrary from '@/components/survey/library/QuestionLibrary.vue';
@@ -396,7 +394,7 @@ export default {
       this.dirty = true;
       const { latestVersion } = this.initialSurvey;
       const nextVersion = latestVersion + 1;
-      const date = moment().toISOString(true);
+      const date = new Date().toISOString();
 
       const nextVersionObj = this.survey.revisions.find((revision) => revision.version === latestVersion);
       nextVersionObj.version = nextVersion;

@@ -1,7 +1,6 @@
 import ObjectID from 'bson-objectid';
 import { flatten, unflatten } from 'flat';
 import { cloneDeep, groupBy } from 'lodash';
-import moment from 'moment';
 import * as constants from '@/constants';
 import api from '@/services/api.service';
 import { getNested } from '@/utils/surveyStack';
@@ -83,7 +82,7 @@ export const getBreadcrumbsForSubmission = (controls, position) => {
  */
 const createSubmissionFromSurvey = ({ survey, version = 1, instance, submitAsUser = undefined }) => {
   const submission = {};
-  const dateNow = moment().toISOString(true);
+  const dateNow = new Date().toISOString();
 
   submission._id = new ObjectID().toString();
   submission.meta = {
