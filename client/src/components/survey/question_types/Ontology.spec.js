@@ -1,6 +1,6 @@
 import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuetify from 'vuetify';
-import Ontology, { fetchSubmissions } from './Ontology.vue';
+import Ontology from './Ontology.vue';
 import { resourceLocations, resourceTypes } from '@/utils/resources';
 
 const vuetify = new Vuetify();

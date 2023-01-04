@@ -1,11 +1,9 @@
 import draftStore from './draft.store';
+import { createSurvey } from '@/utils/surveys';
+import { createSubmissionFromSurvey } from '@/utils/submissions';
+import { addRevisionToSurvey, createControl } from '@/../tests/surveyTestingUtils';
 
 const { actions, mutations } = draftStore;
-
-import { createSurvey } from '@/utils/surveys';
-import submissionUtils from '@/utils/submissions';
-const { createSubmissionFromSurvey } = submissionUtils;
-import { addRevisionToSurvey, createControl } from '@/../tests/surveyTestingUtils';
 
 describe('draft store', () => {
   describe('actions', () => {

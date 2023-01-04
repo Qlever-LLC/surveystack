@@ -70,8 +70,8 @@ import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
 import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
-import { getApiComposeErros } from '@/utils/draft';
-import submissionUtils from '@/utils/submissions';
+import { getApiComposeErrors } from '@/utils/draft';
+import { createSubmissionFromSurvey } from '@/utils/submissions';
 import { defaultsDeep } from 'lodash';
 
 export default {
@@ -130,7 +130,7 @@ export default {
       window.parent.postMessage(message, '*');
     },
     async submit({ payload }) {
-      this.apiComposeErrors = getApiComposeErros(this.survey, payload);
+      this.apiComposeErrors = getApiComposeErrors(this.survey, payload);
       if (this.apiComposeErrors.length > 0) {
         this.showApiComposeErrors = true;
         return;
@@ -195,7 +195,7 @@ export default {
     }
 
     this.survey = await this.$store.dispatch('surveys/fetchSurvey', this.submission.meta.survey.id);
-    const cleanSubmission = submissionUtils.createSubmissionFromSurvey({
+    const cleanSubmission = createSubmissionFromSurvey({
       survey: this.survey,
       version: this.submission.meta.survey.version,
     });

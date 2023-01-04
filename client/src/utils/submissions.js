@@ -42,7 +42,7 @@ const getFlatName = (controls, position) => {
     flatName += `.${control.name}`;
   });
 
-  return flatName.substr(1);
+  return flatName.substring(1);
 };
 
 const getControl = (controls, position) => {
@@ -62,7 +62,7 @@ const getControl = (controls, position) => {
   return control;
 };
 
-export const getBreadcrumbsForSubmission = (controls, position) => {
+const getBreadcrumbsForSubmission = (controls, position) => {
   let currentControls = controls;
   const breadcrumbs = [];
   position.forEach((i) => {
@@ -80,7 +80,7 @@ export const getBreadcrumbsForSubmission = (controls, position) => {
  *
  * @returns {Object} A submission for a specific survey version.
  */
-const createSubmissionFromSurvey = ({ survey, version = 1, instance, submitAsUser = undefined }) => {
+export const createSubmissionFromSurvey = ({ survey, version = 1, instance, submitAsUser = undefined }) => {
   const submission = {};
   const dateNow = new Date().toISOString();
 
@@ -165,7 +165,7 @@ const createSubmissionFromSurvey = ({ survey, version = 1, instance, submitAsUse
  *
  * @returns {Object} The nested object from submission's data
  */
-const getSubmissionField = (submission, survey, position) => {
+export const getSubmissionField = (submission, survey, position) => {
   // TODO: handle version not found
   const { controls } = survey.revisions.find((revision) => revision.version === submission.meta.survey.version);
 
@@ -266,8 +266,3 @@ export async function fetchSubmissionUniqueItems(surveyId, path) {
   }));
   return uniqueItems;
 }
-
-export default {
-  createSubmissionFromSurvey,
-  getSubmissionField,
-};

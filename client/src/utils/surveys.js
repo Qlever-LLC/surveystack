@@ -4,7 +4,7 @@
 
 import { unflatten } from 'flat';
 import { clone, cloneDeep, set } from 'lodash';
-import submissionUtils from './submissions';
+import { getSubmissionField } from './submissions';
 import { SPEC_VERSION_SURVEY } from '@/constants';
 import supplySandbox from './supplySandbox';
 import ObjectID from 'bson-objectid';
@@ -654,7 +654,7 @@ const firstParentWithRelevance = (submission, survey, index, positions) => {
   }
   parts.reverse();
   const relevantParent = parts.find((p) => {
-    const field = submissionUtils.getSubmissionField(submission, survey, p);
+    const field = getSubmissionField(submission, survey, p);
     return field.meta.relevant === false;
   });
 
@@ -663,7 +663,7 @@ const firstParentWithRelevance = (submission, survey, index, positions) => {
 
 export const isRelevant = (submission, survey, index, positions) => {
   const relevantPosition = firstParentWithRelevance(submission, survey, index, positions) || positions[index];
-  const field = submissionUtils.getSubmissionField(submission, survey, relevantPosition);
+  const field = getSubmissionField(submission, survey, relevantPosition);
   return field.meta.relevant;
 };
 

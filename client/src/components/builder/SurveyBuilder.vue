@@ -238,7 +238,6 @@
 <script>
 import { cloneDeep, isEqual, isEqualWith, uniqBy } from 'lodash';
 import { Pane, Splitpanes } from 'splitpanes';
-
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
 import questionLibrary from '@/components/survey/library/QuestionLibrary.vue';
@@ -246,20 +245,16 @@ import controlAdder from '@/components/builder/ControlAdder.vue';
 import surveyDetails from '@/components/builder/SurveyDetails.vue';
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 import consoleLog from '@/components/builder/ConsoleLog.vue';
-
 import appCodeView from '@/components/builder/CodeView.vue';
 import appExamplesView from '@/components/builder/ExamplesView.vue';
-
 import appMixin from '@/components/mixin/appComponent.mixin';
-import api from '@/services/api.service';
+import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
 import slugify from '@/utils/slugify';
-
 import { defaultApiCompose } from '@/utils/apiCompose';
-
-import submissionUtils from '@/utils/submissions';
-import { SPEC_VERSION_SCRIPT } from '@/constants';
+import { createSubmissionFromSurvey } from '@/utils/submissions';
 import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 import * as surveyStackUtils from '@/utils/surveyStack';
+import { SPEC_VERSION_SCRIPT } from '@/constants';
 import {
   executeUnsafe,
   getFlatName,
@@ -271,7 +266,7 @@ import {
   insertControl,
   isResourceReferenced,
 } from '@/utils/surveys';
-import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
+import api from '@/services/api.service';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -743,7 +738,7 @@ export default {
     createInstance() {
       const { version } = this.survey.revisions[this.survey.revisions.length - 1];
 
-      this.instance = submissionUtils.createSubmissionFromSurvey({
+      this.instance = createSubmissionFromSurvey({
         survey: this.survey,
         version,
         instance: this.instance,
