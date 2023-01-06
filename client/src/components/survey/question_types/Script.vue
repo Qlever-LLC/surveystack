@@ -231,9 +231,17 @@ export default {
       );
     },
     async fetchScriptSource() {
-      //TODO fetch from cache/indexeddb/store if offline
-      const sourceId = this.control && this.control.options && this.control.options.source;
-      const { data } = await api.get(`/scripts/${sourceId}`);
+      //TODO fetch from cache/indexeddb/store if user offline
+      const resourceId = this.control && this.control.options && this.control.options.source;
+      const scriptResource = this.resources.find((r) => r.id === resourceId);
+      let scriptId;
+      if (scriptResource) {
+        scriptId = scriptResource.content;
+      } else {
+        //fallback to directly using script id
+        scriptId = this.control.options.source;
+      }
+      const { data } = await api.get(`/scripts/${scriptId}`);
       this.source = data;
     },
   },

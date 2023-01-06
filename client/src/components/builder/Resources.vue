@@ -84,12 +84,20 @@
             <v-list-item-subtitle v-if="resource.type === resourceTypes.FILE">
               {{ `resources/${resource.id}/${resource.label} : ${resource.type}` }}
             </v-list-item-subtitle>
-            <v-list-item-subtitle v-else>{{ resource.name }} : {{ resource.type }} </v-list-item-subtitle>
+            <v-list-item-subtitle v-else> {{ resource.name }}</v-list-item-subtitle>
           </v-list-item-content>
           <v-icon v-if="resource.libraryId" color="grey lighten-1">mdi-library</v-icon>
           <v-list-item-action v-if="resource.type === resourceTypes.FILE">
             <v-btn icon>
               <v-icon color="grey lighten-1" @click.stop="removeRemoteResource(resource)"> mdi-delete </v-icon>
+            </v-btn>
+          </v-list-item-action>
+          <!--TODO REPLACE THIS BY AUTOMATIC REMOVAL-->
+          <v-list-item-action
+            v-if="resource.type === resourceTypes.SCRIPT_REFERENCE || resource.type === resourceTypes.SURVEY_REFERENCE"
+          >
+            <v-btn icon>
+              <v-icon color="grey lighten-1" @click.stop="removeResource(resource.id)"> mdi-delete </v-icon>
             </v-btn>
           </v-list-item-action>
         </v-list-item>
@@ -130,6 +138,7 @@ export default {
         { text: 'Image URL', value: resourceTypes.IMAGE },
         { text: 'File', value: resourceTypes.FILE },
         { text: 'Survey reference', value: resourceTypes.SURVEY_REFERENCE },
+        { text: 'Script reference', value: resourceTypes.SCRIPT_REFERENCE },
       ],
       ontologyEditorDialog: false,
       selectedId: null,

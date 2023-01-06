@@ -274,6 +274,8 @@ import {
   isResourceReferenced,
 } from '@/utils/surveys';
 import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
+import { resourceLocations, resourceTypes, setResource } from '@/utils/resources';
+import ObjectId from 'bson-objectid';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -475,6 +477,18 @@ export default {
       // remove library resources which are not used anymore (e.g. this could happen if resources with same origin are added when consuming the same library multiple times)
       this.cleanupLibraryResources();
     },
+    cleanupScriptRefResources() {
+      const controls = this.survey.revisions[this.survey.revisions.length - 1].controls;
+      this.survey.resources = this.survey.resources.filter(
+        (resource) => resource.type !== resourceTypes.SCRIPT_REFERENCE || isResourceReferenced(controls, resource.id)
+      );
+    },
+    cleanupSurveyRefResources() {
+      const controls = this.survey.revisions[this.survey.revisions.length - 1].controls;
+      this.survey.resources = this.survey.resources.filter(
+        (resource) => resource.type !== resourceTypes.SURVEY_REFERENCE || isResourceReferenced(controls, resource.id)
+      );
+    },
     cleanupLibraryResources() {
       const controls = this.survey.revisions[this.survey.revisions.length - 1].controls;
       this.survey.resources = this.survey.resources.filter(
@@ -602,7 +616,15 @@ export default {
       this.closeLibrary();
       this.control = control;
       if (control && control.type === 'script' && control.options.source) {
-        const data = await this.fetchScript(control.options.source);
+        const scriptResource = this.survey.resources.find((r) => r.id === control.options.source);
+        let scriptId;
+        if (scriptResource) {
+          scriptId = scriptResource.content;
+        } else {
+          //fallback to directly using script id
+          scriptId = control.options.source;
+        }
+        const data = await this.fetchScript(scriptId);
         this.scriptEditorIsVisible = false;
         this.setScriptCode(data);
       } else {
@@ -612,6 +634,8 @@ export default {
     async controlRemoved() {
       await this.controlSelected(null);
       this.cleanupLibraryResources();
+      this.cleanupScriptRefResources();
+      this.cleanupSurveyRefResources();
     },
     async fetchScript(id) {
       const { data } = await api.get(`/scripts/${id}`);
@@ -698,10 +722,29 @@ export default {
       this.$router.push('/surveys/browse');
     },
     async setControlSource(value) {
-      this.$set(this.control.options, 'source', value);
       if (this.control.type === 'script') {
-        const data = await this.fetchScript(value);
+        const data = await this.fetchScript(value.id);
         this.setScriptCode(data);
+        //create new script reference resource
+        const label = 'Script Reference ' + value.name;
+        let newResource = {
+          id: new ObjectId().toString(),
+          label: label,
+          name: slugify(label) + '_' + value.id,
+          type: resourceTypes.SCRIPT_REFERENCE,
+          location: resourceLocations.REMOTE,
+          content: value.id,
+        };
+        //update survey resources
+        const newResources = setResource(this.survey.resources, newResource);
+        this.setSurveyResources(newResources);
+        //store resource id to the script's source
+        this.$set(this.control.options, 'source', newResource.id);
+        //clean up unused script references
+        this.cleanupScriptRefResources();
+        this.cleanupSurveyRefResources();
+      } else {
+        this.$set(this.control.options, 'source', value);
       }
     },
     setSurveyResources(resources) {
