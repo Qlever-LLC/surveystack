@@ -71,7 +71,6 @@ function defaultColumnWidth(type) {
     case 'farmos_planting':
     case 'farmos_field':
     case 'dropdown':
-    case 'autocomplete':
       return 240;
     default:
       return 160;
@@ -134,21 +133,21 @@ export default {
       return this.headers.map(({ scaleWidth = 100, type }) => defaultColumnWidth(type) * (scaleWidth / 100));
     },
     cellWidthStyles() {
-      return this.colMinWidths.map((minWidth, colIdx) => ({
+      return this.colMinWidths.map((minWidth) => ({
         minWidth: `${minWidth}px`,
         flexBasis: `${minWidth}px`,
       }));
     },
     leftFixStyles() {
       return this.cellWidthStyles.map((style, colIdx) => {
-        style = { ...style };
+        const newStyle = { ...style };
         if (this.fixColMask[colIdx]) {
-          style.position = 'sticky';
-          style.left = `${sum(this.colMinWidths.slice(0, colIdx))}px`;
+          newStyle.position = 'sticky';
+          newStyle.left = `${sum(this.colMinWidths.slice(0, colIdx))}px`;
           /* should be above non-fixed input cells */
-          style.zIndex = 1;
+          newStyle.zIndex = 1;
         }
-        return style;
+        return newStyle;
       });
     },
     minRowWidth() {
@@ -207,7 +206,7 @@ export default {
       );
     },
     // create a 2d boolean matrix where true marks the cells visible on the scren (experimenal)
-    updateCellVisibilityMask: debounce(function() {
+    updateCellVisibilityMask: debounce(function () {
       if (!this.dontRenderOffScreenCells) {
         return;
       }
@@ -376,8 +375,8 @@ export default {
   height: 100%;
 }
 
-/** 
- Make sure the horizontal scrollbar is visible on macOS/webkit. 
+/**
+ Make sure the horizontal scrollbar is visible on macOS/webkit.
  Same solution the Vuetify data-table uses
  */
 .mt-body::-webkit-scrollbar {

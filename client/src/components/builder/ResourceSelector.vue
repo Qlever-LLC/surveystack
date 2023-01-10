@@ -1,13 +1,15 @@
 <template>
   <v-select
+    label="Resource"
+    :placeholder="placeholder"
+    :value="value"
+    @input="handleSelect"
     :items="items"
     item-text="label"
     item-value="id"
-    :value="value"
     :disabled="disabled"
-    @input="handleSelect"
-    placeholder="Choose a resource"
-    outlined
+    hide-details
+    :outlined="outlined"
   />
 </template>
 
@@ -36,6 +38,12 @@ export default {
     disabled: {
       required: false,
     },
+    placeholder: {
+      type: String,
+    },
+    outlined: {
+      type: Boolean,
+    },
   },
   computed: {
     filteredResources() {
@@ -46,11 +54,8 @@ export default {
     items() {
       return [
         ...this.filteredResources,
-        ...this.newResourceTypes.map((type, i) => ({
-          label: `+ New ${type
-            .toLowerCase()
-            .split('_')
-            .join(' ')}`,
+        ...this.newResourceTypes.map((type) => ({
+          label: `+ New ${type.toLowerCase().split('_').join(' ')}`,
           id: `${NEW_RESOURCE_PREFIX}${type}`,
         })),
       ];

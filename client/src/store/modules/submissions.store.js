@@ -1,7 +1,7 @@
 import * as db from '@/store/db';
 import api from '@/services/api.service';
 
-import submissionUtils from '@/utils/submissions';
+import { createSubmissionFromSurvey } from '@/utils/submissions';
 
 import router from '@/router';
 
@@ -114,7 +114,7 @@ const actions = {
   async [types.actions.startDraft]({ dispatch }, { survey, submitAsUser = undefined, version = 0 }) {
     const surveyEntity = await dispatch('surveys/fetchSurvey', survey, { root: true });
     const activeVersion = version === 0 ? surveyEntity.latestVersion : version;
-    const submission = submissionUtils.createSubmissionFromSurvey({
+    const submission = createSubmissionFromSurvey({
       survey: surveyEntity,
       version: activeVersion,
       submitAsUser: submitAsUser,

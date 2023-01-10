@@ -80,20 +80,22 @@
                     <v-text-field v-model="item.label" label="Label" style="font-size: 1.3rem" dense />
                     <v-text-field v-model="item.value" label="Value" dense />
                     <v-select
-                      dense
-                      v-bind:value="item.type"
-                      v-on:input="(t) => onTypeChanged(item, t)"
-                      :items="$options.MATRIX_COLUMN_TYPES"
                       label="Type"
+                      :value="item.type"
+                      @input="(type) => onChanged(item, { type, defaultValue: null })"
+                      :items="$options.MATRIX_COLUMN_TYPES"
+                      dense
                     />
-                    <div v-if="item.type === 'dropdown' || item.type === 'autocomplete'" class="d-flex flex-column">
+
+                    <div v-if="item.type === 'dropdown'" class="d-flex flex-column">
                       <div class="d-flex flex-row flex-wrap">
                         <v-select
-                          dense
                           v-model="item.resource"
+                          @input="(resource) => onChanged(item, { resource, defaultValue: null })"
                           :items="resourceSelectItems"
                           label="Resource"
                           hide-details
+                          dense
                           style="max-width: 10rem"
                         />
                         <v-btn
@@ -109,16 +111,59 @@
                           <v-icon>mdi-pencil</v-icon>
                         </v-btn>
                       </div>
-                      <v-checkbox class="mt-2 ml-2" v-model="item.multiple" label="Multi-select" hide-details dense />
-                      <v-checkbox
-                        v-if="item.type === 'autocomplete'"
+                      <checkbox class="mt-2 ml-2" v-model="item.multiple" label="Multi-select" hide-details dense />
+                      <checkbox
                         class="mt-0 ml-2"
                         v-model="item.custom"
-                        label="Custom inputs"
+                        :checked="item.custom"
+                        @input="(custom) => onChanged(item, { custom, autocomplete: custom || item.autocomplete })"
+                        label="Allow custom answer"
+                        hide-details
+                        dense
+                      >
+                        <template slot="helper-text">
+                          Allows the user to input answers that do not exist within the provided items. This will also
+                          require <strong>Autocomplete</strong> is on
+                        </template>
+                      </checkbox>
+                      <checkbox
+                        class="mt-0 ml-2"
+                        v-model="item.autocomplete"
+                        label="Autocomplete"
+                        :disabled="Boolean(item.custom)"
+                        helper-text="Provides selectable suggestions as a user types into it. It allows users to quickly search through and select from large collections of options"
                         hide-details
                         dense
                       />
                     </div>
+
+                    <v-text-field
+                      v-if="item.type === 'text'"
+                      v-model="item.defaultValue"
+                      label="Default value"
+                      dense
+                      hide-details
+                    />
+                    <v-text-field
+                      v-if="item.type === 'number'"
+                      type="number"
+                      v-model="item.defaultValue"
+                      label="Default value"
+                      dense
+                      hide-details
+                    />
+                    <ontology
+                      v-if="item.type === 'dropdown'"
+                      v-model="item.defaultValue"
+                      :multiple="item.multiple"
+                      :customAnswer="item.custom"
+                      :autocomplete="item.autocomplete"
+                      :source="item.resource"
+                      :resources="resources"
+                      dense
+                      class="mt-5"
+                    />
+                    <date v-if="item.type === 'date'" v-model="item.defaultValue" type="date" dense />
 
                     <div v-if="item.type == 'farmos_uuid'" class="d-flex flex-column">
                       <v-select
@@ -131,7 +176,7 @@
                       />
                     </div>
 
-                    <v-checkbox
+                    <checkbox
                       v-model="item.required"
                       @change="
                         (v) => {
@@ -139,39 +184,36 @@
                         }
                       "
                       label="Required"
-                      class="mt-2"
+                      helper-text="Make this a required field"
                       hide-details
+                      class="mt-4"
                     />
-                    <v-checkbox
+                    <checkbox
                       v-model="item.redacted"
                       label="Private"
+                      helper-text="Visible to submitter and admins only"
                       class="mt-2"
-                      hint="Visible to submitter and admins only"
-                      persistent-hint
                     />
-                    <v-checkbox
+                    <checkbox
                       v-if="allowSetAllowHide"
                       v-model="item.allowHide"
                       label="Allow hide"
                       class="mt-2"
-                      hint="Allow users of this question set to hide this column"
-                      persistent-hint
+                      helper-text="Allow users of this question set to hide this column"
                     />
-                    <v-checkbox
+                    <checkbox
                       v-if="!allowSetAllowHide && item.allowHide"
                       v-model="item.hidden"
                       label="Hidden"
                       class="mt-2"
-                      hint="Submitters can not see this column. This option is intentionally allowed by the question set designer"
-                      persistent-hint
+                      helper-text="Submitters can not see this column. This option is intentionally allowed by the question set designer"
                     />
-
-                    <div
+                    <checkbox
                       v-if="item.type == 'farmos_field' || item.type == 'farmos_planting'"
-                      class="d-flex flex-column"
-                    >
-                      <v-checkbox class="mt-2" v-model="item.multiple" label="Multiselect" hide-details />
-                    </div>
+                      v-model="item.multiple"
+                      label="Multi-select"
+                      class="mt-2"
+                    />
 
                     <h4 class="mt-6 mb-4">Display Options</h4>
                     <v-text-field
@@ -204,14 +246,16 @@
 
 <script>
 import ObjectId from 'bson-objectid';
-import draggable from 'vuedraggable';
-
-import appOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
+import Draggable from 'vuedraggable';
 import { resourceLocations, resourceTypes } from '@/utils/resources';
+import { cleanupAutocompleteMatrix } from '@/utils/surveys';
+import AppOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
+import Ontology from '@/components/builder/Ontology.vue';
+import Date from '@/components/builder/Date.vue';
+import Checkbox from '@/components/builder/Checkbox.vue';
 
 const MATRIX_COLUMN_TYPES = [
-  { text: 'Ontology - Dropdown', value: 'dropdown' },
-  { text: 'Ontology - Auto Complete', value: 'autocomplete' },
+  { text: 'Dropdown', value: 'dropdown' },
   { text: 'Text', value: 'text' },
   { text: 'Text and QR-Code', value: 'qrcode' },
   { text: 'Number', value: 'number' },
@@ -231,6 +275,13 @@ const createOptions = (src) => {
 };
 
 export default {
+  components: {
+    AppOntologyListEditor,
+    Draggable,
+    Ontology,
+    Date,
+    Checkbox,
+  },
   props: {
     value: {
       type: Object,
@@ -246,10 +297,6 @@ export default {
       type: Boolean,
       required: true,
     },
-  },
-  components: {
-    appOntologyListEditor,
-    draggable,
   },
   data() {
     return {
@@ -285,9 +332,6 @@ export default {
     },
   },
   methods: {
-    log(v) {
-      console.log(v);
-    },
     removeResource(id) {
       const index = this.resources.findIndex((r) => r.id === id);
       const newResources = [...this.resources.slice(0, index), ...this.resources.slice(index + 1)];
@@ -346,6 +390,7 @@ export default {
         resource: '',
         multiple: false,
         custom: false,
+        autocomplete: false,
         required: false,
         redacted: false,
         scaleWidth: 100,
@@ -359,10 +404,15 @@ export default {
     addColumn() {
       this.value.content = [...this.value.content, this.createEmptyColumn()];
     },
-    onTypeChanged(item, type) {
-      item.type = type;
+    onChanged(item, value) {
+      Object.assign(item, value);
       item = createOptions(item);
     },
+  },
+  created() {
+    // Compatible with original `autocomplete` question type (https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56)
+    this.value.content = [...this.value.content].map(cleanupAutocompleteMatrix);
+    this.$emit('input', this.value);
   },
   MATRIX_COLUMN_TYPES,
 };
@@ -373,5 +423,9 @@ export default {
   min-height: initial;
   flex-grow: 1;
   align-self: center;
+}
+
+>>> .v-input--checkbox {
+  width: fit-content;
 }
 </style>

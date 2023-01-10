@@ -17,7 +17,7 @@ const addControl = async (type, { dataName, label, hint, moreInfo } = {}) => {
   await fireEvent.click(screen.getByTestId(`add-control-${type}`));
 
   const fields = [
-    [dataName, 'Data name'],
+    [dataName, 'Value'],
     [label, 'Label'],
     [hint, 'Hint'],
     [moreInfo, 'More info'],
@@ -34,7 +34,7 @@ const updateProperty = async (label, value, openAdvanced) => {
   if (openAdvanced) {
     await fireEvent.click(within(props).getByText(/advanced/i));
   }
-  const input = within(props).getByLabelText(label);
+  const input = within(props).getAllByLabelText(label)[0];
   await fireEvent.update(input, value);
 };
 
@@ -127,8 +127,8 @@ describe('add control', () => {
   describe('update properties', () => {
     // all the string/bool props with arbitrary control types
     [
-      { inputLabel: 'Data name', type: 'number', value: 'control_name', propPath: 'name' },
       { inputLabel: 'Label', type: 'string', value: 'Foo Bar', propPath: 'label' },
+      { inputLabel: 'Value', type: 'number', value: 'control_name', propPath: 'name' },
       { inputLabel: 'Hint', type: 'page', value: 'Heads up!', propPath: 'hint' },
       {
         inputLabel: 'More info',
@@ -136,6 +136,7 @@ describe('add control', () => {
         value: 'Info',
         propPath: 'moreInfo',
       },
+      { inputLabel: 'Default value', type: 'string', value: 'Initial', propPath: 'defaultValue' },
       { inputLabel: 'QR Code', type: 'string', value: true, propPath: 'options.enableQr' },
       { inputLabel: 'Required', type: 'matrix', value: true, propPath: 'options.required' },
       { inputLabel: 'Private', type: 'matrix', value: true, propPath: 'options.redacted' },
@@ -172,7 +173,7 @@ describe('add control', () => {
         openAdvanced: true,
       },
       {
-        inputLabel: 'Allow Multiple Selections',
+        inputLabel: 'Multiple select',
         type: 'farmOsFarm',
         value: true,
         propPath: 'options.hasMultipleSelections',
@@ -184,11 +185,24 @@ describe('add control', () => {
         propPath: 'options.buttonLabel',
       },
       {
-        inputLabel: 'Allow Multiple Selections',
+        inputLabel: 'Multiple select',
         type: 'ontology',
         value: true,
         propPath: 'options.hasMultipleSelections',
       },
+      {
+        inputLabel: 'Autocomplete',
+        type: 'ontology',
+        value: true,
+        propPath: 'options.allowAutocomplete',
+      },
+      {
+        inputLabel: 'Allow custom answer',
+        type: 'ontology',
+        value: true,
+        propPath: 'options.allowCustomSelection',
+      },
+
       {
         inputLabel: 'Show Polygon Control',
         type: 'geoJSON',

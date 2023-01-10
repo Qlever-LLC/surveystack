@@ -1,359 +1,343 @@
 <template>
-  <div>
+  <div class="property-panel">
     <v-card-title class="pl-0">Properties</v-card-title>
-
     <v-form v-if="control">
+      <!-- Default properties -->
+      <v-text-field v-model="control.label" label="Label" hide-details />
       <v-text-field
-        outlined
         v-model="control.name"
-        label="Data name"
+        label="Value"
         :disabled="!!control.libraryId && !control.isLibraryRoot"
         :rules="[nameIsUnique, nameHasValidCharacters, nameHasValidLength]"
+        hide-details
       />
-      <v-text-field outlined v-model="control.label" label="Label" />
-      <v-text-field outlined v-model="control.hint" label="Hint" />
-      <v-text-field outlined v-model="control.moreInfo" label="More info" />
+      <v-text-field v-model="control.hint" label="Hint" hide-details />
+      <v-text-field v-model="control.moreInfo" label="More info" hide-details />
 
-      <v-checkbox
-        v-if="isText"
-        outlined
-        v-model="control.options.enableQr"
-        :disabled="!!control.libraryId && !control.isLibraryRoot"
-        label="QR Code"
-      />
-
-      <div class="d-flex align-start" v-if="isScript">
-        <v-autocomplete
-          v-model="scriptSourceId"
-          v-if="isScript"
-          :items="scriptSourceItems"
-          :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-          label="Script Source"
-          item-text="name"
-          item-value="_id"
-          @focus="handleScriptSourceFocus"
-          @change="(id) => $emit('set-control-source', id)"
-          solo
-          outlined
-          chips
-          persistent-hint
-        >
-          <template v-slot:selection="{ item }">
-            <div>{{ item.name }}</div>
-          </template>
-        </v-autocomplete>
-        <v-btn icon class="mt-2" @click="(ev) => $emit('set-script-editor-is-visible', true)">
-          <v-icon>mdi-open-in-new</v-icon>
-        </v-btn>
-      </div>
-      <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
-
-      <v-text-field
-        v-if="control.type === 'script'"
-        outlined
-        v-model="control.options.buttonLabel"
-        label="Run Button Label"
-      />
-
-      <v-checkbox
-        class="ma-0 text--primary"
-        v-model="control.options.isNativeScript"
-        v-if="control.type === 'script'"
-        color="grey darken-1"
-        label="Native Script"
-        :disabled="!!control.libraryId && !control.isLibraryRoot"
-      >
-        <template slot="label">
-          <div>
-            <div class="text--primary">Native Script</div>
-            <div class="body-2">Show Download Link for Surveystack Kit APK</div>
-          </div>
-        </template>
-      </v-checkbox>
-
-      <v-textarea
-        v-model="scriptParams"
-        @input="handleScriptParamsChange"
-        v-if="isScript"
-        label="Parameters"
-        :rules="[validateScriptParams]"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-        outlined
-      />
-
-      <v-checkbox
-        class="my-1"
-        outlined
-        v-if="showRequiredOption"
-        v-model="control.options.required"
-        label="Required"
-        color="grey darken-1"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-      >
-        <template slot="label">
-          <div>
-            <div class="text--primary">Required</div>
-            <div class="body-2">Make this a required field</div>
-          </div>
-        </template>
-      </v-checkbox>
-
-      <v-checkbox v-if="isPage" class="my-1" color="grey darken-1" v-model="control.options.compact" label="Compact">
-        <template slot="label">
-          <div>
-            <div class="text--primary">Compact</div>
-            <div class="body-2">Reduce the spaces and combine fields into one card</div>
-          </div>
-        </template>
-      </v-checkbox>
-
-      <v-checkbox
-        class="my-1"
-        color="grey darken-1"
-        v-model="control.options.redacted"
-        label="Private"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-      >
-        <template slot="label">
-          <div>
-            <div class="text--primary">Private</div>
-            <div class="body-2">Only admins and original submitters can see this field</div>
-          </div>
-        </template>
-      </v-checkbox>
-
-      <v-checkbox
-        class="my-1"
-        color="grey darken-1"
-        v-if="survey.meta.isLibrary && !control.libraryIsInherited && !control.libraryId"
-        v-model="control.options.allowHide"
-        label="Allow hide"
-      >
-        <template slot="label">
-          <div>
-            <div class="text--primary">Allow hide</div>
-            <div class="body-2">Allow users of this question set to hide this question</div>
-          </div>
-        </template>
-      </v-checkbox>
-
-      <v-checkbox
-        class="my-1"
-        color="grey darken-1"
-        v-if="survey.meta.isLibrary && !control.libraryIsInherited && !control.libraryId"
-        v-model="control.options.allowModify"
-        label="Allow modify"
-      >
-        <template slot="label">
-          <div>
-            <div class="text--primary">Allow modify</div>
-            <div class="body-2">Allow users of this question set to modify this question</div>
-          </div>
-        </template>
-      </v-checkbox>
-
-      <v-checkbox
-        class="my-1"
-        color="grey darken-1"
-        v-if="control.libraryId && control.options.allowHide"
-        v-model="control.options.hidden"
-        label="Hidden"
-      >
-        <template slot="label">
-          <div>
-            <div class="text--primary">Hidden</div>
-            <div class="body-2">
-              Submitters can not see this field. This option is intentionally allowed by the question set designer
-            </div>
-          </div>
-        </template>
-      </v-checkbox>
-
-      <v-checkbox
-        class="ma-0"
-        color="grey darken-1"
-        v-model="control.options.allowCustomSelection"
-        v-if="isSelect || isOntology"
-        outlined
-        label="Allow Custom Entry"
+      <!-- Control properties -->
+      <v-text-field v-if="isText" v-model="control.defaultValue" label="Default value" hide-details />
+      <v-text-field v-if="isNumber" type="number" v-model="control.defaultValue" label="Default value" hide-details />
+      <instructions-editor
+        v-if="isInstructions"
+        v-model="control.options.source"
+        class="mt-6"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
-
-      <v-checkbox
-        class="ma-0"
-        color="grey darken-1"
-        v-model="control.options.hasMultipleSelections"
-        v-if="
-          control.type === 'ontology' ||
-          control.type === 'farmOsPlanting' ||
-          control.type === 'farmOsFarm' ||
-          control.type === 'farmOsField'
-        "
-        label="Allow Multiple Selections"
+      <instructions-image-split-editor
+        v-if="isInstructionsImageSplit"
+        v-model="control.options.source"
+        :resources="survey.resources"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        @set-survey-resources="(val) => $emit('set-survey-resources', val)"
+        @set-control-source="(val) => $emit('set-control-source', val)"
       />
-
-      <v-combobox
-        v-if="control.type === 'farmOsUuid'"
-        outlined
-        label="FarmOS Type"
-        v-model="control.options.farmOsType"
-        :items="control.options.farmOsTypes"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-      />
-
       <v-select
         v-if="isDate"
         :items="dateTypes"
         label="Type"
         v-model="control.options.subtype"
-        outlined
+        @input="() => (control.defaultValue = null)"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-      />
-
-      <div v-if="!showAdvanced" class="d-flex justify-end mt-4">
-        <v-btn @click="showAdvanced = true" color="grey darken-1" small text>advanced</v-btn>
-      </div>
-      <div v-else class="mt-2">
-        <div class="d-flex justify-space-between">
-          <v-card-title class="px-0 d-flex">Advanced Options</v-card-title>
-          <v-icon @click.stop="showAdvanced = false">mdi-close</v-icon>
-        </div>
-
-        <div class="d-flex">
-          <v-checkbox
-            class="ma-0"
-            color="grey darken-1"
-            outlined
-            v-model="relevance.enabled"
-            label="Relevance Expression"
-            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-          />
-          <v-spacer />
-          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-relevance')">
-            mdi-open-in-new
-          </v-icon>
-        </div>
-
-        <div class="d-flex">
-          <v-checkbox
-            color="grey darken-1"
-            class="ma-0"
-            outlined
-            v-model="calculate.enabled"
-            label="Calculate Expression"
-            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-          />
-          <v-spacer />
-          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-calculate')">
-            mdi-open-in-new
-          </v-icon>
-        </div>
-
-        <div class="d-flex">
-          <v-checkbox
-            class="ma-0"
-            color="grey darken-1"
-            outlined
-            v-model="constraint.enabled"
-            label="Constraint Expression"
-            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-          />
-          <v-spacer />
-          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-constraint')">
-            mdi-open-in-new
-          </v-icon>
-        </div>
-
-        <div class="d-flex">
-          <v-checkbox
-            class="ma-0"
-            color="grey darken-1"
-            outlined
-            v-model="apiCompose.enabled"
-            label="Api Compose Expression"
-            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-          />
-          <v-spacer />
-          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-api-compose')">
-            mdi-open-in-new
-          </v-icon>
-        </div>
-      </div>
-
-      <app-file-properties
-        v-if="isFile"
-        v-model="control.options.source"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-        class="mt-5"
+        hide-details
       />
       <select-items-editor
         v-if="isSelect"
         v-model="control.options.source"
+        @set-control-source="() => (control.defaultValue = null)"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-        class="mt-5"
+        class="mt-3"
       />
-      <app-ontology-properties
-        v-else-if="isOntology"
+      <ontology-properties
+        v-if="isOntology"
         :value="control.options.source"
         :resources="survey.resources"
         :disable-selection="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
-        class="mt-5"
       />
-      <app-matrix-properties
-        v-else-if="isMatrix"
+      <v-text-field
+        v-if="isMatrix"
+        v-model="control.options.source.config.addRowLabel"
+        label="Add Row label"
+        hide-details
+      />
+      <matrix-properties
+        v-if="isMatrix"
         v-model="control.options.source"
         :resources="survey.resources"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         :allowSetAllowHide="!!survey.meta.isLibrary"
         @set-control-source="(val) => $emit('set-control-source', val)"
         @set-survey-resources="(val) => $emit('set-survey-resources', val)"
-        class="mt-5"
         @set-control-required="control.options.required = true"
+        class="mt-3"
       />
-      <instructions-editor
-        v-else-if="isInstructions"
-        v-model="control.options.source"
+      <v-select
+        v-if="this.control.type === 'file'"
+        label="Restrict uploaded file types (.csv, .pdf, etc.)"
+        v-model="control.options.source.types"
+        :items="fileTypes"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        multiple
+        chips
+        clearable
+        deletable-chips
+        hide-details
+      />
+      <v-autocomplete
+        v-if="isScript"
+        label="Script Source"
+        v-model="scriptSourceId"
+        :items="scriptSourceItems"
+        item-text="name"
+        item-value="_id"
+        append-outer-icon="mdi-open-in-new"
+        @click:append-outer="() => $emit('set-script-editor-is-visible', true)"
+        @focus="handleScriptSourceFocus"
+        @change="(id) => $emit('set-control-source', id)"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        hide-details
+      >
+        <template v-slot:selection="{ item }">
+          <div>{{ item.name }}</div>
+        </template>
+      </v-autocomplete>
+      <v-text-field v-if="isScript" v-model="control.options.buttonLabel" label="Run Button Label" hide-details />
+      <!-- TODO: allow params to be written JS style, instead of strict JSON, fix updating -->
+      <v-textarea
+        v-if="isScript"
+        v-model="scriptParams"
+        @input="handleScriptParamsChange"
+        label="Parameters"
+        :rules="[validateScriptParams]"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        class="pt-3"
+        hide-details
+      />
+      <v-combobox
+        v-if="isFarmOsUuid"
+        label="FarmOS Type"
+        v-model="control.options.farmOsType"
+        :items="control.options.farmOsTypes"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
-      <instructions-image-split-editor
-        v-else-if="isInstructionsImageSplit"
-        v-model="control.options.source"
+      <checkbox
+        v-if="isSelect || isOntology"
+        class="ml-2"
+        label="Allow custom answer"
+        v-model="control.options.allowCustomSelection"
+        @input="
+          () => {
+            control.options.allowAutocomplete = true;
+            control.defaultValue = null;
+          }
+        "
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        dense
+      >
+        <template slot="helper-text">
+          Allows the user to input answers that do not exist within the provided items.
+          <span v-if="isOntology">This will also require <strong>Autocomplete</strong> is on</span>
+        </template>
+      </checkbox>
+      <checkbox
+        v-if="isOntology"
+        class="ml-2"
+        label="Autocomplete"
+        v-model="control.options.allowAutocomplete"
+        :disabled="
+          (!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot) ||
+          control.options.allowCustomSelection
+        "
+        helper-text="Provides selectable suggestions as a user types into it. It allows users to quickly search through and select from large collections of options"
+        dense
+      />
+      <ontology
+        v-if="isOntology"
+        v-model="control.defaultValue"
+        :multiple="control.options.hasMultipleSelections"
+        :customAnswer="control.options.allowCustomSelection"
+        :autocomplete="control.options.allowAutocomplete"
+        :source="control.options.source"
         :resources="survey.resources"
-        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-        @set-survey-resources="(val) => $emit('set-survey-resources', val)"
-        @set-control-source="(val) => $emit('set-control-source', val)"
+      />
+      <date
+        v-if="isDate && control.options.subtype"
+        v-model="control.defaultValue"
+        @input="() => $forceUpdate()"
+        :type="control.options.subtype"
+        class="mt-3"
+      />
+      <select-items
+        v-if="isSelect && control.options.source"
+        v-model="control.defaultValue"
+        :items="control.options.source"
+        :custom="control.options.allowCustomSelection"
+        :multiple="control.type === 'selectMultiple'"
+        class="mt-3"
       />
 
-      <geojson-properties v-if="isGeoJSON" v-model="control.options.geoJSON" />
+      <!-- Control options -->
+      <v-spacer></v-spacer>
+      <checkbox
+        v-if="showRequiredOption"
+        label="Required"
+        v-model="control.options.required"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        helper-text="Make this a required field"
+      />
+      <checkbox
+        label="Private"
+        v-model="control.options.redacted"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        helper-text="Only admins and original submitters can see this field"
+      />
+      <checkbox
+        v-if="isPage"
+        label="Compact"
+        v-model="control.options.compact"
+        helper-text="Reduce the spaces and combine fields into one card"
+      />
+      <checkbox
+        v-if="isText"
+        label="QR Code"
+        v-model="control.options.enableQr"
+        :disabled="!!control.libraryId && !control.isLibraryRoot"
+      />
+      <checkbox
+        v-if="survey.meta.isLibrary && !control.libraryIsInherited && !control.libraryId"
+        label="Allow modify"
+        v-model="control.options.allowModify"
+        helper-text="Allow users of this question set to modify this question"
+      />
+      <checkbox
+        v-if="survey.meta.isLibrary && !control.libraryIsInherited && !control.libraryId"
+        label="Allow hide"
+        v-model="control.options.allowHide"
+        helper-text="Allow users of this question set to hide this question"
+      />
+      <checkbox
+        v-if="control.libraryId && control.options.allowHide"
+        label="Hidden"
+        v-model="control.options.hidden"
+        helper-text="Submitters can not see this field. This option is intentionally allowed by the question set designer"
+      />
+      <checkbox
+        v-if="
+          control.type === 'ontology' ||
+          control.type === 'farmOsPlanting' ||
+          control.type === 'farmOsFarm' ||
+          control.type === 'farmOsField'
+        "
+        label="Multiple select"
+        v-model="control.options.hasMultipleSelections"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+      />
+      <checkbox
+        v-if="isFile"
+        label="Multiple upload"
+        v-model="control.options.source.allowMultiple"
+        helper-text="Allow user to upload multiple files"
+      />
+      <checkbox
+        v-if="control.type === 'script'"
+        label="Native Script"
+        v-model="control.options.isNativeScript"
+        :disabled="!!control.libraryId && !control.isLibraryRoot"
+        helper-text="Show Download Link for Surveystack Kit APK"
+      />
+      <template v-if="isGeoJSON">
+        <checkbox
+          v-for="opt in geoJsonOptions"
+          :key="opt.key"
+          :label="opt.text"
+          v-model="control.options.geoJSON[opt.key]"
+        />
+      </template>
+
+      <!-- Advanced properties -->
+      <v-btn v-if="!showAdvanced" color="grey darken-1" class="align-self-end" @click="showAdvanced = true" small text>
+        advanced
+      </v-btn>
+      <div v-else class="advanced pb-6">
+        <div>
+          <v-card-title class="px-0 py-0">Advanced Options</v-card-title>
+          <v-icon @click.stop="showAdvanced = false">mdi-close</v-icon>
+        </div>
+
+        <div>
+          <checkbox
+            label="Relevance Expression"
+            v-model="relevance.enabled"
+            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+          />
+          <v-icon color="grey darken-1" @click="$emit('code-relevance')" size="20"> mdi-open-in-new </v-icon>
+        </div>
+
+        <div>
+          <checkbox
+            label="Calculate Expression"
+            v-model="calculate.enabled"
+            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+          />
+          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-calculate')" size="20">
+            mdi-open-in-new
+          </v-icon>
+        </div>
+
+        <div>
+          <checkbox
+            label="Constraint Expression"
+            v-model="constraint.enabled"
+            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+          />
+          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-constraint')" size="20">
+            mdi-open-in-new
+          </v-icon>
+        </div>
+
+        <div>
+          <checkbox
+            label="Api Compose Expression"
+            v-model="apiCompose.enabled"
+            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+          />
+          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-api-compose')" size="20">
+            mdi-open-in-new
+          </v-icon>
+        </div>
+      </div>
     </v-form>
     <div v-else>...</div>
   </div>
 </template>
 <script>
 import { getAdvancedCodeTemplate, findParentByChildId } from '@/utils/surveys';
-import api from '@/services/api.service';
-import AppFileProperties from '@/components/builder/FileProperties.vue';
+import { nameHasValidCharacters, nameHasValidLength } from '@/utils/resources';
+import SelectItems from '@/components/builder/SelectItems.vue';
 import SelectItemsEditor from '@/components/builder/SelectItemsEditor.vue';
-import appMatrixProperties from '@/components/builder/MatrixProperties.vue';
-import appOntologyProperties from '@/components/builder/OntologyProperties.vue';
+import MatrixProperties from '@/components/builder/MatrixProperties.vue';
+import OntologyProperties from '@/components/builder/OntologyProperties.vue';
 import InstructionsEditor from '@/components/builder/TipTapEditor.vue';
 import InstructionsImageSplitEditor from '@/components/builder/InstructionsImageSplitEditor.vue';
-import GeoJSONProperties from '@/components/builder/GeoJSONProperties.vue';
+import Ontology from '@/components/builder/Ontology.vue';
+import Date from '@/components/builder/Date.vue';
+import Checkbox from '@/components/builder/Checkbox.vue';
+import api from '@/services/api.service';
 
 import { convertToKey } from '@/utils/builder';
 
 export default {
   components: {
-    AppFileProperties,
+    SelectItems,
     SelectItemsEditor,
+    OntologyProperties,
+    MatrixProperties,
     InstructionsEditor,
-    appOntologyProperties,
-    appMatrixProperties,
     InstructionsImageSplitEditor,
-    'geojson-properties': GeoJSONProperties,
+    Ontology,
+    Date,
+    Checkbox,
   },
   props: {
     control: {
@@ -398,18 +382,31 @@ export default {
           text: 'Week of Month and Year',
           value: 'date-week-month-year',
         },
-        // {
-        //   text: 'Year Only',
-        //   value: 'date-year',
-        // },
       ],
-      // nameRules: {
-      //   // const pat = new RegExp(this.controlNames.join('|'));
-      //   unique(val) {
-      //     console.log(this.controlNames.some(name => name === val));
-      //     return this.controlNames.some(name => name === val) ? true : 'date name must be unique';
-      //   },
-      // },
+      fileTypes: [
+        { text: 'PDF (.pdf)', value: 'application/pdf' },
+        { text: 'Spreadsheets (.csv)', value: 'text/csv' },
+        { text: 'Image (.gif, .png, .jpg, .jpeg)', value: 'image/*' },
+        { text: 'Plain text (.txt)', value: 'text/plain' },
+      ],
+      geoJsonOptions: [
+        {
+          key: 'showPolygon',
+          text: 'Show polygon control',
+        },
+        {
+          key: 'showLine',
+          text: 'Show line control',
+        },
+        {
+          key: 'showPoint',
+          text: 'Show point control',
+        },
+        {
+          key: 'showCircle',
+          text: 'Show circle control',
+        },
+      ],
     };
   },
   computed: {
@@ -427,6 +424,9 @@ export default {
     },
     isText() {
       return this.control.type === 'string';
+    },
+    isNumber() {
+      return this.control.type === 'number';
     },
     isScript() {
       return this.control.type === 'script';
@@ -452,21 +452,18 @@ export default {
     isPage() {
       return this.control.type === 'page';
     },
+    isFarmOsUuid() {
+      return this.control.type === 'farmOsUuid';
+    },
     showRequiredOption() {
-      if (this.control.options.required) {
-        // if current state is required, add possibility to clear required
-        return true;
-      }
-
-      if (['group', 'page', 'instructions', 'instructionsImageSplit'].includes(this.control.type)) {
-        return false;
-      }
-
-      return true;
+      return (
+        this.control.options.required ||
+        !['group', 'page', 'instructions', 'instructionsImageSplit'].includes(this.control.type)
+      );
     },
   },
   methods: {
-    nameIsUnique(val) {
+    nameIsUnique() {
       const hasSameNameAndDifferentId = (control) =>
         control.name === this.control.name && control.id !== this.control.id;
       const parent = findParentByChildId(this.control.id, this.controls);
@@ -474,16 +471,10 @@ export default {
       const controlsWithSameName = parent
         ? parent.children.filter(hasSameNameAndDifferentId)
         : this.controls.filter(hasSameNameAndDifferentId);
-      return controlsWithSameName.length > 0 ? 'Data name must be unique' : true;
+      return controlsWithSameName.length > 0 ? 'Value must be unique' : true;
     },
-    nameHasValidCharacters(val) {
-      const namePattern = /^[\w]*$/;
-      return namePattern.test(val) ? true : 'Data name must only contain valid charcters';
-    },
-    nameHasValidLength(val) {
-      const namePattern = /^.{1,}$/; // one character should be ok, especially within groups
-      return namePattern.test(val) ? true : 'Data name must be at least 1 characters in length';
-    },
+    nameHasValidCharacters,
+    nameHasValidLength,
     openAdvancedEditor() {
       // TODO: can't pass params to new window
       // Use Vuex maybe?
@@ -540,7 +531,7 @@ export default {
   },
   watch: {
     'control.name': {
-      handler(newVal, oldVal) {
+      handler(newVal) {
         const key = convertToKey(newVal);
         this.control.name = key;
       },
@@ -555,6 +546,47 @@ export default {
   },
   created() {
     this.updateScript();
+
+    // Adjust autocomplete option value to be compatible with original `ontology` question type
+    // https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56
+    if (typeof this.control.options.allowAutocomplete !== 'boolean') {
+      this.control.options.allowAutocomplete = this.control.options.allowCustomSelection || false;
+    }
   },
 };
 </script>
+
+<style scoped>
+.property-panel form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.property-panel form > * + *,
+.property-panel form > .advanced > * + * {
+  margin-top: 16px;
+}
+
+.property-panel form > .ml-2 + .ml-2 {
+  margin-top: 12px;
+}
+
+.property-panel form > .spacer {
+  height: 4px;
+}
+
+.property-panel form > .advanced > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.property-panel form > .advanced .v-input--selection-controls {
+  margin-top: 0;
+}
+
+.property-panel .v-input--selection-controls {
+  padding-top: 0;
+}
+</style>
