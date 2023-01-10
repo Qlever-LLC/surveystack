@@ -1,9 +1,8 @@
 import { ObjectId } from 'mongodb';
 import { db } from '../../db';
 import { aggregator } from './aggregator';
-import { uniqBy } from 'lodash';
+import uniq from 'lodash/uniq';
 import boom from '@hapi/boom';
-import _ from 'lodash';
 import { getDescendantGroups, getAscendantGroups } from '../roles.service';
 import { addGroupToCoffeeShop, isCoffeeShopEnabled, removeGroupFromCoffeeShop } from './coffeeshop';
 
@@ -20,9 +19,9 @@ export const asMongoId = (source) =>
   source instanceof ObjectId ? source : ObjectId(typeof source === 'string' ? source : source._id);
 
 /**
- * @param { Object } group who contains attribut path
+ * @param { Object } group who contains attribute path
  * @returns root group ID or null;
- * is RootGroup if group has an entry in farmos-group-settigns
+ * is RootGroup if group has an entry in farmos-group-settings
  */
 export const getFarmOSRootGroup = async (ascendantGroups, descendantGroups) => {
   const union = [...ascendantGroups, ...descendantGroups];
@@ -631,7 +630,7 @@ export const getMemberInformationForDomain = async (descendants) => {
 
   // console.log(JSON.stringify(res, null, 2));
 
-  const groupIds = _.uniq(res.flatMap((item) => item['group_mappings'].map((gm) => gm.groupId)));
+  const groupIds = uniq(res.flatMap((item) => item['group_mappings'].map((gm) => gm.groupId)));
   // console.log("groupIds", groupIds);
 
   const groups = await db
@@ -681,7 +680,7 @@ export const getMemberInformationForDomain = async (descendants) => {
       };
     });
 
-  const mappedInstances = _.uniq(
+  const mappedInstances = uniq(
     prj.flatMap((item) => item.connectedFarms.map((f) => f.instanceName))
   );
   const farmosInstancesMappedToAllGroups = await db
@@ -785,7 +784,7 @@ export const getGroupInformation = async (groupId, isSuperAdmin = false) => {
 
   // by users
 
-  const userIds = _.uniq(membersRawData.members.map((m) => m.user + ''));
+  const userIds = uniq(membersRawData.members.map((m) => m.user + ''));
   const members = [];
 
   // console.log("userids", userIds);
@@ -891,7 +890,7 @@ export const disableSubgroupsAllowCreateInstances = async (groupId) => {
   return await updateSubgroupsAllowCreateInstances(groupId, false);
 };
 
-const updateEnableCoffeShop = async (groupId, enable) => {
+const updateEnableCoffeeShop = async (groupId, enable) => {
   const res = await db.collection('groups').findOne({ _id: asMongoId(groupId) });
   if (!res) {
     throw boom.notFound();
@@ -910,9 +909,9 @@ const updateEnableCoffeShop = async (groupId, enable) => {
 };
 
 export const enableCoffeeshop = async (groupId) => {
-  return await updateEnableCoffeShop(groupId, true);
+  return await updateEnableCoffeeShop(groupId, true);
 };
 
 export const disableCoffeeshop = async (groupId) => {
-  return await updateEnableCoffeShop(groupId, false);
+  return await updateEnableCoffeeShop(groupId, false);
 };
