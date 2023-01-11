@@ -267,6 +267,8 @@ import {
   isResourceReferenced,
 } from '@/utils/surveys';
 import api from '@/services/api.service';
+import { resourceLocations, resourceTypes, setResource } from '@/utils/resources';
+import ObjectId from 'bson-objectid';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 

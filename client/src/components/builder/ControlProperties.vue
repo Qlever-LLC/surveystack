@@ -94,7 +94,7 @@
         append-outer-icon="mdi-open-in-new"
         @click:append-outer="() => $emit('set-script-editor-is-visible', true)"
         @focus="handleScriptSourceFocus"
-        @change="(id) => $emit('set-control-source', id)"
+        @change="handleScriptSourceChange"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         hide-details
       >
