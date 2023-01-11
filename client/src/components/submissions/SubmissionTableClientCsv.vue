@@ -206,7 +206,10 @@ import papa from 'papaparse';
 import csvService from '@/services/csv.service';
 import SubmissionTableCellModal from './SubmissionTableCellModal.vue';
 import { getLabelFromKey, openResourceInTab } from '@/utils/resources';
-import moment from 'moment';
+import parse from 'date-fns/parse';
+import parseISO from 'date-fns/parseISO';
+import isValid from 'date-fns/isValid';
+import format from 'date-fns/format';
 import cloneDeep from 'lodash/cloneDeep';
 import omit from 'lodash/omit';
 
@@ -394,22 +397,18 @@ export default {
   methods: {
     getLabelFromKey,
     getCellValue(item, header) {
-      if (typeof item === 'string') {
-        return item || ' ';
+      const value = typeof item === 'string' ? item : typeof item[header] === 'string' ? item[header] : null;
+
+      // Parse date
+      let parsedDate = parseISO(value);
+      if (!isValid(parsedDate)) {
+        parsedDate = parse(value, 'yyyy-MM-dd', new Date());
+      }
+      if (isValid(parsedDate)) {
+        return format(parsedDate, 'MMM d, yyyy h:mm a');
       }
 
-      const value = item[header];
-      if (typeof value !== 'string') {
-        return ' ';
-      }
-
-      const parsedDate = Date.parse(value);
-      if (!isNaN(parsedDate) && new Date(parsedDate).toISOString() === value) {
-        const dateValue = moment(value);
-        return dateValue.format('MMM D, YYYY h:mm A');
-      }
-
-      return value;
+      return value || ' ';
     },
     shouldTruncate(value) {
       return value.length > this.textTruncateLength;
@@ -439,7 +438,7 @@ export default {
       this.modalShowCopyButton = false;
     },
     createCustomFilter(field) {
-      return (value, search, item) => {
+      return (value) => {
         if (!this.searchFields[field]) {
           return true;
         }

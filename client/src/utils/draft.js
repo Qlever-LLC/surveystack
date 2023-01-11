@@ -1,6 +1,6 @@
 import { linearControlsWithGroups } from '@/utils/submissions';
 
-export const getApiComposeErros = (survey, submission) => {
+export const getApiComposeErrors = (survey, submission) => {
   const errors = [];
   linearControlsWithGroups(survey, submission).forEach((control) => {
     console.log('walking through', control);

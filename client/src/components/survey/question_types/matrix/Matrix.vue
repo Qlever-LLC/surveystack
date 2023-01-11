@@ -129,9 +129,9 @@ import appMatrixCell from '@/components/survey/question_types/matrix/MatrixCell.
 import appMatrixTable from '@/components/survey/question_types/matrix/MatrixTable.vue';
 import appRequired from '@/components/survey/drafts/Required.vue';
 import appRedacted from '@/components/survey/drafts/Redacted.vue';
-
 import baseQuestionComponent from '../BaseQuestionComponent';
 import farmosBase from '../FarmOsBase';
+import { cleanupAutocompleteMatrix } from '@/utils/surveys';
 
 /* copied from FarmOsPlanting.vue */
 const hashItem = (listItem) => {
@@ -256,8 +256,13 @@ export default {
       return this.control.options.source;
     },
     headers() {
-      // remove all hidden headers
-      return this.source.content.filter((header) => !header.hidden);
+      return (
+        this.source.content
+          // remove all hidden headers
+          .filter((header) => !header.hidden)
+          // Compatible with original `autocomplete` question type (https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56)
+          .map(cleanupAutocompleteMatrix)
+      );
     },
     fields() {
       return this.source.content.map((col) => col.value);
@@ -272,8 +277,7 @@ export default {
       get() {
         return this.rowToBeDeleted >= 0;
       },
-      set(v) {
-        // set from dialog close
+      set() {
         this.rowToBeDeleted = -1;
       },
     },
@@ -298,17 +302,17 @@ export default {
   methods: {
     add() {
       // create empty row object from headers
-      const newRow = this.fields.reduce((accu, current) => ({ ...accu, [current]: { value: null } }), {});
-
-      // eslint-disable-next-line
+      const newRow = this.fields.reduce((prev, current) => ({ ...prev, [current]: { value: null } }), {});
       for (const key of Object.keys(newRow)) {
         const header = this.headers.find((h) => h.value === key);
-
-        if (header && header.redacted) {
+        if (!header) {
+          continue;
+        }
+        if (header.redacted) {
           newRow[key].meta = { permissions: ['admin'] };
         }
+        newRow[key].value = header.defaultValue || null;
       }
-
       if (this.rows === null) {
         this.rows = [];
       }

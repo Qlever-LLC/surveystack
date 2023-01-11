@@ -93,7 +93,7 @@
       </pane>
 
       <pane class="pane pane-controls" v-if="control">
-        <v-card class="px-4 pb-3 mb-3">
+        <v-card class="px-4 pb-3 m-2 mb-3">
           <!-- <v-card-title class="pl-0">Details</v-card-title> -->
           <control-properties
             v-if="control"
@@ -238,9 +238,6 @@
 <script>
 import { cloneDeep, isEqual, isEqualWith, uniqBy } from 'lodash';
 import { Pane, Splitpanes } from 'splitpanes';
-
-import moment from 'moment';
-
 import graphicalView from '@/components/builder/GraphicalView.vue';
 import controlProperties from '@/components/builder/ControlProperties.vue';
 import questionLibrary from '@/components/survey/library/QuestionLibrary.vue';
@@ -248,20 +245,16 @@ import controlAdder from '@/components/builder/ControlAdder.vue';
 import surveyDetails from '@/components/builder/SurveyDetails.vue';
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 import consoleLog from '@/components/builder/ConsoleLog.vue';
-
 import appCodeView from '@/components/builder/CodeView.vue';
 import appExamplesView from '@/components/builder/ExamplesView.vue';
-
 import appMixin from '@/components/mixin/appComponent.mixin';
-import api from '@/services/api.service';
+import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
 import slugify from '@/utils/slugify';
-
 import { defaultApiCompose } from '@/utils/apiCompose';
-
-import submissionUtils from '@/utils/submissions';
-import { SPEC_VERSION_SCRIPT } from '@/constants';
+import { createSubmissionFromSurvey } from '@/utils/submissions';
 import { availableControls, createControlInstance } from '@/utils/surveyConfig';
 import * as surveyStackUtils from '@/utils/surveyStack';
+import { SPEC_VERSION_SCRIPT } from '@/constants';
 import {
   executeUnsafe,
   getFlatName,
@@ -273,9 +266,7 @@ import {
   insertControl,
   isResourceReferenced,
 } from '@/utils/surveys';
-import UpdateLibraryDialog from '@/components/survey/library/UpdateLibraryDialog';
-import { resourceLocations, resourceTypes, setResource } from '@/utils/resources';
-import ObjectId from 'bson-objectid';
+import api from '@/services/api.service';
 
 const codeEditor = () => import('@/components/ui/CodeEditor.vue');
 
@@ -398,7 +389,7 @@ export default {
       this.dirty = true;
       const { latestVersion } = this.initialSurvey;
       const nextVersion = latestVersion + 1;
-      const date = moment().toISOString(true);
+      const date = new Date().toISOString();
 
       const nextVersionObj = this.survey.revisions.find((revision) => revision.version === latestVersion);
       nextVersionObj.version = nextVersion;
@@ -568,15 +559,15 @@ export default {
       this.selectedTab = tabMap.indexOf(tab);
 
       if (!this.control.options[tab].code) {
-        let initalCode;
+        let initialCode;
         if (tab === 'apiCompose') {
-          initalCode = defaultApiCompose;
+          initialCode = defaultApiCompose;
         } else {
-          initalCode = initialRelevanceCode(tab);
+          initialCode = initialRelevanceCode(tab);
         }
 
-        this.control.options[tab].code = initalCode;
-        this.activeCode = initalCode;
+        this.control.options[tab].code = initialCode;
+        this.activeCode = initialCode;
       } else {
         this.activeCode = this.control.options[tab].code;
       }
@@ -644,7 +635,7 @@ export default {
     setScriptCode(data) {
       if (!data) {
         // default empty script...
-        // ideally we shouldnt need to instantiate inside SurveyBuilder
+        // ideally we shouldn't need to instantiate inside SurveyBuilder
         this.scriptCode = {
           _id: null,
           name: 'New Script',
@@ -703,7 +694,6 @@ export default {
       this.showLibrary = false;
     },
     openLibrary(libraryId) {
-      this.control = null;
       this.showLibrary = true;
       if (libraryId) {
         this.libraryId = libraryId;
@@ -789,7 +779,7 @@ export default {
     createInstance() {
       const { version } = this.survey.revisions[this.survey.revisions.length - 1];
 
-      this.instance = submissionUtils.createSubmissionFromSurvey({
+      this.instance = createSubmissionFromSurvey({
         survey: this.survey,
         version,
         instance: this.instance,
@@ -870,7 +860,6 @@ export default {
     controlId() {
       const position = getPosition(this.control, this.currentControls);
       const id = getFlatName(this.currentControls, position);
-      console.log('controlId', id);
       return id;
     },
     hasCode() {
@@ -977,7 +966,7 @@ export default {
       deep: true,
     },
     survey: {
-      handler(newVal, oldVal) {
+      handler(newVal) {
         this.initNavbarAndDirtyFlag(newVal);
         if (!this.initialSurvey || !this.survey) {
           this.surveyUnchanged = true;

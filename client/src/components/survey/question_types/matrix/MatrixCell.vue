@@ -2,12 +2,7 @@
   <v-text-field
     v-if="header.type === 'text'"
     :value="value"
-    @input="
-      (v) => {
-        value = getValueOrNull(v);
-        onInput();
-      }
-    "
+    @input="onInput"
     outlined
     hide-details
     autocomplete="off"
@@ -18,12 +13,7 @@
       <v-text-field
         ref="text-qrcode"
         :value="value"
-        @input="
-          (v) => {
-            value = getValueOrNull(v);
-            onInput();
-          }
-        "
+        @input="onInput"
         outlined
         hide-details
         autocomplete="off"
@@ -31,100 +21,84 @@
       />
     </div>
     <div style="flex: 0; display: flex; align-items: center">
-      <app-qr-scanner
-        class="mx-2 py-2"
-        ref="scan-button"
-        small
-        @codeDetected="
-          (v) => {
-            // console.log('value is', v);
-            value = getValueOrNull(v);
-            onInput();
-          }
-        "
-      />
+      <app-qr-scanner class="mx-2 py-2" ref="scan-button" small @codeDetected="onInput" />
     </div>
   </div>
-
   <v-text-field
     v-else-if="header.type === 'farmos_uuid'"
     :value="localValue"
-    @input="
-      (v) => {
-        if (!this.value || this.value.name !== v) {
-          const text = getValueOrNull(v);
-          value = {
-            name: text,
-            id: uuidv4(),
-          };
-        }
-        onInput();
-      }
-    "
+    @input="onInput"
     outlined
     hide-details
     autocomplete="off"
     :disabled="disabled"
   />
-
   <v-text-field
     v-else-if="header.type === 'number'"
     :value="value"
-    @input="
-      (v) => {
-        value = handleNumberInput(v);
-        onInput();
-      }
-    "
+    @input="onNumberInput"
     type="number"
     outlined
     hide-details
     :disabled="disabled"
   />
   <v-select
-    v-else-if="header.type === 'dropdown'"
+    v-else-if="header.type === 'dropdown' && !header.custom && !header.autocomplete"
+    :placeholder="header.multiple ? 'Select answers' : 'Select answer'"
+    :value="value"
+    @input="onInput"
     :items="items"
     item-text="label"
     item-value="value"
-    :value="value"
-    @input="
-      (v) => {
-        value = getValueOrNull(v);
-        onInput();
-      }
-    "
-    hide-details
-    outlined
     :multiple="header.multiple"
     :disabled="disabled"
+    hide-details
+    outlined
   >
     <template v-slot:selection="{ item, index }">
       <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
     </template>
   </v-select>
-  <v-combobox
-    v-else-if="header.type === 'autocomplete' && header.custom"
+  <v-autocomplete
+    v-else-if="header.type === 'dropdown' && !header.custom && header.autocomplete"
+    ref="dropdownRef"
+    placeholder="Type to search"
+    :value="value"
+    @input="onDropDownInput"
+    :search-input.sync="comboboxSearch"
     :items="items"
     item-text="label"
     item-value="value"
-    :value="value"
-    @input="
-      (v) => {
-        comboboxSearch = null;
-        value = getValueOrNull(v);
-        onInput();
-      }
-    "
     :delimiters="[',']"
+    :return-object="false"
     :multiple="header.multiple"
     :disabled="disabled"
-    :return-object="false"
-    :search-input.sync="comboboxSearch"
+    hide-details
     outlined
-    class="custom-ontology"
   >
     <template v-slot:selection="{ item, index }">
-      <matrix-cell-selection-label :label="getLabel(item)" :index="index" :value="value" />
+      <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
+    </template>
+  </v-autocomplete>
+  <v-combobox
+    v-else-if="header.type === 'dropdown' && header.custom"
+    ref="dropdownRef"
+    placeholder="Type to search or add custom answer"
+    :value="value"
+    @input="onDropDownInput"
+    :search-input.sync="comboboxSearch"
+    :items="items"
+    item-text="label"
+    item-value="value"
+    :delimiters="[',']"
+    :return-object="false"
+    :multiple="header.multiple"
+    :disabled="disabled"
+    hide-details
+    outlined
+  >
+    <template v-slot:selection="{ item, index }">
+      <matrix-cell-selection-label :label="getDropdownLabel(item)" :index="index" :value="value" />
     </template>
     <template v-slot:no-data>
       <v-list-item>
@@ -138,39 +112,11 @@
     </template>
   </v-combobox>
   <v-autocomplete
-    v-else-if="header.type === 'autocomplete' && !header.custom"
-    :items="items"
-    item-text="label"
-    item-value="value"
-    :value="value"
-    @input="
-      (v) => {
-        comboboxSearch = null;
-        value = getValueOrNull(v);
-        onInput();
-      }
-    "
-    hide-details
-    outlined
-    :multiple="header.multiple"
-    :disabled="disabled"
-    :search-input.sync="comboboxSearch"
-  >
-    <template v-slot:selection="{ item, index }">
-      <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
-    </template>
-  </v-autocomplete>
-  <v-autocomplete
     v-else-if="header.type === 'farmos_field'"
     :items="farmos.farms || []"
     :multiple="header.multiple"
     :value="value"
-    @input="
-      (v) => {
-        value = getValueOrNull(v);
-        onInput();
-      }
-    "
+    @input="onInput"
     :label="value ? value.farmName : null"
     item-text="value.name"
     item-value="value"
@@ -204,12 +150,7 @@
     v-else-if="header.type === 'farmos_planting'"
     :multiple="header.multiple"
     :value="value"
-    @input="
-      (v) => {
-        value = getValueOrNull(localChange(v));
-        onInput();
-      }
-    "
+    @input="(v) => onInput(localChange(v))"
     :items="farmos.plantings || []"
     :label="value ? value.farmName : null"
     item-text="value.name"
@@ -230,18 +171,12 @@
       offset-y
       max-width="290px"
       min-width="290px"
-      ref="datepickermenu"
+      ref="datepickerRef"
       :disabled="disabled"
     >
       <template v-slot:activator="{ on, attrs }">
         <v-text-field
-          :value="value"
-          @input="
-            (v) => {
-              value = v;
-              onInput();
-            }
-          "
+          :value="getDateLabel"
           @click="setActivePickerMonth"
           hide-details
           v-bind="attrs"
@@ -251,19 +186,18 @@
           :disabled="disabled"
           :style="{ pointerEvents: disabled ? 'none' : 'auto' }"
           readonly
-        ></v-text-field>
+        />
       </template>
       <v-date-picker
         :value="value"
         @input="
           (v) => {
-            value = v;
+            onDateInput(v);
             menus[`${index}_${header.value}`] = false;
-            onInput();
           }
         "
         no-title
-      ></v-date-picker>
+      />
     </v-menu>
   </div>
 
@@ -275,6 +209,10 @@ import { getValueOrNull } from '@/utils/surveyStack';
 import appQrScanner from '@/components/ui/QrScanner.vue';
 import { uuidv4 } from '@/utils/surveys';
 import MatrixCellSelectionLabel from './MatrixCellSelectionLabel.vue';
+import parse from 'date-fns/parse';
+import parseISO from 'date-fns/parseISO';
+import isValid from 'date-fns/isValid';
+import format from 'date-fns/format';
 
 export default {
   components: {
@@ -332,35 +270,55 @@ export default {
     items() {
       return this.getDropdownItems(this.header.value, Array.isArray(this.value) ? this.value : [this.value]);
     },
+    getDateLabel() {
+      const date = parseISO(this.value);
+      if (!isValid(date)) {
+        return '';
+      }
+      return format(date, 'yyyy-MM-dd');
+    },
   },
   methods: {
     getValueOrNull,
     uuidv4,
-    onInput() {
+    onInput(value) {
+      this.value = getValueOrNull(value);
       this.$emit('changed');
     },
-    handleNumberInput(v) {
-      if (v === '') {
-        return null;
+    onDateInput(value) {
+      const date = parse(value, 'yyyy-MM-dd', new Date());
+      if (!isValid(date)) {
+        return;
       }
-
-      const n = Number(v);
-
-      // eslint-disable-next-line
-      if (isNaN(n)) {
-        return null;
-      }
-
-      return n;
+      this.value = date.toISOString();
+      this.$emit('changed');
     },
-    getLabel(value) {
+    onFarmOsInput(value) {
+      if (!this.value || this.value.name !== value) {
+        this.value = { id: uuidv4(), name: getValueOrNull(value) };
+        this.$emit('changed');
+      }
+    },
+    onNumberInput(value) {
+      const numValue = Number(value);
+      this.value = isNaN(numValue) ? null : numValue;
+      this.$emit('changed');
+    },
+    onDropDownInput(value) {
+      this.onInput(value);
+      this.comboboxSearch = null;
+      if (this.$refs.dropdownRef) {
+        this.$refs.dropdownRef.isMenuActive = false;
+      }
+    },
+    getDropdownLabel(value) {
       const dropdownItems = this.items;
       const found = dropdownItems.find((i) => i.value === value);
       return found ? found.label : value;
     },
     setActivePickerMonth() {
       setTimeout(() => {
-        this.$refs.datepickermenu.$children[1].$children[0].activePicker = 'MONTH';
+        this.$refs.datepickerRef.$children[1].$children[0].activePicker = 'MONTH';
       });
     },
     // copied/adapted from FarmOsPlanting.vue
@@ -416,6 +374,16 @@ export default {
       }
 
       return assets;
+    },
+  },
+  watch: {
+    comboboxSearch(newVal) {
+      const match = newVal
+        ? this.items.find((item) => item.label.toLowerCase().indexOf(newVal.toLowerCase()) >= 0)
+        : undefined;
+      if (!match) {
+        this.$refs.dropdownRef.setMenuIndex(-1);
+      }
     },
   },
 };

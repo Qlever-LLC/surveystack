@@ -219,9 +219,7 @@ export default {
       getSubmissionCount,
       getQSConsumerCount,
       isVersionDeletable(version) {
-        return (
-          cleanupInfoResponse.value.versionsToDelete.includes(String(version)) && getQSConsumerCount(version) === 0
-        );
+        return !cleanupInfoResponse.value.versionsToKeep.includes(String(version)); //Hint: checking against versionsToKeep instead of versionsToDelete as drafts may not be included in versionsToDelete
       },
       selectedVersionsToDelete,
       deleteVersionsIsLoading,
