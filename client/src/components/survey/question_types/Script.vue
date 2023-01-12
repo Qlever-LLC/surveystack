@@ -85,6 +85,7 @@ import api from '@/services/api.service';
 import BaseQuestionComponent from './BaseQuestionComponent';
 import * as surveyStackUtils from '@/utils/surveyStack';
 import appDialog from '@/components/ui/Dialog.vue';
+import store from '@/store';
 
 export default {
   mixins: [BaseQuestionComponent],
@@ -234,15 +235,19 @@ export default {
       //TODO fetch from cache/indexeddb/store if user offline
       const resourceId = this.control && this.control.options && this.control.options.source;
       const scriptResource = this.resources.find((r) => r.id === resourceId);
-      let scriptId;
+      let script;
       if (scriptResource) {
-        scriptId = scriptResource.content;
+        //load script from store
+        let resourceContainingScriptData = await store.dispatch('resources/fetchScriptResource', scriptResource);
+        script = resourceContainingScriptData.fileData;
       } else {
         //fallback to directly using script id
-        scriptId = this.control.options.source;
+        let scriptId = this.control.options.source;
+        const { data } = await api.get(`/scripts/${scriptId}`);
+        script = data;
       }
-      const { data } = await api.get(`/scripts/${scriptId}`);
-      this.source = data;
+
+      this.source = script;
     },
   },
   watch: {

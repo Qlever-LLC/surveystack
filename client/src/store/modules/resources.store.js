@@ -173,7 +173,7 @@ const actions = {
         db.persistResource(resourceStored);
         commit('ADD_RESOURCE', resourceStored);
       }
-      return resource;
+      return resourceStored;
     } catch (error) {
       dispatch('feedback/add', `Could not fetch resource ${resource.id}. This problem is reported automatically.`, {
         root: true,
