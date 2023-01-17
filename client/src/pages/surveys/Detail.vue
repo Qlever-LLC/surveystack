@@ -209,13 +209,16 @@ export default {
     const { group } = this.$route.query;
 
     if (group) {
+      //TODO CHECK THIS
       this.$store.dispatch('surveys/fetchPinned'); // TODO do we need fetchPinned?
       await autoSelectActiveGroup(this.$store, group);
     }
 
+    //TODO also fetch scripts here in case survey is not pinned?
     const { data: entity } = await api.get(`/surveys/${id}`);
     this.entity = entity;
 
+    //TODO CHECK THIS . thats not cached by fetch pinned, so this will probably throw in offline
     const { data: surveyInfo } = await api.get(`/surveys/info?id=${id}`);
     this.surveyInfo = surveyInfo;
 
