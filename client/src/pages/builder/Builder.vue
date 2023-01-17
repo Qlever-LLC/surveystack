@@ -110,7 +110,7 @@ import resultMixin from '@/components/ui/ResultsMixin';
 import { createSurvey, updateControls } from '@/utils/surveys';
 import { isIos, isSafari } from '@/utils/compatibility';
 import { uploadFileResources } from '@/utils/resources';
-import { getApiComposeErros } from '@/utils/draft';
+import { getApiComposeErrors } from '@/utils/draft';
 import VersionsDialog from '@/components/builder/VersionsDialog';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
@@ -191,7 +191,7 @@ export default {
       }
     },
     async submitSubmission({ payload }) {
-      this.apiComposeErrors = getApiComposeErros(this.survey, payload);
+      this.apiComposeErrors = getApiComposeErrors(this.survey, payload);
       if (this.apiComposeErrors.length > 0) {
         this.showApiComposeErrors = true;
         return;

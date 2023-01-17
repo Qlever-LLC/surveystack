@@ -1,7 +1,7 @@
 import * as db from '@/store/db';
 import api from '@/services/api.service';
 
-import submissionUtils from '@/utils/submissions';
+import { createSubmissionFromSurvey } from '@/utils/submissions';
 
 import router from '@/router';
 
@@ -118,7 +118,7 @@ const actions = {
       { id: survey._id, version: activeVersion },
       { root: true }
     );
-    const submission = submissionUtils.createSubmissionFromSurvey({
+    const submission = createSubmissionFromSurvey({
       survey: surveyEntity,
       version: activeVersion,
       submitAsUser: submitAsUser,

@@ -77,17 +77,15 @@
                   <v-list-item-subtitle v-if="e.meta && e.meta.group && e.meta.group.id">
                     {{ getGroupName(e.meta.group.id) }}
                   </v-list-item-subtitle>
-                  <small v-if="e.latestVersion" class="grey--text">Survey Version {{ e.latestVersion }}</small
-                  ><br />
-                  <small class="grey--text">created {{ e.createdAgo }} ago</small>
+                  <small v-if="e.latestVersion" class="grey--text">Survey Version {{ e.latestVersion }}</small>
+                  <br />
+                  <small v-if="e.createdAgo" class="grey--text">created {{ e.createdAgo }} ago</small>
                 </div>
               </v-list-item-content>
             </v-list-item>
             <v-divider v-if="i < surveys.content.length - 1" />
           </div>
-          <div v-if="surveys.content.length < 1" class="py-12 text-center">
-            No surveys available
-          </div>
+          <div v-if="surveys.content.length < 1" class="py-12 text-center">No surveys available</div>
         </v-card-text>
         <v-card-actions>
           <v-pagination
@@ -103,7 +101,9 @@
 </template>
 
 <script>
-import moment from 'moment';
+import isValid from 'date-fns/isValid';
+import parseISO from 'date-fns/parseISO';
+import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
 
 const PAGINATION_LIMIT = 10;
@@ -111,7 +111,6 @@ const PAGINATION_LIMIT = 10;
 export default {
   data() {
     return {
-      now: moment(),
       selectedGroupIds: [],
       activeTab: null,
       page: 1,
@@ -249,7 +248,7 @@ export default {
     async fetchData({ user, groups = [] } = {}) {
       //  TODO create two lists, filter by active group and others
       // const groupsParam = (groups || [this.activeGroupId]).map(group => `group[]=${group}`).join('&');
-      const now = moment();
+      const now = new Date();
       const queryParams = new URLSearchParams();
       if (user) {
         queryParams.append('creator', user);
@@ -272,11 +271,12 @@ export default {
         const { data } = await api.get(`/surveys/list-page?${queryParams}`);
         this.surveys = data;
         this.surveys.content.forEach((s) => {
-          if (!s.meta || !s.meta.dateCreated) {
-            return;
+          if (s.meta) {
+            const parsedDate = parseISO(s.meta.dateCreated);
+            if (isValid(parsedDate)) {
+              s.createdAgo = formatDistance(parsedDate, now);
+            }
           }
-          // eslint-disable-next-line no-param-reassign
-          s.createdAgo = moment.duration(now.diff(s.meta.dateCreated)).humanize();
         });
         return data;
       } catch (e) {

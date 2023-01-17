@@ -110,7 +110,7 @@ describe('surveyDiff', () => {
         "Control types don't match"
       );
     });
-    it('compares all the common fileds', () => {
+    it('compares all the common fields', () => {
       const commonFields = [
         'type',
         'name',

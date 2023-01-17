@@ -112,7 +112,7 @@
       </v-data-table>
     </v-card-text>
     <v-spacer />
-    <v-card-actions class="select-table-actions d-flex justify-end mr-3 align-start">
+    <v-card-actions class="d-flex justify-end mr-3 align-start">
       <v-btn text class="ml-4" @click="close">Close</v-btn>
     </v-card-actions>
 

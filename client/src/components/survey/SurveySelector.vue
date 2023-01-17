@@ -30,7 +30,9 @@
 </template>
 
 <script>
-import moment from 'moment';
+import isValid from 'date-fns/isValid';
+import parseISO from 'date-fns/parseISO';
+import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 
 export default {
   props: {
@@ -62,7 +64,8 @@ export default {
   },
   methods: {
     renderDateFromNow(date) {
-      return moment(date).fromNow();
+      const parsedDate = parseISO(date);
+      return isValid(parsedDate) ? formatDistanceToNow(parseISO(date), { addSuffix: true }) : '';
     },
   },
   mounted() {

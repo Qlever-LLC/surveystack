@@ -4,8 +4,7 @@
 
 import { unflatten } from 'flat';
 import { clone, cloneDeep, set } from 'lodash';
-import moment from 'moment';
-import submissionUtils from './submissions';
+import { getSubmissionField } from './submissions';
 import { SPEC_VERSION_SURVEY } from '@/constants';
 import supplySandbox from './supplySandbox';
 import ObjectID from 'bson-objectid';
@@ -561,11 +560,6 @@ export function compileSandbox(src, fname) {
   };
 }
 
-export const handleize = (str) => {
-  const handle = str && str.toLowerCase().replace(/\s/gi, '-');
-  return handle;
-};
-
 export const simplify = (submissionItem) => {
   if (submissionItem.meta !== undefined && submissionItem.meta.type !== 'group') {
     return submissionItem.value || null;
@@ -660,7 +654,7 @@ const firstParentWithRelevance = (submission, survey, index, positions) => {
   }
   parts.reverse();
   const relevantParent = parts.find((p) => {
-    const field = submissionUtils.getSubmissionField(submission, survey, p);
+    const field = getSubmissionField(submission, survey, p);
     return field.meta.relevant === false;
   });
 
@@ -669,7 +663,7 @@ const firstParentWithRelevance = (submission, survey, index, positions) => {
 
 export const isRelevant = (submission, survey, index, positions) => {
   const relevantPosition = firstParentWithRelevance(submission, survey, index, positions) || positions[index];
-  const field = submissionUtils.getSubmissionField(submission, survey, relevantPosition);
+  const field = getSubmissionField(submission, survey, relevantPosition);
   return field.meta.relevant;
 };
 
@@ -1042,7 +1036,7 @@ export function updateControls(
  * @param {number} options.specVersion specification version for survey definition
  */
 export function createSurvey({ creator = null, group = null, specVersion = SPEC_VERSION_SURVEY }) {
-  const currentDate = moment().toISOString(true);
+  const currentDate = new Date().toISOString();
   return {
     _id: '',
     name: '',
@@ -1085,3 +1079,15 @@ export const calcSurveySizeMB = (survey) => {
   const megaBytes = kiloBytes / 1024;
   return Math.round(megaBytes * 10) / 10;
 };
+
+export function cleanupAutocompleteMatrix(content) {
+  const isAutocomplete = content.type === 'autocomplete';
+  const custom = content.custom || false;
+  const autocomplete = isAutocomplete || custom || content.autocomplete || false;
+  return {
+    ...content,
+    type: isAutocomplete ? 'dropdown' : content.type,
+    custom,
+    autocomplete,
+  };
+}

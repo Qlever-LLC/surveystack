@@ -65,7 +65,7 @@
                 >
                   add to survey
                 </v-btn>
-                <!--TODO Resolve #48, then uncommet this
+                <!--TODO Resolve #48, then uncomment this
                 div>
                   <v-tooltip bottom>
                     <template v-slot:activator="{ on, attrs }">
@@ -128,7 +128,9 @@
   </div>
 </template>
 <script>
-import moment from 'moment';
+import isValid from 'date-fns/isValid';
+import parseISO from 'date-fns/parseISO';
+import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
 
@@ -166,7 +168,6 @@ export default {
   },
   methods: {
     async fetchData() {
-      const now = moment();
       const queryParams = new URLSearchParams();
       if (this.search) {
         queryParams.append('q', this.search);
@@ -180,18 +181,7 @@ export default {
         this.loading = true;
         const { data } = await api.get(`/surveys/list-page?${queryParams}`);
         this.loading = false;
-
-        for (let i = 0; i < data.content.length; i++) {
-          const s = data.content[i];
-          if (!s.meta || !s.meta.dateCreated) {
-            continue;
-          }
-          // eslint-disable-next-line no-param-reassign
-          s.createdAgo = moment.duration(now.diff(s.meta.dateCreated)).humanize();
-        }
-
         this.surveys = data;
-
         return data;
       } catch (e) {
         console.log('Error fetching surveys:', e);
@@ -221,7 +211,7 @@ export default {
     },
   },
   watch: {
-    search(value) {
+    search() {
       this.page = 1;
       this.fetchData();
     },

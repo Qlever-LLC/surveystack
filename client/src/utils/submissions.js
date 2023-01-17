@@ -1,8 +1,9 @@
 import ObjectID from 'bson-objectid';
 import { flatten, unflatten } from 'flat';
-import { cloneDeep } from 'lodash';
-import moment from 'moment';
+import { cloneDeep, groupBy } from 'lodash';
 import * as constants from '@/constants';
+import api from '@/services/api.service';
+import { getNested } from '@/utils/surveyStack';
 
 function* processPositions(data, position = []) {
   if (!data) {
@@ -41,7 +42,7 @@ const getFlatName = (controls, position) => {
     flatName += `.${control.name}`;
   });
 
-  return flatName.substr(1);
+  return flatName.substring(1);
 };
 
 const getControl = (controls, position) => {
@@ -61,7 +62,7 @@ const getControl = (controls, position) => {
   return control;
 };
 
-export const getBreadcrumbsForSubmission = (controls, position) => {
+const getBreadcrumbsForSubmission = (controls, position) => {
   let currentControls = controls;
   const breadcrumbs = [];
   position.forEach((i) => {
@@ -79,9 +80,9 @@ export const getBreadcrumbsForSubmission = (controls, position) => {
  *
  * @returns {Object} A submission for a specific survey version.
  */
-const createSubmissionFromSurvey = ({ survey, version = 1, instance, submitAsUser = undefined }) => {
+export const createSubmissionFromSurvey = ({ survey, version = 1, instance, submitAsUser = undefined }) => {
   const submission = {};
-  const dateNow = moment().toISOString(true);
+  const dateNow = new Date().toISOString();
 
   submission._id = new ObjectID().toString();
   submission.meta = {
@@ -140,7 +141,8 @@ const createSubmissionFromSurvey = ({ survey, version = 1, instance, submitAsUse
       meta.permissions = ['admin'];
     }
 
-    const entry = { value: v || null, meta };
+    // Set control value by order of 1. original value (if set), 2. default value (if set), 3. null
+    const entry = { value: v || control.defaultValue || null, meta };
     if (control.type === 'group' || control.type === 'page') {
       delete entry.value;
       delete entry.meta.dateModified;
@@ -163,7 +165,7 @@ const createSubmissionFromSurvey = ({ survey, version = 1, instance, submitAsUse
  *
  * @returns {Object} The nested object from submission's data
  */
-const getSubmissionField = (submission, survey, position) => {
+export const getSubmissionField = (submission, survey, position) => {
   // TODO: handle version not found
   const { controls } = survey.revisions.find((revision) => revision.version === submission.meta.survey.version);
 
@@ -229,7 +231,38 @@ export const linearControlsWithGroups = (survey, submission) => {
   return res;
 };
 
-export default {
-  createSubmissionFromSurvey,
-  getSubmissionField,
-};
+export async function fetchSubmissionUniqueItems(surveyId, path) {
+  const query = `&project={"${path}.value":1}`;
+  const { data } = await api.get(`/submissions?survey=${surveyId}${query}`);
+  const items = data
+    .map((item) => {
+      const value = getNested(item, `${path}.value`, null);
+      return {
+        id: item._id,
+        label: JSON.stringify(value).replace(/^"(.+(?="$))"$/, '$1'),
+        value,
+      };
+    })
+    .filter((item) => item.value !== null);
+
+  const explodeItem = (item) =>
+    item.value
+      .map((v, i) => ({
+        id: `${item.id}__${i}`,
+        // stringify and remove wrapping quote characters so that strings are rendered without quotation marks
+        label: JSON.stringify(v).replace(/^"(.+(?="$))"$/, '$1'),
+        value: v,
+      }))
+      .filter((v) => v.value);
+
+  const explodedItems = items
+    .map((it) => (Array.isArray(it.value) ? explodeItem(it) : [it]))
+    .reduce((acc, curr) => [...acc, ...curr], []);
+
+  const uniqueItems = Object.values(groupBy(explodedItems, 'label')).map((group) => ({
+    ...group[0],
+    label: group[0].label,
+    count: group.length,
+  }));
+  return uniqueItems;
+}

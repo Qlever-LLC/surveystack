@@ -9,7 +9,15 @@ import { queryParam } from '../helpers';
 
 const col = 'memberships';
 
-export const getMemberships = async (group, user, invitationCode, status, role, doPopulate) => {
+export const getMemberships = async ({
+  group,
+  user,
+  invitationCode,
+  status,
+  role,
+  populate,
+  coffeeShop,
+}) => {
   const filter = {};
 
   if (group) {
@@ -36,8 +44,11 @@ export const getMemberships = async (group, user, invitationCode, status, role, 
   }
 
   const pipeline = [{ $match: filter }];
-  if (queryParam(doPopulate)) {
+  if (queryParam(populate) || queryParam(coffeeShop)) {
     pipeline.push(...createPopulationPipeline());
+  }
+  if (queryParam(coffeeShop)) {
+    pipeline.push(...createGroupCoffeeShopPipeline());
   }
 
   const entities = await db.collection(col).aggregate(pipeline).toArray();
@@ -138,6 +149,47 @@ export const createPopulationPipeline = () => {
   ];
   pipeline.push(...groupLookup);
   pipeline.push({ $sort: { 'group.path': 1 } });
+
+  return pipeline;
+};
+
+export const createGroupCoffeeShopPipeline = () => {
+  const pipeline = [];
+
+  // FarmOS integration settings
+  pipeline.push(
+    ...[
+      {
+        $lookup: {
+          from: 'farmos-coffeeshop',
+          let: { groupId: '$group._id' },
+          pipeline: [{ $match: { $expr: { $eq: ['$group', '$$groupId'] } } }],
+          as: 'd1',
+        },
+      },
+      {
+        $lookup: {
+          from: 'farmos-group-settings',
+          let: { groupId: '$group._id' },
+          pipeline: [{ $match: { $expr: { $eq: ['$groupId', '$$groupId'] } } }],
+          as: 'd2',
+        },
+      },
+      {
+        $unwind: '$d2',
+      },
+      {
+        $addFields: {
+          'group.coffeeShopSettings.groupHasCoffeeshopAccess': {
+            $cond: [{ $gt: [{ $size: '$d1' }, 0] }, true, false],
+          },
+          'group.coffeeShopSettings.allowSubgroupsToJoinCoffeeShop':
+            '$d2.allowSubgroupsToJoinCoffeeShop',
+        },
+      },
+      { $project: { d1: 0, d2: 0 } },
+    ]
+  );
 
   return pipeline;
 };

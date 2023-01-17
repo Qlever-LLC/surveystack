@@ -107,7 +107,6 @@
 
 <script>
 import ObjectId from 'bson-objectid';
-import moment from 'moment';
 import api from '@/services/api.service';
 import EmailValidator from 'email-validator';
 
@@ -144,7 +143,7 @@ export default {
         role: 'user',
         meta: {
           status: 'pending',
-          dateCreated: moment().toISOString(),
+          dateCreated: new Date().toISOString(),
           dateSent: null,
           dateActivated: null,
           notes: '',
