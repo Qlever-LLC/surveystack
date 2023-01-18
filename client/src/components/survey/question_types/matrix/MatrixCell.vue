@@ -26,7 +26,7 @@
   </div>
   <v-text-field
     v-else-if="header.type === 'farmos_uuid'"
-    :value="localValue"
+    :value="value"
     @input="onInput"
     outlined
     hide-details
@@ -261,7 +261,7 @@ export default {
       },
     },
     localValue() {
-      if (this.value == null) {
+      if (this.value === null) {
         return '';
       } else {
         return this.value && this.value.name ? this.value.name : '';
@@ -279,7 +279,6 @@ export default {
     },
   },
   methods: {
-    getValueOrNull,
     uuidv4,
     onInput(value) {
       this.value = getValueOrNull(value);

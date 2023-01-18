@@ -41,7 +41,6 @@ export default {
     appQrScanner,
   },
   methods: {
-    getValueOrNull,
     submit() {
       this.onInput(this.value);
       this.$emit('next');
@@ -50,8 +49,9 @@ export default {
       this.changed(code);
     },
     onInput(v) {
-      if (this.value !== v) {
-        this.changed(getValueOrNull(v));
+      const newValue = getValueOrNull(v);
+      if (this.value !== newValue) {
+        this.changed(newValue);
       }
     },
     tryAutofocus() {
