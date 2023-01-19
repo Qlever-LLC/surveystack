@@ -26,8 +26,15 @@
   </div>
   <v-text-field
     v-else-if="header.type === 'farmos_uuid'"
-    :value="value"
-    @input="onInput"
+    :value="localValue"
+    @input="
+      (v) => {
+        if (!this.value || this.value.name !== v) {
+          const name = getValueOrNull(v);
+          onInput({ id: uuidv4(), name });
+        }
+      }
+    "
     outlined
     hide-details
     autocomplete="off"
@@ -280,6 +287,7 @@ export default {
   },
   methods: {
     uuidv4,
+    getValueOrNull,
     onInput(value) {
       this.value = getValueOrNull(value);
       this.$emit('changed');
