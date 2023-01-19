@@ -174,7 +174,7 @@ export default {
       }
       if (this.value !== value) {
         if (Array.isArray(value)) {
-          this.changed(getValueOrNull(value.sort()));
+          this.changed(getValueOrNull(value.map(getValueOrNull).sort()));
         } else {
           const nextValue = getValueOrNull(value);
           this.changed(nextValue ? [nextValue] : nextValue);

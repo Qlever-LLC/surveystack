@@ -27,14 +27,7 @@
   <v-text-field
     v-else-if="header.type === 'farmos_uuid'"
     :value="localValue"
-    @input="
-      (v) => {
-        if (!this.value || this.value.name !== v) {
-          const name = getValueOrNull(v);
-          onInput({ id: uuidv4(), name });
-        }
-      }
-    "
+    @input="onFarmOsInput"
     outlined
     hide-details
     autocomplete="off"
@@ -287,10 +280,8 @@ export default {
     },
   },
   methods: {
-    uuidv4,
-    getValueOrNull,
     isValidNumber(val) {
-      return isNaN(Number(val)) ? 'The value has to be a number' : true;
+      return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
     },
     onInput(value) {
       this.value = getValueOrNull(value);

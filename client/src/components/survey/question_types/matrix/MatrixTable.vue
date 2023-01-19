@@ -336,7 +336,6 @@ export default {
 }
 
 .mt-body .mt-row {
-  height: var(--mt-row-height);
   min-width: var(--mt-min-row-width);
 }
 
