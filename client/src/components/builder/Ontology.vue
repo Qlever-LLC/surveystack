@@ -124,7 +124,7 @@ export default {
   methods: {
     onChange(value) {
       this.comboboxSearch = null;
-      this.$emit('input', getValueOrNull(value));
+      this.$emit('input', getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value));
       if (this.$refs.dropdownRef) {
         this.$refs.dropdownRef.isMenuActive = false;
       }

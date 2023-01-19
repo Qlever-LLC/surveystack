@@ -284,7 +284,7 @@ export default {
       return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
     },
     onInput(value) {
-      this.value = getValueOrNull(value);
+      this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
       this.$emit('changed');
     },
     onDateInput(value) {
