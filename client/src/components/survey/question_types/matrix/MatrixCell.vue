@@ -46,8 +46,9 @@
     @input="onNumberInput"
     type="number"
     outlined
-    hide-details
+    hide-details="auto"
     :disabled="disabled"
+    :rules="[isValidNumber]"
   />
   <v-select
     v-else-if="header.type === 'dropdown' && !header.custom && !header.autocomplete"
@@ -288,6 +289,9 @@ export default {
   methods: {
     uuidv4,
     getValueOrNull,
+    isValidNumber(val) {
+      return isNaN(Number(val)) ? 'The value has to be a number' : true;
+    },
     onInput(value) {
       this.value = getValueOrNull(value);
       this.$emit('changed');
