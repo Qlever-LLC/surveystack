@@ -310,7 +310,12 @@ export default {
       return item.label.trim() && item.value.trim();
     },
     close() {
-      const content = this.resource.content.filter(this.matchValidItem);
+      const content = this.resource.content
+        .map((item) => ({
+          ...item,
+          value: typeof item.value === 'string' ? item.value.trim() : item.value,
+        }))
+        .filter(this.matchValidItem);
       this.$emit('change', { ...this.resource, content });
       this.$emit('close-dialog');
     },

@@ -131,12 +131,17 @@ export function isAnswered(node, submission) {
 }
 
 export function getValueOrNull(v) {
+  if (typeof v === 'undefined') {
+    return null;
+  }
+
   if (Array.isArray(v) && v.length === 0) {
     return null;
   }
 
-  if (v === '' || v === undefined) {
-    return null;
+  if (typeof v === 'string') {
+    const value = v.trim();
+    return value || null;
   }
 
   // should we also check for empty object and return null instead?
