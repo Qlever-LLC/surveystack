@@ -15,8 +15,22 @@
       <v-text-field v-model="control.moreInfo" label="More info" hide-details />
 
       <!-- Control properties -->
-      <v-text-field v-if="isText" v-model="control.defaultValue" label="Default value" hide-details />
-      <v-text-field v-if="isNumber" type="number" v-model="control.defaultValue" label="Default value" hide-details />
+      <v-text-field
+        v-if="isText"
+        v-model="control.defaultValue"
+        @blur="handleDefaultValueTrim"
+        label="Default value"
+        hide-details
+      />
+      <v-text-field
+        v-if="isNumber"
+        type="number"
+        v-model="control.defaultValue"
+        @blur="handleDefaultValueTrim"
+        label="Default value"
+        hide-details="auto"
+        :rules="[isValidNumber]"
+      />
       <instructions-editor
         v-if="isInstructions"
         v-model="control.options.source"
@@ -118,6 +132,7 @@
         v-if="isFarmOsUuid"
         label="FarmOS Type"
         v-model="control.options.farmOsType"
+        @input="handleFarmOsTypeChange"
         :items="control.options.farmOsTypes"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
@@ -165,12 +180,14 @@
         v-if="isDate && control.options.subtype"
         v-model="control.defaultValue"
         @input="() => $forceUpdate()"
+        @blur="handleDefaultValueTrim"
         :type="control.options.subtype"
         class="mt-3"
       />
       <select-items
         v-if="isSelect && control.options.source"
         v-model="control.defaultValue"
+        @blur="handleDefaultValueTrim"
         :items="control.options.source"
         :custom="control.options.allowCustomSelection"
         :multiple="control.type === 'selectMultiple'"
@@ -324,7 +341,7 @@ import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
 import Checkbox from '@/components/builder/Checkbox.vue';
 import api from '@/services/api.service';
-
+import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
 
 export default {
@@ -516,6 +533,13 @@ export default {
         console.warn('script params not valid JSON', error);
       }
     },
+    handleDefaultValueTrim() {
+      const value = this.control.defaultValue;
+      this.control.defaultValue = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
+    },
+    handleFarmOsTypeChange(type) {
+      this.control.options.farmOsType = getValueOrNull(type);
+    },
     validateScriptParams(params) {
       try {
         JSON.parse(params);
@@ -523,6 +547,9 @@ export default {
         return 'Invalid JSON';
       }
       return true;
+    },
+    isValidNumber(val) {
+      return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
     },
     getScriptParams() {
       return (
