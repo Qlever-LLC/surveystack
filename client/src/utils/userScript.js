@@ -34,27 +34,6 @@ export default function buildScriptQuestionIframeContents({
       </div>
       <div id="root"></div>
       <script type="module">
-        import {
-          requestFetchSubmissions,
-          requestSetStatus,
-          requestSetValue,
-          requestSetContext,
-          requestSetRenderQueue,
-          requestLogMessage,
-          requestRunSurveyStackKit,
-          onMessage,
-          handleLoaded,
-          statusTypes,
-          renderScript,
-          runScript,
-          resetDOM,
-          // createUI,
-        } from '${baseURL}/iframeMessaging.js';
-
-        import { createUI } from '${baseURL}/iframeUI.js';
-        import * as ui from '${baseURL}/iframeUI.js';
-        import * as utils from '${baseURL}/sandboxUtils.js';
-
         window.log = requestLogMessage;
         window.runSurveyStackKit = requestRunSurveyStackKit;
 

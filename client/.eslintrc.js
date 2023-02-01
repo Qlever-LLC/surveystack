@@ -5,6 +5,7 @@ module.exports = {
   },
   extends: ["plugin:vue/essential", "eslint:recommended", "@vue/prettier", "plugin:storybook/recommended"],
   plugins: ['import'],
+  ignorePatterns: ["marked.esm.js"],
   rules: {
     'import/no-cycle': 'error',
     'no-console': process.env.NODE_ENV === 'production' ? 'off' : 'off',
