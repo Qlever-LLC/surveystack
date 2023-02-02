@@ -8,6 +8,7 @@ export function onMessage(type, callback) {
       callback(event.data.payload);
     }
   }
+
   window.addEventListener('message', handler);
   return handler;
 }
@@ -21,12 +22,14 @@ export default function buildScriptQuestionIframeContents({
   contextJSON,
   controlJSON,
   paramsJSON,
+  iframeMessagingSource,
+  iframeUISource,
+  sandboxUtilsSource,
+  iframeStyles,
 }) {
-  let baseURL = window.location.origin;
-
   return `
   <head>
-    <link href="${baseURL}/iframeStyles.css" rel="stylesheet">
+   <style type="text/css">${iframeStyles}</style>
   </head>
   <body>
       <div class="spinner-container">
@@ -34,6 +37,10 @@ export default function buildScriptQuestionIframeContents({
       </div>
       <div id="root"></div>
       <script type="module">
+        ${iframeMessagingSource}
+        ${iframeUISource}
+        ${sandboxUtilsSource}
+
         window.log = requestLogMessage;
         window.runSurveyStackKit = requestRunSurveyStackKit;
 

@@ -197,7 +197,9 @@ export default {
         '*'
       );
     },
-    initializeIframe() {
+    async initializeIframe() {
+      const baseURL = window.location.origin;
+
       const { iframe } = this.$refs;
       const submissionJSON = JSON.stringify(this.submission);
       const parentJSON = JSON.stringify(this.parent);
@@ -205,6 +207,10 @@ export default {
       const contextJSON = JSON.stringify(this.meta.context || {});
       const controlJSON = JSON.stringify(this.control);
       const paramsJSON = JSON.stringify((this.control.options && this.control.options.params) || {});
+      const iframeMessagingSource = await fetch(`${baseURL}/sandboxUtils.js`); //TODO read file with get
+      const iframeUISource = await fetch(`${baseURL}/iframeUI.js`); //TODO expose createUI directly and all other function as ui, like import { createUI } from '../../public/iframeUI'; and import * as ui from '../../public/iframeUI';
+      const sandboxUtilsSource = await fetch(`${baseURL}/sandboxUtils.js`); //TODO expose as utils like  import * as utils from '${baseURL}/sandboxUtils.js';
+      const iframeStyles = await fetch(`${baseURL}/iframeStyles.csss`);
 
       const html = buildScriptQuestionIframeContents({
         scriptSource: this.source.content,
@@ -214,6 +220,10 @@ export default {
         contextJSON,
         controlJSON,
         paramsJSON,
+        iframeMessagingSource,
+        iframeUISource,
+        sandboxUtilsSource,
+        iframeStyles,
       });
       iframe.src = `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
     },
@@ -262,7 +272,7 @@ export default {
     try {
       this.isLoading = true;
       await this.fetchScriptSource();
-      this.initializeIframe();
+      await this.initializeIframe();
       this.initializeEventListeners();
       this.isLoading = false;
     } catch (err) {
