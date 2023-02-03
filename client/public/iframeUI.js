@@ -1,4 +1,4 @@
-import marked from 'https://cdn.jsdelivr.net/npm/marked@latest/lib/marked.esm.js';
+import { marked } from 'https://cdn.jsdelivr.net/npm/marked@4.0.0/lib/marked.esm.js';
 
 export const ui = {
   card,
