@@ -1,4 +1,4 @@
-import { marked } from 'https://cdn.jsdelivr.net/npm/marked@4.0.0/lib/marked.esm.js';
+//import { marked } from 'https://cdn.jsdelivr.net/npm/marked@4.0.0/lib/marked.esm.js'; //TODO replace this
 
 export const ui = {
   card,
@@ -81,7 +81,8 @@ export function text(content) {
 
 export function markdown(content) {
   const node = document.createElement('div');
-  node.innerHTML = marked(content);
+  //TODO temp removed, reactivate it
+  //  node.innerHTML = marked(content);
   return node;
 }
 
