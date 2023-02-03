@@ -1,4 +1,12 @@
-import markedEsm from './marked.esm';
+import marked from 'https://cdn.jsdelivr.net/npm/marked@latest/lib/marked.esm.js';
+
+export const ui = {
+  card,
+  message,
+  text,
+  markdown,
+  md,
+};
 
 export function card(content, { header, meta, footer } = {}) {
   const node = document.createElement('div');
@@ -73,7 +81,7 @@ export function text(content) {
 
 export function markdown(content) {
   const node = document.createElement('div');
-  node.innerHTML = markedEsm(content);
+  node.innerHTML = marked(content);
   return node;
 }
 

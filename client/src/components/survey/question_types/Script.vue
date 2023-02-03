@@ -207,10 +207,10 @@ export default {
       const contextJSON = JSON.stringify(this.meta.context || {});
       const controlJSON = JSON.stringify(this.control);
       const paramsJSON = JSON.stringify((this.control.options && this.control.options.params) || {});
-      const iframeMessagingSource = await fetch(`${baseURL}/sandboxUtils.js`); //TODO read file with get
-      const iframeUISource = await fetch(`${baseURL}/iframeUI.js`); //TODO expose createUI directly and all other function as ui, like import { createUI } from '../../public/iframeUI'; and import * as ui from '../../public/iframeUI';
-      const sandboxUtilsSource = await fetch(`${baseURL}/sandboxUtils.js`); //TODO expose as utils like  import * as utils from '${baseURL}/sandboxUtils.js';
-      const iframeStyles = await fetch(`${baseURL}/iframeStyles.csss`);
+      const iframeMessagingSource = await (await fetch(`${baseURL}/iframeMessaging.js`)).text(); //TODO read file with get
+      const iframeUISource = await (await fetch(`${baseURL}/iframeUI.js`)).text(); //TODO expose createUI directly and all other function as ui, like import { createUI } from '../../public/iframeUI'; and import * as ui from '../../public/iframeUI';
+      const sandboxUtilsSource = await (await fetch(`${baseURL}/sandboxUtils.js`)).text(); //TODO expose as utils like  import * as utils from '${baseURL}/sandboxUtils.js';
+      const iframeStyles = await (await fetch(`${baseURL}/iframeStyles.css`)).text();
 
       const html = buildScriptQuestionIframeContents({
         scriptSource: this.source.content,
