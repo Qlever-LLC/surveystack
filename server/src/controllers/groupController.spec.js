@@ -85,7 +85,7 @@ describe('group-controller', () => {
     );
   });
 
-  it('super admin from an other group can archive it', async () => {
+  it('super admin can archive any group', async () => {
     const { group } = await init();
     const superAdmin = await createSuperAdmin();
     const req = getCreateReq(group);
