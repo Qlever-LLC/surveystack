@@ -63,8 +63,16 @@ const outputSchema = Joi.object({
 
 const joinGroupOutputSchema = Joi.object({
   entity: Joi.object({
-    email: Joi.string().required(),
-    slug: Joi.string().required(),
+    users: Joi.array()
+      .min(0)
+      .items(
+        Joi.object({
+          email: Joi.string().required(),
+          name: Joi.string().required(),
+        }).optional()
+      )
+      .required(),
+    groups: Joi.array().min(0).items(Joi.string().optional()).required(),
   }).required(),
 })
   .required()
@@ -93,11 +101,11 @@ export const FRAGMENT_GROUP_DETAILS = gql`
   ${FRAGMENT_PERSON_DETAILS}
 `;
 
-export const QUERY_GROUP_BY_SLUG = gql`{
-  query ($slug: String) { 
-    group(slug: $slug) { 
+export const QUERY_GROUP_BY_SLUG = gql`
+  query ($slug: String) {
+    group(slug: $slug) {
       id
-     }
+    }
   }
 `;
 
@@ -167,8 +175,8 @@ export const queryHyloUser = async (options) => {
 export const queryHyloGroup = async (options) => {
   const { slug, gqlRequest, logger } = { ...deps, ...options };
   logger.info(`Query Hylo user - slug="${slug}"`);
-  const result = (await gqlRequest(QUERY_GROUP_BY_SLUG, { slug })).id;
-  logger.info('Query Hylo group result:', { id: result });
+  const result = (await gqlRequest(QUERY_GROUP_BY_SLUG, { slug })).group;
+  logger.info('Query Hylo group result:', result.id);
   return result;
 };
 
@@ -462,12 +470,12 @@ export const handleJoinGroupOutput = async (options) => {
     logger,
     hyloGroupId,
     addMember: _addMember,
-    queryHyloUser: _queryHyloUser,
     queryHyloGroup: _queryHyloGroup,
     gqlRequest: _gqlRequest,
     gqlRequestWithUrl: _gqlRequestWithUrl,
     postHyloUser: _postHyloUser,
-  } = { ...deps, addMember, queryHyloUser, queryHyloGroup, ...options };
+    upsertHyloUser: _upsertHyloUser,
+  } = { ...deps, addMember, queryHyloUser, queryHyloGroup, upsertHyloUser, ...options };
 
   const { value: output, error } = joinGroupOutputSchema.validate(_output);
   if (error) {
@@ -497,29 +505,33 @@ export const handleJoinGroupOutput = async (options) => {
   const postHyloUser = (body) => _postHyloUser(body, apiUrl);
   const baseDeps = { gqlRequest, postHyloUser, logger };
 
-  let hyloUser = await _queryHyloUser({ email: entity.email, ...options });
-  if (!hyloUser) {
-    throw boom.badData(`error: user not found in hylo ${entity.email}`);
+  const mappedUsers = [];
+
+  for (const slug of entity.groups) {
+    let { id: groupId } = await _queryHyloGroup({ slug, ...options });
+    if (!groupId) {
+      throw boom.badData(`error: group not found in hylo ${slug}`);
+    }
+
+    for (const user of entity.users) {
+      mappedUsers.push(
+        await _upsertHyloUser({
+          email: user.email,
+          name: user.name,
+          hyloGroupId: groupId,
+          ...baseDeps,
+        })
+      );
+    }
   }
-
-  let groupId = await _queryHyloGroup({ slug: entity.slug, ...options });
-
-  if (!groupId) {
-    throw boom.badData(`error: group not found in hylo ${entity.slug}`);
-  }
-
-  logger.info('Add user to the group (to be sure they are added)...');
-  await _addMember({ hyloGroupId: groupId, hyloUserId: hyloUser.id, ...baseDeps });
 
   const permanent = {
     type: API_COMPOSE_TYPE_HYLO,
     hyloType: HYLO_TYPE_JOIN_GROUP,
-    // TODO we probably won't need email and name
-    hyloGroup: groupId,
-    hyloUser: hyloUser.id,
+    mappedUsers,
   };
 
-  return { hyloUser: hyloUser, hyloGroup: groupId, permanent };
+  return { permanent };
 };
 
 export const handle = async (options) => {
@@ -565,6 +577,7 @@ export const handle = async (options) => {
     }
   }
 
+  console.log('joingroup', joinGroupOutputs);
   for (const output of joinGroupOutputs) {
     try {
       const result = await _handleJoinGroupOutput({
