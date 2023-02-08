@@ -31,7 +31,7 @@ import {
   getTree,
 } from '../services/farmos/manage';
 import { aggregator } from '../services/farmos/aggregator';
-import { hasAdminRole } from '../services/roles.service';
+import { hasAdminRoleForRequest } from '../services/roles.service';
 
 export const asMongoId = (source) =>
   source instanceof ObjectId ? source : ObjectId(typeof source === 'string' ? source : source._id);
@@ -83,7 +83,7 @@ const requireGroupedAdmin = (req, res) => {
     throw boom.unauthorized();
   }
 
-  if (!hasAdminRole(userId, group)) {
+  if (!hasAdminRoleForRequest(res, group)) {
     throw boom.unauthorized();
   }
   return userId;

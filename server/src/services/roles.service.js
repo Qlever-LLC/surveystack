@@ -90,7 +90,13 @@ export const hasRole = async (userId, groupId, role) => {
   return roles.some((role) => targetRole.startsWith(role));
 };
 
-export const hasAdminRole = (userId, groupId) => hasRole(userId, groupId, 'admin');
+export const hasAdminRoleForRequest = (res, groupId) => {
+  return res.locals.auth.isSuperAdmin || hasAdminRole(res.locals.auth.user._id, groupId);
+};
+
+export const hasAdminRole = (userId, groupId) => {
+  return hasRole(userId, groupId, 'admin');
+};
 export const hasUserRole = (userId, groupId) => hasRole(userId, groupId, 'user');
 
 export const getRoles = async (user) => {
@@ -121,6 +127,7 @@ export const getRoles = async (user) => {
 export default {
   getRoles,
   hasRole,
+  hasAdminRoleForRequest,
   hasAdminRole,
   hasUserRole,
   getDescendantGroups,
