@@ -508,10 +508,12 @@ export const handleJoinGroupOutput = async (options) => {
   const mappedUsers = [];
 
   for (const slug of entity.groups) {
-    let { id: groupId } = await _queryHyloGroup({ slug, ...options });
-    if (!groupId) {
+    const group = await _queryHyloGroup({ slug, ...options });
+    if (!group) {
       throw boom.badData(`error: group not found in hylo ${slug}`);
     }
+
+    let { id: groupId } = group;
 
     for (const user of entity.users) {
       mappedUsers.push(
