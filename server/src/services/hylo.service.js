@@ -176,7 +176,7 @@ export const queryHyloGroup = async (options) => {
   const { slug, gqlRequest, logger } = { ...deps, ...options };
   logger.info(`Query Hylo user - slug="${slug}"`);
   const result = (await gqlRequest(QUERY_GROUP_BY_SLUG, { slug })).group;
-  logger.info('Query Hylo group result:', result.id);
+  logger.info('Query Hylo group result:', result);
   return result;
 };
 
@@ -509,6 +509,7 @@ export const handleJoinGroupOutput = async (options) => {
 
   for (const slug of entity.groups) {
     const group = await _queryHyloGroup({ slug, ...options });
+    console.log('group', group);
     if (!group) {
       throw boom.badData(`error: group not found in hylo ${slug}`);
     }
