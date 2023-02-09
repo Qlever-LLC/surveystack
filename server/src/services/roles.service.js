@@ -90,6 +90,17 @@ export const hasRole = async (userId, groupId, role) => {
   return roles.some((role) => targetRole.startsWith(role));
 };
 
+const hasSuperAdminRole = async (userId) => {
+  const userObjectId = typeof userId === 'string' ? new ObjectId(userId) : userId;
+
+  return (await db.collection('users').findOne({
+    _id: userObjectId,
+    permissions: { $eleMatch: { $eq: 'super-admin' } },
+  }))
+    ? true
+    : false;
+};
+
 export const hasAdminRoleForRequest = (res, groupId) => {
   return res.locals.auth.isSuperAdmin || hasAdminRole(res.locals.auth.user._id, groupId);
 };
@@ -127,6 +138,7 @@ export const getRoles = async (user) => {
 export default {
   getRoles,
   hasRole,
+  hasSuperAdminRole,
   hasAdminRoleForRequest,
   hasAdminRole,
   hasUserRole,
