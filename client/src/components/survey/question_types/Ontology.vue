@@ -169,6 +169,9 @@ export default {
   methods: {
     onChange(value) {
       this.comboboxSearch = null;
+      if (this.$refs.dropdownRef && !control.options.hasMultipleSelections) {
+        this.$refs.dropdownRef.isMenuActive = false;
+      }
       if (this.value !== value) {
         if (Array.isArray(value)) {
           this.changed(getValueOrNull(value.map(getValueOrNull)));
