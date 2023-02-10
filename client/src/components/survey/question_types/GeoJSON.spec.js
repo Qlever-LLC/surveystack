@@ -164,6 +164,7 @@ function mockSurvey() {
 
 describe('GeoJSON Question', () => {
   describe('hides controls', () => {
+    let getByRole;
     let getByTitle;
     let getByText;
     let container;
@@ -237,7 +238,10 @@ describe('GeoJSON Question', () => {
         router: router,
       };
 
-      const { getByTitle, getByPlaceholderText } = renderWithVuetify(GeoJSON, renderOptions);
+      const { getByTitle, getByText, getByRole, getByPlaceholderText, container, updateProps } = renderWithVuetify(
+        GeoJSON,
+        renderOptions
+      );
 
       expect(getByTitle('Geolocate').parentElement.classList.contains('active')).toBe(true);
       // expect(input).toHaveFocus() doesn't seem to be working, even though element has focus in browser
@@ -256,7 +260,10 @@ describe('GeoJSON Question', () => {
         router: router,
       };
 
-      const { getByTitle, getByPlaceholderText } = renderWithVuetify(GeoJSON, renderOptions);
+      const { getByTitle, getByText, getByRole, getByPlaceholderText, container, updateProps } = renderWithVuetify(
+        GeoJSON,
+        renderOptions
+      );
 
       expect(getByTitle('Geolocate').parentElement.classList.contains('active')).toBe(false);
       // expect(input).toHaveFocus() doesn't seem to be working, even though element has focus in browser
