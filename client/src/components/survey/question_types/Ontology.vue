@@ -169,9 +169,6 @@ export default {
   methods: {
     onChange(value) {
       this.comboboxSearch = null;
-      if (this.$refs.dropdownRef) {
-        this.$refs.dropdownRef.isMenuActive = false;
-      }
       if (this.value !== value) {
         if (Array.isArray(value)) {
           this.changed(getValueOrNull(value.map(getValueOrNull)));
@@ -269,7 +266,7 @@ export default {
       const match = newVal
         ? this.items.find((item) => item.label.toLowerCase().indexOf(newVal.toLowerCase()) >= 0)
         : undefined;
-      if (!match) {
+      if (!match && this.$refs.dropdownRef) {
         this.$refs.dropdownRef.setMenuIndex(-1);
       }
     },
