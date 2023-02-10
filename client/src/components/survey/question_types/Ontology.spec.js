@@ -1,4 +1,4 @@
-import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
 import Vuetify from 'vuetify';
 import Ontology from './Ontology.vue';
 import { resourceLocations, resourceTypes } from '@/utils/resources';

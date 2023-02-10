@@ -310,8 +310,7 @@ export default {
       ]).filter((f) => !user.connectedFarms.some((c) => c.instanceName == f && !c.skip));
     },
     async enable() {
-      const res = await api.post('/farmos/group-manage/enable', { groupId: this.groupId, enable: true });
-      // console.log('res', res.data);
+      await api.post('/farmos/group-manage/enable', { groupId: this.groupId, enable: true });
       try {
         const res = await api.get('/farmos/group-manage/' + this.groupId);
         this.groupInfos = res.data;
@@ -335,15 +334,12 @@ export default {
       this.showDeactivateDialog = false;
     },
     async connectFarms(farms) {
-      // console.log('connecting farms', farms, this.selectedUser);
-
       this.loading = true;
       this.showConnectDialog = false;
 
       for (const farm of farms) {
-        // console.log('farm', farm, farms);
         try {
-          const res = await api.post(`/farmos/group-manage/${this.groupId}/mapUser`, {
+          await api.post(`/farmos/group-manage/${this.groupId}/mapUser`, {
             userId: this.selectedUser.user,
             instanceName: farm,
           });
@@ -428,7 +424,7 @@ export default {
     },
     async plansChanged(plans) {
       this.loading = true;
-      const res = await api.post(`/farmos/group-manage/${this.groupId}/updatePlans`, { plans });
+      await api.post(`/farmos/group-manage/${this.groupId}/updatePlans`, { plans });
       await this.init();
     },
     async createFarm() {

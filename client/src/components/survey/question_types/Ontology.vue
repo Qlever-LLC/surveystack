@@ -169,7 +169,7 @@ export default {
   methods: {
     onChange(value) {
       this.comboboxSearch = null;
-      if (this.$refs.dropdownRef && !control.options.hasMultipleSelections) {
+      if (this.$refs.dropdownRef && !this.control.options.hasMultipleSelections) {
         this.$refs.dropdownRef.isMenuActive = false;
       }
       if (this.value !== value) {
