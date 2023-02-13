@@ -275,6 +275,9 @@ export default {
               (m) => m.name.toLowerCase(),
             ]);
             this.groupInfos = groupInfos.response;
+            if (!groupInfos.response.isDomainRoot && !groupInfos.response.allowSubgroupsToJoinCoffeeShop) {
+              this.groupInfos.groupHasCoffeeShopAccess = false;
+            }
             this.farmosEnabled = true;
           }
         } else {
