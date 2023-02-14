@@ -107,7 +107,6 @@
 
 <script>
 import api from '@/services/api.service';
-import { autoSelectActiveGroup } from '@/utils/memberships';
 import { get } from 'lodash';
 
 const DEFAULT_ENTITY = {

@@ -113,7 +113,7 @@ export default {
       }
 
       try {
-        const user = await this.$store.dispatch('auth/login', {
+        await this.$store.dispatch('auth/login', {
           url: '/auth/register',
           user: this.entity,
         });
@@ -121,7 +121,7 @@ export default {
         // try to auto join group if this is a whitelabel
         if (this.isWhitelabel) {
           try {
-            const { data } = await api.post(`/memberships/join-group?id=${this.whitelabelPartner.id}`);
+            await api.post(`/memberships/join-group?id=${this.whitelabelPartner.id}`);
             await autoSelectActiveGroup(this.$store, this.whitelabelPartner.id);
           } catch (error) {
             console.log(error.response.data.message);

@@ -11,8 +11,6 @@
 </template>
 
 <script>
-import _ from 'lodash';
-import { ref } from '@vue/composition-api';
 import FarmOSRegister from '@/pages/farmos-manage/FarmOSRegister.vue';
 
 export default {
@@ -23,9 +21,6 @@ export default {
       type: Object,
       required: true,
     },
-  },
-  setup(props, { emit }) {
-    return {};
   },
   computed: {
     show: {

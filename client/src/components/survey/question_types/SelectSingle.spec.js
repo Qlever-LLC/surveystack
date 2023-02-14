@@ -1,4 +1,4 @@
-import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
 import SelectSingle, { getNextValue } from './SelectSingle.vue';
 
 const selectSource = [

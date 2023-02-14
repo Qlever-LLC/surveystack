@@ -1,9 +1,9 @@
 module.exports = {
   root: true,
   env: {
-    node: true
+    node: true,
   },
-  extends: ["plugin:vue/essential", "eslint:recommended", "@vue/prettier", "plugin:storybook/recommended"],
+  extends: ['plugin:vue/essential', 'eslint:recommended', '@vue/prettier', 'plugin:storybook/recommended'],
   plugins: ['import'],
   ignorePatterns: ["marked.esm.js"],
   rules: {
@@ -17,16 +17,18 @@ module.exports = {
     'no-continue': 0,
     'no-param-reassign': 1,
     'brace-style': 1,
-    'vue/no-unused-components': 'warn'
+    'vue/no-unused-components': 'warn',
   },
   globals: {},
   parserOptions: {
-    parser: 'babel-eslint'
+    parser: 'babel-eslint',
   },
-  overrides: [{
-    files: ['**/*.spec.js'],
-    env: {
-      jest: true
-    }
-  }]
+  overrides: [
+    {
+      files: ['**/*.spec.js'],
+      env: {
+        jest: true,
+      },
+    },
+  ],
 };

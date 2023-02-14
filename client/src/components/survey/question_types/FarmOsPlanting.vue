@@ -5,15 +5,28 @@
 
     <v-progress-circular v-if="loading" indeterminate color="secondary" class="my-8"> </v-progress-circular>
 
-    <v-list style="overflow: auto;">
-      <v-list-item-group v-if="!loading" :disabled="loading" :value="listSelection" @change="localChange"
-        :multiple="!!control.options.hasMultipleSelections">
-        <v-list-item v-for="(item, idx) in transformed" :value="hashItem(item)" :key="`item_${idx}`"
-          :disabled="!control.options.hasMultipleSelections && item.value.isField">
+    <v-list style="overflow: auto">
+      <v-list-item-group
+        v-if="!loading"
+        :disabled="loading"
+        :value="listSelection"
+        @change="localChange"
+        :multiple="!!control.options.hasMultipleSelections"
+      >
+        <v-list-item
+          v-for="(item, idx) in transformed"
+          :value="hashItem(item)"
+          :key="`item_${idx}`"
+          :disabled="!control.options.hasMultipleSelections && item.value.isField"
+        >
           <template v-slot:default="{ active }">
             <v-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
-              <v-checkbox v-if="control.options.hasMultipleSelections" :input-value="active"
-                :true-value="hashItem(item)" color="focus" />
+              <v-checkbox
+                v-if="control.options.hasMultipleSelections"
+                :input-value="active"
+                :true-value="hashItem(item)"
+                color="focus"
+              />
               <v-radio-group v-else :value="active">
                 <v-radio :value="true" color="focus" />
               </v-radio-group>
@@ -87,7 +100,7 @@ const transform = (assets) => {
       return asset.value.location.some((loc) => loc.id === area.location.id);
     });
 
-    console.log("loc", area);
+    console.log('loc', area);
     const field = {
       value: {
         farmId: area.farmId,
@@ -157,7 +170,7 @@ const transform = (assets) => {
       isField: true,
     },
     label: '<span class="green-chip mr-4 ml-0 chip-no-wrap">New Plantings</span>',
-  }
+  };
 
   res.push(withoutAreaSection, ...withoutArea);
 
@@ -256,9 +269,9 @@ export default {
   white-space: nowrap;
 }
 
-.farm-os-planting>>>.v-list-item__title .orange-chip,
-.farm-os-planting>>>.v-list-item__title .green-chip,
-.farm-os-planting>>>.v-list-item__title .blue-chip {
+.farm-os-planting >>> .v-list-item__title .orange-chip,
+.farm-os-planting >>> .v-list-item__title .green-chip,
+.farm-os-planting >>> .v-list-item__title .blue-chip {
   display: inline-flex;
   border: 1px var(--v-focus-base) solid;
   background-color: white;
@@ -272,12 +285,12 @@ export default {
   vertical-align: middle;
 }
 
-.farm-os-planting>>>.v-list-item__title .green-chip {
+.farm-os-planting >>> .v-list-item__title .green-chip {
   color: #46b355;
   border: 1px #46b355 solid;
 }
 
-.farm-os-planting>>>.v-list-item__title .orange-chip {
+.farm-os-planting >>> .v-list-item__title .orange-chip {
   color: #f38d49;
   border: 1px #f38d49 solid;
 }

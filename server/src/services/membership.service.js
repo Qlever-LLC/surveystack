@@ -153,46 +153,45 @@ export const createPopulationPipeline = () => {
   return pipeline;
 };
 
-export const createGroupCoffeeShopPipeline = () => {
-  const pipeline = [];
-
-  // FarmOS integration settings
-  pipeline.push(
-    ...[
-      {
-        $lookup: {
-          from: 'farmos-coffeeshop',
-          let: { groupId: '$group._id' },
-          pipeline: [{ $match: { $expr: { $eq: ['$group', '$$groupId'] } } }],
-          as: 'd1',
-        },
-      },
-      {
-        $lookup: {
-          from: 'farmos-group-settings',
-          let: { groupId: '$group._id' },
-          pipeline: [{ $match: { $expr: { $eq: ['$groupId', '$$groupId'] } } }],
-          as: 'd2',
-        },
-      },
-      {
-        $unwind: '$d2',
-      },
-      {
-        $addFields: {
-          'group.coffeeShopSettings.groupHasCoffeeshopAccess': {
-            $cond: [{ $gt: [{ $size: '$d1' }, 0] }, true, false],
+// FarmOS integration settings
+export const createGroupCoffeeShopPipeline = () => [
+  {
+    $lookup: {
+      from: 'farmos-coffeeshop',
+      let: { groupId: '$group._id' },
+      pipeline: [{ $match: { $expr: { $eq: ['$group', '$$groupId'] } } }],
+      as: 'd1',
+    },
+  },
+  {
+    $lookup: {
+      from: 'farmos-group-settings',
+      let: { groupId: '$group._id' },
+      pipeline: [
+        {
+          $match: {
+            $and: [
+              { $expr: { $eq: ['$groupId', '$$groupId'] } },
+              { allowSubgroupsToJoinCoffeeShop: true },
+            ],
           },
-          'group.coffeeShopSettings.allowSubgroupsToJoinCoffeeShop':
-            '$d2.allowSubgroupsToJoinCoffeeShop',
         },
+      ],
+      as: 'd2',
+    },
+  },
+  {
+    $addFields: {
+      'group.coffeeShopSettings.groupHasCoffeeshopAccess': {
+        $cond: [{ $gt: [{ $size: '$d1' }, 0] }, true, false],
       },
-      { $project: { d1: 0, d2: 0 } },
-    ]
-  );
-
-  return pipeline;
-};
+      'group.coffeeShopSettings.allowSubgroupsToJoinCoffeeShop': {
+        $cond: [{ $gt: [{ $size: '$d2' }, 0] }, true, false],
+      },
+    },
+  },
+  { $project: { d1: 0, d2: 0 } },
+];
 
 export const addMembership = async ({ user, group, role }) => {
   const entity = { user, group, role };

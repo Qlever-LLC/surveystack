@@ -137,6 +137,14 @@
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
       />
       <checkbox
+        v-if="control.type === 'ontology'"
+        class="ml-2"
+        label="Multiple select"
+        v-model="control.options.hasMultipleSelections"
+        :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+        dense
+      />
+      <checkbox
         v-if="isSelect || isOntology"
         class="ml-2"
         label="Allow custom answer"
@@ -240,12 +248,7 @@
         helper-text="Submitters can not see this field. This option is intentionally allowed by the question set designer"
       />
       <checkbox
-        v-if="
-          control.type === 'ontology' ||
-          control.type === 'farmOsPlanting' ||
-          control.type === 'farmOsFarm' ||
-          control.type === 'farmOsField'
-        "
+        v-if="control.type === 'farmOsPlanting' || control.type === 'farmOsFarm' || control.type === 'farmOsField'"
         label="Multiple select"
         v-model="control.options.hasMultipleSelections"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"

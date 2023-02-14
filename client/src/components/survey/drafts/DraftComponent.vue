@@ -57,13 +57,7 @@
           <v-icon>mdi-arrow-down</v-icon>
         </v-btn>
       </v-fab-transition>
-      <app-control
-        class="pb-1"
-        :path="path"
-        :control="control"
-        :forceMobile="forceMobile"
-        :isInBuilder="builder"
-      />
+      <app-control class="pb-1" :path="path" :control="control" :forceMobile="forceMobile" :isInBuilder="builder" />
     </div>
 
     <!-- Footer with next/prev buttons -->

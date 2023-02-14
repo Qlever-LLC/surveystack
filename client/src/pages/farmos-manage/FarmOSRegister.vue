@@ -220,9 +220,7 @@
 </template>
 
 <script>
-import _ from 'lodash';
-
-import api from '@/services/api.service';
+import cloneDeep from 'lodash/cloneDeep';
 import appDialog from '@/components/ui/Dialog.vue';
 import appFieldCreator from './FieldCreator.vue';
 import appFieldList from './FieldList.vue';
@@ -238,7 +236,7 @@ export default {
   },
   data() {
     return {
-      localViewModel: _.cloneDeep(this.viewModel),
+      localViewModel: cloneDeep(this.viewModel),
       field: {
         wkt: '',
         name: '',
@@ -324,7 +322,7 @@ export default {
       immediate: true,
       handler(vm) {
         console.log('change propagated', vm);
-        this.localViewModel = _.cloneDeep(vm);
+        this.localViewModel = cloneDeep(vm);
       },
     },
   },

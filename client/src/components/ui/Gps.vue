@@ -25,9 +25,7 @@
     <!-- TODO: fix copied snack notification -->
     <v-snackbar v-model="snackbar">
       {{ snackbarText }}
-      <v-btn color="pink" text @click="snackbar = false">
-        Close
-      </v-btn>
+      <v-btn color="pink" text @click="snackbar = false"> Close </v-btn>
     </v-snackbar>
   </div>
 </template>
