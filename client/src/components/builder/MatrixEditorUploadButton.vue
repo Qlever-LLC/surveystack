@@ -36,10 +36,7 @@ export default {
           skipEmptyLines: true,
           // Normalize column headings and remove TYPE from "h|TYPE"
           transformHeader(h) {
-            return h
-              .trim()
-              .toLowerCase()
-              .split('|')[0];
+            return h.trim().toLowerCase().split('|')[0];
           },
         });
 

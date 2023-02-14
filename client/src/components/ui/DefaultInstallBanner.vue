@@ -53,7 +53,7 @@ export default {
   },
   created() {
     window.addEventListener('beforeinstallprompt', this.beforeInstallPrompt);
-    window.addEventListener('appinstalled', (evt) => {
+    window.addEventListener('appinstalled', () => {
       // localStorage.installed = true;
       // localStorage.setItem('installed', true);
     });

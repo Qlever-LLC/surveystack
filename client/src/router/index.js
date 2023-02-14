@@ -2,7 +2,6 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import { decode as b64Decode } from 'js-base64';
 import Home from '@/pages/Home.vue';
-import Test from '@/pages/Test.vue';
 import Unauthorized from '@/pages/Unauthorized.vue';
 
 const MySubmissions = () => import('@/pages/surveys/MySubmissions.vue');
@@ -56,8 +55,6 @@ const Script = () => import('@/pages/scripts/Script.vue');
 const ScriptEdit = () => import('@/pages/scripts/ScriptEdit.vue');
 const FarmOSGroupManage = () => import('@/pages/groups/FarmOS.vue');
 const HyloGroupManage = () => import('@/pages/groups/Hylo.vue');
-
-
 
 Vue.use(VueRouter);
 
@@ -221,7 +218,7 @@ const routes = [
     props: true,
     components: getComponents(FarmOSGroupManage),
   },
-    {
+  {
     path: '/group-manage/hylo/:id',
     name: 'hylo-group-manage',
     props: true,
@@ -351,12 +348,12 @@ const routes = [
   ...(process.env.NODE_ENV === 'production'
     ? []
     : [
-      {
-        path: '/tabularasa',
-        name: 'tabula-rasa',
-        component: TabulaRasa,
-      },
-    ]),
+        {
+          path: '/tabularasa',
+          name: 'tabula-rasa',
+          component: TabulaRasa,
+        },
+      ]),
   {
     path: '/kit/*',
     name: 'kit',

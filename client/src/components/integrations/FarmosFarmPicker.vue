@@ -60,7 +60,7 @@ export default {
   },
   watch: {
     selectedFarm: {
-      async handler(newVal, oldVal) {
+      async handler() {
         const a = this.aggregators.find((aggregator) => aggregator._id === this.selectedAggregator);
         const f = a.farms.find((farm) => farm.id === this.selectedFarm);
         const data = {
