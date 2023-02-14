@@ -43,7 +43,7 @@ export default {
   width: 100%;
   padding: 0.5rem;
   white-space: initial;
-  font-size: .875rem;
+  font-size: 0.875rem;
   position: absolute;
   transform: translate(-70px, calc(-100% - 4px));
   min-height: 40px;

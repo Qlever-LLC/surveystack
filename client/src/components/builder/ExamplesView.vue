@@ -15,11 +15,9 @@
           filled
         >
         </v-autocomplete>
-        <v-btn outlined class="ma-2" dark color="white" text @click="close">
-          Close
-        </v-btn>
+        <v-btn outlined class="ma-2" dark color="white" text @click="close"> Close </v-btn>
       </v-row>
-      <div style="width: 100%; height: 80vh;">
+      <div style="width: 100%; height: 80vh">
         <app-code-view :raw="true" :value="code" v-if="selected !== null"> </app-code-view>
       </div>
     </v-container>

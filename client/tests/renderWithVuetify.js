@@ -1,7 +1,7 @@
 import { render } from '@testing-library/vue';
 import Vuetify from 'vuetify';
 
-const renderWithVuetify = function(component, options, callback) {
+const renderWithVuetify = function (component, options, callback) {
   const root = document.createElement('div');
   root.setAttribute('data-app', 'true');
 

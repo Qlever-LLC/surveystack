@@ -100,7 +100,6 @@
 
 <script>
 import api from '@/services/api.service';
-import appIntegrationList from '@/components/integrations/IntegrationList.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 
 const availableRoles = [
@@ -127,7 +126,6 @@ const availableStatus = [
 
 export default {
   components: {
-    appIntegrationList,
     appDialog,
   },
   data() {

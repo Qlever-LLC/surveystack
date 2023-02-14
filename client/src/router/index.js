@@ -2,7 +2,6 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import { decode as b64Decode } from 'js-base64';
 import Home from '@/pages/Home.vue';
-import Test from '@/pages/Test.vue';
 import Unauthorized from '@/pages/Unauthorized.vue';
 
 const MySubmissions = () => import('@/pages/surveys/MySubmissions.vue');

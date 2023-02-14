@@ -27,7 +27,6 @@
 
 <script>
 import SurveyDiffCard from './SurveyDiffCard.vue';
-import { changeType } from '@/utils/surveyDiff';
 
 export default {
   name: 'survey-diff-card-tree',

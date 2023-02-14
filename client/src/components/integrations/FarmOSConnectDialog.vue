@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { ref, computed, emits } from '@vue/composition-api';
+import { ref } from '@vue/composition-api';
 
 export default {
   emits: ['connect', 'addExisting', 'create'],
