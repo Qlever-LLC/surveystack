@@ -26,6 +26,7 @@ import Group from '@/pages/groups/Group.vue';
 const GroupEdit = () => import('@/pages/groups/GroupEdit.vue');
 
 import SubmissionList from '@/pages/submissions/List.vue';
+import SubmissionDetail from '@/pages/submissions/Detail.vue';
 
 import ScriptList from '@/pages/scripts/ScriptList.vue';
 
@@ -56,8 +57,6 @@ const Script = () => import('@/pages/scripts/Script.vue');
 const ScriptEdit = () => import('@/pages/scripts/ScriptEdit.vue');
 const FarmOSGroupManage = () => import('@/pages/groups/FarmOS.vue');
 const HyloGroupManage = () => import('@/pages/groups/Hylo.vue');
-
-
 
 Vue.use(VueRouter);
 
@@ -156,6 +155,11 @@ const routes = [
     components: getComponents(DraftSubmission, { navbar: SubmissionDraftNavbar }),
   },
   {
+    path: '/submissions/:id',
+    name: 'submissions-detail',
+    components: getComponents(SubmissionDetail),
+  },
+  {
     path: '/auth/login',
     name: 'auth-login',
     components: getComponents(Login),
@@ -221,7 +225,7 @@ const routes = [
     props: true,
     components: getComponents(FarmOSGroupManage),
   },
-    {
+  {
     path: '/group-manage/hylo/:id',
     name: 'hylo-group-manage',
     props: true,
@@ -351,12 +355,12 @@ const routes = [
   ...(process.env.NODE_ENV === 'production'
     ? []
     : [
-      {
-        path: '/tabularasa',
-        name: 'tabula-rasa',
-        component: TabulaRasa,
-      },
-    ]),
+        {
+          path: '/tabularasa',
+          name: 'tabula-rasa',
+          component: TabulaRasa,
+        },
+      ]),
   {
     path: '/kit/*',
     name: 'kit',

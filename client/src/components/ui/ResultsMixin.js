@@ -1,4 +1,5 @@
 import { get } from 'lodash';
+import { nextTick } from 'vue';
 
 export default {
   data() {
@@ -9,7 +10,7 @@ export default {
   },
   methods: {
     result({ response, error }) {
-      this.showResult = true;
+      this.showResult = false;
       this.resultItems = [];
       let hasErrors = false;
 
@@ -53,17 +54,11 @@ export default {
         });
       }
 
-      const getLogsOf = (key) =>
-        get(response, `data.${key}`, [])
-          .map((h) => h.logs || [])
-          .flat();
-
-      if (!hasErrors) {
-        this.resultItems.push({
-          title: 'Success',
-          body: 'Successful submission',
-          response,
-          logs: [...getLogsOf('farmos'), ...getLogsOf('hylo')],
+      if (hasErrors) {
+        this.showResult = true;
+      } else {
+        this.$nextTick(function () {
+          this.$router.push(`/submissions/${this.submission._id}`);
         });
       }
     },
