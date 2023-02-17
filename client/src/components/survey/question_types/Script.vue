@@ -207,9 +207,10 @@ export default {
       const contextJSON = JSON.stringify(this.meta.context || {});
       const controlJSON = JSON.stringify(this.control);
       const paramsJSON = JSON.stringify((this.control.options && this.control.options.params) || {});
-      const iframeMessagingSource = await (await fetch(`${baseURL}/iframeMessaging.js`)).text(); //TODO read file with get
-      const iframeUISource = await (await fetch(`${baseURL}/iframeUI.js`)).text(); //TODO expose createUI directly and all other function as ui, like import { createUI } from '../../public/iframeUI'; and import * as ui from '../../public/iframeUI';
-      const sandboxUtilsSource = await (await fetch(`${baseURL}/sandboxUtils.js`)).text(); //TODO expose as utils like  import * as utils from '${baseURL}/sandboxUtils.js';
+      const iframeMessagingSource = await (await fetch(`${baseURL}/iframeMessaging.js`)).text();
+      const markedSource = await (await fetch(`${baseURL}/marked.esm.js`)).text(); //required by iframeUI.js
+      const iframeUISource = await (await fetch(`${baseURL}/iframeUI.js`)).text();
+      const sandboxUtilsSource = await (await fetch(`${baseURL}/sandboxUtils.js`)).text();
       const iframeStyles = await (await fetch(`${baseURL}/iframeStyles.css`)).text();
 
       const html = buildScriptQuestionIframeContents({
@@ -221,6 +222,7 @@ export default {
         controlJSON,
         paramsJSON,
         iframeMessagingSource,
+        markedSource,
         iframeUISource,
         sandboxUtilsSource,
         iframeStyles,
@@ -251,7 +253,7 @@ export default {
         let resourceContainingScriptData = await store.dispatch('resources/fetchScriptResource', scriptResource);
         script = resourceContainingScriptData.fileData;
       } else {
-        //fallback to directly using script id
+        //fallback to directly using script id in case of legacy survey
         let scriptId = this.control.options.source;
         const { data } = await api.get(`/scripts/${scriptId}`);
         script = data;

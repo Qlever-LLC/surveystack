@@ -1,5 +1,3 @@
-//import { marked } from 'https://cdn.jsdelivr.net/npm/marked@4.0.0/lib/marked.esm.js'; //TODO replace this
-
 export const ui = {
   card,
   message,
@@ -81,8 +79,9 @@ export function text(content) {
 
 export function markdown(content) {
   const node = document.createElement('div');
-  //TODO temp removed, reactivate it
-  //  node.innerHTML = marked(content);
+  // marked function is provided at runtime as js text copied into the iframe html
+  // eslint-disable-next-line no-undef
+  node.innerHTML = marked(content);
   return node;
 }
 

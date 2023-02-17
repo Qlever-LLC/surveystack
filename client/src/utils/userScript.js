@@ -23,6 +23,7 @@ export default function buildScriptQuestionIframeContents({
   controlJSON,
   paramsJSON,
   iframeMessagingSource,
+  markedSource,
   iframeUISource,
   sandboxUtilsSource,
   iframeStyles,
@@ -38,6 +39,7 @@ export default function buildScriptQuestionIframeContents({
       <div id="root"></div>
       <script type="module">
         ${iframeMessagingSource}
+        ${markedSource}
         ${iframeUISource}
         ${sandboxUtilsSource}
 
