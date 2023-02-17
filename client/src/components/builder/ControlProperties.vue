@@ -564,7 +564,7 @@ export default {
       if (scriptResource) {
         this.scriptSourceId = scriptResource.content;
       } else {
-        //fallback to directly using script id
+        //fallback to directly using script id in case of legacy survey
         this.scriptSourceId = this.control.options.source;
       }
       this.scriptParams = this.getScriptParams();

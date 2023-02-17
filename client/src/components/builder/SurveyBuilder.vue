@@ -614,7 +614,7 @@ export default {
         if (scriptResource) {
           scriptId = scriptResource.content;
         } else {
-          //fallback to directly using script id
+          //fallback to directly using script id in case of legacy survey
           scriptId = control.options.source;
         }
         const data = await this.fetchScript(scriptId);
