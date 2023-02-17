@@ -1,9 +1,7 @@
 <template>
   <v-dialog :value="value" @input="(v) => $emit('input', v)" width="700" max-width="75%">
     <v-card>
-      <v-card-title>
-        Add Survey To Library
-      </v-card-title>
+      <v-card-title> Add Survey To Library </v-card-title>
       <v-card-text>
         <v-text-field :value="localLibrarySurvey.name" label="Title" readonly />
         <h3>Description</h3>
@@ -27,9 +25,7 @@
           <span v-if="!librarySurvey.meta.isLibrary">Add to library</span>
           <span v-if="localLibrarySurvey.meta.isLibrary">Save</span>
         </v-btn>
-        <v-btn @click="$emit('cancel')" color="primary" text>
-          Cancel
-        </v-btn>
+        <v-btn @click="$emit('cancel')" color="primary" text> Cancel </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

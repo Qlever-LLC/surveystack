@@ -46,7 +46,7 @@ export default {
         visible: true, // defaults to true
         base: true, // defaults to false
       };
-      const xyzLayer = map.addLayer('xyz', xyzOpts);
+      map.addLayer('xyz', xyzOpts);
 
       console.log('created map', this.value);
       let layer;

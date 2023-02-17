@@ -206,7 +206,7 @@ export default {
       event.dataTransfer.dropEffect = 'copy';
       this.isDragging = true;
     },
-    onDragLeave(event) {
+    onDragLeave() {
       this.isDragging = false;
     },
     async addFile(file, destArray, allowMultiple, allowedTypes) {

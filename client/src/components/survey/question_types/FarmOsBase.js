@@ -1,7 +1,6 @@
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { linearControls } from '@/utils/submissions';
-import { NODE_STREAM_INPUT } from 'papaparse';
 
 const base = (type) => ({
   data() {
@@ -39,7 +38,7 @@ const base = (type) => ({
       this.loading = true;
       try {
         const response = await api.get('farmos/farms');
-        this.farms = response.data.map(({ name, instanceName }) => ({
+        this.farms = response.data.map(({ instanceName }) => ({
           label: instanceName,
           value: {
             url: instanceName,

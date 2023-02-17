@@ -1,5 +1,5 @@
 require('fake-indexeddb/auto');
-import { mount, shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Vuetify from 'vuetify';
 import FileComp from './File.vue';
 import { Blob } from 'buffer';

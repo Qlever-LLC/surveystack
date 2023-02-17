@@ -14,9 +14,7 @@
         </v-list-item-action>
       </v-list-item>
     </v-list>
-    <v-btn class="ml-auto mr-0 d-block mb-3" @click="handleAddImage">
-      +&nbsp; Add Image
-    </v-btn>
+    <v-btn class="ml-auto mr-0 d-block mb-3" @click="handleAddImage"> +&nbsp; Add Image </v-btn>
   </div>
 </template>
 

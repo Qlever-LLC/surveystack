@@ -4,6 +4,7 @@ import { cloneDeep, groupBy } from 'lodash';
 import * as constants from '@/constants';
 import api from '@/services/api.service';
 import { getNested } from '@/utils/surveyStack';
+import { AuthService } from '@/services/storage.service';
 
 function* processPositions(data, position = []) {
   if (!data) {
@@ -83,6 +84,8 @@ const getBreadcrumbsForSubmission = (controls, position) => {
 export const createSubmissionFromSurvey = ({ survey, version = 1, instance, submitAsUser = undefined }) => {
   const submission = {};
   const dateNow = new Date().toISOString();
+  const currentUser = AuthService.getUser();
+  const creator = currentUser._id || null;
 
   submission._id = new ObjectID().toString();
   submission.meta = {
@@ -99,6 +102,7 @@ export const createSubmissionFromSurvey = ({ survey, version = 1, instance, subm
     },
     specVersion: constants.SPEC_VERSION_SUBMISSION,
     submitAsUser: submitAsUser,
+    creator,
   };
 
   // TODO: handle version not found

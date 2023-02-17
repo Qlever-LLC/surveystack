@@ -192,7 +192,6 @@
 
 <script>
 import api from '@/services/api.service';
-import appIntegrationList from '@/components/integrations/IntegrationList.vue';
 import appPinnedSurveys from '@/components/groups/PinnedSurveys.vue';
 import appDocLinks from '@/components/groups/DocLinks.vue';
 import appBasicList from '@/components/ui/BasicList.vue';
@@ -203,8 +202,6 @@ import appMemberHyloStatus from './MemberHyloStatus.vue';
 import { handleize } from '@/utils/groups';
 import { SPEC_VERSION_GROUP } from '@/constants';
 import { get } from 'lodash';
-
-const appFarmHubOnboarding = () => import('@/components/integrations/FarmHubOnboarding.vue');
 
 const integrations = [
   {
@@ -221,12 +218,10 @@ const integrations = [
 
 export default {
   components: {
-    appIntegrationList,
     appPinnedSurveys,
     appDocLinks,
     appBasicList,
     appDialog,
-    appFarmHubOnboarding,
     appGroupBreadcrumbs,
     appConfirmMembershipButton,
     appMemberHyloStatus,
@@ -345,7 +340,7 @@ export default {
   },
   watch: {
     'entity.name': {
-      handler(newVal, oldVal) {
+      handler(newVal) {
         if (!this.editMode) {
           const handle = handleize(newVal);
           this.entity.slug = handle;
@@ -353,7 +348,7 @@ export default {
       },
     },
     'entity.slug': {
-      handler(newVal, oldVal) {
+      handler(newVal) {
         const handle = handleize(newVal);
         this.entity.slug = handle;
       },
