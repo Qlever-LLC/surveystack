@@ -235,16 +235,6 @@ export default {
       this.source = data;
     },
   },
-  watch: {
-    submission: {
-      handler: function (val, oldVal) {
-        if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
-          this.initializeIframe();
-        }
-      },
-      deep: true,
-    },
-  },
   async mounted() {
     try {
       this.isLoading = true;
