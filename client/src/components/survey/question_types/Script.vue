@@ -237,8 +237,10 @@ export default {
   },
   watch: {
     submission: {
-      handler: function () {
-        this.initializeIframe();
+      handler: function (val, oldVal) {
+        if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
+          this.initializeIframe();
+        }
       },
       deep: true,
     },
