@@ -52,7 +52,6 @@ const fetchPinned = async (commit, dispatch) => {
         try {
           let s = await actions.fetchSurvey({ commit }, sid);
           if (s.resources) {
-            //TODO also fetch script resources
             await dispatch('resources/fetchResources', s.resources, { root: true });
           }
           fetched.push(s);
