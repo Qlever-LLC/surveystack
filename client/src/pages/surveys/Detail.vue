@@ -218,9 +218,13 @@ export default {
     const { data: entity } = await api.get(`/surveys/${id}`);
     this.entity = entity;
 
-    //TODO CHECK THIS . thats not cached by fetch pinned, so this will probably throw in offline
-    const { data: surveyInfo } = await api.get(`/surveys/info?id=${id}`);
-    this.surveyInfo = surveyInfo;
+    try {
+      // load date of latestSubmission and number of submissions. This is not prefetched, so it will throw when offline
+      const { data: surveyInfo } = await api.get(`/surveys/info?id=${id}`);
+      this.surveyInfo = surveyInfo;
+    } catch (error) {
+      console.warn('unable to get survey stats infos. Maybe device is offline.');
+    }
 
     const user = this.$store.getters['auth/user'];
     this.$store.dispatch('memberships/getUserMemberships', user._id);
