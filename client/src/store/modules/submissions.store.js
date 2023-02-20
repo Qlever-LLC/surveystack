@@ -133,7 +133,7 @@ const actions = {
       query: { minimal_ui: router.currentRoute.query.minimal_ui },
     });
   },
-  async [types.actions.update]({ commit, dispatch }, submission) {
+  async [types.actions.update]({ commit }, submission) {
     await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
     commit(types.mutations.UPDATE_SUBMISSION, submission);
     return submission;
