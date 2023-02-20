@@ -135,7 +135,7 @@ const mutations = {
   },
   REMOVE_SURVEY(state, id) {
     const index = state.surveys.findIndex((survey) => survey._id === id);
-    state.submissions.splice(index, 1);
+    state.surveys.splice(index, 1);
   },
   SET_PINNED(state, pinned) {
     state.pinned = pinned;
