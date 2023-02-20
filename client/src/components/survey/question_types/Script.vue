@@ -244,7 +244,6 @@ export default {
       );
     },
     async fetchScriptSource() {
-      //TODO fetch from cache/indexeddb/store if user offline
       const resourceId = this.control && this.control.options && this.control.options.source;
       const scriptResource = this.resources.find((r) => r.id === resourceId);
       let script;
