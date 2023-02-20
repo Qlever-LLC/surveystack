@@ -58,6 +58,12 @@
           </div>
         </template>
         <div v-if="additionalMessage" v-html="additionalMessage" />
+
+        <div v-if="isSuccess" class="my-6 d-flex flex-column align-stretch">
+          <v-btn color="primary" depressed dense @click="$emit('download')">Download</v-btn>
+          <v-btn class="mt-3" color="primary" depressed dense @click="$emit('emailMe')">Email me survey</v-btn>
+        </div>
+
         <v-card-actions>
           <v-spacer />
           <v-btn text color="primary" @click="onClose"> Ok </v-btn>
@@ -69,6 +75,7 @@
 
 <script>
 import CopyToClipboard from '../submissions/CopyToClipboard.vue';
+
 export default {
   components: {
     CopyToClipboard,
@@ -103,6 +110,9 @@ export default {
       set(value) {
         this.$emit('input', value);
       },
+    },
+    isSuccess() {
+      return this.items.every((item) => !item.error);
     },
   },
   methods: {

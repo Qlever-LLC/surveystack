@@ -10,7 +10,7 @@ export default {
   },
   methods: {
     result({ response, error }) {
-      this.showResult = false;
+      this.showResult = true;
       this.resultItems = [];
       let hasErrors = false;
 
@@ -54,11 +54,17 @@ export default {
         });
       }
 
-      if (hasErrors) {
-        this.showResult = true;
-      } else {
-        this.$nextTick(function () {
-          this.$router.push(`/submissions/${this.submission._id}`);
+      const getLogsOf = (key) =>
+        get(response, `data.${key}`, [])
+          .map((h) => h.logs || [])
+          .flat();
+
+      if (!hasErrors) {
+        this.resultItems.push({
+          title: 'Success',
+          body: 'Successful submission',
+          response,
+          logs: [...getLogsOf('farmos'), ...getLogsOf('hylo')],
         });
       }
     },

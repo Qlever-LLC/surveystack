@@ -5,6 +5,13 @@ import * as constants from '@/constants';
 import api from '@/services/api.service';
 import { getNested } from '@/utils/surveyStack';
 import { AuthService } from '@/services/storage.service';
+import pdfMake from 'pdfmake/build/pdfmake';
+import pdfFonts from 'pdfmake/build/vfs_fonts';
+import isValid from 'date-fns/isValid';
+import parseISO from 'date-fns/parseISO';
+import dateFnsFormat from 'date-fns/format';
+
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 function* processPositions(data, position = []) {
   if (!data) {
@@ -269,4 +276,78 @@ export async function fetchSubmissionUniqueItems(surveyId, path) {
     count: group.length,
   }));
   return uniqueItems;
+}
+
+// export async function generateSubmissionPdf(submissionId) {
+//   const { data } = await api.get(`/submissions/${id}?pure=1`);
+// }
+
+function formatDate(date, format = 'yyyy-MM-dd hh:mm') {
+  const parsedDate = parseISO(date);
+  return dateFnsFormat(isValid(parsedDate) ? parsedDate : new Date(), format);
+}
+
+export function generateSubmissionPdf(survey, submission) {
+  if (!survey || !submission) {
+    return;
+  }
+
+  const docDefinition = {
+    content: [],
+    styles: {
+      header: {
+        fontSize: 20,
+        bold: true,
+        alignment: 'center',
+      },
+      meta: {
+        fontSize: 10,
+        color: '#64748b',
+      },
+    },
+    defaultStyle: {
+      lineHeight: 1.15,
+    },
+  };
+
+  // Survey info
+  const metaGroup = `Submitted to: ${submission.meta.group.path}`;
+  const metaDate = `Submitted at: ${formatDate(
+    submission.meta.dateSubmitted || submission.meta.dateModified || submission.meta.dateCreated
+  )}`;
+
+  docDefinition.content.push(
+    {
+      text: `Survey: ${survey.name}`,
+      style: 'header',
+    },
+    {
+      text: `\n${metaGroup}\n${metaDate}\n\n`,
+      style: 'meta',
+    }
+  );
+
+  const revision = survey.revisions.find((revision) => revision.version === submission.meta.survey.version);
+  if (!revision) {
+    return;
+  }
+
+  // Controls
+  docDefinition.content.push(
+    ...revision.controls.flatMap(({ type, label, hint, name }) => {
+      const controlDefinition = [];
+      const hasAnswer = name in submission.data;
+      const answer = hasAnswer ? submission.data[name].value : null;
+
+      if (type === 'string' || type == 'number') {
+        const hintText = hint ? ` (${hint.trim()})` : '';
+        controlDefinition.push({ text: `Q: ${label}${hintText}` });
+        controlDefinition.push({ text: `A: ${answer || 'No answer'}\n\n` });
+      }
+
+      return controlDefinition;
+    })
+  );
+
+  return pdfMake.createPdf(docDefinition);
 }

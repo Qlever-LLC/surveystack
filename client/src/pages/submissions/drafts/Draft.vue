@@ -47,6 +47,8 @@
         }
       "
       @close="onCloseResultDialog"
+      @download="download"
+      @email-me="emailMe"
     />
 
     <result-dialog
@@ -61,9 +63,7 @@
 <script>
 import api from '@/services/api.service';
 import appMixin from '@/components/mixin/appComponent.mixin';
-import * as db from '@/store/db';
 import resultMixin from '@/components/ui/ResultsMixin';
-
 import appDraftComponent from '@/components/survey/drafts/DraftComponent.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import ConfirmLeaveDialog from '@/components/shared/ConfirmLeaveDialog.vue';
@@ -71,8 +71,9 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
-import { createSubmissionFromSurvey } from '@/utils/submissions';
-import { defaultsDeep } from 'lodash';
+import { generateSubmissionPdf, createSubmissionFromSurvey } from '@/utils/submissions';
+import * as db from '@/store/db';
+import defaultsDeep from 'lodash/defaultsDeep';
 
 export default {
   mixins: [appMixin, resultMixin],
@@ -169,6 +170,11 @@ export default {
         window.parent.postMessage(message, '*');
       }
     },
+    download() {
+      const pdf = generateSubmissionPdf(this.survey, this.submission);
+      pdf.download();
+    },
+    emailMe() {},
   },
   async created() {
     this.loading = true;
@@ -219,7 +225,7 @@ export default {
       return;
     }
 
-    if (this.submission.meta.submitAsUser) {
+    if (this.submission && this.submission.meta.submitAsUser) {
       api.removeHeader('x-delegate-to');
     }
     next(true);
