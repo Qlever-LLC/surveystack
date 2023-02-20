@@ -235,14 +235,6 @@ export default {
       this.source = data;
     },
   },
-  watch: {
-    submission: {
-      handler: function () {
-        this.initializeIframe();
-      },
-      deep: true,
-    },
-  },
   async mounted() {
     try {
       this.isLoading = true;
