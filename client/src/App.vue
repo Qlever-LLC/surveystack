@@ -37,7 +37,6 @@ export default {
     async fetchPinnedSurveys() {
       await this.$store.dispatch('resources/initFromIndexedDB');
       await this.$store.dispatch('surveys/fetchPinned');
-      //TODO fetch script resources
     },
     fetchFarmOsAssets() {
       if (this.$store.getters['auth/isLoggedIn']) {
