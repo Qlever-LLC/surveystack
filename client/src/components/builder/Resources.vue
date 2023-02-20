@@ -92,14 +92,6 @@
               <v-icon color="grey lighten-1" @click.stop="removeRemoteResource(resource)"> mdi-delete </v-icon>
             </v-btn>
           </v-list-item-action>
-          <!--TODO REPLACE THIS BY AUTOMATIC REMOVAL-->
-          <v-list-item-action
-            v-if="resource.type === resourceTypes.SCRIPT_REFERENCE || resource.type === resourceTypes.SURVEY_REFERENCE"
-          >
-            <v-btn icon>
-              <v-icon color="grey lighten-1" @click.stop="removeResource(resource.id)"> mdi-delete </v-icon>
-            </v-btn>
-          </v-list-item-action>
         </v-list-item>
       </template>
       <v-list-item v-else>
