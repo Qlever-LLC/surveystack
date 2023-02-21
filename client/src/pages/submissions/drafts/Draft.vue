@@ -71,7 +71,8 @@ import SubmittingDialog from '@/components/shared/SubmittingDialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
-import { generateSubmissionPdf, createSubmissionFromSurvey } from '@/utils/submissions';
+import { createSubmissionFromSurvey } from '@/utils/submissions';
+import SubmissionPdf from '@/utils/submissionPdf';
 import * as db from '@/store/db';
 import defaultsDeep from 'lodash/defaultsDeep';
 
@@ -171,7 +172,7 @@ export default {
       }
     },
     download() {
-      const pdf = generateSubmissionPdf(this.survey, this.submission);
+      const pdf = new SubmissionPdf(this.survey, this.submission);
       pdf.download();
     },
     emailMe() {},
