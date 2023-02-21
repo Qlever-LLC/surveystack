@@ -197,10 +197,16 @@ export default {
 }
 
 .group {
+  margin: 8px 0px;
   padding: 1rem;
   box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
   border-left: 4px solid #fff;
   transition: 0.2s;
+  background-color: #ffffff;
+}
+
+.group:first-child {
+  margin-top: 0px;
 }
 
 .group:hover {

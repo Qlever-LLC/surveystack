@@ -1,10 +1,10 @@
 <template>
   <div>
     <v-dialog v-model="show" max-width="350" :persistent="persistent">
-      <v-card class="pa-4">
-        <v-card-title class="headline" v-if="title">{{ title }}</v-card-title>
-        <template v-for="(item, idx) in items">
-          <div :key="'item_' + idx">
+      <v-card>
+        <v-card-title v-if="title" class="headline mb-2">{{ title }}</v-card-title>
+        <v-card-text>
+          <div v-for="(item, idx) in items" :key="idx">
             <v-card flat dark outlined class="mb-2" :color="item.error ? 'red darken-4' : 'green'">
               <v-card-text class="white--text">
                 <span style="font-weight: bold">{{ item.title }}</span> {{ item.body }}
@@ -56,8 +56,8 @@
               <!-- <pre v-if="item.logs">{{ JSON.stringify(item.logs, null, 2) }}</pre> -->
             </v-card>
           </div>
-        </template>
-        <div v-if="additionalMessage" v-html="additionalMessage" />
+          <div v-if="additionalMessage" class="px-2" v-html="additionalMessage" />
+        </v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn text color="primary" @click="onClose"> Ok </v-btn>
