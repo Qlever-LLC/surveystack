@@ -2,27 +2,25 @@
   <div>
     <app-dialog
       v-model="showConfirmDeletionDialog"
+      v-bind="dialogProps"
       v-if="rowToBeDeleted >= 0"
       @confirm="remove(rowToBeDeleted)"
       @cancel="rowToBeDeleted = -1"
       title="Confirm Deletion"
       labelConfirm="DELETE"
       :maxWidth="400"
-      :attach="dialogAttach"
-      :hide-overlay="dialogHideOverlay"
     >
       Do you want to delete this row?
     </app-dialog>
 
     <v-dialog
       v-model="showEditItemDialog"
+      v-bind="dialogProps"
       v-if="showEditItemDialog"
       title="Edit"
       hideCancel
       @confirm="showEditItemDialog = false"
       max-width="800px"
-      :attach="dialogAttach"
-      :hide-overlay="dialogHideOverlay"
     >
       <div style="background: #1867c0; padding: 4px 0px">
         <v-card>
@@ -290,13 +288,6 @@ export default {
     },
     farmos() {
       return { farms: this.farms, plantings: this.farmosTransformedPlantings };
-    },
-    dialogAttach() {
-      const dom = document.querySelector('#previewSurvey');
-      return dom ? '#previewSurvey' : undefined;
-    },
-    dialogHideOverlay() {
-      return !!this.dialogAttach;
     },
   },
   data() {
