@@ -213,8 +213,11 @@ export default {
       await autoSelectActiveGroup(this.$store, group);
     }
 
-    //TODO also fetch scripts here in case survey is not pinned?
     const { data: entity } = await api.get(`/surveys/${id}`);
+    if (entity.resources) {
+      //also fetch resources here in case survey is not pinned, so it's available if devices goes offline
+      await this.$store.dispatch('resources/fetchResources', entity.resources);
+    }
     this.entity = entity;
 
     try {
