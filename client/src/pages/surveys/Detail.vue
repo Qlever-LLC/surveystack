@@ -209,8 +209,6 @@ export default {
     const { group } = this.$route.query;
 
     if (group) {
-      //TODO CHECK THIS
-      this.$store.dispatch('surveys/fetchPinned'); // TODO do we need fetchPinned?
       await autoSelectActiveGroup(this.$store, group);
     }
 
