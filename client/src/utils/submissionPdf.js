@@ -20,14 +20,15 @@ const styles = {
   },
   meta: {
     fontSize: 10,
-    color: '#64748b',
+    color: '#9ca3af',
   },
   question: {
+    fontSize: 14,
     bold: true,
     margin: [0, 0, 0, 8],
   },
   answer: {
-    color: '#374151',
+    color: '#1e293b',
   },
 };
 
@@ -128,6 +129,7 @@ export default class SubmissionPDF {
       location: this.generateLocationControl,
       selectSingle: this.generateRadioControl,
       selectMultiple: this.generateCheckControl,
+      ontology: this.generateDropdownControl,
       matrix: this.generateMatrixControl,
     }[control.type];
 
@@ -145,7 +147,7 @@ export default class SubmissionPDF {
   generateNormalControl(control, path = []) {
     const key = [...path, control.name, 'value'];
     const value = getProperty(this.submission.data, key);
-    this.docDefinition.content.push(this.getQuestion(control), this.getAnswer(value), '\n\n');
+    this.docDefinition.content.push(this.getQuestion(control), this.getTextAnswer(value), '\n\n');
   }
 
   generateDateControl(control, path = []) {
@@ -153,13 +155,13 @@ export default class SubmissionPDF {
     const value = getProperty(this.submission.data, key);
     const date = parseISO(value);
     const dateValue = isValid(date) ? dateFnsFormat(date, 'MMM d, yyyy h:mm a') : null;
-    this.docDefinition.content.push(this.getQuestion(control), this.getAnswer(dateValue), '\n\n');
+    this.docDefinition.content.push(this.getQuestion(control), this.getTextAnswer(dateValue), '\n\n');
   }
 
   generateLocationControl(control, path = []) {
     const key = [...path, control.name, 'value', 'geometry', 'coordinates'];
     const value = getProperty(this.submission.data, key);
-    this.docDefinition.content.push(this.getQuestion(control), this.getAnswer(value), '\n\n');
+    this.docDefinition.content.push(this.getQuestion(control), this.getTextAnswer(value), '\n\n');
   }
 
   async generateRadioControl(control, path = []) {
@@ -178,6 +180,14 @@ export default class SubmissionPDF {
     this.docDefinition.content.push(this.getQuestion(control), this.getSelectAnswer(value, source, true, 4), '\n\n');
   }
 
+  async generateDropdownControl(control, path = []) {
+    const key = [...path, control.name, 'value'];
+    const value = getProperty(this.submission.data, key);
+    const source = await this.getControlSource(control);
+
+    this.docDefinition.content.push(this.getQuestion(control), this.getDropdownAnswer(value, source, 4), '\n\n');
+  }
+
   generateMatrixControl(control, path = []) {
     const headers = getProperty(control, ['options', 'source', 'content']);
     if (!Array.isArray(headers)) {
@@ -190,19 +200,33 @@ export default class SubmissionPDF {
       .fill(0)
       .map(() => ({}));
     const noDataCell = {
-      ...this.getAnswer(),
+      ...this.getTextAnswer(),
       colSpan: headers.length,
       alignment: 'center',
+      margin: [0, 4, 0, 4],
     };
     const rows =
       answer.length === 0
         ? [[noDataCell, ...emptyCells].slice(0, -1)]
-        : answer.map((row) => headers.map((header) => this.getAnswer(getProperty(row, [header.value, 'value']))));
+        : answer.map((row) => headers.map((header) => this.getTextAnswer(getProperty(row, [header.value, 'value']))));
 
     this.docDefinition.content.push(
       this.getQuestion(control),
       {
-        layout: 'lightHorizontalLines',
+        layout: {
+          hLineWidth: function (i, node) {
+            return 1;
+          },
+          vLineWidth: function (i, node) {
+            return 0;
+          },
+          hLineColor: function (i, node) {
+            return i === 0 || i === node.table.body.length ? styles.answer.color : styles.meta.color;
+          },
+          fillColor: function (rowIndex, node, columnIndex) {
+            return rowIndex % 2 === 1 ? 'white' : '#d1d5db';
+          },
+        },
         table: {
           headerRows: 1,
           body: [headers.map((header) => header.label || header.value), ...rows],
@@ -221,7 +245,7 @@ export default class SubmissionPDF {
     };
   }
 
-  getAnswer(answer) {
+  getTextAnswer(answer) {
     const text = Array.isArray(answer)
       ? JSON.stringify(answer)
       : answer === null || answer === undefined
@@ -231,6 +255,7 @@ export default class SubmissionPDF {
 
     return {
       text,
+      style: 'answer',
       color: hasAnswer ? styles.answer.color : styles.meta.color,
     };
   }
@@ -266,11 +291,53 @@ export default class SubmissionPDF {
     };
   }
 
+  getDropdownAnswer(answer, source, cols = 1) {
+    const value = Array.isArray(answer) ? answer : answer ? [answer] : [];
+    const options = [...source];
+
+    const custom = value.find((val) => val && source.every((item) => item.value !== val));
+    if (custom) {
+      options.push({ value: custom, label: custom });
+    }
+
+    const group = [];
+    if (cols === 1) {
+      group.push(options);
+    } else {
+      options.forEach((option, index) => {
+        const i = index % cols;
+        if (!Array.isArray(group[i])) {
+          group[i] = [];
+        }
+        group[i].push(option);
+      });
+    }
+
+    const isChecked = (option) => value.includes(option.value);
+
+    return {
+      columns: group.map((columnOptions) => ({
+        ul: columnOptions.map((option) => ({
+          ...this.getTextAnswer(option.label),
+          color: isChecked(option) ? 'blue' : styles.answer.color,
+        })),
+      })),
+    };
+  }
+
   getSelectDefinition(option, multiple, checked) {
     return {
       table: {
         widths: [12, '*'],
-        body: [[{ svg: getControlSvg(multiple, checked), fit: [12, 12] }, this.getAnswer(option.label)]],
+        body: [
+          [
+            {
+              svg: getControlSvg(multiple, checked),
+              fit: [12, 12],
+            },
+            this.getTextAnswer(option.label),
+          ],
+        ],
       },
       layout: 'noBorders',
     };
@@ -301,7 +368,7 @@ export default class SubmissionPDF {
     }
 
     if (resource.location === 'REMOTE') {
-      return await fetchSubmissionUniqueItems(resource.id, resource.path);
+      return await fetchSubmissionUniqueItems(resource.content.id, resource.content.path);
     }
 
     return [];
