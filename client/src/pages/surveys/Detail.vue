@@ -209,6 +209,7 @@ export default {
     const { group } = this.$route.query;
 
     if (group) {
+      // see analysis in https://gitlab.com/our-sci/software/surveystack/-/merge_requests/230#note_1286909610
       await autoSelectActiveGroup(this.$store, group);
     }
 
