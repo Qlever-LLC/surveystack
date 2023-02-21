@@ -8,6 +8,8 @@
       title="Confirm Deletion"
       labelConfirm="DELETE"
       :maxWidth="400"
+      :attach="dialogAttach"
+      :hide-overlay="dialogHideOverlay"
     >
       Do you want to delete this row?
     </app-dialog>
@@ -19,6 +21,8 @@
       hideCancel
       @confirm="showEditItemDialog = false"
       max-width="800px"
+      :attach="dialogAttach"
+      :hide-overlay="dialogHideOverlay"
     >
       <div style="background: #1867c0; padding: 4px 0px">
         <v-card>
@@ -286,6 +290,13 @@ export default {
     },
     farmos() {
       return { farms: this.farms, plantings: this.farmosTransformedPlantings };
+    },
+    dialogAttach() {
+      const dom = document.querySelector('#previewSurvey');
+      return dom ? '#previewSurvey' : undefined;
+    },
+    dialogHideOverlay() {
+      return !!this.dialogAttach;
     },
   },
   data() {

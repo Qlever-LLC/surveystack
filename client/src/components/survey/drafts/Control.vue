@@ -2,7 +2,13 @@
   <div :class="className" style="width: 100%">
     <div v-if="control.type === 'page' && !insidePage">
       <div v-for="(child, i) in control.children" :key="i">
-        <app-control :path="`${path}.${child.name}`" :control="child" :autoFocus="i === 0" insidePage />
+        <app-control
+          :path="`${path}.${child.name}`"
+          :control="child"
+          :autoFocus="i === 0"
+          :forceMobile="forceMobile"
+          insidePage
+        />
       </div>
     </div>
 
