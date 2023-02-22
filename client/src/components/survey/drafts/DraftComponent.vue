@@ -202,7 +202,6 @@ export default {
       // this.$store.dispatch('draft/next')
       queueAction(this.$store, 'draft/next');
       window.scrollTo(0, 0);
-      console.log(1111, this.survey, this.submission);
     },
     prev() {
       // this.$store.dispatch('draft/prev')

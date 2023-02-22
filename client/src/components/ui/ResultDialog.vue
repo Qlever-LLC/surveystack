@@ -106,7 +106,6 @@ export default {
       },
     },
     isSuccess() {
-      console.log(111, this.items);
       return this.items.every((item) => !item.error);
     },
   },

@@ -56,6 +56,8 @@
       :items="resultItems"
       title="Result of Submission"
       additionalMessage="<span class='caption'>Note: submissions from Builder are automatically archived. Please browse archived submissions to view this result.</span>"
+      @download="download"
+      @email-me="emailMe"
     />
 
     <result-dialog
@@ -101,17 +103,16 @@
 
 <script>
 import ObjectId from 'bson-objectid';
-import api from '@/services/api.service';
-
 import appDialog from '@/components/ui/Dialog.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import resultMixin from '@/components/ui/ResultsMixin';
-
+import VersionsDialog from '@/components/builder/VersionsDialog';
 import { createSurvey, updateControls } from '@/utils/surveys';
 import { isIos, isSafari } from '@/utils/compatibility';
 import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
-import VersionsDialog from '@/components/builder/VersionsDialog';
+import SubmissionPdf from '@/utils/submissionPdf';
+import api from '@/services/api.service';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
@@ -134,6 +135,7 @@ export default {
         creator: this.$store.state.auth.user._id,
         group: this.getActiveGroupSimpleObject(),
       }),
+      submission: null,
       showSnackbar: false,
       snackbarMessage: '',
       showDeleteModal: false,
@@ -191,6 +193,7 @@ export default {
       }
     },
     async submitSubmission({ payload }) {
+      this.submission = null;
       this.apiComposeErrors = getApiComposeErrors(this.survey, payload);
       if (this.apiComposeErrors.length > 0) {
         this.showApiComposeErrors = true;
@@ -200,7 +203,7 @@ export default {
       this.submitting = true;
       try {
         await uploadFileResources(this.$store, this.survey, payload, false);
-        const submission = {
+        this.submission = {
           ...payload,
           meta: {
             ...payload.meta,
@@ -208,7 +211,7 @@ export default {
             archivedReason: 'SUBMISSION_FROM_BUILDER',
           },
         };
-        const response = await api.post('/submissions', submission);
+        const response = await api.post('/submissions', this.submission);
         try {
           this.result({ response });
         } catch (error) {
@@ -355,6 +358,11 @@ export default {
     onReloadSurvey() {
       this.fetchData();
     },
+    download() {
+      const pdf = new SubmissionPdf(this.survey, this.submission);
+      pdf.download();
+    },
+    emailMe() {},
   },
   async created() {
     this.editMode = !this.$route.matched.some(({ name }) => name === 'surveys-new');
