@@ -35,6 +35,7 @@ export default {
       location: null,
       gps: null,
       geolocationID: null,
+      timer: 0,
       usingGPS: true,
       marker: null,
       ctrl: null,
@@ -218,12 +219,19 @@ export default {
 
     // TODO: this will now trigger a map error
     if (navigator.geolocation) {
-      this.geolocationID = navigator.geolocation.watchPosition(successHandler, errorHandler);
+      this.geolocationID = navigator.geolocation.watchPosition(successHandler, errorHandler, { timeout: 5000 });
+      this.timer = setTimeout(() => {
+        console.warn('No confirmation from the user permission');
+        this.geolocationError = 'Timed out, please allow or block the permission.';
+      }, 10000);
     }
   },
   beforeDestroy() {
     if (navigator.geolocation) {
       navigator.geolocation.clearWatch(this.geolocationID);
+    }
+    if (this.timer) {
+      clearTimeout(this.timer);
     }
     this.map.remove();
   },
