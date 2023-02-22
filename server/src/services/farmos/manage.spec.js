@@ -122,11 +122,11 @@ describe('manageFarmOS', () => {
     expect(results[0].instanceName).toBe(farmOSInstanceName);
     expect(results[0].owner).toBe(true);
   });
-  it('addFarmToSurveystackGroup && removeFarmFromSurveystackGroup', async () => {
+  it('createFarmOSInstanceForUserAndGroup && removeFarmFromSurveystackGroup', async () => {
     const { group, admin1, user1 } = await init();
     const farmOSInstanceName = 'test.surveystack.io';
+    await createFarmOSInstanceForUserAndGroup(user1.user._id, group._id, farmOSInstanceName, true);
 
-    await addFarmToSurveystackGroup(farmOSInstanceName, group._id);
     let results = await listFarmOSInstancesForGroup(group._id);
     expect(results[0].instanceName).toBe(farmOSInstanceName);
 
@@ -134,7 +134,9 @@ describe('manageFarmOS', () => {
       /mapping already exists/
     );
 
-    await removeFarmFromSurveystackGroup(farmOSInstanceName, group._id);
+    await expect(removeFarmFromSurveystackGroup(farmOSInstanceName, group._id)).rejects.toThrow(
+      /getaddrinfo ENOTFOUND mail.example.com/
+    );
     results = await listFarmOSInstancesForGroup(group._id);
     expect(results.length).toBe(0);
   });

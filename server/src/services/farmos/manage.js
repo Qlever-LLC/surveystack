@@ -5,6 +5,7 @@ import uniq from 'lodash/uniq';
 import boom from '@hapi/boom';
 import { getDescendantGroups, getAscendantGroups } from '../roles.service';
 import { addGroupToCoffeeShop, isCoffeeShopEnabled, removeGroupFromCoffeeShop } from './coffeeshop';
+import mailService from '../../services/mail/mail.service';
 
 const config = () => {
   if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
@@ -378,6 +379,43 @@ export const removeFarmFromSurveystackGroup = async (instanceName, groupId) => {
   await db
     .collection('farmos-group-mapping')
     .deleteMany({ instanceName, groupId: asMongoId(groupId) });
+  await sendUserRemoveFarmFromSurveystackGroupNotification(instanceName, groupId);
+};
+
+const sendUserRemoveFarmFromSurveystackGroupNotification = async (instanceName, groupId) => {
+  const userInstance = await db.collection('farmos-instances').findOne({
+    instanceName: instanceName,
+  });
+  if (!userInstance.userId) {
+    throw boom.badData("instance doesn't exist");
+  }
+  const user = await db.collection('users').findOne({
+    _id: asMongoId(userInstance.userId),
+  });
+  if (!user.email) {
+    throw boom.badData('user email not found');
+  }
+  const userEmail = user.email;
+
+  const group = await db.collection('groups').findOne({
+    _id: asMongoId(groupId),
+  });
+
+  if (!group.name) {
+    throw boom.badData('group name not found');
+  }
+  const groupName = group.name;
+
+  await mailService.send({
+    to: userEmail,
+    subject: 'Your instance has been removed from a group',
+    text: `Hello,
+
+    This email is to inform you that your farmOS instance ${instanceName} has been removed from the group ${groupName} in SurveyStack. 
+    Please reach out to your group admin or info@our-sci.net if you have any questions.
+
+    Best Regards`,
+  });
 };
 
 export const addFarmToUser = async (instanceName, userId, groupId, owner) => {
