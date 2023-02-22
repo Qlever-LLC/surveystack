@@ -187,6 +187,14 @@ export default {
     started() {
       return true;
     },
+    stopTimer() {
+      if (!this.timer) {
+        return;
+      }
+
+      clearTimeout(this.timer);
+      this.timer = 0;
+    },
   },
   created() {
     this.first = true;
@@ -211,10 +219,12 @@ export default {
 
     const successHandler = (position) => {
       this.gps = this.geoJsonFromPosition(position);
+      this.stopTimer();
     };
     const errorHandler = (err) => {
       console.warn(`Error (${err.code}): ${err.message}`);
       this.geolocationError = err;
+      this.stopTimer();
     };
 
     // TODO: this will now trigger a map error
@@ -230,9 +240,7 @@ export default {
     if (navigator.geolocation) {
       navigator.geolocation.clearWatch(this.geolocationID);
     }
-    if (this.timer) {
-      clearTimeout(this.timer);
-    }
+    this.stopTimer();
     this.map.remove();
   },
 };
