@@ -24,7 +24,13 @@
         <app-control-hint :value="control.hint" />
 
         <div v-for="(child, i) in control.children" :key="i">
-          <app-control :path="`${path}.${child.name}`" :control="child" :autoFocus="autoFocus && i === 0" insidePage />
+          <app-control
+            :path="`${path}.${child.name}`"
+            :control="child"
+            :autoFocus="autoFocus && i === 0"
+            :forceMobile="forceMobile"
+            insidePage
+          />
         </div>
 
         <app-control-more-info :value="control.moreInfo" />
