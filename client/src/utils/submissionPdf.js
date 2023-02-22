@@ -153,47 +153,47 @@ export default class SubmissionPDF {
     const key = [...path, control.name, 'value'];
     const value = getProperty(this.submission.data, key);
 
-    this.docDefinition.content.push(this.getQuestion(control), this.getTextAnswer(value), '\n\n');
+    this.docDefinition.content.push(this.getQuestionDef(control), this.getTextDef(value), '\n\n');
   }
 
   generateDateControl(control, path = []) {
     const key = [...path, control.name, 'value'];
     const value = getProperty(this.submission.data, key);
 
-    this.docDefinition.content.push(this.getQuestion(control), this.getDateAnswer(value), '\n\n');
+    this.docDefinition.content.push(this.getQuestionDef(control), this.getDateDef(value), '\n\n');
   }
 
   generateLocationControl(control, path = []) {
     const key = [...path, control.name, 'value', 'geometry', 'coordinates'];
     const value = getProperty(this.submission.data, key);
 
-    this.docDefinition.content.push(this.getQuestion(control), this.getTextAnswer(value), '\n\n');
+    this.docDefinition.content.push(this.getQuestionDef(control), this.getTextDef(value), '\n\n');
   }
 
   async generateRadioControl(control, path = []) {
     const key = [...path, control.name, 'value'];
     const value = getProperty(this.submission.data, key);
-    const source = await this.getControlSource(control);
+    const source = await this.getControlDef(control);
 
-    this.docDefinition.content.push(this.getQuestion(control), this.getSelectAnswer(value, source, false, 4), '\n\n');
+    this.docDefinition.content.push(this.getQuestionDef(control), this.getSelectDef(value, source, false, 4), '\n\n');
   }
 
   async generateCheckControl(control, path = []) {
     const key = [...path, control.name, 'value'];
     const value = getProperty(this.submission.data, key);
-    const source = await this.getControlSource(control);
+    const source = await this.getControlDef(control);
 
-    this.docDefinition.content.push(this.getQuestion(control), this.getSelectAnswer(value, source, true, 4), '\n\n');
+    this.docDefinition.content.push(this.getQuestionDef(control), this.getSelectDef(value, source, true, 4), '\n\n');
   }
 
   async generateDropdownControl(control, path = []) {
     const key = [...path, control.name, 'value'];
     const value = getProperty(this.submission.data, key);
-    const source = await this.getControlSource(control);
+    const source = await this.getControlDef(control);
 
     this.docDefinition.content.push(
-      this.getQuestion(control),
-      this.getSelectAnswer(value, source, control.options.hasMultipleSelections, 4),
+      this.getQuestionDef(control),
+      this.getSelectDef(value, source, control.options.hasMultipleSelections, 4),
       '\n\n'
     );
   }
@@ -204,7 +204,7 @@ export default class SubmissionPDF {
       return;
     }
 
-    const headers = cols.map((header) => this.getTextAnswer(header.label || header.value, true));
+    const headers = cols.map((header) => this.getTextDef(header.label || header.value, true));
     const rows = [];
 
     const key = [...path, control.name, 'value'];
@@ -216,19 +216,19 @@ export default class SubmissionPDF {
       for (const col of cols) {
         const value = getProperty(item, [col.value, 'value']);
         if (col.type === 'date') {
-          row.push(this.getDateAnswer(value, true, ''));
+          row.push(this.getDateDef(value, true, ''));
         } else if (col.type === 'dropdown') {
           const dropdownVal = Array.isArray(value) ? value : value ? [value] : [];
-          const dropdownSource = await this.getControlSource(col);
+          const dropdownSource = await this.getControlDef(col);
           const text = dropdownVal
             .map((val) => {
               const match = dropdownSource.find((s) => s.value === val);
               return match ? match.label || match.value : val;
             })
             .join(', ');
-          row.push(this.getTextAnswer(text, true, ''));
+          row.push(this.getTextDef(text, true, ''));
         } else {
-          row.push(this.getTextAnswer(value, true, ''));
+          row.push(this.getTextDef(value, true, ''));
         }
       }
 
@@ -236,11 +236,11 @@ export default class SubmissionPDF {
     }
 
     if (answer.length === 0) {
-      rows.push(this.getNoDataTableRow(cols.length));
+      rows.push(this.getNoDataTableRowDef(cols.length));
     }
 
     this.docDefinition.content.push(
-      this.getQuestion(control),
+      this.getQuestionDef(control),
       {
         layout: {
           hLineWidth: function (i, node) {
@@ -270,7 +270,7 @@ export default class SubmissionPDF {
     );
   }
 
-  getQuestion(control) {
+  getQuestionDef(control) {
     this.questionIndex += 1;
 
     return {
@@ -279,7 +279,7 @@ export default class SubmissionPDF {
     };
   }
 
-  getTextAnswer(answer, small = false, placeholder = 'No answer') {
+  getTextDef(answer, small = false, placeholder = 'No answer') {
     let text = Array.isArray(answer)
       ? JSON.stringify(answer)
       : answer === null || answer === undefined
@@ -300,14 +300,14 @@ export default class SubmissionPDF {
     return d;
   }
 
-  getDateAnswer(answer, small = false, placeholder = 'No answer') {
+  getDateDef(answer, small = false, placeholder = 'No answer') {
     const date = parseISO(answer);
     const value = isValid(date) ? dateFnsFormat(date, 'MMM d, yyyy h:mm a') : null;
 
-    return this.getTextAnswer(value, small, placeholder);
+    return this.getTextDef(value, small, placeholder);
   }
 
-  getSelectAnswer(answer, source, multiple, cols = 1) {
+  getSelectDef(answer, source, multiple, cols = 1) {
     const value = Array.isArray(answer) ? answer : answer ? [answer] : [];
     const options = [...source];
 
@@ -333,14 +333,32 @@ export default class SubmissionPDF {
 
     return {
       columns: group.map((columnOptions) =>
-        columnOptions.map((option) => this.getSelectDefinition(option, multiple, isChecked(option)))
+        columnOptions.map((option) => this.getSelectItemDef(option, multiple, isChecked(option)))
       ),
     };
   }
 
-  getNoDataTableRow(cols) {
+  getSelectItemDef(option, multiple, checked) {
+    return {
+      table: {
+        widths: [12, 'auto'],
+        body: [
+          [
+            {
+              svg: getControlSvg(multiple, checked),
+              fit: [16, 16],
+            },
+            this.getTextDef(option.label),
+          ],
+        ],
+      },
+      layout: 'noBorders',
+    };
+  }
+
+  getNoDataTableRowDef(cols) {
     const noDataCell = {
-      ...this.getTextAnswer(null, true),
+      ...this.getTextDef(null, true),
       colSpan: cols,
       alignment: 'center',
       margin: [0, 4, 0, 4],
@@ -352,7 +370,7 @@ export default class SubmissionPDF {
     return [noDataCell, ...emptyCells].slice(0, -1);
   }
 
-  getDropdownAnswer(answer, source, cols = 1) {
+  getDropdownDef(answer, source, cols = 1) {
     const value = Array.isArray(answer) ? answer : answer ? [answer] : [];
     const options = [...source];
 
@@ -379,32 +397,14 @@ export default class SubmissionPDF {
     return {
       columns: group.map((columnOptions) => ({
         ul: columnOptions.map((option) => ({
-          ...this.getTextAnswer(option.label),
+          ...this.getTextDef(option.label),
           color: isChecked(option) ? 'blue' : styles.answer.color,
         })),
       })),
     };
   }
 
-  getSelectDefinition(option, multiple, checked) {
-    return {
-      table: {
-        widths: [12, 'auto'],
-        body: [
-          [
-            {
-              svg: getControlSvg(multiple, checked),
-              fit: [16, 16],
-            },
-            this.getTextAnswer(option.label),
-          ],
-        ],
-      },
-      layout: 'noBorders',
-    };
-  }
-
-  async getControlSource(control) {
+  async getControlDef(control) {
     const source = getProperty(control, 'options.source', control.resource);
     if (Array.isArray(source)) {
       return source;
