@@ -134,9 +134,8 @@ describe('manageFarmOS', () => {
       /mapping already exists/
     );
 
-    await expect(removeFarmFromSurveystackGroup(farmOSInstanceName, group._id)).rejects.toThrow(
-      /getaddrinfo ENOTFOUND mail.example.com/
-    );
+    await removeFarmFromSurveystackGroup(farmOSInstanceName, group._id);
+
     results = await listFarmOSInstancesForGroup(group._id);
     expect(results.length).toBe(0);
   });

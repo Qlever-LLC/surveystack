@@ -12,7 +12,7 @@ import {
   listFarmOSInstancesForUser,
   getSuperAllFarmosMappings,
   addFarmToSurveystackGroup,
-  removeFarmFromSurveystackGroup,
+  removeFarmFromSurveystackGroupAndSendNotification,
   addFarmToUser,
   removeFarmFromUser,
   getPlans as manageGetPlans,
@@ -389,7 +389,7 @@ export const superAdminUnMapFarmosInstance = async (req, res) => {
     throw boom.badData('instance name missing');
   }
 
-  await removeFarmFromSurveystackGroup(instanceName, group);
+  await removeFarmFromSurveystackGroupAndSendNotification(instanceName, group);
   return res.send({
     status: 'success',
   });

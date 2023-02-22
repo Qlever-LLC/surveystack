@@ -375,14 +375,18 @@ export const addFarmToSurveystackGroup = async (instanceName, groupId) => {
   return { _id };
 };
 
+export const removeFarmFromSurveystackGroupAndSendNotification = async (instanceName, groupId) => {
+  await removeFarmFromSurveystackGroup(instanceName, groupId);
+  await sendUserRemoveFarmFromSurveystackGroupNotification(instanceName, groupId);
+};
+
 export const removeFarmFromSurveystackGroup = async (instanceName, groupId) => {
   await db
     .collection('farmos-group-mapping')
     .deleteMany({ instanceName, groupId: asMongoId(groupId) });
-  await sendUserRemoveFarmFromSurveystackGroupNotification(instanceName, groupId);
 };
 
-const sendUserRemoveFarmFromSurveystackGroupNotification = async (instanceName, groupId) => {
+const extractDataForMailing = async (instanceName, groupId) => {
   const userInstance = await db.collection('farmos-instances').findOne({
     instanceName: instanceName,
   });
@@ -405,6 +409,12 @@ const sendUserRemoveFarmFromSurveystackGroupNotification = async (instanceName, 
     throw boom.badData('group name not found');
   }
   const groupName = group.name;
+
+  return { userEmail, groupName };
+};
+
+const sendUserRemoveFarmFromSurveystackGroupNotification = async (instanceName, groupId) => {
+  const { userEmail, groupName } = await extractDataForMailing(instanceName, groupId);
 
   await mailService.send({
     to: userEmail,
