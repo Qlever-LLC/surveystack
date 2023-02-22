@@ -268,8 +268,27 @@ export const getTree = async (group) => {
  * The user receives ownership over the farmos instance
  */
 export const mapFarmOSInstanceToUser = async (userId, instanceName, owner) => {
-  const _id = new ObjectId();
+  const res = await db
+    .collection('farmos-instances')
+    .find({
+      instanceName,
+      userId: asMongoId(userId),
+    })
+    .toArray();
 
+  if (res.length > 0) {
+    throw boom.badData('mapping already exists');
+  }
+
+  const user = await db.collection('users').findOne({
+    _id: asMongoId(userId),
+  });
+
+  if (!user) {
+    throw boom.badData('user not found');
+  }
+
+  const _id = new ObjectId();
   await db.collection('farmos-instances').insertOne({
     _id,
     userId: asMongoId(userId),
@@ -292,20 +311,6 @@ export const unmapFarmOSInstance = async (id) => {
   await db.collection('farmos-instances').deleteOne({
     _id: ObjectId(id),
   });
-};
-
-/**
- * A group Admin creates a new farmos instance for a user
- * The instance is added to the groups plan
- */
-export const createFarmOSInstanceForUserAndGroup = async (
-  userId,
-  groupId,
-  instanceName,
-  userIsOwner
-) => {
-  await addFarmToSurveystackGroup(instanceName, groupId);
-  return await mapFarmOSInstanceToUser(userId, instanceName, userIsOwner);
 };
 
 /**
@@ -344,7 +349,12 @@ export const getSuperAllFarmosMappings = async () => {
   };
 };
 
-export const addFarmToSurveystackGroup = async (instanceName, groupId) => {
+export const addFarmToSurveystackGroupAndSendNotification = async (instanceName, groupId) => {
+  await sendUseraddFarmToSurveystackGroupNotification(instanceName, groupId);
+  return await addFarmToSurveystackGroup(instanceName, groupId);
+};
+
+const addFarmToSurveystackGroup = async (instanceName, groupId) => {
   const res = await db
     .collection('farmos-group-mapping')
     .find({
@@ -411,6 +421,21 @@ const extractDataForMailing = async (instanceName, groupId) => {
   const groupName = group.name;
 
   return { userEmail, groupName };
+};
+
+const sendUseraddFarmToSurveystackGroupNotification = async (instanceName, groupId) => {
+  const { userEmail, groupName } = await extractDataForMailing(instanceName, groupId);
+
+  await mailService.send({
+    to: userEmail,
+    subject: 'Your instance has been added to a group',
+    text: `Hello,
+
+    This email is to inform you that your farmOS instance ${instanceName} has been added to ${groupName} in SurveyStack.
+    Please reach out to your group admin or info@our-sci.net if you have any questions.  
+
+    Best Regards`,
+  });
 };
 
 const sendUserRemoveFarmFromSurveystackGroupNotification = async (instanceName, groupId) => {

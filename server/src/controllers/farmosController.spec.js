@@ -19,7 +19,7 @@ import {
 import { createGroup, createReq, createRes, createUser } from '../testUtils';
 import {
   mapFarmOSInstanceToUser,
-  addFarmToSurveystackGroup,
+  addFarmToSurveystackGroupAndSendNotification,
   setPlanForGroup,
   getGroupInformation,
   createFarmosGroupSettings,
@@ -32,6 +32,8 @@ import {
 } from '../services/farmos/__mock__/farmos.asset.response';
 
 import membershipController from './membershipController';
+
+jest.mock('../services/mail/mail.service');
 
 const init = async () => {
   const group = await createGroup();
@@ -116,7 +118,7 @@ const createFarmOSDomain = async (gs) => {
   }
 
   for (const farm of _.uniq(farms)) {
-    await addFarmToSurveystackGroup(farm, group._id);
+    await addFarmToSurveystackGroupAndSendNotification(farm, group._id);
   }
 
   return res;

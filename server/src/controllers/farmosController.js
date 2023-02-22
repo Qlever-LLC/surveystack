@@ -11,7 +11,7 @@ import { isFarmosUrlAvailable, createInstance } from '../services/farmos.service
 import {
   listFarmOSInstancesForUser,
   getSuperAllFarmosMappings,
-  addFarmToSurveystackGroup,
+  addFarmToSurveystackGroupAndSendNotification,
   removeFarmFromSurveystackGroupAndSendNotification,
   addFarmToUser,
   removeFarmFromUser,
@@ -373,7 +373,7 @@ export const superAdminMapFarmosInstance = async (req, res) => {
     throw boom.badData('instance name missing');
   }
 
-  await addFarmToSurveystackGroup(instanceName, group);
+  await addFarmToSurveystackGroupAndSendNotification(instanceName, group);
   return res.send({
     status: 'success',
   });
@@ -860,9 +860,9 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
       planName
     );
 
-    mapFarmOSInstanceToUser(owner, url, true);
+    await mapFarmOSInstanceToUser(owner, url, true);
 
-    addFarmToSurveystackGroup(url, groupId, planName);
+    await addFarmToSurveystackGroupAndSendNotification(url, groupId);
 
     await db.collection('farmos.fields').insertOne({
       url,
