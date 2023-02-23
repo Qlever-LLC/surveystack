@@ -20,6 +20,28 @@ const requestWakeLock = async () => {
 
 const MAP_STYLES = ['satellite', 'streets', 'outdoors'];
 
+const geoJsonFromLngLat = ({ lng, lat }) => ({
+  type: 'Feature',
+  geometry: {
+    type: 'Point',
+    coordinates: [lng, lat],
+  },
+  properties: {
+    accuracy: null,
+  },
+});
+
+const geoJsonFromPosition = ({ coords }) => ({
+  type: 'Feature',
+  geometry: {
+    type: 'Point',
+    coordinates: [coords.longitude, coords.latitude],
+  },
+  properties: {
+    accuracy: coords.accuracy,
+  },
+});
+
 export default {
   mixins: [baseQuestionComponent],
   components: {
@@ -27,79 +49,72 @@ export default {
   },
   data() {
     return {
+      usingGPS: true,
       panel: [0],
       map: null,
-      mapError: false,
-      geolocationError: false,
-      first: true,
-      location: null,
-      gps: null,
-      geolocationID: null,
-      timer: 0,
-      usingGPS: true,
+      mapStyle: MAP_STYLES[0],
       marker: null,
       ctrl: null,
-      mapStyle: MAP_STYLES[0],
+      mapError: false,
+      location: null,
+      gpsLocation: null,
+      gpsTimer: 0,
+      geolocationID: null,
+      geolocationError: false,
     };
   },
   methods: {
-    geoJsonFromLngLat({ lng, lat }) {
-      return {
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [lng, lat],
-        },
-        properties: {
-          accuracy: null,
-        },
-      };
-    },
-    geoJsonFromPosition({ coords }) {
-      return {
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [coords.longitude, coords.latitude],
-        },
-        properties: {
-          accuracy: coords.accuracy,
-        },
-      };
-    },
     pickLocation() {
-      const loc = this.usingGPS ? this.gps : this.geoJsonFromLngLat(this.map.getCenter());
-      this.changed(loc);
-      this.location = loc;
+      this.location = this.usingGPS ? this.gpsLocation : geoJsonFromLngLat(this.map.getCenter());
+      this.changed(this.location);
 
-      if (this.location) {
-        this.marker = new mapboxgl.Marker()
-          .setLngLat([this.location.geometry.coordinates[0], this.location.geometry.coordinates[1]])
-          .addTo(this.map);
+      if (!this.location || !this.map) {
+        return;
       }
+
+      if (this.marker) {
+        this.marker.remove();
+        this.marker = null;
+      }
+
+      this.marker = new mapboxgl.Marker()
+        .setLngLat([this.location.geometry.coordinates[0], this.location.geometry.coordinates[1]])
+        .addTo(this.map);
     },
     retake() {
       this.changed(null);
       if (this.marker) {
         this.marker.remove();
+        this.marker = null;
       }
       this.location = null;
       this.ctrl.trigger();
     },
-    handleMap(map, value) {
-      this.ctrl = new mapboxgl.GeolocateControl({
-        positionOptions: {
-          enableHighAccuracy: true,
-        },
-        trackUserLocation: true,
-      });
+    switchMapStyle() {
+      const index = MAP_STYLES.indexOf(this.mapStyle);
+      const newIndex = (index + 1) % MAP_STYLES.length;
+      this.mapStyle = MAP_STYLES[newIndex];
+      this.map.setStyle(`mapbox://styles/mapbox/${this.mapStyle}-v9`);
+    },
+    stopGpsTimer() {
+      if (!this.gpsTimer) {
+        return;
+      }
 
-      map.addControl(this.ctrl);
+      clearTimeout(this.gpsTimer);
+      this.gpsTimer = 0;
+    },
+    startMap() {
+      this.map = new mapboxgl.Map({
+        container: `map-question-${this.index}`,
+        style: `mapbox://styles/mapbox/${this.mapStyle}-v9`,
+        zoom: 15,
+      });
 
       const geocoder = new MapboxGeocoder({
         // Initialize the geocoder
         accessToken: mapboxgl.accessToken, // Set the access token
-        mapboxgl: map, // Set the mapbox-gl instance
+        mapboxgl: this.map, // Set the mapbox-gl instance
         marker: false, // Do not use the default marker style
       });
 
@@ -107,63 +122,74 @@ export default {
         this.usingGPS = false;
       });
 
-      // Add the geocoder above the map
-      // document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
-      document.getElementById(`map-question-geocoder-${this.index}`).appendChild(geocoder.onAdd(map));
+      document.getElementById(`map-question-geocoder-${this.index}`).appendChild(geocoder.onAdd(this.map));
 
-      map.on('error', (err) => {
-        console.log(err);
-        this.mapError = true;
-        this.usingGPS = true;
-      });
-
-      map.on('drag', () => {
-        this.usingGPS = false;
+      this.ctrl = new mapboxgl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true,
+        },
+        trackUserLocation: true,
       });
 
       this.ctrl.on('trackuserlocationstart', () => {
         this.usingGPS = true;
       });
 
-      // this.ctrl.on('trackuserlocationend', () => {
-      //   console.log('trackuserlocationend');
-      // });
-
-      map.on('load', () => {
-        if (!value) {
-          this.ctrl.trigger();
-        }
-        map.resize();
-      });
-
-      this.ctrl.on('geolocate', (e) => {
-        if (!this.first) {
+      this.ctrl.on('geolocate', (position) => {
+        if (this.gpsLocation) {
           return;
         }
 
-        map.stop();
-        map.jumpTo({
-          center: [e.coords.longitude, e.coords.latitude],
-        });
-
-        this.first = false;
+        this.gpsLocation = geoJsonFromPosition(position);
       });
 
-      if (value) {
-        this.marker = new mapboxgl.Marker()
-          .setLngLat([value.geometry.coordinates[0], value.geometry.coordinates[1]])
-          .addTo(map);
+      this.map.addControl(this.ctrl);
 
-        map.jumpTo({
-          center: [value.geometry.coordinates[0], value.geometry.coordinates[1]],
+      if (this.value) {
+        this.marker = new mapboxgl.Marker().setLngLat(this.value.geometry.coordinates[0]).addTo(this.map);
+
+        this.map.jumpTo({
+          center: this.value.geometry.coordinates,
         });
       }
+
+      this.map.on('load', () => {
+        if (!this.value) {
+          this.ctrl.trigger();
+        }
+        this.map.resize();
+      });
+
+      this.map.on('error', (err) => {
+        console.log(err);
+        this.mapError = true;
+        this.usingGPS = true;
+      });
+
+      this.map.on('drag', () => {
+        this.usingGPS = false;
+      });
     },
-    switchMapStyle() {
-      const index = MAP_STYLES.indexOf(this.mapStyle);
-      const newIndex = (index + 1) % MAP_STYLES.length;
-      this.mapStyle = MAP_STYLES[newIndex];
-      this.map.setStyle(`mapbox://styles/mapbox/${this.mapStyle}-v9`);
+    startGps() {
+      if (!navigator.geolocation) {
+        return;
+      }
+
+      this.geolocationID = navigator.geolocation.watchPosition(
+        (position) => {
+          this.gpsLocation = geoJsonFromPosition(position);
+        },
+        (err) => {
+          console.warn(`Error (${err.code}): ${err.message}`);
+          this.geolocationError = err;
+        }
+      );
+
+      this.gpsTimer = setTimeout(() => {
+        console.warn('No confirmation from the user permission');
+        this.geolocationError = 'No confirmation from the user permission';
+        this.usingGPS = false;
+      }, 30000);
     },
   },
   computed: {
@@ -177,70 +203,50 @@ export default {
       }
 
       return {
-        location: this.usingGPS ? this.gps : this.geoJsonFromLngLat(this.map.getCenter()),
+        location: this.usingGPS ? this.gpsLocation : geoJsonFromLngLat(this.map.getCenter()),
         label: this.usingGPS ? 'Using GPS' : 'Using Map Center',
       };
     },
     disablePick() {
-      return !this.gps && this.mapError;
+      return !this.gpsLocation || this.mapError;
     },
-    started() {
-      return true;
-    },
-    stopTimer() {
-      if (!this.timer) {
-        return;
-      }
+  },
+  watch: {
+    gpsLocation: {
+      handler(val) {
+        if (val) {
+          this.stopGpsTimer();
+        }
 
-      clearTimeout(this.timer);
-      this.timer = 0;
+        if (!this.map || !this.usingGPS) {
+          return;
+        }
+
+        this.map.stop();
+        this.map.jumpTo({ center: val.geometry.coordinates });
+      },
+      deep: true,
     },
   },
   created() {
-    this.first = true;
+    mapboxgl.accessToken = 'pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA';
     this.location = this.value;
   },
   mounted() {
-    setTimeout(() => {}, 2000);
-
-    mapboxgl.accessToken = 'pk.eyJ1Ijoib3Vyc2NpIiwiYSI6ImNqb2ljdHMxYjA1bDAzcW03Zjd0cHBsbXMifQ.rL9QPLvi0kLP3DzLt1PQBA';
-    this.map = new mapboxgl.Map({
-      container: `map-question-${this.index}`,
-      style: `mapbox://styles/mapbox/${this.mapStyle}-v9`,
-      // center: [8.311068, 47.462507],
-      zoom: 15,
-    });
-
-    this.handleMap(this.map, this.value);
+    this.startMap();
+    this.startGps();
 
     if (wakeLock in navigator) {
       requestWakeLock();
     }
 
-    const successHandler = (position) => {
-      this.gps = this.geoJsonFromPosition(position);
-      this.stopTimer();
-    };
-    const errorHandler = (err) => {
-      console.warn(`Error (${err.code}): ${err.message}`);
-      this.geolocationError = err;
-      this.stopTimer();
-    };
-
     // TODO: this will now trigger a map error
-    if (navigator.geolocation) {
-      this.geolocationID = navigator.geolocation.watchPosition(successHandler, errorHandler);
-      this.timer = setTimeout(() => {
-        console.warn('No confirmation from the user permission');
-        this.geolocationError = 'Timed out, please allow or block the permission.';
-      }, 10000);
-    }
   },
   beforeDestroy() {
     if (navigator.geolocation) {
       navigator.geolocation.clearWatch(this.geolocationID);
     }
-    this.stopTimer();
     this.map.remove();
+    this.stopGpsTimer();
   },
 };
