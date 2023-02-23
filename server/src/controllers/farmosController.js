@@ -13,7 +13,6 @@ import {
   getSuperAllFarmosMappings,
   addFarmToSurveystackGroupAndSendNotification,
   removeFarmFromSurveystackGroupAndSendNotification,
-  addFarmToUser,
   removeFarmFromUser,
   getPlans as manageGetPlans,
   getPlanForGroup as manageGetPlanForGroup,
@@ -409,7 +408,7 @@ export const superAdminMapFarmosInstanceToUser = async (req, res) => {
     throw boom.badData('owner attribute missing');
   }
 
-  await addFarmToUser(instanceName, user, group, !!owner);
+  await mapFarmOSInstanceToUser(user, instanceName, !!owner);
   return res.send({
     status: 'success',
   });
@@ -425,7 +424,7 @@ export const superAdminUnMapFarmosInstanceFromUser = async (req, res) => {
     throw boom.badData('instance name missing');
   }
 
-  await removeFarmFromUser(instanceName, user, group);
+  await removeFarmFromUser(instanceName, user);
   return res.send({
     status: 'success',
   });

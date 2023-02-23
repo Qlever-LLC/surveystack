@@ -45,10 +45,16 @@ export const hasPermission = async (userId, instanceName) => {
       continue;
     }
 
-    // if the user is not anymore admin of a group, deny
-    if (instance.groupId) {
-      if (adminOfGroups.includes(instance.groupId + '')) {
-        allowedInstances[instance.instanceName] = 1;
+    if (allowedInstances[instance.instanceName] !== 1) {
+      const groupMapping = await db
+        .collection('farmos-group-mapping')
+        .find({ instanceName: instanceName })
+        .toArray();
+      // if the user is not anymore admin of a group, deny
+      for (const group of groupMapping) {
+        if (adminOfGroups.includes(group.groupId + '')) {
+          allowedInstances[instance.instanceName] = 1;
+        }
       }
     }
   }

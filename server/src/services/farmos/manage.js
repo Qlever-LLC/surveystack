@@ -364,6 +364,16 @@ export const addFarmToSurveystackGroupAndSendNotification = async (instanceName,
   return await addFarmToSurveystackGroup(instanceName, groupId);
 };
 
+export const createFarmOSInstanceForUserAndGroup = async (
+  userId,
+  groupId,
+  instanceName,
+  userIsOwner
+) => {
+  await mapFarmOSInstanceToUser(userId, instanceName, userIsOwner);
+  return await addFarmToSurveystackGroupAndSendNotification(instanceName, groupId);
+};
+
 const addFarmToSurveystackGroup = async (instanceName, groupId) => {
   const res = await db
     .collection('farmos-group-mapping')
@@ -486,56 +496,8 @@ const sendUserRemoveFarmFromSurveystackGroupNotification = async (instanceName, 
   });
 };
 
-export const addFarmToUser = async (instanceName, userId, groupId, owner) => {
-  const res = await db
-    .collection('farmos-instances')
-    .find({
-      instanceName,
-      userId: asMongoId(userId),
-    })
-    .toArray();
-
-  if (res.length > 0) {
-    throw boom.badData('mapping already exists');
-  }
-
-  const user = await db.collection('users').findOne({
-    _id: asMongoId(userId),
-  });
-
-  if (!user) {
-    throw boom.badData('user not found');
-  }
-
-  if (groupId) {
-    const group = await db.collection('groups').findOne({
-      _id: asMongoId(groupId),
-    });
-
-    if (!group) {
-      throw boom.badData('group not found');
-    }
-  }
-
-  const _id = new ObjectId();
-  const doc = {
-    _id,
-    instanceName,
-    userId: asMongoId(userId),
-    owner: !!owner,
-  };
-
-  if (groupId) {
-    doc.groupId = asMongoId(groupId);
-  }
-  await db.collection('farmos-instances').insertOne(doc);
-};
-
-export const removeFarmFromUser = async (instanceName, userId, groupId) => {
+export const removeFarmFromUser = async (instanceName, userId) => {
   const filter = { instanceName, userId: asMongoId(userId) };
-  if (groupId) {
-    filter.groupId = asMongoId(groupId);
-  }
 
   // console.log('filter', filter);
 

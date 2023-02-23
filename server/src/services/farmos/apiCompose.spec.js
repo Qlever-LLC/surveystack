@@ -12,10 +12,12 @@ import {
   mapFarmOSInstanceToUser,
   unmapFarmOSInstance,
   listFarmOSInstancesForUser,
-  addFarmToUser,
+  createFarmOSInstanceForUserAndGroup,
 } from './manage';
 
 import { createAsset } from './apiCompose';
+
+jest.mock('../../services/mail/mail.service');
 
 const init = async () => {
   const group = await createGroup();
@@ -38,7 +40,7 @@ describe('farmos2-api-compose', () => {
     const { group, user1, user2, admin1 } = await init();
     const instanceName = 'test.surveystack.io';
     await mapFarmOSInstanceToUser(user1.user._id, instanceName, true);
-    await addFarmToUser(instanceName, admin1.user._id, group._id, false);
+    await createFarmOSInstanceForUserAndGroup(admin1.user._id, group._id, instanceName, false);
 
     expect(await hasPermission(user1.user._id, instanceName)).toBe(true);
     expect(await hasPermission(user2.user._id, instanceName)).toBe(false);
