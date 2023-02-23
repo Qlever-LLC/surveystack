@@ -386,8 +386,8 @@ const addFarmToSurveystackGroup = async (instanceName, groupId) => {
 };
 
 export const removeFarmFromSurveystackGroupAndSendNotification = async (instanceName, groupId) => {
-  await removeFarmFromSurveystackGroup(instanceName, groupId);
   await sendUserRemoveFarmFromSurveystackGroupNotification(instanceName, groupId);
+  return await removeFarmFromSurveystackGroup(instanceName, groupId);
 };
 
 export const removeFarmFromSurveystackGroup = async (instanceName, groupId) => {
