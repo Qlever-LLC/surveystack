@@ -279,7 +279,8 @@
       <v-btn v-if="!showAdvanced" color="grey darken-1" class="align-self-end" @click="showAdvanced = true" small text>
         advanced
       </v-btn>
-      <div v-else class="advanced pb-6">
+      <div v-else class="advanced">
+        <v-spacer></v-spacer>
         <div>
           <v-card-title class="px-0 py-0">Advanced Options</v-card-title>
           <v-icon @click.stop="showAdvanced = false">mdi-close</v-icon>
@@ -327,8 +328,57 @@
           </v-icon>
         </div>
       </div>
+
+      <!-- Print layout -->
+      <template v-if="isSelect || isOntology">
+        <v-btn v-if="!showLayout" color="grey darken-1" class="align-self-end" @click="showLayout = true" small text>
+          Layout
+        </v-btn>
+        <div v-else class="advanced">
+          <v-spacer></v-spacer>
+          <div>
+            <v-card-title class="px-0 py-0">Print Layout</v-card-title>
+            <v-icon @click.stop="showLayout = false">mdi-close</v-icon>
+          </div>
+
+          <v-select
+            class="mt-2"
+            label="Columns"
+            v-model="control.options.layout.columnCount"
+            :items="[1, 2, 3, 4, 5]"
+            color="focus"
+            hide-details
+          >
+            <template #append-outer>
+              <v-tooltip max-width="400" transition="slide-x-transition" right>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</v-icon>
+                </template>
+                Set the number of items in a row
+              </v-tooltip>
+            </template>
+          </v-select>
+
+          <div>
+            <checkbox
+              label="Show values only"
+              v-model="control.options.layout.valuesOnly"
+              helper-text="Render the selected items only without all items"
+            />
+          </div>
+
+          <div v-if="isOntology && !control.options.layout.valuesOnly">
+            <checkbox
+              label="Use control"
+              v-model="control.options.layout.usingControl"
+              helper-text="Render the selected items using the Checkbox/Radio controls"
+            />
+          </div>
+        </div>
+      </template>
+
+      <v-spacer></v-spacer>
     </v-form>
-    <div v-else>...</div>
   </div>
 </template>
 <script>
@@ -380,6 +430,7 @@ export default {
   data() {
     return {
       showAdvanced: false,
+      showLayout: false,
       // if we migrate to using Vue Composition API, the script functionality could be extracted out into a `useScriptProperties` hook
       scriptSourceId: null,
       scriptParams: this.getScriptParams(),
@@ -558,6 +609,16 @@ export default {
       this.scriptSourceId = this.control.options.source;
       this.scriptParams = this.getScriptParams();
     },
+    validateOptions() {
+      // Adjust autocomplete option value to be compatible with original `ontology` question type
+      // https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56
+      if (typeof this.control.options.allowAutocomplete !== 'boolean') {
+        this.control.options.allowAutocomplete = this.control.options.allowCustomSelection || false;
+      }
+      if (!this.control.options.layout) {
+        this.control.options.layout = {};
+      }
+    },
   },
   watch: {
     'control.name': {
@@ -571,17 +632,14 @@ export default {
         if (this.isScript && newVal !== oldVal) {
           this.updateScript();
         }
+
+        this.validateOptions();
       },
     },
   },
   created() {
     this.updateScript();
-
-    // Adjust autocomplete option value to be compatible with original `ontology` question type
-    // https://gitlab.com/OpenTEAM1/draft-tech-feedback/-/issues/56
-    if (typeof this.control.options.allowAutocomplete !== 'boolean') {
-      this.control.options.allowAutocomplete = this.control.options.allowCustomSelection || false;
-    }
+    this.validateOptions();
   },
 };
 </script>
