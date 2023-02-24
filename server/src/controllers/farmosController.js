@@ -1185,9 +1185,16 @@ export const updateGroupsForUser = async (req, res) => {
       instanceName,
     })
     .toArray();
-  const initialInstanceGroupsId = initialInstanceGroups.map((e) => e.groupId);
+  const initialGroups = await db
+    .collection('groups')
+    .find({
+      _id: {
+        $in: initialInstanceGroups.map((e) => e.groupId),
+      },
+    })
+    .toArray();
 
-  let resultInstanceGroups = [];
+  let resultGroups = [];
 
   // clear all mappings of groups in descendants
   await db.collection('farmos-group-mapping').deleteMany({
@@ -1207,34 +1214,53 @@ export const updateGroupsForUser = async (req, res) => {
       }))
     );
 
-    resultInstanceGroups = await db
+    const resultInstanceGroups = await db
       .collection('farmos-group-mapping')
       .find({
         groupId: {
           $in: tree.descendants.map((d) => d._id),
         },
-        instanceName,
+      })
+      .toArray();
+    resultGroups = await db
+      .collection('groups')
+      .find({
+        _id: {
+          $in: resultInstanceGroups.map((e) => e.groupId),
+        },
       })
       .toArray();
   }
+
+  const initialGroupsName = initialGroups.map((e) => e.name);
+  const resultGroupsName = resultGroups.map((e) => e.name);
 
   // compare with the initial result the group(s)
   // if just add without remove => add notification
   // else if just remove without add => remove notification
   // else move notification
-  if (initialInstanceGroups.length === 0 && resultInstanceGroups.length > 0) {
-    await sendUserAddFarmToMultipleSurveystackGroupNotification(instanceName, groupIds);
-  } else if (initialInstanceGroups.length > 0 && resultInstanceGroups.length === 0) {
-    await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(
-      instanceName,
-      initialInstanceGroupsId
-    );
+  if (initialGroupsName.every((val) => resultGroupsName.includes(val))) {
+    const differenceName = resultGroupsName.filter((x) => !initialGroupsName.includes(x));
+    const difference = resultGroups
+      .filter((e) => differenceName.includes(e.name))
+      .map((e) => e._id);
+    await sendUserAddFarmToMultipleSurveystackGroupNotification(instanceName, difference);
+  } else if (resultGroupsName.every((val) => initialGroupsName.includes(val))) {
+    const differenceName = initialGroupsName.filter((x) => !resultGroupsName.includes(x));
+    const difference = initialGroups
+      .filter((e) => differenceName.includes(e.name))
+      .map((e) => e._id);
+    await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(instanceName, difference);
   } else {
-    let difference = initialInstanceGroupsId.filter((x) => !groupIds.includes(x));
+    const differenceName = initialGroupsName.filter((x) => !resultGroupsName.includes(x));
+    const difference = initialGroups
+      .filter((e) => differenceName.includes(e.name))
+      .map((e) => e._id);
+    const resultInstanceGroupsId = resultGroups.map((e) => e._id);
     await sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification(
       instanceName,
       difference,
-      groupIds
+      resultInstanceGroupsId
     );
   }
 
