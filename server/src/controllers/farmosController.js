@@ -1185,6 +1185,8 @@ export const updateGroupsForUser = async (req, res) => {
       instanceName,
     })
     .toArray();
+  const initialInstanceGroupsId = initialInstanceGroups.map((e) => e.groupId);
+
   let resultInstanceGroups = [];
 
   // clear all mappings of groups in descendants
@@ -1196,22 +1198,22 @@ export const updateGroupsForUser = async (req, res) => {
   });
 
   // add all
-  let insertedIds = [];
   if (groupIds.length > 0) {
-    insertedIds = await db.collection('farmos-group-mapping').insertMany(
+    await db.collection('farmos-group-mapping').insertMany(
       groupIds.map((gid) => ({
         _id: new ObjectId(),
         groupId: new ObjectId(gid),
         instanceName,
       }))
-    ).insertedIds;
+    );
 
     resultInstanceGroups = await db
       .collection('farmos-group-mapping')
       .find({
-        _id: {
-          $in: insertedIds,
+        groupId: {
+          $in: tree.descendants.map((d) => d._id),
         },
+        instanceName,
       })
       .toArray();
   }
@@ -1220,15 +1222,19 @@ export const updateGroupsForUser = async (req, res) => {
   // if just add without remove => add notification
   // else if just remove without add => remove notification
   // else move notification
-  if (initialInstanceGroups.length > 0 && resultInstanceGroups === 0) {
-    sendUserAddFarmToMultipleSurveystackGroupNotification(instanceName, insertedIds);
-  } else if (initialInstanceGroups.length === 0 && resultInstanceGroups > 0) {
-    sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(instanceName, groupIds);
-  } else {
-    sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification(
+  if (initialInstanceGroups.length === 0 && resultInstanceGroups.length > 0) {
+    await sendUserAddFarmToMultipleSurveystackGroupNotification(instanceName, groupIds);
+  } else if (initialInstanceGroups.length > 0 && resultInstanceGroups.length === 0) {
+    await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(
       instanceName,
-      groupIds,
-      insertedIds
+      initialInstanceGroupsId
+    );
+  } else {
+    let difference = initialInstanceGroupsId.filter((x) => !groupIds.includes(x));
+    await sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification(
+      instanceName,
+      difference,
+      groupIds
     );
   }
 

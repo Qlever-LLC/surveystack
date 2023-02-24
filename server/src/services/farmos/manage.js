@@ -482,7 +482,7 @@ export const sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification = a
   });
 };
 
-const sendUserAddFarmToSurveystackGroupNotification = async (instanceName, groupId) => {
+export const sendUserAddFarmToSurveystackGroupNotification = async (instanceName, groupId) => {
   const groupName = await extractGroupNameForMailing(groupId);
 
   await sendAddNotification(instanceName, groupName);
