@@ -341,24 +341,6 @@
             <v-icon @click.stop="showLayout = false">mdi-close</v-icon>
           </div>
 
-          <v-select
-            class="mt-2"
-            label="Columns"
-            v-model="control.options.layout.columnCount"
-            :items="[1, 2, 3, 4, 5]"
-            color="focus"
-            hide-details
-          >
-            <template #append-outer>
-              <v-tooltip max-width="400" transition="slide-x-transition" right>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</v-icon>
-                </template>
-                Set the number of items in a row
-              </v-tooltip>
-            </template>
-          </v-select>
-
           <div>
             <checkbox
               label="Show values only"
@@ -374,6 +356,24 @@
               helper-text="Render the selected items using the Checkbox/Radio controls"
             />
           </div>
+
+          <v-select
+            v-if="!control.options.layout.valuesOnly"
+            label="Columns"
+            v-model="control.options.layout.columnCount"
+            :items="[1, 2, 3, 4, 5]"
+            color="focus"
+            hide-details
+          >
+            <template #append-outer>
+              <v-tooltip max-width="400" transition="slide-x-transition" right>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon v-bind="attrs" v-on="on" size="20">mdi-help-circle-outline</v-icon>
+                </template>
+                Set the number of items in a row
+              </v-tooltip>
+            </template>
+          </v-select>
         </div>
       </template>
 
@@ -615,8 +615,13 @@ export default {
       if (typeof this.control.options.allowAutocomplete !== 'boolean') {
         this.control.options.allowAutocomplete = this.control.options.allowCustomSelection || false;
       }
-      if (!this.control.options.layout) {
-        this.control.options.layout = {};
+
+      if (typeof this.control.options.layout === 'undefined') {
+        this.$set(this.control.options, 'layout', {
+          valuesOnly: true,
+          usingControl: false,
+          columnCount: 1,
+        });
       }
     },
   },

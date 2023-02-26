@@ -173,29 +173,54 @@ export default class SubmissionPDF {
   async generateRadioControl(control, path = []) {
     const key = [...path, control.name, 'value'];
     const value = getProperty(this.submission.data, key);
-    const source = await this.getControlDef(control);
+    const source = await this.getControlSource(control);
+    const layout = this.getControlLayout(control);
 
-    this.docDefinition.content.push(this.getQuestionDef(control), this.getSelectDef(value, source, false, 4), '\n\n');
+    this.docDefinition.content.push(this.getQuestionDef(control));
+    if (layout.valuesOnly) {
+      const answer = this.transformValueToLabel(value, source);
+      this.docDefinition.content.push(this.getTextDef(answer));
+    } else {
+      this.docDefinition.content.push(this.getSelectDef(value, source, false, layout.columnCount));
+    }
+    this.docDefinition.content.push('\n\n');
   }
 
   async generateCheckControl(control, path = []) {
     const key = [...path, control.name, 'value'];
     const value = getProperty(this.submission.data, key);
-    const source = await this.getControlDef(control);
+    const source = await this.getControlSource(control);
 
-    this.docDefinition.content.push(this.getQuestionDef(control), this.getSelectDef(value, source, true, 4), '\n\n');
+    const layout = this.getControlLayout(control);
+
+    this.docDefinition.content.push(this.getQuestionDef(control));
+    if (layout.valuesOnly) {
+      const answer = this.transformValueToLabel(value, source);
+      this.docDefinition.content.push(this.getTextDef(answer));
+    } else {
+      this.docDefinition.content.push(this.getSelectDef(value, source, true, layout.columnCount));
+    }
+    this.docDefinition.content.push('\n\n');
   }
 
   async generateDropdownControl(control, path = []) {
     const key = [...path, control.name, 'value'];
     const value = getProperty(this.submission.data, key);
-    const source = await this.getControlDef(control);
+    const source = await this.getControlSource(control);
+    const layout = this.getControlLayout(control);
 
-    this.docDefinition.content.push(
-      this.getQuestionDef(control),
-      this.getSelectDef(value, source, control.options.hasMultipleSelections, 4),
-      '\n\n'
-    );
+    this.docDefinition.content.push(this.getQuestionDef(control));
+    if (layout.valuesOnly) {
+      const answer = this.transformValueToLabel(value, source);
+      this.docDefinition.content.push(this.getTextDef(answer));
+    } else if (layout.usingControl) {
+      this.docDefinition.content.push(
+        this.getSelectDef(value, source, control.options.hasMultipleSelections, layout.columnCount)
+      );
+    } else {
+      this.docDefinition.content.push(this.getDropdownDef(value, source, layout.columnCount));
+    }
+    this.docDefinition.content.push('\n\n');
   }
 
   async generateMatrixControl(control, path = []) {
@@ -219,7 +244,7 @@ export default class SubmissionPDF {
           row.push(this.getDateDef(value, true, ''));
         } else if (col.type === 'dropdown') {
           const dropdownVal = Array.isArray(value) ? value : value ? [value] : [];
-          const dropdownSource = await this.getControlDef(col);
+          const dropdownSource = await this.getControlSource(col);
           const text = dropdownVal
             .map((val) => {
               const match = dropdownSource.find((s) => s.value === val);
@@ -280,16 +305,11 @@ export default class SubmissionPDF {
   }
 
   getTextDef(answer, small = false, placeholder = 'No answer') {
-    let text = Array.isArray(answer)
-      ? JSON.stringify(answer)
-      : answer === null || answer === undefined
-      ? placeholder
-      : answer;
-    const hasAnswer = text !== placeholder;
+    const value = this.getArrayValue(answer);
+    const hasAnswer = value.length > 0;
 
     const d = {
-      text,
-      style: 'answer',
+      text: value.join(', ') || placeholder,
       color: hasAnswer ? styles.answer.color : styles.meta.color,
     };
 
@@ -308,7 +328,7 @@ export default class SubmissionPDF {
   }
 
   getSelectDef(answer, source, multiple, cols = 1) {
-    const value = Array.isArray(answer) ? answer : answer ? [answer] : [];
+    const value = this.getArrayValue(answer);
     const options = [...source];
 
     const custom = value.find((val) => val && source.every((item) => item.value !== val));
@@ -356,20 +376,6 @@ export default class SubmissionPDF {
     };
   }
 
-  getNoDataTableRowDef(cols) {
-    const noDataCell = {
-      ...this.getTextDef(null, true),
-      colSpan: cols,
-      alignment: 'center',
-      margin: [0, 4, 0, 4],
-    };
-    const emptyCells = Array(cols)
-      .fill(0)
-      .map(() => ({}));
-
-    return [noDataCell, ...emptyCells].slice(0, -1);
-  }
-
   getDropdownDef(answer, source, cols = 1) {
     const value = Array.isArray(answer) ? answer : answer ? [answer] : [];
     const options = [...source];
@@ -383,8 +389,9 @@ export default class SubmissionPDF {
     if (cols === 1) {
       group.push(options);
     } else {
+      const countPerCol = Math.ceil(options.length / cols);
       options.forEach((option, index) => {
-        const i = index % cols;
+        const i = Math.floor(index / countPerCol);
         if (!Array.isArray(group[i])) {
           group[i] = [];
         }
@@ -404,7 +411,21 @@ export default class SubmissionPDF {
     };
   }
 
-  async getControlDef(control) {
+  getNoDataTableRowDef(cols) {
+    const noDataCell = {
+      ...this.getTextDef(null, true),
+      colSpan: cols,
+      alignment: 'center',
+      margin: [0, 4, 0, 4],
+    };
+    const emptyCells = Array(cols)
+      .fill(0)
+      .map(() => ({}));
+
+    return [noDataCell, ...emptyCells].slice(0, -1);
+  }
+
+  async getControlSource(control) {
     const source = getProperty(control, 'options.source', control.resource);
     if (Array.isArray(source)) {
       return source;
@@ -433,5 +454,29 @@ export default class SubmissionPDF {
     }
 
     return [];
+  }
+
+  getControlLayout(control) {
+    const layout = control.options.layout || {};
+    const cols = Number(layout.columnCount);
+
+    return {
+      columnCount: isNaN(cols) ? 1 : cols,
+      valuesOnly: layout.valuesOnly || false,
+      usingControl: layout.usingControl || false,
+    };
+  }
+
+  getArrayValue(value) {
+    return Array.isArray(value) ? value : value ? [value] : [];
+  }
+
+  transformValueToLabel(value, source) {
+    if (Array.isArray(value)) {
+      return value.flatMap((item) => this.transformValueToLabel(item, source));
+    }
+
+    const match = source.find((option) => option.value === value);
+    return match ? match.label : value;
   }
 }
