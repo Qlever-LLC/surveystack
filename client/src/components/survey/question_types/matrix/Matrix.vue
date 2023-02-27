@@ -2,6 +2,7 @@
   <div>
     <app-dialog
       v-model="showConfirmDeletionDialog"
+      v-bind="dialogProps"
       v-if="rowToBeDeleted >= 0"
       @confirm="remove(rowToBeDeleted)"
       @cancel="rowToBeDeleted = -1"
@@ -14,6 +15,7 @@
 
     <v-dialog
       v-model="showEditItemDialog"
+      v-bind="dialogProps"
       v-if="showEditItemDialog"
       title="Edit"
       hideCancel
