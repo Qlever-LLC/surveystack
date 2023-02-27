@@ -8,6 +8,7 @@
       labelConfirm="Close"
       :hideCancel="true"
       v-model="showAndroidInstallDialog"
+      v-bind="dialogProps"
       @cancel="showAndroidInstallDialog = false"
       @confirm="showAndroidInstallDialog = false"
     >

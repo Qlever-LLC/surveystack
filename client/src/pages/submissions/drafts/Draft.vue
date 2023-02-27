@@ -10,7 +10,9 @@
     <div v-else-if="loading && !hasError" class="d-flex align-center justify-center" style="height: 100%">
       <v-progress-circular :size="50" color="primary" indeterminate />
     </div>
-    <div v-else-if="hasError" class="text-center mt-8">Error Loading Draft Submission or Survey</div>
+    <div v-else-if="hasError" class="text-center mt-8">
+      Error Loading Draft Submission or Survey. Click <a @click="$router.back()">here</a> to go back to Survey.
+    </div>
 
     <confirm-leave-dialog ref="confirmLeaveDialog" title="Confirm Exit Draft" v-if="submission && survey">
       Are you sure you want to exit this draft?
@@ -221,7 +223,7 @@ export default {
     this.loading = false;
   },
   beforeRouteLeave(to, from, next) {
-    if (this.submission && this.survey && !this.isSubmitted) {
+    if (this.submission && this.survey && !this.isSubmitted && !this.hasError) {
       this.$refs.confirmLeaveDialog.open(next);
       return;
     }
@@ -229,6 +231,7 @@ export default {
     if (this.submission && this.submission.meta.submitAsUser) {
       api.removeHeader('x-delegate-to');
     }
+
     next(true);
   },
 };

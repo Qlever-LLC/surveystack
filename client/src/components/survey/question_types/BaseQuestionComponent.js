@@ -40,4 +40,13 @@ export default {
       this.$emit('show-next');
     },
   },
+  computed: {
+    dialogProps() {
+      const dom = document.querySelector('#previewSurvey');
+      return {
+        attach: dom ? '#previewSurvey' : undefined,
+        hideOverlay: !!dom,
+      };
+    },
+  },
 };
