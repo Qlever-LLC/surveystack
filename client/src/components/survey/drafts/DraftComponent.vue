@@ -79,8 +79,8 @@
     />
   </div>
   <div v-else-if="builder" class="d-flex flex-column justify-space-around" style="height: 100%">
-    <v-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded
-      ><div class="text-body-1 my-4 text-center">
+    <v-sheet class="mx-1 px-2 py-4" color="white" elevation="1" rounded>
+      <div class="text-body-1 my-4 text-center">
         Click on the
         <v-btn fab dark x-small color="blue darken-2" style="pointer-events: none">
           <v-icon>mdi-plus</v-icon>
@@ -100,8 +100,8 @@
           Publish
         </v-btn>
         to allow users to submit to your survey
-      </div></v-sheet
-    >
+      </div>
+    </v-sheet>
   </div>
   <v-alert v-else border="left" prominent text type="error">
     <v-row align="center">

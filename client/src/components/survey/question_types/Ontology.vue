@@ -123,6 +123,9 @@
           {{ getLabelForItemValue(data.item) }}
         </v-chip>
       </template>
+      <template v-slot:selection="data" v-else>
+        {{ getLabelForItemValue(data.item) }}
+      </template>
       <template v-slot:no-data>
         <v-list-item>
           <v-list-item-content>
