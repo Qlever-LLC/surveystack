@@ -5,7 +5,7 @@ import parseISO from 'date-fns/parseISO';
 import dateFnsFormat from 'date-fns/format';
 import getProperty from 'lodash/get';
 import { fetchSubmissionUniqueItems } from './submissions';
-import { getFileResource, getPublicDownloadUrl } from '@/utils/resources';
+import { getPublicDownloadUrl } from '@/utils/resources';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -34,6 +34,9 @@ const styles = {
   link: {
     color: 'blue',
     decoration: 'underline',
+  },
+  code: {
+    background: '#f5f5f5',
   },
   table: {
     headerColor: '#d1d5db',
@@ -144,6 +147,7 @@ export default class SubmissionPDF {
       matrix: this.generateMatrixControl,
       image: this.generateFileControl,
       file: this.generateFileControl,
+      geoJSON: this.generateGeoJsonControl,
     }[control.type];
 
     if (generator) {
@@ -157,16 +161,18 @@ export default class SubmissionPDF {
     }
   }
 
+  /*******************************************************************/
+  /********************     Control generators     *******************/
+  /*******************************************************************/
+
   generateNormalControl(control, path = []) {
-    const key = [...path, control.name, 'value'];
-    const value = getProperty(this.submission.data, key);
+    const value = this.getAnswer(control, path);
 
     this.docDefinition.content.push(this.getQuestionDef(control), this.getTextDef(value), '\n\n');
   }
 
   generateDateControl(control, path = []) {
-    const key = [...path, control.name, 'value'];
-    const value = getProperty(this.submission.data, key);
+    const value = this.getAnswer(control, path);
 
     this.docDefinition.content.push(this.getQuestionDef(control), this.getDateDef(value), '\n\n');
   }
@@ -179,8 +185,7 @@ export default class SubmissionPDF {
   }
 
   async generateRadioControl(control, path = []) {
-    const key = [...path, control.name, 'value'];
-    const value = getProperty(this.submission.data, key);
+    const value = this.getAnswer(control, path);
     const source = await this.getControlSource(control);
     const layout = this.getControlLayout(control);
 
@@ -195,10 +200,8 @@ export default class SubmissionPDF {
   }
 
   async generateCheckControl(control, path = []) {
-    const key = [...path, control.name, 'value'];
-    const value = getProperty(this.submission.data, key);
+    const value = this.getAnswer(control, path);
     const source = await this.getControlSource(control);
-
     const layout = this.getControlLayout(control);
 
     this.docDefinition.content.push(this.getQuestionDef(control));
@@ -212,8 +215,7 @@ export default class SubmissionPDF {
   }
 
   async generateDropdownControl(control, path = []) {
-    const key = [...path, control.name, 'value'];
-    const value = getProperty(this.submission.data, key);
+    const value = this.getAnswer(control, path);
     const source = await this.getControlSource(control);
     const layout = this.getControlLayout(control);
 
@@ -232,8 +234,7 @@ export default class SubmissionPDF {
   }
 
   generateFileControl(control, path = []) {
-    const key = [...path, control.name, 'value'];
-    const value = getProperty(this.submission.data, key);
+    const value = this.getAnswer(control, path);
     const multiple = getProperty(control, 'options.source.allowMultiple', false);
     const layout = this.getControlLayout(control);
 
@@ -242,6 +243,12 @@ export default class SubmissionPDF {
       this.getFileDef(value, multiple, layout.preview),
       '\n\n'
     );
+  }
+
+  generateGeoJsonControl(control, path = []) {
+    const value = this.getAnswer(control, path);
+
+    this.docDefinition.content.push(this.getQuestionDef(control), this.getGeoJsonDef(value), '\n\n');
   }
 
   async generateMatrixControl(control, path = []) {
@@ -315,6 +322,10 @@ export default class SubmissionPDF {
       '\n\n'
     );
   }
+
+  /*******************************************************************/
+  /**************     Definitions for each controls     **************/
+  /*******************************************************************/
 
   getQuestionDef(control) {
     this.questionIndex += 1;
@@ -460,6 +471,30 @@ export default class SubmissionPDF {
     return multiple ? def : def.ul[0];
   }
 
+  getGeoJsonDef(answer) {
+    if (!answer) {
+      return this.getTextDef(answer);
+    }
+
+    return {
+      table: {
+        body: [
+          [
+            {
+              text: JSON.stringify(answer, null, 2),
+              preserveLeadingSpaces: true,
+              fontSize: 10,
+              color: 'black',
+              margin: [16, 4, 16, 4],
+            },
+          ],
+        ],
+      },
+      layout: 'noBorders',
+      fillColor: styles.code.background,
+    };
+  }
+
   getNoDataTableRowDef(cols) {
     const noDataCell = {
       ...this.getTextDef(null, true),
@@ -473,6 +508,10 @@ export default class SubmissionPDF {
 
     return [noDataCell, ...emptyCells].slice(0, -1);
   }
+
+  /*******************************************************************/
+  /*************************     Helpers     *************************/
+  /*******************************************************************/
 
   async getControlSource(control) {
     const source = getProperty(control, 'options.source', control.resource);
@@ -515,6 +554,13 @@ export default class SubmissionPDF {
       usingControl: layout.usingControl || false,
       preview: layout.preview || false,
     };
+  }
+
+  getAnswer(control, path = []) {
+    const key = [...path, control.name, 'value'];
+    const value = getProperty(this.submission.data, key);
+
+    return value;
   }
 
   getArrayValue(value) {
