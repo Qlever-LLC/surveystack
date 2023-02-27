@@ -5,6 +5,7 @@ import parseISO from 'date-fns/parseISO';
 import dateFnsFormat from 'date-fns/format';
 import getProperty from 'lodash/get';
 import { fetchSubmissionUniqueItems } from './submissions';
+import { getFileResource, getPublicDownloadUrl } from '@/utils/resources';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -29,6 +30,10 @@ const styles = {
   },
   answer: {
     color: '#1e293b',
+  },
+  link: {
+    color: 'blue',
+    decoration: 'underline',
   },
   table: {
     headerColor: '#d1d5db',
@@ -72,6 +77,7 @@ export default class SubmissionPDF {
       content: [],
       styles,
       defaultStyle,
+      images: {},
     };
   }
 
@@ -136,6 +142,7 @@ export default class SubmissionPDF {
       selectMultiple: this.generateCheckControl,
       ontology: this.generateDropdownControl,
       matrix: this.generateMatrixControl,
+      image: this.generateImageControl,
     }[control.type];
 
     if (generator) {
@@ -221,6 +228,12 @@ export default class SubmissionPDF {
       this.docDefinition.content.push(this.getDropdownDef(value, source, layout.columnCount));
     }
     this.docDefinition.content.push('\n\n');
+  }
+
+  generateImageControl(control, path = []) {
+    const key = [...path, control.name, 'value'];
+    const value = getProperty(this.submission.data, key);
+    this.docDefinition.content.push(this.getQuestionDef(control), this.getImageDef(value), '\n\n');
   }
 
   async generateMatrixControl(control, path = []) {
@@ -409,6 +422,34 @@ export default class SubmissionPDF {
         })),
       })),
     };
+  }
+
+  getImageDef(answer) {
+    if (answer.length === 0) {
+      return this.getTextDef(answer);
+    }
+
+    const def = { ul: [] };
+
+    answer.forEach((image) => {
+      const ext = (image.split('.').pop() || '').toLowerCase();
+      const isSupport = ['png', 'jpg', 'jpeg'].includes(ext);
+      const url = getPublicDownloadUrl(image);
+      const stack = [
+        {
+          text: image,
+          link: url,
+          style: 'link',
+        },
+      ];
+      if (isSupport) {
+        this.docDefinition.images[image] = url;
+        stack.push({ image, fit: [300, 300], margin: [0, 8, 0, 8] });
+      }
+      def.ul.push({ stack });
+    });
+
+    return def;
   }
 
   getNoDataTableRowDef(cols) {
