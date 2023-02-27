@@ -38,13 +38,20 @@ export default function buildScriptQuestionIframeContents({
       </div>
       <div id="root"></div>
       <script type="module">
-        ${iframeMessagingSource}
         ${markedSource}
         ${iframeUISource}
         ${sandboxUtilsSource}
+        ${iframeMessagingSource}
 
-        window.log = requestLogMessage;
-        window.runSurveyStackKit = requestRunSurveyStackKit;
+        async function loadLibs() {
+            const libraries = await getLibraries();
+            console.error('number of libraries injected to iframe: '+libraries.length);
+            for await (const lib of libraries) {
+              await import(/* webpackIgnore: true */'data:text/javascript;base64,'+lib);
+            }
+          }
+
+          loadLibs();
 
         function getInitialState() {
           return {

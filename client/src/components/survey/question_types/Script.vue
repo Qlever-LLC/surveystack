@@ -197,6 +197,50 @@ export default {
         '*'
       );
     },
+    async handleRequestLibraries() {
+      console.log('script requested libraries');
+      let libraries = [];
+      //TODO load librariesRequired from this.source.libraries and let script admin manage that list
+      const librariesRequired = [
+        /*{
+          name: 'Plotly1',
+          url: 'https://cdn.plot.ly/plotly-1.58.5.min.js',
+          //url: ''https://cdn.plot.ly/plotly-latest.min.js', //currently points to 1.58.5
+        },*/
+        {
+          name: 'Plotly2',
+          url: 'https://cdn.plot.ly/plotly-2.18.2.min.js',
+        },
+      ];
+
+      for await (const lib of librariesRequired) {
+        try {
+          let librarySource = await (await fetch(lib.url)).text();
+          if (lib.name === 'Plotly1') {
+            //hack for plotly https://github.com/plotly/plotly.js/issues/3518#issuecomment-832681024
+            librarySource = librarySource.replace(
+              '"object"==typeof e&&e.exports?e.exports=t:this.d3=t}()',
+              '"object"==typeof e&&e.exports?e.exports=t:this.d3=t}.apply(self)'
+            );
+          }
+
+          //unescape(encodeURIComponent) was required over only btoa(librarySource) to make plotly 2.18.2 work
+          //decodeURI does not work so stay with deprecation of unescape, possoible explanation see https://stackoverflow.com/questions/619323/decodeuricomponent-vs-unescape-what-is-wrong-with-unescape
+          const librarySourceBase64 = btoa(unescape(encodeURIComponent(librarySource)));
+          libraries.push(librarySourceBase64);
+        } catch (error) {
+          console.error('unable to import library: ' + error);
+        }
+      }
+
+      this.$refs.iframe.contentWindow.postMessage(
+        {
+          type: 'RETURN_LIBRARIES',
+          payload: libraries,
+        },
+        '*'
+      );
+    },
     async initializeIframe() {
       const baseURL = window.location.origin;
 
@@ -228,6 +272,7 @@ export default {
         iframeStyles,
       });
       iframe.src = `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
+      iframe.id = 'script-iframe';
     },
     initializeEventListeners() {
       // onMessage returns the message listener function so that the listener can be removed on destroyed lifecycle method
@@ -240,7 +285,8 @@ export default {
         onMessage('REQUEST_SET_QUESTION_CONTEXT', this.handleRequestSetContext),
         onMessage('REQUEST_SET_QUESTION_RENDER_QUEUE', this.handleRequestSetRenderQueue),
         onMessage('REQUEST_SET_QUESTION_RENDER_QUEUE', this.handleRequestSetRenderQueue),
-        onMessage('REQUEST_RESOURCE', this.handleRequestResource)
+        onMessage('REQUEST_RESOURCE', this.handleRequestResource),
+        onMessage('REQUEST_LIBRARIES', this.handleRequestLibraries)
       );
     },
     async fetchScriptSource() {
