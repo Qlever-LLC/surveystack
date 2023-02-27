@@ -249,7 +249,7 @@ const updateGroup = async (req, res) => {
   sanitizeGroup(entity);
 
   const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
-  if (!rolesService.hasAdminRoleForRequest(res, existing._id)) {
+  if (!(await rolesService.hasAdminRoleForRequest(res, existing._id))) {
     throw boom.unauthorized(`You are not authorized: admin@${existing.path}`);
   }
 
