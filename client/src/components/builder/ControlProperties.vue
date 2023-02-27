@@ -205,7 +205,7 @@
       <!-- Control options -->
       <v-spacer></v-spacer>
       <checkbox
-        v-if="showRequiredOption"
+        v-if="hasRequiredOption"
         label="Required"
         v-model="control.options.required"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
@@ -330,7 +330,7 @@
       </div>
 
       <!-- Print layout -->
-      <template v-if="isSelect || isOntology">
+      <template v-if="hasLayoutOptions">
         <v-btn v-if="!showLayout" color="grey darken-1" class="align-self-end" @click="showLayout = true" small text>
           Layout
         </v-btn>
@@ -341,7 +341,15 @@
             <v-icon @click.stop="showLayout = false">mdi-close</v-icon>
           </div>
 
-          <div>
+          <div v-if="isFile">
+            <checkbox
+              label="Show preview"
+              v-model="control.options.layout.preview"
+              helper-text="Render the uploaded images. JPEG and PNG formats are supported. By default, only links are rendered."
+            />
+          </div>
+
+          <div v-if="!isFile">
             <checkbox
               label="Show values only"
               v-model="control.options.layout.valuesOnly"
@@ -358,7 +366,7 @@
           </div>
 
           <v-select
-            v-if="!control.options.layout.valuesOnly"
+            v-if="!isFile && !control.options.layout.valuesOnly"
             label="Columns"
             v-model="control.options.layout.columnCount"
             :items="[1, 2, 3, 4, 5]"
@@ -526,11 +534,14 @@ export default {
     isFarmOsUuid() {
       return this.control.type === 'farmOsUuid';
     },
-    showRequiredOption() {
+    hasRequiredOption() {
       return (
         this.control.options.required ||
         !['group', 'page', 'instructions', 'instructionsImageSplit'].includes(this.control.type)
       );
+    },
+    hasLayoutOptions() {
+      return this.isSelect || this.isOntology || this.isFile;
     },
   },
   methods: {

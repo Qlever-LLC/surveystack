@@ -142,7 +142,8 @@ export default class SubmissionPDF {
       selectMultiple: this.generateCheckControl,
       ontology: this.generateDropdownControl,
       matrix: this.generateMatrixControl,
-      image: this.generateImageControl,
+      image: this.generateFileControl,
+      file: this.generateFileControl,
     }[control.type];
 
     if (generator) {
@@ -230,10 +231,17 @@ export default class SubmissionPDF {
     this.docDefinition.content.push('\n\n');
   }
 
-  generateImageControl(control, path = []) {
+  generateFileControl(control, path = []) {
     const key = [...path, control.name, 'value'];
     const value = getProperty(this.submission.data, key);
-    this.docDefinition.content.push(this.getQuestionDef(control), this.getImageDef(value), '\n\n');
+    const multiple = getProperty(control, 'options.source.allowMultiple', false);
+    const layout = this.getControlLayout(control);
+
+    this.docDefinition.content.push(
+      this.getQuestionDef(control),
+      this.getFileDef(value, multiple, layout.preview),
+      '\n\n'
+    );
   }
 
   async generateMatrixControl(control, path = []) {
@@ -424,7 +432,7 @@ export default class SubmissionPDF {
     };
   }
 
-  getImageDef(answer) {
+  getFileDef(answer, multiple, preview) {
     if (answer.length === 0) {
       return this.getTextDef(answer);
     }
@@ -433,7 +441,7 @@ export default class SubmissionPDF {
 
     answer.forEach((image) => {
       const ext = (image.split('.').pop() || '').toLowerCase();
-      const isSupport = ['png', 'jpg', 'jpeg'].includes(ext);
+      const isImage = ['png', 'jpg', 'jpeg'].includes(ext);
       const url = getPublicDownloadUrl(image);
       const stack = [
         {
@@ -442,14 +450,14 @@ export default class SubmissionPDF {
           style: 'link',
         },
       ];
-      if (isSupport) {
+      if (isImage && preview) {
         this.docDefinition.images[image] = url;
         stack.push({ image, fit: [300, 300], margin: [0, 8, 0, 8] });
       }
       def.ul.push({ stack });
     });
 
-    return def;
+    return multiple ? def : def.ul[0];
   }
 
   getNoDataTableRowDef(cols) {
@@ -505,6 +513,7 @@ export default class SubmissionPDF {
       columnCount: isNaN(cols) ? 1 : cols,
       valuesOnly: layout.valuesOnly || false,
       usingControl: layout.usingControl || false,
+      preview: layout.preview || false,
     };
   }
 
