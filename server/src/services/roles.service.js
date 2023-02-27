@@ -102,7 +102,11 @@ const hasSuperAdminRole = async (userId) => {
 };
 
 export const hasAdminRoleForRequest = (res, groupId) => {
-  return res.locals.auth.isSuperAdmin || hasAdminRole(res.locals.auth.user._id, groupId);
+  let admin = false;
+  if (res.locals.auth.user) {
+    admin = hasAdminRole(res.locals.auth.user._id, groupId);
+  }
+  return res.locals.auth.isSuperAdmin || admin;
 };
 
 export const hasAdminRole = (userId, groupId) => {
