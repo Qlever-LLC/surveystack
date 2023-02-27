@@ -59,7 +59,6 @@ export default {
       location: null,
       gpsLocation: null,
       gpsTimer: 0,
-      geolocationID: null,
       geolocationError: false,
     };
   },
@@ -95,6 +94,14 @@ export default {
       const newIndex = (index + 1) % MAP_STYLES.length;
       this.mapStyle = MAP_STYLES[newIndex];
       this.map.setStyle(`mapbox://styles/mapbox/${this.mapStyle}-v9`);
+    },
+    startGpsTimer() {
+      this.stopGpsTimer();
+      this.gpsTimer = setTimeout(() => {
+        console.warn('No confirmation from the user permission');
+        this.geolocationError = 'No confirmation from the user permission';
+        this.usingGPS = false;
+      }, 30000);
     },
     stopGpsTimer() {
       if (!this.gpsTimer) {
@@ -132,14 +139,12 @@ export default {
       });
 
       this.ctrl.on('trackuserlocationstart', () => {
+        this.startGpsTimer();
         this.usingGPS = true;
       });
 
       this.ctrl.on('geolocate', (position) => {
-        if (this.gpsLocation) {
-          return;
-        }
-
+        this.stopGpsTimer();
         this.gpsLocation = geoJsonFromPosition(position);
       });
 
@@ -169,27 +174,6 @@ export default {
       this.map.on('drag', () => {
         this.usingGPS = false;
       });
-    },
-    startGps() {
-      if (!navigator.geolocation) {
-        return;
-      }
-
-      this.geolocationID = navigator.geolocation.watchPosition(
-        (position) => {
-          this.gpsLocation = geoJsonFromPosition(position);
-        },
-        (err) => {
-          console.warn(`Error (${err.code}): ${err.message}`);
-          this.geolocationError = err;
-        }
-      );
-
-      this.gpsTimer = setTimeout(() => {
-        console.warn('No confirmation from the user permission');
-        this.geolocationError = 'No confirmation from the user permission';
-        this.usingGPS = false;
-      }, 30000);
     },
   },
   computed: {
@@ -234,7 +218,6 @@ export default {
   },
   mounted() {
     this.startMap();
-    this.startGps();
 
     if (wakeLock in navigator) {
       requestWakeLock();
@@ -243,10 +226,7 @@ export default {
     // TODO: this will now trigger a map error
   },
   beforeDestroy() {
-    if (navigator.geolocation) {
-      navigator.geolocation.clearWatch(this.geolocationID);
-    }
-    this.map.remove();
     this.stopGpsTimer();
+    this.map.remove();
   },
 };
