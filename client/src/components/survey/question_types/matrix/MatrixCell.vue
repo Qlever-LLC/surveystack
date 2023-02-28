@@ -309,7 +309,7 @@ export default {
     onDropDownInput(value) {
       this.onInput(value);
       this.comboboxSearch = null;
-      if (this.$refs.dropdownRef) {
+      if (this.$refs.dropdownRef && !this.header.multiple) {
         this.$refs.dropdownRef.isMenuActive = false;
       }
     },
@@ -383,7 +383,7 @@ export default {
       const match = newVal
         ? this.items.find((item) => item.label.toLowerCase().indexOf(newVal.toLowerCase()) >= 0)
         : undefined;
-      if (!match) {
+      if (!match && this.$refs.dropdownRef) {
         this.$refs.dropdownRef.setMenuIndex(-1);
       }
     },

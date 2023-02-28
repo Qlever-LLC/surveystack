@@ -24,7 +24,7 @@ const styles = {
     color: '#9ca3af',
   },
   question: {
-    fontSize: 14,
+    fontSize: 12,
     bold: true,
     margin: [0, 0, 0, 8],
   },
@@ -61,6 +61,12 @@ const SVG = {
     '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><g><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.58 20 4 16.42 4 12C4 7.58 7.58 4 12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20Z" fill="#374151"/></g></svg>',
 };
 
+const LVL = {
+  page: 1,
+  group: 2,
+  question: 3,
+};
+
 function getControlSvg(multiple, checked) {
   return SVG[`${multiple ? 'check' : 'radio'}-${Boolean(checked)}`];
 }
@@ -81,7 +87,9 @@ export default class SubmissionPDF {
       styles,
       defaultStyle,
       images: {},
+      pageBreakBefore: this.pageBreakBefore.bind(this),
     };
+    this.pages = [];
   }
 
   async download() {
@@ -106,6 +114,7 @@ export default class SubmissionPDF {
 
       if (revision && Array.isArray(revision.controls)) {
         this.questionIndex = 0;
+        this.pages = [];
         this.isLoading = false;
         for (const control of revision.controls) {
           await this.generateControl(control);
@@ -116,6 +125,10 @@ export default class SubmissionPDF {
 
     return pdfMake.createPdf(this.docDefinition);
   }
+
+  /*******************************************************************/
+  /********************     Document meta info     *******************/
+  /*******************************************************************/
 
   generateMeta() {
     const metaGroup = `Submitted to: ${this.submission.meta.group.path}`;
@@ -135,8 +148,24 @@ export default class SubmissionPDF {
     );
   }
 
+  /*******************************************************************/
+  /****************     Header/ Footer/ Page break     ***************/
+  /*******************************************************************/
+
+  pageBreakBefore(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
+    return currentNode.headlineLevel && followingNodesOnPage.length === 0;
+  }
+
+  /*******************************************************************/
+  /********************     Control generators     *******************/
+  /*******************************************************************/
+
   async generateControl(control, path = []) {
     const generator = {
+      page: this.generatePageControl,
+      group: this.generateGroupControl,
+      instructions: this.generateInstructionControl,
+      instructionsImageSplit: this.generateInstructionSplitControl,
       string: this.generateNormalControl,
       number: this.generateNormalControl,
       date: this.generateDateControl,
@@ -161,9 +190,23 @@ export default class SubmissionPDF {
     }
   }
 
-  /*******************************************************************/
-  /********************     Control generators     *******************/
-  /*******************************************************************/
+  generatePageControl(control) {
+    const { id = '', label = '' } = control;
+    this.pages.push({ id, label });
+    this.docDefinition.content.push(this.getPageDef(control));
+  }
+
+  generateGroupControl(control) {
+    this.docDefinition.content.push({ text: control.label, headlineLevel: LVL.group });
+  }
+
+  generateInstructionControl(control) {
+    this.docDefinition.content.push({ text: control.label, headlineLevel: LVL.question });
+  }
+
+  generateInstructionSplitControl(control) {
+    this.docDefinition.content.push({ text: control.label, headlineLevel: LVL.question });
+  }
 
   generateNormalControl(control, path = []) {
     const value = this.getAnswer(control, path);
@@ -271,14 +314,9 @@ export default class SubmissionPDF {
         if (col.type === 'date') {
           row.push(this.getDateDef(value, true, ''));
         } else if (col.type === 'dropdown') {
-          const dropdownVal = Array.isArray(value) ? value : value ? [value] : [];
+          const dropdownVal = this.getArrayValue(value);
           const dropdownSource = await this.getControlSource(col);
-          const text = dropdownVal
-            .map((val) => {
-              const match = dropdownSource.find((s) => s.value === val);
-              return match ? match.label || match.value : val;
-            })
-            .join(', ');
+          const text = this.transformValueToLabel(dropdownVal, dropdownSource);
           row.push(this.getTextDef(text, true, ''));
         } else {
           row.push(this.getTextDef(value, true, ''));
@@ -327,16 +365,30 @@ export default class SubmissionPDF {
   /**************     Definitions for each controls     **************/
   /*******************************************************************/
 
+  getPageDef(control) {
+    const d = {
+      text: '',
+      headlineLevel: LVL.page,
+    };
+
+    if (this.pages.length > 1) {
+      d.pageBreak = 'before';
+    }
+
+    return d;
+  }
+
   getQuestionDef(control) {
     this.questionIndex += 1;
 
     return {
       text: `${this.questionIndex}. ${control.label || control.hint}`,
       style: 'question',
+      headlineLevel: LVL.question,
     };
   }
 
-  getTextDef(answer, small = false, placeholder = 'No answer') {
+  getTextDef(answer, dense = false, placeholder = 'No answer') {
     const value = this.getArrayValue(answer);
     const hasAnswer = value.length > 0;
 
@@ -345,7 +397,7 @@ export default class SubmissionPDF {
       color: hasAnswer ? styles.answer.color : styles.meta.color,
     };
 
-    if (small) {
+    if (dense) {
       d.fontSize = 10;
     }
 
