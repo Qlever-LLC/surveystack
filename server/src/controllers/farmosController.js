@@ -1165,6 +1165,65 @@ const assertGroupsInTree = async (groupIds, tree) => {
   }
 };
 
+export const addNotes = async (req, res) => {
+  const { note, instanceName, groupIds } = req.body;
+
+  //get groupNames from groupIds
+  const groups = await db
+    .collection('groups')
+    .find({
+      _id: {
+        $in: groupIds.map((gid) => ObjectId(gid)),
+      },
+    })
+    .toArray();
+  const groupNames = groups.map((el) => el.name);
+
+  //if doc with instanceName already exists, concat note and groupNames with existing
+  //else create new doc
+  const instanceNote = await db.collection('farmos-instance-notes').findOne({
+    instanceName: instanceName,
+  });
+  if (instanceNote) {
+    //obtain list of uniques groups
+    const newGroup = groupNames.filter((x) => !instanceNote.groupNames.includes(x));
+    let newGroupNames = instanceNote.groupNames;
+    if (newGroup) {
+      const newGroupConcat = newGroup.join(',');
+      newGroupNames += ', ' + newGroupConcat;
+    }
+
+    let newNote = instanceNote.note;
+    if (note) {
+      newNote += ', ' + note;
+    }
+
+    const myquery = { instanceName: instanceName };
+    await db.collection('farmos-instance-notes').deleteOne(myquery);
+
+    const myobj = {
+      _id: new ObjectId(),
+      note: newNote,
+      instanceName: instanceName,
+      groupNames: newGroupNames,
+    };
+    db.collection('farmos-instance-notes').insertOne(myobj);
+  } else {
+    const groupNamesConcat = groupNames.join(',');
+    const myobj = {
+      _id: new ObjectId(),
+      note: note,
+      instanceName: instanceName,
+      groupNames: groupNamesConcat,
+    };
+    db.collection('farmos-instance-notes').insertOne(myobj);
+  }
+
+  return res.send({
+    status: 'ok',
+  });
+};
+
 export const updateGroupsForUser = async (req, res) => {
   const { userId, instanceName, groupIds, tree } = await requireGroup(req, {
     userId: Joi.objectId().required(),
@@ -1189,7 +1248,7 @@ export const updateGroupsForUser = async (req, res) => {
     .collection('groups')
     .find({
       _id: {
-        $in: initialInstanceGroups.map((e) => e.groupId),
+        $in: initialInstanceGroups.map((e) => ObjectId(e.groupId)),
       },
     })
     .toArray();
@@ -1226,7 +1285,7 @@ export const updateGroupsForUser = async (req, res) => {
       .collection('groups')
       .find({
         _id: {
-          $in: resultInstanceGroups.map((e) => e.groupId),
+          $in: resultInstanceGroups.map((e) => ObjectId(e.groupId)),
         },
       })
       .toArray();
@@ -1241,10 +1300,12 @@ export const updateGroupsForUser = async (req, res) => {
   // else move notification
   if (initialGroupsName.every((val) => resultGroupsName.includes(val))) {
     const differenceName = resultGroupsName.filter((x) => !initialGroupsName.includes(x));
-    const difference = resultGroups
-      .filter((e) => differenceName.includes(e.name))
-      .map((e) => e._id);
-    await sendUserAddFarmToMultipleSurveystackGroupNotification(instanceName, difference);
+    if (differenceName.length > 0) {
+      const difference = resultGroups
+        .filter((e) => differenceName.includes(e.name))
+        .map((e) => e._id);
+      await sendUserAddFarmToMultipleSurveystackGroupNotification(instanceName, difference);
+    }
   } else if (resultGroupsName.every((val) => initialGroupsName.includes(val))) {
     const differenceName = initialGroupsName.filter((x) => !resultGroupsName.includes(x));
     const difference = initialGroups

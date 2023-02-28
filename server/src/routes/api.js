@@ -318,6 +318,12 @@ router.post(
 );
 
 router.post(
+  '/farmos/group-manage/add-notes',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.addNotes)
+);
+
+router.post(
   '/farmos/group-manage/:groupId/updatePlans',
   [assertIsSuperAdmin],
   catchErrors(farmosController.updatePlansForGroup)
