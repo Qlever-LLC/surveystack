@@ -23,6 +23,12 @@ const styles = {
     fontSize: 10,
     color: '#9ca3af',
   },
+  toc: {
+    fontSize: 12,
+    color: 'black',
+    italics: true,
+    margin: [0, 0, 0, 16],
+  },
   question: {
     fontSize: 12,
     bold: true,
@@ -67,6 +73,11 @@ const LVL = {
   question: 3,
 };
 
+const TOC = {
+  page: 'PAGE',
+  group: 'GROUP',
+};
+
 function getControlSvg(multiple, checked) {
   return SVG[`${multiple ? 'check' : 'radio'}-${Boolean(checked)}`];
 }
@@ -82,6 +93,7 @@ export default class SubmissionPDF {
     this.submission = submission;
     this.isLoading = false;
     this.questionIndex = 0;
+    this.toc = [];
     this.docDefinition = {
       content: [],
       styles,
@@ -89,7 +101,6 @@ export default class SubmissionPDF {
       images: {},
       pageBreakBefore: this.pageBreakBefore.bind(this),
     };
-    this.pages = [];
   }
 
   async download() {
@@ -105,8 +116,11 @@ export default class SubmissionPDF {
   async generate() {
     this.docDefinition.content = [];
 
+    this.isLoading = true;
     if (this.survey && this.submission) {
+      this.generateInfo();
       this.generateMeta();
+      this.generateToc();
 
       const revision = this.survey.revisions.find(
         (revision) => revision.version === this.submission.meta.survey.version
@@ -114,14 +128,13 @@ export default class SubmissionPDF {
 
       if (revision && Array.isArray(revision.controls)) {
         this.questionIndex = 0;
-        this.pages = [];
-        this.isLoading = false;
+        this.toc = [];
         for (const control of revision.controls) {
           await this.generateControl(control);
         }
-        this.isLoading = true;
       }
     }
+    this.isLoading = false;
 
     return pdfMake.createPdf(this.docDefinition);
   }
@@ -129,6 +142,15 @@ export default class SubmissionPDF {
   /*******************************************************************/
   /********************     Document meta info     *******************/
   /*******************************************************************/
+
+  generateInfo() {
+    this.docDefinition.info = {
+      title: `${this.survey.name} - SurveyStack report`,
+      author: 'Our-Sci SurveyStack team',
+      subject: `Report of the SurveyStack survey`,
+      keywords: 'SurveyStack, Survey, FarmOS, OurSci, what else?',
+    };
+  }
 
   generateMeta() {
     const metaGroup = `Submitted to: ${this.submission.meta.group.path}`;
@@ -146,6 +168,14 @@ export default class SubmissionPDF {
       },
       '\n\n'
     );
+
+    return this.docDefinition.content.length;
+  }
+
+  generateToc() {
+    this.docDefinition.content.push(...this.getTocDef());
+
+    return this.docDefinition.content.length;
   }
 
   /*******************************************************************/
@@ -153,7 +183,15 @@ export default class SubmissionPDF {
   /*******************************************************************/
 
   pageBreakBefore(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
-    return currentNode.headlineLevel && followingNodesOnPage.length === 0;
+    if (currentNode.headlineLevel === LVL.group) {
+      return followingNodesOnPage.length <= 2;
+    }
+
+    if (currentNode.headlineLevel === LVL.question) {
+      return followingNodesOnPage.length <= 1;
+    }
+
+    return false;
   }
 
   /*******************************************************************/
@@ -191,40 +229,53 @@ export default class SubmissionPDF {
   }
 
   generatePageControl(control) {
-    const { id = '', label = '' } = control;
-    this.pages.push({ id, label });
+    const { id, label } = control;
+    this.toc.push({ id, label, lvl: LVL.page });
     this.docDefinition.content.push(this.getPageDef(control));
+
+    return this.docDefinition.content.length;
   }
 
   generateGroupControl(control) {
-    this.docDefinition.content.push({ text: control.label, headlineLevel: LVL.group });
+    const { id, label } = control;
+    this.toc.push({ id, label, lvl: LVL.group });
+    this.docDefinition.content.push(this.getGroupDef(control));
+
+    return this.docDefinition.content.length;
   }
 
   generateInstructionControl(control) {
     this.docDefinition.content.push({ text: control.label, headlineLevel: LVL.question });
+
+    return this.docDefinition.content.length;
   }
 
   generateInstructionSplitControl(control) {
     this.docDefinition.content.push({ text: control.label, headlineLevel: LVL.question });
+
+    return this.docDefinition.content.length;
   }
 
   generateNormalControl(control, path = []) {
     const value = this.getAnswer(control, path);
-
     this.docDefinition.content.push(this.getQuestionDef(control), this.getTextDef(value), '\n\n');
+
+    return this.docDefinition.content.length;
   }
 
   generateDateControl(control, path = []) {
     const value = this.getAnswer(control, path);
-
     this.docDefinition.content.push(this.getQuestionDef(control), this.getDateDef(value), '\n\n');
+
+    return this.docDefinition.content.length;
   }
 
   generateLocationControl(control, path = []) {
     const key = [...path, control.name, 'value', 'geometry', 'coordinates'];
     const value = getProperty(this.submission.data, key);
-
     this.docDefinition.content.push(this.getQuestionDef(control), this.getTextDef(value), '\n\n');
+
+    return this.docDefinition.content.length;
   }
 
   async generateRadioControl(control, path = []) {
@@ -240,6 +291,8 @@ export default class SubmissionPDF {
       this.docDefinition.content.push(this.getSelectDef(value, source, false, layout.columnCount));
     }
     this.docDefinition.content.push('\n\n');
+
+    return this.docDefinition.content.length;
   }
 
   async generateCheckControl(control, path = []) {
@@ -255,6 +308,8 @@ export default class SubmissionPDF {
       this.docDefinition.content.push(this.getSelectDef(value, source, true, layout.columnCount));
     }
     this.docDefinition.content.push('\n\n');
+
+    return this.docDefinition.content.length;
   }
 
   async generateDropdownControl(control, path = []) {
@@ -274,6 +329,8 @@ export default class SubmissionPDF {
       this.docDefinition.content.push(this.getDropdownDef(value, source, layout.columnCount));
     }
     this.docDefinition.content.push('\n\n');
+
+    return this.docDefinition.content.length;
   }
 
   generateFileControl(control, path = []) {
@@ -286,12 +343,15 @@ export default class SubmissionPDF {
       this.getFileDef(value, multiple, layout.preview),
       '\n\n'
     );
+
+    return this.docDefinition.content.length;
   }
 
   generateGeoJsonControl(control, path = []) {
     const value = this.getAnswer(control, path);
-
     this.docDefinition.content.push(this.getQuestionDef(control), this.getGeoJsonDef(value), '\n\n');
+
+    return this.docDefinition.content.length;
   }
 
   async generateMatrixControl(control, path = []) {
@@ -359,23 +419,38 @@ export default class SubmissionPDF {
       },
       '\n\n'
     );
+
+    return this.docDefinition.content.length;
   }
 
   /*******************************************************************/
   /**************     Definitions for each controls     **************/
   /*******************************************************************/
 
+  getTocDef() {
+    return [
+      {
+        toc: {
+          title: { text: 'Table of contents', style: 'toc' },
+        },
+      },
+    ];
+  }
+
   getPageDef(control) {
-    const d = {
-      text: '',
+    return {
+      text: ' ',
       headlineLevel: LVL.page,
+      pageBreak: 'before',
     };
+  }
 
-    if (this.pages.length > 1) {
-      d.pageBreak = 'before';
-    }
-
-    return d;
+  getGroupDef(control) {
+    return {
+      text: control.label,
+      tocItem: true,
+      headlineLevel: LVL.group,
+    };
   }
 
   getQuestionDef(control) {
