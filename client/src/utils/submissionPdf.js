@@ -27,7 +27,7 @@ const styles = {
     margin: [0, 0, 0, 48],
   },
   toc: {
-    fontSize: 12,
+    fontSize: 16,
     lineHeight: 1.5,
     italics: true,
     alignment: 'center',
@@ -102,8 +102,10 @@ export default class SubmissionPDF {
   toc;
   docDefinition;
 
-  constructor() {
+  constructor(survey, submission) {
     this.initialize();
+    this.survey = survey;
+    this.submission = submission;
   }
 
   set survey(val) {
@@ -127,8 +129,6 @@ export default class SubmissionPDF {
   }
 
   initialize(survey = null, submission = null) {
-    this.survey = survey;
-    this.submission = submission;
     this.questionIndex = 0;
     this.toc = [];
     this.docDefinition = {
@@ -140,14 +140,12 @@ export default class SubmissionPDF {
     };
   }
 
-  async download(survey, submission) {
-    this.initialize(survey, submission);
+  async download() {
     const maker = await this.generate();
     maker.download();
   }
 
-  async print(survey, submission) {
-    this.initialize(survey, submission);
+  async print() {
     const maker = await this.generate();
     maker.print();
   }
@@ -157,9 +155,10 @@ export default class SubmissionPDF {
       return;
     }
 
+    this.initialize();
     this.generateInfo();
-    const metaIndex = this.generateMeta();
 
+    const metaIndex = this.generateMeta();
     const revision = this.survey.revisions.find((revision) => revision.version === this.submission.meta.survey.version);
 
     if (revision && Array.isArray(revision.controls)) {

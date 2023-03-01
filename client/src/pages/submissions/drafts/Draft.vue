@@ -100,7 +100,6 @@ export default {
       showResubmissionDialog: false,
       apiComposeErrors: [],
       showApiComposeErrors: false,
-      pdf: new SubmissionPdf(),
       downloading: false,
       sendingEmail: false,
     };
@@ -180,7 +179,7 @@ export default {
     },
     async download() {
       this.downloading = true;
-      await this.pdf.download(this.survey, this.submission);
+      await new SubmissionPdf(this.survey, this.submission).download();
       this.downloading = false;
     },
     emailMe() {},
