@@ -56,6 +56,8 @@
       :items="resultItems"
       title="Result of Submission"
       additionalMessage="<span class='caption'>Note: submissions from Builder are automatically archived. Please browse archived submissions to view this result.</span>"
+      :downloading="downloading"
+      :sending-email="sendingEmail"
       @download="download"
       @email-me="emailMe"
     />
@@ -148,6 +150,9 @@ export default {
       apiComposeErrors: [],
       showApiComposeErrors: false,
       versionsDialogIsVisible: false,
+      pdf: new SubmissionPdf(),
+      downloading: false,
+      sendingEmail: false,
     };
   },
   mounted() {
@@ -358,9 +363,10 @@ export default {
     onReloadSurvey() {
       this.fetchData();
     },
-    download() {
-      const pdf = new SubmissionPdf(this.survey, this.submission);
-      pdf.download();
+    async download() {
+      this.downloading = true;
+      await this.pdf.download(this.survey, this.submission);
+      this.downloading = false;
     },
     emailMe() {},
   },

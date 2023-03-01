@@ -60,8 +60,10 @@
           <div v-if="additionalMessage" class="px-2" v-html="additionalMessage" />
 
           <div v-if="isSuccess" class="mt-6 d-flex flex-column align-stretch">
-            <v-btn color="primary" depressed dense @click="$emit('download')">Download</v-btn>
-            <v-btn class="mt-3" color="primary" depressed dense @click="$emit('emailMe')">Email me survey</v-btn>
+            <v-btn color="primary" depressed dense :loading="downloading" @click="$emit('download')">Download</v-btn>
+            <v-btn class="mt-3" color="primary" depressed dense :loading="sendingEmail" @click="$emit('emailMe')">
+              Email me survey
+            </v-btn>
           </div>
         </v-card-text>
 
@@ -101,6 +103,14 @@ export default {
     },
     additionalMessage: {
       type: String,
+    },
+    downloading: {
+      type: Boolean,
+      default: () => false,
+    },
+    sendingEmail: {
+      type: Boolean,
+      default: () => false,
     },
   },
   computed: {

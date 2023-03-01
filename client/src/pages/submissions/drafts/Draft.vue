@@ -48,6 +48,8 @@
           query: { minimal_ui: $route.query.minimal_ui },
         }
       "
+      :downloading="downloading"
+      :sending-email="sendingEmail"
       @close="onCloseResultDialog"
       @download="download"
       @email-me="emailMe"
@@ -98,6 +100,9 @@ export default {
       showResubmissionDialog: false,
       apiComposeErrors: [],
       showApiComposeErrors: false,
+      pdf: new SubmissionPdf(),
+      downloading: false,
+      sendingEmail: false,
     };
   },
   methods: {
@@ -173,9 +178,10 @@ export default {
         window.parent.postMessage(message, '*');
       }
     },
-    download() {
-      const pdf = new SubmissionPdf(this.survey, this.submission);
-      pdf.download();
+    async download() {
+      this.downloading = true;
+      await this.pdf.download(this.survey, this.submission);
+      this.downloading = false;
     },
     emailMe() {},
   },
