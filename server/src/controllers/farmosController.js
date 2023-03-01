@@ -11,6 +11,7 @@ import { isFarmosUrlAvailable, createInstance } from '../services/farmos.service
 import {
   listFarmOSInstancesForUser,
   getSuperAllFarmosMappings,
+  getSuperAllFarmosNotes,
   addFarmToSurveystackGroupAndSendNotification,
   removeFarmFromSurveystackGroupAndSendNotification,
   removeFarmFromUser,
@@ -362,6 +363,11 @@ export const getLogs = async (req, res) => {
 
 export const superAdminGetAllInstances = async (req, res) => {
   const r = await getSuperAllFarmosMappings();
+  return res.send(r);
+};
+
+export const superAdminGetAllNotes = async (req, res) => {
+  const r = await getSuperAllFarmosNotes();
   return res.send(r);
 };
 

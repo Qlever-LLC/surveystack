@@ -349,6 +349,11 @@ export const getSuperAllFarmosMappings = async () => {
   };
 };
 
+export const getSuperAllFarmosNotes = async () => {
+  const allNotes = await db.collection('farmos-instance-notes').find().toArray();
+  return allNotes;
+};
+
 export const moveFarmFromMultGroupToMultSurveystackGroupAndSendNotification = async (
   instanceName,
   oldGroupIds,

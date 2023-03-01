@@ -191,6 +191,7 @@
             <tr>
               <th class="text-left">Instance Name</th>
               <th class="text-left">Tags</th>
+              <th class="text-left">Notes</th>
               <th class="text-left">Action</th>
             </tr>
           </thead>
@@ -204,6 +205,10 @@
                   </v-chip>
                 </div>
               </td>
+              <td v-if="farm.note">
+                {{ `${farm.note}` }}
+              </td>
+              <td v-else></td>
               <td>
                 <v-btn x-small color="blue" class="ma-1" @click="mapGroup(farm.instanceName)" dark>Map to Group</v-btn>
               </td>
@@ -222,6 +227,7 @@ export default {
   props: {
     groups: Array,
     mappings: Object,
+    notes: Array,
     loading: Boolean,
     users: Array,
   },
@@ -303,9 +309,15 @@ export default {
       const mappings = [];
 
       for (const farm of farms) {
+        let note = undefined;
+        const noteOfFarm = this.notes.find((el) => el.instanceName === farm.url);
+        if (noteOfFarm) {
+          note = `Removed from ${noteOfFarm.groupNames} reason: ${noteOfFarm.note}`;
+        }
         mappings.push({
           instanceName: farm.url,
           tags: farm.tags.split(' '),
+          note: note,
         });
       }
 

@@ -317,6 +317,12 @@ router.post(
   catchErrors(farmosController.superAdminUpdateFarmOSAccess)
 );
 
+router.get(
+  '/farmos/notes/all',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.superAdminGetAllNotes)
+);
+
 router.post(
   '/farmos/group-manage/add-notes',
   [assertHasGroupAdminAccess],

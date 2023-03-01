@@ -24,6 +24,7 @@
           :is="item.component"
           :groups="groups"
           :mappings="mappings"
+          :notes="notes"
           :users="users"
           :loading="loading"
           :viewModel="item.viewModel || {}"
@@ -51,6 +52,7 @@ export default {
   data() {
     return {
       mappings: null,
+      notes: null,
       groups: null,
       users: null,
       tab: null,
@@ -120,6 +122,7 @@ export default {
   methods: {
     async reload() {
       this.loading = true;
+      const { data: notes } = await api.get('/farmos/notes/all');
       const { data: mappings } = await api.get('/farmos/all');
       const { data: groups } = await api.get('/groups?populate=0&prefix=/');
       const { data: users } = await api.get('/users');
@@ -128,6 +131,7 @@ export default {
       console.log('mappings', mappings);
 
       this.loading = false;
+      this.notes = notes;
       this.mappings = mappings;
       this.groups = groups;
       this.users = users;
