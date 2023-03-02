@@ -330,6 +330,12 @@ router.post(
 );
 
 router.post(
+  '/farmos/group-manage/add-sa-notes',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.addSuperAdminNotes)
+);
+
+router.post(
   '/farmos/group-manage/:groupId/updatePlans',
   [assertIsSuperAdmin],
   catchErrors(farmosController.updatePlansForGroup)

@@ -32,6 +32,7 @@
           @create-instance="createInstance"
           @create-plan="createPlan"
           @delete-plan="deletePlan"
+          @addSuperAdminNote="addSuperAdminNote"
         ></v-component>
       </v-tab-item>
     </v-tabs-items>
@@ -397,6 +398,22 @@ export default {
 
       vm.loading = false;
       vm.count += 1;
+    },
+    async addSuperAdminNote(arg) {
+      const { updatedNote: note, selectedInstance: instanceName } = arg;
+      try {
+        await api.post(`/farmos/group-manage/add-sa-notes`, {
+          note,
+          instanceName,
+        });
+        this.success('Succefully added notes');
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+          this.error(error.response.data.message);
+        } else {
+          this.error(error.message);
+        }
+      }
     },
     success(msg) {
       this.successMessage = msg;

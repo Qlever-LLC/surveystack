@@ -1216,19 +1216,18 @@ export const addNotes = async (req, res) => {
     ('0' + d.getHours()).slice(-2) +
     ':' +
     ('0' + d.getMinutes()).slice(-2);
-  const newNote = `US ${timestamp}\nRemoved from ${groupNames} reason: ${note}\n\n`;
+  const newNote = `${timestamp} us-format\nRemoved from ${groupNames} reason: ${note}\n\n`;
 
   const instanceNote = await db.collection('farmos-instance-notes').findOne({
     instanceName: instanceName,
   });
   if (instanceNote) {
-    //$set instanceNote.note + newNote
-    const totalNote = instanceNote.note + newNote;
+    instanceNote.note += newNote;
     db.collection('farmos-instance-notes').updateOne(
       { instanceName: instanceName },
       {
         $set: {
-          note: totalNote,
+          note: instanceNote.note,
         },
       }
     );
@@ -1239,6 +1238,76 @@ export const addNotes = async (req, res) => {
       note: newNote,
     };
     db.collection('farmos-instance-notes').insertOne(myobj);
+  }
+
+  return res.send({
+    status: 'ok',
+  });
+};
+
+export const addSuperAdminNotes = async (req, res) => {
+  const { note, instanceName } = req.body;
+
+  const schema = Joi.object({
+    //note is nullable
+    note: Joi.string(),
+    instanceName: Joi.string().required(),
+  });
+
+  const validres = schema.validate(
+    {
+      ...req.body,
+    },
+    { allowUnknown: true }
+  );
+
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
+  //template:
+  //note = `timestamp\nRemoved from ${groupNames} reason: ${note}\n\n`;
+  const d = new Date();
+  const timestamp =
+    ('0' + (d.getMonth() + 1)).slice(-2) +
+    '-' +
+    ('0' + d.getDate()).slice(-2) +
+    '-' +
+    d.getFullYear() +
+    ' ' +
+    ('0' + d.getHours()).slice(-2) +
+    ':' +
+    ('0' + d.getMinutes()).slice(-2);
+  const newNote = `${timestamp} us-format\nRemoved by Super Admin reason: ${note}\n\n`;
+
+  const instanceNote = await db.collection('farmos-instance-notes').findOne({
+    instanceName: instanceName,
+  });
+  // if variable note is empty, empty the field note in the DB
+  if (instanceNote) {
+    if (note) {
+      instanceNote.note += '\n' + newNote;
+    } else {
+      instanceNote.note = '';
+    }
+    db.collection('farmos-instance-notes').updateOne(
+      { instanceName: instanceName },
+      {
+        $set: {
+          note: instanceNote.note,
+        },
+      }
+    );
+  } else {
+    if (!note) {
+      const myobj = {
+        _id: new ObjectId(),
+        instanceName: instanceName,
+        note: [newNote],
+      };
+      db.collection('farmos-instance-notes').insertOne(myobj);
+    }
   }
 
   return res.send({
