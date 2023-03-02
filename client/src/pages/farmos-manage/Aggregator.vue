@@ -312,7 +312,7 @@ export default {
         let note = undefined;
         const noteOfFarm = this.notes.find((el) => el.instanceName === farm.url);
         if (noteOfFarm) {
-          note = `Removed from ${noteOfFarm.groupNames} reason: ${noteOfFarm.note}`;
+          note = noteOfFarm.note;
         }
         mappings.push({
           instanceName: farm.url,

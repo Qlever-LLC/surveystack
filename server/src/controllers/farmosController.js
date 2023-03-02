@@ -1201,44 +1201,47 @@ export const addNotes = async (req, res) => {
       },
     })
     .toArray();
-  const groupNames = groups.map((el) => el.name);
+  const groupNames = groups.map((el) => el.name).join(',');
 
   //if doc with instanceName already exists, concat note and groupNames with existing
   //else create new doc
+
+  //template:
+  //note = `timestamp\nRemoved from ${groupNames} reason: ${note}\n\n`;
+  const d = new Date();
+
+  const getNbMonth = d.getMonth() + 1;
+  const timestamp =
+    getNbMonth +
+    '-' +
+    d.getDate() +
+    '-' +
+    d.getFullYear() +
+    ' ' +
+    d.getHours() +
+    ':' +
+    d.getMinutes();
+  const newNote = `US ${timestamp}\nRemoved from ${groupNames} reason: ${note}\n\n`;
+
   const instanceNote = await db.collection('farmos-instance-notes').findOne({
     instanceName: instanceName,
   });
   if (instanceNote) {
-    //obtain list of uniques groups
-    const newGroup = groupNames.filter((x) => !instanceNote.groupNames.includes(x));
-    let newGroupNames = instanceNote.groupNames;
-    if (newGroup) {
-      const newGroupConcat = newGroup.join(',');
-      newGroupNames += ', ' + newGroupConcat;
-    }
-
-    let newNote = instanceNote.note;
-    if (note) {
-      newNote += ', ' + note;
-    }
-
-    const myquery = { instanceName: instanceName };
-    await db.collection('farmos-instance-notes').deleteOne(myquery);
-
-    const myobj = {
-      _id: new ObjectId(),
-      note: newNote,
-      instanceName: instanceName,
-      groupNames: newGroupNames,
-    };
-    db.collection('farmos-instance-notes').insertOne(myobj);
+    //$set instanceNote.note + newNote
+    const totalNote = instanceNote.note + newNote;
+    db.collection('farmos-instance-notes').updateOne(
+      { instanceName: instanceName },
+      {
+        $set: {
+          note: totalNote,
+        },
+      }
+    );
   } else {
-    const groupNamesConcat = groupNames.join(',');
     const myobj = {
       _id: new ObjectId(),
-      note: note,
       instanceName: instanceName,
-      groupNames: groupNamesConcat,
+      note: newNote,
     };
     db.collection('farmos-instance-notes').insertOne(myobj);
   }
