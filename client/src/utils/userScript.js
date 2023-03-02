@@ -44,14 +44,13 @@ export default function buildScriptQuestionIframeContents({
         ${iframeMessagingSource}
 
         async function loadLibs() {
-            const libraries = await getLibraries();
-            console.error('number of libraries injected to iframe: '+libraries.length);
-            for await (const lib of libraries) {
-              await import(/* webpackIgnore: true */'data:text/javascript;base64,'+lib);
-            }
+          const libraries = await getLibraries();
+          for await (const lib of libraries) {
+            await import(/* webpackIgnore: true */'data:text/javascript;base64,'+lib);
           }
+        }
 
-          loadLibs();
+        loadLibs();
 
         function getInitialState() {
           return {

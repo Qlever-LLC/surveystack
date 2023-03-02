@@ -169,7 +169,7 @@ const actions = {
         const { data: scriptCode } = await api.get(`/scripts/${resource.content}`);
         resourceStored = cloneDeep(resource);
         resourceStored._id = resourceStored.id; //_id is required to be stored in idb
-        resourceStored.fileData = scriptCode; //JSON.stringify(scriptCode);
+        resourceStored.fileData = scriptCode;
         db.persistResource(resourceStored);
         commit('ADD_RESOURCE', resourceStored);
       }
