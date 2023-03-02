@@ -1,6 +1,6 @@
 export const types = {};
 
-export async function getLibraries() {
+export function getLibraries() {
   window.parent.postMessage(
     {
       type: 'REQUEST_LIBRARIES',
@@ -9,7 +9,7 @@ export async function getLibraries() {
     '*'
   );
 
-  return await new Promise(function (resolve, reject) {
+  return new Promise(function (resolve, reject) {
     const handler = function (event) {
       if (event.data && event.data.type === 'RETURN_LIBRARIES' && event.data.payload) {
         resolve(event.data.payload);
