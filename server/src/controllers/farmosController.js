@@ -1203,24 +1203,19 @@ export const addNotes = async (req, res) => {
     .toArray();
   const groupNames = groups.map((el) => el.name).join(',');
 
-  //if doc with instanceName already exists, concat note and groupNames with existing
-  //else create new doc
-
   //template:
   //note = `timestamp\nRemoved from ${groupNames} reason: ${note}\n\n`;
   const d = new Date();
-
-  const getNbMonth = d.getMonth() + 1;
   const timestamp =
-    getNbMonth +
+    ('0' + (d.getMonth() + 1)).slice(-2) +
     '-' +
-    d.getDate() +
+    ('0' + d.getDate()).slice(-2) +
     '-' +
     d.getFullYear() +
     ' ' +
-    d.getHours() +
+    ('0' + d.getHours()).slice(-2) +
     ':' +
-    d.getMinutes();
+    ('0' + d.getMinutes()).slice(-2);
   const newNote = `US ${timestamp}\nRemoved from ${groupNames} reason: ${note}\n\n`;
 
   const instanceNote = await db.collection('farmos-instance-notes').findOne({
