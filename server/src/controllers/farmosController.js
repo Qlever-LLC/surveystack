@@ -1174,6 +1174,24 @@ const assertGroupsInTree = async (groupIds, tree) => {
 export const addNotes = async (req, res) => {
   const { note, instanceName, groupIds } = req.body;
 
+  const schema = Joi.object({
+    note: Joi.string().required(),
+    instanceName: Joi.string().required(),
+    groupIds: Joi.array().items(Joi.objectId().required()).required(),
+  });
+
+  const validres = schema.validate(
+    {
+      ...req.body,
+    },
+    { allowUnknown: true }
+  );
+
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
   //get groupNames from groupIds
   const groups = await db
     .collection('groups')

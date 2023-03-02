@@ -14,7 +14,7 @@
         <v-checkbox v-model="note" label="To reduce costs" value="To reduce costs"></v-checkbox>
 
         <div class="d-flex mb-4">
-          <v-text-field v-model="noteTF" label="Other" hide-details></v-text-field>
+          <v-text-field v-model.trim="noteTF" label="Other" hide-details></v-text-field>
         </div>
 
         <v-btn block @click="addNote" color="primary">Submit</v-btn>
@@ -45,8 +45,8 @@ export default {
   },
   methods: {
     addNote() {
-      if (this.noteTF && this.noteTF.trim()) {
-        this.note.push(this.noteTF.trim());
+      if (this.noteTF) {
+        this.note.push(this.noteTF);
       }
       const noteConcat = this.note.join(', ');
       this.$emit('addNote', noteConcat);
