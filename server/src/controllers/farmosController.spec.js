@@ -19,7 +19,7 @@ import {
 import { createGroup, createReq, createRes, createUser } from '../testUtils';
 import {
   mapFarmOSInstanceToUser,
-  addFarmToSurveystackGroupAndSendNotification,
+  addFarmToSurveystackGroup,
   setPlanForGroup,
   getGroupInformation,
   createFarmosGroupSettings,
@@ -118,7 +118,7 @@ const createFarmOSDomain = async (gs) => {
   }
 
   for (const farm of _.uniq(farms)) {
-    await addFarmToSurveystackGroupAndSendNotification(farm, group._id);
+    await addFarmToSurveystackGroup(farm, group._id);
   }
 
   return res;

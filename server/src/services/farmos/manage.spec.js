@@ -380,7 +380,11 @@ describe('manageFarmOS', () => {
       admin1_farmOSInstance2,
       true
     );
-    await addFarmToSurveystackGroupAndSendNotification(admin1_farmOSInstance2, groupMichigan._id);
+    await addFarmToSurveystackGroupAndSendNotification(
+      admin1.user._id,
+      admin1_farmOSInstance2,
+      groupMichigan._id
+    );
     const admin1_farmOSInstance3 = 'ourscinet.farmos.net';
     await createFarmOSInstanceForUserAndGroup(
       admin1.user._id,
@@ -388,10 +392,23 @@ describe('manageFarmOS', () => {
       admin1_farmOSInstance3,
       false
     );
-    await addFarmToSurveystackGroupAndSendNotification(admin1_farmOSInstance3, groupMichigan._id);
-    await addFarmToSurveystackGroupAndSendNotification(admin1_farmOSInstance3, groupEurope._id);
-    await addFarmToSurveystackGroupAndSendNotification(admin1_farmOSInstance3, groupCommunity._id);
     await addFarmToSurveystackGroupAndSendNotification(
+      admin1.user._id,
+      admin1_farmOSInstance3,
+      groupMichigan._id
+    );
+    await addFarmToSurveystackGroupAndSendNotification(
+      admin1.user._id,
+      admin1_farmOSInstance3,
+      groupEurope._id
+    );
+    await addFarmToSurveystackGroupAndSendNotification(
+      admin1.user._id,
+      admin1_farmOSInstance3,
+      groupCommunity._id
+    );
+    await addFarmToSurveystackGroupAndSendNotification(
+      admin1.user._id,
       admin1_farmOSInstance3,
       groupCommunityLab._id
     );
@@ -431,6 +448,7 @@ describe('manageFarmOS', () => {
       true
     );
     const { _id: idExternal1 } = await addFarmToSurveystackGroupAndSendNotification(
+      userext.user._id,
       userext_farmOSInstance1,
       groupMichigan._id
     );
@@ -444,6 +462,7 @@ describe('manageFarmOS', () => {
       true
     );
     const { _id: idExternal2 } = await addFarmToSurveystackGroupAndSendNotification(
+      userext2.user._id,
       userext_farmOSInstance2,
       groupMichigan._id
     );

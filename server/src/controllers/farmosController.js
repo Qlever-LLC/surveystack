@@ -12,8 +12,8 @@ import {
   listFarmOSInstancesForUser,
   getSuperAllFarmosMappings,
   getSuperAllFarmosNotes,
-  addFarmToSurveystackGroupAndSendNotification,
-  removeFarmFromSurveystackGroupAndSendNotification,
+  addFarmToSurveystackGroup,
+  removeFarmFromSurveystackGroup,
   removeFarmFromUser,
   getPlans as manageGetPlans,
   getPlanForGroup as manageGetPlanForGroup,
@@ -382,7 +382,7 @@ export const superAdminMapFarmosInstance = async (req, res) => {
     throw boom.badData('instance name missing');
   }
 
-  await addFarmToSurveystackGroupAndSendNotification(instanceName, group);
+  await addFarmToSurveystackGroup(instanceName, group);
   return res.send({
     status: 'success',
   });
@@ -398,7 +398,7 @@ export const superAdminUnMapFarmosInstance = async (req, res) => {
     throw boom.badData('instance name missing');
   }
 
-  await removeFarmFromSurveystackGroupAndSendNotification(instanceName, group);
+  await removeFarmFromSurveystackGroup(instanceName, group);
   return res.send({
     status: 'success',
   });
@@ -871,7 +871,7 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
 
     await mapFarmOSInstanceToUser(owner, url, true);
 
-    await addFarmToSurveystackGroupAndSendNotification(url, groupId);
+    await addFarmToSurveystackGroup(url, groupId);
 
     await db.collection('farmos.fields').insertOne({
       url,
@@ -1094,12 +1094,8 @@ export const mapUser = async (req, res) => {
   }
 
   if (mapToUser) {
-    await db.collection('farmos-instances').insertOne({
-      _id: new ObjectId(),
-      userId: new ObjectId(userId),
-      instanceName,
-      owner: true,
-    });
+    const userId = new ObjectId(userId);
+    await mapFarmOSInstanceToUser(userId, instanceName, true);
   }
 
   return res.send({
@@ -1395,7 +1391,11 @@ export const updateGroupsForUser = async (req, res) => {
     if (differenceName.length > 0) {
       const difference = resultGroups.filter((e) => differenceName.includes(e.name));
       const differenceId = difference.map((e) => e._id);
-      await sendUserAddFarmToMultipleSurveystackGroupNotification(instanceName, differenceId);
+      await sendUserAddFarmToMultipleSurveystackGroupNotification(
+        userId,
+        instanceName,
+        differenceId
+      );
       const differenceGroupName = difference.map((e) => e.name).join(',');
       resStatus = `Successfully added instance to ${differenceGroupName}, instance owner will be notified`;
     }
@@ -1403,7 +1403,11 @@ export const updateGroupsForUser = async (req, res) => {
     const differenceName = initialGroupsName.filter((x) => !resultGroupsName.includes(x));
     const difference = initialGroups.filter((e) => differenceName.includes(e.name));
     const differenceId = difference.map((e) => e._id);
-    await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(instanceName, differenceId);
+    await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(
+      userId,
+      instanceName,
+      differenceId
+    );
     const differenceGroupName = difference.map((e) => e.name).join(',');
     resStatus = `Successfully removed instance from ${differenceGroupName}, instance owner will be notified`;
   } else {
@@ -1412,6 +1416,7 @@ export const updateGroupsForUser = async (req, res) => {
     const differenceId = difference.map((e) => e._id);
     const resultInstanceGroupsId = resultGroups.map((e) => e._id);
     await sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification(
+      userId,
       instanceName,
       differenceId,
       resultInstanceGroupsId
@@ -1519,6 +1524,7 @@ export const removeMembershipHook = async (membership) => {
     const results = [];
     for (const connectedFarm of toDelete) {
       await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(
+        userId,
         connectedFarm.instanceName,
         connectedFarm.groups.map((g) => g.groupId)
       );

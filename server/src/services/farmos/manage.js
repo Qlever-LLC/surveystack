@@ -296,6 +296,10 @@ export const mapFarmOSInstanceToUser = async (userId, instanceName, owner) => {
     owner,
   });
 
+  //TODO
+  // send email to instance owner
+  // send email to newly mapped user
+
   return {
     _id,
     userId,
@@ -355,11 +359,13 @@ export const getSuperAllFarmosNotes = async () => {
 };
 
 export const moveFarmFromMultGroupToMultSurveystackGroupAndSendNotification = async (
+  userId,
   instanceName,
   oldGroupIds,
   newGroupIds
 ) => {
   await sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification(
+    userId,
     instanceName,
     oldGroupIds,
     newGroupIds
@@ -372,8 +378,12 @@ export const moveFarmFromMultGroupToMultSurveystackGroupAndSendNotification = as
   }
 };
 
-export const addFarmToSurveystackGroupAndSendNotification = async (instanceName, groupId) => {
-  await sendUserAddFarmToSurveystackGroupNotification(instanceName, groupId);
+export const addFarmToSurveystackGroupAndSendNotification = async (
+  userId,
+  instanceName,
+  groupId
+) => {
+  await sendUserAddFarmToSurveystackGroupNotification(userId, instanceName, groupId);
   return await addFarmToSurveystackGroup(instanceName, groupId);
 };
 
@@ -384,10 +394,10 @@ export const createFarmOSInstanceForUserAndGroup = async (
   userIsOwner
 ) => {
   await mapFarmOSInstanceToUser(userId, instanceName, userIsOwner);
-  return await addFarmToSurveystackGroupAndSendNotification(instanceName, groupId);
+  return await addFarmToSurveystackGroupAndSendNotification(userId, instanceName, groupId);
 };
 
-const addFarmToSurveystackGroup = async (instanceName, groupId) => {
+export const addFarmToSurveystackGroup = async (instanceName, groupId) => {
   const res = await db
     .collection('farmos-group-mapping')
     .find({
@@ -418,8 +428,12 @@ const addFarmToSurveystackGroup = async (instanceName, groupId) => {
   return { _id };
 };
 
-export const removeFarmFromSurveystackGroupAndSendNotification = async (instanceName, groupId) => {
-  await sendUserRemoveFarmFromSurveystackGroupNotification(instanceName, groupId);
+export const removeFarmFromSurveystackGroupAndSendNotification = async (
+  userId,
+  instanceName,
+  groupId
+) => {
+  await sendUserRemoveFarmFromSurveystackGroupNotification(userId, instanceName, groupId);
   return await removeFarmFromSurveystackGroup(instanceName, groupId);
 };
 
@@ -429,15 +443,9 @@ export const removeFarmFromSurveystackGroup = async (instanceName, groupId) => {
     .deleteMany({ instanceName, groupId: asMongoId(groupId) });
 };
 
-const extractUserMailForMailing = async (instanceName) => {
-  const userInstance = await db.collection('farmos-instances').findOne({
-    instanceName: instanceName,
-  });
-  if (!userInstance || !userInstance.userId) {
-    throw boom.badData("instance doesn't exist");
-  }
+const extractUserMailForMailing = async (userId) => {
   const user = await db.collection('users').findOne({
-    _id: asMongoId(userInstance.userId),
+    _id: asMongoId(userId),
   });
   if (!user || !user.email) {
     throw boom.badData('user email not found');
@@ -457,11 +465,12 @@ const extractGroupNameForMailing = async (groupId) => {
 };
 
 export const sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification = async (
+  userId,
   instanceName,
   oldGroupIds,
   newGroupIds
 ) => {
-  const userEmail = await extractUserMailForMailing(instanceName);
+  const userEmail = await extractUserMailForMailing(userId);
 
   const oldGroupNamesList = [];
   for (const groupId of oldGroupIds) {
@@ -487,13 +496,18 @@ export const sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification = a
   });
 };
 
-export const sendUserAddFarmToSurveystackGroupNotification = async (instanceName, groupId) => {
+export const sendUserAddFarmToSurveystackGroupNotification = async (
+  userId,
+  instanceName,
+  groupId
+) => {
   const groupName = await extractGroupNameForMailing(groupId);
 
-  await sendAddNotification(instanceName, groupName);
+  await sendAddNotification(userId, instanceName, groupName);
 };
 
 export const sendUserAddFarmToMultipleSurveystackGroupNotification = async (
+  userId,
   instanceName,
   groupIds
 ) => {
@@ -503,11 +517,11 @@ export const sendUserAddFarmToMultipleSurveystackGroupNotification = async (
   }
   const groupsNameConcat = groupsName.join(', ');
 
-  await sendAddNotification(instanceName, groupsNameConcat);
+  await sendAddNotification(userId, instanceName, groupsNameConcat);
 };
 
-const sendAddNotification = async (instanceName, groupName) => {
-  const userEmail = await extractUserMailForMailing(instanceName);
+const sendAddNotification = async (userId, instanceName, groupName) => {
+  const userEmail = await extractUserMailForMailing(userId);
 
   await mailService.send({
     to: userEmail,
@@ -521,13 +535,18 @@ const sendAddNotification = async (instanceName, groupName) => {
   });
 };
 
-const sendUserRemoveFarmFromSurveystackGroupNotification = async (instanceName, groupId) => {
+const sendUserRemoveFarmFromSurveystackGroupNotification = async (
+  userId,
+  instanceName,
+  groupId
+) => {
   const groupName = await extractGroupNameForMailing(groupId);
 
-  await sendRemoveNotification(instanceName, groupName);
+  await sendRemoveNotification(userId, instanceName, groupName);
 };
 
 export const sendUserRemoveFarmFromMultipleSurveystackGroupsNotification = async (
+  userId,
   instanceName,
   groupIds
 ) => {
@@ -537,11 +556,11 @@ export const sendUserRemoveFarmFromMultipleSurveystackGroupsNotification = async
   }
   const groupsNameConcat = groupsName.join(', ');
 
-  await sendRemoveNotification(instanceName, groupsNameConcat);
+  await sendRemoveNotification(userId, instanceName, groupsNameConcat);
 };
 
-const sendRemoveNotification = async (instanceName, groupName) => {
-  const userEmail = await extractUserMailForMailing(instanceName);
+const sendRemoveNotification = async (userId, instanceName, groupName) => {
+  const userEmail = await extractUserMailForMailing(userId);
 
   await mailService.send({
     to: userEmail,
