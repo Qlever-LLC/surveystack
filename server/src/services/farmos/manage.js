@@ -296,9 +296,39 @@ export const mapFarmOSInstanceToUser = async (userId, instanceName, owner) => {
     owner,
   });
 
-  //TODO
   // send email to instance owner
+  const ownerInstance = await db.collection('farmos-instances').findOne({
+    instanceName,
+    owner: true,
+  });
+  if (ownerInstance) {
+    const ownerId = ownerInstance.userId;
+    const ownerDoc = await db.collection('users').findOne({
+      _id: asMongoId(ownerId),
+    });
+    await mailService.send({
+      to: ownerDoc.email,
+      subject: 'Your instance has been mapped',
+      text: `Hello,
+
+    This email is to inform you that ${user.email} has been mapped to the farmOS instance ${instanceName} in SurveyStack.
+    Please reach out to your group admin or info @our-sci.net if you have any questions. 
+
+    Best Regards`,
+    });
+  }
+
   // send email to newly mapped user
+  await mailService.send({
+    to: user.email,
+    subject: 'You have been mapped',
+    text: `Hello,
+
+    This email is to inform you that you have been mapped to the farmOS instance ${instanceName} in SurveyStack.
+    Please reach out to your group admin or info@our-sci.net if you have any questions.
+
+    Best Regards`,
+  });
 
   return {
     _id,
