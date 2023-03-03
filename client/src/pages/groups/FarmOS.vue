@@ -388,12 +388,12 @@ export default {
       this.loading = true;
 
       try {
-        await api.post(`/farmos/group-manage/${groupId}/update-groups-for-user`, {
+        const resp = await api.post(`/farmos/group-manage/${groupId}/update-groups-for-user`, {
           userId,
           instanceName,
           groupIds,
         });
-        this.success('Succefully umapped groups');
+        this.success(resp.data.status);
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           this.error(error.response.data.message);
@@ -423,7 +423,6 @@ export default {
           instanceName,
           groupIds,
         });
-        this.success('Succefully added notes');
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           this.error(error.response.data.message);
