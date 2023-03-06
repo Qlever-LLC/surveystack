@@ -265,18 +265,25 @@ export const getTree = async (group) => {
 };
 
 export const getOwnerFromInstanceName = async (instanceName) => {
-  const ownerInstance = await db.collection('farmos-instances').findOne({
-    instanceName,
-    owner: true,
-  });
-  if (ownerInstance) {
-    const ownerId = ownerInstance.userId;
-    const ownerDoc = await db.collection('users').findOne({
-      _id: asMongoId(ownerId),
-    });
-    return ownerDoc;
+  const instanceOwners = await db
+    .collection('farmos-instances')
+    .find({
+      instanceName,
+      owner: true,
+    })
+    .toArray();
+  if (instanceOwners.length > 0) {
+    const ownersId = instanceOwners.map((ownerInstance) => ownerInstance.userId);
+    const ownersDoc = await db
+      .collection('users')
+      .find({
+        _id: { $in: ownersId.map((id) => asMongoId(id)) },
+      })
+      .toArray();
+    if (ownersDoc.length > 0) {
+      return ownersDoc;
+    }
   }
-  //throw boom.badData("instance doesn't have owner");
   return null;
 };
 
@@ -313,21 +320,24 @@ export const mapFarmOSInstanceToUser = async (userId, instanceName, owner) => {
   });
 
   // send email to instance owner
-  const instanceOwner = await getOwnerFromInstanceName(instanceName);
-  //throw boom.badData('owner email not found');
-  if (instanceOwner && instanceOwner.email) {
-    const ownerEmail = instanceOwner.email;
+  const instanceOwners = await getOwnerFromInstanceName(instanceName);
+  if (instanceOwners) {
+    for (const instanceOwner of instanceOwners) {
+      if (instanceOwner && instanceOwner.email) {
+        const ownerEmail = instanceOwner.email;
 
-    await mailService.send({
-      to: ownerEmail,
-      subject: 'Your instance has been mapped',
-      text: `Hello,
+        await mailService.send({
+          to: ownerEmail,
+          subject: 'Your instance has been mapped',
+          text: `Hello,
 
     This email is to inform you that ${ownerEmail} has been mapped to the farmOS instance ${instanceName} in SurveyStack.
     Please reach out to your group admin or info @our-sci.net if you have any questions. 
 
     Best Regards`,
-    });
+        });
+      }
+    }
   }
 
   // send email to newly mapped user
@@ -491,33 +501,36 @@ export const sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification = a
   oldGroupIds,
   newGroupIds
 ) => {
-  const owner = await getOwnerFromInstanceName(instanceName);
-  //throw boom.badData('owner email not found');
-  if (owner && owner.email) {
-    const ownerEmail = owner.email;
+  const owners = await getOwnerFromInstanceName(instanceName);
+  if (owners) {
+    for (const owner of owners) {
+      if (owner && owner.email) {
+        const ownerEmail = owner.email;
 
-    const oldGroupNamesList = [];
-    for (const groupId of oldGroupIds) {
-      oldGroupNamesList.push(await extractGroupNameForMailing(groupId));
-    }
-    const oldGroupNames = oldGroupNamesList.join(', ');
+        const oldGroupNamesList = [];
+        for (const groupId of oldGroupIds) {
+          oldGroupNamesList.push(await extractGroupNameForMailing(groupId));
+        }
+        const oldGroupNames = oldGroupNamesList.join(', ');
 
-    const newGroupNamesList = [];
-    for (const groupId of newGroupIds) {
-      newGroupNamesList.push(await extractGroupNameForMailing(groupId));
-    }
-    const newGroupNames = newGroupNamesList.join(', ');
+        const newGroupNamesList = [];
+        for (const groupId of newGroupIds) {
+          newGroupNamesList.push(await extractGroupNameForMailing(groupId));
+        }
+        const newGroupNames = newGroupNamesList.join(', ');
 
-    await mailService.send({
-      to: ownerEmail,
-      subject: 'Your instance has been moved to another group',
-      text: `Hello,
+        await mailService.send({
+          to: ownerEmail,
+          subject: 'Your instance has been moved to another group',
+          text: `Hello,
 
     This email is to inform you that your farmOS instance ${instanceName} has been removed from ${oldGroupNames} and added to ${newGroupNames} in SurveyStack.
     Please reach out to your group admin or info@our-sci.net if you have any questions.  
 
     Best Regards`,
-    });
+        });
+      }
+    }
   }
 };
 
@@ -541,21 +554,24 @@ export const sendUserAddFarmToMultipleSurveystackGroupNotification = async (
 };
 
 const sendAddNotification = async (instanceName, groupName) => {
-  const owner = await getOwnerFromInstanceName(instanceName);
-  //throw boom.badData('owner email not found');
-  if (owner && owner.email) {
-    const userEmail = owner.email;
+  const owners = await getOwnerFromInstanceName(instanceName);
+  if (owners) {
+    for (const owner of owners) {
+      if (owner && owner.email) {
+        const userEmail = owner.email;
 
-    await mailService.send({
-      to: userEmail,
-      subject: 'Your instance has been added to a group',
-      text: `Hello,
+        await mailService.send({
+          to: userEmail,
+          subject: 'Your instance has been added to a group',
+          text: `Hello,
 
     This email is to inform you that your farmOS instance ${instanceName} has been added to ${groupName} in SurveyStack.
     Please reach out to your group admin or info@our-sci.net if you have any questions.  
 
     Best Regards`,
-    });
+        });
+      }
+    }
   }
 };
 
@@ -579,21 +595,24 @@ export const sendUserRemoveFarmFromMultipleSurveystackGroupsNotification = async
 };
 
 const sendRemoveNotification = async (instanceName, groupName) => {
-  const owner = await getOwnerFromInstanceName(instanceName);
-  //throw boom.badData('owner email not found');
-  if (owner && owner.email) {
-    const ownerEmail = owner.email;
+  const owners = await getOwnerFromInstanceName(instanceName);
+  if (owners) {
+    for (const owner of owners) {
+      if (owner && owner.email) {
+        const ownerEmail = owner.email;
 
-    await mailService.send({
-      to: ownerEmail,
-      subject: 'Your instance has been removed from a group',
-      text: `Hello,
+        await mailService.send({
+          to: ownerEmail,
+          subject: 'Your instance has been removed from a group',
+          text: `Hello,
 
     This email is to inform you that your farmOS instance ${instanceName} has been removed from the group ${groupName} in SurveyStack. 
     Please reach out to your group admin or info@our-sci.net if you have any questions.
 
     Best Regards`,
-    });
+        });
+      }
+    }
   }
 };
 
