@@ -265,7 +265,7 @@ export default {
       const updatedNote = this.updatedNote;
       const selectedInstance = this.selectedInstance;
       this.$emit('addSuperAdminNote', { updatedNote, selectedInstance });
-      this.updatedNote = undefined;
+      this.updatedNote = null;
     },
   },
   computed: {
