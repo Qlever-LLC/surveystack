@@ -13,7 +13,6 @@ import {
   getSuperAllFarmosMappings,
   addFarmToSurveystackGroupAndSendNotification,
   removeFarmFromSurveystackGroupAndSendNotification,
-  addFarmToUser,
   removeFarmFromUser,
   getPlans as manageGetPlans,
   getPlanForGroup as manageGetPlanForGroup,
@@ -29,6 +28,10 @@ import {
   disableSubgroupsAllowCreateInstances,
   getTreeFromGroupId,
   getTree,
+  sendUserAddFarmToSurveystackGroupNotification,
+  sendUserAddFarmToMultipleSurveystackGroupNotification,
+  sendUserRemoveFarmFromMultipleSurveystackGroupsNotification,
+  sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification,
 } from '../services/farmos/manage';
 import { aggregator } from '../services/farmos/aggregator';
 import { hasAdminRole } from '../services/roles.service';
@@ -409,7 +412,7 @@ export const superAdminMapFarmosInstanceToUser = async (req, res) => {
     throw boom.badData('owner attribute missing');
   }
 
-  await addFarmToUser(instanceName, user, group, !!owner);
+  await mapFarmOSInstanceToUser(user, instanceName, !!owner);
   return res.send({
     status: 'success',
   });
@@ -425,7 +428,7 @@ export const superAdminUnMapFarmosInstanceFromUser = async (req, res) => {
     throw boom.badData('instance name missing');
   }
 
-  await removeFarmFromUser(instanceName, user, group);
+  await removeFarmFromUser(instanceName, user);
   return res.send({
     status: 'success',
   });
@@ -1076,6 +1079,7 @@ export const mapUser = async (req, res) => {
   }
 
   if (mapToGroup) {
+    await sendUserAddFarmToSurveystackGroupNotification(instanceName, groupId);
     await db.collection('farmos-group-mapping').insertOne({
       _id: new ObjectId(),
       groupId: new ObjectId(groupId),
@@ -1171,8 +1175,28 @@ export const updateGroupsForUser = async (req, res) => {
   await assertUserInSubGroup(userId, tree);
   await assertGroupsInTree(groupIds, tree);
 
-  // clear all mappings of groups in descendants
+  // find out in which group(s) the instance is located
+  const initialInstanceGroups = await db
+    .collection('farmos-group-mapping')
+    .find({
+      groupId: {
+        $in: tree.descendants.map((d) => d._id),
+      },
+      instanceName,
+    })
+    .toArray();
+  const initialGroups = await db
+    .collection('groups')
+    .find({
+      _id: {
+        $in: initialInstanceGroups.map((e) => e.groupId),
+      },
+    })
+    .toArray();
 
+  let resultGroups = [];
+
+  // clear all mappings of groups in descendants
   await db.collection('farmos-group-mapping').deleteMany({
     groupId: {
       $in: tree.descendants.map((d) => d._id),
@@ -1181,7 +1205,6 @@ export const updateGroupsForUser = async (req, res) => {
   });
 
   // add all
-
   if (groupIds.length > 0) {
     await db.collection('farmos-group-mapping').insertMany(
       groupIds.map((gid) => ({
@@ -1189,6 +1212,55 @@ export const updateGroupsForUser = async (req, res) => {
         groupId: new ObjectId(gid),
         instanceName,
       }))
+    );
+
+    const resultInstanceGroups = await db
+      .collection('farmos-group-mapping')
+      .find({
+        groupId: {
+          $in: tree.descendants.map((d) => d._id),
+        },
+      })
+      .toArray();
+    resultGroups = await db
+      .collection('groups')
+      .find({
+        _id: {
+          $in: resultInstanceGroups.map((e) => e.groupId),
+        },
+      })
+      .toArray();
+  }
+
+  const initialGroupsName = initialGroups.map((e) => e.name);
+  const resultGroupsName = resultGroups.map((e) => e.name);
+
+  // compare with the initial result the group(s)
+  // if just add without remove => add notification
+  // else if just remove without add => remove notification
+  // else move notification
+  if (initialGroupsName.every((val) => resultGroupsName.includes(val))) {
+    const differenceName = resultGroupsName.filter((x) => !initialGroupsName.includes(x));
+    const difference = resultGroups
+      .filter((e) => differenceName.includes(e.name))
+      .map((e) => e._id);
+    await sendUserAddFarmToMultipleSurveystackGroupNotification(instanceName, difference);
+  } else if (resultGroupsName.every((val) => initialGroupsName.includes(val))) {
+    const differenceName = initialGroupsName.filter((x) => !resultGroupsName.includes(x));
+    const difference = initialGroups
+      .filter((e) => differenceName.includes(e.name))
+      .map((e) => e._id);
+    await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(instanceName, difference);
+  } else {
+    const differenceName = initialGroupsName.filter((x) => !resultGroupsName.includes(x));
+    const difference = initialGroups
+      .filter((e) => differenceName.includes(e.name))
+      .map((e) => e._id);
+    const resultInstanceGroupsId = resultGroups.map((e) => e._id);
+    await sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification(
+      instanceName,
+      difference,
+      resultInstanceGroupsId
     );
   }
 
@@ -1289,6 +1361,10 @@ export const removeMembershipHook = async (membership) => {
 
     const results = [];
     for (const connectedFarm of toDelete) {
+      await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(
+        connectedFarm.instanceName,
+        connectedFarm.groups.map((g) => g.groupId)
+      );
       const res = await db.collection('farmos-group-mapping').deleteMany({
         instanceName: connectedFarm.instanceName,
         groupId: {
