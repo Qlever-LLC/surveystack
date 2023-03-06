@@ -549,7 +549,7 @@ const runPendingFarmOSOperations = async (url, plan) => {
           },
         };
         const response = await create(url, 'asset', 'land', payload);
-        db.collection('farmos.webhookrequests').insertOne({
+        await db.collection('farmos.webhookrequests').insertOne({
           url,
           plan,
           created: new Date(),
@@ -557,7 +557,7 @@ const runPendingFarmOSOperations = async (url, plan) => {
           message: `created field ${field.name} with id ${response.data.id} for ${url}`,
         });
       } catch (error) {
-        db.collection('farmos.webhookrequests').insertOne({
+        await db.collection('farmos.webhookrequests').insertOne({
           url,
           plan,
           created: new Date(),
@@ -568,7 +568,7 @@ const runPendingFarmOSOperations = async (url, plan) => {
     }
   } catch (error) {
     console.log('error', error);
-    db.collection('farmos.webhookrequests').insertOne({
+    await db.collection('farmos.webhookrequests').insertOne({
       url,
       plan,
       created: new Date(),
@@ -612,7 +612,7 @@ export const webhookCallback = async (req, res, next) => {
       throw boom.badRequest('plan is missing');
     }
 
-    db.collection('farmos.webhookrequests').insertOne({
+    await db.collection('farmos.webhookrequests').insertOne({
       url,
       plan,
       created: new Date(),
@@ -1171,7 +1171,19 @@ const assertGroupsInTree = async (groupIds, tree) => {
   }
 };
 
+const getCurrentDateAsString = () => {
+  const date = new Date();
+  return date.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+  });
+};
+
 export const addNotes = async (req, res) => {
+  const parentGroupId = req.params.groupId || req.body.groupId;
   const { note, instanceName, groupIds } = req.body;
 
   const schema = Joi.object({
@@ -1192,12 +1204,24 @@ export const addNotes = async (req, res) => {
     throw boom.badData(`error: ${errors.join(',')}`);
   }
 
+  //assert that all groupIds are under the farmos domain to which hasGroupAdminAccess checked
+  const tree = await getTreeFromGroupId(parentGroupId);
+  const descendant = await tree.getDescendantGroups();
+  if (!groupIds.every((val) => descendant.map((el) => el._id).includes(val))) {
+    throw boom.badData(`error: you don't have access`);
+  }
+
+  //check if the instance is under the group checked with hasGroupAdminAccess
+  if (!descendant.includes(instanceName)) {
+    throw boom.badData(`error: you don't have access`);
+  }
+
   //get groupNames from groupIds
   const groups = await db
     .collection('groups')
     .find({
       _id: {
-        $in: groupIds.map((gid) => ObjectId(gid)),
+        $in: groupIds.map((gid) => asMongoId(gid)),
       },
     })
     .toArray();
@@ -1205,25 +1229,15 @@ export const addNotes = async (req, res) => {
 
   //template:
   //note = `timestamp\nRemoved from ${groupNames} reason: ${note}\n\n`;
-  const d = new Date();
-  const timestamp =
-    ('0' + (d.getMonth() + 1)).slice(-2) +
-    '-' +
-    ('0' + d.getDate()).slice(-2) +
-    '-' +
-    d.getFullYear() +
-    ' ' +
-    ('0' + d.getHours()).slice(-2) +
-    ':' +
-    ('0' + d.getMinutes()).slice(-2);
-  const newNote = `${timestamp} us-format\nRemoved from ${groupNames} reason: ${note}\n\n`;
+  const timestamp = getCurrentDateAsString();
+  const newNote = `${timestamp}\nRemoved from ${groupNames} reason: ${note}\n\n`;
 
   const instanceNote = await db.collection('farmos-instance-notes').findOne({
     instanceName: instanceName,
   });
   if (instanceNote) {
     instanceNote.note += newNote;
-    db.collection('farmos-instance-notes').updateOne(
+    await db.collection('farmos-instance-notes').updateOne(
       { instanceName: instanceName },
       {
         $set: {
@@ -1237,7 +1251,7 @@ export const addNotes = async (req, res) => {
       instanceName: instanceName,
       note: newNote,
     };
-    db.collection('farmos-instance-notes').insertOne(myobj);
+    await db.collection('farmos-instance-notes').insertOne(myobj);
   }
 
   return res.send({
@@ -1268,18 +1282,8 @@ export const addSuperAdminNotes = async (req, res) => {
 
   //template:
   //note = `timestamp\nRemoved from ${groupNames} reason: ${note}\n\n`;
-  const d = new Date();
-  const timestamp =
-    ('0' + (d.getMonth() + 1)).slice(-2) +
-    '-' +
-    ('0' + d.getDate()).slice(-2) +
-    '-' +
-    d.getFullYear() +
-    ' ' +
-    ('0' + d.getHours()).slice(-2) +
-    ':' +
-    ('0' + d.getMinutes()).slice(-2);
-  const newNote = `${timestamp} us-format\nRemoved by Super Admin reason: ${note}\n\n`;
+  const timestamp = getCurrentDateAsString();
+  const newNote = `${timestamp}\nRemoved by Super Admin reason: ${note}\n\n`;
 
   const instanceNote = await db.collection('farmos-instance-notes').findOne({
     instanceName: instanceName,
@@ -1291,7 +1295,7 @@ export const addSuperAdminNotes = async (req, res) => {
     } else {
       instanceNote.note = '';
     }
-    db.collection('farmos-instance-notes').updateOne(
+    await db.collection('farmos-instance-notes').updateOne(
       { instanceName: instanceName },
       {
         $set: {
@@ -1306,7 +1310,7 @@ export const addSuperAdminNotes = async (req, res) => {
         instanceName: instanceName,
         note: [newNote],
       };
-      db.collection('farmos-instance-notes').insertOne(myobj);
+      await db.collection('farmos-instance-notes').insertOne(myobj);
     }
   }
 
@@ -1339,7 +1343,7 @@ export const updateGroupsForUser = async (req, res) => {
     .collection('groups')
     .find({
       _id: {
-        $in: initialInstanceGroups.map((e) => ObjectId(e.groupId)),
+        $in: initialInstanceGroups.map((e) => asMongoId(e.groupId)),
       },
     })
     .toArray();
@@ -1376,7 +1380,7 @@ export const updateGroupsForUser = async (req, res) => {
       .collection('groups')
       .find({
         _id: {
-          $in: resultInstanceGroups.map((e) => ObjectId(e.groupId)),
+          $in: resultInstanceGroups.map((e) => asMongoId(e.groupId)),
         },
       })
       .toArray();
