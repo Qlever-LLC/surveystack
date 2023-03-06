@@ -433,7 +433,7 @@ export const createFarmOSInstanceForUserAndGroup = async (
   return await addFarmToSurveystackGroupAndSendNotification(instanceName, groupId);
 };
 
-export const addFarmToSurveystackGroup = async (instanceName, groupId) => {
+const addFarmToSurveystackGroup = async (instanceName, groupId) => {
   const res = await db
     .collection('farmos-group-mapping')
     .find({

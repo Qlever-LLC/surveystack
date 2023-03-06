@@ -12,8 +12,6 @@ import {
   listFarmOSInstancesForUser,
   getSuperAllFarmosMappings,
   getSuperAllFarmosNotes,
-  addFarmToSurveystackGroup,
-  removeFarmFromSurveystackGroup,
   removeFarmFromUser,
   getPlans as manageGetPlans,
   getPlanForGroup as manageGetPlanForGroup,
@@ -29,7 +27,8 @@ import {
   disableSubgroupsAllowCreateInstances,
   getTreeFromGroupId,
   getTree,
-  sendUserAddFarmToSurveystackGroupNotification,
+  addFarmToSurveystackGroupAndSendNotification,
+  removeFarmFromSurveystackGroupAndSendNotification,
   sendUserAddFarmToMultipleSurveystackGroupNotification,
   sendUserRemoveFarmFromMultipleSurveystackGroupsNotification,
   sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification,
@@ -382,7 +381,7 @@ export const superAdminMapFarmosInstance = async (req, res) => {
     throw boom.badData('instance name missing');
   }
 
-  await addFarmToSurveystackGroup(instanceName, group);
+  await addFarmToSurveystackGroupAndSendNotification(instanceName, group);
   return res.send({
     status: 'success',
   });
@@ -398,7 +397,7 @@ export const superAdminUnMapFarmosInstance = async (req, res) => {
     throw boom.badData('instance name missing');
   }
 
-  await removeFarmFromSurveystackGroup(instanceName, group);
+  await removeFarmFromSurveystackGroupAndSendNotification(instanceName, group);
   return res.send({
     status: 'success',
   });
@@ -871,7 +870,7 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
 
     await mapFarmOSInstanceToUser(owner, url, true);
 
-    await addFarmToSurveystackGroup(url, groupId);
+    await addFarmToSurveystackGroupAndSendNotification(url, groupId);
 
     await db.collection('farmos.fields').insertOne({
       url,
@@ -1085,12 +1084,7 @@ export const mapUser = async (req, res) => {
   }
 
   if (mapToGroup) {
-    await sendUserAddFarmToSurveystackGroupNotification(instanceName, groupId);
-    await db.collection('farmos-group-mapping').insertOne({
-      _id: new ObjectId(),
-      groupId: new ObjectId(groupId),
-      instanceName,
-    });
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, groupId);
   }
 
   if (mapToUser) {
