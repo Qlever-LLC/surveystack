@@ -448,17 +448,19 @@ const createSurvey = async (req, res) => {
   return res.status(500).send({ message: 'Internal error' });
 };
 
-const isUserAllowedToModifySurvey = async (survey, user) => {
+const isUserAllowedToModifySurvey = async (survey, res) => {
+  const user = res.locals.auth.user._id;
   if (!survey.meta.group && !survey.meta.creator) {
     return true; // no user and no group => free for all!
   }
-
   if (survey.meta.creator.equals(user)) {
     return true; // user may delete their own surveys
   }
-
-  const hasAdminRole = await rolesService.hasAdminRole(user, survey.meta.group.id);
-  if (hasAdminRole) {
+  const hasAdminRoleForRequest = await rolesService.hasAdminRoleForRequest(
+    res,
+    survey.meta.group.id
+  );
+  if (hasAdminRoleForRequest) {
     return true; // group admins may delete surveys
   }
 
@@ -474,7 +476,7 @@ const updateSurvey = async (req, res) => {
     throw boom.notFound(`No entity with _id exists: ${id}`);
   }
 
-  const isAllowed = await isUserAllowedToModifySurvey(existing, res.locals.auth.user._id);
+  const isAllowed = await isUserAllowedToModifySurvey(existing, res);
   if (!isAllowed) {
     throw boom.unauthorized(`You are not authorized to update survey: ${id}`);
   }
@@ -502,7 +504,7 @@ const deleteSurvey = async (req, res) => {
     throw boom.notFound(`No entity with _id exists: ${id}`);
   }
 
-  const isAllowed = await isUserAllowedToModifySurvey(existing, res.locals.auth.user._id);
+  const isAllowed = await isUserAllowedToModifySurvey(existing, res);
   if (!isAllowed) {
     throw boom.unauthorized(`You are not authorized to delete survey: ${id}`);
   }
@@ -603,13 +605,13 @@ const getPinned = async (req, res) => {
   });
 };
 
-const getSurveyAndCleanupInfo = async (id, userId) => {
+const getSurveyAndCleanupInfo = async (id, res) => {
   const survey = await db.collection(SURVEYS_COLLECTION).findOne({ _id: new ObjectId(id) });
   if (!survey) {
     throw boom.notFound(`No entity with _id exists: ${id}`);
   }
 
-  const isAllowed = await isUserAllowedToModifySurvey(survey, userId);
+  const isAllowed = await isUserAllowedToModifySurvey(survey, res);
   if (!isAllowed) {
     throw boom.unauthorized(`You are not authorized to update survey: ${id}`);
   }
@@ -676,7 +678,7 @@ const getCleanupSurveyInfo = async (req, res) => {
     surveyVersions,
     submissionsVersionCounts,
     libraryConsumersByVersion,
-  } = await getSurveyAndCleanupInfo(id, res.locals.auth.user._id);
+  } = await getSurveyAndCleanupInfo(id, res);
   res.send({
     versionsToKeep,
     versionsToDelete,
@@ -689,10 +691,7 @@ const getCleanupSurveyInfo = async (req, res) => {
 const cleanupSurvey = async (req, res) => {
   const { id } = req.params;
   const { versions: requestedVersionsToDelete, resourceIds, auto, dryRun } = req.query;
-  const { survey, versionsToKeep, versionsToDelete } = await getSurveyAndCleanupInfo(
-    id,
-    res.locals.auth.user._id
-  );
+  const { survey, versionsToKeep, versionsToDelete } = await getSurveyAndCleanupInfo(id, res);
 
   // Don't allow deletion of survey versions that have associated submissions
   if (requestedVersionsToDelete.some((v) => versionsToKeep.includes(v))) {

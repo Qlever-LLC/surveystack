@@ -2,13 +2,13 @@ import membershipController from './membershipController';
 const { updateMembership, activateMembershipByAdmin, createConfirmedMembership } =
   membershipController;
 import { db } from '../db';
-import { createGroup, createReq, createRes, asMongoId } from '../testUtils';
+import { createGroup, createReq, createRes, asMongoId, createSuperAdmin } from '../testUtils';
 
 jest.mock('../services/membership.service');
 import membershipService from '../services/membership.service';
 
 describe('updateMembership', () => {
-  it('can update editable fields', async () => {
+  it('group admin can update editable fields', async () => {
     const group = await createGroup();
     const admin = await group.createAdminMember();
     const user = await group.createUserMember();
@@ -53,6 +53,34 @@ describe('updateMembership', () => {
       'Only group admins can update memberships'
     );
   });
+
+  it('super admin can update editable fields', async () => {
+    const group = await createGroup();
+    const superAdmin = await createSuperAdmin();
+    const user = await group.createUserMember();
+
+    const req = createReq({
+      body: {
+        group: group._id,
+        role: 'admin',
+        meta: {
+          invitationName: 'Changed Name',
+          invitationEmail: 'something.different@email.com',
+        },
+      },
+      params: { id: user.membership._id },
+    });
+    const res = await createRes({ user: superAdmin });
+
+    await updateMembership(req, res);
+
+    const updatedUserMembership = await db
+      .collection('memberships')
+      .findOne({ _id: asMongoId(user.membership) });
+    expect(updatedUserMembership.role).toBe('admin');
+    expect(updatedUserMembership.meta.invitationName).toBe('Changed Name');
+    expect(updatedUserMembership.meta.invitationEmail).toBe(user.membership.meta.invitationEmail);
+  });
 });
 
 describe('activateMembershipByAdmin', () => {
@@ -78,11 +106,21 @@ describe('activateMembershipByAdmin', () => {
     const user = await group.createUserMember();
     res = await createRes({ user: user.user });
     await expect(activateMembershipByAdmin(req, res)).rejects.toThrow(
-      'Only group admins can create memberships'
+      'Only group admins can activate memberships'
     );
   });
 
-  it('calls membershipService.activateMembershipByAdmin', async () => {
+  it('group admin calls membershipService.activateMembershipByAdmin', async () => {
+    await activateMembershipByAdmin(req, res);
+    expect(membershipService.activateMembershipByAdmin).toHaveBeenCalledWith({
+      membershipId: pendingUser.membership._id,
+      origin: req.headers.origin,
+    });
+  });
+
+  it('super admin calls membershipService.activateMembershipByAdmin', async () => {
+    const superAdmin = await createSuperAdmin();
+    res = await createRes({ user: superAdmin });
     await activateMembershipByAdmin(req, res);
     expect(membershipService.activateMembershipByAdmin).toHaveBeenCalledWith({
       membershipId: pendingUser.membership._id,
@@ -117,7 +155,7 @@ describe('createConfirmedMembership', () => {
     const user = await group.createUserMember();
     res = await createRes({ user: user.user });
     await expect(createConfirmedMembership(req, res)).rejects.toThrow(
-      'Only group admins can create memberships'
+      'Only group admins can confirm memberships'
     );
   });
 
@@ -128,7 +166,7 @@ describe('createConfirmedMembership', () => {
     );
   });
 
-  it('inserts membership into db', async () => {
+  it('group admin inserts membership into db', async () => {
     await createConfirmedMembership(req, res);
 
     await expect(
@@ -136,7 +174,30 @@ describe('createConfirmedMembership', () => {
     ).resolves.toMatchObject(entity);
   });
 
-  it('calls membershipService.activateMembershipByAdmin', async () => {
+  it('group admin calls membershipService.activateMembershipByAdmin', async () => {
+    await createConfirmedMembership(req, res);
+    const membership = await db
+      .collection('memberships')
+      .findOne({ 'meta.invitationEmail': invitationEmail });
+    expect(membershipService.activateMembershipByAdmin).toHaveBeenCalledWith({
+      membershipId: membership._id,
+      origin: req.headers.origin,
+    });
+  });
+
+  it('super admin inserts membership into db', async () => {
+    const superAdmin = await createSuperAdmin();
+    res = await createRes({ user: superAdmin });
+    await createConfirmedMembership(req, res);
+
+    await expect(
+      db.collection('memberships').findOne({ 'meta.invitationEmail': invitationEmail })
+    ).resolves.toMatchObject(entity);
+  });
+
+  it('super admin calls membershipService.activateMembershipByAdmin', async () => {
+    const superAdmin = await createSuperAdmin();
+    res = await createRes({ user: superAdmin });
     await createConfirmedMembership(req, res);
     const membership = await db
       .collection('memberships')

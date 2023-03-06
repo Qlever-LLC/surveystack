@@ -185,9 +185,8 @@ export const inviteMemberToHyloGroup = async (req, res) => {
   }
 
   // Authorize request
-  const adminId = get(res, 'locals.auth.user._id');
-  const hasAdminRole = await rolesService.hasAdminRole(adminId, membership.group);
-  if (!hasAdminRole) {
+  const hasAdminRoleForRequest = await rolesService.hasAdminRoleForRequest(res, membership.group);
+  if (!hasAdminRoleForRequest) {
     throw boom.unauthorized();
   }
 
