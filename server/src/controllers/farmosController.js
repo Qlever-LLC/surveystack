@@ -1173,12 +1173,12 @@ const getCurrentDateAsString = () => {
 };
 
 export const addNotes = async (req, res) => {
-  const parentGroupId = req.params.groupId || req.body.groupId;
-  const { note, instanceName, groupIds } = req.body;
+  const { note, instanceName, parentGroupId, groupIds } = req.body;
 
   const schema = Joi.object({
     note: Joi.string().required(),
     instanceName: Joi.string().required(),
+    parentGroupId: Joi.objectId().required(),
     groupIds: Joi.array().items(Joi.objectId().required()).required(),
   });
 
@@ -1196,14 +1196,24 @@ export const addNotes = async (req, res) => {
 
   //assert that all groupIds are under the farmos domain to which hasGroupAdminAccess checked
   const tree = await getTreeFromGroupId(parentGroupId);
-  const descendant = await tree.getDescendantGroups();
-  if (!groupIds.every((val) => descendant.map((el) => el._id).includes(val))) {
+  const descendants = tree.descendants;
+  if (
+    groupIds.every((val) => descendants.map((el) => String(el._id)).includes(String(val))) === false
+  ) {
     throw boom.badData(`error: you don't have access`);
   }
 
   //check if the instance is under the group checked with hasGroupAdminAccess
-  if (!descendant.includes(instanceName)) {
-    throw boom.badData(`error: you don't have access`);
+  const grps = await db
+    .collection('farmos-group-mapping')
+    .find({
+      groupId: {
+        $in: descendants.map((el) => asMongoId(el._id)),
+      },
+    })
+    .toArray();
+  if (!grps.map((el) => el.instanceName).includes(instanceName)) {
+    throw boom.badData(`error: you do not have access`);
   }
 
   //get groupNames from groupIds
