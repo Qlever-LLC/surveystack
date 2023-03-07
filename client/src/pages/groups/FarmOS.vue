@@ -416,11 +416,13 @@ export default {
       const note = arg;
       const instanceName = this.updateFarmInstanceName;
       const groupIds = this.differenceRemovedGroupIds; // find associated name on server side
+      const parentGroupId = this.groupId;
 
       try {
         await api.post(`/farmos/group-manage/add-notes`, {
           note,
           instanceName,
+          parentGroupId,
           groupIds,
         });
         this.success('Succefully added notes');
