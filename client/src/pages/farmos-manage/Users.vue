@@ -31,6 +31,7 @@
         <thead>
           <tr>
             <th class="text-left">Instance Name</th>
+            <th class="text-left">Mappings</th>
             <th class="text-left">Owner</th>
             <th class="text-left">Action</th>
           </tr>
@@ -50,6 +51,7 @@
                 :items="instances"
               ></v-autocomplete>
             </td>
+            <td></td>
             <td>
               <v-checkbox v-model="owner" label="owner"></v-checkbox>
             </td>
@@ -59,7 +61,34 @@
           </tr>
 
           <tr v-for="(instance, idx) in mappedInstances" :key="`user-${idx}`">
-            <td>{{ instance.instanceName }}</td>
+            <td>{{ `${instance.instanceName}` }}</td>
+            <td>
+              <div>
+                <v-chip
+                  small
+                  class="ma-1"
+                  dark
+                  color="blue"
+                  v-for="(userMapping, uidx) in instance.userMappings"
+                  :key="`instance-${idx}-user-${uidx}`"
+                >
+                  {{ userMapping.user }}
+                </v-chip>
+              </div>
+
+              <div>
+                <v-chip
+                  class="ma-1"
+                  small
+                  dark
+                  color="green"
+                  v-for="(groupMapping, gidx) in instance.groupMappings"
+                  :key="`instance-${idx}-group-${gidx}`"
+                >
+                  {{ groupMapping.group }}
+                </v-chip>
+              </div>
+            </td>
             <td>{{ instance.owner }}</td>
             <td>
               <v-btn color="red" @click="$emit('unmap-user', selectedUser, instance.instanceName)" dark>Unmap</v-btn>
@@ -94,12 +123,39 @@ export default {
         return [];
       }
 
-      return this.mappings.surveystackUserFarms
+      const farms = this.mappings.surveystackUserFarms
         .filter((farm) => farm.userId === this.selectedUser)
         .map((farm) => ({
           instanceName: farm.instanceName,
           owner: farm.owner,
         }));
+
+      const mappings = [];
+
+      for (const farm of farms) {
+        const userMappings = this.mappings.surveystackUserFarms
+          .filter((f) => f.instanceName === farm.instanceName)
+          .map((m) => ({
+            instanceName: m.instanceName,
+            user: this.users.find((u) => u._id === m.userId).email,
+          }));
+
+        const groupMappings = this.mappings.surveystackFarms
+          .filter((f) => f.instanceName === farm.instanceName)
+          .map((group) => ({
+            instanceName: group.instanceName,
+            group: this.groups.find((g) => g._id === group.groupId).path,
+          }));
+
+        mappings.push({
+          instanceName: farm.instanceName,
+          owner: farm.owner,
+          userMappings,
+          groupMappings,
+        });
+      }
+
+      return mappings;
     },
     instances() {
       return this.mappings.aggregatorFarms.map((farm) => ({
