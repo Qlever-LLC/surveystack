@@ -51,13 +51,6 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(instance, idx) in mappedInstances" :key="`grp-${idx}`">
-            <td>{{ instance.instanceName }}</td>
-            <td>
-              <v-btn color="red" @click="$emit('unmap-group', selectedGroup, instance.instanceName)" dark>Unmap</v-btn>
-            </td>
-          </tr>
-
           <tr>
             <td>
               <v-autocomplete
@@ -74,6 +67,13 @@
             </td>
             <td>
               <v-btn color="primary" @click="$emit('map-group', selectedGroup, selectedInstance)">Map</v-btn>
+            </td>
+          </tr>
+
+          <tr v-for="(instance, idx) in mappedInstances" :key="`grp-${idx}`">
+            <td>{{ instance.instanceName }}</td>
+            <td>
+              <v-btn color="red" @click="$emit('unmap-group', selectedGroup, instance.instanceName)" dark>Unmap</v-btn>
             </td>
           </tr>
         </tbody>

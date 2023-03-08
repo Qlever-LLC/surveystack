@@ -106,7 +106,7 @@ export default {
           },
         },
         {
-          name: 'Plans',
+          name: 'Create Plans',
           id: 'plans',
           component: Plans,
           viewModel: {

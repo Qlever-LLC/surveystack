@@ -36,14 +36,6 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(instance, idx) in mappedInstances" :key="`user-${idx}`">
-            <td>{{ instance.instanceName }}</td>
-            <td>{{ instance.owner }}</td>
-            <td>
-              <v-btn color="red" @click="$emit('unmap-user', selectedUser, instance.instanceName)" dark>Unmap</v-btn>
-            </td>
-          </tr>
-
           <tr>
             <td>
               <v-autocomplete
@@ -63,6 +55,14 @@
             </td>
             <td>
               <v-btn color="primary" @click="$emit('map-user', selectedUser, selectedInstance, owner)">Map</v-btn>
+            </td>
+          </tr>
+
+          <tr v-for="(instance, idx) in mappedInstances" :key="`user-${idx}`">
+            <td>{{ instance.instanceName }}</td>
+            <td>{{ instance.owner }}</td>
+            <td>
+              <v-btn color="red" @click="$emit('unmap-user', selectedUser, instance.instanceName)" dark>Unmap</v-btn>
             </td>
           </tr>
         </tbody>
