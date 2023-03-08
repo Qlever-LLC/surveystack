@@ -1280,31 +1280,29 @@ export const addSuperAdminNotes = async (req, res) => {
     throw boom.badData(`error: ${errors.join(',')}`);
   }
 
-  //template:
-  //note = `timestamp\nRemoved from ${groupNames} reason: ${note}\n\n`;
-  const timestamp = getCurrentDateAsString();
-  const newNote = `${timestamp}\nRemoved by Super Admin reason: ${note}\n\n`;
-
-  const instanceNote = await db.collection('farmos-instance-notes').findOne({
-    instanceName: instanceName,
-  });
   // if variable note is empty, empty the field note in the DB
-  if (instanceNote) {
-    if (note) {
+  if (note) {
+    //template:
+    //note = `timestamp\nRemoved from ${groupNames} reason: ${note}\n\n`;
+    const timestamp = getCurrentDateAsString();
+    const newNote = `${timestamp}\nRemoved by Super Admin reason: ${note}\n`;
+
+    const instanceNote = await db.collection('farmos-instance-notes').findOne({
+      instanceName: instanceName,
+    });
+
+    if (instanceNote) {
       instanceNote.note += '\n' + newNote;
+
+      await db.collection('farmos-instance-notes').updateOne(
+        { instanceName: instanceName },
+        {
+          $set: {
+            note: instanceNote.note,
+          },
+        }
+      );
     } else {
-      instanceNote.note = '';
-    }
-    await db.collection('farmos-instance-notes').updateOne(
-      { instanceName: instanceName },
-      {
-        $set: {
-          note: instanceNote.note,
-        },
-      }
-    );
-  } else {
-    if (!note) {
       const myobj = {
         _id: new ObjectId(),
         instanceName: instanceName,

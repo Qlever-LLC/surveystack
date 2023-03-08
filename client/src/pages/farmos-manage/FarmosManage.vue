@@ -407,6 +407,11 @@ export default {
           instanceName,
         });
         this.success('Succefully added notes');
+        //reload notes
+        this.loading = true;
+        const { data: notes } = await api.get('/farmos/notes/all');
+        this.notes = notes;
+        this.loading = false;
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           this.error(error.response.data.message);

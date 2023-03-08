@@ -22,9 +22,20 @@
       :items="mappings.aggregatorFarms"
     ></v-autocomplete>
 
+    <div class="d-flex flex-column mb-5" v-if="!!selectedInstance">
+      <h3>Notes</h3>
+      <textarea
+        readonly
+        rows="3"
+        style="border-style: dotted"
+        class="pa-1 w-100"
+        v-model="selectedInstanceNote"
+      ></textarea>
+    </div>
+
     <div class="d-flex flex-row mb-5" v-if="!!selectedInstance">
       <v-text-field v-model.trim="updatedNote" label="Note" hide-details></v-text-field>
-      <v-btn color="primary" @click="addSuperAdminNote">update note</v-btn>
+      <v-btn color="primary" @click="addSuperAdminNote">append to note</v-btn>
     </div>
 
     <div class="d-flex flex-column mt-2" v-if="!!selectedInstance">
@@ -264,11 +275,21 @@ export default {
     addSuperAdminNote() {
       const updatedNote = this.updatedNote;
       const selectedInstance = this.selectedInstance;
-      this.$emit('addSuperAdminNote', { updatedNote, selectedInstance });
+      if (updatedNote) {
+        this.$emit('addSuperAdminNote', { updatedNote, selectedInstance });
+      }
       this.updatedNote = null;
     },
   },
   computed: {
+    selectedInstanceNote() {
+      let note = null;
+      const noteOfFarm = this.notes.find((el) => el.instanceName === this.selectedInstance);
+      if (noteOfFarm) {
+        note = noteOfFarm.note;
+      }
+      return note;
+    },
     selectedInstanceInfo() {
       return this.mappings.aggregatorFarms.find((e) => e.url === this.selectedInstance);
     },
@@ -322,7 +343,7 @@ export default {
       const mappings = [];
 
       for (const farm of farms) {
-        let note = undefined;
+        let note = null;
         const noteOfFarm = this.notes.find((el) => el.instanceName === farm.url);
         if (noteOfFarm) {
           note = noteOfFarm.note;
