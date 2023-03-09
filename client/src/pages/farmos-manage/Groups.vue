@@ -40,6 +40,8 @@
       </v-col>
     </v-row> -->
 
+    <div v-if="!loading && !!selectedGroup" class="px-3">{{ amountMappedInstances }}</div>
+
     <v-divider class="my-4"></v-divider>
 
     <v-simple-table v-if="!loading">
@@ -169,6 +171,15 @@ export default {
       }
 
       return mappings;
+    },
+    amountMappedInstances() {
+      if (this.mappedInstances.length === 0) {
+        return `0 Instance`;
+      } else if (this.mappedInstances.length === 1) {
+        return `1 Instance`;
+      } else {
+        return `${this.mappedInstances.length} Instances`;
+      }
     },
     instances() {
       return this.mappings.aggregatorFarms.map((farm) => ({
