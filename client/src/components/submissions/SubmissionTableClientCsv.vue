@@ -401,11 +401,15 @@ export default {
 
       // Parse date
       let parsedDate = parseISO(value);
-      if (!isValid(parsedDate)) {
-        parsedDate = parse(value, 'yyyy-MM-dd', new Date());
-      }
       if (isValid(parsedDate)) {
         return format(parsedDate, 'MMM d, yyyy h:mm a');
+      }
+
+      // YYYY-MM-DD
+      const isValidFormat = /^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(value);
+      parsedDate = parse(value, 'yyyy-MM-dd', new Date());
+      if (isValidFormat && isValid(parsedDate)) {
+        return format(parsedDate, 'MMM d, yyyy');
       }
 
       return value || ' ';
