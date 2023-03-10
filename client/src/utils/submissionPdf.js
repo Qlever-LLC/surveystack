@@ -128,7 +128,7 @@ export default class SubmissionPDF {
     this.docDefinition = val;
   }
 
-  initialize(survey = null, submission = null) {
+  initialize() {
     this.questionIndex = 0;
     this.toc = [];
     this.docDefinition = {
@@ -136,18 +136,26 @@ export default class SubmissionPDF {
       styles,
       defaultStyle,
       images: {},
-      pageBreakBefore: this.pageBreakBefore.bind(this),
+      // pageBreakBefore: this.pageBreakBefore.bind(this),
     };
   }
 
   async download() {
-    const maker = await this.generate();
-    maker.download();
+    try {
+      const maker = await this.generate();
+      maker.download();
+    } catch (e) {
+      console.error('Failed to generate PDF', e);
+    }
   }
 
   async print() {
-    const maker = await this.generate();
-    maker.print();
+    try {
+      const maker = await this.generate();
+      maker.print();
+    } catch (e) {
+      console.error('Failed to generate PDF', e);
+    }
   }
 
   async generate() {
@@ -168,7 +176,7 @@ export default class SubmissionPDF {
     }
 
     this.generateToc(metaIndex);
-
+    console.log(77777, this.docDefinition);
     return pdfMake.createPdf(this.docDefinition);
   }
 
@@ -245,6 +253,11 @@ export default class SubmissionPDF {
   /*******************************************************************/
 
   async generateControl(control, path = []) {
+    const hidden = getProperty(control, 'options.hidden', false);
+    if (hidden) {
+      return;
+    }
+
     const generator = {
       page: this.generatePageControl,
       group: this.generateGroupControl,
@@ -636,13 +649,14 @@ export default class SubmissionPDF {
   }
 
   getFileDef(answer, multiple, preview) {
-    if (answer.length === 0) {
-      return this.getTextDef(answer);
+    const value = this.getArrayValue(answer);
+    if (value.length === 0) {
+      return this.getTextDef(value);
     }
 
     const def = { ul: [] };
 
-    answer.forEach((image) => {
+    value.forEach((image) => {
       const ext = (image.split('.').pop() || '').toLowerCase();
       const isImage = ['png', 'jpg', 'jpeg'].includes(ext);
       const url = getPublicDownloadUrl(image);
@@ -730,7 +744,11 @@ export default class SubmissionPDF {
     }
 
     if (resource.location === 'REMOTE') {
-      return await fetchSubmissionUniqueItems(resource.content.id, resource.content.path);
+      try {
+        return await fetchSubmissionUniqueItems(resource.content.id, resource.content.path);
+      } catch {
+        return [];
+      }
     }
 
     return [];
