@@ -45,7 +45,7 @@ const farmOsFieldHeaders = (index = 1) => [
 
 const farmOsPlantingHeaders = (index = 1) => [
   `data.farmos_planting_${index}.value.0.archived`,
-  `data.farmos_planting_${index}.value.0.assetId`,
+  `data.farmos_planting_${index}.value.0.id`,
   `data.farmos_planting_${index}.value.0.farmId`,
   `data.farmos_planting_${index}.value.0.farmName`,
   `data.farmos_planting_${index}.value.0.hash`,

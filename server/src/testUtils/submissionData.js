@@ -186,7 +186,7 @@ const farmOsPlantingData = (overrides = {}, index = 1) => ({
         farmName: 'Mock farm name',
         url: 'Mock url',
         name: 'Mock name',
-        assetId: new ObjectId(),
+        id: new ObjectId(),
         archived: true,
         location: [
           {

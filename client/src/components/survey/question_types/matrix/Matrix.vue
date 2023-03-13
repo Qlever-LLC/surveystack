@@ -1,27 +1,13 @@
 <template>
   <div>
-    <app-dialog
-      v-model="showConfirmDeletionDialog"
-      v-bind="dialogProps"
-      v-if="rowToBeDeleted >= 0"
-      @confirm="remove(rowToBeDeleted)"
-      @cancel="rowToBeDeleted = -1"
-      title="Confirm Deletion"
-      labelConfirm="DELETE"
-      :maxWidth="400"
-    >
+    <app-dialog v-model="showConfirmDeletionDialog" v-bind="dialogProps" v-if="rowToBeDeleted >= 0"
+      @confirm="remove(rowToBeDeleted)" @cancel="rowToBeDeleted = -1" title="Confirm Deletion" labelConfirm="DELETE"
+      :maxWidth="400">
       Do you want to delete this row?
     </app-dialog>
 
-    <v-dialog
-      v-model="showEditItemDialog"
-      v-bind="dialogProps"
-      v-if="showEditItemDialog"
-      title="Edit"
-      hideCancel
-      @confirm="showEditItemDialog = false"
-      max-width="800px"
-    >
+    <v-dialog v-model="showEditItemDialog" v-bind="dialogProps" v-if="showEditItemDialog" title="Edit" hideCancel
+      @confirm="showEditItemDialog = false" max-width="800px">
       <div style="background: #1867c0; padding: 4px 0px">
         <v-card>
           <v-card-title>
@@ -39,15 +25,8 @@
                   <app-redacted v-if="header.redacted" />
                   <app-required v-if="header.required" />
                 </div>
-                <app-matrix-cell
-                  :header="header"
-                  :item="editedItem"
-                  :getDropdownItems="getDropdownItems"
-                  :farmos="farmos"
-                  :index="idx"
-                  @changed="onInput"
-                  class="my-2"
-                />
+                <app-matrix-cell :header="header" :item="editedItem" :getDropdownItems="getDropdownItems" :farmos="farmos"
+                  :index="idx" @changed="onInput" class="my-2" />
               </div>
             </v-form>
           </v-card-text>
@@ -66,17 +45,9 @@
     <app-control-label :value="control.label" :redacted="redacted" :required="required" />
     <app-control-hint :value="control.hint" />
 
-    <app-matrix-table
-      :headers="headers"
-      :rows="rows || []"
-      :fixedColumns="fixedColumns"
-      :isMobile="isMobile"
-      :rowActionsWidth="64"
-      :floatingFooterSize="isInBuilder ? 0 : 64"
-      :addRowLabel="addRowLabel"
-      @showEditDialog="(rowIdx) => editItem(rowIdx)"
-      @addRow="add"
-    >
+    <app-matrix-table :headers="headers" :rows="rows || []" :fixedColumns="fixedColumns" :isMobile="isMobile"
+      :rowActionsWidth="64" :floatingFooterSize="isInBuilder ? 0 : 64" :addRowLabel="addRowLabel"
+      @showEditDialog="(rowIdx) => editItem(rowIdx)" @addRow="add">
       <template v-slot:header-cell="{ header }">
         <v-tooltip top>
           <template v-slot:activator="{ on }">
@@ -89,17 +60,8 @@
       </template>
       <template v-slot:row-cell="{ header, row, colIdx }">
         <v-form autocomplete="off" @submit.prevent="" :style="{ width: '100%' }">
-          <app-matrix-cell
-            :header="header"
-            :item="row"
-            :getDropdownItems="getDropdownItems"
-            :farmos="farmos"
-            :index="colIdx"
-            @changed="onInput"
-            :disabled="isMobile"
-            class="mt-2"
-            :loading="loading"
-          />
+          <app-matrix-cell :header="header" :item="row" :getDropdownItems="getDropdownItems" :farmos="farmos"
+            :index="colIdx" @changed="onInput" :disabled="isMobile" class="mt-2" :loading="loading" />
         </v-form>
       </template>
       <template v-if="!isMobile" v-slot:row-actions="{ rowIdx }">
@@ -149,7 +111,7 @@ const hashItem = (listItem) => {
     return `FIELD:${value.farmId}.${value.location.id}`;
   }
 
-  return `ASSET:${value.farmId}.${value.assetId}`;
+  return `ASSET:${value.farmId}.${value.id}`;
 };
 
 /* copied from FarmOsPlanting.vue */
@@ -400,16 +362,16 @@ export default {
 }
 */
 
->>> .v-data-table__wrapper::-webkit-scrollbar {
+>>>.v-data-table__wrapper::-webkit-scrollbar {
   height: 12px;
 }
 
->>> .v-data-table__wrapper::-webkit-scrollbar-track {
+>>>.v-data-table__wrapper::-webkit-scrollbar-track {
   border-radius: 3px;
   background: #eee;
 }
 
->>> .v-data-table__wrapper::-webkit-scrollbar-thumb {
+>>>.v-data-table__wrapper::-webkit-scrollbar-thumb {
   border-radius: 3px;
   background: #bbb;
 }

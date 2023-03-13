@@ -6,27 +6,14 @@
     <v-progress-circular v-if="loading" indeterminate color="secondary" class="my-8"> </v-progress-circular>
 
     <v-list style="overflow: auto">
-      <v-list-item-group
-        v-if="!loading"
-        :disabled="loading"
-        :value="listSelection"
-        @change="localChange"
-        :multiple="!!control.options.hasMultipleSelections"
-      >
-        <v-list-item
-          v-for="(item, idx) in transformed"
-          :value="hashItem(item)"
-          :key="`item_${idx}`"
-          :disabled="!control.options.hasMultipleSelections && item.value.isField"
-        >
+      <v-list-item-group v-if="!loading" :disabled="loading" :value="listSelection" @change="localChange"
+        :multiple="!!control.options.hasMultipleSelections">
+        <v-list-item v-for="(item, idx) in transformed" :value="hashItem(item)" :key="`item_${idx}`"
+          :disabled="!control.options.hasMultipleSelections && item.value.isField">
           <template v-slot:default="{ active }">
             <v-list-item-action class="ml-2 mr-2" v-if="!item.value.isField">
-              <v-checkbox
-                v-if="control.options.hasMultipleSelections"
-                :input-value="active"
-                :true-value="hashItem(item)"
-                color="focus"
-              />
+              <v-checkbox v-if="control.options.hasMultipleSelections" :input-value="active" :true-value="hashItem(item)"
+                color="focus" />
               <v-radio-group v-else :value="active">
                 <v-radio :value="true" color="focus" />
               </v-radio-group>
@@ -59,7 +46,7 @@ const hashItem = (listItem) => {
     return `FIELD:${value.farmId}.${value.location.id}`;
   }
 
-  return `ASSET:${value.farmId}.${value.assetId}`;
+  return `ASSET:${value.farmId}.${value.id}`;
 };
 
 const transform = (assets) => {
@@ -147,8 +134,7 @@ const transform = (assets) => {
       farmName: item.farmName,
       location: null,
       isField: false,
-      hash: `UNASSIGNED:${item.farmId}:${item.assetId}`,
-
+      hash: `UNASSIGNED:${item.farmId}:${item.id}`,
     });
   }); */
 
@@ -228,8 +214,6 @@ export default {
         return this.transformed.find((t) => t.value.hash === h).value;
       });
 
-      // const [farmId, assetId] = itemId.split('.');
-
       const fields = selectedItems.filter((item) => !!item.isField);
 
       // selected assets
@@ -245,7 +229,7 @@ export default {
       assetsToSelect.forEach((assetToSelect) => {
         if (
           assets.some(
-            (asset) => asset.farmId === assetToSelect.value.farmId && asset.assetId === assetToSelect.value.assetId
+            (asset) => asset.farmId === assetToSelect.value.farmId && asset.id === assetToSelect.value.id
           )
         ) {
           // skip
@@ -269,9 +253,9 @@ export default {
   white-space: nowrap;
 }
 
-.farm-os-planting >>> .v-list-item__title .orange-chip,
-.farm-os-planting >>> .v-list-item__title .green-chip,
-.farm-os-planting >>> .v-list-item__title .blue-chip {
+.farm-os-planting>>>.v-list-item__title .orange-chip,
+.farm-os-planting>>>.v-list-item__title .green-chip,
+.farm-os-planting>>>.v-list-item__title .blue-chip {
   display: inline-flex;
   border: 1px var(--v-focus-base) solid;
   background-color: white;
@@ -285,12 +269,12 @@ export default {
   vertical-align: middle;
 }
 
-.farm-os-planting >>> .v-list-item__title .green-chip {
+.farm-os-planting>>>.v-list-item__title .green-chip {
   color: #46b355;
   border: 1px #46b355 solid;
 }
 
-.farm-os-planting >>> .v-list-item__title .orange-chip {
+.farm-os-planting>>>.v-list-item__title .orange-chip {
   color: #f38d49;
   border: 1px #f38d49 solid;
 }
