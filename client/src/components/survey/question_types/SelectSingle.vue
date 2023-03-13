@@ -4,7 +4,7 @@
     <app-control-hint :value="control.hint" />
     <div class="py-2">
       <v-radio-group
-        :value="value && value[0]"
+        :value="Array.isArray(value) ? value[0] : value"
         @change="onChange"
         v-if="sourceIsValid"
         class="mt-0"

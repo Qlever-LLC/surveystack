@@ -81,11 +81,7 @@ const defaults = {
     // If a callback function is provided, pass it the defaults
     // and return what it evaluates to.
     if (typeof options.controls === 'function') {
-      return options.controls(
-        defaultControls()
-          .extend(farmMapDefaults)
-          .getArray()
-      );
+      return options.controls(defaultControls().extend(farmMapDefaults).getArray());
     }
 
     // Otherwise just return the defaults.
@@ -116,11 +112,7 @@ const defaults = {
     // If a callback function is provided, pass it the defaults
     // and return what it evaluates to.
     if (typeof options.interactions === 'function') {
-      return options.interactions(
-        defaultInteractions()
-          .extend(farmMapDefaults)
-          .getArray()
-      );
+      return options.interactions(defaultInteractions().extend(farmMapDefaults).getArray());
     }
 
     // Otherwise just return the defaults.

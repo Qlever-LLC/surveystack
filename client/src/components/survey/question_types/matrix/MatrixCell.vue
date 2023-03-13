@@ -27,7 +27,7 @@
   <v-text-field
     v-else-if="header.type === 'farmos_uuid'"
     :value="localValue"
-    @input="onInput"
+    @input="onFarmOsInput"
     outlined
     hide-details
     autocomplete="off"
@@ -39,8 +39,9 @@
     @input="onNumberInput"
     type="number"
     outlined
-    hide-details
+    hide-details="auto"
     :disabled="disabled"
+    :rules="[isValidNumber]"
   />
   <v-select
     v-else-if="header.type === 'dropdown' && !header.custom && !header.autocomplete"
@@ -261,7 +262,7 @@ export default {
       },
     },
     localValue() {
-      if (this.value == null) {
+      if (this.value === null) {
         return '';
       } else {
         return this.value && this.value.name ? this.value.name : '';
@@ -279,10 +280,11 @@ export default {
     },
   },
   methods: {
-    getValueOrNull,
-    uuidv4,
+    isValidNumber(val) {
+      return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
+    },
     onInput(value) {
-      this.value = getValueOrNull(value);
+      this.value = getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value);
       this.$emit('changed');
     },
     onDateInput(value) {

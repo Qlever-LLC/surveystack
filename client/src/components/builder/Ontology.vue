@@ -84,6 +84,20 @@
     class="full-width custom-ontology dropdown"
     data-test-id="combobox"
   >
+    <template v-slot:selection="data" v-if="multiple">
+      <v-chip
+        v-bind="data.attrs"
+        :input-value="data.selected"
+        close
+        @click="data.select"
+        @click:close="remove(data.item)"
+      >
+        {{ getLabelForItemValue(data.item) }}
+      </v-chip>
+    </template>
+    <template v-slot:selection="data" v-else>
+      {{ getLabelForItemValue(data.item) }}
+    </template>
     <template v-slot:no-data>
       <v-list-item>
         <v-list-item-content>
@@ -124,8 +138,8 @@ export default {
   methods: {
     onChange(value) {
       this.comboboxSearch = null;
-      this.$emit('input', getValueOrNull(value));
-      if (this.$refs.dropdownRef) {
+      this.$emit('input', getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value));
+      if (this.$refs.dropdownRef && !this.multiple) {
         this.$refs.dropdownRef.isMenuActive = false;
       }
     },
@@ -196,7 +210,7 @@ export default {
       const match = newVal
         ? this.items.find((item) => item.label.toLowerCase().indexOf(newVal.toLowerCase()) >= 0)
         : undefined;
-      if (!match) {
+      if (!match && this.$refs.dropdownRef) {
         this.$refs.dropdownRef.setMenuIndex(-1);
       }
     },

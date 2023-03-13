@@ -2,7 +2,13 @@
   <div :class="className" style="width: 100%">
     <div v-if="control.type === 'page' && !insidePage">
       <div v-for="(child, i) in control.children" :key="i">
-        <app-control :path="`${path}.${child.name}`" :control="child" :autoFocus="i === 0" insidePage />
+        <app-control
+          :path="`${path}.${child.name}`"
+          :control="child"
+          :autoFocus="i === 0"
+          :forceMobile="forceMobile"
+          insidePage
+        />
       </div>
     </div>
 
@@ -18,7 +24,13 @@
         <app-control-hint :value="control.hint" />
 
         <div v-for="(child, i) in control.children" :key="i">
-          <app-control :path="`${path}.${child.name}`" :control="child" :autoFocus="autoFocus && i === 0" insidePage />
+          <app-control
+            :path="`${path}.${child.name}`"
+            :control="child"
+            :autoFocus="autoFocus && i === 0"
+            :forceMobile="forceMobile"
+            insidePage
+          />
         </div>
 
         <app-control-more-info :value="control.moreInfo" />
@@ -191,10 +203,16 @@ export default {
 }
 
 .group {
+  margin: 8px 0px;
   padding: 1rem;
   box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
   border-left: 4px solid #fff;
   transition: 0.2s;
+  background-color: #ffffff;
+}
+
+.group:first-child {
+  margin-top: 0px;
 }
 
 .group:hover {

@@ -128,9 +128,6 @@
   </div>
 </template>
 <script>
-import isValid from 'date-fns/isValid';
-import parseISO from 'date-fns/parseISO';
-import formatDistance from 'date-fns/formatDistance';
 import api from '@/services/api.service';
 import graphicalView from '@/components/builder/GraphicalView.vue';
 

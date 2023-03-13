@@ -14,6 +14,7 @@ import { isString, pick, find } from 'lodash';
 
 export const API_COMPOSE_TYPE_HYLO = 'hylo';
 export const HYLO_TYPE_SYNC_GROUP = 'sync-group';
+export const HYLO_TYPE_JOIN_GROUP = 'join-group';
 
 const createLogger = () => {
   const logs = [];
@@ -46,7 +47,7 @@ const outputSchema = Joi.object({
   entity: Joi.object({
     name: Joi.string().required(),
     slug: Joi.string().required(),
-    type: Joi.string().valid('farm').required(),
+    type: Joi.string().valid('farm').optional(),
     extraModerators: Joi.array()
       .min(0)
       .items(
@@ -55,6 +56,23 @@ const outputSchema = Joi.object({
           email: Joi.object({ value: Joi.string().required() }).required(),
         }).optional()
       ),
+  }).required(),
+})
+  .required()
+  .options({ allowUnknown: true });
+
+const joinGroupOutputSchema = Joi.object({
+  entity: Joi.object({
+    users: Joi.array()
+      .min(0)
+      .items(
+        Joi.object({
+          email: Joi.string().required(),
+          name: Joi.string().required(),
+        }).optional()
+      )
+      .required(),
+    groups: Joi.array().min(0).items(Joi.string().optional()).required(),
   }).required(),
 })
   .required()
@@ -81,6 +99,14 @@ export const FRAGMENT_GROUP_DETAILS = gql`
     }
   }
   ${FRAGMENT_PERSON_DETAILS}
+`;
+
+export const QUERY_GROUP_BY_SLUG = gql`
+  query ($slug: String) {
+    group(slug: $slug) {
+      id
+    }
+  }
 `;
 
 export const QUERY_PERSON_BY_EMAIL = gql`
@@ -143,6 +169,14 @@ export const queryHyloUser = async (options) => {
   logger.info(`Query Hylo user - email="${email}"`);
   const result = (await gqlRequest(QUERY_PERSON_BY_EMAIL, { email })).person;
   logger.info('Query Hylo user result:', { person: result });
+  return result;
+};
+
+export const queryHyloGroup = async (options) => {
+  const { slug, gqlRequest, logger } = { ...deps, ...options };
+  logger.info(`Query Hylo user - slug="${slug}"`);
+  const result = (await gqlRequest(QUERY_GROUP_BY_SLUG, { slug })).group;
+  logger.info('Query Hylo group result:', result);
   return result;
 };
 
@@ -428,6 +462,81 @@ export const handleSyncGroupOutput = async (options) => {
   return { hyloUser, hyloGroup, extraModeratorUsers, permanent };
 };
 
+export const handleJoinGroupOutput = async (options) => {
+  const {
+    output: _output,
+    user,
+    group,
+    logger,
+    hyloGroupId,
+    addMember: _addMember,
+    queryHyloGroup: _queryHyloGroup,
+    gqlRequest: _gqlRequest,
+    gqlRequestWithUrl: _gqlRequestWithUrl,
+    postHyloUser: _postHyloUser,
+    upsertHyloUser: _upsertHyloUser,
+  } = { ...deps, addMember, queryHyloUser, queryHyloGroup, upsertHyloUser, ...options };
+
+  const { value: output, error } = joinGroupOutputSchema.validate(_output);
+  if (error) {
+    const errors = error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(', ')}`);
+  }
+  logger.success('Output is valid', output);
+
+  const {
+    url,
+    entity: { ...entity },
+  } = output;
+
+  function addHttps(url) {
+    if (!/^https?:\/\//i.test(url)) {
+      url = 'https://' + url;
+    }
+    return url;
+  }
+
+  const apiUrl = url ? addHttps(url) : process.env.HYLO_API_URL;
+  logger.info(`Hylo API URL: "${apiUrl}"`, {
+    urlFromApiCompose: String(url),
+    defaultHyloApiUrl: process.env.HYLO_API_URL,
+  });
+  const gqlRequest = _gqlRequestWithUrl(apiUrl);
+  const postHyloUser = (body) => _postHyloUser(body, apiUrl);
+  const baseDeps = { gqlRequest, postHyloUser, logger };
+
+  const mappedUsers = [];
+
+  for (const slug of entity.groups) {
+    const group = await _queryHyloGroup({ slug, ...options });
+    console.log('group', group);
+    if (!group) {
+      throw boom.badData(`error: group not found in hylo ${slug}`);
+    }
+
+    let { id: groupId } = group;
+
+    for (const user of entity.users) {
+      mappedUsers.push(
+        await _upsertHyloUser({
+          email: user.email,
+          name: user.name,
+          hyloGroupId: groupId,
+          ...baseDeps,
+        })
+      );
+    }
+  }
+
+  const permanent = {
+    type: API_COMPOSE_TYPE_HYLO,
+    hyloType: HYLO_TYPE_JOIN_GROUP,
+    mappedUsers,
+  };
+
+  return { permanent };
+};
+
 export const handle = async (options) => {
   const {
     submission,
@@ -436,17 +545,45 @@ export const handle = async (options) => {
     user,
     getHyloApiComposeOutputs: _getHyloApiComposeOutputs,
     handleSyncGroupOutput: _handleSyncGroupOutput,
-  } = { getHyloApiComposeOutputs, handleSyncGroupOutput, ...options };
+    handleJoinGroupOutput: _handleJoinGroupOutput,
+  } = { getHyloApiComposeOutputs, handleSyncGroupOutput, handleJoinGroupOutput, ...options };
   const outputs = _getHyloApiComposeOutputs({ submission, survey });
   const results = [];
   const logger = createLogger();
+
   const syncGroupOutputs = outputs.filter((o) => o.hyloType === HYLO_TYPE_SYNC_GROUP);
-  if (syncGroupOutputs.length > 1) {
-    throw new Error(`The submission can't have more that one hyloType='sync-group' outputs`);
+  const joinGroupOutputs = outputs.filter((o) => o.hyloType === HYLO_TYPE_JOIN_GROUP);
+
+  if (syncGroupOutputs.length > 1 || joinGroupOutputs.length > 1) {
+    throw new Error(
+      `The submission can't have more that one hyloType='sync-group/join-group' outputs`
+    );
   }
+
   for (const output of syncGroupOutputs) {
     try {
       const result = await _handleSyncGroupOutput({
+        output,
+        user,
+        group: submission.meta.group,
+        hyloGroupId: find(prevSubmission?.meta?.permanentResults || [], {
+          type: API_COMPOSE_TYPE_HYLO,
+          hyloType: HYLO_TYPE_SYNC_GROUP,
+        })?.createdHyloGroup?.id,
+        logger,
+      });
+      result.logs = logger.getLogs();
+      results.push(result);
+    } catch (e) {
+      e.logs = logger.getLogs();
+      throw e;
+    }
+  }
+
+  console.log('joingroup', joinGroupOutputs);
+  for (const output of joinGroupOutputs) {
+    try {
+      const result = await _handleJoinGroupOutput({
         output,
         user,
         group: submission.meta.group,

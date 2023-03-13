@@ -49,15 +49,22 @@
         <div class="pa-3">
           <p class="font-weight-bold">Settings</p>
           <v-container class="pa-0" fluid>
-            <v-checkbox
-              v-if="groupInfos.allowSubgroupsToJoinCoffeeShop || groupInfos.isDomainRoot"
-              class="ma-0 pa-0"
-              hide-details
-              :ripple="false"
-              v-model="groupInfos.groupHasCoffeeShopAccess"
-              @change="$emit('addGrpCoffeeShop', $event)"
-              label="Add this group to the Coffee Shop"
-            ></v-checkbox>
+            <v-tooltip bottom :disabled="canAddCoffeeShop">
+              <template v-slot:activator="{ on, attrs }">
+                <div v-bind="attrs" v-on="on">
+                  <v-checkbox
+                    class="ma-0 pa-0"
+                    label="Add this group to the Coffee Shop"
+                    v-model="groupInfos.groupHasCoffeeShopAccess"
+                    :ripple="false"
+                    :disabled="!canAddCoffeeShop"
+                    hide-details
+                    @change="$emit('addGrpCoffeeShop', $event)"
+                  />
+                </div>
+              </template>
+              <span>Talk to your parent group administrator to enable this option</span>
+            </v-tooltip>
             <v-checkbox
               v-if="groupInfos.isDomainRoot"
               class="ma-0 pa-0"
@@ -66,7 +73,7 @@
               v-model="groupInfos.allowSubgroupsToJoinCoffeeShop"
               @change="$emit('allowSbGrpsJoinCoffeeShop', $event)"
               :label="`Allow subgroups to join the Coffee Shop`"
-            ></v-checkbox>
+            />
             <v-checkbox
               v-if="groupInfos.isDomainRoot"
               class="ma-0 pa-0"
@@ -74,8 +81,7 @@
               v-model="groupInfos.allowSubgroupAdminsToCreateFarmOSInstances"
               @change="$emit('allowSbGrpsAdminsCreateFarmOSFarms', $event)"
               label="Allow subgroups admins to create FarmOS Farms through Survey Stack"
-            >
-            </v-checkbox>
+            />
           </v-container>
         </div>
       </div>
@@ -103,12 +109,10 @@
 <script>
 import { ref, computed } from '@vue/composition-api';
 import FarmOSGroupTable from './FarmOSGroupTable.vue';
-import appDialog from '@/components/ui/Dialog.vue';
 
 export default {
   components: {
     FarmOSGroupTable,
-    appDialog,
   },
   props: {
     groupInfos: {
@@ -134,21 +138,14 @@ export default {
     'deactivate',
   ],
   setup(props) {
-    // part Search input field
     const search = ref('');
-    let headers = computed(() => {
-      return [
-        {
-          text: 'Group Members',
-          value: 'groupMembers',
-        },
-        {
-          text: 'Connected Farms',
-          value: 'connectedFarms',
-        },
-        { text: 'Memberships', value: 'memberships' },
-      ];
-    });
+    const selectedPlans = ref(props.groupInfos.planIds);
+    const seats = ref(props.groupInfos.seats.max);
+    const upgradeDialog = ref(false);
+
+    const canAddCoffeeShop = computed(
+      () => props.groupInfos.isDomainRoot || props.groupInfos.allowSubgroupsToJoinCoffeeShop
+    );
 
     const filteredMembers = computed(() => {
       const s = search.value.toLowerCase().trim();
@@ -194,52 +191,19 @@ export default {
       });
     });
 
-    const developMbships = ref([]);
-    for (let i = 0; i < props.groupInfos.members.length; i++) {
-      developMbships.value.push(ref(false));
-    }
-    function toggleDevelopMbships(index) {
-      developMbships.value[index].value = !developMbships.value[index].value;
-    }
-
-    const selectedPlans = ref(props.groupInfos.planIds);
-
-    const seats = ref(props.groupInfos.seats.max);
-
-    const upgradeDialog = ref(false);
     return {
       search,
-      headers,
       filteredMembers,
-      developMbships,
-      toggleDevelopMbships,
       selectedPlans,
       seats,
       upgradeDialog,
+      canAddCoffeeShop,
     };
   },
 };
 </script>
 
 <style scoped>
-.headerCSS {
-  /* top: 0px;
-  background-color: white;
-  position: sticky;
-  font-size: 16px !important;
-  border-bottom: none; */
-  /* z-index: 10; */
-}
-
-.header2CSS {
-  /* top: 48px;
-  background-color: white;
-  position: sticky;
-  font-size: 16px;
-  border-bottom: none; */
-  /* z-index: 10; */
-}
-
 .v-data-table /deep/ .v-data-table__wrapper {
   overflow: unset;
 }

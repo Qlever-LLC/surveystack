@@ -258,9 +258,7 @@ class SnappingGrid extends Control {
       const updateState = () => {
         const mapHasOtherDrawInteractions = this.mapHasOtherDrawInteractions();
 
-        const mapInteractions = this.getMap()
-          .getInteractions()
-          .getArray();
+        const mapInteractions = this.getMap().getInteractions().getArray();
 
         const mapHasOurDrawInteraction = mapInteractions.some(
           (interaction) => interaction === this.drawSnappingOriginsInteraction

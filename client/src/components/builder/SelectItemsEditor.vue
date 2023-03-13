@@ -13,6 +13,7 @@
         hide-details
         readonly
         outlined
+        :disabled="disabled"
       />
     </template>
 
@@ -73,7 +74,14 @@ export default {
     draggable,
   },
   props: {
-    value: { type: Array, default: () => [] },
+    value: {
+      type: Array,
+      default: () => [],
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+    },
   },
   model: {
     prop: 'value',
@@ -88,7 +96,9 @@ export default {
   },
   computed: {
     validItems() {
-      return this.items.filter((item) => item.label.trim() && item.value.trim());
+      return this.items
+        .map((item) => ({ label: item.label.trim(), value: item.value.trim() }))
+        .filter((item) => item.label && item.value);
     },
     getLabel() {
       const len = this.validItems.length;

@@ -5,9 +5,18 @@
       <v-card-text>
         Update Groups with Access to Farm Instance
         <br />
-        <v-autocomplete label="Select Groups" multiple chips :items="allGroups"
-          :item-text="(g) => `${g.name} (${g.path})`" :item-value="(g) => `${g._id}`" class="mt-4"
-          v-model="selectedGroups" dense open-on-clear />
+        <v-autocomplete
+          label="Select Groups"
+          multiple
+          chips
+          :items="allGroups"
+          :item-text="(g) => `${g.name} (${g.path})`"
+          :item-value="(g) => `${g._id}`"
+          class="mt-4"
+          v-model="selectedGroups"
+          dense
+          open-on-clear
+        />
         <v-btn block @click="updateGroups" color="primary">Update Groups</v-btn>
       </v-card-text>
     </v-card>

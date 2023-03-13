@@ -2,7 +2,7 @@
   <v-card outlined class="tiptap-editor">
     <v-card-title class="pa-0">
       <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
-        <v-toolbar color="grey lighten-3" style="zoom:0.75;" flat dense v-if="!disabled" class="pa-0 editor-toolbar">
+        <v-toolbar color="grey lighten-3" style="zoom: 0.75" flat dense v-if="!disabled" class="pa-0 editor-toolbar">
           <v-toolbar-items class="pa-0 align-center justify-space-between" color="grey lighten-3">
             <div>
               <v-btn
@@ -320,7 +320,7 @@
           </v-card>
         </div>
       </editor-menu-bubble>
-      <editor-content :disabled="!disabled" :editor="editor" class="tiptap-editor" style="width: 100%; height: 100%;" />
+      <editor-content :disabled="!disabled" :editor="editor" class="tiptap-editor" style="width: 100%; height: 100%" />
     </v-card-text>
   </v-card>
 </template>
@@ -341,7 +341,6 @@ import {
   Bold,
   Code,
   Italic,
-  Link,
   Table,
   TableHeader,
   TableCell,

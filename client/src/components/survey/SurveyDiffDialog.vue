@@ -43,6 +43,5 @@ export default {
     },
   },
   emits: ['cancel'],
-  setup(props, { emit }) {},
 };
 </script>

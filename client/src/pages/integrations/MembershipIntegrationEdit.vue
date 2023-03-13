@@ -36,19 +36,18 @@
 
 <script>
 import ObjectId from 'bson-objectid';
-import axios from 'axios';
 import api from '@/services/api.service';
 
 import appJsonEditor from '@/components/ui/JsonEditor.vue';
 import appFarmosFarmPicker from '@/components/integrations/FarmosFarmPicker.vue';
 
-const exampleIntegration = {
-  type: 'farmos-aggregator',
-  name: 'FarmOS Aggregator RFC',
-  url: 'oursci.farmos.group',
-  apiKey: '1234',
-  parameters: 'rfc,nofa',
-};
+// const exampleIntegration = {
+//   type: 'farmos-aggregator',
+//   name: 'FarmOS Aggregator RFC',
+//   url: 'oursci.farmos.group',
+//   apiKey: '1234',
+//   parameters: 'rfc,nofa',
+// };
 
 const integrationTypes = [
   {
@@ -116,7 +115,7 @@ export default {
   },
   watch: {
     'entity.type': {
-      async handler(newVal, oldVal) {
+      async handler(newVal) {
         if (newVal === 'farmos-farm') {
           const m = await api.get(`/memberships/${this.entity.membership}`);
 

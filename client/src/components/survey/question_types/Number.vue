@@ -65,7 +65,7 @@ export default {
         let converted = this.parseInputToNumber(v);
 
         if (converted === false) {
-          // Report no value when the input is invald or empty
+          // Report no value when the input is invalid or empty
           this.changed(null);
           return;
         }
@@ -73,7 +73,7 @@ export default {
       }
     },
     isValidNumber(val) {
-      return this.parseInputToNumber(val) === false ? 'The value has to be a number' : true;
+      return this.parseInputToNumber(val) === false ? 'Please enter a number' : true;
     },
   },
   mounted() {

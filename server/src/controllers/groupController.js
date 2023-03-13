@@ -248,13 +248,14 @@ const updateGroup = async (req, res) => {
   const entity = req.body;
   sanitizeGroup(entity);
 
+  const { isSuperAdmin } = res.locals.auth;
   const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
   const hasAdminRole = await rolesService.hasRole(
     res.locals.auth.user._id,
     new ObjectId(id),
     'admin'
   );
-  if (!hasAdminRole) {
+  if (!hasAdminRole && !isSuperAdmin) {
     throw boom.unauthorized(`You are not authorized: admin@${existing.path}`);
   }
 

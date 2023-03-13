@@ -33,13 +33,13 @@ import api from '@/services/api.service';
 import appJsonEditor from '@/components/ui/JsonEditor.vue';
 import appFeedback from '@/components/ui/Feedback.vue';
 
-const exampleIntegration = {
-  type: 'farmos-aggregator',
-  name: 'FarmOS Aggregator RFC',
-  url: 'oursci.farmos.group',
-  apiKey: '1234',
-  parameters: 'rfc,nofa',
-};
+// const exampleIntegration = {
+//   type: 'farmos-aggregator',
+//   name: 'FarmOS Aggregator RFC',
+//   url: 'oursci.farmos.group',
+//   apiKey: '1234',
+//   parameters: 'rfc,nofa',
+// };
 
 const integrationTypes = [
   {

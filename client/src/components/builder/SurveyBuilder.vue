@@ -185,7 +185,7 @@
 
       <pane class="pane pane-draft" :style="{ width: isPreviewMobile ? '375px' : '800px' }">
         <!-- this is a hack to make preview work inside panes... not sure where 182px is coming from -->
-        <div style="height: calc(100vh - 182px); max-height: calc(100vh - 182px); overflow: auto">
+        <div id="previewSurvey" style="height: calc(100vh - 182px); max-height: calc(100vh - 182px); overflow: auto">
           <app-draft-component
             @submit="(payload) => $emit('submit', payload)"
             v-if="survey && instance"
@@ -1244,5 +1244,11 @@ export default {
 .default-theme.splitpanes--horizontal > .splitpanes__splitter:after,
 .default-theme .splitpanes--horizontal > .splitpanes__splitter:after {
   margin-top: 1px;
+}
+
+#previewSurvey > .v-dialog__content.v-dialog__content--active {
+  border-color: rgba(33, 33, 33, 0.46);
+  background-color: rgba(33, 33, 33, 0.46);
+  pointer-events: all;
 }
 </style>
