@@ -345,19 +345,17 @@ export default {
         return [];
       }
       const defaultItems = ontology.content.map((row) => ({ label: row.label, value: row.value }));
-      const usedValues = this.rows
-        .map((row) => row[field].value) // get the value from each row
-        .map((value) => (Array.isArray(value) ? value : [value])) // convert individual values to list
-        .flat(); // convert the values of each row into one list
+
       // All the custom items the users typed in
       const customItems = without(
-        uniq(usedValues).filter((v) => !isNil(v)), // get all the uniq non-empty values
+        uniq(values).filter((v) => !isNil(v)), // get all the uniq non-empty values
         ...defaultItems.map((i) => i.value) // without the default values
       ).map((value) => ({ label: value, value }));
+
       const allItems = sortBy(
         [...defaultItems, ...customItems],
         [
-          (a) => !values.includes(a.value), // move selected items first
+          (a) => !customItems.includes(a.value), // move selected items first
           'label',
         ]
       );
