@@ -54,6 +54,19 @@ const getUser = async (req, res) => {
   return res.send(entity);
 };
 
+/**
+ * returns true if the user owns an instance at least once
+ */
+const isUserOwner = async (req, res) => {
+  const { userId } = req.params;
+  const ownership = await db.collection('farmos-instances').find({
+    _id: new ObjectId(userId),
+    owner: true,
+  });
+  const response = ownership.length > 0 ? true : false;
+  return res.send(response);
+};
+
 const createUser = async (req, res) => {
   const entity = req.body;
 
@@ -159,6 +172,7 @@ const deleteUser = async (req, res) => {
 export default {
   getUsers,
   getUser,
+  isUserOwner,
   createUser,
   updateUser,
   deleteUser,

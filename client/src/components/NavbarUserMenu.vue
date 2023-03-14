@@ -9,7 +9,7 @@
       max-height="calc(100% - 100px)"
     >
       <template v-slot:activator="{ on }">
-        <v-btn text v-on="on">
+        <v-btn text v-on="on" @click="checkIsOwner">
           <v-icon>mdi-account</v-icon>
         </v-btn>
       </template>
@@ -19,6 +19,12 @@
             <v-icon>mdi-account-circle</v-icon>
           </v-list-item-icon>
           <v-list-item-title> Profile </v-list-item-title>
+        </v-list-item>
+        <v-list-item v-if="isOwner" link :to="{ name: 'farmos-profile' }">
+          <v-list-item-icon>
+            <v-icon>mdi-leaf-circle-outline</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title> FarmOS Profile </v-list-item-title>
         </v-list-item>
         <v-divider />
         <v-subheader>Active Group</v-subheader>
@@ -45,10 +51,16 @@
 
 <script>
 import ActiveGroupSelectorList from '@/components/shared/ActiveGroupSelectorList.vue';
+import api from '@/services/api.service';
 
 export default {
   components: {
     ActiveGroupSelectorList,
+  },
+  data() {
+    return {
+      isOwner: false,
+    };
   },
   computed: {
     activeGroup: {
@@ -61,6 +73,15 @@ export default {
     },
   },
   methods: {
+    async checkIsOwner() {
+      const user = this.$store.getters['auth/user'];
+      this.isOwner = false;
+      if (user) {
+        const userId = user._id;
+        const { data } = await api.get(`/owner/${userId}`);
+        this.isOwner = data;
+      }
+    },
     async logout() {
       this.$store.dispatch('auth/logout');
       this.$router.push('/auth/login');
