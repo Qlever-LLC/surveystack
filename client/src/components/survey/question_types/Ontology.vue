@@ -222,14 +222,7 @@ export default {
         ...defaultItems.map((i) => i.value) // without the default values
       ).map((value) => ({ label: value, value }));
 
-      const allItems = sortBy(
-        [...defaultItems, ...customItems],
-        [
-          (a) => !customItems.includes(a.value), // move selected items first
-          'label',
-        ]
-      );
-      return allItems;
+      return [...defaultItems, ...customItems];
     },
     sourceIsValid() {
       return this.items && Array.isArray(this.items) && this.items.every(({ label, value }) => label && value);
