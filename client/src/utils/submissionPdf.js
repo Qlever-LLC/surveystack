@@ -7,7 +7,6 @@ import getProperty from 'lodash/get';
 import { fetchSubmissionUniqueItems } from './submissions';
 import { getPublicDownloadUrl } from '@/utils/resources';
 import htmlToPdfMake from 'html-to-pdfmake';
-import { cloneDeep } from 'lodash';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -26,15 +25,6 @@ const styles = {
     fontSize: 8,
     color: '#9ca3af',
     margin: [0, 0, 0, 48],
-  },
-  toc: {
-    fontSize: 16,
-    lineHeight: 1.5,
-    italics: true,
-    alignment: 'center',
-    decoration: 'underline',
-    decorationStyle: 'double',
-    margin: [0, 0, 0, 16],
   },
   group: {
     fontSize: 14,
@@ -99,10 +89,8 @@ function formatDate(date, format = 'MMM d, yyyy h:mm a') {
 export default class SubmissionPDF {
   survey;
   submission;
-  toc;
   docDefinition;
   metaIndex;
-  questionIndex;
 
   constructor(survey, submission) {
     this.initialize();
@@ -118,28 +106,18 @@ export default class SubmissionPDF {
     this.submission = val;
   }
 
-  set questionIndex(val) {
-    this.questionIndex = val;
-  }
-
-  set toc(val) {
-    this.toc = val;
-  }
-
   set docDefinition(val) {
     this.docDefinition = val;
   }
 
   initialize() {
     this.metaIndex = 0;
-    this.questionIndex = 0;
-    this.toc = [];
     this.docDefinition = {
       content: [],
       styles,
       defaultStyle,
       images: {},
-      pageBreakBefore: this.pageBreakBefore.bind(this),
+      // pageBreakBefore: this.pageBreakBefore.bind(this),
     };
   }
 
@@ -173,13 +151,14 @@ export default class SubmissionPDF {
     const revision = this.survey.revisions.find((revision) => revision.version === this.submission.meta.survey.version);
 
     if (revision && Array.isArray(revision.controls)) {
-      for (const control of revision.controls) {
-        await this.generateControl(control);
+      for (let index = 0; index < revision.controls.length; index++) {
+        const control = revision.controls[index];
+        await this.generateControl({
+          ...control,
+          index: `${index + 1}.`,
+        });
       }
     }
-
-    console.log(77777, cloneDeep(this.docDefinition));
-    // this.generateToc(metaIndex);
 
     return pdfMake.createPdf(this.docDefinition);
   }
@@ -226,13 +205,6 @@ export default class SubmissionPDF {
     );
 
     this.metaIndex = this.docDefinition.content.length;
-  }
-
-  generateToc(metaIndex) {
-    if (this.toc.length > 0) {
-      this.docDefinition.content.splice(metaIndex, 0, this.getTocDef());
-    }
-
     return this.docDefinition.content.length;
   }
 
@@ -290,16 +262,20 @@ export default class SubmissionPDF {
     }
 
     if (Array.isArray(control.children)) {
-      for (const child of control.children) {
-        await this.generateControl(child, [...path, control.name]);
+      for (let index = 0; index < control.children.length; index++) {
+        const child = control.children[index];
+        await this.generateControl(
+          {
+            ...child,
+            index: `${control.index}${index + 1}.`,
+          },
+          [...path, control.name]
+        );
       }
     }
   }
 
   generatePageControl(control) {
-    // const { id, label } = control;
-    // this.toc.push({ id, label, lvl: LVL.page });
-
     const def = this.getPageDef(control);
     this.docDefinition.content.push(def);
 
@@ -307,11 +283,10 @@ export default class SubmissionPDF {
   }
 
   generateGroupControl(control) {
-    // const { id, label } = control;
-    // this.toc.push({ id, label, lvl: LVL.group });
-
-    const def = this.getGroupDef(control, '\n');
-    this.docDefinition.content.push(def);
+    const def = this.getGroupDef(control);
+    if (def) {
+      this.docDefinition.content.push(def);
+    }
 
     return this.docDefinition.content.length;
   }
@@ -324,7 +299,12 @@ export default class SubmissionPDF {
   }
 
   generateInstructionSplitControl(control) {
-    this.docDefinition.content.push({ text: control.label, headlineLevel: LVL.question });
+    if (control.label) {
+      this.docDefinition.content.push({
+        text: `${control.index} ${control.label}`,
+        headlineLevel: LVL.question,
+      });
+    }
 
     return this.docDefinition.content.length;
   }
@@ -490,43 +470,36 @@ export default class SubmissionPDF {
   /**************     Definitions for each controls     **************/
   /*******************************************************************/
 
-  getTocDef() {
-    return {
-      toc: {
-        title: {
-          text: '  Table of contents  ',
-          style: 'toc',
-        },
-      },
-    };
-  }
-
   getPageDef() {
     return {
       text: ' ',
       headlineLevel: LVL.page,
-      pageBreak: this.isFirstControl() ? undefined : 'before',
     };
   }
 
   getGroupDef(control) {
+    if (!control.label) {
+      return null;
+    }
+
     return {
-      text: control.label,
-      tocItem: true,
+      text: `${control.index} ${control.label}`,
       headlineLevel: LVL.group,
       style: 'group',
     };
   }
 
   getInstructionDef(control) {
-    const d = [
-      {
-        text: control.label,
+    const d = [];
+
+    if (control.label) {
+      d.push({
+        text: `${control.index} ${control.label}`,
         headlineLevel: LVL.question,
         style: 'question',
         color: 'black',
-      },
-    ];
+      });
+    }
 
     if (control.options.source) {
       const parsed = htmlToPdfMake(control.options.source);
@@ -537,10 +510,8 @@ export default class SubmissionPDF {
   }
 
   getQuestionDef(control) {
-    this.questionIndex += 1;
-
     return {
-      text: `${this.questionIndex}. ${control.label || control.hint}`,
+      text: `${control.index} ${control.label || control.hint || ''}`,
       style: 'question',
       headlineLevel: LVL.question,
     };
