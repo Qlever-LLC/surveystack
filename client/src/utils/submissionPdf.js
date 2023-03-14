@@ -7,6 +7,7 @@ import getProperty from 'lodash/get';
 import { fetchSubmissionUniqueItems } from './submissions';
 import { getPublicDownloadUrl } from '@/utils/resources';
 import htmlToPdfMake from 'html-to-pdfmake';
+import { cloneDeep } from 'lodash';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -59,7 +60,7 @@ const styles = {
   table: {
     headerColor: '#d1d5db',
     evenColor: '#f3f4f6',
-    oddColor: '#white',
+    oddColor: 'white',
   },
 };
 
@@ -98,9 +99,10 @@ function formatDate(date, format = 'MMM d, yyyy h:mm a') {
 export default class SubmissionPDF {
   survey;
   submission;
-  questionIndex;
   toc;
   docDefinition;
+  metaIndex;
+  questionIndex;
 
   constructor(survey, submission) {
     this.initialize();
@@ -129,6 +131,7 @@ export default class SubmissionPDF {
   }
 
   initialize() {
+    this.metaIndex = 0;
     this.questionIndex = 0;
     this.toc = [];
     this.docDefinition = {
@@ -136,7 +139,7 @@ export default class SubmissionPDF {
       styles,
       defaultStyle,
       images: {},
-      // pageBreakBefore: this.pageBreakBefore.bind(this),
+      pageBreakBefore: this.pageBreakBefore.bind(this),
     };
   }
 
@@ -166,7 +169,7 @@ export default class SubmissionPDF {
     this.initialize();
     this.generateInfo();
 
-    const metaIndex = this.generateMeta();
+    this.generateMeta();
     const revision = this.survey.revisions.find((revision) => revision.version === this.submission.meta.survey.version);
 
     if (revision && Array.isArray(revision.controls)) {
@@ -175,8 +178,9 @@ export default class SubmissionPDF {
       }
     }
 
-    this.generateToc(metaIndex);
-    console.log(77777, this.docDefinition);
+    console.log(77777, cloneDeep(this.docDefinition));
+    // this.generateToc(metaIndex);
+
     return pdfMake.createPdf(this.docDefinition);
   }
 
@@ -221,7 +225,7 @@ export default class SubmissionPDF {
       }
     );
 
-    return this.docDefinition.content.length;
+    this.metaIndex = this.docDefinition.content.length;
   }
 
   generateToc(metaIndex) {
@@ -236,6 +240,7 @@ export default class SubmissionPDF {
   /****************     Header/ Footer/ Page break     ***************/
   /*******************************************************************/
 
+  // eslint-disable-next-line no-unused-vars
   pageBreakBefore(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
     if (currentNode.headlineLevel === LVL.group) {
       return followingNodesOnPage.length <= 2;
@@ -292,8 +297,8 @@ export default class SubmissionPDF {
   }
 
   generatePageControl(control) {
-    const { id, label } = control;
-    this.toc.push({ id, label, lvl: LVL.page });
+    // const { id, label } = control;
+    // this.toc.push({ id, label, lvl: LVL.page });
 
     const def = this.getPageDef(control);
     this.docDefinition.content.push(def);
@@ -302,8 +307,8 @@ export default class SubmissionPDF {
   }
 
   generateGroupControl(control) {
-    const { id, label } = control;
-    this.toc.push({ id, label, lvl: LVL.group });
+    // const { id, label } = control;
+    // this.toc.push({ id, label, lvl: LVL.group });
 
     const def = this.getGroupDef(control, '\n');
     this.docDefinition.content.push(def);
@@ -426,7 +431,7 @@ export default class SubmissionPDF {
     const rows = [];
 
     const key = [...path, control.name, 'value'];
-    const answer = getProperty(this.submission.data, key) || [];
+    const answer = this.getArrayValue(getProperty(this.submission.data, key));
 
     for (const item of answer) {
       const row = [];
@@ -448,22 +453,22 @@ export default class SubmissionPDF {
       rows.push(row);
     }
 
-    if (answer.length === 0) {
+    if (rows.length === 0) {
       rows.push(this.getNoDataTableRowDef(cols.length));
     }
 
     this.docDefinition.content.push(this.getQuestionDef(control), {
       layout: {
-        hLineWidth: function (i, node) {
+        hLineWidth: function () {
           return 1;
         },
-        vLineWidth: function (i, node) {
+        vLineWidth: function () {
           return 0;
         },
         hLineColor: function (i, node) {
           return i === 0 || i === node.table.body.length ? styles.answer.color : styles.meta.color;
         },
-        fillColor: function (rowIndex, node, columnIndex) {
+        fillColor: function (rowIndex) {
           return rowIndex === 0
             ? styles.table.headerColor
             : rowIndex % 2 === 1
@@ -488,7 +493,10 @@ export default class SubmissionPDF {
   getTocDef() {
     return {
       toc: {
-        title: { text: '  Table of contents  ', style: 'toc' },
+        title: {
+          text: '  Table of contents  ',
+          style: 'toc',
+        },
       },
     };
   }
@@ -497,7 +505,7 @@ export default class SubmissionPDF {
     return {
       text: ' ',
       headlineLevel: LVL.page,
-      pageBreak: 'before',
+      pageBreak: this.isFirstControl() ? undefined : 'before',
     };
   }
 
@@ -775,6 +783,10 @@ export default class SubmissionPDF {
 
   getArrayValue(value) {
     return Array.isArray(value) ? value : value ? [value] : [];
+  }
+
+  isFirstControl() {
+    return this.metaIndex === this.docDefinition.content.length;
   }
 
   transformValueToLabel(value, source) {
