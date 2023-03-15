@@ -1235,7 +1235,7 @@ export const addNotes = async (req, res) => {
       },
     })
     .toArray();
-  const groupNames = groups.map((el) => el.name).join(',');
+  const groupNames = groups.map((el) => el.name).join(', ');
 
   //template:
   //note = `timestamp\nRemoved from ${groupNames} reason: ${note}\n\n`;
@@ -1245,24 +1245,12 @@ export const addNotes = async (req, res) => {
   const instanceNote = await db.collection('farmos-instance-notes').findOne({
     instanceName: instanceName,
   });
-  if (instanceNote) {
-    instanceNote.note += newNote;
-    await db.collection('farmos-instance-notes').updateOne(
-      { instanceName: instanceName },
-      {
-        $set: {
-          note: instanceNote.note,
-        },
-      }
-    );
-  } else {
-    const myobj = {
-      _id: new ObjectId(),
-      instanceName: instanceName,
-      note: newNote,
-    };
-    await db.collection('farmos-instance-notes').insertOne(myobj);
-  }
+
+  const noteToStore = instanceNote ? instanceNote.note + newNote : newNote;
+
+  await db
+    .collection('farmos-instance-notes')
+    .updateOne({ instanceName: instanceName }, { $set: { note: noteToStore } }, { upsert: true });
 
   return res.send({
     status: 'ok',
@@ -1290,38 +1278,22 @@ export const addSuperAdminNotes = async (req, res) => {
     throw boom.badData(`error: ${errors.join(',')}`);
   }
 
-  //template:
-  //note = `timestamp\nRemoved from ${groupNames} reason: ${note}\n\n`;
-  const timestamp = getCurrentDateAsString();
-  const newNote = `${timestamp}\nRemoved by Super Admin reason: ${note}\n\n`;
-
-  const instanceNote = await db.collection('farmos-instance-notes').findOne({
-    instanceName: instanceName,
-  });
   // if variable note is empty, empty the field note in the DB
-  if (instanceNote) {
-    if (note) {
-      instanceNote.note += '\n' + newNote;
-    } else {
-      instanceNote.note = '';
-    }
-    await db.collection('farmos-instance-notes').updateOne(
-      { instanceName: instanceName },
-      {
-        $set: {
-          note: instanceNote.note,
-        },
-      }
-    );
-  } else {
-    if (!note) {
-      const myobj = {
-        _id: new ObjectId(),
-        instanceName: instanceName,
-        note: [newNote],
-      };
-      await db.collection('farmos-instance-notes').insertOne(myobj);
-    }
+  if (note) {
+    //template:
+    //note = `timestamp\nRemoved from ${groupNames} reason: ${note}\n\n`;
+    const timestamp = getCurrentDateAsString();
+    const newNote = `${timestamp}\nRemoved by Super Admin reason: ${note}\n\n`;
+
+    const instanceNote = await db.collection('farmos-instance-notes').findOne({
+      instanceName: instanceName,
+    });
+
+    const noteToStore = instanceNote ? instanceNote.note + newNote : newNote;
+
+    await db
+      .collection('farmos-instance-notes')
+      .updateOne({ instanceName: instanceName }, { $set: { note: noteToStore } }, { upsert: true });
   }
 
   return res.send({
