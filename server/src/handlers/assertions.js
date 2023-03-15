@@ -266,3 +266,16 @@ export const checkFeatureToggledOn = (toggleName) => async (req, res, next) => {
     next(boom.notImplemented('this feature is turned off'));
   }
 };
+
+export const assertIsAtLeastOnceOwner = async (req, res, next) => {
+  const userId = res.locals.auth.user._id;
+  const ownership = await db.collection('farmos-instances').findOne({
+    _id: new ObjectId(userId),
+    owner: true,
+  });
+  if (!ownership) {
+    throw boom.unauthorized();
+  }
+
+  next();
+};

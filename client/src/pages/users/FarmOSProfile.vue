@@ -95,10 +95,19 @@
 </template>
 
 <script>
+import api from '@/services/api.service';
+
 export default {
   data() {
     return {
       email: '',
+      instances: [],
+      /*
+        [
+          {instanceName: "instanceName", isOwnerOfInstance: true, groups: ["name", "name"], otherUsers: ["email", "email"]}
+          {instanceName: "instanceName", isOwnerOfInstance: false, groups: [], otherUsers: []}
+        ]
+      */
     };
   },
   computed: {
@@ -109,9 +118,13 @@ export default {
       return this.$store.getters['auth/user'];
     },
   },
-  created() {
+  async created() {
     if (this.user) {
       this.email = this.user.email;
+      const userId = user._id;
+      const { data } = await api.get(`/ownership/${userId}`);
+      console.log(data);
+      this.instances = data;
     }
   },
 };

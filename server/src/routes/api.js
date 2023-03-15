@@ -35,6 +35,7 @@ import {
   assertHasIds,
   validateBulkReassignRequestBody,
   checkFeatureToggledOn,
+  assertIsAtLeastOnceOwner,
 } from '../handlers/assertions';
 
 import { catchErrors } from '../handlers/errorHandlers';
@@ -192,6 +193,12 @@ router.delete(
 
 /** Users */
 router.get('/owner/:userId', catchErrors(userController.isUserOwner));
+router.get(
+  '/ownership/:userId',
+  assertIsAtLeastOnceOwner,
+  catchErrors(userController.getOwnership)
+);
+
 router.get('/users', assertIsSuperAdmin, catchErrors(userController.getUsers));
 router.get('/users/:id', catchErrors(userController.getUser));
 router.post('/users', [assertNameNotEmpty], catchErrors(userController.createUser));

@@ -67,6 +67,17 @@ const isUserOwner = async (req, res) => {
   return res.send(response);
 };
 
+// TODO getOwnership
+/*
+  [
+    {instanceName: "instanceName", isOwnerOfInstance: true, groups: ["name", "name"], otherUsers: ["email", "email"]}
+    {instanceName: "instanceName", isOwnerOfInstance: false, groups: [], otherUsers: []}
+  ]
+*/
+const getOwnership = async (req, res) => {
+  const { userId } = req.params;
+};
+
 const createUser = async (req, res) => {
   const entity = req.body;
 
@@ -173,6 +184,7 @@ export default {
   getUsers,
   getUser,
   isUserOwner,
+  getOwnership,
   createUser,
   updateUser,
   deleteUser,
