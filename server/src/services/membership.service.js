@@ -105,7 +105,10 @@ export const getMemberships = async ({
 
   // FarmOS integration settings for coffee-shop
   if (queryParam(coffeeShop)) {
-    const farmosCoffeeshop = await db.collection('farmos-coffeeshop').find().toArray();
+    const farmosCoffeeshop = await db
+      .collection('farmos-coffeeshop')
+      .find({ group: { $in: entities.map((item) => item.group._id) } })
+      .toArray();
     const enableIds = farmosCoffeeshop.map((item) => String(item.group));
 
     entities.forEach((entity, index) => {
