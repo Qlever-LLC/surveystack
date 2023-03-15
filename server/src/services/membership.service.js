@@ -47,9 +47,6 @@ export const getMemberships = async ({
   if (queryParam(populate) || queryParam(coffeeShop)) {
     pipeline.push(...createPopulationPipeline());
   }
-  if (queryParam(coffeeShop)) {
-    pipeline.push(...createGroupCoffeeShopPipeline());
-  }
 
   const entities = await db.collection(col).aggregate(pipeline).toArray();
 
@@ -106,6 +103,18 @@ export const getMemberships = async ({
     return [...admins, ...otherMembers];
   }
 
+  // FarmOS integration settings for coffee-shop
+  if (queryParam(coffeeShop)) {
+    const farmosCoffeeshop = await db.collection('farmos-coffeeshop').find().toArray();
+    const enableIds = farmosCoffeeshop.map((item) => String(item.group));
+
+    entities.forEach((entity, index) => {
+      entities[index].group.coffeeShopSettings = {
+        groupHasCoffeeshopAccess: enableIds.includes(String(entity.group._id)),
+      };
+    });
+  }
+
   return entities;
 };
 
@@ -152,46 +161,6 @@ export const createPopulationPipeline = () => {
 
   return pipeline;
 };
-
-// FarmOS integration settings
-export const createGroupCoffeeShopPipeline = () => [
-  {
-    $lookup: {
-      from: 'farmos-coffeeshop',
-      let: { groupId: '$group._id' },
-      pipeline: [{ $match: { $expr: { $eq: ['$group', '$$groupId'] } } }],
-      as: 'd1',
-    },
-  },
-  {
-    $lookup: {
-      from: 'farmos-group-settings',
-      let: { groupId: '$group._id' },
-      pipeline: [
-        {
-          $match: {
-            $and: [
-              { $expr: { $eq: ['$groupId', '$$groupId'] } },
-              { allowSubgroupsToJoinCoffeeShop: true },
-            ],
-          },
-        },
-      ],
-      as: 'd2',
-    },
-  },
-  {
-    $addFields: {
-      'group.coffeeShopSettings.groupHasCoffeeshopAccess': {
-        $cond: [{ $gt: [{ $size: '$d1' }, 0] }, true, false],
-      },
-      'group.coffeeShopSettings.allowSubgroupsToJoinCoffeeShop': {
-        $cond: [{ $gt: [{ $size: '$d2' }, 0] }, true, false],
-      },
-    },
-  },
-  { $project: { d1: 0, d2: 0 } },
-];
 
 export const addMembership = async ({ user, group, role }) => {
   const entity = { user, group, role };
