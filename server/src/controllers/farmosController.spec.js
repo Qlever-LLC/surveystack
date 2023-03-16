@@ -520,7 +520,7 @@ describe('farmos-controller', () => {
     await superAdminCreateFarmOsInstance(
       {
         body,
-        headers: origin,
+        headers: { origin: origin },
       },
       {
         send,
@@ -552,7 +552,7 @@ describe('farmos-controller', () => {
     await superAdminCreateFarmOsInstance(
       {
         body,
-        headers: origin,
+        headers: { origin: origin },
       },
       {
         send,
@@ -624,7 +624,7 @@ describe('farmos-controller', () => {
       membersBefore.flatMap((m) => m.connectedFarms.flatMap((c) => c.instanceName))
     );
     res = mockRes(admin.user._id);
-    req = { params: { id: member.membership._id }, headers: origin };
+    req = { params: { id: member.membership._id }, headers: { origin: origin } };
 
     await membershipController.deleteMembership(req, res, undefined, async (membership) => {
       await removeMembershipHook(membership, origin);
