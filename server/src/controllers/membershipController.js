@@ -271,7 +271,8 @@ const deleteMembership = async (req, res, _, hook) => {
   }
 
   try {
-    await hook(membership); // hook before removal
+    const { origin } = req.headers;
+    await hook(membership, origin); // hook before removal
 
     let r = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
     assert.equal(1, r.deletedCount);
