@@ -53,6 +53,8 @@ process.env.FARMOS_CALLBACK_KEY = 'x';
 process.env.FARMOS_AGGREGATOR_URL = 'x';
 process.env.FARMOS_AGGREGATOR_APIKEY = 'x';
 
+const origin = 'url';
+
 function mockRes(userId) {
   return {
     data: null,
@@ -118,9 +120,8 @@ const createFarmOSDomain = async (gs) => {
       await mapFarmOSInstanceToUser(user.user._id, farm, true);
     }
   }
-
   for (const farm of _.uniq(farms)) {
-    await addFarmToSurveystackGroupAndSendNotification(farm, group._id);
+    await addFarmToSurveystackGroupAndSendNotification(farm, group._id, origin);
   }
 
   return res;
@@ -180,8 +181,8 @@ describe('farmos-controller', () => {
     const user1 = await parentGroup.createUserMember();
     await mapFarmOSInstanceToUser(user1.user._id, instanceName, true);
     const parentGroupId = parentGroup._id;
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId);
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, groupAA._id);
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, groupAA._id, origin);
     const affectedGroupIds = [parentGroupId, groupAA._id];
 
     const req = createReq({
@@ -215,8 +216,8 @@ describe('farmos-controller', () => {
     const user1 = await parentGroup.createUserMember();
     await mapFarmOSInstanceToUser(user1.user._id, instanceName, true);
     const parentGroupId = parentGroup._id;
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId);
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, groupAA._id);
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, groupAA._id, origin);
     const affectedGroupIds = [parentGroupId, groupAA._id];
 
     const res = await createRes({ status: 'ok' });
@@ -261,8 +262,8 @@ describe('farmos-controller', () => {
     const user1 = await parentGroup.createUserMember();
     await mapFarmOSInstanceToUser(user1.user._id, instanceName, true);
     const parentGroupId = parentGroup._id;
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId);
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, groupAA._id);
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, groupAA._id, origin);
     const affectedGroupIds = [parentGroupId, groupAA._id, extGroup._id];
 
     const req = createReq({
@@ -291,7 +292,7 @@ describe('farmos-controller', () => {
     const superAdmin = await parentGroup.createUserMember();
     await mapFarmOSInstanceToUser(superAdmin.user._id, instanceName, true);
     const parentGroupId = parentGroup._id;
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId);
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
 
     const req = createReq({
       body: {
@@ -318,7 +319,7 @@ describe('farmos-controller', () => {
     const superAdmin = await parentGroup.createUserMember();
     await mapFarmOSInstanceToUser(superAdmin.user._id, instanceName, true);
     const parentGroupId = parentGroup._id;
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId);
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
 
     const res = await createRes({ status: 'ok' });
     const req1 = createReq({
@@ -519,6 +520,7 @@ describe('farmos-controller', () => {
     await superAdminCreateFarmOsInstance(
       {
         body,
+        headers: origin,
       },
       {
         send,
@@ -550,6 +552,7 @@ describe('farmos-controller', () => {
     await superAdminCreateFarmOsInstance(
       {
         body,
+        headers: origin,
       },
       {
         send,
@@ -621,10 +624,10 @@ describe('farmos-controller', () => {
       membersBefore.flatMap((m) => m.connectedFarms.flatMap((c) => c.instanceName))
     );
     res = mockRes(admin.user._id);
-    req = { params: { id: member.membership._id } };
+    req = { params: { id: member.membership._id }, headers: origin };
 
     await membershipController.deleteMembership(req, res, undefined, async (membership) => {
-      await removeMembershipHook(membership);
+      await removeMembershipHook(membership, origin);
     });
 
     res = mockRes(member.user._id);

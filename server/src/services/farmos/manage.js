@@ -357,12 +357,14 @@ export const getSuperAllFarmosNotes = async () => {
 export const moveFarmFromMultGroupToMultSurveystackGroupAndSendNotification = async (
   instanceName,
   oldGroupIds,
-  newGroupIds
+  newGroupIds,
+  origin
 ) => {
   await sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification(
     instanceName,
     oldGroupIds,
-    newGroupIds
+    newGroupIds,
+    origin
   );
   for (const oldGroupId of oldGroupIds) {
     await removeFarmFromSurveystackGroup(instanceName, oldGroupId);
@@ -372,8 +374,12 @@ export const moveFarmFromMultGroupToMultSurveystackGroupAndSendNotification = as
   }
 };
 
-export const addFarmToSurveystackGroupAndSendNotification = async (instanceName, groupId) => {
-  await sendUserAddFarmToSurveystackGroupNotification(instanceName, groupId);
+export const addFarmToSurveystackGroupAndSendNotification = async (
+  instanceName,
+  groupId,
+  origin
+) => {
+  await sendUserAddFarmToSurveystackGroupNotification(instanceName, groupId, origin);
   return await addFarmToSurveystackGroup(instanceName, groupId);
 };
 
@@ -381,10 +387,11 @@ export const createFarmOSInstanceForUserAndGroup = async (
   userId,
   groupId,
   instanceName,
-  userIsOwner
+  userIsOwner,
+  origin
 ) => {
   await mapFarmOSInstanceToUser(userId, instanceName, userIsOwner);
-  return await addFarmToSurveystackGroupAndSendNotification(instanceName, groupId);
+  return await addFarmToSurveystackGroupAndSendNotification(instanceName, groupId, origin);
 };
 
 const addFarmToSurveystackGroup = async (instanceName, groupId) => {
@@ -418,8 +425,12 @@ const addFarmToSurveystackGroup = async (instanceName, groupId) => {
   return { _id };
 };
 
-export const removeFarmFromSurveystackGroupAndSendNotification = async (instanceName, groupId) => {
-  await sendUserRemoveFarmFromSurveystackGroupNotification(instanceName, groupId);
+export const removeFarmFromSurveystackGroupAndSendNotification = async (
+  instanceName,
+  groupId,
+  origin
+) => {
+  await sendUserRemoveFarmFromSurveystackGroupNotification(instanceName, groupId, origin);
   return await removeFarmFromSurveystackGroup(instanceName, groupId);
 };
 
@@ -459,7 +470,8 @@ const extractGroupNameForMailing = async (groupId) => {
 export const sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification = async (
   instanceName,
   oldGroupIds,
-  newGroupIds
+  newGroupIds,
+  origin
 ) => {
   const userEmail = await extractUserMailForMailing(instanceName);
 
@@ -480,6 +492,7 @@ export const sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification = a
     subject: 'Your instance has been moved to another group',
     text: `Hello,
 
+    ${origin}
     This email is to inform you that your farmOS instance ${instanceName} has been removed from ${oldGroupNames} and added to ${newGroupNames} in SurveyStack.
     Please reach out to your group admin or info@our-sci.net if you have any questions.  
 
@@ -487,15 +500,20 @@ export const sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification = a
   });
 };
 
-export const sendUserAddFarmToSurveystackGroupNotification = async (instanceName, groupId) => {
+export const sendUserAddFarmToSurveystackGroupNotification = async (
+  instanceName,
+  groupId,
+  origin
+) => {
   const groupName = await extractGroupNameForMailing(groupId);
 
-  await sendAddNotification(instanceName, groupName);
+  await sendAddNotification(instanceName, groupName, origin);
 };
 
 export const sendUserAddFarmToMultipleSurveystackGroupNotification = async (
   instanceName,
-  groupIds
+  groupIds,
+  origin
 ) => {
   const groupsName = [];
   for (const groupId of groupIds) {
@@ -503,10 +521,10 @@ export const sendUserAddFarmToMultipleSurveystackGroupNotification = async (
   }
   const groupsNameConcat = groupsName.join(', ');
 
-  await sendAddNotification(instanceName, groupsNameConcat);
+  await sendAddNotification(instanceName, groupsNameConcat, origin);
 };
 
-const sendAddNotification = async (instanceName, groupName) => {
+const sendAddNotification = async (instanceName, groupName, origin) => {
   const userEmail = await extractUserMailForMailing(instanceName);
 
   await mailService.send({
@@ -514,6 +532,7 @@ const sendAddNotification = async (instanceName, groupName) => {
     subject: 'Your instance has been added to a group',
     text: `Hello,
 
+    ${origin}
     This email is to inform you that your farmOS instance ${instanceName} has been added to ${groupName} in SurveyStack.
     Please reach out to your group admin or info@our-sci.net if you have any questions.  
 
@@ -521,15 +540,20 @@ const sendAddNotification = async (instanceName, groupName) => {
   });
 };
 
-const sendUserRemoveFarmFromSurveystackGroupNotification = async (instanceName, groupId) => {
+const sendUserRemoveFarmFromSurveystackGroupNotification = async (
+  instanceName,
+  groupId,
+  origin
+) => {
   const groupName = await extractGroupNameForMailing(groupId);
 
-  await sendRemoveNotification(instanceName, groupName);
+  await sendRemoveNotification(instanceName, groupName, origin);
 };
 
 export const sendUserRemoveFarmFromMultipleSurveystackGroupsNotification = async (
   instanceName,
-  groupIds
+  groupIds,
+  origin
 ) => {
   const groupsName = [];
   for (const groupId of groupIds) {
@@ -537,10 +561,10 @@ export const sendUserRemoveFarmFromMultipleSurveystackGroupsNotification = async
   }
   const groupsNameConcat = groupsName.join(', ');
 
-  await sendRemoveNotification(instanceName, groupsNameConcat);
+  await sendRemoveNotification(instanceName, groupsNameConcat, origin);
 };
 
-const sendRemoveNotification = async (instanceName, groupName) => {
+const sendRemoveNotification = async (instanceName, groupName, origin) => {
   const userEmail = await extractUserMailForMailing(instanceName);
 
   await mailService.send({
@@ -548,6 +572,7 @@ const sendRemoveNotification = async (instanceName, groupName) => {
     subject: 'Your instance has been removed from a group',
     text: `Hello,
 
+    ${origin}
     This email is to inform you that your farmOS instance ${instanceName} has been removed from the group ${groupName} in SurveyStack. 
     Please reach out to your group admin or info@our-sci.net if you have any questions.
 

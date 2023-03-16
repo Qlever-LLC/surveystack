@@ -239,9 +239,9 @@ router.put(
 );
 router.delete(
   '/memberships/:id',
-  catchErrors(membershipController.deleteMembership, async (membership) => {
+  catchErrors(membershipController.deleteMembership, async (membership, origin) => {
     try {
-      await farmosController.removeMembershipHook(membership);
+      await farmosController.removeMembershipHook(membership, origin);
     } catch (error) {
       // log the error, but don't escalate as it is not critical
       console.log(error);
