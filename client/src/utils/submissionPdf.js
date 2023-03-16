@@ -14,39 +14,22 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 //   const { data } = await api.getProperty(`/submissions/${id}?pure=1`);
 // }
 
-const styles = {
-  header: {
-    fontSize: 20,
-    bold: true,
-    alignment: 'center',
-    margin: [0, 0, 0, 12],
-  },
-  meta: {
-    fontSize: 8,
-    color: '#9ca3af',
-    margin: [0, 0, 0, 48],
-  },
-  group: {
-    fontSize: 14,
-    bold: true,
-    alignment: 'center',
-    margin: [0, 0, 0, 16],
-  },
-  question: {
-    bold: true,
-    color: 'blue',
-    margin: [0, 0, 0, 8],
-  },
-  answer: {
-    color: '#1e293b',
-  },
-  link: {
-    color: 'blue',
-    decoration: 'underline',
-  },
-  code: {
-    background: '#f5f5f5',
-  },
+const fontSizes = {
+  xxl: 24,
+  xl: 20,
+  lg: 18,
+  md: 16,
+  sm: 14,
+  xs: 12,
+  xxs: 8,
+};
+
+const colors = {
+  black: 'black',
+  gray: '#9ca3af',
+  darkGray: '#374151',
+  blue: '#1e3a8a',
+  code: '#f5f5f5',
   table: {
     headerColor: '#d1d5db',
     evenColor: '#f3f4f6',
@@ -54,10 +37,58 @@ const styles = {
   },
 };
 
+const margins = {
+  xl: [0, 0, 0, 48],
+  lg: [0, 0, 0, 24],
+  md: [0, 0, 0, 16],
+  sm: [0, 0, 0, 12],
+  xs: [0, 0, 0, 8],
+};
+
+const styles = {
+  header: {
+    fontSize: fontSizes.xxl,
+    bold: true,
+    alignment: 'center',
+    margin: margins.sm,
+  },
+  meta: {
+    fontSize: fontSizes.xxs,
+    color: colors.gray,
+    margin: margins.xl,
+  },
+  section: {
+    fontSize: fontSizes.xl,
+    bold: true,
+    margin: margins.xs,
+  },
+  label: {
+    bold: true,
+    margin: margins.xs,
+    italic: true,
+  },
+  hint: {
+    color: colors.darkGray,
+    margin: margins.xs,
+    italic: true,
+  },
+  text: {
+    margin: margins.xs,
+  },
+  link: {
+    color: colors.blue,
+    decoration: 'underline',
+  },
+  code: {
+    fontSize: fontSizes.xxs,
+    color: colors.black,
+    margin: [16, 4, 16, 4],
+  },
+};
+
 const defaultStyle = {
-  fontSize: 12,
-  bold: false,
-  color: 'black',
+  fontSize: fontSizes.xs,
+  color: colors.black,
 };
 
 const SVG = {
@@ -72,9 +103,8 @@ const SVG = {
 };
 
 const LVL = {
-  page: 1,
-  group: 2,
-  question: 3,
+  section: 1,
+  block: 2,
 };
 
 function getControlSvg(multiple, checked) {
@@ -83,7 +113,216 @@ function getControlSvg(multiple, checked) {
 
 function formatDate(date, format = 'MMM d, yyyy h:mm a') {
   const parsedDate = parseISO(date);
-  return dateFnsFormat(isValid(parsedDate) ? parsedDate : new Date(), format);
+  return isValid(parsedDate) && parsedDate.toISOString() === date ? dateFnsFormat(parsedDate, format) : date;
+}
+
+function isRootControl(control) {
+  return control.index.length === 1;
+}
+
+function isContainerControl(control) {
+  return control.type === 'page' || control.type === 'group';
+}
+
+function transformValueToLabel(value, source) {
+  if (Array.isArray(value)) {
+    return value.flatMap((item) => transformValueToLabel(item, source));
+  }
+
+  const match = source.find((option) => option.value === value);
+  return match ? match.label : value;
+}
+
+function toArray(value) {
+  return Array.isArray(value) ? value : value ? [value] : [];
+}
+
+function getSectionDef(index, text) {
+  const fontSize = index.length === 1 ? fontSizes.md : index.length === 2 ? fontSizes.sm : fontSizes.xs;
+
+  return {
+    text: `${index.join('.')} ${text || ''}`,
+    headlineLevel: LVL.section,
+    style: 'section',
+    fontSize,
+  };
+}
+
+function getAnswerDef(answer, placeholder = 'No answer') {
+  const value = toArray(answer);
+
+  return {
+    text: value.join(', ') || placeholder,
+    style: 'text',
+    color: value.length > 0 ? colors.black : colors.gray,
+  };
+}
+
+function getCellDef(answer) {
+  return {
+    ...getAnswerDef(answer, ' '),
+    fontSize: fontSizes.xs,
+  };
+}
+
+function getInstructionDef(control) {
+  return control.options.source ? htmlToPdfMake(control.options.source) : [];
+}
+
+function getSelectItemDef(option, multiple, checked) {
+  return {
+    table: {
+      widths: [12, 'auto'],
+      body: [
+        [
+          {
+            svg: getControlSvg(multiple, checked),
+            fit: [16, 16],
+          },
+          getAnswerDef(option.label),
+        ],
+      ],
+    },
+    layout: 'noBorders',
+  };
+}
+
+function getSelectDef(answer, source, cols = 1, multiple) {
+  const value = toArray(answer);
+  const options = [...source];
+
+  const custom = value.find((val) => val && source.every((item) => item.value !== val));
+  if (custom) {
+    options.push({ value: custom, label: custom });
+  }
+
+  const group = [];
+  if (cols === 1) {
+    group.push(options);
+  } else {
+    options.forEach((option, index) => {
+      const i = index % cols;
+      if (!Array.isArray(group[i])) {
+        group[i] = [];
+      }
+      group[i].push(option);
+    });
+  }
+
+  const isChecked = (option) => value.includes(option.value);
+
+  return {
+    columns: group.map((columnOptions) =>
+      columnOptions.map((option) => getSelectItemDef(option, multiple, isChecked(option)))
+    ),
+  };
+}
+
+function getDropdownDef(answer, source, cols = 1) {
+  const value = toArray(answer);
+  const options = [...source];
+
+  const custom = value.find((val) => val && source.every((item) => item.value !== val));
+  if (custom) {
+    options.push({ value: custom, label: custom });
+  }
+
+  const group = [];
+  if (cols === 1) {
+    group.push(options);
+  } else {
+    const countPerCol = Math.ceil(options.length / cols);
+    options.forEach((option, index) => {
+      const i = Math.floor(index / countPerCol);
+      if (!Array.isArray(group[i])) {
+        group[i] = [];
+      }
+      group[i].push(option);
+    });
+  }
+
+  const isChecked = (option) => value.includes(option.value);
+
+  return {
+    columns: group.map((columnOptions) => ({
+      ul: columnOptions.map((option) => {
+        const d = getAnswerDef(option.label);
+        if (isChecked(option)) {
+          d.decoration = 'underline';
+        }
+        return d;
+      }),
+    })),
+  };
+}
+
+function getFileDef(answer, multiple, preview) {
+  const value = toArray(answer);
+  if (value.length === 0) {
+    return getAnswerDef(value);
+  }
+
+  const def = { ul: [] };
+  const images = {};
+
+  value.forEach((image) => {
+    const ext = (image.split('.').pop() || '').toLowerCase();
+    const isImage = ['png', 'jpg', 'jpeg'].includes(ext);
+    const url = getPublicDownloadUrl(image);
+    const stack = [
+      {
+        text: image,
+        link: url,
+        style: 'link',
+      },
+    ];
+    if (isImage && preview) {
+      images[image] = url;
+      stack.push({ image, fit: [300, 300], margin: [0, 8, 0, 8] });
+    }
+    def.ul.push({ stack });
+  });
+
+  return {
+    images,
+    def: multiple ? def : def.ul[0],
+  };
+}
+
+function getGeoJsonDef(answer) {
+  if (!answer) {
+    return getAnswerDef(answer);
+  }
+
+  return {
+    table: {
+      body: [
+        [
+          {
+            text: JSON.stringify(answer, null, 2),
+            style: 'code',
+            preserveLeadingSpaces: true,
+          },
+        ],
+      ],
+    },
+    layout: 'noBorders',
+    fillColor: colors.code,
+  };
+}
+
+function getEmptyRowDef(cols) {
+  const noDataCell = {
+    ...getCellDef(null),
+    colSpan: cols,
+    alignment: 'center',
+    margin: [0, 4, 0, 4],
+  };
+  const emptyCells = Array(cols)
+    .fill(0)
+    .map(() => '');
+
+  return [noDataCell, ...emptyCells].slice(0, -1);
 }
 
 export default class SubmissionPDF {
@@ -98,18 +337,6 @@ export default class SubmissionPDF {
     this.submission = submission;
   }
 
-  set survey(val) {
-    this.survey = val;
-  }
-
-  set submission(val) {
-    this.submission = val;
-  }
-
-  set docDefinition(val) {
-    this.docDefinition = val;
-  }
-
   initialize() {
     this.metaIndex = 0;
     this.docDefinition = {
@@ -117,45 +344,43 @@ export default class SubmissionPDF {
       styles,
       defaultStyle,
       images: {},
+      // TODO: - After section implementation
       // pageBreakBefore: this.pageBreakBefore.bind(this),
     };
   }
 
   async download() {
-    try {
-      const maker = await this.generate();
+    const maker = await this.generate();
+    if (maker) {
       maker.download();
-    } catch (e) {
-      console.error('Failed to generate PDF', e);
     }
   }
 
   async print() {
-    try {
-      const maker = await this.generate();
+    const maker = await this.generate();
+    if (maker) {
       maker.print();
-    } catch (e) {
-      console.error('Failed to generate PDF', e);
     }
   }
 
   async generate() {
     if (!this.survey || !this.submission) {
-      return;
+      return null;
     }
 
     this.initialize();
     this.generateInfo();
-
     this.generateMeta();
+
     const revision = this.survey.revisions.find((revision) => revision.version === this.submission.meta.survey.version);
 
     if (revision && Array.isArray(revision.controls)) {
-      for (let index = 0; index < revision.controls.length; index++) {
-        const control = revision.controls[index];
+      const visibleControls = revision.controls.filter((control) => !getProperty(control, 'options.hidden', false));
+      for (let index = 0; index < visibleControls.length; index += 1) {
+        const control = visibleControls[index];
         await this.generateControl({
           ...control,
-          index: `${index + 1}.`,
+          index: [index + 1],
         });
       }
     }
@@ -178,7 +403,7 @@ export default class SubmissionPDF {
 
   generateMeta() {
     const { dateSubmitted, dateModified, dateCreated } = this.submission.meta;
-    const metaDate = formatDate(dateSubmitted || dateModified || dateCreated);
+    const metaDate = formatDate(dateSubmitted || dateModified || dateCreated || new Date().toISOString());
 
     this.docDefinition.content.push(
       {
@@ -214,11 +439,11 @@ export default class SubmissionPDF {
 
   // eslint-disable-next-line no-unused-vars
   pageBreakBefore(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
-    if (currentNode.headlineLevel === LVL.group) {
+    if (currentNode.headlineLevel === LVL.section) {
       return followingNodesOnPage.length <= 2;
     }
 
-    if (currentNode.headlineLevel === LVL.question) {
+    if (currentNode.headlineLevel === LVL.block) {
       return followingNodesOnPage.length <= 1;
     }
 
@@ -230,203 +455,138 @@ export default class SubmissionPDF {
   /*******************************************************************/
 
   async generateControl(control, path = []) {
-    const hidden = getProperty(control, 'options.hidden', false);
-    if (hidden) {
-      return;
-    }
+    // Group, Page
+    if (isContainerControl(control)) {
+      this.docDefinition.content.push(getSectionDef(control.index, control.label));
 
-    const generator = {
-      page: this.generatePageControl,
-      group: this.generateGroupControl,
-      instructions: this.generateInstructionControl,
-      instructionsImageSplit: this.generateInstructionSplitControl,
-      string: this.generateNormalControl,
-      number: this.generateNormalControl,
-      date: this.generateDateControl,
-      location: this.generateLocationControl,
-      selectSingle: this.generateRadioControl,
-      selectMultiple: this.generateCheckControl,
-      ontology: this.generateDropdownControl,
-      matrix: this.generateMatrixControl,
-      image: this.generateFileControl,
-      file: this.generateFileControl,
-      geoJSON: this.generateGeoJsonControl,
-    }[control.type];
-
-    if (generator) {
-      await generator.bind(this)(control, path);
-
-      if (!['page', 'group'].includes(control.type)) {
-        this.docDefinition.content.push('\n\n');
+      if (!Array.isArray(control.children)) {
+        return;
       }
-    }
 
-    if (Array.isArray(control.children)) {
-      for (let index = 0; index < control.children.length; index++) {
-        const child = control.children[index];
+      const visibleChildren = control.children.filter((child) => !getProperty(child, 'options.hidden', false));
+
+      for (let index = 0; index < visibleChildren.length; index += 1) {
+        const child = visibleChildren[index];
         await this.generateControl(
           {
             ...child,
-            index: `${control.index}${index + 1}.`,
+            index: [...control.index, index + 1],
           },
           [...path, control.name]
         );
       }
-    }
-  }
 
-  generatePageControl(control) {
-    const def = this.getPageDef(control);
-    this.docDefinition.content.push(def);
-
-    return this.docDefinition.content.length;
-  }
-
-  generateGroupControl(control) {
-    const def = this.getGroupDef(control);
-    if (def) {
-      this.docDefinition.content.push(def);
-    }
-
-    return this.docDefinition.content.length;
-  }
-
-  generateInstructionControl(control) {
-    const defs = this.getInstructionDef(control);
-    this.docDefinition.content.push(...defs);
-
-    return this.docDefinition.content.length;
-  }
-
-  generateInstructionSplitControl(control) {
-    if (control.label) {
-      this.docDefinition.content.push({
-        text: `${control.index} ${control.label}`,
-        headlineLevel: LVL.question,
-      });
-    }
-
-    return this.docDefinition.content.length;
-  }
-
-  generateNormalControl(control, path = []) {
-    const value = this.getAnswer(control, path);
-    this.docDefinition.content.push(this.getQuestionDef(control), this.getTextDef(value));
-
-    return this.docDefinition.content.length;
-  }
-
-  generateDateControl(control, path = []) {
-    const value = this.getAnswer(control, path);
-    this.docDefinition.content.push(this.getQuestionDef(control), this.getDateDef(value));
-
-    return this.docDefinition.content.length;
-  }
-
-  generateLocationControl(control, path = []) {
-    const key = [...path, control.name, 'value', 'geometry', 'coordinates'];
-    const value = getProperty(this.submission.data, key);
-    this.docDefinition.content.push(this.getQuestionDef(control), this.getTextDef(value));
-
-    return this.docDefinition.content.length;
-  }
-
-  async generateRadioControl(control, path = []) {
-    const value = this.getAnswer(control, path);
-    const source = await this.getControlSource(control);
-    const layout = this.getControlLayout(control);
-
-    this.docDefinition.content.push(this.getQuestionDef(control));
-    if (layout.valuesOnly) {
-      const answer = this.transformValueToLabel(value, source);
-      this.docDefinition.content.push(this.getTextDef(answer));
-    } else {
-      this.docDefinition.content.push(this.getSelectDef(value, source, false, layout.columnCount));
-    }
-    this.docDefinition.content.push();
-
-    return this.docDefinition.content.length;
-  }
-
-  async generateCheckControl(control, path = []) {
-    const value = this.getAnswer(control, path);
-    const source = await this.getControlSource(control);
-    const layout = this.getControlLayout(control);
-
-    this.docDefinition.content.push(this.getQuestionDef(control));
-    if (layout.valuesOnly) {
-      const answer = this.transformValueToLabel(value, source);
-      this.docDefinition.content.push(this.getTextDef(answer));
-    } else {
-      this.docDefinition.content.push(this.getSelectDef(value, source, true, layout.columnCount));
-    }
-
-    return this.docDefinition.content.length;
-  }
-
-  async generateDropdownControl(control, path = []) {
-    const value = this.getAnswer(control, path);
-    const source = await this.getControlSource(control);
-    const layout = this.getControlLayout(control);
-
-    this.docDefinition.content.push(this.getQuestionDef(control));
-    if (layout.valuesOnly) {
-      const answer = this.transformValueToLabel(value, source);
-      this.docDefinition.content.push(this.getTextDef(answer));
-    } else if (layout.usingControl) {
-      this.docDefinition.content.push(
-        this.getSelectDef(value, source, control.options.hasMultipleSelections, layout.columnCount)
-      );
-    } else {
-      this.docDefinition.content.push(this.getDropdownDef(value, source, layout.columnCount));
-    }
-
-    return this.docDefinition.content.length;
-  }
-
-  generateFileControl(control, path = []) {
-    const value = this.getAnswer(control, path);
-    const multiple = getProperty(control, 'options.source.allowMultiple', false);
-    const layout = this.getControlLayout(control);
-
-    this.docDefinition.content.push(this.getQuestionDef(control), this.getFileDef(value, multiple, layout.preview));
-
-    return this.docDefinition.content.length;
-  }
-
-  generateGeoJsonControl(control, path = []) {
-    const value = this.getAnswer(control, path);
-    this.docDefinition.content.push(this.getQuestionDef(control), this.getGeoJsonDef(value));
-
-    return this.docDefinition.content.length;
-  }
-
-  async generateMatrixControl(control, path = []) {
-    const cols = getProperty(control, ['options', 'source', 'content']);
-    if (!Array.isArray(cols)) {
       return;
     }
 
-    const headers = cols.map((header) => this.getTextDef(header.label || header.value, true));
+    // Root
+    if (isRootControl(control)) {
+      this.docDefinition.content.push(getSectionDef(control.index));
+    }
+
+    const { name, label, type, hint, moreInfo, options } = control;
+
+    // label
+    if (label) {
+      this.docDefinition.content.push({
+        text: label,
+        style: 'label',
+        headlineLevel: LVL.block,
+      });
+    }
+
+    // hint
+    if ((type !== 'instructions' || type !== 'instructionsImageSplit') && hint) {
+      this.docDefinition.content.push({
+        text: hint,
+        style: 'hint',
+      });
+    }
+
+    // Answer / Content
+    const answerKey = [...path, name, 'value'];
+    if (type === 'location') {
+      answerKey.push('geometry', 'coordinates');
+    }
+    let answer = getProperty(this.submission.data, answerKey);
+    if (type === 'date') {
+      answer = formatDate(answer);
+    }
+
+    if (type === 'instructions') {
+      // Instructions
+      this.docDefinition.content.push(getInstructionDef(control));
+    } else if (type === 'selectSingle' || type === 'selectMultiple' || type === 'ontology') {
+      // Selections
+      const source = await this.getControlSource(control);
+      const layout = this.getControlLayout(control);
+      const multiple = type === 'selectMultiple' || (type === 'ontology' && options.hasMultipleSelections);
+
+      if (layout.valuesOnly) {
+        const value = transformValueToLabel(answer, source);
+        this.docDefinition.content.push(getAnswerDef(value));
+      } else if (type !== 'ontology' || (type === 'ontology' && layout.usingControl)) {
+        this.docDefinition.content.push(getSelectDef(answer, source, layout.columnCount, multiple));
+      } else {
+        this.docDefinition.content.push(getDropdownDef(answer, source, layout.columnCount));
+      }
+    } else if (type === 'file' || type === 'image') {
+      // File
+      const multiple = getProperty(options, 'source.allowMultiple', false);
+      const layout = this.getControlLayout(control);
+      const { images, def } = getFileDef(answer, multiple, layout.preview);
+
+      this.docDefinition.images = { ...this.docDefinition.images, ...images };
+      this.docDefinition.content.push(def);
+    } else if (type === 'geoJSON') {
+      // GeoJSON
+      this.docDefinition.content.push(getGeoJsonDef(answer));
+    } else if (type === 'matrix') {
+      // Matrix
+      const def = this.getMatrixDef(answer, options);
+      if (def) {
+        this.docDefinition.content.push(def);
+      }
+    } else {
+      this.docDefinition.content.push(getAnswerDef(answer));
+    }
+
+    // More info
+    if (moreInfo) {
+      this.docDefinition.content.push({
+        text: moreInfo,
+        color: colors.gray,
+      });
+    }
+
+    this.docDefinition.content.push('\n\n');
+  }
+
+  async getMatrixDef(answer, options) {
+    const cols = getProperty(options, 'source.content');
+    if (!Array.isArray(cols)) {
+      return null;
+    }
+
+    const headers = cols.map((header) => getCellDef(header.label || header.value));
     const rows = [];
+    const value = toArray(answer);
 
-    const key = [...path, control.name, 'value'];
-    const answer = this.getArrayValue(getProperty(this.submission.data, key));
-
-    for (const item of answer) {
+    for (const item of value) {
       const row = [];
 
       for (const col of cols) {
-        const value = getProperty(item, [col.value, 'value']);
-        if (col.type === 'date') {
-          row.push(this.getDateDef(value, true, ''));
-        } else if (col.type === 'dropdown') {
-          const dropdownVal = this.getArrayValue(value);
+        let colValue = getProperty(item, `${col.value}.value`);
+        if (col.type === 'dropdown') {
+          const dropdownVal = toArray(colValue);
           const dropdownSource = await this.getControlSource(col);
-          const text = this.transformValueToLabel(dropdownVal, dropdownSource);
-          row.push(this.getTextDef(text, true, ''));
+          const text = transformValueToLabel(dropdownVal, dropdownSource);
+          row.push(getCellDef(text));
         } else {
-          row.push(this.getTextDef(value, true, ''));
+          if (col.type === 'date') {
+            colValue = formatDate(colValue);
+          }
+          row.push(getCellDef(colValue));
         }
       }
 
@@ -434,10 +594,10 @@ export default class SubmissionPDF {
     }
 
     if (rows.length === 0) {
-      rows.push(this.getNoDataTableRowDef(cols.length));
+      rows.push(getEmptyRowDef(cols.length));
     }
 
-    this.docDefinition.content.push(this.getQuestionDef(control), {
+    return {
       layout: {
         hLineWidth: function () {
           return 1;
@@ -461,237 +621,7 @@ export default class SubmissionPDF {
         headerRows: 1,
         body: [headers, ...rows],
       },
-    });
-
-    return this.docDefinition.content.length;
-  }
-
-  /*******************************************************************/
-  /**************     Definitions for each controls     **************/
-  /*******************************************************************/
-
-  getPageDef() {
-    return {
-      text: ' ',
-      headlineLevel: LVL.page,
     };
-  }
-
-  getGroupDef(control) {
-    if (!control.label) {
-      return null;
-    }
-
-    return {
-      text: `${control.index} ${control.label}`,
-      headlineLevel: LVL.group,
-      style: 'group',
-    };
-  }
-
-  getInstructionDef(control) {
-    const d = [];
-
-    if (control.label) {
-      d.push({
-        text: `${control.index} ${control.label}`,
-        headlineLevel: LVL.question,
-        style: 'question',
-        color: 'black',
-      });
-    }
-
-    if (control.options.source) {
-      const parsed = htmlToPdfMake(control.options.source);
-      d.push(...parsed);
-    }
-
-    return d;
-  }
-
-  getQuestionDef(control) {
-    return {
-      text: `${control.index} ${control.label || control.hint || ''}`,
-      style: 'question',
-      headlineLevel: LVL.question,
-    };
-  }
-
-  getTextDef(answer, dense = false, placeholder = 'No answer') {
-    const value = this.getArrayValue(answer);
-    const hasAnswer = value.length > 0;
-
-    const d = {
-      text: value.join(', ') || placeholder,
-      color: hasAnswer ? styles.answer.color : styles.meta.color,
-    };
-
-    if (dense) {
-      d.fontSize = 10;
-    }
-
-    return d;
-  }
-
-  getDateDef(answer, small = false, placeholder = 'No answer') {
-    const date = parseISO(answer);
-    const value = isValid(date) ? dateFnsFormat(date, 'MMM d, yyyy h:mm a') : null;
-
-    return this.getTextDef(value, small, placeholder);
-  }
-
-  getSelectDef(answer, source, multiple, cols = 1) {
-    const value = this.getArrayValue(answer);
-    const options = [...source];
-
-    const custom = value.find((val) => val && source.every((item) => item.value !== val));
-    if (custom) {
-      options.push({ value: custom, label: custom });
-    }
-
-    const group = [];
-    if (cols === 1) {
-      group.push(options);
-    } else {
-      options.forEach((option, index) => {
-        const i = index % cols;
-        if (!Array.isArray(group[i])) {
-          group[i] = [];
-        }
-        group[i].push(option);
-      });
-    }
-
-    const isChecked = (option) => value.includes(option.value);
-
-    return {
-      columns: group.map((columnOptions) =>
-        columnOptions.map((option) => this.getSelectItemDef(option, multiple, isChecked(option)))
-      ),
-    };
-  }
-
-  getSelectItemDef(option, multiple, checked) {
-    return {
-      table: {
-        widths: [12, 'auto'],
-        body: [
-          [
-            {
-              svg: getControlSvg(multiple, checked),
-              fit: [16, 16],
-            },
-            this.getTextDef(option.label),
-          ],
-        ],
-      },
-      layout: 'noBorders',
-    };
-  }
-
-  getDropdownDef(answer, source, cols = 1) {
-    const value = this.getArrayValue(answer);
-    const options = [...source];
-
-    const custom = value.find((val) => val && source.every((item) => item.value !== val));
-    if (custom) {
-      options.push({ value: custom, label: custom });
-    }
-
-    const group = [];
-    if (cols === 1) {
-      group.push(options);
-    } else {
-      const countPerCol = Math.ceil(options.length / cols);
-      options.forEach((option, index) => {
-        const i = Math.floor(index / countPerCol);
-        if (!Array.isArray(group[i])) {
-          group[i] = [];
-        }
-        group[i].push(option);
-      });
-    }
-
-    const isChecked = (option) => value.includes(option.value);
-
-    return {
-      columns: group.map((columnOptions) => ({
-        ul: columnOptions.map((option) => {
-          const d = this.getTextDef(option.label);
-          if (isChecked(option)) {
-            d.decoration = 'underline';
-          }
-          return d;
-        }),
-      })),
-    };
-  }
-
-  getFileDef(answer, multiple, preview) {
-    const value = this.getArrayValue(answer);
-    if (value.length === 0) {
-      return this.getTextDef(value);
-    }
-
-    const def = { ul: [] };
-
-    value.forEach((image) => {
-      const ext = (image.split('.').pop() || '').toLowerCase();
-      const isImage = ['png', 'jpg', 'jpeg'].includes(ext);
-      const url = getPublicDownloadUrl(image);
-      const stack = [
-        {
-          text: image,
-          link: url,
-          style: 'link',
-        },
-      ];
-      if (isImage && preview) {
-        this.docDefinition.images[image] = url;
-        stack.push({ image, fit: [300, 300], margin: [0, 8, 0, 8] });
-      }
-      def.ul.push({ stack });
-    });
-
-    return multiple ? def : def.ul[0];
-  }
-
-  getGeoJsonDef(answer) {
-    if (!answer) {
-      return this.getTextDef(answer);
-    }
-
-    return {
-      table: {
-        body: [
-          [
-            {
-              text: JSON.stringify(answer, null, 2),
-              preserveLeadingSpaces: true,
-              fontSize: 10,
-              color: 'black',
-              margin: [16, 4, 16, 4],
-            },
-          ],
-        ],
-      },
-      layout: 'noBorders',
-      fillColor: styles.code.background,
-    };
-  }
-
-  getNoDataTableRowDef(cols) {
-    const noDataCell = {
-      ...this.getTextDef(null, true),
-      colSpan: cols,
-      alignment: 'center',
-      margin: [0, 4, 0, 4],
-    };
-    const emptyCells = Array(cols)
-      .fill(0)
-      .map(() => ({}));
-
-    return [noDataCell, ...emptyCells].slice(0, -1);
   }
 
   /*******************************************************************/
@@ -745,27 +675,7 @@ export default class SubmissionPDF {
     };
   }
 
-  getAnswer(control, path = []) {
-    const key = [...path, control.name, 'value'];
-    const value = getProperty(this.submission.data, key);
-
-    return value;
-  }
-
-  getArrayValue(value) {
-    return Array.isArray(value) ? value : value ? [value] : [];
-  }
-
   isFirstControl() {
     return this.metaIndex === this.docDefinition.content.length;
-  }
-
-  transformValueToLabel(value, source) {
-    if (Array.isArray(value)) {
-      return value.flatMap((item) => this.transformValueToLabel(item, source));
-    }
-
-    const match = source.find((option) => option.value === value);
-    return match ? match.label : value;
   }
 }
