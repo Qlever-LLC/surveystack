@@ -497,13 +497,13 @@ export const sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification = a
 
   const subject = 'Your instance has been moved to another group';
   const description = `Your farmOS instance ${instanceName} has been removed from the group ${oldGroupNames} and added to the group ${newGroupNames} in SurveyStack.`;
-  await mailService.sendHandleNotification(
-    userEmail,
-    subject,
-    magicLinkProfile,
-    description,
-    description
-  );
+  await mailService.sendHandleNotification({
+    to: userEmail,
+    subject: subject,
+    link: magicLinkProfile,
+    actionDescriptionHtml: description,
+    actionDescriptionText: description,
+  });
 };
 
 export const sendUserAddFarmToSurveystackGroupNotification = async (
@@ -542,13 +542,13 @@ const sendAddNotification = async (instanceName, groupName, origin) => {
 
   const subject = 'Your instance has been added to a group';
   const description = `Your farmOS instance ${instanceName} has been added to the group ${groupName} in SurveyStack.`;
-  await mailService.sendHandleNotification(
-    userEmail,
-    subject,
-    magicLinkProfile,
-    description,
-    description
-  );
+  await mailService.sendHandleNotification({
+    to: userEmail,
+    subject: subject,
+    link: magicLinkProfile,
+    actionDescriptionHtml: description,
+    actionDescriptionText: description,
+  });
 };
 
 const sendUserRemoveFarmFromSurveystackGroupNotification = async (
@@ -587,13 +587,13 @@ const sendRemoveNotification = async (instanceName, groupName, origin) => {
 
   const subject = 'Your instance has been removed from a group';
   const description = `Your farmOS instance ${instanceName} has been removed from the group ${groupName} in SurveyStack.`;
-  await mailService.sendHandleNotification(
-    userEmail,
-    subject,
-    magicLinkProfile,
-    description,
-    description
-  );
+  await mailService.sendHandleNotification({
+    to: userEmail,
+    subject: subject,
+    link: magicLinkProfile,
+    actionDescriptionHtml: description,
+    actionDescriptionText: description,
+  });
 };
 
 export const removeFarmFromUser = async (instanceName, userId) => {
