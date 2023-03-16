@@ -6,6 +6,7 @@ import boom from '@hapi/boom';
 import { getDescendantGroups, getAscendantGroups } from '../roles.service';
 import { addGroupToCoffeeShop, isCoffeeShopEnabled, removeGroupFromCoffeeShop } from './coffeeshop';
 import mailService from '../../services/mail/mail.service';
+import { createMagicLink } from '../auth.service';
 
 const config = () => {
   if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
@@ -487,17 +488,22 @@ export const sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification = a
   }
   const newGroupNames = newGroupNamesList.join(', ');
 
-  await mailService.send({
-    to: userEmail,
-    subject: 'Your instance has been moved to another group',
-    text: `Hello,
-
-    ${origin}
-    This email is to inform you that your farmOS instance ${instanceName} has been removed from ${oldGroupNames} and added to ${newGroupNames} in SurveyStack.
-    Please reach out to your group admin or info@our-sci.net if you have any questions.  
-
-    Best Regards`,
+  const magicLinkProfile = await createMagicLink({
+    origin,
+    email: userEmail,
+    expiresAfterDays: 7,
+    landingPath: `/auth/profile`,
   });
+
+  const subject = 'Your instance has been moved to another group';
+  const description = `Your farmOS instance ${instanceName} has been removed from the group ${oldGroupNames} and added to the group ${newGroupNames} in SurveyStack.`;
+  await mailService.sendHandleNotification(
+    userEmail,
+    subject,
+    magicLinkProfile,
+    description,
+    description
+  );
 };
 
 export const sendUserAddFarmToSurveystackGroupNotification = async (
@@ -527,17 +533,22 @@ export const sendUserAddFarmToMultipleSurveystackGroupNotification = async (
 const sendAddNotification = async (instanceName, groupName, origin) => {
   const userEmail = await extractUserMailForMailing(instanceName);
 
-  await mailService.send({
-    to: userEmail,
-    subject: 'Your instance has been added to a group',
-    text: `Hello,
-
-    ${origin}
-    This email is to inform you that your farmOS instance ${instanceName} has been added to ${groupName} in SurveyStack.
-    Please reach out to your group admin or info@our-sci.net if you have any questions.  
-
-    Best Regards`,
+  const magicLinkProfile = await createMagicLink({
+    origin,
+    email: userEmail,
+    expiresAfterDays: 7,
+    landingPath: `/auth/profile`,
   });
+
+  const subject = 'Your instance has been added to a group';
+  const description = `Your farmOS instance ${instanceName} has been added to the group ${groupName} in SurveyStack.`;
+  await mailService.sendHandleNotification(
+    userEmail,
+    subject,
+    magicLinkProfile,
+    description,
+    description
+  );
 };
 
 const sendUserRemoveFarmFromSurveystackGroupNotification = async (
@@ -567,17 +578,22 @@ export const sendUserRemoveFarmFromMultipleSurveystackGroupsNotification = async
 const sendRemoveNotification = async (instanceName, groupName, origin) => {
   const userEmail = await extractUserMailForMailing(instanceName);
 
-  await mailService.send({
-    to: userEmail,
-    subject: 'Your instance has been removed from a group',
-    text: `Hello,
-
-    ${origin}
-    This email is to inform you that your farmOS instance ${instanceName} has been removed from the group ${groupName} in SurveyStack. 
-    Please reach out to your group admin or info@our-sci.net if you have any questions.
-
-    Best Regards`,
+  const magicLinkProfile = await createMagicLink({
+    origin,
+    email: userEmail,
+    expiresAfterDays: 7,
+    landingPath: `/auth/profile`,
   });
+
+  const subject = 'Your instance has been removed from a group';
+  const description = `Your farmOS instance ${instanceName} has been removed from the group ${groupName} in SurveyStack.`;
+  await mailService.sendHandleNotification(
+    userEmail,
+    subject,
+    magicLinkProfile,
+    description,
+    description
+  );
 };
 
 export const removeFarmFromUser = async (instanceName, userId) => {
