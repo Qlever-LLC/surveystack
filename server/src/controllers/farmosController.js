@@ -1209,7 +1209,7 @@ export const addNotes = async (req, res) => {
 
   if (validres.error) {
     const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
-    throw boom.badData(`error: ${errors.join(',')}`);
+    throw boom.badData(`error: ${errors.join(', ')}`);
   }
 
   //assert that all groupIds are under the farmos domain to which hasGroupAdminAccess checked
@@ -1219,19 +1219,6 @@ export const addNotes = async (req, res) => {
     groupIds.every((val) => descendants.map((el) => String(el._id)).includes(String(val))) === false
   ) {
     throw boom.badData(`error: you don't have access`);
-  }
-
-  //check if the instance is under the group checked with hasGroupAdminAccess
-  const grps = await db
-    .collection('farmos-group-mapping')
-    .find({
-      groupId: {
-        $in: descendants.map((el) => asMongoId(el._id)),
-      },
-    })
-    .toArray();
-  if (!grps.map((el) => el.instanceName).includes(instanceName)) {
-    throw boom.badData(`error: you do not have access`);
   }
 
   //get groupNames from groupIds
@@ -1417,7 +1404,7 @@ export const updateGroupsForUser = async (req, res) => {
     const resultInstanceGroupsId = resultGroups.map((e) => e._id);
     await sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification(
       instanceName,
-      difference,
+      differenceId,
       resultInstanceGroupsId,
       origin
     );
