@@ -420,8 +420,9 @@ export const superAdminMapFarmosInstanceToUser = async (req, res) => {
   if (typeof owner == undefined) {
     throw boom.badData('owner attribute missing');
   }
+  const { origin } = req.headers;
 
-  await mapFarmOSInstanceToUser(user, instanceName, !!owner);
+  await mapFarmOSInstanceToUser(user, instanceName, !!owner, origin);
   return res.send({
     status: 'success',
   });
@@ -874,7 +875,8 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
       planName
     );
 
-    await mapFarmOSInstanceToUser(owner, url, true);
+    const { origin } = req.headers;
+    await mapFarmOSInstanceToUser(owner, url, true, origin);
 
     await addFarmToSurveystackGroupAndSendNotification(url, groupId, origin);
 
@@ -1097,7 +1099,7 @@ export const mapUser = async (req, res) => {
 
   if (mapToUser) {
     const userId = new ObjectId(userId);
-    await mapFarmOSInstanceToUser(userId, instanceName, true);
+    await mapFarmOSInstanceToUser(userId, instanceName, true, origin);
   }
 
   const group = await db.collection('groups').find({

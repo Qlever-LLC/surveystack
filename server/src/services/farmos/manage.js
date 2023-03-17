@@ -291,7 +291,7 @@ export const getOwnerFromInstanceName = async (instanceName) => {
 /**
  * The user receives ownership over the farmos instance
  */
-export const mapFarmOSInstanceToUser = async (userId, instanceName, owner) => {
+export const mapFarmOSInstanceToUser = async (userId, instanceName, owner, origin) => {
   const res = await db
     .collection('farmos-instances')
     .find({
@@ -320,37 +320,49 @@ export const mapFarmOSInstanceToUser = async (userId, instanceName, owner) => {
     owner,
   });
 
-  // send email to instance owner
+  // send email to instance owner(s)
   const instanceOwners = await getOwnerFromInstanceName(instanceName);
   if (instanceOwners) {
     for (const instanceOwner of instanceOwners) {
       if (instanceOwner && instanceOwner.email) {
         const ownerEmail = instanceOwner.email;
 
-        await mailService.send({
+        const magicLinkProfile = await createMagicLink({
+          origin,
+          email: ownerEmail,
+          expiresAfterDays: 7,
+          landingPath: `/auth/profile`,
+        });
+
+        const subject = 'Your instance has been mapped';
+        const description = `The email ${ownerEmail} has been mapped to the farmOS instance ${instanceName} in SurveyStack.`;
+        await mailService.sendHandleNotification({
           to: ownerEmail,
-          subject: 'Your instance has been mapped',
-          text: `Hello,
-
-    This email is to inform you that ${ownerEmail} has been mapped to the farmOS instance ${instanceName} in SurveyStack.
-    Please reach out to your group admin or info @our-sci.net if you have any questions. 
-
-    Best Regards`,
+          subject: subject,
+          link: magicLinkProfile,
+          actionDescriptionHtml: description,
+          actionDescriptionText: description,
         });
       }
     }
   }
 
   // send email to newly mapped user
-  await mailService.send({
+  const magicLinkProfile = await createMagicLink({
+    origin,
+    email: user.email,
+    expiresAfterDays: 7,
+    landingPath: `/auth/profile`,
+  });
+
+  const subject = 'You have been mapped';
+  const description = `You have been mapped to the farmOS instance ${instanceName} in SurveyStack.`;
+  await mailService.sendHandleNotification({
     to: user.email,
-    subject: 'You have been mapped',
-    text: `Hello,
-
-    This email is to inform you that you have been mapped to the farmOS instance ${instanceName} in SurveyStack.
-    Please reach out to your group admin or info@our-sci.net if you have any questions.
-
-    Best Regards`,
+    subject: subject,
+    link: magicLinkProfile,
+    actionDescriptionHtml: description,
+    actionDescriptionText: description,
   });
 
   return {
@@ -447,7 +459,7 @@ export const createFarmOSInstanceForUserAndGroup = async (
   userIsOwner,
   origin
 ) => {
-  await mapFarmOSInstanceToUser(userId, instanceName, userIsOwner);
+  await mapFarmOSInstanceToUser(userId, instanceName, userIsOwner, origin);
   return await addFarmToSurveystackGroupAndSendNotification(instanceName, groupId, origin);
 };
 

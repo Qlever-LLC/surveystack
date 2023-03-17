@@ -117,7 +117,7 @@ const createFarmOSDomain = async (gs) => {
 
     for (const farm of u.farms) {
       farms.push(farm);
-      await mapFarmOSInstanceToUser(user.user._id, farm, true);
+      await mapFarmOSInstanceToUser(user.user._id, farm, true, origin);
     }
   }
   for (const farm of _.uniq(farms)) {
@@ -131,7 +131,7 @@ describe('farmos-controller', () => {
   it('get-farmos-instances', async () => {
     const { group, admin1, user1 } = await init();
 
-    await mapFarmOSInstanceToUser(user1.user._id, 'user.farmos.dev', true);
+    await mapFarmOSInstanceToUser(user1.user._id, 'user.farmos.dev', true, origin);
 
     const res = mockRes(user1.user._id);
     await getFarmOSInstances({}, res);
@@ -144,7 +144,7 @@ describe('farmos-controller', () => {
   it('get-farmos-instances-not-logged-in', async () => {
     const { group, admin1, user1 } = await init();
 
-    await mapFarmOSInstanceToUser(user1.user._id, 'farm1.farmos.dev', true);
+    await mapFarmOSInstanceToUser(user1.user._id, 'farm1.farmos.dev', true, origin);
 
     const res = mockRes('');
     await expect(getFarmOSInstances({}, res)).rejects.toThrow(boom.unauthorized());
@@ -153,10 +153,10 @@ describe('farmos-controller', () => {
   it('get-instances-for-admin', async () => {
     const { group, admin1, user1 } = await init();
 
-    await mapFarmOSInstanceToUser(user1.user._id, 'user-farm.farmos.dev', true);
+    await mapFarmOSInstanceToUser(user1.user._id, 'user-farm.farmos.dev', true, origin);
 
-    await mapFarmOSInstanceToUser(admin1.user._id, 'user-farm.farmos.dev', false);
-    await mapFarmOSInstanceToUser(admin1.user._id, 'admin-farm.farmos.dev', true);
+    await mapFarmOSInstanceToUser(admin1.user._id, 'user-farm.farmos.dev', false, origin);
+    await mapFarmOSInstanceToUser(admin1.user._id, 'admin-farm.farmos.dev', true, origin);
 
     const userRes = mockRes(user1.user._id);
     await getFarmOSInstances({}, userRes);
@@ -179,7 +179,7 @@ describe('farmos-controller', () => {
     const groupAA = await parentGroup.createSubGroup({ name: 'GroupAA' });
     const groupAB = await parentGroup.createSubGroup({ name: 'GroupAB' });
     const user1 = await parentGroup.createUserMember();
-    await mapFarmOSInstanceToUser(user1.user._id, instanceName, true);
+    await mapFarmOSInstanceToUser(user1.user._id, instanceName, true, origin);
     const parentGroupId = parentGroup._id;
     await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
     await addFarmToSurveystackGroupAndSendNotification(instanceName, groupAA._id, origin);
@@ -214,7 +214,7 @@ describe('farmos-controller', () => {
     const groupAA = await parentGroup.createSubGroup({ name: 'GroupAA' });
     const groupAB = await parentGroup.createSubGroup({ name: 'GroupAB' });
     const user1 = await parentGroup.createUserMember();
-    await mapFarmOSInstanceToUser(user1.user._id, instanceName, true);
+    await mapFarmOSInstanceToUser(user1.user._id, instanceName, true, origin);
     const parentGroupId = parentGroup._id;
     await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
     await addFarmToSurveystackGroupAndSendNotification(instanceName, groupAA._id, origin);
@@ -260,7 +260,7 @@ describe('farmos-controller', () => {
     const groupAB = await parentGroup.createSubGroup({ name: 'GroupAB' });
     const extGroup = await createGroup({ name: 'GroupZ' });
     const user1 = await parentGroup.createUserMember();
-    await mapFarmOSInstanceToUser(user1.user._id, instanceName, true);
+    await mapFarmOSInstanceToUser(user1.user._id, instanceName, true, origin);
     const parentGroupId = parentGroup._id;
     await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
     await addFarmToSurveystackGroupAndSendNotification(instanceName, groupAA._id, origin);
@@ -290,7 +290,7 @@ describe('farmos-controller', () => {
     const parentGroup = await createGroup({ name: 'GroupA' });
     // the middleware checks that only a super admin has access
     const superAdmin = await parentGroup.createUserMember();
-    await mapFarmOSInstanceToUser(superAdmin.user._id, instanceName, true);
+    await mapFarmOSInstanceToUser(superAdmin.user._id, instanceName, true, origin);
     const parentGroupId = parentGroup._id;
     await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
 
@@ -317,7 +317,7 @@ describe('farmos-controller', () => {
     const instanceName = 'farmos.net';
     const parentGroup = await createGroup({ name: 'GroupA' });
     const superAdmin = await parentGroup.createUserMember();
-    await mapFarmOSInstanceToUser(superAdmin.user._id, instanceName, true);
+    await mapFarmOSInstanceToUser(superAdmin.user._id, instanceName, true, origin);
     const parentGroupId = parentGroup._id;
     await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
 
@@ -354,7 +354,7 @@ describe('farmos-controller', () => {
     mockAxios.get.mockImplementation(() => Promise.resolve({ data: assetResponse }));
 
     const user = await createUser();
-    await mapFarmOSInstanceToUser(user._id, 'buddingmoonfarm.farmos.dev', true);
+    await mapFarmOSInstanceToUser(user._id, 'buddingmoonfarm.farmos.dev', true, origin);
 
     const res = mockRes(user._id);
     const send = jest.fn();
@@ -395,7 +395,7 @@ describe('farmos-controller', () => {
     mockAxios.get.mockImplementation(() => Promise.resolve({ data: logResponse }));
 
     const user = await createUser();
-    await mapFarmOSInstanceToUser(user._id, 'buddingmoonfarm.farmos.dev', true);
+    await mapFarmOSInstanceToUser(user._id, 'buddingmoonfarm.farmos.dev', true, origin);
 
     const res = mockRes(user._id);
     await getLogs(
@@ -755,7 +755,7 @@ describe('farmos-controller', () => {
     // const group = await createGroup({ name: 'Bionutrient' });
     // const admin = await group.createAdminMember();
     // const user = await group.createUserMember();
-    // await mapFarmOSInstanceToUser(user.user._id, 'userinstance.farmos.net', true);
+    // await mapFarmOSInstanceToUser(user.user._id, 'userinstance.farmos.net', true, origin);
     // const req = {
     //   params: { groupId: group._id + "" },
     //   body: {
@@ -781,7 +781,7 @@ describe('farmos-controller', () => {
     mockAxios.get.mockImplementation(() => Promise.resolve({ data: assetResponse }));
 
     const user = await createUser();
-    await mapFarmOSInstanceToUser(user._id, 'buddingmoonfarm.farmos.dev', true);
+    await mapFarmOSInstanceToUser(user._id, 'buddingmoonfarm.farmos.dev', true, origin);
 
     const res = mockRes(user._id);
     const send = jest.fn();

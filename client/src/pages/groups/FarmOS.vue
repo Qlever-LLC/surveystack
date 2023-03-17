@@ -348,10 +348,11 @@ export default {
 
       for (const farm of farms) {
         try {
-          await api.post(`/farmos/group-manage/${this.groupId}/mapUser`, {
+          const resp = await api.post(`/farmos/group-manage/${this.groupId}/mapUser`, {
             userId: this.selectedUser.user,
             instanceName: farm,
           });
+          this.success(resp.data.status);
         } catch (error) {
           this.error(error + '');
         }

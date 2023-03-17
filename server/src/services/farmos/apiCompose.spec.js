@@ -41,7 +41,7 @@ describe('farmos2-api-compose', () => {
   it.only('has-permission', async () => {
     const { group, user1, user2, admin1 } = await init();
     const instanceName = 'test.surveystack.io';
-    await mapFarmOSInstanceToUser(user1.user._id, instanceName, true);
+    await mapFarmOSInstanceToUser(user1.user._id, instanceName, true, origin);
     await createFarmOSInstanceForUserAndGroup(
       admin1.user._id,
       group._id,
@@ -58,7 +58,7 @@ describe('farmos2-api-compose', () => {
 
     expect(await hasPermission(admin1.user._id, instanceName)).toBe(false);
 
-    const mapResult = await mapFarmOSInstanceToUser(user2.user._id, instanceName, false);
+    const mapResult = await mapFarmOSInstanceToUser(user2.user._id, instanceName, false, origin);
 
     /**
      * user2 is not admin, so does not have permission
