@@ -1100,8 +1100,12 @@ export const mapUser = async (req, res) => {
     await mapFarmOSInstanceToUser(userId, instanceName, true);
   }
 
+  const group = await db.collection('groups').find({
+    _id: groupId,
+  });
+  const resStatus = `Successfully added instance to ${group.name}, instance owner will be notified`;
   return res.send({
-    status: 'ok',
+    status: resStatus,
   });
 };
 
