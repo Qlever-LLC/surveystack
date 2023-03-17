@@ -269,7 +269,8 @@ export default {
       }
     },
     items() {
-      return this.getDropdownItems(this.header.value, Array.isArray(this.value) ? this.value : [this.value]);
+      const arrayValue = Array.isArray(this.value) ? this.value : this.value ? [this.value] : [];
+      return this.getDropdownItems(this.header.value, arrayValue);
     },
     getDateLabel() {
       const date = parseISO(this.value);
@@ -288,8 +289,9 @@ export default {
       this.$emit('changed');
     },
     onDateInput(value) {
+      const isValidFormat = /^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(value);
       const date = parse(value, 'yyyy-MM-dd', new Date());
-      if (!isValid(date)) {
+      if (!isValidFormat || !isValid(date)) {
         return;
       }
       this.value = date.toISOString();
