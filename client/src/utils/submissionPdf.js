@@ -26,6 +26,8 @@ const fontSizes = {
 
 const colors = {
   black: 'black',
+  white: 'white',
+  lightGray: '#e5e7eb',
   gray: '#9ca3af',
   darkGray: '#374151',
   blue: '#1e3a8a',
@@ -55,24 +57,37 @@ const styles = {
   meta: {
     fontSize: fontSizes.xxs,
     color: colors.gray,
-    margin: margins.xl,
+    margin: margins.md,
   },
   section: {
     fontSize: fontSizes.xl,
     bold: true,
-    margin: margins.xs,
   },
   label: {
     bold: true,
     margin: margins.xs,
-    italic: true,
   },
   hint: {
     color: colors.darkGray,
     margin: margins.xs,
     italic: true,
   },
-  text: {
+  moreInfo: {
+    color: colors.gray,
+    italics: true,
+    margin: margins.xs,
+  },
+  answer: {
+    color: colors.blue,
+  },
+  answerEmpty: {
+    background: colors.lightGray,
+    color: colors.black,
+    margin: margins.xs,
+  },
+  answerHighlight: {
+    background: colors.blue,
+    color: colors.white,
     margin: margins.xs,
   },
   link: {
@@ -92,14 +107,10 @@ const defaultStyle = {
 };
 
 const SVG = {
-  'check-true':
-    '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><g><path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19ZM17.99 9L16.58 7.58L9.99 14.17L7.41 11.6L5.99 13.01L9.99 17L17.99 9Z" fill="#374151"/></g></svg>',
-  'check-false':
-    '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><g><path d="M19 5V19H5V5H19ZM19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3Z" fill="#374151"/></g></svg>',
-  'radio-true':
-    '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><g><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.58 20 4 16.42 4 12C4 7.58 7.58 4 12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20Z" fill="#374151"/><path d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17Z" fill="#374151"/></g></svg>',
-  'radio-false':
-    '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><g><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.58 20 4 16.42 4 12C4 7.58 7.58 4 12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20Z" fill="#374151"/></g></svg>',
+  'check-true': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><g><path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19ZM17.99 9L16.58 7.58L9.99 14.17L7.41 11.6L5.99 13.01L9.99 17L17.99 9Z" fill="${colors.blue}"/></g></svg>`,
+  'check-false': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><g><path d="M19 5V19H5V5H19ZM19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3Z" fill="${colors.blue}"/></g></svg>`,
+  'radio-true': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><g><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.58 20 4 16.42 4 12C4 7.58 7.58 4 12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20Z" fill=${colors.blue}/><path d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17Z" fill="${colors.blue}"/></g></svg>`,
+  'radio-false': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><g><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.58 20 4 16.42 4 12C4 7.58 7.58 4 12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20Z" fill=${colors.blue}/></g></svg>`,
 };
 
 const LVL = {
@@ -137,24 +148,33 @@ function toArray(value) {
   return Array.isArray(value) ? value : value ? [value] : [];
 }
 
-function getSectionDef(index, text) {
-  const fontSize = index.length === 1 ? fontSizes.md : index.length === 2 ? fontSizes.sm : fontSizes.xs;
+function getSectionDef(control) {
+  const fontSize = control.index.length === 1 ? fontSizes.md : fontSizes.sm;
 
   return {
-    text: `${index.join('.')} ${text || ''}`,
-    headlineLevel: LVL.section,
-    style: 'section',
-    fontSize,
+    table: {
+      body: [
+        [
+          {
+            text: `${control.index.join('.')} ${control.label || ''}`.trim(),
+            headlineLevel: LVL.section,
+            style: 'section',
+            fontSize,
+          },
+        ],
+      ],
+    },
+    margin: margins.xs,
   };
 }
 
 function getAnswerDef(answer, placeholder = 'No answer') {
   const value = toArray(answer);
+  const hasAnswer = value.length > 0;
 
   return {
     text: value.join(', ') || placeholder,
-    style: 'text',
-    color: value.length > 0 ? colors.black : colors.gray,
+    style: hasAnswer ? 'answer' : 'answerEmpty',
   };
 }
 
@@ -248,7 +268,7 @@ function getDropdownDef(answer, source, cols = 1) {
       ul: columnOptions.map((option) => {
         const d = getAnswerDef(option.label);
         if (isChecked(option)) {
-          d.decoration = 'underline';
+          d.style = 'answerHighlight';
         }
         return d;
       }),
@@ -344,8 +364,7 @@ export default class SubmissionPDF {
       styles,
       defaultStyle,
       images: {},
-      // TODO: - After section implementation
-      // pageBreakBefore: this.pageBreakBefore.bind(this),
+      pageBreakBefore: this.pageBreakBefore.bind(this),
     };
   }
 
@@ -457,7 +476,7 @@ export default class SubmissionPDF {
   async generateControl(control, path = []) {
     // Group, Page
     if (isContainerControl(control)) {
-      this.docDefinition.content.push(getSectionDef(control.index, control.label));
+      this.docDefinition.content.push(getSectionDef(control));
 
       if (!Array.isArray(control.children)) {
         return;
@@ -481,7 +500,7 @@ export default class SubmissionPDF {
 
     // Root
     if (isRootControl(control)) {
-      this.docDefinition.content.push(getSectionDef(control.index));
+      this.docDefinition.content.push(getSectionDef(control));
     }
 
     const { name, label, type, hint, moreInfo, options } = control;
@@ -499,7 +518,15 @@ export default class SubmissionPDF {
     if ((type !== 'instructions' || type !== 'instructionsImageSplit') && hint) {
       this.docDefinition.content.push({
         text: hint,
-        style: 'hint',
+        style: label ? 'hint' : 'label',
+      });
+    }
+
+    // More info
+    if (moreInfo) {
+      this.docDefinition.content.push({
+        text: moreInfo,
+        style: 'moreInfo',
       });
     }
 
@@ -551,15 +578,7 @@ export default class SubmissionPDF {
       this.docDefinition.content.push(getAnswerDef(answer));
     }
 
-    // More info
-    if (moreInfo) {
-      this.docDefinition.content.push({
-        text: moreInfo,
-        color: colors.gray,
-      });
-    }
-
-    this.docDefinition.content.push('\n\n');
+    this.docDefinition.content.push('\n');
   }
 
   async getMatrixDef(answer, options) {
