@@ -394,22 +394,24 @@ export default {
           groupIds,
         });
         this.success(resp.data.status);
+
+        this.showDisonnectDialog = false;
+
+        this.differenceRemovedGroupIds = this.selectedGroupIds.filter((x) => !groupIds.includes(x));
+        if (this.differenceRemovedGroupIds.length > 0) {
+          //only if remove happened
+          this.showRemoveNoteDialog = true;
+        } else {
+          await this.init();
+        }
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           this.error(error.response.data.message);
         } else {
           this.error(error.message);
         }
-      }
-
-      this.showDisonnectDialog = false;
-
-      this.differenceRemovedGroupIds = this.selectedGroupIds.filter((x) => !groupIds.includes(x));
-      if (this.differenceRemovedGroupIds.length > 0) {
-        //only if remove happened
-        this.showRemoveNoteDialog = true;
-      } else {
-        await this.init();
+        this.showDisonnectDialog = false;
+        this.loading = false;
       }
     },
     async addNote(arg) {
