@@ -294,7 +294,18 @@
           <v-icon color="grey darken-1" @click="$emit('code-relevance')" size="20"> mdi-open-in-new </v-icon>
         </div>
 
-        <div>
+        <div v-if="!isPage && !isGroup">
+          <checkbox
+            label="Initialize Expression"
+            v-model="initialize.enabled"
+            :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
+          />
+          <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-initialize')" size="20">
+            mdi-open-in-new
+          </v-icon>
+        </div>
+
+        <!--div>
           <checkbox
             label="Calculate Expression"
             v-model="calculate.enabled"
@@ -303,9 +314,9 @@
           <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-calculate')" size="20">
             mdi-open-in-new
           </v-icon>
-        </div>
+        </div-->
 
-        <div>
+        <!--div>
           <checkbox
             label="Constraint Expression"
             v-model="constraint.enabled"
@@ -314,7 +325,7 @@
           <v-icon class="align-self-start" color="grey darken-1" @click="$emit('code-constraint')" size="20">
             mdi-open-in-new
           </v-icon>
-        </div>
+        </div-->
 
         <div>
           <checkbox
@@ -363,6 +374,7 @@ export default {
     control: {
       required: false,
     },
+    initialize: {},
     calculate: {},
     relevance: {},
     constraint: {},

@@ -9,6 +9,10 @@ export const defaultControlOptions = {
     enabled: false,
     code: '',
   },
+  initialize: {
+    enabled: false,
+    code: '',
+  },
   constraint: {
     enabled: false,
     code: '',

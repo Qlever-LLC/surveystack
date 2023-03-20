@@ -255,6 +255,11 @@ const actions = {
         continue;
       }
 
+      const [initialize] = await codeEvaluator.calculateInitialize([nextNode], state.submission, state.survey); // eslint-disable-line
+      if (initialize && initialize.result) {
+        commit('SET_PROPERTY', { path: `${initialize.path}.value`, value: initialize.result });
+      }
+
       commit('NEXT', nextNode);
       return;
     }
