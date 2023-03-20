@@ -354,14 +354,8 @@ export default {
         uniq(usedValues).filter((v) => !isNil(v)), // get all the uniq non-empty values
         ...defaultItems.map((i) => i.value) // without the default values
       ).map((value) => ({ label: value, value }));
-      const allItems = sortBy(
-        [...defaultItems, ...customItems],
-        [
-          (a) => !values.includes(a.value), // move selected items first
-          'label',
-        ]
-      );
-      return allItems;
+
+      return [...defaultItems, ...customItems];
     },
     onInput() {
       this.$emit('changed', this.rows);
