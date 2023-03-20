@@ -109,8 +109,8 @@ const defaultStyle = {
 const SVG = {
   'check-true': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><g><path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19ZM17.99 9L16.58 7.58L9.99 14.17L7.41 11.6L5.99 13.01L9.99 17L17.99 9Z" fill="${colors.blue}"/></g></svg>`,
   'check-false': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><g><path d="M19 5V19H5V5H19ZM19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3Z" fill="${colors.blue}"/></g></svg>`,
-  'radio-true': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><g><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.58 20 4 16.42 4 12C4 7.58 7.58 4 12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20Z" fill=${colors.blue}/><path d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17Z" fill="${colors.blue}"/></g></svg>`,
-  'radio-false': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><g><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.58 20 4 16.42 4 12C4 7.58 7.58 4 12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20Z" fill=${colors.blue}/></g></svg>`,
+  'radio-true': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><g><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.58 20 4 16.42 4 12C4 7.58 7.58 4 12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20Z" fill="${colors.blue}"/><path d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17Z" fill="${colors.blue}"/></g></svg>`,
+  'radio-false': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><g><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.58 20 4 16.42 4 12C4 7.58 7.58 4 12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20Z" fill="${colors.blue}"/></g></svg>`,
 };
 
 const LVL = {
@@ -150,20 +150,35 @@ function toArray(value) {
 
 function getSectionDef(control) {
   const fontSize = control.index.length === 1 ? fontSizes.md : fontSizes.sm;
+  const text = `${control.index.join('.')}${control.label ? `. ${control.label}` : ''}`;
 
   return {
+    layout: {
+      hLineWidth: function () {
+        return 1;
+      },
+      vLineWidth: function () {
+        return 1;
+      },
+      hLineColor: function () {
+        return colors.gray;
+      },
+      vLineColor: function () {
+        return colors.gray;
+      },
+    },
     table: {
       body: [
         [
           {
-            text: `${control.index.join('.')} ${control.label || ''}`.trim(),
-            headlineLevel: LVL.section,
+            text,
             style: 'section',
             fontSize,
           },
         ],
       ],
     },
+    headlineLevel: LVL.section,
     margin: margins.xs,
   };
 }
@@ -175,13 +190,6 @@ function getAnswerDef(answer, placeholder = 'No answer') {
   return {
     text: value.join(', ') || placeholder,
     style: hasAnswer ? 'answer' : 'answerEmpty',
-  };
-}
-
-function getCellDef(answer) {
-  return {
-    ...getAnswerDef(answer, ' '),
-    fontSize: fontSizes.xs,
   };
 }
 
@@ -333,7 +341,7 @@ function getGeoJsonDef(answer) {
 
 function getEmptyRowDef(cols) {
   const noDataCell = {
-    ...getCellDef(null),
+    ...getAnswerDef(null),
     colSpan: cols,
     alignment: 'center',
     margin: [0, 4, 0, 4],
@@ -498,15 +506,14 @@ export default class SubmissionPDF {
       return;
     }
 
-    // Root
-    if (isRootControl(control)) {
-      this.docDefinition.content.push(getSectionDef(control));
-    }
-
     const { name, label, type, hint, moreInfo, options } = control;
 
-    // label
-    if (label) {
+    const len = this.docDefinition.content.length;
+    if (isRootControl(control)) {
+      // Root
+      this.docDefinition.content.push(getSectionDef(control));
+    } else if (label) {
+      // label
       this.docDefinition.content.push({
         text: label,
         style: 'label',
@@ -516,9 +523,11 @@ export default class SubmissionPDF {
 
     // hint
     if ((type !== 'instructions' || type !== 'instructionsImageSplit') && hint) {
+      const labelSet = len !== this.docDefinition.content.length;
       this.docDefinition.content.push({
         text: hint,
-        style: label ? 'hint' : 'label',
+        style: labelSet ? 'hint' : 'label',
+        headlineLevel: labelSet ? 0 : LVL.block,
       });
     }
 
@@ -537,7 +546,7 @@ export default class SubmissionPDF {
     }
     let answer = getProperty(this.submission.data, answerKey);
     if (type === 'date') {
-      answer = formatDate(answer);
+      answer = formatDate(answer, 'MMM d, yyyy');
     }
 
     if (type === 'instructions') {
@@ -570,7 +579,7 @@ export default class SubmissionPDF {
       this.docDefinition.content.push(getGeoJsonDef(answer));
     } else if (type === 'matrix') {
       // Matrix
-      const def = this.getMatrixDef(answer, options);
+      const def = await this.getMatrixDef(answer, options);
       if (def) {
         this.docDefinition.content.push(def);
       }
@@ -587,7 +596,8 @@ export default class SubmissionPDF {
       return null;
     }
 
-    const headers = cols.map((header) => getCellDef(header.label || header.value));
+    // const headers = cols.map((header) => getCellDef(header.label || header.value));
+    const headers = cols.map((header) => header.label || header.value);
     const rows = [];
     const value = toArray(answer);
 
@@ -600,12 +610,12 @@ export default class SubmissionPDF {
           const dropdownVal = toArray(colValue);
           const dropdownSource = await this.getControlSource(col);
           const text = transformValueToLabel(dropdownVal, dropdownSource);
-          row.push(getCellDef(text));
+          row.push(text.join(', '));
         } else {
           if (col.type === 'date') {
-            colValue = formatDate(colValue);
+            colValue = formatDate(colValue, 'MMM d, yyyy');
           }
-          row.push(getCellDef(colValue));
+          row.push(colValue);
         }
       }
 
@@ -625,14 +635,14 @@ export default class SubmissionPDF {
           return 0;
         },
         hLineColor: function (i, node) {
-          return i === 0 || i === node.table.body.length ? styles.answer.color : styles.meta.color;
+          return i === 0 || i === node.table.body.length ? colors.darkGray : colors.gray;
         },
         fillColor: function (rowIndex) {
           return rowIndex === 0
-            ? styles.table.headerColor
+            ? colors.table.headerColor
             : rowIndex % 2 === 1
-            ? styles.table.oddColor
-            : styles.table.evenColor;
+            ? colors.table.oddColor
+            : colors.table.evenColor;
         },
       },
       table: {
@@ -640,6 +650,7 @@ export default class SubmissionPDF {
         headerRows: 1,
         body: [headers, ...rows],
       },
+      fontSize: fontSizes.xxs,
     };
   }
 
