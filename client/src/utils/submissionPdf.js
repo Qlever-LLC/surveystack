@@ -88,7 +88,6 @@ const styles = {
   answerHighlight: {
     background: colors.blue,
     color: colors.white,
-    margin: margins.xs,
   },
   link: {
     color: colors.blue,
@@ -146,211 +145,6 @@ function transformValueToLabel(value, source) {
 
 function toArray(value) {
   return Array.isArray(value) ? value : value ? [value] : [];
-}
-
-function getSectionDef(control) {
-  const fontSize = control.index.length === 1 ? fontSizes.md : fontSizes.sm;
-  const text = `${control.index.join('.')}${control.label ? `. ${control.label}` : ''}`;
-
-  return {
-    layout: {
-      hLineWidth: function () {
-        return 1;
-      },
-      vLineWidth: function () {
-        return 1;
-      },
-      hLineColor: function () {
-        return colors.gray;
-      },
-      vLineColor: function () {
-        return colors.gray;
-      },
-    },
-    table: {
-      body: [
-        [
-          {
-            text,
-            style: 'section',
-            fontSize,
-          },
-        ],
-      ],
-    },
-    headlineLevel: LVL.section,
-    margin: margins.xs,
-  };
-}
-
-function getAnswerDef(answer, placeholder = 'No answer') {
-  const value = toArray(answer);
-  const hasAnswer = value.length > 0;
-
-  return {
-    text: value.join(', ') || placeholder,
-    style: hasAnswer ? 'answer' : 'answerEmpty',
-  };
-}
-
-function getInstructionDef(control) {
-  return control.options.source ? htmlToPdfMake(control.options.source) : [];
-}
-
-function getSelectItemDef(option, multiple, checked) {
-  return {
-    table: {
-      widths: [12, 'auto'],
-      body: [
-        [
-          {
-            svg: getControlSvg(multiple, checked),
-            fit: [16, 16],
-          },
-          getAnswerDef(option.label),
-        ],
-      ],
-    },
-    layout: 'noBorders',
-  };
-}
-
-function getSelectDef(answer, source, cols = 1, multiple) {
-  const value = toArray(answer);
-  const options = [...source];
-
-  const custom = value.find((val) => val && source.every((item) => item.value !== val));
-  if (custom) {
-    options.push({ value: custom, label: custom });
-  }
-
-  const group = [];
-  if (cols === 1) {
-    group.push(options);
-  } else {
-    options.forEach((option, index) => {
-      const i = index % cols;
-      if (!Array.isArray(group[i])) {
-        group[i] = [];
-      }
-      group[i].push(option);
-    });
-  }
-
-  const isChecked = (option) => value.includes(option.value);
-
-  return {
-    columns: group.map((columnOptions) =>
-      columnOptions.map((option) => getSelectItemDef(option, multiple, isChecked(option)))
-    ),
-  };
-}
-
-function getDropdownDef(answer, source, cols = 1) {
-  const value = toArray(answer);
-  const options = [...source];
-
-  const custom = value.find((val) => val && source.every((item) => item.value !== val));
-  if (custom) {
-    options.push({ value: custom, label: custom });
-  }
-
-  const group = [];
-  if (cols === 1) {
-    group.push(options);
-  } else {
-    const countPerCol = Math.ceil(options.length / cols);
-    options.forEach((option, index) => {
-      const i = Math.floor(index / countPerCol);
-      if (!Array.isArray(group[i])) {
-        group[i] = [];
-      }
-      group[i].push(option);
-    });
-  }
-
-  const isChecked = (option) => value.includes(option.value);
-
-  return {
-    columns: group.map((columnOptions) => ({
-      ul: columnOptions.map((option) => {
-        const d = getAnswerDef(option.label);
-        if (isChecked(option)) {
-          d.style = 'answerHighlight';
-        }
-        return d;
-      }),
-    })),
-  };
-}
-
-function getFileDef(answer, multiple, preview) {
-  const value = toArray(answer);
-  if (value.length === 0) {
-    return getAnswerDef(value);
-  }
-
-  const def = { ul: [] };
-  const images = {};
-
-  value.forEach((image) => {
-    const ext = (image.split('.').pop() || '').toLowerCase();
-    const isImage = ['png', 'jpg', 'jpeg'].includes(ext);
-    const url = getPublicDownloadUrl(image);
-    const stack = [
-      {
-        text: image,
-        link: url,
-        style: 'link',
-      },
-    ];
-    if (isImage && preview) {
-      images[image] = url;
-      stack.push({ image, fit: [300, 300], margin: [0, 8, 0, 8] });
-    }
-    def.ul.push({ stack });
-  });
-
-  return {
-    images,
-    def: multiple ? def : def.ul[0],
-  };
-}
-
-function getGeoJsonDef(answer) {
-  if (!answer) {
-    return getAnswerDef(answer);
-  }
-
-  return {
-    table: {
-      body: [
-        [
-          {
-            text: JSON.stringify(answer, null, 2),
-            style: 'code',
-            preserveLeadingSpaces: true,
-          },
-        ],
-      ],
-    },
-    layout: 'noBorders',
-    fillColor: colors.code,
-  };
-}
-
-function getEmptyRowDef(cols) {
-  const noDataCell = {
-    ...getAnswerDef(null),
-    colSpan: cols,
-    alignment: 'center',
-    margin: [0, 4, 0, 4],
-  };
-  const emptyCells = Array(cols)
-    .fill(0)
-    .map(() => '');
-
-  return [noDataCell, ...emptyCells].slice(0, -1);
 }
 
 export default class SubmissionPDF {
@@ -484,7 +278,7 @@ export default class SubmissionPDF {
   async generateControl(control, path = []) {
     // Group, Page
     if (isContainerControl(control)) {
-      this.docDefinition.content.push(getSectionDef(control));
+      this.docDefinition.content.push(this.getSectionDef(control));
 
       if (!Array.isArray(control.children)) {
         return;
@@ -511,7 +305,7 @@ export default class SubmissionPDF {
     const len = this.docDefinition.content.length;
     if (isRootControl(control)) {
       // Root
-      this.docDefinition.content.push(getSectionDef(control));
+      this.docDefinition.content.push(this.getSectionDef(control));
     } else if (label) {
       // label
       this.docDefinition.content.push({
@@ -551,7 +345,7 @@ export default class SubmissionPDF {
 
     if (type === 'instructions') {
       // Instructions
-      this.docDefinition.content.push(getInstructionDef(control));
+      this.docDefinition.content.push(this.getInstructionDef(control));
     } else if (type === 'selectSingle' || type === 'selectMultiple' || type === 'ontology') {
       // Selections
       const source = await this.getControlSource(control);
@@ -560,23 +354,23 @@ export default class SubmissionPDF {
 
       if (layout.valuesOnly) {
         const value = transformValueToLabel(answer, source);
-        this.docDefinition.content.push(getAnswerDef(value));
+        this.docDefinition.content.push(this.getAnswerDef(value));
       } else if (type !== 'ontology' || (type === 'ontology' && layout.usingControl)) {
-        this.docDefinition.content.push(getSelectDef(answer, source, layout.columnCount, multiple));
+        this.docDefinition.content.push(this.getSelectDef(answer, source, layout.columnCount, multiple));
       } else {
-        this.docDefinition.content.push(getDropdownDef(answer, source, layout.columnCount));
+        this.docDefinition.content.push(this.getDropdownDef(answer, source, layout.columnCount));
       }
     } else if (type === 'file' || type === 'image') {
       // File
       const multiple = getProperty(options, 'source.allowMultiple', false);
       const layout = this.getControlLayout(control);
-      const { images, def } = getFileDef(answer, multiple, layout.preview);
+      const { images, def } = this.getFileDef(answer, multiple, layout.preview);
 
       this.docDefinition.images = { ...this.docDefinition.images, ...images };
       this.docDefinition.content.push(def);
     } else if (type === 'geoJSON') {
       // GeoJSON
-      this.docDefinition.content.push(getGeoJsonDef(answer));
+      this.docDefinition.content.push(this.getGeoJsonDef(answer));
     } else if (type === 'matrix') {
       // Matrix
       const def = await this.getMatrixDef(answer, options);
@@ -584,10 +378,219 @@ export default class SubmissionPDF {
         this.docDefinition.content.push(def);
       }
     } else {
-      this.docDefinition.content.push(getAnswerDef(answer));
+      this.docDefinition.content.push(this.getAnswerDef(answer));
     }
 
     this.docDefinition.content.push('\n');
+  }
+
+  /*******************************************************************/
+  /***************************     Def     ***************************/
+  /*******************************************************************/
+
+  getSectionDef(control) {
+    const fontSize = control.index.length === 1 ? fontSizes.md : fontSizes.sm;
+    const text = `${control.index.join('.')}${control.label ? `. ${control.label}` : ''}`;
+
+    return {
+      layout: {
+        hLineWidth: function () {
+          return 1;
+        },
+        vLineWidth: function () {
+          return 1;
+        },
+        hLineColor: function () {
+          return colors.gray;
+        },
+        vLineColor: function () {
+          return colors.gray;
+        },
+      },
+      table: {
+        body: [
+          [
+            {
+              text,
+              style: 'section',
+              fontSize,
+            },
+          ],
+        ],
+      },
+      headlineLevel: LVL.section,
+      margin: margins.xs,
+    };
+  }
+
+  getAnswerDef(answer, placeholder = 'No answer') {
+    const value = toArray(answer);
+    const hasAnswer = value.length > 0;
+
+    return {
+      text: value.join(', ') || placeholder,
+      style: hasAnswer ? 'answer' : 'answerEmpty',
+    };
+  }
+
+  getInstructionDef(control) {
+    return control.options.source ? htmlToPdfMake(control.options.source) : [];
+  }
+
+  getSelectItemDef(option, multiple, checked) {
+    return {
+      table: {
+        widths: [12, 'auto'],
+        body: [
+          [
+            {
+              svg: getControlSvg(multiple, checked),
+              fit: [16, 16],
+            },
+            this.getAnswerDef(option.label),
+          ],
+        ],
+      },
+      layout: 'noBorders',
+    };
+  }
+
+  getSelectDef(answer, source, cols = 1, multiple) {
+    const value = toArray(answer);
+    const options = [...source];
+
+    const custom = value.find((val) => val && source.every((item) => item.value !== val));
+    if (custom) {
+      options.push({ value: custom, label: custom });
+    }
+
+    const group = [];
+    if (cols === 1) {
+      group.push(options);
+    } else {
+      options.forEach((option, index) => {
+        const i = index % cols;
+        if (!Array.isArray(group[i])) {
+          group[i] = [];
+        }
+        group[i].push(option);
+      });
+    }
+
+    const isChecked = (option) => value.includes(option.value);
+
+    return {
+      columns: group.map((columnOptions) =>
+        columnOptions.map((option) => this.getSelectItemDef(option, multiple, isChecked(option)))
+      ),
+    };
+  }
+
+  getDropdownDef(answer, source, cols = 1) {
+    const value = toArray(answer);
+    const options = [...source];
+
+    const custom = value.find((val) => val && source.every((item) => item.value !== val));
+    if (custom) {
+      options.push({ value: custom, label: custom });
+    }
+
+    const group = [];
+    if (cols === 1) {
+      group.push(options);
+    } else {
+      const countPerCol = Math.ceil(options.length / cols);
+      options.forEach((option, index) => {
+        const i = Math.floor(index / countPerCol);
+        if (!Array.isArray(group[i])) {
+          group[i] = [];
+        }
+        group[i].push(option);
+      });
+    }
+
+    const isChecked = (option) => value.includes(option.value);
+
+    return {
+      columns: group.map((columnOptions) => ({
+        ul: columnOptions.map((option) => {
+          const d = this.getAnswerDef(option.label);
+          if (isChecked(option)) {
+            d.style = 'answerHighlight';
+          }
+          return d;
+        }),
+      })),
+    };
+  }
+
+  getFileDef(answer, multiple, preview) {
+    const value = toArray(answer);
+    if (value.length === 0) {
+      return this.getAnswerDef(value);
+    }
+
+    const def = { ul: [] };
+    const images = {};
+
+    value.forEach((image) => {
+      const ext = (image.split('.').pop() || '').toLowerCase();
+      const isImage = ['png', 'jpg', 'jpeg'].includes(ext);
+      const url = getPublicDownloadUrl(image);
+      const stack = [
+        {
+          text: image,
+          link: url,
+          style: 'link',
+        },
+      ];
+      if (isImage && preview) {
+        images[image] = url;
+        stack.push({ image, fit: [300, 300], margin: [0, 8, 0, 8] });
+      }
+      def.ul.push({ stack });
+    });
+
+    return {
+      images,
+      def: multiple ? def : def.ul[0],
+    };
+  }
+
+  getGeoJsonDef(answer) {
+    if (!answer) {
+      return this.getAnswerDef(answer);
+    }
+
+    return {
+      table: {
+        body: [
+          [
+            {
+              text: JSON.stringify(answer, null, 2),
+              style: 'code',
+              preserveLeadingSpaces: true,
+            },
+          ],
+        ],
+      },
+      layout: 'noBorders',
+      fillColor: colors.code,
+    };
+  }
+
+  getEmptyRowDef(cols) {
+    const noDataCell = {
+      ...this.getAnswerDef(null),
+      colSpan: cols,
+      alignment: 'center',
+      margin: [0, 4, 0, 4],
+    };
+    const emptyCells = Array(cols)
+      .fill(0)
+      .map(() => '');
+
+    return [noDataCell, ...emptyCells].slice(0, -1);
   }
 
   async getMatrixDef(answer, options) {
@@ -623,7 +626,7 @@ export default class SubmissionPDF {
     }
 
     if (rows.length === 0) {
-      rows.push(getEmptyRowDef(cols.length));
+      rows.push(this.getEmptyRowDef(cols.length));
     }
 
     return {

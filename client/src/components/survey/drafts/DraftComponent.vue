@@ -201,7 +201,12 @@ export default {
     next() {
       // this.$store.dispatch('draft/next')
       queueAction(this.$store, 'draft/next');
-      window.scrollTo(0, 0);
+      const previewDom = document.querySelector('#previewSurvey');
+      if (previewDom) {
+        previewDom.scrollTo(0, 0);
+      } else {
+        window.scrollTo(0, 0);
+      }
     },
     prev() {
       // this.$store.dispatch('draft/prev')
