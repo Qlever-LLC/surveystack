@@ -411,13 +411,13 @@ export default {
         this.loading = true;
         const { data: notes } = await api.get('/farmos/notes/all');
         this.notes = notes;
-        this.loading = false;
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           this.error(error.response.data.message);
         } else {
           this.error(error.message);
         }
+        this.loading = false;
       }
     },
     success(msg) {
