@@ -265,7 +265,7 @@ export const getTree = async (group) => {
   };
 };
 
-export const getOwnerFromInstanceName = async (instanceName) => {
+export const getOwnersFromInstanceName = async (instanceName) => {
   const instanceOwners = await db
     .collection('farmos-instances')
     .find({
@@ -273,19 +273,19 @@ export const getOwnerFromInstanceName = async (instanceName) => {
       owner: true,
     })
     .toArray();
-  if (instanceOwners.length > 0) {
-    const ownersId = instanceOwners.map((ownerInstance) => ownerInstance.userId);
-    const ownersDoc = await db
-      .collection('users')
-      .find({
-        _id: { $in: ownersId.map((id) => asMongoId(id)) },
-      })
-      .toArray();
-    if (ownersDoc.length > 0) {
-      return ownersDoc;
-    }
+  if (instanceOwners.length === 0) {
+    return null;
   }
-  return null;
+  const ownersId = instanceOwners.map((ownerInstance) => ownerInstance.userId);
+  const ownersDoc = await db
+    .collection('users')
+    .find({
+      _id: { $in: ownersId.map((id) => asMongoId(id)) },
+    })
+    .toArray();
+  if (ownersDoc.length > 0) {
+    return ownersDoc;
+  }
 };
 
 /**
@@ -321,7 +321,7 @@ export const mapFarmOSInstanceToUser = async (userId, instanceName, owner, origi
   });
 
   // send email to instance owner(s)
-  const instanceOwners = await getOwnerFromInstanceName(instanceName);
+  const instanceOwners = await getOwnersFromInstanceName(instanceName);
   if (instanceOwners) {
     for (const instanceOwner of instanceOwners) {
       if (instanceOwner && instanceOwner.email) {
@@ -526,41 +526,42 @@ export const sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification = a
   newGroupIds,
   origin
 ) => {
-  const owners = await getOwnerFromInstanceName(instanceName);
-  if (owners) {
-    for (const owner of owners) {
-      if (owner && owner.email) {
-        const ownerEmail = owner.email;
+  const owners = await getOwnersFromInstanceName(instanceName);
+  if (!owners) {
+    return;
+  }
+  for (const owner of owners) {
+    if (owner && owner.email) {
+      const ownerEmail = owner.email;
 
-        const oldGroupNamesList = [];
-        for (const groupId of oldGroupIds) {
-          oldGroupNamesList.push(await extractGroupNameForMailing(groupId));
-        }
-        const oldGroupNames = oldGroupNamesList.join(', ');
-
-        const newGroupNamesList = [];
-        for (const groupId of newGroupIds) {
-          newGroupNamesList.push(await extractGroupNameForMailing(groupId));
-        }
-        const newGroupNames = newGroupNamesList.join(', ');
-
-        const magicLinkProfile = await createMagicLink({
-          origin,
-          email: ownerEmail,
-          expiresAfterDays: 7,
-          landingPath: `/auth/profile`,
-        });
-
-        const subject = 'Your instance has been moved to another group';
-        const description = `Your farmOS instance ${instanceName} has been removed from the group ${oldGroupNames} and added to the group ${newGroupNames} in SurveyStack.`;
-        await mailService.sendHandleNotification({
-          to: ownerEmail,
-          subject: subject,
-          link: magicLinkProfile,
-          actionDescriptionHtml: description,
-          actionDescriptionText: description,
-        });
+      const oldGroupNamesList = [];
+      for (const groupId of oldGroupIds) {
+        oldGroupNamesList.push(await extractGroupNameForMailing(groupId));
       }
+      const oldGroupNames = oldGroupNamesList.join(', ');
+
+      const newGroupNamesList = [];
+      for (const groupId of newGroupIds) {
+        newGroupNamesList.push(await extractGroupNameForMailing(groupId));
+      }
+      const newGroupNames = newGroupNamesList.join(', ');
+
+      const magicLinkProfile = await createMagicLink({
+        origin,
+        email: ownerEmail,
+        expiresAfterDays: 7,
+        landingPath: `/auth/profile`,
+      });
+
+      const subject = 'Your instance has been moved to another group';
+      const description = `Your farmOS instance ${instanceName} has been removed from the group ${oldGroupNames} and added to the group ${newGroupNames} in SurveyStack.`;
+      await mailService.sendHandleNotification({
+        to: ownerEmail,
+        subject: subject,
+        link: magicLinkProfile,
+        actionDescriptionHtml: description,
+        actionDescriptionText: description,
+      });
     }
   }
 };
@@ -590,29 +591,30 @@ export const sendUserAddFarmToMultipleSurveystackGroupNotification = async (
 };
 
 const sendAddNotification = async (instanceName, groupName, origin) => {
-  const owners = await getOwnerFromInstanceName(instanceName);
-  if (owners) {
-    for (const owner of owners) {
-      if (owner && owner.email) {
-        const ownerEmail = owner.email;
+  const owners = await getOwnersFromInstanceName(instanceName);
+  if (!owners) {
+    return;
+  }
+  for (const owner of owners) {
+    if (owner && owner.email) {
+      const ownerEmail = owner.email;
 
-        const magicLinkProfile = await createMagicLink({
-          origin,
-          email: ownerEmail,
-          expiresAfterDays: 7,
-          landingPath: `/auth/profile`,
-        });
+      const magicLinkProfile = await createMagicLink({
+        origin,
+        email: ownerEmail,
+        expiresAfterDays: 7,
+        landingPath: `/auth/profile`,
+      });
 
-        const subject = 'Your instance has been added to a group';
-        const description = `Your farmOS instance ${instanceName} has been added to the group ${groupName} in SurveyStack.`;
-        await mailService.sendHandleNotification({
-          to: ownerEmail,
-          subject: subject,
-          link: magicLinkProfile,
-          actionDescriptionHtml: description,
-          actionDescriptionText: description,
-        });
-      }
+      const subject = 'Your instance has been added to a group';
+      const description = `Your farmOS instance ${instanceName} has been added to the group ${groupName} in SurveyStack.`;
+      await mailService.sendHandleNotification({
+        to: ownerEmail,
+        subject: subject,
+        link: magicLinkProfile,
+        actionDescriptionHtml: description,
+        actionDescriptionText: description,
+      });
     }
   }
 };
@@ -642,29 +644,30 @@ export const sendUserRemoveFarmFromMultipleSurveystackGroupsNotification = async
 };
 
 const sendRemoveNotification = async (instanceName, groupName, origin) => {
-  const owners = await getOwnerFromInstanceName(instanceName);
-  if (owners) {
-    for (const owner of owners) {
-      if (owner && owner.email) {
-        const ownerEmail = owner.email;
+  const owners = await getOwnersFromInstanceName(instanceName);
+  if (!owners) {
+    return;
+  }
+  for (const owner of owners) {
+    if (owner && owner.email) {
+      const ownerEmail = owner.email;
 
-        const magicLinkProfile = await createMagicLink({
-          origin,
-          email: ownerEmail,
-          expiresAfterDays: 7,
-          landingPath: `/auth/profile`,
-        });
+      const magicLinkProfile = await createMagicLink({
+        origin,
+        email: ownerEmail,
+        expiresAfterDays: 7,
+        landingPath: `/auth/profile`,
+      });
 
-        const subject = 'Your instance has been removed from a group';
-        const description = `Your farmOS instance ${instanceName} has been removed from the group ${groupName} in SurveyStack.`;
-        await mailService.sendHandleNotification({
-          to: ownerEmail,
-          subject: subject,
-          link: magicLinkProfile,
-          actionDescriptionHtml: description,
-          actionDescriptionText: description,
-        });
-      }
+      const subject = 'Your instance has been removed from a group';
+      const description = `Your farmOS instance ${instanceName} has been removed from the group ${groupName} in SurveyStack.`;
+      await mailService.sendHandleNotification({
+        to: ownerEmail,
+        subject: subject,
+        link: magicLinkProfile,
+        actionDescriptionHtml: description,
+        actionDescriptionText: description,
+      });
     }
   }
 };
