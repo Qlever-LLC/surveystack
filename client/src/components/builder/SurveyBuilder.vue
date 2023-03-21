@@ -557,30 +557,35 @@ export default {
         });
     },
     highlight(tab, select = true) {
+      console.log('----1 highlight:' + select);
       this.codeError = null;
       this.evaluated = null;
 
       this.hideCode = false;
 
       if (!this.control.options[tab]) {
+        console.log('----1.5 highlight options not set:' + tab);
         this.control.options[tab] = {
           code: '',
-          enabled: false,
+          enabled: select,
         };
+        console.log('----1.6 highlight options now ' + this.control.options[tab].enabled);
       }
-
+      console.log('----2 highlight:' + this.control.options[tab].enabled);
       if (this.control.options[tab] && !this.control.options[tab].enabled) {
         this.highlightNext();
         return;
       }
 
       this.selectedTab = tabMap.indexOf(tab);
-
+      console.log('----3 highlight ' + this.selectedTab);
       if (!this.control.options[tab].code) {
+        console.log('---- tab: ' + tab);
         let initialCode;
         if (tab === 'apiCompose') {
           initialCode = defaultApiCompose;
         } else if (tab === 'initialize') {
+          console.log('----calling initialInitializeCode');
           initialCode = initialInitializeCode(tab);
         } else {
           initialCode = initialRelevanceCode(tab);
@@ -952,6 +957,7 @@ export default {
         };
 
         if (!newVal) {
+          console.log('handler(newval): newVal is undef');
           this.optionsRelevance = null;
           this.optionsInitialize = null;
           this.optionsCalculate = null;
