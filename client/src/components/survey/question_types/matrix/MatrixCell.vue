@@ -147,9 +147,21 @@ export default {
   computed: {
     value: {
       get() {
-        return this.item[this.header.value].value;
+        const value = this.item[this.header.value].value;;
+        if (this.header.type == "farmos_planting" || this.header.type == "farmos_field") {
+          if (!this.header.multiple && Array.isArray(value)) {
+            return value[0];
+          }
+        }
+
+        return value;
       },
       set(value) {
+        if (this.header.type == "farmos_planting" || this.header.type == "farmos_field") {
+          if (!Array.isArray(value)) {
+            value = [value];
+          }
+        }
         this.item[this.header.value].value = value;
       },
     },
