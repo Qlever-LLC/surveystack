@@ -60,7 +60,7 @@ const base = (type) => ({
             farmName: f.instanceName,
             url: f.instanceName,
             name: f.name.trim(),
-            fieldId: f.id,
+            id: f.id,
           },
         }));
       } catch (e) {
@@ -85,7 +85,7 @@ const base = (type) => ({
               farmName: '',
               url: '',
               name: node.value.name,
-              fieldId: node.value.id,
+              id: node.value.id,
             },
           });
         }
@@ -112,7 +112,7 @@ const base = (type) => ({
                       farmName: '',
                       url: '',
                       name: targetValue.name,
-                      fieldId: targetValue.id,
+                      id: targetValue.id,
                     },
                   });
                 }

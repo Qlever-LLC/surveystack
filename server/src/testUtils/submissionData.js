@@ -167,7 +167,7 @@ const farmOsFieldData = (overrides = {}, index = 1) => ({
         farmName: 'Mock farm name',
         url: 'Mock url',
         name: 'Mock name',
-        fieldId: new ObjectId(),
+        id: new ObjectId(),
       },
     ],
     meta: {

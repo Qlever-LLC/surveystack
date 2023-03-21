@@ -80,7 +80,7 @@ describe('test-aggregator-integration', () => {
 
     const { data: plants } = await getTaxonomy(TEST_FARM, 'plant_type');
     const { data: fields } = await getAssets(TEST_FARM, 'land');
-    const fieldId = fields.data[0].id;
+    const id = fields.data[0].id;
 
     const plantTypes = plants.data.map((p) => {
       return {
@@ -115,7 +115,7 @@ describe('test-aggregator-integration', () => {
             data: [
               {
                 type: 'asset--land',
-                id: fieldId,
+                id: id,
               },
             ],
           },

@@ -40,7 +40,7 @@ const farmOsFieldHeaders = (index = 1) => [
   `data.farmos_field_${index}.value.0.farmName`,
   `data.farmos_field_${index}.value.0.url`,
   `data.farmos_field_${index}.value.0.name`,
-  `data.farmos_field_${index}.value.0.fieldId`,
+  `data.farmos_field_${index}.value.0.id`,
 ];
 
 const farmOsPlantingHeaders = (index = 1) => [
