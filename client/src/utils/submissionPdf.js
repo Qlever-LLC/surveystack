@@ -711,14 +711,19 @@ export default class SubmissionPDF {
   }
 
   getControlLayout(control) {
-    const layout = control.options.layout || {};
-    const cols = Number(layout.columnCount);
+    const { valuesOnly, usingControl, columnCount, preview } = {
+      valuesOnly: true,
+      usingControl: false,
+      columnCount: 1,
+      preview: false,
+      ...control.options.layout,
+    };
 
     return {
-      columnCount: isNaN(cols) ? 1 : cols,
-      valuesOnly: layout.valuesOnly || false,
-      usingControl: layout.usingControl || false,
-      preview: layout.preview || false,
+      columnCount,
+      valuesOnly,
+      usingControl,
+      preview,
     };
   }
 
