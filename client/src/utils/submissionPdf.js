@@ -126,14 +126,6 @@ function formatDate(date, format = 'MMM d, yyyy h:mm a') {
   return isValid(parsedDate) && parsedDate.toISOString() === date ? dateFnsFormat(parsedDate, format) : date;
 }
 
-function isRootControl(control) {
-  return control.index.length === 1;
-}
-
-function isContainerControl(control) {
-  return control.type === 'page' || control.type === 'group';
-}
-
 function transformValueToLabel(value, source) {
   if (Array.isArray(value)) {
     return value.flatMap((item) => transformValueToLabel(item, source));
@@ -291,7 +283,7 @@ export default class SubmissionPDF {
 
   async generateControl(control, path = []) {
     // Group, Page
-    if (isContainerControl(control)) {
+    if (this.isContainerControl(control)) {
       this.docDefinition.content.push(this.getSectionDef(control));
 
       if (!Array.isArray(control.children)) {
@@ -317,7 +309,7 @@ export default class SubmissionPDF {
     const { name, label, type, hint, moreInfo, options } = control;
 
     const len = this.docDefinition.content.length;
-    if (isRootControl(control)) {
+    if (this.isRootControl(control)) {
       // Root
       this.docDefinition.content.push(this.getSectionDef(control));
     } else if (label) {
@@ -729,5 +721,13 @@ export default class SubmissionPDF {
 
   isFirstControl() {
     return this.metaIndex === this.docDefinition.content.length;
+  }
+
+  isRootControl(control) {
+    return control.index.length === 1;
+  }
+
+  isContainerControl(control) {
+    return control.type === 'page' || control.type === 'group';
   }
 }
