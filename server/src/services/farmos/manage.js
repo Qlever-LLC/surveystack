@@ -591,32 +591,10 @@ export const sendUserAddFarmToMultipleSurveystackGroupNotification = async (
 };
 
 const sendAddNotification = async (instanceName, groupName, origin) => {
-  const owners = await getOwnersFromInstanceName(instanceName);
-  if (!owners) {
-    return;
-  }
-  for (const owner of owners) {
-    if (owner && owner.email) {
-      const ownerEmail = owner.email;
+  const subject = 'Your instance has been added to a group';
+  const description = `Your farmOS instance ${instanceName} has been added to the group ${groupName} in SurveyStack.`;
 
-      const magicLinkProfile = await createMagicLink({
-        origin,
-        email: ownerEmail,
-        expiresAfterDays: 7,
-        landingPath: `/auth/profile`,
-      });
-
-      const subject = 'Your instance has been added to a group';
-      const description = `Your farmOS instance ${instanceName} has been added to the group ${groupName} in SurveyStack.`;
-      await mailService.sendHandleNotification({
-        to: ownerEmail,
-        subject: subject,
-        link: magicLinkProfile,
-        actionDescriptionHtml: description,
-        actionDescriptionText: description,
-      });
-    }
-  }
+  await sendHandleNotification(instanceName, origin, subject, description);
 };
 
 const sendUserRemoveFarmFromSurveystackGroupNotification = async (
@@ -644,6 +622,13 @@ export const sendUserRemoveFarmFromMultipleSurveystackGroupsNotification = async
 };
 
 const sendRemoveNotification = async (instanceName, groupName, origin) => {
+  const subject = 'Your instance has been removed from a group';
+  const description = `Your farmOS instance ${instanceName} has been removed from the group ${groupName} in SurveyStack.`;
+
+  await sendHandleNotification(instanceName, origin, subject, description);
+};
+
+const sendHandleNotification = async (instanceName, origin, subject, description) => {
   const owners = await getOwnersFromInstanceName(instanceName);
   if (!owners) {
     return;
@@ -659,8 +644,6 @@ const sendRemoveNotification = async (instanceName, groupName, origin) => {
         landingPath: `/auth/profile`,
       });
 
-      const subject = 'Your instance has been removed from a group';
-      const description = `Your farmOS instance ${instanceName} has been removed from the group ${groupName} in SurveyStack.`;
       await mailService.sendHandleNotification({
         to: ownerEmail,
         subject: subject,
