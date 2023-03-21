@@ -247,13 +247,13 @@ export default {
       const assetsToSelect = fields.flatMap((field) =>
         this.farmos.plantings
           .filter((item) => !item.value.isField)
-          .filter((item) => item.value.farmId === field.farmId)
+          .filter((item) => item.value.farmName === field.farmName)
           .filter((item) => item.value.location.some((loc) => loc.id === field.location.id))
       );
 
       assetsToSelect.forEach((assetToSelect) => {
         if (
-          assets.some((asset) => asset.farmId === assetToSelect.value.farmId && asset.id === assetToSelect.value.id)
+          assets.some((asset) => asset.farmName === assetToSelect.value.farmName && asset.id === assetToSelect.value.id)
         ) {
           // skip
         } else {

@@ -153,7 +153,6 @@ const base = (type) => ({
           return {
             label: `<span class="blue-chip mr-4">${f.instanceName}</span> ${f.name} `,
             value: {
-              farmId: f.instanceName,
               farmName: f.instanceName,
               url: f.instanceName,
               name: f.name.trim(),
@@ -187,7 +186,6 @@ const base = (type) => ({
           localPlantings.push({
             label: `${node.value.name}`,
             value: {
-              farmId: '',
               farmName: '',
               url: '',
               name: node.value.name,
@@ -215,7 +213,6 @@ const base = (type) => ({
                   localPlantings.push({
                     label: `${targetValue.name}`,
                     value: {
-                      farmId: '',
                       farmName: '',
                       url: '',
                       name: targetValue.name,

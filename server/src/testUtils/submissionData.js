@@ -182,7 +182,6 @@ const farmOsPlantingData = (overrides = {}, index = 1) => ({
   [`farmos_planting_${index}`]: {
     value: [
       {
-        farmId: new ObjectId(),
         farmName: 'Mock farm name',
         url: 'Mock url',
         name: 'Mock name',
