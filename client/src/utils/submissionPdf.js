@@ -152,11 +152,13 @@ export default class SubmissionPDF {
   submission;
   docDefinition;
   metaIndex;
+  disabled;
 
   constructor(survey, submission) {
     this.initialize();
     this.survey = survey;
     this.submission = submission;
+    this.disabled = !this.survey || !this.submission;
   }
 
   initialize() {
@@ -173,7 +175,7 @@ export default class SubmissionPDF {
   async download() {
     const maker = await this.generate();
     if (maker) {
-      maker.download();
+      maker.download(this.filename());
     }
   }
 
@@ -185,7 +187,7 @@ export default class SubmissionPDF {
   }
 
   async generate() {
-    if (!this.survey || !this.submission) {
+    if (this.disabled) {
       return null;
     }
 
@@ -209,14 +211,26 @@ export default class SubmissionPDF {
     return pdfMake.createPdf(this.docDefinition);
   }
 
+  filename() {
+    if (!this.disabled) {
+      return '';
+    }
+
+    const { dateSubmitted, dateModified, dateCreated } = this.submission.meta;
+    const date = dateSubmitted || dateModified || dateCreated || new Date().toISOString();
+    return `${this.survey.name}-${this.submission._id.slice(-6)}-${formatDate(date, 'yyyy-MM-dd')}.pdf`;
+  }
+
   /*******************************************************************/
   /********************     Document meta info     *******************/
   /*******************************************************************/
 
   generateInfo() {
+    const filename = this.filename();
+    const title = filename ? filename.slice(0, -4) : `${this.survey.name} - SurveyStack report`;
     this.docDefinition.info = {
-      title: `${this.survey.name} - SurveyStack report`,
-      author: 'Our-Sci SurveyStack team',
+      title,
+      author: 'Our-Sci SurveyStack Team',
       subject: `Report of the SurveyStack survey`,
       keywords: 'SurveyStack, Survey, FarmOS, OurSci, what else?',
     };

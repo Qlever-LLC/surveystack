@@ -13,6 +13,7 @@ import * as hyloService from '../services/hylo.service';
 import rolesService from '../services/roles.service';
 import { queryParam } from '../helpers';
 import { appendDatabaseOperationDurationToLoggingMessage } from '../middleware/logging';
+import mailService from '../services/mail/mail.service';
 const col = 'submissions';
 const DEFAULT_LIMIT = 100000;
 const DEFAULT_SORT = { _id: -1 }; // reverse insert order
@@ -1194,6 +1195,18 @@ const deleteSubmissions = async (req, res) => {
   return res.send({ message: 'OK' });
 };
 
+const sendPdfLink = async (req, res) => {
+  await mailService.sendLink({
+    to: res.locals.auth.user.email,
+    subject: `Survey report - ${req.body.survey}`,
+    link: `${req.headers.origin}/submissions/${req.params.id}/pdf`,
+    actionDescriptionHtml: `Thank you for taking a time to complete our survey. Here's a link to your survey result.`,
+    btnText: 'View submission',
+  });
+
+  return res.send({ success: true });
+};
+
 export default {
   getSubmissions,
   getSubmissionsPage,
@@ -1206,4 +1219,5 @@ export default {
   archiveSubmissions,
   deleteSubmissions,
   prepareSubmissionsToQSLs,
+  sendPdfLink,
 };

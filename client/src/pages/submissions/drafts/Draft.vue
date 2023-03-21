@@ -52,7 +52,7 @@
       :sending-email="sendingEmail"
       @close="onCloseResultDialog"
       @download="download"
-      @email-me="emailMe"
+      @emailMe="emailMe"
     />
 
     <result-dialog
@@ -179,10 +179,43 @@ export default {
     },
     async download() {
       this.downloading = true;
-      await new SubmissionPdf(this.survey, this.submission).download();
-      this.downloading = false;
+      this.resultItems = this.resultItems.filter((item) => !item.downloadError);
+
+      try {
+        await new SubmissionPdf(this.survey, this.submission).download();
+      } catch (e) {
+        console.error('Failed to download PDF', e);
+        this.resultItems = [
+          ...this.resultItems.filter((item) => !item.downloadError),
+          {
+            title: 'Error',
+            body: 'Sorry, something went wrong while downloading a PDF. Try again later.',
+            downloadError: true,
+          },
+        ];
+      } finally {
+        this.downloading = false;
+      }
     },
-    emailMe() {},
+    async emailMe() {
+      this.sendingEmail = true;
+      this.resultItems = this.resultItems.filter((item) => !item.emailError);
+
+      try {
+        await api.post(`/submissions/${this.submission._id}/send-email`, { survey: this.survey.name });
+      } catch (e) {
+        this.resultItems = [
+          ...this.resultItems.filter((item) => !item.emailError),
+          {
+            title: 'Error',
+            body: 'Sorry, something went wrong while sending an email. Try again later.',
+            emailError: true,
+          },
+        ];
+      } finally {
+        this.sendingEmail = false;
+      }
+    },
   },
   async created() {
     this.loading = true;

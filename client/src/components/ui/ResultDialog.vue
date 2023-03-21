@@ -6,7 +6,13 @@
 
         <v-card-text>
           <div v-for="(item, idx) in items" :key="idx">
-            <v-card flat dark outlined class="mb-2" :color="item.error ? 'red darken-4' : 'green'">
+            <v-card
+              flat
+              dark
+              outlined
+              class="mb-2"
+              :color="item.error || item.downloadError || item.emailError ? 'red darken-4' : 'green'"
+            >
               <v-card-text class="white--text">
                 <span style="font-weight: bold">{{ item.title }}</span> {{ item.body }}
               </v-card-text>
@@ -59,7 +65,7 @@
           </div>
           <div v-if="additionalMessage" class="px-2" v-html="additionalMessage" />
 
-          <div v-if="isSuccess" class="mt-6 d-flex flex-column align-stretch">
+          <div v-if="showOptions" class="mt-6 d-flex flex-column align-stretch">
             <v-btn color="primary" depressed dense :loading="downloading" @click="$emit('download')">Download</v-btn>
             <v-btn class="mt-3" color="primary" depressed dense :loading="sendingEmail" @click="$emit('emailMe')">
               Email me survey
@@ -77,12 +83,7 @@
 </template>
 
 <script>
-import CopyToClipboard from '../submissions/CopyToClipboard.vue';
-
 export default {
-  components: {
-    CopyToClipboard,
-  },
   props: {
     value: {
       required: true,
@@ -122,8 +123,8 @@ export default {
         this.$emit('input', value);
       },
     },
-    isSuccess() {
-      return this.items.every((item) => !item.error);
+    showOptions() {
+      return this.items.every((item) => !item.error || item.emailError || item.downloadError);
     },
   },
   methods: {

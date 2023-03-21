@@ -114,6 +114,11 @@ router.post(
   ],
   catchErrors(submissionController.bulkReassignSubmissions)
 );
+router.post(
+  '/submissions/:id/send-email',
+  [assertAuthenticated, assertEntityExists({ collection: 'submissions' })],
+  catchErrors(submissionController.sendPdfLink)
+);
 router.get(
   '/submissions/:id',
   [assertEntityExists({ collection: 'submissions' })],
@@ -142,7 +147,7 @@ router.delete(
 );
 router.post(
   '/submissions/bulk-delete',
-  [assertHasIds, assertEntitiesExist({ collection: 'submissions' }), assertEntitiesRights],
+  [assertHasIds, assertEntitiesExist({ collection: 'submissions' })],
   catchErrors(submissionController.deleteSubmissions)
 );
 
