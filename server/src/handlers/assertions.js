@@ -270,7 +270,7 @@ export const checkFeatureToggledOn = (toggleName) => async (req, res, next) => {
 export const assertIsAtLeastOnceOwner = async (req, res, next) => {
   const userId = res.locals.auth.user._id;
   const ownership = await db.collection('farmos-instances').findOne({
-    _id: new ObjectId(userId),
+    userId: new ObjectId(userId),
     owner: true,
   });
   if (!ownership) {

@@ -4,7 +4,7 @@
       <p class="mt-4 mb-6">
         You are logged in as
         <strong>{{ user.email }} </strong>.
-        {{ user }}
+        {{ instances }}
       </p>
 
       <div class="d-flex justify-space-between">
@@ -104,8 +104,22 @@ export default {
       instances: [],
       /*
         [
-          {instanceName: "instanceName", isOwnerOfInstance: true, groups: ["name", "name"], otherUsers: ["email", "email"]}
-          {instanceName: "instanceName", isOwnerOfInstance: false, groups: [], otherUsers: []}
+          { 
+            instanceName: "instanceName", 
+            isOwner: true, 
+            groups: [
+              { "groupId":"string id", "groupName": "name"},
+              { "groupId":"string id", "groupName": "name"},
+            ], 
+            otherUsers: [
+              { "userId":"string id", "userEmail": "email"},
+              { "userId":"string id", "userEmail": "email"},
+            ]
+          },
+          { 
+            instanceName: "instanceName",
+            isOwner: false
+          }
         ]
       */
     };
@@ -121,9 +135,8 @@ export default {
   async created() {
     if (this.user) {
       this.email = this.user.email;
-      const userId = user._id;
+      const userId = this.user._id;
       const { data } = await api.get(`/ownership/${userId}`);
-      console.log(data);
       this.instances = data;
     }
   },
