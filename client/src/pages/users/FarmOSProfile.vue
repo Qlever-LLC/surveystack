@@ -36,53 +36,44 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td class="d-flex justify-space-between align-center">
-                <div>instanceName</div>
+            <tr v-for="(instance, idx) in instances" :key="`grp-${idx}`">
+              <td>
+                <div style="white-space: nowrap">{{ `${instance.instanceName}` }}</div>
                 <div>
-                  <v-btn text small class="px-1" style="min-width: 0px" color="blue">access</v-btn>
-                  <v-btn text small class="px-1" style="min-width: 0px" color="black">move</v-btn>
-                  <v-btn text small class="px-1" style="min-width: 0px" color="red">delete</v-btn>
+                  <v-btn text x-small class="px-1 mx-1" style="min-width: 0px" color="blue">access</v-btn>
+                  <v-btn text x-small class="px-1 mx-1" style="min-width: 0px" color="black">move</v-btn>
+                  <v-btn text x-small class="px-1 mx-1" style="min-width: 0px" color="red">delete</v-btn>
                 </div>
               </td>
               <td>
-                <v-chip class="ma-1" close outlined color="primary"> Our Sci </v-chip>
+                <div v-if="instance.isOwner">
+                  <v-chip
+                    class="ma-1"
+                    small
+                    close
+                    v-for="(group, uidx) in instance.groups"
+                    :key="`instance-${idx}-group-${uidx}`"
+                  >
+                    {{ group.groupName }}
+                  </v-chip>
+                </div>
+                <div v-else>only owners may view this information</div>
               </td>
               <td>
-                <v-chip class="ma-1" close outlined color="primary"> gbathree@gmail.com </v-chip>
+                <div v-if="instance.isOwner">
+                  <v-chip
+                    class="ma-1"
+                    small
+                    close
+                    v-for="(user, uidx) in instance.otherUsers"
+                    :key="`instance-${idx}-user-${uidx}`"
+                  >
+                    {{ user.userEmail }}
+                  </v-chip>
+                </div>
+                <div v-else>only owners may view this information</div>
               </td>
             </tr>
-            <!--<tr v-for="(instance, idx) in mappedInstances" :key="`grp-${idx}`">
-             <td>{{ `${instance.instanceName}` }}</td>
-            <td>
-              <div>
-                <v-chip
-                  small
-                  class="ma-1"
-                  dark
-                  color="primary"
-                  v-for="(userMapping, uidx) in instance.userMappings"
-                  :key="`instance-${idx}-user-${uidx}`"
-                >
-                  {{ userMapping.user }}
-                </v-chip>
-              </div>
-            </td>
-            <td>
-              <div>
-                <v-chip
-                  small
-                  class="ma-1"
-                  dark
-                  color="primary"
-                  v-for="(userMapping, uidx) in instance.userMappings"
-                  :key="`instance-${idx}-user-${uidx}`"
-                >
-                  {{ userMapping.user }}
-                </v-chip>
-              </div>
-            </td>
-          </tr> -->
           </tbody>
         </template>
       </v-simple-table>
