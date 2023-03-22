@@ -348,10 +348,11 @@ export default {
 
       for (const farm of farms) {
         try {
-          await api.post(`/farmos/group-manage/${this.groupId}/mapUser`, {
+          const resp = await api.post(`/farmos/group-manage/${this.groupId}/mapUser`, {
             userId: this.selectedUser.user,
             instanceName: farm,
           });
+          this.success(resp.data.status);
         } catch (error) {
           this.error(error + '');
         }
@@ -394,22 +395,24 @@ export default {
           groupIds,
         });
         this.success(resp.data.status);
+
+        this.showDisonnectDialog = false;
+
+        this.differenceRemovedGroupIds = this.selectedGroupIds.filter((x) => !groupIds.includes(x));
+        if (this.differenceRemovedGroupIds.length > 0) {
+          //only if remove happened
+          this.showRemoveNoteDialog = true;
+        } else {
+          await this.init();
+        }
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           this.error(error.response.data.message);
         } else {
           this.error(error.message);
         }
-      }
-
-      this.showDisonnectDialog = false;
-
-      this.differenceRemovedGroupIds = this.selectedGroupIds.filter((x) => !groupIds.includes(x));
-      if (this.differenceRemovedGroupIds.length > 0) {
-        //only if remove happened
-        this.showRemoveNoteDialog = true;
-      } else {
-        await this.init();
+        this.showDisonnectDialog = false;
+        this.loading = false;
       }
     },
     async addNote(arg) {

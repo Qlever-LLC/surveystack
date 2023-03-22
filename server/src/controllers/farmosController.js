@@ -381,7 +381,9 @@ export const superAdminMapFarmosInstance = async (req, res) => {
     throw boom.badData('instance name missing');
   }
 
-  await addFarmToSurveystackGroupAndSendNotification(instanceName, group);
+  const { origin } = req.headers;
+
+  await addFarmToSurveystackGroupAndSendNotification(instanceName, group, origin);
   return res.send({
     status: 'success',
   });
@@ -397,7 +399,9 @@ export const superAdminUnMapFarmosInstance = async (req, res) => {
     throw boom.badData('instance name missing');
   }
 
-  await removeFarmFromSurveystackGroupAndSendNotification(instanceName, group);
+  const { origin } = req.headers;
+
+  await removeFarmFromSurveystackGroupAndSendNotification(instanceName, group, origin);
   return res.send({
     status: 'success',
   });
@@ -416,8 +420,9 @@ export const superAdminMapFarmosInstanceToUser = async (req, res) => {
   if (typeof owner == undefined) {
     throw boom.badData('owner attribute missing');
   }
+  const { origin } = req.headers;
 
-  await mapFarmOSInstanceToUser(user, instanceName, !!owner);
+  await mapFarmOSInstanceToUser(user, instanceName, !!owner, origin);
   return res.send({
     status: 'success',
   });
@@ -826,6 +831,8 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
     });
   }
 
+  const { origin } = req.headers;
+
   const {
     groupId: group,
     url,
@@ -868,9 +875,10 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
       planName
     );
 
-    await mapFarmOSInstanceToUser(owner, url, true);
+    const { origin } = req.headers;
+    await mapFarmOSInstanceToUser(owner, url, true, origin);
 
-    await addFarmToSurveystackGroupAndSendNotification(url, groupId);
+    await addFarmToSurveystackGroupAndSendNotification(url, groupId, origin);
 
     await db.collection('farmos.fields').insertOne({
       url,
@@ -1036,6 +1044,8 @@ export const mapUser = async (req, res) => {
     instanceName: Joi.string().required(),
   });
 
+  const { origin } = req.headers;
+
   const userRes = await db.collection('users').findOne({ _id: new ObjectId(userId) });
   if (!userRes) {
     throw boom.notFound(`user with id: ${userId} not found`);
@@ -1084,16 +1094,20 @@ export const mapUser = async (req, res) => {
   }
 
   if (mapToGroup) {
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, groupId);
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, groupId, origin);
   }
 
   if (mapToUser) {
     const userId = new ObjectId(userId);
-    await mapFarmOSInstanceToUser(userId, instanceName, true);
+    await mapFarmOSInstanceToUser(userId, instanceName, true, origin);
   }
 
+  const group = await db.collection('groups').find({
+    _id: groupId,
+  });
+  const resStatus = `Successfully added instance to ${group.name}, instance owner will be notified`;
   return res.send({
-    status: 'ok',
+    status: resStatus,
   });
 };
 
@@ -1191,7 +1205,7 @@ export const addNotes = async (req, res) => {
 
   if (validres.error) {
     const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
-    throw boom.badData(`error: ${errors.join(',')}`);
+    throw boom.badData(`error: ${errors.join(', ')}`);
   }
 
   //assert that all groupIds are under the farmos domain to which hasGroupAdminAccess checked
@@ -1203,19 +1217,6 @@ export const addNotes = async (req, res) => {
     throw boom.badData(`error: you don't have access`);
   }
 
-  //check if the instance is under the group checked with hasGroupAdminAccess
-  const grps = await db
-    .collection('farmos-group-mapping')
-    .find({
-      groupId: {
-        $in: descendants.map((el) => asMongoId(el._id)),
-      },
-    })
-    .toArray();
-  if (!grps.map((el) => el.instanceName).includes(instanceName)) {
-    throw boom.badData(`error: you do not have access`);
-  }
-
   //get groupNames from groupIds
   const groups = await db
     .collection('groups')
@@ -1225,7 +1226,7 @@ export const addNotes = async (req, res) => {
       },
     })
     .toArray();
-  const groupNames = groups.map((el) => el.name).join(',');
+  const groupNames = groups.map((el) => el.name).join(', ');
 
   //template:
   //note = `timestamp\nRemoved from ${groupNames} reason: ${note}\n\n`;
@@ -1235,24 +1236,12 @@ export const addNotes = async (req, res) => {
   const instanceNote = await db.collection('farmos-instance-notes').findOne({
     instanceName: instanceName,
   });
-  if (instanceNote) {
-    instanceNote.note += newNote;
-    await db.collection('farmos-instance-notes').updateOne(
-      { instanceName: instanceName },
-      {
-        $set: {
-          note: instanceNote.note,
-        },
-      }
-    );
-  } else {
-    const myobj = {
-      _id: new ObjectId(),
-      instanceName: instanceName,
-      note: newNote,
-    };
-    await db.collection('farmos-instance-notes').insertOne(myobj);
-  }
+
+  const noteToStore = instanceNote ? instanceNote.note + newNote : newNote;
+
+  await db
+    .collection('farmos-instance-notes')
+    .updateOne({ instanceName: instanceName }, { $set: { note: noteToStore } }, { upsert: true });
 
   return res.send({
     status: 'ok',
@@ -1285,31 +1274,17 @@ export const addSuperAdminNotes = async (req, res) => {
     //template:
     //note = `timestamp\nRemoved from ${groupNames} reason: ${note}\n\n`;
     const timestamp = getCurrentDateAsString();
-    const newNote = `${timestamp}\nRemoved by Super Admin reason: ${note}\n`;
+    const newNote = `${timestamp}\nRemoved by Super Admin reason: ${note}\n\n`;
 
     const instanceNote = await db.collection('farmos-instance-notes').findOne({
       instanceName: instanceName,
     });
 
-    if (instanceNote) {
-      instanceNote.note += '\n' + newNote;
+    const noteToStore = instanceNote ? instanceNote.note + newNote : newNote;
 
-      await db.collection('farmos-instance-notes').updateOne(
-        { instanceName: instanceName },
-        {
-          $set: {
-            note: instanceNote.note,
-          },
-        }
-      );
-    } else {
-      const myobj = {
-        _id: new ObjectId(),
-        instanceName: instanceName,
-        note: [newNote],
-      };
-      await db.collection('farmos-instance-notes').insertOne(myobj);
-    }
+    await db
+      .collection('farmos-instance-notes')
+      .updateOne({ instanceName: instanceName }, { $set: { note: noteToStore } }, { upsert: true });
   }
 
   return res.send({
@@ -1323,6 +1298,8 @@ export const updateGroupsForUser = async (req, res) => {
     instanceName: Joi.string().required(),
     groupIds: Joi.array().items(Joi.objectId()).required(),
   });
+
+  const { origin } = req.headers;
 
   await assertUserInSubGroup(userId, tree);
   await assertGroupsInTree(groupIds, tree);
@@ -1397,16 +1374,24 @@ export const updateGroupsForUser = async (req, res) => {
     if (differenceName.length > 0) {
       const difference = resultGroups.filter((e) => differenceName.includes(e.name));
       const differenceId = difference.map((e) => e._id);
-      await sendUserAddFarmToMultipleSurveystackGroupNotification(instanceName, differenceId);
-      const differenceGroupName = difference.map((e) => e.name).join(',');
+      await sendUserAddFarmToMultipleSurveystackGroupNotification(
+        instanceName,
+        differenceId,
+        origin
+      );
+      const differenceGroupName = difference.map((e) => e.name).join(', ');
       resStatus = `Successfully added instance to ${differenceGroupName}, instance owner will be notified`;
     }
   } else if (resultGroupsName.every((val) => initialGroupsName.includes(val))) {
     const differenceName = initialGroupsName.filter((x) => !resultGroupsName.includes(x));
     const difference = initialGroups.filter((e) => differenceName.includes(e.name));
     const differenceId = difference.map((e) => e._id);
-    await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(instanceName, differenceId);
-    const differenceGroupName = difference.map((e) => e.name).join(',');
+    await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(
+      instanceName,
+      differenceId,
+      origin
+    );
+    const differenceGroupName = difference.map((e) => e.name).join(', ');
     resStatus = `Successfully removed instance from ${differenceGroupName}, instance owner will be notified`;
   } else {
     const differenceName = initialGroupsName.filter((x) => !resultGroupsName.includes(x));
@@ -1416,7 +1401,8 @@ export const updateGroupsForUser = async (req, res) => {
     await sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification(
       instanceName,
       differenceId,
-      resultInstanceGroupsId
+      resultInstanceGroupsId,
+      origin
     );
     const oldName = difference.map((e) => e.name).join(',');
     const newName = resultGroups.map((e) => e.name).join(',');
@@ -1452,7 +1438,7 @@ const assertFarmInSubGroup = async (instanceName, tree) => {
   }
 };
 
-export const removeMembershipHook = async (membership) => {
+export const removeMembershipHook = async (membership, origin) => {
   const { user: userId, group: groupId } = membership;
 
   // eslint-disable-next-line no-unreachable
@@ -1522,7 +1508,8 @@ export const removeMembershipHook = async (membership) => {
     for (const connectedFarm of toDelete) {
       await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(
         connectedFarm.instanceName,
-        connectedFarm.groups.map((g) => g.groupId)
+        connectedFarm.groups.map((g) => g.groupId),
+        origin
       );
       const res = await db.collection('farmos-group-mapping').deleteMany({
         instanceName: connectedFarm.instanceName,

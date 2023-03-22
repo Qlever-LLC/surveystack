@@ -224,10 +224,9 @@
               <td>
                 <v-btn x-small color="blue" class="ma-1" @click="mapGroup(farm.instanceName)" dark>Map to Group</v-btn>
               </td>
-              <td v-if="farm.note">
-                <textarea readonly rows="3" v-model="farm.note"></textarea>
+              <td>
+                <textarea v-if="farm.note" readonly rows="3" v-model="farm.note"></textarea>
               </td>
-              <td v-else></td>
             </tr>
           </tbody>
         </template>
