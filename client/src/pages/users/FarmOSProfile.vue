@@ -4,7 +4,6 @@
       <p class="mt-4 mb-6">
         You are logged in as
         <strong>{{ user.email }} </strong>.
-        {{ instances }}
       </p>
 
       <div class="d-flex justify-space-between">
