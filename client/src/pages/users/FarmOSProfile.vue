@@ -40,8 +40,13 @@
                 <div style="white-space: nowrap">{{ `${instance.instanceName}` }}</div>
                 <div>
                   <v-btn text x-small class="px-1 mx-1" style="min-width: 0px" color="blue">access</v-btn>
-                  <v-btn text x-small class="px-1 mx-1" style="min-width: 0px" color="black">move</v-btn>
-                  <v-btn text x-small class="px-1 mx-1" style="min-width: 0px" color="red">delete</v-btn>
+                  <span v-if="instance.isOwner">
+                    <v-btn text x-small class="px-1 mx-1" style="min-width: 0px" color="black">move</v-btn>
+                    <v-btn text x-small class="px-1 mx-1" style="min-width: 0px" color="red">delete</v-btn>
+                  </span>
+                  <span v-else>
+                    <v-btn text x-small class="px-1 mx-1" style="min-width: 0px" color="red">remove</v-btn>
+                  </span>
                 </div>
               </td>
               <td>
