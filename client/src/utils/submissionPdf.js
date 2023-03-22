@@ -204,7 +204,7 @@ export default class SubmissionPDF {
   }
 
   filename() {
-    if (!this.disabled) {
+    if (this.disabled) {
       return '';
     }
 
