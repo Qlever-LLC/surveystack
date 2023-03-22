@@ -22,9 +22,7 @@ export const getMemberships = async ({
 
   if (group) {
     const parentGroups = await rolesService.getParentGroups(group);
-    // console.log('parentGroups', parentGroups);
     filter.group = { $in: parentGroups.map((g) => new ObjectId(g._id)) };
-    // console.log('filter', filter);
   }
 
   if (user) {
@@ -78,8 +76,6 @@ export const getMemberships = async ({
 
       admins.push(member);
     }
-
-    // console.log('admins', admins);
 
     for (const member of filteredMemberships) {
       if (member.role !== 'user') {
@@ -268,18 +264,14 @@ const getAdminOfSubGroups = async (entities) => {
       const subgroups = await rolesService.getDescendantGroups(e.group);
 
       for (const subgroup of subgroups) {
-        // console.log('subgroup', subgroup._id);
-        // console.log('entities', entities);
-        // console.log('adminOfSubGroups', adminOfSubGroups);
+        const isEntityPresent = entities.some(
+          (item) => String(item.group._id) === String(subgroup._id)
+        );
+        const isSubGroupPresent = adminOfSubGroups.some(
+          (item) => String(item.group._id) === String(subgroup._id)
+        );
 
-        if (adminOfSubGroups.find((m) => m.group._id == subgroup._id)) {
-          continue;
-        }
-
-        const presentEntity = entities.find((e) => `${e.group._id}` == `${subgroup._id}`);
-        // console.log('found entity', presentEntity);
-
-        if (presentEntity) {
+        if (isEntityPresent || isSubGroupPresent) {
           continue;
         }
 
