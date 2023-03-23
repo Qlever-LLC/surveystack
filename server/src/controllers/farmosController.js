@@ -1525,6 +1525,17 @@ export const removeMembershipHook = async (membership, origin) => {
   }
 };
 
+export const getFarmOwnerLink = async (req, res) => {
+  const { instanceName, userId } = req.body;
+
+  await assertFarmMappedToUser(instanceName, userId);
+
+  const { getAdminLink } = config();
+  const link = await getAdminLink(instanceName);
+
+  return res.send(link);
+};
+
 export const getAdminLink = async (req, res) => {
   const { userId, instanceName, tree } = await requireGroup(req, {
     userId: Joi.objectId().required(),

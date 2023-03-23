@@ -269,6 +269,11 @@ router.get('/roles', catchErrors(rolesController.getRoles));
 /** farmos */
 router.get('/farmos/farms', catchErrors(handleDelegates(farmosController.getFarmOSInstances)));
 router.get('/farmos/assets', catchErrors(handleDelegates(farmosController.getAssets)));
+router.post(
+  '/farmos/get-farm-owner-link',
+  assertIsAtLeastOnceOwner,
+  catchErrors(farmosController.getFarmOwnerLink)
+);
 
 // TODO update test connection
 // router.post('/farmos/test', [assertAuthenticated], catchErrors(farmosController.testConnection));

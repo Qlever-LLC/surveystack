@@ -1,10 +1,48 @@
 <template>
   <v-container class="maxw-4">
     <template v-if="isLoggedIn">
+      <v-alert
+        v-if="successMessage"
+        class="mt-4"
+        style="cursor: pointer"
+        mode="fade"
+        text
+        type="success"
+        @click="successMessage = null"
+        >{{ successMessage }}</v-alert
+      >
+
+      <v-alert v-if="errorMessage" style="cursor: pointer" class="mt-4 cursor-pointer" mode="fade" text type="error">{{
+        errorMessage
+      }}</v-alert>
+
       <p class="mt-4 mb-6">
         You are logged in as
         <strong>{{ user.email }} </strong>.
       </p>
+      <app-dialog
+        modal
+        :maxWidth="600"
+        labelConfirm="Close"
+        :hideCancel="true"
+        v-model="showLinkDialog"
+        @cancel="showLinkDialog = false"
+        @confirm="showLinkDialog = false"
+        title="Access FarmOS Instance"
+      >
+        <div class="d-flex justify-center my-8">
+          <v-btn
+            :loading="!linkReady"
+            :disabled="!linkReady"
+            :href="adminLink"
+            @click="invalidateLink"
+            color="primary"
+            target="_blank"
+          >
+            {{ linkReady ? 'Access' : 'Loading' }}</v-btn
+          >
+        </div>
+      </app-dialog>
 
       <div class="d-flex justify-space-between">
         <h2>FarmOS Integrations</h2>
@@ -39,12 +77,29 @@
               <td>
                 <div style="white-space: nowrap">{{ `${instance.instanceName}` }}</div>
                 <div>
-                  <v-btn text x-small class="px-1 mx-1" style="min-width: 0px" color="blue">access</v-btn>
                   <span v-if="instance.isOwner">
+                    <v-btn
+                      text
+                      x-small
+                      class="px-1 mx-1"
+                      style="min-width: 0px"
+                      color="blue"
+                      @click="accessFarm(instance.instanceName)"
+                      >access</v-btn
+                    >
                     <v-btn text x-small class="px-1 mx-1" style="min-width: 0px" color="black">move</v-btn>
                     <v-btn text x-small class="px-1 mx-1" style="min-width: 0px" color="red">delete</v-btn>
                   </span>
                   <span v-else>
+                    <v-btn
+                      text
+                      x-small
+                      class="px-1 mx-1"
+                      style="min-width: 0px"
+                      color="blue"
+                      @click="accessFarm(instance.instanceName)"
+                      >access</v-btn
+                    >
                     <v-btn text x-small class="px-1 mx-1" style="min-width: 0px" color="red">remove</v-btn>
                   </span>
                 </div>
@@ -91,10 +146,21 @@
 
 <script>
 import api from '@/services/api.service';
+import appDialog from '@/components/ui/Dialog.vue';
 
 export default {
+  components: {
+    appDialog,
+  },
   data() {
     return {
+      successMessage: null,
+      errorMessage: null,
+
+      showLinkDialog: false,
+      adminLink: '',
+      linkReady: false,
+
       email: '',
       instances: [],
       /*
@@ -130,10 +196,52 @@ export default {
   async created() {
     if (this.user) {
       this.email = this.user.email;
+      await this.init();
+    }
+  },
+  methods: {
+    async init() {
       const userId = this.user._id;
       const { data } = await api.get(`/ownership/${userId}`);
       this.instances = data;
-    }
+    },
+    async accessFarm(instanceName) {
+      try {
+        const userId = this.user._id;
+        this.showLinkDialog = true;
+        const { data: link } = await api.post(`/farmos/get-farm-owner-link`, {
+          instanceName,
+          userId,
+        });
+        this.adminLink = link;
+        this.linkReady = true;
+      } catch (error) {
+        this.showLinkDialog = false;
+        if (error.response && error.response.data && error.response.data.message) {
+          this.error(error.response.data.message);
+        } else {
+          this.error(error.message);
+        }
+
+        this.invalidateLink();
+      }
+    },
+    invalidateLink() {
+      this.linkReady = false;
+      this.showLinkDialog = false;
+      this.adminLink = '';
+    },
+
+    success(msg) {
+      this.successMessage = msg;
+      this.errorMessage = null;
+      window.scrollTo(0, 0);
+    },
+    error(msg) {
+      this.errorMessage = msg;
+      this.successMessage = null;
+      window.scrollTo(0, 0);
+    },
   },
 };
 </script>
