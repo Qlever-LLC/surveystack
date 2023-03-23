@@ -2,7 +2,6 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-throw-literal */
 
-
 /*
 Simple example to demonstrate how to create a planting on farmos.
 
@@ -53,14 +52,13 @@ function apiCompose(submission) {
   const request = populatePlanting(
     submission.data.planting.farmos_field,
     submission.data.planting.date,
-    submission.data.planting.crop,
+    submission.data.planting.crop
   );
 
   request.body.method = 'farm_transplanting';
 
   return request;
 }
-
 
 /**
  * Helper function to populate the request
@@ -70,7 +68,7 @@ function apiCompose(submission) {
  */
 
 function populatePlanting(fieldAnswer, dateAnswer, cropAnswer) {
-  if (!fieldAnswer.value || !fieldAnswer.value.fieldId) {
+  if (!fieldAnswer.value || !fieldAnswer.value.id) {
     throw 'Please select a field';
   }
 
@@ -84,7 +82,7 @@ function populatePlanting(fieldAnswer, dateAnswer, cropAnswer) {
 
   const crop = cropAnswer.value;
   const farmUrl = fieldAnswer.value.url;
-  const area = fieldAnswer.value.fieldId;
+  const area = fieldAnswer.value.id;
   const date = dateAnswer.value;
 
   return {

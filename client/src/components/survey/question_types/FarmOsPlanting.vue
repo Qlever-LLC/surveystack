@@ -53,13 +53,13 @@ const hashItem = (listItem) => {
 
   const { value } = listItem;
   if (value.isField) {
-    if (!value.farmId) {
+    if (!value.farmName) {
       return 'NOT_ASSIGNED';
     }
-    return `FIELD:${value.farmId}.${value.location.id}`;
+    return `FIELD:${value.farmName}.${value.location.id}`;
   }
 
-  return `ASSET:${value.farmId}.${value.assetId}`;
+  return `ASSET:${value.farmName}.${value.id}`;
 };
 
 const transform = (assets) => {
@@ -81,8 +81,7 @@ const transform = (assets) => {
     }
 
     asset.value.location.forEach((location) => {
-      areas[`${asset.value.farmId}.${location.id}`] = {
-        farmId: asset.value.farmId,
+      areas[`${asset.value.farmName}.${location.id}`] = {
         farmName: asset.value.farmName,
         location,
       };
@@ -93,7 +92,7 @@ const transform = (assets) => {
     const area = areas[key];
 
     const matchedAssets = assets.filter((asset) => {
-      if (asset.value.farmId !== area.farmId) {
+      if (asset.value.farmName !== area.farmName) {
         return false;
       }
 
@@ -103,7 +102,6 @@ const transform = (assets) => {
     console.log('loc', area);
     const field = {
       value: {
-        farmId: area.farmId,
         farmName: area.farmName,
         location: area.location,
         isField: true,
@@ -126,35 +124,8 @@ const transform = (assets) => {
     return [field, ...assetItems];
   });
 
-  /* const unassigned = {};
-  withoutArea.forEach((item) => {
-    if (!unassigned[item.farmId]) {
-      unassigned[item.farmId] = {
-        label: `<span class="blue-chip mr-4 ml-0 chip-no-wrap">${item.farmName}: Assets without field</span>`,
-        value: {
-          farmId: item.farmId,
-          farmName: item.farmName,
-          location: null,
-          isField: true,
-          hash: `UNASSIGNED:${item.farmId}`,
-        },
-        assets: [],
-      };
-    }
-
-    unassigned[item.farmId].assets.push({
-      farmId: item.farmId,
-      farmName: item.farmName,
-      location: null,
-      isField: false,
-      hash: `UNASSIGNED:${item.farmId}:${item.assetId}`,
-
-    });
-  }); */
-
   const withoutAreaSection = {
     value: {
-      farmId: null,
       farmName: null,
       location: null,
       isField: true,
@@ -164,7 +135,6 @@ const transform = (assets) => {
 
   const localAssetSection = {
     value: {
-      farmId: null,
       farmName: null,
       location: null,
       isField: true,
@@ -228,8 +198,6 @@ export default {
         return this.transformed.find((t) => t.value.hash === h).value;
       });
 
-      // const [farmId, assetId] = itemId.split('.');
-
       const fields = selectedItems.filter((item) => !!item.isField);
 
       // selected assets
@@ -238,15 +206,13 @@ export default {
       const assetsToSelect = fields.flatMap((field) =>
         this.transformed
           .filter((item) => !item.value.isField)
-          .filter((item) => item.value.farmId === field.farmId)
+          .filter((item) => item.value.farmName === field.farmName)
           .filter((item) => item.value.location.some((loc) => loc.id === field.location.id))
       );
 
       assetsToSelect.forEach((assetToSelect) => {
         if (
-          assets.some(
-            (asset) => asset.farmId === assetToSelect.value.farmId && asset.assetId === assetToSelect.value.assetId
-          )
+          assets.some((asset) => asset.farmName === assetToSelect.value.farmName && asset.id === assetToSelect.value.id)
         ) {
           // skip
         } else {
