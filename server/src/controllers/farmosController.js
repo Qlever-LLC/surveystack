@@ -1526,7 +1526,8 @@ export const removeMembershipHook = async (membership, origin) => {
 };
 
 export const getFarmOwnerLink = async (req, res) => {
-  const { instanceName, userId } = req.body;
+  const userId = res.locals.auth.user._id;
+  const { instanceName } = req.body;
 
   await assertFarmMappedToUser(instanceName, userId);
 
@@ -1550,6 +1551,46 @@ export const getAdminLink = async (req, res) => {
   const link = await getAdminLink(instanceName);
 
   return res.send(link);
+};
+
+export const availableUpdateOwnership = async (req, res) => {
+  const { newOwnerEmail } = req.body;
+
+  const newOwner = await db.collection('users').findOne({
+    email: newOwnerEmail,
+  });
+
+  if (!newOwner) {
+    throw boom.badRequest("user doesn't exist");
+  }
+  return res.send({ status: 'ok' });
+};
+
+export const updateOwnership = async (req, res) => {
+  const userId = res.locals.auth.user._id;
+  const { instanceName, newOwnerEmail } = req.body;
+
+  const newOwner = await db.collection('users').findOne({
+    email: newOwnerEmail,
+  });
+
+  if (!newOwner) {
+    throw boom.badRequest("user doesn't exist");
+  }
+
+  await db
+    .collection('farmos-instances')
+    .updateOne({ instanceName: instanceName, userId: userId }, { $set: { owner: false } });
+
+  await db
+    .collection('farmos-instances')
+    .updateOne(
+      { instanceName: instanceName, userId: newOwner._id },
+      { $set: { owner: true } },
+      { upsert: true }
+    );
+
+  return res.send('the ownership change has been successfully modified');
 };
 
 export const testConnection = async (req, res) => {

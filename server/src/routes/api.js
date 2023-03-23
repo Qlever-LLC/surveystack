@@ -36,6 +36,7 @@ import {
   validateBulkReassignRequestBody,
   checkFeatureToggledOn,
   assertIsAtLeastOnceOwner,
+  assertIsOwnerOf,
 } from '../handlers/assertions';
 
 import { catchErrors } from '../handlers/errorHandlers';
@@ -273,6 +274,16 @@ router.post(
   '/farmos/get-farm-owner-link',
   assertIsAtLeastOnceOwner,
   catchErrors(farmosController.getFarmOwnerLink)
+);
+router.post(
+  '/farmos/available-update-ownership',
+  assertIsOwnerOf,
+  catchErrors(farmosController.availableUpdateOwnership)
+);
+router.post(
+  '/farmos/update-ownership',
+  assertIsOwnerOf,
+  catchErrors(farmosController.updateOwnership)
 );
 
 // TODO update test connection

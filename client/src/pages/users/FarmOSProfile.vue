@@ -26,8 +26,8 @@
         labelConfirm="Close"
         :hideCancel="true"
         v-model="showLinkDialog"
-        @cancel="showLinkDialog = false"
-        @confirm="showLinkDialog = false"
+        @cancel="closeAndReset"
+        @confirm="closeAndReset"
         title="Access FarmOS Instance"
       >
         <div class="d-flex justify-center my-8">
@@ -35,12 +35,66 @@
             :loading="!linkReady"
             :disabled="!linkReady"
             :href="adminLink"
-            @click="invalidateLink"
+            @click="closeAndReset"
             color="primary"
             target="_blank"
           >
             {{ linkReady ? 'Access' : 'Loading' }}</v-btn
           >
+        </div>
+      </app-dialog>
+
+      <app-dialog
+        modal
+        :maxWidth="600"
+        labelConfirm="Close"
+        :hideCancel="true"
+        v-model="showMoveDialog"
+        @cancel="closeAndReset"
+        @confirm="closeAndReset"
+        title="Change Ownership of FarmOS Instance"
+      >
+        <div class="my-8">
+          <p>To whom do you wish to transfer the ownership of this farm?</p>
+          <div class="d-flex mb-4">
+            <v-text-field v-model.trim="newOwnerEmail" label="enter new owner email" hide-details></v-text-field>
+          </div>
+          <v-alert
+            v-if="errorDialogMessage"
+            style="cursor: pointer"
+            class="mt-4 cursor-pointer"
+            mode="fade"
+            text
+            type="error"
+            >{{ errorDialogMessage }}</v-alert
+          >
+          <v-btn block @click="changeOwner" color="primary" target="_blank"> Update</v-btn>
+        </div>
+      </app-dialog>
+      <app-dialog
+        modal
+        :maxWidth="600"
+        labelConfirm="Close"
+        :hideCancel="true"
+        v-model="showConfirmMoveDialog"
+        @cancel="closeAndReset"
+        @confirm="closeAndReset"
+        title="Change Ownership of FarmOS Instance"
+      >
+        <div class="my-8" style="color: black">
+          <p>
+            Are you sure you want to move ownership to another Survey Stack user?<br />
+            By doing so you will:
+          </p>
+          <ul>
+            1. No longer have full administrative control over your farmOS farm instance.<br />
+            2. Not be able to control access to your farm by groups or users.<br />
+          </ul>
+          <p>
+            You will still be able to see fields, plantings and logs in your Survey Stack surveys and push surveys to
+            that farm.
+          </p>
+          <v-btn block @click="confirmChangeOwner" color="primary" target="_blank"> Confirm</v-btn>
         </div>
       </app-dialog>
 
@@ -84,10 +138,18 @@
                       class="px-1 mx-1"
                       style="min-width: 0px"
                       color="blue"
-                      @click="accessFarm(instance.instanceName)"
+                      @click="accessInstance(instance.instanceName)"
                       >access</v-btn
                     >
-                    <v-btn text x-small class="px-1 mx-1" style="min-width: 0px" color="black">move</v-btn>
+                    <v-btn
+                      text
+                      x-small
+                      class="px-1 mx-1"
+                      style="min-width: 0px"
+                      color="black"
+                      @click="moveInstance(instance.instanceName)"
+                      >move</v-btn
+                    >
                     <v-btn text x-small class="px-1 mx-1" style="min-width: 0px" color="red">delete</v-btn>
                   </span>
                   <span v-else>
@@ -97,7 +159,7 @@
                       class="px-1 mx-1"
                       style="min-width: 0px"
                       color="blue"
-                      @click="accessFarm(instance.instanceName)"
+                      @click="accessInstance(instance.instanceName)"
                       >access</v-btn
                     >
                     <v-btn text x-small class="px-1 mx-1" style="min-width: 0px" color="red">remove</v-btn>
@@ -156,28 +218,34 @@ export default {
     return {
       successMessage: null,
       errorMessage: null,
+      errorDialogMessage: null,
 
       showLinkDialog: false,
       adminLink: '',
       linkReady: false,
 
+      showMoveDialog: false,
+      instanceOnWhichOwnerChanges: '',
+      newOwnerEmail: '',
+      showConfirmMoveDialog: false,
+
       email: '',
       instances: [],
       /*
         [
-          { 
-            instanceName: "instanceName", 
-            isOwner: true, 
+          {
+            instanceName: "instanceName",
+            isOwner: true,
             groups: [
               { "groupId":"string id", "groupName": "name"},
               { "groupId":"string id", "groupName": "name"},
-            ], 
+            ],
             otherUsers: [
               { "userId":"string id", "userEmail": "email"},
               { "userId":"string id", "userEmail": "email"},
             ]
           },
-          { 
+          {
             instanceName: "instanceName",
             isOwner: false
           }
@@ -205,31 +273,75 @@ export default {
       const { data } = await api.get(`/ownership/${userId}`);
       this.instances = data;
     },
-    async accessFarm(instanceName) {
+    async accessInstance(instanceName) {
       try {
-        const userId = this.user._id;
         this.showLinkDialog = true;
         const { data: link } = await api.post(`/farmos/get-farm-owner-link`, {
           instanceName,
-          userId,
         });
         this.adminLink = link;
         this.linkReady = true;
       } catch (error) {
-        this.showLinkDialog = false;
         if (error.response && error.response.data && error.response.data.message) {
           this.error(error.response.data.message);
         } else {
           this.error(error.message);
         }
-
-        this.invalidateLink();
+        this.closeAndReset();
       }
     },
-    invalidateLink() {
+    async moveInstance(instanceName) {
+      this.showMoveDialog = true;
+      this.instanceOnWhichOwnerChanges = instanceName;
+    },
+
+    async changeOwner() {
+      try {
+        const instanceName = this.instanceOnWhichOwnerChanges;
+        const newOwnerEmail = this.newOwnerEmail;
+
+        await api.post(`/farmos/available-update-ownership`, {
+          instanceName,
+          newOwnerEmail,
+        });
+        this.showConfirmMoveDialog = true;
+        this.errorDialogMessage = null;
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+          this.dialogError(error.response.data.message);
+        } else {
+          this.dialogError(error.message);
+        }
+        this.newOwnerEmail = '';
+      }
+    },
+    async confirmChangeOwner() {
+      try {
+        const instanceName = this.instanceOnWhichOwnerChanges;
+        const newOwnerEmail = this.newOwnerEmail;
+
+        const { data } = await api.post(`/farmos/update-ownership`, {
+          instanceName,
+          newOwnerEmail,
+        });
+        this.success(data);
+        this.init();
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+          this.error(error.response.data.message);
+        } else {
+          this.error(error.message);
+        }
+      }
+      this.closeAndReset();
+    },
+    closeAndReset() {
       this.linkReady = false;
       this.showLinkDialog = false;
       this.adminLink = '';
+      this.showMoveDialog = false;
+      this.newOwnerEmail = '';
+      this.showConfirmMoveDialog = false;
     },
 
     success(msg) {
@@ -241,6 +353,9 @@ export default {
       this.errorMessage = msg;
       this.successMessage = null;
       window.scrollTo(0, 0);
+    },
+    dialogError(msg) {
+      this.errorDialogMessage = msg;
     },
   },
 };

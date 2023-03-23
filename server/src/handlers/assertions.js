@@ -279,3 +279,18 @@ export const assertIsAtLeastOnceOwner = async (req, res, next) => {
 
   next();
 };
+
+export const assertIsOwnerOf = async (req, res, next) => {
+  const userId = res.locals.auth.user._id;
+  const { instanceName } = req.body;
+  const ownership = await db.collection('farmos-instances').findOne({
+    userId: new ObjectId(userId),
+    instanceName: instanceName,
+    owner: true,
+  });
+  if (!ownership) {
+    throw boom.unauthorized();
+  }
+
+  next();
+};
