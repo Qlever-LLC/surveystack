@@ -60,7 +60,7 @@ const base = (type) => ({
             farmName: f.instanceName,
             url: f.instanceName,
             name: f.name.trim(),
-            fieldId: f.id,
+            id: f.id,
           },
         }));
       } catch (e) {
@@ -85,7 +85,7 @@ const base = (type) => ({
               farmName: '',
               url: '',
               name: node.value.name,
-              fieldId: node.value.id,
+              id: node.value.id,
             },
           });
         }
@@ -112,7 +112,7 @@ const base = (type) => ({
                       farmName: '',
                       url: '',
                       name: targetValue.name,
-                      fieldId: targetValue.id,
+                      id: targetValue.id,
                     },
                   });
                 }
@@ -153,7 +153,6 @@ const base = (type) => ({
           return {
             label: `<span class="blue-chip mr-4">${f.instanceName}</span> ${f.name} `,
             value: {
-              farmId: f.instanceName,
               farmName: f.instanceName,
               url: f.instanceName,
               name: f.name.trim(),
@@ -187,7 +186,6 @@ const base = (type) => ({
           localPlantings.push({
             label: `${node.value.name}`,
             value: {
-              farmId: '',
               farmName: '',
               url: '',
               name: node.value.name,
@@ -215,7 +213,6 @@ const base = (type) => ({
                   localPlantings.push({
                     label: `${targetValue.name}`,
                     value: {
-                      farmId: '',
                       farmName: '',
                       url: '',
                       name: targetValue.name,
