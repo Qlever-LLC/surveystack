@@ -346,7 +346,6 @@ export default {
           const survey = await this.getSurvey(submission);
           if (survey) {
             submission.meta.survey.name = survey.name;
-            console.warn('resolving survey name: ' + survey.name);
           }
         }
       }
@@ -356,6 +355,7 @@ export default {
       let survey = this.$store.getters['surveys/getSurvey'](submission.meta.survey.id);
       if (!survey) {
         //not found in the local store, fetch the survey from backend
+        console.warn('fetching survey name of survey id ' + submission.meta.survey.id);
         survey = await this.$store.dispatch('surveys/fetchSurvey', { id: submission.meta.survey.id });
       }
 
