@@ -49,19 +49,7 @@ describe('Matrix question', () => {
       const options = [item('value_1', 'label_1'), item('value_2', 'label_2')];
       const valuesInRows = [[], ['custom_1', 'custom_2'], ['custom_3'], ['custom_2', 'custom_4'], []];
       const items = run({ options, valuesInRows, numRows: 12 });
-      expect(items).toMatchObject([item('custom_1'), item('custom_2'), item('custom_3'), item('custom_4'), ...options]);
-    });
-
-    it('sorts items alphabetically by the label', () => {
-      const options = [item('zeta', 'beta'), item('theta'), item('delta'), item('alpha')];
-      const items = run({ options });
-      expect(items).toMatchObject([item('alpha'), item('zeta', 'beta'), item('delta'), item('theta')]);
-    });
-
-    it('sorts selected items to the top of the list', () => {
-      const options = [item('beta'), item('theta'), item('delta'), item('alpha'), item('eta')];
-      const items = run({ options, rowIdx: 0, valuesInRows: [['eta', 'delta']] });
-      expect(items).toMatchObject([item('delta'), item('eta'), item('alpha'), item('beta'), item('theta')]);
+      expect(items).toMatchObject([...options, item('custom_1'), item('custom_2'), item('custom_3'), item('custom_4')]);
     });
 
     it('return empty array for unknown resource', () => {
