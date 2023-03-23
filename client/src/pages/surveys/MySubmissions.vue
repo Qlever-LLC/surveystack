@@ -346,7 +346,7 @@ export default {
           const survey = await this.getSurvey(submission);
           if (survey) {
             submission.meta.survey.name = survey.name;
-            console.warn('fetched missing survey name: ' + survey.name);
+            console.warn('resolving survey name: ' + survey.name);
           }
         }
       }
