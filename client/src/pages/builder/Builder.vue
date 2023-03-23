@@ -327,17 +327,18 @@ export default {
         this.snack(`error parsing Survey file:${err}`);
       }
     },
-    exportSurvey() {
-      const data = JSON.stringify(this.survey, null, 4);
+    async exportSurvey() {
+      const { data } = await api.get(`/surveys/${this.survey._id}?version=all`);
+      const dataString = JSON.stringify(data, null, 4);
+      //create temporary download link
       const element = document.createElement('a');
-      element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(data)}`);
+      element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(dataString)}`);
       element.setAttribute('download', `${this.survey.name}.json`);
-
       element.style.display = 'none';
       document.body.appendChild(element);
-
+      //click the download lonk
       element.click();
-
+      //remove the link
       document.body.removeChild(element);
     },
     async fetchData() {
