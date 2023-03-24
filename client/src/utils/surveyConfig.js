@@ -61,7 +61,9 @@ export const createControlInstance = (control) => {
     id: new ObjectId().toString(),
   });
 
-  if (control.type === 'selectSingle' || control.type === 'selectMultiple') {
+  if (control.type === 'page') {
+    cloneWithDefaultOptions.options.compact = false;
+  } else if (control.type === 'selectSingle' || control.type === 'selectMultiple') {
     cloneWithDefaultOptions.options.source = [];
   } else if (control.type === 'matrix') {
     cloneWithDefaultOptions.options.source = createDefaultMatrixSource();
