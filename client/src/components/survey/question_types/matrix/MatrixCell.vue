@@ -255,9 +255,21 @@ export default {
   computed: {
     value: {
       get() {
-        return this.item[this.header.value].value;
+        const value = this.item[this.header.value].value;
+        if (this.header.type == 'farmos_planting' || this.header.type == 'farmos_field') {
+          if (!this.header.multiple && Array.isArray(value)) {
+            return value[0];
+          }
+        }
+
+        return value;
       },
       set(value) {
+        if (this.header.type == 'farmos_planting' || this.header.type == 'farmos_field') {
+          if (!Array.isArray(value)) {
+            value = [value];
+          }
+        }
         this.item[this.header.value].value = value;
       },
     },
@@ -347,8 +359,6 @@ export default {
         return this.farmos.plantings.find((t) => t.value.hash === h).value;
       });
 
-      // const [farmId, assetId] = itemId.split('.');
-
       const fields = selectedItems.filter((item) => !!item.isField);
 
       // selected assets
@@ -357,15 +367,13 @@ export default {
       const assetsToSelect = fields.flatMap((field) =>
         this.farmos.plantings
           .filter((item) => !item.value.isField)
-          .filter((item) => item.value.farmId === field.farmId)
+          .filter((item) => item.value.farmName === field.farmName)
           .filter((item) => item.value.location.some((loc) => loc.id === field.location.id))
       );
 
       assetsToSelect.forEach((assetToSelect) => {
         if (
-          assets.some(
-            (asset) => asset.farmId === assetToSelect.value.farmId && asset.assetId === assetToSelect.value.assetId
-          )
+          assets.some((asset) => asset.farmName === assetToSelect.value.farmName && asset.id === assetToSelect.value.id)
         ) {
           // skip
         } else {
@@ -397,6 +405,7 @@ export default {
 >>> .v-select__selections {
   flex-wrap: nowrap;
 }
+
 >>> .v-select__selections span {
   text-overflow: ellipsis;
   overflow: hidden;
