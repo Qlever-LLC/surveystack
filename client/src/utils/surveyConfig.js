@@ -98,6 +98,11 @@ export const createControlInstance = (control) => {
     cloneWithDefaultOptions.options.farmOsType = 'field';
   }
 
+  if (control.type !== 'group' && control.type !== 'page' && control.value === undefined) {
+    control.value = null;
+    control.defaultValue = null;
+  }
+
   delete cloneWithDefaultOptions.icon;
   return cloneWithDefaultOptions;
 };
@@ -153,7 +158,6 @@ export const availableControls = [
     type: 'location',
     icon: 'mdi-map-marker-plus',
   },
-
   {
     name: 'multiple_choice',
     label: 'Multiple Choice',
