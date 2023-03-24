@@ -36,7 +36,7 @@ import {
   validateBulkReassignRequestBody,
   checkFeatureToggledOn,
   assertIsAtLeastOnceOwner,
-  assertIsOwnerOf,
+  assertIsOwnerOfInstance,
 } from '../handlers/assertions';
 
 import { catchErrors } from '../handlers/errorHandlers';
@@ -277,13 +277,21 @@ router.post(
 );
 router.post(
   '/farmos/available-update-ownership',
-  assertIsOwnerOf,
+  assertIsOwnerOfInstance,
   catchErrors(farmosController.availableUpdateOwnership)
 );
 router.post(
   '/farmos/update-ownership',
-  assertIsOwnerOf,
+  assertIsOwnerOfInstance,
   catchErrors(farmosController.updateOwnership)
+);
+router.post(
+  '/farmos/available-remove-instance-from-user',
+  catchErrors(farmosController.availableRemoveInstanceFromUser)
+);
+router.post(
+  '/farmos/remove-instance-from-user',
+  catchErrors(farmosController.removeInstanceFromUser)
 );
 
 // TODO update test connection

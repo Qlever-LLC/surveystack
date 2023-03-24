@@ -20,6 +20,8 @@
         You are logged in as
         <strong>{{ user.email }} </strong>.
       </p>
+
+      <!-- access Dialog -->
       <app-dialog
         modal
         :maxWidth="600"
@@ -44,6 +46,7 @@
         </div>
       </app-dialog>
 
+      <!-- move Dialog -->
       <app-dialog
         modal
         :maxWidth="600"
@@ -71,6 +74,7 @@
           <v-btn block @click="changeOwner" color="primary" target="_blank"> Update</v-btn>
         </div>
       </app-dialog>
+      <!-- move confirmation Dialog -->
       <app-dialog
         modal
         :maxWidth="600"
@@ -95,6 +99,31 @@
             that farm.
           </p>
           <v-btn block @click="confirmChangeOwner" color="primary" target="_blank"> Confirm</v-btn>
+        </div>
+      </app-dialog>
+
+      <!-- remove Dialog -->
+      <app-dialog
+        modal
+        :maxWidth="600"
+        labelConfirm="Close"
+        :hideCancel="true"
+        v-model="showConfirmRemoveDialog"
+        @cancel="closeAndReset"
+        @confirm="closeAndReset"
+        title="Remove FarmOS Instance"
+      >
+        <div class="my-8" style="color: black">
+          <p>
+            Are you sure? This will disconnect your Survey Stack account from your farmOS account. You will no longer be
+            able to:
+          </p>
+          <ul>
+            1. Use the Coffee Shop with this farmOS farm<br />
+            2. See this farm's fields or plantings when filling out surveys.<br />
+            3. Push data from Survey Stack surveys into this farmOS farm.<br /><br />
+          </ul>
+          <v-btn block @click="confirmRemoveInstance" color="primary" target="_blank"> Confirm</v-btn>
         </div>
       </app-dialog>
 
@@ -162,7 +191,15 @@
                       @click="accessInstance(instance.instanceName)"
                       >access</v-btn
                     >
-                    <v-btn text x-small class="px-1 mx-1" style="min-width: 0px" color="red">remove</v-btn>
+                    <v-btn
+                      text
+                      x-small
+                      class="px-1 mx-1"
+                      style="min-width: 0px"
+                      color="red"
+                      @click="removeInstance(instance.instanceName)"
+                      >remove</v-btn
+                    >
                   </span>
                 </div>
               </td>
@@ -220,14 +257,17 @@ export default {
       errorMessage: null,
       errorDialogMessage: null,
 
+      instanceUnderWork: '',
+
       showLinkDialog: false,
       adminLink: '',
       linkReady: false,
 
       showMoveDialog: false,
-      instanceOnWhichOwnerChanges: '',
       newOwnerEmail: '',
       showConfirmMoveDialog: false,
+
+      showConfirmRemoveDialog: false,
 
       email: '',
       instances: [],
@@ -273,7 +313,9 @@ export default {
       const { data } = await api.get(`/ownership/${userId}`);
       this.instances = data;
     },
+    // access button
     async accessInstance(instanceName) {
+      this.cleanMessage();
       try {
         this.showLinkDialog = true;
         const { data: link } = await api.post(`/farmos/get-farm-owner-link`, {
@@ -290,14 +332,15 @@ export default {
         this.closeAndReset();
       }
     },
+    // move button
     async moveInstance(instanceName) {
+      this.cleanMessage();
       this.showMoveDialog = true;
-      this.instanceOnWhichOwnerChanges = instanceName;
+      this.instanceUnderWork = instanceName;
     },
-
     async changeOwner() {
       try {
-        const instanceName = this.instanceOnWhichOwnerChanges;
+        const instanceName = this.instanceUnderWork;
         const newOwnerEmail = this.newOwnerEmail;
 
         await api.post(`/farmos/available-update-ownership`, {
@@ -317,7 +360,7 @@ export default {
     },
     async confirmChangeOwner() {
       try {
-        const instanceName = this.instanceOnWhichOwnerChanges;
+        const instanceName = this.instanceUnderWork;
         const newOwnerEmail = this.newOwnerEmail;
 
         const { data } = await api.post(`/farmos/update-ownership`, {
@@ -335,15 +378,59 @@ export default {
       }
       this.closeAndReset();
     },
+    // remove button
+    async removeInstance(instanceName) {
+      this.cleanMessage();
+      this.instanceUnderWork = instanceName;
+      try {
+        await api.post(`/farmos/available-remove-instance-from-user`, {
+          instanceName,
+        });
+        this.showConfirmRemoveDialog = true;
+        this.error = null;
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+          this.error(error.response.data.message);
+        } else {
+          this.error(error.message);
+        }
+        this.closeAndReset();
+      }
+    },
+    async confirmRemoveInstance() {
+      try {
+        const instanceName = this.instanceUnderWork;
+
+        const { data } = await api.post(`/farmos/remove-instance-from-user`, {
+          instanceName,
+        });
+        this.success(data);
+        this.init();
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+          this.error(error.response.data.message);
+        } else {
+          this.error(error.message);
+        }
+      }
+      this.closeAndReset();
+    },
+
     closeAndReset() {
+      this.instanceUnderWork = '';
       this.linkReady = false;
       this.showLinkDialog = false;
       this.adminLink = '';
       this.showMoveDialog = false;
       this.newOwnerEmail = '';
       this.showConfirmMoveDialog = false;
+      this.showConfirmRemoveDialog = false;
     },
 
+    cleanMessage() {
+      this.successMessage = null;
+      this.errorMessage = null;
+    },
     success(msg) {
       this.successMessage = msg;
       this.errorMessage = null;

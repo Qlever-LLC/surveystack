@@ -1593,6 +1593,28 @@ export const updateOwnership = async (req, res) => {
   return res.send('the ownership change has been successfully modified');
 };
 
+export const availableRemoveInstanceFromUser = async (req, res) => {
+  const userId = res.locals.auth.user._id;
+  const { instanceName } = req.body;
+  const isMapped = await db.collection('farmos-instances').findOne({
+    userId: new ObjectId(userId),
+    instanceName: instanceName,
+  });
+  if (!isMapped) {
+    throw boom.badRequest("You don't have access to this instance");
+  }
+  return res.send({ status: 'ok' });
+};
+
+export const removeInstanceFromUser = async (req, res) => {
+  const userId = res.locals.auth.user._id;
+  const { instanceName } = req.body;
+
+  await removeFarmFromUser(instanceName, userId);
+
+  return res.send({ status: 'the instance has been successfully removed' });
+};
+
 export const testConnection = async (req, res) => {
   /**
    * TODO migrate Testconnection
