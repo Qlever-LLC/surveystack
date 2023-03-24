@@ -127,6 +127,41 @@
         </div>
       </app-dialog>
 
+      <!-- delete Dialog -->
+      <app-dialog
+        modal
+        :maxWidth="600"
+        labelConfirm="Close"
+        :hideCancel="true"
+        v-model="showConfirmDeleteDialog"
+        @cancel="closeAndReset"
+        @confirm="closeAndReset"
+        title="Remove FarmOS Instance"
+      >
+        <div class="my-8" style="color: black">
+          <p>
+            Are you sure? This will disconnect your Survey Stack account from your farmOS account. You will no longer be
+            able to:
+          </p>
+          <ul>
+            1. Use the Coffee Shop with this farmOS farm<br />
+            2. See this farm's fields or plantings when filling out surveys.<br />
+            3. Push data from Survey Stack surveys into this farmOS farm.<br />
+          </ul>
+          <p>
+            Unlinking the account will also disconnect this account from all groups and other users who would have
+            access to it.
+          </p>
+          <p>
+            Unlinking the account will mean you will be responsible for paying for your farmOS farm through Farmier
+            hosting directly. You will receive an email from Farmier to sign up to pay directly through them. If you
+            wish to continue access your farmOS farm you should sign up with hosting through Farmier at that point.
+          </p>
+          <p>If you want to transfer ownership of this farm to someone else, press the 'move' button instead.</p>
+          <v-btn block @click="confirmDeleteInstance" color="primary" target="_blank"> Confirm</v-btn>
+        </div>
+      </app-dialog>
+
       <div class="d-flex justify-space-between">
         <h2>FarmOS Integrations</h2>
         <v-btn disabled color="primary">Connect from Farmier</v-btn>
@@ -179,7 +214,15 @@
                       @click="moveInstance(instance.instanceName)"
                       >move</v-btn
                     >
-                    <v-btn text x-small class="px-1 mx-1" style="min-width: 0px" color="red">delete</v-btn>
+                    <v-btn
+                      text
+                      x-small
+                      class="px-1 mx-1"
+                      style="min-width: 0px"
+                      color="red"
+                      @click="deleteInstance(instance.instanceName)"
+                      >delete</v-btn
+                    >
                   </span>
                   <span v-else>
                     <v-btn
@@ -268,6 +311,7 @@ export default {
       showConfirmMoveDialog: false,
 
       showConfirmRemoveDialog: false,
+      showConfirmDeleteDialog: false,
 
       email: '',
       instances: [],
@@ -415,6 +459,43 @@ export default {
       }
       this.closeAndReset();
     },
+    // delete button
+    async deleteInstance(instanceName) {
+      this.cleanMessage();
+      this.instanceUnderWork = instanceName;
+      try {
+        await api.post(`/farmos/available-delete-instance-from-user`, {
+          instanceName,
+        });
+        this.showConfirmDeleteDialog = true;
+        this.error = null;
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+          this.error(error.response.data.message);
+        } else {
+          this.error(error.message);
+        }
+        this.closeAndReset();
+      }
+    },
+    async confirmDeleteInstance() {
+      try {
+        const instanceName = this.instanceUnderWork;
+
+        const { data } = await api.post(`/farmos/delete-instance-from-user`, {
+          instanceName,
+        });
+        this.success(data);
+        this.init();
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+          this.error(error.response.data.message);
+        } else {
+          this.error(error.message);
+        }
+      }
+      this.closeAndReset();
+    },
 
     closeAndReset() {
       this.instanceUnderWork = '';
@@ -425,6 +506,7 @@ export default {
       this.newOwnerEmail = '';
       this.showConfirmMoveDialog = false;
       this.showConfirmRemoveDialog = false;
+      this.showConfirmDeleteDialog = false;
     },
 
     cleanMessage() {

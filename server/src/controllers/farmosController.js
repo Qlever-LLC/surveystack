@@ -1555,6 +1555,9 @@ export const getAdminLink = async (req, res) => {
 
 export const availableUpdateOwnership = async (req, res) => {
   const { newOwnerEmail } = req.body;
+  if (!newOwnerEmail) {
+    throw boom.badData('email of the new owner missing');
+  }
 
   const newOwner = await db.collection('users').findOne({
     email: newOwnerEmail,
@@ -1569,6 +1572,12 @@ export const availableUpdateOwnership = async (req, res) => {
 export const updateOwnership = async (req, res) => {
   const userId = res.locals.auth.user._id;
   const { instanceName, newOwnerEmail } = req.body;
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
+  if (!newOwnerEmail) {
+    throw boom.badData('email of the new owner missing');
+  }
 
   const newOwner = await db.collection('users').findOne({
     email: newOwnerEmail,
@@ -1596,6 +1605,10 @@ export const updateOwnership = async (req, res) => {
 export const availableRemoveInstanceFromUser = async (req, res) => {
   const userId = res.locals.auth.user._id;
   const { instanceName } = req.body;
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
+
   const isMapped = await db.collection('farmos-instances').findOne({
     userId: new ObjectId(userId),
     instanceName: instanceName,
@@ -1609,10 +1622,45 @@ export const availableRemoveInstanceFromUser = async (req, res) => {
 export const removeInstanceFromUser = async (req, res) => {
   const userId = res.locals.auth.user._id;
   const { instanceName } = req.body;
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
 
   await removeFarmFromUser(instanceName, userId);
 
   return res.send({ status: 'the instance has been successfully removed' });
+};
+
+export const availableDeleteInstance = async (req, res) => {
+  const { instanceName } = req.body;
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
+
+  const isMappedInGroup = await db.collection('farmos-group-mapping').findOne({
+    instanceName: instanceName,
+  });
+  if (!isMappedInGroup) {
+    throw boom.badRequest('This instance is not mapped in a group');
+  }
+  return res.send({ status: 'ok' });
+};
+
+export const deleteInstance = async (req, res) => {
+  const { instanceName } = req.body;
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
+
+  await db.collection('farmos-instances').deleteMany({
+    instanceName,
+  });
+
+  await db.collection('farmos-group-mapping').deleteMany({
+    instanceName,
+  });
+
+  return res.send('the instance has been successfully deleted');
 };
 
 export const testConnection = async (req, res) => {

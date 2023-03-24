@@ -293,6 +293,16 @@ router.post(
   '/farmos/remove-instance-from-user',
   catchErrors(farmosController.removeInstanceFromUser)
 );
+router.post(
+  '/farmos/available-delete-instance-from-user',
+  assertIsOwnerOfInstance,
+  catchErrors(farmosController.availableDeleteInstance)
+);
+router.post(
+  '/farmos/delete-instance-from-user',
+  assertIsOwnerOfInstance,
+  catchErrors(farmosController.deleteInstance)
+);
 
 // TODO update test connection
 // router.post('/farmos/test', [assertAuthenticated], catchErrors(farmosController.testConnection));

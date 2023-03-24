@@ -283,6 +283,9 @@ export const assertIsAtLeastOnceOwner = async (req, res, next) => {
 export const assertIsOwnerOfInstance = async (req, res, next) => {
   const userId = res.locals.auth.user._id;
   const { instanceName } = req.body;
+  if (!instanceName) {
+    throw boom.badRequest('instance name missing');
+  }
   const ownership = await db.collection('farmos-instances').findOne({
     userId: new ObjectId(userId),
     instanceName: instanceName,
