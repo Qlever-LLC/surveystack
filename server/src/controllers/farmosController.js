@@ -1699,6 +1699,42 @@ export const removeInstanceFromGroup = async (req, res) => {
   return res.send('the instance has been successfully removed from the group');
 };
 
+export const availableRemoveInstanceFromOtherUser = async (req, res) => {
+  const { instanceName, userId } = req.body;
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
+  if (!userId) {
+    throw boom.badData('userId missing');
+  }
+
+  const isMapped = await db.collection('farmos-instances').findOne({
+    instanceName,
+    userId: new ObjectId(userId),
+  });
+  if (!isMapped) {
+    throw boom.badRequest('This instance is not mapped to user');
+  }
+  return res.send({ status: 'ok' });
+};
+
+export const removeInstanceFromOtherUser = async (req, res) => {
+  const { instanceName, userId } = req.body;
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
+  if (!userId) {
+    throw boom.badData('userId missing');
+  }
+
+  await db.collection('farmos-instances').deleteOne({
+    instanceName,
+    userId: new ObjectId(userId),
+  });
+
+  return res.send('the instance has been successfully removed from the user');
+};
+
 export const testConnection = async (req, res) => {
   /**
    * TODO migrate Testconnection

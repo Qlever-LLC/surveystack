@@ -188,6 +188,26 @@
         </div>
       </app-dialog>
 
+      <!-- Remove Instance From Other User Dialog showConfirmRemoveInstFromOthUsrDialog -->
+      <app-dialog
+        modal
+        :maxWidth="600"
+        labelConfirm="Close"
+        :hideCancel="true"
+        v-model="showConfirmRemoveInstFromOthUsrDialog"
+        @cancel="closeAndReset"
+        @confirm="closeAndReset"
+        title="Remove Instance From Group"
+      >
+        <div class="my-8" style="color: black">
+          <p>
+            Are you sure? Removing this users access means they can no longer see your farmOS instance or access your
+            fields, plantings or logs through in their surveys.
+          </p>
+          <v-btn block @click="confirmRemoveInstFromOthUsrDialog" color="primary" target="_blank"> Confirm</v-btn>
+        </div>
+      </app-dialog>
+
       <div class="d-flex justify-space-between">
         <h2>FarmOS Integrations</h2>
         <v-btn disabled color="primary">Connect from Farmier</v-btn>
@@ -295,6 +315,7 @@
                     close
                     v-for="(user, uidx) in instance.otherUsers"
                     :key="`instance-${idx}-user-${uidx}`"
+                    @click:close="removeInstanceFromOtherUser(instance.instanceName, user.userId)"
                   >
                     {{ user.userEmail }}
                   </v-chip>
@@ -329,6 +350,7 @@ export default {
 
       instanceUnderWork: '',
       groupIdUnderWork: '',
+      otherUserIdUnderWork: '',
 
       showLinkDialog: false,
       adminLink: '',
@@ -341,6 +363,7 @@ export default {
       showConfirmRemoveDialog: false,
       showConfirmDeleteDialog: false,
       showConfirmRemoveInstFromGrpDialog: false,
+      showConfirmRemoveInstFromOthUsrDialog: false,
 
       email: '',
       instances: [],
@@ -534,6 +557,39 @@ export default {
       }
       this.closeAndReset();
     },
+    // v-chip close an other user
+    async removeInstanceFromOtherUser(instanceName, userId) {
+      this.cleanMessage();
+      this.instanceUnderWork = instanceName;
+      this.otherUserIdUnderWork = userId;
+      try {
+        await api.post(`/farmos/available-remove-instance-from-other-user`, {
+          instanceName,
+          userId,
+        });
+        this.showConfirmRemoveInstFromOthUsrDialog = true;
+        this.error = null;
+      } catch (error) {
+        this.errorCatched(error);
+        this.closeAndReset();
+      }
+    },
+    async confirmRemoveInstFromOthUsrDialog() {
+      try {
+        const instanceName = this.instanceUnderWork;
+        const userId = this.otherUserIdUnderWork;
+
+        const { data } = await api.post(`/farmos/remove-instance-from-other-user`, {
+          instanceName,
+          userId,
+        });
+        this.success(data);
+        this.init();
+      } catch (error) {
+        this.errorCatched(error);
+      }
+      this.closeAndReset();
+    },
 
     closeAndReset() {
       this.instanceUnderWork = '';
@@ -546,6 +602,7 @@ export default {
       this.showConfirmRemoveDialog = false;
       this.showConfirmDeleteDialog = false;
       this.showConfirmRemoveInstFromGrpDialog = false;
+      this.showConfirmRemoveInstFromOthUsrDialog = false;
     },
 
     cleanMessage() {
