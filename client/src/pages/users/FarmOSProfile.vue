@@ -162,6 +162,32 @@
         </div>
       </app-dialog>
 
+      <!-- Remove Instance From Group Dialog -->
+      <app-dialog
+        modal
+        :maxWidth="600"
+        labelConfirm="Close"
+        :hideCancel="true"
+        v-model="showConfirmRemoveInstFromGrpDialog"
+        @cancel="closeAndReset"
+        @confirm="closeAndReset"
+        title="Remove Instance From Group"
+      >
+        <div class="my-8" style="color: black">
+          <p>
+            Are you sure? Removing yourself from this group means group admins can no longer access your farmOS account
+            or see your fields, plantings or logs from their account. You will also no longer be part of their Coffee
+            Shop group or discussion.
+          </p>
+          <p>
+            If you wish to completely remove access to this farm by this groups administrators, you should stop being a
+            member of this group.
+          </p>
+          <p>This will also affect anyone else linked to this farm through Survey Stack.</p>
+          <v-btn block @click="confirmRemoveInstFromGrpDialog" color="primary" target="_blank"> Confirm</v-btn>
+        </div>
+      </app-dialog>
+
       <div class="d-flex justify-space-between">
         <h2>FarmOS Integrations</h2>
         <v-btn disabled color="primary">Connect from Farmier</v-btn>
@@ -254,6 +280,7 @@
                     close
                     v-for="(group, uidx) in instance.groups"
                     :key="`instance-${idx}-group-${uidx}`"
+                    @click:close="removeInstanceFromGroup(instance.instanceName, group.groupId)"
                   >
                     {{ group.groupName }}
                   </v-chip>
@@ -301,6 +328,7 @@ export default {
       errorDialogMessage: null,
 
       instanceUnderWork: '',
+      groupIdUnderWork: '',
 
       showLinkDialog: false,
       adminLink: '',
@@ -312,6 +340,7 @@ export default {
 
       showConfirmRemoveDialog: false,
       showConfirmDeleteDialog: false,
+      showConfirmRemoveInstFromGrpDialog: false,
 
       email: '',
       instances: [],
@@ -368,11 +397,7 @@ export default {
         this.adminLink = link;
         this.linkReady = true;
       } catch (error) {
-        if (error.response && error.response.data && error.response.data.message) {
-          this.error(error.response.data.message);
-        } else {
-          this.error(error.message);
-        }
+        this.errorCatched(error);
         this.closeAndReset();
       }
     },
@@ -414,11 +439,7 @@ export default {
         this.success(data);
         this.init();
       } catch (error) {
-        if (error.response && error.response.data && error.response.data.message) {
-          this.error(error.response.data.message);
-        } else {
-          this.error(error.message);
-        }
+        this.errorCatched(error);
       }
       this.closeAndReset();
     },
@@ -433,11 +454,7 @@ export default {
         this.showConfirmRemoveDialog = true;
         this.error = null;
       } catch (error) {
-        if (error.response && error.response.data && error.response.data.message) {
-          this.error(error.response.data.message);
-        } else {
-          this.error(error.message);
-        }
+        this.errorCatched(error);
         this.closeAndReset();
       }
     },
@@ -451,11 +468,7 @@ export default {
         this.success(data);
         this.init();
       } catch (error) {
-        if (error.response && error.response.data && error.response.data.message) {
-          this.error(error.response.data.message);
-        } else {
-          this.error(error.message);
-        }
+        this.errorCatched(error);
       }
       this.closeAndReset();
     },
@@ -470,11 +483,7 @@ export default {
         this.showConfirmDeleteDialog = true;
         this.error = null;
       } catch (error) {
-        if (error.response && error.response.data && error.response.data.message) {
-          this.error(error.response.data.message);
-        } else {
-          this.error(error.message);
-        }
+        this.errorCatched(error);
         this.closeAndReset();
       }
     },
@@ -488,18 +497,47 @@ export default {
         this.success(data);
         this.init();
       } catch (error) {
-        if (error.response && error.response.data && error.response.data.message) {
-          this.error(error.response.data.message);
-        } else {
-          this.error(error.message);
-        }
+        this.errorCatched(error);
+      }
+      this.closeAndReset();
+    },
+    // v-chip close a group
+    async removeInstanceFromGroup(instanceName, groupId) {
+      this.cleanMessage();
+      this.instanceUnderWork = instanceName;
+      this.groupIdUnderWork = groupId;
+      try {
+        await api.post(`/farmos/available-remove-instance-from-group`, {
+          instanceName,
+          groupId,
+        });
+        this.showConfirmRemoveInstFromGrpDialog = true;
+        this.error = null;
+      } catch (error) {
+        this.errorCatched(error);
+        this.closeAndReset();
+      }
+    },
+    async confirmRemoveInstFromGrpDialog() {
+      try {
+        const instanceName = this.instanceUnderWork;
+        const groupId = this.groupIdUnderWork;
+
+        const { data } = await api.post(`/farmos/remove-instance-from-group`, {
+          instanceName,
+          groupId,
+        });
+        this.success(data);
+        this.init();
+      } catch (error) {
+        this.errorCatched(error);
       }
       this.closeAndReset();
     },
 
     closeAndReset() {
       this.instanceUnderWork = '';
-      this.linkReady = false;
+      (this.groupIdUnderWork = ''), (this.linkReady = false);
       this.showLinkDialog = false;
       this.adminLink = '';
       this.showMoveDialog = false;
@@ -507,6 +545,7 @@ export default {
       this.showConfirmMoveDialog = false;
       this.showConfirmRemoveDialog = false;
       this.showConfirmDeleteDialog = false;
+      this.showConfirmRemoveInstFromGrpDialog = false;
     },
 
     cleanMessage() {
@@ -517,6 +556,13 @@ export default {
       this.successMessage = msg;
       this.errorMessage = null;
       window.scrollTo(0, 0);
+    },
+    errorCatched(error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        this.error(error.response.data.message);
+      } else {
+        this.error(error.message);
+      }
     },
     error(msg) {
       this.errorMessage = msg;

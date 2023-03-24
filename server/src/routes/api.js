@@ -303,6 +303,16 @@ router.post(
   assertIsOwnerOfInstance,
   catchErrors(farmosController.deleteInstance)
 );
+router.post(
+  '/farmos/available-remove-instance-from-group',
+  assertIsOwnerOfInstance,
+  catchErrors(farmosController.availableRemoveInstanceFromGroup)
+);
+router.post(
+  '/farmos/remove-instance-from-group',
+  assertIsOwnerOfInstance,
+  catchErrors(farmosController.removeInstanceFromGroup)
+);
 
 // TODO update test connection
 // router.post('/farmos/test', [assertAuthenticated], catchErrors(farmosController.testConnection));

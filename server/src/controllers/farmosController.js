@@ -1663,6 +1663,42 @@ export const deleteInstance = async (req, res) => {
   return res.send('the instance has been successfully deleted');
 };
 
+export const availableRemoveInstanceFromGroup = async (req, res) => {
+  const { instanceName, groupId } = req.body;
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
+  if (!groupId) {
+    throw boom.badData('groupId missing');
+  }
+
+  const isMappedInGroup = await db.collection('farmos-group-mapping').findOne({
+    instanceName,
+    groupId: new ObjectId(groupId),
+  });
+  if (!isMappedInGroup) {
+    throw boom.badRequest('This instance is not mapped in a group');
+  }
+  return res.send({ status: 'ok' });
+};
+
+export const removeInstanceFromGroup = async (req, res) => {
+  const { instanceName, groupId } = req.body;
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
+  if (!groupId) {
+    throw boom.badData('groupId missing');
+  }
+
+  await db.collection('farmos-group-mapping').deleteOne({
+    instanceName,
+    groupId: new ObjectId(groupId),
+  });
+
+  return res.send('the instance has been successfully removed from the group');
+};
+
 export const testConnection = async (req, res) => {
   /**
    * TODO migrate Testconnection
