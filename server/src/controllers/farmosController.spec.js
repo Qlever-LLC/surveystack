@@ -17,6 +17,11 @@ import {
   getDomain,
   addNotes,
   addSuperAdminNotes,
+  updateOwnership,
+  removeInstanceFromUser,
+  deleteInstance,
+  removeInstanceFromGroup,
+  removeInstanceFromOtherUser,
 } from './farmosController';
 import { createGroup, createReq, createRes, createUser } from '../testUtils';
 import {
@@ -797,4 +802,270 @@ describe('farmos-controller', () => {
       },
       res
     );*/
+
+  it('update Ownership success', async () => {
+    const instanceName = 'instanceName';
+    const user1 = await createUser();
+    const user2 = await createUser();
+    await mapFarmOSInstanceToUser(user1._id, instanceName, true, origin);
+    const newOwnerEmail = user2.email;
+
+    const req = createReq({
+      body: {
+        instanceName,
+        newOwnerEmail,
+      },
+    });
+    const res = mockRes(user1._id);
+
+    await updateOwnership(req, res);
+
+    const db = getDb();
+    const instanceLinkedToUser1 = await db.collection('farmos-instances').findOne({
+      instanceName: instanceName,
+      userId: user1._id,
+    });
+    expect(instanceLinkedToUser1.owner).toEqual(false);
+    const instanceLinkedToUser2 = await db.collection('farmos-instances').findOne({
+      instanceName: instanceName,
+      userId: user2._id,
+    });
+    expect(instanceLinkedToUser2.owner).toEqual(true);
+  });
+  it('update Ownership error', async () => {
+    const instanceName = 'instanceName';
+    const user1 = await createUser();
+    const user2FakeEmail = 'email@fake.com';
+    await mapFarmOSInstanceToUser(user1._id, instanceName, true, origin);
+
+    const req = createReq({
+      body: {
+        instanceName,
+        newOwnerEmail: user2FakeEmail,
+      },
+    });
+    const res = mockRes(user1._id);
+
+    await expect(updateOwnership(req, res)).rejects.toThrow(/user doesn't exist/);
+
+    const db = getDb();
+    const instanceLinkedToUser1 = await db.collection('farmos-instances').findOne({
+      instanceName: instanceName,
+      userId: user1._id,
+    });
+    expect(instanceLinkedToUser1.owner).toEqual(true);
+  });
+  it('remove Instance From User success', async () => {
+    const instanceName = 'instanceName';
+    const user = await createUser();
+    await mapFarmOSInstanceToUser(user._id, instanceName, true, origin);
+
+    const req = createReq({
+      body: {
+        instanceName,
+      },
+    });
+    const res = mockRes(user._id);
+
+    await removeInstanceFromUser(req, res);
+
+    const db = getDb();
+    const coupleExists = await db.collection('farmos-instances').findOne({
+      instanceName: instanceName,
+      userId: user._id,
+    });
+    expect(coupleExists).toEqual(null);
+  });
+  it('remove Instance From User error', async () => {
+    const instanceName = 'instanceName';
+    const user1 = await createUser();
+    await mapFarmOSInstanceToUser(user1._id, instanceName, true, origin);
+    const wrongInstanceName = 'wrongInstanceName';
+
+    const req = createReq({
+      body: {
+        instanceName: wrongInstanceName,
+      },
+    });
+    const res = mockRes(user1._id);
+
+    await expect(removeInstanceFromUser(req, res)).rejects.toThrow(
+      /You don't have access to this instance/
+    );
+
+    const db = getDb();
+    const coupleExists = await db.collection('farmos-instances').findOne({
+      instanceName: wrongInstanceName,
+      userId: user1._id,
+    });
+    expect(coupleExists).toEqual(null);
+  });
+
+  it('delete Instance success', async () => {
+    const instanceName = 'instanceName';
+    const { group, admin1, user1 } = await init();
+    const user = user1.user;
+    await mapFarmOSInstanceToUser(user._id, instanceName, true, origin);
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, group._id, origin);
+
+    const req = createReq({
+      body: {
+        instanceName,
+      },
+    });
+    const res = mockRes(user._id);
+    const db = getDb();
+
+    let coupleInstExists = await db.collection('farmos-instances').findOne({
+      instanceName,
+      userId: user._id,
+    });
+    expect(coupleInstExists.instanceName).toEqual(instanceName);
+    let coupleGrpExists = await db.collection('farmos-group-mapping').findOne({
+      instanceName,
+      groupId: group._id,
+    });
+    expect(coupleGrpExists.instanceName).toEqual(instanceName);
+
+    await deleteInstance(req, res);
+
+    coupleInstExists = await db.collection('farmos-instances').findOne({
+      instanceName,
+      userId: user._id,
+    });
+    expect(coupleInstExists).toEqual(null);
+    coupleGrpExists = await db.collection('farmos-group-mapping').findOne({
+      instanceName,
+      userId: user._id,
+    });
+    expect(coupleGrpExists).toEqual(null);
+  });
+  it('delete Instance error', async () => {
+    const instanceName = 'instanceName';
+    const { group, admin1, user1 } = await init();
+    const user = user1.user;
+    await mapFarmOSInstanceToUser(user._id, instanceName, true, origin);
+
+    const req = createReq({
+      body: {
+        instanceName,
+      },
+    });
+    const res = mockRes(user._id);
+    const db = getDb();
+
+    await expect(deleteInstance(req, res)).rejects.toThrow(
+      /This instance is not mapped in a group/
+    );
+
+    const coupleInstExists = await db.collection('farmos-instances').findOne({
+      instanceName,
+      userId: user._id,
+    });
+    expect(coupleInstExists.instanceName).toEqual(instanceName);
+    const coupleGrpExists = await db.collection('farmos-group-mapping').findOne({
+      instanceName,
+      userId: user._id,
+    });
+    expect(coupleGrpExists).toEqual(null);
+  });
+
+  it('remove Instance From Group success', async () => {
+    const instanceName = 'instanceName';
+    const { group, admin1, user1 } = await init();
+    const user = user1.user;
+    await mapFarmOSInstanceToUser(user._id, instanceName, true, origin);
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, group._id, origin);
+
+    const req = createReq({
+      body: {
+        instanceName,
+        groupId: group._id,
+      },
+    });
+    const res = mockRes(user._id);
+
+    await removeInstanceFromGroup(req, res);
+
+    const db = getDb();
+    const coupleExists = await db.collection('farmos-group-mapping').findOne({
+      instanceName: instanceName,
+      groupId: group._id,
+    });
+    expect(coupleExists).toEqual(null);
+  });
+
+  it('remove Instance From Group error', async () => {
+    const instanceName = 'instanceName';
+    const { group, admin1, user1 } = await init();
+    const user = user1.user;
+    await mapFarmOSInstanceToUser(user._id, instanceName, true, origin);
+
+    const req = createReq({
+      body: {
+        instanceName,
+        groupId: group._id,
+      },
+    });
+    const res = mockRes(user._id);
+
+    await expect(removeInstanceFromGroup(req, res)).rejects.toThrow(
+      /This instance is not mapped in a group/
+    );
+
+    const db = getDb();
+    const coupleExists = await db.collection('farmos-group-mapping').findOne({
+      instanceName: instanceName,
+      groupId: group._id,
+    });
+    expect(coupleExists).toEqual(null);
+  });
+
+  it('remove Instance From Other User succes', async () => {
+    const instanceName = 'instanceName';
+    const user = await createUser();
+    await mapFarmOSInstanceToUser(user._id, instanceName, true, origin);
+
+    const req = createReq({
+      body: {
+        instanceName,
+        userId: user._id,
+      },
+    });
+    const res = mockRes(user._id);
+
+    await removeInstanceFromOtherUser(req, res);
+
+    const db = getDb();
+    const coupleExists = await db.collection('farmos-instances').findOne({
+      instanceName: instanceName,
+      userId: user._id,
+    });
+    expect(coupleExists).toEqual(null);
+  });
+  it('remove Instance From Other User error', async () => {
+    const instanceName = 'instanceName';
+    const user = await createUser();
+    await mapFarmOSInstanceToUser(user._id, instanceName, true, origin);
+    const wrongInstanceName = 'wrongInstanceName';
+
+    const req = createReq({
+      body: {
+        instanceName: wrongInstanceName,
+        userId: user._id,
+      },
+    });
+    const res = mockRes(user._id);
+
+    await expect(removeInstanceFromOtherUser(req, res)).rejects.toThrow(
+      /This instance is not mapped to user/
+    );
+
+    const db = getDb();
+    const coupleExists = await db.collection('farmos-instances').findOne({
+      instanceName: wrongInstanceName,
+      userId: user._id,
+    });
+    expect(coupleExists).toEqual(null);
+  });
 });
