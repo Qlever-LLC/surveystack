@@ -25,7 +25,6 @@ import Group from '@/pages/groups/Group.vue';
 const GroupEdit = () => import('@/pages/groups/GroupEdit.vue');
 
 import SubmissionList from '@/pages/submissions/List.vue';
-import SubmissionPDF from '@/pages/submissions/PDF.vue';
 
 import ScriptList from '@/pages/scripts/ScriptList.vue';
 
@@ -152,11 +151,6 @@ const routes = [
     path: '/submissions/drafts/:id',
     name: 'submissions-drafts-detail',
     components: getComponents(DraftSubmission, { navbar: SubmissionDraftNavbar }),
-  },
-  {
-    path: '/submissions/:id/pdf',
-    name: 'submissions-detail',
-    components: getComponents(SubmissionPDF),
   },
   {
     path: '/auth/login',

@@ -105,6 +105,7 @@
 
 <script>
 import ObjectId from 'bson-objectid';
+import { parse as parseDisposition } from 'content-disposition';
 import appDialog from '@/components/ui/Dialog.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import resultMixin from '@/components/ui/ResultsMixin';
@@ -113,9 +114,8 @@ import { createSurvey, updateControls } from '@/utils/surveys';
 import { isIos, isSafari } from '@/utils/compatibility';
 import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
-import SubmissionPdf from '@/utils/submissionPdf';
-import api from '@/services/api.service';
 import downloadExternal from '@/utils/downloadExternal';
+import api from '@/services/api.service';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
@@ -359,8 +359,11 @@ export default {
       this.resultItems = this.resultItems.filter((item) => !item.downloadError);
 
       try {
-        const { data } = await api.get(`/submissions/${this.submission._id}/pdf?survey=${this.survey._id}`);
-        downloadExternal(data, `${new SubmissionPdf(this.survey, this.submission).filename()}.pdf`);
+        const { headers, data } = await api.get(
+          `/submissions/${this.submission._id}/pdf?survey=${this.survey._id}&base64=1`
+        );
+        const disposition = parseDisposition(headers['content-disposition']);
+        downloadExternal(data, disposition.parameters.filename);
       } catch (e) {
         console.error('Failed to download PDF', e);
         this.resultItems = [

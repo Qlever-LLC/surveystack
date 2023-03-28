@@ -1196,9 +1196,15 @@ const getSubmissionPdf = async (req, res) => {
     throw boom.notFound(`No survey found with id: ${surveyId}`);
   }
 
-  pdfService.getPdfDocument(survey, submission, (data) => {
-    res.contentType('application/pdf');
-    res.send('data:application/pdf;base64,' + data);
+  const fileName = pdfService.getPdfName(survey, submission);
+
+  pdfService.getPdfBase64(survey, submission, (data) => {
+    res.attachment(fileName);
+    if (queryParam(req.query.base64)) {
+      res.send('data:application/pdf;base64,' + data);
+    } else {
+      res.send(Buffer.from(data, 'base64'));
+    }
   });
 };
 
@@ -1206,7 +1212,7 @@ const sendPdfLink = async (req, res) => {
   await mailService.sendLink({
     to: res.locals.auth.user.email,
     subject: `Survey report - ${req.body.survey}`,
-    link: `${req.headers.origin}/submissions/${req.params.id}/pdf`,
+    link: `${req.headers.origin}/api/submissions/${req.params.id}/pdf`,
     actionDescriptionHtml: `Thank you for taking a time to complete our survey. Here's a link to your survey result.`,
     btnText: 'View submission',
   });

@@ -1,9 +1,7 @@
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import htmlToPdfMake from 'html-to-pdfmake';
-import isValid from 'date-fns/isValid';
-import parseISO from 'date-fns/parseISO';
-import dateFnsFormat from 'date-fns/format';
+import dayjs from 'dayjs';
 import getProperty from 'lodash/get';
 import groupBy from 'lodash/groupBy';
 import { JSDOM } from 'jsdom';
@@ -122,10 +120,11 @@ function getControlSvg(multiple, checked) {
   return SVG[`${multiple ? 'check' : 'radio'}-${Boolean(checked)}`];
 }
 
-function formatDate(date, format = 'MMM d, yyyy h:mm a') {
-  const parsedDate = parseISO(date);
-  return isValid(parsedDate) && parsedDate.toISOString() === date
-    ? dateFnsFormat(parsedDate, format)
+function formatDate(date, format = 'MMM D, YYYY h:mm A') {
+  const parsedDate = dayjs(date);
+
+  return parsedDate.isValid() && parsedDate.toISOString() === date
+    ? parsedDate.format(format)
     : date;
 }
 
@@ -217,7 +216,23 @@ class PdfGenerator {
     };
   }
 
-  async generate(callback) {
+  async generateBlob(callback) {
+    const pdf = await this.pdf();
+    if (!pdf) {
+      return null;
+    }
+    pdf.getBlob(callback);
+  }
+
+  async generateBase64(callback) {
+    const pdf = await this.pdf();
+    if (!pdf) {
+      return null;
+    }
+    pdf.getBase64(callback);
+  }
+
+  async pdf() {
     if (this.disabled) {
       return null;
     }
@@ -243,7 +258,7 @@ class PdfGenerator {
       }
     }
 
-    pdfMake.createPdf(this.docDefinition).getBase64(callback);
+    return pdfMake.createPdf(this.docDefinition);
   }
 
   filename() {
@@ -252,11 +267,11 @@ class PdfGenerator {
     }
 
     const { dateSubmitted, dateModified, dateCreated } = this.submission.meta;
-    const date = dateSubmitted || dateModified || dateCreated || new Date().toISOString();
+    const date = (dateSubmitted || dateModified || dateCreated || new Date()).toISOString();
 
     return `${this.survey.name}-${this.submission._id.toString().slice(-6)}-${formatDate(
       date,
-      'yyyy-MM-dd'
+      'YYYY-MM-DD-HH-mm-ss'
     )}`;
   }
 
@@ -276,7 +291,7 @@ class PdfGenerator {
   generateMeta() {
     const { dateSubmitted, dateModified, dateCreated } = this.submission.meta;
     const metaDate = formatDate(
-      dateSubmitted || dateModified || dateCreated || new Date().toISOString()
+      (dateSubmitted || dateModified || dateCreated || new Date()).toISOString()
     );
 
     this.docDefinition.content.push(
@@ -395,7 +410,7 @@ class PdfGenerator {
     }
     let answer = getProperty(this.submission.data, answerKey);
     if (type === 'date') {
-      answer = formatDate(answer, 'MMM d, yyyy');
+      answer = formatDate(answer, 'MMM D, YYYY');
     }
 
     if (type === 'instructions') {
@@ -674,7 +689,7 @@ class PdfGenerator {
           row.push(text.join(', '));
         } else {
           if (col.type === 'date') {
-            colValue = formatDate(colValue, 'MMM d, yyyy');
+            colValue = formatDate(colValue, 'MMM D, YYYY');
           }
           row.push(colValue);
         }
@@ -784,9 +799,19 @@ class PdfGenerator {
   }
 }
 
-function getPdfDocument(survey, submission, callback) {
+function getPdfBase64(survey, submission, callback) {
   const generator = new PdfGenerator(survey, submission);
-  generator.generate(callback);
+  generator.generateBase64(callback);
 }
 
-export default { getPdfDocument };
+function getPdfBlob(survey, submission, callback) {
+  const generator = new PdfGenerator(survey, submission);
+  generator.generateBlob(callback);
+}
+
+function getPdfName(survey, submission) {
+  const generator = new PdfGenerator(survey, submission);
+  return generator.filename() + '.pdf';
+}
+
+export default { getPdfBase64, getPdfBlob, getPdfName };

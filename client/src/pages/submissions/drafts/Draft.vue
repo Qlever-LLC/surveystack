@@ -65,6 +65,7 @@
 </template>
 
 <script>
+import { parse as parseDisposition } from 'content-disposition';
 import api from '@/services/api.service';
 import appMixin from '@/components/mixin/appComponent.mixin';
 import resultMixin from '@/components/ui/ResultsMixin';
@@ -76,7 +77,6 @@ import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArc
 import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
 import { createSubmissionFromSurvey } from '@/utils/submissions';
-import SubmissionPdf from '@/utils/submissionPdf';
 import * as db from '@/store/db';
 import defaultsDeep from 'lodash/defaultsDeep';
 import downloadExternal from '@/utils/downloadExternal';
@@ -183,8 +183,11 @@ export default {
       this.resultItems = this.resultItems.filter((item) => !item.downloadError);
 
       try {
-        const { data } = await api.get(`/submissions/${this.submission._id}/pdf?survey=${this.survey._id}`);
-        downloadExternal(data, `${new SubmissionPdf(this.survey, this.submission).filename()}.pdf`);
+        const { headers, data } = await api.get(
+          `/submissions/${this.submission._id}/pdf?survey=${this.survey._id}&base64=1`
+        );
+        const disposition = parseDisposition(headers['content-disposition']);
+        downloadExternal(data, disposition.parameters.filename);
       } catch (e) {
         console.error('Failed to download PDF', e);
         this.resultItems = [
