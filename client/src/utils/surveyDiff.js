@@ -1,6 +1,8 @@
 import { get, isArray, isEqual, isNil, isObjectLike, pull, toPath, uniq } from 'lodash';
 import flatten from 'flat';
-import { getPosition, insertControl, replaceControl } from '@/utils/surveys';
+import { changeRecursive, getPosition, insertControl, replaceControl } from '@/utils/surveys';
+import * as utils from '@/utils/surveys';
+import ObjectID from 'bson-objectid';
 
 export const changeType = {
   CHANGED: 'changed',
@@ -352,7 +354,10 @@ export function merge(
           position[position.length - 1]--; //move back
         }
         //flag the control as consumer-added non-library-control
-        change.controlRevisionNew.isNonLibraryControl = true;
+        changeRecursive(change.controlRevisionNew, (control) => {
+          control.isNonLibraryControl = true;
+        });
+
         //insert control
         insertControl(change.controlRevisionNew, mergedControls, position, false);
         break;
