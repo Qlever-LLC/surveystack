@@ -417,8 +417,8 @@ export default {
         } else {
           this.error(error.message);
         }
-        this.loading = false;
       }
+      this.loading = false;
     },
     success(msg) {
       this.successMessage = msg;
