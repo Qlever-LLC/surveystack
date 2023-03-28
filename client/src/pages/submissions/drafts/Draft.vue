@@ -79,6 +79,7 @@ import { createSubmissionFromSurvey } from '@/utils/submissions';
 import SubmissionPdf from '@/utils/submissionPdf';
 import * as db from '@/store/db';
 import defaultsDeep from 'lodash/defaultsDeep';
+import downloadExternal from '@/utils/downloadExternal';
 
 export default {
   mixins: [appMixin, resultMixin],
@@ -182,7 +183,8 @@ export default {
       this.resultItems = this.resultItems.filter((item) => !item.downloadError);
 
       try {
-        await new SubmissionPdf(this.survey, this.submission).download();
+        const { data } = await api.get(`/submissions/${this.submission._id}/pdf?survey=${this.survey._id}`);
+        downloadExternal(data, `${new SubmissionPdf(this.survey, this.submission).filename()}.pdf`);
       } catch (e) {
         console.error('Failed to download PDF', e);
         this.resultItems = [

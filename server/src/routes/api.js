@@ -124,6 +124,11 @@ router.get(
   [assertEntityExists({ collection: 'submissions' })],
   catchErrors(submissionController.getSubmission)
 );
+router.get(
+  '/submissions/:id/pdf',
+  [assertEntityExists({ collection: 'submissions' })],
+  catchErrors(submissionController.getSubmissionPdf)
+);
 router.post(
   '/submissions',
   [assertSubmissionRights],

@@ -115,6 +115,7 @@ import { uploadFileResources } from '@/utils/resources';
 import { getApiComposeErrors } from '@/utils/draft';
 import SubmissionPdf from '@/utils/submissionPdf';
 import api from '@/services/api.service';
+import downloadExternal from '@/utils/downloadExternal';
 
 const SurveyBuilder = () => import('@/components/builder/SurveyBuilder.vue');
 
@@ -336,16 +337,7 @@ export default {
     },
     exportSurvey() {
       const data = JSON.stringify(this.survey, null, 4);
-      const element = document.createElement('a');
-      element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(data)}`);
-      element.setAttribute('download', `${this.survey.name}.json`);
-
-      element.style.display = 'none';
-      document.body.appendChild(element);
-
-      element.click();
-
-      document.body.removeChild(element);
+      downloadExternal(`data:text/plain;charset=utf-8,${encodeURIComponent(data)}`, `${this.survey.name}.json`);
     },
     async fetchData() {
       try {
@@ -367,7 +359,8 @@ export default {
       this.resultItems = this.resultItems.filter((item) => !item.downloadError);
 
       try {
-        await new SubmissionPdf(this.survey, this.submission).download();
+        const { data } = await api.get(`/submissions/${this.submission._id}/pdf?survey=${this.survey._id}`);
+        downloadExternal(data, `${new SubmissionPdf(this.survey, this.submission).filename()}.pdf`);
       } catch (e) {
         console.error('Failed to download PDF', e);
         this.resultItems = [

@@ -11,9 +11,10 @@ import headerService from '../services/header.service';
 import * as farmOsService from '../services/farmos.service';
 import * as hyloService from '../services/hylo.service';
 import rolesService from '../services/roles.service';
+import mailService from '../services/mail/mail.service';
+import pdfService from '../services/pdf.service';
 import { queryParam } from '../helpers';
 import { appendDatabaseOperationDurationToLoggingMessage } from '../middleware/logging';
-import mailService from '../services/mail/mail.service';
 const col = 'submissions';
 const DEFAULT_LIMIT = 100000;
 const DEFAULT_SORT = { _id: -1 }; // reverse insert order
@@ -140,7 +141,7 @@ const createRedactStage = (user, roles) => {
           // => submission_role = "admin@/oursci/lab/testing/"
           // A user role of "admin@/oursci/" can view, since
           // "admin@/oursci/lab/testing" is a regexMatch of "^admin@/oursci/"
-          // TODO: with this case branch, we probably dont even need the one from before
+          // TODO: with this case branch, we probably don't even need the one from before
           {
             case: {
               $anyElementTrue: {
@@ -184,18 +185,6 @@ const createRelevanceStage = () => {
     $redact: {
       $cond: {
         if: { $eq: ['$meta.relevant', false] },
-        then: '$$PRUNE',
-        else: '$$DESCEND',
-      },
-    },
-  };
-};
-
-const createDataMetaStage = () => {
-  return {
-    $redact: {
-      $cond: {
-        if: { $eq: ['$CURRENT', false] },
         then: '$$PRUNE',
         else: '$$DESCEND',
       },
@@ -328,12 +317,12 @@ export const buildPipeline = async (req, res) => {
         sort = s;
       }
     } catch (error) {
-      throw boom.badRequest(`Bad query paramter sort: ${sort}`);
+      throw boom.badRequest(`Bad query parameter sort: ${sort}`);
     }
 
     _.forOwn(sort, (v) => {
       if (v !== -1 && v !== 1) {
-        throw boom.badRequest(`Bad query paramter sort, value must be either 1 or -1`);
+        throw boom.badRequest(`Bad query parameter sort, value must be either 1 or -1`);
       }
     });
   }
@@ -407,7 +396,7 @@ const getSubmissionsPage = async (req, res) => {
         skip = querySkip;
       }
     } catch (error) {
-      throw boom.badRequest(`Bad query paramter skip: ${skip}`);
+      throw boom.badRequest(`Bad query parameter skip: ${skip}`);
     }
   }
 
@@ -419,7 +408,7 @@ const getSubmissionsPage = async (req, res) => {
         limit = queryLimit;
       }
     } catch (error) {
-      throw boom.badRequest(`Bad query paramter limit: ${limit}`);
+      throw boom.badRequest(`Bad query parameter limit: ${limit}`);
     }
   }
 
@@ -474,7 +463,7 @@ const getSubmissions = async (req, res) => {
         pipeline.push({ $skip: skip });
       }
     } catch (error) {
-      throw boom.badRequest(`Bad query paramter skip: ${skip}`);
+      throw boom.badRequest(`Bad query parameter skip: ${skip}`);
     }
   }
 
@@ -487,7 +476,7 @@ const getSubmissions = async (req, res) => {
         pipeline.push({ $limit: limit });
       }
     } catch (error) {
-      throw boom.badRequest(`Bad query paramter limit: ${limit}`);
+      throw boom.badRequest(`Bad query parameter limit: ${limit}`);
     }
   }
 
@@ -511,7 +500,7 @@ const addSkipToPipeline = (pipeline, reqSkip) => {
         pipeline.push({ $skip: skip });
       }
     } catch (error) {
-      throw boom.badRequest(`Bad query paramter skip: ${skip}`);
+      throw boom.badRequest(`Bad query parameter skip: ${skip}`);
     }
   }
 };
@@ -526,7 +515,7 @@ const addLimitToPipeline = (pipeline, reqLimit) => {
         pipeline.push({ $limit: limit });
       }
     } catch (error) {
-      throw boom.badRequest(`Bad query paramter limit: ${limit}`);
+      throw boom.badRequest(`Bad query parameter limit: ${limit}`);
     }
   }
 };
@@ -659,7 +648,7 @@ const handleApiCompose = async (submissionEntities, user) => {
   submissionEntities = cloneDeep(submissionEntities);
 
   // HOTFIX: do hylo first because farmos handler remove all apiCompose outputs from the submission
-  // TODO: solve this in a cleaner way. Create utiliti functions for apiCompose handlers
+  // TODO: solve this in a cleaner way. Create utility functions for apiCompose handlers
   let hyloResults;
   try {
     hyloResults = await Promise.all(
@@ -1195,6 +1184,24 @@ const deleteSubmissions = async (req, res) => {
   return res.send({ message: 'OK' });
 };
 
+const getSubmissionPdf = async (req, res) => {
+  const submission = await db.collection(col).findOne({ _id: new ObjectId(req.params.id) });
+  if (!submission) {
+    throw boom.notFound(`No entity found for id: ${req.params.id}`);
+  }
+
+  const surveyId = req.query.survey || String(submission.meta.survey.id);
+  const survey = await db.collection('surveys').findOne({ _id: new ObjectId(surveyId) });
+  if (!survey) {
+    throw boom.notFound(`No survey found with id: ${surveyId}`);
+  }
+
+  pdfService.getPdfDocument(survey, submission, (data) => {
+    res.contentType('application/pdf');
+    res.send('data:application/pdf;base64,' + data);
+  });
+};
+
 const sendPdfLink = async (req, res) => {
   await mailService.sendLink({
     to: res.locals.auth.user.email,
@@ -1219,5 +1226,6 @@ export default {
   archiveSubmissions,
   deleteSubmissions,
   prepareSubmissionsToQSLs,
+  getSubmissionPdf,
   sendPdfLink,
 };
