@@ -195,8 +195,6 @@ async function getSubmissionUniqueItems(surveyId, path) {
     count: group.length,
   }));
 
-  console.log(2222222, uniqueItems);
-
   return uniqueItems;
 }
 
@@ -277,7 +275,6 @@ class PdfGenerator {
 
   generateMeta() {
     const { dateSubmitted, dateModified, dateCreated } = this.submission.meta;
-    console.log(111111111, dateSubmitted || dateModified || dateCreated || new Date().toISOString());
     const metaDate = formatDate(
       dateSubmitted || dateModified || dateCreated || new Date().toISOString()
     );

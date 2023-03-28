@@ -225,6 +225,7 @@ import appDialog from '@/components/ui/Dialog.vue';
 import appSubmissionArchiveDialog from '@/components/survey/drafts/SubmissionArchiveDialog.vue';
 
 import { createBasicQueryList } from '@/utils/surveyStack';
+import downloadExternal from '@/utils/downloadExternal';
 
 const defaultPageSize = 10;
 
