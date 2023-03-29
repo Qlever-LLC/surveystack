@@ -2,6 +2,7 @@ import {
   getPropertiesFromMatrix,
   transformGeoJsonHeaders,
   transformMatrixHeaders,
+  getHeaderOrder,
 } from './SubmissionTableClientCsv.vue';
 import { fireEvent } from '@testing-library/vue';
 import { within } from '@testing-library/dom';
@@ -396,6 +397,31 @@ describe('SubmissionTableClientCsv', () => {
     });
   });
 
+  describe('getHeaderOrder', () => {
+    const survey = {
+      revisions: [
+        { controls: [] },
+        { controls: [{ name: 'dropdown_1' }, { name: 'text_2' }, { name: 'number_3' }] },
+        { controls: [{ name: 'dropdown_1' }, { name: 'dropdown_2' }, { name: 'text_2' }, { name: 'number_3' }] },
+        { controls: [{ name: 'dropdown_2' }, { name: 'text_2' }, { name: 'text_3' }, { name: 'number_3' }] },
+      ],
+    };
+
+    it('returns the minimum index of the current header from all revisions of the survey', () => {
+      expect(getHeaderOrder('data.dropdown_1.value', survey)).toEqual(0);
+      expect(getHeaderOrder('data.text_3.value', survey)).toEqual(2);
+      expect(getHeaderOrder('data.number_3.value', survey)).toEqual(2);
+    });
+
+    it('returns -1 if the header is meta', () => {
+      expect(getHeaderOrder('meta.creator.value', survey)).toEqual(-1);
+    });
+
+    it('returns 99999 if the header is not exist in the controls of all revisions', () => {
+      expect(getHeaderOrder('data.ontology_4.value', survey)).toEqual(99999);
+    });
+  });
+
   describe('SubmissionTableClientCsv UI Tests', () => {
     it('should check that the modal text content is the same with the clicked table cell', async () => {
       const { getByText, getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
@@ -428,173 +454,173 @@ describe('SubmissionTableClientCsv', () => {
       const modal = queryByRole('dialog');
       expect(modal).toBeNull();
     });
-  });
 
-  it('should check that the modal text content is the same with the clicked table cell', async () => {
-    const { getByText, getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: { submissions: mockSubmissions(), selected: [] },
-      router: router,
-      store: createStoreObject(),
-    });
-    const td = getByText(
-      'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout'
-    );
-    await fireEvent.click(td);
-    const modal = getByRole('dialog');
-    within(modal).getByText(
-      'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout'
-    );
-  });
-
-  it('emits update:selected event when submission checkbox is clicked', async () => {
-    const { getAllByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: { submissions: mockSubmissions(), selected: [] },
-      router: router,
-      store: createStoreObject(),
+    it('should check that the modal text content is the same with the clicked table cell', async () => {
+      const { getByText, getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
+        propsData: { submissions: mockSubmissions(), selected: [] },
+        router: router,
+        store: createStoreObject(),
+      });
+      const td = getByText(
+        'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout'
+      );
+      await fireEvent.click(td);
+      const modal = getByRole('dialog');
+      within(modal).getByText(
+        'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout'
+      );
     });
 
-    const checkbox = getAllByRole('checkbox');
-    await fireEvent.click(checkbox[1]); //checkbox[0] is the toggleSelectAllItems checkbox, so take the second one (index 1)
-    expect(emitted()['update:selected']).toBeTruthy();
-  });
+    it('emits update:selected event when submission checkbox is clicked', async () => {
+      const { getAllByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
+        propsData: { submissions: mockSubmissions(), selected: [] },
+        router: router,
+        store: createStoreObject(),
+      });
 
-  it('displays selected text and submission action buttons when the selected prop contains a submission from the submissions prop', async () => {
-    const { getByRole, getByText } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: {
-        submissions: mockSubmissions(),
-        selected: [
-          {
-            _id: '61bd8891ff21c10001c986aa',
-            'data.text_1.value': 'Test',
-          },
-        ],
-      },
-      router: router,
-      store: createStoreObject(),
-    });
-    getByText(/1 submission selected/i);
-    getByRole('button', { name: /archive/i });
-    getByRole('button', { name: /reassign/i });
-    getByRole('button', { name: /resubmit/i });
-  });
-
-  it('emits showArchiveModal event when archive button is clicked', async () => {
-    const { getByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: {
-        submissions: mockSubmissions(),
-        selected: [
-          {
-            _id: '61bd8891ff21c10001c986aa',
-            'data.text_1.value': 'Test',
-          },
-        ],
-      },
-      router: router,
-      store: createStoreObject(),
+      const checkbox = getAllByRole('checkbox');
+      await fireEvent.click(checkbox[1]); //checkbox[0] is the toggleSelectAllItems checkbox, so take the second one (index 1)
+      expect(emitted()['update:selected']).toBeTruthy();
     });
 
-    const archiveButton = getByRole('button', { name: /archive/i });
-    await fireEvent.click(archiveButton);
-    expect(emitted().showArchiveModal).toBeTruthy();
-  });
-
-  it('should emit resubmit event when resubmit button is clicked', async () => {
-    const { getByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: {
-        submissions: mockSubmissions(),
-        selected: [
-          {
-            _id: '61bd8891ff21c10001c986aa',
-            'data.text_1.value': 'Test',
-          },
-        ],
-      },
-      router: router,
-      store: createStoreObject(),
+    it('displays selected text and submission action buttons when the selected prop contains a submission from the submissions prop', async () => {
+      const { getByRole, getByText } = renderWithVuetify(SubmissionTableClientCsv, {
+        propsData: {
+          submissions: mockSubmissions(),
+          selected: [
+            {
+              _id: '61bd8891ff21c10001c986aa',
+              'data.text_1.value': 'Test',
+            },
+          ],
+        },
+        router: router,
+        store: createStoreObject(),
+      });
+      getByText(/1 submission selected/i);
+      getByRole('button', { name: /archive/i });
+      getByRole('button', { name: /reassign/i });
+      getByRole('button', { name: /resubmit/i });
     });
 
-    const resubmitButton = getByRole('button', { name: /resubmit/i });
-    await fireEvent.click(resubmitButton);
-    expect(emitted().resubmit).toBeTruthy();
-  });
+    it('emits showArchiveModal event when archive button is clicked', async () => {
+      const { getByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
+        propsData: {
+          submissions: mockSubmissions(),
+          selected: [
+            {
+              _id: '61bd8891ff21c10001c986aa',
+              'data.text_1.value': 'Test',
+            },
+          ],
+        },
+        router: router,
+        store: createStoreObject(),
+      });
 
-  it('should emit reassignment event when reassign button is clicked', async () => {
-    const { getByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: {
-        submissions: mockSubmissions(),
-        selected: [
-          {
-            _id: '61bd8891ff21c10001c986aa',
-            'data.text_1.value': 'Test',
-          },
-        ],
-      },
-      router: router,
-      store: createStoreObject(),
+      const archiveButton = getByRole('button', { name: /archive/i });
+      await fireEvent.click(archiveButton);
+      expect(emitted().showArchiveModal).toBeTruthy();
     });
 
-    const reassignButton = getByRole('button', { name: /reassign/i });
-    await fireEvent.click(reassignButton);
-    expect(emitted().reassignment).toBeTruthy();
-  });
+    it('should emit resubmit event when resubmit button is clicked', async () => {
+      const { getByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
+        propsData: {
+          submissions: mockSubmissions(),
+          selected: [
+            {
+              _id: '61bd8891ff21c10001c986aa',
+              'data.text_1.value': 'Test',
+            },
+          ],
+        },
+        router: router,
+        store: createStoreObject(),
+      });
 
-  it('should disable reassign Button if actionsAreDisabled prop is set to true', async () => {
-    const { getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: {
-        submissions: mockSubmissions(),
-        actionsAreDisabled: true,
-        selected: [
-          {
-            _id: '61bd8891ff21c10001c986aa',
-            'data.text_1.value': 'Test',
-          },
-        ],
-      },
-      router: router,
-      store: createStoreObject(),
+      const resubmitButton = getByRole('button', { name: /resubmit/i });
+      await fireEvent.click(resubmitButton);
+      expect(emitted().resubmit).toBeTruthy();
     });
 
-    const reassignButton = getByRole('button', { name: /reassign/i });
-    expect(reassignButton).toBeDisabled();
-  });
+    it('should emit reassignment event when reassign button is clicked', async () => {
+      const { getByRole, emitted } = renderWithVuetify(SubmissionTableClientCsv, {
+        propsData: {
+          submissions: mockSubmissions(),
+          selected: [
+            {
+              _id: '61bd8891ff21c10001c986aa',
+              'data.text_1.value': 'Test',
+            },
+          ],
+        },
+        router: router,
+        store: createStoreObject(),
+      });
 
-  it('should disable resubmit Button if actionsAreDisabled prop is set to true', async () => {
-    const { getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: {
-        submissions: mockSubmissions(),
-        actionsAreDisabled: true,
-        selected: [
-          {
-            _id: '61bd8891ff21c10001c986aa',
-            'data.text_1.value': 'Test',
-          },
-        ],
-      },
-      router: router,
-      store: createStoreObject(),
+      const reassignButton = getByRole('button', { name: /reassign/i });
+      await fireEvent.click(reassignButton);
+      expect(emitted().reassignment).toBeTruthy();
     });
 
-    const resubmitButton = getByRole('button', { name: /resubmit/i });
-    expect(resubmitButton).toBeDisabled();
-  });
+    it('should disable reassign Button if actionsAreDisabled prop is set to true', async () => {
+      const { getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
+        propsData: {
+          submissions: mockSubmissions(),
+          actionsAreDisabled: true,
+          selected: [
+            {
+              _id: '61bd8891ff21c10001c986aa',
+              'data.text_1.value': 'Test',
+            },
+          ],
+        },
+        router: router,
+        store: createStoreObject(),
+      });
 
-  it('should disable archive Button if actionsAreDisabled prop is set to true', async () => {
-    const { getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
-      propsData: {
-        submissions: mockSubmissions(),
-        actionsAreDisabled: true,
-        selected: [
-          {
-            _id: '61bd8891ff21c10001c986aa',
-            'data.text_1.value': 'Test',
-          },
-        ],
-      },
-      router: router,
-      store: createStoreObject(),
+      const reassignButton = getByRole('button', { name: /reassign/i });
+      expect(reassignButton).toBeDisabled();
     });
 
-    const archiveButton = getByRole('button', { name: /archive/i });
-    expect(archiveButton).toBeDisabled();
+    it('should disable resubmit Button if actionsAreDisabled prop is set to true', async () => {
+      const { getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
+        propsData: {
+          submissions: mockSubmissions(),
+          actionsAreDisabled: true,
+          selected: [
+            {
+              _id: '61bd8891ff21c10001c986aa',
+              'data.text_1.value': 'Test',
+            },
+          ],
+        },
+        router: router,
+        store: createStoreObject(),
+      });
+
+      const resubmitButton = getByRole('button', { name: /resubmit/i });
+      expect(resubmitButton).toBeDisabled();
+    });
+
+    it('should disable archive Button if actionsAreDisabled prop is set to true', async () => {
+      const { getByRole } = renderWithVuetify(SubmissionTableClientCsv, {
+        propsData: {
+          submissions: mockSubmissions(),
+          actionsAreDisabled: true,
+          selected: [
+            {
+              _id: '61bd8891ff21c10001c986aa',
+              'data.text_1.value': 'Test',
+            },
+          ],
+        },
+        router: router,
+        store: createStoreObject(),
+      });
+
+      const archiveButton = getByRole('button', { name: /archive/i });
+      expect(archiveButton).toBeDisabled();
+    });
   });
 });

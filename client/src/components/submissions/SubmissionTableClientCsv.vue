@@ -268,6 +268,22 @@ export function transformMatrixHeaders(headers, submissions) {
   return result;
 }
 
+export function getHeaderOrder(header, survey) {
+  const [key, value] = header.split('.');
+
+  // Meta header first
+  if (key === 'meta') {
+    return -1;
+  }
+
+  // Indexes per revisions
+  const indexes = survey.revisions
+    .map((revision) => revision.controls.findIndex((control) => control.name === value))
+    .filter((index) => index >= 0);
+
+  return indexes.length === 0 ? 99999 : Math.min(...indexes);
+}
+
 const PREFERRED_HEADERS = ['_id', 'meta.creatorDetail.name', 'meta.dateSubmitted'];
 
 export default {
@@ -277,6 +293,9 @@ export default {
   props: {
     actionsAreDisabled: {
       type: Boolean,
+    },
+    survey: {
+      type: Object,
     },
     submissions: {
       type: Object,
@@ -459,7 +478,10 @@ export default {
             });
           }
         });
-        matrixHeaders.forEach((header) => {
+        const sortedHeaders = this.survey
+          ? matrixHeaders.sort((a, b) => getHeaderOrder(a, this.survey) - getHeaderOrder(b, this.survey))
+          : [...matrixHeaders];
+        sortedHeaders.forEach((header) => {
           if (
             PREFERRED_HEADERS.includes(header) ||
             (this.excludeMeta && (header.startsWith('meta') || header.includes('meta')))

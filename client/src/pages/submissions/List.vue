@@ -153,6 +153,7 @@
         <v-tabs-items v-model="tab" touchless>
           <v-tab-item>
             <app-submissions-table-client-csv
+              :survey="surveyEntity"
               :submissions="submissions"
               v-if="submissions"
               :selected.sync="selected"
