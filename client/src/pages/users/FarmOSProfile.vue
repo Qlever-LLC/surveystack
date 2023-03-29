@@ -90,10 +90,10 @@
             Are you sure you want to move ownership to another Survey Stack user?<br />
             By doing so you will:
           </p>
-          <ul>
-            1. No longer have full administrative control over your farmOS farm instance.<br />
-            2. Not be able to control access to your farm by groups or users.<br />
-          </ul>
+          <ol class="mb-4">
+            <li>No longer have full administrative control over your farmOS farm instance.</li>
+            <li>Not be able to control access to your farm by groups or users.</li>
+          </ol>
           <p>
             You will still be able to see fields, plantings and logs in your Survey Stack surveys and push surveys to
             that farm.
@@ -118,11 +118,11 @@
             Are you sure? This will disconnect your Survey Stack account from your farmOS account. You will no longer be
             able to:
           </p>
-          <ul>
-            1. Use the Coffee Shop with this farmOS farm<br />
-            2. See this farm's fields or plantings when filling out surveys.<br />
-            3. Push data from Survey Stack surveys into this farmOS farm.<br /><br />
-          </ul>
+          <ol class="mb-4">
+            <li>Use the Coffee Shop with this farmOS farm</li>
+            <li>See this farm's fields or plantings when filling out surveys.</li>
+            <li>Push data from Survey Stack surveys into this farmOS farm.</li>
+          </ol>
           <v-btn block @click="confirmRemoveInstance" color="primary" target="_blank"> Confirm</v-btn>
         </div>
       </app-dialog>
@@ -143,11 +143,11 @@
             Are you sure? This will disconnect your Survey Stack account from your farmOS account. You will no longer be
             able to:
           </p>
-          <ul>
-            1. Use the Coffee Shop with this farmOS farm<br />
-            2. See this farm's fields or plantings when filling out surveys.<br />
-            3. Push data from Survey Stack surveys into this farmOS farm.<br />
-          </ul>
+          <ol class="mb-4">
+            <li>Use the Coffee Shop with this farmOS farm</li>
+            <li>See this farm's fields or plantings when filling out surveys.</li>
+            <li>Push data from Survey Stack surveys into this farmOS farm.</li>
+          </ol>
           <p>
             Unlinking the account will also disconnect this account from all groups and other users who would have
             access to it.
