@@ -1,8 +1,6 @@
 import { get, isArray, isEqual, isNil, isObjectLike, pull, toPath, uniq } from 'lodash';
 import flatten from 'flat';
 import { changeRecursive, getPosition, insertControl, replaceControl } from '@/utils/surveys';
-import * as utils from '@/utils/surveys';
-import ObjectID from 'bson-objectid';
 
 export const changeType = {
   CHANGED: 'changed',
