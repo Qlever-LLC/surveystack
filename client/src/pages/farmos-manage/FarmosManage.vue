@@ -122,6 +122,7 @@ export default {
   },
   methods: {
     async reload() {
+      this.resetMessage();
       this.loading = true;
       const { data: notes } = await api.get('/farmos/notes/all');
       const { data: mappings } = await api.get('/farmos/all');
@@ -149,7 +150,7 @@ export default {
       console.dir(users);
     },
     async mapGroup(group, instanceName) {
-      this.error(null);
+      this.resetMessage();
       try {
         this.loading = true;
 
@@ -175,7 +176,7 @@ export default {
     },
     async unmapGroup(group, instanceName) {
       console.log('unmap group instanceName', instanceName);
-      this.error(null);
+      this.resetMessage();
       try {
         this.loading = true;
 
@@ -195,7 +196,7 @@ export default {
       }
     },
     async mapUser(user, instanceName, owner) {
-      this.error(null);
+      this.resetMessage();
       try {
         console.log('owner', owner);
         this.loading = true;
@@ -217,7 +218,7 @@ export default {
       }
     },
     async unmapUser(user, instanceName) {
-      this.error(null);
+      this.resetMessage();
       try {
         this.loading = true;
 
@@ -237,7 +238,7 @@ export default {
       }
     },
     async unmapFarm(instanceName) {
-      this.error(null);
+      this.resetMessage();
       try {
         this.loading = true;
         await api.post('/farmos/unmap-instance', {
@@ -258,6 +259,7 @@ export default {
       return this.items.find((item) => item.id === componentId).viewModel;
     },
     async checkUrl(viewModel) {
+      this.resetMessage();
       const vm = this.vmOf('create-instance');
       vm.form = viewModel.form;
 
@@ -302,6 +304,7 @@ export default {
       vm.count += 1; // invalidate cache
     },
     async createInstance(form) {
+      this.resetMessage();
       const vm = this.vmOf('create-instance');
       vm.form = form;
       vm.loading = true;
@@ -350,6 +353,7 @@ export default {
       vm.count += 1; // invalidate cache
     },
     async createPlan(planName, planUrl) {
+      this.resetMessage();
       const vm = this.vmOf('plans');
       vm.loading = true;
       try {
@@ -375,6 +379,7 @@ export default {
       vm.count += 1;
     },
     async deletePlan(planId) {
+      this.resetMessage();
       const vm = this.vmOf('plans');
       vm.loading = true;
 
@@ -400,6 +405,7 @@ export default {
       vm.count += 1;
     },
     async addSuperAdminNote(arg) {
+      this.resetMessage();
       const { updatedNote: note, selectedInstance: instanceName } = arg;
       try {
         await api.post(`/farmos/group-manage/add-sa-notes`, {
@@ -419,6 +425,10 @@ export default {
         }
       }
       this.loading = false;
+    },
+    resetMessage() {
+      this.errorMessage = null;
+      this.successMessage = null;
     },
     success(msg) {
       this.successMessage = msg;

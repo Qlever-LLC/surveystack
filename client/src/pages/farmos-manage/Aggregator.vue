@@ -35,7 +35,7 @@
 
     <div class="d-flex flex-row mb-5" v-if="!!selectedInstance">
       <v-text-field v-model.trim="updatedNote" label="Note" hide-details></v-text-field>
-      <v-btn color="primary" @click="addSuperAdminNote">append to note</v-btn>
+      <v-btn color="primary" @click="addSuperAdminNote">update note</v-btn>
     </div>
 
     <div class="d-flex flex-column mt-2" v-if="!!selectedInstance">
