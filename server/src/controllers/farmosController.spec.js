@@ -308,7 +308,7 @@ describe('farmos-controller', () => {
       instanceName: instanceName,
     });
     expect(instanceNote.instanceName).toEqual(instanceName);
-    expect(instanceNote.note).toContain('Removed by Super Admin reason:');
+    expect(instanceNote.note).toContain('Super Admin:');
     expect(instanceNote.note).toContain(note);
   });
   it('add 2 notes for 1 instance as Super Admin', async () => {
@@ -343,7 +343,7 @@ describe('farmos-controller', () => {
       instanceName: instanceName,
     });
     expect(instanceNote.instanceName).toEqual(instanceName);
-    expect(instanceNote.note).toContain('Removed by Super Admin reason:');
+    expect(instanceNote.note).toContain('Super Admin:');
     expect(instanceNote.note).toContain(note1);
     expect(instanceNote.note).toContain(note2);
   });

@@ -1274,7 +1274,7 @@ export const addSuperAdminNotes = async (req, res) => {
     //template:
     //note = `timestamp\nRemoved from ${groupNames} reason: ${note}\n\n`;
     const timestamp = getCurrentDateAsString();
-    const newNote = `${timestamp}\nSuper Admin : ${note}\n\n`;
+    const newNote = `${timestamp}\nSuper Admin: ${note}\n\n`;
 
     const instanceNote = await db.collection('farmos-instance-notes').findOne({
       instanceName: instanceName,
