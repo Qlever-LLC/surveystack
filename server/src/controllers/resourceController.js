@@ -33,7 +33,7 @@ const getUploadURL = async (req, res) => {
   const resource = req.body;
 
   // validate resource object param
-  if (!resource._id || !resource.key || !resource.contentType || !resource.contentLength) {
+  if (!resource._id || !resource.key || !resource.contentLength) {
     return res.status(500).send({ message: 'Incomplete message body supplied' });
   }
   if (resource.state === 'committed' || resource.state === 'pending') {
