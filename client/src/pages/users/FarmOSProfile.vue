@@ -344,6 +344,7 @@ export default {
   },
   data() {
     return {
+      timeoutID: null,
       successMessage: null,
       errorMessage: null,
       errorDialogMessage: null,
@@ -411,7 +412,6 @@ export default {
     },
     // access button
     async accessInstance(instanceName) {
-      this.cleanMessage();
       try {
         this.showLinkDialog = true;
         const { data: link } = await api.post(`/farmos/get-farm-owner-link`, {
@@ -426,7 +426,6 @@ export default {
     },
     // move button
     async moveInstance(instanceName) {
-      this.cleanMessage();
       this.showMoveDialog = true;
       this.instanceUnderWork = instanceName;
     },
@@ -468,7 +467,6 @@ export default {
     },
     // remove button
     async removeInstance(instanceName) {
-      this.cleanMessage();
       this.instanceUnderWork = instanceName;
       try {
         await api.post(`/farmos/available-remove-instance-from-user`, {
@@ -497,7 +495,6 @@ export default {
     },
     // delete button
     async deleteInstance(instanceName) {
-      this.cleanMessage();
       this.instanceUnderWork = instanceName;
       try {
         await api.post(`/farmos/available-delete-instance-from-user`, {
@@ -526,7 +523,6 @@ export default {
     },
     // v-chip close a group
     async removeInstanceFromGroup(instanceName, groupId) {
-      this.cleanMessage();
       this.instanceUnderWork = instanceName;
       this.groupIdUnderWork = groupId;
       try {
@@ -559,7 +555,6 @@ export default {
     },
     // v-chip close an other user
     async removeInstanceFromOtherUser(instanceName, userId) {
-      this.cleanMessage();
       this.instanceUnderWork = instanceName;
       this.otherUserIdUnderWork = userId;
       try {
@@ -605,14 +600,17 @@ export default {
       this.showConfirmRemoveInstFromOthUsrDialog = false;
     },
 
-    cleanMessage() {
-      this.successMessage = null;
-      this.errorMessage = null;
-    },
     success(msg) {
+      if (this.timeoutID) {
+        clearTimeout(this.timeoutID);
+      }
       this.successMessage = msg;
       this.errorMessage = null;
       window.scrollTo(0, 0);
+      this.timeoutID = setTimeout(() => {
+        this.successMessage = null;
+        this.timeoutID = null;
+      }, 15000);
     },
     errorCatched(error) {
       if (error.response && error.response.data && error.response.data.message) {
@@ -622,9 +620,16 @@ export default {
       }
     },
     error(msg) {
+      if (this.timeoutID) {
+        clearTimeout(this.timeoutID);
+      }
       this.errorMessage = msg;
       this.successMessage = null;
       window.scrollTo(0, 0);
+      this.timeoutID = setTimeout(() => {
+        this.errorMessage = null;
+        this.timeoutID = null;
+      }, 15000);
     },
     dialogError(msg) {
       this.errorDialogMessage = msg;

@@ -178,6 +178,7 @@ export default {
       disconnectUserId: '',
       plans: [],
       createViewModel: {},
+      timeoutID: null,
       successMessage: null,
       errorMessage: null,
 
@@ -626,14 +627,28 @@ export default {
       await this.init();
     },
     success(msg) {
+      if (this.timeoutID) {
+        clearTimeout(this.timeoutID);
+      }
       this.successMessage = msg;
       this.errorMessage = null;
-      window.scrollTo(0, 0);
+      this.timeoutID = window.scrollTo(0, 0);
+      setTimeout(() => {
+        this.successMessage = null;
+        this.timeoutID = null;
+      }, 15000);
     },
     error(msg) {
+      if (this.timeoutID) {
+        clearTimeout(this.timeoutID);
+      }
       this.errorMessage = msg;
       this.successMessage = null;
       window.scrollTo(0, 0);
+      this.timeoutID = setTimeout(() => {
+        this.errorMessage = null;
+        this.timeoutID = null;
+      }, 15000);
     },
   },
 };
