@@ -277,9 +277,9 @@
 
       <!-- Advanced properties -->
       <v-btn v-if="!showAdvanced" color="grey darken-1" class="align-self-end" @click="showAdvanced = true" small text>
-        advanced
+        Advanced
       </v-btn>
-      <div v-else class="advanced">
+      <div v-else class="extra-options">
         <v-spacer></v-spacer>
         <div>
           <v-card-title class="px-0 py-0">Advanced Options</v-card-title>
@@ -334,11 +334,23 @@
         <v-btn v-if="!showLayout" color="grey darken-1" class="align-self-end" @click="showLayout = true" small text>
           Layout
         </v-btn>
-        <div v-else class="advanced">
+        <div v-else class="extra-options">
           <v-spacer></v-spacer>
           <div>
             <v-card-title class="px-0 py-0">Print Layout</v-card-title>
             <v-icon @click.stop="showLayout = false">mdi-close</v-icon>
+          </div>
+
+          <div v-if="isInstructions">
+            <checkbox label="Hidden" v-model="control.options.layout.hidden" />
+          </div>
+
+          <div v-if="isMatrix">
+            <checkbox
+              label="Hidden"
+              v-model="control.options.layout.table"
+              helper-text="Renders the matrix answers in tabular format. Otherwise, it is rendered in list format."
+            />
           </div>
 
           <div v-if="isFile">
@@ -349,7 +361,7 @@
             />
           </div>
 
-          <div v-if="!isFile">
+          <div v-if="isSelect || isOntology">
             <checkbox
               label="Show values only"
               v-model="control.options.layout.valuesOnly"
@@ -366,7 +378,7 @@
           </div>
 
           <v-select
-            v-if="!isFile && !control.options.layout.valuesOnly"
+            v-if="(isSelect || isOntology) && !control.options.layout.valuesOnly"
             label="Columns"
             v-model="control.options.layout.columnCount"
             :items="[1, 2, 3, 4, 5]"
@@ -541,7 +553,7 @@ export default {
       );
     },
     hasLayoutOptions() {
-      return this.isSelect || this.isOntology || this.isFile;
+      return this.isInstructions || this.isSelect || this.isOntology || this.isFile || this.isMatrix;
     },
   },
   methods: {
@@ -629,9 +641,12 @@ export default {
 
       if (typeof this.control.options.layout === 'undefined') {
         this.$set(this.control.options, 'layout', {
+          hidden: false,
           valuesOnly: true,
           usingControl: false,
           columnCount: 1,
+          preview: false,
+          table: true,
         });
       }
     },
@@ -668,7 +683,7 @@ export default {
 }
 
 .property-panel form > * + *,
-.property-panel form > .advanced > * + * {
+.property-panel form > .extra-options > * + * {
   margin-top: 16px;
 }
 
@@ -680,13 +695,13 @@ export default {
   height: 4px;
 }
 
-.property-panel form > .advanced > div {
+.property-panel form > .extra-options > div {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.property-panel form > .advanced .v-input--selection-controls {
+.property-panel form > .extra-options .v-input--selection-controls {
   margin-top: 0;
 }
 

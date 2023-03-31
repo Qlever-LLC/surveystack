@@ -725,16 +725,6 @@ export default {
         ? true
         : 'Questions list contains an invalid data name';
     },
-    setSurveyName(value) {
-      this.$set(this.survey, 'name', value);
-      this.$forceUpdate();
-    },
-    setSurveyGroup(value) {
-      this.$set(this.survey, 'group', value);
-    },
-    setSurveyDescription(value) {
-      this.$set(this.survey, 'description', value);
-    },
     createInstance() {
       const { version } = this.survey.revisions[this.survey.revisions.length - 1];
 

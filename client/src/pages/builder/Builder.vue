@@ -359,9 +359,7 @@ export default {
       this.resultItems = this.resultItems.filter((item) => !item.downloadError);
 
       try {
-        const { headers, data } = await api.get(
-          `/submissions/${this.submission._id}/pdf?survey=${this.survey._id}&base64=1`
-        );
+        const { headers, data } = await api.get(`/submissions/${this.submission._id}/pdf?base64=1`);
         const disposition = parseDisposition(headers['content-disposition']);
         downloadExternal(data, disposition.parameters.filename);
       } catch (e) {

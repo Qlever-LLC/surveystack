@@ -1185,15 +1185,40 @@ const deleteSubmissions = async (req, res) => {
 };
 
 const getSubmissionPdf = async (req, res) => {
-  const submission = await db.collection(col).findOne({ _id: new ObjectId(req.params.id) });
+  const [submission] = await db
+    .collection(col)
+    .aggregate([
+      { $match: { _id: new ObjectId(req.params.id) } },
+      {
+        $lookup: {
+          from: 'users',
+          let: { userId: '$meta.creator' },
+          pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$userId'] } } }],
+          as: 'user',
+        },
+      },
+      { $unwind: '$user' },
+      {
+        $lookup: {
+          from: 'groups',
+          let: { groupId: '$meta.group.id' },
+          pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$groupId'] } } }],
+          as: 'group',
+        },
+      },
+      { $unwind: '$group' },
+      { $set: { 'meta.group.name': '$group.name', 'meta.creator': '$user' } },
+      { $project: { user: 0, group: 0 } },
+    ])
+    .toArray();
+
   if (!submission) {
     throw boom.notFound(`No entity found for id: ${req.params.id}`);
   }
 
-  const surveyId = req.query.survey || String(submission.meta.survey.id);
-  const survey = await db.collection('surveys').findOne({ _id: new ObjectId(surveyId) });
+  const survey = await db.collection('surveys').findOne({ _id: submission.meta.survey.id });
   if (!survey) {
-    throw boom.notFound(`No survey found with id: ${surveyId}`);
+    throw boom.notFound(`No survey found with id: ${submission.meta.survey.id}`);
   }
 
   const fileName = pdfService.getPdfName(survey, submission);
@@ -1213,8 +1238,9 @@ const sendPdfLink = async (req, res) => {
     to: res.locals.auth.user.email,
     subject: `Survey report - ${req.body.survey}`,
     link: `${req.headers.origin}/api/submissions/${req.params.id}/pdf`,
-    actionDescriptionHtml: `Thank you for taking a time to complete our survey. Here's a link to your survey result.`,
-    btnText: 'View submission',
+    actionDescriptionHtml:
+      'Thank you for taking a time to complete our survey. You can download your submission by clicking the button below.',
+    btnText: 'Download',
   });
 
   return res.send({ success: true });
