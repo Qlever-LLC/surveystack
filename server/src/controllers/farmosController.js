@@ -1103,7 +1103,7 @@ export const mapUser = async (req, res) => {
   }
 
   const group = await db.collection('groups').find({
-    _id: groupId,
+    _id: asMongoId(groupId),
   });
   const resStatus = `Successfully added instance to ${group.name}, instance owner will be notified`;
   return res.send({
@@ -1309,7 +1309,7 @@ export const updateGroupsForUser = async (req, res) => {
     .collection('farmos-group-mapping')
     .find({
       groupId: {
-        $in: tree.descendants.map((d) => d._id),
+        $in: tree.descendants.map((d) => asMongoId(d._id)),
       },
       instanceName,
     })
@@ -1328,7 +1328,7 @@ export const updateGroupsForUser = async (req, res) => {
   // clear all mappings of groups in descendants
   await db.collection('farmos-group-mapping').deleteMany({
     groupId: {
-      $in: tree.descendants.map((d) => d._id),
+      $in: tree.descendants.map((d) => asMongoId(d._id)),
     },
     instanceName,
   });
@@ -1347,7 +1347,7 @@ export const updateGroupsForUser = async (req, res) => {
       .collection('farmos-group-mapping')
       .find({
         groupId: {
-          $in: tree.descendants.map((d) => d._id),
+          $in: tree.descendants.map((d) => asMongoId(d._id)),
         },
       })
       .toArray();
