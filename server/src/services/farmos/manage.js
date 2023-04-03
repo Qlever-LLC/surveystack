@@ -291,7 +291,7 @@ export const getOwnersFromInstanceName = async (instanceName) => {
 /**
  * The user receives ownership over the farmos instance
  */
-export const mapFarmOSInstanceToUser = async (userId, instanceName, owner, origin) => {
+export const mapFarmOSInstanceToUser = async (userId, instanceName, isOwner, origin) => {
   const res = await db
     .collection('farmos-instances')
     .find({
@@ -317,7 +317,7 @@ export const mapFarmOSInstanceToUser = async (userId, instanceName, owner, origi
     _id,
     userId: asMongoId(userId),
     instanceName,
-    owner,
+    isOwner,
   });
 
   // send email to instance owner(s)
@@ -369,7 +369,7 @@ export const mapFarmOSInstanceToUser = async (userId, instanceName, owner, origi
     _id,
     userId,
     instanceName,
-    owner,
+    isOwner,
   };
 };
 
