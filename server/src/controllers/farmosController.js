@@ -1177,8 +1177,7 @@ const assertGroupsInTree = async (groupIds, tree) => {
 
 const getCurrentDateAsString = () => {
   const date = new Date();
-  return date.toLocaleString('en-US', {
-    timeZone: 'America/New_York',
+  return date.toLocaleString(undefined, {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
