@@ -317,7 +317,7 @@ export const mapFarmOSInstanceToUser = async (userId, instanceName, isOwner, ori
     _id,
     userId: asMongoId(userId),
     instanceName,
-    isOwner,
+    owner: isOwner,
   });
 
   // send email to instance owner(s)
