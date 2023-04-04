@@ -74,6 +74,7 @@
       :allGroups="allGroups"
       :selectedGroupIds="selectedGroupIds"
       @updateGroups="updateGroups"
+      @cancelUpdate="cancelUpdate"
     />
 
     <FarmOSRemoveNoteDialog
@@ -447,9 +448,13 @@ export default {
       await this.init();
       this.loading = false;
     },
-    async cancelNote() {
+    async cancelUpdate() {
+      this.showDisonnectDialog = false;
       await this.init();
+    },
+    async cancelNote() {
       this.showRemoveNoteDialog = false;
+      await this.init();
     },
     async openFarm(item) {
       const { instanceName, userId } = item;
