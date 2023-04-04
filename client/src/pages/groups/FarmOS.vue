@@ -69,13 +69,19 @@
 
     <FarmOSDisconnectDialog
       v-model="showDisonnectDialog"
+      :loading="loading"
       :updateFarmInstanceName="updateFarmInstanceName"
       :allGroups="allGroups"
       :selectedGroupIds="selectedGroupIds"
       @updateGroups="updateGroups"
     />
 
-    <FarmOSRemoveNoteDialog v-model="showRemoveNoteDialog" @addNote="addNote" />
+    <FarmOSRemoveNoteDialog
+      v-model="showRemoveNoteDialog"
+      :loading="loading"
+      @addNote="addNote"
+      @cancelNote="cancelNote"
+    />
 
     <FarmOSGroupSettings
       class="ma-16"
@@ -385,6 +391,7 @@ export default {
       const [instanceName, groupIds] = args;
       const userId = this.disconnectUserId;
       const groupId = this.groupId;
+      const initialGroupIds = this.selectedGroupIds;
 
       this.loading = true;
 
@@ -393,17 +400,16 @@ export default {
           userId,
           instanceName,
           groupIds,
+          initialGroupIds,
         });
         this.success(resp.data.status);
 
-        this.showDisonnectDialog = false;
-
-        this.differenceRemovedGroupIds = this.selectedGroupIds.filter((x) => !groupIds.includes(x));
-        if (this.differenceRemovedGroupIds.length > 0) {
+        this.differenceRemovedGroupIds = initialGroupIds.filter((x) => !groupIds.includes(x));
+        const resultingGroupIdsInitiallyPresent = groupIds.every((x) => initialGroupIds.includes(x));
+        if (this.differenceRemovedGroupIds.length > 0 && resultingGroupIdsInitiallyPresent) {
           //only if remove happened
           this.showRemoveNoteDialog = true;
-        } else {
-          await this.init();
+          // extraction for addNotes
         }
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
@@ -411,15 +417,17 @@ export default {
         } else {
           this.error(error.message);
         }
-        this.showDisonnectDialog = false;
-        this.loading = false;
       }
+      this.showDisonnectDialog = false;
+      await this.init();
+      this.loading = false;
     },
     async addNote(arg) {
       const note = arg;
       const instanceName = this.updateFarmInstanceName;
       const groupIds = this.differenceRemovedGroupIds; // find associated name on server side
       const parentGroupId = this.groupId;
+      this.loading = true;
 
       try {
         await api.post(`/farmos/group-manage/add-notes`, {
@@ -437,6 +445,11 @@ export default {
       }
       this.showRemoveNoteDialog = false;
       await this.init();
+      this.loading = false;
+    },
+    async cancelNote() {
+      await this.init();
+      this.showRemoveNoteDialog = false;
     },
     async openFarm(item) {
       const { instanceName, userId } = item;

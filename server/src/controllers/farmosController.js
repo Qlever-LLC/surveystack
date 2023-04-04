@@ -1298,10 +1298,11 @@ export const addSuperAdminNotes = async (req, res) => {
 };
 
 export const updateGroupsForUser = async (req, res) => {
-  const { userId, instanceName, groupIds, tree } = await requireGroup(req, {
+  const { userId, instanceName, groupIds, initialGroupIds, tree } = await requireGroup(req, {
     userId: Joi.objectId().required(),
     instanceName: Joi.string().required(),
     groupIds: Joi.array().items(Joi.objectId()).required(),
+    initialGroupIds: Joi.array().items(Joi.objectId()).required(),
   });
 
   const { origin } = req.headers;
@@ -1310,25 +1311,23 @@ export const updateGroupsForUser = async (req, res) => {
   await assertGroupsInTree(groupIds, tree);
 
   // find out in which group(s) the instance is located
-  const initialInstanceGroups = await db
-    .collection('farmos-group-mapping')
-    .find({
-      groupId: {
-        $in: tree.descendants.map((d) => asMongoId(d._id)),
-      },
-      instanceName,
-    })
-    .toArray();
   const initialGroups = await db
     .collection('groups')
     .find({
       _id: {
-        $in: initialInstanceGroups.map((e) => asMongoId(e.groupId)),
+        $in: initialGroupIds.map((i) => asMongoId(i)),
       },
     })
     .toArray();
 
-  let resultGroups = [];
+  const resultGroups = await db
+    .collection('groups')
+    .find({
+      _id: {
+        $in: groupIds.map((i) => asMongoId(i)),
+      },
+    })
+    .toArray();
 
   // clear all mappings of groups in descendants
   await db.collection('farmos-group-mapping').deleteMany({
@@ -1347,34 +1346,25 @@ export const updateGroupsForUser = async (req, res) => {
         instanceName,
       }))
     );
-
-    const resultInstanceGroups = await db
-      .collection('farmos-group-mapping')
-      .find({
-        groupId: {
-          $in: tree.descendants.map((d) => asMongoId(d._id)),
-        },
-      })
-      .toArray();
-    resultGroups = await db
-      .collection('groups')
-      .find({
-        _id: {
-          $in: resultInstanceGroups.map((e) => asMongoId(e.groupId)),
-        },
-      })
-      .toArray();
   }
 
   const initialGroupsName = initialGroups.map((e) => e.name);
   const resultGroupsName = resultGroups.map((e) => e.name);
 
-  let resStatus = 'no changes';
+  const initialContainsResult = initialGroupsName.every((val) => resultGroupsName.includes(val));
+  const resultContainsInitial = resultGroupsName.every((val) => initialGroupsName.includes(val));
+
+  if (initialContainsResult && resultContainsInitial) {
+    return res.send({
+      status: 'no changes',
+    });
+  }
+  let resStatus = '';
   // compare with the initial result the group(s)
   // if just add without remove => add notification
   // else if just remove without add => remove notification
   // else move notification
-  if (initialGroupsName.every((val) => resultGroupsName.includes(val))) {
+  if (initialContainsResult) {
     const differenceName = resultGroupsName.filter((x) => !initialGroupsName.includes(x));
     if (differenceName.length > 0) {
       const difference = resultGroups.filter((e) => differenceName.includes(e.name));
@@ -1387,7 +1377,7 @@ export const updateGroupsForUser = async (req, res) => {
       const differenceGroupName = difference.map((e) => e.name).join(', ');
       resStatus = `Successfully added instance to ${differenceGroupName}, instance owner will be notified`;
     }
-  } else if (resultGroupsName.every((val) => initialGroupsName.includes(val))) {
+  } else if (resultContainsInitial) {
     const differenceName = initialGroupsName.filter((x) => !resultGroupsName.includes(x));
     const difference = initialGroups.filter((e) => differenceName.includes(e.name));
     const differenceId = difference.map((e) => e._id);

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="show" max-width="500" max-height="1000" @input="(v) => v || (selectedGroups = [])">
+  <v-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v || (selectedGroups = [])">
     <v-card class="pa-4">
       <v-card-title class="headline"> Manage Groups </v-card-title>
       <v-card-text>
@@ -17,7 +17,7 @@
           dense
           open-on-clear
         />
-        <v-btn block @click="updateGroups" color="primary">Update Groups</v-btn>
+        <v-btn block @click="updateGroups" color="primary" :disabled="loading" :loading="loading">Update Groups</v-btn>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -26,7 +26,7 @@
 <script>
 export default {
   emits: ['updateGroups'],
-  props: ['updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],
+  props: ['loading', 'updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],
   data() {
     return {
       selectedGroups: [],
