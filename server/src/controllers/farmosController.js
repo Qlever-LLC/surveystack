@@ -1055,7 +1055,7 @@ export const mapUser = async (req, res) => {
     .collection('memberships')
     .find({
       group: new ObjectId(groupId),
-      user: userRes._id,
+      user: new ObjectId(userRes._id),
     })
     .toArray();
 
@@ -1098,7 +1098,6 @@ export const mapUser = async (req, res) => {
   }
 
   if (mapToUser) {
-    const userId = new ObjectId(userId);
     await mapFarmOSInstanceToUser(userId, instanceName, true, origin);
   }
 

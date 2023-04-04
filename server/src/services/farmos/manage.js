@@ -296,7 +296,7 @@ export const mapFarmOSInstanceToUser = async (userId, instanceName, isOwner, ori
     .collection('farmos-instances')
     .find({
       instanceName,
-      userId: asMongoId(userId),
+      userId: new ObjectId(userId),
     })
     .toArray();
 
@@ -305,9 +305,8 @@ export const mapFarmOSInstanceToUser = async (userId, instanceName, isOwner, ori
   }
 
   const user = await db.collection('users').findOne({
-    _id: asMongoId(userId),
+    _id: new ObjectId(userId),
   });
-
   if (!user) {
     throw boom.badData('user not found');
   }
@@ -315,7 +314,7 @@ export const mapFarmOSInstanceToUser = async (userId, instanceName, isOwner, ori
   const _id = new ObjectId();
   await db.collection('farmos-instances').insertOne({
     _id,
-    userId: asMongoId(userId),
+    userId: new ObjectId(userId),
     instanceName,
     owner: isOwner,
   });
