@@ -347,7 +347,7 @@
 
           <div v-if="isMatrix">
             <checkbox
-              label="Hidden"
+              label="Table format"
               v-model="control.options.layout.table"
               helper-text="Renders the matrix answers in tabular format. Otherwise, it is rendered in list format."
             />

@@ -2,6 +2,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import htmlToPdfMake from 'html-to-pdfmake';
 import dayjs from 'dayjs';
+import axios from 'axios';
 import getProperty from 'lodash/get';
 import groupBy from 'lodash/groupBy';
 import { JSDOM } from 'jsdom';
@@ -45,6 +46,7 @@ const margins = {
   md: [0, 0, 0, 16],
   sm: [0, 0, 0, 12],
   xs: [0, 0, 0, 8],
+  answer: [12, 0, 0, 0],
 };
 
 const styles = {
@@ -79,11 +81,12 @@ const styles = {
   },
   answer: {
     color: colors.blue,
+    margin: margins.answer,
   },
   answerEmpty: {
     background: colors.lightGray,
     color: colors.black,
-    margin: margins.xs,
+    margin: margins.answer,
   },
   answerHighlight: {
     background: colors.blue,
@@ -212,7 +215,6 @@ class PdfGenerator {
       content: [],
       styles,
       defaultStyle,
-      images: {},
       pageBreakBefore: this.pageBreakBefore.bind(this),
     };
   }
@@ -436,9 +438,10 @@ class PdfGenerator {
       answer = formatDate(answer, 'MMM D, YYYY');
     }
 
+    let def = null;
     if (type === 'instructions') {
       // Instructions
-      this.docDefinition.content.push(this.getInstructionDef(control));
+      def = this.getInstructionDef(control);
     } else if (type === 'selectSingle' || type === 'selectMultiple' || type === 'ontology') {
       // Selections
       const multiple =
@@ -446,37 +449,32 @@ class PdfGenerator {
 
       if (layout.valuesOnly) {
         const value = transformValueToLabel(answer, source);
-        this.docDefinition.content.push(this.getAnswerDef(value));
+        def = this.getAnswerDef(value);
       } else if (type !== 'ontology' || (type === 'ontology' && layout.usingControl)) {
-        this.docDefinition.content.push(
-          this.getSelectDef(answer, source, layout.columnCount, multiple)
-        );
+        def = this.getSelectDef(answer, source, layout.columnCount, multiple);
       } else {
-        this.docDefinition.content.push(this.getDropdownDef(answer, source, layout.columnCount));
+        def = this.getDropdownDef(answer, source, layout.columnCount);
       }
     } else if (type === 'file' || type === 'image') {
       // File
       const multiple = getProperty(options, 'source.allowMultiple', false);
-      const { images, def } = this.getFileDef(answer, multiple, layout.preview);
-
-      this.docDefinition.images = { ...this.docDefinition.images, ...images };
-      this.docDefinition.content.push(def);
+      def = await this.getFileDef(answer, multiple, layout.preview);
     } else if (type === 'matrix') {
       // Matrix
-      const def = layout.table
+      def = layout.table
         ? await this.getMatrixTableDef(answer, options)
         : await this.getMatrixListDef(answer, options);
-      if (def) {
-        this.docDefinition.content.push(def);
-      }
     } else if (type === 'script' || typeof answer === 'object') {
       // GeoJSON, FarmOS etc
-      this.docDefinition.content.push(this.getObjectDef(answer));
+      def = this.getObjectDef(answer);
     } else {
-      this.docDefinition.content.push(this.getAnswerDef(answer));
+      def = this.getAnswerDef(answer);
     }
 
-    this.docDefinition.content.push('\n');
+    if (def) {
+      this.docDefinition.content.push(def);
+    }
+    this.docDefinition.content.push({ text: '', margin: margins.lg });
   }
 
   /*******************************************************************/
@@ -484,9 +482,6 @@ class PdfGenerator {
   /*******************************************************************/
 
   getSectionDef(control) {
-    const fontSize = control.index.length === 1 ? fontSizes.md : fontSizes.sm;
-    const text = `${control.index.join('.')}${control.label ? `. ${control.label}` : ''}`;
-
     return {
       layout: {
         hLineWidth: function () {
@@ -506,9 +501,9 @@ class PdfGenerator {
         body: [
           [
             {
-              text,
+              text: `${control.index.join('.')}${control.label ? `. ${control.label}` : ''}`,
               style: 'section',
-              fontSize,
+              fontSize: fontSizes.sm,
             },
           ],
         ],
@@ -578,6 +573,7 @@ class PdfGenerator {
       columns: group.map((columnOptions) =>
         columnOptions.map((option) => this.getSelectItemDef(option, multiple, isChecked(option)))
       ),
+      margin: margins.answer,
     };
   }
 
@@ -616,40 +612,48 @@ class PdfGenerator {
           return d;
         }),
       })),
+      margin: margins.answer,
     };
   }
 
-  getFileDef(answer, multiple, preview) {
+  async getFileDef(answer, multiple, preview) {
     const value = toArray(answer);
     if (value.length === 0) {
       return this.getAnswerDef(value);
     }
 
-    const def = { ul: [] };
-    const images = {};
+    const ul = [];
 
-    value.forEach((image) => {
-      const ext = (image.split('.').pop() || '').toLowerCase();
+    for (let i = 0; i < value.length; i++) {
+      const file = value[i];
+      const ext = (file.split('.').pop() || '').toLowerCase();
       const isImage = ['png', 'jpg', 'jpeg'].includes(ext);
-      const url = getPublicDownloadUrl(image);
+      const url = getPublicDownloadUrl(file);
       const stack = [
         {
-          text: image,
+          text: file,
           link: url,
           style: 'link',
         },
       ];
       if (isImage && preview) {
-        images[image] = url;
-        stack.push({ image, fit: [300, 300], margin: [0, 8, 0, 8] });
+        try {
+          const { data } = await axios.get(url, { responseType: 'arraybuffer' });
+          const buffer = Buffer.from(data, 'binary').toString('base64');
+          stack.push({
+            image: `data:image/${ext};base64,` + buffer,
+            fit: [300, 300],
+            margin: [0, 8, 0, 8],
+          });
+        } catch (e) {
+          console.error('Fetching remote file failed', url, e);
+        }
       }
-      def.ul.push({ stack });
-    });
 
-    return {
-      images,
-      def: multiple ? def : def.ul[0],
-    };
+      ul.push({ stack, margin: margins.answer });
+    }
+
+    return multiple ? { ul } : ul[0];
   }
 
   getObjectDef(answer) {
@@ -670,6 +674,7 @@ class PdfGenerator {
       },
       layout: 'noBorders',
       fillColor: colors.code,
+      margin: margins.answer,
     };
   }
 
@@ -768,39 +773,32 @@ class PdfGenerator {
       const row = [];
 
       for (const col of cols) {
-        const cell = [`${col.label || col.value}: `];
-
         let colValue = getProperty(value, `${i}.${col.value}.value`, null);
         if (!colValue) {
           continue;
         }
+
         if (col.type === 'dropdown') {
           const dropdownVal = toArray(colValue);
           const dropdownSource = await this.getControlSource(col);
-          const text = transformValueToLabel(dropdownVal, dropdownSource);
-          cell.push(text);
-        } else {
-          if (col.type === 'date') {
-            colValue = formatDate(colValue, 'MMM D, YYYY');
-          }
-          cell.push(colValue);
+          colValue = transformValueToLabel(dropdownVal, dropdownSource);
+        } else if (col.type === 'date') {
+          colValue = formatDate(colValue, 'MMM D, YYYY');
         }
 
-        row.push(cell);
+        row.push(`${col.label || col.value}: ${colValue}`);
       }
 
       rows.push(`Row ${i + 1}`);
 
       if (row.length > 0) {
-        rows.push({
-          type: 'circle',
-          ul: row,
-        });
+        rows.push({ type: 'circle', ul: row, margin: [0, 0, 0, 4] });
       }
     }
 
     return {
       ul: rows,
+      style: 'answer',
     };
   }
 
