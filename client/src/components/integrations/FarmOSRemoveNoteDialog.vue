@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="show" max-width="500" max-height="1000" @input="(v) => v">
+  <v-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v">
     <v-card class="pa-4">
       <v-card-title class="headline"> Why is this instance being removed? </v-card-title>
       <v-card-text>
@@ -17,7 +17,10 @@
           <v-text-field v-model.trim="noteTF" label="Other" hide-details></v-text-field>
         </div>
 
-        <v-btn block @click="addNote" color="primary">Submit</v-btn>
+        <div class="d-flex justify-space-around">
+          <v-btn :disabled="loading" :loading="loading" @click="cancelNote" color="error">Don't Add Note</v-btn>
+          <v-btn :disabled="btnDisabled" :loading="loading" @click="addNote" color="primary">Submit</v-btn>
+        </div>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -25,8 +28,8 @@
 
 <script>
 export default {
-  emits: ['addNote'],
-  props: ['value'],
+  emits: ['addNote', 'cancelNote'],
+  props: ['loading', 'value'],
   data() {
     return {
       note: [],
@@ -42,6 +45,9 @@ export default {
         this.$emit('input', value);
       },
     },
+    btnDisabled() {
+      return !(this.note.length > 0 || this.noteTF) || this.loading;
+    },
   },
   methods: {
     addNote() {
@@ -52,6 +58,11 @@ export default {
       this.$emit('addNote', noteConcat);
       this.noteTF = undefined;
       this.note = [];
+    },
+    cancelNote() {
+      this.noteTF = undefined;
+      this.note = [];
+      this.$emit('cancelNote');
     },
   },
 };

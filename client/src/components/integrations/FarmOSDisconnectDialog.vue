@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="show" max-width="500" max-height="1000" @input="(v) => v || (selectedGroups = [])">
+  <v-dialog persistent v-model="show" max-width="500" max-height="1000" @input="(v) => v || (selectedGroups = [])">
     <v-card class="pa-4">
       <v-card-title class="headline"> Manage Groups </v-card-title>
       <v-card-text>
@@ -17,7 +17,10 @@
           dense
           open-on-clear
         />
-        <v-btn block @click="updateGroups" color="primary">Update Groups</v-btn>
+        <div class="d-flex justify-space-around">
+          <v-btn :disabled="loading" :loading="loading" @click="cancelUpdate" color="error">Cancel</v-btn>
+          <v-btn :disabled="loading" :loading="loading" @click="updateGroups" color="primary"> Update Groups </v-btn>
+        </div>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -25,8 +28,8 @@
 
 <script>
 export default {
-  emits: ['updateGroups'],
-  props: ['updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],
+  emits: ['updateGroups', 'cancelUpdate'],
+  props: ['loading', 'updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],
   data() {
     return {
       selectedGroups: [],
@@ -35,6 +38,10 @@ export default {
   methods: {
     updateGroups() {
       this.$emit('updateGroups', [this.updateFarmInstanceName, this.selectedGroups]);
+      this.selectedGroups = [];
+    },
+    cancelUpdate() {
+      this.$emit('cancelUpdate');
       this.selectedGroups = [];
     },
   },
