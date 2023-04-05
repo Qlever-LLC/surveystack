@@ -323,7 +323,7 @@ export const mapFarmOSInstanceToUser = async (userId, instanceName, isOwner, ori
   const instanceOwners = await getOwnersFromInstanceName(instanceName);
   if (instanceOwners) {
     for (const instanceOwner of instanceOwners) {
-      if (instanceOwner && instanceOwner.email) {
+      if (instanceOwner && instanceOwner.email && instanceOwner.email !== user.email) {
         const ownerEmail = instanceOwner.email;
 
         const magicLinkProfile = await createMagicLink({
@@ -334,7 +334,7 @@ export const mapFarmOSInstanceToUser = async (userId, instanceName, isOwner, ori
         });
 
         const subject = 'Your instance has been mapped';
-        const description = `The email ${ownerEmail} has been mapped to the farmOS instance ${instanceName} in SurveyStack.`;
+        const description = `The email ${user.email} has been mapped to the farmOS instance ${instanceName} in SurveyStack.`;
         await mailService.sendHandleNotification({
           to: ownerEmail,
           subject: subject,
