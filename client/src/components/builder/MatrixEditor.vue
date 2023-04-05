@@ -1,13 +1,26 @@
 <template>
   <div>
-    <v-dialog v-model="editorDialog">
-      <app-ontology-list-editor
+    <v-dialog v-if="resource && resource.type === resourceTypes.ONTOLOGY_LIST" v-model="ontologyListDialog">
+      <ontology-list-editor
         :resources="resources"
-        :resource="ontology"
-        :disabled="ontology && !!ontology.libraryId"
+        :resource="resource"
+        :disabled="!!resource.libraryId"
         @change="setResource"
         @delete="removeResource"
-        @close-dialog="editorDialog = false"
+        @close-dialog="ontologyListDialog = false"
+      />
+    </v-dialog>
+    <v-dialog
+      v-if="resource && resource.type === resourceTypes.SURVEY_REFERENCE"
+      v-model="ontologyReferenceDialog"
+      max-width="50%"
+    >
+      <ontology-reference-editor
+        :resources="resources"
+        :resource="resource"
+        @change="setResource"
+        @delete="removeResource"
+        @close-dialog="ontologyReferenceDialog = false"
       />
     </v-dialog>
 
@@ -88,26 +101,24 @@
                     />
 
                     <div v-if="item.type === 'dropdown'" class="d-flex flex-column">
-                      <div class="d-flex flex-row flex-wrap">
-                        <v-select
+                      <div class="d-flex flex-row">
+                        <resource-selector
                           v-model="item.resource"
-                          @input="(resource) => onChanged(item, { resource, defaultValue: null })"
-                          :items="resourceSelectItems"
-                          label="Resource"
+                          @on-new="createOntology(i, $event)"
+                          @on-select="onChanged(item, { resource: $event, defaultValue: null })"
+                          style="min-width: 0px"
+                          :resources="filteredResources"
+                          :newResourceTypes="[resourceTypes.ONTOLOGY_LIST, resourceTypes.SURVEY_REFERENCE]"
                           hide-details
                           dense
-                          style="max-width: 10rem"
                         />
                         <v-btn
-                          @click="createOntology(i)"
-                          small
+                          class="ml-1"
+                          :disabled="!item.resource"
                           icon
-                          :color="!item.resource ? 'primary' : ''"
-                          class="ml-auto"
+                          small
+                          @click="openOntologyEditor(item.resource)"
                         >
-                          <v-icon>mdi-plus</v-icon>
-                        </v-btn>
-                        <v-btn @click="openOntologyEditor(item.resource)" small :disabled="!item.resource" icon>
                           <v-icon>mdi-pencil</v-icon>
                         </v-btn>
                       </div>
@@ -256,11 +267,13 @@
 <script>
 import ObjectId from 'bson-objectid';
 import Draggable from 'vuedraggable';
-import AppOntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
 import Checkbox from '@/components/builder/Checkbox.vue';
-import { resourceLocations, resourceTypes } from '@/utils/resources';
+import ResourceSelector from '@/components/builder/ResourceSelector.vue';
+import OntologyListEditor from '@/components/builder/OntologyListEditor.vue';
+import OntologyReferenceEditor from '@/components/builder/OntologyReferenceEditor.vue';
+import { createResource, resourceLocations, resourceTypes } from '@/utils/resources';
 import { cleanupAutocompleteMatrix } from '@/utils/surveys';
 import { getValueOrNull } from '@/utils/surveyStack';
 
@@ -286,11 +299,13 @@ const createOptions = (src) => {
 
 export default {
   components: {
-    AppOntologyListEditor,
     Draggable,
     Ontology,
     Date,
     Checkbox,
+    ResourceSelector,
+    OntologyListEditor,
+    OntologyReferenceEditor,
   },
   props: {
     value: {
@@ -310,19 +325,17 @@ export default {
   },
   data() {
     return {
-      deleteDialogIsVisible: false,
-      editorDialog: false,
-      editOntologyId: null,
+      ontologyListDialog: false,
+      ontologyReferenceDialog: false,
+      resourceTypes,
+      resource: null,
     };
   },
   computed: {
-    resourceSelectItems() {
-      return this.resources
-        .filter((resource) => resource.type === resourceTypes.ONTOLOGY_LIST)
-        .map((resource) => ({ text: resource.label, value: resource.id }));
-    },
-    ontology() {
-      return this.resources.find((resource) => resource.id === this.editOntologyId);
+    filteredResources() {
+      return this.resources.filter(
+        (resource) => resource.type === resourceTypes.ONTOLOGY_LIST || resource.type === resourceTypes.SURVEY_REFERENCE
+      );
     },
     // get/set the position of the columns and the "lock-to-left" marker
     columns: {
@@ -352,25 +365,37 @@ export default {
       const newResources = [...this.resources.slice(0, index), resource, ...this.resources.slice(index + 1)];
       this.$emit('set-survey-resources', newResources);
     },
-    createOntology(column) {
-      const id = new ObjectId().toString();
-      this.columns[column].resource = id;
-      this.$emit('set-survey-resources', [
-        ...this.resources,
-        {
-          label: `Ontology List ${this.resources.length + 1}`,
-          name: `ontology_list_${this.resources.length + 1}`,
-          id,
-          type: resourceTypes.ONTOLOGY_LIST,
-          location: resourceLocations.EMBEDDED,
-          content: [],
-        },
-      ]);
-      this.openOntologyEditor(id);
+    createOntology(column, type) {
+      const newResource =
+        type === resourceTypes.ONTOLOGY_LIST
+          ? createResource(this.resources, type, resourceLocations.EMBEDDED, {
+              labelPrefix: 'Dropdown Items',
+              defaultContent: [],
+            })
+          : createResource(this.resources, type, resourceLocations.REMOTE, {
+              labelPrefix: 'Survey Reference',
+              defaultContent: [],
+            });
+      this.columns[column].resource = newResource.id;
+      this.$emit('set-survey-resources', [...this.resources, newResource]);
+      this.openOntologyEditor(newResource);
     },
     openOntologyEditor(id) {
-      this.editOntologyId = id;
-      this.editorDialog = true;
+      this.resource = typeof id === 'string' ? this.resources.find((resource) => resource.id === id) : id;
+
+      if (
+        !this.resource ||
+        (this.resource.type !== resourceTypes.ONTOLOGY_LIST && this.resource.type !== resourceTypes.SURVEY_REFERENCE)
+      ) {
+        this.resource = null;
+        return;
+      }
+
+      if (this.resource.type === resourceTypes.ONTOLOGY_LIST) {
+        this.ontologyListDialog = true;
+      } else if (this.resource.type === resourceTypes.SURVEY_REFERENCE) {
+        this.ontologyReferenceDialog = true;
+      }
     },
     moveItemLeft(index) {
       if (index === 0) {

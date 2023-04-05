@@ -10,6 +10,7 @@
     :disabled="disabled"
     hide-details
     :outlined="outlined"
+    v-bind="$attrs"
   />
 </template>
 

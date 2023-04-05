@@ -87,7 +87,7 @@
         class="mt-3"
       />
       <v-select
-        v-if="this.control.type === 'file'"
+        v-if="isFile"
         label="Restrict uploaded file types (.csv, .pdf, etc.)"
         v-model="control.options.source.types"
         :items="fileTypes"
