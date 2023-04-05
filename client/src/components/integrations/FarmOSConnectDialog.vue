@@ -26,7 +26,7 @@
                 display: flex;
                 position: sticky;
                 top: 0px;
-                z-index: 2;
+                z-index: 5;
                 justify-content: center;
                 width: 100%;
               "

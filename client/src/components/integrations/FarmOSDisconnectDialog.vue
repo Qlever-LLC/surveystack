@@ -16,7 +16,28 @@
           v-model="selectedGroups"
           dense
           open-on-clear
-        />
+        >
+          <template slot="prepend-item">
+            <v-btn
+              :disabled="loading"
+              :loading="loading"
+              @click="updateGroups"
+              color="primary"
+              style="
+                min-height: 40px;
+                align-items: center;
+                display: flex;
+                position: sticky;
+                top: 0px;
+                z-index: 5;
+                justify-content: center;
+                width: 100%;
+              "
+            >
+              Update Groups
+            </v-btn>
+          </template>
+        </v-autocomplete>
         <div class="d-flex justify-space-around">
           <v-btn :disabled="loading" :loading="loading" @click="cancelUpdate" color="error">Cancel</v-btn>
           <v-btn :disabled="loading" :loading="loading" @click="updateGroups" color="primary"> Update Groups </v-btn>
