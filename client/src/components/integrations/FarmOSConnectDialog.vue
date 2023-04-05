@@ -14,9 +14,29 @@
           :items="farmInstances"
           class="mt-4"
           v-model="selectedFarms"
-        />
-        <v-btn block @click="connect" :disabled="selectedFarms.length <= 0" color="primary"
-          >Connect selected Farms
+        >
+          <template slot="prepend-item">
+            <v-btn
+              @click="connect"
+              :disabled="selectedFarms.length <= 0"
+              color="primary"
+              style="
+                min-height: 40px;
+                align-items: center;
+                display: flex;
+                position: sticky;
+                top: 0px;
+                z-index: 2;
+                justify-content: center;
+                width: 100%;
+              "
+            >
+              Connect selected Farms
+            </v-btn>
+          </template>
+        </v-autocomplete>
+        <v-btn block @click="connect" :disabled="selectedFarms.length <= 0" color="primary">
+          Connect selected Farms
         </v-btn>
       </v-card-text>
 
