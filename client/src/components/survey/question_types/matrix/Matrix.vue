@@ -74,6 +74,7 @@
       :rowActionsWidth="64"
       :floatingFooterSize="isInBuilder ? 0 : 64"
       :addRowLabel="addRowLabel"
+      :loading="isLoading"
       @showEditDialog="(rowIdx) => editItem(rowIdx)"
       @addRow="add"
     >
@@ -134,6 +135,8 @@ import appRedacted from '@/components/survey/drafts/Redacted.vue';
 import baseQuestionComponent from '../BaseQuestionComponent';
 import farmosBase from '../FarmOsBase';
 import { cleanupAutocompleteMatrix } from '@/utils/surveys';
+import { resourceTypes } from '@/utils/resources';
+import { fetchSubmissionUniqueItems } from '@/utils/submissions';
 
 /* copied from FarmOsPlanting.vue */
 const hashItem = (listItem) => {
@@ -295,6 +298,8 @@ export default {
       showEditItemDialog: false,
       editedIndex: -1,
       editedItem: null,
+      resourcesMap: {},
+      isLoading: false,
     };
   },
   methods: {
@@ -334,13 +339,12 @@ export default {
       this.editedItem = this.rows[index];
       this.showEditItemDialog = true;
     },
-    getDropdownItems(field, values = []) {
+    getDropdownItems(field) {
       const column = this.source.content.find((col) => col.value === field);
-      const ontology = this.resources.find((resource) => resource.id === column.resource);
-      if (!ontology) {
+      const defaultItems = this.resourcesMap[column.resource];
+      if (!defaultItems) {
         return [];
       }
-      const defaultItems = ontology.content.map((row) => ({ label: row.label, value: row.value }));
       const usedValues = this.rows
         .map((row) => row[field].value) // get the value from each row
         .map((value) => (Array.isArray(value) ? value : [value])) // convert individual values to list
@@ -364,6 +368,8 @@ export default {
     },
   },
   async created() {
+    this.isLoading = true;
+
     //load farmos field areas
     if (this.headers.find((header) => header.type === 'farmos_field')) {
       this.fetchAreas();
@@ -373,6 +379,27 @@ export default {
       await this.fetchAssets();
       this.farmosTransformedPlantings = transform(this.assets);
     }
+    // load reference ontology list
+    const ontologyHeaders = this.headers.filter((header) => header.type === 'dropdown' && !!header.resource);
+    for (let i = 0; i < ontologyHeaders.length; i++) {
+      const header = ontologyHeaders[i];
+      const resource = this.resources.find((resource) => resource.id === header.resource);
+      if (!resource) {
+        continue;
+      }
+      if (resource.type === resourceTypes.ONTOLOGY_LIST) {
+        this.resourcesMap[header.resource] = resource.content;
+      } else if (resource.type === resourceTypes.SURVEY_REFERENCE) {
+        const { id, path } = resource.content;
+        try {
+          this.resourcesMap[header.resource] = await fetchSubmissionUniqueItems(id, path);
+        } catch (e) {
+          console.error('Fetching ontology reference list failed', e);
+        }
+      }
+    }
+
+    this.isLoading = false;
   },
 };
 </script>
