@@ -703,6 +703,15 @@ class PdfGenerator {
     const rows = [];
     const value = toArray(answer);
 
+    // To fetch dropdown list items in advance for performance issue
+    const resources = {};
+    const dropdownCols = cols.filter((col) => col.type === 'dropdown');
+    for (let i = 0; i < dropdownCols.length; i++) {
+      const col = dropdownCols[i];
+      const resource = await this.getControlSource(col);
+      resources[col.resource] = resource;
+    }
+
     for (const item of value) {
       const row = [];
 
@@ -710,15 +719,14 @@ class PdfGenerator {
         let colValue = getProperty(item, `${col.value}.value`);
         if (col.type === 'dropdown') {
           const dropdownVal = toArray(colValue);
-          const dropdownSource = await this.getControlSource(col);
-          const text = transformValueToLabel(dropdownVal, dropdownSource);
-          row.push(text.join(', '));
-        } else {
-          if (col.type === 'date') {
-            colValue = formatDate(colValue, 'MMM D, YYYY');
-          }
-          row.push(colValue);
+          const text = transformValueToLabel(dropdownVal, resources[col.resource]);
+          colValue = text.join(', ');
+        } else if (col.type === 'date') {
+          colValue = formatDate(colValue, 'MMM D, YYYY');
+        } else if (colValue && typeof colValue === 'object') {
+          colValue = JSON.stringify(colValue).trim();
         }
+        row.push(colValue);
       }
 
       rows.push(row);
@@ -767,6 +775,15 @@ class PdfGenerator {
       return this.getAnswerDef(null);
     }
 
+    // To fetch dropdown list items in advance for performance issue
+    const resources = {};
+    const dropdownCols = cols.filter((col) => col.type === 'dropdown');
+    for (let i = 0; i < dropdownCols.length; i++) {
+      const col = dropdownCols[i];
+      const resource = await this.getControlSource(col);
+      resources[col.resource] = resource;
+    }
+
     const rows = [];
 
     for (let i = 0; i < value.length; i++) {
@@ -777,16 +794,19 @@ class PdfGenerator {
         if (!colValue) {
           continue;
         }
-
         if (col.type === 'dropdown') {
           const dropdownVal = toArray(colValue);
-          const dropdownSource = await this.getControlSource(col);
-          colValue = transformValueToLabel(dropdownVal, dropdownSource);
+          const text = transformValueToLabel(dropdownVal, resources[col.resource]);
+          colValue = text.join(', ');
         } else if (col.type === 'date') {
           colValue = formatDate(colValue, 'MMM D, YYYY');
+        } else if (typeof colValue === 'object') {
+          colValue = this.getObjectDef(colValue);
         }
 
-        row.push(`${col.label || col.value}: ${colValue}`);
+        row.push({
+          text: [`${col.label || col.value}: `, colValue],
+        });
       }
 
       rows.push(`Row ${i + 1}`);
