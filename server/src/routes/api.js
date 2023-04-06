@@ -434,6 +434,12 @@ router.post(
 );
 
 router.post(
+  '/farmos/group-manage/get-owners-from-instances',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.getOwnersFromInstances)
+);
+
+router.post(
   '/farmos/group-manage/:groupId/update-groups-for-user',
   [assertHasGroupAdminAccess],
   catchErrors(farmosController.updateGroupsForUser)

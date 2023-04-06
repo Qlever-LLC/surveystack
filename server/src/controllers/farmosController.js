@@ -1113,6 +1113,85 @@ export const mapUser = async (req, res) => {
   });
 };
 
+export const getOwnersFromInstances = async (req, res) => {
+  const { instances } = req.body;
+
+  const schema = Joi.object({
+    instances: Joi.array().required(),
+  });
+
+  const validres = schema.validate(
+    {
+      ...req.body,
+    },
+    { allowUnknown: true }
+  );
+
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(', ')}`);
+  }
+
+  // get all owners foreach instances Name
+  const instancesObj = await db
+    .collection('farmos-instances')
+    .find({
+      instanceName: {
+        $in: instances,
+      },
+    })
+    .toArray();
+  const ownerUsers = await db
+    .collection('users')
+    .find(
+      {
+        _id: {
+          $in: instancesObj.filter((i) => i.owner).map((i) => new ObjectId(i.userId)),
+        },
+      },
+      {
+        email: 1,
+        name: 1,
+      }
+    )
+    .toArray();
+
+  const ownerUsersMappedInst = [];
+  for (const inst of instancesObj) {
+    const ownersMapping = ownerUsers
+      .filter((o) => String(o._id) === String(inst.userId))
+      .map((p) => ({
+        email: p.email,
+        name: p.name,
+      }));
+    ownerUsersMappedInst.push({
+      instanceName: inst.instanceName,
+      owners: ownersMapping,
+    });
+  }
+
+  const mergedData = [];
+  /* merge ownerUsersMappedInst to get unique instanceName
+  [{
+      instanceName: 'aaa.farm',
+      owners: [ {email: '', name: ''}, {email: '', name: ''} ]
+    },{...}]
+  */
+  ownerUsersMappedInst.forEach(function (item) {
+    var existing = mergedData.filter(function (v, i) {
+      return v.instanceName == item.instanceName;
+    });
+    if (existing.length) {
+      var existingIndex = mergedData.indexOf(existing[0]);
+      mergedData[existingIndex].owners = mergedData[existingIndex].owners.concat(item.owners);
+    } else {
+      mergedData.push(item);
+    }
+  });
+
+  res.send(mergedData);
+};
+
 const assertUserInGroup = async (userId, groupId) => {
   const userRes = await db.collection('users').findOne({ _id: new ObjectId(userId) });
   if (!userRes) {

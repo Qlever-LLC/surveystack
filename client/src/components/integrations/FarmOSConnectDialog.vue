@@ -12,12 +12,14 @@
           chips
           deletable-chips
           :items="farmInstances"
+          :item-text="(i) => `${i.instanceName}`"
           class="mt-4"
           v-model="selectedFarms"
         >
           <template slot="prepend-item">
             <v-btn
               @click="connect"
+              :loading="loadingOwners"
               :disabled="selectedFarms.length <= 0"
               color="primary"
               style="
@@ -34,8 +36,20 @@
               Connect selected Farms
             </v-btn>
           </template>
+
+          <template v-slot:item="{ item }">
+            <v-list-item-content style="width: min-content">
+              <v-list-item-title>{{ item.instanceName }}</v-list-item-title>
+              <v-list-item-subtitle v-if="item.owners.length > 0" class="d-flex justify-end"
+                >owner(s):</v-list-item-subtitle
+              >
+              <v-list-item-subtitle class="d-flex justify-end" v-for="owner in item.owners" :key="owner.email">
+                {{ owner.name }}({{ owner.email }})
+              </v-list-item-subtitle>
+            </v-list-item-content>
+          </template>
         </v-autocomplete>
-        <v-btn block @click="connect" :disabled="selectedFarms.length <= 0" color="primary">
+        <v-btn block @click="connect" :loading="loadingOwners" :disabled="selectedFarms.length <= 0" color="primary">
           Connect selected Farms
         </v-btn>
       </v-card-text>
@@ -69,6 +83,10 @@ export default {
       required: true,
     },
     allowCreate: {
+      type: Boolean,
+      required: true,
+    },
+    loadingOwners: {
       type: Boolean,
       required: true,
     },

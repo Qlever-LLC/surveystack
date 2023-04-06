@@ -63,6 +63,7 @@
       v-model="showConnectDialog"
       :farmInstances="farmInstances"
       :allowCreate="allowCreate"
+      :loadingOwners="loadingOwners"
       @connect="connectFarms"
       @create="createFarm"
     />
@@ -171,6 +172,7 @@ export default {
       btnEnable: false,
       btnContact: true,
       showConnectDialog: false,
+      loadingOwners: false,
       showCreateDialog: false,
       showDisonnectDialog: false,
       showRemoveNoteDialog: false,
@@ -267,7 +269,6 @@ export default {
     async init() {
       const { id: groupId } = this.$route.params;
       this.groupId = groupId;
-
       try {
         const { data: res } = await api.get(`/farmos/group-manage/${groupId}/domain`);
         if (res.domain) {
@@ -315,16 +316,30 @@ export default {
         this.loading = false;
       }
     },
-    connect(userId) {
+    async connect(userId) {
       const user = this.groupInfos.members.find((m) => m.user === userId);
       this.selectedUser = user;
       console.log('connecting user', this.selectedUser);
+      this.loadingOwners = true;
       this.showConnectDialog = true;
 
-      this.farmInstances = _.uniq([
+      const farmInstancesWithoutOwnerPart = _.uniq([
         ...user.connectedFarms.filter((f) => f.owner == true).flatMap((f) => f.instanceName),
         ...this.groupInfos.unassignedInstances.flatMap((f) => f.instanceName),
       ]).filter((f) => !user.connectedFarms.some((c) => c.instanceName == f && !c.skip));
+
+      try {
+        const response = await api.post(`/farmos/group-manage/get-owners-from-instances`, {
+          groupId: this.groupId, // for assertion
+          instances: farmInstancesWithoutOwnerPart,
+        });
+        this.farmInstances = response.data
+      } catch (error) {
+        this.error(error + '');
+        this.showConnectDialog = false;
+      }
+
+      this.loadingOwners = false;
     },
     async enable() {
       await api.post('/farmos/group-manage/enable', { groupId: this.groupId, enable: true });
