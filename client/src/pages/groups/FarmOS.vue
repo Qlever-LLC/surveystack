@@ -1,5 +1,8 @@
 <template>
   <v-container v-if="farmosEnabled" class="max-800">
+    <div class="d-flex justify-space-between align-center">
+      <app-group-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
+    </div>
     <v-alert
       v-if="successMessage"
       class="mt-4"
@@ -104,6 +107,9 @@
   </v-container>
 
   <v-container v-else>
+    <div class="d-flex justify-space-between align-center">
+      <app-group-breadcrumbs :path="groupPath" :disabledSuffix="suffixPart" />
+    </div>
     <v-row v-if="loading">
       <v-col>
         <v-progress-linear indeterminate class="mb-0" />
@@ -138,6 +144,7 @@ import FarmOSDisconnectDialog from './../../components/integrations/FarmOSDiscon
 import FarmOSCreateDialog from './../../components/integrations/FarmOSCreateDialog.vue';
 import FarmOSRemoveNoteDialog from './../../components/integrations/FarmOSRemoveNoteDialog.vue';
 import appDialog from '@/components/ui/Dialog.vue';
+import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
 
 export default {
   props: {
@@ -150,6 +157,7 @@ export default {
     FarmOSDisconnectDialog,
     FarmOSRemoveNoteDialog,
     appDialog,
+    appGroupBreadcrumbs,
   },
   computed: {
     superAdmin() {
@@ -166,6 +174,8 @@ export default {
     return {
       groupInfos: null,
       groupId: null,
+      groupPath: '',
+      suffixPart: '',
       farmosEnabled: false,
       loading: true,
       message: '',
@@ -202,6 +212,14 @@ export default {
     // setup function
     // fetch group settings
     await this.init();
+
+    try {
+      const { data } = await api.get(`/groups/${this.groupId}?populate=true`);
+      this.groupPath = data.path;
+      this.suffixPart = 'farmOS Integration';
+    } catch (e) {
+      console.log('something went wrong:', e);
+    }
 
     /*
     this.groupInfos.value.members.forEach((el) => {
@@ -333,7 +351,7 @@ export default {
           groupId: this.groupId, // for assertion
           instances: farmInstancesWithoutOwnerPart,
         });
-        this.farmInstances = response.data
+        this.farmInstances = response.data;
       } catch (error) {
         this.error(error + '');
         this.showConnectDialog = false;
