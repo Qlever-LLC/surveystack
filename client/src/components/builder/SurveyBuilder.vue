@@ -563,6 +563,7 @@ export default {
 
       this.hideCode = false;
 
+      //TODO solve healing of legacy surveys which are missing that expression
       if (!this.control.options[tab]) {
         console.log('----1.5 highlight options not set:' + tab);
         this.control.options[tab] = {
@@ -572,6 +573,7 @@ export default {
         console.log('----1.6 highlight options now ' + this.control.options[tab].enabled);
       }
       console.log('----2 highlight:' + this.control.options[tab].enabled);
+
       if (this.control.options[tab] && !this.control.options[tab].enabled) {
         this.highlightNext();
         return;
