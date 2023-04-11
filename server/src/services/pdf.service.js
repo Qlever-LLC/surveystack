@@ -9,6 +9,7 @@ import { JSDOM } from 'jsdom';
 import { ObjectId } from 'mongodb';
 import { db } from '../db';
 import { getPublicDownloadUrl } from './bucket.service';
+import { cloneDeep } from 'lodash';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -352,11 +353,11 @@ class PdfGenerator {
   // eslint-disable-next-line no-unused-vars
   pageBreakBefore(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
     if (currentNode.headlineLevel === LVL.section) {
-      return followingNodesOnPage.length <= 2;
+      return followingNodesOnPage.length <= 2 && nodesOnNextPage.length > 2;
     }
 
     if (currentNode.headlineLevel === LVL.block) {
-      return followingNodesOnPage.length <= 1;
+      return followingNodesOnPage.length <= 1 && nodesOnNextPage.length > 1;
     }
 
     return false;
@@ -367,6 +368,13 @@ class PdfGenerator {
   /*******************************************************************/
 
   async generateControl(control, path = []) {
+    // Check relevant
+    const relevantKey = [...path, control.name, 'meta', 'relevant'];
+    const isRelevant = getProperty(this.submission.data, relevantKey, true);
+    if (!isRelevant) {
+      return;
+    }
+
     // Group, Page
     if (this.isContainerControl(control)) {
       this.docDefinition.content.push(this.getSectionDef(control));
