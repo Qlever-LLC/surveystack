@@ -145,6 +145,7 @@ import FarmOSCreateDialog from './../../components/integrations/FarmOSCreateDial
 import FarmOSRemoveNoteDialog from './../../components/integrations/FarmOSRemoveNoteDialog.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 import appGroupBreadcrumbs from '@/components/groups/Breadcrumbs.vue';
+import { getCurrentDateAsString } from '@/utils/timestamp.js';
 
 export default {
   props: {
@@ -463,6 +464,7 @@ export default {
       const groupIds = this.differenceRemovedGroupIds; // find associated name on server side
       const parentGroupId = this.groupId;
       this.loading = true;
+      const timestamp = getCurrentDateAsString();
 
       try {
         await api.post(`/farmos/group-manage/add-notes`, {
@@ -470,6 +472,7 @@ export default {
           instanceName,
           parentGroupId,
           groupIds,
+          timestamp,
         });
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {

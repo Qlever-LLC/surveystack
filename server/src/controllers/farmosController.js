@@ -1256,21 +1256,8 @@ const assertGroupsInTree = async (groupIds, tree) => {
   }
 };
 
-const getCurrentDateAsString = () => {
-  const date = new Date();
-  return date.toLocaleString(undefined, {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    timeZoneName: 'short',
-  });
-};
-
 export const addNotes = async (req, res) => {
-  const { note, instanceName, parentGroupId, groupIds } = req.body;
+  const { note, instanceName, parentGroupId, groupIds, timestamp } = req.body;
 
   const schema = Joi.object({
     note: Joi.string().required(),
@@ -1311,9 +1298,6 @@ export const addNotes = async (req, res) => {
     .toArray();
   const groupNames = groups.map((el) => el.name).join(', ');
 
-  //template:
-  //note = `timestamp\nRemoved from ${groupNames} reason: ${note}\n\n`;
-  const timestamp = getCurrentDateAsString();
   const newNote = `${timestamp}\nRemoved from ${groupNames} reason: ${note}\n\n`;
 
   const instanceNote = await db.collection('farmos-instance-notes').findOne({
@@ -1332,7 +1316,7 @@ export const addNotes = async (req, res) => {
 };
 
 export const addSuperAdminNotes = async (req, res) => {
-  const { note, instanceName } = req.body;
+  const { note, instanceName, timestamp } = req.body;
 
   const schema = Joi.object({
     //note is nullable
@@ -1354,9 +1338,6 @@ export const addSuperAdminNotes = async (req, res) => {
 
   // if variable note is empty, empty the field note in the DB
   if (note) {
-    //template:
-    //note = `timestamp\nRemoved from ${groupNames} reason: ${note}\n\n`;
-    const timestamp = getCurrentDateAsString();
     const newNote = `${timestamp}\nSuper Admin: ${note}\n\n`;
 
     const instanceNote = await db.collection('farmos-instance-notes').findOne({

@@ -196,6 +196,7 @@ describe('farmos-controller', () => {
         instanceName: instanceName,
         parentGroupId: parentGroupId,
         groupIds: affectedGroupIds,
+        timestamp: new Date(),
       },
     });
     const res = await createRes({ status: 'ok' });
@@ -232,6 +233,7 @@ describe('farmos-controller', () => {
         instanceName: instanceName,
         parentGroupId: parentGroupId,
         groupIds: affectedGroupIds,
+        timestamp: new Date(),
       },
     });
     await addNotes(req1, res);
@@ -242,6 +244,7 @@ describe('farmos-controller', () => {
         instanceName: instanceName,
         parentGroupId: parentGroupId,
         groupIds: affectedGroupIds,
+        timestamp: new Date(),
       },
     });
     await addNotes(req2, res);
@@ -277,6 +280,7 @@ describe('farmos-controller', () => {
         instanceName: instanceName,
         parentGroupId: parentGroupId,
         groupIds: affectedGroupIds,
+        timestamp: new Date(),
       },
     });
     const res = await createRes({ status: 'ok' });
@@ -303,6 +307,7 @@ describe('farmos-controller', () => {
       body: {
         note: note,
         instanceName: instanceName,
+        timestamp: new Date(),
       },
     });
     const res = await createRes({ status: 'ok' });
@@ -331,6 +336,7 @@ describe('farmos-controller', () => {
       body: {
         note: note1,
         instanceName: instanceName,
+        timestamp: new Date(),
       },
     });
     await addSuperAdminNotes(req1, res);
@@ -339,6 +345,7 @@ describe('farmos-controller', () => {
       body: {
         note: note2,
         instanceName: instanceName,
+        timestamp: new Date(),
       },
     });
     await addSuperAdminNotes(req2, res);

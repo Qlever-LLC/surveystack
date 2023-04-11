@@ -48,6 +48,7 @@ import Groups from './Groups.vue';
 import Users from './Users.vue';
 import FarmOSRegisterVue from './FarmOSRegister.vue';
 import Plans from './Plans.vue';
+import { getCurrentDateAsString } from '@/utils/timestamp.js';
 
 export default {
   data() {
@@ -398,9 +399,11 @@ export default {
     async addSuperAdminNote(arg) {
       const { updatedNote: note, selectedInstance: instanceName } = arg;
       try {
+        const timestamp = getCurrentDateAsString();
         await api.post(`/farmos/group-manage/add-sa-notes`, {
           note,
           instanceName,
+          timestamp,
         });
         this.success('Succefully added notes');
         //reload notes
