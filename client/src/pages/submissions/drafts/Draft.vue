@@ -48,11 +48,9 @@
           query: { minimal_ui: $route.query.minimal_ui },
         }
       "
-      :downloading="downloading"
-      :sending-email="sendingEmail"
+      :survey="survey"
+      :submission="submission"
       @close="onCloseResultDialog"
-      @download="download"
-      @emailMe="emailMe"
     />
 
     <result-dialog
@@ -65,7 +63,6 @@
 </template>
 
 <script>
-import { parse as parseDisposition } from 'content-disposition';
 import api from '@/services/api.service';
 import appMixin from '@/components/mixin/appComponent.mixin';
 import resultMixin from '@/components/ui/ResultsMixin';
@@ -79,7 +76,6 @@ import { getApiComposeErrors } from '@/utils/draft';
 import { createSubmissionFromSurvey } from '@/utils/submissions';
 import * as db from '@/store/db';
 import defaultsDeep from 'lodash/defaultsDeep';
-import downloadExternal from '@/utils/downloadExternal';
 
 export default {
   mixins: [appMixin, resultMixin],
@@ -101,8 +97,6 @@ export default {
       showResubmissionDialog: false,
       apiComposeErrors: [],
       showApiComposeErrors: false,
-      downloading: false,
-      sendingEmail: false,
     };
   },
   methods: {
@@ -176,47 +170,6 @@ export default {
         this.submitting = false;
         // Sent message to parent frame that Submission succeeded or failed
         window.parent.postMessage(message, '*');
-      }
-    },
-    async download() {
-      this.downloading = true;
-      this.resultItems = this.resultItems.filter((item) => !item.downloadError);
-
-      try {
-        const { headers, data } = await api.get(`/submissions/${this.submission._id}/pdf?base64=1`);
-        const disposition = parseDisposition(headers['content-disposition']);
-        downloadExternal(data, disposition.parameters.filename);
-      } catch (e) {
-        console.error('Failed to download PDF', e);
-        this.resultItems = [
-          ...this.resultItems.filter((item) => !item.downloadError),
-          {
-            title: 'Error',
-            body: 'Sorry, something went wrong while downloading a PDF. Try again later.',
-            downloadError: true,
-          },
-        ];
-      } finally {
-        this.downloading = false;
-      }
-    },
-    async emailMe() {
-      this.sendingEmail = true;
-      this.resultItems = this.resultItems.filter((item) => !item.emailError);
-
-      try {
-        await api.post(`/submissions/${this.submission._id}/send-email`, { survey: this.survey.name });
-      } catch (e) {
-        this.resultItems = [
-          ...this.resultItems.filter((item) => !item.emailError),
-          {
-            title: 'Error',
-            body: 'Sorry, something went wrong while sending an email. Try again later.',
-            emailError: true,
-          },
-        ];
-      } finally {
-        this.sendingEmail = false;
       }
     },
   },

@@ -203,11 +203,15 @@ async function getSubmissionUniqueItems(surveyId, path) {
 }
 
 class PdfGenerator {
-  constructor(survey, submission) {
+  constructor({ survey, submission, options }) {
     this.initialize();
     this.survey = survey;
     this.submission = submission;
     this.disabled = !this.survey || !this.submission;
+    this.options = {
+      empty: false,
+      ...options,
+    };
   }
 
   initialize() {
@@ -251,7 +255,8 @@ class PdfGenerator {
 
     if (revision && Array.isArray(revision.controls)) {
       const visibleControls = revision.controls.filter(
-        (control) => !this.isHiddenControl.bind(this)(control)
+        (control) =>
+          !this.isHiddenControl.bind(this)(control) && this.isRelevantControl.bind(this)(control)
       );
       for (let index = 0; index < visibleControls.length; index += 1) {
         const control = visibleControls[index];
@@ -368,13 +373,6 @@ class PdfGenerator {
   /*******************************************************************/
 
   async generateControl(control, path = []) {
-    // Check relevant
-    const relevantKey = [...path, control.name, 'meta', 'relevant'];
-    const isRelevant = getProperty(this.submission.data, relevantKey, true);
-    if (!isRelevant) {
-      return;
-    }
-
     // Group, Page
     if (this.isContainerControl(control)) {
       this.docDefinition.content.push(this.getSectionDef(control));
@@ -384,7 +382,8 @@ class PdfGenerator {
       }
 
       const visibleChildren = control.children.filter(
-        (child) => !this.isHiddenControl.bind(this)(child)
+        (child) =>
+          !this.isHiddenControl.bind(this)(child) && this.isRelevantControl.bind(this)(child, path)
       );
       for (let index = 0; index < visibleChildren.length; index += 1) {
         const child = visibleChildren[index];
@@ -447,6 +446,7 @@ class PdfGenerator {
     }
 
     let def = null;
+    // TODO: - Emptyyyyyyyyyyyyyyyyyyy
     if (type === 'instructions') {
       // Instructions
       def = this.getInstructionDef(control);
@@ -906,25 +906,24 @@ class PdfGenerator {
     const layout = this.getControlLayout(control);
     return getProperty(control, 'options.hidden', false) || layout.hidden;
   }
+
+  isRelevantControl(control, path = []) {
+    const relevantKey = [...path, control.name, 'meta', 'relevant'];
+    return getProperty(this.submission.data, relevantKey, true);
+  }
 }
 
-function getPdfBase64(survey, submission, callback) {
-  const generator = new PdfGenerator(survey, submission);
+function getPdfBase64(survey, submission, options, callback) {
+  const generator = new PdfGenerator({ survey, submission, options });
   generator.generateBase64(callback);
 }
 
-function getPdfBlob(survey, submission, callback) {
-  const generator = new PdfGenerator(survey, submission);
-  generator.generateBlob(callback);
-}
-
 function getPdfName(survey, submission) {
-  const generator = new PdfGenerator(survey, submission);
+  const generator = new PdfGenerator({ survey, submission });
   return generator.filename() + '.pdf';
 }
 
 export default {
   getPdfBase64,
-  getPdfBlob,
   getPdfName,
 };

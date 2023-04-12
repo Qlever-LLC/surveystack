@@ -5,14 +5,8 @@
         <v-card-title v-if="title" class="headline mb-2">{{ title }}</v-card-title>
 
         <v-card-text>
-          <div v-for="(item, idx) in items" :key="idx">
-            <v-card
-              flat
-              dark
-              outlined
-              class="mb-2"
-              :color="item.error || item.downloadError || item.emailError ? 'red darken-4' : 'green'"
-            >
+          <div v-for="(item, idx) in messages" :key="idx">
+            <v-card flat dark outlined class="mb-2" :color="item.error ? 'red darken-4' : 'green'">
               <v-card-text class="white--text">
                 <span style="font-weight: bold">{{ item.title }}</span> {{ item.body }}
               </v-card-text>
@@ -66,8 +60,20 @@
           <div v-if="additionalMessage" class="px-2" v-html="additionalMessage" />
 
           <div v-if="showOptions" class="mt-6 d-flex flex-column align-stretch">
-            <v-btn color="primary" depressed dense :loading="downloading" @click="$emit('download')">Download</v-btn>
-            <v-btn class="mt-3" color="primary" depressed dense :loading="sendingEmail" @click="$emit('emailMe')">
+            <v-btn color="primary" depressed dense :loading="download.loading" @click="downloadSubmission">
+              Download survey
+            </v-btn>
+            <v-btn
+              class="mt-3"
+              color="primary"
+              depressed
+              dense
+              :loading="printable.loading"
+              @click="downloadPaperVersion"
+            >
+              Download paper version
+            </v-btn>
+            <v-btn class="mt-3" color="primary" depressed dense :loading="emailing.loading" @click="emailMe">
               Email me survey
             </v-btn>
           </div>
@@ -83,6 +89,10 @@
 </template>
 
 <script>
+import { parse as parseDisposition } from 'content-disposition';
+import downloadExternal from '@/utils/downloadExternal';
+import api from '@/services/api.service';
+
 export default {
   props: {
     value: {
@@ -105,15 +115,29 @@ export default {
     additionalMessage: {
       type: String,
     },
-    downloading: {
-      type: Boolean,
-      default: () => false,
+    submission: {
+      type: Object,
+      default: null,
     },
-    sendingEmail: {
-      type: Boolean,
-      default: () => false,
+    survey: {
+      type: Object,
+      default: null,
     },
   },
+  data: () => ({
+    download: {
+      loading: false,
+      error: null,
+    },
+    printable: {
+      loading: false,
+      error: null,
+    },
+    emailing: {
+      loading: false,
+      error: null,
+    },
+  }),
   computed: {
     show: {
       get() {
@@ -123,11 +147,81 @@ export default {
         this.$emit('input', value);
       },
     },
+    messages() {
+      const items = [...this.items];
+
+      if (this.download.error) {
+        items.push(this.download.error);
+      }
+      if (this.printable.error) {
+        items.push(this.printable.error);
+      }
+      if (this.emailing.error) {
+        items.push(this.emailing.error);
+      }
+
+      return items;
+    },
     showOptions() {
-      return this.items.every((item) => !item.error || item.emailError || item.downloadError);
+      return this.survey && this.submission && this.items.every((item) => !item.error);
     },
   },
   methods: {
+    async downloadSubmission() {
+      this.download.loading = true;
+      this.download.error = null;
+
+      try {
+        const { headers, data } = await api.get(`/submissions/${this.submission._id}/pdf?base64=1`);
+        const disposition = parseDisposition(headers['content-disposition']);
+        downloadExternal(data, disposition.parameters.filename);
+      } catch (e) {
+        console.error('Failed to download PDF of submission', e);
+        this.download.error = {
+          title: 'Error',
+          body: 'Sorry, something went wrong while downloading a PDF of survey. Try again later.',
+          error: true,
+        };
+      } finally {
+        this.download.loading = false;
+      }
+    },
+    async downloadPaperVersion() {
+      this.printable.loading = true;
+      this.printable.error = null;
+
+      try {
+        const { headers, data } = await api.get(`/submissions/${this.submission._id}/pdf?base64=1&empty=1`);
+        const disposition = parseDisposition(headers['content-disposition']);
+        downloadExternal(data, disposition.parameters.filename);
+      } catch (e) {
+        console.error('Failed to download printable PDF', e);
+        this.printable.error = {
+          title: 'Error',
+          body: 'Sorry, something went wrong while downloading a PDF of paper version. Try again later.',
+          error: true,
+        };
+      } finally {
+        this.printable.loading = false;
+      }
+    },
+    async emailMe() {
+      this.emailing.loading = true;
+      this.emailing.error = null;
+console.log(111111,this.survey,this.submission);
+      try {
+        await api.post(`/submissions/${this.submission._id}/send-email`, { survey: this.survey.name });
+      } catch (e) {
+        console.error('Failed to email a survey', e);
+        this.emailing.error = {
+          title: 'Error',
+          body: 'Sorry, something went wrong while sending an email. Try again later.',
+          error: true,
+        };
+      } finally {
+        this.emailing.loading = false;
+      }
+    },
     onClose() {
       this.show = null;
       this.$emit('close');

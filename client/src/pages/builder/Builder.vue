@@ -56,10 +56,8 @@
       :items="resultItems"
       title="Result of Submission"
       additionalMessage="<span class='caption'>Note: submissions from Builder are automatically archived. Please browse archived submissions to view this result.</span>"
-      :downloading="downloading"
-      :sending-email="sendingEmail"
-      @download="download"
-      @emailMe="emailMe"
+      :survey="survey"
+      :submission="submission"
     />
 
     <result-dialog
@@ -105,7 +103,6 @@
 
 <script>
 import ObjectId from 'bson-objectid';
-import { parse as parseDisposition } from 'content-disposition';
 import appDialog from '@/components/ui/Dialog.vue';
 import resultDialog from '@/components/ui/ResultDialog.vue';
 import resultMixin from '@/components/ui/ResultsMixin';
@@ -151,8 +148,6 @@ export default {
       apiComposeErrors: [],
       showApiComposeErrors: false,
       versionsDialogIsVisible: false,
-      downloading: false,
-      sendingEmail: false,
     };
   },
   mounted() {
@@ -353,47 +348,6 @@ export default {
     },
     onReloadSurvey() {
       this.fetchData();
-    },
-    async download() {
-      this.downloading = true;
-      this.resultItems = this.resultItems.filter((item) => !item.downloadError);
-
-      try {
-        const { headers, data } = await api.get(`/submissions/${this.submission._id}/pdf?base64=1`);
-        const disposition = parseDisposition(headers['content-disposition']);
-        downloadExternal(data, disposition.parameters.filename);
-      } catch (e) {
-        console.error('Failed to download PDF', e);
-        this.resultItems = [
-          ...this.resultItems.filter((item) => !item.downloadError),
-          {
-            title: 'Error',
-            body: 'Sorry, something went wrong while downloading a PDF. Try again later.',
-            downloadError: true,
-          },
-        ];
-      } finally {
-        this.downloading = false;
-      }
-    },
-    async emailMe() {
-      this.sendingEmail = true;
-      this.resultItems = this.resultItems.filter((item) => !item.emailError);
-
-      try {
-        await api.post(`/submissions/${this.submission._id}/send-email`, { survey: this.survey.name });
-      } catch (e) {
-        this.resultItems = [
-          ...this.resultItems.filter((item) => !item.emailError),
-          {
-            title: 'Error',
-            body: 'Sorry, something went wrong while sending an email. Try again later.',
-            emailError: true,
-          },
-        ];
-      } finally {
-        this.sendingEmail = false;
-      }
     },
   },
   async created() {

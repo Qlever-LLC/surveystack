@@ -1,5 +1,4 @@
 import { get } from 'lodash';
-import { nextTick } from 'vue';
 
 export default {
   data() {
