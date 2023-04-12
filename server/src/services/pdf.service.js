@@ -9,7 +9,6 @@ import { JSDOM } from 'jsdom';
 import { ObjectId } from 'mongodb';
 import { db } from '../db';
 import { getPublicDownloadUrl } from './bucket.service';
-import { cloneDeep } from 'lodash';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -48,6 +47,11 @@ const margins = {
   sm: [0, 0, 0, 12],
   xs: [0, 0, 0, 8],
   answer: [12, 0, 0, 0],
+  zero: [0, 0, 0, 0],
+};
+
+const lines = {
+  dash: { dash: { length: 3, space: 3 } },
 };
 
 const styles = {
@@ -446,12 +450,45 @@ class PdfGenerator {
     }
 
     let def = null;
-    // TODO: - Emptyyyyyyyyyyyyyyyyyyy
-    if (type === 'instructions') {
-      // Instructions
+    /*
+     **  Printable version
+     */
+    if (this.options.empty) {
+      // Matrix
+      if (type === 'matrix') {
+        def = await this.getMatrixTableDef('', options);
+      }
+      // Selection
+      else if (type === 'selectSingle' || type === 'selectMultiple' || type === 'ontology') {
+        const multiple =
+          type === 'selectMultiple' || (type === 'ontology' && options.hasMultipleSelections);
+        def = this.getSelectDef('', source, layout.columnCount, multiple);
+      }
+      // Number
+      else if (type === 'number') {
+        def = this.getEmptyNumberDef();
+      }
+      // Date
+      else if (type === 'date') {
+        def = this.getEmptyDateDef();
+      }
+      // Other
+      else if (
+        !['group', 'page', 'instructions', 'instructionsImageSplit', 'script'].includes(type)
+      ) {
+        def = this.getEmptyAnswerDef();
+      }
+    }
+
+    /*
+     **  Normal version
+     */
+    // Instructions
+    else if (type === 'instructions') {
       def = this.getInstructionDef(control);
-    } else if (type === 'selectSingle' || type === 'selectMultiple' || type === 'ontology') {
-      // Selections
+    }
+    // Selections
+    else if (type === 'selectSingle' || type === 'selectMultiple' || type === 'ontology') {
       const multiple =
         type === 'selectMultiple' || (type === 'ontology' && options.hasMultipleSelections);
 
@@ -463,19 +500,24 @@ class PdfGenerator {
       } else {
         def = this.getDropdownDef(answer, source, layout.columnCount);
       }
-    } else if (type === 'file' || type === 'image') {
-      // File
+    }
+    // File
+    else if (type === 'file' || type === 'image') {
       const multiple = getProperty(options, 'source.allowMultiple', false);
       def = await this.getFileDef(answer, multiple, layout.preview);
-    } else if (type === 'matrix') {
-      // Matrix
+    }
+    // Matrix
+    else if (type === 'matrix') {
       def = layout.table
         ? await this.getMatrixTableDef(answer, options)
         : await this.getMatrixListDef(answer, options);
-    } else if (type === 'script' || typeof answer === 'object') {
-      // GeoJSON, FarmOS etc
+    }
+    // GeoJSON, FarmOS etc
+    else if (type === 'script' || typeof answer === 'object') {
       def = this.getObjectDef(answer);
-    } else {
+    }
+    // Other
+    else {
       def = this.getAnswerDef(answer);
     }
 
@@ -543,9 +585,13 @@ class PdfGenerator {
           [
             {
               svg: getControlSvg(multiple, checked),
-              fit: [16, 16],
+              fit: [14, 14],
+              margin: [0, 0.5, 0, 0],
             },
-            this.getAnswerDef(option.label),
+            {
+              ...this.getAnswerDef(option.label),
+              margin: margins.zero,
+            },
           ],
         ],
       },
@@ -686,7 +732,7 @@ class PdfGenerator {
     };
   }
 
-  getEmptyRowDef(cols) {
+  getNoDataRowDef(cols) {
     const noDataCell = {
       ...this.getAnswerDef(null),
       colSpan: cols,
@@ -700,6 +746,18 @@ class PdfGenerator {
     return [noDataCell, ...emptyCells].slice(0, -1);
   }
 
+  getEmptyDataRowDef(cols) {
+    const emptyCell = {
+      text: '',
+      colSpan: cols,
+      margin: [0, 12, 0, 12],
+    };
+    const emptyCells = Array(cols)
+      .fill(0)
+      .map(() => '');
+
+    return [emptyCell, ...emptyCells].slice(0, -1);
+  }
   async getMatrixTableDef(answer, options) {
     const cols = getProperty(options, 'source.content');
     if (!Array.isArray(cols)) {
@@ -710,6 +768,7 @@ class PdfGenerator {
     const headers = cols.map((header) => header.label || header.value);
     const rows = [];
     const value = toArray(answer);
+    const isPrintable = this.options.empty;
 
     // To fetch dropdown list items in advance for performance issue
     const resources = {};
@@ -741,7 +800,11 @@ class PdfGenerator {
     }
 
     if (rows.length === 0) {
-      rows.push(this.getEmptyRowDef(cols.length));
+      if (isPrintable) {
+        rows.push(...Array(10).fill(this.getEmptyDataRowDef(cols.length)));
+      } else {
+        rows.push(this.getNoDataRowDef(cols.length));
+      }
     }
 
     return {
@@ -753,11 +816,18 @@ class PdfGenerator {
           return 0;
         },
         hLineColor: function (i, node) {
-          return i === 0 || i === node.table.body.length ? colors.darkGray : colors.gray;
+          return i === 0 || i === 1 || i === node.table.body.length ? colors.darkGray : colors.gray;
+        },
+        hLineStyle: function (i, node) {
+          return !isPrintable || i === 0 || i === 1 || i === node.table.body.length
+            ? null
+            : lines.dash;
         },
         fillColor: function (rowIndex) {
           return rowIndex === 0
             ? colors.table.headerColor
+            : isPrintable
+            ? colors.white
             : rowIndex % 2 === 1
             ? colors.table.oddColor
             : colors.table.evenColor;
@@ -827,6 +897,122 @@ class PdfGenerator {
     return {
       ul: rows,
       style: 'answer',
+    };
+  }
+
+  getEmptyAnswerDef() {
+    return {
+      layout: {
+        hLineWidth: function () {
+          return 1;
+        },
+        hLineColor: function () {
+          return colors.gray;
+        },
+        hLineStyle: function () {
+          return lines.dash;
+        },
+      },
+      table: {
+        widths: ['*'],
+        body: [
+          [
+            {
+              border: [false, false, false, true],
+              text: ' ',
+              fontSize: fontSizes.xl,
+            },
+          ],
+          [
+            {
+              border: [false, false, false, true],
+              text: ' ',
+              fontSize: fontSizes.xl,
+            },
+          ],
+        ],
+      },
+      margin: margins.answer,
+    };
+  }
+
+  getEmptyNumberDef() {
+    return {
+      layout: {
+        hLineWidth: function () {
+          return 1;
+        },
+        hLineColor: function () {
+          return colors.gray;
+        },
+        hLineStyle: function () {
+          return lines.dash;
+        },
+      },
+      table: {
+        widths: [120],
+        body: [
+          [
+            {
+              border: [false, false, false, true],
+              text: ' ',
+              fontSize: fontSizes.xl,
+            },
+          ],
+        ],
+      },
+      margin: margins.answer,
+    };
+  }
+
+  getEmptyDateDef() {
+    return {
+      layout: {
+        hLineWidth: function () {
+          return 1;
+        },
+        hLineColor: function () {
+          return colors.gray;
+        },
+        hLineStyle: function () {
+          return lines.dash;
+        },
+      },
+      table: {
+        widths: [25, 'auto', 25, 'auto', 50],
+        body: [
+          [
+            {
+              border: [false, false, false, true],
+              text: ' ',
+              fontSize: fontSizes.xl,
+            },
+            {
+              border: [false, false, false, false],
+              text: '/',
+              fontSize: fontSizes.sm,
+              margin: [0, 12, 0, 0],
+            },
+            {
+              border: [false, false, false, true],
+              text: ' ',
+              fontSize: fontSizes.xl,
+            },
+            {
+              border: [false, false, false, false],
+              text: '/',
+              fontSize: fontSizes.sm,
+              margin: [0, 12, 0, 0],
+            },
+            {
+              border: [false, false, false, true],
+              text: ' ',
+              fontSize: fontSizes.xl,
+            },
+          ],
+        ],
+      },
+      margin: margins.answer,
     };
   }
 

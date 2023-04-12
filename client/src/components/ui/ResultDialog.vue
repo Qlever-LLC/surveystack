@@ -208,7 +208,7 @@ export default {
     async emailMe() {
       this.emailing.loading = true;
       this.emailing.error = null;
-console.log(111111,this.survey,this.submission);
+
       try {
         await api.post(`/submissions/${this.submission._id}/send-email`, { survey: this.survey.name });
       } catch (e) {
