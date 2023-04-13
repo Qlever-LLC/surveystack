@@ -305,6 +305,7 @@
           </v-icon>
         </div>
 
+        <!-- TODO not implemented yet - decide to implement or remove-->
         <!--div>
           <checkbox
             label="Calculate Expression"
@@ -315,7 +316,6 @@
             mdi-open-in-new
           </v-icon>
         </div-->
-
         <!--div>
           <checkbox
             label="Constraint Expression"

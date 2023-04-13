@@ -14,16 +14,6 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
     const control = node.model;
     const field = surveyStackUtils.getNested(submission, path);
 
-    //if control option is not existing, quit
-    if (!control.options[option]) {
-      return {
-        path,
-        control,
-        field,
-        skip: true,
-      };
-    }
-
     // if control is hidden set relevance to false
     if (fname === 'relevance' && control.options.hidden) {
       return {
@@ -43,6 +33,17 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
       };
     }
 
+    // if control option is not existing, skip calc for this node
+    if (!control.options[option]) {
+      return {
+        path,
+        control,
+        field,
+        skip: true,
+      };
+    }
+
+    // if control option is disabled, skip calc for this node
     if (!control.options[option].enabled) {
       return {
         path,
