@@ -276,13 +276,20 @@
       </template>
 
       <!-- Advanced properties -->
-      <v-btn v-if="!showAdvanced" color="grey darken-1" class="align-self-end" @click="showAdvanced = true" small text>
+      <v-btn
+        v-if="!showAdvanced && !hasExpressionEnabled"
+        color="grey darken-1"
+        class="align-self-end"
+        @click="showAdvanced = true"
+        small
+        text
+      >
         advanced
       </v-btn>
       <div v-else class="advanced pb-6">
         <div>
           <v-card-title class="px-0 py-0">Advanced Options</v-card-title>
-          <v-icon @click.stop="showAdvanced = false">mdi-close</v-icon>
+          <v-icon v-if="!hasExpressionEnabled" @click.stop="showAdvanced = false">mdi-close</v-icon>
         </div>
 
         <div>
@@ -491,6 +498,15 @@ export default {
       return (
         this.control.options.required ||
         !['group', 'page', 'instructions', 'instructionsImageSplit'].includes(this.control.type)
+      );
+    },
+    hasExpressionEnabled() {
+      return (
+        this.initialize.enabled ||
+        this.calculate.enabled ||
+        this.relevance.enabled ||
+        this.constraint.enabled ||
+        this.apiCompose.enabled
       );
     },
   },
