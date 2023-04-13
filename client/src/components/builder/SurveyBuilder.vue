@@ -557,37 +557,28 @@ export default {
         });
     },
     highlight(tab, select = true) {
-      console.log('----1 highlight:' + select);
       this.codeError = null;
       this.evaluated = null;
 
       this.hideCode = false;
 
-      //TODO solve healing of legacy surveys which are missing that expression
+      //ealry leave in case of a missing option
       if (!this.control.options[tab]) {
-        console.log('----1.5 highlight options not set:' + tab);
-        this.control.options[tab] = {
-          code: '',
-          enabled: select,
-        };
-        console.log('----1.6 highlight options now ' + this.control.options[tab].enabled);
+        return;
       }
-      console.log('----2 highlight:' + this.control.options[tab].enabled);
 
-      if (this.control.options[tab] && !this.control.options[tab].enabled) {
+      if (!this.control.options[tab].enabled) {
         this.highlightNext();
         return;
       }
 
       this.selectedTab = tabMap.indexOf(tab);
-      console.log('----3 highlight ' + this.selectedTab);
+
       if (!this.control.options[tab].code) {
-        console.log('---- tab: ' + tab);
         let initialCode;
         if (tab === 'apiCompose') {
           initialCode = defaultApiCompose;
         } else if (tab === 'initialize') {
-          console.log('----calling initialInitializeCode');
           initialCode = initialInitializeCode(tab);
         } else {
           initialCode = initialRelevanceCode(tab);
@@ -968,11 +959,18 @@ export default {
           return;
         }
 
-        this.optionsRelevance = newVal.options.relevance || cloneDeep(emptyOptions);
-        this.optionsInitialize = newVal.options.initialize || cloneDeep(emptyOptions);
-        this.optionsCalculate = newVal.options.calculate || cloneDeep(emptyOptions);
-        this.optionsConstraint = newVal.options.constraint || cloneDeep(emptyOptions);
-        this.optionsApiCompose = newVal.options.apiCompose || cloneDeep(emptyOptions);
+        //heal missing expression options
+        !newVal.options.relevance ? (newVal.options.relevance = cloneDeep(emptyOptions)) : undefined;
+        !newVal.options.initialize ? (newVal.options.initialize = cloneDeep(emptyOptions)) : undefined;
+        !newVal.options.calculate ? (newVal.options.calculate = cloneDeep(emptyOptions)) : undefined;
+        !newVal.options.constraint ? (newVal.options.constraint = cloneDeep(emptyOptions)) : undefined;
+        !newVal.options.apiCompose ? (newVal.options.apiCompose = cloneDeep(emptyOptions)) : undefined;
+
+        this.optionsRelevance = newVal.options.relevance;
+        this.optionsInitialize = newVal.options.initialize;
+        this.optionsCalculate = newVal.options.calculate;
+        this.optionsConstraint = newVal.options.constraint;
+        this.optionsApiCompose = newVal.options.apiCompose;
       },
       deep: true,
     },
