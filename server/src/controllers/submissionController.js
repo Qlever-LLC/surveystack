@@ -1223,21 +1223,14 @@ const getSubmissionPdf = async (req, res) => {
 
   const fileName = pdfService.getPdfName(survey, submission);
 
-  pdfService.getPdfBase64(
-    survey,
-    submission,
-    {
-      empty: queryParam(req.query.empty),
-    },
-    (data) => {
-      res.attachment(fileName);
-      if (queryParam(req.query.base64)) {
-        res.send('data:application/pdf;base64,' + data);
-      } else {
-        res.send(Buffer.from(data, 'base64'));
-      }
+  pdfService.getPdfBase64(survey, submission, null, (data) => {
+    res.attachment(fileName);
+    if (queryParam(req.query.base64)) {
+      res.send('data:application/pdf;base64,' + data);
+    } else {
+      res.send(Buffer.from(data, 'base64'));
     }
-  );
+  });
 };
 
 const sendPdfLink = async (req, res) => {

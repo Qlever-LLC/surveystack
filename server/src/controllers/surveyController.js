@@ -7,6 +7,7 @@ import _ from 'lodash';
 
 import { changeRecursive, changeRecursiveAsync, checkSurvey } from '../helpers/surveys';
 import rolesService from '../services/roles.service';
+import pdfService from '../services/pdf.service';
 
 const SURVEYS_COLLECTION = 'surveys';
 const SUBMISSIONS_COLLECTION = 'submissions';
@@ -430,6 +431,24 @@ const getSurveyLibraryConsumers = async (req, res) => {
   return res.send(await getSurveyLibraryConsumersInternal(id));
 };
 
+const getSurveyPdf = async (req, res) => {
+  const { id } = req.params;
+  const entity = await db.collection(SURVEYS_COLLECTION).findOne({ _id: new ObjectId(id) });
+
+  if (!entity) {
+    return res.status(404).send({
+      message: `No entity with _id exists: ${id}`,
+    });
+  }
+
+  const fileName = pdfService.getPdfName(entity);
+
+  pdfService.getPdfBase64(entity, null, { printable: 1 }, (data) => {
+    res.attachment(fileName);
+    res.send('data:application/pdf;base64,' + data);
+  });
+};
+
 const createSurvey = async (req, res) => {
   const entity = await sanitize(req.body);
   // apply creator (endpoint already has assertAuthenticated, so auth.user._id must exist)
@@ -757,6 +776,7 @@ export default {
   getSurvey,
   getSurveyLibraryConsumers,
   getSurveyInfo,
+  getSurveyPdf,
   createSurvey,
   updateSurvey,
   deleteSurvey,

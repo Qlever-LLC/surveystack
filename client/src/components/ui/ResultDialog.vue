@@ -63,16 +63,6 @@
             <v-btn color="primary" depressed dense :loading="download.loading" @click="downloadSubmission">
               Download survey
             </v-btn>
-            <v-btn
-              class="mt-3"
-              color="primary"
-              depressed
-              dense
-              :loading="printable.loading"
-              @click="downloadPaperVersion"
-            >
-              Download paper version
-            </v-btn>
             <v-btn class="mt-3" color="primary" depressed dense :loading="emailing.loading" @click="emailMe">
               Email me survey
             </v-btn>
@@ -129,10 +119,6 @@ export default {
       loading: false,
       error: null,
     },
-    printable: {
-      loading: false,
-      error: null,
-    },
     emailing: {
       loading: false,
       error: null,
@@ -152,9 +138,6 @@ export default {
 
       if (this.download.error) {
         items.push(this.download.error);
-      }
-      if (this.printable.error) {
-        items.push(this.printable.error);
       }
       if (this.emailing.error) {
         items.push(this.emailing.error);
@@ -184,25 +167,6 @@ export default {
         };
       } finally {
         this.download.loading = false;
-      }
-    },
-    async downloadPaperVersion() {
-      this.printable.loading = true;
-      this.printable.error = null;
-
-      try {
-        const { headers, data } = await api.get(`/submissions/${this.submission._id}/pdf?base64=1&empty=1`);
-        const disposition = parseDisposition(headers['content-disposition']);
-        downloadExternal(data, disposition.parameters.filename);
-      } catch (e) {
-        console.error('Failed to download printable PDF', e);
-        this.printable.error = {
-          title: 'Error',
-          body: 'Sorry, something went wrong while downloading a PDF of paper version. Try again later.',
-          error: true,
-        };
-      } finally {
-        this.printable.loading = false;
       }
     },
     async emailMe() {

@@ -168,6 +168,7 @@ router.get(
 router.get('/surveys/page', catchErrors(surveyController.getSurveyPage));
 router.get('/surveys/pinned', catchErrors(surveyController.getPinned));
 router.get('/surveys/:id', catchErrors(surveyController.getSurvey));
+router.get('/surveys/:id/pdf', catchErrors(surveyController.getSurveyPdf));
 router.get('/surveys/check-for-updates/:id', catchErrors(surveyController.checkForLibraryUpdates));
 router.post(
   '/surveys',
