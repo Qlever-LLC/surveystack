@@ -502,11 +502,11 @@ export default {
     },
     hasExpressionEnabled() {
       return (
-        this.initialize.enabled ||
-        this.calculate.enabled ||
-        this.relevance.enabled ||
-        this.constraint.enabled ||
-        this.apiCompose.enabled
+        (this.initialize && this.initialize.enabled) ||
+        (this.calculate && this.calculate.enabled) ||
+        (this.relevance && this.relevance.enabled) ||
+        (this.constraint && this.constraint.enabled) ||
+        (this.apiCompose && this.apiCompose.enabled)
       );
     },
   },
