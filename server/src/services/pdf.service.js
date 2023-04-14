@@ -93,10 +93,6 @@ const styles = {
     color: colors.black,
     margin: margins.answer,
   },
-  answerHighlight: {
-    background: colors.blue,
-    color: colors.white,
-  },
   link: {
     color: colors.blue,
     decoration: 'underline',
@@ -481,7 +477,7 @@ class PdfGenerator {
       else if (type === 'selectSingle' || type === 'selectMultiple' || type === 'ontology') {
         const multiple =
           type === 'selectMultiple' || (type === 'ontology' && options.hasMultipleSelections);
-        def = this.getSelectDef('', source, layout.columnCount, multiple);
+        def = this.getSelectDef('', source, layout.columns, multiple);
       }
       // Number
       else if (type === 'number') {
@@ -529,13 +525,11 @@ class PdfGenerator {
       const multiple =
         type === 'selectMultiple' || (type === 'ontology' && options.hasMultipleSelections);
 
-      if (layout.valuesOnly) {
+      if (layout.showAll) {
+        def = this.getSelectDef(answer, source, layout.columns, multiple);
+      } else {
         const value = transformValueToLabel(answer, source);
         def = this.getAnswerDef(value);
-      } else if (type !== 'ontology' || (type === 'ontology' && layout.usingControl)) {
-        def = this.getSelectDef(answer, source, layout.columnCount, multiple);
-      } else {
-        def = this.getDropdownDef(answer, source, layout.columnCount);
       }
     }
     // File
@@ -664,45 +658,6 @@ class PdfGenerator {
       columns: group.map((columnOptions) =>
         columnOptions.map((option) => this.getSelectItemDef(option, multiple, isChecked(option)))
       ),
-      margin: margins.answer,
-    };
-  }
-
-  getDropdownDef(answer, source, cols = 1) {
-    const value = toArray(answer);
-    const options = [...source];
-
-    const custom = value.find((val) => val && source.every((item) => item.value !== val));
-    if (custom) {
-      options.push({ value: custom, label: custom });
-    }
-
-    const group = [];
-    if (cols === 1) {
-      group.push(options);
-    } else {
-      const countPerCol = Math.ceil(options.length / cols);
-      options.forEach((option, index) => {
-        const i = Math.floor(index / countPerCol);
-        if (!Array.isArray(group[i])) {
-          group[i] = [];
-        }
-        group[i].push(option);
-      });
-    }
-
-    const isChecked = (option) => value.includes(option.value);
-
-    return {
-      columns: group.map((columnOptions) => ({
-        ul: columnOptions.map((option) => {
-          const d = this.getAnswerDef(option.label);
-          if (isChecked(option)) {
-            d.style = 'answerHighlight';
-          }
-          return d;
-        }),
-      })),
       margin: margins.answer,
     };
   }
@@ -1052,12 +1007,14 @@ class PdfGenerator {
       );
 
       // Filter instructions
-      if (!this.survey.meta.showInstruction) {
-        validControls = [...validControls].filter((control) => control.type !== 'instructions');
+      if (!this.survey.options.showInstruction) {
+        validControls = [...validControls].filter(
+          (control) => control.type !== 'instructions' && control.type !== 'instructionsImageSplit'
+        );
       }
 
       // Filter unanswered
-      if (this.survey.meta.hideUnanswered) {
+      if (this.survey.options.hideUnanswered) {
         validControls = [...validControls].filter((control) =>
           this.hasAnswer.bind(this)(control, path)
         );
@@ -1090,11 +1047,10 @@ class PdfGenerator {
   }
 
   getControlLayout(control) {
-    const { hidden, valuesOnly, usingControl, columnCount, preview, table } = {
+    const { hidden, showAll, columns, preview, table } = {
       hidden: false,
-      valuesOnly: true,
-      usingControl: false,
-      columnCount: 1,
+      showAll: false,
+      columns: 1,
       preview: false,
       table: true,
       ...control.options.layout,
@@ -1102,9 +1058,8 @@ class PdfGenerator {
 
     return {
       hidden,
-      columnCount,
-      valuesOnly,
-      usingControl,
+      columns,
+      showAll,
       preview,
       table,
     };

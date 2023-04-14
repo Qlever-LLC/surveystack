@@ -102,8 +102,7 @@
               <v-list-item-title>
                 <v-btn @click="editLibraryDialogIsVisible = true" text>
                   <v-icon color="grey">mdi-library</v-icon>
-                  <div class="ml-1" v-if="!value.meta.isLibrary">add to library</div>
-                  <div class="ml-1" v-if="value.meta.isLibrary">edit library data</div>
+                  <div class="ml-1">{{ value.meta.isLibrary ? 'Edit library data' : 'Add to library' }}</div>
                 </v-btn>
               </v-list-item-title>
             </v-list-item>
@@ -111,7 +110,15 @@
               <v-list-item-title>
                 <v-btn @click="libraryConsumersDialogIsVisible = true" text>
                   <v-icon color="grey">mdi-layers-search</v-icon>
-                  <div class="ml-1">list library consumers</div>
+                  <div class="ml-1">List library consumers</div>
+                </v-btn>
+              </v-list-item-title>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title>
+                <v-btn text @click="printSettingDialogIsVisible = true">
+                  <v-icon color="grey">mdi-printer-settings</v-icon>
+                  <div class="ml-1">Print settings</div>
                 </v-btn>
               </v-list-item-title>
             </v-list-item>
@@ -138,6 +145,7 @@
           :library-survey="value"
           @cancel="libraryConsumersDialogIsVisible = false"
         />
+        <survey-settings-dialog v-model="printSettingDialogIsVisible" :survey="survey" />
       </div>
       <div class="d-flex justify-space-between align-center mt-n1">
         <div class="body-2 grey--text caption">
@@ -253,6 +261,7 @@ import { getGroupNameById } from '@/utils/groups';
 import EditLibraryDialog from '@/components/survey/library/EditLibraryDialog';
 import PublishUpdatedLibraryDialog from '@/components/survey/library/PublishUpdatedLibraryDialog';
 import ListLibraryConsumersDialog from '@/components/survey/library/ListLibraryConsumersDialog';
+import SurveySettingsDialog from './SurveySettingsDialog.vue';
 import { calcSurveySizeMB } from '@/utils/surveys';
 
 const availableSubmissions = [
@@ -269,6 +278,7 @@ export default {
       editLibraryDialogIsVisible: false,
       updateLibraryDialogIsVisible: false,
       libraryConsumersDialogIsVisible: false,
+      printSettingDialogIsVisible: false,
       surveyGroupName: 'Group Not Found',
       availableSubmissions,
     };
@@ -311,6 +321,7 @@ export default {
     ListLibraryConsumersDialog,
     PublishUpdatedLibraryDialog,
     EditLibraryDialog,
+    SurveySettingsDialog,
     SurveyNameEditor,
     ActiveGroupSelector,
     appResources,

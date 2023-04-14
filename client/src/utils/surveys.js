@@ -1050,6 +1050,10 @@ export function createSurvey({ creator = null, group = null, specVersion = SPEC_
       specVersion,
     },
     resources: [],
+    options: {
+      showInstruction: false,
+      hideUnanswered: false,
+    },
     revisions: [
       {
         dateCreated: currentDate,

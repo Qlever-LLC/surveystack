@@ -341,7 +341,7 @@
             <v-icon @click.stop="showLayout = false">mdi-close</v-icon>
           </div>
 
-          <div v-if="isInstructions">
+          <div v-if="isInstructions || isInstructionsImageSplit">
             <checkbox label="Hidden" v-model="control.options.layout.hidden" />
           </div>
 
@@ -363,24 +363,16 @@
 
           <div v-if="isSelect || isOntology">
             <checkbox
-              label="Show values only"
-              v-model="control.options.layout.valuesOnly"
-              helper-text="Render the selected items only without all items"
-            />
-          </div>
-
-          <div v-if="isOntology && !control.options.layout.valuesOnly">
-            <checkbox
-              label="Use control"
-              v-model="control.options.layout.usingControl"
-              helper-text="Render the selected items using the Checkbox/Radio controls"
+              label="Show all answers"
+              v-model="control.options.layout.showAll"
+              helper-text="Show full answers list, highlight the selected answer(s)"
             />
           </div>
 
           <v-select
-            v-if="(isSelect || isOntology) && !control.options.layout.valuesOnly"
+            v-if="(isSelect || isOntology) && control.options.layout.showAll"
             label="Columns"
-            v-model="control.options.layout.columnCount"
+            v-model="control.options.layout.columns"
             :items="[1, 2, 3, 4, 5]"
             color="focus"
             hide-details
@@ -553,7 +545,14 @@ export default {
       );
     },
     hasLayoutOptions() {
-      return this.isInstructions || this.isSelect || this.isOntology || this.isFile || this.isMatrix;
+      return (
+        this.isInstructions ||
+        this.isInstructionsImageSplit ||
+        this.isSelect ||
+        this.isOntology ||
+        this.isFile ||
+        this.isMatrix
+      );
     },
   },
   methods: {
@@ -642,9 +641,8 @@ export default {
       if (typeof this.control.options.layout === 'undefined') {
         this.$set(this.control.options, 'layout', {
           hidden: false,
-          valuesOnly: true,
-          usingControl: false,
-          columnCount: 1,
+          showAll: false,
+          columns: 1,
           preview: false,
           table: true,
         });
