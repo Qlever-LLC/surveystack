@@ -1547,6 +1547,56 @@ export const getAdminLink = async (req, res) => {
   return res.send(link);
 };
 
+export const availableAddUserToInstance = async (req, res) => {
+  const { instanceName, newAddedUserEmail } = req.body;
+  await checkAddUserToInstance(instanceName, newAddedUserEmail);
+  const user = await db.collection('users').findOne({
+    email: newAddedUserEmail,
+  });
+  const ownerAlreadyMapped = await db.collection('farmos-instances').findOne({
+    instanceName,
+    userId: new ObjectId(user._id),
+    owner: true,
+  });
+
+  if (ownerAlreadyMapped) {
+    throw boom.badRequest('this user is already mapped to your instance');
+  }
+  return res.send({ status: 'ok' });
+};
+const checkAddUserToInstance = async (instanceName, newAddedUserEmail) => {
+  if (!instanceName) {
+    throw boom.badData('instance name missing');
+  }
+  if (!newAddedUserEmail) {
+    throw boom.badData('email missing');
+  }
+
+  const newOwner = await db.collection('users').findOne({
+    email: newAddedUserEmail,
+  });
+
+  if (!newOwner) {
+    throw boom.badRequest("user doesn't exist");
+  }
+};
+export const addUserToInstance = async (req, res) => {
+  const { instanceName, newAddedUserEmail, userIsOwner } = req.body;
+  await checkAddUserToInstance(instanceName, newAddedUserEmail);
+
+  const user = await db.collection('users').findOne({
+    email: newAddedUserEmail,
+  });
+
+  await db.collection('farmos-instances').insertOne({
+    instanceName: instanceName,
+    userId: new ObjectId(user._id),
+    owner: !!userIsOwner,
+  });
+
+  return res.send('the user has been added to your instance');
+};
+
 export const availableUpdateOwnership = async (req, res) => {
   await checkUpdateOwnership(req);
   return res.send({ status: 'ok' });

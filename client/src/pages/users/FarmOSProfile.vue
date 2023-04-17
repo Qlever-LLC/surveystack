@@ -46,6 +46,52 @@
         </div>
       </app-dialog>
 
+      <!-- add Dialog -->
+      <app-dialog
+        modal
+        :maxWidth="600"
+        labelConfirm="Close"
+        :hideCancel="true"
+        v-model="showAddDialog"
+        @cancel="closeAndReset"
+        @confirm="closeAndReset"
+        title="Add an Additional User"
+      >
+        <div class="my-8">
+          <p>Which user do you want to add to your instance?</p>
+          <div class="d-block mb-4">
+            <v-text-field v-model.trim="newAddedUserEmail" label="enter owner email" hide-details></v-text-field>
+            <v-checkbox v-model="userIsOwner" label="this user will be an owner too"></v-checkbox>
+          </div>
+          <v-alert
+            v-if="errorDialogMessage"
+            style="cursor: pointer"
+            class="mt-4 cursor-pointer"
+            mode="fade"
+            text
+            type="error"
+            >{{ errorDialogMessage }}</v-alert
+          >
+          <v-btn block @click="addUser" color="primary" target="_blank"> Add </v-btn>
+        </div>
+      </app-dialog>
+      <!-- add confirmation Dialog -->
+      <app-dialog
+        modal
+        :maxWidth="600"
+        labelConfirm="Close"
+        :hideCancel="true"
+        v-model="showConfirmAddDialog"
+        @cancel="closeAndReset"
+        @confirm="closeAndReset"
+        title="Add an Additional User"
+      >
+        <div class="my-8" style="color: black">
+          <p class="mb-4">Are you sure you want to add this user {{ newAddedUserEmail }} to your instance?<br /></p>
+          <v-btn block @click="confirmaddUser" color="primary" target="_blank"> Confirm</v-btn>
+        </div>
+      </app-dialog>
+
       <!-- move Dialog -->
       <app-dialog
         modal
@@ -254,6 +300,23 @@
                           class="px-1 mx-1"
                           style="min-width: 0px"
                           color="black"
+                          @click="addUserToInstance(instance.instanceName)"
+                        >
+                          add
+                        </v-btn>
+                      </template>
+                      <span>Add an user to your instance</span>
+                    </v-tooltip>
+
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          v-on="on"
+                          text
+                          x-small
+                          class="px-1 mx-1"
+                          style="min-width: 0px"
+                          color="black"
                           @click="moveInstance(instance.instanceName)"
                         >
                           re-assign
@@ -400,6 +463,11 @@ export default {
       adminLink: '',
       linkReady: false,
 
+      showAddDialog: false,
+      newAddedUserEmail: '',
+      userIsOwner: false,
+      showConfirmAddDialog: false,
+
       showMoveDialog: false,
       newOwnerEmail: '',
       showConfirmMoveDialog: false,
@@ -469,6 +537,51 @@ export default {
         this.errorCatched(error);
         this.closeAndReset();
       }
+    },
+    //add button
+    async addUserToInstance(instanceName) {
+      this.showAddDialog = true;
+      this.instanceUnderWork = instanceName;
+    },
+    async addUser() {
+      try {
+        const instanceName = this.instanceUnderWork;
+        const newAddedUserEmail = this.newAddedUserEmail;
+        const userIsOwner = this.userIsOwner;
+
+        await api.post(`/farmos/available-add-user-to-instance`, {
+          instanceName,
+          newAddedUserEmail,
+          userIsOwner,
+        });
+        this.showConfirmAddDialog = true;
+        this.errorDialogMessage = null;
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+          this.dialogError(error.response.data.message);
+        } else {
+          this.dialogError(error.message);
+        }
+        this.newAddedUserEmail = '';
+      }
+    },
+    async confirmaddUser() {
+      try {
+        const instanceName = this.instanceUnderWork;
+        const newAddedUserEmail = this.newAddedUserEmail;
+        const userIsOwner = this.userIsOwner;
+
+        const { data } = await api.post(`/farmos/add-user-to-instance`, {
+          instanceName,
+          newAddedUserEmail,
+          userIsOwner,
+        });
+        this.success(data);
+        this.init();
+      } catch (error) {
+        this.errorCatched(error);
+      }
+      this.closeAndReset();
     },
     // move button
     async moveInstance(instanceName) {
@@ -637,8 +750,12 @@ export default {
       (this.groupIdUnderWork = ''), (this.linkReady = false);
       this.showLinkDialog = false;
       this.adminLink = '';
+      this.showAddDialog = false;
+      this.newAddedUserEmail = '';
+      this.userIsOwner = false;
       this.showMoveDialog = false;
       this.newOwnerEmail = '';
+      this.showConfirmAddDialog = false;
       this.showConfirmMoveDialog = false;
       this.showConfirmRemoveDialog = false;
       this.showConfirmDeleteDialog = false;

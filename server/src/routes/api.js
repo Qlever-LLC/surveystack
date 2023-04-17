@@ -276,6 +276,16 @@ router.post(
   catchErrors(farmosController.getFarmOwnerLink)
 );
 router.post(
+  '/farmos/available-add-user-to-instance',
+  assertIsOwnerOfInstance,
+  catchErrors(farmosController.availableAddUserToInstance)
+);
+router.post(
+  '/farmos/add-user-to-instance',
+  assertIsOwnerOfInstance,
+  catchErrors(farmosController.addUserToInstance)
+);
+router.post(
   '/farmos/available-update-ownership',
   assertIsOwnerOfInstance,
   catchErrors(farmosController.availableUpdateOwnership)
