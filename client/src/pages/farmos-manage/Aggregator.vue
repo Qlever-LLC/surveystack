@@ -53,18 +53,19 @@
         <v-chip>{{ selectedInstance }}</v-chip>
       </h2>
 
-      <div class="v-flex my-2">
+      <div class="d-flex my-2 align-baseline">
         <v-autocomplete
           outlined
           primary
-          label="Select Group"
+          label="Map Group to Instance"
           v-model="selectedGroup"
           :item-text="(g) => `${g.name} (${g.path})`"
           item-value="_id"
           :items="groups"
+          class="mt-4 mr-4"
         ></v-autocomplete>
         <v-btn :disabled="!selectedGroup" color="primary" @click="$emit('map-group', selectedGroup, selectedInstance)"
-          >Map Selected Aggregator Instance to Group in Surveystack</v-btn
+          >Map</v-btn
         >
       </div>
 
@@ -98,11 +99,32 @@
         User Mappings for
         <v-chip>{{ selectedInstance }}</v-chip>
       </h2>
+
+      <div class="d-flex my-2 justify-space-between align-baseline">
+        <v-autocomplete
+          class="mt-4"
+          outlined
+          primary
+          hint="Select User"
+          label="Map User to Instance"
+          v-model="selectedUser"
+          v-if="!loading && !!groups"
+          :item-text="(item) => `${item.name} (${item.email})`"
+          item-value="_id"
+          :items="users"
+        ></v-autocomplete>
+
+        <v-checkbox v-model="owner" label="owner" class="mx-6"></v-checkbox>
+
+        <v-btn color="primary" @click="$emit('map-user', selectedUser, selectedInstance, owner)">Map</v-btn>
+      </div>
+
+      <v-label class="vy-4">Current User Mappings</v-label>
       <v-simple-table v-if="!loading">
         <template v-slot:default>
           <thead>
             <tr>
-              <th class="text-left">Instance Name</th>
+              <th class="text-left">User</th>
               <th class="text-left">Owner</th>
               <th class="text-left">Action</th>
             </tr>
@@ -113,29 +135,6 @@
               <td>{{ mapping.owner }}</td>
               <td>
                 <v-btn color="red" @click="$emit('unmap-user', mapping.userId, mapping.instanceName)" dark>Unmap</v-btn>
-              </td>
-            </tr>
-
-            <tr>
-              <td>
-                <v-autocomplete
-                  class="mt-4"
-                  outlined
-                  primary
-                  hint="Select User"
-                  label="Map User to Instance"
-                  v-model="selectedUser"
-                  v-if="!loading && !!groups"
-                  :item-text="(item) => `${item.name} (${item.email})`"
-                  item-value="_id"
-                  :items="users"
-                ></v-autocomplete>
-              </td>
-              <td>
-                <v-checkbox v-model="owner" label="owner"></v-checkbox>
-              </td>
-              <td>
-                <v-btn color="primary" @click="$emit('map-user', selectedUser, selectedInstance, owner)">Map</v-btn>
               </td>
             </tr>
           </tbody>
