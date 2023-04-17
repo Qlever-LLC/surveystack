@@ -18,7 +18,7 @@
 
       <p class="mt-4 mb-6">
         You are logged in as
-        <strong>{{ user.email }} </strong>.
+        <strong>{{ email }} </strong>.
       </p>
 
       <!-- access Dialog -->
@@ -212,6 +212,149 @@
         <h2>FarmOS Integrations</h2>
         <v-btn disabled color="primary">Connect from Farmier</v-btn>
       </div>
+
+      <v-simple-table class="mt-8">
+        <template v-slot>
+          <thead>
+            <tr>
+              <th class="text-left">FarmOS Farm URL</th>
+              <th class="text-left">Groups with access</th>
+              <th class="text-left">Other users with access</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(instance, idx) in instances" :key="`grp-${idx}`">
+              <td>
+                <div class="pt-3" style="white-space: nowrap">{{ `${instance.instanceName}` }}</div>
+                <div class="pb-3">
+                  <span v-if="instance.isOwner">
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          v-on="on"
+                          text
+                          x-small
+                          class="px-1 mx-1"
+                          style="min-width: 0px"
+                          color="blue"
+                          @click="accessInstance(instance.instanceName)"
+                        >
+                          access
+                        </v-btn>
+                      </template>
+                      <span>Access FarmOS instance</span>
+                    </v-tooltip>
+
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          v-on="on"
+                          text
+                          x-small
+                          class="px-1 mx-1"
+                          style="min-width: 0px"
+                          color="black"
+                          @click="moveInstance(instance.instanceName)"
+                        >
+                          re-assign
+                        </v-btn>
+                      </template>
+                      <span>Re-assign the instance's ownership</span>
+                    </v-tooltip>
+
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          v-on="on"
+                          text
+                          x-small
+                          class="px-1 mx-1"
+                          style="min-width: 0px"
+                          color="red"
+                          @click="deleteInstance(instance.instanceName)"
+                        >
+                          delete
+                        </v-btn>
+                      </template>
+                      <span>Delete this instance</span>
+                    </v-tooltip>
+                  </span>
+                  <span v-else>
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          v-on="on"
+                          text
+                          x-small
+                          class="px-1 mx-1"
+                          style="min-width: 0px"
+                          color="blue"
+                          @click="accessInstance(instance.instanceName)"
+                        >
+                          access
+                        </v-btn>
+                      </template>
+                      <span>Access FarmOS instance</span>
+                    </v-tooltip>
+
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          v-on="on"
+                          text
+                          x-small
+                          class="px-1 mx-1"
+                          style="min-width: 0px"
+                          color="red"
+                          @click="removeInstance(instance.instanceName)"
+                        >
+                          remove
+                        </v-btn>
+                      </template>
+                      <span>Remove this instance</span>
+                    </v-tooltip>
+                  </span>
+                </div>
+              </td>
+              <td>
+                <div class="py-3" v-if="instance.isOwner">
+                  <v-chip
+                    class="ma-1"
+                    small
+                    close
+                    dark
+                    color="green"
+                    v-for="(group, uidx) in instance.groups"
+                    :key="`instance-${idx}-group-${uidx}`"
+                    @click:close="removeInstanceFromGroup(instance.instanceName, group.groupId)"
+                  >
+                    {{ group.groupName }}
+                  </v-chip>
+                </div>
+                <div v-else>only owners may view this information</div>
+              </td>
+              <td>
+                <div class="py-3" v-if="instance.isOwner">
+                  <v-chip
+                    class="ma-1"
+                    small
+                    close
+                    dark
+                    color="blue"
+                    v-for="(user, uidx) in getEmailsWithoutMySelf(instance.otherUsers)"
+                    :key="`instance-${idx}-user-${uidx}`"
+                    @click:close="removeInstanceFromOtherUser(instance.instanceName, user.userId)"
+                  >
+                    {{ user.userEmail }}
+                  </v-chip>
+                </div>
+                <div v-else>only owners may view this information</div>
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+
       <div class="ma-4">
         <p>
           <b>I need to create a farm!</b> To create a new FarmOS Farm through SurveyStack, you should join or create a
@@ -226,106 +369,6 @@
           want to fully remove access from a group, go to <b>My Groups</b> and remove yourself as a member.
         </p>
       </div>
-
-      <v-simple-table>
-        <template v-slot:default>
-          <thead>
-            <tr>
-              <th class="text-left">FarmOS Farm URL</th>
-              <th class="text-left">Groups with access</th>
-              <th class="text-left">Other users with access</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(instance, idx) in instances" :key="`grp-${idx}`">
-              <td>
-                <div style="white-space: nowrap">{{ `${instance.instanceName}` }}</div>
-                <div>
-                  <span v-if="instance.isOwner">
-                    <v-btn
-                      text
-                      x-small
-                      class="px-1 mx-1"
-                      style="min-width: 0px"
-                      color="blue"
-                      @click="accessInstance(instance.instanceName)"
-                      >access</v-btn
-                    >
-                    <v-btn
-                      text
-                      x-small
-                      class="px-1 mx-1"
-                      style="min-width: 0px"
-                      color="black"
-                      @click="moveInstance(instance.instanceName)"
-                      >move</v-btn
-                    >
-                    <v-btn
-                      text
-                      x-small
-                      class="px-1 mx-1"
-                      style="min-width: 0px"
-                      color="red"
-                      @click="deleteInstance(instance.instanceName)"
-                      >delete</v-btn
-                    >
-                  </span>
-                  <span v-else>
-                    <v-btn
-                      text
-                      x-small
-                      class="px-1 mx-1"
-                      style="min-width: 0px"
-                      color="blue"
-                      @click="accessInstance(instance.instanceName)"
-                      >access</v-btn
-                    >
-                    <v-btn
-                      text
-                      x-small
-                      class="px-1 mx-1"
-                      style="min-width: 0px"
-                      color="red"
-                      @click="removeInstance(instance.instanceName)"
-                      >remove</v-btn
-                    >
-                  </span>
-                </div>
-              </td>
-              <td>
-                <div v-if="instance.isOwner">
-                  <v-chip
-                    class="ma-1"
-                    small
-                    close
-                    v-for="(group, uidx) in instance.groups"
-                    :key="`instance-${idx}-group-${uidx}`"
-                    @click:close="removeInstanceFromGroup(instance.instanceName, group.groupId)"
-                  >
-                    {{ group.groupName }}
-                  </v-chip>
-                </div>
-                <div v-else>only owners may view this information</div>
-              </td>
-              <td>
-                <div v-if="instance.isOwner">
-                  <v-chip
-                    class="ma-1"
-                    small
-                    close
-                    v-for="(user, uidx) in instance.otherUsers"
-                    :key="`instance-${idx}-user-${uidx}`"
-                    @click:close="removeInstanceFromOtherUser(instance.instanceName, user.userId)"
-                  >
-                    {{ user.userEmail }}
-                  </v-chip>
-                </div>
-                <div v-else>only owners may view this information</div>
-              </td>
-            </tr>
-          </tbody>
-        </template>
-      </v-simple-table>
     </template>
     <template v-else>
       <h1>FarmOS Profile</h1>
@@ -409,6 +452,9 @@ export default {
       const userId = this.user._id;
       const { data } = await api.get(`/ownership/${userId}`);
       this.instances = data;
+    },
+    getEmailsWithoutMySelf(user) {
+      return user.filter((u) => u.userEmail !== this.email);
     },
     // access button
     async accessInstance(instanceName) {
