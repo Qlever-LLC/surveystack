@@ -18,7 +18,7 @@
 
       <p class="mt-4 mb-6">
         You are logged in as
-        <strong>{{ user.email }} </strong>.
+        <strong>{{ email }} </strong>.
       </p>
 
       <!-- access Dialog -->
@@ -43,6 +43,52 @@
           >
             {{ linkReady ? 'Access' : 'Loading' }}</v-btn
           >
+        </div>
+      </app-dialog>
+
+      <!-- add Dialog -->
+      <app-dialog
+        modal
+        :maxWidth="600"
+        labelConfirm="Close"
+        :hideCancel="true"
+        v-model="showAddDialog"
+        @cancel="closeAndReset"
+        @confirm="closeAndReset"
+        title="Add an Additional User"
+      >
+        <div class="my-8">
+          <p>Which user do you want to add to your instance?</p>
+          <div class="d-block mb-4">
+            <v-text-field v-model.trim="newAddedUserEmail" label="enter owner email" hide-details></v-text-field>
+            <v-checkbox v-model="userIsOwner" label="this user will be an owner too"></v-checkbox>
+          </div>
+          <v-alert
+            v-if="errorDialogMessage"
+            style="cursor: pointer"
+            class="mt-4 cursor-pointer"
+            mode="fade"
+            text
+            type="error"
+            >{{ errorDialogMessage }}</v-alert
+          >
+          <v-btn block @click="addUser" color="primary" target="_blank"> Add </v-btn>
+        </div>
+      </app-dialog>
+      <!-- add confirmation Dialog -->
+      <app-dialog
+        modal
+        :maxWidth="600"
+        labelConfirm="Close"
+        :hideCancel="true"
+        v-model="showConfirmAddDialog"
+        @cancel="closeAndReset"
+        @confirm="closeAndReset"
+        title="Add an Additional User"
+      >
+        <div class="my-8" style="color: black">
+          <p class="mb-4">Are you sure you want to add this user {{ newAddedUserEmail }} to your instance?<br /></p>
+          <v-btn block @click="confirmaddUser" color="primary" target="_blank"> Confirm</v-btn>
         </div>
       </app-dialog>
 
@@ -212,6 +258,166 @@
         <h2>FarmOS Integrations</h2>
         <v-btn disabled color="primary">Connect from Farmier</v-btn>
       </div>
+
+      <v-simple-table class="mt-8">
+        <template v-slot>
+          <thead>
+            <tr>
+              <th class="text-left">FarmOS Farm URL</th>
+              <th class="text-left">Groups with access</th>
+              <th class="text-left">Other users with access</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(instance, idx) in instances" :key="`grp-${idx}`">
+              <td>
+                <div class="pt-3" style="white-space: nowrap">{{ `${instance.instanceName}` }}</div>
+                <div class="pb-3">
+                  <span v-if="instance.isOwner">
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          v-on="on"
+                          text
+                          x-small
+                          class="px-1 mx-1"
+                          style="min-width: 0px"
+                          color="blue"
+                          @click="accessInstance(instance.instanceName)"
+                        >
+                          access
+                        </v-btn>
+                      </template>
+                      <span>Access FarmOS instance</span>
+                    </v-tooltip>
+
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          v-on="on"
+                          text
+                          x-small
+                          class="px-1 mx-1"
+                          style="min-width: 0px"
+                          color="black"
+                          @click="addUserToInstance(instance.instanceName)"
+                        >
+                          add
+                        </v-btn>
+                      </template>
+                      <span>Add an user to your instance</span>
+                    </v-tooltip>
+
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          v-on="on"
+                          text
+                          x-small
+                          class="px-1 mx-1"
+                          style="min-width: 0px"
+                          color="black"
+                          @click="moveInstance(instance.instanceName)"
+                        >
+                          re-assign
+                        </v-btn>
+                      </template>
+                      <span>Re-assign the instance's ownership</span>
+                    </v-tooltip>
+
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          v-on="on"
+                          text
+                          x-small
+                          class="px-1 mx-1"
+                          style="min-width: 0px"
+                          color="red"
+                          @click="deleteInstance(instance.instanceName)"
+                        >
+                          delete
+                        </v-btn>
+                      </template>
+                      <span>Delete this instance</span>
+                    </v-tooltip>
+                  </span>
+                  <span v-else>
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          v-on="on"
+                          text
+                          x-small
+                          class="px-1 mx-1"
+                          style="min-width: 0px"
+                          color="blue"
+                          @click="accessInstance(instance.instanceName)"
+                        >
+                          access
+                        </v-btn>
+                      </template>
+                      <span>Access FarmOS instance</span>
+                    </v-tooltip>
+
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          v-on="on"
+                          text
+                          x-small
+                          class="px-1 mx-1"
+                          style="min-width: 0px"
+                          color="red"
+                          @click="removeInstance(instance.instanceName)"
+                        >
+                          remove
+                        </v-btn>
+                      </template>
+                      <span>Remove this instance</span>
+                    </v-tooltip>
+                  </span>
+                </div>
+              </td>
+              <td>
+                <div class="py-3" v-if="instance.isOwner">
+                  <v-chip
+                    class="ma-1"
+                    small
+                    close
+                    dark
+                    color="green"
+                    v-for="(group, uidx) in instance.groups"
+                    :key="`instance-${idx}-group-${uidx}`"
+                    @click:close="removeInstanceFromGroup(instance.instanceName, group.groupId)"
+                  >
+                    {{ group.groupName }}
+                  </v-chip>
+                </div>
+                <div v-else>only owners may view this information</div>
+              </td>
+              <td>
+                <div class="py-3" v-if="instance.isOwner">
+                  <v-chip
+                    class="ma-1"
+                    small
+                    close
+                    dark
+                    color="blue"
+                    v-for="(user, uidx) in getEmailsWithoutMySelf(instance.otherUsers)"
+                    :key="`instance-${idx}-user-${uidx}`"
+                    @click:close="removeInstanceFromOtherUser(instance.instanceName, user.userId)"
+                  >
+                    {{ user.userEmail }}
+                  </v-chip>
+                </div>
+                <div v-else>only owners may view this information</div>
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+
       <div class="ma-4">
         <p>
           <b>I need to create a farm!</b> To create a new FarmOS Farm through SurveyStack, you should join or create a
@@ -226,106 +432,6 @@
           want to fully remove access from a group, go to <b>My Groups</b> and remove yourself as a member.
         </p>
       </div>
-
-      <v-simple-table>
-        <template v-slot:default>
-          <thead>
-            <tr>
-              <th class="text-left">FarmOS Farm URL</th>
-              <th class="text-left">Groups with access</th>
-              <th class="text-left">Other users with access</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(instance, idx) in instances" :key="`grp-${idx}`">
-              <td>
-                <div style="white-space: nowrap">{{ `${instance.instanceName}` }}</div>
-                <div>
-                  <span v-if="instance.isOwner">
-                    <v-btn
-                      text
-                      x-small
-                      class="px-1 mx-1"
-                      style="min-width: 0px"
-                      color="blue"
-                      @click="accessInstance(instance.instanceName)"
-                      >access</v-btn
-                    >
-                    <v-btn
-                      text
-                      x-small
-                      class="px-1 mx-1"
-                      style="min-width: 0px"
-                      color="black"
-                      @click="moveInstance(instance.instanceName)"
-                      >move</v-btn
-                    >
-                    <v-btn
-                      text
-                      x-small
-                      class="px-1 mx-1"
-                      style="min-width: 0px"
-                      color="red"
-                      @click="deleteInstance(instance.instanceName)"
-                      >delete</v-btn
-                    >
-                  </span>
-                  <span v-else>
-                    <v-btn
-                      text
-                      x-small
-                      class="px-1 mx-1"
-                      style="min-width: 0px"
-                      color="blue"
-                      @click="accessInstance(instance.instanceName)"
-                      >access</v-btn
-                    >
-                    <v-btn
-                      text
-                      x-small
-                      class="px-1 mx-1"
-                      style="min-width: 0px"
-                      color="red"
-                      @click="removeInstance(instance.instanceName)"
-                      >remove</v-btn
-                    >
-                  </span>
-                </div>
-              </td>
-              <td>
-                <div v-if="instance.isOwner">
-                  <v-chip
-                    class="ma-1"
-                    small
-                    close
-                    v-for="(group, uidx) in instance.groups"
-                    :key="`instance-${idx}-group-${uidx}`"
-                    @click:close="removeInstanceFromGroup(instance.instanceName, group.groupId)"
-                  >
-                    {{ group.groupName }}
-                  </v-chip>
-                </div>
-                <div v-else>only owners may view this information</div>
-              </td>
-              <td>
-                <div v-if="instance.isOwner">
-                  <v-chip
-                    class="ma-1"
-                    small
-                    close
-                    v-for="(user, uidx) in instance.otherUsers"
-                    :key="`instance-${idx}-user-${uidx}`"
-                    @click:close="removeInstanceFromOtherUser(instance.instanceName, user.userId)"
-                  >
-                    {{ user.userEmail }}
-                  </v-chip>
-                </div>
-                <div v-else>only owners may view this information</div>
-              </td>
-            </tr>
-          </tbody>
-        </template>
-      </v-simple-table>
     </template>
     <template v-else>
       <h1>FarmOS Profile</h1>
@@ -356,6 +462,11 @@ export default {
       showLinkDialog: false,
       adminLink: '',
       linkReady: false,
+
+      showAddDialog: false,
+      newAddedUserEmail: '',
+      userIsOwner: false,
+      showConfirmAddDialog: false,
 
       showMoveDialog: false,
       newOwnerEmail: '',
@@ -410,6 +521,9 @@ export default {
       const { data } = await api.get(`/ownership/${userId}`);
       this.instances = data;
     },
+    getEmailsWithoutMySelf(user) {
+      return user.filter((u) => u.userEmail !== this.email);
+    },
     // access button
     async accessInstance(instanceName) {
       try {
@@ -423,6 +537,51 @@ export default {
         this.errorCatched(error);
         this.closeAndReset();
       }
+    },
+    //add button
+    async addUserToInstance(instanceName) {
+      this.showAddDialog = true;
+      this.instanceUnderWork = instanceName;
+    },
+    async addUser() {
+      try {
+        const instanceName = this.instanceUnderWork;
+        const newAddedUserEmail = this.newAddedUserEmail;
+        const userIsOwner = this.userIsOwner;
+
+        await api.post(`/farmos/available-add-user-to-instance`, {
+          instanceName,
+          newAddedUserEmail,
+          userIsOwner,
+        });
+        this.showConfirmAddDialog = true;
+        this.errorDialogMessage = null;
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+          this.dialogError(error.response.data.message);
+        } else {
+          this.dialogError(error.message);
+        }
+        this.newAddedUserEmail = '';
+      }
+    },
+    async confirmaddUser() {
+      try {
+        const instanceName = this.instanceUnderWork;
+        const newAddedUserEmail = this.newAddedUserEmail;
+        const userIsOwner = this.userIsOwner;
+
+        const { data } = await api.post(`/farmos/add-user-to-instance`, {
+          instanceName,
+          newAddedUserEmail,
+          userIsOwner,
+        });
+        this.success(data);
+        this.init();
+      } catch (error) {
+        this.errorCatched(error);
+      }
+      this.closeAndReset();
     },
     // move button
     async moveInstance(instanceName) {
@@ -591,8 +750,12 @@ export default {
       (this.groupIdUnderWork = ''), (this.linkReady = false);
       this.showLinkDialog = false;
       this.adminLink = '';
+      this.showAddDialog = false;
+      this.newAddedUserEmail = '';
+      this.userIsOwner = false;
       this.showMoveDialog = false;
       this.newOwnerEmail = '';
+      this.showConfirmAddDialog = false;
       this.showConfirmMoveDialog = false;
       this.showConfirmRemoveDialog = false;
       this.showConfirmDeleteDialog = false;
