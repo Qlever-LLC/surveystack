@@ -64,6 +64,8 @@
       v-model="showApiComposeErrors"
       :items="apiComposeErrors"
       title="ApiCompose Errors"
+      :survey="survey"
+      :submission="submission"
       @close="showApiComposeErrors = false"
     />
 

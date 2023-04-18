@@ -59,7 +59,7 @@
           </div>
           <div v-if="additionalMessage" class="px-2" v-html="additionalMessage" />
 
-          <div v-if="showOptions" class="mt-6 d-flex flex-column align-stretch">
+          <div v-if="survey && submission" class="mt-6 d-flex flex-column align-stretch">
             <v-btn color="primary" depressed dense :loading="download.loading" @click="downloadSubmission">
               Download survey
             </v-btn>
@@ -81,6 +81,7 @@
 <script>
 import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
+import { downloadPdf } from '@/utils/pdf.js';
 import api from '@/services/api.service';
 
 export default {
@@ -145,8 +146,8 @@ export default {
 
       return items;
     },
-    showOptions() {
-      return this.survey && this.submission && this.items.every((item) => !item.error);
+    hasError() {
+      return this.items.some((item) => item.error);
     },
   },
   methods: {
@@ -155,9 +156,17 @@ export default {
       this.download.error = null;
 
       try {
-        const { headers, data } = await api.get(`/submissions/${this.submission._id}/pdf?base64=1`);
-        const disposition = parseDisposition(headers['content-disposition']);
-        downloadExternal(data, disposition.parameters.filename);
+        if (this.hasError) {
+          const creator = this.$store.getters['auth/user'];
+          await downloadPdf(this.survey, {
+            ...this.submission,
+            meta: { ...this.submission.meta, creator },
+          });
+        } else {
+          const { headers, data } = await api.get(`/submissions/${this.submission._id}/pdf?base64=1`);
+          const disposition = parseDisposition(headers['content-disposition']);
+          downloadExternal(data, disposition.parameters.filename);
+        }
       } catch (e) {
         console.error('Failed to download PDF of submission', e);
         this.download.error = {

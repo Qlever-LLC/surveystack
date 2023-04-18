@@ -57,6 +57,8 @@
       v-model="showApiComposeErrors"
       :items="apiComposeErrors"
       title="ApiCompose Errors"
+      :survey="survey"
+      :submission="submission"
       @close="showApiComposeErrors = false"
     />
   </div>
@@ -142,9 +144,6 @@ export default {
       this.submitting = true;
       this.submission.meta.status = this.addReadyToSubmit(this.submission.meta.status || []);
 
-      // clear submitAsUser as this transient local information
-      delete this.submission.meta.submitAsUser;
-
       let message;
       try {
         await uploadFileResources(this.$store, this.survey, payload, true);
@@ -224,6 +223,7 @@ export default {
 
     if (this.submission && this.submission.meta.submitAsUser) {
       api.removeHeader('x-delegate-to');
+      delete this.submission.meta.submitAsUser;
     }
 
     next(true);
