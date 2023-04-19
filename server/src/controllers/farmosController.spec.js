@@ -22,6 +22,7 @@ import {
   deleteInstance,
   removeInstanceFromGroup,
   removeInstanceFromOtherUser,
+  extractOwnerUsersMappedInst,
 } from './farmosController';
 import { createGroup, createReq, createRes, createUser } from '../testUtils';
 import {
@@ -1074,5 +1075,74 @@ describe('farmos-controller', () => {
       userId: user._id,
     });
     expect(coupleExists).toEqual(null);
+  });
+
+  it('extractOwnerUsersMappedInst', async () => {
+    const instanceA = 'instanceA.net';
+    const instanceB = 'instanceB.net';
+    const instanceC = 'instanceC.net';
+    const user1 = await createUser();
+    const user2 = await createUser();
+    const user3 = await createUser();
+
+    await mapFarmOSInstanceToUser(user1._id, instanceA, true, origin);
+    await mapFarmOSInstanceToUser(user1._id, instanceB, true, origin);
+    await mapFarmOSInstanceToUser(user1._id, instanceC, true, origin);
+
+    await mapFarmOSInstanceToUser(user2._id, instanceA, true, origin);
+    await mapFarmOSInstanceToUser(user2._id, instanceB, true, origin);
+
+    await mapFarmOSInstanceToUser(user3._id, instanceA, true, origin);
+
+    const instances = [instanceA, instanceB, instanceC];
+    const db = getDb();
+    const instancesObj = await db
+      .collection('farmos-instances')
+      .find({
+        instanceName: {
+          $in: instances,
+        },
+      })
+      .toArray();
+    const ownerUsers = await db
+      .collection('users')
+      .find(
+        {
+          _id: {
+            $in: instancesObj.filter((i) => i.owner).map((i) => new ObjectId(i.userId)),
+          },
+        },
+        {
+          email: 1,
+          name: 1,
+        }
+      )
+      .toArray();
+
+    const mergedData = extractOwnerUsersMappedInst(instancesObj, ownerUsers);
+
+    const resA = {
+      instanceName: instanceA,
+      owners: [
+        { email: user1.email, name: user1.name },
+        { email: user2.email, name: user2.name },
+        { email: user3.email, name: user3.name },
+      ],
+    };
+    const resB = {
+      instanceName: instanceB,
+      owners: [
+        { email: user1.email, name: user1.name },
+        { email: user2.email, name: user2.name },
+      ],
+    };
+    const resC = {
+      instanceName: instanceC,
+      owners: [{ email: user1.email, name: user1.name }],
+    };
+
+    expect(mergedData[0]).toEqual(resA);
+    expect(mergedData[1]).toEqual(resB);
+    expect(mergedData[2]).toEqual(resC);
   });
 });

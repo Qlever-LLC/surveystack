@@ -1156,6 +1156,12 @@ export const getOwnersFromInstances = async (req, res) => {
     )
     .toArray();
 
+  const mergedData = extractOwnerUsersMappedInst(instancesObj, ownerUsers);
+
+  res.send(mergedData);
+};
+
+export const extractOwnerUsersMappedInst = (instancesObj, ownerUsers) => {
   const ownerUsersMappedInst = [];
   for (const inst of instancesObj) {
     const ownersMapping = ownerUsers
@@ -1178,7 +1184,7 @@ export const getOwnersFromInstances = async (req, res) => {
     },{...}]
   */
   ownerUsersMappedInst.forEach(function (item) {
-    var existing = mergedData.filter(function (v, i) {
+    var existing = mergedData.filter(function (v) {
       return v.instanceName == item.instanceName;
     });
     if (existing.length) {
@@ -1189,7 +1195,7 @@ export const getOwnersFromInstances = async (req, res) => {
     }
   });
 
-  res.send(mergedData);
+  return mergedData;
 };
 
 const assertUserInGroup = async (userId, groupId) => {
