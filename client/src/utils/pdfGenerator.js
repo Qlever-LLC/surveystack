@@ -167,7 +167,7 @@ async function getResource(resources, source) {
   return [];
 }
 
-class PdfGenerator {
+export default class PdfGenerator {
   constructor({ survey, submission, options }) {
     this.initialize();
     this.survey = survey;
@@ -190,14 +190,13 @@ class PdfGenerator {
   }
 
   async download() {
-    const pdf = await this.pdf();
-    if (!pdf) {
-      return null;
+    const pdf = await this.generate();
+    if (pdf) {
+      pdf.download(this.filename() + '.pdf');
     }
-    pdf.download(this.filename() + '.pdf');
   }
 
-  async pdf() {
+  async generate() {
     if (!this.survey || (!this.options.printable && !this.submission)) {
       return null;
     }
@@ -1004,9 +1003,4 @@ class PdfGenerator {
     let answer = getProperty(this.submission.data, answerKey);
     return toArray(answer).length > 0;
   }
-}
-
-export async function downloadPdf(survey, submission) {
-  const generator = new PdfGenerator({ survey, submission });
-  await generator.download();
 }

@@ -81,7 +81,7 @@
 <script>
 import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
-import { downloadPdf } from '@/utils/pdf.js';
+import PdfGenerator from '@/utils/pdfGenerator';
 import api from '@/services/api.service';
 
 export default {
@@ -108,11 +108,11 @@ export default {
     },
     submission: {
       type: Object,
-      default: null,
+      default: () => null,
     },
     survey: {
       type: Object,
-      default: null,
+      default: () => null,
     },
   },
   data: () => ({
@@ -158,10 +158,11 @@ export default {
       try {
         if (this.hasError) {
           const creator = this.$store.getters['auth/user'];
-          await downloadPdf(this.survey, {
+          const generator = new PdfGenerator(this.survey, {
             ...this.submission,
             meta: { ...this.submission.meta, creator },
           });
+          await generator.download();
         } else {
           const { headers, data } = await api.get(`/submissions/${this.submission._id}/pdf?base64=1`);
           const disposition = parseDisposition(headers['content-disposition']);

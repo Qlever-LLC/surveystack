@@ -20,6 +20,7 @@ describe('ResultDialog', () => {
         ],
         additionalMessage: 'more text',
       },
+      routes: [],
     });
     getByText('title');
     getByText('banana');
@@ -39,6 +40,7 @@ describe('ResultDialog', () => {
             push: jest.fn(),
           },
         },
+        routes: [],
       });
       const button = getByText('Ok');
       await fireEvent.click(button);
