@@ -21,31 +21,6 @@
         <strong>{{ email }} </strong>.
       </p>
 
-      <!-- access Dialog -->
-      <app-dialog
-        modal
-        :maxWidth="600"
-        labelConfirm="Close"
-        :hideCancel="true"
-        v-model="showLinkDialog"
-        @cancel="closeAndReset"
-        @confirm="closeAndReset"
-        title="Access FarmOS Instance"
-      >
-        <div class="d-flex justify-center my-8">
-          <v-btn
-            :loading="!linkReady"
-            :disabled="!linkReady"
-            :href="adminLink"
-            @click="closeAndReset"
-            color="primary"
-            target="_blank"
-          >
-            {{ linkReady ? 'Access' : 'Loading' }}</v-btn
-          >
-        </div>
-      </app-dialog>
-
       <!-- add Dialog -->
       <app-dialog
         modal
@@ -282,7 +257,8 @@
                           class="px-1 mx-1"
                           style="min-width: 0px"
                           color="blue"
-                          @click="accessInstance(instance.instanceName)"
+                          :href="getInstanceLink(instance.instanceName)"
+                          target="_blank"
                         >
                           access
                         </v-btn>
@@ -351,7 +327,8 @@
                           class="px-1 mx-1"
                           style="min-width: 0px"
                           color="blue"
-                          @click="accessInstance(instance.instanceName)"
+                          :href="getInstanceLink(instance.instanceName)"
+                          target="_blank"
                         >
                           access
                         </v-btn>
@@ -447,10 +424,6 @@ export default {
       groupIdUnderWork: '',
       otherUserIdUnderWork: '',
 
-      showLinkDialog: false,
-      adminLink: '',
-      linkReady: false,
-
       showAddDialog: false,
       newAddedUserEmail: '',
       userIsOwner: false,
@@ -513,18 +486,8 @@ export default {
       return user.filter((u) => u.userEmail !== this.email);
     },
     // access button
-    async accessInstance(instanceName) {
-      try {
-        this.showLinkDialog = true;
-        const { data: link } = await api.post(`/farmos/get-farm-owner-link`, {
-          instanceName,
-        });
-        this.adminLink = link;
-        this.linkReady = true;
-      } catch (error) {
-        this.errorCatched(error);
-        this.closeAndReset();
-      }
+    getInstanceLink(instanceName) {
+      return `https://${instanceName}/`;
     },
     //add button
     async addUserToInstance(instanceName) {
@@ -735,9 +698,7 @@ export default {
 
     closeAndReset() {
       this.instanceUnderWork = '';
-      (this.groupIdUnderWork = ''), (this.linkReady = false);
-      this.showLinkDialog = false;
-      this.adminLink = '';
+      this.groupIdUnderWork = '';
       this.showAddDialog = false;
       this.newAddedUserEmail = '';
       this.userIsOwner = false;
