@@ -254,9 +254,8 @@
         </div>
       </app-dialog>
 
-      <div class="d-flex justify-space-between">
+      <div class="d-flex">
         <h2>FarmOS Integrations</h2>
-        <v-btn disabled color="primary">Connect from Farmier</v-btn>
       </div>
 
       <v-simple-table class="mt-8">
@@ -419,18 +418,7 @@
       </v-simple-table>
 
       <div class="ma-4">
-        <p>
-          <b>I need to create a farm!</b> To create a new FarmOS Farm through SurveyStack, you should join or create a
-          group. You can only create new farms inside groups (see <b>SurveyStack Pricing Tiers</b> for details).
-        </p>
-        <p>
-          <b>I already have a FarmOS Farm through Farmier!</b> You can connect it by clicking on 'Connect from Farmier'.
-          Please review <b>FarmOS Privacy</b> notes for how this affects access to your farm data.
-        </p>
-        <p>
-          <b>I want to remove access to my farm for one or more groups</b>. Review the groups with access below. If you
-          want to fully remove access from a group, go to <b>My Groups</b> and remove yourself as a member.
-        </p>
+        <p>If you have questions or need support reach out to your group admin or email info@our-sci.net.</p>
       </div>
     </template>
     <template v-else>
