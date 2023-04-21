@@ -21,31 +21,6 @@
         <strong>{{ email }} </strong>.
       </p>
 
-      <!-- access Dialog -->
-      <app-dialog
-        modal
-        :maxWidth="600"
-        labelConfirm="Close"
-        :hideCancel="true"
-        v-model="showLinkDialog"
-        @cancel="closeAndReset"
-        @confirm="closeAndReset"
-        title="Access FarmOS Instance"
-      >
-        <div class="d-flex justify-center my-8">
-          <v-btn
-            :loading="!linkReady"
-            :disabled="!linkReady"
-            :href="adminLink"
-            @click="closeAndReset"
-            color="primary"
-            target="_blank"
-          >
-            {{ linkReady ? 'Access' : 'Loading' }}</v-btn
-          >
-        </div>
-      </app-dialog>
-
       <!-- add Dialog -->
       <app-dialog
         modal
@@ -254,9 +229,8 @@
         </div>
       </app-dialog>
 
-      <div class="d-flex justify-space-between">
+      <div class="d-flex">
         <h2>FarmOS Integrations</h2>
-        <v-btn disabled color="primary">Connect from Farmier</v-btn>
       </div>
 
       <v-simple-table class="mt-8">
@@ -283,7 +257,8 @@
                           class="px-1 mx-1"
                           style="min-width: 0px"
                           color="blue"
-                          @click="accessInstance(instance.instanceName)"
+                          :href="getInstanceLink(instance.instanceName)"
+                          target="_blank"
                         >
                           access
                         </v-btn>
@@ -352,7 +327,8 @@
                           class="px-1 mx-1"
                           style="min-width: 0px"
                           color="blue"
-                          @click="accessInstance(instance.instanceName)"
+                          :href="getInstanceLink(instance.instanceName)"
+                          target="_blank"
                         >
                           access
                         </v-btn>
@@ -419,18 +395,7 @@
       </v-simple-table>
 
       <div class="ma-4">
-        <p>
-          <b>I need to create a farm!</b> To create a new FarmOS Farm through SurveyStack, you should join or create a
-          group. You can only create new farms inside groups (see <b>SurveyStack Pricing Tiers</b> for details).
-        </p>
-        <p>
-          <b>I already have a FarmOS Farm through Farmier!</b> You can connect it by clicking on 'Connect from Farmier'.
-          Please review <b>FarmOS Privacy</b> notes for how this affects access to your farm data.
-        </p>
-        <p>
-          <b>I want to remove access to my farm for one or more groups</b>. Review the groups with access below. If you
-          want to fully remove access from a group, go to <b>My Groups</b> and remove yourself as a member.
-        </p>
+        <p>If you have questions or need support reach out to your group admin or email info@our-sci.net.</p>
       </div>
     </template>
     <template v-else>
@@ -458,10 +423,6 @@ export default {
       instanceUnderWork: '',
       groupIdUnderWork: '',
       otherUserIdUnderWork: '',
-
-      showLinkDialog: false,
-      adminLink: '',
-      linkReady: false,
 
       showAddDialog: false,
       newAddedUserEmail: '',
@@ -525,18 +486,8 @@ export default {
       return user.filter((u) => u.userEmail !== this.email);
     },
     // access button
-    async accessInstance(instanceName) {
-      try {
-        this.showLinkDialog = true;
-        const { data: link } = await api.post(`/farmos/get-farm-owner-link`, {
-          instanceName,
-        });
-        this.adminLink = link;
-        this.linkReady = true;
-      } catch (error) {
-        this.errorCatched(error);
-        this.closeAndReset();
-      }
+    getInstanceLink(instanceName) {
+      return `https://${instanceName}/`;
     },
     //add button
     async addUserToInstance(instanceName) {
@@ -747,9 +698,7 @@ export default {
 
     closeAndReset() {
       this.instanceUnderWork = '';
-      (this.groupIdUnderWork = ''), (this.linkReady = false);
-      this.showLinkDialog = false;
-      this.adminLink = '';
+      this.groupIdUnderWork = '';
       this.showAddDialog = false;
       this.newAddedUserEmail = '';
       this.userIsOwner = false;
