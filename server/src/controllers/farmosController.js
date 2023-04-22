@@ -18,6 +18,7 @@ import {
   createPlan as manageCreatePlan,
   deletePlan as manageDeletePlan,
   mapFarmOSInstanceToUser,
+  sendEmailToNewlyMappedUserAndOwners,
   getGroupInformation,
   enableCoffeeshop,
   disableCoffeeshop,
@@ -1636,17 +1637,14 @@ const checkAddUserToInstance = async (instanceName, newAddedUserEmail) => {
 };
 export const addUserToInstance = async (req, res) => {
   const { instanceName, newAddedUserEmail, userIsOwner } = req.body;
+  const { origin } = req.headers;
   await checkAddUserToInstance(instanceName, newAddedUserEmail);
 
   const user = await db.collection('users').findOne({
     email: newAddedUserEmail,
   });
 
-  await db.collection('farmos-instances').insertOne({
-    instanceName: instanceName,
-    userId: new ObjectId(user._id),
-    owner: !!userIsOwner,
-  });
+  await mapFarmOSInstanceToUser(user._id, instanceName, userIsOwner, origin);
 
   return res.send('the user has been added to your instance');
 };
@@ -1691,6 +1689,12 @@ export const updateOwnership = async (req, res) => {
       { $set: { owner: true } },
       { upsert: true }
     );
+
+  const user = await db.collection('users').findOne({
+    _id: new ObjectId(userId),
+  });
+  const { origin } = req.headers;
+  await sendEmailToNewlyMappedUserAndOwners(user, instanceName, origin);
 
   return res.send('the ownership change has been successfully modified');
 };

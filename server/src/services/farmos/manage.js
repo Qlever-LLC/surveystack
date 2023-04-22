@@ -319,6 +319,17 @@ export const mapFarmOSInstanceToUser = async (userId, instanceName, isOwner, ori
     owner: isOwner,
   });
 
+  await sendEmailToNewlyMappedUserAndOwners(user, instanceName, origin);
+
+  return {
+    _id,
+    userId,
+    instanceName,
+    isOwner,
+  };
+};
+
+export const sendEmailToNewlyMappedUserAndOwners = async (user, instanceName, origin) => {
   // send email to instance owner(s)
   const instanceOwners = await getOwnersFromInstanceName(instanceName);
   if (instanceOwners) {
@@ -363,13 +374,6 @@ export const mapFarmOSInstanceToUser = async (userId, instanceName, isOwner, ori
     actionDescriptionHtml: description,
     actionDescriptionText: description,
   });
-
-  return {
-    _id,
-    userId,
-    instanceName,
-    isOwner,
-  };
 };
 
 /**

@@ -67,7 +67,7 @@ const isUserOwner = async (req, res) => {
   return res.send(response);
 };
 
-// response structure
+// getOwnership response structure
 /*
   [
     { 
@@ -78,8 +78,8 @@ const isUserOwner = async (req, res) => {
         { "groupId":"string id", "groupName": "name"},
       ], 
       otherUsers: [
-        { "userId":"string id", "userEmail": "email"},
-        { "userId":"string id", "userEmail": "email"},
+        { "userId":"string id", "userEmail": "email", owner: true},
+        { "userId":"string id", "userEmail": "email", owner: false},
       ]
     }
     { 
@@ -107,13 +107,13 @@ const getOwnership = async (req, res) => {
     });
   });
 
-  const instanceNamesWhereOwner = instances.filter((el) => el.owner).map((obj) => obj.instanceName);
+  const instancesWhereOwner = instances.filter((el) => el.owner);
 
   // groups part
   const groupsMapped = await db
     .collection('farmos-group-mapping')
     .find({
-      instanceName: { $in: instanceNamesWhereOwner },
+      instanceName: { $in: instancesWhereOwner.map((obj) => obj.instanceName) },
     })
     .toArray();
   const groupIds = groupsMapped.map((el) => el.groupId);
@@ -129,16 +129,16 @@ const getOwnership = async (req, res) => {
     )
     .toArray();
 
-  for (const inst of instanceNamesWhereOwner) {
+  for (const inst of instancesWhereOwner) {
     const groupMappings = groupsMapped
-      .filter((e) => e.instanceName === inst)
+      .filter((e) => e.instanceName === inst.instanceName)
       .map((f) => ({
         groupId: groupsAffected.find((g) => String(g._id) === String(f.groupId))._id,
         groupName: groupsAffected.find((g) => String(g._id) === String(f.groupId)).name,
       }));
 
     groupCompl.push({
-      instanceName: inst,
+      instanceName: inst.instanceName,
       groups: groupMappings,
     });
   }
@@ -147,7 +147,7 @@ const getOwnership = async (req, res) => {
   const usersMapped = await db
     .collection('farmos-instances')
     .find({
-      instanceName: { $in: instanceNamesWhereOwner },
+      instanceName: { $in: instancesWhereOwner.map((obj) => obj.instanceName) },
     })
     .toArray();
   const userIds = usersMapped.map((el) => el.userId);
@@ -163,16 +163,17 @@ const getOwnership = async (req, res) => {
     )
     .toArray();
 
-  for (const inst of instanceNamesWhereOwner) {
+  for (const inst of instancesWhereOwner) {
     const userMappings = usersMapped
-      .filter((e) => e.instanceName === inst)
+      .filter((e) => e.instanceName === inst.instanceName)
       .map((f) => ({
-        userId: usersAffected.find((g) => String(g._id) === String(f.userId))._id,
+        userId: f.userId,
         userEmail: usersAffected.find((g) => String(g._id) === String(f.userId)).email,
+        owner: f.owner,
       }));
 
     userCompl.push({
-      instanceName: inst,
+      instanceName: inst.instanceName,
       otherUsers: userMappings,
     });
   }
