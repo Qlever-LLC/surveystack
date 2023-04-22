@@ -280,7 +280,7 @@
                           add
                         </v-btn>
                       </template>
-                      <span>Add an user to your instance</span>
+                      <span>Add a user to your instance</span>
                     </v-tooltip>
 
                     <v-tooltip top>
@@ -383,7 +383,7 @@
                     v-for="(user, uidx) in getEmailsWithoutMySelf(instance.otherUsers)"
                     :key="`instance-${idx}-user-${uidx}`"
                     @click:close="removeInstanceFromOtherUser(instance.instanceName, user.userId)"
-                  >
+                    ><span v-if="user.owner" class="mdi mdi-crown pr-1"></span>
                     {{ user.userEmail }}
                   </v-chip>
                 </div>
@@ -450,8 +450,8 @@ export default {
               { "groupId":"string id", "groupName": "name"},
             ],
             otherUsers: [
-              { "userId":"string id", "userEmail": "email"},
-              { "userId":"string id", "userEmail": "email"},
+              { "userId":"string id", "userEmail": "email", owner: true},
+              { "userId":"string id", "userEmail": "email", owner: false},
             ]
           },
           {

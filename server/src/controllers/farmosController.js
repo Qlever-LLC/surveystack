@@ -1570,17 +1570,19 @@ const checkAddUserToInstance = async (instanceName, newAddedUserEmail) => {
 };
 export const addUserToInstance = async (req, res) => {
   const { instanceName, newAddedUserEmail, userIsOwner } = req.body;
+  const { origin } = req.headers;
   await checkAddUserToInstance(instanceName, newAddedUserEmail);
 
   const user = await db.collection('users').findOne({
     email: newAddedUserEmail,
   });
 
-  await db.collection('farmos-instances').insertOne({
+  /*await db.collection('farmos-instances').insertOne({
     instanceName: instanceName,
     userId: new ObjectId(user._id),
     owner: !!userIsOwner,
-  });
+  });*/
+  await mapFarmOSInstanceToUser(user._id, instanceName, userIsOwner, origin);
 
   return res.send('the user has been added to your instance');
 };
