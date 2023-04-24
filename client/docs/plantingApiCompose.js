@@ -11,7 +11,7 @@ function apiCompose(submission) {
 
   const crop = submission.data.planting_group.crop.value;
   const farmUrl = submission.data.planting_group.field.value.url;
-  const area = submission.data.planting_group.field.value.fieldId;
+  const area = submission.data.planting_group.field.value.id;
   const date = submission.data.planting_group.planting_date.value;
 
   const farmosRequest = {
