@@ -1782,7 +1782,7 @@ const checkRemoveInstanceFromGroup = async (req) => {
   if (!instanceName || typeof instanceName !== 'string') {
     throw boom.badData('instance name missing');
   }
-  if (!groupId || typeof groupId !== 'object') {
+  if (!groupId || typeof groupId !== 'string') {
     throw boom.badData('groupId missing');
   }
 
@@ -1816,7 +1816,7 @@ const checkRemoveInstanceFromOtherUser = async (req) => {
   if (!instanceName || typeof instanceName !== 'string') {
     throw boom.badData('instance name missing');
   }
-  if (!userId || typeof userId !== 'object') {
+  if (!userId || typeof userId !== 'string') {
     throw boom.badData('userId missing');
   }
 

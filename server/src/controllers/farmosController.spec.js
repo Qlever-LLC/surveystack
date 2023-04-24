@@ -988,7 +988,7 @@ describe('farmos-controller', () => {
     const req = createReq({
       body: {
         instanceName,
-        groupId: group._id,
+        groupId: String(group._id),
       },
     });
     const res = mockRes(user._id);
@@ -1012,7 +1012,7 @@ describe('farmos-controller', () => {
     const req = createReq({
       body: {
         instanceName,
-        groupId: group._id,
+        groupId: String(group._id),
       },
     });
     const res = mockRes(user._id);
@@ -1037,7 +1037,7 @@ describe('farmos-controller', () => {
     const req = createReq({
       body: {
         instanceName,
-        userId: user._id,
+        userId: String(user._id),
       },
     });
     const res = mockRes(user._id);
@@ -1060,7 +1060,7 @@ describe('farmos-controller', () => {
     const req = createReq({
       body: {
         instanceName: wrongInstanceName,
-        userId: user._id,
+        userId: String(user._id),
       },
     });
     const res = mockRes(user._id);
