@@ -255,9 +255,21 @@ export default {
   computed: {
     value: {
       get() {
-        return this.item[this.header.value].value;
+        const value = this.item[this.header.value].value;
+        if (this.header.type == 'farmos_planting' || this.header.type == 'farmos_field') {
+          if (!this.header.multiple && Array.isArray(value)) {
+            return value[0];
+          }
+        }
+
+        return value;
       },
       set(value) {
+        if (this.header.type == 'farmos_planting' || this.header.type == 'farmos_field') {
+          if (!Array.isArray(value)) {
+            value = [value];
+          }
+        }
         this.item[this.header.value].value = value;
       },
     },
@@ -269,7 +281,8 @@ export default {
       }
     },
     items() {
-      return this.getDropdownItems(this.header.value, Array.isArray(this.value) ? this.value : [this.value]);
+      const arrayValue = Array.isArray(this.value) ? this.value : this.value ? [this.value] : [];
+      return this.getDropdownItems(this.header.value, arrayValue);
     },
     getDateLabel() {
       const date = parseISO(this.value);
@@ -288,8 +301,9 @@ export default {
       this.$emit('changed');
     },
     onDateInput(value) {
+      const isValidFormat = /^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/.test(value);
       const date = parse(value, 'yyyy-MM-dd', new Date());
-      if (!isValid(date)) {
+      if (!isValidFormat || !isValid(date)) {
         return;
       }
       this.value = date.toISOString();
@@ -309,7 +323,7 @@ export default {
     onDropDownInput(value) {
       this.onInput(value);
       this.comboboxSearch = null;
-      if (this.$refs.dropdownRef) {
+      if (this.$refs.dropdownRef && !this.header.multiple) {
         this.$refs.dropdownRef.isMenuActive = false;
       }
     },
@@ -345,8 +359,6 @@ export default {
         return this.farmos.plantings.find((t) => t.value.hash === h).value;
       });
 
-      // const [farmId, assetId] = itemId.split('.');
-
       const fields = selectedItems.filter((item) => !!item.isField);
 
       // selected assets
@@ -355,15 +367,13 @@ export default {
       const assetsToSelect = fields.flatMap((field) =>
         this.farmos.plantings
           .filter((item) => !item.value.isField)
-          .filter((item) => item.value.farmId === field.farmId)
+          .filter((item) => item.value.farmName === field.farmName)
           .filter((item) => item.value.location.some((loc) => loc.id === field.location.id))
       );
 
       assetsToSelect.forEach((assetToSelect) => {
         if (
-          assets.some(
-            (asset) => asset.farmId === assetToSelect.value.farmId && asset.assetId === assetToSelect.value.assetId
-          )
+          assets.some((asset) => asset.farmName === assetToSelect.value.farmName && asset.id === assetToSelect.value.id)
         ) {
           // skip
         } else {
@@ -383,7 +393,7 @@ export default {
       const match = newVal
         ? this.items.find((item) => item.label.toLowerCase().indexOf(newVal.toLowerCase()) >= 0)
         : undefined;
-      if (!match) {
+      if (!match && this.$refs.dropdownRef) {
         this.$refs.dropdownRef.setMenuIndex(-1);
       }
     },
@@ -395,6 +405,7 @@ export default {
 >>> .v-select__selections {
   flex-wrap: nowrap;
 }
+
 >>> .v-select__selections span {
   text-overflow: ellipsis;
   overflow: hidden;
