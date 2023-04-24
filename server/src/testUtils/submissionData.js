@@ -167,7 +167,7 @@ const farmOsFieldData = (overrides = {}, index = 1) => ({
         farmName: 'Mock farm name',
         url: 'Mock url',
         name: 'Mock name',
-        fieldId: new ObjectId(),
+        id: new ObjectId(),
       },
     ],
     meta: {
@@ -182,11 +182,10 @@ const farmOsPlantingData = (overrides = {}, index = 1) => ({
   [`farmos_planting_${index}`]: {
     value: [
       {
-        farmId: new ObjectId(),
         farmName: 'Mock farm name',
         url: 'Mock url',
         name: 'Mock name',
-        assetId: new ObjectId(),
+        id: new ObjectId(),
         archived: true,
         location: [
           {

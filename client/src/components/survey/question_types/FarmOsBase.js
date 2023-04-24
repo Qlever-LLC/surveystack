@@ -1,7 +1,6 @@
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { linearControls } from '@/utils/submissions';
-import { NODE_STREAM_INPUT } from 'papaparse';
 
 const base = (type) => ({
   data() {
@@ -39,7 +38,7 @@ const base = (type) => ({
       this.loading = true;
       try {
         const response = await api.get('farmos/farms');
-        this.farms = response.data.map(({ name, instanceName }) => ({
+        this.farms = response.data.map(({ instanceName }) => ({
           label: instanceName,
           value: {
             url: instanceName,
@@ -61,7 +60,7 @@ const base = (type) => ({
             farmName: f.instanceName,
             url: f.instanceName,
             name: f.name.trim(),
-            fieldId: f.id,
+            id: f.id,
           },
         }));
       } catch (e) {
@@ -86,7 +85,7 @@ const base = (type) => ({
               farmName: '',
               url: '',
               name: node.value.name,
-              fieldId: node.value.id,
+              id: node.value.id,
             },
           });
         }
@@ -113,7 +112,7 @@ const base = (type) => ({
                       farmName: '',
                       url: '',
                       name: targetValue.name,
-                      fieldId: targetValue.id,
+                      id: targetValue.id,
                     },
                   });
                 }
@@ -154,11 +153,10 @@ const base = (type) => ({
           return {
             label: `<span class="blue-chip mr-4">${f.instanceName}</span> ${f.name} `,
             value: {
-              farmId: f.instanceName,
               farmName: f.instanceName,
               url: f.instanceName,
               name: f.name.trim(),
-              assetId: f.id,
+              id: f.id,
               archived: f.archived !== null,
               location: loc,
             },
@@ -188,11 +186,10 @@ const base = (type) => ({
           localPlantings.push({
             label: `${node.value.name}`,
             value: {
-              farmId: '',
               farmName: '',
               url: '',
               name: node.value.name,
-              assetId: node.value.id,
+              id: node.value.id,
               archived: false,
               location: [],
             },
@@ -216,11 +213,10 @@ const base = (type) => ({
                   localPlantings.push({
                     label: `${targetValue.name}`,
                     value: {
-                      farmId: '',
                       farmName: '',
                       url: '',
                       name: targetValue.name,
-                      assetId: targetValue.id,
+                      id: targetValue.id,
                       archived: false,
                       location: [],
                     },

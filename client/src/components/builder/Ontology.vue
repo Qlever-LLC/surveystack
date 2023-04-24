@@ -84,6 +84,20 @@
     class="full-width custom-ontology dropdown"
     data-test-id="combobox"
   >
+    <template v-slot:selection="data" v-if="multiple">
+      <v-chip
+        v-bind="data.attrs"
+        :input-value="data.selected"
+        close
+        @click="data.select"
+        @click:close="remove(data.item)"
+      >
+        {{ getLabelForItemValue(data.item) }}
+      </v-chip>
+    </template>
+    <template v-slot:selection="data" v-else>
+      {{ getLabelForItemValue(data.item) }}
+    </template>
     <template v-slot:no-data>
       <v-list-item>
         <v-list-item-content>
@@ -125,7 +139,7 @@ export default {
     onChange(value) {
       this.comboboxSearch = null;
       this.$emit('input', getValueOrNull(Array.isArray(value) ? value.map(getValueOrNull) : value));
-      if (this.$refs.dropdownRef) {
+      if (this.$refs.dropdownRef && !this.multiple) {
         this.$refs.dropdownRef.isMenuActive = false;
       }
     },
@@ -157,14 +171,8 @@ export default {
         uniq(this.getArrayValue).filter((v) => !isNil(v)), // get all the uniq non-empty values
         ...defaultItems.map((i) => i.value) // without the default values
       ).map((value) => ({ label: value, value }));
-      const allItems = sortBy(
-        [...defaultItems, ...customItems],
-        [
-          (a) => !customItems.includes(a.value), // move selected items first
-          'label',
-        ]
-      );
-      return allItems;
+
+      return [...defaultItems, ...customItems];
     },
     sourceIsValid() {
       return this.items && Array.isArray(this.items) && this.items.every(({ label, value }) => label && value);
@@ -196,7 +204,7 @@ export default {
       const match = newVal
         ? this.items.find((item) => item.label.toLowerCase().indexOf(newVal.toLowerCase()) >= 0)
         : undefined;
-      if (!match) {
+      if (!match && this.$refs.dropdownRef) {
         this.$refs.dropdownRef.setMenuIndex(-1);
       }
     },

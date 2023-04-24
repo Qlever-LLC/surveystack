@@ -112,8 +112,12 @@ export default {
   created() {
     // set `customSelection` value to submission question value if we allow the user to enter custom selections
     // and the current question value is set to a value that is not in entries of `control.options.source`
-    if (this.value && this.value[0] && this.control.options.allowCustomSelection && this.valueIsCustom) {
-      [this.customSelection] = this.value;
+    if (this.control.options.allowCustomSelection && this.valueIsCustom) {
+      if (Array.isArray(this.value) && this.value[0]) {
+        this.customSelection = this.value[0];
+      } else if (this.value) {
+        this.customSelection = this.value;
+      }
     }
   },
 };

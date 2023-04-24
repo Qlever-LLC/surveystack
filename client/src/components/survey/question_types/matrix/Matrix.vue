@@ -2,6 +2,7 @@
   <div>
     <app-dialog
       v-model="showConfirmDeletionDialog"
+      v-bind="dialogProps"
       v-if="rowToBeDeleted >= 0"
       @confirm="remove(rowToBeDeleted)"
       @cancel="rowToBeDeleted = -1"
@@ -14,6 +15,7 @@
 
     <v-dialog
       v-model="showEditItemDialog"
+      v-bind="dialogProps"
       v-if="showEditItemDialog"
       title="Edit"
       hideCancel
@@ -141,13 +143,13 @@ const hashItem = (listItem) => {
 
   const { value } = listItem;
   if (value.isField) {
-    if (!value.farmId) {
+    if (!value.farmName) {
       return 'NOT_ASSIGNED';
     }
-    return `FIELD:${value.farmId}.${value.location.id}`;
+    return `FIELD:${value.farmName}.${value.location.id}`;
   }
 
-  return `ASSET:${value.farmId}.${value.assetId}`;
+  return `ASSET:${value.farmName}.${value.id}`;
 };
 
 /* copied from FarmOsPlanting.vue */
@@ -169,8 +171,7 @@ const transform = (assets) => {
     }
 
     asset.value.location.forEach((location) => {
-      areas[`${asset.value.farmId}.${location.id}`] = {
-        farmId: asset.value.farmId,
+      areas[`${asset.value.farmName}.${location.id}`] = {
         farmName: asset.value.farmName,
         location,
       };
@@ -181,7 +182,7 @@ const transform = (assets) => {
     const area = areas[key];
 
     const matchedAssets = assets.filter((asset) => {
-      if (asset.value.farmId !== area.farmId) {
+      if (asset.value.farmName !== area.farmName) {
         return false;
       }
 
@@ -190,7 +191,6 @@ const transform = (assets) => {
 
     const field = {
       value: {
-        farmId: area.farmId,
         farmName: area.farmName,
         location: area.location,
         isField: true,
@@ -215,7 +215,6 @@ const transform = (assets) => {
 
   const withoutAreaSection = {
     value: {
-      farmId: null,
       farmName: null,
       location: null,
       isField: true,
@@ -225,7 +224,6 @@ const transform = (assets) => {
 
   const localAssetSection = {
     value: {
-      farmId: null,
       farmName: null,
       location: null,
       isField: true,
@@ -352,14 +350,8 @@ export default {
         uniq(usedValues).filter((v) => !isNil(v)), // get all the uniq non-empty values
         ...defaultItems.map((i) => i.value) // without the default values
       ).map((value) => ({ label: value, value }));
-      const allItems = sortBy(
-        [...defaultItems, ...customItems],
-        [
-          (a) => !values.includes(a.value), // move selected items first
-          'label',
-        ]
-      );
-      return allItems;
+
+      return [...defaultItems, ...customItems];
     },
     onInput() {
       this.$emit('changed', this.rows);

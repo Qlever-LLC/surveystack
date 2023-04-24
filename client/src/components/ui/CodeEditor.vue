@@ -20,15 +20,13 @@
         <v-dialog v-model="dialog" width="800">
           <v-card>
             <v-card-title class="headline">Object Created</v-card-title>
-            <div style="width: 100%; height: 60vh;">
+            <div style="width: 100%; height: 60vh">
               <app-code-view :value="result"> </app-code-view>
             </div>
 
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="green darken-1" text @click="dialog = false">
-                Close
-              </v-btn>
+              <v-btn color="green darken-1" text @click="dialog = false"> Close </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -202,7 +200,7 @@ export default {
 
       // this.model.setValue(newVal);
     },
-    result(newVal) {
+    result() {
       // TODO show editor for result
     },
   },

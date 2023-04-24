@@ -30,29 +30,23 @@
             </v-btn>
           </div>
           <div v-else>
-            <v-btn large class="mx-4 full" color="gray" @click="retake">
-              Retake
-            </v-btn>
+            <v-btn large class="mx-4 full" color="gray" @click="retake"> Retake </v-btn>
           </div>
         </div>
       </div>
     </div>
 
     <div id="map-error-alert" class="my-4" v-else>
-      <v-alert type="info" border="right" prominent>
-        Error loading map.
-      </v-alert>
+      <v-alert type="info" border="right" prominent> Error loading map. </v-alert>
       <app-gps :expanded="true" :location="currentLocation.location">
         {{ currentLocation.label }}
       </app-gps>
     </div>
 
-    <v-overlay class="text-center" :value="!gps && !mapError && !geolocationError" light absolute>
+    <v-overlay class="text-center" :value="!gpsLocation && !mapError && !geolocationError" light absolute>
       <v-card light>
         <v-card-text>
-          <div class="subtitle-1 text-center">
-            Getting GPS Coordinates
-          </div>
+          <div class="subtitle-1 text-center">Getting GPS Coordinates</div>
           <div class="mt-2">
             <v-progress-linear indeterminate rounded height="6" />
           </div>

@@ -44,9 +44,7 @@
     </v-card>
     <v-dialog v-model="deleteModalIsVisible" max-width="290">
       <v-card>
-        <v-card-title>
-          Remove Documentation
-        </v-card-title>
+        <v-card-title> Remove Documentation </v-card-title>
         <v-card-text class="mt-4">
           <v-checkbox
             v-model="removeFromDescendants"
@@ -54,17 +52,11 @@
             hide-details
           ></v-checkbox>
         </v-card-text>
-        <v-card-text class="mt-4">
-          Are you sure you want to remove this documentation link?
-        </v-card-text>
+        <v-card-text class="mt-4"> Are you sure you want to remove this documentation link? </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click.stop="cancelDeleteEntry">
-            Cancel
-          </v-btn>
-          <v-btn text color="red" @click.stop="handleConfirmDelete">
-            Remove
-          </v-btn>
+          <v-btn text @click.stop="cancelDeleteEntry"> Cancel </v-btn>
+          <v-btn text color="red" @click.stop="handleConfirmDelete"> Remove </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -87,12 +79,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click.stop="cancelAddEntry">
-            Cancel
-          </v-btn>
-          <v-btn text color="primary" @click.stop="addEntry">
-            Submit
-          </v-btn>
+          <v-btn text @click.stop="cancelAddEntry"> Cancel </v-btn>
+          <v-btn text color="primary" @click.stop="addEntry"> Submit </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

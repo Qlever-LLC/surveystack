@@ -13,6 +13,7 @@
         hide-details
         readonly
         outlined
+        :disabled="disabled"
       />
     </template>
 
@@ -73,7 +74,14 @@ export default {
     draggable,
   },
   props: {
-    value: { type: Array, default: () => [] },
+    value: {
+      type: Array,
+      default: () => [],
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+    },
   },
   model: {
     prop: 'value',

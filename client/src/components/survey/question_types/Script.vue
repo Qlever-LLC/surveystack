@@ -8,6 +8,7 @@
       labelConfirm="Close"
       :hideCancel="true"
       v-model="showAndroidInstallDialog"
+      v-bind="dialogProps"
       @cancel="showAndroidInstallDialog = false"
       @confirm="showAndroidInstallDialog = false"
     >
@@ -233,14 +234,6 @@ export default {
       const sourceId = this.control && this.control.options && this.control.options.source;
       const { data } = await api.get(`/scripts/${sourceId}`);
       this.source = data;
-    },
-  },
-  watch: {
-    submission: {
-      handler: function () {
-        this.initializeIframe();
-      },
-      deep: true,
     },
   },
   async mounted() {
