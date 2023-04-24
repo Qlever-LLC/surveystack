@@ -394,7 +394,7 @@
         </template>
       </v-simple-table>
 
-      <div class="ma-4 mt-8">
+      <div class="ma-4 d-flex justify-center" style="margin-top: 100px !important">
         <p><b>If you have questions or need support reach out to your group admin or email info@our-sci.net.</b></p>
       </div>
     </template>

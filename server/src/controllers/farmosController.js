@@ -1604,7 +1604,7 @@ export const getAdminLink = async (req, res) => {
 
 export const availableAddUserToInstance = async (req, res) => {
   const { instanceName, newAddedUserEmail } = req.body;
-  await checkAddUserToInstance(instanceName, newAddedUserEmail);
+  await checkAddUserToInstance(req);
   const user = await db.collection('users').findOne({
     email: newAddedUserEmail,
   });
@@ -1619,11 +1619,13 @@ export const availableAddUserToInstance = async (req, res) => {
   }
   return res.send({ status: 'ok' });
 };
-const checkAddUserToInstance = async (instanceName, newAddedUserEmail) => {
-  if (!instanceName) {
+const checkAddUserToInstance = async (req) => {
+  const { instanceName, newAddedUserEmail } = req.body;
+
+  if (!instanceName || typeof instanceName !== 'string') {
     throw boom.badData('instance name missing');
   }
-  if (!newAddedUserEmail) {
+  if (!newAddedUserEmail || typeof newAddedUserEmail !== 'string') {
     throw boom.badData('email missing');
   }
 
@@ -1638,7 +1640,7 @@ const checkAddUserToInstance = async (instanceName, newAddedUserEmail) => {
 export const addUserToInstance = async (req, res) => {
   const { instanceName, newAddedUserEmail, userIsOwner } = req.body;
   const { origin } = req.headers;
-  await checkAddUserToInstance(instanceName, newAddedUserEmail);
+  await checkAddUserToInstance(req);
 
   const user = await db.collection('users').findOne({
     email: newAddedUserEmail,
@@ -1656,10 +1658,10 @@ export const availableUpdateOwnership = async (req, res) => {
 
 const checkUpdateOwnership = async (req) => {
   const { instanceName, newOwnerEmail } = req.body;
-  if (!instanceName) {
+  if (!instanceName || typeof instanceName !== 'string') {
     throw boom.badData('instance name missing');
   }
-  if (!newOwnerEmail) {
+  if (!newOwnerEmail || typeof newOwnerEmail !== 'string') {
     throw boom.badData('email of the new owner missing');
   }
 
@@ -1707,7 +1709,7 @@ export const availableRemoveInstanceFromUser = async (req, res) => {
 const checkRemoveInstanceFromUser = async (req, res) => {
   const userId = res.locals.auth.user._id;
   const { instanceName } = req.body;
-  if (!instanceName) {
+  if (!instanceName || typeof instanceName !== 'string') {
     throw boom.badData('instance name missing');
   }
   const isMapped = await db.collection('farmos-instances').findOne({
@@ -1735,7 +1737,7 @@ export const availableDeleteInstance = async (req, res) => {
 const checkDeleteInstance = async (req, res) => {
   const userId = res.locals.auth.user._id;
   const { instanceName } = req.body;
-  if (!instanceName) {
+  if (!instanceName || typeof instanceName !== 'string') {
     throw boom.badData('instance name missing');
   }
 
@@ -1777,10 +1779,10 @@ export const availableRemoveInstanceFromGroup = async (req, res) => {
 
 const checkRemoveInstanceFromGroup = async (req) => {
   const { instanceName, groupId } = req.body;
-  if (!instanceName) {
+  if (!instanceName || typeof instanceName !== 'string') {
     throw boom.badData('instance name missing');
   }
-  if (!groupId) {
+  if (!groupId || typeof groupId !== 'object') {
     throw boom.badData('groupId missing');
   }
 
@@ -1811,10 +1813,10 @@ export const availableRemoveInstanceFromOtherUser = async (req, res) => {
 };
 const checkRemoveInstanceFromOtherUser = async (req) => {
   const { instanceName, userId } = req.body;
-  if (!instanceName) {
+  if (!instanceName || typeof instanceName !== 'string') {
     throw boom.badData('instance name missing');
   }
-  if (!userId) {
+  if (!userId || typeof userId !== 'object') {
     throw boom.badData('userId missing');
   }
 
