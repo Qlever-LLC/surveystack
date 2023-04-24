@@ -61,7 +61,9 @@ export const createControlInstance = (control) => {
     id: new ObjectId().toString(),
   });
 
-  if (control.type === 'selectSingle' || control.type === 'selectMultiple') {
+  if (control.type === 'page') {
+    cloneWithDefaultOptions.options.compact = false;
+  } else if (control.type === 'selectSingle' || control.type === 'selectMultiple') {
     cloneWithDefaultOptions.options.source = [];
   } else if (control.type === 'matrix') {
     cloneWithDefaultOptions.options.source = createDefaultMatrixSource();
@@ -96,6 +98,11 @@ export const createControlInstance = (control) => {
   } else if (control.type === 'farmOsUuid') {
     cloneWithDefaultOptions.options.farmOsTypes = ['field', 'planting'];
     cloneWithDefaultOptions.options.farmOsType = 'field';
+  }
+
+  if (control.type !== 'group' && control.type !== 'page' && control.value === undefined) {
+    control.value = null;
+    control.defaultValue = null;
   }
 
   delete cloneWithDefaultOptions.icon;
@@ -153,7 +160,6 @@ export const availableControls = [
     type: 'location',
     icon: 'mdi-map-marker-plus',
   },
-
   {
     name: 'multiple_choice',
     label: 'Multiple Choice',
