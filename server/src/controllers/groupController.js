@@ -210,8 +210,8 @@ const createGroup = async (req, res) => {
       throw boom.notFound(`No parent group found for subgroup (${entity.dir})`);
     }
 
-    const hasAdminRoleForParentGroup = await rolesService.hasAdminRole(
-      res.locals.auth.user._id,
+    const hasAdminRoleForParentGroup = await rolesService.hasAdminRoleForRequest(
+      res,
       parentGroup._id
     );
 
@@ -248,14 +248,8 @@ const updateGroup = async (req, res) => {
   const entity = req.body;
   sanitizeGroup(entity);
 
-  const { isSuperAdmin } = res.locals.auth;
   const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
-  const hasAdminRole = await rolesService.hasRole(
-    res.locals.auth.user._id,
-    new ObjectId(id),
-    'admin'
-  );
-  if (!hasAdminRole && !isSuperAdmin) {
+  if (!(await rolesService.hasAdminRoleForRequest(res, existing._id))) {
     throw boom.unauthorized(`You are not authorized: admin@${existing.path}`);
   }
 
