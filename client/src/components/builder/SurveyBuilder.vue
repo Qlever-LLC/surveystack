@@ -607,6 +607,10 @@ export default {
           if (typeof res !== 'object') {
             throw Error('Function must return an object');
           }
+        } else if (tab === 'initialize') {
+          if (res == null) {
+            throw Error('Function must return a not-null value');
+          }
         } else if (typeof res !== 'boolean') {
           throw Error('Function must return true or false');
         }
