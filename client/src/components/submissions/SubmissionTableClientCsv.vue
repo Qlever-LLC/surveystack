@@ -206,7 +206,6 @@ import papa from 'papaparse';
 import csvService from '@/services/csv.service';
 import SubmissionTableCellModal from './SubmissionTableCellModal.vue';
 import { getLabelFromKey, openResourceInTab } from '@/utils/resources';
-import parse from 'date-fns/parse';
 import parseISO from 'date-fns/parseISO';
 import isValid from 'date-fns/isValid';
 import format from 'date-fns/format';
@@ -343,7 +342,11 @@ export default {
           } else {
             const [matrix, property] = header.split(MATRIX_SEPARATOR);
             const children = this.parsed.meta.fields
-              .filter((r) => r.startsWith(matrix) && r.endsWith(property))
+              .filter((r) => {
+                const matrixMatch = r.startsWith(matrix);
+                const propertyMatch = r.endsWith(property) && /^.\d.$/g.test(r.slice(matrix.length, -property.length));
+                return matrixMatch && propertyMatch;
+              })
               .sort((a, b) => {
                 const aIndex = Number(a.substring(matrix.length + 1, a.length - property.length - 1));
                 const bIndex = Number(b.substring(matrix.length + 1, b.length - property.length - 1));
@@ -401,10 +404,7 @@ export default {
 
       // Parse date
       let parsedDate = parseISO(value);
-      if (!isValid(parsedDate)) {
-        parsedDate = parse(value, 'yyyy-MM-dd', new Date());
-      }
-      if (isValid(parsedDate)) {
+      if (isValid(parsedDate) && parsedDate.toISOString() === value) {
         return format(parsedDate, 'MMM d, yyyy h:mm a');
       }
 
