@@ -228,7 +228,7 @@ async function getSubmissionUniqueItems(surveyId, path) {
 }
 
 class PdfGenerator {
-  constructor({ survey, submission, options }) {
+  constructor(survey, submission, options) {
     this.initialize();
     this.survey = survey;
     this.submission = submission;
@@ -1000,21 +1000,21 @@ class PdfGenerator {
     // Filter hidden
     let validControls = controls.filter((control) => !this.isHiddenControl.bind(this)(control));
 
-    // Filter relevant
+    // Filter instructions
+    if (!this.survey.options.showInstruction) {
+      validControls = [...validControls].filter(
+        (control) => control.type !== 'instructions' && control.type !== 'instructionsImageSplit'
+      );
+    }
+
     if (!this.options.printable) {
+      // Filter relevant
       validControls = [...validControls].filter((control) =>
         this.isRelevantControl.bind(this)(control, path)
       );
 
-      // Filter instructions
-      if (!this.survey.options.showInstruction) {
-        validControls = [...validControls].filter(
-          (control) => control.type !== 'instructions' && control.type !== 'instructionsImageSplit'
-        );
-      }
-
       // Filter unanswered
-      if (this.survey.options.hideUnanswered) {
+      if (!this.survey.options.showUnanswered) {
         validControls = [...validControls].filter((control) =>
           this.hasAnswer.bind(this)(control, path)
         );
@@ -1088,6 +1088,10 @@ class PdfGenerator {
   }
 
   hasAnswer(control, path = []) {
+    if (control.type === 'instructions' || control.type === 'instructionsImageSplit') {
+      return true;
+    }
+
     const answerKey = [...path, control.name, 'value'];
     if (control.type === 'location') {
       answerKey.push('geometry', 'coordinates');
@@ -1098,12 +1102,12 @@ class PdfGenerator {
 }
 
 function getPdfBase64(survey, submission, options, callback) {
-  const generator = new PdfGenerator({ survey, submission, options });
+  const generator = new PdfGenerator(survey, submission, options);
   generator.generateBase64(callback);
 }
 
 function getPdfName(survey, submission) {
-  const generator = new PdfGenerator({ survey, submission });
+  const generator = new PdfGenerator(survey, submission);
   return generator.filename() + '.pdf';
 }
 

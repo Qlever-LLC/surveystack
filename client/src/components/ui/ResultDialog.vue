@@ -92,7 +92,7 @@ export default {
     items: {
       type: Array,
       default: () => [],
-      validator: (item) => item.every(({ title, body }) => !!title && !!body),
+      // validator: (item) => item.every(({ title, body }) => !!title && !!body),
     },
     title: String,
     persistent: {

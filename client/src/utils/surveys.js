@@ -1051,8 +1051,8 @@ export function createSurvey({ creator = null, group = null, specVersion = SPEC_
     },
     resources: [],
     options: {
-      showInstruction: false,
-      hideUnanswered: false,
+      showInstruction: true,
+      showUnanswered: false,
     },
     revisions: [
       {

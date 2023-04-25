@@ -1,19 +1,25 @@
 <template>
-  <v-dialog :value="value" @input="$emit('input', $event)" width="500" max-width="75%">
+  <v-dialog :value="value" @input="$emit('input', $event)" width="350" max-width="75%">
     <v-card>
       <v-card-title> Print settings </v-card-title>
+
       <v-card-text>
-        <v-checkbox
-          v-model="survey.options.showInstruction"
-          label="Show Instruction questions in PDF submissions."
-          hide-details
-        />
-        <v-checkbox
-          v-model="survey.options.hideUnanswered"
-          label="Don't show unanswered questions in PDF submissions."
-          hide-details
-        />
+        <div class="d-flex">
+          <checkbox
+            v-model="survey.options.showInstruction"
+            label="Show Instructions"
+            helper-text="Make instructions questions visible on PDFs of completed submissions."
+          />
+        </div>
+        <div class="d-flex">
+          <checkbox
+            v-model="survey.options.showUnanswered"
+            label="Show Unanswered"
+            helper-text='Make unanswered questions visible on PDFs of completed submissions. Unanswered questions will show "No answer" in the PDF.'
+          />
+        </div>
       </v-card-text>
+
       <v-card-actions class="mr-3">
         <v-spacer />
         <v-btn @click="$emit('input', false)" color="primary" text> Close </v-btn>
@@ -23,8 +29,11 @@
 </template>
 
 <script>
+import Checkbox from '@/components/ui/Checkbox.vue';
+
 export default {
   name: 'print-settings-dialog',
+  components: { Checkbox },
   props: {
     value: {
       type: Boolean,
@@ -34,6 +43,21 @@ export default {
       type: Object,
       required: true,
     },
+  },
+  created() {
+    if (typeof this.survey.options === 'undefined') {
+      this.$set(this.survey, 'options', {
+        showInstruction: true,
+        showUnanswered: false,
+      });
+    } else {
+      if (typeof this.survey.options.showInstruction === 'undefined') {
+        this.$set(this.survey.options, 'showInstruction', true);
+      }
+      if (typeof this.survey.options.showUnanswered === 'undefined') {
+        this.$set(this.survey.options, 'showUnanswered', false);
+      }
+    }
   },
 };
 </script>

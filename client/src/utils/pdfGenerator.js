@@ -2,6 +2,7 @@
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import htmlToPdfMake from 'html-to-pdfmake';
+import MarkdownIt from 'markdown-it';
 import isValid from 'date-fns/isValid';
 import parseISO from 'date-fns/parseISO';
 import dateFnsFormat from 'date-fns/format';
@@ -12,6 +13,7 @@ import { getPublicDownloadUrl } from './resources';
 import { getGroupNameById } from './groups';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
+const md = new MarkdownIt();
 
 const fontSizes = {
   xxl: 24,
@@ -168,7 +170,7 @@ async function getResource(resources, source) {
 }
 
 export default class PdfGenerator {
-  constructor({ survey, submission, options }) {
+  constructor(survey, submission, options) {
     this.initialize();
     this.survey = survey;
     this.submission = submission;
@@ -211,7 +213,6 @@ export default class PdfGenerator {
 
     if (revision && Array.isArray(revision.controls)) {
       const validControls = this.getValidControls(revision.controls);
-
       for (let index = 0; index < validControls.length; index += 1) {
         const control = validControls[index];
         await this.generateControl({
@@ -430,12 +431,14 @@ export default class PdfGenerator {
     }
     let answer = getProperty(this.submission.data, answerKey);
     if (type === 'date') {
-      answer = formatDate(answer, 'MMM D, YYYY');
+      answer = formatDate(answer, 'MMM d, yyyy');
     }
 
     // Instructions
     if (type === 'instructions') {
       def = this.getInstructionDef(control);
+    } else if (type === 'instructionsImageSplit') {
+      def = await this.getInstructionImageSplitDef(control);
     }
     // Selections
     else if (type === 'selectSingle' || type === 'selectMultiple' || type === 'ontology') {
@@ -520,6 +523,47 @@ export default class PdfGenerator {
 
   getInstructionDef(control) {
     return control.options.source ? htmlToPdfMake(control.options.source, { window }) : [];
+  }
+
+  async getInstructionImageSplitDef(control) {
+    const stack = [];
+
+    const images = Array.isArray(control.options.source.images) ? control.options.source.images : [];
+    for (let i = 0; i < images.length; i++) {
+      console.log(111111, images[i]);
+      const resource = this.survey.resources.find(({ id }) => id === images[i]);
+      if (!resource || typeof resource.content !== 'string' || !resource.content) {
+        continue;
+      }
+
+      const url = resource.content;
+      console.log(22222, url);
+      try {
+        const { data } = await axios.get(url, {
+          responseType: 'arraybuffer',
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+          },
+        });
+        const buffer = Buffer.from(data, 'binary').toString('base64');
+        const ext = (url.split('.').pop() || 'png').toLowerCase().trim();
+
+        stack.push({
+          image: `data:image/${ext};base64,` + buffer,
+          fit: [590, 480],
+          margin: [0, 8, 0, 8],
+        });
+      } catch (e) {
+        console.error('Fetching remote file failed', url, e);
+      }
+    }
+
+    if (control.options.source.body) {
+      const html = md.render(control.options.source.body);
+      stack.push(htmlToPdfMake(html));
+    }
+
+    return { stack };
   }
 
   getSelectItemDef(option, multiple, checked) {
@@ -664,6 +708,7 @@ export default class PdfGenerator {
 
     return [emptyCell, ...emptyCells].slice(0, -1);
   }
+
   async getMatrixTableDef(answer, options) {
     const cols = getProperty(options, 'source.content');
     if (!Array.isArray(cols)) {
@@ -687,7 +732,7 @@ export default class PdfGenerator {
           const text = transformValueToLabel(dropdownVal, resource);
           colValue = text.join(', ');
         } else if (col.type === 'date') {
-          colValue = formatDate(colValue, 'MMM D, YYYY');
+          colValue = formatDate(colValue, 'MMM d, yyyy');
         } else if (colValue && typeof colValue === 'object') {
           colValue = JSON.stringify(colValue).trim();
         }
@@ -765,7 +810,7 @@ export default class PdfGenerator {
           const text = transformValueToLabel(dropdownVal, resource);
           colValue = text.join(', ');
         } else if (col.type === 'date') {
-          colValue = formatDate(colValue, 'MMM D, YYYY');
+          colValue = formatDate(colValue, 'MMM d, yyyy');
         } else if (typeof colValue === 'object') {
           colValue = this.getObjectDef(colValue);
         }
@@ -912,19 +957,19 @@ export default class PdfGenerator {
     // Filter hidden
     let validControls = controls.filter((control) => !this.isHiddenControl.bind(this)(control));
 
-    // Filter relevant
+    // Filter instructions
+    if (!this.survey.options.showInstruction) {
+      validControls = [...validControls].filter(
+        (control) => control.type !== 'instructions' && control.type !== 'instructionsImageSplit'
+      );
+    }
+
     if (!this.options.printable) {
+      // Filter relevant
       validControls = [...validControls].filter((control) => this.isRelevantControl.bind(this)(control, path));
 
-      // Filter instructions
-      if (!this.survey.options.showInstruction) {
-        validControls = [...validControls].filter(
-          (control) => control.type !== 'instructions' && control.type !== 'instructionsImageSplit'
-        );
-      }
-
       // Filter unanswered
-      if (this.survey.options.hideUnanswered) {
+      if (!this.survey.options.showUnanswered) {
         validControls = [...validControls].filter((control) => this.hasAnswer.bind(this)(control, path));
       }
     }
@@ -996,6 +1041,10 @@ export default class PdfGenerator {
   }
 
   hasAnswer(control, path = []) {
+    if (control.type === 'instructions' || control.type === 'instructionsImageSplit') {
+      return true;
+    }
+
     const answerKey = [...path, control.name, 'value'];
     if (control.type === 'location') {
       answerKey.push('geometry', 'coordinates');

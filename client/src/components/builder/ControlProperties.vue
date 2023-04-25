@@ -371,12 +371,29 @@
 
           <v-select
             v-if="(isSelect || isOntology) && control.options.layout.showAll"
-            label="Columns"
+            label="Answer layout"
             v-model="control.options.layout.columns"
             :items="[1, 2, 3, 4, 5]"
             color="focus"
             hide-details
           >
+            <template v-slot:selection="{ item, index }">
+              {{ item === 1 ? '1 column' : `${item} columns` }}
+            </template>
+
+            <template v-slot:item="{ item, on, attrs }">
+              <div class="d-flex align-center">
+                <div class="col-label">
+                  {{ item === 1 ? '1 column' : `${item} columns` }}
+                </div>
+                <div class="ml-2" :class="`col-item cols-${item}`" v-on="on" v-bind="attrs">
+                  <div v-for="letter in 'ABCDE'.split('')" :key="letter">
+                    {{ letter }}
+                  </div>
+                </div>
+              </div>
+            </template>
+
             <template #append-outer>
               <v-tooltip max-width="400" transition="slide-x-transition" right>
                 <template v-slot:activator="{ on, attrs }">
@@ -404,7 +421,7 @@ import InstructionsEditor from '@/components/builder/TipTapEditor.vue';
 import InstructionsImageSplitEditor from '@/components/builder/InstructionsImageSplitEditor.vue';
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
-import Checkbox from '@/components/builder/Checkbox.vue';
+import Checkbox from '@/components/ui/Checkbox.vue';
 import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { convertToKey } from '@/utils/builder';
@@ -705,5 +722,49 @@ export default {
 
 .property-panel .v-input--selection-controls {
   padding-top: 0;
+}
+</style>
+
+<style>
+.v-list-item > div {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.v-list-item .col-label {
+  width: 80px;
+}
+
+.v-list-item .col-item {
+  flex-grow: 1;
+  padding: 8px;
+  display: grid;
+  gap: 8px;
+}
+
+.v-list-item .col-item > * {
+  border: 2px solid #bdbdbd;
+  text-align: center;
+  padding: 2px;
+}
+
+.v-list-item .col-item.cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.v-list-item .col-item.cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.v-list-item .col-item.cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.v-list-item .col-item.cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.v-list-item .col-item.cols-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 </style>
