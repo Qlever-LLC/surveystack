@@ -378,7 +378,7 @@
             </template>
 
             <template v-slot:item="{ item, on, attrs }">
-              <div class="d-flex align-center">
+              <div class="d-flex align-center col">
                 <div class="col-label">
                   {{ item === 1 ? '1 column' : `${item} columns` }}
                 </div>
@@ -714,7 +714,7 @@ export default {
 </style>
 
 <style>
-.v-list-item > div {
+.v-list-item > div.col {
   width: 100%;
   white-space: nowrap;
 }
