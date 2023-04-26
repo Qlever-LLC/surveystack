@@ -1,6 +1,7 @@
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import htmlToPdfMake from 'html-to-pdfmake';
+import MarkdownIt from 'markdown-it';
 import dayjs from 'dayjs';
 import axios from 'axios';
 import getProperty from 'lodash/get';
@@ -13,6 +14,7 @@ import { getPublicDownloadUrl } from './bucket.service';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const { window } = new JSDOM('');
+const markdown = new MarkdownIt();
 
 const fontSizes = {
   xxl: 24,
@@ -232,6 +234,12 @@ class PdfGenerator {
     this.initialize();
     this.survey = survey;
     this.submission = submission;
+    if (!this.survey.options) {
+      this.survey.options = {
+        showInstruction: true,
+        showUnanswered: false,
+      };
+    }
     this.options = {
       printable: false,
       ...options,
@@ -250,7 +258,7 @@ class PdfGenerator {
   }
 
   async generateBlob(callback) {
-    const pdf = await this.pdf();
+    const pdf = await this.generate();
     if (!pdf) {
       return null;
     }
@@ -258,14 +266,14 @@ class PdfGenerator {
   }
 
   async generateBase64(callback) {
-    const pdf = await this.pdf();
+    const pdf = await this.generate();
     if (!pdf) {
       return null;
     }
     pdf.getBase64(callback);
   }
 
-  async pdf() {
+  async generate() {
     if (!this.survey || (!this.options.printable && !this.submission)) {
       return null;
     }
@@ -300,11 +308,8 @@ class PdfGenerator {
       return `${this.survey.name} - SurveyStack`;
     }
 
-    const { dateSubmitted, dateModified, dateCreated } = this.submission.meta;
-    const date = (dateSubmitted || dateModified || dateCreated || new Date()).toISOString();
-
     return `${this.survey.name}-${this.submission._id.toString().slice(-6)}-${formatDate(
-      date,
+      this.getSubmissionDate(),
       'YYYY-MM-DD-HH-mm-ss'
     )}`;
   }
@@ -326,14 +331,9 @@ class PdfGenerator {
     const metaBody = [];
 
     if (this.submission) {
-      const { dateSubmitted, dateModified, dateCreated } = this.submission.meta;
-      const metaDate = formatDate(
-        (dateSubmitted || dateModified || dateCreated || new Date()).toISOString()
-      );
-
       metaBody.push(
         ['Submitted to', `${this.submission.meta.group.name} (${this.submission.meta.group.path})`],
-        ['Submitted on', metaDate],
+        ['Submitted on', this.getSubmissionDate()],
         [
           'Submitted by',
           {
@@ -519,6 +519,8 @@ class PdfGenerator {
     // Instructions
     if (type === 'instructions') {
       def = this.getInstructionDef(control);
+    } else if (type === 'instructionsImageSplit') {
+      def = await this.getInstructionImageSplitDef(control);
     }
     // Selections
     else if (type === 'selectSingle' || type === 'selectMultiple' || type === 'ontology') {
@@ -606,6 +608,42 @@ class PdfGenerator {
 
   getInstructionDef(control) {
     return control.options.source ? htmlToPdfMake(control.options.source, { window }) : [];
+  }
+
+  async getInstructionImageSplitDef(control) {
+    const stack = [];
+
+    const images = Array.isArray(control.options.source.images)
+      ? control.options.source.images
+      : [];
+    for (let i = 0; i < images.length; i++) {
+      const resource = this.survey.resources.find(({ id }) => id === images[i]);
+      if (!resource || typeof resource.content !== 'string' || !resource.content) {
+        continue;
+      }
+
+      const url = resource.content;
+      try {
+        const { data } = await axios.get(url, { responseType: 'arraybuffer' });
+        const buffer = Buffer.from(data, 'binary').toString('base64');
+        const ext = (url.split('.').pop() || 'png').toLowerCase().trim();
+
+        stack.push({
+          image: `data:image/${ext};base64,` + buffer,
+          fit: [480, 300],
+          margin: [0, 8, 0, 8],
+        });
+      } catch (e) {
+        console.error('Fetching remote file failed', url, e);
+      }
+    }
+
+    if (control.options.source.body) {
+      const html = markdown.render(control.options.source.body);
+      stack.push(htmlToPdfMake(html, { window }));
+    }
+
+    return { stack };
   }
 
   getSelectItemDef(option, multiple, checked) {
@@ -1063,6 +1101,18 @@ class PdfGenerator {
       preview,
       table,
     };
+  }
+
+  getSubmissionDate() {
+    const { dateSubmitted, dateModified, dateCreated } = this.submission.meta;
+    let date = dateSubmitted || dateModified || dateCreated;
+    if (date instanceof Date) {
+      date = date.toISOString();
+    } else if (!date) {
+      date = new Date().toISOString();
+    }
+
+    return date;
   }
 
   isFirstControl() {

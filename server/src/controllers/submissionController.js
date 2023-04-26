@@ -1207,7 +1207,12 @@ const getSubmissionPdf = async (req, res) => {
         },
       },
       { $unwind: '$group' },
-      { $set: { 'meta.group.name': '$group.name', 'meta.creator': '$user' } },
+      {
+        $set: {
+          'meta.group.name': '$group.name',
+          'meta.creator': '$user',
+        },
+      },
       { $project: { user: 0, group: 0 } },
     ])
     .toArray();
@@ -1221,6 +1226,46 @@ const getSubmissionPdf = async (req, res) => {
     throw boom.notFound(`No survey found with id: ${submission.meta.survey.id}`);
   }
 
+  const fileName = pdfService.getPdfName(survey, submission);
+
+  pdfService.getPdfBase64(survey, submission, null, (data) => {
+    res.attachment(fileName);
+    if (queryParam(req.query.base64)) {
+      res.send('data:application/pdf;base64,' + data);
+    } else {
+      res.send(Buffer.from(data, 'base64'));
+    }
+  });
+};
+
+const postSubmissionPdf = async (req, res) => {
+  const { survey, submission } = req.body;
+  if (!survey) {
+    throw boom.notFound('No survey found in the request body');
+  }
+  if (!submission) {
+    throw boom.notFound('No submission found in the request body');
+  }
+
+  // Fetch group name
+  const group = await db
+    .collection('groups')
+    .findOne({ _id: new ObjectId(submission.meta.group.id) });
+
+  if (!group) {
+    throw boom.notFound(`No group found with id: ${submission.meta.group.id}`);
+  }
+
+  submission.meta.group.name = group.name;
+
+  // Fetch submitter by considering proxy
+  const creator = await db
+    .collection('users')
+    .findOne({ _id: new ObjectId(submission.meta.creator) });
+
+  submission.meta.creator = creator;
+
+  // Generate PDF
   const fileName = pdfService.getPdfName(survey, submission);
 
   pdfService.getPdfBase64(survey, submission, null, (data) => {
@@ -1259,5 +1304,6 @@ export default {
   deleteSubmissions,
   prepareSubmissionsToQSLs,
   getSubmissionPdf,
+  postSubmissionPdf,
   sendPdfLink,
 };

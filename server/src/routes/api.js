@@ -17,7 +17,7 @@ import resourceController from '../controllers/resourceController';
 
 import groupIntegrationController from '../controllers/groupIntegrationController';
 import membershipIntegrationController from '../controllers/membershipIntegrationController';
-import { isToggleOn, unleashProxyApp } from '../services/featureToggle.service';
+import { unleashProxyApp } from '../services/featureToggle.service';
 
 import cfsController from '../controllers/cfsController';
 
@@ -129,6 +129,7 @@ router.get(
   [assertEntityExists({ collection: 'submissions' })],
   catchErrors(submissionController.getSubmissionPdf)
 );
+router.post('/submissions/pdf', catchErrors(submissionController.postSubmissionPdf));
 router.post(
   '/submissions',
   [assertSubmissionRights],

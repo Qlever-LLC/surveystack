@@ -81,7 +81,6 @@
 <script>
 import { parse as parseDisposition } from 'content-disposition';
 import downloadExternal from '@/utils/downloadExternal';
-import PdfGenerator from '@/utils/pdfGenerator';
 import api from '@/services/api.service';
 
 export default {
@@ -156,17 +155,22 @@ export default {
       this.download.error = null;
 
       try {
+        let res = null;
         if (this.hasError) {
-          const creator = this.$store.getters['auth/user'];
-          const generator = new PdfGenerator(this.survey, {
-            ...this.submission,
-            meta: { ...this.submission.meta, creator },
+          if (this.submission.meta.submitAsUser) {
+            this.submission.meta.creator = this.submission.meta.submitAsUser._id;
+          }
+          res = await api.post(`/submissions/pdf?base64=1`, {
+            survey: this.survey,
+            submission: this.submission,
           });
-          await generator.download();
         } else {
-          const { headers, data } = await api.get(`/submissions/${this.submission._id}/pdf?base64=1`);
-          const disposition = parseDisposition(headers['content-disposition']);
-          downloadExternal(data, disposition.parameters.filename);
+          res = await api.get(`/submissions/${this.submission._id}/pdf?base64=1`);
+        }
+
+        if (res) {
+          const disposition = parseDisposition(res.headers['content-disposition']);
+          downloadExternal(res.data, disposition.parameters.filename);
         }
       } catch (e) {
         console.error('Failed to download PDF of submission', e);
