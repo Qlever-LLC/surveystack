@@ -1128,8 +1128,7 @@ class PdfGenerator {
   }
 
   isHiddenControl(control) {
-    const layout = this.getControlLayout(control);
-    return getProperty(control, 'options.hidden', false) || layout.hidden;
+    return getProperty(control, 'options.hidden', false);
   }
 
   isRelevantControl(control, path = []) {

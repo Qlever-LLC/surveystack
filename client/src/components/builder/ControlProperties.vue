@@ -341,10 +341,6 @@
             <v-icon @click.stop="showLayout = false">mdi-close</v-icon>
           </div>
 
-          <div v-if="isInstructions || isInstructionsImageSplit">
-            <checkbox label="Hidden" v-model="control.options.layout.hidden" />
-          </div>
-
           <div v-if="isMatrix">
             <checkbox
               label="Table format"
@@ -562,14 +558,7 @@ export default {
       );
     },
     hasLayoutOptions() {
-      return (
-        this.isInstructions ||
-        this.isInstructionsImageSplit ||
-        this.isSelect ||
-        this.isOntology ||
-        this.isFile ||
-        this.isMatrix
-      );
+      return this.isSelect || this.isOntology || this.isFile || this.isMatrix;
     },
   },
   methods: {
@@ -657,7 +646,6 @@ export default {
 
       if (typeof this.control.options.layout === 'undefined') {
         this.$set(this.control.options, 'layout', {
-          hidden: false,
           showAll: false,
           columns: 1,
           preview: false,
