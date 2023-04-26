@@ -719,40 +719,40 @@ export default {
   white-space: nowrap;
 }
 
-.v-list-item .col-label {
+.v-list-item > div.col > .col-label {
   width: 80px;
 }
 
-.v-list-item .col-item {
+.v-list-item > div.col > .col-item {
   flex-grow: 1;
   padding: 8px;
   display: grid;
   gap: 8px;
 }
 
-.v-list-item .col-item > * {
+.v-list-item > div.col > .col-item > * {
   border: 2px solid #bdbdbd;
   text-align: center;
   padding: 2px;
 }
 
-.v-list-item .col-item.cols-1 {
+.v-list-item > div.col > .col-item.cols-1 {
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 
-.v-list-item .col-item.cols-2 {
+.v-list-item > div.col > .col-item.cols-2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.v-list-item .col-item.cols-3 {
+.v-list-item > div.col > .col-item.cols-3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.v-list-item .col-item.cols-4 {
+.v-list-item > div.col > .col-item.cols-4 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-.v-list-item .col-item.cols-5 {
+.v-list-item > div.col > .col-item.cols-5 {
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 </style>
