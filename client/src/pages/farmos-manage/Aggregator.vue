@@ -22,6 +22,11 @@
       :items="mappings.aggregatorFarms"
     ></v-autocomplete>
 
+    <div class="d-flex flex-row mb-5" v-if="!!selectedInstance">
+      <v-text-field v-model.trim="updatedNote" label="Note" hide-details></v-text-field>
+      <v-btn color="primary" @click="addSuperAdminNote">update note</v-btn>
+    </div>
+
     <div class="d-flex flex-column mt-2" v-if="!!selectedInstance">
       <v-label>Tags for instance on FarmOS Aggregator</v-label>
       <div class="d-flex mt-4">
@@ -192,6 +197,7 @@
               <th class="text-left">Instance Name</th>
               <th class="text-left">Tags</th>
               <th class="text-left">Action</th>
+              <th class="text-left">Notes</th>
             </tr>
           </thead>
           <tbody>
@@ -207,6 +213,9 @@
               <td>
                 <v-btn x-small color="blue" class="ma-1" @click="mapGroup(farm.instanceName)" dark>Map to Group</v-btn>
               </td>
+              <td>
+                <textarea v-if="farm.note" readonly rows="3" v-model="farm.note"></textarea>
+              </td>
             </tr>
           </tbody>
         </template>
@@ -219,9 +228,11 @@
 import _ from 'lodash';
 
 export default {
+  emits: ['addSuperAdminNote'],
   props: {
     groups: Array,
     mappings: Object,
+    notes: String,
     loading: Boolean,
     users: Array,
   },
@@ -233,6 +244,7 @@ export default {
       owner: false,
       error: null,
       success: null,
+      updatedNote: null,
     };
   },
   methods: {
@@ -247,6 +259,12 @@ export default {
       this.$nextTick(() => {
         this.$vuetify.goTo(this.$refs['map-group']);
       });
+    },
+    addSuperAdminNote() {
+      const updatedNote = this.updatedNote;
+      const selectedInstance = this.selectedInstance;
+      this.$emit('addSuperAdminNote', { updatedNote, selectedInstance });
+      this.updatedNote = null;
     },
   },
   computed: {
@@ -303,9 +321,15 @@ export default {
       const mappings = [];
 
       for (const farm of farms) {
+        let note = undefined;
+        const noteOfFarm = this.notes.find((el) => el.instanceName === farm.url);
+        if (noteOfFarm) {
+          note = noteOfFarm.note;
+        }
         mappings.push({
           instanceName: farm.url,
           tags: farm.tags.split(' '),
+          note: note,
         });
       }
 

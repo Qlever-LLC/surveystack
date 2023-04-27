@@ -11,6 +11,7 @@ import { isFarmosUrlAvailable, createInstance } from '../services/farmos.service
 import {
   listFarmOSInstancesForUser,
   getSuperAllFarmosMappings,
+  getSuperAllFarmosNotes,
   addFarmToSurveystackGroupAndSendNotification,
   removeFarmFromSurveystackGroupAndSendNotification,
   removeFarmFromUser,
@@ -365,6 +366,11 @@ export const superAdminGetAllInstances = async (req, res) => {
   return res.send(r);
 };
 
+export const superAdminGetAllNotes = async (req, res) => {
+  const r = await getSuperAllFarmosNotes();
+  return res.send(r);
+};
+
 export const superAdminMapFarmosInstance = async (req, res) => {
   const { group } = req.body;
   if (!group) {
@@ -376,7 +382,9 @@ export const superAdminMapFarmosInstance = async (req, res) => {
     throw boom.badData('instance name missing');
   }
 
-  await addFarmToSurveystackGroupAndSendNotification(instanceName, group);
+  const { origin } = req.headers;
+
+  await addFarmToSurveystackGroupAndSendNotification(instanceName, group, origin);
   return res.send({
     status: 'success',
   });
@@ -392,7 +400,9 @@ export const superAdminUnMapFarmosInstance = async (req, res) => {
     throw boom.badData('instance name missing');
   }
 
-  await removeFarmFromSurveystackGroupAndSendNotification(instanceName, group);
+  const { origin } = req.headers;
+
+  await removeFarmFromSurveystackGroupAndSendNotification(instanceName, group, origin);
   return res.send({
     status: 'success',
   });
@@ -543,7 +553,7 @@ const runPendingFarmOSOperations = async (url, plan) => {
           },
         };
         const response = await create(url, 'asset', 'land', payload);
-        db.collection('farmos.webhookrequests').insertOne({
+        await db.collection('farmos.webhookrequests').insertOne({
           url,
           plan,
           created: new Date(),
@@ -551,7 +561,7 @@ const runPendingFarmOSOperations = async (url, plan) => {
           message: `created field ${field.name} with id ${response.data.id} for ${url}`,
         });
       } catch (error) {
-        db.collection('farmos.webhookrequests').insertOne({
+        await db.collection('farmos.webhookrequests').insertOne({
           url,
           plan,
           created: new Date(),
@@ -562,7 +572,7 @@ const runPendingFarmOSOperations = async (url, plan) => {
     }
   } catch (error) {
     console.log('error', error);
-    db.collection('farmos.webhookrequests').insertOne({
+    await db.collection('farmos.webhookrequests').insertOne({
       url,
       plan,
       created: new Date(),
@@ -606,7 +616,7 @@ export const webhookCallback = async (req, res, next) => {
       throw boom.badRequest('plan is missing');
     }
 
-    db.collection('farmos.webhookrequests').insertOne({
+    await db.collection('farmos.webhookrequests').insertOne({
       url,
       plan,
       created: new Date(),
@@ -821,6 +831,8 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
     });
   }
 
+  const { origin } = req.headers;
+
   const {
     groupId: group,
     url,
@@ -865,7 +877,7 @@ export const superAdminCreateFarmOsInstance = async (req, res) => {
 
     await mapFarmOSInstanceToUser(owner, url, true);
 
-    await addFarmToSurveystackGroupAndSendNotification(url, groupId);
+    await addFarmToSurveystackGroupAndSendNotification(url, groupId, origin);
 
     await db.collection('farmos.fields').insertOne({
       url,
@@ -1031,6 +1043,8 @@ export const mapUser = async (req, res) => {
     instanceName: Joi.string().required(),
   });
 
+  const { origin } = req.headers;
+
   const userRes = await db.collection('users').findOne({ _id: new ObjectId(userId) });
   if (!userRes) {
     throw boom.notFound(`user with id: ${userId} not found`);
@@ -1079,7 +1093,7 @@ export const mapUser = async (req, res) => {
   }
 
   if (mapToGroup) {
-    await sendUserAddFarmToSurveystackGroupNotification(instanceName, groupId);
+    await sendUserAddFarmToSurveystackGroupNotification(instanceName, groupId, origin);
     await db.collection('farmos-group-mapping').insertOne({
       _id: new ObjectId(),
       groupId: new ObjectId(groupId),
@@ -1165,12 +1179,144 @@ const assertGroupsInTree = async (groupIds, tree) => {
   }
 };
 
+const getCurrentDateAsString = () => {
+  const date = new Date();
+  return date.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+  });
+};
+
+export const addNotes = async (req, res) => {
+  const { note, instanceName, parentGroupId, groupIds } = req.body;
+
+  const schema = Joi.object({
+    note: Joi.string().required(),
+    instanceName: Joi.string().required(),
+    parentGroupId: Joi.objectId().required(),
+    groupIds: Joi.array().items(Joi.objectId().required()).required(),
+  });
+
+  const validres = schema.validate(
+    {
+      ...req.body,
+    },
+    { allowUnknown: true }
+  );
+
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
+  //assert that all groupIds are under the farmos domain to which hasGroupAdminAccess checked
+  const tree = await getTreeFromGroupId(parentGroupId);
+  const descendants = tree.descendants;
+  if (
+    groupIds.every((val) => descendants.map((el) => String(el._id)).includes(String(val))) === false
+  ) {
+    throw boom.badData(`error: you don't have access`);
+  }
+
+  //check if the instance is under the group checked with hasGroupAdminAccess
+  const grps = await db
+    .collection('farmos-group-mapping')
+    .find({
+      groupId: {
+        $in: descendants.map((el) => asMongoId(el._id)),
+      },
+    })
+    .toArray();
+  if (!grps.map((el) => el.instanceName).includes(instanceName)) {
+    throw boom.badData(`error: you do not have access`);
+  }
+
+  //get groupNames from groupIds
+  const groups = await db
+    .collection('groups')
+    .find({
+      _id: {
+        $in: groupIds.map((gid) => asMongoId(gid)),
+      },
+    })
+    .toArray();
+  const groupNames = groups.map((el) => el.name).join(', ');
+
+  //template:
+  //note = `timestamp\nRemoved from ${groupNames} reason: ${note}\n\n`;
+  const timestamp = getCurrentDateAsString();
+  const newNote = `${timestamp}\nRemoved from ${groupNames} reason: ${note}\n\n`;
+
+  const instanceNote = await db.collection('farmos-instance-notes').findOne({
+    instanceName: instanceName,
+  });
+
+  const noteToStore = instanceNote ? instanceNote.note + newNote : newNote;
+
+  await db
+    .collection('farmos-instance-notes')
+    .updateOne({ instanceName: instanceName }, { $set: { note: noteToStore } }, { upsert: true });
+
+  return res.send({
+    status: 'ok',
+  });
+};
+
+export const addSuperAdminNotes = async (req, res) => {
+  const { note, instanceName } = req.body;
+
+  const schema = Joi.object({
+    //note is nullable
+    note: Joi.string(),
+    instanceName: Joi.string().required(),
+  });
+
+  const validres = schema.validate(
+    {
+      ...req.body,
+    },
+    { allowUnknown: true }
+  );
+
+  if (validres.error) {
+    const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
+    throw boom.badData(`error: ${errors.join(',')}`);
+  }
+
+  // if variable note is empty, empty the field note in the DB
+  if (note) {
+    //template:
+    //note = `timestamp\nRemoved from ${groupNames} reason: ${note}\n\n`;
+    const timestamp = getCurrentDateAsString();
+    const newNote = `${timestamp}\nRemoved by Super Admin reason: ${note}\n\n`;
+
+    const instanceNote = await db.collection('farmos-instance-notes').findOne({
+      instanceName: instanceName,
+    });
+
+    const noteToStore = instanceNote ? instanceNote.note + newNote : newNote;
+
+    await db
+      .collection('farmos-instance-notes')
+      .updateOne({ instanceName: instanceName }, { $set: { note: noteToStore } }, { upsert: true });
+  }
+
+  return res.send({
+    status: 'ok',
+  });
+};
+
 export const updateGroupsForUser = async (req, res) => {
   const { userId, instanceName, groupIds, tree } = await requireGroup(req, {
     userId: Joi.objectId().required(),
     instanceName: Joi.string().required(),
     groupIds: Joi.array().items(Joi.objectId()).required(),
   });
+
+  const { origin } = req.headers;
 
   await assertUserInSubGroup(userId, tree);
   await assertGroupsInTree(groupIds, tree);
@@ -1189,7 +1335,7 @@ export const updateGroupsForUser = async (req, res) => {
     .collection('groups')
     .find({
       _id: {
-        $in: initialInstanceGroups.map((e) => e.groupId),
+        $in: initialInstanceGroups.map((e) => asMongoId(e.groupId)),
       },
     })
     .toArray();
@@ -1226,7 +1372,7 @@ export const updateGroupsForUser = async (req, res) => {
       .collection('groups')
       .find({
         _id: {
-          $in: resultInstanceGroups.map((e) => e.groupId),
+          $in: resultInstanceGroups.map((e) => asMongoId(e.groupId)),
         },
       })
       .toArray();
@@ -1241,16 +1387,22 @@ export const updateGroupsForUser = async (req, res) => {
   // else move notification
   if (initialGroupsName.every((val) => resultGroupsName.includes(val))) {
     const differenceName = resultGroupsName.filter((x) => !initialGroupsName.includes(x));
-    const difference = resultGroups
-      .filter((e) => differenceName.includes(e.name))
-      .map((e) => e._id);
-    await sendUserAddFarmToMultipleSurveystackGroupNotification(instanceName, difference);
+    if (differenceName.length > 0) {
+      const difference = resultGroups
+        .filter((e) => differenceName.includes(e.name))
+        .map((e) => e._id);
+      await sendUserAddFarmToMultipleSurveystackGroupNotification(instanceName, difference, origin);
+    }
   } else if (resultGroupsName.every((val) => initialGroupsName.includes(val))) {
     const differenceName = initialGroupsName.filter((x) => !resultGroupsName.includes(x));
     const difference = initialGroups
       .filter((e) => differenceName.includes(e.name))
       .map((e) => e._id);
-    await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(instanceName, difference);
+    await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(
+      instanceName,
+      difference,
+      origin
+    );
   } else {
     const differenceName = initialGroupsName.filter((x) => !resultGroupsName.includes(x));
     const difference = initialGroups
@@ -1260,7 +1412,8 @@ export const updateGroupsForUser = async (req, res) => {
     await sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification(
       instanceName,
       difference,
-      resultInstanceGroupsId
+      resultInstanceGroupsId,
+      origin
     );
   }
 
@@ -1293,7 +1446,7 @@ const assertFarmInSubGroup = async (instanceName, tree) => {
   }
 };
 
-export const removeMembershipHook = async (membership) => {
+export const removeMembershipHook = async (membership, origin) => {
   const { user: userId, group: groupId } = membership;
 
   // eslint-disable-next-line no-unreachable
@@ -1363,7 +1516,8 @@ export const removeMembershipHook = async (membership) => {
     for (const connectedFarm of toDelete) {
       await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(
         connectedFarm.instanceName,
-        connectedFarm.groups.map((g) => g.groupId)
+        connectedFarm.groups.map((g) => g.groupId),
+        origin
       );
       const res = await db.collection('farmos-group-mapping').deleteMany({
         instanceName: connectedFarm.instanceName,

@@ -239,9 +239,9 @@ router.put(
 );
 router.delete(
   '/memberships/:id',
-  catchErrors(membershipController.deleteMembership, async (membership) => {
+  catchErrors(membershipController.deleteMembership, async (membership, origin) => {
     try {
-      await farmosController.removeMembershipHook(membership);
+      await farmosController.removeMembershipHook(membership, origin);
     } catch (error) {
       // log the error, but don't escalate as it is not critical
       console.log(error);
@@ -315,6 +315,24 @@ router.post(
   '/farmos/group-manage/enable',
   [assertIsSuperAdmin],
   catchErrors(farmosController.superAdminUpdateFarmOSAccess)
+);
+
+router.get(
+  '/farmos/notes/all',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.superAdminGetAllNotes)
+);
+
+router.post(
+  '/farmos/group-manage/add-notes',
+  [assertHasGroupAdminAccess],
+  catchErrors(farmosController.addNotes)
+);
+
+router.post(
+  '/farmos/group-manage/add-sa-notes',
+  [assertIsSuperAdmin],
+  catchErrors(farmosController.addSuperAdminNotes)
 );
 
 router.post(

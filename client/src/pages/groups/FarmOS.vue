@@ -75,6 +75,8 @@
       @updateGroups="updateGroups"
     />
 
+    <FarmOSRemoveNoteDialog v-model="showRemoveNoteDialog" @addNote="addNote" />
+
     <FarmOSGroupSettings
       class="ma-16"
       @addGrpCoffeeShop="enableCoffeeshop"
@@ -126,6 +128,7 @@ import FarmOSGroupSettings from './../../components/integrations/FarmOSGroupSett
 import FarmOSConnectDialog from './../../components/integrations/FarmOSConnectDialog.vue';
 import FarmOSDisconnectDialog from './../../components/integrations/FarmOSDisconnectDialog.vue';
 import FarmOSCreateDialog from './../../components/integrations/FarmOSCreateDialog.vue';
+import FarmOSRemoveNoteDialog from './../../components/integrations/FarmOSRemoveNoteDialog.vue';
 import appDialog from '@/components/ui/Dialog.vue';
 
 export default {
@@ -137,6 +140,7 @@ export default {
     FarmOSConnectDialog,
     FarmOSCreateDialog,
     FarmOSDisconnectDialog,
+    FarmOSRemoveNoteDialog,
     appDialog,
   },
   computed: {
@@ -162,6 +166,8 @@ export default {
       showConnectDialog: false,
       showCreateDialog: false,
       showDisonnectDialog: false,
+      showRemoveNoteDialog: false,
+      differenceRemovedGroupIds: [],
       selectedUser: null,
       farmInstances: [],
 
@@ -375,19 +381,53 @@ export default {
       this.showDisonnectDialog = true;
     },
     async updateGroups(args) {
-      const [instanceName, groupIds] = args;
-      const userId = this.disconnectUserId;
-      const groupId = this.groupId;
+      if (!this.loading) {
+        const [instanceName, groupIds] = args;
+        const userId = this.disconnectUserId;
+        const groupId = this.groupId;
 
-      this.loading = true;
+        this.loading = true;
+
+        try {
+          await api.post(`/farmos/group-manage/${groupId}/update-groups-for-user`, {
+            userId,
+            instanceName,
+            groupIds,
+          });
+          this.success('Succefully umapped groups');
+        } catch (error) {
+          if (error.response && error.response.data && error.response.data.message) {
+            this.error(error.response.data.message);
+          } else {
+            this.error(error.message);
+          }
+        }
+
+        this.showDisonnectDialog = false;
+
+        this.differenceRemovedGroupIds = this.selectedGroupIds.filter((x) => !groupIds.includes(x));
+        if (this.differenceRemovedGroupIds.length > 0) {
+          //only if remove happened
+          this.showRemoveNoteDialog = true;
+        } else {
+          await this.init();
+        }
+      }
+    },
+    async addNote(arg) {
+      const note = arg;
+      const instanceName = this.updateFarmInstanceName;
+      const groupIds = this.differenceRemovedGroupIds; // find associated name on server side
+      const parentGroupId = this.groupId;
 
       try {
-        await api.post(`/farmos/group-manage/${groupId}/update-groups-for-user`, {
-          userId,
+        await api.post(`/farmos/group-manage/add-notes`, {
+          note,
           instanceName,
+          parentGroupId,
           groupIds,
         });
-        this.success('Succefully umapped groups');
+        this.success('Succefully added notes');
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           this.error(error.response.data.message);
@@ -395,8 +435,7 @@ export default {
           this.error(error.message);
         }
       }
-
-      this.showDisonnectDialog = false;
+      this.showRemoveNoteDialog = false;
       await this.init();
     },
     async openFarm(item) {

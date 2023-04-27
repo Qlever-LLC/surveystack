@@ -15,6 +15,8 @@ import {
   removeMembershipHook,
   mapUser,
   getDomain,
+  addNotes,
+  addSuperAdminNotes,
 } from './farmosController';
 import { createGroup, createReq, createRes, createUser } from '../testUtils';
 import {
@@ -50,6 +52,8 @@ const init = async () => {
 process.env.FARMOS_CALLBACK_KEY = 'x';
 process.env.FARMOS_AGGREGATOR_URL = 'x';
 process.env.FARMOS_AGGREGATOR_APIKEY = 'x';
+
+const origin = 'url';
 
 function mockRes(userId) {
   return {
@@ -116,9 +120,8 @@ const createFarmOSDomain = async (gs) => {
       await mapFarmOSInstanceToUser(user.user._id, farm, true);
     }
   }
-
   for (const farm of _.uniq(farms)) {
-    await addFarmToSurveystackGroupAndSendNotification(farm, group._id);
+    await addFarmToSurveystackGroupAndSendNotification(farm, group._id, origin);
   }
 
   return res;
@@ -167,6 +170,182 @@ describe('farmos-controller', () => {
     expect(farms).toEqual(
       expect.arrayContaining(['admin-farm.farmos.dev', 'user-farm.farmos.dev'])
     );
+  });
+
+  it('add 1 note', async () => {
+    const note = 'this is a note';
+    const instanceName = 'farmos.net';
+    const parentGroup = await createGroup({ name: 'GroupA' });
+    const groupAA = await parentGroup.createSubGroup({ name: 'GroupAA' });
+    const groupAB = await parentGroup.createSubGroup({ name: 'GroupAB' });
+    const user1 = await parentGroup.createUserMember();
+    await mapFarmOSInstanceToUser(user1.user._id, instanceName, true);
+    const parentGroupId = parentGroup._id;
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, groupAA._id, origin);
+    const affectedGroupIds = [parentGroupId, groupAA._id];
+
+    const req = createReq({
+      body: {
+        note: note,
+        instanceName: instanceName,
+        parentGroupId: parentGroupId,
+        groupIds: affectedGroupIds,
+      },
+    });
+    const res = await createRes({ status: 'ok' });
+    await addNotes(req, res);
+
+    const db = getDb();
+    const instanceNote = await db.collection('farmos-instance-notes').findOne({
+      instanceName: instanceName,
+    });
+    expect(instanceNote.instanceName).toEqual(instanceName);
+    expect(instanceNote.note).toContain(note);
+    expect(instanceNote.note).toContain(parentGroup.name);
+    expect(instanceNote.note).toContain(groupAA.name);
+  });
+
+  it('add 2 notes for 1 instance', async () => {
+    const note1 = 'this is the first note';
+    const note2 = 'this is the second note';
+    const instanceName = 'farmos.net';
+    const parentGroup = await createGroup({ name: 'GroupA' });
+    const groupAA = await parentGroup.createSubGroup({ name: 'GroupAA' });
+    const groupAB = await parentGroup.createSubGroup({ name: 'GroupAB' });
+    const user1 = await parentGroup.createUserMember();
+    await mapFarmOSInstanceToUser(user1.user._id, instanceName, true);
+    const parentGroupId = parentGroup._id;
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, groupAA._id, origin);
+    const affectedGroupIds = [parentGroupId, groupAA._id];
+
+    const res = await createRes({ status: 'ok' });
+    const req1 = createReq({
+      body: {
+        note: note1,
+        instanceName: instanceName,
+        parentGroupId: parentGroupId,
+        groupIds: affectedGroupIds,
+      },
+    });
+    await addNotes(req1, res);
+
+    const req2 = createReq({
+      body: {
+        note: note2,
+        instanceName: instanceName,
+        parentGroupId: parentGroupId,
+        groupIds: affectedGroupIds,
+      },
+    });
+    await addNotes(req2, res);
+
+    const db = getDb();
+    const instanceNote = await db.collection('farmos-instance-notes').findOne({
+      instanceName: instanceName,
+    });
+    expect(instanceNote.instanceName).toEqual(instanceName);
+    expect(instanceNote.note).toContain(note1);
+    expect(instanceNote.note).toContain(note2);
+    expect(instanceNote.note).toContain(parentGroup.name);
+    expect(instanceNote.note).toContain(groupAA.name);
+  });
+
+  it('reject adding 1 note to unauthorized group', async () => {
+    const note = 'this is a note';
+    const instanceName = 'farmos.net';
+    const parentGroup = await createGroup({ name: 'GroupA' });
+    const groupAA = await parentGroup.createSubGroup({ name: 'GroupAA' });
+    const groupAB = await parentGroup.createSubGroup({ name: 'GroupAB' });
+    const extGroup = await createGroup({ name: 'GroupZ' });
+    const user1 = await parentGroup.createUserMember();
+    await mapFarmOSInstanceToUser(user1.user._id, instanceName, true);
+    const parentGroupId = parentGroup._id;
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, groupAA._id, origin);
+    const affectedGroupIds = [parentGroupId, groupAA._id, extGroup._id];
+
+    const req = createReq({
+      body: {
+        note: note,
+        instanceName: instanceName,
+        parentGroupId: parentGroupId,
+        groupIds: affectedGroupIds,
+      },
+    });
+    const res = await createRes({ status: 'ok' });
+    await expect(addNotes(req, res)).rejects.toThrow(/error: you don't have access/);
+
+    const db = getDb();
+    const instanceNote = await db.collection('farmos-instance-notes').findOne({
+      instanceName: instanceName,
+    });
+    expect(instanceNote).toBe(null);
+  });
+
+  it('add 1 note as Super Admin', async () => {
+    const note = 'this is a note';
+    const instanceName = 'farmos.net';
+    const parentGroup = await createGroup({ name: 'GroupA' });
+    // the middleware checks that only a super admin has access
+    const superAdmin = await parentGroup.createUserMember();
+    await mapFarmOSInstanceToUser(superAdmin.user._id, instanceName, true);
+    const parentGroupId = parentGroup._id;
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
+
+    const req = createReq({
+      body: {
+        note: note,
+        instanceName: instanceName,
+      },
+    });
+    const res = await createRes({ status: 'ok' });
+    await addSuperAdminNotes(req, res);
+
+    const db = getDb();
+    const instanceNote = await db.collection('farmos-instance-notes').findOne({
+      instanceName: instanceName,
+    });
+    expect(instanceNote.instanceName).toEqual(instanceName);
+    expect(instanceNote.note).toContain('Removed by Super Admin reason:');
+    expect(instanceNote.note).toContain(note);
+  });
+  it('add 2 notes for 1 instance as Super Admin', async () => {
+    const note1 = 'this is the first note';
+    const note2 = 'this is the second note';
+    const instanceName = 'farmos.net';
+    const parentGroup = await createGroup({ name: 'GroupA' });
+    const superAdmin = await parentGroup.createUserMember();
+    await mapFarmOSInstanceToUser(superAdmin.user._id, instanceName, true);
+    const parentGroupId = parentGroup._id;
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
+
+    const res = await createRes({ status: 'ok' });
+    const req1 = createReq({
+      body: {
+        note: note1,
+        instanceName: instanceName,
+      },
+    });
+    await addSuperAdminNotes(req1, res);
+
+    const req2 = createReq({
+      body: {
+        note: note2,
+        instanceName: instanceName,
+      },
+    });
+    await addSuperAdminNotes(req2, res);
+
+    const db = getDb();
+    const instanceNote = await db.collection('farmos-instance-notes').findOne({
+      instanceName: instanceName,
+    });
+    expect(instanceNote.instanceName).toEqual(instanceName);
+    expect(instanceNote.note).toContain('Removed by Super Admin reason:');
+    expect(instanceNote.note).toContain(note1);
+    expect(instanceNote.note).toContain(note2);
   });
 
   it('get-assets', async () => {
@@ -341,6 +520,7 @@ describe('farmos-controller', () => {
     await superAdminCreateFarmOsInstance(
       {
         body,
+        headers: { origin: origin },
       },
       {
         send,
@@ -372,6 +552,7 @@ describe('farmos-controller', () => {
     await superAdminCreateFarmOsInstance(
       {
         body,
+        headers: { origin: origin },
       },
       {
         send,
@@ -443,10 +624,10 @@ describe('farmos-controller', () => {
       membersBefore.flatMap((m) => m.connectedFarms.flatMap((c) => c.instanceName))
     );
     res = mockRes(admin.user._id);
-    req = { params: { id: member.membership._id } };
+    req = { params: { id: member.membership._id }, headers: { origin: origin } };
 
     await membershipController.deleteMembership(req, res, undefined, async (membership) => {
-      await removeMembershipHook(membership);
+      await removeMembershipHook(membership, origin);
     });
 
     res = mockRes(member.user._id);

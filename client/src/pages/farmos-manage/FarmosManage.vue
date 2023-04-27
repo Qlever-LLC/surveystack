@@ -24,6 +24,7 @@
           :is="item.component"
           :groups="groups"
           :mappings="mappings"
+          :notes="notes"
           :users="users"
           :loading="loading"
           :viewModel="item.viewModel || {}"
@@ -31,6 +32,7 @@
           @create-instance="createInstance"
           @create-plan="createPlan"
           @delete-plan="deletePlan"
+          @addSuperAdminNote="addSuperAdminNote"
         ></v-component>
       </v-tab-item>
     </v-tabs-items>
@@ -51,6 +53,7 @@ export default {
   data() {
     return {
       mappings: null,
+      notes: null,
       groups: null,
       users: null,
       tab: null,
@@ -120,6 +123,7 @@ export default {
   methods: {
     async reload() {
       this.loading = true;
+      const { data: notes } = await api.get('/farmos/notes/all');
       const { data: mappings } = await api.get('/farmos/all');
       const { data: groups } = await api.get('/groups?populate=0&prefix=/');
       const { data: users } = await api.get('/users');
@@ -128,6 +132,7 @@ export default {
       console.log('mappings', mappings);
 
       this.loading = false;
+      this.notes = notes;
       this.mappings = mappings;
       this.groups = groups;
       this.users = users;
@@ -393,6 +398,22 @@ export default {
 
       vm.loading = false;
       vm.count += 1;
+    },
+    async addSuperAdminNote(arg) {
+      const { updatedNote: note, selectedInstance: instanceName } = arg;
+      try {
+        await api.post(`/farmos/group-manage/add-sa-notes`, {
+          note,
+          instanceName,
+        });
+        this.success('Succefully added notes');
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+          this.error(error.response.data.message);
+        } else {
+          this.error(error.message);
+        }
+      }
     },
     success(msg) {
       this.successMessage = msg;

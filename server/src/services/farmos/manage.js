@@ -6,6 +6,7 @@ import boom from '@hapi/boom';
 import { getDescendantGroups, getAscendantGroups } from '../roles.service';
 import { addGroupToCoffeeShop, isCoffeeShopEnabled, removeGroupFromCoffeeShop } from './coffeeshop';
 import mailService from '../../services/mail/mail.service';
+import { createMagicLink } from '../auth.service';
 
 const config = () => {
   if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
@@ -349,15 +350,22 @@ export const getSuperAllFarmosMappings = async () => {
   };
 };
 
+export const getSuperAllFarmosNotes = async () => {
+  const allNotes = await db.collection('farmos-instance-notes').find().toArray();
+  return allNotes;
+};
+
 export const moveFarmFromMultGroupToMultSurveystackGroupAndSendNotification = async (
   instanceName,
   oldGroupIds,
-  newGroupIds
+  newGroupIds,
+  origin
 ) => {
   await sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification(
     instanceName,
     oldGroupIds,
-    newGroupIds
+    newGroupIds,
+    origin
   );
   for (const oldGroupId of oldGroupIds) {
     await removeFarmFromSurveystackGroup(instanceName, oldGroupId);
@@ -367,8 +375,12 @@ export const moveFarmFromMultGroupToMultSurveystackGroupAndSendNotification = as
   }
 };
 
-export const addFarmToSurveystackGroupAndSendNotification = async (instanceName, groupId) => {
-  await sendUserAddFarmToSurveystackGroupNotification(instanceName, groupId);
+export const addFarmToSurveystackGroupAndSendNotification = async (
+  instanceName,
+  groupId,
+  origin
+) => {
+  await sendUserAddFarmToSurveystackGroupNotification(instanceName, groupId, origin);
   return await addFarmToSurveystackGroup(instanceName, groupId);
 };
 
@@ -376,10 +388,11 @@ export const createFarmOSInstanceForUserAndGroup = async (
   userId,
   groupId,
   instanceName,
-  userIsOwner
+  userIsOwner,
+  origin
 ) => {
   await mapFarmOSInstanceToUser(userId, instanceName, userIsOwner);
-  return await addFarmToSurveystackGroupAndSendNotification(instanceName, groupId);
+  return await addFarmToSurveystackGroupAndSendNotification(instanceName, groupId, origin);
 };
 
 const addFarmToSurveystackGroup = async (instanceName, groupId) => {
@@ -413,8 +426,12 @@ const addFarmToSurveystackGroup = async (instanceName, groupId) => {
   return { _id };
 };
 
-export const removeFarmFromSurveystackGroupAndSendNotification = async (instanceName, groupId) => {
-  await sendUserRemoveFarmFromSurveystackGroupNotification(instanceName, groupId);
+export const removeFarmFromSurveystackGroupAndSendNotification = async (
+  instanceName,
+  groupId,
+  origin
+) => {
+  await sendUserRemoveFarmFromSurveystackGroupNotification(instanceName, groupId, origin);
   return await removeFarmFromSurveystackGroup(instanceName, groupId);
 };
 
@@ -454,7 +471,8 @@ const extractGroupNameForMailing = async (groupId) => {
 export const sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification = async (
   instanceName,
   oldGroupIds,
-  newGroupIds
+  newGroupIds,
+  origin
 ) => {
   const userEmail = await extractUserMailForMailing(instanceName);
 
@@ -470,27 +488,38 @@ export const sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification = a
   }
   const newGroupNames = newGroupNamesList.join(', ');
 
-  await mailService.send({
+  const magicLinkProfile = await createMagicLink({
+    origin,
+    email: userEmail,
+    expiresAfterDays: 7,
+    landingPath: `/auth/profile`,
+  });
+
+  const subject = 'Your instance has been moved to another group';
+  const description = `Your farmOS instance ${instanceName} has been removed from the group ${oldGroupNames} and added to the group ${newGroupNames} in SurveyStack.`;
+  await mailService.sendHandleNotification({
     to: userEmail,
-    subject: 'Your instance has been moved to another group',
-    text: `Hello,
-
-    This email is to inform you that your farmOS instance ${instanceName} has been removed from ${oldGroupNames} and added to ${newGroupNames} in SurveyStack.
-    Please reach out to your group admin or info@our-sci.net if you have any questions.  
-
-    Best Regards`,
+    subject: subject,
+    link: magicLinkProfile,
+    actionDescriptionHtml: description,
+    actionDescriptionText: description,
   });
 };
 
-export const sendUserAddFarmToSurveystackGroupNotification = async (instanceName, groupId) => {
+export const sendUserAddFarmToSurveystackGroupNotification = async (
+  instanceName,
+  groupId,
+  origin
+) => {
   const groupName = await extractGroupNameForMailing(groupId);
 
-  await sendAddNotification(instanceName, groupName);
+  await sendAddNotification(instanceName, groupName, origin);
 };
 
 export const sendUserAddFarmToMultipleSurveystackGroupNotification = async (
   instanceName,
-  groupIds
+  groupIds,
+  origin
 ) => {
   const groupsName = [];
   for (const groupId of groupIds) {
@@ -498,33 +527,44 @@ export const sendUserAddFarmToMultipleSurveystackGroupNotification = async (
   }
   const groupsNameConcat = groupsName.join(', ');
 
-  await sendAddNotification(instanceName, groupsNameConcat);
+  await sendAddNotification(instanceName, groupsNameConcat, origin);
 };
 
-const sendAddNotification = async (instanceName, groupName) => {
+const sendAddNotification = async (instanceName, groupName, origin) => {
   const userEmail = await extractUserMailForMailing(instanceName);
 
-  await mailService.send({
+  const magicLinkProfile = await createMagicLink({
+    origin,
+    email: userEmail,
+    expiresAfterDays: 7,
+    landingPath: `/auth/profile`,
+  });
+
+  const subject = 'Your instance has been added to a group';
+  const description = `Your farmOS instance ${instanceName} has been added to the group ${groupName} in SurveyStack.`;
+  await mailService.sendHandleNotification({
     to: userEmail,
-    subject: 'Your instance has been added to a group',
-    text: `Hello,
-
-    This email is to inform you that your farmOS instance ${instanceName} has been added to ${groupName} in SurveyStack.
-    Please reach out to your group admin or info@our-sci.net if you have any questions.  
-
-    Best Regards`,
+    subject: subject,
+    link: magicLinkProfile,
+    actionDescriptionHtml: description,
+    actionDescriptionText: description,
   });
 };
 
-const sendUserRemoveFarmFromSurveystackGroupNotification = async (instanceName, groupId) => {
+const sendUserRemoveFarmFromSurveystackGroupNotification = async (
+  instanceName,
+  groupId,
+  origin
+) => {
   const groupName = await extractGroupNameForMailing(groupId);
 
-  await sendRemoveNotification(instanceName, groupName);
+  await sendRemoveNotification(instanceName, groupName, origin);
 };
 
 export const sendUserRemoveFarmFromMultipleSurveystackGroupsNotification = async (
   instanceName,
-  groupIds
+  groupIds,
+  origin
 ) => {
   const groupsName = [];
   for (const groupId of groupIds) {
@@ -532,21 +572,27 @@ export const sendUserRemoveFarmFromMultipleSurveystackGroupsNotification = async
   }
   const groupsNameConcat = groupsName.join(', ');
 
-  await sendRemoveNotification(instanceName, groupsNameConcat);
+  await sendRemoveNotification(instanceName, groupsNameConcat, origin);
 };
 
-const sendRemoveNotification = async (instanceName, groupName) => {
+const sendRemoveNotification = async (instanceName, groupName, origin) => {
   const userEmail = await extractUserMailForMailing(instanceName);
 
-  await mailService.send({
+  const magicLinkProfile = await createMagicLink({
+    origin,
+    email: userEmail,
+    expiresAfterDays: 7,
+    landingPath: `/auth/profile`,
+  });
+
+  const subject = 'Your instance has been removed from a group';
+  const description = `Your farmOS instance ${instanceName} has been removed from the group ${groupName} in SurveyStack.`;
+  await mailService.sendHandleNotification({
     to: userEmail,
-    subject: 'Your instance has been removed from a group',
-    text: `Hello,
-
-    This email is to inform you that your farmOS instance ${instanceName} has been removed from the group ${groupName} in SurveyStack. 
-    Please reach out to your group admin or info@our-sci.net if you have any questions.
-
-    Best Regards`,
+    subject: subject,
+    link: magicLinkProfile,
+    actionDescriptionHtml: description,
+    actionDescriptionText: description,
   });
 };
 
