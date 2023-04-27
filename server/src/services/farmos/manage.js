@@ -5,6 +5,7 @@ import uniq from 'lodash/uniq';
 import boom from '@hapi/boom';
 import { getDescendantGroups, getAscendantGroups } from '../roles.service';
 import { addGroupToCoffeeShop, isCoffeeShopEnabled, removeGroupFromCoffeeShop } from './coffeeshop';
+import mailService from '../../services/mail/mail.service';
 
 const config = () => {
   if (!process.env.FARMOS_AGGREGATOR_URL || !process.env.FARMOS_AGGREGATOR_APIKEY) {
@@ -267,8 +268,27 @@ export const getTree = async (group) => {
  * The user receives ownership over the farmos instance
  */
 export const mapFarmOSInstanceToUser = async (userId, instanceName, owner) => {
-  const _id = new ObjectId();
+  const res = await db
+    .collection('farmos-instances')
+    .find({
+      instanceName,
+      userId: asMongoId(userId),
+    })
+    .toArray();
 
+  if (res.length > 0) {
+    throw boom.badData('mapping already exists');
+  }
+
+  const user = await db.collection('users').findOne({
+    _id: asMongoId(userId),
+  });
+
+  if (!user) {
+    throw boom.badData('user not found');
+  }
+
+  const _id = new ObjectId();
   await db.collection('farmos-instances').insertOne({
     _id,
     userId: asMongoId(userId),
@@ -291,20 +311,6 @@ export const unmapFarmOSInstance = async (id) => {
   await db.collection('farmos-instances').deleteOne({
     _id: ObjectId(id),
   });
-};
-
-/**
- * A group Admin creates a new farmos instance for a user
- * The instance is added to the groups plan
- */
-export const createFarmOSInstanceForUserAndGroup = async (
-  userId,
-  groupId,
-  instanceName,
-  userIsOwner
-) => {
-  await addFarmToSurveystackGroup(instanceName, groupId);
-  return await mapFarmOSInstanceToUser(userId, instanceName, userIsOwner);
 };
 
 /**
@@ -343,7 +349,40 @@ export const getSuperAllFarmosMappings = async () => {
   };
 };
 
-export const addFarmToSurveystackGroup = async (instanceName, groupId) => {
+export const moveFarmFromMultGroupToMultSurveystackGroupAndSendNotification = async (
+  instanceName,
+  oldGroupIds,
+  newGroupIds
+) => {
+  await sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification(
+    instanceName,
+    oldGroupIds,
+    newGroupIds
+  );
+  for (const oldGroupId of oldGroupIds) {
+    await removeFarmFromSurveystackGroup(instanceName, oldGroupId);
+  }
+  for (const newGroupId of newGroupIds) {
+    await addFarmToSurveystackGroup(instanceName, newGroupId);
+  }
+};
+
+export const addFarmToSurveystackGroupAndSendNotification = async (instanceName, groupId) => {
+  await sendUserAddFarmToSurveystackGroupNotification(instanceName, groupId);
+  return await addFarmToSurveystackGroup(instanceName, groupId);
+};
+
+export const createFarmOSInstanceForUserAndGroup = async (
+  userId,
+  groupId,
+  instanceName,
+  userIsOwner
+) => {
+  await mapFarmOSInstanceToUser(userId, instanceName, userIsOwner);
+  return await addFarmToSurveystackGroupAndSendNotification(instanceName, groupId);
+};
+
+const addFarmToSurveystackGroup = async (instanceName, groupId) => {
   const res = await db
     .collection('farmos-group-mapping')
     .find({
@@ -374,62 +413,145 @@ export const addFarmToSurveystackGroup = async (instanceName, groupId) => {
   return { _id };
 };
 
+export const removeFarmFromSurveystackGroupAndSendNotification = async (instanceName, groupId) => {
+  await sendUserRemoveFarmFromSurveystackGroupNotification(instanceName, groupId);
+  return await removeFarmFromSurveystackGroup(instanceName, groupId);
+};
+
 export const removeFarmFromSurveystackGroup = async (instanceName, groupId) => {
   await db
     .collection('farmos-group-mapping')
     .deleteMany({ instanceName, groupId: asMongoId(groupId) });
 };
 
-export const addFarmToUser = async (instanceName, userId, groupId, owner) => {
-  const res = await db
-    .collection('farmos-instances')
-    .find({
-      instanceName,
-      userId: asMongoId(userId),
-    })
-    .toArray();
-
-  if (res.length > 0) {
-    throw boom.badData('mapping already exists');
-  }
-
-  const user = await db.collection('users').findOne({
-    _id: asMongoId(userId),
+const extractUserMailForMailing = async (instanceName) => {
+  const userInstance = await db.collection('farmos-instances').findOne({
+    instanceName: instanceName,
   });
-
-  if (!user) {
-    throw boom.badData('user not found');
+  if (!userInstance || !userInstance.userId) {
+    throw boom.badData("instance doesn't exist");
   }
-
-  if (groupId) {
-    const group = await db.collection('groups').findOne({
-      _id: asMongoId(groupId),
-    });
-
-    if (!group) {
-      throw boom.badData('group not found');
-    }
+  const user = await db.collection('users').findOne({
+    _id: asMongoId(userInstance.userId),
+  });
+  if (!user || !user.email) {
+    throw boom.badData('user email not found');
   }
-
-  const _id = new ObjectId();
-  const doc = {
-    _id,
-    instanceName,
-    userId: asMongoId(userId),
-    owner: !!owner,
-  };
-
-  if (groupId) {
-    doc.groupId = asMongoId(groupId);
-  }
-  await db.collection('farmos-instances').insertOne(doc);
+  return user.email;
 };
 
-export const removeFarmFromUser = async (instanceName, userId, groupId) => {
-  const filter = { instanceName, userId: asMongoId(userId) };
-  if (groupId) {
-    filter.groupId = asMongoId(groupId);
+const extractGroupNameForMailing = async (groupId) => {
+  const group = await db.collection('groups').findOne({
+    _id: asMongoId(groupId),
+  });
+
+  if (!group || !group.name) {
+    throw boom.badData('group name not found');
   }
+  return group.name;
+};
+
+export const sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification = async (
+  instanceName,
+  oldGroupIds,
+  newGroupIds
+) => {
+  const userEmail = await extractUserMailForMailing(instanceName);
+
+  const oldGroupNamesList = [];
+  for (const groupId of oldGroupIds) {
+    oldGroupNamesList.push(await extractGroupNameForMailing(groupId));
+  }
+  const oldGroupNames = oldGroupNamesList.join(', ');
+
+  const newGroupNamesList = [];
+  for (const groupId of newGroupIds) {
+    newGroupNamesList.push(await extractGroupNameForMailing(groupId));
+  }
+  const newGroupNames = newGroupNamesList.join(', ');
+
+  await mailService.send({
+    to: userEmail,
+    subject: 'Your instance has been moved to another group',
+    text: `Hello,
+
+    This email is to inform you that your farmOS instance ${instanceName} has been removed from ${oldGroupNames} and added to ${newGroupNames} in SurveyStack.
+    Please reach out to your group admin or info@our-sci.net if you have any questions.  
+
+    Best Regards`,
+  });
+};
+
+export const sendUserAddFarmToSurveystackGroupNotification = async (instanceName, groupId) => {
+  const groupName = await extractGroupNameForMailing(groupId);
+
+  await sendAddNotification(instanceName, groupName);
+};
+
+export const sendUserAddFarmToMultipleSurveystackGroupNotification = async (
+  instanceName,
+  groupIds
+) => {
+  const groupsName = [];
+  for (const groupId of groupIds) {
+    groupsName.push(await extractGroupNameForMailing(groupId));
+  }
+  const groupsNameConcat = groupsName.join(', ');
+
+  await sendAddNotification(instanceName, groupsNameConcat);
+};
+
+const sendAddNotification = async (instanceName, groupName) => {
+  const userEmail = await extractUserMailForMailing(instanceName);
+
+  await mailService.send({
+    to: userEmail,
+    subject: 'Your instance has been added to a group',
+    text: `Hello,
+
+    This email is to inform you that your farmOS instance ${instanceName} has been added to ${groupName} in SurveyStack.
+    Please reach out to your group admin or info@our-sci.net if you have any questions.  
+
+    Best Regards`,
+  });
+};
+
+const sendUserRemoveFarmFromSurveystackGroupNotification = async (instanceName, groupId) => {
+  const groupName = await extractGroupNameForMailing(groupId);
+
+  await sendRemoveNotification(instanceName, groupName);
+};
+
+export const sendUserRemoveFarmFromMultipleSurveystackGroupsNotification = async (
+  instanceName,
+  groupIds
+) => {
+  const groupsName = [];
+  for (const groupId of groupIds) {
+    groupsName.push(await extractGroupNameForMailing(groupId));
+  }
+  const groupsNameConcat = groupsName.join(', ');
+
+  await sendRemoveNotification(instanceName, groupsNameConcat);
+};
+
+const sendRemoveNotification = async (instanceName, groupName) => {
+  const userEmail = await extractUserMailForMailing(instanceName);
+
+  await mailService.send({
+    to: userEmail,
+    subject: 'Your instance has been removed from a group',
+    text: `Hello,
+
+    This email is to inform you that your farmOS instance ${instanceName} has been removed from the group ${groupName} in SurveyStack. 
+    Please reach out to your group admin or info@our-sci.net if you have any questions.
+
+    Best Regards`,
+  });
+};
+
+export const removeFarmFromUser = async (instanceName, userId) => {
+  const filter = { instanceName, userId: asMongoId(userId) };
 
   // console.log('filter', filter);
 
