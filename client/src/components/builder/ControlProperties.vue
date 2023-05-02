@@ -13,7 +13,14 @@
       />
       <v-text-field v-model="control.hint" label="Hint" hide-details />
       <!-- <v-text-field v-model="control.moreInfo" label="More info" hide-details /> -->
-      <markdown-editor v-model="control.moreInfo" label="More info" placeholder="Add more info here" class="mt-6">
+      <markdown-editor
+        v-model="control.moreInfo"
+        :resources="survey.resources"
+        label="More info"
+        placeholder="Add more info here"
+        class="mt-6"
+        @set-survey-resources="(val) => $emit('set-survey-resources', val)"
+      >
         <template #title>More info (markdown supported)</template>
       </markdown-editor>
 
