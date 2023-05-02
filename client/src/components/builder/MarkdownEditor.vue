@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="open" width="800" @click:outside="$refs.anchorRef.blur()">
+  <v-dialog v-model="open" :width="getDialogWidth" @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
       <v-text-field
         ref="anchorRef"
@@ -24,28 +24,52 @@
       </v-card-title>
 
       <v-card-text>
-        <div class="d-flex justify-space-between align-end">
+        <div class="d-flex align-end mb-4">
           <v-btn-toggle v-model="viewMode" mandatory dense>
             <v-btn>Edit</v-btn>
             <v-btn>Preview</v-btn>
           </v-btn-toggle>
 
-          <v-btn color="primary" dense>Add Resource</v-btn>
+          <label for="fileRef" class="ml-auto mr-2 cursor-pointer">
+            <v-btn class="pointer-events-none" dense>
+              <v-icon class="mr-1">mdi-upload</v-icon>
+              Add Image
+            </v-btn>
+          </label>
+          <v-btn color="primary" dense @click="resourceOpen = true">
+            <v-icon class="mr-1">mdi-plus</v-icon>
+            Add Resource
+          </v-btn>
+          <input type="file" id="fileRef" ref="fileRef" class="d-none" @change="onFileChange" />
         </div>
 
-        <div class="wrapper">
-          <v-textarea
-            v-if="viewMode === 0"
-            ref="editorRef"
-            v-model="markdown"
-            auto-grow
-            hide-details
-            @drop.prevent="onDrop"
-          ></v-textarea>
-          <div v-else ref="previewRef" class="preview mt-4" v-html="getPreview"></div>
-          <div v-if="isLoading" class="loading d-flex flex-column justify-center align-center">
-            <v-progress-circular indeterminate color="primary"></v-progress-circular>
+        <div class="wrapper d-flex align-stretch">
+          <div class="editor">
+            <textarea v-if="viewMode === 0" ref="editorRef" v-model="markdown" @drop.prevent="onDrop"></textarea>
+            <div v-else ref="previewRef" class="preview" v-html="getPreview"></div>
+            <div v-if="isLoading" class="loading d-flex flex-column justify-center align-center">
+              <v-progress-circular indeterminate color="primary"></v-progress-circular>
+            </div>
           </div>
+
+          <v-list
+            v-if="resourceOpen"
+            class="resource-panel"
+            :class="{
+              'd-none': viewMode !== 0,
+            }"
+            dense
+          >
+            <v-subheader>
+              Survey Resources
+              <v-btn class="ml-auto" icon @click="resourceOpen = false"><v-icon>mdi-close</v-icon></v-btn>
+            </v-subheader>
+            <v-list-item v-for="item in resources" :key="item.id" link @click="update(item.label, item.id)">
+              <v-list-item-content>
+                <v-list-item-title>{{ item.label }}</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
         </div>
       </v-card-text>
 
@@ -76,12 +100,16 @@ export default {
   data() {
     return {
       open: false,
+      resourceOpen: false,
       viewMode: 0,
       markdown: '',
       isLoading: false,
     };
   },
   computed: {
+    getDialogWidth() {
+      return this.resourceOpen ? 1050 : 750;
+    },
     getText() {
       const text = this.value || '';
       return text.length > TEXT_LENGTH ? text.slice(0, TEXT_LENGTH) + '...' : text;
@@ -91,46 +119,63 @@ export default {
     },
   },
   methods: {
+    update(alt, resId) {
+      if (!resId) {
+        return;
+      }
+
+      // Get image url
+      const resource = this.$store.getters['resources/getResource'](resId);
+      const url = getPublicDownloadUrl(resource.key, true);
+
+      if (!url) {
+        console.warn('Cannot load resource url with ID:', resId);
+        return;
+      }
+
+      // Update markdown text
+      const pos = this.$refs.editorRef.selectionStart;
+      const before = this.markdown.slice(0, pos);
+      const after = this.markdown.slice(pos);
+      const imageMd = `![${alt || 'Image'}](${url})`;
+      this.markdown = `${before} ${imageMd} ${after}`;
+    },
     async createFileResource(file) {
       this.isLoading = true;
-
       // Create new remote file resource
-      const id = await this.$store.dispatch('resources/addRemoteResource', file);
-      const resource = this.$store.getters['resources/getResource'](id);
+      const resId = await this.$store.dispatch('resources/addRemoteResource', file);
+      const resource = this.$store.getters['resources/getResource'](resId);
       const newResource = {
-        id,
+        id: resId,
         name: resource.name,
         label: resource.label,
         type: resourceTypes.FILE,
         location: resourceLocations.REMOTE,
       };
-
+      this.update(file.name, resId);
       // Add to survey resource
       this.$emit('set-survey-resources', [...this.resources, newResource]);
       this.isLoading = false;
-
-      return resource.key;
     },
     onChange(val) {
       if (!val) {
         this.$emit('input', null);
       }
     },
-    async onDrop(e) {
-      const files = e.dataTransfer.files;
-      const cursorPos =
-        typeof e.target.selectionStart === 'number' ? e.target.selectionStart : e.targe.value.length - 1;
-
-      const file = files[0];
+    async onFileChange(e) {
+      const file = e.target.files[0];
       if (!file) {
         return;
       }
-
-      const key = await this.createFileResource(file);
-      const before = this.markdown.slice(0, cursorPos);
-      const after = this.markdown.slice(cursorPos);
-      const imageMd = `![${file.name}](${getPublicDownloadUrl(key, true)})`;
-      this.markdown = `${before} ${imageMd} ${after}`;
+      await this.createFileResource(file);
+      this.$refs.fileRef.value = null;
+    },
+    async onDrop(e) {
+      const file = e.dataTransfer.files[0];
+      if (!file) {
+        return;
+      }
+      await this.createFileResource(file);
     },
     focus() {
       const el = this.$refs.editorRef;
@@ -164,7 +209,6 @@ export default {
       if (!val) {
         return;
       }
-
       this.markdown = this.value || '';
       setTimeout(() => this.focus(), 200);
     },
@@ -176,34 +220,54 @@ export default {
 </script>
 
 <style scoped>
->>> .v-text-field > .v-input__control > .v-input__slot:before,
->>> .v-text-field > .v-input__control > .v-input__slot:after {
-  border: none !important;
-  transition: none !important;
-}
-
 >>> .wrapper {
-  position: relative;
+  max-height: 500px;
 }
 
->>> .wrapper > .loading {
+>>> .editor {
+  position: relative;
+  flex: 1 1 0%;
+}
+
+>>> .editor > .loading {
   position: absolute;
   inset: 0px;
   top: 12px;
   background-color: rgba(220, 220, 220, 0.75);
 }
 
->>> .wrapper textarea,
->>> .wrapper .preview {
+>>> .editor textarea,
+>>> .editor .preview {
   width: 100%;
-  min-height: 140px;
-  max-height: 500px;
-  border: 1px solid #ccc;
-  padding: 4px 8px;
+  height: 100%;
+  min-height: 160px;
+  border: 1px solid #ddd;
   overflow: auto;
+  outline: none;
+}
+>>> .editor textarea {
+  padding: 4px 8px;
 }
 
->>> .wrapper .preview img {
+>>> .editor .preview img {
   max-width: 100%;
+}
+
+>>> .resource-panel .v-subheader {
+  font-weight: 600;
+  font-size: 1rem;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 8px;
+}
+
+>>> .resource-panel {
+  width: 300px;
+  margin-left: 12px;
+  min-height: 300px;
+  border: 1px solid #ddd;
+}
+
+>>> .resource-panel > * {
+  border-bottom: 1px solid #eee;
 }
 </style>
