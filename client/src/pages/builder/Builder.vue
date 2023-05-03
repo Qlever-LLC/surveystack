@@ -346,6 +346,10 @@ export default {
         this.survey._id = id;
         const { data } = await api.get(`/surveys/${this.survey._id}`);
         this.survey = { ...this.survey, ...data };
+        // Fetch all resources into local storage
+        if (this.survey.resources) {
+          await this.$store.dispatch('resources/fetchResources', this.survey.resources, { root: true });
+        }
       } catch (e) {
         console.log('something went wrong:', e);
       }
