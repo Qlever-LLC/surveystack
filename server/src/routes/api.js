@@ -196,7 +196,7 @@ router.delete(
 router.get('/owner/:userId', catchErrors(userController.isUserOwner));
 router.get(
   '/ownership/:userId',
-  assertIsAtLeastOnceOwner,
+  [assertAuthenticated, assertIsAtLeastOnceOwner],
   catchErrors(userController.getOwnership)
 );
 
@@ -273,60 +273,62 @@ router.get('/farmos/assets', catchErrors(handleDelegates(farmosController.getAss
 
 router.post(
   '/farmos/available-add-user-to-instance',
-  assertIsOwnerOfInstance,
+  [assertAuthenticated, assertIsOwnerOfInstance],
   catchErrors(farmosController.availableAddUserToInstance)
 );
 router.post(
   '/farmos/add-user-to-instance',
-  assertIsOwnerOfInstance,
+  [assertAuthenticated, assertIsOwnerOfInstance],
   catchErrors(farmosController.addUserToInstance)
 );
 router.post(
   '/farmos/available-update-ownership',
-  assertIsOwnerOfInstance,
+  [assertAuthenticated, assertIsOwnerOfInstance],
   catchErrors(farmosController.availableUpdateOwnership)
 );
 router.post(
   '/farmos/update-ownership',
-  assertIsOwnerOfInstance,
+  [assertAuthenticated, assertIsOwnerOfInstance],
   catchErrors(farmosController.updateOwnership)
 );
 router.post(
   '/farmos/available-remove-instance-from-user',
+  assertAuthenticated,
   catchErrors(farmosController.availableRemoveInstanceFromUser)
 );
 router.post(
   '/farmos/remove-instance-from-user',
+  assertAuthenticated,
   catchErrors(farmosController.removeInstanceFromUser)
 );
 router.post(
   '/farmos/available-delete-instance-from-user',
-  assertIsOwnerOfInstance,
+  [assertAuthenticated, assertIsOwnerOfInstance],
   catchErrors(farmosController.availableDeleteInstance)
 );
 router.post(
   '/farmos/delete-instance-from-user',
-  assertIsOwnerOfInstance,
+  [assertAuthenticated, assertIsOwnerOfInstance],
   catchErrors(farmosController.deleteInstance)
 );
 router.post(
   '/farmos/available-remove-instance-from-group',
-  assertIsOwnerOfInstance,
+  [assertAuthenticated, assertIsOwnerOfInstance],
   catchErrors(farmosController.availableRemoveInstanceFromGroup)
 );
 router.post(
   '/farmos/remove-instance-from-group',
-  assertIsOwnerOfInstance,
+  [assertAuthenticated, assertIsOwnerOfInstance],
   catchErrors(farmosController.removeInstanceFromGroup)
 );
 router.post(
   '/farmos/available-remove-instance-from-other-user',
-  assertIsOwnerOfInstance,
+  [assertAuthenticated, assertIsOwnerOfInstance],
   catchErrors(farmosController.availableRemoveInstanceFromOtherUser)
 );
 router.post(
   '/farmos/remove-instance-from-other-user',
-  assertIsOwnerOfInstance,
+  [assertAuthenticated, assertIsOwnerOfInstance],
   catchErrors(farmosController.removeInstanceFromOtherUser)
 );
 
