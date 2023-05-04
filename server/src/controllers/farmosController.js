@@ -1184,12 +1184,9 @@ export const extractOwnerUsersMappedInst = (instancesObj, ownerUsers) => {
       owners: [ {email: '', name: ''}, {email: '', name: ''} ]
     },{...}]
   */
-  ownerUsersMappedInst.forEach(function (item) {
-    var existing = mergedData.filter(function (v) {
-      return v.instanceName == item.instanceName;
-    });
-    if (existing.length) {
-      var existingIndex = mergedData.indexOf(existing[0]);
+  ownerUsersMappedInst.forEach((item) => {
+    const existingIndex = mergedData.findIndex((v) => v.instanceName === item.instanceName);
+    if (existingIndex !== -1) {
       mergedData[existingIndex].owners = mergedData[existingIndex].owners.concat(item.owners);
     } else {
       mergedData.push(item);
