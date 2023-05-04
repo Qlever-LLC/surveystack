@@ -179,10 +179,7 @@ export default {
     try {
       this.submission = await this.$store.dispatch('submissions/fetchLocalSubmission', id);
     } catch (error) {
-      console.log('Error: submission not found');
-      this.hasError = true;
-      this.loading = false;
-      return;
+      console.warn('Submission not found', id);
     }
 
     if (!this.submission) {
@@ -221,10 +218,7 @@ export default {
       return;
     }
 
-    if (this.submission && this.submission.meta.submitAsUser) {
-      api.removeHeader('x-delegate-to');
-      delete this.submission.meta.submitAsUser;
-    }
+    api.removeHeader('x-delegate-to');
 
     next(true);
   },

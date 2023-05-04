@@ -29,8 +29,10 @@ const sanitize = async (entity) => {
   entity.meta.dateCreated = new Date(entity.meta.dateCreated);
   entity.meta.dateModified = new Date(entity.meta.dateModified);
   entity.meta.dateSubmitted = new Date();
-
   entity.meta.survey.id = new ObjectId(entity.meta.survey.id);
+
+  // Delete temporal data that is used in client to render Proxy data
+  delete entity.meta.submitAsUser;
 
   if (entity.meta.group) {
     if (entity.meta.group.id) {
@@ -335,6 +337,36 @@ export const buildPipeline = async (req, res) => {
   return pipeline;
 };
 
+// Attach 'meta.submitAsUser' if proxy
+const addCreatorDetailStage = (pipeline, proxyUserId) => {
+  pipeline.push(
+    {
+      $lookup: {
+        from: 'users',
+        let: {
+          creatorId: '$meta.creator',
+          proxyUserId: '$meta.proxyUserId',
+        },
+        pipeline: [
+          {
+            $match: {
+              $and: [
+                { $expr: { $eq: ['$_id', '$$creatorId'] } },
+                { $expr: { $eq: ['$$proxyUserId', new ObjectId(proxyUserId)] } },
+              ],
+            },
+          },
+          { $project: { name: 1, email: 1, _id: 1 } },
+        ],
+        as: 'meta.submitAsUser',
+      },
+    },
+    {
+      $unwind: { path: '$meta.submitAsUser', preserveNullAndEmptyArrays: true },
+    }
+  );
+};
+
 const addUserDetailsStage = (pipeline) => {
   pipeline.push({
     $lookup: {
@@ -609,9 +641,16 @@ const getSubmission = async (req, res) => {
     pipeline.push(relevanceStage);
   }
 
+  // Fetch by id
   pipeline.push({ $match: { _id: new ObjectId(id) } });
+
+  // Attach proxy details
+  addCreatorDetailStage(pipeline, user);
+
+  // Redact
   const redactStage = createRedactStage(user, roles);
   pipeline.push(redactStage);
+
   const [entity] = await db.collection(col).aggregate(pipeline).toArray();
   if (!entity) {
     throw boom.notFound(`No entity found for id: ${id}`);
