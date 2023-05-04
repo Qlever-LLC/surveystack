@@ -35,7 +35,7 @@ import {
   sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification,
 } from '../services/farmos/manage';
 import { aggregator } from '../services/farmos/aggregator';
-import { hasAdminRole } from '../services/roles.service';
+import { hasAdminRoleForRequest } from '../services/roles.service';
 
 export const asMongoId = (source) =>
   source instanceof ObjectId ? source : ObjectId(typeof source === 'string' ? source : source._id);
@@ -75,7 +75,7 @@ const requireUserId = (res) => {
   return userId;
 };
 
-const requireGroupedAdmin = (req, res) => {
+const requireGroupedAdmin = async (req, res) => {
   const { group } = req.body;
   const userId = res.locals.auth.user._id;
 
@@ -87,7 +87,7 @@ const requireGroupedAdmin = (req, res) => {
     throw boom.unauthorized();
   }
 
-  if (!hasAdminRole(userId, group)) {
+  if (!(await hasAdminRoleForRequest(res, group))) {
     throw boom.unauthorized();
   }
   return userId;
@@ -470,7 +470,7 @@ export const superAdminUnMapFarmosInstanceFromAll = async (req, res) => {
  */
 export const getInstancesForGroup = async (req, res) => {
   const userId = requireUserId(res);
-  const groupId = requireGroupedAdmin(req, res);
+  const groupId = await requireGroupedAdmin(req, res);
 
   return res.send([]);
 };

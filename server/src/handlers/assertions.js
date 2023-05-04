@@ -32,11 +32,10 @@ export const assertHasGroupAdminAccess = catchErrors(async (req, res, next) => {
     throw boom.unauthorized();
   }
 
-  const userId = res.locals.auth.user._id;
   const groupId = req.params.groupId || req.body.groupId;
 
-  const hasAdminRole = await rolesService.hasAdminRole(userId, groupId);
-  if (!hasAdminRole) {
+  const hasAdminRoleForRequest = await rolesService.hasAdminRoleForRequest(res, groupId);
+  if (!hasAdminRoleForRequest) {
     throw boom.unauthorized();
   }
 
@@ -94,12 +93,12 @@ export const assertEntityExists = ({ collection }) =>
     next();
   });
 
-const hasEntityRights = async ({ entity, auth }) => {
-  if (auth.isSuperAdmin) {
+const hasEntityRights = async ({ entity, res }) => {
+  if (res.locals.auth.isSuperAdmin) {
     return true;
   }
 
-  if (entity.meta.creator?.equals(auth.user._id)) {
+  if (entity.meta.creator?.equals(res.locals.auth.user._id)) {
     return true;
   }
 
@@ -107,8 +106,11 @@ const hasEntityRights = async ({ entity, auth }) => {
     return true;
   }
 
-  const hasAdminRole = await rolesService.hasAdminRole(auth.user._id, entity.meta.group?.id);
-  if (hasAdminRole) {
+  const hasAdminRoleForRequest = await rolesService.hasAdminRoleForRequest(
+    res,
+    entity.meta.group?.id
+  );
+  if (hasAdminRoleForRequest) {
     return true;
   }
 
@@ -118,9 +120,7 @@ const hasEntityRights = async ({ entity, auth }) => {
 export const assertEntitiesRights = catchErrors(async (req, res, next) => {
   const entities = res.locals.existing;
 
-  const rights = await Promise.all(
-    entities.map((entity) => hasEntityRights({ entity, auth: res.locals.auth }))
-  );
+  const rights = await Promise.all(entities.map((entity) => hasEntityRights({ entity, res })));
 
   if (rights.every(Boolean)) {
     return next();
@@ -132,7 +132,7 @@ export const assertEntitiesRights = catchErrors(async (req, res, next) => {
 export const assertEntityRights = catchErrors(async (req, res, next) => {
   const entity = res.locals.existing;
 
-  if (await hasEntityRights({ entity, auth: res.locals.auth })) {
+  if (await hasEntityRights({ entity, res })) {
     return next();
   }
 
@@ -177,9 +177,9 @@ const hasSubmissionRights = async (submission, res) => {
   }
 
   const hasUserRole = await rolesService.hasUserRole(userId, groupId);
-  const hasAdminRole = await rolesService.hasAdminRole(userId, groupId);
+  const hasAdminRoleForRequest = await rolesService.hasAdminRoleForRequest(res, groupId);
 
-  if (submissions === 'group' && (hasUserRole || hasAdminRole)) {
+  if (submissions === 'group' && (hasUserRole || hasAdminRoleForRequest)) {
     // group members can submit
     return true;
   }
