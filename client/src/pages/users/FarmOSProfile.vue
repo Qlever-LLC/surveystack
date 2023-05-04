@@ -245,7 +245,7 @@
           <tbody>
             <tr v-for="(instance, idx) in instances" :key="`grp-${idx}`">
               <td>
-                <div class="pt-3" style="white-space: nowrap">{{ `${instance.instanceName}` }}</div>
+                <div class="pt-3" style="white-space: nowrap">{{ instance.instanceName }}</div>
                 <div class="pb-3">
                   <span v-if="instance.isOwner">
                     <v-tooltip top>

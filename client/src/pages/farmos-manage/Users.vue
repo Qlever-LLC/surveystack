@@ -61,7 +61,7 @@
           </tr>
 
           <tr v-for="(instance, idx) in mappedInstances" :key="`user-${idx}`">
-            <td>{{ `${instance.instanceName}` }}</td>
+            <td>{{ instance.instanceName }}</td>
             <td>
               <div>
                 <v-chip

@@ -75,7 +75,7 @@
           </tr>
 
           <tr v-for="(instance, idx) in mappedInstances" :key="`grp-${idx}`">
-            <td>{{ `${instance.instanceName}` }}</td>
+            <td>{{ instance.instanceName }}</td>
             <td>
               <div>
                 <v-chip
