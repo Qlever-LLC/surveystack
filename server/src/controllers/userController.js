@@ -181,7 +181,7 @@ const getOwnership = async (req, res) => {
   // merge data with all complements arrays
   const mergeById = (array1, array2) =>
     array1.map((itm) => ({
-      ...array2.find((item) => item.instanceName === itm.instanceName && item),
+      ...array2.find((item) => item.instanceName === itm.instanceName),
       ...itm,
     }));
 
