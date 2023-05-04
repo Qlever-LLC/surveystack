@@ -394,8 +394,8 @@
         </template>
       </v-simple-table>
 
-      <div class="ma-4">
-        <p>If you have questions or need support reach out to your group admin or email info@our-sci.net.</p>
+      <div style="margin-top: 100px !important">
+        <p><b>If you have questions or need support reach out to your group admin or email info@our-sci.net.</b></p>
       </div>
     </template>
     <template v-else>
@@ -487,7 +487,7 @@ export default {
     },
     // access button
     getInstanceLink(instanceName) {
-      return `https://${instanceName}/`;
+      return `https://${instanceName}/user/login`;
     },
     //add button
     async addUserToInstance(instanceName) {
