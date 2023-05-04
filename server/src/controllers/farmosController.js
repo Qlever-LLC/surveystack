@@ -1209,7 +1209,7 @@ export const addNotes = async (req, res) => {
 
   if (validres.error) {
     const errors = validres.error.details.map((e) => `${e.path.join('.')}: ${e.message}`);
-    throw boom.badData(`error: ${errors.join(',')}`);
+    throw boom.badData(`error: ${errors.join(', ')}`);
   }
 
   //assert that all groupIds are under the farmos domain to which hasGroupAdminAccess checked
@@ -1219,19 +1219,6 @@ export const addNotes = async (req, res) => {
     groupIds.every((val) => descendants.map((el) => String(el._id)).includes(String(val))) === false
   ) {
     throw boom.badData(`error: you don't have access`);
-  }
-
-  //check if the instance is under the group checked with hasGroupAdminAccess
-  const grps = await db
-    .collection('farmos-group-mapping')
-    .find({
-      groupId: {
-        $in: descendants.map((el) => asMongoId(el._id)),
-      },
-    })
-    .toArray();
-  if (!grps.map((el) => el.instanceName).includes(instanceName)) {
-    throw boom.badData(`error: you do not have access`);
   }
 
   //get groupNames from groupIds
@@ -1381,6 +1368,7 @@ export const updateGroupsForUser = async (req, res) => {
   const initialGroupsName = initialGroups.map((e) => e.name);
   const resultGroupsName = resultGroups.map((e) => e.name);
 
+  let resStatus = 'no changes';
   // compare with the initial result the group(s)
   // if just add without remove => add notification
   // else if just remove without add => remove notification
@@ -1388,37 +1376,45 @@ export const updateGroupsForUser = async (req, res) => {
   if (initialGroupsName.every((val) => resultGroupsName.includes(val))) {
     const differenceName = resultGroupsName.filter((x) => !initialGroupsName.includes(x));
     if (differenceName.length > 0) {
-      const difference = resultGroups
-        .filter((e) => differenceName.includes(e.name))
-        .map((e) => e._id);
-      await sendUserAddFarmToMultipleSurveystackGroupNotification(instanceName, difference, origin);
+      const difference = resultGroups.filter((e) => differenceName.includes(e.name));
+      const differenceId = difference.map((e) => e._id);
+      await sendUserAddFarmToMultipleSurveystackGroupNotification(
+        instanceName,
+        differenceId,
+        origin
+      );
+      const differenceGroupName = difference.map((e) => e.name).join(', ');
+      resStatus = `Successfully added instance to ${differenceGroupName}, instance owner will be notified`;
     }
   } else if (resultGroupsName.every((val) => initialGroupsName.includes(val))) {
     const differenceName = initialGroupsName.filter((x) => !resultGroupsName.includes(x));
-    const difference = initialGroups
-      .filter((e) => differenceName.includes(e.name))
-      .map((e) => e._id);
+    const difference = initialGroups.filter((e) => differenceName.includes(e.name));
+    const differenceId = difference.map((e) => e._id);
     await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(
       instanceName,
-      difference,
+      differenceId,
       origin
     );
+    const differenceGroupName = difference.map((e) => e.name).join(', ');
+    resStatus = `Successfully removed instance from ${differenceGroupName}, instance owner will be notified`;
   } else {
     const differenceName = initialGroupsName.filter((x) => !resultGroupsName.includes(x));
-    const difference = initialGroups
-      .filter((e) => differenceName.includes(e.name))
-      .map((e) => e._id);
+    const difference = initialGroups.filter((e) => differenceName.includes(e.name));
+    const differenceId = difference.map((e) => e._id);
     const resultInstanceGroupsId = resultGroups.map((e) => e._id);
     await sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification(
       instanceName,
-      difference,
+      differenceId,
       resultInstanceGroupsId,
       origin
     );
+    const oldName = difference.map((e) => e.name).join(',');
+    const newName = resultGroups.map((e) => e.name).join(',');
+    resStatus = `Successfully move instance from ${oldName} to ${newName}, instance owner will be notified`;
   }
 
   return res.send({
-    status: 'ok',
+    status: resStatus,
   });
 };
 

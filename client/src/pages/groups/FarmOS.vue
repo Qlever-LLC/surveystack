@@ -381,27 +381,19 @@ export default {
       this.showDisonnectDialog = true;
     },
     async updateGroups(args) {
-      if (!this.loading) {
-        const [instanceName, groupIds] = args;
-        const userId = this.disconnectUserId;
-        const groupId = this.groupId;
+      const [instanceName, groupIds] = args;
+      const userId = this.disconnectUserId;
+      const groupId = this.groupId;
 
-        this.loading = true;
+      this.loading = true;
 
-        try {
-          await api.post(`/farmos/group-manage/${groupId}/update-groups-for-user`, {
-            userId,
-            instanceName,
-            groupIds,
-          });
-          this.success('Succefully umapped groups');
-        } catch (error) {
-          if (error.response && error.response.data && error.response.data.message) {
-            this.error(error.response.data.message);
-          } else {
-            this.error(error.message);
-          }
-        }
+      try {
+        const resp = await api.post(`/farmos/group-manage/${groupId}/update-groups-for-user`, {
+          userId,
+          instanceName,
+          groupIds,
+        });
+        this.success(resp.data.status);
 
         this.showDisonnectDialog = false;
 
@@ -412,6 +404,14 @@ export default {
         } else {
           await this.init();
         }
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+          this.error(error.response.data.message);
+        } else {
+          this.error(error.message);
+        }
+        this.showDisonnectDialog = false;
+        this.loading = false;
       }
     },
     async addNote(arg) {
@@ -427,7 +427,6 @@ export default {
           parentGroupId,
           groupIds,
         });
-        this.success('Succefully added notes');
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           this.error(error.response.data.message);
