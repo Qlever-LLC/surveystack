@@ -1209,7 +1209,7 @@ const assertUserInGroup = async (userId, groupId) => {
     .collection('memberships')
     .find({
       group: new ObjectId(groupId),
-      user: userRes._id,
+      user: new ObjectId(userRes._id),
     })
     .toArray();
 
@@ -1230,7 +1230,7 @@ const assertUserInSubGroup = async (userId, tree) => {
       group: {
         $in: tree.descendants.map((d) => new ObjectId(d._id)),
       },
-      user: userRes._id,
+      user: new ObjectId(userRes._id),
     })
     .toArray();
 
