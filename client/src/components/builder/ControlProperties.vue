@@ -332,7 +332,7 @@
       <!-- Print layout -->
       <template v-if="hasLayoutOptions">
         <v-btn v-if="!showLayout" color="grey darken-1" class="align-self-end" @click="showLayout = true" small text>
-          Layout
+          Print Layout
         </v-btn>
         <div v-else class="extra-options">
           <v-spacer></v-spacer>
@@ -365,8 +365,16 @@
             />
           </div>
 
+          <div v-if="isSelect || isOntology">
+            <checkbox
+              label="Hide Answer List"
+              v-model="control.options.layout.hideList"
+              helper-text='Do not show the complete list of answers when printing a fresh survey (the "Print Survey" button)'
+            />
+          </div>
+
           <v-select
-            v-if="(isSelect || isOntology) && control.options.layout.showAll"
+            v-if="isSelect || isOntology"
             label="Answer layout"
             v-model="control.options.layout.columns"
             :items="[1, 2, 3, 4, 5]"
@@ -647,7 +655,8 @@ export default {
       if (typeof this.control.options.layout === 'undefined') {
         this.$set(this.control.options, 'layout', {
           showAll: false,
-          columns: 1,
+          hideList: false,
+          columns: 3,
           preview: false,
           table: true,
         });

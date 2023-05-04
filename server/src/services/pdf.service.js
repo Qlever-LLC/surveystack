@@ -477,7 +477,11 @@ class PdfGenerator {
       else if (type === 'selectSingle' || type === 'selectMultiple' || type === 'ontology') {
         const multiple =
           type === 'selectMultiple' || (type === 'ontology' && options.hasMultipleSelections);
-        def = this.getSelectDef('', source, layout.columns, multiple);
+        if (layout.hideList) {
+          def = this.getPrintableAnswerDef();
+        } else {
+          def = this.getSelectDef('', source, layout.columns, multiple);
+        }
       }
       // Number
       else if (type === 'number') {
@@ -678,16 +682,13 @@ class PdfGenerator {
     }
 
     const group = [];
-    if (cols === 1) {
-      group.push(options);
-    } else {
-      options.forEach((option, index) => {
-        const i = index % cols;
-        if (!Array.isArray(group[i])) {
-          group[i] = [];
-        }
-        group[i].push(option);
-      });
+    const perColumns = Math.floor(options.length / cols);
+    const remain = options.length % cols;
+    let from = 0;
+    for (let i = 0; i < cols; i += 1) {
+      const count = i < remain ? perColumns + 1 : perColumns;
+      group[i] = options.slice(from, from + count);
+      from += count;
     }
 
     const isChecked = (option) => value.includes(option.value);
@@ -1085,10 +1086,11 @@ class PdfGenerator {
   }
 
   getControlLayout(control) {
-    const { hidden, showAll, columns, preview, table } = {
+    const { hidden, showAll, hideList, columns, preview, table } = {
       hidden: false,
       showAll: false,
-      columns: 1,
+      hideList: false,
+      columns: 3,
       preview: false,
       table: true,
       ...control.options.layout,
@@ -1098,6 +1100,7 @@ class PdfGenerator {
       hidden,
       columns,
       showAll,
+      hideList,
       preview,
       table,
     };
