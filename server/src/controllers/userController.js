@@ -168,7 +168,7 @@ const getOwnership = async (req, res) => {
       .filter((e) => e.instanceName === inst.instanceName)
       .map((f) => ({
         userId: f.userId,
-        userEmail: usersAffected.find((g) => String(g._id) === String(f.userId)).email,
+        userEmail: usersAffected.find((g) => String(g._id) === String(f.userId))?.email,
         owner: f.owner,
       }));
 
