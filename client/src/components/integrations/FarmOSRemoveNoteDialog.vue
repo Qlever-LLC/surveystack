@@ -5,8 +5,8 @@
       <v-card-text>
         <v-checkbox
           v-model="note"
-          label="Farmer is no longer part of the project"
-          value="Farmer is no longer part of the project"
+          label="Farmer is no longer part of the projet"
+          value="Farmer is no longer part of the projet"
         ></v-checkbox>
 
         <v-checkbox v-model="note" label="Accidentally added" value="Accidentally added"></v-checkbox>

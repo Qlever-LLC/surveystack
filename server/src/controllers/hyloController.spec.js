@@ -9,7 +9,7 @@ import {
   setIntegratedHyloGroup,
   inviteMemberToHyloGroup,
 } from './hyloController';
-import { createGroup, createReq, createRes } from '../testUtils';
+import { createGroup, createReq, createRes, createSuperAdmin } from '../testUtils';
 import { gqlRequest } from '../services/hylo/utils';
 import { COLL_GROUPS_HYLO_MAPPINGS, db } from '../db';
 import { addMember, createHyloGroup, upsertHyloUser } from '../services/hylo.service';
@@ -217,12 +217,29 @@ describe('hyloController', () => {
       );
     });
 
-    it('calls upsertHyloUser', async () => {
+    it('group admin calls upsertHyloUser', async () => {
       await inviteMemberToHyloGroup(req, res);
       expect(upsertHyloUser).toHaveBeenCalledWith({ name: user.user.name, email: user.user.email });
     });
 
-    it('calls addMember', async () => {
+    it('group admin calls addMember', async () => {
+      await inviteMemberToHyloGroup(req, res);
+      expect(addMember).toHaveBeenCalledWith({
+        hyloUserId: hyloUser.id,
+        hyloGroupId: hyloGroup.id,
+      });
+    });
+
+    it('super admin calls upsertHyloUser', async () => {
+      const superAdmin = await createSuperAdmin();
+      res = await createRes({ user: superAdmin });
+      await inviteMemberToHyloGroup(req, res);
+      expect(upsertHyloUser).toHaveBeenCalledWith({ name: user.user.name, email: user.user.email });
+    });
+
+    it('super admin calls addMember', async () => {
+      const superAdmin = await createSuperAdmin();
+      res = await createRes({ user: superAdmin });
       await inviteMemberToHyloGroup(req, res);
       expect(addMember).toHaveBeenCalledWith({
         hyloUserId: hyloUser.id,
