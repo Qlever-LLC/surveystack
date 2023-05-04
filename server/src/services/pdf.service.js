@@ -894,12 +894,18 @@ class PdfGenerator {
         } else if (col.type === 'date') {
           colValue = formatDate(colValue, 'MMM D, YYYY');
         } else if (typeof colValue === 'object') {
-          colValue = this.getObjectDef(colValue);
+          colValue = {
+            text: JSON.stringify(colValue).trim(),
+            style: 'code',
+            background: colors.code,
+          };
         }
 
-        row.push({
-          text: [`${col.label || col.value}: `, colValue],
-        });
+        let label = `${col.label || col.value}: `;
+        if (typeof colValue === 'object') {
+          label += '\n';
+        }
+        row.push({ text: [label, colValue] });
       }
 
       rows.push(`Row ${i + 1}`);
