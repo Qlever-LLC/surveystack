@@ -23,16 +23,7 @@
               :loading="loading"
               @click="updateGroups"
               color="primary"
-              style="
-                min-height: 40px;
-                align-items: center;
-                display: flex;
-                position: sticky;
-                top: 0px;
-                z-index: 5;
-                justify-content: center;
-                width: 100%;
-              "
+              class="button--autocomplete"
             >
               Update Groups
             </v-btn>
@@ -48,6 +39,8 @@
 </template>
 
 <script>
+import './css/button.css';
+
 export default {
   emits: ['updateGroups', 'cancelUpdate'],
   props: ['loading', 'updateFarmInstanceName', 'allGroups', 'selectedGroupIds', 'value'],

@@ -22,16 +22,7 @@
               :loading="loadingOwners"
               :disabled="selectedFarms.length <= 0"
               color="primary"
-              style="
-                min-height: 40px;
-                align-items: center;
-                display: flex;
-                position: sticky;
-                top: 0px;
-                z-index: 5;
-                justify-content: center;
-                width: 100%;
-              "
+              class="button--autocomplete"
             >
               Connect selected Farms
             </v-btn>
@@ -73,6 +64,7 @@
 
 <script>
 import { ref } from '@vue/composition-api';
+import './css/button.css';
 
 export default {
   emits: ['connect', 'addExisting', 'create'],
