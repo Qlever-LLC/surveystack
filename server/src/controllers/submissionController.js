@@ -336,7 +336,7 @@ export const buildPipeline = async (req, res) => {
 };
 
 // Attach 'meta.submitAsUser' if proxy
-const addCreatorDetailStage = (pipeline, proxyUserId) => {
+const addCreatorDetailStage = (pipeline) => {
   pipeline.push(
     {
       $lookup: {
@@ -350,7 +350,7 @@ const addCreatorDetailStage = (pipeline, proxyUserId) => {
             $match: {
               $and: [
                 { $expr: { $eq: ['$_id', '$$creatorId'] } },
-                { $expr: { $eq: ['$$proxyUserId', new ObjectId(proxyUserId)] } },
+                { $expr: { $eq: [{ $type: '$$proxyUserId' }, 'objectId'] } },
               ],
             },
           },
@@ -643,7 +643,7 @@ const getSubmission = async (req, res) => {
   pipeline.push({ $match: { _id: new ObjectId(id) } });
 
   // Attach proxy details
-  addCreatorDetailStage(pipeline, user);
+  addCreatorDetailStage(pipeline);
 
   // Redact
   const redactStage = createRedactStage(user, roles);
