@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="open" :width="getDialogWidth" @click:outside="$refs.anchorRef.blur()">
+  <v-dialog v-model="open" :width="getDialogWidth" persistent @click:outside="$refs.anchorRef.blur()">
     <template v-slot:activator="{ on, attrs }">
       <v-text-field
         ref="anchorRef"
@@ -14,7 +14,7 @@
         readonly
         outlined
         clearable
-        @input="onChange"
+        @input="onTextFieldChange"
       />
     </template>
 
@@ -24,39 +24,46 @@
       </v-card-title>
 
       <v-card-text>
-        <div class="d-flex align-end mb-4">
+        <div class="toolbar d-flex align-end mb-4">
           <v-btn-toggle v-model="viewMode" mandatory dense>
             <v-btn>Edit</v-btn>
             <v-btn>Preview</v-btn>
           </v-btn-toggle>
 
-          <label for="fileRef" class="ml-auto mr-2 cursor-pointer">
-            <v-btn class="pointer-events-none" dense>
-              <v-icon class="mr-1">mdi-upload</v-icon>
-              Add Image
+          <template v-if="viewMode === 0">
+            <label for="fileRef" class="ml-auto mr-2">
+              <v-btn dense>
+                <v-icon class="mr-1">mdi-upload</v-icon>
+                Add Image
+              </v-btn>
+            </label>
+            <v-btn color="primary" dense :disabled="resourceOpen" @click="openResource">
+              <v-icon class="mr-1">mdi-plus</v-icon>
+              Add Resource
             </v-btn>
-          </label>
-          <v-btn color="primary" dense @click="resourceOpen = true">
-            <v-icon class="mr-1">mdi-plus</v-icon>
-            Add Resource
-          </v-btn>
-          <input type="file" id="fileRef" ref="fileRef" class="d-none" @change="onFileChange" />
+            <input id="fileRef" ref="fileRef" type="file" accept="image/*" class="d-none" @change="onFileChange" />
+          </template>
         </div>
 
-        <div class="wrapper d-flex align-stretch">
+        <div class="d-flex align-stretch">
           <div class="editor">
             <v-textarea
               v-if="viewMode === 0"
               ref="editorRef"
               v-model="markdown"
               :class="{ resource: resourceOpen }"
+              :readonly="showAttach"
               auto-grow
               hide-details
+              @blur="updateCaretPosition"
+              @dragover.prevent="showAttach = true"
+              @dragleave.prevent="showAttach = false"
               @drop.prevent="onDrop"
             ></v-textarea>
             <div v-else ref="previewRef" class="preview" v-html="getPreview"></div>
-            <div v-if="isLoading" class="loading d-flex flex-column justify-center align-center">
-              <v-progress-circular indeterminate color="primary"></v-progress-circular>
+            <div v-if="isLoading || showAttach" class="overlap d-flex flex-column justify-center align-center">
+              <v-progress-circular v-if="isLoading" indeterminate color="primary"></v-progress-circular>
+              <v-icon v-else color="gray darken-4">mdi-paperclip</v-icon>
             </div>
           </div>
 
@@ -73,7 +80,7 @@
               <v-btn class="ml-auto" icon @click="resourceOpen = false"><v-icon>mdi-close</v-icon></v-btn>
             </v-subheader>
 
-            <v-list-item v-for="item in validResources" :key="item.id" link @click="update(item.id)">
+            <v-list-item v-for="item in validResources" :key="item.id" link @click="onAddResource(item.id)">
               <v-list-item-content>
                 <v-list-item-title>{{ item.label }}</v-list-item-title>
               </v-list-item-content>
@@ -110,9 +117,11 @@ export default {
     return {
       open: false,
       resourceOpen: false,
-      viewMode: 0,
-      markdown: '',
+      showAttach: false,
       isLoading: false,
+      markdown: '',
+      caretPosition: 0,
+      viewMode: 0,
     };
   },
   computed: {
@@ -134,29 +143,17 @@ export default {
     },
   },
   methods: {
-    update(resId) {
-      if (!resId) {
-        return;
-      }
-
-      // Get curet position
-      const pos = this.$refs.editorRef.selectionStart || Math.max(this.markdown.length - 1, 0);
-      const before = this.markdown.slice(0, pos);
-      const after = this.markdown.slice(pos);
-
-      // Load resource
-      let resource = this.resources.find((res) => res.id === resId);
+    update(resource) {
       if (!resource) {
-        console.warn('Cannot load resource with ID:', resId);
         return;
       }
+
+      // Get markdown slices
+      const before = this.markdown.slice(0, this.caretPosition);
+      const after = this.markdown.slice(this.caretPosition);
 
       // Get resource URL
-      let url = resource.content;
-      if (resource.type === resourceTypes.FILE) {
-        resource = this.$store.getters['resources/getResource'](resId);
-        url = getPublicDownloadUrl(resource.key, true);
-      }
+      const url = resource.type === resourceTypes.FILE ? getPublicDownloadUrl(resource.key, true) : resource.content;
 
       // Make image/file link in markdown
       let resourceMd = `[${resource.label}](${url})`;
@@ -185,11 +182,39 @@ export default {
       this.$emit('set-survey-resources', [...this.resources, newResource]);
 
       // Update markdown
-      this.update(resId);
+      this.update({ ...resource, type: resourceTypes.FILE });
 
       this.isLoading = false;
     },
-    onChange(val) {
+    openResource() {
+      this.resourceOpen = true;
+      this.$nextTick(() => {
+        this.$refs.editorRef.focus();
+      });
+    },
+    updateCaretPosition() {
+      const el = this.$refs.editorRef;
+      this.caretPosition =
+        el && el.$refs.input.selectionStart ? el.$refs.input.selectionStart : Math.max(this.markdown.length - 1, 0);
+    },
+    onAddResource(resId) {
+      // Load resource
+      let resource = this.resources.find((res) => res.id === resId);
+      if (!resource) {
+        console.warn('Cannot load resource with ID:', resId);
+        return;
+      }
+
+      if (resource.type === resourceTypes.FILE) {
+        resource = {
+          ...this.$store.getters['resources/getResource'](resId),
+          type: resourceTypes.FILE,
+        };
+      }
+
+      this.update(resource);
+    },
+    onTextFieldChange(val) {
       if (!val) {
         this.$emit('input', null);
       }
@@ -203,30 +228,13 @@ export default {
       this.$refs.fileRef.value = null;
     },
     async onDrop(e) {
+      this.showAttach = false;
       const file = e.dataTransfer.files[0];
       if (!file) {
         return;
       }
+
       await this.createFileResource(file);
-    },
-    focus() {
-      const el = this.$refs.editorRef;
-      if (!el) {
-        return;
-      }
-      console.log(1111111, el.setSelectionRange, el.createTextRange, el);
-      if (el.setSelectionRange) {
-        el.focus();
-        el.setSelectionRange(0, 0);
-      } else if (el.createTextRange) {
-        var range = el.createTextRange();
-        range.moveStart('character', 0);
-        range.select();
-      } else {
-        el.selectionStart = 0;
-        el.selectionEnd = 0;
-        el.focus();
-      }
     },
     close() {
       this.open = false;
@@ -244,11 +252,10 @@ export default {
       }
 
       this.resourceOpen = false;
+      this.isLoading = false;
       this.viewMode = 0;
       this.markdown = this.value || '';
-      this.isLoading = false;
-
-      setTimeout(() => this.focus(), 200);
+      this.updateCaretPosition();
     },
   },
   created() {
@@ -258,16 +265,20 @@ export default {
 </script>
 
 <style scoped>
+>>> .toolbar label button {
+  pointer-events: none !important;
+}
+
 >>> .editor {
   position: relative;
   flex: 1 1 0%;
 }
 
->>> .editor > .loading {
+>>> .editor > .overlap {
   position: absolute;
   inset: 0px;
-  top: 12px;
-  background-color: rgba(220, 220, 220, 0.75);
+  background-color: rgba(255, 255, 255, 0.5);
+  pointer-events: none;
 }
 
 >>> .editor .v-textarea {
@@ -294,8 +305,19 @@ export default {
   padding: 2px 8px;
 }
 
+>>> .editor textarea:read-only {
+  border: 1.5px dashed #888;
+  border-radius: 4px;
+}
+
 >>> .editor .preview img {
   max-width: 100%;
+}
+
+>>> .editor > .v-textarea.v-text-field > .v-input__control > .v-input__slot:before,
+>>> .editor > .v-textarea.v-text-field > .v-input__control > .v-input__slot:after {
+  border: none !important;
+  transition: none;
 }
 
 >>> .resource-panel {
