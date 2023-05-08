@@ -1,6 +1,12 @@
 <template>
   <div>
-    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+      :initializable="control.options.initialize.enabled"
+      @initialize="initialize"
+    />
     <div style="display: flex">
       <div style="flex: 1">
         <v-text-field

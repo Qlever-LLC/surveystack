@@ -24,15 +24,6 @@ async function calculateField({ nodes, submission, survey, option, fname }) {
       };
     }
 
-    if (fname === 'initialize' && field.value !== null && field.value !== undefined) {
-      return {
-        path,
-        control,
-        field,
-        skip: true,
-      };
-    }
-
     // if control option is not existing, skip calc for this node
     if (!control.options[option]) {
       return {

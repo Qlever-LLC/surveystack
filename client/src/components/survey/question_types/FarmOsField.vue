@@ -1,6 +1,12 @@
 <template>
   <div class="farm-os-field">
-    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+      :initializable="control.options.initialize.enabled"
+      @initialize="initialize"
+    />
     <v-autocomplete
       :disabled="loading"
       :value="getValue"

@@ -154,6 +154,8 @@ export default {
     handleScriptHasLoaded() {
       if (this.value) {
         this.requestRenderScript();
+      } else {
+        this.requestRunScript();
       }
     },
     handleRequestSetQuestionValue({ value }) {

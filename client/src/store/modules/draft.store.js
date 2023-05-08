@@ -255,9 +255,17 @@ const actions = {
         continue;
       }
 
-      const [initialize] = await codeEvaluator.calculateInitialize([nextNode], state.submission, state.survey); // eslint-disable-line
-      if (initialize && initialize.result) {
-        commit('SET_PROPERTY', { path: `${initialize.path}.value`, value: initialize.result });
+      //initialize value if value is nullish
+      const nextNodePath = nextNode
+        .getPath()
+        .map((n) => n.model.name)
+        .join('.');
+      const field = surveyStackUtils.getNested(state.submission, nextNodePath);
+      if (field.value === null || field.value === undefined) {
+        const [initialize] = await codeEvaluator.calculateInitialize([nextNode], state.submission, state.survey); // eslint-disable-line
+        if (initialize && initialize.result) {
+          commit('SET_PROPERTY', { path: `${initialize.path}.value`, value: initialize.result });
+        }
       }
 
       commit('NEXT', nextNode);
@@ -391,6 +399,12 @@ const actions = {
         // commit('SET_PROPERTY', { path: `${path}.meta.computedRelevance`, value: result }); // TODO: set computedRelevance as well?
       }
     });
+  },
+  async initialize({ commit, state }) {
+    const [initialize] = await codeEvaluator.calculateInitialize([state.node], state.submission, state.survey); // eslint-disable-line
+    if (initialize && initialize.result) {
+      commit('SET_PROPERTY', { path: `${initialize.path}.value`, value: initialize.result });
+    }
   },
   async calculateApiCompose({ commit, state }) {
     // TODO: only calculate subset of nodes

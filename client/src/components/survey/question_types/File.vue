@@ -3,7 +3,13 @@
     <v-snackbar v-model="alertMessageVisible" color="orange" :timeout="6000" fixed centered>
       {{ alertMessage }}
     </v-snackbar>
-    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+      :initializable="control.options.initialize.enabled"
+      @initialize="initialize"
+    />
     <app-control-hint :value="control.hint" />
 
     <div @drop.prevent="onDrop" @dragover.prevent="onDragOver" @dragleave="onDragLeave">

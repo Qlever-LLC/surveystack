@@ -1,6 +1,12 @@
 <template>
   <div class="ontology question">
-    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+      :initializable="control.options.initialize.enabled"
+      @initialize="initialize"
+    />
     <v-select
       v-if="sourceIsValid && !control.options.allowCustomSelection && !control.options.allowAutocomplete"
       :label="control.hint"

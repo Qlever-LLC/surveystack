@@ -1,6 +1,12 @@
 <template>
   <div>
-    <app-control-label :value="control.label" :redacted="redacted" :required="required" />
+    <app-control-label
+      :value="control.label"
+      :redacted="redacted"
+      :required="required"
+      :initializable="control.options.initialize.enabled"
+      @initialize="initialize"
+    />
     <app-control-hint :value="control.hint" />
 
     <div :id="`map-question-geocoder-${index}`" class="geocoder" style="z-index: 200" />
