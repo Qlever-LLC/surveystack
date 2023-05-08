@@ -39,6 +39,9 @@ export default {
     showNext() {
       this.$emit('show-next');
     },
+    initialize() {
+      this.$emit('initialize');
+    },
   },
   computed: {
     dialogProps() {
