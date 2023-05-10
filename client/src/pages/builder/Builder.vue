@@ -73,7 +73,7 @@
       v-if="versionsDialogIsVisible"
       v-model="versionsDialogIsVisible"
       @cancel="versionsDialogIsVisible = false"
-      :survey="survey"
+      :survey-id="survey._id"
       @reload-survey="onReloadSurvey"
     />
 
@@ -332,15 +332,16 @@ export default {
         this.snack(`error parsing Survey file:${err}`);
       }
     },
-    exportSurvey() {
-      const data = JSON.stringify(this.survey, null, 4);
-      downloadExternal(`data:text/plain;charset=utf-8,${encodeURIComponent(data)}`, `${this.survey.name}.json`);
+    async exportSurvey() {
+      const { data } = await api.get(`/surveys/${this.survey._id}?version=all`);
+      const dataString = JSON.stringify(data, null, 4);
+      downloadExternal(`data:text/plain;charset=utf-8,${encodeURIComponent(dataString)}`, `${this.survey.name}.json`);
     },
     async fetchData() {
       try {
         const { id } = this.$route.params;
         this.survey._id = id;
-        const { data } = await api.get(`/surveys/${this.survey._id}`);
+        const { data } = await api.get(`/surveys/${this.survey._id}?version=latestPublishedOrDraft`);
         this.survey = { ...this.survey, ...data };
       } catch (e) {
         console.log('something went wrong:', e);
