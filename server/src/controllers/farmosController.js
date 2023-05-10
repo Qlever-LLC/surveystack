@@ -5,7 +5,7 @@ import joiObjectId from 'joi-objectid';
 Joi.objectId = joiObjectId(Joi);
 
 import isString from 'lodash/isString';
-import uniq from 'lodash/uniq';
+import _, { result } from 'lodash';
 import boom from '@hapi/boom';
 import { isFarmosUrlAvailable, createInstance } from '../services/farmos.service';
 import {
@@ -1361,6 +1361,11 @@ export const addSuperAdminNotes = async (req, res) => {
 };
 
 export const updateGroupsForUser = async (req, res) => {
+  // a, b => a, b, c (added to c)
+  // a, b => a (removed from b)
+  // a, b, c => a (removed from a and b)
+  // a, b, c => a, d (moved from a, b, c to a and d)
+
   const { userId, instanceName, groupIds, initialGroupIds, tree } = await requireGroup(req, {
     userId: Joi.objectId().required(),
     instanceName: Joi.string().required(),
@@ -1411,60 +1416,59 @@ export const updateGroupsForUser = async (req, res) => {
     );
   }
 
-  const initialGroupsName = initialGroups.map((e) => e.name);
-  const resultGroupsName = resultGroups.map((e) => e.name);
+  // const sameGroups = _.intersectionBy(initialGroups, resultGroups, (g) => g._id + '');
+  const additionalGroups = _.differenceBy(resultGroups, initialGroups, (g) => g._id + '');
+  const missingGroups = _.differenceBy(initialGroups, resultGroups, (g) => g._id + '');
 
-  const initialContainsResult = initialGroupsName.every((val) => resultGroupsName.includes(val));
-  const resultContainsInitial = resultGroupsName.every((val) => initialGroupsName.includes(val));
+  if (additionalGroups.length == 0 && missingGroups.length == 0) {
+    console.log('collections are the same');
 
-  if (initialContainsResult && resultContainsInitial) {
+    // both collections are the same
     return res.send({
       status: 'no changes',
     });
   }
+
   let resStatus = '';
   // compare with the initial result the group(s)
   // if just add without remove => add notification
   // else if just remove without add => remove notification
   // else move notification
-  if (initialContainsResult) {
-    const differenceName = resultGroupsName.filter((x) => !initialGroupsName.includes(x));
-    if (differenceName.length > 0) {
-      const difference = resultGroups.filter((e) => differenceName.includes(e.name));
-      const differenceId = difference.map((e) => e._id);
-      await sendUserAddFarmToMultipleSurveystackGroupNotification(
-        instanceName,
-        differenceId,
-        origin
-      );
-      const differenceGroupName = difference.map((e) => e.name).join(', ');
-      resStatus = `Successfully added instance to ${differenceGroupName}, instance owner will be notified`;
-    }
-  } else if (resultContainsInitial) {
-    const differenceName = initialGroupsName.filter((x) => !resultGroupsName.includes(x));
-    const difference = initialGroups.filter((e) => differenceName.includes(e.name));
-    const differenceId = difference.map((e) => e._id);
-    await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(
-      instanceName,
-      differenceId,
-      origin
-    );
-    const differenceGroupName = difference.map((e) => e.name).join(', ');
-    resStatus = `Successfully removed instance from ${differenceGroupName}, instance owner will be notified`;
-  } else {
-    const differenceName = initialGroupsName.filter((x) => !resultGroupsName.includes(x));
-    const difference = initialGroups.filter((e) => differenceName.includes(e.name));
-    const differenceId = difference.map((e) => e._id);
-    const resultInstanceGroupsId = resultGroups.map((e) => e._id);
+
+  console.log('missingGroups', missingGroups);
+  console.log('additionalGroups', additionalGroups);
+
+  if (missingGroups.length > 0 && additionalGroups.length > 0) {
     await sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification(
       instanceName,
-      differenceId,
-      resultInstanceGroupsId,
+      initialGroups.map((g) => g._id),
+      resultGroups.map((g) => g._id),
       origin
     );
-    const oldName = difference.map((e) => e.name).join(',');
-    const newName = resultGroups.map((e) => e.name).join(',');
+
+    const oldName = initialGroups.map((g) => g.name).join(',');
+    const newName = resultGroups.map((g) => g.name).join(',');
+
     resStatus = `Successfully move instance from ${oldName} to ${newName}, instance owner will be notified`;
+  } else if (additionalGroups.length > 0) {
+    await sendUserAddFarmToMultipleSurveystackGroupNotification(
+      instanceName,
+      additionalGroups.map((g) => g._id),
+      origin
+    );
+    resStatus = `Successfully added instance to ${additionalGroups
+      .map((g) => g._name)
+      .join(', ')}, instance owner will be notified`;
+  } else if (missingGroups.length > 0) {
+    await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(
+      instanceName,
+      missingGroups.map((g) => g._id),
+      origin
+    );
+
+    resStatus = `Successfully removed instance from ${missingGroups
+      .map((g) => g._name)
+      .join(', ')}, instance owner will be notified`;
   }
 
   return res.send({
@@ -1552,7 +1556,7 @@ export const removeMembershipHook = async (membership, origin) => {
       othersInstances.push(...memberFarms);
     }
 
-    const instances = uniq(othersInstances);
+    const instances = _.uniq(othersInstances);
 
     const memberInfo = groupInformation.members.find((m) => m.user + '' == userId + '');
     if (!memberInfo) {

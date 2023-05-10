@@ -4,6 +4,12 @@ import _ from 'lodash';
 import { ObjectId } from 'mongodb';
 const { getDb } = require('../db');
 
+import * as manage from '../services/farmos/manage';
+
+jest.spyOn(manage, 'sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification');
+jest.spyOn(manage, 'sendUserAddFarmToMultipleSurveystackGroupNotification');
+jest.spyOn(manage, 'sendUserRemoveFarmFromMultipleSurveystackGroupsNotification');
+
 import {
   getFarmOSInstances,
   getAssets,
@@ -23,6 +29,7 @@ import {
   removeInstanceFromGroup,
   removeInstanceFromOtherUser,
   extractOwnerUsersMappedInst,
+  updateGroupsForUser,
 } from './farmosController';
 import { createGroup, createReq, createRes, createUser } from '../testUtils';
 import {
@@ -33,6 +40,11 @@ import {
   createFarmosGroupSettings,
 } from '../services/farmos/manage';
 import * as farmosManageModule from '../services/farmos/manage';
+import {
+  sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification,
+  sendUserRemoveFarmFromMultipleSurveystackGroupsNotification,
+  sendUserAddFarmToMultipleSurveystackGroupNotification,
+} from '../services/farmos/manage';
 import {
   assetResponse,
   logResponse,
@@ -1144,5 +1156,101 @@ describe('farmos-controller', () => {
     expect(mergedData[0]).toEqual(resA);
     expect(mergedData[1]).toEqual(resB);
     expect(mergedData[2]).toEqual(resC);
+  });
+
+  it('updateGroupsForUser', async () => {
+    const instanceName = 'test.farmos.net';
+    const parentGroup = await createGroup({ name: 'Parent Group' });
+
+    await createFarmosGroupSettings(parentGroup._id);
+
+    const a = await parentGroup.createSubGroup({ name: 'A' });
+    const b = await parentGroup.createSubGroup({ name: 'B' });
+    const c = await parentGroup.createSubGroup({ name: 'C' });
+    const d = await parentGroup.createSubGroup({ name: 'D' });
+
+    const user = await parentGroup.createUserMember();
+    const admin = await parentGroup.createAdminMember();
+
+    await mapFarmOSInstanceToUser(user.user._id, instanceName, true, origin);
+
+    const parentGroupId = parentGroup._id;
+
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, a._id, origin);
+    await addFarmToSurveystackGroupAndSendNotification(instanceName, b._id, origin);
+
+    const addMethod = sendUserAddFarmToMultipleSurveystackGroupNotification;
+    const moveMethod = sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification;
+    const removeMethod = sendUserRemoveFarmFromMultipleSurveystackGroupsNotification;
+
+    const runWithGroups = async (initial, updated, expectedMethod) => {
+      const res = mockRes(admin.user._id);
+      const req = createReq({
+        params: {
+          groupId: parentGroup._id,
+        },
+        body: {
+          userId: user.user._id + '',
+          instanceName: instanceName,
+          initialGroupIds: initial.map((g) => g.id + ''),
+          groupIds: [b._id + '', d._id + ''],
+        },
+      });
+      await updateGroupsForUser(req, res);
+      expect(expectedMethod).toHaveBeenCalled();
+    };
+
+    const res = mockRes(admin.user._id);
+    console.log(res);
+    let req = createReq({
+      params: {
+        groupId: parentGroup._id,
+      },
+      body: {
+        userId: user.user._id + '',
+        instanceName: instanceName,
+        initialGroupIds: [a._id + '', c._id + ''],
+        groupIds: [b._id + '', d._id + ''],
+      },
+    });
+
+    await updateGroupsForUser(req, res);
+
+    expect(sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification).toHaveBeenCalled();
+
+    req = createReq({
+      params: {
+        groupId: parentGroup._id,
+      },
+      body: {
+        userId: user.user._id + '',
+        instanceName: instanceName,
+        initialGroupIds: [a._id + '', c._id + ''],
+        groupIds: [a._id + ''],
+      },
+    });
+
+    await updateGroupsForUser(req, res);
+
+    expect(sendUserRemoveFarmFromMultipleSurveystackGroupsNotification).toHaveBeenCalled();
+
+    req = createReq({
+      params: {
+        groupId: parentGroup._id,
+      },
+      body: {
+        userId: user.user._id + '',
+        instanceName: instanceName,
+        initialGroupIds: [a._id + ''],
+        groupIds: [a._id + '', c._id + ''],
+      },
+    });
+
+    await updateGroupsForUser(req, res);
+
+    expect(sendUserAddFarmToMultipleSurveystackGroupNotification).toHaveBeenCalled();
+
+    console.log('res', res.data);
   });
 });
