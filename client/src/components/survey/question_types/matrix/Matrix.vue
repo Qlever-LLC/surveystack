@@ -67,7 +67,7 @@
       :value="control.label"
       :redacted="redacted"
       :required="required"
-      :initializable="control.options.initialize.enabled"
+      :initializable="control.options.initialize && control.options.initialize.enabled"
       @initialize="initialize"
     />
     <app-control-hint :value="control.hint" />
