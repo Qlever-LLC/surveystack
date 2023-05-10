@@ -469,8 +469,13 @@ class PdfGenerator {
      **  Printable version
      */
     if (this.options.printable) {
+      if (type === 'instructions') {
+        def = this.getInstructionDef(control);
+      } else if (type === 'instructionsImageSplit') {
+        def = await this.getInstructionImageSplitDef(control);
+      }
       // Matrix
-      if (type === 'matrix') {
+      else if (type === 'matrix') {
         def = await this.getMatrixTableDef('', options);
       }
       // Selection
@@ -492,9 +497,7 @@ class PdfGenerator {
         def = this.getPrintableDateDef();
       }
       // Other
-      else if (
-        !['group', 'page', 'instructions', 'instructionsImageSplit', 'script'].includes(type)
-      ) {
+      else if (!['group', 'page', 'script'].includes(type)) {
         def = this.getPrintableAnswerDef();
       }
 
@@ -1045,14 +1048,14 @@ class PdfGenerator {
     // Filter hidden
     let validControls = controls.filter((control) => !this.isHiddenControl.bind(this)(control));
 
-    // Filter instructions
-    if (!this.survey.options.showInstruction) {
-      validControls = [...validControls].filter(
-        (control) => control.type !== 'instructions' && control.type !== 'instructionsImageSplit'
-      );
-    }
-
     if (!this.options.printable) {
+      // Filter instructions
+      if (!this.survey.options.showInstruction) {
+        validControls = [...validControls].filter(
+          (control) => control.type !== 'instructions' && control.type !== 'instructionsImageSplit'
+        );
+      }
+
       // Filter relevant
       validControls = [...validControls].filter((control) =>
         this.isRelevantControl.bind(this)(control, path)
