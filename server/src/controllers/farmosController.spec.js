@@ -1193,64 +1193,19 @@ describe('farmos-controller', () => {
         body: {
           userId: user.user._id + '',
           instanceName: instanceName,
-          initialGroupIds: initial.map((g) => g.id + ''),
-          groupIds: [b._id + '', d._id + ''],
+          initialGroupIds: initial.map((g) => g._id + ''),
+          groupIds: updated.map((g) => g._id + ''),
         },
       });
       await updateGroupsForUser(req, res);
       expect(expectedMethod).toHaveBeenCalled();
     };
 
-    const res = mockRes(admin.user._id);
-    console.log(res);
-    let req = createReq({
-      params: {
-        groupId: parentGroup._id,
-      },
-      body: {
-        userId: user.user._id + '',
-        instanceName: instanceName,
-        initialGroupIds: [a._id + '', c._id + ''],
-        groupIds: [b._id + '', d._id + ''],
-      },
-    });
+    await runWithGroups([a, c], [b, d], moveMethod);
+    await runWithGroups([a, c], [a], removeMethod);
+    await runWithGroups([a], [a, b, d], addMethod);
 
-    await updateGroupsForUser(req, res);
-
-    expect(sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification).toHaveBeenCalled();
-
-    req = createReq({
-      params: {
-        groupId: parentGroup._id,
-      },
-      body: {
-        userId: user.user._id + '',
-        instanceName: instanceName,
-        initialGroupIds: [a._id + '', c._id + ''],
-        groupIds: [a._id + ''],
-      },
-    });
-
-    await updateGroupsForUser(req, res);
-
-    expect(sendUserRemoveFarmFromMultipleSurveystackGroupsNotification).toHaveBeenCalled();
-
-    req = createReq({
-      params: {
-        groupId: parentGroup._id,
-      },
-      body: {
-        userId: user.user._id + '',
-        instanceName: instanceName,
-        initialGroupIds: [a._id + ''],
-        groupIds: [a._id + '', c._id + ''],
-      },
-    });
-
-    await updateGroupsForUser(req, res);
-
-    expect(sendUserAddFarmToMultipleSurveystackGroupNotification).toHaveBeenCalled();
-
-    console.log('res', res.data);
+    await runWithGroups([a, b, c, d], [], removeMethod);
+    await runWithGroups([], [a, b, c, d], addMethod);
   });
 });
