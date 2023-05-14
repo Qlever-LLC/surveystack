@@ -36,8 +36,8 @@ const base = () => ({
     async fetchFarms() {
       this.loading = true;
       try {
-        const response = await api.get('farmos/farms');
-        this.farms = response.data.map(({ instanceName }) => ({
+        const farms = await this.$store.dispatch('draft/getFarmOsResource', 'farms');
+        this.farms = farms.map(({ instanceName }) => ({
           label: instanceName,
           value: {
             url: instanceName,
@@ -51,9 +51,9 @@ const base = () => ({
     async fetchAreas() {
       this.loading = true;
       try {
-        const response = await api.get('farmos/assets?bundle=land');
+        const assets = await this.$store.dispatch('draft/getFarmOsResource', 'assets');
 
-        this.farms = response.data.assets.map((f) => ({
+        this.farms = assets.map((f) => ({
           label: `<span class="blue-chip mr-4">${f.instanceName}</span> ${f.name} `,
           value: {
             farmName: f.instanceName,
@@ -113,13 +113,10 @@ const base = () => ({
       this.loading = true;
 
       try {
-        const [landRes, plantRes] = await Promise.all([
-          api.get('farmos/assets?bundle=land'),
-          api.get('farmos/assets?bundle=plant'),
+        const [locationAssets, plantAssets] = await Promise.all([
+          this.$store.dispatch('draft/getFarmOsResource', 'assets'),
+          this.$store.dispatch('draft/getFarmOsResource', 'plant'),
         ]);
-
-        const locationAssets = landRes.data.assets;
-        const plantAssets = plantRes.data.assets;
 
         this.assets = plantAssets.map((asset) => {
           const location = asset.location
