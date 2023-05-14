@@ -2,7 +2,7 @@ import api from '@/services/api.service';
 import { getValueOrNull } from '@/utils/surveyStack';
 import { linearControls } from '@/utils/submissions';
 
-const base = (type) => ({
+const base = () => ({
   data() {
     return {
       loading: false,
@@ -30,7 +30,6 @@ const base = (type) => ({
       return (item && item.label) || value;
     },
     getLabelForItemValue2(value) {
-      // console.log(value);
       const item = this.farms.find((x) => x.value === value);
       return (item && item.label) || value;
     },
@@ -70,15 +69,11 @@ const base = (type) => ({
 
       const submission = this.$store.getters['draft/submission'];
       const survey = this.$store.getters['draft/survey'];
-      const nodes = linearControls(survey, submission);
-      const farmOsType = 'field';
+      const nodes = linearControls(survey, submission).filter((node) => node.value);
 
       const localAreas = [];
       for (const node of nodes) {
-        if (node.type === 'farmOsUuid' && node.options.farmOsType === farmOsType) {
-          if (!node.value) {
-            continue;
-          }
+        if (node.type === 'farmOsUuid' && node.options.farmOsType === 'field') {
           localAreas.push({
             label: `<span class="green-chip mr-4">New Field</span> ${node.value.name}`,
             value: {
@@ -88,77 +83,65 @@ const base = (type) => ({
               id: node.value.id,
             },
           });
-        }
+        } else if (node.type === 'matrix' && node.options && node.options.source && node.options.source.content) {
+          const farmosUuidElements = node.options.source.content.filter(
+            (c) => c.type == 'farmos_uuid' && c.options.farmOsType === 'field'
+          );
 
-        if (node.type === 'matrix') {
-          if (!node.options || !node.options.source || !node.options.source.content) {
-            continue;
-          }
-
-          const farmosUuidElemets = node.options.source.content.filter((c) => c.type == 'farmos_uuid');
-
-          for (const config of farmosUuidElemets) {
-            // console.log('config', config);
-            const type = config.options.farmOsType;
+          for (const config of farmosUuidElements) {
             const colName = config.value;
-            if (type === farmOsType && node.value) {
-              // console.log('type matches');
-              for (const v of node.value) {
-                const targetValue = v[colName].value;
-                if (targetValue && targetValue.name) {
-                  localAreas.push({
-                    label: `<span class="green-chip mr-4">New Field</span> ${targetValue.name}`,
-                    value: {
-                      farmName: '',
-                      url: '',
-                      name: targetValue.name,
-                      id: targetValue.id,
-                    },
-                  });
-                }
-              }
-            }
+            const values = node.value.filter((row) => row[colName].value && row[colName].value.name);
+            localAreas.push(
+              ...values.map((row) => ({
+                label: `<span class="green-chip mr-4">New Field</span> ${row[colName].value.name}`,
+                value: {
+                  farmName: '',
+                  url: '',
+                  name: row[colName].value.name,
+                  id: row[colName].value.id,
+                },
+              }))
+            );
           }
         }
       }
 
       this.farms = [...localAreas, ...this.farms];
-
       this.loading = false;
     },
     async fetchAssets() {
       this.loading = true;
+
       try {
-        const { data: location } = await api.get('farmos/assets?bundle=land');
+        const [landRes, plantRes] = await Promise.all([
+          api.get('farmos/assets?bundle=land'),
+          api.get('farmos/assets?bundle=plant'),
+        ]);
 
-        // console.log('locations', location);
+        const locationAssets = landRes.data.assets;
+        const plantAssets = plantRes.data.assets;
 
-        const response = await api.get('farmos/assets?bundle=plant');
+        this.assets = plantAssets.map((asset) => {
+          const location = asset.location
+            ? asset.location.map(({ id }) => {
+                const match = locationAssets.find((l) => l.id === id);
 
-        // console.log('res', response.data);
-        this.assets = response.data.assets.map((f) => {
-          let loc = [];
-
-          if (f.location) {
-            loc = f.location.map((loc) => {
-              const asset = location.assets.find((l) => l.id === loc.id);
-
-              return {
-                id: loc.id,
-                name: asset ? asset.name : '(No Area Associated)',
-              };
-            });
-          }
+                return {
+                  id,
+                  name: match ? match.name : '(No Area Associated)',
+                };
+              })
+            : [];
 
           return {
-            label: `<span class="blue-chip mr-4">${f.instanceName}</span> ${f.name} `,
+            label: `<span class="blue-chip mr-4">${asset.instanceName}</span> ${asset.name} `,
             value: {
-              farmName: f.instanceName,
-              url: f.instanceName,
-              name: f.name.trim(),
-              id: f.id,
-              archived: f.archived !== null,
-              location: loc,
+              farmName: asset.instanceName,
+              url: asset.instanceName,
+              name: asset.name.trim(),
+              id: asset.id,
+              archived: asset.archived !== null,
+              location,
             },
           };
         });
@@ -171,18 +154,11 @@ const base = (type) => ({
 
       const submission = this.$store.getters['draft/submission'];
       const survey = this.$store.getters['draft/survey'];
-      const nodes = linearControls(survey, submission);
-
-      // console.log('nodes', nodes);
-
-      const farmOsType = 'planting';
+      const nodes = linearControls(survey, submission).filter((node) => node.value);
 
       const localPlantings = [];
       for (const node of nodes) {
-        if (node.type === 'farmOsUuid' && node.options.farmOsType === farmOsType) {
-          if (!node.value || !node.value.name) {
-            continue;
-          }
+        if (node.type === 'farmOsUuid' && node.options.farmOsType === 'planting' && node.value.name) {
           localPlantings.push({
             label: `${node.value.name}`,
             value: {
@@ -194,48 +170,42 @@ const base = (type) => ({
               location: [],
             },
           });
-        }
+        } else if (node.type === 'matrix' && node.options && node.options.source && node.options.source.content) {
+          const farmosUuidElements = node.options.source.content.filter(
+            (c) => c.type == 'farmos_uuid' && c.options.farmOsType === 'planting'
+          );
 
-        if (node.type === 'matrix') {
-          if (!node.options || !node.options.source || !node.options.source.content) {
-            continue;
-          }
-
-          const farmosUuidElemets = node.options.source.content.filter((c) => c.type == 'farmos_uuid');
-
-          for (const config of farmosUuidElemets) {
-            const type = config.options.farmOsType;
+          for (const config of farmosUuidElements) {
             const colName = config.value;
-            if (type === farmOsType && node.value) {
-              for (const v of node.value) {
-                const targetValue = v[colName].value;
-                if (targetValue && targetValue.name) {
-                  localPlantings.push({
-                    label: `${targetValue.name}`,
-                    value: {
-                      farmName: '',
-                      url: '',
-                      name: targetValue.name,
-                      id: targetValue.id,
-                      archived: false,
-                      location: [],
-                    },
-                  });
-                }
-              }
-            }
+            const values = node.value.filter((row) => row[colName].value && row[colName].value.name);
+
+            localPlantings.push(
+              ...values.map((row) => ({
+                label: `${row[colName].value.name}`,
+                value: {
+                  farmName: '',
+                  url: '',
+                  name: row[colName].value.name,
+                  id: row[colName].value.id,
+                  archived: false,
+                  location: [],
+                },
+              }))
+            );
           }
         }
       }
 
-      // console.log('localplantings', localPlantings);
       this.assets = [...localPlantings, ...this.assets];
       this.loading = false;
     },
   },
   computed: {
+    getArrayValue() {
+      return Array.isArray(this.value) ? this.value : this.value ? [this.value] : [];
+    },
     getValue() {
-      return this.control.options.hasMultipleSelections ? this.value : this.value && this.value[0];
+      return this.control.options.hasMultipleSelections ? this.getArrayValue : this.getArrayValue[0] || this.value;
     },
     sourceIsValid() {
       return (
