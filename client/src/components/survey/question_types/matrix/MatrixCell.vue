@@ -128,9 +128,7 @@
   >
     <template v-slot:selection="data" v-if="!!header.multiple">
       <v-chip v-bind="data.attrs" :input-value="data.selected" @click="data.select">
-        <template v-slot:default>
-          <span v-html="data.item.label" />
-        </template>
+        <span v-html="data.item.label" />
       </v-chip>
     </template>
     <template v-slot:selection="{ item }" v-else>
@@ -157,10 +155,20 @@
     item-text="value.name"
     item-value="value"
     hide-details
+    clearable
     outlined
     :disabled="disabled || loading"
   >
-    <template v-slot:item="{ item }">
+    <template v-slot:selection="{ item, index }">
+      <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
+    </template>
+
+    <template v-slot:item="data" v-if="!!header.multiple">
+      <v-list-item-content>
+        <v-list-item-title v-html="data.item.label" />
+      </v-list-item-content>
+    </template>
+    <template v-slot:item="{ item }" v-else>
       <div v-html="item.label"></div>
     </template>
   </v-autocomplete>
