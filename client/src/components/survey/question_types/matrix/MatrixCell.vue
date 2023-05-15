@@ -266,7 +266,7 @@ export default {
       },
       set(value) {
         if (this.header.type == 'farmos_planting' || this.header.type == 'farmos_field') {
-          if (!Array.isArray(value)) {
+          if (value && !Array.isArray(value)) {
             value = [value];
           }
         }
