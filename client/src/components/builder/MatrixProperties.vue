@@ -25,7 +25,7 @@
       @delete="removeResource"
       @close-dialog="open = false"
       @set-survey-resources="$emit('set-survey-resources', $event)"
-      @set-control-required="$emit('set-control-required', $event)"
+      @set-control-required="$emit('set-control-required')"
     />
   </v-dialog>
 </template>

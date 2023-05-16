@@ -192,7 +192,11 @@
 
                     <checkbox
                       v-model="item.required"
-                      @change="$emit('set-control-required', $event)"
+                      @change="
+                        (v) => {
+                          v && $emit('set-control-required');
+                        }
+                      "
                       label="Required"
                       helper-text="Make this a required field"
                       hide-details

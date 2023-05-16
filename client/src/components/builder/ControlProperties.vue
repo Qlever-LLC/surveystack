@@ -42,8 +42,8 @@
         v-model="control.options.source"
         :resources="survey.resources"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-        @set-survey-resources="'set-survey-resources', $event"
-        @set-control-source="'set-control-source', $event"
+        @set-survey-resources="$emit('set-survey-resources', $event)"
+        @set-control-source="$emit('set-control-source', $event)"
       />
       <v-select
         v-if="isDate"
@@ -83,7 +83,7 @@
         :allowSetAllowHide="!!survey.meta.isLibrary"
         @set-control-source="$emit('set-control-source', $event)"
         @set-survey-resources="$emit('set-survey-resources', $event)"
-        @set-control-required="control.options.required = $event"
+        @set-control-required="control.options.required = true"
         class="mt-3"
       />
       <v-select
