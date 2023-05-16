@@ -58,7 +58,7 @@
             color="secondary"
             class="ml-2"
             :disabled="surveyEntity && surveyEntity.meta.isLibrary"
-            @click="startDraft(survey)"
+            @click="startDraft(surveyEntity)"
           >
             <v-icon left>mdi-plus</v-icon>
             New submission
@@ -570,7 +570,7 @@ export default {
   },
   async created() {
     this.survey = this.$route.query.survey;
-    const { data: surveyEntity } = await api.get(`/surveys/${this.survey}`);
+    const { data: surveyEntity } = await api.get(`/surveys/${this.survey}?version=latest`);
     this.surveyEntity = surveyEntity;
     await this.fetchData();
   },

@@ -42,8 +42,8 @@
         v-model="control.options.source"
         :resources="survey.resources"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-        @set-survey-resources="(val) => $emit('set-survey-resources', val)"
-        @set-control-source="(val) => $emit('set-control-source', val)"
+        @set-survey-resources="'set-survey-resources', $event"
+        @set-control-source="'set-control-source', $event"
       />
       <v-select
         v-if="isDate"
@@ -66,8 +66,8 @@
         :value="control.options.source"
         :resources="survey.resources"
         :disable-selection="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
-        @set-control-source="(val) => $emit('set-control-source', val)"
-        @set-survey-resources="(val) => $emit('set-survey-resources', val)"
+        @set-control-source="$emit('set-control-source', $event)"
+        @set-survey-resources="$emit('set-survey-resources', $event)"
       />
       <v-text-field
         v-if="isMatrix"
@@ -81,9 +81,9 @@
         :resources="survey.resources"
         :disabled="!!control.libraryId && !control.options.allowModify && !control.isLibraryRoot"
         :allowSetAllowHide="!!survey.meta.isLibrary"
-        @set-control-source="(val) => $emit('set-control-source', val)"
-        @set-survey-resources="(val) => $emit('set-survey-resources', val)"
-        @set-control-required="control.options.required = true"
+        @set-control-source="$emit('set-control-source', $event)"
+        @set-survey-resources="$emit('set-survey-resources', $event)"
+        @set-control-required="control.options.required = $event"
         class="mt-3"
       />
       <v-select

@@ -111,10 +111,7 @@
                   :scale="0.75"
                   v-if="selectedSurvey && selectedSurvey._id === c._id"
                   class="graphical-view"
-                  :controls="
-                    selectedSurvey.revisions.find((revision) => revision.version === selectedSurvey.latestVersion)
-                      .controls
-                  "
+                  :controls="selectedSurvey.revisions[selectedSurvey.revisions.length - 1].controls"
                 />
               </v-col>
             </v-row>
@@ -205,7 +202,7 @@ export default {
       } else if (this.selectedSurvey && this.selectedSurvey._id === surveyId) {
         this.selectedSurvey = null; // deselect card
       } else {
-        const { data } = await api.get(`/surveys/${surveyId}`);
+        const { data } = await api.get(`/surveys/${surveyId}?version=latest`);
         this.selectedSurvey = data; // select card
       }
     },

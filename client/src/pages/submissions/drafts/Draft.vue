@@ -179,10 +179,7 @@ export default {
     try {
       this.submission = await this.$store.dispatch('submissions/fetchLocalSubmission', id);
     } catch (error) {
-      console.log('Error: submission not found');
-      this.hasError = true;
-      this.loading = false;
-      return;
+      console.warn('Submission not found', id);
     }
 
     if (!this.submission) {
@@ -196,7 +193,10 @@ export default {
       this.showResubmissionDialog = true;
     }
 
-    this.survey = await this.$store.dispatch('surveys/fetchSurvey', this.submission.meta.survey.id);
+    this.survey = await this.$store.dispatch('surveys/fetchSurvey', {
+      id: this.submission.meta.survey.id,
+      version: this.submission.meta.survey.version,
+    });
     const cleanSubmission = createSubmissionFromSurvey({
       survey: this.survey,
       version: this.submission.meta.survey.version,
@@ -221,9 +221,7 @@ export default {
       return;
     }
 
-    if (this.submission && this.submission.meta.submitAsUser) {
-      api.removeHeader('x-delegate-to');
-    }
+    api.removeHeader('x-delegate-to');
 
     next(true);
   },

@@ -112,8 +112,12 @@ const actions = {
   // TODO: figure out where and when to persist to database and store.
   // Also, should this even be a Vuex action or should it reside somewhere else?
   async [types.actions.startDraft]({ dispatch }, { survey, submitAsUser = undefined, version = 0 }) {
-    const surveyEntity = await dispatch('surveys/fetchSurvey', survey, { root: true });
-    const activeVersion = version === 0 ? surveyEntity.latestVersion : version;
+    const activeVersion = version === 0 ? survey.latestVersion : version;
+    const surveyEntity = await dispatch(
+      'surveys/fetchSurvey',
+      { id: survey._id, version: activeVersion },
+      { root: true }
+    );
     const submission = createSubmissionFromSurvey({
       survey: surveyEntity,
       version: activeVersion,

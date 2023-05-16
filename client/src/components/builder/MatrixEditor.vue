@@ -112,13 +112,7 @@
                           hide-details
                           dense
                         />
-                        <v-btn
-                          class="ml-1"
-                          :disabled="!item.resource"
-                          icon
-                          small
-                          @click="openOntologyEditor(item.resource)"
-                        >
+                        <v-btn v-if="item.resource" class="ml-1" icon small @click="openOntologyEditor(item.resource)">
                           <v-icon>mdi-pencil</v-icon>
                         </v-btn>
                       </div>
@@ -198,11 +192,7 @@
 
                     <checkbox
                       v-model="item.required"
-                      @change="
-                        (v) => {
-                          v && $emit('set-control-required');
-                        }
-                      "
+                      @change="$emit('set-control-required', $event)"
                       label="Required"
                       helper-text="Make this a required field"
                       hide-details
@@ -265,7 +255,6 @@
 </template>
 
 <script>
-import ObjectId from 'bson-objectid';
 import Draggable from 'vuedraggable';
 import Ontology from '@/components/builder/Ontology.vue';
 import Date from '@/components/builder/Date.vue';
@@ -273,7 +262,7 @@ import Checkbox from '@/components/builder/Checkbox.vue';
 import ResourceSelector from '@/components/builder/ResourceSelector.vue';
 import OntologyListEditor from '@/components/builder/OntologyListEditor.vue';
 import OntologyReferenceEditor from '@/components/builder/OntologyReferenceEditor.vue';
-import { createResource, resourceLocations, resourceTypes } from '@/utils/resources';
+import { createResource, removeResource, resourceLocations, resourceTypes, setResource } from '@/utils/resources';
 import { cleanupAutocompleteMatrix } from '@/utils/surveys';
 import { getValueOrNull } from '@/utils/surveyStack';
 
@@ -328,6 +317,7 @@ export default {
       ontologyListDialog: false,
       ontologyReferenceDialog: false,
       resourceTypes,
+      colIndex: -1,
       resource: null,
     };
   },
@@ -356,14 +346,15 @@ export default {
   },
   methods: {
     removeResource(id) {
-      const index = this.resources.findIndex((r) => r.id === id);
-      const newResources = [...this.resources.slice(0, index), ...this.resources.slice(index + 1)];
-      this.$emit('set-survey-resources', newResources);
+      this.$emit('set-survey-resources', removeResource(this.resources, id));
+      this.resource = null;
+      if (this.colIndex >= 0) {
+        this.columns[this.colIndex].resource = null;
+      }
     },
     setResource(resource) {
-      const index = this.resources.findIndex((r) => r.id === resource.id);
-      const newResources = [...this.resources.slice(0, index), resource, ...this.resources.slice(index + 1)];
-      this.$emit('set-survey-resources', newResources);
+      this.$emit('set-survey-resources', setResource(this.resources, resource));
+      this.resource = resource;
     },
     createOntology(column, type) {
       const newResource =
@@ -376,6 +367,7 @@ export default {
               labelPrefix: 'Survey Reference',
               defaultContent: [],
             });
+      this.colIndex = column;
       this.columns[column].resource = newResource.id;
       this.$emit('set-survey-resources', [...this.resources, newResource]);
       this.openOntologyEditor(newResource);
@@ -449,6 +441,18 @@ export default {
     },
     isValidNumber(val) {
       return val === '' || val === null || isNaN(Number(val)) ? 'Please enter a number' : true;
+    },
+  },
+  watch: {
+    ontologyListDialog(val) {
+      if (!val) {
+        this.colIndex = -1;
+      }
+    },
+    ontologyReferenceDialog(val) {
+      if (!val) {
+        this.colIndex = -1;
+      }
     },
   },
   created() {

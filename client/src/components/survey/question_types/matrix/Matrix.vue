@@ -99,7 +99,7 @@
             @changed="onInput"
             :disabled="isMobile"
             class="mt-2"
-            :loading="loading"
+            :loading="isLoading"
           />
         </v-form>
       </template>
@@ -118,15 +118,19 @@
     </app-matrix-table>
     <app-control-more-info :value="control.moreInfo" />
 
-    <div class="d-flex flex-row align-center" v-if="loading">
+    <div class="d-flex flex-row align-center" v-if="isFarmOsLoading">
       <v-progress-circular indeterminate color="primary" size="24" />
-      <div class="ml-2 text--secondary">Loading farmOS data</div>
+      <div class="ml-2 text--secondary">Loading farmOS data...</div>
+    </div>
+    <div class="d-flex flex-row align-center" v-if="isOntologyLoading">
+      <v-progress-circular indeterminate color="primary" size="24" />
+      <div class="ml-2 text--secondary">Loading ontology resources...</div>
     </div>
   </div>
 </template>
 
 <script>
-import { cloneDeep, isNil, sortBy, uniq, without } from 'lodash';
+import { cloneDeep, isNil, uniq, without } from 'lodash';
 import appDialog from '@/components/ui/Dialog.vue';
 import appMatrixCell from '@/components/survey/question_types/matrix/MatrixCell.vue';
 import appMatrixTable from '@/components/survey/question_types/matrix/MatrixTable.vue';
@@ -244,13 +248,27 @@ const transform = (assets) => {
 };
 
 export default {
-  mixins: [baseQuestionComponent, farmosBase('fields')],
+  mixins: [baseQuestionComponent, farmosBase()],
   components: {
     appDialog,
     appMatrixCell,
     appMatrixTable,
     appRequired,
     appRedacted,
+  },
+  data() {
+    return {
+      rows: this.value,
+      rowToBeDeleted: -1,
+      menus: {}, // object to hold v-models for v-menu
+      farmosTransformedPlantings: [],
+      showEditItemDialog: false,
+      editedIndex: -1,
+      editedItem: null,
+      resourcesMap: {},
+      isOntologyLoading: false,
+      isFarmOsLoading: false,
+    };
   },
   computed: {
     source() {
@@ -285,22 +303,12 @@ export default {
     isMobile() {
       return !this.$vuetify.breakpoint.smAndUp || this.forceMobile;
     },
+    isLoading() {
+      return this.isOntologyLoading || this.isFarmOsLoading;
+    },
     farmos() {
       return { farms: this.farms, plantings: this.farmosTransformedPlantings };
     },
-  },
-  data() {
-    return {
-      rows: this.value,
-      rowToBeDeleted: -1,
-      menus: {}, // object to hold v-models for v-menu
-      farmosTransformedPlantings: [],
-      showEditItemDialog: false,
-      editedIndex: -1,
-      editedItem: null,
-      resourcesMap: {},
-      isLoading: false,
-    };
   },
   methods: {
     add() {
@@ -366,40 +374,49 @@ export default {
       this.rows = [...this.rows, clone];
       this.$emit('changed', this.rows);
     },
-  },
-  async created() {
-    this.isLoading = true;
+    async loadFarmOs() {
+      this.isFarmOsLoading = true;
 
-    //load farmos field areas
-    if (this.headers.find((header) => header.type === 'farmos_field')) {
-      this.fetchAreas();
-    }
-    // load farmos assets
-    if (this.headers.find((header) => header.type === 'farmos_planting')) {
-      await this.fetchAssets();
-      this.farmosTransformedPlantings = transform(this.assets);
-    }
-    // load reference ontology list
-    const ontologyHeaders = this.headers.filter((header) => header.type === 'dropdown' && !!header.resource);
-    for (let i = 0; i < ontologyHeaders.length; i++) {
-      const header = ontologyHeaders[i];
-      const resource = this.resources.find((resource) => resource.id === header.resource);
-      if (!resource) {
-        continue;
+      //load farmos field areas
+      if (this.headers.some((header) => header.type === 'farmos_field')) {
+        await this.fetchAreas();
       }
-      if (resource.type === resourceTypes.ONTOLOGY_LIST) {
-        this.resourcesMap[header.resource] = resource.content;
-      } else if (resource.type === resourceTypes.SURVEY_REFERENCE) {
-        const { id, path } = resource.content;
-        try {
-          this.resourcesMap[header.resource] = await fetchSubmissionUniqueItems(id, path);
-        } catch (e) {
-          console.error('Fetching ontology reference list failed', e);
+
+      // load farmos assets
+      if (this.headers.some((header) => header.type === 'farmos_planting')) {
+        await this.fetchAssets();
+        this.farmosTransformedPlantings = transform(this.assets);
+      }
+
+      this.isFarmOsLoading = false;
+    },
+    async loadOntology() {
+      this.isOntologyLoading = true;
+
+      const ontologyHeaders = this.headers.filter((header) => header.type === 'dropdown' && header.resource);
+      for (let i = 0; i < ontologyHeaders.length; i++) {
+        const header = ontologyHeaders[i];
+        const resource = this.resources.find((resource) => resource.id === header.resource);
+        if (!resource) {
+          continue;
+        }
+        if (resource.type === resourceTypes.ONTOLOGY_LIST) {
+          this.resourcesMap[header.resource] = resource.content;
+        } else if (resource.type === resourceTypes.SURVEY_REFERENCE) {
+          const { id, path } = resource.content;
+          try {
+            this.resourcesMap[header.resource] = await fetchSubmissionUniqueItems(id, path);
+          } catch (e) {
+            console.error('Fetching ontology reference list failed', e);
+          }
         }
       }
-    }
 
-    this.isLoading = false;
+      this.isOntologyLoading = false;
+    },
+  },
+  async created() {
+    await Promise.all([this.loadFarmOs(), this.loadOntology()]);
   },
 };
 </script>
