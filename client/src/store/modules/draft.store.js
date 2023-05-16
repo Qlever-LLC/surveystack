@@ -3,6 +3,8 @@ import TreeModel from 'tree-model';
 import * as surveyStackUtils from '@/utils/surveyStack';
 import * as codeEvaluator from '@/utils/codeEvaluator';
 import * as db from '@/store/db';
+import api from '@/services/api.service';
+import Vue from 'vue';
 
 /*
   README:
@@ -14,7 +16,7 @@ import * as db from '@/store/db';
   If the control type is of type 'group' or 'page', it may contain other nested controls as children.
 
   By using a tree model of the survey controls, we can traverse the tree more easily,
-  and make use of utilits such as .getPath(), .parent, .hasChildren(), etc.
+  and make use of utilities such as .getPath(), .parent, .hasChildren(), etc.
 
   NOTE: The tree model is ONLY used for the hierarchical survey controls, not for the submission object (see below).
 
@@ -64,6 +66,7 @@ const createInitialState = () => ({
   showConfirmSubmission: false,
   errors: null,
   persist: false,
+  farmOsCache: {}, // Cache for farmos resources, should be reset when survey starts
 });
 
 const initialState = createInitialState();
@@ -344,12 +347,12 @@ const actions = {
     commit('SHOW_CONFIRM_SUBMISSION', show);
   },
   async isSkipPage(commit, index, traversal, state) {
-    let cidx = index + 1;
+    let i = index + 1;
     let skipPage = true;
 
     // lookahead
-    while (cidx < traversal.length) {
-      const lookahead = traversal[cidx++];
+    while (i < traversal.length) {
+      const lookahead = traversal[i++];
       const isInsidePage = lookahead
         .getPath()
         .slice(1)
@@ -410,6 +413,23 @@ const actions = {
     } else {
       commit('SET_ERRORS', null);
     }
+  },
+  async getFarmOsResource({ commit, state }, type) {
+    let resource = state.farmOsCache[type];
+
+    const url = {
+      farms: 'farmos/farms',
+      assets: 'farmos/assets?bundle=land',
+      plant: 'farmos/assets?bundle=plant',
+    }[type];
+
+    if (!resource && url) {
+      const response = await api.get(url);
+      resource = type === 'farms' ? response.data : response.data.assets;
+      commit('SET_FARMOS_RESOURCE', { type, resource });
+    }
+
+    return resource;
   },
 };
 
@@ -481,6 +501,9 @@ const mutations = {
   },
   SHOW_CONFIRM_SUBMISSION(state, show) {
     state.showConfirmSubmission = show;
+  },
+  SET_FARMOS_RESOURCE(state, { type, resource }) {
+    Vue.set(state.farmOsCache, type, resource);
   },
   SET_ERRORS(state, errors) {
     state.errors = errors;

@@ -128,9 +128,7 @@
   >
     <template v-slot:selection="data" v-if="!!header.multiple">
       <v-chip v-bind="data.attrs" :input-value="data.selected" @click="data.select">
-        <template v-slot:default>
-          <span v-html="data.item.label" />
-        </template>
+        <span v-html="data.item.label" />
       </v-chip>
     </template>
     <template v-slot:selection="{ item }" v-else>
@@ -157,10 +155,20 @@
     item-text="value.name"
     item-value="value"
     hide-details
+    clearable
     outlined
     :disabled="disabled || loading"
   >
-    <template v-slot:item="{ item }">
+    <template v-slot:selection="{ item, index }">
+      <matrix-cell-selection-label :label="item.label" :index="index" :value="value" />
+    </template>
+
+    <template v-slot:item="data" v-if="!!header.multiple">
+      <v-list-item-content>
+        <v-list-item-title v-html="data.item.label" />
+      </v-list-item-content>
+    </template>
+    <template v-slot:item="{ item }" v-else>
       <div v-html="item.label"></div>
     </template>
   </v-autocomplete>
@@ -266,7 +274,7 @@ export default {
       },
       set(value) {
         if (this.header.type == 'farmos_planting' || this.header.type == 'farmos_field') {
-          if (!Array.isArray(value)) {
+          if (value && !Array.isArray(value)) {
             value = [value];
           }
         }
@@ -339,47 +347,35 @@ export default {
     },
     // copied/adapted from FarmOsPlanting.vue
     localChange(hashesArg) {
-      let hashes;
-      if (!Array.isArray(hashesArg)) {
-        if (hashesArg) {
-          hashes = [hashesArg];
-        } else {
-          return null;
-        }
-      } else {
-        hashes = hashesArg;
+      if (!hashesArg) {
+        return null;
       }
 
-      // console.log('hashes', hashes);
+      const hashes = Array.isArray(hashesArg) ? hashesArg : [hashesArg];
 
-      const selectedItems = hashes.map((h) => {
-        if (typeof h !== 'string') {
-          return h;
-        }
-        return this.farmos.plantings.find((t) => t.value.hash === h).value;
-      });
+      const selectedItems = hashes
+        .map((h) => {
+          if (typeof h !== 'string') {
+            return h;
+          }
+          return this.farmos.plantings.find((t) => t.value.hash === h).value;
+        })
+        .filter(Boolean);
 
-      const fields = selectedItems.filter((item) => !!item.isField);
-
-      // selected assets
       const assets = selectedItems.filter((item) => !item.isField);
-
+      const fields = selectedItems.filter((item) => !!item.isField);
       const assetsToSelect = fields.flatMap((field) =>
-        this.farmos.plantings
-          .filter((item) => !item.value.isField)
-          .filter((item) => item.value.farmName === field.farmName)
-          .filter((item) => item.value.location.some((loc) => loc.id === field.location.id))
+        this.farmos.plantings.filter(
+          (item) =>
+            !item.value.isField &&
+            item.value.farmName === field.farmName &&
+            item.value.location.some((loc) => loc.id === field.location.id)
+        )
       );
-
-      assetsToSelect.forEach((assetToSelect) => {
-        if (
-          assets.some((asset) => asset.farmName === assetToSelect.value.farmName && asset.id === assetToSelect.value.id)
-        ) {
-          // skip
-        } else {
-          assets.push(assetToSelect.value);
-        }
-      });
+      const noneExist = assetsToSelect.filter(
+        (asset) => !assets.some(({ id, farmName }) => farmName === asset.value.farmName && id === asset.value.id)
+      );
+      assets.push(...noneExist);
 
       if (!Array.isArray(hashesArg)) {
         return assets[0];
