@@ -147,6 +147,7 @@ router.post(
 );
 
 /** Surveys */
+router.get('/surveys', catchErrors(surveyController.getSurveys));
 router.get('/surveys/info', catchErrors(surveyController.getSurveyInfo));
 router.get('/surveys/list-page', catchErrors(surveyController.getSurveyListPage));
 router.get(
