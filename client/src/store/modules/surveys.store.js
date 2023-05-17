@@ -78,9 +78,13 @@ const actions = {
     commit('RESET');
   },
   async fetchSurvey({ commit }, { id, version = 'latest' }) {
-    const response = await api.get(`/surveys/${id}?version=${version}`);
-    commit('ADD_SURVEY', response.data);
-    return response.data;
+    try {
+      const response = await api.get(`/surveys/${id}?version=${version}`);
+      commit('ADD_SURVEY', response.data);
+      return response.data;
+    } catch (e) {
+      console.error('Failed to load survey', id, version, e);
+    }
   },
   async fetchPinned({ commit, dispatch, rootState, rootGetters }) {
     const pinned = [];

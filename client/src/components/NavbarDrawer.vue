@@ -95,13 +95,18 @@ export default {
     }
 
     return {
-      drawerIsVisible: false,
       lcl: JSON.parse(process.env.VUE_APP_LCL),
       sidenav: {
         collect: [
           {
             type: 'subheader',
             label: 'COLLECT',
+          },
+          {
+            type: 'link',
+            label: 'Drafts',
+            to: { name: 'drafts-list' },
+            icon: 'mdi-clipboard',
           },
           {
             type: 'link',
