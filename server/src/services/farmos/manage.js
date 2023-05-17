@@ -274,18 +274,15 @@ export const getOwnersFromInstanceName = async (instanceName) => {
     })
     .toArray();
   if (instanceOwners.length === 0) {
-    return null;
+    return [];
   }
   const ownersId = instanceOwners.map((ownerInstance) => ownerInstance.userId);
-  const ownersDoc = await db
+  return await db
     .collection('users')
     .find({
       _id: { $in: ownersId.map((id) => asMongoId(id)) },
     })
     .toArray();
-  if (ownersDoc.length > 0) {
-    return ownersDoc;
-  }
 };
 
 /**
@@ -332,28 +329,26 @@ export const mapFarmOSInstanceToUser = async (userId, instanceName, isOwner, ori
 export const sendEmailToNewlyMappedUserAndOwners = async (user, instanceName, origin) => {
   // send email to instance owner(s)
   const instanceOwners = await getOwnersFromInstanceName(instanceName);
-  if (instanceOwners) {
-    for (const instanceOwner of instanceOwners) {
-      if (instanceOwner && instanceOwner.email && instanceOwner.email !== user.email) {
-        const ownerEmail = instanceOwner.email;
+  for (const instanceOwner of instanceOwners) {
+    if (instanceOwner && instanceOwner.email && instanceOwner.email !== user.email) {
+      const ownerEmail = instanceOwner.email;
 
-        const magicLinkProfile = await createMagicLink({
-          origin,
-          email: ownerEmail,
-          expiresAfterDays: 7,
-          landingPath: `/auth/profile`,
-        });
+      const magicLinkProfile = await createMagicLink({
+        origin,
+        email: ownerEmail,
+        expiresAfterDays: 7,
+        landingPath: `/auth/profile`,
+      });
 
-        const subject = 'Your instance has been mapped';
-        const description = `The email ${user.email} has been mapped to the farmOS instance ${instanceName} in SurveyStack.`;
-        await mailService.sendHandleNotification({
-          to: ownerEmail,
-          subject: subject,
-          link: magicLinkProfile,
-          actionDescriptionHtml: description,
-          actionDescriptionText: description,
-        });
-      }
+      const subject = 'Your instance has been mapped';
+      const description = `The email ${user.email} has been mapped to the farmOS instance ${instanceName} in SurveyStack.`;
+      await mailService.sendHandleNotification({
+        to: ownerEmail,
+        subject: subject,
+        link: magicLinkProfile,
+        actionDescriptionHtml: description,
+        actionDescriptionText: description,
+      });
     }
   }
 
@@ -530,9 +525,6 @@ export const sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification = a
   origin
 ) => {
   const owners = await getOwnersFromInstanceName(instanceName);
-  if (!owners) {
-    return;
-  }
   for (const owner of owners) {
     if (owner && owner.email) {
       const ownerEmail = owner.email;
@@ -633,9 +625,6 @@ const sendRemoveNotification = async (instanceName, groupName, origin) => {
 
 const sendHandleNotification = async (instanceName, origin, subject, description) => {
   const owners = await getOwnersFromInstanceName(instanceName);
-  if (!owners) {
-    return;
-  }
   for (const owner of owners) {
     if (owner && owner.email) {
       const ownerEmail = owner.email;
