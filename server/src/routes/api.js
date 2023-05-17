@@ -5,6 +5,7 @@ import authController from '../controllers/authController';
 import groupController from '../controllers/groupController';
 import surveyController from '../controllers/surveyController';
 import submissionController from '../controllers/submissionController';
+import draftController from '../controllers/draftController';
 import userController from '../controllers/userController';
 import scriptController from '../controllers/scriptController';
 import rolesController from '../controllers/rolesController';
@@ -17,7 +18,7 @@ import resourceController from '../controllers/resourceController';
 
 import groupIntegrationController from '../controllers/groupIntegrationController';
 import membershipIntegrationController from '../controllers/membershipIntegrationController';
-import { isToggleOn, unleashProxyApp } from '../services/featureToggle.service';
+import { unleashProxyApp } from '../services/featureToggle.service';
 
 import cfsController from '../controllers/cfsController';
 
@@ -145,6 +146,10 @@ router.post(
   [assertHasIds, assertEntitiesExist({ collection: 'submissions' }), assertEntitiesRights],
   catchErrors(submissionController.deleteSubmissions)
 );
+
+/** Drafts */
+router.get('/drafts', catchErrors(draftController.getDrafts));
+router.post('/drafts', [assertAuthenticated], catchErrors(draftController.createDrafts));
 
 /** Surveys */
 router.get('/surveys/info', catchErrors(surveyController.getSurveyInfo));
