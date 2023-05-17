@@ -10,10 +10,14 @@
       </v-row>
       <v-row class="d-flex flex-grow-1">
         <v-tabs flat v-model="activeTab" centered icons-and-text grow @change="updateActiveTab">
-          <v-tab v-for="tab in tabs" :key="tab.name" :href="`#${tab.name}`" class="background">
+          <v-tab href="#drafts" class="background">
             <span class="d-flex flex-row align-center font-weight-regular">
-              <v-icon class="mr-2">{{ tab.icon }}</v-icon
-              >{{ tab.title }}
+              <v-icon class="mr-2">mdi-file-document-edit</v-icon>Drafts
+            </span>
+          </v-tab>
+          <v-tab href="#sent" class="background">
+            <span class="d-flex flex-row align-center font-weight-regular">
+              <v-icon class="mr-2">mdi-email-check</v-icon>Sent
             </span>
           </v-tab>
         </v-tabs>
@@ -31,8 +35,8 @@
                   <v-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                       <v-card :elevation="3" class="py-3 px-4">
-                        <v-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="surveyForSubmission(item)">
-                          {{ surveyForSubmission(item).name }}
+                        <v-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
+                          {{ item.meta.survey.name }}
                         </v-list-item-title>
                         <v-list-item-title class="font-weight-regular" v-else> Loading name </v-list-item-title>
                         <v-list-item-subtitle class="font-weight-regular mt-2">
@@ -79,8 +83,8 @@
                   <v-list-item :key="i">
                     <v-list-item-content @click="select(item)" class="cursor-pointer" two-line>
                       <v-card :elevation="3" class="py-3 px-4">
-                        <v-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="surveyForSubmission(item)">
-                          {{ surveyForSubmission(item).name }}
+                        <v-list-item-title class="text-h6 mb-2 font-weight-bold" v-if="item.meta.survey.name">
+                          {{ item.meta.survey.name }}
                         </v-list-item-title>
                         <v-list-item-title class="font-weight-regular" v-else> Loading name </v-list-item-title>
                         <v-list-item-subtitle class="font-weight-regular mt-2">
@@ -170,6 +174,7 @@ export default {
       isLoading: false,
       activeTab: 'drafts',
       page: 1,
+      localSubmissions: [],
       remoteSubmissions: [],
       remotePage: 1,
       remoteSubmissionsPagination: {
@@ -187,10 +192,9 @@ export default {
     this.$store.dispatch('appui/setTitle', 'My Submissions');
   },
   async created() {
-    await Promise.all([
-      this.$store.dispatch('submissions/fetchLocalSubmissions'),
-      this.$store.dispatch('surveys/fetchSurveys'),
-    ]);
+    let submissions = await this.$store.dispatch('submissions/fetchLocalSubmissions');
+    submissions = this.sortSubmissions(submissions);
+    this.localSubmissions = await this.setSurveyNames(submissions);
   },
   beforeDestroy() {
     this.$store.dispatch('appui/reset');
@@ -232,7 +236,7 @@ export default {
         {
           name: 'drafts',
           title: 'Drafts',
-          content: this.sortSubmissions(this.$store.getters['submissions/drafts']),
+          content: this.localSubmissions,
           icon: 'mdi-file-document-edit',
         },
         // {
@@ -259,7 +263,8 @@ export default {
     async uploadSubmission(submission) {
       this.isSubmitting = true;
       try {
-        await uploadFileResources(this.$store, this.surveyForSubmission(submission), submission, true);
+        const survey = await this.getSurvey(submission);
+        await uploadFileResources(this.$store, survey, submission, true);
         const response = submission.meta.dateSubmitted
           ? await api.put(`/submissions/${submission._id}`, submission)
           : await api.post('/submissions', submission);
@@ -315,6 +320,9 @@ export default {
         const { data } = await api.get(`/submissions/page?${queryParams}`);
         this.remoteSubmissions = data.content;
         this.remoteSubmissionsPagination = data.pagination;
+
+        //load survey names where required
+        await this.setSurveyNames(this.remoteSubmissions);
       } catch (err) {
         console.log('Could not fetch remote submissions', err);
         this.remoteSubmissions = [];
@@ -332,8 +340,26 @@ export default {
         await this.fetchRemoteSubmissions();
       }
     },
-    surveyForSubmission(submission) {
-      return this.$store.state.surveys.surveys.find((survey) => survey._id === submission.meta.survey.id);
+    async setSurveyNames(submissions) {
+      for (let submission of submissions) {
+        if (!submission.meta.survey.name) {
+          const survey = await this.getSurvey(submission);
+          if (survey) {
+            submission.meta.survey.name = survey.name;
+          }
+        }
+      }
+      return submissions;
+    },
+    async getSurvey(submission) {
+      let survey = this.$store.getters['surveys/getSurvey'](submission.meta.survey.id);
+      if (!survey) {
+        //not found in the local store, fetch the survey from backend
+        console.warn('fetching survey name of survey id ' + submission.meta.survey.id);
+        survey = await this.$store.dispatch('surveys/fetchSurvey', { id: submission.meta.survey.id });
+      }
+
+      return survey;
     },
     async select(draft) {
       console.log('select', draft._id, this.getSubmission(draft._id));
