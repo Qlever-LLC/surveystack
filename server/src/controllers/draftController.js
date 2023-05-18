@@ -2,8 +2,10 @@ import { ObjectId } from 'mongodb';
 import boom from '@hapi/boom';
 import { db, mongoClient } from '../db';
 import { withSession, withTransaction } from '../db/helpers';
+import { queryParam } from '../helpers';
 
 const col = 'drafts';
+const DEFAULT_LIMIT = 100000;
 
 const sanitize = (entity) => {
   if (entity._id) {
@@ -31,20 +33,6 @@ const sanitize = (entity) => {
   }
 
   return entity;
-};
-
-const getDrafts = async (req, res) => {
-  const authUserId = res.locals.auth.user._id;
-
-  const entities = await db
-    .collection(col)
-    .find({
-      $or: [{ 'meta.creator': authUserId }, { 'meta.proxyUserId': authUserId }],
-    })
-    .sort({ 'meta.dateModified': -1 })
-    .toArray();
-
-  return res.send(entities);
 };
 
 const createDrafts = async (req, res) => {
@@ -76,4 +64,130 @@ const createDrafts = async (req, res) => {
   res.send({ ...results });
 };
 
-export default { getDrafts, createDrafts };
+const getDrafts = async (req, res) => {
+  const user = res.locals.auth.user._id;
+
+  const skip = req.query.skip ? Number(req.query.skip) : 0;
+  if (isNaN(skip)) {
+    throw boom.badRequest(`Bad query parameter skip: ${skip}`);
+  }
+
+  const limit = req.query.limit ? Number(req.query.limit) : DEFAULT_LIMIT;
+  if (isNaN(limit) || limit === 0) {
+    throw boom.badRequest(`Bad query parameter limit: ${limit}`);
+  }
+
+  let match = {};
+
+  // Filter by survey
+  if (Array.isArray(req.query.survey)) {
+    match = {
+      'meta.survey.id': { $in: req.query.survey.map((id) => new ObjectId(id)) },
+    };
+  }
+
+  const pipeline = [
+    // Submitted or proxy by user
+    {
+      $match: {
+        $or: [{ 'meta.creator': user }, { 'meta.proxyUserId': user }],
+        ...match,
+      },
+    },
+    // Pagination
+    {
+      $facet: {
+        content: [{ $skip: skip }, { $limit: limit }],
+        pagination: [{ $count: 'total' }, { $addFields: { skip, limit } }],
+      },
+    },
+    { $unwind: '$pagination' },
+    // Sort
+    {
+      $sort: { 'meta.dateModified': -1 },
+    },
+  ];
+
+  const emptyEntities = { content: [], pagination: { total: 0, skip, limit } };
+  let submitted = emptyEntities;
+  let draft = emptyEntities;
+
+  // Fetch draft (draft=1)
+  if (queryParam(req.query.draft)) {
+    const [entities] = await db
+      .collection(col)
+      .aggregate(pipeline, { allowDiskUse: true })
+      .toArray();
+
+    if (entities) {
+      draft = entities;
+    }
+  }
+
+  // Fetch submitted (submitted=1)
+  if (queryParam(req.query.submitted)) {
+    const [entities] = await db
+      .collection('submissions')
+      .aggregate(pipeline, { allowDiskUse: true })
+      .toArray();
+
+    if (entities) {
+      submitted = entities;
+    }
+  }
+
+  return res.send({
+    draft,
+    submitted,
+  });
+};
+
+const getDraftSurveys = async (req, res) => {
+  const { local } = req.query;
+  const user = res.locals.auth.user._id;
+
+  const surveyIds = [];
+
+  // Survey from local drafts
+  if (Array.isArray(local)) {
+    surveyIds.push(...local.map((id) => new ObjectId(id)));
+  }
+
+  // Survey from remote drafts
+  if (queryParam(req.query.draft)) {
+    const draftEntities = await db
+      .collection(col)
+      .find({ $or: [{ 'meta.creator': user }, { 'meta.proxyUserId': user }] })
+      .toArray();
+
+    surveyIds.push(
+      ...draftEntities
+        .map((entity) => entity.meta.survey.id)
+        .filter((item, index, ary) => ary.indexOf(item) === index)
+    );
+  }
+
+  // Survey from submitted submissions
+  if (queryParam(req.query.submitted)) {
+    const submittedEntities = await db
+      .collection('submissions')
+      .find({ $or: [{ 'meta.creator': user }, { 'meta.proxyUserId': user }] })
+      .toArray();
+
+    surveyIds.push(
+      ...submittedEntities
+        .map((entity) => entity.meta.survey.id)
+        .filter((item, index, ary) => ary.indexOf(item) === index)
+        .filter((item) => !surveyIds.includes(item))
+    );
+  }
+
+  const surveys = await db
+    .collection('surveys')
+    .aggregate([{ $match: { _id: { $in: surveyIds } } }, { $project: { _id: 1, name: 1 } }])
+    .toArray();
+
+  return res.send(surveys);
+};
+
+export default { getDrafts, createDrafts, getDraftSurveys };

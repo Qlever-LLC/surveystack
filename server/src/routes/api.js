@@ -150,6 +150,7 @@ router.post(
 /** Drafts */
 router.get('/drafts', catchErrors(draftController.getDrafts));
 router.post('/drafts', [assertAuthenticated], catchErrors(draftController.createDrafts));
+router.get('/drafts/surveys', catchErrors(draftController.getDraftSurveys));
 
 /** Surveys */
 router.get('/surveys/info', catchErrors(surveyController.getSurveyInfo));

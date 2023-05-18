@@ -9,7 +9,7 @@
       <template v-for="(item, i) in items">
         <v-divider v-if="item.type === 'divider'" :key="i" dark class="my-1" />
         <v-subheader v-else-if="item.type === 'subheader'" :key="i">{{ item.label }}</v-subheader>
-        <v-list-item v-else :key="i" :to="item.to">
+        <v-list-item v-else :key="i" :to="item.to" @click="handleMenuClick">
           <v-list-item-icon v-if="item.icon" :class="item.class">
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-icon>
@@ -171,14 +171,6 @@ export default {
     };
   },
   computed: {
-    drawer: {
-      get() {
-        return this.$store.getters['appui/menu'];
-      },
-      set(value) {
-        this.$store.dispatch('appui/setMenu', value);
-      },
-    },
     readyToSubmitCount() {
       return this.$store.getters['submissions/readyToSubmit'].length;
     },
@@ -210,6 +202,11 @@ export default {
         }
       });
       return Array.from(docs.values());
+    },
+  },
+  methods: {
+    handleMenuClick() {
+      this.$emit('input', false);
     },
   },
 };

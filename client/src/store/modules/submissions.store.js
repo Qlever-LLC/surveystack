@@ -39,6 +39,7 @@ const getters = {
   drafts: (state) => state.submissions.filter((s) => s),
   outbox: (state) => state.submissions.filter((s) => s),
   // TODO should this search previously uploaded submissions
+  getSubmissions: (state) => state.submissions,
   getSubmission: (state) => (id) => state.submissions.find((submission) => submission._id === id),
   readyToSubmit: (state) =>
     state.submissions
