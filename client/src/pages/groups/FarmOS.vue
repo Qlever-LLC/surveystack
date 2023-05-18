@@ -427,7 +427,6 @@ export default {
       const [instanceName, groupIds] = args;
       const userId = this.disconnectUserId;
       const groupId = this.groupId;
-      const initialGroupIds = this.selectedGroupIds;
 
       this.loading = true;
 
@@ -436,16 +435,16 @@ export default {
           userId,
           instanceName,
           groupIds,
-          initialGroupIds,
         });
         this.success(resp.data.status);
+
+        const initialGroupIds = resp.data.initialGroupIds;
 
         this.differenceRemovedGroupIds = initialGroupIds.filter((x) => !groupIds.includes(x));
         const resultingGroupIdsInitiallyPresent = groupIds.every((x) => initialGroupIds.includes(x));
         if (this.differenceRemovedGroupIds.length > 0 && resultingGroupIdsInitiallyPresent) {
           //only if remove happened
           this.showRemoveNoteDialog = true;
-          // extraction for addNotes
         }
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {

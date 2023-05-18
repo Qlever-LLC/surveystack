@@ -35,6 +35,7 @@ import { createGroup, createReq, createRes, createUser } from '../testUtils';
 import {
   mapFarmOSInstanceToUser,
   addFarmToSurveystackGroupAndSendNotification,
+  removeFarmFromSurveystackGroupAndSendNotification,
   setPlanForGroup,
   getGroupInformation,
   createFarmosGroupSettings,
@@ -1177,14 +1178,16 @@ describe('farmos-controller', () => {
     const parentGroupId = parentGroup._id;
 
     await addFarmToSurveystackGroupAndSendNotification(instanceName, parentGroupId, origin);
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, a._id, origin);
-    await addFarmToSurveystackGroupAndSendNotification(instanceName, b._id, origin);
 
     const addMethod = sendUserAddFarmToMultipleSurveystackGroupNotification;
     const moveMethod = sendUserMoveFarmFromMultGroupToMultSurveystackGroupNotification;
     const removeMethod = sendUserRemoveFarmFromMultipleSurveystackGroupsNotification;
 
     const runWithGroups = async (initial, updated, expectedMethod) => {
+      // initialization process
+      for (const grp of initial) {
+        await addFarmToSurveystackGroupAndSendNotification(instanceName, grp._id, origin);
+      }
       const res = mockRes(admin.user._id);
       const req = createReq({
         params: {
@@ -1193,12 +1196,16 @@ describe('farmos-controller', () => {
         body: {
           userId: user.user._id + '',
           instanceName: instanceName,
-          initialGroupIds: initial.map((g) => g._id + ''),
           groupIds: updated.map((g) => g._id + ''),
         },
       });
       await updateGroupsForUser(req, res);
       expect(expectedMethod).toHaveBeenCalled();
+
+      // clear process
+      for (const grp of updated) {
+        await removeFarmFromSurveystackGroupAndSendNotification(instanceName, grp._id, origin);
+      }
     };
 
     await runWithGroups([a, c], [b, d], moveMethod);

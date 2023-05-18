@@ -1366,11 +1366,10 @@ export const updateGroupsForUser = async (req, res) => {
   // a, b, c => a (removed from a and b)
   // a, b, c => a, d (moved from a, b, c to a and d)
 
-  const { userId, instanceName, groupIds, initialGroupIds, tree } = await requireGroup(req, {
+  const { userId, instanceName, groupIds, tree } = await requireGroup(req, {
     userId: Joi.objectId().required(),
     instanceName: Joi.string().required(),
     groupIds: Joi.array().items(Joi.objectId()).required(),
-    initialGroupIds: Joi.array().items(Joi.objectId()).required(),
   });
 
   const { origin } = req.headers;
@@ -1378,15 +1377,22 @@ export const updateGroupsForUser = async (req, res) => {
   await assertUserInSubGroup(userId, tree);
   await assertGroupsInTree(groupIds, tree);
 
-  // find out in which group(s) the instance is located
+  // find out in which group(s) the instance was initially located
+  const initialGroupMappings = await db
+    .collection('farmos-group-mapping')
+    .find({
+      instanceName: instanceName,
+    })
+    .toArray();
   const initialGroups = await db
     .collection('groups')
     .find({
       _id: {
-        $in: initialGroupIds.map((i) => asMongoId(i)),
+        $in: initialGroupMappings.map((grp) => asMongoId(grp.groupId)),
       },
     })
     .toArray();
+  const initialGroupIds = initialGroups.map((el) => el._id);
 
   const resultGroups = await db
     .collection('groups')
@@ -1426,6 +1432,7 @@ export const updateGroupsForUser = async (req, res) => {
     // both collections are the same
     return res.send({
       status: 'no changes',
+      initialGroupIds: initialGroupIds,
     });
   }
 
@@ -1457,7 +1464,7 @@ export const updateGroupsForUser = async (req, res) => {
       origin
     );
     resStatus = `Successfully added instance to ${additionalGroups
-      .map((g) => g._name)
+      .map((g) => g.name)
       .join(', ')}, instance owner will be notified`;
   } else if (missingGroups.length > 0) {
     await sendUserRemoveFarmFromMultipleSurveystackGroupsNotification(
@@ -1467,12 +1474,13 @@ export const updateGroupsForUser = async (req, res) => {
     );
 
     resStatus = `Successfully removed instance from ${missingGroups
-      .map((g) => g._name)
+      .map((g) => g.name)
       .join(', ')}, instance owner will be notified`;
   }
 
   return res.send({
     status: resStatus,
+    initialGroupIds: initialGroupIds,
   });
 };
 
