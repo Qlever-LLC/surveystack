@@ -32,6 +32,9 @@ const sanitize = (entity) => {
     entity.meta.proxyUserId = new ObjectId(entity.meta.proxyUserId);
   }
 
+  // Remove temporal properties for client usage
+  delete entity.options;
+
   return entity;
 };
 
@@ -80,9 +83,10 @@ const getDrafts = async (req, res) => {
   let match = {};
 
   // Filter by survey
-  if (Array.isArray(req.query.survey)) {
+  if (req.query.survey) {
+    const ids = Array.isArray(req.query.survey) ? req.query.survey : [req.query.survey];
     match = {
-      'meta.survey.id': { $in: req.query.survey.map((id) => new ObjectId(id)) },
+      'meta.survey.id': { $in: ids.map((id) => new ObjectId(id)) },
     };
   }
 

@@ -165,7 +165,7 @@ export default {
   },
   watch: {
     activeSubmissionId(id) {
-      this.activeSubmission = this.$store.getters['submissions/getSubmission'](id);
+      this.activeSubmission = this.$store.getters['mySubmissions/getSubmission'](id);
     },
   },
   data() {
@@ -192,7 +192,7 @@ export default {
     this.$store.dispatch('appui/setTitle', 'My Submissions');
   },
   async created() {
-    let submissions = await this.$store.dispatch('submissions/fetchLocalSubmissions');
+    let submissions = await this.$store.dispatch('mySubmissions/fetchLocalSubmissions');
     submissions = this.sortSubmissions(submissions);
     this.localSubmissions = await this.setSurveyNames(submissions);
   },
@@ -207,7 +207,7 @@ export default {
     // },
     readyToSubmit() {
       // return this.$store.state.readyToSubmit.readyToSubmit || [];
-      return this.$store.getters['submissions/readyToSubmit'];
+      return this.$store.getters['mySubmissions/readyToSubmit'];
     },
     activeTabBody() {
       return this.tabs.find((t) => t.name === this.activeTab);
@@ -268,7 +268,7 @@ export default {
         const response = submission.meta.dateSubmitted
           ? await api.put(`/submissions/${submission._id}`, submission)
           : await api.post('/submissions', submission);
-        await this.$store.dispatch('submissions/remove', submission._id);
+        await this.$store.dispatch('mySubmissions/remove', submission._id);
         this.result({ response });
       } catch (err) {
         console.log('Draft submit error:', err);
@@ -299,7 +299,7 @@ export default {
       }
     },
     getSubmission(id) {
-      return this.$store.getters['submissions/getSubmission'](id);
+      return this.$store.getters['mySubmissions/getSubmission'](id);
     },
     readyToSubmitHas(id) {
       return this.readyToSubmit.indexOf(id) > -1;
@@ -370,7 +370,7 @@ export default {
         // The draft will be persisted anyways as soon as the user makes any edits to the submission.
 
         // TODO: if implementation changes here, also adapt @/pages/submissions/List.vue's 'resubmit' method
-        await this.$store.dispatch('submissions/fetchRemoteSubmission', draft._id);
+        await this.$store.dispatch('mySubmissions/fetchRemoteSubmission', draft._id);
       }
       this.$router.push(`/submissions/drafts/${draft._id}`);
     },
@@ -380,7 +380,7 @@ export default {
       );
     },
     async setSubmissionGroup(id, groupId) {
-      await this.$store.dispatch('submissions/update', {
+      await this.$store.dispatch('mySubmissions/update', {
         // ...submission,
         ...this.activeSubmission,
         meta: {
@@ -392,7 +392,7 @@ export default {
           },
         },
       });
-      this.activeSubmission = this.$store.getters['submissions/getSubmission'](this.activeSubmissionId);
+      this.activeSubmission = this.$store.getters['mySubmissions/getSubmission'](this.activeSubmissionId);
     },
   },
 };

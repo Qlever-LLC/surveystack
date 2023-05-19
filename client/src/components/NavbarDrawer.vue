@@ -172,7 +172,7 @@ export default {
   },
   computed: {
     readyToSubmitCount() {
-      return this.$store.getters['submissions/readyToSubmit'].length;
+      return this.$store.getters['mySubmissions/readyToSubmit'].length;
     },
     items() {
       const items = [];

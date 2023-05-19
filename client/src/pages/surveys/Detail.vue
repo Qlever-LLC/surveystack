@@ -102,12 +102,12 @@ export default {
   },
   methods: {
     startDraft(survey) {
-      this.$store.dispatch('submissions/startDraft', { survey });
+      this.$store.dispatch('mySubmissions/startDraft', { survey });
     },
     startDraftAs(survey, selectedMember) {
       this.showSelectMember = false;
       if (selectedMember.user) {
-        this.$store.dispatch('submissions/startDraft', { survey, submitAsUser: selectedMember.user });
+        this.$store.dispatch('mySubmissions/startDraft', { survey, submitAsUser: selectedMember.user });
       }
     },
   },

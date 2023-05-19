@@ -155,6 +155,7 @@ function getResults(storeName, success) {
 
   objectStore.openCursor().onerror = (event) => {
     console.log(`Error: ${event}`);
+    success(results);
   };
 }
 
