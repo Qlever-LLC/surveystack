@@ -47,9 +47,10 @@ export default {
       }
     },
     fetchMySubmissions() {
-      this.$store.dispatch('submissions/fetchLocalSubmissions');
-      this.$store.dispatch('submissions/fetchRemoteSubmissions', true);
-      this.$store.dispatch('submissions/fetchSurveys');
+      this.$store.dispatch('submissions/fetchLocalDrafts').then(() => {
+        this.$store.dispatch('submissions/fetchSubmissions', true);
+        this.$store.dispatch('submissions/fetchSurveys');
+      });
     },
   },
 };

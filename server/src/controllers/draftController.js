@@ -56,6 +56,10 @@ const paginationStages = (req) => {
   }
 
   return [
+    // Sort
+    {
+      $sort: { 'meta.dateModified': -1 },
+    },
     // Pagination
     {
       $facet: {
@@ -64,10 +68,6 @@ const paginationStages = (req) => {
       },
     },
     { $unwind: '$pagination' },
-    // Sort
-    {
-      $sort: { 'meta.dateModified': -1 },
-    },
   ];
 };
 
@@ -256,7 +256,7 @@ const getDrafts = async (req, res) => {
   if (req.query.lastDateModified) {
     match = {
       ...match,
-      $lt: ['meta.dateModified', new Date(req.query.lastDateModified)],
+      'meta.dateModified': { $lt: new Date(req.query.lastDateModified) },
     };
   }
 
@@ -297,7 +297,11 @@ const getDrafts = async (req, res) => {
       .collection('submissions')
       .aggregate(pipeline, { allowDiskUse: true })
       .toArray();
-
+    console.log(
+      1111111,
+      match,
+      entities.content.map((item) => item.meta.dateModified)
+    );
     if (entities) {
       submitted = entities.content.map((item) => ({
         ...item,

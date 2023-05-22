@@ -124,7 +124,7 @@ const actions = {
     }
 
     commit('SET_FILTER', filter);
-    dispatch('fetchRemoteSubmissions', true);
+    dispatch('fetchSubmissions', true);
   },
   async saveToLocal({ commit }, submission) {
     commit('SET_LOADING', { [submission._id]: 'resubmit' });
@@ -179,8 +179,8 @@ const actions = {
       query: { minimal_ui: router.currentRoute.query.minimal_ui },
     });
   },
-  async fetchLocalSubmissions({ commit, rootGetters }) {
-    commit('SET_LOADING', { fetch: true });
+  async fetchLocalDrafts({ commit, rootGetters }) {
+    commit('SET_LOADING', { drafts: true });
 
     const response = await new Promise((resolve) => {
       db.openDb(() => {
@@ -195,11 +195,11 @@ const actions = {
     );
 
     commit('SET_LOCAL_DRAFTS', mySubmissions);
-    commit('REMOVE_LOADING', 'fetch');
+    commit('REMOVE_LOADING', 'drafts');
 
     return response;
   },
-  async fetchRemoteSubmissions({ commit, state }, reset = false) {
+  async fetchSubmissions({ commit, state }, reset = false) {
     if (state.loading.submissions) {
       return;
     }
@@ -213,7 +213,7 @@ const actions = {
     const isLocal = state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.LOCAL_DRAFTS);
     const isRemote = state.filter.type.length !== 1 || !isLocal;
 
-    const [lastSubmission] = state.submissions;
+    const [lastSubmission] = state.submissions.slice(-1);
     let localData = [];
     let remoteData = [];
 
