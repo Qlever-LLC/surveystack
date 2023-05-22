@@ -1,17 +1,11 @@
 <template>
-  <v-card
-    class="draft-card"
-    :class="{
-      checked,
-      invalid: invalidSurvey,
-    }"
-  >
+  <v-card class="draft-card" :class="{ checked, invalid: !survey }">
     <div class="top">
       <div
         class="status-bar"
         :class="{
           'light-blue darken-3': isDraft,
-          'green darken-3': !isDraft,
+          'green darken-1': !isDraft,
         }"
       ></div>
       <div class="d-flex flex-column align-start">
@@ -21,20 +15,20 @@
         <div
           class="text-subtitle-1 mt-2 d-flex align-center"
           :class="{
-            'blue-grey--text text--lighten-3 font-weight-light': invalidSurvey,
-            'green--text text--darken-3': !invalidSurvey && !isDraft,
-            'light-blue--text text--darken-3': !invalidSurvey && isDraft,
+            'blue-grey--text text--lighten-3 font-weight-light': !survey,
+            'green--text text--darken-1': survey && !isDraft,
+            'light-blue--text text--darken-3': survey && isDraft,
           }"
         >
-          <v-icon v-if="!surveyName" class="mr-1" small>mdi-alert-outline</v-icon>
-          {{ surveyName || 'No survey found' }}
+          <v-icon v-if="!survey" class="mr-1" small>mdi-alert-outline</v-icon>
+          {{ survey ? survey.name : 'No survey found' }}
         </div>
       </div>
       <v-spacer></v-spacer>
       <v-btn v-if="isLocal" color="primary" outlined rounded small>
         <v-icon left small>mdi-cloud-upload-outline</v-icon> Save
       </v-btn>
-      <v-btn v-if="isDraft && !invalidSurvey" color="primary" elevation="0" rounded small>
+      <v-btn v-if="isDraft && survey" color="primary" elevation="0" rounded small>
         <v-icon left small>mdi-play</v-icon> Continue
       </v-btn>
     </div>
@@ -81,26 +75,23 @@ export default {
       type: Object,
       required: true,
     },
-    survey: {
-      type: Object,
-    },
     checked: {
       type: Boolean,
     },
   },
-  setup(props) {
+  setup(props, { root }) {
     const chipColor = computed(() => (props.checked ? 'secondary' : undefined));
-    const surveyName = computed(() => (props.survey ? props.survey.name : undefined));
-    const invalidSurvey = computed(() => !surveyName.value);
-    const isDraft = computed(() => props.submission.draftOptions && !!props.submission.draftOptions.draft);
-    const isLocal = computed(() => props.submission.draftOptions && !!props.submission.draftOptions.local);
+    const isDraft = computed(() => props.submission.options.draft);
+    const isLocal = computed(() => props.submission.options.local);
     const dateSubmitted = computed(() => formatDate(props.submission.meta.dateSubmitted));
     const dateModified = computed(() => formatDate(props.submission.meta.dateModified));
+    const survey = computed(() =>
+      root.$store.getters['submissions/surveys'].find((item) => item._id === props.submission.meta.survey.id)
+    );
 
     return {
+      survey,
       chipColor,
-      surveyName,
-      invalidSurvey,
       isDraft,
       isLocal,
       dateSubmitted,

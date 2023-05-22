@@ -38,6 +38,160 @@ const sanitize = (entity) => {
   return entity;
 };
 
+const isDraft = (req) => queryParam(req.query.draft);
+const isSubmitted = (req) =>
+  queryParam(req.query.creator) ||
+  queryParam(req.query.proxyUserId) ||
+  queryParam(req.query.resubmitter);
+
+const paginationStages = (req) => {
+  const skip = req.query.skip ? Number(req.query.skip) : 0;
+  if (isNaN(skip)) {
+    throw boom.badRequest(`Bad query parameter skip: ${skip}`);
+  }
+
+  const limit = req.query.limit ? Number(req.query.limit) : DEFAULT_LIMIT;
+  if (isNaN(limit) || limit === 0) {
+    throw boom.badRequest(`Bad query parameter limit: ${limit}`);
+  }
+
+  return [
+    // Pagination
+    {
+      $facet: {
+        content: [{ $skip: skip }, { $limit: limit }],
+        pagination: [{ $count: 'total' }, { $addFields: { skip, limit } }],
+      },
+    },
+    { $unwind: '$pagination' },
+    // Sort
+    {
+      $sort: { 'meta.dateModified': -1 },
+    },
+  ];
+};
+
+const draftStages = (req, res, match) => {
+  const user = res.locals.auth.user._id;
+
+  return [
+    {
+      $match: {
+        $or: [{ 'meta.resubmitter': user }, { 'meta.proxyUserId': user }, { 'meta.creator': user }],
+        ...match,
+      },
+    },
+  ];
+};
+
+const submittedStages = (req, res, match) => {
+  const user = res.locals.auth.user._id;
+
+  return [
+    {
+      $match: {
+        $or: [
+          ...(queryParam(req.query.resubmitter) ? [{ 'meta.resubmitter': user }] : []),
+          ...(queryParam(req.query.proxyUserId) ? [{ 'meta.proxyUserId': user }] : []),
+          ...(queryParam(req.query.creator) ? [{ 'meta.creator': user }] : []),
+        ],
+        ...match,
+      },
+    },
+  ];
+};
+
+const surveyStages = (req, res) => {
+  const user = res.locals.auth.user._id;
+
+  return [
+    // Join `drafts`
+    ...(isDraft(req)
+      ? [
+          {
+            $lookup: {
+              from: 'drafts',
+              let: { surveyId: '$_id' },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $and: [
+                        {
+                          $eq: ['$meta.survey.id', '$$surveyId'],
+                        },
+                        {
+                          $or: [
+                            { $eq: ['$meta.resubmitter', user] },
+                            { $eq: ['$meta.proxyUserId', user] },
+                            { $eq: ['$meta.creator', user] },
+                          ],
+                        },
+                      ],
+                    },
+                  },
+                },
+              ],
+              as: 'draft',
+            },
+          },
+        ]
+      : []),
+    // Join `submissions`
+    ...(isSubmitted(req)
+      ? [
+          {
+            $lookup: {
+              from: 'submissions',
+              let: { surveyId: '$_id' },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $and: [
+                        {
+                          $eq: ['$meta.survey.id', '$$surveyId'],
+                        },
+                        {
+                          $or: [
+                            ...(queryParam(req.query.resubmitter)
+                              ? [{ $eq: ['$meta.resubmitter', user] }]
+                              : []),
+                            ...(queryParam(req.query.proxyUserId)
+                              ? [{ $eq: ['$meta.proxyUserId', user] }]
+                              : []),
+                            ...(queryParam(req.query.creator)
+                              ? [{ $eq: ['$meta.creator', user] }]
+                              : []),
+                          ],
+                        },
+                      ],
+                    },
+                  },
+                },
+              ],
+              as: 'submitted',
+            },
+          },
+        ]
+      : []),
+    {
+      $match: {
+        $or: [
+          ...(isDraft(req) ? [{ draft: { $exists: true, $ne: [] } }] : []),
+          ...(isSubmitted(req) ? [{ submitted: { $exists: true, $ne: [] } }] : []),
+          ...(req.query.localSurveyIds
+            ? [{ _id: { $in: req.query.localSurveyIds.map((id) => new ObjectId(id)) } }]
+            : []),
+        ],
+      },
+    },
+    {
+      $project: { _id: 1, name: 1 },
+    },
+  ];
+};
+
 const createDrafts = async (req, res) => {
   const drafts = Array.isArray(req.body) ? req.body : [req.body];
 
@@ -67,131 +221,128 @@ const createDrafts = async (req, res) => {
   res.send({ ...results });
 };
 
+/**
+ * Fetch my submissions from the combined parameters
+ * - What is 'my submissions'? - creator, proxyUserId, resubmitter are my user ID
+ *
+ * This function designed to support infinite pagination for the my submissions page.
+ * Since we have 3 data sources (local IDB, remote draft collection, remote submissions collection),
+ * it is difficult to implement a pagination normally but infinite is possible by using the modified date as a skip point.
+ *
+ * @param {
+ *   lastDateModified:  string,          // Filter submissions that has older date modified than the last element
+ *   limit:             number,          // How many items per request?
+ *   draft:             boolean,         // Fetch draft submissions
+ *   creator:           boolean,         // Fetch the submissions that is submitted by me
+ *   proxyUserId:       boolean,         // Fetch the submissions that is submitted by me as a proxy
+ *   resubmitter:       boolean,         // Fetch the submissions that is resubmitted by me
+ *   surveyIds:         array,           // Filter by survey(s)
+ * } req
+ * @param {*} res
+ * @returns
+ * {
+ *   submissions:  array,          // Submissions
+ *   total:        number,         // Total count
+ * }
+ */
 const getDrafts = async (req, res) => {
-  const user = res.locals.auth.user._id;
-
-  const skip = req.query.skip ? Number(req.query.skip) : 0;
-  if (isNaN(skip)) {
-    throw boom.badRequest(`Bad query parameter skip: ${skip}`);
-  }
-
-  const limit = req.query.limit ? Number(req.query.limit) : DEFAULT_LIMIT;
-  if (isNaN(limit) || limit === 0) {
-    throw boom.badRequest(`Bad query parameter limit: ${limit}`);
-  }
+  let draft = [];
+  let submitted = [];
+  let total = 0;
 
   let match = {};
 
-  // Filter by survey
-  if (req.query.survey) {
-    const ids = Array.isArray(req.query.survey) ? req.query.survey : [req.query.survey];
+  // Filter by last modified date
+  if (req.query.lastDateModified) {
     match = {
-      'meta.survey.id': { $in: ids.map((id) => new ObjectId(id)) },
+      ...match,
+      $lt: ['meta.dateModified', new Date(req.query.lastDateModified)],
     };
   }
 
-  const pipeline = [
-    // Submitted or proxy by user
-    {
-      $match: {
-        $or: [{ 'meta.creator': user }, { 'meta.proxyUserId': user }],
-        ...match,
-      },
-    },
-    // Pagination
-    {
-      $facet: {
-        content: [{ $skip: skip }, { $limit: limit }],
-        pagination: [{ $count: 'total' }, { $addFields: { skip, limit } }],
-      },
-    },
-    { $unwind: '$pagination' },
-    // Sort
-    {
-      $sort: { 'meta.dateModified': -1 },
-    },
-  ];
+  // Filter by survey
+  if (Array.isArray(req.query.surveyIds) && req.query.surveyIds.length > 0) {
+    match = {
+      ...match,
+      'meta.survey.id': { $in: req.query.surveyIds.map((id) => new ObjectId(id)) },
+    };
+  }
 
-  const emptyEntities = { content: [], pagination: { total: 0, skip, limit } };
-  let submitted = emptyEntities;
-  let draft = emptyEntities;
+  // Fetch remote draft
+  if (isDraft(req)) {
+    const pipeline = [...draftStages(req, res, match), ...paginationStages(req)];
 
-  // Fetch draft (draft=1)
-  if (queryParam(req.query.draft)) {
     const [entities] = await db
       .collection(col)
       .aggregate(pipeline, { allowDiskUse: true })
       .toArray();
 
     if (entities) {
-      draft = entities;
+      draft = entities.content.map((item) => ({
+        ...item,
+        options: {
+          draft: true,
+          local: false,
+        },
+      }));
+      total += entities.pagination.total;
     }
   }
 
-  // Fetch submitted (submitted=1)
-  if (queryParam(req.query.submitted)) {
+  // Fetch remote submitted
+  if (isSubmitted(req)) {
+    let pipeline = [...submittedStages(req, res, match), ...paginationStages(req, res)];
+
     const [entities] = await db
       .collection('submissions')
       .aggregate(pipeline, { allowDiskUse: true })
       .toArray();
 
     if (entities) {
-      submitted = entities;
+      submitted = entities.content.map((item) => ({
+        ...item,
+        options: {
+          draft: false,
+          local: false,
+        },
+      }));
+      total += entities.pagination.total;
     }
   }
 
   return res.send({
-    draft,
-    submitted,
+    total,
+    submissions: [...draft, ...submitted],
   });
 };
 
-const getDraftSurveys = async (req, res) => {
-  const { local } = req.query;
-  const user = res.locals.auth.user._id;
+/**
+ * Fetch the surveys of my submissions
+ * - What is 'my submissions'? - creator, proxyUserId, resubmitter are my user ID
+ * - Why fetch surveys? - We have survey filters and it is changed based on the parameters
+ *
+ * @param {
+ *   draft:             boolean,         // Fetch draft submissions
+ *   creator:           boolean,         // Fetch the submissions that is submitted by me
+ *   proxyUserId:       boolean,         // Fetch the submissions that is submitted by me as a proxy
+ *   resubmitter:       boolean,         // Fetch the submissions that is resubmitted by me
+ *   localSurveyIds:    array,           // Survey ID(s) of the local drafts
+ * } req
+ * @param {*} res
+ * @returns             array,          // Surveys { ID, name }
+ */
+const getSurveys = async (req, res) => {
+  let surveys = [];
 
-  const surveyIds = [];
-
-  // Survey from local drafts
-  if (Array.isArray(local)) {
-    surveyIds.push(...local.map((id) => new ObjectId(id)));
+  // At least one parameter should be set
+  if (!isDraft(req) && !isSubmitted(req) && !req.query.localSurveyIds) {
+    return surveys;
   }
 
-  // Survey from remote drafts
-  if (queryParam(req.query.draft)) {
-    const draftEntities = await db
-      .collection(col)
-      .find({ $or: [{ 'meta.creator': user }, { 'meta.proxyUserId': user }] })
-      .toArray();
-
-    surveyIds.push(
-      ...draftEntities
-        .map((entity) => entity.meta.survey.id)
-        .filter((item, index, ary) => ary.indexOf(item) === index)
-    );
-  }
-
-  // Survey from submitted submissions
-  if (queryParam(req.query.submitted)) {
-    const submittedEntities = await db
-      .collection('submissions')
-      .find({ $or: [{ 'meta.creator': user }, { 'meta.proxyUserId': user }] })
-      .toArray();
-
-    surveyIds.push(
-      ...submittedEntities
-        .map((entity) => entity.meta.survey.id)
-        .filter((item, index, ary) => ary.indexOf(item) === index)
-        .filter((item) => !surveyIds.includes(item))
-    );
-  }
-
-  const surveys = await db
-    .collection('surveys')
-    .aggregate([{ $match: { _id: { $in: surveyIds } } }, { $project: { _id: 1, name: 1 } }])
-    .toArray();
+  const pipeline = surveyStages(req, res);
+  surveys = await db.collection('surveys').aggregate(pipeline).toArray();
 
   return res.send(surveys);
 };
 
-export default { getDrafts, createDrafts, getDraftSurveys };
+export default { createDrafts, getDrafts, getSurveys };

@@ -32,6 +32,7 @@ export default {
   mounted() {
     this.fetchPinnedSurveys();
     this.fetchFarmOsAssets();
+    this.fetchMySubmissions();
   },
   methods: {
     async fetchPinnedSurveys() {
@@ -44,6 +45,11 @@ export default {
         api.get('farmos/assets?bundle=land');
         api.get('farmos/assets?bundle=plant');
       }
+    },
+    fetchMySubmissions() {
+      this.$store.dispatch('submissions/fetchLocalSubmissions');
+      this.$store.dispatch('submissions/fetchRemoteSubmissions', true);
+      this.$store.dispatch('submissions/fetchSurveys');
     },
   },
 };

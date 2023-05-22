@@ -2,6 +2,7 @@ import * as db from '@/store/db';
 import api from '@/services/api.service';
 import { createSubmissionFromSurvey } from '@/utils/submissions';
 import router from '@/router';
+import { isEqual } from 'lodash';
 
 const PER_PAGE = 10;
 
@@ -14,15 +15,15 @@ export const SubmissionTypes = {
 };
 
 const createInitialState = () => ({
-  submissions: [],
   localDrafts: [],
+  submissions: [],
   surveys: [],
+  localTotal: 0,
+  remoteTotal: 0,
   filter: {
     type: [],
     survey: [],
   },
-  localTotal: 0,
-  remoteTotal: 0,
   loading: {},
 });
 
@@ -33,9 +34,9 @@ const getters = {
   surveys: (state) => state.surveys,
   total: (state) => state.remoteTotal + state.localTotal,
   filter: (state) => state.filter,
-  isFetching: (state) => !!state.loading.fetch,
-  isLoading: (state) => Object.keys(state.loading) > 0,
-  getLoading: (state, id) => state.loading[id] || false,
+  isLoading: (state) => Object.values(state.loading).filter(Boolean) > 0,
+  getLoading: (state) => (id) => state.loading[id] || false,
+  hasMoreData: (state, getters) => state.submissions.length < getters.total,
 };
 
 const mutations = {
@@ -58,7 +59,7 @@ const mutations = {
   },
   SET_LOCAL_DRAFTS: (state, drafts) => {
     state.localDrafts = drafts;
-    state.localTotal = state.localDrafts.length;
+    state.localTotal = state.localDrafts.length || -1;
   },
   ADD_OR_UPDATE_LOCAL_DRAFT: (state, submission) => {
     let index = state.localDrafts.findIndex((item) => item._id === submission._id);
@@ -70,22 +71,22 @@ const mutations = {
   },
   REMOVE_LOCAL_DRAFT: (state, id) => {
     state.localDrafts = state.localDrafts.filter((item) => item._id !== id);
-    state.localTotal = state.localDrafts.length;
+    state.localTotal = state.localDrafts.length || -1;
   },
-  REMOTE_TOTAL: (state, remoteTotal) => {
+  SET_REMOTE_TOTAL: (state, remoteTotal) => {
     state.remoteTotal = remoteTotal;
   },
-  SURVEYS: (state, surveys) => {
+  SET_SURVEYS: (state, surveys) => {
     state.surveys = surveys;
   },
-  FILTER: (state, filter) => {
-    state.filter = { ...state, filter, ...filter };
+  SET_FILTER: (state, filter) => {
+    state.filter = { ...state.filter, ...filter };
   },
-  LOADING_ON: (state, loading) => {
+  SET_LOADING: (state, loading) => {
     state.loading = { ...state.loading, ...loading };
   },
-  LOADING_OFF: (state, id) => {
-    delete state.loading[id];
+  REMOVE_LOADING: (state, id) => {
+    state.loading = { ...state.loading, [id]: undefined };
   },
 };
 
@@ -93,14 +94,8 @@ const actions = {
   reset({ commit }) {
     commit('RESET');
   },
-  async setLocal({ commit }, submission) {
-    await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
-    commit('ADD_OR_UPDATE_LOCAL_DRAFT', submission);
-    commit('ADD_OR_UPDATE_SUBMISSION', submission);
-    return submission;
-  },
   async remove({ commit, state }, id) {
-    commit('LOADING_ON', { [id]: 'removing' });
+    commit('SET_LOADING', { [id]: 'removing' });
     const isLocal = state.localDrafts.some((item) => item._id === id);
 
     if (isLocal) {
@@ -119,10 +114,28 @@ const actions = {
         console.warn('Failed to remove submission from the Server IDB', e);
       }
     }
-    commit('LOADING_OFF', id);
+    commit('REMOVE_LOADING', id);
   },
-  setFilter({ commit }, filter) {
-    commit('FILTER', filter);
+  setFilter({ commit, state, dispatch }, filter) {
+    // Not changed
+    const newFilter = { ...state.filter, ...filter };
+    if (isEqual(state.filter, newFilter)) {
+      return;
+    }
+
+    commit('SET_FILTER', filter);
+    dispatch('fetchRemoteSubmissions', true);
+  },
+  async saveToLocal({ commit }, submission) {
+    commit('SET_LOADING', { [submission._id]: 'resubmit' });
+
+    await db.saveToIndexedDB(db.stores.SUBMISSIONS, submission);
+    commit('ADD_OR_UPDATE_LOCAL_DRAFT', submission);
+    commit('ADD_OR_UPDATE_SUBMISSION', submission);
+
+    commit('REMOVE_LOADING', submission._id);
+
+    return submission;
   },
   async startDraft({ dispatch, commit }, { survey, submitAsUser = undefined, version = 0 }) {
     const activeVersion = version || survey.latestVersion;
@@ -152,13 +165,13 @@ const actions = {
     });
   },
   async resubmit({ commit }, id) {
-    commit('LOADING_ON', { [id]: 'resubmit' });
+    commit('SET_LOADING', { [id]: 'resubmit' });
 
     const { data } = await api.get(`/submissions/${id}?pure=1`);
     commit('ADD_OR_UPDATE_LOCAL_DRAFT', data);
     commit('ADD_OR_UPDATE_SUBMISSION', data);
 
-    commit('LOADING_OFF', id);
+    commit('REMOVE_LOADING', id);
 
     router.push({
       name: 'submissions-drafts-detail',
@@ -166,80 +179,46 @@ const actions = {
       query: { minimal_ui: router.currentRoute.query.minimal_ui },
     });
   },
-  async fetchLocalSubmissions({ commit }) {
-    commit('LOADING_ON', { fetch: true });
+  async fetchLocalSubmissions({ commit, rootGetters }) {
+    commit('SET_LOADING', { fetch: true });
+
     const response = await new Promise((resolve) => {
       db.openDb(() => {
         db.getAllSubmissions(resolve);
       });
     });
-    commit('SET_LOCAL_DRAFTS', response);
-    commit('LOADING_OFF', 'fetch');
+
+    // Filter my submissions
+    const user = rootGetters['auth/user']._id;
+    const mySubmissions = response.filter(
+      (item) => item.meta.resubmitter === user || item.meta.proxyUserId === user || item.meta.creator === user
+    );
+
+    commit('SET_LOCAL_DRAFTS', mySubmissions);
+    commit('REMOVE_LOADING', 'fetch');
+
     return response;
   },
-  async fetchRemoteSubmissions({ commit, state, dispatch }, reset = false) {
-    commit('LOADING_ON', { fetch: true });
+  async fetchRemoteSubmissions({ commit, state }, reset = false) {
+    if (state.loading.submissions) {
+      return;
+    }
+
+    commit('SET_LOADING', { submissions: true });
 
     if (reset) {
       commit('SET_SUBMISSIONS', []);
     }
 
-    const type =
-      state.filter.type.length === 0
-        ? [
-            SubmissionTypes.LOCAL_DRAFTS,
-            SubmissionTypes.REMOTE_DRAFTS,
-            SubmissionTypes.SUBMITTED,
-            SubmissionTypes.SUBMITTED_AS_PROXY,
-            SubmissionTypes.RESUBMITTED,
-          ]
-        : state.filter.type;
+    const isLocal = state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.LOCAL_DRAFTS);
+    const isRemote = state.filter.type.length !== 1 || !isLocal;
 
     const [lastSubmission] = state.submissions;
-    let remoteData = [];
     let localData = [];
+    let remoteData = [];
 
-    // Fetch if remote has data
-    if (state.remoteTotal >= 0) {
-      const params = new URLSearchParams();
-
-      if (lastSubmission) {
-        params.append('date', lastSubmission.meta.dateModified);
-      }
-      if (type.includes(SubmissionTypes.REMOTE_DRAFTS)) {
-        params.append('draft', '1');
-      }
-      if (type.includes(SubmissionTypes.SUBMITTED)) {
-        params.append('creator', '1');
-      }
-      if (type.includes(SubmissionTypes.SUBMITTED_AS_PROXY)) {
-        params.append('userProxyId', '1');
-      }
-      if (type.includes(SubmissionTypes.RESUBMITTED)) {
-        params.append('resubmitter', '1');
-      }
-      state.filer.survey.forEach((survey) => {
-        params.append('survey[]', survey);
-      });
-
-      try {
-        const { data } = await api.get(`/drafts?${params}`);
-        remoteData = data.submissions;
-
-        // Update remote total count
-        commit('REMOTE_TOTAL', data.total || -1);
-
-        // If the surveys is updated by changes of type
-        if (JSON.stringify(state.filter.survey) !== data.surveys) {
-          commit('SURVEYS', data.surveys);
-          dispatch('setFilter', { surveys: [] });
-        }
-      } catch (e) {
-        console.warn('Failed to fetch drafts with filter', type, e);
-      }
-    }
-
-    if (type.includes(SubmissionTypes.LOCAL_DRAFTS)) {
+    // Fetch if local has data
+    if (isLocal && state.localTotal >= 0) {
       localData = state.localDrafts.map((item) => ({
         ...item,
         options: {
@@ -256,9 +235,40 @@ const actions = {
 
       // Filter by survey
       if (state.filter.survey.length > 0) {
-        localData = localData.filter((item) =>
-          state.filter.survey.some((survey) => item.meta.survey.id === survey._id)
-        );
+        localData = localData.filter((item) => state.filter.survey.some((id) => item.meta.survey.id === id));
+      }
+    }
+
+    // Fetch if remote has data
+    if (isRemote && state.remoteTotal >= 0) {
+      const params = new URLSearchParams();
+      params.append('limit', PER_PAGE.toString());
+
+      if (lastSubmission) {
+        params.append('lastDateModified', lastSubmission.meta.dateModified);
+      }
+      if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.REMOTE_DRAFTS)) {
+        params.append('draft', '1');
+      }
+      if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.SUBMITTED)) {
+        params.append('creator', '1');
+      }
+      if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.SUBMITTED_AS_PROXY)) {
+        params.append('proxyUserId', '1');
+      }
+      if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.RESUBMITTED)) {
+        params.append('resubmitter', '1');
+      }
+      state.filter.survey.forEach((id) => {
+        params.append('surveyIds[]', id);
+      });
+
+      try {
+        const { data } = await api.get(`/drafts?${params}`);
+        remoteData = data.submissions;
+        commit('SET_REMOTE_TOTAL', data.total || -1);
+      } catch (e) {
+        console.warn('Failed to fetch drafts with filter', state.filter, e);
       }
     }
 
@@ -284,8 +294,40 @@ const actions = {
 
     // Append the new data
     commit('SET_SUBMISSIONS', [...state.submissions, ...uniqueSubmissions.slice(0, PER_PAGE)]);
+    commit('REMOVE_LOADING', 'submissions');
+  },
 
-    commit('LOADING_OFF', 'fetch');
+  async fetchSurveys({ commit, state }) {
+    commit('SET_LOADING', { surveys: true });
+    commit('SET_SURVEYS', []);
+
+    const params = new URLSearchParams();
+    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.LOCAL_DRAFTS)) {
+      state.localDrafts.forEach((item) => {
+        params.append('localSurveyIds[]', item.meta.survey.id);
+      });
+    }
+    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.REMOTE_DRAFTS)) {
+      params.append('draft', '1');
+    }
+    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.SUBMITTED)) {
+      params.append('creator', '1');
+    }
+    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.SUBMITTED_AS_PROXY)) {
+      params.append('proxyUserId', '1');
+    }
+    if (state.filter.type.length === 0 || state.filter.type.includes(SubmissionTypes.RESUBMITTED)) {
+      params.append('resubmitter', '1');
+    }
+
+    try {
+      const { data } = await api.get(`/drafts/surveys?${params}`);
+      commit('SET_SURVEYS', data);
+    } catch (e) {
+      console.warn('Failed to fetch surveys of my submissions', state.filter, e);
+    }
+
+    commit('REMOVE_LOADING', 'surveys');
   },
 };
 

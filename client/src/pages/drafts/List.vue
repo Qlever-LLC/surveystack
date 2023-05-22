@@ -1,22 +1,13 @@
 <template>
   <div class="background wrapper">
-    <v-container>
+    <v-container class="text-center pb-8">
       <draft-filter></draft-filter>
 
-      <v-progress-circular
-        v-if="isLoading"
-        :size="30"
-        color="primary"
-        class="loading"
-        indeterminate
-      ></v-progress-circular>
-
-      <div v-else class="mt-8">
+      <div class="mt-8">
         <draft-card
           v-for="submission in submissions"
           :key="submission._id"
           :submission="submission"
-          :survey="getSurvey(submission)"
           :checked="checked.includes(submission)"
           @click.native="handleCheck(submission)"
         >
@@ -24,6 +15,8 @@
 
         <p v-if="submissions.length === 0" class="text-center">No matching submissions found.</p>
       </div>
+
+      <v-progress-circular v-if="isLoading" :size="30" color="primary" class="my-4" indeterminate></v-progress-circular>
     </v-container>
   </div>
 </template>
@@ -67,13 +60,6 @@ export default defineComponent({
   .container {
     position: relative;
     flex: 1 1 0%;
-
-    .loading {
-      position: absolute;
-      left: 50%;
-      top: 30%;
-      transform: translateX(-50%);
-    }
   }
 }
 </style>
