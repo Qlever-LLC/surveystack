@@ -3,6 +3,8 @@ import boom from '@hapi/boom';
 import { db, mongoClient } from '../db';
 import { withSession, withTransaction } from '../db/helpers';
 import { queryParam } from '../helpers';
+import assert from 'assert';
+import rolesService from '../services/roles.service';
 
 const col = 'drafts';
 const DEFAULT_LIMIT = 100000;
@@ -43,6 +45,23 @@ const isSubmitted = (req) =>
   queryParam(req.query.creator) ||
   queryParam(req.query.proxyUserId) ||
   queryParam(req.query.resubmitter);
+
+const isUserAllowedToModifyDraft = async (draft, user) => {
+  if (draft.meta.creator === user) {
+    return true; // user may delete their own draft
+  }
+
+  if (draft.meta.proxyUserId === user) {
+    return true; // proxy user may delete their draft
+  }
+
+  const hasAdminRole = await rolesService.hasAdminRole(user, draft.meta.group.id);
+  if (hasAdminRole) {
+    return true; // group admins may delete surveys
+  }
+
+  return false;
+};
 
 const paginationStages = (req) => {
   const skip = req.query.skip ? Number(req.query.skip) : 0;
@@ -197,7 +216,7 @@ const createDrafts = async (req, res) => {
 
   let draftsEntities = await Promise.all(drafts.map(sanitize));
 
-  const results = await withSession(mongoClient, async (session) => {
+  const entities = await withSession(mongoClient, async (session) => {
     try {
       return await withTransaction(session, async () => {
         const result = await db.collection(col).insertMany(draftsEntities);
@@ -214,11 +233,11 @@ const createDrafts = async (req, res) => {
     }
   });
 
-  if (!results) {
+  if (!entities) {
     throw boom.internal('The transaction was intentionally aborted.');
   }
 
-  res.send({ ...results });
+  res.send(entities);
 };
 
 /**
@@ -297,11 +316,7 @@ const getDrafts = async (req, res) => {
       .collection('submissions')
       .aggregate(pipeline, { allowDiskUse: true })
       .toArray();
-    console.log(
-      1111111,
-      match,
-      entities.content.map((item) => item.meta.dateModified)
-    );
+
     if (entities) {
       submitted = entities.content.map((item) => ({
         ...item,
@@ -340,7 +355,7 @@ const getSurveys = async (req, res) => {
 
   // At least one parameter should be set
   if (!isDraft(req) && !isSubmitted(req) && !req.query.localSurveyIds) {
-    return surveys;
+    return res.send(surveys);
   }
 
   const pipeline = surveyStages(req, res);
@@ -349,4 +364,27 @@ const getSurveys = async (req, res) => {
   return res.send(surveys);
 };
 
-export default { createDrafts, getDrafts, getSurveys };
+const deleteDraft = async (req, res) => {
+  const { id } = req.params;
+
+  const existing = await db.collection(col).findOne({ _id: new ObjectId(id) });
+  if (!existing) {
+    throw boom.notFound(`No entity with _id exists: ${id}`);
+  }
+
+  const isAllowed = await isUserAllowedToModifyDraft(existing, res.locals.auth.user._id);
+  if (!isAllowed) {
+    throw boom.unauthorized(`You are not authorized to delete draft: ${id}`);
+  }
+
+  try {
+    const result = await db.collection(col).deleteOne({ _id: new ObjectId(id) });
+    assert.equal(1, result.deletedCount);
+  } catch (e) {
+    throw boom.internal('Unknown internal error', e);
+  }
+
+  return res.send({ message: 'OK' });
+};
+
+export default { createDrafts, getDrafts, getSurveys, deleteDraft };

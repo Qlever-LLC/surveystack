@@ -25,11 +25,16 @@
         </div>
       </div>
       <v-spacer></v-spacer>
-      <v-btn v-if="isLocal" color="primary" outlined rounded small>
-        <v-icon left small>mdi-cloud-upload-outline</v-icon> Save
+      <delete-btn :submission="submission"></delete-btn>
+      <save-btn v-if="isDraft && isLocal" :submission="submission"></save-btn>
+      <download-btn v-if="isDraft && !isLocal" :submission="submission"></download-btn>
+      <v-btn v-if="isDraft" color="primary" elevation="0" rounded small>
+        <v-icon left small>mdi-play</v-icon>
+        Continue
       </v-btn>
-      <v-btn v-if="isDraft && survey" color="primary" elevation="0" rounded small>
-        <v-icon left small>mdi-play</v-icon> Continue
+      <v-btn v-if="!isDraft" color="primary" elevation="0" rounded small>
+        <v-icon left small>mdi-redo-variant</v-icon>
+        Resubmit
       </v-btn>
     </div>
 
@@ -60,8 +65,11 @@
 </template>
 
 <script>
+import { computed } from '@vue/composition-api';
 import submission from '@/router/submission';
-import { computed, ref } from '@vue/composition-api';
+import SaveBtn from '@/components/drafts/Save.vue';
+import DownloadBtn from '@/components/drafts/Download.vue';
+import DeleteBtn from '@/components/drafts/Delete.vue';
 import * as dateFns from 'date-fns';
 
 const formatDate = (date) => {
@@ -70,6 +78,11 @@ const formatDate = (date) => {
 };
 
 export default {
+  components: {
+    SaveBtn,
+    DownloadBtn,
+    DeleteBtn,
+  },
   props: {
     submission: {
       type: Object,
@@ -153,6 +166,10 @@ export default {
       transition-property: color, background-color;
       transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
       transition-duration: 150ms;
+    }
+
+    .spacer + div {
+      gap: 8px;
     }
   }
 

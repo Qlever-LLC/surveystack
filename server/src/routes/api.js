@@ -151,6 +151,7 @@ router.post(
 router.get('/drafts', catchErrors(draftController.getDrafts));
 router.get('/drafts/surveys', catchErrors(draftController.getSurveys));
 router.post('/drafts', [assertAuthenticated], catchErrors(draftController.createDrafts));
+router.delete('/drafts/:id', [assertAuthenticated], catchErrors(draftController.deleteDraft));
 
 /** Surveys */
 router.get('/surveys/info', catchErrors(surveyController.getSurveyInfo));

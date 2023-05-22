@@ -47,7 +47,7 @@
 
 <script>
 import { computed, defineComponent, ref } from '@vue/composition-api';
-import { SubmissionTypes } from '@/store/modules/submissions.store';
+import { SubmissionLoadingActions, SubmissionTypes } from '@/store/modules/submissions.store';
 
 export default defineComponent({
   setup(props, { root }) {
@@ -61,7 +61,9 @@ export default defineComponent({
         root.$store.dispatch('submissions/fetchSurveys');
       },
     });
-    const isSurveyLoading = computed(() => root.$store.getters['submissions/getLoading']('surveys'));
+    const isSurveyLoading = computed(() =>
+      root.$store.getters['submissions/getLoading'](SubmissionLoadingActions.FETCH_SURVEYS)
+    );
     const surveys = computed(() => root.$store.getters['submissions/surveys']);
     const survey = computed({
       get() {

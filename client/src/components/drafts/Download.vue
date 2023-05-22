@@ -8,8 +8,8 @@
     small
     @click.stop="handleClick"
   >
-    <v-icon left small>mdi-cloud-upload-outline</v-icon>
-    Save
+    <v-icon left small>mdi-cloud-download-outline</v-icon>
+    Download
   </v-btn>
 </template>
 
@@ -26,10 +26,10 @@ export default defineComponent({
   },
   setup(props, { root }) {
     const loading = computed(() => root.$store.getters['submissions/getLoading'](props.submission._id));
-    const isLoading = computed(() => loading.value === SubmissionLoadingActions.SAVE_TO_SERVER);
+    const isLoading = computed(() => loading.value === SubmissionLoadingActions.SAVE_TO_LOCAL);
 
     const handleClick = () => {
-      root.$store.dispatch('submissions/saveToServer', props.submission);
+      root.$store.dispatch('submissions/saveToLocal', props.submission);
     };
 
     return {
