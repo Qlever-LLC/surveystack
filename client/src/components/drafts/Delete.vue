@@ -1,10 +1,16 @@
 <template>
   <v-dialog v-model="isOpen" max-width="400">
     <template v-slot:activator="{ on, attrs }">
-      <v-btn v-bind="attrs" color="error" :disabled="Boolean(disabled)" outlined rounded small v-on="on" @click.stop>
-        <v-icon left small>mdi-delete-outline</v-icon>
-        {{ submission.options.draft ? 'Delete' : 'Archive' }}
-      </v-btn>
+      <v-list-item v-bind="attrs" color="error" :disabled="Boolean(disabled)" v-on="on">
+        <v-list-item-icon class="mr-4 text--error">
+          <v-icon>mdi-delete-outline</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>
+            {{ submission.options.draft ? 'Delete' : 'Archive' }}
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
     </template>
 
     <v-card class="d-flex flex-column">

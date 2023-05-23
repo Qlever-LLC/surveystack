@@ -1,16 +1,12 @@
 <template>
-  <v-btn
-    color="primary"
-    :disabled="Boolean(disabled)"
-    :loading="isLoading"
-    outlined
-    rounded
-    small
-    @click.stop="handleClick"
-  >
-    <v-icon left small>mdi-cloud-upload-outline</v-icon>
-    Save
-  </v-btn>
+  <v-list-item :disabled="Boolean(disabled)" @click="handleClick">
+    <v-list-item-icon class="mr-4">
+      <v-icon>mdi-cloud-upload-outline</v-icon>
+    </v-list-item-icon>
+    <v-list-item-content>
+      <v-list-item-title> Save </v-list-item-title>
+    </v-list-item-content>
+  </v-list-item>
 </template>
 
 <script>

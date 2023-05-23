@@ -8,6 +8,8 @@
           'green darken-1': !isDraft,
         }"
       ></div>
+
+      <!-- Id & survey -->
       <div class="d-flex flex-column align-start">
         <v-chip :color="chipColor" :input-value="true" label small>
           {{ submission._id }}
@@ -24,18 +26,33 @@
           {{ survey ? survey.name : 'No survey found' }}
         </div>
       </div>
+
       <v-spacer></v-spacer>
-      <delete-btn :submission="submission"></delete-btn>
-      <save-btn v-if="isDraft && isLocal" :submission="submission"></save-btn>
-      <download-btn v-if="isDraft && !isLocal" :submission="submission"></download-btn>
-      <v-btn v-if="isDraft" color="primary" elevation="0" rounded small>
+
+      <!-- Main buttons -->
+      <v-btn v-if="isDraft" color="primary" elevation="0" rounded>
         <v-icon left small>mdi-play</v-icon>
         Continue
       </v-btn>
-      <v-btn v-if="!isDraft" color="primary" elevation="0" rounded small>
+      <v-btn v-if="!isDraft" color="primary" elevation="0" rounded>
         <v-icon left small>mdi-redo-variant</v-icon>
         Resubmit
       </v-btn>
+
+      <!-- More actions -->
+      <v-menu bottom left offset-y close-on-content-click close-on-click>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn v-bind="attrs" icon v-on="on">
+            <v-icon>mdi-dots-vertical</v-icon>
+          </v-btn>
+        </template>
+
+        <v-list class="action-menu" dense>
+          <save v-if="isDraft && isLocal" :submission="submission"></save>
+          <download v-if="isDraft && !isLocal" :submission="submission"></download>
+          <delete :submission="submission"></delete>
+        </v-list>
+      </v-menu>
     </div>
 
     <v-divider />
@@ -67,9 +84,9 @@
 <script>
 import { computed } from '@vue/composition-api';
 import submission from '@/router/submission';
-import SaveBtn from '@/components/drafts/Save.vue';
-import DownloadBtn from '@/components/drafts/Download.vue';
-import DeleteBtn from '@/components/drafts/Delete.vue';
+import Save from '@/components/drafts/Save.vue';
+import Download from '@/components/drafts/Download.vue';
+import Delete from '@/components/drafts/Delete.vue';
 import * as dateFns from 'date-fns';
 
 const formatDate = (date) => {
@@ -79,9 +96,9 @@ const formatDate = (date) => {
 
 export default {
   components: {
-    SaveBtn,
-    DownloadBtn,
-    DeleteBtn,
+    Save,
+    Download,
+    Delete,
   },
   props: {
     submission: {
@@ -133,8 +150,13 @@ export default {
     border: 2px solid var(--v-secondary-lighten2);
   }
 
-  &:hover .top .status-bar {
-    opacity: 1;
+  &:hover .top {
+    .status-bar {
+      opacity: 1;
+    }
+    .spacer + .v-btn {
+      display: block;
+    }
   }
 
   & > div {
@@ -168,8 +190,8 @@ export default {
       transition-duration: 150ms;
     }
 
-    .spacer + div {
-      gap: 8px;
+    .spacer + .v-btn {
+      display: none;
     }
   }
 
@@ -179,5 +201,9 @@ export default {
       align-self: center;
     }
   }
+}
+
+.action-menu {
+  min-width: 140px;
 }
 </style>
