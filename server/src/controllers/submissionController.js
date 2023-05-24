@@ -335,22 +335,18 @@ export const buildPipeline = async (req, res) => {
   return pipeline;
 };
 
-// Attach 'meta.submitAsUser' if proxy
-const addCreatorDetailStage = (pipeline) => {
+const addCreatorDetailStage = (pipeline, user) => {
   pipeline.push(
     {
       $lookup: {
         from: 'users',
-        let: {
-          creatorId: '$meta.creator',
-          proxyUserId: '$meta.proxyUserId',
-        },
+        let: { creatorId: '$meta.creator' },
         pipeline: [
           {
             $match: {
               $and: [
                 { $expr: { $eq: ['$_id', '$$creatorId'] } },
-                { $expr: { $eq: [{ $type: '$$proxyUserId' }, 'objectId'] } },
+                { $expr: { $ne: ['$$creatorId', new ObjectId(user)] } },
               ],
             },
           },
@@ -621,14 +617,22 @@ const getSubmission = async (req, res) => {
     roles.push(...userRoles);
   }
 
-  // Add creator details if request has admin rights on survey.
-  // However, don't add creator details if pure=1 is set (e.g. for re-submissions)
-  if (user && !queryParam(req.query.pure)) {
-    const groupId = res.locals.existing.meta.group.id;
-    const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
+  if (user) {
+    // Add creator details as `meta.submitAsUser` if pure=1 is set (re-submissions)
+    // This will allow admin/proxy can resubmit with correct request header
+    if (queryParam(req.query.pure)) {
+      addCreatorDetailStage(pipeline, user);
+    }
 
-    if (hasAdminRights) {
-      addUserDetailsStage(pipeline);
+    // Add creator details if request has admin rights on survey.
+    // However, don't add creator details if pure=1 is set (e.g. for re-submissions)
+    else {
+      const groupId = res.locals.existing.meta.group.id;
+      const hasAdminRights = await rolesService.hasAdminRole(user, groupId);
+
+      if (hasAdminRights) {
+        addUserDetailsStage(pipeline);
+      }
     }
   }
 
@@ -641,9 +645,6 @@ const getSubmission = async (req, res) => {
 
   // Fetch by id
   pipeline.push({ $match: { _id: new ObjectId(id) } });
-
-  // Attach proxy details
-  addCreatorDetailStage(pipeline);
 
   // Redact
   const redactStage = createRedactStage(user, roles);

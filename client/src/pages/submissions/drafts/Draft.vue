@@ -209,8 +209,12 @@ export default {
       this.hasError = true;
     }
 
+    // Set proxy header if resubmit by proxy or admin.
+    // Otherwise, remove it
     if (this.submission.meta.submitAsUser) {
       api.setHeader('x-delegate-to', this.submission.meta.submitAsUser._id);
+    } else {
+      api.removeHeader('x-delegate-to');
     }
 
     this.loading = false;
