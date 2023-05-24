@@ -91,7 +91,6 @@ export default {
     items: {
       type: Array,
       default: () => [],
-      // validator: (item) => item.every(({ title, body }) => !!title && !!body),
     },
     title: String,
     persistent: {
@@ -157,6 +156,9 @@ export default {
       try {
         let res = null;
         if (this.hasError) {
+          // If there's error while submitting a submission, we post submission and survey object
+          // to generate PDF. There's a requirement to allow download PDF in such a failure case.
+
           if (this.submission.meta.submitAsUser) {
             this.submission.meta.creator = this.submission.meta.submitAsUser._id;
           }
@@ -165,6 +167,8 @@ export default {
             submission: this.submission,
           });
         } else {
+          // Otherwise, download PDF normally (with submission ID in the backend side)
+
           res = await api.get(`/submissions/${this.submission._id}/pdf?base64=1`);
         }
 
@@ -176,7 +180,7 @@ export default {
         console.error('Failed to download PDF of submission', e);
         this.download.error = {
           title: 'Error',
-          body: 'Sorry, something went wrong while downloading a PDF of survey. Try again later.',
+          body: 'Sorry, something went wrong while downloading your survey PDF. Please try again later.',
           error: true,
         };
       } finally {
@@ -188,12 +192,12 @@ export default {
       this.emailing.error = null;
 
       try {
-        await api.post(`/submissions/${this.submission._id}/send-email`, { survey: this.survey.name });
+        await api.post(`/submissions/${this.submission._id}/send-email`);
       } catch (e) {
         console.error('Failed to email a survey', e);
         this.emailing.error = {
           title: 'Error',
-          body: 'Sorry, something went wrong while sending an email. Try again later.',
+          body: 'Sorry, something went wrong while sending the email. Please try again later.',
           error: true,
         };
       } finally {

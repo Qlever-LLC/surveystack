@@ -392,6 +392,7 @@ export default {
       const date = new Date().toISOString();
 
       const nextVersionObj = this.survey.revisions.find((revision) => revision.version === latestVersion);
+      console.log(111111, this.survey.revisions.map(i => i.version), latestVersion, nextVersionObj);
       nextVersionObj.version = nextVersion;
       nextVersionObj.dateCreated = date;
 

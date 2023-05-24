@@ -15,6 +15,7 @@ import mailService from '../services/mail/mail.service';
 import pdfService from '../services/pdf.service';
 import { queryParam } from '../helpers';
 import { appendDatabaseOperationDurationToLoggingMessage } from '../middleware/logging';
+import { getServerSelfOrigin } from '../services/auth.service';
 const col = 'submissions';
 const DEFAULT_LIMIT = 100000;
 const DEFAULT_SORT = { _id: -1 }; // reverse insert order
@@ -1265,25 +1266,29 @@ const getSubmissionPdf = async (req, res) => {
     throw boom.notFound(`No survey found with id: ${submission.meta.survey.id}`);
   }
 
-  const fileName = pdfService.getPdfName(survey, submission);
+  try {
+    const fileName = pdfService.getPdfName(survey, submission);
 
-  pdfService.getPdfBase64(survey, submission, null, (data) => {
-    res.attachment(fileName);
-    if (queryParam(req.query.base64)) {
-      res.send('data:application/pdf;base64,' + data);
-    } else {
-      res.send(Buffer.from(data, 'base64'));
-    }
-  });
+    pdfService.getPdfBase64(survey, submission, null, (data) => {
+      res.attachment(fileName);
+      if (queryParam(req.query.base64)) {
+        res.send('data:application/pdf;base64,' + data);
+      } else {
+        res.send(Buffer.from(data, 'base64'));
+      }
+    });
+  } catch (e) {
+    throw boom.internal(e);
+  }
 };
 
 const postSubmissionPdf = async (req, res) => {
   const { survey, submission } = req.body;
   if (!survey) {
-    throw boom.notFound('No survey found in the request body');
+    throw boom.badRequest('No survey found in the request body');
   }
   if (!submission) {
-    throw boom.notFound('No submission found in the request body');
+    throw boom.badRequest('No submission found in the request body');
   }
 
   // Fetch group name
@@ -1305,25 +1310,34 @@ const postSubmissionPdf = async (req, res) => {
   submission.meta.creator = creator;
 
   // Generate PDF
-  const fileName = pdfService.getPdfName(survey, submission);
+  try {
+    const fileName = pdfService.getPdfName(survey, submission);
 
-  pdfService.getPdfBase64(survey, submission, null, (data) => {
-    res.attachment(fileName);
-    if (queryParam(req.query.base64)) {
-      res.send('data:application/pdf;base64,' + data);
-    } else {
-      res.send(Buffer.from(data, 'base64'));
-    }
-  });
+    pdfService.getPdfBase64(survey, submission, null, (data) => {
+      res.attachment(fileName);
+      if (queryParam(req.query.base64)) {
+        res.send('data:application/pdf;base64,' + data);
+      } else {
+        res.send(Buffer.from(data, 'base64'));
+      }
+    });
+  } catch (e) {
+    throw boom.internal(e);
+  }
 };
 
 const sendPdfLink = async (req, res) => {
+  const submission = await db.collection(col).findOne({ _id: new ObjectId(req.params.id) });
+  if (!submission) {
+    throw boom.notFound(`No entity found for id: ${req.params.id}`);
+  }
+
   await mailService.sendLink({
     to: res.locals.auth.user.email,
-    subject: `Survey report - ${req.body.survey}`,
-    link: `${req.headers.origin}/api/submissions/${req.params.id}/pdf`,
+    subject: `Survey report - ${submission.meta.survey.name}`,
+    link: new URL(`/api/submissions/${req.params.id}/pdf`, getServerSelfOrigin(req)).toString(),
     actionDescriptionHtml:
-      'Thank you for taking a time to complete our survey. You can download your submission by clicking the button below.',
+      'Thank you for taking the time to complete our survey. You can download a copy of your submission by clicking the button below.',
     btnText: 'Download',
   });
 

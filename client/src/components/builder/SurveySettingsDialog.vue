@@ -8,14 +8,14 @@
           <checkbox
             v-model="survey.options.showInstruction"
             label="Show Instructions"
-            helper-text="Make instructions questions visible on PDFs of completed submissions."
+            helper-text="Display instructions question on PDFs of completed submissions."
           />
         </div>
         <div class="d-flex">
           <checkbox
             v-model="survey.options.showUnanswered"
             label="Show Unanswered"
-            helper-text='Make unanswered questions visible on PDFs of completed submissions. Unanswered questions will show "No answer" in the PDF.'
+            helper-text='Display unanswered questions on PDFs of completed submissions. Unanswered questions will show "No answer" in the PDF.'
           />
         </div>
       </v-card-text>

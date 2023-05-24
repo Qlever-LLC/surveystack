@@ -472,17 +472,19 @@ const getSurveyPdf = async (req, res) => {
   const entity = await db.collection(SURVEYS_COLLECTION).findOne({ _id: new ObjectId(id) });
 
   if (!entity) {
-    return res.status(404).send({
-      message: `No entity with _id exists: ${id}`,
-    });
+    return res.status(404).send({ message: `No entity with _id exists: ${id}` });
   }
 
-  const fileName = pdfService.getPdfName(entity);
+  try {
+    const fileName = pdfService.getPdfName(entity);
 
-  pdfService.getPdfBase64(entity, null, { printable: 1 }, (data) => {
-    res.attachment(fileName);
-    res.send('data:application/pdf;base64,' + data);
-  });
+    pdfService.getPdfBase64(entity, null, { printable: 1 }, (data) => {
+      res.attachment(fileName);
+      res.send('data:application/pdf;base64,' + data);
+    });
+  } catch (e) {
+    throw boom.internal(e);
+  }
 };
 
 const createSurvey = async (req, res) => {

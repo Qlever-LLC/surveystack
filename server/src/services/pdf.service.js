@@ -13,7 +13,6 @@ import { getPublicDownloadUrl } from './bucket.service';
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-const { window } = new JSDOM('');
 const markdown = new MarkdownIt();
 
 const fontSizes = {
@@ -231,6 +230,10 @@ async function getSubmissionUniqueItems(surveyId, path) {
 
 class PdfGenerator {
   constructor(survey, submission, options) {
+    if (!survey) {
+      throw new Error('Invalid survey');
+    }
+
     this.initialize();
     this.survey = survey;
     this.submission = submission;
@@ -274,7 +277,7 @@ class PdfGenerator {
   }
 
   async generate() {
-    if (!this.survey || (!this.options.printable && !this.submission)) {
+    if (!this.options.printable && !this.submission) {
       return null;
     }
 
@@ -614,7 +617,13 @@ class PdfGenerator {
   }
 
   getInstructionDef(control) {
-    return control.options.source ? htmlToPdfMake(control.options.source, { window }) : [];
+    let window = null;
+    window = new JSDOM('').window;
+    const def = control.options.source ? htmlToPdfMake(control.options.source, { window }) : [];
+    window.close();
+    window = null;
+
+    return def;
   }
 
   async getInstructionImageSplitDef(control) {
@@ -647,7 +656,11 @@ class PdfGenerator {
 
     if (control.options.source.body) {
       const html = markdown.render(control.options.source.body);
+      let window = null;
+      window = new JSDOM('').window;
       stack.push(htmlToPdfMake(html, { window }));
+      window.close();
+      window = null;
     }
 
     return { stack };
@@ -798,7 +811,6 @@ class PdfGenerator {
       return null;
     }
 
-    // const headers = cols.map((header) => getCellDef(header.label || header.value));
     const headers = cols.map((header) => header.label || header.value);
     const rows = [];
     const value = toArray(answer);
@@ -1051,21 +1063,19 @@ class PdfGenerator {
     if (!this.options.printable) {
       // Filter instructions
       if (!this.survey.options.showInstruction) {
-        validControls = [...validControls].filter(
+        validControls = validControls.filter(
           (control) => control.type !== 'instructions' && control.type !== 'instructionsImageSplit'
         );
       }
 
       // Filter relevant
-      validControls = [...validControls].filter((control) =>
+      validControls = validControls.filter((control) =>
         this.isRelevantControl.bind(this)(control, path)
       );
 
       // Filter unanswered
       if (!this.survey.options.showUnanswered) {
-        validControls = [...validControls].filter((control) =>
-          this.hasAnswer.bind(this)(control, path)
-        );
+        validControls = validControls.filter((control) => this.hasAnswer.bind(this)(control, path));
       }
     }
 

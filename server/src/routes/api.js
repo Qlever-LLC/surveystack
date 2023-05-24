@@ -153,7 +153,7 @@ router.delete(
 );
 router.post(
   '/submissions/bulk-delete',
-  [assertHasIds, assertEntitiesExist({ collection: 'submissions' })],
+  [assertHasIds, assertEntitiesExist({ collection: 'submissions' }), assertEntitiesRights],
   catchErrors(submissionController.deleteSubmissions)
 );
 

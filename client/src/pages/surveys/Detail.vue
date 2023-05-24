@@ -89,6 +89,7 @@ import BtnDropdown from '@/components/ui/BtnDropdown';
 import { autoSelectActiveGroup } from '@/utils/memberships';
 import downloadExternal from '@/utils/downloadExternal';
 import api from '@/services/api.service';
+import { get } from 'lodash';
 
 export default {
   props: {
@@ -136,9 +137,11 @@ export default {
         console.error('Failed to download printable PDF', e);
         this.$store.dispatch(
           'feedback/add',
-          e.response
-            ? e.response.data.message
-            : 'Sorry, something went wrong while downloading a PDF of paper version. Try again later.'
+          get(
+            e,
+            'response.data.message',
+            'Sorry, something went wrong while downloading a PDF of paper version. Try again later.'
+          )
         );
       } finally {
         this.download.loading = false;
