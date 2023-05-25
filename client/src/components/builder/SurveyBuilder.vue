@@ -423,7 +423,7 @@ export default {
     },
     async addQuestionsFromLibrary(librarySurveyId) {
       // load library survey
-      const { data: librarySurvey } = await api.get(`/surveys/${librarySurveyId}`);
+      const { data: librarySurvey } = await api.get(`/surveys/${librarySurveyId}?version=latest`);
       // add resources from library survey
       const newResources = getPreparedLibraryResources(librarySurvey);
 
@@ -451,7 +451,7 @@ export default {
     },
     async updateLibrary(updateLibraryRootGroup) {
       this.updateLibraryRootGroup = updateLibraryRootGroup;
-      const { data } = await api.get(`/surveys/${updateLibraryRootGroup.libraryId}`);
+      const { data } = await api.get(`/surveys/${updateLibraryRootGroup.libraryId}?version=all`);
       this.updateToLibrary = data;
       this.updateLibraryDialogIsVisible = true;
     },

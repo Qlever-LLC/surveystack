@@ -158,7 +158,7 @@ const transform = (assets) => {
 };
 
 export default {
-  mixins: [baseQuestionComponent, farmosBase('assets')],
+  mixins: [baseQuestionComponent, farmosBase()],
   data() {
     return {
       transformed: [],

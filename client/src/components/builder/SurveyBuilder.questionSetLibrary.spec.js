@@ -75,7 +75,7 @@ describe('question set library', () => {
     api.get.mockImplementation(
       createApiGetMock({
         '/surveys/list-page?isLibrary=true&skip=0&limit=12': qslListResponse,
-        [`/surveys/${qsl._id}`]: { data: qsl },
+        [`/surveys/${qsl._id}?version=latest`]: { data: qsl },
       })
     );
   });

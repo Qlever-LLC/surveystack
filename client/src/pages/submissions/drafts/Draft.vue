@@ -193,7 +193,10 @@ export default {
       this.showResubmissionDialog = true;
     }
 
-    this.survey = await this.$store.dispatch('surveys/fetchSurvey', this.submission.meta.survey.id);
+    this.survey = await this.$store.dispatch('surveys/fetchSurvey', {
+      id: this.submission.meta.survey.id,
+      version: this.submission.meta.survey.version,
+    });
     const cleanSubmission = createSubmissionFromSurvey({
       survey: this.survey,
       version: this.submission.meta.survey.version,
@@ -206,8 +209,12 @@ export default {
       this.hasError = true;
     }
 
+    // Set proxy header if resubmit by proxy or admin.
+    // Otherwise, remove it
     if (this.submission.meta.submitAsUser) {
       api.setHeader('x-delegate-to', this.submission.meta.submitAsUser._id);
+    } else {
+      api.removeHeader('x-delegate-to');
     }
 
     this.loading = false;

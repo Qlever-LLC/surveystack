@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import api from '@/services/api.service';
+
 export default {
   data() {
     return {
@@ -43,6 +45,7 @@ export default {
       this.next = next;
     },
     handleConfirm() {
+      api.removeHeader('x-delegate-to');
       this.isVisible = false;
       this.next(true);
     },

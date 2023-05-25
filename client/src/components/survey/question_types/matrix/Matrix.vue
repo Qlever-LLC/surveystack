@@ -104,7 +104,7 @@
             @changed="onInput"
             :disabled="isMobile"
             class="mt-2"
-            :loading="loading"
+            :loading="isFarmOsLoading"
           />
         </v-form>
       </template>
@@ -123,7 +123,7 @@
     </app-matrix-table>
     <app-control-more-info :value="control.moreInfo" />
 
-    <div class="d-flex flex-row align-center" v-if="loading">
+    <div class="d-flex flex-row align-center" v-if="isFarmOsLoading">
       <v-progress-circular indeterminate color="primary" size="24" />
       <div class="ml-2 text--secondary">Loading farmOS data</div>
     </div>
@@ -247,13 +247,25 @@ const transform = (assets) => {
 };
 
 export default {
-  mixins: [baseQuestionComponent, farmosBase('fields')],
+  mixins: [baseQuestionComponent, farmosBase()],
   components: {
     appDialog,
     appMatrixCell,
     appMatrixTable,
     appRequired,
     appRedacted,
+  },
+  data() {
+    return {
+      rows: this.value,
+      rowToBeDeleted: -1,
+      menus: {}, // object to hold v-models for v-menu
+      farmosTransformedPlantings: [],
+      showEditItemDialog: false,
+      editedIndex: -1,
+      editedItem: null,
+      isFarmOsLoading: false,
+    };
   },
   computed: {
     source() {
@@ -291,17 +303,6 @@ export default {
     farmos() {
       return { farms: this.farms, plantings: this.farmosTransformedPlantings };
     },
-  },
-  data() {
-    return {
-      rows: this.value,
-      rowToBeDeleted: -1,
-      menus: {}, // object to hold v-models for v-menu
-      farmosTransformedPlantings: [],
-      showEditItemDialog: false,
-      editedIndex: -1,
-      editedItem: null,
-    };
   },
   methods: {
     add() {
@@ -370,15 +371,20 @@ export default {
     },
   },
   async created() {
+    this.isFarmOsLoading = true;
+
     //load farmos field areas
-    if (this.headers.find((header) => header.type === 'farmos_field')) {
-      this.fetchAreas();
+    if (this.headers.some((header) => header.type === 'farmos_field')) {
+      await this.fetchAreas();
     }
+
     // load farmos assets
-    if (this.headers.find((header) => header.type === 'farmos_planting')) {
+    if (this.headers.some((header) => header.type === 'farmos_planting')) {
       await this.fetchAssets();
       this.farmosTransformedPlantings = transform(this.assets);
     }
+
+    this.isFarmOsLoading = false;
   },
 };
 </script>

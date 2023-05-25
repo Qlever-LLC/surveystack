@@ -255,6 +255,7 @@ export const createSurvey = async (control = '', overrides = {}) => {
       'meta.dateModified',
       'meta.dateSubmitted',
       'meta.survey.id',
+      'meta.survey.name',
       'meta.survey.version',
       'meta.revision',
       'meta.permissions',
